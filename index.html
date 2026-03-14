@@ -8,43 +8,29 @@
 <title>釣りマップ</title>
 
 <style>
+/* ===== 基本設定 ===== */
+
+*{
+box-sizing:border-box;
+}
+
+html{
+font-size:16px;
+-webkit-text-size-adjust:100%;
+}
 
 body{
 margin:0;
-font-family:-apple-system,BlinkMacSystemFont;
-background:#f4f7fb;
-text-align:center;
-}
-
-h1{
-margin:20px;
+font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+background:#f5f7fa;
 color:#222;
+overflow-x:hidden;
 }
 
-#map{
-width:95%;
-max-width:900px;
-margin:auto;
-}
 
-svg{
-width:100%;
-height:auto;
-}
+/* ===== ヘッダー ===== */
 
-path{
-fill:#6f8fb8;
-stroke:#ffffff;
-stroke-width:0.7;
-transition:0.2s;
-}
-
-.region-hover path{
-fill:#3f6fa6;
-cursor:pointer;
-}
-
-.header{
+header{
 
 position:sticky;
 top:0;
@@ -53,44 +39,108 @@ display:flex;
 align-items:center;
 justify-content:space-between;
 
-padding:14px 16px;
+padding:10px 12px;
 
 background:#ffffff;
-border-bottom:1px solid #e6e6e6;
+border-bottom:1px solid #e5e5e5;
 
 z-index:1000;
 
 }
 
-.logo a{
-font-size:1.2rem;
-font-weight:700;
-text-decoration:none;
 
-color:#1d1d1f;
+/* ロゴ */
+
+.logo a{
+
+text-decoration:none;
+color:#007aff;
+font-weight:700;
+
+font-size:1.2rem;
 
 }
 
+
+/* ナビ */
+
 .nav{
+
 display:flex;
-gap:20px;
+gap:14px;
 
 }
 
 .nav a{
+
 text-decoration:none;
-font-size:clamp(0.8rem,2vw,0.9rem);
-color:#2a6fb0;
+color:#333;
+
 font-weight:500;
+
+font-size:clamp(0.75rem,2.3vw,0.9rem);
+
+white-space:nowrap;
+
 }
 
-.nav a:hover{
-opacity:0.7;
+
+/* ===== メイン ===== */
+
+main{
+
+padding:12px;
 
 }
 
-html{
-font-size:16px;
+
+/* ===== 地図コンテナ ===== */
+
+.map-container{
+
+width:100%;
+max-width:1000px;
+
+margin:0 auto;
+
+}
+
+
+/* ===== SVG地図 ===== */
+
+svg{
+
+width:100%;
+height:auto;
+
+}
+
+
+/* ===== 地図ホバー ===== */
+
+.region:hover{
+
+opacity:0.8;
+cursor:pointer;
+
+}
+
+
+/* ===== フッター ===== */
+
+footer{
+
+margin-top:30px;
+padding:20px 10px;
+
+background:#ffffff;
+border-top:1px solid #e5e5e5;
+
+text-align:center;
+
+font-size:0.8rem;
+color:#666;
+
 }
 
 </style>
