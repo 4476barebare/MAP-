@@ -35,11 +35,13 @@ BlinkMacSystemFont,
 Arial,
 sans-serif;
 
-background:#fff;
+background:#ffffff;
 color:#222;
+
 overflow-x:hidden;
 
 }
+
 
 /* ======================
 ヘッダー
@@ -47,12 +49,13 @@ overflow-x:hidden;
 
 header{
 
-background:#fff;
+background:#ffffff;
 border-bottom:1px solid #e5e5e5;
 
 }
 
-/* 内部 */
+
+/* ヘッダー内部 */
 
 .header-inner{
 
@@ -63,23 +66,33 @@ display:flex;
 align-items:center;
 justify-content:space-between;
 
-padding:12px 16px;
+padding:10px 12px;
 
 }
 
-/* ロゴ */
+
+/* ======================
+タイトル
+====================== */
 
 .logo{
 
 font-weight:700;
-font-size:1.1rem;
-color:#007aff;
+
+/* 一回り小さく */
+font-size:0.95rem;
+
+/* 地図と同じブルー系 */
+color:#3f6fa5;
 
 white-space:nowrap;
 
 }
 
-/* ナビ */
+
+/* ======================
+ナビ
+====================== */
 
 .nav{
 
@@ -90,6 +103,7 @@ gap:14px;
 
 }
 
+
 /* ナビリンク */
 
 .nav a{
@@ -98,15 +112,16 @@ text-decoration:none;
 
 color:#333;
 
-font-size:0.85rem;
+font-size:0.8rem;
 
 white-space:nowrap;
 
 }
 
 .nav a:hover{
-color:#007aff;
+color:#3f6fa5;
 }
+
 
 /* ======================
 メイン
@@ -116,11 +131,15 @@ main{
 
 max-width:1100px;
 margin:auto;
+
 padding:20px;
 
 }
 
-/* 地図 */
+
+/* ======================
+地図
+====================== */
 
 .map{
 
@@ -137,6 +156,7 @@ height:auto;
 
 }
 
+
 /* ======================
 広告
 ====================== */
@@ -144,11 +164,13 @@ height:auto;
 .ad{
 
 text-align:center;
+
 margin:20px 0;
 
 color:#999;
 
 }
+
 
 /* ======================
 フッター
@@ -173,6 +195,7 @@ border-top:1px solid #e5e5e5;
 </style>
 
 </head>
+
 
 <body>
 
@@ -208,923 +231,7 @@ border-top:1px solid #e5e5e5;
 
 <div class="map">
 
-<img src="japan.svg">
-
-</div>
-
-</main>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<footer>
-
-© 釣り行こナビ
-
-</footer>
-
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣り行こナビ</title>
-
-<style>
-
-/* ======================
-基本設定
-====================== */
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-html{
-font-size:16px;
--webkit-text-size-adjust:100%;
-}
-
-body{
-
-font-family:
--apple-system,
-BlinkMacSystemFont,
-"Helvetica Neue",
-Arial,
-sans-serif;
-
-background:#fff;
-color:#222;
-overflow-x:hidden;
-
-}
-
-/* ======================
-ヘッダー
-====================== */
-
-header{
-
-background:#fff;
-border-bottom:1px solid #e5e5e5;
-
-}
-
-/* 内部 */
-
-.header-inner{
-
-max-width:1100px;
-margin:auto;
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:12px 16px;
-
-}
-
-/* ロゴ */
-
-.logo{
-
-font-weight:700;
-font-size:1.1rem;
-color:#007aff;
-
-white-space:nowrap;
-
-}
-
-/* ナビ */
-
-.nav{
-
-display:flex;
-align-items:center;
-
-gap:14px;
-
-}
-
-/* ナビリンク */
-
-.nav a{
-
-text-decoration:none;
-
-color:#333;
-
-font-size:0.85rem;
-
-white-space:nowrap;
-
-}
-
-.nav a:hover{
-color:#007aff;
-}
-
-/* ======================
-メイン
-====================== */
-
-main{
-
-max-width:1100px;
-margin:auto;
-padding:20px;
-
-}
-
-/* 地図 */
-
-.map{
-
-text-align:center;
-
-}
-
-.map img{
-
-width:100%;
-max-width:900px;
-
-height:auto;
-
-}
-
-/* ======================
-広告
-====================== */
-
-.ad{
-
-text-align:center;
-margin:20px 0;
-
-color:#999;
-
-}
-
-/* ======================
-フッター
-====================== */
-
-footer{
-
-margin-top:40px;
-
-padding:20px;
-
-text-align:center;
-
-font-size:0.8rem;
-
-color:#666;
-
-border-top:1px solid #e5e5e5;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-
-<header>
-
-<div class="header-inner">
-
-<div class="logo">
-釣り行こナビ
-</div>
-
-<nav class="nav">
-
-<a href="#">登録地点</a>
-<a href="#">釣りニュース</a>
-<a href="#">全国地図</a>
-<a href="#">その他</a>
-
-</nav>
-
-</div>
-
-</header>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<main>
-
-<div class="map">
-
-<img src="japan.svg">
-
-</div>
-
-</main>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<footer>
-
-© 釣り行こナビ
-
-</footer>
-
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣り行こナビ</title>
-
-<style>
-
-/* ======================
-基本設定
-====================== */
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-html{
-font-size:16px;
--webkit-text-size-adjust:100%;
-}
-
-body{
-
-font-family:
--apple-system,
-BlinkMacSystemFont,
-"Helvetica Neue",
-Arial,
-sans-serif;
-
-background:#fff;
-color:#222;
-overflow-x:hidden;
-
-}
-
-/* ======================
-ヘッダー
-====================== */
-
-header{
-
-background:#fff;
-border-bottom:1px solid #e5e5e5;
-
-}
-
-/* 内部 */
-
-.header-inner{
-
-max-width:1100px;
-margin:auto;
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:12px 16px;
-
-}
-
-/* ロゴ */
-
-.logo{
-
-font-weight:700;
-font-size:1.1rem;
-color:#007aff;
-
-white-space:nowrap;
-
-}
-
-/* ナビ */
-
-.nav{
-
-display:flex;
-align-items:center;
-
-gap:14px;
-
-}
-
-/* ナビリンク */
-
-.nav a{
-
-text-decoration:none;
-
-color:#333;
-
-font-size:0.85rem;
-
-white-space:nowrap;
-
-}
-
-.nav a:hover{
-color:#007aff;
-}
-
-/* ======================
-メイン
-====================== */
-
-main{
-
-max-width:1100px;
-margin:auto;
-padding:20px;
-
-}
-
-/* 地図 */
-
-.map{
-
-text-align:center;
-
-}
-
-.map img{
-
-width:100%;
-max-width:900px;
-
-height:auto;
-
-}
-
-/* ======================
-広告
-====================== */
-
-.ad{
-
-text-align:center;
-margin:20px 0;
-
-color:#999;
-
-}
-
-/* ======================
-フッター
-====================== */
-
-footer{
-
-margin-top:40px;
-
-padding:20px;
-
-text-align:center;
-
-font-size:0.8rem;
-
-color:#666;
-
-border-top:1px solid #e5e5e5;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-
-<header>
-
-<div class="header-inner">
-
-<div class="logo">
-釣り行こナビ
-</div>
-
-<nav class="nav">
-
-<a href="#">登録地点</a>
-<a href="#">釣りニュース</a>
-<a href="#">全国地図</a>
-<a href="#">その他</a>
-
-</nav>
-
-</div>
-
-</header>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<main>
-
-<div class="map">
-
-<img src="japan.svg">
-
-</div>
-
-</main>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<footer>
-
-© 釣り行こナビ
-
-</footer>
-
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣り行こナビ</title>
-
-<style>
-
-/* ======================
-基本設定
-====================== */
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-html{
-font-size:16px;
--webkit-text-size-adjust:100%;
-}
-
-body{
-
-font-family:
--apple-system,
-BlinkMacSystemFont,
-"Helvetica Neue",
-Arial,
-sans-serif;
-
-background:#fff;
-color:#222;
-overflow-x:hidden;
-
-}
-
-/* ======================
-ヘッダー
-====================== */
-
-header{
-
-background:#fff;
-border-bottom:1px solid #e5e5e5;
-
-}
-
-/* 内部 */
-
-.header-inner{
-
-max-width:1100px;
-margin:auto;
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:12px 16px;
-
-}
-
-/* ロゴ */
-
-.logo{
-
-font-weight:700;
-font-size:1.1rem;
-color:#007aff;
-
-white-space:nowrap;
-
-}
-
-/* ナビ */
-
-.nav{
-
-display:flex;
-align-items:center;
-
-gap:14px;
-
-}
-
-/* ナビリンク */
-
-.nav a{
-
-text-decoration:none;
-
-color:#333;
-
-font-size:0.85rem;
-
-white-space:nowrap;
-
-}
-
-.nav a:hover{
-color:#007aff;
-}
-
-/* ======================
-メイン
-====================== */
-
-main{
-
-max-width:1100px;
-margin:auto;
-padding:20px;
-
-}
-
-/* 地図 */
-
-.map{
-
-text-align:center;
-
-}
-
-.map img{
-
-width:100%;
-max-width:900px;
-
-height:auto;
-
-}
-
-/* ======================
-広告
-====================== */
-
-.ad{
-
-text-align:center;
-margin:20px 0;
-
-color:#999;
-
-}
-
-/* ======================
-フッター
-====================== */
-
-footer{
-
-margin-top:40px;
-
-padding:20px;
-
-text-align:center;
-
-font-size:0.8rem;
-
-color:#666;
-
-border-top:1px solid #e5e5e5;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-
-<header>
-
-<div class="header-inner">
-
-<div class="logo">
-釣り行こナビ
-</div>
-
-<nav class="nav">
-
-<a href="#">登録地点</a>
-<a href="#">釣りニュース</a>
-<a href="#">全国地図</a>
-<a href="#">その他</a>
-
-</nav>
-
-</div>
-
-</header>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<main>
-
-<div class="map">
-
-<img src="japan.svg">
-
-</div>
-
-</main>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<footer>
-
-© 釣り行こナビ
-
-</footer>
-
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣り行こナビ</title>
-
-<style>
-
-/* ======================
-基本設定
-====================== */
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-html{
-font-size:16px;
--webkit-text-size-adjust:100%;
-}
-
-body{
-
-font-family:
--apple-system,
-BlinkMacSystemFont,
-"Helvetica Neue",
-Arial,
-sans-serif;
-
-background:#fff;
-color:#222;
-overflow-x:hidden;
-
-}
-
-/* ======================
-ヘッダー
-====================== */
-
-header{
-
-background:#fff;
-border-bottom:1px solid #e5e5e5;
-
-}
-
-/* 内部 */
-
-.header-inner{
-
-max-width:1100px;
-margin:auto;
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:12px 16px;
-
-}
-
-/* ロゴ */
-
-.logo{
-
-font-weight:700;
-font-size:1.1rem;
-color:#007aff;
-
-white-space:nowrap;
-
-}
-
-/* ナビ */
-
-.nav{
-
-display:flex;
-align-items:center;
-
-gap:14px;
-
-}
-
-/* ナビリンク */
-
-.nav a{
-
-text-decoration:none;
-
-color:#333;
-
-font-size:0.85rem;
-
-white-space:nowrap;
-
-}
-
-.nav a:hover{
-color:#007aff;
-}
-
-/* ======================
-メイン
-====================== */
-
-main{
-
-max-width:1100px;
-margin:auto;
-padding:20px;
-
-}
-
-/* 地図 */
-
-.map{
-
-text-align:center;
-
-}
-
-.map img{
-
-width:100%;
-max-width:900px;
-
-height:auto;
-
-}
-
-/* ======================
-広告
-====================== */
-
-.ad{
-
-text-align:center;
-margin:20px 0;
-
-color:#999;
-
-}
-
-/* ======================
-フッター
-====================== */
-
-footer{
-
-margin-top:40px;
-
-padding:20px;
-
-text-align:center;
-
-font-size:0.8rem;
-
-color:#666;
-
-border-top:1px solid #e5e5e5;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-
-<header>
-
-<div class="header-inner">
-
-<div class="logo">
-釣り行こナビ
-</div>
-
-<nav class="nav">
-
-<a href="#">登録地点</a>
-<a href="#">釣りニュース</a>
-<a href="#">全国地図</a>
-<a href="#">その他</a>
-
-</nav>
-
-</div>
-
-</header>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<main>
-
-<div class="map">
-
-<img src="japan.svg">
+<img src="japan.svg" alt="日本地図">
 
 </div>
 
