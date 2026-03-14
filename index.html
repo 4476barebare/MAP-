@@ -11,404 +11,78 @@
 
 body{
 margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue";
+font-family:-apple-system,BlinkMacSystemFont;
 background:#f4f7fb;
 text-align:center;
 }
 
 h1{
 margin:20px;
-color:#222;
 }
 
-#map{
+.mapWrap{
+position:relative;
 width:95%;
 max-width:900px;
 margin:auto;
 }
 
-#map svg{
+.mapWrap img{
 width:100%;
-height:auto;
 }
 
-#map path{
-fill:#6f8fb8;
-stroke:white;
-stroke-width:0.7;
+.region{
+position:absolute;
 cursor:pointer;
-transition:0.2s;
-}
-
-#map path:hover{
-fill:#3f6fa6;
 }
 
 </style>
 </head>
 
-
 <body>
 
 <h1>釣りマップ</h1>
 
-<div id="map"></div>
+<div class="mapWrap">
+
+<img src="japan.svg">
+
+<!-- 北海道 -->
+<div class="region" style="top:2%;left:55%;width:25%;height:15%;" onclick="go('hokkaido')"></div>
+
+<!-- 東北 -->
+<div class="region" style="top:20%;left:55%;width:18%;height:15%;" onclick="go('tohoku')"></div>
+
+<!-- 北関東 -->
+<div class="region" style="top:35%;left:55%;width:18%;height:12%;" onclick="go('kita-kanto')"></div>
+
+<!-- 関東甲信北陸 -->
+<div class="region" style="top:48%;left:52%;width:22%;height:14%;" onclick="go('kanto')"></div>
+
+<!-- 中部 -->
+<div class="region" style="top:62%;left:50%;width:22%;height:10%;" onclick="go('chubu')"></div>
+
+<!-- 関西 -->
+<div class="region" style="top:72%;left:48%;width:20%;height:10%;" onclick="go('kansai')"></div>
+
+<!-- 中国四国 -->
+<div class="region" style="top:80%;left:40%;width:28%;height:10%;" onclick="go('chugoku')"></div>
+
+<!-- 九州 -->
+<div class="region" style="top:88%;left:30%;width:20%;height:10%;" onclick="go('kyushu')"></div>
+
+<!-- 沖縄 -->
+<div class="region" style="top:95%;left:25%;width:10%;height:5%;" onclick="go('okinawa')"></div>
+
+</div>
 
 <script>
 
-fetch("japan.svg")
-.then(res => res.text())
-.then(svg => {
+function go(region){
 
-document.getElementById("map").innerHTML = svg
+location.href="map.html?region="+region
 
-const prefs = document.querySelectorAll("#map path")
-
-prefs.forEach(pref => {
-
-pref.addEventListener("click", () => {
-
-const id = pref.id
-
-location.href = "map.html?pref=" + id
-
-})
-
-})
-
-})
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣りマップ</title>
-
-<style>
-
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue";
-background:#f4f7fb;
-text-align:center;
 }
-
-h1{
-margin:20px;
-color:#222;
-}
-
-#map{
-width:95%;
-max-width:900px;
-margin:auto;
-}
-
-#map svg{
-width:100%;
-height:auto;
-}
-
-#map path{
-fill:#6f8fb8;
-stroke:white;
-stroke-width:0.7;
-cursor:pointer;
-transition:0.2s;
-}
-
-#map path:hover{
-fill:#3f6fa6;
-}
-
-</style>
-</head>
-
-
-<body>
-
-<h1>釣りマップ</h1>
-
-<div id="map"></div>
-
-<script>
-
-fetch("japan.svg")
-.then(res => res.text())
-.then(svg => {
-
-document.getElementById("map").innerHTML = svg
-
-const prefs = document.querySelectorAll("#map path")
-
-prefs.forEach(pref => {
-
-pref.addEventListener("click", () => {
-
-const id = pref.id
-
-location.href = "map.html?pref=" + id
-
-})
-
-})
-
-})
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣りマップ</title>
-
-<style>
-
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue";
-background:#f4f7fb;
-text-align:center;
-}
-
-h1{
-margin:20px;
-color:#222;
-}
-
-#map{
-width:95%;
-max-width:900px;
-margin:auto;
-}
-
-#map svg{
-width:100%;
-height:auto;
-}
-
-#map path{
-fill:#6f8fb8;
-stroke:white;
-stroke-width:0.7;
-cursor:pointer;
-transition:0.2s;
-}
-
-#map path:hover{
-fill:#3f6fa6;
-}
-
-</style>
-</head>
-
-
-<body>
-
-<h1>釣りマップ</h1>
-
-<div id="map"></div>
-
-<script>
-
-fetch("japan.svg")
-.then(res => res.text())
-.then(svg => {
-
-document.getElementById("map").innerHTML = svg
-
-const prefs = document.querySelectorAll("#map path")
-
-prefs.forEach(pref => {
-
-pref.addEventListener("click", () => {
-
-const id = pref.id
-
-location.href = "map.html?pref=" + id
-
-})
-
-})
-
-})
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣りマップ</title>
-
-<style>
-
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue";
-background:#f4f7fb;
-text-align:center;
-}
-
-h1{
-margin:20px;
-color:#222;
-}
-
-#map{
-width:95%;
-max-width:900px;
-margin:auto;
-}
-
-#map svg{
-width:100%;
-height:auto;
-}
-
-#map path{
-fill:#6f8fb8;
-stroke:white;
-stroke-width:0.7;
-cursor:pointer;
-transition:0.2s;
-}
-
-#map path:hover{
-fill:#3f6fa6;
-}
-
-</style>
-</head>
-
-
-<body>
-
-<h1>釣りマップ</h1>
-
-<div id="map"></div>
-
-<script>
-
-fetch("japan.svg")
-.then(res => res.text())
-.then(svg => {
-
-document.getElementById("map").innerHTML = svg
-
-const prefs = document.querySelectorAll("#map path")
-
-prefs.forEach(pref => {
-
-pref.addEventListener("click", () => {
-
-const id = pref.id
-
-location.href = "map.html?pref=" + id
-
-})
-
-})
-
-})
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣りマップ</title>
-
-<style>
-
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue";
-background:#f4f7fb;
-text-align:center;
-}
-
-h1{
-margin:20px;
-color:#222;
-}
-
-#map{
-width:95%;
-max-width:900px;
-margin:auto;
-}
-
-#map svg{
-width:100%;
-height:auto;
-}
-
-#map path{
-fill:#6f8fb8;
-stroke:white;
-stroke-width:0.7;
-cursor:pointer;
-transition:0.2s;
-}
-
-#map path:hover{
-fill:#3f6fa6;
-}
-
-</style>
-</head>
-
-
-<body>
-
-<h1>釣りマップ</h1>
-
-<div id="map"></div>
-
-<script>
-
-fetch("japan.svg")
-.then(res => res.text())
-.then(svg => {
-
-document.getElementById("map").innerHTML = svg
-
-const prefs = document.querySelectorAll("#map path")
-
-prefs.forEach(pref => {
-
-pref.addEventListener("click", () => {
-
-const id = pref.id
-
-location.href = "map.html?pref=" + id
-
-})
-
-})
-
-})
 
 </script>
 
