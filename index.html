@@ -193,63 +193,126 @@ document.getElementById("map").innerHTML=svg
 const regions={
 
 hokkaido:["JP01"],
-
 tohoku:["JP02","JP03","JP04","JP05"],
-
 kitaKanto:["JP07","JP08","JP09","JP12"],
-
-kantoHokuriku:["JP10","JP11","JP13","JP14","JP15","JP16","JP17","JP19"],
-
+kanto:["JP10","JP11","JP13","JP14","JP15","JP16","JP17","JP19"],
 chubu:["JP20","JP21","JP22","JP23"],
-
 kansai:["JP18","JP24","JP25","JP26","JP27","JP29","JP30"],
-
-chugokuShikoku:[
-"JP28","JP31","JP32","JP33","JP34",
-"JP35","JP36","JP37","JP38","JP39"
-],
-
+chugokuShikoku:["JP28","JP31","JP32","JP33","JP34","JP35","JP36","JP37","JP38","JP39"],
 kyushu:["JP40","JP41","JP42","JP43","JP45","JP46"],
-
 okinawa:["JP47"]
 
 }
 
+const svgEl=document.querySelector("#map svg")
+
 for(const region in regions){
+
+const g=document.createElementNS("http://www.w3.org/2000/svg","g")
+g.setAttribute("class","region")
+g.setAttribute("data-region",region)
 
 regions[region].forEach(pref=>{
 
 const el=document.getElementById(pref)
-
-if(!el) return
-
-el.addEventListener("mouseover",()=>{
-
-regions[region].forEach(p=>{
-const e=document.getElementById(p)
-if(e) e.classList.add("region-hover")
-})
+if(el) g.appendChild(el)
 
 })
 
-el.addEventListener("mouseout",()=>{
-
-regions[region].forEach(p=>{
-const e=document.getElementById(p)
-if(e) e.classList.remove("region-hover")
-})
-
-})
-
-el.addEventListener("click",()=>{
-
-location.href="map.html?region="+region
-
-})
-
-})
+svgEl.appendChild(g)
 
 }
+
+document.querySelectorAll(".region").forEach(region=>{
+
+region.addEventListener("mouseenter",()=>{
+
+region.querySelectorAll("path").forEach(p=>{
+p.style.fill="#3f6fa6"
+})
+
+})
+
+region.addEventListener("mouseleave",()=>{
+
+region.querySelectorAll("path").forEach(p=>{
+p.style.fill="#6f8fb8"
+})
+
+})
+
+region.addEventListener("click",()=>{
+
+location.href="map.html?region="+region.dataset.region
+
+})
+
+})
+
+})fetch("japan.svg")
+.then(res=>res.text())
+.then(svg=>{
+
+document.getElementById("map").innerHTML=svg
+
+const regions={
+
+hokkaido:["JP01"],
+tohoku:["JP02","JP03","JP04","JP05"],
+kitaKanto:["JP07","JP08","JP09","JP12"],
+kanto:["JP10","JP11","JP13","JP14","JP15","JP16","JP17","JP19"],
+chubu:["JP20","JP21","JP22","JP23"],
+kansai:["JP18","JP24","JP25","JP26","JP27","JP29","JP30"],
+chugokuShikoku:["JP28","JP31","JP32","JP33","JP34","JP35","JP36","JP37","JP38","JP39"],
+kyushu:["JP40","JP41","JP42","JP43","JP45","JP46"],
+okinawa:["JP47"]
+
+}
+
+const svgEl=document.querySelector("#map svg")
+
+for(const region in regions){
+
+const g=document.createElementNS("http://www.w3.org/2000/svg","g")
+g.setAttribute("class","region")
+g.setAttribute("data-region",region)
+
+regions[region].forEach(pref=>{
+
+const el=document.getElementById(pref)
+if(el) g.appendChild(el)
+
+})
+
+svgEl.appendChild(g)
+
+}
+
+document.querySelectorAll(".region").forEach(region=>{
+
+region.addEventListener("mouseenter",()=>{
+
+region.querySelectorAll("path").forEach(p=>{
+p.style.fill="#3f6fa6"
+})
+
+})
+
+region.addEventListener("mouseleave",()=>{
+
+region.querySelectorAll("path").forEach(p=>{
+p.style.fill="#6f8fb8"
+})
+
+})
+
+region.addEventListener("click",()=>{
+
+location.href="map.html?region="+region.dataset.region
+
+})
+
+})
 
 })
 
