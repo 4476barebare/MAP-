@@ -4,105 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣りマップ</title>
-<style>
-body {
-  font-family: -apple-system, sans-serif;
-  background-color: #F2F7FF;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-}
-h1 {
-  color: #1D1D1F;
-  margin: 20px 0;
-}
-img {
-  max-width: 95%;
-  height: auto;
-  cursor: pointer;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <h1>釣りマップ</h1>
 
-<!-- SVGを直接埋め込む -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200">
+<!-- 外部SVG読み込み -->
+<object type="image/svg+xml" data="japan.svg" width="100%" height="auto" id="japan-map"></object>
 
-<style>
-.region{
- fill:#5B7FA6;
- stroke:white;
- stroke-width:2;
- cursor:pointer;
-}
-.region:hover{
- fill:#4A6E91;
-}
-text{
- font-family: sans-serif;
- font-size: 20px;
- fill: #1D1D1F;
- pointer-events: none;
-}
-</style>
-
-<!-- 北海道 -->
-<g id="hokkaido" class="region" onclick="location.href='hokkaido.html'">
-  <path d="M500,100 L550,150 L520,200 L480,200 L450,150 Z"/>
-  <text x="490" y="160">北海道</text>
-</g>
-
-<!-- 東北 -->
-<g id="tohoku" class="region" onclick="location.href='tohoku.html'">
-  <path d="M500,220 L550,270 L520,320 L480,320 L450,270 Z"/>
-  <text x="480" y="270">青森秋田岩手宮城</text>
-</g>
-
-<!-- 福島茨城千葉栃木 -->
-<g id="south-tohoku" class="region" onclick="location.href='south-tohoku.html'">
-  <path d="M500,340 L550,390 L520,440 L480,440 L450,390 Z"/>
-  <text x="470" y="390">福島茨城千葉栃木</text>
-</g>
-
-<!-- 関東・中部北部 -->
-<g id="kanto-chubu" class="region" onclick="location.href='kanto-chubu.html'">
-  <path d="M400,460 L600,460 L580,520 L420,520 Z"/>
-  <text x="430" y="490">新潟富山石川群馬東京埼玉神奈川山梨</text>
-</g>
-
-<!-- 中部南部 -->
-<g id="chubu-south" class="region" onclick="location.href='chubu-south.html'">
-  <path d="M420,540 L580,540 L560,600 L440,600 Z"/>
-  <text x="450" y="570">静岡長野岐阜愛知</text>
-</g>
-
-<!-- 関西 -->
-<g id="kansai" class="region" onclick="location.href='kansai.html'">
-  <path d="M380,620 L580,620 L560,680 L400,680 Z"/>
-  <text x="420" y="650">福井滋賀京都三重奈良和歌山大阪</text>
-</g>
-
-<!-- 中国・四国 -->
-<g id="chugoku-shikoku" class="region" onclick="location.href='chugoku-shikoku.html'">
-  <path d="M300,700 L580,700 L560,800 L320,800 Z"/>
-  <text x="350" y="750">兵庫岡山鳥取広島島根山口愛媛高知香川徳島</text>
-</g>
-
-<!-- 九州 -->
-<g id="kyushu" class="region" onclick="location.href='kyushu.html'">
-  <path d="M300,820 L500,820 L480,920 L320,920 Z"/>
-  <text x="350" y="870">福岡佐賀長崎熊本宮崎鹿児島</text>
-</g>
-
-<!-- 沖縄 -->
-<g id="okinawa" class="region" onclick="location.href='okinawa.html'">
-  <path d="M400,950 L450,950 L450,1000 L400,1000 Z"/>
-  <text x="405" y="975">沖縄</text>
-</g>
-
-</svg>
-
+<script src="script.js"></script>
 </body>
 </html>
