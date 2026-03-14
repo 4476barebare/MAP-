@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>釣りマップ</title>
 
@@ -18,21 +18,29 @@ text-align:center;
 
 h1{
 margin:20px;
+color:#222;
 }
 
-.mapWrap{
-position:relative;
+#map{
 width:95%;
 max-width:900px;
 margin:auto;
 }
 
-.mapWrap img{
+svg{
 width:100%;
+height:auto;
 }
 
-.region{
-position:absolute;
+path{
+fill:#6f8fb8;
+stroke:#ffffff;
+stroke-width:0.7;
+transition:0.2s;
+}
+
+.region-hover path{
+fill:#3f6fa6;
 cursor:pointer;
 }
 
@@ -43,46 +51,207 @@ cursor:pointer;
 
 <h1>釣りマップ</h1>
 
-<div class="mapWrap">
-
-<img src="japan.svg">
-
-<!-- 北海道 -->
-<div class="region" style="top:2%;left:55%;width:25%;height:15%;" onclick="go('hokkaido')"></div>
-
-<!-- 東北 -->
-<div class="region" style="top:20%;left:55%;width:18%;height:15%;" onclick="go('tohoku')"></div>
-
-<!-- 北関東 -->
-<div class="region" style="top:35%;left:55%;width:18%;height:12%;" onclick="go('kita-kanto')"></div>
-
-<!-- 関東甲信北陸 -->
-<div class="region" style="top:48%;left:52%;width:22%;height:14%;" onclick="go('kanto')"></div>
-
-<!-- 中部 -->
-<div class="region" style="top:62%;left:50%;width:22%;height:10%;" onclick="go('chubu')"></div>
-
-<!-- 関西 -->
-<div class="region" style="top:72%;left:48%;width:20%;height:10%;" onclick="go('kansai')"></div>
-
-<!-- 中国四国 -->
-<div class="region" style="top:80%;left:40%;width:28%;height:10%;" onclick="go('chugoku')"></div>
-
-<!-- 九州 -->
-<div class="region" style="top:88%;left:30%;width:20%;height:10%;" onclick="go('kyushu')"></div>
-
-<!-- 沖縄 -->
-<div class="region" style="top:95%;left:25%;width:10%;height:5%;" onclick="go('okinawa')"></div>
-
-</div>
+<div id="map"></div>
 
 <script>
 
-function go(region){
+fetch("japan.svg")
+.then(res=>res.text())
+.then(svg=>{
+
+document.getElementById("map").innerHTML=svg
+
+const regions={
+
+hokkaido:["JP01"],
+
+tohoku:["JP02","JP03","JP04","JP05"],
+
+kitaKanto:["JP07","JP08","JP09","JP12"],
+
+kantoHokuriku:["JP10","JP11","JP13","JP14","JP15","JP16","JP17","JP19"],
+
+chubu:["JP20","JP21","JP22","JP23"],
+
+kansai:["JP18","JP24","JP25","JP26","JP27","JP29","JP30"],
+
+chugokuShikoku:[
+"JP28","JP31","JP32","JP33","JP34",
+"JP35","JP36","JP37","JP38","JP39"
+],
+
+kyushu:["JP40","JP41","JP42","JP43","JP45","JP46"],
+
+okinawa:["JP47"]
+
+}
+
+for(const region in regions){
+
+regions[region].forEach(pref=>{
+
+const el=document.getElementById(pref)
+
+if(!el) return
+
+el.addEventListener("mouseover",()=>{
+
+regions[region].forEach(p=>{
+const e=document.getElementById(p)
+if(e) e.classList.add("region-hover")
+})
+
+})
+
+el.addEventListener("mouseout",()=>{
+
+regions[region].forEach(p=>{
+const e=document.getElementById(p)
+if(e) e.classList.remove("region-hover")
+})
+
+})
+
+el.addEventListener("click",()=>{
 
 location.href="map.html?region="+region
 
+})
+
+})
+
 }
+
+})
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>釣りマップ</title>
+
+<style>
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont;
+background:#f4f7fb;
+text-align:center;
+}
+
+h1{
+margin:20px;
+color:#222;
+}
+
+#map{
+width:95%;
+max-width:900px;
+margin:auto;
+}
+
+svg{
+width:100%;
+height:auto;
+}
+
+path{
+fill:#6f8fb8;
+stroke:#ffffff;
+stroke-width:0.7;
+transition:0.2s;
+}
+
+.region-hover path{
+fill:#3f6fa6;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>釣りマップ</h1>
+
+<div id="map"></div>
+
+<script>
+
+fetch("japan.svg")
+.then(res=>res.text())
+.then(svg=>{
+
+document.getElementById("map").innerHTML=svg
+
+const regions={
+
+hokkaido:["JP01"],
+
+tohoku:["JP02","JP03","JP04","JP05"],
+
+kitaKanto:["JP07","JP08","JP09","JP12"],
+
+kantoHokuriku:["JP10","JP11","JP13","JP14","JP15","JP16","JP17","JP19"],
+
+chubu:["JP20","JP21","JP22","JP23"],
+
+kansai:["JP18","JP24","JP25","JP26","JP27","JP29","JP30"],
+
+chugokuShikoku:[
+"JP28","JP31","JP32","JP33","JP34",
+"JP35","JP36","JP37","JP38","JP39"
+],
+
+kyushu:["JP40","JP41","JP42","JP43","JP45","JP46"],
+
+okinawa:["JP47"]
+
+}
+
+for(const region in regions){
+
+regions[region].forEach(pref=>{
+
+const el=document.getElementById(pref)
+
+if(!el) return
+
+el.addEventListener("mouseover",()=>{
+
+regions[region].forEach(p=>{
+const e=document.getElementById(p)
+if(e) e.classList.add("region-hover")
+})
+
+})
+
+el.addEventListener("mouseout",()=>{
+
+regions[region].forEach(p=>{
+const e=document.getElementById(p)
+if(e) e.classList.remove("region-hover")
+})
+
+})
+
+el.addEventListener("click",()=>{
+
+location.href="map.html?region="+region
+
+})
+
+})
+
+}
+
+})
 
 </script>
 
