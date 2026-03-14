@@ -44,12 +44,78 @@ fill:#3f6fa6;
 cursor:pointer;
 }
 
+.header{
+
+position:sticky;
+top:0;
+
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+padding:14px 16px;
+
+background:#ffffff;
+border-bottom:1px solid #e6e6e6;
+
+z-index:1000;
+
+}
+
+.logo a{
+
+font-size:18px;
+font-weight:700;
+text-decoration:none;
+
+color:#1d1d1f;
+
+}
+
+.nav{
+
+display:flex;
+gap:20px;
+
+}
+
+.nav a{
+
+text-decoration:none;
+font-size:14px;
+
+color:#2a6fb0;
+font-weight:500;
+
+}
+
+.nav a:hover{
+
+opacity:0.7;
+
+}
+
 </style>
 </head>
 
 <body>
 
-<h1>釣りマップ</h1>
+<header class="header">
+
+<div class="logo">
+<a href="/">釣り行こナビ</a>
+</div>
+
+<nav class="nav">
+
+<a href="#">登録地点</a>
+<a href="#">釣りニュース</a>
+<a href="#">全国地図</a>
+<a href="#">その他</a>
+
+</nav>
+
+</header>
 
 <div id="map"></div>
 
