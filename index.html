@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -25,7 +26,6 @@ margin:0;
 font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
 background:#f5f7fa;
 color:#222;
-overflow-x:hidden;
 }
 
 
@@ -45,19 +45,22 @@ padding:10px 14px;
 background:#ffffff;
 border-bottom:1px solid #e5e5e5;
 
-z-index:1000;
-
 }
+
+
+/ ロゴ /
 
 .logo a{
 
 text-decoration:none;
 color:#007aff;
-
 font-weight:700;
 font-size:1.2rem;
 
 }
+
+
+/ ナビ /
 
 .nav{
 
@@ -70,11 +73,8 @@ gap:14px;
 
 text-decoration:none;
 color:#333;
-
 font-weight:500;
-font-size:clamp(0.75rem,2.3vw,0.9rem);
-
-white-space:nowrap;
+font-size:0.9rem;
 
 }
 
@@ -83,58 +83,25 @@ white-space:nowrap;
 
 main{
 
-height:calc(100svh - 60px);
-
-display:flex;
-justify-content:center;
-align-items:center;
+padding:20px;
 
 }
 
 
-/ ===== 地図コンテナ ===== /
+/ ===== 地図 ===== /
 
 .map-container{
 
-width:100%;
-height:100%;
-
-display:flex;
-justify-content:center;
-align-items:center;
-
-padding:10px;
+max-width:900px;
+margin:auto;
 
 }
 
-
-/ ===== 日本地図 ===== /
-
-object{
+.map-container object{
 
 width:100%;
-height:100%;
-
-/ 中央基準で拡大 /
-
-transform:scale(1.25);
-transform-origin:center;
-
-}
-
-
-/ ===== 地図ホバー ===== /
-
-.region{
-
-transition:0.2s;
-
-}
-
-.region:hover{
-
-opacity:0.8;
-cursor:pointer;
+height:auto;
+display:block;
 
 }
 
@@ -186,7 +153,7 @@ color:#666;
 
 <div class="map-container">
 
-<object id="japanMap" type="image/svg+xml" data="japan.svg"></object>
+<object type="image/svg+xml" data="japan.svg"></object>
 
 </div>
 
@@ -199,32 +166,6 @@ color:#666;
 © 2026 釣り行こナビ
 
 </footer>
-
-
-
-<script>
-
-document.getElementById("japanMap").addEventListener("load", function(){
-
-const svgDoc = this.contentDocument;
-
-const regions = svgDoc.querySelectorAll(".region");
-
-regions.forEach(region => {
-
-region.addEventListener("click", function(){
-
-const name = this.id;
-
-location.href = "map.html?region=" + name;
-
-});
-
-});
-
-});
-
-</script>
 
 
 </body>
