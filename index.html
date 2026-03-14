@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/mapdata/countries/jp/jp-all.js"></script>
+
+<style>
+#container{
+height:600px;
+max-width:900px;
+margin:auto;
+}
+</style>
+
+</head>
+
+<body>
+
+<h2 style="text-align:center">日本釣りマップ</h2>
+<div id="container"></div>
+
+<script>
+
+var data = [
+['jp-hk', 1], // 北海道
+['jp-a', 1],  // 青森
+['jp-iw', 1],
+['jp-my', 1],
+['jp-ak', 1],
+['jp-yt', 1],
+['jp-fk', 1],
+['jp-ib', 1],
+['jp-tc', 1],
+['jp-gm', 1],
+['jp-st', 1],
+['jp-ch', 1],
+['jp-tk', 1],
+['jp-kn', 1]
+];
+
+Highcharts.mapChart('container', {
+
+chart: {
+map: 'countries/jp/jp-all'
+},
+
+title: {
+text: '日本の釣りエリア'
+},
+
+mapNavigation: {
+enabled: true
+},
+
+colorAxis: {
+min: 0
+},
+
+series: [{
+data: data,
+name: 'Japan',
+states: {
+hover: {
+color: '#4da3ff'
+}
+},
+
+dataLabels: {
+enabled: true,
+format: '{point.name}'
+},
+
+point: {
+events: {
+click: function () {
+
+var pref = this.properties['hc-key'];
+
+location.href = "/prefecture/" + pref;
+
+}
+}
+}
+
+}]
+
+});
+
+</script>
+
+</body>
+</html>
