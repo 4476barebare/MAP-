@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -43,7 +44,7 @@ overflow-x:hidden;
 
 
 /* ======================
-ヘッダー
+ヘッダー（触らない）
 ====================== */
 
 header{
@@ -66,17 +67,9 @@ padding:10px 12px;
 
 }
 
-
-/* ======================
-タイトル
-====================== */
-
 .logo{
 
 font-weight:700;
-
-/* ナビと同じサイズ */
-
 font-size:0.8rem;
 
 color:#3f6fa5;
@@ -84,11 +77,6 @@ color:#3f6fa5;
 white-space:nowrap;
 
 }
-
-
-/* ======================
-ナビ
-====================== */
 
 .nav{
 
@@ -140,20 +128,28 @@ text-align:center;
 
 }
 
-.map img{
+/* 地図本体 */
+
+.japan-map{
 
 width:100%;
 max-width:900px;
 
-height:auto;
+height:520px;
 
-/* 地図ブルー化 */
+margin:auto;
 
-filter:
+/* タイトルと同じ色 */
 
-hue-rotate(190deg)
-saturate(2)
-brightness(0.9);
+background:#3f6fa5;
+
+/* SVGを形として使用 */
+
+mask:url("japan.svg") no-repeat center;
+mask-size:contain;
+
+-webkit-mask:url("japan.svg") no-repeat center;
+-webkit-mask-size:contain;
 
 }
 
@@ -230,7 +226,7 @@ border-top:1px solid #e5e5e5;
 
 <div class="map">
 
-<img src="japan.svg" alt="日本地図">
+<div class="japan-map"></div>
 
 </div>
 
