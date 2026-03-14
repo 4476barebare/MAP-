@@ -1,0 +1,19 @@
+body {
+    font-family: -apple-system, sans-serif;
+    margin: 0;
+    text-align: center;
+    background: #F2F7FF;
+}
+h1 {
+    color: #1D1D1F;
+    margin: 20px 0;
+}
+.region {
+    fill: #5B7FA6;
+    stroke: white;
+    stroke-width: 1.5;
+    cursor: pointer;
+}
+.region:hover {
+    fill: #4A6E91;
+}
