@@ -3,146 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>日本釣りマップ</title>
-
+<title>釣りマップ</title>
 <style>
-
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial;
-background:#ffffff;
-color:#1d1d1f;
+body {
+  font-family: -apple-system, sans-serif;
+  background-color: #F2F7FF;
+  text-align: center;
+  margin: 0;
+  padding: 0;
 }
-
-header{
-text-align:center;
-padding:40px 20px;
-font-size:32px;
-font-weight:600;
+h1 {
+  color: #1D1D1F;
+  margin: 20px 0;
 }
-
-.subtitle{
-text-align:center;
-color:#6e6e73;
-margin-top:-10px;
-margin-bottom:40px;
+img {
+  max-width: 95%;
+  height: auto;
+  cursor: pointer;
 }
-
-.container{
-max-width:1100px;
-margin:auto;
-padding:20px;
-}
-
-.map-card{
-background:#f5f7fb;
-border-radius:20px;
-padding:30px;
-text-align:center;
-box-shadow:0 4px 20px rgba(0,0,0,0.05);
-}
-
-.map-card img{
-width:100%;
-max-width:700px;
-cursor:pointer;
-}
-
-.ad{
-margin:40px 0;
-padding:30px;
-background:#f2f2f2;
-text-align:center;
-border-radius:12px;
-color:#999;
-font-size:14px;
-}
-
-.features{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:20px;
-margin-top:40px;
-}
-
-.feature{
-background:#f8f9fb;
-padding:25px;
-border-radius:16px;
-text-align:center;
-}
-
-.feature h3{
-margin:10px 0;
-font-size:18px;
-color:#0A84FF;
-}
-
-footer{
-text-align:center;
-margin:60px 0;
-color:#6e6e73;
-font-size:14px;
-}
-
 </style>
-
 </head>
-
 <body>
 
-<header>
-日本釣りマップ
-</header>
+<h1>釣りマップ</h1>
 
-<div class="subtitle">
-釣り場・トイレ・コンビニ・釣具店を探す
-</div>
+<!-- SVGを直接埋め込む -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1200">
 
-<div class="container">
+<style>
+.region{
+ fill:#5B7FA6;
+ stroke:white;
+ stroke-width:2;
+ cursor:pointer;
+}
+.region:hover{
+ fill:#4A6E91;
+}
+text{
+ font-family: sans-serif;
+ font-size: 20px;
+ fill: #1D1D1F;
+ pointer-events: none;
+}
+</style>
 
-<div class="map-card">
+<!-- 北海道 -->
+<g id="hokkaido" class="region" onclick="location.href='hokkaido.html'">
+  <path d="M500,100 L550,150 L520,200 L480,200 L450,150 Z"/>
+  <text x="490" y="160">北海道</text>
+</g>
 
-<p>地域を選択してください</p>
+<!-- 東北 -->
+<g id="tohoku" class="region" onclick="location.href='tohoku.html'">
+  <path d="M500,220 L550,270 L520,320 L480,320 L450,270 Z"/>
+  <text x="480" y="270">青森秋田岩手宮城</text>
+</g>
 
-<img src="japan.svg" onclick="location.href='region.html'">
+<!-- 福島茨城千葉栃木 -->
+<g id="south-tohoku" class="region" onclick="location.href='south-tohoku.html'">
+  <path d="M500,340 L550,390 L520,440 L480,440 L450,390 Z"/>
+  <text x="470" y="390">福島茨城千葉栃木</text>
+</g>
 
-</div>
+<!-- 関東・中部北部 -->
+<g id="kanto-chubu" class="region" onclick="location.href='kanto-chubu.html'">
+  <path d="M400,460 L600,460 L580,520 L420,520 Z"/>
+  <text x="430" y="490">新潟富山石川群馬東京埼玉神奈川山梨</text>
+</g>
 
-<div class="ad">
-広告スペース
-</div>
+<!-- 中部南部 -->
+<g id="chubu-south" class="region" onclick="location.href='chubu-south.html'">
+  <path d="M420,540 L580,540 L560,600 L440,600 Z"/>
+  <text x="450" y="570">静岡長野岐阜愛知</text>
+</g>
 
-<div class="features">
+<!-- 関西 -->
+<g id="kansai" class="region" onclick="location.href='kansai.html'">
+  <path d="M380,620 L580,620 L560,680 L400,680 Z"/>
+  <text x="420" y="650">福井滋賀京都三重奈良和歌山大阪</text>
+</g>
 
-<div class="feature">
-<h3>🎣 釣り場</h3>
-<p>堤防・サーフ・港などの釣りポイント</p>
-</div>
+<!-- 中国・四国 -->
+<g id="chugoku-shikoku" class="region" onclick="location.href='chugoku-shikoku.html'">
+  <path d="M300,700 L580,700 L560,800 L320,800 Z"/>
+  <text x="350" y="750">兵庫岡山鳥取広島島根山口愛媛高知香川徳島</text>
+</g>
 
-<div class="feature">
-<h3>🚻 トイレ</h3>
-<p>近くの公衆トイレを表示</p>
-</div>
+<!-- 九州 -->
+<g id="kyushu" class="region" onclick="location.href='kyushu.html'">
+  <path d="M300,820 L500,820 L480,920 L320,920 Z"/>
+  <text x="350" y="870">福岡佐賀長崎熊本宮崎鹿児島</text>
+</g>
 
-<div class="feature">
-<h3>🏪 コンビニ</h3>
-<p>食料や氷を買える場所</p>
-</div>
+<!-- 沖縄 -->
+<g id="okinawa" class="region" onclick="location.href='okinawa.html'">
+  <path d="M400,950 L450,950 L450,1000 L400,1000 Z"/>
+  <text x="405" y="975">沖縄</text>
+</g>
 
-<div class="feature">
-<h3>🎣🏬 釣具店</h3>
-<p>近くの釣具店</p>
-</div>
-
-</div>
-
-</div>
-
-<footer>
-© 日本釣りマップ
-</footer>
+</svg>
 
 </body>
 </html>
