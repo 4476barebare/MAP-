@@ -1,147 +1,220 @@
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>釣り行こナビ</title>
 
 <style>
 
-/* ===== 基本設定 ===== */
+/* =========================
+基本リセット
+========================= */
 
-{
+*{
 box-sizing:border-box;
+margin:0;
+padding:0;
 }
+
+
+/* =========================
+HTML基本設定
+========================= */
 
 html{
+
 font-size:16px;
+
 -webkit-text-size-adjust:100%;
+
 }
+
+
+/* =========================
+body
+========================= */
 
 body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-background:#f5f7fa;
+
+font-family:
+-apple-system,
+BlinkMacSystemFont,
+"Helvetica Neue",
+Arial,
+sans-serif;
+
+line-height:1.5;
+
 color:#222;
+
+background:#ffffff;
+
 overflow-x:hidden;
+
 }
 
 
-/ ===== ヘッダー ===== /
+/* =========================
+ヘッダー
+========================= */
 
 header{
 
-position:sticky;
-top:0;
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:10px 12px;
-
 background:#ffffff;
+
 border-bottom:1px solid #e5e5e5;
+
+position:sticky;
+
+top:0;
 
 z-index:1000;
 
 }
 
 
-/ ロゴ /
+/* ヘッダー内部 */
+
+.header-inner{
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:12px 16px;
+
+max-width:1100px;
+
+margin:auto;
+
+}
+
+
+/* ロゴ */
 
 .logo a{
 
 text-decoration:none;
-color:#007aff;
+
 font-weight:700;
 
 font-size:1.2rem;
 
+color:#007aff;
+
 }
 
 
-/ ナビ /
+/* ナビ */
 
 .nav{
 
 display:flex;
-gap:14px;
+
+gap:18px;
 
 }
+
+
+/* ナビリンク */
 
 .nav a{
 
 text-decoration:none;
+
 color:#333;
 
-font-weight:500;
-
-font-size:clamp(0.75rem,2.3vw,0.9rem);
+font-size:clamp(0.8rem,2vw,0.9rem);
 
 white-space:nowrap;
 
 }
 
 
-/ ===== メイン ===== /
+.nav a:hover{
 
-main{
-
-padding:12px;
+color:#007aff;
 
 }
 
 
-/ ===== 地図コンテナ ===== /
+/* =========================
+メイン
+========================= */
+
+main{
+
+max-width:1100px;
+
+margin:auto;
+
+padding:20px;
+
+}
+
+
+/* =========================
+地図
+========================= */
 
 .map-container{
 
 width:100%;
-max-width:1000px;
 
-margin:0 auto;
+text-align:center;
 
 }
 
 
-/ ===== SVG地図 ===== /
-
-svg{
+.map-container img{
 
 width:100%;
+
+max-width:900px;
+
 height:auto;
 
 }
 
 
-/ ===== 地図ホバー ===== /
+/* =========================
+広告
+========================= */
 
-.region:hover{
+.ad{
 
-opacity:0.8;
-cursor:pointer;
+margin:20px auto;
+
+text-align:center;
 
 }
 
 
-/ ===== フッター ===== */
+/* =========================
+フッター
+========================= */
 
 footer{
 
-margin-top:30px;
-padding:20px 10px;
+margin-top:40px;
 
-background:#ffffff;
-border-top:1px solid #e5e5e5;
+padding:20px;
 
 text-align:center;
 
 font-size:0.8rem;
+
 color:#666;
+
+border-top:1px solid #e5e5e5;
 
 }
 
@@ -149,70 +222,87 @@ color:#666;
 
 </head>
 
+
 <body>
 
 
+<!-- =========================
+ヘッダー
+========================= -->
+
 <header>
+
+<div class="header-inner">
 
 <div class="logo">
 <a href="#">釣り行こナビ</a>
 </div>
 
 <nav class="nav">
+
 <a href="#">登録地点</a>
+
 <a href="#">釣りニュース</a>
+
 <a href="#">全国地図</a>
+
 <a href="#">その他</a>
+
 </nav>
+
+</div>
 
 </header>
 
 
+<!-- =========================
+広告
+========================= -->
+
+<div class="ad">
+
+広告スペース
+
+</div>
+
+
+<!-- =========================
+メイン
+========================= -->
 
 <main>
 
 <div class="map-container">
 
-<object id="japanMap" type="image/svg+xml" data="japan.svg"></object>
+<img src="japan.svg" alt="日本地図">
 
 </div>
 
 </main>
 
 
+<!-- =========================
+広告
+========================= -->
+
+<div class="ad">
+
+広告スペース
+
+</div>
+
+
+<!-- =========================
+フッター
+========================= -->
 
 <footer>
 
-© 2026 釣り行こナビ
+© 釣り行こナビ
 
 </footer>
 
 
-
-<script>
-
-document.getElementById("japanMap").addEventListener("load", function(){
-
-const svgDoc = this.contentDocument;
-
-const regions = svgDoc.querySelectorAll(".region");
-
-regions.forEach(region => {
-
-region.addEventListener("click", function(){
-
-const name = this.id;
-
-location.href = "map.html?region=" + name;
-
-});
-
-});
-
-});
-
-</script>
-
-
 </body>
+
 </html>
