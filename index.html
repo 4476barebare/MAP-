@@ -3,16 +3,323 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>釣りマップ</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont;
+background:#f5f7fb;
+text-align:center;
+}
+
+h1{
+margin:20px;
+}
+
+#map{
+width:95%;
+max-width:900px;
+margin:auto;
+}
+
+svg{
+width:100%;
+height:auto;
+}
+
+path{
+fill:#6f8fb8;
+stroke:#ffffff;
+stroke-width:0.5;
+cursor:pointer;
+transition:0.2s;
+}
+
+path:hover{
+fill:#3d6fa8;
+}
+
+</style>
 </head>
+
 <body>
 
 <h1>釣りマップ</h1>
 
-<!-- 外部SVG読み込み -->
-<object type="image/svg+xml" data="japan.svg" width="100%" height="auto" id="japan-map"></object>
+<div id="map"></div>
 
-<script src="script.js"></script>
+<script>
+
+const svgURL =
+"https://raw.githubusercontent.com/geolonia/japanese-prefectures/master/japan.svg"
+
+fetch(svgURL)
+.then(res=>res.text())
+.then(data=>{
+
+document.getElementById("map").innerHTML=data
+
+document.querySelectorAll("path").forEach(pref=>{
+
+pref.addEventListener("click",()=>{
+
+const prefID=pref.id
+
+location.href="map.html?pref="+prefID
+
+})
+
+})
+
+})
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>釣りマップ</title>
+
+<style>
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont;
+background:#f5f7fb;
+text-align:center;
+}
+
+h1{
+margin:20px;
+}
+
+#map{
+width:95%;
+max-width:900px;
+margin:auto;
+}
+
+svg{
+width:100%;
+height:auto;
+}
+
+path{
+fill:#6f8fb8;
+stroke:#ffffff;
+stroke-width:0.5;
+cursor:pointer;
+transition:0.2s;
+}
+
+path:hover{
+fill:#3d6fa8;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>釣りマップ</h1>
+
+<div id="map"></div>
+
+<script>
+
+const svgURL =
+"https://raw.githubusercontent.com/geolonia/japanese-prefectures/master/japan.svg"
+
+fetch(svgURL)
+.then(res=>res.text())
+.then(data=>{
+
+document.getElementById("map").innerHTML=data
+
+document.querySelectorAll("path").forEach(pref=>{
+
+pref.addEventListener("click",()=>{
+
+const prefID=pref.id
+
+location.href="map.html?pref="+prefID
+
+})
+
+})
+
+})
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>釣りマップ</title>
+
+<style>
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont;
+background:#f5f7fb;
+text-align:center;
+}
+
+h1{
+margin:20px;
+}
+
+#map{
+width:95%;
+max-width:900px;
+margin:auto;
+}
+
+svg{
+width:100%;
+height:auto;
+}
+
+path{
+fill:#6f8fb8;
+stroke:#ffffff;
+stroke-width:0.5;
+cursor:pointer;
+transition:0.2s;
+}
+
+path:hover{
+fill:#3d6fa8;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>釣りマップ</h1>
+
+<div id="map"></div>
+
+<script>
+
+const svgURL =
+"https://raw.githubusercontent.com/geolonia/japanese-prefectures/master/japan.svg"
+
+fetch(svgURL)
+.then(res=>res.text())
+.then(data=>{
+
+document.getElementById("map").innerHTML=data
+
+document.querySelectorAll("path").forEach(pref=>{
+
+pref.addEventListener("click",()=>{
+
+const prefID=pref.id
+
+location.href="map.html?pref="+prefID
+
+})
+
+})
+
+})
+
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>釣りマップ</title>
+
+<style>
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont;
+background:#f5f7fb;
+text-align:center;
+}
+
+h1{
+margin:20px;
+}
+
+#map{
+width:95%;
+max-width:900px;
+margin:auto;
+}
+
+svg{
+width:100%;
+height:auto;
+}
+
+path{
+fill:#6f8fb8;
+stroke:#ffffff;
+stroke-width:0.5;
+cursor:pointer;
+transition:0.2s;
+}
+
+path:hover{
+fill:#3d6fa8;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>釣りマップ</h1>
+
+<div id="map"></div>
+
+<script>
+
+const svgURL =
+"https://raw.githubusercontent.com/geolonia/japanese-prefectures/master/japan.svg"
+
+fetch(svgURL)
+.then(res=>res.text())
+.then(data=>{
+
+document.getElementById("map").innerHTML=data
+
+document.querySelectorAll("path").forEach(pref=>{
+
+pref.addEventListener("click",()=>{
+
+const prefID=pref.id
+
+location.href="map.html?pref="+prefID
+
+})
+
+})
+
+})
+
+</script>
+
 </body>
 </html>
