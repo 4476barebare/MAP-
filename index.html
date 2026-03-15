@@ -31,7 +31,7 @@ header {
 .logo {
   font-weight:700;
   font-size:0.8rem;
-  color:#191970; /* 新しい青 */
+  color:#191970;
   white-space:nowrap;
 }
 .nav {
@@ -115,7 +115,7 @@ main {
   max-width:900px;
   height:520px;
   margin:auto;
-  background:#191970; /* 新しい青 */
+  background:#191970;
   mask:url("japan.svg") no-repeat center;
   mask-size:contain;
   -webkit-mask:url("japan.svg") no-repeat center;
@@ -190,11 +190,29 @@ document.addEventListener('click', e=>{
   }
 });
 
-// 登録地点追加・削除
+// 登録地点リスト
 const locationList = document.getElementById('locationList');
 
+// 既存・新規の ✖️ ボタンにイベントを付与
+function attachDeleteEvents() {
+  const deleteButtons = locationList.querySelectorAll('.delete-btn');
+  deleteButtons.forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const li = btn.parentElement;
+      li.remove();
+      // リストが空になったら「登録なし」を表示
+      if(locationList.children.length === 0){
+        locationList.innerHTML = '<li class="location-none">登録なし</li>';
+      }
+    });
+  });
+}
+
+// 初期サンプルにイベント付与
+attachDeleteEvents();
+
+// 登録地点追加
 function addLocation(name){
-  // 登録なしがあれば削除
   const noneItem = locationList.querySelector('.location-none');
   if(noneItem) noneItem.remove();
 
@@ -203,16 +221,16 @@ function addLocation(name){
   const btn = document.createElement('button');
   btn.textContent = '✖️';
   btn.className = 'delete-btn';
-  btn.addEventListener('click', ()=> li.remove());
   li.appendChild(btn);
   locationList.appendChild(li);
+
+  attachDeleteEvents();
 }
 
+// リストリセット
 function resetLocations(){
   locationList.innerHTML = '<li class="location-none">登録なし</li>';
 }
-
-// サンプル追加のため初期値は残す（新潟、群馬、飯岡漁港）
 </script>
 
 </body>
