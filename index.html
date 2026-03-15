@@ -1,102 +1,161 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>釣り行こNAVI</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  background: #ffffff;
-  color: #333;
+
+/* ======================
+基本設定
+====================== */
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-/* ヘッダー */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 20px;
-  border-bottom: 1px solid #e5e5e5;
-  background: #ffffff;
+html{
+  font-size:16px;
+  -webkit-text-size-adjust:100%;
 }
 
-.logo {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #2f6fb4;
+body{
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  background:#ffffff;
+  color:#222;
+  overflow-x:hidden;
 }
 
-nav {
-  display: flex;
-  gap: 18px;
-  font-size: 0.95rem;
+/* ======================
+ヘッダー
+====================== */
+header{
+  background:#ffffff;
+  border-bottom:1px solid #e5e5e5;
 }
 
-nav a {
-  text-decoration: none;
-  color: #333;
+.header-inner{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
 }
 
-nav a:hover {
-  color: #2f6fb4;
+.logo{
+  font-weight:700;
+  font-size:0.8rem; /* ナビと同じサイズ */
+  color:#3f6fa5; /* タイトルと地図統一 */
+  white-space:nowrap;
 }
 
-/* メイン */
-main {
-  padding: 20px;
+.nav{
+  display:flex;
+  align-items:center;
+  gap:14px;
 }
 
-/* 地図 */
-.map-container {
-  max-width: 900px;
-  margin: 0 auto;
-  text-align: center;
+.nav a{
+  text-decoration:none;
+  color:#333;
+  font-size:0.8rem;
+  white-space:nowrap;
 }
 
-.map-container svg,
-.map-container object {
-  width: 100%;
-  height: auto;
-  display: block;
+.nav a:hover{
+  color:#3f6fa5;
 }
 
-/* 地図カラー */
-.map-container path {
-  fill: #2f6fb4;
-  stroke: #ffffff;
-  stroke-width: 0.6;
-  transition: 0.2s;
+/* ======================
+メイン
+====================== */
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
 }
 
-.map-container path:hover {
-  opacity: 0.8;
-  cursor: pointer;
+/* ======================
+地図
+====================== */
+.map{
+  text-align:center;
 }
+
+/* 地図マスクでブルー表示 */
+.japan-map{
+  width:100%;
+  max-width:900px;
+  height:520px;
+  margin:auto;
+  background:#3f6fa5; /* タイトルと同色 */
+  mask:url("japan.svg") no-repeat center;
+  mask-size:contain;
+  -webkit-mask:url("japan.svg") no-repeat center;
+  -webkit-mask-size:contain;
+}
+
+/* ======================
+広告
+====================== */
+.ad{
+  text-align:center;
+  margin:20px 0;
+  color:#999;
+}
+
+/* ======================
+フッター
+====================== */
+footer{
+  margin-top:40px;
+  padding:20px;
+  text-align:center;
+  font-size:0.8rem;
+  color:#666;
+  border-top:1px solid #e5e5e5;
+}
+
 </style>
+
 </head>
 
 <body>
 
 <header>
-  <div class="logo">釣り行こNAVI</div>
-
-  <nav>
-    <a href="#">登録地点</a>
-    <a href="#">釣りニュース</a>
-    <a href="#">全国地図</a>
-    <a href="#">その他</a>
-  </nav>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+      <a href="#">登録地点</a>
+      <a href="#">釣りニュース</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
 </header>
 
+<div class="ad">広告スペース</div>
+
 <main>
-  <div class="map-container">
-    <object data="japan.svg" type="image/svg+xml"></object>
+  <div class="map">
+    <div class="japan-map"></div>
   </div>
 </main>
+
+<div class="ad">広告スペース</div>
+
+<footer>© 釣り行こNAVI</footer>
 
 </body>
 </html>
