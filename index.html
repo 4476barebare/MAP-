@@ -327,22 +327,6 @@ function addLocation(name){
 function resetLocations(){
   locationList.innerHTML = '<li class="location-none">登録なし</li>';
 }
-
-// ここからニュース
-
-const newsBtn = document.getElementById("newsBtn");
-const overlay = document.getElementById("newsOverlay");
-const closeBtn = document.getElementById("closeNews");
-
-newsBtn.addEventListener("click", e=>{
-  e.preventDefault();
-  overlay.style.display="flex";
-});
-
-closeBtn.addEventListener("click", ()=>{
-  overlay.style.display="none";
-});
-
 </script>
 
 <div id="newsOverlay">
@@ -364,5 +348,23 @@ closeBtn.addEventListener("click", ()=>{
   </div>
 
 </div>
+
+<script>
+// ここからニュース
+
+const newsBtn = document.getElementById("newsBtn");
+const overlay = document.getElementById("newsOverlay");
+const closeBtn = document.getElementById("closeNews");
+
+newsBtn.addEventListener("click", e=>{
+  e.preventDefault();
+  overlay.style.display="flex";
+});
+
+closeBtn.addEventListener("click", ()=>{
+  overlay.style.display="none";
+});
+
+</script>
 
 </body>
