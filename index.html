@@ -1,89 +1,105 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日本釣りマップ</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    h1 {
-      text-align: center;
-      margin: 20px 0;
-    }
+<title>釣り行こNAVI</title>
 
-    .map-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px;
-    }
+<style>
 
-    .mainmap {
-      min-width: 600px;
-      max-width: 900px;
-    }
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background:#ffffff;
+  color:#333;
+}
 
-    .okinawa {
-      width: 120px;
-    }
+/* ヘッダー */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 20px;
+  border-bottom:1px solid #e5e5e5;
+  background:#ffffff;
+}
 
-    svg {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+.logo{
+  font-size:1rem;
+  font-weight:600;
+  color:#2f6fb4;
+}
 
-    path {
-      cursor: pointer;
-      transition: fill 0.2s;
-    }
+nav{
+  display:flex;
+  gap:18px;
+  font-size:0.95rem;
+}
 
-    path:hover {
-      fill: #8fc98f;
-    }
-  </style>
+nav a{
+  text-decoration:none;
+  color:#333;
+}
+
+nav a:hover{
+  color:#2f6fb4;
+}
+
+/* メイン */
+main{
+  padding:20px;
+}
+
+/* 地図 */
+.map-container{
+  max-width:900px;
+  margin:auto;
+}
+
+.map-container svg{
+  width:100%;
+  height:auto;
+}
+
+/* 地図カラー */
+.map-container path{
+  fill:#2f6fb4;
+  stroke:#ffffff;
+  stroke-width:0.6;
+  transition:0.2s;
+}
+
+.map-container path:hover{
+  opacity:0.8;
+  cursor:pointer;
+}
+
+</style>
 </head>
+
 <body>
 
-<h1>日本釣りマップ</h1>
+<header>
 
-<div class="map-wrap">
-  <!-- 本土SVG -->
-  <div class="mainmap">
-    <object type="image/svg+xml" data="japan-main.svg" aria-label="日本本土"></object>
+  <div class="logo">釣り行こNAVI</div>
+
+  <nav>
+    <a href="#">登録地点</a>
+    <a href="#">釣りニュース</a>
+    <a href="#">全国地図</a>
+    <a href="#">その他</a>
+  </nav>
+
+</header>
+
+<main>
+
+  <div class="map-container">
+    <object data="japan.svg" type="image/svg+xml"></object>
   </div>
 
-  <!-- 沖縄分離SVG -->
-  <div class="okinawa">
-    <object type="image/svg+xml" data="okinawa.svg" aria-label="沖縄"></object>
-  </div>
-</div>
-
-<script>
-  // SVG内のパスをクリックしたら名前を表示
-  function setupSVG(obj) {
-    const svgDoc = obj.contentDocument;
-    if (!svgDoc) return;
-    const paths = svgDoc.querySelectorAll('path');
-    paths.forEach(path => {
-      path.addEventListener('click', () => {
-        const name = path.getAttribute('name') || '不明';
-        alert(name + ' を選択しました！');
-      });
-    });
-  }
-
-  window.addEventListener('load', () => {
-    document.querySelectorAll('object[type="image/svg+xml"]').forEach(obj => {
-      obj.addEventListener('load', () => setupSVG(obj));
-    });
-  });
-</script>
+</main>
 
 </body>
 </html>
