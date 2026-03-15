@@ -2,14 +2,11 @@
 <html lang="ja">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>釣り行こNAVI</title>
 
 <style>
-
 /* ======================
 基本設定
 ====================== */
@@ -18,20 +15,10 @@
   margin:0;
   padding:0;
 }
-
-html{
-  font-size:16px;
-  -webkit-text-size-adjust:100%;
-}
-
+html{ font-size:16px; -webkit-text-size-adjust:100%; }
 body{
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  background:#ffffff;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background:#fff;
   color:#222;
   overflow-x:hidden;
 }
@@ -55,16 +42,64 @@ header{
 
 .logo{
   font-weight:700;
-  font-size:0.8rem; /* ナビと同じサイズ */
-  color:#3f6fa5; /* タイトルと地図統一 */
+  font-size:0.8rem; /* ヘッダー他項目と同じサイズ */
+  color:#3f6fa5;    /* タイトル・地図と同色 */
   white-space:nowrap;
 }
 
 .nav{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   gap:14px;
 }
+
+/* アコーディオン部分 */
+.accordion {
+  position: relative;
+}
+
+.accordion-btn {
+  background: none;
+  border: none;
+  font-size:0.8rem;
+  color:#333;
+  cursor:pointer;
+  padding:0;
+}
+
+.accordion-btn:hover { color:#3f6fa5; }
+
+.accordion-panel {
+  display: none;
+  background:#f9f9f9;
+  margin-top:4px;
+  border:1px solid #e5e5e5;
+  border-radius:4px;
+  padding:4px 8px;
+}
+
+.location-list {
+  list-style:none;
+  padding-left:0;
+  margin:0;
+}
+
+.location-list li {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:2px 0;
+  font-size:0.8rem;
+}
+
+.delete-btn {
+  background:none;
+  border:none;
+  color:#c00;
+  cursor:pointer;
+  font-size:0.8rem;
+}
+.delete-btn:hover { color:#f00; }
 
 .nav a{
   text-decoration:none;
@@ -72,10 +107,7 @@ header{
   font-size:0.8rem;
   white-space:nowrap;
 }
-
-.nav a:hover{
-  color:#3f6fa5;
-}
+.nav a:hover { color:#3f6fa5; }
 
 /* ======================
 メイン
@@ -89,11 +121,7 @@ main{
 /* ======================
 地図
 ====================== */
-.map{
-  text-align:center;
-}
-
-/* 地図マスクでブルー表示 */
+.map{ text-align:center; }
 .japan-map{
   width:100%;
   max-width:900px;
@@ -109,11 +137,7 @@ main{
 /* ======================
 広告
 ====================== */
-.ad{
-  text-align:center;
-  margin:20px 0;
-  color:#999;
-}
+.ad{ text-align:center; margin:20px 0; color:#999; }
 
 /* ======================
 フッター
@@ -126,9 +150,7 @@ footer{
   color:#666;
   border-top:1px solid #e5e5e5;
 }
-
 </style>
-
 </head>
 
 <body>
@@ -137,7 +159,25 @@ footer{
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
     <nav class="nav">
-      <a href="#">登録地点</a>
+      <div class="accordion">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list">
+            <li>
+              新潟
+              <button class="delete-btn">✖️</button>
+            </li>
+            <li>
+              群馬
+              <button class="delete-btn">✖️</button>
+            </li>
+            <li>
+              飯岡漁港(千葉)
+              <button class="delete-btn">✖️</button>
+            </li>
+          </ul>
+        </div>
+      </div>
       <a href="#">釣りニュース</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
@@ -156,6 +196,24 @@ footer{
 <div class="ad">広告スペース</div>
 
 <footer>© 釣り行こNAVI</footer>
+
+<script>
+// アコーディオン展開
+document.querySelectorAll('.accordion-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const panel = btn.nextElementSibling;
+    panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+  });
+});
+
+// 削除ボタン処理
+document.querySelectorAll('.delete-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const li = btn.closest('li');
+    li.remove();
+  });
+});
+</script>
 
 </body>
 </html>
