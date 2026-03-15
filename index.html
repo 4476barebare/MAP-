@@ -1,65 +1,62 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こNAVI</title>
 
 <style>
-/* 基本設定 */
+/* 全体リセット */
 * { box-sizing:border-box; margin:0; padding:0; }
-html { font-size:16px; -webkit-text-size-adjust:100%; }
-body { font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; background:#fff; color:#222; overflow-x:hidden; }
-html, body { width:100%; height:100%; }
+html, body { width:100%; height:100%; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; background:#fff; color:#222; overflow-x:hidden; }
+header, main, footer { width:100%; }
+main { padding:20px; max-width:1100px; margin:auto; }
 
 /* ヘッダー */
-header { background:#fff; border-bottom:1px solid #e5e5e5; position:relative; }
-.header-inner { max-width:1100px; margin:auto; display:flex; align-items:center; justify-content:space-between; padding:10px 12px; position:relative; z-index:1; }
+header { background:#fff; border-bottom:1px solid #e5e5e5; }
+.header-inner { max-width:1100px; margin:auto; display:flex; justify-content:space-between; align-items:center; padding:10px 12px; }
 .logo { font-weight:700; font-size:0.8rem; color:#191970; white-space:nowrap; }
-.nav { display:flex; align-items:center; gap:14px; position:relative; }
+.nav { display:flex; align-items:center; gap:14px; }
 
 /* アコーディオン */
 .accordion-wrapper { position:relative; }
-.accordion-btn { background:none; border:none; font-size:0.8rem; color:#333; cursor:pointer; padding:0; }
+.accordion-btn { background:none; border:none; font-size:0.8rem; color:#333; cursor:pointer; }
 .accordion-btn:hover { color:#191970; }
-.accordion-panel { display:none; position:absolute; top:100%; left:0; background:#f9f9f9; border:1px solid #e5e5e5; border-radius:4px; padding:4px 8px; min-width:150px; box-shadow:0 2px 6px rgba(0,0,0,0.1); z-index:10; }
-
+.accordion-panel {
+  display:none; position:absolute; top:100%; left:0; background:#f9f9f9;
+  border:1px solid #e5e5e5; border-radius:4px; padding:4px 8px; min-width:150px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1); z-index:10;
+}
 .location-list { list-style:none; padding-left:0; margin:0; }
 .location-list li { display:flex; justify-content:space-between; align-items:center; padding:2px 0; font-size:0.8rem; }
 .delete-btn { background:none; border:none; color:#c00; cursor:pointer; font-size:0.8rem; }
 .delete-btn:hover { color:#f00; }
-.location-none { font-style:italic; color:#999; padding:2px 0; }
+.location-none { font-style:italic; color:#999; }
 
 /* ヘッダーリンク */
 .nav a { text-decoration:none; color:#333; font-size:0.8rem; white-space:nowrap; }
 .nav a:hover { color:#191970; }
-
-/* メイン */
-main { max-width:1100px; margin:auto; padding:20px; text-align:center; }
-
-/* 地図拡大・センタリング */
-#mapContainer {
-  width: 100%;
-  height: calc(100vh - 160px); /* ヘッダー＋広告＋余白を除いた領域 */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-svg#japanMap {
-  width: 95%;
-  height: auto;
-  max-height: 100%;
-}
 
 /* 広告 */
 .ad { text-align:center; margin:20px 0; color:#999; }
 
 /* フッター */
 footer { margin-top:40px; padding:20px; text-align:center; font-size:0.8rem; color:#666; border-top:1px solid #e5e5e5; }
+
+/* 地図コンテナ */
+.map { display:flex; justify-content:center; align-items:center; width:100%; height:80vh; background:#191970; }
+.japan-map {
+  width:100%;
+  max-width:1200px;
+  height:100%;
+  mask: url("japan.svg") no-repeat center;
+  mask-size: contain;
+  -webkit-mask: url("japan.svg") no-repeat center;
+  -webkit-mask-size: contain;
+  background-color:#00f; /* SVGの見え方を確認 */
+}
 </style>
 </head>
-
 <body>
 
 <header>
@@ -86,15 +83,8 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:0.8rem; col
 <div class="ad">広告スペース</div>
 
 <main>
-  <div id="mapContainer">
-    <!-- ここにSVGを挿入 -->
-    <svg id="japanMap" viewBox="400 350 200 200" xmlns="http://www.w3.org/2000/svg">
-      <!-- SVGパスはここにすべて貼る -->
-      <path d="M473.7 393.9l0.5-0.7 0.9-0.7 0.3-0.3 ..." id="JP20" name="Nagano"></path>
-      <path d="M526.3 374.7l1.4-0.8 1.1-1.2 ..." id="JP09" name="Tochigi"></path>
-      <path d="M435.4 420.3l1-1.7 0.4-1.8 ..." id="JP21" name="Gifu"></path>
-      <!-- 他の都道府県もすべてここに挿入 -->
-    </svg>
+  <div class="map">
+    <div class="japan-map"></div>
   </div>
 </main>
 
@@ -112,8 +102,6 @@ accordionBtn.addEventListener('click', ()=>{
   });
   panel.style.display = (panel.style.display==='block') ? 'none':'block';
 });
-
-// ページクリックで閉じる
 document.addEventListener('click', e=>{
   if(!e.target.closest('.accordion-wrapper')){
     document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
@@ -122,14 +110,10 @@ document.addEventListener('click', e=>{
 
 // 登録地点リスト
 const locationList = document.getElementById('locationList');
-
-// 既存・新規の ✖️ ボタンにイベントを付与
 function attachDeleteEvents() {
-  const deleteButtons = locationList.querySelectorAll('.delete-btn');
-  deleteButtons.forEach(btn=>{
+  locationList.querySelectorAll('.delete-btn').forEach(btn=>{
     btn.addEventListener('click', e=>{
-      const li = btn.parentElement;
-      li.remove();
+      const li = btn.parentElement; li.remove();
       if(locationList.children.length === 0){
         locationList.innerHTML = '<li class="location-none">登録なし</li>';
       }
@@ -137,22 +121,17 @@ function attachDeleteEvents() {
   });
 }
 attachDeleteEvents();
-
-// 登録地点追加
 function addLocation(name){
   const noneItem = locationList.querySelector('.location-none');
   if(noneItem) noneItem.remove();
   const li = document.createElement('li');
   li.textContent = name + ' ';
   const btn = document.createElement('button');
-  btn.textContent = '✖️';
-  btn.className = 'delete-btn';
+  btn.textContent = '✖️'; btn.className='delete-btn';
   li.appendChild(btn);
   locationList.appendChild(li);
   attachDeleteEvents();
 }
-
-// リストリセット
 function resetLocations(){
   locationList.innerHTML = '<li class="location-none">登録なし</li>';
 }
