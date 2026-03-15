@@ -147,6 +147,27 @@ height:auto;
 display:block;
 }
 
+.japan-map{
+  width:100%;
+  max-width:900px;
+  height:520px;
+  margin:auto;
+
+  background:linear-gradient(
+    180deg,
+    #3a6edc,
+    #2f5ec8,
+    #244ab0
+  );
+
+  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+
+  mask:url("japan.svg") no-repeat center;
+  mask-size:contain;
+  -webkit-mask:url("japan.svg") no-repeat center;
+  -webkit-mask-size:contain;
+}
+
 /* ad */
 
 .ad{
@@ -242,7 +263,7 @@ cursor:pointer;
           </ul>
         </div>
       </div>
-      <a href="#" id="newsBtn">釣りニュース</a>
+      <a href="#" id="newsBtn">釣りNEWS</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
     </nav>
