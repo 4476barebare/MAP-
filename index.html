@@ -124,28 +124,7 @@ padding:20px;
 text-align:center;
 }
 
-.japan-map {
-  width:100%;
-  max-width:900px;
-  height:520px;
-  margin:auto;
-  background:#191970;
-
-  mask:url("japan.svg") no-repeat center;
-  mask-size:180%;
-  mask-position:37% center;
-
-  -webkit-mask:url("japan.svg") no-repeat center;
-  -webkit-mask-size:180%;
-  -webkit-mask-position:37% center;
-}
-
-
-.japan-map img{
-width:100%;
-height:auto;
-display:block;
-}
+/* 日本地図 */
 
 .japan-map{
   width:100%;
@@ -155,20 +134,19 @@ display:block;
 
   background:linear-gradient(
     180deg,
-    #3a6edc,
-    #2f5ec8,
-    #244ab0
+    #4a7cff 0%,
+    #2f5ec8 60%,
+    #1f3f9c 100%
   );
 
-  filter:drop-shadow(0 6px 10px rgba(0,0,0,0.25));
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,0.25));
 
   mask:url("japan.svg") no-repeat center;
   mask-size:contain;
+
   -webkit-mask:url("japan.svg") no-repeat center;
   -webkit-mask-size:contain;
-}}
-
-
+}
 
 
 /* ad */
