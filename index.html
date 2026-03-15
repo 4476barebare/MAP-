@@ -1,249 +1,93 @@
-
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣り行こNAVI</title>
-
+<title>日本釣りマップ</title>
 <style>
-
-/* ======================
-基本設定
-====================== */
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-}
-
-html{
-font-size:16px;
--webkit-text-size-adjust:100%;
-}
-
-body{
-
-font-family:
--apple-system,
-BlinkMacSystemFont,
-"Helvetica Neue",
-Arial,
-sans-serif;
-
-background:#ffffff;
-color:#222;
-
-overflow-x:hidden;
-
-}
-
-
-/* ======================
-ヘッダー（触らない）
-====================== */
-
-header{
-
-background:#ffffff;
-border-bottom:1px solid #e5e5e5;
-
-}
-
-.header-inner{
-
-max-width:1100px;
-margin:auto;
-
-display:flex;
-align-items:center;
-justify-content:space-between;
-
-padding:10px 12px;
-
-}
-
-.logo{
-
-font-weight:700;
-font-size:0.8rem;
-
-color:#3f6fa5;
-
-white-space:nowrap;
-
-}
-
-.nav{
-
-display:flex;
-align-items:center;
-
-gap:14px;
-
-}
-
-.nav a{
-
-text-decoration:none;
-
-color:#333;
-
-font-size:0.8rem;
-
-white-space:nowrap;
-
-}
-
-.nav a:hover{
-color:#3f6fa5;
-}
-
-
-/* ======================
-メイン
-====================== */
-
-main{
-
-max-width:1100px;
-margin:auto;
-
-padding:20px;
-
-}
-
-
-/* ======================
-地図
-====================== */
-
-.map{
-
-text-align:center;
-
-}
-
-/* 地図本体 */
-
-.japan-map{
-
-width:100%;
-max-width:900px;
-
-height:520px;
-
-margin:auto;
-
-/* タイトルと同じ色 */
-
-background:#3f6fa5;
-
-/* SVGを形として使用 */
-
-mask:url("japan.svg") no-repeat center;
-mask-size:contain;
-
--webkit-mask:url("japan.svg") no-repeat center;
--webkit-mask-size:contain;
-
-}
-
-
-/* ======================
-広告
-====================== */
-
-.ad{
-
-text-align:center;
-margin:20px 0;
-
-color:#999;
-
-}
-
-
-/* ======================
-フッター
-====================== */
-
-footer{
-
-margin-top:40px;
-
-padding:20px;
-
-text-align:center;
-
-font-size:0.8rem;
-
-color:#666;
-
-border-top:1px solid #e5e5e5;
-
-}
-
+  /* レイアウト */
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+  }
+
+  .map-wrap {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* 沖縄用 */
+  .okinawa {
+    width: 120px; /* サイズ調整 */
+    height: auto;
+  }
+
+  /* 本土用 */
+  .mainmap {
+    flex: 1;
+    min-width: 600px;
+  }
+
+  /* SVGの基本スタイル */
+  svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* 都道府県にホバー効果 */
+  path {
+    cursor: pointer;
+    transition: fill 0.2s;
+  }
+
+  path:hover {
+    fill: #8fc98f; /* ホバー時の色 */
+  }
 </style>
-
 </head>
-
 <body>
 
+<h1>日本釣りマップ</h1>
 
-<header>
+<div class="map-wrap">
+  <!-- 沖縄分離SVG -->
+  <div class="okinawa">
+    <object type="image/svg+xml" data="okinawa.svg" aria-label="沖縄"></object>
+  </div>
 
-<div class="header-inner">
-
-<div class="logo">
-釣り行こNAVI
+  <!-- 本土SVG -->
+  <div class="mainmap">
+    <object type="image/svg+xml" data="japan-main.svg" aria-label="日本本土"></object>
+  </div>
 </div>
 
-<nav class="nav">
+<!-- クリックやポップアップ用JS -->
+<script>
+  function setupMap(svgObject) {
+    const svgDoc = svgObject.contentDocument;
+    if (!svgDoc) return;
 
-<a href="#">登録地点</a>
-<a href="#">釣りニュース</a>
-<a href="#">全国地図</a>
-<a href="#">その他</a>
+    const paths = svgDoc.querySelectorAll('path');
+    paths.forEach(path => {
+      path.addEventListener('click', () => {
+        const name = path.getAttribute('name');
+        alert(name + ' を選択しました！');
+      });
+    });
+  }
 
-</nav>
-
-</div>
-
-</header>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<main>
-
-<div class="map">
-
-<div class="japan-map"></div>
-
-</div>
-
-</main>
-
-
-<div class="ad">
-広告スペース
-</div>
-
-
-<footer>
-
-© 釣り行こNAVI
-
-</footer>
-
+  window.addEventListener('load', () => {
+    const objs = document.querySelectorAll('object[type="image/svg+xml"]');
+    objs.forEach(obj => {
+      obj.addEventListener('load', () => setupMap(obj));
+    });
+  });
+</script>
 
 </body>
 </html>
