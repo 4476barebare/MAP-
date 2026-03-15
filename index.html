@@ -242,7 +242,7 @@ cursor:pointer;
           </ul>
         </div>
       </div>
-      <a href="#">釣りニュース</a>
+      <a href="#" id="newsBtn">釣りニュース</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
     </nav>
@@ -328,12 +328,13 @@ function resetLocations(){
   locationList.innerHTML = '<li class="location-none">登録なし</li>';
 }
 
-const newsLink = document.querySelector('.nav a');
+// ここからニュース
 
+const newsBtn = document.getElementById("newsBtn");
 const overlay = document.getElementById("newsOverlay");
 const closeBtn = document.getElementById("closeNews");
 
-newsLink.addEventListener("click", e=>{
+newsBtn.addEventListener("click", e=>{
   e.preventDefault();
   overlay.style.display="flex";
 });
