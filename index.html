@@ -31,10 +31,11 @@ align-items:center;
 padding:10px 15px;
 }
 
-.logo{
-font-weight:bold;
-font-size:16px;
-color:#191970;
+.logo {
+  font-weight:700;
+  font-size:0.8rem;
+  color:#191970;
+  white-space:nowrap;
 }
 
 .nav{
@@ -43,10 +44,11 @@ gap:15px;
 align-items:center;
 }
 
-.nav a{
-text-decoration:none;
-color:#333;
-font-size:14px;
+.nav a {
+  text-decoration:none;
+  color:#333;
+  font-size:0.8rem;
+  white-space:nowrap;
 }
 
 /* accordion */
@@ -113,9 +115,18 @@ text-align:center;
 }
 
 .japan-map{
-width:100%;
-max-width:900px;
-margin:auto;
+  width:100%;
+  max-width:900px;
+  height:520px;
+  margin:auto;
+
+  background:#191970;
+
+  mask:url("japan.svg") no-repeat center;
+  mask-size:contain;
+
+  -webkit-mask:url("japan.svg") no-repeat center;
+  -webkit-mask-size:contain;
 }
 
 .japan-map img{
@@ -175,7 +186,6 @@ border-top:1px solid #ddd;
 <main>
   <div class="map">
     <div class="japan-map">
-      <img src="japan.svg" alt="日本地図">
     </div>
   </div>
 </main>
