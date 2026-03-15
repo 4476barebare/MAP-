@@ -31,7 +31,7 @@ header {
 .logo {
   font-weight:700;
   font-size:0.8rem;
-  color:#3f6fa5;
+  color:#191970; /* 新しい青 */
   white-space:nowrap;
 }
 .nav {
@@ -51,7 +51,7 @@ header {
   cursor:pointer;
   padding:0;
 }
-.accordion-btn:hover { color:#3f6fa5; }
+.accordion-btn:hover { color:#191970; }
 
 .accordion-panel {
   display:none;
@@ -99,7 +99,7 @@ header {
   font-size:0.8rem;
   white-space:nowrap;
 }
-.nav a:hover { color:#3f6fa5; }
+.nav a:hover { color:#191970; }
 
 /* メイン */
 main {
@@ -115,7 +115,7 @@ main {
   max-width:900px;
   height:520px;
   margin:auto;
-  background:#3f6fa5;
+  background:#191970; /* 新しい青 */
   mask:url("japan.svg") no-repeat center;
   mask-size:contain;
   -webkit-mask:url("japan.svg") no-repeat center;
@@ -147,7 +147,9 @@ footer {
         <button class="accordion-btn">登録地点 ▼</button>
         <div class="accordion-panel">
           <ul class="location-list" id="locationList">
-            <li class="location-none">登録なし</li>
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
           </ul>
         </div>
       </div>
@@ -171,11 +173,10 @@ footer {
 <footer>© 釣り行こNAVI</footer>
 
 <script>
-// 登録地点アコーディオン
+// アコーディオン展開
 const accordionBtn = document.querySelector('.accordion-btn');
 const panel = document.querySelector('.accordion-panel');
 accordionBtn.addEventListener('click', ()=>{
-  // 他閉じる
   document.querySelectorAll('.accordion-panel').forEach(p=>{
     if(p!==panel) p.style.display='none';
   });
@@ -211,7 +212,7 @@ function resetLocations(){
   locationList.innerHTML = '<li class="location-none">登録なし</li>';
 }
 
-// 例: addLocation('新潟'); addLocation('群馬');
+// サンプル追加のため初期値は残す（新潟、群馬、飯岡漁港）
 </script>
 
 </body>
