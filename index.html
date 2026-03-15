@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -10,125 +8,142 @@
 
 <style>
 
-/* ======================
-基本設定
-====================== */
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-html{
-  font-size:16px;
-  -webkit-text-size-adjust:100%;
-}
-
 body{
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
-  background:#ffffff;
-  color:#222;
-  overflow-x:hidden;
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+background:#ffffff;
+color:#333;
 }
 
-/* ======================
-ヘッダー
-====================== */
+/* header /
+
 header{
-  background:#ffffff;
-  border-bottom:1px solid #e5e5e5;
+border-bottom:1px solid #ddd;
+background:#fff;
 }
 
 .header-inner{
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 12px;
+max-width:1100px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px 15px;
 }
 
 .logo{
-  font-weight:700;
-  font-size:0.8rem; /* ナビと同じサイズ */
-  color:#3f6fa5; /* タイトルと地図統一 */
-  white-space:nowrap;
+font-weight:bold;
+font-size:16px;
+color:#191970;
 }
 
 .nav{
-  display:flex;
-  align-items:center;
-  gap:14px;
+display:flex;
+gap:15px;
+align-items:center;
 }
 
 .nav a{
-  text-decoration:none;
-  color:#333;
-  font-size:0.8rem;
-  white-space:nowrap;
+text-decoration:none;
+color:#333;
+font-size:14px;
 }
 
-.nav a:hover{
-  color:#3f6fa5;
+/ accordion /
+
+.accordion-wrapper{
+position:relative;
 }
 
-/* ======================
-メイン
-====================== */
+.accordion-btn{
+background:none;
+border:none;
+font-size:14px;
+cursor:pointer;
+}
+
+.accordion-panel{
+display:none;
+position:absolute;
+top:30px;
+left:0;
+background:#f9f9f9;
+border:1px solid #ddd;
+border-radius:4px;
+padding:8px;
+min-width:150px;
+}
+
+.location-list{
+list-style:none;
+padding:0;
+margin:0;
+}
+
+.location-list li{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:3px 0;
+font-size:14px;
+}
+
+.delete-btn{
+background:none;
+border:none;
+cursor:pointer;
+color:#c00;
+}
+
+.location-none{
+color:#888;
+font-style:italic;
+}
+
+/ map /
+
 main{
-  max-width:1100px;
-  margin:auto;
-  padding:20px;
+max-width:1100px;
+margin:auto;
+padding:20px;
 }
 
-/* ======================
-地図
-====================== */
 .map{
-  text-align:center;
+text-align:center;
 }
 
-/* 地図マスクでブルー表示 */
 .japan-map{
-  width:100%;
-  max-width:900px;
-  height:520px;
-  margin:auto;
-  background:#3f6fa5; /* タイトルと同色 */
-  mask:url("japan.svg") no-repeat center;
-  mask-size:contain;
-  -webkit-mask:url("japan.svg") no-repeat center;
-  -webkit-mask-size:contain;
+width:100%;
+max-width:900px;
+margin:auto;
 }
 
-/* ======================
-広告
-====================== */
+.japan-map img{
+width:100%;
+height:auto;
+display:block;
+}
+
+/ ad /
+
 .ad{
-  text-align:center;
-  margin:20px 0;
-  color:#999;
+text-align:center;
+margin:20px 0;
+color:#999;
 }
 
-/* ======================
-フッター
-====================== */
+/ footer */
+
 footer{
-  margin-top:40px;
-  padding:20px;
-  text-align:center;
-  font-size:0.8rem;
-  color:#666;
-  border-top:1px solid #e5e5e5;
+margin-top:40px;
+padding:20px;
+text-align:center;
+font-size:13px;
+color:#777;
+border-top:1px solid #ddd;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -137,7 +152,16 @@ footer{
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
     <nav class="nav">
-      <a href="#">登録地点</a>
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
       <a href="#">釣りニュース</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
@@ -149,7 +173,9 @@ footer{
 
 <main>
   <div class="map">
-    <div class="japan-map"></div>
+    <div class="japan-map">
+      <img src="japan.svg" alt="日本地図">
+    </div>
   </div>
 </main>
 
@@ -157,5 +183,327 @@ footer{
 
 <footer>© 釣り行こNAVI</footer>
 
+<script>
+
+// アコーディオン展開
+const accordionBtn = document.querySelector('.accordion-btn');
+const panel = document.querySelector('.accordion-panel');
+
+accordionBtn.addEventListener('click', ()=>{
+  document.querySelectorAll('.accordion-panel').forEach(p=>{
+    if(p!==panel) p.style.display='none';
+  });
+  panel.style.display = (panel.style.display==='block') ? 'none':'block';
+});
+
+// ページクリックで閉じる
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.accordion-wrapper')){
+    document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+  }
+});
+
+// 登録地点リスト
+const locationList = document.getElementById('locationList');
+
+// 既存・新規の ✖️ ボタンにイベントを付与
+function attachDeleteEvents() {
+  const deleteButtons = locationList.querySelectorAll('.delete-btn');
+
+  deleteButtons.forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const li = btn.parentElement;
+      li.remove();
+
+      if(locationList.children.length === 0){
+        locationList.innerHTML = '<li class="location-none">登録なし</li>';
+      }
+    });
+  });
+}
+
+// 初期サンプル
+attachDeleteEvents();
+
+// 登録地点追加
+function addLocation(name){
+
+  const noneItem = locationList.querySelector('.location-none');
+  if(noneItem) noneItem.remove();
+
+  const li = document.createElement('li');
+  li.textContent = name + ' ';
+
+  const btn = document.createElement('button');
+  btn.textContent = '✖️';
+  btn.className = 'delete-btn';
+
+  li.appendChild(btn);
+  locationList.appendChild(li);
+
+  attachDeleteEvents();
+}
+
+// リストリセット
+function resetLocations(){
+  locationList.innerHTML = '<li class="location-none">登録なし</li>';
+}
+
+</script>
+
 </body>
-</html>
+</h<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>釣り行こNAVI</title>
+
+<style>
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+background:#ffffff;
+color:#333;
+}
+
+/* header /
+
+header{
+border-bottom:1px solid #ddd;
+background:#fff;
+}
+
+.header-inner{
+max-width:1100px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px 15px;
+}
+
+.logo{
+font-weight:bold;
+font-size:16px;
+color:#191970;
+}
+
+.nav{
+display:flex;
+gap:15px;
+align-items:center;
+}
+
+.nav a{
+text-decoration:none;
+color:#333;
+font-size:14px;
+}
+
+/ accordion /
+
+.accordion-wrapper{
+position:relative;
+}
+
+.accordion-btn{
+background:none;
+border:none;
+font-size:14px;
+cursor:pointer;
+}
+
+.accordion-panel{
+display:none;
+position:absolute;
+top:30px;
+left:0;
+background:#f9f9f9;
+border:1px solid #ddd;
+border-radius:4px;
+padding:8px;
+min-width:150px;
+}
+
+.location-list{
+list-style:none;
+padding:0;
+margin:0;
+}
+
+.location-list li{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:3px 0;
+font-size:14px;
+}
+
+.delete-btn{
+background:none;
+border:none;
+cursor:pointer;
+color:#c00;
+}
+
+.location-none{
+color:#888;
+font-style:italic;
+}
+
+/ map /
+
+main{
+max-width:1100px;
+margin:auto;
+padding:20px;
+}
+
+.map{
+text-align:center;
+}
+
+.japan-map{
+width:100%;
+max-width:900px;
+margin:auto;
+}
+
+.japan-map img{
+width:100%;
+height:auto;
+display:block;
+}
+
+/ ad /
+
+.ad{
+text-align:center;
+margin:20px 0;
+color:#999;
+}
+
+/ footer */
+
+footer{
+margin-top:40px;
+padding:20px;
+text-align:center;
+font-size:13px;
+color:#777;
+border-top:1px solid #ddd;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+      <a href="#">釣りニュース</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
+</header>
+
+<div class="ad">広告スペース</div>
+
+<main>
+  <div class="map">
+    <div class="japan-map">
+      <img src="japan.svg" alt="日本地図">
+    </div>
+  </div>
+</main>
+
+<div class="ad">広告スペース</div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<script>
+
+// アコーディオン展開
+const accordionBtn = document.querySelector('.accordion-btn');
+const panel = document.querySelector('.accordion-panel');
+
+accordionBtn.addEventListener('click', ()=>{
+  document.querySelectorAll('.accordion-panel').forEach(p=>{
+    if(p!==panel) p.style.display='none';
+  });
+  panel.style.display = (panel.style.display==='block') ? 'none':'block';
+});
+
+// ページクリックで閉じる
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.accordion-wrapper')){
+    document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+  }
+});
+
+// 登録地点リスト
+const locationList = document.getElementById('locationList');
+
+// 既存・新規の ✖️ ボタンにイベントを付与
+function attachDeleteEvents() {
+  const deleteButtons = locationList.querySelectorAll('.delete-btn');
+
+  deleteButtons.forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const li = btn.parentElement;
+      li.remove();
+
+      if(locationList.children.length === 0){
+        locationList.innerHTML = '<li class="location-none">登録なし</li>';
+      }
+    });
+  });
+}
+
+// 初期サンプル
+attachDeleteEvents();
+
+// 登録地点追加
+function addLocation(name){
+
+  const noneItem = locationList.querySelector('.location-none');
+  if(noneItem) noneItem.remove();
+
+  const li = document.createElement('li');
+  li.textContent = name + ' ';
+
+  const btn = document.createElement('button');
+  btn.textContent = '✖️';
+  btn.className = 'delete-btn';
+
+  li.appendChild(btn);
+  locationList.appendChild(li);
+
+  attachDeleteEvents();
+}
+
+// リストリセット
+function resetLocations(){
+  locationList.innerHTML = '<li class="location-none">登録なし</li>';
+}
+
+</script>
+
+</body>
+</h
