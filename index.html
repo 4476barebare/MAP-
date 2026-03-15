@@ -132,6 +132,11 @@ text-align:center;
   height:520px;
   margin:auto;
 
+  /* 地図を80%拡大 */
+  transform:scale(1.8);
+  transform-origin:center;
+
+  /* 国土グラデーション */
   background:linear-gradient(
     180deg,
     #4a7cff 0%,
@@ -139,13 +144,17 @@ text-align:center;
     #1f3f9c 100%
   );
 
+  /* 影 */
   filter:drop-shadow(0 8px 14px rgba(0,0,0,0.25));
 
-  mask:url("japan.svg") no-repeat center;
+  /* SVGマスク */
+  mask:url("japan.svg") no-repeat;
   mask-size:contain;
+  mask-position:37% center;
 
-  -webkit-mask:url("japan.svg") no-repeat center;
+  -webkit-mask:url("japan.svg") no-repeat;
   -webkit-mask-size:contain;
+  -webkit-mask-position:37% center;
 }
 
 
