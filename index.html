@@ -1,90 +1,86 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>日本釣りマップ</title>
-<style>
-  /* レイアウト */
-  body {
-    font-family: sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f0f0f0;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日本釣りマップ</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+    }
 
-  .map-wrap {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    flex-wrap: wrap;
-  }
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+    }
 
-  /* 沖縄用 */
-  .okinawa {
-    width: 120px; /* サイズ調整 */
-    height: auto;
-  }
+    .map-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
 
-  /* 本土用 */
-  .mainmap {
-    flex: 1;
-    min-width: 600px;
-  }
+    .mainmap {
+      min-width: 600px;
+      max-width: 900px;
+    }
 
-  /* SVGの基本スタイル */
-  svg {
-    width: 100%;
-    height: auto;
-    display: block;
-  }
+    .okinawa {
+      width: 120px;
+    }
 
-  /* 都道府県にホバー効果 */
-  path {
-    cursor: pointer;
-    transition: fill 0.2s;
-  }
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
-  path:hover {
-    fill: #8fc98f; /* ホバー時の色 */
-  }
-</style>
+    path {
+      cursor: pointer;
+      transition: fill 0.2s;
+    }
+
+    path:hover {
+      fill: #8fc98f;
+    }
+  </style>
 </head>
 <body>
 
 <h1>日本釣りマップ</h1>
 
 <div class="map-wrap">
-  <!-- 沖縄分離SVG -->
-  <div class="okinawa">
-    <object type="image/svg+xml" data="okinawa.svg" aria-label="沖縄"></object>
-  </div>
-
   <!-- 本土SVG -->
   <div class="mainmap">
     <object type="image/svg+xml" data="japan-main.svg" aria-label="日本本土"></object>
   </div>
+
+  <!-- 沖縄分離SVG -->
+  <div class="okinawa">
+    <object type="image/svg+xml" data="okinawa.svg" aria-label="沖縄"></object>
+  </div>
 </div>
 
-<!-- クリックやポップアップ用JS -->
 <script>
-  function setupMap(svgObject) {
-    const svgDoc = svgObject.contentDocument;
+  // SVG内のパスをクリックしたら名前を表示
+  function setupSVG(obj) {
+    const svgDoc = obj.contentDocument;
     if (!svgDoc) return;
-
     const paths = svgDoc.querySelectorAll('path');
     paths.forEach(path => {
       path.addEventListener('click', () => {
-        const name = path.getAttribute('name');
+        const name = path.getAttribute('name') || '不明';
         alert(name + ' を選択しました！');
       });
     });
   }
 
   window.addEventListener('load', () => {
-    const objs = document.querySelectorAll('object[type="image/svg+xml"]');
-    objs.forEach(obj => {
-      obj.addEventListener('load', () => setupMap(obj));
+    document.querySelectorAll('object[type="image/svg+xml"]').forEach(obj => {
+      obj.addEventListener('load', () => setupSVG(obj));
     });
   });
 </script>
