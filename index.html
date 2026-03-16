@@ -8,12 +8,15 @@
 <title>釣り行こNAVI</title>
 
 <style>
+html,body{
+overflow-x:hidden;
+}
+
 body{
 margin:0;
 font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
 background:#ffffff;
 color:#333;
-overflow-x:hidden;
 }
 
 /* header */
@@ -126,36 +129,36 @@ text-align:center;
 }
 
 /* 日本地図 */
-
 .japan-map{
+
   width:100%;
   max-width:900px;
   height:520px;
   margin:auto;
 
-  /* 地図を80%拡大 */
+  /* 地図拡大 */
   transform:scale(1.8);
   transform-origin:center;
 
-  /* 国土グラデーション */
+  /* グラデーション */
   background:linear-gradient(
-    180deg,
+    to bottom,
     #4a7cff 0%,
-    #2f5ec8 60%,
+    #2f5ec8 50%,
     #1f3f9c 100%
   );
 
   /* 影 */
-  filter:drop-shadow(0 8px 14px rgba(0,0,0,0.25));
+  filter:drop-shadow(0px 10px 16px rgba(0,0,0,0.25));
 
   /* SVGマスク */
   mask:url("japan.svg") no-repeat;
   mask-size:contain;
-  mask-position:30% center;
+  mask-position:37% center;
 
   -webkit-mask:url("japan.svg") no-repeat;
   -webkit-mask-size:contain;
-  -webkit-mask-position:30% center;
+  -webkit-mask-position:37% center;
 }
 
 
