@@ -131,16 +131,11 @@ text-align:center;
 /* 日本地図 */
 .japan-map{
 
-  width:100%;
-  max-width:900px;
-  height:520px;
+  width:180%;
+  max-width:1620px;
+  height:936px;
   margin:auto;
 
-  /* 地図拡大 */
-  transform:scale(1.8);
-  transform-origin:center;
-
-  /* グラデーション */
   background:linear-gradient(
     to bottom,
     #4a7cff 0%,
@@ -148,10 +143,8 @@ text-align:center;
     #1f3f9c 100%
   );
 
-  /* 影 */
   filter:drop-shadow(0px 10px 16px rgba(0,0,0,0.25));
 
-  /* SVGマスク */
   mask:url("japan.svg") no-repeat;
   mask-size:contain;
   mask-position:37% center;
