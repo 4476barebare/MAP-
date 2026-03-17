@@ -25,129 +25,25 @@ header {
   position: relative;
   z-index: 1;
 }
-.logo {
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: #191970;
-  display: flex;
-  align-items: center;
-}
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.nav a {
-  text-decoration: none;
-  color: #191970;
-  font-size: 0.8rem;
-}
-.accordion-wrapper {
-  position: relative;
-}
-.accordion-btn {
-  background: none;
-  border: none;
-  font-size: 0.8rem;
-  color: #191970;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-.accordion-panel {
-  display: none;
-  position: absolute;
-  top: 30px;
-  left: 0;
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px;
-  min-width: 150px;
-}
-.location-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.location-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3px 0;
-  font-size: 14px;
-}
-.delete-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #c00;
-}
-.location-none {
-  color: #888;
-  font-style: italic;
-}
-main {
-  max-width: 1100px;
-  margin: auto;
-  padding: 20px;
-}
-.map {
-  text-align: center;
-}
-.japan-map {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.22));
-}
-.japan-map svg {
-  width: 100%;
-  height: auto;
-}
-
-.japan-map path {
-  stroke: #191970;
-  stroke-width: 0.3; /* 薄くする */
-}
-
-.ad {
-  text-align: center;
-  margin: 20px 0;
-  color: #999;
-}
-footer {
-  margin-top: 40px;
-  padding: 20px;
-  text-align: center;
-  font-size: 13px;
-  color: #777;
-  border-top: 1px solid #ddd;
-}
-#newsOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-.news-window {
-  position: relative;
-  width: 85%;
-  max-width: 900px;
-  height: 70vh;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
+.logo { font-weight: 700; font-size: 0.8rem; color: #191970; display: flex; align-items: center; }
+.nav { display: flex; align-items: center; gap: 14px; }
+.nav a { text-decoration: none; color: #191970; font-size: 0.8rem; }
+.accordion-wrapper { position: relative; }
+.accordion-btn { background: none; border: none; font-size: 0.8rem; color: #191970; cursor: pointer; display: flex; align-items: center; }
+.accordion-panel { display: none; position: absolute; top: 30px; left: 0; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 8px; min-width: 150px; }
+.location-list { list-style: none; padding: 0; margin: 0; }
+.location-list li { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 14px; }
+.delete-btn { background: none; border: none; cursor: pointer; color: #c00; }
+.location-none { color: #888; font-style: italic; }
+main { max-width: 1100px; margin: auto; padding: 20px; }
+.map { text-align: center; }
+.japan-map { width: 100%; max-width: 900px; margin: 0 auto; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.22)); }
+.japan-map svg { width: 100%; height: auto; }
+.japan-map path { fill: #191970; stroke: #191970; stroke-width: 0.5; }
+.ad { text-align: center; margin: 20px 0; color: #999; }
+footer { margin-top: 40px; padding: 20px; text-align: center; font-size: 13px; color: #777; border-top: 1px solid #ddd; }
+#newsOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); display: none; justify-content: center; align-items: center; z-index: 999; }
+.news-window { position: relative; width: 85%; max-width: 900px; height: 70vh; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); overflow: hidden; display: flex; flex-direction: column; }
 </style>
 </head>
 <body>
@@ -173,8 +69,7 @@ footer {
 </header>
 <main>
 <div class="map">
-<div class="japan-map" id="map">
-</div>
+<div class="japan-map" id="map"></div>
 </div>
 </main>
 <div class="ad">広告スペース</div>
@@ -182,8 +77,7 @@ footer {
 <div id="newsOverlay">
 <div class="news-window">
 <button id="closeNews">閉じる</button>
-<div class="news-content">
-</div>
+<div class="news-content"></div>
 </div>
 </div>
 <script>
@@ -250,17 +144,24 @@ fetch('japan.svg')
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
+    // まず全体の線を薄く
+    mapDiv.querySelectorAll('path').forEach(p=>{
+      p.style.stroke = '#191970';   // 県境色を濃紺にして目立たせない
+      p.style.strokeWidth = '0.3';  // 細線
+    });
+
+    // 地域グループだけ白線に
     const groups = mapDiv.querySelectorAll('g.region-group');
     groups.forEach(group => {
+      mapDiv.appendChild(group); // 上に移動
       group.querySelectorAll('path').forEach(path => {
-        path.style.stroke = '#ffffff';       // 線色
-        path.style.strokeWidth = '2';        // 線幅
-        path.style.strokeLinejoin = 'round';// 角丸
+        path.style.stroke = '#ffffff';
+        path.style.strokeWidth = '2';
+        path.style.strokeLinejoin = 'round';
       });
     });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
-
 </script>
 </body>
 </html>
