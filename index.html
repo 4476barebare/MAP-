@@ -104,30 +104,128 @@ newsBtn.addEventListener("click", e=>{
   overlay.style.display="flex";
 });
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
-
-// SVG 読み込み & 地域グループにだけ線を付ける
-fetch('japan.svg')
-  .then(res => res.text())
-  .then(svgText => {
-    const mapDiv = document.getElementById('map');
-    mapDiv.innerHTML = svgText;
-
-    // 県の path は全部非表示（opacity 0）
-    mapDiv.querySelectorAll('path:not(g.region-group path)').forEach(p=>{
-      p.style.opacity = '0';
-    });
-
-    // 地域グループだけ線を付ける
-    mapDiv.querySelectorAll('g.region-group path').forEach(path=>{
-      path.style.opacity = '1';
-      path.style.stroke = '#ffffff';
-      path.style.strokeWidth = '2';
-      path.style.strokeLinejoin = 'round';
-    });
-
-    console.log("線を付けた地域グループ数:", mapDiv.querySelectorAll('g.region-group path').length);
-  })
-  .catch(err => console.error('SVG読み込みエラー:', err));
 </script>
+
+<script src="https://unpkg.com/polygon-clipping@0.15.3/dist/polygon-clipping.umd.js"></script>
+
+<script>
+fetch('japan.svg')
+.then(res => res.text())
+.then(svgText => {
+
+  const mapDiv = document.getElementById('map');
+  mapDiv.innerHTML = svgText;
+
+  const svg = mapDiv.querySelector('svg');
+
+  // ===== 正しい県IDベース =====
+  const regions = {
+    hokkaido: ['Hokkaido'],
+
+    tohoku: [
+      'Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'
+    ],
+
+    kanto: [
+      'Ibaraki','Tochigi','Gunma','Saitama','Chiba','Tokyo','Kanagawa'
+    ],
+
+    chubu: [
+      'Niigata','Toyama','Ishikawa','Fukui',
+      'Yamanashi','Nagano','Gifu','Shizuoka','Aichi'
+    ],
+
+    kansai: [
+      'Mie','Shiga','Kyoto','Osaka','Hyogo','Nara','Wakayama'
+    ],
+
+    chugoku: [
+      'Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'
+    ],
+
+    shikoku: [
+      'Tokushima','Kagawa','Ehime','Kochi'
+    ],
+
+    kyushu: [
+      'Fukuoka','Saga','Nagasaki','Kumamoto',
+      'Oita','Miyazaki','Kagoshima'
+    ],
+
+    okinawa: ['Okinawa']
+  };
+
+  function pathToPoly(d){
+    const nums = d.match(/-?\d+\.?\d*/g);
+    if(!nums) return null;
+
+    let poly = [];
+    for(let i=0;i<nums.length;i+=2){
+      poly.push([parseFloat(nums[i]), parseFloat(nums[i+1])]);
+    }
+    return poly.length > 2 ? [poly] : null;
+  }
+
+  // ===== 地域ごとに外枠生成 =====
+  Object.entries(regions).forEach(([name, prefList])=>{
+
+    let polys = [];
+
+    prefList.forEach(id=>{
+      const el = svg.querySelector(`#${id}`);
+      if(!el){
+        console.warn("未検出:", id);
+        return;
+      }
+
+      const d = el.getAttribute('d');
+      const poly = pathToPoly(d);
+      if(poly) polys.push(poly);
+    });
+
+    if(polys.length === 0) return;
+
+    let merged;
+    try{
+      merged = polygonClipping.union(...polys);
+    }catch(e){
+      console.error(name,"失敗",e);
+      return;
+    }
+
+    let d = '';
+    merged.forEach(poly=>{
+      poly.forEach(ring=>{
+        ring.forEach((p,i)=>{
+          d += (i===0?'M':'L') + p[0] + ' ' + p[1] + ' ';
+        });
+        d += 'Z ';
+      });
+    });
+
+    const outline = document.createElementNS("http://www.w3.org/2000/svg","path");
+    outline.setAttribute('d', d.trim());
+    outline.setAttribute('fill', 'none');
+    outline.setAttribute('stroke', '#ffffff');
+    outline.setAttribute('stroke-width', '3');
+    outline.setAttribute('stroke-linejoin', 'round');
+
+    svg.appendChild(outline);
+  });
+
+  // ===== 県境を消す =====
+  svg.querySelectorAll('path').forEach(p=>{
+    if(p.getAttribute('fill') !== 'none'){
+      p.style.stroke = 'none';
+    }
+  });
+
+  console.log("地域グループ完成");
+
+})
+.catch(err => console.error(err));
+</script>
+
+
 </body>
 </html>
