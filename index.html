@@ -230,23 +230,27 @@ cursor:pointer;
 </div>
 
 <style>
+
+/* 親コンテナの幅と中央揃え */
 #map-container {
   width: 100%;
-  max-width: 800px;  /* 必要に応じて調整 */
+  max-width: 800px;
   margin: 0 auto;
 }
-#map {
+
+/* SVGを画面に収める */
+#map-container svg {
   width: 100%;
   height: auto;
   display: block;
-  /* ドロップシャドウ */
-  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5))
-          brightness(0)   /* 黒ベースを消す */
-          saturate(100%)  /* 色を保持 */
-          sepia(1)        /* 色変換のベース */
-          hue-rotate(200deg)  /* ヘッダーの色に近づける */
-          saturate(3);     /* 彩度補正 */
 }
+
+/* SVG内部のグループに色と影を上書き */
+#map-container svg g {
+  fill: #191970 !important;
+  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5));
+}
+
 </style>
 
 <div class="ad">広告スペース</div>
