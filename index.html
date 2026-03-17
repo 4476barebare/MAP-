@@ -263,9 +263,10 @@ fetch('japan.svg')
   });
   // 県パスだけ線を消す
     document.querySelectorAll('#map path.prefecture').forEach(path => {
-      path.removeAttribute('stroke');
+      path.removeAttribute('stroke'); // 県境だけ削除
     });
-  });
+
+    // 地域グループはCSSで自動的に太線描画される
     // ---------- ここまで ----------
 </script>
 </body>
