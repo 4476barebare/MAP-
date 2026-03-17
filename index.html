@@ -107,19 +107,7 @@ closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 </script>
 
 
-
-<div id="logBox"></div>
-
-<script src="https://unpkg.com/polygon-clipping@0.15.3/dist/polygon-clipping.umd.js"></script>
-
 <script>
-// ===== ログ関数 =====
-function log(msg){
-  const box = document.getElementById('logBox');
-  box.innerHTML += msg + "<br>";
-}
-
-// ===== SVG読み込み =====
 fetch('japan.svg')
 .then(res => res.text())
 .then(svgText => {
@@ -129,122 +117,48 @@ fetch('japan.svg')
 
   const svg = mapDiv.querySelector('svg');
 
-  // ===== 地域定義（IDベース）=====
   const regions = {
     hokkaido: ['Hokkaido'],
-
-    tohoku: [
-      'Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'
-    ],
-
-    kanto: [
-      'Ibaraki','Tochigi','Gunma','Saitama','Chiba','Tokyo','Kanagawa'
-    ],
-
-    chubu: [
-      'Niigata','Toyama','Ishikawa','Fukui',
-      'Yamanashi','Nagano','Gifu','Shizuoka','Aichi'
-    ],
-
-    kansai: [
-      'Mie','Shiga','Kyoto','Osaka','Hyogo','Nara','Wakayama'
-    ],
-
-    chugoku: [
-      'Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'
-    ],
-
-    shikoku: [
-      'Tokushima','Kagawa','Ehime','Kochi'
-    ],
-
-    kyushu: [
-      'Fukuoka','Saga','Nagasaki','Kumamoto',
-      'Oita','Miyazaki','Kagoshima'
-    ],
-
+    tohoku: ['Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'],
+    kanto: ['Ibaraki','Tochigi','Gunma','Saitama','Chiba','Tokyo','Kanagawa'],
+    chubu: ['Niigata','Toyama','Ishikawa','Fukui','Yamanashi','Nagano','Gifu','Shizuoka','Aichi'],
+    kansai: ['Mie','Shiga','Kyoto','Osaka','Hyogo','Nara','Wakayama'],
+    chugoku: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
+    shikoku: ['Tokushima','Kagawa','Ehime','Kochi'],
+    kyushu: ['Fukuoka','Saga','Nagasaki','Kumamoto','Oita','Miyazaki','Kagoshima'],
     okinawa: ['Okinawa']
   };
 
-  // ===== path → polygon =====
-  function pathToPoly(d){
-    const nums = d.match(/-?\d+\.?\d*/g);
-    if(!nums) return null;
+  // ===== 地域ごとにグループ生成 =====
+  Object.entries(regions).forEach(([name, list])=>{
 
-    let poly = [];
-    for(let i=0;i<nums.length;i+=2){
-      poly.push([parseFloat(nums[i]), parseFloat(nums[i+1])]);
-    }
-    return poly.length > 2 ? [poly] : null;
-  }
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
 
-  // ===== 地域ごとに外枠生成 =====
-  Object.entries(regions).forEach(([name, prefList])=>{
-
-    let polys = [];
-
-    prefList.forEach(id=>{
+    list.forEach(id=>{
       const el = svg.querySelector('#' + id);
+      if(!el) return;
 
-      if(!el){
-        log("未検出: " + id);
-        return;
-      }
+      const clone = el.cloneNode(true);
 
-      const d = el.getAttribute('d');
-      const poly = pathToPoly(d);
+      clone.setAttribute('fill', 'none');
+      clone.setAttribute('stroke', '#ffffff');
+      clone.setAttribute('stroke-width', '3');
+      clone.setAttribute('stroke-linejoin', 'round');
 
-      if(poly){
-        polys.push(poly);
-      }else{
-        log("変換失敗: " + id);
-      }
+      g.appendChild(clone);
     });
 
-    if(polys.length === 0){
-      log("地域スキップ: " + name);
-      return;
-    }
-
-    let merged;
-    try{
-      merged = polygonClipping.union(...polys);
-    }catch(e){
-      log("union失敗: " + name);
-      return;
-    }
-
-    let d = '';
-    merged.forEach(poly=>{
-      poly.forEach(ring=>{
-        ring.forEach((p,i)=>{
-          d += (i===0?'M':'L') + p[0] + ' ' + p[1] + ' ';
-        });
-        d += 'Z ';
-      });
-    });
-
-    const outline = document.createElementNS("http://www.w3.org/2000/svg","path");
-    outline.setAttribute('d', d.trim());
-    outline.setAttribute('fill', 'none');
-    outline.setAttribute('stroke', '#ffffff');
-    outline.setAttribute('stroke-width', '3');
-    outline.setAttribute('stroke-linejoin', 'round');
-
-    svg.appendChild(outline);
+    svg.appendChild(g);
   });
 
-  // ===== 県境を消す =====
+  // ===== 県境消す =====
   svg.querySelectorAll('path').forEach(p=>{
     if(p.getAttribute('fill') !== 'none'){
       p.style.stroke = 'none';
     }
   });
 
-  log("処理完了");
-
-})
-.catch(err => log("SVG読み込み失敗"));
+});
 </script>
 
 
