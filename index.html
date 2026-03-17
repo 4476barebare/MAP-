@@ -118,28 +118,28 @@ newsBtn.addEventListener("click", e=>{
 });
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 
-// SVG読み込み & 地域グループだけ線を付け、県境は消す
+
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // 全 path を取得
-    const allPaths = mapDiv.querySelectorAll('path');
+    // すべての path を透明にして県境を消す
+    mapDiv.querySelectorAll('path').forEach(path => {
+      path.style.opacity = '0';
+    });
 
-    allPaths.forEach(path => {
-      const group = path.closest('g');
-
-      if (group && group.classList.contains('region-group')) {
-        // 地域グループだけ線を付ける
-        path.style.stroke = '#ffffff';
-        path.style.strokeWidth = '2';
-        path.style.strokeLinejoin = 'round';
-      } else {
-        // 県境やその他の path は非表示
-        path.style.opacity = '0';
-      }
+    // 地域グループだけ線と色を付ける
+    const groups = mapDiv.querySelectorAll('g.region-group');
+    groups.forEach(group => {
+      group.querySelectorAll('path').forEach(path => {
+        path.style.opacity = '1';             // 表示
+        path.style.fill = path.getAttribute('fill') || '#191970'; // 元色を保持
+        path.style.stroke = '#ffffff';        // 線色
+        path.style.strokeWidth = '2';         // 線幅
+        path.style.strokeLinejoin = 'round';  // 角丸
+      });
     });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
