@@ -153,12 +153,12 @@ footer {
   fill: #191970; /* 塗り色維持 */
   stroke: none;  /* 県境は消えない（元SVGにないため不要） */
 }
-
-/* 地域グループ境界だけ白線で太く表示 */
-.region-group path {
-  stroke: #ffffff;    /* 白線 */
-  stroke-width: 2;    /* 太さ2 */
-}
+  /* 地域グループ線用のスタイル */
+  .region-group path {
+    stroke: #ffffff;
+    stroke-width: 2;
+    fill: #191970; /* 塗り色維持 */
+  }
 </style>
 </head>
 <body>
@@ -258,7 +258,20 @@ closeBtn.addEventListener("click", ()=>{
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
-    document.getElementById('map').innerHTML = svgText;
+    const mapDiv = document.getElementById('map');
+    mapDiv.innerHTML = svgText;
+
+    // 地域グループ <g> を選択
+    const regionGroups = mapDiv.querySelectorAll('g.region-group');
+
+    regionGroups.forEach(g => {
+      g.querySelectorAll('path').forEach(path => {
+        // stroke がなければ追加
+        path.setAttribute('stroke', '#ffffff');
+        path.setAttribute('stroke-width', '2');
+        path.setAttribute('fill', '#191970'); // 塗り色維持
+      });
+    });
   });
 </script>
 </body>
