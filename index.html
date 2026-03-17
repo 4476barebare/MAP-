@@ -140,34 +140,28 @@ fetch('japan.svg')
 
   Object.values(regions).forEach(list => {
 
-    let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    let d = "";
 
     list.forEach(id => {
       const el = svg.querySelector('#'+id);
       if(!el) return;
 
-      const box = el.getBBox();
-
-      minX = Math.min(minX, box.x);
-      minY = Math.min(minY, box.y);
-      maxX = Math.max(maxX, box.x + box.width);
-      maxY = Math.max(maxY, box.y + box.height);
+      // pathのdを連結
+      d += el.getAttribute('d') + " ";
     });
 
-    if(minX === Infinity) return;
+    if(!d) return;
 
-    const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
 
-    rect.setAttribute('x', minX);
-    rect.setAttribute('y', minY);
-    rect.setAttribute('width', maxX - minX);
-    rect.setAttribute('height', maxY - minY);
+    path.setAttribute('d', d);
 
-    rect.setAttribute('fill','none');
-    rect.setAttribute('stroke','#ff0000');
-    rect.setAttribute('stroke-width','4');
+    path.setAttribute('fill','none');
+    path.setAttribute('stroke','#ff0000');
+    path.setAttribute('stroke-width','4');
+    path.setAttribute('stroke-linejoin','round');
 
-    regionLayer.appendChild(rect);
+    regionLayer.appendChild(path);
 
   });
 
@@ -175,6 +169,7 @@ fetch('japan.svg')
 
 });
 </script>
+
 
 
 </body>
