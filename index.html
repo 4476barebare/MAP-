@@ -242,22 +242,25 @@ closeBtn.addEventListener("click", ()=>{
  overlay.style.display="none";
 });
 
-
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // ここで g に直接 stroke を付ける
+    // path に直接 stroke を付与する
     const groups = mapDiv.querySelectorAll('g[id$="_group"]');
     groups.forEach(group => {
-      group.setAttribute('stroke', '#ffffff');
-      group.setAttribute('stroke-width', '2');
-      group.setAttribute('stroke-linejoin', 'round');
+      const paths = group.querySelectorAll('path');
+      paths.forEach(path => {
+        path.setAttribute('stroke', '#ffffff');     // 白線
+        path.setAttribute('stroke-width', '2');     // 太さ
+        path.setAttribute('stroke-linejoin', 'round');
+      });
     });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
+
 
 </script>
 </body>
