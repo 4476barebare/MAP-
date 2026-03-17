@@ -124,6 +124,22 @@ fetch('japan.svg')
     p.style.stroke = 'none';
   });
 
+  // ===== フィルター定義 =====
+  const defs = document.createElementNS("http://www.w3.org/2000/svg","defs");
+
+  defs.innerHTML = `
+    <filter id="outline">
+      <feMorphology operator="dilate" radius="2"/>
+      <feColorMatrix type="matrix"
+        values="0 0 0 0 1
+                0 0 0 0 1
+                0 0 0 0 1
+                0 0 0 1 0"/>
+    </filter>
+  `;
+
+  svg.prepend(defs);
+
   const regions = {
     kanto: ['Tokyo','Kanagawa','Chiba','Saitama','Ibaraki','Tochigi','Gunma'],
     kansai: ['Osaka','Kyoto','Hyogo','Nara','Shiga','Wakayama','Mie'],
@@ -146,13 +162,8 @@ fetch('japan.svg')
 
       const clone = el.cloneNode(true);
 
-      clone.setAttribute('fill','none');
-      clone.setAttribute('stroke','#ff0000'); // ← 赤にして見えるように
-      clone.setAttribute('stroke-width','6'); // ← 太くする
-      clone.setAttribute('stroke-linejoin','round');
-
-      // 🔥 わずかに拡大（これが重要）
-      clone.setAttribute('transform','scale(1.01)');
+      clone.setAttribute('fill','#fff');
+      clone.setAttribute('filter','url(#outline)');
 
       regionLayer.appendChild(clone);
     });
@@ -163,6 +174,7 @@ fetch('japan.svg')
 
 });
 </script>
+
 
 
 </body>
