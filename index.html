@@ -249,18 +249,20 @@ fetch('japan.svg')
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
-
-    // SVG が入った後に地域グループの path を取得
-    const groups = mapDiv.querySelectorAll('g[id$="_group"]'); // _groupで終わる <g> を全て取得
-    groups.forEach(group => {
-      group.querySelectorAll('path').forEach(path => {
-        if(path) {
-          path.setAttribute('stroke', '#ffffff');     // 白線
-          path.setAttribute('stroke-width', '2');     // 太さ
+    
+    // setTimeout で少し待つことでブラウザに DOM 変換させる
+    setTimeout(() => {
+      const groups = mapDiv.querySelectorAll('g[id$="_group"]');
+      groups.forEach(group => {
+        group.querySelectorAll('path').forEach(path => {
+          path.setAttribute('stroke', '#ffffff');
+          path.setAttribute('stroke-width', '2');
           path.setAttribute('stroke-linejoin', 'round');
-        }
+        });
       });
-    });
+    }, 50);
+
+
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 
