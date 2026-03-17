@@ -106,9 +106,20 @@ newsBtn.addEventListener("click", e=>{
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 </script>
 
+
+
+<div id="logBox"></div>
+
 <script src="https://unpkg.com/polygon-clipping@0.15.3/dist/polygon-clipping.umd.js"></script>
 
 <script>
+// ===== ログ関数 =====
+function log(msg){
+  const box = document.getElementById('logBox');
+  box.innerHTML += msg + "<br>";
+}
+
+// ===== SVG読み込み =====
 fetch('japan.svg')
 .then(res => res.text())
 .then(svgText => {
@@ -118,7 +129,7 @@ fetch('japan.svg')
 
   const svg = mapDiv.querySelector('svg');
 
-  // ===== 正しい県IDベース =====
+  // ===== 地域定義（IDベース）=====
   const regions = {
     hokkaido: ['Hokkaido'],
 
@@ -155,6 +166,7 @@ fetch('japan.svg')
     okinawa: ['Okinawa']
   };
 
+  // ===== path → polygon =====
   function pathToPoly(d){
     const nums = d.match(/-?\d+\.?\d*/g);
     if(!nums) return null;
@@ -172,24 +184,33 @@ fetch('japan.svg')
     let polys = [];
 
     prefList.forEach(id=>{
-      const el = svg.querySelector(`#${id}`);
+      const el = svg.querySelector('#' + id);
+
       if(!el){
-        console.warn("未検出:", id);
+        log("未検出: " + id);
         return;
       }
 
       const d = el.getAttribute('d');
       const poly = pathToPoly(d);
-      if(poly) polys.push(poly);
+
+      if(poly){
+        polys.push(poly);
+      }else{
+        log("変換失敗: " + id);
+      }
     });
 
-    if(polys.length === 0) return;
+    if(polys.length === 0){
+      log("地域スキップ: " + name);
+      return;
+    }
 
     let merged;
     try{
       merged = polygonClipping.union(...polys);
     }catch(e){
-      console.error(name,"失敗",e);
+      log("union失敗: " + name);
       return;
     }
 
@@ -220,10 +241,10 @@ fetch('japan.svg')
     }
   });
 
-  console.log("地域グループ完成");
+  log("処理完了");
 
 })
-.catch(err => console.error(err));
+.catch(err => log("SVG読み込み失敗"));
 </script>
 
 
