@@ -119,7 +119,7 @@ fetch('japan.svg')
 
   const svg = mapDiv.querySelector('svg');
 
-  // ===== 県境消す =====
+  // 県境消す
   svg.querySelectorAll('path').forEach(p => {
     p.style.stroke = 'none';
   });
@@ -140,21 +140,34 @@ fetch('japan.svg')
 
   Object.values(regions).forEach(list => {
 
+    let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+
     list.forEach(id => {
       const el = svg.querySelector('#'+id);
       if(!el) return;
 
-      const clone = el.cloneNode(true);
+      const box = el.getBBox();
 
-      // ここが重要
-      clone.setAttribute('fill','none');   // ← 塗らない
-      clone.setAttribute('stroke','#ff0000');
-      clone.setAttribute('stroke-width','6');
-      clone.setAttribute('stroke-linejoin','round');
-      clone.setAttribute('transform','scale(1.02)');
-
-      regionLayer.appendChild(clone);
+      minX = Math.min(minX, box.x);
+      minY = Math.min(minY, box.y);
+      maxX = Math.max(maxX, box.x + box.width);
+      maxY = Math.max(maxY, box.y + box.height);
     });
+
+    if(minX === Infinity) return;
+
+    const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+
+    rect.setAttribute('x', minX);
+    rect.setAttribute('y', minY);
+    rect.setAttribute('width', maxX - minX);
+    rect.setAttribute('height', maxY - minY);
+
+    rect.setAttribute('fill','none');
+    rect.setAttribute('stroke','#ff0000');
+    rect.setAttribute('stroke-width','4');
+
+    regionLayer.appendChild(rect);
 
   });
 
@@ -162,7 +175,6 @@ fetch('japan.svg')
 
 });
 </script>
-
 
 
 </body>
