@@ -148,18 +148,17 @@ footer {
   flex-direction: column;
 }
 
-  /* 県パスは塗りだけ維持 */
-  path.prefecture {
-    fill: #191970;
-    stroke: none; /* 元々不要なら消してOK */
-  }
+/* 全てのパスは塗りだけ */
+#map path {
+  fill: #191970; /* 塗り色維持 */
+  stroke: none;  /* 県境は消えない（元SVGにないため不要） */
+}
 
-  /* 地域グループ線だけ白で太く描画 */
-  .region-group path {
-    stroke: #ffffff;
-    stroke-width: 2;
-    fill: #191970;  /* 塗り色維持 */
-  }
+/* 地域グループ境界だけ白線で太く表示 */
+.region-group path {
+  stroke: #ffffff;    /* 白線 */
+  stroke-width: 2;    /* 太さ2 */
+}
 </style>
 </head>
 <body>
