@@ -138,10 +138,11 @@ filter:drop-shadow(0 3px 5px rgba(0,0,0,0.22));
 /* 日本地図 */
 .japan-map{
 
-  width:100%;
-  max-width:900px;
-  height:520px;
-  margin:auto;
+  width: 100%;       /* 横幅を画面幅に合わせる */
+  max-width: 800px;  /* 必要に応じて最大幅を指定 */
+  height: auto;      /* 縦横比を維持 */
+  display: block;
+  margin: 0 auto;    /* 中央寄せ */
 
   /* 地図拡大 */
   transform:scale(1.8) translateX(25px);
