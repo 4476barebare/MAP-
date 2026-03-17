@@ -261,17 +261,17 @@ fetch('japan.svg')
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // 地域グループ <g> を選択
     const regionGroups = mapDiv.querySelectorAll('g.region-group');
 
-    regionGroups.forEach(g => {
-      g.querySelectorAll('path').forEach(path => {
-        // stroke がなければ追加
-        path.setAttribute('stroke', '#ffffff');
-        path.setAttribute('stroke-width', '2');
-        path.setAttribute('fill', '#191970'); // 塗り色維持
+    regionGroups.forEach(group => {
+      group.querySelectorAll('path').forEach(path => {
+        path.setAttribute('stroke', '#ffffff');     // 線の色
+        path.setAttribute('stroke-width', '2');     // 線の太さ
+        path.setAttribute('stroke-linejoin', 'round'); // 角を丸く
+        path.setAttribute('fill', '#191970');       // 塗り色維持
       });
     });
+
   });
 </script>
 </body>
