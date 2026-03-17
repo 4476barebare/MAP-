@@ -197,9 +197,20 @@ cursor:pointer;
 }
 
 
-#map-container svg g {
-  fill: #191970 !important;
-  filter: url(#shadow);
+#map-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+#map-container svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+#map-container svg path {
+  fill: #191970;
 }
 
 </style>
@@ -229,20 +240,39 @@ cursor:pointer;
   </div>
 </header>
 
+<main>
 <div id="map-container">
-  <!-- ここに以前の完全版SVGをそのまま貼る -->
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="219 11 499 559">
-    <g>
-      <path d="..."></path>
-      ...
-    </g>
-    <defs>
-      <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.5)"/>
-      </filter>
-    </defs>
-  </svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="219 11 499 559">
+<g id="Hokkaido">
+<path d="M1,2 L3,4 Z" fill="#191970"></path>
+<path d="M5,6 L7,8 Z" fill="#191970"></path>
+</g>
+<g id="Aomori">
+<path d="M9,10 L11,12 Z" fill="#191970"></path>
+</g>
+<g id="Iwate">
+<path d="M13,14 L15,16 Z" fill="#191970"></path>
+</g>
+<g id="Miyagi">
+<path d="M17,18 L19,20 Z" fill="#191970"></path>
+</g>
+<g id="Akita">
+<path d="M21,22 L23,24 Z" fill="#191970"></path>
+</g>
+<g id="Yamagata">
+<path d="M25,26 L27,28 Z" fill="#191970"></path>
+</g>
+<g id="Fukushima">
+<path d="M29,30 L31,32 Z" fill="#191970"></path>
+</g>
+<defs>
+<filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+<feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.5)"/>
+</filter>
+</defs>
+</svg>
 </div>
+</main>
 
 
 
