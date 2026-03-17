@@ -149,14 +149,13 @@ footer {
 }
 
 #map path {
-  fill: #191970;        /* 元の地図色を維持 */
-  stroke: #ffffff;      /* 県境を白で描画 */
-  stroke-width: 1;      /* 県境の線幅 */
+  fill: #191970;       /* 地図の色 */
+  stroke: none;        /* 県境は消す */
 }
 
 #map g path {
-  stroke: #ffffff;      /* 地域グループ境界も白 */
-  stroke-width: 2;      /* 県より2倍太くする */
+  stroke: #ffffff;     /* 地域グループの線を白で描画 */
+  stroke-width: 2;     /* 太さは自由に調整 */
 }
 </style>
 </head>
