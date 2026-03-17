@@ -147,6 +147,17 @@ footer {
   display: flex;
   flex-direction: column;
 }
+
+#map path {
+  fill: #191970;        /* 元の地図色を維持 */
+  stroke: #ffffff;      /* 県境を白で描画 */
+  stroke-width: 1;      /* 県境の線幅 */
+}
+
+#map g path {
+  stroke: #ffffff;      /* 地域グループ境界も白 */
+  stroke-width: 2;      /* 県より2倍太くする */
+}
 </style>
 </head>
 <body>
