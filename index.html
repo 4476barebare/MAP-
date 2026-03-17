@@ -146,20 +146,18 @@ fetch('japan.svg')
     const svg = mapDiv.querySelector('svg');
     if(!svg) return;
 
-    // 県境用に薄くする
+    // 県境の stroke を完全に消す
     svg.querySelectorAll('path').forEach(p => {
-      // 地域グループ内の path は除外
       if(!p.closest('g.region-group')){
-        p.style.stroke = '#191970';   // 薄めの色に
-        p.style.strokeWidth = '0.3';  // 細く
+        p.removeAttribute('stroke'); // stroke を消す
       }
     });
 
     // 地域グループだけ白太線に
     svg.querySelectorAll('g.region-group path').forEach(path => {
-      path.style.stroke = '#ffffff';
-      path.style.strokeWidth = '2';
-      path.style.strokeLinejoin = 'round';
+      path.setAttribute('stroke', '#ffffff');
+      path.setAttribute('stroke-width', '2');
+      path.setAttribute('stroke-linejoin', 'round');
     });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
