@@ -1,31 +1,23 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>釣り行こNAVI</title>
-
 <style>
 html,body{
-overflow-x:hidden;
+  overflow-x:hidden;
 }
-
 body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-background:#ffffff;
-color:#333;
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background:#ffffff;
+  color:#333;
 }
-
-/* header */
-
 header{
-border-bottom:1px solid #191970;
-background:#fff;
+  border-bottom:1px solid #191970;
+  background:#fff;
 }
-
 .header-inner{
   max-width:1100px;
   margin:auto;
@@ -36,7 +28,6 @@ background:#fff;
   position:relative;
   z-index:1;
 }
-
 .logo{
   font-weight:700;
   font-size:0.8rem;
@@ -45,27 +36,21 @@ background:#fff;
   display:flex;
   align-items:center;
 }
-
 .nav{
   display:flex;
   align-items:center;
   gap:14px;
   position:relative;
 }
-
 .nav a {
   text-decoration:none;
   color:#191970;
   font-size:0.8rem;
   white-space:nowrap;
 }
-
-/* accordion */
-
 .accordion-wrapper{
-position:relative;
+  position:relative;
 }
-
 .accordion-btn{
   background:none;
   border:none;
@@ -77,314 +62,681 @@ position:relative;
   display:flex;
   align-items:center;
 }
-
 .accordion-panel{
-display:none;
-position:absolute;
-top:30px;
-left:0;
-background:#f9f9f9;
-border:1px solid #ddd;
-border-radius:4px;
-padding:8px;
-min-width:150px;
+  display:none;
+  position:absolute;
+  top:30px;
+  left:0;
+  background:#f9f9f9;
+  border:1px solid #ddd;
+  border-radius:4px;
+  padding:8px;
+  min-width:150px;
 }
-
 .location-list{
-list-style:none;
-padding:0;
-margin:0;
+  list-style:none;
+  padding:0;
+  margin:0;
 }
-
 .location-list li{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:3px 0;
-font-size:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:3px 0;
+  font-size:14px;
 }
-
 .delete-btn{
-background:none;
-border:none;
-cursor:pointer;
-color:#c00;
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#c00;
 }
-
 .location-none{
-color:#888;
-font-style:italic;
+  color:#888;
+  font-style:italic;
 }
-
 .nav a,
 .logo,
 .accordion-btn{
-text-shadow:0 1px 2px rgba(0,0,0,0.15);
+  text-shadow:0 1px 2px rgba(0,0,0,0.15);
 }
-
-
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+.map{
+  text-align:center;
+}
+.japan-map svg{
+  width:100%;
+  max-width:900px;
+  height:auto;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.22));
+}
 .ad{
-text-align:center;
-margin:20px 0;
-color:#999;
+  text-align:center;
+  margin:20px 0;
+  color:#999;
 }
-
-/* footer */
-
 footer{
-margin-top:40px;
-padding:20px;
-text-align:center;
-font-size:13px;
-color:#777;
-border-top:1px solid #ddd;
+  margin-top:40px;
+  padding:20px;
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  border-top:1px solid #ddd;
 }
-
-/* ニュースオーバーレイ */
-
 #newsOverlay{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.55);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:999;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
 }
-
-/* ニュースウィンドウ */
-
 .news-window{
-position:relative;
-width:85%;
-max-width:900px;
-height:70vh;
-background:#fff;
-border-radius:12px;
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
-overflow:hidden;
-display:flex;
-flex-direction:column;
+  position:relative;
+  width:85%;
+  max-width:900px;
+  height:70vh;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
-
-/* スクロール部分 */
-
-.news-content{
-overflow-y:auto;
-padding:20px;
-}
-
-/* ダミー記事 */
-
-.rss-item{
-padding:10px 0;
-border-bottom:1px solid #eee;
-}
-
-/* 閉じるボタン */
-
-#closeNews{
-position:absolute;
-top:10px;
-right:15px;
-border:none;
-background:none;
-font-size:22px;
-cursor:pointer;
-}
-
-
-#map-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-#map-container svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-#map-container svg path {
-  fill: #191970;
-}
-
 </style>
-
 </head>
-
 <body>
-
 <header>
-  <div class="header-inner">
-    <div class="logo">釣り行こNAVI</div>
-    <nav class="nav">
-      <div class="accordion-wrapper">
-        <button class="accordion-btn">登録地点 ▼</button>
-        <div class="accordion-panel">
-          <ul class="location-list" id="locationList">
-            <li>新潟 <button class="delete-btn">✖️</button></li>
-            <li>群馬 <button class="delete-btn">✖️</button></li>
-            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
-          </ul>
-        </div>
-      </div>
-      <a href="#" id="newsBtn">釣りNEWS</a>
-      <a href="#">全国地図</a>
-      <a href="#">その他</a>
-    </nav>
-  </div>
+<div class="header-inner">
+<div class="logo">釣り行こNAVI</div>
+<nav class="nav">
+<div class="accordion-wrapper">
+<button class="accordion-btn">登録地点 ▼</button>
+<div class="accordion-panel">
+<ul class="location-list" id="locationList">
+<li>新潟 <button class="delete-btn">✖️</button></li>
+<li>群馬 <button class="delete-btn">✖️</button></li>
+<li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+</ul>
+</div>
+</div>
+<a href="#" id="newsBtn">釣りNEWS</a>
+<a href="#">全国地図</a>
+<a href="#">その他</a>
+</nav>
+</div>
 </header>
-
 <main>
-<div id="map-container">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="219 11 499 559">
-<g id="Hokkaido">
-<path d="M1,2 L3,4 Z" fill="#191970"></path>
-<path d="M5,6 L7,8 Z" fill="#191970"></path>
+<div class="map">
+<div class="japan-map">
+<!-- 埋め込みSVG -->
+<svg xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="219 11 499 559">
+<!-- 以下、a214ec45b4b30b9e2223aeb4f9107f51のSVG内容を丸ごと貼る -->
+<!-- パスやグループは全てそのまま保持 -->
+<g fill="#191970" stroke="#191970" stroke-width="0.5">
+  <!-- ここにSVGの全パスやグループを入れる -->
 </g>
-<g id="Aomori">
-<path d="M9,10 L11,12 Z" fill="#191970"></path>
-</g>
-<g id="Iwate">
-<path d="M13,14 L15,16 Z" fill="#191970"></path>
-</g>
-<g id="Miyagi">
-<path d="M17,18 L19,20 Z" fill="#191970"></path>
-</g>
-<g id="Akita">
-<path d="M21,22 L23,24 Z" fill="#191970"></path>
-</g>
-<g id="Yamagata">
-<path d="M25,26 L27,28 Z" fill="#191970"></path>
-</g>
-<g id="Fukushima">
-<path d="M29,30 L31,32 Z" fill="#191970"></path>
-</g>
-<defs>
-<filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-<feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.5)"/>
-</filter>
-</defs>
 </svg>
 </div>
+</div>
 </main>
-
-
-
-
-
 <div class="ad">広告スペース</div>
-
 <footer>© 釣り行こNAVI</footer>
-
 <script>
-
-// アコーディオン展開
 const accordionBtn = document.querySelector('.accordion-btn');
 const panel = document.querySelector('.accordion-panel');
-
 accordionBtn.addEventListener('click', ()=>{
-  document.querySelectorAll('.accordion-panel').forEach(p=>{
-    if(p!==panel) p.style.display='none';
-  });
-  panel.style.display = (panel.style.display==='block') ? 'none':'block';
+ document.querySelectorAll('.accordion-panel').forEach(p=>{
+ if(p!==panel) p.style.display='none';
+ });
+ panel.style.display = (panel.style.display==='block') ? 'none':'block';
 });
-
-// ページクリックで閉じる
 document.addEventListener('click', e=>{
-  if(!e.target.closest('.accordion-wrapper')){
-    document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
-  }
+ if(!e.target.closest('.accordion-wrapper')){
+ document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+ }
 });
-
-// 登録地点リスト
 const locationList = document.getElementById('locationList');
-
-// 既存・新規の ✖️ ボタンにイベントを付与
 function attachDeleteEvents() {
-  const deleteButtons = locationList.querySelectorAll('.delete-btn');
-
-  deleteButtons.forEach(btn=>{
-    btn.addEventListener('click', e=>{
-      const li = btn.parentElement;
-      li.remove();
-
-      if(locationList.children.length === 0){
-        locationList.innerHTML = '<li class="location-none">登録なし</li>';
-      }
-    });
-  });
+ const deleteButtons = locationList.querySelectorAll('.delete-btn');
+ deleteButtons.forEach(btn=>{
+ btn.addEventListener('click', e=>{
+ const li = btn.parentElement;
+ li.remove();
+ if(locationList.children.length === 0){
+ locationList.innerHTML = '<li class="location-none">登録なし</li>';
+ }
+ });
+ });
 }
-
-// 初期サンプル
 attachDeleteEvents();
-
-// 登録地点追加
 function addLocation(name){
-
-  const noneItem = locationList.querySelector('.location-none');
-  if(noneItem) noneItem.remove();
-
-  const li = document.createElement('li');
-  li.textContent = name + ' ';
-
-  const btn = document.createElement('button');
-  btn.textContent = '✖️';
-  btn.className = 'delete-btn';
-
-  li.appendChild(btn);
-  locationList.appendChild(li);
-
-  attachDeleteEvents();
+ const noneItem = locationList.querySelector('.location-none');
+ if(noneItem) noneItem.remove();
+ const li = document.createElement('li');
+ li.textContent = name + ' ';
+ const btn = document.createElement('button');
+ btn.textContent = '✖️';
+ btn.className = 'delete-btn';
+ li.appendChild(btn);
+ locationList.appendChild(li);
+ attachDeleteEvents();
 }
-
-// リストリセット
 function resetLocations(){
-  locationList.innerHTML = '<li class="location-none">登録なし</li>';
+ locationList.innerHTML = '<li class="location-none">登録なし</li>';
 }
-</script>
-
-<div id="newsOverlay">
-
-  <div class="news-window">
-
-    <button id="closeNews">✕</button>
-
-    <div class="news-content">
-
-      <div class="rss-item">ニューステスト1</div>
-      <div class="rss-item">ニューステスト2</div>
-      <div class="rss-item">ニューステスト3</div>
-      <div class="rss-item">ニューステスト4</div>
-      <div class="rss-item">ニューステスト5</div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<script>
-// ここからニュース
-
 const newsBtn = document.getElementById("newsBtn");
 const overlay = document.getElementById("newsOverlay");
 const closeBtn = document.getElementById("closeNews");
-
 newsBtn.addEventListener("click", e=>{
-  e.preventDefault();
-  overlay.style.display="flex";
+ e.preventDefault();
+ overlay.style.display="flex";
 });
-
 closeBtn.addEventListener("click", ()=>{
-  overlay.style.display="none";
+ overlay.style.display="none";
 });
-
 </script>
-
 </body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こNAVI</title>
+<style>
+html,body{
+  overflow-x:hidden;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background:#ffffff;
+  color:#333;
+}
+header{
+  border-bottom:1px solid #191970;
+  background:#fff;
+}
+.header-inner{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  position:relative;
+  z-index:1;
+}
+.logo{
+  font-weight:700;
+  font-size:0.8rem;
+  color:#191970;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+}
+.nav{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  position:relative;
+}
+.nav a {
+  text-decoration:none;
+  color:#191970;
+  font-size:0.8rem;
+  white-space:nowrap;
+}
+.accordion-wrapper{
+  position:relative;
+}
+.accordion-btn{
+  background:none;
+  border:none;
+  font-size:0.8rem;
+  color:#191970;
+  cursor:pointer;
+  padding:0;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+}
+.accordion-panel{
+  display:none;
+  position:absolute;
+  top:30px;
+  left:0;
+  background:#f9f9f9;
+  border:1px solid #ddd;
+  border-radius:4px;
+  padding:8px;
+  min-width:150px;
+}
+.location-list{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+.location-list li{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:3px 0;
+  font-size:14px;
+}
+.delete-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#c00;
+}
+.location-none{
+  color:#888;
+  font-style:italic;
+}
+.nav a,
+.logo,
+.accordion-btn{
+  text-shadow:0 1px 2px rgba(0,0,0,0.15);
+}
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+.map{
+  text-align:center;
+}
+.japan-map svg{
+  width:100%;
+  max-width:900px;
+  height:auto;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.22));
+}
+.ad{
+  text-align:center;
+  margin:20px 0;
+  color:#999;
+}
+footer{
+  margin-top:40px;
+  padding:20px;
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  border-top:1px solid #ddd;
+}
+#newsOverlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+.news-window{
+  position:relative;
+  width:85%;
+  max-width:900px;
+  height:70vh;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+</style>
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="logo">釣り行こNAVI</div>
+<nav class="nav">
+<div class="accordion-wrapper">
+<button class="accordion-btn">登録地点 ▼</button>
+<div class="accordion-panel">
+<ul class="location-list" id="locationList">
+<li>新潟 <button class="delete-btn">✖️</button></li>
+<li>群馬 <button class="delete-btn">✖️</button></li>
+<li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+</ul>
+</div>
+</div>
+<a href="#" id="newsBtn">釣りNEWS</a>
+<a href="#">全国地図</a>
+<a href="#">その他</a>
+</nav>
+</div>
+</header>
+<main>
+<div class="map">
+<div class="japan-map">
+<!-- 埋め込みSVG -->
+<svg xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="219 11 499 559">
+<!-- 以下、a214ec45b4b30b9e2223aeb4f9107f51のSVG内容を丸ごと貼る -->
+<!-- パスやグループは全てそのまま保持 -->
+<g fill="#191970" stroke="#191970" stroke-width="0.5">
+  <!-- ここにSVGの全パスやグループを入れる -->
+</g>
+</svg>
+</div>
+</div>
+</main>
+<div class="ad">広告スペース</div>
+<footer>© 釣り行こNAVI</footer>
+<script>
+const accordionBtn = document.querySelector('.accordion-btn');
+const panel = document.querySelector('.accordion-panel');
+accordionBtn.addEventListener('click', ()=>{
+ document.querySelectorAll('.accordion-panel').forEach(p=>{
+ if(p!==panel) p.style.display='none';
+ });
+ panel.style.display = (panel.style.display==='block') ? 'none':'block';
+});
+document.addEventListener('click', e=>{
+ if(!e.target.closest('.accordion-wrapper')){
+ document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+ }
+});
+const locationList = document.getElementById('locationList');
+function attachDeleteEvents() {
+ const deleteButtons = locationList.querySelectorAll('.delete-btn');
+ deleteButtons.forEach(btn=>{
+ btn.addEventListener('click', e=>{
+ const li = btn.parentElement;
+ li.remove();
+ if(locationList.children.length === 0){
+ locationList.innerHTML = '<li class="location-none">登録なし</li>';
+ }
+ });
+ });
+}
+attachDeleteEvents();
+function addLocation(name){
+ const noneItem = locationList.querySelector('.location-none');
+ if(noneItem) noneItem.remove();
+ const li = document.createElement('li');
+ li.textContent = name + ' ';
+ const btn = document.createElement('button');
+ btn.textContent = '✖️';
+ btn.className = 'delete-btn';
+ li.appendChild(btn);
+ locationList.appendChild(li);
+ attachDeleteEvents();
+}
+function resetLocations(){
+ locationList.innerHTML = '<li class="location-none">登録なし</li>';
+}
+const newsBtn = document.getElementById("newsBtn");
+const overlay = document.getElementById("newsOverlay");
+const closeBtn = document.getElementById("closeNews");
+newsBtn.addEventListener("click", e=>{
+ e.preventDefault();
+ overlay.style.display="flex";
+});
+closeBtn.addEventListener("click", ()=>{
+ overlay.style.display="none";
+});
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こNAVI</title>
+<style>
+html,body{
+  overflow-x:hidden;
+}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background:#ffffff;
+  color:#333;
+}
+header{
+  border-bottom:1px solid #191970;
+  background:#fff;
+}
+.header-inner{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  position:relative;
+  z-index:1;
+}
+.logo{
+  font-weight:700;
+  font-size:0.8rem;
+  color:#191970;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+}
+.nav{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  position:relative;
+}
+.nav a {
+  text-decoration:none;
+  color:#191970;
+  font-size:0.8rem;
+  white-space:nowrap;
+}
+.accordion-wrapper{
+  position:relative;
+}
+.accordion-btn{
+  background:none;
+  border:none;
+  font-size:0.8rem;
+  color:#191970;
+  cursor:pointer;
+  padding:0;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+}
+.accordion-panel{
+  display:none;
+  position:absolute;
+  top:30px;
+  left:0;
+  background:#f9f9f9;
+  border:1px solid #ddd;
+  border-radius:4px;
+  padding:8px;
+  min-width:150px;
+}
+.location-list{
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+.location-list li{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:3px 0;
+  font-size:14px;
+}
+.delete-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#c00;
+}
+.location-none{
+  color:#888;
+  font-style:italic;
+}
+.nav a,
+.logo,
+.accordion-btn{
+  text-shadow:0 1px 2px rgba(0,0,0,0.15);
+}
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+.map{
+  text-align:center;
+}
+.japan-map svg{
+  width:100%;
+  max-width:900px;
+  height:auto;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.22));
+}
+.ad{
+  text-align:center;
+  margin:20px 0;
+  color:#999;
+}
+footer{
+  margin-top:40px;
+  padding:20px;
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  border-top:1px solid #ddd;
+}
+#newsOverlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+.news-window{
+  position:relative;
+  width:85%;
+  max-width:900px;
+  height:70vh;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+</style>
+</head>
+<body>
+<header>
+<div class="header-inner">
+<div class="logo">釣り行こNAVI</div>
+<nav class="nav">
+<div class="accordion-wrapper">
+<button class="accordion-btn">登録地点 ▼</button>
+<div class="accordion-panel">
+<ul class="location-list" id="locationList">
+<li>新潟 <button class="delete-btn">✖️</button></li>
+<li>群馬 <button class="delete-btn">✖️</button></li>
+<li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+</ul>
+</div>
+</div>
+<a href="#" id="newsBtn">釣りNEWS</a>
+<a href="#">全国地図</a>
+<a href="#">その他</a>
+</nav>
+</div>
+</header>
+<main>
+<div class="map">
+<div class="japan-map">
+<!-- 埋め込みSVG -->
+<svg xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="219 11 499 559">
+<!-- 以下、a214ec45b4b30b9e2223aeb4f9107f51のSVG内容を丸ごと貼る -->
+<!-- パスやグループは全てそのまま保持 -->
+<g fill="#191970" stroke="#191970" stroke-width="0.5">
+  <!-- ここにSVGの全パスやグループを入れる -->
+</g>
+</svg>
+</div>
+</div>
+</main>
+<div class="ad">広告スペース</div>
+<footer>© 釣り行こNAVI</footer>
+<script>
+const accordionBtn = document.querySelector('.accordion-btn');
+const panel = document.querySelector('.accordion-panel');
+accordionBtn.addEventListener('click', ()=>{
+ document.querySelectorAll('.accordion-panel').forEach(p=>{
+ if(p!==panel) p.style.display='none';
+ });
+ panel.style.display = (panel.style.display==='block') ? 'none':'block';
+});
+document.addEventListener('click', e=>{
+ if(!e.target.closest('.accordion-wrapper')){
+ document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+ }
+});
+const locationList = document.getElementById('locationList');
+function attachDeleteEvents() {
+ const deleteButtons = locationList.querySelectorAll('.delete-btn');
+ deleteButtons.forEach(btn=>{
+ btn.addEventListener('click', e=>{
+ const li = btn.parentElement;
+ li.remove();
+ if(locationList.children.length === 0){
+ locationList.innerHTML = '<li class="location-none">登録なし</li>';
+ }
+ });
+ });
+}
+attachDeleteEvents();
+function addLocation(name){
+ const noneItem = locationList.querySelector('.location-none');
+ if(noneItem) noneItem.remove();
+ const li = document.createElement('li');
+ li.textContent = name + ' ';
+ const btn = document.createElement('button');
+ btn.textContent = '✖️';
+ btn.className = 'delete-btn';
+ li.appendChild(btn);
+ locationList.appendChild(li);
+ attachDeleteEvents();
+}
+function resetLocations(){
+ locationList.innerHTML = '<li class="location-none">登録なし</li>';
+}
+const newsBtn = document.getElementById("newsBtn");
+const overlay = document.getElementById("newsOverlay");
+const closeBtn = document.getElementById("closeNews");
+newsBtn.addEventListener("click", e=>{
+ e.preventDefault();
+ overlay.style.display="flex";
+});
+closeBtn.addEventListener("click", ()=>{
+ overlay.style.display="none";
+});
+</script>
+</body>
+</html>
