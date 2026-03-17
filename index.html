@@ -243,26 +243,19 @@ closeBtn.addEventListener("click", ()=>{
 });
 
 
-// japan.svg を DOM に読み込む
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
-    
-    // setTimeout で少し待つことでブラウザに DOM 変換させる
-    setTimeout(() => {
-      const groups = mapDiv.querySelectorAll('g[id$="_group"]');
-      groups.forEach(group => {
-        group.querySelectorAll('path').forEach(path => {
-          path.setAttribute('stroke', '#ffffff');
-          path.setAttribute('stroke-width', '2');
-          path.setAttribute('stroke-linejoin', 'round');
-        });
-      });
-    }, 50);
 
-
+    // ここで g に直接 stroke を付ける
+    const groups = mapDiv.querySelectorAll('g[id$="_group"]');
+    groups.forEach(group => {
+      group.setAttribute('stroke', '#ffffff');
+      group.setAttribute('stroke-width', '2');
+      group.setAttribute('stroke-linejoin', 'round');
+    });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 
