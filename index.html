@@ -107,8 +107,7 @@ main {
 }
 .japan-map path {
   fill: #191970;
-  stroke: #191970;
-  stroke-width: 0.5;
+  stroke: none; /* デフォルト線を消す */
 }
 .ad {
   text-align: center;
@@ -248,12 +247,12 @@ fetch('japan.svg')
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    const groups = mapDiv.querySelectorAll('g[id$="_group"]');
+    const groups = mapDiv.querySelectorAll('g.region-group');
 groups.forEach(group => {
   group.querySelectorAll('path').forEach(path => {
-    path.setAttribute('stroke', '#ffffff'); // 線色
-    path.setAttribute('stroke-width', '2'); // 線幅
-    path.setAttribute('stroke-linejoin', 'round'); // 角丸
+    path.setAttribute('stroke', '#ffffff');       // 線色
+    path.setAttribute('stroke-width', '2');       // 線幅
+    path.setAttribute('stroke-linejoin', 'round');// 角丸
   });
 });
   })
