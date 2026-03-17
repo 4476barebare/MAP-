@@ -94,19 +94,6 @@ function attachDeleteEvents() {
   });
 }
 attachDeleteEvents();
-function addLocation(name){
-  const noneItem = locationList.querySelector('.location-none');
-  if(noneItem) noneItem.remove();
-  const li = document.createElement('li');
-  li.textContent = name + ' ';
-  const btn = document.createElement('button');
-  btn.textContent = '✖️';
-  btn.className = 'delete-btn';
-  li.appendChild(btn);
-  locationList.appendChild(li);
-  attachDeleteEvents();
-}
-function resetLocations(){ locationList.innerHTML = '<li class="location-none">登録なし</li>'; }
 
 // ニュースオーバーレイ
 const newsBtn = document.getElementById("newsBtn");
@@ -118,69 +105,29 @@ newsBtn.addEventListener("click", e=>{
 });
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 
+// SVG 読み込み & 地域グループにだけ線を付ける
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // すべての path の stroke を消す（保険）
-    mapDiv.querySelectorAll('path').forEach(p => {
-      p.style.stroke = 'none';
+    // 県の path は全部非表示（opacity 0）
+    mapDiv.querySelectorAll('path:not(g.region-group path)').forEach(p=>{
+      p.style.opacity = '0';
     });
 
-    // 地域グループにだけ線を付ける
-    mapDiv.querySelectorAll('g.region-group').forEach(group => {
-      group.querySelectorAll('path').forEach(path => {
-        path.style.stroke = '#ffffff';
-        path.style.strokeWidth = '2';
-        path.style.strokeLinejoin = 'round';
-      });
-    });
-  })
-  .catch(err => console.error('SVG読み込みエラー:', err));fetch('japan.svg')
-  .then(res => res.text())
-  .then(svgText => {
-    const mapDiv = document.getElementById('map');
-    mapDiv.innerHTML = svgText;
-
-    // すべての path の stroke を消す（保険）
-    mapDiv.querySelectorAll('path').forEach(p => {
-      p.style.stroke = 'none';
+    // 地域グループだけ線を付ける
+    mapDiv.querySelectorAll('g.region-group path').forEach(path=>{
+      path.style.opacity = '1';
+      path.style.stroke = '#ffffff';
+      path.style.strokeWidth = '2';
+      path.style.strokeLinejoin = 'round';
     });
 
-    // 地域グループにだけ線を付ける
-    mapDiv.querySelectorAll('g.region-group').forEach(group => {
-      group.querySelectorAll('path').forEach(path => {
-        path.style.stroke = '#ffffff';
-        path.style.strokeWidth = '2';
-        path.style.strokeLinejoin = 'round';
-      });
-    });
-  })
-  .catch(err => console.error('SVG読み込みエラー:', err));fetch('japan.svg')
-  .then(res => res.text())
-  .then(svgText => {
-    const mapDiv = document.getElementById('map');
-    mapDiv.innerHTML = svgText;
-
-    // すべての path の stroke を消す（保険）
-    mapDiv.querySelectorAll('path').forEach(p => {
-      p.style.stroke = 'none';
-    });
-
-    // 地域グループにだけ線を付ける
-    mapDiv.querySelectorAll('g.region-group').forEach(group => {
-      group.querySelectorAll('path').forEach(path => {
-        path.style.stroke = '#ffffff';
-        path.style.strokeWidth = '2';
-        path.style.strokeLinejoin = 'round';
-      });
-    });
+    console.log("線を付けた地域グループ数:", mapDiv.querySelectorAll('g.region-group path').length);
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
-
-
 </script>
 </body>
 </html>
