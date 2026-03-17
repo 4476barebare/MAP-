@@ -148,15 +148,17 @@ footer {
   flex-direction: column;
 }
 
-#map path {
-  fill: #191970;       /* 地図の色 */
-  stroke: none;   /* 県境は消す */
-}
+  /* 県パスは線を消す */
+  #map path.prefecture {
+    fill: #191970;
+    stroke: none;
+  }
 
-#map g path {
-  stroke: #ffffff;     /* 地域グループの線を白で描画 */
-  stroke-width: 2;     /* 太さは自由に調整 */
-}
+  /* 地域グループの線だけ白で太く描画 */
+  #map g path {
+    stroke: #ffffff;
+    stroke-width: 2;
+    fill: #191970;
 </style>
 </head>
 <body>
@@ -251,24 +253,18 @@ newsBtn.addEventListener("click", e=>{
 closeBtn.addEventListener("click", ()=>{
  overlay.style.display="none";
 });
+
 // 外部SVGをDOMに読み込む
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     document.getElementById('map').innerHTML = svgText;
   });
-  // ---------- ここから追加 ----------
-    // 県パスの線を完全に消す
-    document.querySelectorAll('#map path').forEach(path => {
+  // 県パスだけ線を消す
+    document.querySelectorAll('#map path.prefecture').forEach(path => {
       path.removeAttribute('stroke');
     });
-
-    // 地域グループの線を設定
-    document.querySelectorAll('#map g path').forEach(path => {
-      path.setAttribute('stroke', '#ffffff'); // 白線
-      path.setAttribute('stroke-width', '2');  // 太さ
-      path.setAttribute('fill', '#191970');    // 塗り色維持
-    });
+  });
     // ---------- ここまで ----------
 </script>
 </body>
