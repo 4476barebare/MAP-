@@ -107,6 +107,9 @@ closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 </script>
 
 
+
+<div id="map"></div>
+
 <script>
 fetch('japan.svg')
 .then(res => res.text())
@@ -117,47 +120,53 @@ fetch('japan.svg')
 
   const svg = mapDiv.querySelector('svg');
 
+  // ===== 県境を完全に消す =====
+  svg.querySelectorAll('path').forEach(p => {
+    p.style.stroke = 'none';
+  });
+
+  // ===== 地域定義 =====
   const regions = {
-    hokkaido: ['Hokkaido'],
+    kanto: ['Tokyo','Kanagawa','Chiba','Saitama','Ibaraki','Tochigi','Gunma'],
+    kansai: ['Osaka','Kyoto','Hyogo','Nara','Shiga','Wakayama','Mie'],
     tohoku: ['Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'],
-    kanto: ['Ibaraki','Tochigi','Gunma','Saitama','Chiba','Tokyo','Kanagawa'],
     chubu: ['Niigata','Toyama','Ishikawa','Fukui','Yamanashi','Nagano','Gifu','Shizuoka','Aichi'],
-    kansai: ['Mie','Shiga','Kyoto','Osaka','Hyogo','Nara','Wakayama'],
     chugoku: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
     shikoku: ['Tokushima','Kagawa','Ehime','Kochi'],
     kyushu: ['Fukuoka','Saga','Nagasaki','Kumamoto','Oita','Miyazaki','Kagoshima'],
+    hokkaido: ['Hokkaido'],
     okinawa: ['Okinawa']
   };
 
-  // ===== 地域線用グループ（最背面）=====
+  // ===== 地域レイヤー =====
   const regionLayer = document.createElementNS("http://www.w3.org/2000/svg","g");
+  regionLayer.setAttribute("id","region-borders");
 
-  Object.entries(regions).forEach(([name, list])=>{
+  Object.values(regions).forEach(list => {
 
-    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
-
-    list.forEach(id=>{
-      const el = svg.querySelector('#' + id);
+    list.forEach(id => {
+      const el = svg.querySelector('#'+id);
       if(!el) return;
 
       const clone = el.cloneNode(true);
 
-      clone.setAttribute('fill', 'none');
-      clone.setAttribute('stroke', '#ffffff');
-      clone.setAttribute('stroke-width', '3');
-      clone.setAttribute('stroke-linejoin', 'round');
+      clone.setAttribute('fill','none');
+      clone.setAttribute('stroke','#ffffff');
+      clone.setAttribute('stroke-width','4');
+      clone.setAttribute('stroke-linejoin','round');
 
-      g.appendChild(clone);
+      regionLayer.appendChild(clone);
     });
 
-    regionLayer.appendChild(g);
   });
 
-  // ===== 一番最初に挿入（ここが重要）=====
-  svg.insertBefore(regionLayer, svg.firstChild);
+  // ===== 一番上に重ねる =====
+  svg.appendChild(regionLayer);
 
 });
-</script><script>
+</script><div id="map"></div>
+
+<script>
 fetch('japan.svg')
 .then(res => res.text())
 .then(svgText => {
@@ -167,48 +176,163 @@ fetch('japan.svg')
 
   const svg = mapDiv.querySelector('svg');
 
+  // ===== 県境を完全に消す =====
+  svg.querySelectorAll('path').forEach(p => {
+    p.style.stroke = 'none';
+  });
+
+  // ===== 地域定義 =====
   const regions = {
-    hokkaido: ['Hokkaido'],
+    kanto: ['Tokyo','Kanagawa','Chiba','Saitama','Ibaraki','Tochigi','Gunma'],
+    kansai: ['Osaka','Kyoto','Hyogo','Nara','Shiga','Wakayama','Mie'],
     tohoku: ['Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'],
-    kanto: ['Ibaraki','Tochigi','Gunma','Saitama','Chiba','Tokyo','Kanagawa'],
     chubu: ['Niigata','Toyama','Ishikawa','Fukui','Yamanashi','Nagano','Gifu','Shizuoka','Aichi'],
-    kansai: ['Mie','Shiga','Kyoto','Osaka','Hyogo','Nara','Wakayama'],
     chugoku: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
     shikoku: ['Tokushima','Kagawa','Ehime','Kochi'],
     kyushu: ['Fukuoka','Saga','Nagasaki','Kumamoto','Oita','Miyazaki','Kagoshima'],
+    hokkaido: ['Hokkaido'],
     okinawa: ['Okinawa']
   };
 
-  // ===== 地域線用グループ（最背面）=====
+  // ===== 地域レイヤー =====
   const regionLayer = document.createElementNS("http://www.w3.org/2000/svg","g");
+  regionLayer.setAttribute("id","region-borders");
 
-  Object.entries(regions).forEach(([name, list])=>{
+  Object.values(regions).forEach(list => {
 
-    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
-
-    list.forEach(id=>{
-      const el = svg.querySelector('#' + id);
+    list.forEach(id => {
+      const el = svg.querySelector('#'+id);
       if(!el) return;
 
       const clone = el.cloneNode(true);
 
-      clone.setAttribute('fill', 'none');
-      clone.setAttribute('stroke', '#ffffff');
-      clone.setAttribute('stroke-width', '3');
-      clone.setAttribute('stroke-linejoin', 'round');
+      clone.setAttribute('fill','none');
+      clone.setAttribute('stroke','#ffffff');
+      clone.setAttribute('stroke-width','4');
+      clone.setAttribute('stroke-linejoin','round');
 
-      g.appendChild(clone);
+      regionLayer.appendChild(clone);
     });
 
-    regionLayer.appendChild(g);
   });
 
-  // ===== 一番最初に挿入（ここが重要）=====
-  svg.insertBefore(regionLayer, svg.firstChild);
+  // ===== 一番上に重ねる =====
+  svg.appendChild(regionLayer);
+
+});
+</script><div id="map"></div>
+
+<script>
+fetch('japan.svg')
+.then(res => res.text())
+.then(svgText => {
+
+  const mapDiv = document.getElementById('map');
+  mapDiv.innerHTML = svgText;
+
+  const svg = mapDiv.querySelector('svg');
+
+  // ===== 県境を完全に消す =====
+  svg.querySelectorAll('path').forEach(p => {
+    p.style.stroke = 'none';
+  });
+
+  // ===== 地域定義 =====
+  const regions = {
+    kanto: ['Tokyo','Kanagawa','Chiba','Saitama','Ibaraki','Tochigi','Gunma'],
+    kansai: ['Osaka','Kyoto','Hyogo','Nara','Shiga','Wakayama','Mie'],
+    tohoku: ['Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'],
+    chubu: ['Niigata','Toyama','Ishikawa','Fukui','Yamanashi','Nagano','Gifu','Shizuoka','Aichi'],
+    chugoku: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
+    shikoku: ['Tokushima','Kagawa','Ehime','Kochi'],
+    kyushu: ['Fukuoka','Saga','Nagasaki','Kumamoto','Oita','Miyazaki','Kagoshima'],
+    hokkaido: ['Hokkaido'],
+    okinawa: ['Okinawa']
+  };
+
+  // ===== 地域レイヤー =====
+  const regionLayer = document.createElementNS("http://www.w3.org/2000/svg","g");
+  regionLayer.setAttribute("id","region-borders");
+
+  Object.values(regions).forEach(list => {
+
+    list.forEach(id => {
+      const el = svg.querySelector('#'+id);
+      if(!el) return;
+
+      const clone = el.cloneNode(true);
+
+      clone.setAttribute('fill','none');
+      clone.setAttribute('stroke','#ffffff');
+      clone.setAttribute('stroke-width','4');
+      clone.setAttribute('stroke-linejoin','round');
+
+      regionLayer.appendChild(clone);
+    });
+
+  });
+
+  // ===== 一番上に重ねる =====
+  svg.appendChild(regionLayer);
+
+});
+</script><div id="map"></div>
+
+<script>
+fetch('japan.svg')
+.then(res => res.text())
+.then(svgText => {
+
+  const mapDiv = document.getElementById('map');
+  mapDiv.innerHTML = svgText;
+
+  const svg = mapDiv.querySelector('svg');
+
+  // ===== 県境を完全に消す =====
+  svg.querySelectorAll('path').forEach(p => {
+    p.style.stroke = 'none';
+  });
+
+  // ===== 地域定義 =====
+  const regions = {
+    kanto: ['Tokyo','Kanagawa','Chiba','Saitama','Ibaraki','Tochigi','Gunma'],
+    kansai: ['Osaka','Kyoto','Hyogo','Nara','Shiga','Wakayama','Mie'],
+    tohoku: ['Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'],
+    chubu: ['Niigata','Toyama','Ishikawa','Fukui','Yamanashi','Nagano','Gifu','Shizuoka','Aichi'],
+    chugoku: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
+    shikoku: ['Tokushima','Kagawa','Ehime','Kochi'],
+    kyushu: ['Fukuoka','Saga','Nagasaki','Kumamoto','Oita','Miyazaki','Kagoshima'],
+    hokkaido: ['Hokkaido'],
+    okinawa: ['Okinawa']
+  };
+
+  // ===== 地域レイヤー =====
+  const regionLayer = document.createElementNS("http://www.w3.org/2000/svg","g");
+  regionLayer.setAttribute("id","region-borders");
+
+  Object.values(regions).forEach(list => {
+
+    list.forEach(id => {
+      const el = svg.querySelector('#'+id);
+      if(!el) return;
+
+      const clone = el.cloneNode(true);
+
+      clone.setAttribute('fill','none');
+      clone.setAttribute('stroke','#ffffff');
+      clone.setAttribute('stroke-width','4');
+      clone.setAttribute('stroke-linejoin','round');
+
+      regionLayer.appendChild(clone);
+    });
+
+  });
+
+  // ===== 一番上に重ねる =====
+  svg.appendChild(regionLayer);
 
 });
 </script>
-
 
 </body>
 </html>
