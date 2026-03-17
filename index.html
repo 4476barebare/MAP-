@@ -119,26 +119,25 @@ newsBtn.addEventListener("click", e=>{
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 
 
+
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // すべての path を透明にして県境を消す
+    // まず全ての path の stroke をリセット（県境の線を消す）
     mapDiv.querySelectorAll('path').forEach(path => {
-      path.style.opacity = '0';
+      path.style.stroke = 'none';
     });
 
-    // 地域グループだけ線と色を付ける
+    // 地域グループだけ線を付ける
     const groups = mapDiv.querySelectorAll('g.region-group');
     groups.forEach(group => {
       group.querySelectorAll('path').forEach(path => {
-        path.style.opacity = '1';             // 表示
-        path.style.fill = path.getAttribute('fill') || '#191970'; // 元色を保持
-        path.style.stroke = '#ffffff';        // 線色
-        path.style.strokeWidth = '2';         // 線幅
-        path.style.strokeLinejoin = 'round';  // 角丸
+        path.style.stroke = '#ffffff';       // 線色
+        path.style.strokeWidth = '2';        // 線幅
+        path.style.strokeLinejoin = 'round'; // 角丸
       });
     });
   })
