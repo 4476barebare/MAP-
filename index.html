@@ -129,7 +129,9 @@ fetch('japan.svg')
     okinawa: ['Okinawa']
   };
 
-  // ===== 地域ごとにグループ生成 =====
+  // ===== 地域線用グループ（最背面）=====
+  const regionLayer = document.createElementNS("http://www.w3.org/2000/svg","g");
+
   Object.entries(regions).forEach(([name, list])=>{
 
     const g = document.createElementNS("http://www.w3.org/2000/svg","g");
@@ -148,15 +150,61 @@ fetch('japan.svg')
       g.appendChild(clone);
     });
 
-    svg.appendChild(g);
+    regionLayer.appendChild(g);
   });
 
-  // ===== 県境消す =====
-  svg.querySelectorAll('path').forEach(p=>{
-    if(p.getAttribute('fill') !== 'none'){
-      p.style.stroke = 'none';
-    }
+  // ===== 一番最初に挿入（ここが重要）=====
+  svg.insertBefore(regionLayer, svg.firstChild);
+
+});
+</script><script>
+fetch('japan.svg')
+.then(res => res.text())
+.then(svgText => {
+
+  const mapDiv = document.getElementById('map');
+  mapDiv.innerHTML = svgText;
+
+  const svg = mapDiv.querySelector('svg');
+
+  const regions = {
+    hokkaido: ['Hokkaido'],
+    tohoku: ['Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'],
+    kanto: ['Ibaraki','Tochigi','Gunma','Saitama','Chiba','Tokyo','Kanagawa'],
+    chubu: ['Niigata','Toyama','Ishikawa','Fukui','Yamanashi','Nagano','Gifu','Shizuoka','Aichi'],
+    kansai: ['Mie','Shiga','Kyoto','Osaka','Hyogo','Nara','Wakayama'],
+    chugoku: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
+    shikoku: ['Tokushima','Kagawa','Ehime','Kochi'],
+    kyushu: ['Fukuoka','Saga','Nagasaki','Kumamoto','Oita','Miyazaki','Kagoshima'],
+    okinawa: ['Okinawa']
+  };
+
+  // ===== 地域線用グループ（最背面）=====
+  const regionLayer = document.createElementNS("http://www.w3.org/2000/svg","g");
+
+  Object.entries(regions).forEach(([name, list])=>{
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+
+    list.forEach(id=>{
+      const el = svg.querySelector('#' + id);
+      if(!el) return;
+
+      const clone = el.cloneNode(true);
+
+      clone.setAttribute('fill', 'none');
+      clone.setAttribute('stroke', '#ffffff');
+      clone.setAttribute('stroke-width', '3');
+      clone.setAttribute('stroke-linejoin', 'round');
+
+      g.appendChild(clone);
+    });
+
+    regionLayer.appendChild(g);
   });
+
+  // ===== 一番最初に挿入（ここが重要）=====
+  svg.insertBefore(regionLayer, svg.firstChild);
 
 });
 </script>
