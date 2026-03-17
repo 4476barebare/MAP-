@@ -239,6 +239,13 @@ cursor:pointer;
   width: 100%;
   height: auto;
   display: block;
+  /* ドロップシャドウ */
+  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5))
+          brightness(0)   /* 黒ベースを消す */
+          saturate(100%)  /* 色を保持 */
+          sepia(1)        /* 色変換のベース */
+          hue-rotate(200deg)  /* ヘッダーの色に近づける */
+          saturate(3);     /* 彩度補正 */
 }
 </style>
 
