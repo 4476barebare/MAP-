@@ -241,6 +241,7 @@ closeBtn.addEventListener("click", ()=>{
  overlay.style.display="none";
 });
 
+// SVG 読み込み & 地域グループにだけ線を付ける
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
@@ -248,13 +249,13 @@ fetch('japan.svg')
     mapDiv.innerHTML = svgText;
 
     const groups = mapDiv.querySelectorAll('g.region-group');
-groups.forEach(group => {
-  group.querySelectorAll('path').forEach(path => {
-    path.setAttribute('stroke', '#ffffff');       // 線色
-    path.setAttribute('stroke-width', '2');       // 線幅
-    path.setAttribute('stroke-linejoin', 'round');// 角丸
-  });
-});
+    groups.forEach(group => {
+      group.querySelectorAll('path').forEach(path => {
+        path.style.stroke = '#ffffff';       // 線色
+        path.style.strokeWidth = '2';        // 線幅
+        path.style.strokeLinejoin = 'round';// 角丸
+      });
+    });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 
