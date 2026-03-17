@@ -150,7 +150,7 @@ footer {
 
 #map path {
   fill: #191970;       /* 地図の色 */
-  stroke: none !important;   /* 県境は消す */
+  stroke: none;   /* 県境は消す */
 }
 
 #map g path {
@@ -257,6 +257,19 @@ fetch('japan.svg')
   .then(svgText => {
     document.getElementById('map').innerHTML = svgText;
   });
+  // ---------- ここから追加 ----------
+    // 県パスの線を完全に消す
+    document.querySelectorAll('#map path').forEach(path => {
+      path.removeAttribute('stroke');
+    });
+
+    // 地域グループの線を設定
+    document.querySelectorAll('#map g path').forEach(path => {
+      path.setAttribute('stroke', '#ffffff'); // 白線
+      path.setAttribute('stroke-width', '2');  // 太さ
+      path.setAttribute('fill', '#191970');    // 塗り色維持
+    });
+    // ---------- ここまで ----------
 </script>
 </body>
 </html>
