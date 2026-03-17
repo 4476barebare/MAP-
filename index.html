@@ -146,13 +146,16 @@ fetch('japan.svg')
     const svg = mapDiv.querySelector('svg');
     if(!svg) return;
 
-    // 全体の線を薄く
+    // 県境用に薄くする
     svg.querySelectorAll('path').forEach(p => {
-      p.style.stroke = '#191970';
-      p.style.strokeWidth = '0.3';
+      // 地域グループ内の path は除外
+      if(!p.closest('g.region-group')){
+        p.style.stroke = '#191970';   // 薄めの色に
+        p.style.strokeWidth = '0.3';  // 細く
+      }
     });
 
-    // 地域グループだけ白線に
+    // 地域グループだけ白太線に
     svg.querySelectorAll('g.region-group path').forEach(path => {
       path.style.stroke = '#ffffff';
       path.style.strokeWidth = '2';
