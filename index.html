@@ -248,19 +248,17 @@ fetch('japan.svg')
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // path に直接 stroke を付与する
-    const groups = mapDiv.querySelectorAll('g[id$="_group"]');
+    // 地域グループ（class="region-group"）だけに線を付与
+    const groups = mapDiv.querySelectorAll('g[class*="region-group"]');
     groups.forEach(group => {
-      const paths = group.querySelectorAll('path');
-      paths.forEach(path => {
-        path.setAttribute('stroke', '#ffffff');     // 白線
-        path.setAttribute('stroke-width', '2');     // 太さ
-        path.setAttribute('stroke-linejoin', 'round');
+      group.querySelectorAll('path').forEach(path => {
+        path.setAttribute('stroke', '#ffffff');       // 線色
+        path.setAttribute('stroke-width', '2');       // 線幅
+        path.setAttribute('stroke-linejoin', 'round');// 角丸
       });
     });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
-
 
 </script>
 </body>
