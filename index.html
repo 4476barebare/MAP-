@@ -148,17 +148,17 @@ footer {
   flex-direction: column;
 }
 
-  /* 県パスは線を消す */
-  #map path.prefecture {
+  /* 県パスは塗りだけ維持 */
+  path.prefecture {
     fill: #191970;
-    stroke: none;
+    stroke: none; /* 元々不要なら消してOK */
   }
 
-  /* 地域グループの線だけ白で太く描画 */
-  #map g path {
+  /* 地域グループ線だけ白で太く描画 */
+  .region-group path {
     stroke: #ffffff;
     stroke-width: 2;
-    fill: #191970;
+    fill: #191970;  /* 塗り色維持 */
   }
 </style>
 </head>
@@ -261,13 +261,6 @@ fetch('japan.svg')
   .then(svgText => {
     document.getElementById('map').innerHTML = svgText;
   });
-  // 県パスだけ線を消す
-    document.querySelectorAll('#map path.prefecture').forEach(path => {
-      path.removeAttribute('stroke'); // 県境だけ削除
-    });
-
-    // 地域グループはCSSで自動的に太線描画される
-    // ---------- ここまで ----------
 </script>
 </body>
 </html>
