@@ -196,6 +196,12 @@ font-size:22px;
 cursor:pointer;
 }
 
+
+#map-container svg g {
+  fill: #191970 !important;
+  filter: url(#shadow);
+}
+
 </style>
 
 </head>
@@ -223,35 +229,24 @@ cursor:pointer;
   </div>
 </header>
 
-
-
 <div id="map-container">
-  <img src="japan.svg" alt="Japan Map" id="map">
+  <!-- ここに以前の完全版SVGをそのまま貼る -->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="219 11 499 559">
+    <g>
+      <path d="..."></path>
+      ...
+    </g>
+    <defs>
+      <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="rgba(0,0,0,0.5)"/>
+      </filter>
+    </defs>
+  </svg>
 </div>
 
-<style>
 
-/* 親コンテナの幅と中央揃え */
-#map-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
 
-/* SVGを画面に収める */
-#map-container svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
 
-/* SVG内部のグループに色と影を上書き */
-#map-container svg g {
-  fill: #191970 !important;
-  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5));
-}
-
-</style>
 
 <div class="ad">広告スペース</div>
 
