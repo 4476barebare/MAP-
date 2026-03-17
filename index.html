@@ -241,12 +241,25 @@ newsBtn.addEventListener("click", e=>{
 closeBtn.addEventListener("click", ()=>{
  overlay.style.display="none";
 });
-// 外部SVGをDOMに読み込む
+
+// SVG読み込み → DOM化
 fetch('japan.svg')
-  .then(res => res.text())
-  .then(svgText => {
-    document.getElementById('map').innerHTML = svgText;
+.then(res => res.text())
+.then(svgText => {
+  document.getElementById('map').innerHTML = svgText;
+
+  // 地域グループに線を付与
+  const groups = document.querySelectorAll('#map g[id$="_group"]');
+  groups.forEach(g => {
+    g.querySelectorAll('path').forEach(p => {
+      p.setAttribute('stroke','#ffffff');       // 白線
+      p.setAttribute('stroke-width','2');       // 太さ
+      p.setAttribute('stroke-linejoin','round'); 
+    });
   });
+});
+
+
 </script>
 </body>
 </html>
