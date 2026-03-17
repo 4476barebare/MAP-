@@ -147,18 +147,6 @@ footer {
   display: flex;
   flex-direction: column;
 }
-
-/* 全てのパスは塗りだけ */
-#map path {
-  fill: #191970; /* 塗り色維持 */
-  stroke: none;  /* 県境は消えない（元SVGにないため不要） */
-}
-  /* 地域グループ線用のスタイル */
-  .region-group path {
-    stroke: #ffffff;
-    stroke-width: 2;
-    fill: #191970; /* 塗り色維持 */
-  }
 </style>
 </head>
 <body>
@@ -253,25 +241,11 @@ newsBtn.addEventListener("click", e=>{
 closeBtn.addEventListener("click", ()=>{
  overlay.style.display="none";
 });
-
 // 外部SVGをDOMに読み込む
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
-    const mapDiv = document.getElementById('map');
-    mapDiv.innerHTML = svgText;
-
-    const regionGroups = mapDiv.querySelectorAll('g.region-group');
-
-    regionGroups.forEach(group => {
-      group.querySelectorAll('path').forEach(path => {
-        path.setAttribute('stroke', '#ffffff');     // 線の色
-        path.setAttribute('stroke-width', '2');     // 線の太さ
-        path.setAttribute('stroke-linejoin', 'round'); // 角を丸く
-        path.setAttribute('fill', '#191970');       // 塗り色維持
-      });
-    });
-
+    document.getElementById('map').innerHTML = svgText;
   });
 </script>
 </body>
