@@ -137,28 +137,26 @@ closeBtn.addEventListener("click", ()=>{
  overlay.style.display="none";
 });
 
-// SVG 読み込み & 地域グループにだけ線を付ける
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // まず全体の線を薄く
-    mapDiv.querySelectorAll('path').forEach(p=>{
-      p.style.stroke = '#191970';   // 県境色を濃紺にして目立たせない
-      p.style.strokeWidth = '0.3';  // 細線
+    const svg = mapDiv.querySelector('svg');
+    if(!svg) return;
+
+    // 全体の線を薄く
+    svg.querySelectorAll('path').forEach(p => {
+      p.style.stroke = '#191970';
+      p.style.strokeWidth = '0.3';
     });
 
     // 地域グループだけ白線に
-    const groups = mapDiv.querySelectorAll('g.region-group');
-    groups.forEach(group => {
-      mapDiv.appendChild(group); // 上に移動
-      group.querySelectorAll('path').forEach(path => {
-        path.style.stroke = '#ffffff';
-        path.style.strokeWidth = '2';
-        path.style.strokeLinejoin = 'round';
-      });
+    svg.querySelectorAll('g.region-group path').forEach(path => {
+      path.style.stroke = '#ffffff';
+      path.style.strokeWidth = '2';
+      path.style.strokeLinejoin = 'round';
     });
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
