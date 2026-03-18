@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こNAVI</title>
-
-<!-- 外部CSS -->
 <link rel="stylesheet" href="header.css">
 </head>
 <body>
@@ -31,18 +29,204 @@
   </div>
 </header>
 
+<main>
+  <div class="map">
+    <div class="japan-map" id="map"></div>
+  </div>
+</main>
+
+<div class="ad">広告スペース</div>
+<footer>© 釣り行こNAVI</footer>
+
 <div id="newsOverlay">
   <div class="news-window">
-    <p>ニュースコンテンツ</p>
     <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
   </div>
 </div>
 
-<div style="height:1500px; padding-top:20px;">
-  <p>ここに地図やその他コンテンツが入ります。</p>
+<script src="header.js"></script>
+
+<!-- 地図スクリプトはまだ HTML 内に残す -->
+<script>
+const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
+fetch('japan.svg')
+  .then(res => res.text())
+  .then(svgText => {
+    const mapDiv = document.getElementById('map');
+    mapDiv.innerHTML = svgText;
+
+    regionIDs.forEach(id=>{
+      const path = document.getElementById(id);
+      if(path){
+        path.setAttribute('fill', '#191970');
+        path.setAttribute('stroke', '#ffffff');
+        path.setAttribute('stroke-width', '1.5');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.style.cursor = 'pointer';
+
+        path.addEventListener('click', ()=>{
+          alert(`${id} がタップされました`);
+        });
+      }
+    });
+  })
+  .catch(err => console.error('SVG読み込みエラー:', err));
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こNAVI</title>
+<link rel="stylesheet" href="header.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="map">
+    <div class="japan-map" id="map"></div>
+  </div>
+</main>
+
+<div class="ad">広告スペース</div>
+<footer>© 釣り行こNAVI</footer>
+
+<div id="newsOverlay">
+  <div class="news-window">
+    <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
+  </div>
 </div>
 
-<!-- 外部JS -->
 <script src="header.js"></script>
+
+<!-- 地図スクリプトはまだ HTML 内に残す -->
+<script>
+const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
+fetch('japan.svg')
+  .then(res => res.text())
+  .then(svgText => {
+    const mapDiv = document.getElementById('map');
+    mapDiv.innerHTML = svgText;
+
+    regionIDs.forEach(id=>{
+      const path = document.getElementById(id);
+      if(path){
+        path.setAttribute('fill', '#191970');
+        path.setAttribute('stroke', '#ffffff');
+        path.setAttribute('stroke-width', '1.5');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.style.cursor = 'pointer';
+
+        path.addEventListener('click', ()=>{
+          alert(`${id} がタップされました`);
+        });
+      }
+    });
+  })
+  .catch(err => console.error('SVG読み込みエラー:', err));
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こNAVI</title>
+<link rel="stylesheet" href="header.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="map">
+    <div class="japan-map" id="map"></div>
+  </div>
+</main>
+
+<div class="ad">広告スペース</div>
+<footer>© 釣り行こNAVI</footer>
+
+<div id="newsOverlay">
+  <div class="news-window">
+    <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
+  </div>
+</div>
+
+<script src="header.js"></script>
+
+<!-- 地図スクリプトはまだ HTML 内に残す -->
+<script>
+const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
+fetch('japan.svg')
+  .then(res => res.text())
+  .then(svgText => {
+    const mapDiv = document.getElementById('map');
+    mapDiv.innerHTML = svgText;
+
+    regionIDs.forEach(id=>{
+      const path = document.getElementById(id);
+      if(path){
+        path.setAttribute('fill', '#191970');
+        path.setAttribute('stroke', '#ffffff');
+        path.setAttribute('stroke-width', '1.5');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.style.cursor = 'pointer';
+
+        path.addEventListener('click', ()=>{
+          alert(`${id} がタップされました`);
+        });
+      }
+    });
+  })
+  .catch(err => console.error('SVG読み込みエラー:', err));
+</script>
+
 </body>
 </html>
