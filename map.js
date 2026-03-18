@@ -29,14 +29,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
           // グループクリック
           path.addEventListener('click', ()=>{
-            alert(`${id} タップ（グループ非表示、県表示）`);
-            path.style.display = 'none'; // クリックしたグループだけ非表示
+            alert(`${id} タップ（全グループ非表示、県表示）`);
 
-            // 該当する県だけ表示
+            // 1. 全てのグループ非表示
+            regionIDs.forEach(gid=>{
+              const gpath = document.getElementById(gid);
+              if(gpath) gpath.style.display = 'none';
+            });
+
+            // 2. 該当県のみ表示
             groupToPrefectures[id].forEach(prefID=>{
               const prefPath = document.getElementById(prefID);
               if(prefPath){
-                prefPath.style.display = 'block';          // 表示
+                prefPath.style.display = 'block';
                 prefPath.setAttribute('fill','#191970');   // 塗り色
                 prefPath.setAttribute('stroke','#191970'); // 県境
                 prefPath.setAttribute('stroke-width','1');
