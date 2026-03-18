@@ -1,10 +1,7 @@
-// map.js
 document.addEventListener('DOMContentLoaded', ()=>{
-
   const mapDiv = document.getElementById('map');
   const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
 
-  // グループと県の対応データ
   const groupToPrefectures = {
     'Path_1': ['Hokkaido'],
     'Path_2': ['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
@@ -16,43 +13,35 @@ document.addEventListener('DOMContentLoaded', ()=>{
     'Path_8': ['Okinawa']
   };
 
-  // SVG読み込み
   fetch('japan.svg')
     .then(res => res.text())
     .then(svgText => {
       mapDiv.innerHTML = svgText;
 
-      // 初期状態：グループレイヤー表示、県レイヤー非表示
+      // 初期状態：グループのみ表示
       regionIDs.forEach(id=>{
         const path = document.getElementById(id);
         if(path){
-          path.setAttribute('fill','#888');          // 初期グレー
+          path.setAttribute('fill','#888');          // グレー
           path.setAttribute('stroke','#191970');    // グループ線
           path.setAttribute('stroke-width','1.5');
           path.style.cursor = 'pointer';
 
-          // クリック時処理
+          // グループクリック
           path.addEventListener('click', ()=>{
-            alert(`${id} タップ（初期レイヤー非表示、該当県表示）`);
+            alert(`${id} タップ（グループ非表示、県表示）`);
+            path.style.display = 'none'; // クリックしたグループだけ非表示
 
-            // 初期グループ全消去
-            regionIDs.forEach(gid=>{
-              const gpath = document.getElementById(gid);
-              if(gpath) gpath.style.display = 'none';
-            });
-
-            // 対応県を表示
-            const prefectures = groupToPrefectures[id];
-            prefectures.forEach(prefID=>{
+            // 該当する県だけ表示
+            groupToPrefectures[id].forEach(prefID=>{
               const prefPath = document.getElementById(prefID);
               if(prefPath){
-                prefPath.style.display = 'block';
-                prefPath.setAttribute('fill','#191970');    // 県塗り
-                prefPath.setAttribute('stroke','#191970');  // 県境
+                prefPath.style.display = 'block';          // 表示
+                prefPath.setAttribute('fill','#191970');   // 塗り色
+                prefPath.setAttribute('stroke','#191970'); // 県境
                 prefPath.setAttribute('stroke-width','1');
                 prefPath.style.cursor = 'pointer';
 
-                // 県クリック判定
                 prefPath.addEventListener('click', ()=>{
                   alert(`${prefID} タップ`);
                 });
@@ -62,7 +51,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         }
       });
 
-      // 初期状態で県レイヤーは非表示
+      // 初期状態で県パスは非表示
       Object.values(groupToPrefectures).flat().forEach(prefID=>{
         const prefPath = document.getElementById(prefID);
         if(prefPath) prefPath.style.display = 'none';
