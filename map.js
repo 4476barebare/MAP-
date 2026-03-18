@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'Path_8': ['Okinawa']
       };
 
-      // グループごとの倍率とオフセット（後から微調整可能）
+      // グループごとの倍率とオフセット
       const groupScales = {
         'Path_1': 3,
         'Path_2': 4,
@@ -34,14 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
         'Path_8': 6
       };
       const groupOffsets = {
-        'Path_1': {x:-200, y:-200},
-        'Path_2': {x:-100, y:-200},
-        'Path_3': {x:300, y:0},
-        'Path_4': {x:100, y:0},
-        'Path_5': {x:100, y:0},
+        'Path_1': {x:0, y:0},
+        'Path_2': {x:0, y:0},
+        'Path_3': {x:0, y:0},
+        'Path_4': {x:0, y:0},
+        'Path_5': {x:0, y:0},
         'Path_6': {x:0, y:0},
         'Path_7': {x:0, y:0},
-        'Path_8': {x:200, y:200}
+        'Path_8': {x:0, y:0}
       };
 
       // 初期状態: 県パス非表示、塗りはヘッダーロゴ色、枠線白で細め
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           });
 
-          // 3. 拡大表示
+          // 3. 拡大表示（縦横同時に倍率）
           const bbox = group.getBBox();
           let cx = bbox.x + bbox.width/2;
           let cy = bbox.y + bbox.height/2;
@@ -100,7 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
           const translateX = svgWidth/2 - cx*scale;
           const translateY = svgHeight/2 - cy*scale;
 
+          // 縦横同時拡大
           svg.style.transition = 'transform 0.5s ease';
+          svg.style.transformOrigin = 'center center';
           svg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
 
           // 4. 県クリックイベント（1回だけ）
