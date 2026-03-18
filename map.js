@@ -25,19 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
       // 初期状態: 県パス非表示、塗りはヘッダーロゴ色、枠線白で細め
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.style.fill = '#ff6600';    // ヘッダー・ロゴ色
+        p.style.fill = '#191970';    // ヘッダー・ロゴ色
         p.style.stroke = '#fff';     // 枠線白
         p.style.strokeWidth = '0.5px';
       });
 
-      // 地域グループ初期表示：塗りヘッダーロゴ色、枠線白
+      // 地域グループ初期表示：塗りヘッダーロゴ色、枠線白で太め
       Object.keys(groupToPrefectures).forEach(gid => {
         const group = svg.getElementById(gid);
         if (!group) return;
         group.style.display = 'inline';
-        group.style.fill = '#ff6600'; // ヘッダー・ロゴ色
+        group.style.fill = '#191970'; // ヘッダー・ロゴ色
         group.style.stroke = '#fff';  // 白枠
-        group.style.strokeWidth = '1px';
+        group.style.strokeWidth = '3px'; // 太め
         group.style.cursor = 'pointer';
 
         // 地域グループクリック
