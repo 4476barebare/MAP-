@@ -231,16 +231,16 @@ fetch('japan.svg')
     mapDiv.innerHTML = svgText;
 
     regionIDs.forEach(id=>{
-      const path = document.getElementById(id);
-      if(path){
-        path.setAttribute('fill', '#191970');
-        path.setAttribute('stroke', '#ffffff');
-        path.setAttribute('stroke-width', '1.5');
-        path.setAttribute('stroke-linejoin', 'round');
-        path.style.cursor = 'pointer';
-
-        path.addEventListener('click', ()=>{
-          showRegionDetail(id);
+      const group = document.getElementById(id);
+      if(group){
+        // グループの各県 path にクリックイベント
+        group.querySelectorAll('path').forEach(path=>{
+          path.style.fill = '#191970';
+          path.style.stroke = '#ffffff';
+          path.style.strokeWidth = '1.5';
+          path.style.strokeLinejoin = 'round';
+          path.style.cursor = 'pointer';
+          path.addEventListener('click', ()=>showRegionDetail(id));
         });
       }
     });
@@ -253,18 +253,17 @@ function showRegionDetail(regionID){
   const mapDiv = document.getElementById('map');
   const svg = mapDiv.querySelector('svg');
 
-  // 全県非表示（先に初期化）
-  svg.querySelectorAll('path').forEach(p=> p.style.display='none');
+  // 全県 path を非表示
+  svg.querySelectorAll('g[id^="Path_"] path').forEach(p=> p.style.display='none');
 
   // 指定地域だけ表示
   const regionGroup = svg.querySelector(`#${regionID}`);
   if(regionGroup){
-    // 県を表示 & 県名ラベル作成
     regionGroup.querySelectorAll('path').forEach(prefPath=>{
       prefPath.style.display='block';
-      prefPath.style.fill = '#191970';
-      prefPath.style.stroke = '#ffffff';
-      prefPath.style.strokeWidth = '1.5';
+      prefPath.setAttribute('fill', '#191970');
+      prefPath.setAttribute('stroke', '#ffffff');
+      prefPath.setAttribute('stroke-width', '1.5');
 
       // ラベル
       const bbox = prefPath.getBBox();
@@ -276,7 +275,7 @@ function showRegionDetail(regionID){
       regionGroup.appendChild(label);
     });
 
-    // 拡大（要微調整）
+    // 拡大（微調整可能）
     regionGroup.setAttribute('transform','scale(3) translate(-150,-150)');
   }
 }
