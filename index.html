@@ -3,61 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>釣り行こNAVI</title>
-<link rel="stylesheet" href="header.css">
+<title>釣り行こNAVI - ヘッダー動作確認用</title>
 <style>
-/* 地図周りの最低限のCSS */
-#map-container {
-  position: relative;
-  width: 100%;
-  height: 600px;
-  overflow: hidden;
-}
+/* --- ヘッダー --- */
+header { position: fixed; top:0; left:0; right:0; background:#fff; z-index:1000; padding:10px; border-bottom:1px solid #ccc; }
+header h1 { margin:0; font-size:18px; }
 
-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+/* --- アコーディオン --- */
+.accordion-wrapper { margin-top:60px; }
+.accordion-btn { background:#eee; border:none; padding:10px; width:100%; text-align:left; cursor:pointer; font-size:16px; }
+.accordion-panel { display:none; background:#fafafa; padding:10px; border:1px solid #ddd; }
+ul#locationList { padding-left:20px; margin:0; }
+
+/* --- ニュースオーバーレイ --- */
+#newsOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:2000; }
+#newsOverlay div { background:#fff; padding:20px; max-width:90%; max-height:80%; overflow:auto; }
+#newsOverlay button { margin-top:10px; }
 </style>
 </head>
 <body>
+
 <header>
-  <div class="header-inner">
-    <div class="logo">釣り行こNAVI</div>
-    <nav class="nav">
-      <div class="accordion-wrapper">
-        <button class="accordion-btn">登録地点</button>
-        <div class="accordion-panel">
-          <ul id="locationList">
-            <li class="location-none">登録なし</li>
-          </ul>
-        </div>
-      </div>
-      <a href="#" id="newsBtn">ニュース</a>
-    </nav>
-  </div>
+  <h1>釣り行こNAVI</h1>
 </header>
 
-<div id="map-container">
-  <!-- 日本地図 SVG をここに埋め込む -->
-  <svg id="japanMap" viewBox="0 0 900 600">
-    <!-- Path_1 ~ Path_8 の地域グループをここに -->
-  </svg>
-</div>
-
-<!-- ニュースオーバーレイ -->
-<div id="newsOverlay">
-  <div class="news-window">
-    <button id="closeNews">閉じる</button>
-    <div class="news-content">
-      <!-- RSSやニュース表示予定 -->
-    </div>
+<div class="accordion-wrapper">
+  <button class="accordion-btn">登録地点</button>
+  <div class="accordion-panel">
+    <ul id="locationList">
+      <li class="location-none">登録なし</li>
+    </ul>
   </div>
 </div>
 
+<button id="newsBtn">ニュース</button>
 
+<div id="newsOverlay">
+  <div>
+    <p>ニュースコンテンツ</p>
+    <button id="closeNews">閉じる</button>
+  </div>
+</div>
 
+<!-- --- ページ本文 --- -->
+<div style="height:1500px; padding-top:20px;">
+  <p>ここに地図やその他のコンテンツが入ります。</p>
+</div>
+
+<!-- --- JS は body の最後に置く --- -->
 <script src="header.js"></script>
 </body>
 </html>
