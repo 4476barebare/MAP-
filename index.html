@@ -130,18 +130,20 @@ const prefNames = { hokkaido:'北海道', aomori:'青森県', iwate:'岩手県',
 // SVG objectロード後
 const obj = document.getElementById('japanMapObj');
 obj.addEventListener('load', ()=>{
-  const svgDoc = obj.contentDocument;
-  const paths = svgDoc.querySelectorAll('g[id^="Path_"] path');
+    const svgDoc = obj.contentDocument;
 
-  paths.forEach(path=>{
-    path.style.fill = '#ADD8E6'; // 初期薄青
-    path.style.stroke = '#ffffff';
-    path.style.strokeWidth = '1.5';
-    path.style.strokeLinejoin = 'round';
-    path.style.cursor = 'pointer';
-
-    path.addEventListener('click', ()=>showRegionDetail(path.parentNode.id, svgDoc));
-  });
+    // 少し待ってから path に fill を設定
+    setTimeout(()=>{
+        const paths = svgDoc.querySelectorAll('g[id^="Path_"] path');
+        paths.forEach(path=>{
+            path.style.fill = '#ADD8E6';
+            path.style.stroke = '#ffffff';
+            path.style.strokeWidth = '1.5';
+            path.style.strokeLinejoin = 'round';
+            path.style.cursor = 'pointer';
+            path.addEventListener('click', ()=>showRegionDetail(path.parentNode.id, svgDoc));
+        });
+    }, 50); // 50ms 程度待つと安定
 });
 
 // クリック後表示
@@ -181,5 +183,6 @@ function showRegionDetail(regionID, svgDoc){
 }
 
 </script>
+テスト
 </body>
 </html>
