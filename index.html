@@ -206,28 +206,28 @@ const prefNames = {
 // 地図読み込み & 初期表示
 const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
 
+
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // 初期表示：薄い青で塗る
-    regionIDs.forEach(id=>{
-      const group = document.getElementById(id);
-      if(group){
-        group.querySelectorAll('path').forEach(path=>{
-          path.style.fill = '#ADD8E6'; // 薄い青
-          path.style.stroke = '#ffffff';
-          path.style.strokeWidth = '1.5';
-          path.style.strokeLinejoin = 'round';
-          path.style.cursor = 'pointer';
-          path.addEventListener('click', ()=>showRegionDetail(id));
-        });
-      }
+    // SVG 内の全 path を初期色で設定
+    mapDiv.querySelectorAll('g[id^="Path_"] path').forEach(path=>{
+      path.style.fill = '#ADD8E6';  // 初期薄青
+      path.style.stroke = '#ffffff';
+      path.style.strokeWidth = '1.5';
+      path.style.strokeLinejoin = 'round';
+      path.style.cursor = 'pointer';
+
+      // クリックイベント
+      path.addEventListener('click', e=>{
+        const groupID = path.parentNode.id;
+        showRegionDetail(groupID);
+      });
     });
-  })
-  .catch(err => console.error('SVG読み込みエラー:', err));
+  });
 
 // クリック後に地域拡大・濃い青表示・ラベル
 function showRegionDetail(regionID){
@@ -268,6 +268,6 @@ function showRegionDetail(regionID){
   }
 }
 </script>
-反映テスト
+反映テスト2
 </body>
 </html>
