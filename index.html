@@ -104,70 +104,52 @@ newsBtn.addEventListener("click", e=>{
   overlay.style.display="flex";
 });
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
-</script>
 
-
-<div id="map"></div>
-
-<script>
 fetch('japan.svg')
-.then(res => res.text())
-.then(svgText => {
+  .then(res => res.text())
+  .then(svgText => {
+    const mapDiv = document.getElementById('map');
+    mapDiv.innerHTML = svgText;
 
-  const mapDiv = document.getElementById('map');
-  mapDiv.innerHTML = svgText;
-
-  const svg = mapDiv.querySelector('svg');
-
-  // 県境消す
-  svg.querySelectorAll('path').forEach(p => {
-    p.style.stroke = 'none';
-  });
-
-  const regions = {
-    kanto: ['Tokyo','Kanagawa','Chiba','Saitama','Ibaraki','Tochigi','Gunma'],
-    kansai: ['Osaka','Kyoto','Hyogo','Nara','Shiga','Wakayama','Mie'],
-    tohoku: ['Aomori','Iwate','Miyagi','Akita','Yamagata','Fukushima'],
-    chubu: ['Niigata','Toyama','Ishikawa','Fukui','Yamanashi','Nagano','Gifu','Shizuoka','Aichi'],
-    chugoku: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
-    shikoku: ['Tokushima','Kagawa','Ehime','Kochi'],
-    kyushu: ['Fukuoka','Saga','Nagasaki','Kumamoto','Oita','Miyazaki','Kagoshima'],
-    hokkaido: ['Hokkaido'],
-    okinawa: ['Okinawa']
-  };
-
-  const regionLayer = document.createElementNS("http://www.w3.org/2000/svg","g");
-
-  Object.values(regions).forEach(list => {
-
-    let d = "";
-
-    list.forEach(id => {
-      const el = svg.querySelector('#'+id);
-      if(!el) return;
-
-      // pathのdを連結
-      d += el.getAttribute('d') + " ";
+    // ===== 県（ベース） =====
+    document.querySelectorAll('#map path').forEach(p=>{
+      p.style.fill = '#191970';
+      p.style.stroke = 'none';
     });
 
-    if(!d) return;
+    // ===== 地域パス（指定ID） =====
+    const regionIds = [
+      'Path_1', // 北海道
+      'Path_2', // 東北
+      'Path_3', // 関東
+      'Path_4', // 中部
+      'Path_5', // 近畿
+      'Path_6', // 中国・四国
+      'Path_7', // 九州
+      'Path_8'  // 沖縄
+    ];
 
-    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+    regionIds.forEach(id => {
+      const p = document.getElementById(id);
 
-    path.setAttribute('d', d);
+      if (!p) {
+        console.log('見つからないID:', id);
+        return;
+      }
 
-    path.setAttribute('fill','none');
-    path.setAttribute('stroke','#ff0000');
-    path.setAttribute('stroke-width','4');
-    path.setAttribute('stroke-linejoin','round');
+      // 地域線を描画
+      p.style.fill = 'none';
+      p.style.stroke = '#ff0000';   // 確認用（後で色変える）
+      p.style.strokeWidth = '4';
+      p.style.opacity = '1';
 
-    regionLayer.appendChild(path);
+      // 最前面に出す
+      p.parentNode.appendChild(p);
+    });
 
-  });
-
-  svg.appendChild(regionLayer);
-
-});
+    console.log('地域パス処理完了');
+  })
+  .catch(err => console.error('SVG読み込みエラー:', err));
 </script>
 
 
