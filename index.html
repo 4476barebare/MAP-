@@ -124,35 +124,34 @@ const closeBtn = document.getElementById("closeNews");
 newsBtn.addEventListener("click", e=>{ e.preventDefault(); overlay.style.display="flex"; });
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 
-// 県名
+// 都道府県ラベル
 const prefNames = { hokkaido:'北海道', aomori:'青森県', iwate:'岩手県', miyagi:'宮城県', akita:'秋田県', yamagata:'山形県', fukushima:'福島県' };
 
-// 地図読み込み
-const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
-fetch('japan.svg')
-.then(res=>res.text())
-.then(svgText=>{
-  const mapDiv = document.getElementById('map');
-  mapDiv.innerHTML = svgText;
+// SVG objectロード後
+const obj = document.getElementById('japanMapObj');
+obj.addEventListener('load', ()=>{
+  const svgDoc = obj.contentDocument;
+  const paths = svgDoc.querySelectorAll('g[id^="Path_"] path');
 
-  // 初期状態：薄い青
-  mapDiv.querySelectorAll('g[id^="Path_"] path').forEach(path=>{
-    path.style.fill='#ADD8E6';
-    path.style.stroke='#ffffff';
-    path.style.strokeWidth='1.5';
-    path.style.strokeLinejoin='round';
-    path.style.cursor='pointer';
-    path.addEventListener('click', ()=>showRegionDetail(path.parentNode.id));
+  paths.forEach(path=>{
+    path.style.fill = '#ADD8E6'; // 初期薄青
+    path.style.stroke = '#ffffff';
+    path.style.strokeWidth = '1.5';
+    path.style.strokeLinejoin = 'round';
+    path.style.cursor = 'pointer';
+
+    path.addEventListener('click', ()=>showRegionDetail(path.parentNode.id, svgDoc));
   });
 });
 
-// クリック後：拡大・濃青
-function showRegionDetail(regionID){
-  const svg = document.querySelector('#map svg');
-  svg.querySelectorAll('g[id^="Path_"] path').forEach(p=>p.style.display='none');
+// クリック後表示
+function showRegionDetail(regionID, svgDoc){
+  const paths = svgDoc.querySelectorAll('g[id^="Path_"] path');
+  paths.forEach(p=>p.style.display='none');
 
-  const group = svg.querySelector('#'+regionID);
+  const group = svgDoc.querySelector('#'+regionID);
   if(!group) return;
+
   group.querySelectorAll('path').forEach(p=>{
     p.style.display='block';
     p.style.fill='#191970';
@@ -167,6 +166,7 @@ function showRegionDetail(regionID){
   const ty = -bbox.y + (svgHeight-bbox.height*scale)/2/scale;
   group.setAttribute('transform',`scale(${scale}) translate(${tx},${ty})`);
 
+  // ラベル
   if(!group.querySelector('.region-label')){
     group.querySelectorAll('path').forEach(p=>{
       const bb = p.getBBox();
@@ -179,6 +179,7 @@ function showRegionDetail(regionID){
     });
   }
 }
+
 </script>
 </body>
 </html>
