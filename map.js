@@ -12,8 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const groupScales = {
-    Path_1:3, Path_2:4, Path_3:4.5, Path_4:5,
-    Path_5:6, Path_6:5, Path_7:6, Path_8:6
+    Path_1:1, Path_2:1, Path_3:1, Path_4:1,
+    Path_5:1, Path_6:1, Path_7:1, Path_8:1
   };
 
   fetch('japan.svg')
