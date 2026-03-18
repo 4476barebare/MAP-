@@ -8,9 +8,10 @@ document.addEventListener('DOMContentLoaded', ()=>{
     panel.style.display = (panel.style.display==='block') ? 'none':'block';
   });
 
+  // ページクリックで閉じる
   document.addEventListener('click', e=>{
     if(!e.target.closest('.accordion-wrapper')){
-      document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+      panel.style.display='none';
     }
   });
 
