@@ -11,7 +11,7 @@ html, body {
   font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   background:#fff;
   color:#333;
-  overflow-x: hidden; /* 横スクロール禁止 */
+  overflow-x: hidden;
 }
 
 header {
@@ -46,14 +46,12 @@ header {
 .delete-btn { background:none; border:none; cursor:pointer; color:#c00; }
 .location-none { color:#888; font-style:italic; }
 
-/* main の上部にヘッダー高さ分の余白を確保 */
 main {
   padding-top: 60px;
 }
 
 .map { text-align:center; }
 
-/* 地図表示エリア */
 .japan-map {
   width:100%;
   max-width:900px;
@@ -67,7 +65,6 @@ main {
   height:auto;
 }
 
-/* 拡大時テキスト */
 .region-label {
   font-size:14px;
   font-weight:bold;
@@ -85,7 +82,6 @@ footer {
   border-top:1px solid #ddd;
 }
 
-/* ニュースポップアップ */
 #newsOverlay {
   position:fixed;
   top:0;
@@ -129,7 +125,6 @@ footer {
         </ul>
       </div>
     </div>
-
     <a href="#" id="newsBtn">釣りNEWS</a>
     <a href="#">全国地図</a>
     <a href="#">その他</a>
@@ -185,19 +180,6 @@ function attachDeleteEvents() {
   });
 }
 attachDeleteEvents();
-function addLocation(name){
-  const noneItem = locationList.querySelector('.location-none');
-  if(noneItem) noneItem.remove();
-  const li = document.createElement('li');
-  li.textContent = name + ' ';
-  const btn = document.createElement('button');
-  btn.textContent = '✖️';
-  btn.className = 'delete-btn';
-  li.appendChild(btn);
-  locationList.appendChild(li);
-  attachDeleteEvents();
-}
-function resetLocations(){ locationList.innerHTML = '<li class="location-none">登録なし</li>'; }
 
 // ニュースオーバーレイ
 const newsBtn = document.getElementById("newsBtn");
@@ -218,10 +200,10 @@ const prefNames = {
   akita: '秋田県',
   yamagata: '山形県',
   fukushima: '福島県',
-  // 以降も必要に応じて追加
+  // 必要に応じて追加
 };
 
-// 地図読み込み & 地域クリック処理
+// 地図読み込み & 初期表示
 const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
 
 fetch('japan.svg')
@@ -230,12 +212,12 @@ fetch('japan.svg')
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
+    // 初期表示：薄い青で塗る
     regionIDs.forEach(id=>{
       const group = document.getElementById(id);
       if(group){
-        // グループの各県 path にクリックイベント
         group.querySelectorAll('path').forEach(path=>{
-          path.style.fill = '#191970';
+          path.style.fill = '#ADD8E6'; // 薄い青
           path.style.stroke = '#ffffff';
           path.style.strokeWidth = '1.5';
           path.style.strokeLinejoin = 'round';
@@ -244,36 +226,35 @@ fetch('japan.svg')
         });
       }
     });
-
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 
-// 地域詳細表示
+// クリック後に地域拡大・濃い青表示・ラベル
 function showRegionDetail(regionID){
   const svg = document.querySelector('#map svg');
 
-  // 全県非表示（path だけ）
+  // 全県 path 非表示
   svg.querySelectorAll('g[id^="Path_"] path').forEach(p => p.style.display='none');
 
   const regionGroup = svg.querySelector(`#${regionID}`);
   if(!regionGroup) return;
 
-  // 地域内の県 path を表示
   regionGroup.querySelectorAll('path').forEach(prefPath=>{
     prefPath.style.display='block';
-    prefPath.setAttribute('fill','#191970');
+    prefPath.setAttribute('fill','#191970'); // 濃い青
     prefPath.setAttribute('stroke','#ffffff');
     prefPath.setAttribute('stroke-width','1.5');
   });
 
-  // transform は bbox を元に自動計算
+  // transform を bbox から自動計算
   const bbox = regionGroup.getBBox();
-  const scale = Math.min(900/bbox.width, 600/bbox.height); // svgサイズに合わせる
-  const translateX = -bbox.x + (900 - bbox.width*scale)/2/scale;
-  const translateY = -bbox.y + (600 - bbox.height*scale)/2/scale;
+  const svgWidth = 900, svgHeight = 600;
+  const scale = Math.min(svgWidth/bbox.width, svgHeight/bbox.height);
+  const translateX = -bbox.x + (svgWidth - bbox.width*scale)/2/scale;
+  const translateY = -bbox.y + (svgHeight - bbox.height*scale)/2/scale;
   regionGroup.setAttribute('transform',`scale(${scale}) translate(${translateX},${translateY})`);
 
-  // ラベルは一度だけ作る
+  // ラベルは一度だけ作成
   if(!regionGroup.querySelector('.region-label')){
     regionGroup.querySelectorAll('path').forEach(prefPath=>{
       const bbox = prefPath.getBBox();
@@ -287,6 +268,6 @@ function showRegionDetail(regionID){
   }
 }
 </script>
-
+反映テスト
 </body>
 </html>
