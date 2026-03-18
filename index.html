@@ -4,38 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こNAVI</title>
-
-<!-- 外部CSS -->
+<!-- ヘッダー用 CSS -->
 <link rel="stylesheet" href="header.css">
-
+<!-- コンテンツ用 CSS -->
 <style>
-/* メイン、地図、広告、フッター、ニュースオーバーレイのみここで管理 */
-html, body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-  background:#fff;
-  color:#333;
-  overflow-x: hidden;
-}
 main { max-width:1100px; margin:auto; padding:20px; }
 .map { text-align:center; }
 .japan-map { width:100%; max-width:900px; margin:0 auto; filter:drop-shadow(0 3px 5px rgba(0,0,0,0.22)); }
 .japan-map svg { width:100%; height:auto; }
 .ad { text-align:center; margin:20px 0; color:#999; }
 footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color:#777; border-top:1px solid #ddd; }
-#newsOverlay { 
-  position:fixed; top:0; left:0; width:100%; height:100%; 
-  background:rgba(0,0,0,0.55); display:none; 
-  justify-content:center; align-items:center; z-index:999; 
-}
-.news-window { 
-  position:relative; width:85%; max-width:900px; height:70vh; 
-  background:#fff; border-radius:12px; 
-  box-shadow:0 10px 30px rgba(0,0,0,0.4); 
-  overflow:hidden; display:flex; flex-direction:column; 
-}
 </style>
-
 </head>
 <body>
 
@@ -69,6 +48,7 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
 <div class="ad">広告スペース</div>
 <footer>© 釣り行こNAVI</footer>
 
+<!-- ニュースオーバーレイは header.js が制御 -->
 <div id="newsOverlay">
   <div class="news-window">
     <button id="closeNews">閉じる</button>
@@ -76,35 +56,10 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
   </div>
 </div>
 
-<!-- 外部JS -->
+<!-- ヘッダー JS -->
 <script src="header.js"></script>
-
-<script>
-// 地図読み込み & 地域ハイライト
-const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
-fetch('japan.svg')
-  .then(res => res.text())
-  .then(svgText => {
-    const mapDiv = document.getElementById('map');
-    mapDiv.innerHTML = svgText;
-
-    regionIDs.forEach(id=>{
-      const path = document.getElementById(id);
-      if(path){
-        path.setAttribute('fill', '#191970');       
-        path.setAttribute('stroke', '#ffffff');     
-        path.setAttribute('stroke-width', '1.5');
-        path.setAttribute('stroke-linejoin', 'round');
-        path.style.cursor = 'pointer';
-
-        path.addEventListener('click', ()=>{
-          alert(`${id} がタップされました`);
-        });
-      }
-    });
-  })
-  .catch(err => console.error('SVG読み込みエラー:', err));
-</script>
+<!-- 地図処理 JS -->
+<script src="map.js"></script>
 
 </body>
 </html>
