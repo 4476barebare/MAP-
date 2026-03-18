@@ -63,28 +63,35 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
 </div>
 </div>
 
+
 <script>
-// アコーディオン処理
+// ===== アコーディオン =====
 const accordionBtn = document.querySelector('.accordion-btn');
 const panel = document.querySelector('.accordion-panel');
-accordionBtn.addEventListener('click', ()=>{
-  document.querySelectorAll('.accordion-panel').forEach(p=>{
-    if(p!==panel) p.style.display='none';
-  });
-  panel.style.display = (panel.style.display==='block') ? 'none':'block';
-});
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.accordion-wrapper')){
-    document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
-  }
-});
 
-// 登録地点操作
+if (accordionBtn && panel) {
+  accordionBtn.addEventListener('click', ()=>{
+    document.querySelectorAll('.accordion-panel').forEach(p=>{
+      if(p!==panel) p.style.display='none';
+    });
+    panel.style.display = (panel.style.display==='block') ? 'none':'block';
+  });
+
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('.accordion-wrapper')){
+      document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+    }
+  });
+}
+
+// ===== 登録地点 =====
 const locationList = document.getElementById('locationList');
+
 function attachDeleteEvents() {
+  if (!locationList) return;
   const deleteButtons = locationList.querySelectorAll('.delete-btn');
   deleteButtons.forEach(btn=>{
-    btn.addEventListener('click', e=>{
+    btn.addEventListener('click', ()=>{
       const li = btn.parentElement;
       li.remove();
       if(locationList.children.length === 0){
@@ -95,16 +102,45 @@ function attachDeleteEvents() {
 }
 attachDeleteEvents();
 
-// ニュースオーバーレイ
+function addLocation(name){
+  if (!locationList) return;
+  const noneItem = locationList.querySelector('.location-none');
+  if(noneItem) noneItem.remove();
+
+  const li = document.createElement('li');
+  li.textContent = name + ' ';
+
+  const btn = document.createElement('button');
+  btn.textContent = '✖️';
+  btn.className = 'delete-btn';
+
+  li.appendChild(btn);
+  locationList.appendChild(li);
+  attachDeleteEvents();
+}
+
+function resetLocations(){
+  if (!locationList) return;
+  locationList.innerHTML = '<li class="location-none">登録なし</li>';
+}
+
+// ===== ニュース =====
 const newsBtn = document.getElementById("newsBtn");
 const overlay = document.getElementById("newsOverlay");
 const closeBtn = document.getElementById("closeNews");
-newsBtn.addEventListener("click", e=>{
-  e.preventDefault();
-  overlay.style.display="flex";
-});
-closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 
+if (newsBtn && overlay && closeBtn) {
+  newsBtn.addEventListener("click", e=>{
+    e.preventDefault();
+    overlay.style.display="flex";
+  });
+
+  closeBtn.addEventListener("click", ()=>{
+    overlay.style.display="none";
+  });
+}
+
+// ===== SVG読み込み＆地域操作 =====
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
@@ -117,7 +153,7 @@ fetch('japan.svg')
       p.style.stroke = 'none';
     });
 
-    // ===== 地域パス（指定ID） =====
+    // ===== 地域ID =====
     const regionIds = [
       'Path_1', // 北海道
       'Path_2', // 東北
@@ -129,24 +165,356 @@ fetch('japan.svg')
       'Path_8'  // 沖縄
     ];
 
+    let activeRegion = null;
+
     regionIds.forEach(id => {
-  const p = document.getElementById(id);
-  if (!p) return;
+      const p = document.getElementById(id);
 
-  p.style.fill = 'none';
-  p.style.stroke = '#ffffff';
-  p.style.strokeWidth = '2';
-  p.style.strokeLinejoin = 'round';
-  p.style.strokeLinecap = 'round';
+      if (!p) {
+        console.log('見つからないID:', id);
+        return;
+      }
 
-  p.parentNode.appendChild(p);
-});
+      // ===== 初期スタイル =====
+      p.style.fill = 'none';
+      p.style.stroke = '#ffffff';
+      p.style.strokeWidth = '2';
+      p.style.strokeLinejoin = 'round';
+      p.style.strokeLinecap = 'round';
+      p.style.cursor = 'pointer';
 
-    console.log('地域パス処理完了');
+      // 最前面へ
+      p.parentNode.appendChild(p);
+
+      // ===== タップ処理 =====
+      p.addEventListener('click', () => {
+
+        // 前の選択を戻す
+        if (activeRegion) {
+          activeRegion.style.stroke = '#ffffff';
+          activeRegion.style.strokeWidth = '2';
+        }
+
+        // 今回の選択を強調
+        p.style.stroke = '#00ffff';
+        p.style.strokeWidth = '4';
+
+        activeRegion = p;
+
+        // ===== 画面遷移 =====
+        console.log('選択:', id);
+
+        // 少しだけハイライト見せてから遷移
+        setTimeout(()=>{
+          location.href = `region.html?area=${id}`;
+        }, 150);
+      });
+    });
+
+    console.log('地域処理完了');
+  })
+  .catch(err => console.error('SVG読み込みエラー:', err));
+</script><script>
+// ===== アコーディオン =====
+const accordionBtn = document.querySelector('.accordion-btn');
+const panel = document.querySelector('.accordion-panel');
+
+if (accordionBtn && panel) {
+  accordionBtn.addEventListener('click', ()=>{
+    document.querySelectorAll('.accordion-panel').forEach(p=>{
+      if(p!==panel) p.style.display='none';
+    });
+    panel.style.display = (panel.style.display==='block') ? 'none':'block';
+  });
+
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('.accordion-wrapper')){
+      document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+    }
+  });
+}
+
+// ===== 登録地点 =====
+const locationList = document.getElementById('locationList');
+
+function attachDeleteEvents() {
+  if (!locationList) return;
+  const deleteButtons = locationList.querySelectorAll('.delete-btn');
+  deleteButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const li = btn.parentElement;
+      li.remove();
+      if(locationList.children.length === 0){
+        locationList.innerHTML = '<li class="location-none">登録なし</li>';
+      }
+    });
+  });
+}
+attachDeleteEvents();
+
+function addLocation(name){
+  if (!locationList) return;
+  const noneItem = locationList.querySelector('.location-none');
+  if(noneItem) noneItem.remove();
+
+  const li = document.createElement('li');
+  li.textContent = name + ' ';
+
+  const btn = document.createElement('button');
+  btn.textContent = '✖️';
+  btn.className = 'delete-btn';
+
+  li.appendChild(btn);
+  locationList.appendChild(li);
+  attachDeleteEvents();
+}
+
+function resetLocations(){
+  if (!locationList) return;
+  locationList.innerHTML = '<li class="location-none">登録なし</li>';
+}
+
+// ===== ニュース =====
+const newsBtn = document.getElementById("newsBtn");
+const overlay = document.getElementById("newsOverlay");
+const closeBtn = document.getElementById("closeNews");
+
+if (newsBtn && overlay && closeBtn) {
+  newsBtn.addEventListener("click", e=>{
+    e.preventDefault();
+    overlay.style.display="flex";
+  });
+
+  closeBtn.addEventListener("click", ()=>{
+    overlay.style.display="none";
+  });
+}
+
+// ===== SVG読み込み＆地域操作 =====
+fetch('japan.svg')
+  .then(res => res.text())
+  .then(svgText => {
+    const mapDiv = document.getElementById('map');
+    mapDiv.innerHTML = svgText;
+
+    // ===== 県（ベース） =====
+    document.querySelectorAll('#map path').forEach(p=>{
+      p.style.fill = '#191970';
+      p.style.stroke = 'none';
+    });
+
+    // ===== 地域ID =====
+    const regionIds = [
+      'Path_1', // 北海道
+      'Path_2', // 東北
+      'Path_3', // 関東
+      'Path_4', // 中部
+      'Path_5', // 近畿
+      'Path_6', // 中国・四国
+      'Path_7', // 九州
+      'Path_8'  // 沖縄
+    ];
+
+    let activeRegion = null;
+
+    regionIds.forEach(id => {
+      const p = document.getElementById(id);
+
+      if (!p) {
+        console.log('見つからないID:', id);
+        return;
+      }
+
+      // ===== 初期スタイル =====
+      p.style.fill = 'none';
+      p.style.stroke = '#ffffff';
+      p.style.strokeWidth = '2';
+      p.style.strokeLinejoin = 'round';
+      p.style.strokeLinecap = 'round';
+      p.style.cursor = 'pointer';
+
+      // 最前面へ
+      p.parentNode.appendChild(p);
+
+      // ===== タップ処理 =====
+      p.addEventListener('click', () => {
+
+        // 前の選択を戻す
+        if (activeRegion) {
+          activeRegion.style.stroke = '#ffffff';
+          activeRegion.style.strokeWidth = '2';
+        }
+
+        // 今回の選択を強調
+        p.style.stroke = '#00ffff';
+        p.style.strokeWidth = '4';
+
+        activeRegion = p;
+
+        // ===== 画面遷移 =====
+        console.log('選択:', id);
+
+        // 少しだけハイライト見せてから遷移
+        setTimeout(()=>{
+          location.href = `region.html?area=${id}`;
+        }, 150);
+      });
+    });
+
+    console.log('地域処理完了');
+  })
+  .catch(err => console.error('SVG読み込みエラー:', err));
+</script><script>
+// ===== アコーディオン =====
+const accordionBtn = document.querySelector('.accordion-btn');
+const panel = document.querySelector('.accordion-panel');
+
+if (accordionBtn && panel) {
+  accordionBtn.addEventListener('click', ()=>{
+    document.querySelectorAll('.accordion-panel').forEach(p=>{
+      if(p!==panel) p.style.display='none';
+    });
+    panel.style.display = (panel.style.display==='block') ? 'none':'block';
+  });
+
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('.accordion-wrapper')){
+      document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
+    }
+  });
+}
+
+// ===== 登録地点 =====
+const locationList = document.getElementById('locationList');
+
+function attachDeleteEvents() {
+  if (!locationList) return;
+  const deleteButtons = locationList.querySelectorAll('.delete-btn');
+  deleteButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const li = btn.parentElement;
+      li.remove();
+      if(locationList.children.length === 0){
+        locationList.innerHTML = '<li class="location-none">登録なし</li>';
+      }
+    });
+  });
+}
+attachDeleteEvents();
+
+function addLocation(name){
+  if (!locationList) return;
+  const noneItem = locationList.querySelector('.location-none');
+  if(noneItem) noneItem.remove();
+
+  const li = document.createElement('li');
+  li.textContent = name + ' ';
+
+  const btn = document.createElement('button');
+  btn.textContent = '✖️';
+  btn.className = 'delete-btn';
+
+  li.appendChild(btn);
+  locationList.appendChild(li);
+  attachDeleteEvents();
+}
+
+function resetLocations(){
+  if (!locationList) return;
+  locationList.innerHTML = '<li class="location-none">登録なし</li>';
+}
+
+// ===== ニュース =====
+const newsBtn = document.getElementById("newsBtn");
+const overlay = document.getElementById("newsOverlay");
+const closeBtn = document.getElementById("closeNews");
+
+if (newsBtn && overlay && closeBtn) {
+  newsBtn.addEventListener("click", e=>{
+    e.preventDefault();
+    overlay.style.display="flex";
+  });
+
+  closeBtn.addEventListener("click", ()=>{
+    overlay.style.display="none";
+  });
+}
+
+// ===== SVG読み込み＆地域操作 =====
+fetch('japan.svg')
+  .then(res => res.text())
+  .then(svgText => {
+    const mapDiv = document.getElementById('map');
+    mapDiv.innerHTML = svgText;
+
+    // ===== 県（ベース） =====
+    document.querySelectorAll('#map path').forEach(p=>{
+      p.style.fill = '#191970';
+      p.style.stroke = 'none';
+    });
+
+    // ===== 地域ID =====
+    const regionIds = [
+      'Path_1', // 北海道
+      'Path_2', // 東北
+      'Path_3', // 関東
+      'Path_4', // 中部
+      'Path_5', // 近畿
+      'Path_6', // 中国・四国
+      'Path_7', // 九州
+      'Path_8'  // 沖縄
+    ];
+
+    let activeRegion = null;
+
+    regionIds.forEach(id => {
+      const p = document.getElementById(id);
+
+      if (!p) {
+        console.log('見つからないID:', id);
+        return;
+      }
+
+      // ===== 初期スタイル =====
+      p.style.fill = 'none';
+      p.style.stroke = '#ffffff';
+      p.style.strokeWidth = '2';
+      p.style.strokeLinejoin = 'round';
+      p.style.strokeLinecap = 'round';
+      p.style.cursor = 'pointer';
+
+      // 最前面へ
+      p.parentNode.appendChild(p);
+
+      // ===== タップ処理 =====
+      p.addEventListener('click', () => {
+
+        // 前の選択を戻す
+        if (activeRegion) {
+          activeRegion.style.stroke = '#ffffff';
+          activeRegion.style.strokeWidth = '2';
+        }
+
+        // 今回の選択を強調
+        p.style.stroke = '#00ffff';
+        p.style.strokeWidth = '4';
+
+        activeRegion = p;
+
+        // ===== 画面遷移 =====
+        console.log('選択:', id);
+
+        // 少しだけハイライト見せてから遷移
+        setTimeout(()=>{
+          location.href = `region.html?area=${id}`;
+        }, 150);
+      });
+    });
+
+    console.log('地域処理完了');
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 </script>
-
 
 
 </body>
