@@ -34,14 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
         'Path_8': 6
       };
       const groupOffsets = {
-        'Path_1': {x:0, y:0},
-        'Path_2': {x:0, y:0},
+        'Path_1': {x:-600, y:0},
+        'Path_2': {x:-700, y:-100},
         'Path_3': {x:-200, y:0},
-        'Path_4': {x:0, y:700},
-        'Path_5': {x:200, y:700},
+        'Path_4': {x:0, y:400},
+        'Path_5': {x:100, y:900},
         'Path_6': {x:0, y:0},
         'Path_7': {x:0, y:0},
-        'Path_8': {x:-100, y:0}
+        'Path_8': {x:-100, y:-100}
       };
 
       // 初期状態: 県パス非表示、塗りはヘッダーロゴ色、枠線白で細め
