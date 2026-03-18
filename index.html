@@ -441,52 +441,49 @@ if (newsBtn && overlay && closeBtn) {
 }
 
 // ===== SVG読み込み＆地域操作 =====
-
+// 地図読み込み & 地域ハイライト処理
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // 県パスは非表示または線なし
-    mapDiv.querySelectorAll('path').forEach(p=>{
-      p.style.stroke = 'none';
-    });
+    // 地域ごとのIDとリンク先
+    const regions = {
+      'Path_1': '/hokkaido',        // 北海道
+      'Path_2': '/tohoku',          // 東北
+      'Path_3': '/kanto',           // 関東
+      'Path_4': '/chubu',           // 中部
+      'Path_5': '/kinki',           // 近畿
+      'Path_6': '/chugoku_shikoku', // 中国四国
+      'Path_7': '/kyushu',          // 九州
+      'Path_8': '/okinawa'          // 沖縄
+    };
 
-    const regionIds = [
-      'Path_1','Path_2','Path_3','Path_4',
-      'Path_5','Path_6','Path_7','Path_8'
-    ];
+    const fillColor = '#4a6fa5';                  // 落ち着いた青
+    const strokeColor = 'rgba(255,255,255,0.5)'; // 白の薄枠
+    const strokeWidth = 1;
 
-    const baseColor = '#4a6fa5';
-    const activeColor = '#3a5a8c';
-    let activeRegion = null;
+    for (const [id, link] of Object.entries(regions)) {
+      const g = mapDiv.querySelector(`#${id}`);
+      if (!g) continue;
 
-    // IDを持つパスを取得し、クリック可能に
-    regionIds.forEach(id => {
-      const p = mapDiv.querySelector(`#${id}`);
-      if (!p) {
-        console.warn('region not found:', id);
-        return;
-      }
+      // 塗りだけ色を設定、枠線は白
+      g.style.fill = fillColor;
+      g.style.stroke = strokeColor;
+      g.style.strokeWidth = strokeWidth;
+      g.style.cursor = 'pointer';
+      g.style.pointerEvents = 'all'; // 塗り部分もクリック可能
 
-      p.style.fill = baseColor;
-      p.style.stroke = 'rgba(255,255,255,0.4)';
-      p.style.strokeWidth = '1';
-      p.style.cursor = 'pointer';
-      p.style.transition = 'all 0.15s ease';
-
-      // タップ処理
-      p.addEventListener('click', () => {
-        if (activeRegion) activeRegion.style.fill = baseColor;
-        p.style.fill = activeColor;
-        activeRegion = p;
-
-        // 遷移
-        setTimeout(()=>location.href=`region.html?area=${id}`, 120);
+      // クリックで画面遷移
+      g.addEventListener('click', () => {
+        window.location.href = link;
       });
-    });
 
+      // マウスオーバーで塗りトーンを少し上げる
+      g.addEventListener('mouseenter', () => g.style.fill = '#6c86b3');
+      g.addEventListener('mouseleave', () => g.style.fill = fillColor);
+    }
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 </script>
