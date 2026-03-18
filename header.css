@@ -1,61 +1,95 @@
+/* header.css（元設定＋折り返し防止） */
 header {
-  border-bottom:1px solid #191970;
-  background:#fff;
+  border-bottom: 1px solid #191970;
+  background: #fff;
+  position: fixed;       /* ヘッダー固定 */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .header-inner {
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 12px;
-  position:relative;
-  z-index:1;
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  position: relative;
+  z-index: 1;
 }
 
-.logo { 
-  font-weight:700; 
-  font-size:0.8rem; 
-  color:#191970; 
-  display:flex; 
-  align-items:center; 
+.logo {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #191970;
+  display: flex;
+  align-items: center;
 }
 
-.nav { 
-  display:flex; 
-  align-items:center; 
-  gap:14px; 
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.nav a { 
-  text-decoration:none; 
-  color:#191970; 
-  font-size:0.8rem; 
+.nav a {
+  text-decoration: none;
+  color: #191970;
+  font-size: 0.8rem;
+  white-space: nowrap;       /* 折り返し禁止 */
 }
 
-.accordion-wrapper { 
-  position:relative; 
+.accordion-wrapper {
+  position: relative;
 }
 
-.accordion-btn { 
-  background:none; 
-  border:none; 
-  font-size:0.8rem; 
-  color:#191970; 
-  cursor:pointer; 
-  display:flex; 
-  align-items:center; 
+.accordion-btn {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  color: #191970;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;       /* 折り返し禁止 */
 }
 
-.accordion-panel { 
-  display:none; 
-  position:absolute; 
-  top:30px; 
-  left:0; 
-  background:#f9f9f9; 
-  border:1px solid #ddd; 
-  border-radius:4px; 
-  padding:8px; 
-  min-width:150px; 
+.accordion-panel {
+  display: none;
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  min-width: 150px;
+}
+
+.location-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.location-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+  font-size: 14px;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c00;
+}
+
+.location-none {
+  color: #888;
+  font-style: italic;
 }
