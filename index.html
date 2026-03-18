@@ -448,45 +448,50 @@ fetch('japan.svg')
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // 地域ごとのIDとリンク先
     const regions = {
-      'Path_1': '/hokkaido',        // 北海道
-      'Path_2': '/tohoku',          // 東北
-      'Path_3': '/kanto',           // 関東
-      'Path_4': '/chubu',           // 中部
-      'Path_5': '/kinki',           // 近畿
-      'Path_6': '/chugoku_shikoku', // 中国四国
-      'Path_7': '/kyushu',          // 九州
-      'Path_8': '/okinawa'          // 沖縄
+      'Path_1': '/hokkaido',
+      'Path_2': '/tohoku',
+      'Path_3': '/kanto',
+      'Path_4': '/chubu',
+      'Path_5': '/kinki',
+      'Path_6': '/chugoku_shikoku',
+      'Path_7': '/kyushu',
+      'Path_8': '/okinawa'
     };
 
-    const fillColor = '#4a6fa5';                  // 落ち着いた青
-    const strokeColor = 'rgba(255,255,255,0.5)'; // 白の薄枠
+    const fillColor = '#4a6fa5';                   // 落ち着いた青
+    const strokeColor = 'rgba(255,255,255,0.5)';  // 白の薄枠
     const strokeWidth = 1;
 
     for (const [id, link] of Object.entries(regions)) {
       const g = mapDiv.querySelector(`#${id}`);
       if (!g) continue;
 
-      // 塗りだけ色を設定、枠線は白
-      g.style.fill = fillColor;
-      g.style.stroke = strokeColor;
-      g.style.strokeWidth = strokeWidth;
-      g.style.cursor = 'pointer';
-      g.style.pointerEvents = 'all'; // 塗り部分もクリック可能
-
-      // クリックで画面遷移
-      g.addEventListener('click', () => {
-        window.location.href = link;
+      // 内部 path に塗りを設定
+      g.querySelectorAll('path').forEach(path => {
+        path.style.fill = fillColor;
+        path.style.stroke = strokeColor;
+        path.style.strokeWidth = strokeWidth;
+        path.style.strokeLinejoin = 'round';
       });
 
+      // グループ自体にはクリック判定
+      g.style.cursor = 'pointer';
+      g.style.pointerEvents = 'all';
+      g.addEventListener('click', () => { window.location.href = link; });
+
       // マウスオーバーで塗りトーンを少し上げる
-      g.addEventListener('mouseenter', () => g.style.fill = '#6c86b3');
-      g.addEventListener('mouseleave', () => g.style.fill = fillColor);
+      g.addEventListener('mouseenter', () => {
+        g.querySelectorAll('path').forEach(path => path.style.fill = '#6c86b3');
+      });
+      g.addEventListener('mouseleave', () => {
+        g.querySelectorAll('path').forEach(path => path.style.fill = fillColor);
+      });
     }
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 </script>
+
 
 
 </body>
