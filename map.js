@@ -2,28 +2,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
 
-  let svg;
-  let currentGroup = null;
-
-  // 🔧 調整値
-  const groupOffsets = {
-    Path_1:{x:0,y:0}, Path_2:{x:0,y:0}, Path_3:{x:0,y:0}, Path_4:{x:0,y:0},
-    Path_5:{x:0,y:0}, Path_6:{x:0,y:0}, Path_7:{x:0,y:0}, Path_8:{x:0,y:0}
-  };
-
-  const groupScales = {
-    Path_1:1, Path_2:1, Path_3:1, Path_4:1,
-    Path_5:1, Path_6:1, Path_7:1, Path_8:1
-  };
-
   fetch('japan.svg')
     .then(res => res.text())
     .then(svgText => {
 
       mapDiv.innerHTML = svgText;
-      svg = mapDiv.querySelector('svg');
 
+      const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
+
+      // 描画改善
+      svg.style.shapeRendering = 'geometricPrecision';
+      svg.style.transformOrigin = 'center center';
+
+      // 設定統合
+      const groupSettings = {
+        Path_1: { scale:3.4, x:230, y:0 },
+        Path_2: { scale:3.4, x:190, y:110 },
+        Path_3: { scale:5.2, x:130, y:130 },
+        Path_4: { scale:5.6, x:90, y:140 },
+        Path_5: { scale:7, x:30, y:160 },
+        Path_6: { scale:4.8, x:0, y:200 },
+        Path_7: { scale:5.8, x:-60, y:220 },
+        Path_8: { scale:3.4, x:30, y:20 }
+      };
 
       const groupToPrefectures = {
         Path_1:['Hokkaido'],
@@ -36,15 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_8:['Okinawa']
       };
 
-      // 初期：県非表示
+      // 県パス初期設定
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
         p.style.fill = '#191970';
         p.style.stroke = '#fff';
         p.style.strokeWidth = '0.5px';
+        p.style.vectorEffect = 'non-scaling-stroke'; // 重要
       });
 
-      // グループ
+      // 地域グループ
       Object.keys(groupToPrefectures).forEach(gid => {
         const group = svg.getElementById(gid);
         if (!group) return;
@@ -53,37 +56,48 @@ document.addEventListener('DOMContentLoaded', () => {
         group.style.stroke = '#fff';
         group.style.strokeWidth = '3px';
         group.style.cursor = 'pointer';
+        group.style.vectorEffect = 'non-scaling-stroke'; // 重要
 
         group.addEventListener('click', () => {
 
-          currentGroup = gid;
-
-          // 全グループ非表示
+          // 1. 全グループ非表示
           Object.keys(groupToPrefectures).forEach(g => {
             const el = svg.getElementById(g);
             if (el) el.style.display = 'none';
           });
 
-          // 対象県のみ表示
+          // 2. 対象県のみ表示
           prefGroup.querySelectorAll('path').forEach(p => {
             p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
           });
 
+          // 3. 拡大処理
           applyTransform(gid);
-          updateDisplay();
+
+          // 4. 県クリックイベント（1回のみ）
+          groupToPrefectures[gid].forEach(pid => {
+            const p = prefGroup.querySelector(`#${pid}`);
+            if (p && !p.dataset.eventAttached) {
+              p.addEventListener('click', () => {
+                alert(`県クリック: ${pid}`);
+              });
+              p.dataset.eventAttached = 'true';
+            }
+          });
 
         });
       });
 
-      // 🔧 transform
       function applyTransform(gid){
         const group = svg.getElementById(gid);
         const bbox = group.getBBox();
 
-        let cx = bbox.x + bbox.width/2 + groupOffsets[gid].x;
-        let cy = bbox.y + bbox.height/2 + groupOffsets[gid].y;
+        const s = groupSettings[gid];
 
-        const scale = groupScales[gid];
+        let cx = bbox.x + bbox.width/2 + s.x;
+        let cy = bbox.y + bbox.height/2 + s.y;
+
+        const scale = s.scale;
 
         const svgW = svg.viewBox.baseVal.width;
         const svgH = svg.viewBox.baseVal.height;
@@ -91,60 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const tx = svgW/2 - cx * scale;
         const ty = svgH/2 - cy * scale;
 
+        svg.style.transition = 'transform 0.4s ease';
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
       }
 
-      // 🔧 UI生成
-      createController();
-
-      function createController(){
-
-        const ctrl = document.createElement('div');
-        ctrl.innerHTML = `
-          <div style="position:fixed;bottom:20px;left:20px;z-index:9999;background:#0008;padding:10px;border-radius:10px;color:#fff">
-            <div id="posDisplay">x:0 y:0 scale:1</div>
-            <button onclick="move(0,-10)">↑</button><br>
-            <button onclick="move(-10,0)">←</button>
-            <button onclick="move(10,0)">→</button><br>
-            <button onclick="move(0,10)">↓</button><br>
-            <button onclick="zoom(0.2)">＋</button>
-            <button onclick="zoom(-0.2)">－</button>
-          </div>
-        `;
-        document.body.appendChild(ctrl);
-      }
-
-      // 🔧 グローバル操作
-      window.move = (x,y)=>{
-        if(!currentGroup) return;
-
-        groupOffsets[currentGroup].x += x;
-        groupOffsets[currentGroup].y += y;
-
-        applyTransform(currentGroup);
-        updateDisplay();
-
-        console.log(currentGroup, groupOffsets[currentGroup]);
-      };
-
-      window.zoom = (z)=>{
-        if(!currentGroup) return;
-
-        groupScales[currentGroup] += z;
-
-        applyTransform(currentGroup);
-        updateDisplay();
-
-        console.log(currentGroup, groupScales[currentGroup]);
-      };
-
-      function updateDisplay(){
-        const d = document.getElementById('posDisplay');
-        if(!currentGroup) return;
-
-        d.textContent = `x:${groupOffsets[currentGroup].x} y:${groupOffsets[currentGroup].y} scale:${groupScales[currentGroup].toFixed(2)}`;
-      }
-
-    });
+    })
+    .catch(err => console.error('SVG読み込みエラー:', err));
 
 });
