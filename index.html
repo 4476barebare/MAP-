@@ -130,22 +130,17 @@ fetch('japan.svg')
     ];
 
     regionIds.forEach(id => {
-      const p = document.getElementById(id);
+  const p = document.getElementById(id);
+  if (!p) return;
 
-      if (!p) {
-        console.log('見つからないID:', id);
-        return;
-      }
+  p.style.fill = 'none';
+  p.style.stroke = '#ffffff';
+  p.style.strokeWidth = '2';
+  p.style.strokeLinejoin = 'round';
+  p.style.strokeLinecap = 'round';
 
-      // 地域線を描画
-      p.style.fill = 'none';
-      p.style.stroke = '#ff0000';   // 確認用（後で色変える）
-      p.style.strokeWidth = '4';
-      p.style.opacity = '1';
-
-      // 最前面に出す
-      p.parentNode.appendChild(p);
-    });
+  p.parentNode.appendChild(p);
+});
 
     console.log('地域パス処理完了');
   })
