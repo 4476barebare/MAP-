@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こNAVI</title>
+
 <style>
 html, body {
   margin:0;
@@ -12,18 +13,17 @@ html, body {
   color:#333;
   overflow-x: hidden; /* 横スクロール禁止 */
 }
-/* ヘッダーを常に画面上部に固定 */
+
 header {
-  position: fixed;    /* 常に上部に固定 */
-  top: 0;             /* 上端に配置 */
-  left: 0;            /* 左端に揃える */
-  width: 100%;        /* 横幅いっぱい */
-  z-index: 1000;      /* 他要素より前面に表示 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
   border-bottom: 1px solid #191970;
-  background: #fff;   /* 背景を白に固定 */
+  background: #fff;
 }
 
-/* ヘッダー内コンテンツはそのまま中央揃え */
 .header-inner {
   max-width: 1100px;
   margin: auto;
@@ -34,6 +34,7 @@ header {
   position: relative;
   z-index: 1;
 }
+
 .logo { font-weight:700; font-size:0.8rem; color:#191970; display:flex; align-items:center; }
 .nav { display:flex; align-items:center; gap:14px; }
 .nav a { text-decoration:none; color:#191970; font-size:0.8rem; }
@@ -47,62 +48,110 @@ header {
 
 /* main の上部にヘッダー高さ分の余白を確保 */
 main {
-  padding-top: 60px; /* header 高さに合わせて調整 */
+  padding-top: 60px;
 }
 
-
 .map { text-align:center; }
-.japan-map { width:100%; max-width:900px; margin:0 auto; filter:drop-shadow(0 3px 5px rgba(0,0,0,0.22)); }
-.japan-map svg { width:100%; height:auto; }
-.ad { text-align:center; margin:20px 0; color:#999; }
-footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color:#777; border-top:1px solid #ddd; }
-#newsOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); display:none; justify-content:center; align-items:center; z-index:999; }
-.news-window { position:relative; width:85%; max-width:900px; height:70vh; background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.4); overflow:hidden; display:flex; flex-direction:column; }
+
+/* 地図表示エリア */
+.japan-map {
+  width:100%;
+  max-width:900px;
+  margin:0 auto;
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,0.22));
+  position:relative;
+}
+
+.japan-map svg {
+  width:100%;
+  height:auto;
+}
+
+/* 拡大時テキスト */
+.region-label {
+  font-size:14px;
+  font-weight:bold;
+  fill:#000;
+  text-anchor:middle;
+  pointer-events:none;
+}
+
+footer {
+  margin-top:40px;
+  padding:20px;
+  text-align:center;
+  font-size:13px;
+  color:#777;
+  border-top:1px solid #ddd;
+}
+
+/* ニュースポップアップ */
+#newsOverlay {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+.news-window {
+  position:relative;
+  width:85%;
+  max-width:900px;
+  height:70vh;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
 </style>
 </head>
+
 <body>
+
 <header>
 <div class="header-inner">
-<div class="logo">釣り行こNAVI</div>
-<nav class="nav">
-<div class="accordion-wrapper">
-<button class="accordion-btn">登録地点 ▼</button>
-<div class="accordion-panel">
-<ul class="location-list" id="locationList">
-<li>新潟 <button class="delete-btn">✖️</button></li>
-<li>群馬 <button class="delete-btn">✖️</button></li>
-<li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
-</ul>
-</div>
-</div>
-<a href="#" id="newsBtn">釣りNEWS</a>
-<a href="#">全国地図</a>
-<a href="#">その他</a>
-</nav>
+  <div class="logo">釣り行こNAVI</div>
+  <nav class="nav">
+    <div class="accordion-wrapper">
+      <button class="accordion-btn">登録地点 ▼</button>
+      <div class="accordion-panel">
+        <ul class="location-list" id="locationList">
+          <li>新潟 <button class="delete-btn">✖️</button></li>
+          <li>群馬 <button class="delete-btn">✖️</button></li>
+          <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+        </ul>
+      </div>
+    </div>
+
+    <a href="#" id="newsBtn">釣りNEWS</a>
+    <a href="#">全国地図</a>
+    <a href="#">その他</a>
+  </nav>
 </div>
 </header>
 
 <main>
-<div class="map">
-<div class="japan-map" id="map"></div>
-</div>
+  <div class="map">
+    <div class="japan-map" id="map"></div>
+  </div>
 </main>
 
-
 <div class="ad">広告スペース</div>
 
-<div class="ad">広告スペース</div>
-
-
-
-<div class="ad">広告スペース</div>
 <footer>© 釣り行こNAVI</footer>
 
 <div id="newsOverlay">
-<div class="news-window">
-<button id="closeNews">閉じる</button>
-<div class="news-content"></div>
-</div>
+  <div class="news-window">
+    <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
+  </div>
 </div>
 
 <script>
@@ -126,7 +175,7 @@ const locationList = document.getElementById('locationList');
 function attachDeleteEvents() {
   const deleteButtons = locationList.querySelectorAll('.delete-btn');
   deleteButtons.forEach(btn=>{
-    btn.addEventListener('click', e=>{
+    btn.addEventListener('click', ()=>{
       const li = btn.parentElement;
       li.remove();
       if(locationList.children.length === 0){
@@ -160,8 +209,21 @@ newsBtn.addEventListener("click", e=>{
 });
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 
-// 地図読み込み & 地域ハイライト
+// 県名リスト
+const prefNames = {
+  hokkaido: '北海道',
+  aomori: '青森県',
+  iwate: '岩手県',
+  miyagi: '宮城県',
+  akita: '秋田県',
+  yamagata: '山形県',
+  fukushima: '福島県',
+  // 以降も必要に応じて追加
+};
+
+// 地図読み込み & 地域クリック処理
 const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
+
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
@@ -171,19 +233,53 @@ fetch('japan.svg')
     regionIDs.forEach(id=>{
       const path = document.getElementById(id);
       if(path){
-        path.setAttribute('fill', '#191970');       // タイトル色
-        path.setAttribute('stroke', '#ffffff');     // 枠線は白
+        path.setAttribute('fill', '#191970');
+        path.setAttribute('stroke', '#ffffff');
         path.setAttribute('stroke-width', '1.5');
         path.setAttribute('stroke-linejoin', 'round');
         path.style.cursor = 'pointer';
 
         path.addEventListener('click', ()=>{
-          alert(`${id} がタップされました`);
+          showRegionDetail(id);
         });
       }
     });
+
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
+
+// 地域詳細表示
+function showRegionDetail(regionID){
+  const mapDiv = document.getElementById('map');
+  const svg = mapDiv.querySelector('svg');
+
+  // 全県非表示（先に初期化）
+  svg.querySelectorAll('path').forEach(p=> p.style.display='none');
+
+  // 指定地域だけ表示
+  const regionGroup = svg.querySelector(`#${regionID}`);
+  if(regionGroup){
+    // 県を表示 & 県名ラベル作成
+    regionGroup.querySelectorAll('path').forEach(prefPath=>{
+      prefPath.style.display='block';
+      prefPath.style.fill = '#191970';
+      prefPath.style.stroke = '#ffffff';
+      prefPath.style.strokeWidth = '1.5';
+
+      // ラベル
+      const bbox = prefPath.getBBox();
+      const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+      label.setAttribute('x', bbox.x + bbox.width/2);
+      label.setAttribute('y', bbox.y + bbox.height/2);
+      label.setAttribute('class','region-label');
+      label.textContent = prefNames[prefPath.id] || prefPath.id;
+      regionGroup.appendChild(label);
+    });
+
+    // 拡大（要微調整）
+    regionGroup.setAttribute('transform','scale(3) translate(-150,-150)');
+  }
+}
 </script>
 
 </body>
