@@ -5,9 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こNAVI</title>
 <style>
-html, body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; background:#fff; color:#333; }
-header { border-bottom:1px solid #191970; background:#fff; }
-.header-inner { max-width:1100px; margin:auto; display:flex; align-items:center; justify-content:space-between; padding:10px 12px; position:relative; z-index:1; }
+html, body {
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background:#fff;
+  color:#333;
+  overflow-x: hidden; /* 横スクロール禁止 */
+}
+header {
+  border-bottom:1px solid #191970;
+  background:#fff;
+}
+.header-inner {
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  position:relative;
+  z-index:1;
+}
 .logo { font-weight:700; font-size:0.8rem; color:#191970; display:flex; align-items:center; }
 .nav { display:flex; align-items:center; gap:14px; }
 .nav a { text-decoration:none; color:#191970; font-size:0.8rem; }
@@ -29,42 +47,41 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
 </style>
 </head>
 <body>
-
 <header>
 <div class="header-inner">
-  <div class="logo">釣り行こNAVI</div>
-  <nav class="nav">
-    <div class="accordion-wrapper">
-      <button class="accordion-btn">登録地点 ▼</button>
-      <div class="accordion-panel">
-        <ul class="location-list" id="locationList">
-          <li>新潟 <button class="delete-btn">✖️</button></li>
-          <li>群馬 <button class="delete-btn">✖️</button></li>
-          <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
-        </ul>
-      </div>
-    </div>
-    <a href="#" id="newsBtn">釣りNEWS</a>
-    <a href="#">全国地図</a>
-    <a href="#">その他</a>
-  </nav>
+<div class="logo">釣り行こNAVI</div>
+<nav class="nav">
+<div class="accordion-wrapper">
+<button class="accordion-btn">登録地点 ▼</button>
+<div class="accordion-panel">
+<ul class="location-list" id="locationList">
+<li>新潟 <button class="delete-btn">✖️</button></li>
+<li>群馬 <button class="delete-btn">✖️</button></li>
+<li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+</ul>
+</div>
+</div>
+<a href="#" id="newsBtn">釣りNEWS</a>
+<a href="#">全国地図</a>
+<a href="#">その他</a>
+</nav>
 </div>
 </header>
 
 <main>
-  <div class="map">
-    <div class="japan-map" id="map"></div>
-  </div>
+<div class="map">
+<div class="japan-map" id="map"></div>
+</div>
 </main>
 
 <div class="ad">広告スペース</div>
 <footer>© 釣り行こNAVI</footer>
 
 <div id="newsOverlay">
-  <div class="news-window">
-    <button id="closeNews">閉じる</button>
-    <div class="news-content"></div>
-  </div>
+<div class="news-window">
+<button id="closeNews">閉じる</button>
+<div class="news-content"></div>
+</div>
 </div>
 
 <script>
@@ -122,30 +139,26 @@ newsBtn.addEventListener("click", e=>{
 });
 closeBtn.addEventListener("click", ()=>{ overlay.style.display="none"; });
 
-// SVG 読み込み & 地域グループ塗り
+// 地図読み込み & 地域ハイライト
+const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    const regionIDs = [
-      'Path_1', 'Path_2', 'Path_3', 'Path_4',
-      'Path_5', 'Path_6', 'Path_7', 'Path_8'
-    ];
-
-    regionIDs.forEach(id => {
+    regionIDs.forEach(id=>{
       const path = document.getElementById(id);
       if(path){
-        path.setAttribute('fill', '#4a6fa5');    // 落ち着いた青
-        path.setAttribute('stroke', '#ffffff'); // 枠線は白
+        path.setAttribute('fill', '#191970');       // タイトル色
+        path.setAttribute('stroke', '#ffffff');     // 枠線は白
         path.setAttribute('stroke-width', '1.5');
         path.setAttribute('stroke-linejoin', 'round');
-
         path.style.cursor = 'pointer';
-        path.addEventListener('click', ()=>{ alert(`${id} がタップされました`); });
-      } else {
-        console.warn('地域パス見つからず:', id);
+
+        path.addEventListener('click', ()=>{
+          alert(`${id} がタップされました`);
+        });
       }
     });
   })
