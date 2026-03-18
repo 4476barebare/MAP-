@@ -441,15 +441,15 @@ if (newsBtn && overlay && closeBtn) {
 }
 
 // ===== SVG読み込み＆地域操作 =====
+
 fetch('japan.svg')
   .then(res => res.text())
   .then(svgText => {
     const mapDiv = document.getElementById('map');
     mapDiv.innerHTML = svgText;
 
-    // ===== 県（ベース） =====
-    document.querySelectorAll('#map path').forEach(p=>{
-      p.style.fill = '#191970'; // 下地
+    // 県パスは非表示または線なし
+    mapDiv.querySelectorAll('path').forEach(p=>{
       p.style.stroke = 'none';
     });
 
@@ -460,35 +460,30 @@ fetch('japan.svg')
 
     const baseColor = '#4a6fa5';
     const activeColor = '#3a5a8c';
-
     let activeRegion = null;
 
+    // IDを持つパスを取得し、クリック可能に
     regionIds.forEach(id => {
-      const p = document.getElementById(id);
-      if (!p) return;
+      const p = mapDiv.querySelector(`#${id}`);
+      if (!p) {
+        console.warn('region not found:', id);
+        return;
+      }
 
-      // ===== 見た目 =====
       p.style.fill = baseColor;
       p.style.stroke = 'rgba(255,255,255,0.4)';
       p.style.strokeWidth = '1';
       p.style.cursor = 'pointer';
       p.style.transition = 'all 0.15s ease';
 
-      p.parentNode.appendChild(p);
-
-      // ===== タップ =====
+      // タップ処理
       p.addEventListener('click', () => {
-
-        if (activeRegion) {
-          activeRegion.style.fill = baseColor;
-        }
-
+        if (activeRegion) activeRegion.style.fill = baseColor;
         p.style.fill = activeColor;
         activeRegion = p;
 
-        setTimeout(()=>{
-          location.href = `region.html?area=${id}`;
-        }, 120);
+        // 遷移
+        setTimeout(()=>location.href=`region.html?area=${id}`, 120);
       });
     });
 
