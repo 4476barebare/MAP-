@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', ()=>{
   const mapDiv = document.getElementById('map');
-  const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
 
+  // 地域グループ ID と対応する県 ID
+  const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
   const groupToPrefectures = {
     'Path_1': ['Hokkaido'],
     'Path_2': ['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
@@ -18,38 +19,30 @@ document.addEventListener('DOMContentLoaded', ()=>{
     .then(svgText => {
       mapDiv.innerHTML = svgText;
 
-      // 初期状態：グループのみ表示
+      // 初期状態：地域グループのみ表示
       regionIDs.forEach(id=>{
         const path = document.getElementById(id);
         if(path){
-          path.setAttribute('fill','#888');          // グレー
-          path.setAttribute('stroke','#191970');    // グループ線
+          path.setAttribute('fill','#888');      // 灰色
+          path.setAttribute('stroke','#191970'); // 青いグループ線
           path.setAttribute('stroke-width','1.5');
           path.style.cursor = 'pointer';
 
-          // グループクリック
           path.addEventListener('click', ()=>{
-            alert(`${id} タップ（全グループ非表示、県表示）`);
-
-            // 1. 全てのグループ非表示
+            // クリック時：全てのグループ非表示
             regionIDs.forEach(gid=>{
               const gpath = document.getElementById(gid);
               if(gpath) gpath.style.display = 'none';
             });
 
-            // 2. 該当県のみ表示
+            // クリックしたグループの県のみ赤色で表示
             groupToPrefectures[id].forEach(prefID=>{
               const prefPath = document.getElementById(prefID);
               if(prefPath){
                 prefPath.style.display = 'block';
-                prefPath.setAttribute('fill','#191970');   // 塗り色
-                prefPath.setAttribute('stroke','#191970'); // 県境
+                prefPath.setAttribute('fill','red');
+                prefPath.setAttribute('stroke','#191970');
                 prefPath.setAttribute('stroke-width','1');
-                prefPath.style.cursor = 'pointer';
-
-                prefPath.addEventListener('click', ()=>{
-                  alert(`${prefID} タップ`);
-                });
               }
             });
           });
