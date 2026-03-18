@@ -3,31 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>釣り行こNAVI - 外部CSS/JS版</title>
+<title>釣り行こNAVI</title>
 
 <!-- 外部CSS -->
 <link rel="stylesheet" href="header.css">
-
 </head>
 <body>
 
 <header>
-  <h1>釣り行こNAVI</h1>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+      <a href="#">ホーム</a>
+      <a href="#">地域</a>
+      <a href="#">ニュース</a>
+    </nav>
+    <div class="accordion-wrapper">
+      <button class="accordion-btn">登録地点</button>
+      <div class="accordion-panel">
+        <ul id="locationList" class="location-list">
+          <li class="location-none">登録なし</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </header>
 
-<div class="accordion-wrapper">
-  <button class="accordion-btn">登録地点</button>
-  <div class="accordion-panel">
-    <ul id="locationList">
-      <li class="location-none">登録なし</li>
-    </ul>
-  </div>
-</div>
-
-<button id="newsBtn">ニュース</button>
+<button id="newsBtn" style="margin-top:80px;">ニュース</button>
 
 <div id="newsOverlay">
-  <div>
+  <div class="news-window">
     <p>ニュースコンテンツ</p>
     <button id="closeNews">閉じる</button>
   </div>
