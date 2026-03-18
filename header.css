@@ -1,8 +1,8 @@
-/* header.css（元設定＋折り返し防止） */
+/* header.css（折り返し防止＋元設定維持） */
 header {
   border-bottom: 1px solid #191970;
   background: #fff;
-  position: fixed;       /* ヘッダー固定 */
+  position: fixed;   /* 常に固定 */
   top: 0;
   left: 0;
   width: 100%;
@@ -26,19 +26,24 @@ header {
   color: #191970;
   display: flex;
   align-items: center;
+  white-space: nowrap;   /* 折り返し防止 */
 }
 
 .nav {
   display: flex;
   align-items: center;
   gap: 14px;
+  flex-wrap: nowrap;     /* 横に収まらない場合は縮小、折り返さない */
 }
 
 .nav a {
   text-decoration: none;
   color: #191970;
   font-size: 0.8rem;
-  white-space: nowrap;       /* 折り返し禁止 */
+  white-space: nowrap;   /* 折り返し防止 */
+  overflow: hidden;      /* はみ出し対策 */
+  text-overflow: ellipsis;
+  max-width: 120px;      /* 必要に応じて調整 */
 }
 
 .accordion-wrapper {
@@ -53,7 +58,10 @@ header {
   cursor: pointer;
   display: flex;
   align-items: center;
-  white-space: nowrap;       /* 折り返し禁止 */
+  white-space: nowrap;   /* 折り返し防止 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;      /* 必要に応じて調整 */
 }
 
 .accordion-panel {
