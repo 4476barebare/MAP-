@@ -480,35 +480,43 @@ function showRegionDetail(regionID){
   const mapDiv = document.getElementById('map');
   const svg = mapDiv.querySelector('svg');
 
-  // 全県非表示
-  svg.querySelectorAll('g[id^="Path_"] path').forEach(p=>p.style.display='none');
+  // 全県リセット
+  svg.querySelectorAll('g[id^="Path_"]').forEach(g=>{
+    g.querySelectorAll('path').forEach(p=>{
+      p.style.display='block';
+      p.style.fill='#ADD8E6'; // 初期薄青
+      p.style.stroke='#ffffff';
+      p.style.strokeWidth='1.5';
+      g.removeAttribute('transform'); // transformリセット
+    });
+  });
 
-  // 選択地域だけ表示
+  // 選択地域
   const group = svg.querySelector('#'+regionID);
   if(!group) return;
 
+  // 拡大は viewBox を書き換える
+  const bbox = group.getBBox();
+  const svgWidth = svg.viewBox.baseVal.width || 900;
+  const svgHeight = svg.viewBox.baseVal.height || 600;
+  const scale = Math.min(svgWidth/bbox.width, svgHeight/bbox.height) * 0.9; // 少し余白
+  const vbX = bbox.x + bbox.width/2 - svgWidth/(2*scale);
+  const vbY = bbox.y + bbox.height/2 - svgHeight/(2*scale);
+  svg.setAttribute('viewBox', `${vbX} ${vbY} ${svgWidth/scale} ${svgHeight/scale}`);
+
+  // 塗りとラベル
   group.querySelectorAll('path').forEach(p=>{
-    p.style.display='block';
     p.style.fill='#191970'; // 濃青
     p.style.stroke='#ffffff';
     p.style.strokeWidth='1.5';
   });
 
-  // 拡大 transform（自動計算）
-  const bbox = group.getBBox();
-  const svgWidth=900, svgHeight=600;
-  const scale = Math.min(svgWidth/bbox.width, svgHeight/bbox.height);
-  const tx = -bbox.x + (svgWidth - bbox.width*scale)/2/scale;
-  const ty = -bbox.y + (svgHeight - bbox.height*scale)/2/scale;
-  group.setAttribute('transform',`scale(${scale}) translate(${tx},${ty})`);
-
-  // 県ラベルは一度だけ追加
   if(!group.querySelector('.region-label')){
     group.querySelectorAll('path').forEach(p=>{
       const bb = p.getBBox();
       const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-      text.setAttribute('x',bb.x + bb.width/2);
-      text.setAttribute('y',bb.y + bb.height/2);
+      text.setAttribute('x',bb.x+bb.width/2);
+      text.setAttribute('y',bb.y+bb.height/2);
       text.setAttribute('class','region-label');
       text.textContent = prefNames[p.id] || p.id;
       group.appendChild(text);
@@ -516,6 +524,5 @@ function showRegionDetail(regionID){
   }
 }
 </script>
-
 </body>
 </html>
