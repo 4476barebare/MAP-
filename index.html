@@ -449,69 +449,49 @@ fetch('japan.svg')
 
     // ===== 県（ベース） =====
     document.querySelectorAll('#map path').forEach(p=>{
-      p.style.fill = '#191970';
+      p.style.fill = '#191970'; // 下地
       p.style.stroke = 'none';
     });
 
-    // ===== 地域ID =====
     const regionIds = [
-      'Path_1', // 北海道
-      'Path_2', // 東北
-      'Path_3', // 関東
-      'Path_4', // 中部
-      'Path_5', // 近畿
-      'Path_6', // 中国・四国
-      'Path_7', // 九州
-      'Path_8'  // 沖縄
+      'Path_1','Path_2','Path_3','Path_4',
+      'Path_5','Path_6','Path_7','Path_8'
     ];
+
+    const baseColor = '#4a6fa5';
+    const activeColor = '#3a5a8c';
 
     let activeRegion = null;
 
     regionIds.forEach(id => {
       const p = document.getElementById(id);
+      if (!p) return;
 
-      if (!p) {
-        console.log('見つからないID:', id);
-        return;
-      }
-
-      // ===== 初期スタイル =====
-      p.style.fill = 'none';
-      p.style.stroke = '#ffffff';
-      p.style.strokeWidth = '2';
-      p.style.strokeLinejoin = 'round';
-      p.style.strokeLinecap = 'round';
+      // ===== 見た目 =====
+      p.style.fill = baseColor;
+      p.style.stroke = 'rgba(255,255,255,0.4)';
+      p.style.strokeWidth = '1';
       p.style.cursor = 'pointer';
+      p.style.transition = 'all 0.15s ease';
 
-      // 最前面へ
       p.parentNode.appendChild(p);
 
-      // ===== タップ処理 =====
+      // ===== タップ =====
       p.addEventListener('click', () => {
 
-        // 前の選択を戻す
         if (activeRegion) {
-          activeRegion.style.stroke = '#ffffff';
-          activeRegion.style.strokeWidth = '2';
+          activeRegion.style.fill = baseColor;
         }
 
-        // 今回の選択を強調
-        p.style.stroke = '#00ffff';
-        p.style.strokeWidth = '4';
-
+        p.style.fill = activeColor;
         activeRegion = p;
 
-        // ===== 画面遷移 =====
-        console.log('選択:', id);
-
-        // 少しだけハイライト見せてから遷移
         setTimeout(()=>{
           location.href = `region.html?area=${id}`;
-        }, 150);
+        }, 120);
       });
     });
 
-    console.log('地域処理完了');
   })
   .catch(err => console.error('SVG読み込みエラー:', err));
 </script>
