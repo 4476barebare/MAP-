@@ -250,22 +250,32 @@ fetch('japan.svg')
 
 // 地域詳細表示
 function showRegionDetail(regionID){
-  const mapDiv = document.getElementById('map');
-  const svg = mapDiv.querySelector('svg');
+  const svg = document.querySelector('#map svg');
 
-  // 全県 path を非表示
-  svg.querySelectorAll('g[id^="Path_"] path').forEach(p=> p.style.display='none');
+  // 全県非表示（path だけ）
+  svg.querySelectorAll('g[id^="Path_"] path').forEach(p => p.style.display='none');
 
-  // 指定地域だけ表示
   const regionGroup = svg.querySelector(`#${regionID}`);
-  if(regionGroup){
-    regionGroup.querySelectorAll('path').forEach(prefPath=>{
-      prefPath.style.display='block';
-      prefPath.setAttribute('fill', '#191970');
-      prefPath.setAttribute('stroke', '#ffffff');
-      prefPath.setAttribute('stroke-width', '1.5');
+  if(!regionGroup) return;
 
-      // ラベル
+  // 地域内の県 path を表示
+  regionGroup.querySelectorAll('path').forEach(prefPath=>{
+    prefPath.style.display='block';
+    prefPath.setAttribute('fill','#191970');
+    prefPath.setAttribute('stroke','#ffffff');
+    prefPath.setAttribute('stroke-width','1.5');
+  });
+
+  // transform は bbox を元に自動計算
+  const bbox = regionGroup.getBBox();
+  const scale = Math.min(900/bbox.width, 600/bbox.height); // svgサイズに合わせる
+  const translateX = -bbox.x + (900 - bbox.width*scale)/2/scale;
+  const translateY = -bbox.y + (600 - bbox.height*scale)/2/scale;
+  regionGroup.setAttribute('transform',`scale(${scale}) translate(${translateX},${translateY})`);
+
+  // ラベルは一度だけ作る
+  if(!regionGroup.querySelector('.region-label')){
+    regionGroup.querySelectorAll('path').forEach(prefPath=>{
       const bbox = prefPath.getBBox();
       const label = document.createElementNS('http://www.w3.org/2000/svg','text');
       label.setAttribute('x', bbox.x + bbox.width/2);
@@ -274,9 +284,6 @@ function showRegionDetail(regionID){
       label.textContent = prefNames[prefPath.id] || prefPath.id;
       regionGroup.appendChild(label);
     });
-
-    // 拡大（微調整可能）
-    regionGroup.setAttribute('transform','scale(3) translate(-150,-150)');
   }
 }
 </script>
