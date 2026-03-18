@@ -1,31 +1,58 @@
-// map.js
 document.addEventListener('DOMContentLoaded', () => {
   const mapDiv = document.getElementById('map');
 
-  // 地域グループID
-  const groupPaths = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
+  // 地域グループID → 県ID配列
+  const regionData = {
+    Path_1: ['Hokkaido'],
+    Path_2: ['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
+    Path_3: ['Niigata','Gunma','Tochigi','Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'],
+    Path_4: ['Shizuoka','Yamanashi','Nagano','Ishikawa','Toyama','Gifu','Aichi'],
+    Path_5: ['Mie','Nara','Wakayama','Osaka','Shiga','Kyoto','Hyogo'],
+    Path_6: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi','Tokushima','Kagawa','Kochi','Ehime'],
+    Path_7: ['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima'],
+    Path_8: ['Okinawa']
+  };
 
   fetch('japan.svg')
     .then(res => res.text())
     .then(svgText => {
-      // SVGを挿入
       mapDiv.innerHTML = svgText;
 
-      // 初期状態：地域グループだけ表示
-      groupPaths.forEach(id => {
-        const path = document.getElementById(id);
-        if(!path) return;
+      // 初期：地域グループだけ表示
+      Object.keys(regionData).forEach(groupID => {
+        const groupPath = document.getElementById(groupID);
+        if(!groupPath) return;
 
-        path.setAttribute('fill', '#cce0ff');       // 薄い青（透明ではない）
-        path.setAttribute('stroke', '#191970');     // 枠線残す
-        path.setAttribute('stroke-width', '1.5');
-        path.setAttribute('stroke-linejoin', 'round');
-        path.style.cursor = 'pointer';
+        groupPath.setAttribute('fill', '#cce0ff');       // 塗りあり
+        groupPath.setAttribute('stroke', '#191970');     // 枠線
+        groupPath.setAttribute('stroke-width', '1.5');
+        groupPath.setAttribute('stroke-linejoin', 'round');
+        groupPath.style.cursor = 'pointer';
 
-        path.addEventListener('click', (e) => {
-          // 当たり判定確認メッセージ
-          console.log(`クリック判定: ${id}`, e.target);
-          alert(`${id} がクリックされました`);
+        groupPath.addEventListener('click', e => {
+          console.log(`地域クリック: ${groupID}`, e.target);
+          alert(`${groupID} を展開`);
+
+          // グループ非表示
+          groupPath.style.display = 'none';
+
+          // 県パスを表示
+          const prefectures = regionData[groupID];
+          prefectures.forEach(prefID => {
+            const prefPath = document.getElementById(prefID);
+            if(!prefPath) return;
+
+            prefPath.setAttribute('fill', '#99ccff');
+            prefPath.setAttribute('stroke', '#191970');
+            prefPath.setAttribute('stroke-width', '1');
+            prefPath.setAttribute('stroke-linejoin', 'round');
+            prefPath.style.cursor = 'pointer';
+
+            prefPath.addEventListener('click', ev => {
+              console.log(`県クリック: ${prefID}`, ev.target);
+              alert(`${prefID} がクリックされました`);
+            });
+          });
         });
       });
     })
