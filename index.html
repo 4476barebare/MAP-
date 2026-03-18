@@ -12,19 +12,27 @@ html, body {
   color:#333;
   overflow-x: hidden; /* 横スクロール禁止 */
 }
+/* ヘッダーを常に画面上部に固定 */
 header {
-  border-bottom:1px solid #191970;
-  background:#fff;
+  position: fixed;    /* 常に上部に固定 */
+  top: 0;             /* 上端に配置 */
+  left: 0;            /* 左端に揃える */
+  width: 100%;        /* 横幅いっぱい */
+  z-index: 1000;      /* 他要素より前面に表示 */
+  border-bottom: 1px solid #191970;
+  background: #fff;   /* 背景を白に固定 */
 }
+
+/* ヘッダー内コンテンツはそのまま中央揃え */
 .header-inner {
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 12px;
-  position:relative;
-  z-index:1;
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  position: relative;
+  z-index: 1;
 }
 .logo { font-weight:700; font-size:0.8rem; color:#191970; display:flex; align-items:center; }
 .nav { display:flex; align-items:center; gap:14px; }
@@ -36,7 +44,13 @@ header {
 .location-list li { display:flex; justify-content:space-between; align-items:center; padding:3px 0; font-size:14px; }
 .delete-btn { background:none; border:none; cursor:pointer; color:#c00; }
 .location-none { color:#888; font-style:italic; }
-main { max-width:1100px; margin:auto; padding:20px; }
+
+/* main の上部にヘッダー高さ分の余白を確保 */
+main {
+  padding-top: 60px; /* header 高さに合わせて調整 */
+}
+
+
 .map { text-align:center; }
 .japan-map { width:100%; max-width:900px; margin:0 auto; filter:drop-shadow(0 3px 5px rgba(0,0,0,0.22)); }
 .japan-map svg { width:100%; height:auto; }
@@ -73,6 +87,13 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
 <div class="japan-map" id="map"></div>
 </div>
 </main>
+
+
+<div class="ad">広告スペース</div>
+
+<div class="ad">広告スペース</div>
+
+
 
 <div class="ad">広告スペース</div>
 <footer>© 釣り行こNAVI</footer>
