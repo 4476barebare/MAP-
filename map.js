@@ -1,7 +1,6 @@
-document.addEventListener('DOMContentLoaded', ()=>{
-  const mapDiv = document.getElementById('map');
+// map.js
+document.addEventListener('DOMContentLoaded', () => {
 
-  const regionIDs = ['Path_1','Path_2','Path_3','Path_4','Path_5','Path_6','Path_7','Path_8'];
   const groupToPrefectures = {
     'Path_1': ['Hokkaido'],
     'Path_2': ['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
@@ -13,33 +12,59 @@ document.addEventListener('DOMContentLoaded', ()=>{
     'Path_8': ['Okinawa']
   };
 
+  const mapDiv = document.getElementById('map');
+
   fetch('japan.svg')
     .then(res => res.text())
     .then(svgText => {
       mapDiv.innerHTML = svgText;
+      const svg = mapDiv.querySelector('svg');
 
-      // 少し待ってからイベントをバインド
-      setTimeout(()=>{
-        regionIDs.forEach(id=>{
-          const path = document.getElementById(id);
-          if(path){
-            path.setAttribute('fill','#888');
-            path.setAttribute('stroke','#191970');
-            path.setAttribute('stroke-width','1.5');
-            path.style.cursor = 'pointer';
+      // 初期表示：地域グループだけ
+      Object.keys(groupToPrefectures).forEach(gid => {
+        const groupPath = svg.getElementById(gid);
+        if(groupPath){
+          groupPath.setAttribute('fill', '#888'); // グループは灰色
+          groupPath.setAttribute('stroke', '#191970');
+          groupPath.setAttribute('stroke-width', '1.5');
+          groupPath.style.cursor = 'pointer';
 
-            path.addEventListener('click', ()=>{
-              alert(`このグループで赤色にする県: ${groupToPrefectures[id].join(', ')}`);
+          groupPath.addEventListener('click', () => {
+            const targetPref = groupToPrefectures[gid];
+            alert(`このグループで赤色にする県: ${targetPref.join(', ')}`);
+
+            // 全グループ非表示
+            Object.keys(groupToPrefectures).forEach(hid=>{
+              const p = svg.getElementById(hid);
+              if(p) p.style.display='none';
             });
-          }
-        });
 
-        // 県パスは非表示
-        Object.values(groupToPrefectures).flat().forEach(prefID=>{
-          const prefPath = document.getElementById(prefID);
-          if(prefPath) prefPath.style.display = 'none';
-        });
-      }, 50); // 50ms 遅延
+            // 対応する県パスだけ赤で表示
+            targetPref.forEach(pid=>{
+              const prefPath = svg.getElementById(pid);
+              if(prefPath){
+                prefPath.style.display='inline';
+                prefPath.setAttribute('fill','red');
+                prefPath.setAttribute('stroke','#191970');
+                prefPath.setAttribute('stroke-width','1.5');
+                prefPath.style.cursor='pointer';
+
+                prefPath.addEventListener('click', ()=>{
+                  alert(`${pid} がクリックされました`);
+                });
+              }
+            });
+          });
+        }
+      });
+
+      // 最初に県パスは非表示
+      Object.values(groupToPrefectures).flat().forEach(pid=>{
+        const prefPath = svg.getElementById(pid);
+        if(prefPath){
+          prefPath.style.display='none';
+        }
+      });
     })
     .catch(err => console.error('SVG読み込みエラー:', err));
 });
