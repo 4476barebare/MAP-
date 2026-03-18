@@ -11,20 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
       // SVGを挿入
       mapDiv.innerHTML = svgText;
 
-      // 初期状態：地域グループだけ
+      // 初期状態：地域グループだけ表示
       groupPaths.forEach(id => {
         const path = document.getElementById(id);
         if(!path) return;
 
-        path.setAttribute('fill', '#cce0ff');       // 薄い青
+        path.setAttribute('fill', '#cce0ff');       // 薄い青（透明ではない）
         path.setAttribute('stroke', '#191970');     // 枠線残す
         path.setAttribute('stroke-width', '1.5');
         path.setAttribute('stroke-linejoin', 'round');
         path.style.cursor = 'pointer';
 
-        path.addEventListener('click', () => {
-          console.log(`${id} がクリックされました`);
-          // ここでクリック時に県パス表示関数呼び出し予定
+        path.addEventListener('click', (e) => {
+          // 当たり判定確認メッセージ
+          console.log(`クリック判定: ${id}`, e.target);
+          alert(`${id} がクリックされました`);
         });
       });
     })
