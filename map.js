@@ -1,7 +1,6 @@
-// map.js - japan.svg 読み込み＋地域グループ → 県表示
+// map.js - japan.svg 読み込み＋地域グループ→県表示（初期グループ消去対応）
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 地域グループと対応県のマッピング
   const regionGroups = {
     Path_1: ['Hokkaido'],
     Path_2: ['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
@@ -13,19 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
     Path_8: ['Okinawa']
   };
 
-  // SVG読み込み
   fetch('japan.svg')
     .then(res => res.text())
     .then(svgText => {
       const mapDiv = document.getElementById('map');
       mapDiv.innerHTML = svgText;
 
-      // 初期で県パスを非表示
+      // 初期で県パス非表示
       Object.values(regionGroups).flat().forEach(pid => {
         const p = document.getElementById(pid);
-        if(p){
-          p.style.display = 'none';
-        }
+        if(p) p.style.display = 'none';
       });
 
       // 初期表示：地域グループのみ
@@ -34,17 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!group) return;
 
         group.style.display = 'block';
-        group.style.fill = '#cccccc';       // 初期塗り
-        group.style.stroke = '#191970';     // 枠線
+        group.style.fill = '#cccccc';
+        group.style.stroke = '#191970';
         group.style.strokeWidth = '1';
         group.style.cursor = 'pointer';
 
-        // グループクリックで県パス表示
         group.addEventListener('click', () => {
-          // クリックしたグループ非表示
-          group.style.display = 'none';
+          // 全グループ非表示
+          Object.keys(regionGroups).forEach(gid2 => {
+            const g = document.getElementById(gid2);
+            if(g) g.style.display = 'none';
+          });
 
-          // 対応県パスを表示
+          // 対応する県パスを表示
           regionGroups[gid].forEach(pid => {
             const p = document.getElementById(pid);
             if(p){
