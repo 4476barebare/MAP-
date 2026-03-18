@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const groupScales = {
         'Path_1': 3,
         'Path_2': 4,
-        'Path_3': 4.5,
+        'Path_3': 2,
         'Path_4': 5,
         'Path_5': 6,
         'Path_6': 5,
@@ -36,12 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const groupOffsets = {
         'Path_1': {x:0, y:0},
         'Path_2': {x:0, y:0},
-        'Path_3': {x:0, y:0},
-        'Path_4': {x:0, y:0},
-        'Path_5': {x:0, y:0},
+        'Path_3': {x:-200, y:0},
+        'Path_4': {x:0, y:700},
+        'Path_5': {x:200, y:700},
         'Path_6': {x:0, y:0},
         'Path_7': {x:0, y:0},
-        'Path_8': {x:0, y:0}
+        'Path_8': {x:-100, y:0}
       };
 
       // 初期状態: 県パス非表示、塗りはヘッダーロゴ色、枠線白で細め
