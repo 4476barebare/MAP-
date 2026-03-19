@@ -169,28 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // =========================
-// 左上ナビ作成（ヘッダー1行分下、文字更新、中央揃え）
-// =========================
-const regionNames = [
-  {gid:'Path_1', name:'北海道'},
-  {gid:'Path_2', name:'東北地方'},
-  {gid:'Path_3', name:'関東新潟'},
-  {gid:'Path_4', name:'中部地方'},
-  {gid:'Path_5', name:'近畿地方'},
-  {gid:'Path_6', name:'中国四国'},
-  {gid:'Path_7', name:'九州地方'},
-  {gid:'Path_8', name:'沖縄'}
-];
-
+      // 左上ナビ作成
 const navDiv = document.createElement('div');
 navDiv.style.position = 'absolute';
-navDiv.style.top = '60px'; // ヘッダーから1行分程度下
+navDiv.style.top = '60px';   // ヘッダー下
 navDiv.style.left = '20px';
-navDiv.style.zIndex = '1000';
+navDiv.style.zIndex = '2';   // ヘッダーや登録地点UIより下
 navDiv.style.display = 'flex';
 navDiv.style.flexDirection = 'column';
-navDiv.style.gap = '2px'; // ボタン間隔を狭く
+navDiv.style.gap = '2px';
 document.body.appendChild(navDiv);
 
 regionNames.forEach(r => {
@@ -198,14 +185,42 @@ regionNames.forEach(r => {
   btn.textContent = r.name;
   btn.style.cursor = 'pointer';
   btn.style.padding = '4px 8px';
-  btn.style.background = '#ffffff88'; // 少し透明感
+  btn.style.background = '#ffffff88';
   btn.style.border = '1px solid #666';
-  btn.style.fontSize = '14px'; // 少し大きめ
-  btn.style.color = '#191970'; // 濃紺
-  btn.style.textAlign = 'center'; // 文字中央揃え
-  btn.style.minWidth = '120px'; // 長い文字でも揃うように固定幅
+  btn.style.fontSize = '14px';
+  btn.style.color = '#191970';
+  btn.style.textAlign = 'center';
+  btn.style.minWidth = '120px';
   btn.addEventListener('click', () => {
     showRegion(r.gid);
+    navDiv.style.display = 'none'; // 地域グループクリックで非表示
+  });
+  navDiv.appendChild(btn);
+});// 左上ナビ作成
+const navDiv = document.createElement('div');
+navDiv.style.position = 'absolute';
+navDiv.style.top = '60px';   // ヘッダー下
+navDiv.style.left = '20px';
+navDiv.style.zIndex = '2';   // ヘッダーや登録地点UIより下
+navDiv.style.display = 'flex';
+navDiv.style.flexDirection = 'column';
+navDiv.style.gap = '2px';
+document.body.appendChild(navDiv);
+
+regionNames.forEach(r => {
+  const btn = document.createElement('button');
+  btn.textContent = r.name;
+  btn.style.cursor = 'pointer';
+  btn.style.padding = '4px 8px';
+  btn.style.background = '#ffffff88';
+  btn.style.border = '1px solid #666';
+  btn.style.fontSize = '14px';
+  btn.style.color = '#191970';
+  btn.style.textAlign = 'center';
+  btn.style.minWidth = '120px';
+  btn.addEventListener('click', () => {
+    showRegion(r.gid);
+    navDiv.style.display = 'none'; // 地域グループクリックで非表示
   });
   navDiv.appendChild(btn);
 });
