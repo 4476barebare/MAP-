@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-
   const mapDiv = document.getElementById('map');
 
   fetch('japan.svg')
@@ -15,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
       svg.style.transformOrigin = 'center center';
 
       let currentGroup = null;
+      const labelOffsets = {};
 
       // =========================
       // 地域拡大設定
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // =========================
-      // 地域グループクリック
+      // 地域グループ初期設定
       // =========================
       Object.keys(groupToPrefectures).forEach(gid => {
         const group = svg.getElementById(gid);
@@ -86,50 +86,12 @@ document.addEventListener('DOMContentLoaded', () => {
         group.style.strokeWidth = '1.5px';
         group.style.cursor = 'pointer';
         group.style.vectorEffect = 'non-scaling-stroke';
-
-        group.addEventListener('click', () => {
-          currentGroup = gid;
-          showPrefectures(gid);
-        });
       });
 
-      function showPrefectures(gid){
-        Object.keys(groupToPrefectures).forEach(g => {
-          const el = svg.getElementById(g);
-          if(el) el.style.display = 'none';
-        });
-
-        prefGroup.querySelectorAll('path').forEach(p => {
-          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
-        });
-
-        applyTransform(gid);
-      }
-
-      function applyTransform(gid){
-        const group = svg.getElementById(gid);
-        const bbox = group.getBBox();
-        const s = groupSettings[gid];
-
-        let cx = bbox.x + bbox.width/2 + s.x;
-        let cy = bbox.y + bbox.height/2 + s.y;
-
-        const scale = s.scale;
-
-        const svgW = svg.viewBox.baseVal.width;
-        const svgH = svg.viewBox.baseVal.height;
-
-        const tx = svgW/2 - cx * scale;
-        const ty = svgH/2 - cy * scale;
-
-        svg.style.transition = 'transform 0.4s ease';
-        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-      }
-
       // =========================
-      // 左上地域ボタン
+      // 左上ボタン作成
       // =========================
-      const regions = [
+      const regionList = [
         {id:'Path_1', name:'北海道'},
         {id:'Path_2', name:'東北地方'},
         {id:'Path_3', name:'関東新潟'},
@@ -142,34 +104,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const container = document.createElement('div');
       container.style.position = 'fixed';
-      container.style.top = 'calc(1em + 1rem)'; // ヘッダー1行分+余白
-      container.style.left = '0';
-      container.style.zIndex = '1'; // ナビやニュースより下
+      container.style.top = 'calc(1em + 40px)'; // ヘッダー下に1行分余白
+      container.style.left = '10px';
+      container.style.zIndex = '1000';
       container.style.display = 'flex';
       container.style.flexDirection = 'column';
-      container.style.gap = '0.2em';
-      container.style.pointerEvents = 'auto';
+      container.style.gap = '4px';
 
-      regions.forEach(r => {
+      regionList.forEach(r => {
         const btn = document.createElement('div');
         btn.textContent = r.name;
-        btn.style.cursor = 'pointer';
-        btn.style.background = 'transparent';
+        btn.style.fontSize = '14px';
         btn.style.color = '#191970';
-        btn.style.fontSize = '1.1em';
         btn.style.textAlign = 'center';
-        btn.style.padding = '2px 5px';
+        btn.style.cursor = 'pointer';
+        btn.style.background = '#ffffffaa';
+        btn.style.borderRadius = '4px';
+        btn.style.padding = '2px 6px';
         btn.style.userSelect = 'none';
+
         btn.addEventListener('click', () => {
           currentGroup = r.id;
+
+          // 地域グループの表示を保証
+          const group = svg.getElementById(r.id);
+          if (group) group.style.display = 'inline';
+
           showPrefectures(r.id);
-          container.style.display = 'none'; // 地域選択後に消す
+
+          // ボタンは消す
+          container.style.display = 'none';
         });
+
         container.appendChild(btn);
       });
 
       document.body.appendChild(container);
 
-    });
+      // =========================
+      // 県表示処理
+      // =========================
+      function showPrefectures(gid){
+        prefGroup.querySelectorAll('path').forEach(p => {
+          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
+        });
 
+        applyTransform(gid);
+        addPrefLabels(groupToPrefectures[gid]);
+      }
+
+      function applyTransform(gid){
+        const group = svg.getElementById(gid);
+        const bbox = group.getBBox();
+        const s = groupSettings[gid];
+
+        const cx = bbox.x + bbox.width/2 + s.x;
+        const cy = bbox.y + bbox.height/2 + s.y;
+
+        const scale = s.scale;
+        const svgW = svg.viewBox.baseVal.width;
+        const svgH = svg.viewBox.baseVal.height;
+
+        const tx = svgW/2 - cx * scale;
+        const ty = svgH/2 - cy * scale;
+
+        svg.style.transition = 'transform 0.4s ease';
+        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      }
+
+      function addPrefLabels(prefIds){
+        svg.querySelectorAll('.pref-label').forEach(e => e.remove());
+
+        prefIds.forEach(pid => {
+          const p = prefGroup.querySelector(`#${pid}`);
+          if (!p) return;
+
+          const bbox = p.getBBox();
+          const cx = bbox.x + bbox.width/2;
+          const cy = bbox.y + bbox.height/2;
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+          text.setAttribute('x', cx);
+          text.setAttribute('y', cy);
+          text.setAttribute('text-anchor','middle');
+          text.setAttribute('class','pref-label');
+          text.setAttribute('fill','#191970');
+          text.style.fontSize = '12px';
+
+          const t1 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+          t1.setAttribute('x', cx);
+          t1.setAttribute('dy','0');
+          t1.textContent = prefNames[pid];
+
+          const count = prefCounts[pid] || 0;
+
+          const t2 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+          t2.setAttribute('x', cx);
+          t2.setAttribute('dy','1.2em');
+          t2.textContent = `(${count})`;
+
+          text.appendChild(t1);
+          text.appendChild(t2);
+          svg.appendChild(text);
+        });
+      }
+    });
 });
