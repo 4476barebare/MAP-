@@ -187,3 +187,111 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => console.error('SVG読み込みエラー:', err));
 });
+
+
+const labelOffsets = {};const labelOffsets = {};
+
+function addPrefLabels(prefIds){
+
+  svg.querySelectorAll('.pref-label').forEach(e => e.remove());
+
+  prefIds.forEach(pid => {
+
+    const p = prefGroup.querySelector(`#${pid}`);
+    if (!p) return;
+
+    const bbox = p.getBBox();
+
+    let cx = bbox.x + bbox.width / 2;
+    let cy = bbox.y + bbox.height / 2;
+
+    // 個別補正
+    const offset = labelOffsets[pid] || {x:0, y:0};
+    cx += offset.x;
+    cy += offset.y;
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x', cx);
+    text.setAttribute('y', cy);
+    text.setAttribute('text-anchor','middle');
+    text.setAttribute('class','pref-label');
+    text.dataset.pid = pid;
+
+    const t1 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+    t1.setAttribute('x', cx);
+    t1.setAttribute('dy','-0.3em');
+    t1.textContent = prefNames[pid] || pid;
+
+    const count = prefCounts[pid] || 0;
+
+    const t2 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+    t2.setAttribute('x', cx);
+    t2.setAttribute('dy','1.2em');
+    t2.textContent = `(${count})`;
+
+    text.appendChild(t1);
+    text.appendChild(t2);
+
+    // クリックで選択
+    text.addEventListener('click', () => {
+      currentLabel = pid;
+      updateLabelDisplay();
+    });
+
+    svg.appendChild(text);
+
+  });
+}
+
+let currentLabel = null;
+
+function createLabelController(){
+
+  const ctrl = document.createElement('div');
+
+  ctrl.innerHTML = `
+    <div style="position:fixed;bottom:20px;right:20px;z-index:9999;background:#0008;padding:10px;border-radius:10px;color:#fff">
+      <div id="labelDisplay">label: none</div>
+      <button onclick="labelMove(0,-2)">↑</button><br>
+      <button onclick="labelMove(-2,0)">←</button>
+      <button onclick="labelMove(2,0)">→</button><br>
+      <button onclick="labelMove(0,2)">↓</button>
+    </div>
+  `;
+
+  document.body.appendChild(ctrl);
+}
+
+window.labelMove = (x,y)=>{
+
+  if(!currentLabel) return;
+
+  if(!labelOffsets[currentLabel]){
+    labelOffsets[currentLabel] = {x:0,y:0};
+  }
+
+  labelOffsets[currentLabel].x += x;
+  labelOffsets[currentLabel].y += y;
+
+  addPrefLabels(Object.keys(labelOffsets)); // 再描画
+
+  updateLabelDisplay();
+
+  console.log(currentLabel, labelOffsets[currentLabel]);
+};
+
+function updateLabelDisplay(){
+
+  const d = document.getElementById('labelDisplay');
+
+  if(!currentLabel){
+    d.textContent = 'label: none';
+    return;
+  }
+
+  const o = labelOffsets[currentLabel];
+
+  d.textContent = `${currentLabel} x:${o.x} y:${o.y}`;
+}
+
+createLabelController();
