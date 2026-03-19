@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const navDiv = document.createElement('div');
 
       navDiv.style.position = 'fixed';
-      navDiv.style.top = '80px';
+      navDiv.style.top = '60px';
       navDiv.style.left = '10px';
       navDiv.style.zIndex = '1';
 
