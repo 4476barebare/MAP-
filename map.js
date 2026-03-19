@@ -10,9 +10,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
+      
+      // =========================
+// デザイン強制上書き（白塗り＋紺線）
+// =========================
+
+// 影削除
+svg.querySelectorAll('*').forEach(el => {
+  el.style.filter = 'none';
+});
+
+// 全パス統一
+svg.querySelectorAll('path').forEach(p => {
+  p.style.fill = '#ffffff';     // 白塗り
+  p.style.stroke = '#191970';   // 紺線
+  p.style.strokeWidth = '1px';
+});
+      
 
       svg.style.shapeRendering = 'geometricPrecision';
       svg.style.transformOrigin = 'center center';
+      
+      
+      
+      
 
       // =========================
       // 状態管理
