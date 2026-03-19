@@ -170,22 +170,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-// 左上ナビ作成（修正版）
+// 左上ナビ作成（ヘッダー1行分下、文字更新、中央揃え）
 // =========================
 const regionNames = [
   {gid:'Path_1', name:'北海道'},
-  {gid:'Path_2', name:'東北'},
+  {gid:'Path_2', name:'東北地方'},
   {gid:'Path_3', name:'関東新潟'},
-  {gid:'Path_4', name:'中部'},
-  {gid:'Path_5', name:'近畿'},
+  {gid:'Path_4', name:'中部地方'},
+  {gid:'Path_5', name:'近畿地方'},
   {gid:'Path_6', name:'中国四国'},
-  {gid:'Path_7', name:'九州'},
+  {gid:'Path_7', name:'九州地方'},
   {gid:'Path_8', name:'沖縄'}
 ];
 
 const navDiv = document.createElement('div');
 navDiv.style.position = 'absolute';
-navDiv.style.top = '40px'; // ヘッダーの上にかからないように
+navDiv.style.top = '60px'; // ヘッダーから1行分程度下
 navDiv.style.left = '20px';
 navDiv.style.zIndex = '1000';
 navDiv.style.display = 'flex';
@@ -197,18 +197,18 @@ regionNames.forEach(r => {
   const btn = document.createElement('button');
   btn.textContent = r.name;
   btn.style.cursor = 'pointer';
-  btn.style.padding = '2px 6px';
+  btn.style.padding = '4px 8px';
   btn.style.background = '#ffffff88'; // 少し透明感
   btn.style.border = '1px solid #666';
   btn.style.fontSize = '14px'; // 少し大きめ
   btn.style.color = '#191970'; // 濃紺
-  btn.style.textAlign = 'left';
+  btn.style.textAlign = 'center'; // 文字中央揃え
+  btn.style.minWidth = '120px'; // 長い文字でも揃うように固定幅
   btn.addEventListener('click', () => {
     showRegion(r.gid);
   });
   navDiv.appendChild(btn);
 });
-
     });
 
 });
