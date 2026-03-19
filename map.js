@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 左上ナビ（最終版）
+      // 左上ナビ（最終・ブラウザ吸収版）
       // =========================
       const regionNames = [
         {gid:'Path_1', name:'北海道'},
@@ -193,12 +193,17 @@ document.addEventListener('DOMContentLoaded', () => {
       navDiv.style.gap = '2px';
       navDiv.style.pointerEvents = 'none';
 
-      // ★ヘッダー同期＋ブラウザ差補正
       const headerInner = document.querySelector('.header-inner');
       if (headerInner) {
         const rect = headerInner.getBoundingClientRect();
-        navDiv.style.left = (rect.left + 6) + 'px'; // ←微調整済み
-        navDiv.style.top = (rect.bottom + 5) + 'px';
+
+        // Safari判定
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+        const offset = isSafari ? 10 : 6;
+
+        navDiv.style.left = (Math.round(rect.left) + offset) + 'px';
+        navDiv.style.top = (Math.round(rect.bottom) + 5) + 'px';
       }
 
       regionNames.forEach(r => {
