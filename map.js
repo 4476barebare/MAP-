@@ -166,57 +166,169 @@ document.addEventListener('DOMContentLoaded', () => {
           svg.appendChild(text);
         });
       }
-
       // =========================
-      // 左上ナビ（完成版）
-      // =========================
-      const regionNames = [
-        {gid:'Path_1', name:'北海道'},
-        {gid:'Path_2', name:'東北地方'},
-        {gid:'Path_3', name:'関東新潟'},
-        {gid:'Path_4', name:'中部地方'},
-        {gid:'Path_5', name:'近畿地方'},
-        {gid:'Path_6', name:'中国四国'},
-        {gid:'Path_7', name:'九州地方'},
-        {gid:'Path_8', name:'沖縄'}
-      ];
+// 左上ナビ（超安全版）
+// =========================
+const regionNames = [
+  {gid:'Path_1', name:'北海道'},
+  {gid:'Path_2', name:'東北地方'},
+  {gid:'Path_3', name:'関東新潟'},
+  {gid:'Path_4', name:'中部地方'},
+  {gid:'Path_5', name:'近畿地方'},
+  {gid:'Path_6', name:'中国四国'},
+  {gid:'Path_7', name:'九州地方'},
+  {gid:'Path_8', name:'沖縄'}
+];
 
-      const navDiv = document.createElement('div');
+const navDiv = document.createElement('div');
 
-      navDiv.style.position = 'fixed';
-      navDiv.style.top = '80px';
-      navDiv.style.left = '10px';
-      navDiv.style.zIndex = '10';
+navDiv.style.position = 'fixed';
+navDiv.style.top = '80px';
+navDiv.style.left = '10px';
+navDiv.style.zIndex = '1'; // ←ヘッダーより下
 
-      navDiv.style.display = 'flex';
-      navDiv.style.flexDirection = 'column';
-      navDiv.style.gap = '2px';
+navDiv.style.display = 'flex';
+navDiv.style.flexDirection = 'column';
+navDiv.style.gap = '2px';
 
-      navDiv.style.background = '#ffffffcc';
-      navDiv.style.border = '1px solid #191970';
-      navDiv.style.borderRadius = '6px';
-      navDiv.style.padding = '4px';
+navDiv.style.background = '#ffffff';
+navDiv.style.border = '1px solid #191970';
+navDiv.style.borderRadius = '6px';
+navDiv.style.padding = '4px';
 
-      regionNames.forEach(r => {
-        const btn = document.createElement('div');
+regionNames.forEach(r => {
 
-        btn.textContent = r.name;
-        btn.style.cursor = 'pointer';
-        btn.style.padding = '2px 6px';
-        btn.style.color = '#191970';
-        btn.style.textAlign = 'center';
-        btn.style.fontSize = '14px';
+  const btn = document.createElement('div');
 
-        btn.addEventListener('click', () => {
-          showRegion(r.gid);
-          navDiv.style.display = 'none';
-        });
+  btn.textContent = r.name;
+  btn.style.cursor = 'pointer';
+  btn.style.padding = '2px 6px';
+  btn.style.color = '#191970';
+  btn.style.textAlign = 'center';
+  btn.style.fontSize = '14px';
+  btn.style.userSelect = 'none';
 
-        navDiv.appendChild(btn);
-      });
+  btn.onclick = () => {
+    const group = svg.getElementById(r.gid);
+    if (group) {
+      group.dispatchEvent(new Event('click')); // ←これだけ
+    }
+    navDiv.style.display = 'none';
+  };
 
-      document.body.appendChild(navDiv);
+  navDiv.appendChild(btn);
+});
 
-    });
+document.body.appendChild(navDiv);// =========================
+// 左上ナビ（超安全版）
+// =========================
+const regionNames = [
+  {gid:'Path_1', name:'北海道'},
+  {gid:'Path_2', name:'東北地方'},
+  {gid:'Path_3', name:'関東新潟'},
+  {gid:'Path_4', name:'中部地方'},
+  {gid:'Path_5', name:'近畿地方'},
+  {gid:'Path_6', name:'中国四国'},
+  {gid:'Path_7', name:'九州地方'},
+  {gid:'Path_8', name:'沖縄'}
+];
+
+const navDiv = document.createElement('div');
+
+navDiv.style.position = 'fixed';
+navDiv.style.top = '80px';
+navDiv.style.left = '10px';
+navDiv.style.zIndex = '1'; // ←ヘッダーより下
+
+navDiv.style.display = 'flex';
+navDiv.style.flexDirection = 'column';
+navDiv.style.gap = '2px';
+
+navDiv.style.background = '#ffffff';
+navDiv.style.border = '1px solid #191970';
+navDiv.style.borderRadius = '6px';
+navDiv.style.padding = '4px';
+
+regionNames.forEach(r => {
+
+  const btn = document.createElement('div');
+
+  btn.textContent = r.name;
+  btn.style.cursor = 'pointer';
+  btn.style.padding = '2px 6px';
+  btn.style.color = '#191970';
+  btn.style.textAlign = 'center';
+  btn.style.fontSize = '14px';
+  btn.style.userSelect = 'none';
+
+  btn.onclick = () => {
+    const group = svg.getElementById(r.gid);
+    if (group) {
+      group.dispatchEvent(new Event('click')); // ←これだけ
+    }
+    navDiv.style.display = 'none';
+  };
+
+  navDiv.appendChild(btn);
+});
+
+document.body.appendChild(navDiv);// =========================
+// 左上ナビ（超安全版）
+// =========================
+const regionNames = [
+  {gid:'Path_1', name:'北海道'},
+  {gid:'Path_2', name:'東北地方'},
+  {gid:'Path_3', name:'関東新潟'},
+  {gid:'Path_4', name:'中部地方'},
+  {gid:'Path_5', name:'近畿地方'},
+  {gid:'Path_6', name:'中国四国'},
+  {gid:'Path_7', name:'九州地方'},
+  {gid:'Path_8', name:'沖縄'}
+];
+
+const navDiv = document.createElement('div');
+
+navDiv.style.position = 'fixed';
+navDiv.style.top = '80px';
+navDiv.style.left = '10px';
+navDiv.style.zIndex = '1'; // ←ヘッダーより下
+
+navDiv.style.display = 'flex';
+navDiv.style.flexDirection = 'column';
+navDiv.style.gap = '2px';
+
+navDiv.style.background = '#ffffff';
+navDiv.style.border = '1px solid #191970';
+navDiv.style.borderRadius = '6px';
+navDiv.style.padding = '4px';
+
+regionNames.forEach(r => {
+
+  const btn = document.createElement('div');
+
+  btn.textContent = r.name;
+  btn.style.cursor = 'pointer';
+  btn.style.padding = '2px 6px';
+  btn.style.color = '#191970';
+  btn.style.textAlign = 'center';
+  btn.style.fontSize = '14px';
+  btn.style.userSelect = 'none';
+
+  btn.onclick = () => {
+    const group = svg.getElementById(r.gid);
+    if (group) {
+      group.dispatchEvent(new Event('click')); // ←これだけ
+    }
+    navDiv.style.display = 'none';
+  };
+
+  navDiv.appendChild(btn);
+});
+
+document.body.appendChild(navDiv);
+
+};
+
+ 
 
 });
