@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
       mapDiv.innerHTML = svgText;
 
       const svg = mapDiv.querySelector('svg');
+      if (!svg) return;
+
       const prefGroup = svg.querySelector('#pref');
+      if (!prefGroup) return;
 
       svg.style.shapeRendering = 'geometricPrecision';
       svg.style.transformOrigin = 'center center';
@@ -64,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       // =========================
-      // 初期：県パス非表示
+      // 初期：県非表示
       // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
@@ -79,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       Object.keys(groupToPrefectures).forEach(gid => {
 
-        const group = svg.getElementById(gid);
+        const group = svg.querySelector('#' + gid);
         if (!group) return;
 
         group.style.fill = '#ffffff';
@@ -98,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentGroup = gid;
 
         Object.keys(groupToPrefectures).forEach(g => {
-          const el = svg.getElementById(g);
+          const el = svg.querySelector('#' + g);
           if (el) el.style.display = 'none';
         });
 
@@ -111,7 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function applyTransform(gid){
-        const group = svg.getElementById(gid);
+        const group = svg.querySelector('#' + gid);
+        if (!group) return;
+
         const bbox = group.getBBox();
         const s = groupSettings[gid];
 
@@ -134,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.querySelectorAll('.pref-label').forEach(e => e.remove());
 
         prefIds.forEach(pid => {
-          const p = prefGroup.querySelector(`#${pid}`);
+          const p = prefGroup.querySelector('#' + pid);
           if (!p) return;
 
           const bbox = p.getBBox();
@@ -154,182 +159,72 @@ document.addEventListener('DOMContentLoaded', () => {
           t1.setAttribute('dy','-0.3em');
           t1.textContent = prefNames[pid];
 
-          const count = prefCounts[pid] || 0;
-
           const t2 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
           t2.setAttribute('x', cx);
           t2.setAttribute('dy','1.2em');
-          t2.textContent = `(${count})`;
+          t2.textContent = `(${prefCounts[pid] || 0})`;
 
           text.appendChild(t1);
           text.appendChild(t2);
           svg.appendChild(text);
         });
       }
+
       // =========================
-// 左上ナビ（超安全版）
-// =========================
-const regionNames = [
-  {gid:'Path_1', name:'北海道'},
-  {gid:'Path_2', name:'東北地方'},
-  {gid:'Path_3', name:'関東新潟'},
-  {gid:'Path_4', name:'中部地方'},
-  {gid:'Path_5', name:'近畿地方'},
-  {gid:'Path_6', name:'中国四国'},
-  {gid:'Path_7', name:'九州地方'},
-  {gid:'Path_8', name:'沖縄'}
-];
+      // 左上ナビ（安定版）
+      // =========================
+      const regionNames = [
+        {gid:'Path_1', name:'北海道'},
+        {gid:'Path_2', name:'東北地方'},
+        {gid:'Path_3', name:'関東新潟'},
+        {gid:'Path_4', name:'中部地方'},
+        {gid:'Path_5', name:'近畿地方'},
+        {gid:'Path_6', name:'中国四国'},
+        {gid:'Path_7', name:'九州地方'},
+        {gid:'Path_8', name:'沖縄'}
+      ];
 
-const navDiv = document.createElement('div');
+      const navDiv = document.createElement('div');
 
-navDiv.style.position = 'fixed';
-navDiv.style.top = '80px';
-navDiv.style.left = '10px';
-navDiv.style.zIndex = '1'; // ←ヘッダーより下
+      navDiv.style.position = 'fixed';
+      navDiv.style.top = '80px';
+      navDiv.style.left = '10px';
+      navDiv.style.zIndex = '1';
 
-navDiv.style.display = 'flex';
-navDiv.style.flexDirection = 'column';
-navDiv.style.gap = '2px';
+      navDiv.style.display = 'inline-flex';
+      navDiv.style.flexDirection = 'column';
+      navDiv.style.gap = '2px';
 
-navDiv.style.background = '#ffffff';
-navDiv.style.border = '1px solid #191970';
-navDiv.style.borderRadius = '6px';
-navDiv.style.padding = '4px';
+      navDiv.style.pointerEvents = 'none';
 
-regionNames.forEach(r => {
+      regionNames.forEach(r => {
 
-  const btn = document.createElement('div');
+        const btn = document.createElement('div');
 
-  btn.textContent = r.name;
-  btn.style.cursor = 'pointer';
-  btn.style.padding = '2px 6px';
-  btn.style.color = '#191970';
-  btn.style.textAlign = 'center';
-  btn.style.fontSize = '14px';
-  btn.style.userSelect = 'none';
+        btn.textContent = r.name;
+        btn.style.cursor = 'pointer';
+        btn.style.padding = '2px 6px';
+        btn.style.color = '#191970';
+        btn.style.textAlign = 'center';
+        btn.style.fontSize = '14px';
 
-  btn.onclick = () => {
-    const group = svg.getElementById(r.gid);
-    if (group) {
-      group.dispatchEvent(new Event('click')); // ←これだけ
-    }
-    navDiv.style.display = 'none';
-  };
+        btn.style.background = '#ffffff';
+        btn.style.border = '1px solid #191970';
+        btn.style.borderRadius = '4px';
 
-  navDiv.appendChild(btn);
-});
+        btn.style.pointerEvents = 'auto';
 
-document.body.appendChild(navDiv);// =========================
-// 左上ナビ（超安全版）
-// =========================
-const regionNames = [
-  {gid:'Path_1', name:'北海道'},
-  {gid:'Path_2', name:'東北地方'},
-  {gid:'Path_3', name:'関東新潟'},
-  {gid:'Path_4', name:'中部地方'},
-  {gid:'Path_5', name:'近畿地方'},
-  {gid:'Path_6', name:'中国四国'},
-  {gid:'Path_7', name:'九州地方'},
-  {gid:'Path_8', name:'沖縄'}
-];
+        btn.onclick = () => {
+          const group = svg.querySelector('#' + r.gid);
+          if (group) group.dispatchEvent(new Event('click'));
+          navDiv.style.display = 'none';
+        };
 
-const navDiv = document.createElement('div');
+        navDiv.appendChild(btn);
+      });
 
-navDiv.style.position = 'fixed';
-navDiv.style.top = '80px';
-navDiv.style.left = '10px';
-navDiv.style.zIndex = '1'; // ←ヘッダーより下
+      document.body.appendChild(navDiv);
 
-navDiv.style.display = 'flex';
-navDiv.style.flexDirection = 'column';
-navDiv.style.gap = '2px';
-
-navDiv.style.background = '#ffffff';
-navDiv.style.border = '1px solid #191970';
-navDiv.style.borderRadius = '6px';
-navDiv.style.padding = '4px';
-
-regionNames.forEach(r => {
-
-  const btn = document.createElement('div');
-
-  btn.textContent = r.name;
-  btn.style.cursor = 'pointer';
-  btn.style.padding = '2px 6px';
-  btn.style.color = '#191970';
-  btn.style.textAlign = 'center';
-  btn.style.fontSize = '14px';
-  btn.style.userSelect = 'none';
-
-  btn.onclick = () => {
-    const group = svg.getElementById(r.gid);
-    if (group) {
-      group.dispatchEvent(new Event('click')); // ←これだけ
-    }
-    navDiv.style.display = 'none';
-  };
-
-  navDiv.appendChild(btn);
-});
-
-document.body.appendChild(navDiv);// =========================
-// 左上ナビ（超安全版）
-// =========================
-const regionNames = [
-  {gid:'Path_1', name:'北海道'},
-  {gid:'Path_2', name:'東北地方'},
-  {gid:'Path_3', name:'関東新潟'},
-  {gid:'Path_4', name:'中部地方'},
-  {gid:'Path_5', name:'近畿地方'},
-  {gid:'Path_6', name:'中国四国'},
-  {gid:'Path_7', name:'九州地方'},
-  {gid:'Path_8', name:'沖縄'}
-];
-
-const navDiv = document.createElement('div');
-
-navDiv.style.position = 'fixed';
-navDiv.style.top = '80px';
-navDiv.style.left = '10px';
-navDiv.style.zIndex = '1'; // ←ヘッダーより下
-
-navDiv.style.display = 'flex';
-navDiv.style.flexDirection = 'column';
-navDiv.style.gap = '2px';
-
-btn.style.background = '#ffffff';
-btn.style.border = '1px solid #191970';
-btn.style.borderRadius = '4px';
-
-
-
-regionNames.forEach(r => {
-
-  const btn = document.createElement('div');
-
-  btn.textContent = r.name;
-  btn.style.cursor = 'pointer';
-  btn.style.padding = '2px 6px';
-  btn.style.color = '#191970';
-  btn.style.textAlign = 'center';
-  btn.style.fontSize = '14px';
-  btn.style.userSelect = 'none';
-
-  btn.onclick = () => {
-    const group = svg.getElementById(r.gid);
-    if (group) {
-      group.dispatchEvent(new Event('click')); // ←これだけ
-    }
-    navDiv.style.display = 'none';
-  };
-
-  navDiv.appendChild(btn);
-});
-
-document.body.appendChild(navDiv);
-
-};
-
- 
+    });
 
 });
