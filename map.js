@@ -297,10 +297,11 @@ navDiv.style.display = 'flex';
 navDiv.style.flexDirection = 'column';
 navDiv.style.gap = '2px';
 
-navDiv.style.background = '#ffffff';
-navDiv.style.border = '1px solid #191970';
-navDiv.style.borderRadius = '6px';
-navDiv.style.padding = '4px';
+btn.style.background = '#ffffff';
+btn.style.border = '1px solid #191970';
+btn.style.borderRadius = '4px';
+
+
 
 regionNames.forEach(r => {
 
