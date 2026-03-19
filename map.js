@@ -16,9 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
       const labelOffsets = {};
 
-      // =========================
-      // 地域拡大設定
-      // =========================
       const groupSettings = {
         Path_1: { scale:3.4, x:230, y:0 },
         Path_2: { scale:3.4, x:190, y:110 },
@@ -58,10 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Okinawa:'沖縄県'
       };
 
-      const prefCounts = {
-        Tokyo:12,
-        Kanagawa:8
-      };
+      const prefCounts = { Tokyo:12, Kanagawa:8 };
 
       // =========================
       // 初期：県非表示
@@ -75,21 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // =========================
-      // 地域グループ初期設定
-      // =========================
-      Object.keys(groupToPrefectures).forEach(gid => {
-        const group = svg.getElementById(gid);
-        if (!group) return;
-
-        group.style.fill = '#ffffff';
-        group.style.stroke = '#191970';
-        group.style.strokeWidth = '1.5px';
-        group.style.cursor = 'pointer';
-        group.style.vectorEffect = 'non-scaling-stroke';
-      });
-
-      // =========================
-      // 左上ボタン作成
+      // 地域ボタン作成
       // =========================
       const regionList = [
         {id:'Path_1', name:'北海道'},
@@ -104,12 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const container = document.createElement('div');
       container.style.position = 'fixed';
-      container.style.top = 'calc(1em + 40px)'; // ヘッダー下に1行分余白
+      container.style.top = '80px'; // ヘッダー下に1行分余白
       container.style.left = '10px';
-      container.style.zIndex = '1000';
+      container.style.zIndex = '50'; // ヘッダーより下
       container.style.display = 'flex';
       container.style.flexDirection = 'column';
-      container.style.gap = '4px';
+      container.style.gap = '2px';
+      container.style.background = '#ffffffcc';
+      container.style.border = '1px solid #191970';
+      container.style.borderRadius = '4px';
+      container.style.padding = '4px';
 
       regionList.forEach(r => {
         const btn = document.createElement('div');
@@ -118,21 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.style.color = '#191970';
         btn.style.textAlign = 'center';
         btn.style.cursor = 'pointer';
-        btn.style.background = '#ffffffaa';
-        btn.style.borderRadius = '4px';
-        btn.style.padding = '2px 6px';
         btn.style.userSelect = 'none';
+        btn.style.padding = '2px 4px';
 
         btn.addEventListener('click', () => {
           currentGroup = r.id;
 
-          // 地域グループの表示を保証
-          const group = svg.getElementById(r.id);
-          if (group) group.style.display = 'inline';
-
           showPrefectures(r.id);
 
-          // ボタンは消す
+          // 地域ボタンは消す
           container.style.display = 'none';
         });
 
@@ -197,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
           t1.textContent = prefNames[pid];
 
           const count = prefCounts[pid] || 0;
-
           const t2 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
           t2.setAttribute('x', cx);
           t2.setAttribute('dy','1.2em');
@@ -208,5 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
           svg.appendChild(text);
         });
       }
+
     });
 });
