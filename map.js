@@ -15,6 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
       svg.style.transformOrigin = 'center center';
 
       // =========================
+      // 状態管理
+      // =========================
+      let currentGroup = null;
+      let currentLabel = null;
+
+      const labelOffsets = {};
+
+      // =========================
       // 地域拡大設定
       // =========================
       const groupSettings = {
@@ -43,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       // =========================
-      // 県名漢字
+      // 県名
       // =========================
       const prefNames = {
         Hokkaido:'北海道', Aomori:'青森県', Iwate:'岩手県', Akita:'秋田県',
@@ -62,16 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
         Okinawa:'沖縄県'
       };
 
-      // =========================
-      // ピン件数（仮）
-      // =========================
       const prefCounts = {
         Tokyo:12,
         Kanagawa:8
       };
 
       // =========================
-      // 初期：県非表示
+      // 初期
       // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
@@ -81,9 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.vectorEffect = 'non-scaling-stroke';
       });
 
-      // =========================
-      // 地域初期表示
-      // =========================
       Object.keys(groupToPrefectures).forEach(gid => {
 
         const group = svg.getElementById(gid);
@@ -97,13 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         group.addEventListener('click', () => {
 
-          // 地域非表示
+          currentGroup = gid;
+
           Object.keys(groupToPrefectures).forEach(g => {
             const el = svg.getElementById(g);
             if (el) el.style.display = 'none';
           });
 
-          // 対象県表示
           prefGroup.querySelectorAll('path').forEach(p => {
             p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
           });
@@ -115,14 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       });
 
-      // =========================
-      // 拡大処理
-      // =========================
       function applyTransform(gid){
 
         const group = svg.getElementById(gid);
         const bbox = group.getBBox();
-
         const s = groupSettings[gid];
 
         let cx = bbox.x + bbox.width/2 + s.x;
@@ -140,9 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
       }
 
-      // =========================
-      // 県ラベル描画
-      // =========================
       function addPrefLabels(prefIds){
 
         svg.querySelectorAll('.pref-label').forEach(e => e.remove());
@@ -153,17 +148,24 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!p) return;
 
           const bbox = p.getBBox();
+
           let cx = bbox.x + bbox.width / 2;
           let cy = bbox.y + bbox.height / 2;
 
-          if (pid === 'Tokyo'){ cx += 8; cy -= 5; }
-          if (pid === 'Kanagawa'){ cx += 6; cy += 4; }
+          const offset = labelOffsets[pid] || {x:0, y:0};
+          cx += offset.x;
+          cy += offset.y;
 
           const text = document.createElementNS('http://www.w3.org/2000/svg','text');
           text.setAttribute('x', cx);
           text.setAttribute('y', cy);
           text.setAttribute('text-anchor','middle');
           text.setAttribute('class','pref-label');
+
+          text.addEventListener('click', () => {
+            currentLabel = pid;
+            updateLabelDisplay();
+          });
 
           const t1 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
           t1.setAttribute('x', cx);
@@ -184,114 +186,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      // =========================
+      // 調整UI
+      // =========================
+      function createLabelController(){
+
+        const ctrl = document.createElement('div');
+
+        ctrl.innerHTML = `
+          <div style="position:fixed;bottom:20px;right:20px;z-index:9999;background:#0008;padding:10px;border-radius:10px;color:#fff">
+            <div id="labelDisplay">label: none</div>
+            <button onclick="labelMove(0,-2)">↑</button><br>
+            <button onclick="labelMove(-2,0)">←</button>
+            <button onclick="labelMove(2,0)">→</button><br>
+            <button onclick="labelMove(0,2)">↓</button>
+          </div>
+        `;
+
+        document.body.appendChild(ctrl);
+      }
+
+      window.labelMove = (x,y)=>{
+
+        if(!currentLabel || !currentGroup) return;
+
+        if(!labelOffsets[currentLabel]){
+          labelOffsets[currentLabel] = {x:0,y:0};
+        }
+
+        labelOffsets[currentLabel].x += x;
+        labelOffsets[currentLabel].y += y;
+
+        addPrefLabels(groupToPrefectures[currentGroup]);
+
+        updateLabelDisplay();
+
+        console.log(currentLabel, labelOffsets[currentLabel]);
+      };
+
+      function updateLabelDisplay(){
+
+        const d = document.getElementById('labelDisplay');
+
+        if(!currentLabel){
+          d.textContent = 'label: none';
+          return;
+        }
+
+        const o = labelOffsets[currentLabel] || {x:0,y:0};
+
+        d.textContent = `${currentLabel} x:${o.x} y:${o.y}`;
+      }
+
+      createLabelController();
+
     })
     .catch(err => console.error('SVG読み込みエラー:', err));
+
 });
-
-
-const labelOffsets = {};const labelOffsets = {};
-
-function addPrefLabels(prefIds){
-
-  svg.querySelectorAll('.pref-label').forEach(e => e.remove());
-
-  prefIds.forEach(pid => {
-
-    const p = prefGroup.querySelector(`#${pid}`);
-    if (!p) return;
-
-    const bbox = p.getBBox();
-
-    let cx = bbox.x + bbox.width / 2;
-    let cy = bbox.y + bbox.height / 2;
-
-    // 個別補正
-    const offset = labelOffsets[pid] || {x:0, y:0};
-    cx += offset.x;
-    cy += offset.y;
-
-    const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-    text.setAttribute('x', cx);
-    text.setAttribute('y', cy);
-    text.setAttribute('text-anchor','middle');
-    text.setAttribute('class','pref-label');
-    text.dataset.pid = pid;
-
-    const t1 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
-    t1.setAttribute('x', cx);
-    t1.setAttribute('dy','-0.3em');
-    t1.textContent = prefNames[pid] || pid;
-
-    const count = prefCounts[pid] || 0;
-
-    const t2 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
-    t2.setAttribute('x', cx);
-    t2.setAttribute('dy','1.2em');
-    t2.textContent = `(${count})`;
-
-    text.appendChild(t1);
-    text.appendChild(t2);
-
-    // クリックで選択
-    text.addEventListener('click', () => {
-      currentLabel = pid;
-      updateLabelDisplay();
-    });
-
-    svg.appendChild(text);
-
-  });
-}
-
-let currentLabel = null;
-
-function createLabelController(){
-
-  const ctrl = document.createElement('div');
-
-  ctrl.innerHTML = `
-    <div style="position:fixed;bottom:20px;right:20px;z-index:9999;background:#0008;padding:10px;border-radius:10px;color:#fff">
-      <div id="labelDisplay">label: none</div>
-      <button onclick="labelMove(0,-2)">↑</button><br>
-      <button onclick="labelMove(-2,0)">←</button>
-      <button onclick="labelMove(2,0)">→</button><br>
-      <button onclick="labelMove(0,2)">↓</button>
-    </div>
-  `;
-
-  document.body.appendChild(ctrl);
-}
-
-window.labelMove = (x,y)=>{
-
-  if(!currentLabel) return;
-
-  if(!labelOffsets[currentLabel]){
-    labelOffsets[currentLabel] = {x:0,y:0};
-  }
-
-  labelOffsets[currentLabel].x += x;
-  labelOffsets[currentLabel].y += y;
-
-  addPrefLabels(Object.keys(labelOffsets)); // 再描画
-
-  updateLabelDisplay();
-
-  console.log(currentLabel, labelOffsets[currentLabel]);
-};
-
-function updateLabelDisplay(){
-
-  const d = document.getElementById('labelDisplay');
-
-  if(!currentLabel){
-    d.textContent = 'label: none';
-    return;
-  }
-
-  const o = labelOffsets[currentLabel];
-
-  d.textContent = `${currentLabel} x:${o.x} y:${o.y}`;
-}
-
-createLabelController();
