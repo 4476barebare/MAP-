@@ -170,41 +170,44 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 左上ナビ作成
-      // =========================
-      const regionNames = [
-        {gid:'Path_1', name:'北海道'},
-        {gid:'Path_2', name:'東北'},
-        {gid:'Path_3', name:'関東新潟'},
-        {gid:'Path_4', name:'中部'},
-        {gid:'Path_5', name:'近畿'},
-        {gid:'Path_6', name:'中国四国'},
-        {gid:'Path_7', name:'九州'},
-        {gid:'Path_8', name:'沖縄'}
-      ];
+// 左上ナビ作成（修正版）
+// =========================
+const regionNames = [
+  {gid:'Path_1', name:'北海道'},
+  {gid:'Path_2', name:'東北'},
+  {gid:'Path_3', name:'関東新潟'},
+  {gid:'Path_4', name:'中部'},
+  {gid:'Path_5', name:'近畿'},
+  {gid:'Path_6', name:'中国四国'},
+  {gid:'Path_7', name:'九州'},
+  {gid:'Path_8', name:'沖縄'}
+];
 
-      const navDiv = document.createElement('div');
-      navDiv.style.position = 'absolute';
-      navDiv.style.top = '20px';
-      navDiv.style.left = '20px';
-      navDiv.style.zIndex = '1000';
-      navDiv.style.display = 'flex';
-      navDiv.style.flexDirection = 'column';
-      navDiv.style.gap = '5px';
-      document.body.appendChild(navDiv);
+const navDiv = document.createElement('div');
+navDiv.style.position = 'absolute';
+navDiv.style.top = '40px'; // ヘッダーの上にかからないように
+navDiv.style.left = '20px';
+navDiv.style.zIndex = '1000';
+navDiv.style.display = 'flex';
+navDiv.style.flexDirection = 'column';
+navDiv.style.gap = '2px'; // ボタン間隔を狭く
+document.body.appendChild(navDiv);
 
-      regionNames.forEach(r => {
-        const btn = document.createElement('button');
-        btn.textContent = r.name;
-        btn.style.cursor = 'pointer';
-        btn.style.padding = '2px 6px';
-        btn.style.background = '#fff8';
-        btn.style.border = '1px solid #666';
-        btn.addEventListener('click', () => {
-          showRegion(r.gid);
-        });
-        navDiv.appendChild(btn);
-      });
+regionNames.forEach(r => {
+  const btn = document.createElement('button');
+  btn.textContent = r.name;
+  btn.style.cursor = 'pointer';
+  btn.style.padding = '2px 6px';
+  btn.style.background = '#ffffff88'; // 少し透明感
+  btn.style.border = '1px solid #666';
+  btn.style.fontSize = '14px'; // 少し大きめ
+  btn.style.color = '#191970'; // 濃紺
+  btn.style.textAlign = 'left';
+  btn.addEventListener('click', () => {
+    showRegion(r.gid);
+  });
+  navDiv.appendChild(btn);
+});
 
     });
 
