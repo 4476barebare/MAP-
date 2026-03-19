@@ -219,11 +219,13 @@ regionNames.forEach(r => {
   btn.style.textAlign = 'center';
   btn.style.minWidth = '120px';
   btn.addEventListener('click', () => {
-    showRegion(r.gid);
-    navDiv.style.display = 'none'; // 地域グループクリックで非表示
+    showRegion(r.gid);      // 地図上の地域グループを表示
+    navDiv.style.display = 'none'; // ナビを非表示に
   });
   navDiv.appendChild(btn);
 });
+  
+  
     });
 
 });
