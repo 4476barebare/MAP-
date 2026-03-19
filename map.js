@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 左上ナビ（安定版）
+      // 左上ナビ（完全同期版）
       // =========================
       const regionNames = [
         {gid:'Path_1', name:'北海道'},
@@ -187,15 +187,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const navDiv = document.createElement('div');
 
       navDiv.style.position = 'fixed';
-      navDiv.style.top = '60px';
-      navDiv.style.left = '10px';
       navDiv.style.zIndex = '1';
-
       navDiv.style.display = 'inline-flex';
       navDiv.style.flexDirection = 'column';
       navDiv.style.gap = '2px';
-
       navDiv.style.pointerEvents = 'none';
+
+      // ★ヘッダーと完全同期
+      const headerInner = document.querySelector('.header-inner');
+      if (headerInner) {
+        const rect = headerInner.getBoundingClientRect();
+        navDiv.style.left = rect.left + 'px';
+        navDiv.style.top = rect.bottom + 5 + 'px';
+      }
 
       regionNames.forEach(r => {
 
