@@ -88,11 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       const initialNav = createInitialNav();
 
-      // 上下ダミー
       const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
-
-      // 4隅ダミーBOX
       const leftTopDummy = createCornerDummy('leftTop');
       const rightBottomDummy = createCornerDummy('rightBottom');
       const leftBottomDummy = createCornerDummy('leftBottom');
@@ -219,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 上ダミー（中央上）
+      // 上下・4隅ダミー
       // =========================
       function createTopDummy(){
         const wrapper = document.createElement('div');
@@ -240,8 +237,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for(let i=0;i<5;i++){
           const box = createBox();
-          box.style.background = '#ccf';      // 薄い青
-          box.textContent = `Top-${i+1}`;     // ラベル
+          box.style.background = '#ccf';
+          box.textContent = `Top-${i+1}`;
           nav.appendChild(box);
         }
 
@@ -250,9 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      // =========================
-      // 下ダミー（中央下）
-      // =========================
       function createBottomDummy(){
         const wrapper = document.createElement('div');
         wrapper.id = 'bottomDummy';
@@ -266,8 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for(let i=0;i<4;i++){
           const box = createBox();
-          box.style.background = '#cfc';      // 薄い緑
-          box.textContent = `Bottom-${i+1}`;  // ラベル
+          box.style.background = '#cfc';
+          box.textContent = `Bottom-${i+1}`;
           wrapper.appendChild(box);
         }
 
@@ -275,9 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      // =========================
-      // 4隅ダミーBOX
-      // =========================
       function createCornerDummy(position){
         const wrapper = document.createElement('div');
         wrapper.id = position + 'Dummy';
@@ -293,19 +284,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if(position === 'leftTop'){
           wrapper.style.top = '5px';
           wrapper.style.left = '5px';
-          color = '#fcc'; // 薄い赤
+          color = '#fcc';
         } else if(position === 'rightBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.right = '5px';
-          color = '#fcf'; // 薄いピンク
+          color = '#fcf';
         } else if(position === 'leftBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.left = '5px';
-          color = '#ffc'; // 薄い黄
+          color = '#ffc';
         } else if(position === 'rightTop'){
           wrapper.style.top = '5px';
           wrapper.style.right = '5px';
-          color = '#cff'; // 薄い水色
+          color = '#cff';
         }
 
         for(let i=0;i<boxes;i++){
@@ -319,6 +310,52 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-    });
+      // =========================
+      // 拡大後調整コンソール
+      // =========================
+      function createAdjustConsole() {
+        const consoleDiv = document.createElement('div');
+        consoleDiv.style.position = 'absolute';
+        consoleDiv.style.bottom = '10px';
+        consoleDiv.style.right = '10px';
+        consoleDiv.style.background = 'rgba(255,255,255,0.9)';
+        consoleDiv.style.border = '1px solid #191970';
+        consoleDiv.style.padding = '6px';
+        consoleDiv.style.display = 'flex';
+        consoleDiv.style.flexDirection = 'column';
+        consoleDiv.style.gap = '4px';
+        consoleDiv.style.zIndex = '100';
 
+        const controls = [
+          { label: '↑', action: () => adjustGroup(0, -5, 0) },
+          { label: '↓', action: () => adjustGroup(0, 5, 0) },
+          { label: '←', action: () => adjustGroup(-5, 0, 0) },
+          { label: '→', action: () => adjustGroup(5, 0, 0) },
+          { label: '➕', action: () => adjustGroup(0, 0, 0.1) },
+          { label: '➖', action: () => adjustGroup(0, 0, -0.1) }
+        ];
+
+        controls.forEach(c => {
+          const btn = document.createElement('button');
+          btn.textContent = c.label;
+          btn.style.fontSize = '16px';
+          btn.style.cursor = 'pointer';
+          btn.onclick = c.action;
+          consoleDiv.appendChild(btn);
+        });
+
+        mapDiv.appendChild(consoleDiv);
+      }
+      createAdjustConsole();
+
+      function adjustGroup(dx, dy, dscale) {
+        if (!currentGroup) return;
+        const s = groupSettings[currentGroup];
+        s.x += dx;
+        s.y += dy;
+        s.scale = Math.max(0.1, s.scale + dscale);
+        applyTransform(currentGroup);
+      }
+
+    });
 });
