@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
+  mapDiv.style.position = 'relative'; // ★ absolute基準
 
   fetch('japan.svg')
     .then(res => res.text())
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
 
       // =========================
-      // 地域設定（北海道・沖縄は拡大なし）
+      // 地域設定
       // =========================
       const groupSettings = {
         Path_2: { scale:3.4, x:190, y:110 },
@@ -60,11 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
-        p.style.vectorEffect = 'non-scaling-stroke';
       });
 
       // =========================
-      // 地域クリック設定
+      // 地域クリック
       // =========================
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
@@ -74,14 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         g.setAttribute('fill', '#ffffff');
         g.setAttribute('stroke', '#191970');
-        g.style.vectorEffect = 'non-scaling-stroke';
 
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
         } else {
           g.style.cursor = 'default';
-          g.addEventListener('click', (e) => e.stopPropagation());
         }
 
       });
@@ -102,19 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentGroup = gid;
 
-        // 初期ナビ消す
         initialNav.style.display = 'none';
 
-        // ダミー表示
         leftDummy.style.display = 'flex';
         rightDummy.style.display = 'flex';
-        topDummy.style.display = 'flex';
+        topDummy.style.display = 'block';
         bottomDummy.style.display = 'flex';
 
-        // 地域非表示
         allGroups.forEach(g => g.style.display = 'none');
 
-        // 県表示
         prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = groupToPrefectures[gid].includes(p.id)
             ? 'inline'
@@ -150,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 県名ラベル
+      // 県名
       // =========================
       function addPrefLabels(prefIds){
 
@@ -175,14 +169,26 @@ document.addEventListener('DOMContentLoaded', () => {
           text.setAttribute('font-size', '10');
           text.setAttribute('fill', '#191970');
 
-          const t1 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
-          t1.setAttribute('x', cx);
-          t1.setAttribute('dy','0.35em');
-          t1.textContent = prefNames[pid];
+          text.textContent = prefNames[pid];
 
-          text.appendChild(t1);
           svg.appendChild(text);
         });
+      }
+
+      // =========================
+      // BOX
+      // =========================
+      function createBox(){
+        const box = document.createElement('div');
+        box.style.border = '1px solid #191970';
+        box.style.background = '#fff';
+        box.style.height = '26px';
+        box.style.minWidth = '80px';
+        box.style.display = 'flex';
+        box.style.alignItems = 'center';
+        box.style.justifyContent = 'center';
+        box.style.fontSize = '13px';
+        return box;
       }
 
       // =========================
@@ -190,20 +196,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       function createInitialNav(){
 
-        const regionList = [
-          {gid:'Path_1', name:'北海道', active:false},
-          {gid:'Path_2', name:'東北地方', active:true},
-          {gid:'Path_3', name:'関東新潟', active:true},
-          {gid:'Path_4', name:'中部地方', active:true},
-          {gid:'Path_5', name:'近畿地方', active:true},
-          {gid:'Path_6', name:'中国四国', active:true},
-          {gid:'Path_7', name:'九州地方', active:true},
-          {gid:'Path_8', name:'沖縄', active:false}
-        ];
+        const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
 
         const nav = document.createElement('div');
 
-        nav.style.position = 'fixed';
+        nav.style.position = 'absolute';
         nav.style.top = '60px';
         nav.style.left = '28px';
         nav.style.display = 'flex';
@@ -211,14 +208,14 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.gap = '4px';
         nav.style.zIndex = '10';
 
-        regionList.forEach(r => {
+        names.forEach((name, i) => {
 
           const box = createBox();
-          box.textContent = r.name;
+          box.textContent = name;
 
-          if(r.active){
+          if(i !== 0 && i !== 7){
             box.style.cursor = 'pointer';
-            box.onclick = () => showRegion(r.gid);
+            box.onclick = () => showRegion(`Path_${i+1}`);
           } else {
             box.style.opacity = '0.6';
           }
@@ -226,29 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
           nav.appendChild(box);
         });
 
-        document.body.appendChild(nav);
+        mapDiv.appendChild(nav);
         return nav;
-      }
-
-      // =========================
-      // 共通BOX
-      // =========================
-      function createBox(){
-
-        const box = document.createElement('div');
-
-        box.style.border = '1px solid #191970';
-        box.style.background = '#ffffff';
-        box.style.height = '26px';
-        box.style.minWidth = '80px';
-
-        box.style.display = 'flex';
-        box.style.alignItems = 'center';
-        box.style.justifyContent = 'center';
-
-        box.style.fontSize = '13px';
-
-        return box;
       }
 
       // =========================
@@ -258,12 +234,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nav = document.createElement('div');
 
-        nav.style.position = 'fixed';
+        nav.style.position = 'absolute';
         nav.style.top = '60px';
-        nav.style.bottom = '20px';
         nav.style.display = 'none';
         nav.style.flexDirection = 'column';
-        nav.style.justifyContent = 'flex-end';
+        nav.style.justifyContent = 'flex-start';
         nav.style.gap = '4px';
         nav.style.zIndex = '10';
 
@@ -274,45 +249,50 @@ document.addEventListener('DOMContentLoaded', () => {
           nav.appendChild(createBox());
         }
 
-        document.body.appendChild(nav);
+        mapDiv.appendChild(nav);
         return nav;
       }
 
       // =========================
-      // 上ダミー（5個・折り返し）
+      // 上ダミー
       // =========================
       function createTopDummy(){
 
+        const wrapper = document.createElement('div');
+
+        wrapper.style.position = 'absolute';
+        wrapper.style.top = '60px';
+        wrapper.style.left = '50%';
+        wrapper.style.transform = 'translateX(-50%)';
+        wrapper.style.display = 'none';
+        wrapper.style.zIndex = '10';
+
         const nav = document.createElement('div');
 
-        nav.style.position = 'fixed';
-        nav.style.top = '60px';
-        nav.style.left = '50%';
-        nav.style.transform = 'translateX(-50%)';
-
-        nav.style.display = 'none';
+        nav.style.display = 'flex';
         nav.style.flexWrap = 'wrap';
-        nav.style.justifyContent = 'center';
+        nav.style.justifyContent = 'flex-start';
         nav.style.width = '340px';
         nav.style.gap = '4px';
-        nav.style.zIndex = '10';
 
         for(let i=0;i<5;i++){
           nav.appendChild(createBox());
         }
 
-        document.body.appendChild(nav);
-        return nav;
+        wrapper.appendChild(nav);
+        mapDiv.appendChild(wrapper);
+
+        return wrapper;
       }
 
       // =========================
-      // 下ダミー（4個）
+      // 下ダミー
       // =========================
       function createBottomDummy(){
 
         const nav = document.createElement('div');
 
-        nav.style.position = 'fixed';
+        nav.style.position = 'absolute';
         nav.style.bottom = '10px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
@@ -321,11 +301,13 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.gap = '6px';
         nav.style.zIndex = '10';
 
+        nav.style.display = 'flex';
+
         for(let i=0;i<4;i++){
           nav.appendChild(createBox());
         }
 
-        document.body.appendChild(nav);
+        mapDiv.appendChild(nav);
         return nav;
       }
 
