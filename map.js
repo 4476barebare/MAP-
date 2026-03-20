@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         nav.style.position = 'absolute';
         nav.style.top = '0px';
-        nav.style.left = '0px';
+        nav.style.left = '-10px';
         nav.style.display = 'flex';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
@@ -234,13 +234,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(side === 'left'){
           nav.style.top = '0px';
-          nav.style.left = '0px';
+          nav.style.left = '-10px';
           nav.style.justifyContent = 'flex-start';
         }
 
         if(side === 'right'){
           nav.style.bottom = '0px';
-          nav.style.right = '0px';
+          nav.style.right = '-10px';
           nav.style.justifyContent = 'flex-end';
         }
 
