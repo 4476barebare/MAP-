@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nav = document.createElement('div');
 
         nav.style.position = 'absolute';
-        nav.style.top = '0px';
+        nav.style.top = '5px';
         nav.style.left = '5px';
         nav.style.display = 'flex';
         nav.style.flexDirection = 'column';
