@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
 
+  // 地図基準
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
 
@@ -19,9 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentGroup = null;
 
-      // =========================
-      // 地域設定（そのまま）
-      // =========================
       const groupSettings = {
         Path_2: { scale:6.7, x:145, y:45 },
         Path_3: { scale:8.6, x:105, y:100 },
@@ -31,9 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7: { scale:11.2, x:-105, y:200 }
       };
 
-      // =========================
-      // ★ 県表示（復活）
-      // =========================
+      const groupBoxSettings = {
+        Path_2:{ leftTop:[0,1,2], rightBottom:[0,1,2] },
+        Path_3:{ rightTop:[0,1,2], leftBottom:[0,1,2,3,4] },
+        Path_4:{ rightTop:[0,1,2], leftBottom:[0,1,2,3] },
+        Path_5:{ rightTop:[0,1], leftBottom:[0,1,2,3,4] },
+        Path_6:{ top:[0,1,2,3,4], bottom:[0,1,2,3] },
+        Path_7:{ rightTop:[0,1,2], rightBottom:[0,1,2,3] }
+      };
+
       const groupToPrefectures = {
         Path_2:['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
         Path_3:['Niigata','Gunma','Tochigi','Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'],
@@ -43,90 +47,43 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
       };
 
-      // =========================
-      // BOX設定（そのまま）
-      // =========================
-      const groupBoxSettings = {
-        Path_2: { leftTop:[0,1,2], rightBottom:[0,1,2] },
-        Path_3: { rightTop:[0,1,2], leftBottom:[0,1,2,3,4] },
-        Path_4: { rightTop:[0,1,2], leftBottom:[0,1,2,3] },
-        Path_5: { rightTop:[0,1], leftBottom:[0,1,2,3,4] },
-        Path_6: { top:[0,1,2,3,4], bottom:[0,1,2,3] },
-        Path_7: { rightTop:[0,1,2], rightBottom:[0,1,2,3] }
+      const prefNames = {
+        Aomori:'青森県', Iwate:'岩手県', Akita:'秋田県',
+        Miyagi:'宮城県', Yamagata:'山形県', Fukushima:'福島県',
+        Niigata:'新潟県', Gunma:'群馬県', Tochigi:'栃木県', Chiba:'千葉県',
+        Ibaraki:'茨城県', Tokyo:'東京都', Saitama:'埼玉県', Kanagawa:'神奈川県',
+        Shizuoka:'静岡県', Yamanashi:'山梨県', Nagano:'長野県',
+        Ishikawa:'石川県', Toyama:'富山県', Gifu:'岐阜県', Aichi:'愛知県',
+        Mie:'三重県', Nara:'奈良県', Wakayama:'和歌山県',
+        Osaka:'大阪府', Shiga:'滋賀県', Kyoto:'京都府', Hyogo:'兵庫県',
+        Tottori:'鳥取県', Shimane:'島根県', Okayama:'岡山県',
+        Hiroshima:'広島県', Yamaguchi:'山口県',
+        Tokushima:'徳島県', Kagawa:'香川県', Kochi:'高知県', Ehime:'愛媛県',
+        Fukuoka:'福岡県', Saga:'佐賀県', Nagasaki:'長崎県',
+        Oita:'大分県', Kumamoto:'熊本県', Miyazaki:'宮崎県', Kagoshima:'鹿児島県'
       };
 
-      // =========================
-      // BOX→県
-      // =========================
+      // ★追加：BOX→県対応
       const boxToPrefecture = {
-        Path_2: {
-          'leftTop-1': { id:'Aomori', name:'青森県' },
-          'leftTop-2': { id:'Akita', name:'秋田県' },
-          'leftTop-3': { id:'Yamagata', name:'山形県' },
-          'rightBottom-1': { id:'Iwate', name:'岩手県' },
-          'rightBottom-2': { id:'Miyagi', name:'宮城県' },
-          'rightBottom-3': { id:'Fukushima', name:'福島県' }
-        },
-        Path_3: {
-          'rightTop-1': { id:'Niigata', name:'新潟県' },
-          'rightTop-2': { id:'Tochigi', name:'栃木県' },
-          'rightTop-3': { id:'Ibaraki', name:'茨城県' },
-          'leftBottom-1': { id:'Gunma', name:'群馬県' },
-          'leftBottom-2': { id:'Saitama', name:'埼玉県' },
-          'leftBottom-3': { id:'Tokyo', name:'東京都' },
-          'leftBottom-4': { id:'Kanagawa', name:'神奈川県' },
-          'leftBottom-5': { id:'Chiba', name:'千葉県' }
-        },
-        Path_4: {
-          'rightTop-1': { id:'Nagano', name:'長野県' },
-          'rightTop-2': { id:'Toyama', name:'富山県' },
-          'rightTop-3': { id:'Ishikawa', name:'石川県' },
-          'leftBottom-1': { id:'Gifu', name:'岐阜県' },
-          'leftBottom-2': { id:'Aichi', name:'愛知県' },
-          'leftBottom-3': { id:'Shizuoka', name:'静岡県' },
-          'leftBottom-4': { id:'Yamanashi', name:'山梨県' }
-        },
-        Path_5: {
-          'rightTop-1': { id:'Fukui', name:'福井県' },
-          'rightTop-2': { id:'Kyoto', name:'京都府' },
-          'leftBottom-1': { id:'Hyogo', name:'兵庫県' },
-          'leftBottom-2': { id:'Osaka', name:'大阪府' },
-          'leftBottom-3': { id:'Wakayama', name:'和歌山県' },
-          'leftBottom-4': { id:'Nara', name:'奈良県' },
-          'leftBottom-5': { id:'Mie', name:'三重県' }
-        },
-        Path_6: {
-          'top-1': { id:'Shimane', name:'島根県' },
-          'top-2': { id:'Hiroshima', name:'広島県' },
-          'top-3': { id:'Tottori', name:'鳥取県' },
-          'top-4': { id:'Okayama', name:'岡山県' },
-          'top-5': { id:'Yamaguchi', name:'山口県' },
-          'bottom-1': { id:'Ehime', name:'愛媛県' },
-          'bottom-2': { id:'Kochi', name:'高知県' },
-          'bottom-3': { id:'Kagawa', name:'香川県' },
-          'bottom-4': { id:'Tokushima', name:'徳島県' }
-        },
-        Path_7: {
-          'rightTop-1': { id:'Fukuoka', name:'福岡県' },
-          'rightTop-2': { id:'Saga', name:'佐賀県' },
-          'rightTop-3': { id:'Nagasaki', name:'長崎県' },
-          'rightBottom-1': { id:'Oita', name:'大分県' },
-          'rightBottom-2': { id:'Kumamoto', name:'熊本県' },
-          'rightBottom-3': { id:'Miyazaki', name:'宮崎県' },
-          'rightBottom-4': { id:'Kagoshima', name:'鹿児島県' }
-        }
+        Path_2:['Aomori','Akita','Yamagata','Iwate','Miyagi','Fukushima'],
+        Path_3:['Niigata','Tochigi','Ibaraki','Gunma','Saitama','Tokyo','Kanagawa','Chiba'],
+        Path_4:['Nagano','Toyama','Ishikawa','Gifu','Aichi','Shizuoka','Yamanashi'],
+        Path_5:['Fukui','Kyoto','Hyogo','Osaka','Wakayama','Nara','Mie'],
+        Path_6:['Shimane','Hiroshima','Tottori','Okayama','Yamaguchi','Ehime','Kochi','Kagawa','Tokushima'],
+        Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
       };
 
       function selectPref(prefId){
         console.log('選択:', prefId);
       }
 
-      // 初期
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
+        p.setAttribute('stroke-width', '1');
 
+        // ★追加：県クリック共通化
         p.addEventListener('click', () => selectPref(p.id));
       });
 
@@ -134,6 +91,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       allGroups.forEach(g => {
         const gid = g.id;
+        g.setAttribute('fill', '#ffffff');
+        g.setAttribute('stroke', '#191970');
+
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
@@ -141,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const initialNav = createInitialNav();
+
       const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
       const leftTopDummy = createCornerDummy('leftTop');
@@ -149,43 +110,49 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightTopDummy = createCornerDummy('rightTop');
 
       function hideAllBoxes(){
-        [topDummy,bottomDummy,leftTopDummy,rightBottomDummy,leftBottomDummy,rightTopDummy]
-        .forEach(w=>{
-          w.style.display='none';
-          Array.from(w.children).forEach(c=>c.style.display='none');
-        });
+        [topDummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
+          .forEach(wrapper => {
+            wrapper.style.display = 'none';
+            Array.from(wrapper.children).forEach(c => c.style.display = 'none');
+          });
       }
 
       function showBoxes(gid){
         const setting = groupBoxSettings[gid];
         if(!setting) return;
 
-        Object.keys(setting).forEach(pos=>{
+        let visibleBoxes = [];
+
+        Object.keys(setting).forEach(pos => {
           let wrapper;
-          if(pos==='top') wrapper=topDummy;
-          if(pos==='bottom') wrapper=bottomDummy;
-          if(pos==='leftTop') wrapper=leftTopDummy;
-          if(pos==='rightBottom') wrapper=rightBottomDummy;
-          if(pos==='leftBottom') wrapper=leftBottomDummy;
-          if(pos==='rightTop') wrapper=rightTopDummy;
 
-          wrapper.style.display='flex';
+          if(pos === 'top') wrapper = topDummy;
+          if(pos === 'bottom') wrapper = bottomDummy;
+          if(pos === 'leftTop') wrapper = leftTopDummy;
+          if(pos === 'rightBottom') wrapper = rightBottomDummy;
+          if(pos === 'leftBottom') wrapper = leftBottomDummy;
+          if(pos === 'rightTop') wrapper = rightTopDummy;
 
-          setting[pos].forEach(i=>{
-            wrapper.children[i].style.display='flex';
+          wrapper.style.display = 'flex';
+
+          setting[pos].forEach(i => {
+            const box = wrapper.children[i];
+            box.style.display = 'flex';
+            visibleBoxes.push(box);
           });
         });
 
-        const mapping = boxToPrefecture[gid];
-        if(mapping){
-          Object.keys(mapping).forEach(boxId=>{
-            const box = mapDiv.querySelector(`[data-box-id="${boxId}"]`);
-            if(box){
-              box.textContent = mapping[boxId].name;
-              box.dataset.prefId = mapping[boxId].id;
-            }
-          });
-        }
+        // ★追加：BOXに県割当
+        const list = boxToPrefecture[gid] || [];
+        visibleBoxes.forEach((box, i) => {
+          const pid = list[i];
+          if(pid){
+            box.textContent = prefNames[pid];
+            box.dataset.prefId = pid;
+
+            box.onclick = () => selectPref(pid);
+          }
+        });
       }
 
       function showRegion(gid){
@@ -196,63 +163,102 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAllBoxes();
         showBoxes(gid);
 
-        allGroups.forEach(g=>g.style.display='none');
+        allGroups.forEach(g => g.style.display = 'none');
 
-        // ★復活
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline':'none';
+        prefGroup.querySelectorAll('path').forEach(p => {
+          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
         });
 
         applyTransform(gid);
+        addPrefLabels(groupToPrefectures[gid]);
       }
 
-      function applyTransform(gid){
-        const group = svg.querySelector('#'+gid);
+      function applyTransform(gid) {
+        const group = svg.querySelector('#' + gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
 
-        const cx = bbox.x + bbox.width/2 + s.x;
-        const cy = bbox.y + bbox.height/2 + s.y;
+        const cx = bbox.x + bbox.width / 2 + s.x;
+        const cy = bbox.y + bbox.height / 2 + s.y;
 
         const scale = s.scale;
-        const displayScale = svg.clientWidth / svg.viewBox.baseVal.width;
 
-        const tx = (svg.clientWidth/2) - cx*scale*displayScale;
-        const ty = (svg.clientHeight/2) - cy*scale*displayScale;
+        const svgDisplayWidth = svg.clientWidth;
+        const viewBoxWidth = svg.viewBox.baseVal.width;
+        const displayScale = svgDisplayWidth / viewBoxWidth;
 
-        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale*displayScale})`;
+        const tx = (svgDisplayWidth / 2) - cx * scale * displayScale;
+        const ty = (svg.clientHeight / 2) - cy * scale * displayScale;
+
+        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
+
+        prefGroup.querySelectorAll('path').forEach(p => {
+          p.setAttribute('stroke-width', '0.3');
+        });
+      }
+
+      function addPrefLabels(prefIds){
+        svg.querySelectorAll('.pref-label').forEach(e => e.remove());
+        prefIds.forEach(pid => {
+          const p = prefGroup.querySelector(`#${pid}`);
+          if(!p) return;
+          const bbox = p.getBBox();
+          const cx = bbox.x + bbox.width / 2;
+          const cy = bbox.y + bbox.height / 2;
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+          text.setAttribute('x', cx);
+          text.setAttribute('y', cy);
+          text.setAttribute('text-anchor','middle');
+          text.setAttribute('font-size','10');
+          text.setAttribute('fill','#191970');
+          text.textContent = prefNames[pid];
+
+          svg.appendChild(text);
+        });
       }
 
       function createBox(){
-        const box=document.createElement('div');
-        box.style.border='1px solid #191970';
-        box.style.height='26px';
-        box.style.width='88px';
-        box.style.display='flex';
-        box.style.alignItems='center';
-        box.style.justifyContent='center';
+        const box = document.createElement('div');
+        box.style.border = '1px solid #191970';
+        box.style.background = '#fff';
+        box.style.height = '26px';
+        box.style.minWidth = '80px';
+        box.style.display = 'flex';
+        box.style.alignItems = 'center';
+        box.style.justifyContent = 'center';
+        box.style.fontSize = '13px';
+        box.style.color = '#191970';
+        box.style.boxShadow = '0 0 4px rgba(0,0,0,0.25)';
 
-        box.addEventListener('click',()=>{
-          if(box.dataset.prefId) selectPref(box.dataset.prefId);
-        });
+        // ★追加
+        box.dataset.prefId = '';
 
         return box;
       }
 
       function createInitialNav(){
-        const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
-        const nav=document.createElement('div');
-        nav.style.position='absolute';
-        nav.style.top='5px';
-        nav.style.left='5px';
-        nav.style.display='flex';
-        nav.style.flexDirection='column';
-        nav.style.gap='4px';
+        const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
+        const nav = document.createElement('div');
+        nav.style.position = 'absolute';
+        nav.style.top = '5px';
+        nav.style.left = '5px';
+        nav.style.display = 'flex';
+        nav.style.flexDirection = 'column';
+        nav.style.gap = '4px';
+        nav.style.zIndex = '10';
 
-        names.forEach((name,i)=>{
-          const box=createBox();
-          box.textContent=name;
-          if(i!==0&&i!==7) box.onclick=()=>showRegion(`Path_${i+1}`);
+        names.forEach((name, i) => {
+          const box = createBox();
+          box.textContent = name;
+
+          if(i !== 0 && i !== 7){
+            box.style.cursor = 'pointer';
+            box.onclick = () => showRegion(`Path_${i+1}`);
+          } else {
+            box.style.opacity = '0.6';
+          }
+
           nav.appendChild(box);
         });
 
@@ -261,66 +267,84 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function createTopDummy(){
-        const w=document.createElement('div');
-        w.style.position='absolute';
-        w.style.top='5px';
-        w.style.left='50%';
-        w.style.transform='translateX(-50%)';
-        w.style.display='none';
+        const wrapper = document.createElement('div');
+        wrapper.id = 'topDummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.top = '5px';
+        wrapper.style.left = '50%';
+        wrapper.style.transform = 'translateX(-50%)';
+        wrapper.style.display = 'none';
+        wrapper.style.zIndex = '10';
 
-        const nav=document.createElement('div');
-        nav.style.display='flex';
-        nav.style.flexWrap='wrap';
-        nav.style.width='340px';
+        const nav = document.createElement('div');
+        nav.style.display = 'flex';
+        nav.style.flexWrap = 'wrap';
+        nav.style.justifyContent = 'flex-start';
+        nav.style.width = '340px';
+        nav.style.gap = '4px';
 
         for(let i=0;i<5;i++){
-          const b=createBox();
-          b.dataset.boxId=`top-${i+1}`;
-          nav.appendChild(b);
+          const box = createBox();
+          nav.appendChild(box);
         }
 
-        w.appendChild(nav);
-        mapDiv.appendChild(w);
-        return w;
+        wrapper.appendChild(nav);
+        mapDiv.appendChild(wrapper);
+        return wrapper;
       }
 
       function createBottomDummy(){
-        const w=document.createElement('div');
-        w.style.position='absolute';
-        w.style.bottom='5px';
-        w.style.left='50%';
-        w.style.transform='translateX(-50%)';
-        w.style.display='none';
+        const wrapper = document.createElement('div');
+        wrapper.id = 'bottomDummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.bottom = '5px';
+        wrapper.style.left = '50%';
+        wrapper.style.transform = 'translateX(-50%)';
+        wrapper.style.display = 'none';
+        wrapper.style.gap = '6px';
+        wrapper.style.zIndex = '10';
 
         for(let i=0;i<4;i++){
-          const b=createBox();
-          b.dataset.boxId=`bottom-${i+1}`;
-          w.appendChild(b);
+          const box = createBox();
+          wrapper.appendChild(box);
         }
 
-        mapDiv.appendChild(w);
-        return w;
+        mapDiv.appendChild(wrapper);
+        return wrapper;
       }
 
-      function createCornerDummy(pos){
-        const w=document.createElement('div');
-        w.style.position='absolute';
-        w.style.display='none';
-        w.style.flexDirection='column';
+      function createCornerDummy(position){
+        const wrapper = document.createElement('div');
+        wrapper.id = position + 'Dummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.display = 'none';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '4px';
+        wrapper.style.zIndex = '10';
 
-        if(pos==='leftTop'){ w.style.top='5px'; w.style.left='5px'; }
-        if(pos==='rightBottom'){ w.style.bottom='5px'; w.style.right='5px'; }
-        if(pos==='leftBottom'){ w.style.bottom='5px'; w.style.left='5px'; }
-        if(pos==='rightTop'){ w.style.top='5px'; w.style.right='5px'; }
+        const boxes = 5;
 
-        for(let i=0;i<5;i++){
-          const b=createBox();
-          b.dataset.boxId=`${pos}-${i+1}`;
-          w.appendChild(b);
+        if(position === 'leftTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.left = '5px';
+        } else if(position === 'rightBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.right = '5px';
+        } else if(position === 'leftBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.left = '5px';
+        } else if(position === 'rightTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.right = '5px';
         }
 
-        mapDiv.appendChild(w);
-        return w;
+        for(let i=0;i<boxes;i++){
+          const box = createBox();
+          wrapper.appendChild(box);
+        }
+
+        mapDiv.appendChild(wrapper);
+        return wrapper;
       }
 
     });
