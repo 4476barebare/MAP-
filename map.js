@@ -234,12 +234,12 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.zIndex = '10';
 
         if(side === 'left'){
-          nav.style.left = '10px';
+          nav.style.left = '5px';
           nav.style.justifyContent = 'flex-start';
         }
 
         if(side === 'right'){
-          nav.style.right = '10px';
+          nav.style.right = '5px';
           nav.style.bottom = '30px';
           nav.style.top = 'auto';
           nav.style.justifyContent = 'flex-end';
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.createElement('div');
 
         wrapper.style.position = 'absolute';
-        wrapper.style.top = '50px';
+        wrapper.style.top = '5px';
         wrapper.style.left = '50%';
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nav = document.createElement('div');
 
         nav.style.position = 'absolute';
-        nav.style.bottom = '30px';
+        nav.style.bottom = '5px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
 
