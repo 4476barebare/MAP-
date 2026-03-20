@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
 
       // =========================
-      // 地域設定（クリック対象のみ）
+      // 地域設定
       // =========================
       const groupSettings = {
         Path_2: { scale:3.4, x:190, y:110 },
@@ -37,71 +37,87 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
       };
 
-      const prefNames = {
-        Osaka:'大阪府',
-        Tokyo:'東京都'
-      };
-
-      const prefCounts = {
-        Tokyo:12,
-        Kanagawa:8
-      };
-
       // =========================
       // 初期：県非表示
       // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.setAttribute('fill', '#ffffff');
+        p.setAttribute('fill', '#fff');
         p.setAttribute('stroke', '#191970');
-        p.style.strokeWidth = '0.8px';
-        p.style.vectorEffect = 'non-scaling-stroke';
       });
 
       // =========================
-      // 地図クリック（地域）
+      // ★ SVGクリック完全制御
       // =========================
-      Object.keys(groupSettings).forEach(gid => {
+      const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
-        const group = svg.querySelector('#' + gid);
-        if (!group) return;
+      allGroups.forEach(g => {
 
-        group.setAttribute('fill', '#ffffff');
-        group.setAttribute('stroke', '#191970');
-        group.style.cursor = 'pointer';
-        group.style.vectorEffect = 'non-scaling-stroke';
-
-        group.addEventListener('click', () => {
-          showRegion(gid);
-        });
+        // 全部一旦クリック無効化
+        g.replaceWith(g.cloneNode(true));
 
       });
 
+      // 再取得（cloneしたので）
+      const newGroups = svg.querySelectorAll('[id^="Path_"]');
+
+      newGroups.forEach(g => {
+
+        const gid = g.id;
+
+        g.setAttribute('fill', '#fff');
+        g.setAttribute('stroke', '#191970');
+
+        // 有効なグループだけクリック付与
+        if(groupSettings[gid]){
+          g.style.cursor = 'pointer';
+
+          g.addEventListener('click', () => {
+            showRegion(gid);
+          });
+
+        } else {
+          // 北海道・沖縄はクリック無効
+          g.style.cursor = 'default';
+        }
+
+      });
+
+      // =========================
+      // UI生成（先に作る）
+      // =========================
+
+      const initialNav = createInitialNav();
+      const leftDummy = createSideDummy('left');
+      const rightDummy = createSideDummy('right');
+      const bottomDummy = createBottomDummy();
+
+      // =========================
+      // 表示処理
+      // =========================
       function showRegion(gid){
 
         currentGroup = gid;
 
-        // 初期BOX消す
+        // ★ 初期BOX消す
         initialNav.style.display = 'none';
 
-        // 地域非表示
-        Object.keys(groupSettings).forEach(g => {
-          const el = svg.querySelector('#' + g);
-          if (el) el.style.display = 'none';
-        });
-
-        // 県表示
-        prefGroup.querySelectorAll('path').forEach(p => {
-          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
-        });
-
-        applyTransform(gid);
-        addPrefLabels(groupToPrefectures[gid]);
-
-        // ダミー表示
+        // ★ ダミー表示
         leftDummy.style.display = 'flex';
         rightDummy.style.display = 'flex';
         bottomDummy.style.display = 'flex';
+
+        // 地域非表示
+        newGroups.forEach(g => g.style.display = 'none');
+
+        // 県表示
+        prefGroup.querySelectorAll('path').forEach(p => {
+          p.style.display = groupToPrefectures[gid].includes(p.id)
+            ? 'inline'
+            : 'none';
+        });
+
+        applyTransform(gid);
       }
 
       function applyTransform(gid){
@@ -120,46 +136,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const tx = svgW/2 - cx * scale;
         const ty = svgH/2 - cy * scale;
 
-        svg.style.transition = 'transform 0.4s ease';
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
       }
 
-      function addPrefLabels(prefIds){
-        svg.querySelectorAll('.pref-label').forEach(e => e.remove());
-
-        prefIds.forEach(pid => {
-          const p = prefGroup.querySelector('#' + pid);
-          if (!p) return;
-
-          const bbox = p.getBBox();
-          const cx = bbox.x + bbox.width/2;
-          const cy = bbox.y + bbox.height/2;
-
-          const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-          text.setAttribute('x', cx);
-          text.setAttribute('y', cy);
-          text.setAttribute('text-anchor','middle');
-          text.textContent = prefNames[pid] || pid;
-
-          svg.appendChild(text);
-        });
-      }
-
       // =========================
-      // 初期ナビ（本物）
+      // 初期ナビ
       // =========================
-      const regionList = [
-        {gid:'Path_1', name:'北海道', active:false},
-        {gid:'Path_2', name:'東北地方', active:true},
-        {gid:'Path_3', name:'関東新潟', active:true},
-        {gid:'Path_4', name:'中部地方', active:true},
-        {gid:'Path_5', name:'近畿地方', active:true},
-        {gid:'Path_6', name:'中国四国', active:true},
-        {gid:'Path_7', name:'九州地方', active:true},
-        {gid:'Path_8', name:'沖縄', active:false}
-      ];
-
       function createInitialNav(){
+
+        const regionList = [
+          {gid:'Path_1', name:'北海道', active:false},
+          {gid:'Path_2', name:'東北地方', active:true},
+          {gid:'Path_3', name:'関東新潟', active:true},
+          {gid:'Path_4', name:'中部地方', active:true},
+          {gid:'Path_5', name:'近畿地方', active:true},
+          {gid:'Path_6', name:'中国四国', active:true},
+          {gid:'Path_7', name:'九州地方', active:true},
+          {gid:'Path_8', name:'沖縄', active:false}
+        ];
+
         const nav = document.createElement('div');
         nav.style.position = 'fixed';
         nav.style.top = '60px';
@@ -167,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.display = 'flex';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
-        nav.style.zIndex = '1';
 
         regionList.forEach(r => {
           const box = document.createElement('div');
@@ -192,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // ダミーBOX
+      // ダミー
       // =========================
       function createBox(){
         const box = document.createElement('div');
@@ -210,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.display = 'none';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
-        nav.style.zIndex = '1';
 
         if(side === 'left') nav.style.left = '24px';
         if(side === 'right') nav.style.right = '24px';
@@ -231,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.transform = 'translateX(-50%)';
         nav.style.display = 'none';
         nav.style.gap = '8px';
-        nav.style.zIndex = '1';
 
         for(let i=0;i<5;i++){
           nav.appendChild(createBox());
@@ -240,11 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(nav);
         return nav;
       }
-
-      const initialNav = createInitialNav();
-      const leftDummy = createSideDummy('left');
-      const rightDummy = createSideDummy('right');
-      const bottomDummy = createBottomDummy();
 
     });
 
