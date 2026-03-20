@@ -1,4 +1,5 @@
-<script>
+
+
 document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
@@ -89,8 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       const initialNav = createInitialNav();
 
+      // 上下ダミー
       const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
+
+      // 4隅ダミーBOX
       const leftTopDummy = createCornerDummy('leftTop');
       const rightBottomDummy = createCornerDummy('rightBottom');
       const leftBottomDummy = createCornerDummy('leftBottom');
@@ -217,41 +221,106 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 上下ダミー＆4隅ダミー
+      // 上ダミー（中央上）
       // =========================
-      function createTopDummy(){ return createCornerWrapper('top', 5, 'center', 5, 5, 5, 5, '#ccf', 5, 5); }
-      function createBottomDummy(){ return createCornerWrapper('bottom', 5, 'center', 5, 5, 5, 5, '#cfc', 4, 6); }
-      function createCornerDummy(pos){
-        let color = '#fff';
-        if(pos==='leftTop') color='#fcc';
-        else if(pos==='rightBottom') color='#fcf';
-        else if(pos==='leftBottom') color='#ffc';
-        else if(pos==='rightTop') color='#cff';
-        return createCornerWrapper(pos==='leftTop'||pos==='rightTop'? 'top':'bottom',5,pos==='leftTop'||pos==='leftBottom'? 'left':'right',5,pos==='rightTop'||pos==='rightBottom'? 'right':undefined,undefined,undefined,color,3,4,pos);
+      function createTopDummy(){
+        const wrapper = document.createElement('div');
+        wrapper.id = 'topDummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.top = '5px';
+        wrapper.style.left = '50%';
+        wrapper.style.transform = 'translateX(-50%)';
+        wrapper.style.display = 'none';
+        wrapper.style.zIndex = '10';
+
+        const nav = document.createElement('div');
+        nav.style.display = 'flex';
+        nav.style.flexWrap = 'wrap';
+        nav.style.justifyContent = 'flex-start';
+        nav.style.width = '340px';
+        nav.style.gap = '4px';
+
+        for(let i=0;i<5;i++){
+          const box = createBox();
+          box.style.background = '#ccf';      // 薄い青
+          box.textContent = `Top-${i+1}`;     // ラベル
+          nav.appendChild(box);
+        }
+
+        wrapper.appendChild(nav);
+        mapDiv.appendChild(wrapper);
+        return wrapper;
       }
 
-      function createCornerWrapper(vertical, vOffset, horizontal, hOffset, rightOffset, bottomOffset, leftOffset, color, count, gap, labelPrefix){
+      // =========================
+      // 下ダミー（中央下）
+      // =========================
+      function createBottomDummy(){
         const wrapper = document.createElement('div');
-        wrapper.id = labelPrefix ? labelPrefix+'Dummy':vertical+horizontal+'Dummy';
-        wrapper.style.position='absolute';
-        wrapper.style.display='none';
-        wrapper.style.flexDirection='column';
-        wrapper.style.gap=gap+'px';
-        wrapper.style.zIndex='10';
-        if(vertical==='top') wrapper.style.top=vOffset+'px';
-        if(vertical==='bottom') wrapper.style.bottom=vOffset+'px';
-        if(horizontal==='left') wrapper.style.left=hOffset+'px';
-        if(horizontal==='right') wrapper.style.right=hOffset+'px';
-        for(let i=0;i<count;i++){
-          const box=createBox();
-          box.style.background=color;
-          box.textContent=labelPrefix ? `${labelPrefix}-${i+1}` : `${vertical}-${i+1}`;
+        wrapper.id = 'bottomDummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.bottom = '5px';
+        wrapper.style.left = '50%';
+        wrapper.style.transform = 'translateX(-50%)';
+        wrapper.style.display = 'none';
+        wrapper.style.gap = '6px';
+        wrapper.style.zIndex = '10';
+
+        for(let i=0;i<4;i++){
+          const box = createBox();
+          box.style.background = '#cfc';      // 薄い緑
+          box.textContent = `Bottom-${i+1}`;  // ラベル
           wrapper.appendChild(box);
         }
+
+        mapDiv.appendChild(wrapper);
+        return wrapper;
+      }
+
+      // =========================
+      // 4隅ダミーBOX
+      // =========================
+      function createCornerDummy(position){
+        const wrapper = document.createElement('div');
+        wrapper.id = position + 'Dummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.display = 'none';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '4px';
+        wrapper.style.zIndex = '10';
+
+        const boxes = 3;
+        let color = '#fff';
+
+        if(position === 'leftTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.left = '5px';
+          color = '#fcc'; // 薄い赤
+        } else if(position === 'rightBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.right = '5px';
+          color = '#fcf'; // 薄いピンク
+        } else if(position === 'leftBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.left = '5px';
+          color = '#ffc'; // 薄い黄
+        } else if(position === 'rightTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.right = '5px';
+          color = '#cff'; // 薄い水色
+        }
+
+        for(let i=0;i<boxes;i++){
+          const box = createBox();
+          box.style.background = color;
+          box.textContent = `${position}-${i+1}`;
+          wrapper.appendChild(box);
+        }
+
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
     });
+
 });
-</script>
