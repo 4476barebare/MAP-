@@ -311,51 +311,62 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 拡大後調整コンソール
       // =========================
-      function createAdjustConsole() {
-        const consoleDiv = document.createElement('div');
-        consoleDiv.style.position = 'absolute';
-        consoleDiv.style.bottom = '10px';
-        consoleDiv.style.right = '10px';
-        consoleDiv.style.background = 'rgba(255,255,255,0.9)';
-        consoleDiv.style.border = '1px solid #191970';
-        consoleDiv.style.padding = '6px';
-        consoleDiv.style.display = 'flex';
-        consoleDiv.style.flexDirection = 'column';
-        consoleDiv.style.gap = '4px';
-        consoleDiv.style.zIndex = '100';
+// 拡大後調整コンソール（数値表示付き）
+// =========================
+function createAdjustConsole() {
+  const consoleDiv = document.createElement('div');
+  consoleDiv.style.position = 'absolute';
+  consoleDiv.style.bottom = '10px';
+  consoleDiv.style.right = '10px';
+  consoleDiv.style.background = 'rgba(255,255,255,0.9)';
+  consoleDiv.style.border = '1px solid #191970';
+  consoleDiv.style.padding = '6px';
+  consoleDiv.style.display = 'flex';
+  consoleDiv.style.flexDirection = 'column';
+  consoleDiv.style.gap = '4px';
+  consoleDiv.style.zIndex = '100';
 
-        const controls = [
-          { label: '↑', action: () => adjustGroup(0, -5, 0) },
-          { label: '↓', action: () => adjustGroup(0, 5, 0) },
-          { label: '←', action: () => adjustGroup(-5, 0, 0) },
-          { label: '→', action: () => adjustGroup(5, 0, 0) },
-          { label: '➕', action: () => adjustGroup(0, 0, 0.1) },
-          { label: '➖', action: () => adjustGroup(0, 0, -0.1) }
-        ];
+  const controls = [
+    { label: '↑', action: () => adjustGroup(0, -5, 0) },
+    { label: '↓', action: () => adjustGroup(0, 5, 0) },
+    { label: '←', action: () => adjustGroup(-5, 0, 0) },
+    { label: '→', action: () => adjustGroup(5, 0, 0) },
+    { label: '➕', action: () => adjustGroup(0, 0, 0.1) },
+    { label: '➖', action: () => adjustGroup(0, 0, -0.1) }
+  ];
 
-        controls.forEach(c => {
-          const btn = document.createElement('button');
-          btn.textContent = c.label;
-          btn.style.fontSize = '16px';
-          btn.style.cursor = 'pointer';
-          btn.onclick = c.action;
-          consoleDiv.appendChild(btn);
-        });
+  controls.forEach(c => {
+    const btn = document.createElement('button');
+    btn.textContent = c.label;
+    btn.style.fontSize = '16px';
+    btn.style.cursor = 'pointer';
+    btn.onclick = c.action;
+    consoleDiv.appendChild(btn);
+  });
 
-        mapDiv.appendChild(consoleDiv);
-      }
-      createAdjustConsole();
+  // 数値表示用div
+  const statusDiv = document.createElement('div');
+  statusDiv.id = 'groupStatus';
+  statusDiv.style.fontSize = '12px';
+  statusDiv.style.color = '#191970';
+  statusDiv.textContent = 'x: 0, y: 0, scale: 1';
+  consoleDiv.appendChild(statusDiv);
 
-      function adjustGroup(dx, dy, dscale) {
-        if (!currentGroup) return;
-        const s = groupSettings[currentGroup];
-        s.x += dx;
-        s.y += dy;
-        s.scale = Math.max(0.1, s.scale + dscale);
-        applyTransform(currentGroup);
-      }
+  mapDiv.appendChild(consoleDiv);
+}
 
+// adjustGroup 内で値更新
+function adjustGroup(dx, dy, dscale) {
+  if (!currentGroup) return;
+  const s = groupSettings[currentGroup];
+  s.x += dx;
+  s.y += dy;
+  s.scale = Math.max(0.1, s.scale + dscale);
+  applyTransform(currentGroup);
+
+  const statusDiv = document.getElementById('groupStatus');
+  statusDiv.textContent = `x: ${s.x}, y: ${s.y}, scale: ${s.scale.toFixed(2)}`;
+}
     });
 });
