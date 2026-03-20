@@ -90,10 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
       // UI生成
       // =========================
       const initialNav = createInitialNav();
-      const leftDummy = createSideDummy('left');
-      const rightDummy = createSideDummy('right');
+
+      // 上下ダミー
       const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
+
+      // 4隅ダミーBOX
+      const leftTopDummy = createCornerDummy('leftTop');
+      const rightBottomDummy = createCornerDummy('rightBottom');
+      const leftBottomDummy = createCornerDummy('leftBottom');
+      const rightTopDummy = createCornerDummy('rightTop');
 
       // =========================
       // 地域表示
@@ -104,10 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         initialNav.style.display = 'none';
 
-        leftDummy.style.display = 'flex';
-        rightDummy.style.display = 'flex';
         topDummy.style.display = 'block';
         bottomDummy.style.display = 'flex';
+        leftTopDummy.style.display = 'flex';
+        rightBottomDummy.style.display = 'flex';
+        leftBottomDummy.style.display = 'flex';
+        rightTopDummy.style.display = 'flex';
 
         allGroups.forEach(g => g.style.display = 'none');
 
@@ -123,30 +131,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function applyTransform(gid) {
 
-  const group = svg.querySelector('#' + gid);
-  const bbox = group.getBBox();
-  const s = groupSettings[gid];
+        const group = svg.querySelector('#' + gid);
+        const bbox = group.getBBox();
+        const s = groupSettings[gid];
 
-  const cx = bbox.x + bbox.width / 2 + s.x;
-  const cy = bbox.y + bbox.height / 2 + s.y;
+        const cx = bbox.x + bbox.width / 2 + s.x;
+        const cy = bbox.y + bbox.height / 2 + s.y;
 
-  const scale = s.scale;
+        const scale = s.scale;
 
-  // 表示幅に合わせた倍率を計算
-  const svgDisplayWidth = svg.clientWidth; // 現在の表示幅
-  const viewBoxWidth = svg.viewBox.baseVal.width;
-  const displayScale = svgDisplayWidth / viewBoxWidth;
+        const svgDisplayWidth = svg.clientWidth;
+        const viewBoxWidth = svg.viewBox.baseVal.width;
+        const displayScale = svgDisplayWidth / viewBoxWidth;
 
-  const tx = (svgDisplayWidth / 2) - cx * scale * displayScale;
-  const ty = (svg.clientHeight / 2) - cy * scale * displayScale;
+        const tx = (svgDisplayWidth / 2) - cx * scale * displayScale;
+        const ty = (svg.clientHeight / 2) - cy * scale * displayScale;
 
-  svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
+        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
 
-        // ★ 拡大時だけ線幅を細くする
-    prefGroup.querySelectorAll('path').forEach(p => {
-        p.setAttribute('stroke-width', '0.3'); // ここで細めに設定
-    });
-        
+        // 拡大時だけ線幅を細く
+        prefGroup.querySelectorAll('path').forEach(p => {
+          p.setAttribute('stroke-width', '0.3');
+        });
+
       }
 
       function addPrefLabels(prefIds){
@@ -181,18 +188,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // BOX共通
       // =========================
       function createBox(){
-          const box = document.createElement('div');
-  box.style.border = '1px solid #191970';      // 枠線
-  box.style.background = '#fff';              // 背景
-  box.style.height = '26px';
-  box.style.minWidth = '80px';
-  box.style.display = 'flex';
-  box.style.alignItems = 'center';
-  box.style.justifyContent = 'center';
-  box.style.fontSize = '13px';
-  box.style.color = '#191970';                // 文字色を指定
-  box.style.boxShadow = '0 0 4px rgba(0,0,0,0.25)'; // 枠にだけ軽いドロップシャドウ
-  return box;
+        const box = document.createElement('div');
+        box.style.border = '1px solid #191970';
+        box.style.background = '#fff';
+        box.style.height = '26px';
+        box.style.minWidth = '80px';
+        box.style.display = 'flex';
+        box.style.alignItems = 'center';
+        box.style.justifyContent = 'center';
+        box.style.fontSize = '13px';
+        box.style.color = '#191970';
+        box.style.boxShadow = '0 0 4px rgba(0,0,0,0.25)';
+        return box;
       }
 
       // =========================
@@ -203,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
 
         const nav = document.createElement('div');
-
         nav.style.position = 'absolute';
         nav.style.top = '5px';
         nav.style.left = '5px';
@@ -213,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.zIndex = '10';
 
         names.forEach((name, i) => {
-
           const box = createBox();
           box.textContent = name;
 
@@ -232,43 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 左右ダミー
-      // =========================
-      function createSideDummy(side){
-
-        const nav = document.createElement('div');
-        nav.style.position = 'absolute';
-        nav.style.display = 'none';
-        nav.style.flexDirection = 'column';
-        nav.style.gap = '4px';
-        nav.style.zIndex = '10';
-
-        if(side === 'left'){
-          nav.style.top = '0px';
-          nav.style.left = '5px';
-          nav.style.justifyContent = 'flex-start';
-        }
-
-        if(side === 'right'){
-          nav.style.bottom = '0px';
-          nav.style.right = '5px';
-          nav.style.justifyContent = 'flex-end';
-        }
-
-        for(let i=0;i<6;i++){
-          nav.appendChild(createBox());
-        }
-
-        mapDiv.appendChild(nav);
-        return nav;
-      }
-
-      // =========================
-      // 上ダミー
+      // 上ダミー（中央上）
       // =========================
       function createTopDummy(){
-
         const wrapper = document.createElement('div');
+        wrapper.id = 'topDummy';
         wrapper.style.position = 'absolute';
         wrapper.style.top = '5px';
         wrapper.style.left = '50%';
@@ -294,25 +267,61 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 下ダミー
+      // 下ダミー（中央下）
       // =========================
       function createBottomDummy(){
-
-        const nav = document.createElement('div');
-        nav.style.position = 'absolute';
-        nav.style.bottom = '5px';
-        nav.style.left = '50%';
-        nav.style.transform = 'translateX(-50%)';
-        nav.style.display = 'none';
-        nav.style.gap = '6px';
-        nav.style.zIndex = '10';
+        const wrapper = document.createElement('div');
+        wrapper.id = 'bottomDummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.bottom = '5px';
+        wrapper.style.left = '50%';
+        wrapper.style.transform = 'translateX(-50%)';
+        wrapper.style.display = 'none';
+        wrapper.style.gap = '6px';
+        wrapper.style.zIndex = '10';
 
         for(let i=0;i<4;i++){
-          nav.appendChild(createBox());
+          wrapper.appendChild(createBox());
         }
 
-        mapDiv.appendChild(nav);
-        return nav;
+        mapDiv.appendChild(wrapper);
+        return wrapper;
+      }
+
+      // =========================
+      // 4隅ダミーBOX
+      // =========================
+      function createCornerDummy(position){
+        const wrapper = document.createElement('div');
+        wrapper.id = position + 'Dummy';
+        wrapper.style.position = 'absolute';
+        wrapper.style.display = 'none';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '4px';
+        wrapper.style.zIndex = '10';
+
+        const boxes = 3;
+
+        if(position === 'leftTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.left = '5px';
+        } else if(position === 'rightBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.right = '5px';
+        } else if(position === 'leftBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.left = '5px';
+        } else if(position === 'rightTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.right = '5px';
+        }
+
+        for(let i=0;i<boxes;i++){
+          wrapper.appendChild(createBox());
+        }
+
+        mapDiv.appendChild(wrapper);
+        return wrapper;
       }
 
     });
