@@ -193,8 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const nav = document.createElement('div');
 
         nav.style.position = 'absolute';
-        nav.style.top = '60px';
-        nav.style.left = '10px';
+        nav.style.top = '0px';
+        nav.style.left = '0px';
         nav.style.display = 'flex';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
@@ -232,14 +232,14 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.zIndex = '10';
 
         if(side === 'left'){
-          nav.style.top = '60px';
-          nav.style.left = '5px';
+          nav.style.top = '0px';
+          nav.style.left = '0px';
           nav.style.justifyContent = 'flex-start';
         }
 
         if(side === 'right'){
-          nav.style.bottom = '5px';
-          nav.style.right = '5px';
+          nav.style.bottom = '0px';
+          nav.style.right = '0px';
           nav.style.justifyContent = 'flex-end';
         }
 
@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const wrapper = document.createElement('div');
         wrapper.style.position = 'absolute';
-        wrapper.style.top = '5px';
+        wrapper.style.top = '0px';
         wrapper.style.left = '50%';
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nav = document.createElement('div');
         nav.style.position = 'absolute';
-        nav.style.bottom = '5px';
+        nav.style.bottom = '0px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
         nav.style.display = 'none';
