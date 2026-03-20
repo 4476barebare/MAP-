@@ -38,6 +38,13 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
   z-index: 1;
 }
 
+#map svg path {
+  stroke-linejoin: round; /* 角を丸く */
+  stroke-linecap: round;  /* 線端も丸く */
+  vector-effect: non-scaling-stroke; /* 拡大しても線幅一定 */
+}
+
+
 #map > div {   /* ダミーBOXや初期ナビ */
   z-index: 10; /* ここは JS 側と合わせる */
 }
