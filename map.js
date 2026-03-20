@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
 
       // =========================
-      // 地域設定（北海道・沖縄なし）
+      // 地域設定（北海道・沖縄は拡大なし）
       // =========================
       const groupSettings = {
         Path_2: { scale:3.4, x:190, y:110 },
@@ -35,6 +35,22 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_5:['Mie','Nara','Wakayama','Osaka','Shiga','Kyoto','Hyogo'],
         Path_6:['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi','Tokushima','Kagawa','Kochi','Ehime'],
         Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
+      };
+
+      const prefNames = {
+        Hokkaido:'北海道', Aomori:'青森県', Iwate:'岩手県', Akita:'秋田県',
+        Miyagi:'宮城県', Yamagata:'山形県', Fukushima:'福島県',
+        Niigata:'新潟県', Gunma:'群馬県', Tochigi:'栃木県', Chiba:'千葉県',
+        Ibaraki:'茨城県', Tokyo:'東京都', Saitama:'埼玉県', Kanagawa:'神奈川県',
+        Shizuoka:'静岡県', Yamanashi:'山梨県', Nagano:'長野県',
+        Ishikawa:'石川県', Toyama:'富山県', Gifu:'岐阜県', Aichi:'愛知県',
+        Mie:'三重県', Nara:'奈良県', Wakayama:'和歌山県',
+        Osaka:'大阪府', Shiga:'滋賀県', Kyoto:'京都府', Hyogo:'兵庫県',
+        Tottori:'鳥取県', Shimane:'島根県', Okayama:'岡山県',
+        Hiroshima:'広島県', Yamaguchi:'山口県',
+        Tokushima:'徳島県', Kagawa:'香川県', Kochi:'高知県', Ehime:'愛媛県',
+        Fukuoka:'福岡県', Saga:'佐賀県', Nagasaki:'長崎県',
+        Oita:'大分県', Kumamoto:'熊本県', Miyazaki:'宮崎県', Kagoshima:'鹿児島県'
       };
 
       // =========================
@@ -62,23 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
-
-          g.addEventListener('click', () => {
-            showRegion(gid);
-          });
-
+          g.addEventListener('click', () => showRegion(gid));
         } else {
-          // 北海道・沖縄 → 無効
           g.style.cursor = 'default';
-          g.addEventListener('click', (e) => {
-            e.stopPropagation();
-          });
+          g.addEventListener('click', (e) => e.stopPropagation());
         }
 
       });
 
       // =========================
-      // UI生成（先に）
+      // UI生成
       // =========================
       const initialNav = createInitialNav();
       const leftDummy = createSideDummy('left');
@@ -111,10 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         applyTransform(gid);
+
+        // ★県名表示
+        addPrefLabels(groupToPrefectures[gid]);
       }
 
       // =========================
-      // 拡大処理
+      // 拡大
       // =========================
       function applyTransform(gid){
 
@@ -135,6 +147,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
         svg.style.transition = 'transform 0.4s ease';
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      }
+
+      // =========================
+      // 県名ラベル
+      // =========================
+      function addPrefLabels(prefIds){
+
+        svg.querySelectorAll('.pref-label').forEach(e => e.remove());
+
+        prefIds.forEach(pid => {
+
+          const p = prefGroup.querySelector(`#${pid}`);
+          if (!p) return;
+
+          const bbox = p.getBBox();
+
+          const cx = bbox.x + bbox.width / 2;
+          const cy = bbox.y + bbox.height / 2;
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+
+          text.setAttribute('x', cx);
+          text.setAttribute('y', cy);
+          text.setAttribute('text-anchor','middle');
+          text.setAttribute('class','pref-label');
+          text.setAttribute('font-size', '10');
+          text.setAttribute('fill', '#191970');
+
+          const t1 = document.createElementNS('http://www.w3.org/2000/svg','tspan');
+          t1.setAttribute('x', cx);
+          t1.setAttribute('dy','0.35em');
+          t1.textContent = prefNames[pid];
+
+          text.appendChild(t1);
+          svg.appendChild(text);
+        });
       }
 
       // =========================
@@ -191,8 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         box.style.border = '1px solid #191970';
         box.style.background = '#ffffff';
-
-        // ★ 高さ固定
         box.style.height = '28px';
         box.style.minWidth = '90px';
 
