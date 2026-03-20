@@ -172,16 +172,18 @@ document.addEventListener('DOMContentLoaded', () => {
       // BOX共通
       // =========================
       function createBox(){
-        const box = document.createElement('div');
-        box.style.border = '1px solid #191970';
-        box.style.background = '#fff';
-        box.style.height = '26px';
-        box.style.minWidth = '80px';
-        box.style.display = 'flex';
-        box.style.alignItems = 'center';
-        box.style.justifyContent = 'center';
-        box.style.fontSize = '13px';
-        return box;
+          const box = document.createElement('div');
+  box.style.border = '1px solid #191970';      // 枠線
+  box.style.background = '#fff';              // 背景
+  box.style.height = '26px';
+  box.style.minWidth = '80px';
+  box.style.display = 'flex';
+  box.style.alignItems = 'center';
+  box.style.justifyContent = 'center';
+  box.style.fontSize = '13px';
+  box.style.color = '#191970';                // 文字色を指定
+  box.style.boxShadow = '0 0 4px rgba(0,0,0,0.25)'; // 枠にだけ軽いドロップシャドウ
+  return box;
       }
 
       // =========================
