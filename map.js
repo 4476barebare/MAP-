@@ -326,30 +326,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // =========================
       // =========================
-      // ここから追加：色付け＆ラベル
-      // =========================
-      const colorMap = {
-        topDummy:'#e0f7fa',
-        bottomDummy:'#fff3e0',
-        leftTopDummy:'#f1f8e9',
-        rightBottomDummy:'#f1f8e9',
-        leftBottomDummy:'#f1f8e9',
-        rightTopDummy:'#f1f8e9'
-      };
+// ダミーBOXに色とラベルを追加
+// =========================
+const colorMap = {
+  topDummy:'#e0f7fa',
+  bottomDummy:'#fff3e0',
+  leftTopDummy:'#f1f8e9',
+  rightBottomDummy:'#f1f8e9',
+  leftBottomDummy:'#f1f8e9',
+  rightTopDummy:'#f1f8e9'
+};
 
-      Object.keys(colorMap).forEach(id => {
-        const dummy = document.getElementById(id);
-        if(dummy){
-          dummy.querySelectorAll('div').forEach((box, idx) => {
-            box.style.background = colorMap[id];
-            const label = document.createElement('span');
-            label.textContent = `${id.replace('Dummy','')}-${idx+1}`;
-            label.style.fontSize = '10px';
-            label.style.marginLeft = '4px';
-            box.appendChild(label);
-          });
-        }
-      });
+Object.keys(colorMap).forEach(id => {
+  const dummy = document.getElementById(id);
+  if(dummy){
+    // wrapper直下のnavを取得（上ダミーはnav内にBOXがあるため）
+    const nav = dummy.querySelector(':scope > div') || dummy;
+    nav.querySelectorAll(':scope > div').forEach((box, idx) => {
+      box.style.background = colorMap[id];
+      const label = document.createElement('span');
+      label.textContent = `${id.replace('Dummy','')}-${idx+1}`;
+      label.style.fontSize = '10px';
+      label.style.marginLeft = '4px';
+      box.appendChild(label);
+    });
+  }
+});
 
     });
 
