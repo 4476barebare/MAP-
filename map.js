@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // 地域設定
       // =========================
       const groupSettings = {
-        Path_2: { scale:3.4, x:190, y:110 },
-        Path_3: { scale:5.2, x:130, y:130 },
-        Path_4: { scale:5.6, x:90, y:140 },
-        Path_5: { scale:7, x:30, y:160 },
-        Path_6: { scale:4.8, x:0, y:200 },
-        Path_7: { scale:5.8, x:-60, y:220 }
+        Path_2: { scale:6.7, x:145, y:45 },
+        Path_3: { scale:8.6, x:105, y:100 },
+        Path_4: { scale:10.1, x:55, y:110 },
+        Path_5: { scale:13.6, x:0, y:140 },
+        Path_6: { scale:9.5, x:-50, y:165 },
+        Path_7: { scale:11.2, x:-105, y:200 }
       };
 
       const groupToPrefectures = {
