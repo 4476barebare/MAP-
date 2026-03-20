@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '1'); // 初
+        p.setAttribute('stroke-width', '1');
       });
 
       // =========================
@@ -73,9 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
-
         const gid = g.id;
-
         g.setAttribute('fill', '#ffffff');
         g.setAttribute('stroke', '#191970');
 
@@ -83,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
         }
-
       });
 
       // =========================
@@ -105,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // 地域表示
       // =========================
       function showRegion(gid){
-
         currentGroup = gid;
 
         initialNav.style.display = 'none';
@@ -120,9 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g => g.style.display = 'none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
-          p.style.display = groupToPrefectures[gid].includes(p.id)
-            ? 'inline'
-            : 'none';
+          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
         });
 
         applyTransform(gid);
@@ -130,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function applyTransform(gid) {
-
         const group = svg.querySelector('#' + gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
@@ -149,35 +142,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
 
-        // 拡大時だけ線幅を細く
         prefGroup.querySelectorAll('path').forEach(p => {
           p.setAttribute('stroke-width', '0.3');
         });
-
       }
 
       function addPrefLabels(prefIds){
-
         svg.querySelectorAll('.pref-label').forEach(e => e.remove());
-
         prefIds.forEach(pid => {
-
           const p = prefGroup.querySelector(`#${pid}`);
-          if (!p) return;
-
+          if(!p) return;
           const bbox = p.getBBox();
-
           const cx = bbox.x + bbox.width / 2;
           const cy = bbox.y + bbox.height / 2;
 
           const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-
           text.setAttribute('x', cx);
           text.setAttribute('y', cy);
           text.setAttribute('text-anchor','middle');
           text.setAttribute('font-size','10');
           text.setAttribute('fill','#191970');
-
           text.textContent = prefNames[pid];
 
           svg.appendChild(text);
@@ -206,9 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 初期ナビ
       // =========================
       function createInitialNav(){
-
         const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
-
         const nav = document.createElement('div');
         nav.style.position = 'absolute';
         nav.style.top = '5px';
@@ -257,12 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.gap = '4px';
 
         for(let i=0;i<5;i++){
-          nav.appendChild(createBox());
+          const box = createBox();
+          box.style.background = '#ccf';      // 薄い青
+          box.textContent = `Top-${i+1}`;     // ラベル
+          nav.appendChild(box);
         }
 
         wrapper.appendChild(nav);
         mapDiv.appendChild(wrapper);
-
         return wrapper;
       }
 
@@ -281,7 +265,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.zIndex = '10';
 
         for(let i=0;i<4;i++){
-          wrapper.appendChild(createBox());
+          const box = createBox();
+          box.style.background = '#cfc';      // 薄い緑
+          box.textContent = `Bottom-${i+1}`;  // ラベル
+          wrapper.appendChild(box);
         }
 
         mapDiv.appendChild(wrapper);
@@ -301,55 +288,36 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.zIndex = '10';
 
         const boxes = 3;
+        let color = '#fff';
 
         if(position === 'leftTop'){
           wrapper.style.top = '5px';
           wrapper.style.left = '5px';
+          color = '#fcc'; // 薄い赤
         } else if(position === 'rightBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.right = '5px';
+          color = '#fcf'; // 薄いピンク
         } else if(position === 'leftBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.left = '5px';
+          color = '#ffc'; // 薄い黄
         } else if(position === 'rightTop'){
           wrapper.style.top = '5px';
           wrapper.style.right = '5px';
+          color = '#cff'; // 薄い水色
         }
 
         for(let i=0;i<boxes;i++){
-          wrapper.appendChild(createBox());
+          const box = createBox();
+          box.style.background = color;
+          box.textContent = `${position}-${i+1}`;
+          wrapper.appendChild(box);
         }
 
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-
-      // =========================
-      // ★ ダミーBOXに色とラベル追加
-      // =========================
-      const colorMap = {
-        topDummy:'#e0f7fa',
-        bottomDummy:'#fff3e0',
-        leftTopDummy:'#f1f8e9',
-        rightBottomDummy:'#f1f8e9',
-        leftBottomDummy:'#f1f8e9',
-        rightTopDummy:'#f1f8e9'
-      };
-
-      Object.keys(colorMap).forEach(id => {
-        const dummy = document.getElementById(id);
-        if(dummy){
-          const nav = dummy.querySelector(':scope > div') || dummy;
-          nav.querySelectorAll(':scope > div').forEach((box, idx) => {
-            box.style.background = colorMap[id];
-            const label = document.createElement('span');
-            label.textContent = `${id.replace('Dummy','')}-${idx+1}`;
-            label.style.fontSize = '10px';
-            label.style.marginLeft = '4px';
-            box.appendChild(label);
-          });
-        }
-      });
 
     });
 
@@ -419,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '1'); // 初
+        p.setAttribute('stroke-width', '1');
       });
 
       // =========================
@@ -428,9 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
-
         const gid = g.id;
-
         g.setAttribute('fill', '#ffffff');
         g.setAttribute('stroke', '#191970');
 
@@ -438,7 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
         }
-
       });
 
       // =========================
@@ -460,7 +425,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // 地域表示
       // =========================
       function showRegion(gid){
-
         currentGroup = gid;
 
         initialNav.style.display = 'none';
@@ -475,9 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g => g.style.display = 'none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
-          p.style.display = groupToPrefectures[gid].includes(p.id)
-            ? 'inline'
-            : 'none';
+          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
         });
 
         applyTransform(gid);
@@ -485,7 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function applyTransform(gid) {
-
         const group = svg.querySelector('#' + gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
@@ -504,35 +465,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
 
-        // 拡大時だけ線幅を細く
         prefGroup.querySelectorAll('path').forEach(p => {
           p.setAttribute('stroke-width', '0.3');
         });
-
       }
 
       function addPrefLabels(prefIds){
-
         svg.querySelectorAll('.pref-label').forEach(e => e.remove());
-
         prefIds.forEach(pid => {
-
           const p = prefGroup.querySelector(`#${pid}`);
-          if (!p) return;
-
+          if(!p) return;
           const bbox = p.getBBox();
-
           const cx = bbox.x + bbox.width / 2;
           const cy = bbox.y + bbox.height / 2;
 
           const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-
           text.setAttribute('x', cx);
           text.setAttribute('y', cy);
           text.setAttribute('text-anchor','middle');
           text.setAttribute('font-size','10');
           text.setAttribute('fill','#191970');
-
           text.textContent = prefNames[pid];
 
           svg.appendChild(text);
@@ -561,9 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 初期ナビ
       // =========================
       function createInitialNav(){
-
         const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
-
         const nav = document.createElement('div');
         nav.style.position = 'absolute';
         nav.style.top = '5px';
@@ -612,12 +562,14 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.gap = '4px';
 
         for(let i=0;i<5;i++){
-          nav.appendChild(createBox());
+          const box = createBox();
+          box.style.background = '#ccf';      // 薄い青
+          box.textContent = `Top-${i+1}`;     // ラベル
+          nav.appendChild(box);
         }
 
         wrapper.appendChild(nav);
         mapDiv.appendChild(wrapper);
-
         return wrapper;
       }
 
@@ -636,7 +588,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.zIndex = '10';
 
         for(let i=0;i<4;i++){
-          wrapper.appendChild(createBox());
+          const box = createBox();
+          box.style.background = '#cfc';      // 薄い緑
+          box.textContent = `Bottom-${i+1}`;  // ラベル
+          wrapper.appendChild(box);
         }
 
         mapDiv.appendChild(wrapper);
@@ -656,55 +611,36 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.zIndex = '10';
 
         const boxes = 3;
+        let color = '#fff';
 
         if(position === 'leftTop'){
           wrapper.style.top = '5px';
           wrapper.style.left = '5px';
+          color = '#fcc'; // 薄い赤
         } else if(position === 'rightBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.right = '5px';
+          color = '#fcf'; // 薄いピンク
         } else if(position === 'leftBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.left = '5px';
+          color = '#ffc'; // 薄い黄
         } else if(position === 'rightTop'){
           wrapper.style.top = '5px';
           wrapper.style.right = '5px';
+          color = '#cff'; // 薄い水色
         }
 
         for(let i=0;i<boxes;i++){
-          wrapper.appendChild(createBox());
+          const box = createBox();
+          box.style.background = color;
+          box.textContent = `${position}-${i+1}`;
+          wrapper.appendChild(box);
         }
 
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-
-      // =========================
-      // ★ ダミーBOXに色とラベル追加
-      // =========================
-      const colorMap = {
-        topDummy:'#e0f7fa',
-        bottomDummy:'#fff3e0',
-        leftTopDummy:'#f1f8e9',
-        rightBottomDummy:'#f1f8e9',
-        leftBottomDummy:'#f1f8e9',
-        rightTopDummy:'#f1f8e9'
-      };
-
-      Object.keys(colorMap).forEach(id => {
-        const dummy = document.getElementById(id);
-        if(dummy){
-          const nav = dummy.querySelector(':scope > div') || dummy;
-          nav.querySelectorAll(':scope > div').forEach((box, idx) => {
-            box.style.background = colorMap[id];
-            const label = document.createElement('span');
-            label.textContent = `${id.replace('Dummy','')}-${idx+1}`;
-            label.style.fontSize = '10px';
-            label.style.marginLeft = '4px';
-            box.appendChild(label);
-          });
-        }
-      });
 
     });
 
@@ -774,7 +710,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '1'); // 初
+        p.setAttribute('stroke-width', '1');
       });
 
       // =========================
@@ -783,9 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
-
         const gid = g.id;
-
         g.setAttribute('fill', '#ffffff');
         g.setAttribute('stroke', '#191970');
 
@@ -793,7 +727,6 @@ document.addEventListener('DOMContentLoaded', () => {
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
         }
-
       });
 
       // =========================
@@ -815,7 +748,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // 地域表示
       // =========================
       function showRegion(gid){
-
         currentGroup = gid;
 
         initialNav.style.display = 'none';
@@ -830,9 +762,7 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g => g.style.display = 'none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
-          p.style.display = groupToPrefectures[gid].includes(p.id)
-            ? 'inline'
-            : 'none';
+          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
         });
 
         applyTransform(gid);
@@ -840,7 +770,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function applyTransform(gid) {
-
         const group = svg.querySelector('#' + gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
@@ -859,35 +788,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
 
-        // 拡大時だけ線幅を細く
         prefGroup.querySelectorAll('path').forEach(p => {
           p.setAttribute('stroke-width', '0.3');
         });
-
       }
 
       function addPrefLabels(prefIds){
-
         svg.querySelectorAll('.pref-label').forEach(e => e.remove());
-
         prefIds.forEach(pid => {
-
           const p = prefGroup.querySelector(`#${pid}`);
-          if (!p) return;
-
+          if(!p) return;
           const bbox = p.getBBox();
-
           const cx = bbox.x + bbox.width / 2;
           const cy = bbox.y + bbox.height / 2;
 
           const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-
           text.setAttribute('x', cx);
           text.setAttribute('y', cy);
           text.setAttribute('text-anchor','middle');
           text.setAttribute('font-size','10');
           text.setAttribute('fill','#191970');
-
           text.textContent = prefNames[pid];
 
           svg.appendChild(text);
@@ -916,9 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // 初期ナビ
       // =========================
       function createInitialNav(){
-
         const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
-
         const nav = document.createElement('div');
         nav.style.position = 'absolute';
         nav.style.top = '5px';
@@ -967,12 +885,14 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.gap = '4px';
 
         for(let i=0;i<5;i++){
-          nav.appendChild(createBox());
+          const box = createBox();
+          box.style.background = '#ccf';      // 薄い青
+          box.textContent = `Top-${i+1}`;     // ラベル
+          nav.appendChild(box);
         }
 
         wrapper.appendChild(nav);
         mapDiv.appendChild(wrapper);
-
         return wrapper;
       }
 
@@ -991,7 +911,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.zIndex = '10';
 
         for(let i=0;i<4;i++){
-          wrapper.appendChild(createBox());
+          const box = createBox();
+          box.style.background = '#cfc';      // 薄い緑
+          box.textContent = `Bottom-${i+1}`;  // ラベル
+          wrapper.appendChild(box);
         }
 
         mapDiv.appendChild(wrapper);
@@ -1011,55 +934,36 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.zIndex = '10';
 
         const boxes = 3;
+        let color = '#fff';
 
         if(position === 'leftTop'){
           wrapper.style.top = '5px';
           wrapper.style.left = '5px';
+          color = '#fcc'; // 薄い赤
         } else if(position === 'rightBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.right = '5px';
+          color = '#fcf'; // 薄いピンク
         } else if(position === 'leftBottom'){
           wrapper.style.bottom = '5px';
           wrapper.style.left = '5px';
+          color = '#ffc'; // 薄い黄
         } else if(position === 'rightTop'){
           wrapper.style.top = '5px';
           wrapper.style.right = '5px';
+          color = '#cff'; // 薄い水色
         }
 
         for(let i=0;i<boxes;i++){
-          wrapper.appendChild(createBox());
+          const box = createBox();
+          box.style.background = color;
+          box.textContent = `${position}-${i+1}`;
+          wrapper.appendChild(box);
         }
 
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-
-      // =========================
-      // ★ ダミーBOXに色とラベル追加
-      // =========================
-      const colorMap = {
-        topDummy:'#e0f7fa',
-        bottomDummy:'#fff3e0',
-        leftTopDummy:'#f1f8e9',
-        rightBottomDummy:'#f1f8e9',
-        leftBottomDummy:'#f1f8e9',
-        rightTopDummy:'#f1f8e9'
-      };
-
-      Object.keys(colorMap).forEach(id => {
-        const dummy = document.getElementById(id);
-        if(dummy){
-          const nav = dummy.querySelector(':scope > div') || dummy;
-          nav.querySelectorAll(':scope > div').forEach((box, idx) => {
-            box.style.background = colorMap[id];
-            const label = document.createElement('span');
-            label.textContent = `${id.replace('Dummy','')}-${idx+1}`;
-            label.style.fontSize = '10px';
-            label.style.marginLeft = '4px';
-            box.appendChild(label);
-          });
-        }
-      });
 
     });
 
