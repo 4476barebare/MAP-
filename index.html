@@ -25,7 +25,10 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
 #map {
   position: relative;
   width: 100%;
-  min-height: 420px; /* ★これが重要 */
+  max-width: 900px;  /* 横幅制限 */
+  height: 420px;     /* 縦幅固定 */
+  overflow: hidden;  /* はみ出しを非表示 */
+  margin: 0 auto;    /* 中央揃え */
   z-index: 50;
 }
 
