@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
-  mapDiv.style.position = 'relative'; // ★ absolute基準
+
+  // ★ 地図基準にする
+  mapDiv.style.position = 'relative';
 
   fetch('japan.svg')
     .then(res => res.text())
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const prefNames = {
-        Hokkaido:'北海道', Aomori:'青森県', Iwate:'岩手県', Akita:'秋田県',
+        Aomori:'青森県', Iwate:'岩手県', Akita:'秋田県',
         Miyagi:'宮城県', Yamagata:'山形県', Fukushima:'福島県',
         Niigata:'新潟県', Gunma:'群馬県', Tochigi:'栃木県', Chiba:'千葉県',
         Ibaraki:'茨城県', Tokyo:'東京都', Saitama:'埼玉県', Kanagawa:'神奈川県',
@@ -78,8 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
-        } else {
-          g.style.cursor = 'default';
         }
 
       });
@@ -119,9 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addPrefLabels(groupToPrefectures[gid]);
       }
 
-      // =========================
-      // 拡大
-      // =========================
       function applyTransform(gid){
 
         const group = svg.querySelector('#' + gid);
@@ -139,13 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const tx = svgW/2 - cx * scale;
         const ty = svgH/2 - cy * scale;
 
-        svg.style.transition = 'transform 0.4s ease';
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
       }
 
-      // =========================
-      // 県名
-      // =========================
       function addPrefLabels(prefIds){
 
         svg.querySelectorAll('.pref-label').forEach(e => e.remove());
@@ -165,9 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
           text.setAttribute('x', cx);
           text.setAttribute('y', cy);
           text.setAttribute('text-anchor','middle');
-          text.setAttribute('class','pref-label');
-          text.setAttribute('font-size', '10');
-          text.setAttribute('fill', '#191970');
+          text.setAttribute('font-size','10');
+          text.setAttribute('fill','#191970');
 
           text.textContent = prefNames[pid];
 
@@ -176,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // BOX
+      // BOX共通
       // =========================
       function createBox(){
         const box = document.createElement('div');
@@ -202,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         nav.style.position = 'absolute';
         nav.style.top = '60px';
-        nav.style.left = '28px';
+        nav.style.left = '10px';
         nav.style.display = 'flex';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
@@ -228,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // 左右ダミー
+      // 左ダミー
       // =========================
       function createSideDummy(side){
 
@@ -238,12 +230,20 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.top = '60px';
         nav.style.display = 'none';
         nav.style.flexDirection = 'column';
-        nav.style.justifyContent = 'flex-start';
         nav.style.gap = '4px';
         nav.style.zIndex = '10';
 
-        if(side === 'left') nav.style.left = '28px';
-        if(side === 'right') nav.style.right = '28px';
+        if(side === 'left'){
+          nav.style.left = '10px';
+          nav.style.justifyContent = 'flex-start';
+        }
+
+        if(side === 'right'){
+          nav.style.right = '10px';
+          nav.style.bottom = '30px';
+          nav.style.top = 'auto';
+          nav.style.justifyContent = 'flex-end';
+        }
 
         for(let i=0;i<6;i++){
           nav.appendChild(createBox());
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const wrapper = document.createElement('div');
 
         wrapper.style.position = 'absolute';
-        wrapper.style.top = '60px';
+        wrapper.style.top = '50px';
         wrapper.style.left = '50%';
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
@@ -293,15 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const nav = document.createElement('div');
 
         nav.style.position = 'absolute';
-        nav.style.bottom = '10px';
+        nav.style.bottom = '30px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
 
         nav.style.display = 'none';
         nav.style.gap = '6px';
         nav.style.zIndex = '10';
-
-        nav.style.display = 'flex';
 
         for(let i=0;i<4;i++){
           nav.appendChild(createBox());
