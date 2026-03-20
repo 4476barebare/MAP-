@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // 地域設定
       // =========================
       const groupSettings = {
-        Path_2: { scale:6.7, x:145, y:45 },
-        Path_3: { scale:8.6, x:105, y:100 },
-        Path_4: { scale:10.1, x:55, y:110 },
-        Path_5: { scale:13.6, x:0, y:140 },
-        Path_6: { scale:9.5, x:-50, y:165 },
-        Path_7: { scale:11.2, x:-105, y:200 }
+        Path_2: { scale:3.4, x:190, y:110 },
+        Path_3: { scale:5.2, x:130, y:130 },
+        Path_4: { scale:5.6, x:90, y:140 },
+        Path_5: { scale:7, x:30, y:160 },
+        Path_6: { scale:4.8, x:0, y:200 },
+        Path_7: { scale:5.8, x:-60, y:220 }
       };
 
       const groupToPrefectures = {
@@ -62,8 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.setAttribute('fill', '#ffffff');
-        p.setAttribute('stroke', '#191970');
+        p.setAttribute('fill', '#34A853');    // Google 緑
+        p.setAttribute('stroke', '#F4B400');  // Google 黄色
         p.setAttribute('stroke-width', '1');
       });
 
@@ -74,8 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       allGroups.forEach(g => {
         const gid = g.id;
-        g.setAttribute('fill', '#ffffff');
-        g.setAttribute('stroke', '#191970');
+        g.setAttribute('fill', '#34A853');
+        g.setAttribute('stroke', '#F4B400');
 
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
@@ -114,6 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
+          p.setAttribute('fill', '#34A853');    // Google 緑
+          p.setAttribute('stroke', '#F4B400');  // Google 黄色
         });
 
         applyTransform(gid);
@@ -141,6 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         prefGroup.querySelectorAll('path').forEach(p => {
           p.setAttribute('stroke-width', '0.3');
+          p.setAttribute('fill', '#34A853');
+          p.setAttribute('stroke', '#F4B400');
         });
       }
 
@@ -309,67 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-
-      // =========================
-      // 拡大後調整コンソール（数値表示付き）
-      // =========================
-      function createAdjustConsole() {
-        const consoleDiv = document.createElement('div');
-        consoleDiv.style.position = 'absolute';
-        consoleDiv.style.bottom = '10px';
-        consoleDiv.style.right = '10px';
-        consoleDiv.style.background = 'rgba(255,255,255,0.9)';
-        consoleDiv.style.border = '1px solid #191970';
-        consoleDiv.style.padding = '6px';
-        consoleDiv.style.display = 'flex';
-        consoleDiv.style.flexDirection = 'column';
-        consoleDiv.style.gap = '4px';
-        consoleDiv.style.zIndex = '100';
-
-        const controls = [
-          { label: '↑', action: () => adjustGroup(0, -5, 0) },
-          { label: '↓', action: () => adjustGroup(0, 5, 0) },
-          { label: '←', action: () => adjustGroup(-5, 0, 0) },
-          { label: '→', action: () => adjustGroup(5, 0, 0) },
-          { label: '➕', action: () => adjustGroup(0, 0, 0.1) },
-          { label: '➖', action: () => adjustGroup(0, 0, -0.1) }
-        ];
-
-        controls.forEach(c => {
-          const btn = document.createElement('button');
-          btn.textContent = c.label;
-          btn.style.fontSize = '16px';
-          btn.style.cursor = 'pointer';
-          btn.onclick = c.action;
-          consoleDiv.appendChild(btn);
-        });
-
-        const statusDiv = document.createElement('div');
-        statusDiv.id = 'groupStatus';
-        statusDiv.style.fontSize = '12px';
-        statusDiv.style.color = '#191970';
-        statusDiv.textContent = 'x: 0, y: 0, scale: 1';
-        consoleDiv.appendChild(statusDiv);
-
-        mapDiv.appendChild(consoleDiv);
-      }
-
-      function adjustGroup(dx, dy, dscale) {
-        if (!currentGroup) return;
-        const s = groupSettings[currentGroup];
-        s.x += dx;
-        s.y += dy;
-        s.scale = Math.max(0.1, s.scale + dscale);
-        applyTransform(currentGroup);
-
-        const statusDiv = document.getElementById('groupStatus');
-        statusDiv.textContent = `x: ${s.x}, y: ${s.y}, scale: ${s.scale.toFixed(2)}`;
-      }
-
-      // =========================
-      // コンソール追加
-      // =========================
-      createAdjustConsole();
 
     });
 
