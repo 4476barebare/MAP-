@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
 
+  // 地図基準
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
 
@@ -10,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(svgText => {
 
       mapDiv.innerHTML = svgText;
+
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
 
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '1'); 
+        p.setAttribute('stroke-width', '1'); // 初期
       });
 
       // =========================
@@ -86,33 +88,36 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       const initialNav = createInitialNav();
 
+      // 4隅ダミー
+      const cornerLeftTop = createCornerDummy('左上', '#e0f0ff', 'cornerLeftTop');
+      const cornerRightTop = createCornerDummy('右上', '#ffe0e0', 'cornerRightTop');
+      const cornerLeftBottom = createCornerDummy('左下', '#e0ffe0', 'cornerLeftBottom');
+      const cornerRightBottom = createCornerDummy('右下', '#fff0e0', 'cornerRightBottom');
+
+      // 上下ダミー
       const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
-      const leftTopDummy = createCornerDummy('leftTop', '#d0f0d0');       // 薄緑
-      const rightBottomDummy = createCornerDummy('rightBottom', '#f0d0d0'); // 薄ピンク
-      const leftBottomDummy = createCornerDummy('leftBottom', '#e0d0f0');   // 薄紫
-      const rightTopDummy = createCornerDummy('rightTop', '#f0f0d0');       // 薄黄
 
       // =========================
       // 地域表示
       // =========================
       function showRegion(gid){
         currentGroup = gid;
+
         initialNav.style.display = 'none';
 
-        topDummy.style.display = 'block';
+        // 表示切替
+        cornerLeftTop.style.display = 'flex';
+        cornerRightTop.style.display = 'flex';
+        cornerLeftBottom.style.display = 'flex';
+        cornerRightBottom.style.display = 'flex';
+        topDummy.style.display = 'flex';
         bottomDummy.style.display = 'flex';
-        leftTopDummy.style.display = 'flex';
-        rightBottomDummy.style.display = 'flex';
-        leftBottomDummy.style.display = 'flex';
-        rightTopDummy.style.display = 'flex';
 
         allGroups.forEach(g => g.style.display = 'none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
-          p.style.display = groupToPrefectures[gid].includes(p.id)
-            ? 'inline'
-            : 'none';
+          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline' : 'none';
         });
 
         applyTransform(gid);
@@ -144,7 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function addPrefLabels(prefIds){
         svg.querySelectorAll('.pref-label').forEach(e => e.remove());
-
         prefIds.forEach(pid => {
           const p = prefGroup.querySelector(`#${pid}`);
           if (!p) return;
@@ -159,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
           text.setAttribute('text-anchor','middle');
           text.setAttribute('font-size','10');
           text.setAttribute('fill','#191970');
+          text.classList.add('pref-label');
           text.textContent = prefNames[pid];
 
           svg.appendChild(text);
@@ -168,10 +173,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       // BOX共通
       // =========================
-      function createBox(bgColor, labelText){
+      function createBox(color='#fff', label=''){
         const box = document.createElement('div');
         box.style.border = '1px solid #191970';
-        box.style.background = bgColor || '#fff';
+        box.style.background = color;
         box.style.height = '26px';
         box.style.minWidth = '80px';
         box.style.display = 'flex';
@@ -180,10 +185,13 @@ document.addEventListener('DOMContentLoaded', () => {
         box.style.fontSize = '13px';
         box.style.color = '#191970';
         box.style.boxShadow = '0 0 4px rgba(0,0,0,0.25)';
-        if(labelText) box.textContent = labelText;
+        if(label) box.textContent = label;
         return box;
       }
 
+      // =========================
+      // 初期ナビ
+      // =========================
       function createInitialNav(){
         const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav = document.createElement('div');
@@ -196,11 +204,13 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.zIndex = '10';
 
         names.forEach((name, i) => {
-          const box = createBox(null, name);
+          const box = createBox(undefined, name);
           if(i !== 0 && i !== 7){
             box.style.cursor = 'pointer';
             box.onclick = () => showRegion(`Path_${i+1}`);
-          } else box.style.opacity = '0.6';
+          } else {
+            box.style.opacity = '0.6';
+          }
           nav.appendChild(box);
         });
 
@@ -208,6 +218,34 @@ document.addEventListener('DOMContentLoaded', () => {
         return nav;
       }
 
+      // =========================
+      // 4隅ダミーBOX
+      // =========================
+      function createCornerDummy(position, color, id){
+        const wrapper = document.createElement('div');
+        wrapper.id = id;
+        wrapper.style.position = 'absolute';
+        wrapper.style.display = 'none';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '4px';
+        wrapper.style.zIndex = '10';
+
+        if(position==='左上'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
+        if(position==='右上'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
+        if(position==='左下'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
+        if(position==='右下'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
+
+        for(let i=0;i<3;i++){
+          wrapper.appendChild(createBox(color, position+(i+1)));
+        }
+
+        mapDiv.appendChild(wrapper);
+        return wrapper;
+      }
+
+      // =========================
+      // 上ダミー
+      // =========================
       function createTopDummy(){
         const wrapper = document.createElement('div');
         wrapper.id = 'topDummy';
@@ -217,14 +255,21 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
         wrapper.style.zIndex = '10';
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'row'; // 横並び
+        wrapper.style.gap = '4px';
 
         for(let i=0;i<5;i++){
-          wrapper.appendChild(createBox('#c0e0ff', 'Top'+(i+1)));
+          wrapper.appendChild(createBox('#c0e0ff','Top'+(i+1)));
         }
+
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
+      // =========================
+      // 下ダミー
+      // =========================
       function createBottomDummy(){
         const wrapper = document.createElement('div');
         wrapper.id = 'bottomDummy';
@@ -233,36 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.left = '50%';
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
-        wrapper.style.gap = '6px';
         wrapper.style.zIndex = '10';
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'row'; // 横並び
+        wrapper.style.gap = '6px';
 
         for(let i=0;i<4;i++){
-          wrapper.appendChild(createBox('#ffe0c0', 'Bottom'+(i+1)));
-        }
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
-
-      function createCornerDummy(position, color){
-        const wrapper = document.createElement('div');
-        wrapper.id = position+'Dummy';
-        wrapper.style.position = 'absolute';
-        wrapper.style.display = 'none';
-        wrapper.style.flexDirection = 'column';
-        wrapper.style.gap = '4px';
-        wrapper.style.zIndex = '10';
-
-        const posMap = {
-          leftTop: {top:'5px', left:'5px'},
-          rightBottom: {bottom:'5px', right:'5px'},
-          leftBottom: {bottom:'5px', left:'5px'},
-          rightTop: {top:'5px', right:'5px'}
-        };
-
-        Object.assign(wrapper.style, posMap[position]);
-
-        for(let i=0;i<3;i++){
-          wrapper.appendChild(createBox(color, position+'_'+(i+1)));
+          wrapper.appendChild(createBox('#ffe0c0','Bottom'+(i+1)));
         }
 
         mapDiv.appendChild(wrapper);
