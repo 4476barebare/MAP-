@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const wrapper = document.createElement('div');
         wrapper.style.position = 'absolute';
-        wrapper.style.top = '-25px';
+        wrapper.style.top = '-15px';
         wrapper.style.left = '50%';
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const nav = document.createElement('div');
         nav.style.position = 'absolute';
-        nav.style.bottom = '-25px';
+        nav.style.bottom = '-35px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
         nav.style.display = 'none';
