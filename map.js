@@ -121,13 +121,14 @@ document.addEventListener('DOMContentLoaded', () => {
         addPrefLabels(groupToPrefectures[gid]);
       }
 
-      function applyTransform(gid){
+      function applyTransform(gid) {
+
   const group = svg.querySelector('#' + gid);
   const bbox = group.getBBox();
   const s = groupSettings[gid];
 
-  const cx = bbox.x + bbox.width/2 + s.x;
-  const cy = bbox.y + bbox.height/2 + s.y;
+  const cx = bbox.x + bbox.width / 2 + s.x;
+  const cy = bbox.y + bbox.height / 2 + s.y;
 
   const scale = s.scale;
 
@@ -140,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const ty = (svg.clientHeight / 2) - cy * scale * displayScale;
 
   svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
-  
+
         // ★ 拡大時だけ線幅を細くする
     prefGroup.querySelectorAll('path').forEach(p => {
         p.setAttribute('stroke-width', '0.3'); // ここで細めに設定
