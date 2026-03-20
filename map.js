@@ -122,24 +122,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function applyTransform(gid){
+  const group = svg.querySelector('#' + gid);
+  const bbox = group.getBBox();
+  const s = groupSettings[gid];
 
-        const group = svg.querySelector('#' + gid);
-        const bbox = group.getBBox();
-        const s = groupSettings[gid];
+  const cx = bbox.x + bbox.width/2 + s.x;
+  const cy = bbox.y + bbox.height/2 + s.y;
 
-        const cx = bbox.x + bbox.width/2 + s.x;
-        const cy = bbox.y + bbox.height/2 + s.y;
+  const scale = s.scale;
 
-        const scale = s.scale;
+  // 表示幅に合わせた倍率を計算
+  const svgDisplayWidth = svg.clientWidth; // 現在の表示幅
+  const viewBoxWidth = svg.viewBox.baseVal.width;
+  const displayScale = svgDisplayWidth / viewBoxWidth;
 
-        const svgW = svg.viewBox.baseVal.width;
-        const svgH = svg.viewBox.baseVal.height;
+  const tx = (svgDisplayWidth / 2) - cx * scale * displayScale;
+  const ty = (svg.clientHeight / 2) - cy * scale * displayScale;
 
-        const tx = svgW/2 - cx * scale;
-        const ty = svgH/2 - cy * scale;
-
-        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-        
+  svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
+  
         // ★ 拡大時だけ線幅を細くする
     prefGroup.querySelectorAll('path').forEach(p => {
         p.setAttribute('stroke-width', '0.3'); // ここで細めに設定
