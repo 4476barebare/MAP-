@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
 
+  // 地図基準
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
 
@@ -20,15 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
 
       // =========================
-      // 地域設定（そのまま維持）
+      // 地域設定（成功テイクそのまま）
       // =========================
       const groupSettings = {
-        Path_2: { scale:3.4, x:190, y:110 },
-        Path_3: { scale:5.2, x:130, y:130 },
-        Path_4: { scale:5.6, x:90, y:140 },
-        Path_5: { scale:7, x:30, y:160 },
-        Path_6: { scale:4.8, x:0, y:200 },
-        Path_7: { scale:5.8, x:-60, y:220 }
+        Path_2: { scale:6.7, x:145, y:45 },
+        Path_3: { scale:8.6, x:105, y:100 },
+        Path_4: { scale:10.1, x:55, y:110 },
+        Path_5: { scale:13.6, x:0, y:140 },
+        Path_6: { scale:9.5, x:-50, y:165 },
+        Path_7: { scale:11.2, x:-105, y:200 }
       };
 
       const groupToPrefectures = {
@@ -61,8 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.setAttribute('fill', '#34A853');
-        p.setAttribute('stroke', '#F4B400');
+        p.setAttribute('fill', '#ffffff');
+        p.setAttribute('stroke', '#191970');
         p.setAttribute('stroke-width', '1');
       });
 
@@ -73,8 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       allGroups.forEach(g => {
         const gid = g.id;
-        g.setAttribute('fill', '#34A853');
-        g.setAttribute('stroke', '#F4B400');
+        g.setAttribute('fill', '#ffffff');
+        g.setAttribute('stroke', '#191970');
 
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
@@ -82,7 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
+      // =========================
+      // UI生成（ダミーBOXそのまま）
+      // =========================
       const initialNav = createInitialNav();
+
       const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
       const leftTopDummy = createCornerDummy('leftTop');
@@ -116,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // ★ 修正済み（ここが重要）
+      // ★成功テイクの核心（絶対変更禁止）
       // =========================
       function applyTransform(gid) {
         const group = svg.querySelector('#' + gid);
@@ -126,11 +131,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const cx = bbox.x + bbox.width / 2 + s.x;
         const cy = bbox.y + bbox.height / 2 + s.y;
 
-        const tx = (svg.clientWidth / 2) - cx * s.scale;
-        const ty = (svg.clientHeight / 2) - cy * s.scale;
+        const scale = s.scale;
 
-        // ← ここが修正ポイント（displayScale削除）
-        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${s.scale})`;
+        const svgDisplayWidth = svg.clientWidth;
+        const viewBoxWidth = svg.viewBox.baseVal.width;
+        const displayScale = svgDisplayWidth / viewBoxWidth;
+
+        const tx = (svgDisplayWidth / 2) - cx * scale * displayScale;
+        const ty = (svg.clientHeight / 2) - cy * scale * displayScale;
+
+        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
 
         prefGroup.querySelectorAll('path').forEach(p => {
           p.setAttribute('stroke-width', '0.3');
@@ -159,7 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // UI系はそのまま
+      // =========================
+      // UI共通
+      // =========================
       function createBox(){
         const box = document.createElement('div');
         box.style.border = '1px solid #191970';
@@ -213,6 +225,20 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display = 'none';
         wrapper.style.zIndex = '10';
 
+        const nav = document.createElement('div');
+        nav.style.display = 'flex';
+        nav.style.flexWrap = 'wrap';
+        nav.style.width = '340px';
+        nav.style.gap = '4px';
+
+        for(let i=0;i<5;i++){
+          const box = createBox();
+          box.style.background = '#ccf';
+          box.textContent = `Top-${i+1}`;
+          nav.appendChild(box);
+        }
+
+        wrapper.appendChild(nav);
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -224,15 +250,55 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.left = '50%';
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
+        wrapper.style.gap = '6px';
         wrapper.style.zIndex = '10';
+
+        for(let i=0;i<4;i++){
+          const box = createBox();
+          box.style.background = '#cfc';
+          box.textContent = `Bottom-${i+1}`;
+          wrapper.appendChild(box);
+        }
 
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
-      function createCornerDummy(){
+      function createCornerDummy(position){
         const wrapper = document.createElement('div');
+        wrapper.style.position = 'absolute';
         wrapper.style.display = 'none';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '4px';
+        wrapper.style.zIndex = '10';
+
+        let color = '#fff';
+
+        if(position === 'leftTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.left = '5px';
+          color = '#fcc';
+        } else if(position === 'rightBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.right = '5px';
+          color = '#fcf';
+        } else if(position === 'leftBottom'){
+          wrapper.style.bottom = '5px';
+          wrapper.style.left = '5px';
+          color = '#ffc';
+        } else if(position === 'rightTop'){
+          wrapper.style.top = '5px';
+          wrapper.style.right = '5px';
+          color = '#cff';
+        }
+
+        for(let i=0;i<3;i++){
+          const box = createBox();
+          box.style.background = color;
+          box.textContent = `${position}-${i+1}`;
+          wrapper.appendChild(box);
+        }
+
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
