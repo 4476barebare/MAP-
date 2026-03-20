@@ -8,50 +8,78 @@
 <link rel="stylesheet" href="header.css">
 <!-- コンテンツ用 CSS -->
 <style>
+/* html・bodyの余白を消す */
 html, body {
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-  background:#fff;
-  color:#333;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background: #fff;
+  color: #333;
   overflow-x: hidden;
 }
-main { max-width:1100px; margin:auto; padding:20px; }
-.map { text-align:center; }
-.japan-map { width:100%; max-width:900px; margin:0 auto; }
-.japan-map svg { width:100%; height:auto; }
-.ad { text-align:center; margin:20px 0; color:#999; }
-footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color:#777; border-top:1px solid #ddd; }
 
+/* main全体は中央揃えだが余白ゼロ */
+main {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Map全体 */
+.map {
+  text-align: center;
+}
+
+/* SVGラップ */
+.japan-map {
+  width: 100%;
+  max-width: 100%;  /* 横幅制限なし */
+  margin: 0;
+}
+
+/* SVG自体 */
 #map {
   position: relative;
-  width: 100%;       /* 親コンテナいっぱいに広がる */
-  max-width: 100%;  /* 最大幅を制限 */
-  margin: 0 auto;    /* 中央揃え */
-  min-height: 420px; /* 高さは確保 */
-  overflow: hidden;  /* はみ出し防止 */
+  width: 100%;
+  min-height: 420px;
+  overflow: hidden; /* はみ出し防止 */
   z-index: 50;
 }
 
 #map svg {
-  width: 100%;       /* 横幅可変 */
+  width: 100%;
   height: auto;
   display: block;
   position: relative;
   z-index: 1;
 }
 
+/* 県境の線を滑らかに */
 #map svg path {
-  stroke-linejoin: round; /* 角を丸く */
-  stroke-linecap: round;  /* 線端も丸く */
-  vector-effect: non-scaling-stroke; /* 拡大しても線幅一定 */
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
-
-#map > div {   /* ダミーBOXや初期ナビ */
-  z-index: 10; /* ここは JS 側と合わせる */
+/* ダミーBOXや初期ナビ */
+#map > div {
+  z-index: 10;
 }
 
-
+/* 広告・footer */
+.ad {
+  text-align: center;
+  margin: 20px 0;
+  color: #999;
+}
+footer {
+  margin-top: 40px;
+  padding: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #777;
+  border-top: 1px solid #ddd;
+}
 </style>
 </head>
 <body>
@@ -86,7 +114,7 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
 <div class="ad">広告スペース</div>
 <footer>© 釣り行こNAVI</footer>
 
-<!-- ニュースオーバーレイは header.js が制御 -->
+<!-- ニュースオーバーレイ -->
 <div id="newsOverlay">
   <div class="news-window">
     <button id="closeNews">閉じる</button>
@@ -94,9 +122,8 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
   </div>
 </div>
 
-<!-- ヘッダー JS -->
+<!-- JS -->
 <script src="header.js"></script>
-<!-- 地図処理 JS -->
 <script src="map.js"></script>
 
 </body>
