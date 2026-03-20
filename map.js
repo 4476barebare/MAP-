@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
+
+  // 地図基準
   mapDiv.style.position = 'relative';
 
   fetch('japan.svg')
@@ -12,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
 
+      svg.style.shapeRendering = 'geometricPrecision';
       svg.style.transformOrigin = 'center center';
 
       let currentGroup = null;
@@ -58,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.setAttribute('fill', '#fff');
+        p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
       });
 
@@ -68,15 +71,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
+
         const gid = g.id;
 
-        g.setAttribute('fill', '#fff');
+        g.setAttribute('fill', '#ffffff');
         g.setAttribute('stroke', '#191970');
 
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
         }
+
       });
 
       // =========================
@@ -112,11 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
-
-        adjustDummyPosition(); // ★ここが今回の核
       }
 
       function applyTransform(gid){
+
         const group = svg.querySelector('#' + gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
@@ -146,8 +150,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const bbox = p.getBBox();
 
-          const cx = bbox.x + bbox.width/2;
-          const cy = bbox.y + bbox.height/2;
+          const cx = bbox.x + bbox.width / 2;
+          const cy = bbox.y + bbox.height / 2;
 
           const text = document.createElementNS('http://www.w3.org/2000/svg','text');
 
@@ -164,29 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // SVG基準位置調整（重要）
-      // =========================
-      function adjustDummyPosition(){
-
-        requestAnimationFrame(() => {
-
-          const svgRect = svg.getBoundingClientRect();
-          const mapRect = mapDiv.getBoundingClientRect();
-
-          // 上
-          topDummy.style.top =
-            (svgRect.top - mapRect.top + 4) + 'px';
-
-          // 下
-          bottomDummy.style.top =
-            (svgRect.bottom - mapRect.top - 12) + 'px';
-
-          bottomDummy.style.bottom = 'auto';
-        });
-      }
-
-      // =========================
-      // BOX
+      // BOX共通
       // =========================
       function createBox(){
         const box = document.createElement('div');
@@ -216,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.display = 'flex';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
+        nav.style.zIndex = '10';
 
         names.forEach((name, i) => {
 
@@ -236,23 +219,28 @@ document.addEventListener('DOMContentLoaded', () => {
         return nav;
       }
 
+      // =========================
+      // 左右ダミー
+      // =========================
       function createSideDummy(side){
 
         const nav = document.createElement('div');
-
         nav.style.position = 'absolute';
         nav.style.display = 'none';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
+        nav.style.zIndex = '10';
 
         if(side === 'left'){
           nav.style.top = '60px';
-          nav.style.left = '10px';
+          nav.style.left = '5px';
+          nav.style.justifyContent = 'flex-start';
         }
 
         if(side === 'right'){
-          nav.style.right = '10px';
-          nav.style.bottom = '30px';
+          nav.style.bottom = '5px';
+          nav.style.right = '5px';
+          nav.style.justifyContent = 'flex-end';
         }
 
         for(let i=0;i<6;i++){
@@ -263,19 +251,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return nav;
       }
 
+      // =========================
+      // 上ダミー
+      // =========================
       function createTopDummy(){
 
         const wrapper = document.createElement('div');
-
         wrapper.style.position = 'absolute';
+        wrapper.style.top = '5px';
         wrapper.style.left = '50%';
         wrapper.style.transform = 'translateX(-50%)';
         wrapper.style.display = 'none';
+        wrapper.style.zIndex = '10';
 
         const nav = document.createElement('div');
-
         nav.style.display = 'flex';
         nav.style.flexWrap = 'wrap';
+        nav.style.justifyContent = 'flex-start';
         nav.style.width = '340px';
         nav.style.gap = '4px';
 
@@ -289,15 +281,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
+      // =========================
+      // 下ダミー
+      // =========================
       function createBottomDummy(){
 
         const nav = document.createElement('div');
-
         nav.style.position = 'absolute';
+        nav.style.bottom = '5px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
         nav.style.display = 'none';
         nav.style.gap = '6px';
+        nav.style.zIndex = '10';
 
         for(let i=0;i<4;i++){
           nav.appendChild(createBox());
