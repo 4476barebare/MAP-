@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // ★ 拡大時だけ線幅を細くする
     prefGroup.querySelectorAll('path').forEach(p => {
-        p.setAttribute('stroke-width', '0.6'); // ここで細めに設定
+        p.setAttribute('stroke-width', '0.3'); // ここで細めに設定
     });
         
       }
