@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
 
-  // 地図基準
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
 
@@ -33,7 +32,19 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       // =========================
-      // BOX表示設定（そのまま）
+      // ★ 県表示（復活）
+      // =========================
+      const groupToPrefectures = {
+        Path_2:['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
+        Path_3:['Niigata','Gunma','Tochigi','Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'],
+        Path_4:['Shizuoka','Yamanashi','Nagano','Ishikawa','Toyama','Gifu','Aichi'],
+        Path_5:['Mie','Nara','Wakayama','Osaka','Shiga','Kyoto','Hyogo'],
+        Path_6:['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi','Tokushima','Kagawa','Kochi','Ehime'],
+        Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
+      };
+
+      // =========================
+      // BOX設定（そのまま）
       // =========================
       const groupBoxSettings = {
         Path_2: { leftTop:[0,1,2], rightBottom:[0,1,2] },
@@ -45,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       // =========================
-      // ★ BOX → 県（ID＋表示名）
+      // BOX→県
       // =========================
       const boxToPrefecture = {
         Path_2: {
@@ -106,35 +117,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      // =========================
-      // 共通処理
-      // =========================
       function selectPref(prefId){
         console.log('選択:', prefId);
       }
 
-      // =========================
-      // 初期：県非表示
-      // =========================
+      // 初期
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '1');
 
-        // ★ 県クリック統一
-        p.addEventListener('click', () => {
-          selectPref(p.id);
-        });
+        p.addEventListener('click', () => selectPref(p.id));
       });
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
         const gid = g.id;
-        g.setAttribute('fill', '#ffffff');
-        g.setAttribute('stroke', '#191970');
-
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
@@ -142,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const initialNav = createInitialNav();
-
       const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
       const leftTopDummy = createCornerDummy('leftTop');
@@ -151,47 +149,40 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightTopDummy = createCornerDummy('rightTop');
 
       function hideAllBoxes(){
-        [topDummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
-          .forEach(wrapper => {
-            wrapper.style.display = 'none';
-            Array.from(wrapper.children).forEach(c => c.style.display = 'none');
-          });
+        [topDummy,bottomDummy,leftTopDummy,rightBottomDummy,leftBottomDummy,rightTopDummy]
+        .forEach(w=>{
+          w.style.display='none';
+          Array.from(w.children).forEach(c=>c.style.display='none');
+        });
       }
 
       function showBoxes(gid){
         const setting = groupBoxSettings[gid];
         if(!setting) return;
 
-        Object.keys(setting).forEach(pos => {
+        Object.keys(setting).forEach(pos=>{
           let wrapper;
+          if(pos==='top') wrapper=topDummy;
+          if(pos==='bottom') wrapper=bottomDummy;
+          if(pos==='leftTop') wrapper=leftTopDummy;
+          if(pos==='rightBottom') wrapper=rightBottomDummy;
+          if(pos==='leftBottom') wrapper=leftBottomDummy;
+          if(pos==='rightTop') wrapper=rightTopDummy;
 
-          if(pos === 'top') wrapper = topDummy;
-          if(pos === 'bottom') wrapper = bottomDummy;
-          if(pos === 'leftTop') wrapper = leftTopDummy;
-          if(pos === 'rightBottom') wrapper = rightBottomDummy;
-          if(pos === 'leftBottom') wrapper = leftBottomDummy;
-          if(pos === 'rightTop') wrapper = rightTopDummy;
+          wrapper.style.display='flex';
 
-          if(!wrapper) return;
-
-          wrapper.style.display = 'flex';
-
-          setting[pos].forEach(i => {
-            if(wrapper.children[i]){
-              wrapper.children[i].style.display = 'flex';
-            }
+          setting[pos].forEach(i=>{
+            wrapper.children[i].style.display='flex';
           });
         });
 
-        // ★ BOXに県名セット
         const mapping = boxToPrefecture[gid];
         if(mapping){
-          Object.keys(mapping).forEach(boxId => {
+          Object.keys(mapping).forEach(boxId=>{
             const box = mapDiv.querySelector(`[data-box-id="${boxId}"]`);
             if(box){
-              const data = mapping[boxId];
-              box.textContent = data.name;
-              box.dataset.prefId = data.id;
+              box.textContent = mapping[boxId].name;
+              box.dataset.prefId = mapping[boxId].id;
             }
           });
         }
@@ -205,78 +196,63 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAllBoxes();
         showBoxes(gid);
 
-        allGroups.forEach(g => g.style.display = 'none');
+        allGroups.forEach(g=>g.style.display='none');
+
+        // ★復活
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.style.display = groupToPrefectures[gid].includes(p.id) ? 'inline':'none';
+        });
 
         applyTransform(gid);
       }
 
-      function applyTransform(gid) {
-        const group = svg.querySelector('#' + gid);
+      function applyTransform(gid){
+        const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
 
-        const cx = bbox.x + bbox.width / 2 + s.x;
-        const cy = bbox.y + bbox.height / 2 + s.y;
+        const cx = bbox.x + bbox.width/2 + s.x;
+        const cy = bbox.y + bbox.height/2 + s.y;
 
         const scale = s.scale;
+        const displayScale = svg.clientWidth / svg.viewBox.baseVal.width;
 
-        const svgDisplayWidth = svg.clientWidth;
-        const viewBoxWidth = svg.viewBox.baseVal.width;
-        const displayScale = svgDisplayWidth / viewBoxWidth;
+        const tx = (svg.clientWidth/2) - cx*scale*displayScale;
+        const ty = (svg.clientHeight/2) - cy*scale*displayScale;
 
-        const tx = (svgDisplayWidth / 2) - cx * scale * displayScale;
-        const ty = (svg.clientHeight / 2) - cy * scale * displayScale;
-
-        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale * displayScale})`;
+        svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale*displayScale})`;
       }
 
-      // =========================
-      // UI
-      // =========================
       function createBox(){
-        const box = document.createElement('div');
-        box.style.border = '1px solid #191970';
-        box.style.background = '#fff';
-        box.style.height = '26px';
-        box.style.width = '88px'; // ★固定幅
-        box.style.display = 'flex';
-        box.style.alignItems = 'center';
-        box.style.justifyContent = 'center';
-        box.style.fontSize = '13px';
-        box.style.color = '#191970';
-        box.style.boxShadow = '0 0 4px rgba(0,0,0,0.25)';
+        const box=document.createElement('div');
+        box.style.border='1px solid #191970';
+        box.style.height='26px';
+        box.style.width='88px';
+        box.style.display='flex';
+        box.style.alignItems='center';
+        box.style.justifyContent='center';
 
-        // ★ BOXクリック統一
-        box.addEventListener('click', () => {
-          const prefId = box.dataset.prefId;
-          if(prefId) selectPref(prefId);
+        box.addEventListener('click',()=>{
+          if(box.dataset.prefId) selectPref(box.dataset.prefId);
         });
 
         return box;
       }
 
       function createInitialNav(){
-        const names = ['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
-        const nav = document.createElement('div');
-        nav.style.position = 'absolute';
-        nav.style.top = '5px';
-        nav.style.left = '5px';
-        nav.style.display = 'flex';
-        nav.style.flexDirection = 'column';
-        nav.style.gap = '4px';
-        nav.style.zIndex = '10';
+        const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
+        const nav=document.createElement('div');
+        nav.style.position='absolute';
+        nav.style.top='5px';
+        nav.style.left='5px';
+        nav.style.display='flex';
+        nav.style.flexDirection='column';
+        nav.style.gap='4px';
 
-        names.forEach((name, i) => {
-          const box = createBox();
-          box.textContent = name;
-
-          if(i !== 0 && i !== 7){
-            box.style.cursor = 'pointer';
-            box.onclick = () => showRegion(`Path_${i+1}`);
-          } else {
-            box.style.opacity = '0.6';
-          }
-
+        names.forEach((name,i)=>{
+          const box=createBox();
+          box.textContent=name;
+          if(i!==0&&i!==7) box.onclick=()=>showRegion(`Path_${i+1}`);
           nav.appendChild(box);
         });
 
@@ -285,72 +261,66 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function createTopDummy(){
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'absolute';
-        wrapper.style.top = '5px';
-        wrapper.style.left = '50%';
-        wrapper.style.transform = 'translateX(-50%)';
-        wrapper.style.display = 'none';
-        wrapper.style.zIndex = '10';
+        const w=document.createElement('div');
+        w.style.position='absolute';
+        w.style.top='5px';
+        w.style.left='50%';
+        w.style.transform='translateX(-50%)';
+        w.style.display='none';
 
-        const nav = document.createElement('div');
-        nav.style.display = 'flex';
-        nav.style.flexWrap = 'wrap';
-        nav.style.width = '340px';
-        nav.style.gap = '4px';
+        const nav=document.createElement('div');
+        nav.style.display='flex';
+        nav.style.flexWrap='wrap';
+        nav.style.width='340px';
 
         for(let i=0;i<5;i++){
-          const box = createBox();
-          box.dataset.boxId = `top-${i+1}`;
-          nav.appendChild(box);
+          const b=createBox();
+          b.dataset.boxId=`top-${i+1}`;
+          nav.appendChild(b);
         }
 
-        wrapper.appendChild(nav);
-        mapDiv.appendChild(wrapper);
-        return wrapper;
+        w.appendChild(nav);
+        mapDiv.appendChild(w);
+        return w;
       }
 
       function createBottomDummy(){
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'absolute';
-        wrapper.style.bottom = '5px';
-        wrapper.style.left = '50%';
-        wrapper.style.transform = 'translateX(-50%)';
-        wrapper.style.display = 'none';
-        wrapper.style.gap = '6px';
-        wrapper.style.zIndex = '10';
+        const w=document.createElement('div');
+        w.style.position='absolute';
+        w.style.bottom='5px';
+        w.style.left='50%';
+        w.style.transform='translateX(-50%)';
+        w.style.display='none';
 
         for(let i=0;i<4;i++){
-          const box = createBox();
-          box.dataset.boxId = `bottom-${i+1}`;
-          wrapper.appendChild(box);
+          const b=createBox();
+          b.dataset.boxId=`bottom-${i+1}`;
+          w.appendChild(b);
         }
 
-        mapDiv.appendChild(wrapper);
-        return wrapper;
+        mapDiv.appendChild(w);
+        return w;
       }
 
-      function createCornerDummy(position){
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'absolute';
-        wrapper.style.display = 'none';
-        wrapper.style.flexDirection = 'column';
-        wrapper.style.gap = '4px';
-        wrapper.style.zIndex = '10';
+      function createCornerDummy(pos){
+        const w=document.createElement('div');
+        w.style.position='absolute';
+        w.style.display='none';
+        w.style.flexDirection='column';
 
-        if(position === 'leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
-        if(position === 'rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
-        if(position === 'leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
-        if(position === 'rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
+        if(pos==='leftTop'){ w.style.top='5px'; w.style.left='5px'; }
+        if(pos==='rightBottom'){ w.style.bottom='5px'; w.style.right='5px'; }
+        if(pos==='leftBottom'){ w.style.bottom='5px'; w.style.left='5px'; }
+        if(pos==='rightTop'){ w.style.top='5px'; w.style.right='5px'; }
 
         for(let i=0;i<5;i++){
-          const box = createBox();
-          box.dataset.boxId = `${position}-${i+1}`;
-          wrapper.appendChild(box);
+          const b=createBox();
+          b.dataset.boxId=`${pos}-${i+1}`;
+          w.appendChild(b);
         }
 
-        mapDiv.appendChild(wrapper);
-        return wrapper;
+        mapDiv.appendChild(w);
+        return w;
       }
 
     });
