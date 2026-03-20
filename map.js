@@ -32,6 +32,36 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7: { scale:11.2, x:-105, y:200 }
       };
 
+      // =========================
+      // ダミーBOX表示設定（追加）
+      // =========================
+      const groupBoxSettings = {
+        Path_2: {
+          leftTop: [0,1,2],
+          rightBottom: [0,1,2]
+        },
+        Path_3: {
+          rightTop: [0,1,2],
+          leftBottom: [0,1,2,3,4]
+        },
+        Path_4: {
+          rightTop: [0,1,2],
+          leftBottom: [0,1,2,3]
+        },
+        Path_5: {
+          rightTop: [0,1],
+          leftBottom: [0,1,2,3,4]
+        },
+        Path_6: {
+          top: [0,1,2,3,4],
+          bottom: [0,1,2,3]
+        },
+        Path_7: {
+          rightTop: [0,1,2],
+          rightBottom: [0,1,2,3]
+        }
+      };
+
       const groupToPrefectures = {
         Path_2:['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
         Path_3:['Niigata','Gunma','Tochigi','Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'],
@@ -84,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // =========================
-      // UI生成（ダミーBOXそのまま）
+      // UI生成（成功テイクそのまま）
       // =========================
       const initialNav = createInitialNav();
 
@@ -96,6 +126,43 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightTopDummy = createCornerDummy('rightTop');
 
       // =========================
+      // BOX制御（追加）
+      // =========================
+      function hideAllBoxes(){
+        [topDummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
+          .forEach(wrapper => {
+            wrapper.style.display = 'none';
+            Array.from(wrapper.children).forEach(c => c.style.display = 'none');
+          });
+      }
+
+      function showBoxes(gid){
+        const setting = groupBoxSettings[gid];
+        if(!setting) return;
+
+        Object.keys(setting).forEach(pos => {
+          let wrapper;
+
+          if(pos === 'top') wrapper = topDummy;
+          if(pos === 'bottom') wrapper = bottomDummy;
+          if(pos === 'leftTop') wrapper = leftTopDummy;
+          if(pos === 'rightBottom') wrapper = rightBottomDummy;
+          if(pos === 'leftBottom') wrapper = leftBottomDummy;
+          if(pos === 'rightTop') wrapper = rightTopDummy;
+
+          if(!wrapper) return;
+
+          wrapper.style.display = 'flex';
+
+          setting[pos].forEach(i => {
+            if(wrapper.children[i]){
+              wrapper.children[i].style.display = 'flex';
+            }
+          });
+        });
+      }
+
+      // =========================
       // 地域表示
       // =========================
       function showRegion(gid){
@@ -103,12 +170,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         initialNav.style.display = 'none';
 
-        topDummy.style.display = 'flex';
-        bottomDummy.style.display = 'flex';
-        leftTopDummy.style.display = 'flex';
-        rightBottomDummy.style.display = 'flex';
-        leftBottomDummy.style.display = 'flex';
-        rightTopDummy.style.display = 'flex';
+        // ★ここだけ変更
+        hideAllBoxes();
+        showBoxes(gid);
 
         allGroups.forEach(g => g.style.display = 'none');
 
@@ -120,9 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addPrefLabels(groupToPrefectures[gid]);
       }
 
-      // =========================
-      // ★成功テイクの核心（絶対変更禁止）
-      // =========================
       function applyTransform(gid) {
         const group = svg.querySelector('#' + gid);
         const bbox = group.getBBox();
@@ -152,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
         prefIds.forEach(pid => {
           const p = prefGroup.querySelector(`#${pid}`);
           if(!p) return;
-
           const bbox = p.getBBox();
           const cx = bbox.x + bbox.width / 2;
           const cy = bbox.y + bbox.height / 2;
@@ -170,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // UI共通
+      // 以下 UI系（完全据え置き）
       // =========================
       function createBox(){
         const box = document.createElement('div');
@@ -218,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createTopDummy(){
         const wrapper = document.createElement('div');
+        wrapper.id = 'topDummy';
         wrapper.style.position = 'absolute';
         wrapper.style.top = '5px';
         wrapper.style.left = '50%';
@@ -228,6 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nav = document.createElement('div');
         nav.style.display = 'flex';
         nav.style.flexWrap = 'wrap';
+        nav.style.justifyContent = 'flex-start';
         nav.style.width = '340px';
         nav.style.gap = '4px';
 
@@ -245,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createBottomDummy(){
         const wrapper = document.createElement('div');
+        wrapper.id = 'bottomDummy';
         wrapper.style.position = 'absolute';
         wrapper.style.bottom = '5px';
         wrapper.style.left = '50%';
@@ -266,12 +329,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createCornerDummy(position){
         const wrapper = document.createElement('div');
+        wrapper.id = position + 'Dummy';
         wrapper.style.position = 'absolute';
         wrapper.style.display = 'none';
         wrapper.style.flexDirection = 'column';
         wrapper.style.gap = '4px';
         wrapper.style.zIndex = '10';
 
+        const boxes = 5;
         let color = '#fff';
 
         if(position === 'leftTop'){
@@ -292,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
           color = '#cff';
         }
 
-        for(let i=0;i<3;i++){
+        for(let i=0;i<boxes;i++){
           const box = createBox();
           box.style.background = color;
           box.textContent = `${position}-${i+1}`;
