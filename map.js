@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
 
       // =========================
-      // 地域設定
+      // 地域設定（北海道・沖縄なし）
       // =========================
       const groupSettings = {
         Path_2: { scale:3.4, x:190, y:110 },
@@ -42,33 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
       // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.setAttribute('fill', '#fff');
+        p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
+        p.style.vectorEffect = 'non-scaling-stroke';
       });
 
       // =========================
-      // ★ SVGクリック完全制御
+      // 地域クリック設定
       // =========================
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
 
-        // 全部一旦クリック無効化
-        g.replaceWith(g.cloneNode(true));
-
-      });
-
-      // 再取得（cloneしたので）
-      const newGroups = svg.querySelectorAll('[id^="Path_"]');
-
-      newGroups.forEach(g => {
-
         const gid = g.id;
 
-        g.setAttribute('fill', '#fff');
+        g.setAttribute('fill', '#ffffff');
         g.setAttribute('stroke', '#191970');
+        g.style.vectorEffect = 'non-scaling-stroke';
 
-        // 有効なグループだけクリック付与
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
 
@@ -77,38 +68,40 @@ document.addEventListener('DOMContentLoaded', () => {
           });
 
         } else {
-          // 北海道・沖縄はクリック無効
+          // 北海道・沖縄 → 無効
           g.style.cursor = 'default';
+          g.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
         }
 
       });
 
       // =========================
-      // UI生成（先に作る）
+      // UI生成（先に）
       // =========================
-
       const initialNav = createInitialNav();
       const leftDummy = createSideDummy('left');
       const rightDummy = createSideDummy('right');
       const bottomDummy = createBottomDummy();
 
       // =========================
-      // 表示処理
+      // 地域表示
       // =========================
       function showRegion(gid){
 
         currentGroup = gid;
 
-        // ★ 初期BOX消す
+        // 初期BOX消す
         initialNav.style.display = 'none';
 
-        // ★ ダミー表示
+        // ダミー表示
         leftDummy.style.display = 'flex';
         rightDummy.style.display = 'flex';
         bottomDummy.style.display = 'flex';
 
         // 地域非表示
-        newGroups.forEach(g => g.style.display = 'none');
+        allGroups.forEach(g => g.style.display = 'none');
 
         // 県表示
         prefGroup.querySelectorAll('path').forEach(p => {
@@ -120,7 +113,11 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTransform(gid);
       }
 
+      // =========================
+      // 拡大処理
+      // =========================
       function applyTransform(gid){
+
         const group = svg.querySelector('#' + gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
@@ -136,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tx = svgW/2 - cx * scale;
         const ty = svgH/2 - cy * scale;
 
+        svg.style.transition = 'transform 0.4s ease';
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
       }
 
@@ -156,20 +154,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
 
         const nav = document.createElement('div');
+
         nav.style.position = 'fixed';
         nav.style.top = '60px';
-        nav.style.left = '24px';
+        nav.style.left = '28px';
         nav.style.display = 'flex';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
+        nav.style.zIndex = '10';
 
         regionList.forEach(r => {
-          const box = document.createElement('div');
+
+          const box = createBox();
           box.textContent = r.name;
-          box.style.border = '1px solid #191970';
-          box.style.padding = '4px';
-          box.style.textAlign = 'center';
-          box.style.background = '#fff';
 
           if(r.active){
             box.style.cursor = 'pointer';
@@ -186,27 +183,44 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
-      // ダミー
+      // 共通BOX
       // =========================
       function createBox(){
+
         const box = document.createElement('div');
+
         box.style.border = '1px solid #191970';
-        box.style.padding = '4px';
-        box.style.minWidth = '80px';
-        box.style.background = '#fff';
+        box.style.background = '#ffffff';
+
+        // ★ 高さ固定
+        box.style.height = '28px';
+        box.style.minWidth = '90px';
+
+        box.style.display = 'flex';
+        box.style.alignItems = 'center';
+        box.style.justifyContent = 'center';
+
+        box.style.fontSize = '14px';
+
         return box;
       }
 
+      // =========================
+      // 左右ダミー
+      // =========================
       function createSideDummy(side){
+
         const nav = document.createElement('div');
+
         nav.style.position = 'fixed';
         nav.style.top = '60px';
         nav.style.display = 'none';
         nav.style.flexDirection = 'column';
         nav.style.gap = '4px';
+        nav.style.zIndex = '10';
 
-        if(side === 'left') nav.style.left = '24px';
-        if(side === 'right') nav.style.right = '24px';
+        if(side === 'left') nav.style.left = '28px';
+        if(side === 'right') nav.style.right = '28px';
 
         for(let i=0;i<6;i++){
           nav.appendChild(createBox());
@@ -216,16 +230,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return nav;
       }
 
+      // =========================
+      // 下ダミー（4個）
+      // =========================
       function createBottomDummy(){
+
         const nav = document.createElement('div');
+
         nav.style.position = 'fixed';
         nav.style.bottom = '20px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
+
         nav.style.display = 'none';
         nav.style.gap = '8px';
+        nav.style.zIndex = '10';
 
-        for(let i=0;i<5;i++){
+        for(let i=0;i<4;i++){
           nav.appendChild(createBox());
         }
 
