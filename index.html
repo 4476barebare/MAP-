@@ -26,7 +26,7 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
   position: relative;
   width: 100%;
   min-height: 420px; /* ★これが重要 */
-  z-index: 1;
+  z-index: 50;
 }
 
 
@@ -35,6 +35,11 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
   height: auto;
   display: block;
 }
+
+#map > div {   /* ダミーBOXや初期ナビ */
+  z-index: 10; /* ここは JS 側と合わせる */
+}
+
 
 </style>
 </head>
