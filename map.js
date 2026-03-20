@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 地図基準
   mapDiv.style.position = 'relative';
+  mapDiv.style.zIndex = '50';
 
   fetch('japan.svg')
     .then(res => res.text())
