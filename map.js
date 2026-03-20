@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
+        p.setAttribute('stroke-width', '1'); // 初
       });
 
       // =========================
@@ -138,6 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const ty = svgH/2 - cy * scale;
 
         svg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+        
+        // ★ 拡大時だけ線幅を細くする
+    prefGroup.querySelectorAll('path').forEach(p => {
+        p.setAttribute('stroke-width', '0.6'); // ここで細めに設定
+    });
+        
       }
 
       function addPrefLabels(prefIds){
