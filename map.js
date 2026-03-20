@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const initialNav = createInitialNav();
       const leftDummy = createSideDummy('left');
       const rightDummy = createSideDummy('right');
+      const topDummy = createTopDummy();
       const bottomDummy = createBottomDummy();
 
       // =========================
@@ -101,12 +102,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentGroup = gid;
 
-        // 初期BOX消す
+        // 初期ナビ消す
         initialNav.style.display = 'none';
 
         // ダミー表示
         leftDummy.style.display = 'flex';
         rightDummy.style.display = 'flex';
+        topDummy.style.display = 'flex';
         bottomDummy.style.display = 'flex';
 
         // 地域非表示
@@ -120,8 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         applyTransform(gid);
-
-        // ★県名表示
         addPrefLabels(groupToPrefectures[gid]);
       }
 
@@ -239,14 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         box.style.border = '1px solid #191970';
         box.style.background = '#ffffff';
-        box.style.height = '28px';
-        box.style.minWidth = '90px';
+        box.style.height = '26px';
+        box.style.minWidth = '80px';
 
         box.style.display = 'flex';
         box.style.alignItems = 'center';
         box.style.justifyContent = 'center';
 
-        box.style.fontSize = '14px';
+        box.style.fontSize = '13px';
 
         return box;
       }
@@ -260,8 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         nav.style.position = 'fixed';
         nav.style.top = '60px';
+        nav.style.bottom = '20px';
         nav.style.display = 'none';
         nav.style.flexDirection = 'column';
+        nav.style.justifyContent = 'flex-end';
         nav.style.gap = '4px';
         nav.style.zIndex = '10';
 
@@ -277,6 +279,33 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // =========================
+      // 上ダミー（5個・折り返し）
+      // =========================
+      function createTopDummy(){
+
+        const nav = document.createElement('div');
+
+        nav.style.position = 'fixed';
+        nav.style.top = '60px';
+        nav.style.left = '50%';
+        nav.style.transform = 'translateX(-50%)';
+
+        nav.style.display = 'none';
+        nav.style.flexWrap = 'wrap';
+        nav.style.justifyContent = 'center';
+        nav.style.width = '340px';
+        nav.style.gap = '4px';
+        nav.style.zIndex = '10';
+
+        for(let i=0;i<5;i++){
+          nav.appendChild(createBox());
+        }
+
+        document.body.appendChild(nav);
+        return nav;
+      }
+
+      // =========================
       // 下ダミー（4個）
       // =========================
       function createBottomDummy(){
@@ -284,12 +313,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const nav = document.createElement('div');
 
         nav.style.position = 'fixed';
-        nav.style.bottom = '20px';
+        nav.style.bottom = '10px';
         nav.style.left = '50%';
         nav.style.transform = 'translateX(-50%)';
 
         nav.style.display = 'none';
-        nav.style.gap = '8px';
+        nav.style.gap = '6px';
         nav.style.zIndex = '10';
 
         for(let i=0;i<4;i++){
