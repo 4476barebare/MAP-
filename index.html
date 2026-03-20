@@ -24,14 +24,13 @@ footer { margin-top:40px; padding:20px; text-align:center; font-size:13px; color
 
 #map {
   position: relative;
-  width: 100%;
-  max-width: 900px;  /* 横幅制限 */
-  height: 420px;     /* 縦幅固定 */
-  overflow: hidden;  /* はみ出しを非表示 */
+  width: 100%;       /* 親コンテナいっぱいに広がる */
+  max-width: 900px;  /* 横幅の最大サイズを固定 */
   margin: 0 auto;    /* 中央揃え */
+  min-height: 420px; /* 高さは固定 */
+  overflow: hidden;  /* はみ出し防止 */
   z-index: 50;
 }
-
 
 #map svg {
   width: 100%;
