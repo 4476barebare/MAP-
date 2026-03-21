@@ -27,8 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const groupBoxSettings = {
-        Path_2: { leftTop:['AOMORI','IWATE','AKITA'], rightBottom:['MIYAGI','YAMAGATA','FUKUSHIMA'] },
-        Path_3: { rightTop:['NIIGATA','TOCHIGI','IBARAKI'], leftBottom:['GUNMA','SAITAMA','TOKYO','KANAGAWA','CHIBA'] },
+        Path_2: { leftTop:['AOMORI','AKITA','YAMAGATA','NIIGATA'], rightBottom:['IWATE','MIYAGI','FUKUSHIMA'] },
+        Path_3: { rightTop:['GUNMA','TOCHIGI','IBARAKI'], leftBottom:['SAITAMA','TOKYO','KANAGAWA','CHIBA'] },
         Path_4: { rightTop:['TOYAMA','ISHIKAWA','NAGANO','YAMANASHI'], leftBottom:['FUKUI','GIFU','AICHI','SHIZUOKA'] },
         Path_5: { rightTop:['SHIGA','KYOTO'], leftBottom:['HYOGO','OSAKA','WAKAYAMA','NARA','MIE'] },
         Path_6: { top:['SHIMANE','HIROSHIMA','TOTTORI','OKAYAMA'], top2:['YAMAGUCHI','OKINAWA','OKINAWA','OKINAWA'], bottom:['EHIME','KOCHI','KAGAWA','TOKUSHIMA'] },
@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const groupToPrefectures = {
-        Path_2:['AOMORI','IWATE','AKITA','MIYAGI','YAMAGATA','FUKUSHIMA'],
-        Path_3:['NIIGATA','TOCHIGI','IBARAKI','GUNMA','SAITAMA','TOKYO','KANAGAWA','CHIBA'],
+        Path_2:['AOMORI','AKITA','YAMAGATA','NIIGATA','IWATE','MIYAGI','FUKUSHIMA'],
+        Path_3:['GUNMA','TOCHIGI','IBARAKI','SAITAMA','TOKYO','KANAGAWA','CHIBA'],
         Path_4:['TOYAMA','ISHIKAWA','NAGANO','YAMANASHI','FUKUI','GIFU','AICHI','SHIZUOKA'],
         Path_5:['SHIGA','KYOTO','HYOGO','OSAKA','WAKAYAMA','NARA','MIE'],
         Path_6:['SHIMANE','HIROSHIMA','TOTTORI','OKAYAMA','YAMAGUCHI','EHIME','KOCHI','KAGAWA','TOKUSHIMA'],
