@@ -29,31 +29,31 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const groupBoxSettings = {
-        Path_2: {
-          leftTop: [0,1,2],
-          rightBottom: [0,1,2]
-        },
-        Path_3: {
-          rightTop: [0,1,2],
-          leftBottom: [0,1,2,3,4]
-        },
-        Path_4: {
-          rightTop: [0,1,2],
-          leftBottom: [0,1,2,3]
-        },
-        Path_5: {
-          rightTop: [0,1],
-          leftBottom: [0,1,2,3,4]
-        },
-        Path_6: {
-          top: [0,1,2,3,4],
-          bottom: [0,1,2,3]
-        },
-        Path_7: {
-          rightTop: [0,1,2],
-          rightBottom: [0,1,2,3]
-        }
-      };
+  Path_2: {
+    leftTop: ['Aomori','Iwate','Akita'],
+    rightBottom: ['Miyagi','Yamagata','Fukushima']
+  },
+  Path_3: {
+    rightTop: ['Niigata','Gunma','Tochigi'],
+    leftBottom: ['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa']
+  },
+  Path_4: {
+    rightTop: ['Ishikawa','Toyama','Fukui'], // ← 福井ここ
+    leftBottom: ['Nagano','Gifu','Shizuoka','Aichi']
+  },
+  Path_5: {
+    rightTop: ['Shiga','Kyoto'],
+    leftBottom: ['Mie','Nara','Wakayama','Osaka','Hyogo']
+  },
+  Path_6: {
+    top: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
+    bottom: ['Tokushima','Kagawa','Kochi','Ehime']
+  },
+  Path_7: {
+    rightTop: ['Fukuoka','Saga','Nagasaki'],
+    rightBottom: ['Oita','Kumamoto','Miyazaki','Kagoshima']
+  }
+};
 
       const groupToPrefectures = {
         Path_2:['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
@@ -122,50 +122,36 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function showBoxes(gid){
-        const setting = groupBoxSettings[gid];
-        if(!setting) return;
+  const setting = groupBoxSettings[gid];
+  if(!setting) return;
 
-        Object.keys(setting).forEach(pos => {
+  Object.keys(setting).forEach(pos => {
 
-          let wrapper;
+    let wrapper;
 
-          if(pos === 'top') wrapper = topDummy;
-          if(pos === 'bottom') wrapper = bottomDummy;
-          if(pos === 'leftTop') wrapper = leftTopDummy;
-          if(pos === 'rightBottom') wrapper = rightBottomDummy;
-          if(pos === 'leftBottom') wrapper = leftBottomDummy;
-          if(pos === 'rightTop') wrapper = rightTopDummy;
+    if(pos === 'top') wrapper = topDummy;
+    if(pos === 'bottom') wrapper = bottomDummy;
+    if(pos === 'leftTop') wrapper = leftTopDummy;
+    if(pos === 'rightBottom') wrapper = rightBottomDummy;
+    if(pos === 'leftBottom') wrapper = leftBottomDummy;
+    if(pos === 'rightTop') wrapper = rightTopDummy;
 
-          if(!wrapper) return;
+    if(!wrapper) return;
 
-          wrapper.style.display = 'flex';
+    wrapper.style.display = 'flex';
 
-          setting[pos].forEach((i, idx) => {
+    setting[pos].forEach((pid, i) => {
+      if(wrapper.children[i]){
+        const box = wrapper.children[i];
+        box.style.display = 'flex';
 
-            if(wrapper.children[i]){
-              const box = wrapper.children[i];
-              box.style.display = 'flex';
-
-              let pid;
-
-              if(pos === 'top'){
-                pid = groupToPrefectures[gid][idx];
-              } else if(pos === 'bottom'){
-                pid = groupToPrefectures[gid][idx + setting.top.length];
-              } else {
-                pid = groupToPrefectures[gid][idx];
-              }
-
-              if(pid){
-                box.textContent = prefNames[pid];
-                box.dataset.prefId = pid;
-              }
-            }
-
-          });
-
-        });
+        box.textContent = prefNames[pid];
+        box.dataset.prefId = pid;
       }
+    });
+
+  });
+}
 
       function showRegion(gid){
         currentGroup = gid;
