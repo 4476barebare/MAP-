@@ -300,4 +300,36 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     });
+    
+    
+    function addOkinawaLabel(){
+  const p = prefGroup.querySelector('#OKINAWA');
+  if(!p) return;
+
+  const bbox = p.getBBox();
+  const cx = bbox.x + bbox.width/2;
+  const cy = bbox.y + bbox.height/2;
+
+  const text = document.createElementNS('http://www.w3.org/2000/svg','text');
+  text.setAttribute('class','pref-label');
+  text.setAttribute('x', cx);
+  text.setAttribute('y', cy);
+  text.setAttribute('text-anchor','middle');
+  text.setAttribute('font-size','10');
+  text.setAttribute('fill','#191970');
+
+  // 👇 ここで回転（沖縄に合わせて微調整）
+  text.setAttribute('transform', `rotate(-20, ${cx}, ${cy})`);
+
+  text.textContent = 'OKINAWA';
+
+  svg.appendChild(text);
+}
+    
+    window.addEventListener('load', ()=>{
+  addOkinawaLabel();
+})
+    
+    
+    
 });
