@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
         p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '1');
+        p.setAttribute('stroke-width', '0.3');
       });
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
