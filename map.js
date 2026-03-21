@@ -126,22 +126,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function showRegion(gid){
-        currentGroup = gid;
-        initialNav.style.display='none';
-        hideAllBoxes();
-        showBoxes(gid);
+    currentGroup = gid;
+    initialNav.style.display='none';
+    hideAllBoxes();
+    showBoxes(gid);
 
-        allGroups.forEach(g=>g.style.display='none');
+    allGroups.forEach(g=>g.style.display='none');
 
-        prefGroup.querySelectorAll('path').forEach(p=>{
-            
-            
-          p.style.display = groupToPrefectures[gid].includes(p.id)? 'inline';
-        });
+    prefGroup.querySelectorAll('path').forEach(p=>{
+      p.style.display = groupToPrefectures[gid].includes(p.id)? 'inline':'none';
+    });
 
-        applyTransform(gid);
-        addPrefLabels(groupToPrefectures[gid]);
-      }
+    applyTransform(gid);
+    addPrefLabels(groupToPrefectures[gid]);
+
+    // ここから追加：選択したグループ以外を再表示
+    allGroups.forEach(g => {
+        if(g.id !== gid) g.style.display = 'inline';
+    });
+};
 
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
