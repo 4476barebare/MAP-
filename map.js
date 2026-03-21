@@ -27,38 +27,38 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       const groupBoxSettings = {
-        Path_2: { leftTop:['Aomori','Iwate','Akita'], rightBottom:['Miyagi','Yamagata','Fukushima'] },
-        Path_3: { rightTop:['Niigata','Gunma','Tochigi'], leftBottom:['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'] },
-        Path_4: { rightTop:['Ishikawa','Toyama','Fukui','Nagano'], leftBottom:['Gifu','Shizuoka','Aichi','Yamanashi'] },
-        Path_5: { rightTop:['Shiga','Kyoto'], leftBottom:['Mie','Nara','Wakayama','Osaka','Hyogo'] },
-        Path_6: { top:['Tottori','Shimane','Okayama','Hiroshima'], top2:['Yamaguchi','Fukui','Hyogo','Shimane'], bottom:['Tokushima','Kagawa','Kochi','Ehime'] },
-        Path_7: { rightTop:['Fukuoka','Saga','Nagasaki'], rightBottom:['Oita','Kumamoto','Miyazaki','Kagoshima'] }
-      };
+  PATH_2: { LEFTTOP:['AOMORI','IWATE','AKITA'], RIGHTBOTTOM:['MIYAGI','YAMAGATA','FUKUSHIMA'] },
+  PATH_3: { RIGHTTOP:['NIIGATA','GUNMA','TOCHIGI'], LEFTBOTTOM:['CHIBA','IBARAKI','TOKYO','SAITAMA','KANAGAWA'] },
+  PATH_4: { RIGHTTOP:['ISHIKAWA','TOYAMA','FUKUI','NAGANO'], LEFTBOTTOM:['GIFU','SHIZUOKA','AICHI','YAMANASHI'] },
+  PATH_5: { RIGHTTOP:['SHIGA','KYOTO'], LEFTBOTTOM:['MIE','NARA','WAKAYAMA','OSAKA','HYOGO'] },
+  PATH_6: { TOP:['TOTTORI','SHIMANE','OKAYAMA','HIROSHIMA'], TOP2:['YAMAGUCHI','FUKUI','HYOGO','SHIMANE'], BOTTOM:['TOKUSHIMA','KAGAWA','KOCHI','EHIME'] },
+  PATH_7: { RIGHTTOP:['FUKUOKA','SAGA','NAGASAKI'], RIGHTBOTTOM:['OITA','KUMAMOTO','MIYAZAKI','KAGOSHIMA'] }
+};
 
-      const groupToPrefectures = {
-        Path_2:['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
-        Path_3:['Niigata','Gunma','Tochigi','Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'],
-        Path_4:['Shizuoka','Yamanashi','Nagano','Ishikawa','Toyama','Fukui','Gifu','Aichi'],
-        Path_5:['Mie','Nara','Wakayama','Osaka','Shiga','Kyoto','Hyogo'],
-        Path_6:['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi','Tokushima','Kagawa','Kochi','Ehime'],
-        Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
-      };
+const groupToPrefectures = {
+  PATH_2:['AOMORI','IWATE','AKITA','MIYAGI','YAMAGATA','FUKUSHIMA'],
+  PATH_3:['NIIGATA','GUNMA','TOCHIGI','CHIBA','IBARAKI','TOKYO','SAITAMA','KANAGAWA'],
+  PATH_4:['SHIZUOKA','YAMANASHI','NAGANO','ISHIKAWA','TOYAMA','FUKUI','GIFU','AICHI'],
+  PATH_5:['MIE','NARA','WAKAYAMA','OSAKA','SHIGA','KYOTO','HYOGO'],
+  PATH_6:['TOTTORI','SHIMANE','OKAYAMA','HIROSHIMA','YAMAGUCHI','TOKUSHIMA','KAGAWA','KOCHI','EHIME','FUKUI','HYOGO'],
+  PATH_7:['FUKUOKA','SAGA','NAGASAKI','OITA','KUMAMOTO','MIYAZAKI','KAGOSHIMA']
+};
 
-      const prefNames = {
-        Aomori:'青森県', Iwate:'岩手県', Akita:'秋田県',
-        Miyagi:'宮城県', Yamagata:'山形県', Fukushima:'福島県',
-        Niigata:'新潟県', Gunma:'群馬県', Tochigi:'栃木県', Chiba:'千葉県',
-        Ibaraki:'茨城県', Tokyo:'東京都', Saitama:'埼玉県', Kanagawa:'神奈川県',
-        Shizuoka:'静岡県', Yamanashi:'山梨県', Nagano:'長野県',
-        Ishikawa:'石川県', Toyama:'富山県', Fukui:'福井県',
-        Gifu:'岐阜県', Aichi:'愛知県',
-        Mie:'三重県', Nara:'奈良県', Wakayama:'和歌山県',
-        Osaka:'大阪府', Shiga:'滋賀県', Kyoto:'京都府', Hyogo:'兵庫県',
-        Tottori:'鳥取県', Shimane:'島根県', Okayama:'岡山県', Hiroshima:'広島県', Yamaguchi:'山口県',
-        Tokushima:'徳島県', Kagawa:'香川県', Kochi:'高知県', Ehime:'愛媛県',
-        Fukuoka:'福岡県', Saga:'佐賀県', Nagasaki:'長崎県',
-        Oita:'大分県', Kumamoto:'熊本県', Miyazaki:'宮崎県', Kagoshima:'鹿児島県'
-      };
+const prefNames = {
+  AOMORI:'青森県', IWATE:'岩手県', AKITA:'秋田県',
+  MIYAGI:'宮城県', YAMAGATA:'山形県', FUKUSHIMA:'福島県',
+  NIIGATA:'新潟県', GUNMA:'群馬県', TOCHIGI:'栃木県', CHIBA:'千葉県',
+  IBARAKI:'茨城県', TOKYO:'東京都', SAITAMA:'埼玉県', KANAGAWA:'神奈川県',
+  SHIZUOKA:'静岡県', YAMANASHI:'山梨県', NAGANO:'長野県',
+  ISHIKAWA:'石川県', TOYAMA:'富山県', FUKUI:'福井県',
+  GIFU:'岐阜県', AICHI:'愛知県',
+  MIE:'三重県', NARA:'奈良県', WAKAYAMA:'和歌山県',
+  OSAKA:'大阪府', SHIGA:'滋賀県', KYOTO:'京都府', HYOGO:'兵庫県',
+  TOTTORI:'鳥取県', SHIMANE:'島根県', OKAYAMA:'岡山県', HIROSHIMA:'広島県', YAMAGUCHI:'山口県',
+  TOKUSHIMA:'徳島県', KAGAWA:'香川県', KOCHI:'高知県', EHIME:'愛媛県',
+  FUKUOKA:'福岡県', SAGA:'佐賀県', NAGASAKI:'長崎県',
+  OITA:'大分県', KUMAMOTO:'熊本県', MIYAZAKI:'宮崎県', KAGOSHIMA:'鹿児島県'
+};
 
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
