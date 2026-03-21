@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_3: { rightTop:['GUNMA','TOCHIGI','IBARAKI'], leftBottom:['SAITAMA','TOKYO','KANAGAWA','CHIBA'] },
         Path_4: { rightTop:['TOYAMA','ISHIKAWA','NAGANO','YAMANASHI'], leftBottom:['FUKUI','GIFU','AICHI','SHIZUOKA'] },
         Path_5: { rightTop:['SHIGA','KYOTO'], leftBottom:['HYOGO','OSAKA','WAKAYAMA','NARA','MIE'] },
-        Path_6: { top:['SHIMANE','HIROSHIMA','TOTTORI','OKAYAMA'], top2:['YAMAGUCHI','OKINAWA','OKINAWA','OKINAWA'], bottom:['EHIME','KOCHI','KAGAWA','TOKUSHIMA'] },
+        Path_6: { top:['SHIMANE','HIROSHIMA','TOTTORI','OKAYAMA'], top2:['YAMAGUCHI'], bottom:['EHIME','KOCHI','KAGAWA','TOKUSHIMA'] },
         Path_7: { rightTop:['FUKUOKA','SAGA','NAGASAKI'], rightBottom:['OITA','KUMAMOTO','MIYAZAKI','KAGOSHIMA'] }
       };
 
@@ -144,6 +144,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ★クリック無効化
         disableOtherAreas(groupToPrefectures[gid]);
+        
+        if(gid === 'Path_6'){
+  const topRect = topDummy.getBoundingClientRect();
+  const mapRect = mapDiv.getBoundingClientRect();
+
+  const left = topRect.left - mapRect.left;
+
+  top2Dummy.style.left = left + 'px';
+  top2Dummy.style.transform = 'none';
+}else{
+  top2Dummy.style.left = '50%';
+  top2Dummy.style.transform = 'translateX(-50%)';
+}
+        
+        
 
         // 他グループ表示（クリック不可）
         allGroups.forEach(g => {
