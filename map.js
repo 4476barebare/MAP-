@@ -285,6 +285,102 @@ OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島�
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
+      
+      
+      // --- 調整コンソール追記ここから ---
+(function(){
+    // コンソール用 div を作る
+    const consoleDiv = document.createElement('div');
+    consoleDiv.id = 'adjustConsole';
+    consoleDiv.style.position = 'fixed';
+    consoleDiv.style.bottom = '10px';
+    consoleDiv.style.right = '10px';
+    consoleDiv.style.padding = '10px';
+    consoleDiv.style.background = 'rgba(0,0,0,0.7)';
+    consoleDiv.style.color = '#fff';
+    consoleDiv.style.fontFamily = 'monospace';
+    consoleDiv.style.fontSize = '14px';
+    consoleDiv.style.zIndex = 9999;
+    consoleDiv.style.borderRadius = '6px';
+    consoleDiv.style.userSelect = 'none';
+    consoleDiv.style.width = '180px';
+    consoleDiv.style.textAlign = 'center';
+    consoleDiv.innerHTML = `
+        <div id="coordDisplay">x:0 y:0 scale:1</div>
+        <div style="margin-top:5px;">
+            <button id="leftBtn">←</button>
+            <button id="upBtn">↑</button>
+            <button id="downBtn">↓</button>
+            <button id="rightBtn">→</button>
+        </div>
+        <div style="margin-top:5px;">
+            <button id="plusBtn">+</button>
+            <button id="minusBtn">-</button>
+        </div>
+    `;
+    document.body.appendChild(consoleDiv);
+
+    let currentGroup = null; // 操作対象の g 要素
+    let tx = 0, ty = 0, scale = 1;
+
+    // 拡大されたグループがある場合に currentGroup を設定
+    const observer = new MutationObserver(() => {
+        // 拡大時に SVG 内で transform が追加される g を検出
+        const groups = document.querySelectorAll('svg g');
+        groups.forEach(g => {
+            const t = g.getAttribute('transform');
+            if(t && t.includes('scale')) {
+                currentGroup = g;
+                const match = /translate\(([-\d.]+),([-\d.]+)\) scale\(([\d.]+)\)/.exec(t);
+                if(match){
+                    tx = parseFloat(match[1]);
+                    ty = parseFloat(match[2]);
+                    scale = parseFloat(match[3]);
+                    updateDisplay();
+                }
+            }
+        });
+    });
+    observer.observe(document.body, {childList:true, subtree:true});
+
+    function updateDisplay(){
+        if(currentGroup) {
+            currentGroup.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);
+            document.getElementById('coordDisplay').innerText =
+                `x:${tx.toFixed(3)} y:${ty.toFixed(3)} scale:${scale.toFixed(3)}`;
+        }
+    }
+
+    const moveStep = 5;    // 移動量
+    const scaleStep = 0.05; // 拡大縮小倍率
+
+    document.getElementById('leftBtn').addEventListener('click',()=>{ tx -= moveStep; updateDisplay(); });
+    document.getElementById('rightBtn').addEventListener('click',()=>{ tx += moveStep; updateDisplay(); });
+    document.getElementById('upBtn').addEventListener('click',()=>{ ty -= moveStep; updateDisplay(); });
+    document.getElementById('downBtn').addEventListener('click',()=>{ ty += moveStep; updateDisplay(); });
+    document.getElementById('plusBtn').addEventListener('click',()=>{ scale += scaleStep; updateDisplay(); });
+    document.getElementById('minusBtn').addEventListener('click',()=>{ scale = Math.max(0.01, scale - scaleStep); updateDisplay(); });
+
+    // キーボード操作対応
+    document.addEventListener('keydown', (e)=>{
+        if(!currentGroup) return;
+        switch(e.key){
+            case 'ArrowLeft': tx -= moveStep; break;
+            case 'ArrowRight': tx += moveStep; break;
+            case 'ArrowUp': ty -= moveStep; break;
+            case 'ArrowDown': ty += moveStep; break;
+            case '+': case '=': scale += scaleStep; break;
+            case '-': case '_': scale = Math.max(0.01, scale - scaleStep); break;
+            default: return;
+        }
+        e.preventDefault();
+        updateDisplay();
+    });
+})();
+      
+      
+      
+      
 
     });
 });
