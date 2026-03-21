@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // 初期：県は非表示
+      // 初期：県非表示
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
         p.setAttribute('fill', '#ffffff');
@@ -142,12 +142,17 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
 
-        // ★クリック無効化（重要）
+        // ★クリック無効化
         disableOtherAreas(groupToPrefectures[gid]);
 
-        // 他グループは表示だけ（クリック不可）
+        // 他グループ表示（クリック不可）
         allGroups.forEach(g => {
           if(g.id !== gid) g.style.display = 'inline';
+        });
+
+        // ★枠の太さ統一（今回の修正）
+        allGroups.forEach(g=>{
+          g.setAttribute('stroke-width','0.3');
         });
       }
 
@@ -167,13 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const ty = (svg.clientHeight/2) - cy*scale*displayScale;
 
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale*displayScale})`;
-        prefGroup.querySelectorAll('path').forEach(p=>p.setAttribute('stroke-width','0.3'));
+
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.setAttribute('stroke-width','0.3');
+        });
       }
 
-      // ★県名表示は無効化（空）
       function addPrefLabels(prefIds){}
 
-      // ★クリック制御
       function disableOtherAreas(activeIds){
         allGroups.forEach(g=>{
           g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none';
