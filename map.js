@@ -541,13 +541,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
           wrapper.style.display = 'flex';
 
-          setting[pos].forEach((i, idx) => {
-            if(wrapper.children[i]){
-              const box = wrapper.children[i];
-              box.style.display = 'flex';
+          setting[pos].forEach((i) => {
+  if(wrapper.children[i]){
+    const box = wrapper.children[i];
+    box.style.display = 'flex';
 
-              // ★追加：県名＋ID
-              const pid = groupToPrefectures[gid][idx];
+    const pid = groupToPrefectures[gid][i]; // ← ここを i に変更
               if(pid){
                 box.textContent = prefNames[pid];
                 box.dataset.prefId = pid;
