@@ -64,15 +64,35 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       // ★追加：BOX→県対応
-      const boxToPrefecture = {
-        Path_2:['Aomori','Akita','Yamagata','Iwate','Miyagi','Fukushima'],
-        Path_3:['Niigata','Tochigi','Ibaraki','Gunma','Saitama','Tokyo','Kanagawa','Chiba'],
-        Path_4:['Nagano','Toyama','Ishikawa','Gifu','Aichi','Shizuoka','Yamanashi'],
-        Path_5:['Fukui','Kyoto','Hyogo','Osaka','Wakayama','Nara','Mie'],
-        Path_6:['Shimane','Hiroshima','Tottori','Okayama','Yamaguchi','Ehime','Kochi','Kagawa','Tokushima'],
-        Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
-      };
-
+       
+       const boxToPrefecture = {
+  Path_2: {
+    leftTop:['Aomori','Akita','Yamagata'],
+    rightBottom:['Iwate','Miyagi','Fukushima']
+  },
+  Path_3: {
+    rightTop:['Niigata','Tochigi','Ibaraki'],
+    leftBottom:['Gunma','Saitama','Tokyo','Kanagawa','Chiba']
+  },
+  Path_4: {
+    rightTop:['Nagano','Toyama','Ishikawa'],
+    leftBottom:['Gifu','Aichi','Shizuoka','Yamanashi']
+  },
+  Path_5: {
+    rightTop:['Fukui','Kyoto'],
+    leftBottom:['Hyogo','Osaka','Wakayama','Nara','Mie']
+  },
+  Path_6: {
+    top:['Shimane','Hiroshima','Tottori','Okayama','Yamaguchi'],
+    bottom:['Ehime','Kochi','Kagawa','Tokushima']
+  },
+  Path_7: {
+    rightTop:['Fukuoka','Saga','Nagasaki'],
+    rightBottom:['Oita','Kumamoto','Miyazaki','Kagoshima']
+  }
+};
+       
+       
       function selectPref(prefId){
         console.log('選択:', prefId);
       }
@@ -118,42 +138,56 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function showBoxes(gid){
-        const setting = groupBoxSettings[gid];
-        if(!setting) return;
+  const setting = groupBoxSettings[gid];
+  if(!setting) return;
 
-        let visibleBoxes = [];
+  const mapping = boxToPrefecture[gid] || {};
 
-        Object.keys(setting).forEach(pos => {
-          let wrapper;
+  Object.keys(setting).forEach(pos => {
 
-          if(pos === 'top') wrapper = topDummy;
-          if(pos === 'bottom') wrapper = bottomDummy;
-          if(pos === 'leftTop') wrapper = leftTopDummy;
-          if(pos === 'rightBottom') wrapper = rightBottomDummy;
-          if(pos === 'leftBottom') wrapper = leftBottomDummy;
-          if(pos === 'rightTop') wrapper = rightTopDummy;
+    let wrapper;
 
-          wrapper.style.display = 'flex';
+    if(pos === 'top') wrapper = topDummy;
+    if(pos === 'bottom') wrapper = bottomDummy;
+    if(pos === 'leftTop') wrapper = leftTopDummy;
+    if(pos === 'rightBottom') wrapper = rightBottomDummy;
+    if(pos === 'leftBottom') wrapper = leftBottomDummy;
+    if(pos === 'rightTop') wrapper = rightTopDummy;
 
-          setting[pos].forEach(i => {
-            const box = wrapper.children[i];
-            box.style.display = 'flex';
-            visibleBoxes.push(box);
-          });
-        });
+    if(!wrapper) return;
 
-        // ★追加：BOXに県割当
-        const list = boxToPrefecture[gid] || [];
-        visibleBoxes.forEach((box, i) => {
-          const pid = list[i];
-          if(pid){
-            box.textContent = prefNames[pid];
-            box.dataset.prefId = pid;
+    // 表示ON
+    wrapper.style.display = 'flex';
 
-            box.onclick = () => selectPref(pid);
-          }
-        });
+    setting[pos].forEach((i, idx) => {
+
+      const box = wrapper.children[i];
+      if(!box) return;
+
+      box.style.display = 'flex';
+
+      // ★ここが重要：位置ごとに県を割り当てる
+      const pid = mapping[pos]?.[idx];
+
+      if(pid){
+        box.textContent = prefNames[pid];
+        box.dataset.prefId = pid;
+
+        box.onclick = () => selectPref(pid);
+      } else {
+        // 念のためクリア
+        box.textContent = '';
+        box.dataset.prefId = '';
+        box.onclick = null;
       }
+
+    });
+
+  });
+}
+
+
+      
 
       function showRegion(gid){
         currentGroup = gid;
