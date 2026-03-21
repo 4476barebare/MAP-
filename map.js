@@ -266,10 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.zIndex='10';
 
         let color='#fff';
-        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; color='#fcc'; }
-        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; color='#fcf'; }
-        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; color='#ffc'; }
-        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; color='#cff'; }
+        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
+        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
+        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
+        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
 
         for(let i=0;i<5;i++){
           const box=createBox();
