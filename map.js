@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const groupBoxSettings = {
         Path_2: { leftTop:['Aomori','Iwate','Akita'], rightBottom:['Miyagi','Yamagata','Fukushima'] },
         Path_3: { rightTop:['Niigata','Gunma','Tochigi'], leftBottom:['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'] },
-        Path_4: { rightTop:['Ishikawa','Toyama','Fukui'], leftBottom:['Nagano','Gifu','Shizuoka','Aichi'] },
+        Path_4: { rightTop:['Ishikawa','Toyama','Fukui','Nagano'], leftBottom:['Gifu','Shizuoka','Aichi','Yamanashi'] },
         Path_5: { rightTop:['Shiga','Kyoto'], leftBottom:['Mie','Nara','Wakayama','Osaka','Hyogo'] },
         Path_6: { top:['Tottori','Shimane','Okayama','Hiroshima'], bottom:['Yamaguchi','Tokushima','Kagawa','Kochi','Ehime'] },
         Path_7: { rightTop:['Fukuoka','Saga','Nagasaki'], rightBottom:['Oita','Kumamoto','Miyazaki','Kagoshima'] }
