@@ -28,37 +28,38 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7: { scale:11.2, x:-105, y:200 }
       };
 
+      // ★県を直接指定（完全修正）
       const groupBoxSettings = {
-  Path_2: {
-    leftTop: ['Aomori','Iwate','Akita'],
-    rightBottom: ['Miyagi','Yamagata','Fukushima']
-  },
-  Path_3: {
-    rightTop: ['Niigata','Gunma','Tochigi'],
-    leftBottom: ['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa']
-  },
-  Path_4: {
-    rightTop: ['Ishikawa','Toyama','Fukui'], // ← 福井ここ
-    leftBottom: ['Nagano','Gifu','Shizuoka','Aichi']
-  },
-  Path_5: {
-    rightTop: ['Shiga','Kyoto'],
-    leftBottom: ['Mie','Nara','Wakayama','Osaka','Hyogo']
-  },
-  Path_6: {
-    top: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
-    bottom: ['Tokushima','Kagawa','Kochi','Ehime']
-  },
-  Path_7: {
-    rightTop: ['Fukuoka','Saga','Nagasaki'],
-    rightBottom: ['Oita','Kumamoto','Miyazaki','Kagoshima']
-  }
-};
+        Path_2: {
+          leftTop: ['Aomori','Iwate','Akita'],
+          rightBottom: ['Miyagi','Yamagata','Fukushima']
+        },
+        Path_3: {
+          rightTop: ['Niigata','Gunma','Tochigi'],
+          leftBottom: ['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa']
+        },
+        Path_4: {
+          rightTop: ['Ishikawa','Toyama','Fukui'],
+          leftBottom: ['Nagano','Gifu','Shizuoka','Aichi']
+        },
+        Path_5: {
+          rightTop: ['Shiga','Kyoto'],
+          leftBottom: ['Mie','Nara','Wakayama','Osaka','Hyogo']
+        },
+        Path_6: {
+          top: ['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'],
+          bottom: ['Tokushima','Kagawa','Kochi','Ehime']
+        },
+        Path_7: {
+          rightTop: ['Fukuoka','Saga','Nagasaki'],
+          rightBottom: ['Oita','Kumamoto','Miyazaki','Kagoshima']
+        }
+      };
 
       const groupToPrefectures = {
         Path_2:['Aomori','Iwate','Akita','Miyagi','Yamagata','Fukushima'],
         Path_3:['Niigata','Gunma','Tochigi','Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'],
-        Path_4:['Shizuoka','Yamanashi','Nagano','Ishikawa','Toyama','Gifu','Aichi'],
+        Path_4:['Shizuoka','Yamanashi','Nagano','Ishikawa','Toyama','Fukui','Gifu','Aichi'],
         Path_5:['Mie','Nara','Wakayama','Osaka','Shiga','Kyoto','Hyogo'],
         Path_6:['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi','Tokushima','Kagawa','Kochi','Ehime'],
         Path_7:['Fukuoka','Saga','Nagasaki','Oita','Kumamoto','Miyazaki','Kagoshima']
@@ -70,7 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
         Niigata:'新潟県', Gunma:'群馬県', Tochigi:'栃木県', Chiba:'千葉県',
         Ibaraki:'茨城県', Tokyo:'東京都', Saitama:'埼玉県', Kanagawa:'神奈川県',
         Shizuoka:'静岡県', Yamanashi:'山梨県', Nagano:'長野県',
-        Ishikawa:'石川県', Toyama:'富山県', Gifu:'岐阜県', Aichi:'愛知県',
+        Ishikawa:'石川県', Toyama:'富山県', Fukui:'福井県',
+        Gifu:'岐阜県', Aichi:'愛知県',
         Mie:'三重県', Nara:'奈良県', Wakayama:'和歌山県',
         Osaka:'大阪府', Shiga:'滋賀県', Kyoto:'京都府', Hyogo:'兵庫県',
         Tottori:'鳥取県', Shimane:'島根県', Okayama:'岡山県',
@@ -113,45 +115,53 @@ document.addEventListener('DOMContentLoaded', () => {
         [topDummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
           .forEach(wrapper => {
             wrapper.style.display = 'none';
-            Array.from(wrapper.children).forEach(c => {
+            Array.from(wrapper.querySelectorAll('div')).forEach(c => {
               c.style.display = 'none';
               c.textContent = '';
-              c.dataset.prefId = '';
             });
           });
       }
 
       function showBoxes(gid){
-  const setting = groupBoxSettings[gid];
-  if(!setting) return;
+        const setting = groupBoxSettings[gid];
+        if(!setting) return;
 
-  Object.keys(setting).forEach(pos => {
+        Object.keys(setting).forEach(pos => {
 
-    let wrapper;
+          let wrapper;
 
-    if(pos === 'top') wrapper = topDummy;
-    if(pos === 'bottom') wrapper = bottomDummy;
-    if(pos === 'leftTop') wrapper = leftTopDummy;
-    if(pos === 'rightBottom') wrapper = rightBottomDummy;
-    if(pos === 'leftBottom') wrapper = leftBottomDummy;
-    if(pos === 'rightTop') wrapper = rightTopDummy;
+          if(pos === 'top') wrapper = topDummy;
+          if(pos === 'bottom') wrapper = bottomDummy;
+          if(pos === 'leftTop') wrapper = leftTopDummy;
+          if(pos === 'rightBottom') wrapper = rightBottomDummy;
+          if(pos === 'leftBottom') wrapper = leftBottomDummy;
+          if(pos === 'rightTop') wrapper = rightTopDummy;
 
-    if(!wrapper) return;
+          if(!wrapper) return;
 
-    wrapper.style.display = 'flex';
+          wrapper.style.display = 'flex';
 
-    setting[pos].forEach((pid, i) => {
-      if(wrapper.children[i]){
-        const box = wrapper.children[i];
-        box.style.display = 'flex';
+          setting[pos].forEach((pid, i) => {
 
-        box.textContent = prefNames[pid];
-        box.dataset.prefId = pid;
+            if(pos === 'top'){
+              const container = wrapper.children[0];
+              const box = container.children[i];
+              if(box){
+                box.style.display = 'flex';
+                box.textContent = prefNames[pid];
+              }
+            } else {
+              const box = wrapper.children[i];
+              if(box){
+                box.style.display = 'flex';
+                box.textContent = prefNames[pid];
+              }
+            }
+
+          });
+
+        });
       }
-    });
-
-  });
-}
 
       function showRegion(gid){
         currentGroup = gid;
@@ -276,13 +286,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const nav = document.createElement('div');
         nav.style.display = 'flex';
         nav.style.flexWrap = 'wrap';
-        nav.style.justifyContent = 'flex-start';
         nav.style.width = '340px';
         nav.style.gap = '4px';
 
         for(let i=0;i<5;i++){
           const box = createBox();
-          box.style.background = '#ccf';
           nav.appendChild(box);
         }
 
@@ -304,7 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for(let i=0;i<4;i++){
           const box = createBox();
-          box.style.background = '#cfc';
           wrapper.appendChild(box);
         }
 
