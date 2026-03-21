@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const groupSettings = {
         Path_2: { scale:6.7, x:145, y:45 },
-        Path_3: { scale:15, x:90, y:100 },
+        Path_3: { scale:15, x:95, y:95 },
         Path_4: { scale:10.1, x:55, y:110 },
         Path_5: { scale:13.6, x:0, y:140 },
         Path_6: { scale:9.5, x:-50, y:165 },
@@ -286,107 +286,6 @@ OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島�
         return wrapper;
       }
       
-      
-      
-      
-      // --- 調整コンソール追記（グループ内県まとめ移動版） ---
-(function(){
-    // コンソール用 div 作成
-    const consoleDiv = document.createElement('div');
-    consoleDiv.id = 'adjustConsole';
-    consoleDiv.style.position = 'fixed';
-    consoleDiv.style.bottom = '10px';
-    consoleDiv.style.right = '10px';
-    consoleDiv.style.padding = '10px';
-    consoleDiv.style.background = 'rgba(0,0,0,0.7)';
-    consoleDiv.style.color = '#fff';
-    consoleDiv.style.fontFamily = 'monospace';
-    consoleDiv.style.fontSize = '14px';
-    consoleDiv.style.zIndex = 9999;
-    consoleDiv.style.borderRadius = '6px';
-    consoleDiv.style.userSelect = 'none';
-    consoleDiv.style.width = '200px';
-    consoleDiv.style.textAlign = 'center';
-    consoleDiv.innerHTML = `
-        <div id="coordDisplay">x:0 y:0 scale:1</div>
-        <div style="margin-top:5px;">
-            <button id="leftBtn">←</button>
-            <button id="upBtn">↑</button>
-            <button id="downBtn">↓</button>
-            <button id="rightBtn">→</button>
-        </div>
-        <div style="margin-top:5px;">
-            <button id="plusBtn">+</button>
-            <button id="minusBtn">-</button>
-        </div>
-    `;
-    document.body.appendChild(consoleDiv);
-
-    let currentGroup = null; // 現在操作中のグループ
-    let tx = 0, ty = 0, scale = 1;
-    const moveStep = 5;    // 移動量
-    const scaleStep = 0.05; // 拡大縮小倍率
-
-    // 拡大されたグループを自動検知
-    const observer = new MutationObserver(() => {
-        if(currentGroup) return; // すでにセット済みならスキップ
-        const groups = document.querySelectorAll('svg g');
-        groups.forEach(g => {
-            // クリックで拡大されたグループ（transform に scale があるもの）を検出
-            const t = g.getAttribute('transform');
-            if(t && t.includes('scale')){
-                currentGroup = g;
-                // 各 path の元 transform を保持
-                currentGroup.querySelectorAll('path').forEach(path=>{
-                    if(!path.dataset.originalTransform) path.dataset.originalTransform = path.getAttribute('transform') || '';
-                });
-                // 初期 transform 抽出
-                const match = /translate\(([-\d.]+),([-\d.]+)\) scale\(([\d.]+)\)/.exec(t);
-                if(match){
-                    tx = parseFloat(match[1]);
-                    ty = parseFloat(match[2]);
-                    scale = parseFloat(match[3]);
-                    updateDisplay();
-                }
-            }
-        });
-    });
-    observer.observe(document.body, {childList:true, subtree:true});
-
-    function updateDisplay(){
-        if(!currentGroup) return;
-        currentGroup.querySelectorAll('path').forEach(path=>{
-            const original = path.dataset.originalTransform || '';
-            path.setAttribute('transform', `${original} translate(${tx},${ty}) scale(${scale})`);
-        });
-        document.getElementById('coordDisplay').innerText =
-            `x:${tx.toFixed(3)} y:${ty.toFixed(3)} scale:${scale.toFixed(3)}`;
-    }
-
-    // ボタン操作
-    document.getElementById('leftBtn').addEventListener('click',()=>{ tx -= moveStep; updateDisplay(); });
-    document.getElementById('rightBtn').addEventListener('click',()=>{ tx += moveStep; updateDisplay(); });
-    document.getElementById('upBtn').addEventListener('click',()=>{ ty -= moveStep; updateDisplay(); });
-    document.getElementById('downBtn').addEventListener('click',()=>{ ty += moveStep; updateDisplay(); });
-    document.getElementById('plusBtn').addEventListener('click',()=>{ scale += scaleStep; updateDisplay(); });
-    document.getElementById('minusBtn').addEventListener('click',()=>{ scale = Math.max(0.01, scale - scaleStep); updateDisplay(); });
-
-    // キーボード操作対応
-    document.addEventListener('keydown', (e)=>{
-        if(!currentGroup) return;
-        switch(e.key){
-            case 'ArrowLeft': tx -= moveStep; break;
-            case 'ArrowRight': tx += moveStep; break;
-            case 'ArrowUp': ty -= moveStep; break;
-            case 'ArrowDown': ty += moveStep; break;
-            case '+': case '=': scale += scaleStep; break;
-            case '-': case '_': scale = Math.max(0.01, scale - scaleStep); break;
-            default: return;
-        }
-        e.preventDefault();
-        updateDisplay();
-    });
-})();
 
 
 
