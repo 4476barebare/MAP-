@@ -136,9 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
         prefGroup.querySelectorAll('path').forEach(p=>{
             
             
-        p.style.display = 'inline
-            
-            
+          p.style.display = groupToPrefectures[gid].includes(p.id)? 'inline';
         });
 
         applyTransform(gid);
