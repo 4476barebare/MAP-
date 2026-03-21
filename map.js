@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const groupSettings = {
         Path_2: { scale:6.7, x:145, y:45 },
-        Path_3: { scale:15, x:100, y:100 },
+        Path_3: { scale:15, x:90, y:100 },
         Path_4: { scale:10.1, x:55, y:110 },
         Path_5: { scale:13.6, x:0, y:140 },
         Path_6: { scale:9.5, x:-50, y:165 },
