@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
-
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
 
@@ -186,14 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createBox(){
         const box = document.createElement('div');
-        box.classList.add('pref-box'); // ← CSSで統一
-        box.style.height = '26px';
-        box.style.minWidth = '80px';
-        box.style.display = 'flex';
-        box.style.alignItems = 'center';
-        box.style.justifyContent = 'center';
-        box.style.fontSize = '13px';
-        box.style.color = '#191970';
+        box.classList.add('pref-box'); // CSS で統一
         return box;
       }
 
@@ -232,12 +224,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-
         for(let i=0;i<4;i++){
           const box=createBox();
           wrapper.appendChild(box);
         }
-
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -252,12 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-
         for(let i=0;i<4;i++){
           const box=createBox();
           wrapper.appendChild(box);
         }
-
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -270,12 +258,14 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.flexDirection='column';
         wrapper.style.gap='4px';
         wrapper.style.zIndex='10';
-
+        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
+        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
+        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
+        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
         for(let i=0;i<5;i++){
           const box=createBox();
           wrapper.appendChild(box);
         }
-
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
