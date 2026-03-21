@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
-
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
 
@@ -10,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(svgText => {
 
       mapDiv.innerHTML = svgText;
-
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
 
@@ -28,17 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7: { scale:11.2, x:-105, y:200 }
       };
 
-      // ★ここだけ純粋に追加
       const groupBoxSettings = {
         Path_2: { leftTop:['Aomori','Iwate','Akita'], rightBottom:['Miyagi','Yamagata','Fukushima'] },
         Path_3: { rightTop:['Niigata','Gunma','Tochigi'], leftBottom:['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'] },
         Path_4: { rightTop:['Ishikawa','Toyama','Fukui'], leftBottom:['Nagano','Gifu','Shizuoka','Aichi'] },
         Path_5: { rightTop:['Shiga','Kyoto'], leftBottom:['Mie','Nara','Wakayama','Osaka','Hyogo'] },
-        Path_6: { 
-          top:['Tottori','Shimane','Okayama','Hiroshima'],        // 既存Top-1
-          top2:['Tokushima','Kagawa','Kochi','Ehime'],            // 新規Top-2
-          bottom:['Yamaguchi']                                    // Bottomに福井追加（例）
-        },
+        Path_6: { top:['Tottori','Shimane','Okayama','Hiroshima'], bottom:['Yamaguchi','Tokushima','Kagawa','Kochi','Ehime'] },
         Path_7: { rightTop:['Fukuoka','Saga','Nagasaki'], rightBottom:['Oita','Kumamoto','Miyazaki','Kagoshima'] }
       };
 
@@ -67,29 +60,28 @@ document.addEventListener('DOMContentLoaded', () => {
         Oita:'大分県', Kumamoto:'熊本県', Miyazaki:'宮崎県', Kagoshima:'鹿児島県'
       };
 
-      prefGroup.querySelectorAll('path').forEach(p=>{
-        p.style.display='none';
-        p.setAttribute('fill','#ffffff');
-        p.setAttribute('stroke','#191970');
-        p.setAttribute('stroke-width','1');
+      prefGroup.querySelectorAll('path').forEach(p => {
+        p.style.display = 'none';
+        p.setAttribute('fill', '#ffffff');
+        p.setAttribute('stroke', '#191970');
+        p.setAttribute('stroke-width', '1');
       });
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
-
-      allGroups.forEach(g=>{
+      allGroups.forEach(g => {
         const gid = g.id;
-        g.setAttribute('fill','#ffffff');
-        g.setAttribute('stroke','#191970');
+        g.setAttribute('fill', '#ffffff');
+        g.setAttribute('stroke', '#191970');
         if(groupSettings[gid]){
-          g.style.cursor='pointer';
-          g.addEventListener('click',()=>showRegion(gid));
+          g.style.cursor = 'pointer';
+          g.addEventListener('click', () => showRegion(gid));
         }
       });
 
       const initialNav = createInitialNav();
 
       const topDummy = createTopDummy();
-      const top2Dummy = createTop2Dummy(); // 新規Top-2
+      const top2Dummy = createTop2Dummy(); // ← Path_6用のTop-2
       const bottomDummy = createBottomDummy();
       const leftTopDummy = createCornerDummy('leftTop');
       const rightBottomDummy = createCornerDummy('rightBottom');
@@ -111,58 +103,50 @@ document.addEventListener('DOMContentLoaded', () => {
         const setting = groupBoxSettings[gid];
         if(!setting) return;
 
-        if(setting.top){
-          topDummy.style.display='flex';
-          setting.top.forEach((pid,i)=>{
-            const box = topDummy.children[i];
-            if(box){ box.style.display='flex'; box.textContent = prefNames[pid]; }
-          });
-        }
+        Object.keys(setting).forEach(pos=>{
+          let wrapper;
+          if(pos==='top') wrapper = topDummy;
+          if(pos==='top2') wrapper = top2Dummy; // ← Top-2用
+          if(pos==='bottom') wrapper = bottomDummy;
+          if(pos==='leftTop') wrapper = leftTopDummy;
+          if(pos==='rightBottom') wrapper = rightBottomDummy;
+          if(pos==='leftBottom') wrapper = leftBottomDummy;
+          if(pos==='rightTop') wrapper = rightTopDummy;
+          if(!wrapper) return;
 
-        if(setting.top2){
-          top2Dummy.style.display='flex';
-          setting.top2.forEach((pid,i)=>{
-            const box = top2Dummy.children[i];
-            if(box){ box.style.display='flex'; box.textContent = prefNames[pid]; }
+          wrapper.style.display='flex';
+          setting[pos].forEach((pid,i)=>{
+            const box = wrapper.children[i];
+            if(box){
+              box.style.display='flex';
+              box.textContent = prefNames[pid];
+            }
           });
-        }
-
-        if(setting.bottom){
-          bottomDummy.style.display='flex';
-          setting.bottom.forEach((pid,i)=>{
-            const box = bottomDummy.children[i];
-            if(box){ box.style.display='flex'; box.textContent = prefNames[pid]; }
-          });
-        }
-
-        ['leftTop','rightBottom','leftBottom','rightTop'].forEach(pos=>{
-          if(setting[pos]){
-            const wrapper = {leftTop:leftTopDummy,rightBottom:rightBottomDummy,leftBottom:leftBottomDummy,rightTop:rightTopDummy}[pos];
-            wrapper.style.display='flex';
-            setting[pos].forEach((pid,i)=>{
-              const box = wrapper.children[i];
-              if(box){ box.style.display='flex'; box.textContent = prefNames[pid]; }
-            });
-          }
         });
       }
 
       function showRegion(gid){
         currentGroup = gid;
+        initialNav.style.display='none';
         hideAllBoxes();
+
+        // Path_6だけTop-2表示
+        if(gid==='Path_6'){
+          groupBoxSettings[gid]['top2'] = ['Yamaguchi','Fukui','Hyogo','Shimane'];
+        }
+
         showBoxes(gid);
 
         allGroups.forEach(g=>g.style.display='none');
 
         prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.display = groupToPrefectures[gid].includes(p.id)?'inline':'none';
+          p.style.display = groupToPrefectures[gid].includes(p.id)? 'inline':'none';
         });
 
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
       }
 
-      // --- ここから下は元のまま ---
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
@@ -179,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const ty = (svg.clientHeight/2) - cy*scale*displayScale;
 
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale*displayScale})`;
-
         prefGroup.querySelectorAll('path').forEach(p=>p.setAttribute('stroke-width','0.3'));
       }
 
@@ -189,8 +172,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const p = prefGroup.querySelector(`#${pid}`);
           if(!p) return;
           const bbox = p.getBBox();
-          const cx = bbox.x + bbox.width/2;
-          const cy = bbox.y + bbox.height/2;
+          const cx = bbox.x+bbox.width/2;
+          const cy = bbox.y+bbox.height/2;
 
           const text = document.createElementNS('http://www.w3.org/2000/svg','text');
           text.setAttribute('x',cx);
@@ -199,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
           text.setAttribute('font-size','10');
           text.setAttribute('fill','#191970');
           text.textContent = prefNames[pid];
-
           svg.appendChild(text);
         });
       }
@@ -254,22 +236,27 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++){ wrapper.appendChild(createBox()); }
+
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
+
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
+      // ← Path_6用Top-2
       function createTop2Dummy(){
         const wrapper=document.createElement('div');
         wrapper.id='top2Dummy';
         wrapper.style.position='absolute';
-        wrapper.style.top='40px'; // Top-1の下に配置
+        wrapper.style.top='35px';
         wrapper.style.left='50%';
         wrapper.style.transform='translateX(-50%)';
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++){ wrapper.appendChild(createBox()); }
+
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
+
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -284,7 +271,9 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++){ wrapper.appendChild(createBox()); }
+
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
+
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -315,5 +304,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     });
-
 });
