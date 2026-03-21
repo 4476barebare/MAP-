@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(svgText => {
 
       mapDiv.innerHTML = svgText;
-
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
 
@@ -30,9 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const groupBoxSettings = {
         Path_2: { leftTop:['Aomori','Iwate','Akita'], rightBottom:['Miyagi','Yamagata','Fukushima'] },
         Path_3: { rightTop:['Niigata','Gunma','Tochigi'], leftBottom:['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa'] },
-        Path_4: { rightTop:['Ishikawa','Toyama','Fukui'], leftBottom:['Nagano','Gifu','Shizuoka','Aichi'] },
+        Path_4: { rightTop:['Ishikawa','Toyama','Fukui','Nagano'], leftBottom:['Gifu','Shizuoka','Aichi','Yamanashi'] },
         Path_5: { rightTop:['Shiga','Kyoto'], leftBottom:['Mie','Nara','Wakayama','Osaka','Hyogo'] },
-        Path_6: { top:['Tottori','Shimane','Okayama','Hiroshima','Yamaguchi'], bottom:['Tokushima','Kagawa','Kochi','Ehime'] },
+        Path_6: { top:['Tottori','Shimane','Okayama','Hiroshima'], top2:['Yamaguchi','Fukui','Hyogo','Shimane'], bottom:['Tokushima','Kagawa','Kochi','Ehime'] },
         Path_7: { rightTop:['Fukuoka','Saga','Nagasaki'], rightBottom:['Oita','Kumamoto','Miyazaki','Kagoshima'] }
       };
 
@@ -69,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
-
       allGroups.forEach(g => {
         const gid = g.id;
         g.setAttribute('fill', '#ffffff');
@@ -83,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const initialNav = createInitialNav();
 
       const topDummy = createTopDummy();
+      const top2Dummy = createTop2Dummy();
       const bottomDummy = createBottomDummy();
       const leftTopDummy = createCornerDummy('leftTop');
       const rightBottomDummy = createCornerDummy('rightBottom');
@@ -90,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightTopDummy = createCornerDummy('rightTop');
 
       function hideAllBoxes(){
-        [topDummy,bottomDummy,leftTopDummy,rightBottomDummy,leftBottomDummy,rightTopDummy]
+        [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
           .forEach(wrapper=>{
             wrapper.style.display='none';
             Array.from(wrapper.querySelectorAll('div')).forEach(c=>{
@@ -107,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(setting).forEach(pos=>{
           let wrapper;
           if(pos==='top') wrapper = topDummy;
+          if(pos==='top2') wrapper = top2Dummy;
           if(pos==='bottom') wrapper = bottomDummy;
           if(pos==='leftTop') wrapper = leftTopDummy;
           if(pos==='rightBottom') wrapper = rightBottomDummy;
@@ -115,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
           if(!wrapper) return;
 
           wrapper.style.display='flex';
-
           setting[pos].forEach((pid,i)=>{
             const box = wrapper.children[i];
             if(box){
@@ -158,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const ty = (svg.clientHeight/2) - cy*scale*displayScale;
 
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale*displayScale})`;
-
         prefGroup.querySelectorAll('path').forEach(p=>p.setAttribute('stroke-width','0.3'));
       }
 
@@ -178,14 +176,13 @@ document.addEventListener('DOMContentLoaded', () => {
           text.setAttribute('font-size','10');
           text.setAttribute('fill','#191970');
           text.textContent = prefNames[pid];
-
           svg.appendChild(text);
         });
       }
 
       function createBox(){
         const box = document.createElement('div');
-        box.classList.add('pref-box'); // CSS で統一
+        box.classList.add('pref-box');
         return box;
       }
 
@@ -224,10 +221,22 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++){
-          const box=createBox();
-          wrapper.appendChild(box);
-        }
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
+        mapDiv.appendChild(wrapper);
+        return wrapper;
+      }
+
+      function createTop2Dummy(){
+        const wrapper=document.createElement('div');
+        wrapper.id='top2Dummy';
+        wrapper.style.position='absolute';
+        wrapper.style.top='35px';
+        wrapper.style.left='50%';
+        wrapper.style.transform='translateX(-50%)';
+        wrapper.style.display='none';
+        wrapper.style.gap='6px';
+        wrapper.style.zIndex='10';
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -242,10 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++){
-          const box=createBox();
-          wrapper.appendChild(box);
-        }
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -258,18 +264,22 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.flexDirection='column';
         wrapper.style.gap='4px';
         wrapper.style.zIndex='10';
-        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
-        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
+
+        let color='#fff';
+        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; color='#fcc'; }
+        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; color='#fcf'; }
+        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; color='#ffc'; }
+        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; color='#cff'; }
+
         for(let i=0;i<5;i++){
           const box=createBox();
+          box.style.background=color;
           wrapper.appendChild(box);
         }
+
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
     });
-
 });
