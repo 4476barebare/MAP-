@@ -134,7 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g=>g.style.display='none');
 
         prefGroup.querySelectorAll('path').forEach(p=>{
-        
+            
+            
+        p.style.display = 'inline
+            
+            
         });
 
         applyTransform(gid);
