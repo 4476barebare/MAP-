@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
           leftBottom: ['Chiba','Ibaraki','Tokyo','Saitama','Kanagawa']
         },
         Path_4: {
-          rightTop: ['Ishikawa','Toyama','Fukui'],
+          rightTop: ['Nagano','Ishikawa','Toyama','Fukui'],
           leftBottom: ['Nagano','Gifu','Shizuoka','Aichi']
         },
         Path_5: {
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
           setting[pos].forEach((pid, i) => {
 
             if(pos === 'top'){
-              const container = wrapper.children[0];
+              const container = wrapper.querySelector('div');
               const box = container.children[i];
               if(box){
                 box.style.display = 'flex';
