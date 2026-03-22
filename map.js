@@ -1,8 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   const mapDiv = document.getElementById('map');
-  mapDiv.style.position = 'relative';
-  mapDiv.style.zIndex = '50';
+
+  // ★変更：レイアウト系もCSSに移行
+  // mapDiv.style.position = 'relative';
+  // mapDiv.style.zIndex = '50';
 
   fetch('japan.svg')
     .then(res => res.text())
@@ -12,8 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
 
-      svg.style.shapeRendering = 'geometricPrecision';
-      svg.style.transformOrigin = 'center center';
+      // ★変更：描画設定はCSSへ
+      // svg.style.shapeRendering = 'geometricPrecision';
+      // svg.style.transformOrigin = 'center center';
 
       let currentGroup = null;
 
@@ -60,22 +63,29 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
+      // =========================
       // 初期：県非表示
+      // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.setAttribute('fill', '#ffffff');
-        p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '0.3');
+
+        // ★変更：見た目はCSSへ
+        // p.setAttribute('fill', '#ffffff');
+        // p.setAttribute('stroke', '#191970');
+        // p.setAttribute('stroke-width', '0.3');
       });
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
         const gid = g.id;
-        g.setAttribute('fill', '#ffffff');
-        g.setAttribute('stroke', '#191970');
+
+        // ★変更：見た目はCSSへ
+        // g.setAttribute('fill', '#ffffff');
+        // g.setAttribute('stroke', '#191970');
+
         if(groupSettings[gid]){
-          g.style.cursor = 'pointer';
+          g.style.cursor = 'pointer'; // ←操作なので残す
           g.addEventListener('click', () => showRegion(gid));
         }
       });
@@ -142,33 +152,28 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
 
-        // ★クリック無効化
         disableOtherAreas(groupToPrefectures[gid]);
         
         if(gid === 'Path_6'){
-  const topRect = topDummy.getBoundingClientRect();
-  const mapRect = mapDiv.getBoundingClientRect();
+          const topRect = topDummy.getBoundingClientRect();
+          const mapRect = mapDiv.getBoundingClientRect();
+          const left = topRect.left - mapRect.left;
 
-  const left = topRect.left - mapRect.left;
+          top2Dummy.style.left = left + 'px';
+          top2Dummy.style.transform = 'none';
+        }else{
+          top2Dummy.style.left = '50%';
+          top2Dummy.style.transform = 'translateX(-50%)';
+        }
 
-  top2Dummy.style.left = left + 'px';
-  top2Dummy.style.transform = 'none';
-}else{
-  top2Dummy.style.left = '50%';
-  top2Dummy.style.transform = 'translateX(-50%)';
-}
-        
-        
-
-        // 他グループ表示（クリック不可）
         allGroups.forEach(g => {
           if(g.id !== gid) g.style.display = 'inline';
         });
 
-        // ★枠の太さ統一（今回の修正）
-        allGroups.forEach(g=>{
-          g.setAttribute('stroke-width','0.3');
-        });
+        // ★変更：線の太さはCSSで統一
+        // allGroups.forEach(g=>{
+        //   g.setAttribute('stroke-width','0.3');
+        // });
       }
 
       function applyTransform(gid){
@@ -188,9 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale*displayScale})`;
 
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.setAttribute('stroke-width','0.3');
-        });
+        // ★変更：線太さはCSSへ
+        // prefGroup.querySelectorAll('path').forEach(p=>{
+        //   p.setAttribute('stroke-width','0.3');
+        // });
       }
 
       function addPrefLabels(prefIds){}
@@ -214,13 +220,16 @@ document.addEventListener('DOMContentLoaded', () => {
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
-        nav.style.position='absolute';
-        nav.style.top='5px';
-        nav.style.left='5px';
-        nav.style.display='flex';
-        nav.style.flexDirection='column';
-        nav.style.gap='4px';
-        nav.style.zIndex='10';
+
+        // ★変更：見た目はCSSへ
+        // nav.style.position='absolute';
+        // nav.style.top='5px';
+        // nav.style.left='5px';
+        // nav.style.display='flex';
+        // nav.style.flexDirection='column';
+        // nav.style.gap='4px';
+        // nav.style.zIndex='10';
+
         names.forEach((name,i)=>{
           const box=createBox();
           box.textContent=name;
@@ -238,13 +247,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createTopDummy(){
         const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.top='5px';
-        wrapper.style.left='50%';
-        wrapper.style.transform='translateX(-50%)';
+
+        // ★変更：位置・見た目はCSSへ
+
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
+
         for(let i=0;i<4;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
@@ -252,13 +261,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createTop2Dummy(){
         const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.top='35px';
-        wrapper.style.left='50%';
-        wrapper.style.transform='translateX(-50%)';
+
+        // ★変更：位置・見た目はCSSへ
+
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
+
         for(let i=0;i<4;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
@@ -266,13 +275,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createBottomDummy(){
         const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.bottom='5px';
-        wrapper.style.left='50%';
-        wrapper.style.transform='translateX(-50%)';
+
+        // ★変更：位置・見た目はCSSへ
+
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
+
         for(let i=0;i<4;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
@@ -280,16 +289,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function createCornerDummy(position){
         const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
+
+        // ★変更：位置はCSSへ
+
         wrapper.style.display='none';
         wrapper.style.flexDirection='column';
         wrapper.style.gap='4px';
         wrapper.style.zIndex='10';
-
-        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
-        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
 
         for(let i=0;i<5;i++){
           wrapper.appendChild(createBox());
@@ -300,9 +306,5 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     });
-    
-    
-    
-    
-    
+
 });
