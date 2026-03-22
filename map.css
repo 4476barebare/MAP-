@@ -45,15 +45,9 @@
   gap: 6px;
 }
 
-
-/* 選択された県のスタイル */
-.selected-pref {
-  fill: #f0fff0;       /* 選択時の塗り色（薄い黄色） */
-}
-
 /* 初期画面の県 */
 .prefecture-initial {
-    fill: #000;
+    fill: #fff;
     stroke: #191970;
     stroke-width: 0.3;
     transition: all 0.2s ease;
@@ -69,7 +63,7 @@
 
 /* 拡大後：非選択県 */
 .prefecture-unselected {
-    fill: #000;
+    fill: #fff;
     stroke: #191970;
     stroke-width: 0.3;
     transition: all 0.2s ease;
