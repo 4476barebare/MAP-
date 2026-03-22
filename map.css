@@ -1,0 +1,61 @@
+/* 地図全体ラップ */
+#map {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  overflow: hidden; /* はみ出し防止 */
+  z-index: 50;
+}
+
+/* SVG自体 */
+#map svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  filter: drop-shadow(0 0 16px #6495ed) drop-shadow(0 0 3px #191970);
+  shape-rendering: geometricPrecision;
+  z-index: 1;
+  transform-origin: center center;
+}
+
+/* 県境の線を滑らかに */
+#map svg path {
+  stroke: #191970;
+  stroke-width: 0.3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  fill: #ffffff;
+}
+
+/* 県名や選択用ボックス */
+.pref-box {
+  background: #ffffff; /* 白塗り */
+  border: 1px solid #191970; /* 枠色 */
+  box-shadow: 0 0 4px rgba(0,0,0,0.25); /* ドロップシャドウ */
+  height: 26px;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #191970;
+}
+
+/* ダミーBOXや初期ナビなどのラップ */
+#map > div {
+  z-index: 10;
+  position: absolute;
+  display: flex;
+  gap: 6px;
+}
+
+/* 特定位置用のラップ調整（top / top2 / bottom / corner） */
+.top-box { top: 5px; left: 50%; transform: translateX(-50%); }
+.top2-box { top: 35px; left: 50%; transform: translateX(-50%); }
+.bottom-box { bottom: 5px; left: 50%; transform: translateX(-50%); }
+.leftTop-box { top: 5px; left: 5px; flex-direction: column; gap: 4px; }
+.rightTop-box { top: 5px; right: 5px; flex-direction: column; gap: 4px; }
+.leftBottom-box { bottom: 5px; left: 5px; flex-direction: column; gap: 4px; }
+.rightBottom-box { bottom: 5px; right: 5px; flex-direction: column; gap: 4px; }
