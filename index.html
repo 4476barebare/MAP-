@@ -34,7 +34,8 @@ main {
 /* ヘッダー直下の固定ニュースフィーダー */
 #newsTicker {
   position: sticky;       /* ヘッダー下に常に表示 */
-  top: 52px;              /* ヘッダーの高さに合わせる（header-inner + paddingなど） */
+  top: 0;                 /* ヘッダーの直下に配置 */
+  margin-top: 52px;       /* ヘッダーの高さ分だけずらす */
   left: 0;
   width: 100%;
   overflow: hidden;
@@ -44,6 +45,7 @@ main {
   line-height: 28px;
   white-space: nowrap;
   z-index: 99;
+  height: 28px;           /* ニュース行の高さを固定 */
 }
 
 #newsTicker .ticker-content {
