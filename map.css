@@ -44,11 +44,12 @@
 }
 
 /* ダミーBOXや初期ナビなどのラップ */
+/* CSS側: 基本スタイルだけ */
 #map > div {
   z-index: 10;
   position: absolute;
-  display: flex;
   gap: 6px;
+  flex-direction: row;
 }
 
 /* 特定位置用のラップ調整（top / top2 / bottom / corner） */
