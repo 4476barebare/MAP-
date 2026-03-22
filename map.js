@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_3: { scale:15, x:92, y:95 },
         Path_4: { scale:10.2, x:54, y:110 },
         Path_5: { scale:13.6, x:0, y:140 },
-        Path_6: { scale:9.5, x:-53, y:165 },
+        Path_6: { scale:9.5, x:-51, y:165 },
         Path_7: { scale:11.2, x:-105, y:200 }
       };
 
