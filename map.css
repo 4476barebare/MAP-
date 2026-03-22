@@ -26,7 +26,7 @@
   height: auto;
   display: block;
   position: relative;
-  filter: drop-shadow(0 0 16px #6495ed) drop-shadow(0 0 3px #191970);
+  filter: drop-shadow(0 0 8px #6495ed) drop-shadow(0 0 3px #191970);
   z-index: 1;
 }
 
