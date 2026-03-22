@@ -31,33 +31,32 @@ main {
   text-align: center;
 }
 
+/* ヘッダー直下ニュースフィーダー */
 #newsTicker {
-  position: relative;
+  position: absolute;       /* ヘッダー下に配置 */
+  top: 100%;               /* ヘッダーの下端に合わせる */
+  left: 0;
   width: 100%;
-  height: 28px;
   overflow: hidden;
   background: #191970;
-  color: #ffffff;
+  color: #fff;
   font-size: 14px;
   line-height: 28px;
   white-space: nowrap;
+  z-index: 99;             /* ヘッダーの機能より下に表示 */
 }
 
-#newsTicker .ticker-track {
+#newsTicker .ticker-content {
   display: inline-block;
-  white-space: nowrap;
-  animation: tickerLoop 15s linear infinite;
+  padding-left: 100%;      /* 右端から流れる初期位置 */
+  animation: ticker 15s linear infinite;
 }
 
-#newsTicker .ticker-item {
-  display: inline-block;
-  padding-right: 50px; /* テキスト間のスペース */
+@keyframes ticker {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
 }
 
-@keyframes tickerLoop {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); } /* 半分ずらすだけでループ */
-}
 
 </style>
 </head>
