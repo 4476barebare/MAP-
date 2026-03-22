@@ -143,6 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
         disableOtherAreas(groupToPrefectures[gid]);
+        
+        // ★ 追加：選択県に属性付与（過去の選択も残す）
+    groupToPrefectures[gid].forEach(pref => {
+        const el = document.getElementById(pref);
+        if(el) el.setAttribute('data-selected','true');
+    });
 
         // ★Path_6のみ top2Dummy の位置調整
         if(gid === 'Path_6'){
