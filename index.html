@@ -4,11 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こNAVI</title>
+
 <!-- ヘッダー用 CSS -->
 <link rel="stylesheet" href="header.css">
-<!-- コンテンツ用 CSS -->
+<!-- Map専用 CSS -->
+<link rel="stylesheet" href="map.css">
+
 <style>
-/* html・bodyの余白を消す */
+/* html・body の全体設定はここに残す */
 html, body {
   margin: 0;
   padding: 0;
@@ -18,84 +21,14 @@ html, body {
   overflow-x: hidden;
 }
 
-/* main全体は中央揃えだが余白ゼロ */
 main {
   max-width: 100%;
   margin: 0;
   padding: 0;
 }
 
-/* Map全体 */
 .map {
   text-align: center;
-}
-
-/* SVGラップ */
-.japan-map {
-  width: 100%;
-  max-width: 100%;  /* 横幅制限なし */
-  margin: 0;
-}
-
-
-.pref-box {
-  background: #ffffff;             /* 白塗り */
-  border: 1px solid #191970;       /* 枠色 */
-  box-shadow: 0 0 4px rgba(0,0,0,0.25); /* ドロップシャドウ */
-  height: 26px;
-  min-width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: #191970;
-}
-
-/* SVG自体 */
-#map {
-  position: relative;
-  width: 100%;
-  min-height: 420px;
-  overflow: hidden; /* はみ出し防止 */
-  z-index: 50;
-}
-
-#map svg {
-  width: 100%;
-  height: auto;
-  display: block;
-  position: relative;
-  
-  filter: drop-shadow(0 0 16px #6495ed) drop-shadow(0 0 3px #191970);
-  
-  z-index: 1;
-}
-
-/* 県境の線を滑らかに */
-#map svg path {
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-
-/* ダミーBOXや初期ナビ */
-#map > div {
-  z-index: 10;
-}
-
-/* 広告・footer */
-.ad {
-  text-align: center;
-  margin: 20px 0;
-  color: #999;
-}
-footer {
-  margin-top: 40px;
-  padding: 20px;
-  text-align: center;
-  font-size: 13px;
-  color: #777;
-  border-top: 1px solid #ddd;
 }
 </style>
 </head>
