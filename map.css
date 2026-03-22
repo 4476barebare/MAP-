@@ -51,10 +51,6 @@
   fill: #f0fff0;       /* 選択時の塗り色（薄い黄色） */
 }
 
-/* ================================== */
-/* map.js 用 都道府県クラス CSS */
-/* ================================== */
-
 /* 初期画面の県 */
 .prefecture-initial {
   fill: #eee;
@@ -76,61 +72,5 @@
   fill: #ddd;
   stroke: #666;
   stroke-width: 1;
-  transition: all 0.2s ease;
-}
-
-/* グループ単位（初期画面の大枠） */
-.group-initial {
-  fill: #fff;
-  stroke: #191970;
-  stroke-width: 0.3;
-}
-
-/* ダミーBOX内の都道府県ラベル */
-.pref-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-width: 50px;
-  min-height: 24px;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #333;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-  transition: all 0.2s ease;
-}
-
-/* 初期ナビボックス */
-div[id^="nav"] .pref-box {
-  background-color: #fff;
-  border: 1px solid #999;
-  cursor: pointer;
-}
-
-div[id^="nav"] .pref-box:hover {
-  background-color: #ffc;
-  border-color: #f90;
-}
-
-/* ダミーBOX wrapper */
-div.dummy-wrapper {
-  display: flex;
-  gap: 6px;
-  position: absolute;
-  z-index: 10;
-}
-
-/* 左上・右上・左下・右下の位置調整 */
-div.dummy-leftTop { top: 5px; left: 5px; flex-direction: column; }
-div.dummy-rightTop { top: 5px; right: 5px; flex-direction: column; }
-div.dummy-leftBottom { bottom: 5px; left: 5px; flex-direction: column; }
-div.dummy-rightBottom { bottom: 5px; right: 5px; flex-direction: column; }
-
-/* transition のスムーズ化 */
-svg path {
   transition: all 0.2s ease;
 }
