@@ -136,10 +136,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         allGroups.forEach(g=>g.style.display='none');
 
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.display = groupToPrefectures[gid].includes(p.id)? 'inline':'none';
+        prefGroup.querySelectorAll('path').forEach(p => {
+            if(groupToPrefectures[gid].includes(p.id)) {
+                p.style.display = 'inline';
+                p.classList.add('selected-pref');   // クラスを追加
+                } else {
+                    p.style.display = 'none';
+                    p.classList.remove('selected-pref'); // クラスを削除
+                    }
+            
         });
-
+        
+        
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
         disableOtherAreas(groupToPrefectures[gid]);
