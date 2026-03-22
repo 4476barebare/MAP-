@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
 
       const groupSettings = {
-        Path_2: { scale:6.7, x:135, y:45 },
-        Path_3: { scale:15, x:90, y:95 },
+        Path_2: { scale:6.7, x:125, y:45 },
+        Path_3: { scale:15, x:92, y:95 },
         Path_4: { scale:10.1, x:55, y:110 },
         Path_5: { scale:13.6, x:0, y:140 },
         Path_6: { scale:9.5, x:-50, y:165 },
