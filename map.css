@@ -1,8 +1,8 @@
 /* ダミーBOXや初期ナビのスタイル */
 .pref-box {
-  background: #ffffff;             /* 白塗り */
-  border: 1px solid #191970;       /* 枠色 */
-  box-shadow: 0 0 4px rgba(0,0,0,0.25); /* ドロップシャドウ */
+  background: #ffffff;
+  border: 1px solid #191970;
+  box-shadow: 0 0 4px rgba(0,0,0,0.25);
   height: 26px;
   min-width: 80px;
   display: flex;
@@ -36,6 +36,7 @@
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
+
 
 /* ダミーBOXや初期ナビラッパー */
 #map > div {
