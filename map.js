@@ -127,6 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
       }
+      
+      // ★追加関数：タイミング保証版で選択県に属性を付与
+        function markSelectedPref(prefArray){
+            requestAnimationFrame(() => {
+                prefArray.forEach(pref => {
+                    const el = document.getElementById(pref);
+                    if(el) el.setAttribute('data-selected','true');
+                });
+            });
+        }
 
       function showRegion(gid){
         currentGroup = gid;
@@ -144,11 +154,25 @@ document.addEventListener('DOMContentLoaded', () => {
         addPrefLabels(groupToPrefectures[gid]);
         disableOtherAreas(groupToPrefectures[gid]);
         
-        // ★ 追加：選択県に属性付与（過去の選択も残す）
-    groupToPrefectures[gid].forEach(pref => {
-        const el = document.getElementById(pref);
-        if(el) el.setAttribute('data-selected','true');
-    });
+        // ★ 追加：属性付与（前後行込み）
+            applyTransform(gid);
+            addPrefLabels(groupToPrefectures[gid]);
+            disableOtherAreas(groupToPrefectures[gid]);
+
+            markSelectedPref(groupToPrefectures[gid]);
+            // ★ ここまで// ★ 追加：属性付与（前後行込み）
+            applyTransform(gid);
+            addPrefLabels(groupToPrefectures[gid]);
+            disableOtherAreas(groupToPrefectures[gid]);
+
+            markSelectedPref(groupToPrefectures[gid]);
+            // ★ ここまで// ★ 追加：属性付与（前後行込み）
+            applyTransform(gid);
+            addPrefLabels(groupToPrefectures[gid]);
+            disableOtherAreas(groupToPrefectures[gid]);
+
+            markSelectedPref(groupToPrefectures[gid]);
+            // ★ ここまで
 
         // ★Path_6のみ top2Dummy の位置調整
         if(gid === 'Path_6'){
