@@ -53,24 +53,24 @@
 
 /* 初期画面の県 */
 .prefecture-initial {
-  fill: #eee;
-  stroke: #666;
-  stroke-width: 1;
-  transition: all 0.2s ease;
+    fill: #000;
+    stroke: #191970;
+    stroke-width: 0.3;
+    transition: all 0.2s ease;
 }
 
 /* 拡大後：選択県 */
 .prefecture-selected {
-  fill: #ffc;
-  stroke: #f90;
-  stroke-width: 2;
-  transition: all 0.2s ease;
+    fill: #f0fff0;
+    stroke: #191970;
+    stroke-width: 0.3;
+    transition: all 0.2s ease;
 }
 
 /* 拡大後：非選択県 */
 .prefecture-unselected {
-  fill: #ddd;
-  stroke: #666;
-  stroke-width: 1;
-  transition: all 0.2s ease;
+    fill: #000;
+    stroke: #191970;
+    stroke-width: 0.3;
+    transition: all 0.2s ease;
 }
