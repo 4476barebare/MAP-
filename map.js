@@ -60,20 +60,18 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // 初期：県非表示
+      // 初期：県非表示＋クラス付与
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        p.setAttribute('fill', '#ffffff');
-        p.setAttribute('stroke', '#191970');
-        p.setAttribute('stroke-width', '0.3');
+        p.classList.add('prefecture-initial');
+        p.classList.remove('prefecture-selected','prefecture-unselected');
       });
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
         const gid = g.id;
-        g.setAttribute('fill', '#ffffff');
-        g.setAttribute('stroke', '#191970');
+        g.classList.add('group-initial');
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
@@ -139,15 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
         prefGroup.querySelectorAll('path').forEach(p => {
             if(groupToPrefectures[gid].includes(p.id)) {
                 p.style.display = 'inline';
-                p.classList.add('selected-pref');   // クラスを追加
-                } else {
-                    p.style.display = 'none';
-                    p.classList.remove('selected-pref'); // クラスを削除
-                    }
-            
+                p.classList.add('prefecture-selected');
+                p.classList.remove('prefecture-unselected','prefecture-initial');
+            } else {
+                p.style.display = 'none';
+                p.classList.add('prefecture-unselected');
+                p.classList.remove('prefecture-selected','prefecture-initial');
+            }
         });
-        
-        
+
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
         disableOtherAreas(groupToPrefectures[gid]);
