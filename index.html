@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="map.css">
 
 <style>
-/* html・body の全体設定はここに残す */
+/* html・body の全体設定 */
 html, body {
   margin: 0;
   padding: 0;
@@ -31,10 +31,10 @@ main {
   text-align: center;
 }
 
-/* ヘッダー直下の固定ニュースフィーダー */
+/* ヘッダー直下ニュースフィーダー */
 #newsTicker {
-  position: absolute;   /* header 内の絶対配置 */
-  bottom: 0;            /* header-inner の下端に合わせる */
+  position: absolute;
+  top: 100%;           /* ヘッダーの下端に合わせる */
   left: 0;
   width: 100%;
   overflow: hidden;
@@ -43,8 +43,7 @@ main {
   font-size: 14px;
   line-height: 28px;
   white-space: nowrap;
-  z-index: 99;
-  height: 28px;
+  z-index: 99;         /* ヘッダーの下 */
 }
 
 #newsTicker .ticker-content {
@@ -54,55 +53,13 @@ main {
 }
 
 #newsTicker .ticker-item {
-  margin-right: 50px;
-}#newsTicker {
-  position: absolute;   /* header 内の絶対配置 */
-  bottom: 0;            /* header-inner の下端に合わせる */
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  background: #191970;
-  color: #fff;
-  font-size: 14px;
-  line-height: 28px;
-  white-space: nowrap;
-  z-index: 99;
-  height: 28px;
+  margin-right: 50px;   /* アイテム間のスペース */
 }
 
-#newsTicker .ticker-content {
-  display: inline-block;
-  padding-left: 100%;
-  animation: ticker 15s linear infinite;
+@keyframes ticker {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
 }
-
-#newsTicker .ticker-item {
-  margin-right: 50px;
-}#newsTicker {
-  position: absolute;   /* header 内の絶対配置 */
-  bottom: 0;            /* header-inner の下端に合わせる */
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  background: #191970;
-  color: #fff;
-  font-size: 14px;
-  line-height: 28px;
-  white-space: nowrap;
-  z-index: 99;
-  height: 28px;
-}
-
-#newsTicker .ticker-content {
-  display: inline-block;
-  padding-left: 100%;
-  animation: ticker 15s linear infinite;
-}
-
-#newsTicker .ticker-item {
-  margin-right: 50px;
-}
-
 </style>
 </head>
 <body>
@@ -126,15 +83,15 @@ main {
       <a href="#">その他</a>
     </nav>
   </div>
+</header>
 
+<!-- ニュースフィーダー -->
 <div id="newsTicker">
   <div class="ticker-content">
     <span class="ticker-item">今はテストのニュースです。釣果情報や台風情報などを流す予定です。 ● </span>
     <span class="ticker-item">今はテストのニュースです。釣果情報や台風情報などを流す予定です。 ● </span>
   </div>
-</div
-
-</header>
+</div>
 
 <main>
   <div class="map">
