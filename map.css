@@ -63,7 +63,7 @@
 
 /* 拡大後：非選択県 */
 .prefecture-unselected {
-    fill: #fff;
+    fill: #d3d3d3;
     stroke: #191970;
     stroke-width: 0.3;
     transition: all 0.2s ease;
