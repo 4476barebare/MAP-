@@ -30,7 +30,6 @@
 }
 
 #map svg {
-    fill: #ffffff !important;
   width: 100%;
   height: auto;
   display: block;
@@ -42,27 +41,9 @@
   z-index: 1;
 }
 
-/* 県境線を滑らかに */
-#map svg path.prefecture-initial {
-    fill: #ffffff !important;
-    stroke: #191970 !important;
-    stroke-width: 0.3 !important;
-    transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke !important;
+path {
+  fill: none !important;  /* SVGの属性を無視してクリア */
 }
-
-#map svg path.prefecture-selected {
-    fill: #f0fff0 !important;
-    stroke: #191970 !important;
-    stroke-width: 0.3 !important;
-    transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke !important;
-}
-
-#map svg path.prefecture-unselected {
-    fill: #d3d3d3 !important;
-    stroke: #191970 !important;
-    stroke-width: 0.3 !important;
-    transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke !important;
-}
+path.prefecture-initial { fill: #fff; stroke: #191970; stroke-width:1; }
+path.prefecture-selected { fill: #f0fff0; stroke: #191970; stroke-width:0.3; }
+path.prefecture-unselected { fill: #d3d3d3; stroke: #191970; stroke-width:0.3; }
