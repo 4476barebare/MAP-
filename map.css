@@ -46,4 +46,4 @@ path {
 }
 path.prefecture-initial { fill: #fff; stroke: #191970; stroke-width:1; }
 path.prefecture-selected { fill: #f0fff0; stroke: #191970; stroke-width:0.3; }
-path.prefecture-unselected { fill: #d3d3d3; stroke: #191970; stroke-width:0.3; }
+path.prefecture-unselected { fill: #ff0000; stroke: #191970; stroke-width:0.3; }
