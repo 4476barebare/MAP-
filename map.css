@@ -54,7 +54,7 @@
 path.prefecture-initial {
     fill: #fff;
     stroke: #191970;
-    stroke-width: 0.3;
+    stroke-width: 1;
     transition: all 0.2s ease;
     vector-effect: non-scaling-stroke
 }
@@ -72,7 +72,7 @@ path.prefecture-selected {
 path.prefecture-unselected {
     fill: #d3d3d3;
     stroke: #191970;
-    stroke-width: 0.3;
+    stroke-width: 1;
     transition: all 0.2s ease;
     vector-effect: non-scaling-stroke
 }
