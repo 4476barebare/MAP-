@@ -63,8 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
       // 初期：県非表示
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
-        
-        p.classList.remove('prefecture-selected','prefecture-unselected');
         p.classList.add('prefecture-initial');
       });
 
@@ -80,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const initialNav = createInitialNav();
 
-      // ★ダミーBOXの作成
+      // ★ダミーBOX作成
       const topDummy = createTopDummy();
       const top2Dummy = createTop2Dummy();
       const bottomDummy = createBottomDummy();
@@ -93,10 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
           .forEach(wrapper=>{
             wrapper.style.display='none';
-            Array.from(wrapper.querySelectorAll('div')).forEach(c=>{
-              c.style.display='none';
-              c.textContent='';
-            });
+            Array.from(wrapper.querySelectorAll('div')).forEach(c=>{ c.style.display='none'; c.textContent=''; });
           });
       }
 
@@ -107,21 +102,18 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(setting).forEach(pos=>{
           let wrapper;
           if(pos==='top') wrapper = topDummy;
-          if(pos==='top2') wrapper = top2Dummy;
-          if(pos==='bottom') wrapper = bottomDummy;
-          if(pos==='leftTop') wrapper = leftTopDummy;
-          if(pos==='rightBottom') wrapper = rightBottomDummy;
-          if(pos==='leftBottom') wrapper = leftBottomDummy;
-          if(pos==='rightTop') wrapper = rightTopDummy;
+          else if(pos==='top2') wrapper = top2Dummy;
+          else if(pos==='bottom') wrapper = bottomDummy;
+          else if(pos==='leftTop') wrapper = leftTopDummy;
+          else if(pos==='rightBottom') wrapper = rightBottomDummy;
+          else if(pos==='leftBottom') wrapper = leftBottomDummy;
+          else if(pos==='rightTop') wrapper = rightTopDummy;
           if(!wrapper) return;
 
           wrapper.style.display='flex';
           setting[pos].forEach((pid,i)=>{
             const box = wrapper.children[i];
-            if(box){
-              box.style.display='flex';
-              box.textContent = prefNames[pid];
-            }
+            if(box){ box.style.display='flex'; box.textContent = prefNames[pid]; }
           });
         });
       }
@@ -135,31 +127,26 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g=>g.style.display='none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
-            if(groupToPrefectures[gid].includes(p.id)) {
-                p.style.display = 'inline';
-                
-                p.classList.remove('prefecture-initial','prefecture-unselected');
-                p.classList.add('prefecture-selected');
-                } else {
-                    p.style.display = 'none';
-                    
-                    p.classList.remove('prefecture-initial','prefecture-selected');
-                    p.classList.add('prefecture-unselected');
-                }
-            
+          if(groupToPrefectures[gid].includes(p.id)) {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-unselected');
+            p.classList.add('prefecture-selected');
+          } else {
+            p.style.display = 'none';
+            p.classList.remove('prefecture-initial','prefecture-selected');
+            p.classList.add('prefecture-unselected');
+          }
         });
-        
-        
+
         applyTransform(gid);
         addPrefLabels(groupToPrefectures[gid]);
         disableOtherAreas(groupToPrefectures[gid]);
 
-        // ★Path_6のみ top2Dummy の位置調整
+        // Path_6のみ top2Dummy の位置調整
         if(gid === 'Path_6'){
           const topRect = topDummy.getBoundingClientRect();
           const mapRect = mapDiv.getBoundingClientRect();
-          const left = topRect.left - mapRect.left;
-          top2Dummy.style.left = left + 'px';
+          top2Dummy.style.left = (topRect.left - mapRect.left) + 'px';
           top2Dummy.style.transform = 'none';
         } else {
           top2Dummy.style.left = '50%';
@@ -171,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      // 拡大縮小＋線幅補正
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
@@ -188,86 +176,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale*displayScale})`;
 
+        // stroke-width補正（基準 0.5px）
+        const effectiveScale = scale * displayScale;
         prefGroup.querySelectorAll('path').forEach(p=>{
+            p.style.strokeWidth = (0.5 / effectiveScale) + 'px';
         });
       }
 
       function addPrefLabels(prefIds){}
 
       function disableOtherAreas(activeIds){
-        allGroups.forEach(g=>{
-          g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none';
-        });
-
+        allGroups.forEach(g=>{ g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none'; });
         prefGroup.querySelectorAll('path').forEach(p=>{
           p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
         });
       }
 
-      function createBox(){
-        const box = document.createElement('div');
-        box.classList.add('pref-box');
-        return box;
-      }
-
+      function createBox(){ const box = document.createElement('div'); box.classList.add('pref-box'); return box; }
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
-        nav.style.position='absolute';
-        nav.style.top='5px';
-        nav.style.left='5px';
-        nav.style.display='flex';
-        nav.style.flexDirection='column';
-        nav.style.gap='4px';
-        nav.style.zIndex='10';
+        nav.style.position='absolute'; nav.style.top='5px'; nav.style.left='5px';
+        nav.style.display='flex'; nav.style.flexDirection='column'; nav.style.gap='4px'; nav.style.zIndex='10';
         names.forEach((name,i)=>{
-          const box=createBox();
-          box.textContent=name;
-          if(i!==0 && i!==7){
-            box.style.cursor='pointer';
-            box.onclick=()=>showRegion(`Path_${i+1}`);
-          } else {
-            box.style.opacity='0.6';
-          }
+          const box=createBox(); box.textContent=name;
+          if(i!==0 && i!==7){ box.style.cursor='pointer'; box.onclick=()=>showRegion(`Path_${i+1}`); }
+          else{ box.style.opacity='0.6'; }
           nav.appendChild(box);
         });
         mapDiv.appendChild(nav);
         return nav;
       }
 
-      function createTopDummy(){
-        const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.top='5px';
-        wrapper.style.left='50%';
-        wrapper.style.transform='translateX(-50%)';
-        wrapper.style.display='none';
-        wrapper.style.gap='6px';
-        wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
+      function createTopDummy(){ return createDummy(5,50); }
+      function createTop2Dummy(){ return createDummy(35,50); }
+      function createBottomDummy(){ return createDummy(null,50,'bottom'); }
 
-      function createTop2Dummy(){
+      function createDummy(top,left,position){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
-        wrapper.style.top='35px';
-        wrapper.style.left='50%';
-        wrapper.style.transform='translateX(-50%)';
-        wrapper.style.display='none';
-        wrapper.style.gap='6px';
-        wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
-
-      function createBottomDummy(){
-        const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.bottom='5px';
-        wrapper.style.left='50%';
+        if(position==='bottom') wrapper.style.bottom = '5px';
+        else wrapper.style.top = top+'px';
+        wrapper.style.left = left+'%';
         wrapper.style.transform='translateX(-50%)';
         wrapper.style.display='none';
         wrapper.style.gap='6px';
@@ -290,10 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
         else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
 
-        for(let i=0;i<5;i++){
-          wrapper.appendChild(createBox());
-        }
-
+        for(let i=0;i<5;i++){ wrapper.appendChild(createBox()); }
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
