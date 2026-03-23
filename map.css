@@ -22,6 +22,7 @@
 }
 
 #map svg {
+     fill: #fff;
     stroke-width: 0.3;
   width: 100%;
   height: auto;
@@ -31,29 +32,49 @@
   z-index: 1;
 }
 
-/* 初期画面の県：線を確実に表示 */
-#map svg path.prefecture-initial {
-    fill: #ffffff !important;        /* 白塗り */
-    stroke: #191970 !important;      /* 線色 */
-    stroke-width: 0.3 !important;    /* 線の太さ */
+/* 県境線を滑らかに */
+#map svg path {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+#map svg [id^="Path_"] {
+  fill: #fff;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ダミーBOXや初期ナビラッパー */
+#map > div {
+  z-index: 10;
+  position: absolute;
+  display: flex;
+  gap: 6px;
+}
+
+/* 初期画面の県 */
+path.prefecture-initial {
+    fill: #fff;
+    stroke: #191970;
+    stroke-width: 0.3;
     transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke !important;
+    vector-effect: non-scaling-stroke
 }
 
 /* 拡大後：選択県 */
-#map svg path.prefecture-selected {
-    fill: #f0fff0 !important;
-    stroke: #191970 !important;
-    stroke-width: 0.3 !important;
+path.prefecture-selected {
+    fill: #f0fff0;
+    stroke: #191970;
+    stroke-width: 0.3;
     transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke !important;
+    vector-effect: non-scaling-stroke
 }
 
 /* 拡大後：非選択県 */
-#map svg path.prefecture-unselected {
-    fill: #d3d3d3 !important;
-    stroke: #191970 !important;
-    stroke-width: 0.3 !important;
+path.prefecture-unselected {
+    fill: #d3d3d3;
+    stroke: #191970;
+    stroke-width: 0.3;
     transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke !important;
+    vector-effect: non-scaling-stroke
 }
