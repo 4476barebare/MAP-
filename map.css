@@ -22,7 +22,6 @@
 }
 
 #map svg {
-     fill: #fff;
     stroke-width: 0.3;
   width: 100%;
   height: auto;
@@ -34,6 +33,7 @@
 
 /* 県境線を滑らかに */
 #map svg path {
+    fill: #fff;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
