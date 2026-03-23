@@ -35,6 +35,9 @@
   display: block;
   position: relative;
   filter: drop-shadow(0 0 8px #6495ed) drop-shadow(0 0 3px #191970);
+  stroke: #191970;       /* デフォルト線色 */
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
   z-index: 1;
 }
 
