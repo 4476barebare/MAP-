@@ -60,10 +60,43 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // 初期表示：全県非表示＋初期クラス
+      // ---------------- ハッシュ設定 ----------------
+      const hashMap = {
+        TOHOKU: 'Path_2',
+        KANTO: 'Path_3',
+        CHUBU: 'Path_4',
+        KINKI: 'Path_5',
+        CHUGOKU: 'Path_6',
+        KYUSHU: 'Path_7'
+      };
+
+      const groupToHash = {
+        Path_2:'TOHOKU',
+        Path_3:'KANTO',
+        Path_4:'CHUBU',
+        Path_5:'KINKI',
+        Path_6:'CHUGOKU',
+        Path_7:'KYUSHU'
+      };
+
+      function applyHash(){
+        const hash = (location.hash || '').replace('#','').toUpperCase();
+        const gid = hashMap[hash];
+
+        if(gid && currentGroup !== gid){
+          showRegion(gid);
+        }
+
+        const hashSpan = document.getElementById('currentHash');
+        if(hashSpan) hashSpan.textContent = location.hash || '(なし)';
+      }
+
+      window.addEventListener('hashchange', applyHash);
+      // ---------------------------------------------
+
+      // 初期表示
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
-        p.classList.remove('prefecture-selected','prefecture-unselected');
         p.classList.add('prefecture-initial');
       });
 
@@ -72,168 +105,77 @@ document.addEventListener('DOMContentLoaded', () => {
         const gid = g.id;
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
-          g.addEventListener('click', () => showRegion(gid));
+          g.addEventListener('click', () => {
+            if(groupToHash[gid]){
+              location.hash = groupToHash[gid];
+            }
+            showRegion(gid);
+          });
         }
       });
 
       const initialNav = createInitialNav();
-      const topDummy = createTopDummy();
-      const top2Dummy = createTop2Dummy();
-      const bottomDummy = createBottomDummy();
-      const leftTopDummy = createCornerDummy('leftTop');
-      const rightBottomDummy = createCornerDummy('rightBottom');
-      const leftBottomDummy = createCornerDummy('leftBottom');
-      const rightTopDummy = createCornerDummy('rightTop');
-      
-      function applyHash(){
-        const hash = (location.hash || '').replace('#','').toUpperCase();
-        const gid = hashMap[hash];
-        if(gid && currentGroup !== gid) showRegion(gid);
-        const hashSpan = document.getElementById('currentHash');
-        if(hashSpan) hashSpan.textContent = location.hash || '(なし)';
-      }
-
-      applyHash();
-      window.addEventListener('hashchange', applyHash);
-      // -------------------
-
-      function hideAllBoxes(){
-        [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
-          .forEach(wrapper=>{
-            wrapper.style.display='none';
-            Array.from(wrapper.querySelectorAll('div')).forEach(c=>{
-              c.style.display='none';
-              c.textContent='';
-            });
-          });
-      }
-
-      function showBoxes(gid){
-        const setting = groupBoxSettings[gid];
-        if(!setting) return;
-
-        Object.keys(setting).forEach(pos=>{
-          let wrapper;
-          if(pos==='top') wrapper = topDummy;
-          if(pos==='top2') wrapper = top2Dummy;
-          if(pos==='bottom') wrapper = bottomDummy;
-          if(pos==='leftTop') wrapper = leftTopDummy;
-          if(pos==='rightBottom') wrapper = rightBottomDummy;
-          if(pos==='leftBottom') wrapper = leftBottomDummy;
-          if(pos==='rightTop') wrapper = rightTopDummy;
-          if(!wrapper) return;
-
-          wrapper.style.display='flex';
-          setting[pos].forEach((pid,i)=>{
-            const box = wrapper.children[i];
-            if(box){
-              box.style.display='flex';
-              box.textContent = prefNames[pid];
-            }
-          });
-        });
-      }
 
       function showRegion(gid){
+        if(currentGroup === gid) return;
         currentGroup = gid;
-        
-        // ---------------- ハッシュ自動更新 ----------------
-  const groupToHash = {
-    Path_2:'TOHOKU',
-    Path_3:'KANTO',
-    Path_4:'CHUBU',
-    Path_5:'KINKI',
-    Path_6:'CHUGOKU',
-    Path_7:'KYUSHU'
-  };
-  if(groupToHash[gid]) {
-    // URLのハッシュを変更（ページスクロールは防止）
-    if(location.hash.replace('#','') !== groupToHash[gid]){
-      history.replaceState(null, '', '#' + groupToHash[gid]);
-    }
-  }
-  const hashSpan = document.getElementById('currentHash');
-  if(hashSpan) hashSpan.textContent = location.hash || '
-        
-        
+
         initialNav.style.display='none';
-        hideAllBoxes();
-        showBoxes(gid);
 
         allGroups.forEach(g=>g.style.display='none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
           if(groupToPrefectures[gid].includes(p.id)) {
-            p.style.display = 'inline';
-            p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
           } else {
-            p.style.display = 'inline';
-            p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
           }
         });
 
         applyTransform(gid);
-        addPrefLabels(groupToPrefectures[gid]);
-        disableOtherAreas(groupToPrefectures[gid]);
-
-        if(gid === 'Path_6'){
-          const topRect = topDummy.getBoundingClientRect();
-          const mapRect = mapDiv.getBoundingClientRect();
-          const left = topRect.left - mapRect.left;
-          top2Dummy.style.left = left + 'px';
-          top2Dummy.style.transform = 'none';
-        } else {
-          top2Dummy.style.left = '50%';
-          top2Dummy.style.transform = 'translateX(-50%)';
-        }
 
         allGroups.forEach(g=>{
           if(g.id !== gid) g.style.display = 'inline';
         });
+
+        const hashSpan = document.getElementById('currentHash');
+        if(hashSpan) hashSpan.textContent = location.hash || '(なし)';
       }
 
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
+
         const cx = bbox.x + bbox.width/2 + s.x;
         const cy = bbox.y + bbox.height/2 + s.y;
         const scale = s.scale;
 
-        const svgDisplayWidth = svg.clientWidth;
-        const viewBoxWidth = svg.viewBox.baseVal.width;
-        const displayScale = svgDisplayWidth / viewBoxWidth;
+        const svgW = svg.clientWidth;
+        const vbW = svg.viewBox.baseVal.width;
+        const displayScale = svgW / vbW;
 
         const finalScale = scale * displayScale;
-        const tx = (svgDisplayWidth/2) - cx * finalScale;
+        const tx = (svgW/2) - cx * finalScale;
         const ty = (svg.clientHeight/2) - cy * finalScale;
 
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
 
         const baseStroke = 0.5;
         prefGroup.querySelectorAll('path').forEach(p=>{
-            p.style.strokeWidth = (baseStroke / finalScale) + 'px';
+          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
         });
 
         allGroups.forEach(g=>{
-            g.style.strokeWidth = (baseStroke / finalScale) + 'px';
+          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
         });
       }
 
-      function addPrefLabels(prefIds){}
-
-      function disableOtherAreas(activeIds){
-        allGroups.forEach(g=>{
-          g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none';
-        });
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
-        });
+      function createBox(){
+        const box = document.createElement('div');
+        box.classList.add('pref-box');
+        return box;
       }
-
-      function createBox(){ const box = document.createElement('div'); box.classList.add('pref-box'); return box; }
 
       function createInitialNav(){
         const names=['北海道','東北新潟','関東地方','中部地方','近畿地方','中国四国','九州地方','沖縄'];
@@ -245,55 +187,34 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.flexDirection='column';
         nav.style.gap='4px';
         nav.style.zIndex='10';
+
         names.forEach((name,i)=>{
           const box=createBox();
           box.textContent=name;
+
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
-            box.onclick=()=>showRegion(`Path_${i+1}`);
-          } else box.style.opacity='0.6';
+            box.onclick=()=>{
+              const gid = `Path_${i+1}`;
+              if(groupToHash[gid]){
+                location.hash = groupToHash[gid];
+              }
+              showRegion(gid);
+            };
+          } else {
+            box.style.opacity='0.6';
+          }
+
           nav.appendChild(box);
         });
+
         mapDiv.appendChild(nav);
         return nav;
       }
 
-      function createTopDummy(){ return createCornerDummyWrapper('top',5,50,'X'); }
-      function createTop2Dummy(){ return createCornerDummyWrapper('top',35,50,'X'); }
-      function createBottomDummy(){ return createCornerDummyWrapper('bottom',5,50,'X'); }
-
-      function createCornerDummy(position){
-        const wrapper = document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.display='none';
-        wrapper.style.flexDirection='column';
-        wrapper.style.gap='4px';
-        wrapper.style.zIndex='10';
-
-        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
-        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
-
-        for(let i=0;i<5;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
-
-      function createCornerDummyWrapper(vertical,posValue,horPercent,axis){
-        const wrapper = document.createElement('div');
-        wrapper.style.position='absolute';
-        if(vertical==='top') wrapper.style.top = posValue+'px';
-        else wrapper.style.bottom = posValue+'px';
-        wrapper.style.left = horPercent+'%';
-        if(axis==='X') wrapper.style.transform = 'translateX(-50%)';
-        wrapper.style.display = 'none';
-        wrapper.style.gap = '6px';
-        wrapper.style.zIndex = '10';
-        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
+      // 初回ハッシュ適用（最後に実行）
+      applyHash();
 
     });
+
 });
