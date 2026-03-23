@@ -57,3 +57,24 @@ path.prefecture-initial { fill: #fff; stroke: #191970; transition: all 0.2s ease
 /* 拡大後 */
 path.prefecture-selected { fill: #f0fff0; stroke: #191970; transition: all 0.2s ease; }
 path.prefecture-unselected { fill: #d3d3d3; stroke: #191970; transition: all 0.2s ease; }
+
+/* 初期表示（白） */
+.prefecture-initial {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 0.5px;
+}
+
+/* 選択済み（薄い緑） */
+.prefecture-selected {
+  fill: #f0fff0;
+  stroke: #000;
+  stroke-width: 0.5px;
+}
+
+/* 選択外（グレー） */
+.prefecture-unselected {
+  fill: #d3d3d3;
+  stroke: #000;
+  stroke-width: 0.5px;
+}
