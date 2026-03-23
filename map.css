@@ -32,12 +32,14 @@
 
 /* 県境線を滑らかに */
 #map svg path {
+    stroke-width: 1;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
 
 #map svg [id^="Path_"] {
+    stroke-width: 1;
   fill: #fff;
   vector-effect: non-scaling-stroke;
 }
