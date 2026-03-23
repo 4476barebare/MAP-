@@ -179,10 +179,11 @@ function applyTransform(gid){
   svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
 
   // ★線幅補正
-  const baseStroke = 0.3; // 表示上維持したい線幅
-  prefGroup.querySelectorAll('path').forEach(p => {
-      p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-  });
+  // ★線幅補正（SVG内全てのパス）
+const baseStroke = 0.3; // 表示上維持したい線幅
+svg.querySelectorAll('path').forEach(p => {
+    p.style.strokeWidth = (baseStroke / finalScale) + 'px';
+});
 }
 
       function addPrefLabels(prefIds){}
