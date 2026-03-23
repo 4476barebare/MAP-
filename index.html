@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -9,8 +9,6 @@
 <link rel="stylesheet" href="header.css">
 <!-- Map専用 CSS -->
 <link rel="stylesheet" href="map.css">
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-o9N1jXU6gjbpgUo8YpD+1eAiFFfR78fDx0f2h1n8hU4=" crossorigin=""/>
 
 <style>
 /* html・body の全体設定 */
@@ -24,7 +22,7 @@ html, body {
 }
 
 main {
-  background-color: #191970;
+    background-color: #191970;
   max-width: 100%;
   margin: 0;
   padding: 0;
@@ -34,13 +32,6 @@ main {
   text-align: center;
 }
 
-/* Leaflet用マップは初期非表示 */
-#leafletMap {
-  width: 100%;
-  height: 600px;
-  display: none;
-  position: relative;
-}
 </style>
 </head>
 <body>
@@ -64,18 +55,22 @@ main {
       <a href="#">その他</a>
     </nav>
   </div>
+
 </header>
 
 <main>
   <div class="map">
-    <!-- SVG 地図 -->
     <div class="japan-map" id="map"></div>
-    <!-- Leaflet 地図 -->
-    <div id="leafletMap"></div>
   </div>
 </main>
 
 <div class="ad">広告スペース</div>
+
+<!-- ハッシュ表示用 -->
+<div id="hashDisplay" style="position:fixed; bottom:30px; left:5px; background:#eee; padding:4px 8px; font-size:12px; z-index:100;">
+  ハッシュ: <span id="currentHash"></span>
+</div>
+
 <footer>© 釣り行こNAVI</footer>
 
 <!-- ニュースオーバーレイ -->
@@ -89,37 +84,94 @@ main {
 <!-- JS -->
 <script src="header.js"></script>
 <script src="map.js"></script>
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-pvJ2qIpr9c61wKxFvxFvq6sVRhQzzl8zzC3ZJZ2f6Ps=" crossorigin=""></script>
 
-<script>
-// Leaflet 地図初期化関数
-function initLeafletMap(lat, lng, zoom) {
-  const mapDiv = document.getElementById('leafletMap');
-  if(!mapDiv._leafletMap){
-    mapDiv._leafletMap = L.map('leafletMap').setView([lat, lng], zoom);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(mapDiv._leafletMap);
-  } else {
-    mapDiv._leafletMap.setView([lat, lng], zoom);
-  }
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こNAVI</title>
+
+<!-- ヘッダー用 CSS -->
+<link rel="stylesheet" href="header.css">
+<!-- Map専用 CSS -->
+<link rel="stylesheet" href="map.css">
+
+<style>
+/* html・body の全体設定 */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background: #fff;
+  color: #333;
+  overflow-x: hidden;
 }
 
-// SVG 県クリック時の Leaflet 切替処理（例：千葉県）
-function switchToLeafletForChiba() {
-  // SVG を非表示
-  document.getElementById('map').style.display = 'none';
-  // Leaflet 地図を表示
-  const leafletDiv = document.getElementById('leafletMap');
-  leafletDiv.style.display = 'block';
-  // 千葉県中心座標（例：35.6, 140.1）
-  initLeafletMap(35.6, 140.1, 9);
+main {
+    background-color: #191970;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-// map.js の showRegion 内で千葉県クリック時に呼ぶ
-// 例: if(p.id === 'CHIBA'){ switchToLeafletForChiba(); }
-</script>
+.map {
+  text-align: center;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
+
+</header>
+
+<main>
+  <div class="map">
+    <div class="japan-map" id="map"></div>
+  </div>
+</main>
+
+<div class="ad">広告スペース</div>
+
+<!-- ハッシュ表示用 -->
+<div id="hashDisplay" style="position:fixed; bottom:30px; left:5px; background:#eee; padding:4px 8px; font-size:12px; z-index:100;">
+  ハッシュ: <span id="currentHash"></span>
+</div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<!-- ニュースオーバーレイ -->
+<div id="newsOverlay">
+  <div class="news-window">
+    <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="header.js"></script>
+<script src="map.js"></script>
 
 </body>
 </html>
