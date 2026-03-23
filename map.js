@@ -4,18 +4,23 @@ document.addEventListener('DOMContentLoaded', () => {
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
 
+  let isUpdatingHash = false;
+  let currentGroup = null;
+
   fetch('japan.svg')
     .then(res => res.text())
     .then(svgText => {
 
       mapDiv.innerHTML = svgText;
+
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
+      const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       svg.style.shapeRendering = 'geometricPrecision';
       svg.style.transformOrigin = 'center center';
 
-      let currentGroup = null;
+      // ---------------- 設定 ----------------
 
       const groupSettings = {
         Path_2: { scale:6.7, x:135, y:45 },
@@ -35,14 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7:['FUKUOKA','SAGA','NAGASAKI','OITA','KUMAMOTO','MIYAZAKI','KAGOSHIMA'],
       };
 
-      // ---------------- ハッシュ ----------------
       const hashMap = {
-        TOHOKU: 'Path_2',
-        KANTO: 'Path_3',
-        CHUBU: 'Path_4',
-        KINKI: 'Path_5',
-        CHUGOKU: 'Path_6',
-        KYUSHU: 'Path_7'
+        TOHOKU:'Path_2',
+        KANTO:'Path_3',
+        CHUBU:'Path_4',
+        KINKI:'Path_5',
+        CHUGOKU:'Path_6',
+        KYUSHU:'Path_7'
       };
 
       const groupToHash = {
@@ -54,7 +58,27 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7:'KYUSHU'
       };
 
+      // ---------------- 初期状態 ----------------
+
+      prefGroup.querySelectorAll('path').forEach(p => {
+        p.style.display = 'inline';
+        p.classList.remove('prefecture-selected','prefecture-unselected');
+        p.classList.add('prefecture-initial');
+      });
+
+      // ---------------- ハッシュ表示 ----------------
+
+      function updateHashView(){
+        const el = document.getElementById('currentHash');
+        if(el) el.textContent = location.hash || '(なし)';
+      }
+
+      // ---------------- ハッシュ反映 ----------------
+
       function applyHash(){
+
+        if(isUpdatingHash) return;
+
         const hash = (location.hash || '').replace('#','').toUpperCase();
         const gid = hashMap[hash];
 
@@ -62,67 +86,32 @@ document.addEventListener('DOMContentLoaded', () => {
           showRegion(gid);
         }
 
-        const hashSpan = document.getElementById('currentHash');
-        if(hashSpan) hashSpan.textContent = location.hash || '(なし)';
+        updateHashView();
       }
 
       window.addEventListener('hashchange', applyHash);
-      // ----------------------------------------
-
-      // 初期状態
-      prefGroup.querySelectorAll('path').forEach(p => {
-        p.style.display = 'inline';
-
-        // ★ここ重要（CSS崩れ対策）
-        p.classList.remove('prefecture-selected','prefecture-unselected');
-        p.classList.add('prefecture-initial');
-      });
-
-      const allGroups = svg.querySelectorAll('[id^="Path_"]');
-
-      allGroups.forEach(g => {
-        const gid = g.id;
-
-        if(groupSettings[gid]){
-          g.style.cursor = 'pointer';
-
-          g.addEventListener('click', () => {
-
-            // ハッシュ付与
-            if(groupToHash[gid]){
-              location.hash = groupToHash[gid];
-            }
-
-            showRegion(gid);
-          });
-        }
-      });
-
-      const initialNav = createInitialNav();
 
       // ---------------- メイン処理 ----------------
+
       function showRegion(gid){
 
         if(currentGroup === gid) return;
         currentGroup = gid;
 
-        initialNav.style.display='none';
+        initialNav.style.display = 'none';
 
-        allGroups.forEach(g=>g.style.display='none');
+        allGroups.forEach(g => g.style.display = 'none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
 
           if(groupToPrefectures[gid].includes(p.id)){
-
-            // ★CSS正しく切替
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
-
-          } else {
-
+          }else{
             p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
           }
+
         });
 
         applyTransform(gid);
@@ -131,12 +120,13 @@ document.addEventListener('DOMContentLoaded', () => {
           if(g.id !== gid) g.style.display = 'inline';
         });
 
-        const hashSpan = document.getElementById('currentHash');
-        if(hashSpan) hashSpan.textContent = location.hash || '(なし)';
+        updateHashView();
       }
-      // ------------------------------------------
+
+      // ---------------- 拡大処理 ----------------
 
       function applyTransform(gid){
+
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
@@ -150,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const displayScale = svgW / vbW;
 
         const finalScale = scale * displayScale;
+
         const tx = (svgW/2) - cx * finalScale;
         const ty = (svg.clientHeight/2) - cy * finalScale;
 
@@ -164,7 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g=>{
           g.style.strokeWidth = (baseStroke / finalScale) + 'px';
         });
+
       }
+
+      // ---------------- UI ----------------
 
       function createBox(){
         const box = document.createElement('div');
@@ -173,46 +167,92 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       function createInitialNav(){
-        const names=['北海道','東北新潟','関東地方','中部地方','近畿地方','中国四国','九州地方','沖縄'];
 
-        const nav=document.createElement('div');
-        nav.style.position='absolute';
-        nav.style.top='5px';
-        nav.style.left='5px';
-        nav.style.display='flex';
-        nav.style.flexDirection='column';
-        nav.style.gap='4px';
-        nav.style.zIndex='10';
+        const names = ['北海道','東北新潟','関東地方','中部地方','近畿地方','中国四国','九州地方','沖縄'];
+
+        const nav = document.createElement('div');
+        nav.style.position = 'absolute';
+        nav.style.top = '5px';
+        nav.style.left = '5px';
+        nav.style.display = 'flex';
+        nav.style.flexDirection = 'column';
+        nav.style.gap = '4px';
+        nav.style.zIndex = '10';
 
         names.forEach((name,i)=>{
-          const box=createBox();
-          box.textContent=name;
 
-          if(i!==0 && i!==7){
-            box.style.cursor='pointer';
+          const box = createBox();
+          box.textContent = name;
 
-            box.onclick=()=>{
+          if(i !== 0 && i !== 7){
+
+            box.style.cursor = 'pointer';
+
+            box.onclick = () => {
+
               const gid = `Path_${i+1}`;
 
-              if(groupToHash[gid]){
-                location.hash = groupToHash[gid];
+              showRegion(gid); // ★先に描画
+
+              const hash = groupToHash[gid];
+              if(hash){
+
+                isUpdatingHash = true;
+                location.hash = hash;
+                updateHashView();
+                isUpdatingHash = false;
+
               }
 
-              showRegion(gid);
             };
 
-          } else {
-            box.style.opacity='0.6';
+          }else{
+            box.style.opacity = '0.6';
           }
 
           nav.appendChild(box);
+
         });
 
         mapDiv.appendChild(nav);
         return nav;
       }
 
-      // 初回ハッシュ適用
+      const initialNav = createInitialNav();
+
+      // ---------------- クリック ----------------
+
+      allGroups.forEach(g => {
+
+        const gid = g.id;
+
+        if(groupSettings[gid]){
+
+          g.style.cursor = 'pointer';
+
+          g.addEventListener('click', () => {
+
+            showRegion(gid); // ★先に描画
+
+            const hash = groupToHash[gid];
+
+            if(hash){
+
+              isUpdatingHash = true;
+              location.hash = hash;
+              updateHashView();
+              isUpdatingHash = false;
+
+            }
+
+          });
+
+        }
+
+      });
+
+      // ---------------- 初回 ----------------
+
       applyHash();
 
     });
