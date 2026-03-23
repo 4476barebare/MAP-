@@ -35,7 +35,7 @@
 #map svg path {
     fill: #fff;
      stroke: #191970;
-    stroke-width: 0.3
+    stroke-width: 0.3;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
