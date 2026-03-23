@@ -186,9 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const baseStroke = 0.5;
         prefGroup.querySelectorAll('path').forEach(p=>{
             p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-            if(p.classList.contains('prefecture-initial')) p.style.fill = '#fff';
-            else if(p.classList.contains('prefecture-selected')) p.style.fill = '#f0fff0';
-            else if(p.classList.contains('prefecture-unselected')) p.style.fill = '#d3d3d3';
         });
 
         // 選択外グループの線幅補正
