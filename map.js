@@ -179,18 +179,12 @@ function applyTransform(gid){
   svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
 
   // ★線幅補正
-  const baseStroke = 0.5; // 表示上維持したい線幅
-
-function adjustAllPaths(finalScale){
-    prefGroup.querySelectorAll('path').forEach(p=>{
-        // 線幅補正
-        p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        
-        // fill を維持
-        if(p.classList.contains('prefecture-initial')) p.style.fill = '#fff';
-        else if(p.classList.contains('prefecture-selected')) p.style.fill = '#f0fff0';
-        else if(p.classList.contains('prefecture-unselected')) p.style.fill = '#d3d3d3';
-    });
+  const baseStroke = 0.3; // 表示上維持したい線幅
+  prefGroup.querySelectorAll('path').forEach(p => {
+      p.style.strokeWidth = (baseStroke / finalScale) + 'px';
+  });
+  
+  svg.style.strokeWidth = (baseStroke / finalScale) + 'px';
 }
 
       function addPrefLabels(prefIds){}
