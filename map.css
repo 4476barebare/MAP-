@@ -31,6 +31,8 @@
 
 /* SVG設定 */
 #map svg {
+    
+    fill: #fff;
   width: 100%;
   height: auto;
   display: block;
