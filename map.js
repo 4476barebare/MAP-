@@ -158,30 +158,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // 拡大縮小＋線幅補正
-      function applyTransform(gid){
-        const group = svg.querySelector('#'+gid);
-        const bbox = group.getBBox();
-        const s = groupSettings[gid];
-        const cx = bbox.x + bbox.width/2 + s.x;
-        const cy = bbox.y + bbox.height/2 + s.y;
-        const scale = s.scale;
+function applyTransform(gid){
+  const group = svg.querySelector('#'+gid);
+  const bbox = group.getBBox();
+  const s = groupSettings[gid];
+  const cx = bbox.x + bbox.width/2 + s.x;
+  const cy = bbox.y + bbox.height/2 + s.y;
+  const scale = s.scale;
 
-        const svgDisplayWidth = svg.clientWidth;
-        const viewBoxWidth = svg.viewBox.baseVal.width;
-        const displayScale = svgDisplayWidth / viewBoxWidth;
+  const svgDisplayWidth = svg.clientWidth;
+  const viewBoxWidth = svg.viewBox.baseVal.width;
+  const displayScale = svgDisplayWidth / viewBoxWidth;
 
-        const tx = (svgDisplayWidth/2) - cx*scale*displayScale;
-        const ty = (svg.clientHeight/2) - cy*scale*displayScale;
+  const finalScale = scale * displayScale;
 
-        svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale*displayScale})`;
+  const tx = (svgDisplayWidth/2) - cx * finalScale;
+  const ty = (svg.clientHeight/2) - cy * finalScale;
 
-        // stroke-width補正（基準 0.5px）
-        const effectiveScale = scale * displayScale;
-        prefGroup.querySelectorAll('path').forEach(p=>{
-            p.style.strokeWidth = (0.5 / effectiveScale) + 'px';
-        });
-      }
+  // SVG全体を移動・拡大
+  svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
+
+  // ★線幅補正
+  const baseStroke = 0.3; // 表示上維持したい線幅
+  prefGroup.querySelectorAll('path').forEach(p => {
+      p.style.strokeWidth = (baseStroke / finalScale) + 'px';
+  });
+}
 
       function addPrefLabels(prefIds){}
 
