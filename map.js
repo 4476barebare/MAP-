@@ -84,29 +84,28 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightBottomDummy = createCornerDummy('rightBottom');
       const leftBottomDummy = createCornerDummy('leftBottom');
       const rightTopDummy = createCornerDummy('rightTop');
-      
-      // --- ここから追加 ---
-      // ---------------- ハッシュ対応 ----------------
+
+      // --- ハッシュ対応 ---
       const hashMap = {
-          TOHOKU: 'Path_2',
-          KANTO: 'Path_3',
-          CHUBU: 'Path_4',
-          KINKI: 'Path_5',
-          CHUGOKU: 'Path_6',
-          KYUSHU: 'Path_7'
-      }; // 必要に応じて追加可能
+        TOHOKU: 'Path_2',
+        KANTO: 'Path_3',
+        CHUBU: 'Path_4',
+        KINKI: 'Path_5',
+        CHUGOKU: 'Path_6',
+        KYUSHU: 'Path_7'
+      };
+
       function applyHash(){
-        const hash = location.hash.replace('#','').toUpperCase();
+        const hash = (location.hash || '').replace('#','').toUpperCase();
         const gid = hashMap[hash];
-        if(gid) showRegion(gid);
+        if(gid && currentGroup !== gid) showRegion(gid);
         const hashSpan = document.getElementById('currentHash');
         if(hashSpan) hashSpan.textContent = location.hash || '(なし)';
       }
-      applyHash();
 
+      applyHash();
       window.addEventListener('hashchange', applyHash);
-      // ---------------------------------------------
-      
+      // -------------------
 
       function hideAllBoxes(){
         [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
@@ -133,10 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
           if(pos==='leftBottom') wrapper = leftBottomDummy;
           if(pos==='rightTop') wrapper = rightTopDummy;
           if(!wrapper) return;
-          
-          
-          
-          
 
           wrapper.style.display='flex';
           setting[pos].forEach((pid,i)=>{
@@ -158,15 +153,15 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g=>g.style.display='none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
-            if(groupToPrefectures[gid].includes(p.id)) {
-                p.style.display = 'inline';
-                p.classList.remove('prefecture-initial','prefecture-unselected');
-                p.classList.add('prefecture-selected');
-            } else {
-                p.style.display = 'inline';
-                p.classList.remove('prefecture-initial','prefecture-selected');
-                p.classList.add('prefecture-unselected');
-            }
+          if(groupToPrefectures[gid].includes(p.id)) {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-unselected');
+            p.classList.add('prefecture-selected');
+          } else {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-selected');
+            p.classList.add('prefecture-unselected');
+          }
         });
 
         applyTransform(gid);
@@ -189,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // 拡大縮小＋線幅補正（基準 0.5px）
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
@@ -206,22 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const tx = (svgDisplayWidth/2) - cx * finalScale;
         const ty = (svg.clientHeight/2) - cy * finalScale;
 
-        // SVG全体を移動・拡大
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
 
-        // ★線幅補正＆初期・選択・非選択 fill を維持
         const baseStroke = 0.5;
         prefGroup.querySelectorAll('path').forEach(p=>{
             p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-            
-            // この3行を削除
-            if(p.classList.contains('prefecture-initial')) p.style.fill = '#fff';
-            else if(p.classList.contains('prefecture-selected')) p.style.fill = '#f0fff0';
-            else if(p.classList.contains('prefecture-unselected')) p.style.fill = '#d3d3d3'
-            
         });
 
-        // 選択外グループの線幅補正
         allGroups.forEach(g=>{
             g.style.strokeWidth = (baseStroke / finalScale) + 'px';
         });
