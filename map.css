@@ -33,7 +33,7 @@
 
 /* 県境線を滑らかに */
 #map svg path {
-    fill: #fff;
+    
      stroke: #191970;
     stroke-width: 0.3;
   stroke-linejoin: round;
