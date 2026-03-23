@@ -64,9 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'none';
         
-        p.style.fill = '';
-        p.style.stroke = '';
-        
         p.classList.remove('prefecture-selected','prefecture-unselected');
         p.classList.add('prefecture-initial');
       });
@@ -141,16 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if(groupToPrefectures[gid].includes(p.id)) {
                 p.style.display = 'inline';
                 
-                p.style.fill = '';
-                p.style.stroke = '';
-                
                 p.classList.remove('prefecture-initial','prefecture-unselected');
                 p.classList.add('prefecture-selected');
                 } else {
                     p.style.display = 'none';
-                    
-                    p.style.fill = '';
-                    p.style.stroke = '';
                     
                     p.classList.remove('prefecture-initial','prefecture-selected');
                     p.classList.add('prefecture-unselected');
