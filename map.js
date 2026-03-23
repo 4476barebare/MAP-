@@ -84,17 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightBottomDummy = createCornerDummy('rightBottom');
       const leftBottomDummy = createCornerDummy('leftBottom');
       const rightTopDummy = createCornerDummy('rightTop');
-
-      // --- ハッシュ対応 ---
-      const hashMap = {
-        TOHOKU: 'Path_2',
-        KANTO: 'Path_3',
-        CHUBU: 'Path_4',
-        KINKI: 'Path_5',
-        CHUGOKU: 'Path_6',
-        KYUSHU: 'Path_7'
-      };
-
+      
       function applyHash(){
         const hash = (location.hash || '').replace('#','').toUpperCase();
         const gid = hashMap[hash];
@@ -146,6 +136,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function showRegion(gid){
         currentGroup = gid;
+        
+        // ---------------- ハッシュ自動更新 ----------------
+  const groupToHash = {
+    Path_2:'TOHOKU',
+    Path_3:'KANTO',
+    Path_4:'CHUBU',
+    Path_5:'KINKI',
+    Path_6:'CHUGOKU',
+    Path_7:'KYUSHU'
+  };
+  if(groupToHash[gid]) {
+    // URLのハッシュを変更（ページスクロールは防止）
+    if(location.hash.replace('#','') !== groupToHash[gid]){
+      history.replaceState(null, '', '#' + groupToHash[gid]);
+    }
+  }
+  const hashSpan = document.getElementById('currentHash');
+  if(hashSpan) hashSpan.textContent = location.hash || '
+        
+        
         initialNav.style.display='none';
         hideAllBoxes();
         showBoxes(gid);
