@@ -30,6 +30,7 @@
 }
 
 #map svg {
+    fill: #ffffff !important;
   width: 100%;
   height: auto;
   display: block;
