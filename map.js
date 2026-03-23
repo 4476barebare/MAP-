@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
       function createBox(){ const box = document.createElement('div'); box.classList.add('pref-box'); return box; }
 
       function createInitialNav(){
-        const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
+        const names=['北海道','東北新潟','関東地方','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
         nav.style.position='absolute';
         nav.style.top='5px';
