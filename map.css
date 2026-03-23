@@ -39,6 +39,7 @@
 
 #map svg [id^="Path_"] {
   fill: #fff;
+  vector-effect: non-scaling-stroke;
 }
 
 /* ダミーBOXや初期ナビラッパー */
@@ -55,6 +56,7 @@ path.prefecture-initial {
     stroke: #191970;
     stroke-width: 0.3;
     transition: all 0.2s ease;
+    vector-effect: non-scaling-stroke
 }
 
 /* 拡大後：選択県 */
@@ -63,6 +65,7 @@ path.prefecture-selected {
     stroke: #191970;
     stroke-width: 0.3;
     transition: all 0.2s ease;
+    vector-effect: non-scaling-stroke
 }
 
 /* 拡大後：非選択県 */
@@ -71,4 +74,5 @@ path.prefecture-unselected {
     stroke: #191970;
     stroke-width: 0.3;
     transition: all 0.2s ease;
+    vector-effect: non-scaling-stroke
 }
