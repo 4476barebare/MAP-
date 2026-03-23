@@ -36,6 +36,9 @@
   stroke-linecap: round;
 }
 
+#map svg [id^="Path_"] {
+  fill: #fff;
+}
 
 /* ダミーBOXや初期ナビラッパー */
 #map > div {
