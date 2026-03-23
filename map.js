@@ -86,15 +86,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightTopDummy = createCornerDummy('rightTop');
       
       // --- ここから追加 ---
-      // ハッシュ対応
+      // ---------------- ハッシュ対応 ----------------
       const hashMap = {
-        KANTO: 'Path_3'
-      };
-      const hash = location.hash.replace('#','').toUpperCase();
-      if(hash && hashMap[hash]){
-        showRegion(hashMap[hash]);
+          TOHOKU: 'Path_2',
+          KANTO: 'Path_3',
+          CHUBU: 'Path_4',
+          KINKI: 'Path_5',
+          CHUGOKU: 'Path_6',
+          KYUSHU: 'Path_7'
+      }; // 必要に応じて追加可能
+      function applyHash(){
+        const hash = location.hash.replace('#','').toUpperCase();
+        const gid = hashMap[hash];
+        if(gid) showRegion(gid);
+        const hashSpan = document.getElementById('currentHash');
+        if(hashSpan) hashSpan.textContent = location.hash || '(なし)';
       }
-      // --- ここまで追加 ---
+      applyHash();
+
+      window.addEventListener('hashchange', applyHash);
+      // ---------------------------------------------
       
 
       function hideAllBoxes(){
