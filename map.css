@@ -46,7 +46,7 @@
 }
 
 /* 初期画面の県 */
-.prefecture-initial {
+path.prefecture-initial {
     fill: #fff;
     stroke: #191970;
     stroke-width: 0.3;
@@ -54,7 +54,7 @@
 }
 
 /* 拡大後：選択県 */
-.prefecture-selected {
+path.prefecture-selected {
     fill: #f0fff0;
     stroke: #191970;
     stroke-width: 0.3;
@@ -62,7 +62,7 @@
 }
 
 /* 拡大後：非選択県 */
-.prefecture-unselected {
+path.prefecture-unselected {
     fill: #d3d3d3;
     stroke: #191970;
     stroke-width: 0.3;
