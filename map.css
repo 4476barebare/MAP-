@@ -32,7 +32,6 @@
 /* SVG設定 */
 #map svg {
     
-    fill: #fff;
   width: 100%;
   height: auto;
   display: block;
@@ -46,6 +45,7 @@
 
 /* 県パス共通 */
 #map svg path {
+    fill: #fff;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
