@@ -84,6 +84,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const rightBottomDummy = createCornerDummy('rightBottom');
       const leftBottomDummy = createCornerDummy('leftBottom');
       const rightTopDummy = createCornerDummy('rightTop');
+      
+      // --- ここから追加 ---
+      // ハッシュ対応
+      const hashMap = {
+        KANTO: 'Path_3'
+      };
+      const hash = location.hash.replace('#','').toUpperCase();
+      if(hash && hashMap[hash]){
+        showRegion(hashMap[hash]);
+      }
+      // --- ここまで追加 ---
+      
 
       function hideAllBoxes(){
         [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
@@ -110,6 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
           if(pos==='leftBottom') wrapper = leftBottomDummy;
           if(pos==='rightTop') wrapper = rightTopDummy;
           if(!wrapper) return;
+          
+          
+          
+          
 
           wrapper.style.display='flex';
           setting[pos].forEach((pid,i)=>{
