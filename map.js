@@ -71,8 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       allGroups.forEach(g => {
         const gid = g.id;
-        g.setAttribute('fill', '#ffffff');
-        g.setAttribute('stroke', '#191970');
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
@@ -166,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         allGroups.forEach(g=>{
-          g.setAttribute('stroke-width','0.3');
           if(g.id !== gid) g.style.display = 'inline';
         });
       }
@@ -189,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${scale*displayScale})`;
 
         prefGroup.querySelectorAll('path').forEach(p=>{
-          p.setAttribute('stroke-width','0.3');
         });
       }
 
