@@ -12,11 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
       
-      prefGroup.querySelectorAll('path').forEach(p => {
-    p.style.fill = '#fff';          // 塗りを白に
-    p.style.stroke = '#191970';     // 線色は既存の色でOK
-});
-
       svg.style.shapeRendering = 'geometricPrecision';
       svg.style.transformOrigin = 'center center';
 
