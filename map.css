@@ -1,8 +1,10 @@
-/* ダミーBOXや初期ナビのスタイル */
+/* -----------------------------
+   ダミーBOXや初期ナビのスタイル
+----------------------------- */
 .pref-box {
   background: #ffffff;
   border: 1px solid #191970;
-  box-shadow: 0 0 4px rgba(0,0,0,0.25);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
   height: 26px;
   min-width: 80px;
   display: flex;
@@ -12,7 +14,9 @@
   color: #191970;
 }
 
-/* Map全体 */
+/* -----------------------------
+   Map全体
+----------------------------- */
 #map {
   position: relative;
   width: 100%;
@@ -21,8 +25,18 @@
   z-index: 50;
 }
 
+/* ダミーBOXや初期ナビラッパー */
+#map > div {
+  position: absolute;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+/* -----------------------------
+   SVG本体
+----------------------------- */
 #map svg {
-   
   width: 100%;
   height: auto;
   display: block;
@@ -31,53 +45,203 @@
   z-index: 1;
 }
 
-/* 県境線を滑らかに */
+/* 県境線を滑らかに、拡大縮小でも線の太さを保持 */
 #map svg path {
-    
-     stroke: #191970;
-    stroke-width: 0.3;
+  stroke: #191970;
+  stroke-width: 0.3;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
 
+/* Path_X のグループ全体の塗り（初期は白） */
 #map svg [id^="Path_"] {
-    
   fill: #fff;
   vector-effect: non-scaling-stroke;
 }
 
+/* -----------------------------
+   初期画面の県
+----------------------------- */
+path.prefecture-initial {
+  fill: #fff;
+  stroke: #191970;
+  stroke-width: 1; /* 初期画面は少し太め */
+  transition: all 0.2s ease;
+  vector-effect: non-scaling-stroke;
+}
+
+/* -----------------------------
+   拡大後：選択県
+----------------------------- */
+path.prefecture-selected {
+  fill: #f0fff0;
+  stroke: #191970;
+  stroke-width: 0.3;
+  transition: all 0.2s ease;
+  vector-effect: non-scaling-stroke;
+}/* -----------------------------
+   ダミーBOXや初期ナビのスタイル
+----------------------------- */
+.pref-box {
+  background: #ffffff;
+  border: 1px solid #191970;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  height: 26px;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #191970;
+}
+
+/* -----------------------------
+   Map全体
+----------------------------- */
+#map {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  z-index: 50;
+}
+
 /* ダミーBOXや初期ナビラッパー */
 #map > div {
-  z-index: 10;
   position: absolute;
   display: flex;
   gap: 6px;
+  z-index: 10;
 }
 
-/* 初期画面の県 */
+/* -----------------------------
+   SVG本体
+----------------------------- */
+#map svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  filter: drop-shadow(0 0 8px #6495ed) drop-shadow(0 0 3px #191970);
+  z-index: 1;
+}
+
+/* 県境線を滑らかに、拡大縮小でも線の太さを保持 */
+#map svg path {
+  stroke: #191970;
+  stroke-width: 0.3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Path_X のグループ全体の塗り（初期は白） */
+#map svg [id^="Path_"] {
+  fill: #fff;
+  vector-effect: non-scaling-stroke;
+}
+
+/* -----------------------------
+   初期画面の県
+----------------------------- */
 path.prefecture-initial {
-    fill: #fff;
-    stroke: #191970;
-    stroke-width: 0.3;
-    transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke
+  fill: #fff;
+  stroke: #191970;
+  stroke-width: 1; /* 初期画面は少し太め */
+  transition: all 0.2s ease;
+  vector-effect: non-scaling-stroke;
 }
 
-/* 拡大後：選択県 */
+/* -----------------------------
+   拡大後：選択県
+----------------------------- */
 path.prefecture-selected {
-    fill: #f0fff0;
-    stroke: #191970;
-    stroke-width: 0.3;
-    transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke
+  fill: #f0fff0;
+  stroke: #191970;
+  stroke-width: 0.3;
+  transition: all 0.2s ease;
+  vector-effect: non-scaling-stroke;
+}/* -----------------------------
+   ダミーBOXや初期ナビのスタイル
+----------------------------- */
+.pref-box {
+  background: #ffffff;
+  border: 1px solid #191970;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  height: 26px;
+  min-width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #191970;
 }
 
-/* 拡大後：非選択県 */
-path.prefecture-unselected {
-    fill: #d3d3d3;
-    stroke: #191970;
-    stroke-width: 0.3;
-    transition: all 0.2s ease;
-    vector-effect: non-scaling-stroke
+/* -----------------------------
+   Map全体
+----------------------------- */
+#map {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  z-index: 50;
+}
+
+/* ダミーBOXや初期ナビラッパー */
+#map > div {
+  position: absolute;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+/* -----------------------------
+   SVG本体
+----------------------------- */
+#map svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  position: relative;
+  filter: drop-shadow(0 0 8px #6495ed) drop-shadow(0 0 3px #191970);
+  z-index: 1;
+}
+
+/* 県境線を滑らかに、拡大縮小でも線の太さを保持 */
+#map svg path {
+  stroke: #191970;
+  stroke-width: 0.3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Path_X のグループ全体の塗り（初期は白） */
+#map svg [id^="Path_"] {
+  fill: #fff;
+  vector-effect: non-scaling-stroke;
+}
+
+/* -----------------------------
+   初期画面の県
+----------------------------- */
+path.prefecture-initial {
+  fill: #fff;
+  stroke: #191970;
+  stroke-width: 1; /* 初期画面は少し太め */
+  transition: all 0.2s ease;
+  vector-effect: non-scaling-stroke;
+}
+
+/* -----------------------------
+   拡大後：選択県
+----------------------------- */
+path.prefecture-selected {
+  fill: #f0fff0;
+  stroke: #191970;
+  stroke-width: 0.3;
+  transition: all 0.2s ease;
+  vector-effect: non-scaling-stroke;
 }
