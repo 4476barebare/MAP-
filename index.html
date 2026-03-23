@@ -10,8 +10,10 @@
 <!-- Map専用 CSS -->
 <link rel="stylesheet" href="map.css">
 
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
 <style>
-/* html・body の全体設定 */
 html, body {
   margin: 0;
   padding: 0;
@@ -22,7 +24,7 @@ html, body {
 }
 
 main {
-    background-color: #191970;
+  background-color: #191970;
   max-width: 100%;
   margin: 0;
   padding: 0;
@@ -30,6 +32,17 @@ main {
 
 .map {
   text-align: center;
+  height: 600px; /* 元のマップ高さに合わせる */
+}
+
+/* Leaflet専用 */
+#leafletMap {
+  width: 100%;
+  height: 100%;
+}
+
+.leaflet-container-custom {
+  z-index: 0; /* 元のSVGやBOXの上に被らないように */
 }
 
 </style>
@@ -55,19 +68,18 @@ main {
       <a href="#">その他</a>
     </nav>
   </div>
-
 </header>
 
 <main>
   <div class="map">
-    <div class="japan-map" id="map"></div>
+    <!-- Leaflet専用マップ -->
+    <div id="leafletMap" class="leaflet-container-custom"></div>
   </div>
 </main>
 
 <div class="ad">広告スペース</div>
 <footer>© 釣り行こNAVI</footer>
 
-<!-- ニュースオーバーレイ -->
 <div id="newsOverlay">
   <div class="news-window">
     <button id="closeNews">閉じる</button>
@@ -76,8 +88,36 @@ main {
 </div>
 
 <!-- JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="header.js"></script>
 <script src="map.js"></script>
+
+<script>
+// Leaflet初期化
+const leafletMap = L.map('leafletMap').setView([36.0, 139.0], 5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(leafletMap);
+
+// 千葉県ズーム関数
+function zoomToChiba() {
+    const chibaLatLng = [35.607, 140.106];
+    leafletMap.setView(chibaLatLng, 9);
+}
+
+// デバッグ用ボタン
+document.addEventListener('DOMContentLoaded', () => {
+    const mapContainer = document.getElementById('leafletMap');
+    const chibaBtn = document.createElement('button');
+    chibaBtn.textContent = '千葉県を表示';
+    chibaBtn.style.position = 'absolute';
+    chibaBtn.style.top = '10px';
+    chibaBtn.style.left = '10px';
+    chibaBtn.style.zIndex = '1000';
+    chibaBtn.onclick = zoomToChiba;
+    mapContainer.appendChild(chibaBtn);
+});
+</script>
 
 </body>
 </html>
