@@ -203,7 +203,7 @@ top2BOX.children.forEach((c,i)=>{
 
 
 
-//  function handleInitialHash(){
+function handleInitialHash(){
 //      alert('handleInitialHash called — hash now = ' + location.hash);
 
 //      const hash = location.hash.replace('#','').toUpperCase();
@@ -226,14 +226,13 @@ top2BOX.children.forEach((c,i)=>{
  //       }
 //    }
 
-showRegion();
-            return;
 
 
-    alert('fallback to initial screen');
-    initialNav.style.display='flex';
-    hideAllBOX();
-//}
+
+//    alert('fallback to initial screen');
+   initialNav.style.display='flex';
+   hideAllBOX();
+}
 
 
 
