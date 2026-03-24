@@ -55,15 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // ★共通クリック処理
+      // ★共通クリック処理（ハッシュ追加方式）
       function handlePrefClick(prefId){
-        // 県ハッシュ対応
         const leafletPrefs = ['CHIBA']; // Leaflet表示対象
         if(leafletPrefs.includes(prefId)){
-          location.hash = prefId; // ハッシュ追加
           switchToLeaflet(prefId);
-        } else {
-          alert(`ハッシュ ${prefId} を追加します`);
+          return;
+        }
+
+        // 既存ハッシュを取得し配列化
+        let hashes = location.hash ? location.hash.replace('#','').split('/') : [];
+        if(!hashes.includes(prefId)){
+          hashes.push(prefId);
+          location.hash = hashes.join('/');
         }
       }
 
@@ -150,11 +154,11 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g=>g.style.display='none');
         prefGroup.querySelectorAll('path').forEach(p => {
           if(GROUPS[gid].prefList.includes(p.id)) {
-            p.style.display = 'inline';
+            p.style.display='inline';
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
           } else {
-            p.style.display = 'inline';
+            p.style.display='inline';
             p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
           }
@@ -173,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
         leafletDiv.style.height = '420px';
         mapDiv.appendChild(leafletDiv);
 
-        // 県ごとの中心座標
         const prefCenters = { CHIBA:[35.6074,140.1063] };
         const map = L.map('leafletMap').setView(prefCenters[prefId], 10);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -187,18 +190,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★ハッシュ変更対応
       window.addEventListener('hashchange', () => {
-        const hash = location.hash.replace('#','').toUpperCase();
+        const hashes = location.hash.replace('#','').toUpperCase().split('/');
 
         const leafletPrefs = ['CHIBA'];
-        if(leafletPrefs.includes(hash)){
-          switchToLeaflet(hash);
+        const leafAdded = hashes.filter(h=>leafletPrefs.includes(h));
+        if(leafAdded.length>0){
+          switchToLeaflet(leafAdded[0]);
           return;
         }
 
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-        if(gid){
-          showRegion(gid);
-        }
+        hashes.forEach(hash=>{
+          const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+          if(gid){
+            showRegion(gid);
+          }
+        });
       });
 
       // ★ロード時の直URL対応
@@ -206,8 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.dispatchEvent(new Event('hashchange'));
       }
 
-      // ★BOX・NAV作成関数は元のまま
+      // ★BOX・NAV作成関数
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
+
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
@@ -234,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
       function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X'); }
       function createTop2BOX(){ return createCornerBOXWrapper('top',35,50,'X'); }
       function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X'); }
+
       function createCornerBOX(position){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
@@ -249,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
+
       function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
@@ -264,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      // ★SVG変換・選択制御は元のまま
+      // ★SVG変換・選択制御
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
