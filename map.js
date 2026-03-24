@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★初期化関数（クリックやグループイベント保持）
       function initPrefPaths() {
+          
+          alert("イベント開始"); /
         prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = 'inline';
           p.classList.remove('prefecture-selected','prefecture-unselected');
@@ -73,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
             handlePrefClick(p.id);
           });
         });
+        
+        alert("イベントとうろくちゅう"); /
 
         // グループクリックイベント登録（旧方式：直接 showRegion 呼び出し）
     Object.keys(GROUPS).forEach(gid => {
