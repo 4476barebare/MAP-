@@ -326,5 +326,19 @@ if(!location.hash || location.hash === '#'){
 }
   
   
+  document.addEventListener('DOMContentLoaded', () => {
+    const manualNav = document.getElementById('manual-region-nav');
+    manualNav.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+            const gid = btn.dataset.gid;
+            showRegion(gid);
+        };
+    });
+});
+
+
+  
+  
+  
     }); // fetch end
 });
