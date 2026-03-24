@@ -322,17 +322,13 @@ function showRegion(gid){
     
     
     // ★汎用ハッシュ更新関数（showRegionや県クリックには触らず独立）
-
 function updateHash(gid = null, prefId = null, subId = null) {
     // 現在のハッシュを分解
     let parts = location.hash.replace(/^#/, '').split('/');
     if(parts.length === 1 && parts[0] === '') parts = [];
 
-    // gid がある場合、groupSettings から hash 値を取り出して設定
-    if(gid !== null && groupSettings[gid]) {
-        parts[0] = groupSettings[gid].hash;
-    }
-
+    // 条件に応じて上書き
+    if(gid !== null) parts[0] = gid;
     if(prefId !== null) parts[1] = prefId;
     if(subId !== null) parts[2] = subId;
 
@@ -345,7 +341,5 @@ function updateHash(gid = null, prefId = null, subId = null) {
         history.pushState({ gid, prefId, subId }, '', '#' + newHash);
     }
 }
-
-
 
 });
