@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7: { scale:11.2, x:-105, y:200 }
       };
 
-      // ★追加（ハッシュ対応）
+      // ★ハッシュ対応
       const groupToHash = {
         Path_2:'TOHOKU',
         Path_3:'KANTO',
@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
+      // 初期状態
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
         p.classList.remove('prefecture-selected','prefecture-unselected');
@@ -87,11 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
+      // ★クリック → hashのみ
       allGroups.forEach(g => {
         const gid = g.id;
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
-          // ★変更：hash経由にする
           g.addEventListener('click', () => {
             location.hash = groupToHash[gid];
           });
@@ -240,7 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
           box.textContent=name;
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
-            // ★変更：hash経由
             box.onclick=()=>{ location.hash = groupToHash[`Path_${i+1}`]; };
           } else box.style.opacity='0.6';
           nav.appendChild(box);
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      // ★追加：hash制御
+      // ★hashchange → showRegion
       window.addEventListener('hashchange', () => {
         const hash = location.hash.replace('#','').toUpperCase();
         const gid = hashToGroup[hash];
@@ -295,9 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // ★追加：直URL対応
-      if(location.hash){
-        window.dispatchEvent(new Event('hashchange'));
+      // ★初期ロード（dispatch禁止版）
+      const initHash = location.hash.replace('#','').toUpperCase();
+      const initGroup = hashToGroup[initHash];
+      if(initGroup){
+        showRegion(initGroup);
       }
 
     });
