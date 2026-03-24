@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
         Path_7: { scale:11.2, x:-105, y:200 }
       };
 
-      // ★ハッシュ対応
       const groupToHash = {
         Path_2:'TOHOKU',
         Path_3:'KANTO',
@@ -79,16 +78,25 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // 初期状態
+      // ★共通クリック処理
+      function handlePrefClick(prefId){
+        alert(`ハッシュ ${prefId} を追加します`);
+      }
+
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
         p.classList.remove('prefecture-selected','prefecture-unselected');
         p.classList.add('prefecture-initial');
+
+        // ★追加（地図クリック）
+        p.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handlePrefClick(p.id);
+        });
       });
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
-      // ★クリック → hashのみ
       allGroups.forEach(g => {
         const gid = g.id;
         if(groupSettings[gid]){
@@ -135,11 +143,18 @@ document.addEventListener('DOMContentLoaded', () => {
           if(!wrapper) return;
 
           wrapper.style.display='flex';
+
           setting[pos].forEach((pid,i)=>{
             const box = wrapper.children[i];
             if(box){
               box.style.display='flex';
               box.textContent = prefNames[pid];
+
+              // ★BOXクリックも共通functionへ
+              box.onclick = (e)=>{
+                e.stopPropagation();
+                handlePrefClick(pid);
+              };
             }
           });
         });
@@ -154,19 +169,18 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g=>g.style.display='none');
 
         prefGroup.querySelectorAll('path').forEach(p => {
-            if(groupToPrefectures[gid].includes(p.id)) {
-                p.style.display = 'inline';
-                p.classList.remove('prefecture-initial','prefecture-unselected');
-                p.classList.add('prefecture-selected');
-            } else {
-                p.style.display = 'inline';
-                p.classList.remove('prefecture-initial','prefecture-selected');
-                p.classList.add('prefecture-unselected');
-            }
+          if(groupToPrefectures[gid].includes(p.id)) {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-unselected');
+            p.classList.add('prefecture-selected');
+          } else {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-selected');
+            p.classList.add('prefecture-unselected');
+          }
         });
 
         applyTransform(gid);
-        addPrefLabels(groupToPrefectures[gid]);
         disableOtherAreas(groupToPrefectures[gid]);
 
         if(gid === 'Path_6'){
@@ -189,31 +203,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
         const s = groupSettings[gid];
+
         const cx = bbox.x + bbox.width/2 + s.x;
         const cy = bbox.y + bbox.height/2 + s.y;
-        const scale = s.scale;
 
         const svgDisplayWidth = svg.clientWidth;
         const viewBoxWidth = svg.viewBox.baseVal.width;
         const displayScale = svgDisplayWidth / viewBoxWidth;
 
-        const finalScale = scale * displayScale;
+        const finalScale = s.scale * displayScale;
         const tx = (svgDisplayWidth/2) - cx * finalScale;
         const ty = (svg.clientHeight/2) - cy * finalScale;
 
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
 
         const baseStroke = 0.5;
+
         prefGroup.querySelectorAll('path').forEach(p=>{
-            p.style.strokeWidth = (baseStroke / finalScale) + 'px';
+          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
         });
 
         allGroups.forEach(g=>{
-            g.style.strokeWidth = (baseStroke / finalScale) + 'px';
+          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
         });
       }
-
-      function addPrefLabels(prefIds){}
 
       function disableOtherAreas(activeIds){
         allGroups.forEach(g=>{
@@ -224,11 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      function createBox(){ const box = document.createElement('div'); box.classList.add('pref-box'); return box; }
+      function createBox(){
+        const box = document.createElement('div');
+        box.classList.add('pref-box');
+        return box;
+      }
 
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
+
         nav.style.position='absolute';
         nav.style.top='5px';
         nav.style.left='5px';
@@ -236,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nav.style.flexDirection='column';
         nav.style.gap='4px';
         nav.style.zIndex='10';
+
         names.forEach((name,i)=>{
           const box=createBox();
           box.textContent=name;
@@ -245,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
+
         mapDiv.appendChild(nav);
         return nav;
       }
@@ -274,19 +294,22 @@ document.addEventListener('DOMContentLoaded', () => {
       function createCornerDummyWrapper(vertical,posValue,horPercent,axis){
         const wrapper = document.createElement('div');
         wrapper.style.position='absolute';
+
         if(vertical==='top') wrapper.style.top = posValue+'px';
         else wrapper.style.bottom = posValue+'px';
+
         wrapper.style.left = horPercent+'%';
         if(axis==='X') wrapper.style.transform = 'translateX(-50%)';
+
         wrapper.style.display = 'none';
         wrapper.style.gap = '6px';
         wrapper.style.zIndex = '10';
+
         for(let i=0;i<4;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
-      // ★hashchange → showRegion
       window.addEventListener('hashchange', () => {
         const hash = location.hash.replace('#','').toUpperCase();
         const gid = hashToGroup[hash];
@@ -295,11 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // ★初期ロード（dispatch禁止版）
-      const initHash = location.hash.replace('#','').toUpperCase();
-      const initGroup = hashToGroup[initHash];
-      if(initGroup){
-        showRegion(initGroup);
+      if(location.hash){
+        window.dispatchEvent(new Event('hashchange'));
       }
 
     });
