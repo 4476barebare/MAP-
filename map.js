@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentGroup = null;
 
-      // ★GROUPS設定
+      // ★GROUPSに完全統合
       const GROUPS = {
         Path_2: { hash:'TOHOKU', scale:6.7, x:135, y:45,
                   prefBoxes: { leftTop:['AOMORI','AKITA','YAMAGATA','NIIGATA'], rightBottom:['IWATE','MIYAGI','FUKUSHIMA'] },
@@ -55,18 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // ★県クリック処理（アラート + ハッシュ追加）
+      // ★共通クリック処理（県はアラート表示）
       function handlePrefClick(prefId){
-        const groupId = Object.keys(GROUPS).find(g => GROUPS[g].prefList.includes(prefId));
-        if(groupId){
-          const hashStr = `${GROUPS[groupId].hash}/${prefId}`;
-          location.hash = hashStr;
+        if(currentGroup){
+          location.hash = `${GROUPS[currentGroup].hash}/${prefId}`;
+        } else {
+          alert(`${prefNames[prefId]}：表示予定`);
         }
-        alert('表示予定');
       }
 
-      // ★初期化関数
-      function initPrefPaths(){
+      // ★初期化 function化
+      function initializePrefs(){
+        // 県 path 表示 & クリック
         prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = 'inline';
           p.classList.remove('prefecture-selected','prefecture-unselected');
@@ -78,15 +78,20 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
 
-        // グループクリックも初期化
+        // グループ表示 & クリック
         const allGroups = svg.querySelectorAll('[id^="Path_"]');
-        allGroups.forEach(g=>{
-          g.style.cursor = 'pointer';
-          g.addEventListener('click', () => {
-            location.hash = GROUPS[g.id].hash;
-          });
+        allGroups.forEach(g => {
+          g.style.display = 'inline';
+          if(GROUPS[g.id]){
+            g.style.cursor = 'pointer';
+            g.addEventListener('click', () => {
+              location.hash = GROUPS[g.id].hash;
+            });
+          }
         });
       }
+
+      initializePrefs();
 
       // ★BOX作成
       const initialNav = createInitialNav();
@@ -177,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const tx = (svgDisplayWidth/2) - cx * finalScale;
         const ty = (svg.clientHeight/2) - cy * finalScale;
         svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
-
         const baseStroke = 0.5;
         prefGroup.querySelectorAll('path').forEach(p=>{
           p.style.strokeWidth = (baseStroke / finalScale) + 'px';
@@ -196,7 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // ★BOX作成関数群
+      // ★初期画面 BOX 作成関数
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
@@ -221,9 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return nav;
       }
 
-      function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X',4); }
-      function createTop2BOX(){ return createCornerBOXWrapper('top',35,50,'X',4); } // top2位置調整維持
-      function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X',4); }
+      function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X'); }
+      function createTop2BOX(){ return createCornerBOXWrapper('top',35,0,'X'); } // 左揃え
+      function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X'); }
       function createCornerBOX(position){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
@@ -239,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-      function createCornerBOXWrapper(vertical,posValue,horPercent,axis,count){
+      function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
         if(vertical==='top') wrapper.style.top = posValue+'px';
@@ -249,33 +253,38 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap = '6px';
         wrapper.style.zIndex = '10';
-        for(let i=0;i<count;i++) wrapper.appendChild(createBox());
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
-      // ★ロード時ハッシュ判定
-      function handleInitialHash(){
-        if(location.hash){
-          const hash = location.hash.replace('#','').toUpperCase();
-          const groupId = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-          const prefId = Object.keys(prefNames).find(p => `${GROUPS[groupId]?.hash}/${p}` === hash);
+      // ★ハッシュ変更時処理
+      window.addEventListener('hashchange', () => {
+        const hash = location.hash.replace('#','').toUpperCase();
+        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
 
-          if(groupId){
-            showRegion(groupId);
-          } else if(prefId){
-            handlePrefClick(prefId);
-          } else {
-            initPrefPaths();
-          }
+        if(gid){
+          showRegion(gid);
         } else {
-          initPrefPaths();
+          // #GROUP/PREF の場合
+          const parts = hash.split('/');
+          if(parts.length === 2){
+            alert(`${prefNames[parts[1]]}：表示予定`);
+          } else {
+            // 初期画面に戻す
+            currentGroup = null;
+            initializePrefs();
+            initialNav.style.display='flex';
+            hideAllBOX();
+          }
         }
+      });
+
+      // ★ロード時ハッシュ対応
+      if(location.hash){
+        window.dispatchEvent(new Event('hashchange'));
       }
 
-      // ★初期化呼び出し
-      initPrefPaths();
-      handleInitialHash();
-
     });
+
 });
