@@ -77,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
-          updateHash(gid);
         }
       });
 
@@ -196,6 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             });
         });
+        // 拡大後、gidが確定したタイミングで
+if(!location.hash || location.hash === '#'){
+    updateHash(gid);  // ハッシュが空ならgidをセット
+}
       }
 
       function applyTransform(gid){
