@@ -63,8 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★初期化関数（クリックやグループイベント保持）
       function initPrefPaths() {
-          
-          alert("イベント開始"); /
         prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = 'inline';
           p.classList.remove('prefecture-selected','prefecture-unselected');
@@ -75,20 +73,17 @@ document.addEventListener('DOMContentLoaded', () => {
             handlePrefClick(p.id);
           });
         });
-        
-        alert("イベントとうろくちゅう"); /
 
-        // グループクリックイベント登録（旧方式：直接 showRegion 呼び出し）
-    Object.keys(GROUPS).forEach(gid => {
-        const gElem = svg.querySelector('#' + gid);
-        if (!gElem) return;
-        gElem.style.cursor = 'pointer';
-        gElem.addEventListener('click', e => {
+        // グループクリック追加
+        Object.keys(GROUPS).forEach(gid=>{
+          const gElem = svg.querySelector('#'+gid);
+          if(!gElem) return;
+          gElem.style.cursor = 'pointer';
+          gElem.addEventListener('click', e=>{
             e.stopPropagation();
-            showRegion(gid);  // ★直接拡大
+            location.hash = GROUPS[gid].hash;
+          });
         });
-    });
-
         
         alert("イベント登録済み"); // ★追加
       }
@@ -205,7 +200,8 @@ top2BOX.children.forEach((c,i)=>{
 
 function handleInitialHash(){
     const hash = location.hash.replace('#','').toUpperCase();
-
+    
+    alert('ハッシュチェック開始');  
     initPrefPaths();  // ★必ず最初にクリックイベント登録
 
     if(hash){  // ハッシュがある場合
@@ -216,11 +212,14 @@ function handleInitialHash(){
 
         // グループハッシュ判定
         const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+        alert('ハッシュ有り');  
         if(gid){
             showRegion(gid);  // グループ拡大
             return;
         }
     }
+    
+    
 
     // ハッシュなし、または未該当の場合 → 初期画面表示
     initialNav.style.display = 'flex';
