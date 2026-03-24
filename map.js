@@ -366,5 +366,40 @@ if(manualNav){
 // ===== 戻る・進む対応（任意だが推奨）=====
 window.addEventListener('hashchange', handleHash);
          
+         
+         
+         // ★ fetch内の最後に置く
+const hash = location.hash.replace(/^#/, '');
+
+if(hash){
+    const parts = hash.split('/'); // ['KANTO','CHIBA','NORTH']
+
+    // ① 地域（必須）
+    const regionHash = parts[0];
+    const gid = Object.keys(groupSettings)
+        .find(k => groupSettings[k].hash === regionHash);
+
+    if(gid){
+        showRegion(gid);
+    }
+
+    // ② 県（将来用）
+    if(parts[1]){
+        // ここはまだ未実装でOK
+        // gotoPref(parts[1]) 的なもの
+    }
+
+    // ③ エリア（将来用）
+    if(parts[2]){
+        // さらに下層
+    }
+}
+         
+         
+         
+         
+         
+         
+         
     }); // fetch end
 });
