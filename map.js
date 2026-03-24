@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
             box.onclick=()=>showRegion(`Path_${i+1}`);
-            updateHash(gid);
+            
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
