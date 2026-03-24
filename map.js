@@ -86,16 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const initialNav = createInitialNav();
-      const topDummy = createTopDummy();
-      const top2Dummy = createTop2Dummy();
-      const bottomDummy = createBottomDummy();
-      const leftTopDummy = createCornerDummy('leftTop');
-      const rightBottomDummy = createCornerDummy('rightBottom');
-      const leftBottomDummy = createCornerDummy('leftBottom');
-      const rightTopDummy = createCornerDummy('rightTop');
+      const topBOX = createTopBOX();
+      const top2BOX = createTop2BOX();
+      const bottomBOX = createBottomBOX();
+      const leftTopBOX = createCornerBOX('leftTop');
+      const rightBottomBOX = createCornerBOX('rightBottom');
+      const leftBottomBOX = createCornerBOX('leftBottom');
+      const rightTopBOX = createCornerBOX('rightTop');
 
-      function hideAllBoxes(){
-        [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
+      function hideAllBOX(){
+        [topBOX, top2BOX, bottomBOX, leftTopBOX, rightBottomBOX, leftBottomBOX, rightTopBOX]
           .forEach(wrapper=>{
             wrapper.style.display='none';
             Array.from(wrapper.querySelectorAll('div')).forEach(c=>{
@@ -105,19 +105,19 @@ document.addEventListener('DOMContentLoaded', () => {
           });
       }
 
-      function showBoxes(gid){
+      function showBOX(gid){
         const setting = GROUPS[gid].prefBoxes;
         if(!setting) return;
 
         Object.keys(setting).forEach(pos=>{
           let wrapper;
-          if(pos==='top') wrapper = topDummy;
-          if(pos==='top2') wrapper = top2Dummy;
-          if(pos==='bottom') wrapper = bottomDummy;
-          if(pos==='leftTop') wrapper = leftTopDummy;
-          if(pos==='rightBottom') wrapper = rightBottomDummy;
-          if(pos==='leftBottom') wrapper = leftBottomDummy;
-          if(pos==='rightTop') wrapper = rightTopDummy;
+          if(pos==='top') wrapper = topBOX;
+          if(pos==='top2') wrapper = top2BOX;
+          if(pos==='bottom') wrapper = bottomBOX;
+          if(pos==='leftTop') wrapper = leftTopBOX;
+          if(pos==='rightBottom') wrapper = rightBottomBOX;
+          if(pos==='leftBottom') wrapper = leftBottomBOX;
+          if(pos==='rightTop') wrapper = rightTopBOX;
           if(!wrapper) return;
 
           wrapper.style.display='flex';
@@ -141,8 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
       function showRegion(gid){
         currentGroup = gid;
         initialNav.style.display='none';
-        hideAllBoxes();
-        showBoxes(gid);
+        hideAllBOX();
+        showBOX(gid);
 
         allGroups.forEach(g=>g.style.display='none');
 
@@ -162,14 +162,14 @@ document.addEventListener('DOMContentLoaded', () => {
         disableOtherAreas(GROUPS[gid].prefList);
 
         if(gid === 'Path_6'){
-          const topRect = topDummy.getBoundingClientRect();
+          const topRect = topBOX.getBoundingClientRect();
           const mapRect = mapDiv.getBoundingClientRect();
           const left = topRect.left - mapRect.left;
-          top2Dummy.style.left = left + 'px';
-          top2Dummy.style.transform = 'none';
+          top2BOX.style.left = left + 'px';
+          top2BOX.style.transform = 'none';
         } else {
-          top2Dummy.style.left = '50%';
-          top2Dummy.style.transform = 'translateX(-50%)';
+          top2BOX.style.left = '50%';
+          top2BOX.style.transform = 'translateX(-50%)';
         }
 
         allGroups.forEach(g=>{
@@ -247,11 +247,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return nav;
       }
 
-      function createTopDummy(){ return createCornerDummyWrapper('top',5,50,'X'); }
-      function createTop2Dummy(){ return createCornerDummyWrapper('top',35,50,'X'); }
-      function createBottomDummy(){ return createCornerDummyWrapper('bottom',5,50,'X'); }
+      function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X'); }
+      function createTop2BOX(){ return createCornerBOXWrapper('top',35,50,'X'); }
+      function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X'); }
 
-      function createCornerDummy(position){
+      function createCornerBOX(position){
         const wrapper = document.createElement('div');
         wrapper.style.position='absolute';
         wrapper.style.display='none';
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      function createCornerDummyWrapper(vertical,posValue,horPercent,axis){
+      function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
         const wrapper = document.createElement('div');
         wrapper.style.position='absolute';
 
