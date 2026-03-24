@@ -193,26 +193,35 @@ top2BOX.children.forEach((c,i)=>{
         });
       }
 
-      // ★初期ハッシュ判定
-      function handleInitialHash(){
-        initPrefPaths();
 
+
+function handleInitialHash(){
         const hash = location.hash.replace('#','').toUpperCase();
 
-        const gid = Object.keys(GROUPS).find(g=>GROUPS[g].hash===hash);
-        if(gid){
-          showRegion(gid);
-          return;
-        }
+        if(hash){  // ハッシュがある場合
+          initPrefPaths();  // ★県・グループにクリックイベント登録
 
-        if(Object.keys(prefNames).includes(hash)){
-          alert("表示予定");
-          return;
-        }
+          if(hash.includes('/')){  // 県単体（未実装）
+            alert('これから作る');  // 仮処理
+            return;
+          }
 
-        initialNav.style.display='flex';
-        hideAllBOX();
+          // グループハッシュ判定
+          const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+          if(gid){
+            showRegion(gid);  // グループ拡大
+            return;
+          }
+
+        } else {  // ハッシュなしの場合 → 初期画面
+          initPrefPaths();  // クリックイベント付与
+          initialNav.style.display = 'flex';
+          hideAllBOX();
+        }
       }
+
+
+
 
       handleInitialHash();
       window.addEventListener('hashchange', handleInitialHash);
