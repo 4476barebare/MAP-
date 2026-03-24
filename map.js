@@ -90,7 +90,7 @@ window.addEventListener('hashchange', handleInitialHash);
           });
         });
         
-        alert("イベント登録済み"); // ★追加
+      //  alert("イベント登録済み"); // ★追加
       //    }
 
       // ★BOX作成（古い位置情報で top2 など修正済み）
@@ -203,33 +203,33 @@ top2BOX.children.forEach((c,i)=>{
 
 
 
-function handleInitialHash(){
-    alert('handleInitialHash called — hash now = ' + location.hash);
+//  function handleInitialHash(){
+//      alert('handleInitialHash called — hash now = ' + location.hash);
 
-    const hash = location.hash.replace('#','').toUpperCase();
-    initPrefPaths();
+//      const hash = location.hash.replace('#','').toUpperCase();
+//      initPrefPaths();
+//  
+//      if(hash){
+//          alert('hash non-empty: ' + hash);
 
-    if(hash){
-        alert('hash non-empty: ' + hash);
+//          if(hash.includes('/')){
+//              alert('prefect hash detected (with slash): ' + hash);
+//              return;
+ //         }
 
-        if(hash.includes('/')){
-            alert('prefect hash detected (with slash): ' + hash);
-            return;
-        }
+//          const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+ //         alert('gid found? ' + gid);
 
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-        alert('gid found? ' + gid);
+ //         if(gid){
+//              showRegion(gid);
+//              return;
+//          }
+//      }
 
-        if(gid){
-            showRegion(gid);
-            return;
-        }
-    }
-
-    alert('fallback to initial screen');
-    initialNav.style.display='flex';
-    hideAllBOX();
-}
+      alert('fallback to initial screen');
+     initialNav.style.display='flex';
+      hideAllBOX();
+//  }
 
 
 
