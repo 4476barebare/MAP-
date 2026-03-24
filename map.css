@@ -31,7 +31,6 @@
 
 /* SVG設定 */
 #map svg {
-    
   width: 100%;
   height: auto;
   display: block;
@@ -43,38 +42,30 @@
   shape-rendering: geometricPrecision;
 }
 
-/* 県パス共通 */
-#map svg path {
-    fill: #fff;
+/* 県パス共通（※ここがポイント：デフォルトだけに限定） */
+#map svg path:not(.prefecture-selected):not(.prefecture-unselected):not(.prefecture-initial) {
+  fill: #fff;
   stroke-linejoin: round;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
 }
 
-/* 初期画面 */
-path.prefecture-initial { fill: #fff; stroke: #191970; transition: all 0.2s ease; }
-
-/* 拡大後 */
-path.prefecture-selected { fill: #f0fff0; stroke: #191970; transition: all 0.2s ease; }
-path.prefecture-unselected { fill: #d3d3d3; stroke: #191970; transition: all 0.2s ease; }
-
-/* 初期表示（白） */
-.prefecture-initial {
+/* 初期画面（強化版） */
+#map svg path.prefecture-initial {
   fill: #fff;
-  stroke: #000;
-  stroke-width: 0.5px;
+  stroke: #191970;
+  transition: all 0.2s ease;
 }
 
-/* 選択済み（薄い緑） */
-.prefecture-selected {
+/* 拡大後（強制的に勝たせる） */
+#map svg path.prefecture-selected {
   fill: #f0fff0;
-  stroke: #000;
-  stroke-width: 0.5px;
+  stroke: #191970;
+  transition: all 0.2s ease;
 }
 
-/* 選択外（グレー） */
-.prefecture-unselected {
+#map svg path.prefecture-unselected {
   fill: #d3d3d3;
-  stroke: #000;
-  stroke-width: 0.5px;
+  stroke: #191970;
+  transition: all 0.2s ease;
 }
