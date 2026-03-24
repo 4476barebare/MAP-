@@ -250,6 +250,7 @@ function showRegion(gid){
 
       function createBox(){ const box = document.createElement('div'); box.classList.add('pref-box'); return box; }
 
+
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
@@ -266,7 +267,6 @@ function showRegion(gid){
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
             box.onclick=()=>showRegion(`Path_${i+1}`);
-            updateHash(`gid`);  // ←ここを1行追加
             
           } else box.style.opacity='0.6';
           nav.appendChild(box);
@@ -274,6 +274,7 @@ function showRegion(gid){
         mapDiv.appendChild(nav);
         return nav;
       }
+
 
       function createTopDummy(){ return createCornerDummyWrapper('top',5,50,'X'); }
       function createTop2Dummy(){ return createCornerDummyWrapper('top',35,50,'X'); }
