@@ -266,7 +266,7 @@ function showRegion(gid){
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
             box.onclick=()=>showRegion(`Path_${i+1}`);
-            updateHash(`Path_${i+1}`);  // ←ここを1行追加
+            updateHash(`gid`);  // ←ここを1行追加
             
           } else box.style.opacity='0.6';
           nav.appendChild(box);
@@ -321,8 +321,81 @@ function showRegion(gid){
     });
     
     
-    // ★汎用ハッシュ更新関数（showRegionや県クリックには触らず独立）
 function updateHash(gid = null, prefId = null, subId = null) {
+    // gid が Path_# の場合は hash 名に変換
+    if (gid && groupSettings[gid]?.hash) {
+        gid = groupSettings[gid].hash;
+    }
+
+    // 現在のハッシュを分解
+    let parts = location.hash.replace(/^#/, '').split('/');
+    if(parts.length === 1 && parts[0] === '') parts = [];
+
+    // 条件に応じて上書き
+    if(gid !== null) parts[0] = gid;
+    if(prefId !== null) parts[1] = prefId;
+    if(subId !== null) parts[2] = subId;
+
+    // 余分な undefined や空文字を削除
+    parts = parts.filter(p => p);
+
+    // 新しいハッシュを設定
+    const newHash = parts.join('/');
+    if('#' + newHash !== location.hash) {
+        history.pushState({ gid, prefId, subId }, '', '#' + newHash);
+    }
+}function updateHash(gid = null, prefId = null, subId = null) {
+    // gid が Path_# の場合は hash 名に変換
+    if (gid && groupSettings[gid]?.hash) {
+        gid = groupSettings[gid].hash;
+    }
+
+    // 現在のハッシュを分解
+    let parts = location.hash.replace(/^#/, '').split('/');
+    if(parts.length === 1 && parts[0] === '') parts = [];
+
+    // 条件に応じて上書き
+    if(gid !== null) parts[0] = gid;
+    if(prefId !== null) parts[1] = prefId;
+    if(subId !== null) parts[2] = subId;
+
+    // 余分な undefined や空文字を削除
+    parts = parts.filter(p => p);
+
+    // 新しいハッシュを設定
+    const newHash = parts.join('/');
+    if('#' + newHash !== location.hash) {
+        history.pushState({ gid, prefId, subId }, '', '#' + newHash);
+    }
+}function updateHash(gid = null, prefId = null, subId = null) {
+    // gid が Path_# の場合は hash 名に変換
+    if (gid && groupSettings[gid]?.hash) {
+        gid = groupSettings[gid].hash;
+    }
+
+    // 現在のハッシュを分解
+    let parts = location.hash.replace(/^#/, '').split('/');
+    if(parts.length === 1 && parts[0] === '') parts = [];
+
+    // 条件に応じて上書き
+    if(gid !== null) parts[0] = gid;
+    if(prefId !== null) parts[1] = prefId;
+    if(subId !== null) parts[2] = subId;
+
+    // 余分な undefined や空文字を削除
+    parts = parts.filter(p => p);
+
+    // 新しいハッシュを設定
+    const newHash = parts.join('/');
+    if('#' + newHash !== location.hash) {
+        history.pushState({ gid, prefId, subId }, '', '#' + newHash);
+    }
+}function updateHash(gid = null, prefId = null, subId = null) {
+    // gid が Path_# の場合は hash 名に変換
+    if (gid && groupSettings[gid]?.hash) {
+        gid = groupSettings[gid].hash;
+    }
+
     // 現在のハッシュを分解
     let parts = location.hash.replace(/^#/, '').split('/');
     if(parts.length === 1 && parts[0] === '') parts = [];
@@ -341,5 +414,8 @@ function updateHash(gid = null, prefId = null, subId = null) {
         history.pushState({ gid, prefId, subId }, '', '#' + newHash);
     }
 }
+
+
+
 
 });
