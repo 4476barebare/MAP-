@@ -133,31 +133,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★グループ拡大処理
       function showRegion(gid){
+    const allGroups = svg.querySelectorAll('[id^="Path_"]');  // ←ここで先に取得
+    
     alert(
-  `gidを表示します: ${gid}\n` +
-  `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-  `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-  `allGroups = ${allGroups.length} 個\n` +
-  Array.from(allGroups).map(g => g.id).join(', ')
-);
+        `gidを表示します: ${gid}\n` +
+        `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+        `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+        `allGroups = ${allGroups.length} 個\n` +
+        Array.from(allGroups).map(g => g.id).join(', ')
+    );
+
     currentGroup = gid;
     initialNav.style.display='none';
     hideAllBOX();
     showBOX(gid);
 
-    const allGroups = svg.querySelectorAll('[id^="Path_"]');
     allGroups.forEach(g=>{
         g.style.display = 'none';
     });
-    
-    
-    alert(
-  `2回目gidを表示します: ${gid}\n` +
-  `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-  `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-  `allGroups = ${allGroups.length} 個\n` +
-  Array.from(allGroups).map(g => g.id).join(', ')
-);
 
     // 県パス表示
     prefGroup.querySelectorAll('path').forEach(p=>{
@@ -171,16 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
             p.classList.add('prefecture-unselected');
         }
     });
-    
-    
-    
-    alert(
-  `3回目gidを表示します: ${gid}\n` +
-  `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-  `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-  `allGroups = ${allGroups.length} 個\n` +
-  Array.from(allGroups).map(g => g.id).join(', ')
-);
 
     // ★対象グループを先に表示してから transform
     const targetGroup = svg.querySelector('#'+gid);
@@ -193,7 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`対象グループが見つかりません: ${gid}`);
     }
 }
-
       // ★SVG拡大制御
       function applyTransform(gid){
           
