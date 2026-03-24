@@ -10,14 +10,6 @@
 <!-- Map専用 CSS -->
 <link rel="stylesheet" href="map.css">
 
-<!-- Leaflet CSS -->
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-sA+e2UfM2M4u7dHMBk2sPtyb4Y4I/6b0o+N/m0qMCXk="
-  crossorigin=""
-/>
-
 <style>
 html, body {
   margin: 0;
@@ -27,17 +19,8 @@ html, body {
   color: #333;
   overflow-x: hidden;
 }
-
-main {
-  background-color: #191970;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.map {
-  text-align: center;
-}
+main { background-color: #191970; max-width: 100%; margin: 0; padding: 0; }
+.map { text-align: center; }
 </style>
 </head>
 <body>
@@ -70,7 +53,6 @@ main {
 </main>
 
 <div class="ad">広告スペース</div>
-
 <footer>© 釣り行こNAVI</footer>
 
 <!-- ニュースオーバーレイ -->
@@ -83,24 +65,17 @@ main {
 
 <!-- JS -->
 <script src="header.js"></script>
-
-<!-- Leaflet JS -->
-<script
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-vw26f91ue5K4Y/wCjx2c0Dxq0MYN6fBR0rKJtYngsBM="
-  crossorigin="">
-</script>
-
 <script src="map.js"></script>
 
+<!-- ★ロード時ハッシュチェックで Leaflet 起動 -->
 <script>
-// ★ページロード時のハッシュチェックでLeaflet起動
 window.addEventListener('DOMContentLoaded', () => {
   const hash = location.hash.replace('#','').toUpperCase();
-  if(hash.includes('/')) {
+  // 「/県ID」形式であれば Leaflet を起動
+  if(hash.includes('/')){
     const parts = hash.split('/');
     const prefId = parts[1];
-    if(window.switchToLeaflet && prefId){
+    if(prefId && window.switchToLeaflet){
       window.switchToLeaflet(prefId);
     }
   }
