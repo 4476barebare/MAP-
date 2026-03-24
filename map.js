@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const prefGroup = svg.querySelector('#pref');
       
       // ★ここでハッシュチェック開始
-handleInitialHash();  // ← 位置はここが最適
+//      handleInitialHash();  // ← 位置はここが最適
 window.addEventListener('hashchange', handleInitialHash);
 
 
@@ -66,8 +66,9 @@ window.addEventListener('hashchange', handleInitialHash);
         alert(`表示予定: ${prefNames[prefId]}`);
       }
 
-
- prefGroup.querySelectorAll('path').forEach(p => {
+      // ★初期化関数（クリックやグループイベント保持）
+      // function initPrefPaths() {
+        prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = 'inline';
           p.classList.remove('prefecture-selected','prefecture-unselected');
           p.classList.add('prefecture-initial');
@@ -77,11 +78,6 @@ window.addEventListener('hashchange', handleInitialHash);
             handlePrefClick(p.id);
           });
         });
-
-
-      // ★初期化関数（クリックやグループイベント保持）
-      function initPrefPaths() {
-       
 
         // グループクリック追加
         Object.keys(GROUPS).forEach(gid=>{
@@ -95,7 +91,7 @@ window.addEventListener('hashchange', handleInitialHash);
         });
         
         alert("イベント登録済み"); // ★追加
-      }
+      //    }
 
       // ★BOX作成（古い位置情報で top2 など修正済み）
       const initialNav = createInitialNav();
