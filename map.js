@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
+          updateHash(gid);
         }
       });
 
@@ -252,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
             box.onclick=()=>showRegion(`Path_${i+1}`);
+            updateHash(gid);
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
@@ -296,8 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-    }); // fetch end
-
   // ハッシュ更新用（fetch 外）
   function updateHash(gid = null, prefId = null, subId = null) {
     let parts = location.hash.replace(/^#/, '').split('/');
@@ -311,5 +311,5 @@ document.addEventListener('DOMContentLoaded', () => {
         history.pushState({ gid, prefId, subId }, '', '#' + newHash);
     }
   }
-
+    }); // fetch end
 });
