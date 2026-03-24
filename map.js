@@ -62,18 +62,30 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ★初期化関数
-      function initPrefPaths() {
-        prefGroup.querySelectorAll('path').forEach(p => {
-          p.style.display = 'inline';
-          p.classList.remove('prefecture-selected', 'prefecture-unselected');
-          p.classList.add('prefecture-initial');
+      // ★初期化関数
+function initPrefPaths() {
+  prefGroup.querySelectorAll('path').forEach(p => {
+    p.style.display = 'inline';
+    p.classList.remove('prefecture-selected', 'prefecture-unselected');
+    p.classList.add('prefecture-initial');
 
-          p.addEventListener('click', (e) => {
-            e.stopPropagation();
-            handlePrefClick(p.id);
-          });
-        });
-      }
+    p.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handlePrefClick(p.id);
+    });
+  });
+
+  // ★グループクリック追加
+  Object.keys(GROUPS).forEach(gid => {
+    const gElem = svg.querySelector('#' + gid);
+    if(!gElem) return;
+    gElem.style.cursor = 'pointer';
+    gElem.addEventListener('click', (e) => {
+      e.stopPropagation();
+      location.hash = GROUPS[gid].hash;
+    });
+  });
+}
 
       // ★BOX作成関数（以前のまま）
       const initialNav = createInitialNav();
@@ -132,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAllBOX();
         showBOX(gid);
 
+        // path表示切替
         const allGroups = svg.querySelectorAll('[id^="Path_"]');
         allGroups.forEach(g=>g.style.display='none');
 
@@ -148,12 +161,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         applyTransform(gid);
-
-        // 拡大後のハッシュをグループ名に
-        location.hash = GROUPS[gid].hash;
       }
 
-      // ★SVG変換・拡大制御
+      // ★SVG変換・拡大制御（以前のまま）
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
@@ -207,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // ★ハッシュ変更対応
       window.addEventListener('hashchange', handleInitialHash);
 
-      // ★初期NAVとBOX作成関数
+      // ★初期NAVとBOX作成関数（以前と同じ）
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
       function createInitialNav(){
         const names=['北海道','東北地方','関東地方','中部地方','近畿地方','中国四国','九州地方','沖縄'];
