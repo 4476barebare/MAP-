@@ -89,7 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // ★BOX作成（古い位置情報で top2 など修正済み）
       const initialNav = createInitialNav();
       const topBOX = createCornerBOXWrapper('top',5,50,'X');
-      const top2BOX = createCornerBOXWrapper('top',35,50,'X'); // 古いソース位置反映
+      // --- 差し替え部分 start ---
+const top2BOX = createCornerBOXWrapper('top',35,50,'X'); // 元は5枠分だったが
+top2BOX.style.transform = 'translateX(-100%)'; // 左端揃えに変更
+top2BOX.children.forEach((c,i)=>{
+  if(i>0) c.style.display='none'; // 1枠だけ表示
+});
+// --- 差し替え部分 end ---
       const bottomBOX = createCornerBOXWrapper('bottom',5,50,'X');
       const leftTopBOX = createCornerBOX('leftTop');
       const rightBottomBOX = createCornerBOX('rightBottom');
