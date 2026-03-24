@@ -37,7 +37,6 @@
   position: relative;
   filter: drop-shadow(0 0 8px #6495ed) drop-shadow(0 0 3px #191970);
   stroke: #191970;
-  vector-effect: non-scaling-stroke;
   z-index: 1;
   shape-rendering: geometricPrecision;
 }
@@ -47,7 +46,6 @@
   fill: #fff;
   stroke-linejoin: round;
   stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
 }
 
 /* 初期画面（強化版） */
