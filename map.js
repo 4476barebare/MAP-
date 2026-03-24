@@ -227,8 +227,8 @@ top2BOX.children.forEach((c,i)=>{
 //      }
 
       alert('fallback to initial screen');
-     initialNav.style.display='flex';
-      hideAllBOX();
+//     initialNav.style.display='flex';
+ //     hideAllBOX();
 //  }
 
 
