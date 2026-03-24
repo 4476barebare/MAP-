@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★グループ拡大処理
       function showRegion(gid){
-        alert(`gidを表示します: ${gid}`);
+        
         currentGroup = gid;
         initialNav.style.display='none';
         hideAllBOX();
@@ -159,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★SVG拡大制御
       function applyTransform(gid){
+          alert(`gidを表示します: ${gid}`);
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
         const s = GROUPS[gid];
