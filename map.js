@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // ★BOX作成（古い位置情報で top2 など修正済み）
       const initialNav = createInitialNav();
       const topBOX = createCornerBOXWrapper('top',5,50,'X');
+      
       // --- 差し替え部分 start ---
 const top2BOX = createCornerBOXWrapper('top',35,50,'X'); // 元は5枠分だったが
 top2BOX.style.transform = 'translateX(-100%)'; // 左端揃えに変更
@@ -96,6 +97,7 @@ top2BOX.children.forEach((c,i)=>{
   if(i>0) c.style.display='none'; // 1枠だけ表示
 });
 // --- 差し替え部分 end ---
+      
       const bottomBOX = createCornerBOXWrapper('bottom',5,50,'X');
       const leftTopBOX = createCornerBOX('leftTop');
       const rightBottomBOX = createCornerBOX('rightBottom');
@@ -255,26 +257,19 @@ top2BOX.children.forEach((c,i)=>{
         return wrapper;
       }
       function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
-  const wrapper = document.createElement('div');
-  wrapper.style.position = 'absolute';
-  
-  if(vertical==='top') wrapper.style.top = posValue + 'px';
-  else wrapper.style.bottom = posValue + 'px';
-  
-  wrapper.style.left = horPercent + '%';
-  if(axis==='X') wrapper.style.transform = 'translateX(-50%)';
-  
-  wrapper.style.display = 'none';
-  wrapper.style.gap = '6px';
-  wrapper.style.zIndex = '10';
-  
-  // top2 用にボックス数を5個に修正
-  const boxCount = (posValue === 35) ? 5 : 4; 
-  for(let i=0;i<boxCount;i++) wrapper.appendChild(createBox());
-  
-  mapDiv.appendChild(wrapper);
-  return wrapper;
-}
+        const wrapper=document.createElement('div');
+        wrapper.style.position='absolute';
+        if(vertical==='top') wrapper.style.top=posValue+'px';
+        else wrapper.style.bottom=posValue+'px';
+        wrapper.style.left=horPercent+'%';
+        if(axis==='X') wrapper.style.transform='translateX(-50%)';
+        wrapper.style.display='none';
+        wrapper.style.gap='6px';
+        wrapper.style.zIndex='10';
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
+        mapDiv.appendChild(wrapper);
+        return wrapper;
+      }
+
     });
 });
-
