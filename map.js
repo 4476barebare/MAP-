@@ -84,6 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
             location.hash = GROUPS[gid].hash;
           });
         });
+        
+        alert("イベント登録済み"); // ★追加
       }
 
       // ★BOX作成（古い位置情報で top2 など修正済み）
@@ -146,6 +148,7 @@ top2BOX.children.forEach((c,i)=>{
 
       // ★グループ拡大処理
       function showRegion(gid){
+          alert(`gidを表示します: ${gid}`); // ★追加
         currentGroup = gid;
         initialNav.style.display='none';
         hideAllBOX();
