@@ -156,31 +156,56 @@ top2BOX.children.forEach((c,i)=>{
       }
 
       // ★グループ拡大処理
-      function showRegion(gid){
-          alert(`gidを表示します: ${gid}`); // ★追加
-        currentGroup = gid;
-        initialNav.style.display='none';
-        hideAllBOX();
-        showBOX(gid);
+     function showRegion(gid){
+    alert(`gidを表示します: ${gid}`); // デバッグ用
 
-        const allGroups = svg.querySelectorAll('[id^="Path_"]');
-        allGroups.forEach(g=>g.style.display='none');
+    currentGroup = gid;
 
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          if(GROUPS[gid].prefList.includes(p.id)){
-            p.style.display='inline';
+    // 初期ナビを消す
+    initialNav.style.display = 'none';
+
+    // すべてのBOXを隠す
+    hideAllBOX();
+
+    // 選択したグループ用BOXだけ表示
+    showBOX(gid);
+
+    // グループ全体を一旦非表示
+    allGroups.forEach(g => g.style.display = 'none');
+
+    // 県 path の表示切替
+    prefGroup.querySelectorAll('path').forEach(p => {
+        if(GROUPS[gid].prefList.includes(p.id)){
+            p.style.display = 'inline';
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
-          } else {
-            p.style.display='inline';
+        } else {
+            p.style.display = 'inline';
             p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
-          }
-        });
+        }
+    });
 
-        applyTransform(gid);
-      }
+    // 拡大・移動処理
+    applyTransform(gid);
 
+    // top2BOX の位置微調整（Path_6 の場合のみ）
+    if(gid === 'Path_6'){
+        const topRect = topBOX.getBoundingClientRect();
+        const mapRect = mapDiv.getBoundingClientRect();
+        const left = topRect.left - mapRect.left;
+        top2BOX.style.left = left + 'px';
+        top2BOX.style.transform = 'none';
+    } else {
+        top2BOX.style.left = '50%';
+        top2BOX.style.transform = 'translateX(-50%)';
+    }
+
+    // 選択以外のグループを再表示
+    allGroups.forEach(g=>{
+        if(g.id !== gid) g.style.display = 'inline';
+    });
+}
       // ★SVG拡大制御
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
