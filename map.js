@@ -133,7 +133,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★グループ拡大処理
       function showRegion(gid){
-    alert(`gidを表示します: ${gid}`); // ★アラート確認
+    alert(
+  `gidを表示します: ${gid}\n` +
+  `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+  `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+  `allGroups = ${allGroups.length} 個\n` +
+  Array.from(allGroups).map(g => g.id).join(', ')
+);
     currentGroup = gid;
     initialNav.style.display='none';
     hideAllBOX();
@@ -143,6 +149,15 @@ document.addEventListener('DOMContentLoaded', () => {
     allGroups.forEach(g=>{
         g.style.display = 'none';
     });
+    
+    
+    alert(
+  `2回目gidを表示します: ${gid}\n` +
+  `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+  `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+  `allGroups = ${allGroups.length} 個\n` +
+  Array.from(allGroups).map(g => g.id).join(', ')
+);
 
     // 県パス表示
     prefGroup.querySelectorAll('path').forEach(p=>{
@@ -156,6 +171,16 @@ document.addEventListener('DOMContentLoaded', () => {
             p.classList.add('prefecture-unselected');
         }
     });
+    
+    
+    
+    alert(
+  `3回目gidを表示します: ${gid}\n` +
+  `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+  `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
+  `allGroups = ${allGroups.length} 個\n` +
+  Array.from(allGroups).map(g => g.id).join(', ')
+);
 
     // ★対象グループを先に表示してから transform
     const targetGroup = svg.querySelector('#'+gid);
