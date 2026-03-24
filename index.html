@@ -1,3 +1,6 @@
+まずはindex.html
+
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -11,6 +14,7 @@
 <link rel="stylesheet" href="map.css">
 
 <style>
+/* html・body の全体設定 */
 html, body {
   margin: 0;
   padding: 0;
@@ -19,8 +23,18 @@ html, body {
   color: #333;
   overflow-x: hidden;
 }
-main { background-color: #191970; max-width: 100%; margin: 0; padding: 0; }
-.map { text-align: center; }
+
+main {
+    background-color: #191970;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.map {
+  text-align: center;
+}
+
 </style>
 </head>
 <body>
@@ -44,6 +58,7 @@ main { background-color: #191970; max-width: 100%; margin: 0; padding: 0; }
       <a href="#">その他</a>
     </nav>
   </div>
+
 </header>
 
 <main>
@@ -53,6 +68,8 @@ main { background-color: #191970; max-width: 100%; margin: 0; padding: 0; }
 </main>
 
 <div class="ad">広告スペース</div>
+
+
 <footer>© 釣り行こNAVI</footer>
 
 <!-- ニュースオーバーレイ -->
@@ -66,21 +83,6 @@ main { background-color: #191970; max-width: 100%; margin: 0; padding: 0; }
 <!-- JS -->
 <script src="header.js"></script>
 <script src="map.js"></script>
-
-<!-- ★ロード時ハッシュチェックで Leaflet 起動 -->
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-  const hash = location.hash.replace('#','').toUpperCase();
-  // 「/県ID」形式であれば Leaflet を起動
-  if(hash.includes('/')){
-    const parts = hash.split('/');
-    const prefId = parts[1];
-    if(prefId && window.switchToLeaflet){
-      window.switchToLeaflet(prefId);
-    }
-  }
-});
-</script>
 
 </body>
 </html>
