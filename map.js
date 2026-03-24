@@ -253,7 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
             box.onclick=()=>showRegion(`Path_${i+1}`);
-            
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
@@ -300,6 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ハッシュ更新用（fetch 外）
   function updateHash(gid = null, prefId = null, subId = null) {
+      alert(gid);
     let parts = location.hash.replace(/^#/, '').split('/');
     if(parts.length === 1 && parts[0] === '') parts = [];
     if(gid !== null) parts[0] = gid;
