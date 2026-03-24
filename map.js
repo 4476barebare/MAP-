@@ -308,6 +308,12 @@ function showRegion(gid){
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
+      
+      
+      
+      function gotoPref(prefId){
+    alert(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+}
 
     });
     
@@ -331,14 +337,6 @@ function updateHash(gid = null, prefId = null, subId = null) {
     if('#' + newHash !== location.hash) {
         history.pushState({ gid, prefId, subId }, '', '#' + newHash);
     }
-    
-    
 }
-
-function gotoPref(prefId){
-    alert(`pref clicked: ${prefId} (${prefNames[prefId]})`);
-}
-
-  
 
 });
