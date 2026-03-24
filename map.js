@@ -326,17 +326,16 @@ if(!location.hash || location.hash === '#'){
 }
   
   
-  document.addEventListener('DOMContentLoaded', () => {
-    const manualNav = document.getElementById('manual-region-nav');
+  // ★ map.js 最後尾にそのまま追記
+const manualNav = document.getElementById('manual-region-nav');
+if(manualNav){
     manualNav.querySelectorAll('button').forEach(btn => {
         btn.onclick = () => {
             const gid = btn.dataset.gid;
             showRegion(gid);
         };
     });
-});
-
-
+}
   
   
   
