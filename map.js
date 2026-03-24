@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentGroup = null;
 
-      // ★統合データ
+      // =========================
+      // ★ 統合データ
+      // =========================
       const GROUPS = {
         TOHOKU: {
           id:'Path_2', scale:6.7, x:135, y:45,
@@ -61,19 +63,50 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // ★共通クリック
+      // =========================
+      // ★ 共通クリック
+      // =========================
       function handlePrefClick(prefId){
         alert(`ハッシュ ${prefId} を追加します`);
       }
 
-      // ★グループ取得
       function getGroupById(gid){
         return Object.entries(GROUPS).find(([k,v]) => v.id === gid);
       }
 
-      // ★BOX分割（自動）
+      // =========================
+      // ★ BOX分割（位置復活）
+      // =========================
       function splitBoxes(key){
         const pref = GROUPS[key].prefectures;
+
+        if(key === 'TOHOKU'){
+          return {
+            leftTop: pref.slice(0,4),
+            rightBottom: pref.slice(4)
+          };
+        }
+
+        if(key === 'KANTO'){
+          return {
+            rightTop: pref.slice(0,3),
+            leftBottom: pref.slice(3)
+          };
+        }
+
+        if(key === 'CHUBU'){
+          return {
+            rightTop: pref.slice(0,4),
+            leftBottom: pref.slice(4)
+          };
+        }
+
+        if(key === 'KINKI'){
+          return {
+            rightTop: pref.slice(0,2),
+            leftBottom: pref.slice(2)
+          };
+        }
 
         if(key === 'CHUGOKU'){
           return {
@@ -83,12 +116,17 @@ document.addEventListener('DOMContentLoaded', () => {
           };
         }
 
-        return {
-          rightTop: pref.slice(0,3),
-          leftBottom: pref.slice(3)
-        };
+        if(key === 'KYUSHU'){
+          return {
+            rightTop: pref.slice(0,3),
+            rightBottom: pref.slice(3)
+          };
+        }
       }
 
+      // =========================
+      // ★ 県クリック
+      // =========================
       prefGroup.querySelectorAll('path').forEach(p => {
         p.classList.add('prefecture-initial');
 
@@ -98,6 +136,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
+      // =========================
+      // ★ グループクリック
+      // =========================
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
@@ -110,18 +151,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
 
+      // =========================
+      // ★ ダミーBOX生成（元構造維持）
+      // =========================
       const initialNav = createInitialNav();
       const topDummy = createTopDummy();
       const top2Dummy = createTop2Dummy();
       const bottomDummy = createBottomDummy();
+      const leftTopDummy = createCornerDummy('leftTop');
+      const rightBottomDummy = createCornerDummy('rightBottom');
       const leftBottomDummy = createCornerDummy('leftBottom');
       const rightTopDummy = createCornerDummy('rightTop');
 
       function hideAllBoxes(){
-        [topDummy, top2Dummy, bottomDummy, leftBottomDummy, rightTopDummy]
+        [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
           .forEach(w=>{
             w.style.display='none';
-            Array.from(w.children).forEach(c=>c.style.display='none');
+            Array.from(w.children).forEach(c=>{
+              c.style.display='none';
+              c.textContent='';
+            });
           });
       }
 
@@ -133,6 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
           if(pos==='top') wrapper = topDummy;
           if(pos==='top2') wrapper = top2Dummy;
           if(pos==='bottom') wrapper = bottomDummy;
+          if(pos==='leftTop') wrapper = leftTopDummy;
+          if(pos==='rightBottom') wrapper = rightBottomDummy;
           if(pos==='leftBottom') wrapper = leftBottomDummy;
           if(pos==='rightTop') wrapper = rightTopDummy;
 
@@ -144,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const box = wrapper.children[i];
             if(box){
               box.style.display='flex';
-              box.textContent = prefNames[pid];
+              box.textContent = prefNames[pid]; // ★漢字復元
               box.onclick = (e)=>{
                 e.stopPropagation();
                 handlePrefClick(pid);
