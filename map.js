@@ -133,33 +133,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★グループ拡大処理
       function showRegion(gid){
-        
-        currentGroup = gid;
-        initialNav.style.display='none';
-        hideAllBOX();
-        showBOX(gid);
+    alert(`gidを表示します: ${gid}`); // ★アラート確認
+    currentGroup = gid;
+    initialNav.style.display='none';
+    hideAllBOX();
+    showBOX(gid);
 
-        const allGroups = svg.querySelectorAll('[id^="Path_"]');
-        allGroups.forEach(g=>g.style.display='none');
+    const allGroups = svg.querySelectorAll('[id^="Path_"]');
+    allGroups.forEach(g=>{
+        g.style.display = 'none';
+    });
 
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          if(GROUPS[gid].prefList.includes(p.id)){
+    // 県パス表示
+    prefGroup.querySelectorAll('path').forEach(p=>{
+        if(GROUPS[gid].prefList.includes(p.id)){
             p.style.display='inline';
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
-          } else {
+        } else {
             p.style.display='inline';
             p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
-          }
-        });
+        }
+    });
 
+    // ★対象グループを先に表示してから transform
+    const targetGroup = svg.querySelector('#'+gid);
+    if(targetGroup){
+        targetGroup.style.display = 'inline';
+        alert('トランスフォーム呼び出し前');
         applyTransform(gid);
-      }
+        alert('トランスフォーム呼び出し後');
+    } else {
+        alert(`対象グループが見つかりません: ${gid}`);
+    }
+}
 
       // ★SVG拡大制御
       function applyTransform(gid){
-          alert(`gidでトランスフォーム: ${gid}`);
+          
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
         const s = GROUPS[gid];
@@ -180,9 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.querySelectorAll('[id^="Path_"]').forEach(g=>{
           g.style.strokeWidth = (baseStroke/finalScale)+'px';
         });
-        
-        alert(`トランスフォーム完了: ${gid}`);
-        
       }
 
       // ★ハッシュチェック（初期表示）
