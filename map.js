@@ -217,12 +217,12 @@ top2BOX.children.forEach((c,i)=>{
 //              return;
  //         }
 
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+//        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
  //         alert('gid found? ' + gid);
 
  //         if(gid){
-//              showRegion(gid);
-//              return;
+          showRegion(gid);
+             return;
 //          }
 //      }
 
