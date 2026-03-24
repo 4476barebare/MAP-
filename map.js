@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentGroup = null;
 
+      // ★GROUPS設定
       const GROUPS = {
         Path_2: { hash:'TOHOKU', scale:6.7, x:135, y:45,
                   prefBoxes: { leftTop:['AOMORI','AKITA','YAMAGATA','NIIGATA'], rightBottom:['IWATE','MIYAGI','FUKUSHIMA'] },
@@ -54,13 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // 県クリック処理
+      // ★県クリック処理（アラート + ハッシュ追加）
       function handlePrefClick(prefId){
-        alert(`${prefNames[prefId]} は表示予定です`);
+        const groupId = Object.keys(GROUPS).find(g => GROUPS[g].prefList.includes(prefId));
+        if(groupId){
+          const hashStr = `${GROUPS[groupId].hash}/${prefId}`;
+          location.hash = hashStr;
+        }
+        alert('表示予定');
       }
 
-      // 初期化関数
-      function initPrefPath(){
+      // ★初期化関数
+      function initPrefPaths(){
         prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = 'inline';
           p.classList.remove('prefecture-selected','prefecture-unselected');
@@ -71,22 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
             handlePrefClick(p.id);
           });
         });
-      }
 
-      // 初期化
-      initPrefPath();
-
-      const allGroups = svg.querySelectorAll('[id^="Path_"]');
-      allGroups.forEach(g=>{
-        if(GROUPS[g.id]){
+        // グループクリックも初期化
+        const allGroups = svg.querySelectorAll('[id^="Path_"]');
+        allGroups.forEach(g=>{
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => {
-            showRegion(g.id);
+            location.hash = GROUPS[g.id].hash;
           });
-        }
-      });
+        });
+      }
 
-      // BOX作成
+      // ★BOX作成
       const initialNav = createInitialNav();
       const topBOX = createTopBOX();
       const top2BOX = createTop2BOX();
@@ -142,7 +144,9 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAllBOX();
         showBOX(gid);
 
+        const allGroups = svg.querySelectorAll('[id^="Path_"]');
         allGroups.forEach(g=>g.style.display='none');
+
         prefGroup.querySelectorAll('path').forEach(p => {
           if(GROUPS[gid].prefList.includes(p.id)) {
             p.style.display = 'inline';
@@ -159,34 +163,40 @@ document.addEventListener('DOMContentLoaded', () => {
         disableOtherAreas(GROUPS[gid].prefList);
       }
 
-      // ハッシュ変更時
-      window.addEventListener('hashchange', () => {
-        const hash = location.hash.replace('#','').toUpperCase();
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+      // ★SVG変換・選択制御
+      function applyTransform(gid){
+        const group = svg.querySelector('#'+gid);
+        const bbox = group.getBBox();
+        const s = GROUPS[gid];
+        const cx = bbox.x + bbox.width/2 + s.x;
+        const cy = bbox.y + bbox.height/2 + s.y;
+        const svgDisplayWidth = svg.clientWidth;
+        const viewBoxWidth = svg.viewBox.baseVal.width;
+        const displayScale = svgDisplayWidth / viewBoxWidth;
+        const finalScale = s.scale * displayScale;
+        const tx = (svgDisplayWidth/2) - cx * finalScale;
+        const ty = (svg.clientHeight/2) - cy * finalScale;
+        svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
 
-        if(gid){
-          showRegion(gid);
-        } else {
-          alert('表示予定です');
-          initPrefPath();
-        }
-      });
-
-      // ロード時チェック
-      if(location.hash){
-        const hash = location.hash.replace('#','').toUpperCase();
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-        if(gid){
-          showRegion(gid);
-        } else if(prefNames[hash]){
-          alert(`${prefNames[hash]} は表示予定です`);
-          initPrefPath();
-        } else {
-          initPrefPath();
-        }
+        const baseStroke = 0.5;
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
+        });
+        const allGroups = svg.querySelectorAll('[id^="Path_"]');
+        allGroups.forEach(g=>{
+          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
+        });
       }
 
-      // BOX作成関数（元通り）
+      function disableOtherAreas(activeIds){
+        const allGroups = svg.querySelectorAll('[id^="Path_"]');
+        allGroups.forEach(g=>{ g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none'; });
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
+        });
+      }
+
+      // ★BOX作成関数群
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
@@ -203,16 +213,17 @@ document.addEventListener('DOMContentLoaded', () => {
           box.textContent=name;
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
-            box.onclick=()=>{ showRegion(`Path_${i+1}`); };
+            box.onclick=()=>{ location.hash = GROUPS[`Path_${i+1}`].hash; };
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
         mapDiv.appendChild(nav);
         return nav;
       }
-      function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X'); }
-      function createTop2BOX(){ return createCornerBOXWrapper('top',35,50,'X'); }
-      function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X'); }
+
+      function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X',4); }
+      function createTop2BOX(){ return createCornerBOXWrapper('top',35,50,'X',4); } // top2位置調整維持
+      function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X',4); }
       function createCornerBOX(position){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
@@ -228,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-      function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
+      function createCornerBOXWrapper(vertical,posValue,horPercent,axis,count){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
         if(vertical==='top') wrapper.style.top = posValue+'px';
@@ -238,40 +249,33 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.style.display='none';
         wrapper.style.gap = '6px';
         wrapper.style.zIndex = '10';
-        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
+        for(let i=0;i<count;i++) wrapper.appendChild(createBox());
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
 
-      // SVG変換・選択制御
-      function applyTransform(gid){
-        const group = svg.querySelector('#'+gid);
-        const bbox = group.getBBox();
-        const s = GROUPS[gid];
-        const cx = bbox.x + bbox.width/2 + s.x;
-        const cy = bbox.y + bbox.height/2 + s.y;
-        const svgDisplayWidth = svg.clientWidth;
-        const viewBoxWidth = svg.viewBox.baseVal.width;
-        const displayScale = svgDisplayWidth / viewBoxWidth;
-        const finalScale = s.scale * displayScale;
-        const tx = (svgDisplayWidth/2) - cx * finalScale;
-        const ty = (svg.clientHeight/2) - cy * finalScale;
-        svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
-        const baseStroke = 0.5;
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
-        allGroups.forEach(g=>{
-          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
+      // ★ロード時ハッシュ判定
+      function handleInitialHash(){
+        if(location.hash){
+          const hash = location.hash.replace('#','').toUpperCase();
+          const groupId = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+          const prefId = Object.keys(prefNames).find(p => `${GROUPS[groupId]?.hash}/${p}` === hash);
+
+          if(groupId){
+            showRegion(groupId);
+          } else if(prefId){
+            handlePrefClick(prefId);
+          } else {
+            initPrefPaths();
+          }
+        } else {
+          initPrefPaths();
+        }
       }
 
-      function disableOtherAreas(activeIds){
-        allGroups.forEach(g=>{ g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none'; });
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
-        });
-      }
+      // ★初期化呼び出し
+      initPrefPaths();
+      handleInitialHash();
 
     });
 });
