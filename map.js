@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
       mapDiv.innerHTML = svgText;
       const svg = mapDiv.querySelector('svg');
       const prefGroup = svg.querySelector('#pref');
+      
+      // ★ここでハッシュチェック開始
+handleInitialHash();  // ← 位置はここが最適
+window.addEventListener('hashchange', handleInitialHash);
+
 
       svg.style.shapeRendering = 'geometricPrecision';
       svg.style.transformOrigin = 'center center';
@@ -199,30 +204,30 @@ top2BOX.children.forEach((c,i)=>{
 
 
 function handleInitialHash(){
-    const hash = location.hash.replace('#','').toUpperCase();
-    
-    alert('ハッシュチェック開始');  
-    initPrefPaths();  // ★必ず最初にクリックイベント登録
+    alert('handleInitialHash called — hash now = ' + location.hash);
 
-    if(hash){  // ハッシュがある場合
-        if(hash.includes('/')){  // 県単体（未実装）
-            alert('これから作る');  // 仮処理
+    const hash = location.hash.replace('#','').toUpperCase();
+    initPrefPaths();
+
+    if(hash){
+        alert('hash non-empty: ' + hash);
+
+        if(hash.includes('/')){
+            alert('prefect hash detected (with slash): ' + hash);
             return;
         }
 
-        // グループハッシュ判定
         const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-        alert('ハッシュ有り');  
+        alert('gid found? ' + gid);
+
         if(gid){
-            showRegion(gid);  // グループ拡大
+            showRegion(gid);
             return;
         }
     }
-    
-    
 
-    // ハッシュなし、または未該当の場合 → 初期画面表示
-    initialNav.style.display = 'flex';
+    alert('fallback to initial screen');
+    initialNav.style.display='flex';
     hideAllBOX();
 }
 
