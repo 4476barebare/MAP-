@@ -55,20 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // ★共通クリック処理（ハッシュ追加方式）
+      // ★共通クリック処理（グループハッシュ + 県ID形式）
       function handlePrefClick(prefId){
-        const leafletPrefs = ['CHIBA']; // Leaflet表示対象
-        if(leafletPrefs.includes(prefId)){
-          switchToLeaflet(prefId);
-          return;
-        }
-
-        // 既存ハッシュを取得し配列化
-        let hashes = location.hash ? location.hash.replace('#','').split('/') : [];
-        if(!hashes.includes(prefId)){
-          hashes.push(prefId);
-          location.hash = hashes.join('/');
-        }
+        let currentHash = location.hash.replace('#','').toUpperCase();
+        let groupPart = currentHash.split('/')[0] || currentGroup && GROUPS[currentGroup].hash || '';
+        location.hash = groupPart ? `${groupPart}/${prefId}` : prefId;
       }
 
       // 初期化
@@ -77,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
         p.classList.remove('prefecture-selected','prefecture-unselected');
         p.classList.add('prefecture-initial');
 
-        // 地図クリックも共通function
         p.addEventListener('click', (e) => {
           e.stopPropagation();
           handlePrefClick(p.id);
@@ -154,11 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
         allGroups.forEach(g=>g.style.display='none');
         prefGroup.querySelectorAll('path').forEach(p => {
           if(GROUPS[gid].prefList.includes(p.id)) {
-            p.style.display='inline';
+            p.style.display = 'inline';
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
           } else {
-            p.style.display='inline';
+            p.style.display = 'inline';
             p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
           }
@@ -168,43 +158,23 @@ document.addEventListener('DOMContentLoaded', () => {
         disableOtherAreas(GROUPS[gid].prefList);
       }
 
-      // ★Leaflet切替関数
-      function switchToLeaflet(prefId){
-        mapDiv.innerHTML = ''; // SVG消去
-        const leafletDiv = document.createElement('div');
-        leafletDiv.id = 'leafletMap';
-        leafletDiv.style.width = '100%';
-        leafletDiv.style.height = '420px';
-        mapDiv.appendChild(leafletDiv);
-
-        const prefCenters = { CHIBA:[35.6074,140.1063] };
-        const map = L.map('leafletMap').setView(prefCenters[prefId], 10);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        L.marker(prefCenters[prefId]).addTo(map)
-          .bindPopup(prefNames[prefId])
-          .openPopup();
-      }
-
       // ★ハッシュ変更対応
       window.addEventListener('hashchange', () => {
-        const hashes = location.hash.replace('#','').toUpperCase().split('/');
+        const hash = location.hash.replace('#','').toUpperCase();
+        const [group, pref] = hash.split('/');
 
-        const leafletPrefs = ['CHIBA'];
-        const leafAdded = hashes.filter(h=>leafletPrefs.includes(h));
-        if(leafAdded.length>0){
-          switchToLeaflet(leafAdded[0]);
-          return;
-        }
-
-        hashes.forEach(hash=>{
-          const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-          if(gid){
-            showRegion(gid);
+        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === group);
+        if(gid){
+          showRegion(gid);
+          if(pref){
+            // 選択県だけハイライト
+            prefGroup.querySelectorAll('path').forEach(p=>{
+              p.classList.remove('prefecture-selected','prefecture-unselected');
+              if(p.id === pref) p.classList.add('prefecture-selected');
+              else p.classList.add('prefecture-unselected');
+            });
           }
-        });
+        }
       });
 
       // ★ロード時の直URL対応
@@ -212,9 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.dispatchEvent(new Event('hashchange'));
       }
 
-      // ★BOX・NAV作成関数
+      // ★BOX・NAV作成関数は元のまま
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
-
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
@@ -241,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
       function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X'); }
       function createTop2BOX(){ return createCornerBOXWrapper('top',35,50,'X'); }
       function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X'); }
-
       function createCornerBOX(position){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
@@ -257,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-
       function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
@@ -273,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      // ★SVG変換・選択制御
+      // ★SVG変換・選択制御は元のまま
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
