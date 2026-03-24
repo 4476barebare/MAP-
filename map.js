@@ -196,29 +196,28 @@ top2BOX.children.forEach((c,i)=>{
 
 
 function handleInitialHash(){
-        const hash = location.hash.replace('#','').toUpperCase();
+    const hash = location.hash.replace('#','').toUpperCase();
 
-        if(hash){  // ハッシュがある場合
-          initPrefPaths();  // ★県・グループにクリックイベント登録
+    initPrefPaths();  // ★必ず最初にクリックイベント登録
 
-          if(hash.includes('/')){  // 県単体（未実装）
+    if(hash){  // ハッシュがある場合
+        if(hash.includes('/')){  // 県単体（未実装）
             alert('これから作る');  // 仮処理
             return;
-          }
+        }
 
-          // グループハッシュ判定
-          const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-          if(gid){
+        // グループハッシュ判定
+        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+        if(gid){
             showRegion(gid);  // グループ拡大
             return;
-          }
-
-        } else {  // ハッシュなしの場合 → 初期画面
-          initPrefPaths();  // クリックイベント付与
-          initialNav.style.display = 'flex';
-          hideAllBOX();
         }
-      }
+    }
+
+    // ハッシュなし、または未該当の場合 → 初期画面表示
+    initialNav.style.display = 'flex';
+    hideAllBOX();
+}
 
 
 
