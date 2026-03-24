@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentGroup = null;
 
-      // ★GROUPS 定義
       const GROUPS = {
         Path_2: { hash:'TOHOKU', scale:6.7, x:135, y:45,
                   prefBoxes: { leftTop:['AOMORI','AKITA','YAMAGATA','NIIGATA'], rightBottom:['IWATE','MIYAGI','FUKUSHIMA'] },
@@ -55,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // ★県クリック処理
+      // 県クリック処理
       function handlePrefClick(prefId){
-        alert(`${prefNames[prefId] || prefId} は表示予定です`);
+        alert(`${prefNames[prefId]} は表示予定です`);
       }
 
-      // ★初期化 function
-      function initPrefPaths(){
+      // 初期化関数
+      function initPrefPath(){
         prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = 'inline';
           p.classList.remove('prefecture-selected','prefecture-unselected');
@@ -74,18 +73,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      initPrefPaths(); // 初期化呼び出し
+      // 初期化
+      initPrefPath();
 
-      // ★グループクリック設定
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
       allGroups.forEach(g=>{
-        g.style.cursor='pointer';
-        g.addEventListener('click', ()=>{
-          location.hash = GROUPS[g.id].hash;
-        });
+        if(GROUPS[g.id]){
+          g.style.cursor = 'pointer';
+          g.addEventListener('click', () => {
+            showRegion(g.id);
+          });
+        }
       });
 
-      // ★BOX 作成
+      // BOX作成
       const initialNav = createInitialNav();
       const topBOX = createTopBOX();
       const top2BOX = createTop2BOX();
@@ -158,37 +159,34 @@ document.addEventListener('DOMContentLoaded', () => {
         disableOtherAreas(GROUPS[gid].prefList);
       }
 
-      // ★SVG 初期化・選択制御は既存のまま
-      function applyTransform(gid){
-        const group = svg.querySelector('#'+gid);
-        const bbox = group.getBBox();
-        const s = GROUPS[gid];
-        const cx = bbox.x + bbox.width/2 + s.x;
-        const cy = bbox.y + bbox.height/2 + s.y;
-        const svgDisplayWidth = svg.clientWidth;
-        const viewBoxWidth = svg.viewBox.baseVal.width;
-        const displayScale = svgDisplayWidth / viewBoxWidth;
-        const finalScale = s.scale * displayScale;
-        const tx = (svgDisplayWidth/2) - cx * finalScale;
-        const ty = (svg.clientHeight/2) - cy * finalScale;
-        svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
-        const baseStroke = 0.5;
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
-        allGroups.forEach(g=>{
-          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
+      // ハッシュ変更時
+      window.addEventListener('hashchange', () => {
+        const hash = location.hash.replace('#','').toUpperCase();
+        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+
+        if(gid){
+          showRegion(gid);
+        } else {
+          alert('表示予定です');
+          initPrefPath();
+        }
+      });
+
+      // ロード時チェック
+      if(location.hash){
+        const hash = location.hash.replace('#','').toUpperCase();
+        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+        if(gid){
+          showRegion(gid);
+        } else if(prefNames[hash]){
+          alert(`${prefNames[hash]} は表示予定です`);
+          initPrefPath();
+        } else {
+          initPrefPath();
+        }
       }
 
-      function disableOtherAreas(activeIds){
-        allGroups.forEach(g=>{ g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none'; });
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
-        });
-      }
-
-      // ★初期NAV/BOX作成関数（既存通り）
+      // BOX作成関数（元通り）
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
@@ -205,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
           box.textContent=name;
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
-            box.onclick=()=>{ location.hash = GROUPS[`Path_${i+1}`].hash; };
+            box.onclick=()=>{ showRegion(`Path_${i+1}`); };
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
@@ -245,22 +243,34 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      // ★ロード時ハッシュ判定
-      if(location.hash){
-        const hash = location.hash.replace('#','').toUpperCase();
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+      // SVG変換・選択制御
+      function applyTransform(gid){
+        const group = svg.querySelector('#'+gid);
+        const bbox = group.getBBox();
+        const s = GROUPS[gid];
+        const cx = bbox.x + bbox.width/2 + s.x;
+        const cy = bbox.y + bbox.height/2 + s.y;
+        const svgDisplayWidth = svg.clientWidth;
+        const viewBoxWidth = svg.viewBox.baseVal.width;
+        const displayScale = svgDisplayWidth / viewBoxWidth;
+        const finalScale = s.scale * displayScale;
+        const tx = (svgDisplayWidth/2) - cx * finalScale;
+        const ty = (svg.clientHeight/2) - cy * finalScale;
+        svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
+        const baseStroke = 0.5;
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
+        });
+        allGroups.forEach(g=>{
+          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
+        });
+      }
 
-        if(gid){
-          showRegion(gid);
-        } else {
-          // 県ならアラート
-          const prefIds = Object.keys(prefNames).map(k => k.toUpperCase());
-          if(prefIds.includes(hash)){
-            alert(`${prefNames[hash] || hash} は表示予定です`);
-          } else {
-            initPrefPaths(); // どちらでもなければ初期表示
-          }
-        }
+      function disableOtherAreas(activeIds){
+        allGroups.forEach(g=>{ g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none'; });
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
+        });
       }
 
     });
