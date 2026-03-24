@@ -339,5 +339,52 @@ if(manualNav){
   
   
   
+    // ★ fetch内の最後に置く
+
+
+// ===== ハッシュ処理（関数化）=====
+function handleHash(){
+    const hash = location.hash.replace(/^#/, '');
+
+    if(hash){
+        const parts = hash.split('/');
+
+        const regionHash = parts[0];
+        const gid = Object.keys(groupSettings)
+            .find(k => groupSettings[k].hash === regionHash);
+
+        if(gid){
+            showRegion(gid);
+        }
+
+        // 将来拡張用
+        if(parts[1]){
+            // gotoPref(parts[1]);
+        }
+    }
+}
+
+// ===== 初期ハッシュ反映 =====
+handleHash();
+
+// ===== ボタン連動 =====
+const manualNav = document.getElementById('manual-region-nav');
+if(manualNav){
+    manualNav.querySelectorAll('button').forEach(btn => {
+        btn.onclick = () => {
+            const hash = btn.dataset.hash;
+            location.hash = '#' + hash;
+            handleHash(); // 即時反映
+        };
+    });
+}
+
+// ===== 戻る・進む対応（任意だが推奨）=====
+window.addEventListener('hashchange', handleHash);
+        
+        
+        
+        
+        
     }); // fetch end
 });
