@@ -55,48 +55,81 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      // ★県クリック処理（ハッシュ追加）
+      // ★県クリック処理（ハッシュ追加＋アラート）
       function handlePrefClick(prefId){
-        location.hash += '/' + prefId; // ハッシュ追加
+        location.hash += '/' + prefId;
         alert(`表示予定: ${prefNames[prefId]}`);
       }
 
-      // ★初期化関数
-      // ★初期化関数
-function initPrefPaths() {
-  prefGroup.querySelectorAll('path').forEach(p => {
-    p.style.display = 'inline';
-    p.classList.remove('prefecture-selected', 'prefecture-unselected');
-    p.classList.add('prefecture-initial');
+      // ★初期化関数（県クリック登録）
+      function initPrefPaths() {
+        prefGroup.querySelectorAll('path').forEach(p => {
+          p.style.display = 'inline';
+          p.classList.remove('prefecture-selected','prefecture-unselected');
+          p.classList.add('prefecture-initial');
 
-    p.addEventListener('click', (e) => {
-      e.stopPropagation();
-      handlePrefClick(p.id);
-    });
-  });
+          p.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            handlePrefClick(p.id);
+          });
+        });
+      }
 
-  // ★グループクリック追加
-  Object.keys(GROUPS).forEach(gid => {
-    const gElem = svg.querySelector('#' + gid);
-    if(!gElem) return;
-    gElem.style.cursor = 'pointer';
-    gElem.addEventListener('click', (e) => {
-      e.stopPropagation();
-      location.hash = GROUPS[gid].hash;
-    });
-  });
-}
+      // ★BOX生成（安全版、位置は壊さない）
+      function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
 
-      // ★BOX作成関数（以前のまま）
-      const initialNav = createInitialNav();
+      function createTopBOX(){ return createCornerDummyWrapper('top',5,50,'X'); }
+      function createTop2BOX(){ return createCornerDummyWrapper('top',35,50,'X'); }
+      function createBottomBOX(){ return createCornerDummyWrapper('bottom',5,50,'X'); }
+      function createLeftTopBOX(){ return createCornerDummy('leftTop'); }
+      function createRightBottomBOX(){ return createCornerDummy('rightBottom'); }
+      function createLeftBottomBOX(){ return createCornerDummy('leftBottom'); }
+      function createRightTopBOX(){ return createCornerDummy('rightTop'); }
+
+      function createCornerDummy(position){
+        const wrapper = document.createElement('div');
+        wrapper.style.position='absolute';
+        wrapper.style.display='none';
+        wrapper.style.flexDirection='column';
+        wrapper.style.gap='4px';
+        wrapper.style.zIndex='10';
+
+        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
+        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
+        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
+        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
+
+        for(let i=0;i<5;i++) wrapper.appendChild(createBox());
+        mapDiv.appendChild(wrapper);
+        return wrapper;
+      }
+
+      function createCornerDummyWrapper(vertical,posValue,horPercent,axis){
+        const wrapper = document.createElement('div');
+        wrapper.style.position='absolute';
+        if(vertical==='top') wrapper.style.top = posValue+'px';
+        else wrapper.style.bottom = posValue+'px';
+        wrapper.style.left = horPercent+'%';
+        if(axis==='X') wrapper.style.transform = 'translateX(-50%)';
+        wrapper.style.display='none';
+        wrapper.style.gap='6px';
+        wrapper.style.zIndex='10';
+
+        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
+        mapDiv.appendChild(wrapper);
+        return wrapper;
+      }
+
+      // ★BOX変数
       const topBOX = createTopBOX();
       const top2BOX = createTop2BOX();
       const bottomBOX = createBottomBOX();
-      const leftTopBOX = createCornerBOX('leftTop');
-      const rightBottomBOX = createCornerBOX('rightBottom');
-      const leftBottomBOX = createCornerBOX('leftBottom');
-      const rightTopBOX = createCornerBOX('rightTop');
+      const leftTopBOX = createLeftTopBOX();
+      const rightBottomBOX = createRightBottomBOX();
+      const leftBottomBOX = createLeftBottomBOX();
+      const rightTopBOX = createRightTopBOX();
 
+      // ★BOX表示制御
       function hideAllBOX(){
         [topBOX, top2BOX, bottomBOX, leftTopBOX, rightBottomBOX, leftBottomBOX, rightTopBOX]
           .forEach(wrapper=>{
@@ -113,13 +146,13 @@ function initPrefPaths() {
         if(!setting) return;
         Object.keys(setting).forEach(pos=>{
           let wrapper;
-          if(pos==='top') wrapper = topBOX;
-          else if(pos==='top2') wrapper = top2BOX;
-          else if(pos==='bottom') wrapper = bottomBOX;
-          else if(pos==='leftTop') wrapper = leftTopBOX;
-          else if(pos==='rightBottom') wrapper = rightBottomBOX;
-          else if(pos==='leftBottom') wrapper = leftBottomBOX;
-          else if(pos==='rightTop') wrapper = rightTopBOX;
+          if(pos==='top') wrapper=topBOX;
+          else if(pos==='top2') wrapper=top2BOX;
+          else if(pos==='bottom') wrapper=bottomBOX;
+          else if(pos==='leftTop') wrapper=leftTopBOX;
+          else if(pos==='rightBottom') wrapper=rightBottomBOX;
+          else if(pos==='leftBottom') wrapper=leftBottomBOX;
+          else if(pos==='rightTop') wrapper=rightTopBOX;
           if(!wrapper) return;
 
           wrapper.style.display='flex';
@@ -144,17 +177,16 @@ function initPrefPaths() {
         hideAllBOX();
         showBOX(gid);
 
-        // path表示切替
         const allGroups = svg.querySelectorAll('[id^="Path_"]');
         allGroups.forEach(g=>g.style.display='none');
 
-        prefGroup.querySelectorAll('path').forEach(p => {
-          if(GROUPS[gid].prefList.includes(p.id)) {
-            p.style.display = 'inline';
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          if(GROUPS[gid].prefList.includes(p.id)){
+            p.style.display='inline';
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
           } else {
-            p.style.display = 'inline';
+            p.style.display='inline';
             p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
           }
@@ -163,7 +195,7 @@ function initPrefPaths() {
         applyTransform(gid);
       }
 
-      // ★SVG変換・拡大制御（以前のまま）
+      // ★SVG変換・拡大
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
@@ -188,37 +220,26 @@ function initPrefPaths() {
       }
 
       // ★初期ハッシュ判定
-      function handleInitialHash() {
-        initPrefPaths(); // まず初期化
-
+      function handleInitialHash(){
+        initPrefPaths();
         const hash = location.hash.replace('#','').toUpperCase();
 
-        // グループ判定
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash===hash);
         if(gid){
-          showRegion(gid); // グループ拡大
+          showRegion(gid);
           return;
         }
 
-        // 県判定
         if(Object.keys(prefNames).includes(hash)){
-          alert("表示予定"); // 県単位はアラート
+          alert("表示予定");
           return;
         }
 
-        // どちらでもない場合 → 初期画面表示
-        initialNav.style.display = 'flex';
+        initialNav.style.display='flex';
         hideAllBOX();
       }
 
-      // ★ロード時呼び出し
-      handleInitialHash();
-
-      // ★ハッシュ変更対応
-      window.addEventListener('hashchange', handleInitialHash);
-
-      // ★初期NAVとBOX作成関数（以前と同じ）
-      function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
+      // ★初期NAV
       function createInitialNav(){
         const names=['北海道','東北地方','関東地方','中部地方','近畿地方','中国四国','九州地方','沖縄'];
         const nav=document.createElement('div');
@@ -234,45 +255,21 @@ function initPrefPaths() {
           box.textContent=name;
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
-            box.onclick=()=>{ location.hash = GROUPS[`Path_${i+1}`].hash; };
+            box.onclick=()=>{ location.hash=GROUPS[`Path_${i+1}`].hash; };
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
         mapDiv.appendChild(nav);
         return nav;
       }
-      function createTopBOX(){ return createCornerBOXWrapper('top',5,50,'X'); }
-      function createTop2BOX(){ return createCornerBOXWrapper('top',35,50,'X'); }
-      function createBottomBOX(){ return createCornerBOXWrapper('bottom',5,50,'X'); }
-      function createCornerBOX(position){
-        const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.display='none';
-        wrapper.style.flexDirection='column';
-        wrapper.style.gap='4px';
-        wrapper.style.zIndex='10';
-        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
-        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
-        for(let i=0;i<5;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
-      function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
-        const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        if(vertical==='top') wrapper.style.top = posValue+'px';
-        else wrapper.style.bottom = posValue+'px';
-        wrapper.style.left = horPercent+'%';
-        if(axis==='X') wrapper.style.transform = 'translateX(-50%)';
-        wrapper.style.display='none';
-        wrapper.style.gap = '6px';
-        wrapper.style.zIndex = '10';
-        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
+
+      const initialNav = createInitialNav();
+
+      // ★ロード時呼び出し
+      handleInitialHash();
+
+      // ★ハッシュ変更対応
+      window.addEventListener('hashchange', handleInitialHash);
 
     });
 });
