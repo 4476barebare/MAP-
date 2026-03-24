@@ -74,16 +74,17 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
 
-        // グループクリック追加
-        Object.keys(GROUPS).forEach(gid=>{
-          const gElem = svg.querySelector('#'+gid);
-          if(!gElem) return;
-          gElem.style.cursor = 'pointer';
-          gElem.addEventListener('click', e=>{
+        // グループクリックイベント登録（旧方式：直接 showRegion 呼び出し）
+    Object.keys(GROUPS).forEach(gid => {
+        const gElem = svg.querySelector('#' + gid);
+        if (!gElem) return;
+        gElem.style.cursor = 'pointer';
+        gElem.addEventListener('click', e => {
             e.stopPropagation();
-            location.hash = GROUPS[gid].hash;
-          });
+            showRegion(gid);  // ★直接拡大
         });
+    });
+
         
         alert("イベント登録済み"); // ★追加
       }
