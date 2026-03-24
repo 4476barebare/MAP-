@@ -249,20 +249,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
       function createCornerBOXWrapper(vertical,posValue,horPercent,axis){
-        const wrapper=document.createElement('div');
-        wrapper.style.position='absolute';
-        if(vertical==='top') wrapper.style.top=posValue+'px';
-        else wrapper.style.bottom=posValue+'px';
-        wrapper.style.left=horPercent+'%';
-        if(axis==='X') wrapper.style.transform='translateX(-50%)';
-        wrapper.style.display='none';
-        wrapper.style.gap='6px';
-        wrapper.style.zIndex='10';
-        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
-
+  const wrapper = document.createElement('div');
+  wrapper.style.position = 'absolute';
+  
+  if(vertical==='top') wrapper.style.top = posValue + 'px';
+  else wrapper.style.bottom = posValue + 'px';
+  
+  wrapper.style.left = horPercent + '%';
+  if(axis==='X') wrapper.style.transform = 'translateX(-50%)';
+  
+  wrapper.style.display = 'none';
+  wrapper.style.gap = '6px';
+  wrapper.style.zIndex = '10';
+  
+  // top2 用にボックス数を5個に修正
+  const boxCount = (posValue === 35) ? 5 : 4; 
+  for(let i=0;i<boxCount;i++) wrapper.appendChild(createBox());
+  
+  mapDiv.appendChild(wrapper);
+  return wrapper;
+}
     });
 });document.addEventListener('DOMContentLoaded', () => {
 
