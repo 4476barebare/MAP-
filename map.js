@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ★SVG拡大制御
       function applyTransform(gid){
-          alert(`gidを表示します: ${gid}`);
+          alert(`gidでトランスフォーム: ${gid}`);
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
         const s = GROUPS[gid];
@@ -180,6 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
         svg.querySelectorAll('[id^="Path_"]').forEach(g=>{
           g.style.strokeWidth = (baseStroke/finalScale)+'px';
         });
+        
+        alert(`トランスフォーム完了: ${gid}`);
+        
       }
 
       // ★ハッシュチェック（初期表示）
