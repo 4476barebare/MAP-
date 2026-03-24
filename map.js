@@ -302,17 +302,29 @@ if(!location.hash || location.hash === '#'){
 
   // ハッシュ更新用（fetch 外）
   function updateHash(gid = null, prefId = null, subId = null) {
-      alert(gid);
+    // gid → hash 名変換
+    let hashGid = gid && groupSettings[gid] ? groupSettings[gid].hash : gid;
+    
+    alert( hashGid );
+    // 現在のハッシュを分解
     let parts = location.hash.replace(/^#/, '').split('/');
     if(parts.length === 1 && parts[0] === '') parts = [];
-    if(gid !== null) parts[0] = gid;
+
+    // 条件に応じて上書き
+    if(hashGid !== null) parts[0] = hashGid;
     if(prefId !== null) parts[1] = prefId;
     if(subId !== null) parts[2] = subId;
+
+    // 余分な undefined や空文字を削除
     parts = parts.filter(p => p);
+
+    // 新しいハッシュを設定
     const newHash = parts.join('/');
     if('#' + newHash !== location.hash) {
         history.pushState({ gid, prefId, subId }, '', '#' + newHash);
     }
-  }
+}
+  
+  
     }); // fetch end
 });
