@@ -73,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(groupSettings[gid]){
           g.style.cursor = 'pointer';
           g.addEventListener('click', () => showRegion(gid));
+          updateHash(gid); // ← ここを追
         }
       });
 
@@ -265,6 +266,8 @@ function showRegion(gid){
           if(i!==0 && i!==7){
             box.style.cursor='pointer';
             box.onclick=()=>showRegion(`Path_${i+1}`);
+            updateHash(`Path_${i+1}`);  // ←ここを1行追加
+            
           } else box.style.opacity='0.6';
           nav.appendChild(box);
         });
