@@ -60,11 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
+      // ★ 県クリック（ハッシュ対応）
       function gotoPref(prefId){
         alert(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+        updateHash(null, prefId);
       }
 
-      // 初期表示：全県非表示＋初期クラス
+      // 初期表示
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
         p.classList.remove('prefecture-selected','prefecture-unselected');
@@ -129,65 +131,34 @@ document.addEventListener('DOMContentLoaded', () => {
       function showRegion(gid){
         currentGroup = gid;
 
-        // 初期ナビ非表示＆BOX非表示
         initialNav.style.display = 'none';
         hideAllBoxes();
-
-        // 拡大対象グループのBOX表示
         showBoxes(gid);
 
-        // 全グループ非表示
         allGroups.forEach(g => g.style.display = 'none');
 
-        // 県パス表示
         prefGroup.querySelectorAll('path').forEach(p => {
             if(groupToPrefectures[gid].includes(p.id)) {
-                p.style.display = 'inline';
                 p.classList.remove('prefecture-initial','prefecture-unselected');
                 p.classList.add('prefecture-selected');
-
-                // SVGパスクリックでgotoPref
-                p.onclick = e => {
-                    e.stopPropagation();
-                    gotoPref(p.id);
-                };
-
+                p.onclick = e => { e.stopPropagation(); gotoPref(p.id); };
             } else {
-                p.style.display = 'inline';
                 p.classList.remove('prefecture-initial','prefecture-selected');
                 p.classList.add('prefecture-unselected');
             }
         });
 
-        // 拡大変形
         applyTransform(gid);
-
-        // 他エリアのクリック制御
         disableOtherAreas(groupToPrefectures[gid]);
 
-        // top2Dummy の位置調整（Path_6のみ例外）
-        if(gid === 'Path_6'){
-            const topRect = topDummy.getBoundingClientRect();
-            const mapRect = mapDiv.getBoundingClientRect();
-            const left = topRect.left - mapRect.left;
-            top2Dummy.style.left = left + 'px';
-            top2Dummy.style.transform = 'none';
-        } else {
-            top2Dummy.style.left = '50%';
-            top2Dummy.style.transform = 'translateX(-50%)';
-        }
-
-        // 他グループを残して表示（非拡大）
         allGroups.forEach(g => {
             if(g.id !== gid) g.style.display = 'inline';
         });
 
-        // --- BOXクリックイベント登録 ---
         const boxWrappers = [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy];
         boxWrappers.forEach(wrapper => {
             Array.from(wrapper.children).forEach(box => {
                 if(box.textContent.trim() === '') return;
-
                 box.onclick = e => {
                     e.stopPropagation();
                     const prefId = Object.keys(prefNames).find(key => prefNames[key] === box.textContent);
@@ -195,211 +166,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             });
         });
-        // 拡大後、gidが確定したタイミングで
-if(!location.hash || location.hash === '#'){
-    updateHash(gid);  // ハッシュが空ならgidをセット
-}
-      }
 
-      function applyTransform(gid){
-        const group = svg.querySelector('#'+gid);
-        const bbox = group.getBBox();
-        const s = groupSettings[gid];
-        const cx = bbox.x + bbox.width/2 + s.x;
-        const cy = bbox.y + bbox.height/2 + s.y;
-        const scale = s.scale;
-
-        const svgDisplayWidth = svg.clientWidth;
-        const viewBoxWidth = svg.viewBox.baseVal.width;
-        const displayScale = svgDisplayWidth / viewBoxWidth;
-
-        const finalScale = scale * displayScale;
-        const tx = (svgDisplayWidth/2) - cx * finalScale;
-        const ty = (svg.clientHeight/2) - cy * finalScale;
-
-        svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
-
-        const baseStroke = 0.5;
-        prefGroup.querySelectorAll('path').forEach(p=>{
-            p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
-
-        allGroups.forEach(g=>{
-            g.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
-      }
-
-      function disableOtherAreas(activeIds){
-        allGroups.forEach(g=>{
-          g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none';
-        });
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
-        });
-      }
-
-      function createBox(){ const box = document.createElement('div'); box.classList.add('pref-box'); return box; }
-
-      function createInitialNav(){
-        const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
-        const nav=document.createElement('div');
-        nav.style.position='absolute';
-        nav.style.top='5px';
-        nav.style.left='5px';
-        nav.style.display='flex';
-        nav.style.flexDirection='column';
-        nav.style.gap='4px';
-        nav.style.zIndex='10';
-        names.forEach((name,i)=>{
-          const box=createBox();
-          box.textContent=name;
-          if(i!==0 && i!==7){
-            box.style.cursor='pointer';
-            box.onclick=()=>showRegion(`Path_${i+1}`);
-          } else box.style.opacity='0.6';
-          nav.appendChild(box);
-        });
-        mapDiv.appendChild(nav);
-        return nav;
-      }
-
-      function createTopDummy(){ return createCornerDummyWrapper('top',5,50,'X'); }
-      function createTop2Dummy(){ return createCornerDummyWrapper('top',35,50,'X'); }
-      function createBottomDummy(){ return createCornerDummyWrapper('bottom',5,50,'X'); }
-
-      function createCornerDummy(position){
-        const wrapper = document.createElement('div');
-        wrapper.style.position='absolute';
-        wrapper.style.display='none';
-        wrapper.style.flexDirection='column';
-        wrapper.style.gap='4px';
-        wrapper.style.zIndex='10';
-
-        if(position==='leftTop'){ wrapper.style.top='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightBottom'){ wrapper.style.bottom='5px'; wrapper.style.right='5px'; }
-        else if(position==='leftBottom'){ wrapper.style.bottom='5px'; wrapper.style.left='5px'; }
-        else if(position==='rightTop'){ wrapper.style.top='5px'; wrapper.style.right='5px'; }
-
-        for(let i=0;i<5;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
-
-      function createCornerDummyWrapper(vertical,posValue,horPercent,axis){
-        const wrapper = document.createElement('div');
-        wrapper.style.position='absolute';
-        if(vertical==='top') wrapper.style.top = posValue+'px';
-        else wrapper.style.bottom = posValue+'px';
-        wrapper.style.left = horPercent+'%';
-        if(axis==='X') wrapper.style.transform = 'translateX(-50%)';
-        wrapper.style.display = 'none';
-        wrapper.style.gap = '6px';
-        wrapper.style.zIndex = '10';
-        for(let i=0;i<4;i++) wrapper.appendChild(createBox());
-        mapDiv.appendChild(wrapper);
-        return wrapper;
-      }
-
-  // ハッシュ更新用（fetch 外）
-  function updateHash(gid = null, prefId = null, subId = null) {
-    // gid → hash 名変換
-    let hashGid = gid && groupSettings[gid] ? groupSettings[gid].hash : gid;
-    
-    alert( hashGid );
-    // 現在のハッシュを分解
-    let parts = location.hash.replace(/^#/, '').split('/');
-    if(parts.length === 1 && parts[0] === '') parts = [];
-
-    // 条件に応じて上書き
-    if(hashGid !== null) parts[0] = hashGid;
-    if(prefId !== null) parts[1] = prefId;
-    if(subId !== null) parts[2] = subId;
-
-    // 余分な undefined や空文字を削除
-    parts = parts.filter(p => p);
-
-    // 新しいハッシュを設定
-    const newHash = parts.join('/');
-    if('#' + newHash !== location.hash) {
-        history.pushState({ gid, prefId, subId }, '', '#' + newHash);
-    }
-}
-  
-  
-// ===== ハッシュ処理（関数化）=====
-function handleHash(){
-    const hash = location.hash.replace(/^#/, '');
-
-    if(hash){
-        const parts = hash.split('/');
-
-        const regionHash = parts[0];
-        const gid = Object.keys(groupSettings)
-            .find(k => groupSettings[k].hash === regionHash);
-
-        if(gid){
-            showRegion(gid);
+        if(!location.hash || location.hash === '#'){
+            updateHash(gid);
         }
+      }
 
-        // 将来拡張用
-        if(parts[1]){
-            // gotoPref(parts[1]);
+      function updateHash(gid=null,prefId=null,subId=null){
+        let parts = location.hash.replace(/^#/, '').split('/');
+        if(parts.length===1 && parts[0]==='') parts=[];
+
+        if(gid!==null){
+          const h = groupSettings[gid] ? groupSettings[gid].hash : gid;
+          parts[0]=h;
         }
-    }
-}
+        if(prefId!==null) parts[1]=prefId;
+        if(subId!==null) parts[2]=subId;
 
-// ===== 初期ハッシュ反映 =====
-handleHash();
+        if(gid!==null && prefId===null) parts=parts.slice(0,1);
+        if(prefId!==null && subId===null) parts=parts.slice(0,2);
 
-// ===== ボタン連動 =====
-const manualNav = document.getElementById('manual-region-nav');
-if(manualNav){
-    manualNav.querySelectorAll('button').forEach(btn => {
-        btn.onclick = () => {
-            const hash = btn.dataset.hash;
-            location.hash = '#' + hash;
-            handleHash(); // 即時反映
-        };
+        parts = parts.filter(Boolean);
+        const newHash = parts.join('/');
+
+        if('#'+newHash !== location.hash){
+          history.pushState(null,'','#'+newHash);
+        }
+      }
+
+      function handleHash(){
+        const hash = location.hash.replace(/^#/, '');
+        if(hash){
+          const parts = hash.split('/');
+          const gid = Object.keys(groupSettings)
+            .find(k => groupSettings[k].hash === parts[0]);
+
+          if(gid) showRegion(gid);
+          if(parts[1]) gotoPref(parts[1]);
+        }
+      }
+
+      handleHash();
+      window.addEventListener('hashchange', handleHash);
+
     });
-}
-
-// ===== 戻る・進む対応（任意だが推奨）=====
-window.addEventListener('hashchange', handleHash);
-         
-         
-         
-     //     // ★ fetch内の最後に置く
-// const hash = location.hash.replace(/^#/, '');
-
-// if(hash){
- //    const parts = hash.split('/'); // ['KANTO','CHIBA','NORTH']
-
- //    // ① 地域（必須）
-//     const regionHash = parts[0];
- //    const gid = Object.keys(groupSettings)
-  //       .find(k => groupSettings[k].hash === regionHash);
-
-  //   if(gid){
-  //       showRegion(gid);
-   //  }
-
- //    // ② 県（将来用）
-//     if(parts[1]){
-        // ここはまだ未実装でOK
-        // gotoPref(parts[1]) 的なもの
-   //  }
-
-  //   // ③ エリア（将来用）
- //    if(parts[2]){
-        // さらに下層
-//     }
-// }
-         
-         
-         
-         
-         
-         
-         
-    }); // fetch end
 });
