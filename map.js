@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .find(k => groupSettings[k].hash === parts[0]);
 
           if(gid) showRegion(gid);
-          if(parts[1]) gotoPref(parts[1]);
+          //if(parts[1]) gotoPref(parts[1]);
         }
       }
 
