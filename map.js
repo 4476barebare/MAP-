@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentGroup = null;
 
-      // ★GROUPS定義
+      // --------------------------
+      // 地域グループと県リスト
+      // --------------------------
       const GROUPS = {
         Path_2: { hash:'TOHOKU', scale:6.7, x:135, y:45,
                   prefBoxes: { leftTop:['AOMORI','AKITA','YAMAGATA','NIIGATA'], rightBottom:['IWATE','MIYAGI','FUKUSHIMA'] },
@@ -55,9 +57,49 @@ document.addEventListener('DOMContentLoaded', () => {
         OITA:'大分県',KUMAMOTO:'熊本県',MIYAZAKI:'宮崎県',KAGOSHIMA:'鹿児島県',
       };
 
-      const leafletPrefs = ['CHIBA']; // Leaflet表示対象
+      const leafletPrefs = ['CHIBA'];
 
-      // ★Leaflet切替関数
+      // --------------------------
+      // 県クリック共通処理
+      // --------------------------
+      function handlePrefClick(prefId){
+        if(leafletPrefs.includes(prefId)){
+          const currentHash = location.hash || '';
+          let newHash;
+          if(currentHash.includes('/')) {
+            newHash = currentHash.replace(/\/\w+$/i, '/'+prefId);
+          } else {
+            newHash = currentHash + '/' + prefId;
+          }
+          location.hash = newHash.toUpperCase();
+          switchToLeaflet(prefId);
+        } else {
+          alert(`ハッシュ ${prefId} を追加します`);
+        }
+      }
+
+      // --------------------------
+      // SVG初期化・クリック登録
+      // --------------------------
+      prefGroup.querySelectorAll('path').forEach(p => {
+        p.style.display = 'inline';
+        p.classList.remove('prefecture-selected','prefecture-unselected');
+        p.classList.add('prefecture-initial');
+        p.addEventListener('click', e => { e.stopPropagation(); handlePrefClick(p.id); });
+      });
+
+      const allGroups = svg.querySelectorAll('[id^="Path_"]');
+      allGroups.forEach(g => {
+        const gid = g.id;
+        if(GROUPS[gid]){
+          g.style.cursor = 'pointer';
+          g.addEventListener('click', () => { location.hash = GROUPS[gid].hash; });
+        }
+      });
+
+      // --------------------------
+      // Leaflet起動
+      // --------------------------
       function switchToLeaflet(prefId){
         mapDiv.innerHTML = '';
         const leafletDiv = document.createElement('div');
@@ -77,44 +119,66 @@ document.addEventListener('DOMContentLoaded', () => {
           .openPopup();
       }
 
-      // ★クリック共通処理
-      function handlePrefClick(prefId, groupHash){
-        if(leafletPrefs.includes(prefId)){
-          location.hash = `${groupHash}/${prefId}`;
-          switchToLeaflet(prefId);
-        } else {
-          alert(`ハッシュ ${prefId} を追加します`);
+      // --------------------------
+      // SVG表示関連関数
+      // --------------------------
+      function showRegion(gid){
+        currentGroup = gid;
+        initialNav.style.display='none';
+        hideAllBOX();
+        showBOX(gid);
+
+        allGroups.forEach(g=>g.style.display='none');
+        prefGroup.querySelectorAll('path').forEach(p => {
+          if(GROUPS[gid].prefList.includes(p.id)) {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-unselected');
+            p.classList.add('prefecture-selected');
+          } else {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-selected');
+            p.classList.add('prefecture-unselected');
+          }
+        });
+
+        applyTransform(gid);
+        disableOtherAreas(GROUPS[gid].prefList);
+      }
+
+      // --------------------------
+      // ハッシュ変更対応
+      // --------------------------
+      window.addEventListener('hashchange', () => {
+        const hashFull = location.hash.replace('#','').toUpperCase();
+        const parts = hashFull.split('/');
+        if(parts.length === 2 && leafletPrefs.includes(parts[1])){
+          switchToLeaflet(parts[1]);
+          return;
+        }
+
+        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === parts[0]);
+        if(gid){
+          showRegion(gid);
+        }
+      });
+
+      // --------------------------
+      // ページロード時ハッシュ判定
+      // --------------------------
+      if(location.hash){
+        const hashFull = location.hash.replace('#','').toUpperCase();
+        const parts = hashFull.split('/');
+        if(parts.length === 2 && leafletPrefs.includes(parts[1])){
+          switchToLeaflet(parts[1]);
+        } else if(parts.length === 1 && Object.values(GROUPS).some(g => g.hash === parts[0])){
+          const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === parts[0]);
+          showRegion(gid);
         }
       }
 
-      // ★SVG 初期化
-      prefGroup.querySelectorAll('path').forEach(p => {
-        p.style.display = 'inline';
-        p.classList.remove('prefecture-selected','prefecture-unselected');
-        p.classList.add('prefecture-initial');
-
-        p.addEventListener('click', e => {
-          e.stopPropagation();
-          // 所属グループを検索
-          const groupHash = Object.values(GROUPS)
-            .find(g => g.prefList.includes(p.id))?.hash;
-          if(groupHash) handlePrefClick(p.id, groupHash);
-        });
-      });
-
-      // ★グループクリック
-      const allGroups = svg.querySelectorAll('[id^="Path_"]');
-      allGroups.forEach(g => {
-        const gid = g.id;
-        if(GROUPS[gid]){
-          g.style.cursor = 'pointer';
-          g.addEventListener('click', () => {
-            location.hash = GROUPS[gid].hash;
-          });
-        }
-      });
-
-      // ★BOX作成関数・表示
+      // --------------------------
+      // NAV / BOX 作成関数
+      // --------------------------
       const initialNav = createInitialNav();
       const topBOX = createTopBOX();
       const top2BOX = createTop2BOX();
@@ -129,7 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
           .forEach(wrapper=>{
             wrapper.style.display='none';
             Array.from(wrapper.querySelectorAll('div')).forEach(c=>{
-              c.style.display='none'; c.textContent='';
+              c.style.display='none';
+              c.textContent='';
             });
           });
       }
@@ -154,56 +219,44 @@ document.addEventListener('DOMContentLoaded', () => {
             if(box){
               box.style.display='flex';
               box.textContent = prefNames[pid];
-              box.onclick = e=>{
+              box.onclick = (e)=>{
                 e.stopPropagation();
-                handlePrefClick(pid, GROUPS[gid].hash);
+                handlePrefClick(pid);
               };
             }
           });
         });
       }
 
-      function showRegion(gid){
-        currentGroup = gid;
-        initialNav.style.display='none';
-        hideAllBOX();
-        showBOX(gid);
-
-        allGroups.forEach(g=>g.style.display='none');
-        prefGroup.querySelectorAll('path').forEach(p => {
-          if(GROUPS[gid].prefList.includes(p.id)){
-            p.style.display='inline';
-            p.classList.remove('prefecture-initial','prefecture-unselected');
-            p.classList.add('prefecture-selected');
-          } else {
-            p.style.display='inline';
-            p.classList.remove('prefecture-initial','prefecture-selected');
-            p.classList.add('prefecture-unselected');
-          }
+      function applyTransform(gid){
+        const group = svg.querySelector('#'+gid);
+        const bbox = group.getBBox();
+        const s = GROUPS[gid];
+        const cx = bbox.x + bbox.width/2 + s.x;
+        const cy = bbox.y + bbox.height/2 + s.y;
+        const svgDisplayWidth = svg.clientWidth;
+        const viewBoxWidth = svg.viewBox.baseVal.width;
+        const displayScale = svgDisplayWidth / viewBoxWidth;
+        const finalScale = s.scale * displayScale;
+        const tx = (svgDisplayWidth/2) - cx * finalScale;
+        const ty = (svg.clientHeight/2) - cy * finalScale;
+        svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
+        const baseStroke = 0.5;
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
         });
-
-        applyTransform(gid);
-        disableOtherAreas(GROUPS[gid].prefList);
+        allGroups.forEach(g=>{
+          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
+        });
       }
 
-      // ★ハッシュ変更対応
-      window.addEventListener('hashchange', () => {
-        const hashStr = location.hash.replace('#','').toUpperCase();
-        const [groupHash, prefId] = hashStr.split('/');
+      function disableOtherAreas(activeIds){
+        allGroups.forEach(g=>{ g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none'; });
+        prefGroup.querySelectorAll('path').forEach(p=>{
+          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
+        });
+      }
 
-        if(prefId && leafletPrefs.includes(prefId)){
-          switchToLeaflet(prefId);
-          return;
-        }
-
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === groupHash);
-        if(gid) showRegion(gid);
-      });
-
-      // ★ロード時直URL対応
-      if(location.hash) window.dispatchEvent(new Event('hashchange'));
-
-      // ★BOX・NAV作成関数
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
@@ -261,35 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      // ★SVG変換・選択制御
-      function applyTransform(gid){
-        const group = svg.querySelector('#'+gid);
-        const bbox = group.getBBox();
-        const s = GROUPS[gid];
-        const cx = bbox.x + bbox.width/2 + s.x;
-        const cy = bbox.y + bbox.height/2 + s.y;
-        const svgDisplayWidth = svg.clientWidth;
-        const viewBoxWidth = svg.viewBox.baseVal.width;
-        const displayScale = svgDisplayWidth / viewBoxWidth;
-        const finalScale = s.scale * displayScale;
-        const tx = (svgDisplayWidth/2) - cx * finalScale;
-        const ty = (svg.clientHeight/2) - cy * finalScale;
-        svg.style.transform = `translate(${tx}px,${ty}px) scale(${finalScale})`;
-        const baseStroke = 0.5;
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
-        allGroups.forEach(g=>{
-          g.style.strokeWidth = (baseStroke / finalScale) + 'px';
-        });
-      }
+    });
 
-      function disableOtherAreas(activeIds){
-        allGroups.forEach(g=>{ g.style.pointerEvents = (g.id === currentGroup) ? 'auto' : 'none'; });
-        prefGroup.querySelectorAll('path').forEach(p=>{
-          p.style.pointerEvents = activeIds.includes(p.id) ? 'auto' : 'none';
-        });
-      }
-
-    }); // fetch
-}); // DOMContentLoaded
+});
