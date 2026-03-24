@@ -132,50 +132,48 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ★グループ拡大処理
-      function showRegion(gid){
-    const allGroups = svg.querySelectorAll('[id^="Path_"]');  // ←ここで先に取得
-    
-    alert(
-        `gidを表示します: ${gid}\n` +
-        `svg = ${svg ? svg.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-        `prefGroup = ${prefGroup ? prefGroup.outerHTML.slice(0, 500) + '…' : 'null'}\n` +
-        `allGroups = ${allGroups.length} 個\n` +
-        Array.from(allGroups).map(g => g.id).join(', ')
-    );
-
+      // ★グループ拡大処理（対象グループチェック付き）
+function showRegion(gid){
+    alert(`gidを表示します: ${gid}`);
     currentGroup = gid;
-    initialNav.style.display='none';
+
+    // ★対象グループの存在確認
+    const targetGroup = svg.querySelector('#' + gid);
+    if (!targetGroup){
+        alert(`対象グループが見つかりません: ${gid}`);
+        return; // 存在しなければここで終了
+    }
+
+    // 初期ナビ非表示＆BOXリセット
+    initialNav.style.display = 'none';
     hideAllBOX();
     showBOX(gid);
 
-    allGroups.forEach(g=>{
-        g.style.display = 'none';
-    });
+    // 全グループ非表示
+    const allGroups = svg.querySelectorAll('[id^="Path_"]');
+    allGroups.forEach(g => g.style.display = 'none');
 
-    // 県パス表示
-    prefGroup.querySelectorAll('path').forEach(p=>{
-        if(GROUPS[gid].prefList.includes(p.id)){
-            p.style.display='inline';
+    // 県パスの表示・クラス更新
+    prefGroup.querySelectorAll('path').forEach(p => {
+        if (GROUPS[gid].prefList.includes(p.id)){
+            p.style.display = 'inline';
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
         } else {
-            p.style.display='inline';
+            p.style.display = 'inline';
             p.classList.remove('prefecture-initial','prefecture-selected');
             p.classList.add('prefecture-unselected');
         }
     });
 
-    // ★対象グループを先に表示してから transform
-    const targetGroup = svg.querySelector('#'+gid);
-    if(targetGroup){
-        targetGroup.style.display = 'inline';
-        alert('トランスフォーム呼び出し前');
-        applyTransform(gid);
-        alert('トランスフォーム呼び出し後');
-    } else {
-        alert(`対象グループが見つかりません: ${gid}`);
-    }
+    // 対象グループを表示して transform 適用
+    targetGroup.style.display = 'inline';
+    alert('トランスフォーム呼び出し前');
+    applyTransform(gid);
+    alert('トランスフォーム呼び出し後');
 }
+    
+    
       // ★SVG拡大制御
       function applyTransform(gid){
           
