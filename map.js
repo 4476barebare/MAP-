@@ -209,22 +209,26 @@ top2BOX.children.forEach((c,i)=>{
 //      const hash = location.hash.replace('#','').toUpperCase();
 //      initPrefPaths();
 //  
-    if(hash){
-        alert('hash non-empty: ' + hash);
+ //   if(hash){
+ //       alert('hash non-empty: ' + hash);
 
-        if(hash.includes('/')){
-            alert('prefect hash detected (with slash): ' + hash);
+   //     if(hash.includes('/')){
+ //           alert('prefect hash detected (with slash): ' + hash);
+ //           return;
+ //       }
+
+  //      const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
+ //       alert('gid found? ' + gid);
+
+ //       if(gid){
+ //           showRegion(gid);
+//            return;
+ //       }
+//    }
+
+showRegion();
             return;
-        }
 
-        const gid = Object.keys(GROUPS).find(g => GROUPS[g].hash === hash);
-        alert('gid found? ' + gid);
-
-        if(gid){
-            showRegion(gid);
-            return;
-        }
-    }
 
     alert('fallback to initial screen');
     initialNav.style.display='flex';
