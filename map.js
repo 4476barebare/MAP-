@@ -86,6 +86,10 @@ window.addEventListener('hashchange', handleInitialHash);
           gElem.style.cursor = 'pointer';
           gElem.addEventListener('click', e=>{
             e.stopPropagation();
+            
+            // location.hash = GROUPS[gid].hash; // ← ハッシュ更新は一旦不要
+    showRegion(gid);  // ★直接拡大
+            
             location.hash = GROUPS[gid].hash;
           });
         });
