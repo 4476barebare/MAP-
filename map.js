@@ -66,9 +66,8 @@ window.addEventListener('hashchange', handleInitialHash);
         alert(`表示予定: ${prefNames[prefId]}`);
       }
 
-      // ★初期化関数（クリックやグループイベント保持）
-      function initPrefPaths() {
-        prefGroup.querySelectorAll('path').forEach(p => {
+
+ prefGroup.querySelectorAll('path').forEach(p => {
           p.style.display = 'inline';
           p.classList.remove('prefecture-selected','prefecture-unselected');
           p.classList.add('prefecture-initial');
@@ -78,6 +77,11 @@ window.addEventListener('hashchange', handleInitialHash);
             handlePrefClick(p.id);
           });
         });
+
+
+      // ★初期化関数（クリックやグループイベント保持）
+      function initPrefPaths() {
+       
 
         // グループクリック追加
         Object.keys(GROUPS).forEach(gid=>{
