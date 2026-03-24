@@ -18,13 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = null;
 
       const groupSettings = {
-        Path_2: { scale:6.7, x:135, y:45 },
-        Path_3: { scale:15, x:92, y:95 },
-        Path_4: { scale:10.2, x:54, y:110 },
-        Path_5: { scale:13.6, x:0, y:140 },
-        Path_6: { scale:9.5, x:-51, y:165 },
-        Path_7: { scale:11.2, x:-105, y:200 }
-      };
+  Path_2: { scale:6.7, x:135, y:45, hash:'TOHOKU' },
+  Path_3: { scale:15, x:92, y:95, hash:'KANTO' },
+  Path_4: { scale:10.2, x:54, y:110, hash:'CHUBU' },
+  Path_5: { scale:13.6, x:0, y:140, hash:'KINKI' },
+  Path_6: { scale:9.5, x:-51, y:165, hash:'CHUGOKU' },
+  Path_7: { scale:11.2, x:-105, y:200, hash:'KYUSHU' }
+};
 
       const groupBoxSettings = {
         Path_2: { leftTop:['AOMORI','AKITA','YAMAGATA','NIIGATA'], rightBottom:['IWATE','MIYAGI','FUKUSHIMA'] },
@@ -121,46 +121,80 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         });
       }
-
+      
+      
       function showRegion(gid){
-        currentGroup = gid;
-        initialNav.style.display='none';
-        hideAllBoxes();
-        showBoxes(gid);
+    currentGroup = gid;
 
-        allGroups.forEach(g=>g.style.display='none');
+    // 初期ナビ非表示＆BOX非表示
+    initialNav.style.display = 'none';
+    hideAllBoxes();
 
-        prefGroup.querySelectorAll('path').forEach(p => {
-            if(groupToPrefectures[gid].includes(p.id)) {
-                p.style.display = 'inline';
-                p.classList.remove('prefecture-initial','prefecture-unselected');
-                p.classList.add('prefecture-selected');
-            } else {
-                p.style.display = 'inline';
-                p.classList.remove('prefecture-initial','prefecture-selected');
-                p.classList.add('prefecture-unselected');
-            }
-        });
+    // 拡大対象グループのBOX表示
+    showBoxes(gid);
 
-        applyTransform(gid);
-        addPrefLabels(groupToPrefectures[gid]);
-        disableOtherAreas(groupToPrefectures[gid]);
+    // 全グループ非表示
+    allGroups.forEach(g => g.style.display = 'none');
 
-        if(gid === 'Path_6'){
-          const topRect = topDummy.getBoundingClientRect();
-          const mapRect = mapDiv.getBoundingClientRect();
-          const left = topRect.left - mapRect.left;
-          top2Dummy.style.left = left + 'px';
-          top2Dummy.style.transform = 'none';
+    // 県パス表示
+    prefGroup.querySelectorAll('path').forEach(p => {
+        if(groupToPrefectures[gid].includes(p.id)) {
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-unselected');
+            p.classList.add('prefecture-selected');
+
+            // SVGパスクリックでgotoPref
+            p.onclick = e => {
+                e.stopPropagation();
+                gotoPref(p.id);
+            };
+
         } else {
-          top2Dummy.style.left = '50%';
-          top2Dummy.style.transform = 'translateX(-50%)';
+            p.style.display = 'inline';
+            p.classList.remove('prefecture-initial','prefecture-selected');
+            p.classList.add('prefecture-unselected');
         }
+    });
 
-        allGroups.forEach(g=>{
-          if(g.id !== gid) g.style.display = 'inline';
+    // 拡大変形
+    applyTransform(gid);
+
+    // 他エリアのクリック制御
+    disableOtherAreas(groupToPrefectures[gid]);
+
+    // top2Dummy の位置調整（Path_6のみ例外）
+    if(gid === 'Path_6'){
+        const topRect = topDummy.getBoundingClientRect();
+        const mapRect = mapDiv.getBoundingClientRect();
+        const left = topRect.left - mapRect.left;
+        top2Dummy.style.left = left + 'px';
+        top2Dummy.style.transform = 'none';
+    } else {
+        top2Dummy.style.left = '50%';
+        top2Dummy.style.transform = 'translateX(-50%)';
+    }
+
+    // 他グループを残して表示（非拡大）
+    allGroups.forEach(g => {
+        if(g.id !== gid) g.style.display = 'inline';
+    });
+
+    // --- ここからBOXのクリックイベント登録 ---
+    const boxWrappers = [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy];
+    boxWrappers.forEach(wrapper => {
+        Array.from(wrapper.children).forEach(box => {
+            // BOXが空なら無視
+            if(box.textContent.trim() === '') return;
+
+            box.onclick = e => {
+                e.stopPropagation();
+                const prefId = Object.keys(prefNames).find(key => prefNames[key] === box.textContent);
+                if(prefId) gotoPref(prefId);
+            };
         });
-      }
+    });
+}
+      
 
       // 拡大縮小＋線幅補正（基準 0.5px）
       function applyTransform(gid){
@@ -274,4 +308,35 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     });
+    
+    
+    // ★汎用ハッシュ更新関数（showRegionや県クリックには触らず独立）
+function updateHash(gid = null, prefId = null, subId = null) {
+    // 現在のハッシュを分解
+    let parts = location.hash.replace(/^#/, '').split('/');
+    if(parts.length === 1 && parts[0] === '') parts = [];
+
+    // 条件に応じて上書き
+    if(gid !== null) parts[0] = gid;
+    if(prefId !== null) parts[1] = prefId;
+    if(subId !== null) parts[2] = subId;
+
+    // 余分な undefined や空文字を削除
+    parts = parts.filter(p => p);
+
+    // 新しいハッシュを設定
+    const newHash = parts.join('/');
+    if('#' + newHash !== location.hash) {
+        history.pushState({ gid, prefId, subId }, '', '#' + newHash);
+    }
+    
+    function gotoPref(prefId){
+    alert(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+}
+
+    
+    
+    
+    
+}
 });
