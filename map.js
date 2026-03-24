@@ -132,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAllBOX();
         showBOX(gid);
 
-        // path表示切替
         const allGroups = svg.querySelectorAll('[id^="Path_"]');
         allGroups.forEach(g=>g.style.display='none');
 
@@ -149,9 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         applyTransform(gid);
+
+        // 拡大後のハッシュをグループ名に
+        location.hash = GROUPS[gid].hash;
       }
 
-      // ★SVG変換・拡大制御（以前のまま）
+      // ★SVG変換・拡大制御
       function applyTransform(gid){
         const group = svg.querySelector('#'+gid);
         const bbox = group.getBBox();
@@ -205,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // ★ハッシュ変更対応
       window.addEventListener('hashchange', handleInitialHash);
 
-      // ★初期NAVとBOX作成関数（以前と同じ）
+      // ★初期NAVとBOX作成関数
       function createBox(){ const box=document.createElement('div'); box.classList.add('pref-box'); return box; }
       function createInitialNav(){
         const names=['北海道','東北地方','関東地方','中部地方','近畿地方','中国四国','九州地方','沖縄'];
