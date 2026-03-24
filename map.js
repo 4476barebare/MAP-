@@ -123,7 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       
-      function showRegion(gid){
+
+
+function showRegion(gid){
     currentGroup = gid;
 
     // 初期ナビ非表示＆BOX非表示
@@ -330,13 +332,13 @@ function updateHash(gid = null, prefId = null, subId = null) {
         history.pushState({ gid, prefId, subId }, '', '#' + newHash);
     }
     
-    function gotoPref(prefId){
+    
+}
+
+function gotoPref(prefId){
     alert(`pref clicked: ${prefId} (${prefNames[prefId]})`);
 }
 
-    
-    
-    
-    
-}
+  
+
 });
