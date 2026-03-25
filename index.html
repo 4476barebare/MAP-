@@ -48,21 +48,6 @@ main {
   background: rgba(0,0,0,0.3);
 }
 
-#lf-map {
-  width: 100%;
-  height: 100%;
-}
-
-#test-display {
-   width: 100%;
-  height: 400px; /* min-height → height に変更 */
-  background: rgba(255,255,255,0.1);
-  border: 1px solid #191970;
-  margin-top: 10px;
-  text-align: center;
-  color: #fff;
-  line-height: 400px;
-}
 
 #log-panel {
   position: fixed;
@@ -105,17 +90,12 @@ main {
 
 <main>
   <div class="map">
-    <!-- 既存 SVG 描画領域 -->
+    <!-- SVG 日本地図描画 -->
     <div class="japan-map" id="map"></div>
 
-    <!-- map.js 用 overlay -->
+    <!-- Leaflet 用 overlay -->
     <div id="map-overlay">
       <div id="lf-map"></div>
-    </div>
-
-    <!-- テスト用表示エリア -->
-    <div id="test-display">
-      テスト表示エリア
     </div>
   </div>
 </main>
@@ -148,11 +128,9 @@ main {
 </div>
 
 <!-- JS -->
-<!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" ...>
-
 <!-- Leaflet JS を先に読み込む -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" ...></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-o9N1j4G+VvK4D7gX3FzFzWt5hXlq+ZL8JHvZj9ytgVk=" crossorigin=""></script>
 
 <!-- その後に自作 JS を読み込む -->
 <script src="header.js"></script>
