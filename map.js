@@ -121,32 +121,26 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
 let leafletInitialized = false;
 
-
 function switchToLeaflet(prefId){
+
     const overlay = document.getElementById('map-overlay');
     const mapDiv = document.getElementById('map');
-    if(!overlay){
-        addLog('map-overlay が見つかりません');
+    const lfMapDiv = document.getElementById('lf-map');
+
+    if(!overlay || !mapDiv || !lfMapDiv){
+        addLog('必要要素が見つかりません');
         return;
     }
-    
-    overlay.style.height = mapDiv.offsetHeight + 'px';
+
+    // --- overlay 表示 ---
     overlay.style.display = 'block';
     addLog('overlay 表示完了');
-
-    const lfMapDiv = document.getElementById('lf-map');
-    if(!lfMapDiv){
-        addLog('lf-map が見つかりません');
-        return;
-    }
-    
-    lfMapDiv.style.height = overlay.offsetHeight + 'px';
 
     addLog('Leaflet 初期化開始');
 
     let testMap;
     try {
-        testMap = L.map('lf-map'); // ← ここを修正
+        testMap = L.map('lf-map');
         addLog('L.map 作成完了');
     } catch(e){
         addLog('L.map エラー: ' + e.message);
@@ -165,22 +159,35 @@ function switchToLeaflet(prefId){
             attribution:'&copy; OpenStreetMap contributors'
         }).addTo(testMap);
         addLog('tileLayer addTo 完了');
-
-    // ← ここで追加
-    testMap.invalidateSize(); // 親 div のサイズに合わせて Leaflet を再描画
-    addLog('invalidateSize() 完了');
     } catch(e){
         addLog('tileLayer エラー: ' + e.message);
     }
 
+    // --- ★ここが今回の核心（高さ同期 + 再描画） ---
+    requestAnimationFrame(() => {
+
+        // SVGと同じ高さにする
+        const h = mapDiv.offsetHeight;
+        overlay.style.height = h + 'px';
+        lfMapDiv.style.height = h + 'px';
+
+        // Leafletを親サイズに合わせる
+        testMap.invalidateSize();
+
+        addLog('高さ同期 & invalidateSize 完了');
+    });
+
     addLog('Leaflet 初期化完了');
 
+    // --- 都道府県処理 ---
     if(prefId){
         addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
+
         const prefCenters = {
             CHIBA: [35.6073, 140.1063],
             TOKYO: [35.6895, 139.6917],
         };
+
         if(prefCenters[prefId]){
             testMap.setView(prefCenters[prefId], 10);
             L.marker(prefCenters[prefId]).addTo(testMap);
