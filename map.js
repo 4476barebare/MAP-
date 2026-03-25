@@ -243,15 +243,17 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       window.addEventListener('hashchange', handleHash);
 
-      // ★追加: テスト描画エリアに Leaflet 地図描画
-      const lfDiv = document.getElementById('lf-map');
-      if (lfDiv && !lfDiv._leafletMap) {
-        const testMap = L.map(lfDiv).setView([36.0,138.0],5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(testMap);
-        lfDiv._leafletMap = testMap;
-      }
+      const testDiv = document.getElementById('test-display');
+if (testDiv && !testDiv._leafletMap) {
+  testDiv.style.height = '300px'; // 高さ必須
+  testDiv.style.lineHeight = 'normal';
 
+  const testMap = L.map(testDiv).setView([36.0, 138.0], 5); // 日本中央
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(testMap);
+
+  testDiv._leafletMap = testMap;
+}
     }); // fetch end
 });
