@@ -116,18 +116,32 @@ Object.keys(groupBoxSettings).forEach(gid => {
         OITA:'大分県', KUMAMOTO:'熊本県', MIYAZAKI:'宮崎県', KAGOSHIMA:'鹿児島県'
       };
 
-      function gotoPref(prefId) {
-        updateHash(prefId, 2);
+      
+            // ★Leaflet 初期化関数 (外に置く)
+      let leafletInitialized = false;
+      function switchToLeaflet() {
+        if(leafletInitialized) return;
 
-        // ★変更: ログ出力
-        addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
-        
-        // ★追加: Leaflet / OSM を表示
-    if(typeof switchToLeaflet === 'function') {
-        switchToLeaflet();
+        const testMapDiv = document.getElementById('test-display');
+        if(!testMapDiv){ addLog('test-display が見つかりません'); return; }
 
-        
+        const testMap = L.map('test-display').setView([35.681236, 139.767125], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+          attribution:'&copy; OpenStreetMap contributors'
+        }).addTo(testMap);
+
+        leafletInitialized = true;
+        addLog('Leaflet / OSM 初期化完了');
       }
+
+      // ★Pref 選択時
+      function gotoPref(prefId){
+        updateHash(prefId,2);
+        addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+
+        if(typeof switchToLeaflet==='function') switchToLeaflet();
+      }
+
 
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
@@ -393,27 +407,6 @@ Object.keys(groupBoxSettings).forEach(gid => {
       }
       
       
-       // ★新規追加: Leaflet / OSM 描画関数
-      let leafletInitialized = false;
-      function switchToLeaflet() {
-        if (leafletInitialized) return;
-
-        const testMapDiv = document.getElementById('test-display');
-        if (!testMapDiv) {
-          addLog('test-display が見つかりません');
-          return;
-        }
-
-        const testMap = L.map('test-display').setView([35.681236, 139.767125], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(testMap);
-
-        leafletInitialized = true;
-        addLog('Leaflet / OSM 初期化完了');
-      }
-
-
       
 
       function handleHash(){
