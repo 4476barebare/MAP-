@@ -138,6 +138,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
       function gotoPref(prefId){
         updateHash(prefId,2);
         addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+        
+        addLog('pref clicked: ' + prefId);
 
         if(typeof switchToLeaflet==='function') switchToLeaflet();
       }
