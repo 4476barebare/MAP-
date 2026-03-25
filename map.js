@@ -121,76 +121,60 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
 let leafletInitialized = false;
 
-function switchToLeaflet(prefId) {
-    if (leafletInitialized) return;
-
-    const mapDiv = document.getElementById('lf-map');
-    if (!mapDiv) {
-        addLog('lf-map が見つかりません');
-        return;
-    }
+// map.js 修正版（Leaflet 初期化用）
+function switchToLeaflet(prefId){
+    // ★修正ポイント: #test-display から #map に変更
+    const mapDiv = document.getElementById('map');
+    if(!mapDiv){ addLog('map が見つかりません'); return; }
 
     addLog('Leaflet 初期化開始');
 
     let testMap;
-
-    // 1. マップ生成
+    // ★修正ポイント: try-catch を追加してエラー原因をログに出す
     try {
-        testMap = L.map('lf-map');
+        testMap = L.map('map');  // ★修正ポイント: id を map に変更
         addLog('L.map 作成完了');
-    } catch (e) {
+    } catch(e){
         addLog('L.map エラー: ' + e.message);
         return;
     }
 
-    // 2. 初期表示位置設定
+    // ★修正ポイント: setView を分割してログ確認可能に
     try {
         testMap.setView([35.681236, 139.767125], 5);
         addLog('setView 完了');
-    } catch (e) {
+    } catch(e){
         addLog('setView エラー: ' + e.message);
-        return;
     }
 
-    // 3. タイルレイヤ追加
+    // ★修正ポイント: tileLayer を分割、ログ確認追加
     try {
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+            attribution:'&copy; OpenStreetMap contributors'
         }).addTo(testMap);
         addLog('tileLayer addTo 完了');
-    } catch (e) {
+    } catch(e){
         addLog('tileLayer エラー: ' + e.message);
-        return;
     }
 
-    // 4. prefId による中心変更とマーカー
-    if (prefId) {
+    // ★修正ポイント: prefId があれば中心を移動してマーカー追加
+    if(prefId){
         addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
-
         const prefCenters = {
             CHIBA: [35.6073, 140.1063],
             TOKYO: [35.6895, 139.6917],
-            // 必要に応じて全県分追加
+            // 必要に応じて全県追加可能
         };
-
-        if (prefCenters[prefId]) {
-            try {
-                testMap.setView(prefCenters[prefId], 10);
-                L.marker(prefCenters[prefId]).addTo(testMap);
-                addLog('prefId 用の setView + marker 完了');
-            } catch (e) {
-                addLog('prefId 処理エラー: ' + e.message);
-            }
+        if(prefCenters[prefId]){
+            testMap.setView(prefCenters[prefId], 10); // ★修正ポイント: setView でズーム更新
+            L.marker(prefCenters[prefId]).addTo(testMap); // ★修正ポイント: マーカー追加
         } else {
             addLog('座標未登録: ' + prefId);
         }
     }
 
-    leafletInitialized = true;
-    addLog('Leaflet 初期化完了');
+    addLog('Leaflet 初期化完了'); // ★修正ポイント: 初期化完了ログ
 }
-
-
 
 
       // ★Pref 選択時
