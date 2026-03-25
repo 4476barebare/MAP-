@@ -147,8 +147,19 @@ Object.keys(groupBoxSettings).forEach(gid => {
       function gotoPref(prefId) {
         updateHash(prefId, 2);
 
-        // ★変更: ログ出力
-        addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+        
+        // ★ログ出力
+  addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+
+  // ★テスト表示エリアに反映
+  const testDiv = document.getElementById('test-display');
+  if (testDiv) {
+    const line = document.createElement('div');
+    line.textContent = `クリック: ${prefNames[prefId]} (${prefId})`;
+    testDiv.appendChild(line);
+
+        
+        
       }
 
       prefGroup.querySelectorAll('path').forEach(p => {
