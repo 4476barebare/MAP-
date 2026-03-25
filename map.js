@@ -17,43 +17,78 @@ document.addEventListener('DOMContentLoaded', () => {
       svg.style.transformOrigin = 'center center';
 
       let currentGroup = null;
+      
+      // ★新規: 統合データベース（今後の基準データ）
+const REGION_DB = {
+  Path_2: {
+    transform: { scale: 6.7, x: 135, y: 45 },
+    hash: 'TOHOKU',
+    boxes: {
+      leftTop: ['AOMORI', 'AKITA', 'YAMAGATA', 'NIIGATA'],
+      rightBottom: ['IWATE', 'MIYAGI', 'FUKUSHIMA']
+    }
+  },
+  Path_3: {
+    transform: { scale: 15, x: 92, y: 95 },
+    hash: 'KANTO',
+    boxes: {
+      rightTop: ['GUNMA', 'TOCHIGI', 'IBARAKI'],
+      leftBottom: ['SAITAMA', 'TOKYO', 'KANAGAWA', 'CHIBA']
+    }
+  },
+  Path_4: {
+    transform: { scale: 10.2, x: 54, y: 110 },
+    hash: 'CHUBU',
+    boxes: {
+      rightTop: ['TOYAMA', 'ISHIKAWA', 'NAGANO', 'YAMANASHI'],
+      leftBottom: ['FUKUI', 'GIFU', 'AICHI', 'SHIZUOKA']
+    }
+  },
+  Path_5: {
+    transform: { scale: 13.6, x: 0, y: 140 },
+    hash: 'KINKI',
+    boxes: {
+      rightTop: ['SHIGA', 'KYOTO'],
+      leftBottom: ['HYOGO', 'OSAKA', 'WAKAYAMA', 'NARA', 'MIE']
+    }
+  },
+  Path_6: {
+    transform: { scale: 9.5, x: -51, y: 165 },
+    hash: 'CHUGOKU',
+    boxes: {
+      top: ['SHIMANE', 'HIROSHIMA', 'TOTTORI', 'OKAYAMA'],
+      top2: ['YAMAGUCHI'],
+      bottom: ['EHIME', 'KOCHI', 'KAGAWA', 'TOKUSHIMA']
+    }
+  },
+  Path_7: {
+    transform: { scale: 11.2, x: -105, y: 200 },
+    hash: 'KYUSHU',
+    boxes: {
+      rightTop: ['FUKUOKA', 'SAGA', 'NAGASAKI'],
+      rightBottom: ['OITA', 'KUMAMOTO', 'MIYAZAKI', 'KAGOSHIMA']
+    }
+  }
+};
 
-      const groupSettings = {
-        Path_2: { scale: 6.7, x: 135, y: 45, hash: 'TOHOKU' },
-        Path_3: { scale: 15, x: 92, y: 95, hash: 'KANTO' },
-        Path_4: { scale: 10.2, x: 54, y: 110, hash: 'CHUBU' },
-        Path_5: { scale: 13.6, x: 0, y: 140, hash: 'KINKI' },
-        Path_6: { scale: 9.5, x: -51, y: 165, hash: 'CHUGOKU' },
-        Path_7: { scale: 11.2, x: -105, y: 200, hash: 'KYUSHU' }
-      };
+      // ★変更: REGION_DBから生成（既存構造維持）
+const groupSettings = {};
 
-      const groupBoxSettings = {
-        Path_2: {
-          leftTop: ['AOMORI', 'AKITA', 'YAMAGATA', 'NIIGATA'],
-          rightBottom: ['IWATE', 'MIYAGI', 'FUKUSHIMA']
-        },
-        Path_3: {
-          rightTop: ['GUNMA', 'TOCHIGI', 'IBARAKI'],
-          leftBottom: ['SAITAMA', 'TOKYO', 'KANAGAWA', 'CHIBA']
-        },
-        Path_4: {
-          rightTop: ['TOYAMA', 'ISHIKAWA', 'NAGANO', 'YAMANASHI'],
-          leftBottom: ['FUKUI', 'GIFU', 'AICHI', 'SHIZUOKA']
-        },
-        Path_5: {
-          rightTop: ['SHIGA', 'KYOTO'],
-          leftBottom: ['HYOGO', 'OSAKA', 'WAKAYAMA', 'NARA', 'MIE']
-        },
-        Path_6: {
-          top: ['SHIMANE', 'HIROSHIMA', 'TOTTORI', 'OKAYAMA'],
-          top2: ['YAMAGUCHI'],
-          bottom: ['EHIME', 'KOCHI', 'KAGAWA', 'TOKUSHIMA']
-        },
-        Path_7: {
-          rightTop: ['FUKUOKA', 'SAGA', 'NAGASAKI'],
-          rightBottom: ['OITA', 'KUMAMOTO', 'MIYAZAKI', 'KAGOSHIMA']
-        }
-      };
+Object.keys(REGION_DB).forEach(gid => {
+  groupSettings[gid] = {
+    ...REGION_DB[gid].transform,
+    hash: REGION_DB[gid].hash
+  };
+});
+
+
+// ★変更: REGION_DBから生成（既存構造維持）
+const groupBoxSettings = {};
+
+Object.keys(REGION_DB).forEach(gid => {
+  groupBoxSettings[gid] = REGION_DB[gid].boxes;
+});
+
       
      // ★変更: groupToPrefectures を手動定義から自動生成に変更（既存ロジックはそのまま使用）
 const groupToPrefectures = {};
