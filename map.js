@@ -163,19 +163,22 @@ function switchToLeaflet(prefId){
         addLog('tileLayer エラー: ' + e.message);
     }
 
-    // --- ★ここが今回の核心（高さ同期 + 再描画） ---
-    requestAnimationFrame(() => {
 
-        // SVGと同じ高さにする
-        const h = mapDiv.offsetHeight;
-        overlay.style.height = h + 'px';
-        lfMapDiv.style.height = h + 'px';
+requestAnimationFrame(() => {
 
-        // Leafletを親サイズに合わせる
-        testMap.invalidateSize();
+    const svg = mapDiv.querySelector('svg');
 
-        addLog('高さ同期 & invalidateSize 完了');
-    });
+    // ★ SVGの実寸を使う（ここが核心）
+    const h = svg ? svg.getBoundingClientRect().height : mapDiv.offsetHeight;
+
+    overlay.style.height = h + 'px';
+    lfMapDiv.style.height = h + 'px';
+
+    testMap.invalidateSize();
+
+    addLog('高さ同期(実寸SVG) & invalidateSize 完了');
+});
+
 
     addLog('Leaflet 初期化完了');
 
