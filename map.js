@@ -3,6 +3,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const mapDiv = document.getElementById('map');
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
+  
+  
+   // ★追加: テスト表示エリア取得
+  const testDiv = document.getElementById('test-display');
+
+  // ★追加: ログ関数
+  function addLog(text){
+    if(testDiv){
+      testDiv.textContent = text;  // ここに出力
+    }
+  }
+
+
+  
 
   // ★追加: ログ取得
   const logDiv = document.getElementById('log-panel');
@@ -115,6 +129,20 @@ Object.keys(groupBoxSettings).forEach(gid => {
         FUKUOKA:'福岡県', SAGA:'佐賀県', NAGASAKI:'長崎県',
         OITA:'大分県', KUMAMOTO:'熊本県', MIYAZAKI:'宮崎県', KAGOSHIMA:'鹿児島県'
       };
+      
+      
+       // ★追加: 県クリック時の表示
+      prefGroup.querySelectorAll('path').forEach(p => {
+        p.style.cursor = 'pointer';
+        p.addEventListener('click', e => {
+          e.stopPropagation();
+          const prefId = p.id;
+          const name = prefNames[prefId] || prefId;
+          addLog(`クリックした県: ${name}`);
+        });
+      });
+
+      
 
       function gotoPref(prefId) {
         updateHash(prefId, 2);
