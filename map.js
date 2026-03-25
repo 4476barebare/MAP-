@@ -124,10 +124,80 @@ Object.keys(groupBoxSettings).forEach(gid => {
     if(!testMapDiv){ addLog('test-display が見つかりません'); return; }
 
     addLog('Leaflet 初期化開始');
-    const testMap = L.map('test-display').setView([35.681236, 139.767125], 5);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-        attribution:'&copy; OpenStreetMap contributors'
-    }).addTo(testMap);
+    
+    try {
+    const testMapDiv = document.getElementById('test-display');
+    if(!testMapDiv){ addLog('test-display が見つかりません'); return; }
+
+    addLog('Leaflet 初期化開始');
+
+    // 1. マップ生成
+    let testMap;
+    try {
+        testMap = L.map('test-display');
+        addLog('L.map 作成完了');
+    } catch(e){
+        addLog('L.map エラー: ' + e.message);
+    }
+
+    // 2. 初期表示位置設定
+    try {
+        testMap.setView([35.681236, 139.767125], 5);
+        addLog('setView 完了');
+    } catch(e){
+        addLog('setView エラー: ' + e.message);
+    }
+
+    // 3. タイルレイヤ追加
+    try {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+            attribution:'&copy; OpenStreetMap contributors'
+        }).addTo(testMap);
+        addLog('tileLayer addTo 完了');
+    } catch(e){
+        addLog('tileLayer エラー: ' + e.message);
+    }
+
+    addLog('Leaflet 初期化完了');
+} catch(e){
+    addLog('Leaflet 初期化全体エラー: ' + e.message);
+}try {
+    const testMapDiv = document.getElementById('test-display');
+    if(!testMapDiv){ addLog('test-display が見つかりません'); return; }
+
+    addLog('Leaflet 初期化開始');
+
+    // 1. マップ生成
+    let testMap;
+    try {
+        testMap = L.map('test-display');
+        addLog('L.map 作成完了');
+    } catch(e){
+        addLog('L.map エラー: ' + e.message);
+    }
+
+    // 2. 初期表示位置設定
+    try {
+        testMap.setView([35.681236, 139.767125], 5);
+        addLog('setView 完了');
+    } catch(e){
+        addLog('setView エラー: ' + e.message);
+    }
+
+    // 3. タイルレイヤ追加
+    try {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+            attribution:'&copy; OpenStreetMap contributors'
+        }).addTo(testMap);
+        addLog('tileLayer addTo 完了');
+    } catch(e){
+        addLog('tileLayer エラー: ' + e.message);
+    }
+
+    addLog('Leaflet 初期化完了');
+} catch(e){
+    addLog('Leaflet 初期化全体エラー: ' + e.message);
+}
     
     addLog('Leaflet　ここまで完了');
 
