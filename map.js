@@ -427,6 +427,9 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
     
     function openMapOverlay(prefId){
+        
+        console.log('openMapOverlay呼ばれた', prefId);
+        
       const overlay = document.getElementById('map-overlay');
       overlay.style.display = 'block';
 
