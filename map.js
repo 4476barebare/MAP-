@@ -121,27 +121,34 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
 let leafletInitialized = false;
 
-// map.js 修正版（Leaflet 初期化用）
+
 function switchToLeaflet(prefId){
-    // ★修正ポイント: #test-display から #map に変更
-    const mapDiv = document.getElementById('map');
-    if(!mapDiv){ addLog('map が見つかりません'); return; }
-    
-    overlay.style.display = 'block'; // overlay 表示
+    // overlay を安全に取得して表示
+    const overlay = document.getElementById('map-overlay');
+    if(!overlay){
+        addLog('map-overlay が見つかりません');
+        return;
+    }
+    overlay.style.display = 'block';
+    addLog('overlay 表示完了');
+
+    const testMapDiv = document.getElementById('test-display');
+    if(!testMapDiv){
+        addLog('test-display が見つかりません');
+        return;
+    }
 
     addLog('Leaflet 初期化開始');
 
     let testMap;
-    // ★修正ポイント: try-catch を追加してエラー原因をログに出す
     try {
-        testMap = L.map('map');  // ★修正ポイント: id を map に変更
+        testMap = L.map('test-display');
         addLog('L.map 作成完了');
     } catch(e){
         addLog('L.map エラー: ' + e.message);
-        return;
+        return; // ここで止める
     }
 
-    // ★修正ポイント: setView を分割してログ確認可能に
     try {
         testMap.setView([35.681236, 139.767125], 5);
         addLog('setView 完了');
@@ -149,7 +156,6 @@ function switchToLeaflet(prefId){
         addLog('setView エラー: ' + e.message);
     }
 
-    // ★修正ポイント: tileLayer を分割、ログ確認追加
     try {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
             attribution:'&copy; OpenStreetMap contributors'
@@ -159,24 +165,24 @@ function switchToLeaflet(prefId){
         addLog('tileLayer エラー: ' + e.message);
     }
 
-    // ★修正ポイント: prefId があれば中心を移動してマーカー追加
+    addLog('Leaflet 初期化完了');
+
     if(prefId){
         addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
         const prefCenters = {
             CHIBA: [35.6073, 140.1063],
             TOKYO: [35.6895, 139.6917],
-            // 必要に応じて全県追加可能
         };
         if(prefCenters[prefId]){
-            testMap.setView(prefCenters[prefId], 10); // ★修正ポイント: setView でズーム更新
-            L.marker(prefCenters[prefId]).addTo(testMap); // ★修正ポイント: マーカー追加
+            testMap.setView(prefCenters[prefId], 10);
+            L.marker(prefCenters[prefId]).addTo(testMap);
         } else {
             addLog('座標未登録: ' + prefId);
         }
     }
-
-    addLog('Leaflet 初期化完了'); // ★修正ポイント: 初期化完了ログ
 }
+
+
 
 
       // ★Pref 選択時
