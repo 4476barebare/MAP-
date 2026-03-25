@@ -424,6 +424,25 @@ Object.keys(groupBoxSettings).forEach(gid => {
       }
 
       window.addEventListener('hashchange', handleHash);
+      
+    
+    function openMapOverlay(prefId){
+      const overlay = document.getElementById('map-overlay');
+      overlay.style.display = 'block';
 
+      if(lfMap){
+        lfMap.remove();
+      }
+
+      lfMap = L.map('lf-map').setView([35.68,139.76],8);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        attribution:'&copy; OpenStreetMap contributors'
+      }).addTo(lfMap);
+    }
+    
+    
+      
     });
+    
 });
