@@ -134,12 +134,19 @@ function switchToLeaflet(prefId){
 
     // --- overlay 表示 ---
     overlay.style.display = 'block';
-    addLog('overlay 表示完了');
+
+    // --- ★先に高さ確定（ここが最重要） ---
+    const h = mapDiv.getBoundingClientRect().height;
+    overlay.style.height = h + 'px';
+    lfMapDiv.style.height = h + 'px';
+
+    addLog('高さ確定: ' + h);
 
     addLog('Leaflet 初期化開始');
 
     let testMap;
     try {
+        // ★この時点でサイズ確定済み
         testMap = L.map('lf-map');
         addLog('L.map 作成完了');
     } catch(e){
@@ -147,45 +154,19 @@ function switchToLeaflet(prefId){
         return;
     }
 
-    try {
-        testMap.setView([35.681236, 139.767125], 5);
-        addLog('setView 完了');
-    } catch(e){
-        addLog('setView エラー: ' + e.message);
-    }
+    testMap.setView([35.681236, 139.767125], 5);
 
-    try {
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-            attribution:'&copy; OpenStreetMap contributors'
-        }).addTo(testMap);
-        addLog('tileLayer addTo 完了');
-    } catch(e){
-        addLog('tileLayer エラー: ' + e.message);
-    }
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        attribution:'&copy; OpenStreetMap contributors'
+    }).addTo(testMap);
 
-
-requestAnimationFrame(() => {
-
-    const svg = mapDiv.querySelector('svg');
-
-    // ★ SVGの実寸を使う（ここが核心）
-    const h = svg ? svg.getBoundingClientRect().height : mapDiv.offsetHeight;
-
-    overlay.style.height = h + 'px';
-    lfMapDiv.style.height = h + 'px';
-
+    // 保険
     testMap.invalidateSize();
-
-    addLog('高さ同期(実寸SVG) & invalidateSize 完了');
-});
-
 
     addLog('Leaflet 初期化完了');
 
-    // --- 都道府県処理 ---
+    // --- pref処理 ---
     if(prefId){
-        addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
-
         const prefCenters = {
             CHIBA: [35.6073, 140.1063],
             TOKYO: [35.6895, 139.6917],
@@ -194,13 +175,9 @@ requestAnimationFrame(() => {
         if(prefCenters[prefId]){
             testMap.setView(prefCenters[prefId], 10);
             L.marker(prefCenters[prefId]).addTo(testMap);
-        } else {
-            addLog('座標未登録: ' + prefId);
         }
     }
 }
-
-
 
       // ★Pref 選択時
       function gotoPref(prefId){
