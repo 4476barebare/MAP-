@@ -54,16 +54,16 @@ document.addEventListener('DOMContentLoaded', () => {
           rightBottom: ['OITA', 'KUMAMOTO', 'MIYAZAKI', 'KAGOSHIMA']
         }
       };
+      
+     // ★変更: groupToPrefectures を手動定義から自動生成に変更（既存ロジックはそのまま使用）
+const groupToPrefectures = {};
 
-      const groupToPrefectures = {
-        Path_2: ['AOMORI', 'AKITA', 'YAMAGATA', 'NIIGATA', 'IWATE', 'MIYAGI', 'FUKUSHIMA'],
-        Path_3: ['GUNMA', 'TOCHIGI', 'IBARAKI', 'SAITAMA', 'TOKYO', 'KANAGAWA', 'CHIBA'],
-        Path_4: ['TOYAMA', 'ISHIKAWA', 'NAGANO', 'YAMANASHI', 'FUKUI', 'GIFU', 'AICHI', 'SHIZUOKA'],
-        Path_5: ['SHIGA', 'KYOTO', 'HYOGO', 'OSAKA', 'WAKAYAMA', 'NARA', 'MIE'],
-        Path_6: ['SHIMANE', 'HIROSHIMA', 'TOTTORI', 'OKAYAMA', 'YAMAGUCHI', 'EHIME', 'KOCHI', 'KAGAWA', 'TOKUSHIMA'],
-        Path_7: ['FUKUOKA', 'SAGA', 'NAGASAKI', 'OITA', 'KUMAMOTO', 'MIYAZAKI', 'KAGOSHIMA']
-      };
+Object.keys(groupBoxSettings).forEach(gid => {
+  groupToPrefectures[gid] = Object.values(groupBoxSettings[gid]).flat();
+}); 
+      
 
+      
       const prefNames = {
         AOMORI: '青森県', IWATE: '岩手県', AKITA: '秋田県',
         MIYAGI: '宮城県', YAMAGATA: '山形県', FUKUSHIMA: '福島県',
