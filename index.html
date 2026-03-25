@@ -51,6 +51,21 @@ main {
 }
 
 
+#map-overlay{
+  display:none;
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:100;
+}
+
+#lf-map{
+  width:100%;
+  height:100%;
+}
+
 
 </style>
 </head>
@@ -78,11 +93,20 @@ main {
 
 </header>
 
+
 <main>
-  <div class="map">
+  <div class="map" style="position:relative;">
+    
     <div class="japan-map" id="map"></div>
+
+    <div id="map-overlay">
+      <div id="lf-map"></div>
+    </div>
+
   </div>
 </main>
+
+
 
 <!-- ★追加: ログ表示エリア -->
 <div id="log-panel"></div>
