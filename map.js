@@ -143,6 +143,18 @@ Object.keys(groupBoxSettings).forEach(gid => {
         }
     };
 });
+
+// ★テスト描画エリアに Leaflet 地図を描画
+const testDiv = document.getElementById('test-display');
+if (testDiv) {
+    const testMap = L.map(testDiv).setView([36.0, 138.0], 5); // 日本中心
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(testMap);
+}
+
+
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
 
       allGroups.forEach(g => {
