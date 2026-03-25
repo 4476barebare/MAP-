@@ -160,6 +160,10 @@ function switchToLeaflet(prefId){
             attribution:'&copy; OpenStreetMap contributors'
         }).addTo(testMap);
         addLog('tileLayer addTo 完了');
+
+    // ← ここで追加
+    testMap.invalidateSize(); // 親 div のサイズに合わせて Leaflet を再描画
+    addLog('invalidateSize() 完了');
     } catch(e){
         addLog('tileLayer エラー: ' + e.message);
     }
