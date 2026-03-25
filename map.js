@@ -30,75 +30,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentGroup = null;
       
-const REGION_DB = {
-  Path_2: {
-    transform: { scale: 6.7, x: 135, y: 45 },
-    hash: 'TOHOKU',
-    boxes: {
-      leftTop: ['AOMORI', 'AKITA', 'YAMAGATA', 'NIIGATA'],
-      rightBottom: ['IWATE', 'MIYAGI', 'FUKUSHIMA']
-    }
-  },
-  Path_3: {
-    transform: { scale: 15, x: 92, y: 95 },
-    hash: 'KANTO',
-    boxes: {
-      rightTop: ['GUNMA', 'TOCHIGI', 'IBARAKI'],
-      leftBottom: ['SAITAMA', 'TOKYO', 'KANAGAWA', 'CHIBA']
-    }
-  },
-  Path_4: {
-    transform: { scale: 10.2, x: 54, y: 110 },
-    hash: 'CHUBU',
-    boxes: {
-      rightTop: ['TOYAMA', 'ISHIKAWA', 'NAGANO', 'YAMANASHI'],
-      leftBottom: ['FUKUI', 'GIFU', 'AICHI', 'SHIZUOKA']
-    }
-  },
-  Path_5: {
-    transform: { scale: 13.6, x: 0, y: 140 },
-    hash: 'KINKI',
-    boxes: {
-      rightTop: ['SHIGA', 'KYOTO'],
-      leftBottom: ['HYOGO', 'OSAKA', 'WAKAYAMA', 'NARA', 'MIE']
-    }
-  },
-  Path_6: {
-    transform: { scale: 9.5, x: -51, y: 165 },
-    hash: 'CHUGOKU',
-    boxes: {
-      top: ['SHIMANE', 'HIROSHIMA', 'TOTTORI', 'OKAYAMA'],
-      top2: ['YAMAGUCHI'],
-      bottom: ['EHIME', 'KOCHI', 'KAGAWA', 'TOKUSHIMA']
-    }
-  },
-  Path_7: {
-    transform: { scale: 11.2, x: -105, y: 200 },
-    hash: 'KYUSHU',
-    boxes: {
-      rightTop: ['FUKUOKA', 'SAGA', 'NAGASAKI'],
-      rightBottom: ['OITA', 'KUMAMOTO', 'MIYAZAKI', 'KAGOSHIMA']
-    }
-  }
-};
+      const REGION_DB = {
+        Path_2: { transform: { scale: 6.7, x: 135, y: 45 }, hash: 'TOHOKU', boxes: { leftTop: ['AOMORI', 'AKITA', 'YAMAGATA', 'NIIGATA'], rightBottom: ['IWATE', 'MIYAGI', 'FUKUSHIMA'] } },
+        Path_3: { transform: { scale: 15, x: 92, y: 95 }, hash: 'KANTO', boxes: { rightTop: ['GUNMA', 'TOCHIGI', 'IBARAKI'], leftBottom: ['SAITAMA', 'TOKYO', 'KANAGAWA', 'CHIBA'] } },
+        Path_4: { transform: { scale: 10.2, x: 54, y: 110 }, hash: 'CHUBU', boxes: { rightTop: ['TOYAMA', 'ISHIKAWA', 'NAGANO', 'YAMANASHI'], leftBottom: ['FUKUI', 'GIFU', 'AICHI', 'SHIZUOKA'] } },
+        Path_5: { transform: { scale: 13.6, x: 0, y: 140 }, hash: 'KINKI', boxes: { rightTop: ['SHIGA', 'KYOTO'], leftBottom: ['HYOGO', 'OSAKA', 'WAKAYAMA', 'NARA', 'MIE'] } },
+        Path_6: { transform: { scale: 9.5, x: -51, y: 165 }, hash: 'CHUGOKU', boxes: { top: ['SHIMANE', 'HIROSHIMA', 'TOTTORI', 'OKAYAMA'], top2: ['YAMAGUCHI'], bottom: ['EHIME', 'KOCHI', 'KAGAWA', 'TOKUSHIMA'] } },
+        Path_7: { transform: { scale: 11.2, x: -105, y: 200 }, hash: 'KYUSHU', boxes: { rightTop: ['FUKUOKA', 'SAGA', 'NAGASAKI'], rightBottom: ['OITA', 'KUMAMOTO', 'MIYAZAKI', 'KAGOSHIMA'] } }
+      };
 
-const groupSettings = {};
-Object.keys(REGION_DB).forEach(gid => {
-  groupSettings[gid] = {
-    ...REGION_DB[gid].transform,
-    hash: REGION_DB[gid].hash
-  };
-});
+      const groupSettings = {};
+      Object.keys(REGION_DB).forEach(gid => {
+        groupSettings[gid] = { ...REGION_DB[gid].transform, hash: REGION_DB[gid].hash };
+      });
 
-const groupBoxSettings = {};
-Object.keys(REGION_DB).forEach(gid => {
-  groupBoxSettings[gid] = REGION_DB[gid].boxes;
-});
+      const groupBoxSettings = {};
+      Object.keys(REGION_DB).forEach(gid => {
+        groupBoxSettings[gid] = REGION_DB[gid].boxes;
+      });
 
-const groupToPrefectures = {};
-Object.keys(groupBoxSettings).forEach(gid => {
-  groupToPrefectures[gid] = Object.values(groupBoxSettings[gid]).flat();
-}); 
+      const groupToPrefectures = {};
+      Object.keys(groupBoxSettings).forEach(gid => {
+        groupToPrefectures[gid] = Object.values(groupBoxSettings[gid]).flat();
+      }); 
 
       const prefNames = {
         AOMORI:'青森県', IWATE:'岩手県', AKITA:'秋田県',
@@ -118,8 +72,6 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       function gotoPref(prefId) {
         updateHash(prefId, 2);
-
-        // ★変更: ログ出力
         addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
       }
 
@@ -149,7 +101,7 @@ Object.keys(groupBoxSettings).forEach(gid => {
       const rightTopDummy = createCornerDummy('rightTop');
 
       function hideAllBoxes() {
-        [topDummy,top2Dummy,bottomDummy,leftTopDummy,rightBottomDummy,leftBottomDummy,rightTopDummy]
+        [topDummy, top2Dummy, bottomDummy, leftTopDummy, rightBottomDummy, leftBottomDummy, rightTopDummy]
         .forEach(wrapper=>{
           wrapper.style.display='none';
           Array.from(wrapper.querySelectorAll('div')).forEach(c=>{
@@ -162,10 +114,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
       function showBoxes(gid){
         const setting = groupBoxSettings[gid];
         if(!setting) return;
-
         Object.keys(setting).forEach(pos=>{
           let wrapper;
-
           if(pos==='top')wrapper=topDummy;
           if(pos==='top2')wrapper=top2Dummy;
           if(pos==='bottom')wrapper=bottomDummy;
@@ -173,11 +123,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
           if(pos==='rightBottom')wrapper=rightBottomDummy;
           if(pos==='leftBottom')wrapper=leftBottomDummy;
           if(pos==='rightTop')wrapper=rightTopDummy;
-
           if(!wrapper) return;
-
           wrapper.style.display='flex';
-
           setting[pos].forEach((pid,i)=>{
             const box=wrapper.children[i];
             if(box){
@@ -189,21 +136,16 @@ Object.keys(groupBoxSettings).forEach(gid => {
       }
 
       function showRegion(gid){
-
         currentGroup=gid;
-
         initialNav.style.display='none';
         hideAllBoxes();
         showBoxes(gid);
-
         allGroups.forEach(g=>g.style.display='none');
-
         prefGroup.querySelectorAll('path').forEach(p=>{
           if(groupToPrefectures[gid].includes(p.id)){
             p.style.display='inline';
             p.classList.remove('prefecture-initial','prefecture-unselected');
             p.classList.add('prefecture-selected');
-
             p.onclick=e=>{
               e.stopPropagation();
               gotoPref(p.id);
@@ -214,10 +156,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
             p.classList.add('prefecture-unselected');
           }
         });
-
         applyTransform(gid);
         disableOtherAreas(groupToPrefectures[gid]);
-
         if(gid==='Path_6'){
           const topRect=topDummy.getBoundingClientRect();
           const mapRect=mapDiv.getBoundingClientRect();
@@ -228,27 +168,21 @@ Object.keys(groupBoxSettings).forEach(gid => {
           top2Dummy.style.left='50%';
           top2Dummy.style.transform='translateX(-50%)';
         }
-
         allGroups.forEach(g=>{
           if(g.id!==gid)g.style.display='inline';
         });
-
         const boxWrappers=[topDummy,top2Dummy,bottomDummy,leftTopDummy,rightBottomDummy,leftBottomDummy,rightTopDummy];
-
         boxWrappers.forEach(wrapper=>{
           Array.from(wrapper.children).forEach(box=>{
             if(box.textContent.trim()==='')return;
-
             box.onclick=e=>{
               e.stopPropagation();
               const prefId=Object.keys(prefNames)
               .find(key=>prefNames[key]===box.textContent);
-
               if(prefId)gotoPref(prefId);
             };
           });
         });
-
         if(!location.hash||location.hash==='#'){
           updateHash(groupSettings[gid].hash,1);
         }
@@ -258,28 +192,20 @@ Object.keys(groupBoxSettings).forEach(gid => {
         const group=svg.querySelector('#'+gid);
         const bbox=group.getBBox();
         const s=groupSettings[gid];
-
         const cx=bbox.x+bbox.width/2+s.x;
         const cy=bbox.y+bbox.height/2+s.y;
         const scale=s.scale;
-
         const svgDisplayWidth=svg.clientWidth;
         const viewBoxWidth=svg.viewBox.baseVal.width;
         const displayScale=svgDisplayWidth/viewBoxWidth;
-
         const finalScale=scale*displayScale;
-
         const tx=(svgDisplayWidth/2)-cx*finalScale;
         const ty=(svg.clientHeight/2)-cy*finalScale;
-
         svg.style.transform=`translate(${tx}px,${ty}px) scale(${finalScale})`;
-
         const baseStroke=0.5;
-
         prefGroup.querySelectorAll('path').forEach(p=>{
           p.style.strokeWidth=(baseStroke/finalScale)+'px';
         });
-
         allGroups.forEach(g=>{
           g.style.strokeWidth=(baseStroke/finalScale)+'px';
         });
@@ -289,7 +215,6 @@ Object.keys(groupBoxSettings).forEach(gid => {
         allGroups.forEach(g=>{
           g.style.pointerEvents=(g.id===currentGroup)?'auto':'none';
         });
-
         prefGroup.querySelectorAll('path').forEach(p=>{
           p.style.pointerEvents=activeIds.includes(p.id)?'auto':'none';
         });
@@ -303,7 +228,6 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       function createInitialNav(){
         const names=['北海道','東北地方','関東新潟','中部地方','近畿地方','中国四国','九州地方','沖縄'];
-
         const nav=document.createElement('div');
         nav.style.position='absolute';
         nav.style.top='5px';
@@ -312,21 +236,17 @@ Object.keys(groupBoxSettings).forEach(gid => {
         nav.style.flexDirection='column';
         nav.style.gap='4px';
         nav.style.zIndex='10';
-
         names.forEach((name,i)=>{
           const box=createBox();
           box.textContent=name;
-
           if(i!==0&&i!==7){
             box.style.cursor='pointer';
             box.onclick=()=>showRegion(`Path_${i+1}`);
           }else{
             box.style.opacity='0.6';
           }
-
           nav.appendChild(box);
         });
-
         mapDiv.appendChild(nav);
         return nav;
       }
@@ -334,7 +254,6 @@ Object.keys(groupBoxSettings).forEach(gid => {
       function createTopDummy(){return createCornerDummyWrapper('top',5,50,'X');}
       function createTop2Dummy(){return createCornerDummyWrapper('top',35,50,'X');}
       function createBottomDummy(){return createCornerDummyWrapper('bottom',5,50,'X');}
-
       function createCornerDummy(position){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
@@ -342,35 +261,25 @@ Object.keys(groupBoxSettings).forEach(gid => {
         wrapper.style.flexDirection='column';
         wrapper.style.gap='4px';
         wrapper.style.zIndex='10';
-
         if(position==='leftTop'){wrapper.style.top='5px';wrapper.style.left='5px';}
         else if(position==='rightBottom'){wrapper.style.bottom='5px';wrapper.style.right='5px';}
         else if(position==='leftBottom'){wrapper.style.bottom='5px';wrapper.style.left='5px';}
         else if(position==='rightTop'){wrapper.style.top='5px';wrapper.style.right='5px';}
-
         for(let i=0;i<5;i++){wrapper.appendChild(createBox());}
-
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-
       function createCornerDummyWrapper(vertical,posValue,horPercent,axis){
         const wrapper=document.createElement('div');
         wrapper.style.position='absolute';
-
         if(vertical==='top'){wrapper.style.top=posValue+'px';}
         else{wrapper.style.bottom=posValue+'px';}
-
         wrapper.style.left=horPercent+'%';
-
         if(axis==='X'){wrapper.style.transform='translateX(-50%)';}
-
         wrapper.style.display='none';
         wrapper.style.gap='6px';
         wrapper.style.zIndex='10';
-
         for(let i=0;i<4;i++){wrapper.appendChild(createBox());}
-
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
@@ -378,41 +287,25 @@ Object.keys(groupBoxSettings).forEach(gid => {
       function updateHash(value, level = 1){
         let hash = location.hash.replace(/^#/, '');
         let parts = hash ? hash.split('/') : [];
-
-        // ★変更: alert削除（副作用排除）
         parts[level - 1] = value;
         parts = parts.slice(0, level);
-
         location.hash = '#' + parts.join('/');
       }
 
       function handleHash(){
         const hash = location.hash.replace(/^#/, '');
-
         if(hash){
-            
-            addLog('hash changed: ' + hash); // ←ここに入れる
-            
+          addLog('hash changed: ' + hash);
           const parts = hash.split('/');
           const regionHash = parts[0];
-
-          const gid = Object.keys(groupSettings)
-            .find(k => groupSettings[k].hash === regionHash);
-
-          if(gid){
-            showRegion(gid);
-          }
-
-          if(parts[1]){
-            // gotoPref(parts[1]);
-          }
+          const gid = Object.keys(groupSettings).find(k => groupSettings[k].hash === regionHash);
+          if(gid){ showRegion(gid); }
         }
       }
 
       handleHash();
 
       const manualNav = document.getElementById('manual-region-nav');
-
       if (manualNav) {
         manualNav.querySelectorAll('button').forEach(btn => {
           btn.onclick = () => {
@@ -422,8 +315,16 @@ Object.keys(groupBoxSettings).forEach(gid => {
           };
         });
       }
-
       window.addEventListener('hashchange', handleHash);
 
-    });
+      // ★ Leaflet + OSM 初期化（#test-display 用）★
+      const testDisplay = document.getElementById('test-display');
+      if(testDisplay){
+        const leafletMap = L.map(testDisplay).setView([36.2048, 138.2529], 5); // 日本中心
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(leafletMap);
+        addLog('Leaflet map initialized in #test-display');
+      }
+
 });
