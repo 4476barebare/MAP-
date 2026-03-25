@@ -81,7 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
       };
 
       function gotoPref(prefId) {
-        alert(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+          updateHash(prefId, 2);
+    alert(`pref clicked: ${prefId} (${prefNames[prefId]})`);
       }
 
       // 初期表示
@@ -220,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!location.hash || location.hash === '#') {
-          updateHash(gid);
+          updateHash(groupSettings[gid].hash, 1);
         }
       }
 
@@ -371,27 +372,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
       }
 
-      function updateHash(gid = null, prefId = null, subId = null) {
+      
+      
+      function updateHash(value, level = 1){
+    let hash = location.hash.replace(/^#/, '');
+    let parts = hash ? hash.split('/') : [];
 
-        let hashGid = gid && groupSettings[gid] ? groupSettings[gid].hash : gid;
+    alert(value)
+    // levelで上書き位置を制御
+    parts[level - 1] = value;
 
-        alert(hashGid);
+    // 下位階層は削除（重要）
+    parts = parts.slice(0, level);
 
-        let parts = location.hash.replace(/^#/, '').split('/');
-        if (parts.length === 1 && parts[0] === '') parts = [];
+    location.hash = '#' + parts.join('/');
+}
 
-        if (hashGid !== null) parts[0] = hashGid;
-        if (prefId !== null) parts[1] = prefId;
-        if (subId !== null) parts[2] = subId;
-
-        parts = parts.filter(p => p);
-
-        const newHash = parts.join('/');
-
-        if ('#' + newHash !== location.hash) {
-          history.pushState({ gid, prefId, subId }, '', '#' + newHash);
-        }
-      }
+      
 
       function handleHash() {
 
