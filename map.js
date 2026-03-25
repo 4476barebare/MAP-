@@ -128,6 +128,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
         attribution:'&copy; OpenStreetMap contributors'
     }).addTo(testMap);
+    
+    addLog('Leaflet　ここまで完了');
 
     if(prefId){
         addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
