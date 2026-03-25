@@ -133,55 +133,70 @@ function switchToLeaflet(prefId){
     }
 
     // --- overlay 表示 ---
-    
     overlay.style.display = 'block';
+    addLog('overlay 表示完了');
 
-// ★ここを丸ごと差し替え
+    // --- ★レイアウト確定後に全処理 ---
+    requestAnimationFrame(() => {
 
-const rect = mapDiv.getBoundingClientRect();
+        // --- サイズ確定 ---
+        const rect = mapDiv.getBoundingClientRect();
 
-overlay.style.height = rect.height + 'px';
-lfMapDiv.style.height = rect.height + 'px';
+        overlay.style.height = rect.height + 'px';
+        lfMapDiv.style.height = rect.height + 'px';
 
-addLog('高さ確定: ' + rect.height);    
+        addLog('高さ確定: ' + rect.height);
 
-
-    addLog('Leaflet 初期化開始');
-
-    let testMap;
-    try {
-        // ★この時点でサイズ確定済み
-        testMap = L.map('lf-map');
-        addLog('L.map 作成完了');
-    } catch(e){
-        addLog('L.map エラー: ' + e.message);
-        return;
-    }
-
-    testMap.setView([35.681236, 139.767125], 5);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-        attribution:'&copy; OpenStreetMap contributors'
-    }).addTo(testMap);
-
-    // 保険
-    testMap.invalidateSize();
-
-    addLog('Leaflet 初期化完了');
-
-    // --- pref処理 ---
-    if(prefId){
-        const prefCenters = {
-            CHIBA: [35.6073, 140.1063],
-            TOKYO: [35.6895, 139.6917],
-        };
-
-        if(prefCenters[prefId]){
-            testMap.setView(prefCenters[prefId], 10);
-            L.marker(prefCenters[prefId]).addTo(testMap);
+        // --- Leaflet 初期化（ここが核心） ---
+        let testMap;
+        try {
+            testMap = L.map('lf-map');
+            addLog('L.map 作成完了');
+        } catch(e){
+            addLog('L.map エラー: ' + e.message);
+            return;
         }
-    }
+
+        try {
+            testMap.setView([35.681236, 139.767125], 5);
+            addLog('setView 完了');
+        } catch(e){
+            addLog('setView エラー: ' + e.message);
+        }
+
+        try {
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+                attribution:'&copy; OpenStreetMap contributors'
+            }).addTo(testMap);
+            addLog('tileLayer addTo 完了');
+        } catch(e){
+            addLog('tileLayer エラー: ' + e.message);
+        }
+
+        addLog('Leaflet 初期化完了');
+
+        // --- 都道府県処理 ---
+        if(prefId){
+            addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
+
+            const prefCenters = {
+                CHIBA: [35.6073, 140.1063],
+                TOKYO: [35.6895, 139.6917],
+            };
+
+            if(prefCenters[prefId]){
+                testMap.setView(prefCenters[prefId], 10);
+                L.marker(prefCenters[prefId]).addTo(testMap);
+            } else {
+                addLog('座標未登録: ' + prefId);
+            }
+        }
+
+    });
 }
+
+
+
 
       // ★Pref 選択時
       function gotoPref(prefId){
