@@ -126,6 +126,8 @@ function switchToLeaflet(prefId){
     // ★修正ポイント: #test-display から #map に変更
     const mapDiv = document.getElementById('map');
     if(!mapDiv){ addLog('map が見つかりません'); return; }
+    
+    overlay.style.display = 'block'; // overlay 表示
 
     addLog('Leaflet 初期化開始');
 
