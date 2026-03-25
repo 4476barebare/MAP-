@@ -118,6 +118,7 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       function gotoPref(prefId) {
         updateHash(prefId, 2);
+        openMapOverlay(prefId);
 
         // ★変更: ログ出力
         addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
