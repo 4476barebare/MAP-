@@ -214,27 +214,22 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
         allGroups.forEach(g => g.style.display = 'none');
 
-        prefGroup.querySelectorAll('path').forEach(p => {
+        // 初期表示
+prefGroup.querySelectorAll('path').forEach(p => {
+    // 元の初期化処理
+    p.style.display = 'inline';
+    p.classList.remove('prefecture-selected', 'prefecture-unselected');
+    p.classList.add('prefecture-initial');
 
-          if (groupToPrefectures[gid].includes(p.id)) {
-
-            p.style.display = 'inline';
-            p.classList.remove('prefecture-initial', 'prefecture-unselected');
-            p.classList.add('prefecture-selected');
-
-            p.onclick = e => {
-              e.stopPropagation();
-              gotoPref(p.id);
-            };
-
-          } else {
-
-            p.style.display = 'inline';
-            p.classList.remove('prefecture-initial', 'prefecture-selected');
-            p.classList.add('prefecture-unselected');
-
-          }
-        });
+    // ★追記: クリック時にテスト描画エリアに反映（元の挙動を壊さない）
+    p.addEventListener('click', e => {
+        e.stopPropagation();
+        const testDiv = document.getElementById('test-display');
+        if (testDiv) {
+            testDiv.textContent = `クリック: ${prefNames[p.id]} (${p.id})`;
+        }
+    });
+});
 
         applyTransform(gid);
         disableOtherAreas(groupToPrefectures[gid]);
