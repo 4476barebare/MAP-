@@ -116,11 +116,28 @@ Object.keys(groupBoxSettings).forEach(gid => {
         OITA:'大分県', KUMAMOTO:'熊本県', MIYAZAKI:'宮崎県', KAGOSHIMA:'鹿児島県'
       };
 
-      function gotoPref(prefId) {
-        updateHash(prefId, 2);
-        // ★変更: ログ出力
-        addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
-        openMapOverlay(prefId);
+
+
+function gotoPref(prefId) {
+  updateHash(prefId, 2);
+
+  // ★ログ出力
+  addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+
+  // ★overlay表示
+  const overlay = document.getElementById('map-overlay');
+  if(overlay) overlay.style.display = 'block';
+
+  // ★Leaflet初期化（初回クリックのみ）
+  if(!window.lfMap){
+    window.lfMap = L.map('lf-map').setView([36.2048, 138.2529], 5); // 日本中心
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(window.lfMap);
+  }
+}
+
+
       }
 
       prefGroup.querySelectorAll('path').forEach(p => {
@@ -374,27 +391,6 @@ Object.keys(groupBoxSettings).forEach(gid => {
         mapDiv.appendChild(wrapper);
         return wrapper;
       }
-      
-          function openMapOverlay(prefId){
-        
-        console.log('openMapOverlay呼ばれた', prefId);
-        
-      const overlay = document.getElementById('map-overlay');
-      overlay.style.display = 'block';
-
-      if(lfMap){
-        lfMap.remove();
-      }
-
-      lfMap = L.map('lf-map').setView([35.68,139.76],8);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-        attribution:'&copy; OpenStreetMap contributors'
-      }).addTo(lfMap);
-    }
-    
-
-      
 
       function updateHash(value, level = 1){
         let hash = location.hash.replace(/^#/, '');
@@ -446,9 +442,7 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       window.addEventListener('hashchange', handleHash);
       
-    
 
-      
     });
     
 });
