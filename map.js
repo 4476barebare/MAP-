@@ -133,12 +133,20 @@ function switchToLeaflet(prefId){
     }
 
     // --- overlay 表示 ---
+    
     overlay.style.display = 'block';
 
-    // --- ★先に高さ確定（ここが最重要） ---
-    const h = mapDiv.getBoundingClientRect().height;
-    overlay.style.height = h + 'px';
-    lfMapDiv.style.height = h + 'px';
+// ★ここを丸ごと差し替え
+const rect = mapDiv.getBoundingClientRect();
+
+overlay.style.width = rect.width + 'px';
+overlay.style.height = rect.height + 'px';
+
+lfMapDiv.style.width = rect.width + 'px';
+lfMapDiv.style.height = rect.height + 'px';
+
+addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
+    
 
     addLog('高さ確定: ' + h);
 
