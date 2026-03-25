@@ -119,29 +119,40 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
             // ★Leaflet 初期化関数 (外に置く)
       let leafletInitialized = false;
-      function switchToLeaflet() {
-        if(leafletInitialized) return;
+      function switchToLeaflet(prefId){
+    const testMapDiv = document.getElementById('test-display');
+    if(!testMapDiv){ addLog('test-display が見つかりません'); return; }
 
-        const testMapDiv = document.getElementById('test-display');
-        if(!testMapDiv){ addLog('test-display が見つかりません'); return; }
+    addLog('Leaflet 初期化開始');
+    const testMap = L.map('test-display').setView([35.681236, 139.767125], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        attribution:'&copy; OpenStreetMap contributors'
+    }).addTo(testMap);
 
-        const testMap = L.map('test-display').setView([35.681236, 139.767125], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-          attribution:'&copy; OpenStreetMap contributors'
-        }).addTo(testMap);
-
-        leafletInitialized = true;
-        addLog('Leaflet / OSM 初期化完了');
-      }
-
+    if(prefId){
+        addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
+        const prefCenters = {
+            CHIBA: [35.6073, 140.1063],
+            TOKYO: [35.6895, 139.6917],
+        };
+        if(prefCenters[prefId]){
+            testMap.setView(prefCenters[prefId], 10);
+            L.marker(prefCenters[prefId]).addTo(testMap);
+        } else {
+            addLog('座標未登録: ' + prefId);
+        }
+    }
+    addLog('Leaflet 初期化完了');
+}
+      
       // ★Pref 選択時
       function gotoPref(prefId){
         updateHash(prefId,2);
-        addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
-        
         addLog('pref clicked: ' + prefId);
 
-        if(typeof switchToLeaflet==='function') switchToLeaflet();
+        // prefId をそのまま渡す
+    switchToLeaflet(prefId);
+
       }
 
 
