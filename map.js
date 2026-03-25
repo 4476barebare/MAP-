@@ -3,6 +3,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const mapDiv = document.getElementById('map');
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
+  
+  
+  const testDiv = document.getElementById('test-display');
+  if (testDiv) {
+    // Leaflet 用の高さ確保
+    testDiv.style.height = '400px';
+    testDiv.style.lineHeight = 'normal';
+
+    // Leaflet マップ初期化（日本中央）
+    const testMap = L.map(testDiv).setView([36.0, 138.0], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(testMap);
+    testDiv._leafletMap = testMap;
+  }
+
+
+  
+  
+  
 
   fetch('japan.svg')
     .then(res => res.text())
@@ -61,18 +81,28 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // ★初期表示・クリック対応
+      
+      
+      
+      // 初期化処理（SVGパス）
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
         p.classList.remove('prefecture-selected','prefecture-unselected');
         p.classList.add('prefecture-initial');
 
-        // テスト表示エリアに反映
         p.onclick = e => {
           e.stopPropagation();
           const testDiv = document.getElementById('test-display');
           if (testDiv) testDiv.textContent = `クリック: ${prefNames[p.id]} (${p.id})`;
+          addLog(`クリックした県: ${prefNames[p.id]}`);
+          gotoPref(p.id);
         };
       });
+
+
+      
+      
+     
 
       const allGroups = svg.querySelectorAll('[id^="Path_"]');
       allGroups.forEach(g => {
@@ -243,17 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       window.addEventListener('hashchange', handleHash);
 
-      const testDiv = document.getElementById('test-display');
-if (testDiv && !testDiv._leafletMap) {
-  testDiv.style.height = '300px'; // 高さ必須
-  testDiv.style.lineHeight = 'normal';
-
-  const testMap = L.map(testDiv).setView([36.0, 138.0], 5); // 日本中央
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(testMap);
-
-  testDiv._leafletMap = testMap;
-}
+      
     }); // fetch end
 });
