@@ -3,31 +3,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const mapDiv = document.getElementById('map');
   mapDiv.style.position = 'relative';
   mapDiv.style.zIndex = '50';
-  
-  
-   // ★追加: テスト表示エリア取得
+
+  // ★テスト表示エリア取得
   const testDiv = document.getElementById('test-display');
 
-  // ★追加: ログ関数
-  function addLog(text){
-    if(testDiv){
-      testDiv.textContent = text;  // ここに出力
-    }
-  }
-
-
-  
-
-  // ★追加: ログ取得
+  // ★ログパネル取得
   const logDiv = document.getElementById('log-panel');
 
-  // ★追加: ログ関数
+  // ★従来ログ（log-panel用）
   function addLog(text){
     if(!logDiv) return;
     const line = document.createElement('div');
     line.textContent = text;
     logDiv.appendChild(line);
     logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  // ★テスト表示用関数
+  function addTestDisplay(text){
+    if(!testDiv) return;
+    const line = document.createElement('div');
+    line.textContent = text;
+    testDiv.appendChild(line);
   }
 
   fetch('japan.svg')
@@ -43,76 +40,25 @@ document.addEventListener('DOMContentLoaded', () => {
       svg.style.transformOrigin = 'center center';
 
       let currentGroup = null;
-      
-const REGION_DB = {
-  Path_2: {
-    transform: { scale: 6.7, x: 135, y: 45 },
-    hash: 'TOHOKU',
-    boxes: {
-      leftTop: ['AOMORI', 'AKITA', 'YAMAGATA', 'NIIGATA'],
-      rightBottom: ['IWATE', 'MIYAGI', 'FUKUSHIMA']
-    }
-  },
-  Path_3: {
-    transform: { scale: 15, x: 92, y: 95 },
-    hash: 'KANTO',
-    boxes: {
-      rightTop: ['GUNMA', 'TOCHIGI', 'IBARAKI'],
-      leftBottom: ['SAITAMA', 'TOKYO', 'KANAGAWA', 'CHIBA']
-    }
-  },
-  Path_4: {
-    transform: { scale: 10.2, x: 54, y: 110 },
-    hash: 'CHUBU',
-    boxes: {
-      rightTop: ['TOYAMA', 'ISHIKAWA', 'NAGANO', 'YAMANASHI'],
-      leftBottom: ['FUKUI', 'GIFU', 'AICHI', 'SHIZUOKA']
-    }
-  },
-  Path_5: {
-    transform: { scale: 13.6, x: 0, y: 140 },
-    hash: 'KINKI',
-    boxes: {
-      rightTop: ['SHIGA', 'KYOTO'],
-      leftBottom: ['HYOGO', 'OSAKA', 'WAKAYAMA', 'NARA', 'MIE']
-    }
-  },
-  Path_6: {
-    transform: { scale: 9.5, x: -51, y: 165 },
-    hash: 'CHUGOKU',
-    boxes: {
-      top: ['SHIMANE', 'HIROSHIMA', 'TOTTORI', 'OKAYAMA'],
-      top2: ['YAMAGUCHI'],
-      bottom: ['EHIME', 'KOCHI', 'KAGAWA', 'TOKUSHIMA']
-    }
-  },
-  Path_7: {
-    transform: { scale: 11.2, x: -105, y: 200 },
-    hash: 'KYUSHU',
-    boxes: {
-      rightTop: ['FUKUOKA', 'SAGA', 'NAGASAKI'],
-      rightBottom: ['OITA', 'KUMAMOTO', 'MIYAZAKI', 'KAGOSHIMA']
-    }
-  }
-};
 
-const groupSettings = {};
-Object.keys(REGION_DB).forEach(gid => {
-  groupSettings[gid] = {
-    ...REGION_DB[gid].transform,
-    hash: REGION_DB[gid].hash
-  };
-});
+      const REGION_DB = {
+        Path_2: { transform: { scale: 6.7, x: 135, y: 45 }, hash: 'TOHOKU', boxes: { leftTop: ['AOMORI','AKITA','YAMAGATA','NIIGATA'], rightBottom: ['IWATE','MIYAGI','FUKUSHIMA'] } },
+        Path_3: { transform: { scale: 15, x: 92, y: 95 }, hash: 'KANTO', boxes: { rightTop: ['GUNMA','TOCHIGI','IBARAKI'], leftBottom: ['SAITAMA','TOKYO','KANAGAWA','CHIBA'] } },
+        Path_4: { transform: { scale: 10.2, x: 54, y: 110 }, hash: 'CHUBU', boxes: { rightTop: ['TOYAMA','ISHIKAWA','NAGANO','YAMANASHI'], leftBottom: ['FUKUI','GIFU','AICHI','SHIZUOKA'] } },
+        Path_5: { transform: { scale: 13.6, x: 0, y: 140 }, hash: 'KINKI', boxes: { rightTop: ['SHIGA','KYOTO'], leftBottom: ['HYOGO','OSAKA','WAKAYAMA','NARA','MIE'] } },
+        Path_6: { transform: { scale: 9.5, x: -51, y: 165 }, hash: 'CHUGOKU', boxes: { top: ['SHIMANE','HIROSHIMA','TOTTORI','OKAYAMA'], top2: ['YAMAGUCHI'], bottom: ['EHIME','KOCHI','KAGAWA','TOKUSHIMA'] } },
+        Path_7: { transform: { scale: 11.2, x: -105, y: 200 }, hash: 'KYUSHU', boxes: { rightTop: ['FUKUOKA','SAGA','NAGASAKI'], rightBottom: ['OITA','KUMAMOTO','MIYAZAKI','KAGOSHIMA'] } }
+      };
 
-const groupBoxSettings = {};
-Object.keys(REGION_DB).forEach(gid => {
-  groupBoxSettings[gid] = REGION_DB[gid].boxes;
-});
+      const groupSettings = {};
+      const groupBoxSettings = {};
+      const groupToPrefectures = {};
 
-const groupToPrefectures = {};
-Object.keys(groupBoxSettings).forEach(gid => {
-  groupToPrefectures[gid] = Object.values(groupBoxSettings[gid]).flat();
-}); 
+      Object.keys(REGION_DB).forEach(gid=>{
+        groupSettings[gid] = { ...REGION_DB[gid].transform, hash: REGION_DB[gid].hash };
+        groupBoxSettings[gid] = REGION_DB[gid].boxes;
+        groupToPrefectures[gid] = Object.values(REGION_DB[gid].boxes).flat();
+      });
 
       const prefNames = {
         AOMORI:'青森県', IWATE:'岩手県', AKITA:'秋田県',
@@ -129,38 +75,26 @@ Object.keys(groupBoxSettings).forEach(gid => {
         FUKUOKA:'福岡県', SAGA:'佐賀県', NAGASAKI:'長崎県',
         OITA:'大分県', KUMAMOTO:'熊本県', MIYAZAKI:'宮崎県', KAGOSHIMA:'鹿児島県'
       };
-      
-      
-       // ★追加: 県クリック時の表示
-      prefGroup.querySelectorAll('path').forEach(p => {
+
+      // ★県クリック時にテスト表示
+      prefGroup.querySelectorAll('path').forEach(p=>{
         p.style.cursor = 'pointer';
-        p.addEventListener('click', e => {
+        p.addEventListener('click', e=>{
           e.stopPropagation();
           const prefId = p.id;
           const name = prefNames[prefId] || prefId;
           addLog(`クリックした県: ${name}`);
+          addTestDisplay(`クリック: ${name} (${prefId})`);
         });
       });
 
-      
-
-      function gotoPref(prefId) {
-        updateHash(prefId, 2);
-
-        
-        // ★ログ出力
-  addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
-
-  // ★テスト表示エリアに反映
-  const testDiv = document.getElementById('test-display');
-  if (testDiv) {
-    const line = document.createElement('div');
-    line.textContent = `クリック: ${prefNames[prefId]} (${prefId})`;
-    testDiv.appendChild(line);
-
-        
-        
+      function gotoPref(prefId){
+        updateHash(prefId,2);
+        addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
+        addTestDisplay(`クリック: ${prefNames[prefId]} (${prefId})`);
       }
+
+      // --- ここから既存の showRegion
 
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
