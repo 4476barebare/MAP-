@@ -144,7 +144,18 @@ function switchToLeaflet(prefId){
 
         overlay.style.height = rect.height + 'px';
         lfMapDiv.style.height = rect.height + 'px';
+        
+        
+        // ★これ追加（重要）
+if(testMap){
+    testMap.remove();
+    testMap = null;
+    addLog('既存Leaflet破棄');
+}
 
+
+        lfMapDiv.innerHTML = '';
+        
         addLog('高さ確定: ' + rect.height);
 
         // --- Leaflet 初期化（ここが核心） ---
