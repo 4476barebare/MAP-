@@ -390,6 +390,9 @@ Object.keys(groupBoxSettings).forEach(gid => {
         const hash = location.hash.replace(/^#/, '');
 
         if(hash){
+            
+            addLog('hash changed: ' + hash); // ←ここに入れる
+            
           const parts = hash.split('/');
           const regionHash = parts[0];
 
