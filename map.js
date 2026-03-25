@@ -137,18 +137,14 @@ function switchToLeaflet(prefId){
     overlay.style.display = 'block';
 
 // ★ここを丸ごと差し替え
+
 const rect = mapDiv.getBoundingClientRect();
 
-overlay.style.width = rect.width + 'px';
 overlay.style.height = rect.height + 'px';
-
-lfMapDiv.style.width = rect.width + 'px';
 lfMapDiv.style.height = rect.height + 'px';
 
-addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
-    
+addLog('高さ確定: ' + rect.height);    
 
-    addLog('高さ確定: ' + h);
 
     addLog('Leaflet 初期化開始');
 
