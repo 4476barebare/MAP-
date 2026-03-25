@@ -103,11 +103,26 @@ main {
 
 <main>
   <div class="map" style="position:relative;">
-    
+    <!-- 既存 SVG 描画領域 -->
     <div class="japan-map" id="map"></div>
 
+    <!-- map.js で使う overlay -->
     <div id="map-overlay">
       <div id="lf-map"></div>
+    </div>
+
+    <!-- ★新規追加：テスト用表示エリア -->
+    <div id="test-display" style="
+      width: 100%;
+      min-height: 200px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid #191970;
+      margin-top: 10px;
+      text-align: center;
+      color: #fff;
+      line-height: 200px;
+    ">
+      テスト表示エリア
     </div>
 
   </div>
