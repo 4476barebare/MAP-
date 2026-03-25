@@ -123,7 +123,6 @@ let leafletInitialized = false;
 
 
 function switchToLeaflet(prefId){
-    // overlay を安全に取得して表示
     const overlay = document.getElementById('map-overlay');
     if(!overlay){
         addLog('map-overlay が見つかりません');
@@ -132,9 +131,9 @@ function switchToLeaflet(prefId){
     overlay.style.display = 'block';
     addLog('overlay 表示完了');
 
-    const testMapDiv = document.getElementById('test-display');
-    if(!testMapDiv){
-        addLog('test-display が見つかりません');
+    const lfMapDiv = document.getElementById('lf-map');
+    if(!lfMapDiv){
+        addLog('lf-map が見つかりません');
         return;
     }
 
@@ -142,11 +141,11 @@ function switchToLeaflet(prefId){
 
     let testMap;
     try {
-        testMap = L.map('test-display');
+        testMap = L.map('lf-map'); // ← ここを修正
         addLog('L.map 作成完了');
     } catch(e){
         addLog('L.map エラー: ' + e.message);
-        return; // ここで止める
+        return;
     }
 
     try {
@@ -181,7 +180,6 @@ function switchToLeaflet(prefId){
         }
     }
 }
-
 
 
 
