@@ -28,16 +28,6 @@ main {
   padding: 0;
 }
 
-.map {
-  text-align: center;
-   height:100vh; /* ★これ追加 */
-}
-
-.japan-map{
-  width:100%;
-  height:100%;
-}
-
 /* ★追加: ログ表示スタイル */
 #log-panel {
   position: fixed;
@@ -57,21 +47,32 @@ main {
 }
 
 
-#map-overlay{
-  display:none;
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:100;
+.map {
+  position: relative;
+  min-height: 420px; /* 画面に応じて可変に */
+  text-align: center;
 }
 
-#lf-map{
-  width:100%;
-  height:100%;
+.japan-map {
+  width: 100%;
+  height: 100%;
 }
 
+#map-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  background: rgba(0,0,0,0.3); /* optional: overlay 背景 */
+}
+
+#lf-map {
+  width: 100%;
+  height: 100%;
+}
 
 </style>
 </head>
