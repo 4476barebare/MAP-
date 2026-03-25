@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こNAVI</title>
 
-<!-- ヘッダー用 CSS -->
+<!-- CSS -->
 <link rel="stylesheet" href="header.css">
-<!-- Map専用 CSS -->
 <link rel="stylesheet" href="map.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-sA+e2FHPp6zL5I7GxP3N/1M0o9r0fD4vP5b1x9Cw9IY=" crossorigin=""/>
 
 <style>
-/* html・body の全体設定 */
 html, body {
   margin: 0;
   padding: 0;
@@ -22,34 +22,15 @@ html, body {
 }
 
 main {
-    background-color: #191970;
+  background-color: #191970;
   max-width: 100%;
   margin: 0;
   padding: 0;
 }
 
-/* ★追加: ログ表示スタイル */
-#log-panel {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-
-  max-height: 120px;
-  overflow-y: auto;
-
-  background: rgba(0,0,0,0.7);
-  color: #fff;
-  font-size: 12px;
-
-  padding: 5px;
-  z-index: 999;
-}
-
-
 .map {
   position: relative;
-  min-height: 420px; /* 画面に応じて可変に */
+  min-height: 420px;
   text-align: center;
 }
 
@@ -66,7 +47,7 @@ main {
   width: 100%;
   height: 100%;
   z-index: 100;
-  background: rgba(0,0,0,0.3); /* optional: overlay 背景 */
+  background: rgba(0,0,0,0.3);
 }
 
 #lf-map {
@@ -74,8 +55,33 @@ main {
   height: 100%;
 }
 
+#test-display {
+  width: 100%;
+  min-height: 200px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #191970;
+  margin-top: 10px;
+  text-align: center;
+  color: #fff;
+  line-height: 200px;
+}
+
+#log-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  max-height: 120px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 12px;
+  padding: 5px;
+  z-index: 999;
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -97,40 +103,26 @@ main {
       <a href="#">その他</a>
     </nav>
   </div>
-
 </header>
 
-
 <main>
-  <div class="map" style="position:relative;">
+  <div class="map">
     <!-- 既存 SVG 描画領域 -->
     <div class="japan-map" id="map"></div>
 
-    <!-- map.js で使う overlay -->
+    <!-- map.js 用 overlay -->
     <div id="map-overlay">
       <div id="lf-map"></div>
     </div>
 
-    <!-- ★新規追加：テスト用表示エリア -->
-    <div id="test-display" style="
-      width: 100%;
-      min-height: 200px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid #191970;
-      margin-top: 10px;
-      text-align: center;
-      color: #fff;
-      line-height: 200px;
-    ">
+    <!-- テスト用表示エリア -->
+    <div id="test-display">
       テスト表示エリア
     </div>
-
   </div>
 </main>
 
-
-
-<!-- ★追加: ログ表示エリア -->
+<!-- ログ表示 -->
 <div id="log-panel"></div>
 
 <div class="ad">広告スペース</div>
@@ -147,12 +139,6 @@ main {
   <button data-hash="TOHOKU">#TOHOKU</button>
 </div>
 
-
-
-
-
-
-
 <footer>© 釣り行こNAVI</footer>
 
 <!-- ニュースオーバーレイ -->
@@ -165,14 +151,8 @@ main {
 
 <!-- JS -->
 <script src="header.js"></script>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-sA+e2FHPp6zL5I7GxP3N/1M0o9r0fD4vP5b1x9Cw9IY="
-  crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-o9N1j4G+VvK4D7gX3FzFzWt5hXlq+ZL8JHvZj9ytgVk="
-  crossorigin=""></script>
-
+  integrity="sha256-o9N1j4G+VvK4D7gX3FzFzWt5hXlq+ZL8JHvZj9ytgVk=" crossorigin=""></script>
 <script src="map.js"></script>
 
 </body>
