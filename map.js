@@ -124,10 +124,13 @@ let leafletInitialized = false;
 
 function switchToLeaflet(prefId){
     const overlay = document.getElementById('map-overlay');
+    const mapDiv = document.getElementById('map');
     if(!overlay){
         addLog('map-overlay が見つかりません');
         return;
     }
+    
+    overlay.style.height = mapDiv.offsetHeight + 'px';
     overlay.style.display = 'block';
     addLog('overlay 表示完了');
 
@@ -136,6 +139,8 @@ function switchToLeaflet(prefId){
         addLog('lf-map が見つかりません');
         return;
     }
+    
+    lfMapDiv.style.height = overlay.offsetHeight + 'px';
 
     addLog('Leaflet 初期化開始');
 
