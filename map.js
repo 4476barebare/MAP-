@@ -116,28 +116,11 @@ Object.keys(groupBoxSettings).forEach(gid => {
         OITA:'大分県', KUMAMOTO:'熊本県', MIYAZAKI:'宮崎県', KAGOSHIMA:'鹿児島県'
       };
 
+      function gotoPref(prefId) {
+        updateHash(prefId, 2);
 
-
-function gotoPref(prefId) {
-  updateHash(prefId, 2);
-
-  // ★ログ出力
-  addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
-
-  // ★overlay表示
-  const overlay = document.getElementById('map-overlay');
-  if(overlay) overlay.style.display = 'block';
-
-  // ★Leaflet初期化（初回クリックのみ）
-  if(!window.lfMap){
-    window.lfMap = L.map('lf-map').setView([36.2048, 138.2529], 5); // 日本中心
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(window.lfMap);
-  }
-}
-
-
+        // ★変更: ログ出力
+        addLog(`pref clicked: ${prefId} (${prefNames[prefId]})`);
       }
 
       prefGroup.querySelectorAll('path').forEach(p => {
@@ -441,8 +424,6 @@ function gotoPref(prefId) {
       }
 
       window.addEventListener('hashchange', handleHash);
-      
 
     });
-    
 });
