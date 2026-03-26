@@ -63,10 +63,19 @@ main {
   z-index: 999;
 }
 
-#map,
-#map-overlay,
 #lf-map {
-    overflow: hidden;   /* ← 重要 */
+  position: absolute;
+  width: auto;
+  height: auto;
+  z-index: 0;
+}
+
+#map-container {
+  position: relative;
+  width: auto;
+  height: auto;
+  overflow: hidden;
+  background: #fff;
 }
 
 
