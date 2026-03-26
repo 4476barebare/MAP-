@@ -221,7 +221,7 @@ function initLeafletBackground() {
         addLog('pref clicked: ' + prefId);
 
         // prefId をそのまま渡す
-    switchToLeafletBackground(prefId);
+        prepareLeafletBackground(prefId);
 
       }
 
