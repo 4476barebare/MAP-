@@ -119,29 +119,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
             // ★Leaflet 初期化関数 (外に置く)
       
-      
-      function logMapRect(){
 
-    const mapDiv = document.getElementById('map');
-
-    if(!mapDiv){
-        addLog('map が見つからない');
-        return;
-    }
-
-    const rect = mapDiv.getBoundingClientRect();
-
-    addLog(
-        'map rect → ' +
-        'W:' + rect.width +
-        ' H:' + rect.height +
-        ' T:' + rect.top +
-        ' L:' + rect.left
-    );
-}
-      
-      
-let testMap = null; // ★グローバル（関数の外）
+      let leafletMap = null;
 
 function switchToLeaflet(prefId){
 
@@ -150,68 +129,91 @@ function switchToLeaflet(prefId){
     const lfMapDiv = document.getElementById('lf-map');
 
     if(!overlay || !mapDiv || !lfMapDiv){
-        addLog('必要要素が見つかりません');
+        addLog('必要な要素が見つからない');
         return;
     }
 
+    // --- 表示 ---
     overlay.style.display = 'block';
-    addLog('overlay 表示完了');
 
-    requestAnimationFrame(() => {
-        
-        
-        logMapRect(); // ←ここ
-        
+    // --- サイズ同期（SVGと同じ箱） ---
+    const rect = mapDiv.getBoundingClientRect();
+    overlay.style.width  = rect.width  + 'px';
+    overlay.style.height = rect.height + 'px';
+    lfMapDiv.style.width  = rect.width  + 'px';
+    lfMapDiv.style.height = rect.height + 'px';
 
-        const rect = mapDiv.getBoundingClientRect();
+    addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
 
-        overlay.style.height = rect.height + 'px';
-        lfMapDiv.style.height = rect.height + 'px';
+    // --- 再初期化対策 ---
+    if(leafletMap){
+        leafletMap.remove();
+        leafletMap = null;
+        addLog('既存Leaflet破棄');
+    }
 
-        // ★既存マップ破棄（ここが効く）
-        if(testMap){
-            testMap.remove();
-            testMap = null;
-            addLog('既存Leaflet破棄');
-        }
+    addLog('Leaflet 初期化開始');
 
-        lfMapDiv.innerHTML = '';
+    try {
+        leafletMap = L.map('lf-map');
+        addLog('L.map 作成完了');
+    } catch(e){
+        addLog('L.map エラー: ' + e.message);
+        return;
+    }
 
-        addLog('高さ確定: ' + rect.height);
-
-        // ★ここでは再宣言しない
-        try {
-            testMap = L.map('lf-map');
-            addLog('L.map 作成完了');
-        } catch(e){
-            addLog('L.map エラー: ' + e.message);
-            return;
-        }
-
-        testMap.setView([35.681236, 139.767125], 5);
-
+    try {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
             attribution:'&copy; OpenStreetMap contributors'
-        }).addTo(testMap);
+        }).addTo(leafletMap);
 
-        addLog('Leaflet 初期化完了');
+        addLog('tileLayer addTo 完了');
+    } catch(e){
+        addLog('tileLayer エラー: ' + e.message);
+    }
 
-        if(prefId){
-            const prefCenters = {
-                CHIBA: [35.6073, 140.1063],
-                TOKYO: [35.6895, 139.6917],
-            };
+    // --- SVGと表示範囲を合わせる ---
+    const prefBounds = {
+        CHIBA: [
+            [34.9, 139.7],
+            [36.1, 140.9]
+        ],
+        TOKYO: [
+            [35.4, 139.3],
+            [35.9, 140.0]
+        ]
+    };
 
-            if(prefCenters[prefId]){
-                testMap.setView(prefCenters[prefId], 10);
-                L.marker(prefCenters[prefId]).addTo(testMap);
-            }
+    if(prefId){
+        addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
+
+        if(prefBounds[prefId]){
+            leafletMap.fitBounds(prefBounds[prefId]);
+            addLog('fitBounds 適用: ' + prefId);
+
+            // 中心マーカー（確認用）
+            const centerLat = (prefBounds[prefId][0][0] + prefBounds[prefId][1][0]) / 2;
+            const centerLng = (prefBounds[prefId][0][1] + prefBounds[prefId][1][1]) / 2;
+
+            L.marker([centerLat, centerLng]).addTo(leafletMap);
+
+        } else {
+            addLog('bounds未登録: ' + prefId);
         }
+    }
 
+    // --- サイズ確定後に再描画 ---
+    requestAnimationFrame(() => {
+        leafletMap.invalidateSize();
+        addLog('invalidateSize() 完了');
     });
+
+    addLog('Leaflet 初期化完了');
 }
-
-
+      
+      
+      
+      
       // ★Pref 選択時
       function gotoPref(prefId){
         updateHash(prefId,2);
