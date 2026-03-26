@@ -158,12 +158,15 @@ function prepareLeafletBackground(prefId) {
     addLog('背景用 div 作成完了');
 
     // 確定用に透明 SVG を追加
-    const svgCheck = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svgCheck.setAttribute("width", "100%");
-    svgCheck.setAttribute("height", "100%");
-    svgCheck.style.opacity = "0";
-    svgCheck.style.pointerEvents = "none";
-    bgDiv.appendChild(svgCheck);
+    const testSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+testSvg.setAttribute("width", "100%");
+testSvg.setAttribute("height", "100%");
+testSvg.style.position = "absolute";
+testSvg.style.top = "0";
+testSvg.style.left = "0";
+testSvg.style.zIndex = "0"; // 背景
+testSvg.innerHTML = `<rect x="0" y="0" width="100%" height="100%" fill="red" />`; // ← ここを赤に
+mapDiv.appendChild(testSvg);
 
     // 後半関数呼び出し
     startLeafletBackground(prefId);
