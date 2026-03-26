@@ -120,7 +120,7 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
 let leafletBackgroundMap = null;
 
-// --- 前半：#map 自体に高さ固定・内部要素完全削除 ---
+// --- 前半：SVG や div は作らず #map に高さを付与 ---
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     if (!mapDiv) {
@@ -130,37 +130,35 @@ function prepareLeafletBackground(prefId) {
 
     addLog('prefId 受け取り: ' + prefId);
 
-    // 高さ固定
-    mapDiv.style.height = '420px';
-    mapDiv.style.position = 'relative'; // 必須：absolute 要素の基準
+    // #map 内の全要素を非表示（完全削除する場合は removeChild に置き換え可）
+    const svgEls = mapDiv.querySelectorAll('*');
+    svgEls.forEach(el => {
+        el.style.visibility = 'hidden';
+    });
 
-    // #map 内の全要素を完全削除（SVGやBOXなど）
-    const childEls = Array.from(mapDiv.children);
-    childEls.forEach(el => el.remove());
-
-    // 既存 Leaflet マップも削除
+    // 既存 Leaflet があれば削除
     if (leafletBackgroundMap) {
         leafletBackgroundMap.remove();
         leafletBackgroundMap = null;
         addLog('既存背景 Leaflet 削除');
     }
 
-    addLog('#map 高さ固定・内部完全削除完了');
+    // #map のサイズを固定
+    mapDiv.style.width = '100%';
+    mapDiv.style.height = '420px';
+    mapDiv.style.position = 'relative';
+    addLog('#map 高さを固定 420px に設定');
 
     // 後半呼び出し
     startLeafletBackground(prefId);
 }
 
-// --- 後半：Leaflet 初期化（操作オフ・中心固定・OSMバナー非表示） ---
+// --- 後半：Leaflet 初期化（操作オフ・中心固定・OSMバナー非表示・fitBounds使用） ---
 function startLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
-    if (!mapDiv) {
-        addLog('map が存在しないので Leaflet を開始できない');
-        return;
-    }
 
     // Leaflet 初期化（全操作オフ）
-    leafletBackgroundMap = L.map('map', {
+    leafletBackgroundMap = L.map(mapDiv, {
         zoomControl: false,
         dragging: false,
         scrollWheelZoom: false,
@@ -169,39 +167,38 @@ function startLeafletBackground(prefId) {
         boxZoom: false,
         keyboard: false,
         tap: false,
-        attributionControl: false // OSM バナー非表示
+        attributionControl: false
     });
 
     // OSM タイル追加
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletBackgroundMap);
 
-    // 千葉県中心に固定
-    let centerLatLng = [35.5, 140.25];
-    const zoomLevel = 9;
-
+    // 千葉県 bounds
     const prefBounds = {
         CHIBA: [
-            [35.15, 140.10],
-            [35.95, 140.40]
+            [35.15, 140.10], // 南西
+            [35.95, 140.40]  // 北東
         ]
     };
 
     if (prefId && prefBounds[prefId]) {
-        centerLatLng = [
-            (prefBounds[prefId][0][0] + prefBounds[prefId][1][0]) / 2,
-            (prefBounds[prefId][0][1] + prefBounds[prefId][1][1]) / 2
-        ];
+        // fitBounds で全域表示
+        leafletBackgroundMap.fitBounds(prefBounds[prefId], { padding: [20, 20], animate: false });
+        addLog('fitBounds 適用: ' + prefId);
+    } else {
+        // デフォルト位置
+        leafletBackgroundMap.setView([35.5, 140.25], 9);
+        addLog('デフォルト中心に設定');
     }
 
-    leafletBackgroundMap.setView(centerLatLng, zoomLevel);
-    addLog('中心位置固定: ' + centerLatLng.join(', ') + ', ズーム: ' + zoomLevel);
-
+    // サイズ再計算
     requestAnimationFrame(() => {
         leafletBackgroundMap.invalidateSize();
         addLog('invalidateSize() 完了');
-        addLog('Leaflet 背景初期化完了（#map 高さ固定・操作オフ・OSMバナー非表示）');
+        addLog('Leaflet 背景初期化完了（fitBounds で千葉県全域表示）');
     });
 }
+
 
 
 
