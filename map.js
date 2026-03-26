@@ -118,34 +118,35 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       
 
+
 let leafletBackgroundMap = null;
 let pendingPrefId = null;
 
-// --- 前半: SVG 無効化 & 背景 div 作成 ---
+// --- 前半: SVG 非表示 & 背景 div 作成 ---
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
-    const svgEls = mapDiv.querySelectorAll('*'); // #map 内の全要素
-    const existingBg = document.getElementById('leaflet-bg');
-
     if (!mapDiv) {
-        console.log('map 要素が見つからない');
+        addLog('map 要素が見つからない（前半）');
         return;
     }
 
-    console.log('prefId 受け取り（前半）: ' + prefId);
-    pendingPrefId = prefId; // 後半で使用
+    const svgEls = mapDiv.querySelectorAll('*');
+    const existingBg = document.getElementById('leaflet-bg');
+
+    pendingPrefId = prefId;
+    addLog('prefId 受け取り（前半）: ' + prefId);
 
     // SVG 等を非表示
     svgEls.forEach(el => {
-        el.style.visibility = 'hidden'; // 安定動作用
-        // el.style.display = 'none'; // 無効化用（コメントアウト）
+        el.style.visibility = 'hidden';
+        // el.style.display = 'none'; // 無効化用
     });
 
     // 既存背景削除
     if (leafletBackgroundMap) {
         leafletBackgroundMap.remove();
         leafletBackgroundMap = null;
-        console.log('既存背景 Leaflet 削除');
+        addLog('既存背景 Leaflet 削除');
     }
     if (existingBg) {
         existingBg.remove();
@@ -162,22 +163,19 @@ function prepareLeafletBackground(prefId) {
     bgDiv.style.zIndex = '0';
     mapDiv.appendChild(bgDiv);
 
-    console.log('前半完了: 背景 div 作成 & SVG 非表示');
+    addLog('前半完了: 背景 div 作成 & SVG 非表示');
 }
 
 // --- 後半: Leaflet 初期化 ---
 function initLeafletBackground() {
-    const prefBounds = {
-        CHIBA: [
-            [35.15, 140.10],
-            [35.95, 140.40]
-        ]
-    };
-
-    if (!document.getElementById('leaflet-bg')) {
-        console.log('背景 div が見つからない');
+    const bgDiv = document.getElementById('leaflet-bg');
+    if (!bgDiv) {
+        addLog('背景 div が見つからない（後半）');
         return;
     }
+
+    const mapDiv = document.getElementById('map');
+    const centerLatLng = [35.5, 140.25]; // 千葉県中心
 
     leafletBackgroundMap = L.map('leaflet-bg', {
         zoomControl: false,
@@ -191,23 +189,32 @@ function initLeafletBackground() {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(leafletBackgroundMap);
 
-    // prefId があれば fitBounds、それ以外はデフォルト中心
+    // prefId に応じて表示範囲調整
+    const prefBounds = {
+        CHIBA: [
+            [35.15, 140.10],
+            [35.95, 140.40]
+        ]
+    };
+
     if (pendingPrefId && prefBounds[pendingPrefId]) {
-        leafletBackgroundMap.fitBounds(prefBounds[pendingPrefId], { padding: [0,0], animate:false });
-        console.log('fitBounds 適用（後半）: ' + pendingPrefId);
+        leafletBackgroundMap.fitBounds(prefBounds[pendingPrefId], {
+            padding: [0, 0],
+            animate: false
+        });
+        addLog('fitBounds 適用（後半）: ' + pendingPrefId);
     } else {
-        leafletBackgroundMap.setView([35.5, 140.25], 10);
-        console.log('デフォルト中心に設定（後半）');
+        // デフォルト中心位置
+        leafletBackgroundMap.setView(centerLatLng, 10);
+        addLog('デフォルト中心に設定（後半）');
     }
 
     // サイズ確定後再描画
     requestAnimationFrame(() => {
         leafletBackgroundMap.invalidateSize();
-        console.log('invalidateSize() 完了（後半）');
+        addLog('invalidateSize() 完了（後半）');
     });
 }
-
-
 
 
 
