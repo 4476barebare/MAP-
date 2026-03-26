@@ -205,6 +205,7 @@ function switchToLeaflet(prefId){
     }
 
 
+
 requestAnimationFrame(() => {
 
     const rect = mapDiv.getBoundingClientRect();
@@ -215,15 +216,13 @@ requestAnimationFrame(() => {
     lfMapDiv.style.width  = rect.width  + 'px';
     lfMapDiv.style.height = rect.height + 'px';
 
-    addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
-
     // 既存破棄
     if(leafletMap){
         leafletMap.remove();
         leafletMap = null;
     }
 
-    // ★ この時点で初期化
+    // 初期化
     leafletMap = L.map('lf-map', {
         zoomControl: false,
         dragging: false,
@@ -232,14 +231,10 @@ requestAnimationFrame(() => {
         touchZoom: false
     });
 
-    // タイル
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
         .addTo(leafletMap);
 
-    // ★ ここで1回だけ
-    leafletMap.invalidateSize();
-
-    // 表示
+    // ★ 先にview確定
     if(prefId && prefBounds[prefId]){
         const b = prefBounds[prefId];
         const centerLat = (b[0][0] + b[1][0]) / 2;
@@ -248,8 +243,10 @@ requestAnimationFrame(() => {
         leafletMap.setView([centerLat, centerLng], 10);
     }
 
-});
+    // ★ 最後に1回だけ
+    leafletMap.invalidateSize();
 
+});
 
     addLog('Leaflet 初期化完了');
 }
