@@ -15,16 +15,11 @@
 /* Map全体 */
 #map {
   position: relative;
-  width: 512px;
-  height: 420px;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 420px;
   overflow: hidden;
   z-index: 50;
 }
-
-
-
-
 
 /* ダミーBOXラッパー */
 #map > div {
@@ -36,7 +31,7 @@
 
 /* SVG設定 */
 #map svg {
-  width: 512px;
+  width: 100%;
   height: auto;
   display: block;
   position: relative;
@@ -74,30 +69,31 @@
 }
 
 
+
 /* =======================
    Leaflet 用スタイル追加
    ======================= */
 
 /* --- Leaflet 背景 (#lf-map) --- */
 #lf-map {
-  width: 512px;
-  height: 512px;
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
-  overflow: hidden; /* 背景タイルはみ出し非表示 */
+  transform: translateX(-50%);
+
+  width: auto;
+  height: auto;
+
   z-index: 0;
 }
 
 /* --- 表示枠 (#map-container) --- */
 #map-container {
-  width: 100%;       /* 画面幅いっぱい */
-  height: 512px;     /* 高さ固定 */
-  overflow: hidden;  /* はみ出し部分非表示 */
-  background: white; /* 塗り白 */
-  position: relative;
-  z-index: 5;
+  position: relative;   /* ← これ重要 */
+  width: 100%;
+  height: 512px;
+  overflow: hidden;
+  background: #fff;     /* ← 白塗り */
 }
 
 /* --- 上に重ねる透明
