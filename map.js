@@ -175,8 +175,8 @@ function switchToLeaflet(prefId){
     // --- SVGと表示範囲を合わせる ---
     const prefBounds = {
         CHIBA: [
-            [34.9, 139.7],
-            [36.1, 140.9]
+        [35.2, 139.9],
+        [35.8, 140.5]
         ],
         TOKYO: [
             [35.4, 139.3],
@@ -188,7 +188,8 @@ function switchToLeaflet(prefId){
         addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
 
         if(prefBounds[prefId]){
-            leafletMap.fitBounds(prefBounds[prefId]);
+            
+            
             addLog('fitBounds 適用: ' + prefId);
 
             // 中心マーカー（確認用）
@@ -204,9 +205,19 @@ function switchToLeaflet(prefId){
 
     // --- サイズ確定後に再描画 ---
     requestAnimationFrame(() => {
-        leafletMap.invalidateSize();
-        addLog('invalidateSize() 完了');
-    });
+
+    leafletMap.invalidateSize();
+    addLog('invalidateSize() 完了');
+
+    if(prefId && prefBounds[prefId]){
+        leafletMap.fitBounds(prefBounds[prefId], {
+            padding: [0, 0],
+            maxZoom: 10
+        });
+        addLog('fitBounds 再適用: ' + prefId);
+    }
+
+});
 
     addLog('Leaflet 初期化完了');
 }
