@@ -119,6 +119,28 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
             // ★Leaflet 初期化関数 (外に置く)
       
+      
+      function logMapRect(){
+
+    const mapDiv = document.getElementById('map');
+
+    if(!mapDiv){
+        addLog('map が見つからない');
+        return;
+    }
+
+    const rect = mapDiv.getBoundingClientRect();
+
+    addLog(
+        'map rect → ' +
+        'W:' + rect.width +
+        ' H:' + rect.height +
+        ' T:' + rect.top +
+        ' L:' + rect.left
+    );
+}
+      
+      
 let testMap = null; // ★グローバル（関数の外）
 
 function switchToLeaflet(prefId){
@@ -136,6 +158,10 @@ function switchToLeaflet(prefId){
     addLog('overlay 表示完了');
 
     requestAnimationFrame(() => {
+        
+        
+        logMapRect(); // ←ここ
+        
 
         const rect = mapDiv.getBoundingClientRect();
 
