@@ -120,24 +120,32 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
 let leafletBackgroundMap = null;
 
-// --- 前半: #map を空にして背景 div を作る ---
+// --- 前半：SVG を透明化して背景用 div を作成 ---
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
-    const svgEls = mapDiv.querySelectorAll('*'); // #map 内の全要素
-    if (!mapDiv) return;
+    if (!mapDiv) {
+        addLog('map 要素が見つからない');
+        return;
+    }
 
     addLog('prefId 受け取り: ' + prefId);
 
-    // 全要素非表示
+    // #map 内の全要素を非表示
+    const svgEls = mapDiv.querySelectorAll('*');
     svgEls.forEach(el => {
         el.style.visibility = 'hidden'; // display:none より安定
     });
 
-    // 既存 div があれば削除
+    // 既存背景 div / Leaflet 削除
     const existingBg = document.getElementById('leaflet-bg');
+    if (leafletBackgroundMap) {
+        leafletBackgroundMap.remove();
+        leafletBackgroundMap = null;
+        addLog('既存背景 Leaflet 削除');
+    }
     if (existingBg) existingBg.remove();
 
-    // 背景 div 作成
+    // 背景用 div 作成
     const bgDiv = document.createElement('div');
     bgDiv.id = 'leaflet-bg';
     bgDiv.style.position = 'absolute';
@@ -147,47 +155,40 @@ function prepareLeafletBackground(prefId) {
     bgDiv.style.height = '100%';
     bgDiv.style.zIndex = '0'; // 背景
     mapDiv.appendChild(bgDiv);
-
     addLog('背景用 div 作成完了');
 
-    // --- 後半呼び出し待機 ---
-    const checkInterval = setInterval(() => {
-        const div = document.getElementById('leaflet-bg');
-        if (div) {
-            clearInterval(checkInterval);
-            initLeafletBackground(prefId);
-        }
-    }, 50);
+    // 確定用に透明 SVG を追加
+    const svgCheck = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svgCheck.setAttribute("width", "100%");
+    svgCheck.setAttribute("height", "100%");
+    svgCheck.style.opacity = "0";
+    svgCheck.style.pointerEvents = "none";
+    bgDiv.appendChild(svgCheck);
+
+    // 後半関数呼び出し
+    startLeafletBackground(prefId);
 }
 
-// --- 後半: Leaflet 初期化 ---
-function initLeafletBackground(prefId) {
+// --- 後半：Leaflet 初期化 ---
+function startLeafletBackground(prefId) {
     const bgDiv = document.getElementById('leaflet-bg');
     if (!bgDiv) {
-        addLog('背景 div が存在しないため初期化中止');
+        addLog('背景 div が存在しないので Leaflet を開始できない');
         return;
     }
 
-    // 既存 Leaflet があれば破棄
-    if (leafletBackgroundMap) {
-        leafletBackgroundMap.remove();
-        leafletBackgroundMap = null;
-        addLog('既存 Leaflet 削除');
-    }
-
-    // Leaflet 初期化
     leafletBackgroundMap = L.map('leaflet-bg', {
         zoomControl: false,
         dragging: true,
         scrollWheelZoom: true,
         doubleClickZoom: true,
-        touchZoom: true,
-        attributionControl: false // 右下バナー非表示
+        touchZoom: true
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletBackgroundMap);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(leafletBackgroundMap);
 
-    // 千葉県 bounds
     const prefBounds = {
         CHIBA: [
             [35.15, 140.10],
@@ -196,7 +197,7 @@ function initLeafletBackground(prefId) {
     };
 
     if (prefId && prefBounds[prefId]) {
-        leafletBackgroundMap.fitBounds(prefBounds[prefId], { padding: [0,0], animate: false });
+        leafletBackgroundMap.fitBounds(prefBounds[prefId], { padding: [0,0], animate:false });
         addLog('fitBounds 適用: ' + prefId);
     } else {
         leafletBackgroundMap.setView([35.5, 140.25], 10);
@@ -207,12 +208,9 @@ function initLeafletBackground(prefId) {
     requestAnimationFrame(() => {
         leafletBackgroundMap.invalidateSize();
         addLog('invalidateSize() 完了');
+        addLog('Leaflet 背景初期化完了');
     });
-
-    addLog('Leaflet 背景初期化完了');
 }
-
-
 
       // ★Pref 選択時
       function gotoPref(prefId){
