@@ -134,7 +134,7 @@ function switchToLeafletBackground(prefId) {
     children.forEach(el => {
         // el.style.display = 'none';      // 完全非表示
         // el.style.visibility = 'hidden';  // 透明化
-        // el.style.opacity = 0;            // 透過
+        el.style.opacity = 0;            // 透過
     });
 
     // --- 背景用 Leaflet div 作成 ---
