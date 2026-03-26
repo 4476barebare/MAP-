@@ -37,6 +37,18 @@ main {
   height: 100%;
 }
 
+#map-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  background: rgba(0,0,0,0.3);
+}
+
+
 #log-panel {
   position: fixed;
   bottom: 0;
@@ -55,17 +67,6 @@ main {
 #map-overlay,
 #lf-map {
     overflow: hidden;   /* ← 重要 */
-}
-
-#map-overlay {
-    position: absolute; /* すでにある場合は ok */
-    top: 0;             /* 親からの位置 */
-    left: 0;
-    width: 100vw;       /* 表示したい領域 */
-    height: 100vh;      /* 表示したい領域 */
-    overflow: hidden;   /* スクロール禁止 */
-    z-index: 100;
-    pointer-events: none;
 }
 
 
