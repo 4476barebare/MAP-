@@ -149,22 +149,16 @@ function prepareLeafletBackground(prefId) {
 }
 
 
-// --- 後半：Leaflet 初期化（操作オフ・中心固定・OSMリンク非表示） ---
+// --- 後半：Leaflet 初期化（#map に直接描画・操作オフ・中心固定） ---
 function startLeafletBackground(prefId) {
-    const bgDiv = document.getElementById('leaflet-bg');
-    if (!bgDiv) {
-        addLog('背景 div が存在しないので Leaflet を開始できない');
+    const mapDiv = document.getElementById('map');
+    if (!mapDiv) {
+        addLog('map 要素が存在しないので Leaflet を開始できない');
         return;
     }
 
-    // #map のサイズに合わせる
-    const mapDiv = document.getElementById('map');
-    const rect = mapDiv.getBoundingClientRect();
-    bgDiv.style.width = rect.width + 'px';
-    bgDiv.style.height = rect.height + 'px';
-
     // Leaflet 初期化（全操作オフ・OSMバナー非表示）
-    leafletBackgroundMap = L.map('leaflet-bg', {
+    leafletBackgroundMap = L.map('map', {
         zoomControl: false,
         dragging: false,
         scrollWheelZoom: false,
@@ -173,27 +167,22 @@ function startLeafletBackground(prefId) {
         boxZoom: false,
         keyboard: false,
         tap: false,
-        attributionControl: false,
-        maxBounds: [[35.15, 140.10],[35.95, 140.40]  // 北東
-        ],
-        maxBoundsViscosity: 0.5
+        attributionControl: false
     });
 
     // OSM タイル追加
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: ''
-    }).addTo(leafletBackgroundMap);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletBackgroundMap);
 
     // 千葉県中心に固定
+    let centerLatLng = [35.5, 140.25];
+    const zoomLevel = 10;
+
     const prefBounds = {
         CHIBA: [
             [35.15, 140.10],
             [35.95, 140.40]
         ]
     };
-
-    let centerLatLng = [35.5, 140.25];
-    const zoomLevel = 10; // ← ズーム1広げる
 
     if (prefId && prefBounds[prefId]) {
         centerLatLng = [
@@ -205,16 +194,12 @@ function startLeafletBackground(prefId) {
     leafletBackgroundMap.setView(centerLatLng, zoomLevel);
     addLog('中心位置固定: ' + centerLatLng.join(', ') + ', ズーム: ' + zoomLevel);
 
-    // サイズ確定
     requestAnimationFrame(() => {
         leafletBackgroundMap.invalidateSize();
         addLog('invalidateSize() 完了');
-        addLog('Leaflet 背景初期化完了（SVG領域サイズ・中心固定・OSMバナー非表示）');
+        addLog('Leaflet 背景初期化完了（#map に直接描画・中心固定）');
     });
 }
-
-
-
 
 
 
