@@ -118,34 +118,40 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       
 
-
-
-
 let leafletBackgroundMap = null;
+let pendingPrefId = null;
 
-// --- 前半: SVG 非表示 + 背景 div 作成 ---
-function prepareLeafletBackground(prefId, callback) {
+// --- 前半: SVG 無効化 & 背景 div 作成 ---
+function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
+    const svgEls = mapDiv.querySelectorAll('*'); // #map 内の全要素
+    const existingBg = document.getElementById('leaflet-bg');
+
     if (!mapDiv) {
         console.log('map 要素が見つからない');
         return;
     }
 
-    console.log('prefId 受け取り(前半): ' + prefId);
+    console.log('prefId 受け取り（前半）: ' + prefId);
+    pendingPrefId = prefId; // 後半で使用
 
-    // #map 内の全要素を非表示
-    const svgEls = mapDiv.querySelectorAll('*');
+    // SVG 等を非表示
     svgEls.forEach(el => {
-        // 非表示は visibility で安定
-        el.style.visibility = 'hidden';
-        // el.style.opacity = 0; // 透明化だけにしたい場合はこちら
+        el.style.visibility = 'hidden'; // 安定動作用
+        // el.style.display = 'none'; // 無効化用（コメントアウト）
     });
 
-    // 既存背景 div 削除
-    const existingBg = document.getElementById('leaflet-bg');
-    if (existingBg) existingBg.remove();
+    // 既存背景削除
+    if (leafletBackgroundMap) {
+        leafletBackgroundMap.remove();
+        leafletBackgroundMap = null;
+        console.log('既存背景 Leaflet 削除');
+    }
+    if (existingBg) {
+        existingBg.remove();
+    }
 
-    // 背景用 div 作成
+    // 背景 div 作成
     const bgDiv = document.createElement('div');
     bgDiv.id = 'leaflet-bg';
     bgDiv.style.position = 'absolute';
@@ -157,31 +163,10 @@ function prepareLeafletBackground(prefId, callback) {
     mapDiv.appendChild(bgDiv);
 
     console.log('前半完了: 背景 div 作成 & SVG 非表示');
-
-    // 前半完了後、後半を呼ぶ
-    if (callback && typeof callback === 'function') {
-        callback(prefId);
-    }
 }
 
 // --- 後半: Leaflet 初期化 ---
-function initLeafletBackground(prefId) {
-    const bgDiv = document.getElementById('leaflet-bg');
-    if (!bgDiv) return;
-
-    leafletBackgroundMap = L.map('leaflet-bg', {
-        zoomControl: false,
-        attributionControl: false,
-        dragging: true,
-        scrollWheelZoom: true,
-        doubleClickZoom: true,
-        touchZoom: true
-    });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-        .addTo(leafletBackgroundMap);
-
-    // 千葉県中心
+function initLeafletBackground() {
     const prefBounds = {
         CHIBA: [
             [35.15, 140.10],
@@ -189,26 +174,44 @@ function initLeafletBackground(prefId) {
         ]
     };
 
-    if (prefId && prefBounds[prefId]) {
-        leafletBackgroundMap.fitBounds(prefBounds[prefId], { padding: [0, 0], animate: false });
-        console.log('fitBounds 適用: ' + prefId);
-    } else {
-        leafletBackgroundMap.setView([35.5, 140.25], 10);
-        console.log('デフォルト中心に設定');
+    if (!document.getElementById('leaflet-bg')) {
+        console.log('背景 div が見つからない');
+        return;
     }
 
-    requestAnimationFrame(() => {
-        leafletBackgroundMap.invalidateSize();
-        console.log('invalidateSize() 完了');
+    leafletBackgroundMap = L.map('leaflet-bg', {
+        zoomControl: false,
+        dragging: true,
+        scrollWheelZoom: true,
+        doubleClickZoom: true,
+        touchZoom: true
     });
 
-    console.log('後半完了: Leaflet 初期化');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(leafletBackgroundMap);
+
+    // prefId があれば fitBounds、それ以外はデフォルト中心
+    if (pendingPrefId && prefBounds[pendingPrefId]) {
+        leafletBackgroundMap.fitBounds(prefBounds[pendingPrefId], { padding: [0,0], animate:false });
+        console.log('fitBounds 適用（後半）: ' + pendingPrefId);
+    } else {
+        leafletBackgroundMap.setView([35.5, 140.25], 10);
+        console.log('デフォルト中心に設定（後半）');
+    }
+
+    // サイズ確定後再描画
+    requestAnimationFrame(() => {
+        leafletBackgroundMap.invalidateSize();
+        console.log('invalidateSize() 完了（後半）');
+    });
 }
 
-// --- まとめて呼ぶ ---
-function switchToLeafletBackground(prefId) {
-    prepareLeafletBackground(prefId, initLeafletBackground);
-}
+
+
+
+
+
 
 
     
