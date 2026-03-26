@@ -118,11 +118,9 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       
 
-
 let leafletBackgroundMap = null;
 
-
-// --- 前半：#map 幅高さ固定＆内部非表示 ---
+// --- 前半：#map 自体に高さ固定・内部要素完全削除 ---
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     if (!mapDiv) {
@@ -132,32 +130,36 @@ function prepareLeafletBackground(prefId) {
 
     addLog('prefId 受け取り: ' + prefId);
 
-    // #map の幅と高さを固定
-    mapDiv.style.width = '100%';
+    // 高さ固定
     mapDiv.style.height = '420px';
-    mapDiv.style.position = 'relative';
+    mapDiv.style.position = 'relative'; // 必須：absolute 要素の基準
 
-    // #map 内の全要素を非表示
-    const mapChildren = mapDiv.querySelectorAll('*');
-    mapChildren.forEach(el => {
-        el.style.display = 'none';
-    });
-    addLog('#map 内の要素を display:none に設定');
+    // #map 内の全要素を完全削除（SVGやBOXなど）
+    const childEls = Array.from(mapDiv.children);
+    childEls.forEach(el => el.remove());
+
+    // 既存 Leaflet マップも削除
+    if (leafletBackgroundMap) {
+        leafletBackgroundMap.remove();
+        leafletBackgroundMap = null;
+        addLog('既存背景 Leaflet 削除');
+    }
+
+    addLog('#map 高さ固定・内部完全削除完了');
 
     // 後半呼び出し
     startLeafletBackground(prefId);
 }
 
-
-// --- 後半：Leaflet 初期化（#map に直接描画・操作オフ・中心固定） ---
+// --- 後半：Leaflet 初期化（操作オフ・中心固定・OSMバナー非表示） ---
 function startLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     if (!mapDiv) {
-        addLog('map 要素が存在しないので Leaflet を開始できない');
+        addLog('map が存在しないので Leaflet を開始できない');
         return;
     }
 
-    // Leaflet 初期化（全操作オフ・OSMバナー非表示）
+    // Leaflet 初期化（全操作オフ）
     leafletBackgroundMap = L.map('map', {
         zoomControl: false,
         dragging: false,
@@ -167,7 +169,7 @@ function startLeafletBackground(prefId) {
         boxZoom: false,
         keyboard: false,
         tap: false,
-        attributionControl: false
+        attributionControl: false // OSM バナー非表示
     });
 
     // OSM タイル追加
@@ -175,7 +177,7 @@ function startLeafletBackground(prefId) {
 
     // 千葉県中心に固定
     let centerLatLng = [35.5, 140.25];
-    const zoomLevel = 10;
+    const zoomLevel = 9;
 
     const prefBounds = {
         CHIBA: [
@@ -197,7 +199,7 @@ function startLeafletBackground(prefId) {
     requestAnimationFrame(() => {
         leafletBackgroundMap.invalidateSize();
         addLog('invalidateSize() 完了');
-        addLog('Leaflet 背景初期化完了（#map に直接描画・中心固定）');
+        addLog('Leaflet 背景初期化完了（#map 高さ固定・操作オフ・OSMバナー非表示）');
     });
 }
 
