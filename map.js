@@ -178,15 +178,27 @@ function switchToLeaflet(prefId){
             ]
         };
 
-        if(prefId && prefBounds[prefId]){
-            const b = prefBounds[prefId];
-            const centerLat = (b[0][0] + b[1][0]) / 2;
-            const centerLng = (b[0][1] + b[1][1]) / 2;
+       
+       if(prefId && prefBounds[prefId]){
+    const b = prefBounds[prefId];
 
-            leafletMap.setView([centerLat, centerLng], 10);
+    leafletMap.fitBounds(b, {
+        padding: [0, 0],
+        animate: false
+    });
 
-            L.marker([centerLat, centerLng]).addTo(leafletMap);
-        }
+    // ★ 強制再配置
+    leafletMap._resetView(
+        leafletMap.getCenter(),
+        leafletMap.getZoom(),
+        true
+    );
+
+    const centerLat = (b[0][0] + b[1][0]) / 2;
+    const centerLng = (b[0][1] + b[1][1]) / 2;
+
+    L.marker([centerLat, centerLng]).addTo(leafletMap);
+}
 
         // 最後に1回だけ
         leafletMap.invalidateSize();
