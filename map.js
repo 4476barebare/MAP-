@@ -118,10 +118,10 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       
 
-
 let leafletBackgroundMap = null;
 
-// --- 前半：#map を透明フレームにして準備 ---
+
+// --- 前半：#map を透明フレームとして準備 ---
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     const lfDiv = document.getElementById('lf-map');
@@ -137,6 +137,15 @@ function prepareLeafletBackground(prefId) {
     // #map 内の全要素を完全削除
     while (mapDiv.firstChild) mapDiv.removeChild(mapDiv.firstChild);
 
+    // #map を透明フレームとして設定
+    mapDiv.style.position = 'absolute';
+    mapDiv.style.top = '0';
+    mapDiv.style.left = '0';
+    mapDiv.style.width = '100%';
+    mapDiv.style.height = '100%'; // 親の map-container に合わせる
+    mapDiv.style.background = 'transparent';
+    mapDiv.style.zIndex = '50';
+
     // Leaflet 背景削除（既存があれば）
     if (leafletBackgroundMap) {
         leafletBackgroundMap.remove();
@@ -146,6 +155,7 @@ function prepareLeafletBackground(prefId) {
 
     startLeafletBackground(prefId);
 }
+
 
 // --- 後半：Leaflet 初期化（操作オフ・中心固定・OSMバナー非表示） ---
 function startLeafletBackground(prefId) {
@@ -198,6 +208,7 @@ function startLeafletBackground(prefId) {
         addLog('Leaflet 背景初期化完了（#lf-map 512×512・#map は透明フレーム）');
     });
 }
+
 
 
       // ★Pref 選択時
