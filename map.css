@@ -96,5 +96,9 @@
 
 /* Leaflet タイルの影響を受けないように透過や背景を明示 */
 .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    
+    
   background: transparent;
 }
