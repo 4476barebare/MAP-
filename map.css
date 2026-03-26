@@ -21,6 +21,10 @@
   z-index: 50;
 }
 
+
+
+
+
 /* ダミーBOXラッパー */
 #map > div {
   z-index: 10;
@@ -73,33 +77,26 @@
    Leaflet 用スタイル追加
    ======================= */
 
-/* Leaflet マップ用 div */
+/* --- Leaflet 背景 (#lf-map) --- */
 #lf-map {
+  width: 512px;
+  height: 512px;
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100; /* SVG の上に表示 */
-  pointer-events: auto; /* マーカー操作を可能に */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden; /* 背景タイルはみ出し非表示 */
+  z-index: 0;
 }
 
-/* Leaflet のポップアップ・ツールチップの調整 */
-.leaflet-popup-content-wrapper {
-  font-size: 12px;
-  line-height: 1.3;
+/* --- 表示枠 (#map-container) --- */
+#map-container {
+  width: 100%;       /* 画面幅いっぱい */
+  height: 512px;     /* 高さ固定 */
+  overflow: hidden;  /* はみ出し部分非表示 */
+  background: white; /* 塗り白 */
+  position: relative;
+  z-index: 5;
 }
 
-.leaflet-tooltip {
-  font-size: 12px;
-}
-
-/* Leaflet タイルの影響を受けないように透過や背景を明示 */
-.leaflet-container {
-    width: 100% !important;
-    height: 100% !important;
-    
-    
-  background: transparent;
-}
-
+/* --- 上に重ねる透明
