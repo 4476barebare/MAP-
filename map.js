@@ -121,6 +121,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
 let leafletMap = null;
 
+
+
 function switchToLeaflet(prefId){
 
     const overlay = document.getElementById('map-overlay');
@@ -132,30 +134,33 @@ function switchToLeaflet(prefId){
         return;
     }
 
-    // 表示（先に出す）
     overlay.style.display = 'block';
 
-    requestAnimationFrame(() => {
+    // ★ サイズ確定を監視
+    const ro = new ResizeObserver(entries => {
 
-        // --- サイズ取得 ---
         const rect = mapDiv.getBoundingClientRect();
 
-        // --- サイズ固定 ---
+        // サイズが0や異常なら無視
+        if(rect.width < 50 || rect.height < 50){
+            return;
+        }
+
+        // 一度だけ実行
+        ro.disconnect();
+
         overlay.style.width  = rect.width  + 'px';
         overlay.style.height = rect.height + 'px';
         lfMapDiv.style.width  = rect.width  + 'px';
         lfMapDiv.style.height = rect.height + 'px';
 
-        addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
+        addLog('サイズ確定（確定版）: ' + rect.width + ' x ' + rect.height);
 
-        // --- 既存破棄 ---
         if(leafletMap){
             leafletMap.remove();
             leafletMap = null;
-            addLog('既存Leaflet破棄');
         }
 
-        // --- 初期化（1回だけ） ---
         leafletMap = L.map('lf-map', {
             zoomControl: false,
             dragging: false,
@@ -164,15 +169,11 @@ function switchToLeaflet(prefId){
             touchZoom: false
         });
 
-        // --- タイル ---
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-            attribution:'&copy; OpenStreetMap contributors'
-        }).addTo(leafletMap);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+            .addTo(leafletMap);
 
-        // --- サイズ確定をLeafletに通知（先に） ---
         leafletMap.invalidateSize();
 
-        // --- 表示範囲 ---
         const prefBounds = {
             CHIBA: [
                 [35.15, 140.10],
@@ -185,30 +186,17 @@ function switchToLeaflet(prefId){
         };
 
         if(prefId && prefBounds[prefId]){
-
             leafletMap.fitBounds(prefBounds[prefId], {
                 padding: [0, 0],
                 animate: false
             });
-
-            addLog('fitBounds 適用: ' + prefId);
-
-            // 中心マーカー（確認用）
-            const b = prefBounds[prefId];
-            const centerLat = (b[0][0] + b[1][0]) / 2;
-            const centerLng = (b[0][1] + b[1][1]) / 2;
-
-            L.marker([centerLat, centerLng]).addTo(leafletMap);
-
-        } else {
-            addLog('bounds未登録: ' + prefId);
         }
 
-        addLog('Leaflet 初期化完了');
+        addLog('Leaflet 完全初期化完了');
     });
+
+    ro.observe(mapDiv);
 }
-
-
 
       // ★Pref 選択時
       function gotoPref(prefId){
