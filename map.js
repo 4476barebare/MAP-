@@ -165,8 +165,7 @@ testSvg.style.position = "absolute";
 testSvg.style.top = "0";
 testSvg.style.left = "0";
 testSvg.style.zIndex = "0"; // 背景
-testSvg.innerHTML = `<rect x="0" y="0" width="100%" height="100%" fill="red" />`; // ← ここを赤に
-mapDiv.appendChild(testSvg);
+testSvg.innerHTML = `<rect x="0" y="0" width="100%" height="100%" fill="rgba(255,0,0,0.3)" />`;
 
     // 後半関数呼び出し
     startLeafletBackground(prefId);
