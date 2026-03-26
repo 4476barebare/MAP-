@@ -175,8 +175,9 @@ function switchToLeaflet(prefId){
     // --- SVGと表示範囲を合わせる ---
     const prefBounds = {
         CHIBA: [
-        [35.2, 139.9],
-        [35.8, 140.5]
+   [35.15, 140.10],
+    [35.95, 140.40]
+
         ],
         TOKYO: [
             [35.4, 139.3],
