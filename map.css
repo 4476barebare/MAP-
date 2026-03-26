@@ -15,8 +15,9 @@
 /* Map全体 */
 #map {
   position: relative;
-  width: 100%;
-  min-height: 420px;
+  width: 512px;
+  height: 420px;
+  margin: 0 auto;
   overflow: hidden;
   z-index: 50;
 }
