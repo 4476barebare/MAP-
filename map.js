@@ -160,14 +160,14 @@ function prepareLeafletBackground(prefId) {
     // 確定用に透明 SVG を追加
     const testSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 testSvg.setAttribute("width", "100%");
-testSvg.setAttribute("height", "600"); // px固定
+testSvg.setAttribute("height", "400"); // px固定
 testSvg.style.position = "absolute";
 testSvg.style.top = "0";
 testSvg.style.left = "0";
 testSvg.style.zIndex = "0"; // 背景
 
 // 半透明赤の矩形を描画
-testSvg.innerHTML = `<rect x="0" y="0" width="100%" height="600" fill="rgba(255,0,0,0.3)" />`;
+testSvg.innerHTML = `<rect x="0" y="0" width="100%" height="400" fill="rgba(255,0,0,0.3)" />`;
 
 mapDiv.appendChild(testSvg);
     // 後半関数呼び出し
