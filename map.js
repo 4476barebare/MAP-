@@ -118,7 +118,7 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       
             // ★Leaflet 初期化関数 (外に置く)
-      
+      let leafletMap = null;
       function switchToLeaflet(prefId){
     const lfMapDiv = document.getElementById('lf-map');
 
