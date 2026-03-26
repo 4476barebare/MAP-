@@ -122,6 +122,7 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       let leafletMap = null;
 
+
 function switchToLeaflet(prefId){
 
     const overlay = document.getElementById('map-overlay');
@@ -133,125 +134,66 @@ function switchToLeaflet(prefId){
         return;
     }
 
-    // --- 表示 ---
     overlay.style.display = 'block';
 
-    // --- サイズ同期（SVGと同じ箱） ---
-    const rect = mapDiv.getBoundingClientRect();
-    overlay.style.width  = rect.width  + 'px';
-    overlay.style.height = rect.height + 'px';
-    lfMapDiv.style.width  = rect.width  + 'px';
-    lfMapDiv.style.height = rect.height + 'px';
+    requestAnimationFrame(() => {
 
-    addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
+        const rect = mapDiv.getBoundingClientRect();
 
-    // --- 再初期化対策 ---
-    if(leafletMap){
-        leafletMap.remove();
-        leafletMap = null;
-        addLog('既存Leaflet破棄');
-    }
+        // サイズ確定
+        overlay.style.width  = rect.width  + 'px';
+        overlay.style.height = rect.height + 'px';
+        lfMapDiv.style.width  = rect.width  + 'px';
+        lfMapDiv.style.height = rect.height + 'px';
 
-    addLog('Leaflet 初期化開始');
+        addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
 
-    try {
-        leafletMap = L.map('lf-map');
-        addLog('L.map 作成完了');
-    } catch(e){
-        addLog('L.map エラー: ' + e.message);
-        return;
-    }
+        // 既存破棄
+        if(leafletMap){
+            leafletMap.remove();
+            leafletMap = null;
+        }
 
-    try {
+        // ★ ここで1回だけ初期化
+        leafletMap = L.map('lf-map', {
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false
+        });
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
             attribution:'&copy; OpenStreetMap contributors'
         }).addTo(leafletMap);
 
-        addLog('tileLayer addTo 完了');
-    } catch(e){
-        addLog('tileLayer エラー: ' + e.message);
-    }
+        const prefBounds = {
+            CHIBA: [
+                [35.15, 140.10],
+                [35.95, 140.40]
+            ],
+            TOKYO: [
+                [35.4, 139.3],
+                [35.9, 140.0]
+            ]
+        };
 
-    // --- SVGと表示範囲を合わせる ---
-    const prefBounds = {
-        CHIBA: [
-   [35.15, 140.10],
-    [35.95, 140.40]
+        if(prefId && prefBounds[prefId]){
+            const b = prefBounds[prefId];
+            const centerLat = (b[0][0] + b[1][0]) / 2;
+            const centerLng = (b[0][1] + b[1][1]) / 2;
 
-        ],
-        TOKYO: [
-            [35.4, 139.3],
-            [35.9, 140.0]
-        ]
-    };
-
-    if(prefId){
-        addLog('Leafletに渡されたprefId: ' + prefId + ' (' + prefNames[prefId] + ')');
-
-        if(prefBounds[prefId]){
-            
-            
-            addLog('fitBounds 適用: ' + prefId);
-
-            // 中心マーカー（確認用）
-            const centerLat = (prefBounds[prefId][0][0] + prefBounds[prefId][1][0]) / 2;
-            const centerLng = (prefBounds[prefId][0][1] + prefBounds[prefId][1][1]) / 2;
+            leafletMap.setView([centerLat, centerLng], 10);
 
             L.marker([centerLat, centerLng]).addTo(leafletMap);
-
-        } else {
-            addLog('bounds未登録: ' + prefId);
         }
-    }
 
+        // 最後に1回だけ
+        leafletMap.invalidateSize();
 
-
-requestAnimationFrame(() => {
-
-    const rect = mapDiv.getBoundingClientRect();
-
-    // サイズ確定
-    overlay.style.width  = rect.width  + 'px';
-    overlay.style.height = rect.height + 'px';
-    lfMapDiv.style.width  = rect.width  + 'px';
-    lfMapDiv.style.height = rect.height + 'px';
-
-    // 既存破棄
-    if(leafletMap){
-        leafletMap.remove();
-        leafletMap = null;
-    }
-
-    // 初期化
-    leafletMap = L.map('lf-map', {
-        zoomControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false
+        addLog('Leaflet 初期化完了');
     });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-        .addTo(leafletMap);
-
-    // ★ 先にview確定
-    if(prefId && prefBounds[prefId]){
-        const b = prefBounds[prefId];
-        const centerLat = (b[0][0] + b[1][0]) / 2;
-        const centerLng = (b[0][1] + b[1][1]) / 2;
-
-        leafletMap.setView([centerLat, centerLng], 10);
-    }
-
-    // ★ 最後に1回だけ
-    leafletMap.invalidateSize();
-
-});
-
-    addLog('Leaflet 初期化完了');
-}
-      
-      
+}   
       
       
       // ★Pref 選択時
