@@ -153,7 +153,7 @@ function prepareLeafletBackground(prefId) {
     bgDiv.style.top = '0';
     bgDiv.style.left = '0';
     bgDiv.style.width = '100%';
-    bgDiv.style.height = '100%';
+    bgDiv.style.height = '420;
     bgDiv.style.zIndex = '0';
     mapDiv.appendChild(bgDiv);
     addLog('背景用 div 作成完了');
