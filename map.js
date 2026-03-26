@@ -198,7 +198,7 @@ function startLeafletBackground(prefId) {
         keyboard: false,
         tap: false,
         attributionControl: false,
-        //maxBounds: [[35.15, 140.10],[35.95, 140.40]  // 北東
+        maxBounds: [[35.15, 140.10],[35.95, 140.40]  // 北東
         ],
         maxBoundsViscosity: 0.5
     });
