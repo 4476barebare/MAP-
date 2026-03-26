@@ -183,13 +183,19 @@ function startLeafletBackground(prefId) {
         return;
     }
 
+    // #map のサイズを取得
+    const mapDiv = document.getElementById('map');
+    const rect = mapDiv.getBoundingClientRect();
+    bgDiv.style.width = rect.width + 'px';
+    bgDiv.style.height = rect.height + 'px';
+
     // Leaflet 初期化（全操作オフ）
     leafletBackgroundMap = L.map('leaflet-bg', {
         zoomControl: false,
-        dragging: false,          // ドラッグ無効
-        scrollWheelZoom: false,   // ホイール無効
-        doubleClickZoom: false,   // ダブルクリック無効
-        touchZoom: false,         // タッチ操作無効
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false,
         boxZoom: false,
         keyboard: false,
         tap: false
@@ -200,6 +206,10 @@ function startLeafletBackground(prefId) {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(leafletBackgroundMap);
 
+    // 千葉県中心に固定
+    let centerLatLng = [35.5, 140.25];
+    let zoomLevel = 10;
+
     const prefBounds = {
         CHIBA: [
             [35.15, 140.10],
@@ -207,12 +217,7 @@ function startLeafletBackground(prefId) {
         ]
     };
 
-    // 千葉県中心に固定
-    let centerLatLng = [35.5, 140.25];
-    let zoomLevel = 10;
-
     if (prefId && prefBounds[prefId]) {
-        // fitBounds を使わず、中心座標・ズーム固定
         centerLatLng = [
             (prefBounds[prefId][0][0] + prefBounds[prefId][1][0]) / 2,
             (prefBounds[prefId][0][1] + prefBounds[prefId][1][1]) / 2
@@ -222,14 +227,12 @@ function startLeafletBackground(prefId) {
     leafletBackgroundMap.setView(centerLatLng, zoomLevel);
     addLog('中心位置固定: ' + centerLatLng.join(', '));
 
-    // サイズ確定後再描画
     requestAnimationFrame(() => {
         leafletBackgroundMap.invalidateSize();
         addLog('invalidateSize() 完了');
-        addLog('Leaflet 背景初期化完了（操作オフ・中心固定）');
+        addLog('Leaflet 背景初期化完了（SVG領域サイズ・中心固定）');
     });
 }
-
 
 
       // ★Pref 選択時
