@@ -121,7 +121,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
 let leafletBackgroundMap = null;
 
-// --- 前半：SVG を透明化して背景用 div 作成 ---
+
+// --- 前半：#map 幅高さ固定＆内部非表示 ---
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     if (!mapDiv) {
@@ -131,47 +132,22 @@ function prepareLeafletBackground(prefId) {
 
     addLog('prefId 受け取り: ' + prefId);
 
+    // #map の幅と高さを固定
+    mapDiv.style.width = '100%';
+    mapDiv.style.height = '420px';
+    mapDiv.style.position = 'relative';
+
     // #map 内の全要素を非表示
-    const svgEls = mapDiv.querySelectorAll('*');
-    svgEls.forEach(el => {
-        el.style.visibility = 'hidden';
+    const mapChildren = mapDiv.querySelectorAll('*');
+    mapChildren.forEach(el => {
+        el.style.display = 'none';
     });
-
-    // 既存背景 div / Leaflet 削除
-    const existingBg = document.getElementById('leaflet-bg');
-    if (leafletBackgroundMap) {
-        leafletBackgroundMap.remove();
-        leafletBackgroundMap = null;
-        addLog('既存背景 Leaflet 削除');
-    }
-    if (existingBg) existingBg.remove();
-
-    // 背景用 div 作成
-    const bgDiv = document.createElement('div');
-    bgDiv.id = 'leaflet-bg';
-    bgDiv.style.position = 'absolute';
-    bgDiv.style.top = '0';
-    bgDiv.style.left = '0';
-    bgDiv.style.width = '100%';
-    bgDiv.style.height = '420';
-    bgDiv.style.zIndex = '0';
-    mapDiv.appendChild(bgDiv);
-    addLog('背景用 div 作成完了');
-
-    // 確定用に透明 SVG を追加
-    const testSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    testSvg.setAttribute("width", "100%");
-    testSvg.setAttribute("height", "420");
-    testSvg.style.position = "absolute";
-    testSvg.style.top = "0";
-    testSvg.style.left = "0";
-    testSvg.style.zIndex = "0";
-    testSvg.innerHTML = `<rect x="0" y="0" width="100%" height="420" fill="rgba(255,0,0,0.3)" />`;
-    mapDiv.appendChild(testSvg);
+    addLog('#map 内の要素を display:none に設定');
 
     // 後半呼び出し
     startLeafletBackground(prefId);
 }
+
 
 // --- 後半：Leaflet 初期化（操作オフ・中心固定・OSMリンク非表示） ---
 function startLeafletBackground(prefId) {
