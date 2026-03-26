@@ -204,22 +204,45 @@ function switchToLeaflet(prefId){
         }
     }
 
-    // --- サイズ確定後に再描画 ---
-    requestAnimationFrame(() => {
+ requestAnimationFrame(() => {
+
+    const rect = mapDiv.getBoundingClientRect();
+
+    overlay.style.width  = rect.width  + 'px';
+    overlay.style.height = rect.height + 'px';
+    lfMapDiv.style.width  = rect.width  + 'px';
+    lfMapDiv.style.height = rect.height + 'px';
+
+    addLog('サイズ確定: ' + rect.width + ' x ' + rect.height);
+
+    // --- ここで初期化 ---
+    if(leafletMap){
+        leafletMap.remove();
+        leafletMap = null;
+        addLog('既存Leaflet破棄');
+    }
+
+    leafletMap = L.map('lf-map', {
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
 
     leafletMap.invalidateSize();
-    addLog('invalidateSize() 完了');
 
     if(prefId && prefBounds[prefId]){
-        leafletMap.fitBounds(prefBounds[prefId], {
-            padding: [0, 0],
-            maxZoom: 10
-        });
-        addLog('fitBounds 再適用: ' + prefId);
+        const b = prefBounds[prefId];
+        const centerLat = (b[0][0] + b[1][0]) / 2;
+        const centerLng = (b[0][1] + b[1][1]) / 2;
+
+        leafletMap.setView([centerLat, centerLng], 10);
     }
 
 });
-
     addLog('Leaflet 初期化完了');
 }
       
