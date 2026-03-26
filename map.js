@@ -117,92 +117,98 @@ Object.keys(groupBoxSettings).forEach(gid => {
       };
 
       
-            // ★Leaflet 初期化関数 (外に置く)
-      let leafletMap = null;
-      
-     
-     function switchToLeaflet(prefId){
+let bgLeafletMap = null;
 
-    const overlay = document.getElementById('map-overlay');
+function switchToLeafletBackground(prefId) {
+
     const mapDiv = document.getElementById('map');
-    const lfMapDiv = document.getElementById('lf-map');
-
-    if(!overlay || !mapDiv || !lfMapDiv){
-        addLog('必要な要素が見つからない');
+    if (!mapDiv) {
+        console.error('map 要素が見つかりません');
         return;
     }
 
-    overlay.style.display = 'block';
+    addLog('switchToLeafletBackground 実行: prefId=' + prefId);
 
-    // ★ サイズ確定を監視
-    const ro = new ResizeObserver(entries => {
-
-        const rect = mapDiv.getBoundingClientRect();
-
-        // サイズが0や異常なら無視
-        if(rect.width < 50 || rect.height < 50){
-            return;
-        }
-
-        // 一度だけ実行
-        ro.disconnect();
-
-        overlay.style.width  = rect.width  + 'px';
-        overlay.style.height = rect.height + 'px';
-        lfMapDiv.style.width  = rect.width  + 'px';
-        lfMapDiv.style.height = rect.height + 'px';
-
-        addLog('サイズ確定（確定版）: ' + rect.width + ' x ' + rect.height);
-
-        if(leafletMap){
-            leafletMap.remove();
-            leafletMap = null;
-        }
-
-        leafletMap = L.map('lf-map', {
-            zoomControl: false,
-            dragging: false,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            touchZoom: false
-        });
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-            .addTo(leafletMap);
-
-        leafletMap.invalidateSize();
-
-        const prefBounds = {
-            CHIBA: [
-                [35.15, 140.10],
-                [35.95, 140.40]
-            ],
-            TOKYO: [
-                [35.4, 139.3],
-                [35.9, 140.0]
-            ]
-        };
-
-        if(prefId && prefBounds[prefId]){
-            leafletMap.fitBounds(prefBounds[prefId], {
-                padding: [0, 0],
-                animate: false
-            });
-        }
-
-        addLog('Leaflet 完全初期化完了');
+    // --- 既存要素を非表示化 / 透明化（テスト用、コメントで無効化可） ---
+    const children = Array.from(mapDiv.children);
+    children.forEach(el => {
+        // el.style.display = 'none';      // 完全非表示
+        // el.style.visibility = 'hidden';  // 透明化
+        // el.style.opacity = 0;            // 透過
     });
 
-    ro.observe(mapDiv);
-}      
-      
+    // --- 背景用 Leaflet div 作成 ---
+    let leafletDiv = document.getElementById('leaflet-bg');
+    if (!leafletDiv) {
+        leafletDiv = document.createElement('div');
+        leafletDiv.id = 'leaflet-bg';
+        mapDiv.appendChild(leafletDiv);
+
+        // CSS: 親 #map に追従させる
+        Object.assign(leafletDiv.style, {
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            zIndex: 0 // 背景
+        });
+    }
+
+    // --- 既存 Leaflet があれば破棄 ---
+    if (bgLeafletMap) {
+        bgLeafletMap.remove();
+        bgLeafletMap = null;
+        addLog('既存背景Leaflet破棄');
+    }
+
+    // --- Leaflet 初期化 ---
+    bgLeafletMap = L.map('leaflet-bg', {
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(bgLeafletMap);
+
+    // --- 千葉県中心 / prefId 判別 ---
+    const prefCenters = {
+        CHIBA: [35.6073, 140.1063],
+        TOKYO: [35.6895, 139.6917]
+    };
+
+    let center = prefCenters.CHIBA; // デフォルト千葉
+    if (prefId && prefCenters[prefId]) {
+        center = prefCenters[prefId];
+    }
+
+    bgLeafletMap.setView(center, 10);
+    addLog('背景Leaflet 初期化完了: center=' + center);
+
+    // --- サイズ確定 ---
+    bgLeafletMap.invalidateSize();
+}
+
+
+
+
+
+
+
+
+
+    
       // ★Pref 選択時
       function gotoPref(prefId){
         updateHash(prefId,2);
         addLog('pref clicked: ' + prefId);
 
         // prefId をそのまま渡す
-    switchToLeaflet(prefId);
+    switchToLeafletBackground(prefId);
 
       }
 
