@@ -119,39 +119,82 @@ Object.keys(groupBoxSettings).forEach(gid => {
       
             // ★Leaflet 初期化関数 (外に置く)
       let leafletMap = null;
-      function switchToLeaflet(prefId){
+      
+     
+     function switchToLeaflet(prefId){
+
+    const overlay = document.getElementById('map-overlay');
+    const mapDiv = document.getElementById('map');
     const lfMapDiv = document.getElementById('lf-map');
 
-    if(leafletMap){
-        leafletMap.remove();
-        leafletMap = null;
+    if(!overlay || !mapDiv || !lfMapDiv){
+        addLog('必要な要素が見つからない');
+        return;
     }
 
-    leafletMap = L.map('lf-map', {
-        zoomControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false
+    overlay.style.display = 'block';
+
+    // ★ サイズ確定を監視
+    const ro = new ResizeObserver(entries => {
+
+        const rect = mapDiv.getBoundingClientRect();
+
+        // サイズが0や異常なら無視
+        if(rect.width < 50 || rect.height < 50){
+            return;
+        }
+
+        // 一度だけ実行
+        ro.disconnect();
+
+        overlay.style.width  = rect.width  + 'px';
+        overlay.style.height = rect.height + 'px';
+        lfMapDiv.style.width  = rect.width  + 'px';
+        lfMapDiv.style.height = rect.height + 'px';
+
+        addLog('サイズ確定（確定版）: ' + rect.width + ' x ' + rect.height);
+
+        if(leafletMap){
+            leafletMap.remove();
+            leafletMap = null;
+        }
+
+        leafletMap = L.map('lf-map', {
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            touchZoom: false
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+            .addTo(leafletMap);
+
+        leafletMap.invalidateSize();
+
+        const prefBounds = {
+            CHIBA: [
+                [35.15, 140.10],
+                [35.95, 140.40]
+            ],
+            TOKYO: [
+                [35.4, 139.3],
+                [35.9, 140.0]
+            ]
+        };
+
+        if(prefId && prefBounds[prefId]){
+            leafletMap.fitBounds(prefBounds[prefId], {
+                padding: [0, 0],
+                animate: false
+            });
+        }
+
+        addLog('Leaflet 完全初期化完了');
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-        .addTo(leafletMap);
-
-    // 例：都道府県に合わせて表示
-    const prefBounds = {
-        CHIBA: [[35.15, 140.10],[35.95, 140.40]],
-        TOKYO: [[35.4, 139.3],[35.9, 140.0]]
-    };
-
-    if(prefId && prefBounds[prefId]){
-        leafletMap.fitBounds(prefBounds[prefId], {padding: [0,0], animate:false});
-    }
-
-    leafletMap.invalidateSize();
-}
-      
-      
+    ro.observe(mapDiv);
+}      
       
       // ★Pref 選択時
       function gotoPref(prefId){
