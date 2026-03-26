@@ -19,9 +19,6 @@ html, body {
   overflow-x: hidden;
 }
 
-body {
-  position: relative;
-}
 
 
 main {
@@ -151,6 +148,27 @@ main {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <script src="header.js" defer></script>
 <script src="map.js" defer></script>
+
+
+<script>
+function adjustLfMapPosition() {
+  const header = document.querySelector('header');
+  const lfMap = document.getElementById('lf-map');
+
+  if (!header || !lfMap) return;
+
+  const headerHeight = header.offsetHeight;
+
+  // ヘッダー分だけ下げる
+  lfMap.style.top = headerHeight + 'px';
+}
+
+// 初回
+window.addEventListener('load', adjustLfMapPosition);
+
+// リサイズ対応（レスポンシブ用）
+window.addEventListener('resize', adjustLfMapPosition);
+</script>
 
 </body>
 </html>
