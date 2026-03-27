@@ -27,12 +27,25 @@ html, body {
   overflow-x: hidden;
 }
 
+header {
+  position: relative;
+  z-index: 100;
+  background: #fff;
+}
+
 main {
-  width: 512px;
-  height: 512px;
-  margin: 0 auto;      /* センタリング */
-  position: relative;  /* Leaflet基準 */
-  background-color: #191970;
+  position: relative;   /* Leaflet 基準 */
+  width: 100%;
+  height: 500px;        /* 高さはお好みで調整 */
+}
+
+#lf-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
 #log-panel {
@@ -67,7 +80,7 @@ main {
           </ul>
         </div>
       </div>
-      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">釣りNEWS</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
     </nav>
@@ -75,7 +88,9 @@ main {
 </header>
 
 <!-- Leaflet 地図 -->
-<main id="lf-map"></main>
+<main>
+  <div id="lf-map"></div>
+</main>
 
 <!-- ログパネル -->
 <div id="log-panel"></div>
@@ -88,7 +103,7 @@ main {
   crossorigin="">
 </script>
 
-<!-- ヘッダー操作 -->
+<!-- ヘッダー JS -->
 <script src="/MAP-/header.js" defer></script>
 
 <script>
@@ -112,14 +127,13 @@ function adjustLfMapPosition() {
   lfMap.style.top = headerHeight + 'px';
 }
 
-// --- 初回ロードとリサイズ対応 ---
+// 初回ロードとリサイズ対応
 window.addEventListener('load', adjustLfMapPosition);
 window.addEventListener('resize', adjustLfMapPosition);
 
-// --- Leaflet 初期化 ---
+// Leaflet 初期化
 window.addEventListener('load', () => {
   const lfMapDiv = document.getElementById('lf-map');
-
   const leafletMap = L.map(lfMapDiv, {
     zoomControl: false,
     dragging: false,
@@ -140,15 +154,10 @@ window.addEventListener('load', () => {
   leafletMap.setView(centerLatLng, zoomLevel);
 
   addLog('Leaflet 初期化完了');
-  addLog('lf-map offsetWidth: ' + lfMapDiv.offsetWidth);
-  addLog('lf-map offsetHeight: ' + lfMapDiv.offsetHeight);
 
-  // タイルズレ防止
   setTimeout(() => {
     leafletMap.invalidateSize(true);
     addLog('Leaflet invalidateSize() 実行');
-    addLog('lf-map offsetWidth: ' + lfMapDiv.offsetWidth);
-    addLog('lf-map offsetHeight: ' + lfMapDiv.offsetHeight);
   }, 50);
 });
 </script>
