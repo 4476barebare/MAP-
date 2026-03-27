@@ -3,184 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>釣り行こNAVI</title>
-
-<!-- CSS -->
-<link rel="stylesheet" href="header.css">
-<link rel="stylesheet" href="map.css">
-
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-  background: #fff;
-  color: #333;
-  overflow-x: hidden;
-}
-
-
-.map {
-  position: relative;
-  min-height: 420px;
-  text-align: center;
-}
-
-.japan-map {
-  width: 100%;
-  height: 100%;
-}
-
-#map-overlay {
-  display: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  background: rgba(0,0,0,0.3);
-}
-
-
-#log-panel {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  max-height: 120px;
-  overflow-y: auto;
-  background: rgba(0,0,0,0.7);
-  color: #fff;
-  font-size: 12px;
-  padding: 5px;
-  z-index: 999;
-}
-
-main {
-  position: relative;   /* ← 追加（基準になる） */
-  background-color: #191970;
-  margin: 0 auto; /* センタリング */
-  height: 420px;
-}
-
-/* 背景（Leaflet） */
-#lf-map {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;     /* ← auto禁止 */
-  height: 100%;    /* ← これが超重要 */
-  z-index: 0;
-}
-
-/* 前面（SVG） */
-#map-container {
-  position: absolute;  /* ← relativeやめる */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-}
-
-</style>
-
-<!-- Leaflet CSS -->
+<title>Leaflet サンプル map</title>
 <link
   rel="stylesheet"
   href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-sA+e2pA+6y6ILm4QyZ91z6/WTGnT8FxZ2P8eT+Zg5uw="
+  integrity="sha256-sA+Rl1XkR9gC1nHshT6ZzB4j9x0Of0XqD4iXGPaN6wY="
   crossorigin=""
 />
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    text-align: center;
+  }
 
+  main {
+    width: 512px;
+    height: 512px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #ccc;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+</style>
 </head>
-
 <body>
-
-<header>
-  <div class="header-inner">
-    <div class="logo">釣り行こNAVI</div>
-    <nav class="nav">
-      <div class="accordion-wrapper">
-        <button class="accordion-btn">登録地点 ▼</button>
-        <div class="accordion-panel">
-          <ul class="location-list" id="locationList">
-            <li>新潟 <button class="delete-btn">✖️</button></li>
-            <li>群馬 <button class="delete-btn">✖️</button></li>
-            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
-          </ul>
-        </div>
-      </div>
-      <a href="#" id="newsBtn">釣りNEWS</a>
-      <a href="#">全国地図</a>
-      <a href="#">その他</a>
-    </nav>
-  </div>
-</header>
-
+<h2>Leaflet 単体サンプル</h2>
 <main>
-<div id="lf-map"></div>
-  <div id="map-container">
-    <div id="map"></div>
-  </div>
+  <div id="map"></div>
 </main>
 
-<!-- ログ表示 -->
-<div id="log-panel"></div>
-
-<div class="ad">広告スペース</div>
-
-<div id="manual-region-nav" style="
-    display:flex;
-    justify-content:center;
-    padding:8px;
-    background:rgba(255,255,255,0.8);
-    border-radius:6px;
-    box-shadow:0 0 4px rgba(0,0,0,0.3);
-    margin-top:10px;
-">
-  <button data-hash="TOHOKU">#TOHOKU</button>
-</div>
-
-<footer>© 釣り行こNAVI</footer>
-
-<!-- ニュースオーバーレイ -->
-<div id="newsOverlay">
-  <div class="news-window">
-    <button id="closeNews">閉じる</button>
-    <div class="news-content"></div>
-  </div>
-</div>
-
-<!-- JS -->
-<!-- Leaflet JS を先に読み込む -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-<script src="header.js" defer></script>
-<script src="map.js" defer></script>
-
-
-
-<script>
-function adjustLfMapPosition() {
-  const header = document.querySelector('header');
-  const lfMap = document.getElementById('lf-map');
-
-  if (!header || !lfMap) return;
-
-  const headerHeight = header.offsetHeight;
-
-  // ヘッダー分だけ下げる
-  lfMap.style.top = headerHeight + 'px';
-}
-
-// 初回
-window.addEventListener('load', adjustLfMapPosition);
-
-// リサイズ対応（レスポンシブ用）
-window.addEventListener('resize', adjustLfMapPosition);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-vy8j7qzv/N8IWrp4IdfZrIh0Y8zXk3T1N7tGgKZ8Z2c="
+  crossorigin="">
 </script>
+<script>
+  function addLog(msg) {
+    console.log(msg);
+  }
 
+  const mapDiv = document.getElementById('map');
 
+  // --- Leaflet 初期化 ---
+  const leafletMap = L.map(mapDiv, {
+    zoomControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    touchZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    tap: false,
+    attributionControl: false,
+    preferCanvas: true
+  });
+
+  // --- タイル追加 ---
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
+
+  // --- 中心位置・ズーム ---
+  const centerLatLng = [35.5, 140.25]; // 千葉あたり
+  const zoomLevel = 10;
+  leafletMap.setView(centerLatLng, zoomLevel);
+
+  // --- サイズログ ---
+  addLog('map offsetWidth: ' + mapDiv.offsetWidth);
+  addLog('map offsetHeight: ' + mapDiv.offsetHeight);
+
+  // --- 再計算でタイルズレ防止 ---
+  setTimeout(() => {
+    leafletMap.invalidateSize(true);
+    addLog('Leaflet invalidateSize() 実行');
+    addLog('map offsetWidth: ' + mapDiv.offsetWidth);
+    addLog('map offsetHeight: ' + mapDiv.offsetHeight);
+  }, 50);
+</script>
 </body>
 </html>
