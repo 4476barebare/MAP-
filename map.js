@@ -161,15 +161,14 @@ function prepareLeafletBackground(prefId) {
     lfDiv.style.background = 'transparent';
     lfDiv.style.transform = 'none';
 
-    // --- map（前面フレーム） ---
-    while (mapDiv.firstChild) mapDiv.removeChild(mapDiv.firstChild);
+// --- map 表示領域だけ 420px に切り取り ---
     mapDiv.style.position = 'absolute';
     mapDiv.style.top = '0';
     mapDiv.style.left = '0';
     mapDiv.style.width = '100%';
-    mapDiv.style.height = MAP_HEIGHT + 'px';
-    mapDiv.style.background = 'transparent';
-    mapDiv.style.zIndex = '50';
+    mapDiv.style.height = VIEW_HEIGHT + 'px';
+    mapDiv.style.overflow = 'hidden';
+    mapDiv.innerHTML = ''; // 前の要素削除
 
     // --- ログ出力（サイズ確認） ---
     addLog('前半終了時のサイズ確認');
