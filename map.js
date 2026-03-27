@@ -172,7 +172,6 @@ function prepareLeafletBackground(prefId) {
     }
 
     // --- ログ出力（サイズ確認） ---
-    addLog('前半終了時のサイズ確認');
     addLog('前半lf-map offsetWidth: ' + lfDiv.offsetWidth);
     addLog('前半lf-map offsetHeight: ' + lfDiv.offsetHeight);
     addLog('前半container offsetTop: ' + containerDiv.offsetTop);
@@ -182,9 +181,7 @@ function prepareLeafletBackground(prefId) {
 
    
 
-    
-    // --- Leaflet初期化 ---
-    leafletBackgroundMap = L.map('lf-map', {
+    leafletBackgroundMap = L.map(lfDiv, {
     zoomControl: false,
     dragging: false,
     scrollWheelZoom: false,
@@ -197,9 +194,18 @@ function prepareLeafletBackground(prefId) {
     preferCanvas: true
 });
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletBackgroundMap);
 
-    // --- 中心位置 ---
+
+    addLog('中盤lf-map offsetWidth: ' + lfDiv.offsetWidth);
+    addLog('中盤lf-map offsetHeight: ' + lfDiv.offsetHeight);
+
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletBackgroundMap);
+leafletBackgroundMap.setView(centerLatLng, zoomLevel);
+
+// タ
+    // --- Leaflet初期化 ---
+        // --- 中心位置 ---
     const prefBounds = {
         CHIBA: [
             [35.15, 140.10],
