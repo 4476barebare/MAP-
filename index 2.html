@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaflet サンプル map</title>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-sA+Rl1XkR9gC1nHshT6ZzB4j9x0Of0XqD4iXGPaN6wY="
+  crossorigin=""
+/>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    text-align: center;
+  }
+
+  main {
+    width: 512px;
+    height: 512px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #ccc;
+  }
+
+  #map {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+</style>
+</head>
+<body>
+<h2>Leaflet 単体サンプル</h2>
+<main>
+  <div id="map"></div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-vy8j7qzv/N8IWrp4IdfZrIh0Y8zXk3T1N7tGgKZ8Z2c="
+  crossorigin="">
+</script>
+<script>
+  function addLog(msg) {
+    console.log(msg);
+  }
+
+  const mapDiv = document.getElementById('map');
+
+  // --- Leaflet 初期化 ---
+  const leafletMap = L.map(mapDiv, {
+    zoomControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    touchZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    tap: false,
+    attributionControl: false,
+    preferCanvas: true
+  });
+
+  // --- タイル追加 ---
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
+
+  // --- 中心位置・ズーム ---
+  const centerLatLng = [35.5, 140.25]; // 千葉あたり
+  const zoomLevel = 10;
+  leafletMap.setView(centerLatLng, zoomLevel);
+
+  // --- サイズログ ---
+  addLog('map offsetWidth: ' + mapDiv.offsetWidth);
+  addLog('map offsetHeight: ' + mapDiv.offsetHeight);
+
+  // --- 再計算でタイルズレ防止 ---
+  setTimeout(() => {
+    leafletMap.invalidateSize(true);
+    addLog('Leaflet invalidateSize() 実行');
+    addLog('map offsetWidth: ' + mapDiv.offsetWidth);
+    addLog('map offsetHeight: ' + mapDiv.offsetHeight);
+  }, 50);
+</script>
+</body>
+</html>
