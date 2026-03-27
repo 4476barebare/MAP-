@@ -163,6 +163,13 @@ function prepareLeafletBackground(prefId) {
     mapDiv.style.height = MAP_HEIGHT + 'px';
     mapDiv.style.background = 'transparent';
     mapDiv.style.zIndex = '50';
+    
+     // --- 既存 Leaflet 削除 ---
+    if (leafletBackgroundMap) {
+        leafletBackgroundMap.remove();
+        leafletBackgroundMap = null;
+        addLog('既存 Leaflet 削除');
+    }
 
     // --- ログ出力（サイズ確認） ---
     addLog('前半終了時のサイズ確認');
@@ -173,32 +180,24 @@ function prepareLeafletBackground(prefId) {
     addLog('前半container clientWidth: ' + containerDiv.clientWidth);
     addLog('前半container clientHeight: ' + containerDiv.clientHeight);
 
-    // --- 既存 Leaflet 削除 ---
-    if (leafletBackgroundMap) {
-        leafletBackgroundMap.remove();
-        leafletBackgroundMap = null;
-        addLog('既存 Leaflet 削除');
-    }
+   
 
     
-    lfDiv.style.width = '512px';
-lfDiv.style.height = '512px';
     // --- Leaflet初期化 ---
-    leafletBackgroundMap = L.map(lfDiv, {
-        zoomControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        tap: false,
-        attributionControl: false,
-        preferCanvas: true
-    });
+    leafletBackgroundMap = L.map('lf-map', {
+    zoomControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    touchZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    tap: false,
+    attributionControl: false,
+    preferCanvas: true
+});
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-        .addTo(lf-map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletBackgroundMap);
 
     // --- 中心位置 ---
     const prefBounds = {
