@@ -27,16 +27,12 @@ html, body {
   overflow-x: hidden;
 }
 
-header {
-  position: relative;
-  z-index: 100;
-  background: #fff;
-}
-
 main {
-  position: relative;   /* Leaflet 基準 */
+  position: relative;
   width: 100%;
-  height: 500px;        /* 高さはお好みで調整 */
+  height: 500px;         /* 必要に応じて高さ調整 */
+  padding-top: 60px;     /* ヘッダー高さ分を確保 */
+  background-color: #191970;
 }
 
 #lf-map {
@@ -80,14 +76,13 @@ main {
           </ul>
         </div>
       </div>
-      <a href="#">釣りNEWS</a>
+      <a href="#" id="newsBtn">釣りNEWS</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
     </nav>
   </div>
 </header>
 
-<!-- Leaflet 地図 -->
 <main>
   <div id="lf-map"></div>
 </main>
@@ -100,10 +95,9 @@ main {
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
   integrity="sha256-vy8j7qzv/N8IWrp4IdfZrIh0Y8zXk3T1N7tGgKZ8Z2c="
-  crossorigin="">
-</script>
+  crossorigin=""></script>
 
-<!-- ヘッダー JS -->
+<!-- ヘッダー操作 -->
 <script src="/MAP-/header.js" defer></script>
 
 <script>
@@ -118,22 +112,10 @@ function addLog(msg) {
   }
 }
 
-function adjustLfMapPosition() {
-  const header = document.querySelector('header');
-  const lfMap = document.getElementById('lf-map');
-  if (!header || !lfMap) return;
-
-  const headerHeight = header.offsetHeight;
-  lfMap.style.top = headerHeight + 'px';
-}
-
-// 初回ロードとリサイズ対応
-window.addEventListener('load', adjustLfMapPosition);
-window.addEventListener('resize', adjustLfMapPosition);
-
-// Leaflet 初期化
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
   const lfMapDiv = document.getElementById('lf-map');
+
+  // Leaflet 初期化
   const leafletMap = L.map(lfMapDiv, {
     zoomControl: false,
     dragging: false,
@@ -147,14 +129,19 @@ window.addEventListener('load', () => {
     preferCanvas: true
   });
 
+  // タイルレイヤー追加
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletMap);
 
+  // 中心位置・ズーム
   const centerLatLng = [35.5, 140.25]; // 千葉あたり
   const zoomLevel = 10;
   leafletMap.setView(centerLatLng, zoomLevel);
 
   addLog('Leaflet 初期化完了');
+  addLog('lf-map offsetWidth: ' + lfMapDiv.offsetWidth);
+  addLog('lf-map offsetHeight: ' + lfMapDiv.offsetHeight);
 
+  // タイルズレ防止
   setTimeout(() => {
     leafletMap.invalidateSize(true);
     addLog('Leaflet invalidateSize() 実行');
