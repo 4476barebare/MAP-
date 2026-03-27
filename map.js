@@ -166,12 +166,12 @@ function prepareLeafletBackground(prefId) {
 
     // --- ログ出力（サイズ確認） ---
     addLog('前半終了時のサイズ確認');
-    addLog('lf-map offsetWidth: ' + lfDiv.offsetWidth);
-    addLog('lf-map offsetHeight: ' + lfDiv.offsetHeight);
-    addLog('container offsetTop: ' + containerDiv.offsetTop);
-    addLog('container offsetLeft: ' + containerDiv.offsetLeft);
-    addLog('container clientWidth: ' + containerDiv.clientWidth);
-    addLog('container clientHeight: ' + containerDiv.clientHeight);
+    addLog('前半lf-map offsetWidth: ' + lfDiv.offsetWidth);
+    addLog('前半lf-map offsetHeight: ' + lfDiv.offsetHeight);
+    addLog('前半container offsetTop: ' + containerDiv.offsetTop);
+    addLog('前半container offsetLeft: ' + containerDiv.offsetLeft);
+    addLog('前半container clientWidth: ' + containerDiv.clientWidth);
+    addLog('前半container clientHeight: ' + containerDiv.clientHeight);
 
     // --- 既存 Leaflet 削除 ---
     if (leafletBackgroundMap) {
@@ -193,6 +193,11 @@ function startLeafletBackground(prefId) {
         addLog('lf-map が存在しない');
         return;
     }
+    
+    
+     // --- 強制 512×512 ---
+    lfDiv.style.width = '512px';
+    lfDiv.style.height = '512px';
 
     // --- Leaflet初期化 ---
     leafletBackgroundMap = L.map(lfDiv, {
