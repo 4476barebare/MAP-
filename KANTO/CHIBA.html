@@ -24,11 +24,25 @@ html, body {
   overflow-x: hidden;
 }
 
-/* 地図 */
-#lf-map {
-  width: 100%;
+main {
+  position: relative;
   height: 500px;
-  background: red;
+}
+
+#lf-map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+
+.leaflet-pane {
+  z-index: 0 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 0 !important;
 }
 </style>
 </head>
@@ -58,7 +72,9 @@ html, body {
 </header>
 
 <!-- 地図 -->
-<div id="lf-map"></div>
+<main>
+  <div id="lf-map"></div>
+</main>
 
 <!-- フッター -->
 <footer class="footer">
@@ -76,10 +92,10 @@ html, body {
 </div>
 
 <!-- JS（順番重要） -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- ★defer外す（ここ重要） -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <script src="/MAP-/header.js" defer></script>
+
 
 <!-- 地図（触るな） -->
 <script>
