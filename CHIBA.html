@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こCHIBA</title>
+
+<!-- ヘッダーCSS（/MAP-/で統一） -->
+<link rel="stylesheet" href="/MAP-/header.css">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body {
+  margin: 0;
+}
+
+/* 地図（絶対に触らない領域） */
+#lf-map {
+  width: 100%;
+  height: 500px;
+  background: red;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ヘッダー（完全復元） -->
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 地図 -->
+<div id="lf-map"></div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ヘッダーJS（/MAP-/で統一） -->
+<script src="/MAP-/header.js" defer></script>
+
+<!-- ★地図（ここは今後触るな） -->
+<script>
+const map = L.map('lf-map').setView([35.5, 140.25], 10);
+
+L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こCHIBA</title>
+
+<!-- ヘッダーCSS（/MAP-/で統一） -->
+<link rel="stylesheet" href="/MAP-/header.css">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body {
+  margin: 0;
+}
+
+/* 地図（絶対に触らない領域） */
+#lf-map {
+  width: 100%;
+  height: 500px;
+  background: red;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ヘッダー（完全復元） -->
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 地図 -->
+<div id="lf-map"></div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ヘッダーJS（/MAP-/で統一） -->
+<script src="/MAP-/header.js" defer></script>
+
+<!-- ★地図（ここは今後触るな） -->
+<script>
+const map = L.map('lf-map').setView([35.5, 140.25], 10);
+
+L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こCHIBA</title>
+
+<!-- ヘッダーCSS（/MAP-/で統一） -->
+<link rel="stylesheet" href="/MAP-/header.css">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body {
+  margin: 0;
+}
+
+/* 地図（絶対に触らない領域） */
+#lf-map {
+  width: 100%;
+  height: 500px;
+  background: red;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ヘッダー（完全復元） -->
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
+    </nav>
+  </div>
+</header>
+
+<!-- 地図 -->
+<div id="lf-map"></div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- ヘッダーJS（/MAP-/で統一） -->
+<script src="/MAP-/header.js" defer></script>
+
+<!-- ★地図（ここは今後触るな） -->
+<script>
+const map = L.map('lf-map').setView([35.5, 140.25], 10);
+
+L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+</script>
+
+</body>
+</html>
