@@ -137,6 +137,7 @@ function prepareLeafletBackground(prefId) {
 
     // --- main を 512px に固定して中央寄せ ---
     mainDiv.style.width = LF_SIZE + 'px';
+    mainDiv.style.height = '512px';
     mainDiv.style.margin = '0 auto';
     mainDiv.style.overflow = 'hidden';
     mainDiv.style.position = 'relative';
