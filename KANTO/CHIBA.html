@@ -3,28 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CHIBA TEST</title>
+<title>釣り行こCHIBA</title>
 
+<!-- ヘッダーCSS（そのまま） -->
+<link rel="stylesheet" href="./header.css">
+
+<!-- Leaflet CSS -->
 <link rel="stylesheet"
  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body {
+  margin: 0;
+}
+
+/* とりあえず地図だけ確実に出す */
+#lf-map {
+  width: 100%;
+  height: 500px;
+  background: red;
+}
+</style>
 </head>
 
-<body style="margin:0;">
+<body>
 
-<div id="lf-map" style="width:100%; height:500px; background:red;"></div>
+<!-- ヘッダー（そのまま） -->
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+      <a href="#">全国地図</a>
+    </nav>
+  </div>
+</header>
 
+<!-- 地図 -->
+<div id="lf-map"></div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<!-- ★ここが最重要：直書きで即実行 -->
 <script>
-console.log("JS開始");
-
 const map = L.map('lf-map').setView([35.5, 140.25], 10);
 
 L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19
 }).addTo(map);
-
-console.log("Leaflet完了");
 </script>
 
 </body>
