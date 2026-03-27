@@ -39,7 +39,6 @@ html, body {
 <header>
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
-
     <nav class="nav">
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
@@ -51,7 +50,6 @@ html, body {
           </ul>
         </div>
       </div>
-
       <a href="#" id="newsBtn">釣りNEWS</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
@@ -68,6 +66,16 @@ html, body {
     <p>© 釣り行こNAVI</p>
   </div>
 </footer>
+
+
+<div id="newsOverlay">
+  <div class="news-window">
+    <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
+  </div>
+</div>
+
+<!-- JS -
 
 <!-- JS（順番重要） -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
