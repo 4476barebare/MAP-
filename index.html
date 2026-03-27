@@ -19,13 +19,6 @@ html, body {
   overflow-x: hidden;
 }
 
-main {
-  background-color: #191970;
-  max-width: 100%;
-  height: 420px;
-  margin: 0;
-  padding: 0;
-}
 
 .map {
   position: relative;
@@ -64,22 +57,32 @@ main {
   z-index: 999;
 }
 
+main {
+  position: relative;   /* ← 追加（基準になる） */
+  background-color: #191970;
+  max-width: 100%;
+  height: 420px;
+}
+
+/* 背景（Leaflet） */
 #lf-map {
   position: absolute;
-  width: auto;
-  height: 420px;
+  top: 0;
+  left: 0;
+  width: 100%;     /* ← auto禁止 */
+  height: 100%;    /* ← これが超重要 */
   z-index: 0;
 }
 
+/* 前面（SVG） */
 #map-container {
-  position: relative;
-  width: auto;
-  height: 420px;
-  overflow: hidden;
-  background: #fff;
-  z-index: 1; /* ← これ追加 */
+  position: absolute;  /* ← relativeやめる */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
 }
-
 
 </style>
 </head>
@@ -108,11 +111,10 @@ main {
 </header>
 
 <main>
-<div id="lf-map">
+<div id="lf-map"></div>
   <div id="map-container">
     <div id="map"></div>
   </div>
-</div>
 </main>
 
 <!-- ログ表示 -->
