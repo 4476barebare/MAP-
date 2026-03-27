@@ -152,34 +152,29 @@ main {
 
 
 <script>
-function adjustLfMapLayout() {
+function adjustLfMapPosition() {
   const header = document.querySelector('header');
   const lfMap = document.getElementById('lf-map');
-  const map = document.getElementById('map');
 
-  if (!header || !lfMap || !map) return;
+  if (!header || !lfMap) return;
 
   const headerHeight = header.offsetHeight;
-  const mapRect = map.getBoundingClientRect();
 
-  // 上位置（ヘッダー下）
+  // 上だけ調整
   lfMap.style.top = headerHeight + 'px';
 
-  // 幅と高さをmapに合わせる
-  lfMap.style.width = mapRect.width + 'px';
-  lfMap.style.height = mapRect.height + 'px';
-
-  // 横中央
+  // 横中央だけ維持
   lfMap.style.left = '50%';
   lfMap.style.transform = 'translateX(-50%)';
 }
 
 // 初回
-window.addEventListener('load', adjustLfMapLayout);
+window.addEventListener('load', adjustLfMapPosition);
 
 // リサイズ対応
-window.addEventListener('resize', adjustLfMapLayout);
+window.addEventListener('resize', adjustLfMapPosition);
 </script>
+
 
 </body>
 </html>
