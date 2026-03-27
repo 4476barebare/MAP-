@@ -163,19 +163,10 @@ function prepareLeafletBackground(prefId) {
     mapDiv.style.height = MAP_HEIGHT + 'px';
     mapDiv.style.background = 'transparent';
     mapDiv.style.zIndex = '50';
-
-    // --- 既存Leaflet削除 ---
-    if (leafletBackgroundMap) {
-        leafletBackgroundMap.remove();
-        leafletBackgroundMap = null;
-        addLog('既存Leaflet削除');
-    }
-
-    // サイズ確定後に初期化
-    requestAnimationFrame(() => {
-        
-        
-          // --- ログ出力（サイズ確認） ---
+    
+    
+    
+      // --- ログ出力（サイズ確認） ---
     addLog('前半終了時のサイズ確認');
     addLog('lf-map offsetWidth: ' + lfDiv.offsetWidth);
     addLog('lf-map offsetHeight: ' + lfDiv.offsetHeight);
@@ -183,8 +174,20 @@ function prepareLeafletBackground(prefId) {
     addLog('container offsetLeft: ' + containerDiv.offsetLeft);
     addLog('container clientWidth: ' + containerDiv.clientWidth);
     addLog('container clientHeight: ' + containerDiv.clientHeight);
-        
-        
+
+    // --- 既存Leaflet削除 ---
+    if (leafletBackgroundMap) {
+        leafletBackgroundMap.remove();
+        leafletBackgroundMap = null;
+        addLog('既存Leaflet削除');
+    }
+    
+    
+    
+    
+
+    // サイズ確定後に初期化
+    requestAnimationFrame(() => {
         startLeafletBackground(prefId);
     });
 }
