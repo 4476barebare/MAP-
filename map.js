@@ -229,9 +229,7 @@ function startLeafletBackground(prefId) {
 setTimeout(() => {
     leafletBackgroundMap.invalidateSize(true);
 
-    // --- ログ追記 ---
-    const containerDiv = lfDiv.parentElement;
-    addLog('Leaflet invalidateSize() 実行');
+
     addLog('最終 lf-map offsetWidth: ' + lfDiv.offsetWidth);
     addLog('最終 lf-map offsetHeight: ' + lfDiv.offsetHeight);
     addLog('親 container offsetTop: ' + containerDiv.offsetTop);
@@ -239,8 +237,7 @@ setTimeout(() => {
     addLog('親 container clientWidth: ' + containerDiv.clientWidth);
     addLog('親 container clientHeight: ' + containerDiv.clientHeight);
 
-    addLog('Leaflet 完全初期化完了');
-}, 50);
+
 
 
     setTimeout(() => {
