@@ -173,6 +173,18 @@ function prepareLeafletBackground(prefId) {
 
     // サイズ確定後に初期化
     requestAnimationFrame(() => {
+        
+        
+          // --- ログ出力（サイズ確認） ---
+    addLog('前半終了時のサイズ確認');
+    addLog('lf-map offsetWidth: ' + lfDiv.offsetWidth);
+    addLog('lf-map offsetHeight: ' + lfDiv.offsetHeight);
+    addLog('container offsetTop: ' + containerDiv.offsetTop);
+    addLog('container offsetLeft: ' + containerDiv.offsetLeft);
+    addLog('container clientWidth: ' + containerDiv.clientWidth);
+    addLog('container clientHeight: ' + containerDiv.clientHeight);
+        
+        
         startLeafletBackground(prefId);
     });
 }
