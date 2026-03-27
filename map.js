@@ -180,25 +180,8 @@ function prepareLeafletBackground(prefId) {
         addLog('既存 Leaflet 削除');
     }
 
-    // --- 後半（Leaflet初期化）発火 ---
-    requestAnimationFrame(() => {
-        startLeafletBackground(prefId);
-    });
-}
-
-
-function startLeafletBackground(prefId) {
-    const lfDiv = document.getElementById('lf-map');
-    if (!lfDiv) {
-        addLog('lf-map が存在しない');
-        return;
-    }
     
     
-     // --- 強制 512×512 ---
-    lfDiv.style.width = '512px';
-    lfDiv.style.height = '512px';
-
     // --- Leaflet初期化 ---
     leafletBackgroundMap = L.map(lfDiv, {
         zoomControl: false,
