@@ -120,8 +120,6 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
 let leafletBackgroundMap = null;
 
-
-// --- 前半：#map を透明フレームとして準備 ---
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     const lfDiv = document.getElementById('lf-map');
@@ -134,38 +132,57 @@ function prepareLeafletBackground(prefId) {
 
     addLog('prefId 受け取り: ' + prefId);
 
-    // #map 内の全要素を完全削除
+    // --- サイズ定義（ここが基準） ---
+    const LF_SIZE = 512;
+    const MAP_HEIGHT = 420;
+
+    // --- container（外枠） ---
+    containerDiv.style.width = '100%';
+    containerDiv.style.height = LF_SIZE + 'px';
+    containerDiv.style.position = 'relative';
+    containerDiv.style.overflow = 'hidden';
+
+    // --- lf-map（背景）512×512中央 ---
+    lfDiv.style.position = 'absolute';
+    lfDiv.style.width = LF_SIZE + 'px';
+    lfDiv.style.height = LF_SIZE + 'px';
+    lfDiv.style.left = '50%';
+    lfDiv.style.top = '50%';
+    lfDiv.style.transform = 'translate(-50%, -50%)';
+    lfDiv.style.zIndex = '0';
+
+    // --- map（前面フレーム） ---
     while (mapDiv.firstChild) mapDiv.removeChild(mapDiv.firstChild);
 
-    // #map を透明フレームとして設定
     mapDiv.style.position = 'absolute';
     mapDiv.style.top = '0';
     mapDiv.style.left = '0';
     mapDiv.style.width = '100%';
-    mapDiv.style.height = '100%'; // 親の map-container に合わせる
+    mapDiv.style.height = MAP_HEIGHT + 'px';
     mapDiv.style.background = 'transparent';
     mapDiv.style.zIndex = '50';
 
-    // Leaflet 背景削除（既存があれば）
+    // --- 既存Leaflet削除 ---
     if (leafletBackgroundMap) {
         leafletBackgroundMap.remove();
         leafletBackgroundMap = null;
         addLog('既存背景 Leaflet 削除');
     }
 
-    startLeafletBackground(prefId);
+    // 次フレームで確実にサイズ確定させてから初期化
+    requestAnimationFrame(() => {
+        startLeafletBackground(prefId);
+    });
 }
 
 
-// --- 後半：Leaflet 初期化（操作オフ・中心固定・OSMバナー非表示） ---
 function startLeafletBackground(prefId) {
     const lfDiv = document.getElementById('lf-map');
     if (!lfDiv) {
-        addLog('lf-map が存在しないので Leaflet を開始できない');
+        addLog('lf-map が存在しない');
         return;
     }
 
-    // Leaflet 初期化（全操作オフ）
     leafletBackgroundMap = L.map('lf-map', {
         zoomControl: false,
         dragging: false,
@@ -175,13 +192,13 @@ function startLeafletBackground(prefId) {
         boxZoom: false,
         keyboard: false,
         tap: false,
-        attributionControl: false // 右上バナー非表示
+        attributionControl: false
     });
 
-    // OSM タイル追加
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(leafletBackgroundMap);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        .addTo(leafletBackgroundMap);
 
-    // 千葉県中心に固定
+    // --- 中心定義 ---
     const prefBounds = {
         CHIBA: [
             [35.15, 140.10],
@@ -200,12 +217,10 @@ function startLeafletBackground(prefId) {
     }
 
     leafletBackgroundMap.setView(centerLatLng, zoomLevel);
-    addLog('中心位置固定: ' + centerLatLng.join(', ') + ', ズーム: ' + zoomLevel);
 
     requestAnimationFrame(() => {
         leafletBackgroundMap.invalidateSize();
-        addLog('invalidateSize() 完了');
-        addLog('Leaflet 背景初期化完了（#lf-map 512×512・#map は透明フレーム）');
+        addLog('Leaflet 背景初期化完了');
     });
 }
 
