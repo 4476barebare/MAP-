@@ -117,11 +117,8 @@ Object.keys(groupBoxSettings).forEach(gid => {
       };
 
       
-
-
-
-      // ★Pref 選択時
-      function gotoPref(prefId) {
+// ★Pref 選択時
+function gotoPref(prefId) {
     if (!prefId) return;
 
     // prefId が属する地域 hash を検索
@@ -139,11 +136,12 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
     if (!regionHash) return; // 見つからなければ何もしない
 
-    // 動的にリンク開く
-    window.location.href = `/${regionHash}/${prefId}.html`;
+    // 動的にリンク開く（相対パスでプロジェクト内を参照）
+    window.location.href = `./${regionHash}/${prefId}.html`;
 }
 
 
+      
       prefGroup.querySelectorAll('path').forEach(p => {
         p.style.display = 'inline';
         p.classList.remove('prefecture-selected','prefecture-unselected');
