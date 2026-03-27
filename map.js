@@ -225,9 +225,23 @@ function startLeafletBackground(prefId) {
 
     leafletBackgroundMap.setView(centerLatLng, zoomLevel);
 
-    // --- 強制再認識・サイズ補正 ---
-    lfDiv.style.width = '512px';
-    lfDiv.style.height = '512px';
+
+setTimeout(() => {
+    leafletBackgroundMap.invalidateSize(true);
+
+    // --- ログ追記 ---
+    const containerDiv = lfDiv.parentElement;
+    addLog('Leaflet invalidateSize() 実行');
+    addLog('最終 lf-map offsetWidth: ' + lfDiv.offsetWidth);
+    addLog('最終 lf-map offsetHeight: ' + lfDiv.offsetHeight);
+    addLog('親 container offsetTop: ' + containerDiv.offsetTop);
+    addLog('親 container offsetLeft: ' + containerDiv.offsetLeft);
+    addLog('親 container clientWidth: ' + containerDiv.clientWidth);
+    addLog('親 container clientHeight: ' + containerDiv.clientHeight);
+
+    addLog('Leaflet 完全初期化完了');
+}, 50);
+
 
     setTimeout(() => {
         leafletBackgroundMap.invalidateSize(true);
