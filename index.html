@@ -150,28 +150,29 @@ main {
 <script src="map.js" defer></script>
 
 
-
 <script>
 function adjustLfMapPosition() {
   const header = document.querySelector('header');
   const lfMap = document.getElementById('lf-map');
+  const map = document.getElementById('map');
 
-  if (!header || !lfMap) return;
+  if (!header || !lfMap || !map) return;
 
   const headerHeight = header.offsetHeight;
+  const mapRect = map.getBoundingClientRect();
 
-  // 上だけ調整
+  // 上位置
   lfMap.style.top = headerHeight + 'px';
 
-  // 横中央だけ維持
+  // 横幅だけ合わせる ← これが重要
+  lfMap.style.width = mapRect.width + 'px';
+
+  // 中央揃え
   lfMap.style.left = '50%';
   lfMap.style.transform = 'translateX(-50%)';
 }
 
-// 初回
 window.addEventListener('load', adjustLfMapPosition);
-
-// リサイズ対応
 window.addEventListener('resize', adjustLfMapPosition);
 </script>
 
