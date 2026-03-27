@@ -120,6 +120,9 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
 let leafletBackgroundMap = null;
 
+// =========================
+// 前半：レイアウト構築
+// =========================
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     const lfDiv = document.getElementById('lf-map');
@@ -132,7 +135,6 @@ function prepareLeafletBackground(prefId) {
 
     addLog('prefId 受け取り: ' + prefId);
 
-    // --- サイズ定義（ここが基準） ---
     const LF_SIZE = 512;
     const MAP_HEIGHT = 420;
 
@@ -142,13 +144,13 @@ function prepareLeafletBackground(prefId) {
     containerDiv.style.position = 'relative';
     containerDiv.style.overflow = 'hidden';
 
-    // --- lf-map（背景）512×512中央 ---
+    // --- lf-map（背景：左上固定） ---
     lfDiv.style.position = 'absolute';
     lfDiv.style.width = LF_SIZE + 'px';
     lfDiv.style.height = LF_SIZE + 'px';
-    lfDiv.style.left = '50%';
-    lfDiv.style.top = '50%';
-    lfDiv.style.transform = 'translate(-50%, -50%)';
+    lfDiv.style.left = '0';
+    lfDiv.style.top = '0';
+    lfDiv.style.transform = 'none';
     lfDiv.style.zIndex = '0';
 
     // --- map（前面フレーム） ---
@@ -166,16 +168,19 @@ function prepareLeafletBackground(prefId) {
     if (leafletBackgroundMap) {
         leafletBackgroundMap.remove();
         leafletBackgroundMap = null;
-        addLog('既存背景 Leaflet 削除');
+        addLog('既存Leaflet削除');
     }
 
-    // 次フレームで確実にサイズ確定させてから初期化
+    // サイズ確定後に初期化
     requestAnimationFrame(() => {
         startLeafletBackground(prefId);
     });
 }
 
 
+// =========================
+// 後半：Leaflet初期化
+// =========================
 function startLeafletBackground(prefId) {
     const lfDiv = document.getElementById('lf-map');
     if (!lfDiv) {
@@ -198,7 +203,7 @@ function startLeafletBackground(prefId) {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
         .addTo(leafletBackgroundMap);
 
-    // --- 中心定義 ---
+    // --- 中心位置 ---
     const prefBounds = {
         CHIBA: [
             [35.15, 140.10],
@@ -218,12 +223,12 @@ function startLeafletBackground(prefId) {
 
     leafletBackgroundMap.setView(centerLatLng, zoomLevel);
 
-    requestAnimationFrame(() => {
+    // タイルズレ防止
+    setTimeout(() => {
         leafletBackgroundMap.invalidateSize();
-        addLog('Leaflet 背景初期化完了');
-    });
+        addLog('Leaflet 初期化完了');
+    }, 50);
 }
-
 
 
       // ★Pref 選択時
