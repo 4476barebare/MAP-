@@ -121,7 +121,7 @@ Object.keys(groupBoxSettings).forEach(gid => {
 let leafletBackgroundMap = null;
 
 // =========================
-// 前半：レイアウト構築
+// 前半：レイアウト構築 + ログ確認
 // =========================
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
@@ -139,23 +139,23 @@ function prepareLeafletBackground(prefId) {
     const MAP_HEIGHT = 420;
 
     // --- container（外枠） ---
-    containerDiv.style.width = '100%';
-    containerDiv.style.height = LF_SIZE + 'px';
     containerDiv.style.position = 'relative';
+    containerDiv.style.width = '100%';
+    containerDiv.style.height = MAP_HEIGHT + 'px';
     containerDiv.style.overflow = 'hidden';
 
-    // --- lf-map（Leaflet背景） ---
+    // --- lf-map（背景） ---
     lfDiv.style.position = 'absolute';
     lfDiv.style.width = LF_SIZE + 'px';
     lfDiv.style.height = LF_SIZE + 'px';
     lfDiv.style.left = '0';
     lfDiv.style.top = '0';
-    lfDiv.style.transform = 'none';
     lfDiv.style.zIndex = '0';
+    lfDiv.style.background = 'transparent';
+    lfDiv.style.transform = 'none';
 
     // --- map（前面フレーム） ---
     while (mapDiv.firstChild) mapDiv.removeChild(mapDiv.firstChild);
-
     mapDiv.style.position = 'absolute';
     mapDiv.style.top = '0';
     mapDiv.style.left = '0';
@@ -163,10 +163,8 @@ function prepareLeafletBackground(prefId) {
     mapDiv.style.height = MAP_HEIGHT + 'px';
     mapDiv.style.background = 'transparent';
     mapDiv.style.zIndex = '50';
-    
-    
-    
-      // --- ログ出力（サイズ確認） ---
+
+    // --- ログ出力（サイズ確認） ---
     addLog('前半終了時のサイズ確認');
     addLog('lf-map offsetWidth: ' + lfDiv.offsetWidth);
     addLog('lf-map offsetHeight: ' + lfDiv.offsetHeight);
@@ -175,23 +173,18 @@ function prepareLeafletBackground(prefId) {
     addLog('container clientWidth: ' + containerDiv.clientWidth);
     addLog('container clientHeight: ' + containerDiv.clientHeight);
 
-    // --- 既存Leaflet削除 ---
+    // --- 既存 Leaflet 削除 ---
     if (leafletBackgroundMap) {
         leafletBackgroundMap.remove();
         leafletBackgroundMap = null;
-        addLog('既存Leaflet削除');
+        addLog('既存 Leaflet 削除');
     }
-    
-    
-    
-    
 
-    // サイズ確定後に初期化
+    // --- 後半（Leaflet初期化）発火 ---
     requestAnimationFrame(() => {
         startLeafletBackground(prefId);
     });
 }
-
 // =========================
 // 後半：Leaflet初期化
 // =========================
