@@ -118,16 +118,17 @@ Object.keys(groupBoxSettings).forEach(gid => {
 
       
 
+
 let leafletBackgroundMap = null;
 
 // =========================
-// 前半：レイアウト構築＋ログ
+// 前半：レイアウト準備
 // =========================
 function prepareLeafletBackground(prefId) {
     const mapDiv = document.getElementById('map');
     const lfDiv = document.getElementById('lf-map');
     const containerDiv = document.getElementById('map-container');
-    const mainDiv = document.getElementById('main');
+    const mainDiv = document.getElementById('main'); // mainを中心固定用に取得
 
     if (!mapDiv || !lfDiv || !containerDiv || !mainDiv) {
         addLog('必要な要素が見つからない');
@@ -139,35 +140,33 @@ function prepareLeafletBackground(prefId) {
     const LF_SIZE = 512;
     const MAP_HEIGHT = 420;
 
-    // --- main を固定幅にしてセンタリング ---
-    mainDiv.style.width  = LF_SIZE + 'px';
-    mainDiv.style.height = LF_SIZE + 'px';
+    // --- main を 512px 幅にしてセンタリング ---
+    mainDiv.style.width = LF_SIZE + 'px';
     mainDiv.style.margin = '0 auto';
-    mainDiv.style.position = 'relative';
     mainDiv.style.overflow = 'hidden';
 
-    // --- container（表示枠） ---
-    containerDiv.style.width = LF_SIZE + 'px';
-    containerDiv.style.height = MAP_HEIGHT + 'px';
+    // --- container（外枠） ---
     containerDiv.style.position = 'relative';
+    containerDiv.style.width = '100%';
+    containerDiv.style.height = MAP_HEIGHT + 'px';
     containerDiv.style.overflow = 'hidden';
 
     // --- lf-map（背景） ---
     lfDiv.style.position = 'absolute';
-    lfDiv.style.width  = LF_SIZE + 'px';
+    lfDiv.style.width = LF_SIZE + 'px';
     lfDiv.style.height = LF_SIZE + 'px';
-    lfDiv.style.left   = '0';
-    lfDiv.style.top    = '0';
+    lfDiv.style.left = '0';
+    lfDiv.style.top = '0';
     lfDiv.style.zIndex = '0';
     lfDiv.style.background = 'transparent';
-    lfDiv.style.transform  = 'none';
+    lfDiv.style.transform = 'none';
 
     // --- map（前面フレーム） ---
     while (mapDiv.firstChild) mapDiv.removeChild(mapDiv.firstChild);
     mapDiv.style.position = 'absolute';
-    mapDiv.style.top  = '0';
+    mapDiv.style.top = '0';
     mapDiv.style.left = '0';
-    mapDiv.style.width  = '100%';
+    mapDiv.style.width = '100%';
     mapDiv.style.height = MAP_HEIGHT + 'px';
     mapDiv.style.background = 'transparent';
     mapDiv.style.zIndex = '50';
@@ -180,6 +179,7 @@ function prepareLeafletBackground(prefId) {
     addLog('前半container offsetLeft: ' + containerDiv.offsetLeft);
     addLog('前半container clientWidth: ' + containerDiv.clientWidth);
     addLog('前半container clientHeight: ' + containerDiv.clientHeight);
+    addLog('前半main offsetWidth: ' + mainDiv.offsetWidth);
 
     // --- 既存 Leaflet 削除 ---
     if (leafletBackgroundMap) {
@@ -188,35 +188,17 @@ function prepareLeafletBackground(prefId) {
         addLog('既存 Leaflet 削除');
     }
 
-    // --- 後半初期化は DOM 確定後 ---
-    requestAnimationFrame(() => startLeafletBackground(prefId));
+    // --- 後半に進む ---
+    requestAnimationFrame(() => {
+        startLeafletBackground(prefId, lfDiv, mainDiv);
+    });
 }
 
 // =========================
-// 後半：Leaflet初期化＋ログ
+// 後半：Leaflet 初期化
 // =========================
-function startLeafletBackground(prefId) {
-    const lfDiv = document.getElementById('lf-map');
-    const containerDiv = document.getElementById('map-container');
-
-    // 中心位置デフォルト
-    let centerLatLng = [35.5, 140.25];
-    const zoomLevel = 10;
-
-    // --- 県別座標 ---
-    const prefBounds = {
-        CHIBA: [
-            [35.15, 140.10],
-            [35.95, 140.40]
-        ]
-    };
-
-    if (prefId && prefBounds[prefId]) {
-        centerLatLng = [
-            (prefBounds[prefId][0][0] + prefBounds[prefId][1][0]) / 2,
-            (prefBounds[prefId][0][1] + prefBounds[prefId][1][1]) / 2
-        ];
-    }
+function startLeafletBackground(prefId, lfDiv, mainDiv) {
+    const LF_SIZE = 512;
 
     // --- Leaflet 初期化 ---
     leafletBackgroundMap = L.map(lfDiv, {
@@ -232,30 +214,48 @@ function startLeafletBackground(prefId) {
         preferCanvas: true
     });
 
-    addLog('中盤lf-map offsetWidth: ' + lfDiv.offsetWidth);
-    addLog('中盤lf-map offsetHeight: ' + lfDiv.offsetHeight);
-
-    // --- タイル追加 ---
+    // --- タイルレイヤー ---
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
         .addTo(leafletBackgroundMap);
 
-    // --- setView ---
+    // --- 中心位置 ---
+    const prefBounds = {
+        CHIBA: [
+            [35.15, 140.10],
+            [35.95, 140.40]
+        ]
+    };
+
+    let centerLatLng = [35.5, 140.25];
+    const zoomLevel = 10;
+
+    if (prefId && prefBounds[prefId]) {
+        centerLatLng = [
+            (prefBounds[prefId][0][0] + prefBounds[prefId][1][0]) / 2,
+            (prefBounds[prefId][0][1] + prefBounds[prefId][1][1]) / 2
+        ];
+    }
+
     leafletBackgroundMap.setView(centerLatLng, zoomLevel);
 
-    // --- サイズ再計算／タイル再描画 ---
-    setTimeout(() => {
-        leafletBackgroundMap.invalidateSize(true);
-        leafletBackgroundMap._onResize();
+    // --- 中盤ログ ---
+    addLog('中盤 lf-map offsetWidth: ' + lfDiv.offsetWidth);
+    addLog('中盤 lf-map offsetHeight: ' + lfDiv.offsetHeight);
+    addLog('中盤 main offsetWidth: ' + mainDiv.offsetWidth);
 
-        addLog('最終 lf-map offsetWidth: ' + lfDiv.offsetWidth);
-        addLog('最終 lf-map offsetHeight: ' + lfDiv.offsetHeight);
-        addLog('親 container offsetTop: ' + containerDiv.offsetTop);
-        addLog('親 container offsetLeft: ' + containerDiv.offsetLeft);
-        addLog('親 container clientWidth: ' + containerDiv.clientWidth);
-        addLog('親 container clientHeight: ' + containerDiv.clientHeight);
-        addLog('Leaflet 完全初期化完了');
-    }, 50);
+    // --- サイズ再認識 ---
+    lfDiv.style.width = LF_SIZE + 'px';
+    lfDiv.style.height = LF_SIZE + 'px';
+    leafletBackgroundMap.invalidateSize(true);
+    leafletBackgroundMap._onResize();
+
+    // --- 最終ログ ---
+    addLog('最終 lf-map offsetWidth: ' + lfDiv.offsetWidth);
+    addLog('最終 lf-map offsetHeight: ' + lfDiv.offsetHeight);
+    addLog('最終 main offsetWidth: ' + mainDiv.offsetWidth);
+    addLog('Leaflet 完全初期化完了');
 }
+
 
 
       // ★Pref 選択時
