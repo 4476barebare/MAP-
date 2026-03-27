@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こCHIBA</title>
 
-<!-- ヘッダーCSS（そのまま） -->
+<!-- ヘッダーCSS（元通り） -->
 <link rel="stylesheet" href="./header.css">
 
 <!-- Leaflet CSS -->
@@ -17,7 +17,7 @@ body {
   margin: 0;
 }
 
-/* とりあえず地図だけ確実に出す */
+/* 地図は触らない（確実に出す） */
 #lf-map {
   width: 100%;
   height: 500px;
@@ -28,12 +28,26 @@ body {
 
 <body>
 
-<!-- ヘッダー（そのまま） -->
+<!-- ✅ ヘッダー構造（元通り） -->
 <header>
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
+
     <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <a href="#" id="newsBtn">釣りNEWS</a>
       <a href="#">全国地図</a>
+      <a href="#">その他</a>
     </nav>
   </div>
 </header>
@@ -43,10 +57,13 @@ body {
 
 <footer>© 釣り行こNAVI</footer>
 
-<!-- Leaflet JS -->
+<!-- Leaflet JS（そのまま） -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- ★ここが最重要：直書きで即実行 -->
+<!-- ヘッダーJS（元通り） -->
+<script src="./header.js" defer></script>
+
+<!-- ★地図は絶対にこの形から触らない -->
 <script>
 const map = L.map('lf-map').setView([35.5, 140.25], 10);
 
