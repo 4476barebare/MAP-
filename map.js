@@ -181,7 +181,8 @@ function prepareLeafletBackground(prefId) {
     }
 
     
-    
+    lfDiv.style.width = '512px';
+lfDiv.style.height = '512px';
     // --- Leaflet初期化 ---
     leafletBackgroundMap = L.map(lfDiv, {
         zoomControl: false,
@@ -197,7 +198,7 @@ function prepareLeafletBackground(prefId) {
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-        .addTo(leafletBackgroundMap);
+        .addTo(lf-map);
 
     // --- 中心位置 ---
     const prefBounds = {
