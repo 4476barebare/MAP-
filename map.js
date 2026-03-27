@@ -201,8 +201,10 @@ function prepareLeafletBackground(prefId) {
         preferCanvas: true
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
-        .addTo(leafletBackgroundMap);
+   // 差し替え後
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    tileSize: 512  // ← ここを追加
+}).addTo(leafletBackgroundMap);
 
     // --- 中心位置 ---
     const prefBounds = {
