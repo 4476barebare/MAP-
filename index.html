@@ -19,11 +19,10 @@ html, body {
   overflow-x: hidden;
 }
 
-
-
 main {
   background-color: #191970;
   max-width: 100%;
+  height: 420px;
   margin: 0;
   padding: 0;
 }
@@ -68,14 +67,14 @@ main {
 #lf-map {
   position: absolute;
   width: auto;
-  height: auto;
+  height: 420px;
   z-index: 0;
 }
 
 #map-container {
   position: relative;
   width: auto;
-  height: auto;
+  height: 420px;
   overflow: hidden;
   background: #fff;
   z-index: 1; /* ← これ追加 */
@@ -150,29 +149,24 @@ main {
 <script src="map.js" defer></script>
 
 
+
 <script>
 function adjustLfMapPosition() {
   const header = document.querySelector('header');
   const lfMap = document.getElementById('lf-map');
-  const map = document.getElementById('map');
 
-  if (!header || !lfMap || !map) return;
+  if (!header || !lfMap) return;
 
   const headerHeight = header.offsetHeight;
-  const mapRect = map.getBoundingClientRect();
 
-  // 上位置
+  // ヘッダー分だけ下げる
   lfMap.style.top = headerHeight + 'px';
-
-  // 横幅だけ合わせる ← これが重要
-  lfMap.style.width = mapRect.width + 'px';
-
-  // 中央揃え
-  lfMap.style.left = '50%';
-  lfMap.style.transform = 'translateX(-50%)';
 }
 
+// 初回
 window.addEventListener('load', adjustLfMapPosition);
+
+// リサイズ対応（レスポンシブ用）
 window.addEventListener('resize', adjustLfMapPosition);
 </script>
 
