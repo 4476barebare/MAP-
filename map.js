@@ -140,7 +140,7 @@ function prepareLeafletBackground(prefId) {
     // --- container（外枠） ---
     containerDiv.style.width = '100%';
     containerDiv.style.height = LF_SIZE + 'px';
-    containerDiv.style.position = 'absolute'; // ← 修正ポイント
+    containerDiv.style.position = 'relative'; // ← 修正ポイント
     containerDiv.style.top = '0';             // ← 追加
     containerDiv.style.left = '0';            // ← 追加
     containerDiv.style.overflow = 'hidden';
