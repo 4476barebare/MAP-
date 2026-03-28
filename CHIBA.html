@@ -5,12 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>釣り行こCHIBA</title>
 
-<!-- ヘッダーCSS -->
 <link rel="stylesheet" href="/MAP-/header.css">
-
-<!-- Leaflet CSS -->
-<link rel="stylesheet"
- href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 html, body {
@@ -22,29 +18,73 @@ html, body {
   overflow-x: hidden;
 }
 
-
-
-
-/* 地図（元のまま） */
 #lf-map {
   width: 100%;
-  height: 500px;
-  background: red;
+  height: 60vh;
+  position: relative;
 }
 
 .leaflet-container {
   z-index: 0;
 }
 
+
+.map-menu {
+  position: absolute;
+  bottom: 10px;
+  left: 5px;
+  right: 5px;
+  border: 1px solid #191970;
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+  padding: 4px 8px;
+  z-index: 500;
+}
+
+.map-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 各行 */
+.map-menu li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px dotted #191970;
+
+  font-size: 14px;
+  padding: 6px 0;
+  cursor: pointer;
+
+  /* 軽い点線 */
+  border-bottom: 1px dotted #ccc;
+}
+
+/* 最後の線消す */
+.map-menu li:last-child {
+  border-bottom: none;
+}
+
+/* 次ページボタン（右端に小さく） */
+.next-btn {
+  font-size: 12px;
+  color: #007aff;
+  margin-left: 8px;
+  white-space: nowrap;
+}
 </style>
 </head>
 
 <body>
 
-<!-- ヘッダー -->
 <header>
   <div class="header-inner">
-    <div class="logo">釣り行こNAVI</div>
+    <div class="logo">釣り行こCHIBA</div>
     <nav class="nav">
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
@@ -57,18 +97,21 @@ html, body {
         </div>
       </div>
       <a href="#" id="newsBtn">釣りNEWS</a>
-      <a href="#">全国地図</a>
-      <a href="#">その他</a>
+      <a href="#">スポット一覧</a>
     </nav>
   </div>
 </header>
-<!-- 地図 -->
-<div id="lf-map"></div>
 
-<!-- フッター -->
+<div id="lf-map">
+
+  <div id="map-menu" class="map-menu">
+    <ul></ul>
+  </div>
+
+</div>
+
 <footer>© 釣り行こNAVI</footer>
 
-<!-- ニュースオーバーレイ -->
 <div id="newsOverlay">
   <div class="news-window">
     <button id="closeNews">閉じる</button>
@@ -76,21 +119,94 @@ html, body {
   </div>
 </div>
 
-<!-- JS（順番重要） -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- header.js（そのまま） -->
 <script src="/MAP-/header.js" defer></script>
 
-<!-- ★ここだけ修正（実行タイミング） -->
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
-  const map = L.map('lf-map').setView([35.5, 140.25], 10);
+  const map = L.map('lf-map').setView([35.15, 140.3], 8);
+  map.attributionControl.setPrefix(false);
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
+  const menu = document.querySelector('#map-menu ul');
+  const maxRowsPerPage = 4;
+
+  // --- ダミーデータ（将来的にCSVロード） ---
+  const points = [
+    {name:'ポイント1', lat:35.15, lng:140.3},
+    {name:'ポイント2', lat:35.2, lng:140.35},
+    {name:'ポイント3', lat:35.25, lng:140.4},
+    {name:'ポイント4', lat:35.3, lng:140.45},
+    {name:'ポイント5', lat:35.35, lng:140.5},
+    {name:'ポイント6', lat:35.4, lng:140.55},
+    {name:'ポイント7', lat:35.45, lng:140.6}
+  ];
+
+  let currentPage = 0;
+  const totalPages = Math.ceil(points.length / maxRowsPerPage);
+
+
+function renderMenu() {
+  menu.innerHTML = '';
+
+  const start = currentPage * maxRowsPerPage;
+  const end = Math.min(start + maxRowsPerPage, points.length);
+
+  for(let i=start;i<end;i++){
+    const li = document.createElement('li');
+
+    const text = document.createElement('span');
+    text.textContent = points[i].name;
+
+    li.appendChild(text);
+
+    // ★ 4行目かつ次ページがある場合だけボタン追加
+    if(i === end - 1 && currentPage < totalPages - 1){
+      const next = document.createElement('span');
+      next.textContent = '▶';
+      next.className = 'next-btn';
+
+      next.addEventListener('click', function(e){
+        e.stopPropagation(); // 行クリック防止
+        currentPage++;
+        renderMenu();
+      });
+
+      li.appendChild(next);
+    }
+
+    li.dataset.lat = points[i].lat;
+    li.dataset.lng = points[i].lng;
+
+    li.addEventListener('click', function() {
+      map.setView([this.dataset.lat, this.dataset.lng], 12);
+      menu.innerHTML = '';
+    });
+
+    menu.appendChild(li);
+  }
+
+  // 前ページ（1行目に入れる）
+  if(currentPage > 0){
+    const firstLi = menu.firstChild;
+    const prev = document.createElement('span');
+    prev.textContent = '◀';
+    prev.className = 'next-btn';
+
+    prev.addEventListener('click', function(e){
+      e.stopPropagation();
+      currentPage--;
+      renderMenu();
+    });
+
+    firstLi.appendChild(prev);
+  }
+}
+
+
+
+  renderMenu();
 
 });
 </script>
