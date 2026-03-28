@@ -24,23 +24,11 @@ html, body {
   overflow-x: hidden;
 }
 
-main {
-
-}
-
+/* 地図 */
 #lf-map {
-  position: absolute;
   width: 100%;
   height: 500px;
-}
-
-.leaflet-pane {
-  z-index: 0 !important;
-}
-
-.leaflet-top,
-.leaflet-bottom {
-  z-index: 0 !important;
+  background: red;
 }
 </style>
 </head>
@@ -51,6 +39,7 @@ main {
 <header>
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
+
     <nav class="nav">
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
@@ -62,6 +51,7 @@ main {
           </ul>
         </div>
       </div>
+
       <a href="#" id="newsBtn">釣りNEWS</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
@@ -70,18 +60,12 @@ main {
 </header>
 
 <!-- 地図 -->
-<main>
-  <div id="lf-map"></div>
-</main>
+<div id="lf-map"></div>
 
 <!-- フッター -->
-<footer class="footer">
-  <div class="footer-inner">
-    <p>© 釣り行こNAVI</p>
-  </div>
-</footer>
+<footer>© 釣り行こNAVI</footer>
 
-
+<!-- ニュースオーバーレイ -->
 <div id="newsOverlay">
   <div class="news-window">
     <button id="closeNews">閉じる</button>
@@ -89,11 +73,14 @@ main {
   </div>
 </div>
 
+
+
+
 <!-- JS（順番重要） -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<!-- ★defer外す（ここ重要） -->
 <script src="/MAP-/header.js" defer></script>
-
 
 <!-- 地図（触るな） -->
 <script>
