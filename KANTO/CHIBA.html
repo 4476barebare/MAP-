@@ -12,22 +12,35 @@
 <style>
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
 }
 
-/* 地図 */
+/* ===== 地図エリア ===== */
 #lf-map{
-  width:100%;
-  height:60vh;
   position:relative;
+  height:60vh;
 }
 
-.leaflet-container{
-  width:100%;
+/* Leaflet本体だけを下に固定 */
+#map-inner{
   height:100%;
+  width:100%;
+  z-index:0;
 }
 
-/* ターゲット */
+/* UIレイヤー（これが重要） */
+#ui-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none; /* ←基本無効 */
+  z-index:10;
+}
+
+/* UIは個別に有効化 */
+.ui{
+  pointer-events:auto;
+}
+
+/* ===== ターゲット ===== */
 #center-target{
   position:absolute;
   top:50%;
@@ -35,8 +48,6 @@ body{
   width:14px;
   height:14px;
   transform:translate(-50%,-50%);
-  pointer-events:none;
-  z-index:10;
 }
 
 #center-target::before,
@@ -55,13 +66,13 @@ body{
 
 #center-target::after{
   top:50%;
-  height:1px;
   width:100%;
+  height:1px;
   transform:translateY(-50%);
 }
 
-/* メニュー */
-.map-menu{
+/* ===== メニュー ===== */
+#map-menu{
   position:absolute;
   bottom:10px;
   left:8px;
@@ -72,29 +83,26 @@ body{
   border-radius:8px;
 
   padding:4px 8px;
-  z-index:20;
 }
 
-.map-menu ul{
+#map-menu ul{
   margin:0;
   padding:0;
   list-style:none;
 }
 
-.map-menu li{
+#map-menu li{
   display:flex;
   justify-content:space-between;
-  align-items:center;
 
   font-size:13px;
   line-height:1.2;
   padding:4px 0;
 
   border-bottom:1px dotted #191970;
-  cursor:pointer;
 }
 
-.map-menu li:last-child{
+#map-menu li:last-child{
   border-bottom:none;
 }
 
@@ -131,10 +139,18 @@ body{
 
 <div id="lf-map">
 
-  <div id="center-target"></div>
+  <!-- 地図本体 -->
+  <div id="map-inner"></div>
 
-  <div id="map-menu" class="map-menu">
-    <ul></ul>
+  <!-- UIレイヤー -->
+  <div id="ui-layer">
+
+    <div id="center-target"></div>
+
+    <div id="map-menu" class="ui">
+      <ul></ul>
+    </div>
+
   </div>
 
 </div>
@@ -147,77 +163,57 @@ body{
 <script>
 window.addEventListener('DOMContentLoaded', function(){
 
+  const map = L.map('map-inner').setView([35.15,140.3],8);
+
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19
+  }).addTo(map);
+
   const menu = document.querySelector('#map-menu ul');
 
-  const maxRows = 4;
-  let currentPage = 0;
-
-  const points = [
-    {name:'ポイント1', lat:35.15, lng:140.3},
-    {name:'ポイント2', lat:35.2, lng:140.35},
-    {name:'ポイント3', lat:35.25, lng:140.4},
-    {name:'ポイント4', lat:35.3, lng:140.45},
-    {name:'ポイント5', lat:35.35, lng:140.5},
-    {name:'ポイント6', lat:35.4, lng:140.55}
+  const points=[
+    {name:'ポイント1',lat:35.15,lng:140.3},
+    {name:'ポイント2',lat:35.2,lng:140.35},
+    {name:'ポイント3',lat:35.25,lng:140.4},
+    {name:'ポイント4',lat:35.3,lng:140.45},
+    {name:'ポイント5',lat:35.35,lng:140.5}
   ];
 
-  function renderMenu(){
+  let page=0;
+  const max=4;
+
+  function render(){
     menu.innerHTML='';
 
-    const start = currentPage * maxRows;
-    const end = Math.min(start + maxRows, points.length);
+    const start=page*max;
+    const end=Math.min(start+max,points.length);
 
     for(let i=start;i<end;i++){
-      const li = document.createElement('li');
+      const li=document.createElement('li');
 
-      const text = document.createElement('span');
-      text.textContent = points[i].name;
-      li.appendChild(text);
+      li.textContent=points[i].name;
 
-      if(i === end-1 && end < points.length){
-        const next = document.createElement('span');
+      li.onclick=()=>{
+        map.setView([points[i].lat,points[i].lng],12);
+      };
+
+      if(i===end-1 && end<points.length){
+        const next=document.createElement('span');
         next.textContent='▶';
         next.className='nav-btn';
         next.onclick=(e)=>{
           e.stopPropagation();
-          currentPage++;
-          renderMenu();
+          page++;
+          render();
         };
         li.appendChild(next);
       }
-
-      if(i === start && currentPage > 0){
-        const prev = document.createElement('span');
-        prev.textContent='◀';
-        prev.className='nav-btn';
-        prev.onclick=(e)=>{
-          e.stopPropagation();
-          currentPage--;
-          renderMenu();
-        };
-        li.appendChild(prev);
-      }
-
-      li.onclick=()=>{
-        map.setView([points[i].lat, points[i].lng], 12);
-      };
 
       menu.appendChild(li);
     }
   }
 
-  // ★ここ重要：map生成後に描画
-  const map = L.map('lf-map').setView([35.15, 140.3], 8);
-
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
-
-  // 初回描画
-  renderMenu();
-
-  // ★念押し（Leaflet安定後）
-  setTimeout(renderMenu, 100);
+  render();
 
 });
 </script>
@@ -237,22 +233,35 @@ window.addEventListener('DOMContentLoaded', function(){
 <style>
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
 }
 
-/* 地図 */
+/* ===== 地図エリア ===== */
 #lf-map{
-  width:100%;
-  height:60vh;
   position:relative;
+  height:60vh;
 }
 
-.leaflet-container{
-  width:100%;
+/* Leaflet本体だけを下に固定 */
+#map-inner{
   height:100%;
+  width:100%;
+  z-index:0;
 }
 
-/* ターゲット */
+/* UIレイヤー（これが重要） */
+#ui-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none; /* ←基本無効 */
+  z-index:10;
+}
+
+/* UIは個別に有効化 */
+.ui{
+  pointer-events:auto;
+}
+
+/* ===== ターゲット ===== */
 #center-target{
   position:absolute;
   top:50%;
@@ -260,8 +269,6 @@ body{
   width:14px;
   height:14px;
   transform:translate(-50%,-50%);
-  pointer-events:none;
-  z-index:10;
 }
 
 #center-target::before,
@@ -280,13 +287,13 @@ body{
 
 #center-target::after{
   top:50%;
-  height:1px;
   width:100%;
+  height:1px;
   transform:translateY(-50%);
 }
 
-/* メニュー */
-.map-menu{
+/* ===== メニュー ===== */
+#map-menu{
   position:absolute;
   bottom:10px;
   left:8px;
@@ -297,29 +304,26 @@ body{
   border-radius:8px;
 
   padding:4px 8px;
-  z-index:20;
 }
 
-.map-menu ul{
+#map-menu ul{
   margin:0;
   padding:0;
   list-style:none;
 }
 
-.map-menu li{
+#map-menu li{
   display:flex;
   justify-content:space-between;
-  align-items:center;
 
   font-size:13px;
   line-height:1.2;
   padding:4px 0;
 
   border-bottom:1px dotted #191970;
-  cursor:pointer;
 }
 
-.map-menu li:last-child{
+#map-menu li:last-child{
   border-bottom:none;
 }
 
@@ -356,10 +360,18 @@ body{
 
 <div id="lf-map">
 
-  <div id="center-target"></div>
+  <!-- 地図本体 -->
+  <div id="map-inner"></div>
 
-  <div id="map-menu" class="map-menu">
-    <ul></ul>
+  <!-- UIレイヤー -->
+  <div id="ui-layer">
+
+    <div id="center-target"></div>
+
+    <div id="map-menu" class="ui">
+      <ul></ul>
+    </div>
+
   </div>
 
 </div>
@@ -372,77 +384,57 @@ body{
 <script>
 window.addEventListener('DOMContentLoaded', function(){
 
+  const map = L.map('map-inner').setView([35.15,140.3],8);
+
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19
+  }).addTo(map);
+
   const menu = document.querySelector('#map-menu ul');
 
-  const maxRows = 4;
-  let currentPage = 0;
-
-  const points = [
-    {name:'ポイント1', lat:35.15, lng:140.3},
-    {name:'ポイント2', lat:35.2, lng:140.35},
-    {name:'ポイント3', lat:35.25, lng:140.4},
-    {name:'ポイント4', lat:35.3, lng:140.45},
-    {name:'ポイント5', lat:35.35, lng:140.5},
-    {name:'ポイント6', lat:35.4, lng:140.55}
+  const points=[
+    {name:'ポイント1',lat:35.15,lng:140.3},
+    {name:'ポイント2',lat:35.2,lng:140.35},
+    {name:'ポイント3',lat:35.25,lng:140.4},
+    {name:'ポイント4',lat:35.3,lng:140.45},
+    {name:'ポイント5',lat:35.35,lng:140.5}
   ];
 
-  function renderMenu(){
+  let page=0;
+  const max=4;
+
+  function render(){
     menu.innerHTML='';
 
-    const start = currentPage * maxRows;
-    const end = Math.min(start + maxRows, points.length);
+    const start=page*max;
+    const end=Math.min(start+max,points.length);
 
     for(let i=start;i<end;i++){
-      const li = document.createElement('li');
+      const li=document.createElement('li');
 
-      const text = document.createElement('span');
-      text.textContent = points[i].name;
-      li.appendChild(text);
+      li.textContent=points[i].name;
 
-      if(i === end-1 && end < points.length){
-        const next = document.createElement('span');
+      li.onclick=()=>{
+        map.setView([points[i].lat,points[i].lng],12);
+      };
+
+      if(i===end-1 && end<points.length){
+        const next=document.createElement('span');
         next.textContent='▶';
         next.className='nav-btn';
         next.onclick=(e)=>{
           e.stopPropagation();
-          currentPage++;
-          renderMenu();
+          page++;
+          render();
         };
         li.appendChild(next);
       }
-
-      if(i === start && currentPage > 0){
-        const prev = document.createElement('span');
-        prev.textContent='◀';
-        prev.className='nav-btn';
-        prev.onclick=(e)=>{
-          e.stopPropagation();
-          currentPage--;
-          renderMenu();
-        };
-        li.appendChild(prev);
-      }
-
-      li.onclick=()=>{
-        map.setView([points[i].lat, points[i].lng], 12);
-      };
 
       menu.appendChild(li);
     }
   }
 
-  // ★ここ重要：map生成後に描画
-  const map = L.map('lf-map').setView([35.15, 140.3], 8);
-
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
-
-  // 初回描画
-  renderMenu();
-
-  // ★念押し（Leaflet安定後）
-  setTimeout(renderMenu, 100);
+  render();
 
 });
 </script>
@@ -462,22 +454,35 @@ window.addEventListener('DOMContentLoaded', function(){
 <style>
 body{
   margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
 }
 
-/* 地図 */
+/* ===== 地図エリア ===== */
 #lf-map{
-  width:100%;
-  height:60vh;
   position:relative;
+  height:60vh;
 }
 
-.leaflet-container{
-  width:100%;
+/* Leaflet本体だけを下に固定 */
+#map-inner{
   height:100%;
+  width:100%;
+  z-index:0;
 }
 
-/* ターゲット */
+/* UIレイヤー（これが重要） */
+#ui-layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none; /* ←基本無効 */
+  z-index:10;
+}
+
+/* UIは個別に有効化 */
+.ui{
+  pointer-events:auto;
+}
+
+/* ===== ターゲット ===== */
 #center-target{
   position:absolute;
   top:50%;
@@ -485,8 +490,6 @@ body{
   width:14px;
   height:14px;
   transform:translate(-50%,-50%);
-  pointer-events:none;
-  z-index:10;
 }
 
 #center-target::before,
@@ -505,13 +508,13 @@ body{
 
 #center-target::after{
   top:50%;
-  height:1px;
   width:100%;
+  height:1px;
   transform:translateY(-50%);
 }
 
-/* メニュー */
-.map-menu{
+/* ===== メニュー ===== */
+#map-menu{
   position:absolute;
   bottom:10px;
   left:8px;
@@ -522,29 +525,26 @@ body{
   border-radius:8px;
 
   padding:4px 8px;
-  z-index:20;
 }
 
-.map-menu ul{
+#map-menu ul{
   margin:0;
   padding:0;
   list-style:none;
 }
 
-.map-menu li{
+#map-menu li{
   display:flex;
   justify-content:space-between;
-  align-items:center;
 
   font-size:13px;
   line-height:1.2;
   padding:4px 0;
 
   border-bottom:1px dotted #191970;
-  cursor:pointer;
 }
 
-.map-menu li:last-child{
+#map-menu li:last-child{
   border-bottom:none;
 }
 
@@ -581,10 +581,18 @@ body{
 
 <div id="lf-map">
 
-  <div id="center-target"></div>
+  <!-- 地図本体 -->
+  <div id="map-inner"></div>
 
-  <div id="map-menu" class="map-menu">
-    <ul></ul>
+  <!-- UIレイヤー -->
+  <div id="ui-layer">
+
+    <div id="center-target"></div>
+
+    <div id="map-menu" class="ui">
+      <ul></ul>
+    </div>
+
   </div>
 
 </div>
@@ -597,302 +605,57 @@ body{
 <script>
 window.addEventListener('DOMContentLoaded', function(){
 
+  const map = L.map('map-inner').setView([35.15,140.3],8);
+
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    maxZoom:19
+  }).addTo(map);
+
   const menu = document.querySelector('#map-menu ul');
 
-  const maxRows = 4;
-  let currentPage = 0;
-
-  const points = [
-    {name:'ポイント1', lat:35.15, lng:140.3},
-    {name:'ポイント2', lat:35.2, lng:140.35},
-    {name:'ポイント3', lat:35.25, lng:140.4},
-    {name:'ポイント4', lat:35.3, lng:140.45},
-    {name:'ポイント5', lat:35.35, lng:140.5},
-    {name:'ポイント6', lat:35.4, lng:140.55}
+  const points=[
+    {name:'ポイント1',lat:35.15,lng:140.3},
+    {name:'ポイント2',lat:35.2,lng:140.35},
+    {name:'ポイント3',lat:35.25,lng:140.4},
+    {name:'ポイント4',lat:35.3,lng:140.45},
+    {name:'ポイント5',lat:35.35,lng:140.5}
   ];
 
-  function renderMenu(){
+  let page=0;
+  const max=4;
+
+  function render(){
     menu.innerHTML='';
 
-    const start = currentPage * maxRows;
-    const end = Math.min(start + maxRows, points.length);
+    const start=page*max;
+    const end=Math.min(start+max,points.length);
 
     for(let i=start;i<end;i++){
-      const li = document.createElement('li');
+      const li=document.createElement('li');
 
-      const text = document.createElement('span');
-      text.textContent = points[i].name;
-      li.appendChild(text);
+      li.textContent=points[i].name;
 
-      if(i === end-1 && end < points.length){
-        const next = document.createElement('span');
+      li.onclick=()=>{
+        map.setView([points[i].lat,points[i].lng],12);
+      };
+
+      if(i===end-1 && end<points.length){
+        const next=document.createElement('span');
         next.textContent='▶';
         next.className='nav-btn';
         next.onclick=(e)=>{
           e.stopPropagation();
-          currentPage++;
-          renderMenu();
+          page++;
+          render();
         };
         li.appendChild(next);
       }
-
-      if(i === start && currentPage > 0){
-        const prev = document.createElement('span');
-        prev.textContent='◀';
-        prev.className='nav-btn';
-        prev.onclick=(e)=>{
-          e.stopPropagation();
-          currentPage--;
-          renderMenu();
-        };
-        li.appendChild(prev);
-      }
-
-      li.onclick=()=>{
-        map.setView([points[i].lat, points[i].lng], 12);
-      };
 
       menu.appendChild(li);
     }
   }
 
-  // ★ここ重要：map生成後に描画
-  const map = L.map('lf-map').setView([35.15, 140.3], 8);
-
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
-
-  // 初回描画
-  renderMenu();
-
-  // ★念押し（Leaflet安定後）
-  setTimeout(renderMenu, 100);
-
-});
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>釣り行こCHIBA</title>
-
-<link rel="stylesheet" href="/MAP-/header.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<style>
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-}
-
-/* 地図 */
-#lf-map{
-  width:100%;
-  height:60vh;
-  position:relative;
-}
-
-.leaflet-container{
-  width:100%;
-  height:100%;
-}
-
-/* ターゲット */
-#center-target{
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:14px;
-  height:14px;
-  transform:translate(-50%,-50%);
-  pointer-events:none;
-  z-index:10;
-}
-
-#center-target::before,
-#center-target::after{
-  content:"";
-  position:absolute;
-  background:red;
-}
-
-#center-target::before{
-  left:50%;
-  width:1px;
-  height:100%;
-  transform:translateX(-50%);
-}
-
-#center-target::after{
-  top:50%;
-  height:1px;
-  width:100%;
-  transform:translateY(-50%);
-}
-
-/* メニュー */
-.map-menu{
-  position:absolute;
-  bottom:10px;
-  left:8px;
-  right:8px;
-
-  background:#fff;
-  border:1px solid #191970;
-  border-radius:8px;
-
-  padding:4px 8px;
-  z-index:20;
-}
-
-.map-menu ul{
-  margin:0;
-  padding:0;
-  list-style:none;
-}
-
-.map-menu li{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  font-size:13px;
-  line-height:1.2;
-  padding:4px 0;
-
-  border-bottom:1px dotted #191970;
-  cursor:pointer;
-}
-
-.map-menu li:last-child{
-  border-bottom:none;
-}
-
-.nav-btn{
-  font-size:11px;
-  color:#007aff;
-  margin-left:6px;
-  cursor:pointer;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-  <div class="header-inner">
-    <div class="logo">釣り行こCHIBA</div>
-    <nav class="nav">
-      <div class="accordion-wrapper">
-        <button class="accordion-btn">登録地点 ▼</button>
-        <div class="accordion-panel">
-          <ul class="location-list">
-            <li>新潟</li>
-            <li>群馬</li>
-            <li>飯岡漁港(千葉)</li>
-          </ul>
-        </div>
-      </div>
-      <a href="#">釣りNEWS</a>
-      <a href="#">スポット一覧</a>
-    </nav>
-  </div>
-</header>
-
-<div id="lf-map">
-
-  <div id="center-target"></div>
-
-  <div id="map-menu" class="map-menu">
-    <ul></ul>
-  </div>
-
-</div>
-
-<footer>© 釣り行こNAVI</footer>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/MAP-/header.js" defer></script>
-
-<script>
-window.addEventListener('DOMContentLoaded', function(){
-
-  const menu = document.querySelector('#map-menu ul');
-
-  const maxRows = 4;
-  let currentPage = 0;
-
-  const points = [
-    {name:'ポイント1', lat:35.15, lng:140.3},
-    {name:'ポイント2', lat:35.2, lng:140.35},
-    {name:'ポイント3', lat:35.25, lng:140.4},
-    {name:'ポイント4', lat:35.3, lng:140.45},
-    {name:'ポイント5', lat:35.35, lng:140.5},
-    {name:'ポイント6', lat:35.4, lng:140.55}
-  ];
-
-  function renderMenu(){
-    menu.innerHTML='';
-
-    const start = currentPage * maxRows;
-    const end = Math.min(start + maxRows, points.length);
-
-    for(let i=start;i<end;i++){
-      const li = document.createElement('li');
-
-      const text = document.createElement('span');
-      text.textContent = points[i].name;
-      li.appendChild(text);
-
-      if(i === end-1 && end < points.length){
-        const next = document.createElement('span');
-        next.textContent='▶';
-        next.className='nav-btn';
-        next.onclick=(e)=>{
-          e.stopPropagation();
-          currentPage++;
-          renderMenu();
-        };
-        li.appendChild(next);
-      }
-
-      if(i === start && currentPage > 0){
-        const prev = document.createElement('span');
-        prev.textContent='◀';
-        prev.className='nav-btn';
-        prev.onclick=(e)=>{
-          e.stopPropagation();
-          currentPage--;
-          renderMenu();
-        };
-        li.appendChild(prev);
-      }
-
-      li.onclick=()=>{
-        map.setView([points[i].lat, points[i].lng], 12);
-      };
-
-      menu.appendChild(li);
-    }
-  }
-
-  // ★ここ重要：map生成後に描画
-  const map = L.map('lf-map').setView([35.15, 140.3], 8);
-
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
-
-  // 初回描画
-  renderMenu();
-
-  // ★念押し（Leaflet安定後）
-  setTimeout(renderMenu, 100);
+  render();
 
 });
 </script>
