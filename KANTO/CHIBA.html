@@ -28,17 +28,19 @@ html, body {
   z-index: 0;
 }
 
+
 .map-menu {
   position: absolute;
   bottom: 10px;
   left: 5px;
   right: 5px;
-  background: rgba(255,255,255,0.95);
-  padding: 6px 10px;
-  box-shadow: 0 0 4px rgba(0,0,0,0.3);
-  border-radius: 6px;
+
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+  padding: 4px 8px;
   z-index: 500;
-  overflow: hidden;
 }
 
 .map-menu ul {
@@ -47,15 +49,31 @@ html, body {
   padding: 0;
 }
 
+/* 各行 */
 .map-menu li {
-  padding: 2px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 14px;
+  padding: 6px 0;
   cursor: pointer;
+
+  /* 軽い点線 */
+  border-bottom: 1px dotted #ccc;
 }
 
-.map-menu li.next-page,
-.map-menu li.prev-page {
-  font-weight: bold;
-  text-align: right;
+/* 最後の線消す */
+.map-menu li:last-child {
+  border-bottom: none;
+}
+
+/* 次ページボタン（右端に小さく） */
+.next-btn {
+  font-size: 12px;
+  color: #007aff;
+  margin-left: 8px;
+  white-space: nowrap;
 }
 </style>
 </head>
@@ -126,46 +144,65 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentPage = 0;
   const totalPages = Math.ceil(points.length / maxRowsPerPage);
 
-  function renderMenu() {
-    menu.innerHTML = '';
-    const start = currentPage * maxRowsPerPage;
-    const end = Math.min(start + maxRowsPerPage, points.length);
-    for(let i=start;i<end;i++){
-      const li = document.createElement('li');
-      li.textContent = points[i].name;
-      li.dataset.lat = points[i].lat;
-      li.dataset.lng = points[i].lng;
-      li.addEventListener('click', function() {
-        map.setView([parseFloat(this.dataset.lat), parseFloat(this.dataset.lng)], 12);
-        menu.innerHTML = '';
-      });
-      menu.appendChild(li);
-    }
 
-    // 次ページボタン
-    if(currentPage < totalPages - 1){
-      const liNext = document.createElement('li');
-      liNext.textContent = '▶ 次ページ';
-      liNext.classList.add('next-page');
-      liNext.addEventListener('click', function(){
+function renderMenu() {
+  menu.innerHTML = '';
+
+  const start = currentPage * maxRowsPerPage;
+  const end = Math.min(start + maxRowsPerPage, points.length);
+
+  for(let i=start;i<end;i++){
+    const li = document.createElement('li');
+
+    const text = document.createElement('span');
+    text.textContent = points[i].name;
+
+    li.appendChild(text);
+
+    // ★ 4行目かつ次ページがある場合だけボタン追加
+    if(i === end - 1 && currentPage < totalPages - 1){
+      const next = document.createElement('span');
+      next.textContent = '▶';
+      next.className = 'next-btn';
+
+      next.addEventListener('click', function(e){
+        e.stopPropagation(); // 行クリック防止
         currentPage++;
         renderMenu();
       });
-      menu.appendChild(liNext);
+
+      li.appendChild(next);
     }
 
-    // 前ページボタン
-    if(currentPage > 0){
-      const liPrev = document.createElement('li');
-      liPrev.textContent = '◀ 前ページ';
-      liPrev.classList.add('prev-page');
-      liPrev.addEventListener('click', function(){
-        currentPage--;
-        renderMenu();
-      });
-      menu.appendChild(liPrev);
-    }
+    li.dataset.lat = points[i].lat;
+    li.dataset.lng = points[i].lng;
+
+    li.addEventListener('click', function() {
+      map.setView([this.dataset.lat, this.dataset.lng], 12);
+      menu.innerHTML = '';
+    });
+
+    menu.appendChild(li);
   }
+
+  // 前ページ（1行目に入れる）
+  if(currentPage > 0){
+    const firstLi = menu.firstChild;
+    const prev = document.createElement('span');
+    prev.textContent = '◀';
+    prev.className = 'next-btn';
+
+    prev.addEventListener('click', function(e){
+      e.stopPropagation();
+      currentPage--;
+      renderMenu();
+    });
+
+    firstLi.appendChild(prev);
+  }
+}
+
+
 
   renderMenu();
 
