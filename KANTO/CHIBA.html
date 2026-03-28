@@ -22,17 +22,15 @@ html, body {
   overflow-x: hidden;
 }
 
-header {
-  position: relative;
-  z-index: 1000;
-}
-
-
-/* 地図（元のまま） */
+/* 地図（背景だけ削除） */
 #lf-map {
   width: 100%;
   height: 500px;
-  background: red;
+}
+
+/* Leafletを背面へ */
+.leaflet-container {
+  z-index: 0;
 }
 </style>
 </head>
@@ -60,6 +58,7 @@ header {
     </nav>
   </div>
 </header>
+
 <!-- 地図 -->
 <div id="lf-map"></div>
 
@@ -74,21 +73,52 @@ header {
   </div>
 </div>
 
+<!-- デバッグ表示（追加） -->
+<div id="map-debug" style="
+position:fixed;
+bottom:10px;
+left:10px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+padding:8px;
+font-size:12px;
+z-index:9999;
+border-radius:6px;
+">
+  lat: <span id="lat">-</span><br>
+  lng: <span id="lng">-</span><br>
+  zoom: <span id="zoom">-</span>
+</div>
+
 <!-- JS（順番重要） -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <!-- header.js（そのまま） -->
 <script src="/MAP-/header.js" defer></script>
 
-<!-- ★ここだけ修正（実行タイミング） -->
+<!-- 地図 -->
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
-  const map = L.map('lf-map').setView([35.5, 140.25], 10);
+  const map = L.map('lf-map').setView([35.5, 140.25], 9); // ←ズームだけ変更
+
+  map.attributionControl.setPrefix(false); // ←ロゴ削除
 
   L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19
   }).addTo(map);
+
+  // デバッグ表示
+  function updateDebug() {
+    const center = map.getCenter();
+    document.getElementById('lat').textContent = center.lat.toFixed(5);
+    document.getElementById('lng').textContent = center.lng.toFixed(5);
+    document.getElementById('zoom').textContent = map.getZoom();
+  }
+
+  map.on('move', updateDebug);
+  map.on('zoom', updateDebug);
+  updateDebug();
 
 });
 </script>
