@@ -8,7 +8,8 @@
 <!-- ヘッダーCSS -->
 <link rel="stylesheet" href="/MAP-/header.css">
 
-
+<!-- フッターCSS（あるなら） -->
+<link rel="stylesheet" href="/MAP-/footer.css">
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet"
@@ -24,32 +25,12 @@ html, body {
   overflow-x: hidden;
 }
 
-main {
-    position: relative;
-width: 100%
-  height: 500px;
-
-}
-
+/* 地図 */
 #lf-map {
-  position: absolute;
-   top: 0;
-  left: 0;
   width: 100%;
   height: 500px;
+  background: red;
 }
-
-.leaflet-pane {
-  z-index: 0 !important;
-}
-
-.leaflet-top,
-.leaflet-bottom {
-  z-index: 0 !important;
-}
-
-
-
 </style>
 </head>
 
@@ -59,6 +40,7 @@ width: 100%
 <header>
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
+
     <nav class="nav">
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
@@ -70,6 +52,7 @@ width: 100%
           </ul>
         </div>
       </div>
+
       <a href="#" id="newsBtn">釣りNEWS</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
@@ -78,9 +61,7 @@ width: 100%
 </header>
 
 <!-- 地図 -->
-<main>
-  <div id="lf-map"></div>
-</main>
+<div id="lf-map"></div>
 
 <!-- フッター -->
 <footer class="footer">
@@ -90,18 +71,22 @@ width: 100%
 </footer>
 
 
-<div id="newsOverlay">
-  <div class="news-window">
+<!-- ニュースオーバーレイ -->
+<div id="newsOverlay" style="display:none;">
+  <div class="news-content">
     <button id="closeNews">閉じる</button>
-    <div class="news-content"></div>
+    <p>ここにニュースを表示</p>
   </div>
 </div>
 
+
+
+
 <!-- JS（順番重要） -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-<script src="/MAP-/header.js" defer></script>
-
+<!-- ★defer外す（ここ重要） -->
+<script src="/MAP-/header.js"></script>
 
 <!-- 地図（触るな） -->
 <script>
