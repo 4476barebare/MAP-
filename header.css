@@ -4,6 +4,7 @@
 header {
   border-bottom:1px solid #191970;
   background:#fff;
+  z-index: 2000; /* ←最強にする */
 }
 .header-inner {
   max-width:1100px;
