@@ -22,6 +22,12 @@ html, body {
   overflow-x: hidden;
 }
 
+header {
+  position: relative;
+  z-index: 1000;
+}
+
+
 /* 地図（元のまま） */
 #lf-map {
   width: 100%;
@@ -39,7 +45,7 @@ html, body {
     <div class="logo">釣り行こNAVI</div>
     <nav class="nav">
       <div class="accordion-wrapper">
-        <button class="accordion-btn" onclick="event.stopPropagation()">登録地点 ▼</button>
+        <button class="accordion-btn">登録地点 ▼</button>
         <div class="accordion-panel">
           <ul class="location-list" id="locationList">
             <li>新潟 <button class="delete-btn">✖️</button></li>
