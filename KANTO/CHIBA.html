@@ -14,10 +14,10 @@ html, body {
   padding: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   background: #fff;
-  color: #333;
   overflow-x: hidden;
 }
 
+/* 地図 */
 #lf-map {
   width: 100%;
   height: 60vh;
@@ -28,54 +28,67 @@ html, body {
   z-index: 0;
 }
 
+/* 中心ターゲット（＋） */
+#center-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: red;
+  font-size: 24px;
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 400;
+}
 
+/* メニュー */
 .map-menu {
   position: absolute;
   bottom: 10px;
   left: 5px;
   right: 5px;
-  border: 1px solid #191970;
 
   background: #fff;
+  border: 1px solid #191970;
   border-radius: 8px;
+
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 
   padding: 4px 8px;
   z-index: 500;
+
+  overflow: hidden;
+  transition: max-height 0.25s ease;
 }
 
+/* リスト */
 .map-menu ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* 各行 */
 .map-menu li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px dotted #191970;
 
   font-size: 14px;
   padding: 6px 0;
   cursor: pointer;
 
-  /* 軽い点線 */
-  border-bottom: 1px dotted #ccc;
+  border-bottom: 1px dotted #191970;
 }
 
-/* 最後の線消す */
 .map-menu li:last-child {
   border-bottom: none;
 }
 
-/* 次ページボタン（右端に小さく） */
-.next-btn {
+/* ナビボタン */
+.nav-btn {
   font-size: 12px;
   color: #007aff;
   margin-left: 8px;
-  white-space: nowrap;
 }
 </style>
 </head>
@@ -89,14 +102,14 @@ html, body {
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
         <div class="accordion-panel">
-          <ul class="location-list" id="locationList">
-            <li>新潟 <button class="delete-btn">✖️</button></li>
-            <li>群馬 <button class="delete-btn">✖️</button></li>
-            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          <ul class="location-list">
+            <li>新潟</li>
+            <li>群馬</li>
+            <li>飯岡漁港(千葉)</li>
           </ul>
         </div>
       </div>
-      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">釣りNEWS</a>
       <a href="#">スポット一覧</a>
     </nav>
   </div>
@@ -104,6 +117,10 @@ html, body {
 
 <div id="lf-map">
 
+  <!-- 中心ターゲット -->
+  <div id="center-target">＋</div>
+
+  <!-- メニュー -->
   <div id="map-menu" class="map-menu">
     <ul></ul>
   </div>
@@ -111,13 +128,6 @@ html, body {
 </div>
 
 <footer>© 釣り行こNAVI</footer>
-
-<div id="newsOverlay">
-  <div class="news-window">
-    <button id="closeNews">閉じる</button>
-    <div class="news-content"></div>
-  </div>
-</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
@@ -127,84 +137,79 @@ window.addEventListener('DOMContentLoaded', function() {
 
   const map = L.map('lf-map').setView([35.15, 140.3], 8);
   map.attributionControl.setPrefix(false);
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
 
-  const menu = document.querySelector('#map-menu ul');
-  const maxRowsPerPage = 4;
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
 
-  // --- ダミーデータ（将来的にCSVロード） ---
+  const menuBox = document.getElementById('map-menu');
+  const menu = menuBox.querySelector('ul');
+
+  const maxRows = 4;
+  let currentPage = 0;
+
+  // ダミーデータ（CSV想定）
   const points = [
     {name:'ポイント1', lat:35.15, lng:140.3},
     {name:'ポイント2', lat:35.2, lng:140.35},
     {name:'ポイント3', lat:35.25, lng:140.4},
     {name:'ポイント4', lat:35.3, lng:140.45},
     {name:'ポイント5', lat:35.35, lng:140.5},
-    {name:'ポイント6', lat:35.4, lng:140.55},
-    {name:'ポイント7', lat:35.45, lng:140.6}
+    {name:'ポイント6', lat:35.4, lng:140.55}
   ];
 
-  let currentPage = 0;
-  const totalPages = Math.ceil(points.length / maxRowsPerPage);
+  const totalPages = Math.ceil(points.length / maxRows);
 
+  function renderMenu(){
+    menu.innerHTML = '';
 
-function renderMenu() {
-  menu.innerHTML = '';
+    const start = currentPage * maxRows;
+    const end = Math.min(start + maxRows, points.length);
 
-  const start = currentPage * maxRowsPerPage;
-  const end = Math.min(start + maxRowsPerPage, points.length);
+    for(let i=start;i<end;i++){
+      const li = document.createElement('li');
 
-  for(let i=start;i<end;i++){
-    const li = document.createElement('li');
+      const text = document.createElement('span');
+      text.textContent = points[i].name;
+      li.appendChild(text);
 
-    const text = document.createElement('span');
-    text.textContent = points[i].name;
+      // 次ページ（4行目に埋め込み）
+      if(i === end - 1 && currentPage < totalPages - 1){
+        const next = document.createElement('span');
+        next.textContent = '▶';
+        next.className = 'nav-btn';
+        next.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage++;
+          renderMenu();
+        };
+        li.appendChild(next);
+      }
 
-    li.appendChild(text);
+      // 前ページ（1行目に埋め込み）
+      if(i === start && currentPage > 0){
+        const prev = document.createElement('span');
+        prev.textContent = '◀';
+        prev.className = 'nav-btn';
+        prev.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage--;
+          renderMenu();
+        };
+        li.appendChild(prev);
+      }
 
-    // ★ 4行目かつ次ページがある場合だけボタン追加
-    if(i === end - 1 && currentPage < totalPages - 1){
-      const next = document.createElement('span');
-      next.textContent = '▶';
-      next.className = 'next-btn';
+      li.onclick = ()=>{
+        map.setView([points[i].lat, points[i].lng], 12);
+        menuBox.style.maxHeight = '0px';
+      };
 
-      next.addEventListener('click', function(e){
-        e.stopPropagation(); // 行クリック防止
-        currentPage++;
-        renderMenu();
-      });
-
-      li.appendChild(next);
+      menu.appendChild(li);
     }
 
-    li.dataset.lat = points[i].lat;
-    li.dataset.lng = points[i].lng;
-
-    li.addEventListener('click', function() {
-      map.setView([this.dataset.lat, this.dataset.lng], 12);
-      menu.innerHTML = '';
-    });
-
-    menu.appendChild(li);
+    // 高さ自動調整（ヌルっと）
+    menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
   }
-
-  // 前ページ（1行目に入れる）
-  if(currentPage > 0){
-    const firstLi = menu.firstChild;
-    const prev = document.createElement('span');
-    prev.textContent = '◀';
-    prev.className = 'next-btn';
-
-    prev.addEventListener('click', function(e){
-      e.stopPropagation();
-      currentPage--;
-      renderMenu();
-    });
-
-    firstLi.appendChild(prev);
-  }
-}
-
-
 
   renderMenu();
 
