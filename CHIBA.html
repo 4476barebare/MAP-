@@ -8,8 +8,6 @@
 <!-- ヘッダーCSS -->
 <link rel="stylesheet" href="/MAP-/header.css">
 
-
-
 <!-- Leaflet CSS -->
 <link rel="stylesheet"
  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -24,12 +22,20 @@ html, body {
   overflow-x: hidden;
 }
 
-/* 地図 */
+
+
+
+/* 地図（元のまま） */
 #lf-map {
   width: 100%;
   height: 500px;
   background: red;
 }
+
+.leaflet-container {
+  z-index: 0;
+}
+
 </style>
 </head>
 
@@ -39,7 +45,6 @@ html, body {
 <header>
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
-
     <nav class="nav">
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
@@ -51,14 +56,12 @@ html, body {
           </ul>
         </div>
       </div>
-
       <a href="#" id="newsBtn">釣りNEWS</a>
       <a href="#">全国地図</a>
       <a href="#">その他</a>
     </nav>
   </div>
 </header>
-
 <!-- 地図 -->
 <div id="lf-map"></div>
 
@@ -73,22 +76,23 @@ html, body {
   </div>
 </div>
 
-
-
-
 <!-- JS（順番重要） -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- ★defer外す（ここ重要） -->
+<!-- header.js（そのまま） -->
 <script src="/MAP-/header.js" defer></script>
 
-<!-- 地図（触るな） -->
+<!-- ★ここだけ修正（実行タイミング） -->
 <script>
-const map = L.map('lf-map').setView([35.5, 140.25], 10);
+window.addEventListener('DOMContentLoaded', function() {
 
-L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19
-}).addTo(map);
+  const map = L.map('lf-map').setView([35.5, 140.25], 10);
+
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+});
 </script>
 
 </body>
