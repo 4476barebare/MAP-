@@ -24,11 +24,23 @@ html, body {
   overflow-x: hidden;
 }
 
-/* 地図 */
+main {
+
+}
+
 #lf-map {
+  position: absolute;
   width: 100%;
   height: 500px;
-  background: red;
+}
+
+.leaflet-pane {
+  z-index: 0 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 0 !important;
 }
 </style>
 </head>
@@ -58,7 +70,9 @@ html, body {
 </header>
 
 <!-- 地図 -->
-<div id="lf-map"></div>
+<main>
+  <div id="lf-map"></div>
+</main>
 
 <!-- フッター -->
 <footer class="footer">
