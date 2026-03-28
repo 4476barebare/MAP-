@@ -28,17 +28,39 @@ html, body {
   z-index: 0;
 }
 
-/* 中心ターゲット（＋） */
+/* 中心ターゲット（細い＋） */
 #center-target {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 18px;
+  height: 18px;
   transform: translate(-50%, -50%);
-  color: red;
-  font-size: 24px;
-  font-weight: bold;
+  z-index: 1000;
   pointer-events: none;
-  z-index: 400;
+}
+
+#center-target::before,
+#center-target::after {
+  content: "";
+  position: absolute;
+  background: red;
+}
+
+#center-target::before {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+#center-target::after {
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  transform: translateY(-50%);
 }
 
 /* メニュー */
@@ -54,7 +76,7 @@ html, body {
 
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 
-  padding: 4px 8px;
+  padding: 2px 8px;
   z-index: 500;
 
   overflow: hidden;
@@ -73,10 +95,11 @@ html, body {
   justify-content: space-between;
   align-items: center;
 
-  font-size: 14px;
-  padding: 6px 0;
-  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 0; /* ← 行間詰めた */
+  line-height: 1.2; /* ← さらに詰める */
 
+  cursor: pointer;
   border-bottom: 1px dotted #191970;
 }
 
@@ -86,9 +109,9 @@ html, body {
 
 /* ナビボタン */
 .nav-btn {
-  font-size: 12px;
+  font-size: 11px;
   color: #007aff;
-  margin-left: 8px;
+  margin-left: 6px;
 }
 </style>
 </head>
@@ -118,7 +141,7 @@ html, body {
 <div id="lf-map">
 
   <!-- 中心ターゲット -->
-  <div id="center-target">＋</div>
+  <div id="center-target"></div>
 
   <!-- メニュー -->
   <div id="map-menu" class="map-menu">
@@ -148,7 +171,7 @@ window.addEventListener('DOMContentLoaded', function() {
   const maxRows = 4;
   let currentPage = 0;
 
-  // ダミーデータ（CSV想定）
+  // ダミー（CSV想定）
   const points = [
     {name:'ポイント1', lat:35.15, lng:140.3},
     {name:'ポイント2', lat:35.2, lng:140.35},
@@ -173,7 +196,7 @@ window.addEventListener('DOMContentLoaded', function() {
       text.textContent = points[i].name;
       li.appendChild(text);
 
-      // 次ページ（4行目に埋め込み）
+      // 次ページ
       if(i === end - 1 && currentPage < totalPages - 1){
         const next = document.createElement('span');
         next.textContent = '▶';
@@ -186,7 +209,7 @@ window.addEventListener('DOMContentLoaded', function() {
         li.appendChild(next);
       }
 
-      // 前ページ（1行目に埋め込み）
+      // 前ページ
       if(i === start && currentPage > 0){
         const prev = document.createElement('span');
         prev.textContent = '◀';
@@ -207,7 +230,491 @@ window.addEventListener('DOMContentLoaded', function() {
       menu.appendChild(li);
     }
 
-    // 高さ自動調整（ヌルっと）
+    // 高さ自動（ヌルっと）
+    menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+  }
+
+  renderMenu();
+
+});
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こCHIBA</title>
+
+<link rel="stylesheet" href="/MAP-/header.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background: #fff;
+  overflow-x: hidden;
+}
+
+/* 地図 */
+#lf-map {
+  width: 100%;
+  height: 60vh;
+  position: relative;
+}
+
+.leaflet-container {
+  z-index: 0;
+}
+
+/* 中心ターゲット（細い＋） */
+#center-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+#center-target::before,
+#center-target::after {
+  content: "";
+  position: absolute;
+  background: red;
+}
+
+#center-target::before {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+#center-target::after {
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  transform: translateY(-50%);
+}
+
+/* メニュー */
+.map-menu {
+  position: absolute;
+  bottom: 10px;
+  left: 5px;
+  right: 5px;
+
+  background: #fff;
+  border: 1px solid #191970;
+  border-radius: 8px;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+  padding: 2px 8px;
+  z-index: 500;
+
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+/* リスト */
+.map-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.map-menu li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 13px;
+  padding: 4px 0; /* ← 行間詰めた */
+  line-height: 1.2; /* ← さらに詰める */
+
+  cursor: pointer;
+  border-bottom: 1px dotted #191970;
+}
+
+.map-menu li:last-child {
+  border-bottom: none;
+}
+
+/* ナビボタン */
+.nav-btn {
+  font-size: 11px;
+  color: #007aff;
+  margin-left: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こCHIBA</div>
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list">
+            <li>新潟</li>
+            <li>群馬</li>
+            <li>飯岡漁港(千葉)</li>
+          </ul>
+        </div>
+      </div>
+      <a href="#">釣りNEWS</a>
+      <a href="#">スポット一覧</a>
+    </nav>
+  </div>
+</header>
+
+<div id="lf-map">
+
+  <!-- 中心ターゲット -->
+  <div id="center-target"></div>
+
+  <!-- メニュー -->
+  <div id="map-menu" class="map-menu">
+    <ul></ul>
+  </div>
+
+</div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/MAP-/header.js" defer></script>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+
+  const map = L.map('lf-map').setView([35.15, 140.3], 8);
+  map.attributionControl.setPrefix(false);
+
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+  const menuBox = document.getElementById('map-menu');
+  const menu = menuBox.querySelector('ul');
+
+  const maxRows = 4;
+  let currentPage = 0;
+
+  // ダミー（CSV想定）
+  const points = [
+    {name:'ポイント1', lat:35.15, lng:140.3},
+    {name:'ポイント2', lat:35.2, lng:140.35},
+    {name:'ポイント3', lat:35.25, lng:140.4},
+    {name:'ポイント4', lat:35.3, lng:140.45},
+    {name:'ポイント5', lat:35.35, lng:140.5},
+    {name:'ポイント6', lat:35.4, lng:140.55}
+  ];
+
+  const totalPages = Math.ceil(points.length / maxRows);
+
+  function renderMenu(){
+    menu.innerHTML = '';
+
+    const start = currentPage * maxRows;
+    const end = Math.min(start + maxRows, points.length);
+
+    for(let i=start;i<end;i++){
+      const li = document.createElement('li');
+
+      const text = document.createElement('span');
+      text.textContent = points[i].name;
+      li.appendChild(text);
+
+      // 次ページ
+      if(i === end - 1 && currentPage < totalPages - 1){
+        const next = document.createElement('span');
+        next.textContent = '▶';
+        next.className = 'nav-btn';
+        next.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage++;
+          renderMenu();
+        };
+        li.appendChild(next);
+      }
+
+      // 前ページ
+      if(i === start && currentPage > 0){
+        const prev = document.createElement('span');
+        prev.textContent = '◀';
+        prev.className = 'nav-btn';
+        prev.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage--;
+          renderMenu();
+        };
+        li.appendChild(prev);
+      }
+
+      li.onclick = ()=>{
+        map.setView([points[i].lat, points[i].lng], 12);
+        menuBox.style.maxHeight = '0px';
+      };
+
+      menu.appendChild(li);
+    }
+
+    // 高さ自動（ヌルっと）
+    menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+  }
+
+  renderMenu();
+
+});
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こCHIBA</title>
+
+<link rel="stylesheet" href="/MAP-/header.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  background: #fff;
+  overflow-x: hidden;
+}
+
+/* 地図 */
+#lf-map {
+  width: 100%;
+  height: 60vh;
+  position: relative;
+}
+
+.leaflet-container {
+  z-index: 0;
+}
+
+/* 中心ターゲット（細い＋） */
+#center-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+#center-target::before,
+#center-target::after {
+  content: "";
+  position: absolute;
+  background: red;
+}
+
+#center-target::before {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+#center-target::after {
+  top: 50%;
+  left: 0;
+  height: 1px;
+  width: 100%;
+  transform: translateY(-50%);
+}
+
+/* メニュー */
+.map-menu {
+  position: absolute;
+  bottom: 10px;
+  left: 5px;
+  right: 5px;
+
+  background: #fff;
+  border: 1px solid #191970;
+  border-radius: 8px;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+
+  padding: 2px 8px;
+  z-index: 500;
+
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+/* リスト */
+.map-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.map-menu li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 13px;
+  padding: 4px 0; /* ← 行間詰めた */
+  line-height: 1.2; /* ← さらに詰める */
+
+  cursor: pointer;
+  border-bottom: 1px dotted #191970;
+}
+
+.map-menu li:last-child {
+  border-bottom: none;
+}
+
+/* ナビボタン */
+.nav-btn {
+  font-size: 11px;
+  color: #007aff;
+  margin-left: 6px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こCHIBA</div>
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list">
+            <li>新潟</li>
+            <li>群馬</li>
+            <li>飯岡漁港(千葉)</li>
+          </ul>
+        </div>
+      </div>
+      <a href="#">釣りNEWS</a>
+      <a href="#">スポット一覧</a>
+    </nav>
+  </div>
+</header>
+
+<div id="lf-map">
+
+  <!-- 中心ターゲット -->
+  <div id="center-target"></div>
+
+  <!-- メニュー -->
+  <div id="map-menu" class="map-menu">
+    <ul></ul>
+  </div>
+
+</div>
+
+<footer>© 釣り行こNAVI</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/MAP-/header.js" defer></script>
+
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+
+  const map = L.map('lf-map').setView([35.15, 140.3], 8);
+  map.attributionControl.setPrefix(false);
+
+  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+  const menuBox = document.getElementById('map-menu');
+  const menu = menuBox.querySelector('ul');
+
+  const maxRows = 4;
+  let currentPage = 0;
+
+  // ダミー（CSV想定）
+  const points = [
+    {name:'ポイント1', lat:35.15, lng:140.3},
+    {name:'ポイント2', lat:35.2, lng:140.35},
+    {name:'ポイント3', lat:35.25, lng:140.4},
+    {name:'ポイント4', lat:35.3, lng:140.45},
+    {name:'ポイント5', lat:35.35, lng:140.5},
+    {name:'ポイント6', lat:35.4, lng:140.55}
+  ];
+
+  const totalPages = Math.ceil(points.length / maxRows);
+
+  function renderMenu(){
+    menu.innerHTML = '';
+
+    const start = currentPage * maxRows;
+    const end = Math.min(start + maxRows, points.length);
+
+    for(let i=start;i<end;i++){
+      const li = document.createElement('li');
+
+      const text = document.createElement('span');
+      text.textContent = points[i].name;
+      li.appendChild(text);
+
+      // 次ページ
+      if(i === end - 1 && currentPage < totalPages - 1){
+        const next = document.createElement('span');
+        next.textContent = '▶';
+        next.className = 'nav-btn';
+        next.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage++;
+          renderMenu();
+        };
+        li.appendChild(next);
+      }
+
+      // 前ページ
+      if(i === start && currentPage > 0){
+        const prev = document.createElement('span');
+        prev.textContent = '◀';
+        prev.className = 'nav-btn';
+        prev.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage--;
+          renderMenu();
+        };
+        li.appendChild(prev);
+      }
+
+      li.onclick = ()=>{
+        map.setView([points[i].lat, points[i].lng], 12);
+        menuBox.style.maxHeight = '0px';
+      };
+
+      menu.appendChild(li);
+    }
+
+    // 高さ自動（ヌルっと）
     menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
   }
 
