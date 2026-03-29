@@ -59,7 +59,7 @@ html, body {
   padding:1px 0; border-radius:2px; margin-right:1px;
 }
 
-.weather-block:first-child { flex:0 0 10px; margin-right:1px; }
+.weather-block.first-block { flex:0 0 30px; margin-right:1px; font-weight:bold; }
 
 /* 色分け */
 .time-block { background:#e0e0e0; }
@@ -72,6 +72,15 @@ html, body {
 
 #tide-canvas {
   display:block; width:100%; height:36px; background:#eef; margin-top:3px;
+}
+
+/* 日付行 */
+.weather-header {
+  display:flex;
+  justify-content:space-between;
+  font-size:10px;
+  margin:2px 0; /* 半分に縮小 */
+  font-family:monospace;
 }
 </style>
 </head>
@@ -177,19 +186,13 @@ window.addEventListener('DOMContentLoaded', function() {
 
     // ===== 日付と出典行 =====
     const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.justifyContent = 'space-between';
-    header.style.fontSize = '10px';
-    header.style.margin = '5px 0';
-    header.style.fontFamily = 'monospace';
-
+    header.className = 'weather-header';
     const dateEl = document.createElement('div');
     dateEl.textContent = `${date.getFullYear()}年${String(date.getMonth()+1).padStart(2,'0')}月${String(date.getDate()).padStart(2,'0')}日`;
     const sourceEl = document.createElement('div');
     sourceEl.textContent = 'Yahoo天気・海しる';
     header.appendChild(dateEl);
     header.appendChild(sourceEl);
-
     container.appendChild(header);
 
     // ===== 天気ブロック =====
@@ -202,6 +205,12 @@ window.addEventListener('DOMContentLoaded', function() {
       row.className = 'weather-row';
       const first = document.createElement('span');
       first.className = 'weather-block first-block';
+      // 見出しラベル
+      first.textContent = key==='time'?'時間':
+                          key==='icon'?'天気':
+                          key==='temp'?'気温':
+                          key==='precip'?'降水':
+                          key==='wind'?'風速':'風向';
       row.appendChild(first);
       weatherData[key].forEach(v=>{
         const block = document.createElement('span');
@@ -211,7 +220,6 @@ window.addEventListener('DOMContentLoaded', function() {
       });
       weatherContainer.appendChild(row);
     });
-
     container.appendChild(weatherContainer);
 
     // ===== 波ブロック =====
@@ -219,6 +227,7 @@ window.addEventListener('DOMContentLoaded', function() {
     waveRow.className = 'weather-row';
     const firstWave = document.createElement('span');
     firstWave.className = 'weather-block first-block';
+    firstWave.textContent = '波';
     waveRow.appendChild(firstWave);
     waveData.forEach(v=>{
       const block = document.createElement('span');
@@ -280,15 +289,15 @@ window.addEventListener('DOMContentLoaded', function() {
   // ===== サンプルデータ呼び出し =====
   const sampleDate = new Date();
   const sampleWeatherData = {
-    time: ['0','2','4','6','8','10','12','14','16','18','20','22'],
-    icon: ['🌙','🌙','☀️','☀️','☁️','☁️','☀️','☀️','🌙','🌙','🌙','🌙'],
-    temp: [10,11,12,12,14,16,18,16,13,12,10,10],
-    precip: [0,10,20,30,10,0,0,20,30,10,0,0],
-    wind: [1.2,2.0,2.5,3.0,1.8,1.0,1.5,2.0,2.2,1.5,1.0,0.5].map(v=>v.toFixed(1)),
-    winddir: ['↑','↗','→','↘','↓','↙','←','↖','↑','↗','→','↘']
+    time: ['0','4','8','12','16','20'],
+    icon: ['🌙','☀️','☁️','☀️','🌙','🌙'],
+    temp: [10,12,14,16,13,10],
+    precip: [0,20,10,0,30,0],
+    wind: [1.2,2.5,1.0,1.5,2.2,1.0].map(v=>v.toFixed(1)),
+    winddir: ['↑','→','↓','←','↑','→']
   };
-  const sampleWaveData = [0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5];
-  const sampleTideData = [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6];
+  const sampleWaveData = [0.5,0.7,1.0,0.8,0.6,0.5];
+  const sampleTideData = [0.2,0.4,0.6,0.8,0.6,0.4];
 
   renderWeatherWaveTide(sampleDate, sampleWeatherData, sampleWaveData, sampleTideData);
 
