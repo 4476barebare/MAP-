@@ -199,16 +199,17 @@ border-radius:6px;
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
-  // ===== 地図初期化 =====
-  const map = L.map('lf-map').setView([35.45, 140.25], 9);
-  map.attributionControl.setPrefix(false);
+// ===== 地図初期化 =====
+const map = L.map('lf-map').setView([35.45, 140.25], 9);
+map.attributionControl.setPrefix(false);
 
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
-  
-  tileLayer.getContainer().style.filter = "grayscale(100%) brightness(90%) contrast(110%)";
+// タイルレイヤーを変数に格納
+const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
 
+// 白黒化・明るさ・コントラスト調整
+tileLayer.getContainer().style.filter = "grayscale(100%) brightness(90%) contrast(110%)";
 
   // ===== メニュー =====
   const menuBox = document.getElementById('map-menu');
