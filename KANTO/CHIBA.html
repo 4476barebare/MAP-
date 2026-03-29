@@ -108,8 +108,8 @@ html, body {
 
 /* 天気UI */
 #weather-container {
-  width: fit-content;
-  margin: 10px auto;
+  width: 100%;
+  margin: 5px auto;
   display: flex;
   flex-direction: column;
   font-family: monospace;
@@ -134,7 +134,7 @@ html, body {
 
 .weather-block:first-child {
   width: 10px; /* 見出し */
-  font-weight: bold;
+  margin-right: 1px;
 }
 
 .weather-icon {
@@ -188,7 +188,8 @@ html, body {
   <div class="weather-row" id="icon-row"></div>
   <div class="weather-row" id="temp-row"></div>
   <div class="weather-row" id="precip-row"></div>
-  <div class="weather-row" id="wind-row"></div>
+  <div class="weather-row" id="wind-row">風</div>
+  <div class="weather-row" id="wind-direction"></div>
 </div>
 
 <footer>© 釣り行こNAVI</footer>
