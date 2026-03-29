@@ -97,20 +97,21 @@ html, body {
 
 <header>
   <div class="header-inner">
-    <div class="logo">釣り行こCHIBA</div>
+    <div class="logo">釣り行こNAVI</div>
     <nav class="nav">
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
         <div class="accordion-panel">
-          <ul class="location-list">
-            <li>新潟</li>
-            <li>群馬</li>
-            <li>飯岡漁港(千葉)</li>
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
           </ul>
         </div>
       </div>
-      <a href="#">釣りNEWS</a>
-      <a href="#">スポット一覧</a>
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">全国地図</a>
+      <a href="#">その他</a>
     </nav>
   </div>
 </header>
@@ -128,6 +129,16 @@ html, body {
 </div>
 
 <footer>© 釣り行こNAVI</footer>
+
+
+
+<!-- ニュースオーバーレイ -->
+<div id="newsOverlay">
+  <div class="news-window">
+    <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
+  </div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
