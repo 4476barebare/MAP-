@@ -4,7 +4,7 @@
 header {
   border-bottom:1px solid #191970;
   background:#fff;
-  z-index: 2000; /* ←最強にする */
+  z-index: 2500; /* ←最強にする */
 }
 .header-inner {
   max-width:1100px;
@@ -37,7 +37,7 @@ header {
 /* アコーディオン */
 .accordion-wrapper {
     position:relative;
-    z-index: 2001; /* ←最強にする */
+    z-index: 2600;
 }
 
 .accordion-btn { 
@@ -73,7 +73,7 @@ header {
   background:rgba(0,0,0,0.55); display:none; 
   justify-content:center;
   align-items:center;
-  z-index:2100; 
+  z-index:3000; 
 }
 .news-window { 
   position:relative;
