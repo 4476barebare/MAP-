@@ -190,8 +190,8 @@ window.addEventListener('DOMContentLoaded', function() {
     header.appendChild(dateEl);
     header.appendChild(sourceEl);
 
-    container.appendChild(header);
-
+    container.insertBefore(header, container.firstChild);
+    
     // ===== 天気ブロック =====
     const weatherContainer = document.createElement('div');
     weatherContainer.className = 'weather-container';
