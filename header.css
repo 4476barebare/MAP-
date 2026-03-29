@@ -14,7 +14,6 @@ header {
   justify-content:space-between;
   padding:10px 12px;
   position:relative;
-  z-index: 2001; /* ←最強にする */
 }
 .logo { 
   font-weight:700; 
@@ -27,6 +26,8 @@ header {
   display:flex; 
   align-items:center; 
   gap:14px; 
+  z-index: 2001; /* ←最強にする */
+
 }
 .nav a { 
   text-decoration:none; 
@@ -69,7 +70,7 @@ header {
   background:rgba(0,0,0,0.55); display:none; 
   justify-content:center;
   align-items:center;
-  z-index:2002; 
+  z-index:2100; 
 }
 .news-window { 
   position:relative;
