@@ -260,33 +260,24 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 // 座標＆ズーム表示
+// 座標＆ズーム表示
 const debugBox = document.createElement('div');
-debugBox.style.position = 'fixed';
-debugBox.style.bottom = '5px';
-debugBox.style.right = '5px';
-debugBox.style.background = 'rgba(0,0,0,0.7)';
-debugBox.style.color = '#fff';
-debugBox.style.fontSize = '12px';
-debugBox.style.padding = '4px 6px';
-debugBox.style.zIndex = '4000';
-debugBox.style.borderRadius = '4px';
+
+Object.assign(debugBox.style, {
+  position: 'fixed',
+  bottom: '80px',   // ← ここでしっかり上げる
+  left: '10px',     // ← 左に変更
+  right: 'auto',    // ← 右を無効化（これ重要）
+  background: 'rgba(0,0,0,0.7)',
+  color: '#fff',
+  fontSize: '12px',
+  padding: '4px 6px',
+  zIndex: '5000',
+  borderRadius: '4px',
+  lineHeight: '1.2'
+});
 
 document.body.appendChild(debugBox);
-
-function updateDebug() {
-  const center = map.getCenter();
-  const zoom = map.getZoom();
-
-  debugBox.textContent =
-    `Lat: ${center.lat.toFixed(5)} / Lng: ${center.lng.toFixed(5)} / Zoom: ${zoom}`;
-}
-
-// 初期表示
-updateDebug();
-
-// 地図動いたら更新
-map.on('move', updateDebug);
-
 </script>
 
 </body>
