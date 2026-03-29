@@ -291,8 +291,9 @@ window.addEventListener('DOMContentLoaded', function() {
     updateDebug();
   });
 
-  // イベント（確実に拾う）
-  map.on('moveend zoomend', updateDebug);
+  // イベント
+  map.on('move', updateDebug);
+  map.on('zoom', updateDebug);
 
 });
 </script>
