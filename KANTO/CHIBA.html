@@ -210,7 +210,7 @@ const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
 
 // まず元の白黒タイル
 tileLayer.getContainer().style.filter =
-  "grayscale(100%) brightness(90%) contrast(110%)";
+  "grayscale(100%) brightness(110%) contrast(110%)";
 
 // 青の半透明オーバーレイを追加
 const blueOverlay = L.rectangle(map.getBounds(), {
