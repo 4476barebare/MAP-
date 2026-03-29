@@ -208,8 +208,17 @@ const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
   maxZoom: 19
 }).addTo(map);
 
+// まず元の白黒タイル
 tileLayer.getContainer().style.filter =
-  "grayscale(60%) brightness(95%) contrast(110%) hue-rotate(210deg)";
+  "grayscale(100%) brightness(90%) contrast(110%)";
+
+// 青の半透明オーバーレイを追加
+const blueOverlay = L.rectangle(map.getBounds(), {
+  color: "#191970",       // 青
+  weight: 0,              // 線は無し
+  fillOpacity: 0.1,       // 透明度で調整
+  interactive: false      // マップ操作に影響なし
+}).addTo(map);
 
 
 
