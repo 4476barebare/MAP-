@@ -170,12 +170,18 @@ window.addEventListener('DOMContentLoaded', function() {
   map.on('move',updateDebug);
   map.on('zoom',updateDebug);
 
-  // ===== 天気・波・潮位UI関数 =====
-  function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
+
+function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
 
-    // ===== 日付と出典行 =====
+    // ===== wrapper div =====
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    container.appendChild(wrapper);
+
+    // ===== 日付＋出典行 =====
     const header = document.createElement('div');
     header.style.display = 'flex';
     header.style.justifyContent = 'space-between';
@@ -190,8 +196,8 @@ window.addEventListener('DOMContentLoaded', function() {
     header.appendChild(dateEl);
     header.appendChild(sourceEl);
 
-    container.insertBefore(header, container.firstChild);
-    
+    wrapper.appendChild(header);
+
     // ===== 天気ブロック =====
     const weatherContainer = document.createElement('div');
     weatherContainer.className = 'weather-container';
@@ -203,16 +209,19 @@ window.addEventListener('DOMContentLoaded', function() {
       const first = document.createElement('span');
       first.className = 'weather-block first-block';
       row.appendChild(first);
-      weatherData[key].forEach(v=>{
+
+      // 4時間おきに省略して表示
+      weatherData[key].forEach((v,i)=>{
         const block = document.createElement('span');
         block.className = 'weather-block ' + (key==='time'?'time-block':key==='icon'?'icon-block':key==='temp'?'temp-block':key==='precip'?'precip-block':key==='wind'?'wind-block':'winddir-block');
-        block.textContent = v;
+        block.textContent = (key==='time' && i%2!==0) ? '' : v; // 2時間毎データだが表示は4時間毎
         row.appendChild(block);
       });
+
       weatherContainer.appendChild(row);
     });
 
-    container.appendChild(weatherContainer);
+    wrapper.appendChild(weatherContainer);
 
     // ===== 波ブロック =====
     const waveRow = document.createElement('div');
@@ -220,13 +229,13 @@ window.addEventListener('DOMContentLoaded', function() {
     const firstWave = document.createElement('span');
     firstWave.className = 'weather-block first-block';
     waveRow.appendChild(firstWave);
-    waveData.forEach(v=>{
+    waveData.forEach((v,i)=>{
       const block = document.createElement('span');
       block.className = 'weather-block wave-block';
       block.textContent = v.toFixed(1)+'m';
       waveRow.appendChild(block);
     });
-    container.appendChild(waveRow);
+    wrapper.appendChild(waveRow);
 
     // ===== 潮位canvas =====
     const tideRow = document.createElement('div');
@@ -239,9 +248,9 @@ window.addEventListener('DOMContentLoaded', function() {
     canvas.style.background = '#eef';
     canvas.style.marginTop = '3px';
     tideRow.appendChild(canvas);
-    container.appendChild(tideRow);
+    wrapper.appendChild(tideRow);
 
-    // ===== 潮位描画 =====
+    // ===== 潮位描画（塗りつぶし＋線） =====
     const ctx = canvas.getContext('2d');
     function drawTide(data) {
       const rect = canvas.getBoundingClientRect();
@@ -277,7 +286,7 @@ window.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize',()=>drawTide(tideData));
   }
 
-  // ===== サンプルデータ呼び出し =====
+  // ===== サンプルデータ =====
   const sampleDate = new Date();
   const sampleWeatherData = {
     time: ['0','2','4','6','8','10','12','14','16','18','20','22'],
@@ -291,6 +300,7 @@ window.addEventListener('DOMContentLoaded', function() {
   const sampleTideData = [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6];
 
   renderWeatherWaveTide(sampleDate, sampleWeatherData, sampleWaveData, sampleTideData);
+
 
 });
 </script>
