@@ -52,7 +52,7 @@ html, body {
 }
 
 .weather-row {
-  display:flex; justify-content:flex-start; margin-bottom:1px;
+  display:flex; justify-content:space-between; margin-bottom:1px;
 }
 
 .weather-block {
@@ -209,48 +209,72 @@ window.addEventListener('DOMContentLoaded', function() {
     const first=document.createElement('span');
     first.className='weather-block first-block '+(id.includes('time')?'time-block':id.includes('icon')?'icon-block':id.includes('temp')?'temp-block':id.includes('precip')?'precip-block':id.includes('wind')?'wind-block':'winddir-block');
     container.appendChild(first);
-    rows[id].forEach(v=>{
+    rows[id].forEach((v,i)=>{
       const block=document.createElement('span');
       block.className='weather-block '+(id.includes('time')?'time-block':id.includes('icon')?'icon-block':id.includes('temp')?'temp-block':id.includes('precip')?'precip-block':id.includes('wind')?'wind-block':'winddir-block');
-      // 4時間毎に表示、他は空白
-      if(id==='time-row'){
-        block.textContent = (v % 4 === 0) ? v : '';
-      } else {
-        block.textContent = v;
-      }
+      // 4時間ごとに表示、それ以外は空白
+      if(id.includes('time') && (i%2!==0)) block.textContent='';
+      else block.textContent=v;
       container.appendChild(block);
     });
   }
 
   // ===== 波・潮サンプル =====
-  const waveData=[0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5]; // 2hごと
-  const tideData=[0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6]; // 2hごと
+  const waveData=[0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5]; // m
+  const tideData=[0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6]; // 任意スケール
 
+  // 波ブロック
   const waveRow=document.getElementById('wave-row');
   waveRow.innerHTML='';
   const firstWave=document.createElement('span');
   firstWave.className='weather-block first-block';
   waveRow.appendChild(firstWave);
-  waveData.forEach(v=>{
+  waveData.forEach((v,i)=>{
     const block=document.createElement('span');
     block.className='weather-block wave-block';
     block.textContent=v.toFixed(1)+'m';
     waveRow.appendChild(block);
   });
 
+  // 潮位Canvas
   const canvas=document.getElementById('tide-canvas');
   const ctx=canvas.getContext('2d');
 
-  function drawTide(data){
+  function drawTideFill(data){
     const rect=canvas.getBoundingClientRect();
     canvas.width=rect.width;
     canvas.height=rect.height;
     ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // 滑らかな曲線用にベジェ曲線で補完
     ctx.beginPath();
     data.forEach((val,i)=>{
       const x=(i/(data.length-1))*canvas.width;
       const y=canvas.height - val*canvas.height*0.8;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      if(i===0) ctx.moveTo(x,y);
+      else{
+        const prevX=((i-1)/(data.length-1))*canvas.width;
+        const prevY=canvas.height - data[i-1]*canvas.height*0.8;
+        const cx=(prevX + x)/2;
+        ctx.quadraticCurveTo(prevX, prevY, cx, (prevY+y)/2);
+        ctx.lineTo(x,y);
+      }
+    });
+    // 下までパスを閉じる
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+
+    ctx.fillStyle='rgba(0,119,204,0.4)';
+    ctx.fill();
+
+    // 上に線を描く
+    ctx.beginPath();
+    data.forEach((val,i)=>{
+      const x=(i/(data.length-1))*canvas.width;
+      const y=canvas.height - val*canvas.height*0.8;
+      if(i===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
     });
     ctx.strokeStyle='#0077cc';
     ctx.lineWidth=2;
@@ -259,8 +283,8 @@ window.addEventListener('DOMContentLoaded', function() {
     ctx.stroke();
   }
 
-  drawTide(tideData);
-  window.addEventListener('resize',()=>drawTide(tideData));
+  drawTideFill(tideData);
+  window.addEventListener('resize',()=>drawTideFill(tideData));
 
 });
 </script>
