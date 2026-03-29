@@ -30,6 +30,9 @@ html, body {
 }
 
 
+
+
+
 #center-target {
   position: absolute;
   top: 50%;
@@ -106,6 +109,7 @@ html, body {
   align-items: center;
 
   font-size: 14px;
+  color: #191970;
   padding: 3px 0;
   cursor: pointer;
 
@@ -202,6 +206,8 @@ window.addEventListener('DOMContentLoaded', function() {
   L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19
   }).addTo(map);
+  
+  tileLayer.getContainer().style.filter = "grayscale(100%) brightness(90%) contrast(110%)";
 
 
   // ===== メニュー =====
