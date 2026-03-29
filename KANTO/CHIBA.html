@@ -10,8 +10,7 @@
 
 <style>
 html, body {
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   font-family: -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   background: #fff;
   overflow-x: hidden;
@@ -53,7 +52,7 @@ html, body {
 }
 
 .weather-row {
-  display:flex; justify-content:space-between; margin-bottom:1px;
+  display:flex; justify-content:flex-start; margin-bottom:1px;
 }
 
 .weather-block {
@@ -210,24 +209,22 @@ window.addEventListener('DOMContentLoaded', function() {
     const first=document.createElement('span');
     first.className='weather-block first-block '+(id.includes('time')?'time-block':id.includes('icon')?'icon-block':id.includes('temp')?'temp-block':id.includes('precip')?'precip-block':id.includes('wind')?'wind-block':'winddir-block');
     container.appendChild(first);
-
-    rows[id].forEach((v,i)=>{
+    rows[id].forEach(v=>{
       const block=document.createElement('span');
       block.className='weather-block '+(id.includes('time')?'time-block':id.includes('icon')?'icon-block':id.includes('temp')?'temp-block':id.includes('precip')?'precip-block':id.includes('wind')?'wind-block':'winddir-block');
-      
+      // 4時間毎に表示、他は空白
       if(id==='time-row'){
-        block.textContent = (i%4===0) ? v : '';
+        block.textContent = (v % 4 === 0) ? v : '';
       } else {
         block.textContent = v;
       }
-
       container.appendChild(block);
     });
   }
 
   // ===== 波・潮サンプル =====
-  const waveData=[0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5]; // m
-  const tideData=[0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6]; // 任意スケール
+  const waveData=[0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5]; // 2hごと
+  const tideData=[0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6]; // 2hごと
 
   const waveRow=document.getElementById('wave-row');
   waveRow.innerHTML='';
@@ -243,6 +240,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   const canvas=document.getElementById('tide-canvas');
   const ctx=canvas.getContext('2d');
+
   function drawTide(data){
     const rect=canvas.getBoundingClientRect();
     canvas.width=rect.width;
@@ -256,8 +254,11 @@ window.addEventListener('DOMContentLoaded', function() {
     });
     ctx.strokeStyle='#0077cc';
     ctx.lineWidth=2;
+    ctx.lineJoin='round';
+    ctx.lineCap='round';
     ctx.stroke();
   }
+
   drawTide(tideData);
   window.addEventListener('resize',()=>drawTide(tideData));
 
