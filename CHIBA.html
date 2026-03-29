@@ -22,24 +22,56 @@ html, body {
   width: 100%;
   height: 60vh;
   position: relative;
+  z-index: 0; 
 }
 
 .leaflet-container {
   z-index: 0;
 }
 
-/* 中心ターゲット（＋） */
+
 #center-target {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: red;
-  font-size: 24px;
-  font-weight: bold;
+
+  width: 20px;
+  height: 20px;
+
   pointer-events: none;
-  z-index: 1999;
+  z-index: 1990;
 }
+
+/* 縦線 */
+#center-target::before,
+#center-target::after {
+  content: "";
+  position: absolute;
+  background: red;
+}
+
+/* 縦 */
+#center-target::before {
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+/* 横 */
+#center-target::after {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+
+
+
 
 /* メニュー */
 .map-menu {
@@ -55,7 +87,7 @@ html, body {
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 
   padding: 4px 8px;
-  z-index: 1990;
+  z-index: 1980;
 
   overflow: hidden;
   transition: max-height 0.25s ease;
@@ -119,7 +151,7 @@ html, body {
 <div id="lf-map">
 
   <!-- 中心ターゲット -->
-  <div id="center-target">＋</div>
+  <div id="center-target"></div>
 
   <!-- メニュー -->
   <div id="map-menu" class="map-menu">
@@ -225,6 +257,36 @@ window.addEventListener('DOMContentLoaded', function() {
   renderMenu();
 
 });
+
+
+// 座標＆ズーム表示
+const debugBox = document.createElement('div');
+debugBox.style.position = 'fixed';
+debugBox.style.bottom = '20px';
+debugBox.style.right = '60px';
+debugBox.style.background = 'rgba(0,0,0,0.7)';
+debugBox.style.color = '#fff';
+debugBox.style.fontSize = '12px';
+debugBox.style.padding = '4px 6px';
+debugBox.style.zIndex = '4000';
+debugBox.style.borderRadius = '4px';
+
+document.body.appendChild(debugBox);
+
+function updateDebug() {
+  const center = map.getCenter();
+  const zoom = map.getZoom();
+
+  debugBox.textContent =
+    `Lat: ${center.lat.toFixed(5)} / Lng: ${center.lng.toFixed(5)} / Zoom: ${zoom}`;
+}
+
+// 初期表示
+updateDebug();
+
+// 地図動いたら更新
+map.on('move', updateDebug);
+
 </script>
 
 </body>
