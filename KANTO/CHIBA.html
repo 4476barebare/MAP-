@@ -208,10 +208,10 @@ const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png'
   maxZoom: 19
 }).addTo(map);
 
+tileLayer.getContainer().style.filter =
+  "grayscale(60%) brightness(95%) contrast(110%) hue-rotate(210deg)";
 
-// 白黒化＋明るさ＋コントラスト＋青み補正
-tileLayer.getContainer().style.filter = 
-  "grayscale(100%) brightness(90%) contrast(110%) hue-rotate(200deg)";
+
 
 
   // ===== メニュー =====
