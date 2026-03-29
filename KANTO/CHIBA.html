@@ -172,6 +172,24 @@ html, body {
   </div>
 </div>
 
+
+<!-- デバッグ表示（消さないで） -->
+<div id="map-debug" style="
+position:fixed;
+bottom:10px;
+left:10px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+padding:8px;
+font-size:12px;
+z-index:9999;
+border-radius:6px;
+">
+  lat: <span id="lat">-</span><br>
+  lng: <span id="lng">-</span><br>
+  zoom: <span id="zoom">-</span>
+</div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
