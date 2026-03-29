@@ -59,12 +59,7 @@ html, body {
   padding:1px 0; border-radius:2px; margin-right:1px;
 }
 
-.weather-block:first-child {
-    flex: 0 0 10px;
-    margin-right:1px;
-    text-align: center;  /* 中央寄せ */
-}
-
+.weather-block:first-child { flex:0 0 10px; margin-right:1px; }
 
 /* 色分け */
 .time-block { background:#e0e0e0; }
@@ -175,18 +170,12 @@ window.addEventListener('DOMContentLoaded', function() {
   map.on('move',updateDebug);
   map.on('zoom',updateDebug);
 
-
-function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
+  // ===== 天気・波・潮位UI関数 =====
+  function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
 
-    // ===== wrapper div =====
-    const wrapper = document.createElement('div');
-    wrapper.style.display = 'flex';
-    wrapper.style.flexDirection = 'column';
-    container.appendChild(wrapper);
-
-    // ===== 日付＋出典行 =====
+    // ===== 日付と出典行 =====
     const header = document.createElement('div');
     header.style.display = 'flex';
     header.style.justifyContent = 'space-between';
@@ -201,7 +190,7 @@ function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
     header.appendChild(dateEl);
     header.appendChild(sourceEl);
 
-    wrapper.appendChild(header);
+    container.appendChild(header);
 
     // ===== 天気ブロック =====
     const weatherContainer = document.createElement('div');
@@ -214,19 +203,16 @@ function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
       const first = document.createElement('span');
       first.className = 'weather-block first-block';
       row.appendChild(first);
-
-      // 4時間おきに省略して表示
-      weatherData[key].forEach((v,i)=>{
+      weatherData[key].forEach(v=>{
         const block = document.createElement('span');
         block.className = 'weather-block ' + (key==='time'?'time-block':key==='icon'?'icon-block':key==='temp'?'temp-block':key==='precip'?'precip-block':key==='wind'?'wind-block':'winddir-block');
-        block.textContent = (key==='time' && i%2!==0) ? '' : v; // 2時間毎データだが表示は4時間毎
+        block.textContent = v;
         row.appendChild(block);
       });
-
       weatherContainer.appendChild(row);
     });
 
-    wrapper.appendChild(weatherContainer);
+    container.appendChild(weatherContainer);
 
     // ===== 波ブロック =====
     const waveRow = document.createElement('div');
@@ -234,13 +220,13 @@ function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
     const firstWave = document.createElement('span');
     firstWave.className = 'weather-block first-block';
     waveRow.appendChild(firstWave);
-    waveData.forEach((v,i)=>{
+    waveData.forEach(v=>{
       const block = document.createElement('span');
       block.className = 'weather-block wave-block';
       block.textContent = v.toFixed(1)+'m';
       waveRow.appendChild(block);
     });
-    wrapper.appendChild(waveRow);
+    container.appendChild(waveRow);
 
     // ===== 潮位canvas =====
     const tideRow = document.createElement('div');
@@ -253,9 +239,9 @@ function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
     canvas.style.background = '#eef';
     canvas.style.marginTop = '3px';
     tideRow.appendChild(canvas);
-    wrapper.appendChild(tideRow);
+    container.appendChild(tideRow);
 
-    // ===== 潮位描画（塗りつぶし＋線） =====
+    // ===== 潮位描画 =====
     const ctx = canvas.getContext('2d');
     function drawTide(data) {
       const rect = canvas.getBoundingClientRect();
@@ -291,7 +277,7 @@ function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
     window.addEventListener('resize',()=>drawTide(tideData));
   }
 
-  // ===== サンプルデータ =====
+  // ===== サンプルデータ呼び出し =====
   const sampleDate = new Date();
   const sampleWeatherData = {
     time: ['0','2','4','6','8','10','12','14','16','18','20','22'],
@@ -305,7 +291,6 @@ function renderWeatherWaveTide(date, weatherData, waveData, tideData) {
   const sampleTideData = [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6];
 
   renderWeatherWaveTide(sampleDate, sampleWeatherData, sampleWaveData, sampleTideData);
-
 
 });
 </script>
