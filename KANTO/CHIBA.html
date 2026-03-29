@@ -284,9 +284,7 @@ window.addEventListener('DOMContentLoaded', function() {
     document.getElementById('lng').textContent = center.lng.toFixed(5);
     document.getElementById('zoom').textContent = map.getZoom();
   }
-
-  map.on('move', updateDebug);
-  map.on('zoom', updateDebug);
+  map.on('moveend zoomend', updateDebug);
   updateDebug();
 });
 
