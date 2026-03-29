@@ -129,7 +129,7 @@ html, body {
 
 <header>
   <div class="header-inner">
-    <div class="logo">釣り行こNAVI</div>
+    <div class="logo">釣り行こCHIBA</div>
     <nav class="nav">
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
@@ -142,8 +142,7 @@ html, body {
         </div>
       </div>
       <a href="#" id="newsBtn">釣りNEWS</a>
-      <a href="#">全国地図</a>
-      <a href="#">その他</a>
+      <a href="#">スポット一覧</a>
     </nav>
   </div>
 </header>
@@ -197,7 +196,7 @@ border-radius:6px;
 window.addEventListener('DOMContentLoaded', function() {
 
   // ===== 地図初期化 =====
-  const map = L.map('lf-map').setView([35.15, 140.3], 8);
+  const map = L.map('lf-map').setView([35.45, 140.25], 9);
   map.attributionControl.setPrefix(false);
 
   L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -213,12 +212,11 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentPage = 0;
 
   const points = [
-    {name:'ポイント1', lat:35.15, lng:140.3},
-    {name:'ポイント2', lat:35.2, lng:140.35},
-    {name:'ポイント3', lat:35.25, lng:140.4},
-    {name:'ポイント4', lat:35.3, lng:140.45},
-    {name:'ポイント5', lat:35.35, lng:140.5},
-    {name:'ポイント6', lat:35.4, lng:140.55}
+    {name:'フォントのテスト', lat:35.15, lng:140.3},
+    {name:'本当のテスト', lat:35.2, lng:140.35},
+    {name:'ほんとのテキスト', lat:35.25, lng:140.4},
+    {name:'本当のテイスト', lat:35.3, lng:140.45},
+
   ];
 
   const totalPages = Math.ceil(points.length / maxRows);
