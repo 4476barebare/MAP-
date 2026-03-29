@@ -240,52 +240,59 @@ window.addEventListener('DOMContentLoaded', function() {
   const canvas=document.getElementById('tide-canvas');
   const ctx=canvas.getContext('2d');
 
-  function drawTideFill(data){
-    const rect=canvas.getBoundingClientRect();
-    canvas.width=rect.width;
-    canvas.height=rect.height;
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+ function drawTideFilled(data){
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 滑らかな曲線用にベジェ曲線で補完
-    ctx.beginPath();
-    data.forEach((val,i)=>{
-      const x=(i/(data.length-1))*canvas.width;
-      const y=canvas.height - val*canvas.height*0.8;
-      if(i===0) ctx.moveTo(x,y);
-      else{
-        const prevX=((i-1)/(data.length-1))*canvas.width;
-        const prevY=canvas.height - data[i-1]*canvas.height*0.8;
-        const cx=(prevX + x)/2;
-        ctx.quadraticCurveTo(prevX, prevY, cx, (prevY+y)/2);
-        ctx.lineTo(x,y);
-      }
-    });
-    // 下までパスを閉じる
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.lineTo(0, canvas.height);
-    ctx.closePath();
+  const getY = val => canvas.height - val * canvas.height * 0.8;
 
-    ctx.fillStyle='rgba(0,119,204,0.4)';
-    ctx.fill();
+  ctx.beginPath();
+  data.forEach((val, i) => {
+    const x = (i / (data.length - 1)) * canvas.width;
+    const y = getY(val);
+    if (i === 0) ctx.moveTo(x, y);
+    else {
+      const prevX = ((i - 1) / (data.length - 1)) * canvas.width;
+      const prevY = getY(data[i - 1]);
+      const cx = (prevX + x) / 2;
+      ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
+      ctx.lineTo(x, y);
+    }
+  });
 
-    // 上に線を描く
-    ctx.beginPath();
-    data.forEach((val,i)=>{
-      const x=(i/(data.length-1))*canvas.width;
-      const y=canvas.height - val*canvas.height*0.8;
-      if(i===0) ctx.moveTo(x,y);
-      else ctx.lineTo(x,y);
-    });
-    ctx.strokeStyle='#0077cc';
-    ctx.lineWidth=2;
-    ctx.lineJoin='round';
-    ctx.lineCap='round';
-    ctx.stroke();
-  }
+  // 塗りつぶし
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.lineTo(0, canvas.height);
+  ctx.closePath();
+  ctx.fillStyle = '#0077cc';
+  ctx.fill();
 
-  drawTideFill(tideData);
-  window.addEventListener('resize',()=>drawTideFill(tideData));
+  // 線を描画
+  ctx.beginPath();
+  data.forEach((val, i) => {
+    const x = (i / (data.length - 1)) * canvas.width;
+    const y = getY(val);
+    if (i === 0) ctx.moveTo(x, y);
+    else {
+      const prevX = ((i - 1) / (data.length - 1)) * canvas.width;
+      const prevY = getY(data[i - 1]);
+      const cx = (prevX + x) / 2;
+      ctx.quadraticCurveTo(prevX, prevY, cx, (prevY + y) / 2);
+      ctx.lineTo(x, y);
+    }
+  });
+  ctx.strokeStyle = '#0077cc';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
 
+drawTideFilled(tideData);
+window.addEventListener('resize', () => drawTideFilled(tideData));
+ 
+ 
+ 
 });
 </script>
 </body>
