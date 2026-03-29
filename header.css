@@ -14,6 +14,7 @@ header {
   justify-content:space-between;
   padding:10px 12px;
   position:relative;
+  z-index: 2001; /* ←最強にする */
 }
 .logo { 
   font-weight:700; 
