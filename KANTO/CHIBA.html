@@ -77,19 +77,23 @@ html, body {
 
 .weather-row {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between; /* 均等配置 */
   margin-bottom: 1px;
 }
 
 .weather-block {
-  width: 18px;
-  margin-right: 1px;
-  white-space: nowrap;
+  flex: 1;                /* 均等幅にする */
   text-align: center;
   font-size: 10px;
   line-height: 1.1;
   padding: 1px 0;
   border-radius: 2px;
+  margin-right: 1px;      /* ブロック間マージン */
+}
+
+.weather-block:first-child {
+  flex: 0 0 10px;         /* 見出し列だけ固定幅 */
+  margin-right: 1px;
 }
 
 /* 色分け */
