@@ -284,7 +284,7 @@ const blueOverlay = L.rectangle(map.getBounds(), {
     header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
     container.appendChild(header);
 
-    const keys = ['time','icon','temp','precip','wind','winddir'];
+    const keys = ['時間','天気','気温','降率','風速','風向'];
 
     keys.forEach(key=>{
       const row=document.createElement('div');
@@ -312,7 +312,7 @@ const blueOverlay = L.rectangle(map.getBounds(), {
 
     const waveLabel=document.createElement('span');
     waveLabel.className='weather-block first-block';
-    waveLabel.textContent='波';
+    waveLabel.textContent='波高';
     waveRow.appendChild(waveLabel);
 
     waveData.forEach(v=>{
