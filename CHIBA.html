@@ -44,7 +44,7 @@ html, body {
 .map-menu li:last-child { border-bottom:none; }
 .nav-btn { font-size:12px; color:#007aff; margin-left:8px; }
 
-/* UI */
+/* 天気UI */
 .weather-container, #weather-wave-tide-container {
   width:100%; display:flex; flex-direction:column;
   font-family:monospace; font-size:10px; margin-top:5px; text-align:center;
@@ -83,27 +83,6 @@ html, body {
   font-size:10px;
   margin:2px 0;
 }
-
-/* ニュース */
-#newsOverlay{
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  z-index:3000;
-}
-.news-window{
-  position:absolute;
-  top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  background:#fff;
-  width:90%;
-  max-height:80%;
-  overflow:auto;
-  padding:10px;
-  border-radius:8px;
-}
 </style>
 </head>
 <body>
@@ -135,9 +114,8 @@ html, body {
 
 <div id="weather-wave-tide-container"></div>
 
-<footer>© 釣り行こNAVI</footer>
 
-<!-- ニュース -->
+<!-- ニュースオーバーレイ -->
 <div id="newsOverlay">
   <div class="news-window">
     <button id="closeNews">閉じる</button>
@@ -145,19 +123,63 @@ html, body {
   </div>
 </div>
 
+
+
+
+<footer>© 釣り行こNAVI</footer>
+
+
+
+<!-- デバッグ表示（消さないで） -->
+<div id="map-debug" style="
+position:fixed;
+bottom:10px;
+left:10px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+padding:8px;
+font-size:12px;
+z-index:9999;
+border-radius:6px;
+">
+  lat: <span id="lat">-</span><br>
+  lng: <span id="lng">-</span><br>
+  zoom: <span id="zoom">-</span>
+</div>
+
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
-  // 地図
-  const map = L.map('lf-map').setView([35.45,140.25],9);
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',{ maxZoom:19 }).addTo(map);
+  // ===== 地図 =====
+// ===== 地図初期化 =====
+const map = L.map('lf-map').setView([35.45, 140.25], 9);
+map.attributionControl.setPrefix(false);
 
-  // メニュー
+// タイルレイヤーを変数に格納
+const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+
+// まず元の白黒タイル
+tileLayer.getContainer().style.filter =
+  "grayscale(100%) brightness(110%) contrast(110%)";
+
+// 青の半透明オーバーレイを追加
+const blueOverlay = L.rectangle(map.getBounds(), {
+  color: "#191970",       // 青
+  weight: 0,              // 線は無し
+  fillOpacity: 0.1,       // 透明度で調整
+  interactive: false      // マップ操作に影響なし
+}).addTo(map);
+
+  // ===== メニュー =====
   const menuBox = document.getElementById('map-menu');
   const menu = menuBox.querySelector('ul');
+
   const maxRows = 4;
   let currentPage = 0;
 
@@ -166,40 +188,51 @@ window.addEventListener('DOMContentLoaded', function() {
     {name:'南房総エリア', lat:35.2, lng:140.35},
     {name:'外房エリア', lat:35.25, lng:140.4},
     {name:'九十九里銚子エリア', lat:35.3, lng:140.45},
+
   ];
 
-  const totalPages = Math.ceil(points.length/maxRows);
+  const totalPages = Math.ceil(points.length / maxRows);
 
   function renderMenu(){
-    menu.innerHTML='';
-    const start=currentPage*maxRows;
-    const end=Math.min(start+maxRows,points.length);
+    menu.innerHTML = '';
+
+    const start = currentPage * maxRows;
+    const end = Math.min(start + maxRows, points.length);
 
     for(let i=start;i<end;i++){
-      const li=document.createElement('li');
-      const text=document.createElement('span');
-      text.textContent=points[i].name;
+      const li = document.createElement('li');
+
+      const text = document.createElement('span');
+      text.textContent = points[i].name;
       li.appendChild(text);
 
-      if(i===end-1 && currentPage<totalPages-1){
-        const next=document.createElement('span');
-        next.textContent='▶';
-        next.className='nav-btn';
-        next.onclick=e=>{e.stopPropagation();currentPage++;renderMenu();};
+      if(i === end - 1 && currentPage < totalPages - 1){
+        const next = document.createElement('span');
+        next.textContent = '▶';
+        next.className = 'nav-btn';
+        next.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage++;
+          renderMenu();
+        };
         li.appendChild(next);
       }
 
-      if(i===start && currentPage>0){
-        const prev=document.createElement('span');
-        prev.textContent='◀';
-        prev.className='nav-btn';
-        prev.onclick=e=>{e.stopPropagation();currentPage--;renderMenu();};
+      if(i === start && currentPage > 0){
+        const prev = document.createElement('span');
+        prev.textContent = '◀';
+        prev.className = 'nav-btn';
+        prev.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage--;
+          renderMenu();
+        };
         li.appendChild(prev);
       }
 
-      li.onclick=()=>{
-        map.setView([points[i].lat,points[i].lng],12);
-        menuBox.style.maxHeight='0px';
+      li.onclick = ()=>{
+        map.setView([points[i].lat, points[i].lng], 12);
+        menuBox.style.maxHeight = '0px';
       };
 
       menu.appendChild(li);
@@ -210,18 +243,40 @@ window.addEventListener('DOMContentLoaded', function() {
 
   renderMenu();
 
-  // UI
+
+  // ===== デバッグ表示（確実版） =====
+  const latEl = document.getElementById('lat');
+  const lngEl = document.getElementById('lng');
+  const zoomEl = document.getElementById('zoom');
+
+  function updateDebug() {
+    const center = map.getCenter();
+    latEl.textContent = center.lat.toFixed(5);
+    lngEl.textContent = center.lng.toFixed(5);
+    zoomEl.textContent = map.getZoom();
+  }
+
+  // 初期化完了後に必ず1回実行
+  map.whenReady(function(){
+    updateDebug();
+  });
+
+  // イベント
+  map.on('move', updateDebug);
+  map.on('zoom', updateDebug);
+
+  // ===== 天気・潮UI（元のまま）=====
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
 
     const container = document.getElementById('weather-wave-tide-container');
-    container.innerHTML='';
+    container.innerHTML = '';
 
-    const header=document.createElement('div');
-    header.className='weather-header';
-    header.innerHTML=`<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
+    const header = document.createElement('div');
+    header.className = 'weather-header';
+    header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
     container.appendChild(header);
 
-    const keys=['time','icon','temp','precip','wind','winddir'];
+    const keys = ['time','icon','temp','precip','wind','winddir'];
 
     keys.forEach(key=>{
       const row=document.createElement('div');
@@ -243,6 +298,7 @@ window.addEventListener('DOMContentLoaded', function() {
       container.appendChild(row);
     });
 
+    // 波
     const waveRow=document.createElement('div');
     waveRow.className='weather-row';
 
@@ -260,6 +316,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     container.appendChild(waveRow);
 
+    // 潮＋canvas
     const tideRow=document.createElement('div');
     tideRow.className='weather-row';
 
@@ -284,48 +341,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
-      const getX = i => i/(data.length-1)*canvas.width;
-      const getY = v => canvas.height - v * canvas.height * 0.8;
-
-      // 塗り
       ctx.beginPath();
       data.forEach((v,i)=>{
-        const x=getX(i);
-        const y=getY(v);
-
-        if(i===0){
-          ctx.moveTo(x,y);
-        }else{
-          const prevX=getX(i-1);
-          const prevY=getY(data[i-1]);
-          const cx=(prevX+x)/2;
-          ctx.quadraticCurveTo(prevX, prevY, cx, (prevY+y)/2);
-          ctx.lineTo(x,y);
-        }
-      });
-
-      ctx.lineTo(canvas.width, canvas.height);
-      ctx.lineTo(0, canvas.height);
-      ctx.closePath();
-
-      ctx.fillStyle='#0077cc';
-      ctx.fill();
-
-      // 線
-      ctx.beginPath();
-      data.forEach((v,i)=>{
-        const x=getX(i);
-        const y=getY(v);
-
-        if(i===0){
-          ctx.moveTo(x,y);
-        }else{
-          const prevX=getX(i-1);
-          const prevY=getY(data[i-1]);
-          const cx=(prevX+x)/2;
-          ctx.quadraticCurveTo(prevX, prevY, cx, (prevY+y)/2);
-          ctx.lineTo(x,y);
-        }
+        const x=i/(data.length-1)*canvas.width;
+        const y=canvas.height-v*canvas.height*0.8;
+        if(i===0)ctx.moveTo(x,y);
+        else ctx.lineTo(x,y);
       });
 
       ctx.strokeStyle='#0077cc';
@@ -337,6 +358,7 @@ window.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize',()=>draw(tideData));
   }
 
+  // サンプル
   renderWeatherWaveTide(
     new Date(),
     {
