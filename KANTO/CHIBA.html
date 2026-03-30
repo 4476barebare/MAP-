@@ -47,7 +47,11 @@ html, body {
 /* 天気UI */
 .weather-container, #weather-wave-tide-container {
   width:100%; display:flex; flex-direction:column;
-  font-family:monospace; font-size:10px; margin-top:5px; text-align:center;
+  color: #191970;
+  font-family:monospace;
+  font-size:10px;
+  margin-top:5px;
+  text-align:center;
 }
 
 .weather-row { display:flex; justify-content:space-between; margin-bottom:1px; }
@@ -384,7 +388,7 @@ function draw(data){
 
   ctx.lineTo(points[points.length-1].x, canvas.height);
   ctx.closePath();
-  ctx.fillStyle = '#0077cc';
+  ctx.fillStyle = '#191970';
   ctx.fill();
 
   // 線
@@ -394,7 +398,7 @@ function draw(data){
     const cps = getControlPoints(points[i-1], points[i], points[i+1]);
     ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
   }
-  ctx.strokeStyle = '#0077cc';
+  ctx.strokeStyle = '#191970';
   ctx.lineWidth = 1;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
