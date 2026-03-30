@@ -155,46 +155,53 @@ border-radius:6px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
-
 
   // ===== デバッグ表示（確実版） =====
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
 
-  function updateDebug() {
-    const center = map.getCenter();
-    latEl.textContent = center.lat.toFixed(5);
-    lngEl.textContent = center.lng.toFixed(5);
-    zoomEl.textContent = map.getZoom();
+  // ===== 地図描画を関数化（ここだけ変更） =====
+  function renderMap(center=[35.45,140.25], zoom=9) {
+    // 既存の map があれば削除
+    if (window.map) {
+      window.map.remove();
+    }
+
+    const map = L.map('lf-map').setView(center, zoom);
+    window.map = map; // グローバル参照用
+
+    map.attributionControl.setPrefix(false);
+
+    // タイルレイヤー
+    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    tileLayer.getContainer().style.filter =
+      "grayscale(100%) brightness(110%) contrast(110%)";
+
+    // デバッグ更新関数
+    function updateDebug() {
+      const center = map.getCenter();
+      latEl.textContent = center.lat.toFixed(5);
+      lngEl.textContent = center.lng.toFixed(5);
+      zoomEl.textContent = map.getZoom();
+    }
+
+    map.whenReady(updateDebug);
+    map.on('move', updateDebug);
+    map.on('zoom', updateDebug);
+
+    return map;
   }
+  // ===== ここまで関数化部分 =====
 
-
-
-
-  // ===== 地図 =====
-// ===== 地図初期化 =====
-const map = L.map('lf-map').setView([35.45, 140.25], 9);
-map.attributionControl.setPrefix(false);
-
-// タイルレイヤーを変数に格納
-const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 19
-}).addTo(map);
-
-// まず元の白黒タイル
-tileLayer.getContainer().style.filter =
-  "grayscale(100%) brightness(110%) contrast(110%)";
-
-// 青の半透明オーバーレイを追加
-//const blueOverlay = L.rectangle(map.getBounds(), {
-//  color: "#191970",       // 青
-//  weight: 0,              // 線は無し
-//  fillOpacity: 0.1,       // 透明度で調整
-//  interactive: false      // マップ操作に影響なし
-//}).addTo(map);
+  // ===== 元の地図描画呼び出し =====
+  const map = renderMap(); // 初期描画（元の中心・ズーム）
 
   // ===== メニュー =====
   const menuBox = document.getElementById('map-menu');
@@ -208,7 +215,6 @@ tileLayer.getContainer().style.filter =
     {name:'南房総エリア', lat:35.2, lng:140.35},
     {name:'外房エリア', lat:35.25, lng:140.4},
     {name:'九十九里銚子エリア', lat:35.3, lng:140.45}
-
   ];
 
   const totalPages = Math.ceil(points.length / maxRows);
@@ -263,20 +269,8 @@ tileLayer.getContainer().style.filter =
 
   renderMenu();
 
-
-
-  // 初期化完了後に必ず1回実行
-  map.whenReady(function(){
-    updateDebug();
-  });
-
-  // イベント
-  map.on('move', updateDebug);
-  map.on('zoom', updateDebug);
-
   // ===== 天気・潮UI（元のまま）=====
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
-
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
 
@@ -285,132 +279,121 @@ tileLayer.getContainer().style.filter =
     header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
     container.appendChild(header);
 
-const keys = [
-  { key:'time', label:'時間' },
-  { key:'icon', label:'天気' },
-  { key:'temp', label:'気温' },
-  { key:'precip', label:'降率' },
-  { key:'wind', label:'風速' },
-  { key:'winddir', label:'風向' }
-];
-keys.forEach(k => {
-  const row = document.createElement('div');
-  row.className = 'weather-row';
+    const keys = [
+      { key:'time', label:'時間' },
+      { key:'icon', label:'天気' },
+      { key:'temp', label:'気温' },
+      { key:'precip', label:'降率' },
+      { key:'wind', label:'風速' },
+      { key:'winddir', label:'風向' }
+    ];
+    keys.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'weather-row';
 
-  const label = document.createElement('span');
-  label.className = 'weather-block first-block';
-  label.textContent = k.label;
-  row.appendChild(label);
+      const label = document.createElement('span');
+      label.className = 'weather-block first-block';
+      label.textContent = k.label;
+      row.appendChild(label);
 
-  weatherData[k.key].forEach((v,i)=>{
-    const b = document.createElement('span');
-    b.className = 'weather-block';
-    if(k.key==='time' && i%2!==0) b.textContent='';
-    else b.textContent = v;
-    row.appendChild(b);
-  });
+      weatherData[k.key].forEach((v,i)=>{
+        const b = document.createElement('span');
+        b.className = 'weather-block';
+        if(k.key==='time' && i%2!==0) b.textContent='';
+        else b.textContent = v;
+        row.appendChild(b);
+      });
 
-  container.appendChild(row);
-});
+      container.appendChild(row);
+    });
 
-
-   // 波
+    // 波
     const waveRow=document.createElement('div');
     waveRow.className='weather-row';
-
     const waveLabel=document.createElement('span');
     waveLabel.className='weather-block first-block';
     waveLabel.textContent='波高';
     waveRow.appendChild(waveLabel);
-
     waveData.forEach(v=>{
       const b=document.createElement('span');
       b.className='weather-block wave-block';
       b.textContent=v+'m';
       waveRow.appendChild(b);
     });
-
     container.appendChild(waveRow);
 
     // 潮＋canvas
     const tideRow=document.createElement('div');
     tideRow.className='weather-row';
-
     const tideLabel=document.createElement('span');
     tideLabel.className='weather-block first-block tide-label';
     tideLabel.textContent=tideName;
     tideRow.appendChild(tideLabel);
-
     const canvas=document.createElement('canvas');
     canvas.style.flex='1';
     canvas.style.height='36px';
     tideRow.appendChild(canvas);
-
     container.appendChild(tideRow);
 
     const ctx=canvas.getContext('2d');
+    function draw(data){
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
 
-function draw(data){
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
+      const points = data.map((v,i) => {
+        const x = i/(data.length-1) * canvas.width;
+        const y = canvas.height - v*canvas.height*0.8;
+        return {x, y};
+      });
 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+      function getControlPoints(p0, p1, p2, t=0.3){
+        const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+        const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+        const fa = t * d01/(d01+d12);
+        const fb = t - fa;
+        const cp1x = p1.x - fa*(p2.x-p0.x);
+        const cp1y = p1.y - fa*(p2.y-p0.y);
+        const cp2x = p1.x + fb*(p2.x-p0.x);
+        const cp2y = p1.y + fb*(p2.y-p0.y);
+        return [{x:cp1x,y:cp1y},{x:cp2x,y:cp2y}];
+      }
 
-  const points = data.map((v,i) => {
-    const x = i/(data.length-1) * canvas.width;
-    const y = canvas.height - v*canvas.height*0.8;
-    return {x, y};
-  });
+      // 塗りつぶし
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, canvas.height);
+      ctx.lineTo(points[0].x, points[0].y);
 
-  // ベジェ曲線で滑らかに描くための補助関数
-  function getControlPoints(p0, p1, p2, t=0.3){
-    const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
-    const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-    const fa = t * d01/(d01+d12);
-    const fb = t - fa;
-    const cp1x = p1.x - fa*(p2.x-p0.x);
-    const cp1y = p1.y - fa*(p2.y-p0.y);
-    const cp2x = p1.x + fb*(p2.x-p0.x);
-    const cp2y = p1.y + fb*(p2.y-p0.y);
-    return [{x:cp1x,y:cp1y},{x:cp2x,y:cp2y}];
-  }
+      for(let i=1; i<points.length-1; i++){
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
 
-  // 塗りつぶし
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, canvas.height);
-  ctx.lineTo(points[0].x, points[0].y);
+      ctx.lineTo(points[points.length-1].x, canvas.height);
+      ctx.closePath();
+      ctx.fillStyle = '#191970';
+      ctx.fill();
 
-  for(let i=1; i<points.length-1; i++){
-    const cps = getControlPoints(points[i-1], points[i], points[i+1]);
-    ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
-  }
-
-  ctx.lineTo(points[points.length-1].x, canvas.height);
-  ctx.closePath();
-  ctx.fillStyle = '#191970';
-  ctx.fill();
-
-  // 線
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, points[0].y);
-  for(let i=1; i<points.length-1; i++){
-    const cps = getControlPoints(points[i-1], points[i], points[i+1]);
-    ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
-  }
-  ctx.strokeStyle = '#191970';
-  ctx.lineWidth = 1;
-  ctx.lineJoin = 'round';
-  ctx.lineCap = 'round';
-  ctx.stroke();
-}
-
+      // 線
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for(let i=1; i<points.length-1; i++){
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
+      ctx.strokeStyle = '#191970';
+      ctx.lineWidth = 1;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
 
     draw(tideData);
     window.addEventListener('resize',()=>draw(tideData));
   }
 
-  // サンプル
+  // サンプル呼び出し
   renderWeatherWaveTide(
     new Date(),
     {
@@ -428,5 +411,6 @@ function draw(data){
 
 });
 </script>
-</body>
+
+
 </html>
