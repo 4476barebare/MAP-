@@ -128,11 +128,47 @@ html, body {
 
 <footer>© 釣り行こNAVI</footer>
 
+
+
+<!-- デバッグ表示（消さないで） -->
+<div id="map-debug" style="
+position:fixed;
+bottom:10px;
+left:10px;
+background:rgba(0,0,0,0.7);
+color:#fff;
+padding:8px;
+font-size:12px;
+z-index:9999;
+border-radius:6px;
+">
+  lat: <span id="lat">-</span><br>
+  lng: <span id="lng">-</span><br>
+  zoom: <span id="zoom">-</span>
+</div>
+
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
 <script>
 window.addEventListener('DOMContentLoaded', function() {
+
+
+  // ===== デバッグ表示（確実版） =====
+  const latEl = document.getElementById('lat');
+  const lngEl = document.getElementById('lng');
+  const zoomEl = document.getElementById('zoom');
+
+  function updateDebug() {
+    const center = map.getCenter();
+    latEl.textContent = center.lat.toFixed(5);
+    lngEl.textContent = center.lng.toFixed(5);
+    zoomEl.textContent = map.getZoom();
+  }
+
+
+
 
   // ===== 地図 =====
 // ===== 地図初期化 =====
@@ -224,17 +260,6 @@ const blueOverlay = L.rectangle(map.getBounds(), {
   renderMenu();
 
 
-  // ===== デバッグ表示（確実版） =====
-  const latEl = document.getElementById('lat');
-  const lngEl = document.getElementById('lng');
-  const zoomEl = document.getElementById('zoom');
-
-  function updateDebug() {
-    const center = map.getCenter();
-    latEl.textContent = center.lat.toFixed(5);
-    lngEl.textContent = center.lng.toFixed(5);
-    zoomEl.textContent = map.getZoom();
-  }
 
   // 初期化完了後に必ず1回実行
   map.whenReady(function(){
