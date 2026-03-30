@@ -281,29 +281,36 @@ const blueOverlay = L.rectangle(map.getBounds(), {
     header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
     container.appendChild(header);
 
-    const keys = ['時間','天気','気温','降率','風速','風向'];
+const keys = [
+  { key:'time', label:'時間' },
+  { key:'icon', label:'天気' },
+  { key:'temp', label:'気温' },
+  { key:'precip', label:'降率' },
+  { key:'wind', label:'風速' },
+  { key:'winddir', label:'風向' }
 
-    keys.forEach(key=>{
-      const row=document.createElement('div');
-      row.className='weather-row';
+keys.forEach(k => {
+  const row = document.createElement('div');
+  row.className = 'weather-row';
 
-      const label=document.createElement('span');
-      label.className='weather-block first-block';
-      label.textContent=key;
-      row.appendChild(label);
+  const label = document.createElement('span');
+  label.className = 'weather-block first-block';
+  label.textContent = k.label;
+  row.appendChild(label);
 
-      weatherData[key].forEach((v,i)=>{
-        const b=document.createElement('span');
-        b.className='weather-block';
-        if(key==='time' && i%2!==0) b.textContent='';
-        else b.textContent=v;
-        row.appendChild(b);
-      });
+  weatherData[k.key].forEach((v,i)=>{
+    const b = document.createElement('span');
+    b.className = 'weather-block';
+    if(k.key==='time' && i%2!==0) b.textContent='';
+    else b.textContent = v;
+    row.appendChild(b);
+  });
 
-      container.appendChild(row);
-    });
+  container.appendChild(row);
+});
 
-    // 波
+
+   // 波
     const waveRow=document.createElement('div');
     waveRow.className='weather-row';
 
