@@ -193,66 +193,118 @@ window.addEventListener('DOMContentLoaded', function() {
   map.on('move', updateDebug);
   map.on('zoom', updateDebug);
 
-  function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
 
-    const container = document.getElementById('weather-wave-tide-container');
-    container.innerHTML = '';
+function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
 
-    const tideRow=document.createElement('div');
-    tideRow.className='weather-row';
+  const container = document.getElementById('weather-wave-tide-container');
+  container.innerHTML = '';
 
-    const tideLabel=document.createElement('span');
-    tideLabel.className='weather-block first-block tide-label';
-    tideLabel.textContent=tideName;
-    tideRow.appendChild(tideLabel);
+  // ===== ヘッダー =====
+  const header = document.createElement('div');
+  header.className = 'weather-header';
+  header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
+  container.appendChild(header);
 
-    const canvas=document.createElement('canvas');
-    canvas.style.flex='1';
-    canvas.style.height='36px';
-    tideRow.appendChild(canvas);
+  // ===== 天気 =====
+  const keys = ['time','icon','temp','precip','wind','winddir'];
 
-    container.appendChild(tideRow);
+  keys.forEach(key=>{
+    const row=document.createElement('div');
+    row.className='weather-row';
 
-    const ctx=canvas.getContext('2d');
+    const label=document.createElement('span');
+    label.className='weather-block first-block';
+    label.textContent=key;
+    row.appendChild(label);
 
-    function draw(data){
-      const rect=canvas.getBoundingClientRect();
-      canvas.width=rect.width;
-      canvas.height=rect.height;
+    weatherData[key].forEach((v,i)=>{
+      const b=document.createElement('span');
+      b.className='weather-block';
+      if(key==='time' && i%2!==0) b.textContent='';
+      else b.textContent=v;
+      row.appendChild(b);
+    });
 
-      ctx.clearRect(0,0,canvas.width,canvas.height);
+    container.appendChild(row);
+  });
 
-      ctx.beginPath();
+  // ===== 波 =====
+  const waveRow=document.createElement('div');
+  waveRow.className='weather-row';
 
-      data.forEach((v,i)=>{
-        const x=i/(data.length-1)*canvas.width;
-        const y=canvas.height-v*canvas.height*0.8;
+  const waveLabel=document.createElement('span');
+  waveLabel.className='weather-block first-block';
+  waveLabel.textContent='波';
+  waveRow.appendChild(waveLabel);
 
-        if(i===0){
-          ctx.moveTo(x,y);
-        }else{
-          const prevX=(i-1)/(data.length-1)*canvas.width;
-          const prevY=canvas.height-data[i-1]*canvas.height*0.8;
-          const cx=(prevX+x)/2;
-          ctx.quadraticCurveTo(prevX,prevY,cx,(prevY+y)/2);
-        }
-      });
+  waveData.forEach(v=>{
+    const b=document.createElement('span');
+    b.className='weather-block wave-block';
+    b.textContent=v+'m';
+    waveRow.appendChild(b);
+  });
 
-      ctx.lineTo(canvas.width, canvas.height);
-      ctx.lineTo(0, canvas.height);
-      ctx.closePath();
+  container.appendChild(waveRow);
 
-      ctx.fillStyle='rgba(0,119,204,0.3)';
-      ctx.fill();
+  // ===== 潮（滑らか＋塗り）=====
+  const tideRow=document.createElement('div');
+  tideRow.className='weather-row';
 
-      ctx.strokeStyle='#0077cc';
-      ctx.lineWidth=1.5;
-      ctx.stroke();
-    }
+  const tideLabel=document.createElement('span');
+  tideLabel.className='weather-block first-block tide-label';
+  tideLabel.textContent=tideName;
+  tideRow.appendChild(tideLabel);
 
-    draw(tideData);
-    window.addEventListener('resize',()=>draw(tideData));
+  const canvas=document.createElement('canvas');
+  canvas.style.flex='1';
+  canvas.style.height='36px';
+  tideRow.appendChild(canvas);
+
+  container.appendChild(tideRow);
+
+  const ctx=canvas.getContext('2d');
+
+  function draw(data){
+    const rect=canvas.getBoundingClientRect();
+    canvas.width=rect.width;
+    canvas.height=rect.height;
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.beginPath();
+
+    data.forEach((v,i)=>{
+      const x=i/(data.length-1)*canvas.width;
+      const y=canvas.height-v*canvas.height*0.8;
+
+      if(i===0){
+        ctx.moveTo(x,y);
+      }else{
+        const prevX=(i-1)/(data.length-1)*canvas.width;
+        const prevY=canvas.height-data[i-1]*canvas.height*0.8;
+        const cx=(prevX+x)/2;
+        ctx.quadraticCurveTo(prevX,prevY,cx,(prevY+y)/2);
+      }
+    });
+
+    // 塗り
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+
+    ctx.fillStyle='rgba(0,119,204,0.3)';
+    ctx.fill();
+
+    // 線
+    ctx.strokeStyle='#0077cc';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
   }
+
+  draw(tideData);
+  window.addEventListener('resize',()=>draw(tideData));
+}
+
 
   renderWeatherWaveTide(
     new Date(),
