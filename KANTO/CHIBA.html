@@ -114,6 +114,18 @@ html, body {
 
 <div id="weather-wave-tide-container"></div>
 
+
+<!-- ニュースオーバーレイ -->
+<div id="newsOverlay">
+  <div class="news-window">
+    <button id="closeNews">閉じる</button>
+    <div class="news-content"></div>
+  </div>
+</div>
+
+
+
+
 <footer>© 釣り行こNAVI</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -123,8 +135,26 @@ html, body {
 window.addEventListener('DOMContentLoaded', function() {
 
   // ===== 地図 =====
-  const map = L.map('lf-map').setView([35.45,140.25],9);
-  L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',{ maxZoom:19 }).addTo(map);
+// ===== 地図初期化 =====
+const map = L.map('lf-map').setView([35.45, 140.25], 9);
+map.attributionControl.setPrefix(false);
+
+// タイルレイヤーを変数に格納
+const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
+}).addTo(map);
+
+// まず元の白黒タイル
+tileLayer.getContainer().style.filter =
+  "grayscale(100%) brightness(110%) contrast(110%)";
+
+// 青の半透明オーバーレイを追加
+const blueOverlay = L.rectangle(map.getBounds(), {
+  color: "#191970",       // 青
+  weight: 0,              // 線は無し
+  fillOpacity: 0.1,       // 透明度で調整
+  interactive: false      // マップ操作に影響なし
+}).addTo(map);
 
   // ===== メニュー（ここだけ追加）=====
   const menuBox = document.getElementById('map-menu');
