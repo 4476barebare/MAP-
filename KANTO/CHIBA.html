@@ -342,7 +342,6 @@ const blueOverlay = L.rectangle(map.getBounds(), {
 
     const ctx=canvas.getContext('2d');
 
-
 function draw(data){
   const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width;
@@ -356,19 +355,41 @@ function draw(data){
     return {x, y};
   });
 
+  // ベジェ曲線で滑らかに描くための補助関数
+  function getControlPoints(p0, p1, p2, t=0.3){
+    const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+    const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+    const fa = t * d01/(d01+d12);
+    const fb = t - fa;
+    const cp1x = p1.x - fa*(p2.x-p0.x);
+    const cp1y = p1.y - fa*(p2.y-p0.y);
+    const cp2x = p1.x + fb*(p2.x-p0.x);
+    const cp2y = p1.y + fb*(p2.y-p0.y);
+    return [{x:cp1x,y:cp1y},{x:cp2x,y:cp2y}];
+  }
+
   // 塗りつぶし
   ctx.beginPath();
-  ctx.moveTo(points[0].x, canvas.height); // 左下からスタート
-  points.forEach(p => ctx.lineTo(p.x, p.y));
-  ctx.lineTo(points[points.length-1].x, canvas.height); // 右下に戻る
+  ctx.moveTo(points[0].x, canvas.height);
+  ctx.lineTo(points[0].x, points[0].y);
+
+  for(let i=1; i<points.length-1; i++){
+    const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+    ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+  }
+
+  ctx.lineTo(points[points.length-1].x, canvas.height);
   ctx.closePath();
-  ctx.fillStyle = '#0077cc'; // 線と同じ色
+  ctx.fillStyle = '#0077cc';
   ctx.fill();
 
-  // 線描画
+  // 線
   ctx.beginPath();
   ctx.moveTo(points[0].x, points[0].y);
-  points.forEach(p => ctx.lineTo(p.x, p.y));
+  for(let i=1; i<points.length-1; i++){
+    const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+    ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+  }
   ctx.strokeStyle = '#0077cc';
   ctx.lineWidth = 1;
   ctx.lineJoin = 'round';
