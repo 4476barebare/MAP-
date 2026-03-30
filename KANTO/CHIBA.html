@@ -164,44 +164,28 @@ window.addEventListener('DOMContentLoaded', function() {
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
 
-  // ===== 地図描画を関数化（ここだけ変更） =====
-  function renderMap(center=[35.45,140.25], zoom=9) {
-    // 既存の map があれば削除
-    if (window.map) {
-      window.map.remove();
-    }
-
-    const map = L.map('lf-map').setView(center, zoom);
-    window.map = map; // グローバル参照用
-
-    map.attributionControl.setPrefix(false);
-
-    // タイルレイヤー
-    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
-
-    tileLayer.getContainer().style.filter =
-      "grayscale(100%) brightness(110%) contrast(110%)";
-
-    // デバッグ更新関数
-    function updateDebug() {
-      const center = map.getCenter();
-      latEl.textContent = center.lat.toFixed(5);
-      lngEl.textContent = center.lng.toFixed(5);
-      zoomEl.textContent = map.getZoom();
-    }
-
-    map.whenReady(updateDebug);
-    map.on('move', updateDebug);
-    map.on('zoom', updateDebug);
-
-    return map;
+  function updateDebug() {
+    if(!map) return;
+    const center = map.getCenter();
+    latEl.textContent = center.lat.toFixed(5);
+    lngEl.textContent = center.lng.toFixed(5);
+    zoomEl.textContent = map.getZoom();
   }
-  // ===== ここまで関数化部分 =====
 
-  // ===== 元の地図描画呼び出し =====
-  const map = renderMap(); // 初期描画（元の中心・ズーム）
+
+  // ===== 地図 =====
+  // ===== 地図初期化 =====
+  const map = L.map('lf-map').setView([35.45, 140.25], 9);
+  map.attributionControl.setPrefix(false);
+
+  const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+  // 白黒調整
+  tileLayer.getContainer().style.filter =
+    "grayscale(100%) brightness(110%) contrast(110%)";
+
 
   // ===== メニュー =====
   const menuBox = document.getElementById('map-menu');
@@ -219,19 +203,21 @@ window.addEventListener('DOMContentLoaded', function() {
 
   const totalPages = Math.ceil(points.length / maxRows);
 
-  function renderMenu(){
+  // ===== メニュー描画関数（地図とは独立） =====
+  function renderMenu(pointsArray){
     menu.innerHTML = '';
 
     const start = currentPage * maxRows;
-    const end = Math.min(start + maxRows, points.length);
+    const end = Math.min(start + maxRows, pointsArray.length);
 
     for(let i=start;i<end;i++){
       const li = document.createElement('li');
 
       const text = document.createElement('span');
-      text.textContent = points[i].name;
+      text.textContent = pointsArray[i].name;
       li.appendChild(text);
 
+      // 次ページボタン
       if(i === end - 1 && currentPage < totalPages - 1){
         const next = document.createElement('span');
         next.textContent = '▶';
@@ -239,11 +225,12 @@ window.addEventListener('DOMContentLoaded', function() {
         next.onclick = (e)=>{
           e.stopPropagation();
           currentPage++;
-          renderMenu();
+          renderMenu(pointsArray);
         };
         li.appendChild(next);
       }
 
+      // 前ページボタン
       if(i === start && currentPage > 0){
         const prev = document.createElement('span');
         prev.textContent = '◀';
@@ -251,13 +238,16 @@ window.addEventListener('DOMContentLoaded', function() {
         prev.onclick = (e)=>{
           e.stopPropagation();
           currentPage--;
-          renderMenu();
+          renderMenu(pointsArray);
         };
         li.appendChild(prev);
       }
 
+      // 地図がある場合のみズーム中心を移動
       li.onclick = ()=>{
-        map.setView([points[i].lat, points[i].lng], 12);
+        if(map) {
+          map.setView([pointsArray[i].lat, pointsArray[i].lng], 12);
+        }
         menuBox.style.maxHeight = '0px';
       };
 
@@ -267,9 +257,21 @@ window.addEventListener('DOMContentLoaded', function() {
     menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
   }
 
-  renderMenu();
+  // ===== 初回メニュー描画 =====
+  renderMenu(points);
 
-  // ===== 天気・潮UI（元のまま）=====
+
+  // 初期化完了後に必ず1回実行
+  map.whenReady(function(){
+    updateDebug();
+  });
+
+  // イベント
+  map.on('move', updateDebug);
+  map.on('zoom', updateDebug);
+
+
+  // ===== 天気・潮UI（既存そのまま）=====
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
@@ -329,6 +331,7 @@ window.addEventListener('DOMContentLoaded', function() {
     tideLabel.className='weather-block first-block tide-label';
     tideLabel.textContent=tideName;
     tideRow.appendChild(tideLabel);
+
     const canvas=document.createElement('canvas');
     canvas.style.flex='1';
     canvas.style.height='36px';
@@ -336,10 +339,12 @@ window.addEventListener('DOMContentLoaded', function() {
     container.appendChild(tideRow);
 
     const ctx=canvas.getContext('2d');
+
     function draw(data){
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = rect.height;
+
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
       const points = data.map((v,i) => {
@@ -364,12 +369,10 @@ window.addEventListener('DOMContentLoaded', function() {
       ctx.beginPath();
       ctx.moveTo(points[0].x, canvas.height);
       ctx.lineTo(points[0].x, points[0].y);
-
       for(let i=1; i<points.length-1; i++){
         const cps = getControlPoints(points[i-1], points[i], points[i+1]);
         ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
       }
-
       ctx.lineTo(points[points.length-1].x, canvas.height);
       ctx.closePath();
       ctx.fillStyle = '#191970';
@@ -393,7 +396,7 @@ window.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize',()=>draw(tideData));
   }
 
-  // サンプル呼び出し
+  // ===== サンプル呼び出し =====
   renderWeatherWaveTide(
     new Date(),
     {
@@ -411,6 +414,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
+
 
 
 </html>
