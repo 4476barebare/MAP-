@@ -173,91 +173,78 @@ let map; // グローバル変数
 
 function checkCSV() {
   fetch('/MAP-/data/location.csv')
-    .then(function(response) { return response.text(); })
-    .then(function(text) {
-      // URL からファイル名を取得
+    .then(response => response.text())
+    .then(text => {
       const urlParts = location.pathname.split('/');
-      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html または CHIBA.html/○○ または CHIBA.html/○○/△△
+      const fileName = urlParts[urlParts.length - 1];
 
-      // .html の後に / があるかチェック（1段目）
-      let baseFile, areaSuffix;
-      if (fileName.includes('.html/')) {
-        [baseFile, areaSuffix] = fileName.split('.html/');
+      // #方式で分割
+      let baseFile, hashSuffix;
+      if (fileName.includes('.html#')) {
+        [baseFile, hashSuffix] = fileName.split('.html#');
       } else {
         baseFile = fileName.replace('.html','');
-        areaSuffix = null;
+        hashSuffix = null;
       }
 
       let prefCode = baseFile.toUpperCase();
 
-      // /○○ がある場合は2段階目の / があるかチェック
-      if (areaSuffix) {
-        if (areaSuffix.includes('/')) {
-          // さらに / がある場合の処理
-          const [firstPart, secondPart] = areaSuffix.split('/');
+      // 従来処理をコールバック化
+      const continueProcessing = () => {
+        const lines = text.trim().split('\n');
+        let areas = [];
+
+        // 県情報取得
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
+            const prefName = cols[0].trim();
+            const prefZoom = parseFloat(cols[1]);
+            const prefLat = parseFloat(cols[3]);
+            const prefLng = parseFloat(cols[4]);
+            initMap(prefLat, prefLng, prefZoom);
+
+            // 親が一致するエリア取得
+            for (let j = 1; j < lines.length; j++) {
+              const c = lines[j].split(',');
+              if ((c[5] ? c[5].trim() : '') === prefName) {
+                areas.push({
+                  areaName: c[0].trim(),
+                  areaZoom: parseFloat(c[1]),
+                  areaLat: parseFloat(c[3]),
+                  areaLng: parseFloat(c[4])
+                });
+              }
+            }
+          }
+        }
+
+        renderMenu(areas);
+      };
+
+      // 分岐
+      if (hashSuffix) {
+        if (hashSuffix.includes('/')) {
+          const [firstPart, secondPart] = hashSuffix.split('/');
           alert('県確定: ' + prefCode);
-          
-          // firstPart で prefCode 上書き → エリア確定
           prefCode = firstPart.toUpperCase();
           alert('エリア確定: ' + prefCode);
-          
-          // secondPart で prefCode 上書き → エリア2確定
           prefCode = secondPart.toUpperCase();
           alert('エリア2確定: ' + prefCode);
-          
-          handleDoubleAreaURL(baseFile.toUpperCase(), firstPart, secondPart, text);
-          return; // 従来処理はスキップ
+
+          continueProcessing(); // prefCode が確定してから呼ぶ
         } else {
-          // /○○ のみの場合の処理
           alert('県確定: ' + prefCode);
-          
-          // エリア確定で prefCode 上書き
-          prefCode = areaSuffix.toUpperCase();
+          prefCode = hashSuffix.toUpperCase();
           alert('エリア確定: ' + prefCode);
-          
-          handleAreaURL(baseFile.toUpperCase(), areaSuffix, text);
-          return; // 従来処理はスキップ
+
+          continueProcessing(); // prefCode が確定してから呼ぶ
         }
+      } else {
+        continueProcessing(); // 通常の県ページ
       }
-
-      // 従来処理
-      const lines = text.trim().split('\n');
-      let areas = []; // 親が一致するエリア用配列
-
-      // 県情報取得
-      for (let i = 1; i < lines.length; i++) { // ヘッダはスキップ
-        const cols = lines[i].split(',');
-        if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
-          prefName = cols[0].trim();
-          prefZoom = parseFloat(cols[1]);
-          prefLat = parseFloat(cols[3]);
-          prefLng = parseFloat(cols[4]);
-
-          alert('県確定: ' + prefName);
-
-          initMap(prefLat, prefLng, prefZoom);
-        }
-      }
-
-      // 県を親に持つエリア取得
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',');
-        const parent = cols[5] ? cols[5].trim() : '';
-        if (parent === prefName) {
-          areas.push({
-            areaName: cols[0].trim(),
-            areaZoom: parseFloat(cols[1]),
-            areaLat: parseFloat(cols[3]),
-            areaLng: parseFloat(cols[4])
-          });
-        }
-      }
-
-      // メニュー描画
-      renderMenu(areas);
     });
 }
-
 
 
 
