@@ -210,6 +210,13 @@ function checkCSV() {
     const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
     }).addTo(map);
+    
+    
+// サイズを強制更新して中心を再設定
+map.whenReady(() => {
+  map.invalidateSize();
+  map.setView([prefLatGlobal, prefLngGlobal], prefZoomGlobal);
+})
 
     // 白黒フィルター
     tileLayer.getContainer().style.filter =
