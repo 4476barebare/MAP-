@@ -193,16 +193,16 @@ function checkCSV() {
         if (parts.length === 2) {
           area1 = parts[0];
           area2 = parts[1];
-          alert('県確定: ' + basePref);
-          alert('エリア1確定: ' + area1);
-          alert('エリア2確定: ' + area2);
+ //         alert('県確定: ' + basePref);
+ //         alert('エリア1確定: ' + area1);
+//          alert('エリア2確定: ' + area2);
         } else {
           area1 = parts[0];
-          alert('県確定: ' + basePref);
-          alert('エリア1確定: ' + area1);
+ //         alert('県確定: ' + basePref);
+ //         alert('エリア1確定: ' + area1);
         }
       } else {
-        alert('県確定: ' + prefCode);
+//        alert('県確定: ' + prefCode);
       }
 
       const lines = text.trim().split('\n');
@@ -353,28 +353,28 @@ function renderMenu(areas) {
 li.onclick = () => {
   const parentArea = areas[i].areaName; // このレベルのエリア名
   let childHash = ''; // エリア2用
+  let targetLat = areas[i].areaLat;
+  let targetLng = areas[i].areaLng;
+  let targetZoom = areas[i].areaZoom;
 
   // CSVの親列にこのエリア名を持つ行があれば最初の子を取得
   const childArea = areas.find(a => a.parent === parentArea);
   if (childArea) {
     childHash = '/' + encodeURIComponent(childArea.areaName);
+    targetLat = childArea.areaLat;
+    targetLng = childArea.areaLng;
+    targetZoom = childArea.areaZoom;
   }
 
   // URL の hash を書き換え
   location.hash = encodeURIComponent(parentArea) + childHash;
 
+  // 地図を移動
+  initMap(targetLat, targetLng, targetZoom);
+
   // メニュー div を完全に閉じる
   menuBox.style.display = 'none';
 };
-
-    menu.appendChild(li);
-  }
-
-  // 高さを再計算して開く（スクロール用）
-  menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
-  menu.style.display = 'block';
-}
-
 
 
   // ===== 天気・潮UI関数（元のまま）=====
