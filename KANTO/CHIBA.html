@@ -148,11 +148,9 @@ border-radius:6px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
-
 <script>
 window.addEventListener('DOMContentLoaded', function() {
-
-  // ===== デバッグ表示 =====
+  // デバッグ表示
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
@@ -163,238 +161,160 @@ window.addEventListener('DOMContentLoaded', function() {
     lngEl.textContent = center.lng.toFixed(5);
     zoomEl.textContent = map.getZoom();
   }
-  
-  
-//let prefNameGlobal = null;
-//let prefLatGlobal = null;
-//let prefLngGlobal = null;
-//let prefZoomGlobal = null;
-let map; // グローバル変数
 
+  let map; // グローバル変数
 
-function checkCSV() {
-  fetch('/MAP-/data/location.csv')
-    .then(response => response.text())
-    .then(text => {
-      // URL 取得
-      const urlParts = location.pathname.split('/');
-      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
-      const hash = location.hash ? location.hash.slice(1) : null; // #以下
+  function checkCSV() {
+    fetch('/MAP-/data/location.csv')
+      .then(response => response.text())
+      .then(text => {
+        const urlParts = location.pathname.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        const hash = location.hash ? location.hash.slice(1) : null;
 
-      const basePref = fileName.replace('.html','');
-      let prefCode = basePref.toUpperCase();
+        const basePref = fileName.replace('.html', '');
+        let prefCode = basePref.toUpperCase();
+        let area1 = null;
+        let area2 = null;
 
-      let area1 = null;
-      let area2 = null;
-
-      // ハッシュ解析
-      if (hash) {
-        const parts = hash.split('/');
-        if (parts.length === 2) {
+        if (hash) {
+          const parts = hash.split('/');
           area1 = parts[0];
-          area2 = parts[1];
- //         alert('県確定: ' + basePref);
- //         alert('エリア1確定: ' + area1);
-//          alert('エリア2確定: ' + area2);
-        } else {
-          area1 = parts[0];
- //         alert('県確定: ' + basePref);
- //         alert('エリア1確定: ' + area1);
-        }
-      } else {
-//        alert('県確定: ' + prefCode);
-      }
-
-      const lines = text.trim().split('\n');
-      let areas = [];
-      let prefLat, prefLng, prefZoom, prefName;
-
-      // CSV 一回ループで県・エリア・エリア2情報を整理
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',');
-        const name = cols[0].trim();
-        const zoom = parseFloat(cols[1]);
-        const lat = parseFloat(cols[3]);
-        const lng = parseFloat(cols[4]);
-        const parent = cols[5] ? cols[5].trim() : '';
-
-        // 県情報取得
-        if (name.toUpperCase() === basePref.toUpperCase()) {
-          prefName = name;
-          prefZoom = zoom;
-          prefLat = lat;
-          prefLng = lng;
+          if (parts.length === 2) area2 = parts[1];
         }
 
-        // 親が確定県ならエリア1候補として追加
-        if (parent === prefName) {
-          areas.push({
-            areaName: name,
-            areaZoom: zoom,
-            areaLat: lat,
-            areaLng: lng
-          });
+        const lines = text.trim().split('\n');
+        let areas = [];
+        let prefLat, prefLng, prefZoom, prefName;
+
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          const name = cols[0].trim();
+          const zoom = parseFloat(cols[1]);
+          const lat = parseFloat(cols[3]);
+          const lng = parseFloat(cols[4]);
+          const parent = cols[5] ? cols[5].trim() : '';
+
+          if (name.toUpperCase() === basePref.toUpperCase()) {
+            prefName = name;
+            prefZoom = zoom;
+            prefLat = lat;
+            prefLng = lng;
+          }
+
+          if (parent === prefName || (area1 && parent === area1)) {
+            areas.push({
+              areaName: name,
+              areaZoom: zoom,
+              areaLat: lat,
+              areaLng: lng,
+              parent: parent
+            });
+          }
         }
 
-        // 親がエリア1ならエリア2候補として追加
-        if (area1 && parent === area1) {
-          areas.push({
-            areaName: name,
-            areaZoom: zoom,
-            areaLat: lat,
-            areaLng: lng
-          });
-        }
-      }
-
-      // 初期マップ表示（県 → エリア1 → エリア2 の優先順）
-      if (area2) {
-        const target = areas.find(a => a.areaName === decodeURIComponent(area2));
-        if (target) {
-          initMap(target.areaLat, target.areaLng, target.areaZoom);
+        if (area2) {
+          const target = areas.find(a => a.areaName === decodeURIComponent(area2));
+          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
+          else if (area1) {
+            const target1 = areas.find(a => a.areaName === decodeURIComponent(area1));
+            if (target1) initMap(target1.areaLat, target1.areaLng, target1.areaZoom);
+            else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
+          }
         } else if (area1) {
-          const target1 = areas.find(a => a.areaName === decodeURIComponent(area1));
-          if (target1) initMap(target1.areaLat, target1.areaLng, target1.areaZoom);
+          const target = areas.find(a => a.areaName === decodeURIComponent(area1));
+          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
+          else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
         } else if (prefLat && prefLng) {
           initMap(prefLat, prefLng, prefZoom);
         }
-      } else if (area1) {
-        const target = areas.find(a => a.areaName === decodeURIComponent(area1));
-        if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
-        else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
-      } else if (prefLat && prefLng) {
-        initMap(prefLat, prefLng, prefZoom);
-      }
 
-      // メニュー描画
-      renderMenu(areas);
-    });
-}
+        renderMenu(areas);
+      });
+  }
 
-
-
-  function initMap(prefLat,prefLng,prefZoom) {
-    //alert(prefLat+prefLng+prefZoom);
-    if(map) map.remove(); // 再描画対応：既存マップ削除
-
-    map = L.map('lf-map').setView([prefLat,prefLng],prefZoom);
+  function initMap(lat, lng, zoom) {
+    if (map) map.remove();
+    map = L.map('lf-map').setView([lat, lng], zoom);
     map.attributionControl.setPrefix(false);
 
     const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
     }).addTo(map);
-    
-    
 
-    // 白黒フィルター
-    tileLayer.getContainer().style.filter =
-      "grayscale(100%) brightness(110%) contrast(110%)";
+    tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
 
-    // イベント
     map.on('move', updateDebug);
     map.on('zoom', updateDebug);
-
     map.whenReady(updateDebug);
   }
 
-// ===== メニュー描画関数 =====
-// ===== メニュー描画関数 =====
-const menuBox = document.getElementById('map-menu');
-const menu = menuBox.querySelector('ul');
-const maxRows = 4;
-let currentPage = 0;
+  const menuBox = document.getElementById('map-menu');
+  const menu = menuBox.querySelector('ul');
+  const maxRows = 4;
+  let currentPage = 0;
 
-
-function renderMenu(areas) {
-   // hash が無い場合のみメニューを開く
-  if (!location.hash) {
-    menuBox.style.display = 'block';
+  function renderMenu(areas) {
+    menuBox.style.display = !location.hash ? 'block' : 'none';
     menuBox.style.overflow = 'visible';
-  } else {
-    // hash がある場合は閉じたまま
-    menuBox.style.display = 'none';
-  }
-  
-  const totalPages = Math.ceil(areas.length / maxRows);
-  menu.innerHTML = '';
 
-  const start = currentPage * maxRows;
-  const end = Math.min(start + maxRows, areas.length);
+    const totalPages = Math.ceil(areas.length / maxRows);
+    menu.innerHTML = '';
+    const start = currentPage * maxRows;
+    const end = Math.min(start + maxRows, areas.length);
 
-  for (let i = start; i < end; i++) {
-    const li = document.createElement('li');
+    for (let i = start; i < end; i++) {
+      const li = document.createElement('li');
+      const text = document.createElement('span');
+      text.textContent = areas[i].areaName;
+      li.appendChild(text);
 
-    const text = document.createElement('span');
-    text.textContent = areas[i].areaName;
-    li.appendChild(text);
-
-    // 次ページボタン
-    if (i === end - 1 && currentPage < totalPages - 1) {
-      const next = document.createElement('span');
-      next.textContent = '▶';
-      next.className = 'nav-btn';
-      next.onclick = (e) => {
-        e.stopPropagation();
-        currentPage++;
-        renderMenu(areas);
-      };
-      li.appendChild(next);
-    }
-
-    // 前ページボタン
-    if (i === start && currentPage > 0) {
-      const prev = document.createElement('span');
-      prev.textContent = '◀';
-      prev.className = 'nav-btn';
-      prev.onclick = (e) => {
-        e.stopPropagation();
-        currentPage--;
-        renderMenu(areas);
-      };
-      li.appendChild(prev);
-    }
-
-    // クリックで URL 書き換え＆地図移動＆メニューを閉じる
-    li.onclick = () => {
-      let pathHash = []; // ← コメント1: 階層全てのエリア名を格納
-      let targetLat = areas[i].areaLat;
-      let targetLng = areas[i].areaLng;
-      let targetZoom = areas[i].areaZoom;
-
-      let currentParent = areas[i].areaName; // このエリアからスタート
-      pathHash.push(currentParent); // コメント2: 最初の親を追加
-
-      // コメント3: 深い子エリアがある場合、最初の子を辿って hash と座標を決定
-      while (true) {
-        const child = areas.find(a => a.parent === currentParent);
-        if (!child) break; // 子がなければ終了
-        pathHash.push(child.areaName);
-        targetLat = child.areaLat;
-        targetLng = child.areaLng;
-        targetZoom = child.areaZoom;
-        currentParent = child.areaName;
+      if (i === end - 1 && currentPage < totalPages - 1) {
+        const next = document.createElement('span');
+        next.textContent = '▶';
+        next.className = 'nav-btn';
+        next.onclick = (e) => { e.stopPropagation(); currentPage++; renderMenu(areas); };
+        li.appendChild(next);
       }
 
-      // URL hash を階層に応じて作成
-      location.hash = pathHash.map(encodeURIComponent).join('/'); // コメント4: 複数階層対応
+      if (i === start && currentPage > 0) {
+        const prev = document.createElement('span');
+        prev.textContent = '◀';
+        prev.className = 'nav-btn';
+        prev.onclick = (e) => { e.stopPropagation(); currentPage--; renderMenu(areas); };
+        li.appendChild(prev);
+      }
 
-      // 地図を移動
-      initMap(targetLat, targetLng, targetZoom);
+      li.onclick = () => {
+        let pathHash = [];
+        let targetLat = areas[i].areaLat;
+        let targetLng = areas[i].areaLng;
+        let targetZoom = areas[i].areaZoom;
+        let currentParent = areas[i].areaName;
+        pathHash.push(currentParent);
 
-      // メニュー div を完全に閉じる
-      menuBox.style.display = 'none';
-    };
+        while (true) {
+          const child = areas.find(a => a.parent === currentParent);
+          if (!child) break;
+          pathHash.push(child.areaName);
+          targetLat = child.areaLat;
+          targetLng = child.areaLng;
+          targetZoom = child.areaZoom;
+          currentParent = child.areaName;
+        }
 
-    menu.appendChild(li);
+        location.hash = pathHash.map(encodeURIComponent).join('/');
+        initMap(targetLat, targetLng, targetZoom);
+        menuBox.style.display = 'none';
+      };
+
+      menu.appendChild(li);
+    }
+
+    menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+    menu.style.display = 'block';
   }
 
-  // 高さを再計算して開く（スクロール用）
-  menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
-  menu.style.display = 'block';
-}
-
-
-  // ===== 天気・潮UI関数（元のまま）=====
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
@@ -412,6 +332,7 @@ function renderMenu(areas) {
       { key:'wind', label:'風速' },
       { key:'winddir', label:'風向' }
     ];
+
     keys.forEach(k => {
       const row = document.createElement('div');
       row.className = 'weather-row';
@@ -421,46 +342,46 @@ function renderMenu(areas) {
       label.textContent = k.label;
       row.appendChild(label);
 
-      weatherData[k.key].forEach((v,i)=>{
+      weatherData[k.key].forEach((v,i) => {
         const b = document.createElement('span');
         b.className = 'weather-block';
-        if(k.key==='time' && i%2!==0) b.textContent='';
-        else b.textContent = v;
+        b.textContent = (k.key==='time' && i%2!==0) ? '' : v;
         row.appendChild(b);
       });
 
       container.appendChild(row);
     });
 
-    const waveRow=document.createElement('div');
-    waveRow.className='weather-row';
-    const waveLabel=document.createElement('span');
-    waveLabel.className='weather-block first-block';
-    waveLabel.textContent='波高';
+    const waveRow = document.createElement('div');
+    waveRow.className = 'weather-row';
+    const waveLabel = document.createElement('span');
+    waveLabel.className = 'weather-block first-block';
+    waveLabel.textContent = '波高';
     waveRow.appendChild(waveLabel);
-    waveData.forEach(v=>{
-      const b=document.createElement('span');
-      b.className='weather-block wave-block';
-      b.textContent=v+'m';
+
+    waveData.forEach(v => {
+      const b = document.createElement('span');
+      b.className = 'weather-block wave-block';
+      b.textContent = v + 'm';
       waveRow.appendChild(b);
     });
     container.appendChild(waveRow);
 
-    const tideRow=document.createElement('div');
-    tideRow.className='weather-row';
-    const tideLabel=document.createElement('span');
-    tideLabel.className='weather-block first-block tide-label';
-    tideLabel.textContent=tideName;
+    const tideRow = document.createElement('div');
+    tideRow.className = 'weather-row';
+    const tideLabel = document.createElement('span');
+    tideLabel.className = 'weather-block first-block tide-label';
+    tideLabel.textContent = tideName;
     tideRow.appendChild(tideLabel);
 
-    const canvas=document.createElement('canvas');
-    canvas.style.flex='1';
-    canvas.style.height='36px';
+    const canvas = document.createElement('canvas');
+    canvas.style.flex = '1';
+    canvas.style.height = '36px';
     tideRow.appendChild(canvas);
     container.appendChild(tideRow);
 
-    const ctx=canvas.getContext('2d');
-    function draw(data){
+    const ctx = canvas.getContext('2d');
+    function draw(data) {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width;
       canvas.height = rect.height;
@@ -472,22 +393,21 @@ function renderMenu(areas) {
         return {x, y};
       });
 
-      function getControlPoints(p0, p1, p2, t=0.3){
+      function getControlPoints(p0,p1,p2,t=0.3) {
         const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
         const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
         const fa = t * d01/(d01+d12);
         const fb = t - fa;
-        const cp1x = p1.x - fa*(p2.x-p0.x);
-        const cp1y = p1.y - fa*(p2.y-p0.y);
-        const cp2x = p1.x + fb*(p2.x-p0.x);
-        const cp2y = p1.y + fb*(p2.y-p0.y);
-        return [{x:cp1x,y:cp1y},{x:cp2x,y:cp2y}];
+        return [
+          {x: p1.x - fa*(p2.x-p0.x), y: p1.y - fa*(p2.y-p0.y)},
+          {x: p1.x + fb*(p2.x-p0.x), y: p1.y + fb*(p2.y-p0.y)}
+        ];
       }
 
       ctx.beginPath();
       ctx.moveTo(points[0].x, canvas.height);
       ctx.lineTo(points[0].x, points[0].y);
-      for(let i=1; i<points.length-1; i++){
+      for (let i=1; i<points.length-1; i++) {
         const cps = getControlPoints(points[i-1], points[i], points[i+1]);
         ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
       }
@@ -498,7 +418,7 @@ function renderMenu(areas) {
 
       ctx.beginPath();
       ctx.moveTo(points[0].x, points[0].y);
-      for(let i=1; i<points.length-1; i++){
+      for (let i=1; i<points.length-1; i++) {
         const cps = getControlPoints(points[i-1], points[i], points[i+1]);
         ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
       }
@@ -510,12 +430,11 @@ function renderMenu(areas) {
     }
 
     draw(tideData);
-    window.addEventListener('resize',()=>draw(tideData));
+    window.addEventListener('resize', () => draw(tideData));
   }
 
-  // ===== 初期化実行 =====
+  // 初期化実行
   checkCSV();
- 
 
   renderWeatherWaveTide(
     new Date(),
@@ -531,9 +450,7 @@ function renderMenu(areas) {
     [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
     '大潮'
   );
-
 });
 </script>
-
 </body>
 </html>
