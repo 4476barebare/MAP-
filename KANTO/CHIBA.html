@@ -304,14 +304,14 @@ const menu = menuBox.querySelector('ul');
 const maxRows = 4;
 let currentPage = 0;
 
+
 function renderMenu(areas) {
   // メニューを開く
   menuBox.style.display = 'block';
   menuBox.style.overflow = 'visible';
-
-  const totalPages = Math.ceil(areas.length / maxRows);
   menu.innerHTML = '';
 
+  const totalPages = Math.ceil(areas.length / maxRows);
   const start = currentPage * maxRows;
   const end = Math.min(start + maxRows, areas.length);
 
@@ -348,33 +348,40 @@ function renderMenu(areas) {
       li.appendChild(prev);
     }
 
-    // クリックで URL 書き換え＆メニューを完全に閉じる
+    // クリックで URL 書き換え＆地図移動＆メニューを完全に閉じる
+    li.onclick = () => {
+      const parentArea = areas[i].areaName;
+      let targetLat = areas[i].areaLat;
+      let targetLng = areas[i].areaLng;
+      let targetZoom = areas[i].areaZoom;
+      let childHash = '';
 
-li.onclick = () => {
-  const parentArea = areas[i].areaName; // このレベルのエリア名
-  let childHash = ''; // エリア2用
-  let targetLat = areas[i].areaLat;
-  let targetLng = areas[i].areaLng;
-  let targetZoom = areas[i].areaZoom;
+      // エリア2の座標を取得（parent列が一致する最初の子）
+      const childArea = areas.find(a => a.parent && a.parent === parentArea);
+      if (childArea) {
+        childHash = '/' + encodeURIComponent(childArea.areaName);
+        targetLat = childArea.areaLat;
+        targetLng = childArea.areaLng;
+        targetZoom = childArea.areaZoom;
+      }
 
-  // CSVの親列にこのエリア名を持つ行があれば最初の子を取得
-  const childArea = areas.find(a => a.parent === parentArea);
-  if (childArea) {
-    childHash = '/' + encodeURIComponent(childArea.areaName);
-    targetLat = childArea.areaLat;
-    targetLng = childArea.areaLng;
-    targetZoom = childArea.areaZoom;
+      // URL hash 更新
+      location.hash = encodeURIComponent(parentArea) + childHash;
+
+      // 地図移動
+      initMap(targetLat, targetLng, targetZoom);
+
+      // メニュー完全閉じ
+      menuBox.style.display = 'none';
+    };
+
+    menu.appendChild(li);
   }
 
-  // URL の hash を書き換え
-  location.hash = encodeURIComponent(parentArea) + childHash;
-
-  // 地図を移動
-  initMap(targetLat, targetLng, targetZoom);
-
-  // メニュー div を完全に閉じる
-  menuBox.style.display = 'none';
-};
+  // 高さを再計算して開く（スクロール用）
+  menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+  menu.style.display = 'block';
+}
 
 
   // ===== 天気・潮UI関数（元のまま）=====
