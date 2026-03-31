@@ -169,7 +169,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // ===== CSV読み込み =====
   async function loadCSV() {
-    const res = await fetch('/MAP-/data/locations.csv');
+    const res = await fetch('/MAP-/data/location.csv');
     const text = await res.text();
 
     const rows = text.trim().split('\n').map(r => r.split(','));
