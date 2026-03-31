@@ -166,51 +166,64 @@ window.addEventListener('DOMContentLoaded', function() {
   
   let currentData = null;
 
-fetch('/MAP-/data/location.csv')
-  .then(res => res.text())
-  .then(text => {
+  async function loadAndDefineCurrentData() {
+    alert('CSV読み込み開始');
 
-    const rows = text.trim().split('\n').map(r => r.split(','));
-    const header = rows.shift();
+    try {
+      const res = await fetch('/MAP-/data/location.csv');
+      alert('fetch status: ' + res.status);
 
-    const csv = rows.map(r => {
-      let obj = {};
-      header.forEach((key, i) => obj[key] = r[i]);
-      return obj;
-    });
+      const text = await res.text();
+      alert('CSV取得OK\n1行目: ' + text.split('\n')[0]);
 
-    // URL → name取得
-    const file = location.pathname.split('/').pop();
-    const name = file.replace('.html', '');
+      const rows = text.trim().split('\n').map(r => r.split(','));
+      const header = rows.shift(); // ヘッダ行を削除
 
-    // CSV参照
-    currentData = csv.find(row => row.name === name);
+      const csv = rows.map(r => {
+        let obj = {};
+        header.forEach((key,i)=> obj[key] = r[i]);
+        return obj;
+      });
 
-    if (!currentData) return;
+      // URLから名前取得
+      const file = location.pathname.split('/').pop();
+      const name = file.replace('.html','');
+      alert('URL名: ' + name);
 
-    // 次の処理へ
-    initMap();
+      // CSV参照
+      currentData = csv.find(row => row.name === name);
 
-  });
-  
+      if(!currentData) {
+        alert('該当データなし');
+      } else {
+        alert('currentData 定義OK\n' +
+              'name: ' + currentData.name + '\n' +
+              'lat: ' + currentData.lat + ', lng: ' + currentData.lng + 
+              ', zoom: ' + currentData.zoom);
+      }
 
+    } catch(e) {
+      alert('エラー: ' + e.message);
+    }
+  }
 
+  loadAndDefineCurrentData();
+initMap();
 
   // ===== 地図初期化関数 =====
-  let map; // グローバル変数
+  let map;
   function initMap() {
 
   const lat = parseFloat(currentData.lat);
   const lng = parseFloat(currentData.lng);
   const zoom = parseInt(currentData.zoom);
-  
 
   map = L.map('lf-map', {
-  zoomControl: false
-}).setView([lat, lng], zoom);
+    zoomControl: false
+  }).setView([lat, lng], zoom);
 
-map.setMinZoom(zoom);
-map.setMaxZoom(zoom);
+  map.setMinZoom(zoom);
+  map.setMaxZoom(zoom);
 
   const tileLayer = L.tileLayer(
     'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -415,7 +428,6 @@ map.setMaxZoom(zoom);
   // ===== 初期化実行 =====
 
   renderMenu();
-
   renderWeatherWaveTide(
     new Date(),
     {
