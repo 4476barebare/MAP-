@@ -165,12 +165,13 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   
   
+
 let prefNameGlobal = null;
 let prefLatGlobal = null;
 let prefLngGlobal = null;
 let prefZoomGlobal = null;
 
-function checkCSV() {
+function checkCSV(callback) {
   fetch('/MAP-/data/location.csv')
     .then(function(response) { return response.text(); })
     .then(function(text) {
@@ -187,38 +188,53 @@ function checkCSV() {
           prefNameGlobal = cols[0].trim();
           prefLatGlobal = parseFloat(cols[3]);
           prefLngGlobal = parseFloat(cols[4]);
-          prefZoomGlobal = parseFloat(cols[2]);
+          prefZoomGlobal = parseFloat(cols[2]) || 10; // zoom が空欄なら10
           break; // 見つけたら終了
         }
       }
 
-
+      if (callback) callback(); // CSV 読み込み後に呼び出す
+    })
+    .catch(function(e) {
+      alert('CSV読み込み失敗: ' + e.message);
     });
 }
 
-  // ===== 地図初期化関数 =====
-  let map; // グローバル変数
-  function initMap() {
-       alert(prefNameGlobal);
-    if(map) map.remove(); // 再描画対応：既存マップ削除
+// ===== 地図初期化関数 =====
+let map; // グローバル変数
+function initMap() {
 
-    map = L.map('lf-map').setView([35.45, 140.25], 9);
-    map.attributionControl.setPrefix(false);
-
-    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
-
-    // 白黒フィルター
-    tileLayer.getContainer().style.filter =
-      "grayscale(100%) brightness(110%) contrast(110%)";
-
-    // イベント
-    map.on('move', updateDebug);
-    map.on('zoom', updateDebug);
-
-    map.whenReady(updateDebug);
+  // 座標がまだ取得できていない場合は CSV 読み込みからやり直す
+  if (!prefLatGlobal || !prefLngGlobal) {
+    checkCSV(initMap); // CSV 読み込み後に再度 initMap を呼ぶ
+    return;             // 一旦ここで終了
   }
+
+  alert(prefNameGlobal); // CSV で取得できたか確認
+
+
+  if(map) map.remove(); // 再描画対応：既存マップ削除
+
+  map = L.map('lf-map').setView([prefLatGlobal, prefLngGlobal], prefZoomGlobal);
+  map.attributionControl.setPrefix(false);
+
+  const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+  // 白黒フィルター
+  tileLayer.getContainer().style.filter =
+    "grayscale(100%) brightness(110%) contrast(110%)";
+
+  // イベント
+  map.on('move', updateDebug);
+  map.on('zoom', updateDebug);
+
+  map.whenReady(updateDebug);
+}
+
+
+
 
   // ===== メニュー描画関数 =====
   const menuBox = document.getElementById('map-menu');
@@ -403,9 +419,11 @@ function checkCSV() {
   }
 
   // ===== 初期化実行 =====
-  checkCSV();
- 
-  initMap();
+// ===== 実行 =====
+checkCSV(initMap);
+
+
+  
   renderMenu();
 
   renderWeatherWaveTide(
