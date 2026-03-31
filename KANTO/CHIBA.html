@@ -198,26 +198,26 @@ checkCSV();
 
   // ===== 地図初期化関数 =====
   let map; // グローバル変数
-  function initMap() {
-    if(map) map.remove(); // 再描画対応：既存マップ削除
+function initMap(lat, lng, zoom) {
+  if (map) map.remove(); // 既存マップ削除
 
-    map = L.map('lf-map').setView([35.45, 140.25], 9);
-    map.attributionControl.setPrefix(false);
+  map = L.map('lf-map').setView([lat, lng], zoom);
+  map.attributionControl.setPrefix(false);
 
-    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
+  const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19
+  }).addTo(map);
 
-    // 白黒フィルター
-    tileLayer.getContainer().style.filter =
-      "grayscale(100%) brightness(110%) contrast(110%)";
+  tileLayer.getContainer().style.filter =
+    "grayscale(100%) brightness(110%) contrast(110%)";
 
-    // イベント
-    map.on('move', updateDebug);
-    map.on('zoom', updateDebug);
+  map.on('move', updateDebug);
+  map.on('zoom', updateDebug);
 
-    map.whenReady(updateDebug);
-  }
+  map.whenReady(updateDebug);
+}
+
+
 
   // ===== メニュー描画関数 =====
   const menuBox = document.getElementById('map-menu');
