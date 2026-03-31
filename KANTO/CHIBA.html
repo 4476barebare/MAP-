@@ -165,68 +165,61 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   
   
-
-
-// ===== グローバル変数 =====
 let prefNameGlobal = null;
 let prefLatGlobal = null;
 let prefLngGlobal = null;
 let prefZoomGlobal = null;
-let map; // Leafletマップ
+let map; // グローバル変数
 
-// ===== CSV 読み込み関数（コールバックで initMap を呼ぶ）=====
-function checkCSV(callback) {
+function checkCSV() {
   fetch('/MAP-/data/location.csv')
-    .then(res => res.text())
-    .then(text => {
+    .then(function(response) { return response.text(); })
+    .then(function(text) {
+      // URL から県名を取得
       const urlParts = location.pathname.split('/');
-      const fileName = urlParts[urlParts.length - 1];
+      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
       const prefCode = fileName.replace('.html','').toUpperCase();
 
+      // 行ごとに分割して県名だけチェック
       const lines = text.trim().split('\n');
-      for (let i = 1; i < lines.length; i++) {
+      for (let i = 1; i < lines.length; i++) { // ヘッダはスキップ
         const cols = lines[i].split(',');
         if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
           prefNameGlobal = cols[0].trim();
           prefLatGlobal = parseFloat(cols[3]);
           prefLngGlobal = parseFloat(cols[4]);
-          prefZoomGlobal = parseFloat(cols[1]); // CSV の zoom 値をそのまま使用
-          break;
+          prefZoomGlobal = parseFloat(cols[1]);
+          initMap();
         }
       }
 
-      if (callback) callback();
-    })
-    .catch(e => alert('CSV 読み込み失敗: ' + e.message));
+
+    });
 }
 
-// ===== 地図初期化関数（CSV値のみ使用）=====
-function initMap() {
-  if (!prefLatGlobal || !prefLngGlobal || !prefZoomGlobal) {
-    alert('CSVから座標やズーム値が取得できません');
-    return;
+  // ===== 地図初期化関数 =====
+
+  function initMap() {
+    alert(prefNameGlobal);
+    if(map) map.remove(); // 再描画対応：既存マップ削除
+
+    map = L.map('lf-map').setView([35.45, 140.25], 9);
+    map.attributionControl.setPrefix(false);
+
+    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
+
+    // 白黒フィルター
+    tileLayer.getContainer().style.filter =
+      "grayscale(100%) brightness(110%) contrast(110%)";
+
+    // イベント
+    map.on('move', updateDebug);
+    map.on('zoom', updateDebug);
+
+    map.whenReady(updateDebug);
   }
-
-  if (map) map.remove();
-
-  map = L.map('lf-map').setView([prefLatGlobal, prefLngGlobal], prefZoomGlobal);
-  map.attributionControl.setPrefix(false);
-
-  const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19
-  }).addTo(map);
-
-  tileLayer.getContainer().style.filter =
-    "grayscale(100%) brightness(110%) contrast(110%)";
-
-  map.on('move', updateDebug);
-  map.on('zoom', updateDebug);
-
-  map.whenReady(updateDebug);
-}
-
-
-
 
   // ===== メニュー描画関数 =====
   const menuBox = document.getElementById('map-menu');
@@ -411,14 +404,8 @@ function initMap() {
   }
 
   // ===== 初期化実行 =====
-// ===== 実行 =====
-
-// ===== 1番外側で呼び出す =====
-window.addEventListener('DOMContentLoaded', function() {
-  checkCSV(initMap);
-});
-
-  
+  checkCSV();
+ 
   renderMenu();
 
   renderWeatherWaveTide(
