@@ -164,33 +164,12 @@ window.addEventListener('DOMContentLoaded', function() {
     zoomEl.textContent = map.getZoom();
   }
 
-  // ===== CSV読み込み =====
-  let currentData = [];
-  fetch('/MAP-/location.csv')
-    .then(response => response.text())
-    .then(text => {
-      const lines = text.trim().split('\n');
-      currentData = lines.map(line => {
-        const [name, lat, lng] = line.split(',');
-        return { name, lat: parseFloat(lat), lng: parseFloat(lng) };
-      });
-
-      alert('CSV読み込み完了: ' + currentData.length + '地点');
-
-      // CSV読込後に地図初期化
-      initMap();
-    });
-
-  // ===== 地図初期化 =====
+  // ===== 地図初期化関数 =====
   let map; // グローバル変数
-  function initMap() {
-    if(map) map.remove(); // 再描画対応
+  function initMap(centerLat=35.45, centerLng=140.25, zoomLevel=9) {
+    if(map) map.remove(); // 再描画対応：既存マップ削除
 
-    // CSVがあれば最初の地点、なければデフォルト
-    const centerLatLng = currentData.length > 0 ? 
-      [currentData[0].lat, currentData[0].lng] : [35.45, 140.25];
-
-    map = L.map('lf-map').setView(centerLatLng, 12);
+    map = L.map('lf-map').setView([centerLat, centerLng], zoomLevel);
     map.attributionControl.setPrefix(false);
 
     const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -201,18 +180,47 @@ window.addEventListener('DOMContentLoaded', function() {
     tileLayer.getContainer().style.filter =
       "grayscale(100%) brightness(110%) contrast(110%)";
 
-    // CSVがある場合は全地点にマーカー追加
-    currentData.forEach(point => {
-      L.marker([point.lat, point.lng]).addTo(map)
-        .bindPopup(point.name);
-    });
-
-    // デバッグ表示更新
-    updateDebug();
-
-    // 地図移動イベントでデバッグ更新
+    // イベント
     map.on('move', updateDebug);
     map.on('zoom', updateDebug);
+
+    map.whenReady(updateDebug);
+  }
+
+  // ===== CSV読み込みして地図初期座標を取得 =====
+  function loadCSVAndInitMap(csvPath) {
+    fetch(csvPath)
+      .then(response => response.text())
+      .then(text => {
+        const lines = text.trim().split('\n');
+        const header = lines[0].split(',');
+        const dataLines = lines.slice(1);
+
+        if(dataLines.length === 0){
+          alert('CSVにデータがありません。固定値で初期化します。');
+          initMap();
+          return;
+        }
+
+        const locations = dataLines.map(line => {
+          const cols = line.split(',');
+          return {
+            name: cols[0],
+            lat: parseFloat(cols[1]),
+            lng: parseFloat(cols[2])
+          };
+        });
+
+        // CSVの最初の地点を中心に設定
+        const first = locations[0];
+        alert(`CSV読み込み完了。最初の地点: ${first.name} (${first.lat}, ${first.lng})`);
+        initMap(first.lat, first.lng, 12);
+      })
+      .catch(err => {
+        console.error(err);
+        alert('CSV読み込みに失敗しました。固定値で初期化します。');
+        initMap();
+      });
   }
 
   // ===== メニュー描画関数 =====
@@ -398,6 +406,7 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   // ===== 初期化実行 =====
+  loadCSVAndInitMap('/MAP-/location.csv'); // CSVから中心座標を取得
   renderMenu();
 
   renderWeatherWaveTide(
@@ -417,7 +426,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
-
 
 </body>
 </html>
