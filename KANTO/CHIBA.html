@@ -148,33 +148,35 @@ border-radius:6px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
-
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
-  (async function(){  // asyncラップで await 使用可能に
+  // ===== デバッグ表示 =====
+  const latEl = document.getElementById('lat');
+  const lngEl = document.getElementById('lng');
+  const zoomEl = document.getElementById('zoom');
 
-    // ===== デバッグ表示 =====
-    const latEl = document.getElementById('lat');
-    const lngEl = document.getElementById('lng');
-    const zoomEl = document.getElementById('zoom');
+  let map;
+  let currentData;
+  let currentPage = 0;
+  const maxRows = 10;
+  const menu = document.getElementById('menu');
+  const menuBox = document.getElementById('menu-box');
+  let points = [];
 
-    let map;
-    let currentData;
+  function updateDebug() {
+    if(!map) return;
+    const center = map.getCenter();
+    latEl.textContent = center.lat.toFixed(5);
+    lngEl.textContent = center.lng.toFixed(5);
+    zoomEl.textContent = map.getZoom();
+  }
 
-    function updateDebug() {
-      if(!map) return;
-      const center = map.getCenter();
-      latEl.textContent = center.lat.toFixed(5);
-      lngEl.textContent = center.lng.toFixed(5);
-      zoomEl.textContent = map.getZoom();
-    }
-
-    // ===== CSV読み込みとURL判定 =====
-    async function defineCurrentData() {
-      try {
-        const res = await fetch('/MAP-/data/location.csv');
-        const text = await res.text();
+  // ===== CSV読み込みとURL判定 =====
+  function defineCurrentData() {
+    fetch('/MAP-/data/location.csv')
+      .then(res => res.text())
+      .then(text => {
         const rows = text.trim().split('\n').map(r => r.split(','));
         const header = rows.shift();
         const csv = rows.map(r => {
@@ -184,231 +186,218 @@ window.addEventListener('DOMContentLoaded', function() {
         });
         const name = location.pathname.split('/').pop().replace('.html','');
         currentData = csv.find(row => row.name === name);
-        if(!currentData) alert('該当するデータなし');
-        else alert('currentData OK\nlat:' + currentData.lat + ', lng:' + currentData.lng + ', zoom:' + currentData.zoom);
-      } catch(e) {
-        alert('CSV読み込みエラー:' + e.message);
-      }
-    }
 
-    // ===== 地図描画関数 =====
-    function initMap() {
-      if(!currentData) return;
-      const lat = parseFloat(currentData.lat);
-      const lng = parseFloat(currentData.lng);
-      const zoom = parseInt(currentData.zoom);
+        if(!currentData) {
+          alert('該当するデータなし');
+        } else {
+          alert('currentData OK\nlat:' + currentData.lat + ', lng:' + currentData.lng + ', zoom:' + currentData.zoom);
+          initMap(); // CSV取得後に地図描画
+        }
+      })
+      .catch(e => alert('CSV読み込みエラー:' + e.message));
+  }
 
-      alert('描画座標確認\nlat:' + lat + ', lng:' + lng + ', zoom:' + zoom);
+  // ===== 地図描画関数（Leaflet部） =====
+  function initMap() {
+    const lat = parseFloat(currentData.lat);
+    const lng = parseFloat(currentData.lng);
+    const zoom = parseInt(currentData.zoom);
 
-      map = L.map('lf-map', { zoomControl:false }).setView([lat,lng], zoom);
+    alert('描画座標確認\nlat:' + lat + ', lng:' + lng + ', zoom:' + zoom);
 
-      map.setMinZoom(zoom);
-      map.setMaxZoom(zoom);
+    map = L.map('lf-map', { zoomControl:false }).setView([lat,lng], zoom);
+    map.attributionControl.setPrefix(false);
 
-      const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+    map.setMinZoom(zoom);
+    map.setMaxZoom(zoom);
 
-      // カラー調整
-      tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
+    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19
+    }).addTo(map);
 
-      // 操作ロック
-      map.dragging.disable();
-      map.scrollWheelZoom.disable();
-      map.doubleClickZoom.disable();
-      map.touchZoom.disable();
-      map.boxZoom.disable();
-      map.keyboard.disable();
-    }
+    tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
 
-    await defineCurrentData();
-    initMap();
+    map.dragging.disable();
+    map.scrollWheelZoom.disable();
+    map.doubleClickZoom.disable();
+    map.touchZoom.disable();
+    map.boxZoom.disable();
+    map.keyboard.disable();
+
+    map.invalidateSize();
+  }
+
+  // ===== メニュー描画関数 =====
+  function renderMenu() {
+    menu.innerHTML = '';
 
     const totalPages = Math.ceil(points.length / maxRows);
+    const start = currentPage * maxRows;
+    const end = Math.min(start + maxRows, points.length);
 
-    function renderMenu() {
-      menu.innerHTML = '';
+    for(let i=start;i<end;i++){
+      const li = document.createElement('li');
 
-      const start = currentPage * maxRows;
-      const end = Math.min(start + maxRows, points.length);
+      const text = document.createElement('span');
+      text.textContent = points[i].name;
+      li.appendChild(text);
 
-      for(let i=start;i<end;i++){
-        const li = document.createElement('li');
-
-        const text = document.createElement('span');
-        text.textContent = points[i].name;
-        li.appendChild(text);
-
-        if(i === end - 1 && currentPage < totalPages - 1){
-          const next = document.createElement('span');
-          next.textContent = '▶';
-          next.className = 'nav-btn';
-          next.onclick = (e)=>{
-            e.stopPropagation();
-            currentPage++;
-            renderMenu();
-          };
-          li.appendChild(next);
-        }
-
-        if(i === start && currentPage > 0){
-          const prev = document.createElement('span');
-          prev.textContent = '◀';
-          prev.className = 'nav-btn';
-          prev.onclick = (e)=>{
-            e.stopPropagation();
-            currentPage--;
-            renderMenu();
-          };
-          li.appendChild(prev);
-        }
-
-        li.onclick = ()=>{
-          map.setView([points[i].lat, points[i].lng], 12);
-          menuBox.style.maxHeight = '0px';
+      if(i === end - 1 && currentPage < totalPages - 1){
+        const next = document.createElement('span');
+        next.textContent = '▶';
+        next.className = 'nav-btn';
+        next.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage++;
+          renderMenu();
         };
-
-        menu.appendChild(li);
+        li.appendChild(next);
       }
 
-      menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
-    }
-
-    // ===== 天気・潮UI関数（元のまま）=====
-    function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
-      const container = document.getElementById('weather-wave-tide-container');
-      container.innerHTML = '';
-
-      const header = document.createElement('div');
-      header.className = 'weather-header';
-      header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
-      container.appendChild(header);
-
-      const keys = [
-        { key:'time', label:'時間' },
-        { key:'icon', label:'天気' },
-        { key:'temp', label:'気温' },
-        { key:'precip', label:'降率' },
-        { key:'wind', label:'風速' },
-        { key:'winddir', label:'風向' }
-      ];
-      keys.forEach(k => {
-        const row = document.createElement('div');
-        row.className = 'weather-row';
-
-        const label = document.createElement('span');
-        label.className = 'weather-block first-block';
-        label.textContent = k.label;
-        row.appendChild(label);
-
-        weatherData[k.key].forEach((v,i)=>{
-          const b = document.createElement('span');
-          b.className = 'weather-block';
-          if(k.key==='time' && i%2!==0) b.textContent='';
-          else b.textContent = v;
-          row.appendChild(b);
-        });
-
-        container.appendChild(row);
-      });
-
-      const waveRow=document.createElement('div');
-      waveRow.className='weather-row';
-      const waveLabel=document.createElement('span');
-      waveLabel.className='weather-block first-block';
-      waveLabel.textContent='波高';
-      waveRow.appendChild(waveLabel);
-      waveData.forEach(v=>{
-        const b=document.createElement('span');
-        b.className='weather-block wave-block';
-        b.textContent=v+'m';
-        waveRow.appendChild(b);
-      });
-      container.appendChild(waveRow);
-
-      const tideRow=document.createElement('div');
-      tideRow.className='weather-row';
-      const tideLabel=document.createElement('span');
-      tideLabel.className='weather-block first-block tide-label';
-      tideLabel.textContent=tideName;
-      tideRow.appendChild(tideLabel);
-
-      const canvas=document.createElement('canvas');
-      canvas.style.flex='1';
-      canvas.style.height='36px';
-      tideRow.appendChild(canvas);
-      container.appendChild(tideRow);
-
-      const ctx=canvas.getContext('2d');
-      function draw(data){
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-
-        const points = data.map((v,i) => {
-          const x = i/(data.length-1) * canvas.width;
-          const y = canvas.height - v*canvas.height*0.8;
-          return {x, y};
-        });
-
-        function getControlPoints(p0, p1, p2, t=0.3){
-          const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
-          const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-          const fa = t * d01/(d01+d12);
-          const fb = t - fa;
-          const cp1x = p1.x - fa*(p2.x-p0.x);
-          const cp1y = p1.y - fa*(p2.y-p0.y);
-          const cp2x = p1.x + fb*(p2.x-p0.x);
-          const cp2y = p1.y + fb*(p2.y-p0.y);
-          return [{x:cp1x,y:cp1y},{x:cp2x,y:cp2y}];
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, canvas.height);
-        ctx.lineTo(points[0].x, points[0].y);
-        for(let i=1; i<points.length-1; i++){
-          const cps = getControlPoints(points[i-1], points[i], points[i+1]);
-          ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
-        }
-        ctx.lineTo(points[points.length-1].x, canvas.height);
-        ctx.closePath();
-        ctx.fillStyle = '#191970';
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for(let i=1; i<points.length-1; i++){
-          const cps = getControlPoints(points[i-1], points[i], points[i+1]);
-          ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
-        }
-        ctx.strokeStyle = '#191970';
-        ctx.lineWidth = 1;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.stroke();
+      if(i === start && currentPage > 0){
+        const prev = document.createElement('span');
+        prev.textContent = '◀';
+        prev.className = 'nav-btn';
+        prev.onclick = (e)=>{
+          e.stopPropagation();
+          currentPage--;
+          renderMenu();
+        };
+        li.appendChild(prev);
       }
 
-      draw(tideData);
-      window.addEventListener('resize',()=>draw(tideData));
+      li.onclick = ()=>{
+        map.setView([points[i].lat, points[i].lng], 12);
+        menuBox.style.maxHeight = '0px';
+      };
+
+      menu.appendChild(li);
     }
 
-    // ===== 初期化実行 =====
-    renderMenu();
-    renderWeatherWaveTide(
-      new Date(),
-      {
-        time:['0','2','4','6','8','10','12','14','16','18','20','22'],
-        icon:['☀️','☀️','☀️','☀️','☁️','☁️','☀️','☀️','🌙','🌙','🌙','🌙'],
-        temp:[10,11,12,12,14,16,18,16,13,12,10,10],
-        precip:[0,10,20,30,10,0,0,20,30,10,0,0],
-        wind:[1,2,2,3,1,1,1,2,2,1,1,0],
-        winddir:['→','→','→','→','→','→','→','→','→','→','→','→']
-      },
-      [0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5],
-      [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
-      '大潮'
-    );
+    menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+  }
 
-  })();
+  // ===== 天気・潮UI関数 =====
+  function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
+    const container = document.getElementById('weather-wave-tide-container');
+    container.innerHTML = '';
+
+    const header = document.createElement('div');
+    header.className = 'weather-header';
+    header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
+    container.appendChild(header);
+
+    const keys = [
+      { key:'time', label:'時間' },
+      { key:'icon', label:'天気' },
+      { key:'temp', label:'気温' },
+      { key:'precip', label:'降率' },
+      { key:'wind', label:'風速' },
+      { key:'winddir', label:'風向' }
+    ];
+    keys.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'weather-row';
+
+      const label = document.createElement('span');
+      label.className = 'weather-block first-block';
+      label.textContent = k.label;
+      row.appendChild(label);
+
+      weatherData[k.key].forEach((v,i)=>{
+        const b = document.createElement('span');
+        b.className = 'weather-block';
+        if(k.key==='time' && i%2!==0) b.textContent='';
+        else b.textContent = v;
+        row.appendChild(b);
+      });
+
+      container.appendChild(row);
+    });
+
+    const waveRow=document.createElement('div');
+    waveRow.className='weather-row';
+    const waveLabel=document.createElement('span');
+    waveLabel.className='weather-block first-block';
+    waveLabel.textContent='波高';
+    waveRow.appendChild(waveLabel);
+    waveData.forEach(v=>{
+      const b=document.createElement('span');
+      b.className='weather-block wave-block';
+      b.textContent=v+'m';
+      waveRow.appendChild(b);
+    });
+    container.appendChild(waveRow);
+
+    const tideRow=document.createElement('div');
+    tideRow.className='weather-row';
+    const tideLabel=document.createElement('span');
+    tideLabel.className='weather-block first-block tide-label';
+    tideLabel.textContent=tideName;
+    tideRow.appendChild(tideLabel);
+
+    const canvas=document.createElement('canvas');
+    canvas.style.flex='1';
+    canvas.style.height='36px';
+    tideRow.appendChild(canvas);
+    container.appendChild(tideRow);
+
+    const ctx=canvas.getContext('2d');
+    function draw(data){
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      const points = data.map((v,i) => {
+        const x = i/(data.length-1) * canvas.width;
+        const y = canvas.height - v*canvas.height*0.8;
+        return {x, y};
+      });
+
+      function getControlPoints(p0, p1, p2, t=0.3){
+        const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+        const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+        const fa = t * d01/(d01+d12);
+        const fb = t - fa;
+        const cp1x = p1.x - fa*(p2.x-p0.x);
+        const cp1y = p1.y - fa*(p2.y-p0.y);
+        const cp2x = p1.x + fb*(p2.x-p0.x);
+        const cp2y = p1.y + fb*(p2.y-p0.y);
+        return [{x:cp1x,y:cp1y},{x:cp2x,y:cp2y}];
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, canvas.height);
+      ctx.lineTo(points[0].x, points[0].y);
+      for(let i=1; i<points.length-1; i++){
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
+      ctx.lineTo(points[points.length-1].x, canvas.height);
+      ctx.closePath();
+      ctx.fillStyle = '#191970';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for(let i=1; i<points.length-1; i++){
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
+      ctx.strokeStyle = '#191970';
+      ctx.lineWidth = 1;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+
+    draw(tideData);
+    window.addEventListener('resize',()=>draw(tideData));
+  }
+
+  // ===== 初期化実行 =====
+  defineCurrentData();
 
 });
 </script>
