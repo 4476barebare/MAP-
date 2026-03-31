@@ -244,17 +244,16 @@ function checkCSV() {
   }
 
 // ===== メニュー描画関数 =====
+// ===== メニュー描画関数 =====
 const menuBox = document.getElementById('map-menu');
 const menu = menuBox.querySelector('ul');
 const maxRows = 4;
 let currentPage = 0;
 
 function renderMenu(areas) {
-    
-    alert(JSON.stringify(areas)); // 必要ならアラートでも確認可
-
-    
-  if (!areas || areas.length === 0) return;
+  // メニューを開く
+  menuBox.style.display = 'block';
+  menuBox.style.overflow = 'visible';
 
   const totalPages = Math.ceil(areas.length / maxRows);
   menu.innerHTML = '';
@@ -269,7 +268,7 @@ function renderMenu(areas) {
     text.textContent = areas[i].areaName;
     li.appendChild(text);
 
-    // ページ送りボタン
+    // 次ページボタン
     if (i === end - 1 && currentPage < totalPages - 1) {
       const next = document.createElement('span');
       next.textContent = '▶';
@@ -282,6 +281,7 @@ function renderMenu(areas) {
       li.appendChild(next);
     }
 
+    // 前ページボタン
     if (i === start && currentPage > 0) {
       const prev = document.createElement('span');
       prev.textContent = '◀';
@@ -294,28 +294,28 @@ function renderMenu(areas) {
       li.appendChild(prev);
     }
 
-   // クリックでURL末尾書き換え（漢字は encodeURIComponent）
+    // クリックで URL 書き換え＆メニューを完全に閉じる
     li.onclick = () => {
+      // URL 末尾をエンコードしたエリア名に変更
       const newArea = encodeURIComponent(areas[i].areaName);
       const parts = location.pathname.split('/');
       parts[parts.length - 1] = newArea;
       const newUrl = parts.join('/');
       history.pushState(null, '', newUrl);
 
-      // 座標・ズーム情報もここで利用可能
-      // const lat = li.dataset.lat, lng = li.dataset.lng, zoom = li.dataset.zoom;
-
-      menuBox.style.maxHeight = '0px';
-      menuBox.style.overflow = 'hidden';
-      menu.style.display = 'none'; // ul自体を非表示にする
+      // メニュー div を完全に閉じる
+      menuBox.style.display = 'none';
     };
-
 
     menu.appendChild(li);
   }
 
+  // 高さを再計算して開く（スクロール用）
   menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+  menu.style.display = 'block';
 }
+
+
 
   // ===== 天気・潮UI関数（元のまま）=====
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
