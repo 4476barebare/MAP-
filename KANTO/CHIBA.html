@@ -309,9 +309,10 @@ function renderMenu(areas) {
   // メニューを開く
   menuBox.style.display = 'block';
   menuBox.style.overflow = 'visible';
-  menu.innerHTML = '';
 
   const totalPages = Math.ceil(areas.length / maxRows);
+  menu.innerHTML = '';
+
   const start = currentPage * maxRows;
   const end = Math.min(start + maxRows, areas.length);
 
@@ -348,30 +349,34 @@ function renderMenu(areas) {
       li.appendChild(prev);
     }
 
-    // クリックで URL 書き換え＆地図移動＆メニューを完全に閉じる
+    // クリックで URL 書き換え＆地図移動＆メニューを閉じる
     li.onclick = () => {
-      const parentArea = areas[i].areaName;
+      let pathHash = []; // ← コメント1: 階層全てのエリア名を格納
       let targetLat = areas[i].areaLat;
       let targetLng = areas[i].areaLng;
       let targetZoom = areas[i].areaZoom;
-      let childHash = '';
 
-      // エリア2の座標を取得（parent列が一致する最初の子）
-      const childArea = areas.find(a => a.parent && a.parent === parentArea);
-      if (childArea) {
-        childHash = '/' + encodeURIComponent(childArea.areaName);
-        targetLat = childArea.areaLat;
-        targetLng = childArea.areaLng;
-        targetZoom = childArea.areaZoom;
+      let currentParent = areas[i].areaName; // このエリアからスタート
+      pathHash.push(currentParent); // コメント2: 最初の親を追加
+
+      // コメント3: 深い子エリアがある場合、最初の子を辿って hash と座標を決定
+      while (true) {
+        const child = areas.find(a => a.parent === currentParent);
+        if (!child) break; // 子がなければ終了
+        pathHash.push(child.areaName);
+        targetLat = child.areaLat;
+        targetLng = child.areaLng;
+        targetZoom = child.areaZoom;
+        currentParent = child.areaName;
       }
 
-      // URL hash 更新
-      location.hash = encodeURIComponent(parentArea) + childHash;
+      // URL hash を階層に応じて作成
+      location.hash = pathHash.map(encodeURIComponent).join('/'); // コメント4: 複数階層対応
 
-      // 地図移動
+      // 地図を移動
       initMap(targetLat, targetLng, targetZoom);
 
-      // メニュー完全閉じ
+      // メニュー div を完全に閉じる
       menuBox.style.display = 'none';
     };
 
