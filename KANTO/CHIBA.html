@@ -166,7 +166,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // ===== CSV読み込み =====
   let currentData = [];
-  fetch('/MAP-/points.csv')
+  fetch('/MAP-/location.csv')
     .then(response => response.text())
     .then(text => {
       const lines = text.trim().split('\n');
