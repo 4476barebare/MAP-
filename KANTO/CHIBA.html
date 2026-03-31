@@ -148,6 +148,7 @@ border-radius:6px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
@@ -163,30 +164,79 @@ window.addEventListener('DOMContentLoaded', function() {
     zoomEl.textContent = map.getZoom();
   }
 
-  // ===== 地図初期化関数 =====
-  let map; // グローバル変数
-  function initMap() {
-    if(map) map.remove(); // 再描画対応：既存マップ削除
+  // ===== 地図 =====
+  let map;
 
-    map = L.map('lf-map').setView([35.45, 140.25], 9);
+  // ===== CSV読み込み =====
+  async function loadCSV() {
+    const res = await fetch('/MAP-/data/locations.csv');
+    const text = await res.text();
+
+    const rows = text.trim().split('\n').map(r => r.split(','));
+    const header = rows.shift();
+
+    return rows.map(r => {
+      let obj = {};
+      header.forEach((key, i) => obj[key] = r[i]);
+      return obj;
+    });
+  }
+
+  // ===== URLからCHIBA取得 =====
+  function getCurrentName() {
+    const file = location.pathname.split('/').pop(); // CHIBA.html
+    return file.replace('.html', ''); // CHIBA
+  }
+
+  // ===== 初期地図（①）=====
+  async function initPrefecture() {
+
+    const csv = await loadCSV();
+    const name = getCurrentName();
+
+    const prefecture = csv.find(row => row.name === name);
+
+    if (!prefecture) {
+      console.error('該当データなし:', name);
+      return;
+    }
+
+    const lat = parseFloat(prefecture.lat);
+    const lng = parseFloat(prefecture.lng);
+    const zoom = parseInt(prefecture.zoom);
+
+    if(map) map.remove();
+
+    map = L.map('lf-map', {
+      zoomControl: false
+    }).setView([lat, lng], zoom);
+
     map.attributionControl.setPrefix(false);
 
-    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
+    const tileLayer = L.tileLayer(
+      'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      { maxZoom: 19 }
+    ).addTo(map);
 
     // 白黒フィルター
     tileLayer.getContainer().style.filter =
       "grayscale(100%) brightness(110%) contrast(110%)";
 
-    // イベント
+    // デバッグ更新
     map.on('move', updateDebug);
     map.on('zoom', updateDebug);
-
     map.whenReady(updateDebug);
+
+    // ★操作ロック
+    map.dragging.disable();
+    map.scrollWheelZoom.disable();
+    map.doubleClickZoom.disable();
+    map.touchZoom.disable();
+    map.boxZoom.disable();
+    map.keyboard.disable();
   }
 
-  // ===== メニュー描画関数 =====
+  // ===== メニュー描画関数（元のまま）=====
   const menuBox = document.getElementById('map-menu');
   const menu = menuBox.querySelector('ul');
   const maxRows = 4;
@@ -369,7 +419,7 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   // ===== 初期化実行 =====
-  initMap();
+  initPrefecture(); // ←ここだけ差し替え
   renderMenu();
 
   renderWeatherWaveTide(
@@ -389,5 +439,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
+</body>
+
+
 </body>
 </html>
