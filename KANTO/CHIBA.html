@@ -156,82 +156,54 @@ window.addEventListener('DOMContentLoaded', function() {
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
 
-  let map;
-  let currentData;
-  let currentPage = 0;
-  const maxRows = 10;
-  const menu = document.getElementById('menu');
-  const menuBox = document.getElementById('menu-box');
-  let points = [];
-
   function updateDebug() {
-    if(!map) return;
     const center = map.getCenter();
     latEl.textContent = center.lat.toFixed(5);
     lngEl.textContent = center.lng.toFixed(5);
     zoomEl.textContent = map.getZoom();
   }
 
-  // ===== CSV読み込みとURL判定 =====
-  function defineCurrentData() {
-    fetch('/MAP-/data/location.csv')
-      .then(res => res.text())
-      .then(text => {
-        const rows = text.trim().split('\n').map(r => r.split(','));
-        const header = rows.shift();
-        const csv = rows.map(r => {
-          let obj = {};
-          header.forEach((key,i)=> obj[key] = r[i]);
-          return obj;
-        });
-        const name = location.pathname.split('/').pop().replace('.html','');
-        currentData = csv.find(row => row.name === name);
-
-        if(!currentData) {
-          alert('該当するデータなし');
-        } else {
-          alert('currentData OK\nlat:' + currentData.lat + ', lng:' + currentData.lng + ', zoom:' + currentData.zoom);
-          initMap(); // CSV取得後に地図描画
-        }
-      })
-      .catch(e => alert('CSV読み込みエラー:' + e.message));
-  }
-
-  // ===== 地図描画関数（Leaflet部） =====
+  // ===== 地図初期化関数 =====
+  let map; // グローバル変数
   function initMap() {
-    const lat = parseFloat(currentData.lat);
-    const lng = parseFloat(currentData.lng);
-    const zoom = parseInt(currentData.zoom);
+    if(map) map.remove(); // 再描画対応：既存マップ削除
 
-    alert('描画座標確認\nlat:' + lat + ', lng:' + lng + ', zoom:' + zoom);
-
-    map = L.map('lf-map', { zoomControl:false }).setView([lat,lng], zoom);
+    map = L.map('lf-map').setView([35.45, 140.25], 9);
     map.attributionControl.setPrefix(false);
-
-    map.setMinZoom(zoom);
-    map.setMaxZoom(zoom);
 
     const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19
     }).addTo(map);
 
-    tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
+    // 白黒フィルター
+    tileLayer.getContainer().style.filter =
+      "grayscale(100%) brightness(110%) contrast(110%)";
 
-    map.dragging.disable();
-    map.scrollWheelZoom.disable();
-    map.doubleClickZoom.disable();
-    map.touchZoom.disable();
-    map.boxZoom.disable();
-    map.keyboard.disable();
+    // イベント
+    map.on('move', updateDebug);
+    map.on('zoom', updateDebug);
 
-    map.invalidateSize();
+    map.whenReady(updateDebug);
   }
 
   // ===== メニュー描画関数 =====
+  const menuBox = document.getElementById('map-menu');
+  const menu = menuBox.querySelector('ul');
+  const maxRows = 4;
+  let currentPage = 0;
+
+  const points = [
+    {name:'内房エリア', lat:35.15, lng:140.3},
+    {name:'南房総エリア', lat:35.2, lng:140.35},
+    {name:'外房エリア', lat:35.25, lng:140.4},
+    {name:'九十九里銚子エリア', lat:35.3, lng:140.45}
+  ];
+
+  const totalPages = Math.ceil(points.length / maxRows);
+
   function renderMenu() {
     menu.innerHTML = '';
 
-    const totalPages = Math.ceil(points.length / maxRows);
     const start = currentPage * maxRows;
     const end = Math.min(start + maxRows, points.length);
 
@@ -277,7 +249,7 @@ window.addEventListener('DOMContentLoaded', function() {
     menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
   }
 
-  // ===== 天気・潮UI関数 =====
+  // ===== 天気・潮UI関数（元のまま）=====
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
@@ -397,10 +369,25 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   // ===== 初期化実行 =====
-  defineCurrentData();
+  initMap();
+  renderMenu();
+
+  renderWeatherWaveTide(
+    new Date(),
+    {
+      time:['0','2','4','6','8','10','12','14','16','18','20','22'],
+      icon:['☀️','☀️','☀️','☀️','☁️','☁️','☀️','☀️','🌙','🌙','🌙','🌙'],
+      temp:[10,11,12,12,14,16,18,16,13,12,10,10],
+      precip:[0,10,20,30,10,0,0,20,30,10,0,0],
+      wind:[1,2,2,3,1,1,1,2,2,1,1,0],
+      winddir:['→','→','→','→','→','→','→','→','→','→','→','→']
+    },
+    [0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5],
+    [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
+    '大潮'
+  );
 
 });
 </script>
-
 </body>
 </html>
