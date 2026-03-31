@@ -170,21 +170,36 @@ window.addEventListener('DOMContentLoaded', function() {
 //let prefLngGlobal = null;
 //let prefZoomGlobal = null;
 let map; // グローバル変数
-
 function checkCSV() {
   fetch('/MAP-/data/location.csv')
     .then(function(response) { return response.text(); })
     .then(function(text) {
-      // URL から県名を取得
+      // URL からファイル名を取得
       const urlParts = location.pathname.split('/');
-      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
-      const prefCode = fileName.replace('.html','').toUpperCase();
+      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html または CHIBA.html/○○
 
-      // 行ごとに分割して県名だけチェック
+      // .html の後に / があるかチェック
+      let baseFile, areaSuffix;
+      if (fileName.includes('.html/')) {
+        [baseFile, areaSuffix] = fileName.split('.html/');
+      } else {
+        baseFile = fileName.replace('.html','');
+        areaSuffix = null;
+      }
+
+      const prefCode = baseFile.toUpperCase();
+
+      // /○○ がある場合は別処理
+      if (areaSuffix) {
+        handleAreaURL(prefCode, areaSuffix, text);
+        return; // 従来処理はスキップ
+      }
+
+      // 従来処理
       const lines = text.trim().split('\n');
-      
       let areas = []; // 親が一致するエリア用配列
-      
+
+      // 県情報取得
       for (let i = 1; i < lines.length; i++) { // ヘッダはスキップ
         const cols = lines[i].split(',');
         if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
@@ -192,31 +207,29 @@ function checkCSV() {
           prefZoom = parseFloat(cols[1]);
           prefLat = parseFloat(cols[3]);
           prefLng = parseFloat(cols[4]);
-          
-          initMap(prefLat,prefLng,prefZoom);
+
+          initMap(prefLat, prefLng, prefZoom);
         }
       }
-      
-      // 県を親に持つ行を取得
+
+      // 県を親に持つエリア取得
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',');
         const parent = cols[5] ? cols[5].trim() : '';
         if (parent === prefName) {
-          // name, zoom, lat, lng を areas に追加
           areas.push({
-              areaName: cols[0].trim(),
-              areaZoom: parseFloat(cols[1]),
+            areaName: cols[0].trim(),
+            areaZoom: parseFloat(cols[1]),
             areaLat: parseFloat(cols[3]),
             areaLng: parseFloat(cols[4])
           });
         }
       }
 
-      // 確認用
-     renderMenu(areas); 
-         });
+      // メニュー描画
+      renderMenu(areas);
+    });
 }
-
   // ===== 地図初期化関数 =====
 
   function initMap(prefLat,prefLng,prefZoom) {
