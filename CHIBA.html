@@ -171,85 +171,105 @@ window.addEventListener('DOMContentLoaded', function() {
 //let prefZoomGlobal = null;
 let map; // グローバル変数
 
+
 function checkCSV() {
   fetch('/MAP-/data/location.csv')
-    .then(function(response) { return response.text(); })
-    .then(function(text) {
-      // URL からファイル名を取得
+    .then(response => response.text())
+    .then(text => {
+      // URL 取得
       const urlParts = location.pathname.split('/');
       const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
-      const hash = location.hash ? location.hash.slice(1) : null; // #以降
+      const hash = location.hash ? location.hash.slice(1) : null; // #以下
 
-      let prefCode = fileName.replace('.html','').toUpperCase();
+      const basePref = fileName.replace('.html','');
+      let prefCode = basePref.toUpperCase();
 
+      let area1 = null;
+      let area2 = null;
+
+      // ハッシュ解析
       if (hash) {
-        // # がある場合の処理
-        if (hash.includes('/')) {
-          // さらに / がある場合の処理
-          const [firstPart, secondPart] = hash.split('/');
-          alert('県確定: ' + prefCode);
-
-          // firstPart で prefCode 上書き → エリア確定
-          prefCode = firstPart.toUpperCase();
-          alert('エリア確定: ' + prefCode);
-
-          // secondPart で prefCode 上書き → エリア2確定
-          prefCode = secondPart.toUpperCase();
-          alert('エリア2確定: ' + prefCode);
-
-          handleDoubleAreaURL(fileName.replace('.html','').toUpperCase(), firstPart, secondPart, text);
-          return; // 従来処理はスキップ
+        const parts = hash.split('/');
+        if (parts.length === 2) {
+          area1 = parts[0];
+          area2 = parts[1];
+ //         alert('県確定: ' + basePref);
+ //         alert('エリア1確定: ' + area1);
+//          alert('エリア2確定: ' + area2);
         } else {
-          // #○○ のみの場合の処理
-          alert('県確定: ' + prefCode);
-
-          // エリア確定で prefCode 上書き
-          prefCode = hash.toUpperCase();
-          alert('エリア確定: ' + prefCode);
-
-          handleAreaURL(fileName.replace('.html','').toUpperCase(), hash, text);
-          return; // 従来処理はスキップ
+          area1 = parts[0];
+ //         alert('県確定: ' + basePref);
+ //         alert('エリア1確定: ' + area1);
         }
+      } else {
+//        alert('県確定: ' + prefCode);
       }
 
-      // 従来処理（# が無い場合）
       const lines = text.trim().split('\n');
-      let areas = []; // 親が一致するエリア用配列
+      let areas = [];
+      let prefLat, prefLng, prefZoom, prefName;
 
-      // 県情報取得
-      for (let i = 1; i < lines.length; i++) { // ヘッダはスキップ
-        const cols = lines[i].split(',');
-        if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
-          prefName = cols[0].trim();
-          prefZoom = parseFloat(cols[1]);
-          prefLat = parseFloat(cols[3]);
-          prefLng = parseFloat(cols[4]);
-
-          alert('県確定: ' + prefName);
-
-          initMap(prefLat, prefLng, prefZoom);
-        }
-      }
-
-      // 県を親に持つエリア取得
+      // CSV 一回ループで県・エリア・エリア2情報を整理
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',');
+        const name = cols[0].trim();
+        const zoom = parseFloat(cols[1]);
+        const lat = parseFloat(cols[3]);
+        const lng = parseFloat(cols[4]);
         const parent = cols[5] ? cols[5].trim() : '';
+
+        // 県情報取得
+        if (name.toUpperCase() === basePref.toUpperCase()) {
+          prefName = name;
+          prefZoom = zoom;
+          prefLat = lat;
+          prefLng = lng;
+        }
+
+        // 親が確定県ならエリア1候補として追加
         if (parent === prefName) {
           areas.push({
-            areaName: cols[0].trim(),
-            areaZoom: parseFloat(cols[1]),
-            areaLat: parseFloat(cols[3]),
-            areaLng: parseFloat(cols[4])
+            areaName: name,
+            areaZoom: zoom,
+            areaLat: lat,
+            areaLng: lng
           });
         }
+
+        // 親がエリア1ならエリア2候補として追加
+        if (area1 && parent === area1) {
+          areas.push({
+            areaName: name,
+            areaZoom: zoom,
+            areaLat: lat,
+            areaLng: lng
+          });
+        }
+      }
+
+      // 初期マップ表示（県 → エリア1 → エリア2 の優先順）
+      if (area2) {
+        const target = areas.find(a => a.areaName === decodeURIComponent(area2));
+        if (target) {
+          initMap(target.areaLat, target.areaLng, target.areaZoom);
+        } else if (area1) {
+          const target1 = areas.find(a => a.areaName === decodeURIComponent(area1));
+          if (target1) initMap(target1.areaLat, target1.areaLng, target1.areaZoom);
+        } else if (prefLat && prefLng) {
+          initMap(prefLat, prefLng, prefZoom);
+        }
+      } else if (area1) {
+        const target = areas.find(a => a.areaName === decodeURIComponent(area1));
+        if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
+        else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
+      } else if (prefLat && prefLng) {
+        initMap(prefLat, prefLng, prefZoom);
       }
 
       // メニュー描画
       renderMenu(areas);
     });
 }
-
 
 
 
@@ -284,11 +304,16 @@ const menu = menuBox.querySelector('ul');
 const maxRows = 4;
 let currentPage = 0;
 
-function renderMenu(areas) {
-  // メニューを開く
-  menuBox.style.display = 'block';
-  menuBox.style.overflow = 'visible';
 
+function renderMenu(areas) {
+   // hash が無い場合のみメニューを開く
+  if (!location.hash) {
+    menuBox.style.display = 'block';
+    menuBox.style.overflow = 'visible';
+  } else {
+    // hash がある場合は閉じたまま
+    menuBox.style.display = 'none';
+  
   const totalPages = Math.ceil(areas.length / maxRows);
   menu.innerHTML = '';
 
@@ -328,24 +353,36 @@ function renderMenu(areas) {
       li.appendChild(prev);
     }
 
-    // クリックで URL 書き換え＆メニューを完全に閉じる
+    // クリックで URL 書き換え＆地図移動＆メニューを閉じる
+    li.onclick = () => {
+      let pathHash = []; // ← コメント1: 階層全てのエリア名を格納
+      let targetLat = areas[i].areaLat;
+      let targetLng = areas[i].areaLng;
+      let targetZoom = areas[i].areaZoom;
 
-li.onclick = () => {
-  const parentArea = areas[i].areaName; // このレベルのエリア名
-  let childHash = ''; // エリア2用
+      let currentParent = areas[i].areaName; // このエリアからスタート
+      pathHash.push(currentParent); // コメント2: 最初の親を追加
 
-  // CSVの親列にこのエリア名を持つ行があれば最初の子を取得
-  const childArea = areas.find(a => a.parent === parentArea);
-  if (childArea) {
-    childHash = '/' + encodeURIComponent(childArea.areaName);
-  }
+      // コメント3: 深い子エリアがある場合、最初の子を辿って hash と座標を決定
+      while (true) {
+        const child = areas.find(a => a.parent === currentParent);
+        if (!child) break; // 子がなければ終了
+        pathHash.push(child.areaName);
+        targetLat = child.areaLat;
+        targetLng = child.areaLng;
+        targetZoom = child.areaZoom;
+        currentParent = child.areaName;
+      }
 
-  // URL の hash を書き換え
-  location.hash = encodeURIComponent(parentArea) + childHash;
+      // URL hash を階層に応じて作成
+      location.hash = pathHash.map(encodeURIComponent).join('/'); // コメント4: 複数階層対応
 
-  // メニュー div を完全に閉じる
-  menuBox.style.display = 'none';
-};
+      // 地図を移動
+      initMap(targetLat, targetLng, targetZoom);
+
+      // メニュー div を完全に閉じる
+      menuBox.style.display = 'none';
+    };
 
     menu.appendChild(li);
   }
@@ -354,7 +391,6 @@ li.onclick = () => {
   menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
   menu.style.display = 'block';
 }
-
 
 
   // ===== 天気・潮UI関数（元のまま）=====
