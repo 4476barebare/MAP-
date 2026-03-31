@@ -151,118 +151,81 @@ border-radius:6px;
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
-  alert('DOMContentLoaded');
-
   // ===== デバッグ表示 =====
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
 
   function updateDebug() {
-    if(!map) return;
     const center = map.getCenter();
     latEl.textContent = center.lat.toFixed(5);
     lngEl.textContent = center.lng.toFixed(5);
     zoomEl.textContent = map.getZoom();
   }
+  
+  
+  let currentData = null;
 
-  // ===== 地図 =====
-  let map;
-
-  // ===== CSV読み込み =====
-  async function loadCSV() {
-    alert('CSV fetch開始');
-
-    const res = await fetch('./data/location.csv'); // 修正済み
-
-    alert('status: ' + res.status);
-
-    const text = await res.text();
-
-    alert('CSV取得OK');
+fetch('/MAP-/data/location.csv')
+  .then(res => res.text())
+  .then(text => {
 
     const rows = text.trim().split('\n').map(r => r.split(','));
     const header = rows.shift();
 
-    return rows.map(r => {
+    const csv = rows.map(r => {
       let obj = {};
       header.forEach((key, i) => obj[key] = r[i]);
       return obj;
     });
-  }
 
-  // ===== URLからCHIBA取得 =====
-  function getCurrentName() {
+    // URL → name取得
     const file = location.pathname.split('/').pop();
     const name = file.replace('.html', '');
-    alert('URL名: ' + name);
-    return name;
-  }
 
-  // ===== 初期地図 =====
-  async function initPrefecture() {
+    // CSV参照
+    currentData = csv.find(row => row.name === name);
 
-    try {
+    if (!currentData) return;
 
-      const csv = await loadCSV();
+    // 次の処理へ
+    initMap();
 
-      const name = getCurrentName();
+  });
 
-      const prefecture = csv.find(row => row.name === name);
+  // ===== 地図初期化関数 =====
+  let map; // グローバル変数
+  function initMap() {
 
-      if (!prefecture) {
-        alert('該当データなし');
-        return;
-      }
+  const lat = parseFloat(currentData.lat);
+  const lng = parseFloat(currentData.lng);
+  const zoom = parseInt(currentData.zoom);
 
-      alert('対象データ取得OK');
+  map = L.map('lf-map', {
+    zoomControl: false,
+    minZoom: zoom,   // ズーム固定
+    maxZoom: zoom    // ズーム固定
+  }).setView([lat, lng], zoom);
 
-      const lat = parseFloat(prefecture.lat);
-      const lng = parseFloat(prefecture.lng);
-      const zoom = parseInt(prefecture.zoom);
+  const tileLayer = L.tileLayer(
+    'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { maxZoom: 19 }
+  ).addTo(map);
 
-      alert(`lat:${lat} lng:${lng} zoom:${zoom}`);
+  // カラー調整（元のやつ）
+  tileLayer.getContainer().style.filter =
+    "grayscale(100%) brightness(110%) contrast(110%)";
 
-      if(map) map.remove();
+  // 操作ロック
+  map.dragging.disable();
+  map.scrollWheelZoom.disable();
+  map.doubleClickZoom.disable();
+  map.touchZoom.disable();
+  map.boxZoom.disable();
+  map.keyboard.disable();
+}
 
-      map = L.map('lf-map', {
-        zoomControl: false
-      }).setView([lat, lng], zoom);
-
-      alert('map生成OK');
-
-      map.attributionControl.setPrefix(false);
-
-      const tileLayer = L.tileLayer(
-        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        { maxZoom: 19 }
-      ).addTo(map);
-
-      alert('タイル追加OK');
-
-      // フィルター
-      tileLayer.getContainer().style.filter =
-        "grayscale(100%) brightness(110%) contrast(110%)";
-
-      // イベント
-      map.on('move', updateDebug);
-      map.on('zoom', updateDebug);
-      map.whenReady(updateDebug);
-
-      // 操作ロック
-      map.dragging.disable();
-      map.scrollWheelZoom.disable();
-      map.doubleClickZoom.disable();
-      map.touchZoom.disable();
-      map.boxZoom.disable();
-      map.keyboard.disable();
-
-    } catch(e) {
-      alert('エラー: ' + e.message);
-    }
-  }
-
-  // ===== メニュー（元のまま）=====
+  // ===== メニュー描画関数 =====
   const menuBox = document.getElementById('map-menu');
   const menu = menuBox.querySelector('ul');
   const maxRows = 4;
@@ -325,21 +288,145 @@ window.addEventListener('DOMContentLoaded', function() {
     menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
   }
 
-  // ===== 天気UI（元のまま）=====
-  function renderWeatherWaveTide(){}
+  // ===== 天気・潮UI関数（元のまま）=====
+  function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
+    const container = document.getElementById('weather-wave-tide-container');
+    container.innerHTML = '';
 
-  // ===== 初期実行 =====
-  initPrefecture();
+    const header = document.createElement('div');
+    header.className = 'weather-header';
+    header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
+    container.appendChild(header);
+
+    const keys = [
+      { key:'time', label:'時間' },
+      { key:'icon', label:'天気' },
+      { key:'temp', label:'気温' },
+      { key:'precip', label:'降率' },
+      { key:'wind', label:'風速' },
+      { key:'winddir', label:'風向' }
+    ];
+    keys.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'weather-row';
+
+      const label = document.createElement('span');
+      label.className = 'weather-block first-block';
+      label.textContent = k.label;
+      row.appendChild(label);
+
+      weatherData[k.key].forEach((v,i)=>{
+        const b = document.createElement('span');
+        b.className = 'weather-block';
+        if(k.key==='time' && i%2!==0) b.textContent='';
+        else b.textContent = v;
+        row.appendChild(b);
+      });
+
+      container.appendChild(row);
+    });
+
+    const waveRow=document.createElement('div');
+    waveRow.className='weather-row';
+    const waveLabel=document.createElement('span');
+    waveLabel.className='weather-block first-block';
+    waveLabel.textContent='波高';
+    waveRow.appendChild(waveLabel);
+    waveData.forEach(v=>{
+      const b=document.createElement('span');
+      b.className='weather-block wave-block';
+      b.textContent=v+'m';
+      waveRow.appendChild(b);
+    });
+    container.appendChild(waveRow);
+
+    const tideRow=document.createElement('div');
+    tideRow.className='weather-row';
+    const tideLabel=document.createElement('span');
+    tideLabel.className='weather-block first-block tide-label';
+    tideLabel.textContent=tideName;
+    tideRow.appendChild(tideLabel);
+
+    const canvas=document.createElement('canvas');
+    canvas.style.flex='1';
+    canvas.style.height='36px';
+    tideRow.appendChild(canvas);
+    container.appendChild(tideRow);
+
+    const ctx=canvas.getContext('2d');
+    function draw(data){
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      const points = data.map((v,i) => {
+        const x = i/(data.length-1) * canvas.width;
+        const y = canvas.height - v*canvas.height*0.8;
+        return {x, y};
+      });
+
+      function getControlPoints(p0, p1, p2, t=0.3){
+        const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+        const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+        const fa = t * d01/(d01+d12);
+        const fb = t - fa;
+        const cp1x = p1.x - fa*(p2.x-p0.x);
+        const cp1y = p1.y - fa*(p2.y-p0.y);
+        const cp2x = p1.x + fb*(p2.x-p0.x);
+        const cp2y = p1.y + fb*(p2.y-p0.y);
+        return [{x:cp1x,y:cp1y},{x:cp2x,y:cp2y}];
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, canvas.height);
+      ctx.lineTo(points[0].x, points[0].y);
+      for(let i=1; i<points.length-1; i++){
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
+      ctx.lineTo(points[points.length-1].x, canvas.height);
+      ctx.closePath();
+      ctx.fillStyle = '#191970';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for(let i=1; i<points.length-1; i++){
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
+      ctx.strokeStyle = '#191970';
+      ctx.lineWidth = 1;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+
+    draw(tideData);
+    window.addEventListener('resize',()=>draw(tideData));
+  }
+
+  // ===== 初期化実行 =====
+  initMap();
   renderMenu();
+
+  renderWeatherWaveTide(
+    new Date(),
+    {
+      time:['0','2','4','6','8','10','12','14','16','18','20','22'],
+      icon:['☀️','☀️','☀️','☀️','☁️','☁️','☀️','☀️','🌙','🌙','🌙','🌙'],
+      temp:[10,11,12,12,14,16,18,16,13,12,10,10],
+      precip:[0,10,20,30,10,0,0,20,30,10,0,0],
+      wind:[1,2,2,3,1,1,1,2,2,1,1,0],
+      winddir:['→','→','→','→','→','→','→','→','→','→','→','→']
+    },
+    [0.5,0.7,1.0,0.8,0.6,0.5,0.7,0.9,1.2,0.8,0.6,0.5],
+    [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
+    '大潮'
+  );
 
 });
 </script>
-
-
-
-
-</body>
-
-
 </body>
 </html>
