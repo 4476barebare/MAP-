@@ -207,10 +207,11 @@ fetch('/MAP-/data/location.csv')
 alert(lat + ',' + lng + ',' + zoom);
 
   map = L.map('lf-map', {
-    zoomControl: false,
-    minZoom: zoom,   // ズーム固定
-    maxZoom: zoom    // ズーム固定
-  }).setView([lat, lng], zoom);
+  zoomControl: false
+}).setView([lat, lng], zoom);
+
+map.setMinZoom(zoom);
+map.setMaxZoom(zoom);
 
   const tileLayer = L.tileLayer(
     'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
