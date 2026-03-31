@@ -167,26 +167,32 @@ window.addEventListener('DOMContentLoaded', function() {
   // ===== CSV 読み込み＆県名抽出確認関数 (asyncなし) =====
 
 
+
 function checkCSV() {
   fetch('/MAP-/location.csv')
     .then(res => res.text())
     .then(text => {
       const lines = text.trim().split('\n');
       lines.forEach((line, i) => {
-        const cols = line.split(',').map(c => c.trim() || null); // 空欄は null
-        const name = cols[0];
-        const zoom = cols[1];
-        const maxZoom = cols[2];
-        const lat = cols[3];
-        const lng = cols[4];
-        const parent = cols[5];
-        const style = cols[6];
+        const rawCols = line.split(',');
+        const cols = [
+          rawCols[0] ? rawCols[0].trim() : null,
+          rawCols[1] ? rawCols[1].trim() : null,
+          rawCols[2] ? rawCols[2].trim() : null,
+          rawCols[3] ? rawCols[3].trim() : null,
+          rawCols[4] ? rawCols[4].trim() : null,
+          rawCols[5] ? rawCols[5].trim() : null,
+          rawCols[6] ? rawCols[6].trim() : null
+        ];
 
+        const [name, zoom, maxZoom, lat, lng, parent, style] = cols;
         alert(`行${i}: name=${name}, lat=${lat}, lng=${lng}, parent=${parent}, style=${style}`);
       });
     })
     .catch(e => alert('CSV 読み込み失敗: ' + e.message));
 }
+
+
 
 checkCSV();
 
