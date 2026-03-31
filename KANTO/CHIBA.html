@@ -214,20 +214,6 @@ window.addEventListener('DOMContentLoaded', function() {
   await defineCurrentData();
   initMap();
 
-
-  // ===== メニュー描画関数 =====
-  const menuBox = document.getElementById('map-menu');
-  const menu = menuBox.querySelector('ul');
-  const maxRows = 4;
-  let currentPage = 0;
-
-  const points = [
-    {name:'内房エリア', lat:35.15, lng:140.3},
-    {name:'南房総エリア', lat:35.2, lng:140.35},
-    {name:'外房エリア', lat:35.25, lng:140.4},
-    {name:'九十九里銚子エリア', lat:35.3, lng:140.45}
-  ];
-
   const totalPages = Math.ceil(points.length / maxRows);
 
   function renderMenu() {
@@ -398,7 +384,6 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   // ===== 初期化実行 =====
-
 
   renderMenu();
   renderWeatherWaveTide(
