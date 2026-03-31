@@ -201,7 +201,7 @@ function checkCSV() {
   // ===== 地図初期化関数 =====
 
   function initMap(prefLat,prefLng,prefZoom) {
-    alert(prefLat,prefLng,prefZoom);
+    alert(prefLat+prefLng+prefZoom);
     if(map) map.remove(); // 再描画対応：既存マップ削除
 
     map = L.map('lf-map').setView([35.45, 140.25], 9);
