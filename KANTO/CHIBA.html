@@ -306,10 +306,14 @@ let currentPage = 0;
 
 
 function renderMenu(areas) {
-  // メニューを開く
-  menuBox.style.display = 'block';
-  menuBox.style.overflow = 'visible';
-
+   // hash が無い場合のみメニューを開く
+  if (!location.hash) {
+    menuBox.style.display = 'block';
+    menuBox.style.overflow = 'visible';
+  } else {
+    // hash がある場合は閉じたまま
+    menuBox.style.display = 'none';
+  
   const totalPages = Math.ceil(areas.length / maxRows);
   menu.innerHTML = '';
 
