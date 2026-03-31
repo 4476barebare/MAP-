@@ -192,6 +192,9 @@ fetch('/MAP-/data/location.csv')
     initMap();
 
   });
+  
+
+
 
   // ===== 地図初期化関数 =====
   let map; // グローバル変数
@@ -200,6 +203,8 @@ fetch('/MAP-/data/location.csv')
   const lat = parseFloat(currentData.lat);
   const lng = parseFloat(currentData.lng);
   const zoom = parseInt(currentData.zoom);
+  alert(typeof lat + ',' + typeof lng + ',' + typeof zoom);
+alert(lat + ',' + lng + ',' + zoom);
 
   map = L.map('lf-map', {
     zoomControl: false,
