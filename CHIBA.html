@@ -177,50 +177,42 @@ function checkCSV() {
     .then(function(text) {
       // URL からファイル名を取得
       const urlParts = location.pathname.split('/');
-      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html または CHIBA.html/○○ または CHIBA.html/○○/△△
+      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
+      const hash = location.hash ? location.hash.slice(1) : null; // #以降
 
-      // .html の後に / があるかチェック（1段目）
-      let baseFile, areaSuffix;
-      if (fileName.includes('.html/')) {
-        [baseFile, areaSuffix] = fileName.split('.html/');
-      } else {
-        baseFile = fileName.replace('.html','');
-        areaSuffix = null;
-      }
+      let prefCode = fileName.replace('.html','').toUpperCase();
 
-      let prefCode = baseFile.toUpperCase();
-
-      // /○○ がある場合は2段階目の / があるかチェック
-      if (areaSuffix) {
-        if (areaSuffix.includes('/')) {
+      if (hash) {
+        // # がある場合の処理
+        if (hash.includes('/')) {
           // さらに / がある場合の処理
-          const [firstPart, secondPart] = areaSuffix.split('/');
+          const [firstPart, secondPart] = hash.split('/');
           alert('県確定: ' + prefCode);
-          
+
           // firstPart で prefCode 上書き → エリア確定
           prefCode = firstPart.toUpperCase();
           alert('エリア確定: ' + prefCode);
-          
+
           // secondPart で prefCode 上書き → エリア2確定
           prefCode = secondPart.toUpperCase();
           alert('エリア2確定: ' + prefCode);
-          
-          handleDoubleAreaURL(baseFile.toUpperCase(), firstPart, secondPart, text);
+
+          handleDoubleAreaURL(fileName.replace('.html','').toUpperCase(), firstPart, secondPart, text);
           return; // 従来処理はスキップ
         } else {
-          // /○○ のみの場合の処理
+          // #○○ のみの場合の処理
           alert('県確定: ' + prefCode);
-          
+
           // エリア確定で prefCode 上書き
-          prefCode = areaSuffix.toUpperCase();
+          prefCode = hash.toUpperCase();
           alert('エリア確定: ' + prefCode);
-          
-          handleAreaURL(baseFile.toUpperCase(), areaSuffix, text);
+
+          handleAreaURL(fileName.replace('.html','').toUpperCase(), hash, text);
           return; // 従来処理はスキップ
         }
       }
 
-      // 従来処理
+      // 従来処理（# が無い場合）
       const lines = text.trim().split('\n');
       let areas = []; // 親が一致するエリア用配列
 
@@ -257,7 +249,6 @@ function checkCSV() {
       renderMenu(areas);
     });
 }
-
 
 
 
