@@ -168,49 +168,30 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 function checkCSV() {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/MAP-/location.csv', false); // 同期
-    xhr.send(null);
+  fetch('/MAP-/location.csv')
+    .then(function(response) { return response.text(); })
+    .then(function(text) {
+      // CSV 全体を確認
+      alert('CSV 全体内容:\n' + text);
 
-    if(xhr.status !== 200){
-      alert('CSV 読み込み失敗: ' + xhr.status);
-      return;
-    }
+      // URL から県名を取得
+      var urlParts = location.pathname.split('/');
+      var fileName = urlParts[urlParts.length - 1]; // CHIBA.html
+      var prefCode = fileName.replace('.html','').toUpperCase();
 
-    var text = xhr.responseText;
-    alert('CSV 読み込み成功\n' + text.split('\n')[0] + '...'); // 先頭行確認
-
-    // URL から県名取得
-    var urlParts = location.pathname.split('/');
-    var fileName = urlParts[urlParts.length - 1]; // CHIBA.html
-    var prefCode = fileName.replace('.html','').toUpperCase(); // CHIBA
-    alert('抽出対象: ' + prefCode);
-
-    // CSV を行単位で分割
-    var lines = text.trim().split('\n');
-    var found = false;
-
-    for(var i=1; i<lines.length; i++){ // ヘッダ除外
-      var cols = lines[i].split(',');
-      var csvPref = cols[0].trim().toUpperCase();
-      if(csvPref === prefCode){
-        found = true;
-        var lat = cols[3] || 'null';
-        var lng = cols[4] || 'null';
-        alert('県: ' + csvPref + '\n緯度: ' + lat + '\n経度: ' + lng);
-        return {lat:parseFloat(lat), lng:parseFloat(lng)};
+      // 行ごとに分割して県名だけチェック
+      var lines = text.trim().split('\n');
+      for (var i = 1; i < lines.length; i++) { // ヘッダはスキップ
+        var cols = lines[i].split(',');
+        if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
+          alert('県: ' + cols[0] + '\n緯度: ' + cols[3] + '\n経度: ' + cols[4]);
+          break; // 見つけたら終了
+        }
       }
-    }
+    });
+}
 
-    if(!found){
-      alert('CSV に県 ' + prefCode + ' は存在しません');
-    }
-  }
 
-  var coords = checkCSV();
-  if(coords){
-    alert('Leaflet に渡す座標: ' + coords.lat + ', ' + coords.lng);
-  }
 
 
 checkCSV();
