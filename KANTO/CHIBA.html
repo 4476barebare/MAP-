@@ -204,10 +204,10 @@ function checkCSV() {
         if (parent === prefName) {
           // name, zoom, lat, lng を areas に追加
           areas.push({
-              areaName = cols[0].trim(),
-              areaZoom = parseFloat(cols[1]),
-            areaLat = parseFloat(cols[3]),
-            areaLng = parseFloat(cols[4])
+              areaName: cols[0].trim(),
+              areaZoom: parseFloat(cols[1]),
+            areaLat: parseFloat(cols[3]),
+            areaLng: parseFloat(cols[4])
           });
         }
       }
