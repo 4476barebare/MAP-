@@ -165,46 +165,52 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   
   // ===== CSV 読み込み＆県名抽出確認関数 (asyncなし) =====
-  function checkCSV() {
-    fetch('/MAP-/location.csv')
-      .then(response => {
-        if (!response.ok) throw new Error('CSV ファイル読み込み失敗');
-        return response.text();
-      })
-      .then(text => {
-        // URL から県名を取得 (例: /CHIBA.html → CHIBA)
-        const urlParts = location.pathname.split('/');
-        const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
-        const prefCode = fileName.replace('.html','').toUpperCase(); // CHIBA
 
-        // CSV の各行を配列に
-        const lines = text.trim().split('\n');
-        const dataLines = lines.slice(1); // ヘッダを除外
 
-        // 該当県を検索
-        let found = false;
-        for (const line of dataLines) {
-          const cols = line.split(',');
-          const csvPref = cols[0].trim().toUpperCase();
-          const lat = cols[1].trim();
-          const lng = cols[2].trim();
-          if (csvPref === prefCode) {
-            found = true;
-            alert(`県: ${csvPref}\n緯度: ${lat}\n経度: ${lng}`);
-            break;
-          }
+
+function checkCSV() {
+  fetch('/MAP-/location.csv')
+    .then(res => res.text())
+    .then(text => {
+      alert('CSV 読み込み成功');
+
+      // URL から県名を抽出
+      const fileName = location.pathname.split('/').pop(); // CHIBA.html
+      const prefCode = fileName.replace('.html','').toUpperCase();
+      alert('抽出した県名: ' + prefCode);
+
+      // CSV を行ごとに分割
+      const lines = text.trim().split('\n');
+      const dataLines = lines.slice(1); // ヘッダを除外
+      let found = false;
+
+      for (const line of dataLines) {
+        const cols = line.split(',');
+        const name = cols[0].trim().toUpperCase();
+        const zoom = cols[1].trim();
+        const lat = cols[3].trim();
+        const lng = cols[4].trim();
+        const parent = cols[5].trim();
+
+        alert(`行チェック: ${name}, parent=${parent}, lat=${lat}, lng=${lng}`);
+
+        // parent が空で、県名一致
+        if (parent === '' && name === prefCode) {
+          found = true;
+          alert(`県位置発見: ${name}\n緯度: ${lat}\n経度: ${lng}\nzoom: ${zoom}`);
+          break;
         }
+      }
 
-        if (!found) {
-          alert(`県 ${prefCode} は CSV に存在しません`);
-        }
-      })
-      .catch(e => alert('エラー: ' + e.message));
-  }
+      if (!found) {
+        alert(`県 ${prefCode} は CSV に存在しません`);
+      }
+    })
+    .catch(e => alert('エラー: ' + e.message));
+}
 
-  // 実行
-  checkCSV();
-
+// 実行
+checkCSV();
 
   // ===== 地図初期化関数 =====
   let map; // グローバル変数
