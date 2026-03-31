@@ -338,17 +338,23 @@ function renderMenu(areas) {
     }
 
     // クリックで URL 書き換え＆メニューを完全に閉じる
-    li.onclick = () => {
-      // URL 末尾をエンコードしたエリア名に変更
-      const newArea = encodeURIComponent(areas[i].areaName);
-      const parts = location.pathname.split('/');
-      parts[parts.length - 1] = newArea;
-      const newUrl = parts.join('/');
-      history.pushState(null, '', newUrl);
 
-      // メニュー div を完全に閉じる
-      menuBox.style.display = 'none';
-    };
+li.onclick = () => {
+  const parentArea = areas[i].areaName; // このレベルのエリア名
+  let childHash = ''; // エリア2用
+
+  // CSVの親列にこのエリア名を持つ行があれば最初の子を取得
+  const childArea = areas.find(a => a.parent === parentArea);
+  if (childArea) {
+    childHash = '/' + encodeURIComponent(childArea.areaName);
+  }
+
+  // URL の hash を書き換え
+  location.hash = encodeURIComponent(parentArea) + childHash;
+
+  // メニュー div を完全に閉じる
+  menuBox.style.display = 'none';
+};
 
     menu.appendChild(li);
   }
