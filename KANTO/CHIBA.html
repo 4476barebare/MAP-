@@ -186,21 +186,22 @@ function checkCSV() {
 
       for (const line of dataLines) {
         const cols = line.split(',');
-        const name = cols[0].trim().toUpperCase();
-        const zoom = cols[1].trim();
-        const lat = cols[3].trim();
-        const lng = cols[4].trim();
-        const parent = cols[5].trim();
+        const name   = (cols[0] || '').trim().toUpperCase();
+        const zoom   = (cols[1] || '').trim();
+        const lat    = (cols[3] || '').trim();
+        const lng    = (cols[4] || '').trim();
+        const parent = (cols[5] || '').trim();
 
         alert(`行チェック: ${name}, parent=${parent}, lat=${lat}, lng=${lng}`);
 
-        // parent が空で、県名一致
         if (parent === '' && name === prefCode) {
           found = true;
           alert(`県位置発見: ${name}\n緯度: ${lat}\n経度: ${lng}\nzoom: ${zoom}`);
           break;
         }
       }
+
+
 
       if (!found) {
         alert(`県 ${prefCode} は CSV に存在しません`);
