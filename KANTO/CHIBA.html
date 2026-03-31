@@ -178,8 +178,11 @@ window.addEventListener('DOMContentLoaded', function() {
           for (var i = 1; i < lines.length; i++) { // ヘッダはスキップ
           var cols = lines[i].split(',');
           if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
+              prefName = cols[0];
+              prefLat = cols[3];
+              prefLng = cols[4];
           //alert('県: ' + cols[0] + '\n緯度: ' + cols[3] + '\n経度: ' + cols[4]);
-          break; // 見つけたら終了
+          //break; // 見つけたら終了
           }
     }
     });
@@ -188,7 +191,7 @@ window.addEventListener('DOMContentLoaded', function() {
   // ===== 地図初期化関数 =====
   let map; // グローバル変数
   function initMap() {
-      
+       alert(prefName);
     if(map) map.remove(); // 再描画対応：既存マップ削除
 
     map = L.map('lf-map').setView([35.45, 140.25], 9);
@@ -393,7 +396,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // ===== 初期化実行 =====
   checkCSV();
-  alert('prefCode');
+ 
   initMap();
   renderMenu();
 
