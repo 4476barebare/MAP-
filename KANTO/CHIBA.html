@@ -165,33 +165,41 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   
   
-  function checkCSV() {
-      fetch('/MAP-/data/location.csv')
-      .then(function(response) { return response.text(); })
-      .then(function(text) {
-          // URL から県名を取得
-          var urlParts = location.pathname.split('/');
-          var fileName = urlParts[urlParts.length - 1]; // CHIBA.html
-          var prefCode = fileName.replace('.html','').toUpperCase();
-          // 行ごとに分割して県名だけチェック
-          var lines = text.trim().split('\n')
-          for (var i = 1; i < lines.length; i++) { // ヘッダはスキップ
-          var cols = lines[i].split(',');
-          if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
-              prefName = cols[0];
-              prefLat = cols[3];
-              prefLng = cols[4];
-          //alert('県: ' + cols[0] + '\n緯度: ' + cols[3] + '\n経度: ' + cols[4]);
-          //break; // 見つけたら終了
-          }
-    }
+let prefNameGlobal = null;
+let prefLatGlobal = null;
+let prefLngGlobal = null;
+let prefZoomGlobal = null;
+
+function checkCSV() {
+  fetch('/MAP-/data/location.csv')
+    .then(function(response) { return response.text(); })
+    .then(function(text) {
+      // URL から県名を取得
+      const urlParts = location.pathname.split('/');
+      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
+      const prefCode = fileName.replace('.html','').toUpperCase();
+
+      // 行ごとに分割して県名だけチェック
+      const lines = text.trim().split('\n');
+      for (let i = 1; i < lines.length; i++) { // ヘッダはスキップ
+        const cols = lines[i].split(',');
+        if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
+          prefNameGlobal = cols[0].trim();
+          prefLatGlobal = parseFloat(cols[3]);
+          prefLngGlobal = parseFloat(cols[4]);
+          prefZoomGlobal = parseFloat(cols[2]);
+          break; // 見つけたら終了
+        }
+      }
+
+
     });
-  }
+}
 
   // ===== 地図初期化関数 =====
   let map; // グローバル変数
   function initMap() {
-       alert(prefName);
+       alert(prefNameGlobal);
     if(map) map.remove(); // 再描画対応：既存マップ削除
 
     map = L.map('lf-map').setView([35.45, 140.25], 9);
