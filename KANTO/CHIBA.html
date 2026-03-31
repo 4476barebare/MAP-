@@ -221,12 +221,7 @@ function checkCSV() {
     map.on('move', updateDebug);
     map.on('zoom', updateDebug);
 
-    map.whenReady(() => {
-    map.invalidateSize();                       // サイズを強制更新
-    map.setView([prefLat, prefLng], prefZoom);  // 中心とズーム再設定
-    updateDebug();                              // 初回デバッグ表示
-  });
-
+    map.whenReady(updateDebug);
   }
 
   // ===== メニュー描画関数 =====
