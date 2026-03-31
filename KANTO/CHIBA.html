@@ -294,11 +294,21 @@ function renderMenu(areas) {
       li.appendChild(prev);
     }
 
-    // クリックでマップ移動
+   // クリックでURL末尾書き換え（漢字は encodeURIComponent）
     li.onclick = () => {
-      map.setView([areas[i].areaLat, areas[i].areaLng], areas[i].areaZoom);
+      const newArea = encodeURIComponent(areas[i].areaName);
+      const parts = location.pathname.split('/');
+      parts[parts.length - 1] = newArea;
+      const newUrl = parts.join('/');
+      history.pushState(null, '', newUrl);
+
+      // 座標・ズーム情報もここで利用可能
+      // const lat = li.dataset.lat, lng = li.dataset.lng, zoom = li.dataset.zoom;
+
       menuBox.style.maxHeight = '0px';
+      menuBox.style.overflow = 'hidden';
     };
+
 
     menu.appendChild(li);
   }
