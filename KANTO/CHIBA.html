@@ -166,54 +166,48 @@ window.addEventListener('DOMContentLoaded', function() {
   
   
 
+
+// ===== グローバル変数 =====
 let prefNameGlobal = null;
 let prefLatGlobal = null;
 let prefLngGlobal = null;
 let prefZoomGlobal = null;
+let map; // Leafletマップ
 
+// ===== CSV 読み込み関数（コールバックで initMap を呼ぶ）=====
 function checkCSV(callback) {
   fetch('/MAP-/data/location.csv')
-    .then(function(response) { return response.text(); })
-    .then(function(text) {
-      // URL から県名を取得
+    .then(res => res.text())
+    .then(text => {
       const urlParts = location.pathname.split('/');
-      const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
+      const fileName = urlParts[urlParts.length - 1];
       const prefCode = fileName.replace('.html','').toUpperCase();
 
-      // 行ごとに分割して県名だけチェック
       const lines = text.trim().split('\n');
-      for (let i = 1; i < lines.length; i++) { // ヘッダはスキップ
+      for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',');
         if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
           prefNameGlobal = cols[0].trim();
           prefLatGlobal = parseFloat(cols[3]);
           prefLngGlobal = parseFloat(cols[4]);
-          prefZoomGlobal = parseFloat(cols[2]) || 10; // zoom が空欄なら10
-          break; // 見つけたら終了
+          prefZoomGlobal = parseFloat(cols[1]); // CSV の zoom 値をそのまま使用
+          break;
         }
       }
 
-      if (callback) callback(); // CSV 読み込み後に呼び出す
+      if (callback) callback();
     })
-    .catch(function(e) {
-      alert('CSV読み込み失敗: ' + e.message);
-    });
+    .catch(e => alert('CSV 読み込み失敗: ' + e.message));
 }
 
-// ===== 地図初期化関数 =====
-let map; // グローバル変数
+// ===== 地図初期化関数（CSV値のみ使用）=====
 function initMap() {
-
-  // 座標がまだ取得できていない場合は CSV 読み込みからやり直す
-  if (!prefLatGlobal || !prefLngGlobal) {
-    checkCSV(initMap); // CSV 読み込み後に再度 initMap を呼ぶ
-    return;             // 一旦ここで終了
+  if (!prefLatGlobal || !prefLngGlobal || !prefZoomGlobal) {
+    alert('CSVから座標やズーム値が取得できません');
+    return;
   }
 
-  alert(prefNameGlobal); // CSV で取得できたか確認
-
-
-  if(map) map.remove(); // 再描画対応：既存マップ削除
+  if (map) map.remove();
 
   map = L.map('lf-map').setView([prefLatGlobal, prefLngGlobal], prefZoomGlobal);
   map.attributionControl.setPrefix(false);
@@ -222,17 +216,19 @@ function initMap() {
     maxZoom: 19
   }).addTo(map);
 
-  // 白黒フィルター
   tileLayer.getContainer().style.filter =
     "grayscale(100%) brightness(110%) contrast(110%)";
 
-  // イベント
   map.on('move', updateDebug);
   map.on('zoom', updateDebug);
 
   map.whenReady(updateDebug);
 }
 
+// ===== 1番外側で呼び出す =====
+window.addEventListener('DOMContentLoaded', function() {
+  checkCSV(initMap);
+});
 
 
 
@@ -420,7 +416,6 @@ function initMap() {
 
   // ===== 初期化実行 =====
 // ===== 実行 =====
-checkCSV(initMap);
 
 
   
