@@ -149,6 +149,7 @@ border-radius:6px;
 <script src="/MAP-/header.js" defer></script>
 
 
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
 
@@ -167,55 +168,58 @@ window.addEventListener('DOMContentLoaded', function() {
   // ===== CSV 読み込み＆県名抽出確認関数 (asyncなし) =====
 
 
-  function loadCSV(pref, callback) {
-    fetch('/MAP-/data/location.csv')
-      .then(function(res){ return res.text(); })
-      .then(function(text){
-        var lines = text.trim().split('\n');
-        var headers = lines[0].split(',');
-        var data = null;
+// ===== CSVから指定県データを取得する関数 =====
+function getPrefData(prefCode, callback) {
+  fetch('/MAP-/data/location.csv')
+    .then(function(response) { return response.text(); })
+    .then(function(text) {
+      // CSV全体をデバッグ用に表示
+      alert('CSV 全体内容:\n' + text);
 
-        for(var i=1; i<lines.length; i++){
-          var cols = lines[i].split(',');
-          if(cols[0] && cols[0].trim().toUpperCase() === pref.toUpperCase()){
-            data = {
-              name: cols[0].trim(),
-              zoom: cols[1] ? parseFloat(cols[1].trim()) : null,
-              maxZoom: cols[2] ? parseFloat(cols[2].trim()) : null,
-              lat: cols[3] ? parseFloat(cols[3].trim()) : null,
-              lng: cols[4] ? parseFloat(cols[4].trim()) : null,
-              parent: cols[5] ? cols[5].trim() : null,
-              style: cols[6] ? cols[6].trim() : null
-            };
-            alert('CSV取得成功:\n' +
-                  '県: ' + data.name + '\n' +
-                  '緯度: ' + data.lat + '\n' +
-                  '経度: ' + data.lng + '\n' +
-                  'zoom: ' + data.zoom);
-            break;
-          }
+      var lines = text.trim().split('\n');
+      var headers = lines[0].split(',');
+      var found = null;
+
+      for (var i = 1; i < lines.length; i++) { // ヘッダはスキップ
+        var cols = lines[i].split(',');
+        if (cols[0] && cols[0].trim().toUpperCase() === prefCode.toUpperCase()) {
+          found = {
+            name: cols[0].trim(),
+            zoom: cols[1] ? cols[1].trim() : null,
+            maxZoom: cols[2] ? cols[2].trim() : null,
+            lat: cols[3] ? parseFloat(cols[3].trim()) : null,
+            lng: cols[4] ? parseFloat(cols[4].trim()) : null,
+            parent: cols[5] ? cols[5].trim() : null,
+            style: cols[6] ? cols[6].trim() : null
+          };
+          alert('県: ' + found.name + '\n緯度: ' + found.lat + '\n経度: ' + found.lng);
+          break;
         }
+      }
 
-        callback(data); // 見つかったデータを返す（nullなら県なし）
-      })
-      .catch(function(e){
-        alert('CSV読み込み失敗: ' + e.message);
-        callback(null);
-      });
+      callback(found); // データを呼び出し元に返す
+    });
+}
+
+// ===== 使用例 =====
+var urlParts = location.pathname.split('/');
+var fileName = urlParts[urlParts.length - 1]; // CHIBA.html
+var prefCode = fileName.replace('.html','');   // CHIBA
+
+getPrefData(prefCode, function(prefData){
+  if(prefData) {
+    // Leafletの地図初期化に使用
+    map.setView([prefData.lat, prefData.lng], parseInt(prefData.zoom));
+  } else {
+    alert('CSVに県 ' + prefCode + ' は存在しません');
   }
+});
 
 
-
-
-
-
-  // ===== 地図初期化関数 =====
-  let map; // グローバル変数
+// ===== 地図初期化 =====
+let map; // グローバル変数
 function initMap(lat, lng, zoom) {
-  if (map) map.remove(); // 既存マップ削除
-
-alert('Leafletで受け取った値:\n緯度: ' + lat + '\n経度: ' + lng + '\nzoom: ' + zoom);
-
+  if (map) map.remove();
 
   map = L.map('lf-map').setView([lat, lng], zoom);
   map.attributionControl.setPrefix(false);
@@ -233,7 +237,19 @@ alert('Leafletで受け取った値:\n緯度: ' + lat + '\n経度: ' + lng + '\n
   map.whenReady(updateDebug);
 }
 
+// ===== 使用例 =====
+const urlParts = location.pathname.split('/');
+const fileName = urlParts[urlParts.length - 1]; // CHIBA.html
+const prefCode = fileName.replace('.html','');   // CHIBA
 
+getPrefData(prefCode, function(prefData) {
+  if (prefData) {
+    initMap(prefData.lat, prefData.lng, prefData.zoom);
+  } else {
+    alert('CSVに県 ' + prefCode + ' は存在しません');
+    // デフォルト表示は行わない
+  }
+})
 
   // ===== メニュー描画関数 =====
   const menuBox = document.getElementById('map-menu');
@@ -438,6 +454,7 @@ alert('Leafletで受け取った値:\n緯度: ' + lat + '\n経度: ' + lng + '\n
 
 });
 </script>
+
 
 </body>
 </html>
