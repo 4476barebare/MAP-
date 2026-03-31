@@ -186,8 +186,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // ===== 地図初期化関数 =====
   let map; // グローバル変数
-  function initMap(prefCode) {
-      alert('prefCode');
+  function initMap() {
+      alert(2+'prefCode');
     if(map) map.remove(); // 再描画対応：既存マップ削除
 
     map = L.map('lf-map').setView([35.45, 140.25], 9);
@@ -392,6 +392,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   // ===== 初期化実行 =====
   checkCSV();
+  alert(1+'prefCode');
   initMap();
   renderMenu();
 
