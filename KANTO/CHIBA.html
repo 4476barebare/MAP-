@@ -188,7 +188,7 @@ function checkCSV() {
         areaSuffix = null;
       }
 
-      const prefCode = baseFile.toUpperCase();
+      let prefCode = baseFile.toUpperCase();
 
       // /○○ がある場合は2段階目の / があるかチェック
       if (areaSuffix) {
@@ -196,15 +196,26 @@ function checkCSV() {
           // さらに / がある場合の処理
           const [firstPart, secondPart] = areaSuffix.split('/');
           alert('県確定: ' + prefCode);
-          alert('エリア確定: ' + firstPart);
-          alert('エリア2確定: ' + secondPart);
-          handleDoubleAreaURL(prefCode, firstPart, secondPart, text);
+          
+          // firstPart で prefCode 上書き → エリア確定
+          prefCode = firstPart.toUpperCase();
+          alert('エリア確定: ' + prefCode);
+          
+          // secondPart で prefCode 上書き → エリア2確定
+          prefCode = secondPart.toUpperCase();
+          alert('エリア2確定: ' + prefCode);
+          
+          handleDoubleAreaURL(baseFile.toUpperCase(), firstPart, secondPart, text);
           return; // 従来処理はスキップ
         } else {
           // /○○ のみの場合の処理
           alert('県確定: ' + prefCode);
-          alert('エリア確定: ' + areaSuffix);
-          handleAreaURL(prefCode, areaSuffix, text);
+          
+          // エリア確定で prefCode 上書き
+          prefCode = areaSuffix.toUpperCase();
+          alert('エリア確定: ' + prefCode);
+          
+          handleAreaURL(baseFile.toUpperCase(), areaSuffix, text);
           return; // 従来処理はスキップ
         }
       }
@@ -246,6 +257,9 @@ function checkCSV() {
       renderMenu(areas);
     });
 }
+
+
+
 
 
   function initMap(prefLat,prefLng,prefZoom) {
