@@ -225,10 +225,6 @@ function initMap() {
   map.whenReady(updateDebug);
 }
 
-// ===== 1番外側で呼び出す =====
-window.addEventListener('DOMContentLoaded', function() {
-  checkCSV(initMap);
-});
 
 
 
@@ -417,6 +413,10 @@ window.addEventListener('DOMContentLoaded', function() {
   // ===== 初期化実行 =====
 // ===== 実行 =====
 
+// ===== 1番外側で呼び出す =====
+window.addEventListener('DOMContentLoaded', function() {
+  checkCSV(initMap);
+});
 
   
   renderMenu();
