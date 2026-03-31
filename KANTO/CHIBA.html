@@ -168,7 +168,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 function checkCSV() {
-  fetch('/MAP-/location.csv')
+  fetch('/MAP-/data/location.csv')
     .then(function(response) { return response.text(); })
     .then(function(text) {
       // CSV 全体を確認
