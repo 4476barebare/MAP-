@@ -182,6 +182,9 @@ function checkCSV() {
 
       // 行ごとに分割して県名だけチェック
       const lines = text.trim().split('\n');
+      
+      let areas = []; // 親が一致するエリア用配列
+      
       for (let i = 1; i < lines.length; i++) { // ヘッダはスキップ
         const cols = lines[i].split(',');
         if (cols[0] && cols[0].trim().toUpperCase() === prefCode) {
@@ -193,6 +196,27 @@ function checkCSV() {
           initMap(prefLat,prefLng,prefZoom);
         }
       }
+      
+      // 県を親に持つ行を取得
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',');
+        const parent = cols[5] ? cols[5].trim() : '';
+        if (parent === prefName) {
+          // name, zoom, lat, lng を areas に追加
+          areas.push({
+              areaName = cols[0].trim(),
+              areaZoom = parseFloat(cols[1]),
+            areaLat = parseFloat(cols[3]),
+            areaLng = parseFloat(cols[4])
+          });
+        }
+      }
+
+      // 確認用
+      console.log('親が ' + prefName + ' のエリア一覧:', areas);
+      // alert(JSON.stringify(areas)); // 必要ならアラートでも確認可
+    });
+
 
 
     });
