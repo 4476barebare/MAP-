@@ -190,7 +190,10 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   let map = null; // グローバル変数
-  let areas = [];  // CSVデータを保持
+  let areas = [];  // グローバルで保持（ハッシュバック用）
+
+  // 前回ハッシュを保持
+  let previousHash = location.hash;
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
@@ -232,8 +235,16 @@ window.addEventListener('DOMContentLoaded', function() {
           }
         }
 
-        // 初期ロード時の地図表示
-        if (!hash && prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
+        // ハッシュがある場合は対象位置へ
+        if (hash) {
+          const parts = hash.split('/');
+          const targetName = decodeURIComponent(parts[parts.length - 1]);
+          const target = areas.find(a => a.areaName === targetName);
+          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
+          else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
+        } else if (prefLat && prefLng) {
+          initMap(prefLat, prefLng, prefZoom);
+        }
 
         renderMenu(areas);
       });
@@ -246,17 +257,16 @@ window.addEventListener('DOMContentLoaded', function() {
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
         attribution: '© 国土地理院'
       }).addTo(map);
-
-      map.on('move', updateDebug);
-      map.on('zoom', updateDebug);
-      map.whenReady(updateDebug);
     } else {
-      // 既存マップは再初期化せずに移動だけ
       map.flyTo([lat, lng], zoom, {
         duration: 0.3,
         easeLinearity: 0.8
       });
     }
+
+    map.on('move', updateDebug);
+    map.on('zoom', updateDebug);
+    map.whenReady(updateDebug);
   }
 
   const menuBox = document.getElementById('map-menu');
@@ -267,9 +277,8 @@ window.addEventListener('DOMContentLoaded', function() {
   function renderMenu(areas) {
     menuBox.style.display = !location.hash ? 'block' : 'none';
     menuBox.style.overflow = 'visible';
-
-    const totalPages = Math.ceil(areas.length / maxRows);
     menu.innerHTML = '';
+    const totalPages = Math.ceil(areas.length / maxRows);
     const start = currentPage * maxRows;
     const end = Math.min(start + maxRows, areas.length);
 
@@ -314,13 +323,9 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         location.hash = pathHash.map(encodeURIComponent).join('/');
-        // 初期化せずに移動だけ
-        map.flyTo([targetLat, targetLng], targetZoom, {duration:0.3, easeLinearity:0.8});
+        initMap(targetLat, targetLng, targetZoom);
         menuBox.style.display = 'none';
-
-        // 天気UI表示
-        const weather = document.getElementById('weather-wave-tide-container');
-        weather.style.display = 'block';
+        document.getElementById('weather-wave-tide-container').style.display = 'block';
       };
 
       menu.appendChild(li);
@@ -447,9 +452,30 @@ window.addEventListener('DOMContentLoaded', function() {
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
 
-    // 初期表示制御
     container.style.display = location.hash ? 'block' : 'none';
   }
+
+  // ▼ ブラウザバック用ハッシュ監視
+  window.addEventListener('hashchange', () => {
+    const currentHash = location.hash;
+    const prevLevel = (previousHash.match(/\//g) || []).length;
+    const currLevel = (currentHash.match(/\//g) || []).length;
+
+    if (currLevel < prevLevel) {
+      const path = currentHash.slice(1).split('/').map(decodeURIComponent);
+      const targetName = path[path.length - 1];
+      const target = areas.find(a => a.areaName === targetName);
+      if (target) {
+        map.flyTo([target.areaLat, target.areaLng], target.areaZoom, {
+          duration: 0.3,
+          easeLinearity: 0.8
+        });
+        menuBox.style.display = 'none';
+        document.getElementById('weather-wave-tide-container').style.display = 'block';
+      }
+    }
+    previousHash = currentHash;
+  });
 
   // 初期化実行
   checkCSV();
@@ -468,9 +494,12 @@ window.addEventListener('DOMContentLoaded', function() {
     [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
     '大潮'
   );
+
+  // 初期表示
+  const box = document.getElementById('weather-wave-tide-container');
+  box.style.display = location.hash ? 'block' : 'none';
 });
 </script>
-
 
 </body>
 </html>
