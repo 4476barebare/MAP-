@@ -238,11 +238,18 @@ window.addEventListener('DOMContentLoaded', function() {
     map = L.map('lf-map').setView([lat, lng], zoom);
     map.attributionControl.setPrefix(false);
 
-    const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
-    }).addTo(map);
+    //const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //  maxZoom: 19
+    //}).addTo(map);
+    
+    // 国土地理院（標準地図）
+const tileLayer = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+  attribution: '© 国土地理院'
+}).addTo(map);
+    
+    
 
-    tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
+    // tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
 
     map.on('move', updateDebug);
     map.on('zoom', updateDebug);
