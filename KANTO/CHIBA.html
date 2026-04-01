@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+の<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -171,104 +171,45 @@ border-radius:6px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
-
-  // =========================
   // デバッグ表示
-  // =========================
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
 
   function updateDebug() {
-    if (!map) return;
     const center = map.getCenter();
     latEl.textContent = center.lat.toFixed(5);
     lngEl.textContent = center.lng.toFixed(5);
     zoomEl.textContent = map.getZoom();
   }
 
-  // =========================
-  // グローバル
-  // =========================
-  let map;
-  let areas = []; // ★状態管理用
+  let map; // グローバル変数
 
-  const menuBox = document.getElementById('map-menu');
-  const menu = menuBox.querySelector('ul');
-  const weather = document.getElementById('weather-wave-tide-container');
-
-  const maxRows = 4;
-  let currentPage = 0;
-
-  // =========================
-  // Map初期化（1回だけ）
-  // =========================
-  function initMap(lat, lng, zoom) {
-    if (!map) {
-      map = L.map('lf-map').setView([lat, lng], zoom);
-
-      L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
-        attribution: '© 国土地理院'
-      }).addTo(map);
-
-      map.on('move', updateDebug);
-      map.on('zoom', updateDebug);
-      map.whenReady(updateDebug);
-    }
-    // ★ここでflyToしない
-  }
-
-  // =========================
-  // 状態反映（中核）
-  // =========================
-  function applyStateFromHash() {
-    if (!map || areas.length === 0) return;
-
-    const hash = decodeURIComponent(location.hash.slice(1));
-    const path = hash ? hash.split('/') : [];
-
-    // 初期状態
-    if (path.length === 0) {
-      menuBox.style.display = 'block';
-      weather.style.display = 'none';
-
-      const pref = areas.find(a => !a.parent);
-      if (pref) {
-        map.flyTo([pref.areaLat, pref.areaLng], pref.areaZoom, { duration: 0.3 });
-      }
-      return;
-    }
-
-    const last = path[path.length - 1];
-    const area = areas.find(a => a.areaName === last);
-    if (!area) return;
-
-    map.flyTo([area.areaLat, area.areaLng], area.areaZoom, {
-      duration: 0.3
-    });
-
-    menuBox.style.display = 'none';
-    weather.style.display = 'block';
-  }
-
-  // =========================
-  // CSV読み込み
-  // =========================
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
-      .then(res => res.text())
+      .then(response => response.text())
       .then(text => {
-
         const urlParts = location.pathname.split('/');
         const fileName = urlParts[urlParts.length - 1];
+        const hash = location.hash ? location.hash.slice(1) : null;
+
         const basePref = fileName.replace('.html', '');
+        let prefCode = basePref.toUpperCase();
+        let area1 = null;
+        let area2 = null;
+
+        if (hash) {
+          const parts = hash.split('/');
+          area1 = parts[0];
+          if (parts.length === 2) area2 = parts[1];
+        }
 
         const lines = text.trim().split('\n');
-
-        let prefName, prefLat, prefLng, prefZoom;
-        areas = [];
+        let areas = [];
+        let prefLat, prefLng, prefZoom, prefName;
 
         for (let i = 1; i < lines.length; i++) {
           const cols = lines[i].split(',');
@@ -280,18 +221,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
+            prefZoom = zoom;
             prefLat = lat;
             prefLng = lng;
-            prefZoom = zoom;
+          }
 
-            areas.push({
-              areaName: name,
-              areaZoom: zoom,
-              areaLat: lat,
-              areaLng: lng,
-              parent: ''
-            });
-          } else {
+          if (parent === prefName || (area1 && parent === area1)) {
             areas.push({
               areaName: name,
               areaZoom: zoom,
@@ -302,42 +237,73 @@ window.addEventListener('DOMContentLoaded', function() {
           }
         }
 
-        initMap(prefLat, prefLng, prefZoom);
+        if (area2) {
+          const target = areas.find(a => a.areaName === decodeURIComponent(area2));
+          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
+          else if (area1) {
+            const target1 = areas.find(a => a.areaName === decodeURIComponent(area1));
+            if (target1) initMap(target1.areaLat, target1.areaLng, target1.areaZoom);
+            else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
+          }
+        } else if (area1) {
+          const target = areas.find(a => a.areaName === decodeURIComponent(area1));
+          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
+          else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
+        } else if (prefLat && prefLng) {
+          initMap(prefLat, prefLng, prefZoom);
+        }
 
-        renderMenu();
-
-        applyStateFromHash(); // ★初期反映
+        renderMenu(areas);
       });
   }
 
-  // =========================
-  // メニュー描画
-  // =========================
-  function renderMenu() {
+  function initMap(lat, lng, zoom) {
+    if (!map) {
+      map = L.map('lf-map').setView([lat, lng], zoom);
+
+      L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+        attribution: '© 国土地理院'
+      }).addTo(map);
+
+      // ★イベント登録は初回のみ
+      map.on('move', updateDebug);
+      map.on('zoom', updateDebug);
+      map.whenReady(updateDebug);
+
+    } else {
+      // ★再初期化せず移動だけ（ここが今回の目的）
+      map.flyTo([lat, lng], zoom, {
+        duration: 0.25,        // ★少し高速化
+        easeLinearity: 1.0
+      });
+    }
+  }
+
+  const menuBox = document.getElementById('map-menu');
+  const menu = menuBox.querySelector('ul');
+  const maxRows = 4;
+  let currentPage = 0;
+
+  function renderMenu(areas) {
     menuBox.style.display = !location.hash ? 'block' : 'none';
+    menuBox.style.overflow = 'visible';
+
+    const totalPages = Math.ceil(areas.length / maxRows);
     menu.innerHTML = '';
-
-    const rootAreas = areas.filter(a => a.parent === '');
-    const totalPages = Math.ceil(rootAreas.length / maxRows);
-
     const start = currentPage * maxRows;
-    const end = Math.min(start + maxRows, rootAreas.length);
+    const end = Math.min(start + maxRows, areas.length);
 
     for (let i = start; i < end; i++) {
       const li = document.createElement('li');
       const text = document.createElement('span');
-      text.textContent = rootAreas[i].areaName;
+      text.textContent = areas[i].areaName;
       li.appendChild(text);
 
       if (i === end - 1 && currentPage < totalPages - 1) {
         const next = document.createElement('span');
         next.textContent = '▶';
         next.className = 'nav-btn';
-        next.onclick = (e) => {
-          e.stopPropagation();
-          currentPage++;
-          renderMenu();
-        };
+        next.onclick = (e) => { e.stopPropagation(); currentPage++; renderMenu(areas); };
         li.appendChild(next);
       }
 
@@ -345,38 +311,47 @@ window.addEventListener('DOMContentLoaded', function() {
         const prev = document.createElement('span');
         prev.textContent = '◀';
         prev.className = 'nav-btn';
-        prev.onclick = (e) => {
-          e.stopPropagation();
-          currentPage--;
-          renderMenu();
-        };
+        prev.onclick = (e) => { e.stopPropagation(); currentPage--; renderMenu(areas); };
         li.appendChild(prev);
       }
 
       li.onclick = () => {
         let pathHash = [];
-        let current = rootAreas[i].areaName;
-        pathHash.push(current);
+        let targetLat = areas[i].areaLat;
+        let targetLng = areas[i].areaLng;
+        let targetZoom = areas[i].areaZoom;
+        let currentParent = areas[i].areaName;
+        pathHash.push(currentParent);
 
         while (true) {
-          const child = areas.find(a => a.parent === current);
+          const child = areas.find(a => a.parent === currentParent);
           if (!child) break;
           pathHash.push(child.areaName);
-          current = child.areaName;
+          targetLat = child.areaLat;
+          targetLng = child.areaLng;
+          targetZoom = child.areaZoom;
+          currentParent = child.areaName;
         }
 
-        location.hash = pathHash.map(encodeURIComponent).join('/'); // ★ここだけ
+        location.hash = pathHash.map(encodeURIComponent).join('/');
+
+        // ★ここはそのままでOK（UI制御は既存維持）
+        initMap(targetLat, targetLng, targetZoom);
+        menuBox.style.display = 'none';
+
+        const weather = document.getElementById('weather-wave-tide-container');
+        weather.style.display = 'block';
       };
 
       menu.appendChild(li);
     }
+
+    menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+    menu.style.display = 'block';
   }
 
-  // =========================
-  // 天気UI
-  // =========================
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
-    const container = weather;
+    const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
 
     const header = document.createElement('div');
@@ -412,7 +387,6 @@ window.addEventListener('DOMContentLoaded', function() {
       container.appendChild(row);
     });
 
-    // 波
     const waveRow = document.createElement('div');
     waveRow.className = 'weather-row';
     const waveLabel = document.createElement('span');
@@ -422,16 +396,14 @@ window.addEventListener('DOMContentLoaded', function() {
 
     waveData.forEach(v => {
       const b = document.createElement('span');
-      b.className = 'weather-block';
+      b.className = 'weather-block wave-block';
       b.textContent = v + 'm';
       waveRow.appendChild(b);
     });
     container.appendChild(waveRow);
 
-    // 潮
     const tideRow = document.createElement('div');
     tideRow.className = 'weather-row';
-
     const tideLabel = document.createElement('span');
     tideLabel.className = 'weather-block first-block tide-label';
     tideLabel.textContent = tideName;
@@ -451,15 +423,18 @@ window.addEventListener('DOMContentLoaded', function() {
       canvas.height = rect.height;
       ctx.clearRect(0,0,canvas.width,canvas.height);
 
-      const points = data.map((v,i) => ({
-        x: i/(data.length-1) * canvas.width,
-        y: canvas.height - v*canvas.height*0.8
-      }));
+      const points = data.map((v,i) => {
+        const x = i/(data.length-1) * canvas.width;
+        const y = canvas.height - v*canvas.height*0.8;
+        return {x, y};
+      });
 
       ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-      for (let i=1; i<points.length; i++) {
-        ctx.lineTo(points[i].x, points[i].y);
+      ctx.moveTo(points[0].x, canvas.height);
+      ctx.lineTo(points[0].x, points[0].y);
+      for (let i=1; i<points.length-1; i++) {
+        const p = points[i];
+        ctx.lineTo(p.x, p.y);
       }
       ctx.strokeStyle = '#191970';
       ctx.stroke();
@@ -467,16 +442,13 @@ window.addEventListener('DOMContentLoaded', function() {
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
+
+    // ★既存仕様維持
+    const box = document.getElementById('weather-wave-tide-container');
+    box.style.display = location.hash ? 'block' : 'none';
   }
 
-  // =========================
-  // hash監視
-  // =========================
-  window.addEventListener('hashchange', applyStateFromHash); // ★統一
-
-  // =========================
-  // 初期実行
-  // =========================
+  // 初期化
   checkCSV();
 
   renderWeatherWaveTide(
@@ -494,10 +466,11 @@ window.addEventListener('DOMContentLoaded', function() {
     '大潮'
   );
 
+  const box = document.getElementById('weather-wave-tide-container');
+  box.style.display = location.hash ? 'block' : 'none';
+
 });
 </script>
-
-
 
 
 </body>
