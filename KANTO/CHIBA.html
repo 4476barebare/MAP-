@@ -173,11 +173,16 @@ border-radius:6px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
+
+  let map = null; // Leaflet map
+  let initialLat = null, initialLng = null, initialZoom = null; // 初期座標
+  let hashHistory = []; // 移動履歴
 
   function updateDebug() {
     const center = map.getCenter();
@@ -185,11 +190,6 @@ window.addEventListener('DOMContentLoaded', function() {
     lngEl.textContent = center.lng.toFixed(5);
     zoomEl.textContent = map.getZoom();
   }
-
-  let map = null; // グローバル変数
-  let areas = [];  // CSVから取得したエリアデータ
-  let initialLat, initialLng, initialZoom; // 初期座標
-  let previousHash = location.hash; // 直前のハッシュ保存
 
   function initMap(lat, lng, zoom) {
     if (!map) {
@@ -206,11 +206,7 @@ window.addEventListener('DOMContentLoaded', function() {
       map.on('zoom', updateDebug);
       map.whenReady(updateDebug);
     } else {
-      // 初期化済みならflyToで移動
-      map.flyTo([lat, lng], zoom, {
-        duration: 0.3,
-        easeLinearity: 0.8
-      });
+      map.flyTo([lat, lng], zoom, { duration: 0.3, easeLinearity: 0.8 });
     }
   }
 
@@ -220,19 +216,12 @@ window.addEventListener('DOMContentLoaded', function() {
       .then(text => {
         const urlParts = location.pathname.split('/');
         const fileName = urlParts[urlParts.length - 1];
-        const basePref = fileName.replace('.html', '');
-        let area1 = null, area2 = null;
         const hash = location.hash ? location.hash.slice(1) : null;
 
-        if (hash) {
-          const parts = hash.split('/');
-          area1 = parts[0];
-          if (parts.length === 2) area2 = parts[1];
-        }
-
+        const basePref = fileName.replace('.html', '');
+        let prefLat, prefLng, prefZoom, prefName;
         const lines = text.trim().split('\n');
-        areas = [];
-        let prefName, prefZoom, prefLatTemp, prefLngTemp;
+        let areas = [];
 
         for (let i = 1; i < lines.length; i++) {
           const cols = lines[i].split(',');
@@ -245,41 +234,29 @@ window.addEventListener('DOMContentLoaded', function() {
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
             prefZoom = zoom;
-            prefLatTemp = lat;
-            prefLngTemp = lng;
+            prefLat = lat;
+            prefLng = lng;
           }
 
-          if (parent === prefName || (area1 && parent === area1)) {
-            areas.push({
-              areaName: name,
-              areaZoom: zoom,
-              areaLat: lat,
-              areaLng: lng,
-              parent: parent
-            });
+          if (parent === prefName) {
+            areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
         }
 
-        if (area2) {
-          const target = areas.find(a => a.areaName === decodeURIComponent(area2));
-          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
-          else if (area1) {
-            const target1 = areas.find(a => a.areaName === decodeURIComponent(area1));
-            if (target1) initMap(target1.areaLat, target1.areaLng, target1.areaZoom);
-            else if (prefLatTemp && prefLngTemp) initMap(prefLatTemp, prefLngTemp, prefZoom);
+        if (hash) {
+          const parts = hash.split('/');
+          const targetArea = areas.find(a => a.areaName === decodeURIComponent(parts[0]));
+          if (targetArea) {
+            initMap(targetArea.areaLat, targetArea.areaLng, targetArea.areaZoom);
+            hashHistory.push({ lat: targetArea.areaLat, lng: targetArea.areaLng, zoom: targetArea.areaZoom });
+          } else {
+            initMap(prefLat, prefLng, prefZoom);
+            hashHistory.push({ lat: prefLat, lng: prefLng, zoom: prefZoom });
           }
-        } else if (area1) {
-          const target = areas.find(a => a.areaName === decodeURIComponent(area1));
-          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
-          else if (prefLatTemp && prefLngTemp) initMap(prefLatTemp, prefLngTemp, prefZoom);
-        } else if (prefLatTemp && prefLngTemp) {
-          initMap(prefLatTemp, prefLngTemp, prefZoom);
+        } else {
+          initMap(prefLat, prefLng, prefZoom);
+          hashHistory.push({ lat: prefLat, lng: prefLng, zoom: prefZoom });
         }
-
-        // 初期座標保存
-        initialLat = prefLatTemp;
-        initialLng = prefLngTemp;
-        initialZoom = prefZoom;
 
         renderMenu(areas);
       });
@@ -309,7 +286,7 @@ window.addEventListener('DOMContentLoaded', function() {
         const next = document.createElement('span');
         next.textContent = '▶';
         next.className = 'nav-btn';
-        next.onclick = (e) => { e.stopPropagation(); currentPage++; renderMenu(areas); };
+        next.onclick = e => { e.stopPropagation(); currentPage++; renderMenu(areas); };
         li.appendChild(next);
       }
 
@@ -317,7 +294,7 @@ window.addEventListener('DOMContentLoaded', function() {
         const prev = document.createElement('span');
         prev.textContent = '◀';
         prev.className = 'nav-btn';
-        prev.onclick = (e) => { e.stopPropagation(); currentPage--; renderMenu(areas); };
+        prev.onclick = e => { e.stopPropagation(); currentPage--; renderMenu(areas); };
         li.appendChild(prev);
       }
 
@@ -340,11 +317,10 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         location.hash = pathHash.map(encodeURIComponent).join('/');
-        initMap(targetLat, targetLng, targetZoom);
+        map.flyTo([targetLat, targetLng], targetZoom, { duration: 0.3, easeLinearity: 0.8 });
+        hashHistory.push({ lat: targetLat, lng: targetLng, zoom: targetZoom });
         menuBox.style.display = 'none';
-
-        const weather = document.getElementById('weather-wave-tide-container');
-        weather.style.display = 'block';
+        document.getElementById('weather-wave-tide-container').style.display = 'block';
       };
 
       menu.appendChild(li);
@@ -353,41 +329,6 @@ window.addEventListener('DOMContentLoaded', function() {
     menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
     menu.style.display = 'block';
   }
-
-  // ▼ ブラウザバック対応（ハッシュの階層が減った場合のみ処理）
-  window.addEventListener('hashchange', () => {
-    const currentHash = location.hash;
-    if (!previousHash) {
-      previousHash = currentHash;
-      return;
-    }
-
-    const prevParts = previousHash.slice(1).split('/');
-    const currParts = currentHash.slice(1).split('/');
-
-    if (currParts.length < prevParts.length) {
-      // ハッシュ階層が減った → ブラウザバック
-      if (currParts.length === 0) {
-        // 空になった場合は初期位置へ
-    initMap(initialLat, initialLng, initialZoom);
-
-    const weather = document.getElementById('weather-wave-tide-container');
-    weather.style.display = 'none';
-
-    // メニューを再表示
-    const menuBox = document.getElementById('map-menu');
-    menuBox.style.display = 'block';
-      } else {
-        // 階層が減っただけならそのエリアに移動
-        const targetName = decodeURIComponent(currParts[currParts.length-1]);
-        const target = areas.find(a => a.areaName === targetName);
-        if (target) {
-          initMap(target.areaLat, target.areaLng, target.areaZoom);
-        }
-      }
-    }
-    previousHash = currentHash;
-  });
 
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
     const container = document.getElementById('weather-wave-tide-container');
@@ -410,16 +351,19 @@ window.addEventListener('DOMContentLoaded', function() {
     keys.forEach(k => {
       const row = document.createElement('div');
       row.className = 'weather-row';
+
       const label = document.createElement('span');
       label.className = 'weather-block first-block';
       label.textContent = k.label;
       row.appendChild(label);
+
       weatherData[k.key].forEach((v,i) => {
         const b = document.createElement('span');
         b.className = 'weather-block';
         b.textContent = (k.key==='time' && i%2!==0) ? '' : v;
         row.appendChild(b);
       });
+
       container.appendChild(row);
     });
 
@@ -429,6 +373,7 @@ window.addEventListener('DOMContentLoaded', function() {
     waveLabel.className = 'weather-block first-block';
     waveLabel.textContent = '波高';
     waveRow.appendChild(waveLabel);
+
     waveData.forEach(v => {
       const b = document.createElement('span');
       b.className = 'weather-block wave-block';
@@ -501,11 +446,32 @@ window.addEventListener('DOMContentLoaded', function() {
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
-
-    container.style.display = location.hash ? 'block' : 'none';
+    
+    const box = document.getElementById('weather-wave-tide-container');
+    box.style.display = location.hash ? 'block' : 'none';
   }
 
-  // 初期化実行
+  // ▼ブラウザバック対応
+  window.addEventListener('hashchange', () => {
+    const hash = location.hash ? location.hash.slice(1) : '';
+    const depth = hash.split('/').length;
+    const prevDepth = hashHistory.length;
+    
+    if (!hash) {
+      // 空になった場合は最後の履歴ではなく初期位置へ
+      initMap(initialLat, initialLng, initialZoom);
+      hashHistory = [{ lat: initialLat, lng: initialLng, zoom: initialZoom }];
+      menuBox.style.display = 'block';
+      document.getElementById('weather-wave-tide-container').style.display = 'none';
+    } else if (depth < prevDepth) {
+      // 戻る場合は直前の履歴を参照
+      const prev = hashHistory[depth-1];
+      if (prev) map.flyTo([prev.lat, prev.lng], prev.zoom, { duration: 0.3, easeLinearity: 0.8 });
+      hashHistory = hashHistory.slice(0, depth);
+    }
+  });
+
+  // 初期化
   checkCSV();
 
   renderWeatherWaveTide(
@@ -524,7 +490,6 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
-
 
 </body>
 </html>
