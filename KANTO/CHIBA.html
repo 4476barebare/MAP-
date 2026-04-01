@@ -329,6 +329,11 @@ const tileLayer = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/
         location.hash = pathHash.map(encodeURIComponent).join('/');
         initMap(targetLat, targetLng, targetZoom);
         menuBox.style.display = 'none';
+        
+        const weather = document.getElementById('weather-wave-tide-container');
+  weather.style.display = 'block';
+        
+        
       };
 
       menu.appendChild(li);
