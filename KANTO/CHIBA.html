@@ -45,6 +45,13 @@ html, body {
 .nav-btn { font-size:12px; color:#007aff; margin-left:8px; }
 
 /* 天気UI */
+
+#weather-wave-tide-container {
+  display: none;
+}
+
+
+
 .weather-container, #weather-wave-tide-container {
   width:100%; display:flex; flex-direction:column;
   color: #191970;
@@ -438,6 +445,11 @@ const tileLayer = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
+    
+    // ▼追加：表示制御
+const box = document.getElementById('weather-wave-tide-container');
+box.style.display = location.hash ? 'block' : 'none';
+    
   }
 
   // 初期化実行
@@ -457,7 +469,16 @@ const tileLayer = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/
     [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
     '大潮'
   );
+  
+  const box = document.getElementById('weather-wave-tide-container');
+box.style.display = location.hash ? 'block' : 'none';
+  
+  
+  
 });
+
+
+
 </script>
 </body>
 </html>
