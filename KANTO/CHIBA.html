@@ -258,8 +258,13 @@ function initMap(lat, lng, zoom) {
     }).addTo(map);
   } else {
     // 既にある場合は移動だけ
-    //map.setView([lat, lng], zoom);
-    map.flyTo([lat, lng], zoom);
+    
+    map.flyTo([lat, lng], zoom, {
+  duration: 0.3,
+  easeLinearity: 0.8
+});
+    
+    
   }
     // tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
 
