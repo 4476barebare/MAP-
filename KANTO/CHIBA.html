@@ -249,22 +249,18 @@ window.addEventListener('DOMContentLoaded', function() {
       });
   }
 
-  function initMap(lat, lng, zoom) {
-    if (map) map.remove();
+function initMap(lat, lng, zoom) {
+  if (!map) {
     map = L.map('lf-map').setView([lat, lng], zoom);
-    map.attributionControl.setPrefix(false);
 
-    //const tileLayer = L.tileLayer('https://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //  maxZoom: 19
-    //}).addTo(map);
-    
-    // 国土地理院（標準地図）
-const tileLayer = L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
-  attribution: '© 国土地理院'
-}).addTo(map);
-    
-    
-
+    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+      attribution: '© 国土地理院'
+    }).addTo(map);
+  } else {
+    // 既にある場合は移動だけ
+    //map.setView([lat, lng], zoom);
+    map.flyTo([lat, lng], zoom);
+  }
     // tileLayer.getContainer().style.filter = "grayscale(100%) brightness(110%) contrast(110%)";
 
     map.on('move', updateDebug);
