@@ -186,7 +186,7 @@ window.addEventListener('DOMContentLoaded', function() {
     zoomEl.textContent = map.getZoom();
   }
 
-  let map; // グローバル変数
+  let map; // ←元のまま（変更なし）
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
@@ -258,25 +258,26 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   function initMap(lat, lng, zoom) {
-    if (!map) {
-      map = L.map('lf-map').setView([lat, lng], zoom);
 
-      L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
-        attribution: '© 国土地理院'
-      }).addTo(map);
-
-      // ★イベント登録は初回のみ
-      map.on('move', updateDebug);
-      map.on('zoom', updateDebug);
-      map.whenReady(updateDebug);
-
-    } else {
-      // ★再初期化せず移動だけ（ここが今回の目的）
+    // ★ここだけ追加（再初期化防止）
+    if (map) {
       map.flyTo([lat, lng], zoom, {
-        duration: 0.25,        // ★少し高速化
+        duration: 0.25,
         easeLinearity: 1.0
       });
+      return;
     }
+
+    // ▼ここから下は元コードそのまま
+    map = L.map('lf-map').setView([lat, lng], zoom);
+
+    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+      attribution: '© 国土地理院'
+    }).addTo(map);
+
+    map.on('move', updateDebug);
+    map.on('zoom', updateDebug);
+    map.whenReady(updateDebug);
   }
 
   const menuBox = document.getElementById('map-menu');
@@ -334,9 +335,8 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         location.hash = pathHash.map(encodeURIComponent).join('/');
-
-        // ★ここはそのままでOK（UI制御は既存維持）
         initMap(targetLat, targetLng, targetZoom);
+
         menuBox.style.display = 'none';
 
         const weather = document.getElementById('weather-wave-tide-container');
@@ -433,8 +433,8 @@ window.addEventListener('DOMContentLoaded', function() {
       ctx.moveTo(points[0].x, canvas.height);
       ctx.lineTo(points[0].x, points[0].y);
       for (let i=1; i<points.length-1; i++) {
-        const p = points[i];
-        ctx.lineTo(p.x, p.y);
+        const cps = points[i];
+        ctx.lineTo(cps.x, cps.y);
       }
       ctx.strokeStyle = '#191970';
       ctx.stroke();
@@ -443,12 +443,10 @@ window.addEventListener('DOMContentLoaded', function() {
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
 
-    // ★既存仕様維持
     const box = document.getElementById('weather-wave-tide-container');
     box.style.display = location.hash ? 'block' : 'none';
   }
 
-  // 初期化
   checkCSV();
 
   renderWeatherWaveTide(
