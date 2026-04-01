@@ -176,7 +176,7 @@ border-radius:6px;
 
 <script>
 window.addEventListener('DOMContentLoaded', function() {
-  // デバッグ表示
+  // デバッグ表示用要素
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
@@ -189,13 +189,19 @@ window.addEventListener('DOMContentLoaded', function() {
     zoomEl.textContent = map.getZoom();
   }
 
-  let map = null; // グローバル変数
-  let initialLat, initialLng, initialZoom, initialMaxZoom, initialMinZoom;
+  let map = null;
+
+  // 初期座標・ズーム値（ブラウザバック用）
+  let initialLat, initialLng, initialZoom;
   let initialHash = location.hash || '';
+
+  // メニュークリック用の現在座標
+  let currentLat, currentLng, currentZoom;
+  let currentHash = location.hash || '';
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
-      .then(response => response.text())
+      .then(r => r.text())
       .then(text => {
         const urlParts = location.pathname.split('/');
         const fileName = urlParts[urlParts.length - 1];
@@ -229,17 +235,11 @@ window.addEventListener('DOMContentLoaded', function() {
           }
 
           if (parent === prefName || (area1 && parent === area1)) {
-            areas.push({
-              areaName: name,
-              areaZoom: zoom,
-              areaLat: lat,
-              areaLng: lng,
-              parent: parent
-            });
+            areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
         }
 
-        // 初期位置を設定
+        // 初期座標設定（ブラウザバック用）
         if (area2) {
           const target = areas.find(a => a.areaName === decodeURIComponent(area2));
           if (target) {
@@ -260,34 +260,29 @@ window.addEventListener('DOMContentLoaded', function() {
           initialZoom = prefZoom;
         }
 
+        // 現在座標も初期値として設定
+        currentLat = initialLat;
+        currentLng = initialLng;
+        currentZoom = initialZoom;
+
         renderMenu(areas);
-        initMap(initialLat, initialLng, initialZoom);
+        initMap(currentLat, currentLng, currentZoom);
       });
   }
 
   function initMap(lat, lng, zoom) {
     if (!map) {
-      map = L.map('lf-map', {
-        center: [lat, lng],
-        zoom: zoom,
-      });
-
+      map = L.map('lf-map', { center:[lat,lng], zoom });
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
         attribution: '© 国土地理院'
       }).addTo(map);
 
-      initialMaxZoom = map.getMaxZoom();
-      initialMinZoom = map.getMinZoom();
+      map.on('move', updateDebug);
+      map.on('zoom', updateDebug);
+      map.whenReady(updateDebug);
     } else {
-      map.flyTo([lat, lng], zoom, {
-        duration: 0.3,
-        easeLinearity: 0.8
-      });
+      map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
-
-    map.on('move', updateDebug);
-    map.on('zoom', updateDebug);
-    map.whenReady(updateDebug);
   }
 
   const menuBox = document.getElementById('map-menu');
@@ -298,7 +293,6 @@ window.addEventListener('DOMContentLoaded', function() {
   function renderMenu(areas) {
     menuBox.style.display = !location.hash ? 'block' : 'none';
     menuBox.style.overflow = 'visible';
-
     const totalPages = Math.ceil(areas.length / maxRows);
     menu.innerHTML = '';
     const start = currentPage * maxRows;
@@ -310,58 +304,33 @@ window.addEventListener('DOMContentLoaded', function() {
       text.textContent = areas[i].areaName;
       li.appendChild(text);
 
-      if (i === end - 1 && currentPage < totalPages - 1) {
+      if (i === end - 1 && currentPage < totalPages-1) {
         const next = document.createElement('span');
         next.textContent = '▶';
         next.className = 'nav-btn';
-        next.onclick = (e) => { e.stopPropagation(); currentPage++; renderMenu(areas); };
+        next.onclick = e => { e.stopPropagation(); currentPage++; renderMenu(areas); };
         li.appendChild(next);
       }
-
       if (i === start && currentPage > 0) {
         const prev = document.createElement('span');
         prev.textContent = '◀';
         prev.className = 'nav-btn';
-        prev.onclick = (e) => { e.stopPropagation(); currentPage--; renderMenu(areas); };
+        prev.onclick = e => { e.stopPropagation(); currentPage--; renderMenu(areas); };
         li.appendChild(prev);
       }
 
       li.onclick = () => {
         let pathHash = [];
-        let targetLat = areas[i].areaLat;
-        let targetLng = areas[i].areaLng;
-        let targetZoom = areas[i].areaZoom;
-        let currentParent = areas[i].areaName;
-        pathHash.push(currentParent);
-
-        while (true) {
-          const child = areas.find(a => a.parent === currentParent);
-          if (!child) break;
-          pathHash.push(child.areaName);
-          targetLat = child.areaLat;
-          targetLng = child.areaLng;
-          targetZoom = child.areaZoom;
-          currentParent = child.areaName;
-        }
-
+        pathHash.push(areas[i].areaName);
         location.hash = pathHash.map(encodeURIComponent).join('/');
 
-        // map再初期化せずにflyToで移動
-        if (map) {
-          map.flyTo([targetLat, targetLng], targetZoom, {
-            duration: 0.3,
-            easeLinearity: 0.8
-          });
-        }
+        // メニュークリック用グローバル更新
+        currentLat = areas[i].areaLat;
+        currentLng = areas[i].areaLng;
+        currentZoom = areas[i].areaZoom;
+        currentHash = location.hash;
 
-        // グローバル初期位置更新
-        initialLat = targetLat;
-        initialLng = targetLng;
-        initialZoom = targetZoom;
-        initialMaxZoom = map.getMaxZoom();
-        initialMinZoom = map.getMinZoom();
-        initialHash = location.hash;
-
+        if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
         menuBox.style.display = 'none';
         document.getElementById('weather-wave-tide-container').style.display = 'block';
       };
@@ -369,7 +338,7 @@ window.addEventListener('DOMContentLoaded', function() {
       menu.appendChild(li);
     }
 
-    menuBox.style.maxHeight = menuBox.scrollHeight + 'px';
+    menuBox.style.maxHeight = menuBox.scrollHeight+'px';
     menu.style.display = 'block';
   }
 
@@ -493,31 +462,22 @@ window.addEventListener('DOMContentLoaded', function() {
     container.style.display = location.hash ? 'block' : 'none';
   }
 
-  // ハッシュチェンジ監視：ブラウザバック対応
+  // ハッシュチェンジ監視（ブラウザバック用）
   window.addEventListener('hashchange', () => {
     const newHash = location.hash;
-    if (!initialHash) return; // 最初のロードは無視
-    // /が減った場合のみ発火
     if ((initialHash.match(/\//g)||[]).length > (newHash.match(/\//g)||[]).length) {
       if (!newHash) {
-        // 空になった場合は初期位置へ
-        if (map) {
-          map.flyTo([initialLat, initialLng], initialZoom, {
-            duration: 0.3,
-            easeLinearity: 0.8
-          });
-        }
+        if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
         menuBox.style.display = 'block';
-        const weather = document.getElementById('weather-wave-tide-container');
-        weather.style.display = 'none';
+        document.getElementById('weather-wave-tide-container').style.display = 'none';
       }
-      initialHash = newHash; // 更新
     }
+    initialHash = newHash;
   });
 
-  // 初期化実行
   checkCSV();
 
+  // サンプル天気データ表示
   renderWeatherWaveTide(
     new Date(),
     {
@@ -532,10 +492,8 @@ window.addEventListener('DOMContentLoaded', function() {
     [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
     '大潮'
   );
-
 });
 </script>
-
 
 </body>
 </html>
