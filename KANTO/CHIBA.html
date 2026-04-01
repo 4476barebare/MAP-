@@ -480,7 +480,9 @@ window.addEventListener('DOMContentLoaded', function() {
 function initBackButton() {
   const backBtn = document.getElementById('map-back-btn');
   backBtn.style.display = location.hash ? 'block' : 'none';
-
+  
+  alert(initialHash);
+  alert(currentHash);
   backBtn.onclick = () => {
   if (!initialHash) return;
   location.hash = initialHash;
