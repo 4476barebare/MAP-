@@ -478,9 +478,25 @@ window.addEventListener('DOMContentLoaded', function() {
 
 function initBackButton() {
   const backBtn = document.getElementById('map-back-btn');
+  // ハッシュがある場合だけ表示
   backBtn.style.display = location.hash ? 'block' : 'none';
-  backBtn.onclick = () => handleBackNavigation();
+
+  backBtn.onclick = () => {
+    // 現在のハッシュを取得
+    const parts = location.hash ? location.hash.slice(1).split('/') : [];
+
+    if (parts.length > 0) {
+      // 最後尾を削除して新しいハッシュに設定
+      parts.pop();
+      location.hash = parts.length ? parts.map(encodeURIComponent).join('/') : '';
+      // ここで hashchange が自動発火するので handleBackNavigation() は呼ばれる
+    }
+  };
 }
+
+
+
+
 
 // ハッシュチェンジ／戻る処理の共通関数
 function handleBackNavigation(customHash) {
