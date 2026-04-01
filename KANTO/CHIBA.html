@@ -135,8 +135,21 @@ html, body {
 
 <div id="lf-map">
   <div id="center-target"></div>
+  <!-- 戻るボタン -->
+  <button id="map-back-btn" style="
+    position:absolute;
+    bottom:50px; /* 著作権表記の上に調整 */
+    right:10px;
+    display:none;
+    z-index:2000;
+    background:#fff;
+    border:1px solid #888;
+    border-radius:4px;
+    padding:4px 6px;
+    font-size:12px;
+    cursor:pointer;
+  ">← 戻る</button>
 </div>
-
 
 <div id="map-menu" class="map-menu"><ul></ul></div>
 <div id="weather-wave-tide-container"></div>
@@ -462,26 +475,23 @@ window.addEventListener('DOMContentLoaded', function() {
     container.style.display = location.hash ? 'block' : 'none';
   }
 
-
-window.addEventListener('hashchange', () => {
-  const newHash = location.hash;
+// ハッシュチェンジ／戻る処理の共通関数
+function handleBackNavigation(customHash) {
+  // 引数があればそちらを、なければ現在の location.hash を使用
+  const newHash = customHash !== undefined ? customHash : location.hash;
   const newParts = newHash ? newHash.slice(1).split('/') : [];
   const oldParts = initialHash ? initialHash.slice(1).split('/') : [];
 
-  alert(`ハッシュチェンジ開始\n前: ${initialHash}\n今: ${newHash}`);
-
+  // 以前のハッシュよりパーツ数が少なければ戻ったと判断
   if (newParts.length < oldParts.length) {
-    // 途中戻った場合
     if (newParts.length === 0) {
-      // 完全に初期位置へ戻す
-      alert(`完全に初期位置に戻ります\n移動先ハッシュ: なし`);
+      // 完全に初期位置へ戻る
       if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
       menuBox.style.display = 'block';
       document.getElementById('weather-wave-tide-container').style.display = 'none';
     } else {
-      // 部分的に戻った場合 → last hash 部分の座標へ移動
-      const last = decodeURIComponent(newParts[newParts.length-1]);
-      alert(`部分的に戻ります\n移動先ハッシュ: ${last}`);
+      // 部分的に戻った場合
+      const last = decodeURIComponent(newParts[newParts.length - 1]);
       const target = areas.find(a => a.areaName === last);
       if (target && map) {
         map.flyTo([target.areaLat, target.areaLng], target.areaZoom, { duration:0.3, easeLinearity:0.8 });
@@ -489,8 +499,15 @@ window.addEventListener('hashchange', () => {
     }
   }
 
+  // 更新されたハッシュを記録
   initialHash = newHash;
+}
+
+// ハッシュチェンジイベントに登録
+window.addEventListener('hashchange', () => {
+  handleBackNavigation();
 });
+
 
   checkCSV();
 
