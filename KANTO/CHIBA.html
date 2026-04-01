@@ -176,14 +176,10 @@ border-radius:6px;
 
 <script>
 window.addEventListener('DOMContentLoaded', function() {
-  // デバッグ表示要素
+  // デバッグ表示
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
-
-  let map = null;
-  let initialLat, initialLng, initialZoom, initialMaxZoom, initialMinZoom;
-  let currentHash = location.hash ? location.hash.slice(1) : '';
 
   function updateDebug() {
     if (!map) return;
@@ -193,47 +189,27 @@ window.addEventListener('DOMContentLoaded', function() {
     zoomEl.textContent = map.getZoom();
   }
 
-  function moveTo(lat, lng, zoom) {
-    if (!map) return;
-    map.flyTo([lat, lng], zoom, { duration: 0.3, easeLinearity: 0.8 });
-    initialLat = lat;
-    initialLng = lng;
-    initialZoom = zoom;
-    updateDebug();
-  }
-
-  function initMap(lat, lng, zoom) {
-    if (!map) {
-      map = L.map('lf-map', { maxZoom: 18, minZoom: 4 }).setView([lat, lng], zoom);
-      L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
-        attribution: '© 国土地理院'
-      }).addTo(map);
-      map.on('move', updateDebug);
-      map.on('zoom', updateDebug);
-      map.whenReady(updateDebug);
-
-      // 初期値保持
-      const center = map.getCenter();
-      initialLat = center.lat;
-      initialLng = center.lng;
-      initialZoom = map.getZoom();
-      initialMaxZoom = map.options.maxZoom;
-      initialMinZoom = map.options.minZoom;
-    } else {
-      moveTo(lat, lng, zoom);
-    }
-  }
+  let map = null; // グローバル変数
+  let initialLat, initialLng, initialZoom, initialMaxZoom, initialMinZoom;
+  let initialHash = location.hash || '';
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
-      .then(res => res.text())
+      .then(response => response.text())
       .then(text => {
-        const fileName = location.pathname.split('/').pop();
+        const urlParts = location.pathname.split('/');
+        const fileName = urlParts[urlParts.length - 1];
         const hash = location.hash ? location.hash.slice(1) : null;
-        currentHash = hash;
 
         const basePref = fileName.replace('.html', '');
-        let prefLat, prefLng, prefZoom;
+        let prefName, prefLat, prefLng, prefZoom;
+        let area1 = null, area2 = null;
+
+        if (hash) {
+          const parts = hash.split('/');
+          area1 = parts[0];
+          if (parts.length === 2) area2 = parts[1];
+        }
 
         const lines = text.trim().split('\n');
         let areas = [];
@@ -246,28 +222,72 @@ window.addEventListener('DOMContentLoaded', function() {
           const parent = cols[5] ? cols[5].trim() : '';
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
+            prefName = name;
+            prefZoom = zoom;
             prefLat = lat;
             prefLng = lng;
-            prefZoom = zoom;
           }
 
-          if (parent === basePref || (hash && parent === decodeURIComponent(hash.split('/')[0]))) {
-            areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent: parent });
+          if (parent === prefName || (area1 && parent === area1)) {
+            areas.push({
+              areaName: name,
+              areaZoom: zoom,
+              areaLat: lat,
+              areaLng: lng,
+              parent: parent
+            });
           }
         }
 
-        // 初期表示
-        if (hash) {
-          const parts = hash.split('/');
-          const target = areas.find(a => a.areaName === decodeURIComponent(parts[parts.length - 1]));
-          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
-          else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
+        // 初期位置を設定
+        if (area2) {
+          const target = areas.find(a => a.areaName === decodeURIComponent(area2));
+          if (target) {
+            initialLat = target.areaLat;
+            initialLng = target.areaLng;
+            initialZoom = target.areaZoom;
+          }
+        } else if (area1) {
+          const target = areas.find(a => a.areaName === decodeURIComponent(area1));
+          if (target) {
+            initialLat = target.areaLat;
+            initialLng = target.areaLng;
+            initialZoom = target.areaZoom;
+          }
         } else if (prefLat && prefLng) {
-          initMap(prefLat, prefLng, prefZoom);
+          initialLat = prefLat;
+          initialLng = prefLng;
+          initialZoom = prefZoom;
         }
 
         renderMenu(areas);
+        initMap(initialLat, initialLng, initialZoom);
       });
+  }
+
+  function initMap(lat, lng, zoom) {
+    if (!map) {
+      map = L.map('lf-map', {
+        center: [lat, lng],
+        zoom: zoom,
+      });
+
+      L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+        attribution: '© 国土地理院'
+      }).addTo(map);
+
+      initialMaxZoom = map.getMaxZoom();
+      initialMinZoom = map.getMinZoom();
+    } else {
+      map.flyTo([lat, lng], zoom, {
+        duration: 0.3,
+        easeLinearity: 0.8
+      });
+    }
+
+    map.on('move', updateDebug);
+    map.on('zoom', updateDebug);
+    map.whenReady(updateDebug);
   }
 
   const menuBox = document.getElementById('map-menu');
@@ -278,9 +298,9 @@ window.addEventListener('DOMContentLoaded', function() {
   function renderMenu(areas) {
     menuBox.style.display = !location.hash ? 'block' : 'none';
     menuBox.style.overflow = 'visible';
-    menu.innerHTML = '';
 
     const totalPages = Math.ceil(areas.length / maxRows);
+    menu.innerHTML = '';
     const start = currentPage * maxRows;
     const end = Math.min(start + maxRows, areas.length);
 
@@ -297,6 +317,7 @@ window.addEventListener('DOMContentLoaded', function() {
         next.onclick = (e) => { e.stopPropagation(); currentPage++; renderMenu(areas); };
         li.appendChild(next);
       }
+
       if (i === start && currentPage > 0) {
         const prev = document.createElement('span');
         prev.textContent = '◀';
@@ -306,49 +327,44 @@ window.addEventListener('DOMContentLoaded', function() {
       }
 
       li.onclick = () => {
-  let pathHash = [];
-  let targetLat = areas[i].areaLat;
-  let targetLng = areas[i].areaLng;
-  let targetZoom = areas[i].areaZoom;
-  let currentParent = areas[i].areaName;
-  pathHash.push(currentParent);
+        let pathHash = [];
+        let targetLat = areas[i].areaLat;
+        let targetLng = areas[i].areaLng;
+        let targetZoom = areas[i].areaZoom;
+        let currentParent = areas[i].areaName;
+        pathHash.push(currentParent);
 
-  while (true) {
-    const child = areas.find(a => a.parent === currentParent);
-    if (!child) break;
-    pathHash.push(child.areaName);
-    targetLat = child.areaLat;
-    targetLng = child.areaLng;
-    targetZoom = child.areaZoom;
-    currentParent = child.areaName;
-  }
+        while (true) {
+          const child = areas.find(a => a.parent === currentParent);
+          if (!child) break;
+          pathHash.push(child.areaName);
+          targetLat = child.areaLat;
+          targetLng = child.areaLng;
+          targetZoom = child.areaZoom;
+          currentParent = child.areaName;
+        }
 
-  // location.hash更新
-  location.hash = pathHash.map(encodeURIComponent).join('/');
+        location.hash = pathHash.map(encodeURIComponent).join('/');
 
-  // mapの再初期化はせずflyToでスムーズに移動
-  if (map) {
-    map.flyTo([targetLat, targetLng], targetZoom, {
-      duration: 0.3,
-      easeLinearity: 0.8
-    });
-  }
+        // map再初期化せずにflyToで移動
+        if (map) {
+          map.flyTo([targetLat, targetLng], targetZoom, {
+            duration: 0.3,
+            easeLinearity: 0.8
+          });
+        }
 
-  // 初期位置やハッシュのグローバル変数を更新
-  initialLat = targetLat;
-  initialLng = targetLng;
-  initialZoom = targetZoom;
-  initialMaxZoom = map.getMaxZoom();
-  initialMinZoom = map.getMinZoom();
-  initialHash = location.hash;
+        // グローバル初期位置更新
+        initialLat = targetLat;
+        initialLng = targetLng;
+        initialZoom = targetZoom;
+        initialMaxZoom = map.getMaxZoom();
+        initialMinZoom = map.getMinZoom();
+        initialHash = location.hash;
 
-  // メニュー非表示
-  menuBox.style.display = 'none';
-
-  // 天気UI表示
-  const weather = document.getElementById('weather-wave-tide-container');
-  weather.style.display = 'block';
-};
+        menuBox.style.display = 'none';
+        document.getElementById('weather-wave-tide-container').style.display = 'block';
+      };
 
       menu.appendChild(li);
     }
@@ -357,7 +373,6 @@ window.addEventListener('DOMContentLoaded', function() {
     menu.style.display = 'block';
   }
 
-  // 天気UI描画関数（元のまま）
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
@@ -474,29 +489,33 @@ window.addEventListener('DOMContentLoaded', function() {
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
-    
+
     container.style.display = location.hash ? 'block' : 'none';
   }
 
-  // ブラウザバック/ハッシュ減少対応
-  window.addEventListener('hashchange', function() {
-    const newHash = location.hash ? location.hash.slice(1) : '';
-    const currentDepth = currentHash.split('/').length;
-    const newDepth = newHash ? newHash.split('/').length : 0;
-
-    if (newDepth < currentDepth) {
-      if (newDepth === 0) {
-        moveTo(initialLat, initialLng, initialZoom);
+  // ハッシュチェンジ監視：ブラウザバック対応
+  window.addEventListener('hashchange', () => {
+    const newHash = location.hash;
+    if (!initialHash) return; // 最初のロードは無視
+    // /が減った場合のみ発火
+    if ((initialHash.match(/\//g)||[]).length > (newHash.match(/\//g)||[]).length) {
+      if (!newHash) {
+        // 空になった場合は初期位置へ
+        if (map) {
+          map.flyTo([initialLat, initialLng], initialZoom, {
+            duration: 0.3,
+            easeLinearity: 0.8
+          });
+        }
         menuBox.style.display = 'block';
-        document.getElementById('weather-wave-tide-container').style.display = 'none';
+        const weather = document.getElementById('weather-wave-tide-container');
+        weather.style.display = 'none';
       }
-      // 中間ハッシュ対応は必要に応じて追加可能
+      initialHash = newHash; // 更新
     }
-
-    currentHash = newHash;
   });
 
-  // 初期化
+  // 初期化実行
   checkCSV();
 
   renderWeatherWaveTide(
@@ -513,7 +532,10 @@ window.addEventListener('DOMContentLoaded', function() {
     [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
     '大潮'
   );
+
 });
 </script>
+
+
 </body>
 </html>
