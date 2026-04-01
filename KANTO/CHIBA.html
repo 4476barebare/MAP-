@@ -346,6 +346,7 @@ window.addEventListener('DOMContentLoaded', function() {
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
         menuBox.style.display = 'none';
         document.getElementById('weather-wave-tide-container').style.display = 'block';
+        document.getElementById('map-back-btn').style.display = 'block';
       };
 
       menu.appendChild(li);
@@ -474,6 +475,12 @@ window.addEventListener('DOMContentLoaded', function() {
 
     container.style.display = location.hash ? 'block' : 'none';
   }
+
+function initBackButton() {
+  const backBtn = document.getElementById('map-back-btn');
+  backBtn.style.display = location.hash ? 'block' : 'none';
+  backBtn.onclick = () => handleBackNavigation();
+}
 
 // ハッシュチェンジ／戻る処理の共通関数
 function handleBackNavigation(customHash) {
