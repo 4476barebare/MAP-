@@ -74,6 +74,7 @@ html, body {
 .weather-row {
     display:flex;
     justify-content:space-between;
+    padding-bottom: -1px;
     }
 
 .weather-block {
@@ -85,7 +86,9 @@ html, body {
   margin-right:1px;
 }
 
-.weather-block.first-block { flex:0 0 30px; font-weight:bold; }
+.weather-block.first-block {
+    flex:0 0 30px;
+}
 
 /* 潮名縦書き */
 .tide-label {
@@ -96,20 +99,12 @@ html, body {
   justify-content:center;
 }
 
-/* 色 */
-.time-block{background:#e0e0e0;}
-.icon-block{background:#ffffe0;}
-.temp-block{background:#ffcccc;}
-.precip-block{background:#cce0ff;}
-.wind-block{background:#ccffcc;}
-.winddir-block{background:#f0ccff;}
-.wave-block{background:#ffebcc;}
-
 .weather-header {
   display:flex;
   justify-content:space-between;
   font-size:10px;
   padding-left:2px
+  margin-bottom: -2px;
 }
 </style>
 </head>
