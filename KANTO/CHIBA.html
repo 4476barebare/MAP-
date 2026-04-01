@@ -29,16 +29,13 @@ html, body {
 #center-target::after{top:50%;left:0;width:100%;height:2px;transform:translateY(-50%);}
 
 
-#ui-wrapper {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
+
+
 
 /* メニュー */
 .map-menu {
-  position:absolute; bottom:0px; left:5px; right:5px;
+  position: static;
+  bottom:0px; left:5px; right:5px;
   background:#fff; border:1px solid #191970; border-radius:8px;
   box-shadow:0 2px 6px rgba(0,0,0,0.2); padding:4px 8px; z-index:1980;
   overflow:hidden; transition:max-height 0.25s ease;
@@ -55,7 +52,6 @@ html, body {
 /* 天気UI */
 
 #weather-wave-tide-container {
-    position: absolute;
   display: none;
 }
 
@@ -132,10 +128,9 @@ html, body {
   <div id="center-target"></div>
 </div>
 
-<div id="ui-wrapper">
-  <div id="map-menu" class="map-menu"><ul></ul></div>
-  <div id="weather-wave-tide-container"></div>
-</div>
+
+<div id="map-menu" class="map-menu"><ul></ul></div>
+<div id="weather-wave-tide-container"></div>
 
 
 
