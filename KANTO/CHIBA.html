@@ -482,8 +482,9 @@ function initBackButton() {
   backBtn.style.display = location.hash ? 'block' : 'none';
 
   backBtn.onclick = () => {
-    handleBackNavigation(initialHash);
-  };
+  if (!initialHash) return;
+  location.hash = initialHash;
+};
 }
 
 
