@@ -1,4 +1,4 @@
-の<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -75,6 +75,7 @@ html, body {
   font-family:monospace;
   font-size:10px;
   text-align:center;
+  margin-top:0px;
   margin-bottom: -3px;
 }
 
@@ -131,6 +132,7 @@ html, body {
 </header>
 
 
+
 <div id="lf-map">
   <div id="center-target"></div>
 </div>
@@ -180,13 +182,15 @@ window.addEventListener('DOMContentLoaded', function() {
   const zoomEl = document.getElementById('zoom');
 
   function updateDebug() {
+    if (!map) return;
     const center = map.getCenter();
     latEl.textContent = center.lat.toFixed(5);
     lngEl.textContent = center.lng.toFixed(5);
     zoomEl.textContent = map.getZoom();
   }
 
-  let map; // ←元のまま（変更なし）
+  let map = null; // グローバル変数
+  let areas = [];  // CSVデータを保持
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
@@ -197,19 +201,10 @@ window.addEventListener('DOMContentLoaded', function() {
         const hash = location.hash ? location.hash.slice(1) : null;
 
         const basePref = fileName.replace('.html', '');
-        let prefCode = basePref.toUpperCase();
-        let area1 = null;
-        let area2 = null;
-
-        if (hash) {
-          const parts = hash.split('/');
-          area1 = parts[0];
-          if (parts.length === 2) area2 = parts[1];
-        }
+        let prefLat, prefLng, prefZoom, prefName;
 
         const lines = text.trim().split('\n');
-        let areas = [];
-        let prefLat, prefLng, prefZoom, prefName;
+        areas = [];
 
         for (let i = 1; i < lines.length; i++) {
           const cols = lines[i].split(',');
@@ -226,7 +221,7 @@ window.addEventListener('DOMContentLoaded', function() {
             prefLng = lng;
           }
 
-          if (parent === prefName || (area1 && parent === area1)) {
+          if (parent === prefName || (hash && parent === decodeURIComponent(hash.split('/')[0]))) {
             areas.push({
               areaName: name,
               areaZoom: zoom,
@@ -237,47 +232,31 @@ window.addEventListener('DOMContentLoaded', function() {
           }
         }
 
-        if (area2) {
-          const target = areas.find(a => a.areaName === decodeURIComponent(area2));
-          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
-          else if (area1) {
-            const target1 = areas.find(a => a.areaName === decodeURIComponent(area1));
-            if (target1) initMap(target1.areaLat, target1.areaLng, target1.areaZoom);
-            else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
-          }
-        } else if (area1) {
-          const target = areas.find(a => a.areaName === decodeURIComponent(area1));
-          if (target) initMap(target.areaLat, target.areaLng, target.areaZoom);
-          else if (prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
-        } else if (prefLat && prefLng) {
-          initMap(prefLat, prefLng, prefZoom);
-        }
+        // 初期ロード時の地図表示
+        if (!hash && prefLat && prefLng) initMap(prefLat, prefLng, prefZoom);
 
         renderMenu(areas);
       });
   }
 
   function initMap(lat, lng, zoom) {
+    if (!map) {
+      map = L.map('lf-map').setView([lat, lng], zoom);
 
-    // ★ここだけ追加（再初期化防止）
-    if (map) {
+      L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+        attribution: '© 国土地理院'
+      }).addTo(map);
+
+      map.on('move', updateDebug);
+      map.on('zoom', updateDebug);
+      map.whenReady(updateDebug);
+    } else {
+      // 既存マップは再初期化せずに移動だけ
       map.flyTo([lat, lng], zoom, {
-        duration: 0.25,
-        easeLinearity: 1.0
+        duration: 0.3,
+        easeLinearity: 0.8
       });
-      return;
     }
-
-    // ▼ここから下は元コードそのまま
-    map = L.map('lf-map').setView([lat, lng], zoom);
-
-    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
-      attribution: '© 国土地理院'
-    }).addTo(map);
-
-    map.on('move', updateDebug);
-    map.on('zoom', updateDebug);
-    map.whenReady(updateDebug);
   }
 
   const menuBox = document.getElementById('map-menu');
@@ -335,10 +314,11 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         location.hash = pathHash.map(encodeURIComponent).join('/');
-        initMap(targetLat, targetLng, targetZoom);
-
+        // 初期化せずに移動だけ
+        map.flyTo([targetLat, targetLng], targetZoom, {duration:0.3, easeLinearity:0.8});
         menuBox.style.display = 'none';
 
+        // 天気UI表示
         const weather = document.getElementById('weather-wave-tide-container');
         weather.style.display = 'block';
       };
@@ -416,7 +396,6 @@ window.addEventListener('DOMContentLoaded', function() {
     container.appendChild(tideRow);
 
     const ctx = canvas.getContext('2d');
-
     function draw(data) {
       const rect = canvas.getBoundingClientRect();
       canvas.width = rect.width;
@@ -429,24 +408,50 @@ window.addEventListener('DOMContentLoaded', function() {
         return {x, y};
       });
 
+      function getControlPoints(p0,p1,p2,t=0.3) {
+        const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+        const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+        const fa = t * d01/(d01+d12);
+        const fb = t - fa;
+        return [
+          {x: p1.x - fa*(p2.x-p0.x), y: p1.y - fa*(p2.y-p0.y)},
+          {x: p1.x + fb*(p2.x-p0.x), y: p1.y + fb*(p2.y-p0.y)}
+        ];
+      }
+
       ctx.beginPath();
       ctx.moveTo(points[0].x, canvas.height);
       ctx.lineTo(points[0].x, points[0].y);
       for (let i=1; i<points.length-1; i++) {
-        const cps = points[i];
-        ctx.lineTo(cps.x, cps.y);
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
+      ctx.lineTo(points[points.length-1].x, canvas.height);
+      ctx.closePath();
+      ctx.fillStyle = '#191970';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i=1; i<points.length-1; i++) {
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
       }
       ctx.strokeStyle = '#191970';
+      ctx.lineWidth = 1;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
       ctx.stroke();
     }
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
 
-    const box = document.getElementById('weather-wave-tide-container');
-    box.style.display = location.hash ? 'block' : 'none';
+    // 初期表示制御
+    container.style.display = location.hash ? 'block' : 'none';
   }
 
+  // 初期化実行
   checkCSV();
 
   renderWeatherWaveTide(
@@ -463,10 +468,6 @@ window.addEventListener('DOMContentLoaded', function() {
     [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
     '大潮'
   );
-
-  const box = document.getElementById('weather-wave-tide-container');
-  box.style.display = location.hash ? 'block' : 'none';
-
 });
 </script>
 
