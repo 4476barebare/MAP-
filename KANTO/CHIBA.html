@@ -476,25 +476,28 @@ window.addEventListener('DOMContentLoaded', function() {
     container.style.display = location.hash ? 'block' : 'none';
   }
 
+
 function initBackButton() {
   const backBtn = document.getElementById('map-back-btn');
-  // ハッシュがある場合だけ表示
   backBtn.style.display = location.hash ? 'block' : 'none';
 
   backBtn.onclick = () => {
-    // 現在のハッシュを取得
-    const parts = location.hash ? location.hash.slice(1).split('/') : [];
+    if (!currentHash) return;
 
+    const parts = currentHash.slice(1).split('/');
     if (parts.length > 0) {
-      // 最後尾を削除して新しいハッシュに設定
       parts.pop();
-      location.hash = parts.length ? parts.map(encodeURIComponent).join('/') : '';
-      // ここで hashchange が自動発火するので handleBackNavigation() は呼ばれる
+      const newHash = parts.length ? '#' + parts.map(encodeURIComponent).join('/') : '';
+      currentHash = newHash;
+
+      // 明示的にハッシュ処理を呼ぶ場合
+      handleBackNavigation(newHash);
+
+      // もし hashchange イベントに依存するなら location.hash も更新
+      location.hash = newHash;
     }
   };
 }
-
-
 
 
 
