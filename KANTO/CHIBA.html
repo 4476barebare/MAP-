@@ -200,6 +200,7 @@ border-radius:6px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
   // デバッグ表示用要素
@@ -225,9 +226,9 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
-  // スポットデータ
+  // CSV データ
   let spots = [];
-  let spotLayer = null;
+  let iconLayer = null;
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
@@ -257,7 +258,7 @@ window.addEventListener('DOMContentLoaded', function() {
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
           const restricted = cols[7];
-          const icon = cols[8];
+          const iconFile = cols[8] ? cols[8].trim() : '';
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -270,14 +271,15 @@ window.addEventListener('DOMContentLoaded', function() {
             areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
 
-          if (icon) {
+          // スポットアイコン用
+          if (iconFile) {
             spots.push({
               name,
               lat,
               lng,
               parent,
-              restricted: parseFloat(restricted) || 1500,
-              icon
+              restricted: restricted ? parseFloat(restricted) : 1500,
+              icon: iconFile
             });
           }
         }
@@ -303,7 +305,6 @@ window.addEventListener('DOMContentLoaded', function() {
           initialZoom = prefZoom;
         }
 
-        // 現在座標も初期値として設定
         currentLat = initialLat;
         currentLng = initialLng;
         currentZoom = initialZoom;
@@ -329,14 +330,15 @@ window.addEventListener('DOMContentLoaded', function() {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
 
-    drawFishingIcons();
+    // アイコン描画
+    drawSpotIcons();
   }
 
-  function drawFishingIcons() {
+  function drawSpotIcons() {
     if (!map) return;
 
-    if (!spotLayer) spotLayer = L.layerGroup().addTo(map);
-    spotLayer.clearLayers();
+    if (!iconLayer) iconLayer = L.layerGroup().addTo(map);
+    iconLayer.clearLayers();
 
     if (!location.hash) return;
 
@@ -347,29 +349,20 @@ window.addEventListener('DOMContentLoaded', function() {
       if (s.parent !== current) return;
 
       const html = `
-        <div style="
-          display:flex;
-          align-items:center;
-          color:#191970;
-          font-size:16px;
-          font-family:sans-serif;
-          text-shadow:1px 1px 2px rgba(0,0,0,0.5);
-          white-space:nowrap;
-        ">
-          <img src="/MAP-/icon/${s.icon}" style="width:1em;height:1em;margin-right:2px;">
-          <span>${s.name}</span>
+        <div style="white-space:nowrap; display:flex; align-items:center; color:#191970; text-shadow:1px 1px 2px #000;">
+          <img src="/MAP-/icon/${s.icon}" style="width:1em; height:1em; vertical-align:middle;">
+          <span style="margin-left:2px;">${s.name}</span>
           <span style="margin-left:2px;">▼</span>
         </div>
       `;
 
-      const icon = L.divIcon({
-        className:'',
-        html: html,
-        iconAnchor:[0,0],
-        popupAnchor:[0,-10]
-      });
-
-      L.marker([s.lat, s.lng], { icon }).addTo(spotLayer);
+      const marker = L.marker([s.lat, s.lng], {
+        icon: L.divIcon({
+          className: '',
+          html: html,
+          iconAnchor: [10, 20] // ▼が座標中心
+        })
+      }).addTo(iconLayer);
     });
   }
 
@@ -426,7 +419,7 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
 
-        drawFishingIcons();
+        drawSpotIcons();
       };
 
       menu.appendChild(li);
@@ -582,7 +575,7 @@ window.addEventListener('DOMContentLoaded', function() {
     initialHash = newHash;
     currentHash = newHash;
 
-    drawFishingIcons();
+    drawSpotIcons();
   }
 
   window.addEventListener('hashchange', () => {
@@ -591,6 +584,29 @@ window.addEventListener('DOMContentLoaded', function() {
 
   checkCSV();
   
+  // デバッグ用コンソール
+  const box = document.createElement('div');
+  box.style.position = 'fixed';
+  box.style.bottom = '10px';
+  box.style.right = '10px';
+  box.style.background = 'rgba(0,0,0,0.7)';
+  box.style.color = '#fff';
+  box.style.padding = '10px';
+  box.style.zIndex = 9999;
+  box.style.fontSize = '12px';
+  box.innerHTML = `
+    半径:
+    <input id="radiusInput" type="number" value="500" style="width:60px;">
+    <button id="applyRadius">適用</button>
+  `;
+  document.body.appendChild(box);
+  document.getElementById('applyRadius').onclick = () => {
+    const val = parseFloat(document.getElementById('radiusInput').value);
+    if (isNaN(val)) return;
+    spots.forEach(s => { s.restricted = val; });
+    drawSpotIcons();
+  };
+
   renderWeatherWaveTide(
     new Date(),
     {
@@ -607,6 +623,7 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
+
 
 
 </body>
