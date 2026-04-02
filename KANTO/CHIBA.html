@@ -284,6 +284,10 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   function initMap(lat, lng, zoom) {
+      
+      initialHash = location.hash
+      
+      
     if (!map) {
       map = L.map('lf-map', { center:[lat,lng], zoom });
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
@@ -333,14 +337,22 @@ window.addEventListener('DOMContentLoaded', function() {
       }
 
       li.onclick = () => {
+          
+          
+        newHash　=  currentHash;
+                  
         let pathHash = [];
+        
         pathHash.push(areas[i].areaName);
         location.hash = pathHash.map(encodeURIComponent).join('/');
-
+        
         // メニュークリック用グローバル更新
         currentLat = areas[i].areaLat;
         currentLng = areas[i].areaLng;
         currentZoom = areas[i].areaZoom;
+        
+        initialHash = newHash;
+        
         currentHash = location.hash;
 
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
@@ -484,7 +496,6 @@ function initBackButton() {
   alert(initialHash);
   alert(currentHash);
   backBtn.onclick = () => {
-  if (!initialHash) return;
   location.hash = initialHash;
 };
 }
