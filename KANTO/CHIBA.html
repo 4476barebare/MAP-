@@ -506,16 +506,14 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 function initBackButton(newHash) {
+  const backBtn = document.getElementById('map-back-btn');
+  backBtn.style.display = location.hash ? 'block' : 'none';
+  
   backBtn.onclick = () => {
   //   alert(newHash);
   //    alert(currentHash);
       location.hash = newHash;
 };
-
-
- const backBtn = document.getElementById('map-back-btn');
-  backBtn.style.display = location.hash ? 'block' : 'none';
-
 }
 
 
