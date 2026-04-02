@@ -256,8 +256,8 @@ window.addEventListener('DOMContentLoaded', function() {
           const lat = parseFloat(cols[3]);
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
-          const restricted = cols[7] ? parseFloat(cols[7]) : 0;
-          const iconFile = cols[8] ? cols[8].trim() : '';
+          const restricted = cols[7];
+          const icon = cols[8];
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -270,18 +270,19 @@ window.addEventListener('DOMContentLoaded', function() {
             areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
 
-          if (iconFile) {
+          if (icon) {
             spots.push({
               name,
               lat,
               lng,
               parent,
-              restricted,
-              icon: '/MAP-/icon/' + iconFile
+              restricted: parseFloat(restricted) || 1500,
+              icon
             });
           }
         }
 
+        // 初期座標設定
         if (area2) {
           const target = areas.find(a => a.areaName === decodeURIComponent(area2));
           if (target) {
@@ -302,6 +303,7 @@ window.addEventListener('DOMContentLoaded', function() {
           initialZoom = prefZoom;
         }
 
+        // 現在座標も初期値として設定
         currentLat = initialLat;
         currentLng = initialLng;
         currentZoom = initialZoom;
@@ -327,10 +329,10 @@ window.addEventListener('DOMContentLoaded', function() {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
 
-    drawFishingSpots();
+    drawFishingIcons();
   }
 
-  function drawFishingSpots() {
+  function drawFishingIcons() {
     if (!map) return;
 
     if (!spotLayer) spotLayer = L.layerGroup().addTo(map);
@@ -344,27 +346,30 @@ window.addEventListener('DOMContentLoaded', function() {
     spots.forEach(s => {
       if (s.parent !== current) return;
 
-      const iconHtml = `
-        <div style="white-space:nowrap; display:flex; flex-direction:column; align-items:center; font-size:14px; color:#191970; text-shadow:1px 1px 2px #000;">
-          <img src="${s.icon}" width="24" height="24" style="display:block;"/>
-          <div>${s.name}</div>
-          <div style="cursor:pointer;">▼</div>
+      const html = `
+        <div style="
+          display:flex;
+          align-items:center;
+          color:#191970;
+          font-size:16px;
+          font-family:sans-serif;
+          text-shadow:1px 1px 2px rgba(0,0,0,0.5);
+          white-space:nowrap;
+        ">
+          <img src="/MAP-/icon/${s.icon}" style="width:1em;height:1em;margin-right:2px;">
+          <span>${s.name}</span>
+          <span style="margin-left:2px;">▼</span>
         </div>
       `;
-      const divIcon = L.divIcon({
+
+      const icon = L.divIcon({
         className:'',
-        html: iconHtml,
-        iconSize:[30,60],
-        iconAnchor:[15,0]
+        html: html,
+        iconAnchor:[0,0],
+        popupAnchor:[0,-10]
       });
 
-      const marker = L.marker([s.lat, s.lng], { icon: divIcon }).addTo(spotLayer);
-
-      marker.on('click', () => {
-        if (s.restricted && !isNaN(s.restricted)) {
-          map.setView([s.lat, s.lng], map.getZoom(), { animate:true });
-        }
-      });
+      L.marker([s.lat, s.lng], { icon }).addTo(spotLayer);
     });
   }
 
@@ -421,7 +426,7 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
 
-        drawFishingSpots();
+        drawFishingIcons();
       };
 
       menu.appendChild(li);
@@ -547,6 +552,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
+
     container.style.display = location.hash ? 'block' : 'none';
   }
 
@@ -576,7 +582,7 @@ window.addEventListener('DOMContentLoaded', function() {
     initialHash = newHash;
     currentHash = newHash;
 
-    drawFishingSpots();
+    drawFishingIcons();
   }
 
   window.addEventListener('hashchange', () => {
@@ -584,7 +590,7 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 
   checkCSV();
-
+  
   renderWeatherWaveTide(
     new Date(),
     {
