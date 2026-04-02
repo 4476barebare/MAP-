@@ -365,13 +365,18 @@ window.addEventListener('DOMContentLoaded', function() {
         styleObj[k.trim()] = isNaN(v) ? v.trim() : parseFloat(v);
       });
 
-      const circle = L.circle([s.lat, s.lng], styleObj).addTo(circleLayer);
+      //const circle = L.circle([s.lat, s.lng], styleObj).addTo(circleLayer);
+      const radius = s._debugRadius || parseFloat(styleObj.radius) || 1000;
 
-      circle.on('click', () => {
-        if (s.circleZoom) {
-          map.flyTo([s.lat, s.lng], s.circleZoom, { duration:0.3, easeLinearity:0.8 });
-        }
-      });
+const circle = L.circle([s.lat, s.lng], {
+  ...styleObj,
+  radius: radius
+}).addTo(circleLayer);
+      //circle.on('click', () => {
+      //  if (s.circleZoom) {
+      //    map.flyTo([s.lat, s.lng], s.circleZoom, { duration:0.3, easeLinearity:0.8 });
+      //  }
+      //});
     });
   }
 
@@ -599,6 +604,42 @@ window.addEventListener('DOMContentLoaded', function() {
   });
 
   checkCSV();
+  
+  initCircleDebugConsole();
+  
+  function initCircleDebugConsole() {
+
+  const box = document.createElement('div');
+  box.style.position = 'fixed';
+  box.style.bottom = '10px';
+  box.style.right = '10px';
+  box.style.background = 'rgba(0,0,0,0.7)';
+  box.style.color = '#fff';
+  box.style.padding = '10px';
+  box.style.zIndex = 9999;
+  box.style.fontSize = '12px';
+
+  box.innerHTML = `
+    半径:
+    <input id="radiusInput" type="number" value="500" style="width:60px;">
+    <button id="applyRadius">適用</button>
+  `;
+
+  document.body.appendChild(box);
+
+  document.getElementById('applyRadius').onclick = () => {
+    const val = parseFloat(document.getElementById('radiusInput').value);
+    if (isNaN(val)) return;
+
+    // ★全スポットに一時反映
+    spots.forEach(s => {
+      s._debugRadius = val;
+    });
+
+    drawFishingCircles();
+  };
+}
+  
 
   renderWeatherWaveTide(
     new Date(),
