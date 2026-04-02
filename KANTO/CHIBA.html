@@ -78,7 +78,7 @@ li {
   display:flex;
   justify-content:space-between;
   font-size:10px;
-  padding-left:2px
+  padding-left:2px;
   padding-bottom: 0px;
   margin-bottom: -2px;
 }
@@ -226,6 +226,10 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
+  // ★追加：円用データ
+  let spots = [];
+  let circleLayer = null;
+
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
       .then(r => r.text())
@@ -254,6 +258,9 @@ window.addEventListener('DOMContentLoaded', function() {
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
 
+          const style  = cols[6];
+          const circle = cols[7];
+
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
             prefZoom = zoom;
@@ -263,6 +270,18 @@ window.addEventListener('DOMContentLoaded', function() {
 
           if (parent === prefName || (area1 && parent === area1)) {
             areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
+          }
+
+          // ★追加：円対象
+          if (style) {
+            spots.push({
+              name,
+              lat,
+              lng,
+              parent,
+              style,
+              circleZoom: parseFloat(circle)
+            });
           }
         }
 
@@ -292,7 +311,6 @@ window.addEventListener('DOMContentLoaded', function() {
         currentLng = initialLng;
         currentZoom = initialZoom;
         
-         
         renderMenu(areas);
         initMap(currentLat, currentLng, currentZoom);
       });
@@ -315,6 +333,46 @@ window.addEventListener('DOMContentLoaded', function() {
     } else {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
+
+    // ★追加：円描画
+    drawFishingCircles();
+  }
+
+  // ★追加：円描画関数
+  function drawFishingCircles() {
+
+    if (!map) return;
+
+    if (!circleLayer) {
+      circleLayer = L.layerGroup().addTo(map);
+    }
+
+    circleLayer.clearLayers();
+
+    if (!location.hash) return;
+
+    const parts = location.hash.slice(1).split('/');
+    const current = decodeURIComponent(parts[parts.length - 1]);
+
+    spots.forEach(s => {
+
+      if (s.parent !== current) return;
+
+      const styleObj = {};
+      s.style.split(';').forEach(pair => {
+        const [k,v] = pair.split(':');
+        if (!k || !v) return;
+        styleObj[k.trim()] = isNaN(v) ? v.trim() : parseFloat(v);
+      });
+
+      const circle = L.circle([s.lat, s.lng], styleObj).addTo(circleLayer);
+
+      circle.on('click', () => {
+        if (s.circleZoom) {
+          map.flyTo([s.lat, s.lng], s.circleZoom, { duration:0.3, easeLinearity:0.8 });
+        }
+      });
+    });
   }
 
   const menuBox = document.getElementById('map-menu');
@@ -353,28 +411,30 @@ window.addEventListener('DOMContentLoaded', function() {
 
       li.onclick = () => {
           
-          
-        newHash = currentHash;
-                  
+        let newHash = currentHash;
         let pathHash = [];
         
         pathHash.push(areas[i].areaName);
         location.hash = pathHash.map(encodeURIComponent).join('/');
         
-        // メニュークリック用グローバル更新
         currentLat = areas[i].areaLat;
         currentLng = areas[i].areaLng;
         currentZoom = areas[i].areaZoom;
         
         initialHash = newHash;
-        
         currentHash = location.hash;
 
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
+
         menuBox.style.display = 'none';
+
         initBackButton(newHash);
+
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
+
+        // ★追加
+        drawFishingCircles();
       };
 
       menu.appendChild(li);
@@ -504,61 +564,42 @@ window.addEventListener('DOMContentLoaded', function() {
     container.style.display = location.hash ? 'block' : 'none';
   }
 
-
-function initBackButton(newHash) {
-  const backBtn = document.getElementById('map-back-btn');
-  backBtn.style.display = location.hash ? 'block' : 'none';
-  
-  backBtn.onclick = () => {
-  //   alert(newHash);
-  //    alert(currentHash);
+  function initBackButton(newHash) {
+    const backBtn = document.getElementById('map-back-btn');
+    backBtn.style.display = location.hash ? 'block' : 'none';
+    
+    backBtn.onclick = () => {
       location.hash = newHash;
-};
-
-}
-
-
-
-// ハッシュチェンジ／戻る処理の共通関数
-function handleBackNavigation(customHash) {
-  // 引数があればそちらを、なければ現在の location.hash を使用
-  const newHash = customHash !== undefined ? customHash : location.hash;
-  const newParts = newHash ? newHash.slice(1).split('/') : [];
-  const oldParts = initialHash ? initialHash.slice(1).split('/') : [];
-
-  // 以前のハッシュよりパーツ数が少なければ戻ったと判断
-  if (newParts.length < oldParts.length) {
-    if (newParts.length === 0) {
-      // 完全に初期位置へ戻る
-      if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
-      menuBox.style.display = 'block';
-      document.getElementById('weather-wave-tide-container').style.display = 'none';
-      document.getElementById('map-back-btn').style.display = 'none';
-    } else {
-      // 部分的に戻った場合
-      const last = decodeURIComponent(newParts[newParts.length - 1]);
-      const target = areas.find(a => a.areaName === last);
-      if (target && map) {
-        map.flyTo([target.areaLat, target.areaLng], target.areaZoom, { duration:0.3, easeLinearity:0.8 });
-      }
-    }
+    };
   }
 
+  function handleBackNavigation(customHash) {
+    const newHash = customHash !== undefined ? customHash : location.hash;
+    const newParts = newHash ? newHash.slice(1).split('/') : [];
+    const oldParts = initialHash ? initialHash.slice(1).split('/') : [];
+
+    if (newParts.length < oldParts.length) {
+      if (newParts.length === 0) {
+        if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
+        menuBox.style.display = 'block';
+        document.getElementById('weather-wave-tide-container').style.display = 'none';
+        document.getElementById('map-back-btn').style.display = 'none';
+      }
+    }
+
     initialHash = newHash;
-  currentHash = newHash;
+    currentHash = newHash;
 
-}
+    // ★追加
+    drawFishingCircles();
+  }
 
-// ハッシュチェンジイベントに登録
-window.addEventListener('hashchange', () => {
-  handleBackNavigation();
-});
-
+  window.addEventListener('hashchange', () => {
+    handleBackNavigation();
+  });
 
   checkCSV();
- 
 
-  // サンプル天気データ表示
   renderWeatherWaveTide(
     new Date(),
     {
