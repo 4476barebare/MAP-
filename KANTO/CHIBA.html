@@ -495,10 +495,10 @@ function initBackButton() {
   const backBtn = document.getElementById('map-back-btn');
   backBtn.style.display = location.hash ? 'block' : 'none';
   
-  alert(initialHash);
-  alert(currentHash);
   backBtn.onclick = () => {
-  location.hash = initialHash;
+      alert(initialHash);
+      alert(currentHash);
+      location.hash = initialHash;
 };
 }
 
