@@ -225,7 +225,7 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
-  // ★追加：スポットデータ
+  // スポットデータ
   let spots = [];
   let spotLayer = null;
 
@@ -256,8 +256,8 @@ window.addEventListener('DOMContentLoaded', function() {
           const lat = parseFloat(cols[3]);
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
-          const restricted = cols[7] ? parseFloat(cols[7].trim()) : null;
-          const icon = cols[8] ? cols[8].trim() : null;
+          const restricted = cols[7] ? parseFloat(cols[7]) : 0;
+          const iconFile = cols[8] ? cols[8].trim() : '';
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -270,13 +270,18 @@ window.addEventListener('DOMContentLoaded', function() {
             areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
 
-          // スポット情報を保持
-          if (icon) {
-            spots.push({ name, lat, lng, parent, restricted, icon });
+          if (iconFile) {
+            spots.push({
+              name,
+              lat,
+              lng,
+              parent,
+              restricted,
+              icon: '/MAP-/icon/' + iconFile
+            });
           }
         }
 
-        // 初期座標設定（ブラウザバック用）
         if (area2) {
           const target = areas.find(a => a.areaName === decodeURIComponent(area2));
           if (target) {
@@ -322,16 +327,13 @@ window.addEventListener('DOMContentLoaded', function() {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
 
-    drawSpots();
+    drawFishingSpots();
   }
 
-  // ★スポット描画
-  function drawSpots() {
+  function drawFishingSpots() {
     if (!map) return;
 
-    if (!spotLayer) {
-      spotLayer = L.layerGroup().addTo(map);
-    }
+    if (!spotLayer) spotLayer = L.layerGroup().addTo(map);
     spotLayer.clearLayers();
 
     if (!location.hash) return;
@@ -342,35 +344,27 @@ window.addEventListener('DOMContentLoaded', function() {
     spots.forEach(s => {
       if (s.parent !== current) return;
 
-      // アイコン作成
-      const iconObj = L.divIcon({
-        className: '',
-        html: `
-          <div style="
-            display:flex; flex-direction:column; align-items:center; text-align:center;
-            color:#191970; filter: drop-shadow(1px 1px 1px #000);
-            font-size:12px;
-          ">
-            <img src="/MAP-/icon/${s.icon}" width="24" height="24" style="display:block;">
-            <div>${s.name}</div>
-            <a href="#" style="font-size:10px; color:#007aff; text-decoration:none;">アンカー</a>
-          </div>
-        `,
-        iconSize: [24, 40],
-        iconAnchor: [12, 12],
+      const iconHtml = `
+        <div style="white-space:nowrap; display:flex; flex-direction:column; align-items:center; font-size:14px; color:#191970; text-shadow:1px 1px 2px #000;">
+          <img src="${s.icon}" width="24" height="24" style="display:block;"/>
+          <div>${s.name}</div>
+          <div style="cursor:pointer;">▼</div>
+        </div>
+      `;
+      const divIcon = L.divIcon({
+        className:'',
+        html: iconHtml,
+        iconSize:[30,60],
+        iconAnchor:[15,0]
       });
 
-      const marker = L.marker([s.lat, s.lng], { icon: iconObj }).addTo(spotLayer);
+      const marker = L.marker([s.lat, s.lng], { icon: divIcon }).addTo(spotLayer);
 
-      // 制限距離を円で表示
-      if (s.restricted) {
-        L.circle([s.lat, s.lng], {
-          radius: s.restricted,
-          color: '#191970',
-          weight:1,
-          fillOpacity:0
-        }).addTo(spotLayer);
-      }
+      marker.on('click', () => {
+        if (s.restricted && !isNaN(s.restricted)) {
+          map.setView([s.lat, s.lng], map.getZoom(), { animate:true });
+        }
+      });
     });
   }
 
@@ -413,7 +407,7 @@ window.addEventListener('DOMContentLoaded', function() {
         let pathHash = [];
         pathHash.push(areas[i].areaName);
         location.hash = pathHash.map(encodeURIComponent).join('/');
-        
+
         currentLat = areas[i].areaLat;
         currentLng = areas[i].areaLng;
         currentZoom = areas[i].areaZoom;
@@ -424,12 +418,10 @@ window.addEventListener('DOMContentLoaded', function() {
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
 
         menuBox.style.display = 'none';
-
-        initBackButton(newHash);
-
         document.getElementById('weather-wave-tide-container').style.display = 'block';
+        document.getElementById('map-back-btn').style.display = 'block';
 
-        drawSpots();
+        drawFishingSpots();
       };
 
       menu.appendChild(li);
@@ -472,6 +464,7 @@ window.addEventListener('DOMContentLoaded', function() {
         b.textContent = (k.key==='time' && i%2!==0) ? '' : v;
         row.appendChild(b);
       });
+
       container.appendChild(row);
     });
 
@@ -554,7 +547,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
-
     container.style.display = location.hash ? 'block' : 'none';
   }
 
@@ -584,7 +576,7 @@ window.addEventListener('DOMContentLoaded', function() {
     initialHash = newHash;
     currentHash = newHash;
 
-    drawSpots();
+    drawFishingSpots();
   }
 
   window.addEventListener('hashchange', () => {
@@ -609,6 +601,7 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
+
 
 </body>
 </html>
