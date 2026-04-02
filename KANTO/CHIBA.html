@@ -514,7 +514,7 @@ function initBackButton(newHash) {
   //    alert(currentHash);
       location.hash = newHash;
 };
-document.getElementById('map-back-btn').style.display = 'none';
+
 }
 
 
@@ -533,6 +533,7 @@ function handleBackNavigation(customHash) {
       if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
       menuBox.style.display = 'block';
       document.getElementById('weather-wave-tide-container').style.display = 'none';
+      document.getElementById('map-back-btn').style.display = 'none';
     } else {
       // 部分的に戻った場合
       const last = decodeURIComponent(newParts[newParts.length - 1]);
