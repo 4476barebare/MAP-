@@ -277,7 +277,8 @@ window.addEventListener('DOMContentLoaded', function() {
         currentLat = initialLat;
         currentLng = initialLng;
         currentZoom = initialZoom;
-
+        
+        initBackButton();
         renderMenu(areas);
         initMap(currentLat, currentLng, currentZoom);
       });
@@ -537,7 +538,7 @@ window.addEventListener('hashchange', () => {
 
 
   checkCSV();
-  initBackButton();
+ 
 
   // サンプル天気データ表示
   renderWeatherWaveTide(
