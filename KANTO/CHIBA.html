@@ -278,7 +278,7 @@ window.addEventListener('DOMContentLoaded', function() {
         currentLng = initialLng;
         currentZoom = initialZoom;
         
-        initBackButton();
+         
         renderMenu(areas);
         initMap(currentLat, currentLng, currentZoom);
       });
@@ -358,6 +358,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
         menuBox.style.display = 'none';
+        initBackButton();
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
       };
