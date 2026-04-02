@@ -358,7 +358,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
         menuBox.style.display = 'none';
-        initBackButton();
+        initBackButton(newHash);
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
       };
@@ -491,14 +491,14 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
 
-function initBackButton() {
+function initBackButton(newHash) {
   const backBtn = document.getElementById('map-back-btn');
   backBtn.style.display = location.hash ? 'block' : 'none';
   
   backBtn.onclick = () => {
-      alert(initialHash);
+      alert(newHash);
       alert(currentHash);
-      location.hash = initialHash;
+      location.hash = newHash;
 };
 }
 
