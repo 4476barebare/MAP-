@@ -1,8 +1,8 @@
-name,zoom,maxZoom,lat,lng,parent,style,circle,
+name,zoom,maxZoom,lat,lng,parent,style,restricted,icon
 CHIBA,9,,35.4,140.3,,,,
 内房エリア,10,,35.5,140.03,CHIBA,,,
 南房総エリア,10,,35.103,140,CHIBA,,,
 外房エリア,10,,35.31,140.2,CHIBA,,,
 銚子九十九里エリア,10,,35.7,140.63,CHIBA,,,
-勝浦漁港,16,18,35.1456,140.3115,外房エリア,radius:5000;color:#ff4500;weight:3;fillOpacity:0,18,
-飯岡漁港,15,18,35.69,140.7325,銚子九十九里エリア,radius:5000;color:#ff4500;weight:3;fillOpacity:0,17,
+勝浦漁港,16,18,35.1456,140.3115,外房エリア,radius:5000;color:#ff4500;weight:3;fillOpacity:0,1500,spot.svg
+飯岡漁港,15,18,35.69,140.7325,銚子九十九里エリア,radius:5000;color:#ff4500;weight:3;fillOpacity:0,1500,spot.svg
