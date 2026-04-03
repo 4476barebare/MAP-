@@ -378,10 +378,6 @@ let allData = [];
     drawSpots(areas[i].areaName);
   }
 
-
-
-
-
         menuBox.style.display = 'none';
 
         initBackButton(newHash);
@@ -535,6 +531,13 @@ let allData = [];
     const oldParts = initialHash ? initialHash.slice(1).split('/') : [];
 
     if (!newHash || newHash === '') {
+        
+          if (spotLayer) {
+    map.removeLayer(spotLayer);
+    spotLayer = null;
+  }
+
+        
       if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
       menuBox.style.display = 'block';
       document.getElementById('weather-wave-tide-container').style.display = 'none';
