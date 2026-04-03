@@ -226,9 +226,6 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
-  // スポットデータ
-  let spots = [];
-
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
       .then(r => r.text())
@@ -256,8 +253,6 @@ window.addEventListener('DOMContentLoaded', function() {
           const lat = parseFloat(cols[3]);
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
-          const style  = cols[6];
-          const icon = cols[8] ? '/MAP-/icon/' + cols[8].trim() : null;
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -267,17 +262,7 @@ window.addEventListener('DOMContentLoaded', function() {
           }
 
           if (parent === prefName || (area1 && parent === area1)) {
-            areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent, icon });
-          }
-
-          if (icon) {
-            spots.push({
-              name,
-              lat,
-              lng,
-              parent,
-              icon
-            });
+            areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
         }
 
@@ -327,37 +312,6 @@ window.addEventListener('DOMContentLoaded', function() {
     } else {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
-
-    // スポット描画
-    drawSpots();
-  }
-
-  function drawSpots() {
-    if (!map) return;
-
-    // 既存マーカー削除
-    if (window.spotLayer) {
-      window.spotLayer.clearLayers();
-    } else {
-      window.spotLayer = L.layerGroup().addTo(map);
-    }
-
-    const parts = location.hash ? location.hash.slice(1).split('/') : [];
-    const currentArea = parts.length ? decodeURIComponent(parts[parts.length - 1]) : null;
-
-    spots.forEach(s => {
-      if (currentArea && s.parent !== currentArea) return;
-
-      const icon = L.icon({
-        iconUrl: s.icon,
-        iconSize: [32, 32],
-        iconAnchor: [16, 32], // センタリングアンカー
-        popupAnchor: [0, -32]
-      });
-
-      const marker = L.marker([s.lat, s.lng], { icon }).addTo(window.spotLayer);
-      marker.bindPopup(`<div style="white-space: normal; text-align: center;">${s.name}</div>`);
-    });
   }
 
   const menuBox = document.getElementById('map-menu');
@@ -410,11 +364,8 @@ window.addEventListener('DOMContentLoaded', function() {
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
 
         menuBox.style.display = 'none';
-
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
-
-        drawSpots();
       };
 
       menu.appendChild(li);
@@ -427,130 +378,17 @@ window.addEventListener('DOMContentLoaded', function() {
   function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
     const container = document.getElementById('weather-wave-tide-container');
     container.innerHTML = '';
-
     const header = document.createElement('div');
     header.className = 'weather-header';
     header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
     container.appendChild(header);
-
-    const keys = [
-      { key:'time', label:'時間' },
-      { key:'icon', label:'天気' },
-      { key:'temp', label:'気温' },
-      { key:'precip', label:'降率' },
-      { key:'wind', label:'風速' },
-      { key:'winddir', label:'風向' }
-    ];
-
-    keys.forEach(k => {
-      const row = document.createElement('div');
-      row.className = 'weather-row';
-
-      const label = document.createElement('span');
-      label.className = 'weather-block first-block';
-      label.textContent = k.label;
-      row.appendChild(label);
-
-      weatherData[k.key].forEach((v,i) => {
-        const b = document.createElement('span');
-        b.className = 'weather-block';
-        b.textContent = (k.key==='time' && i%2!==0) ? '' : v;
-        row.appendChild(b);
-      });
-
-      container.appendChild(row);
-    });
-
-    const waveRow = document.createElement('div');
-    waveRow.className = 'weather-row';
-    const waveLabel = document.createElement('span');
-    waveLabel.className = 'weather-block first-block';
-    waveLabel.textContent = '波高';
-    waveRow.appendChild(waveLabel);
-
-    waveData.forEach(v => {
-      const b = document.createElement('span');
-      b.className = 'weather-block wave-block';
-      b.textContent = v + 'm';
-      waveRow.appendChild(b);
-    });
-    container.appendChild(waveRow);
-
-    const tideRow = document.createElement('div');
-    tideRow.className = 'weather-row';
-    const tideLabel = document.createElement('span');
-    tideLabel.className = 'weather-block first-block tide-label';
-    tideLabel.textContent = tideName;
-    tideRow.appendChild(tideLabel);
-
-    const canvas = document.createElement('canvas');
-    canvas.style.flex = '1';
-    canvas.style.height = '36px';
-    tideRow.appendChild(canvas);
-    container.appendChild(tideRow);
-
-    const ctx = canvas.getContext('2d');
-    function draw(data) {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-
-      const points = data.map((v,i) => {
-        const x = i/(data.length-1) * canvas.width;
-        const y = canvas.height - v*canvas.height*0.8;
-        return {x, y};
-      });
-
-      function getControlPoints(p0,p1,p2,t=0.3) {
-        const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
-        const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
-        const fa = t * d01/(d01+d12);
-        const fb = t - fa;
-        return [
-          {x: p1.x - fa*(p2.x-p0.x), y: p1.y - fa*(p2.y-p0.y)},
-          {x: p1.x + fb*(p2.x-p0.x), y: p1.y + fb*(p2.y-p0.y)}
-        ];
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, canvas.height);
-      ctx.lineTo(points[0].x, points[0].y);
-      for (let i=1; i<points.length-1; i++) {
-        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
-        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
-      }
-      ctx.lineTo(points[points.length-1].x, canvas.height);
-      ctx.closePath();
-      ctx.fillStyle = '#191970';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-      for (let i=1; i<points.length-1; i++) {
-        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
-        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
-      }
-      ctx.strokeStyle = '#191970';
-      ctx.lineWidth = 1;
-      ctx.lineJoin = 'round';
-      ctx.lineCap = 'round';
-      ctx.stroke();
-    }
-
-    draw(tideData);
-    window.addEventListener('resize', () => draw(tideData));
-
     container.style.display = location.hash ? 'block' : 'none';
   }
 
   function initBackButton(newHash) {
     const backBtn = document.getElementById('map-back-btn');
     backBtn.style.display = location.hash ? 'block' : 'none';
-    
-    backBtn.onclick = () => {
-      location.hash = newHash;
-    };
+    backBtn.onclick = () => { location.hash = newHash; };
   }
 
   function handleBackNavigation(customHash) {
@@ -569,13 +407,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
     initialHash = newHash;
     currentHash = newHash;
-
-    drawSpots();
   }
 
-  window.addEventListener('hashchange', () => {
-    handleBackNavigation();
-  });
+  window.addEventListener('hashchange', () => { handleBackNavigation(); });
 
   checkCSV();
 
@@ -595,8 +429,6 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
-
-
 
 
 </body>
