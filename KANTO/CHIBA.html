@@ -226,7 +226,7 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
-  // ★追加：スポット用データ
+  // スポットデータ
   let spots = [];
 
   function checkCSV() {
@@ -256,9 +256,8 @@ window.addEventListener('DOMContentLoaded', function() {
           const lat = parseFloat(cols[3]);
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
-
           const style  = cols[6];
-          const icon   = cols[8];
+          const icon = cols[8] ? '/MAP-/icon/' + cols[8].trim() : null;
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -268,10 +267,9 @@ window.addEventListener('DOMContentLoaded', function() {
           }
 
           if (parent === prefName || (area1 && parent === area1)) {
-            areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
+            areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent, icon });
           }
 
-          // ★追加：アイコンスポット
           if (icon) {
             spots.push({
               name,
@@ -330,42 +328,35 @@ window.addEventListener('DOMContentLoaded', function() {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
 
-    // ★追加：アイコンスポット描画
+    // スポット描画
     drawSpots();
   }
 
-  // ★追加：アイコンスポット描画
   function drawSpots() {
     if (!map) return;
 
-    // 既存レイヤー削除
+    // 既存マーカー削除
     if (window.spotLayer) {
       window.spotLayer.clearLayers();
     } else {
       window.spotLayer = L.layerGroup().addTo(map);
     }
 
-    if (!location.hash) return;
-
-    const parts = location.hash.slice(1).split('/');
-    const current = decodeURIComponent(parts[parts.length - 1]);
+    const parts = location.hash ? location.hash.slice(1).split('/') : [];
+    const currentArea = parts.length ? decodeURIComponent(parts[parts.length - 1]) : null;
 
     spots.forEach(s => {
-      if (s.parent !== current) return;
+      if (currentArea && s.parent !== currentArea) return;
 
       const icon = L.icon({
-        iconUrl: '/MAP-/icon/' + s.icon,
-        iconSize: [32,32],
-        iconAnchor: [16,32],
-        popupAnchor: [0,-32]
+        iconUrl: s.icon,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32], // センタリングアンカー
+        popupAnchor: [0, -32]
       });
 
-      const marker = L.marker([s.lat,s.lng], { icon }).addTo(window.spotLayer);
-
-      marker.bindPopup(`<div style="white-space:normal;text-align:center;">${s.name}</div>`);
-      marker.on('click', () => {
-        map.setView([s.lat,s.lng], map.getZoom());
-      });
+      const marker = L.marker([s.lat, s.lng], { icon }).addTo(window.spotLayer);
+      marker.bindPopup(`<div style="white-space: normal; text-align: center;">${s.name}</div>`);
     });
   }
 
@@ -419,6 +410,7 @@ window.addEventListener('DOMContentLoaded', function() {
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
 
         menuBox.style.display = 'none';
+
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
 
@@ -603,6 +595,8 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
+
+
 
 
 </body>
