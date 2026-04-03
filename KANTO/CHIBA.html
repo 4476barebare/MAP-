@@ -226,9 +226,8 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
-  // ★追加：円用データ
+  // ★スポットデータ
   let spots = [];
-  let circleLayer = null;
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
@@ -258,8 +257,7 @@ window.addEventListener('DOMContentLoaded', function() {
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
 
-          const style  = cols[6];
-          const circle = cols[7];
+          const style  = cols[6]; // マーカー画像URL
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -272,15 +270,14 @@ window.addEventListener('DOMContentLoaded', function() {
             areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
 
-          // ★追加：円対象
+          // ★スポットデータ登録
           if (style) {
             spots.push({
               name,
               lat,
               lng,
               parent,
-              style,
-              circleZoom: parseFloat(circle)
+              iconUrl: style
             });
           }
         }
@@ -317,10 +314,8 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   function initMap(lat, lng, zoom) {
-      
-      initialHash = location.hash
-      
-      
+    initialHash = location.hash;
+
     if (!map) {
       map = L.map('lf-map', { center:[lat,lng], zoom });
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
@@ -334,49 +329,29 @@ window.addEventListener('DOMContentLoaded', function() {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
 
-    // ★追加：円描画
-    drawFishingCircles();
+    // ★スポット描画
+    renderMarkers();
   }
 
-  // ★追加：円描画関数
-  function drawFishingCircles() {
-
-    if (!map) return;
-
-    if (!circleLayer) {
-      circleLayer = L.layerGroup().addTo(map);
-    }
-
-    circleLayer.clearLayers();
-
-    if (!location.hash) return;
-
-    const parts = location.hash.slice(1).split('/');
-    const current = decodeURIComponent(parts[parts.length - 1]);
+  // ★スポットマーカー描画関数
+  function renderMarkers() {
+    if (!map || spots.length === 0) return;
 
     spots.forEach(s => {
-
-      if (s.parent !== current) return;
-
-      const styleObj = {};
-      s.style.split(';').forEach(pair => {
-        const [k,v] = pair.split(':');
-        if (!k || !v) return;
-        styleObj[k.trim()] = isNaN(v) ? v.trim() : parseFloat(v);
+      const iconHtml = `
+        <div style="text-align:center;">
+          <img src="${s.iconUrl}" style="width:32px;height:32px;display:block;margin:0 auto;">
+          <span style="display:block;white-space:normal;">${s.name}</span>
+        </div>
+      `;
+      const myIcon = L.divIcon({
+        html: iconHtml,
+        className: '',
+        iconSize: [32, 48],
+        iconAnchor: [16, 24]
       });
 
-      //const circle = L.circle([s.lat, s.lng], styleObj).addTo(circleLayer);
-      const radius = s._debugRadius || parseFloat(styleObj.radius) || 1000;
-
-const circle = L.circle([s.lat, s.lng], {
-  ...styleObj,
-  radius: radius
-}).addTo(circleLayer);
-      //circle.on('click', () => {
-      //  if (s.circleZoom) {
-      //    map.flyTo([s.lat, s.lng], s.circleZoom, { duration:0.3, easeLinearity:0.8 });
-      //  }
-      //});
+      L.marker([s.lat, s.lng], { icon: myIcon }).addTo(map);
     });
   }
 
@@ -415,31 +390,23 @@ const circle = L.circle([s.lat, s.lng], {
       }
 
       li.onclick = () => {
-          
         let newHash = currentHash;
         let pathHash = [];
-        
         pathHash.push(areas[i].areaName);
         location.hash = pathHash.map(encodeURIComponent).join('/');
-        
+
         currentLat = areas[i].areaLat;
         currentLng = areas[i].areaLng;
         currentZoom = areas[i].areaZoom;
-        
+
         initialHash = newHash;
         currentHash = location.hash;
 
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
 
         menuBox.style.display = 'none';
-
-        initBackButton(newHash);
-
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
-
-        // ★追加
-        drawFishingCircles();
       };
 
       menu.appendChild(li);
@@ -470,7 +437,6 @@ const circle = L.circle([s.lat, s.lng], {
     keys.forEach(k => {
       const row = document.createElement('div');
       row.className = 'weather-row';
-
       const label = document.createElement('span');
       label.className = 'weather-block first-block';
       label.textContent = k.label;
@@ -482,7 +448,6 @@ const circle = L.circle([s.lat, s.lng], {
         b.textContent = (k.key==='time' && i%2!==0) ? '' : v;
         row.appendChild(b);
       });
-
       container.appendChild(row);
     });
 
@@ -492,7 +457,6 @@ const circle = L.circle([s.lat, s.lng], {
     waveLabel.className = 'weather-block first-block';
     waveLabel.textContent = '波高';
     waveRow.appendChild(waveLabel);
-
     waveData.forEach(v => {
       const b = document.createElement('span');
       b.className = 'weather-block wave-block';
@@ -565,14 +529,12 @@ const circle = L.circle([s.lat, s.lng], {
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
-
     container.style.display = location.hash ? 'block' : 'none';
   }
 
   function initBackButton(newHash) {
     const backBtn = document.getElementById('map-back-btn');
     backBtn.style.display = location.hash ? 'block' : 'none';
-    
     backBtn.onclick = () => {
       location.hash = newHash;
     };
@@ -594,9 +556,6 @@ const circle = L.circle([s.lat, s.lng], {
 
     initialHash = newHash;
     currentHash = newHash;
-
-    // ★追加
-    drawFishingCircles();
   }
 
   window.addEventListener('hashchange', () => {
@@ -604,42 +563,6 @@ const circle = L.circle([s.lat, s.lng], {
   });
 
   checkCSV();
-  
-  initCircleDebugConsole();
-  
-  function initCircleDebugConsole() {
-
-  const box = document.createElement('div');
-  box.style.position = 'fixed';
-  box.style.bottom = '10px';
-  box.style.right = '10px';
-  box.style.background = 'rgba(0,0,0,0.7)';
-  box.style.color = '#fff';
-  box.style.padding = '10px';
-  box.style.zIndex = 9999;
-  box.style.fontSize = '12px';
-
-  box.innerHTML = `
-    半径:
-    <input id="radiusInput" type="number" value="500" style="width:60px;">
-    <button id="applyRadius">適用</button>
-  `;
-
-  document.body.appendChild(box);
-
-  document.getElementById('applyRadius').onclick = () => {
-    const val = parseFloat(document.getElementById('radiusInput').value);
-    if (isNaN(val)) return;
-
-    // ★全スポットに一時反映
-    spots.forEach(s => {
-      s._debugRadius = val;
-    });
-
-    drawFishingCircles();
-  };
-}
-  
 
   renderWeatherWaveTide(
     new Date(),
