@@ -631,7 +631,6 @@ allData.push({
     '大潮'
   );
   
-
 function drawSpots(parentName) {
   if (!map) return;
 
@@ -647,31 +646,22 @@ function drawSpots(parentName) {
 
   spots.forEach(s => {
 
-    // ★ここ（④の位置）
-    const iconUrl = '/MAP-/icon/' + s.icon;
-
-    const icon = L.icon({
-      iconUrl: iconUrl,
-      iconSize: [32, 32],
-      iconAnchor: [16, 32]
+    const icon = L.divIcon({
+      className: 'spot-wrap',
+      html: `
+        <div class="spot-box">
+          <div class="spot-main">
+            <img src="/MAP-/icon/${s.icon}">
+            <span>${s.name}</span>
+          </div>
+          <div class="spot-arrow">▼</div>
+        </div>
+      `,
+      iconSize: [120, 60],
+      iconAnchor: [60, 60]
     });
 
-    const icon = L.divIcon({
-  className: 'spot-wrap',
-  html: `
-    <div class="spot-box">
-      <div class="spot-main">
-        <img src="/MAP-/icon/${s.icon}">
-        <span>${s.name}</span>
-      </div>
-      <div class="spot-arrow">▼</div>
-    </div>
-  `,
-  iconSize: [120, 60],
-  iconAnchor: [60, 60]
-});
-
-const marker = L.marker([s.lat, s.lng], { icon });
+    const marker = L.marker([s.lat, s.lng], { icon });
 
     marker.bindPopup(s.name);
 
@@ -680,7 +670,6 @@ const marker = L.marker([s.lat, s.lng], { icon });
 
   spotLayer.addTo(map);
 }
-
 
 
 });
