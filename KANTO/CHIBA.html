@@ -201,9 +201,10 @@ border-radius:6px;
 <script src="/MAP-/header.js" defer></script>
 
 
+
 <script>
 window.addEventListener('DOMContentLoaded', function() {
-  // デバッグ表示用要素
+
   const latEl = document.getElementById('lat');
   const lngEl = document.getElementById('lng');
   const zoomEl = document.getElementById('zoom');
@@ -218,11 +219,9 @@ window.addEventListener('DOMContentLoaded', function() {
 
   let map = null;
 
-  // 初期座標・ズーム値（ブラウザバック用）
   let initialLat, initialLng, initialZoom;
   let initialHash = location.hash || '';
 
-  // メニュークリック用の現在座標
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
@@ -266,7 +265,7 @@ window.addEventListener('DOMContentLoaded', function() {
           }
         }
 
-        // 初期座標設定（ブラウザバック用）
+        // 初期座標設定
         if (area2) {
           const target = areas.find(a => a.areaName === decodeURIComponent(area2));
           if (target) {
@@ -287,7 +286,6 @@ window.addEventListener('DOMContentLoaded', function() {
           initialZoom = prefZoom;
         }
 
-        // 現在座標も初期値として設定
         currentLat = initialLat;
         currentLng = initialLng;
         currentZoom = initialZoom;
@@ -299,7 +297,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
   function initMap(lat, lng, zoom) {
     initialHash = location.hash;
-
+    
     if (!map) {
       map = L.map('lf-map', { center:[lat,lng], zoom });
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
@@ -353,11 +351,11 @@ window.addEventListener('DOMContentLoaded', function() {
         let pathHash = [];
         pathHash.push(areas[i].areaName);
         location.hash = pathHash.map(encodeURIComponent).join('/');
-
+        
         currentLat = areas[i].areaLat;
         currentLng = areas[i].areaLng;
         currentZoom = areas[i].areaZoom;
-
+        
         initialHash = newHash;
         currentHash = location.hash;
 
@@ -375,41 +373,31 @@ window.addEventListener('DOMContentLoaded', function() {
     menu.style.display = 'block';
   }
 
-  function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
-    const container = document.getElementById('weather-wave-tide-container');
-    container.innerHTML = '';
-    const header = document.createElement('div');
-    header.className = 'weather-header';
-    header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
-    container.appendChild(header);
-    container.style.display = location.hash ? 'block' : 'none';
-  }
-
   function initBackButton(newHash) {
     const backBtn = document.getElementById('map-back-btn');
     backBtn.style.display = location.hash ? 'block' : 'none';
-    backBtn.onclick = () => { location.hash = newHash; };
+    
+    backBtn.onclick = () => {
+      location.hash = newHash;
+    };
   }
 
   function handleBackNavigation(customHash) {
     const newHash = customHash !== undefined ? customHash : location.hash;
-    const newParts = newHash ? newHash.slice(1).split('/') : [];
     const oldParts = initialHash ? initialHash.slice(1).split('/') : [];
 
-    if (newParts.length < oldParts.length) {
-      if (newParts.length === 0) {
-        if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
-        menuBox.style.display = 'block';
-        document.getElementById('weather-wave-tide-container').style.display = 'none';
-        document.getElementById('map-back-btn').style.display = 'none';
-      }
+    if (!newHash || newHash === '') {
+      if (map) map.flyTo([initialLat, initialLng], initialZoom, { duration:0.3, easeLinearity:0.8 });
+      menuBox.style.display = 'block';
+      document.getElementById('weather-wave-tide-container').style.display = 'none';
+      document.getElementById('map-back-btn').style.display = 'none';
     }
 
     initialHash = newHash;
     currentHash = newHash;
   }
 
-  window.addEventListener('hashchange', () => { handleBackNavigation(); });
+  window.addEventListener('hashchange', () => handleBackNavigation());
 
   checkCSV();
 
@@ -429,7 +417,5 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
-
-
 </body>
 </html>
