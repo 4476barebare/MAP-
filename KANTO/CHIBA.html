@@ -317,61 +317,127 @@ window.addEventListener('DOMContentLoaded', function() {
   const maxRows = 4;
   let currentPage = 0;
 
-  function renderMenu(areas) {
-    menuBox.style.display = !location.hash ? 'block' : 'none';
-    menuBox.style.overflow = 'visible';
-    const totalPages = Math.ceil(areas.length / maxRows);
-    menu.innerHTML = '';
-    const start = currentPage * maxRows;
-    const end = Math.min(start + maxRows, areas.length);
 
-    for (let i = start; i < end; i++) {
-      const li = document.createElement('li');
-      const text = document.createElement('span');
-      text.textContent = areas[i].areaName;
-      li.appendChild(text);
+  function renderWeatherWaveTide(date, weatherData, waveData, tideData, tideName) {
+    const container = document.getElementById('weather-wave-tide-container');
+    container.innerHTML = '';
 
-      if (i === end - 1 && currentPage < totalPages-1) {
-        const next = document.createElement('span');
-        next.textContent = '▶';
-        next.className = 'nav-btn';
-        next.onclick = e => { e.stopPropagation(); currentPage++; renderMenu(areas); };
-        li.appendChild(next);
+    const header = document.createElement('div');
+    header.className = 'weather-header';
+    header.innerHTML = `<div>${date.toLocaleDateString()}</div><div>Yahoo天気・海しる</div>`;
+    container.appendChild(header);
+
+    const keys = [
+      { key:'time', label:'時間' },
+      { key:'icon', label:'天気' },
+      { key:'temp', label:'気温' },
+      { key:'precip', label:'降率' },
+      { key:'wind', label:'風速' },
+      { key:'winddir', label:'風向' }
+    ];
+
+    keys.forEach(k => {
+      const row = document.createElement('div');
+      row.className = 'weather-row';
+
+      const label = document.createElement('span');
+      label.className = 'weather-block first-block';
+      label.textContent = k.label;
+      row.appendChild(label);
+
+      weatherData[k.key].forEach((v,i) => {
+        const b = document.createElement('span');
+        b.className = 'weather-block';
+        b.textContent = (k.key==='time' && i%2!==0) ? '' : v;
+        row.appendChild(b);
+      });
+
+      container.appendChild(row);
+    });
+
+    const waveRow = document.createElement('div');
+    waveRow.className = 'weather-row';
+    const waveLabel = document.createElement('span');
+    waveLabel.className = 'weather-block first-block';
+    waveLabel.textContent = '波高';
+    waveRow.appendChild(waveLabel);
+
+    waveData.forEach(v => {
+      const b = document.createElement('span');
+      b.className = 'weather-block wave-block';
+      b.textContent = v + 'm';
+      waveRow.appendChild(b);
+    });
+    container.appendChild(waveRow);
+
+    const tideRow = document.createElement('div');
+    tideRow.className = 'weather-row';
+    const tideLabel = document.createElement('span');
+    tideLabel.className = 'weather-block first-block tide-label';
+    tideLabel.textContent = tideName;
+    tideRow.appendChild(tideLabel);
+
+    const canvas = document.createElement('canvas');
+    canvas.style.flex = '1';
+    canvas.style.height = '36px';
+    tideRow.appendChild(canvas);
+    container.appendChild(tideRow);
+
+    const ctx = canvas.getContext('2d');
+    function draw(data) {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      const points = data.map((v,i) => {
+        const x = i/(data.length-1) * canvas.width;
+        const y = canvas.height - v*canvas.height*0.8;
+        return {x, y};
+      });
+
+      function getControlPoints(p0,p1,p2,t=0.3) {
+        const d01 = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+        const d12 = Math.hypot(p2.x-p1.x, p2.y-p1.y);
+        const fa = t * d01/(d01+d12);
+        const fb = t - fa;
+        return [
+          {x: p1.x - fa*(p2.x-p0.x), y: p1.y - fa*(p2.y-p0.y)},
+          {x: p1.x + fb*(p2.x-p0.x), y: p1.y + fb*(p2.y-p0.y)}
+        ];
       }
-      if (i === start && currentPage > 0) {
-        const prev = document.createElement('span');
-        prev.textContent = '◀';
-        prev.className = 'nav-btn';
-        prev.onclick = e => { e.stopPropagation(); currentPage--; renderMenu(areas); };
-        li.appendChild(prev);
+
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, canvas.height);
+      ctx.lineTo(points[0].x, points[0].y);
+      for (let i=1; i<points.length-1; i++) {
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
       }
+      ctx.lineTo(points[points.length-1].x, canvas.height);
+      ctx.closePath();
+      ctx.fillStyle = '#191970';
+      ctx.fill();
 
-      li.onclick = () => {
-        let newHash = currentHash;
-        let pathHash = [];
-        pathHash.push(areas[i].areaName);
-        location.hash = pathHash.map(encodeURIComponent).join('/');
-        
-        currentLat = areas[i].areaLat;
-        currentLng = areas[i].areaLng;
-        currentZoom = areas[i].areaZoom;
-        
-        initialHash = newHash;
-        currentHash = location.hash;
-
-        if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
-
-        menuBox.style.display = 'none';
-        document.getElementById('weather-wave-tide-container').style.display = 'block';
-        document.getElementById('map-back-btn').style.display = 'block';
-      };
-
-      menu.appendChild(li);
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i=1; i<points.length-1; i++) {
+        const cps = getControlPoints(points[i-1], points[i], points[i+1]);
+        ctx.bezierCurveTo(cps[0].x, cps[0].y, cps[1].x, cps[1].y, points[i+1].x, points[i+1].y);
+      }
+      ctx.strokeStyle = '#191970';
+      ctx.lineWidth = 1;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.stroke();
     }
 
-    menuBox.style.maxHeight = menuBox.scrollHeight+'px';
-    menu.style.display = 'block';
+    draw(tideData);
+    window.addEventListener('resize', () => draw(tideData));
+
+    container.style.display = location.hash ? 'block' : 'none';
   }
+
 
   function initBackButton(newHash) {
     const backBtn = document.getElementById('map-back-btn');
