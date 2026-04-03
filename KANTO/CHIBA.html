@@ -257,10 +257,19 @@ let allData = [];
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
 
- // ★追加（全データ保持）
-  allData.push({
-    name, zoom, lat, lng, parent
-  });
+allData.push({
+  name: name,
+  zoom: zoom,
+  lat: lat,
+  lng: lng,
+  parent: parent,
+
+  // ★追加
+  maxZoom: cols[2] ? parseFloat(cols[2]) : null,
+  style: cols[6] ? cols[6].trim() : '',
+  restricted: cols[7] ? parseFloat(cols[7]) : null,
+  icon: cols[8] ? cols[8].trim() : null
+});
 
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
@@ -567,7 +576,8 @@ let allData = [];
     '大潮'
   );
   
-  function drawSpots(parentName) {
+
+function drawSpots(parentName) {
   if (!map) return;
 
   if (spotLayer) {
@@ -576,17 +586,33 @@ let allData = [];
 
   spotLayer = L.layerGroup();
 
-  const spots = allData.filter(d => d.parent === parentName && d.zoom >= 15);
+  const spots = allData.filter(d =>
+    d.parent === parentName && d.zoom >= 15
+  );
 
   spots.forEach(s => {
-    const marker = L.marker([s.lat, s.lng]);
+
+    // ★ここ（④の位置）
+    const iconUrl = '/MAP-/icon/' + s.icon;
+
+    const icon = L.icon({
+      iconUrl: iconUrl,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    });
+
+    const marker = L.marker([s.lat, s.lng], { icon });
+
     marker.bindPopup(s.name);
+
     spotLayer.addLayer(marker);
   });
 
   spotLayer.addTo(map);
 }
-  
+
+
+
 });
 </script>
 
