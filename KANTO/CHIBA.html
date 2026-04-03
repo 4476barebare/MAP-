@@ -226,9 +226,9 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
-  // CSV データ
+  // ★追加：円用データ
   let spots = [];
-  let iconLayer = null;
+  let circleLayer = null;
 
   function checkCSV() {
     fetch('/MAP-/data/location.csv')
@@ -257,8 +257,9 @@ window.addEventListener('DOMContentLoaded', function() {
           const lat = parseFloat(cols[3]);
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
-          const restricted = cols[7];
-          const iconFile = cols[8] ? cols[8].trim() : '';
+
+          const style  = cols[6];
+          const circle = cols[7];
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -271,20 +272,20 @@ window.addEventListener('DOMContentLoaded', function() {
             areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
 
-          // スポットアイコン用
-          if (iconFile) {
+          // ★追加：円対象
+          if (style) {
             spots.push({
               name,
               lat,
               lng,
               parent,
-              restricted: restricted ? parseFloat(restricted) : 1500,
-              icon: iconFile
+              style,
+              circleZoom: parseFloat(circle)
             });
           }
         }
 
-        // 初期座標設定
+        // 初期座標設定（ブラウザバック用）
         if (area2) {
           const target = areas.find(a => a.areaName === decodeURIComponent(area2));
           if (target) {
@@ -305,18 +306,21 @@ window.addEventListener('DOMContentLoaded', function() {
           initialZoom = prefZoom;
         }
 
+        // 現在座標も初期値として設定
         currentLat = initialLat;
         currentLng = initialLng;
         currentZoom = initialZoom;
-
+        
         renderMenu(areas);
         initMap(currentLat, currentLng, currentZoom);
       });
   }
 
   function initMap(lat, lng, zoom) {
-    initialHash = location.hash;
-
+      
+      initialHash = location.hash
+      
+      
     if (!map) {
       map = L.map('lf-map', { center:[lat,lng], zoom });
       L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
@@ -330,15 +334,20 @@ window.addEventListener('DOMContentLoaded', function() {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
 
-    // アイコン描画
-    drawSpotIcons();
+    // ★追加：円描画
+    drawFishingCircles();
   }
 
-  function drawSpotIcons() {
+  // ★追加：円描画関数
+  function drawFishingCircles() {
+
     if (!map) return;
 
-    if (!iconLayer) iconLayer = L.layerGroup().addTo(map);
-    iconLayer.clearLayers();
+    if (!circleLayer) {
+      circleLayer = L.layerGroup().addTo(map);
+    }
+
+    circleLayer.clearLayers();
 
     if (!location.hash) return;
 
@@ -346,23 +355,28 @@ window.addEventListener('DOMContentLoaded', function() {
     const current = decodeURIComponent(parts[parts.length - 1]);
 
     spots.forEach(s => {
+
       if (s.parent !== current) return;
 
-      const html = `
-        <div style="white-space:nowrap; display:flex; align-items:center; color:#191970; text-shadow:1px 1px 2px #000;">
-          <img src="/MAP-/icon/${s.icon}" style="width:1em; height:1em; vertical-align:middle;">
-          <span style="margin-left:2px;">${s.name}</span>
-          <span style="margin-left:2px;">▼</span>
-        </div>
-      `;
+      const styleObj = {};
+      s.style.split(';').forEach(pair => {
+        const [k,v] = pair.split(':');
+        if (!k || !v) return;
+        styleObj[k.trim()] = isNaN(v) ? v.trim() : parseFloat(v);
+      });
 
-      const marker = L.marker([s.lat, s.lng], {
-        icon: L.divIcon({
-          className: '',
-          html: html,
-          iconAnchor: [10, 20] // ▼が座標中心
-        })
-      }).addTo(iconLayer);
+      //const circle = L.circle([s.lat, s.lng], styleObj).addTo(circleLayer);
+      const radius = s._debugRadius || parseFloat(styleObj.radius) || 1000;
+
+const circle = L.circle([s.lat, s.lng], {
+  ...styleObj,
+  radius: radius
+}).addTo(circleLayer);
+      //circle.on('click', () => {
+      //  if (s.circleZoom) {
+      //    map.flyTo([s.lat, s.lng], s.circleZoom, { duration:0.3, easeLinearity:0.8 });
+      //  }
+      //});
     });
   }
 
@@ -401,25 +415,31 @@ window.addEventListener('DOMContentLoaded', function() {
       }
 
       li.onclick = () => {
+          
         let newHash = currentHash;
         let pathHash = [];
+        
         pathHash.push(areas[i].areaName);
         location.hash = pathHash.map(encodeURIComponent).join('/');
-
+        
         currentLat = areas[i].areaLat;
         currentLng = areas[i].areaLng;
         currentZoom = areas[i].areaZoom;
-
+        
         initialHash = newHash;
         currentHash = location.hash;
 
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
 
         menuBox.style.display = 'none';
+
+        initBackButton(newHash);
+
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
 
-        drawSpotIcons();
+        // ★追加
+        drawFishingCircles();
       };
 
       menu.appendChild(li);
@@ -575,7 +595,8 @@ window.addEventListener('DOMContentLoaded', function() {
     initialHash = newHash;
     currentHash = newHash;
 
-    drawSpotIcons();
+    // ★追加
+    drawFishingCircles();
   }
 
   window.addEventListener('hashchange', () => {
@@ -584,7 +605,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
   checkCSV();
   
-  // デバッグ用コンソール
+  initCircleDebugConsole();
+  
+  function initCircleDebugConsole() {
+
   const box = document.createElement('div');
   box.style.position = 'fixed';
   box.style.bottom = '10px';
@@ -594,18 +618,28 @@ window.addEventListener('DOMContentLoaded', function() {
   box.style.padding = '10px';
   box.style.zIndex = 9999;
   box.style.fontSize = '12px';
+
   box.innerHTML = `
     半径:
     <input id="radiusInput" type="number" value="500" style="width:60px;">
     <button id="applyRadius">適用</button>
   `;
+
   document.body.appendChild(box);
+
   document.getElementById('applyRadius').onclick = () => {
     const val = parseFloat(document.getElementById('radiusInput').value);
     if (isNaN(val)) return;
-    spots.forEach(s => { s.restricted = val; });
-    drawSpotIcons();
+
+    // ★全スポットに一時反映
+    spots.forEach(s => {
+      s._debugRadius = val;
+    });
+
+    drawFishingCircles();
   };
+}
+  
 
   renderWeatherWaveTide(
     new Date(),
@@ -623,8 +657,6 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
-
-
 
 </body>
 </html>
