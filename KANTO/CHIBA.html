@@ -120,6 +120,61 @@ li {
     justify-content:space-between;
     }
 
+.spot-wrap {
+  background: transparent;
+  border: none;
+}
+
+.spot-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 1行目：アイコン＋テキスト */
+.spot-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  background: #191970;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  max-width: 120px;
+  text-align: center;
+  flex-wrap: wrap;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* アイコン */
+.spot-main img {
+  width: 20px;
+  height: 20px;
+}
+
+/* テキスト折り返し */
+.spot-main span {
+  word-break: break-word;
+  font-size: 12px;
+}
+
+/* ▼ */
+.spot-arrow {
+  color: #191970;
+  font-size: 14px;
+  line-height: 10px;
+
+  text-align: center;
+
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4));
+}
+
+
+
 
 </style>
 </head>
@@ -601,7 +656,22 @@ function drawSpots(parentName) {
       iconAnchor: [16, 32]
     });
 
-    const marker = L.marker([s.lat, s.lng], { icon });
+    const icon = L.divIcon({
+  className: 'spot-wrap',
+  html: `
+    <div class="spot-box">
+      <div class="spot-main">
+        <img src="/MAP-/icon/${s.icon}">
+        <span>${s.name}</span>
+      </div>
+      <div class="spot-arrow">▼</div>
+    </div>
+  `,
+  iconSize: [120, 60],
+  iconAnchor: [60, 60]
+});
+
+const marker = L.marker([s.lat, s.lng], { icon });
 
     marker.bindPopup(s.name);
 
