@@ -218,6 +218,8 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 
   let map = null;
+  let spotLayer = null;
+let allData = [];
 
   let initialLat, initialLng, initialZoom;
   let initialHash = location.hash || '';
@@ -244,6 +246,8 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         const lines = text.trim().split('\n');
+        allData = []; // ←追加
+        
         let areas = [];
         for (let i = 1; i < lines.length; i++) {
           const cols = lines[i].split(',');
@@ -252,6 +256,12 @@ window.addEventListener('DOMContentLoaded', function() {
           const lat = parseFloat(cols[3]);
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
+
+ // ★追加（全データ保持）
+  allData.push({
+    name, zoom, lat, lng, parent
+  });
+
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -363,6 +373,14 @@ window.addEventListener('DOMContentLoaded', function() {
         currentHash = location.hash;
 
         if (map) map.flyTo([currentLat, currentLng], currentZoom, { duration:0.3, easeLinearity:0.8 });
+  // ★追加：エリア1のときだけスポット描画
+  if (!location.hash.includes('/')) {
+    drawSpots(areas[i].areaName);
+  }
+
+
+
+
 
         menuBox.style.display = 'none';
 
@@ -545,7 +563,31 @@ window.addEventListener('DOMContentLoaded', function() {
     [0.2,0.4,0.6,0.8,0.6,0.4,0.2,0.1,0.3,0.5,0.7,0.6],
     '大潮'
   );
+  
+  function drawSpots(parentName) {
+  if (!map) return;
+
+  if (spotLayer) {
+    map.removeLayer(spotLayer);
+  }
+
+  spotLayer = L.layerGroup();
+
+  const spots = allData.filter(d => d.parent === parentName && d.zoom >= 15);
+
+  spots.forEach(s => {
+    const marker = L.marker([s.lat, s.lng]);
+    marker.bindPopup(s.name);
+    spotLayer.addLayer(marker);
+  });
+
+  spotLayer.addTo(map);
+}
+  
 });
 </script>
+
+
+
 </body>
 </html>
