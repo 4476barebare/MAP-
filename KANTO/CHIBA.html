@@ -226,7 +226,7 @@ window.addEventListener('DOMContentLoaded', function() {
   let currentLat, currentLng, currentZoom;
   let currentHash = location.hash || '';
 
-  // ★スポットデータ
+  // ★追加：スポット用データ
   let spots = [];
 
   function checkCSV() {
@@ -257,7 +257,8 @@ window.addEventListener('DOMContentLoaded', function() {
           const lng = parseFloat(cols[4]);
           const parent = cols[5] ? cols[5].trim() : '';
 
-          const style  = cols[6]; // マーカー画像URL
+          const style  = cols[6];
+          const icon   = cols[8];
 
           if (name.toUpperCase() === basePref.toUpperCase()) {
             prefName = name;
@@ -270,14 +271,14 @@ window.addEventListener('DOMContentLoaded', function() {
             areas.push({ areaName: name, areaZoom: zoom, areaLat: lat, areaLng: lng, parent });
           }
 
-          // ★スポットデータ登録
-          if (style) {
+          // ★追加：アイコンスポット
+          if (icon) {
             spots.push({
               name,
               lat,
               lng,
               parent,
-              iconUrl: style
+              icon
             });
           }
         }
@@ -329,29 +330,42 @@ window.addEventListener('DOMContentLoaded', function() {
       map.flyTo([lat, lng], zoom, { duration:0.3, easeLinearity:0.8 });
     }
 
-    // ★スポット描画
-    renderMarkers();
+    // ★追加：アイコンスポット描画
+    drawSpots();
   }
 
-  // ★スポットマーカー描画関数
-  function renderMarkers() {
-    if (!map || spots.length === 0) return;
+  // ★追加：アイコンスポット描画
+  function drawSpots() {
+    if (!map) return;
+
+    // 既存レイヤー削除
+    if (window.spotLayer) {
+      window.spotLayer.clearLayers();
+    } else {
+      window.spotLayer = L.layerGroup().addTo(map);
+    }
+
+    if (!location.hash) return;
+
+    const parts = location.hash.slice(1).split('/');
+    const current = decodeURIComponent(parts[parts.length - 1]);
 
     spots.forEach(s => {
-      const iconHtml = `
-        <div style="text-align:center;">
-          <img src="${s.iconUrl}" style="width:32px;height:32px;display:block;margin:0 auto;">
-          <span style="display:block;white-space:normal;">${s.name}</span>
-        </div>
-      `;
-      const myIcon = L.divIcon({
-        html: iconHtml,
-        className: '',
-        iconSize: [32, 48],
-        iconAnchor: [16, 24]
+      if (s.parent !== current) return;
+
+      const icon = L.icon({
+        iconUrl: '/MAP-/icon/' + s.icon,
+        iconSize: [32,32],
+        iconAnchor: [16,32],
+        popupAnchor: [0,-32]
       });
 
-      L.marker([s.lat, s.lng], { icon: myIcon }).addTo(map);
+      const marker = L.marker([s.lat,s.lng], { icon }).addTo(window.spotLayer);
+
+      marker.bindPopup(`<div style="white-space:normal;text-align:center;">${s.name}</div>`);
+      marker.on('click', () => {
+        map.setView([s.lat,s.lng], map.getZoom());
+      });
     });
   }
 
@@ -407,6 +421,8 @@ window.addEventListener('DOMContentLoaded', function() {
         menuBox.style.display = 'none';
         document.getElementById('weather-wave-tide-container').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'block';
+
+        drawSpots();
       };
 
       menu.appendChild(li);
@@ -437,6 +453,7 @@ window.addEventListener('DOMContentLoaded', function() {
     keys.forEach(k => {
       const row = document.createElement('div');
       row.className = 'weather-row';
+
       const label = document.createElement('span');
       label.className = 'weather-block first-block';
       label.textContent = k.label;
@@ -448,6 +465,7 @@ window.addEventListener('DOMContentLoaded', function() {
         b.textContent = (k.key==='time' && i%2!==0) ? '' : v;
         row.appendChild(b);
       });
+
       container.appendChild(row);
     });
 
@@ -457,6 +475,7 @@ window.addEventListener('DOMContentLoaded', function() {
     waveLabel.className = 'weather-block first-block';
     waveLabel.textContent = '波高';
     waveRow.appendChild(waveLabel);
+
     waveData.forEach(v => {
       const b = document.createElement('span');
       b.className = 'weather-block wave-block';
@@ -529,12 +548,14 @@ window.addEventListener('DOMContentLoaded', function() {
 
     draw(tideData);
     window.addEventListener('resize', () => draw(tideData));
+
     container.style.display = location.hash ? 'block' : 'none';
   }
 
   function initBackButton(newHash) {
     const backBtn = document.getElementById('map-back-btn');
     backBtn.style.display = location.hash ? 'block' : 'none';
+    
     backBtn.onclick = () => {
       location.hash = newHash;
     };
@@ -556,6 +577,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
     initialHash = newHash;
     currentHash = newHash;
+
+    drawSpots();
   }
 
   window.addEventListener('hashchange', () => {
@@ -580,6 +603,7 @@ window.addEventListener('DOMContentLoaded', function() {
   );
 });
 </script>
+
 
 </body>
 </html>
