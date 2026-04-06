@@ -98,7 +98,32 @@ export function selectArea(area, fly = true) {
  * @param {string} csvUrl 
  */
 export async function initMapFromCSV(csvUrl) {
+    
+    
+    
+    
+    
+    
+    
     const data = await loadLocationCSV(csvUrl);
+
+
+
+
+ // ★確認用アラート
+    alert(
+        'Loaded CSV:\n' +
+        'Pref: ' + (data.main ? data.main.name : 'null') + '\n' +
+        'Lat: ' + (data.main ? data.main.lat : 'null') + '\n' +
+        'Lng: ' + (data.main ? data.main.lng : 'null') + '\n' +
+        'Zoom: ' + (data.main ? data.main.zoom : 'null') + '\n' +
+        'Areas count: ' + data.areas.length
+    );
+
+
+
+
+
 
     // ハッシュ解析
     const hashResult = parseHash(data);
