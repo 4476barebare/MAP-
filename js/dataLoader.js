@@ -50,37 +50,48 @@ function loadLocationCSV(csvUrl) {
 }
 
 /**
- * 地図描画関数
- * @param {string} name
- * @param {number} lat
- * @param {number} lng
- * @param {number} zoom
- * @param {number|null} maxZoom
- * @param {'std'|'pale'|'photo'} type
+ * 指定の座標とズームで地図描画、maxZoom がある場合はアラート
+ * @param {string} name - 場所の名前
+ * @param {number} lat - 緯度
+ * @param {number} lng - 経度
+ * @param {number} zoom - ズームレベル
+ * @param {number|null} maxZoom - 最大ズームレベル
+ * @param {object} options - 上書き可能な地図オプション
  */
-function drawLocation(name, lat, lng, zoom, maxZoom = null, type = 'std') {
-    if (maxZoom !== null) {
-        alert(`"${name}" に最大ズームがあります: ${maxZoom}`);
-        return;
-    }
+function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
+  if (maxZoom !== null) {
+    alert(`"${name}" に最大ズームが設定されています: ${maxZoom}`);
+    return;
+  }
 
-    let tileUrl = '';
-    switch(type) {
-        case 'std': tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png'; break;
-        case 'pale': tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'; break;
-        case 'photo': tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg'; break;
-        default: tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png';
-    }
+  // デフォルトは航空写真、全操作禁止
+  const defaultOptions = {
+    center: [lat, lng],
+    zoom: zoom,
+    scrollWheelZoom: false,
+    dragging: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+  };
 
-    if (window.map) {
-        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-        if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
-        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
-    } else {
-        window.map = L.map('lf-map', { center: [lat, lng], zoom });
-        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
-    }
+  const mapOptions = { ...defaultOptions, ...options };
+
+  const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+
+  if (window.map) {
+    window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+    if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+    window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+
+    // 上書きオプションを反映
+    mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
+    mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
+
+  } else {
+    window.map = L.map('lf-map', mapOptions);
+    window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+  }
 }
 
-window.loadLocationCSV = loadLocationCSV;
 window.drawLocation = drawLocation;
