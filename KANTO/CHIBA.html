@@ -246,6 +246,7 @@ li {
 
 <script src="/MAP-/js/dataLoader.js"></script>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -263,9 +264,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.prefData = data.main;
 
-        // 初期ハッシュチェック＋描画
-        let initialHash = location.hash || ''; // ハッシュがなければ空文字
+        // 地図描画（航空写真、全オプション禁止）
+        window.map = L.map('lf-map', {
+            center:[window.prefData.lat, window.prefData.lng],
+            zoom:window.prefData.zoom,
+            scrollWheelZoom:false,
+            doubleClickZoom:false,
+            dragging:false,
+            zoomControl:false
+        });
+        L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
+            attribution:'© 国土地理院'
+        }).addTo(window.map);
 
+        // エリア中心座標リスト
+        const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng, zoom:a.zoom }));
+
+        // --- 初期ハッシュチェック＋描画 ---
+        let initialHash = location.hash || '';
         if (initialHash) {
             const parts = decodeURIComponent(initialHash.substring(1)).split('/');
             const areaName = parts[0];
@@ -288,25 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // エリア中心座標リスト
-        const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng }));
-
-        // 共通移動関数
-        function moveToArea(areaName) {
-            const area = areaCenters.find(a => a.name === areaName);
-            if (!area) return;
-
-            // currentHash = initialHash として扱う
-            initialHash = `#${encodeURIComponent(areaName)}`;
-
-            // 地図移動
-            window.map.flyTo([area.lat, area.lng], window.prefData.zoom);
-
-            // URLハッシュ更新
-            history.replaceState(null, '', initialHash);
-        }
-
-        // 地図クリックで最寄りエリア判定（メニュー上のクリックは無視）
+        // --- 地図クリックで最寄りエリア判定（メニュー上のクリックは無視） ---
         window.map.on('click', (e) => {
 
             const menuRect = document.getElementById('map-menu').getBoundingClientRect();
@@ -314,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.originalEvent.clientX <= menuRect.right &&
                 e.originalEvent.clientY >= menuRect.top &&
                 e.originalEvent.clientY <= menuRect.bottom) {
-                return; // メニュー上のクリックは無視
+                return; // メニュー上クリックは無視
             }
 
             const clickLat = e.latlng.lat;
@@ -333,23 +331,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (nearestArea) moveToArea(nearestArea);
+            if (nearestArea) {
+                const area = areaCenters.find(a => a.name === nearestArea);
+                if (area) {
+                    moveToArea(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+                }
+            }
         });
 
-        // メニュー生成（クリックでmoveToArea呼び出し）
+        // --- メニュー生成（クリックは moveToArea 呼び出し） ---
         const menuUl = document.querySelector('#map-menu ul');
         menuUl.innerHTML = '';
         areaCenters.forEach(area => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = () => moveToArea(area.name);
+            btn.onclick = () => { moveToArea(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom); };
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
 
-        // 完了アラート
-        const areaNames = areaCenters.map(a=>a.name).join(', ');
+        // --- 完了アラート ---
+        const areaNames = areaCenters.map(a => a.name).join(', ');
         alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
 
     }).catch(err => {
@@ -359,8 +362,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-
-
 
 
 </html>
