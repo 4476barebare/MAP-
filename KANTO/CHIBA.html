@@ -320,56 +320,26 @@ border-radius: 4px;
 
 
 <script type="module">
-import { initMapFromCSV, selectArea } from '/MAP-/js/dataLoader.js';
+import { initMapFromCSV, selectArea } from './dataLoader.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const csvUrl = '/MAP-/data/location.csv';
+    const csvUrl = './data/location.csv';
     const data = await initMapFromCSV(csvUrl);
 
-    // エリア中心座標リスト
-    const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng, zoom:a.zoom }));
-
-    // --- メニュー生成（クリックは selectArea 呼び出し） ---
-    const menuUl = document.querySelector('#map-menu ul');
-    menuUl.innerHTML = '';
-    areaCenters.forEach(area => {
-        const li = document.createElement('li');
-        const btn = document.createElement('button');
-        btn.textContent = area.name;
-        btn.onclick = () => selectArea(area, true);
-        li.appendChild(btn);
-        menuUl.appendChild(li);
+    // メニュークリックでエリア選択
+    document.querySelectorAll('.area-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const areaName = btn.dataset.area;
+            const area = data.areas.find(a => a.name === areaName);
+            if (area) selectArea(area, true);
+        });
     });
 
-    // --- 地図クリックで最寄りエリア判定 ---
-    window.map.on('click', (e) => {
-        const menuRect = document.getElementById('map-menu').getBoundingClientRect();
-        if (e.originalEvent.clientX >= menuRect.left &&
-            e.originalEvent.clientX <= menuRect.right &&
-            e.originalEvent.clientY >= menuRect.top &&
-            e.originalEvent.clientY <= menuRect.bottom) {
-            return; // メニュー上クリックは無視
-        }
-
-        const clickLat = e.latlng.lat;
-        const clickLng = e.latlng.lng;
-
-        let minDist = Infinity;
-        let nearestArea = null;
-
-        areaCenters.forEach(area => {
-            const dLat = clickLat - area.lat;
-            const dLng = clickLng - area.lng;
-            const dist = dLat*dLat + dLng*dLng;
-            if (dist < minDist) {
-                minDist = dist;
-                nearestArea = area;
-            }
-        });
-
-        if (nearestArea) selectArea(nearestArea, true);
+    // 地図クリックでエリア選択（例）
+    window.areaData.forEach(area => {
+        const marker = L.marker([area.lat, area.lng]).addTo(window.map);
+        marker.on('click', () => selectArea(area, true));
     });
 });
 </script>
-
 </html>
