@@ -36,8 +36,7 @@ li {
 
 .map-menu {
   position: absolute;  /* 地図コンテナに対して絶対配置 */
-  bottom: 0;           /* 下揃え */
-  font-size: 12px;
+  bottom: 5;           /* 下揃え */
   left: 5px;
   right: 5px;
   min-height: 50px;    /* 必要に応じて高さを調整 */
@@ -55,6 +54,30 @@ li {
 }
 #map-menu button {
   pointer-events: auto;
+}
+
+.map-menu ul {
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+.map-menu li {
+  display:flex;
+  justify-content:space-between
+  align-items:center;
+  font-size:12px;
+  color:#191970;
+  padding:5px 0;
+  cursor:pointer;
+  border-bottom:1px dotted #191970;
+}
+.map-menu li:last-child {
+    border-bottom:none;
+}
+.nav-btn {
+    font-size:12px;
+    color:#007aff;
+    margin-left:8px;
 }
 
 /* 天気UI */
