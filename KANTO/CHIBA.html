@@ -256,27 +256,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.prefData = data.main;
 
-        // 初期ハッシュチェック
-        let initialHash = '';
-        if (!location.hash || location.hash === '') initialHash = '';
+        // 初期ハッシュチェック＋描画
+        let initialHash = location.hash || ''; // ハッシュがなければ空文字
 
-        // 地図描画（航空写真、全オプション禁止）
-        window.map = L.map('lf-map', {
-            center:[window.prefData.lat, window.prefData.lng],
-            zoom:window.prefData.zoom,
-            scrollWheelZoom:false,
-            doubleClickZoom:false,
-            dragging:false,
-            zoomControl:false
-        });
-        L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
-            attribution:'© 国土地理院'
-        }).addTo(window.map);
+        if (initialHash) {
+            const parts = decodeURIComponent(initialHash.substring(1)).split('/');
+            const areaName = parts[0];
+            const spotName = parts[1];
 
-        // エリア中心座標リスト
-        const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng }));
+            if (spotName) {
+                handleSpotInitial(spotName, areaName);
+            } else {
+                handleAreaInitial(areaName);
+            }
+        } else {
+            // ハッシュなし → 県本体表示
+            drawLocation(
+                window.prefData.name,
+                window.prefData.lat,
+                window.prefData.lng,
+                window.prefData.zoom,
+                window.prefData.maxZoom,
+                'photo'
+            );
+        }
 
         // 地図クリックで最寄りエリア判定
+        const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng }));
         window.map.on('click', (e) => {
             const clickLat = e.latlng.lat;
             const clickLng = e.latlng.lng;
@@ -312,6 +318,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // 完了アラート
         const areaNames = areaCenters.map(a=>a.name).join(', ');
         alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
+
+        // 初期描画用関数群（変更なしで組み込み）
+        function handleAreaInitial(areaName) {
+            const area = window.areaData.find(a => a.name === areaName);
+            if (!area) return;
+            drawLocation(area.name, area.lat, area.lng, area.zoom, area.maxZoom, 'photo');
+        }
+
+        function handleSpotInitial(spotName, areaName) {
+            const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
+            if (!spot) return;
+            drawLocation(spot.name, spot.lat, spot.lng, spot.zoom, spot.maxZoom, 'photo');
+        }
 
     }).catch(err => {
         console.error('CSV読み込みエラー:', err);
