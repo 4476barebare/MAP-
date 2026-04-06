@@ -261,45 +261,45 @@ li {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // CSVのURLを定義
-    const csvUrl = '/MAP-/data/location.csv';
+  // CSVのURLを定義
+  const csvUrl = '/MAP-/data/location.csv';
 
-    // CSV読み込み
-    loadLocationCSV(csvUrl).then(data => {
+  // ハッシュチェック
+  let initialHash = '';
+  if (window.location.hash) {
+    initialHash = window.location.hash;
+  }
 
-        // 本体データを prefData に格納
-        window.prefData = data.main;
+  // CSV読み込み
+  loadLocationCSV(csvUrl).then(data => {
 
-        if (!window.prefData) {
-            console.error('CSVに県本体データがありません');
-            alert('県本体データがありません');
-            return;
-        }
+    // データローダー側で用意した県情報
+    window.prefData = data.chiba;
 
-        // URLハッシュをチェック
-        let initialHash = '';
-        if (!location.hash || location.hash === '') {
-            initialHash = ''; // ハッシュが空なら空文字固定
-        }
+    if (window.prefData) {
+      // 座標・ズーム・航空写真で描画
+      drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom,
+        window.prefData.maxZoom,
+        'photo' // 航空写真
+      );
 
-        // drawLocation に座標とズームを渡して描画
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom,
-            window.prefData.maxZoom,
-            'std' // 標準地図
-        );
+      // 完了後にアラートで県名とエリア名表示
+      const areaNames = data.areas.map(a => a.name).join(', ');
+      alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
 
-        // 読み込んだ県名と直下のエリア名をアラートで表示
-        const areaNames = data.areas.map(a => a.name).join(', ');
-        alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
+    } else {
+      console.error('県情報(prefData)が定義されていません');
+      alert('県情報が取得できませんでした');
+    }
 
-    }).catch(err => {
-        console.error('CSV読み込みエラー:', err);
-        alert('CSV読み込みに失敗しました');
-    });
+  }).catch(err => {
+    console.error('CSV読み込みエラー:', err);
+    alert('CSV読み込みに失敗しました');
+  });
 
 });
 </script>
