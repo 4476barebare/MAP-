@@ -246,7 +246,6 @@ li {
 
 <script src="/MAP-/js/dataLoader.js"></script>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -289,52 +288,62 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // 地図クリックで最寄りエリア判定
+        // エリア中心座標リスト
         const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng }));
 
-// 地図クリックで最寄りエリア判定（メニュー上のクリックは無視）
-window.map.on('click', (e) => {
+        // 共通移動関数
+        function moveToArea(areaName) {
+            const area = areaCenters.find(a => a.name === areaName);
+            if (!area) return;
 
-    // メニューの上なら処理しない
-    const menuRect = document.getElementById('map-menu').getBoundingClientRect();
-    if (e.originalEvent.clientX >= menuRect.left &&
-        e.originalEvent.clientX <= menuRect.right &&
-        e.originalEvent.clientY >= menuRect.top &&
-        e.originalEvent.clientY <= menuRect.bottom) {
-        return; // メニュー上のクリックは無視
-    }
+            // currentHash = initialHash として扱う
+            initialHash = `#${encodeURIComponent(areaName)}`;
 
-    // 通常の最寄りエリア判定
-    const clickLat = e.latlng.lat;
-    const clickLng = e.latlng.lng;
+            // 地図移動
+            window.map.flyTo([area.lat, area.lng], window.prefData.zoom);
 
-    let minDist = Infinity;
-    let nearestArea = null;
-
-    areaCenters.forEach(area => {
-        const dLat = clickLat - area.lat;
-        const dLng = clickLng - area.lng;
-        const dist = dLat*dLat + dLng*dLng;
-        if (dist < minDist) {
-            minDist = dist;
-            nearestArea = area.name;
+            // URLハッシュ更新
+            history.replaceState(null, '', initialHash);
         }
-    });
 
-    if (nearestArea) alert(`クリックされたエリア: ${nearestArea}`);
-});
+        // 地図クリックで最寄りエリア判定（メニュー上のクリックは無視）
+        window.map.on('click', (e) => {
 
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+            if (e.originalEvent.clientX >= menuRect.left &&
+                e.originalEvent.clientX <= menuRect.right &&
+                e.originalEvent.clientY >= menuRect.top &&
+                e.originalEvent.clientY <= menuRect.bottom) {
+                return; // メニュー上のクリックは無視
+            }
 
+            const clickLat = e.latlng.lat;
+            const clickLng = e.latlng.lng;
 
+            let minDist = Infinity;
+            let nearestArea = null;
 
-        // メニュー生成（クリックはアラート）
+            areaCenters.forEach(area => {
+                const dLat = clickLat - area.lat;
+                const dLng = clickLng - area.lng;
+                const dist = dLat*dLat + dLng*dLng;
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestArea = area.name;
+                }
+            });
+
+            if (nearestArea) moveToArea(nearestArea);
+        });
+
+        // メニュー生成（クリックでmoveToArea呼び出し）
         const menuUl = document.querySelector('#map-menu ul');
         menuUl.innerHTML = '';
         areaCenters.forEach(area => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = () => { alert(`メニュークリック: ${area.name}`); };
+            btn.onclick = () => moveToArea(area.name);
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
@@ -343,19 +352,6 @@ window.map.on('click', (e) => {
         const areaNames = areaCenters.map(a=>a.name).join(', ');
         alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
 
-        // 初期描画用関数群（変更なしで組み込み）
-        function handleAreaInitial(areaName) {
-            const area = window.areaData.find(a => a.name === areaName);
-            if (!area) return;
-            drawLocation(area.name, area.lat, area.lng, area.zoom, area.maxZoom, 'photo');
-        }
-
-        function handleSpotInitial(spotName, areaName) {
-            const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
-            if (!spot) return;
-            drawLocation(spot.name, spot.lat, spot.lng, spot.zoom, spot.maxZoom, 'photo');
-        }
-
     }).catch(err => {
         console.error('CSV読み込みエラー:', err);
         alert('CSV読み込みに失敗しました');
@@ -363,5 +359,8 @@ window.map.on('click', (e) => {
 
 });
 </script>
+
+
+
 
 </html>
