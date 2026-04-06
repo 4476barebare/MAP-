@@ -1,20 +1,30 @@
 // dataLoader.js
 
-// グローバル保持
-window.locationData = null; // 県本体
-window.areaData = [];       // 直下のエリア
-window.spotData = [];       // スポット
+// グローバルに保持
+window.prefData = null;  // 選択された県本体
+window.areaData = [];    // 選択県直下のエリア
+window.spotData = [];    // 選択県直下のスポット
 
 /**
- * CSV読み込み
- * @param {string} csvUrl
+ * CSV読み込み関数
+ * @param {string} csvUrl - CSVファイルURL
+ * @param {string} currentFile - 現在のHTMLファイル名（例: "chiba.html"）
  * @returns {Promise<{main: object, areas: object[], spots: object[]}>}
  */
-function loadLocationCSV(csvUrl) {
+function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
         .then(r => r.text())
         .then(text => {
             const lines = text.trim().split('\n');
+            const headers = lines[0].split(',');
+
+            let main = null;
+            const areas = [];
+            const spots = [];
+
+            // HTMLファイル名から県名を抽出（拡張子除去して大文字に）
+            const filePref = currentFile.replace('.html', '').toUpperCase();
+
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(',');
                 const name = cols[0].trim();
@@ -29,26 +39,26 @@ function loadLocationCSV(csvUrl) {
 
                 const obj = { name, zoom, maxZoom, lat, lng, parent, style, restricted, icon };
 
-                if (!parent) {
-                    // 親を持たない本体
-                    window.locationData = obj;
-                } else if (parent === window.locationData?.name) {
-                    // 本体直下のエリア
-                    window.areaData.push(obj);
-                } else {
-                    // スポット
-                    window.spotData.push(obj);
+                if (!parent && name.toUpperCase() === filePref) {
+                    // 親を持たず、現在のHTMLに対応する県本体
+                    main = obj;
+                } else if (parent.toUpperCase() === filePref) {
+                    // 選択県直下のエリア
+                    areas.push(obj);
+                } else if (parent && parent.toUpperCase() === filePref) {
+                    // 選択県直下のスポット
+                    spots.push(obj);
                 }
             }
 
-            return {
-                main: window.locationData,
-                areas: window.areaData,
-                spots: window.spotData
-            };
+            // グローバルにも保存
+            window.prefData = main;
+            window.areaData = areas;
+            window.spotData = spots;
+
+            return { main, areas, spots };
         });
 }
-
 /**
  * 指定の座標とズームで地図描画、maxZoom がある場合はアラート
  * @param {string} name - 場所の名前
