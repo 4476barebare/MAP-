@@ -92,18 +92,32 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
   const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
   if (window.map) {
-    window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-    if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
-    window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+  // 既存map更新
+  window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-    // 上書きオプションを反映
-    mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
-    mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
+  if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+  window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
 
-  } else {
-    window.map = L.map('lf-map', mapOptions);
-    window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+  // ★操作を全部制御（ここ重要）
+  mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
+  mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
+  mapOptions.doubleClickZoom ? window.map.doubleClickZoom.enable() : window.map.doubleClickZoom.disable();
+  mapOptions.boxZoom ? window.map.boxZoom.enable() : window.map.boxZoom.disable();
+  mapOptions.keyboard ? window.map.keyboard.enable() : window.map.keyboard.disable();
+  mapOptions.touchZoom ? window.map.touchZoom.enable() : window.map.touchZoom.disable();
+
+  if (window.map.tap) {
+    mapOptions.tap ? window.map.tap.enable() : window.map.tap.disable();
   }
+
+} else {
+  // ★初回生成（これが無いとダメ）
+  window.map = L.map('lf-map', mapOptions);
+
+  window.currentTileLayer = L.tileLayer(tileUrl, {
+    attribution: '© 国土地理院'
+  }).addTo(window.map);
+}
 }
 
 window.drawLocation = drawLocation;
