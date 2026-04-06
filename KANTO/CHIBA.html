@@ -323,7 +323,7 @@ border-radius: 4px;
 import { initMapFromCSV, selectArea } from './dataLoader.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const csvUrl = './data/location.csv';
+    const csvUrl = 'http://www.turiiko.shop/location.csv';
     const data = await initMapFromCSV(csvUrl);
 
     // メニュークリックでエリア選択
