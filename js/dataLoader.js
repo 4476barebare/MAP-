@@ -78,6 +78,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
   const defaultOptions = {
     center: [lat, lng],
     zoom: zoom,
+    zoomControl: false,    // ←ズームボタン非表示
     scrollWheelZoom: false,
     dragging: false,
     doubleClickZoom: false,
