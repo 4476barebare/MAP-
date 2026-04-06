@@ -35,51 +35,47 @@ li {
 
 
 .map-menu {
-  position: absolute;  /* 地図コンテナに対して絶対配置 */
-  bottom: 0;           /* 下揃え */
-  margin-bottom: 5px;
+  position: absolute;
+  bottom: 5px;
   left: 5px;
   right: 5px;
-  transition:max-height 0.25s ease;
-  min-height: 50px;    /* 必要に応じて高さを調整 */
-  background: #fff;
-  border-top: 5px;
-  border-bottom: 5px;
-  padding: 0px;
-  z-index: 1980;       /* Leaflet タイルより上に表示 */
-  overflow: auto;
+  max-height: 200px;
+  background: #fff; /* 白のまま */
   border-radius: 3px;
+  overflow-y: auto;
+  z-index: 1980;
+  padding: 5px 10px;
+  pointer-events: auto; /* これがメニュー全体でクリックを有効化 */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 #map-menu {
-  pointer-events: auto; /* メニューはクリック可能 */
+  pointer-events: auto; /* 念のため */
 }
+
 #map-menu button {
-  pointer-events: auto;
+  pointer-events: auto; /* ボタンも有効 */
 }
 
 .map-menu ul {
-    list-style:none;
-    margin:0;
-    padding:0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
+
 .map-menu li {
-  display:flex;
-  justify-content:space-between
-  align-items:center;
-  font-size:12px;
-  color:#191970;
-  padding:5px 0;
-  cursor:pointer;
-  border-bottom:1px dotted #191970;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #191970;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #191970;
 }
+
 .map-menu li:last-child {
-    border-bottom:none;
-}
-.nav-btn {
-    font-size:12px;
-    color:#007aff;
-    margin-left:8px;
+  border-bottom: none;
 }
 
 /* 天気UI */
