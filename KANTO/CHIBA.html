@@ -316,13 +316,14 @@ border-radius: 4px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/MAP-/header.js" defer></script>
 
-<script src="/MAP-/js/dataLoader.js"></script>
 
 
+<!-- JS モジュールを普通に読み込む -->
 <script type="module">
-import { initMapFromCSV, selectArea } from 'http://www.turiiko.shop/location.csv';
+import { initMapFromCSV, selectArea } from '/MAP-/js/dataLoader.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // CSV は fetch で読み込む
     const csvUrl = 'http://www.turiiko.shop/location.csv';
     const data = await initMapFromCSV(csvUrl);
 
