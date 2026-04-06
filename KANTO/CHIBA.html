@@ -261,46 +261,52 @@ li {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // CSVのURLを定義
-  const csvUrl = '/MAP-/data/location.csv';
+    // 現在の HTML ファイル名を取得
+    const pathParts = location.pathname.split('/');
+    const currentFile = pathParts[pathParts.length - 1]; // 例: "chiba.html"
+    console.log('現在のHTML:', currentFile);
 
-  // ハッシュチェック
-  let initialHash = '';
-  if (window.location.hash) {
-    initialHash = window.location.hash;
-  }
+    // CSVのURL
+    const csvUrl = '/MAP-/data/location.csv';
 
-  // CSV読み込み
-  loadLocationCSV(csvUrl).then(data => {
+    // CSV読み込みに現在のHTML名を渡す
+    loadLocationCSV(csvUrl, currentFile).then(data => {
 
-    // データローダー側で用意した県情報
-    window.prefData = data.chiba;
+        // CSVから取得した県本体データを prefData に格納
+        window.prefData = data.main;
 
-    if (window.prefData) {
-      // 座標・ズーム・航空写真で描画
-      drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom,
-        window.prefData.maxZoom,
-        'photo' // 航空写真
-      );
+        if (!window.prefData) {
+            console.error('CSVに県本体データがありません');
+            alert('県本体データがありません');
+            return;
+        }
 
-      // 完了後にアラートで県名とエリア名表示
-      const areaNames = data.areas.map(a => a.name).join(', ');
-      alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
+        // URLハッシュチェック（空なら空文字固定）
+        let initialHash = '';
+        if (!location.hash || location.hash === '') {
+            initialHash = '';
+        }
 
-    } else {
-      console.error('県情報(prefData)が定義されていません');
-      alert('県情報が取得できませんでした');
-    }
+        // 座標とズームを drawLocation に渡して航空写真で描画
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom,
+            window.prefData.maxZoom,
+            'photo' // 航空写真
+        );
 
-  }).catch(err => {
-    console.error('CSV読み込みエラー:', err);
-    alert('CSV読み込みに失敗しました');
-  });
+        // 読み込んだ県名と直下のエリア名をアラートで表示
+        const areaNames = data.areas.map(a => a.name).join(', ');
+        alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
+
+    }).catch(err => {
+        console.error('CSV読み込みエラー:', err);
+        alert('CSV読み込みに失敗しました');
+    });
 
 });
 </script>
+
 </html>
