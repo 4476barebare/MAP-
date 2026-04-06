@@ -106,3 +106,17 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 }
 
 window.drawLocation = drawLocation;
+
+
+
+function moveToArea(name, lat, lng, zoom) {
+    // 地図移動
+    window.map.flyTo([lat, lng], zoom);
+
+    // URL ハッシュを更新
+    const newHash = encodeURIComponent(name);
+    location.hash = newHash;
+
+    // currentHash を初期ハッシュと同じ値に設定
+    window.currentHash = newHash;
+}
