@@ -97,6 +97,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
   if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
   window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+  window.map.attributionControl.setPosition('topright');
 
   // ★操作を全部制御（ここ重要）
   mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
@@ -117,6 +118,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
   window.currentTileLayer = L.tileLayer(tileUrl, {
     attribution: '© 国土地理院'
   }).addTo(window.map);
+  window.map.attributionControl.setPosition('topright');
 }
 }
 
