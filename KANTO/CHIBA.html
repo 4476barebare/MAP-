@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         window.prefData = data.main;
 
-        // 地図描画（航空写真、全オプション禁止）
+        // 地図描画（航空写真、全操作禁止）
         window.map = L.map('lf-map', {
             center:[window.prefData.lat, window.prefData.lng],
             zoom:window.prefData.zoom,
@@ -352,6 +352,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // エリア中心座標リスト
         const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng, zoom:a.zoom }));
 
+        // --- 共通関数：エリア選択 ---
+        function selectArea(areaName) {
+            const area = areaCenters.find(a => a.name === areaName);
+            if (!area) return;
+
+            // 地図移動
+            drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+
+            // ハッシュ更新
+            location.hash = encodeURIComponent(area.name);
+
+            // 必要に応じてUI更新など
+            console.log(`選択されたエリア: ${area.name}`);
+        }
+
         // --- 初期ハッシュチェック＋描画 ---
         let initialHash = location.hash || '';
         if (initialHash) {
@@ -362,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (spotName) {
                 handleSpotInitial(spotName, areaName);
             } else {
-                handleAreaInitial(areaName);
+                selectArea(areaName);
             }
         } else {
             // ハッシュなし → 県本体表示
@@ -376,9 +391,8 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         }
 
-        // --- 地図クリックで最寄りエリア判定（メニュー上のクリックは無視） ---
+        // --- 地図クリックで最寄りエリア判定 ---
         window.map.on('click', (e) => {
-
             const menuRect = document.getElementById('map-menu').getBoundingClientRect();
             if (e.originalEvent.clientX >= menuRect.left &&
                 e.originalEvent.clientX <= menuRect.right &&
@@ -403,22 +417,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (nearestArea) {
-                const area = areaCenters.find(a => a.name === nearestArea);
-                if (area) {
-                    moveToArea(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-                }
-            }
+            if (nearestArea) selectArea(nearestArea);
         });
 
-        // --- メニュー生成（クリックは moveToArea 呼び出し） ---
+        // --- メニュー生成 ---
         const menuUl = document.querySelector('#map-menu ul');
         menuUl.innerHTML = '';
         areaCenters.forEach(area => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = () => { moveToArea(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom); };
+            btn.onclick = () => selectArea(area.name);
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
