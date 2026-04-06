@@ -138,3 +138,89 @@ function moveToArea(name, lat, lng, zoom) {
     // currentHash を初期ハッシュと同じ値に設定
     window.currentHash = newHash;
 }
+
+
+
+// --- CSV読み込み関数 ---
+export async function loadLocationCSV(csvUrl) {
+    const response = await fetch(csvUrl);
+    const text = await response.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+    const header = lines[0].split(',');
+    const rows = lines.slice(1).map(line => {
+        const cols = line.split(',');
+        const obj = {};
+        header.forEach((h, i) => obj[h] = cols[i]);
+        return obj;
+    });
+
+    const main = rows.find(r => r.type === 'pref');
+    const areas = rows.filter(r => r.type === 'area');
+    return { main, areas };
+}
+
+// --- 初期マップ描画用関数 ---
+export function drawMap(lat, lng, zoom) {
+    if (!window.map) {
+        window.map = L.map('lf-map', {
+            center: [lat, lng],
+            zoom: zoom,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            dragging: false,
+            zoomControl: false
+        });
+        L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
+            attribution:'© 国土地理院'
+        }).addTo(window.map);
+    } else {
+        window.map.setView([lat, lng], zoom);
+    }
+}
+
+// --- ハッシュ解析関数 ---
+export function parseHash(data) {
+    const hash = location.hash || '';
+    if (!hash) return null;
+
+    const [areaName, spotName] = decodeURIComponent(hash.substring(1)).split('/');
+    const area = data.areas.find(a => a.name === areaName);
+    if (!area) return null;
+
+    return { area, spotName };
+}
+
+// --- エリア選択共通処理 ---
+export function selectArea(area, fly = true) {
+    if (fly) {
+        window.map.flyTo([area.lat, area.lng], area.zoom || window.prefData.zoom);
+    } else {
+        window.map.setView([area.lat, area.lng], area.zoom || window.prefData.zoom);
+    }
+
+    // メニューを非表示
+    const menu = document.getElementById('map-menu');
+    if (menu) menu.style.display = 'none';
+
+    // URLハッシュ更新
+    location.hash = encodeURIComponent(area.name);
+}
+
+// --- 初期ロード処理 ---
+export async function initMapFromCSV(csvUrl) {
+    const data = await loadLocationCSV(csvUrl);
+    window.prefData = data.main;
+
+    const hashResult = parseHash(data);
+    if (hashResult) {
+        drawMap(hashResult.area.lat, hashResult.area.lng, hashResult.area.zoom);
+        if (hashResult.spotName && typeof handleSpotInitial === 'function') {
+            handleSpotInitial(hashResult.spotName, hashResult.area.name);
+        }
+    } else {
+        drawMap(window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+    }
+
+    return data;
+}
