@@ -213,6 +213,8 @@ li {
 
 <div id="lf-map">
   <div id="center-target"></div>
+  <div id="map-menu" class="map-menu"><ul></ul></div>
+
   <!-- 戻るボタン -->
   <button id="map-back-btn" style="
     position:absolute;
@@ -229,7 +231,6 @@ li {
   ">← 戻る</button>
 </div>
 
-<div id="map-menu" class="map-menu"><ul></ul></div>
 <div id="weather-wave-tide-container"></div>
 
 
@@ -292,13 +293,70 @@ document.addEventListener('DOMContentLoaded', () => {
         // 読み込んだ県名と直下のエリア名をアラートで表示
         const areaNames = data.areas.map(a => a.name).join(', ');
         alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
-
+        
+        createMapMenuFromAreas();
+        
+        
+        
     }).catch(err => {
         console.error('CSV読み込みエラー:', err);
         alert('CSV読み込みに失敗しました');
     });
+    
+    
+    
+    /**
+ * lf-map 内にエリアメニューを生成（クリックはアラート）
+ * ※呼び出されたときだけ作成される
+ */
+function createMapMenuFromAreas() {
+  const map = document.getElementById('lf-map');
+  if (!map) {
+    console.error('lf-map が存在しません');
+    return;
+  }
+
+  // メニューコンテナを取得、なければ作成
+  let menu = document.getElementById('map-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'map-menu';
+    menu.className = 'map-menu';
+    menu.innerHTML = '<ul></ul>';
+    map.appendChild(menu);
+  }
+
+  const ul = menu.querySelector('ul');
+  ul.innerHTML = ''; // 既存項目をクリア
+
+  // areaData を使ってメニューを生成
+  window.areaData.forEach(area => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.textContent = area.name;
+
+    // クリック時はアラート
+    btn.onclick = () => {
+      alert(`クリックされたエリア: ${area.name}`);
+    };
+
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+}
+
+// グローバル関数として保持
+window.createMapMenuFromAreas = createMapMenuFromAreas;
+    
+    
+    
+    
+    
 
 });
+
+
+
 </script>
 
 </html>
