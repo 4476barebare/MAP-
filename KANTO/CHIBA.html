@@ -317,30 +317,28 @@ border-radius: 4px;
 <script src="/MAP-/header.js" defer></script>
 
 
-
-<!-- JS モジュールを普通に読み込む -->
-<script type="module">
-import { initMapFromCSV, selectArea } from '/MAP-/js/dataLoader.js';
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // CSV は fetch で読み込む
+<script src="/MAP-/js/dataLoader.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
     const csvUrl = 'http://www.turiiko.shop/location.csv';
-    const data = await initMapFromCSV(csvUrl);
+    window.initMapFromCSV(csvUrl);
 
-    // メニュークリックでエリア選択
+    // メニュークリック
     document.querySelectorAll('.area-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', function() {
             const areaName = btn.dataset.area;
-            const area = data.areas.find(a => a.name === areaName);
-            if (area) selectArea(area, true);
+            const area = window.areaData.find(a => a.name === areaName);
+            if (area) window.selectArea(area, true);
         });
     });
 
-    // 地図クリックでエリア選択（例）
-    window.areaData.forEach(area => {
-        const marker = L.marker([area.lat, area.lng]).addTo(window.map);
-        marker.on('click', () => selectArea(area, true));
-    });
+    // 地図クリック例
+    setTimeout(function() { // map生成後に実行
+        window.areaData.forEach(area => {
+            const marker = L.marker([area.lat, area.lng]).addTo(window.map);
+            marker.on('click', function() { window.selectArea(area, true); });
+        });
+    }, 500);
 });
 </script>
 </html>
