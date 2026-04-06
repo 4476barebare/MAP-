@@ -44,9 +44,17 @@ li {
   border-top: 1px solid #191970;
   border-bottom: 1px solid #191970;
   padding: 4px 8px;
-  z-index: 2000;       /* Leaflet タイルより上に表示 */
+  z-index: 1980;       /* Leaflet タイルより上に表示 */
   overflow: auto;
 }
+
+#map-menu {
+  pointer-events: auto; /* メニューはクリック可能 */
+}
+#map-menu button {
+  pointer-events: auto;
+}
+
 /* 天気UI */
 
 #weather-wave-tide-container {
@@ -283,25 +291,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 地図クリックで最寄りエリア判定
         const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng }));
-        window.map.on('click', (e) => {
-            const clickLat = e.latlng.lat;
-            const clickLng = e.latlng.lng;
 
-            let minDist = Infinity;
-            let nearestArea = null;
+// 地図クリックで最寄りエリア判定（メニュー上のクリックは無視）
+window.map.on('click', (e) => {
 
-            areaCenters.forEach(area => {
-                const dLat = clickLat - area.lat;
-                const dLng = clickLng - area.lng;
-                const dist = dLat*dLat + dLng*dLng;
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearestArea = area.name;
-                }
-            });
+    // メニューの上なら処理しない
+    const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+    if (e.originalEvent.clientX >= menuRect.left &&
+        e.originalEvent.clientX <= menuRect.right &&
+        e.originalEvent.clientY >= menuRect.top &&
+        e.originalEvent.clientY <= menuRect.bottom) {
+        return; // メニュー上のクリックは無視
+    }
 
-            if (nearestArea) alert(`クリックされたエリア: ${nearestArea}`);
-        });
+    // 通常の最寄りエリア判定
+    const clickLat = e.latlng.lat;
+    const clickLng = e.latlng.lng;
+
+    let minDist = Infinity;
+    let nearestArea = null;
+
+    areaCenters.forEach(area => {
+        const dLat = clickLat - area.lat;
+        const dLng = clickLng - area.lng;
+        const dist = dLat*dLat + dLng*dLng;
+        if (dist < minDist) {
+            minDist = dist;
+            nearestArea = area.name;
+        }
+    });
+
+    if (nearestArea) alert(`クリックされたエリア: ${nearestArea}`);
+});
+
+
+
 
         // メニュー生成（クリックはアラート）
         const menuUl = document.querySelector('#map-menu ul');
