@@ -241,83 +241,154 @@ li {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
+    // 現在の HTML ファイル名を取得
     const pathParts = location.pathname.split('/');
-    const currentFile = pathParts[pathParts.length - 1];
+    const currentFile = pathParts[pathParts.length - 1]; // 例: "chiba.html"
+
+    // CSVのURL
     const csvUrl = '/MAP-/data/location.csv';
 
-    // ハッシュチェック + 描画 + メニュー生成
-    function initMapWithMenu() {
-        // ハッシュがある場合は何もしない
-        if (location.hash && location.hash !== '') {
-            console.log('ハッシュあり → 描画・メニュー生成スキップ');
+    // CSV読み込みに現在のHTML名を渡す
+    loadLocationCSV(csvUrl, currentFile).then(data => {
+
+        // CSVから取得した県本体データを prefData に格納
+        window.prefData = data.main;
+        window.areaData = data.areas;
+
+        if (!window.prefData) {
+            console.error('CSVに県本体データがありません');
+            alert('県本体データがありません');
             return;
         }
 
-        loadLocationCSV(csvUrl, currentFile).then(data => {
-            const prefData = data.main;
-            if (!prefData) {
-                alert('県本体データがありません');
-                return;
-            }
-
-            // 座標とズームで航空写真描画
-            drawLocation(
-                prefData.name,
-                prefData.lat,
-                prefData.lng,
-                prefData.zoom,
-                prefData.maxZoom,
-                'photo' // 航空写真
-            );
-
-            // 読み込んだ県名とエリア名をアラート
-            const areaNames = data.areas.map(a => a.name).join(', ');
-            alert(`県名: ${prefData.name}\nエリア: ${areaNames}`);
-
-            // メニュー生成
-            createMapMenuFromAreas(data.areas);
-        }).catch(err => {
-            console.error('CSV読み込みエラー:', err);
-            alert('CSV読み込みに失敗しました');
-        });
-    }
-
-    function createMapMenuFromAreas(areas) {
-        const map = document.getElementById('lf-map');
-        if (!map) return;
-
-        let menu = document.getElementById('map-menu');
-        if (!menu) {
-            menu = document.createElement('div');
-            menu.id = 'map-menu';
-            menu.className = 'map-menu';
-            menu.innerHTML = '<ul></ul>';
-            map.appendChild(menu);
+        // URLハッシュチェック（空なら空文字固定）
+        let initialHash = '';
+        if (!location.hash || location.hash === '') {
+            initialHash = '';
         }
 
-        const ul = menu.querySelector('ul');
-        ul.innerHTML = '';
+        // 地図描画＋メニュー生成＋クリック判定
+        initMapWithMenu(window.prefData, window.areaData);
 
-        areas.forEach(area => {
-            const li = document.createElement('li');
-            const btn = document.createElement('button');
-            btn.textContent = area.name;
-            btn.onclick = () => alert(`クリックされたエリア: ${area.name}`);
-            li.appendChild(btn);
-            ul.appendChild(li);
-        });
-    }
+        // 読み込んだ県名と直下のエリア名をアラートで表示
+        const areaNames = window.areaData.map(a => a.name).join(', ');
+        alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
 
-    // 実行
-    initMapWithMenu();
-
-    // グローバル化して必要なら他でも呼べる
-    //window.createMapMenuFromAreas = createMapMenuFromAreas;
+    }).catch(err => {
+        console.error('CSV読み込みエラー:', err);
+        alert('CSV読み込みに失敗しました');
+    });
 
 });
 
+/**
+ * 地図描画、下揃えメニュー生成、エリアクリック判定をまとめた関数
+ * @param {object} prefData - 県本体データ { name, lat, lng, zoom, maxZoom }
+ * @param {Array} areaData - 県直下のエリア配列 [{ name, lat, lng, zoom, maxZoom }, ...]
+ */
+function initMapWithMenu(prefData, areaData) {
+  if (!prefData || !areaData || areaData.length === 0) {
+    console.error('県情報またはエリア情報が不足しています');
+    return;
+  }
 
+  // 地図描画（航空写真）
+  drawLocation(
+    prefData.name,
+    prefData.lat,
+    prefData.lng,
+    prefData.zoom,
+    prefData.maxZoom,
+    'photo'
+  );
 
+  const map = window.map;
+
+  // lf-map 内メニュー作成
+  createMapMenuFromAreas();
+
+  // クリック判定用ポリゴン作成
+  for (let i = 0; i < areaData.length; i++) {
+    const area = areaData[i];
+    const nextArea = areaData[i + 1];
+
+    const center = L.latLng(area.lat, area.lng);
+
+    let polygonPoints = [];
+    if (nextArea) {
+      const midLat = (area.lat + nextArea.lat) / 2;
+      const midLng = (area.lng + nextArea.lng) / 2;
+      const midPoint = L.latLng(midLat, midLng);
+
+      polygonPoints = [
+        [center.lat, center.lng],
+        [midPoint.lat, center.lng],
+        [midPoint.lat, midPoint.lng],
+        [center.lat, midPoint.lng]
+      ];
+    } else {
+      const offset = 0.01; // 適当なサイズ
+      polygonPoints = [
+        [center.lat - offset, center.lng - offset],
+        [center.lat - offset, center.lng + offset],
+        [center.lat + offset, center.lng + offset],
+        [center.lat + offset, center.lng - offset]
+      ];
+    }
+
+    const poly = L.polygon(polygonPoints, { color: 'transparent', fillOpacity: 0 }).addTo(map);
+    poly.on('click', () => {
+      alert(`クリックされたエリア: ${area.name}`);
+    });
+  }
+}
+
+// グローバルで呼び出せるように
+window.initMapWithMenu = initMapWithMenu;
+
+/**
+ * lf-map 内にエリアメニューを生成（クリックはアラート）
+ * ※呼び出されたときだけ作成される
+ */
+function createMapMenuFromAreas() {
+  const map = document.getElementById('lf-map');
+  if (!map) {
+    console.error('lf-map が存在しません');
+    return;
+  }
+
+  // メニューコンテナを取得、なければ作成
+  let menu = document.getElementById('map-menu');
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'map-menu';
+    menu.className = 'map-menu';
+    menu.innerHTML = '<ul></ul>';
+    map.appendChild(menu);
+  }
+
+  const ul = menu.querySelector('ul');
+  ul.innerHTML = ''; // 既存項目をクリア
+
+  // areaData を使ってメニューを生成
+  window.areaData.forEach(area => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.textContent = area.name;
+
+    // クリック時はアラート
+    btn.onclick = () => {
+      alert(`クリックされたエリア: ${area.name}`);
+    };
+
+    li.appendChild(btn);
+    ul.appendChild(li);
+  });
+}
+
+// グローバル関数として保持
+window.createMapMenuFromAreas = createMapMenuFromAreas;
 </script>
 
 </html>
