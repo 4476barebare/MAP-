@@ -37,15 +37,17 @@ li {
 .map-menu {
   position: absolute;  /* 地図コンテナに対して絶対配置 */
   bottom: 0;           /* 下揃え */
+  font-size: 12px;
   left: 5px;
   right: 5px;
   min-height: 50px;    /* 必要に応じて高さを調整 */
-  background: rgba(255,255,255,0.9);
-  border-top: 1px solid #191970;
-  border-bottom: 1px solid #191970;
-  padding: 4px 8px;
+  background: #fff;
+  border-top: 5px;
+  border-bottom: 5px;
+  padding: 0px;
   z-index: 1980;       /* Leaflet タイルより上に表示 */
   overflow: auto;
+  border-radius: 3px;
 }
 
 #map-menu {
