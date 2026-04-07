@@ -1,12 +1,13 @@
-// グローバルに保持
-window.prefData = null;  // 選択された県本体
-window.areaData = [];    // 選択県直下のエリア
-window.spotData = [];    // 選択県直下のスポット
+// dataloader.js
+
+// グローバル
+window.prefData = null;
+window.areaData = [];
+window.spotData = [];
+window.currentHash = '';
 
 /**
  * CSV読み込み
- * @param {string} csvUrl
- * @param {string} currentFile
  */
 function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
@@ -39,7 +40,7 @@ function loadLocationCSV(csvUrl, currentFile) {
                     main = obj;
                 } else if (parent.toUpperCase() === filePref) {
                     areas.push(obj);
-                } else if (parent && areas.find(a => a.name.toUpperCase() === parent.toUpperCase())) {
+                } else if (parent && areas.find(a => a.name === parent)) {
                     spots.push(obj);
                 }
             }
@@ -67,17 +68,16 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         keyboard: false,
         tap: false,
     };
-    const mapOptions = { ...defaultOptions, ...options };
 
+    const mapOptions = { ...defaultOptions, ...options };
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
     if (window.map) {
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-        window.map.attributionControl.setPosition('topright');
-
         if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
         window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
 
+        // 操作制御
         mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
         mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
         mapOptions.doubleClickZoom ? window.map.doubleClickZoom.enable() : window.map.doubleClickZoom.disable();
@@ -85,36 +85,25 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         mapOptions.keyboard ? window.map.keyboard.enable() : window.map.keyboard.disable();
         mapOptions.touchZoom ? window.map.touchZoom.enable() : window.map.touchZoom.disable();
         if (window.map.tap) mapOptions.tap ? window.map.tap.enable() : window.map.tap.disable();
-
     } else {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
-
-        window.currentTileLayer = L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院'
-        }).addTo(window.map);
+        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
     }
 }
 
 /**
  * エリア選択
  */
-function selectArea(areaName, fromBackButton = false) {
+function selectArea(areaName) {
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
-
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+    location.hash = encodeURIComponent(area.name);
+    window.currentHash = location.hash;
 
-    const menu = document.getElementById('map-menu');
-    const backBtn = document.getElementById('map-back-btn');
-
-    if (!fromBackButton) {
-        location.hash = encodeURIComponent(areaName);
-        window.currentHash = location.hash;
-    }
-
-    menu.style.display = 'none';
-    backBtn.style.display = 'block';
+    document.getElementById('map-menu').style.display = 'none';
+    document.getElementById('map-back-btn').style.display = 'block';
 }
 
 /**
@@ -123,40 +112,28 @@ function selectArea(areaName, fromBackButton = false) {
 function selectSpot(areaName, spotName) {
     const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
     if (!spot) return;
-
     drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
-
     location.hash = encodeURIComponent(areaName + '/' + spotName);
     window.currentHash = location.hash;
 
-    const menu = document.getElementById('map-menu');
-    const backBtn = document.getElementById('map-back-btn');
-
-    menu.style.display = 'none';
-    backBtn.style.display = 'block';
+    document.getElementById('map-menu').style.display = 'none';
+    document.getElementById('map-back-btn').style.display = 'block';
 }
 
 /**
- * 戻るボタン
+ * 戻る
  */
-window.goBack = function() {
-    if (!window.currentHash) return;
+function goBack() {
+    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+    location.hash = '';
+    window.currentHash = '';
 
-    const parts = decodeURIComponent(window.currentHash.substring(1)).split('/');
-    const areaName = parts[0];
-    const spotName = parts[1];
+    document.getElementById('map-menu').style.display = 'block';
+    document.getElementById('map-back-btn').style.display = 'none';
+}
 
-    const menu = document.getElementById('map-menu');
-    const backBtn = document.getElementById('map-back-btn');
-
-    if (spotName) {
-        selectArea(areaName, true);
-    } else {
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-        window.currentHash = '';
-        location.hash = '';
-
-        menu.style.display = 'block';
-        backBtn.style.display = 'none';
-    }
-};
+window.selectArea = selectArea;
+window.selectSpot = selectSpot;
+window.goBack = goBack;
+window.drawLocation = drawLocation;
+window.loadLocationCSV = loadLocationCSV;
