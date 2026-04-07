@@ -51,7 +51,6 @@ li { user-select: none; cursor: pointer; }
 </header>
 
 
-
 <div id="lf-map">
   <div class="map-ad">
     <div class="ad-box">AD 320×50</div>
@@ -59,6 +58,7 @@ li { user-select: none; cursor: pointer; }
   <div id="map-menu" class="map-menu"><ul></ul></div>
   <button id="map-back-btn" style="position:absolute;bottom:50px;right:10px;display:none;z-index:2000;background:#fff;border:1px solid #888;border-radius:4px;padding:4px 6px;font-size:12px;cursor:pointer;">← 戻る</button>
 </div>
+
 
 <div id="weather-wave-tide-container"></div>
 <div id="newsOverlay"><div class="news-window"><button id="closeNews">閉じる</button><div class="news-content"></div></div></div>
@@ -70,20 +70,13 @@ li { user-select: none; cursor: pointer; }
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
     const csvUrl = '/MAP-/data/location.csv';
     const currentFile = location.pathname.split('/').pop();
 
     loadLocationCSV(csvUrl, currentFile).then(data => {
         if (!data.main) return;
 
-        window.prefData = data.main;
-        window.areaData = data.areas;
-        window.spotData = data.spots;
-
-        const menu = document.getElementById('map-menu');
-
-        // --- ハッシュ判定 ---
+        // 初期ハッシュ判定
         const initialHash = location.hash;
         if (initialHash) {
             const parts = decodeURIComponent(initialHash.substring(1)).split('/');
@@ -93,20 +86,20 @@ document.addEventListener('DOMContentLoaded', () => {
             window.currentHash = initialHash;
 
             if (spotName) {
-                window.selectSpot(areaName, spotName);
+                selectSpot(areaName, spotName);
             } else {
-                window.selectArea(areaName);
+                selectArea(areaName);
             }
-            menu.style.display = 'none';  // ハッシュありならメニュー非表示
         } else {
-            window.drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-            menu.style.display = 'block';  // デフォルト表示
+            drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+            document.getElementById('map-menu').style.display = 'block';
+            document.getElementById('map-back-btn').style.display = 'none';
             window.currentHash = '';
         }
 
-        // --- クリックで最寄りエリア ---
+        // クリックで最寄りエリア判定
         window.map.on('click', e => {
-            const menuRect = menu.getBoundingClientRect();
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
             if (e.originalEvent.clientX >= menuRect.left &&
                 e.originalEvent.clientX <= menuRect.right &&
                 e.originalEvent.clientY >= menuRect.top &&
@@ -119,17 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dist = dLat*dLat + dLng*dLng;
                 if (dist < minDist) { minDist = dist; nearestArea = area.name; }
             });
-            if (nearestArea) window.selectArea(nearestArea);
+            if (nearestArea) selectArea(nearestArea);
         });
 
-        // --- メニュー生成 ---
-        const menuUl = menu.querySelector('ul');
+        // メニュー生成
+        const menuUl = document.querySelector('#map-menu ul');
         menuUl.innerHTML = '';
         window.areaData.forEach(area => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = () => window.selectArea(area.name);
+            btn.onclick = () => selectArea(area.name);
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
@@ -138,6 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('CSV読み込みに失敗しました');
     });
 
+    // 戻るボタン
+    document.getElementById('map-back-btn').addEventListener('click', () => {
+        window.goBack();
+    });
 });
 </script>
 </body>
