@@ -1,21 +1,3 @@
-// dataloader.js
-// sprite.svg を事前に DOM にロードしてアラートで確認
-(function preloadSprite() {
-    fetch('/MAP-/icon/sprite.svg')
-        .then(res => res.text())
-        .then(svgText => {
-            const div = document.createElement('div');
-            div.style.display = 'none';
-            div.innerHTML = svgText;
-            document.body.appendChild(div);
-            alert('sprite.svg がロードされました');
-        })
-        .catch(() => {
-            alert('sprite.svg のロードに失敗しました');
-        });
-})();
-
-
 
 
 // グローバル
@@ -214,9 +196,7 @@ window.loadLocationCSV = loadLocationCSV;
 
 
 
-
 function showSpotsForArea(areaName) {
-    // 既存スポットマーカーを削除
     if (window.spotMarkers) {
         window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
     }
@@ -228,42 +208,22 @@ function showSpotsForArea(areaName) {
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
     spots.forEach(spot => {
-        const iconId = spot.icon || 'spot';
+        const iconFile = (spot.icon || 'spot') + '.svg'; // CSV icon列 + .svg
 
-        // sprite 内の symbol をクローンして svg を作る
-        const symbol = document.querySelector(`#${iconId}`);
-        if (!symbol) {
-            alert(`シンボル ${iconId} が見つかりません`);
-            return;
-        }
-
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('class', 'spot-icon');
-        svg.setAttribute('width', '24');
-        svg.setAttribute('height', '24');
-
-        // symbol 内の全ての子ノードをクローンして追加
-        symbol.childNodes.forEach(node => svg.appendChild(node.cloneNode(true)));
-
-        // マーカー HTML を作成
-        const div = document.createElement('div');
-        div.className = 'spot-marker';
-        div.appendChild(svg);
-
-        const span = document.createElement('span');
-        span.className = 'spot-name';
-        span.textContent = spot.name;
-        div.appendChild(span);
-
-        const html = div.outerHTML;
+        const html = `
+            <div class="spot-marker">
+                <img class="spot-icon" src="/MAP-/icon/${iconFile}" width="24" height="24">
+                <span class="spot-name">${spot.name}</span>
+            </div>
+        `;
 
         const marker = L.marker([spot.lat, spot.lng], {
             title: spot.name,
             icon: L.divIcon({
                 html: html,
                 className: 'spot-div-icon',
-                iconSize: [150, 24], // 必要に応じて調整
-                iconAnchor: [0, 12]  // 左端中央に合わせる
+                iconSize: [150, 24],
+                iconAnchor: [0, 12]
             })
         }).addTo(window.map);
 
