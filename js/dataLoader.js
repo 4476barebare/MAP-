@@ -1,6 +1,6 @@
 // dataLoader.js
 
-// グローバル変数
+// グローバルに保持
 window.prefData = null;  // 選択された県本体
 window.areaData = [];    // 選択県直下のエリア
 window.spotData = [];    // 選択県直下のスポット
@@ -8,7 +8,8 @@ window.spotData = [];    // 選択県直下のスポット
 /**
  * CSV読み込み関数
  * @param {string} csvUrl - CSVファイルURL
- * @param {string} currentFile - 現在のHTMLファイル名
+ * @param {string} currentFile - 現在のHTMLファイル名（例: "chiba.html"）
+ * @returns {Promise<{main: object, areas: object[], spots: object[]}>}
  */
 function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
@@ -19,8 +20,8 @@ function loadLocationCSV(csvUrl, currentFile) {
 
             let main = null;
             const areas = [];
-            const spots = [];
 
+            // HTMLファイル名から県名を抽出（拡張子除去して大文字に）
             const filePref = currentFile.replace('.html', '').toUpperCase();
 
             for (let i = 1; i < lines.length; i++) {
@@ -38,95 +39,90 @@ function loadLocationCSV(csvUrl, currentFile) {
                 const obj = { name, zoom, maxZoom, lat, lng, parent, style, restricted, icon };
 
                 if (!parent && name.toUpperCase() === filePref) {
+                    // 親を持たず、現在のHTMLに対応する県本体
                     main = obj;
                 } else if (parent.toUpperCase() === filePref) {
+                    // 選択県直下のエリア
                     areas.push(obj);
-                } else if (parent && parent.toUpperCase() === filePref) {
-                    spots.push(obj);
                 }
+                // スポットは無視
             }
 
+            // グローバルに保存
             window.prefData = main;
             window.areaData = areas;
-            window.spotData = spots;
 
-            alert("CSVロード完了: " + main.name);
-
-            return { main, areas, spots };
-        })
-        .catch(err => { alert("CSV読み込みエラー: " + err); });
-}
-
-/**
- * 初期マップ描画
- */
-function drawMap(lat, lng, zoom) {
-    if (!window.map) {
-        window.map = L.map('lf-map', {
-            center: [lat, lng],
-            zoom: zoom,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            dragging: false,
-            zoomControl: false
+            return { main, areas };
         });
-        L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
-            attribution: '© 国土地理院'
-        }).addTo(window.map);
-    } else {
-        window.map.setView([lat, lng], zoom);
-    }
 }
 
-/**
- * ハッシュ解析
- */
-function parseHash(data) {
-    const hash = location.hash || '';
-    if (!hash) return null;
+function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
+  if (maxZoom !== null) {
+    alert(`"${name}" に最大ズームが設定されています: ${maxZoom}`);
+    return;
+  }
 
-    const [areaName, spotName] = decodeURIComponent(hash.substring(1)).split('/');
-    const area = data.areas.find(a => a.name === areaName);
-    if (!area) return null;
+  // デフォルトは航空写真、全操作禁止
+  const defaultOptions = {
+    center: [lat, lng],
+    zoom: zoom,
+    zoomControl: false,    // ←ズームボタン非表示
+    scrollWheelZoom: false,
+    dragging: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    tap: false,
+  };
 
-    return { area, spotName };
+  const mapOptions = { ...defaultOptions, ...options };
+
+  const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+
+  if (window.map) {
+  // 既存map更新
+  window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+window.map.attributionControl.setPosition('topright');
+
+  if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+  window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+  
+  // ★操作を全部制御（ここ重要）
+  mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
+  mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
+  mapOptions.doubleClickZoom ? window.map.doubleClickZoom.enable() : window.map.doubleClickZoom.disable();
+  mapOptions.boxZoom ? window.map.boxZoom.enable() : window.map.boxZoom.disable();
+  mapOptions.keyboard ? window.map.keyboard.enable() : window.map.keyboard.disable();
+  mapOptions.touchZoom ? window.map.touchZoom.enable() : window.map.touchZoom.disable();
+
+  if (window.map.tap) {
+    mapOptions.tap ? window.map.tap.enable() : window.map.tap.disable();
+  }
+
+} else {
+  // ★初回生成（これが無いとダメ）
+  window.map = L.map('lf-map', mapOptions);
+window.map.attributionControl.setPosition('topright');
+
+  window.currentTileLayer = L.tileLayer(tileUrl, {
+    attribution: '© 国土地理院'
+  }).addTo(window.map);
+  
+}
 }
 
-/**
- * 共通エリア選択処理
- */
-function selectArea(area, fly = true) {
-    if (!window.map) { alert("mapが未生成です"); return; }
+window.drawLocation = drawLocation;
 
-    if (fly) {
-        window.map.flyTo([area.lat, area.lng], area.zoom || window.prefData.zoom);
-    } else {
-        window.map.setView([area.lat, area.lng], area.zoom || window.prefData.zoom);
-    }
 
-    // メニュー非表示
-    const menu = document.getElementById('map-menu');
-    if (menu) menu.style.display = 'none';
 
-    // ハッシュ更新
-    location.hash = encodeURIComponent(area.name);
+function moveToArea(name, lat, lng, zoom) {
+    // 地図移動
+    window.map.flyTo([lat, lng], zoom);
+
+    // URL ハッシュを更新
+    const newHash = encodeURIComponent(name);
+    location.hash = newHash;
+
+    // currentHash を初期ハッシュと同じ値に設定
+    window.currentHash = newHash;
 }
-
-/**
- * 初期ロード処理
- */
-function initMapFromCSV(csvUrl) {
-    const currentFile = location.pathname.split('/').pop();
-    loadLocationCSV(csvUrl, currentFile).then(data => {
-        const hashResult = parseHash(data);
-        if (hashResult) {
-            drawMap(hashResult.area.lat, hashResult.area.lng, hashResult.area.zoom);
-        } else {
-            drawMap(window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        }
-    });
-}
-
-// グローバルに公開
-window.initMapFromCSV = initMapFromCSV;
-window.selectArea = selectArea;
