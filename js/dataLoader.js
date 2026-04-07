@@ -95,6 +95,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         window.map.attributionControl.setPosition('topright');
         window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
     }
+        window.currentHash = location.hash;
 }
 
 /**
@@ -107,7 +108,6 @@ function selectArea(areaName) {
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
     //setupNearestClick();
     location.hash = encodeURIComponent(area.name);
-    window.currentHash = location.hash;
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
@@ -128,7 +128,6 @@ function selectSpot(areaName, spotName) {
     if (!spot) return;
     drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
     location.hash = encodeURIComponent(areaName + '/' + spotName);
-    window.currentHash = location.hash;
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
@@ -137,51 +136,46 @@ function selectSpot(areaName, spotName) {
 /**
  * 戻る
  */
-// goBack を改修
-function goBack(prevHash) {
-    const hash = prevHash || ''; // 渡された値を使う
-    window.currentHash = '';     // ブラウザバック後はクリア
 
-    if (!hash) {
-        // 県状態
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-        document.getElementById('map-menu').style.display = 'block';
-        document.getElementById('map-back-btn').style.display = 'none';
-        return;
-    }
+function goBack(hash) {
+    // ハッシュ未指定なら currentHash を使う
+    hash = hash || window.currentHash || '';
 
-    if (hash.includes('/')) {
-        // スポット → エリア
-        const parts = decodeURIComponent(hash).split('/');
-        const areaName = parts[0];
+    // decodeして判定
+    const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
+    const areaName = parts[0];
+    const spotName = parts[1];
+
+    if (spotName) {
+        // スポット→エリアに戻す（まだピン削除処理は未実装）
         const area = window.areaData.find(a => a.name === areaName);
-        if (area) {
-            drawLocation(area.name, area.lat, area.lng, area.zoom, area.maxZoom);
-        }
-        // TODO: スポットマーカー削除（未実装）
+        if (!area) return;
 
-        location.hash = areaName; // エリア状態に戻す
-        document.getElementById('map-menu').style.display = 'block';
-        document.getElementById('map-back-btn').style.display = 'none';
-        return;
-    }
+        // スポットピンを消す処理（未実装）
+        // window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+        // window.spotMarkers = [];
 
-    // エリア → 県
-    const area = window.areaData.find(a => a.name === hash);
-    if (area) {
+        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+        location.hash = encodeURIComponent(area.name);
+        window.currentHash = location.hash;
+
+    } else if (areaName) {
+        // エリア→県に戻す
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
 
-        // 全スポットマーカーを削除
+        // 既存スポットマーカーを削除
         if (window.spotMarkers) {
             window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
             window.spotMarkers = [];
         }
 
         location.hash = '';
-        document.getElementById('map-menu').style.display = 'block';
-        document.getElementById('map-back-btn').style.display = 'none';
-        return;
+        window.currentHash = '';
     }
+
+    // 表示制御はそのまま
+    document.getElementById('map-menu').style.display = 'block';
+    document.getElementById('map-back-btn').style.display = 'none';
 }
 
 window.selectArea = selectArea;
