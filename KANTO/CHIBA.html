@@ -235,16 +235,15 @@ document.getElementById('map-menu').addEventListener('click', e => {
         }
     }
     
-    fetch('/MAP-/icon/back.svg')
+fetch('/MAP-/icon/back.svg')
   .then(res => res.text())
   .then(svg => {
-    document.getElementById('map-back-btn').innerHTML = svg;
+    const btn = document.getElementById('map-back-btn');
+    btn.innerHTML = svg;
 
-    // クラス付与（重要）
-    const svgEl = document.querySelector('#map-back-btn svg');
+    const svgEl = btn.querySelector('svg'); // ←ここ
     if (svgEl) svgEl.classList.add('back-icon');
   });
-
 });
 </script>
 </body>
