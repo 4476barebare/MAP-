@@ -96,11 +96,11 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
  * エリア選択
  */
 function selectArea(areaName) {
-    removeNearestClick();
+    //removeNearestClick();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-    setupNearestClick();
+    //setupNearestClick();
     location.hash = encodeURIComponent(area.name);
     window.currentHash = location.hash;
 
@@ -112,7 +112,7 @@ function selectArea(areaName) {
  * スポット選択
  */
 function selectSpot(areaName, spotName) {
-    removeNearestClick();
+    //removeNearestClick();
     const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
     if (!spot) return;
     drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
