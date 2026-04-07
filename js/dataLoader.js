@@ -108,7 +108,9 @@ function selectArea(areaName) {
     document.getElementById('map-back-btn').style.display = 'block';
     
     
-      showSpotsForArea(areaName);
+    showSpotsForArea(area.name);
+
+
 
 }
 
@@ -160,18 +162,31 @@ window.loadLocationCSV = loadLocationCSV;
 
 
 
-function selectArea(areaName) {
-    const area = window.areaData.find(a => a.name === areaName);
-    if (!area) return;
+// --- 指定エリアのスポットを安全にマーカー表示 ---
+function showSpotsForArea(areaName) {
+    // 既存スポットマーカーを削除
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+    }
+    window.spotMarkers = [];
 
-    drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+    if (!areaName) return;
 
-    // --- ここでスポットを表示 ---
-    showSpotsForArea(area.name);
+    // 比較用にエリア名を正規化（前後空白削除・小文字化）
+    const normAreaName = areaName.trim().toLowerCase();
 
-    location.hash = encodeURIComponent(area.name);
-    window.currentHash = location.hash;
+    // 指定エリアのスポットを取得
+    const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
-    document.getElementById('map-menu').style.display = 'none';
-    document.getElementById('map-back-btn').style.display = 'block';
+    spots.forEach(spot => {
+        const marker = L.marker([spot.lat, spot.lng], {
+            title: spot.name,
+            icon: spot.icon ? L.icon({ iconUrl: spot.icon, iconSize: [25, 25] }) : undefined
+        }).addTo(window.map);
+
+        // スポットクリックは selectSpot に任せる
+        marker.on('click', () => selectSpot(spot.parent, spot.name));
+
+        window.spotMarkers.push(marker);
+    });
 }
