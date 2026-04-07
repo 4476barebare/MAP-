@@ -101,17 +101,12 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 /**
  * エリア選択
  */
-function selectArea(areaName,e) {
+function selectArea(areaName) {
     //removeNearestClick();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
     //setupNearestClick();
-     // イベントオブジェクトがあれば伝播を止める
-    if (e) e.stopPropagation();
-
-    // 次の popstate を無視する
-    window.ignoreNextPop = true;
     
     location.hash = encodeURIComponent(area.name);
 
