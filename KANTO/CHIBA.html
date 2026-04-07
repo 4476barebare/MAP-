@@ -325,6 +325,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const pathParts = location.pathname.split('/');
     const currentFile = pathParts[pathParts.length - 1];
   // CSV読み込み
+  
+  function testCSV() {
+    fetch(csvUrl)
+      .then(r => {
+        if (!r.ok) throw new Error('HTTP status ' + r.status);
+        return r.text();
+      })
+      .then(text => {
+        alert(text); // CSV 全体を表示
+        console.log(text);
+      })
+      .catch(err => {
+        alert('CSV fetch failed: ' + err);
+        console.error(err);
+      });
+  }
+
+  testCSV();
+
+  
+  
+  
+  
+  
     loadLocationCSV(csvUrl, currentFile).then(data => {
 alert(JSON.stringify(data));
 
