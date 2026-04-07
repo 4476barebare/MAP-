@@ -81,23 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.areaData = data.areas;
         window.spotData = data.spots;
 
-        // --- エリア選択 ---
-        function selectArea(areaName) {
-            const area = window.areaData.find(a => a.name === areaName);
-            if (!area) return;
-            drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-            location.hash = encodeURIComponent(area.name);
-            window.currentHash = location.hash;
-        }
-
-        // --- スポット選択 ---
-        function selectSpot(areaName, spotName) {
-            const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
-            if (!spot) return;
-            drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
-            location.hash = encodeURIComponent(areaName + '/' + spotName);
-            window.currentHash = location.hash;
-        }
+        const menu = document.getElementById('map-menu');
 
         // --- ハッシュ判定 ---
         const initialHash = location.hash;
@@ -109,21 +93,20 @@ document.addEventListener('DOMContentLoaded', () => {
             window.currentHash = initialHash;
 
             if (spotName) {
-                selectSpot(areaName, spotName);
+                window.selectSpot(areaName, spotName);
             } else {
-                selectArea(areaName);
+                window.selectArea(areaName);
             }
-            // メニューは非表示
-            document.getElementById('map-menu').style.display = 'none';
+            menu.style.display = 'none';  // ハッシュありならメニュー非表示
         } else {
-            drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-            document.getElementById('map-menu').style.display = 'block'; // メニュー表示
+            window.drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+            menu.style.display = 'block';  // デフォルト表示
             window.currentHash = '';
         }
 
         // --- クリックで最寄りエリア ---
         window.map.on('click', e => {
-            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+            const menuRect = menu.getBoundingClientRect();
             if (e.originalEvent.clientX >= menuRect.left &&
                 e.originalEvent.clientX <= menuRect.right &&
                 e.originalEvent.clientY >= menuRect.top &&
@@ -136,17 +119,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dist = dLat*dLat + dLng*dLng;
                 if (dist < minDist) { minDist = dist; nearestArea = area.name; }
             });
-            if (nearestArea) selectArea(nearestArea);
+            if (nearestArea) window.selectArea(nearestArea);
         });
 
         // --- メニュー生成 ---
-        const menuUl = document.querySelector('#map-menu ul');
+        const menuUl = menu.querySelector('ul');
         menuUl.innerHTML = '';
         window.areaData.forEach(area => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = () => selectArea(area.name);
+            btn.onclick = () => window.selectArea(area.name);
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
