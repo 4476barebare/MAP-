@@ -197,6 +197,7 @@ window.loadLocationCSV = loadLocationCSV;
 
 
 function showSpotsForArea(areaName) {
+    // 既存スポットマーカーを削除
     if (window.spotMarkers) {
         window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
     }
@@ -208,29 +209,29 @@ function showSpotsForArea(areaName) {
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
     spots.forEach(spot => {
-        const iconId = spot.icon || 'default-icon';
+        const iconId = spot.icon || 'spot';
 
-        // SVGを文字列としてdivIconに埋め込み
         const html = `
-            <div class="spot-label">
-                <svg width="16" height="16">
+            <div class="spot-marker">
+                <svg class="spot-icon" width="24" height="24">
                     <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
                 </svg>
-                <span>${spot.name}</span>
+                <span class="spot-name">${spot.name}</span>
             </div>
         `;
 
         const marker = L.marker([spot.lat, spot.lng], {
+            title: spot.name,
             icon: L.divIcon({
-                className: '',
                 html: html,
-                iconSize: [120, 24],
-                iconAnchor: [0, 12] // 左寄せで縦中央
+                className: 'spot-div-icon',
+                iconSize: [150, 24], // 適宜調整
+                iconAnchor: [0, 12] // 左端中央に合わせる
             })
-        });
+        }).addTo(window.map);
 
         marker.on('click', () => selectSpot(spot.parent, spot.name));
+
         window.spotMarkers.push(marker);
-        marker.addTo(window.map);
     });
 }
