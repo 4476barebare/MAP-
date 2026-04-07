@@ -319,26 +319,127 @@ border-radius: 4px;
 
 <script src="/MAP-/js/dataLoader.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const csvUrl = 'http://www.turiiko.shop/location.csv';
-    window.initMapFromCSV(csvUrl);
+document.addEventListener('DOMContentLoaded', () => {
 
-    // メニュークリック
-    document.querySelectorAll('.area-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const areaName = btn.dataset.area;
-            const area = window.areaData.find(a => a.name === areaName);
-            if (area) window.selectArea(area, true);
+    const csvUrl = '/MAP-/data/location.csv';
+    const pathParts = location.pathname.split('/');
+    const currentFile = pathParts[pathParts.length - 1];
+
+    // CSV読み込み
+    loadLocationCSV(csvUrl, currentFile).then(data => {
+
+        if (!data.main) {
+            console.error('県本体データがありません');
+            alert('県本体データがありません');
+            return;
+        }
+        window.prefData = data.main;
+
+        // 地図描画（航空写真、全操作禁止）
+        window.map = L.map('lf-map', {
+            center:[window.prefData.lat, window.prefData.lng],
+            zoom:window.prefData.zoom,
+            scrollWheelZoom:false,
+            doubleClickZoom:false,
+            dragging:false,
+            zoomControl:false
         });
+        L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
+            attribution:'© 国土地理院'
+        }).addTo(window.map);
+
+        // エリア中心座標リスト
+        const areaCenters = data.areas.map(a => ({ name:a.name, lat:a.lat, lng:a.lng, zoom:a.zoom }));
+
+        // --- 共通関数：エリア選択 ---
+        function selectArea(areaName) {
+            const area = areaCenters.find(a => a.name === areaName);
+            if (!area) return;
+
+            // 地図移動
+            drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+
+            // ハッシュ更新
+            location.hash = encodeURIComponent(area.name);
+
+            // 必要に応じてUI更新など
+            console.log(`選択されたエリア: ${area.name}`);
+        }
+
+        // --- 初期ハッシュチェック＋描画 ---
+        let initialHash = location.hash || '';
+        if (initialHash) {
+            const parts = decodeURIComponent(initialHash.substring(1)).split('/');
+            const areaName = parts[0];
+            const spotName = parts[1];
+
+            if (spotName) {
+                handleSpotInitial(spotName, areaName);
+            } else {
+                selectArea(areaName);
+            }
+        } else {
+            // ハッシュなし → 県本体表示
+            drawLocation(
+                window.prefData.name,
+                window.prefData.lat,
+                window.prefData.lng,
+                window.prefData.zoom,
+                window.prefData.maxZoom,
+                'photo'
+            );
+        }
+
+        // --- 地図クリックで最寄りエリア判定 ---
+        window.map.on('click', (e) => {
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+            if (e.originalEvent.clientX >= menuRect.left &&
+                e.originalEvent.clientX <= menuRect.right &&
+                e.originalEvent.clientY >= menuRect.top &&
+                e.originalEvent.clientY <= menuRect.bottom) {
+                return; // メニュー上クリックは無視
+            }
+
+            const clickLat = e.latlng.lat;
+            const clickLng = e.latlng.lng;
+
+            let minDist = Infinity;
+            let nearestArea = null;
+
+            areaCenters.forEach(area => {
+                const dLat = clickLat - area.lat;
+                const dLng = clickLng - area.lng;
+                const dist = dLat*dLat + dLng*dLng;
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestArea = area.name;
+                }
+            });
+
+            if (nearestArea) selectArea(nearestArea);
+        });
+
+        // --- メニュー生成 ---
+        const menuUl = document.querySelector('#map-menu ul');
+        menuUl.innerHTML = '';
+        areaCenters.forEach(area => {
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+            btn.textContent = area.name;
+            btn.onclick = () => selectArea(area.name);
+            li.appendChild(btn);
+            menuUl.appendChild(li);
+        });
+
+        // --- 完了アラート ---
+        const areaNames = areaCenters.map(a => a.name).join(', ');
+        alert(`県名: ${window.prefData.name}\nエリア: ${areaNames}`);
+
+    }).catch(err => {
+        console.error('CSV読み込みエラー:', err);
+        alert('CSV読み込みに失敗しました');
     });
 
-    // 地図クリック例
-    setTimeout(function() { // map生成後に実行
-        window.areaData.forEach(area => {
-            const marker = L.marker([area.lat, area.lng]).addTo(window.map);
-            marker.on('click', function() { window.selectArea(area, true); });
-        });
-    }, 500);
 });
 </script>
 </html>
