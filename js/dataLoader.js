@@ -137,25 +137,51 @@ function selectSpot(areaName, spotName) {
 /**
  * 戻る
  */
-function goBack() {
-    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-    
-        // 既存スポットマーカーを削除
-    if (window.spotMarkers) {
-        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
-        window.spotMarkers = [];
+// goBack を改修
+function goBack(prevHash) {
+    const hash = prevHash || ''; // 渡された値を使う
+    window.currentHash = '';     // ブラウザバック後はクリア
+
+    if (!hash) {
+        // 県状態
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+        document.getElementById('map-menu').style.display = 'block';
+        document.getElementById('map-back-btn').style.display = 'none';
+        return;
     }
-    
-    location.hash = '';
-    window.currentHash = '';
 
-    document.getElementById('map-menu').style.display = 'block';
-    document.getElementById('map-back-btn').style.display = 'none';
-    
+    if (hash.includes('/')) {
+        // スポット → エリア
+        const parts = decodeURIComponent(hash).split('/');
+        const areaName = parts[0];
+        const area = window.areaData.find(a => a.name === areaName);
+        if (area) {
+            drawLocation(area.name, area.lat, area.lng, area.zoom, area.maxZoom);
+        }
+        // TODO: スポットマーカー削除（未実装）
 
+        location.hash = areaName; // エリア状態に戻す
+        document.getElementById('map-menu').style.display = 'block';
+        document.getElementById('map-back-btn').style.display = 'none';
+        return;
+    }
 
-    
-    
+    // エリア → 県
+    const area = window.areaData.find(a => a.name === hash);
+    if (area) {
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+
+        // 全スポットマーカーを削除
+        if (window.spotMarkers) {
+            window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+            window.spotMarkers = [];
+        }
+
+        location.hash = '';
+        document.getElementById('map-menu').style.display = 'block';
+        document.getElementById('map-back-btn').style.display = 'none';
+        return;
+    }
 }
 
 window.selectArea = selectArea;
