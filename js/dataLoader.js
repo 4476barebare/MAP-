@@ -212,6 +212,9 @@ window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
+
+
+
 function showSpotsForArea(areaName) {
     // 既存スポットマーカーを削除
     if (window.spotMarkers) {
@@ -224,33 +227,43 @@ function showSpotsForArea(areaName) {
     const normAreaName = areaName.trim().toLowerCase();
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
-    // sprite が DOM にあるか確認
-    const spriteEl = document.querySelector('div[style*="display: none"] svg');
-    if (!spriteEl) {
-        alert('sprite.svg が DOM にありません');
-    } else {
-        alert('sprite.svg が DOM に存在します');
-    }
-
     spots.forEach(spot => {
         const iconId = spot.icon || 'spot';
 
-        const html = `
-            <div class="spot-marker">
-                <svg class="spot-icon" width="24" height="24">
-                    <use href="#${iconId}"></use>
-                </svg>
-                <span class="spot-name">${spot.name}</span>
-            </div>
-        `;
+        // sprite 内の symbol をクローンして svg を作る
+        const symbol = document.querySelector(`#${iconId}`);
+        if (!symbol) {
+            alert(`シンボル ${iconId} が見つかりません`);
+            return;
+        }
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'spot-icon');
+        svg.setAttribute('width', '24');
+        svg.setAttribute('height', '24');
+
+        // symbol 内の全ての子ノードをクローンして追加
+        symbol.childNodes.forEach(node => svg.appendChild(node.cloneNode(true)));
+
+        // マーカー HTML を作成
+        const div = document.createElement('div');
+        div.className = 'spot-marker';
+        div.appendChild(svg);
+
+        const span = document.createElement('span');
+        span.className = 'spot-name';
+        span.textContent = spot.name;
+        div.appendChild(span);
+
+        const html = div.outerHTML;
 
         const marker = L.marker([spot.lat, spot.lng], {
             title: spot.name,
             icon: L.divIcon({
                 html: html,
                 className: 'spot-div-icon',
-                iconSize: [150, 24],
-                iconAnchor: [0, 12]
+                iconSize: [150, 24], // 必要に応じて調整
+                iconAnchor: [0, 12]  // 左端中央に合わせる
             })
         }).addTo(window.map);
 
