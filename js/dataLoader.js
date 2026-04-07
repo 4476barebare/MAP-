@@ -195,7 +195,6 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 
-
 function showSpotsForArea(areaName) {
     // 既存スポットマーカーを削除
     if (window.spotMarkers) {
@@ -208,8 +207,27 @@ function showSpotsForArea(areaName) {
     const normAreaName = areaName.trim().toLowerCase();
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
+    // --- 確認用ログ ---
+    console.log('Filtered spots for area:', normAreaName, spots);
+    if (spots.length > 0) {
+        alert(`スポット1件目: 名前=${spots[0].name}, icon=${spots[0].icon}`);
+    }
+
     spots.forEach(spot => {
         const iconId = spot.icon || 'spot';
+
+        // --- SVG sprite 確認用 ---
+        const testSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        const useEl = document.createElementNS("http://www.w3.org/2000/svg", "use");
+        useEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `/MAP-/icon/sprite.svg#${iconId}`);
+        testSvg.appendChild(useEl);
+        testSvg.style.position = 'absolute';
+        testSvg.style.top = '0';
+        testSvg.style.left = '0';
+        testSvg.style.width = '24px';
+        testSvg.style.height = '24px';
+        testSvg.style.background = 'rgba(255,0,0,0.2)'; // 赤半透明で見えるように
+        document.body.appendChild(testSvg);
 
         const html = `
             <div class="spot-marker">
