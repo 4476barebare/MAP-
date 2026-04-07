@@ -9,113 +9,23 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-html, body {
-  margin:0; padding:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
-  background:#fff; overflow-x:hidden;
-}
-li, button {
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-}
+html, body { margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; background:#fff; overflow-x:hidden; }
+li, button { -webkit-tap-highlight-color: rgba(0,0,0,0); }
 li:active, button:active { background: transparent; }
 li { user-select: none; cursor: pointer; }
 .leaflet-control-attribution { font-size: 8px; background: rgba(255,255,255,0.5); }
-
-/* 地図 */
 #lf-map { width:100%; height:80vh; position:relative; z-index:0; }
 .leaflet-container { z-index:0; }
 
-.map-menu {
-  position: absolute;
-  bottom: 5px; left: 5px; right: 5px;
-  max-height: 200px;
-  background: #fff;
-  border-radius: 3px;
-  overflow-y: auto;
-  z-index: 1980;
-  padding: 2px 5px;
-  pointer-events: auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
+/* メニューは初期非表示 */
+.map-menu { display:none; position: absolute; bottom: 5px; left: 5px; right: 5px; max-height: 200px; background: #fff; border-radius: 3px; overflow-y: auto; z-index: 1980; padding: 2px 5px; pointer-events: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 #map-menu, #map-menu ul, #map-menu li, #map-menu button { pointer-events: auto; }
 .map-menu ul { list-style: none; margin: 0; padding: 0; }
-.map-menu li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: #191970;
-  padding: 4px 8px;
-  width: 100%;
-  box-sizing: border-box;
-  cursor: pointer;
-  border-bottom: 1px dotted #191970;
-}
+.map-menu li { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #191970; padding: 4px 8px; width: 100%; box-sizing: border-box; cursor: pointer; border-bottom: 1px dotted #191970; }
 .map-menu li:last-child { border-bottom: none; padding-bottom: 3px; }
-#map-menu button {
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  padding: 0;
-  font-size: inherit;
-  text-align: left;
-}
-
-.map-ad {
-  position: absolute;
-  top: 12px; left: 5px;
-  z-index: 1500;
-  pointer-events: none;
-}
-.map-ad .ad-box {
-  width: 320px; height: 50px;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid #ccc;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; color: #333;
-  pointer-events: auto;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  border-radius: 4px;
-}
-
-/* 天気UI */
-#weather-wave-tide-container { display: none; border-top:1px solid #191970; }
-.weather-header { display:flex; justify-content:space-between; font-size:10px; padding-left:2px; padding-bottom: 0; margin-bottom: -2px; }
-.weather-container, #weather-wave-tide-container {
-  width:100%; display:flex; flex-direction:column;
-  color: #191970; font-family:monospace; font-size:10px; text-align:center;
-  margin-top:0; margin-bottom:-3px;
-}
-.weather-block { flex:1; text-align:center; font-size:10px; line-height:1.1; padding:1px 0; margin-right:1px; }
-.weather-block.first-block { flex:0 0 30px; }
-.tide-label { writing-mode: vertical-rl; text-orientation: upright; display:flex; align-items:center; justify-content:center; }
-.weather-row { display:flex; justify-content:space-between; }
-
-.spot-wrap { background: transparent; border: none; }
-.spot-box { display: flex; flex-direction: column; align-items: center; max-width: 120px; }
-.spot-main {
-  color: white;
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-  background: #191970;
-  padding: 4px 6px;
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  max-width: 120px;
-}
-.spot-main img { filter: brightness(0) invert(1); width: 18px; height: 18px; margin-top: 0; }
-.spot-main span {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-align: center;
-  font-size: 12px; line-height: 1.2;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-.spot-arrow { color: #191970; font-size: 14px; line-height: 10px; text-align: center; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+#map-menu button { width: 100%; background: transparent; border: none; color: inherit; cursor: pointer; padding: 0; font-size: inherit; text-align: left; }
+.map-ad { position: absolute; top: 12px; left: 5px; z-index: 1500; pointer-events: none; }
+.map-ad .ad-box { width: 320px; height: 50px; background: rgba(255,255,255,0.9); border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #333; pointer-events: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border-radius: 4px; }
 </style>
 </head>
 <body>
@@ -127,11 +37,7 @@ li { user-select: none; cursor: pointer; }
       <div class="accordion-wrapper">
         <button class="accordion-btn">登録地点 ▼</button>
         <div class="accordion-panel">
-          <ul class="location-list" id="locationList">
-            <li>新潟 <button class="delete-btn">✖️</button></li>
-            <li>群馬 <button class="delete-btn">✖️</button></li>
-            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
-          </ul>
+          <ul class="location-list" id="locationList"></ul>
         </div>
       </div>
       <a href="#" id="newsBtn">釣りNEWS</a>
@@ -145,31 +51,11 @@ li { user-select: none; cursor: pointer; }
     <div class="ad-box">AD 320×50</div>
   </div>
   <div id="map-menu" class="map-menu"><ul></ul></div>
-
-  <button id="map-back-btn" style="
-    position:absolute;
-    bottom:50px;
-    right:10px;
-    display:none;
-    z-index:2000;
-    background:#fff;
-    border:1px solid #888;
-    border-radius:4px;
-    padding:4px 6px;
-    font-size:12px;
-    cursor:pointer;
-  ">← 戻る</button>
+  <button id="map-back-btn" style="position:absolute;bottom:50px;right:10px;display:none;z-index:2000;background:#fff;border:1px solid #888;border-radius:4px;padding:4px 6px;font-size:12px;cursor:pointer;">← 戻る</button>
 </div>
 
 <div id="weather-wave-tide-container"></div>
-
-<div id="newsOverlay">
-  <div class="news-window">
-    <button id="closeNews">閉じる</button>
-    <div class="news-content"></div>
-  </div>
-</div>
-
+<div id="newsOverlay"><div class="news-window"><button id="closeNews">閉じる</button><div class="news-content"></div></div></div>
 <footer>© 釣り行こNAVI</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -180,66 +66,70 @@ li { user-select: none; cursor: pointer; }
 document.addEventListener('DOMContentLoaded', () => {
 
     const csvUrl = '/MAP-/data/location.csv';
-    const pathParts = location.pathname.split('/');
-    const currentFile = pathParts[pathParts.length - 1];
+    const currentFile = location.pathname.split('/').pop();
 
     loadLocationCSV(csvUrl, currentFile).then(data => {
-
-        if (!data.main) { alert('県本体データがありません'); return; }
+        if (!data.main) return;
 
         window.prefData = data.main;
         window.areaData = data.areas;
         window.spotData = data.spots;
 
-        // --- 初回描画関数 ---
-        function initMapView() {
-            drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-        }
-
-        // --- エリア選択関数 ---
+        // --- エリア選択 ---
         function selectArea(areaName) {
             const area = window.areaData.find(a => a.name === areaName);
             if (!area) return;
             drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
             location.hash = encodeURIComponent(area.name);
+            window.currentHash = location.hash;
         }
 
-        // --- 初期ハッシュ判定 ---
+        // --- スポット選択 ---
+        function selectSpot(areaName, spotName) {
+            const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
+            if (!spot) return;
+            drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
+            location.hash = encodeURIComponent(areaName + '/' + spotName);
+            window.currentHash = location.hash;
+        }
+
+        // --- ハッシュ判定 ---
         const initialHash = location.hash;
         if (initialHash) {
             const parts = decodeURIComponent(initialHash.substring(1)).split('/');
             const areaName = parts[0];
             const spotName = parts[1];
 
+            window.currentHash = initialHash;
+
             if (spotName) {
-                handleSpotInitial(spotName, areaName);
+                selectSpot(areaName, spotName);
             } else {
                 selectArea(areaName);
             }
+            // メニューは非表示
+            document.getElementById('map-menu').style.display = 'none';
         } else {
-            initMapView();
+            drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+            document.getElementById('map-menu').style.display = 'block'; // メニュー表示
+            window.currentHash = '';
         }
 
-        // --- 地図クリックで最寄りエリア判定 ---
-        window.map.on('click', (e) => {
+        // --- クリックで最寄りエリア ---
+        window.map.on('click', e => {
             const menuRect = document.getElementById('map-menu').getBoundingClientRect();
             if (e.originalEvent.clientX >= menuRect.left &&
                 e.originalEvent.clientX <= menuRect.right &&
                 e.originalEvent.clientY >= menuRect.top &&
                 e.originalEvent.clientY <= menuRect.bottom) return;
 
-            let minDist = Infinity;
-            let nearestArea = null;
-            const clickLat = e.latlng.lat;
-            const clickLng = e.latlng.lng;
-
+            let nearestArea = null, minDist = Infinity;
             window.areaData.forEach(area => {
-                const dLat = clickLat - area.lat;
-                const dLng = clickLng - area.lng;
+                const dLat = e.latlng.lat - area.lat;
+                const dLng = e.latlng.lng - area.lng;
                 const dist = dLat*dLat + dLng*dLng;
                 if (dist < minDist) { minDist = dist; nearestArea = area.name; }
             });
-
             if (nearestArea) selectArea(nearestArea);
         });
 
@@ -261,7 +151,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-
-
 </body>
 </html>
