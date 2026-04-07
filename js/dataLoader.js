@@ -138,6 +138,7 @@ function selectSpot(areaName, spotName) {
  */
 
 function goBack(hash) {
+     alert(hash);
     // ハッシュ未指定なら currentHash を使う
     hash = hash || window.currentHash || '';
 
