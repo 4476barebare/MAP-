@@ -156,8 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = (event) => {
-                selectArea(area.name,event);
+            btn.onclick = () => {
+                selectArea(area.name);
                 showDebug('Area clicked: ' + area.name);
             };
             li.appendChild(btn);
@@ -247,15 +247,12 @@ fetch('/MAP-/icon/back.svg')
 
 // popstate で currentHash を渡す
 window.addEventListener('popstate', () => {
-    
-    if (window.ignoreNextPop) {
-        window.ignoreNextPop = false; // 無視してリセット
-        return;
-    }
+    if (!window.currentHash) return; // currentHash が空なら無視
 
-    
-    
-    goBack(window.currentHash);
+    // ブラウザバックかどうか判定
+    if (location.hash.length < window.currentHash.length) {
+        goBack(window.currentHash);
+    }
 });
 
 
