@@ -107,7 +107,10 @@ function selectArea(areaName) {
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
     //setupNearestClick();
-    ignoreNextPop = true;
+    e.stopPropagation();       // 伝播を止める
+    window.ignoreNextPop = true; // 次の popstate を無視
+
+
     location.hash = encodeURIComponent(area.name);
 
     document.getElementById('map-menu').style.display = 'none';
@@ -129,7 +132,7 @@ function selectSpot(areaName, spotName) {
     if (!spot) return;
     drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
     
-    ignoreNextPop = true;
+
     location.hash = encodeURIComponent(areaName + '/' + spotName);
 
     document.getElementById('map-menu').style.display = 'none';
