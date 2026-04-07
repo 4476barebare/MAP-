@@ -155,13 +155,31 @@ function goBack(hash) {
         // window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
         // window.spotMarkers = [];
 
+        alert('area.name: ' + area.name);
+        alert('area.lat: ' + area.lat);
+        alert('area.lng: ' + area.lng);
+        alert('area.zoom: ' + (area.zoom || window.prefData.zoom));
+
         drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
         location.hash = encodeURIComponent(area.name);
         window.currentHash = location.hash;
 
     } else if (areaName) {
         // エリア→県に戻す
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+
+        alert('prefData.name: ' + window.prefData.name);
+        alert('prefData.lat: ' + window.prefData.lat);
+        alert('prefData.lng: ' + window.prefData.lng);
+        alert('prefData.zoom: ' + window.prefData.zoom);
+        alert('prefData.maxZoom: ' + window.prefData.maxZoom);
+
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom,
+            window.prefData.maxZoom
+        );
 
         // 既存スポットマーカーを削除
         if (window.spotMarkers) {
