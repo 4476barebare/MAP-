@@ -127,40 +127,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     
 // --- 最寄りクリック用ハンドラを保持 ---
-window.nearestClickHandler = null;
+//window.nearestClickHandler = null;
 
 // --- 最寄りクリック判定の設定 ---
-function setupNearestClick() {
-    if (window.nearestClickHandler) window.map.off('click', window.nearestClickHandler);
+//function setupNearestClick() {
+ //   if (window.nearestClickHandler) window.map.off('click', window.nearestClickHandler);
+//    window.nearestClickHandler = function(e) {
+//        const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+ //       if (e.originalEvent.clientX >= menuRect.left &&
+//            e.originalEvent.clientX <= menuRect.right &&
+//            e.originalEvent.clientY >= menuRect.top &&
+//            e.originalEvent.clientY <= menuRect.bottom) return;
+//        let nearestArea = null, minDist = Infinity;
+//        window.areaData.forEach(area => {
+ //           const dLat = e.latlng.lat - area.lat;
+//            const dLng = e.latlng.lng - area.lng;
+ //           const dist = dLat*dLat + dLng*dLng;
+//            if (dist < minDist) { minDist = dist; nearestArea = area.name; }
+  //      });
 
-    window.nearestClickHandler = function(e) {
-        const menuRect = document.getElementById('map-menu').getBoundingClientRect();
-        if (e.originalEvent.clientX >= menuRect.left &&
-            e.originalEvent.clientX <= menuRect.right &&
-            e.originalEvent.clientY >= menuRect.top &&
-            e.originalEvent.clientY <= menuRect.bottom) return;
+ //       if (nearestArea) selectArea(nearestArea);
+ //   };
 
-        let nearestArea = null, minDist = Infinity;
-        window.areaData.forEach(area => {
-            const dLat = e.latlng.lat - area.lat;
-            const dLng = e.latlng.lng - area.lng;
-            const dist = dLat*dLat + dLng*dLng;
-            if (dist < minDist) { minDist = dist; nearestArea = area.name; }
-        });
+ //   window.map.on('click', window.nearestClickHandler);
+//}
 
-        if (nearestArea) selectArea(nearestArea);
-    };
-
-    window.map.on('click', window.nearestClickHandler);
-}
-
-// --- 最寄りクリック判定を解除 ---
-function removeNearestClick() {
-    if (window.nearestClickHandler) {
-        window.map.off('click', window.nearestClickHandler);
-        window.nearestClickHandler = null;
-    }
-}
+//function removeNearestClick() {
+ //   if (window.nearestClickHandler) {
+//        window.map.off('click', window.nearestClickHandler);
+//        window.nearestClickHandler = null;
+//    }
+//}
 
     
 });
