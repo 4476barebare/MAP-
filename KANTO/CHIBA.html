@@ -156,8 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = () => {
-                selectArea(area.name);
+            btn.onclick = (event) => {
+                selectArea(area.name,event);
                 showDebug('Area clicked: ' + area.name);
             };
             li.appendChild(btn);
