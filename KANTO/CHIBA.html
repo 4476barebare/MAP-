@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else {
             drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+        setupNearestClick();
             document.getElementById('map-menu').style.display = 'block';
             document.getElementById('map-back-btn').style.display = 'none';
             window.currentHash = '';
@@ -113,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             menuUl.appendChild(li);
             
         });
-        setupNearestClick();
+  
 
     }).catch(() => {
         alert('CSV読み込みに失敗しました');
