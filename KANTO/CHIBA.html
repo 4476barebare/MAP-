@@ -301,6 +301,21 @@ window.addEventListener('popstate', () => {
 });
 
 
+spots.forEach(spot => {
+    const iconId = spot.icon || 'spot';
+
+    // マーカー HTML に組み込む
+    const html = `
+        <div class="spot-marker">
+            <svg class="spot-icon" width="24" height="24">
+                <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
+            </svg>
+            <span class="spot-name">${spot.name}</span>
+        </div>
+    `;
+
+    alert(`iconId=${iconId}, html=${html}`);
+});
 
 </script>
 </body>
