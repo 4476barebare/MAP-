@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // CSV読み込み
     loadLocationCSV(csvUrl, currentFile).then(data => {
-
+alert('CSV読み込み成功'); // <- ここで確認
         if (!data.main) {
             console.error('県本体データがありません');
             alert('県本体データがありません');
