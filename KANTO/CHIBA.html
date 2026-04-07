@@ -325,8 +325,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const pathParts = location.pathname.split('/');
     const currentFile = pathParts[pathParts.length - 1];
 
+if (!window.prefData || isNaN(window.prefData.lat) || isNaN(window.prefData.lng)) {
+    alert('prefData が不正です');
+    return;
+}
     // CSV読み込み
     loadLocationCSV(csvUrl, currentFile).then(data => {
+alert(JSON.stringify(data));
+
 alert('CSV読み込み成功'); // <- ここで確認
         if (!data.main) {
             console.error('県本体データがありません');
