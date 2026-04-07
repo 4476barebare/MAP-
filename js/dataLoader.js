@@ -146,22 +146,38 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 
-// --- 指定エリアのスポットをマーカーで表示（クリックイベントなし） ---
+// --- 指定エリアのスポットをマーカーで表示 ---
 function showSpotsForArea(areaName) {
+    if (!window.map) return;
+
     // 既存のスポットマーカーを削除
     if (window.spotMarkers) {
         window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
     }
     window.spotMarkers = [];
 
-    // 指定エリアのスポットを取得
-    const spots = window.spotData.filter(s => s.parent === areaName);
+    if (!areaName) return;
+
+    const areaKey = areaName.trim().toLowerCase();
+
+    // 指定エリアのスポットを取得（親名をtrim＆小文字で比較）
+    const spots = window.spotData.filter(s => (s.parent || '').trim().toLowerCase() === areaKey);
 
     spots.forEach(spot => {
-        const marker = L.marker([spot.lat, spot.lng], {
-            title: spot.name,
-            icon: spot.icon ? L.icon({ iconUrl: spot.icon, iconSize: [25, 25] }) : undefined
-        }).addTo(window.map);
+        const iconOptions = spot.icon ? {
+            icon: L.icon({
+                iconUrl: spot.icon,
+                iconSize: [25, 25],
+                iconAnchor: [12, 12],
+                popupAnchor: [0, -12]
+            })
+        } : {};
+
+        const marker = L.marker([spot.lat, spot.lng], { ...iconOptions, title: spot.name })
+            .addTo(window.map);
+
+        // クリックイベントはまだ不要
+        // marker.on('click', () => { selectSpot(areaName, spot.name); });
 
         window.spotMarkers.push(marker);
     });
