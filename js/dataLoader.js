@@ -106,6 +106,10 @@ function selectArea(areaName) {
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
+    
+    
+      showSpotsForArea(areaName);
+
 }
 
 /**
@@ -140,3 +144,25 @@ window.selectSpot = selectSpot;
 window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
+
+
+// --- 指定エリアのスポットをマーカーで表示（クリックイベントなし） ---
+function showSpotsForArea(areaName) {
+    // 既存のスポットマーカーを削除
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+    }
+    window.spotMarkers = [];
+
+    // 指定エリアのスポットを取得
+    const spots = window.spotData.filter(s => s.parent === areaName);
+
+    spots.forEach(spot => {
+        const marker = L.marker([spot.lat, spot.lng], {
+            title: spot.name,
+            icon: spot.icon ? L.icon({ iconUrl: spot.icon, iconSize: [25, 25] }) : undefined
+        }).addTo(window.map);
+
+        window.spotMarkers.push(marker);
+    });
+}
