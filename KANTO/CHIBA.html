@@ -321,30 +321,10 @@ border-radius: 4px;
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    const csvUrl = 'http://www.turiiko.shop/get_csv.php';
+    const csvUrl = '/MAP-/data/location.csv';
     const pathParts = location.pathname.split('/');
     const currentFile = pathParts[pathParts.length - 1];
   // CSV読み込み
-  
-  function testCSV() {
-    fetch(csvUrl)
-      .then(r => {
-        if (!r.ok) throw new Error('HTTP status ' + r.status);
-        return r.text();
-      })
-      .then(text => {
-        alert(text); // CSV 全体を表示
-        console.log(text);
-      })
-      .catch(err => {
-        alert('CSV fetch failed: ' + err);
-        console.error(err);
-      });
-  }
-
-  testCSV();
-
-  
   
   
   
