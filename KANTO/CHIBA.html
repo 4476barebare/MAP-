@@ -301,20 +301,26 @@ window.addEventListener('popstate', () => {
 });
 
 
+
+const spots = [
+  { name: '飯岡漁港', icon: 'spot', parent: '千葉', lat: 35.77, lng: 140.9 },
+  { name: '九十九里浜', icon: 'spot', parent: '千葉', lat: 35.7, lng: 140.6 }
+];
+
 spots.forEach(spot => {
-    const iconId = spot.icon || 'spot';
+  const iconId = spot.icon || 'spot';
 
-    // マーカー HTML に組み込む
-    const html = `
-        <div class="spot-marker">
-            <svg class="spot-icon" width="24" height="24">
-                <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
-            </svg>
-            <span class="spot-name">${spot.name}</span>
-        </div>
-    `;
+  // マーカー HTML に組み込む
+  const html = `
+      <div class="spot-marker">
+          <svg class="spot-icon" width="24" height="24">
+              <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
+          </svg>
+          <span class="spot-name">${spot.name}</span>
+      </div>
+  `;
 
-    alert(`iconId=${iconId}, html=${html}`);
+  alert(`iconId=${iconId}, html=${html}`);
 });
 
 </script>
