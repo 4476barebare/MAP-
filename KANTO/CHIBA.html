@@ -73,7 +73,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const csvUrl = '/MAP-/data/location.csv';
     const currentFile = location.pathname.split('/').pop();
 
+    // --- デバッグ表示 ---
+    function showDebug(msg) {
+        let debugEl = document.getElementById('debug');
+        if (!debugEl) {
+            debugEl = document.createElement('div');
+            debugEl.id = 'debug';
+            debugEl.style.position = 'fixed';
+            debugEl.style.top = '0';
+            debugEl.style.left = '0';
+            debugEl.style.background = 'rgba(255,255,0,0.8)';
+            debugEl.style.zIndex = '9999';
+            debugEl.style.padding = '4px';
+            debugEl.style.fontSize = '12px';
+            debugEl.style.maxWidth = '300px';
+            debugEl.style.whiteSpace = 'pre-wrap';
+            document.body.appendChild(debugEl);
+        }
+        debugEl.textContent = msg;
+    }
+
+    showDebug('DOMContentLoaded');
+
     loadLocationCSV(csvUrl, currentFile).then(data => {
+        showDebug('CSV loaded: main=' + !!data.main);
+
         if (!data.main) return;
 
         // 初期ハッシュ判定
@@ -85,20 +109,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.currentHash = initialHash;
 
+            showDebug('Initial hash: ' + initialHash);
+
             if (spotName) {
                 selectSpot(areaName, spotName);
+                showDebug('selectSpot called: ' + areaName + '/' + spotName);
             } else {
                 selectArea(areaName);
+                showDebug('selectArea called: ' + areaName);
             }
         } else {
             drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-       // setupNearestClick();
+            showDebug('Initial drawLocation called');
+
             document.getElementById('map-menu').style.display = 'block';
             document.getElementById('map-back-btn').style.display = 'none';
             window.currentHash = '';
         }
-
-      
 
         // メニュー生成
         const menuUl = document.querySelector('#map-menu ul');
@@ -107,59 +134,78 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
-            btn.onclick = () => selectArea(area.name);
-            
-            
+            btn.onclick = () => {
+                selectArea(area.name);
+                showDebug('Area clicked: ' + area.name);
+            };
             li.appendChild(btn);
             menuUl.appendChild(li);
-            
         });
-  
+        showDebug('Menu generated: ' + window.areaData.length + ' areas');
+
+        // --- 最寄りクリック判定 ---
+        setupNearestClick();
 
     }).catch(() => {
-        alert('CSV読み込みに失敗しました');
+        showDebug('CSV読み込みに失敗しました');
     });
 
     // 戻るボタン
     document.getElementById('map-back-btn').addEventListener('click', () => {
-        window.goBack();
+        goBack();
+        showDebug('Back button pressed');
     });
-    
-    
-// --- 最寄りクリック用ハンドラを保持 ---
-//window.nearestClickHandler = null;
 
-// --- 最寄りクリック判定の設定 ---
-//function setupNearestClick() {
- //   if (window.nearestClickHandler) window.map.off('click', window.nearestClickHandler);
-//    window.nearestClickHandler = function(e) {
-//        const menuRect = document.getElementById('map-menu').getBoundingClientRect();
- //       if (e.originalEvent.clientX >= menuRect.left &&
-//            e.originalEvent.clientX <= menuRect.right &&
-//            e.originalEvent.clientY >= menuRect.top &&
-//            e.originalEvent.clientY <= menuRect.bottom) return;
-//        let nearestArea = null, minDist = Infinity;
-//        window.areaData.forEach(area => {
- //           const dLat = e.latlng.lat - area.lat;
-//            const dLng = e.latlng.lng - area.lng;
- //           const dist = dLat*dLat + dLng*dLng;
-//            if (dist < minDist) { minDist = dist; nearestArea = area.name; }
-  //      });
+    // --- 最寄りクリック用ハンドラを保持 ---
+    window.nearestClickHandler = null;
 
- //       if (nearestArea) selectArea(nearestArea);
- //   };
+    // --- 最寄りクリック判定の設定 ---
+    function setupNearestClick() {
+        if (!window.map) {
+            showDebug('setupNearestClick: map is undefined');
+            return;
+        }
+        if (window.nearestClickHandler) window.map.off('click', window.nearestClickHandler);
 
- //   window.map.on('click', window.nearestClickHandler);
-//}
+        window.nearestClickHandler = function(e) {
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+            if (e.originalEvent.clientX >= menuRect.left &&
+                e.originalEvent.clientX <= menuRect.right &&
+                e.originalEvent.clientY >= menuRect.top &&
+                e.originalEvent.clientY <= menuRect.bottom) {
+                showDebug('Click ignored (menu area)');
+                return;
+            }
 
-//function removeNearestClick() {
- //   if (window.nearestClickHandler) {
-//        window.map.off('click', window.nearestClickHandler);
-//        window.nearestClickHandler = null;
-//    }
-//}
+            let nearestArea = null, minDist = Infinity;
+            window.areaData.forEach(area => {
+                const dLat = e.latlng.lat - area.lat;
+                const dLng = e.latlng.lng - area.lng;
+                const dist = dLat*dLat + dLng*dLng;
+                if (dist < minDist) { minDist = dist; nearestArea = area.name; }
+            });
 
-    
+            if (nearestArea) {
+                showDebug('Nearest click detected: ' + nearestArea);
+                selectArea(nearestArea);
+            } else {
+                showDebug('Nearest click: no area found');
+            }
+        };
+
+        window.map.on('click', window.nearestClickHandler);
+        showDebug('Nearest click handler set');
+    }
+
+    // --- 最寄りクリック判定を解除 ---
+    function removeNearestClick() {
+        if (window.nearestClickHandler && window.map) {
+            window.map.off('click', window.nearestClickHandler);
+            window.nearestClickHandler = null;
+            showDebug('Nearest click handler removed');
+        }
+    }
+
 });
 </script>
 </body>
