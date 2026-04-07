@@ -247,6 +247,14 @@ fetch('/MAP-/icon/back.svg')
 
 // popstate で currentHash を渡す
 window.addEventListener('popstate', () => {
+    
+    if (window.ignoreNextPop) {
+        window.ignoreNextPop = false; // 無視してリセット
+        return;
+    }
+
+    
+    
     goBack(window.currentHash);
 });
 
