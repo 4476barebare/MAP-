@@ -141,6 +141,12 @@ document.addEventListener('DOMContentLoaded', () => {
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
+        
+        // ←ここに追加
+document.getElementById('map-menu').addEventListener('click', e => {
+    e.stopPropagation(); // 地図へのクリック伝播を止める
+})
+        
         showDebug('Menu generated: ' + window.areaData.length + ' areas');
 
         // --- 最寄りクリック判定 ---
