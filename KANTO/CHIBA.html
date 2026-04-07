@@ -247,12 +247,16 @@ fetch('/MAP-/icon/back.svg')
 
 // popstate で currentHash を渡す
 window.addEventListener('popstate', () => {
-    if (!window.currentHash) return; // currentHash が空なら無視
+    const newHash = location.hash;  // 現在ブラウザのハッシュ
+    const prevHash = window.currentHash; // 画面上で最後に設定されたハッシュ
 
-    // ブラウザバックかどうか判定
-    if (location.hash.length < window.currentHash.length) {
-        goBack(window.currentHash);
+    // ハッシュが短くなった場合＝ブラウザバック
+    if (newHash.length < prevHash.length) {
+        goBack(prevHash);  // 前のハッシュを渡す
     }
+
+    // currentHash は常に最新に更新
+    window.currentHash = newHash;
 });
 
 
