@@ -197,7 +197,6 @@ window.loadLocationCSV = loadLocationCSV;
 
 
 
-// --- 指定エリアのスポットを安全にマーカー表示 ---
 function showSpotsForArea(areaName) {
     // 既存スポットマーカーを削除
     if (window.spotMarkers) {
@@ -213,15 +212,25 @@ function showSpotsForArea(areaName) {
     // 指定エリアのスポットを取得
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
+    // --- ここからテキスト表示追加 ---
+    const spotListEl = document.getElementById('spot-list');
+    spotListEl.innerHTML = ''; // 既存表示をクリア
+    // --- ここまで追加 ---
+
     spots.forEach(spot => {
+        // マーカーは従来通り
         const marker = L.marker([spot.lat, spot.lng], {
             title: spot.name,
             icon: spot.icon ? L.icon({ iconUrl: spot.icon, iconSize: [25, 25] }) : undefined
         }).addTo(window.map);
 
-        // スポットクリックは selectSpot に任せる
         marker.on('click', () => selectSpot(spot.parent, spot.name));
 
         window.spotMarkers.push(marker);
+
+        // --- ここでテキスト表示 ---
+        const div = document.createElement('div');
+        div.textContent = spot.name; // 名前だけ
+        spotListEl.appendChild(div);
     });
 }
