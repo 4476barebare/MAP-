@@ -178,58 +178,49 @@ li { user-select: none; cursor: pointer; }
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
     const csvUrl = '/MAP-/data/location.csv';
-    const currentFile = location.pathname.split('/').pop();
+    const pathParts = location.pathname.split('/');
+    const currentFile = pathParts[pathParts.length - 1];
 
     loadLocationCSV(csvUrl, currentFile).then(data => {
-        if (!data.main) return;
+
+        if (!data.main) { alert('県本体データがありません'); return; }
 
         window.prefData = data.main;
+        window.areaData = data.areas;
+        window.spotData = data.spots;
 
-        // 地図描画（航空写真、操作禁止）
-        window.map = L.map('lf-map', {
-            center: [window.prefData.lat, window.prefData.lng],
-            zoom: window.prefData.zoom,
-            scrollWheelZoom: false,
-            doubleClickZoom: false,
-            dragging: false,
-            zoomControl: false
-        });
+        // --- 初回描画関数 ---
+        function initMapView() {
+            drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+        }
 
-        L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
-            attribution:'© 国土地理院'
-        }).addTo(window.map);
-
-        const areaCenters = data.areas.map(a => ({
-            name: a.name, lat: a.lat, lng: a.lng, zoom: a.zoom
-        }));
-
+        // --- エリア選択関数 ---
         function selectArea(areaName) {
-            const area = areaCenters.find(a => a.name === areaName);
+            const area = window.areaData.find(a => a.name === areaName);
             if (!area) return;
-
             drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
             location.hash = encodeURIComponent(area.name);
         }
 
-        // 初期ハッシュ処理
-        const initialHash = location.hash ? decodeURIComponent(location.hash.substring(1)) : '';
+        // --- 初期ハッシュ判定 ---
+        const initialHash = location.hash;
         if (initialHash) {
-            const [areaName, spotName] = initialHash.split('/');
-            if (spotName) handleSpotInitial(spotName, areaName);
-            else selectArea(areaName);
+            const parts = decodeURIComponent(initialHash.substring(1)).split('/');
+            const areaName = parts[0];
+            const spotName = parts[1];
+
+            if (spotName) {
+                handleSpotInitial(spotName, areaName);
+            } else {
+                selectArea(areaName);
+            }
         } else {
-            drawLocation(
-                window.prefData.name,
-                window.prefData.lat,
-                window.prefData.lng,
-                window.prefData.zoom,
-                window.prefData.maxZoom,
-                'photo'
-            );
+            initMapView();
         }
 
-        // 地図クリックで最寄りエリア判定
+        // --- 地図クリックで最寄りエリア判定 ---
         window.map.on('click', (e) => {
             const menuRect = document.getElementById('map-menu').getBoundingClientRect();
             if (e.originalEvent.clientX >= menuRect.left &&
@@ -237,26 +228,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.originalEvent.clientY >= menuRect.top &&
                 e.originalEvent.clientY <= menuRect.bottom) return;
 
-            const { lat: clickLat, lng: clickLng } = e.latlng;
-            let minDist = Infinity, nearestArea = null;
+            let minDist = Infinity;
+            let nearestArea = null;
+            const clickLat = e.latlng.lat;
+            const clickLng = e.latlng.lng;
 
-            areaCenters.forEach(area => {
+            window.areaData.forEach(area => {
                 const dLat = clickLat - area.lat;
                 const dLng = clickLng - area.lng;
                 const dist = dLat*dLat + dLng*dLng;
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearestArea = area.name;
-                }
+                if (dist < minDist) { minDist = dist; nearestArea = area.name; }
             });
 
             if (nearestArea) selectArea(nearestArea);
         });
 
-        // メニュー生成
+        // --- メニュー生成 ---
         const menuUl = document.querySelector('#map-menu ul');
         menuUl.innerHTML = '';
-        areaCenters.forEach(area => {
+        window.areaData.forEach(area => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             btn.textContent = area.name;
@@ -268,7 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }).catch(() => {
         alert('CSV読み込みに失敗しました');
     });
+
 });
 </script>
+
+
 </body>
 </html>
