@@ -1,4 +1,22 @@
 // dataloader.js
+// sprite.svg を事前に DOM にロードしてアラートで確認
+(function preloadSprite() {
+    fetch('/MAP-/icon/sprite.svg')
+        .then(res => res.text())
+        .then(svgText => {
+            const div = document.createElement('div');
+            div.style.display = 'none';
+            div.innerHTML = svgText;
+            document.body.appendChild(div);
+            alert('sprite.svg がロードされました');
+        })
+        .catch(() => {
+            alert('sprite.svg のロードに失敗しました');
+        });
+})();
+
+
+
 
 // グローバル
 window.prefData = null;
@@ -194,24 +212,8 @@ window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
-
-
-
-// ページ読み込み時に sprite.svg を事前ロード
-function preloadSprite() {
-    return fetch('/MAP-/icon/sprite.svg')
-        .then(res => res.text())
-        .then(svgText => {
-            const div = document.createElement('div');
-            div.style.display = 'none';
-            div.innerHTML = svgText;
-            document.body.appendChild(div);
-            console.log('sprite.svg loaded into DOM');
-        });
-}
-
-// スポットマーカーを表示
 function showSpotsForArea(areaName) {
+    // 既存スポットマーカーを削除
     if (window.spotMarkers) {
         window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
     }
@@ -228,7 +230,7 @@ function showSpotsForArea(areaName) {
         const html = `
             <div class="spot-marker">
                 <svg class="spot-icon" width="24" height="24">
-                    <use href="#${iconId}"></use>
+                    <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
                 </svg>
                 <span class="spot-name">${spot.name}</span>
             </div>
@@ -239,8 +241,8 @@ function showSpotsForArea(areaName) {
             icon: L.divIcon({
                 html: html,
                 className: 'spot-div-icon',
-                iconSize: [150, 24],
-                iconAnchor: [0, 12]
+                iconSize: [150, 24], // 必要に応じて調整
+                iconAnchor: [0, 12]  // 左端中央に合わせる
             })
         }).addTo(window.map);
 
@@ -248,11 +250,3 @@ function showSpotsForArea(areaName) {
         window.spotMarkers.push(marker);
     });
 }
-
-// 初期化
-document.addEventListener('DOMContentLoaded', async () => {
-    await preloadSprite(); // sprite を先にロード
-    // その後で地図とマーカー生成を呼ぶ
-    showSpotsForArea('Chiba'); 
-});
-
