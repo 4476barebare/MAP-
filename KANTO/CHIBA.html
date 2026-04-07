@@ -111,8 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             li.appendChild(btn);
             menuUl.appendChild(li);
-            setupNearestClick();
+            
         });
+        setupNearestClick();
 
     }).catch(() => {
         alert('CSV読み込みに失敗しました');
