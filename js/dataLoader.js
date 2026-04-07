@@ -194,7 +194,6 @@ window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
-
 function showSpotsForArea(areaName) {
     // 既存スポットマーカーを削除
     if (window.spotMarkers) {
@@ -210,19 +209,6 @@ function showSpotsForArea(areaName) {
     spots.forEach(spot => {
         const iconId = spot.icon || 'spot';
 
-        // --- SVG sprite 確認用 ---
-        const testSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        const useEl = document.createElementNS("http://www.w3.org/2000/svg", "use");
-        useEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `/MAP-/icon/sprite.svg#${iconId}`);
-        testSvg.appendChild(useEl);
-        testSvg.style.position = 'absolute';
-        testSvg.style.top = '0';
-        testSvg.style.left = '0';
-        testSvg.style.width = '24px';
-        testSvg.style.height = '24px';
-        testSvg.style.background = 'rgba(255,0,0,0.2)'; // 赤半透明で見えるように
-        document.body.appendChild(testSvg);
-
         const html = `
             <div class="spot-marker">
                 <svg class="spot-icon" width="24" height="24">
@@ -237,13 +223,12 @@ function showSpotsForArea(areaName) {
             icon: L.divIcon({
                 html: html,
                 className: 'spot-div-icon',
-                iconSize: [150, 24], // 適宜調整
-                iconAnchor: [0, 12] // 左端中央に合わせる
+                iconSize: [150, 24], // 必要に応じて調整
+                iconAnchor: [0, 12]  // 左端中央に合わせる
             })
         }).addTo(window.map);
 
         marker.on('click', () => selectSpot(spot.parent, spot.name));
-
         window.spotMarkers.push(marker);
     });
 }
