@@ -196,7 +196,6 @@ window.loadLocationCSV = loadLocationCSV;
 
 
 
-
 function showSpotsForArea(areaName) {
     // 既存スポットマーカーを削除
     if (window.spotMarkers) {
@@ -206,31 +205,24 @@ function showSpotsForArea(areaName) {
 
     if (!areaName) return;
 
-    // 比較用にエリア名を正規化（前後空白削除・小文字化）
     const normAreaName = areaName.trim().toLowerCase();
-
-    // 指定エリアのスポットを取得
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
-    // --- ここからテキスト表示追加 ---
-    const spotListEl = document.getElementById('spot-list');
-    spotListEl.innerHTML = ''; // 既存表示をクリア
-    // --- ここまで追加 ---
-
     spots.forEach(spot => {
-        // マーカーは従来通り
+        // マーカーの代わりにテキストラベルを使う
         const marker = L.marker([spot.lat, spot.lng], {
             title: spot.name,
-            icon: spot.icon ? L.icon({ iconUrl: spot.icon, iconSize: [25, 25] }) : undefined
+            icon: L.divIcon({
+                className: 'spot-label',
+                html: `<span>${spot.name}</span>`,
+                iconSize: [100, 20],
+                iconAnchor: [50, 10] // 中央揃え
+            })
         }).addTo(window.map);
 
+        // クリックは従来通りスポット選択
         marker.on('click', () => selectSpot(spot.parent, spot.name));
 
         window.spotMarkers.push(marker);
-
-        // --- ここでテキスト表示 ---
-        const div = document.createElement('div');
-        div.textContent = spot.name; // 名前だけ
-        spotListEl.appendChild(div);
     });
 }
