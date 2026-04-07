@@ -101,16 +101,18 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 /**
  * エリア選択
  */
-function selectArea(areaName) {
+function selectArea(areaName,event) {
     //removeNearestClick();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
     //setupNearestClick();
-    e.stopPropagation();       // 伝播を止める
-    window.ignoreNextPop = true; // 次の popstate を無視
+     // イベントオブジェクトがあれば伝播を止める
+    if (e) e.stopPropagation();
 
-
+    // 次の popstate を無視する
+    window.ignoreNextPop = true;
+    
     location.hash = encodeURIComponent(area.name);
 
     document.getElementById('map-menu').style.display = 'none';
