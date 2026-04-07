@@ -1,9 +1,10 @@
 // dataLoader.js
 
 // グローバルに保持
-window.prefData = null;   // 選択された県本体
-window.areaData = [];     // 選択県直下のエリア
-window.spotData = [];     // 選択県直下のスポット
+window.prefData = null;  // 選択された県本体
+window.areaData = [];    // 選択県直下のエリア
+window.spotData = [];    // 選択県直下のスポット
+window.currentHash = null;
 
 /**
  * CSV読み込み関数
@@ -26,7 +27,7 @@ function loadLocationCSV(csvUrl, currentFile) {
 
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(',');
-                const name = cols[0]?.trim();
+                const name = cols[0].trim();
                 const zoom = parseFloat(cols[1]);
                 const maxZoom = cols[2] ? parseFloat(cols[2]) : null;
                 const lat = parseFloat(cols[3]);
@@ -39,18 +40,14 @@ function loadLocationCSV(csvUrl, currentFile) {
                 const obj = { name, zoom, maxZoom, lat, lng, parent, style, restricted, icon };
 
                 if (!parent && name.toUpperCase() === filePref) {
-                    // 県本体
                     main = obj;
                 } else if (parent.toUpperCase() === filePref) {
-                    // 県直下のエリア
                     areas.push(obj);
                 } else if (parent) {
-                    // 県直下ではないスポット
                     spots.push(obj);
                 }
             }
 
-            // グローバルに保存
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
@@ -60,13 +57,7 @@ function loadLocationCSV(csvUrl, currentFile) {
 }
 
 /**
- * 地図表示・更新
- * @param {string} name 
- * @param {number} lat 
- * @param {number} lng 
- * @param {number} zoom 
- * @param {number|null} maxZoom 
- * @param {object} options 
+ * 地図描画（初回・エリア・スポット共通）
  */
 function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
     const defaultOptions = {
@@ -79,7 +70,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         boxZoom: false,
         keyboard: false,
         tap: false,
-        touchZoom: false
+        touchZoom: false,
     };
     const mapOptions = { ...defaultOptions, ...options };
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
@@ -89,7 +80,6 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
         window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
 
-        // 操作制御
         mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
         mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
         mapOptions.doubleClickZoom ? window.map.doubleClickZoom.enable() : window.map.doubleClickZoom.disable();
@@ -97,12 +87,41 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         mapOptions.keyboard ? window.map.keyboard.enable() : window.map.keyboard.disable();
         mapOptions.touchZoom ? window.map.touchZoom.enable() : window.map.touchZoom.disable();
         if (window.map.tap) mapOptions.tap ? window.map.tap.enable() : window.map.tap.disable();
-
     } else {
-        // 初回生成
         window.map = L.map('lf-map', mapOptions);
+        window.map.attributionControl.setPosition('topright');
         window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
     }
 }
 
+/**
+ * エリア選択
+ */
+function selectArea(areaName) {
+    const area = window.areaData.find(a => a.name === areaName);
+    if (!area) return;
+    drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+    location.hash = encodeURIComponent(area.name);
+    window.currentHash = location.hash;
+}
+
+/**
+ * スポット選択
+ */
+function selectSpot(spotName, areaName = null) {
+    let spot;
+    if (areaName) {
+        spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
+    } else {
+        spot = window.spotData.find(s => s.name === spotName);
+    }
+    if (!spot) return;
+    drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
+    location.hash = areaName ? encodeURIComponent(areaName + '/' + spot.name)
+                             : encodeURIComponent(spot.name);
+    window.currentHash = location.hash;
+}
+
 window.drawLocation = drawLocation;
+window.selectArea = selectArea;
+window.selectSpot = selectSpot;
