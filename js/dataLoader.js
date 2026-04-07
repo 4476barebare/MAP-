@@ -101,7 +101,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 /**
  * エリア選択
  */
-function selectArea(areaName,event) {
+function selectArea(areaName,e) {
     //removeNearestClick();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
