@@ -15,35 +15,41 @@ function loadLocationCSV(csvUrl, currentFile) {
         .then(text => {
             const lines = text.trim().split('\n');
             const headers = lines[0].split(',');
+            const filePref = currentFile.replace('.html', '').toUpperCase();
 
             let main = null;
             const areas = [];
             const spots = [];
 
-            const filePref = currentFile.replace('.html', '').toUpperCase();
+            const allRows = lines.slice(1).map(line => {
+                const cols = line.split(',');
+                return {
+                    name: cols[0].trim(),
+                    zoom: parseFloat(cols[1]),
+                    maxZoom: cols[2] ? parseFloat(cols[2]) : null,
+                    lat: parseFloat(cols[3]),
+                    lng: parseFloat(cols[4]),
+                    parent: cols[5] ? cols[5].trim() : '',
+                    style: cols[6] ? cols[6].trim() : '',
+                    restricted: cols[7] ? parseFloat(cols[7]) : null,
+                    icon: cols[8] ? cols[8].trim() : null
+                };
+            });
 
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',');
-                const name = cols[0].trim();
-                const zoom = parseFloat(cols[1]);
-                const maxZoom = cols[2] ? parseFloat(cols[2]) : null;
-                const lat = parseFloat(cols[3]);
-                const lng = parseFloat(cols[4]);
-                const parent = cols[5] ? cols[5].trim() : '';
-                const style = cols[6] ? cols[6].trim() : '';
-                const restricted = cols[7] ? parseFloat(cols[7]) : null;
-                const icon = cols[8] ? cols[8].trim() : null;
+            // 県データ
+            allRows.forEach(row => {
+                if (!row.parent && row.name.toUpperCase() === filePref) main = row;
+            });
 
-                const obj = { name, zoom, maxZoom, lat, lng, parent, style, restricted, icon };
+            // エリアデータ
+            allRows.forEach(row => {
+                if (row.parent.toUpperCase() === filePref) areas.push(row);
+            });
 
-                if (!parent && name.toUpperCase() === filePref) {
-                    main = obj;
-                } else if (parent.toUpperCase() === filePref) {
-                    areas.push(obj);
-                } else if (parent && areas.find(a => a.name === parent)) {
-                    spots.push(obj);
-                }
-            }
+            // スポットデータ
+            allRows.forEach(row => {
+                if (row.parent && areas.find(a => a.name === row.parent)) spots.push(row);
+            });
 
             window.prefData = main;
             window.areaData = areas;
@@ -52,7 +58,6 @@ function loadLocationCSV(csvUrl, currentFile) {
             return { main, areas, spots };
         });
 }
-
 /**
  * 地図描画
  */
