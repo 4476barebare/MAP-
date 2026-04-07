@@ -69,7 +69,26 @@ li { user-select: none; cursor: pointer; }
     white-space: nowrap;
     pointer-events: auto; /* クリック可能 */
 }
+.spot-div-icon {
+    background: none;
+    border: none;
+    padding: 0;
+}
 
+.spot-marker {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* アイコンと名前の間のスペース */
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.spot-marker .spot-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: #fff; /* 必要に応じて色変更 */
+}
 
 </style>
 </head>
