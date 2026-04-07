@@ -224,13 +224,21 @@ function showSpotsForArea(areaName) {
     const normAreaName = areaName.trim().toLowerCase();
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
+    // sprite が DOM にあるか確認
+    const spriteEl = document.querySelector('div[style*="display: none"] svg');
+    if (!spriteEl) {
+        alert('sprite.svg が DOM にありません');
+    } else {
+        alert('sprite.svg が DOM に存在します');
+    }
+
     spots.forEach(spot => {
         const iconId = spot.icon || 'spot';
 
         const html = `
             <div class="spot-marker">
                 <svg class="spot-icon" width="24" height="24">
-                    <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
+                    <use href="#${iconId}"></use>
                 </svg>
                 <span class="spot-name">${spot.name}</span>
             </div>
@@ -241,8 +249,8 @@ function showSpotsForArea(areaName) {
             icon: L.divIcon({
                 html: html,
                 className: 'spot-div-icon',
-                iconSize: [150, 24], // 必要に応じて調整
-                iconAnchor: [0, 12]  // 左端中央に合わせる
+                iconSize: [150, 24],
+                iconAnchor: [0, 12]
             })
         }).addTo(window.map);
 
