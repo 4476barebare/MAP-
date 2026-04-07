@@ -132,11 +132,23 @@ function selectSpot(areaName, spotName) {
  */
 function goBack() {
     drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+    
+        // 既存スポットマーカーを削除
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+        window.spotMarkers = [];
+    }
+    
     location.hash = '';
     window.currentHash = '';
 
     document.getElementById('map-menu').style.display = 'block';
     document.getElementById('map-back-btn').style.display = 'none';
+    
+
+
+    
+    
 }
 
 window.selectArea = selectArea;
@@ -146,39 +158,20 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 
-// --- 指定エリアのスポットをマーカーで表示 ---
-function showSpotsForArea(areaName) {
-    if (!window.map) return;
 
-    // 既存のスポットマーカーを削除
-    if (window.spotMarkers) {
-        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
-    }
-    window.spotMarkers = [];
 
-    if (!areaName) return;
+function selectArea(areaName) {
+    const area = window.areaData.find(a => a.name === areaName);
+    if (!area) return;
 
-    const areaKey = areaName.trim().toLowerCase();
+    drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
 
-    // 指定エリアのスポットを取得（親名をtrim＆小文字で比較）
-    const spots = window.spotData.filter(s => (s.parent || '').trim().toLowerCase() === areaKey);
+    // --- ここでスポットを表示 ---
+    showSpotsForArea(area.name);
 
-    spots.forEach(spot => {
-        const iconOptions = spot.icon ? {
-            icon: L.icon({
-                iconUrl: spot.icon,
-                iconSize: [25, 25],
-                iconAnchor: [12, 12],
-                popupAnchor: [0, -12]
-            })
-        } : {};
+    location.hash = encodeURIComponent(area.name);
+    window.currentHash = location.hash;
 
-        const marker = L.marker([spot.lat, spot.lng], { ...iconOptions, title: spot.name })
-            .addTo(window.map);
-
-        // クリックイベントはまだ不要
-        // marker.on('click', () => { selectSpot(areaName, spot.name); });
-
-        window.spotMarkers.push(marker);
-    });
+    document.getElementById('map-menu').style.display = 'none';
+    document.getElementById('map-back-btn').style.display = 'block';
 }
