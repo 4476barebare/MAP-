@@ -181,7 +181,7 @@ document.getElementById('map-menu').addEventListener('click', e => {
 
     // 戻るボタン
     document.getElementById('map-back-btn').addEventListener('click', () => {
-        goBack();
+        goBack(window.currentHash);
         showDebug('Back button pressed');
     });
 
@@ -245,6 +245,14 @@ fetch('/MAP-/icon/back.svg')
     if (svgEl) svgEl.classList.add('back-icon');
   });
 });
+
+// popstate で currentHash を渡す
+window.addEventListener('popstate', () => {
+    goBack(window.currentHash);
+});
+
+
+
 </script>
 </body>
 </html>
