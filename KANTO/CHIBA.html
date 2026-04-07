@@ -324,12 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const csvUrl = 'http://www.turiiko.shop/get_csv.php';
     const pathParts = location.pathname.split('/');
     const currentFile = pathParts[pathParts.length - 1];
-
-if (!window.prefData || isNaN(window.prefData.lat) || isNaN(window.prefData.lng)) {
-    alert('prefData が不正です');
-    return;
-}
-    // CSV読み込み
+  // CSV読み込み
     loadLocationCSV(csvUrl, currentFile).then(data => {
 alert(JSON.stringify(data));
 
@@ -361,6 +356,9 @@ alert('CSV読み込み成功'); // <- ここで確認
         function selectArea(areaName) {
             const area = areaCenters.find(a => a.name === areaName);
             if (!area) return;
+
+
+
 
             // 地図移動
             drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
