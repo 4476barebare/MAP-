@@ -207,12 +207,6 @@ function showSpotsForArea(areaName) {
     const normAreaName = areaName.trim().toLowerCase();
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
-    // --- 確認用ログ ---
-    console.log('Filtered spots for area:', normAreaName, spots);
-    if (spots.length > 0) {
-        alert(`スポット1件目: 名前=${spots[0].name}, icon=${spots[0].icon}`);
-    }
-
     spots.forEach(spot => {
         const iconId = spot.icon || 'spot';
 
