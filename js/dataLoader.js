@@ -225,7 +225,7 @@ function showSpotsForArea(areaName) {
                 className: '',
                 html: html,
                 iconSize: [32, 32],
-                iconAnchor: [0, 12] // 左寄せで縦中央
+                iconAnchor: [16, 16] // 左寄せで縦中央
             })
         });
 
