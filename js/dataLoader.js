@@ -188,7 +188,7 @@ function setAreaBounds(areaName) {
         [maxLat, maxLng]
     );
 
-    return window.areaBounds;
+    
     
     alert(
     areaBounds.getSouthWest().lat + ',' +
@@ -196,6 +196,8 @@ function setAreaBounds(areaName) {
     areaBounds.getNorthEast().lat + ',' +
     areaBounds.getNorthEast().lng
 );
+
+return window.areaBounds;
 }
 
 function enableDragForArea() {
