@@ -114,8 +114,7 @@ function selectArea(areaName) {
     document.getElementById('map-back-btn').style.display = 'block';
     
     
-    showSpotsForArea(area.name);
-    setAreaBounds(areaName);
+    showSpotsForArea(area.name)
 
 
 
@@ -313,5 +312,7 @@ function showSpotsForArea(areaName) {
 
         window.spotMarkers.push(marker);
         marker.addTo(window.map);
+        
     });
+    setAreaBounds(areaName);
 }
