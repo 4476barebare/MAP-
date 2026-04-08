@@ -152,55 +152,7 @@ window.map.once('moveend', () => {
 });
 }
 
-function setAreaBounds(areaName) {
-    alert(areaName);
 
-    const spots = window.spotData.filter(s => s.area === areaName);
-    alert('spots:' + spots.length);
-    if (spots.length === 0) return null;
-
-    let minLat =  999;
-    let maxLat = -999;
-    let minLng =  999;
-    let maxLng = -999;
-
-    spots.forEach(s => {
-        if (s.lat < minLat) minLat = s.lat;
-        if (s.lat > maxLat) maxLat = s.lat;
-        if (s.lng < minLng) minLng = s.lng;
-        if (s.lng > maxLng) maxLng = s.lng;
-    });
-
-    // --- 10kmを緯度経度に変換 ---
-    const latBuffer = 10 / 111; // 約0.09度
-
-    // 経度は緯度で変わる
-    const centerLat = (minLat + maxLat) / 2;
-    const lngBuffer = 10 / (111 * Math.cos(centerLat * Math.PI / 180));
-
-    // --- バッファ追加 ---
-    minLat -= latBuffer;
-    maxLat += latBuffer;
-    minLng -= lngBuffer;
-    maxLng += lngBuffer;
-
-    // --- グローバル保存 ---
-    window.areaBounds = L.latLngBounds(
-        [minLat, minLng],
-        [maxLat, maxLng]
-    );
-
-    
-
-    alert(
-    window.areaBounds.getSouthWest().lat + ',' +
-    window.areaBounds.getSouthWest().lng + '\n' +
-    window.areaBounds.getNorthEast().lat + ',' +
-    window.areaBounds.getNorthEast().lng
-);
-
-return window.areaBounds;
-}
 
 function enableDragForArea() {
 
@@ -289,10 +241,15 @@ function showSpotsForArea(areaName) {
     const normAreaName = areaName.trim().toLowerCase();
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
+    // ★ min/max 初期化
+    let minLat =  999;
+    let maxLat = -999;
+    let minLng =  999;
+    let maxLng = -999;
+
     spots.forEach(spot => {
         const iconId = spot.icon || 'default-icon';
 
-        // SVGを文字列としてdivIconに埋め込み
         const html = `
             <div class="spot-label">
                 <svg width="16" height="16">
@@ -307,22 +264,45 @@ function showSpotsForArea(areaName) {
                 className: '',
                 html: html,
                 iconSize: [32, 32],
-                iconAnchor: [16, 16] // 左寄せで縦中央
+                iconAnchor: [16, 16]
             })
         });
 
-// ここで座標を渡す
-    marker.on('click', function() {
-        selectSpot(areaName, spot.name, spot.lat, spot.lng);
-    });
+        // ★ ここで min/max 更新
+        if (spot.lat < minLat) minLat = spot.lat;
+        if (spot.lat > maxLat) maxLat = spot.lat;
+        if (spot.lng < minLng) minLng = spot.lng;
+        if (spot.lng > maxLng) maxLng = spot.lng;
 
-
-
-
+        marker.on('click', function() {
+            selectSpot(areaName, spot.name, spot.lat, spot.lng);
+        });
 
         window.spotMarkers.push(marker);
         marker.addTo(window.map);
-        
     });
-    setAreaBounds(areaName);
+
+    // ★ スポットが無い場合は終了
+    if (spots.length === 0) return;
+
+    // ★ 10kmバッファ計算
+    const latBuffer = 10 / 111;
+    const centerLat = (minLat + maxLat) / 2;
+    const lngBuffer = 10 / (111 * Math.cos(centerLat * Math.PI / 180));
+
+    // ★ グローバルに確定
+    window.areaBounds = L.latLngBounds(
+        [minLat - latBuffer, minLng - lngBuffer],
+        [maxLat + latBuffer, maxLng + lngBuffer]
+    );
+
+
+    
+    alert(
+        window.areaBounds.getSouthWest().lat + ',' +
+        window.areaBounds.getSouthWest().lng + '\n' +
+        window.areaBounds.getNorthEast().lat + ',' +
+        window.areaBounds.getNorthEast().lng
+    );
+    
 }
