@@ -103,6 +103,9 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
  */
 function selectArea(areaName) {
     
+    // 既存の最寄りクリックを削除
+    if (typeof removeNearestClick === 'function') removeNearestClick();
+    
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
