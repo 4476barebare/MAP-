@@ -151,26 +151,48 @@ window.map.once('moveend', () => {
 });
 }
 
+function getBoundsFromSpots(areaName) {
 
+    const spots = window.spotData.filter(s => s.area === areaName);
+    if (spots.length === 0) return null;
 
+    let minLat =  999;
+    let maxLat = -999;
+    let minLng =  999;
+    let maxLng = -999;
+
+    spots.forEach(s => {
+        if (s.lat < minLat) minLat = s.lat;
+        if (s.lat > maxLat) maxLat = s.lat;
+        if (s.lng < minLng) minLng = s.lng;
+        if (s.lng > maxLng) maxLng = s.lng;
+    });
+
+    return L.latLngBounds(
+        [minLat, minLng],
+        [maxLat, maxLng]
+    );
+}
 
 
 function enableDragForArea(areaName) {
 
-    const bounds = window.map.getBounds().pad(0.3);
+    const bounds = getBoundsFromSpots(areaName);
+    if (!bounds) return;
+
+    const paddedBounds = bounds.pad(0.2);
 
     window.map.dragging.enable();
     window.map.options.inertia = false;
 
-    window.map.setMaxBounds(bounds);
+    window.map.setMaxBounds(paddedBounds);
 
     window.map.off('move');
 
     window.map.on('move', () => {
-        window.map.panInsideBounds(bounds, { animate: false });
+        window.map.panInsideBounds(paddedBounds, { animate: false });
     });
 }
-
 
 
 
