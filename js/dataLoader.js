@@ -143,12 +143,43 @@ function selectSpot(areaName, spotName) {
 
     // 13固定でスポットに移動（flyToではなくsetView）
     window.map.setView([spot.lat, spot.lng], 13);
+    
+    enableDragForArea(areaName);
 
     // メニュー・戻るボタンの表示は不要ならそのまま
 }
 
 
+function enableDragForArea(areaName) {
+    const area = window.areaData.find(a => a.name === areaName);
+    if (!area) return;
 
+    // 簡易的にlat/lng ± deltaで矩形判定
+    const delta = 0.05; // 調整可能
+    const bounds = {
+        north: area.lat + delta,
+        south: area.lat - delta,
+        east: area.lng + delta,
+        west: area.lng - delta
+    };
+
+    // ドラッグ有効化/無効化をupdate関数で制御
+    function checkDrag() {
+        const center = window.map.getCenter();
+        if (center.lat <= bounds.north && center.lat >= bounds.south &&
+            center.lng <= bounds.east && center.lng >= bounds.west) {
+            window.map.dragging.enable();
+        } else {
+            window.map.dragging.disable();
+        }
+    }
+
+    // マップ移動時に判定
+    window.map.on('move', checkDrag);
+
+    // 初回チェック
+    checkDrag();
+}
 /**
  * 戻る
  */
