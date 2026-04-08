@@ -102,7 +102,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
  * エリア選択
  */
 function selectArea(areaName) {
-    removeNearestClick();
+    
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
@@ -113,7 +113,7 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
     
-    
+    removeNearestClick();
     showSpotsForArea(area.name);
 
 
