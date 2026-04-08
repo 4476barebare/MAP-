@@ -185,7 +185,7 @@ function enableDragForArea(areaName) {
     window.map.dragging.enable();
     window.map.options.inertia = false;
 
-    window.map.setMaxBounds(paddedBounds);
+    //window.map.setMaxBounds(paddedBounds);
 
     window.map.off('move');
 
