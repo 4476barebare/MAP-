@@ -151,6 +151,8 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
 
 
 function enableDragForArea(areaName) {
+    
+    alert(areaName);
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
 
