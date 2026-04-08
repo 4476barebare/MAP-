@@ -193,6 +193,7 @@ function setAreaBounds(areaName) {
 }
 
 function enableDragForArea() {
+    alert(areaBounds);
 
     if (!window.areaBounds) return;
 
