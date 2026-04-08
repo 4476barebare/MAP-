@@ -126,11 +126,11 @@ function selectArea(areaName) {
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
 // --- Phase2用 selectSpot ---
-function selectSpot(areaName, spotLat, spotLng) {
+function selectSpot(spot.parent, spotLat, spotLng) {
     const targetZoom = 13;
 
     // --- まず drawLocation で確実にスポット位置に移動 ---
-    drawLocation(areaName, spotLat, spotLng, targetZoom);
+    drawLocation(spot.parent, spotLat, spotLng, targetZoom);
 
     // --- タイルを Leaflet に切り替え ---
     if (window.map.currentTileLayer) window.map.removeLayer(window.map.currentTileLayer);
