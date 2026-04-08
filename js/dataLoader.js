@@ -147,7 +147,7 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
 
     // メニュー・戻るボタンの表示は不要ならそのまま
     enableDragForArea(areaName);
-    debugMapState();
+    //debugMapState();
 }
 
 
