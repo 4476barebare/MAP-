@@ -140,7 +140,8 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
 
     // 新タイル追加
     window.currentTileLayer = L.tileLayer(tileUrl, {
-        attribution: '© OpenStreetMap contributors'
+        attribution: '© OpenStreetMap contributors',
+        keepBuffer: 4 // ★追加
     }).addTo(window.map);
 
     // 既存のmoveendを消す（多重防止）
