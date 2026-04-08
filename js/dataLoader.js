@@ -189,10 +189,16 @@ function setAreaBounds(areaName) {
     );
 
     return window.areaBounds;
+    
+    alert(
+    areaBounds.getSouthWest().lat + ',' +
+    areaBounds.getSouthWest().lng + '\n' +
+    areaBounds.getNorthEast().lat + ',' +
+    areaBounds.getNorthEast().lng
+);
 }
 
 function enableDragForArea() {
-    alert(areaBounds);
 
     if (!window.areaBounds) return;
 
