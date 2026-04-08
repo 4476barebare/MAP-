@@ -194,6 +194,7 @@ function goBack(hash) {
 
     } else if (areaName) {
         // エリア→県に戻す
+        window.map.off('move');
 
         drawLocation(
             window.prefData.name,
