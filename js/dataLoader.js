@@ -224,7 +224,7 @@ function showSpotsForArea(areaName) {
             icon: L.divIcon({
                 className: '',
                 html: html,
-                iconSize: [120, 24],
+                iconSize: [16, 16],
                 iconAnchor: [0, 12] // 左寄せで縦中央
             })
         });
