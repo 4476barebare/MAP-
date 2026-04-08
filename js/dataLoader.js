@@ -132,7 +132,7 @@ function selectSpot(spotName, spotLat, spotLng) {
 
     // --- まず drawLocation で確実にスポット位置に移動 ---
     // drawLocation の第一引数はエリア名ではなく spotName に合わせる
-    drawLocation(spotName, spotLat, spotLng, targetZoom);
+    //drawLocation(spotName, spotLat, spotLng, targetZoom);
 
     // --- タイルを Leaflet に切り替え ---
     if (window.map.currentTileLayer) window.map.removeLayer(window.map.currentTileLayer);
