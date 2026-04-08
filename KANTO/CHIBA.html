@@ -212,23 +212,25 @@ document.getElementById('map-menu').addEventListener('click', e => {
         showDebug('Back button pressed');
     });
 
-    // --- 最寄りクリック用ハンドラを保持 ---
-// フラグで有効/無効を制御
-window.nearestClickEnabled = true;
 
-// 最寄りクリック用ハンドラを一度だけ登録
+// --- 最寄りクリック用ハンドラ ---
+window.nearestClickHandler = null;
+window.nearestClickEnabled = true; // デフォルトON
+
 function setupNearestClick() {
-    if (!window.map || window.nearestClickHandler) return;
+    if (!window.map) return;
+    if (window.nearestClickHandler) return; // すでに登録済み
 
     window.nearestClickHandler = function(e) {
         if (!window.nearestClickEnabled) return; // 無効なら何もしない
 
         const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+        // メニュークリックは無視
         if (e.originalEvent.clientX >= menuRect.left &&
             e.originalEvent.clientX <= menuRect.right &&
             e.originalEvent.clientY >= menuRect.top &&
             e.originalEvent.clientY <= menuRect.bottom) {
-            return; // メニュー上のクリックは無視
+            return;
         }
 
         let nearestArea = null, minDist = Infinity;
@@ -253,6 +255,21 @@ function removeNearestClick() {
 // 有効化
 function enableNearestClick() {
     window.nearestClickEnabled = true;
+}
+
+// --- selectArea 内で最寄りクリックを無効化 ---
+const _selectArea = selectArea;
+window.selectArea = function(areaName) {
+    removeNearestClick(); // エリア選択中は無効化
+    _selectArea(areaName);
+}
+
+// --- goBack 内で最寄りクリックを復活 ---
+const _goBack = goBack;
+window.goBack = function(hash) {
+    _goBack(hash);
+    // 県画面に戻ったら最寄りクリック復活
+    if (!window.currentHash) enableNearestClick();
 }
 
     
