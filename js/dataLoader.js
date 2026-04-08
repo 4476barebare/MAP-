@@ -126,27 +126,26 @@ function selectArea(areaName) {
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
 
-
-function selectSpot(spotName, spotLat, spotLng) {
+function selectSpot(spotName, spotLat, spotLng, parentArea) {
     const targetZoom = 13;
 
-    // --- まず drawLocation で移動・ズーム ---
+    // --- 移動・ズーム ---
     drawLocation(spotName, spotLat, spotLng, targetZoom);
 
-    // --- 既存タイルを安全に削除 ---
+    // --- タイルを切り替え（既存タイルを安全に削除） ---
     if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
+        try { window.map.removeLayer(window.currentTileLayer); } catch(e){ console.warn(e); }
         window.currentTileLayer = null;
     }
-
-    // --- Leafletタイルを追加 ---
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
     window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
 
     // --- 選択エリア内だけドラッグ許可 ---
-    const spot = window.spotData.find(s => s.name === spotName);
-    if (spot && spot.parent) enableDragForArea(spot.parent);
+    if (parentArea) enableDragForArea(parentArea);
 }
+
+
+
 
 // --- 選択エリア内だけドラッグ許可 ---
 function enableDragForArea(areaName) {
@@ -266,7 +265,8 @@ function showSpotsForArea(areaName) {
 
 // ここで座標を渡す
     marker.on('click', function() {
-        selectSpot(spot.name, spot.lat, spot.lng);
+// spot.parent を渡す
+selectSpot(spot.name, spot.lat, spot.lng, spot.parent);
     });
 
 
