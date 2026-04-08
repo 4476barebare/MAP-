@@ -177,23 +177,16 @@ function getBoundsFromSpots(areaName) {
 
 function enableDragForArea(areaName) {
 
-    const bounds = getBoundsFromSpots(areaName);
-    if (!bounds) return;
-
-    const paddedBounds = bounds.pad(0.2);
-
-    window.map.dragging.enable();
-    window.map.options.inertia = false;
-
-    //window.map.setMaxBounds(paddedBounds);
-
+    // ★ 余計な制御を全部消す
     window.map.off('move');
+    window.map.off('moveend');
 
-    window.map.on('move', () => {
-        window.map.panInsideBounds(paddedBounds, { animate: false });
-    });
+    // ★ ドラッグのみON
+    window.map.dragging.enable();
+
+    // ★ 慣性だけオフ（これは元からなら残してOK）
+    window.map.options.inertia = false;
 }
-
 
 
 /**
