@@ -212,67 +212,55 @@ document.getElementById('map-menu').addEventListener('click', e => {
         showDebug('Back button pressed');
     });
 
-// --- 最寄りクリック用ハンドラを保持 ---
-// --- 最寄りクリック用ハンドラを保持 ---
-window.nearestClickHandler = null;
-window.nearestClickEnabled = true;
+    // --- 最寄りクリック用ハンドラを保持 ---
+    window.nearestClickHandler = null;
 
-// 最寄り判定をセット
-function setupNearestClick() {
-    if (!window.map) return;
+    // --- 最寄りクリック判定の設定 ---
+    function setupNearestClick() {
+        if (!window.map) {
+            showDebug('setupNearestClick: map is undefined');
+            return;
+        }
+        if (window.nearestClickHandler) window.map.off('click', window.nearestClickHandler);
 
-    // すでにハンドラがあれば削除
-    if (window.nearestClickHandler) {
-        window.map.off('click', window.nearestClickHandler);
-    }
-
-    window.nearestClickHandler = function(e) {
-        try {
-            if (!window.nearestClickEnabled) return;
-            if (!window.areaData || window.areaData.length === 0) return;
-
-            const menuEl = document.getElementById('map-menu');
-            const backEl = document.getElementById('map-back-btn');
-            const x = e.originalEvent?.clientX;
-            const y = e.originalEvent?.clientY;
-            if (!menuEl || !backEl || x == null || y == null) return;
-
-            const menuRect = menuEl.getBoundingClientRect();
-            const backRect = backEl.getBoundingClientRect();
-
-            // メニューや戻るボタン上のクリックは無視
-            if ((x >= menuRect.left && x <= menuRect.right && y >= menuRect.top && y <= menuRect.bottom) ||
-                (x >= backRect.left && x <= backRect.right && y >= backRect.top && y <= backRect.bottom)) {
+        window.nearestClickHandler = function(e) {
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+            if (e.originalEvent.clientX >= menuRect.left &&
+                e.originalEvent.clientX <= menuRect.right &&
+                e.originalEvent.clientY >= menuRect.top &&
+                e.originalEvent.clientY <= menuRect.bottom) {
+                showDebug('Click ignored (menu area)');
                 return;
             }
 
-            // 最寄りエリア判定
             let nearestArea = null, minDist = Infinity;
             window.areaData.forEach(area => {
-                if (!area || area.lat == null || area.lng == null) return;
                 const dLat = e.latlng.lat - area.lat;
                 const dLng = e.latlng.lng - area.lng;
                 const dist = dLat*dLat + dLng*dLng;
                 if (dist < minDist) { minDist = dist; nearestArea = area.name; }
             });
 
-            if (nearestArea) selectArea(nearestArea);
+            if (nearestArea) {
+                showDebug('Nearest click detected: ' + nearestArea);
+                selectArea(nearestArea);
+            } else {
+                showDebug('Nearest click: no area found');
+            }
+        };
 
-        } catch(err) {
-            console.error('Nearest click handler error', err);
+        window.map.on('click', window.nearestClickHandler);
+        showDebug('Nearest click handler set');
+    }
+
+    // --- 最寄りクリック判定を解除 ---
+    function removeNearestClick() {
+        if (window.nearestClickHandler && window.map) {
+            window.map.off('click', window.nearestClickHandler);
+            window.nearestClickHandler = null;
+            showDebug('Nearest click handler removed');
         }
-    };
-
-    window.map.on('click', window.nearestClickHandler);
-}
-
-
-
-
-
-
-
-
+    }
     
 fetch('/MAP-/icon/back.svg')
   .then(res => res.text())
@@ -300,7 +288,7 @@ window.addEventListener('popstate', () => {
 });
 
 
- 
+
 
 </script>
 </body>
