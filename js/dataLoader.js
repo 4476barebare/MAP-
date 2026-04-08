@@ -147,6 +147,7 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
     //window.map.setView([spotLat, spotLng], 13);
 
     // メニュー・戻るボタンの表示は不要ならそのまま
+    enableDragForArea(areaName);
 }
 
 
