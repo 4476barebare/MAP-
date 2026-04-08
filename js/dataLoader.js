@@ -189,17 +189,8 @@ function goBack(hash) {
     const spotName = parts[1];
 
     if (spotName) {
-        // スポット→エリアに戻す（まだピン削除処理は未実装）
-        const area = window.areaData.find(a => a.name === areaName);
-        if (!area) return;
-
-        // スポットピンを消す処理（未実装）
-        // window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
-        // window.spotMarkers = [];
-
-        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-        location.hash = encodeURIComponent(area.name);
-        window.currentHash = location.hash;
+        
+        alert("未実装");
 
     } else if (areaName) {
         // エリア→県に戻す
