@@ -208,26 +208,29 @@ function showSpotsForArea(areaName) {
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
     spots.forEach(spot => {
-        const iconFile = (spot.icon || 'spot') + '.svg'; // CSV icon列 + .svg
+        const iconId = spot.icon || 'default-icon';
 
+        // SVGを文字列としてdivIconに埋め込み
         const html = `
-            <div class="spot-marker">
-                <img class="spot-icon" src="/MAP-/icon/${iconFile}" width="24" height="24">
-                <span class="spot-name">${spot.name}</span>
+            <div class="spot-label">
+                <svg width="16" height="16">
+                    <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
+                </svg>
+                <span>${spot.name}</span>
             </div>
         `;
 
         const marker = L.marker([spot.lat, spot.lng], {
-            title: spot.name,
             icon: L.divIcon({
+                className: '',
                 html: html,
-                className: 'spot-div-icon',
-                iconSize: [150, 24],
-                iconAnchor: [0, 12]
+                iconSize: [120, 24],
+                iconAnchor: [0, 12] // 左寄せで縦中央
             })
-        }).addTo(window.map);
+        });
 
         marker.on('click', () => selectSpot(spot.parent, spot.name));
         window.spotMarkers.push(marker);
+        marker.addTo(window.map);
     });
 }
