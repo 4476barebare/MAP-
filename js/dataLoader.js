@@ -102,7 +102,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
  * エリア選択
  */
 function selectArea(areaName) {
-    //removeNearestClick();
+    removeNearestClick();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
@@ -178,6 +178,7 @@ function goBack(hash) {
             window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
             window.spotMarkers = [];
         }
+        setupNearestClick();
 
         location.hash = '';
         window.currentHash = '';
