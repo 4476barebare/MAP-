@@ -232,6 +232,7 @@ window.loadLocationCSV = loadLocationCSV;
 
 
 function showSpotsForArea(areaName) {
+    // 既存マーカー削除
     if (window.spotMarkers) {
         window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
     }
@@ -269,12 +270,13 @@ function showSpotsForArea(areaName) {
             })
         });
 
-        // ★ ここで min/max 更新
+        // ★ min/max 更新
         if (spot.lat < minLat) minLat = spot.lat;
         if (spot.lat > maxLat) maxLat = spot.lat;
         if (spot.lng < minLng) minLng = spot.lng;
         if (spot.lng > maxLng) maxLng = spot.lng;
 
+        // クリック時
         marker.on('click', function() {
             selectSpot(areaName, spot.name, spot.lat, spot.lng);
         });
@@ -283,27 +285,33 @@ function showSpotsForArea(areaName) {
         marker.addTo(window.map);
     });
 
-    // ★ スポットが無い場合は終了
+    // ★ スポットなしなら終了
     if (spots.length === 0) return;
 
-    // ★ 10kmバッファ計算
-    const latBuffer = 10 / 111;
-    const centerLat = (minLat + maxLat) / 2;
-    const lngBuffer = 10 / (111 * Math.cos(centerLat * Math.PI / 180));
+    // =========================
+    // ★ 可変バッファ計算（ここが今回の本体）
+    // =========================
 
-    // ★ グローバルに確定
+    const latSize = maxLat - minLat;
+    const lngSize = maxLng - minLng;
+
+    // 20%拡張 + 最低保証（約5km）
+    const latBuffer = Math.max(latSize * 0.2, 0.05);
+    const lngBuffer = Math.max(lngSize * 0.2, 0.05);
+
+    // ★ bounds確定
     window.areaBounds = L.latLngBounds(
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 
-
-    
+    // ★ デバッグ用（必要ならON）
+    /*
     alert(
         window.areaBounds.getSouthWest().lat + ',' +
         window.areaBounds.getSouthWest().lng + '\n' +
         window.areaBounds.getNorthEast().lat + ',' +
         window.areaBounds.getNorthEast().lng
     );
-    
+    */
 }
