@@ -214,7 +214,7 @@ function showSpotsForArea(areaName) {
         const html = `
             <div class="spot-label">
                 <svg width="16" height="16">
-                    <use href="/MAP-/icon/sprite.svg#${iconId}"></use>
+                    <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
                 </svg>
                 <span>${spot.name}</span>
             </div>
