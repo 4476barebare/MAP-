@@ -102,11 +102,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
  * エリア選択
  */
 function selectArea(areaName) {
-
-removeNearestClick();
-
-
-   
+    //removeNearestClick();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
@@ -117,7 +113,7 @@ removeNearestClick();
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
     
-    //removeNearestClick();
+    
     showSpotsForArea(area.name);
 
 
@@ -144,43 +140,52 @@ function selectSpot(areaName, spotName) {
  * 戻る
  */
 
-// --- 戻るボタン ---
 function goBack(hash) {
+    // ハッシュ未指定なら currentHash を使う
     hash = hash || window.currentHash || '';
+
+    // decodeして判定
     const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
     const areaName = parts[0];
     const spotName = parts[1];
 
     if (spotName) {
-        // スポット→エリア
+        // スポット→エリアに戻す（まだピン削除処理は未実装）
         const area = window.areaData.find(a => a.name === areaName);
         if (!area) return;
 
-        if (window.spotMarkers) {
-            window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
-            window.spotMarkers = [];
-        }
+        // スポットピンを消す処理（未実装）
+        // window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+        // window.spotMarkers = [];
 
         drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
         location.hash = encodeURIComponent(area.name);
         window.currentHash = location.hash;
 
-        removeNearestClick(); // エリア画面では無効
-
     } else if (areaName) {
-        // エリア→県
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+        // エリア→県に戻す
 
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom,
+            window.prefData.maxZoom
+        );
+
+        // 既存スポットマーカーを削除
         if (window.spotMarkers) {
             window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
             window.spotMarkers = [];
         }
 
-        document.getElementById('map-menu').style.display = 'block';
-        document.getElementById('map-back-btn').style.display = 'none';
-
-        enableNearestClick(); // 県画面では有効
+        location.hash = '';
+        window.currentHash = '';
     }
+
+    // 表示制御はそのまま
+    document.getElementById('map-menu').style.display = 'block';
+    document.getElementById('map-back-btn').style.display = 'none';
 }
 
 window.selectArea = selectArea;
