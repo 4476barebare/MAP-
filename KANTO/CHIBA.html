@@ -215,45 +215,55 @@ document.getElementById('map-menu').addEventListener('click', e => {
 // --- 最寄りクリック用ハンドラを保持 ---
 // --- 最寄りクリック用ハンドラを保持 ---
 window.nearestClickHandler = null;
+window.nearestClickEnabled = true;
 
-// --- 最寄りクリック判定の設定 ---
+// 最寄り判定をセット
 function setupNearestClick() {
     if (!window.map) return;
-    if (window.nearestClickHandler) window.map.off('click', window.nearestClickHandler);
+
+    // すでにハンドラがあれば削除
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
+    }
 
     window.nearestClickHandler = function(e) {
-        // メニュー上なら無視
-        const menuRect = document.getElementById('map-menu').getBoundingClientRect();
-        if (e.originalEvent.clientX >= menuRect.left &&
-            e.originalEvent.clientX <= menuRect.right &&
-            e.originalEvent.clientY >= menuRect.top &&
-            e.originalEvent.clientY <= menuRect.bottom) return;
+        try {
+            if (!window.nearestClickEnabled) return;
+            if (!window.areaData || window.areaData.length === 0) return;
 
-        // エリア画面で無効化フラグがあれば無視
-        if (window.nearestClickDisabled) return;
+            const menuEl = document.getElementById('map-menu');
+            const backEl = document.getElementById('map-back-btn');
+            const x = e.originalEvent?.clientX;
+            const y = e.originalEvent?.clientY;
+            if (!menuEl || !backEl || x == null || y == null) return;
 
-        let nearestArea = null, minDist = Infinity;
-        window.areaData.forEach(area => {
-            const dLat = e.latlng.lat - area.lat;
-            const dLng = e.latlng.lng - area.lng;
-            const dist = dLat*dLat + dLng*dLng;
-            if (dist < minDist) { minDist = dist; nearestArea = area.name; }
-        });
+            const menuRect = menuEl.getBoundingClientRect();
+            const backRect = backEl.getBoundingClientRect();
 
-        if (nearestArea) selectArea(nearestArea);
+            // メニューや戻るボタン上のクリックは無視
+            if ((x >= menuRect.left && x <= menuRect.right && y >= menuRect.top && y <= menuRect.bottom) ||
+                (x >= backRect.left && x <= backRect.right && y >= backRect.top && y <= backRect.bottom)) {
+                return;
+            }
+
+            // 最寄りエリア判定
+            let nearestArea = null, minDist = Infinity;
+            window.areaData.forEach(area => {
+                if (!area || area.lat == null || area.lng == null) return;
+                const dLat = e.latlng.lat - area.lat;
+                const dLng = e.latlng.lng - area.lng;
+                const dist = dLat*dLat + dLng*dLng;
+                if (dist < minDist) { minDist = dist; nearestArea = area.name; }
+            });
+
+            if (nearestArea) selectArea(nearestArea);
+
+        } catch(err) {
+            console.error('Nearest click handler error', err);
+        }
     };
 
     window.map.on('click', window.nearestClickHandler);
-}
-
-// --- 最寄りクリックを無効化 ---
-function removeNearestClick() {
-    window.nearestClickDisabled = true;
-}
-
-// --- 最寄りクリックを有効化 ---
-function enableNearestClick() {
-    window.nearestClickDisabled = false;
 }
 
 
