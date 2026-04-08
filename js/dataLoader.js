@@ -130,7 +130,7 @@ function selectSpot(spot.parent, spotLat, spotLng) {
     const targetZoom = 13;
 
     // --- まず drawLocation で確実にスポット位置に移動 ---
-    drawLocation(spot.parent, spotLat, spotLng, targetZoom);
+    drawLocation(areaName, spotLat, spotLng, targetZoom);
 
     // --- タイルを Leaflet に切り替え ---
     if (window.map.currentTileLayer) window.map.removeLayer(window.map.currentTileLayer);
