@@ -186,13 +186,10 @@ function goBack(hash) {
             window.spotMarkers = [];
         }
         //setupNearestClick();
-        // 最寄りクリックを再設定
+        // 最寄りクリックを再設定（解除せずに直接呼ぶ）
         if (typeof setupNearestClick === 'function') {
-            // 一度解除してから再登録
-            removeNearestClick();
             setupNearestClick();
         }
-
 
 
         location.hash = '';
