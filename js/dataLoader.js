@@ -126,21 +126,30 @@ function selectArea(areaName) {
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
 
-// --- 元の関数名に戻す ---
-function selectSpot(areaName, spotLat, spotLng) {
+// --- 元の関数名・引数に戻したPhase2版 ---
+function selectSpot(areaName, spotName) {
+    const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
+    if (!spot) return;
+
     const targetZoom = 13;
 
     // Leafletタイルに切り替え
     if (window.map.currentTileLayer) window.map.removeLayer(window.map.currentTileLayer);
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
     window.map.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
-    window.map.setView([spotLat, spotLng], targetZoom);
+
+    // スポット位置へ固定ズームで移動
+    window.map.setView([spot.lat, spot.lng], targetZoom);
 
     // 選択エリア内ドラッグ制御
     enableDragForArea(areaName);
+
+    // ハッシュ更新・UI制御
+    location.hash = encodeURIComponent(areaName + '/' + spotName);
+    document.getElementById('map-menu').style.display = 'none';
+    document.getElementById('map-back-btn').style.display = 'block';
 }
 
-// ドラッグ制御も元関数名に戻す
 function enableDragForArea(areaName) {
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
@@ -154,11 +163,11 @@ function enableDragForArea(areaName) {
     window.map.setMaxBounds(bounds);
     window.map.dragging.enable();
 
+    // 枠外移動補正
     window.map.on('move', () => {
         window.map.panInsideBounds(bounds, { animate: false });
     });
 }
-
 
 
 
