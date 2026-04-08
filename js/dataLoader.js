@@ -268,7 +268,15 @@ function showSpotsForArea(areaName) {
             })
         });
 
-        marker.on('click', () => selectSpot(areaName,spotLat,spotLng));
+// ここで座標を渡す
+    marker.on('click', function() {
+        selectSpot(spot.parent, spot.lat, spot.lng);
+    });
+
+
+
+
+
         window.spotMarkers.push(marker);
         marker.addTo(window.map);
     });
