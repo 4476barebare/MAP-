@@ -126,12 +126,13 @@ function selectArea(areaName) {
  * @param {string} areaName
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
-function selectSpot(areaName, spotName, spotLat, spotLng) {
+function selectSpot(areaName, selectName, spotLat, spotLng) {
    
     // ★ ここ追加：制限解除
     window.map.setMaxBounds(null);
     
-    drawLocation(spotName, spotLat, spotLng, 13);
+    
+    drawLocation(selectName, spotLat, spotLng, 13);
     
     
      // LeafletタイルURL（例: OSM標準）
