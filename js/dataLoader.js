@@ -127,10 +127,11 @@ function selectArea(areaName) {
  */
 // --- Phase2用 selectSpot ---
 function selectSpot(spotName, spotLat, spotLng) {
+    alert("呼び出し");
     const targetZoom = 13;
 
     // --- まず drawLocation で確実にスポット位置に移動 ---
-    drawLocation(areaName, spotLat, spotLng, targetZoom);
+    drawLocation(areaName, spotLat, spotLng, targetZoom, 13);
 
     // --- タイルを Leaflet に切り替え ---
     if (window.map.currentTileLayer) window.map.removeLayer(window.map.currentTileLayer);
