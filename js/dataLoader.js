@@ -128,6 +128,8 @@ function selectArea(areaName) {
  */
 function selectSpot(areaName, spotName, spotLat, spotLng) {
    
+    // ★ ここ追加：制限解除
+    window.map.setMaxBounds(null);
     
     drawLocation(spotName, spotLat, spotLng, 13);
     
@@ -145,8 +147,8 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
     updateWhenIdle: true
     }).addTo(window.map);
 
-    // 既存のmoveendを消す（多重防止）
-window.map.off('moveend');
+
+
 
 // 移動・ズーム完了後に実行
 window.map.once('moveend', () => {
