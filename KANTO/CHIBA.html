@@ -48,25 +48,28 @@ li { user-select: none; cursor: pointer; }
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
 }
 
-.spot-div-icon {
-    background: none;
-    border: none;
-    padding: 0;
-}
 
-.spot-marker {
+.spot-label {
     display: flex;
     align-items: center;
-    gap: 4px; /* アイコンと名前の間のスペース */
+    gap: 4px; /* アイコンと文字の間 */
+    padding: 2px 6px;
+    border: 1px solid #ffffff; /* 枠白1px */
+    border-radius: 3px;         /* 角丸3px */
+    background-color: #191970;  /* 背景色 */
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* ドロップシャドウ */
     font-size: 12px;
-    white-space: nowrap;
+    font-weight: bold;
 }
 
-.spot-marker .spot-icon {
-    display: block;
-    width: 24px;
-    height: 24px;
-    fill: #fff; /* 必要に応じて色変更 */
+.spot-label svg {
+    width: 16px;
+    height: 16px;
+    fill: #191970; /* SVGの塗り色 */
+}
+
+.spot-label span {
+    color: #191970; /* テキスト色 */
 }
 
 </style>
