@@ -126,7 +126,6 @@ function selectArea(areaName) {
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
 function selectSpot(areaName, spotName, spotLat, spotLng) {
-    alert(spotName);
    
     
     drawLocation(spotName, spotLat, spotLng, 13);
@@ -154,8 +153,6 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
 
 
 
-
-// --- 選択エリア内だけドラッグ許可 ---
 function enableDragForArea(areaName) {
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
@@ -166,15 +163,22 @@ function enableDragForArea(areaName) {
         [area.lat + delta, area.lng + delta]
     );
 
-    window.map.setMaxBounds(bounds);
+    // ★ ドラッグのみON
     window.map.dragging.enable();
 
-    // 枠外移動補正
+    // ★ 慣性オフ（暴走防止）
+    window.map.options.inertia = false;
+
+    // 範囲制限
+    window.map.setMaxBounds(bounds);
+
+    // イベント重複防止
+    window.map.off('move');
+
     window.map.on('move', () => {
         window.map.panInsideBounds(bounds, { animate: false });
     });
 }
-
 
 
 
