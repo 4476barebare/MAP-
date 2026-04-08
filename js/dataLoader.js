@@ -137,9 +137,11 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
     window.currentTileLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors'
     }).addTo(window.map);
+    
+    drawLocation(spotName, spotLat, spotLng, 13);
 
     // 13固定でスポットに移動（flyToではなくsetView）
-    window.map.setView([spotLat, spotLng], 13);
+    //window.map.setView([spotLat, spotLng], 13);
 
     // メニュー・戻るボタンの表示は不要ならそのまま
 }
