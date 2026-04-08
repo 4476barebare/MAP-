@@ -125,61 +125,43 @@ function selectArea(areaName) {
  * @param {string} areaName
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
- 
-function selectSpot(areaName, spotName) {
-    const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
-    if (!spot) return;
 
-    // LeafletタイルURL（例: OSM標準）
-    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+// --- 元の関数名に戻す ---
+function selectSpotPhase2(areaName, spotLat, spotLng) {
+    const targetZoom = 13;
 
-    // 既存タイル削除
-    if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+    // Leafletタイルに切り替え
+    if (window.map.currentTileLayer) window.map.removeLayer(window.map.currentTileLayer);
+    const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+    window.map.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+    window.map.setView([spotLat, spotLng], targetZoom);
 
-    // 新タイル追加
-    window.currentTileLayer = L.tileLayer(tileUrl, {
-        attribution: '© OpenStreetMap contributors'
-    }).addTo(window.map);
-
-    // 13固定でスポットに移動（flyToではなくsetView）
-    window.map.setView([spot.lat, spot.lng], 13);
-    
+    // 選択エリア内ドラッグ制御
     enableDragForArea(areaName);
-
-    // メニュー・戻るボタンの表示は不要ならそのまま
 }
 
-
+// ドラッグ制御も元関数名に戻す
 function enableDragForArea(areaName) {
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
 
-    // 簡易的にlat/lng ± deltaで矩形判定
-    const delta = 0.05; // 調整可能
-    const bounds = {
-        north: area.lat + delta,
-        south: area.lat - delta,
-        east: area.lng + delta,
-        west: area.lng - delta
-    };
+    const delta = 0.05;
+    const bounds = L.latLngBounds(
+        [area.lat - delta, area.lng - delta],
+        [area.lat + delta, area.lng + delta]
+    );
 
-    // ドラッグ有効化/無効化をupdate関数で制御
-    function checkDrag() {
-        const center = window.map.getCenter();
-        if (center.lat <= bounds.north && center.lat >= bounds.south &&
-            center.lng <= bounds.east && center.lng >= bounds.west) {
-            window.map.dragging.enable();
-        } else {
-            window.map.dragging.disable();
-        }
-    }
+    window.map.setMaxBounds(bounds);
+    window.map.dragging.enable();
 
-    // マップ移動時に判定
-    window.map.on('move', checkDrag);
-
-    // 初回チェック
-    checkDrag();
+    window.map.on('move', () => {
+        window.map.panInsideBounds(bounds, { animate: false });
+    });
 }
+
+
+
+
 /**
  * 戻る
  */
