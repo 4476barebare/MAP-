@@ -212,18 +212,21 @@ document.getElementById('map-menu').addEventListener('click', e => {
         showDebug('Back button pressed');
     });
 
-
-
-// フラグで有効/無効を制御
+// --- 最寄りクリック用ハンドラを保持 ---
+window.nearestClickHandler = null;
 window.nearestClickEnabled = true;
 
-// ハンドラは最初に一度だけ登録
+// 最寄り判定をセット
 function setupNearestClick() {
     if (!window.map) return;
-    if (window.nearestClickHandler) return; // 既に登録済み
+
+    // すでにハンドラがあれば削除して再登録
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
+    }
 
     window.nearestClickHandler = function(e) {
-        if (!window.nearestClickEnabled) return; // 無効化
+        if (!window.nearestClickEnabled) return;
 
         const menuRect = document.getElementById('map-menu').getBoundingClientRect();
         if (e.originalEvent.clientX >= menuRect.left &&
@@ -247,13 +250,17 @@ function setupNearestClick() {
     window.map.on('click', window.nearestClickHandler);
 }
 
-// 有効/無効を切り替える
+// 無効化
 function removeNearestClick() {
     window.nearestClickEnabled = false;
 }
+
+// 有効化
 function enableNearestClick() {
     window.nearestClickEnabled = true;
 }
+
+
 
 
 
@@ -284,7 +291,7 @@ window.addEventListener('popstate', () => {
 });
 
 
-
+ 
 
 </script>
 </body>
