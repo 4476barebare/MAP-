@@ -113,7 +113,7 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
     
-    removeNearestClick();
+    //removeNearestClick();
     showSpotsForArea(area.name);
 
 
@@ -178,7 +178,7 @@ function goBack(hash) {
             window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
             window.spotMarkers = [];
         }
-        setupNearestClick();
+        //setupNearestClick();
 
         location.hash = '';
         window.currentHash = '';
