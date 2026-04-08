@@ -126,7 +126,7 @@ function selectArea(areaName) {
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
 // --- Phase2用 selectSpot ---
-function selectSpot(spot.parent, spotLat, spotLng) {
+function selectSpot(spotName, spotLat, spotLng) {
     const targetZoom = 13;
 
     // --- まず drawLocation で確実にスポット位置に移動 ---
@@ -261,7 +261,7 @@ function showSpotsForArea(areaName) {
 
 // ここで座標を渡す
     marker.on('click', function() {
-        selectSpot(spot.parent, spot.lat, spot.lng);
+        selectSpot(spot.name, spot.lat, spot.lng);
     });
 
 
