@@ -126,8 +126,13 @@ function selectArea(areaName) {
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
 function selectSpot(areaName, spotName, spotLat, spotLng) {
-    alert(areaName);
-    // LeafletタイルURL（例: OSM標準）
+    alert(spotName);
+   
+    
+    drawLocation(spotName, spotLat, spotLng, 13);
+    
+    
+     // LeafletタイルURL（例: OSM標準）
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     // 既存タイル削除
@@ -137,8 +142,6 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
     window.currentTileLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors'
     }).addTo(window.map);
-    
-    drawLocation(spotName, spotLat, spotLng, 13);
 
     // 13固定でスポットに移動（flyToではなくsetView）
     //window.map.setView([spotLat, spotLng], 13);
