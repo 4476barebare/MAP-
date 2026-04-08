@@ -213,28 +213,24 @@ document.getElementById('map-menu').addEventListener('click', e => {
     });
 
 // --- 最寄りクリック用ハンドラを保持 ---
+// --- 最寄りクリック用ハンドラを保持 ---
 window.nearestClickHandler = null;
-window.nearestClickEnabled = true;
 
-// 最寄り判定をセット
+// --- 最寄りクリック判定の設定 ---
 function setupNearestClick() {
     if (!window.map) return;
-
-    // すでにハンドラがあれば削除して再登録
-    if (window.nearestClickHandler) {
-        window.map.off('click', window.nearestClickHandler);
-    }
+    if (window.nearestClickHandler) window.map.off('click', window.nearestClickHandler);
 
     window.nearestClickHandler = function(e) {
-        if (!window.nearestClickEnabled) return;
-
+        // メニュー上なら無視
         const menuRect = document.getElementById('map-menu').getBoundingClientRect();
         if (e.originalEvent.clientX >= menuRect.left &&
             e.originalEvent.clientX <= menuRect.right &&
             e.originalEvent.clientY >= menuRect.top &&
-            e.originalEvent.clientY <= menuRect.bottom) {
-            return;
-        }
+            e.originalEvent.clientY <= menuRect.bottom) return;
+
+        // エリア画面で無効化フラグがあれば無視
+        if (window.nearestClickDisabled) return;
 
         let nearestArea = null, minDist = Infinity;
         window.areaData.forEach(area => {
@@ -250,15 +246,18 @@ function setupNearestClick() {
     window.map.on('click', window.nearestClickHandler);
 }
 
-// 無効化
+// --- 最寄りクリックを無効化 ---
 function removeNearestClick() {
-    window.nearestClickEnabled = false;
+    window.nearestClickDisabled = true;
 }
 
-// 有効化
+// --- 最寄りクリックを有効化 ---
 function enableNearestClick() {
-    window.nearestClickEnabled = true;
+    window.nearestClickDisabled = false;
 }
+
+
+
 
 
 
