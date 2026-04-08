@@ -142,8 +142,13 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
         attribution: '© OpenStreetMap contributors'
     }).addTo(window.map);
 
-    // メニュー・戻るボタンの表示は不要ならそのまま
+    // 既存のmoveendを消す（多重防止）
+window.map.off('moveend');
+
+// 移動・ズーム完了後に実行
+window.map.once('moveend', () => {
     enableDragForArea(areaName);
+});
 }
 
 
