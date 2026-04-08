@@ -102,6 +102,10 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
  * エリア選択
  */
 function selectArea(areaName) {
+    if (window.nearestClickHandler && window.map) {
+    window.map.off('click', window.nearestClickHandler);
+    window.nearestClickHandler = null;
+}
     
     // 既存の最寄りクリックを削除
     if (typeof removeNearestClick === 'function') removeNearestClick();
@@ -182,6 +186,7 @@ function goBack(hash) {
             window.spotMarkers = [];
         }
         //setupNearestClick();
+        if (typeof setupNearestClick === 'function') setupNearestClick();
 
         location.hash = '';
         window.currentHash = '';
