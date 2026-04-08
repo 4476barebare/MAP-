@@ -121,20 +121,77 @@ function selectArea(areaName) {
 }
 
 /**
- * スポット選択
+ * スポット描画
+ * @param {string} areaName
+ * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
+ */
+function showSpotsForArea(areaName, highlightZoom13 = false) {
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+    }
+    window.spotMarkers = [];
+
+    if (!areaName) return;
+
+    const normAreaName = areaName.trim().toLowerCase();
+    const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
+
+    spots.forEach(spot => {
+        const iconId = spot.icon || 'default-icon';
+
+        // マーカーサイズ：ズーム13で強調する場合は32→48など
+        const size = highlightZoom13 ? 48 : 32;
+        const anchor = highlightZoom13 ? 24 : 16;
+
+        const html = `
+            <div class="spot-label">
+                <svg width="${size/2}" height="${size/2}">
+                    <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                </svg>
+                <span>${spot.name}</span>
+            </div>
+        `;
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: html,
+                iconSize: [size, size],
+                iconAnchor: [anchor, anchor]
+            })
+        });
+
+        marker.on('click', () => selectSpot(spot.parent, spot.name));
+        window.spotMarkers.push(marker);
+        marker.addTo(window.map);
+    });
+}
+
+/**
+ * スポット選択（Phase2: 13ズームで拡大表示）
  */
 function selectSpot(areaName, spotName) {
-    //removeNearestClick();
     const spot = window.spotData.find(s => s.name === spotName && s.parent === areaName);
     if (!spot) return;
-    drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || window.prefData.zoom);
-    
 
+    // --- Phase1: 固定ズーム13 ---
+    drawLocation(spot.name, spot.lat, spot.lng, 13);
+
+    // --- Phase2: スポット描画 + 最終ズーム ---
+    setTimeout(() => {
+        showSpotsForArea(areaName, true);  // このときだけマーカー拡大
+        window.map.setView([spot.lat, spot.lng], spot.zoom || 15, { animate: true });
+    }, 200);
+
+    // ハッシュ更新
     location.hash = encodeURIComponent(areaName + '/' + spotName);
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 }
+
+
+
 
 /**
  * 戻る
