@@ -156,27 +156,14 @@ window.map.once('moveend', () => {
 
 
 function enableDragForArea(areaName) {
-    
-    alert(areaName);
-    const area = window.areaData.find(a => a.name === areaName);
-    if (!area) return;
 
-    const delta = 0.05;
-    const bounds = L.latLngBounds(
-        [area.lat - delta, area.lng - delta],
-        [area.lat + delta, area.lng + delta]
-    );
+    const bounds = window.map.getBounds().pad(0.3);
 
-    // ★ ドラッグのみON
     window.map.dragging.enable();
-
-    // ★ 慣性オフ（暴走防止）
     window.map.options.inertia = false;
 
-    // 範囲制限
     window.map.setMaxBounds(bounds);
 
-    // イベント重複防止
     window.map.off('move');
 
     window.map.on('move', () => {
