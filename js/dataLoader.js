@@ -115,6 +115,8 @@ function selectArea(areaName) {
     
     
     showSpotsForArea(area.name);
+    setAreaBounds(areaName);
+
 
 
 
@@ -151,7 +153,7 @@ window.map.once('moveend', () => {
 });
 }
 
-function getBoundsFromSpots(areaName) {
+function setAreaBounds(areaName) {
 
     const spots = window.spotData.filter(s => s.area === areaName);
     if (spots.length === 0) return null;
@@ -168,28 +170,43 @@ function getBoundsFromSpots(areaName) {
         if (s.lng > maxLng) maxLng = s.lng;
     });
 
-    return L.latLngBounds(
+    // --- 10kmを緯度経度に変換 ---
+    const latBuffer = 10 / 111; // 約0.09度
+
+    // 経度は緯度で変わる
+    const centerLat = (minLat + maxLat) / 2;
+    const lngBuffer = 10 / (111 * Math.cos(centerLat * Math.PI / 180));
+
+    // --- バッファ追加 ---
+    minLat -= latBuffer;
+    maxLat += latBuffer;
+    minLng -= lngBuffer;
+    maxLng += lngBuffer;
+
+    // --- グローバル保存 ---
+    window.areaBounds = L.latLngBounds(
         [minLat, minLng],
         [maxLat, maxLng]
     );
+
+    return window.areaBounds;
 }
 
+function enableDragForArea() {
 
-function enableDragForArea(areaName) {
-
-    const bounds = window.map.getBounds().pad(0.3);
+    if (!window.areaBounds) return;
 
     window.map.dragging.enable();
     window.map.options.inertia = false;
 
-    window.map.setMaxBounds(bounds);
-
     window.map.off('move');
 
     window.map.on('move', () => {
-        window.map.panInsideBounds(bounds, { animate: false });
+        window.map.panInsideBounds(window.areaBounds, { animate: false });
     });
 }
+
+
 
 /**
  * 戻る
