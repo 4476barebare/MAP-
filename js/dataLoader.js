@@ -127,7 +127,7 @@ function selectArea(areaName) {
  */
 
 // --- 元の関数名に戻す ---
-function selectSpotPhase2(areaName, spotLat, spotLng) {
+function selectSpot(areaName, spotLat, spotLng) {
     const targetZoom = 13;
 
     // Leafletタイルに切り替え
