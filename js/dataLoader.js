@@ -142,12 +142,8 @@ function selectSpot(areaName, spotName, spotLat, spotLng) {
         attribution: '© OpenStreetMap contributors'
     }).addTo(window.map);
 
-    // 13固定でスポットに移動（flyToではなくsetView）
-    //window.map.setView([spotLat, spotLng], 13);
-
     // メニュー・戻るボタンの表示は不要ならそのまま
     enableDragForArea(areaName);
-    //debugMapState();
 }
 
 
@@ -181,22 +177,6 @@ function enableDragForArea(areaName) {
     });
 }
 
-function debugMapState() {
-    const map = window.map;
-
-    const state = {
-        dragging: map.dragging.enabled(),
-        touchZoom: map.touchZoom.enabled(),
-        scrollWheelZoom: map.scrollWheelZoom.enabled(),
-        doubleClickZoom: map.doubleClickZoom.enabled(),
-        boxZoom: map.boxZoom.enabled(),
-        keyboard: map.keyboard.enabled(),
-        inertia: map.options.inertia,
-        maxBounds: map.options.maxBounds ? "SET" : "NONE"
-    };
-
-    alert(JSON.stringify(state, null, 2));
-}
 
 
 
