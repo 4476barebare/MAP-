@@ -156,6 +156,7 @@ function setAreaBounds(areaName) {
     alert('通過');
 
     const spots = window.spotData.filter(s => s.area === areaName);
+    alert('spots:' + spots.length);
     if (spots.length === 0) return null;
 
     let minLat =  999;
@@ -190,12 +191,12 @@ function setAreaBounds(areaName) {
     );
 
     
-    
+
     alert(
-    areaBounds.getSouthWest().lat + ',' +
-    areaBounds.getSouthWest().lng + '\n' +
-    areaBounds.getNorthEast().lat + ',' +
-    areaBounds.getNorthEast().lng
+    window.areaBounds.getSouthWest().lat + ',' +
+    window.areaBounds.getSouthWest().lng + '\n' +
+    window.areaBounds.getNorthEast().lat + ',' +
+    window.areaBounds.getNorthEast().lng
 );
 
 return window.areaBounds;
