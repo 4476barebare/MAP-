@@ -152,11 +152,10 @@ function goBack(hash) {
     const spotName = parts[1];
 
     if (spotName) {
-        // スポット→エリアに戻す
+        // スポット→エリア
         const area = window.areaData.find(a => a.name === areaName);
         if (!area) return;
 
-        // スポットピンを削除
         if (window.spotMarkers) {
             window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
             window.spotMarkers = [];
@@ -166,31 +165,21 @@ function goBack(hash) {
         location.hash = encodeURIComponent(area.name);
         window.currentHash = location.hash;
 
-        // エリア選択後はまだ最寄りクリックは無効
-        removeNearestClick();
+        removeNearestClick(); // エリア画面では無効
 
     } else if (areaName) {
-        // エリア→県に戻す
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom,
-            window.prefData.maxZoom
-        );
+        // エリア→県
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
 
-        // スポットピンを削除
         if (window.spotMarkers) {
             window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
             window.spotMarkers = [];
         }
 
-        // メニュー表示
         document.getElementById('map-menu').style.display = 'block';
         document.getElementById('map-back-btn').style.display = 'none';
 
-        // 県画面では最寄りクリックを再有効化
-        enableNearestClick();
+        enableNearestClick(); // 県画面では有効
     }
 }
 
