@@ -125,27 +125,24 @@ function selectArea(areaName) {
  * @param {string} areaName
  * @param {boolean} highlightZoom13 - trueならマーカーを大きくして表示
  */
-function selectSpot(spotName, spotLat, spotLng) {
-    alert("呼び出し");
-    const targetZoom = 13;
+function selectSpot(areaName, spotName, spotLat, spotLng) {
+    alert(areaName);
+    // LeafletタイルURL（例: OSM標準）
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
+    // 既存タイル削除
+    if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
 
-    // --- まず drawLocation で確実にスポット位置に移動 ---
-    // drawLocation の第一引数はエリア名ではなく spotName に合わせる
-    //drawLocation(spotName, spotLat, spotLng, targetZoom);
+    // 新タイル追加
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(window.map);
 
-    // --- タイルを Leaflet に切り替え ---
-    if (window.map.currentTileLayer) window.map.removeLayer(window.map.currentTileLayer);
-    const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
-    window.map.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+    // 13固定でスポットに移動（flyToではなくsetView）
+    window.map.setView([spotLat, spotLng], 13);
 
-    // --- 選択エリア内だけドラッグ許可 ---
-    // ここは親エリア名が必要なので、spotData から探す
-    const spot = window.spotData.find(s => s.name === spotName);
-    if (spot && spot.parent) enableDragForArea(spot.parent);
+    // メニュー・戻るボタンの表示は不要ならそのまま
 }
-
-
 
 
 
@@ -270,7 +267,7 @@ function showSpotsForArea(areaName) {
 
 // ここで座標を渡す
     marker.on('click', function() {
-        selectSpot(spot.name, spot.lat, spot.lng);
+        selectSpot(areaName, spot.name, spot.lat, spot.lng);
     });
 
 
