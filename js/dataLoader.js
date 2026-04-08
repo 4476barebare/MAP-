@@ -153,7 +153,7 @@ window.map.once('moveend', () => {
 }
 
 function setAreaBounds(areaName) {
-    alert('通過');
+    alert(areaName);
 
     const spots = window.spotData.filter(s => s.area === areaName);
     alert('spots:' + spots.length);
