@@ -1,4 +1,4 @@
-name,zoom,maxZoom,lat,lng,parent,style,restricted,icon
+name,zoom,maxZoom,lat,lng,parent,URL,notes,icon
 CHIBA,9,,35.4,140.3,,,,
 内房エリア,10,,35.665,140.115,CHIBA,,,
 南房総エリア,10,,35.172,140,CHIBA,,,
