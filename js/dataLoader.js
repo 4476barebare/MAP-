@@ -1,4 +1,4 @@
-enableNearestAreaClick();
+
 
 // =====================
 // グローバル
@@ -121,6 +121,13 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
     }
 
     window.currentHash = location.hash;
+    
+    if (!window._nearestClickEnabled) {
+    enableNearestAreaClick();
+    window._nearestClickEnabled = true;
+}
+    
+    
 }
 
 // =====================
@@ -357,31 +364,34 @@ function goBack(hash) {
 
 function enableNearestAreaClick() {
 
+    map.off('click'); // ★重複防止（重要）
+
     map.on('click', function(e) {
 
-        // エリア選択中やスポット中は無効
+        // ★県全体でのみ有効
         if (window.currentAreaName !== null) return;
 
-        const clickedLatLng = e.latlng;
+        const clicked = e.latlng;
 
-        let nearestArea = null;
+        let nearest = null;
         let minDist = Infinity;
 
         window.areaData.forEach(area => {
 
             const dist = map.distance(
-                clickedLatLng,
+                clicked,
                 L.latLng(area.lat, area.lng)
             );
 
             if (dist < minDist) {
                 minDist = dist;
-                nearestArea = area;
+                nearest = area;
             }
         });
 
-        if (nearestArea) {
-            selectArea(nearestArea.name);
+        // ★距離制限（これが無いと暴発する）
+        if (nearest && minDist < 50000) { // 50km目安（調整可）
+            selectArea(nearest.name);
         }
     });
 }
