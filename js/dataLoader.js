@@ -117,8 +117,6 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             ...opts
         });
 
-        window.map.attributionControl.setPosition('topright');
-
         window.currentTileLayer = L.tileLayer(tileUrl, {
             attribution: '© 国土地理院'
         }).addTo(window.map);
@@ -129,10 +127,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             }
         });
     }
-
-    window.currentHash = location.hash;
 }
-
 
 // =====================
 // エリアbounds生成
@@ -163,6 +158,10 @@ function setAreaBounds(areaName) {
 // =====================
 function selectArea(areaName) {
 
+    // ★① まず制限解除（これが無いとズームしない）
+    window.map.setMaxBounds(null);
+    window.areaBounds = null;
+    
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
 
