@@ -1,32 +1,18 @@
-
-
-// =====================
 // グローバル
-// =====================
 window.prefData = null;
 window.areaData = [];
 window.spotData = [];
 window.currentHash = '';
 
-window.spotMarkers = [];
-window.currentAreaName = null;
-window.areaBounds = null;
-
-// =====================
-// CSV読込
-// =====================
 function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
         .then(r => r.text())
         .then(text => {
-
             const lines = text.trim().split('\n');
             const filePref = currentFile.replace('.html', '').toUpperCase();
-
             let main = null;
             const areas = [];
             const spots = [];
-
             const allRows = lines.slice(1).map(line => {
                 const cols = line.split(',');
                 return {
@@ -42,23 +28,26 @@ function loadLocationCSV(csvUrl, currentFile) {
                 };
             });
 
+            // メイン
             allRows.forEach(row => {
-                if (!row.parent && row.name.toUpperCase() === filePref) {
-                    main = row;
-                }
+                if (!row.parent && row.name.toUpperCase() === filePref) main = row;
             });
 
+            // エリア（既存そのまま）
             allRows.forEach(row => {
-                if (row.parent.toUpperCase() === filePref) {
-                    areas.push(row);
-                }
+                if (row.parent.toUpperCase() === filePref) areas.push(row);
             });
 
+            // ★ここだけ変更（spot + fish対応）
             allRows.forEach(row => {
                 const icon = row.icon;
+
                 if (!icon) return;
 
-                if (icon === 'spot' || icon.startsWith('fish')) {
+                if (
+                    icon === 'spot' ||
+                    icon.startsWith('fish')
+                ) {
                     spots.push(row);
                 }
             });
@@ -71,12 +60,10 @@ function loadLocationCSV(csvUrl, currentFile) {
         });
 }
 
-// =====================
-// 地図描画
-// =====================
 function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
-
     const defaultOptions = {
+        center: [lat, lng],
+        zoom: zoom,
         zoomControl: false,
         scrollWheelZoom: false,
         dragging: false,
@@ -85,316 +72,140 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         keyboard: false,
         tap: false
     };
-
-    const opts = { ...defaultOptions, ...options };
-
+    const mapOptions = { ...defaultOptions, ...options };
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
     if (window.map) {
-
-        // ★ここが重要（状態を毎回更新）
-        if (opts.dragging) {
-            window.map.dragging.enable();
-        } else {
-            window.map.dragging.disable();
-        }
-
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-
-        if (window.currentTileLayer) {
-            window.map.removeLayer(window.currentTileLayer);
-        }
-
-        window.currentTileLayer = L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院'
-        }).addTo(window.map);
-
+        if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+        mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
+        mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
+        mapOptions.doubleClickZoom ? window.map.doubleClickZoom.enable() : window.map.doubleClickZoom.disable();
+        mapOptions.boxZoom ? window.map.boxZoom.enable() : window.map.boxZoom.disable();
+        mapOptions.keyboard ? window.map.keyboard.enable() : window.map.keyboard.disable();
+        mapOptions.touchZoom ? window.map.touchZoom.enable() : window.map.touchZoom.disable();
+        if (window.map.tap) mapOptions.tap ? window.map.tap.enable() : window.map.tap.disable();
     } else {
-
-        window.map = L.map('lf-map', {
-            center: [lat, lng],
-            zoom: zoom,
-            ...opts
-        });
-
-        window.currentTileLayer = L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院'
-        }).addTo(window.map);
-
-        window.map.on('zoomend', () => {
-            if (window.currentAreaName !== null) {
-                showSpotsForArea(window.currentAreaName);
-            }
-        });
+        window.map = L.map('lf-map', mapOptions);
+        window.map.attributionControl.setPosition('topright');
+        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
     }
+    window.currentHash = location.hash;
 }
 
-// =====================
-// エリアbounds生成
-// =====================
-function setAreaBounds(areaName) {
-
-    const points = [];
-
-    window.spotData.forEach(spot => {
-        if (spot.parent === areaName) {
-            points.push([spot.lat, spot.lng]);
-        }
-    });
-
-    if (points.length === 0) return;
-
-    let bounds = L.latLngBounds(points);
-
-    bounds = bounds.pad(0.2);
-
-    window.areaBounds = bounds;
-
-    window.map.setMaxBounds(bounds);
-}
-
-// =====================
-// エリア選択
-// =====================
 function selectArea(areaName) {
-
-    // ★① まず制限解除（これが無いとズームしない）
-    window.map.setMaxBounds(null);
-    window.areaBounds = null;
-    
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
-
-    window.currentAreaName = areaName;
-
-    drawLocation(
-        area.name,
-        area.lat,
-        area.lng,
-        area.zoom || window.prefData.zoom,
-        null,
-        { dragging: true }
-    );
-
-    setAreaBounds(areaName);
-
+    drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
     location.hash = encodeURIComponent(area.name);
-
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
-
     showSpotsForArea(area.name);
 }
 
-// =====================
-// スポット描画
-// =====================
-function showSpotsForArea(areaName) {
-
-    window.spotMarkers.forEach(obj => window.map.removeLayer(obj.marker));
-    window.spotMarkers = [];
-
-    const isPrefView = (areaName === null);
-
-    window.spotData.forEach(spot => {
-
-        if (!isPrefView && spot.parent !== areaName) return;
-
-        const html = createSpotHTML(spot, isPrefView);
-        if (!html) return;
-
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                html: html,
-                className: '',
-                iconSize: null
-            })
-        }).addTo(map);
-
-        // ★ここが重要
-        if (!isPrefView) {
-            marker.on('click', () => {
-                selectSpot(areaName, spot.name, spot.lat, spot.lng);
-            });
-        }
-
-        window.spotMarkers.push({ marker, spot });
-    });
-}
-
-// =====================
-// HTML生成（phase制御）
-// =====================
-function createSpotHTML(spot, isPrefView) {
-
-    const iconId = (spot.icon || '').toLowerCase();
-
-    // ===== 旧スポット =====
-    if (iconId === 'spot') {
-
-        if (isPrefView) {
-            return `<div style="width:5px;height:5px;background:#191970;"></div>`;
-        }
-
-        return `
-        <div class="spot-label">
-            <svg width="18" height="18">
-                <use href="/MAP-/icon/sprite.svg#icon-spot"></use>
-            </svg>
-            <span>${spot.name}</span>
-        </div>`;
-    }
-
-    // ===== 新釣り場 =====
-    if (iconId.startsWith('fish')) {
-
-        let color = '#ffffff';
-        if (iconId === 'fish1') color = '#1e90ff';
-        if (iconId === 'fish2') color = '#32cd32';
-        if (iconId === 'fish3') color = '#ff8c00';
-        if (iconId === 'fish4') color = '#ba55d3';
-
-        if (isPrefView) {
-            return `
-            <div>
-                <svg width="16" height="16" style="fill:${color}">
-                    <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                </svg>
-            </div>`;
-        }
-
-        return `
-        <div class="spot-label">
-            <svg width="18" height="18" style="fill:${color}">
-                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-            </svg>
-            <span>${spot.name}</span>
-        </div>`;
-    }
-
-    return '';
-}
-
-// =====================
-// スポット選択
-// =====================
 function selectSpot(areaName, selectName, spotLat, spotLng) {
-
     window.map.setMaxBounds(null);
-
     drawLocation(selectName, spotLat, spotLng, 13);
-
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
-
+    if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
     window.currentTileLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors',
         keepBuffer: 8,
         updateWhenIdle: true
     }).addTo(window.map);
-
     window.map.once('moveend', () => {
-        enableDragForArea();
+        enableDragForArea(areaName);
     });
 }
 
-// =====================
-// ドラッグ制御
-// =====================
 function enableDragForArea() {
-
     if (!window.areaBounds) return;
-
     window.map.dragging.enable();
     window.map.options.inertia = false;
-
     window.map.off('move');
-
     window.map.on('move', () => {
         window.map.panInsideBounds(window.areaBounds, { animate: false });
     });
 }
 
-// =====================
-// 戻る
-// =====================
 function goBack(hash) {
-
     hash = hash || window.currentHash || '';
-
     const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
     const areaName = parts[0];
     const spotName = parts[1];
 
     if (spotName) {
-
         alert("未実装");
-
     } else if (areaName) {
-
         window.map.off('move');
-
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom,
-            window.prefData.maxZoom
-        );
-
-        window.map.setMaxBounds(null);
-        window.areaBounds = null;
-
-        window.spotMarkers.forEach(obj => window.map.removeLayer(obj.marker));
-        window.spotMarkers = [];
-
-        window.currentAreaName = null;
-
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
+        if (window.spotMarkers) {
+            window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+            window.spotMarkers = [];
+        }
         location.hash = '';
         window.currentHash = '';
-
-        // ★県全域スポット再表示
-        showSpotsForArea(null);
     }
 
     document.getElementById('map-menu').style.display = 'block';
     document.getElementById('map-back-btn').style.display = 'none';
 }
 
+window.selectArea = selectArea;
+window.selectSpot = selectSpot;
+window.goBack = goBack;
+window.drawLocation = drawLocation;
+window.loadLocationCSV = loadLocationCSV;
 
-function enableNearestAreaClick() {
+function showSpotsForArea(areaName) {
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+    }
+    window.spotMarkers = [];
+    if (!areaName) return;
 
-    map.off('click'); // ★重複防止（重要）
+    const normAreaName = areaName.trim().toLowerCase();
+    const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
-    map.on('click', function(e) {
+    let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
 
-        // ★県全体でのみ有効
-        if (window.currentAreaName !== null) return;
+    spots.forEach(spot => {
+        const iconId = spot.icon || 'default-icon';
 
-        const clicked = e.latlng;
+        const html = `<div class="spot-label">
+            <svg width="16" height="16">
+                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+            </svg>
+            <span>${spot.name}</span>
+        </div>`;
 
-        let nearest = null;
-        let minDist = Infinity;
-
-        window.areaData.forEach(area => {
-
-            const dist = map.distance(
-                clicked,
-                L.latLng(area.lat, area.lng)
-            );
-
-            if (dist < minDist) {
-                minDist = dist;
-                nearest = area;
-            }
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({ className: '', html: html, iconSize: [32, 32], iconAnchor: [16, 16] })
         });
 
-        // ★距離制限（これが無いと暴発する）
-        if (nearest && minDist < 50000) { // 50km目安（調整可）
-            selectArea(nearest.name);
-        }
+        if (spot.lat < minLat) minLat = spot.lat;
+        if (spot.lat > maxLat) maxLat = spot.lat;
+        if (spot.lng < minLng) minLng = spot.lng;
+        if (spot.lng > maxLng) maxLng = spot.lng;
+
+        marker.on('click', function() {
+            selectSpot(areaName, spot.name, spot.lat, spot.lng);
+        });
+
+        window.spotMarkers.push(marker);
+        marker.addTo(window.map);
     });
+
+    if (spots.length === 0) return;
+
+    const latSize = maxLat - minLat;
+    const lngSize = maxLng - minLng;
+    const latBuffer = Math.max(latSize * 0.2, 0.05);
+    const lngBuffer = Math.max(lngSize * 0.2, 0.05);
+
+    window.areaBounds = L.latLngBounds(
+        [minLat - latBuffer, minLng - lngBuffer],
+        [maxLat + latBuffer, maxLng + lngBuffer]
+    );
 }
