@@ -77,8 +77,6 @@ function loadLocationCSV(csvUrl, currentFile) {
 function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
     const defaultOptions = {
-        center: [lat, lng],
-        zoom: zoom,
         zoomControl: false,
         scrollWheelZoom: false,
         dragging: false,
@@ -88,10 +86,18 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         tap: false
     };
 
-    const mapOptions = { ...defaultOptions, ...options };
+    const opts = { ...defaultOptions, ...options };
+
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
     if (window.map) {
+
+        // ★ここが重要（状態を毎回更新）
+        if (opts.dragging) {
+            window.map.dragging.enable();
+        } else {
+            window.map.dragging.disable();
+        }
 
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
@@ -105,14 +111,18 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
     } else {
 
-        window.map = L.map('lf-map', mapOptions);
+        window.map = L.map('lf-map', {
+            center: [lat, lng],
+            zoom: zoom,
+            ...opts
+        });
+
         window.map.attributionControl.setPosition('topright');
 
         window.currentTileLayer = L.tileLayer(tileUrl, {
             attribution: '© 国土地理院'
         }).addTo(window.map);
 
-        // ズーム時再描画
         window.map.on('zoomend', () => {
             if (window.currentAreaName !== null) {
                 showSpotsForArea(window.currentAreaName);
@@ -121,14 +131,8 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
     }
 
     window.currentHash = location.hash;
-    
-    if (!window._nearestClickEnabled) {
-    enableNearestAreaClick();
-    window._nearestClickEnabled = true;
 }
-    
-    
-}
+
 
 // =====================
 // エリアbounds生成
