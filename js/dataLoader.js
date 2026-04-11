@@ -22,22 +22,34 @@ function loadLocationCSV(csvUrl, currentFile) {
                     lat: parseFloat(cols[3]),
                     lng: parseFloat(cols[4]),
                     parent: cols[5] ? cols[5].trim() : '',
-                 url: cols[6] ? cols[6].trim() : '',
-notes: cols[7] ? cols[7].trim() : '', 
-                    icon: cols[8] ? cols[8].trim() : null
+                    url: cols[6] ? cols[6].trim() : '',
+                    notes: cols[7] ? cols[7].trim() : '',
+                    icon: cols[8] ? cols[8].trim().toLowerCase() : null
                 };
             });
 
+            // メイン
             allRows.forEach(row => {
                 if (!row.parent && row.name.toUpperCase() === filePref) main = row;
             });
 
+            // エリア（既存そのまま）
             allRows.forEach(row => {
                 if (row.parent.toUpperCase() === filePref) areas.push(row);
             });
 
+            // ★ここだけ変更（spot + fish対応）
             allRows.forEach(row => {
-                if (row.parent && areas.find(a => a.name === row.parent)) spots.push(row);
+                const icon = row.icon;
+
+                if (!icon) return;
+
+                if (
+                    icon === 'spot' ||
+                    icon.startsWith('fish')
+                ) {
+                    spots.push(row);
+                }
             });
 
             window.prefData = main;
@@ -157,17 +169,30 @@ function showSpotsForArea(areaName) {
     const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
 
     let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
+
     spots.forEach(spot => {
         const iconId = spot.icon || 'default-icon';
-        const html = `<div class="spot-label"><svg width="16" height="16"><use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use></svg><span>${spot.name}</span></div>`;
+
+        const html = `<div class="spot-label">
+            <svg width="16" height="16">
+                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+            </svg>
+            <span>${spot.name}</span>
+        </div>`;
+
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({ className: '', html: html, iconSize: [32, 32], iconAnchor: [16, 16] })
         });
+
         if (spot.lat < minLat) minLat = spot.lat;
         if (spot.lat > maxLat) maxLat = spot.lat;
         if (spot.lng < minLng) minLng = spot.lng;
         if (spot.lng > maxLng) maxLng = spot.lng;
-        marker.on('click', function() { selectSpot(areaName, spot.name, spot.lat, spot.lng); });
+
+        marker.on('click', function() {
+            selectSpot(areaName, spot.name, spot.lat, spot.lng);
+        });
+
         window.spotMarkers.push(marker);
         marker.addTo(window.map);
     });
@@ -178,5 +203,9 @@ function showSpotsForArea(areaName) {
     const lngSize = maxLng - minLng;
     const latBuffer = Math.max(latSize * 0.2, 0.05);
     const lngBuffer = Math.max(lngSize * 0.2, 0.05);
-    window.areaBounds = L.latLngBounds([minLat - latBuffer, minLng - lngBuffer], [maxLat + latBuffer, maxLng + lngBuffer]);
+
+    window.areaBounds = L.latLngBounds(
+        [minLat - latBuffer, minLng - lngBuffer],
+        [maxLat + latBuffer, maxLng + lngBuffer]
+    );
 }
