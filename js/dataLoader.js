@@ -1,3 +1,5 @@
+enableNearestAreaClick();
+
 // =====================
 // グローバル
 // =====================
@@ -182,7 +184,6 @@ function showSpotsForArea(areaName) {
     window.spotMarkers.forEach(obj => window.map.removeLayer(obj.marker));
     window.spotMarkers = [];
 
-    const zoom = map.getZoom();
     const isPrefView = (areaName === null);
 
     window.spotData.forEach(spot => {
@@ -200,9 +201,12 @@ function showSpotsForArea(areaName) {
             })
         }).addTo(map);
 
-        marker.on('click', () => {
-            selectSpot(areaName, spot.name, spot.lat, spot.lng);
-        });
+        // ★ここが重要
+        if (!isPrefView) {
+            marker.on('click', () => {
+                selectSpot(areaName, spot.name, spot.lat, spot.lng);
+            });
+        }
 
         window.spotMarkers.push({ marker, spot });
     });
@@ -348,4 +352,36 @@ function goBack(hash) {
 
     document.getElementById('map-menu').style.display = 'block';
     document.getElementById('map-back-btn').style.display = 'none';
+}
+
+
+function enableNearestAreaClick() {
+
+    map.on('click', function(e) {
+
+        // エリア選択中やスポット中は無効
+        if (window.currentAreaName !== null) return;
+
+        const clickedLatLng = e.latlng;
+
+        let nearestArea = null;
+        let minDist = Infinity;
+
+        window.areaData.forEach(area => {
+
+            const dist = map.distance(
+                clickedLatLng,
+                L.latLng(area.lat, area.lng)
+            );
+
+            if (dist < minDist) {
+                minDist = dist;
+                nearestArea = area;
+            }
+        });
+
+        if (nearestArea) {
+            selectArea(nearestArea.name);
+        }
+    });
 }
