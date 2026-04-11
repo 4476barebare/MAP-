@@ -1,4 +1,6 @@
+// =====================
 // グローバル
+// =====================
 window.prefData = null;
 window.areaData = [];
 window.spotData = [];
@@ -6,6 +8,7 @@ window.currentHash = '';
 
 window.spotMarkers = [];
 window.currentAreaName = null;
+window.areaBounds = null;
 
 // =====================
 // CSV読込
@@ -14,6 +17,7 @@ function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
         .then(r => r.text())
         .then(text => {
+
             const lines = text.trim().split('\n');
             const filePref = currentFile.replace('.html', '').toUpperCase();
 
@@ -37,11 +41,15 @@ function loadLocationCSV(csvUrl, currentFile) {
             });
 
             allRows.forEach(row => {
-                if (!row.parent && row.name.toUpperCase() === filePref) main = row;
+                if (!row.parent && row.name.toUpperCase() === filePref) {
+                    main = row;
+                }
             });
 
             allRows.forEach(row => {
-                if (row.parent.toUpperCase() === filePref) areas.push(row);
+                if (row.parent.toUpperCase() === filePref) {
+                    areas.push(row);
+                }
             });
 
             allRows.forEach(row => {
@@ -82,6 +90,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
     if (window.map) {
+
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
         if (window.currentTileLayer) {
@@ -93,6 +102,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         }).addTo(window.map);
 
     } else {
+
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
 
@@ -100,15 +110,39 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             attribution: '© 国土地理院'
         }).addTo(window.map);
 
-        // ズーム時更新（phase維持）
+        // ズーム時再描画
         window.map.on('zoomend', () => {
-            if (window.currentAreaName) {
+            if (window.currentAreaName !== null) {
                 showSpotsForArea(window.currentAreaName);
             }
         });
     }
 
     window.currentHash = location.hash;
+}
+
+// =====================
+// エリアbounds生成
+// =====================
+function setAreaBounds(areaName) {
+
+    const points = [];
+
+    window.spotData.forEach(spot => {
+        if (spot.parent === areaName) {
+            points.push([spot.lat, spot.lng]);
+        }
+    });
+
+    if (points.length === 0) return;
+
+    let bounds = L.latLngBounds(points);
+
+    bounds = bounds.pad(0.2);
+
+    window.areaBounds = bounds;
+
+    window.map.setMaxBounds(bounds);
 }
 
 // =====================
@@ -121,7 +155,16 @@ function selectArea(areaName) {
 
     window.currentAreaName = areaName;
 
-    drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+    drawLocation(
+        area.name,
+        area.lat,
+        area.lng,
+        area.zoom || window.prefData.zoom,
+        null,
+        { dragging: true }
+    );
+
+    setAreaBounds(areaName);
 
     location.hash = encodeURIComponent(area.name);
 
@@ -132,21 +175,21 @@ function selectArea(areaName) {
 }
 
 // =====================
-// スポット生成（毎回再描画）
+// スポット描画
 // =====================
 function showSpotsForArea(areaName) {
 
-    // 一旦削除（軽量）
     window.spotMarkers.forEach(obj => window.map.removeLayer(obj.marker));
     window.spotMarkers = [];
 
     const zoom = map.getZoom();
+    const isPrefView = (areaName === null);
 
     window.spotData.forEach(spot => {
 
-        if (spot.parent !== areaName) return;
+        if (!isPrefView && spot.parent !== areaName) return;
 
-        const html = createSpotHTML(spot, zoom);
+        const html = createSpotHTML(spot, isPrefView);
         if (!html) return;
 
         const marker = L.marker([spot.lat, spot.lng], {
@@ -157,7 +200,6 @@ function showSpotsForArea(areaName) {
             })
         }).addTo(map);
 
-        // ★クリック復活
         marker.on('click', () => {
             selectSpot(areaName, spot.name, spot.lat, spot.lng);
         });
@@ -167,16 +209,16 @@ function showSpotsForArea(areaName) {
 }
 
 // =====================
-// HTML生成
+// HTML生成（phase制御）
 // =====================
-function createSpotHTML(spot, zoom) {
+function createSpotHTML(spot, isPrefView) {
 
     const iconId = (spot.icon || '').toLowerCase();
 
     // ===== 旧スポット =====
     if (iconId === 'spot') {
 
-        if (zoom <= 9) {
+        if (isPrefView) {
             return `<div style="width:5px;height:5px;background:#191970;"></div>`;
         }
 
@@ -192,21 +234,27 @@ function createSpotHTML(spot, zoom) {
     // ===== 新釣り場 =====
     if (iconId.startsWith('fish')) {
 
-        // エリア画面では出さない
-        if (zoom < 10) return '';
-
         let color = '#ffffff';
         if (iconId === 'fish1') color = '#1e90ff';
         if (iconId === 'fish2') color = '#32cd32';
         if (iconId === 'fish3') color = '#ff8c00';
         if (iconId === 'fish4') color = '#ba55d3';
 
+        if (isPrefView) {
+            return `
+            <div>
+                <svg width="16" height="16" style="fill:${color}">
+                    <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                </svg>
+            </div>`;
+        }
+
         return `
         <div class="spot-label">
             <svg width="18" height="18" style="fill:${color}">
                 <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
             </svg>
-            ${zoom >= 13 ? `<span>${spot.name}</span>` : ``}
+            <span>${spot.name}</span>
         </div>`;
     }
 
@@ -235,7 +283,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
     }).addTo(window.map);
 
     window.map.once('moveend', () => {
-        enableDragForArea(areaName);
+        enableDragForArea();
     });
 }
 
@@ -257,7 +305,7 @@ function enableDragForArea() {
 }
 
 // =====================
-// 戻る処理
+// 戻る
 // =====================
 function goBack(hash) {
 
@@ -268,7 +316,9 @@ function goBack(hash) {
     const spotName = parts[1];
 
     if (spotName) {
+
         alert("未実装");
+
     } else if (areaName) {
 
         window.map.off('move');
@@ -281,6 +331,9 @@ function goBack(hash) {
             window.prefData.maxZoom
         );
 
+        window.map.setMaxBounds(null);
+        window.areaBounds = null;
+
         window.spotMarkers.forEach(obj => window.map.removeLayer(obj.marker));
         window.spotMarkers = [];
 
@@ -288,6 +341,9 @@ function goBack(hash) {
 
         location.hash = '';
         window.currentHash = '';
+
+        // ★県全域スポット再表示
+        showSpotsForArea(null);
     }
 
     document.getElementById('map-menu').style.display = 'block';
