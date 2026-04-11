@@ -84,7 +84,9 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
     if (window.map) {
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-        if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+        if (window.currentTileLayer) {
+            window.map.removeLayer(window.currentTileLayer);
+        }
 
         window.currentTileLayer = L.tileLayer(tileUrl, {
             attribution: '© 国土地理院'
@@ -98,8 +100,12 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             attribution: '© 国土地理院'
         }).addTo(window.map);
 
-        // ★ 初回だけズームイベント登録
-        window.map.on('zoomend', updateSpotMarkers);
+        // ズーム時更新（phase維持）
+        window.map.on('zoomend', () => {
+            if (window.currentAreaName) {
+                showSpotsForArea(window.currentAreaName);
+            }
+        });
     }
 
     window.currentHash = location.hash;
@@ -126,11 +132,13 @@ function selectArea(areaName) {
 }
 
 // =====================
-// スポット生成（初回のみ）
+// スポット生成（毎回再描画）
 // =====================
 function showSpotsForArea(areaName) {
 
-    if (window.spotMarkers.length > 0) return;
+    // 一旦削除（軽量）
+    window.spotMarkers.forEach(obj => window.map.removeLayer(obj.marker));
+    window.spotMarkers = [];
 
     const zoom = map.getZoom();
 
@@ -138,18 +146,23 @@ function showSpotsForArea(areaName) {
 
         if (spot.parent !== areaName) return;
 
-        const icon = L.divIcon({
-            html: createSpotHTML(spot, zoom),
-            className: '',
-            iconSize: null
+        const html = createSpotHTML(spot, zoom);
+        if (!html) return;
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                html: html,
+                className: '',
+                iconSize: null
+            })
+        }).addTo(map);
+
+        // ★クリック復活
+        marker.on('click', () => {
+            selectSpot(areaName, spot.name, spot.lat, spot.lng);
         });
 
-        const marker = L.marker([spot.lat, spot.lng], { icon }).addTo(map);
-
-        window.spotMarkers.push({
-            marker: marker,
-            spot: spot
-        });
+        window.spotMarkers.push({ marker, spot });
     });
 }
 
@@ -160,11 +173,13 @@ function createSpotHTML(spot, zoom) {
 
     const iconId = (spot.icon || '').toLowerCase();
 
-    // 旧スポット
+    // ===== 旧スポット =====
     if (iconId === 'spot') {
-        if (zoom === 9) {
+
+        if (zoom <= 9) {
             return `<div style="width:5px;height:5px;background:#191970;"></div>`;
         }
+
         return `
         <div class="spot-label">
             <svg width="18" height="18">
@@ -174,8 +189,11 @@ function createSpotHTML(spot, zoom) {
         </div>`;
     }
 
-    // 新釣り場
+    // ===== 新釣り場 =====
     if (iconId.startsWith('fish')) {
+
+        // エリア画面では出さない
+        if (zoom < 10) return '';
 
         let color = '#ffffff';
         if (iconId === 'fish1') color = '#1e90ff';
@@ -196,21 +214,45 @@ function createSpotHTML(spot, zoom) {
 }
 
 // =====================
-// ズーム時更新（再生成なし）
+// スポット選択
 // =====================
-function updateSpotMarkers() {
+function selectSpot(areaName, selectName, spotLat, spotLng) {
 
-    const zoom = map.getZoom();
+    window.map.setMaxBounds(null);
 
-    window.spotMarkers.forEach(obj => {
+    drawLocation(selectName, spotLat, spotLng, 13);
 
-        const html = createSpotHTML(obj.spot, zoom);
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-        obj.marker.setIcon(L.divIcon({
-            html: html,
-            className: '',
-            iconSize: null
-        }));
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© OpenStreetMap contributors',
+        keepBuffer: 8,
+        updateWhenIdle: true
+    }).addTo(window.map);
+
+    window.map.once('moveend', () => {
+        enableDragForArea(areaName);
+    });
+}
+
+// =====================
+// ドラッグ制御
+// =====================
+function enableDragForArea() {
+
+    if (!window.areaBounds) return;
+
+    window.map.dragging.enable();
+    window.map.options.inertia = false;
+
+    window.map.off('move');
+
+    window.map.on('move', () => {
+        window.map.panInsideBounds(window.areaBounds, { animate: false });
     });
 }
 
@@ -220,6 +262,7 @@ function updateSpotMarkers() {
 function goBack(hash) {
 
     hash = hash || window.currentHash || '';
+
     const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
     const areaName = parts[0];
     const spotName = parts[1];
@@ -227,6 +270,8 @@ function goBack(hash) {
     if (spotName) {
         alert("未実装");
     } else if (areaName) {
+
+        window.map.off('move');
 
         drawLocation(
             window.prefData.name,
@@ -236,7 +281,6 @@ function goBack(hash) {
             window.prefData.maxZoom
         );
 
-        // マーカー削除
         window.spotMarkers.forEach(obj => window.map.removeLayer(obj.marker));
         window.spotMarkers = [];
 
