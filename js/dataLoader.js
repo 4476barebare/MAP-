@@ -22,8 +22,8 @@ function loadLocationCSV(csvUrl, currentFile) {
                     lat: parseFloat(cols[3]),
                     lng: parseFloat(cols[4]),
                     parent: cols[5] ? cols[5].trim() : '',
-                    style: cols[6] ? cols[6].trim() : '',
-                    restricted: cols[7] ? parseFloat(cols[7]) : null,
+                 url: cols[6] ? cols[6].trim() : '',
+notes: cols[7] ? cols[7].trim() : '', 
                     icon: cols[8] ? cols[8].trim() : null
                 };
             });
