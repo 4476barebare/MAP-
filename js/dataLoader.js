@@ -32,21 +32,21 @@ function loadLocationCSV(csvUrl, currentFile) {
                 };
             });
 
-            // ★メイン
+            // メイン
             allRows.forEach(row => {
                 if (!row.areaId && row.name.toUpperCase() === filePref) {
                     main = row;
                 }
             });
 
-            // ★エリア（areaId保持）
+            // エリア
             allRows.forEach(row => {
                 if (row.areaId === filePref) {
                     areas.push(row);
                 }
             });
 
-            // ★スポット（areaIdベース）
+            // スポット
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
@@ -84,6 +84,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
     if (window.map) {
+
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
         if (window.currentTileLayer) {
@@ -125,6 +126,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         }
 
     } else {
+
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
 
@@ -149,18 +151,22 @@ function selectArea(areaName) {
 
     hidePrefSpots();
 
-    drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+    drawLocation(
+        area.name,
+        area.lat,
+        area.lng,
+        area.zoom || window.prefData.zoom
+    );
 
     location.hash = encodeURIComponent(area.name);
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
-const areaKey = (area.areaId || '') + "_" + (area.notes || '');
-    // ★ここが重要（必ずCSVのareaIdを渡す）
-showSpotsForArea(areaKey);
 
+    const areaKey = (area.areaId || '') + "_" + (area.notes || '');
+
+    showSpotsForArea(areaKey);
 }
-
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
 
@@ -216,7 +222,7 @@ function goBack(hash) {
     const spotName = parts[1];
 
     if (spotName) {
-        alert("未実装");
+        return;
     } else if (areaName) {
 
         window.map.off('move');
@@ -252,7 +258,6 @@ window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
-
 function showSpotsForArea(areaId) {
 
     if (window.spotMarkers) {
@@ -265,8 +270,6 @@ function showSpotsForArea(areaId) {
     const spots = window.spotData.filter(s =>
         s.areaId === areaId
     );
-
-
 
     if (!spots.length) return;
 
@@ -294,8 +297,6 @@ function showSpotsForArea(areaId) {
                     iconSize: [32, 32],
                     iconAnchor: [16, 16]
                 }),
-
-                // ★ここだけ追加（重なり制御）
                 zIndexOffset: isFish
                     ? 600 + Math.floor(Math.random() * 50)
                     : Math.floor(Math.random() * 500)
