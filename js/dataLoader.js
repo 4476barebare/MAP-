@@ -30,18 +30,12 @@ function loadLocationCSV(csvUrl, currentFile) {
                 };
             });
 
-            // -----------------------
             // メイン
-            // -----------------------
             allRows.forEach(row => {
-                if (!row.parent && row.name.toUpperCase() === filePref) {
-                    main = row;
-                }
+                if (!row.parent && row.name.toUpperCase() === filePref) main = row;
             });
 
-            // -----------------------
-            // エリア（ID付与）
-            // -----------------------
+            // エリア（★ここでID生成）
             allRows.forEach(row => {
                 if (row.parent.toUpperCase() === filePref) {
                     row.areaId = filePref + '_' + (row.notes || row.name);
@@ -49,21 +43,14 @@ function loadLocationCSV(csvUrl, currentFile) {
                 }
             });
 
-            // -----------------------
-            // スポット（areaId付与）
-            // -----------------------
+            // スポット（★areaId紐付け）
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
 
                 if (icon === 'spot' || icon.startsWith('fish')) {
-
                     const parentArea = areas.find(a => a.name === row.parent);
-
-                    if (parentArea) {
-                        row.areaId = parentArea.areaId;
-                    }
-
+                    if (parentArea) row.areaId = parentArea.areaId;
                     spots.push(row);
                 }
             });
@@ -94,56 +81,27 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
     if (window.map) {
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+        if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
 
-        if (window.currentTileLayer) {
-            window.map.removeLayer(window.currentTileLayer);
-        }
+        mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
+        mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
+        mapOptions.doubleClickZoom ? window.map.doubleClickZoom.enable() : window.map.doubleClickZoom.disable();
+        mapOptions.boxZoom ? window.map.boxZoom.enable() : window.map.boxZoom.disable();
+        mapOptions.keyboard ? window.map.keyboard.enable() : window.map.keyboard.disable();
+        mapOptions.touchZoom ? window.map.touchZoom.enable() : window.map.touchZoom.disable();
 
-        window.currentTileLayer = L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院'
-        }).addTo(window.map);
-
-        mapOptions.scrollWheelZoom
-            ? window.map.scrollWheelZoom.enable()
-            : window.map.scrollWheelZoom.disable();
-
-        mapOptions.dragging
-            ? window.map.dragging.enable()
-            : window.map.dragging.disable();
-
-        mapOptions.doubleClickZoom
-            ? window.map.doubleClickZoom.enable()
-            : window.map.doubleClickZoom.disable();
-
-        mapOptions.boxZoom
-            ? window.map.boxZoom.enable()
-            : window.map.boxZoom.disable();
-
-        mapOptions.keyboard
-            ? window.map.keyboard.enable()
-            : window.map.keyboard.disable();
-
-        mapOptions.touchZoom
-            ? window.map.touchZoom.enable()
-            : window.map.touchZoom.disable();
-
-        if (window.map.tap) {
-            mapOptions.tap
-                ? window.map.tap.enable()
-                : window.map.tap.disable();
-        }
+        if (window.map.tap) mapOptions.tap ? window.map.tap.enable() : window.map.tap.disable();
 
     } else {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
-
-        window.currentTileLayer = L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院'
-        }).addTo(window.map);
+        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
     }
 
     window.currentHash = location.hash;
 
+    // ★ここは変えない（pref表示維持）
     if (!window.currentAreaName) {
         showPrefSpots();
     }
@@ -163,7 +121,7 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    showSpotsForArea(area.name);
+    showSpotsForArea(area.areaId); // ★ここだけID渡し
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
@@ -173,9 +131,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
 
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
+    if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
 
     window.currentTileLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors',
@@ -204,7 +160,6 @@ function goBack(hash) {
     window.currentAreaName = null;
 
     hash = hash || window.currentHash || '';
-
     const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
     const areaName = parts[0];
     const spotName = parts[1];
@@ -245,21 +200,20 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 
-/* -----------------------------
-   スポット表示（ID方式）
------------------------------ */
-function showSpotsForArea(areaName) {
+/* =============================
+   エリアスポット表示（ID参照版）
+============================= */
+function showSpotsForArea(areaId) {
+
     if (window.spotMarkers) {
         window.spotMarkers.forEach(m => window.map.removeLayer(m));
     }
     window.spotMarkers = [];
 
-    if (!areaName) return;
+    if (!areaId) return;
 
-    const area = window.areaData.find(a => a.name === areaName);
-    if (!area || !area.areaId) return;
-
-    const spots = window.spotData.filter(s => s.areaId === area.areaId);
+    // ★ここが完全にID一致
+    const spots = window.spotData.filter(s => s.areaId === areaId);
 
     if (!spots.length) return;
 
@@ -270,7 +224,8 @@ function showSpotsForArea(areaName) {
         const iconId = spot.icon || 'spot';
         const isFish = iconId.startsWith('fish');
 
-        const html = `<div class="spot-label ${iconId}">
+        const html = `
+        <div class="spot-label ${iconId}">
             <svg width="16" height="16">
                 <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
             </svg>
@@ -290,7 +245,7 @@ function showSpotsForArea(areaName) {
         });
 
         marker.on('click', () => {
-            selectSpot(areaName, spot.name, spot.lat, spot.lng);
+            selectSpot(areaId, spot.name, spot.lat, spot.lng);
         });
 
         window.spotMarkers.push(marker);
@@ -302,24 +257,25 @@ function showSpotsForArea(areaName) {
         if (spot.lng > maxLng) maxLng = spot.lng;
     });
 
+    const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
+    const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
+
     window.areaBounds = L.latLngBounds(
-        [minLat, minLng],
-        [maxLat, maxLng]
+        [minLat - latBuffer, minLng - lngBuffer],
+        [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
 
 
-/* -----------------------------
-   県全域レイヤー
------------------------------ */
+/* =============================
+   プリセットレイヤー（変更なし）
+============================= */
 function createPrefSpotLayer() {
-
     if (window.prefSpotLayer) return;
 
     const layer = L.layerGroup();
 
     window.spotData.forEach(spot => {
-
         if (!spot.icon) return;
 
         let type = 'spot';
@@ -349,7 +305,6 @@ function createPrefSpotLayer() {
 
 function showPrefSpots() {
     createPrefSpotLayer();
-
     if (!window.map.hasLayer(window.prefSpotLayer)) {
         window.prefSpotLayer.addTo(window.map);
     }
