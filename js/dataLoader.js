@@ -266,10 +266,7 @@ function showSpotsForArea(areaId) {
         s.areaId === areaId
     );
 
-    alert(
-        'areaId: ' + areaId +
-        '\nspots: ' + spots.length
-    );
+
 
     if (!spots.length) return;
 
