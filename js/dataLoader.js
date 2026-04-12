@@ -156,8 +156,10 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
+    // ★ここが重要（必ずCSVのareaIdを渡す）
     showSpotsForArea(area.areaId);
 }
+
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
 
