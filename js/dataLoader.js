@@ -182,9 +182,13 @@ function showSpotsForArea(areaName) {
     let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
 
     spots.forEach(spot => {
-        const iconId = spot.icon || 'default-icon';
 
-        const html = `<div class="spot-label">
+        const iconId = spot.icon || 'spot'; // ← default統一
+
+        // ★ここだけ追加（クラス用）
+        const typeClass = iconId;
+
+        const html = `<div class="spot-label ${typeClass}">
             <svg width="16" height="16">
                 <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
             </svg>
@@ -192,7 +196,12 @@ function showSpotsForArea(areaName) {
         </div>`;
 
         const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({ className: '', html: html, iconSize: [32, 32], iconAnchor: [16, 16] })
+            icon: L.divIcon({
+                className: '',
+                html: html,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            })
         });
 
         if (spot.lat < minLat) minLat = spot.lat;
@@ -220,6 +229,7 @@ function showSpotsForArea(areaName) {
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
+
 
 function createPrefSpotLayer() {
 
