@@ -34,53 +34,43 @@ function loadLocationCSV(csvUrl, currentFile) {
                 };
             });
 
-            /* =========================
-               メイン
-            ========================= */
+            // ★メイン
             allRows.forEach(row => {
                 if (!row.parent && row.name.toUpperCase() === filePref) {
                     main = row;
                 }
             });
 
-            /* =========================
-               エリア（areaId生成）
-               filePref + "_" + name or notes
-            ========================= */
+            // ★エリア（ここで areaId 確定）
+            const areaMap = {};
+
             allRows.forEach(row => {
-                if (row.parent && row.parent.toUpperCase() === filePref) {
-
+                if (row.parent.toUpperCase() === filePref) {
                     row.areaId = filePref + '_' + (row.notes || row.name);
-
                     areas.push(row);
+
+                    areaMap[row.name] = row.areaId;
                 }
             });
 
-            /* =========================
-               スポット（areaId付与）
-               parent→areaIdへ変換
-            ========================= */
-// ★ここだけ変更（spot + fish対応 + areaId必須付与）
-allRows.forEach(row => {
-    const icon = row.icon;
+            // ★スポット（完全に areaId ベース）
+            allRows.forEach(row => {
+                const icon = row.icon;
 
-    if (!icon) return;
+                if (!icon) return;
 
-    if (icon === 'spot' || icon.startsWith('fish')) {
+                if (icon === 'spot' || icon.startsWith('fish')) {
 
-        const parentArea = areas.find(a => a.name === row.parent);
+                    row.areaId = areaMap[row.parent];
 
-        // ★ここ重要：必ず areaId を持たせる
-        if (parentArea) {
-            row.areaId = parentArea.areaId;
-        } else {
-            // ★デバッグ用（原因特定）
-            alert('area未一致: ' + row.parent);
-        }
+                    if (!row.areaId) {
+                        alert('未一致（CSV確認）: ' + row.parent);
+                        return;
+                    }
 
-        spots.push(row);
-    }
-});
+                    spots.push(row);
+                }
+            });
 
             window.prefData = main;
             window.areaData = areas;
