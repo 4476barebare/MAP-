@@ -32,10 +32,12 @@ function loadLocationCSV(csvUrl, currentFile) {
 
             // メイン
             allRows.forEach(row => {
-                if (!row.parent && row.name.toUpperCase() === filePref) main = row;
+                if (!row.parent && row.name.toUpperCase() === filePref) {
+                    main = row;
+                }
             });
 
-            // エリア
+            // エリア（★areaId付与）
             allRows.forEach(row => {
                 if (row.parent.toUpperCase() === filePref) {
                     row.areaId = filePref + "_" + (row.notes || row.name);
@@ -43,16 +45,20 @@ function loadLocationCSV(csvUrl, currentFile) {
                 }
             });
 
-            // スポット
+            // スポット（★areaId付与）
             allRows.forEach(row => {
                 const icon = row.icon;
+
                 if (!icon) return;
 
                 if (icon === 'spot' || icon.startsWith('fish')) {
+
                     const parentArea = areas.find(a => a.name === row.parent);
+
                     if (parentArea) {
                         row.areaId = parentArea.areaId;
                     }
+
                     spots.push(row);
                 }
             });
@@ -84,21 +90,51 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
     if (window.map) {
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-        if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
-        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+        if (window.currentTileLayer) {
+            window.map.removeLayer(window.currentTileLayer);
+        }
 
-        mapOptions.scrollWheelZoom ? window.map.scrollWheelZoom.enable() : window.map.scrollWheelZoom.disable();
-        mapOptions.dragging ? window.map.dragging.enable() : window.map.dragging.disable();
-        mapOptions.doubleClickZoom ? window.map.doubleClickZoom.enable() : window.map.doubleClickZoom.disable();
-        mapOptions.boxZoom ? window.map.boxZoom.enable() : window.map.boxZoom.disable();
-        mapOptions.keyboard ? window.map.keyboard.enable() : window.map.keyboard.disable();
-        mapOptions.touchZoom ? window.map.touchZoom.enable() : window.map.touchZoom.disable();
-        if (window.map.tap) mapOptions.tap ? window.map.tap.enable() : window.map.tap.disable();
+        window.currentTileLayer = L.tileLayer(tileUrl, {
+            attribution: '© 国土地理院'
+        }).addTo(window.map);
+
+        mapOptions.scrollWheelZoom
+            ? window.map.scrollWheelZoom.enable()
+            : window.map.scrollWheelZoom.disable();
+
+        mapOptions.dragging
+            ? window.map.dragging.enable()
+            : window.map.dragging.disable();
+
+        mapOptions.doubleClickZoom
+            ? window.map.doubleClickZoom.enable()
+            : window.map.doubleClickZoom.disable();
+
+        mapOptions.boxZoom
+            ? window.map.boxZoom.enable()
+            : window.map.boxZoom.disable();
+
+        mapOptions.keyboard
+            ? window.map.keyboard.enable()
+            : window.map.keyboard.disable();
+
+        mapOptions.touchZoom
+            ? window.map.touchZoom.enable()
+            : window.map.touchZoom.disable();
+
+        if (window.map.tap) {
+            mapOptions.tap
+                ? window.map.tap.enable()
+                : window.map.tap.disable();
+        }
 
     } else {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
-        window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
+
+        window.currentTileLayer = L.tileLayer(tileUrl, {
+            attribution: '© 国土地理院'
+        }).addTo(window.map);
     }
 
     window.currentHash = location.hash;
@@ -132,7 +168,9 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
 
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    if (window.currentTileLayer) window.map.removeLayer(window.currentTileLayer);
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
 
     window.currentTileLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors',
@@ -152,6 +190,7 @@ function enableDragForArea() {
     window.map.options.inertia = false;
 
     window.map.off('move');
+
     window.map.on('move', () => {
         window.map.panInsideBounds(window.areaBounds, { animate: false });
     });
@@ -161,6 +200,7 @@ function goBack(hash) {
     window.currentAreaName = null;
 
     hash = hash || window.currentHash || '';
+
     const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
     const areaName = parts[0];
     const spotName = parts[1];
@@ -168,6 +208,7 @@ function goBack(hash) {
     if (spotName) {
         alert("未実装");
     } else if (areaName) {
+
         window.map.off('move');
 
         drawLocation(
@@ -200,7 +241,7 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 /* =========================
-   エリアスポット表示（ID版）
+   エリアスポット表示（areaId版）
 ========================= */
 function showSpotsForArea(areaName) {
 
@@ -220,7 +261,7 @@ function showSpotsForArea(areaName) {
 
     if (spots.length === 0) return;
 
-    let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
+    let minLat = 999, maxLat = -999, minLng = 999, maxLng = 999;
 
     spots.forEach(spot => {
 
@@ -247,7 +288,7 @@ function showSpotsForArea(areaName) {
                 : Math.floor(Math.random() * 500)
         });
 
-        marker.on('click', function () {
+        marker.on('click', () => {
             selectSpot(areaName, spot.name, spot.lat, spot.lng);
         });
 
@@ -309,6 +350,7 @@ function createPrefSpotLayer() {
 
 function showPrefSpots() {
     createPrefSpotLayer();
+
     if (!window.map.hasLayer(window.prefSpotLayer)) {
         window.prefSpotLayer.addTo(window.map);
     }
