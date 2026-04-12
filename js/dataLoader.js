@@ -60,21 +60,27 @@ function loadLocationCSV(csvUrl, currentFile) {
                スポット（areaId付与）
                parent→areaIdへ変換
             ========================= */
-            allRows.forEach(row => {
+// ★ここだけ変更（spot + fish対応 + areaId必須付与）
+allRows.forEach(row => {
+    const icon = row.icon;
 
-                if (!row.icon) return;
+    if (!icon) return;
 
-                if (row.icon === 'spot' || row.icon.startsWith('fish')) {
+    if (icon === 'spot' || icon.startsWith('fish')) {
 
-                    const parentArea = areas.find(a => a.name === row.parent);
+        const parentArea = areas.find(a => a.name === row.parent);
 
-                    if (parentArea) {
-                        row.areaId = parentArea.areaId;
-                    }
+        // ★ここ重要：必ず areaId を持たせる
+        if (parentArea) {
+            row.areaId = parentArea.areaId;
+        } else {
+            // ★デバッグ用（原因特定）
+            alert('area未一致: ' + row.parent);
+        }
 
-                    spots.push(row);
-                }
-            });
+        spots.push(row);
+    }
+});
 
             window.prefData = main;
             window.areaData = areas;
