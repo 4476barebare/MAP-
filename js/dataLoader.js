@@ -238,20 +238,13 @@ function createPrefSpotLayer() {
         // 🐟 fish系（アイコン＋白枠）
         else if (spot.icon && spot.icon.startsWith('fish')) {
 
-            html = `<div style="
-                width:16px;
-                height:16px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                background:#fff;
-                border-radius:50%;
-                box-shadow:0 0 0 1.5px #fff;
-            ">
-                <svg width="12" height="12">
-                    <use href="/MAP-/icon/sprite.svg#icon-${spot.icon}"></use>
-                </svg>
-            </div>`;
+             html = `<svg width="14" height="14" viewBox="0 0 24 24">
+        <use href="/MAP-/icon/sprite.svg#icon-${spot.icon}"
+             stroke="#fff"
+             stroke-width="2"
+             paint-order="stroke"
+        ></use>
+    </svg>`;
 
         } else {
             return;
