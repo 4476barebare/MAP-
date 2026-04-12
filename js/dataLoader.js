@@ -216,9 +216,6 @@ function showSpotsForArea(areaName) {
     if (!areaName) return;
 
     const area = window.areaData.find(a => a.name === areaName);
-if (!area) return;
-
-const areaId = area.areaId;
     if (!area) return;
 
     const areaId = area.areaId;
@@ -274,8 +271,6 @@ const areaId = area.areaId;
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
-
-
 /* -----------------------------
    プリセットスポットレイヤー
 ----------------------------- */
