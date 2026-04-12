@@ -92,9 +92,11 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
     }
     window.currentHash = location.hash;
+    showPrefSpots();
 }
 
 function selectArea(areaName) {
+    hidePrefSpots();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
@@ -146,6 +148,7 @@ function goBack(hash) {
         }
         location.hash = '';
         window.currentHash = '';
+        showPrefSpots();
     }
 
     document.getElementById('map-menu').style.display = 'block';
@@ -208,4 +211,51 @@ function showSpotsForArea(areaName) {
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
+}
+
+
+function createPrefSpotLayer() {
+
+    if (window.prefSpotLayer) return;
+
+    const layer = L.layerGroup();
+
+    window.spotData.forEach(spot => {
+
+        // ★spotだけに限定
+        if (spot.icon !== 'spot') return;
+
+        const html = `<div style="
+            width:5px;
+            height:5px;
+            background:#191970;
+        "></div>`;
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: html,
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
+            }),
+            interactive: false
+        });
+
+        layer.addLayer(marker);
+    });
+
+    window.prefSpotLayer = layer;
+}
+
+function showPrefSpots() {
+    createPrefSpotLayer();
+    if (!window.map.hasLayer(window.prefSpotLayer)) {
+        window.prefSpotLayer.addTo(window.map);
+    }
+}
+
+function hidePrefSpots() {
+    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+        window.map.removeLayer(window.prefSpotLayer);
+    }
 }
