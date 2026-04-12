@@ -253,9 +253,7 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 
-
-
-function showSpotsForArea(areaName) {
+function showSpotsForArea(areaId) {
 
     if (window.spotMarkers) {
         window.spotMarkers.forEach(m =>
@@ -265,11 +263,11 @@ function showSpotsForArea(areaName) {
     window.spotMarkers = [];
 
     const spots = window.spotData.filter(s =>
-        s.parent && s.parent.trim().toLowerCase() === areaName.trim().toLowerCase()
+        s.areaId === areaId
     );
 
     alert(
-        'areaName: ' + areaName +
+        'areaId: ' + areaId +
         '\nspots: ' + spots.length
     );
 
@@ -283,35 +281,42 @@ function showSpotsForArea(areaName) {
         const iconId = spot.icon || 'spot';
         const isFish = iconId.startsWith('fish');
 
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: '',
-                html: `
-                    <div class="spot-label ${iconId}">
-                        <svg width="16" height="16">
-                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                        </svg>
-                        <span>${spot.name}</span>
-                    </div>
-                `,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
-            }),
+        const marker = L.marker(
+            [spot.lat, spot.lng],
+            {
+                icon: L.divIcon({
+                    className: '',
+                    html: `
+                        <div class="spot-label ${iconId}">
+                            <svg width="16" height="16">
+                                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                            </svg>
+                            <span>${spot.name}</span>
+                        </div>
+                    `,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                }),
 
-            // ★重なり順制御（維持）
-            zIndexOffset: isFish
-                ? 600 + Math.floor(Math.random() * 50)
-                : Math.floor(Math.random() * 500)
-        });
+                // ★ここだけ追加（重なり制御）
+                zIndexOffset: isFish
+                    ? 600 + Math.floor(Math.random() * 50)
+                    : Math.floor(Math.random() * 500)
+            }
+        );
 
         marker.on('click', function () {
-            selectSpot(areaName, spot.name, spot.lat, spot.lng);
+            selectSpot(
+                areaId,
+                spot.name,
+                spot.lat,
+                spot.lng
+            );
         });
 
         window.spotMarkers.push(marker);
         marker.addTo(window.map);
 
-        // ★min/max計算（維持）
         if (spot.lat < minLat) minLat = spot.lat;
         if (spot.lat > maxLat) maxLat = spot.lat;
         if (spot.lng < minLng) minLng = spot.lng;
@@ -320,7 +325,6 @@ function showSpotsForArea(areaName) {
 
     if (spots.length === 0) return;
 
-    // ★buffer計算（元仕様維持）
     const latSize = maxLat - minLat;
     const lngSize = maxLng - minLng;
 
@@ -331,16 +335,7 @@ function showSpotsForArea(areaName) {
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
-
-    // ★ドラッグ制御（最小限補正）
-    window.map.off('move');
-    window.map.on('move', function () {
-        window.map.panInsideBounds(window.areaBounds, {
-            animate: false
-        });
-    });
 }
-
 
 function createPrefSpotLayer() {
 
