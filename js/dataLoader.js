@@ -96,6 +96,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 }
 
 function selectArea(areaName) {
+    window.currentAreaName = areaName;
     hidePrefSpots();
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
@@ -132,6 +133,7 @@ function enableDragForArea() {
 }
 
 function goBack(hash) {
+    window.currentAreaName = null;
     hash = hash || window.currentHash || '';
     const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
     const areaName = parts[0];
