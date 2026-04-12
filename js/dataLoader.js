@@ -213,7 +213,6 @@ function showSpotsForArea(areaName) {
     );
 }
 
-
 function createPrefSpotLayer() {
 
     if (window.prefSpotLayer) return;
@@ -222,40 +221,20 @@ function createPrefSpotLayer() {
 
     window.spotData.forEach(spot => {
 
-        let html = '';
+        // 対象だけ通す
+        if (
+            spot.icon !== 'spot' &&
+            !(spot.icon && spot.icon.startsWith('fish'))
+        ) return;
 
-        // ■ spot
-        if (spot.icon === 'spot') {
-
-            html = `<div style="
-                width:5px;
-                height:5px;
-                background:#191970;
-            "></div>`;
-
-        }
-
-        // 🐟 fish系（アイコン＋白枠）
-        else if (spot.icon && spot.icon.startsWith('fish')) {
-
-             html = `<svg width="14" height="14" viewBox="0 0 24 24">
-        <use href="/MAP-/icon/sprite.svg#icon-${spot.icon}"
-             stroke="#fff"
-             stroke-width="2"
-             paint-order="stroke"
-        ></use>
-    </svg>`;
-
-        } else {
-            return;
-        }
+        const html = `<div class="pref-dot ${spot.icon}"></div>`;
 
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
                 className: '',
                 html: html,
-                iconSize: null, // ★自動サイズ
-                iconAnchor: [8, 8]
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
             }),
             interactive: false
         });
@@ -265,6 +244,8 @@ function createPrefSpotLayer() {
 
     window.prefSpotLayer = layer;
 }
+
+
 
 function showPrefSpots() {
     createPrefSpotLayer();
