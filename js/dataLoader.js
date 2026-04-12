@@ -177,16 +177,35 @@ function showSpotsForArea(areaName) {
     if (!areaName) return;
 
     const normAreaName = areaName.trim().toLowerCase();
-    const spots = window.spotData.filter(s => s.parent && s.parent.trim().toLowerCase() === normAreaName);
+    const spots = window.spotData.filter(s =>
+        s.parent && s.parent.trim().toLowerCase() === normAreaName
+    );
+
+    // =========================
+    // ★表示優先度テーブル
+    // =========================
+    const zIndexTable = {
+        spot: 0,
+        fish1: 500,
+        fish2: 500,
+        fish3: 500,
+        fish4: 500,
+
+        // 将来拡張用
+        premium: 700,
+        event: 900
+    };
 
     let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
 
     spots.forEach(spot => {
 
-        const iconId = spot.icon || 'spot'; // ← default統一
+        const iconId = spot.icon || 'spot';
 
-        // ★ここだけ追加（クラス用）
+        // クラスそのまま利用（CSS連動）
         const typeClass = iconId;
+
+        const zIndex = zIndexTable[iconId] ?? 0;
 
         const html = `<div class="spot-label ${typeClass}">
             <svg width="16" height="16">
@@ -201,7 +220,8 @@ function showSpotsForArea(areaName) {
                 html: html,
                 iconSize: [32, 32],
                 iconAnchor: [16, 16]
-            })
+            }),
+            zIndexOffset: zIndex
         });
 
         if (spot.lat < minLat) minLat = spot.lat;
@@ -209,7 +229,7 @@ function showSpotsForArea(areaName) {
         if (spot.lng < minLng) minLng = spot.lng;
         if (spot.lng > maxLng) maxLng = spot.lng;
 
-        marker.on('click', function() {
+        marker.on('click', function () {
             selectSpot(areaName, spot.name, spot.lat, spot.lng);
         });
 
@@ -229,7 +249,6 @@ function showSpotsForArea(areaName) {
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
-
 
 function createPrefSpotLayer() {
 
