@@ -300,14 +300,20 @@ function showSpotsForArea(areaId) {
             }
         );
 
-        marker.on('click', () => {
-            selectSpot(
-                area.name,
-                spot.name,
-                spot.lat,
-                spot.lng
-            );
-        });
+marker.on('click', () => {
+
+    const area = window.areaData.find(a => a.name === areaName);
+
+    const areaKey =
+        (area?.areaId || '') + "_" + (area?.notes || '');
+
+    selectSpot(
+        areaKey,
+        spot.name,
+        spot.lat,
+        spot.lng
+    );
+});
 
         marker.addTo(window.map);
         window.spotMarkers.push(marker);
