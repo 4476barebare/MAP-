@@ -229,7 +229,7 @@ function createPrefSpotLayer() {
             !(spot.icon && spot.icon.startsWith('fish'))
         ) return;
         
-        if (window.currentAreaName && spot.parent !== window.currentAreaName) return;
+
 
         const html = `<div class="pref-dot ${spot.icon}"></div>`;
 
