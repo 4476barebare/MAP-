@@ -229,15 +229,18 @@ function createPrefSpotLayer() {
 
     window.spotData.forEach(spot => {
 
-        // 対象だけ通す
-        if (
-            spot.icon !== 'spot' &&
-            !(spot.icon && spot.icon.startsWith('fish'))
-        ) return;
-        
+        // 対象フィルタ
+        if (!spot.icon) return;
 
+        // fish1〜fish4 or spot に正規化
+        let type = 'spot';
 
-        const html = `<div class="pref-dot ${spot.icon}"></div>`;
+        if (spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish[1-4]/);
+            if (match) type = match[0];
+        }
+
+        const html = `<div class="pref-dot ${type}"></div>`;
 
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
@@ -254,6 +257,7 @@ function createPrefSpotLayer() {
 
     window.prefSpotLayer = layer;
 }
+
 
 
 
