@@ -30,22 +30,28 @@ function loadLocationCSV(csvUrl, currentFile) {
                 };
             });
 
+            // -----------------------
             // メイン
+            // -----------------------
             allRows.forEach(row => {
                 if (!row.parent && row.name.toUpperCase() === filePref) {
                     main = row;
                 }
             });
 
-            // ★エリア：ID付与
+            // -----------------------
+            // エリア（ID付与）
+            // -----------------------
             allRows.forEach(row => {
-                if (row.parent && row.parent.toUpperCase() === filePref) {
-                    row.areaId = filePref + "_" + (row.notes || row.name);
+                if (row.parent.toUpperCase() === filePref) {
+                    row.areaId = filePref + '_' + (row.notes || row.name);
                     areas.push(row);
                 }
             });
 
-            // ★スポット：areaId付与（完全ID方式）
+            // -----------------------
+            // スポット（areaId付与）
+            // -----------------------
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
@@ -189,7 +195,6 @@ function enableDragForArea() {
     window.map.options.inertia = false;
 
     window.map.off('move');
-
     window.map.on('move', () => {
         window.map.panInsideBounds(window.areaBounds, { animate: false });
     });
@@ -219,7 +224,7 @@ function goBack(hash) {
         );
 
         if (window.spotMarkers) {
-            window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+            window.spotMarkers.forEach(m => window.map.removeLayer(m));
             window.spotMarkers = [];
         }
 
@@ -245,7 +250,7 @@ window.loadLocationCSV = loadLocationCSV;
 ----------------------------- */
 function showSpotsForArea(areaName) {
     if (window.spotMarkers) {
-        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+        window.spotMarkers.forEach(m => window.map.removeLayer(m));
     }
     window.spotMarkers = [];
 
@@ -297,18 +302,15 @@ function showSpotsForArea(areaName) {
         if (spot.lng > maxLng) maxLng = spot.lng;
     });
 
-    const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
-    const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
-
     window.areaBounds = L.latLngBounds(
-        [minLat - latBuffer, minLng - lngBuffer],
-        [maxLat + latBuffer, maxLng + latBuffer]
+        [minLat, minLng],
+        [maxLat, maxLng]
     );
 }
 
 
 /* -----------------------------
-   県全域スポット（そのまま）
+   県全域レイヤー
 ----------------------------- */
 function createPrefSpotLayer() {
 
