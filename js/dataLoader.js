@@ -256,6 +256,7 @@ window.loadLocationCSV = loadLocationCSV;
 
 function showSpotsForArea(areaId) {
 
+    // 既存マーカー削除
     if (window.spotMarkers) {
         window.spotMarkers.forEach(m =>
             window.map.removeLayer(m)
@@ -263,6 +264,7 @@ function showSpotsForArea(areaId) {
     }
     window.spotMarkers = [];
 
+    // スポット抽出（完全一致）
     const spots = window.spotData.filter(s =>
         s.areaId === areaId
     );
@@ -272,58 +274,52 @@ function showSpotsForArea(areaId) {
         '\nspots: ' + spots.length
     );
 
-    if (!spots.length) return;
+    if (!spots.length) {
+        window.areaBounds = null;
+        return;
+    }
 
-    let minLat = 999, maxLat = -999;
-    let minLng = 999, maxLng = -999;
-
+    // マーカー生成
     spots.forEach(spot => {
 
         const iconId = spot.icon || 'spot';
 
-        const marker = L.marker(
-            [spot.lat, spot.lng],
-            {
-                icon: L.divIcon({
-                    className: '',
-                    html: `
-                        <div class="spot-label ${iconId}">
-                            <svg width="16" height="16">
-                                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                            </svg>
-                            <span>${spot.name}</span>
-                        </div>
-                    `,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                })
-            }
-        );
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: `
+                    <div class="spot-label ${iconId}">
+                        <svg width="16" height="16">
+                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                        </svg>
+                        <span>${spot.name}</span>
+                    </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            })
+        });
 
         marker.on('click', () => {
-            selectSpot(
-                areaId,
-                spot.name,
-                spot.lat,
-                spot.lng
-            );
+            selectSpot(areaId, spot.name, spot.lat, spot.lng);
         });
 
         marker.addTo(window.map);
         window.spotMarkers.push(marker);
-
-        minLat = Math.min(minLat, spot.lat);
-        maxLat = Math.max(maxLat, spot.lat);
-        minLng = Math.min(minLng, spot.lng);
-        maxLng = Math.max(maxLng, spot.lng);
     });
 
-    window.areaBounds = L.latLngBounds(
-        [minLat, minLng],
-        [maxLat, maxLng]
-    );
-}
+    // ★ここが本体（重要）
+    const group = L.featureGroup(window.spotMarkers);
+    window.areaBounds = group.getBounds();
 
+    // ズーム調整
+    if (window.areaBounds.isValid()) {
+        window.map.fitBounds(window.areaBounds, {
+            padding: [20, 20],
+            animate: false
+        });
+    }
+}
 
 function createPrefSpotLayer() {
 
