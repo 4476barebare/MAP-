@@ -37,25 +37,28 @@ function loadLocationCSV(csvUrl, currentFile) {
                 }
             });
 
-            // エリア（★areaId生成）
+            // エリア
             allRows.forEach(row => {
                 if (row.parent.toUpperCase() === filePref) {
-                    row.areaId = filePref + "_" + (row.notes || row.name);
                     areas.push(row);
                 }
             });
 
-            // スポット（★areaId付与）
+            // ★スポット生成（ここだけ修正：areaId付与）
             allRows.forEach(row => {
                 const icon = row.icon;
+
                 if (!icon) return;
 
                 if (icon === 'spot' || icon.startsWith('fish')) {
 
+                    // ★親エリアからareaIdを付与する（重要）
                     const parentArea = areas.find(a => a.name === row.parent);
 
                     if (parentArea) {
                         row.areaId = parentArea.areaId;
+                    } else {
+                        row.areaId = null;
                     }
 
                     spots.push(row);
@@ -65,13 +68,6 @@ function loadLocationCSV(csvUrl, currentFile) {
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
-
-            alert(
-                "CSV LOAD\n" +
-                "areas: " + areas.length + "\n" +
-                "spots: " + spots.length + "\n" +
-                "sample areaId: " + (areas[0] ? areas[0].areaId : "none")
-            );
 
             return { main, areas, spots };
         });
@@ -104,6 +100,36 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             attribution: '© 国土地理院'
         }).addTo(window.map);
 
+        mapOptions.scrollWheelZoom
+            ? window.map.scrollWheelZoom.enable()
+            : window.map.scrollWheelZoom.disable();
+
+        mapOptions.dragging
+            ? window.map.dragging.enable()
+            : window.map.dragging.disable();
+
+        mapOptions.doubleClickZoom
+            ? window.map.doubleClickZoom.enable()
+            : window.map.doubleClickZoom.disable();
+
+        mapOptions.boxZoom
+            ? window.map.boxZoom.enable()
+            : window.map.boxZoom.disable();
+
+        mapOptions.keyboard
+            ? window.map.keyboard.enable()
+            : window.map.keyboard.disable();
+
+        mapOptions.touchZoom
+            ? window.map.touchZoom.enable()
+            : window.map.touchZoom.disable();
+
+        if (window.map.tap) {
+            mapOptions.tap
+                ? window.map.tap.enable()
+                : window.map.tap.disable();
+        }
+
     } else {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
@@ -121,21 +147,11 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 }
 
 function selectArea(areaName) {
-
     window.currentAreaName = areaName;
     hidePrefSpots();
 
     const area = window.areaData.find(a => a.name === areaName);
-    if (!area) {
-        alert("area not found: " + areaName);
-        return;
-    }
-
-    alert(
-        "AREA SELECT\n" +
-        "name: " + area.name + "\n" +
-        "areaId: " + area.areaId
-    );
+    if (!area) return;
 
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
 
@@ -144,10 +160,10 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    showSpotsForArea(area.areaId);
+    showSpotsForArea(area.name);
 }
 
-function selectSpot(areaId, selectName, spotLat, spotLng) {
+function selectSpot(areaName, selectName, spotLat, spotLng) {
     window.map.setMaxBounds(null);
 
     drawLocation(selectName, spotLat, spotLng, 13);
@@ -163,39 +179,86 @@ function selectSpot(areaId, selectName, spotLat, spotLng) {
         keepBuffer: 8,
         updateWhenIdle: true
     }).addTo(window.map);
+
+    window.map.once('moveend', () => {
+        enableDragForArea(areaName);
+    });
 }
 
-function showSpotsForArea(areaId) {
+function enableDragForArea() {
+    if (!window.areaBounds) return;
+
+    window.map.dragging.enable();
+    window.map.options.inertia = false;
+
+    window.map.off('move');
+
+    window.map.on('move', () => {
+        window.map.panInsideBounds(window.areaBounds, { animate: false });
+    });
+}
+
+function goBack(hash) {
+    window.currentAreaName = null;
+
+    hash = hash || window.currentHash || '';
+
+    const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
+    const areaName = parts[0];
+    const spotName = parts[1];
+
+    if (spotName) {
+        alert("未実装");
+    } else if (areaName) {
+
+        window.map.off('move');
+
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom,
+            window.prefData.maxZoom
+        );
+
+        if (window.spotMarkers) {
+            window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+            window.spotMarkers = [];
+        }
+
+        location.hash = '';
+        window.currentHash = '';
+
+        showPrefSpots();
+    }
+
+    document.getElementById('map-menu').style.display = 'block';
+    document.getElementById('map-back-btn').style.display = 'none';
+}
+
+window.selectArea = selectArea;
+window.selectSpot = selectSpot;
+window.goBack = goBack;
+window.drawLocation = drawLocation;
+window.loadLocationCSV = loadLocationCSV;
+
+
+/* -----------------------------
+   スポット表示（ここは未変更）
+----------------------------- */
+
+function showSpotsForArea(areaName) {
     if (window.spotMarkers) {
         window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
     }
     window.spotMarkers = [];
+    if (!areaName) return;
 
-    if (!areaId) return;
+    const normAreaName = areaName.trim().toLowerCase();
 
-    // ★中身確認（areaId基準）
-    alert(
-        "=== AREA ID DEBUG ===\n" +
-        "受け取ったareaId:\n[" + areaId + "]\n\n" +
-        "spotData先頭5件:\n" +
-        window.spotData.slice(0, 5).map(s =>
-            "name=[" + s.name + "] areaId=[" + s.areaId + "] icon=[" + s.icon + "]"
-        ).join("\n")
+    const spots = window.spotData.filter(s =>
+        s.parent && s.parent.trim().toLowerCase() === normAreaName
     );
-
-    const spots = window.spotData.filter(s => {
-
-        const match = s.areaId === areaId;
-
-        // ★一致したものだけ表示（必要なら）
-        if (match) {
-            alert("MATCH:\n" + s.name + "\n" + s.areaId);
-        }
-
-        return match;
-    });
-
-    alert("ヒット件数: " + spots.length);
 
     let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
 
@@ -204,15 +267,17 @@ function showSpotsForArea(areaId) {
         const iconId = spot.icon || 'spot';
         const isFish = iconId.startsWith('fish');
 
+        const html = `<div class="spot-label ${iconId}">
+            <svg width="16" height="16">
+                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+            </svg>
+            <span>${spot.name}</span>
+        </div>`;
+
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
                 className: '',
-                html: `<div class="spot-label ${iconId}">
-                    <svg width="16" height="16">
-                        <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                    </svg>
-                    <span>${spot.name}</span>
-                </div>`,
+                html: html,
                 iconSize: [32, 32],
                 iconAnchor: [16, 16]
             }),
@@ -221,8 +286,8 @@ function showSpotsForArea(areaId) {
                 : Math.floor(Math.random() * 500)
         });
 
-        marker.on('click', () => {
-            selectSpot(areaId, spot.name, spot.lat, spot.lng);
+        marker.on('click', function () {
+            selectSpot(areaName, spot.name, spot.lat, spot.lng);
         });
 
         window.spotMarkers.push(marker);
@@ -234,7 +299,7 @@ function showSpotsForArea(areaId) {
         if (spot.lng > maxLng) maxLng = spot.lng;
     });
 
-    if (!spots.length) return;
+    if (spots.length === 0) return;
 
     const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
     const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
@@ -243,81 +308,4 @@ function showSpotsForArea(areaId) {
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
-}
-
-function goBack() {
-    window.currentAreaName = null;
-
-    drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom
-    );
-
-    if (window.spotMarkers) {
-        window.spotMarkers.forEach(m => window.map.removeLayer(m));
-        window.spotMarkers = [];
-    }
-
-    document.getElementById('map-menu').style.display = 'block';
-    document.getElementById('map-back-btn').style.display = 'none';
-
-    showPrefSpots();
-}
-
-window.selectArea = selectArea;
-window.selectSpot = selectSpot;
-window.goBack = goBack;
-window.drawLocation = drawLocation;
-window.loadLocationCSV = loadLocationCSV;
-
-/* =========================
-   プリセットレイヤー
-========================= */
-
-function createPrefSpotLayer() {
-
-    if (window.prefSpotLayer) return;
-
-    const layer = L.layerGroup();
-
-    window.spotData.forEach(spot => {
-
-        if (!spot.icon) return;
-
-        let type = 'spot';
-
-        if (spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish[1-4]/);
-            if (match) type = match[0];
-        }
-
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: '',
-                html: `<div class="pref-dot ${type}"></div>`,
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
-            }),
-            interactive: false
-        });
-
-        layer.addLayer(marker);
-    });
-
-    window.prefSpotLayer = layer;
-}
-
-function showPrefSpots() {
-    createPrefSpotLayer();
-    if (!window.map.hasLayer(window.prefSpotLayer)) {
-        window.prefSpotLayer.addTo(window.map);
-    }
-}
-
-function hidePrefSpots() {
-    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
-        window.map.removeLayer(window.prefSpotLayer);
-    }
 }
