@@ -215,12 +215,16 @@ function showSpotsForArea(areaName) {
 
     if (!areaName) return;
 
+    // ★ name依存をやめて areaId優先取得
     const area = window.areaData.find(a => a.name === areaName);
-    if (!area) return;
+    if (!area || !area.areaId) return;
 
     const areaId = area.areaId;
 
+    // ★ areaId一致で取得（ここは正しい）
     const spots = window.spotData.filter(s => s.areaId === areaId);
+
+    if (!spots.length) return; // ← ここ重要（無駄処理防止）
 
     let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
 
@@ -261,14 +265,11 @@ function showSpotsForArea(areaName) {
         if (spot.lng > maxLng) maxLng = spot.lng;
     });
 
-    if (!spots.length) return;
-
-    const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
-    const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
-
     window.areaBounds = L.latLngBounds(
-        [minLat - latBuffer, minLng - lngBuffer],
-        [maxLat + latBuffer, maxLng + lngBuffer]
+        [minLat - Math.max((maxLat - minLat) * 0.2, 0.05),
+         minLng - Math.max((maxLng - minLng) * 0.2, 0.05)],
+        [maxLat + Math.max((maxLat - minLat) * 0.2, 0.05),
+         maxLng + Math.max((maxLng - minLng) * 0.2, 0.05)]
     );
 }
 /* -----------------------------
