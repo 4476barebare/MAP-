@@ -153,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const csvUrl = '/MAP-/data/location.csv';
     const currentFile = location.pathname.split('/').pop();
 
-    // --- デバッグ表示 ---
     function showDebug(msg) {
         let debugEl = document.getElementById('debug');
         if (!debugEl) {
@@ -177,11 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadLocationCSV(csvUrl, currentFile).then(data => {
         showDebug('CSV loaded: main=' + !!data.main);
-
         if (!data.main) return;
 
-        // 初期ハッシュ判定
         const initialHash = location.hash;
+
         if (initialHash) {
             const parts = decodeURIComponent(initialHash.substring(1)).split('/');
             const areaName = parts[0];
@@ -189,147 +187,151 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.currentHash = initialHash;
 
-            showDebug('Initial hash: ' + initialHash);
-
             if (spotName) {
                 selectSpot(areaName, spotName);
-                showDebug('selectSpot called: ' + areaName + '/' + spotName);
             } else {
                 selectArea(areaName);
-                showDebug('selectArea called: ' + areaName);
             }
         } else {
-            drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom, window.prefData.maxZoom);
-            showDebug('Initial drawLocation called');
+            drawLocation(
+                window.prefData.name,
+                window.prefData.lat,
+                window.prefData.lng,
+                window.prefData.zoom,
+                window.prefData.maxZoom
+            );
 
             document.getElementById('map-menu').style.display = 'block';
-            document.getElementById('map-back-btn').style.display = 'none'
+            document.getElementById('map-back-btn').style.display = 'none';
         }
 
         // メニュー生成
         const menuUl = document.querySelector('#map-menu ul');
         menuUl.innerHTML = '';
+
         window.areaData.forEach(area => {
             const li = document.createElement('li');
             const btn = document.createElement('button');
-            btn.textContent = area.name;
+
+            const areaName = (area.name || '').trim();
+
+            btn.textContent = areaName;
+
             btn.onclick = () => {
-                selectArea(area.name);
-                showDebug('Area clicked: ' + area.name);
+                selectArea(areaName);
             };
+
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
-        
-        // ←ここに追加
-document.getElementById('map-menu').addEventListener('click', e => {
-    e.stopPropagation(); // 地図へのクリック伝播を止める
-})
-        
-        showDebug('Menu generated: ' + window.areaData.length + ' areas');
 
-        // --- 最寄りクリック判定 ---
+        document.getElementById('map-menu').addEventListener('click', e => {
+            e.stopPropagation();
+        });
+
         setupNearestClick();
 
     }).catch(() => {
-        showDebug('CSV読み込みに失敗しました');
+        showDebug('CSV読み込み失敗');
     });
 
-    // 戻るボタン
     document.getElementById('map-back-btn').addEventListener('click', () => {
         goBack(window.currentHash);
-        showDebug('Back button pressed');
     });
 
-
-// --- 最寄りクリック用ハンドラ ---
-window.nearestClickHandler = null;
-window.nearestClickEnabled = true; // デフォルトON
-
-function setupNearestClick() {
-    if (!window.map) return;
-    if (window.nearestClickHandler) return; // すでに登録済み
-
-    window.nearestClickHandler = function(e) {
-        if (!window.nearestClickEnabled) return; // 無効なら何もしない
-
-        const menuRect = document.getElementById('map-menu').getBoundingClientRect();
-        // メニュークリックは無視
-        if (e.originalEvent.clientX >= menuRect.left &&
-            e.originalEvent.clientX <= menuRect.right &&
-            e.originalEvent.clientY >= menuRect.top &&
-            e.originalEvent.clientY <= menuRect.bottom) {
-            return;
-        }
-
-        let nearestArea = null, minDist = Infinity;
-        window.areaData.forEach(area => {
-            const dLat = e.latlng.lat - area.lat;
-            const dLng = e.latlng.lng - area.lng;
-            const dist = dLat*dLat + dLng*dLng;
-            if (dist < minDist) { minDist = dist; nearestArea = area.name; }
-        });
-
-        if (nearestArea) selectArea(nearestArea);
-    };
-
-    window.map.on('click', window.nearestClickHandler);
-}
-
-// 無効化
-function removeNearestClick() {
-    window.nearestClickEnabled = false;
-}
-
-// 有効化
-function enableNearestClick() {
+    // -----------------------
+    // 最寄りクリック
+    // -----------------------
+    window.nearestClickHandler = null;
     window.nearestClickEnabled = true;
-}
 
-// --- selectArea 内で最寄りクリックを無効化 ---
-const _selectArea = selectArea;
-window.selectArea = function(areaName) {
-    removeNearestClick(); // エリア選択中は無効化
-    _selectArea(areaName);
-}
+    function setupNearestClick() {
+        if (!window.map || window.nearestClickHandler) return;
 
-// --- goBack 内で最寄りクリックを復活 ---
-const _goBack = goBack;
-window.goBack = function(hash) {
-    _goBack(hash);
-    // 県画面に戻ったら最寄りクリック復活
-    if (!window.currentHash) enableNearestClick();
-}
+        window.nearestClickHandler = function(e) {
+            if (!window.nearestClickEnabled) return;
 
-    
-fetch('/MAP-/icon/back.svg')
-  .then(res => res.text())
-  .then(svg => {
-    const btn = document.getElementById('map-back-btn');
-    btn.innerHTML = svg;
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
 
-    const svgEl = btn.querySelector('svg'); // ←ここ
-    if (svgEl) svgEl.classList.add('back-icon');
-  });
-});
+            if (
+                e.originalEvent.clientX >= menuRect.left &&
+                e.originalEvent.clientX <= menuRect.right &&
+                e.originalEvent.clientY >= menuRect.top &&
+                e.originalEvent.clientY <= menuRect.bottom
+            ) return;
 
-// popstate で currentHash を渡す
-window.addEventListener('popstate', () => {
-    const newHash = location.hash;  // 現在ブラウザのハッシュ
-    const prevHash = window.currentHash; // 画面上で最後に設定されたハッシュ
+            let nearestArea = null;
+            let minDist = Infinity;
 
-    // ハッシュが短くなった場合＝ブラウザバック
-    if (newHash.length < prevHash.length) {
-        goBack(prevHash);  // 前のハッシュを渡す
+            window.areaData.forEach(area => {
+                const dLat = e.latlng.lat - area.lat;
+                const dLng = e.latlng.lng - area.lng;
+                const dist = dLat * dLat + dLng * dLng;
+
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestArea = area.name;
+                }
+            });
+
+            if (nearestArea) selectArea(nearestArea);
+        };
+
+        window.map.on('click', window.nearestClickHandler);
     }
 
-    // currentHash は常に最新に更新
-    window.currentHash = newHash;
+    function removeNearestClick() {
+        window.nearestClickEnabled = false;
+    }
+
+    function enableNearestClick() {
+        window.nearestClickEnabled = true;
+    }
+
+    // -----------------------
+    // selectAreaラップ
+    // -----------------------
+    const _selectArea = selectArea;
+    window.selectArea = function(areaName) {
+        removeNearestClick();
+        _selectArea((areaName || '').trim());
+    };
+
+    // -----------------------
+    // goBackラップ
+    // -----------------------
+    const _goBack = goBack;
+    window.goBack = function(hash) {
+        _goBack(hash);
+        if (!window.currentHash) enableNearestClick();
+    };
+
+    // backアイコン
+    fetch('/MAP-/icon/back.svg')
+        .then(res => res.text())
+        .then(svg => {
+            const btn = document.getElementById('map-back-btn');
+            btn.innerHTML = svg;
+
+            const svgEl = btn.querySelector('svg');
+            if (svgEl) svgEl.classList.add('back-icon');
+        });
 });
 
 
+// -----------------------
+// popstate
+// -----------------------
+window.addEventListener('popstate', () => {
+    const newHash = location.hash;
+    const prevHash = window.currentHash;
 
+    if (newHash.length < prevHash.length) {
+        goBack(prevHash);
+    }
 
+    window.currentHash = newHash;
+});
 </script>
 </body>
 </html>
