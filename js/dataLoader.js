@@ -253,7 +253,7 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 
-// ★スポット表示（areaId一致のみ）
+
 function showSpotsForArea(areaId) {
 
     if (window.spotMarkers) {
@@ -300,20 +300,14 @@ function showSpotsForArea(areaId) {
             }
         );
 
-marker.on('click', () => {
-
-    const area = window.areaData.find(a => a.name === areaName);
-
-    const areaKey =
-        (area?.areaId || '') + "_" + (area?.notes || '');
-
-    selectSpot(
-        areaKey,
-        spot.name,
-        spot.lat,
-        spot.lng
-    );
-});
+        marker.on('click', () => {
+            selectSpot(
+                areaId,
+                spot.name,
+                spot.lat,
+                spot.lng
+            );
+        });
 
         marker.addTo(window.map);
         window.spotMarkers.push(marker);
@@ -329,6 +323,7 @@ marker.on('click', () => {
         [maxLat, maxLng]
     );
 }
+
 
 function createPrefSpotLayer() {
 
