@@ -3,7 +3,7 @@ window.prefData = null;
 window.areaData = [];
 window.spotData = [];
 window.currentHash = '';
-window.callareaIds = {}; // ★追加：エリア解決テーブル
+window.currentAreaId = null;
 
 function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
@@ -25,40 +25,30 @@ function loadLocationCSV(csvUrl, currentFile) {
                     maxZoom: cols[2] ? parseFloat(cols[2]) : null,
                     lat: parseFloat(cols[3]),
                     lng: parseFloat(cols[4]),
-                    parent: cols[5] ? cols[5].trim() : '',
+                    areaId: cols[5] ? cols[5].trim() : '',
                     url: cols[6] ? cols[6].trim() : '',
                     notes: cols[7] ? cols[7].trim() : '',
                     icon: cols[8] ? cols[8].trim().toLowerCase() : null
                 };
             });
 
-            // メイン
+            // ★メイン
             allRows.forEach(row => {
-                if (!row.parent && row.name.toUpperCase() === filePref) {
+                if (!row.areaId && row.name.toUpperCase() === filePref) {
                     main = row;
                 }
             });
 
-            // エリア
+            // ★エリア（areaId保持）
             allRows.forEach(row => {
-                if (row.parent.toUpperCase() === filePref) {
-
+                if (row.areaId === filePref) {
                     areas.push(row);
-
-                    // ★ここでID生成＆登録
-                    const key = filePref + '_' + (row.notes || row.name);
-
-                    window.callareaIds[key] = {
-                        areaId: key,
-                        name: row.name
-                    };
                 }
             });
 
-            // スポット（ここでは紐付けしない）
+            // ★スポット（areaIdベース）
             allRows.forEach(row => {
                 const icon = row.icon;
-
                 if (!icon) return;
 
                 if (icon === 'spot' || icon.startsWith('fish')) {
@@ -90,7 +80,8 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
     const mapOptions = { ...defaultOptions, ...options };
 
-    const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+    const tileUrl =
+        'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
     if (window.map) {
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
@@ -144,23 +135,19 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
     window.currentHash = location.hash;
 
-    if (!window.currentAreaName) {
+    if (!window.currentAreaId) {
         showPrefSpots();
     }
 }
 
 function selectArea(areaName) {
 
-    window.currentAreaName = areaName;
-    hidePrefSpots();
-
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
 
-    const areaKey = Object.keys(window.callareaIds)
-        .find(k => window.callareaIds[k].name === areaName);
+    window.currentAreaId = area.areaId;
 
-    if (!areaKey) return;
+    hidePrefSpots();
 
     drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
 
@@ -169,7 +156,7 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    showSpotsForArea(areaKey);
+    showSpotsForArea(area.areaId);
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
@@ -178,7 +165,8 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
 
     drawLocation(selectName, spotLat, spotLng, 13);
 
-    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const tileUrl =
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     if (window.currentTileLayer) {
         window.map.removeLayer(window.currentTileLayer);
@@ -206,17 +194,21 @@ function enableDragForArea() {
     window.map.off('move');
 
     window.map.on('move', () => {
-        window.map.panInsideBounds(window.areaBounds, { animate: false });
+        window.map.panInsideBounds(window.areaBounds, {
+            animate: false
+        });
     });
 }
 
 function goBack(hash) {
 
-    window.currentAreaName = null;
+    window.currentAreaId = null;
 
     hash = hash || window.currentHash || '';
 
-    const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
+    const parts =
+        decodeURIComponent(hash.replace(/^#/, '')).split('/');
+
     const areaName = parts[0];
     const spotName = parts[1];
 
@@ -235,7 +227,9 @@ function goBack(hash) {
         );
 
         if (window.spotMarkers) {
-            window.spotMarkers.forEach(m => window.map.removeLayer(m));
+            window.spotMarkers.forEach(m =>
+                window.map.removeLayer(m)
+            );
             window.spotMarkers = [];
         }
 
@@ -256,52 +250,60 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 
-// ★スポット表示（完全ID解決）
-function showSpotsForArea(areaKey) {
+// ★スポット表示（areaId一致のみ）
+function showSpotsForArea(areaId) {
 
     if (window.spotMarkers) {
-        window.spotMarkers.forEach(m => window.map.removeLayer(m));
+        window.spotMarkers.forEach(m =>
+            window.map.removeLayer(m)
+        );
     }
     window.spotMarkers = [];
 
-    const area = window.callareaIds[areaKey];
-    if (!area) {
-        alert('area not found: ' + areaKey);
-        return;
-    }
-
     const spots = window.spotData.filter(s =>
-        s.parent && s.parent === area.name
+        s.areaId === areaId
     );
 
-    alert('spots: ' + spots.length);
+    alert(
+        'areaId: ' + areaId +
+        '\nspots: ' + spots.length
+    );
 
     if (!spots.length) return;
 
-    let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
+    let minLat = 999, maxLat = -999;
+    let minLng = 999, maxLng = -999;
 
     spots.forEach(spot => {
 
         const iconId = spot.icon || 'spot';
 
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: '',
-                html: `
-                    <div class="spot-label ${iconId}">
-                        <svg width="16" height="16">
-                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                        </svg>
-                        <span>${spot.name}</span>
-                    </div>
-                `,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
-            })
-        });
+        const marker = L.marker(
+            [spot.lat, spot.lng],
+            {
+                icon: L.divIcon({
+                    className: '',
+                    html: `
+                        <div class="spot-label ${iconId}">
+                            <svg width="16" height="16">
+                                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                            </svg>
+                            <span>${spot.name}</span>
+                        </div>
+                    `,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                })
+            }
+        );
 
         marker.on('click', () => {
-            selectSpot(area.name, spot.name, spot.lat, spot.lng);
+            selectSpot(
+                area.name,
+                spot.name,
+                spot.lat,
+                spot.lng
+            );
         });
 
         marker.addTo(window.map);
@@ -336,17 +338,21 @@ function createPrefSpotLayer() {
             if (match) type = match[0];
         }
 
-        const html = `<div class="pref-dot ${type}"></div>`;
+        const html =
+            `<div class="pref-dot ${type}"></div>`;
 
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: '',
-                html: html,
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
-            }),
-            interactive: false
-        });
+        const marker = L.marker(
+            [spot.lat, spot.lng],
+            {
+                icon: L.divIcon({
+                    className: '',
+                    html: html,
+                    iconSize: [5, 5],
+                    iconAnchor: [2.5, 2.5]
+                }),
+                interactive: false
+            }
+        );
 
         layer.addLayer(marker);
     });
@@ -356,13 +362,17 @@ function createPrefSpotLayer() {
 
 function showPrefSpots() {
     createPrefSpotLayer();
+
     if (!window.map.hasLayer(window.prefSpotLayer)) {
         window.prefSpotLayer.addTo(window.map);
     }
 }
 
 function hidePrefSpots() {
-    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+    if (
+        window.prefSpotLayer &&
+        window.map.hasLayer(window.prefSpotLayer)
+    ) {
         window.map.removeLayer(window.prefSpotLayer);
     }
 }
