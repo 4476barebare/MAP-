@@ -254,9 +254,9 @@ window.loadLocationCSV = loadLocationCSV;
 
 
 
-function showSpotsForArea(areaId) {
 
-    // 既存マーカー削除
+function showSpotsForArea(areaName) {
+
     if (window.spotMarkers) {
         window.spotMarkers.forEach(m =>
             window.map.removeLayer(m)
@@ -264,25 +264,24 @@ function showSpotsForArea(areaId) {
     }
     window.spotMarkers = [];
 
-    // スポット抽出（完全一致）
     const spots = window.spotData.filter(s =>
-        s.areaId === areaId
+        s.parent && s.parent.trim().toLowerCase() === areaName.trim().toLowerCase()
     );
 
     alert(
-        'areaId: ' + areaId +
+        'areaName: ' + areaName +
         '\nspots: ' + spots.length
     );
 
-    if (!spots.length) {
-        window.areaBounds = null;
-        return;
-    }
+    if (!spots.length) return;
 
-    // マーカー生成
+    let minLat = 999, maxLat = -999;
+    let minLng = 999, maxLng = -999;
+
     spots.forEach(spot => {
 
         const iconId = spot.icon || 'spot';
+        const isFish = iconId.startsWith('fish');
 
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
@@ -297,29 +296,51 @@ function showSpotsForArea(areaId) {
                 `,
                 iconSize: [32, 32],
                 iconAnchor: [16, 16]
-            })
+            }),
+
+            // ★重なり順制御（維持）
+            zIndexOffset: isFish
+                ? 600 + Math.floor(Math.random() * 50)
+                : Math.floor(Math.random() * 500)
         });
 
-        marker.on('click', () => {
-            selectSpot(areaId, spot.name, spot.lat, spot.lng);
+        marker.on('click', function () {
+            selectSpot(areaName, spot.name, spot.lat, spot.lng);
         });
 
-        marker.addTo(window.map);
         window.spotMarkers.push(marker);
+        marker.addTo(window.map);
+
+        // ★min/max計算（維持）
+        if (spot.lat < minLat) minLat = spot.lat;
+        if (spot.lat > maxLat) maxLat = spot.lat;
+        if (spot.lng < minLng) minLng = spot.lng;
+        if (spot.lng > maxLng) maxLng = spot.lng;
     });
 
-    // ★ここが本体（重要）
-    const group = L.featureGroup(window.spotMarkers);
-    window.areaBounds = group.getBounds();
+    if (spots.length === 0) return;
 
-    // ズーム調整
-    if (window.areaBounds.isValid()) {
-        window.map.fitBounds(window.areaBounds, {
-            padding: [20, 20],
+    // ★buffer計算（元仕様維持）
+    const latSize = maxLat - minLat;
+    const lngSize = maxLng - minLng;
+
+    const latBuffer = Math.max(latSize * 0.2, 0.05);
+    const lngBuffer = Math.max(lngSize * 0.2, 0.05);
+
+    window.areaBounds = L.latLngBounds(
+        [minLat - latBuffer, minLng - lngBuffer],
+        [maxLat + latBuffer, maxLng + lngBuffer]
+    );
+
+    // ★ドラッグ制御（最小限補正）
+    window.map.off('move');
+    window.map.on('move', function () {
+        window.map.panInsideBounds(window.areaBounds, {
             animate: false
         });
-    }
+    });
 }
+
 
 function createPrefSpotLayer() {
 
