@@ -92,7 +92,13 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         window.currentTileLayer = L.tileLayer(tileUrl, { attribution: '© 国土地理院' }).addTo(window.map);
     }
     window.currentHash = location.hash;
-    showPrefSpots();
+
+// ▼ここに条件付きで入れる
+    if (!window.currentAreaName) {
+        showPrefSpots();
+    }
+
+
 }
 
 function selectArea(areaName) {
