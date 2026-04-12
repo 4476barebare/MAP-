@@ -31,39 +31,28 @@ function loadLocationCSV(csvUrl, currentFile) {
                 };
             });
 
-            // -------------------------
             // メイン
-            // -------------------------
             allRows.forEach(row => {
                 if (!row.parent && row.name.toUpperCase() === filePref) {
                     main = row;
                 }
             });
 
-            // -------------------------
-            // エリア（★ここでareaId確定）
-            // -------------------------
+            // エリア（areaId生成）
             allRows.forEach(row => {
                 if (row.parent.toUpperCase() === filePref) {
-
-                    // ★必ずここでIDを作る（基準軸）
                     row.areaId = filePref + '_' + (row.notes || row.name);
-
                     areas.push(row);
                 }
             });
 
-            // -------------------------
-            // スポット（★areaId紐付け）
-            // -------------------------
+            // スポット（areaId付与）
             allRows.forEach(row => {
-
                 const icon = row.icon;
                 if (!icon) return;
 
                 if (icon === 'spot' || icon.startsWith('fish')) {
 
-                    // ★親エリアからareaIdを引き継ぐ
                     const parentArea = areas.find(a => a.name === row.parent);
 
                     row.areaId = parentArea ? parentArea.areaId : null;
@@ -78,164 +67,289 @@ function loadLocationCSV(csvUrl, currentFile) {
 
             return { main, areas, spots };
         });
-}// グローバル
-window.prefData = null;
-window.areaData = [];
-window.spotData = [];
-window.currentHash = '';
+}
 
-function loadLocationCSV(csvUrl, currentFile) {
-    return fetch(csvUrl)
-        .then(r => r.text())
-        .then(text => {
+function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
-            const lines = text.trim().split('\n');
-            const filePref = currentFile.replace('.html', '').toUpperCase();
+    const defaultOptions = {
+        center: [lat, lng],
+        zoom: zoom,
+        zoomControl: false,
+        scrollWheelZoom: false,
+        dragging: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        tap: false
+    };
 
-            let main = null;
-            const areas = [];
-            const spots = [];
+    const mapOptions = { ...defaultOptions, ...options };
+    const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
-            const allRows = lines.slice(1).map(line => {
-                const cols = line.split(',');
-                return {
-                    name: cols[0].trim(),
-                    zoom: parseFloat(cols[1]),
-                    maxZoom: cols[2] ? parseFloat(cols[2]) : null,
-                    lat: parseFloat(cols[3]),
-                    lng: parseFloat(cols[4]),
-                    parent: cols[5] ? cols[5].trim() : '',
-                    url: cols[6] ? cols[6].trim() : '',
-                    notes: cols[7] ? cols[7].trim() : '',
-                    icon: cols[8] ? cols[8].trim().toLowerCase() : null
-                };
-            });
+    if (window.map) {
 
-            // -------------------------
-            // メイン
-            // -------------------------
-            allRows.forEach(row => {
-                if (!row.parent && row.name.toUpperCase() === filePref) {
-                    main = row;
-                }
-            });
+        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-            // -------------------------
-            // エリア（★ここでareaId確定）
-            // -------------------------
-            allRows.forEach(row => {
-                if (row.parent.toUpperCase() === filePref) {
+        if (window.currentTileLayer) {
+            window.map.removeLayer(window.currentTileLayer);
+        }
 
-                    // ★必ずここでIDを作る（基準軸）
-                    row.areaId = filePref + '_' + (row.notes || row.name);
+        window.currentTileLayer = L.tileLayer(tileUrl, {
+            attribution: '© 国土地理院'
+        }).addTo(window.map);
 
-                    areas.push(row);
-                }
-            });
+        mapOptions.scrollWheelZoom
+            ? window.map.scrollWheelZoom.enable()
+            : window.map.scrollWheelZoom.disable();
 
-            // -------------------------
-            // スポット（★areaId紐付け）
-            // -------------------------
-            allRows.forEach(row => {
+        mapOptions.dragging
+            ? window.map.dragging.enable()
+            : window.map.dragging.disable();
 
-                const icon = row.icon;
-                if (!icon) return;
+        mapOptions.doubleClickZoom
+            ? window.map.doubleClickZoom.enable()
+            : window.map.doubleClickZoom.disable();
 
-                if (icon === 'spot' || icon.startsWith('fish')) {
+        mapOptions.boxZoom
+            ? window.map.boxZoom.enable()
+            : window.map.boxZoom.disable();
 
-                    // ★親エリアからareaIdを引き継ぐ
-                    const parentArea = areas.find(a => a.name === row.parent);
+        mapOptions.keyboard
+            ? window.map.keyboard.enable()
+            : window.map.keyboard.disable();
 
-                    row.areaId = parentArea ? parentArea.areaId : null;
+        mapOptions.touchZoom
+            ? window.map.touchZoom.enable()
+            : window.map.touchZoom.disable();
 
-                    spots.push(row);
-                }
-            });
+        if (window.map.tap) {
+            mapOptions.tap
+                ? window.map.tap.enable()
+                : window.map.tap.disable();
+        }
 
-            window.prefData = main;
-            window.areaData = areas;
-            window.spotData = spots;
+    } else {
+        window.map = L.map('lf-map', mapOptions);
+        window.map.attributionControl.setPosition('topright');
 
-            return { main, areas, spots };
+        window.currentTileLayer = L.tileLayer(tileUrl, {
+            attribution: '© 国土地理院'
+        }).addTo(window.map);
+    }
+
+    window.currentHash = location.hash;
+
+    if (!window.currentAreaName) {
+        showPrefSpots();
+    }
+}
+
+function selectArea(areaName) {
+
+    window.currentAreaName = areaName;
+    hidePrefSpots();
+
+    const area = window.areaData.find(a => a.name === areaName);
+    if (!area) return;
+
+    drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+
+    location.hash = encodeURIComponent(area.areaId);
+
+    document.getElementById('map-menu').style.display = 'none';
+    document.getElementById('map-back-btn').style.display = 'block';
+
+    showSpotsForArea(area.areaId);
+}
+
+function selectSpot(areaName, selectName, spotLat, spotLng) {
+
+    window.map.setMaxBounds(null);
+
+    drawLocation(selectName, spotLat, spotLng, 13);
+
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© OpenStreetMap contributors',
+        keepBuffer: 8,
+        updateWhenIdle: true
+    }).addTo(window.map);
+
+    window.map.once('moveend', () => {
+        enableDragForArea(areaName);
+    });
+}
+
+function enableDragForArea() {
+
+    if (!window.areaBounds) return;
+
+    window.map.dragging.enable();
+    window.map.options.inertia = false;
+
+    window.map.off('move');
+
+    window.map.on('move', () => {
+        window.map.panInsideBounds(window.areaBounds, { animate: false });
+    });
+}
+
+function goBack(hash) {
+
+    window.currentAreaName = null;
+
+    hash = hash || window.currentHash || '';
+
+    const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
+    const areaName = parts[0];
+    const spotName = parts[1];
+
+    if (spotName) {
+        alert("未実装");
+    }
+    else if (areaName) {
+
+        window.map.off('move');
+
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom,
+            window.prefData.maxZoom
+        );
+
+        if (window.spotMarkers) {
+            window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+            window.spotMarkers = [];
+        }
+
+        location.hash = '';
+        window.currentHash = '';
+
+        showPrefSpots();
+    }
+
+    document.getElementById('map-menu').style.display = 'block';
+    document.getElementById('map-back-btn').style.display = 'none';
+}
+
+window.selectArea = selectArea;
+window.selectSpot = selectSpot;
+window.goBack = goBack;
+window.drawLocation = drawLocation;
+window.loadLocationCSV = loadLocationCSV;
+
+function showSpotsForArea(areaId) {
+
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
+    }
+
+    window.spotMarkers = [];
+
+    if (!areaId) return;
+
+    const spots = window.spotData.filter(s => s.areaId === areaId);
+
+    if (spots.length === 0) return;
+
+    let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
+
+    spots.forEach(spot => {
+
+        const iconId = spot.icon || 'spot';
+        const isFish = iconId.startsWith('fish');
+
+        const html = `
+            <div class="spot-label ${iconId}">
+                <svg width="16" height="16">
+                    <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                </svg>
+                <span>${spot.name}</span>
+            </div>
+        `;
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: html,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            }),
+            zIndexOffset: isFish
+                ? 600 + Math.floor(Math.random() * 50)
+                : Math.floor(Math.random() * 500)
         });
-}// グローバル
-window.prefData = null;
-window.areaData = [];
-window.spotData = [];
-window.currentHash = '';
 
-function loadLocationCSV(csvUrl, currentFile) {
-    return fetch(csvUrl)
-        .then(r => r.text())
-        .then(text => {
-
-            const lines = text.trim().split('\n');
-            const filePref = currentFile.replace('.html', '').toUpperCase();
-
-            let main = null;
-            const areas = [];
-            const spots = [];
-
-            const allRows = lines.slice(1).map(line => {
-                const cols = line.split(',');
-                return {
-                    name: cols[0].trim(),
-                    zoom: parseFloat(cols[1]),
-                    maxZoom: cols[2] ? parseFloat(cols[2]) : null,
-                    lat: parseFloat(cols[3]),
-                    lng: parseFloat(cols[4]),
-                    parent: cols[5] ? cols[5].trim() : '',
-                    url: cols[6] ? cols[6].trim() : '',
-                    notes: cols[7] ? cols[7].trim() : '',
-                    icon: cols[8] ? cols[8].trim().toLowerCase() : null
-                };
-            });
-
-            // -------------------------
-            // メイン
-            // -------------------------
-            allRows.forEach(row => {
-                if (!row.parent && row.name.toUpperCase() === filePref) {
-                    main = row;
-                }
-            });
-
-            // -------------------------
-            // エリア（★ここでareaId確定）
-            // -------------------------
-            allRows.forEach(row => {
-                if (row.parent.toUpperCase() === filePref) {
-
-                    // ★必ずここでIDを作る（基準軸）
-                    row.areaId = filePref + '_' + (row.notes || row.name);
-
-                    areas.push(row);
-                }
-            });
-
-            // -------------------------
-            // スポット（★areaId紐付け）
-            // -------------------------
-            allRows.forEach(row => {
-
-                const icon = row.icon;
-                if (!icon) return;
-
-                if (icon === 'spot' || icon.startsWith('fish')) {
-
-                    // ★親エリアからareaIdを引き継ぐ
-                    const parentArea = areas.find(a => a.name === row.parent);
-
-                    row.areaId = parentArea ? parentArea.areaId : null;
-
-                    spots.push(row);
-                }
-            });
-
-            window.prefData = main;
-            window.areaData = areas;
-            window.spotData = spots;
-
-            return { main, areas, spots };
+        marker.on('click', () => {
+            selectSpot(areaId, spot.name, spot.lat, spot.lng);
         });
+
+        marker.addTo(window.map);
+        window.spotMarkers.push(marker);
+
+        minLat = Math.min(minLat, spot.lat);
+        maxLat = Math.max(maxLat, spot.lat);
+        minLng = Math.min(minLng, spot.lng);
+        maxLng = Math.max(maxLng, spot.lng);
+    });
+
+    window.areaBounds = L.latLngBounds(
+        [minLat, minLng],
+        [maxLat, maxLng]
+    );
+}
+
+function createPrefSpotLayer() {
+
+    if (window.prefSpotLayer) return;
+
+    const layer = L.layerGroup();
+
+    window.spotData.forEach(spot => {
+
+        if (!spot.icon) return;
+
+        let type = 'spot';
+
+        if (spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish[1-4]/);
+            if (match) type = match[0];
+        }
+
+        const html = `<div class="pref-dot ${type}"></div>`;
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: html,
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
+            }),
+            interactive: false
+        });
+
+        layer.addLayer(marker);
+    });
+
+    window.prefSpotLayer = layer;
+}
+
+function showPrefSpots() {
+    createPrefSpotLayer();
+    if (!window.map.hasLayer(window.prefSpotLayer)) {
+        window.prefSpotLayer.addTo(window.map);
+    }
+}
+
+function hidePrefSpots() {
+    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+        window.map.removeLayer(window.prefSpotLayer);
+    }
 }
