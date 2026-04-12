@@ -166,26 +166,36 @@ function selectSpot(areaId, selectName, spotLat, spotLng) {
 }
 
 function showSpotsForArea(areaId) {
-
     if (window.spotMarkers) {
-        window.spotMarkers.forEach(m => window.map.removeLayer(m));
+        window.spotMarkers.forEach(marker => window.map.removeLayer(marker));
     }
     window.spotMarkers = [];
 
-    if (!areaId) {
-        alert("no areaId");
-        return;
-    }
+    if (!areaId) return;
 
-    const spots = window.spotData.filter(s => s.areaId === areaId);
-
+    // ★中身確認（areaId基準）
     alert(
-        "SPOT FILTER\n" +
-        "areaId: " + areaId + "\n" +
-        "spots: " + spots.length
+        "=== AREA ID DEBUG ===\n" +
+        "受け取ったareaId:\n[" + areaId + "]\n\n" +
+        "spotData先頭5件:\n" +
+        window.spotData.slice(0, 5).map(s =>
+            "name=[" + s.name + "] areaId=[" + s.areaId + "] icon=[" + s.icon + "]"
+        ).join("\n")
     );
 
-    if (!spots.length) return;
+    const spots = window.spotData.filter(s => {
+
+        const match = s.areaId === areaId;
+
+        // ★一致したものだけ表示（必要なら）
+        if (match) {
+            alert("MATCH:\n" + s.name + "\n" + s.areaId);
+        }
+
+        return match;
+    });
+
+    alert("ヒット件数: " + spots.length);
 
     let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
 
@@ -197,8 +207,7 @@ function showSpotsForArea(areaId) {
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
                 className: '',
-                html: `
-                <div class="spot-label ${iconId}">
+                html: `<div class="spot-label ${iconId}">
                     <svg width="16" height="16">
                         <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
                     </svg>
@@ -224,6 +233,8 @@ function showSpotsForArea(areaId) {
         if (spot.lng < minLng) minLng = spot.lng;
         if (spot.lng > maxLng) maxLng = spot.lng;
     });
+
+    if (!spots.length) return;
 
     const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
     const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
