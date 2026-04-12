@@ -177,37 +177,19 @@ function showSpotsForArea(areaName) {
     if (!areaName) return;
 
     const normAreaName = areaName.trim().toLowerCase();
+
     const spots = window.spotData.filter(s =>
         s.parent && s.parent.trim().toLowerCase() === normAreaName
     );
-
-    // =========================
-    // ★表示優先度テーブル
-    // =========================
-    const zIndexTable = {
-        spot: 0,
-        fish1: 500,
-        fish2: 500,
-        fish3: 500,
-        fish4: 500,
-
-        // 将来拡張用
-        premium: 700,
-        event: 900
-    };
 
     let minLat = 999, maxLat = -999, minLng = 999, maxLng = -999;
 
     spots.forEach(spot => {
 
         const iconId = spot.icon || 'spot';
+        const isFish = iconId.startsWith('fish');
 
-        // クラスそのまま利用（CSS連動）
-        const typeClass = iconId;
-
-        const zIndex = zIndexTable[iconId] ?? 0;
-
-        const html = `<div class="spot-label ${typeClass}">
+        const html = `<div class="spot-label ${iconId}">
             <svg width="16" height="16">
                 <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
             </svg>
@@ -221,7 +203,11 @@ function showSpotsForArea(areaName) {
                 iconSize: [32, 32],
                 iconAnchor: [16, 16]
             }),
-            zIndexOffset: zIndex
+
+            // ★重なり順制御
+            zIndexOffset: isFish
+                ? 600 + Math.floor(Math.random() * 50)   // fish優先
+                : Math.floor(Math.random() * 500)        // spotランダム
         });
 
         if (spot.lat < minLat) minLat = spot.lat;
@@ -249,6 +235,9 @@ function showSpotsForArea(areaName) {
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
+
+
+
 
 function createPrefSpotLayer() {
 
