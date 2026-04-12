@@ -222,21 +222,47 @@ function createPrefSpotLayer() {
 
     window.spotData.forEach(spot => {
 
-        // ★spotだけに限定
-        if (spot.icon !== 'spot') return;
+        let html = '';
 
-        const html = `<div style="
-            width:5px;
-            height:5px;
-            background:#191970;
-        "></div>`;
+        // ■ spot
+        if (spot.icon === 'spot') {
+
+            html = `<div style="
+                width:5px;
+                height:5px;
+                background:#191970;
+            "></div>`;
+
+        }
+
+        // 🐟 fish系（アイコン＋白枠）
+        else if (spot.icon && spot.icon.startsWith('fish')) {
+
+            html = `<div style="
+                width:16px;
+                height:16px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background:#fff;
+                border-radius:50%;
+                box-shadow:0 0 0 1.5px #fff;
+            ">
+                <svg width="12" height="12">
+                    <use href="/MAP-/icon/sprite.svg#icon-${spot.icon}"></use>
+                </svg>
+            </div>`;
+
+        } else {
+            return;
+        }
 
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
                 className: '',
                 html: html,
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
+                iconSize: null, // ★自動サイズ
+                iconAnchor: [8, 8]
             }),
             interactive: false
         });
