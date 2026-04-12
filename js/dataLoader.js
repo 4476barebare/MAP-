@@ -155,9 +155,10 @@ function selectArea(areaName) {
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
-
+const areaKey = (area.areaId || '') + "_" + (area.notes || '');
     // ★ここが重要（必ずCSVのareaIdを渡す）
-    showSpotsForArea(area.areaId);
+showSpotsForArea(areaKey);
+
 }
 
 
