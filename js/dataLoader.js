@@ -303,6 +303,7 @@ if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
 
         window.map.off('move');
 window.map.off('moveend');
+window.areaBounds = null;
 
         drawLocation(
             window.prefData.name,
