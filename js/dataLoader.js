@@ -181,6 +181,7 @@ function selectArea(areaName) {
     // -----------------------
     const reqId = Date.now();
     window._shop01RequestId = reqId;
+enableDragForArea();
 
     // -----------------------
     // ズーム開始で消す（1回だけ）
@@ -259,6 +260,8 @@ window.map.off('move');
 
     markerControl.showShop01(areaKey);
 
+window.map.off('move');
+
 }
 
 
@@ -269,6 +272,7 @@ function enableDragForArea() {
     window.map.dragging.enable();
     window.map.options.inertia = false;
 
+    // 既存moveを必ず一旦消す（重複防止）
     window.map.off('move');
 
     window.map.on('move', () => {
