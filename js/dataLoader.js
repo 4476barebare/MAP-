@@ -207,16 +207,22 @@ function selectArea(areaName) {
 window.map.once('moveend', () => {
     enableDragForArea();
     showSpotsForArea(areaKey);
-    markerControl.showShop01(areaKey);
+   
+   
+   if (window._shop01RequestId !== reqId) return;
+
+    // ★ もう1フレーム待つ
+    setTimeout(() => {
+        markerControl.showShop01(areaKey);
+    }, 0);
+   
+   
 
 });
 
 
 
-
-    // -----------------------
-    // 完全停止後に即表示
-    // -----------------------
+//-----------------
    
    
 }
