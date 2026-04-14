@@ -57,42 +57,6 @@ function preloadShop01(shopUrl) {
 }
 
 // -----------------------
-// preload
-// -----------------------
-function preloadShop01(url) {
-
-    return fetch(url)
-        .then(res => res.text())
-        .then(text => {
-
-            const lines = text.trim().split('\n');
-
-            const parsed = lines.slice(1).map(line => {
-                const cols = line.split(',');
-
-                return {
-                    group: cols[0] || '',
-                    name: cols[1] || '',
-                    lat: parseFloat(cols[2]),
-                    lng: parseFloat(cols[3]),
-                    notes: cols[4] || '',
-                    icon: cols[5] || '',
-                    areaId: (cols[6] || '').trim()
-                };
-            });
-
-            window.markerControl.shop01Cache[url] = parsed;
-
-            const cache = {};
-            parsed.forEach(r => {
-                if (!cache[r.areaId]) cache[r.areaId] = [];
-                cache[r.areaId].push(r);
-            });
-
-            window.markerControl.shop01AreaCache[url] = cache;
-        });
-}
-// -----------------------
 // show phase1
 // -----------------------
 function showShop01(areaId) {
