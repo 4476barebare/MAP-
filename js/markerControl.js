@@ -13,11 +13,11 @@ window.markerControl = {
 // -----------------------
 // preload
 // -----------------------
-function preloadShop01(pref) {
+function preloadShop01(url) {
 
-    if (markerControl.shop01Cache[pref]) return;
+    const pref = url.split('/').pop().split('_')[0].toUpperCase();
 
-    var url = '/MAP-/KANTO/' + pref + '_shop.csv';
+    if (window.markerControl.shop01Cache[pref]) return;
 
     fetch(url)
         .then(function(res) {
@@ -41,20 +41,24 @@ function preloadShop01(pref) {
                 };
             });
 
-            markerControl.shop01Cache[pref] = parsed;
-            markerControl.shop01AreaCache[pref] = {};
+            window.markerControl.shop01Cache[pref] = parsed;
+            window.markerControl.shop01AreaCache[pref] = {};
 
             parsed.forEach(function(r) {
-                if (!markerControl.shop01AreaCache[pref][r.areaId]) {
-                    markerControl.shop01AreaCache[pref][r.areaId] = [];
+                if (!window.markerControl.shop01AreaCache[pref][r.areaId]) {
+                    window.markerControl.shop01AreaCache[pref][r.areaId] = [];
                 }
-                markerControl.shop01AreaCache[pref][r.areaId].push(r);
+                window.markerControl.shop01AreaCache[pref][r.areaId].push(r);
             });
 
-            console.log('preload done:', pref);
+            if (window.showDebug) {
+                showDebug('preload done: ' + pref);
+            }
+        })
+        .catch(function(err) {
+            console.error('preload error:', err);
         });
 }
-
 
 // -----------------------
 // show phase1
