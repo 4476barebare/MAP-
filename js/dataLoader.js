@@ -326,10 +326,11 @@ window.areaBounds = null;
         location.hash = '';
         window.currentHash = '';
         
-        window.map.stop();
         
-        markerControl.clearShop01(); // ★追加
-        showPrefSpots();
+requestAnimationFrame(() => {
+    markerControl.clearShop01();
+    showPrefSpots();
+});
     }
 
     document.getElementById('map-menu').style.display = 'block';
