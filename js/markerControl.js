@@ -81,7 +81,6 @@ window.markerControl = {
         height:6px;
         background:#fff;
         border-radius:50%;
-        border:1px solid rgba(0,0,0,0.3);
     "></div>
 `,
 iconSize: [6, 6],
