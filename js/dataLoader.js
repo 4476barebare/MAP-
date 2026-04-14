@@ -388,7 +388,7 @@ function showSpotsForArea(areaKey) {
         marker.on('click', function () {
 
             selectSpot(
-                areaId,
+                areaKey,
                 spot.name,
                 spot.lat,
                 spot.lng
