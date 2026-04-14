@@ -154,7 +154,7 @@ function selectArea(areaName) {
     // ★追加（先にクリア）
     if (window.markerControl) {
         markerControl.clearShop01();
-    
+    }
     
     
 
