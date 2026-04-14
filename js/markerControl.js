@@ -34,7 +34,7 @@ function preloadShop01(url) {
             });
 
             // ★ここ重要：areaId単体でグルーピング
-            markerControl.shop01AreaCache = {};
+            
 
             parsed.forEach(r => {
 
