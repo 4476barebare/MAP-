@@ -153,13 +153,8 @@ li { user-select: none; cursor: pointer; }
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // -----------------------
-    // URLからpref取得 → CSVパス生成
-    // -----------------------
-    const currentFile = location.pathname.split('/').pop();
-
-    // CHIBA.html → CHIBA
-    const pref = currentFile.replace('.html', '').toUpperCase();
+const currentFile = location.pathname.split('/').pop().split('?')[0].split('#')[0];
+const pref = currentFile.replace('.html', '').toUpperCase();
 
     // 安全対策
     const allowed = ['CHIBA','KANAGAWA','TOKYO','SAITAMA'];
