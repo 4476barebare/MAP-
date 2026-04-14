@@ -188,20 +188,7 @@ const pref = currentFile.replace('.html', '').toUpperCase();
     showDebug('DOMContentLoaded: ' + csvUrl);
 
 
-    // -----------------------
-    // ★ shop CSV 事前ロード（最速）
-    // -----------------------
-    if (window.markerControl) {
-        setTimeout(() => {
-            //markerControl.preloadShop01(prefSafe)
-                .then(() => {
-                    console.log('shop preload:', prefSafe);
-                })
-                .catch(e => {
-                    console.error('shop preload error', e);
-                });
-        }, 0);
-    }
+
 
 
     // -----------------------
