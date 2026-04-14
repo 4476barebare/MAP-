@@ -18,6 +18,15 @@ window.markerControl = {
     // CSVロード（shop01）
     // -----------------------
     async loadShop01CSV(areaId) {
+        
+        
+         alert("start: " + areaId);
+
+    const pref = this.getPrefFromAreaId(areaId);
+
+    alert("pref: " + pref);
+
+    if (!pref) return [];
 
         const pref = this.getPrefFromAreaId(areaId);
         if (!pref) return [];
