@@ -112,9 +112,8 @@ window.markerControl = {
             .replace(/[^\w-]/g, '');
     },
 
-
 // ===============================
-// phase2（スポット表示専用）
+// phase2（キャッシュ完全排除版）
 // ===============================
 showShop02(areaKey) {
 
@@ -126,8 +125,8 @@ showShop02(areaKey) {
 
     this.clearShop02();
 
-    // ★02はareaKeyそのまま使う（split禁止・01依存禁止）
-    const shops = this.shop02Cache[areaKey] || [];
+    // ★ 直接元データから拾う（キャッシュ不使用）
+    const shops = window.spotData.filter(s => s.areaId === areaKey);
 
     if (!shops.length) return;
 
@@ -158,7 +157,7 @@ showShop02(areaKey) {
         const marker = L.marker([shop.lat, shop.lng], {
             icon: L.divIcon({
                 className: '',
-                html: html,
+                html,
                 iconSize: [34, 34],
                 iconAnchor: [17, 17]
             })
