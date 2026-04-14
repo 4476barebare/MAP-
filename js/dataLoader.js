@@ -5,13 +5,10 @@ window.spotData = [];
 window.currentHash = '';
 window.currentAreaId = null;
 
-function loadLocationCSV(csvUrl, currentFile) {
+function loadLocationCSV(csvUrl) {
     return fetch(csvUrl)
         .then(r => r.text())
         .then(text => {
-
-            const lines = text.trim().split('\n');
-            const filePref = currentFile.replace('.html', '').toUpperCase();
 
             let main = null;
             const areas = [];
@@ -62,7 +59,7 @@ function loadLocationCSV(csvUrl, currentFile) {
             
                         // ★ここ追加
 if (window.markerControl) {
-    markerControl.preloadShop01(filePref);
+    markerControl.preloadShop01();
 }
             
 
