@@ -73,7 +73,8 @@ function showShop01(areaKey) {
     
 
 
-    var pref = areaId.split('_')[0];
+
+
     
      alert(areaKey);
 
