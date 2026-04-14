@@ -150,6 +150,13 @@ function selectArea(areaName) {
     window.currentAreaId = area.areaId;
 
     hidePrefSpots();
+    
+    // ★追加（先にクリア）
+    if (window.markerControl) {
+        markerControl.clearShop01();
+    
+    
+    
 
     drawLocation(
         area.name,
@@ -166,6 +173,12 @@ function selectArea(areaName) {
     const areaKey = (area.areaId || '') + "_" + (area.notes || '');
 
     showSpotsForArea(areaKey);
+    
+    // ★追加（最後に表示）
+    if (window.markerControl) {
+        markerControl.showShop01(area.areaId);
+    }
+    
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
@@ -212,6 +225,12 @@ function enableDragForArea() {
 function goBack(hash) {
 
     window.currentAreaId = null;
+    
+    // ★追加
+    if (window.markerControl) {
+        markerControl.clearShop01();
+    }
+
 
     hash = hash || window.currentHash || '';
 
