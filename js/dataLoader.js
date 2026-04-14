@@ -240,7 +240,7 @@ window.map.off('move');
     const areaKey = areaName; // or 必要なら再構成
 
     if (window.markerControl) {
-        markerControl.showShop02(areaName);
+        markerControl.showShop02(areaKey);
     }
 
     const tileUrl =
@@ -258,9 +258,9 @@ window.map.off('move');
         }).addTo(window.map);
 
 
-    markerControl.showShop01(areaKey);
-
-window.map.off('move');
+    window.map.once('moveend', () => {
+        enableDragForArea();
+    });
 
 }
 
