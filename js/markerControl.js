@@ -54,7 +54,7 @@ function preloadShop01(url) {
 // -----------------------
 function showShop01(areaKey) {
 
-    alert("スタート");
+
 
     if (!window.map) return;
 
@@ -65,7 +65,6 @@ function showShop01(areaKey) {
 
     markerControl.clearShop01();
 
-    alert(areaKey);
 
     // ★ここが本体修正
     var shops = markerControl.shop01AreaCache?.[areaKey] || [];
