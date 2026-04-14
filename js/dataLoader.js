@@ -166,6 +166,12 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 }
 
 function selectArea(areaName) {
+    
+    if (window.markerControl && markerControl.shop01Layer) {
+    window.map.removeLayer(markerControl.shop01Layer);
+    markerControl.shop01Layer = null;
+}
+    
 
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
@@ -202,18 +208,17 @@ function selectArea(areaName) {
     // -----------------------
     window.map.once('moveend', () => {
 
-    enableDragForArea();
-    showSpotsForArea(areaKey);
+        enableDragForArea();
+        showSpotsForArea(areaKey);
 
-    if (window._shop01RequestId !== reqId) return;
+        if (window._shop01RequestId !== reqId) return;
 
-    window.map.once('zoomend', () => {
-        markerControl.showShop01(areaKey);
+        setTimeout(() => {
+            markerControl.showShop01(areaKey);
+        }, 0);
+
     });
-
-});
 }
-
 
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
