@@ -60,28 +60,27 @@ function preloadShop01(shopUrl) {
 // show phase1
 // -----------------------
 function showShop01(areaKey) {
-    
-      alert("スタート");
+
+    alert("スタート");
 
     if (!window.map) return;
 
+    // レイヤ初期化
     if (!markerControl.shop01Layer) {
         markerControl.shop01Layer = L.layerGroup().addTo(window.map);
     }
 
     markerControl.clearShop01();
-    
 
+    alert(areaKey);
 
+    // ★ここが本体修正
+    var shops = markerControl.shop01AreaCache?.[areaKey] || [];
 
-
-    
-     alert(areaKey);
-
-    var shops = areaKey;
-    
-
-    if (!shops.length) return;
+    if (!shops.length) {
+        alert("shops empty");
+        return;
+    }
 
     shops.forEach(function(shop) {
 
@@ -98,8 +97,6 @@ function showShop01(areaKey) {
         marker.addTo(markerControl.shop01Layer);
     });
 }
-
-
 // -----------------------
 // show phase2
 // -----------------------
