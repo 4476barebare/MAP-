@@ -200,12 +200,24 @@ function selectArea(areaName) {
     }
 }
 
-
 function selectSpot(areaName, selectName, spotLat, spotLng) {
 
     window.map.setMaxBounds(null);
 
     drawLocation(selectName, spotLat, spotLng, 13);
+
+    // ★ areaレイヤー完全破棄
+    if (window.markerControl) {
+        markerControl.clearShop01();
+        markerControl.clearShop02();
+    }
+
+    // ★ spotモードではあるが、phase2を流用するなら再描画
+    const areaKey = areaName; // or 必要なら再構成
+
+    if (window.markerControl) {
+        markerControl.showShop02(areaKey);
+    }
 
     const tileUrl =
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -225,6 +237,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
         enableDragForArea(areaName);
     });
 }
+
 
 function enableDragForArea() {
 
@@ -344,6 +357,8 @@ function showSpotsForArea(areaId) {
 
         marker.on('click', function () {
             selectSpot(
+                alert(areaId);
+
                 areaId,
                 spot.name,
                 spot.lat,
