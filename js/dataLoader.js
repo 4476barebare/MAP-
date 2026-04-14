@@ -272,24 +272,28 @@ function enableDragForArea() {
     window.map.options.maxBoundsViscosity = 1.0;
 }
 
-
 function goBack(hash) {
-window.map.off('move');
-window.map.off('moveend');
-window.areaBounds = null;
-window.currentAreaId = null;
-    
 
+    // ★状態リセット
+    window.map.off('move');
+    window.map.off('moveend');
+    window.map.dragging.disable(); // ←これだけ追加
+    window.areaBounds = null;
+    window.currentAreaId = null;
 
-if (window.spotMarkers) {
-    window.spotMarkers.forEach(m => window.map.removeLayer(m));
-    window.spotMarkers = [];
-}
+    if (window.markerControl) {
+        markerControl.clearShop01();
+        markerControl.clearShop02();
+    }
 
-if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
-    window.map.removeLayer(window.prefSpotLayer);
-}
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(m => window.map.removeLayer(m));
+        window.spotMarkers = [];
+    }
 
+    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+        window.map.removeLayer(window.prefSpotLayer);
+    }
 
     hash = hash || window.currentHash || '';
 
@@ -301,8 +305,8 @@ if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
 
     if (spotName) {
         return;
-    } else if (areaName) {
 
+    } else if (areaName) {
 
         drawLocation(
             window.prefData.name,
@@ -312,25 +316,18 @@ if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
             window.prefData.maxZoom
         );
 
-
         location.hash = '';
         window.currentHash = '';
-        
-        
-requestAnimationFrame(() => {
-    if (window.markerControl) {
-    markerControl.clearShop01();
-    markerControl.clearShop02();
-}
-    
-    
-    showPrefSpots();
-});
+
+        requestAnimationFrame(() => {
+            showPrefSpots();
+        });
     }
 
     document.getElementById('map-menu').style.display = 'block';
     document.getElementById('map-back-btn').style.display = 'none';
 }
+
 
 window.selectArea = selectArea;
 window.selectSpot = selectSpot;
