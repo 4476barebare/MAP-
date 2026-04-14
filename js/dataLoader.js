@@ -210,14 +210,10 @@ window.map.once('moveend', () => {
    
    
    if (window._shop01RequestId !== reqId) return;
-
     // ★ もう1フレーム待つ
     setTimeout(() => {
-        markerControl.clearShop01(); // ★追加
         markerControl.showShop01(areaKey);
     }, 0);
-   
-   
 
 });
 
@@ -329,6 +325,8 @@ window.areaBounds = null;
 
         location.hash = '';
         window.currentHash = '';
+        
+        window.map.stop();
         
         markerControl.clearShop01(); // ★追加
         showPrefSpots();
