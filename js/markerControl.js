@@ -99,9 +99,12 @@ function showShop01(areaKey) {
         return;
     }
 
-    if (!markerControl) {
-        window.showDebug("NO markerControl");
-        return;
+    // ★ここが修正ポイント（レイヤ安定化）
+    if (!markerControl.shop01Layer || !window.map.hasLayer(markerControl.shop01Layer)) {
+        markerControl.shop01Layer = L.layerGroup().addTo(window.map);
+        window.showDebug("LAYER CREATED");
+    } else {
+        window.showDebug("LAYER REUSED");
     }
 
     if (!markerControl.shop01AreaCache) {
@@ -109,30 +112,25 @@ function showShop01(areaKey) {
         return;
     }
 
-    var keys = Object.keys(markerControl.shop01AreaCache);
+    const keys = Object.keys(markerControl.shop01AreaCache || {});
     window.showDebug("CACHE KEYS: " + keys.join(","));
 
-    var shops = markerControl.shop01AreaCache[areaKey] || [];
+    const shops = markerControl.shop01AreaCache[areaKey] || [];
 
     window.showDebug("LOOKUP: " + areaKey);
     window.showDebug("COUNT: " + shops.length);
 
     if (shops.length === 0) {
-        window.showDebug("EMPTY RESULT");
+        window.showDebug("EMPTY");
         return;
-    }
-
-    if (!markerControl.shop01Layer) {
-        markerControl.shop01Layer = L.layerGroup().addTo(window.map);
-        window.showDebug("LAYER CREATED");
     }
 
     markerControl.shop01Layer.clearLayers();
     window.showDebug("LAYER CLEARED");
 
-    for (var i = 0; i < shops.length; i++) {
+    for (let i = 0; i < shops.length; i++) {
 
-        var s = shops[i];
+        const s = shops[i];
 
         if (i === 0) {
             window.showDebug("FIRST: " + s.lat + "," + s.lng);
@@ -143,7 +141,7 @@ function showShop01(areaKey) {
             continue;
         }
 
-        var marker = L.circleMarker([s.lat, s.lng], {
+        const marker = L.circleMarker([s.lat, s.lng], {
             radius: 3,
             color: '#191970',
             weight: 1,
@@ -156,6 +154,7 @@ function showShop01(areaKey) {
 
     window.showDebug("==== showShop01 DONE ====");
 }
+
 // -----------------------
 // show phase2
 // -----------------------
