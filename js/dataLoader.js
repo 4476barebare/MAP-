@@ -62,7 +62,11 @@ function loadLocationCSV(csvUrl, currentFile) {
             
             // ★ここ追加
 if (window.markerControl) {
-    markerControl.preloadShop01(filePref);
+    try {
+        markerControl.preloadShop01(filePref);
+    } catch (e) {
+        alert('preload error: ' + e.message);
+    }
 }
             
 
