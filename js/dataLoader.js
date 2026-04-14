@@ -203,7 +203,12 @@ function selectArea(areaName) {
     document.getElementById('map-back-btn').style.display = 'block';
 
     showSpotsForArea(areaKey);
-   // enableDragForArea();
+
+window.map.once('moveend', () => {
+    enableDragForArea();
+});
+
+
 
 
     // -----------------------
@@ -255,9 +260,9 @@ window.map.off('move');
         }).addTo(window.map);
 
 
-    window.map.once('moveend', () => {
-        enableDragForArea();
-    });
+window.map.once('moveend', () => {
+    enableDragForArea();
+});
 
 }
 
