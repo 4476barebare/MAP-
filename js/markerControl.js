@@ -52,62 +52,56 @@ function preloadShop01(url) {
 // -----------------------
 // show phase1
 // -----------------------
+
 function showShop01(areaKey) {
 
-    alert("[showShop01] called: " + areaKey);
+    window.dlog("==== showShop01 START ====");
+    window.dlog("areaKey: " + areaKey);
 
     if (!window.map) {
-        alert("[showShop01] NO MAP");
+        window.dlog("NO MAP");
         return;
     }
 
     if (!markerControl.shop01Layer) {
         markerControl.shop01Layer = L.layerGroup().addTo(window.map);
-        alert("[shop01Layer] CREATED");
+        window.dlog("shop01Layer CREATED");
     } else {
-        alert("[shop01Layer] EXISTS");
+        window.dlog("shop01Layer EXISTS");
     }
 
-    alert("[cache exists] " + !!markerControl.shop01AreaCache);
+    window.dlog("cache exists: " + !!markerControl.shop01AreaCache);
 
-    alert(
-        "[cache keys] " +
-        Object.keys(markerControl.shop01AreaCache || {}).join(",")
-    );
+    const keys = Object.keys(markerControl.shop01AreaCache || {});
+    window.dlog("cache keys: " + keys.join(","));
 
-    var shops = markerControl.shop01AreaCache?.[areaKey] || [];
+    const shops = markerControl.shop01AreaCache?.[areaKey] || [];
 
-    alert("[lookup key] " + areaKey);
-    alert("[shops length] " + shops.length);
+    window.dlog("shops length: " + shops.length);
 
     if (!shops.length) {
-        alert("[showShop01] EMPTY RESULT for key=" + areaKey);
+        window.dlog("EMPTY RESULT -> STOP");
         return;
     }
 
-    alert("[first shop raw] " + JSON.stringify(shops[0]));
+    window.dlog("first shop: " + JSON.stringify(shops[0]));
 
     markerControl.clearShop01();
 
-    alert(
-        "[after clear] layer count = " +
-        (markerControl.shop01Layer
-            ? markerControl.shop01Layer.getLayers().length
-            : "no layer")
-    );
+    window.dlog("layer cleared");
 
-    shops.forEach(function (shop, i) {
+    shops.forEach((shop, i) => {
 
         if (i === 0) {
-            alert("[first marker lat/lng] " + shop.lat + "," + shop.lng);
+            window.dlog("first lat/lng: " + shop.lat + "," + shop.lng);
         }
 
         if (isNaN(shop.lat) || isNaN(shop.lng)) {
-            alert("[SKIP NaN] " + JSON.stringify(shop));
+            window.dlog("SKIP NaN: " + JSON.stringify(shop));
             return;
         }
 
-        var marker = L.circleMarker([shop.lat, shop.lng], {
+        const marker = L.circleMarker([shop.lat, shop.lng], {
             radius: 3,
             color: '#191970',
             weight: 1,
@@ -118,7 +112,7 @@ function showShop01(areaKey) {
         marker.addTo(markerControl.shop01Layer);
     });
 
-    alert("[showShop01] DONE");
+    window.dlog("==== showShop01 DONE ====");
 }
 // -----------------------
 // show phase2
