@@ -9,12 +9,7 @@ window.markerControl = {
     // -----------------------
     // CSVロード（pref単位）
     // -----------------------
-    async loadShop01CSV(areaId) {
-
-        if (!areaId) {
-            alert("areaId未定義");
-            return [];
-        }
+    async loadShop01CSV(areaId) 
 
         // ★ここはファイル取得のためだけ
         const pref = areaId.split('_')[0];
@@ -49,11 +44,6 @@ window.markerControl = {
         // ★ここが最重要：渡された値そのまま使う
         const filtered = this.shop01Cache[pref].filter(r => r.areaId === areaId);
 
-        alert(
-            `areaId: ${areaId}\n` +
-            `filtered: ${filtered.length}`
-        );
-
         return filtered;
     },
 
@@ -84,7 +74,8 @@ window.markerControl = {
                 {
                     icon: L.divIcon({
                         className: '',
-                        html: `<div style=width:5px;height:5px;background:#fff;"></div>`,
+                        html: `<div style=width:5px;height:5px;background:#fff;border-radius:50%;
+"></div>`,
                         iconSize: [5, 5],
                         iconAnchor: [2.5, 2.5]
                     })
