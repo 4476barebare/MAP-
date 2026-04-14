@@ -191,7 +191,7 @@ var pref = currentFile.replace('.html', '').toUpperCase();
     // -----------------------
     // CSVロード
     // -----------------------
-    loadLocationCSV(csvUrl, currentFile).then(data => {
+    loadLocationCSV(csvUrl).then(data => {
         showDebug('CSV loaded: main=' + !!data.main);
         if (!data.main) return;
 
