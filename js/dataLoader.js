@@ -166,7 +166,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 }
 
 function selectArea(areaName) {
-    alert(areaName);
+
     
     if (window.markerControl && markerControl.shop01Layer) {
     window.map.removeLayer(markerControl.shop01Layer);
@@ -174,14 +174,15 @@ function selectArea(areaName) {
 }
     
 
-    const area = window.areaData.find(a => a.name === areaName);
-    if (!area) return;
+const area = window.areaData.find(a => a.name === areaName);
+if (!area) return;
 
-    window.currentAreaId = area.areaId;
+// ★これだけでいい
+const areaKey = (area.notes || '').trim();
 
+    alert(areaKey);
     hidePrefSpots();
 
-    const areaKey = (area.areaId || '') + "_" + (area.notes || '');
 
     // -----------------------
     // リクエストID（競合防止）
