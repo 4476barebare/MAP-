@@ -9,7 +9,7 @@ window.markerControl = {
     // -----------------------
     // CSVロード（pref単位）
     // -----------------------
-    async loadShop01CSV(areaId) 
+    async loadShop01CSV(areaId) {
 
         // ★ここはファイル取得のためだけ
         const pref = areaId.split('_')[0];
