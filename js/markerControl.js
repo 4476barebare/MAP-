@@ -43,7 +43,7 @@ window.markerControl = {
                 };
             });
 
-            alert(`CSV loaded: ${pref} / ${this.shop01Cache[pref].length}`);
+            //alert(`CSV loaded: ${pref} / ${this.shop01Cache[pref].length}`);
         }
 
         // ★ここが最重要：渡された値そのまま使う
@@ -69,7 +69,7 @@ window.markerControl = {
 
         this.clearShop01();
 
-        alert("表示: " + areaId);
+        //alert("表示: " + areaId);
 
         const shops = await this.loadShop01CSV(areaId);
 
@@ -84,9 +84,10 @@ window.markerControl = {
                 {
                     icon: L.divIcon({
                         className: '',
-                        html: `<div>${shop.name}</div>`,
-                        iconSize: [30, 30],
-                        iconAnchor: [15, 15]
+                        html: `<div style=width:5px; height:5px; background:#fff;"></div>
+`,
+iconSize: [5, 5],
+iconAnchor: [2.5, 2.5]
                     })
                 }
             );
