@@ -59,9 +59,19 @@ function loadLocationCSV(csvUrl, currentFile) {
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
+            
+            // ★ここ追加
+if (window.markerControl) {
+    markerControl.preloadShop01(filePref);
+}
+            
 
             return { main, areas, spots };
         });
+        
+        
+        
+        
 }
 
 function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
