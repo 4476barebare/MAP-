@@ -93,8 +93,8 @@ function showShop01(areaKey) {
 // -----------------------
 // show phase2
 // -----------------------
-function showShop02(areaId) {
-
+function showShop02(areaKey) {
+alert(areaKey);
     if (!window.map) return;
 
     if (!markerControl.shop02Layer) {
