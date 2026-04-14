@@ -151,12 +151,10 @@ function selectArea(areaName) {
 
     hidePrefSpots();
     
-    // ★追加（先にクリア）
+    // ★先にクリア
     if (window.markerControl) {
         markerControl.clearShop01();
     }
-    
-    
 
     drawLocation(
         area.name,
@@ -173,13 +171,23 @@ function selectArea(areaName) {
     const areaKey = (area.areaId || '') + "_" + (area.notes || '');
 
     showSpotsForArea(areaKey);
-    
-    // ★追加（最後に表示）
+
+    // -----------------------
+    // ★ここを変更
+    // -----------------------
     if (window.markerControl) {
-        markerControl.showShop01(areaKey);
+
+        // ズーム中なら待つ
+        if (window.map._animatingZoom) {
+            window.map.once('zoomend', () => {
+                markerControl.showShop01(areaKey);
+            });
+        } else {
+            markerControl.showShop01(areaKey);
+        }
     }
-    
 }
+
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
 
