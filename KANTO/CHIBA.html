@@ -153,49 +153,68 @@ li { user-select: none; cursor: pointer; }
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-const currentFile = location.pathname.split('/').pop().split('?')[0].split('#')[0];
-var pref = currentFile.replace('.html', '').toUpperCase();
-
+    const currentFile = location.pathname.split('/').pop().split('?')[0].split('#')[0];
+    var pref = currentFile.replace('.html', '').toUpperCase();
 
     const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
+    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
+
     // -----------------------
-    // デバッグ表示
+    // デバッグ表示（ログ統一）
     // -----------------------
     function showDebug(msg) {
         let debugEl = document.getElementById('debug');
+
         if (!debugEl) {
             debugEl = document.createElement('div');
             debugEl.id = 'debug';
             debugEl.style.position = 'fixed';
             debugEl.style.top = '0';
             debugEl.style.left = '0';
-            debugEl.style.background = 'rgba(255,255,0,0.8)';
+            debugEl.style.background = 'rgba(255,255,0,0.85)';
             debugEl.style.zIndex = '9999';
-            debugEl.style.padding = '4px';
+            debugEl.style.padding = '6px';
             debugEl.style.fontSize = '12px';
-            debugEl.style.maxWidth = '300px';
+            debugEl.style.maxWidth = '320px';
             debugEl.style.whiteSpace = 'pre-wrap';
+            debugEl.style.maxHeight = '40vh';
+            debugEl.style.overflow = 'auto';
             document.body.appendChild(debugEl);
         }
-        debugEl.textContent = msg;
+
+        debugEl.textContent += msg + "\n";
     }
 
     showDebug('DOMContentLoaded: ' + csvUrl);
 
-
-
-
+    // -----------------------
+    // shop preload（shopUrl渡す）
+    // -----------------------
+    if (window.markerControl) {
+        setTimeout(() => {
+            markerControl.preloadShop01(shopUrl)
+                .then(() => {
+                    showDebug('shop preload done');
+                })
+                .catch(e => {
+                    showDebug('shop preload error: ' + e);
+                });
+        }, 0);
+    }
 
     // -----------------------
     // CSVロード
     // -----------------------
-    loadLocationCSV(csvUrl).then(data => {
+    loadLocationCSV(csvUrl, currentFile).then(data => {
+
         showDebug('CSV loaded: main=' + !!data.main);
+
         if (!data.main) return;
 
         const initialHash = location.hash;
 
         if (initialHash) {
+
             const parts = decodeURIComponent(initialHash.substring(1)).split('/');
             const areaName = parts[0];
             const spotName = parts[1];
@@ -207,7 +226,9 @@ var pref = currentFile.replace('.html', '').toUpperCase();
             } else {
                 selectArea(areaName);
             }
+
         } else {
+
             drawLocation(
                 window.prefData.name,
                 window.prefData.lat,
@@ -227,11 +248,11 @@ var pref = currentFile.replace('.html', '').toUpperCase();
         menuUl.innerHTML = '';
 
         window.areaData.forEach(area => {
+
             const li = document.createElement('li');
             const btn = document.createElement('button');
 
             const areaName = (area.name || '').trim();
-
             btn.textContent = areaName;
 
             btn.onclick = () => {
@@ -252,14 +273,12 @@ var pref = currentFile.replace('.html', '').toUpperCase();
         showDebug('CSV読み込み失敗');
     });
 
-
     // -----------------------
     // 戻るボタン
     // -----------------------
     document.getElementById('map-back-btn').addEventListener('click', () => {
         goBack(window.currentHash);
     });
-
 
     // -----------------------
     // 最寄りクリック
@@ -271,6 +290,7 @@ var pref = currentFile.replace('.html', '').toUpperCase();
         if (!window.map || window.nearestClickHandler) return;
 
         window.nearestClickHandler = function(e) {
+
             if (!window.nearestClickEnabled) return;
 
             const menuRect = document.getElementById('map-menu').getBoundingClientRect();
@@ -286,6 +306,7 @@ var pref = currentFile.replace('.html', '').toUpperCase();
             let minDist = Infinity;
 
             window.areaData.forEach(area => {
+
                 const dLat = e.latlng.lat - area.lat;
                 const dLng = e.latlng.lng - area.lng;
                 const dist = dLat * dLat + dLng * dLng;
@@ -310,26 +331,25 @@ var pref = currentFile.replace('.html', '').toUpperCase();
         window.nearestClickEnabled = true;
     }
 
-
     // -----------------------
     // selectAreaラップ
     // -----------------------
     const _selectArea = selectArea;
+
     window.selectArea = function(areaName) {
         removeNearestClick();
         _selectArea((areaName || '').trim());
     };
 
-
     // -----------------------
     // goBackラップ
     // -----------------------
     const _goBack = goBack;
+
     window.goBack = function(hash) {
         _goBack(hash);
         if (!window.currentHash) enableNearestClick();
     };
-
 
     // -----------------------
     // backアイコン
@@ -337,12 +357,14 @@ var pref = currentFile.replace('.html', '').toUpperCase();
     fetch('/MAP-/icon/back.svg')
         .then(res => res.text())
         .then(svg => {
+
             const btn = document.getElementById('map-back-btn');
             btn.innerHTML = svg;
 
             const svgEl = btn.querySelector('svg');
             if (svgEl) svgEl.classList.add('back-icon');
         });
+
 });
 
 
@@ -350,6 +372,7 @@ var pref = currentFile.replace('.html', '').toUpperCase();
 // popstate
 // -----------------------
 window.addEventListener('popstate', () => {
+
     const newHash = location.hash;
     const prevHash = window.currentHash;
 
@@ -359,6 +382,8 @@ window.addEventListener('popstate', () => {
 
     window.currentHash = newHash;
 });
+
+
 </script>
 </body>
 </html>
