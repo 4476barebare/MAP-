@@ -90,9 +90,21 @@ window.showDebug = function(msg) {
 // -----------------------
 
 function showShop01(areaKey) {
+    
 
     window.showDebug("==== showShop01 START ====");
     window.showDebug("areaKey: " + areaKey);
+
+// ★ここに追加（これだけ）
+    window.map.invalidateSize();
+
+    if (!window.map) {
+        window.showDebug("NO MAP");
+        return;
+    }
+
+
+
 
     if (!window.map) {
         window.showDebug("NO MAP");
