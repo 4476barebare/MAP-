@@ -181,7 +181,6 @@ function selectArea(areaName) {
     // -----------------------
     const reqId = Date.now();
     window._shop01RequestId = reqId;
-enableDragForArea();
 
     // -----------------------
     // ズーム開始で消す（1回だけ）
@@ -208,6 +207,8 @@ enableDragForArea();
     document.getElementById('map-back-btn').style.display = 'block';
 
     showSpotsForArea(areaKey);
+    enableDragForArea();
+
 
     // -----------------------
     // 完全停止後に即表示
