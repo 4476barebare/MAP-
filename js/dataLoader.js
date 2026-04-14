@@ -204,9 +204,9 @@ function selectArea(areaName) {
 
     showSpotsForArea(areaKey);
 
-window.map.once('moveend', () => {
+//window.map.once('moveend', () => {
     enableDragForArea();
-});
+//});
 
 
 
