@@ -178,7 +178,13 @@ const area = window.areaData.find(a => a.name === areaName);
 if (!area) return;
 
 // ★これだけでいい
-const areaKey = (area.notes || '').trim();
+
+// ★必ずここで整形
+const area_Id = (area.areaId || '').trim();
+const notes   = (area.notes || '').trim();
+
+// ★キー生成
+const areaKey = area_Id + "_" + notes;
 
     alert(areaKey);
     hidePrefSpots();
