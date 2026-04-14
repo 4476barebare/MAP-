@@ -217,7 +217,7 @@ function selectArea(areaName) {
 
             // 古い処理は無視
             if (window._shop01RequestId !== reqId) return;
-
+alert(areaKey);
             markerControl.showShop01(areaKey);
         });
     }
