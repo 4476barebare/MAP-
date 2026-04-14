@@ -52,58 +52,59 @@ function preloadShop01(url) {
 // -----------------------
 // show phase1
 // -----------------------
+
 function showShop01(areaKey) {
 
-    showDebug("==== showShop01 START ====");
-    showDebug("areaKey: " + areaKey);
+    window.showDebug("==== showShop01 START ====");
+    window.showDebug("areaKey: " + areaKey);
 
     if (!window.map) {
-        showDebug("NO MAP");
+        window.showDebug("NO MAP");
         return;
     }
 
     if (!markerControl.shop01Layer) {
         markerControl.shop01Layer = L.layerGroup().addTo(window.map);
-        showDebug("shop01Layer CREATED");
+        window.showDebug("shop01Layer CREATED");
     } else {
-        showDebug("shop01Layer EXISTS");
+        window.showDebug("shop01Layer EXISTS");
     }
 
     if (!markerControl.shop01AreaCache) {
-        showDebug("CACHE: undefined");
+        window.showDebug("CACHE undefined");
         return;
     }
 
-    const keys = Object.keys(markerControl.shop01AreaCache);
-    showDebug("CACHE KEYS: " + keys.join(","));
+    const keys = Object.keys(markerControl.shop01AreaCache || {});
+    window.showDebug("CACHE KEYS: " + keys.join(","));
 
-    const shops = markerControl.shop01AreaCache[areaKey] || [];
+    const shops = markerControl.shop01AreaCache?.[areaKey] || [];
 
-    showDebug("LOOKUP KEY: " + areaKey);
-    showDebug("SHOPS LENGTH: " + shops.length);
+    window.showDebug("LOOKUP KEY: " + areaKey);
+    window.showDebug("SHOPS LENGTH: " + shops.length);
 
     if (!shops.length) {
-        showDebug("EMPTY RESULT");
+        window.showDebug("EMPTY RESULT");
         return;
     }
 
-    showDebug("FIRST SHOP: " + JSON.stringify(shops[0]));
+    window.showDebug("FIRST SHOP: " + JSON.stringify(shops[0]));
 
     markerControl.clearShop01();
-    showDebug("LAYER CLEARED");
+    window.showDebug("LAYER CLEARED");
 
-    shops.forEach((shop, i) => {
+    shops.forEach(function (shop, i) {
 
         if (i === 0) {
-            showDebug("FIRST LAT/LNG: " + shop.lat + "," + shop.lng);
+            window.showDebug("FIRST LAT/LNG: " + shop.lat + "," + shop.lng);
         }
 
         if (isNaN(shop.lat) || isNaN(shop.lng)) {
-            showDebug("SKIP NaN: " + JSON.stringify(shop));
+            window.showDebug("SKIP NaN: " + JSON.stringify(shop));
             return;
         }
 
-        const marker = L.circleMarker([shop.lat, shop.lng], {
+        var marker = L.circleMarker([shop.lat, shop.lng], {
             radius: 3,
             color: '#191970',
             weight: 1,
@@ -114,7 +115,7 @@ function showShop01(areaKey) {
         marker.addTo(markerControl.shop01Layer);
     });
 
-    showDebug("==== showShop01 DONE ====");
+    window.showDebug("==== showShop01 DONE ====");
 }
 // -----------------------
 // show phase2
