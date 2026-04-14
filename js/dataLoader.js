@@ -274,10 +274,20 @@ function enableDragForArea() {
 
 
 function goBack(hash) {
-
-    window.currentAreaId = null;
+window.map.off('move');
+window.map.off('moveend');
+window.areaBounds = null;
+window.currentAreaId = null;
     
+if (window.markerControl) {
+    markerControl.clearShop01();
+    markerControl.clearShop02();
+}
 
+if (window.spotMarkers) {
+    window.spotMarkers.forEach(m => window.map.removeLayer(m));
+    window.spotMarkers = [];
+}
 
 if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
     window.map.removeLayer(window.prefSpotLayer);
@@ -296,9 +306,6 @@ if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
         return;
     } else if (areaName) {
 
-        window.map.off('move');
-window.map.off('moveend');
-window.areaBounds = null;
 
         drawLocation(
             window.prefData.name,
@@ -308,20 +315,12 @@ window.areaBounds = null;
             window.prefData.maxZoom
         );
 
-        if (window.spotMarkers) {
-            window.spotMarkers.forEach(m =>
-                window.map.removeLayer(m)
-            );
-            window.spotMarkers = [];
-        }
 
         location.hash = '';
         window.currentHash = '';
         
         
 requestAnimationFrame(() => {
-    markerControl.clearShop01();
-    markerControl.clearShop02();
     showPrefSpots();
 });
     }
