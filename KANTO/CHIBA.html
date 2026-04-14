@@ -188,12 +188,7 @@ const pref = currentFile.replace('.html', '').toUpperCase();
     showDebug('DOMContentLoaded: ' + csvUrl);
 
 
-// ★ shop CSV 事前ロード（必ず先に確定させる）
-let shopReady = Promise.resolve();
 
-if (window.markerControl) {
-    shopReady = markerControl.preloadShop01(prefSafe);
-}
 
 
     // -----------------------
