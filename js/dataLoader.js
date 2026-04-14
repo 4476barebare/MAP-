@@ -185,11 +185,7 @@ function selectArea(areaName) {
     // -----------------------
     // ズーム開始で消す（1回だけ）
     // -----------------------
-    if (window.markerControl) {
-        window.map.once('movestart', () => {
-            markerControl.clearShop01();
-        });
-    }
+
 
     // -----------------------
     // 地図移動
@@ -207,7 +203,7 @@ function selectArea(areaName) {
     document.getElementById('map-back-btn').style.display = 'block';
 
     showSpotsForArea(areaKey);
-    enableDragForArea();
+   // enableDragForArea();
 
 
     // -----------------------
