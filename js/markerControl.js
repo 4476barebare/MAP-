@@ -67,7 +67,7 @@ function showShop01(areaKey) {
 
 
     // ★ここが本体修正
-    var shops = markerControl.shop01AreaCache?.[areaKey] || [];
+    const shops = markerControl.shop01AreaCache?.[areaKey] || [];
 
     if (!shops.length) {
         alert("shops empty");
@@ -78,7 +78,7 @@ function showShop01(areaKey) {
 
         if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
-        var marker = L.circleMarker([shop.lat, shop.lng], {
+        let marker = L.circleMarker([shop.lat, shop.lng], {
             radius: 3,
             color: '#191970',
             weight: 1,
