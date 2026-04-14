@@ -11,13 +11,13 @@ window.markerControl = {
 
 function preloadShop01(shopUrl) {
 
-    alert('preload start: ' + shopUrl);
+   // alert('preload start: ' + shopUrl);
 
     return fetch(shopUrl)
         .then(r => r.text())
         .then(text => {
 
-            alert('preload fetched');
+            //alert('preload fetched');
 
             const lines = text.trim().split('\n');
 
@@ -35,7 +35,7 @@ function preloadShop01(shopUrl) {
                 };
             });
 
-            alert('parsed count: ' + parsed.length);
+           // alert('parsed count: ' + parsed.length);
 
             window.markerControl.shop01Cache[shopUrl] = parsed;
 
@@ -48,7 +48,7 @@ function preloadShop01(shopUrl) {
                 window.markerControl.shop01AreaCache[shopUrl][r.areaId].push(r);
             });
 
-            alert('preload done');
+           // alert('preload done');
 
         })
         .catch(err => {
