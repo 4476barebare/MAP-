@@ -198,26 +198,22 @@ function selectArea(areaName) {
     document.getElementById('map-back-btn').style.display = 'block';
 
     // -----------------------
-    // 描画タイミング制御
+    // 描画
     // -----------------------
     window.map.once('moveend', () => {
 
-        // ① 先に通常スポット
-        showSpotsForArea(areaKey);
+    enableDragForArea();
+    showSpotsForArea(areaKey);
 
-        // ② リクエスト確認
-        if (window._shop01RequestId !== reqId) return;
+    if (window._shop01RequestId !== reqId) return;
 
-        // ③ ショップマーカー描画（次フレーム）
-        setTimeout(() => {
-            markerControl.showShop01(areaKey);
-
-            // ④ 最後にドラッグ制御ON
-            enableDragForArea();
-
-        }, 0);
+    window.map.once('zoomend', () => {
+        markerControl.showShop01(areaKey);
     });
+
+});
 }
+
 
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
