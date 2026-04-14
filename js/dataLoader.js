@@ -262,29 +262,21 @@ window.map.off('move');
 }
 
 function enableDragForArea() {
-
     if (!window.areaBounds) return;
 
+    const bounds = window.areaBounds;
+
+    // ドラッグ有効
     window.map.dragging.enable();
 
-    // ★ これで古い拘束を完全削除
-    window.map.off('move');
+    // Leaflet標準の境界制御に任せる
+    window.map.setMaxBounds(bounds);
 
-    // ★ 安定版の拘束
-    window.map.on('move', function () {
-
-        if (!window.areaBounds) return;
-
-        const b = window.areaBounds;
-        const c = window.map.getCenter();
-
-        if (!b.contains(c)) {
-            window.map.panInsideBounds(b, {
-                animate: false
-            });
-        }
-    });
+    // はみ出し補正を滑らかにする
+    window.map.options.maxBoundsViscosity = 1.0;
 }
+
+
 
 function goBack(hash) {
 
