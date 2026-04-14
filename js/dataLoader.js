@@ -320,6 +320,7 @@ function goBack(hash) {
             window.prefData.zoom,
             window.prefData.maxZoom
         );
+        window.map.invalidateSize();
 
         location.hash = '';
         window.currentHash = '';
