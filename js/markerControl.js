@@ -59,7 +59,7 @@ function preloadShop01(shopUrl) {
 // -----------------------
 // show phase1
 // -----------------------
-function showShop01(areaId) {
+function showShop01(areaKey) {
 
     if (!window.map) return;
 
@@ -68,12 +68,15 @@ function showShop01(areaId) {
     }
 
     markerControl.clearShop01();
+    
+
 
     var pref = areaId.split('_')[0];
+    
+     alert(areaKey);
 
-    var shops =
-        (markerControl.shop01AreaCache[pref] &&
-         markerControl.shop01AreaCache[pref][areaId]) || [];
+    var shops = areaKey;
+    
 
     if (!shops.length) return;
 
