@@ -223,7 +223,7 @@ const areaKey = area_Id + "_" + notes;
 
         setTimeout(() => {
             markerControl.showShop01(areaKey);
-        }, 0);
+        }, 50);
 
     });
 }
