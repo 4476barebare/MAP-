@@ -9,16 +9,15 @@ window.markerControl = {
     shop02Layer: null
 };
 
-
 function preloadShop01(shopUrl) {
 
-    if (window.markerControl.shop01Cache && window.markerControl.shop01Cache[shopUrl]) {
-        return Promise.resolve();
-    }
+    alert('preload start: ' + shopUrl);
 
     return fetch(shopUrl)
         .then(r => r.text())
         .then(text => {
+
+            alert('preload fetched');
 
             const lines = text.trim().split('\n');
 
@@ -36,6 +35,8 @@ function preloadShop01(shopUrl) {
                 };
             });
 
+            alert('parsed count: ' + parsed.length);
+
             window.markerControl.shop01Cache[shopUrl] = parsed;
 
             window.markerControl.shop01AreaCache[shopUrl] = {};
@@ -47,10 +48,13 @@ function preloadShop01(shopUrl) {
                 window.markerControl.shop01AreaCache[shopUrl][r.areaId].push(r);
             });
 
+            alert('preload done');
+
+        })
+        .catch(err => {
+            alert('preload error: ' + err);
         });
 }
-
-
 
 // -----------------------
 // preload
