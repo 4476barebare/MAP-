@@ -60,6 +60,8 @@ function preloadShop01(shopUrl) {
 // show phase1
 // -----------------------
 function showShop01(areaKey) {
+    
+      alert("スタート");
 
     if (!window.map) return;
 
