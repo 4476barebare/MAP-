@@ -67,7 +67,6 @@ window.markerControl = {
 
         if (!window.map) return;
 
-        // 初期化
         if (!this.shop01Layer) {
             this.shop01Layer = L.layerGroup().addTo(window.map);
         }
@@ -86,15 +85,10 @@ window.markerControl = {
 
             if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
-            // ★ Canvas描画（ここが重要）
             const marker = L.circleMarker([shop.lat, shop.lng], {
                 radius: 3,
-
-                // 枠
                 color: '#191970',
                 weight: 1,
-
-                // 塗り
                 fillColor: '#fff',
                 fillOpacity: 1
             });
@@ -104,7 +98,22 @@ window.markerControl = {
     },
 
     // -----------------------
-    // phase2（ラベル・DOM）
+    // icon整形（sprite用）
+    // -----------------------
+    getIconId(raw) {
+
+        if (!raw) return 'default';
+
+        return raw
+            .toString()
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]/g, '');
+    },
+
+    // -----------------------
+    // phase2（SVG sprite + 白丸背景）
     // -----------------------
     showShop02(areaId) {
 
@@ -128,23 +137,32 @@ window.markerControl = {
 
             if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
+            const iconId = this.getIconId(shop.icon);
+
+            const html = `
+                <div style="
+                    width:34px;
+                    height:34px;
+                    background:#fff;
+                    border:2px solid #191970;
+                    border-radius:50%;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.25);
+                ">
+                    <svg width="18" height="18">
+                        <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                    </svg>
+                </div>
+            `;
+
             const marker = L.marker([shop.lat, shop.lng], {
                 icon: L.divIcon({
                     className: '',
-                    html: `
-                        <div style="
-                            background:#191970;
-                            color:#fff;
-                            padding:4px 6px;
-                            font-size:10px;
-                            border-radius:4px;
-                            white-space:nowrap;
-                        ">
-                            ${shop.name}
-                        </div>
-                    `,
-                    iconSize: [80, 20],
-                    iconAnchor: [40, 10]
+                    html: html,
+                    iconSize: [34, 34],
+                    iconAnchor: [17, 17]
                 })
             });
 
