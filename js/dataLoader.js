@@ -58,9 +58,7 @@ function loadLocationCSV(csvUrl) {
             window.spotData = spots;
             
                         // ★ここ追加
-if (window.markerControl) {
-    markerControl.preloadShop01();
-}
+
             
 
             return { main, areas, spots };
