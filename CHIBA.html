@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こCHIBA</title>
+
+<link rel="stylesheet" href="/MAP-/header.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+html, body { margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif; background:#fff; overflow-x:hidden; }
+li, button { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+li:active, button:active { background: transparent; }
+li { user-select: none; cursor: pointer; }
+.leaflet-control-attribution { font-size: 8px; background: rgba(255,255,255,0.5); }
+#lf-map { width:100%; height:80vh; position:relative; z-index:0; }
+.leaflet-container { z-index:0; }
+
+/* メニューは初期非表示 */
+.map-menu { display:none; position: absolute; bottom: 5px; left: 5px; right: 5px; max-height: 200px; background: #fff; border-radius: 3px; overflow-y: auto; z-index: 1980; padding: 2px 5px; pointer-events: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+#map-menu, #map-menu ul, #map-menu li, #map-menu button { pointer-events: auto; }
+.map-menu ul { list-style: none; margin: 0; padding: 0; }
+.map-menu li { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #191970; padding: 4px 8px; width: 100%; box-sizing: border-box; cursor: pointer; border-bottom: 1px dotted #191970; }
+.map-menu li:last-child { border-bottom: none; padding-bottom: 3px; }
+#map-menu button { width: 100%; background: transparent; border: none; color: inherit; cursor: pointer; padding: 0; font-size: inherit; text-align: left; }
+.map-ad { position: absolute; top: 12px; left: 5px; z-index: 1500; pointer-events: none; }
+.map-ad .ad-box { width: 320px; height: 50px; background: rgba(255,255,255,0.9); border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #333; pointer-events: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border-radius: 4px; }
+
+
+.map-back-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2000;
+
+    background: none;
+    border: none;
+    padding: 0;
+
+    -webkit-appearance: none;
+    appearance: none;
+}
+.back-icon {
+    width:36px;
+    height:36px;
+    fill:#fff;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+}
+
+
+.spot-label {
+  display: inline-flex;           /* ← flexに統一 */
+  align-items: center;
+  gap: 3px;
+
+  padding: 1px 4px;
+  font-size: 10px;
+  font-weight: bold;
+  white-space: nowrap;
+
+  border-radius: 3px;
+  background: #191970;
+  color: #fff;
+
+  /* 軽量化 */
+  border: none;
+  box-shadow: none;
+}
+
+.spot-label svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor; /* ←重要：色同期 */
+}
+
+
+
+/* デフォ */
+.spot-label.spot {
+  background: #191970;
+}
+
+/* fish系 */
+.spot-label.fish1 { background: #6495ED; }
+.spot-label.fish2 { background: #2E8B57; }
+.spot-label.fish3 { background: #FF8C00; }
+.spot-label.fish4 { background: #8B008B; }
+
+.pref-dot {
+    width:5px;
+    height:5px;
+}
+
+
+
+/* 旧スポット */
+.pref-dot.spot {
+    background:#191970;
+}
+
+/* fish系（自由に色分け） */
+.pref-dot.fish1 { background:#6495ED; }
+.pref-dot.fish2 { background:#2E8B57; }
+.pref-dot.fish3 { background:#FF8C00; }
+.pref-dot.fish4 { background:#8B008B; }
+
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こCHIBA</div>
+    <nav class="nav">
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <a href="#">スポット一覧</a>
+    </nav>
+  </div>
+</header>
+
+
+<div id="lf-map">
+  <div class="map-ad">
+    <div class="ad-box">AD 320×50</div>
+  </div>
+  <div id="map-menu" class="map-menu"><ul></ul></div>
+  <button id="map-back-btn" class="map-back-btn"></button>
+</div>
+
+
+<div id="weather-wave-tide-container"></div>
+<div id="newsOverlay"><div class="news-window"><button id="closeNews">閉じる</button><div class="news-content"></div></div></div>
+<footer>© 釣り行こNAVI</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/MAP-/header.js" defer></script>
+<script src="/MAP-/js/markerControl.js"></script>
+<script src="/MAP-/js/dataLoader.js"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const currentFile = location.pathname.split('/').pop().split('?')[0].split('#')[0];
+    var pref = currentFile.replace('.html', '').toUpperCase();
+
+    const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
+    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
+
+    // -----------------------
+    // デバッグ表示（ログ統一）
+    // -----------------------
+    function showDebug(msg) {
+        let debugEl = document.getElementById('debug');
+
+        if (!debugEl) {
+            debugEl = document.createElement('div');
+            debugEl.id = 'debug';
+            debugEl.style.position = 'fixed';
+            debugEl.style.top = '0';
+            debugEl.style.left = '0';
+            debugEl.style.background = 'rgba(255,255,0,0.85)';
+            debugEl.style.zIndex = '9999';
+            debugEl.style.padding = '6px';
+            debugEl.style.fontSize = '12px';
+            debugEl.style.maxWidth = '320px';
+            debugEl.style.whiteSpace = 'pre-wrap';
+            debugEl.style.maxHeight = '40vh';
+            debugEl.style.overflow = 'auto';
+            document.body.appendChild(debugEl);
+        }
+
+        debugEl.textContent += msg + "\n";
+    }
+
+    showDebug('DOMContentLoaded: ' + csvUrl);
+
+    // -----------------------
+    // shop preload（shopUrl渡す）
+    // -----------------------
+ // -----------------------
+    // shop preload（CSVと完全同列処理）
+    // -----------------------
+    
+
+
+
+    // -----------------------
+    // CSVロード
+    // -----------------------
+    loadLocationCSV(csvUrl, currentFile).then(data => {
+
+        showDebug('CSV loaded: main=' + !!data.main);
+
+        if (!data.main) return;
+
+        const initialHash = location.hash;
+
+        if (initialHash) {
+
+            const parts = decodeURIComponent(initialHash.substring(1)).split('/');
+            const areaName = parts[0];
+            const spotName = parts[1];
+
+            window.currentHash = initialHash;
+
+            if (spotName) {
+                selectSpot(areaName, spotName);
+            } else {
+                selectArea(areaName);
+            }
+
+        } else {
+
+            drawLocation(
+                window.prefData.name,
+                window.prefData.lat,
+                window.prefData.lng,
+                window.prefData.zoom,
+                window.prefData.maxZoom
+            );
+
+            document.getElementById('map-menu').style.display = 'block';
+            document.getElementById('map-back-btn').style.display = 'none';
+            window.markerControl.preloadShop01(shopUrl);
+        }
+
+        // -----------------------
+        // メニュー生成
+        // -----------------------
+        const menuUl = document.querySelector('#map-menu ul');
+        menuUl.innerHTML = '';
+
+        window.areaData.forEach(area => {
+
+            const li = document.createElement('li');
+            const btn = document.createElement('button');
+
+            const areaName = (area.name || '').trim();
+            btn.textContent = areaName;
+
+            btn.onclick = () => {
+                selectArea(areaName);
+            };
+
+            li.appendChild(btn);
+            menuUl.appendChild(li);
+        });
+
+        document.getElementById('map-menu').addEventListener('click', e => {
+            e.stopPropagation();
+        });
+
+        setupNearestClick();
+
+    }).catch(() => {
+        showDebug('CSV読み込み失敗');
+    });
+
+    // -----------------------
+    // 戻るボタン
+    // -----------------------
+    document.getElementById('map-back-btn').addEventListener('click', () => {
+        goBack(window.currentHash);
+    });
+
+    // -----------------------
+    // 最寄りクリック
+    // -----------------------
+    window.nearestClickHandler = null;
+    window.nearestClickEnabled = true;
+
+    function setupNearestClick() {
+        if (!window.map || window.nearestClickHandler) return;
+
+        window.nearestClickHandler = function(e) {
+
+            if (!window.nearestClickEnabled) return;
+
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+
+            if (
+                e.originalEvent.clientX >= menuRect.left &&
+                e.originalEvent.clientX <= menuRect.right &&
+                e.originalEvent.clientY >= menuRect.top &&
+                e.originalEvent.clientY <= menuRect.bottom
+            ) return;
+
+            let nearestArea = null;
+            let minDist = Infinity;
+
+            window.areaData.forEach(area => {
+
+                const dLat = e.latlng.lat - area.lat;
+                const dLng = e.latlng.lng - area.lng;
+                const dist = dLat * dLat + dLng * dLng;
+
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestArea = area.name;
+                }
+            });
+
+            if (nearestArea) selectArea(nearestArea);
+        };
+
+        window.map.on('click', window.nearestClickHandler);
+    }
+
+    function removeNearestClick() {
+        window.nearestClickEnabled = false;
+    }
+
+    function enableNearestClick() {
+        window.nearestClickEnabled = true;
+    }
+
+    // -----------------------
+    // selectAreaラップ
+    // -----------------------
+    const _selectArea = selectArea;
+
+    window.selectArea = function(areaName) {
+        removeNearestClick();
+        _selectArea((areaName || '').trim());
+    };
+
+    // -----------------------
+    // goBackラップ
+    // -----------------------
+    const _goBack = goBack;
+
+    window.goBack = function(hash) {
+        _goBack(hash);
+        if (!window.currentHash) enableNearestClick();
+    };
+
+    // -----------------------
+    // backアイコン
+    // -----------------------
+    fetch('/MAP-/icon/back.svg')
+        .then(res => res.text())
+        .then(svg => {
+
+            const btn = document.getElementById('map-back-btn');
+            btn.innerHTML = svg;
+
+            const svgEl = btn.querySelector('svg');
+            if (svgEl) svgEl.classList.add('back-icon');
+        });
+
+});
+
+
+// -----------------------
+// popstate
+// -----------------------
+window.addEventListener('popstate', () => {
+
+    const newHash = location.hash;
+    const prevHash = window.currentHash;
+
+    if (newHash.length < prevHash.length) {
+        goBack(prevHash);
+    }
+
+    window.currentHash = newHash;
+});
+
+
+</script>
+</body>
+</html>
