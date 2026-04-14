@@ -233,9 +233,9 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
             updateWhenIdle: true
         }).addTo(window.map);
 
-    window.map.once('moveend', () => {
-        enableDragForArea(areaName);
-    });
+    
+    markerControl.showShop01(areaKey);
+
 }
 
 
