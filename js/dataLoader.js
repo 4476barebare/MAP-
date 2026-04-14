@@ -150,12 +150,27 @@ function selectArea(areaName) {
     window.currentAreaId = area.areaId;
 
     hidePrefSpots();
-    
-    // ★先にクリア
+
+    const areaKey = (area.areaId || '') + "_" + (area.notes || '');
+
+    // -----------------------
+    // リクエストID（競合防止）
+    // -----------------------
+    const reqId = Date.now();
+    window._shop01RequestId = reqId;
+
+    // -----------------------
+    // ズーム開始で消す（1回だけ）
+    // -----------------------
     if (window.markerControl) {
-        markerControl.clearShop01();
+        window.map.once('movestart', () => {
+            markerControl.clearShop01();
+        });
     }
 
+    // -----------------------
+    // 地図移動
+    // -----------------------
     drawLocation(
         area.name,
         area.lat,
@@ -168,32 +183,21 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    const areaKey = (area.areaId || '') + "_" + (area.notes || '');
-
     showSpotsForArea(areaKey);
 
     // -----------------------
-    // ★ここを変更
+    // 完全停止後に即表示
     // -----------------------
-if (window.markerControl) {
+    if (window.markerControl) {
 
-    // 既存の待機をキャンセル用ID
-    const reqId = Date.now();
-    window._shop01RequestId = reqId;
+        window.map.once('moveend', () => {
 
-    window.map.once('moveend', () => {
+            // 古い処理は無視
+            if (window._shop01RequestId !== reqId) return;
 
-        // 古いリクエストは無視
-        if (window._shop01RequestId !== reqId) return;
-
-        requestAnimationFrame(() => {
             markerControl.showShop01(areaKey);
         });
-
-    });
-}
-
-
+    }
 }
 
 
