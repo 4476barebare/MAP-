@@ -94,7 +94,7 @@ function showShop01(areaKey) {
 // show phase2
 // -----------------------
 function showShop02(areaKey) {
-alert(areaKey);
+
     if (!window.map) return;
 
     if (!markerControl.shop02Layer) {
@@ -103,11 +103,11 @@ alert(areaKey);
 
     markerControl.clearShop02();
 
-    var pref = areaId.split('_')[0];
+    // ★ここが正しいキー分解
+    var areaId = areaKey;
 
     var shops =
-        (markerControl.shop01AreaCache[pref] &&
-         markerControl.shop01AreaCache[pref][areaId]) || [];
+        markerControl.shop01AreaCache?.[areaId] || [];
 
     if (!shops.length) return;
 
@@ -138,7 +138,6 @@ alert(areaKey);
         marker.addTo(markerControl.shop02Layer);
     });
 }
-
 
 // -----------------------
 // icon
