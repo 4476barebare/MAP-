@@ -159,7 +159,8 @@ function getIconId(raw) {
 // -----------------------
 function clearShop01() {
     if (markerControl.shop01Layer) {
-        markerControl.shop01Layer.clearLayers();
+        window.map.removeLayer(markerControl.shop01Layer); // ★追加
+        markerControl.shop01Layer = null;                  // ★追加
     }
 }
 
