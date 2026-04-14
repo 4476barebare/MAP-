@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // CHIBA.html → CHIBA
     const pref = currentFile.replace('.html', '').toUpperCase();
 
-    // 安全対策（必要な場合）
+    // 安全対策
     const allowed = ['CHIBA','KANAGAWA','TOKYO','SAITAMA'];
     const prefSafe = allowed.includes(pref) ? pref : 'CHIBA';
 
@@ -191,6 +191,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     showDebug('DOMContentLoaded: ' + csvUrl);
+
+
+    // -----------------------
+    // ★ shop CSV 事前ロード（最速）
+    // -----------------------
+    if (window.markerControl) {
+        setTimeout(() => {
+            markerControl.preloadShop01(prefSafe)
+                .then(() => {
+                    console.log('shop preload:', prefSafe);
+                })
+                .catch(e => {
+                    console.error('shop preload error', e);
+                });
+        }, 0);
+    }
 
 
     // -----------------------
