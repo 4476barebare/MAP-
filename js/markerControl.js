@@ -9,15 +9,13 @@ window.markerControl = {
     shop02Layer: null
 };
 
-function preloadShop01(shopUrl) {
+function preloadShop01(url) {
 
-   // alert('preload start: ' + shopUrl);
+    if (markerControl.shop01Cache[url]) return;
 
-    return fetch(shopUrl)
-        .then(r => r.text())
+    fetch(url)
+        .then(res => res.text())
         .then(text => {
-
-            //alert('preload fetched');
 
             const lines = text.trim().split('\n');
 
@@ -25,37 +23,32 @@ function preloadShop01(shopUrl) {
                 const cols = line.split(',');
 
                 return {
-                    group: cols[0].trim(),
-                    name: cols[1].trim(),
+                    group: cols[0] || '',
+                    name: cols[1] || '',
                     lat: parseFloat(cols[2]),
                     lng: parseFloat(cols[3]),
-                    notes: cols[4] ? cols[4].trim() : '',
-                    icon: cols[5] ? cols[5].trim().toLowerCase() : '',
-                    areaId: cols[6] ? cols[6].trim() : ''
+                    notes: cols[4] || '',
+                    icon: cols[5] || '',
+                    areaId: (cols[6] || '').trim()
                 };
             });
 
-           // alert('parsed count: ' + parsed.length);
-
-            window.markerControl.shop01Cache[shopUrl] = parsed;
-
-            window.markerControl.shop01AreaCache[shopUrl] = {};
+            // ★ここ重要：areaId単体でグルーピング
+            markerControl.shop01AreaCache = {};
 
             parsed.forEach(r => {
-                if (!window.markerControl.shop01AreaCache[shopUrl][r.areaId]) {
-                    window.markerControl.shop01AreaCache[shopUrl][r.areaId] = [];
+
+                const key = r.areaId; // ←これだけ
+
+                if (!markerControl.shop01AreaCache[key]) {
+                    markerControl.shop01AreaCache[key] = [];
                 }
-                window.markerControl.shop01AreaCache[shopUrl][r.areaId].push(r);
+
+                markerControl.shop01AreaCache[key].push(r);
             });
 
-           // alert('preload done');
-
-        })
-        .catch(err => {
-            alert('preload error: ' + err);
         });
 }
-
 // -----------------------
 // show phase1
 // -----------------------
