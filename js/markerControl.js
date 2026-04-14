@@ -7,35 +7,26 @@ window.markerControl = {
     shop01Cache: {},
 
     // -----------------------
-    // areaId → 都道府県抽出
+    // areaId → pref変換
     // -----------------------
     getPrefFromAreaId(areaId) {
         if (!areaId) return null;
-        return areaId.split('_')[0];
+        return areaId.split('_')[0]; // CHIBA_SOTOBOU → CHIBA
     },
 
     // -----------------------
-    // CSVロード（shop01）
+    // CSVロード（pref単位）
     // -----------------------
-    async loadShop01CSV(areaId) {
+    async loadShop01CSV(pref) {
 
-        alert("start: " + areaId);
+        if (!pref) {
+            alert("pref未定義");
+            return [];
+        }
 
-        const pref = this.getPrefFromAreaId(areaId);
-        alert("pref: " + pref);
-
-        if (!pref) return [];
-
-        // キャッシュ
+        // キャッシュチェック
         if (this.shop01Cache[pref]) {
-            const filtered = this.shop01Cache[pref].filter(r => r.areaId === areaId);
-
-            alert(
-                "cache hit\n" +
-                "filter後: " + filtered.length
-            );
-
-            return filtered;
+            return this.shop01Cache[pref];
         }
 
         const url = `/MAP-/KANTO/${pref}_shop.csv`;
@@ -56,32 +47,31 @@ window.markerControl = {
                     lng: parseFloat(cols[3]),
                     notes: cols[4] || '',
                     icon: cols[5] || 'shop',
-                    areaId: (cols[6] || '').trim()
+                    areaId: cols[6] || ''
                 };
             });
 
-            // キャッシュ保存
             this.shop01Cache[pref] = rows;
 
-            const filtered = rows.filter(r => r.areaId === areaId);
-
+            // ★CSVロード確認
             alert(
-                "[CSV loaded]\n" +
-                "pref: " + pref + "\n" +
-                "total: " + rows.length + "\n" +
-                "filtered: " + filtered.length
+                `[shop01 CSV loaded]\n` +
+                `pref: ${pref}\n` +
+                `total: ${rows.length}\n\n` +
+                JSON.stringify(rows.slice(0, 5), null, 2)
             );
 
-            return filtered;
+            return rows;
 
         } catch (e) {
-            alert("CSV load error");
+            console.error('shop01 CSV load error', e);
+            alert('shop01 CSV load error');
             return [];
         }
     },
 
     // -----------------------
-    // 表示（shop01）
+    // 表示（areaIdで絞る）
     // -----------------------
     async showShop01(areaId) {
 
@@ -90,13 +80,27 @@ window.markerControl = {
             return;
         }
 
+        if (!areaId) {
+            alert("areaId未定義");
+            return;
+        }
+
         this.clearShop01();
 
-        alert("showShop01: " + areaId);
+        const pref = this.getPrefFromAreaId(areaId);
 
-        const shops = await this.loadShop01CSV(areaId);
+        alert(`start: ${areaId}\npref: ${pref}`);
 
-        alert("shops: " + shops.length);
+        const rows = await this.loadShop01CSV(pref);
+
+        // ★ここが本体（areaIdでフィルタ）
+        const shops = rows.filter(r => r.areaId === areaId);
+
+        alert(
+            `loaded\npref: ${pref}\n` +
+            `total: ${rows.length}\n` +
+            `filtered: ${shops.length}`
+        );
 
         if (!shops.length) return;
 
@@ -111,14 +115,11 @@ window.markerControl = {
                         className: '',
                         html: `
                             <div class="shop01-label ${shop.icon}">
-                                <svg width="16" height="16">
-                                    <use href="/MAP-/icon/sprite.svg#icon-${shop.icon}"></use>
-                                </svg>
                                 <span>${shop.name}</span>
                             </div>
                         `,
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 16]
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
                     })
                 }
             );
@@ -129,14 +130,14 @@ window.markerControl = {
     },
 
     // -----------------------
-    // 削除（shop01）
+    // 削除
     // -----------------------
     clearShop01() {
 
-        if (!this.shop01Markers.length) return;
+        if (!window.map) return;
 
-        this.shop01Markers.forEach(m => {
-            window.map.removeLayer(m);
+        this.shop01Markers.forEach(marker => {
+            window.map.removeLayer(marker);
         });
 
         this.shop01Markers = [];
