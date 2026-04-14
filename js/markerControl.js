@@ -165,6 +165,10 @@ function showShop01(areaKey) {
     }
 
     window.showDebug("==== showShop01 DONE ====");
+    window.showDebug("pane count: " + Object.keys(window.map._panes || {}).length);
+window.showDebug("layers: shop01=" + !!markerControl.shop01Layer +
+                  " spot=" + !!window.spotMarkers +
+                  " pref=" + !!window.prefSpotLayer);
 }
 
 // -----------------------
