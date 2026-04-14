@@ -176,7 +176,7 @@ function selectArea(areaName) {
     
     // ★追加（最後に表示）
     if (window.markerControl) {
-        markerControl.showShop01(area.areaId);
+        markerControl.showShop01(areaKey);
     }
     
 }
