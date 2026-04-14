@@ -59,12 +59,26 @@ function loadLocationCSV(csvUrl, currentFile) {
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
+        
             
-                        // ★ここ追加
-if (window.markerControl) {
-    markerControl.preloadShop01(filePref);
-}
             
+                if (window.markerControl) {
+        setTimeout(() => {
+            markerControl.preloadShop01(shopUrl)
+                .then(() => {
+                    showDebug('shop preload done');
+                })
+                .catch(e => {
+                    showDebug('shop preload error: ' + e);
+                });
+        }, 0);
+    }
+
+
+
+
+
+
 
             return { main, areas, spots };
         });

@@ -14,6 +14,7 @@ window.markerControl = {
 // preload
 // -----------------------
 function preloadShop01(url) {
+    alert('preloadShop01 fired: ' + url);
 
     const pref = url.split('/').pop().split('_')[0].toUpperCase();
 
