@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var pref = currentFile.replace('.html', '').toUpperCase();
 
     const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
-    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
+    var shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
 
     // -----------------------
     // デバッグ表示（ログ統一）
@@ -190,17 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------
     // shop preload（shopUrl渡す）
     // -----------------------
-    if (window.markerControl) {
-        setTimeout(() => {
-            markerControl.preloadShop01(shopUrl)
-                .then(() => {
-                    showDebug('shop preload done');
-                })
-                .catch(e => {
-                    showDebug('shop preload error: ' + e);
-                });
-        }, 0);
-    }
+
 
     // -----------------------
     // CSVロード
