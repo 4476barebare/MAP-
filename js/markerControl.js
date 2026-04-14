@@ -74,7 +74,15 @@ window.markerControl = {
                 {
                     icon: L.divIcon({
                         className: '',
-                        html: `<div style=width:5px;height:5px;background:#fff;border-radius:50%;"></div>`,
+                        html: `
+                        <div style="
+                        width:6px;
+                        height:6px;
+                        background:#fff;
+                        border-radius:50%;
+                        border:1px solid rgba(0,0,0,0.3);
+                        "></div>
+                        `,
                         iconSize: [5, 5],
                         iconAnchor: [2.5, 2.5]
                     })
