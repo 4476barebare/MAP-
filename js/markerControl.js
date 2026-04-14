@@ -96,7 +96,7 @@ function showShop01(areaKey) {
     window.showDebug("areaKey: " + areaKey);
 
 // ★ここに追加（これだけ）
-    window.map.invalidateSize();
+    window.map.invalidateSize(true);
 
     if (!window.map) {
         window.showDebug("NO MAP");
