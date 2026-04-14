@@ -49,6 +49,42 @@ function preloadShop01(url) {
 
         });
 }
+
+window.showDebug = function(msg) {
+
+    var debugEl = document.getElementById('debug');
+
+    if (!debugEl) {
+        debugEl = document.createElement('div');
+        debugEl.id = 'debug';
+
+        debugEl.style.position = 'fixed';
+        debugEl.style.top = '0';
+        debugEl.style.left = '0';
+        debugEl.style.background = 'rgba(255,255,0,0.9)';
+        debugEl.style.zIndex = '999999';
+        debugEl.style.padding = '6px';
+        debugEl.style.fontSize = '12px';
+        debugEl.style.maxWidth = '320px';
+        debugEl.style.maxHeight = '40vh';
+        debugEl.style.overflow = 'auto';
+        debugEl.style.whiteSpace = 'pre-wrap';
+        debugEl.style.pointerEvents = 'none';
+
+        document.body.appendChild(debugEl);
+    }
+
+    if (typeof msg !== "string") {
+        try {
+            msg = JSON.stringify(msg);
+        } catch (e) {
+            msg = String(msg);
+        }
+    }
+
+    debugEl.textContent += msg + "\n";
+    debugEl.scrollTop = debugEl.scrollHeight;
+};
 // -----------------------
 // show phase1
 // -----------------------
@@ -63,48 +99,51 @@ function showShop01(areaKey) {
         return;
     }
 
-    if (!markerControl.shop01Layer) {
-        markerControl.shop01Layer = L.layerGroup().addTo(window.map);
-        window.showDebug("shop01Layer CREATED");
-    } else {
-        window.showDebug("shop01Layer EXISTS");
-    }
-
-    if (!markerControl.shop01AreaCache) {
-        window.showDebug("CACHE undefined");
+    if (!markerControl) {
+        window.showDebug("NO markerControl");
         return;
     }
 
-    const keys = Object.keys(markerControl.shop01AreaCache || {});
+    if (!markerControl.shop01AreaCache) {
+        window.showDebug("CACHE NOT FOUND");
+        return;
+    }
+
+    var keys = Object.keys(markerControl.shop01AreaCache);
     window.showDebug("CACHE KEYS: " + keys.join(","));
 
-    const shops = markerControl.shop01AreaCache?.[areaKey] || [];
+    var shops = markerControl.shop01AreaCache[areaKey] || [];
 
-    window.showDebug("LOOKUP KEY: " + areaKey);
-    window.showDebug("SHOPS LENGTH: " + shops.length);
+    window.showDebug("LOOKUP: " + areaKey);
+    window.showDebug("COUNT: " + shops.length);
 
-    if (!shops.length) {
+    if (shops.length === 0) {
         window.showDebug("EMPTY RESULT");
         return;
     }
 
-    window.showDebug("FIRST SHOP: " + JSON.stringify(shops[0]));
+    if (!markerControl.shop01Layer) {
+        markerControl.shop01Layer = L.layerGroup().addTo(window.map);
+        window.showDebug("LAYER CREATED");
+    }
 
-    markerControl.clearShop01();
+    markerControl.shop01Layer.clearLayers();
     window.showDebug("LAYER CLEARED");
 
-    shops.forEach(function (shop, i) {
+    for (var i = 0; i < shops.length; i++) {
+
+        var s = shops[i];
 
         if (i === 0) {
-            window.showDebug("FIRST LAT/LNG: " + shop.lat + "," + shop.lng);
+            window.showDebug("FIRST: " + s.lat + "," + s.lng);
         }
 
-        if (isNaN(shop.lat) || isNaN(shop.lng)) {
-            window.showDebug("SKIP NaN: " + JSON.stringify(shop));
-            return;
+        if (isNaN(s.lat) || isNaN(s.lng)) {
+            window.showDebug("SKIP NaN");
+            continue;
         }
 
-        var marker = L.circleMarker([shop.lat, shop.lng], {
+        var marker = L.circleMarker([s.lat, s.lng], {
             radius: 3,
             color: '#191970',
             weight: 1,
@@ -113,7 +152,7 @@ function showShop01(areaKey) {
         });
 
         marker.addTo(markerControl.shop01Layer);
-    });
+    }
 
     window.showDebug("==== showShop01 DONE ====");
 }
