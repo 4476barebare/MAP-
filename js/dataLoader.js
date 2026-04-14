@@ -256,7 +256,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
             updateWhenIdle: true
         }).addTo(window.map);
 
-    alert(areaKey);
+
     markerControl.showShop01(areaKey);
 
 }
