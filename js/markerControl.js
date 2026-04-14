@@ -69,6 +69,12 @@ window.markerControl = {
             alert('shop01 CSV load error');
             return [];
         }
+        
+        alert(
+  "filter前: " + rows.length +
+  "\nfilter後: " + rows.filter(r => r.areaId === areaId).length +
+  "\nareaId: " + areaId
+);
     },
 
     // -----------------------
