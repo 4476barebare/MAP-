@@ -186,7 +186,7 @@ const notes   = (area.notes || '').trim();
 // ★キー生成
 const areaKey = area_Id + "_" + notes;
 
-    alert(areaKey);
+
     hidePrefSpots();
 
 
@@ -340,7 +340,7 @@ window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
-function showSpotsForArea(areaId) {
+function showSpotsForArea(areaKey) {
 
     if (window.spotMarkers) {
         window.spotMarkers.forEach(m =>
@@ -350,7 +350,7 @@ function showSpotsForArea(areaId) {
     window.spotMarkers = [];
 
     const spots = window.spotData.filter(s =>
-        s.areaId === areaId
+        s.areaId === areaKey
     );
 
     if (!spots.length) return;
