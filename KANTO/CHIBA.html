@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var pref = currentFile.replace('.html', '').toUpperCase();
 
     const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
-    var shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
+    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
 
     // -----------------------
     // デバッグ表示（ログ統一）
@@ -190,6 +190,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------
     // shop preload（shopUrl渡す）
     // -----------------------
+ // -----------------------
+    // shop preload（CSVと完全同列処理）
+    // -----------------------
+    preloadShop01(shopUrl);
+
 
 
     // -----------------------
