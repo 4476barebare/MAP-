@@ -224,7 +224,7 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
-
+window.map.off('move');
     window.map.setMaxBounds(null);
 
     drawLocation(selectName, spotLat, spotLng, 13);
