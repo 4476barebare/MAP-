@@ -10,6 +10,48 @@ window.markerControl = {
 };
 
 
+function preloadShop01(shopUrl) {
+
+    if (window.markerControl.shop01Cache && window.markerControl.shop01Cache[shopUrl]) {
+        return Promise.resolve();
+    }
+
+    return fetch(shopUrl)
+        .then(r => r.text())
+        .then(text => {
+
+            const lines = text.trim().split('\n');
+
+            const parsed = lines.slice(1).map(line => {
+                const cols = line.split(',');
+
+                return {
+                    group: cols[0].trim(),
+                    name: cols[1].trim(),
+                    lat: parseFloat(cols[2]),
+                    lng: parseFloat(cols[3]),
+                    notes: cols[4] ? cols[4].trim() : '',
+                    icon: cols[5] ? cols[5].trim().toLowerCase() : '',
+                    areaId: cols[6] ? cols[6].trim() : ''
+                };
+            });
+
+            window.markerControl.shop01Cache[shopUrl] = parsed;
+
+            window.markerControl.shop01AreaCache[shopUrl] = {};
+
+            parsed.forEach(r => {
+                if (!window.markerControl.shop01AreaCache[shopUrl][r.areaId]) {
+                    window.markerControl.shop01AreaCache[shopUrl][r.areaId] = [];
+                }
+                window.markerControl.shop01AreaCache[shopUrl][r.areaId].push(r);
+            });
+
+        });
+}
+
+
+
 // -----------------------
 // preload
 // -----------------------

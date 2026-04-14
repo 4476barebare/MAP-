@@ -62,17 +62,7 @@ function loadLocationCSV(csvUrl, currentFile) {
         
             
             
-                if (window.markerControl) {
-        setTimeout(() => {
-            markerControl.preloadShop01(shopUrl)
-                .then(() => {
-                    showDebug('shop preload done');
-                })
-                .catch(e => {
-                    showDebug('shop preload error: ' + e);
-                });
-        }, 0);
-    }
+
 
 
 
