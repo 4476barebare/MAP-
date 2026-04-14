@@ -14,22 +14,15 @@ window.markerControl = {
 // preload
 // -----------------------
 function preloadShop01(url) {
-    alert('preloadShop01 fired: ' + url);
 
-    const pref = url.split('/').pop().split('_')[0].toUpperCase();
+    return fetch(url)
+        .then(res => res.text())
+        .then(text => {
 
-    if (window.markerControl.shop01Cache[pref]) return;
+            const lines = text.trim().split('\n');
 
-    fetch(url)
-        .then(function(res) {
-            return res.text();
-        })
-        .then(function(text) {
-
-            var lines = text.trim().split('\n');
-
-            var parsed = lines.slice(1).map(function(line) {
-                var cols = line.split(',');
+            const parsed = lines.slice(1).map(line => {
+                const cols = line.split(',');
 
                 return {
                     group: cols[0] || '',
@@ -42,25 +35,17 @@ function preloadShop01(url) {
                 };
             });
 
-            window.markerControl.shop01Cache[pref] = parsed;
-            window.markerControl.shop01AreaCache[pref] = {};
+            window.markerControl.shop01Cache[url] = parsed;
 
-            parsed.forEach(function(r) {
-                if (!window.markerControl.shop01AreaCache[pref][r.areaId]) {
-                    window.markerControl.shop01AreaCache[pref][r.areaId] = [];
-                }
-                window.markerControl.shop01AreaCache[pref][r.areaId].push(r);
+            const cache = {};
+            parsed.forEach(r => {
+                if (!cache[r.areaId]) cache[r.areaId] = [];
+                cache[r.areaId].push(r);
             });
 
-            if (window.showDebug) {
-                showDebug('preload done: ' + pref);
-            }
-        })
-        .catch(function(err) {
-            console.error('preload error:', err);
+            window.markerControl.shop01AreaCache[url] = cache;
         });
 }
-
 // -----------------------
 // show phase1
 // -----------------------
