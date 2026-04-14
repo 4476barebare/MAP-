@@ -112,64 +112,61 @@ window.markerControl = {
             .replace(/[^\w-]/g, '');
     },
 
-    // -----------------------
-    // phase2（SVG sprite + 白丸背景）
-    // -----------------------
-    showShop02(areaId) {
 
-        if (!window.map) return;
+// ===============================
+// phase2（スポット表示専用）
+// ===============================
+showShop02(areaKey) {
 
-        if (!this.shop02Layer) {
-            this.shop02Layer = L.layerGroup().addTo(window.map);
-        }
+    if (!window.map) return;
 
-        this.clearShop02();
+    if (!this.shop02Layer) {
+        this.shop02Layer = L.layerGroup().addTo(window.map);
+    }
 
-        const pref = areaId.split('_')[0];
+    this.clearShop02();
 
-        const shops =
-            (this.shop01AreaCache[pref] &&
-             this.shop01AreaCache[pref][areaId]) || [];
+    // ★02はareaKeyそのまま使う（split禁止・01依存禁止）
+    const shops = this.shop02Cache[areaKey] || [];
 
-        if (!shops.length) return;
+    if (!shops.length) return;
 
-        shops.forEach(shop => {
+    shops.forEach(shop => {
 
-            if (isNaN(shop.lat) || isNaN(shop.lng)) return;
+        if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
-            const iconId = this.getIconId(shop.icon);
+        const iconId = this.getIconId(shop.icon);
 
-            const html = `
-                <div style="
-                    width:34px;
-                    height:34px;
-                    background:#fff;
-                    border:2px solid #191970;
-                    border-radius:50%;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    box-shadow:0 1px 3px rgba(0,0,0,0.25);
-                ">
-                    <svg width="18" height="18">
-                        <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                    </svg>
-                </div>
-            `;
+        const html = `
+            <div style="
+                width:34px;
+                height:34px;
+                background:#fff;
+                border:2px solid #191970;
+                border-radius:50%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                box-shadow:0 1px 3px rgba(0,0,0,0.25);
+            ">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                    <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                </svg>
+            </div>
+        `;
 
-            const marker = L.marker([shop.lat, shop.lng], {
-                icon: L.divIcon({
-                    className: '',
-                    html: html,
-                    iconSize: [34, 34],
-                    iconAnchor: [17, 17]
-                })
-            });
-
-            marker.addTo(this.shop02Layer);
+        const marker = L.marker([shop.lat, shop.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: html,
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
+            })
         });
-    },
 
+        marker.addTo(this.shop02Layer);
+    });
+}
     // -----------------------
     // クリア
     // -----------------------
