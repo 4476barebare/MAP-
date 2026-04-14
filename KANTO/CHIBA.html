@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var pref = currentFile.replace('.html', '').toUpperCase();
 
     const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
-    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
+    shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
 
     // -----------------------
     // デバッグ表示（ログ統一）
@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('map-menu').style.display = 'block';
             document.getElementById('map-back-btn').style.display = 'none';
+            
         }
 
         // -----------------------
