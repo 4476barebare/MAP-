@@ -264,18 +264,10 @@ window.map.off('move');
 function enableDragForArea() {
     if (!window.areaBounds) return;
 
-    const bounds = window.areaBounds;
-
-    // ドラッグ有効
     window.map.dragging.enable();
-
-    // Leaflet標準の境界制御に任せる
-    window.map.setMaxBounds(bounds);
-
-    // はみ出し補正を滑らかにする
+    window.map.setMaxBounds(window.areaBounds);
     window.map.options.maxBoundsViscosity = 1.0;
 }
-
 
 
 function goBack(hash) {
