@@ -18,22 +18,24 @@ window.markerControl = {
     // CSVロード（shop01）
     // -----------------------
     async loadShop01CSV(areaId) {
-        
-        
-         alert("start: " + areaId);
 
-    const pref = this.getPrefFromAreaId(areaId);
-
-    alert("pref: " + pref);
-
-    if (!pref) return [];
+        alert("start: " + areaId);
 
         const pref = this.getPrefFromAreaId(areaId);
+        alert("pref: " + pref);
+
         if (!pref) return [];
 
         // キャッシュ
         if (this.shop01Cache[pref]) {
-            return this.shop01Cache[pref].filter(r => r.areaId === areaId);
+            const filtered = this.shop01Cache[pref].filter(r => r.areaId === areaId);
+
+            alert(
+                "cache hit\n" +
+                "filter後: " + filtered.length
+            );
+
+            return filtered;
         }
 
         const url = `/MAP-/KANTO/${pref}_shop.csv`;
@@ -54,36 +56,28 @@ window.markerControl = {
                     lng: parseFloat(cols[3]),
                     notes: cols[4] || '',
                     icon: cols[5] || 'shop',
-                    areaId: cols[6] || ''
+                    areaId: (cols[6] || '').trim()
                 };
             });
 
             // キャッシュ保存
             this.shop01Cache[pref] = rows;
 
-            // -----------------------
-            // ★デバッグ表示
-            // -----------------------
+            const filtered = rows.filter(r => r.areaId === areaId);
+
             alert(
-                `[shop01 CSV loaded]\n` +
-                `pref: ${pref}\n` +
-                `count: ${rows.length}\n\n` +
-                JSON.stringify(rows.slice(0, 10), null, 2) // 先頭10件だけ
+                "[CSV loaded]\n" +
+                "pref: " + pref + "\n" +
+                "total: " + rows.length + "\n" +
+                "filtered: " + filtered.length
             );
 
-            return rows.filter(r => r.areaId === areaId);
+            return filtered;
 
         } catch (e) {
-            console.error('shop01 CSV load error', e);
-            alert('shop01 CSV load error');
+            alert("CSV load error");
             return [];
         }
-        
-        alert(
-  "filter前: " + rows.length +
-  "\nfilter後: " + rows.filter(r => r.areaId === areaId).length +
-  "\nareaId: " + areaId
-);
     },
 
     // -----------------------
@@ -91,9 +85,19 @@ window.markerControl = {
     // -----------------------
     async showShop01(areaId) {
 
+        if (!window.map) {
+            alert("map未生成");
+            return;
+        }
+
         this.clearShop01();
 
+        alert("showShop01: " + areaId);
+
         const shops = await this.loadShop01CSV(areaId);
+
+        alert("shops: " + shops.length);
+
         if (!shops.length) return;
 
         shops.forEach(shop => {
