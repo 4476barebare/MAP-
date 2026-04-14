@@ -202,11 +202,14 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    showSpotsForArea(areaKey);
+  
 
-//window.map.once('moveend', () => {
+window.map.once('moveend', () => {
     enableDragForArea();
-//});
+    showSpotsForArea(areaKey);
+    markerControl.showShop01(areaKey);
+
+});
 
 
 
@@ -214,16 +217,8 @@ function selectArea(areaName) {
     // -----------------------
     // 完全停止後に即表示
     // -----------------------
-    if (window.markerControl) {
-
-        window.map.once('moveend', () => {
-
-            // 古い処理は無視
-            if (window._shop01RequestId !== reqId) return;
-
-            markerControl.showShop01(areaKey);
-        });
-    }
+   
+   
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
