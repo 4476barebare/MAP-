@@ -325,6 +325,8 @@ window.areaBounds = null;
 
         location.hash = '';
         window.currentHash = '';
+        window.currentAreaId = '';
+    
         
         
 requestAnimationFrame(() => {
