@@ -1,13 +1,13 @@
 // ===============================
-// markerControl.js（シンプル統一版）
+// markerControl.js（軽量版）
 // ===============================
 window.markerControl = {
 
     // -----------------------
-    // キャッシュ（1階層に統一）
+    // キャッシュ
     // -----------------------
-    shop01Cache: {},
-    shop02Cache: {},
+    shop01Cache: {},        // pref単位
+    shop01AreaCache: {},    // pref → areaId単位
 
     // -----------------------
     // レイヤー
@@ -18,11 +18,11 @@ window.markerControl = {
     // -----------------------
     // 事前ロード
     // -----------------------
-    async preloadShop01(areaKey) {
+    async preloadShop01(pref) {
 
-        if (this.shop01Cache[areaKey]) return;
+        if (this.shop01Cache[pref]) return;
 
-        const url = `/MAP-/KANTO/${areaKey}_shop.csv`;
+        const url = `/MAP-/KANTO/${pref}_shop.csv`;
 
         const res = await fetch(url);
         const text = await res.text();
@@ -43,15 +43,27 @@ window.markerControl = {
             };
         });
 
-        this.shop01Cache[areaKey] = parsed;
+        this.shop01Cache[pref] = parsed;
 
-        console.log('preload done:', areaKey);
+        // -----------------------
+        // area単位キャッシュ
+        // -----------------------
+        this.shop01AreaCache[pref] = {};
+
+        parsed.forEach(r => {
+            if (!this.shop01AreaCache[pref][r.areaId]) {
+                this.shop01AreaCache[pref][r.areaId] = [];
+            }
+            this.shop01AreaCache[pref][r.areaId].push(r);
+        });
+
+        console.log('preload done:', pref);
     },
 
     // -----------------------
-    // phase1
+    // phase1（Canvas・軽量）
     // -----------------------
-    showShop01(areaKey) {
+    showShop01(areaId) {
 
         if (!window.map) return;
 
@@ -61,7 +73,11 @@ window.markerControl = {
 
         this.clearShop01();
 
-        const shops = this.shop01Cache[areaKey] || [];
+        const pref = areaId.split('_')[0];
+
+        const shops =
+            (this.shop01AreaCache[pref] &&
+             this.shop01AreaCache[pref][areaId]) || [];
 
         if (!shops.length) return;
 
@@ -82,7 +98,7 @@ window.markerControl = {
     },
 
     // -----------------------
-    // icon整形
+    // icon整形（sprite用）
     // -----------------------
     getIconId(raw) {
 
@@ -97,59 +113,62 @@ window.markerControl = {
     },
 
     // -----------------------
-    // phase2
+    // phase2（SVG sprite + 白丸背景）
     // -----------------------
-    showShop02(areaKey) {
+// ===============================
+// phase2（スポット表示専用）
+// ===============================
+showShop02(areaKey) {
 
-        if (!window.map) return;
+    if (!window.map) return;
 
-        if (!this.shop02Layer) {
-            this.shop02Layer = L.layerGroup().addTo(window.map);
-        }
+    if (!this.shop02Layer) {
+        this.shop02Layer = L.layerGroup().addTo(window.map);
+    }
 
-        this.clearShop02();
+    this.clearShop02();
 
-        const shops = this.shop01Cache[areaKey] || [];
+    // ★02はareaKeyそのまま使う（split禁止・01依存禁止）
+    const shops = this.shop02Cache[areaKey] || [];
 
-        if (!shops.length) return;
+    if (!shops.length) return;
 
-        shops.forEach(shop => {
+    shops.forEach(shop => {
 
-            if (isNaN(shop.lat) || isNaN(shop.lng)) return;
+        if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
-            const iconId = this.getIconId(shop.icon);
+        const iconId = this.getIconId(shop.icon);
 
-            const html = `
-                <div style="
-                    width:32px;
-                    height:32px;
-                    background:#fff;
-                    border:2px solid #191970;
-                    border-radius:50%;
-                    display:flex;
-                    align-items:center;
-                    justify-content:center;
-                    box-shadow:0 2px 6px rgba(0,0,0,0.25);
-                ">
-                    <svg width="18" height="18" viewBox="0 0 24 24">
-                        <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                    </svg>
-                </div>
-            `;
+        const html = `
+            <div style="
+                width:34px;
+                height:34px;
+                background:#fff;
+                border:2px solid #191970;
+                border-radius:50%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                box-shadow:0 1px 3px rgba(0,0,0,0.25);
+            ">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                    <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                </svg>
+            </div>
+        `;
 
-            const marker = L.marker([shop.lat, shop.lng], {
-                icon: L.divIcon({
-                    className: '',
-                    html,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                })
-            });
-
-            marker.addTo(this.shop02Layer);
+        const marker = L.marker([shop.lat, shop.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: html,
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
+            })
         });
-    },
 
+        marker.addTo(this.shop02Layer);
+    });
+}
     // -----------------------
     // クリア
     // -----------------------
@@ -164,4 +183,5 @@ window.markerControl = {
             this.shop02Layer.clearLayers();
         }
     }
+
 };
