@@ -141,10 +141,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
                 
-                            // ★ここ追加
-if (window.markerControl) {
-    markerControl.preloadShop01(filePref);
-}
+                
                 
     }
 
@@ -153,13 +150,16 @@ if (window.markerControl) {
     if (!window.currentAreaId) {
         showPrefSpots();
         
-                    // ★ここ追加
+
+        
+    }
+    
+                        // ★ここ追加
 if (window.markerControl) {
     markerControl.preloadShop01(filePref);
 }
-        
-        
-    }
+    
+    
 }
 
 function selectArea(areaName) {
