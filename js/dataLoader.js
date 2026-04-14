@@ -216,7 +216,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
     const areaKey = areaName; // or 必要なら再構成
 
     if (window.markerControl) {
-        markerControl.showShop02(areaKey);
+        markerControl.showShop02(areaName);
     }
 
     const tileUrl =
@@ -259,10 +259,19 @@ function goBack(hash) {
 
     window.currentAreaId = null;
     
-    // ★追加
-    if (window.markerControl) {
-        markerControl.clearShop01();
-    }
+if (window.markerControl) {
+    markerControl.clearShop01();
+    markerControl.clearShop02();
+}
+
+if (window.spotMarkers) {
+    window.spotMarkers.forEach(m => window.map.removeLayer(m));
+    window.spotMarkers = [];
+}
+
+if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+    window.map.removeLayer(window.prefSpotLayer);
+}
 
 
     hash = hash || window.currentHash || '';
