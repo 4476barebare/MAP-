@@ -54,29 +54,58 @@ function preloadShop01(url) {
 // -----------------------
 function showShop01(areaKey) {
 
+    alert("[showShop01] called: " + areaKey);
 
-
-    if (!window.map) return;
-
-    // レイヤ初期化
-    if (!markerControl.shop01Layer) {
-        markerControl.shop01Layer = L.layerGroup().addTo(window.map);
-    }
-
-    markerControl.clearShop01();
-
-
-    // ★ここが本体修正
-    var shops = markerControl.shop01AreaCache?.[areaKey] || [];
-
-    if (!shops.length) {
-        alert("shops empty");
+    if (!window.map) {
+        alert("[showShop01] NO MAP");
         return;
     }
 
-    shops.forEach(function(shop) {
+    if (!markerControl.shop01Layer) {
+        markerControl.shop01Layer = L.layerGroup().addTo(window.map);
+        alert("[shop01Layer] CREATED");
+    } else {
+        alert("[shop01Layer] EXISTS");
+    }
 
-        if (isNaN(shop.lat) || isNaN(shop.lng)) return;
+    alert("[cache exists] " + !!markerControl.shop01AreaCache);
+
+    alert(
+        "[cache keys] " +
+        Object.keys(markerControl.shop01AreaCache || {}).join(",")
+    );
+
+    var shops = markerControl.shop01AreaCache?.[areaKey] || [];
+
+    alert("[lookup key] " + areaKey);
+    alert("[shops length] " + shops.length);
+
+    if (!shops.length) {
+        alert("[showShop01] EMPTY RESULT for key=" + areaKey);
+        return;
+    }
+
+    alert("[first shop raw] " + JSON.stringify(shops[0]));
+
+    markerControl.clearShop01();
+
+    alert(
+        "[after clear] layer count = " +
+        (markerControl.shop01Layer
+            ? markerControl.shop01Layer.getLayers().length
+            : "no layer")
+    );
+
+    shops.forEach(function (shop, i) {
+
+        if (i === 0) {
+            alert("[first marker lat/lng] " + shop.lat + "," + shop.lng);
+        }
+
+        if (isNaN(shop.lat) || isNaN(shop.lng)) {
+            alert("[SKIP NaN] " + JSON.stringify(shop));
+            return;
+        }
 
         var marker = L.circleMarker([shop.lat, shop.lng], {
             radius: 3,
@@ -88,6 +117,8 @@ function showShop01(areaKey) {
 
         marker.addTo(markerControl.shop01Layer);
     });
+
+    alert("[showShop01] DONE");
 }
 // -----------------------
 // show phase2
