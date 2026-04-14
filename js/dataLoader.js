@@ -279,10 +279,7 @@ window.map.off('moveend');
 window.areaBounds = null;
 window.currentAreaId = null;
     
-if (window.markerControl) {
-    markerControl.clearShop01();
-    markerControl.clearShop02();
-}
+
 
 if (window.spotMarkers) {
     window.spotMarkers.forEach(m => window.map.removeLayer(m));
@@ -321,6 +318,12 @@ if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
         
         
 requestAnimationFrame(() => {
+    if (window.markerControl) {
+    markerControl.clearShop01();
+    markerControl.clearShop02();
+}
+    
+    
     showPrefSpots();
 });
     }
