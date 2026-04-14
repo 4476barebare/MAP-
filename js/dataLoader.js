@@ -166,6 +166,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 }
 
 function selectArea(areaName) {
+    alert(areaName);
     
     if (window.markerControl && markerControl.shop01Layer) {
     window.map.removeLayer(markerControl.shop01Layer);
