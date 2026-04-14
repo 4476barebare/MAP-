@@ -329,7 +329,8 @@ window.areaBounds = null;
 
         location.hash = '';
         window.currentHash = '';
-
+        
+        markerControl.clearShop01(); // ★追加
         showPrefSpots();
     }
 
