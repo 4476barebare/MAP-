@@ -1,5 +1,5 @@
 // ===============================
-// markerControl.js
+// markerControl.js（軽量版）
 // ===============================
 window.markerControl = {
 
@@ -16,11 +16,10 @@ window.markerControl = {
     shop02Layer: null,
 
     // -----------------------
-    // 事前ロード（1回だけ）
+    // 事前ロード
     // -----------------------
     async preloadShop01(pref) {
 
-        // 既にロード済みならスキップ
         if (this.shop01Cache[pref]) return;
 
         const url = `/MAP-/KANTO/${pref}_shop.csv`;
@@ -39,25 +38,22 @@ window.markerControl = {
                 lat: parseFloat(cols[2]),
                 lng: parseFloat(cols[3]),
                 notes: cols[4] || '',
-                icon: cols[5] || 'shop',
+                icon: cols[5] || '',
                 areaId: (cols[6] || '').trim()
             };
         });
 
-        // pref単位キャッシュ
         this.shop01Cache[pref] = parsed;
 
         // -----------------------
-        // ★ area単位キャッシュ（重要）
+        // area単位キャッシュ
         // -----------------------
         this.shop01AreaCache[pref] = {};
 
         parsed.forEach(r => {
-
             if (!this.shop01AreaCache[pref][r.areaId]) {
                 this.shop01AreaCache[pref][r.areaId] = [];
             }
-
             this.shop01AreaCache[pref][r.areaId].push(r);
         });
 
@@ -65,13 +61,13 @@ window.markerControl = {
     },
 
     // -----------------------
-    // phase1（軽量点）
+    // phase1（Canvas・軽量）
     // -----------------------
     showShop01(areaId) {
 
         if (!window.map) return;
 
-        // レイヤー初期化
+        // 初期化
         if (!this.shop01Layer) {
             this.shop01Layer = L.layerGroup().addTo(window.map);
         }
@@ -80,7 +76,6 @@ window.markerControl = {
 
         const pref = areaId.split('_')[0];
 
-        // ★キャッシュから即取得（filterなし）
         const shops =
             (this.shop01AreaCache[pref] &&
              this.shop01AreaCache[pref][areaId]) || [];
@@ -91,21 +86,17 @@ window.markerControl = {
 
             if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
-            const marker = L.marker([shop.lat, shop.lng], {
-                icon: L.divIcon({
-                    className: '',
-                    html: `
-                        <div style="
-                            width:6px;
-                            height:6px;
-                            background:#fff;
-                            border-radius:50%;
-                            border:1px solid #191970;
-                        "></div>
-                    `,
-                    iconSize: [8, 8],
-                    iconAnchor: [4, 4]
-                })
+            // ★ Canvas描画（ここが重要）
+            const marker = L.circleMarker([shop.lat, shop.lng], {
+                radius: 3,
+
+                // 枠
+                color: '#191970',
+                weight: 1,
+
+                // 塗り
+                fillColor: '#fff',
+                fillOpacity: 1
             });
 
             marker.addTo(this.shop01Layer);
@@ -113,7 +104,7 @@ window.markerControl = {
     },
 
     // -----------------------
-    // phase2（ラベル表示）
+    // phase2（ラベル・DOM）
     // -----------------------
     showShop02(areaId) {
 
@@ -162,7 +153,7 @@ window.markerControl = {
     },
 
     // -----------------------
-    // クリア phase1
+    // クリア
     // -----------------------
     clearShop01() {
         if (this.shop01Layer) {
@@ -170,9 +161,6 @@ window.markerControl = {
         }
     },
 
-    // -----------------------
-    // クリア phase2
-    // -----------------------
     clearShop02() {
         if (this.shop02Layer) {
             this.shop02Layer.clearLayers();
