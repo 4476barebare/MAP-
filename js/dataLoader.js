@@ -183,11 +183,6 @@ function selectArea(areaName) {
     window._shop01RequestId = reqId;
 
     // -----------------------
-    // ズーム開始で消す（1回だけ）
-    // -----------------------
-
-
-    // -----------------------
     // 地図移動
     // -----------------------
     drawLocation(
@@ -202,27 +197,28 @@ function selectArea(areaName) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-  
+    // -----------------------
+    // 描画タイミング制御
+    // -----------------------
+    window.map.once('moveend', () => {
 
-window.map.once('moveend', () => {
-    enableDragForArea();
-    showSpotsForArea(areaKey);
-   
-   
-   if (window._shop01RequestId !== reqId) return;
-    // ★ もう1フレーム待つ
-    setTimeout(() => {
-        markerControl.showShop01(areaKey);
-    }, 0);
+        // ① 先に通常スポット
+        showSpotsForArea(areaKey);
 
-});
+        // ② リクエスト確認
+        if (window._shop01RequestId !== reqId) return;
 
+        // ③ ショップマーカー描画（次フレーム）
+        setTimeout(() => {
+            markerControl.showShop01(areaKey);
 
+            // ④ 最後にドラッグ制御ON
+            enableDragForArea();
 
-//-----------------
-   
-   
+        }, 0);
+    });
 }
+
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
 window.map.off('move');
