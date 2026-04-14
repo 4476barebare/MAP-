@@ -4,19 +4,22 @@
 window.markerControl = {
 
     shop01Markers: [],
+    shop02Markers: [],
+
     shop01Cache: {},
+
+    shop01Layer: null, // phase1
+    shop02Layer: null, // phase2
 
     // -----------------------
     // CSVロード（pref単位）
     // -----------------------
     async loadShop01CSV(areaId) {
 
-        // ★ここはファイル取得のためだけ
         const pref = areaId.split('_')[0];
-
         const url = `/MAP-/KANTO/${pref}_shop.csv`;
 
-        // キャッシュ（pref単位）
+        // キャッシュ
         if (!this.shop01Cache[pref]) {
 
             const res = await fetch(url);
@@ -37,32 +40,26 @@ window.markerControl = {
                     areaId: (cols[6] || '').trim()
                 };
             });
-
-            //alert(`CSV loaded: ${pref} / ${this.shop01Cache[pref].length}`);
         }
 
-        // ★ここが最重要：渡された値そのまま使う
-        const filtered = this.shop01Cache[pref].filter(r => r.areaId === areaId);
-
-        return filtered;
+        return this.shop01Cache[pref].filter(r => r.areaId === areaId);
     },
 
     // -----------------------
-    // 表示
+    // phase1（軽量点）
     // -----------------------
     async showShop01(areaId) {
 
-        if (!window.map) {
-            alert("map未生成");
-            return;
+        if (!window.map) return;
+
+        // レイヤー初期化
+        if (!this.shop01Layer) {
+            this.shop01Layer = L.layerGroup().addTo(window.map);
         }
 
         this.clearShop01();
 
-        //alert("表示: " + areaId);
-
         const shops = await this.loadShop01CSV(areaId);
-
         if (!shops.length) return;
 
         shops.forEach(shop => {
@@ -74,35 +71,93 @@ window.markerControl = {
                 {
                     icon: L.divIcon({
                         className: '',
-                        
                         html: `
-    <div style="
-        width:6px;
-        height:6px;
-        background:#fff;
-        border-radius:50%;
-        border:1px solid #191970;
-    "></div>
-`,
-iconSize: [6, 6],
-iconAnchor: [3, 3]
+                            <div style="
+                                width:6px;
+                                height:6px;
+                                background:#fff;
+                                border-radius:50%;
+                                border:1px solid #191970;
+                            "></div>
+                        `,
+                        iconSize: [8, 8],
+                        iconAnchor: [4, 4]
                     })
                 }
             );
 
-            marker.addTo(window.map);
+            marker.addTo(this.shop01Layer);
             this.shop01Markers.push(marker);
         });
     },
 
     // -----------------------
-    // 削除
+    // phase2（拡大表示用）
     // -----------------------
-    clearShop01() {
+    async showShop02(areaId) {
 
         if (!window.map) return;
 
-        this.shop01Markers.forEach(m => window.map.removeLayer(m));
+        // レイヤー初期化
+        if (!this.shop02Layer) {
+            this.shop02Layer = L.layerGroup().addTo(window.map);
+        }
+
+        this.clearShop02();
+
+        const shops = await this.loadShop01CSV(areaId);
+        if (!shops.length) return;
+
+        shops.forEach(shop => {
+
+            if (isNaN(shop.lat) || isNaN(shop.lng)) return;
+
+            const marker = L.marker(
+                [shop.lat, shop.lng],
+                {
+                    icon: L.divIcon({
+                        className: '',
+                        html: `
+                            <div style="
+                                background:#191970;
+                                color:#fff;
+                                padding:4px 6px;
+                                font-size:10px;
+                                border-radius:4px;
+                                white-space:nowrap;
+                            ">
+                                ${shop.name}
+                            </div>
+                        `,
+                        iconSize: [80, 20],
+                        iconAnchor: [40, 10]
+                    })
+                }
+            );
+
+            marker.addTo(this.shop02Layer);
+            this.shop02Markers.push(marker);
+        });
+    },
+
+    // -----------------------
+    // 削除 phase1
+    // -----------------------
+    clearShop01() {
+        if (this.shop01Layer) {
+            this.shop01Layer.clearLayers();
+        }
         this.shop01Markers = [];
+    },
+
+    // -----------------------
+    // 削除 phase2
+    // -----------------------
+    clearShop02() {
+        if (this.shop02Layer) {
+            this.shop02Layer.clearLayers();
+        }
+        this.shop02Markers = [];
     }
+
 };
