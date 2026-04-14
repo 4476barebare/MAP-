@@ -175,17 +175,25 @@ function selectArea(areaName) {
     // -----------------------
     // ★ここを変更
     // -----------------------
-    if (window.markerControl) {
+if (window.markerControl) {
 
-        // ズーム中なら待つ
-        if (window.map._animatingZoom) {
-            window.map.once('zoomend', () => {
-                markerControl.showShop01(areaKey);
-            });
-        } else {
+    // 既存の待機をキャンセル用ID
+    const reqId = Date.now();
+    window._shop01RequestId = reqId;
+
+    window.map.once('moveend', () => {
+
+        // 古いリクエストは無視
+        if (window._shop01RequestId !== reqId) return;
+
+        requestAnimationFrame(() => {
             markerControl.showShop01(areaKey);
-        }
-    }
+        });
+
+    });
+}
+
+
 }
 
 
