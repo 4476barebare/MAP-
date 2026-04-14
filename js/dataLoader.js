@@ -264,21 +264,28 @@ window.map.off('move');
 
 }
 
-
 function enableDragForArea() {
 
     if (!window.areaBounds) return;
 
     window.map.dragging.enable();
-    window.map.options.inertia = false;
 
-    // 既存moveを必ず一旦消す（重複防止）
+    // ★ これで古い拘束を完全削除
     window.map.off('move');
 
-    window.map.on('move', () => {
-        window.map.panInsideBounds(window.areaBounds, {
-            animate: false
-        });
+    // ★ 安定版の拘束
+    window.map.on('move', function () {
+
+        if (!window.areaBounds) return;
+
+        const b = window.areaBounds;
+        const c = window.map.getCenter();
+
+        if (!b.contains(c)) {
+            window.map.panInsideBounds(b, {
+                animate: false
+            });
+        }
     });
 }
 
