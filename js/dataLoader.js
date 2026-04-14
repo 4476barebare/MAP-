@@ -60,14 +60,7 @@ function loadLocationCSV(csvUrl, currentFile) {
             window.areaData = areas;
             window.spotData = spots;
             
-            // ★ここ追加
-if (window.markerControl) {
-    try {
-        markerControl.preloadShop01(filePref);
-    } catch (e) {
-        alert('preload error: ' + e.message);
-    }
-}
+
             
 
             return { main, areas, spots };
@@ -147,12 +140,25 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
         window.currentTileLayer =
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
+                
+                            // ★ここ追加
+if (window.markerControl) {
+    markerControl.preloadShop01(filePref);
+}
+                
     }
 
     window.currentHash = location.hash;
 
     if (!window.currentAreaId) {
         showPrefSpots();
+        
+                    // ★ここ追加
+if (window.markerControl) {
+    markerControl.preloadShop01(filePref);
+}
+        
+        
     }
 }
 
