@@ -138,6 +138,8 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
                 ? window.map.tap.enable()
                 : window.map.tap.disable();
         }
+        
+        window.map._resetView(window.map.getCenter(), window.map.getZoom(), true);
 
     } else {
 
@@ -148,7 +150,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
                 
-                
+                window.map._resetView(window.map.getCenter(), window.map.getZoom(), true);
                 
     }
 
@@ -160,7 +162,7 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
         
     }
-    
+
     
     
 }
