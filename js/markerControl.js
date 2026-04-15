@@ -91,32 +91,50 @@ function showShop02(areaKey) {
     if (!shops.length) return;
 
     shops.forEach(shop => {
+
         if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
         const iconId = getIconId(shop.icon);
+        const label = (shop.group ? shop.group + ' ' : '') + (shop.name || '');
 
         const html =
-            '<div style="' +
-            'width:34px;height:34px;background:#fff;border:2px solid #191970;' +
-            'border-radius:50%;display:flex;align-items:center;justify-content:center;' +
-            'box-shadow:0 1px 3px rgba(0,0,0,0.25);">' +
-            '<svg width="18" height="18">' +
-            '<use href="/MAP-/icon/sprite.svg#icon-' + iconId + '"></use>' +
-            '</svg></div>';
+            '<div style="display:flex;flex-direction:column;align-items:center;transform:translateY(-6px);">' +
+
+                '<div style="' +
+                'width:34px;height:34px;background:#fff;border:2px solid #191970;' +
+                'border-radius:50%;display:flex;align-items:center;justify-content:center;' +
+                'box-shadow:0 1px 3px rgba(0,0,0,0.25);' +
+                '">' +
+
+                    '<svg width="18" height="18">' +
+                    '<use href="/MAP-/icon/sprite.svg#icon-' + iconId + '"></use>' +
+                    '</svg>' +
+
+                '</div>' +
+
+                '<div style="' +
+                'margin-top:2px;font-size:10px;line-height:1;' +
+                'color:#191970;background:rgba(255,255,255,0.85);' +
+                'border:1px solid #191970;border-radius:3px;' +
+                'padding:1px 3px;white-space:nowrap;' +
+                '">' +
+                    label +
+                '</div>' +
+
+            '</div>';
 
         const marker = L.marker([shop.lat, shop.lng], {
             icon: L.divIcon({
                 className: '',
                 html: html,
-                iconSize: [34, 34],
-                iconAnchor: [17, 17]
+                iconSize: [34, 50],
+                iconAnchor: [17, 17] // ★座標はアイコン中心固定
             })
         });
 
         marker.addTo(markerControl.shop02Layer);
     });
 }
-
 // -----------------------
 // icon
 // -----------------------
