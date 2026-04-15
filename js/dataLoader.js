@@ -331,6 +331,8 @@ function goBack(hash) {
 
     document.getElementById('map-menu').style.display = 'block';
     document.getElementById('map-back-btn').style.display = 'none';
+    window.map.setView(window.map.getCenter(), window.map.getZoom(), { animate: false });
+window.map.invalidateSize(true);
 }
 
 
