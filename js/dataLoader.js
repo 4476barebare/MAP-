@@ -167,31 +167,28 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
 function selectArea(areaName) {
 
-    
+    // -----------------------
+    // shop01レイヤ完全リセット
+    // -----------------------
     if (window.markerControl && markerControl.shop01Layer) {
-    window.map.removeLayer(markerControl.shop01Layer);
-    markerControl.shop01Layer = null;
-}
-    
+        window.map.removeLayer(markerControl.shop01Layer);
+        markerControl.shop01Layer = null;
+    }
 
-const area = window.areaData.find(a => a.name === areaName);
-if (!area) return;
-
-// ★これだけでいい
-
-// ★必ずここで整形
-const area_Id = (area.areaId || '').trim();
-const notes   = (area.notes || '').trim();
-
-// ★キー生成
-const areaKey = area_Id + "_" + notes;
-
+    const area = window.areaData.find(a => a.name === areaName);
+    if (!area) return;
 
     hidePrefSpots();
 
+    // -----------------------
+    // キー生成（固定）
+    // -----------------------
+    const area_Id = (area.areaId || '').trim();
+    const notes   = (area.notes || '').trim();
+    const areaKey = area_Id + "_" + notes;
 
     // -----------------------
-    // リクエストID（競合防止）
+    // 競合防止ID
     // -----------------------
     const reqId = Date.now();
     window._shop01RequestId = reqId;
@@ -212,11 +209,8 @@ const areaKey = area_Id + "_" + notes;
     document.getElementById('map-back-btn').style.display = 'block';
 
     // -----------------------
-    // 描画
+    // 描画（順序固定）
     // -----------------------
-
-
-    
     window.map.once('moveend', () => {
 
         enableDragForArea();
@@ -224,12 +218,19 @@ const areaKey = area_Id + "_" + notes;
 
         if (window._shop01RequestId !== reqId) return;
 
-        setTimeout(() => {
-            markerControl.showShop01(areaKey);
-        }, 50);
+        // ★重要：2フレーム待ってから描画確定
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+
+                markerControl.showShop01(areaKey);
+
+            });
+        });
 
     });
 }
+
+
 
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
