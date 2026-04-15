@@ -350,11 +350,18 @@ window.loadLocationCSV = loadLocationCSV;
 
 function showSpotsForArea(areaKey) {
 
-    if (window.spotMarkers) {
-        window.spotMarkers.forEach(m =>
-            window.map.removeLayer(m)
-        );
-    }
+    // ★既存のスポットマーカーを完全削除（pref-dotは残す）
+    window.map.eachLayer(layer => {
+        if (
+            layer instanceof L.Marker &&
+            layer._icon &&
+            !layer._icon.querySelector('.pref-dot')
+        ) {
+            window.map.removeLayer(layer);
+        }
+    });
+
+    // 配列リセット
     window.spotMarkers = [];
 
     const spots = window.spotData.filter(s =>
@@ -394,7 +401,6 @@ function showSpotsForArea(areaKey) {
         );
 
         marker.on('click', function () {
-
             selectSpot(
                 areaKey,
                 spot.name,
@@ -403,16 +409,18 @@ function showSpotsForArea(areaKey) {
             );
         });
 
-        window.spotMarkers.push(marker);
+        // ★mapに直接追加
         marker.addTo(window.map);
 
+        // ★一応保持（デバッグ用）
+        window.spotMarkers.push(marker);
+
+        // bounds計算
         if (spot.lat < minLat) minLat = spot.lat;
         if (spot.lat > maxLat) maxLat = spot.lat;
         if (spot.lng < minLng) minLng = spot.lng;
         if (spot.lng > maxLng) maxLng = spot.lng;
     });
-
-    if (spots.length === 0) return;
 
     const latSize = maxLat - minLat;
     const lngSize = maxLng - minLng;
