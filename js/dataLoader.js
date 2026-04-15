@@ -159,6 +159,13 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
 
 
 function selectArea(areaName) {
+    
+    
+    // ★これ追加
+if (window.spotLayer) {
+    window.map.removeLayer(window.spotLayer);
+    window.spotLayer = null;
+}
 
     // -----------------------
     // shop01レイヤ完全リセット
