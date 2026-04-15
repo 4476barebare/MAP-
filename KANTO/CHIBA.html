@@ -154,13 +154,13 @@ li { user-select: none; cursor: pointer; }
 document.addEventListener('DOMContentLoaded', () => {
 
     const currentFile = location.pathname.split('/').pop().split('?')[0].split('#')[0];
-    var pref = currentFile.replace('.html', '').toUpperCase();
+    const pref = currentFile.replace('.html', '').toUpperCase();
 
     const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
-    shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
+    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
 
     // -----------------------
-    // デバッグ表示（ログ統一）
+    // デバッグ
     // -----------------------
     function showDebug(msg) {
         let debugEl = document.getElementById('debug');
@@ -188,21 +188,11 @@ document.addEventListener('DOMContentLoaded', () => {
     showDebug('DOMContentLoaded: ' + csvUrl);
 
     // -----------------------
-    // shop preload（shopUrl渡す）
-    // -----------------------
- // -----------------------
-    // shop preload（CSVと完全同列処理）
-    // -----------------------
-
-
-
-
-    // -----------------------
     // CSVロード
     // -----------------------
     loadLocationCSV(csvUrl, currentFile).then(data => {
 
-        showDebug('CSV loaded: main=' + !!data.main);
+        showDebug('CSV loaded');
 
         if (!data.main) return;
 
@@ -234,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             document.getElementById('map-menu').style.display = 'block';
             document.getElementById('map-back-btn').style.display = 'none';
+
             window.markerControl.preloadShop01(shopUrl);
         }
 
@@ -259,32 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
             menuUl.appendChild(li);
         });
 
-        document.getElementById('map-menu').addEventListener('click', e => {
-            e.stopPropagation();
-        });
-
-        setupNearestClick();
-
-    }).catch(() => {
-        showDebug('CSV読み込み失敗');
-    });
-
-    // -----------------------
-    // 戻るボタン
-    // -----------------------
-    document.getElementById('map-back-btn').addEventListener('click', () => {
-        goBack(window.currentHash);
-    });
-
-    // -----------------------
-    // 最寄りクリック
-    // -----------------------
-    window.nearestClickHandler = null;
-    window.nearestClickEnabled = true;
-
-    function setupNearestClick() {
-        if (!window.map || window.nearestClickHandler) return;
-
+        // -----------------------
+        // map click（nearest）
+        // -----------------------
         window.nearestClickHandler = function(e) {
 
             if (!window.nearestClickEnabled) return;
@@ -316,25 +284,35 @@ document.addEventListener('DOMContentLoaded', () => {
             if (nearestArea) selectArea(nearestArea);
         };
 
-        window.map.on('click', window.nearestClickHandler);
-    }
-
-    function removeNearestClick() {
-        window.nearestClickEnabled = false;
-    }
-
-    function enableNearestClick() {
         window.nearestClickEnabled = true;
-    }
+        window.map.on('click', window.nearestClickHandler);
+
+    });
 
     // -----------------------
-    // selectAreaラップ
+    // 戻る
+    // -----------------------
+    document.getElementById('map-back-btn').addEventListener('click', () => {
+        goBack(window.currentHash);
+    });
+
+    // -----------------------
+    // selectAreaラップ（競合遮断）
     // -----------------------
     const _selectArea = selectArea;
 
     window.selectArea = function(areaName) {
-        removeNearestClick();
-        _selectArea((areaName || '').trim());
+
+        // ★競合防止：map clickを一旦止める
+        if (window.nearestClickHandler) {
+            window.map.off('click', window.nearestClickHandler);
+        }
+
+        window.nearestClickEnabled = false;
+
+        setTimeout(() => {
+            _selectArea((areaName || '').trim());
+        }, 0);
     };
 
     // -----------------------
@@ -344,11 +322,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.goBack = function(hash) {
         _goBack(hash);
-        if (!window.currentHash) enableNearestClick();
+
+        // ★戻ったら再有効化
+        if (!window.currentHash) {
+            window.nearestClickEnabled = true;
+            if (window.nearestClickHandler) {
+                window.map.on('click', window.nearestClickHandler);
+            }
+        }
     };
 
     // -----------------------
-    // backアイコン
+    // back SVG
     // -----------------------
     fetch('/MAP-/icon/back.svg')
         .then(res => res.text())
@@ -362,7 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
 });
-
 
 // -----------------------
 // popstate
@@ -378,8 +362,6 @@ window.addEventListener('popstate', () => {
 
     window.currentHash = newHash;
 });
-
-
 </script>
 </body>
 </html>
