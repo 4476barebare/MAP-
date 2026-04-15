@@ -97,18 +97,35 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
     const tileUrl =
         'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
-    if (window.map) {
+    // -----------------------
+    // 初回のみ map生成
+    // -----------------------
+    if (!window.map) {
 
-        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+        window.map = L.map('lf-map', mapOptions);
+        window.map.attributionControl.setPosition('topright');
 
-        if (window.currentTileLayer) {
-            window.map.removeLayer(window.currentTileLayer);
-        }
-
+        // ★タイルはここで一度だけ
         window.currentTileLayer =
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
 
+    } else {
+
+        // -----------------------
+        // view更新のみ（ここが本体）
+        // -----------------------
+        window.map.stop(); // 念のためアニメ停止
+
+        window.map.flyTo(
+            [lat, lng],
+            zoom || window.prefData.zoom,
+            { duration: 0.5 }
+        );
+
+        // -----------------------
+        // 操作設定（そのまま維持）
+        // -----------------------
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
             : window.map.scrollWheelZoom.disable();
@@ -138,40 +155,13 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
                 ? window.map.tap.enable()
                 : window.map.tap.disable();
         }
-        
-        
-// ★重要：flyTo終了後にだけ実行
-window.map.once('moveend', () => {
-    window.map.invalidateSize(true);
-});
-        
-        
-        
-        
-    } else {
-
-        window.map = L.map('lf-map', mapOptions);
-        window.map.attributionControl.setPosition('topright');
-
-        window.currentTileLayer =
-            L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
-                .addTo(window.map);
-                
-                
-                       
     }
 
     window.currentHash = location.hash;
 
     if (!window.currentAreaId) {
         showPrefSpots();
-        
-
-        
     }
-
-    
-    
 }
 
 function selectArea(areaName) {
