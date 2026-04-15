@@ -97,32 +97,24 @@ function showShop02(areaKey) {
         const iconId = getIconId(shop.icon);
         const label = (shop.group ? shop.group + ' ' : '') + (shop.name || '');
 
-        const html =
-            '<div style="display:flex;flex-direction:column;align-items:center;transform:translateY(-6px);">' +
+const html =
+    '<div style="display:flex;flex-direction:column;align-items:center;transform:translateY(-6px);">' +
 
-                '<div style="' +
-                'width:34px;height:34px;background:#fff;border:2px solid #191970;' +
-                'border-radius:50%;display:flex;align-items:center;justify-content:center;' +
-                'box-shadow:0 1px 3px rgba(0,0,0,0.25);' +
-                '">' +
+        // ▼ 座標ピン（アイコンの代わり）
+        '<div style="font-size:18px;line-height:1;color:#191970;">▼</div>' +
 
-                    '<svg width="18" height="18">' +
-                    '<use href="/MAP-/icon/sprite.svg#icon-' + iconId + '"></use>' +
-                    '</svg>' +
+        // ラベル（上に小さく）
+        '<div style="' +
+        'margin-top:2px;font-size:10px;line-height:1;' +
+        'color:#191970;background:rgba(255,255,255,0.85);' +
+        'border:1px solid #191970;border-radius:3px;' +
+        'padding:1px 3px;white-space:nowrap;' +
+        '">' +
+        label +
+        '</div>' +
 
-                '</div>' +
-
-                '<div style="' +
-                'margin-top:2px;font-size:10px;line-height:1;' +
-                'color:#191970;background:rgba(255,255,255,0.85);' +
-                'border:1px solid #191970;border-radius:3px;' +
-                'padding:1px 3px;white-space:nowrap;' +
-                '">' +
-                    label +
-                '</div>' +
-
-            '</div>';
-
+    '</div>';
+    
         const marker = L.marker([shop.lat, shop.lng], {
             icon: L.divIcon({
                 className: '',
