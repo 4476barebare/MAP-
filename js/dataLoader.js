@@ -214,6 +214,9 @@ const areaKey = area_Id + "_" + notes;
     // -----------------------
     // 描画
     // -----------------------
+    window.map.setView(window.map.getCenter(), window.map.getZoom(), { animate: false });
+window.map.invalidateSize(true);
+    
     window.map.once('moveend', () => {
 
         enableDragForArea();
@@ -327,10 +330,6 @@ function goBack(hash) {
         requestAnimationFrame(() => {
             showPrefSpots();
         });
-        
-        window.map.setView(window.map.getCenter(), window.map.getZoom(), { animate: false });
-window.map.invalidateSize(true);
-        
     }
 
     document.getElementById('map-menu').style.display = 'block';
