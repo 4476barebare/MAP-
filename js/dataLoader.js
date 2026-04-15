@@ -284,6 +284,10 @@ function enableDragForArea() {
 }
 
 function goBack(hash) {
+    
+    // ★まず完全解除
+window.map.setMaxBounds(null);
+window.map.options.maxBoundsViscosity = 0;
 
     // ★状態リセット
     //window.map.off('move');
