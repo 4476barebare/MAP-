@@ -195,6 +195,8 @@ function selectArea(areaName) {
         area.lng,
         area.zoom || window.prefData.zoom
     );
+    
+    window.map.invalidateSize(true);
 
     location.hash = encodeURIComponent(area.name);
 
@@ -419,7 +421,7 @@ function showSpotsForArea(areaKey) {
 
 function createPrefSpotLayer() {
 
-    if (window.prefSpotLayer) return;
+    //if (window.prefSpotLayer) return;
 
     const layer = L.layerGroup();
 
@@ -457,18 +459,18 @@ function createPrefSpotLayer() {
 }
 
 function showPrefSpots() {
+
     createPrefSpotLayer();
 
-    if (!window.map.hasLayer(window.prefSpotLayer)) {
-        window.prefSpotLayer.addTo(window.map);
-    }
+    // ★無条件で追加
+    window.prefSpotLayer.addTo(window.map);
 }
 
 function hidePrefSpots() {
-    if (
-        window.prefSpotLayer &&
-        window.map.hasLayer(window.prefSpotLayer)
-    ) {
+
+    if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
     }
+
 }
