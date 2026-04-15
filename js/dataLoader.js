@@ -203,7 +203,6 @@ if (window.spotLayer) {
         area.zoom || window.prefData.zoom
     );
     
-    window.map.invalidateSize(true);
 
     location.hash = encodeURIComponent(area.name);
 
@@ -215,6 +214,7 @@ if (window.spotLayer) {
     // -----------------------
     window.map.once('moveend', () => {
 
+        window.map.invalidateSize(true);
         enableDragForArea();
         showSpotsForArea(areaKey);
 
