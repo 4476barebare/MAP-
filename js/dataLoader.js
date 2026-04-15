@@ -286,7 +286,7 @@ function enableDragForArea() {
 function goBack(hash) {
 
     // ★状態リセット
-    window.map.off('move');
+    //window.map.off('move');
     //window.map.off('moveend');
     window.areaBounds = null;
     window.currentAreaId = null;
