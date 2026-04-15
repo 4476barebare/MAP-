@@ -421,7 +421,7 @@ function showSpotsForArea(areaKey) {
 
 function createPrefSpotLayer() {
 
-    //if (window.prefSpotLayer) return;
+    if (window.prefSpotLayer) return;
 
     const layer = L.layerGroup();
 
@@ -459,11 +459,11 @@ function createPrefSpotLayer() {
 }
 
 function showPrefSpots() {
-
     createPrefSpotLayer();
 
-    // ★無条件で追加
-    window.prefSpotLayer.addTo(window.map);
+    if (!window.map.hasLayer(window.prefSpotLayer)) {
+        window.prefSpotLayer.addTo(window.map);
+    }
 }
 
 function hidePrefSpots() {
