@@ -350,18 +350,16 @@ window.loadLocationCSV = loadLocationCSV;
 
 function showSpotsForArea(areaKey) {
 
-    // ★既存のスポットマーカーを完全削除（pref-dotは残す）
+    // ★① Leaflet Marker削除
     window.map.eachLayer(layer => {
-        if (
-            layer instanceof L.Marker &&
-            layer._icon &&
-            !layer._icon.querySelector('.pref-dot')
-        ) {
+        if (layer instanceof L.Marker) {
             window.map.removeLayer(layer);
         }
     });
 
-    // 配列リセット
+    // ★② DOMに残ったドットを強制削除（これが本命）
+    document.querySelectorAll('.spot-label').forEach(el => el.remove());
+
     window.spotMarkers = [];
 
     const spots = window.spotData.filter(s =>
@@ -409,13 +407,9 @@ function showSpotsForArea(areaKey) {
             );
         });
 
-        // ★mapに直接追加
         marker.addTo(window.map);
-
-        // ★一応保持（デバッグ用）
         window.spotMarkers.push(marker);
 
-        // bounds計算
         if (spot.lat < minLat) minLat = spot.lat;
         if (spot.lat > maxLat) maxLat = spot.lat;
         if (spot.lng < minLng) minLng = spot.lng;
