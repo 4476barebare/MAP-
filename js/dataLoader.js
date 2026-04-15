@@ -139,8 +139,15 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
                 : window.map.tap.disable();
         }
         
-        window.map._resetView(window.map.getCenter(), window.map.getZoom(), true);
-
+        
+// ★重要：flyTo終了後にだけ実行
+window.map.once('moveend', () => {
+    window.map.invalidateSize(true);
+});
+        
+        
+        
+        
     } else {
 
         window.map = L.map('lf-map', mapOptions);
@@ -150,8 +157,8 @@ function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
                 
-                window.map._resetView(window.map.getCenter(), window.map.getZoom(), true);
                 
+                       
     }
 
     window.currentHash = location.hash;
