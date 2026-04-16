@@ -95,34 +95,43 @@ function showShop02(areaKey) {
         if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
         const iconId = getIconId(shop.icon);
-        const label = (shop.group ? shop.group + ' ' : '') + (shop.name || '');
 
-const html =
-    '<div style="display:flex;flex-direction:column;align-items:center;transform:translateY(-6px);">' +
+        // ▼ アイコンのみ（○囲み）
+        const html = `<div class="shop-marker">${iconId}</div>`;
 
-        // ▼ 座標ピン（アイコンの代わり）
-        '<div style="font-size:18px;line-height:1;color:#191970;">▼</div>' +
-
-        // ラベル（上に小さく）
-        '<div style="' +
-        'margin-top:2px;font-size:10px;line-height:1;' +
-        'color:#191970;background:rgba(255,255,255,0.85);' +
-        'border:1px solid #191970;border-radius:3px;' +
-        'padding:1px 3px;white-space:nowrap;' +
-        '">' +
-        label +
-        '</div>' +
-
-    '</div>';
-    
         const marker = L.marker([shop.lat, shop.lng], {
             icon: L.divIcon({
                 className: '',
                 html: html,
-                iconSize: [34, 50],
-                iconAnchor: [17, 17] // ★座標はアイコン中心固定
+                iconSize: [24, 24],
+                iconAnchor: [12, 12] // ★完全に中心
             })
         });
+
+        // -----------------------
+        // ポップアップ内容
+        // -----------------------
+        const title = shop.group && shop.group !== '個人商店'
+            ? shop.group + ' ' + (shop.name || '')
+            : (shop.name || '');
+
+        const address = shop.notes || '';
+
+        const googleUrl =
+            'https://www.google.com/search?q=' +
+            encodeURIComponent(title + ' ' + address);
+
+        const popupHtml = `
+            <div class="shop-popup">
+                <div class="shop-popup-title">${title}</div>
+                <div class="shop-popup-address">${address}</div>
+                <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
+                    Googleで検索
+                </a>
+            </div>
+        `;
+
+        marker.bindPopup(popupHtml);
 
         marker.addTo(markerControl.shop02Layer);
     });
