@@ -127,15 +127,18 @@ function showShop02(areaKey) {
             'https://www.google.com/search?q=' +
             encodeURIComponent(title + ' ' + address);
 
-        const popupHtml = `
-            <div class="shop-popup">
-                <div class="shop-popup-title">${title}</div>
-                <div class="shop-popup-address">${address}</div>
-                <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-                    Googleで検索
-                </a>
-            </div>
-        `;
+const popupHtml = `
+    <div class="shop-popup">
+        <div class="shop-popup-title">${title}</div>
+        <div class="shop-popup-address">${address}</div>
+
+        <div class="shop-popup-footer">
+            <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
+                Googleで検索
+            </a>
+        </div>
+    </div>
+`;
 
         marker.bindPopup(popupHtml);
 
