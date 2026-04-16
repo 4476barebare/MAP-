@@ -97,7 +97,13 @@ function showShop02(areaKey) {
         const iconId = getIconId(shop.icon);
 
         // ▼ アイコンのみ（○囲み）
-        const html = `<div class="shop-marker">${iconId}</div>`;
+        const html = `
+<div class="shop-marker">
+    <svg class="shop-icon">
+        <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+    </svg>
+</div>
+`;
 
         const marker = L.marker([shop.lat, shop.lng], {
             icon: L.divIcon({
