@@ -361,7 +361,7 @@ function createPrefSpotLayer() {
         let type = 'spot';
 
         if (spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish[1-4]/);
+            const match = spot.icon.match(/fish\d+/);
             if (match) type = match[0];
         }
 
