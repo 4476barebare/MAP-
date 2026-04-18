@@ -142,6 +142,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 }
 
 function selectArea(areaName) {
+
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
@@ -155,15 +156,6 @@ function selectArea(areaName) {
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
 
-    hidePrefSpots();
-
-    const area_Id = (area.areaId || '').trim();
-    const individualId = (area.individualId || '').trim();
-const areaKey = area_Id + "_" + individualId;
-
-    const reqId = Date.now();
-    window._shop01RequestId = reqId;
-
     drawLocation(
         area.name,
         area.lat,
@@ -171,26 +163,21 @@ const areaKey = area_Id + "_" + individualId;
         area.zoom || window.prefData.zoom
     );
 
-    location.hash = encodeURIComponent(area.name);
+    // ハッシュ更新（構造は維持）
+    location.hash =
+        encodeURIComponent(window.prefData.name) +
+        '/' +
+        encodeURIComponent(area.name);
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    window.map.once('moveend', () => {
-        window.map.invalidateSize(true);
-        enableDragForArea();
-        showSpotsForArea(areaKey);
+    // ★統一ID
+    const areaId = area.pref + "_" + area.individualId;
 
-        if (window._shop01RequestId !== reqId) return;
-
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                markerControl.showShop01(areaKey);
-            });
-        });
-    });
-    window.currentPhase = 'area1';
-    //showCenterMarker();
+    // ★表示はここで呼ぶ
+    showSpotsForArea(areaId);
+    markerControl.showShop01(areaId);
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
