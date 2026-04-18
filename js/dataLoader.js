@@ -435,13 +435,9 @@ function showFishPopup(marker, spot) {
 }
 
 function zoomToSpot(spot) {
-    
-    resetSpotState();
-
 
     switchToGSIPhoto();
 
-    // ★ 先にhash確定
     const areaName = decodeURIComponent(location.hash.replace(/^#/, '')).split('/')[0];
     const individualId = spot.individualId || spot.id || '';
 
@@ -449,7 +445,6 @@ function zoomToSpot(spot) {
         location.hash = areaName + '/' + individualId;
     }
 
-    // 操作ロック
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
@@ -459,7 +454,10 @@ function zoomToSpot(spot) {
         animate: true
     });
 
+    // ★ここが本体
     window.map.once('moveend', function () {
+
+        resetSpotState();   // ←ここに移す
 
         const bounds = window.map.getBounds();
         const initialZoom = window.map.getZoom();
@@ -475,6 +473,7 @@ function zoomToSpot(spot) {
         window.map.touchZoom.enable();
     });
 }
+
 
 
 window.gsiPhotoLayer = L.tileLayer(
