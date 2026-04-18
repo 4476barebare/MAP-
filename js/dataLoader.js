@@ -4,6 +4,7 @@ window.areaData = [];
 window.spotData = [];
 window.currentHash = '';
 window.currentAreaId = null;
+window.currentPhase = 'pref'; // pref / area / spot
 
 function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
@@ -180,6 +181,7 @@ const areaKey = area_Id + "_" + individualId;
             });
         });
     });
+    window.currentPhase = 'area1';
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
@@ -270,6 +272,7 @@ function goBack(hash) {
         });
 
         window.map.invalidateSize(true);
+        window.currentPhase = 'pref';
     }
 
     document.getElementById('map-menu').style.display = 'block';
@@ -325,9 +328,24 @@ function showSpotsForArea(areaKey) {
             }
         );
 
-        marker.on('click', function () {
-            selectSpot(areaKey, spot.name, spot.lat, spot.lng);
-        });
+marker.on('click', function () {
+
+    // phase1（最初のクリック）
+    if (window.currentPhase === 'area1') {
+        window.currentPhase = 'area2';
+        selectSpot(areaKey, spot.name, spot.lat, spot.lng);
+        return;
+    }
+
+    // phase2（2回目以降）
+    if (window.currentPhase === 'area2') {
+        if (isFish) {
+            showFishPopup(marker, spot);
+        } else {
+            zoomToSpot(spot);
+        }
+    }
+});
 
         marker.addTo(window.map);
         window.spotMarkers.push(marker);
@@ -399,4 +417,40 @@ function hidePrefSpots() {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
     }
+}
+
+function showFishPopup(marker, spot) {
+    const html = `
+        <div>
+            <strong>${spot.name}</strong><br>
+            ${spot.notes || ''}
+        </div>
+    `;
+
+    marker.bindPopup(html).openPopup();
+}
+
+function zoomToSpot(spot) {
+    const zoomLevel = Number(spot.zoom) || 15;
+
+    // 地図移動
+    window.map.setView([spot.lat, spot.lng], zoomLevel);
+
+    // レイヤー切替
+    switchToGSIPhoto();
+}
+
+window.gsiPhotoLayer = L.tileLayer(
+    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+    {
+        attribution: '国土地理院'
+    }
+);
+
+function switchToGSIPhoto() {
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer = window.gsiPhotoLayer.addTo(window.map);
 }
