@@ -18,17 +18,17 @@ function loadLocationCSV(csvUrl, currentFile) {
 
             const allRows = lines.slice(1).map(line => {
                 const cols = line.split(',');
-                return {
-                    name: cols[0].trim(),
-                    zoom: parseFloat(cols[1]),
-                    maxZoom: cols[2] ? parseFloat(cols[2]) : null,
-                    lat: parseFloat(cols[3]),
-                    lng: parseFloat(cols[4]),
-                    areaId: cols[5] ? cols[5].trim() : '',
-                    url: cols[6] ? cols[6].trim() : '',
-                    notes: cols[7] ? cols[7].trim() : '',
-                    icon: cols[8] ? cols[8].trim().toLowerCase() : null
-                };
+return {
+    name: cols[0].trim(),
+    zoom: parseFloat(cols[1]),
+    individualId: cols[2] ? cols[2].trim() : '', // ←追加
+    lat: parseFloat(cols[3]),
+    lng: parseFloat(cols[4]),
+    areaId: cols[5] ? cols[5].trim() : '',
+    url: cols[6] ? cols[6].trim() : '',
+    notes: cols[7] ? cols[7].trim() : '',
+    icon: cols[8] ? cols[8].trim().toLowerCase() : null
+};
             });
 
             allRows.forEach(row => {
@@ -59,7 +59,7 @@ function loadLocationCSV(csvUrl, currentFile) {
         });
 }
 
-function drawLocation(name, lat, lng, zoom, maxZoom = null, options = {}) {
+function drawLocation(name, lat, lng, zoom, options = {}) {
     const defaultOptions = {
         center: [lat, lng],
         zoom: zoom,
@@ -259,8 +259,7 @@ function goBack(hash) {
             window.prefData.name,
             window.prefData.lat,
             window.prefData.lng,
-            window.prefData.zoom,
-            window.prefData.maxZoom
+            window.prefData.zoom
         );
 
         location.hash = '';
