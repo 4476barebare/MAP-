@@ -435,15 +435,17 @@ function showFishPopup(marker, spot) {
 }
 
 function zoomToSpot(spot) {
-
+    
+    
+    // ★完全に先に消す（ここが重要）
     if (window.centerMarker) {
-        const marker = window.centerMarker;
+        const m = window.centerMarker;
         window.centerMarker = null;
-
-        requestAnimationFrame(() => {
-            window.map.removeLayer(marker);
-        });
+        const el = m.getElement?.();
+        if (el) el.remove();
+        window.map.removeLayer(m);
     }
+
 
     switchToGSIPhoto();
 
