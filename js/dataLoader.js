@@ -142,6 +142,11 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 }
 
 function selectArea(areaName) {
+    
+        // ★最初にstate確定
+    location.hash = encodeURIComponent(areaName);
+    updateStateFromHash();
+
 
 
     if (window.spotLayer) {
