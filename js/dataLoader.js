@@ -436,15 +436,7 @@ function showFishPopup(marker, spot) {
 
 function zoomToSpot(spot) {
     
-    
-    // ★完全に先に消す（ここが重要）
-    if (window.centerMarker) {
-        const m = window.centerMarker;
-        window.centerMarker = null;
-        const el = m.getElement?.();
-        if (el) el.remove();
-        window.map.removeLayer(m);
-    }
+    resetSpotState();
 
 
     switchToGSIPhoto();
@@ -501,10 +493,20 @@ function switchToGSIPhoto() {
 }
 
 
-function showCenterMarker() {
-    if (!window.centerMarker) return;
+function resetSpotState() {
 
-    if (!window.map.hasLayer(window.centerMarker)) {
-        window.centerMarker.addTo(window.map);
+    if (window.centerMarker) {
+        window.map.removeLayer(window.centerMarker);
+        window.centerMarker = null;
+    }
+
+    if (window.spotLayer) {
+        window.map.removeLayer(window.spotLayer);
+        window.spotLayer = null;
+    }
+
+    if (window.markerControl?.shop01Layer) {
+        window.map.removeLayer(window.markerControl.shop01Layer);
+        window.markerControl.shop01Layer = null;
     }
 }
