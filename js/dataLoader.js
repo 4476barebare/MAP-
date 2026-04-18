@@ -143,9 +143,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
 function selectArea(areaName) {
     
-        // ★最初にstate確定
-    location.hash = encodeURIComponent(areaName);
-    updateStateFromHash();
+
 
 
 
@@ -176,6 +174,11 @@ function selectArea(areaName) {
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
+        // ★最初にstate確定
+    location.hash = encodeURIComponent(areaName);
+    updateStateFromHash();
+    aler(window.currentAreaId);
+
 
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
