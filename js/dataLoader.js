@@ -528,6 +528,7 @@ const spotKey = parts[1] || null;
 
     // pref
     if (!areaName) {
+        window.currentPref = pref;
         window.currentAreaId = null;
         window.currentSpotId = null;
     }
