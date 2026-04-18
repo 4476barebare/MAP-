@@ -143,6 +143,12 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
 function selectArea(areaName) {
 
+    // 既存レイヤー削除
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
+    }
+
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
@@ -163,25 +169,35 @@ function selectArea(areaName) {
         area.zoom || window.prefData.zoom
     );
 
-    // ★ハッシュ更新
+    // hash更新
     location.hash =
         encodeURIComponent(window.prefData.name) +
         '/' +
         encodeURIComponent(area.name);
 
-    // ★ここ重要
+    // state更新
     updateStateFromHash();
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    // ★stateから取得
-    const areaId = window.currentAreaId;
+    // ★移動完了後に表示
+    window.map.once('moveend', () => {
 
-    showSpotsForArea(areaId);
-    markerControl.showShop01(areaId);
+        window.map.invalidateSize(true);
+        enableDragForArea();
+
+        const areaId = window.currentAreaId;
+
+        showSpotsForArea(areaId);
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                markerControl.showShop01(areaId);
+            });
+        });
+    });
 }
-
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
     window.map.off('move');
