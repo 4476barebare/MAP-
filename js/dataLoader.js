@@ -234,20 +234,8 @@ function goBack(hash) {
 
     window.areaBounds = null;
     window.currentAreaId = null;
-
-    if (window.markerControl) {
-        markerControl.clearShop01();
-        markerControl.clearShop02();
-    }
-
-    if (window.spotMarkers) {
-        window.spotMarkers.forEach(m => window.map.removeLayer(m));
-        window.spotMarkers = [];
-    }
-
-    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
-        window.map.removeLayer(window.prefSpotLayer);
-    }
+    
+    resetSpotLayers();
 
     hash = hash || window.currentHash || '';
 
@@ -453,26 +441,10 @@ function zoomToSpot(spot) {
     window.map.setView([spot.lat, spot.lng], spot.zoom || 15, {
         animate: true
     });
-
-        if (window.markerControl) {
-        markerControl.clearShop01();
-        markerControl.clearShop02();
-    }
-        
-        if (window.spotMarkers) {
-        window.spotMarkers.forEach(m => window.map.removeLayer(m));
-        window.spotMarkers = [];
-    }
-
-    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
-        window.map.removeLayer(window.prefSpotLayer);
-    }
-
-
+    
+    resetSpotLayers();
     // ★ここが本体
     window.map.once('moveend', function () {
-
-        //resetSpotState();   // ←ここに移す
 
         const bounds = window.map.getBounds();
         const initialZoom = window.map.getZoom();
@@ -508,20 +480,19 @@ function switchToGSIPhoto() {
 }
 
 
-function resetSpotState() {
+function resetSpotLayers() {
 
-    if (window.centerMarker) {
-        window.map.removeLayer(window.centerMarker);
-        window.centerMarker = null;
+    if (window.markerControl) {
+        markerControl.clearShop01();
+        markerControl.clearShop02();
     }
 
-    if (window.spotLayer) {
-        window.map.removeLayer(window.spotLayer);
-        window.spotLayer = null;
+    if (window.spotMarkers) {
+        window.spotMarkers.forEach(m => window.map.removeLayer(m));
+        window.spotMarkers = [];
     }
 
-    if (window.markerControl?.shop01Layer) {
-        window.map.removeLayer(window.markerControl.shop01Layer);
-        window.markerControl.shop01Layer = null;
+    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+        window.map.removeLayer(window.prefSpotLayer);
     }
 }
