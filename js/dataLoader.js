@@ -438,9 +438,13 @@ function zoomToSpot(spot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    window.map.setView([spot.lat, spot.lng], spot.zoom || 15, {
-        animate: true
-    });
+    drawLocation(
+        spot.name,
+        spot.lat,
+        spot.lng,
+        spot.zoom || 15,
+        { animate: true }
+    );
     
     resetSpotLayers();
     // ★ここが本体
