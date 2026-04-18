@@ -10,6 +10,7 @@ function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
         .then(r => r.text())
         .then(text => {
+
             const lines = text.trim().split('\n');
             const filePref = currentFile.replace('.html', '').toUpperCase();
 
@@ -19,31 +20,34 @@ function loadLocationCSV(csvUrl, currentFile) {
 
             const allRows = lines.slice(1).map(line => {
                 const cols = line.split(',');
-return {
-    name: cols[0].trim(),
-    zoom: parseFloat(cols[1]),
-    individualId: cols[2] ? cols[2].trim() : '', // ←追加
-    lat: parseFloat(cols[3]),
-    lng: parseFloat(cols[4]),
-    areaId: cols[5] ? cols[5].trim() : '',
-    url: cols[6] ? cols[6].trim() : '',
-    notes: cols[7] ? cols[7].trim() : '',
-    icon: cols[8] ? cols[8].trim().toLowerCase() : null
-};
+                return {
+                    name: cols[0].trim(),
+                    zoom: parseFloat(cols[1]),
+                    individualId: cols[2] ? cols[2].trim() : '',
+                    lat: parseFloat(cols[3]),
+                    lng: parseFloat(cols[4]),
+                    areaId: cols[5] ? cols[5].trim() : '',
+                    url: cols[6] ? cols[6].trim() : '',
+                    notes: cols[7] ? cols[7].trim() : '',
+                    icon: cols[8] ? cols[8].trim().toLowerCase() : null
+                };
             });
 
+            // main
             allRows.forEach(row => {
                 if (!row.areaId && row.name.toUpperCase() === filePref) {
                     main = row;
                 }
             });
 
+            // areas
             allRows.forEach(row => {
                 if (row.areaId === filePref) {
                     areas.push(row);
                 }
             });
 
+            // spots
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
@@ -56,9 +60,13 @@ return {
             window.areaData = areas;
             window.spotData = spots;
 
+            // ★ここでやる
+            updateStateFromHash();
+
             return { main, areas, spots };
         });
 }
+
 
 function drawLocation(name, lat, lng, zoom, options = {}) {
     const defaultOptions = {
@@ -494,5 +502,41 @@ function resetSpotLayers() {
 
     if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
         window.map.removeLayer(window.prefSpotLayer);
+    }
+}
+
+function updateStateFromHash() {
+
+    const hash = location.hash.replace('#', '');
+    const parts = hash.split('/');
+
+    const areaName = parts[1] || null;
+    const spotKey = parts[2] || null;
+
+    let resolvedAreaId = null;
+
+    if (areaName) {
+        const area = findAreaByName(areaName);
+        if (area) {
+            resolvedAreaId = area.pref + "_" + area.individualId;
+        }
+    }
+
+    // pref
+    if (!areaName) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+    }
+
+    // area
+    else if (areaName && !spotKey) {
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = null;
+    }
+
+    // spot
+    else if (areaName && spotKey) {
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = resolvedAreaId + "_" + spotKey;
     }
 }
