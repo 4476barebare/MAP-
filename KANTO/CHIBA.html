@@ -308,62 +308,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const areaName = (area.name || '').trim();
             btn.textContent = areaName;
 
-btn.onclick = () => {
-    location.hash = encodeURIComponent(areaName);
-    updateStateFromHash();
-
-    if (!window.currentAreaId) return;
-
-    selectArea(areaName);
-};
+ btn.onclick = () => {
+                selectArea(areaName);
+            };
 
             li.appendChild(btn);
             menuUl.appendChild(li);
         });
 
-// -----------------------
-// map click（nearest）
-// -----------------------
-window.nearestClickHandler = function(e) {
+        // -----------------------
+        // map click（nearest）
+        // -----------------------
+        window.nearestClickHandler = function(e) {
 
-    if (!window.nearestClickEnabled) return;
+            if (!window.nearestClickEnabled) return;
 
-    const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
 
-    if (
-        e.originalEvent.clientX >= menuRect.left &&
-        e.originalEvent.clientX <= menuRect.right &&
-        e.originalEvent.clientY >= menuRect.top &&
-        e.originalEvent.clientY <= menuRect.bottom
-    ) return;
+            if (
+                e.originalEvent.clientX >= menuRect.left &&
+                e.originalEvent.clientX <= menuRect.right &&
+                e.originalEvent.clientY >= menuRect.top &&
+                e.originalEvent.clientY <= menuRect.bottom
+            ) return;
 
-    let nearestArea = null;
-    let minDist = Infinity;
+            let nearestArea = null;
+            let minDist = Infinity;
 
-    window.areaData.forEach(area => {
+            window.areaData.forEach(area => {
 
-        const dLat = e.latlng.lat - area.lat;
-        const dLng = e.latlng.lng - area.lng;
-        const dist = dLat * dLat + dLng * dLng;
+                const dLat = e.latlng.lat - area.lat;
+                const dLng = e.latlng.lng - area.lng;
+                const dist = dLat * dLat + dLng * dLng;
 
-        if (dist < minDist) {
-            minDist = dist;
-            nearestArea = area.name;
-        }
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestArea = area.name;
+                }
+            });
+
+            if (nearestArea) selectArea(nearestArea);
+        };
+
+        window.nearestClickEnabled = true;
+        window.map.on('click', window.nearestClickHandler);
+
     });
-
-    if (nearestArea) {
-
-        // ★ここだけ追加（state確定）
-        location.hash = encodeURIComponent(nearestArea);
-        updateStateFromHash();
-
-        selectArea(nearestArea);
-    }
-};
-
-window.nearestClickEnabled = true;
-window.map.on('click', window.nearestClickHandler);
 
     // -----------------------
     // 戻る
