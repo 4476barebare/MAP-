@@ -454,6 +454,21 @@ function zoomToSpot(spot) {
         animate: true
     });
 
+        if (window.markerControl) {
+        markerControl.clearShop01();
+        markerControl.clearShop02();
+    }
+        
+        if (window.spotMarkers) {
+        window.spotMarkers.forEach(m => window.map.removeLayer(m));
+        window.spotMarkers = [];
+    }
+
+    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+        window.map.removeLayer(window.prefSpotLayer);
+    }
+
+
     // ★ここが本体
     window.map.once('moveend', function () {
 
@@ -471,15 +486,6 @@ function zoomToSpot(spot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-        
-        if (window.spotMarkers) {
-        window.spotMarkers.forEach(m => window.map.removeLayer(m));
-        window.spotMarkers = [];
-    }
-
-    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
-        window.map.removeLayer(window.prefSpotLayer);
-    }
         
     });
 }
