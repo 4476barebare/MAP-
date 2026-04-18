@@ -149,8 +149,8 @@ function selectArea(areaName) {
     hidePrefSpots();
 
     const area_Id = (area.areaId || '').trim();
-    const notes = (area.notes || '').trim();
-    const areaKey = area_Id + "_" + notes;
+    const individualId = (area.individualId || '').trim();
+const areaKey = area_Id + "_" + individualId;
 
     const reqId = Date.now();
     window._shop01RequestId = reqId;
