@@ -346,6 +346,7 @@ marker.on('click', function () {
         if (isFish) {
             showFishPopup(marker, spot);
         } else {
+            hideCenterMarker();
             zoomToSpot(spot);
         }
     }
@@ -436,7 +437,6 @@ function showFishPopup(marker, spot) {
 
 function zoomToSpot(spot) {
 
-    hideCenterMarker();
 
     switchToGSIPhoto();
 
