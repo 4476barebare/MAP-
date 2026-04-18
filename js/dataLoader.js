@@ -90,9 +90,8 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
                 
                 // ★ spot中はここで止める（UI初期化しない）
         if (window.currentPhase === 'spot') {
-            window.currentHash = location.hash;
             return;
-        }
+        }else{
 
                 
                 
@@ -125,6 +124,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
             mapOptions.tap
                 ? window.map.tap.enable()
                 : window.map.tap.disable();
+        }
         }
     } else {
         window.map = L.map('lf-map', mapOptions);
