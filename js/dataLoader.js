@@ -435,11 +435,20 @@ function showFishPopup(marker, spot) {
 }
 
 function zoomToSpot(spot) {
+
     hideCenterMarker();
 
     switchToGSIPhoto();
 
-    // ★ 一旦操作ロック
+    // ★ 先にhash確定
+    const areaName = decodeURIComponent(location.hash.replace(/^#/, '')).split('/')[0];
+    const individualId = spot.individualId || spot.id || '';
+
+    if (areaName && individualId) {
+        location.hash = areaName + '/' + individualId;
+    }
+
+    // 操作ロック
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
@@ -454,32 +463,18 @@ function zoomToSpot(spot) {
         const bounds = window.map.getBounds();
         const initialZoom = window.map.getZoom();
 
-        // 制限適用
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
         window.map.setMinZoom(initialZoom);
         window.map.setMaxZoom(18);
 
-        // ★ 操作解放
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
     });
-    
-     // ★ ここで初めて individualId を付与
-    const areaName = window.currentHash
-        ? decodeURIComponent(location.hash.replace(/^#/, '')).split('/')[0]
-        : '';
-
-    const individualId = spot.individualId || spot.id || '';
-
-    if (areaName && individualId) {
-        location.hash = encodeURIComponent(areaName + '/' + individualId);
-    }
-
-    
 }
+
 
 window.gsiPhotoLayer = L.tileLayer(
     'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
@@ -499,11 +494,14 @@ function switchToGSIPhoto() {
 function hideCenterMarker() {
     if (window.centerMarker) {
         window.map.removeLayer(window.centerMarker);
+        window.centerMarker = null; // ★これ必須
     }
 }
 
 function showCenterMarker() {
-    if (window.centerMarker && !window.map.hasLayer(window.centerMarker)) {
+    if (!window.centerMarker) return;
+
+    if (!window.map.hasLayer(window.centerMarker)) {
         window.centerMarker.addTo(window.map);
     }
 }
