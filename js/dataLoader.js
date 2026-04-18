@@ -457,7 +457,7 @@ function zoomToSpot(spot) {
     // ★ここが本体
     window.map.once('moveend', function () {
 
-        resetSpotState();   // ←ここに移す
+        //resetSpotState();   // ←ここに移す
 
         const bounds = window.map.getBounds();
         const initialZoom = window.map.getZoom();
@@ -471,6 +471,16 @@ function zoomToSpot(spot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
+        
+        if (window.spotMarkers) {
+        window.spotMarkers.forEach(m => window.map.removeLayer(m));
+        window.spotMarkers = [];
+    }
+
+    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+        window.map.removeLayer(window.prefSpotLayer);
+    }
+        
     });
 }
 
