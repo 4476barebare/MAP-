@@ -182,6 +182,7 @@ const areaKey = area_Id + "_" + individualId;
         });
     });
     window.currentPhase = 'area1';
+    showCenterMarker();
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
@@ -255,6 +256,7 @@ function goBack(hash) {
     const spotName = parts[1];
 
     if (spotName) {
+        showCenterMarker();
         return;
     } else if (areaName) {
         drawLocation(
@@ -273,6 +275,8 @@ function goBack(hash) {
 
         window.map.invalidateSize(true);
         window.currentPhase = 'pref';
+        
+        showCenterMarker();
     }
 
     document.getElementById('map-menu').style.display = 'block';
@@ -431,6 +435,7 @@ function showFishPopup(marker, spot) {
 }
 
 function zoomToSpot(spot) {
+    hideCenterMarker();
 
     switchToGSIPhoto();
 
@@ -461,6 +466,19 @@ function zoomToSpot(spot) {
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
     });
+    
+     // ★ ここで初めて individualId を付与
+    const areaName = window.currentHash
+        ? decodeURIComponent(location.hash.replace(/^#/, '')).split('/')[0]
+        : '';
+
+    const individualId = spot.individualId || spot.id || '';
+
+    if (areaName && individualId) {
+        location.hash = encodeURIComponent(areaName + '/' + individualId);
+    }
+
+    
 }
 
 window.gsiPhotoLayer = L.tileLayer(
@@ -476,4 +494,16 @@ function switchToGSIPhoto() {
     }
 
     window.currentTileLayer = window.gsiPhotoLayer.addTo(window.map);
+}
+
+function hideCenterMarker() {
+    if (window.centerMarker) {
+        window.map.removeLayer(window.centerMarker);
+    }
+}
+
+function showCenterMarker() {
+    if (window.centerMarker && !window.map.hasLayer(window.centerMarker)) {
+        window.centerMarker.addTo(window.map);
+    }
 }
