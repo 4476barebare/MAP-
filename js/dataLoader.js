@@ -431,13 +431,34 @@ function showFishPopup(marker, spot) {
 }
 
 function zoomToSpot(spot) {
-    const zoomLevel = Number(spot.zoom) || 15;
 
-    // 地図移動
-    window.map.setView([spot.lat, spot.lng], zoomLevel);
-
-    // レイヤー切替
+    // タイル切替
     switchToGSIPhoto();
+
+    // ズーム有効化
+    window.map.scrollWheelZoom.enable();
+    window.map.doubleClickZoom.enable();
+    window.map.touchZoom.enable();
+
+    // ズーム実行
+    window.map.setView([spot.lat, spot.lng], spot.zoom || 15, {
+        animate: true
+    });
+
+    // ★ ズーム確定後に制御
+    window.map.once('moveend', function () {
+
+        const bounds = window.map.getBounds();
+        const initialZoom = window.map.getZoom();
+
+        // ① ドラッグ制限（この視界に固定）
+        window.map.setMaxBounds(bounds);
+        window.map.options.maxBoundsViscosity = 1.0;
+
+        // ② ズーム制限
+        window.map.setMinZoom(initialZoom); // ←これよりズームアウト不可
+        window.map.setMaxZoom(18);          // ←ここまでズームイン可能
+    });
 }
 
 window.gsiPhotoLayer = L.tileLayer(
