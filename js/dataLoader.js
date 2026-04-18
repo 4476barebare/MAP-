@@ -142,6 +142,11 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 }
 
 function selectArea(areaName) {
+
+    // ★最初にstate確定
+    location.hash = encodeURIComponent(areaName);
+    updateStateFromHash();
+
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
@@ -157,11 +162,6 @@ function selectArea(areaName) {
 
     hidePrefSpots();
 
-    // ★ここだけ変更
-    const individualId = (area.individualId || '').trim();
-    const areaKey =
-        window.prefData.name.toUpperCase() + "_" + individualId;
-
     const reqId = Date.now();
     window._shop01RequestId = reqId;
 
@@ -172,25 +172,23 @@ function selectArea(areaName) {
         area.zoom || window.prefData.zoom
     );
 
-    location.hash = encodeURIComponent(area.name);
-
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         enableDragForArea();
-        showSpotsForArea(areaKey);
+
+        showSpotsForArea(window.currentAreaId);
 
         if (window._shop01RequestId !== reqId) return;
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                markerControl.showShop01(areaKey);
+                markerControl.showShop01(window.currentAreaId);
             });
         });
     });
-    window.currentPhase = 'area1';
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
@@ -204,7 +202,8 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
         markerControl.clearShop02();
     }
 
-    const areaKey = areaName;
+    // ★ここだけ変更
+    const areaKey = window.currentAreaId;
 
     if (window.markerControl) {
         markerControl.showShop02(areaKey);
