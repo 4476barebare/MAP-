@@ -182,7 +182,7 @@ const areaKey = area_Id + "_" + individualId;
         });
     });
     window.currentPhase = 'area1';
-    showCenterMarker();
+    //showCenterMarker();
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
@@ -256,7 +256,7 @@ function goBack(hash) {
     const spotName = parts[1];
 
     if (spotName) {
-        showCenterMarker();
+        //showCenterMarker();
         return;
     } else if (areaName) {
         drawLocation(
@@ -276,7 +276,7 @@ function goBack(hash) {
         window.map.invalidateSize(true);
         window.currentPhase = 'pref';
         
-        showCenterMarker();
+        //showCenterMarker();
     }
 
     document.getElementById('map-menu').style.display = 'block';
