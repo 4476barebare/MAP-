@@ -506,13 +506,13 @@ function updateStateFromHash() {
     const hash = location.hash.replace('#', '');
     const parts = hash.split('/');
 
-    const areaName = parts[1] || null;
-    const spotKey = parts[2] || null;
+const areaName = parts[0] || null;
+const spotKey = parts[1] || null;
 
     let resolvedAreaId = null;
 
     if (areaName) {
-        const area = findAreaByName(areaName);
+        const area = window.areaData.find(a => a.name === areaName);
         if (area) {
             resolvedAreaId = area.pref + "_" + area.individualId;
         }
