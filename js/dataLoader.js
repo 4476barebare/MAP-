@@ -346,7 +346,6 @@ marker.on('click', function () {
         if (isFish) {
             showFishPopup(marker, spot);
         } else {
-            hideCenterMarker();
             zoomToSpot(spot);
         }
     }
@@ -437,6 +436,14 @@ function showFishPopup(marker, spot) {
 
 function zoomToSpot(spot) {
 
+    if (window.centerMarker) {
+        const marker = window.centerMarker;
+        window.centerMarker = null;
+
+        requestAnimationFrame(() => {
+            window.map.removeLayer(marker);
+        });
+    }
 
     switchToGSIPhoto();
 
@@ -491,12 +498,6 @@ function switchToGSIPhoto() {
     window.currentTileLayer = window.gsiPhotoLayer.addTo(window.map);
 }
 
-function hideCenterMarker() {
-    if (window.centerMarker) {
-        window.map.removeLayer(window.centerMarker);
-        window.centerMarker = null; // ★これ必須
-    }
-}
 
 function showCenterMarker() {
     if (!window.centerMarker) return;
