@@ -87,14 +87,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.currentTileLayer =
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
-                
-                // ★ spot中はここで止める（UI初期化しない）
-        if (window.currentPhase === 'spot') {
-            return;
-        }else{
-
-                
-                
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -125,7 +117,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
                 ? window.map.tap.enable()
                 : window.map.tap.disable();
         }
-        }
     } else {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
@@ -137,9 +128,9 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
     window.currentHash = location.hash;
 
-if (window.currentPhase === 'pref') {
-    showPrefSpots();
-}
+    if (!window.currentAreaId) {
+        showPrefSpots();
+    }
 }
 
 function selectArea(areaName) {
@@ -343,7 +334,6 @@ marker.on('click', function () {
         if (isFish) {
             showFishPopup(marker, spot);
         } else {
-            window.currentPhase = 'spot';
             zoomToSpot(spot);
         }
     }
@@ -448,13 +438,9 @@ function zoomToSpot(spot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    drawLocation(
-        spot.name,
-        spot.lat,
-        spot.lng,
-        spot.zoom || 15,
-        { animate: true }
-    );
+    window.map.setView([spot.lat, spot.lng], spot.zoom || 15, {
+        animate: true
+    });
     
     resetSpotLayers();
     // ★ここが本体
