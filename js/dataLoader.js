@@ -163,22 +163,25 @@ function selectArea(areaName) {
         area.zoom || window.prefData.zoom
     );
 
-    // ハッシュ更新（構造は維持）
+    // ★ハッシュ更新
     location.hash =
         encodeURIComponent(window.prefData.name) +
         '/' +
         encodeURIComponent(area.name);
 
+    // ★ここ重要
+    updateStateFromHash();
+
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    // ★統一ID
-    const areaId = area.pref + "_" + area.individualId;
+    // ★stateから取得
+    const areaId = window.currentAreaId;
 
-    // ★表示はここで呼ぶ
     showSpotsForArea(areaId);
     markerControl.showShop01(areaId);
 }
+
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
     window.map.off('move');
