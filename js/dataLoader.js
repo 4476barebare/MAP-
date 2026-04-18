@@ -87,6 +87,15 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.currentTileLayer =
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
+                
+                // ★ spot中はここで止める（UI初期化しない）
+        if (window.currentPhase === 'spot') {
+            window.currentHash = location.hash;
+            return;
+        }
+
+                
+                
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -334,6 +343,7 @@ marker.on('click', function () {
         if (isFish) {
             showFishPopup(marker, spot);
         } else {
+            window.currentPhase = 'spot';
             zoomToSpot(spot);
         }
     }
