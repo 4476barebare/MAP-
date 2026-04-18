@@ -128,9 +128,9 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
     window.currentHash = location.hash;
 
-    if (!window.currentAreaId) {
-        showPrefSpots();
-    }
+if (window.currentPhase === 'pref') {
+    showPrefSpots();
+}
 }
 
 function selectArea(areaName) {
