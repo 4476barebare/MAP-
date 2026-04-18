@@ -177,7 +177,7 @@ function selectArea(areaName) {
         // ★最初にstate確定
     location.hash = encodeURIComponent(areaName);
     updateStateFromHash();
-    aler(window.currentAreaId);
+    alert(window.currentAreaId);
 
 
     window.map.once('moveend', () => {
