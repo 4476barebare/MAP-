@@ -511,36 +511,30 @@ function resetSpotLayers() {
 
 function updateStateFromHash() {
 
-    const hash = location.hash.replace('#', '');
+    const hash = decodeURIComponent(location.hash.replace('#', ''));
     const parts = hash.split('/');
 
-const pref = parts[0] || null;
-const areaName = parts[1] || null;
-const spotKey = parts[2] || null;
+    const areaName = parts[0] || null;
+    const spotKey = parts[1] || null;
 
     let resolvedAreaId = null;
 
     if (areaName) {
         const area = window.areaData.find(a => a.name === areaName);
         if (area) {
-            resolvedAreaId = pref + "_" + area.individualId;
+            resolvedAreaId =
+                window.currentPref + "_" + area.individualId;
         }
     }
 
-    // pref
     if (!areaName) {
-        window.currentPref = pref;
         window.currentAreaId = null;
         window.currentSpotId = null;
     }
-
-    // area
     else if (areaName && !spotKey) {
         window.currentAreaId = resolvedAreaId;
         window.currentSpotId = null;
     }
-
-    // spot
     else if (areaName && spotKey) {
         window.currentAreaId = resolvedAreaId;
         window.currentSpotId = resolvedAreaId + "_" + spotKey;
