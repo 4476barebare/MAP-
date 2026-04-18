@@ -289,6 +289,8 @@ window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
 
 function showSpotsForArea(areaKey) {
+
+    // 既存マーカー削除
     window.map.eachLayer(layer => {
         if (layer instanceof L.Marker) {
             window.map.removeLayer(layer);
@@ -306,49 +308,51 @@ function showSpotsForArea(areaKey) {
     let minLng = 999, maxLng = -999;
 
     spots.forEach(spot => {
+
         const iconId = spot.icon || 'spot';
         const isFish = iconId.startsWith('fish');
 
-        const marker = L.marker(
-            [spot.lat, spot.lng],
-            {
-                icon: L.divIcon({
-                    className: '',
-                    html: `
-                        <div class="spot-label ${iconId}">
-                            <svg width="16" height="16">
-                                <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-                            </svg>
-                            <span>${spot.name}</span>
-                        </div>
-                    `,
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                }),
-                zIndexOffset: isFish
-                    ? 600 + Math.floor(Math.random() * 50)
-                    : Math.floor(Math.random() * 500)
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: `
+                    <div class="spot-label ${iconId}">
+                        <svg width="16" height="16">
+                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                        </svg>
+                        <span>${spot.name}</span>
+                    </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            }),
+            zIndexOffset: isFish
+                ? 600 + Math.floor(Math.random() * 50)
+                : Math.floor(Math.random() * 500)
+        });
+
+        marker.on('click', function () {
+
+            const zoom = window.map.getZoom();
+
+            // ★ phase判定（stateなし運用）
+            const isPhase1 =
+                window.currentAreaId &&
+                zoom <= 12 &&
+                !window.currentSpotId;
+
+            if (isPhase1) {
+                selectSpot(areaKey, spot.name, spot.lat, spot.lng);
+                return;
             }
-        );
 
-marker.on('click', function () {
-
-    // phase1（最初のクリック）
-    if (window.currentPhase === 'area1') {
-        window.currentPhase = 'area2';
-        selectSpot(areaKey, spot.name, spot.lat, spot.lng);
-        return;
-    }
-
-    // phase2（2回目以降）
-    if (window.currentPhase === 'area2') {
-        if (isFish) {
-            showFishPopup(marker, spot);
-        } else {
-            zoomToSpot(spot);
-        }
-    }
-});
+            // phase2
+            if (isFish) {
+                showFishPopup(marker, spot);
+            } else {
+                zoomToSpot(spot);
+            }
+        });
 
         marker.addTo(window.map);
         window.spotMarkers.push(marker);
@@ -370,6 +374,7 @@ marker.on('click', function () {
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
+
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
