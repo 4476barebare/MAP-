@@ -432,32 +432,34 @@ function showFishPopup(marker, spot) {
 
 function zoomToSpot(spot) {
 
-    // タイル切替
     switchToGSIPhoto();
 
-    // ズーム有効化
-    window.map.scrollWheelZoom.enable();
-    window.map.doubleClickZoom.enable();
-    window.map.touchZoom.enable();
+    // ★ 一旦操作ロック
+    window.map.dragging.disable();
+    window.map.scrollWheelZoom.disable();
+    window.map.doubleClickZoom.disable();
+    window.map.touchZoom.disable();
 
-    // ズーム実行
     window.map.setView([spot.lat, spot.lng], spot.zoom || 15, {
         animate: true
     });
 
-    // ★ ズーム確定後に制御
     window.map.once('moveend', function () {
 
         const bounds = window.map.getBounds();
         const initialZoom = window.map.getZoom();
 
-        // ① ドラッグ制限（この視界に固定）
+        // 制限適用
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
+        window.map.setMinZoom(initialZoom);
+        window.map.setMaxZoom(18);
 
-        // ② ズーム制限
-        window.map.setMinZoom(initialZoom); // ←これよりズームアウト不可
-        window.map.setMaxZoom(18);          // ←ここまでズームイン可能
+        // ★ 操作解放
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
     });
 }
 
