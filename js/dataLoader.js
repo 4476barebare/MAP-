@@ -61,6 +61,7 @@ return {
 }
 
 function drawLocation(name, lat, lng, zoom, options = {}) {
+
     const defaultOptions = {
         center: [lat, lng],
         zoom: zoom,
@@ -75,9 +76,18 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
     const mapOptions = { ...defaultOptions, ...options };
 
-    const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+    const tileUrl =
+        'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
+    // =====================
+    // map初期化
+    // =====================
     if (window.map) {
+
+        // =====================
+        // 既存map（ここで分岐）
+        // =====================
+
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
         if (window.currentTileLayer) {
@@ -88,36 +98,58 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
 
-        mapOptions.scrollWheelZoom
-            ? window.map.scrollWheelZoom.enable()
-            : window.map.scrollWheelZoom.disable();
-
-        mapOptions.dragging
-            ? window.map.dragging.enable()
-            : window.map.dragging.disable();
-
-        mapOptions.doubleClickZoom
-            ? window.map.doubleClickZoom.enable()
-            : window.map.doubleClickZoom.disable();
-
-        mapOptions.boxZoom
-            ? window.map.boxZoom.enable()
-            : window.map.boxZoom.disable();
-
-        mapOptions.keyboard
-            ? window.map.keyboard.enable()
-            : window.map.keyboard.disable();
-
-        mapOptions.touchZoom
-            ? window.map.touchZoom.enable()
-            : window.map.touchZoom.disable();
-
-        if (window.map.tap) {
-            mapOptions.tap
-                ? window.map.tap.enable()
-                : window.map.tap.disable();
+        // =====================
+        // ★ spot
+        // =====================
+        if (window.currentPhase === 'spot') {
+            window.currentHash = location.hash;
         }
+
+        // =====================
+        // ★ else（pref / area）
+        // =====================
+        else {
+
+            mapOptions.scrollWheelZoom
+                ? window.map.scrollWheelZoom.enable()
+                : window.map.scrollWheelZoom.disable();
+
+            mapOptions.dragging
+                ? window.map.dragging.enable()
+                : window.map.dragging.disable();
+
+            mapOptions.doubleClickZoom
+                ? window.map.doubleClickZoom.enable()
+                : window.map.doubleClickZoom.disable();
+
+            mapOptions.boxZoom
+                ? window.map.boxZoom.enable()
+                : window.map.boxZoom.disable();
+
+            mapOptions.keyboard
+                ? window.map.keyboard.enable()
+                : window.map.keyboard.disable();
+
+            mapOptions.touchZoom
+                ? window.map.touchZoom.enable()
+                : window.map.touchZoom.disable();
+
+            if (window.map.tap) {
+                mapOptions.tap
+                    ? window.map.tap.enable()
+                    : window.map.tap.disable();
+            }
+
+            if (!window.currentAreaId) {
+                showPrefSpots();
+            }
+        }
+
     } else {
+
+        // =====================
+        // 初回生成
+        // =====================
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
 
@@ -125,13 +157,8 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
     }
-
-    window.currentHash = location.hash;
-
-    if (!window.currentAreaId) {
-        showPrefSpots();
-    }
 }
+
 
 function selectArea(areaName) {
     if (window.spotLayer) {
@@ -334,6 +361,7 @@ marker.on('click', function () {
         if (isFish) {
             showFishPopup(marker, spot);
         } else {
+            window.currentPhase = 'spot';
             zoomToSpot(spot);
         }
     }
