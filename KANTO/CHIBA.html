@@ -264,36 +264,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!data.main) return;
 
-        const initialHash = location.hash;
+const initialHash = location.hash;
 
-        if (initialHash) {
+window.currentHash = initialHash;
+updateStateFromHash();
 
-            const parts = decodeURIComponent(initialHash.substring(1)).split('/');
-            const areaName = parts[0];
-            const spotName = parts[1];
+// ★ここからはstateだけ見る
+if (window.currentSpotId) {
 
-            window.currentHash = initialHash;
+    const parts = decodeURIComponent(initialHash.replace(/^#/, '')).split('/');
+    const areaName = parts[0];
+    const spotKey = parts[1];
 
-            if (spotName) {
-                selectSpot(areaName, spotName);
-            } else {
-                selectArea(areaName);
-            }
+    const spot = window.spotData.find(s =>
+        (s.individualId || s.id) === spotKey
+    );
 
-        } else {
+    if (spot && areaName) {
+        selectArea(areaName);
+        selectSpot(areaName, spot.name, spot.lat, spot.lng);
+    }
 
-            drawLocation(
-                window.prefData.name,
-                window.prefData.lat,
-                window.prefData.lng,
-                window.prefData.zoom
-            );
+} else if (window.currentAreaId) {
 
-            document.getElementById('map-menu').style.display = 'block';
-            document.getElementById('map-back-btn').style.display = 'none';
+    const areaName = decodeURIComponent(initialHash.replace(/^#/, '')).split('/')[0];
+    selectArea(areaName);
 
-            window.markerControl.preloadShop01(shopUrl);
-        }
+} else {
+
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+
+    document.getElementById('map-menu').style.display = 'block';
+    document.getElementById('map-back-btn').style.display = 'none';
+
+    window.markerControl.preloadShop01(shopUrl);
+}
 
         // -----------------------
         // メニュー生成
@@ -310,6 +320,10 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = areaName;
 
  btn.onclick = () => {
+     
+       // ★最初にstate確定
+    location.hash = encodeURIComponent(areaName);
+    updateStateFromHash();
                 selectArea(areaName);
             };
 
