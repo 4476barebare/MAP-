@@ -486,12 +486,6 @@ function showPrefSpots() {
     }
 }
 
-function hidePrefSpots() {
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
-}
 
 function showFishPopup(marker, spot) {
     const html = `
@@ -511,17 +505,9 @@ function zoomToSpot(spot) {
     // -----------------------
     // hash更新（spot側に依存しない）
     // -----------------------
-    const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
-    const areaName = hash.split('/')[0] || '';
+location.hash = window.currentAreaIdName + '/' + (spot.individualId || spot.id);
+    updateStateFromHash();
 
-    const individualId = spot.individualId || spot.id || '';
-
-    if (areaName && individualId) {
-        location.hash = areaName + '/' + individualId;
-
-        // ★状態同期はここで統一
-        updateStateFromHash();
-    }
 
     // -----------------------
     // 操作ロック
