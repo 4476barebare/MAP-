@@ -511,7 +511,13 @@ function showFishPopup(marker, spot) {
         </div>
     `;
 
-    marker.bindPopup(popupHtml).openPopup();
+    // ★ここが本質
+    marker.closePopup();
+    marker.unbindPopup();
+
+    marker.bindPopup(popupHtml, {
+        offset: [0, 8] // 必要なら微調整
+    }).openPopup();
 }
 
 function zoomToSpot(safeSpot) {
