@@ -489,14 +489,29 @@ function showPrefSpots() {
 
 
 function showFishPopup(marker, spot) {
-    const html = `
-        <div>
-            <strong>${spot.name}</strong><br>
-            ${spot.notes || ''}
+
+    const googleUrl =
+        'https://www.google.com/search?q=' +
+        encodeURIComponent(spot.name);
+
+    const popupHtml = `
+        <div class="shop-popup">
+            <div class="shop-popup-address">
+                ${spot.notes || ''}
+            </div>
+
+            <div class="shop-popup-footer">
+                <a class="shop-popup-btn"
+                   href="${googleUrl}"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    Googleで検索
+                </a>
+            </div>
         </div>
     `;
 
-    marker.bindPopup(html).openPopup();
+    marker.bindPopup(popupHtml).openPopup();
 }
 
 function zoomToSpot(safeSpot) {
