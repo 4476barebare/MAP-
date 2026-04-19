@@ -331,28 +331,38 @@ function showSpotsForArea(areaKey) {
                 : Math.floor(Math.random() * 500)
         });
 
-        marker.on('click', function () {
+marker.on('click', function () {
 
-            const zoom = window.map.getZoom();
+    const zoom = window.map.getZoom();
 
-            // ★ phase判定（stateなし運用）
-            const isPhase1 =
-                window.currentAreaId &&
-                zoom <= 12 &&
-                !window.currentSpotId;
+    // ★ phase判定（stateなし運用）
+    const isPhase1 =
+        window.currentAreaId &&
+        zoom <= 12 &&
+        !window.currentSpotId;
 
-            if (isPhase1) {
-                selectSpot(areaKey, spot.name, spot.lat, spot.lng);
-                return;
-            }
+    if (isPhase1) {
+        selectSpot(areaKey, spot.name, spot.lat, spot.lng);
+        return;
+    }
 
-            // phase2
-            if (isFish) {
-                showFishPopup(marker, spot);
-            } else {
-                zoomToSpot(spot);
-            }
-        });
+    // phase2
+    if (isFish) {
+        showFishPopup(marker, spot);
+    } else {
+
+        // ★ここでspotを安全化する（追加のみ）
+        const safeSpot = {
+            name: spot.name,
+            lat: spot.lat,
+            lng: spot.lng,
+            zoom: spot.zoom,
+            individualId: spot.individualId || spot.id || ''
+        };
+
+        zoomToSpot(safeSpot);
+    }
+});
 
         marker.addTo(window.map);
         window.spotMarkers.push(marker);
@@ -442,24 +452,43 @@ function zoomToSpot(spot) {
 
     switchToGSIPhoto();
 
-    const areaName = decodeURIComponent(location.hash.replace(/^#/, '')).split('/')[0];
+    // -----------------------
+    // hash更新（spot側に依存しない）
+    // -----------------------
+    const hash = decodeURIComponent(location.hash.replace(/^#/, ''));
+    const areaName = hash.split('/')[0] || '';
+
     const individualId = spot.individualId || spot.id || '';
 
     if (areaName && individualId) {
         location.hash = areaName + '/' + individualId;
+
+        // ★状態同期はここで統一
+        updateStateFromHash();
     }
 
+    // -----------------------
+    // 操作ロック
+    // -----------------------
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    window.map.setView([spot.lat, spot.lng], spot.zoom || 15, {
-        animate: true
-    });
-    
+    // -----------------------
+    // 移動
+    // -----------------------
+    window.map.setView(
+        [spot.lat, spot.lng],
+        spot.zoom || 15,
+        { animate: true }
+    );
+
     resetSpotLayers();
-    // ★ここが本体
+
+    // -----------------------
+    // 安定後処理
+    // -----------------------
     window.map.once('moveend', function () {
 
         const bounds = window.map.getBounds();
@@ -467,6 +496,7 @@ function zoomToSpot(spot) {
 
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
+
         window.map.setMinZoom(initialZoom);
         window.map.setMaxZoom(18);
 
@@ -474,11 +504,8 @@ function zoomToSpot(spot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-        
     });
 }
-
-
 
 window.gsiPhotoLayer = L.tileLayer(
     'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
