@@ -516,7 +516,7 @@ function showFishPopup(marker, spot) {
     marker.unbindPopup();
 
     marker.bindPopup(popupHtml, {
-        offset: [0, 8] // 必要なら微調整
+        offset: [0, 0] // 必要なら微調整
     }).openPopup();
 }
 
