@@ -176,31 +176,24 @@ li { user-select: none; cursor: pointer; }
 /* -----------------------
    fish popup専用
 ----------------------- */
+/* -----------------------
+   fish popup専用
+----------------------- */
 .shop-popup.fish-popup {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    max-width: 260px;
 }
 
-/* 本文（notes）も念のため固定 */
 .shop-popup.fish-popup .shop-popup-address {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
 }
 
-/* ボタンの矢印を強制的に▼にする */
-.shop-popup.fish-popup .shop-popup-btn::after {
-    content: "\25BC"; /* ▼ */
-    margin-left: 4px;
-    font-family: sans-serif;
-}
-
-/* もし既存で◆が出てる原因を潰す */
+/* ボタンの変な記号を完全削除 */
 .shop-popup-btn::after {
-    content: "\25BC";
+    content: none !important;
 }
-
 
 </style>
 </head>
