@@ -264,12 +264,19 @@ function goBack(hash) {
     // -----------------------
     // spot → areaへ戻る
     // -----------------------
-    if (spotName) {
+if (spotName) {
 
-        // spot状態からエリア再表示へ
-        selectArea(areaName);
-        return;
-    }
+    const rawAreaName = decodeURIComponent(areaName || '').trim();
+
+    const area = window.areaData.find(
+        a => (a.name || '').trim() === rawAreaName
+    );
+
+    if (!area) return;
+
+    selectArea(area.name);
+    return;
+}
 
     // -----------------------
     // area → prefへ戻る（県画面）
