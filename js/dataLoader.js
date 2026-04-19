@@ -240,24 +240,43 @@ function enableDragForArea() {
 }
 
 function goBack(hash) {
+
+    // -----------------------
+    // map制御リセット
+    // -----------------------
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
 
     window.areaBounds = null;
-    window.currentAreaId = null;
-    
+
+    // スポット系レイヤー削除
     resetSpotLayers();
 
+    // -----------------------
+    // 現在hash取得
+    // -----------------------
     hash = hash || window.currentHash || '';
 
     const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
     const areaName = parts[0];
     const spotName = parts[1];
 
+    // -----------------------
+    // spot → areaへ戻る
+    // -----------------------
     if (spotName) {
-        //showCenterMarker();
+
+        // spot状態からエリア再表示へ
+        selectArea(areaName);
         return;
-    } else if (areaName) {
+    }
+
+    // -----------------------
+    // area → prefへ戻る（県画面）
+    // -----------------------
+    if (areaName) {
+
+        // 県中心へ戻す
         drawLocation(
             window.prefData.name,
             window.prefData.lat,
@@ -265,22 +284,32 @@ function goBack(hash) {
             window.prefData.zoom
         );
 
+        // hashリセット
         location.hash = '';
         window.currentHash = '';
 
-        requestAnimationFrame(() => {
-            showPrefSpots();
-        });
+        // ★状態は必ずURLから再構築
+        updateStateFromHash();
 
+        // 県用スポット表示
+        showPrefSpots();
+
+        // 地図再描画補正
         window.map.invalidateSize(true);
-        window.currentPhase = 'pref';
-        
-        //showCenterMarker();
+
+        // -----------------------
+        // 県画面UI
+        // -----------------------
+        document.getElementById('map-menu').style.display = 'block';
+        document.getElementById('map-back-btn').style.display = 'none';
+
+        return;
     }
 
-    document.getElementById('map-menu').style.display = 'block';
-    document.getElementById('map-back-btn').style.display = 'none';
 }
+
+
+
 
 window.selectArea = selectArea;
 window.selectSpot = selectSpot;
