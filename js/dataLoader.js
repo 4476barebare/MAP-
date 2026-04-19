@@ -498,14 +498,14 @@ function showFishPopup(marker, spot) {
     marker.bindPopup(html).openPopup();
 }
 
-function zoomToSpot(spot) {
+function zoomToSpot(safeSpot) {
 
     switchToGSIPhoto();
 
     // -----------------------
     // hash更新（spot側に依存しない）
     // -----------------------
-location.hash = window.currentAreaIdName + '/' + (spot.individualId || spot.id);
+location.hash = window.currentAreaIdName + '/' + (safeSpot.individualId || spot.id);
     updateStateFromHash();
 
 
