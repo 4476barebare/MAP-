@@ -162,7 +162,10 @@ function selectArea(areaName) {
     const area = window.areaData.find(a => a.name === areaName);
     if (!area) return;
 
-    hidePrefSpots();
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
+    }
 
     const reqId = Date.now();
     window._shop01RequestId = reqId;
