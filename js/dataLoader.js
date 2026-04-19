@@ -494,10 +494,11 @@ function showFishPopup(marker, spot) {
         'https://www.google.com/search?q=' +
         encodeURIComponent(spot.name);
 
+
 const popupHtml = `
     <div class="shop-popup">
-        <div class="shop-popup-title dummy">dummy</div>
-        <div class="shop-popup-address">${spot.notes || ''}</div>
+        <div class="shop-popup-title"</div>
+        <div class="shop-popup-address dummy">${spot.notes || ''}</div>
 
         <div class="shop-popup-footer">
             <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
