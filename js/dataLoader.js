@@ -497,7 +497,7 @@ function showFishPopup(marker, spot) {
 
 const popupHtml = `
     <div class="shop-popup">
-        <div class="shop-popup-title"</div>
+        <div class="shop-popup-title"></div>
         <div class="shop-popup-address dummy">${spot.notes || ''}</div>
 
         <div class="shop-popup-footer">
