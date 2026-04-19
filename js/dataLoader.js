@@ -499,6 +499,9 @@ function showFishPopup(marker, spot) {
 }
 
 function zoomToSpot(safeSpot) {
+    
+    alert(window.currentAreaIdName);
+    alert(safeSpot.individualId);
 
     switchToGSIPhoto();
 
