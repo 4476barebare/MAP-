@@ -495,7 +495,7 @@ function showFishPopup(marker, spot) {
         encodeURIComponent(spot.name);
 
     const popupHtml = `
-        <div class="shop-popup fish-popup">
+        <div class="shop-popup">
             <div class="shop-popup-address">
                 ${spot.notes || ''}
             </div>
