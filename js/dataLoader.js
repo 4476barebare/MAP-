@@ -511,9 +511,7 @@ function showFishPopup(marker, spot) {
         </div>
     `;
 
-   marker.bindPopup(popupHtml, {
-    offset: [0, 8]
-}).openPopup();
+    marker.bindPopup(popupHtml).openPopup();
 }
 
 function zoomToSpot(safeSpot) {
