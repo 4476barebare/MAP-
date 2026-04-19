@@ -415,6 +415,9 @@ marker.on('click', function () {
             zoom: spot.zoom,
             individualId: spot.individualId || spot.id || ''
         };
+        
+        location.hash += '/' + safeSpot.individualId;
+    updateStateFromHash();
 
         zoomToSpot(safeSpot);
     }
@@ -506,8 +509,7 @@ function zoomToSpot(safeSpot) {
     // -----------------------
     // hash更新
     // -----------------------
-location.hash += '/' + safeSpot.individualId;
-    updateStateFromHash();
+
 
     // -----------------------
     // 操作ロック
