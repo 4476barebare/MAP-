@@ -266,21 +266,19 @@ function goBack(hash) {
     // -----------------------
 if (spotName) {
 
-
     const rawAreaName = decodeURIComponent(areaName || '').trim();
-    
-    
-        alert(
-        "spotName=" + spotName + "\n" +
-        "rawAreaName=" + areaName + "\n" +
-        "decoded=" + decodeURIComponent(areaName || '').trim()
-    );
 
     const area = window.areaData.find(
         a => (a.name || '').trim() === rawAreaName
     );
 
     if (!area) return;
+
+    // ★ハッシュからspotだけ削除（areaは残す）
+    const newHash = encodeURIComponent(area.name);
+    history.replaceState(null, '', '#' + newHash);
+
+    window.currentHash = '#' + newHash;
 
     selectArea(area.name);
     return;
