@@ -503,11 +503,10 @@ function zoomToSpot(safeSpot) {
     switchToGSIPhoto();
 
     // -----------------------
-    // hash更新（spot側に依存しない）
+    // hash更新
     // -----------------------
-location.hash = window.currentAreaIdName + '/' + (safeSpot.individualId || spot.id);
+    location.hash = window.currentAreaIdName + '/' + safeSpot.individualId;
     updateStateFromHash();
-
 
     // -----------------------
     // 操作ロック
@@ -521,8 +520,8 @@ location.hash = window.currentAreaIdName + '/' + (safeSpot.individualId || spot.
     // 移動
     // -----------------------
     window.map.setView(
-        [spot.lat, spot.lng],
-        spot.zoom || 15,
+        [safeSpot.lat, safeSpot.lng],
+        safeSpot.zoom || 15,
         { animate: true }
     );
 
