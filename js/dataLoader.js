@@ -274,12 +274,24 @@ if (spotName) {
 
     if (!area) return;
 
-    // ★ハッシュからspotだけ削除（areaは残す）
+    // ★ハッシュ修正
     const newHash = encodeURIComponent(area.name);
     history.replaceState(null, '', '#' + newHash);
-
     window.currentHash = '#' + newHash;
 
+    // ★ここ重要：地図状態リセット
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
+
+    window.map.dragging.disable();
+    window.map.scrollWheelZoom.disable(); // ←pref仕様に合わせる
+    window.map.doubleClickZoom.disable();
+    window.map.touchZoom.disable();
+
+    // ★レイヤ掃除
+    resetSpotLayers();
+
+    // ★再描画
     selectArea(area.name);
     return;
 }
