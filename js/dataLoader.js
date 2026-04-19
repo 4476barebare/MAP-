@@ -499,16 +499,14 @@ function showFishPopup(marker, spot) {
 }
 
 function zoomToSpot(safeSpot) {
-    
-    alert(window.currentAreaIdName);
-    alert(safeSpot.individualId);
+
 
     switchToGSIPhoto();
 
     // -----------------------
     // hash更新
     // -----------------------
-    location.hash = window.currentAreaIdName + '/' + safeSpot.individualId;
+location.hash += '/' + safeSpot.individualId;
     updateStateFromHash();
 
     // -----------------------
