@@ -173,6 +173,34 @@ li { user-select: none; cursor: pointer; }
     margin-top: -1px;
 }
 
+/* -----------------------
+   fish popup専用
+----------------------- */
+.shop-popup.fish-popup {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 本文（notes）も念のため固定 */
+.shop-popup.fish-popup .shop-popup-address {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ボタンの矢印を強制的に▼にする */
+.shop-popup.fish-popup .shop-popup-btn::after {
+    content: "\25BC"; /* ▼ */
+    margin-left: 4px;
+    font-family: sans-serif;
+}
+
+/* もし既存で◆が出てる原因を潰す */
+.shop-popup-btn::after {
+    content: "\25BC";
+}
+
 
 </style>
 </head>
