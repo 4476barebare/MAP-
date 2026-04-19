@@ -362,7 +362,13 @@ if (window.currentSpotId) {
                 }
             });
 
-            if (nearestArea) selectArea(nearestArea);
+            if (nearestArea) {
+
+    location.hash = encodeURIComponent(nearestArea);
+    updateStateFromHash();
+    selectArea(nearestArea);
+
+}
         };
 
         window.nearestClickEnabled = true;
