@@ -266,7 +266,15 @@ function goBack(hash) {
     // -----------------------
 if (spotName) {
 
+
     const rawAreaName = decodeURIComponent(areaName || '').trim();
+    
+    
+        alert(
+        "spotName=" + spotName + "\n" +
+        "rawAreaName=" + areaName + "\n" +
+        "decoded=" + decodeURIComponent(areaName || '').trim()
+    );
 
     const area = window.areaData.find(
         a => (a.name || '').trim() === rawAreaName
