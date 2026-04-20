@@ -277,6 +277,7 @@ function showDebug(msg) {
 // PREF / AREA UI
 // =======================
 function initAreaUI() {
+    document.getElementById('map-menu').style.display = 'block';
 
     const menuUl = document.querySelector('#map-menu ul');
     if (!menuUl) {
@@ -294,11 +295,11 @@ function initAreaUI() {
         const areaName = (area.name || '').trim();
         btn.textContent = areaName;
 
-        btn.onclick = () => {
-            location.hash = encodeURIComponent(areaName);
-            updateStateFromHash();
-            routeUpdate();
-        };
+       btn.onclick = () => {
+    location.hash = encodeURIComponent(areaName);
+    updateStateFromHash();
+    selectArea(areaName);
+};
 
         li.appendChild(btn);
         menuUl.appendChild(li);
@@ -334,10 +335,10 @@ function initAreaUI() {
         });
 
         if (nearestArea) {
-            location.hash = encodeURIComponent(nearestArea);
-            updateStateFromHash();
-            routeUpdate();
-        }
+    location.hash = encodeURIComponent(nearestArea);
+    updateStateFromHash();
+    selectArea(nearestArea);
+}
     };
 
     window.nearestClickEnabled = true;
@@ -358,6 +359,7 @@ function destroyAreaUI() {
     }
 
     window.nearestClickEnabled = false;
+   document.getElementById('map-menu').style.display = 'none';
 }
 
 // =======================
