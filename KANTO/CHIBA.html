@@ -462,8 +462,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-    document.getElementById('map-back-btn').addEventListener('click', () => {
-        goBack(window.currentHash);
+    const btn = document.getElementById('map-back-btn');
+
+btn.addEventListener('click', () => {
+    goBack(window.currentHash);
+});
+
+// SVG差し替えは後でOK（イベント後にやる）
+fetch('/MAP-/icon/back.svg')
+    .then(res => res.text())
+    .then(svg => {
+        btn.innerHTML = svg;
     });
 
 });
