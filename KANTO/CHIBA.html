@@ -424,8 +424,6 @@ function routeUpdate() {
 
         document.getElementById('map-back-btn').style.display = 'none';
 
-        window.markerControl.preloadShop01(shopUrl);
-
         initAreaUI(); // ← PREFだけUI起動
 
         return;
@@ -450,6 +448,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStateFromHash();
 
         routeUpdate();
+        
+        window.markerControl.preloadShop01(shopUrl);
+
     });
 
     document.getElementById('map-back-btn').addEventListener('click', () => {
