@@ -468,12 +468,19 @@ btn.addEventListener('click', () => {
     goBack(window.currentHash);
 });
 
-// SVG差し替えは後でOK（イベント後にやる）
-fetch('/MAP-/icon/back.svg')
-    .then(res => res.text())
-    .then(svg => {
-        btn.innerHTML = svg;
-    });
+// -----------------------
+    // back SVG
+    // -----------------------
+    fetch('/MAP-/icon/back.svg')
+        .then(res => res.text())
+        .then(svg => {
+
+            const btn = document.getElementById('map-back-btn');
+            btn.innerHTML = svg;
+
+            const svgEl = btn.querySelector('svg');
+            if (svgEl) svgEl.classList.add('back-icon');
+        });
 
 });
 
