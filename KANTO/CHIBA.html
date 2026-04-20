@@ -298,7 +298,10 @@ function initAreaUI() {
        btn.onclick = () => {
     location.hash = encodeURIComponent(areaName);
     updateStateFromHash();
+    destroyAreaUI();
     selectArea(areaName);
+    
+    document.getElementById('map-back-btn').style.display = 'block';
 };
 
         li.appendChild(btn);
@@ -337,7 +340,10 @@ function initAreaUI() {
         if (nearestArea) {
     location.hash = encodeURIComponent(nearestArea);
     updateStateFromHash();
+    destroyAreaUI();
     selectArea(nearestArea);
+    
+    document.getElementById('map-back-btn').style.display = 'block';
 }
     };
 
