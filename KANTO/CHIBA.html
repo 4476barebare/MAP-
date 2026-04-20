@@ -233,64 +233,54 @@ font-size:12px;
 
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
 
-    const currentFile = location.pathname.split('/').pop().split('?')[0].split('#')[0];
-    const pref = currentFile.replace('.html', '').toUpperCase();
+// =======================
+// グローバル
+// =======================
+window.prefData = null;
+window.areaData = [];
+window.spotData = [];
+window.currentHash = '';
+window.currentAreaId = null;
+window.currentSpotId = null;
+window.currentPref = null;
+window.nearestClickEnabled = true;
+window.nearestClickHandler = null;
 
-    const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
-    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
-    window.currentPref = pref;
+// =======================
+// デバッグ
+// =======================
+function showDebug(msg) {
+    let debugEl = document.getElementById('debug');
 
-    // -----------------------
-    // デバッグ
-    // -----------------------
-    function showDebug(msg) {
-        let debugEl = document.getElementById('debug');
-
-        if (!debugEl) {
-            debugEl = document.createElement('div');
-            debugEl.id = 'debug';
-            debugEl.style.position = 'fixed';
-            debugEl.style.top = '0';
-            debugEl.style.left = '0';
-            debugEl.style.background = 'rgba(255,255,0,0.85)';
-            debugEl.style.zIndex = '9999';
-            debugEl.style.padding = '6px';
-            debugEl.style.fontSize = '12px';
-            debugEl.style.maxWidth = '320px';
-            debugEl.style.whiteSpace = 'pre-wrap';
-            debugEl.style.maxHeight = '40vh';
-            debugEl.style.overflow = 'auto';
-            document.body.appendChild(debugEl);
-        }
-
-        debugEl.textContent += msg + "\n";
+    if (!debugEl) {
+        debugEl = document.createElement('div');
+        debugEl.id = 'debug';
+        debugEl.style.position = 'fixed';
+        debugEl.style.top = '0';
+        debugEl.style.left = '0';
+        debugEl.style.background = 'rgba(255,255,0,0.85)';
+        debugEl.style.zIndex = '9999';
+        debugEl.style.padding = '6px';
+        debugEl.style.fontSize = '12px';
+        debugEl.style.maxWidth = '320px';
+        debugEl.style.whiteSpace = 'pre-wrap';
+        debugEl.style.maxHeight = '40vh';
+        debugEl.style.overflow = 'auto';
+        document.body.appendChild(debugEl);
     }
 
-    showDebug('DOMContentLoaded: ' + csvUrl);
+    debugEl.textContent += msg + "\n";
+}
 
-    // -----------------------
-    // CSVロード
-    // -----------------------
-    loadLocationCSV(csvUrl, currentFile).then(data => {
-
-        showDebug('CSV loaded');
-
-        if (!data.main) return;
-
-        // ★ URL初期反映（ここだけ）
-        updateStateFromHash();
-        routeUpdate();
-        
-        
-
+// =======================
+// PREF / AREA UI
+// =======================
 function initAreaUI() {
 
-    // -----------------------
-    // メニュー生成
-    // -----------------------
     const menuUl = document.querySelector('#map-menu ul');
+    if (!menuUl) return;
+
     menuUl.innerHTML = '';
 
     window.areaData.forEach(area => {
@@ -304,16 +294,14 @@ function initAreaUI() {
         btn.onclick = () => {
             location.hash = encodeURIComponent(areaName);
             updateStateFromHash();
-            selectArea(areaName);
+            routeUpdate();
         };
 
         li.appendChild(btn);
         menuUl.appendChild(li);
     });
 
-    // -----------------------
-    // nearest click登録
-    // -----------------------
+    // nearest click
     window.nearestClickHandler = function(e) {
 
         if (!window.nearestClickEnabled) return;
@@ -345,7 +333,7 @@ function initAreaUI() {
         if (nearestArea) {
             location.hash = encodeURIComponent(nearestArea);
             updateStateFromHash();
-            selectArea(nearestArea);
+            routeUpdate();
         }
     };
 
@@ -353,19 +341,14 @@ function initAreaUI() {
     window.map.on('click', window.nearestClickHandler);
 }
 
+// =======================
+// UI解除
+// =======================
 function destroyAreaUI() {
 
-    // -----------------------
-    // メニュー削除
-    // -----------------------
     const menuUl = document.querySelector('#map-menu ul');
-    if (menuUl) {
-        menuUl.innerHTML = '';
-    }
+    if (menuUl) menuUl.innerHTML = '';
 
-    // -----------------------
-    // nearest click解除
-    // -----------------------
     if (window.nearestClickHandler) {
         window.map.off('click', window.nearestClickHandler);
         window.nearestClickHandler = null;
@@ -374,50 +357,9 @@ function destroyAreaUI() {
     window.nearestClickEnabled = false;
 }
 
-
-
-    // -----------------------
-    // 戻るボタン
-    // -----------------------
-    document.getElementById('map-back-btn').addEventListener('click', () => {
-        goBack(window.currentHash);
-    });
-
-    // -----------------------
-    // selectAreaラップ（競合遮断）
-    // -----------------------
-    const _selectArea = selectArea;
-
-    window.selectArea = function(areaName) {
-
-        if (window.nearestClickHandler) {
-            window.map.off('click', window.nearestClickHandler);
-        }
-
-        window.nearestClickEnabled = false;
-
-        setTimeout(() => {
-            _selectArea((areaName || '').trim());
-        }, 0);
-    };
-
-    // -----------------------
-    // back SVG
-    // -----------------------
-    fetch('/MAP-/icon/back.svg')
-        .then(res => res.text())
-        .then(svg => {
-
-            const btn = document.getElementById('map-back-btn');
-            btn.innerHTML = svg;
-
-            const svgEl = btn.querySelector('svg');
-            if (svgEl) svgEl.classList.add('back-icon');
-        });
-
-});
-
-
+// =======================
+// ROUTE UPDATE（唯一起点）
+// =======================
 function routeUpdate() {
 
     if (!window.prefData) return;
@@ -431,13 +373,11 @@ function routeUpdate() {
             (s.individualId || s.id) === window.currentSpotId.split('_').pop()
         );
 
-        if (!spot) return;
-
         const area = window.areaData.find(a =>
             window.currentAreaId && window.currentAreaId.endsWith(a.individualId)
         );
 
-        if (!area) return;
+        if (!spot || !area) return;
 
         drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || 15);
 
@@ -486,12 +426,37 @@ function routeUpdate() {
 
         window.markerControl.preloadShop01(shopUrl);
 
-        initAreaUI();
+        initAreaUI(); // ← PREFだけUI起動
 
         return;
     }
 }
 
+// =======================
+// DOM INIT
+// =======================
+document.addEventListener('DOMContentLoaded', () => {
+
+    const currentFile = location.pathname.split('/').pop().split('?')[0].split('#')[0];
+    const pref = currentFile.replace('.html', '').toUpperCase();
+
+    const csvUrl = `/MAP-/KANTO/${pref}_location.csv`;
+    const shopUrl = `/MAP-/KANTO/${pref}_shop.csv`;
+
+    window.currentPref = pref;
+
+    loadLocationCSV(csvUrl, currentFile).then(() => {
+
+        updateStateFromHash();
+
+        routeUpdate();
+    });
+
+    document.getElementById('map-back-btn').addEventListener('click', () => {
+        goBack(window.currentHash);
+    });
+
+});
 
 </script>
 </body>
