@@ -279,46 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!data.main) return;
 
-const initialHash = location.hash;
-
-window.currentHash = initialHash;
-updateStateFromHash();
-
-// ★ここからはstateだけ見る
-if (window.currentSpotId) {
-
-    const parts = decodeURIComponent(initialHash.replace(/^#/, '')).split('/');
-    const areaName = parts[0];
-    const spotKey = parts[1];
-
-    const spot = window.spotData.find(s =>
-        (s.individualId || s.id) === spotKey
-    );
-
-    if (spot && areaName) {
-        selectArea(areaName);
-        selectSpot(areaName, spot.name, spot.lat, spot.lng);
-    }
-
-} else if (window.currentAreaId) {
-
-    const areaName = decodeURIComponent(initialHash.replace(/^#/, '')).split('/')[0];
-    selectArea(areaName);
-
-} else {
-
-    drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom
-    );
-
-    document.getElementById('map-menu').style.display = 'block';
-    document.getElementById('map-back-btn').style.display = 'none';
-
-    window.markerControl.preloadShop01(shopUrl);
-}
+        // ★ URL初期反映（ここだけ）
+        updateStateFromHash();
+        routeUpdate();
+        
+        
 
         // -----------------------
         // メニュー生成
@@ -334,12 +299,9 @@ if (window.currentSpotId) {
             const areaName = (area.name || '').trim();
             btn.textContent = areaName;
 
- btn.onclick = () => {
-     
-       // ★最初にstate確定
-    location.hash = encodeURIComponent(areaName);
-    updateStateFromHash();
-                selectArea(areaName);
+            btn.onclick = () => {
+                location.hash = encodeURIComponent(areaName);
+                updateStateFromHash();
             };
 
             li.appendChild(btn);
@@ -378,12 +340,9 @@ if (window.currentSpotId) {
             });
 
             if (nearestArea) {
-
-    location.hash = encodeURIComponent(nearestArea);
-    updateStateFromHash();
-    selectArea(nearestArea);
-
-}
+                location.hash = encodeURIComponent(nearestArea);
+                updateStateFromHash();
+            }
         };
 
         window.nearestClickEnabled = true;
@@ -392,7 +351,7 @@ if (window.currentSpotId) {
     });
 
     // -----------------------
-    // 戻る
+    // 戻るボタン
     // -----------------------
     document.getElementById('map-back-btn').addEventListener('click', () => {
         goBack(window.currentHash);
@@ -405,7 +364,6 @@ if (window.currentSpotId) {
 
     window.selectArea = function(areaName) {
 
-        // ★競合防止：map clickを一旦止める
         if (window.nearestClickHandler) {
             window.map.off('click', window.nearestClickHandler);
         }
@@ -415,23 +373,6 @@ if (window.currentSpotId) {
         setTimeout(() => {
             _selectArea((areaName || '').trim());
         }, 0);
-    };
-
-    // -----------------------
-    // goBackラップ
-    // -----------------------
-    const _goBack = goBack;
-
-    window.goBack = function(hash) {
-        _goBack(hash);
-
-        // ★戻ったら再有効化
-        if (!window.currentHash) {
-            window.nearestClickEnabled = true;
-            if (window.nearestClickHandler) {
-                window.map.on('click', window.nearestClickHandler);
-            }
-        }
     };
 
     // -----------------------
@@ -450,20 +391,75 @@ if (window.currentSpotId) {
 
 });
 
-// -----------------------
-// popstate
-// -----------------------
-window.addEventListener('popstate', () => {
+function routeUpdate() {
 
-    const newHash = location.hash;
-    const prevHash = window.currentHash;
+    if (!window.prefData) return;
 
-    if (newHash.length < prevHash.length) {
-        goBack(prevHash);
+    // -----------------------
+    // SPOT
+    // -----------------------
+    if (window.currentSpotId) {
+
+        const spot = window.spotData.find(s =>
+            (s.individualId || s.id) === window.currentSpotId.split('_').pop()
+        );
+
+        if (!spot) return;
+
+        const area = window.areaData.find(a =>
+            window.currentAreaId.endsWith(a.individualId)
+        );
+
+        if (!area) return;
+
+        drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || 15);
+
+        selectArea(area.name);
+        selectSpot(area.name, spot.name, spot.lat, spot.lng);
+
+        return;
     }
 
-    window.currentHash = newHash;
-});
+    // -----------------------
+    // AREA
+    // -----------------------
+    if (window.currentAreaId) {
+
+        const area = window.areaData.find(a =>
+            window.currentAreaId.endsWith(a.individualId)
+        );
+
+        if (!area) return;
+
+        drawLocation(
+            area.name,
+            area.lat,
+            area.lng,
+            area.zoom || window.prefData.zoom
+        );
+
+        selectArea(area.name);
+
+        return;
+    }
+
+    // -----------------------
+    // PREF
+    // -----------------------
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+
+    document.getElementById('map-menu').style.display = 'block';
+    document.getElementById('map-back-btn').style.display = 'none';
+
+    window.markerControl.preloadShop01(shopUrl);
+}
+
+
 </script>
 </body>
 </html>
