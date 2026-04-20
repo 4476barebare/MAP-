@@ -218,7 +218,7 @@ font-size:12px;
     <div class="ad-box">AD 320×50</div>
   </div>
   <div id="map-menu" class="map-menu"><ul></ul></div>
-  <button id="map-back-btn" class="map-back-btn">テスト</button>
+  <button id="map-back-btn" class="map-back-btn"></button>
 </div>
 
 
@@ -431,8 +431,8 @@ function routeUpdate() {
             window.prefData.zoom
         );
 
-        //document.getElementById('map-back-btn').style.display = 'none';
-        document.getElementById('map-back-btn').style.display = 'block';
+        document.getElementById('map-back-btn').style.display = 'none';
+        //document.getElementById('map-back-btn').style.display = 'block';
         initAreaUI(); // ← PREFだけUI起動
 
         return;
