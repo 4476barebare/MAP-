@@ -285,70 +285,96 @@ document.addEventListener('DOMContentLoaded', () => {
         
         
 
-        // -----------------------
-        // メニュー生成
-        // -----------------------
-        const menuUl = document.querySelector('#map-menu ul');
-        menuUl.innerHTML = '';
+function initAreaUI() {
+
+    // -----------------------
+    // メニュー生成
+    // -----------------------
+    const menuUl = document.querySelector('#map-menu ul');
+    menuUl.innerHTML = '';
+
+    window.areaData.forEach(area => {
+
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+
+        const areaName = (area.name || '').trim();
+        btn.textContent = areaName;
+
+        btn.onclick = () => {
+            location.hash = encodeURIComponent(areaName);
+            updateStateFromHash();
+            selectArea(areaName);
+        };
+
+        li.appendChild(btn);
+        menuUl.appendChild(li);
+    });
+
+    // -----------------------
+    // nearest click登録
+    // -----------------------
+    window.nearestClickHandler = function(e) {
+
+        if (!window.nearestClickEnabled) return;
+
+        const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+
+        if (
+            e.originalEvent.clientX >= menuRect.left &&
+            e.originalEvent.clientX <= menuRect.right &&
+            e.originalEvent.clientY >= menuRect.top &&
+            e.originalEvent.clientY <= menuRect.bottom
+        ) return;
+
+        let nearestArea = null;
+        let minDist = Infinity;
 
         window.areaData.forEach(area => {
 
-            const li = document.createElement('li');
-            const btn = document.createElement('button');
+            const dLat = e.latlng.lat - area.lat;
+            const dLng = e.latlng.lng - area.lng;
+            const dist = dLat * dLat + dLng * dLng;
 
-            const areaName = (area.name || '').trim();
-            btn.textContent = areaName;
-
-            btn.onclick = () => {
-                location.hash = encodeURIComponent(areaName);
-                updateStateFromHash();
-            };
-
-            li.appendChild(btn);
-            menuUl.appendChild(li);
+            if (dist < minDist) {
+                minDist = dist;
+                nearestArea = area.name;
+            }
         });
 
-        // -----------------------
-        // map click（nearest）
-        // -----------------------
-        window.nearestClickHandler = function(e) {
+        if (nearestArea) {
+            location.hash = encodeURIComponent(nearestArea);
+            updateStateFromHash();
+            selectArea(nearestArea);
+        }
+    };
 
-            if (!window.nearestClickEnabled) return;
+    window.nearestClickEnabled = true;
+    window.map.on('click', window.nearestClickHandler);
+}
 
-            const menuRect = document.getElementById('map-menu').getBoundingClientRect();
+function destroyAreaUI() {
 
-            if (
-                e.originalEvent.clientX >= menuRect.left &&
-                e.originalEvent.clientX <= menuRect.right &&
-                e.originalEvent.clientY >= menuRect.top &&
-                e.originalEvent.clientY <= menuRect.bottom
-            ) return;
+    // -----------------------
+    // メニュー削除
+    // -----------------------
+    const menuUl = document.querySelector('#map-menu ul');
+    if (menuUl) {
+        menuUl.innerHTML = '';
+    }
 
-            let nearestArea = null;
-            let minDist = Infinity;
+    // -----------------------
+    // nearest click解除
+    // -----------------------
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
+        window.nearestClickHandler = null;
+    }
 
-            window.areaData.forEach(area => {
+    window.nearestClickEnabled = false;
+}
 
-                const dLat = e.latlng.lat - area.lat;
-                const dLng = e.latlng.lng - area.lng;
-                const dist = dLat * dLat + dLng * dLng;
 
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearestArea = area.name;
-                }
-            });
-
-            if (nearestArea) {
-                location.hash = encodeURIComponent(nearestArea);
-                updateStateFromHash();
-            }
-        };
-
-        window.nearestClickEnabled = true;
-        window.map.on('click', window.nearestClickHandler);
-
-    });
 
     // -----------------------
     // 戻るボタン
@@ -391,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+
 function routeUpdate() {
 
     if (!window.prefData) return;
@@ -407,7 +434,7 @@ function routeUpdate() {
         if (!spot) return;
 
         const area = window.areaData.find(a =>
-            window.currentAreaId.endsWith(a.individualId)
+            window.currentAreaId && window.currentAreaId.endsWith(a.individualId)
         );
 
         if (!area) return;
@@ -446,17 +473,23 @@ function routeUpdate() {
     // -----------------------
     // PREF
     // -----------------------
-    drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom
-    );
+    if (!window.currentAreaId && !window.currentSpotId) {
 
-    document.getElementById('map-menu').style.display = 'block';
-    document.getElementById('map-back-btn').style.display = 'none';
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom
+        );
 
-    window.markerControl.preloadShop01(shopUrl);
+        document.getElementById('map-back-btn').style.display = 'none';
+
+        window.markerControl.preloadShop01(shopUrl);
+
+        initAreaUI();
+
+        return;
+    }
 }
 
 
