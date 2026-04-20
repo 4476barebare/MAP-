@@ -279,7 +279,10 @@ function showDebug(msg) {
 function initAreaUI() {
 
     const menuUl = document.querySelector('#map-menu ul');
-    if (!menuUl) return;
+    if (!menuUl) {
+    document.body.innerHTML += "<div style='color:red'>MENU UL NULL</div>";
+    return;
+}
 
     menuUl.innerHTML = '';
 
