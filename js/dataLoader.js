@@ -4,7 +4,7 @@ window.areaData = [];
 window.spotData = [];
 window.currentHash = '';
 window.currentAreaId = null;
-window.currentPhase = 'pref'; // pref / area / spot
+//window.currentPhase = 'pref'; // pref / area / spot
 
 function loadLocationCSV(csvUrl, currentFile) {
     return fetch(csvUrl)
@@ -60,8 +60,6 @@ function loadLocationCSV(csvUrl, currentFile) {
             window.areaData = areas;
             window.spotData = spots;
 
-            // ★ここでやる
-            updateStateFromHash();
 
             return { main, areas, spots };
         });
@@ -142,9 +140,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 }
 
 function selectArea(areaName) {
-    
-      
-
 
 
     if (window.spotLayer) {
@@ -311,22 +306,16 @@ if (spotName) {
 
         // hashリセット
         location.hash = '';
-        window.currentHash = '';
-
         // ★状態は必ずURLから再構築
         updateStateFromHash();
 
         // 県用スポット表示
         showPrefSpots();
-
-        // 地図再描画補正
+        
         window.map.invalidateSize(true);
-
-        // -----------------------
-        // 県画面UI
-        // -----------------------
-        document.getElementById('map-menu').style.display = 'block';
+        
         document.getElementById('map-back-btn').style.display = 'none';
+        initAreaUI();
 
         return;
     }
@@ -420,6 +409,7 @@ marker.on('click', function () {
         zoomToSpot(safeSpot);
     }
 });
+
 
         marker.addTo(window.map);
         window.spotMarkers.push(marker);
