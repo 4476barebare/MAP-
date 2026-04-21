@@ -561,7 +561,10 @@ function zoomToSpot(safeSpot) {
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
         
-        startZoomGuard();
+        setTimeout(() => {
+    startZoomGuard();
+}, 50);
+
     });
 }
 
