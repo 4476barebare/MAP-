@@ -14,7 +14,13 @@ li, button { -webkit-tap-highlight-color: rgba(0,0,0,0); }
 li:active, button:active { background: transparent; }
 li { user-select: none; cursor: pointer; }
 .leaflet-control-attribution { font-size: 8px; background: rgba(255,255,255,0.5); }
-#lf-map { width:100%; height:80vh; position:relative; z-index:0; }
+#lf-map {
+    width:100%;
+    height:80vh;
+    position:relative; 
+    z-index:0;
+    touch-action: none;
+    }
 .leaflet-container { z-index:0; }
 
 /* メニューは初期非表示 */
@@ -487,50 +493,56 @@ btn.addEventListener('click', () => {
             if (svgEl) svgEl.classList.add('back-icon');
         });
 
-// =======================
-// ピンチアウトで戻る
-// =======================
 
-
-// Leaflet側のズーム完全停止
-map.touchZoom.disable();
+// =======================
+// ピンチアウトで戻る（完全版）
+// =======================
 
 let pinchStartDistance = 0;
 let pinchTriggered = false;
 
-const mapEl = map.getContainer();
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
-mapEl.addEventListener('touchstart', (e) => {
+// documentで取得（Leaflet無視）
+document.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
         pinchStartDistance = getDistance(e.touches);
         pinchTriggered = false;
     }
-}, { capture: true });
+}, { passive: false });
 
-mapEl.addEventListener('touchmove', (e) => {
+document.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
 
         const currentDistance = getDistance(e.touches);
 
+        // 閾値は低めに（確実に発火させる）
         if (!pinchTriggered && currentDistance > pinchStartDistance + 10) {
 
             pinchTriggered = true;
 
+            // 県画面かどうか判定
             const isPrefView = !window.currentAreaId && !window.currentSpotId;
 
-            alert("pinch検出");
-
             if (!isPrefView) {
+                alert("ピンチ検出");
                 goBack(window.currentHash);
             }
         }
     }
-}, { capture: true });
+}, { passive: false });
 
-mapEl.addEventListener('touchend', () => {
+document.addEventListener('touchend', () => {
     pinchStartDistance = 0;
     pinchTriggered = false;
 });
+
+
+
 
 
 
