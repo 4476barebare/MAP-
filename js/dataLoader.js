@@ -515,13 +515,7 @@ const popupHtml = `
 
 function zoomToSpot(safeSpot) {
 
-
     switchToGSIPhoto();
-
-    // -----------------------
-    // hash更新
-    // -----------------------
-
 
     // -----------------------
     // 操作ロック
@@ -550,22 +544,34 @@ function zoomToSpot(safeSpot) {
         const bounds = window.map.getBounds();
         const initialZoom = window.map.getZoom();
 
+        // 範囲固定
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
 
+        // ズーム制限
         window.map.setMinZoom(initialZoom);
         window.map.setMaxZoom(18);
 
+        // 操作復帰
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-        
-        setTimeout(() => {
-    startZoomGuard();
-}, 50);
 
+        showDebug("moveend fired");
     });
+
+    // -----------------------
+    // ★ズームガード（確実起動）
+    // -----------------------
+    setTimeout(() => {
+        if (!window.map) return;
+
+        window._zoomGuardBase = window.map.getZoom();
+        window._zoomGuardActive = true;
+
+        showDebug("ZG START base=" + window._zoomGuardBase);
+    }, 150);
 }
 
 window.gsiPhotoLayer = L.tileLayer(
