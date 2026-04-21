@@ -491,17 +491,21 @@ btn.addEventListener('click', () => {
 // ピンチアウトで戻る
 // =======================
 
+
+// Leaflet側のズーム完全停止
+map.touchZoom.disable();
+
 let pinchStartDistance = 0;
 let pinchTriggered = false;
 
-const mapEl = window.map.getContainer();
+const mapEl = map.getContainer();
 
 mapEl.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
         pinchStartDistance = getDistance(e.touches);
         pinchTriggered = false;
     }
-});
+}, { capture: true });
 
 mapEl.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
@@ -514,13 +518,14 @@ mapEl.addEventListener('touchmove', (e) => {
 
             const isPrefView = !window.currentAreaId && !window.currentSpotId;
 
+            alert("pinch検出");
+
             if (!isPrefView) {
-                alert("pinch!");
                 goBack(window.currentHash);
             }
         }
     }
-});
+}, { capture: true });
 
 mapEl.addEventListener('touchend', () => {
     pinchStartDistance = 0;
