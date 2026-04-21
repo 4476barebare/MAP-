@@ -76,9 +76,11 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         doubleClickZoom: false,
         boxZoom: false,
         keyboard: false,
-        tap: false,
+        //tap: false,
         touchZoom: false,
     };
+    
+    window.baseZoom = zoom;
 
     const mapOptions = { ...defaultOptions, ...options };
 
