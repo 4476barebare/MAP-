@@ -500,18 +500,36 @@ btn.addEventListener('click', () => {
 
 function startZoomGuard() {
     if (!window.map) return;
+
     window._zoomGuardBase = window.map.getZoom();
     window._zoomGuardActive = true;
+
+    showDebug("ZG START base=" + window._zoomGuardBase);
 }
 
 function isZoomGuardFailed(threshold = 0.3) {
-    if (!window._zoomGuardActive || !window.map) return false;
+    if (!window._zoomGuardActive || !window.map) {
+        showDebug("ZG SKIP inactive");
+        return false;
+    }
 
     const currentZoom = window.map.getZoom();
-    return currentZoom > window._zoomGuardBase + threshold;
+    const diff = currentZoom - window._zoomGuardBase;
+    const failed = diff > threshold;
+
+    showDebug(
+        "ZG CHECK base=" + window._zoomGuardBase +
+        " current=" + currentZoom +
+        " diff=" + diff.toFixed(2) +
+        " fail=" + failed
+    );
+
+    return failed;
 }
 
 function stopZoomGuard() {
+    showDebug("ZG STOP");
+
     window._zoomGuardActive = false;
     window._zoomGuardBase = null;
 }
