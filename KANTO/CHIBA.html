@@ -487,7 +487,49 @@ btn.addEventListener('click', () => {
             if (svgEl) svgEl.classList.add('back-icon');
         });
 
+// =======================
+// ピンチアウトで戻る
+// =======================
+let pinchStartDistance = 0;
+let pinchTriggered = false;
+
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+const mapEl = document.getElementById('lf-map');
+
+mapEl.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        pinchStartDistance = getDistance(e.touches);
+        pinchTriggered = false;
+    }
+}, { passive: true });
+
+mapEl.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+
+        const currentDistance = getDistance(e.touches);
+
+        // ある程度広がったら発火（閾値は調整可）
+        if (!pinchTriggered && currentDistance > pinchStartDistance + 30) {
+
+            pinchTriggered = true;
+
+            // PREFにいる時は無視（戻る先ないため）
+            if (window.currentAreaId || window.currentSpotId) {
+                goBack(window.currentHash);
+            }
+        }
+    }
+}, { passive: true });
+
 });
+
+
+
 
 </script>
 </body>
