@@ -500,7 +500,6 @@ btn.addEventListener('click', () => {
 
 function startZoomGuard() {
     if (!window.map) return;
-
     window._zoomGuardBase = window.map.getZoom();
     window._zoomGuardActive = true;
 }
@@ -519,51 +518,67 @@ function stopZoomGuard() {
 
 
 // =======================
-// ピンチイン検知
+// ピンチイン検知（documentベース）
 // =======================
 
-function setupPinchInHandler(onPinchIn) {
-    if (!window.map) return;
+let pinchStartDistance = 0;
+let pinchTriggered = false;
 
-    let startDistance = null;
-    let isPinching = false;
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
-    function getDistance(touches) {
-        const dx = touches[0].clientX - touches[1].clientX;
-        const dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        pinchStartDistance = getDistance(e.touches);
+        pinchTriggered = false;
     }
+}, { passive: false });
 
-    window.map.on('touchstart', function(e) {
-        if (!e.originalEvent.touches || e.originalEvent.touches.length !== 2) return;
 
-        startDistance = getDistance(e.originalEvent.touches);
-        isPinching = true;
-    });
+document.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
 
-    window.map.on('touchmove', function(e) {
-        if (!isPinching || !e.originalEvent.touches || e.originalEvent.touches.length !== 2) return;
+        e.preventDefault(); // チラつき防止
 
-        const currentDistance = getDistance(e.originalEvent.touches);
+        const currentDistance = getDistance(e.touches);
 
-        // 指が縮んだ → ピンチイン
-        if (currentDistance < startDistance - 10) {
+        // ピンチイン検知
+        if (!pinchTriggered && currentDistance < pinchStartDistance - 20) {
 
-            // ズームしてたら無効
+            pinchTriggered = true;
+
+            const isPrefView = !window.currentAreaId && !window.currentSpotId;
+
+            // -----------------------
+            // ズームガード
+            // -----------------------
             if (isZoomGuardFailed()) return;
 
-            isPinching = false;
-            startDistance = null;
-
-            onPinchIn();
+            // -----------------------
+            // 戻る処理
+            // -----------------------
+            if (!isPrefView) {
+                goBack(window.currentHash);
+            }
         }
-    });
+    }
+}, { passive: false });
 
-    window.map.on('touchend', function() {
-        isPinching = false;
-        startDistance = null;
-    });
-}
+
+document.addEventListener('touchend', () => {
+    pinchStartDistance = 0;
+    pinchTriggered = false;
+});
+
+
+
+
+
+
+
 
 });
 
