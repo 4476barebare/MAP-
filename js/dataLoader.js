@@ -558,7 +558,7 @@ function zoomToSpot(safeSpot) {
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
 
-        showDebug("moveend fired");
+        //showDebug("moveend fired");
     });
 
     // -----------------------
@@ -570,7 +570,7 @@ function zoomToSpot(safeSpot) {
         window._zoomGuardBase = window.map.getZoom();
         window._zoomGuardActive = true;
 
-        showDebug("ZG START base=" + window._zoomGuardBase);
+        //showDebug("ZG START base=" + window._zoomGuardBase);
     }, 150);
 }
 
