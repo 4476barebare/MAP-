@@ -494,7 +494,6 @@ btn.addEventListener('click', () => {
         });
 
 
-
 let pinchStartDistance = 0;
 let pinchTriggered = false;
 
@@ -514,19 +513,25 @@ document.addEventListener('touchstart', (e) => {
 document.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
 
-        e.preventDefault(); // ← これがチラつき防止の本体
+        e.preventDefault();
 
         const currentDistance = getDistance(e.touches);
 
         if (!pinchTriggered && currentDistance < pinchStartDistance - 10) {
 
+            const isPrefView = !window.currentAreaId && !window.currentSpotId;
+            const isSpotView = !!window.currentSpotId;
+
+            if (isPrefView) return;
+
+            if (isSpotView) {
+                const currentZoom = window.map.getZoom();
+                if (currentZoom > window.baseZoom) return;
+            }
+
             pinchTriggered = true;
 
-            const isPrefView = !window.currentAreaId && !window.currentSpotId;
-
-            if (!isPrefView) {
-                goBack(window.currentHash);
-            }
+            goBack(window.currentHash);
         }
     }
 }, { passive: false });
@@ -535,10 +540,6 @@ document.addEventListener('touchend', () => {
     pinchStartDistance = 0;
     pinchTriggered = false;
 });
-
-
-
-
 
 
 
