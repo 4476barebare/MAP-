@@ -80,7 +80,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         touchZoom: false,
     };
     
-    window.baseZoom = zoom;
+    //window.baseZoom = zoom;
 
     const mapOptions = { ...defaultOptions, ...options };
 
@@ -264,6 +264,7 @@ function goBack(hash) {
     // spot → areaへ戻る
     // -----------------------
 if (spotName) {
+    stopZoomGuard();
 
     const rawAreaName = decodeURIComponent(areaName || '').trim();
 
@@ -559,6 +560,8 @@ function zoomToSpot(safeSpot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
+        
+        startZoomGuard();
     });
 }
 
