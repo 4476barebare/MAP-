@@ -194,6 +194,8 @@ function enableAreaSwipe() {
         updateStateFromHash();
 
         selectArea(nextArea.name);
+        
+        
     }
 
     el.addEventListener('touchstart', onStart, { passive: true });
@@ -245,15 +247,9 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
             window.map.removeLayer(window.currentTileLayer);
         }
 
-if (window.currentTileLayer) {
-    window.map.removeLayer(window.currentTileLayer);
-}
-
-setTimeout(() => {
-    window.currentTileLayer = L.tileLayer(tileUrl, {
-        attribution: '© 国土地理院'
-    }).addTo(window.map);
-}, 0);
+        window.currentTileLayer =
+            L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
+                .addTo(window.map);
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -301,6 +297,7 @@ setTimeout(() => {
 }
 
 function selectArea(areaName) {
+    alert(areaName);
 
 
     if (window.spotLayer) {
