@@ -310,29 +310,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     }
 }
 
-function prefetchAround(area) {
-
-    if (!window.map) return;
-
-    const zoom = area.zoom || window.map.getZoom();
-
-    const offsets = [
-        [0,0],
-        [0.01,0],[-0.01,0],
-        [0,0.01],[0,-0.01]
-    ];
-
-    offsets.forEach(([dx, dy]) => {
-        const lat = area.lat + dx;
-        const lng = area.lng + dy;
-
-        // 非アニメーションで軽くタイル生成だけ走らせる
-        window.map.panTo([lat, lng], { animate: false });
-    });
-
-    // 元に戻す
-    window.map.panTo([area.lat, area.lng], { animate: false });
-}
 
 function selectArea(areaName) {
 
@@ -359,7 +336,7 @@ function selectArea(areaName) {
     const reqId = Date.now();
     window._shop01RequestId = reqId;
     
-    prefetchAround(area);
+    //prefetchAround(area);
 
     drawLocation(
         area.name,
