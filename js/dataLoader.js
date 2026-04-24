@@ -284,9 +284,23 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
 
+
+window.map.once('moveend', () => {
+
+    if (!window.currentTileLayer || window._tileUrl !== tileUrl) {
+
+        if (window.currentTileLayer) {
+            window.map.removeLayer(window.currentTileLayer);
+        }
+
         window.currentTileLayer =
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
+
+        window._tileUrl = tileUrl;
+    }
+});
+
     }
 
     window.currentHash = location.hash;
@@ -297,10 +311,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 }
 
 function selectArea(areaName) {
-
-// ★これ追加
-    if (window._flyLock) return;
-    window._flyLock = true;
 
 
 
