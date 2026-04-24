@@ -162,12 +162,16 @@ function enableAreaSwipe() {
 
         if (Math.abs(dx) < 50 && Math.abs(dy) < 50) return;
 
-        // ★ individualId完全排除
-        const currentName = window.currentAreaName;
-        if (!currentName) return;
+const id = window.currentAreaId?.split('_')[1];
 
-        const graph = window.areaGraph[currentName];
-        if (!graph) return;
+const currentArea = window.areaData.find(a =>
+    String(a.individualId) === String(id)
+);
+
+if (!currentArea) return;
+
+const graph = window.areaGraph[currentArea.name];
+if (!graph) return;
 
         let next = null;
 
