@@ -138,6 +138,7 @@ function buildAreaGraphFromGrid(areas) {
     window.areaGraph = graph;
 }
 
+
 function enableAreaSwipe() {
 
     if (window._areaSwipeEnabled) return;
@@ -183,43 +184,42 @@ function enableAreaSwipe() {
 
         if (!next) return;
 
+        // =========================
+        // ★ここから完全自前処理
+        // =========================
+
+        const nextArea = window.areaData.find(a => a.name === next);
+        if (!nextArea) return;
+
         disableAreaSwipe();
 
-        // -----------------------------
-        // ★ここから selectArea 相当処理
-        // -----------------------------
+        // hash更新（状態同期）
+        location.hash = '#' + encodeURIComponent(nextArea.name);
 
-        const area = window.areaData.find(a => a.name === next);
-        if (!area) return;
+        window.currentAreaId = nextArea.areaId || nextArea.name;
 
-        // ① 状態更新
-        const resolvedAreaId =
-            window.currentPref + "_" + area.individualId;
-
-        window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = null;
-
-        // ② 地図移動
-        window.map.flyTo(
-            [area.lat, area.lng],
-            area.zoom || window.prefData.zoom
+        // 地図移動（selectAreaの代替）
+        drawLocation(
+            nextArea.name,
+            nextArea.lat,
+            nextArea.lng,
+            nextArea.zoom || window.prefData.zoom
         );
 
-        // ③ moveend後処理（selectAreaと同等）
+        // UI更新
+        document.getElementById('map-menu').style.display = 'none';
+        document.getElementById('map-back-btn').style.display = 'block';
+
+        // スポット再描画
         window.map.once('moveend', () => {
 
             window.map.invalidateSize(true);
+
             enableDragForArea();
 
             showSpotsForArea(window.currentAreaId);
 
             enableAreaSwipe();
-
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    markerControl?.showShop01?.(window.currentAreaId);
-                });
-            });
         });
     }
 
@@ -231,7 +231,6 @@ function enableAreaSwipe() {
 
     window._areaSwipeEnabled = true;
 }
-
 
 function disableAreaSwipe() {
 
