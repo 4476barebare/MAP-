@@ -87,3 +87,47 @@ header {
   display:flex;
   flex-direction:column; 
 }
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.overlay-content {
+  width: 95%;
+  height: 90%;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+#closeCalendar {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+#calendarWrapper {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  display: flex;
+  scroll-snap-type: x mandatory;
+}
+
+.month {
+  min-width: 100%;
+  scroll-snap-align: start;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
