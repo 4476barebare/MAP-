@@ -89,7 +89,7 @@ function loadLocationCSV(csvUrl) {
             // -----------------------
             // グラフ生成
             // -----------------------
-            buildAreaGraphFromGrid();
+            buildAreaGraphFromGrid(allRows);
 
             return { main, areas, spots };
         });
