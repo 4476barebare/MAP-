@@ -146,14 +146,7 @@ function enableAreaSwipe() {
     let startX = 0;
     let startY = 0;
 
-    const map = window.map;
-    const el = map.getContainer();
-
-    // ★ドラッグ完全固定（ここ重要）
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
+    const el = window.map.getContainer();
 
     function onStart(e) {
         const t = e.touches[0];
@@ -194,10 +187,15 @@ function enableAreaSwipe() {
         const nextArea = window.areaData.find(a => a.name === nextName);
         if (!nextArea) return;
 
+        disableAreaSwipe();
+        
+        // ★ここが重要（順番固定）
         location.hash = '#' + encodeURIComponent(nextArea.name);
         updateStateFromHash();
 
         selectArea(nextArea.name);
+        
+        
     }
 
     el.addEventListener('touchstart', onStart, { passive: true });
