@@ -89,7 +89,7 @@ function loadLocationCSV(csvUrl) {
             // -----------------------
             // グラフ生成
             // -----------------------
-            buildAreaGraphFromGrid(allRows);
+            buildAreaGraphFromGrid(areas);
 
             return { main, areas, spots };
         });
@@ -107,58 +107,64 @@ function parseGrid(str) {
     };
 }
 
-function buildAreaGraphFromGrid(allRows) {
+function buildAreaGraphFromGrid(areas) {
 
     alert("=== buildAreaGraphFromGrid START ===");
 
-    // ① 現在のエリア
+    // ① currentPref確認（参考用）
     alert("currentPref: " + window.currentPref);
 
-    if (!allRows || !allRows.length) {
-        alert("allRowsが空");
+    // ② データチェック
+    if (!areas || !areas.length) {
+        alert("areasが空");
         return;
     }
 
-    alert("総行数: " + allRows.length);
+    alert("受け取ったエリア数: " + areas.length);
 
-    // ② areaIdがある行だけ確認
-    let areaCount = 0;
-
-    allRows.forEach((row, i) => {
-
-        if (row.areaId) {
-            areaCount++;
-
-            alert(
-                "行番号: " + i + "\n" +
-                "name: " + (row.name || '') + "\n" +
-                "areaId: [" + row.areaId + "]\n" +
-                "url: [" + (row.url || '') + "]"
-            );
-        }
-    });
-
-    alert("areaId付き行数: " + areaCount);
-
-    // ③ フィルタ結果
-    const pref = window.currentPref;
-
-    const areas = allRows.filter(row =>
-        (row.areaId || '').trim() === pref
-    );
-
-    alert("フィルタ後件数: " + areas.length);
-
-    // ④ 実際に使うgrid確認
+    // ③ 中身確認（gridは既に入っている前提）
     areas.forEach((row, i) => {
 
-        const grid = parseGrid(row.url);
+        alert(
+            "エリア[" + i + "]\n" +
+            "name: " + (row.name || '') + "\n" +
+            "areaId: [" + (row.areaId || '') + "]\n" +
+            "squareX: " + row.squareX + "\n" +
+            "squareY: " + row.squareY + "\n" +
+            "url: [" + (row.url || '') + "]"
+        );
+    });
+
+    // ④ グラフ生成（例：2x2想定）
+    const gridMap = {};
+
+    areas.forEach(row => {
+        if (row.squareX == null || row.squareY == null) return;
+
+        const key = row.squareX + "," + row.squareY;
+        gridMap[key] = row;
+    });
+
+    alert("グリッド登録数: " + Object.keys(gridMap).length);
+
+    // ⑤ 隣接チェック（例）
+    areas.forEach(row => {
+
+        if (row.squareX == null || row.squareY == null) return;
+
+        const x = row.squareX;
+        const y = row.squareY;
+
+        const neighbors = [
+            gridMap[(x+1)+","+y],
+            gridMap[(x-1)+","+y],
+            gridMap[x+","+(y+1)],
+            gridMap[x+","+(y-1)]
+        ].filter(Boolean);
 
         alert(
-            "対象エリア[" + i + "]\n" +
-            "name: " + row.name + "\n" +
-            "url: " + row.url + "\n" +
-            "→ x=" + grid.x + " y=" + grid.y
+            row.name + "\n" +
+            "隣接数: " + neighbors.length
         );
     });
 
