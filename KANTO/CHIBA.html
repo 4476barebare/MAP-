@@ -218,7 +218,7 @@ font-size:12px;
         </div>
       </div>
       <a href="#" id="newsBtn">釣りNEWS</a>
-      <a href="#">スポット一覧</a>
+      <a href="#" id="calendarBtn">カレンダー</a>
     </nav>
   </div>
 </header>
@@ -235,6 +235,16 @@ font-size:12px;
 
 <div id="weather-wave-tide-container"></div>
 <div id="newsOverlay"><div class="news-window"><button id="closeNews">閉じる</button><div class="news-content"></div></div></div>
+<a id="calendarBtn">カレンダー</a>
+
+<div id="calendarOverlay" class="overlay">
+  <div class="overlay-content">
+    <button id="closeCalendar">×</button>
+    <div id="calendarWrapper"></div>
+  </div>
+</div>
+
+
 <footer>© 釣り行こNAVI</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
