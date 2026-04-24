@@ -146,15 +146,21 @@ function enableAreaSwipe() {
     let startX = 0;
     let startY = 0;
 
+    let locked = false; // ★追加（重複実行防止）
+
     const el = window.map.getContainer();
 
     function onStart(e) {
         const t = e.touches[0];
         startX = t.clientX;
         startY = t.clientY;
+
+        locked = false; // ★スワイプ開始時にリセット
     }
 
     function onEnd(e) {
+
+        if (locked) return; // ★二重発火防止
 
         const t = e.changedTouches[0];
 
@@ -187,15 +193,15 @@ function enableAreaSwipe() {
         const nextArea = window.areaData.find(a => a.name === nextName);
         if (!nextArea) return;
 
+        locked = true; // ★ここで以降の入力を遮断
+
         disableAreaSwipe();
-        
-        // ★ここが重要（順番固定）
+
+        // ★順序固定（ここは維持）
         location.hash = '#' + encodeURIComponent(nextArea.name);
         updateStateFromHash();
 
         selectArea(nextArea.name);
-        
-        
     }
 
     el.addEventListener('touchstart', onStart, { passive: true });
@@ -284,24 +290,11 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
 
-
-window.map.once('moveend', () => {
-
-    if (!window.currentTileLayer || window._tileUrl !== tileUrl) {
-
-        if (window.currentTileLayer) {
-            window.map.removeLayer(window.currentTileLayer);
-        }
-
         window.currentTileLayer =
             L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
                 .addTo(window.map);
-
-        window._tileUrl = tileUrl;
     }
-});
 
-    }
 
     window.currentHash = location.hash;
 
