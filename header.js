@@ -173,26 +173,23 @@ function createMonth(year, month) {
   const today = new Date();
   const todayStr = toKey(
     today.getFullYear(),
-    today.getMonth()+1,
+    today.getMonth() + 1,
     today.getDate()
   );
 
   let html = `<div class="month">`;
   html += `<div class="month-title">${year}/${month}</div>`;
   html += `<div class="calendar-grid">`;
-  
-  const WEEK_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
 
-html += `<div class="calendar-grid">`;
+  // ★曜日ヘッダー（ここだけ追加）
+  html += WEEK_LABELS.map(d => `<div class="cell week-head">${d}</div>`).join("");
 
-// ★曜日ヘッダー追加
-html += WEEK_LABELS.map(d => `<div class="cell week-head">${d}</div>`).join("");
-  
-
+  // 空白
   for (let i = 0; i < startDay; i++) {
     html += `<div class="cell empty"></div>`;
   }
 
+  // 日付
   for (let d = 1; d <= daysInMonth; d++) {
 
     const date = new Date(year, month - 1, d);
@@ -201,7 +198,6 @@ html += WEEK_LABELS.map(d => `<div class="cell week-head">${d}</div>`).join("");
     const moonAge = calcMoonAge(date);
     const tide = getTideName(moonAge);
     const tideClass = tide === "大潮" ? "tide-big" : "";
-
 
     let cls = "cell";
     if (key < todayStr) cls += " past";
