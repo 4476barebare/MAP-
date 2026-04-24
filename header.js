@@ -194,6 +194,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
       createMonth(year, month - 1) +
       createMonth(year, month) +
       createMonth(year, month + 1);
+      
+      
+        // ★ここが重要：中央（月）にスクロール
+  requestAnimationFrame(() => {
+    calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
+  });
+
   }
 
   // -------------------------
