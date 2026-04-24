@@ -139,7 +139,8 @@ function buildAreaGraphFromGrid(areas) {
 
     });
 
-    //alert("=== END ===");
+   window.areaGraph = graph;
+
 }
 
 function enableAreaSwipe() {
@@ -197,10 +198,11 @@ function enableAreaSwipe() {
 }
 
 function disableAreaSwipe() {
-    if (!window.map) return;
 
-    window.map.off('touchstart');
-    window.map.off('touchend');
+    if (!window._areaSwipeEnabled) return;
+
+    window.map.off('touchstart', window._areaSwipeStart);
+    window.map.off('touchend', window._areaSwipeEnd);
 
     window._areaSwipeEnabled = false;
 }
