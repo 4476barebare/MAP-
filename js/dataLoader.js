@@ -174,53 +174,26 @@ function enableAreaSwipe() {
         const graph = window.areaGraph[currentArea.name];
         if (!graph) return;
 
-        let next = null;
+        let nextName = null;
 
         if (Math.abs(dx) > Math.abs(dy)) {
-            next = dx > 0 ? graph.left : graph.right;
+            nextName = dx > 0 ? graph.left : graph.right;
         } else {
-            next = dy > 0 ? graph.down : graph.up;
+            nextName = dy > 0 ? graph.down : graph.up;
         }
 
-        if (!next) return;
+        if (!nextName) return;
 
-        // =========================
-        // ★ここから完全自前処理
-        // =========================
-
-        const nextArea = window.areaData.find(a => a.name === next);
+        const nextArea = window.areaData.find(a => a.name === nextName);
         if (!nextArea) return;
 
         disableAreaSwipe();
 
-        // hash更新（状態同期）
+        // ★ここが重要（順番固定）
         location.hash = '#' + encodeURIComponent(nextArea.name);
+        updateStateFromHash();
 
-        window.currentAreaId = nextArea.areaId || nextArea.name;
-
-        // 地図移動（selectAreaの代替）
-        drawLocation(
-            nextArea.name,
-            nextArea.lat,
-            nextArea.lng,
-            nextArea.zoom || window.prefData.zoom
-        );
-
-        // UI更新
-        document.getElementById('map-menu').style.display = 'none';
-        document.getElementById('map-back-btn').style.display = 'block';
-
-        // スポット再描画
-        window.map.once('moveend', () => {
-
-            window.map.invalidateSize(true);
-
-            enableDragForArea();
-
-            showSpotsForArea(window.currentAreaId);
-
-            enableAreaSwipe();
-        });
+        selectArea(nextArea.name);
     }
 
     el.addEventListener('touchstart', onStart, { passive: true });
@@ -231,6 +204,7 @@ function enableAreaSwipe() {
 
     window._areaSwipeEnabled = true;
 }
+
 
 function disableAreaSwipe() {
 
