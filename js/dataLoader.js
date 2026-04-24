@@ -185,32 +185,41 @@ function enableAreaSwipe() {
 
         disableAreaSwipe();
 
-        // -----------------------
-        // ★ここが変更ポイント
-        // -----------------------
+        // -----------------------------
+        // ★ここから selectArea 相当処理
+        // -----------------------------
 
-        const targetArea = window.areaData.find(a => a.name === next);
-        if (!targetArea) return;
+        const area = window.areaData.find(a => a.name === next);
+        if (!area) return;
 
-        // ★移動フラグ（戻り防止）
-        window.isProgrammaticMove = true;
+        // ① 状態更新
+        const resolvedAreaId =
+            window.currentPref + "_" + area.individualId;
 
-        // ★先に移動だけ実行
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = null;
+
+        // ② 地図移動
         window.map.flyTo(
-            [targetArea.lat, targetArea.lng],
-            targetArea.zoom || window.prefData.zoom
+            [area.lat, area.lng],
+            area.zoom || window.prefData.zoom
         );
 
-        // ★移動完了後に確定処理
+        // ③ moveend後処理（selectAreaと同等）
         window.map.once('moveend', () => {
 
-            location.hash = '#' + encodeURIComponent(next);
-            updateStateFromHash();
+            window.map.invalidateSize(true);
+            enableDragForArea();
 
-            selectArea(next);
+            showSpotsForArea(window.currentAreaId);
 
-            // ★解除
-            window.isProgrammaticMove = false;
+            enableAreaSwipe();
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    markerControl?.showShop01?.(window.currentAreaId);
+                });
+            });
         });
     }
 
