@@ -296,12 +296,11 @@ if (!window.currentTileLayer) {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
 
-if (!window.currentTileLayer) {
-    window.currentTileLayer = L.tileLayer(tileUrl, {
+        window.currentTileLayer =
+    L.tileLayer(tileUrl, {
         attribution: '© 国土地理院',
         keepBuffer: 8
     }).addTo(window.map);
-}
     }
 
 
