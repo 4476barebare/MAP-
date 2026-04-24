@@ -162,16 +162,16 @@ function enableAreaSwipe() {
 
         if (Math.abs(dx) < 50 && Math.abs(dy) < 50) return;
 
-const id = window.currentAreaId?.split('_')[1];
+        const id = window.currentAreaId?.split('_')[1];
 
-const currentArea = window.areaData.find(a =>
-    String(a.individualId) === String(id)
-);
+        const currentArea = window.areaData.find(a =>
+            String(a.individualId) === String(id)
+        );
 
-if (!currentArea) return;
+        if (!currentArea) return;
 
-const graph = window.areaGraph[currentArea.name];
-if (!graph) return;
+        const graph = window.areaGraph[currentArea.name];
+        if (!graph) return;
 
         let next = null;
 
@@ -185,12 +185,35 @@ if (!graph) return;
 
         disableAreaSwipe();
 
-        location.hash = '#' + encodeURIComponent(next);
-        updateStateFromHash();
-        selectArea(next);
+        // -----------------------
+        // ★ここが変更ポイント
+        // -----------------------
+
+        const targetArea = window.areaData.find(a => a.name === next);
+        if (!targetArea) return;
+
+        // ★移動フラグ（戻り防止）
+        window.isProgrammaticMove = true;
+
+        // ★先に移動だけ実行
+        window.map.flyTo(
+            [targetArea.lat, targetArea.lng],
+            targetArea.zoom || window.prefData.zoom
+        );
+
+        // ★移動完了後に確定処理
+        window.map.once('moveend', () => {
+
+            location.hash = '#' + encodeURIComponent(next);
+            updateStateFromHash();
+
+            selectArea(next);
+
+            // ★解除
+            window.isProgrammaticMove = false;
+        });
     }
 
-    // ★ Leaflet使わない（これ重要）
     el.addEventListener('touchstart', onStart, { passive: true });
     el.addEventListener('touchend', onEnd, { passive: true });
 
