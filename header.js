@@ -161,54 +161,58 @@ function getTideName(moonAge) {
   // -------------------------
   // 月生成
   // -------------------------
-  function createMonth(year, month) {
-    const first = new Date(year, month - 1, 1);
-    const last = new Date(year, month, 0);
+const WEEK_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
 
-    const startDay = first.getDay();
-    const daysInMonth = last.getDate();
+function createMonth(year, month) {
+  const first = new Date(year, month - 1, 1);
+  const last = new Date(year, month, 0);
 
-    const today = new Date();
-    const todayStr = toKey(
-      today.getFullYear(),
-      today.getMonth()+1,
-      today.getDate()
-    );
+  const startDay = first.getDay();
+  const daysInMonth = last.getDate();
 
-    let html = `<div class="month">`;
-    html += `<div class="month-title">${year}/${month}</div>`;
-    html += `<div class="calendar-grid">`;
+  const today = new Date();
+  const todayStr = toKey(
+    today.getFullYear(),
+    today.getMonth()+1,
+    today.getDate()
+  );
 
-    // 空白
-    for (let i = 0; i < startDay; i++) {
-      html += `<div class="cell empty"></div>`;
-    }
+  let html = `<div class="month">`;
+  html += `<div class="month-title">${year}/${month}</div>`;
+  html += `<div class="calendar-grid">`;
 
-    // 日付生成
-    for (let d = 1; d <= daysInMonth; d++) {
-
-      const date = new Date(year, month - 1, d);
-      const key = toKey(year, month, d);
-
-      const moonAge = calcMoonAge(date);
-      const tide = getTideName(moonAge);
-
-      let cls = "cell";
-
-      if (key < todayStr) cls += " past";
-      if (key === todayStr) cls += " today";
-
-      html += `
-        <div class="${cls}">
-          <div class="day">${d}</div>
-          <div class="tide">${tide}</div>
-        </div>
-      `;
-    }
-
-    html += `</div></div>`;
-    return html;
+  for (let i = 0; i < startDay; i++) {
+    html += `<div class="cell empty"></div>`;
   }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+
+    const date = new Date(year, month - 1, d);
+    const key = toKey(year, month, d);
+
+    const moonAge = calcMoonAge(date);
+    const tide = getTideName(moonAge);
+    const tideClass = tide === "大潮" ? "tide-big" : "";
+
+    const dayOfWeek = date.getDay();
+    const weekLabel = WEEK_LABELS[dayOfWeek];
+
+    let cls = "cell";
+    if (key < todayStr) cls += " past";
+    if (key === todayStr) cls += " today";
+
+    html += `
+      <div class="${cls}">
+        <div class="day">${d}</div>
+        <div class="week">${weekLabel}</div>
+        <div class="tide ${tideClass}">${tide}</div>
+      </div>
+    `;
+  }
+
+  html += `</div></div>`;
+  return html;
+}
 
   // -------------------------
   // カレンダー描画

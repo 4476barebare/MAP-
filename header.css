@@ -205,3 +205,8 @@ header {
   margin-top: 2px;
   line-height: 1;
 }
+
+.tide-big {
+  color: #e60033;
+  font-weight: 600;
+}
