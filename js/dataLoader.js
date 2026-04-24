@@ -109,19 +109,16 @@ function parseGrid(str) {
 
 function buildAreaGraphFromGrid(areas) {
 
-
-    // ④ グラフ生成（例：2x2想定）
     const gridMap = {};
+    const graph = {};
 
+    // 座標 → エリア
     areas.forEach(row => {
         if (row.squareX == null || row.squareY == null) return;
-
-        const key = row.squareX + "," + row.squareY;
-        gridMap[key] = row;
+        gridMap[row.squareX + "," + row.squareY] = row;
     });
 
-
-    // ⑤ 隣接チェック（例）
+    // 隣接構築
     areas.forEach(row => {
 
         if (row.squareX == null || row.squareY == null) return;
@@ -129,18 +126,16 @@ function buildAreaGraphFromGrid(areas) {
         const x = row.squareX;
         const y = row.squareY;
 
-        const neighbors = [
-            gridMap[(x+1)+","+y],
-            gridMap[(x-1)+","+y],
-            gridMap[x+","+(y+1)],
-            gridMap[x+","+(y-1)]
-        ].filter(Boolean);
-
-
+        graph[row.name] = {
+            up:    gridMap[x + "," + (y-1)]?.name || null,
+            down:  gridMap[x + "," + (y+1)]?.name || null,
+            left:  gridMap[(x-1) + "," + y]?.name || null,
+            right: gridMap[(x+1) + "," + y]?.name || null
+        };
     });
 
-   window.areaGraph = graph;
-
+    // ★これが無かった
+    window.areaGraph = graph;
 }
 
 function enableAreaSwipe() {
