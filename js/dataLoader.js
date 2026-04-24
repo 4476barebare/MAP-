@@ -256,11 +256,12 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
             window.map.removeLayer(window.currentTileLayer);
         }
 
-        window.currentTileLayer =
-    L.tileLayer(tileUrl, {
+if (!window.currentTileLayer) {
+    window.currentTileLayer = L.tileLayer(tileUrl, {
         attribution: '© 国土地理院',
         keepBuffer: 8
     }).addTo(window.map);
+}
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -295,11 +296,12 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map = L.map('lf-map', mapOptions);
         window.map.attributionControl.setPosition('topright');
 
-        window.currentTileLayer =
-    L.tileLayer(tileUrl, {
+if (!window.currentTileLayer) {
+    window.currentTileLayer = L.tileLayer(tileUrl, {
         attribution: '© 国土地理院',
         keepBuffer: 8
     }).addTo(window.map);
+}
     }
 
 
