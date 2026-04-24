@@ -297,7 +297,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 }
 
 function selectArea(areaName) {
-    alert(areaName);
+
 
 
     if (window.spotLayer) {
@@ -335,7 +335,9 @@ function selectArea(areaName) {
 
     window.map.once('moveend', () => {
         
-        window.map.invalidateSize(true);
+       requestAnimationFrame(() => {
+    window.map.invalidateSize(true);
+});
         enableDragForArea();
 
         showSpotsForArea(window.currentAreaId);
