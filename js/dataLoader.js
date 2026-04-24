@@ -311,6 +311,35 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 }
 
 
+
+
+function prefetchAround(area) {
+
+    if (!window.map) return;
+
+    const offsets = [
+        [0, 0],
+        [0.005, 0],
+        [-0.005, 0],
+        [0, 0.005],
+        [0, -0.005]
+    ];
+
+    offsets.forEach(([dx, dy]) => {
+
+        const lat = area.lat + dx;
+        const lng = area.lng + dy;
+
+        // ★ viewは動かさない（重要）
+        const temp = L.latLng(lat, lng);
+
+        window.map._getZoomSpan?.(); // 何もしない安全呼び出し
+
+        // tileだけ裏で発火させる（実質キャッシュ目的）
+        window.map.panInsideBounds?.(window.map.getBounds());
+    });
+}
+
 function selectArea(areaName) {
 
 
@@ -336,7 +365,7 @@ function selectArea(areaName) {
     const reqId = Date.now();
     window._shop01RequestId = reqId;
     
-    //prefetchAround(area);
+    prefetchAround(area);
 
     drawLocation(
         area.name,
