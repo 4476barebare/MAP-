@@ -24,6 +24,8 @@ function loadLocationCSV(csvUrl, currentFile) {
 const url = cols[6] ? cols[6].trim() : '';
 const grid = parseGrid(url);
 
+alert("GRID: " + url + " → x=" + grid.x + " y=" + grid.y);
+
 return {
     name: cols[0].trim(),
     zoom: parseFloat(cols[1]),
@@ -64,18 +66,23 @@ return {
                 }
             });
             
-            function parseGrid(str) {
+function parseGrid(str) {
     if (!str) return { x: null, y: null };
 
-    const x = str.match(/x\s*:\s*(-?\d+)/);
-    const y = str.match(/y\s*:\s*(-?\d+)/);
+    const parts = str.split(';');
+    let x = null;
+    let y = null;
 
-    return {
-        x: x ? parseInt(x[1]) : null,
-        y: y ? parseInt(y[1]) : null
-    };
-}
-            
+    parts.forEach(p => {
+        const [key, val] = p.split(':');
+        if (!key || !val) return;
+
+        if (key.trim() === 'x') x = parseInt(val);
+        if (key.trim() === 'y') y = parseInt(val);
+    });
+
+    return { x, y };
+}            
             
             
             
@@ -92,6 +99,7 @@ buildAreaGraphFromGrid();
 
 
 function buildAreaGraphFromGrid() {
+    alert("GRAPH BUILT");
 
     const graph = {};
     const areas = window.areaData;
