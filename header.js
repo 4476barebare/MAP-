@@ -180,6 +180,14 @@ function createMonth(year, month) {
   let html = `<div class="month">`;
   html += `<div class="month-title">${year}/${month}</div>`;
   html += `<div class="calendar-grid">`;
+  
+  const WEEK_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
+
+html += `<div class="calendar-grid">`;
+
+// ★曜日ヘッダー追加
+html += WEEK_LABELS.map(d => `<div class="cell week-head">${d}</div>`).join("");
+  
 
   for (let i = 0; i < startDay; i++) {
     html += `<div class="cell empty"></div>`;
@@ -194,8 +202,6 @@ function createMonth(year, month) {
     const tide = getTideName(moonAge);
     const tideClass = tide === "大潮" ? "tide-big" : "";
 
-    const dayOfWeek = date.getDay();
-    const weekLabel = WEEK_LABELS[dayOfWeek];
 
     let cls = "cell";
     if (key < todayStr) cls += " past";
@@ -204,7 +210,6 @@ function createMonth(year, month) {
     html += `
       <div class="${cls}">
         <div class="day">${d}</div>
-        <div class="week">${weekLabel}</div>
         <div class="tide ${tideClass}">${tide}</div>
       </div>
     `;
