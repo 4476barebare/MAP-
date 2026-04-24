@@ -107,38 +107,62 @@ function parseGrid(str) {
     };
 }
 
-function buildAreaGraphFromGrid() {
+function buildAreaGraphFromGrid(allRows) {
 
-    const graph = {};
-    const areas = window.areaData;
+    alert("=== buildAreaGraphFromGrid START ===");
 
-    areas.forEach(a => {
+    // ① 現在のエリア
+    alert("currentPref: " + window.currentPref);
 
-        if (a.squareX == null || a.squareY == null) return;
+    if (!allRows || !allRows.length) {
+        alert("allRowsが空");
+        return;
+    }
 
-        const n = { left: null, right: null, up: null, down: null };
+    alert("総行数: " + allRows.length);
 
-        areas.forEach(b => {
-            if (a === b) return;
+    // ② areaIdがある行だけ確認
+    let areaCount = 0;
 
-            if (b.squareY === a.squareY) {
-                if (b.squareX === a.squareX - 1) n.left = b.name;
-                if (b.squareX === a.squareX + 1) n.right = b.name;
-            }
+    allRows.forEach((row, i) => {
 
-            if (b.squareX === a.squareX) {
-                if (b.squareY === a.squareY + 1) n.up = b.name;
-                if (b.squareY === a.squareY - 1) n.down = b.name;
-            }
-        });
+        if (row.areaId) {
+            areaCount++;
 
-        graph[a.name] = n;
+            alert(
+                "行番号: " + i + "\n" +
+                "name: " + (row.name || '') + "\n" +
+                "areaId: [" + row.areaId + "]\n" +
+                "url: [" + (row.url || '') + "]"
+            );
+        }
     });
 
-    window.areaGraph = graph;
+    alert("areaId付き行数: " + areaCount);
 
-    // デバッグ確認
-    alert("areaGraph:", graph);
+    // ③ フィルタ結果
+    const pref = window.currentPref;
+
+    const areas = allRows.filter(row =>
+        (row.areaId || '').trim() === pref
+    );
+
+    alert("フィルタ後件数: " + areas.length);
+
+    // ④ 実際に使うgrid確認
+    areas.forEach((row, i) => {
+
+        const grid = parseGrid(row.url);
+
+        alert(
+            "対象エリア[" + i + "]\n" +
+            "name: " + row.name + "\n" +
+            "url: " + row.url + "\n" +
+            "→ x=" + grid.x + " y=" + grid.y
+        );
+    });
+
+    alert("=== END ===");
 }
 
 function enableAreaSwipe() {
