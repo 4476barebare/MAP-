@@ -124,13 +124,39 @@ document.addEventListener('DOMContentLoaded', ()=>{
   // -------------------------
   // 5潮分類
   // -------------------------
-  function getTideName(moonAge) {
-    if (moonAge <= 2 || moonAge >= 28) return "大潮";
-    if ((moonAge >= 3 && moonAge <= 5) || (moonAge >= 24 && moonAge <= 27)) return "中潮";
-    if ((moonAge >= 6 && moonAge <= 8) || (moonAge >= 21 && moonAge <= 23)) return "小潮";
-    if (moonAge >= 9 && moonAge <= 11) return "長潮";
-    return "若潮";
-  }
+function getTideName(moonAge) {
+  const age = Math.floor(moonAge);
+
+  // 大潮（新月・満月付近）
+  if (age === 0 || age === 14 || age === 15) return "大潮";
+
+  // 中潮
+  if (
+    (age >= 1 && age <= 2) ||
+    (age >= 12 && age <= 13) ||
+    (age === 16) ||
+    (age >= 27 && age <= 28)
+  ) return "中潮";
+
+  // 小潮
+  if (
+    (age >= 3 && age <= 4) ||
+    (age >= 10 && age <= 11) ||
+    (age >= 17 && age <= 18) ||
+    (age >= 25 && age <= 26)
+  ) return "小潮";
+
+  // 長潮
+  if (
+    (age >= 5 && age <= 6) ||
+    (age >= 8 && age <= 9) ||
+    (age >= 19 && age <= 20) ||
+    (age >= 23 && age <= 24)
+  ) return "長潮";
+
+  // 残り
+  return "若潮";
+}
 
   // -------------------------
   // 月生成
