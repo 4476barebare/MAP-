@@ -93,19 +93,48 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }
 
   // =========================
-  // カレンダーオーバーレイ
+  // カレンダー（オーバーレイ）
   // =========================
   const calendarBtn = document.getElementById("calendarBtn");
   const calendarOverlay = document.getElementById("calendarOverlay");
   const closeCalendar = document.getElementById("closeCalendar");
   const calendarWrapper = document.getElementById("calendarWrapper");
 
+  // -------------------------
+  // 日付ユーティリティ
+  // -------------------------
   function pad(n){ return n.toString().padStart(2,'0'); }
 
   function toKey(y,m,d){
     return `${y}-${pad(m)}-${pad(d)}`;
   }
 
+  // -------------------------
+  // 月齢（簡易）
+  // -------------------------
+  function calcMoonAge(date) {
+    const synodicMonth = 29.53058867;
+    const base = new Date(2000, 0, 6);
+    const diff = date - base;
+    const days = diff / (1000 * 60 * 60 * 24);
+
+    return (days % synodicMonth + synodicMonth) % synodicMonth;
+  }
+
+  // -------------------------
+  // 5潮分類
+  // -------------------------
+  function getTideName(moonAge) {
+    if (moonAge <= 2 || moonAge >= 28) return "大潮";
+    if ((moonAge >= 3 && moonAge <= 5) || (moonAge >= 24 && moonAge <= 27)) return "中潮";
+    if ((moonAge >= 6 && moonAge <= 8) || (moonAge >= 21 && moonAge <= 23)) return "小潮";
+    if (moonAge >= 9 && moonAge <= 11) return "長潮";
+    return "若潮";
+  }
+
+  // -------------------------
+  // 月生成
+  // -------------------------
   function createMonth(year, month) {
     const first = new Date(year, month - 1, 1);
     const last = new Date(year, month, 0);
@@ -124,12 +153,19 @@ document.addEventListener('DOMContentLoaded', ()=>{
     html += `<div class="month-title">${year}/${month}</div>`;
     html += `<div class="calendar-grid">`;
 
+    // 空白
     for (let i = 0; i < startDay; i++) {
       html += `<div class="cell empty"></div>`;
     }
 
+    // 日付生成
     for (let d = 1; d <= daysInMonth; d++) {
+
+      const date = new Date(year, month - 1, d);
       const key = toKey(year, month, d);
+
+      const moonAge = calcMoonAge(date);
+      const tide = getTideName(moonAge);
 
       let cls = "cell";
 
@@ -139,6 +175,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
       html += `
         <div class="${cls}">
           <div class="day">${d}</div>
+          <div class="tide">${tide}</div>
         </div>
       `;
     }
@@ -147,15 +184,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
     return html;
   }
 
-  function renderCalendar(baseYear, baseMonth) {
+  // -------------------------
+  // カレンダー描画
+  // -------------------------
+  function renderCalendar(year, month) {
     if (!calendarWrapper) return;
 
     calendarWrapper.innerHTML =
-      createMonth(baseYear, baseMonth - 1) +
-      createMonth(baseYear, baseMonth) +
-      createMonth(baseYear, baseMonth + 1);
+      createMonth(year, month - 1) +
+      createMonth(year, month) +
+      createMonth(year, month + 1);
   }
 
+  // -------------------------
+  // 初期化＆イベント
+  // -------------------------
   if (calendarBtn && calendarOverlay && closeCalendar && calendarWrapper) {
 
     const today = new Date();
@@ -179,5 +222,3 @@ document.addEventListener('DOMContentLoaded', ()=>{
       }
     });
   }
-
-});
