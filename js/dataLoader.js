@@ -257,8 +257,10 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         }
 
         window.currentTileLayer =
-            L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
-                .addTo(window.map);
+    L.tileLayer(tileUrl, {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }).addTo(window.map);
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -294,8 +296,10 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map.attributionControl.setPosition('topright');
 
         window.currentTileLayer =
-            L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
-                .addTo(window.map);
+    L.tileLayer(tileUrl, {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }).addTo(window.map);
     }
 
 
@@ -304,6 +308,30 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     if (!window.currentAreaId) {
         showPrefSpots();
     }
+}
+
+function prefetchAround(area) {
+
+    if (!window.map) return;
+
+    const zoom = area.zoom || window.map.getZoom();
+
+    const offsets = [
+        [0,0],
+        [0.01,0],[-0.01,0],
+        [0,0.01],[0,-0.01]
+    ];
+
+    offsets.forEach(([dx, dy]) => {
+        const lat = area.lat + dx;
+        const lng = area.lng + dy;
+
+        // 非アニメーションで軽くタイル生成だけ走らせる
+        window.map.panTo([lat, lng], { animate: false });
+    });
+
+    // 元に戻す
+    window.map.panTo([area.lat, area.lng], { animate: false });
 }
 
 function selectArea(areaName) {
@@ -330,6 +358,8 @@ function selectArea(areaName) {
 
     const reqId = Date.now();
     window._shop01RequestId = reqId;
+    
+    prefetchAround(area);
 
     drawLocation(
         area.name,
