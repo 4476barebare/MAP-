@@ -222,4 +222,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
       }
     });
   }
-}
+};
