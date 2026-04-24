@@ -392,6 +392,8 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
 
 function enableDragForArea() {
     if (!window.areaBounds) return;
+    
+    window.map.setMaxBounds(null); // 追加（重要）
 
     window.map.dragging.enable();
     window.map.setMaxBounds(window.areaBounds);
