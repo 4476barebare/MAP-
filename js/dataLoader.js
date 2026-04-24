@@ -6,100 +6,108 @@ window.currentHash = '';
 window.currentAreaId = null;
 //window.currentPhase = 'pref'; // pref / area / spot
 
-function loadLocationCSV(csvUrl, currentFile) {
+function loadLocationCSV(csvUrl) {
     return fetch(csvUrl)
         .then(r => r.text())
         .then(text => {
 
             const lines = text.trim().split('\n');
-            const filePref = currentFile.replace('.html', '').toUpperCase();
 
             let main = null;
             const areas = [];
             const spots = [];
 
+            // -----------------------
+            // 全行パース（ここでは純データのみ）
+            // -----------------------
             const allRows = lines.slice(1).map(line => {
                 const cols = line.split(',');
 
-const url = cols[6] ? cols[6].trim() : '';
-const grid = parseGrid(url);
+                return {
+                    name: cols[0].trim(),
+                    zoom: parseFloat(cols[1]),
+                    individualId: cols[2] ? cols[2].trim() : '',
+                    lat: parseFloat(cols[3]),
+                    lng: parseFloat(cols[4]),
+                    areaId: cols[5] ? cols[5].trim() : '',
+                    url: cols[6] ? cols[6].trim() : '',
+                    notes: cols[7] ? cols[7].trim() : '',
+                    icon: cols[8] ? cols[8].trim().toLowerCase() : null,
 
-alert("GRID: " + url + " → x=" + grid.x + " y=" + grid.y);
-
-return {
-    name: cols[0].trim(),
-    zoom: parseFloat(cols[1]),
-    individualId: cols[2] ? cols[2].trim() : '',
-    lat: parseFloat(cols[3]),
-    lng: parseFloat(cols[4]),
-    areaId: cols[5] ? cols[5].trim() : '',
-    url: url,
-    notes: cols[7] ? cols[7].trim() : '',
-    icon: cols[8] ? cols[8].trim().toLowerCase() : null,
-
-    // ★これ追加
-    squareX: grid.x,
-    squareY: grid.y
-};
+                    // 初期値（ここでは触らない）
+                    squareX: null,
+                    squareY: null
+                };
             });
 
-            // main
+            // -----------------------
+            // main（県）
+            // -----------------------
             allRows.forEach(row => {
-                if (!row.areaId && row.name.toUpperCase() === filePref) {
+                if (!row.areaId && row.name === window.currentPref) {
                     main = row;
                 }
             });
 
-            // areas
+            // -----------------------
+            // areas（←ここだけgrid処理）
+            // -----------------------
             allRows.forEach(row => {
-                if (row.areaId === filePref) {
+
+                if ((row.areaId || '').trim() === window.currentPref) {
+
+                    // grid解析（エリアだけ）
+                    if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
+                        const grid = parseGrid(row.url);
+                        row.squareX = grid.x;
+                        row.squareY = grid.y;
+                    }
+
                     areas.push(row);
                 }
             });
 
+            // -----------------------
             // spots
+            // -----------------------
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
+
                 if (icon === 'spot' || icon.startsWith('fish')) {
                     spots.push(row);
                 }
             });
-            
-function parseGrid(str) {
-    if (!str) return { x: null, y: null };
 
-    const parts = str.split(';');
-    let x = null;
-    let y = null;
-
-    parts.forEach(p => {
-        const [key, val] = p.split(':');
-        if (!key || !val) return;
-
-        if (key.trim() === 'x') x = parseInt(val);
-        if (key.trim() === 'y') y = parseInt(val);
-    });
-
-    return { x, y };
-}            
-            
-            
-            
-
+            // -----------------------
+            // セット
+            // -----------------------
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
 
-buildAreaGraphFromGrid();
+            // -----------------------
+            // グラフ生成
+            // -----------------------
+            buildAreaGraphFromGrid();
 
             return { main, areas, spots };
         });
 }
 
+function parseGrid(str) {
+    if (!str) return { x: null, y: null };
+
+    const x = str.match(/x\s*:\s*(-?\d+)/);
+    const y = str.match(/y\s*:\s*(-?\d+)/);
+
+    return {
+        x: x ? parseInt(x[1]) : null,
+        y: y ? parseInt(y[1]) : null
+    };
+}
 
 function buildAreaGraphFromGrid() {
-    alert("GRAPH BUILT");
 
     const graph = {};
     const areas = window.areaData;
@@ -128,6 +136,9 @@ function buildAreaGraphFromGrid() {
     });
 
     window.areaGraph = graph;
+
+    // デバッグ確認
+    alert("areaGraph:", graph);
 }
 
 function enableAreaSwipe() {
