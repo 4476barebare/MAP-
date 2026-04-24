@@ -189,8 +189,6 @@ function enableAreaSwipe() {
 
         disableAreaSwipe();
         
-        window._isSwiping = false;
-
         // ★ここが重要（順番固定）
         location.hash = '#' + encodeURIComponent(nextArea.name);
         updateStateFromHash();
@@ -247,9 +245,15 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
             window.map.removeLayer(window.currentTileLayer);
         }
 
-        window.currentTileLayer =
-            L.tileLayer(tileUrl, { attribution: '© 国土地理院' })
-                .addTo(window.map);
+if (window.currentTileLayer) {
+    window.map.removeLayer(window.currentTileLayer);
+}
+
+setTimeout(() => {
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© 国土地理院'
+    }).addTo(window.map);
+}, 0);
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -333,12 +337,6 @@ function selectArea(areaName) {
 
 
     window.map.once('moveend', () => {
-        
-        if (window._isSwiping) {
-        window._isSwiping = false; // ★ここで解除だけ
-        return;
-    }
-
         
         window.map.invalidateSize(true);
         enableDragForArea();
