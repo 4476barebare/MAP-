@@ -188,6 +188,8 @@ function enableAreaSwipe() {
         if (!nextArea) return;
 
         disableAreaSwipe();
+        
+        window._isSwiping = false;
 
         // ★ここが重要（順番固定）
         location.hash = '#' + encodeURIComponent(nextArea.name);
@@ -331,6 +333,13 @@ function selectArea(areaName) {
 
 
     window.map.once('moveend', () => {
+        
+        if (window._isSwiping) {
+        window._isSwiping = false; // ★ここで解除だけ
+        return;
+    }
+
+        
         window.map.invalidateSize(true);
         enableDragForArea();
 
