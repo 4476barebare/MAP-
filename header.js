@@ -196,10 +196,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
       createMonth(year, month + 1);
       
       
-        // ★ここが重要：中央（月）にスクロール
-  requestAnimationFrame(() => {
-    calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
-  });
 
   }
 
@@ -217,6 +213,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     calendarBtn.addEventListener("click", (e)=>{
       e.preventDefault();
       calendarOverlay.style.display = "flex";
+        // ★ここでやる
+  requestAnimationFrame(() => {
+    calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
+  });
+      
+      
     });
 
     closeCalendar.addEventListener("click", ()=>{
