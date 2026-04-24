@@ -145,28 +145,28 @@ function enableAreaSwipe() {
     let startX = 0;
     let startY = 0;
 
-    // ハンドラを変数に保持（これ重要）
-    window._areaSwipeStart = function (e) {
-        const t = e.originalEvent.touches[0];
+    const el = window.map.getContainer();
+
+    function onStart(e) {
+        const t = e.touches[0];
         startX = t.clientX;
         startY = t.clientY;
-    };
+    }
 
-    window._areaSwipeEnd = function (e) {
-        const t = e.originalEvent.changedTouches[0];
+    function onEnd(e) {
+
+        const t = e.changedTouches[0];
 
         const dx = t.clientX - startX;
         const dy = t.clientY - startY;
 
         if (Math.abs(dx) < 50 && Math.abs(dy) < 50) return;
 
-        const currentArea = window.areaData.find(a =>
-            a.individualId === window.currentAreaId?.split('_')[1]
-        );
+        // ★ individualId完全排除
+        const currentName = window.currentAreaName;
+        if (!currentName) return;
 
-        if (!currentArea) return;
-
-        const graph = window.areaGraph[currentArea.name];
+        const graph = window.areaGraph[currentName];
         if (!graph) return;
 
         let next = null;
@@ -177,31 +177,37 @@ function enableAreaSwipe() {
             next = dy > 0 ? graph.down : graph.up;
         }
 
-        if (next) {
-            disableAreaSwipe();
+        if (!next) return;
 
-            location.hash = '#' + encodeURIComponent(next);
-            updateStateFromHash();
-            selectArea(next);
-        }
-    };
+        disableAreaSwipe();
 
-    window.map.on('touchstart', window._areaSwipeStart);
-    window.map.on('touchend', window._areaSwipeEnd);
+        location.hash = '#' + encodeURIComponent(next);
+        updateStateFromHash();
+        selectArea(next);
+    }
+
+    // ★ Leaflet使わない（これ重要）
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchend', onEnd, { passive: true });
+
+    window._areaSwipeStart = onStart;
+    window._areaSwipeEnd = onEnd;
 
     window._areaSwipeEnabled = true;
 }
+
 
 function disableAreaSwipe() {
 
     if (!window._areaSwipeEnabled) return;
 
-    window.map.off('touchstart', window._areaSwipeStart);
-    window.map.off('touchend', window._areaSwipeEnd);
+    const el = window.map.getContainer();
+
+    el.removeEventListener('touchstart', window._areaSwipeStart);
+    el.removeEventListener('touchend', window._areaSwipeEnd);
 
     window._areaSwipeEnabled = false;
 }
-
 
 function drawLocation(name, lat, lng, zoom, options = {}) {
     const defaultOptions = {
