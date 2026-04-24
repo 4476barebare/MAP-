@@ -20,17 +20,25 @@ function loadLocationCSV(csvUrl, currentFile) {
 
             const allRows = lines.slice(1).map(line => {
                 const cols = line.split(',');
-                return {
-                    name: cols[0].trim(),
-                    zoom: parseFloat(cols[1]),
-                    individualId: cols[2] ? cols[2].trim() : '',
-                    lat: parseFloat(cols[3]),
-                    lng: parseFloat(cols[4]),
-                    areaId: cols[5] ? cols[5].trim() : '',
-                    url: cols[6] ? cols[6].trim() : '',
-                    notes: cols[7] ? cols[7].trim() : '',
-                    icon: cols[8] ? cols[8].trim().toLowerCase() : null
-                };
+
+const url = cols[6] ? cols[6].trim() : '';
+const grid = parseGrid(url);
+
+return {
+    name: cols[0].trim(),
+    zoom: parseFloat(cols[1]),
+    individualId: cols[2] ? cols[2].trim() : '',
+    lat: parseFloat(cols[3]),
+    lng: parseFloat(cols[4]),
+    areaId: cols[5] ? cols[5].trim() : '',
+    url: url,
+    notes: cols[7] ? cols[7].trim() : '',
+    icon: cols[8] ? cols[8].trim().toLowerCase() : null,
+
+    // ★これ追加
+    squareX: grid.x,
+    squareY: grid.y
+};
             });
 
             // main
@@ -55,14 +63,125 @@ function loadLocationCSV(csvUrl, currentFile) {
                     spots.push(row);
                 }
             });
+            
+            function parseGrid(str) {
+    if (!str) return { x: null, y: null };
+
+    const x = str.match(/x\s*:\s*(-?\d+)/);
+    const y = str.match(/y\s*:\s*(-?\d+)/);
+
+    return {
+        x: x ? parseInt(x[1]) : null,
+        y: y ? parseInt(y[1]) : null
+    };
+}
+            
+            
+            
+            
 
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
 
+buildAreaGraphFromGrid();
 
             return { main, areas, spots };
         });
+}
+
+
+function buildAreaGraphFromGrid() {
+
+    const graph = {};
+    const areas = window.areaData;
+
+    areas.forEach(a => {
+
+        if (a.squareX == null || a.squareY == null) return;
+
+        const n = { left: null, right: null, up: null, down: null };
+
+        areas.forEach(b => {
+            if (a === b) return;
+
+            if (b.squareY === a.squareY) {
+                if (b.squareX === a.squareX - 1) n.left = b.name;
+                if (b.squareX === a.squareX + 1) n.right = b.name;
+            }
+
+            if (b.squareX === a.squareX) {
+                if (b.squareY === a.squareY + 1) n.up = b.name;
+                if (b.squareY === a.squareY - 1) n.down = b.name;
+            }
+        });
+
+        graph[a.name] = n;
+    });
+
+    window.areaGraph = graph;
+}
+
+function enableAreaSwipe() {
+
+    if (window._areaSwipeEnabled) return;
+
+    window.map.off('touchstart');
+    window.map.off('touchend');
+
+    let startX = 0;
+    let startY = 0;
+
+    window.map.on('touchstart', e => {
+        const t = e.originalEvent.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+    });
+
+    window.map.on('touchend', e => {
+        const t = e.originalEvent.changedTouches[0];
+
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+
+        if (Math.abs(dx) < 50 && Math.abs(dy) < 50) return;
+
+        const currentArea = window.areaData.find(a =>
+            a.individualId === window.currentAreaId?.split('_')[1]
+        );
+
+        if (!currentArea) return;
+
+        const graph = window.areaGraph[currentArea.name];
+        if (!graph) return;
+
+        let next = null;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+            next = dx > 0 ? graph.left : graph.right;
+        } else {
+            next = dy > 0 ? graph.down : graph.up;
+        }
+
+        if (next) {
+            disableAreaSwipe(); // ★遷移前に止めるのがポイント
+
+            location.hash = '#' + encodeURIComponent(next);
+            updateStateFromHash();
+            selectArea(next);
+        }
+    });
+
+    window._areaSwipeEnabled = true;
+}
+
+function disableAreaSwipe() {
+    if (!window.map) return;
+
+    window.map.off('touchstart');
+    window.map.off('touchend');
+
+    window._areaSwipeEnabled = false;
 }
 
 
@@ -183,6 +302,8 @@ function selectArea(areaName) {
         enableDragForArea();
 
         showSpotsForArea(window.currentAreaId);
+        
+        enableAreaSwipe(); // ←これ追加
 
         if (window._shop01RequestId !== reqId) return;
 
@@ -195,6 +316,7 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
+    disableAreaSwipe(); // ★ここ追加
     window.map.off('move');
     window.map.setMaxBounds(null);
 
@@ -390,6 +512,7 @@ marker.on('click', function () {
 
     if (isPhase1) {
         selectSpot(areaKey, spot.name, spot.lat, spot.lng);
+    
         return;
     }
 
