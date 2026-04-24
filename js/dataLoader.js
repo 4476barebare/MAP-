@@ -109,31 +109,6 @@ function parseGrid(str) {
 
 function buildAreaGraphFromGrid(areas) {
 
-    alert("=== buildAreaGraphFromGrid START ===");
-
-    // ① currentPref確認（参考用）
-    alert("currentPref: " + window.currentPref);
-
-    // ② データチェック
-    if (!areas || !areas.length) {
-        alert("areasが空");
-        return;
-    }
-
-    alert("受け取ったエリア数: " + areas.length);
-
-    // ③ 中身確認（gridは既に入っている前提）
-    areas.forEach((row, i) => {
-
-        alert(
-            "エリア[" + i + "]\n" +
-            "name: " + (row.name || '') + "\n" +
-            "areaId: [" + (row.areaId || '') + "]\n" +
-            "squareX: " + row.squareX + "\n" +
-            "squareY: " + row.squareY + "\n" +
-            "url: [" + (row.url || '') + "]"
-        );
-    });
 
     // ④ グラフ生成（例：2x2想定）
     const gridMap = {};
@@ -145,7 +120,6 @@ function buildAreaGraphFromGrid(areas) {
         gridMap[key] = row;
     });
 
-    alert("グリッド登録数: " + Object.keys(gridMap).length);
 
     // ⑤ 隣接チェック（例）
     areas.forEach(row => {
@@ -162,32 +136,27 @@ function buildAreaGraphFromGrid(areas) {
             gridMap[x+","+(y-1)]
         ].filter(Boolean);
 
-        alert(
-            row.name + "\n" +
-            "隣接数: " + neighbors.length
-        );
+
     });
 
-    alert("=== END ===");
+    //alert("=== END ===");
 }
 
 function enableAreaSwipe() {
 
     if (window._areaSwipeEnabled) return;
 
-    window.map.off('touchstart');
-    window.map.off('touchend');
-
     let startX = 0;
     let startY = 0;
 
-    window.map.on('touchstart', e => {
+    // ハンドラを変数に保持（これ重要）
+    window._areaSwipeStart = function (e) {
         const t = e.originalEvent.touches[0];
         startX = t.clientX;
         startY = t.clientY;
-    });
+    };
 
-    window.map.on('touchend', e => {
+    window._areaSwipeEnd = function (e) {
         const t = e.originalEvent.changedTouches[0];
 
         const dx = t.clientX - startX;
@@ -213,13 +182,16 @@ function enableAreaSwipe() {
         }
 
         if (next) {
-            disableAreaSwipe(); // ★遷移前に止めるのがポイント
+            disableAreaSwipe();
 
             location.hash = '#' + encodeURIComponent(next);
             updateStateFromHash();
             selectArea(next);
         }
-    });
+    };
+
+    window.map.on('touchstart', window._areaSwipeStart);
+    window.map.on('touchend', window._areaSwipeEnd);
 
     window._areaSwipeEnabled = true;
 }
