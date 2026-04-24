@@ -193,6 +193,15 @@ function enableAreaSwipe() {
         location.hash = '#' + encodeURIComponent(nextArea.name);
         updateStateFromHash();
 
+window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
+
+    window.areaBounds = null;
+
+
+
+
+
         selectArea(nextArea.name);
         
         
@@ -392,8 +401,6 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
 
 function enableDragForArea() {
     if (!window.areaBounds) return;
-    
-    window.map.setMaxBounds(null); // 追加（重要）
 
     window.map.dragging.enable();
     window.map.setMaxBounds(window.areaBounds);
