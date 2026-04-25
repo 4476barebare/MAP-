@@ -178,7 +178,7 @@ function createMonth(year, month) {
   );
 
   let html = `<div class="month">`;
-  html += `<div class="month-title">${year}/${month}</div>`;
+  html += `<div class="month-title">${year} ${month}月</div>`;
   html += `<div class="calendar-grid">`;
 
   // ★曜日ヘッダー（ここだけ追加）
