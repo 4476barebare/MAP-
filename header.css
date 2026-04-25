@@ -132,18 +132,11 @@ header {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
-
-  display: flex; /* ← 常にflexにする */
+  background: rgba(0,0,0,0.6); /* ★これが暗幕 */
+  display: none;
   justify-content: center;
   align-items: center;
-
-  opacity: 0;              /* ← 非表示はこっちで制御 */
-  pointer-events: none;    /* ← クリック無効 */
-
   z-index: 9999;
-
-  transition: opacity 0.25s ease;
 }
 
 /* 中身 */
@@ -155,24 +148,9 @@ header {
   overflow: hidden;
   position: relative;
   padding-top: 30px; /* ボタン高さ＋余裕 */
-  
-  transform: translateY(20px);
-  opacity: 0;
-
-  transition: 
-    transform 0.25s ease,
-    opacity 0.25s ease;
 }
 
-.overlay.show {
-  opacity: 1;
-  pointer-events: auto;
-}
 
-.overlay.show .overlay-content {
-  transform: translateY(0);
-  opacity: 1;
-}
 
 /* =======================
    カレンダー本体

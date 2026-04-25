@@ -233,35 +233,33 @@ function createMonth(year, month) {
   // -------------------------
   // 初期化＆イベント
   // -------------------------
-if (calendarBtn && calendarOverlay && closeCalendar && calendarWrapper) {
+  if (calendarBtn && calendarOverlay && closeCalendar && calendarWrapper) {
 
-  const today = new Date();
-  const baseYear = today.getFullYear();
-  const baseMonth = today.getMonth() + 1;
+    const today = new Date();
+    const baseYear = today.getFullYear();
+    const baseMonth = today.getMonth() + 1;
 
-  renderCalendar(baseYear, baseMonth);
+    renderCalendar(baseYear, baseMonth);
 
-  // 開く
-  calendarBtn.addEventListener("click", (e)=>{
-    e.preventDefault();
-
-    calendarOverlay.classList.add("show");
-
-    requestAnimationFrame(() => {
-      calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
+    calendarBtn.addEventListener("click", (e)=>{
+      e.preventDefault();
+      calendarOverlay.style.display = "flex";
+        // ★ここでやる
+  requestAnimationFrame(() => {
+    calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
+  });
+      
+      
     });
-  });
 
-  // 閉じる（ボタン）
-  closeCalendar.addEventListener("click", ()=>{
-    calendarOverlay.classList.remove("show");
-  });
+    closeCalendar.addEventListener("click", ()=>{
+      calendarOverlay.style.display = "none";
+    });
 
-  // 閉じる（外クリック）
-  calendarOverlay.addEventListener("click", (e)=>{
-    if (e.target === calendarOverlay) {
-      calendarOverlay.classList.remove("show");
-    }
-  });
-
-}
+    calendarOverlay.addEventListener("click", (e)=>{
+      if (e.target === calendarOverlay) {
+        calendarOverlay.style.display = "none";
+      }
+    });
+  }
+});
