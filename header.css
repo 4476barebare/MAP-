@@ -174,9 +174,6 @@ header {
 }
 
 .month {
-    
-    color: #fff;
-    text-align: center;
   min-width: 100%;
   scroll-snap-align: start;
 
@@ -185,6 +182,12 @@ header {
   background: transparent;
   overflow: hidden; /* ★これ追加 */
 }
+
+.month-title {
+    text-align: center;
+    color: #fff;
+}
+
 
 /* カレンダー全体 */
 .calendar-grid {
