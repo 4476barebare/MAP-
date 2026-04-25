@@ -176,45 +176,68 @@ header {
   flex-direction: column;
 }
 
+/* カレンダー全体 */
 .calendar-grid {
-  flex: 1;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  padding: 6px;
 }
 
-/* =======================
-   日付セル状態
-======================= */
-.cell.past {
-  opacity: 0.35;
-  filter: grayscale(100%);
+/* セル */
+.cell {
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 4px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-.cell.today {
-  border: 2px solid #00aaff;
-}
-
-/* 空セル */
+/* 空白セル */
 .cell.empty {
   background: transparent;
+  box-shadow: none;
 }
 
-.tide {
-  font-size: 9px;
-  color: #555;
-  margin-top: 2px;
-  line-height: 1;
-}
-
-.tide-big {
-  color: #e60033;
-  font-weight: 600;
-}
-
+/* 曜日ヘッダー */
 .week-head {
+  background: #f0f4ff;
+  text-align: center;
   font-size: 0.75rem;
   font-weight: 600;
+  padding: 6px 0;
+  border-radius: 6px;
+}
+
+/* 日付 */
+.day {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* 潮名 */
+.tide {
+  font-size: 0.7rem;
   text-align: center;
-  padding: 4px 0;
-  background: #f0f4ff;
+  color: #444;
+}
+
+/* 大潮（強調） */
+.tide-big {
+  color: #e60033;
+  font-weight: 700;
+}
+
+/* 過去日 */
+.past {
+  opacity: 0.4;
+}
+
+/* 今日 */
+.today {
+  border: 2px solid #191970;
 }
