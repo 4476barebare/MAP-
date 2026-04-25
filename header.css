@@ -149,13 +149,7 @@ header {
   position: relative;
 }
 
-/* 閉じるボタン */
-#closeCalendar {
-  position: absolute;
-  top: 0px;
-  right: 10px;
-  z-index: 10;
-}
+
 
 /* =======================
    カレンダー本体
