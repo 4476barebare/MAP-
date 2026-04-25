@@ -132,7 +132,7 @@ header {
 .overlay {
   position: fixed;
   inset: 0;
-  background: transparent;
+  background: rgba(0,0,0,0.6); /* ★これが暗幕 */
   display: none;
   justify-content: center;
   align-items: center;
