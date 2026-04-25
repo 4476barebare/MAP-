@@ -90,23 +90,53 @@ function showShop02(areaKey) {
     const shops = markerControl.shop01AreaCache?.[areaKey] || [];
     if (!shops.length) return;
 
-    shops.forEach(shop => {
+    // -----------------------
+    // 同一座標でグループ化
+    // -----------------------
+    const groups = {};
 
+    shops.forEach(shop => {
         if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
-        const iconId = getIconId(shop.icon);
+        const key = `${shop.lat.toFixed(6)}_${shop.lng.toFixed(6)}`;
 
-const noCircle = iconId === 'shop4';
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(shop);
+    });
 
-const html = noCircle
-    ? `
+    // -----------------------
+    // 描画
+    // -----------------------
+    Object.values(groups).forEach(group => {
+
+        const count = group.length;
+
+        group.forEach((shop, index) => {
+
+            let lat = shop.lat;
+            let lng = shop.lng;
+
+            // ★複数ある場合だけずらす
+            if (count > 1) {
+                const angle = (index / count) * Math.PI * 2;
+                const offset = 0.00003; // ←ここで調整
+
+                lat += Math.sin(angle) * offset;
+                lng += Math.cos(angle) * offset;
+            }
+
+            const iconId = getIconId(shop.icon);
+            const noCircle = iconId === 'shop4';
+
+            const html = noCircle
+                ? `
 <div class="shop-marker no-circle">
     <svg class="shop-icon">
         <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
     </svg>
 </div>
 `
-    : `
+                : `
 <div class="shop-marker">
     <svg class="shop-icon">
         <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
@@ -114,46 +144,43 @@ const html = noCircle
 </div>
 `;
 
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: '',
+                    html: html,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            });
 
+            // -----------------------
+            // ポップアップ
+            // -----------------------
+            const title = shop.group && shop.group !== '個人商店'
+                ? shop.group + ' ' + (shop.name || '')
+                : (shop.name || '');
 
-        const marker = L.marker([shop.lat, shop.lng], {
-            icon: L.divIcon({
-                className: '',
-                html: html,
-                iconSize: [24, 24],
-                iconAnchor: [12, 12] // ★完全に中心
-            })
-        });
+            const address = shop.notes || '';
 
-        // -----------------------
-        // ポップアップ内容
-        // -----------------------
-        const title = shop.group && shop.group !== '個人商店'
-            ? shop.group + ' ' + (shop.name || '')
-            : (shop.name || '');
+            const googleUrl =
+                'https://www.google.com/search?q=' +
+                encodeURIComponent(title + ' ' + address);
 
-        const address = shop.notes || '';
-
-        const googleUrl =
-            'https://www.google.com/search?q=' +
-            encodeURIComponent(title + ' ' + address);
-
-const popupHtml = `
-    <div class="shop-popup">
-        <div class="shop-popup-title">${title}</div>
-        <div class="shop-popup-address">${address}</div>
-
-        <div class="shop-popup-footer">
-            <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-                Googleで検索
-            </a>
-        </div>
+            const popupHtml = `
+<div class="shop-popup">
+    <div class="shop-popup-title">${title}</div>
+    <div class="shop-popup-address">${address}</div>
+    <div class="shop-popup-footer">
+        <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
+            Googleで検索
+        </a>
     </div>
+</div>
 `;
 
-        marker.bindPopup(popupHtml);
-
-        marker.addTo(markerControl.shop02Layer);
+            marker.bindPopup(popupHtml);
+            marker.addTo(markerControl.shop02Layer);
+        });
     });
 }
 // -----------------------
