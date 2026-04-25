@@ -252,14 +252,14 @@ function createMonth(year, month) {
       
     });
 
-    closeCalendar.addEventListener("click", ()=>{
-      calendarOverlay.style.display = "none";
-    });
+closeCalendar.addEventListener("click", ()=>{
+  calendarOverlay.classList.remove("show");
+});
 
-    calendarOverlay.addEventListener("click", (e)=>{
-      if (e.target === calendarOverlay) {
-        calendarOverlay.style.display = "none";
-      }
-    });
+calendarOverlay.addEventListener("click", (e)=>{
+  if (e.target === calendarOverlay) {
+    calendarOverlay.classList.remove("show");
+  }
+});
   }
 });
