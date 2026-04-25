@@ -164,7 +164,10 @@ header {
   width: 100%;
   height: 100%;
   display: flex;
+
   overflow-x: auto;
+  overflow-y: hidden; /* ★これ追加 */
+
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
@@ -172,16 +175,22 @@ header {
 .month {
   min-width: 100%;
   scroll-snap-align: start;
+
   display: flex;
   flex-direction: column;
+
+  overflow: hidden; /* ★これ追加 */
 }
 
 /* カレンダー全体 */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+
   gap: 4px;
   padding: 6px;
+
+  overflow: hidden; /* ★保険 */
 }
 
 /* セル */
@@ -189,7 +198,7 @@ header {
   background: #fff;
   border-radius: 8px;
   padding: 6px 4px;
-  min-height: 60px;
+  min-height: 55px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -206,9 +215,13 @@ header {
 .week-head {
   background: #f0f4ff;
   text-align: center;
-  font-size: 0.75rem;
+
+  font-size: 0.65rem;
   font-weight: 600;
-  padding: 6px 0;
+
+  padding: 2px 0;   /* ★縮める */
+  min-height: 20px; /* ★固定 */
+
   border-radius: 6px;
 }
 
