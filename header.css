@@ -147,6 +147,7 @@ header {
   border-radius: 12px;
   overflow: hidden;
   position: relative;
+  padding-top: 40px; /* ボタン高さ＋余裕 */
 }
 
 
