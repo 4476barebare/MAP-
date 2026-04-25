@@ -90,42 +90,45 @@ function showShop02(areaKey) {
     const shops = markerControl.shop01AreaCache?.[areaKey] || [];
     if (!shops.length) return;
 
-    // -----------------------
-    // 同一座標でグループ化
-    // -----------------------
+    // =========================
+    // ① 近い座標をグループ化
+    // =========================
     const groups = {};
 
     shops.forEach(shop => {
         if (isNaN(shop.lat) || isNaN(shop.lng)) return;
 
-        const key = `${shop.lat.toFixed(6)}_${shop.lng.toFixed(6)}`;
+        const key = `${Math.round(shop.lat * 500)}_${Math.round(shop.lng * 500)}`;
 
         if (!groups[key]) groups[key] = [];
         groups[key].push(shop);
     });
 
-    // -----------------------
-    // 描画
-    // -----------------------
+    // =========================
+    // ② 描画
+    // =========================
     Object.values(groups).forEach(group => {
 
         const count = group.length;
 
-        group.forEach((shop, index) => {
+        group.forEach((shop, i) => {
 
             let lat = shop.lat;
             let lng = shop.lng;
 
-            // ★複数ある場合だけずらす
+            // -----------------------
+            // 重なり回避
+            // -----------------------
             if (count > 1) {
-                const angle = (index / count) * Math.PI * 2;
-                const offset = 0.00003; // ←ここで調整
+                const angle = (i / count) * Math.PI * 2;
+                const offset = 0.0005;
 
-                lat += Math.sin(angle) * offset;
-                lng += Math.cos(angle) * offset;
+                lat += Math.cos(angle) * offset;
+                lng += Math.sin(angle) * offset;
             }
 
             const iconId = getIconId(shop.icon);
+
             const noCircle = iconId === 'shop4';
 
             const html = noCircle
@@ -153,9 +156,6 @@ function showShop02(areaKey) {
                 })
             });
 
-            // -----------------------
-            // ポップアップ
-            // -----------------------
             const title = shop.group && shop.group !== '個人商店'
                 ? shop.group + ' ' + (shop.name || '')
                 : (shop.name || '');
@@ -167,15 +167,15 @@ function showShop02(areaKey) {
                 encodeURIComponent(title + ' ' + address);
 
             const popupHtml = `
-<div class="shop-popup">
-    <div class="shop-popup-title">${title}</div>
-    <div class="shop-popup-address">${address}</div>
-    <div class="shop-popup-footer">
-        <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-            Googleで検索
-        </a>
+    <div class="shop-popup">
+        <div class="shop-popup-title">${title}</div>
+        <div class="shop-popup-address">${address}</div>
+        <div class="shop-popup-footer">
+            <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
+                Googleで検索
+            </a>
+        </div>
     </div>
-</div>
 `;
 
             marker.bindPopup(popupHtml);
