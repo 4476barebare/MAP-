@@ -132,7 +132,7 @@ header {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: transparent;
   display: none;
   justify-content: center;
   align-items: center;
@@ -167,6 +167,7 @@ header {
 
   overflow-x: auto;
   overflow-y: hidden; /* ★これ追加 */
+  background: transparent;
 
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
@@ -178,7 +179,7 @@ header {
 
   display: flex;
   flex-direction: column;
-
+  background: transparent;
   overflow: hidden; /* ★これ追加 */
 }
 
@@ -189,6 +190,7 @@ header {
 
   gap: 4px;
   padding: 6px;
+  background: transparent;
 
   overflow: hidden; /* ★保険 */
 }
