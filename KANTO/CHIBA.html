@@ -223,28 +223,25 @@ font-size:12px;
   cursor: pointer;
 }
 
-.close-btn {
+/* Leafletの閉じるボタンを強制上書き */
+.leaflet-container .leaflet-popup-close-button {
   position: absolute;
-  top: 8px;
-  right: 10px;
+  top: 8px !important;
+  right: 8px !important;
 
-  z-index: 10000;
+  width: 28px !important;
+  height: 28px !important;
 
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-
-  border: none;
-  border-radius: 50%;
-
-  width: 28px;
-  height: 28px;
-
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
 
-  font-size: 16px;
-  cursor: pointer;
+  background: rgba(0,0,0,0.6) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+
+  font-size: 16px !important;
+  text-decoration: none !important;
 }
 
 </style>
