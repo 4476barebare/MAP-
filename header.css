@@ -132,12 +132,17 @@ header {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6); /* ★これが暗幕 */
-  display: none;
+  background: rgba(0,0,0,0.6);
+
+  display: flex; /* ← 常にflexにする */
   justify-content: center;
   align-items: center;
+
+  opacity: 0;              /* ← 非表示はこっちで制御 */
+  pointer-events: none;    /* ← クリック無効 */
+
   z-index: 9999;
-  
+
   transition: opacity 0.25s ease;
 }
 

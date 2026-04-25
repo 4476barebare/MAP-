@@ -240,14 +240,17 @@ function createMonth(year, month) {
     const baseMonth = today.getMonth() + 1;
 
     renderCalendar(baseYear, baseMonth);
-
+    
+    
     calendarBtn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      calendarOverlay.style.display = "flex";
-        // ★ここでやる
+  e.preventDefault();
+
+  calendarOverlay.classList.add("show"); // ← これに変更
+
   requestAnimationFrame(() => {
     calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
   });
+});
       
       
     });
