@@ -143,7 +143,7 @@ header {
 .overlay-content {
   width: 95%;
   height: 90%;
-  background: #fff;
+  background: transparent;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
