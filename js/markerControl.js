@@ -121,7 +121,7 @@ function showShop02(areaKey) {
             // -----------------------
             if (count > 1) {
                 const angle = (i / count) * Math.PI * 2;
-                const offset = 0.0005;
+                const offset = 0.001;
 
                 lat += Math.cos(angle) * offset;
                 lng += Math.sin(angle) * offset;
