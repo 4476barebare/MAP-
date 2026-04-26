@@ -24,11 +24,43 @@ li { user-select: none; cursor: pointer; }
 .leaflet-container { z-index:0; }
 
 /* メニューは初期非表示 */
-.map-menu { display:none; position: absolute; bottom: 5px; left: 5px; right: 5px; max-height: 200px; background: #fff; border-radius: 3px; overflow-y: auto; z-index: 1980; padding: 2px 5px; pointer-events: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.map-menu {
+    display:none;
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    max-height: 200px;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 3px;
+    overflow-y: auto;
+    z-index: 1980;
+    padding: 2px 5px;
+    pointer-events: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
 #map-menu, #map-menu ul, #map-menu li, #map-menu button { pointer-events: auto; }
-.map-menu ul { list-style: none; margin: 0; padding: 0; }
-.map-menu li { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #191970; padding: 4px 8px; width: 100%; box-sizing: border-box; cursor: pointer; border-bottom: 1px dotted #191970; }
-.map-menu li:last-child { border-bottom: none; padding-bottom: 3px; }
+.map-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.map-menu li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #191970;
+    padding: 4px 8px;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    border-bottom: 1px dotted #191970;
+}
+.map-menu li:last-child {
+    border-bottom: none;
+    padding-bottom: 3px;
+}
 #map-menu button { width: 100%; background: transparent; border: none; color: inherit; cursor: pointer; padding: 0; font-size: inherit; text-align: left; }
 .map-ad { position: absolute;
 top: 12px;
