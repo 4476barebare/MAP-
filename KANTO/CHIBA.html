@@ -31,8 +31,6 @@ li { user-select: none; cursor: pointer; }
     left: 5px;
     right: 5px;
     max-height: 200px;
-    background-color: rgba(0,0,0,0.5);
-    border-radius: 3px;
     overflow-y: auto;
     z-index: 1980;
     padding: 2px 5px;
@@ -42,8 +40,10 @@ li { user-select: none; cursor: pointer; }
 #map-menu, #map-menu ul, #map-menu li, #map-menu button { pointer-events: auto; }
 .map-menu ul {
     list-style: none;
-    margin: 0;
     padding: 0;
+    background-color: rgba(0,0,0,0.5);
+    margin-bottom: 1px;
+    border-radius: 3px;
 }
 .map-menu li {
     display: flex;
@@ -55,8 +55,6 @@ li { user-select: none; cursor: pointer; }
     width: 100%;
     box-sizing: border-box;
     cursor: pointer;
-    margin-bottom: 1px;
-    border-radius: 3px;
 }
 .map-menu li:last-child {
     border-bottom: none;
