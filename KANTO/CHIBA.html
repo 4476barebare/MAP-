@@ -77,10 +77,9 @@ pointer-events: none;}
 
 .map-back-btn {
     position: absolute;
-    bottom: 20px;
+    bottom: 30px;
     right: 20px;
     z-index: 2000;
-
     background: none;
     border: none;
     padding: 0;
@@ -93,6 +92,10 @@ pointer-events: none;}
     height:36px;
     fill:#fff;
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8));
+    
+    /* 右側に行くほど透明 */
+    -webkit-mask-image: linear-gradient(to right, black 60%, transparent);
+    mask-image: linear-gradient(to right, black 60%, transparent);
 }
 
 
