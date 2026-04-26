@@ -40,11 +40,11 @@ li { user-select: none; cursor: pointer; }
 #map-menu, #map-menu ul, #map-menu li, #map-menu button { pointer-events: auto; }
 .map-menu ul {
     list-style: none;
-    margin: 1px;
+    margin: 0;
     padding: 0;
-    background-color: rgba(0,0,0,0.5);
-    border-radius: 3px;
+    background: none; /* ← 消す */
 }
+
 .map-menu li {
     display: flex;
     justify-content: space-between;
@@ -55,6 +55,11 @@ li { user-select: none; cursor: pointer; }
     width: 100%;
     box-sizing: border-box;
     cursor: pointer;
+
+    /* ↓ 追加 */
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 6px;
+    margin: 2px 0; /* 行ごとの間隔 */
 }
 .map-menu li:last-child {
     border-bottom: none;
