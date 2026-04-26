@@ -1,7 +1,7 @@
 name,zoom,individualId,lat,lng,areaId,URL,notes,icon
 CHIBA,9,parent,35.4,140.3,,,,
 東京湾内房エリア,10,UCHIBOU,35.665,140.115,CHIBA,x:0;y:1,,
-南房総エリア,10,MINAMI,35.172,139.9,CHIBA,x:0;y:0,,
+南房総エリア,10,MINAMI,35.172,139.95,CHIBA,x:0;y:0,,
 外房エリア,10.5,SOTOBOU,35.3,140.296,CHIBA,x:1;y:0,,
 銚子九十九里エリア,10,CHOUSHI,35.725,140.645,CHIBA,x:1;y:1,,
 飯岡漁港,15,1,35.690764,140.731924,CHIBA_CHOUSHI,,,spot
