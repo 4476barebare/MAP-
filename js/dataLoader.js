@@ -192,18 +192,12 @@ function enableAreaSwipe() {
         // ★ここが重要（順番固定）
         location.hash = '#' + encodeURIComponent(nextArea.name);
         updateStateFromHash();
-
-window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-
-    window.areaBounds = null;
-
-
-
-
-
-        selectArea(nextArea.name);
         
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+        window.areaBounds = null;
+        
+        selectArea(nextArea.name);
         
     }
 
@@ -293,6 +287,8 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         }
     } else {
         window.map = L.map('lf-map', mapOptions);
+        window.map.options.zoomSnap = 0.5;
+        window.map.options.zoomDelta = 0.5;
         window.map.attributionControl.setPosition('topright');
 
 if (!window.currentTileLayer) {
