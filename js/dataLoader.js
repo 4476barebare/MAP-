@@ -665,49 +665,52 @@ updatePhase2NearestSpot(map, spots, markerMap);
     );
 }
 
+let lastVisibleSet = new Set();
+
 function updatePhase2NearestSpot(map, spots, markerMap) {
-    
-    
-    alert(
-    "map: " + map +
-    "\nspots: " + (spots ? spots.length : spots) +
-    "\nmarkerMap: " + (markerMap ? markerMap.size : markerMap)
-  );
 
+    const bounds = map.getBounds();
 
-    
-    
-    
-  const center = map.getCenter();
-  const bounds = map.getBounds();
+    const currentVisible = new Set(
+        spots
+            .filter(s => bounds.contains([s.lat, s.lng]))
+            .map(s => s.id)
+    );
 
-  const visible = spots.filter(s =>
-    bounds.contains([s.lat, s.lng])
-  );
-  alert("visible count: " + visible.length); 
-
-  if (visible.length === 0) return null;
-
-  let nearest = null;
-  let min = Infinity;
-
-  for (const s of visible) {
-    const dLat = s.lat - center.lat;
-    const dLng = s.lng - center.lng;
-    const d = dLat * dLat + dLng * dLng;
-
-    if (d < min) {
-      min = d;
-      nearest = s;
+    // 視界に入った瞬間だけ検知
+    for (const id of currentVisible) {
+        if (!lastVisibleSet.has(id)) {
+            alert("entered: " + id);
+        }
     }
-  }
-  alert("nearest: " + (nearest ? nearest.id : "null"));
 
-  if (nearest) {
-    updateMarkerState(markerMap, nearest.id, "読み込み済み1");
-  }
+    lastVisibleSet = currentVisible;
 
-  return nearest;
+    // ---- ここから元ロジック ----
+
+    const center = map.getCenter();
+
+    let nearest = null;
+    let min = Infinity;
+
+    for (const s of spots) {
+        if (!bounds.contains([s.lat, s.lng])) continue;
+
+        const dLat = s.lat - center.lat;
+        const dLng = s.lng - center.lng;
+        const d = dLat * dLat + dLng * dLng;
+
+        if (d < min) {
+            min = d;
+            nearest = s;
+        }
+    }
+
+    if (nearest && markerMap.has(nearest.id)) {
+        updateMarkerState(markerMap, nearest.id, "読み込み済み1");
+    }
+
+    return nearest;
 }
 
 function updateMarkerState(markerMap, spotId, status) {
