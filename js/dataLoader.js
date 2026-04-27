@@ -606,14 +606,9 @@ function showSpotsForArea(areaKey) {
                 !window.currentSpotId;
 
             if (isPhase1) {
-
-
-    selectSpot(areaKey, spot.name, spot.lat, spot.lng);
-//updatePhase2NearestSpot(map, spots, markerMap);
-    return;
-}
-
-
+                selectSpot(areaKey, spot.name, spot.lat, spot.lng);
+                return;
+            }
             if (isFish) {
                 showFishPopup(marker, spot);
                 return;
@@ -671,58 +666,37 @@ function showSpotsForArea(areaKey) {
     );
 }
 
+
 let lastVisibleSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     const bounds = map.getBounds();
 
-    const currentVisible = spots
-        .filter(s => bounds.contains([s.lat, s.lng]))
-        .map(s => s.individualId || s.id || s.name);
+    const currentVisible = new Set(
+        spots
+            .filter(s => bounds.contains([s.lat, s.lng]))
+            .map(s => s.individualId || s.id || s.name)
+    );
 
-    const currentSet = new Set(currentVisible);
-
-    // ★ 差分だけ検出
-    for (const id of currentSet) {
+    // ★ 追加されたものだけ検出
+    for (const id of currentVisible) {
         if (!lastVisibleSet.has(id)) {
             alert("entered: " + id);
         }
     }
 
-    lastVisibleSet = currentSet;
-
-    // ---- 最寄り ----
-
-    const center = map.getCenter();
-
-    let nearest = null;
-    let min = Infinity;
-
-    for (const s of spots) {
-        if (!bounds.contains([s.lat, s.lng])) continue;
-
-        const dLat = s.lat - center.lat;
-        const dLng = s.lng - center.lng;
-        const d = dLat * dLat + dLng * dLng;
-
-        if (d < min) {
-            min = d;
-            nearest = s;
+    // ★ 出たものはリセット対象
+    for (const id of lastVisibleSet) {
+        if (!currentVisible.has(id)) {
+            // 任意：out検知も可能
         }
     }
 
-    if (nearest) {
-        const key = nearest.individualId || nearest.id || nearest.name;
+    lastVisibleSet = currentVisible;
 
-        if (markerMap.has(key)) {
-            updateMarkerState(markerMap, key, "読み込み済み1");
-        }
-    }
-
-    return nearest;
+    return null;
 }
-
 
 
 function updateMarkerState(markerMap, spotId, status) {
