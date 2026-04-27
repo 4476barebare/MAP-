@@ -394,8 +394,7 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
-    
-    alert("呼ばれた");
+
     disableAreaSwipe(); // ★ここ追加
     window.map.off('move');
     window.map.setMaxBounds(null);
@@ -494,14 +493,14 @@ function goBack() {
         spotName + "\n" +
         spot.lat + "," + spot.lng
     );
-
-enableDragForArea();
-
-        showSpotsForArea(window.currentAreaId);
-        
-        enableAreaSwipe(); // ←これ追加
-        markerControl.showShop01(window.currentAreaId);
-
+    
+    enableDragForArea();
+    showSpotsForArea(window.currentAreaId);
+    enableAreaSwipe(); // ←これ追加
+    markerControl.showShop01(window.currentAreaId);
+    
+    const newHash = location.hash.replace('/' + spotKey, '');
+    updateStateFromHash();
     selectSpot(area.name, spotName, spot.lat, spot.lng);
 
     return;
