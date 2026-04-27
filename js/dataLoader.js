@@ -431,12 +431,16 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
 
     });
     
-    map.on('moveend', () => {
-    updatePhase2NearestSpot(
-        window.map,
-        window.spotData,
-        window.markerMap
-    );
+map.on('moveend', () => {
+
+    setTimeout(() => {
+        updatePhase2NearestSpot(
+            window.map,
+            window.spotData,
+            window.markerMap
+        );
+    }, 0);
+
 });
 }
 
