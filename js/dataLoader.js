@@ -470,7 +470,6 @@ function goBack() {
 
     const spotKey = spotIdRaw.split('_')[2];
     alert (spotKey);
-    alert (areaId);
     
     
     const spot = window.spotData.find(
@@ -478,14 +477,10 @@ function goBack() {
         String(s.individualId) === String(spotKey) &&
         String(s.areaId) === String(areaId)
 );
+    alert (spot.name);
     if (!spot) return;
 
-    const spotarea = window.areaData.find(
-        a => a.areaId === spot.areaId
-    );
-    if (!spotarea) return;
-
-    const spotName = spotarea.name;
+    const spotName = spot.name;
 
     alert(
         area.name + "\n" +
