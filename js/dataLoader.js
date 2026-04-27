@@ -711,12 +711,20 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
             .map(s => s.name)
     );
 
-    // ★ 追加検出（nameで表示）
-    for (const name of currentVisible) {
-        if (!lastVisibleSet.has(name)) {
-            alert("entered: " + name);
-        }
+
+let entered = false;
+
+for (const name of currentVisible) {
+    if (!lastVisibleSet.has(name)) {
+        alert("entered: " + name);
+        entered = true;
     }
+}
+
+if (entered) {
+    prefetchGsiTilesForSpot(window.map, window.spotData);
+}
+
 
     lastVisibleSet = currentVisible;
 
@@ -751,6 +759,46 @@ for (const s of spots) {
     }
 
     return nearest;
+}
+
+function getBoundsFromSpots(list) {
+    let minLat = Infinity, maxLat = -Infinity;
+    let minLng = Infinity, maxLng = -Infinity;
+
+    for (const s of list) {
+        minLat = Math.min(minLat, s.lat);
+        maxLat = Math.max(maxLat, s.lat);
+        minLng = Math.min(minLng, s.lng);
+        maxLng = Math.max(maxLng, s.lng);
+    }
+
+    return L.latLngBounds(
+        [minLat, minLng],
+        [maxLat, maxLng]
+    );
+}
+
+
+function prefetchGsiTilesForSpot(map, spots) {
+
+    // ★ spotだけ抽出
+    const spotOnly = spots.filter(s => s.icon === "spot");
+    if (spotOnly.length === 0) return;
+
+    // ★ 範囲生成
+    const bounds = getBoundsFromSpots(spotOnly);
+
+    // ★ 現在状態保持
+    const currentZoom = map.getZoom();
+    const currentCenter = map.getCenter();
+
+    // ★ 一瞬だけその範囲を表示（タイル強制ロード）
+    map.fitBounds(bounds, { animate: false });
+
+    // ★ 元に戻す（見た目変えない）
+    setTimeout(() => {
+        map.setView(currentCenter, currentZoom, { animate: false });
+    }, 50);
 }
 
 function updateMarkerState(markerMap, spotId, status) {
