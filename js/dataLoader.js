@@ -452,18 +452,8 @@ function goBack() {
     const areaId = window.currentAreaId;
     const spotId = window.currentSpotId;
 
-    // -----------------------
-    // spot → area
-    // -----------------------
-    if (spotId) {
-
-    stopZoomGuard();
-
-// -----------------------
-// spot → area（簡略版）
-// -----------------------
 if (spotId) {
-    alertspotId);
+    alert(spotId);
 
     stopZoomGuard();
 
