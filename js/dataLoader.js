@@ -481,7 +481,7 @@ function goBack() {
 
  
 
-    stopZoomGuard();
+    //stopZoomGuard();
 
     window.map.dragging.enable();
     window.map.scrollWheelZoom.disable();
