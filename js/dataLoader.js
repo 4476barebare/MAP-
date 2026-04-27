@@ -465,10 +465,11 @@ function goBack() {
     if (spotId) {
 
     const spotIdRaw = window.currentSpotId;
+    alert (spotIdRaw);
     if (!spotIdRaw) return;
 
     const spotKey = spotIdRaw.split('_')[2];
-
+    alert (spotKey);
     const spot = window.spotData.find(
         s => String(s.individualId) === String(spotKey)
     );
