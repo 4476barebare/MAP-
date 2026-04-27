@@ -446,13 +446,13 @@ function goBack() {
 
     resetSpotLayers();
 
-    const areaId = window.currentAreaId;
-    const spotId = window.currentSpotId;
-
-    const rawId = areaId.split('_')[1];
+    const rawId = window.currentAreaId;.split('_')[1];
     const area = window.areaData.find(
         a => String(a.individualId) === rawId
     );
+    
+    const spotIdRaw = window.currentSpotId;
+    const spotId = spotIdRaw.split('_')[2];
 
     if (!area) return;
 
