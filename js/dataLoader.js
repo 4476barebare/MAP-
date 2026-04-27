@@ -429,6 +429,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
     window.map.once('moveend', () => {
         enableDragForArea();
     });
+    updatePhase2NearestSpot(map, spots, markerMap);
 }
 
 function enableDragForArea() {
@@ -603,7 +604,7 @@ function showSpotsForArea(areaKey) {
 
 
     selectSpot(areaKey, spot.name, spot.lat, spot.lng);
-updatePhase2NearestSpot(map, spots, markerMap);
+//updatePhase2NearestSpot(map, spots, markerMap);
     return;
 }
 
