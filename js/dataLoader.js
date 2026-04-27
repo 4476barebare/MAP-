@@ -501,6 +501,7 @@ if (spotName) {
     // area → prefへ戻る（県画面）
     // -----------------------
     if (areaName) {
+        const z = window.map.getZoom();
 if (Math.round(z) === 13) {
     alert(areaName);
     selectArea(area.name);
