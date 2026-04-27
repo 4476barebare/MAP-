@@ -470,6 +470,8 @@ function goBack() {
 
     const spotKey = spotIdRaw.split('_')[2];
     alert (spotKey);
+    alert (areaId);
+    
     
     const spot = window.spotData.find(
     s =>
