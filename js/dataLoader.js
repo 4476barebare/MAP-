@@ -487,6 +487,7 @@ function goBack() {
         if (z >= 12.8) {
             const area = window.areaData.find(a => a.id === areaId);
             if (!area) return;
+            alert(area.name);
 
             selectArea(area.name);
             return;
