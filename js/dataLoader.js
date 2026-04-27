@@ -440,75 +440,58 @@ function enableDragForArea() {
     window.map.options.maxBoundsViscosity = 1.0;
 }
 
-function goBack(hash) {
+function goBack() {
 
     // -----------------------
     // map制御リセット
     // -----------------------
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
-
     window.areaBounds = null;
 
-    // スポット系レイヤー削除
     resetSpotLayers();
 
-    // -----------------------
-    // 現在hash取得
-    // -----------------------
-    hash = hash || window.currentHash || '';
-
-    const parts = decodeURIComponent(hash.replace(/^#/, '')).split('/');
-    const areaName = parts[0];
-    const spotName = parts[1];
+    const areaId = window.currentAreaId;
+    const spotId = window.currentSpotId;
 
     // -----------------------
-    // spot → areaへ戻る
+    // spot → area
     // -----------------------
-if (spotName) {
-    stopZoomGuard();
+    if (spotId) {
 
-    const rawAreaName = decodeURIComponent(areaName || '').trim();
+        stopZoomGuard();
 
-    const area = window.areaData.find(
-        a => (a.name || '').trim() === rawAreaName
-    );
+        const area = window.areaData.find(a => a.id === areaId);
+        if (!area) return;
 
-    if (!area) return;
+        // ハッシュ更新（表示用だけ）
+        history.replaceState(null, '', '#' + encodeURIComponent(area.name));
 
-    // ★ハッシュ修正
-    const newHash = encodeURIComponent(area.name);
-    history.replaceState(null, '', '#' + newHash);
-    window.currentHash = '#' + newHash;
+        // 地図状態
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.disable();
+        window.map.doubleClickZoom.disable();
+        window.map.touchZoom.disable();
 
-    // ★ここ重要：地図状態リセット
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-
-    window.map.dragging.enable();
-    window.map.scrollWheelZoom.disable(); // ←pref仕様に合わせる
-    window.map.doubleClickZoom.disable();
-    window.map.touchZoom.disable();
-
-
-
-    // ★再描画
-    selectArea(area.name);
-    return;
-}
+        selectArea(area.name);
+        return;
+    }
 
     // -----------------------
-    // area → prefへ戻る（県画面）
+    // area → pref
     // -----------------------
-    if (areaName) {
+    if (areaId) {
+
         const z = window.map.getZoom();
-if (Math.round(z) === 13) {
-    alert(areaName);
-    selectArea(areaName);
-    return;
-}else{
 
-        // 県中心へ戻す
+        if (z >= 12.8) {
+            const area = window.areaData.find(a => a.id === areaId);
+            if (!area) return;
+
+            selectArea(area.name);
+            return;
+        }
+
         drawLocation(
             window.prefData.name,
             window.prefData.lat,
@@ -516,27 +499,21 @@ if (Math.round(z) === 13) {
             window.prefData.zoom
         );
 
-        // hashリセット
-        location.hash = '';
-        // ★状態は必ずURLから再構築
-        updateStateFromHash();
+        // 状態リセット
+        window.currentAreaId = null;
+        window.currentSpotId = null;
 
-        // 県用スポット表示
+        location.hash = '';
         showPrefSpots();
-        
+
         window.map.invalidateSize(true);
-        
+
         document.getElementById('map-back-btn').style.display = 'none';
         initAreaUI();
 
         return;
     }
-    }
-
 }
-
-
-
 
 window.selectArea = selectArea;
 window.selectSpot = selectSpot;
