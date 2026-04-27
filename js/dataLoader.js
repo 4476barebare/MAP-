@@ -339,8 +339,6 @@ function prefetchAround(area) {
 
 function selectArea(areaName) {
 
-
-
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
@@ -459,23 +457,40 @@ function goBack() {
     // -----------------------
     if (spotId) {
 
-        stopZoomGuard();
+    stopZoomGuard();
 
-        const area = window.areaData.find(a => a.id === areaId);
-        if (!area) return;
+// -----------------------
+// spot → area（簡略版）
+// -----------------------
+if (spotId) {
+    alertspotId);
 
-        // ハッシュ更新（表示用だけ）
-        history.replaceState(null, '', '#' + encodeURIComponent(area.name));
+    stopZoomGuard();
 
-        // 地図状態
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.disable();
-        window.map.doubleClickZoom.disable();
-        window.map.touchZoom.disable();
+    const center = window.map.getCenter();
 
-        selectArea(area.name);
-        return;
-    }
+    const spotId = window.currentSpotId;
+
+    // ★ここでスポット名取得
+    const spot = window.spotData.find(s => s.id === spotId);
+    const spotName = spot ? spot.name : '';
+
+    // spot解除
+    const newHash = location.hash.replace("/" + spotId, "");
+    history.replaceState(null, '', newHash);
+
+    window.currentSpotId = null;
+
+    window.map.dragging.enable();
+    window.map.scrollWheelZoom.disable();
+    window.map.doubleClickZoom.disable();
+    window.map.touchZoom.disable();
+
+    // そのまま使う
+    selectSpot(window.currentAreaName, spotName, center.lat, center.lng);
+
+    return;
+}
 
     // -----------------------
     // area → pref
@@ -490,7 +505,6 @@ function goBack() {
         const z = window.map.getZoom();
 
         if (z >= 12.8) {
-            alert(area.name);
             selectArea(area.name);
             return;
         }
