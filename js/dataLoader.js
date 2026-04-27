@@ -495,6 +495,13 @@ function goBack() {
         spot.lat + "," + spot.lng
     );
 
+enableDragForArea();
+
+        showSpotsForArea(window.currentAreaId);
+        
+        enableAreaSwipe(); // ←これ追加
+        markerControl.showShop01(window.currentAreaId);
+
     selectSpot(area.name, spotName, spot.lat, spot.lng);
 
     return;
