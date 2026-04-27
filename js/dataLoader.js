@@ -449,26 +449,25 @@ function goBack() {
 
     resetSpotLayers();
 
-    const areaId = window.currentAreaId;
-    const spotId = window.currentSpotId;
-    
-    alert(spotId);
+const areaId = window.currentAreaId;
+const spotId = window.currentSpotId;
+
+alert(spotId);
 
 if (spotId) {
-    alert(spotId);
+
+    alert("inside:" + spotId);
 
     stopZoomGuard();
 
     const center = window.map.getCenter();
 
-    const spotId = window.currentSpotId;
+    const id = spotId; // ←再代入しない
 
-    // ★ここでスポット名取得
-    const spot = window.spotData.find(s => s.id === spotId);
+    const spot = window.spotData.find(s => s.id === id);
     const spotName = spot ? spot.name : '';
 
-    // spot解除
-    const newHash = location.hash.replace("/" + spotId, "");
+    const newHash = location.hash.replace("/" + id, "");
     history.replaceState(null, '', newHash);
 
     window.currentSpotId = null;
@@ -478,7 +477,6 @@ if (spotId) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // そのまま使う
     selectSpot(window.currentAreaName, spotName, center.lat, center.lng);
 
     return;
