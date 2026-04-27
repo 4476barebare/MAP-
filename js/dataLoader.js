@@ -501,7 +501,7 @@ if (spotName) {
     // area → prefへ戻る（県画面）
     // -----------------------
     if (areaName) {
-if (z === 13) {
+if (Math.round(z) === 13) {
     alert(area.name);
     selectArea(area.name);
     return;
