@@ -671,19 +671,22 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
     const bounds = map.getBounds();
 
-    const currentVisible = new Set(
-        spots
-            .filter(s => bounds.contains([s.lat, s.lng]))
-            .map(s => s.individualId || s.id || s.name)
-    );
+    const currentVisible = spots
+        .filter(s => bounds.contains([s.lat, s.lng]))
+        .map(s => s.individualId || s.id || s.name);
 
-    for (const id of currentVisible) {
+    const currentSet = new Set(currentVisible);
+
+    // ★ 差分だけ検出
+    for (const id of currentSet) {
         if (!lastVisibleSet.has(id)) {
             alert("entered: " + id);
         }
     }
 
-    lastVisibleSet = currentVisible;
+    lastVisibleSet = currentSet;
+
+    // ---- 最寄り ----
 
     const center = map.getCenter();
 
@@ -705,6 +708,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
     if (nearest) {
         const key = nearest.individualId || nearest.id || nearest.name;
+
         if (markerMap.has(key)) {
             updateMarkerState(markerMap, key, "読み込み済み1");
         }
@@ -712,6 +716,8 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
     return nearest;
 }
+
+
 
 function updateMarkerState(markerMap, spotId, status) {
   const marker = markerMap.get(spotId);
