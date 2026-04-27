@@ -455,7 +455,7 @@ function goBack() {
     alert(spotId);
 
 if (spotId) {
-    //alert(spotId);
+    alert(spotId);
 
     stopZoomGuard();
 
