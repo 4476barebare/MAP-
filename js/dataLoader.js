@@ -576,6 +576,7 @@ function showSpotsForArea(areaKey) {
                             <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
                         </svg>
                         <span>${spot.name}</span>
+                        <div class="marker-status"></div>
                     </div>
                 `,
                 iconSize: [32, 32],
@@ -661,6 +662,52 @@ function showSpotsForArea(areaKey) {
     );
 }
 
+function updatePhase2NearestSpot(map, spots, markerMap) {
+  const center = map.getCenter();
+  const bounds = map.getBounds();
+
+  const visible = spots.filter(s =>
+    bounds.contains([s.lat, s.lng])
+  );
+
+  if (visible.length === 0) return null;
+
+  let nearest = null;
+  let min = Infinity;
+
+  for (const s of visible) {
+    const dLat = s.lat - center.lat;
+    const dLng = s.lng - center.lng;
+    const d = dLat * dLat + dLng * dLng;
+
+    if (d < min) {
+      min = d;
+      nearest = s;
+    }
+  }
+
+  if (nearest) {
+    updateMarkerState(markerMap, nearest.id, "読み込み済み1");
+  }
+
+  return nearest;
+}
+
+function updateMarkerState(markerMap, spotId, status) {
+  const marker = markerMap.get(spotId);
+  if (!marker) return false;
+
+  const el = marker.getElement();
+  if (!el) return false;
+
+  const statusEl = el.querySelector(".marker-status");
+
+  if (statusEl) {
+    statusEl.textContent = status;
+  }
+
+  return true;
+}
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
@@ -738,61 +785,6 @@ const popupHtml = `
     }).openPopup();
 }
 
-function updatePhase2NearestSpot(map, spots, markerMap) {
-  const center = map.getCenter();
-  const bounds = map.getBounds();
-
-  const visible = spots.filter(s =>
-    bounds.contains([s.lat, s.lng])
-  );
-
-  if (visible.length === 0) return null;
-
-  let nearest = null;
-  let min = Infinity;
-
-  for (const s of visible) {
-    const dLat = s.lat - center.lat;
-    const dLng = s.lng - center.lng;
-    const d = dLat * dLat + dLng * dLng;
-
-    if (d < min) {
-      min = d;
-      nearest = s;
-    }
-  }
-
-  if (nearest) {
-    updateMarkerState(markerMap, nearest.id, "読み込み済み1");
-  }
-
-  return nearest;
-}
-
-function updateMarkerState(markerMap, spotId, status) {
-  const marker = markerMap.get(spotId);
-  if (!marker) return false;
-
-  const el = marker.getElement();
-  if (!el) return false;
-
-  const statusEl = el.querySelector(".marker-status");
-
-  if (statusEl) {
-    statusEl.textContent = status;
-  } else {
-    // 無ければ追加（保険）
-    const wrap = el.querySelector(".marker-wrap");
-    if (wrap) {
-      const div = document.createElement("div");
-      div.className = "marker-status";
-      div.textContent = status;
-      wrap.appendChild(div);
-    }
-  }
-
-  return true;
-}
 
 
 
