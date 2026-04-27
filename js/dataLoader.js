@@ -684,6 +684,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
   const visible = spots.filter(s =>
     bounds.contains([s.lat, s.lng])
   );
+  alert("visible count: " + visible.length); 
 
   if (visible.length === 0) return null;
 
@@ -700,6 +701,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
       nearest = s;
     }
   }
+  alert("nearest: " + (nearest ? nearest.id : "null"));
 
   if (nearest) {
     updateMarkerState(markerMap, nearest.id, "読み込み済み1");
