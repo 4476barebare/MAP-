@@ -673,38 +673,85 @@ function showSpotsForArea(areaKey) {
     );
 }
 
+function getInnerBounds(map, ratio = 0.5) {
+    const b = map.getBounds();
+
+    const latSpan = b.getNorth() - b.getSouth();
+    const lngSpan = b.getEast() - b.getWest();
+
+    const latPad = latSpan * (1 - ratio) / 2;
+    const lngPad = lngSpan * (1 - ratio) / 2;
+
+    return L.latLngBounds(
+        [b.getSouth() + latPad, b.getWest() + lngPad],
+        [b.getNorth() - latPad, b.getEast() - lngPad]
+    );
+}
+
+const iconActionMap = {
+    spot: { type: "spot", weather: "A" },
+    fish1: { type: "fish", weather: "B" },
+    fish2: { type: "fish", weather: "C" },
+    fish3: { type: "fish", weather: "D" },
+    fish4: { type: "fish", weather: "E" },
+    fish5: { type: "fish", weather: "F" },
+    fish6: { type: "fish", weather: "G" }
+};
 
 let lastVisibleSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
-    const bounds = map.getBounds();
+    const bounds = getInnerBounds(map, 0.5);
+    const center = map.getCenter();
 
     const currentVisible = new Set(
         spots
             .filter(s => bounds.contains([s.lat, s.lng]))
-            .map(s => s.individualId || s.id || s.name)
+            .map(s => s.name)
     );
 
-    // ★ 追加されたものだけ検出
-    for (const id of currentVisible) {
-        if (!lastVisibleSet.has(id)) {
-            alert("entered: " + id);
-        }
-    }
-
-    // ★ 出たものはリセット対象
-    for (const id of lastVisibleSet) {
-        if (!currentVisible.has(id)) {
-            // 任意：out検知も可能
+    // ★ 追加検出（nameで表示）
+    for (const name of currentVisible) {
+        if (!lastVisibleSet.has(name)) {
+            alert("entered: " + name);
         }
     }
 
     lastVisibleSet = currentVisible;
 
-    return null;
+    // ★ nearest
+    let nearest = null;
+let min = Infinity;
+
+for (const s of spots) {
+
+    const icon = s.icon || "spot";
+    const action = iconActionMap[icon];
+    if (!action) continue;
+
+    if (!bounds.contains([s.lat, s.lng])) continue;
+
+    const d = map.distance(
+        L.latLng(s.lat, s.lng),
+        center
+    );
+
+    if (d < min) {
+        min = d;
+        nearest = s;
+    }
 }
 
+    if (nearest) {
+        const key = nearest.individualId || nearest.id || nearest.name;
+        if (markerMap.has(key)) {
+            updateMarkerState(markerMap, key, "読み込み済み1");
+        }
+    }
+
+    return nearest;
+}
 
 function updateMarkerState(markerMap, spotId, status) {
   const marker = markerMap.get(spotId);
