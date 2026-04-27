@@ -479,11 +479,7 @@ function goBack() {
 
     const spotName = spot.name;
 
-    alert(
-        area.name + "\n" +
-        spotName + "\n" +
-        spot.lat + "," + spot.lng
-    );
+ 
 
     stopZoomGuard();
 
@@ -491,6 +487,13 @@ function goBack() {
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
+
+
+  alert(
+        area.name + "\n" +
+        spotName + "\n" +
+        spot.lat + "," + spot.lng
+    );
 
     selectSpot(area.name, spotName, spot.lat, spot.lng);
 
