@@ -496,10 +496,10 @@ function goBack() {
     
     enableDragForArea();
     showSpotsForArea(window.currentAreaId);
-    enableAreaSwipe(); // ←これ追加
-    markerControl.showShop01(window.currentAreaId);
+    //enableAreaSwipe(); // ←これ追加
+    //markerControl.showShop01(window.currentAreaId);
     
-    const newHash = location.hash.replace('/' + spotKey, '');
+    location.hash = location.hash.replace('/' + spotKey, '');
     updateStateFromHash();
     selectSpot(area.name, spotName, spot.lat, spot.lng);
 
