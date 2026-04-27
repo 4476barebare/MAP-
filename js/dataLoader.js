@@ -504,7 +504,7 @@ if (spotName) {
         const z = window.map.getZoom();
 if (Math.round(z) === 13) {
     alert(areaName);
-    selectArea(area.name);
+    selectArea(areaName);
     return;
 }else{
 
