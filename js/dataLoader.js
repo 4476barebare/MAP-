@@ -502,7 +502,7 @@ if (spotName) {
     // -----------------------
     if (areaName) {
 if (Math.round(z) === 13) {
-    alert(area.name);
+    alert(areaName);
     selectArea(area.name);
     return;
 }else{
