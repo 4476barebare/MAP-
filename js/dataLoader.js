@@ -440,57 +440,54 @@ function enableDragForArea() {
 
 function goBack() {
 
-    // -----------------------
-    // map制御リセット
-    // -----------------------
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     window.areaBounds = null;
 
     resetSpotLayers();
 
-const areaId = window.currentAreaId;
-const spotId = window.currentSpotId;
+    const areaId = window.currentAreaId;
+    const spotId = window.currentSpotId;
 
-alert(spotId);
+    const rawId = areaId.split('_')[1];
+    const area = window.areaData.find(
+        a => String(a.individualId) === rawId
+    );
+    
+    const spotId = window.currentSpotId;
+    // ① spotId → spot取得
+    const spot = window.spotData.find(s => s.id === spotId);
+    // ② spotからindividualId取得
+    const spotIndividualId = spot.id.split('_')[2];
+    // ③ area取得（areaId一致）
+    const area = window.areaData.find(
+        a => a.areaId === spot.areaId
+    );
+    // ④ 表示名（最終的に使う名前）
+    const spotName = area.name;
 
-if (spotId) {
+    // -----------------------
+    // spot → area
+    // -----------------------
+    if (spotName) {
 
-    alert("inside:" + spotId);
+        stopZoomGuard();
+        
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.disable();
+        window.map.doubleClickZoom.disable();
+        window.map.touchZoom.disable();
 
-    stopZoomGuard();
+        // ★ここ修正（存在しない変数を削除）
+        selectSpot(area.name, spotName, center.lat, center.lng);
 
-    const center = window.map.getCenter();
-
-    const id = spotId; // ←再代入しない
-
-    const spot = window.spotData.find(s => s.id === id);
-    const spotName = spot ? spot.name : '';
-
-    const newHash = location.hash.replace("/" + id, "");
-    history.replaceState(null, '', newHash);
-
-    window.currentSpotId = null;
-
-    window.map.dragging.enable();
-    window.map.scrollWheelZoom.disable();
-    window.map.doubleClickZoom.disable();
-    window.map.touchZoom.disable();
-
-    selectSpot(window.currentAreaName, spotName, center.lat, center.lng);
-
-    return;
-}
+        return;
+    }
 
     // -----------------------
     // area → pref
     // -----------------------
-    if (areaId) {
-        
-        const rawId = areaId.split('_')[1];
-        const area = window.areaData.find(
-            a => String(a.individualId) === rawId);
-        if (!area) return;
+    if (area) {
 
         const z = window.map.getZoom();
 
@@ -506,7 +503,6 @@ if (spotId) {
             window.prefData.zoom
         );
 
-        // 状態リセット
         window.currentAreaId = null;
         window.currentSpotId = null;
 
