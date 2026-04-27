@@ -703,7 +703,6 @@ let lastVisibleSet = new Set();
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     const bounds = getInnerBounds(map, 0.5);
-    const center = map.getCenter();
 
     const currentVisible = new Set(
         spots
@@ -711,54 +710,24 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
             .map(s => s.name)
     );
 
+    let enteredFlag = false;
+    let enteredNames = [];
 
-let entered = false;
-
-for (const name of currentVisible) {
-    if (!lastVisibleSet.has(name)) {
-        alert("entered: " + name);
-        entered = true;
-    }
-}
-
-if (entered) {
-    prefetchGsiTilesForSpot(window.map, window.spotData);
-}
-
-
-    lastVisibleSet = currentVisible;
-
-    // ★ nearest
-    let nearest = null;
-let min = Infinity;
-
-for (const s of spots) {
-
-    const icon = s.icon || "spot";
-    const action = iconActionMap[icon];
-    if (!action) continue;
-
-    if (!bounds.contains([s.lat, s.lng])) continue;
-
-    const d = map.distance(
-        L.latLng(s.lat, s.lng),
-        center
-    );
-
-    if (d < min) {
-        min = d;
-        nearest = s;
-    }
-}
-
-    if (nearest) {
-        const key = nearest.individualId || nearest.id || nearest.name;
-        if (markerMap.has(key)) {
-            updateMarkerState(markerMap, key, "読み込み済み1");
+    for (const name of currentVisible) {
+        if (!lastVisibleSet.has(name)) {
+            enteredNames.push(name);
+            enteredFlag = true;
         }
     }
 
-    return nearest;
+    if (enteredFlag) {
+        alert("entered: " + enteredNames.join(","));
+        prefetchGsiTilesForSpot(window.map, window.spotData);
+    }
+
+    lastVisibleSet = currentVisible;
+
+    return null;
 }
 
 function getBoundsFromSpots(list) {
