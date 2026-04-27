@@ -490,11 +490,8 @@ function goBack() {
         const z = window.map.getZoom();
 
         if (z >= 12.8) {
-            const area = window.areaData.find(a => a.id === areaId);
-            if (!area) return;
-            const areaName = area.name;
-            alert(areaName);
-            selectArea(areaName);
+            alert(area.name);
+            selectArea(area.name);
             return;
         }
 
