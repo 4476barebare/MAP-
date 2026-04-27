@@ -460,17 +460,17 @@ function goBack() {
     // ② spotからindividualId取得
     const spotIndividualId = spot.id.split('_')[2];
     // ③ area取得（areaId一致）
-    const area = window.areaData.find(
+    const spotarea = window.areaData.find(
         a => a.areaId === spot.areaId
     );
     // ④ 表示名（最終的に使う名前）
-    const spotName = area.name;
+    const spotName = spotarea.name;
 
     // -----------------------
     // spot → area
     // -----------------------
     if (spotName) {
-
+        alert(area.name, spotName, spotarea.lat, spotarea.lng);
         stopZoomGuard();
         
         window.map.dragging.enable();
@@ -479,7 +479,7 @@ function goBack() {
         window.map.touchZoom.disable();
 
         // ★ここ修正（存在しない変数を削除）
-        selectSpot(area.name, spotName, center.lat, center.lng);
+        selectSpot(area.name, spotName, spotarea.lat, spotarea.lng);
 
         return;
     }
