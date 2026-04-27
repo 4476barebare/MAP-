@@ -538,14 +538,17 @@ function showSpotsForArea(areaKey) {
     // 初期化
     // =========================
 
+    // 既存マーカー削除
     window.map.eachLayer(layer => {
         if (layer instanceof L.Marker) {
             window.map.removeLayer(layer);
         }
     });
 
+    // ラベルDOM削除
     document.querySelectorAll('.spot-label').forEach(el => el.remove());
 
+    // 状態リセット
     window.spotMarkers = [];
     window.markerMap = new Map();
 
@@ -554,12 +557,6 @@ function showSpotsForArea(areaKey) {
 
     let minLat = Infinity, maxLat = -Infinity;
     let minLng = Infinity, maxLng = -Infinity;
-
-    // phase判定（共通化）
-    const isPhase1 =
-        window.currentAreaId &&
-        window.map.getZoom() <= 12 &&
-        !window.currentSpotId;
 
     // =========================
     // マーカー生成
@@ -579,7 +576,6 @@ function showSpotsForArea(areaKey) {
                             <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
                         </svg>
                         <span>${spot.name}</span>
-                        <div class="marker-status"></div>
                     </div>
                 `,
                 iconSize: [32, 32],
@@ -596,28 +592,27 @@ function showSpotsForArea(areaKey) {
 
         marker.on('click', function () {
 
-            // phase1：そのままスポット選択
+            const zoom = window.map.getZoom();
+
+            const isPhase1 =
+                window.currentAreaId &&
+                zoom <= 12 &&
+                !window.currentSpotId;
+
             if (isPhase1) {
 
-                setActiveSpot(spot);
 
-                selectSpot(
-                    areaKey,
-                    spot.name,
-                    spot.lat,
-                    spot.lng
-                );
+    selectSpot(areaKey, spot.name, spot.lat, spot.lng);
+updatePhase2NearestSpot(map, spots, markerMap);
+    return;
+}
 
-                return;
-            }
 
-            // fish処理
             if (isFish) {
                 showFishPopup(marker, spot);
                 return;
             }
 
-            // phase2：詳細遷移
             const safeSpot = {
                 name: spot.name,
                 lat: spot.lat,
@@ -633,7 +628,7 @@ function showSpotsForArea(areaKey) {
         });
 
         // =========================
-        // map追加
+        // map追加 & 管理登録
         // =========================
 
         marker.addTo(window.map);
@@ -641,23 +636,21 @@ function showSpotsForArea(areaKey) {
         window.spotMarkers.push(marker);
         window.markerMap.set(spot.id, marker);
 
-        // phase2のみ未読表示
-        if (!isPhase1) {
-            updateMarkerState(window.markerMap, spot.id, "未読");
-        }
+        // 初期状態（必要なら）
 
         // =========================
-        // バウンディング
+        // バウンディング計算
         // =========================
 
         minLat = Math.min(minLat, spot.lat);
         maxLat = Math.max(maxLat, spot.lat);
         minLng = Math.min(minLng, spot.lng);
         maxLng = Math.max(maxLng, spot.lng);
+        
     });
 
     // =========================
-    // エリア範囲
+    // エリアバウンス設定
     // =========================
 
     const latSize = maxLat - minLat;
@@ -673,6 +666,18 @@ function showSpotsForArea(areaKey) {
 }
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
+    
+    
+    alert(
+    "map: " + map +
+    "\nspots: " + (spots ? spots.length : spots) +
+    "\nmarkerMap: " + (markerMap ? markerMap.size : markerMap)
+  );
+
+
+    
+    
+    
   const center = map.getCenter();
   const bounds = map.getBounds();
 
