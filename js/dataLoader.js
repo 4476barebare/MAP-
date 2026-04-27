@@ -485,7 +485,7 @@ function goBack() {
     alert(
         area.name + "\n" +
         spotName + "\n" +
-        spotarea.lat + "," + spotarea.lng
+        spot.lat + "," + spot.lng
     );
 
     stopZoomGuard();
@@ -495,7 +495,7 @@ function goBack() {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    selectSpot(area.name, spotName, spotarea.lat, spotarea.lng);
+    selectSpot(area.name, spotName, spot.lat, spot.lng);
 
     return;
 }
