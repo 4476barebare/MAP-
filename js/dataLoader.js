@@ -453,32 +453,37 @@ function goBack() {
     const area = window.areaData.find(
         a => String(a.individualId) === rawId
     );
-    
-    const spotId = window.currentSpotId;
-    // ① spotId → spot取得
-    const spot = window.spotData.find(s => s.id === spotId);
-    // ② spotからindividualId取得
-    const spotIndividualId = spot.id.split('_')[2];
-    // ③ area取得（areaId一致）
-    const spotarea = window.areaData.find(
-        a => a.areaId === spot.areaId
-    );
-    // ④ 表示名（最終的に使う名前）
-    const spotName = spotarea.name;
+
+    if (!area) return;
 
     // -----------------------
-    // spot → area
+    // spot処理テスト
     // -----------------------
-    if (spotName) {
-        alert(area.name, spotName, spotarea.lat, spotarea.lng);
+    if (spotId) {
+
+        const spot = window.spotData.find(s => s.id === spotId);
+        if (!spot) return;
+
+        const spotarea = window.areaData.find(
+            a => a.areaId === spot.areaId
+        );
+        if (!spotarea) return;
+
+        const spotName = spotarea.name;
+
+        alert(
+            area.name + "\n" +
+            spotName + "\n" +
+            spotarea.lat + "," + spotarea.lng
+        );
+
         stopZoomGuard();
-        
+
         window.map.dragging.enable();
         window.map.scrollWheelZoom.disable();
         window.map.doubleClickZoom.disable();
         window.map.touchZoom.disable();
 
-        // ★ここ修正（存在しない変数を削除）
         selectSpot(area.name, spotName, spotarea.lat, spotarea.lng);
 
         return;
