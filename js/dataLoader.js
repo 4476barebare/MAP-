@@ -674,10 +674,9 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
     const currentVisible = new Set(
         spots
             .filter(s => bounds.contains([s.lat, s.lng]))
-            .map(s => s.id)
+            .map(s => s.individualId || s.id || s.name)
     );
 
-    // 視界に入った瞬間だけ検知
     for (const id of currentVisible) {
         if (!lastVisibleSet.has(id)) {
             alert("entered: " + id);
@@ -685,8 +684,6 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
     }
 
     lastVisibleSet = currentVisible;
-
-    // ---- ここから元ロジック ----
 
     const center = map.getCenter();
 
@@ -706,8 +703,11 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         }
     }
 
-    if (nearest && markerMap.has(nearest.id)) {
-        updateMarkerState(markerMap, nearest.id, "読み込み済み1");
+    if (nearest) {
+        const key = nearest.individualId || nearest.id || nearest.name;
+        if (markerMap.has(key)) {
+            updateMarkerState(markerMap, key, "読み込み済み1");
+        }
     }
 
     return nearest;
