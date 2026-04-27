@@ -394,6 +394,8 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
+    
+    alert("呼ばれた");
     disableAreaSwipe(); // ★ここ追加
     window.map.off('move');
     window.map.setMaxBounds(null);
