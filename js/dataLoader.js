@@ -461,33 +461,35 @@ function goBack() {
     // -----------------------
     if (spotId) {
 
-        const spot = window.spotData.find(s => s.id === spotId);
-        if (!spot) return;
+    const spot = window.spotData.find(
+        s => s.individualId === spotId
+    );
+    if (!spot) return;
 
-        const spotarea = window.areaData.find(
-            a => a.areaId === spot.areaId
-        );
-        if (!spotarea) return;
+    const spotarea = window.areaData.find(
+        a => a.areaId === spot.areaId
+    );
+    if (!spotarea) return;
 
-        const spotName = spotarea.name;
+    const spotName = spotarea.name;
 
-        alert(
-            area.name + "\n" +
-            spotName + "\n" +
-            spotarea.lat + "," + spotarea.lng
-        );
+    alert(
+        area.name + "\n" +
+        spotName + "\n" +
+        spotarea.lat + "," + spotarea.lng
+    );
 
-        stopZoomGuard();
+    stopZoomGuard();
 
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.disable();
-        window.map.doubleClickZoom.disable();
-        window.map.touchZoom.disable();
+    window.map.dragging.enable();
+    window.map.scrollWheelZoom.disable();
+    window.map.doubleClickZoom.disable();
+    window.map.touchZoom.disable();
 
-        selectSpot(area.name, spotName, spotarea.lat, spotarea.lng);
+    selectSpot(area.name, spotName, spotarea.lat, spotarea.lng);
 
-        return;
-    }
+    return;
+}
 
     // -----------------------
     // area → pref
