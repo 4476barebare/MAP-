@@ -481,7 +481,11 @@ function goBack() {
     // area → pref
     // -----------------------
     if (areaId) {
-         alert(areaId);
+        
+        const rawId = areaId.split('_')[1];
+        const area = window.areaData.find(
+            a => String(a.individualId) === rawId);
+        if (!area) return;
 
         const z = window.map.getZoom();
 
