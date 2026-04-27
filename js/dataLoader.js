@@ -481,6 +481,7 @@ function goBack() {
     // area → pref
     // -----------------------
     if (areaId) {
+         alert(areaId);
 
         const z = window.map.getZoom();
 
