@@ -501,6 +501,10 @@ if (spotName) {
     // area → prefへ戻る（県画面）
     // -----------------------
     if (areaName) {
+if (z === 13) {
+    selectArea(area.name);
+    return;
+}else{
 
         // 県中心へ戻す
         drawLocation(
@@ -524,6 +528,7 @@ if (spotName) {
         initAreaUI();
 
         return;
+    }
     }
 
 }
