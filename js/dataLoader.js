@@ -441,6 +441,9 @@ function enableDragForArea() {
 
 function goBack() {
 
+    // -----------------------
+    // mapリセット
+    // -----------------------
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     window.areaBounds = null;
@@ -449,95 +452,78 @@ function goBack() {
 
     const areaId = window.currentAreaId;
     const spotId = window.currentSpotId;
-    
 
     const rawId = areaId.split('_')[1];
+
     const area = window.areaData.find(
         a => String(a.individualId) === rawId
     );
-    
-
 
     if (!area) return;
 
-    // -----------------------
-    // spot処理テスト
-    // -----------------------
+    // =====================================================
+    // spot → area
+    // =====================================================
     if (spotId) {
 
-    const spotIdRaw = window.currentSpotId;
+        const spotKey = spotId.split('_')[2];
 
-    const spotKey = spotIdRaw.split('_')[2];
-    
-    const spot = window.spotData.find(
-    s =>
-        String(s.individualId) === String(spotKey) &&
-        String(s.areaId) === String(areaId)
-);
-
-
-    const spotName = spot.name;
-
- 
-
-    //stopZoomGuard();
-
-    window.map.dragging.enable();
-    window.map.scrollWheelZoom.disable();
-    window.map.doubleClickZoom.disable();
-    window.map.touchZoom.disable();
-
-
-  alert(
-        area.name + "\n" +
-        spotName + "\n" +
-        spot.lat + "," + spot.lng
-    );
-    
-    enableDragForArea();
-    showSpotsForArea(window.currentAreaId);
-    //enableAreaSwipe(); // ←これ追加
-    //markerControl.showShop01(window.currentAreaId);
-    
-    location.hash = location.hash.replace('/' + spotKey, '');
-    updateStateFromHash();
-    selectSpot(area.name, spotName, spot.lat, spot.lng);
-
-    return;
-}
-
-    // -----------------------
-    // area → pref
-    // -----------------------
-    if (area) {
-
-        const z = window.map.getZoom();
-
-        if (z >= 12.8) {
-            selectArea(area.name);
-            return;
-        }
-
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom
+        const spot = window.spotData.find(
+            s =>
+                String(s.individualId) === String(spotKey) &&
+                String(s.areaId) === String(areaId)
         );
 
-        window.currentAreaId = null;
-        window.currentSpotId = null;
+        if (!spot) return;
 
-        location.hash = '';
-        showPrefSpots();
+        const spotName = spot.name;
 
-        window.map.invalidateSize(true);
+        // map状態復帰（areaモード）
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.disable();
+        window.map.doubleClickZoom.disable();
+        window.map.touchZoom.disable();
 
-        document.getElementById('map-back-btn').style.display = 'none';
-        initAreaUI();
+        enableDragForArea();
+        showSpotsForArea(window.currentAreaId);
+
+        // URLからspot削除 → state再同期
+        location.hash = location.hash.replace('/' + spotKey, '');
+        updateStateFromHash();
+
+        // spot復帰描画
+        selectSpot(area.name, spotName, spot.lat, spot.lng);
 
         return;
     }
+
+    // =====================================================
+    // area → pref
+    // =====================================================
+    const z = window.map.getZoom();
+
+    if (z >= 12.8) {
+        selectArea(area.name);
+        return;
+    }
+
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+
+    window.currentAreaId = null;
+    window.currentSpotId = null;
+
+    location.hash = '';
+    showPrefSpots();
+
+    window.map.invalidateSize(true);
+
+    document.getElementById('map-back-btn').style.display = 'none';
+    initAreaUI();
 }
 
 window.selectArea = selectArea;
