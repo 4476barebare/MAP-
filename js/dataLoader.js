@@ -451,9 +451,11 @@ function goBack() {
 
     const areaId = window.currentAreaId;
     const spotId = window.currentSpotId;
+    
+    alert(spotId);
 
 if (spotId) {
-    alert(spotId);
+    //alert(spotId);
 
     stopZoomGuard();
 
