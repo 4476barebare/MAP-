@@ -534,6 +534,10 @@ window.loadLocationCSV = loadLocationCSV;
 
 function showSpotsForArea(areaKey) {
 
+    // =========================
+    // 初期化
+    // =========================
+
     // 既存マーカー削除
     window.map.eachLayer(layer => {
         if (layer instanceof L.Marker) {
@@ -541,15 +545,22 @@ function showSpotsForArea(areaKey) {
         }
     });
 
+    // ラベルDOM削除
     document.querySelectorAll('.spot-label').forEach(el => el.remove());
 
+    // 状態リセット
     window.spotMarkers = [];
+    window.markerMap = new Map();
 
     const spots = window.spotData.filter(s => s.areaId === areaKey);
     if (!spots.length) return;
 
-    let minLat = 999, maxLat = -999;
-    let minLng = 999, maxLng = -999;
+    let minLat = Infinity, maxLat = -Infinity;
+    let minLng = Infinity, maxLng = -Infinity;
+
+    // =========================
+    // マーカー生成
+    // =========================
 
     spots.forEach(spot => {
 
@@ -575,52 +586,68 @@ function showSpotsForArea(areaKey) {
                 : Math.floor(Math.random() * 500)
         });
 
-marker.on('click', function () {
+        // =========================
+        // クリック処理
+        // =========================
 
-    const zoom = window.map.getZoom();
+        marker.on('click', function () {
 
-    // ★ phase判定（stateなし運用）
-    const isPhase1 =
-        window.currentAreaId &&
-        zoom <= 12 &&
-        !window.currentSpotId;
+            const zoom = window.map.getZoom();
 
-    if (isPhase1) {
-        selectSpot(areaKey, spot.name, spot.lat, spot.lng);
-    
-        return;
-    }
+            const isPhase1 =
+                window.currentAreaId &&
+                zoom <= 12 &&
+                !window.currentSpotId;
 
-    // phase2
-    if (isFish) {
-        showFishPopup(marker, spot);
-    } else {
+            if (isPhase1) {
+                selectSpot(areaKey, spot.name, spot.lat, spot.lng);
+                return;
+            }
 
-        // ★ここでspotを安全化する（追加のみ）
-        const safeSpot = {
-            name: spot.name,
-            lat: spot.lat,
-            lng: spot.lng,
-            zoom: spot.zoom,
-            individualId: spot.individualId || spot.id || ''
-        };
-        
-        location.hash += '/' + safeSpot.individualId;
-    updateStateFromHash();
+            if (isFish) {
+                showFishPopup(marker, spot);
+                return;
+            }
 
-        zoomToSpot(safeSpot);
-    }
-});
+            const safeSpot = {
+                name: spot.name,
+                lat: spot.lat,
+                lng: spot.lng,
+                zoom: spot.zoom,
+                individualId: spot.individualId || spot.id || ''
+            };
 
+            location.hash += '/' + safeSpot.individualId;
+            updateStateFromHash();
+
+            zoomToSpot(safeSpot);
+        });
+
+        // =========================
+        // map追加 & 管理登録
+        // =========================
 
         marker.addTo(window.map);
-        window.spotMarkers.push(marker);
 
-        if (spot.lat < minLat) minLat = spot.lat;
-        if (spot.lat > maxLat) maxLat = spot.lat;
-        if (spot.lng < minLng) minLng = spot.lng;
-        if (spot.lng > maxLng) maxLng = spot.lng;
+        window.spotMarkers.push(marker);
+        window.markerMap.set(spot.id, marker);
+
+        // 初期状態（必要なら）
+        updateMarkerState(window.markerMap, spot.id, "未読");
+
+        // =========================
+        // バウンディング計算
+        // =========================
+
+        minLat = Math.min(minLat, spot.lat);
+        maxLat = Math.max(maxLat, spot.lat);
+        minLng = Math.min(minLng, spot.lng);
+        maxLng = Math.max(maxLng, spot.lng);
     });
+
+    // =========================
+    // エリアバウンス設定
+    // =========================
 
     const latSize = maxLat - minLat;
     const lngSize = maxLng - minLng;
@@ -710,6 +737,64 @@ const popupHtml = `
         offset: [0, 0] // 必要なら微調整
     }).openPopup();
 }
+
+function updatePhase2NearestSpot(map, spots, markerMap) {
+  const center = map.getCenter();
+  const bounds = map.getBounds();
+
+  const visible = spots.filter(s =>
+    bounds.contains([s.lat, s.lng])
+  );
+
+  if (visible.length === 0) return null;
+
+  let nearest = null;
+  let min = Infinity;
+
+  for (const s of visible) {
+    const dLat = s.lat - center.lat;
+    const dLng = s.lng - center.lng;
+    const d = dLat * dLat + dLng * dLng;
+
+    if (d < min) {
+      min = d;
+      nearest = s;
+    }
+  }
+
+  if (nearest) {
+    updateMarkerState(markerMap, nearest.id, "読み込み済み1");
+  }
+
+  return nearest;
+}
+
+function updateMarkerState(markerMap, spotId, status) {
+  const marker = markerMap.get(spotId);
+  if (!marker) return false;
+
+  const el = marker.getElement();
+  if (!el) return false;
+
+  const statusEl = el.querySelector(".marker-status");
+
+  if (statusEl) {
+    statusEl.textContent = status;
+  } else {
+    // 無ければ追加（保険）
+    const wrap = el.querySelector(".marker-wrap");
+    if (wrap) {
+      const div = document.createElement("div");
+      div.className = "marker-status";
+      div.textContent = status;
+      wrap.appendChild(div);
+    }
+  }
+
+  return true;
+}
+
+
 
 function zoomToSpot(safeSpot) {
 
