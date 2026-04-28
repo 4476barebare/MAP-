@@ -440,7 +440,7 @@ map.on('moveend', () => {
         );
     }, 0);
 
-phase2DetectionEnabled = true;
+window.phase2DetectionEnabled = true;
 });
 }
 
@@ -504,8 +504,7 @@ function goBack() {
         location.hash = location.hash.replace('/' + spotKey, '');
         updateStateFromHash();
         
-        phase2DetectionEnabled = false;
-
+        window.phase2DetectionEnabled = false;
         // spot復帰描画
         selectSpot(area.name, spotName, spot.lat, spot.lng);
 
@@ -704,8 +703,8 @@ let lastVisibleSet = new Set();
 let phase2DetectionEnabled = true;
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
-    if (!phase2DetectionEnabled) return null;
     
+    if (!window.phase2DetectionEnabled) return null;
     const bounds = getInnerBounds(map, 0.5);
 
     const currentVisible = new Set(
@@ -889,8 +888,7 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
-    phase2DetectionEnabled = false;
-
+    window.phase2DetectionEnabled = false;
     switchToGSIPhoto();
 
     // -----------------------
