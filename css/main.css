@@ -1,0 +1,262 @@
+/* =======================
+   ヘッダー全体
+======================= */
+header {
+  border-bottom:1px solid #191970;
+  background:#fff;
+  z-index: 2500;
+}
+
+.header-inner {
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  position:relative;
+}
+
+.logo {
+  font-weight:700;
+  font-size:0.8rem;
+  color:#191970;
+  display:flex;
+  align-items:center;
+}
+
+.nav {
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.nav a {
+  text-decoration:none;
+  color:#191970;
+  font-size:0.8rem;
+}
+
+/* =======================
+   アコーディオン
+======================= */
+.accordion-wrapper {
+  position:relative;
+  z-index: 2600;
+}
+
+.accordion-btn {
+  background:none;
+  border:none;
+  font-size:0.8rem;
+  color:#191970;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+}
+
+.accordion-panel {
+  display:none;
+  position:absolute;
+  top:30px;
+  left:0;
+  background:#f9f9f9;
+  border:1px solid #ddd;
+  border-radius:4px;
+  padding:8px;
+  min-width:150px;
+}
+
+/* =======================
+   登録地点
+======================= */
+.location-list {
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+.location-list li {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:3px 0;
+  font-size:14px;
+}
+
+.delete-btn {
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:#c00;
+}
+
+.location-none {
+  color:#888;
+  font-style:italic;
+}
+
+/* =======================
+   ニュースオーバーレイ
+======================= */
+#newsOverlay {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.55);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:3000;
+}
+
+.news-window {
+  position:relative;
+  width:85%;
+  max-width:900px;
+  height:70vh;
+  background:#fff;
+  border-radius:4px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* =======================
+   汎用オーバーレイ（カレンダー用）
+   ※既存class維持
+======================= */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6); /* ★これが暗幕 */
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* 中身 */
+.overlay-content {
+  width: 95%;
+  height: 90%;
+  background: transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  padding-top: 30px; /* ボタン高さ＋余裕 */
+}
+
+
+
+/* =======================
+   カレンダー本体
+======================= */
+#calendarWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  overflow-x: auto;
+  overflow-y: hidden; /* ★これ追加 */
+  background: transparent;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.month {
+  min-width: 100%;
+  scroll-snap-align: start;
+
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  overflow: hidden; /* ★これ追加 */
+}
+
+.month-title {
+    text-align: center;
+    color: #fff;
+}
+
+
+/* カレンダー全体 */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+
+  gap: 4px;
+  padding: 6px;
+  background: transparent;
+
+  overflow: hidden; /* ★保険 */
+}
+
+/* セル */
+.cell {
+  background: #fff;
+  border-radius: 4px;
+  padding: 6px 4px;
+  min-height: 55px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* 空白セル */
+.cell.empty {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* 曜日ヘッダー */
+.week-head {
+  background: #f0f4ff;
+
+  display: flex;              /* ★追加 */
+  align-items: center;        /* ★縦中央 */
+  justify-content: center;    /* ★横中央 */
+
+  font-size: 0.65rem;
+  font-weight: 600;
+
+  padding: 2px 0;
+  min-height: 20px;
+
+  border-radius: 4px;
+}
+
+/* 日付 */
+.day {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* 潮名 */
+.tide {
+  font-size: 0.7rem;
+  text-align: center;
+  color: #444;
+}
+
+/* 大潮（強調） */
+.tide-big {
+  color: #e60033;
+  font-weight: 700;
+}
+
+/* 過去日 */
+.past {
+  opacity: 0.4;
+}
+
+/* 今日 */
+.today {
+  border: 2px solid #191970;
+}
