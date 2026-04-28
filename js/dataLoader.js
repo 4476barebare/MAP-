@@ -779,6 +779,9 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
 function processSpotUtils(map, spots, mode) {
 
+    // =========================
+    // boundsモード
+    // =========================
     if (mode === "bounds") {
 
         const buffer = 0.002;
@@ -796,66 +799,58 @@ function processSpotUtils(map, spots, mode) {
         return boundsList;
     }
 
+    // =========================
+    // prefetchモード（本体）
+    // =========================
     if (mode === "prefetch") {
 
         if (!map || !spots || !spots.length) return;
 
-        const targets = spots.filter(s => {
-            if (s.icon !== "spot") return false;
-
-            const key = s.id || s.name;
-            if (preloadedSpotSet.has(key)) return false;
-
-            preloadedSpotSet.add(key);
-            return true;
-        });
-
-        if (!targets.length) return;
-
         const zoom = map.getZoom();
+
+        // ★spotだけ対象
+        const targets = spots.filter(s => s.icon === "spot");
+        if (!targets.length) return;
 
         const tileLayer = L.tileLayer(
             'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
             {
                 opacity: 0,
-                keepBuffer: 3,
+                keepBuffer: 6,
                 updateWhenIdle: false,
                 updateWhenZooming: true
             }
         ).addTo(map);
 
-        let loaded = 0;
-        const expected = targets.length * 9; // 3x3想定
-
-        function checkDone() {
-            if (loaded >= expected) {
-                map.removeLayer(tileLayer);
-            }
-        }
-
-        tileLayer.on('tileload', () => {
-            loaded++;
-            checkDone();
-        });
-
         for (const s of targets) {
 
-            const latLng = L.latLng(s.lat, s.lng);
-            const center = map.project(latLng, zoom).divideBy(256).floor();
+            const center = map.project(
+                [s.lat, s.lng],
+                zoom
+            ).divideBy(256).floor();
 
-            // ★3x3プリフェッチ
+            // =========================
+            // 3x3タイル生成要求
+            // =========================
             for (let dx = -1; dx <= 1; dx++) {
                 for (let dy = -1; dy <= 1; dy++) {
 
-                    const tilePoint = L.point(center.x + dx, center.y + dy);
+                    const tilePoint = L.point(
+                        center.x + dx,
+                        center.y + dy
+                    );
 
-                    tileLayer._tileCoordsToBounds(tilePoint);
+                    tileLayer._addTile(tilePoint);
                 }
             }
         }
+
+        // ★時間で安定削除（これが一番安全）
+        setTimeout(() => {
+            map.removeLayer(tileLayer);
+        }, 500);
     }
 }
-
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
