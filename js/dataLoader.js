@@ -707,7 +707,6 @@ function disablePhase2(map) {
     lastVisibleSet = new Set();
 }
 
-
 let lastVisibleSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
@@ -840,8 +839,8 @@ function updateSpotMenu(spots, map) {
 
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
-
     if (!ul) return;
+    menu.classList.add("phase2-lock");
 
     const MAX = 6;
     const center = map.getCenter();
@@ -925,9 +924,7 @@ function updateSpotMenu(spots, map) {
             .forEach(el => el.classList.add("show"));
     });
 }
-// =========================
-// クリック処理（追加）
-// =========================
+
 document.getElementById("map-menu").addEventListener("click", (e) => {
 
     if (!spotMenuClickEnabled) return;
@@ -946,12 +943,12 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
     });
 });
 
-
 function clearSpotMenu() {
 
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
-
+    
+    menu.classList.remove("phase2-lock");
     if (ul) ul.innerHTML = "";
     if (menu) menu.style.display = "none";
 }
