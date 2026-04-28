@@ -697,67 +697,74 @@ function disablePhase2(map) {
 
 let lastVisibleSet = new Set();
 
-/**
- * Phase2検出（純粋ロジック版）
- * ※地図操作は一切しない
- */
 function updatePhase2NearestSpot(map, spots, markerMap) {
+ alert("phase2 called");
+    // =========================
+    // 視界取得
+    // =========================
+    const bounds = map.getBounds();
 
-    // -------------------------
-    // ★完全停止フラグ（zoomToSpot中など）
-    // -------------------------
-    if (window._spotZoomLock) return null;
-
-    if (!window.phase2DetectionEnabled) return null;
-
-    // -------------------------
-    // ★ズーム固定条件
-    // -------------------------
-    const z = map.getZoom();
-    if (Math.round(z) !== 13) return null;
-
-    // -------------------------
-    // 視界内判定
-    // -------------------------
-    const bounds = getInnerBounds(map, 0.5);
-
-    const currentVisible = new Set(
-        spots
-            .filter(s => bounds.contains([s.lat, s.lng]))
-            .map(s => s.name)
+    const visibleSpots = spots.filter(s =>
+        bounds.contains([s.lat, s.lng])
     );
 
-    let enteredNames = [];
-    let enteredFlag = false;
+    const currentVisible = new Set(
+        visibleSpots.map(s => s.name)
+    );
+
+    // =========================
+    // 差分検出
+    // =========================
+    const entered = [];
 
     for (const name of currentVisible) {
         if (!lastVisibleSet.has(name)) {
-            enteredNames.push(name);
-            enteredFlag = true;
+            entered.push(name);
         }
     }
 
-    // -------------------------
-    // ★spotのみ反応（副作用なし）
-    // -------------------------
-    if (enteredFlag) {
+    // =========================
+    // 分岐処理
+    // =========================
+    if (entered.length > 0) {
 
-        const spotTargets = spots.filter(s =>
-            s.icon === "spot" && enteredNames.includes(s.name)
+        const enteredSpots = visibleSpots.filter(s =>
+            entered.includes(s.name)
         );
 
-        alert("entered: " + enteredNames.join(","));
+        const spotTargets = enteredSpots.filter(s => s.icon === "spot");
+        const otherTargets = enteredSpots.filter(s => s.icon !== "spot");
 
-        // ★ここだけ副作用許可（プリフェッチのみ）
+        // -------------------------
+        // spot用（未実装）
+        // -------------------------
         if (spotTargets.length > 0) {
-            prefetchGsiTilesForSpot(window.map, spotTargets);
+            
+            alert(
+            "spot: " + spotTargets.length +
+            "\nother: " + otherTargets.length
+        );
+
+
+            
+        }
+
+        // -------------------------
+        // その他用（未実装）
+        // -------------------------
+        if (otherTargets.length > 0) {
+           alert("未実装");
         }
     }
 
+    // =========================
+    // 状態更新
+    // =========================
     lastVisibleSet = currentVisible;
 
     return null;
 }
+
 function getBoundsFromSpots(list) {
 
     const boundsList = [];
