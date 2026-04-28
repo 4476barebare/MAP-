@@ -896,11 +896,17 @@ function zoomToSpot(safeSpot) {
     disablePhase2(window.map);
     switchToGSIPhoto();
 
+    // -----------------------
+    // 操作ロック
+    // -----------------------
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
+    // -----------------------
+    // 移動
+    // -----------------------
     window.map.setView(
         [safeSpot.lat, safeSpot.lng],
         safeSpot.zoom || 15,
@@ -909,21 +915,32 @@ function zoomToSpot(safeSpot) {
 
     resetSpotLayers();
 
+    // -----------------------
+    // 安定後処理
+    // -----------------------
     window.map.once('moveend', function () {
 
-        // ★ここが重要：動的boundsは禁止
-        if (window.areaBounds) {
-            window.map.setMaxBounds(window.areaBounds);
-        }
+        // ★現在の表示範囲を基準にする（ここは維持）
+        const bounds = window.map.getBounds();
 
+        // ★ドラッグ可能範囲＝初期表示範囲
+        window._spotMaxBounds = bounds;
+
+        window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
 
-        window.map.setMinZoom(safeSpot.zoom);
+        // ★ズーム制御
+        const z = window.map.getZoom();
+        window.map.setMinZoom(z);
         window.map.setMaxZoom(18);
 
-        window._zoomGuardBase = safeSpot.zoom;
+        // ★ズームガード
+        window._zoomGuardBase = z;
         window._zoomGuardActive = true;
 
+        // -----------------------
+        // 操作復帰
+        // -----------------------
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
