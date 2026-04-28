@@ -495,8 +495,6 @@ function goBack() {
     
         // spot復帰描画
         selectSpot(area.name, spotName, spot.lat, spot.lng);
-        stopZoomGuard();
-
         return;
     }
 
