@@ -866,7 +866,7 @@ function updateSpotMenu(spots, map) {
 
         buffer.push({
             key,
-            text: renderSpotName(s),
+            text: s.name,
             lat: s.lat,
             lng: s.lng,
             dist: (s.lat - center.lat) ** 2 + (s.lng - center.lng) ** 2
@@ -904,16 +904,7 @@ function updateSpotMenu(spots, map) {
     });
 }
 
-function renderSpotName(spot) {
 
-    const name = spot.name;
-
-    if (spot.noSearch) {
-        return name;
-    }
-
-    return `<a href="https://www.google.com/search?q=${encodeURIComponent(name)}">${name}</a>`;
-}
 
 function clearSpotMenu() {
 
