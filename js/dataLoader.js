@@ -395,7 +395,7 @@ function selectArea(areaName) {
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
 
-    disableAreaSwipe(); // ★ここ追加
+    disableAreaSwipe();
     window.map.off('move');
     window.map.setMaxBounds(null);
 
@@ -406,7 +406,6 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
         markerControl.clearShop02();
     }
 
-    // ★ここだけ変更
     const areaKey = window.currentAreaId;
 
     if (window.markerControl) {
@@ -419,29 +418,29 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
         window.map.removeLayer(window.currentTileLayer);
     }
 
-    window.currentTileLayer =
-        L.tileLayer(tileUrl, {
-            attribution: '© OpenStreetMap contributors',
-            keepBuffer: 8,
-            updateWhenIdle: true
-        }).addTo(window.map);
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© OpenStreetMap contributors',
+        keepBuffer: 8,
+        updateWhenIdle: true
+    }).addTo(window.map);
 
+    // 通常のmoveend（これは残す）
     window.map.once('moveend', () => {
         enableDragForArea();
-
     });
-    
-map.on('moveend', () => {
-    setTimeout(() => {
+
+    // ★ phase2だけリセット → 再登録（多重防止）
+    window.map.off('moveend.phase2');
+
+    window.map.on('moveend.phase2', function () {
         updatePhase2NearestSpot(
             window.map,
             window.spotData,
             window.markerMap
         );
-    }, 0);
+    });
 
-window.phase2DetectionEnabled = true;
-});
+    window.phase2DetectionEnabled = true;
 }
 
 function enableDragForArea() {
