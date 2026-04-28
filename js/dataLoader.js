@@ -911,11 +911,13 @@ function zoomToSpot(safeSpot) {
     // -----------------------
     // 移動
     // -----------------------
-    window.map.setView(
-        [safeSpot.lat, safeSpot.lng],
-        safeSpot.zoom,
-        { animate: true }
+    drawLocation(
+        safeSpot.name,
+        safeSpot.lat,
+        safeSpot.lng,
+        safeSpot.zoom
     );
+
 
     resetSpotLayers();
 
