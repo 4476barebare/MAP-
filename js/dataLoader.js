@@ -661,7 +661,7 @@ function showSpotsForArea(areaKey) {
     );
 }
 
-let lastVisibleSet = new Set();
+
 
 /**
  * Phase2 有効化
@@ -695,72 +695,69 @@ function disablePhase2(map) {
 }
 
 
+let lastVisibleSet = new Set();
+
 /**
- * Phase2検出本体（純ロジック）
+ * Phase2検出（純粋ロジック版）
+ * ※地図操作は一切しない
  */
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     // -------------------------
-    // 外部ロック
+    // ★完全停止フラグ（zoomToSpot中など）
     // -------------------------
-    if (window._spotZoomLock) return;
-    if (!window.phase2DetectionEnabled) return;
+    if (window._spotZoomLock) return null;
+
+    if (!window.phase2DetectionEnabled) return null;
 
     // -------------------------
-    // ズーム条件（許容範囲にする）
+    // ★ズーム固定条件
     // -------------------------
     const z = map.getZoom();
-    if (Math.abs(z - 13) > 0.3) return;
+    if (Math.round(z) !== 13) return null;
 
     // -------------------------
-    // 視界内取得
+    // 視界内判定
     // -------------------------
     const bounds = getInnerBounds(map, 0.5);
 
-    const visibleSpots = spots.filter(s =>
-        bounds.contains([s.lat, s.lng])
+    const currentVisible = new Set(
+        spots
+            .filter(s => bounds.contains([s.lat, s.lng]))
+            .map(s => s.name)
     );
 
-    const currentSet = new Set(visibleSpots.map(s => s.name));
+    let enteredNames = [];
+    let enteredFlag = false;
 
-    // -------------------------
-    // 差分抽出
-    // -------------------------
-    const enteredNames = [];
-
-    for (const name of currentSet) {
+    for (const name of currentVisible) {
         if (!lastVisibleSet.has(name)) {
             enteredNames.push(name);
+            enteredFlag = true;
         }
     }
 
     // -------------------------
-    // 初回 or 変化なし
+    // ★spotのみ反応（副作用なし）
     // -------------------------
-    if (enteredNames.length === 0) {
-        lastVisibleSet = currentSet;
-        return;
+    if (enteredFlag) {
+
+        const spotTargets = spots.filter(s =>
+            s.icon === "spot" && enteredNames.includes(s.name)
+        );
+
+        alert("entered: " + enteredNames.join(","));
+
+        // ★ここだけ副作用許可（プリフェッチのみ）
+        if (spotTargets.length > 0) {
+            prefetchGsiTilesForSpot(window.map, spotTargets);
+        }
     }
 
-    // -------------------------
-    // spotのみ対象
-    // -------------------------
-    const spotTargets = spots.filter(s =>
-        s.icon === "spot" && enteredNames.includes(s.name)
-    );
+    lastVisibleSet = currentVisible;
 
-    alert("entered: " + enteredNames.join(","));
-
-    if (spotTargets.length > 0) {
-        prefetchGsiTilesForSpot(window.map, spotTargets);
-    }
-
-    // -------------------------
-    // 状態更新
-    // -------------------------
-    lastVisibleSet = currentSet;
+    return null;
 }
-
 function getBoundsFromSpots(list) {
 
     const boundsList = [];
