@@ -704,7 +704,7 @@ const iconActionMap = {
 let lastVisibleSet = new Set();
 let phase2DetectionEnabled = true;
 
-function updatePhase2NearestSpot(map, spots, markerMap) 
+function updatePhase2NearestSpot(map, spots, markerMap) {
     if (!phase2DetectionEnabled) return null;
     
     const bounds = getInnerBounds(map, 0.5);
