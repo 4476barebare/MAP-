@@ -842,7 +842,7 @@ function updateSpotMenu(spots, map) {
 
     if (!ul) return;
 
-    const MAX = 5;
+    const MAX = 6;
 
     const center = map.getCenter();
 
@@ -866,7 +866,7 @@ function updateSpotMenu(spots, map) {
 
         buffer.push({
             key,
-            text: s.name,
+            text: renderSpotName(s),
             lat: s.lat,
             lng: s.lng,
             dist: (s.lat - center.lat) ** 2 + (s.lng - center.lng) ** 2
@@ -902,6 +902,17 @@ function updateSpotMenu(spots, map) {
         document.querySelectorAll("#map-menu li.new-item")
             .forEach(el => el.classList.add("show"));
     });
+}
+
+function renderSpotName(spot) {
+
+    const name = spot.name;
+
+    if (spot.noSearch) {
+        return name;
+    }
+
+    return `<a href="https://www.google.com/search?q=${encodeURIComponent(name)}">${name}</a>`;
 }
 
 function clearSpotMenu() {
