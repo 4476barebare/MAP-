@@ -394,6 +394,7 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
+    lastVisibleSet = new Set();
     // selectSpotの一番上
 window._zoomGuardActive = false;
 window._zoomGuardBase = null;
