@@ -100,9 +100,13 @@ li { user-select: none; cursor: pointer; }
     transform: translateY(0);
 }
 
-.map-menu.phase2-lock li {
+#map-menu.phase2-lock li {
     pointer-events: none;
-    cursor: default;
+}
+
+#map-menu.phase2-lock li .spot-text {
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 /* =========================
