@@ -687,6 +687,7 @@ function enablePhase2(map) {
         phase2Initialized = true;
 
         map.once('moveend', function () {
+            clearSpotMenu();
             updatePhase2NearestSpot(map, window.spotData, window.markerMap);
         });
     }
@@ -834,7 +835,7 @@ function processSpotUtils(map, spots, mode) {
 }
 
 function updateSpotMenu(spots, map) {
-    alert(spots.name);
+    //alert(spots.name);
 
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
@@ -895,6 +896,15 @@ function updateSpotMenu(spots, map) {
     if (buffer.length > 0) {
         menu.style.display = "block";
     }
+}
+
+function clearSpotMenu() {
+
+    const menu = document.getElementById("map-menu");
+    const ul = document.querySelector("#map-menu ul");
+
+    if (ul) ul.innerHTML = "";
+    if (menu) menu.style.display = "none";
 }
 
 function createPrefSpotLayer() {
@@ -976,6 +986,7 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
+    clearSpotMenu();
     
     disablePhase2(window.map);
 
