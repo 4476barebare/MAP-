@@ -834,8 +834,9 @@ function processSpotUtils(map, spots, mode) {
     }
 }
 
+let spotMenuClickEnabled = true;
+
 function updateSpotMenu(spots, map) {
-    //alert(spots.name);
 
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
@@ -843,10 +844,11 @@ function updateSpotMenu(spots, map) {
     if (!ul) return;
 
     const MAX = 6;
-
     const center = map.getCenter();
 
-    // 既存DOMから現在状態を取る（グローバル不要）
+    // =========================
+    // 既存DOMから状態取得
+    // =========================
     const existing = new Set(
         Array.from(ul.children).map(li => li.dataset.key)
     );
@@ -858,6 +860,9 @@ function updateSpotMenu(spots, map) {
         lng: +li.dataset.lng
     }));
 
+    // =========================
+    // 新規追加
+    // =========================
     for (const s of spots) {
 
         const key = s.id || s.name;
@@ -873,7 +878,9 @@ function updateSpotMenu(spots, map) {
         });
     }
 
-    // 距離で削除（遠い順）
+    // =========================
+    // 遠い順削除
+    // =========================
     while (buffer.length > MAX) {
 
         let far = 0;
@@ -887,23 +894,58 @@ function updateSpotMenu(spots, map) {
         buffer.splice(far, 1);
     }
 
-    // 描画（DOMだけで完結）
+    // =========================
+    // 描画
+    // =========================
     ul.innerHTML = buffer
-        .map(i => `<li data-key="${i.key}" data-lat="${i.lat}" data-lng="${i.lng}">${i.text}</li>`)
+        .map(i => `
+            <li 
+                class="new-item"
+                data-key="${i.key}" 
+                data-lat="${i.lat}" 
+                data-lng="${i.lng}"
+            >
+                ${i.text}
+            </li>
+        `)
         .join("");
 
-    // 初回表示だけ制御
+    // =========================
+    // 表示制御
+    // =========================
     if (buffer.length > 0) {
         menu.style.display = "block";
     }
-    
-    // アニメーション発火
+
+    // =========================
+    // アニメーション
+    // =========================
     requestAnimationFrame(() => {
         document.querySelectorAll("#map-menu li.new-item")
             .forEach(el => el.classList.add("show"));
     });
 }
 
+// =========================
+// クリック処理（追加）
+// =========================
+document.getElementById("map-menu").addEventListener("click", (e) => {
+
+    if (!spotMenuClickEnabled) return;
+
+    const li = e.target.closest("li");
+    if (!li) return;
+
+    const lat = parseFloat(li.dataset.lat);
+    const lng = parseFloat(li.dataset.lng);
+
+    if (!lat || !lng) return;
+
+    window.map.flyTo([lat, lng], 16, {
+        animate: true,
+        duration: 0.6
+    });
+});
 
 
 function clearSpotMenu() {
