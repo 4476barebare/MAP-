@@ -661,6 +661,7 @@ function showSpotsForArea(areaKey) {
     );
 }
 
+let phase2Initialized = false;
 
 
 function enablePhase2(map) {
@@ -674,6 +675,19 @@ function enablePhase2(map) {
     };
 
     map.on('dragend', map._phase2Handler);
+    
+     // -------------------------
+    // ★初回強制実行（ここが追加）
+    // -------------------------
+    if (!phase2Initialized) {
+        phase2Initialized = true;
+
+        // 少し待つ（地図描画安定後）
+        setTimeout(() => {
+            updatePhase2NearestSpot(map, window.spotData, window.markerMap);
+        }, 0);
+    }
+
 }
 
 
