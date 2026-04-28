@@ -703,8 +703,14 @@ let lastVisibleSet = new Set();
 let phase2DetectionEnabled = true;
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
-    
+
+    // ★ フェーズ制御
     if (!window.phase2DetectionEnabled) return null;
+
+    // ★ ズーム制御（ここが本質）
+    const z = map.getZoom();
+    if (Math.round(z) !== 13) return null;
+
     const bounds = getInnerBounds(map, 0.5);
 
     const currentVisible = new Set(
