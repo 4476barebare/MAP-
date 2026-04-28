@@ -394,7 +394,9 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
-    updatePhase2NearestSpot("enable");
+    
+    updatePhase2NearestSpot(window.map, "__stop__");
+    
     disableAreaSwipe();
     window.map.off('move');
     window.map.setMaxBounds(null);
@@ -429,22 +431,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
         enableDragForArea();
     });
 
-    // ★ ここが本質（関数で管理）
-    if (window._phase2Handler) {
-        window.map.off('moveend', window._phase2Handler);
-    }
-
-    window._phase2Handler = function () {
-        updatePhase2NearestSpot(
-            window.map,
-            window.spotData,
-            window.markerMap
-        );
-    };
-
-    window.map.on('moveend', window._phase2Handler);
-
-    window.phase2DetectionEnabled = true;
+    updatePhase2NearestSpot(window.map, "__start__");
 }
 
 function enableDragForArea() {
@@ -519,7 +506,6 @@ function goBack() {
     const z = window.map.getZoom();
 
     if (z >= 12.8) {
-        updatePhase2NearestSpot("disable");
         selectArea(area.name);
         return;
     }
@@ -687,13 +673,33 @@ const iconActionMap = {
     fish6: { type: "fish", weather: "G" }
 };
 
-let lastVisibleSet = new Set();
-let phase2DetectionEnabled = true;
+const iconActionMap = {
+    spot: { type: "spot", weather: "A" },
+    fish1: { type: "fish", weather: "B" },
+    fish2: { type: "fish", weather: "C" },
+    fish3: { type: "fish", weather: "D" },
+    fish4: { type: "fish", weather: "E" },
+    fish5: { type: "fish", weather: "F" },
+    fish6: { type: "fish", weather: "G" }
+};
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     // =========================
-    // 内部関数（完全内包）
+    // 内部状態（全部ここで保持）
+    // =========================
+    if (!updatePhase2NearestSpot._state) {
+        updatePhase2NearestSpot._state = {
+            enabled: false,
+            lastVisible: new Set(),
+            boundHandler: null
+        };
+    }
+
+    const state = updatePhase2NearestSpot._state;
+
+    // =========================
+    // 内部関数
     // =========================
     function getInnerBounds(map, ratio = 0.5) {
         const b = map.getBounds();
@@ -711,9 +717,38 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
     }
 
     // =========================
-    // フェーズ制御
+    // 外部トグル（呼び出し制御）
     // =========================
-    if (!window.phase2DetectionEnabled) return null;
+    if (map === "__start__") {
+        state.enabled = true;
+
+        if (state.boundHandler) map.off('moveend', state.boundHandler);
+
+        state.boundHandler = () => {
+            updatePhase2NearestSpot(window.map, window.spotData, null);
+        };
+
+        map.on('moveend', state.boundHandler);
+
+        state.lastVisible.clear();
+        return;
+    }
+
+    if (map === "__stop__") {
+        state.enabled = false;
+
+        if (state.boundHandler) {
+            window.map.off('moveend', state.boundHandler);
+        }
+
+        state.lastVisible.clear();
+        return;
+    }
+
+    // =========================
+    // 無効時は何もしない
+    // =========================
+    if (!state.enabled) return null;
 
     // =========================
     // ズーム制御
@@ -732,36 +767,26 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
             .map(s => s.name)
     );
 
-    // =========================
-    // 侵入検知
-    // =========================
     let enteredNames = [];
 
     for (const name of currentVisible) {
-        if (!lastVisibleSet.has(name)) {
+        if (!state.lastVisible.has(name)) {
             enteredNames.push(name);
         }
     }
 
-    // =========================
-    // 発火処理
-    // =========================
     if (enteredNames.length > 0) {
 
         alert("entered: " + enteredNames.join(","));
 
         const enteredSpots = spots.filter(s =>
-            enteredNames.includes(s.name) &&
-            s.icon === "spot"
+            enteredNames.includes(s.name) && s.icon === "spot"
         );
 
-        prefetchGsiTilesForSpot(window.map, enteredSpots);
+        prefetchGsiTilesForSpot(map, enteredSpots);
     }
 
-    // =========================
-    // 状態更新
-    // =========================
-    lastVisibleSet = currentVisible;
+    state.lastVisible = currentVisible;
 
     return null;
 }
@@ -910,7 +935,7 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
-    updatePhase2NearestSpot("disable");
+    updatePhase2NearestSpot(window.map, "__stop__");
     switchToGSIPhoto()
     // -----------------------
     // 操作ロック
