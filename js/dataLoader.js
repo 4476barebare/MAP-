@@ -768,9 +768,6 @@ function prefetchGsiTilesForSpot(map, spots) {
 
     if (!map || !spots || !spots.length) return;
 
-    if (window._prefetchRunning) return;
-    window._prefetchRunning = true;
-
     const targets = spots.filter(s => {
         if (s.icon !== "spot") return false;
 
@@ -781,39 +778,35 @@ function prefetchGsiTilesForSpot(map, spots) {
         return true;
     });
 
-    if (!targets.length) {
-        window._prefetchRunning = false;
-        return;
-    }
-
-    const boundsList = getBoundsFromSpots(targets);
+    if (!targets.length) return;
 
     const zoom = map.getZoom();
-    const center = map.getCenter();
 
-    let i = 0;
-
-    function step() {
-
-        if (i >= boundsList.length) {
-
-            // ★ 完全復元
-            map.stop(); // ← これ重要
-            map.setView(center, zoom, { animate: false });
-
-            window._prefetchRunning = false;
-            return;
+    // ★ 非表示タイルレイヤー
+    const tileLayer = L.tileLayer(
+        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+        {
+            opacity: 0,          // ← 見えない
+            keepBuffer: 2,
+            updateWhenIdle: false
         }
+    ).addTo(map);
 
-        map.fitBounds(boundsList[i], { animate: false });
+    for (const s of targets) {
 
-        i++;
-        setTimeout(step, 40);
+        const latLng = L.latLng(s.lat, s.lng);
+
+        // ★ 内部的にタイル座標計算させる
+        tileLayer._tileCoordsToBounds(
+            map.project(latLng, zoom).divideBy(256).floor()
+        );
     }
 
-    step();
+    // ★ 読み込みだけさせて削除
+    setTimeout(() => {
+        map.removeLayer(tileLayer);
+    }, 500);
 }
-
 
 function updateMarkerState(markerMap, spotId, status) {
   const marker = markerMap.get(spotId);
