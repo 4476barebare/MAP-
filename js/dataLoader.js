@@ -925,7 +925,6 @@ function updateSpotMenu(spots, map) {
             .forEach(el => el.classList.add("show"));
     });
 }
-
 // =========================
 // クリック処理（追加）
 // =========================
@@ -941,7 +940,7 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
 
     if (!lat || !lng) return;
 
-    window.map.flyTo([lat, lng], 16, {
+    window.map.flyTo([lat, lng], 13, {
         animate: true,
         duration: 0.6
     });
