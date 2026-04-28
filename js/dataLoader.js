@@ -929,17 +929,23 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
 
     if (!spotMenuClickEnabled) return;
 
-    const menu = document.getElementById("map-menu"); // ここだけ追加
-
     const li = e.target.closest("li");
     if (!li) return;
 
-    if (menu.classList.contains("phase2-lock")) return;
+    const menu = document.getElementById("map-menu");
 
     const lat = parseFloat(li.dataset.lat);
     const lng = parseFloat(li.dataset.lng);
-
     if (!lat || !lng) return;
+
+    // =========================
+    // Phase2時だけ「テキスト以外は無効」
+    // =========================
+    if (menu.classList.contains("phase2-lock")) {
+
+        // テキスト以外クリックなら無視
+        if (!e.target.classList.contains("spot-text")) return;
+    }
 
     window.map.flyTo([lat, lng], 13, {
         animate: true,
