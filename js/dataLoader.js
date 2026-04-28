@@ -931,7 +931,7 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
 
     const li = e.target.closest("li");
     if (!li) return;
-
+    
     const lat = parseFloat(li.dataset.lat);
     const lng = parseFloat(li.dataset.lng);
 
@@ -944,10 +944,8 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
 });
 
 function clearSpotMenu() {
-
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
-    
     menu.classList.remove("phase2-lock");
     if (ul) ul.innerHTML = "";
     if (menu) menu.style.display = "none";
