@@ -394,6 +394,12 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
+    
+    window.phase2DetectionEnabled = false;
+
+if (window._phase2Handler) {
+    window.map.off('moveend', window._phase2Handler);
+}
 
     disableAreaSwipe();
     window.map.off('move');
@@ -506,8 +512,7 @@ function goBack() {
         // URLからspot削除 → state再同期
         location.hash = location.hash.replace('/' + spotKey, '');
         updateStateFromHash();
-        
-        window.phase2DetectionEnabled = false;
+    
         // spot復帰描画
         selectSpot(area.name, spotName, spot.lat, spot.lng);
 
@@ -897,7 +902,13 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
-    window.phase2DetectionEnabled = false;
+
+window.phase2DetectionEnabled = false;
+
+if (window._phase2Handler) {
+    window.map.off('moveend', window._phase2Handler);
+}
+
     switchToGSIPhoto();
 
     // -----------------------
