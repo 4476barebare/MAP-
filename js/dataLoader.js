@@ -503,6 +503,8 @@ function goBack() {
         // URLからspot削除 → state再同期
         location.hash = location.hash.replace('/' + spotKey, '');
         updateStateFromHash();
+        
+        resetPrefetchState();
 
         // spot復帰描画
         selectSpot(area.name, spotName, spot.lat, spot.lng);
@@ -787,6 +789,12 @@ function prefetchGsiTilesForSpot(map, spots) {
     step();
 }
 
+function resetPrefetchState() {
+    if (typeof preloadedSpotSet !== "undefined") {
+        preloadedSpotSet.clear();
+    }
+}
+
 function updateMarkerState(markerMap, spotId, status) {
   const marker = markerMap.get(spotId);
   if (!marker) return false;
@@ -883,6 +891,7 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
+    resetPrefetchState();
 
     switchToGSIPhoto();
 
