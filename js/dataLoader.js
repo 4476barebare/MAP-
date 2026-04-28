@@ -661,53 +661,37 @@ function showSpotsForArea(areaKey) {
     );
 }
 
+
 let lastVisibleSet = new Set();
 
-
-/**
- * Phase2検出（純粋ロジック版）
- * ※地図操作は一切しない
- */
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
-    // -------------------------
-    // ★完全停止フラグ（zoomToSpot中など）
-    // -------------------------
     if (window._spotZoomLock) return null;
-
     if (!window.phase2DetectionEnabled) return null;
 
-    // -------------------------
-    // ★ズーム固定条件
-    // -------------------------
     const z = map.getZoom();
     if (Math.round(z) !== 13) return null;
 
-    // -------------------------
-    // 視界内判定
-    // -------------------------
     const bounds = getInnerBounds(map, 0.5);
 
-    const currentVisible = new Set(
-        spots
-            .filter(s => bounds.contains([s.lat, s.lng]))
-            .map(s => s.name)
-    );
+    const currentVisibleNames = spots
+        .filter(s => bounds.contains([s.lat, s.lng]))
+        .map(s => s.name);
+
+    const currentVisibleSet = new Set(currentVisibleNames);
 
     let enteredNames = [];
-    let enteredFlag = false;
 
-    for (const name of currentVisible) {
+    // -------------------------
+    // 差分検出（ここが正）
+    // -------------------------
+    for (const name of currentVisibleSet) {
         if (!lastVisibleSet.has(name)) {
             enteredNames.push(name);
-            enteredFlag = true;
         }
     }
 
-    // -------------------------
-    // ★spotのみ反応（副作用なし）
-    // -------------------------
-    if (enteredFlag) {
+    if (enteredNames.length > 0) {
 
         const spotTargets = spots.filter(s =>
             s.icon === "spot" && enteredNames.includes(s.name)
@@ -715,13 +699,15 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
         alert("entered: " + enteredNames.join(","));
 
-        // ★ここだけ副作用許可（プリフェッチのみ）
         if (spotTargets.length > 0) {
             prefetchGsiTilesForSpot(window.map, spotTargets);
         }
     }
 
-    lastVisibleSet = currentVisible;
+    // -------------------------
+    // ★更新はここだけ
+    // -------------------------
+    lastVisibleSet = currentVisibleSet;
 
     return null;
 }
@@ -892,7 +878,6 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
-    alert(safeSpot.zoom);
 
     window._spotZoomLock = true;
     window.phase2DetectionEnabled = false;
