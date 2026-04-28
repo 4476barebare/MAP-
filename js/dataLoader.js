@@ -754,11 +754,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
             // タイルプリフェッチ
             processSpotUtils(map, spotTargets, "prefetch");
-
-            // ★追加：スポットメニュー更新
-            if (window.spotMenu) {
-                window.spotMenu.update(spotTargets);
-            }
+            updateSpotMenu(spotTargets, map);
         }
 
         // =====================================================
@@ -837,139 +833,69 @@ function processSpotUtils(map, spots, mode) {
     }
 }
 
-function createSpotMenuManager(map) {
+function updateSpotMenu(spots, map) {
+    alert(spots.name);
 
-    let buffer = [];
-    let enabled = false;
-    let handler = null;
-    let firstShown = false;
+    const menu = document.getElementById("map-menu");
+    const ul = document.querySelector("#map-menu ul");
+
+    if (!ul) return;
 
     const MAX = 5;
 
-    function dist(a, b) {
-        return (a.lat - b.lat) ** 2 + (a.lng - b.lng) ** 2;
+    const center = map.getCenter();
+
+    // 既存DOMから現在状態を取る（グローバル不要）
+    const existing = new Set(
+        Array.from(ul.children).map(li => li.dataset.key)
+    );
+
+    const buffer = Array.from(ul.children).map(li => ({
+        key: li.dataset.key,
+        text: li.textContent,
+        lat: +li.dataset.lat,
+        lng: +li.dataset.lng
+    }));
+
+    for (const s of spots) {
+
+        const key = s.id || s.name;
+
+        if (existing.has(key)) continue;
+
+        buffer.push({
+            key,
+            text: s.name,
+            lat: s.lat,
+            lng: s.lng,
+            dist: (s.lat - center.lat) ** 2 + (s.lng - center.lng) ** 2
+        });
     }
 
-    function render() {
+    // 距離で削除（遠い順）
+    while (buffer.length > MAX) {
 
-        const menu = document.getElementById("map-menu");
-        const ul = document.querySelector("#map-menu ul");
+        let far = 0;
 
-        if (!ul) {
-            alert("❌ UL not found");
-            return;
-        }
-
-        if (!firstShown && buffer.length > 0) {
-            menu.style.display = "block";
-            firstShown = true;
-
-            alert("📌 menu shown");
-        }
-
-        ul.innerHTML = buffer
-            .map(i => `<li>${i.text}</li>`)
-            .join("");
-    }
-
-    function update(spots) {
-
-        alert("🔥 update called / spots: " + (spots ? spots.length : 0));
-
-        if (!enabled) {
-            alert("❌ not enabled");
-            return;
-        }
-
-        const center = map.getCenter();
-        const bounds = map.getBounds();
-
-        const visible = spots.filter(s =>
-            bounds.contains([s.lat, s.lng])
-        );
-
-        alert("👁 visible: " + visible.length);
-
-        for (const s of visible) {
-
-            const key = s.id || s.name;
-
-            if (buffer.some(i => i.key === key)) continue;
-
-            buffer.push({
-                key,
-                text: s.name || "NO_NAME",
-                lat: s.lat,
-                lng: s.lng,
-                dist: dist(center, s)
-            });
-
-            while (buffer.length > MAX) {
-
-                let far = 0;
-
-                for (let i = 1; i < buffer.length; i++) {
-                    if (buffer[i].dist > buffer[far].dist) {
-                        far = i;
-                    }
-                }
-
-                buffer.splice(far, 1);
+        for (let i = 1; i < buffer.length; i++) {
+            if (buffer[i].dist > buffer[far].dist) {
+                far = i;
             }
         }
 
-        render();
+        buffer.splice(far, 1);
     }
 
-    function enable() {
+    // 描画（DOMだけで完結）
+    ul.innerHTML = buffer
+        .map(i => `<li data-key="${i.key}" data-lat="${i.lat}" data-lng="${i.lng}">${i.text}</li>`)
+        .join("");
 
-        alert("🟢 enable called");
-
-        if (enabled) return;
-
-        enabled = true;
-        buffer = [];
-        firstShown = false;
-
-        const menu = document.getElementById("map-menu");
-        if (menu) menu.style.display = "none";
-
-        const ul = document.querySelector("#map-menu ul");
-        if (ul) ul.innerHTML = "";
-
-        handler = function () {
-            alert("📡 moveend fired");
-            update(window.spotData || []);
-        };
-
-        map.on("moveend", handler);
+    // 初回表示だけ制御
+    if (buffer.length > 0) {
+        menu.style.display = "block";
     }
-
-    function disable() {
-
-        alert("🔴 disable called");
-
-        if (!enabled) return;
-
-        enabled = false;
-        buffer = [];
-        firstShown = false;
-
-        const menu = document.getElementById("map-menu");
-        if (menu) menu.style.display = "none";
-
-        const ul = document.querySelector("#map-menu ul");
-        if (ul) ul.innerHTML = "";
-
-        if (handler) {
-            map.off("moveend", handler);
-            handler = null;
-        }
-    }
-
-    return { enable, disable };
 }
-
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
