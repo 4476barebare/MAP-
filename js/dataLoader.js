@@ -751,16 +751,8 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         // spot用（未実装）
         // -------------------------
         if (spotTargets.length > 0) {
-            
-            alert(
-            "spot: " + spotTargets.length +
-            "\nother: " + otherTargets.length
-        );
-    processSpotUtils(map, spotTargets, "prefetch");
-
-            
+            processSpotUtils(map, spotTargets, "prefetch");
         }
-
         // -------------------------
         // その他用（未実装）
         // -------------------------
