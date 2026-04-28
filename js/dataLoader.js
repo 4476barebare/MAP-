@@ -764,7 +764,6 @@ function prefetchGsiTilesForSpot(map, spots) {
 
     if (!map || !spots || !spots.length) return;
 
-    // ★ spotのみ + 未ロードのみ
     const targets = spots.filter(s => {
         if (s.icon !== "spot") return false;
 
@@ -777,28 +776,42 @@ function prefetchGsiTilesForSpot(map, spots) {
 
     if (!targets.length) return;
 
-    const boundsList = getBoundsFromSpots(targets);
-
     const zoom = map.getZoom();
-    const center = map.getCenter();
 
-    let i = 0;
+    for (const s of targets) {
 
-    function step() {
+        const lat = s.lat;
+        const lng = s.lng;
 
-        if (i >= boundsList.length) {
-            map.setView(center, zoom, { animate: false });
-            return;
+        // ★ タイル座標計算
+        const tileSize = 256;
+        const scale = 1 << zoom;
+
+        const worldCoordX = (lng + 180) / 360 * scale;
+        const sinLat = Math.sin(lat * Math.PI / 180);
+        const worldCoordY = (
+            (1 - Math.log((1 + sinLat) / (1 - sinLat)) / (2 * Math.PI)) / 2
+        ) * scale;
+
+        const x = Math.floor(worldCoordX);
+        const y = Math.floor(worldCoordY);
+
+        // ★ 周辺3x3タイルだけ叩く
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+
+                const tx = x + dx;
+                const ty = y + dy;
+
+                const url = `https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/${zoom}/${tx}/${ty}.jpg`;
+
+                const img = new Image();
+                img.src = url;
+            }
         }
-
-        map.fitBounds(boundsList[i], { animate: false });
-
-        i++;
-        setTimeout(step, 40);
     }
-
-    step();
 }
+
 
 function updateMarkerState(markerMap, spotId, status) {
   const marker = markerMap.get(spotId);
