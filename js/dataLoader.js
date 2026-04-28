@@ -434,6 +434,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
 map.on('moveend', () => {
 
     setTimeout(() => {
+        phase2DetectionEnabled = true;
         updatePhase2NearestSpot(
             window.map,
             window.spotData,
@@ -701,14 +702,11 @@ const iconActionMap = {
 };
 
 let lastVisibleSet = new Set();
+let phase2DetectionEnabled = true;
 
-function updatePhase2NearestSpot(map, spots, markerMap) {
-    if (skipNextDetection) {
-    lastVisibleSet = new Set();
-    skipNextDetection = false;
-    return null;
-    }
-
+function updatePhase2NearestSpot(map, spots, markerMap) 
+    if (!phase2DetectionEnabled) return null;
+    
     const bounds = getInnerBounds(map, 0.5);
 
     const currentVisible = new Set(
@@ -801,7 +799,7 @@ function resetPrefetchState() {
     }
     // ★ これが抜けてる（検出リセット）
     lastVisibleSet.clear();
-    skipNextDetection = true;
+    phase2DetectionEnabled = false;
 }
 
 
