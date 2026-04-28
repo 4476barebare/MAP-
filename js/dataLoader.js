@@ -896,6 +896,12 @@ function updateSpotMenu(spots, map) {
     if (buffer.length > 0) {
         menu.style.display = "block";
     }
+    
+    // アニメーション発火
+    requestAnimationFrame(() => {
+        document.querySelectorAll("#map-menu li.new-item")
+            .forEach(el => el.classList.add("show"));
+    });
 }
 
 function clearSpotMenu() {
