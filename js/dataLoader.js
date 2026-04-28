@@ -712,22 +712,26 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
             .map(s => s.name)
     );
 
-    let enteredFlag = false;
     let enteredNames = [];
 
     for (const name of currentVisible) {
         if (!lastVisibleSet.has(name)) {
             enteredNames.push(name);
-            enteredFlag = true;
         }
     }
 
-    if (enteredFlag) {
+    if (enteredNames.length) {
+
         alert("entered: " + enteredNames.join(","));
-        prefetchGsiTilesForSpot(window.map, window.spotData);
+
+        const enteredSpots = spots.filter(s =>
+            enteredNames.includes(s.name)
+        );
+
+        prefetchGsiTilesForSpot(map, enteredSpots);
     }
 
-    lastVisibleSet = currentVisible;
+    lastVisibleSet = new Set(currentVisible);
 
     return null;
 }
@@ -790,9 +794,7 @@ function prefetchGsiTilesForSpot(map, spots) {
 }
 
 function resetPrefetchState() {
-    if (typeof preloadedSpotSet !== "undefined") {
-        preloadedSpotSet.clear();
-    }
+    preloadedSpotSet.clear();
 }
 
 function updateMarkerState(markerMap, spotId, status) {
