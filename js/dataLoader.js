@@ -745,10 +745,16 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         }
     }
 
-    if (enteredFlag) {
-        alert("entered: " + enteredNames.join(","));
-        prefetchGsiTilesForSpot(window.map, window.spotData);
-    }
+if (enteredFlag) {
+
+    alert("entered: " + enteredNames.join(","));
+
+    const enteredSpots = spots.filter(s => {
+        return enteredNames.includes(s.name) && s.icon === "spot";
+    });
+
+    prefetchGsiTilesForSpot(window.map, enteredSpots);
+}
 
     lastVisibleSet = currentVisible;
 
