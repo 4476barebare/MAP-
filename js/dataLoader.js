@@ -779,9 +779,46 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
 function processSpotUtils(map, spots, mode) {
 
-    // =========================
-    // boundsモード
-    // =========================
+    if (mode === "prefetch") {
+
+        if (!map || !spots || !spots.length) return;
+
+        const zoom = map.getZoom();
+
+        const targets = spots.filter(s => s.icon === "spot");
+        if (!targets.length) return;
+
+        const baseUrl =
+            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/' +
+            zoom + '/{x}/{y}.jpg';
+
+        const tileSize = 256;
+
+        for (const s of targets) {
+
+            const point = map.project([s.lat, s.lng], zoom);
+
+            const tileX = Math.floor(point.x / tileSize);
+            const tileY = Math.floor(point.y / tileSize);
+
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+
+                    const x = tileX + dx;
+                    const y = tileY + dy;
+
+                    const url = baseUrl
+                        .replace('{x}', x)
+                        .replace('{y}', y);
+
+                    // ★ここが本体（強制キャッシュ）
+                    const img = new Image();
+                    img.src = url;
+                }
+            }
+        }
+    }
+
     if (mode === "bounds") {
 
         const buffer = 0.002;
@@ -798,59 +835,8 @@ function processSpotUtils(map, spots, mode) {
 
         return boundsList;
     }
-
-    // =========================
-    // prefetchモード（本体）
-    // =========================
-    if (mode === "prefetch") {
-
-        if (!map || !spots || !spots.length) return;
-
-        const zoom = map.getZoom();
-
-        // ★spotだけ対象
-        const targets = spots.filter(s => s.icon === "spot");
-        if (!targets.length) return;
-
-        const tileLayer = L.tileLayer(
-            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-            {
-                opacity: 0,
-                keepBuffer: 6,
-                updateWhenIdle: false,
-                updateWhenZooming: true
-            }
-        ).addTo(map);
-
-        for (const s of targets) {
-
-            const center = map.project(
-                [s.lat, s.lng],
-                zoom
-            ).divideBy(256).floor();
-
-            // =========================
-            // 3x3タイル生成要求
-            // =========================
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-
-                    const tilePoint = L.point(
-                        center.x + dx,
-                        center.y + dy
-                    );
-
-                    tileLayer._addTile(tilePoint);
-                }
-            }
-        }
-
-        // ★時間で安定削除（これが一番安全）
-        setTimeout(() => {
-            map.removeLayer(tileLayer);
-        }, 500);
-    }
 }
+
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
