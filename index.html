@@ -607,9 +607,15 @@ function routeUpdate() {
 // =======================
 document.addEventListener('DOMContentLoaded', () => {
 
-    window.currentPref =
-        new URLSearchParams(location.search).get('pref') || 'CHIBA';
+    const url = new URL(location.href);
 
+    if (!url.searchParams.get('pref')) {
+        url.searchParams.set('pref', 'CHIBA');
+        history.replaceState(null, '', url);
+    }
+
+    window.currentPref = url.searchParams.get('pref');
+    
     const csvUrl = `/MAP-/KANTO/${window.currentPref}_location.csv`;
     const shopUrl = `/MAP-/KANTO/${window.currentPref}_shop.csv`;
 
