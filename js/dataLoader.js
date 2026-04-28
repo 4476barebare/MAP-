@@ -933,7 +933,7 @@ function zoomToSpot(safeSpot) {
         window.map.setMaxZoom(18);
         
         window._zoomGuardBase = initialZoom;
-        window._zoomGuardActive = true
+        window._zoomGuardActive = true;
 
         // 操作復帰
         window.map.dragging.enable();
