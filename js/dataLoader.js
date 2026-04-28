@@ -768,7 +768,9 @@ function prefetchGsiTilesForSpot(map, spots) {
 
     if (!map || !spots || !spots.length) return;
 
-    // ★ spotのみ + 未ロードのみ抽出
+    if (window._prefetchRunning) return;
+    window._prefetchRunning = true;
+
     const targets = spots.filter(s => {
         if (s.icon !== "spot") return false;
 
@@ -779,7 +781,10 @@ function prefetchGsiTilesForSpot(map, spots) {
         return true;
     });
 
-    if (!targets.length) return;
+    if (!targets.length) {
+        window._prefetchRunning = false;
+        return;
+    }
 
     const boundsList = getBoundsFromSpots(targets);
 
@@ -791,19 +796,23 @@ function prefetchGsiTilesForSpot(map, spots) {
     function step() {
 
         if (i >= boundsList.length) {
+
+            // ★ 完全復元
+            map.stop(); // ← これ重要
             map.setView(center, zoom, { animate: false });
+
+            window._prefetchRunning = false;
             return;
         }
 
         map.fitBounds(boundsList[i], { animate: false });
 
         i++;
-        setTimeout(step, 40); // ★ これが重要
+        setTimeout(step, 40);
     }
 
     step();
 }
-
 
 
 function updateMarkerState(markerMap, spotId, status) {
