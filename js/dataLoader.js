@@ -790,10 +790,16 @@ function prefetchGsiTilesForSpot(map, spots) {
 }
 
 function resetPrefetchState() {
+
+    // ★ プリロード状態
     if (typeof preloadedSpotSet !== "undefined") {
         preloadedSpotSet.clear();
     }
+
+    // ★ これが抜けてる（検出リセット）
+    lastVisibleSet.clear();
 }
+
 
 function updateMarkerState(markerMap, spotId, status) {
   const marker = markerMap.get(spotId);
