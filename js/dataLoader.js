@@ -663,9 +663,6 @@ function showSpotsForArea(areaKey) {
 
 
 
-/**
- * Phase2 有効化
- */
 function enablePhase2(map) {
 
     if (map._phase2Handler) return;
@@ -673,15 +670,19 @@ function enablePhase2(map) {
     lastVisibleSet = new Set();
 
     map._phase2Handler = function () {
+
+        // ★追加（ループ防止）
+        if (map._phase2Running) return;
+        map._phase2Running = true;
+
         updatePhase2NearestSpot(map, window.spotData, window.markerMap);
+
+        map._phase2Running = false;
     };
 
     map.on('moveend', map._phase2Handler);
 }
 
-/**
- * Phase2 無効化
- */
 function disablePhase2(map) {
 
     if (!map._phase2Handler) return;
