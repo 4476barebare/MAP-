@@ -779,9 +779,6 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
 function processSpotUtils(map, spots, mode) {
 
-    // =========================
-    // ① bounds生成モード
-    // =========================
     if (mode === "bounds") {
 
         const buffer = 0.002;
@@ -799,9 +796,6 @@ function processSpotUtils(map, spots, mode) {
         return boundsList;
     }
 
-    // =========================
-    // ② GSIタイルプリフェッチモード
-    // =========================
     if (mode === "prefetch") {
 
         if (!map || !spots || !spots.length) return;
@@ -824,25 +818,44 @@ function processSpotUtils(map, spots, mode) {
             'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
             {
                 opacity: 0,
-                keepBuffer: 2,
-                updateWhenIdle: false
+                keepBuffer: 3,
+                updateWhenIdle: false,
+                updateWhenZooming: true
             }
         ).addTo(map);
+
+        let loaded = 0;
+        const expected = targets.length * 9; // 3x3想定
+
+        function checkDone() {
+            if (loaded >= expected) {
+                map.removeLayer(tileLayer);
+            }
+        }
+
+        tileLayer.on('tileload', () => {
+            loaded++;
+            checkDone();
+        });
 
         for (const s of targets) {
 
             const latLng = L.latLng(s.lat, s.lng);
+            const center = map.project(latLng, zoom).divideBy(256).floor();
 
-            tileLayer._tileCoordsToBounds(
-                map.project(latLng, zoom).divideBy(256).floor()
-            );
+            // ★3x3プリフェッチ
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dy = -1; dy <= 1; dy++) {
+
+                    const tilePoint = L.point(center.x + dx, center.y + dy);
+
+                    tileLayer._tileCoordsToBounds(tilePoint);
+                }
+            }
         }
-
-        setTimeout(() => {
-            map.removeLayer(tileLayer);
-        }, 500);
     }
 }
+
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
