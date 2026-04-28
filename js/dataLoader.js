@@ -703,6 +703,11 @@ const iconActionMap = {
 let lastVisibleSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
+    if (skipNextDetection) {
+    lastVisibleSet = new Set();
+    skipNextDetection = false;
+    return null;
+    }
 
     const bounds = getInnerBounds(map, 0.5);
 
@@ -790,14 +795,13 @@ function prefetchGsiTilesForSpot(map, spots) {
 }
 
 function resetPrefetchState() {
-
     // ★ プリロード状態
     if (typeof preloadedSpotSet !== "undefined") {
         preloadedSpotSet.clear();
     }
-
     // ★ これが抜けてる（検出リセット）
     lastVisibleSet.clear();
+    skipNextDetection = true;
 }
 
 
