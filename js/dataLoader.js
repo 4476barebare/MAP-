@@ -677,141 +677,158 @@ function showSpotsForArea(areaKey) {
     );
 }
 
-function updatePhase2NearestSpot(action, map, spots, markerMap) {
+const iconActionMap = {
+    spot: { type: "spot", weather: "A" },
+    fish1: { type: "fish", weather: "B" },
+    fish2: { type: "fish", weather: "C" },
+    fish3: { type: "fish", weather: "D" },
+    fish4: { type: "fish", weather: "E" },
+    fish5: { type: "fish", weather: "F" },
+    fish6: { type: "fish", weather: "G" }
+};
+
+let lastVisibleSet = new Set();
+let phase2DetectionEnabled = true;
+
+function updatePhase2NearestSpot(map, spots, markerMap) {
 
     // =========================
-    // 内部状態（ここだけ）
+    // 内部関数（完全内包）
     // =========================
-    if (!window._phase2) {
-        window._phase2 = {
-            enabled: false,
-            lastVisibleSet: new Set(),
-            bound: false
-        };
-    }
+    function getInnerBounds(map, ratio = 0.5) {
+        const b = map.getBounds();
 
-    const state = window._phase2;
+        const latSpan = b.getNorth() - b.getSouth();
+        const lngSpan = b.getEast() - b.getWest();
 
-    // =========================
-    // 初期化（1回だけ）
-    // =========================
-    if (action === "init") {
+        const latPad = latSpan * (1 - ratio) / 2;
+        const lngPad = lngSpan * (1 - ratio) / 2;
 
-        if (state.bound) return;
-
-        map.on('moveend', function () {
-
-            if (!state.enabled) return;
-
-            // ★ズーム13のみ
-            if (Math.round(map.getZoom()) !== 13) return;
-
-            const b = map.getBounds();
-
-            const latSpan = b.getNorth() - b.getSouth();
-            const lngSpan = b.getEast() - b.getWest();
-
-            const latPad = latSpan * 0.25;
-            const lngPad = lngSpan * 0.25;
-
-            const innerBounds = L.latLngBounds(
-                [b.getSouth() + latPad, b.getWest() + lngPad],
-                [b.getNorth() - latPad, b.getEast() - lngPad]
-            );
-
-            const currentVisible = new Set(
-                spots
-                    .filter(s => innerBounds.contains([s.lat, s.lng]))
-                    .map(s => s.name)
-            );
-
-            const entered = [];
-
-            for (const name of currentVisible) {
-                if (!state.lastVisibleSet.has(name)) {
-                    entered.push(name);
-                }
-            }
-
-            if (entered.length > 0) {
-
-                const targets = spots.filter(s => {
-                    if (!entered.includes(s.name)) return false;
-                    if (s.icon !== "spot") return false;
-
-                    const key = s.id || s.name;
-                    if (preloadedSpotSet.has(key)) return false;
-
-                    preloadedSpotSet.add(key);
-                    return true;
-                });
-
-                if (targets.length > 0) {
-
-                    const zoom = map.getZoom();
-
-                    const tileLayer = L.tileLayer(
-                        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-                        {
-                            opacity: 0,
-                            keepBuffer: 2,
-                            updateWhenIdle: false
-                        }
-                    ).addTo(map);
-
-                    for (const s of targets) {
-                        const point = map.project([s.lat, s.lng], zoom).divideBy(256).floor();
-                        tileLayer._tileCoordsToBounds(point);
-                    }
-
-                    setTimeout(() => {
-                        map.removeLayer(tileLayer);
-                    }, 500);
-                }
-            }
-
-            state.lastVisibleSet = currentVisible;
-
-        });
-
-        state.bound = true;
-        return;
+        return L.latLngBounds(
+            [b.getSouth() + latPad, b.getWest() + lngPad],
+            [b.getNorth() - latPad, b.getEast() - lngPad]
+        );
     }
 
     // =========================
-    // ON
+    // フェーズ制御
     // =========================
-    if (action === "enable") {
-        state.enabled = true;
-        state.lastVisibleSet = new Set();
-        return;
+    if (!window.phase2DetectionEnabled) return null;
+
+    // =========================
+    // ズーム制御
+    // =========================
+    const z = map.getZoom();
+    if (Math.round(z) !== 13) return null;
+
+    // =========================
+    // 可視範囲
+    // =========================
+    const bounds = getInnerBounds(map, 0.5);
+
+    const currentVisible = new Set(
+        spots
+            .filter(s => bounds.contains([s.lat, s.lng]))
+            .map(s => s.name)
+    );
+
+    // =========================
+    // 侵入検知
+    // =========================
+    let enteredNames = [];
+
+    for (const name of currentVisible) {
+        if (!lastVisibleSet.has(name)) {
+            enteredNames.push(name);
+        }
     }
 
     // =========================
-    // OFF
+    // 発火処理
     // =========================
-    if (action === "disable") {
-        state.enabled = false;
-        state.lastVisibleSet = new Set();
-        return;
+    if (enteredNames.length > 0) {
+
+        alert("entered: " + enteredNames.join(","));
+
+        const enteredSpots = spots.filter(s =>
+            enteredNames.includes(s.name) &&
+            s.icon === "spot"
+        );
+
+        prefetchGsiTilesForSpot(window.map, enteredSpots);
     }
+
+    // =========================
+    // 状態更新
+    // =========================
+    lastVisibleSet = currentVisible;
+
+    return null;
 }
 
-function updateMarkerState(markerMap, spotId, status) {
-  const marker = markerMap.get(spotId);
-  if (!marker) return false;
 
-  const el = marker.getElement();
-  if (!el) return false;
+function getBoundsFromSpots(list) {
 
-  const statusEl = el.querySelector(".marker-status");
+    const boundsList = [];
+    const buffer = 0.002;
 
-  if (statusEl) {
-    statusEl.textContent = status;
-  }
+    for (const s of list) {
+        boundsList.push(
+            L.latLngBounds(
+                [s.lat - buffer, s.lng - buffer],
+                [s.lat + buffer, s.lng + buffer]
+            )
+        );
+    }
 
-  return true;
+    return boundsList;
 }
+
+function prefetchGsiTilesForSpot(map, spots) {
+
+    if (!map || !spots || !spots.length) return;
+
+    const targets = spots.filter(s => {
+        if (s.icon !== "spot") return false;
+
+        const key = s.id || s.name;
+        if (preloadedSpotSet.has(key)) return false;
+
+        preloadedSpotSet.add(key);
+        return true;
+    });
+
+    if (!targets.length) return;
+
+    const zoom = map.getZoom();
+
+    // ★ 非表示タイルレイヤー
+    const tileLayer = L.tileLayer(
+        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+        {
+            opacity: 0,          // ← 見えない
+            keepBuffer: 2,
+            updateWhenIdle: false
+        }
+    ).addTo(map);
+
+    for (const s of targets) {
+
+        const latLng = L.latLng(s.lat, s.lng);
+
+        // ★ 内部的にタイル座標計算させる
+        tileLayer._tileCoordsToBounds(
+            map.project(latLng, zoom).divideBy(256).floor()
+        );
+    }
+
+    // ★ 読み込みだけさせて削除
+    setTimeout(() => {
+        map.removeLayer(tileLayer);
+    }, 500);
+}
+
+
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
