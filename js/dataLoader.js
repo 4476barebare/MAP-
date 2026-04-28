@@ -904,7 +904,7 @@ function updateSpotMenu(spots, map) {
                 data-lat="${i.lat}" 
                 data-lng="${i.lng}"
             >
-                ${i.text}
+                <span class="spot-text">${i.text}</span>
             </li>
         `)
         .join("");
