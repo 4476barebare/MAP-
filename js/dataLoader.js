@@ -675,7 +675,6 @@ function showSpotsForArea(areaKey) {
     );
 }
 
-
 function getInnerBounds(map, ratio = 0.5) {
     const b = map.getBounds();
 
@@ -702,38 +701,30 @@ const iconActionMap = {
 };
 
 let lastVisibleSet = new Set();
-let preloadedSpotSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     const bounds = getInnerBounds(map, 0.5);
 
-    // ★ spotのみ + 視界内
-    const visibleSpots = spots.filter(s => {
-        const action = iconActionMap[s.icon];
-        return action && action.type === "spot" &&
-               bounds.contains([s.lat, s.lng]);
-    });
+    const currentVisible = new Set(
+        spots
+            .filter(s => bounds.contains([s.lat, s.lng]))
+            .map(s => s.name)
+    );
 
-    const currentVisible = new Set(visibleSpots.map(s => s.name));
-
+    let enteredFlag = false;
     let enteredNames = [];
 
-    for (const s of visibleSpots) {
-        if (!lastVisibleSet.has(s.name)) {
-            enteredNames.push(s.name);
+    for (const name of currentVisible) {
+        if (!lastVisibleSet.has(name)) {
+            enteredNames.push(name);
+            enteredFlag = true;
         }
     }
 
-    if (enteredNames.length > 0) {
+    if (enteredFlag) {
         alert("entered: " + enteredNames.join(","));
-
-        // ★ 必要なspotだけ渡す
-        const targets = visibleSpots.filter(s =>
-            enteredNames.includes(s.name)
-        );
-
-        prefetchGsiTilesForSpot(map, targets);
+        prefetchGsiTilesForSpot(window.map, window.spotData);
     }
 
     lastVisibleSet = currentVisible;
@@ -762,6 +753,21 @@ function prefetchGsiTilesForSpot(map, spots) {
 
     if (!map || !spots || !spots.length) return;
 
+    // ★ spotのみ + 未ロードのみ抽出
+    const targets = spots.filter(s => {
+        if (s.icon !== "spot") return false;
+
+        const key = s.id || s.name;
+        if (preloadedSpotSet.has(key)) return false;
+
+        preloadedSpotSet.add(key);
+        return true;
+    });
+
+    if (!targets.length) return;
+
+    const boundsList = getBoundsFromSpots(targets);
+
     const zoom = map.getZoom();
     const center = map.getCenter();
 
@@ -769,38 +775,24 @@ function prefetchGsiTilesForSpot(map, spots) {
 
     function step() {
 
-        if (i >= spots.length) {
+        if (i >= boundsList.length) {
             map.setView(center, zoom, { animate: false });
             return;
         }
 
-        const s = spots[i];
-        const key = s.id || s.name;
-
-        // ★ 二度読み防止
-        if (!preloadedSpotSet.has(key)) {
-
-            preloadedSpotSet.add(key);
-
-            const buffer = 0.002;
-
-            const bounds = L.latLngBounds(
-                [s.lat - buffer, s.lng - buffer],
-                [s.lat + buffer, s.lng + buffer]
-            );
-
-            map.fitBounds(bounds, { animate: false });
-        }
+        map.fitBounds(boundsList[i], { animate: false });
 
         i++;
-        setTimeout(step, 40);
+        setTimeout(step, 40); // ★ これが重要
     }
 
     step();
 }
 
 function resetPrefetchState() {
-    preloadedSpotSet.clear();
+    if (typeof preloadedSpotSet !== "undefined") {
+        preloadedSpotSet.clear();
+    }
 }
 
 function updateMarkerState(markerMap, spotId, status) {
