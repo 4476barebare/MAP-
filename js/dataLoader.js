@@ -931,6 +931,9 @@ function zoomToSpot(safeSpot) {
         // ズーム制限
         window.map.setMinZoom(initialZoom);
         window.map.setMaxZoom(18);
+        
+        window._zoomGuardBase = initialZoom;
+        window._zoomGuardActive = true
 
         // 操作復帰
         window.map.dragging.enable();
@@ -941,17 +944,6 @@ function zoomToSpot(safeSpot) {
         //showDebug("moveend fired");
     });
 
-    // -----------------------
-    // ★ズームガード（確実起動）
-    // -----------------------
-    setTimeout(() => {
-        if (!window.map) return;
-
-        window._zoomGuardBase = window.map.getZoom();
-        window._zoomGuardActive = true;
-
-        //showDebug("ZG START base=" + window._zoomGuardBase);
-    }, 150);
 }
 
 window.gsiPhotoLayer = L.tileLayer(
