@@ -432,9 +432,7 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
     });
     
 map.on('moveend', () => {
-
     setTimeout(() => {
-        phase2DetectionEnabled = true;
         updatePhase2NearestSpot(
             window.map,
             window.spotData,
@@ -442,6 +440,7 @@ map.on('moveend', () => {
         );
     }, 0);
 
+phase2DetectionEnabled = true;
 });
 }
 
@@ -505,7 +504,7 @@ function goBack() {
         location.hash = location.hash.replace('/' + spotKey, '');
         updateStateFromHash();
         
-        resetPrefetchState();
+        phase2DetectionEnabled = false;
 
         // spot復帰描画
         selectSpot(area.name, spotName, spot.lat, spot.lng);
@@ -792,15 +791,6 @@ function prefetchGsiTilesForSpot(map, spots) {
     step();
 }
 
-function resetPrefetchState() {
-    // ★ プリロード状態
-    if (typeof preloadedSpotSet !== "undefined") {
-        preloadedSpotSet.clear();
-    }
-    // ★ これが抜けてる（検出リセット）
-    lastVisibleSet.clear();
-    phase2DetectionEnabled = false;
-}
 
 
 function updateMarkerState(markerMap, spotId, status) {
@@ -899,7 +889,7 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
-    resetPrefetchState();
+    phase2DetectionEnabled = false;
 
     switchToGSIPhoto();
 
