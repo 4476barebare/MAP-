@@ -854,14 +854,17 @@ function createSpotMenuManager(map) {
 
         const menu = document.getElementById("map-menu");
         const ul = document.querySelector("#map-menu ul");
-        if (!ul) return;
 
-        // =========================
-        // ★初回だけ表示解放
-        // =========================
+        if (!ul) {
+            alert("❌ UL not found");
+            return;
+        }
+
         if (!firstShown && buffer.length > 0) {
             menu.style.display = "block";
             firstShown = true;
+
+            alert("📌 menu shown");
         }
 
         ul.innerHTML = buffer
@@ -871,7 +874,12 @@ function createSpotMenuManager(map) {
 
     function update(spots) {
 
-        if (!enabled) return;
+        alert("🔥 update called / spots: " + (spots ? spots.length : 0));
+
+        if (!enabled) {
+            alert("❌ not enabled");
+            return;
+        }
 
         const center = map.getCenter();
         const bounds = map.getBounds();
@@ -880,26 +888,22 @@ function createSpotMenuManager(map) {
             bounds.contains([s.lat, s.lng])
         );
 
+        alert("👁 visible: " + visible.length);
+
         for (const s of visible) {
 
             const key = s.id || s.name;
 
-            // =========================
-            // 重複排除
-            // =========================
             if (buffer.some(i => i.key === key)) continue;
 
             buffer.push({
                 key,
-                text: s.name,
+                text: s.name || "NO_NAME",
                 lat: s.lat,
                 lng: s.lng,
                 dist: dist(center, s)
             });
 
-            // =========================
-            // 5件制御（遠い順削除）
-            // =========================
             while (buffer.length > MAX) {
 
                 let far = 0;
@@ -919,6 +923,8 @@ function createSpotMenuManager(map) {
 
     function enable() {
 
+        alert("🟢 enable called");
+
         if (enabled) return;
 
         enabled = true;
@@ -932,6 +938,7 @@ function createSpotMenuManager(map) {
         if (ul) ul.innerHTML = "";
 
         handler = function () {
+            alert("📡 moveend fired");
             update(window.spotData || []);
         };
 
@@ -939,6 +946,8 @@ function createSpotMenuManager(map) {
     }
 
     function disable() {
+
+        alert("🔴 disable called");
 
         if (!enabled) return;
 
