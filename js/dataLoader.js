@@ -663,65 +663,72 @@ function showSpotsForArea(areaKey) {
 
 let lastVisibleSet = new Set();
 
-
-/**
- * Phase2検出（純粋ロジック版）
- * ※地図操作は一切しない
- */
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     // -------------------------
-    // ★完全停止フラグ（zoomToSpot中など）
+    // 停止制御
     // -------------------------
     if (window._spotZoomLock) return null;
-
     if (!window.phase2DetectionEnabled) return null;
 
-    // -------------------------
-    // ★ズーム固定条件
-    // -------------------------
     const z = map.getZoom();
     if (Math.round(z) !== 13) return null;
 
-    // -------------------------
-    // 視界内判定
-    // -------------------------
     const bounds = getInnerBounds(map, 0.5);
 
-    const currentVisible = new Set(
-        spots
-            .filter(s => bounds.contains([s.lat, s.lng]))
-            .map(s => s.name)
+    // -------------------------
+    // 視界内候補抽出
+    // -------------------------
+    const visibleSpots = spots.filter(s =>
+        bounds.contains([s.lat, s.lng])
     );
 
-    let enteredNames = [];
-    let enteredFlag = false;
-
-    for (const name of currentVisible) {
-        if (!lastVisibleSet.has(name)) {
-            enteredNames.push(name);
-            enteredFlag = true;
-        }
+    if (visibleSpots.length === 0) {
+        lastVisibleSet = new Set();
+        return null;
     }
 
     // -------------------------
-    // ★spotのみ反応（副作用なし）
+    // ★1番近いスポットのみ選択
+    // （中心から距離で決定）
     // -------------------------
-    if (enteredFlag) {
+    const center = map.getCenter();
 
-        const spotTargets = spots.filter(s =>
-            s.icon === "spot" && enteredNames.includes(s.name)
-        );
+    let nearest = null;
+    let minDist = Infinity;
 
-        alert("entered: " + enteredNames.join(","));
+    for (const s of visibleSpots) {
 
-        // ★ここだけ副作用許可（プリフェッチのみ）
-        if (spotTargets.length > 0) {
-            prefetchGsiTilesForSpot(window.map, spotTargets);
+        const dLat = s.lat - center.lat;
+        const dLng = s.lng - center.lng;
+        const dist = dLat * dLat + dLng * dLng;
+
+        if (dist < minDist) {
+            minDist = dist;
+            nearest = s;
         }
     }
 
-    lastVisibleSet = currentVisible;
+    if (!nearest) return null;
+
+    // -------------------------
+    // 新規判定（同じものは無視）
+    // -------------------------
+    if (lastVisibleSet.has(nearest.name)) return null;
+
+    lastVisibleSet = new Set([nearest.name]);
+
+    // -------------------------
+    // ★アラート（zoom値付き）
+    // -------------------------
+    alert(
+        "nearest: " + nearest.name +
+        "\nzoom: " + nearest.zoom
+    );
+
+    if (nearest.icon === "spot") {
+        prefetchGsiTilesForSpot(window.map, [nearest]);
+    }
 
     return null;
 }
@@ -892,6 +899,7 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
+    alert("zoomToSpot zoom: " + safeSpot.zoom);
 
     window._spotZoomLock = true;
     window.phase2DetectionEnabled = false;
