@@ -429,16 +429,20 @@ function selectSpot(areaName, selectName, spotLat, spotLng) {
         enableDragForArea();
     });
 
-    // ★ phase2だけリセット → 再登録（多重防止）
-    window.map.off('moveend.phase2');
+    // ★ ここが本質（関数で管理）
+    if (window._phase2Handler) {
+        window.map.off('moveend', window._phase2Handler);
+    }
 
-    window.map.on('moveend.phase2', function () {
+    window._phase2Handler = function () {
         updatePhase2NearestSpot(
             window.map,
             window.spotData,
             window.markerMap
         );
-    });
+    };
+
+    window.map.on('moveend', window._phase2Handler);
 
     window.phase2DetectionEnabled = true;
 }
