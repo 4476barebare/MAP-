@@ -670,18 +670,12 @@ function enablePhase2(map) {
     lastVisibleSet = new Set();
 
     map._phase2Handler = function () {
-
-        // ★追加（ループ防止）
-        if (map._phase2Running) return;
-        map._phase2Running = true;
-
         updatePhase2NearestSpot(map, window.spotData, window.markerMap);
-
-        map._phase2Running = false;
     };
 
-    map.on('moveend', map._phase2Handler);
+    map.on('dragend', map._phase2Handler);
 }
+
 
 function disablePhase2(map) {
 
