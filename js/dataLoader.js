@@ -675,6 +675,7 @@ function showSpotsForArea(areaKey) {
     );
 }
 
+
 function getInnerBounds(map, ratio = 0.5) {
     const b = map.getBounds();
 
@@ -701,37 +702,41 @@ const iconActionMap = {
 };
 
 let lastVisibleSet = new Set();
+let preloadedSpotSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     const bounds = getInnerBounds(map, 0.5);
 
-    const currentVisible = new Set(
-        spots
-            .filter(s => bounds.contains([s.lat, s.lng]))
-            .map(s => s.name)
-    );
+    // ★ spotのみ + 視界内
+    const visibleSpots = spots.filter(s => {
+        const action = iconActionMap[s.icon];
+        return action && action.type === "spot" &&
+               bounds.contains([s.lat, s.lng]);
+    });
+
+    const currentVisible = new Set(visibleSpots.map(s => s.name));
 
     let enteredNames = [];
 
-    for (const name of currentVisible) {
-        if (!lastVisibleSet.has(name)) {
-            enteredNames.push(name);
+    for (const s of visibleSpots) {
+        if (!lastVisibleSet.has(s.name)) {
+            enteredNames.push(s.name);
         }
     }
 
-    if (enteredNames.length) {
-
+    if (enteredNames.length > 0) {
         alert("entered: " + enteredNames.join(","));
 
-        const enteredSpots = spots.filter(s =>
+        // ★ 必要なspotだけ渡す
+        const targets = visibleSpots.filter(s =>
             enteredNames.includes(s.name)
         );
 
-        prefetchGsiTilesForSpot(map, enteredSpots);
+        prefetchGsiTilesForSpot(map, targets);
     }
 
-    lastVisibleSet = new Set(currentVisible);
+    lastVisibleSet = currentVisible;
 
     return null;
 }
@@ -753,65 +758,50 @@ function getBoundsFromSpots(list) {
     return boundsList;
 }
 
-// ★ グローバルで1回だけ
-window.preloadedSpotSet = window.preloadedSpotSet || new Set();
-
-function resetPrefetchState() {
-    window.preloadedSpotSet.clear();
-}
-
 function prefetchGsiTilesForSpot(map, spots) {
 
     if (!map || !spots || !spots.length) return;
 
-    const targets = spots.filter(s => {
-        if (s.icon !== "spot") return false;
-
-        const key = s.id || s.name;
-        if (window.preloadedSpotSet.has(key)) return false;
-
-        window.preloadedSpotSet.add(key);
-        return true;
-    });
-
-    if (!targets.length) return;
-
     const zoom = map.getZoom();
+    const center = map.getCenter();
 
-    for (const s of targets) {
+    let i = 0;
 
-        const lat = s.lat;
-        const lng = s.lng;
+    function step() {
 
-        // ★ タイル座標計算
-        const tileSize = 256;
-        const scale = 1 << zoom;
-
-        const worldCoordX = (lng + 180) / 360 * scale;
-        const sinLat = Math.sin(lat * Math.PI / 180);
-        const worldCoordY = (
-            (1 - Math.log((1 + sinLat) / (1 - sinLat)) / (2 * Math.PI)) / 2
-        ) * scale;
-
-        const x = Math.floor(worldCoordX);
-        const y = Math.floor(worldCoordY);
-
-        // ★ 周辺3x3タイルだけ叩く
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dy = -1; dy <= 1; dy++) {
-
-                const tx = x + dx;
-                const ty = y + dy;
-
-                const url = `https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/${zoom}/${tx}/${ty}.jpg`;
-
-                const img = new Image();
-                img.src = url;
-            }
+        if (i >= spots.length) {
+            map.setView(center, zoom, { animate: false });
+            return;
         }
+
+        const s = spots[i];
+        const key = s.id || s.name;
+
+        // ★ 二度読み防止
+        if (!preloadedSpotSet.has(key)) {
+
+            preloadedSpotSet.add(key);
+
+            const buffer = 0.002;
+
+            const bounds = L.latLngBounds(
+                [s.lat - buffer, s.lng - buffer],
+                [s.lat + buffer, s.lng + buffer]
+            );
+
+            map.fitBounds(bounds, { animate: false });
+        }
+
+        i++;
+        setTimeout(step, 40);
     }
+
+    step();
 }
 
+function resetPrefetchState() {
+    preloadedSpotSet.clear();
+}
 
 function updateMarkerState(markerMap, spotId, status) {
   const marker = markerMap.get(spotId);
