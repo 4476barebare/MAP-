@@ -489,14 +489,13 @@ function goBack() {
 
         enableDragForArea();
         showSpotsForArea(window.currentAreaId);
-        stopZoomGuard();
-
         // URLからspot削除 → state再同期
         location.hash = location.hash.replace('/' + spotKey, '');
         updateStateFromHash();
     
         // spot復帰描画
         selectSpot(area.name, spotName, spot.lat, spot.lng);
+        stopZoomGuard();
 
         return;
     }
