@@ -663,64 +663,64 @@ function showSpotsForArea(areaKey) {
 
 let lastVisibleSet = new Set();
 
+
+/**
+ * Phase2検出（純粋ロジック版）
+ * ※地図操作は一切しない
+ */
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
-    // =========================
-    // 視界取得
-    // =========================
-    const bounds = map.getBounds();
+    // -------------------------
+    // ★完全停止フラグ（zoomToSpot中など）
+    // -------------------------
+    if (window._spotZoomLock) return null;
 
-    const visibleSpots = spots.filter(s =>
-        bounds.contains([s.lat, s.lng])
-    );
+    if (!window.phase2DetectionEnabled) return null;
+
+    // -------------------------
+    // ★ズーム固定条件
+    // -------------------------
+    const z = map.getZoom();
+    if (Math.round(z) !== 13) return null;
+
+    // -------------------------
+    // 視界内判定
+    // -------------------------
+    const bounds = getInnerBounds(map, 0.5);
 
     const currentVisible = new Set(
-        visibleSpots.map(s => s.name)
+        spots
+            .filter(s => bounds.contains([s.lat, s.lng]))
+            .map(s => s.name)
     );
 
-    // =========================
-    // 差分検出
-    // =========================
-    const entered = [];
+    let enteredNames = [];
+    let enteredFlag = false;
 
     for (const name of currentVisible) {
         if (!lastVisibleSet.has(name)) {
-            entered.push(name);
+            enteredNames.push(name);
+            enteredFlag = true;
         }
     }
 
-    // =========================
-    // 分岐処理
-    // =========================
-    if (entered.length > 0) {
+    // -------------------------
+    // ★spotのみ反応（副作用なし）
+    // -------------------------
+    if (enteredFlag) {
 
-        const enteredSpots = visibleSpots.filter(s =>
-            entered.includes(s.name)
+        const spotTargets = spots.filter(s =>
+            s.icon === "spot" && enteredNames.includes(s.name)
         );
 
-        const spotTargets = enteredSpots.filter(s => s.icon === "spot");
-        const otherTargets = enteredSpots.filter(s => s.icon !== "spot");
+        alert("entered: " + enteredNames.join(","));
 
-        
-        // -------------------------
-// spot用
-// -------------------------
-if (spotTargets.length > 0) {
-    alert(spotTargets.map(s => s.name).join(","));
-}
-
-// -------------------------
-// その他用（未実装）
-// -------------------------
-if (otherTargets.length > 0) {
-    alert("未実装");
-}
-        
+        // ★ここだけ副作用許可（プリフェッチのみ）
+        if (spotTargets.length > 0) {
+            prefetchGsiTilesForSpot(window.map, spotTargets);
+        }
     }
 
-    // =========================
-    // 状態更新
-    // =========================
     lastVisibleSet = currentVisible;
 
     return null;
@@ -893,20 +893,17 @@ const popupHtml = `
 
 function zoomToSpot(safeSpot) {
 
+    window._spotZoomLock = true;
+    window.phase2DetectionEnabled = false;
+
     disablePhase2(window.map);
     switchToGSIPhoto();
 
-    // -----------------------
-    // 操作ロック
-    // -----------------------
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // -----------------------
-    // 移動
-    // -----------------------
     window.map.setView(
         [safeSpot.lat, safeSpot.lng],
         safeSpot.zoom || 15,
@@ -915,36 +912,28 @@ function zoomToSpot(safeSpot) {
 
     resetSpotLayers();
 
-    // -----------------------
-    // 安定後処理
-    // -----------------------
     window.map.once('moveend', function () {
 
-        // ★現在の表示範囲を基準にする（ここは維持）
         const bounds = window.map.getBounds();
-
-        // ★ドラッグ可能範囲＝初期表示範囲
-        window._spotMaxBounds = bounds;
+        const z = window.map.getZoom();
 
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
 
-        // ★ズーム制御
-        const z = window.map.getZoom();
         window.map.setMinZoom(z);
         window.map.setMaxZoom(18);
 
-        // ★ズームガード
         window._zoomGuardBase = z;
         window._zoomGuardActive = true;
 
-        // -----------------------
-        // 操作復帰
-        // -----------------------
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
+
+        // ★ここで復帰
+        window._spotZoomLock = false;
+        window.phase2DetectionEnabled = true;
     });
 }
 
