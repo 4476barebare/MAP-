@@ -489,6 +489,7 @@ function goBack() {
 
         enableDragForArea();
         showSpotsForArea(window.currentAreaId);
+        stopZoomGuard();
 
         // URLからspot削除 → state再同期
         location.hash = location.hash.replace('/' + spotKey, '');
