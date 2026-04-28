@@ -710,7 +710,7 @@ function disablePhase2(map) {
 let lastVisibleSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
- alert("phase2 called");
+// alert("phase2 called");
     // =========================
     // 視界取得
     // =========================
@@ -756,7 +756,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
             "spot: " + spotTargets.length +
             "\nother: " + otherTargets.length
         );
-
+    processSpotUtils(map, spotTargets, "prefetch");
 
             
         }
@@ -765,7 +765,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         // その他用（未実装）
         // -------------------------
         if (otherTargets.length > 0) {
-           alert("未実装");
+           //alert("未実装");
         }
     }
 
@@ -777,68 +777,72 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
     return null;
 }
 
-function getBoundsFromSpots(list) {
+function processSpotUtils(map, spots, mode) {
 
-    const boundsList = [];
-    const buffer = 0.002;
+    // =========================
+    // ① bounds生成モード
+    // =========================
+    if (mode === "bounds") {
 
-    for (const s of list) {
-        boundsList.push(
-            L.latLngBounds(
-                [s.lat - buffer, s.lng - buffer],
-                [s.lat + buffer, s.lng + buffer]
-            )
-        );
-    }
+        const buffer = 0.002;
+        const boundsList = [];
 
-    return boundsList;
-}
-
-function prefetchGsiTilesForSpot(map, spots) {
-
-    if (!map || !spots || !spots.length) return;
-
-    const targets = spots.filter(s => {
-        if (s.icon !== "spot") return false;
-
-        const key = s.id || s.name;
-        if (preloadedSpotSet.has(key)) return false;
-
-        preloadedSpotSet.add(key);
-        return true;
-    });
-
-    if (!targets.length) return;
-
-    const zoom = map.getZoom();
-
-    // ★ 非表示タイルレイヤー
-    const tileLayer = L.tileLayer(
-        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-        {
-            opacity: 0,          // ← 見えない
-            keepBuffer: 2,
-            updateWhenIdle: false
+        for (const s of spots) {
+            boundsList.push(
+                L.latLngBounds(
+                    [s.lat - buffer, s.lng - buffer],
+                    [s.lat + buffer, s.lng + buffer]
+                )
+            );
         }
-    ).addTo(map);
 
-    for (const s of targets) {
-
-        const latLng = L.latLng(s.lat, s.lng);
-
-        // ★ 内部的にタイル座標計算させる
-        tileLayer._tileCoordsToBounds(
-            map.project(latLng, zoom).divideBy(256).floor()
-        );
+        return boundsList;
     }
 
-    // ★ 読み込みだけさせて削除
-    setTimeout(() => {
-        map.removeLayer(tileLayer);
-    }, 500);
+    // =========================
+    // ② GSIタイルプリフェッチモード
+    // =========================
+    if (mode === "prefetch") {
+
+        if (!map || !spots || !spots.length) return;
+
+        const targets = spots.filter(s => {
+            if (s.icon !== "spot") return false;
+
+            const key = s.id || s.name;
+            if (preloadedSpotSet.has(key)) return false;
+
+            preloadedSpotSet.add(key);
+            return true;
+        });
+
+        if (!targets.length) return;
+
+        const zoom = map.getZoom();
+
+        const tileLayer = L.tileLayer(
+            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+            {
+                opacity: 0,
+                keepBuffer: 2,
+                updateWhenIdle: false
+            }
+        ).addTo(map);
+
+        for (const s of targets) {
+
+            const latLng = L.latLng(s.lat, s.lng);
+
+            tileLayer._tileCoordsToBounds(
+                map.project(latLng, zoom).divideBy(256).floor()
+            );
+        }
+
+        setTimeout(() => {
+            map.removeLayer(tileLayer);
+        }, 500);
+    }
 }
-
-
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
