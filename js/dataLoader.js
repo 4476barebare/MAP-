@@ -394,6 +394,13 @@ function selectArea(areaName) {
 }
 
 function selectSpot(areaName, selectName, spotLat, spotLng) {
+    // selectSpotの一番上
+window._zoomGuardActive = false;
+window._zoomGuardBase = null;
+
+if (window._zoomGuardHandler) {
+    window.map.off('zoomend', window._zoomGuardHandler);
+}
     
     window.phase2DetectionEnabled = false;
 
