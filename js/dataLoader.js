@@ -710,10 +710,10 @@ function disablePhase2(map) {
 let lastVisibleSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
-// alert("phase2 called");
-    // =========================
-    // 視界取得
-    // =========================
+
+    // =========================================================
+    // ■視界取得
+    // =========================================================
     const bounds = map.getBounds();
 
     const visibleSpots = spots.filter(s =>
@@ -724,9 +724,9 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         visibleSpots.map(s => s.name)
     );
 
-    // =========================
-    // 差分検出
-    // =========================
+    // =========================================================
+    // ■差分検出（新規出現スポット）
+    // =========================================================
     const entered = [];
 
     for (const name of currentVisible) {
@@ -735,9 +735,9 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         }
     }
 
-    // =========================
-    // 分岐処理
-    // =========================
+    // =========================================================
+    // ■新規スポットがある場合のみ処理
+    // =========================================================
     if (entered.length > 0) {
 
         const enteredSpots = visibleSpots.filter(s =>
@@ -747,23 +747,31 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         const spotTargets = enteredSpots.filter(s => s.icon === "spot");
         const otherTargets = enteredSpots.filter(s => s.icon !== "spot");
 
-        // -------------------------
-        // spot用（未実装）
-        // -------------------------
+        // =====================================================
+        // ■spot処理（タイルプリフェッチ + メニュー更新）
+        // =====================================================
         if (spotTargets.length > 0) {
+
+            // タイルプリフェッチ
             processSpotUtils(map, spotTargets, "prefetch");
+
+            // ★追加：スポットメニュー更新
+            if (window.spotMenu) {
+                window.spotMenu.update(spotTargets);
+            }
         }
-        // -------------------------
-        // その他用（未実装）
-        // -------------------------
+
+        // =====================================================
+        // ■その他処理（未使用）
+        // =====================================================
         if (otherTargets.length > 0) {
-           //alert("未実装");
+            // 必要ならここに追加
         }
     }
 
-    // =========================
-    // 状態更新
-    // =========================
+    // =========================================================
+    // ■状態更新
+    // =========================================================
     lastVisibleSet = currentVisible;
 
     return null;
@@ -827,6 +835,130 @@ function processSpotUtils(map, spots, mode) {
 
         return boundsList;
     }
+}
+
+function createSpotMenuManager(map) {
+
+    let buffer = [];
+    let enabled = false;
+    let handler = null;
+    let firstShown = false;
+
+    const MAX = 5;
+
+    function dist(a, b) {
+        return (a.lat - b.lat) ** 2 + (a.lng - b.lng) ** 2;
+    }
+
+    function render() {
+
+        const menu = document.getElementById("map-menu");
+        const ul = document.querySelector("#map-menu ul");
+        if (!ul) return;
+
+        // =========================
+        // ★初回だけ表示解放
+        // =========================
+        if (!firstShown && buffer.length > 0) {
+            menu.style.display = "block";
+            firstShown = true;
+        }
+
+        ul.innerHTML = buffer
+            .map(i => `<li>${i.text}</li>`)
+            .join("");
+    }
+
+    function update(spots) {
+
+        if (!enabled) return;
+
+        const center = map.getCenter();
+        const bounds = map.getBounds();
+
+        const visible = spots.filter(s =>
+            bounds.contains([s.lat, s.lng])
+        );
+
+        for (const s of visible) {
+
+            const key = s.id || s.name;
+
+            // =========================
+            // 重複排除
+            // =========================
+            if (buffer.some(i => i.key === key)) continue;
+
+            buffer.push({
+                key,
+                text: s.name,
+                lat: s.lat,
+                lng: s.lng,
+                dist: dist(center, s)
+            });
+
+            // =========================
+            // 5件制御（遠い順削除）
+            // =========================
+            while (buffer.length > MAX) {
+
+                let far = 0;
+
+                for (let i = 1; i < buffer.length; i++) {
+                    if (buffer[i].dist > buffer[far].dist) {
+                        far = i;
+                    }
+                }
+
+                buffer.splice(far, 1);
+            }
+        }
+
+        render();
+    }
+
+    function enable() {
+
+        if (enabled) return;
+
+        enabled = true;
+        buffer = [];
+        firstShown = false;
+
+        const menu = document.getElementById("map-menu");
+        if (menu) menu.style.display = "none";
+
+        const ul = document.querySelector("#map-menu ul");
+        if (ul) ul.innerHTML = "";
+
+        handler = function () {
+            update(window.spotData || []);
+        };
+
+        map.on("moveend", handler);
+    }
+
+    function disable() {
+
+        if (!enabled) return;
+
+        enabled = false;
+        buffer = [];
+        firstShown = false;
+
+        const menu = document.getElementById("map-menu");
+        if (menu) menu.style.display = "none";
+
+        const ul = document.querySelector("#map-menu ul");
+        if (ul) ul.innerHTML = "";
+
+        if (handler) {
+            map.off("moveend", handler);
+            handler = null;
+        }
+    }
+
+    return { enable, disable };
 }
 
 
