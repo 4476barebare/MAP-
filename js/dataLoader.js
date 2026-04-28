@@ -731,43 +731,60 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 }
 
 function getBoundsFromSpots(list) {
-    let minLat = Infinity, maxLat = -Infinity;
-    let minLng = Infinity, maxLng = -Infinity;
+
+    const boundsList = [];
+    const buffer = 0.002;
 
     for (const s of list) {
-        minLat = Math.min(minLat, s.lat);
-        maxLat = Math.max(maxLat, s.lat);
-        minLng = Math.min(minLng, s.lng);
-        maxLng = Math.max(maxLng, s.lng);
+        boundsList.push(
+            L.latLngBounds(
+                [s.lat - buffer, s.lng - buffer],
+                [s.lat + buffer, s.lng + buffer]
+            )
+        );
     }
 
-    return L.latLngBounds(
-        [minLat, minLng],
-        [maxLat, maxLng]
-    );
+    return boundsList;
 }
-
 
 function prefetchGsiTilesForSpot(map, spots) {
 
-    // ★ spotだけ抽出
-    const spotOnly = spots.filter(s => s.icon === "spot");
-    if (spotOnly.length === 0) return;
+    if (!map || !spots || !spots.length) return;
 
-    // ★ 範囲生成
-    const bounds = getBoundsFromSpots(spotOnly);
+    // ★ spotのみ + 未ロードのみ抽出
+    const targets = spots.filter(s => {
+        if (s.icon !== "spot") return false;
 
-    // ★ 現在状態保持
-    const currentZoom = map.getZoom();
-    const currentCenter = map.getCenter();
+        const key = s.id || s.name;
+        if (preloadedSpotSet.has(key)) return false;
 
-    // ★ 一瞬だけその範囲を表示（タイル強制ロード）
-    map.fitBounds(bounds, { animate: false });
+        preloadedSpotSet.add(key);
+        return true;
+    });
 
-    // ★ 元に戻す（見た目変えない）
-    setTimeout(() => {
-        map.setView(currentCenter, currentZoom, { animate: false });
-    }, 50);
+    if (!targets.length) return;
+
+    const boundsList = getBoundsFromSpots(targets);
+
+    const zoom = map.getZoom();
+    const center = map.getCenter();
+
+    let i = 0;
+
+    function step() {
+
+        if (i >= boundsList.length) {
+            map.setView(center, zoom, { animate: false });
+            return;
+        }
+
+        map.fitBounds(boundsList[i], { animate: false });
+
+        i++;
+        setTimeout(step, 40); // ★ これが重要
+    }
+
+    step();
 }
 
 function updateMarkerState(markerMap, spotId, status) {
