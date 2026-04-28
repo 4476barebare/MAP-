@@ -260,3 +260,406 @@ header {
 .today {
   border: 2px solid #191970;
 }
+
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    background: #fff;
+    overflow-x: hidden;
+}
+
+/* =========================
+   基本UI
+========================= */
+li,
+button {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+li:active,
+button:active {
+    background: transparent;
+}
+
+li {
+    user-select: none;
+    cursor: pointer;
+}
+
+/* =========================
+   Leaflet
+========================= */
+.leaflet-control-attribution {
+    font-size: 8px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+#lf-map {
+    width: 100%;
+    height: 80vh;
+    position: relative;
+    z-index: 0;
+    touch-action: none;
+}
+
+.leaflet-container {
+    z-index: 0;
+}
+
+/* =========================
+   MAP MENU
+========================= */
+.map-menu {
+    display: none;
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1980;
+    padding: 2px 5px;
+    pointer-events: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* pointer-events統一 */
+#map-menu,
+#map-menu ul,
+#map-menu li,
+#map-menu button {
+    pointer-events: auto;
+}
+
+/* UL */
+.map-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: none;
+}
+
+/* LI */
+.map-menu li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 13px;
+    color: #fff;
+
+    padding: 4px 8px;
+    width: 100%;
+    box-sizing: border-box;
+
+    cursor: pointer;
+
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    margin: 2px 0;
+
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.2s ease;
+}
+
+.map-menu li:last-child {
+    border-bottom: none;
+    padding-bottom: 3px;
+}
+
+/* アニメーション */
+.map-menu li.new-item {
+    opacity: 0;
+    transform: translateY(6px);
+}
+
+.map-menu li.new-item.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* phase lock */
+#map-menu.phase2-lock li {
+    pointer-events: none;
+}
+
+#map-menu.phase2-lock li .spot-text {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* ボタン */
+#map-menu button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: inherit;
+    text-align: left;
+}
+
+/* =========================
+   AD
+========================= */
+.map-ad {
+    display: none;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1500;
+    pointer-events: none;
+}
+
+.map-ad .ad-box {
+    width: 320px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 12px;
+    color: #333;
+
+    pointer-events: auto;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+/* =========================
+   BACK BUTTON
+========================= */
+.map-back-btn {
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    z-index: 2000;
+    background: none;
+    border: none;
+    padding: 0;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.back-icon {
+    width: 36px;
+    height: 36px;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+    -webkit-mask-image: linear-gradient(
+        to right,
+        black 40%,
+        rgba(0, 0, 0, 0.5) 70%,
+        transparent
+    );
+    mask-image: linear-gradient(
+        to right,
+        black 60%,
+        transparent
+    );
+}
+
+/* =========================
+   SPOT LABEL
+========================= */
+.spot-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+
+    padding: 1px 4px;
+    font-size: 10px;
+    font-weight: bold;
+    white-space: nowrap;
+
+    border-radius: 2px;
+    background: #191970;
+    color: #fff;
+
+    border: none;
+    box-shadow: none;
+}
+
+.spot-label svg {
+    width: 12px;
+    height: 12px;
+    fill: currentColor;
+}
+
+/* spot default */
+.spot-label.spot {
+    background: #191970;
+}
+
+/* fish colors */
+.spot-label.fish1 { background: #6495ED; }
+.spot-label.fish2 { background: #2E8B57; }
+.spot-label.fish3 { background: #FF8C00; }
+.spot-label.fish4 { background: #4B0082; }
+.spot-label.fish6 { background: #008000; }
+
+/* =========================
+   PREF DOT
+========================= */
+.pref-dot {
+    width: 5px;
+    height: 5px;
+}
+
+.pref-dot.spot {
+    background: #191970;
+}
+
+.marker-status {
+    font-size: 10px;
+    color: yellow;
+    text-shadow: 0 0 2px black;
+    margin-top: 2px;
+}
+
+/* fish */
+.pref-dot.fish1 { background: #6495ED; }
+.pref-dot.fish2 { background: #2E8B57; }
+.pref-dot.fish3 { background: #FF8C00; }
+.pref-dot.fish4 { background: #4B0082; }
+.pref-dot.fish6 { background: #008000; }
+
+/* =========================
+   SHOP MARKER
+========================= */
+.shop-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+
+    border: 2px solid #191970;
+    border-radius: 50%;
+    background: #fff;
+
+    font-size: 12px;
+    color: #191970;
+
+    box-sizing: border-box;
+}
+
+.shop-marker.no-circle {
+    border: 0;
+    background: none;
+}
+
+.shop-marker.no-circle .shop-icon {
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.shop-icon {
+    width: 14px;
+    height: 14px;
+    fill: #191970;
+    pointer-events: none;
+}
+
+/* =========================
+   POPUP
+========================= */
+.shop-popup {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.shop-popup-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+    padding-right: 20px;
+}
+
+.shop-popup-address {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.shop-popup-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.shop-popup-btn {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+    color: #555;
+    text-decoration: none;
+}
+
+.shop-popup-address.dummy {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 6px;
+    padding-right: 20px;
+}
+
+.shop-popup-btn::after {
+    content: none !important;
+}
+
+/* =========================
+   LEAFLET POPUP FIX
+========================= */
+.leaflet-popup-content-wrapper {
+    padding: 4px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.leaflet-popup-content {
+    margin: 6px 8px;
+}
+
+.leaflet-popup-tip,
+.leaflet-popup-tip-container {
+    display: none;
+}
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+.close-btn {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+
+    z-index: 10000;
+
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+
+    border: none;
+    border-radius: 50%;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 16px;
+    cursor: pointer;
+}
