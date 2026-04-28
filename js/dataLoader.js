@@ -680,20 +680,24 @@ function enablePhase2(map) {
     // -------------------------
     // 初回強制実行
     // -------------------------
+ // -------------------------
+    // ★初回は moveend 後に実行
+    // -------------------------
     if (!phase2Initialized) {
         phase2Initialized = true;
 
-        setTimeout(() => {
+        map.once('moveend', function () {
             updatePhase2NearestSpot(map, window.spotData, window.markerMap);
-        }, 0);
+        });
     }
+
 }
 
 function disablePhase2(map) {
 
     if (!map._phase2Handler) return;
 
-    map.off('dragend', map._phase2Handler);
+    map.off('dragend', map._phase2Handler); // ←ここ修正
 
     map._phase2Handler = null;
 
@@ -915,6 +919,8 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
+    
+    disablePhase2(window.map);
 
     window._spotZoomLock = true;
     window.phase2DetectionEnabled = false;
