@@ -661,46 +661,45 @@ function showSpotsForArea(areaKey) {
     );
 }
 
-let phase2Initialized = false;
 
+let phase2Initialized = false;
 
 function enablePhase2(map) {
 
     if (map._phase2Handler) return;
 
     lastVisibleSet = new Set();
+    phase2Initialized = false;
 
     map._phase2Handler = function () {
         updatePhase2NearestSpot(map, window.spotData, window.markerMap);
     };
 
     map.on('dragend', map._phase2Handler);
-    
-     // -------------------------
-    // ★初回強制実行（ここが追加）
+
+    // -------------------------
+    // 初回強制実行
     // -------------------------
     if (!phase2Initialized) {
         phase2Initialized = true;
 
-        // 少し待つ（地図描画安定後）
         setTimeout(() => {
             updatePhase2NearestSpot(map, window.spotData, window.markerMap);
         }, 0);
     }
-
 }
-
 
 function disablePhase2(map) {
 
     if (!map._phase2Handler) return;
 
-    map.off('moveend', map._phase2Handler);
+    map.off('dragend', map._phase2Handler);
 
     map._phase2Handler = null;
 
-    // 状態は保持（ここ重要）
-    // lastVisibleSet = new Set(); ←消す
+    phase2Initialized = false;
+
+    lastVisibleSet = new Set();
 }
 
 
