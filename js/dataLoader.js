@@ -763,8 +763,8 @@ function processSpotUtils(map, spots, mode) {
                 .replace('{x}', tileX)
                 .replace('{y}', tileY);
 
-            const img = new Image();
-            img.src = url;
+            //const img = new Image();
+            //img.src = url;
         }
     }
 
