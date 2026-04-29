@@ -754,7 +754,6 @@ function processSpotUtils(map, spots, mode) {
             const lat = s.lat;
             const lng = s.lng;
 
-            // ★tileを直接計算（誤差回避）
             const n = Math.pow(2, zoom);
 
             const tileX = Math.floor((lng + 180) / 360 * n);
@@ -764,12 +763,18 @@ function processSpotUtils(map, spots, mode) {
                 (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
             );
 
-            const url = baseUrl
-                .replace('{x}', tileX)
-                .replace('{y}', tileY);
+            // ★ここだけ変更（1枚 → 2×2）
+            for (let dx = 0; dx <= 1; dx++) {
+                for (let dy = 0; dy <= 1; dy++) {
 
-            const img = new Image();
-            img.src = url;
+                    const url = baseUrl
+                        .replace('{x}', tileX + dx)
+                        .replace('{y}', tileY + dy);
+
+                    const img = new Image();
+                    img.src = url;
+                }
+            }
         }
     }
 
@@ -790,7 +795,6 @@ function processSpotUtils(map, spots, mode) {
         return boundsList;
     }
 }
-
 
 let spotMenuClickEnabled = true;
 
