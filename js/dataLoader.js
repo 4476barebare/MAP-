@@ -533,20 +533,15 @@ function selectSpot(spot) {
 
 // ① 移動完了後に制御をかける
 window.map.once('moveend', () => {
-
-    // -------------------------
-    // 操作有効化
-    // -------------------------
     window.map.dragging.enable();
     window.map.scrollWheelZoom.enable();
     window.map.doubleClickZoom.enable();
     window.map.touchZoom.enable();
-
     window.map.setMaxBounds(window.areaBounds);
     window.map.options.maxBoundsViscosity = 1.0;
-
-    enablePhase2(window.map);
 });
+
+enablePhase2(map);
 
 }
 
@@ -563,6 +558,7 @@ let phase2Initialized = false;
 let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
+    alert("呼び出し");
 
     if (map._phase2Handler) return;
 
