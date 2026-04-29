@@ -715,9 +715,11 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
     // ■安定化（連打・move直後のズレ対策）
     // =========================================================
     requestAnimationFrame(() => {
-
-        const bounds = map.getBounds();
-
+        
+        const bounds = map.getBounds().pad(0.2);
+        const visibleSpots = spots.filter(s =>
+        bounds.contains([s.lat, s.lng])
+        );
         // =====================================================
         // ■視界内スポットを毎回フル取得（差分禁止）
         // =====================================================
