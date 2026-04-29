@@ -439,11 +439,8 @@ function enableDragForArea() {
     if (!window.areaBounds) return;
 
     window.map.dragging.enable();
-    
-    setTimeout(() => {
-    window.map.setMaxBounds(bounds);
+    window.map.setMaxBounds(window.areaBounds);
     window.map.options.maxBoundsViscosity = 1.0;
-}, 0);
 }
 
 function goBack() {
@@ -1009,9 +1006,6 @@ const popupHtml = `
 function zoomToSpot(safeSpot) {
     clearSpotMenu();
     
-    window._spotZoomLock = true;
-    window.phase2DetectionEnabled = false;
-
     disablePhase2(window.map);
     switchToGSIPhoto();
 
@@ -1022,6 +1016,9 @@ function zoomToSpot(safeSpot) {
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
+    window._spotZoomLock = true;
+    //window.phase2DetectionEnabled = false;
+
 
     // -----------------------
     // 移動
@@ -1033,6 +1030,8 @@ function zoomToSpot(safeSpot) {
         safeSpot.zoom
     );
     resetSpotLayers();
+    
+    
 
     // -----------------------
     // 安定後処理
@@ -1056,7 +1055,7 @@ function zoomToSpot(safeSpot) {
         window.map.touchZoom.enable();
 
         window._spotZoomLock = false;
-        window.phase2DetectionEnabled = true;
+        //window.phase2DetectionEnabled = true;
     });
 }
 
