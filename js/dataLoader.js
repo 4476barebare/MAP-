@@ -749,22 +749,27 @@ function processSpotUtils(map, spots, mode) {
             'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/' +
             zoom + '/{x}/{y}.jpg';
 
-        const tileSize = 256;
-
         for (const s of targets) {
 
-            const point = map.project([s.lat, s.lng], zoom);
+            const lat = s.lat;
+            const lng = s.lng;
 
-            // ★ここだけ修正（境界ズレ対策）
-            const tileX = Math.floor((point.x + 1) / tileSize);
-            const tileY = Math.floor((point.y + 1) / tileSize);
+            // ★tileを直接計算（誤差回避）
+            const n = Math.pow(2, zoom);
+
+            const tileX = Math.floor((lng + 180) / 360 * n);
+
+            const latRad = lat * Math.PI / 180;
+            const tileY = Math.floor(
+                (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
+            );
 
             const url = baseUrl
                 .replace('{x}', tileX)
                 .replace('{y}', tileY);
 
-            //const img = new Image();
-            //img.src = url;
+            const img = new Image();
+            img.src = url;
         }
     }
 
@@ -785,6 +790,7 @@ function processSpotUtils(map, spots, mode) {
         return boundsList;
     }
 }
+
 
 let spotMenuClickEnabled = true;
 
