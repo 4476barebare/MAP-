@@ -695,7 +695,7 @@ function processSpotUtils(map, spots, mode) {
     }
 }
 
-let spotMenuClickEnabled = true;
+//let spotMenuClickEnabled = true;
 
 function updateSpotMenu(spots, map) {
 
@@ -789,16 +789,16 @@ function updateSpotMenu(spots, map) {
 
 document.getElementById("map-menu").addEventListener("click", (e) => {
 
-    if (!spotMenuClickEnabled) return;
+    //if (!spotMenuClickEnabled) return;
 
     const li = e.target.closest("li");
-    if (!li) return;
+    //if (!li) return;
 
     const menu = document.getElementById("map-menu");
 
     const lat = parseFloat(li.dataset.lat);
     const lng = parseFloat(li.dataset.lng);
-    if (!lat || !lng) return;
+    //if (!lat || !lng) return;
 
     // =========================
     // Phase2時だけ「テキスト以外は無効」
