@@ -423,55 +423,6 @@ function selectArea(area) {
     });
 }
 
-function selectSpot(areaName, selectName, spotLat, spotLng) {
-    
-    disablePhase2(window.map);
-    
-    disableAreaSwipe();
-    window.map.off('move');
-    window.map.setMaxBounds(null);
-
-    drawLocation(selectName, spotLat, spotLng, 13);
-
-    if (window.markerControl) {
-        markerControl.clearShop01();
-        markerControl.clearShop02();
-    }
-
-    const areaKey = window.currentAreaId;
-
-    if (window.markerControl) {
-        markerControl.showShop02(areaKey);
-    }
-
-    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
-
-    window.currentTileLayer = L.tileLayer(tileUrl, {
-        attribution: '© OpenStreetMap contributors',
-        keepBuffer: 8,
-        updateWhenIdle: true
-    }).addTo(window.map);
-
-    // 通常のmoveend（これは残す）
-    window.map.once('moveend', () => {
-        enableDragForArea();
-    });
-
-    enablePhase2(window.map);
-}
-
-function enableDragForArea() {
-    if (!window.areaBounds) return;
-
-    window.map.dragging.enable();
-    window.map.setMaxBounds(window.areaBounds);
-    window.map.options.maxBoundsViscosity = 1.0;
-}
-
 function showSpotsForArea(areaKey) {
 
     // -------------------------
@@ -517,18 +468,70 @@ function showSpotsForArea(areaKey) {
         });
 
         marker.on('click', function () {
-            zoomToSpot({
+            selectSpot({
                 name: spot.name,
                 lat: spot.lat,
                 lng: spot.lng,
                 zoom: spot.zoom,
-                individualId: spot.individualId || spot.id || ''
-            });
+                individualId: spot.individualId || spot.id || ''});
+                });
+            window.areaSpotLayer.addLayer(marker);
         });
-
-        window.areaSpotLayer.addLayer(marker);
-    });
 }
+
+function selectSpot(spot) {
+
+    const {
+        name,
+        lat,
+        lng,
+        zoom,
+        individualId
+    } = spot;
+
+    const currentZoom = window.map.getZoom();
+
+    if (currentZoom === 13) return;
+
+    if (window.phase1Group) {
+        window.phase1Group.clearLayers();
+    }
+
+    drawLocation(name, lat, lng, 13);
+
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© OpenStreetMap contributors',
+        keepBuffer: 8,
+        updateWhenIdle: true
+    }).addTo(window.map);
+
+    if (window.markerControl) {
+        markerControl.showShop02(window.currentAreaId);
+    }
+
+    disableAreaSwipe();
+
+    window.map.once('moveend', () => {
+        enableDragForArea();
+    });
+
+    enablePhase2(window.map);
+}
+
+function enableDragForArea() {
+    if (!window.areaBounds) return;
+
+    window.map.dragging.enable();
+    window.map.setMaxBounds(window.areaBounds);
+    window.map.options.maxBoundsViscosity = 1.0;
+}
+
 
 let phase2Initialized = false;
 let lastVisibleSet = new Set();
