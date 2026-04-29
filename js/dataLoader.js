@@ -206,6 +206,7 @@ function disableAreaSwipe() {
 }
 
 function drawLocation(name, lat, lng, zoom, options = {}) {
+
     const defaultOptions = {
         center: [lat, lng],
         zoom: zoom,
@@ -215,72 +216,92 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         doubleClickZoom: false,
         boxZoom: false,
         keyboard: false,
-        //tap: false,
         touchZoom: false,
     };
-    
-    //window.baseZoom = zoom;
 
     const mapOptions = { ...defaultOptions, ...options };
 
-    const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+    const tileUrl =
+        'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
-    if (window.map) {
-        
-        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-        if (window.currentTileLayer) {
-            window.map.removeLayer(window.currentTileLayer);
-        }
+    showDebug("DL: enter");
+
+    // -------------------------
+    // 初回生成
+    // -------------------------
+    if (!window.map) {
+
+        window.map = L.map('lf-map', mapOptions);
+
+        window.map.options.zoomSnap = 0.5;
+        window.map.options.zoomDelta = 0.5;
+        window.map.attributionControl.setPosition('topright');
+
         window.currentTileLayer = L.tileLayer(tileUrl, {
             attribution: '© 国土地理院',
             keepBuffer: 8
         }).addTo(window.map);
 
-        mapOptions.scrollWheelZoom
-            ? window.map.scrollWheelZoom.enable()
-            : window.map.scrollWheelZoom.disable();
+        showDebug("DL: init map done");
 
-        mapOptions.dragging
-            ? window.map.dragging.enable()
-            : window.map.dragging.disable();
-
-        mapOptions.doubleClickZoom
-            ? window.map.doubleClickZoom.enable()
-            : window.map.doubleClickZoom.disable();
-
-        mapOptions.boxZoom
-            ? window.map.boxZoom.enable()
-            : window.map.boxZoom.disable();
-
-        mapOptions.keyboard
-            ? window.map.keyboard.enable()
-            : window.map.keyboard.disable();
-
-        mapOptions.touchZoom
-            ? window.map.touchZoom.enable()
-            : window.map.touchZoom.disable();
-
-        if (window.map.tap) {
-            mapOptions.tap
-                ? window.map.tap.enable()
-                : window.map.tap.disable();
-        }
-    } else {
-        window.map = L.map('lf-map', mapOptions);
-        window.map.options.zoomSnap = 0.5;
-        window.map.options.zoomDelta = 0.5;
-        window.map.attributionControl.setPosition('topright');
-        if (!window.currentTileLayer) {
-            window.currentTileLayer = L.tileLayer(tileUrl, {
-                attribution: '© 国土地理院',
-                keepBuffer: 8
-            }).addTo(window.map);
-        }
+        return;
     }
-    
-    if (!window.currentAreaId) {
-        showPrefSpots();
-    }
+
+    // -------------------------
+    // ① 移動（先にflyToだけ）
+    // -------------------------
+    showDebug("DL: flyTo start");
+
+    window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+
+    // -------------------------
+    // ② move完了後にタイル更新
+    // -------------------------
+    window.map.once('moveend', () => {
+
+        showDebug("DL: moveend fired");
+
+        if (window.currentTileLayer) {
+            window.map.removeLayer(window.currentTileLayer);
+            showDebug("DL: tile removed");
+        }
+
+        window.currentTileLayer = L.tileLayer(tileUrl, {
+            attribution: '© 国土地理院',
+            keepBuffer: 8
+        }).addTo(window.map);
+
+        showDebug("DL: tile added");
+    });
+
+    // -------------------------
+    // UIロック解除
+    // -------------------------
+    mapOptions.scrollWheelZoom
+        ? window.map.scrollWheelZoom.enable()
+        : window.map.scrollWheelZoom.disable();
+
+    mapOptions.dragging
+        ? window.map.dragging.enable()
+        : window.map.dragging.disable();
+
+    mapOptions.doubleClickZoom
+        ? window.map.doubleClickZoom.enable()
+        : window.map.doubleClickZoom.disable();
+
+    mapOptions.boxZoom
+        ? window.map.boxZoom.enable()
+        : window.map.boxZoom.disable();
+
+    mapOptions.keyboard
+        ? window.map.keyboard.enable()
+        : window.map.keyboard.disable();
+
+    mapOptions.touchZoom
+        ? window.map.touchZoom.enable()
+        : window.map.touchZoom.disable();
+
+    showDebug("DL: exit");
 }
 
 function prefetchAround(area) {
