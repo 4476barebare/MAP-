@@ -6,8 +6,7 @@ window.loadLocationCSV = loadLocationCSV;
 // グローバル
 window.prefData = null;
 window.areaData = [];
-window.spotData = [];
-window.currentHash = '';
+window.spotData = []
 window.currentAreaId = null;
 
 function loadLocationCSV(csvUrl) {
@@ -227,16 +226,13 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     if (window.map) {
         
         window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-
-    if (window.currentTileLayer) {
+        if (window.currentTileLayer) {
             window.map.removeLayer(window.currentTileLayer);
         }
-
-        window.currentTileLayer =
-    L.tileLayer(tileUrl, {
-        attribution: '© 国土地理院',
-        keepBuffer: 8
-    }).addTo(window.map);
+        window.currentTileLayer = L.tileLayer(tileUrl, {
+            attribution: '© 国土地理院',
+            keepBuffer: 8
+        }).addTo(window.map);
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -272,18 +268,14 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map.options.zoomSnap = 0.5;
         window.map.options.zoomDelta = 0.5;
         window.map.attributionControl.setPosition('topright');
-
-if (!window.currentTileLayer) {
-    window.currentTileLayer = L.tileLayer(tileUrl, {
-        attribution: '© 国土地理院',
-        keepBuffer: 8
-    }).addTo(window.map);
-}
+        if (!window.currentTileLayer) {
+            window.currentTileLayer = L.tileLayer(tileUrl, {
+                attribution: '© 国土地理院',
+                keepBuffer: 8
+            }).addTo(window.map);
+        }
     }
-
-
-    window.currentHash = location.hash;
-
+    
     if (!window.currentAreaId) {
         showPrefSpots();
     }
