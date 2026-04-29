@@ -209,7 +209,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
     const defaultOptions = {
         center: [lat, lng],
-        zoom: zoom,
+        zoom,
         zoomControl: false,
         scrollWheelZoom: false,
         dragging: false,
@@ -221,14 +221,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
     const mapOptions = { ...defaultOptions, ...options };
 
-    const tileUrl =
-        'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
-
-    showDebug("DL: enter");
-
-    // -------------------------
-    // 初回生成
-    // -------------------------
+    // 初回のみ生成
     if (!window.map) {
 
         window.map = L.map('lf-map', mapOptions);
@@ -237,46 +230,21 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map.options.zoomDelta = 0.5;
         window.map.attributionControl.setPosition('topright');
 
-        window.currentTileLayer = L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院',
-            keepBuffer: 8
-        }).addTo(window.map);
-
-        showDebug("DL: init map done");
+        // ★初期はGSI固定（ここだけ）
+        window.currentTileLayer = L.tileLayer(
+            'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+            {
+                attribution: '© 国土地理院',
+                keepBuffer: 8
+            }
+        ).addTo(window.map);
 
         return;
     }
 
-    // -------------------------
-    // ① 移動（先にflyToだけ）
-    // -------------------------
-    showDebug("DL: flyTo start");
-
     window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-    // -------------------------
-    // ② move完了後にタイル更新
-    // -------------------------
-    window.map.once('moveend', () => {
-
-        showDebug("DL: moveend fired");
-
-        if (window.currentTileLayer) {
-            window.map.removeLayer(window.currentTileLayer);
-            showDebug("DL: tile removed");
-        }
-
-        window.currentTileLayer = L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院',
-            keepBuffer: 8
-        }).addTo(window.map);
-
-        showDebug("DL: tile added");
-    });
-
-    // -------------------------
-    // UIロック解除
-    // -------------------------
+    // UI制御だけ
     mapOptions.scrollWheelZoom
         ? window.map.scrollWheelZoom.enable()
         : window.map.scrollWheelZoom.disable();
@@ -300,8 +268,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     mapOptions.touchZoom
         ? window.map.touchZoom.enable()
         : window.map.touchZoom.disable();
-
-    showDebug("DL: exit");
 }
 
 function prefetchAround(area) {
@@ -349,75 +315,43 @@ function prefetchAround(area) {
 
 function selectArea(area) {
 
-    showDebug("SA: enter");
-
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
         : area;
 
-    showDebug("SA: resolved areaObj");
-
-    if (!areaObj) {
-        showDebug("SA: areaObj NULL → return");
-        return;
-    }
-
-    showDebug("SA: phase2 disable start");
-    //disablePhase2(window.map);
-    showDebug("SA: phase2 disable end");
+    if (!areaObj) return;
 
     // -------------------------
-    // layer cleanup
+    // phase2停止
+    // -------------------------
+    // disablePhase2(window.map);
+
+    // -------------------------
+    // レイヤー削除
     // -------------------------
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
-        showDebug("SA: spotLayer removed");
     }
 
     if (window.markerControl?.shop01Layer) {
         window.map.removeLayer(markerControl.shop01Layer);
         markerControl.shop01Layer = null;
-        showDebug("SA: shop01Layer removed");
     }
 
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
-        showDebug("SA: prefSpotLayer removed");
     }
-
-    // -------------------------
-    // tile reset
-    // -------------------------
-    showDebug("SA: tile reset start");
-
-    const tileUrl =
-        'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
-
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
-
-    window.currentTileLayer = L.tileLayer(tileUrl, {
-        attribution: '© 国土地理院',
-        keepBuffer: 8
-    }).addTo(window.map);
-
-    showDebug("SA: tile reset end");
 
     // -------------------------
     // prefetch
     // -------------------------
-    showDebug("SA: prefetch start");
     prefetchAround(areaObj);
-    showDebug("SA: prefetch end");
 
     // -------------------------
-    // move
+    // 地図移動
     // -------------------------
-    showDebug("SA: drawLocation start");
-
     drawLocation(
         areaObj.name,
         areaObj.lat,
@@ -425,39 +359,26 @@ function selectArea(area) {
         areaObj.zoom || window.prefData.zoom
     );
 
-    showDebug("SA: drawLocation end");
-
     // -------------------------
-    // UI
+    // UI更新
     // -------------------------
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    showDebug("SA: UI updated");
-
     // -------------------------
-    // post move
+    // 移動後処理
     // -------------------------
     window.map.once('moveend', () => {
-
-        showDebug("SA: moveend fired");
 
         window.map.invalidateSize(true);
         enableDragForArea();
 
-        showDebug("SA: before showSpotsForArea");
-
         showSpotsForArea(window.currentAreaId);
-
-        showDebug("SA: after showSpotsForArea");
 
         enableAreaSwipe();
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-
-                showDebug("SA: shop01 render");
-
                 markerControl.showShop01(window.currentAreaId);
             });
         });
