@@ -477,6 +477,10 @@ function showSpotsForArea(areaKey) {
                 });
             window.areaSpotLayer.addLayer(marker);
         });
+    window.areaBounds = L.latLngBounds(
+        [minLat - latBuffer, minLng - lngBuffer],
+        [maxLat + latBuffer, maxLng + lngBuffer]
+    );
 }
 
 function selectSpot(spot) {
@@ -537,6 +541,7 @@ window.map.once('moveend', () => {
         window.map.setMaxBounds(window.areaBounds);
         window.map.options.maxBoundsViscosity = 1.0;
     } else {
+        alert("未定義");
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
     }
