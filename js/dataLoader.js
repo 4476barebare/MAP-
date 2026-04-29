@@ -475,17 +475,18 @@ function enableDragForArea() {
 function showSpotsForArea(areaKey) {
 
     // -------------------------
-    // 県ドットを消す
+    // 県ドット削除
     // -------------------------
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
     }
 
     // -------------------------
-    // エリアレイヤー準備（新規）
+    // エリアレイヤー再利用
     // -------------------------
     if (!window.areaSpotLayer) {
-        window.areaSpotLayer = L.layerGroup();
+        window.areaSpotLayer = L.layerGroup().addTo(window.map);
     } else {
         window.areaSpotLayer.clearLayers();
     }
@@ -527,8 +528,6 @@ function showSpotsForArea(areaKey) {
 
         window.areaSpotLayer.addLayer(marker);
     });
-
-    window.areaSpotLayer.addTo(window.map);
 }
 
 let phase2Initialized = false;
@@ -1000,9 +999,10 @@ function goBack() {
 if (window.phase1Group) {
     window.phase1Group.clearLayers();
 }
-// エリアマーカー削除
+
+// エリアマーカーも再利用前提
 if (window.areaSpotLayer) {
-    window.map.removeLayer(window.areaSpotLayer);
+    window.areaSpotLayer.clearLayers();
 }
 
 
