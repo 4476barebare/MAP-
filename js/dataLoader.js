@@ -676,7 +676,6 @@ function enablePhase2(map) {
     };
 
     map.on('dragend', map._phase2Handler);
-    map.on('zoomend', map._phase2Handler); // ← 追加
 
 
     if (!phase2Initialized) {
@@ -759,21 +758,13 @@ function processSpotUtils(map, spots, mode) {
             const tileX = Math.floor(point.x / tileSize);
             const tileY = Math.floor(point.y / tileSize);
 
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
+            const url = baseUrl
+    .replace('{x}', tileX)
+    .replace('{y}', tileY);
 
-                    const x = tileX + dx;
-                    const y = tileY + dy;
+const img = new Image();
+img.src = url;
 
-                    const url = baseUrl
-                        .replace('{x}', x)
-                        .replace('{y}', y);
-
-                    // ★ここが本体（強制キャッシュ）
-                    const img = new Image();
-                    img.src = url;
-                }
-            }
         }
     }
 
