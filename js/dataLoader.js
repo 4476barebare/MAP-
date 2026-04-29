@@ -1002,11 +1002,11 @@ function updateStateFromHash() {
 
 function goBack() {
 
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-    window.areaBounds = null;
+    //window.map.setMaxBounds(null);
+    //window.map.options.maxBoundsViscosity = 0;
+    //window.areaBounds = null;
 
-    resetSpotLayers();
+    //resetSpotLayers();
 
     // -----------------------
     // areaだけオブジェクト化
@@ -1051,6 +1051,14 @@ function goBack() {
     // =====================================================
     // area → pref
     // =====================================================
+    
+    // area → pref
+if (window.markerControl?.shop01Layer) {
+    window.map.removeLayer(markerControl.shop01Layer);
+    markerControl.shop01Layer = null;
+}
+
+const z = window.map.getZoom();
     const z = window.map.getZoom();
 
     if (z >= 12.8) {
