@@ -1005,8 +1005,6 @@ const popupHtml = `
 function zoomToSpot(safeSpot) {
     clearSpotMenu();
     
-    disablePhase2(window.map);
-
     window._spotZoomLock = true;
     window.phase2DetectionEnabled = false;
 
@@ -1030,14 +1028,12 @@ function zoomToSpot(safeSpot) {
         safeSpot.lng,
         safeSpot.zoom
     );
-
-
+    resetSpotLayers();
 
     // -----------------------
     // 安定後処理
     // -----------------------
     window.map.once('moveend', function () {
-        resetSpotLayers();
 
         // ★ zoomはsafeSpot.zoomをそのまま使用（再取得禁止）
         window.map.setMinZoom(safeSpot.zoom);
