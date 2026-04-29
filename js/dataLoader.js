@@ -676,13 +676,9 @@ function enablePhase2(map) {
     };
 
     map.on('dragend', map._phase2Handler);
+    map.on('zoomend', map._phase2Handler); // ← 追加
 
-    // -------------------------
-    // 初回強制実行
-    // -------------------------
- // -------------------------
-    // ★初回は moveend 後に実行
-    // -------------------------
+
     if (!phase2Initialized) {
         phase2Initialized = true;
 
