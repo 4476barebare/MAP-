@@ -287,6 +287,16 @@ function prefetchAround(area) {
 
     if (!window.map) return;
 
+    // -------------------------
+    // 防御（ここ重要）
+    // -------------------------
+    if (!area || typeof area !== 'object') return;
+    if (area.lat == null || area.lng == null) return;
+    if (isNaN(area.lat) || isNaN(area.lng)) return;
+
+    const lat0 = Number(area.lat);
+    const lng0 = Number(area.lng);
+
     const offsets = [
         [0, 0],
         [0.005, 0],
@@ -295,18 +305,24 @@ function prefetchAround(area) {
         [0, -0.005]
     ];
 
+    const bounds = window.map.getBounds();
+
     offsets.forEach(([dx, dy]) => {
 
-        const lat = area.lat + dx;
-        const lng = area.lng + dy;
+        const lat = lat0 + dx;
+        const lng = lng0 + dy;
 
-        // ★ viewは動かさない（重要）
+        // 無効値ガード
+        if (!isFinite(lat) || !isFinite(lng)) return;
+
+        // Leaflet内部トリガー（キャッシュ目的）
         const temp = L.latLng(lat, lng);
 
-        window.map._getZoomSpan?.(); // 何もしない安全呼び出し
+        // 既存ロジック維持（安全呼び出し）
+        window.map._getZoomSpan?.();
 
-        // tileだけ裏で発火させる（実質キャッシュ目的）
-        window.map.panInsideBounds?.(window.map.getBounds());
+        // tileプリフェッチ目的
+        window.map.panInsideBounds?.(bounds);
     });
 }
 
