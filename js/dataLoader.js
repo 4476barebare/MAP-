@@ -243,18 +243,17 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
     const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
-    if (window.map) {
-        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+   if (window.currentTileLayer) {
+    window.map.removeLayer(window.currentTileLayer);
+    window.currentTileLayer = null;
+}
 
-        if (window.currentTileLayer) {
-            window.map.removeLayer(window.currentTileLayer);
-        }
+window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-        window.currentTileLayer =
-    L.tileLayer(tileUrl, {
-        attribution: '© 国土地理院',
-        keepBuffer: 8
-    }).addTo(window.map);
+window.currentTileLayer = L.tileLayer(tileUrl, {
+    attribution: '© 国土地理院',
+    keepBuffer: 8
+}).addTo(window.map);
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
@@ -1040,8 +1039,8 @@ function zoomToSpot(safeSpot) {
         window.map.setMaxZoom(18);
 
         const bounds = window.map.getBounds();
-        //window.map.setMaxBounds(bounds);
-        //window.map.options.maxBoundsViscosity = 1.0;
+        window.map.setMaxBounds(bounds);
+        window.map.options.maxBoundsViscosity = 1.0;
 
         window._zoomGuardBase = safeSpot.zoom;
         window._zoomGuardActive = true;
