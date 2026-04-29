@@ -1015,27 +1015,56 @@ const popupHtml = `
 }
 
 
-
 function zoomToSpot(safeSpot) {
+
+    // -------------------------
+    // Phase2停止
+    // -------------------------
     disablePhase2(window.map);
-    switchToGSIPhoto();
-    
+
+    // -------------------------
+    // GSIレイヤー（使い回し）
+    // -------------------------
+    if (!window.gsiPhotoLayer) {
+        window.gsiPhotoLayer = L.tileLayer(
+            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+            {
+                attribution: '国土地理院'
+            }
+        );
+    }
+
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer = window.gsiPhotoLayer.addTo(window.map);
+
+    // -------------------------
+    // 操作ロック
+    // -------------------------
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
-    
+
+    // -------------------------
+    // 移動
+    // -------------------------
     drawLocation(
         safeSpot.name,
         safeSpot.lat,
         safeSpot.lng,
         safeSpot.zoom
     );
-    
+
     resetSpotLayers();
-    
+
+    // -------------------------
+    // 復帰処理
+    // -------------------------
     window.map.once('moveend', function () {
-        // ★ zoomはsafeSpot.zoomをそのまま使用（再取得禁止）
+
         window.map.setMinZoom(safeSpot.zoom);
         window.map.setMaxZoom(18);
 
@@ -1051,22 +1080,6 @@ function zoomToSpot(safeSpot) {
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
     });
-}
-
-
-window.gsiPhotoLayer = L.tileLayer(
-    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-    {
-        attribution: '国土地理院'
-    }
-);
-
-function switchToGSIPhoto() {
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
-
-    window.currentTileLayer = window.gsiPhotoLayer.addTo(window.map);
 }
 
 
