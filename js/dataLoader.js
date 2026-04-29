@@ -763,7 +763,7 @@ function updateSpotMenu(spots, map) {
     // ここで統合クリック
     // -------------------------
     ul.onclick = (e) => {
-        showDebug(${i.text});
+        showDebug("反応");
 
         const text = e.target.closest(".spot-text");
         if (!text) return;
