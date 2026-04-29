@@ -409,7 +409,6 @@ function selectArea(area) {
     window.map.once('moveend', () => {
 
         window.map.invalidateSize(true);
-        enableDragForArea();
 
         showSpotsForArea(window.currentAreaId);
 
@@ -510,7 +509,7 @@ function selectSpot(spot) {
         window.phase1Group.clearLayers();
     }
 
-    drawLocation(name, lat, lng, 13);
+    //drawLocation(name, lat, lng, 13);
 
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -543,17 +542,8 @@ window.map.once('moveend', () => {
     window.map.doubleClickZoom.enable();
     window.map.touchZoom.enable();
 
-    // -------------------------
-    // 範囲制御（ここが重要）
-    // -------------------------
-    if (window.areaBounds) {
-        window.map.setMaxBounds(window.areaBounds);
-        window.map.options.maxBoundsViscosity = 1.0;
-    } else {
-        alert("未定義");
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
-    }
+    window.map.setMaxBounds(window.areaBounds);
+    window.map.options.maxBoundsViscosity = 1.0;
 
     enablePhase2(window.map);
 });
@@ -1020,7 +1010,6 @@ function goBack() {
         window.map.doubleClickZoom.disable();
         window.map.touchZoom.disable();
 
-        enableDragForArea();
         showSpotsForArea(window.currentAreaId);
 
         location.hash = location.hash.replace('/' + spotKey, '');
