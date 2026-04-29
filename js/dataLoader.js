@@ -1005,24 +1005,14 @@ const popupHtml = `
 
 function zoomToSpot(safeSpot) {
     clearSpotMenu();
-    
     disablePhase2(window.map);
     switchToGSIPhoto();
-
-    // -----------------------
-    // 操作ロック
-    // -----------------------
+    
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
-    window._spotZoomLock = true;
-    //window.phase2DetectionEnabled = false;
-
-
-    // -----------------------
-    // 移動
-    // -----------------------
+    
     drawLocation(
         safeSpot.name,
         safeSpot.lat,
@@ -1031,13 +1021,7 @@ function zoomToSpot(safeSpot) {
     );
     resetSpotLayers();
     
-    
-
-    // -----------------------
-    // 安定後処理
-    // -----------------------
     window.map.once('moveend', function () {
-
         // ★ zoomはsafeSpot.zoomをそのまま使用（再取得禁止）
         window.map.setMinZoom(safeSpot.zoom);
         window.map.setMaxZoom(18);
@@ -1053,9 +1037,6 @@ function zoomToSpot(safeSpot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-
-        window._spotZoomLock = false;
-        //window.phase2DetectionEnabled = true;
     });
 }
 
