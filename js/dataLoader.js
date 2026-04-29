@@ -1006,23 +1006,18 @@ if (window.areaSpotLayer) {
         if (window.phase1Group) {
             window.phase1Group.addTo(window.map);
         }
-        
-          if (s && s.tileLayer) {
-
-        Object.values(window.tileLayers).forEach(layer => {
-            if (window.map.hasLayer(layer)) {
-                window.map.removeLayer(layer);
-            }
-        });
-
+        if (s && s.tileLayer) {
+            Object.values(window.tileLayers).forEach(layer => {
+                if (window.map.hasLayer(layer)) {
+                    window.map.removeLayer(layer);
+                }
+            });
         s.tileLayer.addTo(window.map);
-    }
-window.map.setView(s.center, s.zoom);
-    //
+        window.map.setView(s.center, s.zoom);
+        }
         }else{
             selectArea(area);
         }
-        
     }
 
     drawLocation(
