@@ -363,7 +363,7 @@ function selectArea(area) {
     }
 
     showDebug("SA: phase2 disable start");
-    disablePhase2(window.map);
+    //disablePhase2(window.map);
     showDebug("SA: phase2 disable end");
 
     // -------------------------
@@ -410,7 +410,7 @@ function selectArea(area) {
     // prefetch
     // -------------------------
     showDebug("SA: prefetch start");
-    //prefetchAround(areaObj);
+    prefetchAround(areaObj);
     showDebug("SA: prefetch end");
 
     // -------------------------
