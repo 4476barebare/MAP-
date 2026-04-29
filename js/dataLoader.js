@@ -362,7 +362,7 @@ function selectArea(area) {
     // -------------------------
     // phase2停止
     // -------------------------
-    disablePhase2(window.map);
+    
 
     // -------------------------
     // レイヤー削除
@@ -420,6 +420,7 @@ function selectArea(area) {
             });
         });
     });
+    disablePhase2(window.map);
 }
 
 function showSpotsForArea(areaKey) {
