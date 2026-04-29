@@ -126,7 +126,7 @@ function initAreaUI() {
             location.hash = encodeURIComponent(areaName);
             updateStateFromHash();
             destroyAreaUI();
-            selectArea(areaName);
+            selectArea(area);
         };
 
         li.appendChild(btn);
@@ -165,7 +165,7 @@ function initAreaUI() {
             location.hash = encodeURIComponent(nearestArea);
             updateStateFromHash();
             destroyAreaUI();
-            selectArea(nearestArea);
+            selectArea(nearestAreaObj);
         }
     };
 
