@@ -138,7 +138,6 @@ function buildAreaGraphFromGrid(areas) {
     window.areaGraph = graph;
 }
 
-
 function enableAreaSwipe() {
 
     if (window._areaSwipeEnabled) return;
@@ -209,7 +208,6 @@ function enableAreaSwipe() {
 
     window._areaSwipeEnabled = true;
 }
-
 
 function disableAreaSwipe() {
 
@@ -307,9 +305,6 @@ if (!window.currentTileLayer) {
         showPrefSpots();
     }
 }
-
-
-
 
 function prefetchAround(area) {
 
@@ -662,8 +657,8 @@ function showSpotsForArea(areaKey) {
     );
 }
 
-
 let phase2Initialized = false;
+let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
 
@@ -672,22 +667,45 @@ function enablePhase2(map) {
     lastVisibleSet = new Set();
     phase2Initialized = false;
 
-    map._phase2Handler = function () {
-        updatePhase2NearestSpot(map, window.spotData, window.markerMap);
+    // -------------------------
+    // メイン処理
+    // -------------------------
+    const runPhase2 = () => {
+
+        requestAnimationFrame(() => {
+
+            const bounds = map.getBounds().pad(0.5);
+
+            const visibleSpots = window.spotData.filter(s =>
+                bounds.contains([s.lat, s.lng])
+            );
+
+            const spotTargets = visibleSpots.filter(s => s.icon === "spot");
+            const otherTargets = visibleSpots.filter(s => s.icon !== "spot");
+
+            if (spotTargets.length > 0) {
+                processSpotUtils(map, spotTargets, "prefetch");
+                updateSpotMenu(spotTargets, map);
+            }
+
+            lastVisibleSet = new Set(
+                visibleSpots.map(s => s.name)
+            );
+        });
     };
 
-    map.on('dragend', map._phase2Handler);
+    // -------------------------
+    // dragend登録
+    // -------------------------
+    map._phase2Handler = runPhase2;
+    map.on('dragend', runPhase2);
 
+    // -------------------------
+    // 初回実行（moveend）
+    // -------------------------
+    map.once('moveend', runPhase2);
 
-    if (!phase2Initialized) {
-        phase2Initialized = true;
-
-        map.once('moveend', function () {
-            
-            updatePhase2NearestSpot(map, window.spotData, window.markerMap);
-        });
-    }
-
+    phase2Initialized = true;
 }
 
 function disablePhase2(map) {
@@ -722,37 +740,6 @@ function disablePhase2(map) {
     }
 }
 
-let lastVisibleSet = new Set();
-
-function updatePhase2NearestSpot(map, spots, markerMap) {
-
-    requestAnimationFrame(() => {
-
-        const bounds = map.getBounds().pad(0.5);
-
-        // ★ここは1回だけ
-        const visibleSpots = spots.filter(s =>
-            bounds.contains([s.lat, s.lng])
-        );
-
-        const spotTargets = visibleSpots.filter(s => s.icon === "spot");
-        const otherTargets = visibleSpots.filter(s => s.icon !== "spot");
-
-        if (spotTargets.length > 0) {
-
-            processSpotUtils(map, spotTargets, "prefetch");
-            updateSpotMenu(spotTargets, map);
-        }
-
-        if (otherTargets.length > 0) {
-            // 未使用
-        }
-
-        lastVisibleSet = new Set(
-            visibleSpots.map(s => s.name)
-        );
-    });
-}
 
 function processSpotUtils(map, spots, mode) {
 
@@ -938,50 +925,47 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
 
 
 
-function createPrefSpotLayer() {
-    if (window.prefSpotLayer) return;
-
-    const layer = L.layerGroup();
-
-    window.spotData.forEach(spot => {
-        if (!spot.icon) return;
-
-        let type = 'spot';
-
-        if (spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
-        }
-
-        const html = `<div class="pref-dot ${type}"></div>`;
-
-        const marker = L.marker(
-            [spot.lat, spot.lng],
-            {
-                icon: L.divIcon({
-                    className: '',
-                    html: html,
-                    iconSize: [5, 5],
-                    iconAnchor: [2.5, 2.5]
-                }),
-                interactive: false
-            }
-        );
-
-        layer.addLayer(marker);
-    });
-
-    window.prefSpotLayer = layer;
-}
-
 function showPrefSpots() {
-    createPrefSpotLayer();
+
+    if (!window.prefSpotLayer) {
+
+        const layer = L.layerGroup();
+
+        window.spotData.forEach(spot => {
+            if (!spot.icon) return;
+
+            let type = 'spot';
+
+            if (spot.icon.startsWith('fish')) {
+                const match = spot.icon.match(/fish\d+/);
+                if (match) type = match[0];
+            }
+
+            const html = `<div class="pref-dot ${type}"></div>`;
+
+            const marker = L.marker(
+                [spot.lat, spot.lng],
+                {
+                    icon: L.divIcon({
+                        className: '',
+                        html: html,
+                        iconSize: [5, 5],
+                        iconAnchor: [2.5, 2.5]
+                    }),
+                    interactive: false
+                }
+            );
+
+            layer.addLayer(marker);
+        });
+
+        window.prefSpotLayer = layer;
+    }
 
     if (!window.map.hasLayer(window.prefSpotLayer)) {
         window.prefSpotLayer.addTo(window.map);
     }
 }
-
 
 function showFishPopup(marker, spot) {
 
@@ -1013,7 +997,6 @@ const popupHtml = `
         offset: [0, 0] // 必要なら微調整
     }).openPopup();
 }
-
 
 function zoomToSpot(safeSpot) {
 
