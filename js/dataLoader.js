@@ -683,7 +683,7 @@ function enablePhase2(map) {
         phase2Initialized = true;
 
         map.once('moveend', function () {
-            clearSpotMenu();
+            
             updatePhase2NearestSpot(map, window.spotData, window.markerMap);
         });
     }
@@ -692,15 +692,34 @@ function enablePhase2(map) {
 
 function disablePhase2(map) {
 
-    if (!map._phase2Handler) return;
+    // -------------------------
+    // イベント解除
+    // -------------------------
+    if (map._phase2Handler) {
+        map.off('dragend', map._phase2Handler);
+        map._phase2Handler = null;
+    }
 
-    map.off('dragend', map._phase2Handler); // ←ここ修正
-
-    map._phase2Handler = null;
-
+    // -------------------------
+    // 状態リセット
+    // -------------------------
     phase2Initialized = false;
-
     lastVisibleSet = new Set();
+
+    // -------------------------
+    // UIクリア（ここを統合）
+    // -------------------------
+    const menu = document.getElementById("map-menu");
+    const ul = document.querySelector("#map-menu ul");
+
+    if (menu) {
+        menu.classList.remove("phase2-lock");
+        menu.style.display = "none";
+    }
+
+    if (ul) {
+        ul.innerHTML = "";
+    }
 }
 
 let lastVisibleSet = new Set();
@@ -917,13 +936,7 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
     });
 });
 
-function clearSpotMenu() {
-    const menu = document.getElementById("map-menu");
-    const ul = document.querySelector("#map-menu ul");
-    menu.classList.remove("phase2-lock");
-    if (ul) ul.innerHTML = "";
-    if (menu) menu.style.display = "none";
-}
+
 
 function createPrefSpotLayer() {
     if (window.prefSpotLayer) return;
@@ -1004,7 +1017,6 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
-    clearSpotMenu();
     disablePhase2(window.map);
     switchToGSIPhoto();
     
