@@ -517,10 +517,22 @@ function selectSpot(spot) {
 
     disableAreaSwipe();
 
+    drawLocation(name, lat, lng, 13);
+
+// ① 移動完了後に制御をかける
+window.map.once('moveend', () => {
+
+    // -------------------------
+    // 操作有効化
+    // -------------------------
     window.map.dragging.enable();
     window.map.scrollWheelZoom.enable();
     window.map.doubleClickZoom.enable();
     window.map.touchZoom.enable();
+
+    // -------------------------
+    // 範囲制御（ここが重要）
+    // -------------------------
     if (window.areaBounds) {
         window.map.setMaxBounds(window.areaBounds);
         window.map.options.maxBoundsViscosity = 1.0;
@@ -528,7 +540,10 @@ function selectSpot(spot) {
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
     }
+
     enablePhase2(window.map);
+});
+
 }
 
 function enableDragForArea() {
