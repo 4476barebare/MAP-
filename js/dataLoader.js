@@ -223,7 +223,6 @@ function disableAreaSwipe() {
     window._areaSwipeEnabled = false;
 }
 
-
 function drawLocation(name, lat, lng, zoom, options = {}) {
     const defaultOptions = {
         center: [lat, lng],
@@ -234,56 +233,32 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         doubleClickZoom: false,
         boxZoom: false,
         keyboard: false,
+        //tap: false,
         touchZoom: false,
     };
+    
+    //window.baseZoom = zoom;
 
     const mapOptions = { ...defaultOptions, ...options };
 
-    const tileUrl =
-        'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+    const tileUrl = 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
 
-    // -----------------------------
-    // まだmap未生成
-    // -----------------------------
-    if (!window.map) {
-        window.map = L.map('lf-map', mapOptions);
+    if (window.map) {
+        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-        window.map.options.zoomSnap = 0.5;
-        window.map.options.zoomDelta = 0.5;
-        window.map.attributionControl.setPosition('topright');
+window.map.once('moveend', function () {
 
-        window.currentTileLayer = L.tileLayer(tileUrl, {
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer =
+        L.tileLayer(tileUrl, {
             attribution: '© 国土地理院',
             keepBuffer: 8
         }).addTo(window.map);
-    }
+});
 
-    // -----------------------------
-    // 既存map処理
-    // -----------------------------
-    else {
-
-        // ① 先に移動だけ実行
-        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-
-        // ② タイル差し替えは遅延（ここが重要）
-        setTimeout(() => {
-
-            if (window.currentTileLayer) {
-                window.map.removeLayer(window.currentTileLayer);
-                window.currentTileLayer = null;
-            }
-
-            window.currentTileLayer = L.tileLayer(tileUrl, {
-                attribution: '© 国土地理院',
-                keepBuffer: 8
-            }).addTo(window.map);
-
-        }, 0);
-
-        // -------------------------
-        // UI制御
-        // -------------------------
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
             : window.map.scrollWheelZoom.disable();
@@ -307,7 +282,26 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         mapOptions.touchZoom
             ? window.map.touchZoom.enable()
             : window.map.touchZoom.disable();
+
+        if (window.map.tap) {
+            mapOptions.tap
+                ? window.map.tap.enable()
+                : window.map.tap.disable();
+        }
+    } else {
+        window.map = L.map('lf-map', mapOptions);
+        window.map.options.zoomSnap = 0.5;
+        window.map.options.zoomDelta = 0.5;
+        window.map.attributionControl.setPosition('topright');
+
+if (!window.currentTileLayer) {
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }).addTo(window.map);
+}
     }
+
 
     window.currentHash = location.hash;
 
@@ -315,6 +309,8 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         showPrefSpots();
     }
 }
+
+
 
 
 function prefetchAround(area) {
