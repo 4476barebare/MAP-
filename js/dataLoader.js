@@ -439,8 +439,11 @@ function enableDragForArea() {
     if (!window.areaBounds) return;
 
     window.map.dragging.enable();
-    window.map.setMaxBounds(window.areaBounds);
+    
+    setTimeout(() => {
+    window.map.setMaxBounds(bounds);
     window.map.options.maxBoundsViscosity = 1.0;
+}, 0);
 }
 
 function goBack() {
