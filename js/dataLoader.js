@@ -1030,9 +1030,8 @@ function goBack() {
     // area → pref
     // =====================================================
     
-if (window.markerControl?.shop01Layer) {
-    window.map.removeLayer(window.markerControl.shop01Layer);
-    window.markerControl.shop01Layer = null;
+if (window.phase1Group) {
+    window.phase1Group.clearLayers();
 }
 // エリアマーカー削除
 if (window.areaSpotLayer) {
