@@ -47,17 +47,26 @@ function preloadShop01(url) {
 function showShop01(areaKey) {
     if (!window.map) return;
 
-    window.map.invalidateSize(true);
-
-    if (!markerControl.shop01Layer || !window.map.hasLayer(markerControl.shop01Layer)) {
-        markerControl.shop01Layer = L.layerGroup().addTo(window.map);
-    }
-
     const shops = markerControl.shop01AreaCache[areaKey] || [];
     if (!shops.length) return;
 
-    markerControl.shop01Layer.clearLayers();
+    // -------------------------
+    // phase1Groupに統合（ここが本体）
+    // -------------------------
+    if (!window.phase1Group) {
+        window.phase1Group = L.layerGroup().addTo(window.map);
+    }
 
+    // 既存shop01だけ消す（グループ内管理）
+    window.phase1Group.eachLayer(layer => {
+        if (layer.options && layer.options._shop01) {
+            window.phase1Group.removeLayer(layer);
+        }
+    });
+
+    // -------------------------
+    // 描画
+    // -------------------------
     for (let i = 0; i < shops.length; i++) {
         const s = shops[i];
 
@@ -71,7 +80,10 @@ function showShop01(areaKey) {
             fillOpacity: 1
         });
 
-        marker.addTo(markerControl.shop01Layer);
+        // ★識別フラグ
+        marker.options._shop01 = true;
+
+        window.phase1Group.addLayer(marker);
     }
 }
 

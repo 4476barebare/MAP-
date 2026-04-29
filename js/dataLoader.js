@@ -8,6 +8,8 @@ window.prefData = null;
 window.areaData = [];
 window.spotData = []
 window.currentAreaId = null;
+window.phase1Group = L.layerGroup().addTo(map);
+window.phase2Group = L.layerGroup().addTo(map);
 
 function loadLocationCSV(csvUrl) {
 
@@ -310,48 +312,56 @@ function prefetchAround(area) {
 
 function selectArea(area) {
 
-    // -------------------------
-    // オブジェクト解決（互換対応）
-    // -------------------------
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
         : area;
 
     if (!areaObj) return;
 
-    // -------------------------
-    // スポットレイヤー削除
-    // -------------------------
+    // =========================
+    // phase2停止
+    // =========================
+    disablePhase2(window.map);
+
+    // =========================
+    // レイヤー整理（既存流用）
+    // =========================
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
     }
 
-    // -------------------------
-    // shop01削除
-    // -------------------------
-    if (window.markerControl && markerControl.shop01Layer) {
+    if (window.markerControl?.shop01Layer) {
         window.map.removeLayer(markerControl.shop01Layer);
         markerControl.shop01Layer = null;
     }
 
-    // -------------------------
-    // prefレイヤー削除
-    // -------------------------
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
     }
 
-    // -------------------------
-    // リクエストID
-    // -------------------------
+    // =========================
+    // タイル（phase1固定）
+    // =========================
+    const tileUrl =
+        'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer = L.tileLayer(tileUrl, {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }).addTo(window.map);
+
+    // =========================
+    // 中核処理（そのまま維持）
+    // =========================
     const reqId = Date.now();
     window._shop01RequestId = reqId;
 
-    // -------------------------
-    // 事前処理
-    // -------------------------
     prefetchAround(areaObj);
 
     drawLocation(
@@ -364,16 +374,15 @@ function selectArea(area) {
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    // -------------------------
-    // moveend後処理
-    // -------------------------
+    // =========================
+    // moveend後処理（既存維持）
+    // =========================
     window.map.once('moveend', () => {
 
         window.map.invalidateSize(true);
         enableDragForArea();
 
         showSpotsForArea(window.currentAreaId);
-
         enableAreaSwipe();
 
         if (window._shop01RequestId !== reqId) return;
