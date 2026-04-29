@@ -427,11 +427,10 @@ function selectArea(area) {
 function saveMapState() {
     window.mapStateSnapshot = {
         tileLayer: window.map.hasLayer(window.tileLayers.gsi)
-        ? window.tileLayers.gsi
-        : window.tileLayers.osm,
-
-    center: window.map.getCenter(),
-    zoom: window.map.getZoom()
+            ? window.tileLayers.gsi
+            : window.tileLayers.osm,
+        center: window.map.getCenter(),
+        zoom: window.map.getZoom()
     };
 }
 
@@ -1006,16 +1005,21 @@ if (window.areaSpotLayer) {
         if (window.phase1Group) {
             window.phase1Group.addTo(window.map);
         }
-        if (s && s.tileLayer) {
-            Object.values(window.tileLayers).forEach(layer => {
-                if (window.map.hasLayer(layer)) {
-                    window.map.removeLayer(layer);
-                }
-            });
-        s.tileLayer.addTo(window.map);
-        window.map.setView(s.center, s.zoom);
+
+if (s && s.tileLayer) {
+
+    Object.values(window.tileLayers).forEach(layer => {
+        if (window.map.hasLayer(layer)) {
+            window.map.removeLayer(layer);
         }
-        }else{
+    });
+
+    s.tileLayer.addTo(window.map);
+
+    window.map.setView(s.center, s.zoom);
+}
+
+        else{
             selectArea(area);
         }
     }
