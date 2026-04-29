@@ -1058,7 +1058,7 @@ if (window.markerControl?.shop01Layer) {
     markerControl.shop01Layer = null;
 }
 
-const z = window.map.getZoom();
+
     const z = window.map.getZoom();
 
     if (z >= 12.8) {
