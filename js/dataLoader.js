@@ -308,51 +308,73 @@ function prefetchAround(area) {
     });
 }
 
-function selectArea(areaName) {
+function selectArea(area) {
 
+    // -------------------------
+    // オブジェクト解決（互換対応）
+    // -------------------------
+    const areaObj = typeof area === 'string'
+        ? window.areaData.find(a => a.name === area)
+        : area;
+
+    if (!areaObj) return;
+
+    // -------------------------
+    // スポットレイヤー削除
+    // -------------------------
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
     }
 
+    // -------------------------
+    // shop01削除
+    // -------------------------
     if (window.markerControl && markerControl.shop01Layer) {
         window.map.removeLayer(markerControl.shop01Layer);
         markerControl.shop01Layer = null;
     }
 
-    const area = window.areaData.find(a => a.name === areaName);
-    if (!area) return;
-
+    // -------------------------
+    // prefレイヤー削除
+    // -------------------------
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
     }
 
+    // -------------------------
+    // リクエストID
+    // -------------------------
     const reqId = Date.now();
     window._shop01RequestId = reqId;
-    
-    prefetchAround(area);
+
+    // -------------------------
+    // 事前処理
+    // -------------------------
+    prefetchAround(areaObj);
 
     drawLocation(
-        area.name,
-        area.lat,
-        area.lng,
-        area.zoom || window.prefData.zoom
+        areaObj.name,
+        areaObj.lat,
+        areaObj.lng,
+        areaObj.zoom || window.prefData.zoom
     );
 
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-
-
+    // -------------------------
+    // moveend後処理
+    // -------------------------
     window.map.once('moveend', () => {
-        
+
         window.map.invalidateSize(true);
         enableDragForArea();
 
         showSpotsForArea(window.currentAreaId);
-        
-        enableAreaSwipe(); // ←これ追加
+
+        enableAreaSwipe();
 
         if (window._shop01RequestId !== reqId) return;
 
@@ -414,10 +436,6 @@ function enableDragForArea() {
 }
 
 function showSpotsForArea(areaKey) {
-
-    // =========================
-    // 初期化
-    // =========================
 
     // 既存マーカー削除
     window.map.eachLayer(layer => {
@@ -499,10 +517,8 @@ function showSpotsForArea(areaKey) {
 
             location.hash += '/' + safeSpot.individualId;
             updateStateFromHash();
-
             zoomToSpot(safeSpot);
         });
-
         // =========================
         // map追加 & 管理登録
         // =========================
@@ -512,23 +528,13 @@ function showSpotsForArea(areaKey) {
         window.spotMarkers.push(marker);
         window.markerMap.set(spot.id, marker);
 
-        // 初期状態（必要なら）
-
-        // =========================
-        // バウンディング計算
-        // =========================
-
         minLat = Math.min(minLat, spot.lat);
         maxLat = Math.max(maxLat, spot.lat);
         minLng = Math.min(minLng, spot.lng);
         maxLng = Math.max(maxLng, spot.lng);
         
     });
-
-    // =========================
-    // エリアバウンス設定
-    // =========================
-
+    
     const latSize = maxLat - minLat;
     const lngSize = maxLng - minLng;
 
@@ -997,22 +1003,17 @@ function updateStateFromHash() {
 
 function goBack() {
 
-    // -----------------------
-    // mapリセット
-    // -----------------------
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     window.areaBounds = null;
 
     resetSpotLayers();
 
-    const areaId = window.currentAreaId;
-    const spotId = window.currentSpotId;
-
-    const rawId = areaId.split('_')[1];
-
-    const area = window.areaData.find(
-        a => String(a.individualId) === rawId
+    // -----------------------
+    // areaだけオブジェクト化
+    // -----------------------
+    const area = window.areaData.find(a =>
+        String(a.individualId) === String(window.currentAreaId?.split('_')[1])
     );
 
     if (!area) return;
@@ -1020,21 +1021,18 @@ function goBack() {
     // =====================================================
     // spot → area
     // =====================================================
-    if (spotId) {
+    if (window.currentSpotId) {
 
-        const spotKey = spotId.split('_')[2];
+        const spotKey = window.currentSpotId.split('_')[2];
 
         const spot = window.spotData.find(
             s =>
                 String(s.individualId) === String(spotKey) &&
-                String(s.areaId) === String(areaId)
+                String(s.areaId) === String(window.currentAreaId)
         );
 
         if (!spot) return;
 
-        const spotName = spot.name;
-
-        // map状態復帰（areaモード）
         window.map.dragging.enable();
         window.map.scrollWheelZoom.disable();
         window.map.doubleClickZoom.disable();
@@ -1042,12 +1040,12 @@ function goBack() {
 
         enableDragForArea();
         showSpotsForArea(window.currentAreaId);
-        // URLからspot削除 → state再同期
+
         location.hash = location.hash.replace('/' + spotKey, '');
         updateStateFromHash();
-    
-        // spot復帰描画
-        selectSpot(area.name, spotName, spot.lat, spot.lng);
+
+        // ★ここはそのまま維持
+        selectSpot(area.name, spot.name, spot.lat, spot.lng);
         return;
     }
 
@@ -1057,7 +1055,7 @@ function goBack() {
     const z = window.map.getZoom();
 
     if (z >= 12.8) {
-        selectArea(area.name);
+        selectArea(area);
         return;
     }
 
