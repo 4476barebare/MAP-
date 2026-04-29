@@ -558,7 +558,9 @@ let phase2Initialized = false;
 let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
-    alert("呼び出し");
+    showDebug("P2: enter");
+showDebug("P2: map exists=" + !!map);
+showDebug("P2: spotData=" + !!window.spotData);
 
     if (map._phase2Handler) return;
 
