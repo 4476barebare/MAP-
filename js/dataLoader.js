@@ -275,22 +275,29 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
 function showPrefSpots() {
 
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+    }
+
     window.prefSpotLayer = L.layerGroup();
 
-    const spots = window.spotData.filter(s =>
-        s.icon === 'spot' || (s.icon && s.icon.startsWith('fish'))
-    );
+    window.spotData.forEach(spot => {
 
-    spots.forEach(spot => {
+        if (!spot.icon) return;
 
-        const iconId = spot.icon || 'spot';
+        let type = 'spot';
+
+        if (spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish\d+/);
+            if (match) type = match[0];
+        }
 
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
                 className: '',
-                html: `<div class="pref-dot ${iconId}"></div>`,
-                iconSize: [6, 6],
-                iconAnchor: [3, 3]
+                html: `<div class="pref-dot ${type}"></div>`,
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
             }),
             interactive: false
         });
@@ -789,47 +796,7 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
     });
 });
 
-function showPrefSpots() {
 
-    if (!window.prefSpotLayer) {
-
-        const layer = L.layerGroup();
-
-        window.spotData.forEach(spot => {
-            if (!spot.icon) return;
-
-            let type = 'spot';
-
-            if (spot.icon.startsWith('fish')) {
-                const match = spot.icon.match(/fish\d+/);
-                if (match) type = match[0];
-            }
-
-            const html = `<div class="pref-dot ${type}"></div>`;
-
-            const marker = L.marker(
-                [spot.lat, spot.lng],
-                {
-                    icon: L.divIcon({
-                        className: '',
-                        html: html,
-                        iconSize: [5, 5],
-                        iconAnchor: [2.5, 2.5]
-                    }),
-                    interactive: false
-                }
-            );
-
-            layer.addLayer(marker);
-        });
-
-        window.prefSpotLayer = layer;
-    }
-
-    if (!window.map.hasLayer(window.prefSpotLayer)) {
-        window.prefSpotLayer.addTo(window.map);
-    }
-}
 
 function showFishPopup(marker, spot) {
 
