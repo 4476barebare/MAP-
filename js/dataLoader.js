@@ -1004,9 +1004,11 @@ const popupHtml = `
 
 
 function zoomToSpot(safeSpot) {
+    alert(safeSpot.zoom);
     clearSpotMenu();
     disablePhase2(window.map);
     switchToGSIPhoto();
+    window.map.stop(); // flyTo中断
     
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
