@@ -1005,24 +1005,21 @@ if (window.areaSpotLayer) {
         
         const s = window.mapStateSnapshot;
         
-
+        if (window.phase2Group) {
+            window.phase2Group.clearLayers();
+        }
+        if (window.phase1Group) {
+            window.phase1Group.addTo(window.map);
+        }
         
         if (s) {
-
-    if (window.phase2Group) {
-        window.phase2Group.clearLayers();
-    }
-
-    if (window.phase1Group) {
-        window.phase1Group.addTo(window.map);
-    }
 
     // ★ここ修正
     const type = s.tileType;
 
     
         window.map.removeLayer(window.currentTileLayer);
-    }
+    
 
     window.currentTileLayer = window.tileLayers[type];
     window.currentTileLayer.addTo(window.map);
