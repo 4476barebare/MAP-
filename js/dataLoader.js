@@ -1040,8 +1040,8 @@ function zoomToSpot(safeSpot) {
         window.map.setMaxZoom(18);
 
         const bounds = window.map.getBounds();
-        window.map.setMaxBounds(bounds);
-        window.map.options.maxBoundsViscosity = 1.0;
+        //window.map.setMaxBounds(bounds);
+        //window.map.options.maxBoundsViscosity = 1.0;
 
         window._zoomGuardBase = safeSpot.zoom;
         window._zoomGuardActive = true;
