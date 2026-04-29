@@ -245,21 +245,17 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
     if (window.map) {
         
-       
-       window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-
-window.map.once('moveend', function () {
+        window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
     if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
+            window.map.removeLayer(window.currentTileLayer);
+        }
 
-    window.currentTileLayer =
-        L.tileLayer(tileUrl, {
-            attribution: '© 国土地理院',
-            keepBuffer: 8
-        }).addTo(window.map);
-});
+        window.currentTileLayer =
+    L.tileLayer(tileUrl, {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }).addTo(window.map);
 
         mapOptions.scrollWheelZoom
             ? window.map.scrollWheelZoom.enable()
