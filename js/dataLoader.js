@@ -695,21 +695,17 @@ function processSpotUtils(map, spots, mode) {
     }
 }
 
-//let spotMenuClickEnabled = true;
-
 function updateSpotMenu(spots, map) {
 
     const menu = document.getElementById("map-menu");
-    const ul = document.querySelector("#map-menu ul");
+    const ul = menu.querySelector("ul");
     if (!ul) return;
+
     menu.classList.add("phase2-lock");
 
     const MAX = 6;
     const center = map.getCenter();
 
-    // =========================
-    // 既存DOMから状態取得
-    // =========================
     const existing = new Set(
         Array.from(ul.children).map(li => li.dataset.key)
     );
@@ -718,12 +714,10 @@ function updateSpotMenu(spots, map) {
         key: li.dataset.key,
         text: li.textContent,
         lat: +li.dataset.lat,
-        lng: +li.dataset.lng
+        lng: +li.dataset.lng,
+        dist: (li.dataset.lat - center.lat) ** 2 + (li.dataset.lng - center.lng) ** 2
     }));
 
-    // =========================
-    // 新規追加
-    // =========================
     for (const s of spots) {
 
         const key = s.id || s.name;
@@ -739,9 +733,6 @@ function updateSpotMenu(spots, map) {
         });
     }
 
-    // =========================
-    // 遠い順削除
-    // =========================
     while (buffer.length > MAX) {
 
         let far = 0;
@@ -755,67 +746,42 @@ function updateSpotMenu(spots, map) {
         buffer.splice(far, 1);
     }
 
-    // =========================
-    // 描画
-    // =========================
-    ul.innerHTML = buffer
-        .map(i => `
-            <li 
-                class="new-item"
-                data-key="${i.key}" 
-                data-lat="${i.lat}" 
-                data-lng="${i.lng}"
-            >
-                <span class="spot-text">${i.text}</span>
-            </li>
-        `)
-        .join("");
+    ul.innerHTML = buffer.map(i => `
+        <li class="new-item"
+            data-key="${i.key}"
+            data-lat="${i.lat}"
+            data-lng="${i.lng}">
+            <span class="spot-text">${i.text}</span>
+        </li>
+    `).join("");
 
-    // =========================
-    // 表示制御
-    // =========================
     if (buffer.length > 0) {
         menu.style.display = "block";
     }
 
-    // =========================
-    // アニメーション
-    // =========================
+    // -------------------------
+    // ここで統合クリック
+    // -------------------------
+    ul.onclick = (e) => {
+        showDebug(li.dataset.key);
+
+        const text = e.target.closest(".spot-text");
+        if (!text) return;
+
+        const li = text.closest("li");
+
+        window.map.flyTo(
+            [Number(li.dataset.lat), Number(li.dataset.lng)],
+            13,
+            { animate: true, duration: 0.6 }
+        );
+    };
+
     requestAnimationFrame(() => {
-        document.querySelectorAll("#map-menu li.new-item")
+        ul.querySelectorAll("li.new-item")
             .forEach(el => el.classList.add("show"));
     });
 }
-
-document.getElementById("map-menu").addEventListener("click", (e) => {
-
-    //if (!spotMenuClickEnabled) return;
-
-    const li = e.target.closest("li");
-    //if (!li) return;
-
-    const menu = document.getElementById("map-menu");
-
-    const lat = parseFloat(li.dataset.lat);
-    const lng = parseFloat(li.dataset.lng);
-    //if (!lat || !lng) return;
-
-    // =========================
-    // Phase2時だけ「テキスト以外は無効」
-    // =========================
-    //if (menu.classList.contains("phase2-lock")) {
-
-        // テキスト以外クリックなら無視
-        if (!e.target.classList.contains("spot-text")) return;
-    //}
-
-    window.map.flyTo([lat, lng], 13, {
-        animate: true,
-        duration: 0.6
-    });
-});
-
-
 
 function showFishPopup(marker, spot) {
 
