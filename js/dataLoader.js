@@ -410,7 +410,7 @@ function selectArea(area) {
     // prefetch
     // -------------------------
     showDebug("SA: prefetch start");
-    prefetchAround(areaObj);
+    //prefetchAround(areaObj);
     showDebug("SA: prefetch end");
 
     // -------------------------
