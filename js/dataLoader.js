@@ -328,40 +328,49 @@ function prefetchAround(area) {
 
 function selectArea(area) {
 
+    alert("01: enter selectArea");
+
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
         : area;
 
-    if (!areaObj) return;
+    alert("02: resolved areaObj");
 
-    // =========================
-    // phase2停止
-    // =========================
+    if (!areaObj) {
+        alert("03: areaObj NULL");
+        return;
+    }
+
+    alert("04: before phase2 disable");
     disablePhase2(window.map);
 
-    // =========================
-    // レイヤー整理（既存流用）
-    // =========================
+    alert("05: after phase2 disable");
+
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
     }
+
+    alert("06: spotLayer cleared");
 
     if (window.markerControl?.shop01Layer) {
         window.map.removeLayer(markerControl.shop01Layer);
         markerControl.shop01Layer = null;
     }
 
+    alert("07: shop01Layer cleared");
+
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
     }
 
-    // =========================
-    // タイル（phase1固定）
-    // =========================
+    alert("08: prefSpotLayer cleared");
+
     const tileUrl =
         'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
+
+    alert("09: before tile");
 
     if (window.currentTileLayer) {
         window.map.removeLayer(window.currentTileLayer);
@@ -372,13 +381,16 @@ function selectArea(area) {
         keepBuffer: 8
     }).addTo(window.map);
 
-    // =========================
-    // 中核処理（そのまま維持）
-    // =========================
+    alert("10: after tile");
+
     const reqId = Date.now();
     window._shop01RequestId = reqId;
 
+    alert("11: before prefetch");
+
     prefetchAround(areaObj);
+
+    alert("12: after prefetch");
 
     drawLocation(
         areaObj.name,
@@ -387,13 +399,16 @@ function selectArea(area) {
         areaObj.zoom || window.prefData.zoom
     );
 
+    alert("13: after drawLocation");
+
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    // =========================
-    // moveend後処理（既存維持）
-    // =========================
+    alert("14: UI updated");
+
     window.map.once('moveend', () => {
+
+        alert("15: moveend");
 
         window.map.invalidateSize(true);
         enableDragForArea();
@@ -405,6 +420,9 @@ function selectArea(area) {
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+
+                alert("16: shop01 render");
+
                 markerControl.showShop01(window.currentAreaId);
             });
         });
