@@ -563,11 +563,8 @@ function enablePhase2(map) {
     showDebug("P2: map exists=" + !!map);
     showDebug("P2: spotData=" + !!window.spotData);
 
-    if (map._phase2Handler) return;
-
-    lastVisibleSet = new Set();
-    phase2Initialized = false;
-
+    //if (map._phase2Handler) return;
+    showDebug("ここまで");
     const runPhase2 = () => {
 
         showDebug("P2: runPhase2 fired");
