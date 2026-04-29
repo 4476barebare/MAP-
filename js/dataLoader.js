@@ -1013,14 +1013,13 @@ function zoomToSpot(safeSpot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
     
-    window.map.once('moveend', () => {
     drawLocation(
         safeSpot.name,
         safeSpot.lat,
         safeSpot.lng,
         safeSpot.zoom
     );
-    });
+    
     resetSpotLayers();
     
     window.map.once('moveend', function () {
