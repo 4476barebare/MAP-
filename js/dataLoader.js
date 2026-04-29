@@ -517,14 +517,17 @@ function selectSpot(spot) {
 
     disableAreaSwipe();
 
-    window.map.once('moveend', () => {
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-        enableDragForArea();
-    });
-
+    window.map.dragging.enable();
+    window.map.scrollWheelZoom.enable();
+    window.map.doubleClickZoom.enable();
+    window.map.touchZoom.enable();
+    if (window.areaBounds) {
+        window.map.setMaxBounds(window.areaBounds);
+        window.map.options.maxBoundsViscosity = 1.0;
+    } else {
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+    }
     enablePhase2(window.map);
 }
 
