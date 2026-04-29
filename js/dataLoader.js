@@ -362,7 +362,7 @@ function selectArea(area) {
     // -------------------------
     // phase2停止
     // -------------------------
-    // disablePhase2(window.map);
+    disablePhase2(window.map);
 
     // -------------------------
     // レイヤー削除
@@ -763,8 +763,6 @@ function updateSpotMenu(spots, map) {
     // ここで統合クリック
     // -------------------------
     ul.onclick = (e) => {
-        showDebug("反応");
-
         const text = e.target.closest(".spot-text");
         if (!text) return;
 
