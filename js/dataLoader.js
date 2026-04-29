@@ -711,18 +711,11 @@ let lastVisibleSet = new Set();
 
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
-    // =========================================================
-    // ■安定化（連打・move直後のズレ対策）
-    // =========================================================
     requestAnimationFrame(() => {
-        
+
         const bounds = map.getBounds().pad(0.2);
-        const visibleSpots = spots.filter(s =>
-        bounds.contains([s.lat, s.lng])
-        );
-        // =====================================================
-        // ■視界内スポットを毎回フル取得（差分禁止）
-        // =====================================================
+
+        // ★ここは1回だけ
         const visibleSpots = spots.filter(s =>
             bounds.contains([s.lat, s.lng])
         );
@@ -730,28 +723,16 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         const spotTargets = visibleSpots.filter(s => s.icon === "spot");
         const otherTargets = visibleSpots.filter(s => s.icon !== "spot");
 
-        // =====================================================
-        // ■spot処理（プリフェッチ + メニュー更新）
-        // =====================================================
         if (spotTargets.length > 0) {
 
-            // タイルプリフェッチ（毎回補強）
             processSpotUtils(map, spotTargets, "prefetch");
-
-            // メニュー再構築（欠損防止）
             updateSpotMenu(spotTargets, map);
         }
 
-        // =====================================================
-        // ■その他（必要なら拡張）
-        // =====================================================
         if (otherTargets.length > 0) {
-            // 今は未使用
+            // 未使用
         }
 
-        // =====================================================
-        // ■状態保持（必要ならmarkerMap側で使う）
-        // =====================================================
         lastVisibleSet = new Set(
             visibleSpots.map(s => s.name)
         );
