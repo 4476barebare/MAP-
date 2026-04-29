@@ -425,17 +425,11 @@ function selectArea(area) {
 
 function showSpotsForArea(areaKey) {
 
-    // -------------------------
-    // 県ドット削除
-    // -------------------------
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
     }
 
-    // -------------------------
-    // エリアレイヤー再利用
-    // -------------------------
     if (!window.areaSpotLayer) {
         window.areaSpotLayer = L.layerGroup().addTo(window.map);
     } else {
@@ -444,6 +438,9 @@ function showSpotsForArea(areaKey) {
 
     const spots = window.spotData.filter(s => s.areaId === areaKey);
     if (!spots.length) return;
+
+    let minLat = Infinity, maxLat = -Infinity;
+    let minLng = Infinity, maxLng = -Infinity;
 
     spots.forEach(spot => {
 
@@ -473,15 +470,27 @@ function showSpotsForArea(areaKey) {
                 lat: spot.lat,
                 lng: spot.lng,
                 zoom: spot.zoom,
-                individualId: spot.individualId || spot.id || ''});
-                });
-            window.areaSpotLayer.addLayer(marker);
+                individualId: spot.individualId || spot.id || ''
+            });
         });
+
+        window.areaSpotLayer.addLayer(marker);
+
+        minLat = Math.min(minLat, spot.lat);
+        maxLat = Math.max(maxLat, spot.lat);
+        minLng = Math.min(minLng, spot.lng);
+        maxLng = Math.max(maxLng, spot.lng);
+    });
+
+    const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
+    const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
+
     window.areaBounds = L.latLngBounds(
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
+
 
 function selectSpot(spot) {
 
