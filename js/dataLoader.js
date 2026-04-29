@@ -518,6 +518,10 @@ function selectSpot(spot) {
     disableAreaSwipe();
 
     window.map.once('moveend', () => {
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
         enableDragForArea();
     });
 
