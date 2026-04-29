@@ -238,7 +238,10 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
                 keepBuffer: 8
             }
         ).addTo(window.map);
-
+        
+        if (window.currentAreaId === null) {
+            showPrefSpots();
+        }
         return;
     }
 
@@ -268,6 +271,34 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     mapOptions.touchZoom
         ? window.map.touchZoom.enable()
         : window.map.touchZoom.disable();
+}
+
+function showPrefSpots() {
+
+    window.prefSpotLayer = L.layerGroup();
+
+    const spots = window.spotData.filter(s =>
+        s.icon === 'spot' || (s.icon && s.icon.startsWith('fish'))
+    );
+
+    spots.forEach(spot => {
+
+        const iconId = spot.icon || 'spot';
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: '',
+                html: `<div class="pref-dot ${iconId}"></div>`,
+                iconSize: [6, 6],
+                iconAnchor: [3, 3]
+            }),
+            interactive: false
+        });
+
+        window.prefSpotLayer.addLayer(marker);
+    });
+
+    window.prefSpotLayer.addTo(window.map);
 }
 
 function prefetchAround(area) {
@@ -436,29 +467,24 @@ function enableDragForArea() {
 
 function showSpotsForArea(areaKey) {
 
-    // 既存マーカー削除
-    window.map.eachLayer(layer => {
-        if (layer instanceof L.Marker) {
-            window.map.removeLayer(layer);
-        }
-    });
+    // -------------------------
+    // 県ドットを消す
+    // -------------------------
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+    }
 
-    // ラベルDOM削除
-    document.querySelectorAll('.spot-label').forEach(el => el.remove());
-
-    // 状態リセット
-    window.spotMarkers = [];
-    window.markerMap = new Map();
+    // -------------------------
+    // エリアレイヤー準備
+    // -------------------------
+    if (!window.spotLayer) {
+        window.spotLayer = L.layerGroup().addTo(window.map);
+    } else {
+        window.spotLayer.clearLayers();
+    }
 
     const spots = window.spotData.filter(s => s.areaId === areaKey);
     if (!spots.length) return;
-
-    let minLat = Infinity, maxLat = -Infinity;
-    let minLng = Infinity, maxLng = -Infinity;
-
-    // =========================
-    // マーカー生成
-    // =========================
 
     spots.forEach(spot => {
 
@@ -475,75 +501,27 @@ function showSpotsForArea(areaKey) {
                         </svg>
                         <span>${spot.name}</span>
                     </div>
-                `,
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
+                `
             }),
             zIndexOffset: isFish
                 ? 600 + Math.floor(Math.random() * 50)
                 : Math.floor(Math.random() * 500)
         });
 
-        // =========================
-        // クリック処理
-        // =========================
-
         marker.on('click', function () {
-
-            const zoom = window.map.getZoom();
-
-            const isPhase1 =
-                window.currentAreaId &&
-                zoom <= 12 &&
-                !window.currentSpotId;
-
-            if (isPhase1) {
-                selectSpot(areaKey, spot.name, spot.lat, spot.lng);
-                return;
-            }
-            if (isFish) {
-                showFishPopup(marker, spot);
-                return;
-            }
-
-            const safeSpot = {
+            zoomToSpot({
                 name: spot.name,
                 lat: spot.lat,
                 lng: spot.lng,
                 zoom: spot.zoom,
                 individualId: spot.individualId || spot.id || ''
-            };
-
-            location.hash += '/' + safeSpot.individualId;
-            updateStateFromHash();
-            zoomToSpot(safeSpot);
+            });
         });
-        // =========================
-        // map追加 & 管理登録
-        // =========================
 
-        marker.addTo(window.map);
-
-        window.spotMarkers.push(marker);
-        window.markerMap.set(spot.id, marker);
-
-        minLat = Math.min(minLat, spot.lat);
-        maxLat = Math.max(maxLat, spot.lat);
-        minLng = Math.min(minLng, spot.lng);
-        maxLng = Math.max(maxLng, spot.lng);
-        
+        window.spotLayer.addLayer(marker);
     });
-    
-    const latSize = maxLat - minLat;
-    const lngSize = maxLng - minLng;
 
-    const latBuffer = Math.max(latSize * 0.2, 0.05);
-    const lngBuffer = Math.max(lngSize * 0.2, 0.05);
-
-    window.areaBounds = L.latLngBounds(
-        [minLat - latBuffer, minLng - lngBuffer],
-        [maxLat + latBuffer, maxLng + lngBuffer]
-    );
+    window.spotLayer.addTo(window.map);
 }
 
 let phase2Initialized = false;
