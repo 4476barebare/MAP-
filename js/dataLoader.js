@@ -426,9 +426,12 @@ function selectArea(area) {
 
 function saveMapState() {
     window.mapStateSnapshot = {
-        center: window.map.getCenter(),
-        zoom: window.map.getZoom(),
-        tileType: window.currentTileType || 'gsi'
+        tileLayer: window.map.hasLayer(window.tileLayers.gsi)
+        ? window.tileLayers.gsi
+        : window.tileLayers.osm,
+
+    center: window.map.getCenter(),
+    zoom: window.map.getZoom()
     };
 }
 
@@ -940,15 +943,7 @@ function updateStateFromHash() {
 
 function goBack() {
 
-    //window.map.setMaxBounds(null);
-    //window.map.options.maxBoundsViscosity = 0;
-    //window.areaBounds = null;
 
-    //resetSpotLayers();
-
-    // -----------------------
-    // areaだけオブジェクト化
-    // -----------------------
     const area = window.areaData.find(a =>
         String(a.individualId) === String(window.currentAreaId?.split('_')[1])
     );
@@ -1012,22 +1007,18 @@ if (window.areaSpotLayer) {
             window.phase1Group.addTo(window.map);
         }
         
-        if (s) {
+          if (s && s.tileLayer) {
 
-    // ★ここ修正
-    const type = s.tileType;
+        Object.values(window.tileLayers).forEach(layer => {
+            if (window.map.hasLayer(layer)) {
+                window.map.removeLayer(layer);
+            }
+        });
 
-    
-        window.map.removeLayer(window.currentTileLayer);
-    
-
-    window.currentTileLayer = window.tileLayers[type];
-    window.currentTileLayer.addTo(window.map);
-
-    window.currentTileType = type;
-
-    window.map.setView(s.center, s.zoom);
-        disablePhase2(window.map);
+        s.tileLayer.addTo(window.map);
+    }
+window.map.setView(s.center, s.zoom);
+    //
         }else{
             selectArea(area);
         }
