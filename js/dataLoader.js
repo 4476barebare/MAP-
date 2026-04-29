@@ -708,7 +708,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
     requestAnimationFrame(() => {
 
-        const bounds = map.getBounds().pad(0.2);
+        const bounds = map.getBounds().pad(0.5);
 
         // ★ここは1回だけ
         const visibleSpots = spots.filter(s =>
