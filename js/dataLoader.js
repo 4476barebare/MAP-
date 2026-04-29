@@ -803,11 +803,11 @@ document.getElementById("map-menu").addEventListener("click", (e) => {
     // =========================
     // Phase2時だけ「テキスト以外は無効」
     // =========================
-    if (menu.classList.contains("phase2-lock")) {
+    //if (menu.classList.contains("phase2-lock")) {
 
         // テキスト以外クリックなら無視
         if (!e.target.classList.contains("spot-text")) return;
-    }
+    //}
 
     window.map.flyTo([lat, lng], 13, {
         animate: true,
