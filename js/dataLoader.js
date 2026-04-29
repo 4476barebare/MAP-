@@ -417,10 +417,19 @@ function selectArea(area) {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
+                saveMapState();
             });
         });
     });
     disablePhase2(window.map);
+}
+
+function saveMapState() {
+    window.mapStateSnapshot = {
+        center: window.map.getCenter(),
+        zoom: window.map.getZoom(),
+        tileType: window.currentTileType || 'gsi'
+    };
 }
 
 function showSpotsForArea(areaKey) {
@@ -993,17 +1002,39 @@ if (window.areaSpotLayer) {
     const z = window.map.getZoom();
 
     if (z >= 12.8) {
-        selectArea(area);
         
+        const s = window.mapStateSnapshot;
+        
+
+        
+        if (s) {
+
+    if (window.phase2Group) {
+        window.phase2Group.clearLayers();
+    }
+
+    if (window.phase1Group) {
+        window.phase1Group.addTo(window.map);
+    }
+
+    // ★ここ修正
+    const type = s.tileType;
+
+    
+        window.map.removeLayer(window.currentTileLayer);
+    }
+
+    window.currentTileLayer = window.tileLayers[type];
+    window.currentTileLayer.addTo(window.map);
+
+    window.currentTileType = type;
+
+    window.map.setView(s.center, s.zoom);
         disablePhase2(window.map);
-        if (window.phase2Group) {
-            window.phase2Group.clearLayers();
-        }
-        if (window.phase1Group) {
-            window.phase1Group.addTo(window.map);
+        }else{
+            selectArea(area);
         }
         
-        return
     }
 
     drawLocation(
