@@ -712,57 +712,48 @@ let lastVisibleSet = new Set();
 function updatePhase2NearestSpot(map, spots, markerMap) {
 
     // =========================================================
-    // ■視界取得
+    // ■安定化（連打・move直後のズレ対策）
     // =========================================================
-    const bounds = map.getBounds();
+    requestAnimationFrame(() => {
 
-    const visibleSpots = spots.filter(s =>
-        bounds.contains([s.lat, s.lng])
-    );
+        const bounds = map.getBounds();
 
-    const currentVisible = new Set(
-        visibleSpots.map(s => s.name)
-    );
+        // =====================================================
+        // ■視界内スポットを毎回フル取得（差分禁止）
+        // =====================================================
+        const visibleSpots = spots.filter(s =>
+            bounds.contains([s.lat, s.lng])
+        );
 
-    // =========================================================
-    // ■差分検出（新規出現スポット）
-    // =========================================================
-    const entered = [];
+        const spotTargets = visibleSpots.filter(s => s.icon === "spot");
+        const otherTargets = visibleSpots.filter(s => s.icon !== "spot");
 
-    for (const name of currentVisible) {
-        if (!lastVisibleSet.has(name)) {
-            entered.push(name);
+        // =====================================================
+        // ■spot処理（プリフェッチ + メニュー更新）
+        // =====================================================
+        if (spotTargets.length > 0) {
+
+            // タイルプリフェッチ（毎回補強）
+            processSpotUtils(map, spotTargets, "prefetch");
+
+            // メニュー再構築（欠損防止）
+            updateSpotMenu(spotTargets, map);
         }
-    }
 
-const spotTargets = visibleSpots.filter(s => s.icon === "spot");
-const otherTargets = visibleSpots.filter(s => s.icon !== "spot");
+        // =====================================================
+        // ■その他（必要なら拡張）
+        // =====================================================
+        if (otherTargets.length > 0) {
+            // 今は未使用
+        }
 
-// =====================================================
-// ■spot処理（タイルプリフェッチ + メニュー更新）
-// =====================================================
-if (spotTargets.length > 0) {
-
-    // タイルプリフェッチ（毎回実行）
-    processSpotUtils(map, spotTargets, "prefetch");
-
-    // メニュー更新（差分依存をやめる）
-    updateSpotMenu(spotTargets, map);
-}
-
-// =====================================================
-// ■その他処理（必要なら）
-// =====================================================
-if (otherTargets.length > 0) {
-    // 将来用
-}
-
-    // =========================================================
-    // ■状態更新
-    // =========================================================
-    lastVisibleSet = currentVisible;
-
-    return null;
+        // =====================================================
+        // ■状態保持（必要ならmarkerMap側で使う）
+        // =====================================================
+        lastVisibleSet = new Set(
+            visibleSpots.map(s => s.name)
+        );
+    });
 }
 
 function processSpotUtils(map, spots, mode) {
