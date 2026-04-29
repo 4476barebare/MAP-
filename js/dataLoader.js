@@ -1020,6 +1020,7 @@ if (s && s.tileLayer) {
 }
 
         else{
+        alert("保存されてない");
             selectArea(area);
         }
     }
