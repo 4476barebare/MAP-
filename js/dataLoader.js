@@ -755,16 +755,16 @@ function processSpotUtils(map, spots, mode) {
 
             const point = map.project([s.lat, s.lng], zoom);
 
-            const tileX = Math.floor(point.x / tileSize);
-            const tileY = Math.floor(point.y / tileSize);
+            // ★ここだけ修正（境界ズレ対策）
+            const tileX = Math.floor((point.x + 1) / tileSize);
+            const tileY = Math.floor((point.y + 1) / tileSize);
 
             const url = baseUrl
-    .replace('{x}', tileX)
-    .replace('{y}', tileY);
+                .replace('{x}', tileX)
+                .replace('{y}', tileY);
 
-const img = new Image();
-img.src = url;
-
+            const img = new Image();
+            img.src = url;
         }
     }
 
