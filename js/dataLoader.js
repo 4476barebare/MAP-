@@ -720,7 +720,7 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
 
         if (spotTargets.length > 0) {
 
-            processSpotUtils(map, spotTargets, "prefetch");
+            //processSpotUtils(map, spotTargets, "prefetch");
             //updateSpotMenu(spotTargets, map);
         }
 
