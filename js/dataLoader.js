@@ -735,35 +735,27 @@ function updatePhase2NearestSpot(map, spots, markerMap) {
         }
     }
 
-    // =========================================================
-    // ■新規スポットがある場合のみ処理
-    // =========================================================
-    if (entered.length > 0) {
+const spotTargets = visibleSpots.filter(s => s.icon === "spot");
+const otherTargets = visibleSpots.filter(s => s.icon !== "spot");
 
-        const enteredSpots = visibleSpots.filter(s =>
-            entered.includes(s.name)
-        );
+// =====================================================
+// ■spot処理（タイルプリフェッチ + メニュー更新）
+// =====================================================
+if (spotTargets.length > 0) {
 
-        const spotTargets = enteredSpots.filter(s => s.icon === "spot");
-        const otherTargets = enteredSpots.filter(s => s.icon !== "spot");
+    // タイルプリフェッチ（毎回実行）
+    processSpotUtils(map, spotTargets, "prefetch");
 
-        // =====================================================
-        // ■spot処理（タイルプリフェッチ + メニュー更新）
-        // =====================================================
-        if (spotTargets.length > 0) {
+    // メニュー更新（差分依存をやめる）
+    updateSpotMenu(spotTargets, map);
+}
 
-            // タイルプリフェッチ
-            processSpotUtils(map, spotTargets, "prefetch");
-            updateSpotMenu(spotTargets, map);
-        }
-
-        // =====================================================
-        // ■その他処理（未使用）
-        // =====================================================
-        if (otherTargets.length > 0) {
-            // 必要ならここに追加
-        }
-    }
+// =====================================================
+// ■その他処理（必要なら）
+// =====================================================
+if (otherTargets.length > 0) {
+    // 将来用
+}
 
     // =========================================================
     // ■状態更新
