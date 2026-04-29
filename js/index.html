@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>釣り行こNAVI</title>
+
+<link rel="stylesheet" href="/MAP-/css/main.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+      <a href="#" id="newsBtn">釣りNEWS</a>
+      <div class="accordion-wrapper">
+        <button class="accordion-btn">登録地点 ▼</button>
+        <div class="accordion-panel">
+          <ul class="location-list" id="locationList">
+            <li>新潟 <button class="delete-btn">✖️</button></li>
+            <li>群馬 <button class="delete-btn">✖️</button></li>
+            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+<div id="lf-map">
+  <div class="map-ad">
+    <div class="ad-box">AD 320×50</div>
+  </div>
+  <div id="map-menu" class="map-menu"><ul></ul></div>
+  <button id="map-back-btn" class="map-back-btn"></button>
+</div>
+
+
+<div id="weather-wave-tide-container"></div>
+<div id="newsOverlay"><div class="news-window"><button id="closeNews">閉じる</button><div class="news-content"></div></div></div>
+
+<div id="calendarOverlay" class="overlay">
+  <div class="overlay-content">
+    <button id="closeCalendar" class="close-btn">×</button>
+    <div id="calendarWrapper"></div>
+  </div>
+</div>
+
+
+<footer>© 釣り行こNAVI</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/MAP-/js/header.js" defer></script>
+<script src="/MAP-/js/markerControl.js"></script>
+<script src="/MAP-/js/dataLoader.js"></script>
+
+<script>
+
+// =======================
+// グローバル
+// =======================
+window.prefData = null;
+window.areaData = [];
+window.spotData = [];
+
+window.currentHash = '';
+window.currentAreaId = null;
+window.currentSpotId = null;
+window.currentPref = null;
+
+window.nearestClickEnabled = true;
+window.nearestClickHandler = null;
+
+// =======================
+// デバッグ
+// =======================
+function showDebug(msg) {
+    let debugEl = document.getElementById('debug');
+
+    if (!debugEl) {
+        debugEl = document.createElement('div');
+        debugEl.id = 'debug';
+        debugEl.style.position = 'fixed';
+        debugEl.style.top = '0';
+        debugEl.style.left = '0';
+        debugEl.style.background = 'rgba(255,255,0,0.85)';
+        debugEl.style.zIndex = '9999';
+        debugEl.style.padding = '6px';
+        debugEl.style.fontSize = '12px';
+        debugEl.style.maxWidth = '320px';
+        debugEl.style.whiteSpace = 'pre-wrap';
+        debugEl.style.maxHeight = '40vh';
+        debugEl.style.overflow = 'auto';
+        document.body.appendChild(debugEl);
+    }
+
+    debugEl.textContent += msg + "\n";
+}
+
+// =======================
+// PREF / AREA UI
+// =======================
+function initAreaUI() {
+
+    document.getElementById('map-menu').style.display = 'block';
+
+    const menuUl = document.querySelector('#map-menu ul');
+    if (!menuUl) return;
+
+    menuUl.innerHTML = '';
+
+    window.areaData.forEach(area => {
+
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+
+        const areaName = (area.name || '').trim();
+        btn.textContent = areaName;
+
+        btn.onclick = () => {
+            location.hash = encodeURIComponent(areaName);
+            updateStateFromHash();
+            destroyAreaUI();
+            selectArea(area);
+        };
+
+        li.appendChild(btn);
+        menuUl.appendChild(li);
+    });
+
+    window.nearestClickHandler = function(e) {
+
+        if (!window.nearestClickEnabled) return;
+
+        const rect = document.getElementById('map-menu').getBoundingClientRect();
+
+        if (
+            e.originalEvent.clientX >= rect.left &&
+            e.originalEvent.clientX <= rect.right &&
+            e.originalEvent.clientY >= rect.top &&
+            e.originalEvent.clientY <= rect.bottom
+        ) return;
+
+        let nearestArea = null;
+        let minDist = Infinity;
+
+        window.areaData.forEach(area => {
+
+            const dLat = e.latlng.lat - area.lat;
+            const dLng = e.latlng.lng - area.lng;
+            const dist = dLat * dLat + dLng * dLng;
+
+            if (dist < minDist) {
+                minDist = dist;
+                nearestArea = area.name;
+            }
+        });
+
+        if (nearestArea) {
+            location.hash = encodeURIComponent(nearestArea);
+            updateStateFromHash();
+            //destroyAreaUI();
+            selectArea(area);
+        }
+    };
+
+    window.nearestClickEnabled = true;
+    window.map.on('click', window.nearestClickHandler);
+}
+
+// =======================
+// UI解除
+// =======================
+function destroyAreaUI() {
+
+    const menuUl = document.querySelector('#map-menu ul');
+    if (menuUl) menuUl.innerHTML = '';
+
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
+        window.nearestClickHandler = null;
+    }
+
+    window.nearestClickEnabled = false;
+    document.getElementById('map-menu').style.display = 'none';
+}
+
+// =======================
+// ROUTE UPDATE
+// =======================
+function routeUpdate() {
+
+    if (!window.prefData) return;
+
+    // -----------------------
+    // SPOT
+    // -----------------------
+    if (window.currentSpotId) {
+
+        const spot = window.spotData.find(s =>
+            (s.individualId || s.id) === window.currentSpotId.split('_').pop()
+        );
+
+        const area = window.areaData.find(a =>
+            window.currentAreaId && window.currentAreaId.endsWith(a.individualId)
+        );
+
+        if (!spot || !area) return;
+
+        drawLocation(spot.name, spot.lat, spot.lng, spot.zoom || 15);
+
+        selectArea(area.name);
+        selectSpot(area.name, spot.name, spot.lat, spot.lng);
+
+        return;
+    }
+
+    // -----------------------
+    // AREA
+    // -----------------------
+    if (window.currentAreaId) {
+
+        const area = window.areaData.find(a =>
+            window.currentAreaId.endsWith(a.individualId)
+        );
+
+        if (!area) return;
+
+        drawLocation(
+            area.name,
+            area.lat,
+            area.lng,
+            area.zoom || window.prefData.zoom
+        );
+
+        selectArea(area.name);
+
+        return;
+    }
+
+    // -----------------------
+    // PREF
+    // -----------------------
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+
+    document.getElementById('map-back-btn').style.display = 'none';
+    initAreaUI();
+}
+
+// =======================
+// DOM INIT
+// =======================
+document.addEventListener('DOMContentLoaded', () => {
+
+    const url = new URL(location.href);
+
+    if (!url.searchParams.get('pref')) {
+        url.searchParams.set('pref', 'CHIBA');
+        history.replaceState(null, '', url);
+    }
+
+    window.currentPref = url.searchParams.get('pref');
+    
+    const csvUrl = `/MAP-/KANTO/${window.currentPref}_location.csv`;
+    const shopUrl = `/MAP-/KANTO/${window.currentPref}_shop.csv`;
+
+    loadLocationCSV(csvUrl, window.currentPref).then(() => {
+
+        updateStateFromHash();
+        routeUpdate();
+
+        window.markerControl.preloadShop01(shopUrl);
+    });
+
+    document.getElementById('map-back-btn')
+        .addEventListener('click', () => {
+            goBack(window.currentHash);
+        });
+
+    fetch('/MAP-/icon/back.svg')
+        .then(res => res.text())
+        .then(svg => {
+            const btn = document.getElementById('map-back-btn');
+            btn.innerHTML = svg;
+
+            const svgEl = btn.querySelector('svg');
+            if (svgEl) svgEl.classList.add('back-icon');
+        });
+});
+
+// =======================
+// ZOOM GUARD
+// =======================
+function startZoomGuard() {
+    if (!window.map) return;
+    window._zoomGuardBase = window.map.getZoom();
+    window._zoomGuardActive = true;
+}
+
+function isZoomGuardFailed(threshold = 0.3) {
+    if (!window._zoomGuardActive || !window.map) return false;
+    return (window.map.getZoom() - window._zoomGuardBase) > threshold;
+}
+
+function stopZoomGuard() {
+    window._zoomGuardActive = false;
+    window._zoomGuardBase = null;
+}
+
+// =======================
+// PINCH
+// =======================
+let pinchStartDistance = 0;
+let pinchTriggered = false;
+
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        pinchStartDistance = getDistance(e.touches);
+        pinchTriggered = false;
+    }
+}, { passive: false });
+
+document.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+
+        e.preventDefault();
+
+        const currentDistance = getDistance(e.touches);
+
+        if (!pinchTriggered && currentDistance < pinchStartDistance - 20) {
+
+            pinchTriggered = true;
+
+            const isPrefView = !window.currentAreaId && !window.currentSpotId;
+
+            if (isZoomGuardFailed()) return;
+
+            if (!isPrefView) {
+                goBack(window.currentHash);
+            }
+        }
+    }
+}, { passive: false });
+
+document.addEventListener('touchend', () => {
+    pinchStartDistance = 0;
+    pinchTriggered = false;
+});
+
+</script>
+
+</body>
+</html>
