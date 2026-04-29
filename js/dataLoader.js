@@ -1035,6 +1035,10 @@ if (window.markerControl?.shop01Layer) {
     window.map.removeLayer(markerControl.shop01Layer);
     markerControl.shop01Layer = null;
 }
+// エリアマーカー削除
+if (window.areaSpotLayer) {
+    window.map.removeLayer(window.areaSpotLayer);
+}
 
 
     const z = window.map.getZoom();
