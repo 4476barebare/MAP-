@@ -349,49 +349,51 @@ function prefetchAround(area) {
 
 function selectArea(area) {
 
-    alert("01: enter selectArea");
+    showDebug("SA: enter");
 
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
         : area;
 
-    alert("02: resolved areaObj");
+    showDebug("SA: resolved areaObj");
 
     if (!areaObj) {
-        alert("03: areaObj NULL");
+        showDebug("SA: areaObj NULL → return");
         return;
     }
 
-    alert("04: before phase2 disable");
+    showDebug("SA: phase2 disable start");
     disablePhase2(window.map);
+    showDebug("SA: phase2 disable end");
 
-    alert("05: after phase2 disable");
-
+    // -------------------------
+    // layer cleanup
+    // -------------------------
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
+        showDebug("SA: spotLayer removed");
     }
-
-    alert("06: spotLayer cleared");
 
     if (window.markerControl?.shop01Layer) {
         window.map.removeLayer(markerControl.shop01Layer);
         markerControl.shop01Layer = null;
+        showDebug("SA: shop01Layer removed");
     }
-
-    alert("07: shop01Layer cleared");
 
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
+        showDebug("SA: prefSpotLayer removed");
     }
 
-    alert("08: prefSpotLayer cleared");
+    // -------------------------
+    // tile reset
+    // -------------------------
+    showDebug("SA: tile reset start");
 
     const tileUrl =
         'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg';
-
-    alert("09: before tile");
 
     if (window.currentTileLayer) {
         window.map.removeLayer(window.currentTileLayer);
@@ -402,16 +404,19 @@ function selectArea(area) {
         keepBuffer: 8
     }).addTo(window.map);
 
-    alert("10: after tile");
+    showDebug("SA: tile reset end");
 
-    const reqId = Date.now();
-    window._shop01RequestId = reqId;
-
-    alert("11: before prefetch");
-
+    // -------------------------
+    // prefetch
+    // -------------------------
+    showDebug("SA: prefetch start");
     prefetchAround(areaObj);
+    showDebug("SA: prefetch end");
 
-    alert("12: after prefetch");
+    // -------------------------
+    // move
+    // -------------------------
+    showDebug("SA: drawLocation start");
 
     drawLocation(
         areaObj.name,
@@ -420,29 +425,38 @@ function selectArea(area) {
         areaObj.zoom || window.prefData.zoom
     );
 
-    alert("13: after drawLocation");
+    showDebug("SA: drawLocation end");
 
+    // -------------------------
+    // UI
+    // -------------------------
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
 
-    alert("14: UI updated");
+    showDebug("SA: UI updated");
 
+    // -------------------------
+    // post move
+    // -------------------------
     window.map.once('moveend', () => {
 
-        alert("15: moveend");
+        showDebug("SA: moveend fired");
 
         window.map.invalidateSize(true);
         enableDragForArea();
 
-        showSpotsForArea(window.currentAreaId);
-        enableAreaSwipe();
+        showDebug("SA: before showSpotsForArea");
 
-        if (window._shop01RequestId !== reqId) return;
+        showSpotsForArea(window.currentAreaId);
+
+        showDebug("SA: after showSpotsForArea");
+
+        enableAreaSwipe();
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
 
-                alert("16: shop01 render");
+                showDebug("SA: shop01 render");
 
                 markerControl.showShop01(window.currentAreaId);
             });
