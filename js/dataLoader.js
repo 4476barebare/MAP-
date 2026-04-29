@@ -558,19 +558,19 @@ let phase2Initialized = false;
 let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
+
     showDebug("P2: enter");
-showDebug("P2: map exists=" + !!map);
-showDebug("P2: spotData=" + !!window.spotData);
+    showDebug("P2: map exists=" + !!map);
+    showDebug("P2: spotData=" + !!window.spotData);
 
     if (map._phase2Handler) return;
 
     lastVisibleSet = new Set();
     phase2Initialized = false;
 
-    // -------------------------
-    // メイン処理
-    // -------------------------
     const runPhase2 = () => {
+
+        showDebug("P2: runPhase2 fired");
 
         requestAnimationFrame(() => {
 
@@ -581,29 +581,25 @@ showDebug("P2: spotData=" + !!window.spotData);
             );
 
             const spotTargets = visibleSpots.filter(s => s.icon === "spot");
-            const otherTargets = visibleSpots.filter(s => s.icon !== "spot");
 
             if (spotTargets.length > 0) {
                 processSpotUtils(map, spotTargets, "prefetch");
                 updateSpotMenu(spotTargets, map);
             }
 
-            lastVisibleSet = new Set(
-                visibleSpots.map(s => s.name)
-            );
+            lastVisibleSet = new Set(visibleSpots.map(s => s.name));
         });
     };
 
-    // -------------------------
-    // dragend登録
-    // -------------------------
     map._phase2Handler = runPhase2;
-    map.on('dragend', runPhase2);
 
-    // -------------------------
-    // 初回実行（moveend）
-    // -------------------------
-    map.once('moveend', runPhase2);
+    map.on('dragend', runPhase2);
+    map.on('dragend', () => showDebug("P2: dragend fired"));
+
+    map.once('moveend', () => {
+        showDebug("P2: moveend fired");
+        runPhase2();
+    });
 
     phase2Initialized = true;
 }
