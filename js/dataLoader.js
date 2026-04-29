@@ -475,12 +475,12 @@ function showSpotsForArea(areaKey) {
     }
 
     // -------------------------
-    // エリアレイヤー準備
+    // エリアレイヤー準備（新規）
     // -------------------------
-    if (!window.spotLayer) {
-        window.spotLayer = L.layerGroup().addTo(window.map);
+    if (!window.areaSpotLayer) {
+        window.areaSpotLayer = L.layerGroup();
     } else {
-        window.spotLayer.clearLayers();
+        window.areaSpotLayer.clearLayers();
     }
 
     const spots = window.spotData.filter(s => s.areaId === areaKey);
@@ -518,10 +518,10 @@ function showSpotsForArea(areaKey) {
             });
         });
 
-        window.spotLayer.addLayer(marker);
+        window.areaSpotLayer.addLayer(marker);
     });
 
-    window.spotLayer.addTo(window.map);
+    window.areaSpotLayer.addTo(window.map);
 }
 
 let phase2Initialized = false;
