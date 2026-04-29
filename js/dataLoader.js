@@ -993,7 +993,16 @@ if (window.areaSpotLayer) {
 
     if (z >= 12.8) {
         selectArea(area);
-        return;
+        
+        disablePhase2(window.map);
+        if (window.phase2Group) {
+            window.phase2Group.clearLayers();
+        }
+        if (window.phase1Group) {
+            window.phase1Group.addTo(window.map);
+        }
+        
+        return
     }
 
     drawLocation(
