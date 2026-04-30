@@ -407,6 +407,7 @@ function selectArea(area) {
     // 移動後処理
     // -------------------------
     window.map.once('moveend', () => {
+        saveMapState();
 
         window.map.invalidateSize(true);
 
@@ -417,7 +418,6 @@ function selectArea(area) {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
-                saveMapState();
             });
         });
     });
