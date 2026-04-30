@@ -396,6 +396,8 @@ function selectArea(area) {
         areaObj.lng,
         areaObj.zoom || window.prefData.zoom
     );
+    
+    saveMapState();
 
     // -------------------------
     // UI更新
@@ -408,12 +410,8 @@ function selectArea(area) {
     // -------------------------
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-
         showSpotsForArea(window.currentAreaId);
-
         enableAreaSwipe();
-        saveMapState();
-
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
@@ -424,10 +422,11 @@ function selectArea(area) {
 }
 
 function saveMapState() {
+
+    if (!window.map.hasLayer(window.tileLayers.gsi)) return;
+
     window.mapStateSnapshot = {
-        tileLayer: window.map.hasLayer(window.tileLayers.gsi)
-            ? window.tileLayers.gsi
-            : window.tileLayers.osm,
+        tileLayer: window.tileLayers.gsi,
         center: window.map.getCenter(),
         zoom: window.map.getZoom()
     };
