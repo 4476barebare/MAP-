@@ -1012,18 +1012,19 @@ window.map.options.maxBoundsViscosity = 0;
         }
 
 
-s.tileLayer.addTo(window.map);
+if (s && s.tileLayer) {
 
-    // ★ここが変更点
+    s.tileLayer.addTo(window.map);
+
     window.map.setView(
         [area.lat, area.lng],
         area.zoom || window.prefData.zoom
     );
 
-        else{
-        alert("保存されてない");
-            selectArea(area);
-        }
+} else {
+    alert("保存されてない");
+    selectArea(area);
+}
     }
 
     drawLocation(
