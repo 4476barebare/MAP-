@@ -500,8 +500,11 @@ function selectSpot(spot) {
 
     const currentZoom = window.map.getZoom();
 
-    if (currentZoom === 13) return;
-
+    if (currentZoom === 13) {
+    // ★ ここでspotオブジェクトを渡して呼び出す
+    zoomToSpot(Spot);
+    return;
+}
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
@@ -534,7 +537,7 @@ window.map.once('moveend', () => {
     window.map.options.maxBoundsViscosity = 1.0;
 });
 
-enablePhase2(map);
+enablePhase2(window.map);
 
 }
 
