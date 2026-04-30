@@ -887,6 +887,16 @@ function zoomToSpot(spot) {
     });
 
     resetSpotLayers();
+    
+    // ★ハッシュ更新（末尾追加）
+if (spot && spot.individualId != null) {
+
+    const base = location.hash || '';
+
+    location.hash = base + '/' + spot.individualId;
+
+    updateStateFromHash();
+}
 
     // =====================================================
     // ⑤ 復帰処理
