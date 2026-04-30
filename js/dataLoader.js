@@ -796,17 +796,19 @@ const popupHtml = `
 }
 
 function zoomToSpot(spot) {
-  
+
     // -------------------------
     // Phase2停止
     // -------------------------
     disablePhase2(window.map);
-alert(spot.name);
+
+    alert(spot.name);
+
     // -------------------------
     // GSIレイヤー（使い回し）
     // -------------------------
-    if (!window.gsiPhotoLayer) {
-        window.gsiPhotoLayer = L.tileLayer(
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(
             'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
             {
                 attribution: '国土地理院'
@@ -814,11 +816,14 @@ alert(spot.name);
         );
     }
 
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
+    // ★タイル整理（今の構造に合わせる）
+    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+        window.map.removeLayer(window.osmLayer);
     }
 
-    window.currentTileLayer = window.gsiPhotoLayer.addTo(window.map);
+    if (window.gsiLayer && !window.map.hasLayer(window.gsiLayer)) {
+        window.gsiLayer.addTo(window.map);
+    }
 
     // -------------------------
     // 操作ロック
@@ -832,13 +837,11 @@ alert(spot.name);
     // 移動
     // -------------------------
     drawLocation(
-        safeSpot.name,
-        safeSpot.lat,
-        safeSpot.lng,
-        safeSpot.zoom
+        spot.name,
+        spot.lat,
+        spot.lng,
+        spot.zoom || 15
     );
-
-    
 
     resetSpotLayers();
 
@@ -847,14 +850,14 @@ alert(spot.name);
     // -------------------------
     window.map.once('moveend', function () {
 
-        window.map.setMinZoom(safeSpot.zoom);
+        window.map.setMinZoom(spot.zoom || 15);
         window.map.setMaxZoom(18);
 
         const bounds = window.map.getBounds();
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
 
-        window._zoomGuardBase = safeSpot.zoom;
+        window._zoomGuardBase = spot.zoom || 15;
         window._zoomGuardActive = true;
 
         window.map.dragging.enable();
