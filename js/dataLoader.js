@@ -843,6 +843,7 @@ function normalizeSpot(raw) {
 function zoomToSpot(spot) {
 
     disablePhase2(window.map);
+    resetSpotLayers();
 
     // =====================================================
     // ① 正規化
@@ -886,7 +887,7 @@ function zoomToSpot(spot) {
         duration: 0.5
     });
 
-    resetSpotLayers();
+    
     
     // ★ハッシュ更新（末尾追加）
 if (spot && spot.individualId != null) {
