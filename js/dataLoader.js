@@ -845,35 +845,31 @@ function zoomToSpot(spot) {
     disablePhase2(window.map);
 
     // =====================================================
-    // ① タイル完全リセット（GSI/OSM含む）
+    // ① 正規化
     // =====================================================
-    window.map.eachLayer(layer => {
-        if (layer instanceof L.TileLayer) {
-            window.map.removeLayer(layer);
-        }
-    });
+    const safe = normalizeSpot(spot);
 
-    // ★レイヤ参照も完全リセット
+    // =====================================================
+    // ② ベースレイヤ切替のみ
+    // （削除しない・再生成もしない）
+    // =====================================================
     if (window.gsiLayer) {
-        window.map.removeLayer(window.gsiLayer);
-        window.gsiLayer = null;
+        window.gsiLayer.setUrl(window.gsiLayers.photo);
+    } else {
+        window.gsiLayer = L.tileLayer(
+            window.gsiLayers.photo,
+            {
+                attribution: '国土地理院',
+                maxZoom: 18
+            }
+        ).addTo(window.map);
     }
 
+    // OSMが残っていたら消す（任意・UI整合性だけ）
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
     }
-
-    // =====================================================
-    // ② 新しいベース（航空写真＝photo）
-    // =====================================================
-    window.gsiLayer = L.tileLayer(
-        window.gsiLayers.photo,
-        {
-            attribution: '国土地理院',
-            maxZoom: 18
-        }
-    ).addTo(window.map);
 
     // =====================================================
     // ③ 操作ロック
@@ -884,24 +880,16 @@ function zoomToSpot(spot) {
     window.map.touchZoom.disable();
 
     // =====================================================
-    // ④ 正規化
+    // ④ 移動のみ
     // =====================================================
-    const safe = normalizeSpot(spot);
-
-    // =====================================================
-    // ⑤ 移動
-    // =====================================================
-    drawLocation(
-        safe.name,
-        safe.lat,
-        safe.lng,
-        safe.zoom
-    );
+    window.map.flyTo([safe.lat, safe.lng], safe.zoom, {
+        duration: 0.5
+    });
 
     resetSpotLayers();
 
     // =====================================================
-    // ⑥ 復帰処理
+    // ⑤ 復帰処理
     // =====================================================
     window.map.once('moveend', function () {
 
@@ -920,6 +908,7 @@ function zoomToSpot(spot) {
         window.map.touchZoom.enable();
     });
 }
+
 function resetSpotLayers() {
 
     if (window.markerControl) {
