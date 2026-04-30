@@ -982,7 +982,55 @@ function goBack() {
     // area → pref
     // =====================================================
     
-if (window.phase1Group) {
+
+
+if (z >= 12.8) {
+    
+    const s = window.mapStateSnapshot;
+    
+    window.map.setMinZoom(0);
+    window.map.setMaxZoom(12.8);
+
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
+    
+    if (window.phase2Group) {
+        window.phase2Group.clearLayers();
+    }
+    if (window.phase1Group) {
+        window.phase1Group.addTo(window.map);
+    }
+
+    if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
+        window.map.removeLayer(window.gsiLayer);
+    }
+    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+        window.map.removeLayer(window.osmLayer);
+    }
+
+    if (s && s.tileLayer) {
+
+        s.tileLayer.addTo(window.map);
+
+        window.map.once('layeradd', () => {
+            window.map.setView(
+                [area.lat, area.lng],
+                area.zoom || window.prefData.zoom
+            );
+        });
+
+    } else {
+        alert("保存されてない");
+        selectArea(area);
+    }
+
+} else {
+
+    // =========================
+    // pref 初期化ブロック
+    // =========================
+    
+    if (window.phase1Group) {
     window.phase1Group.clearLayers();
 }
 
@@ -990,62 +1038,13 @@ if (window.phase1Group) {
 if (window.areaSpotLayer) {
     window.areaSpotLayer.clearLayers();
 }
-
-
-    const z = window.map.getZoom();
-
-    if (z >= 12.8) {
-        
-        const s = window.mapStateSnapshot;
-        
-      window.map.setMinZoom(0);
-window.map.setMaxZoom(12.8); // 元の値に合わせろ
-
-window.map.setMaxBounds(null);
-window.map.options.maxBoundsViscosity = 0;
-        
-        if (window.phase2Group) {
-            window.phase2Group.clearLayers();
-        }
-        if (window.phase1Group) {
-            window.phase1Group.addTo(window.map);
-        }
-        if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
-    window.map.removeLayer(window.gsiLayer);
-}
-if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
-    window.map.removeLayer(window.osmLayer);
-}
-
-
-
-if (s && s.tileLayer) {
-
-
-    s.tileLayer.addTo(window.map);
-
-    window.map.once('layeradd', () => {
-        window.map.setView(
-            [area.lat, area.lng],
-            area.zoom || window.prefData.zoom
-        );
-    });
-
-} else {
-    alert("保存されてない");
-    selectArea(area);
-}
-    }
-
+    
     drawLocation(
         window.prefData.name,
         window.prefData.lat,
         window.prefData.lng,
         window.prefData.zoom
     );
-
-    window.currentAreaId = null;
-    window.currentSpotId = null;
 
     location.hash = '';
     showPrefSpots();
@@ -1054,4 +1053,6 @@ if (s && s.tileLayer) {
 
     document.getElementById('map-back-btn').style.display = 'none';
     initAreaUI();
+}
+
 }
