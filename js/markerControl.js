@@ -93,14 +93,18 @@ function showShop01(areaKey) {
 function showShop02(areaKey) {
     if (!window.map) return;
 
-    if (!markerControl.shop02Layer) {
-        markerControl.shop02Layer = L.layerGroup().addTo(window.map);
+    // ★ phase2Groupを使う
+    if (!window.phase2Group) {
+        window.phase2Group = L.layerGroup();
     }
 
-    markerControl.clearShop02();
+    window.phase2Group.clearLayers();
 
     const shops = markerControl.shop01AreaCache?.[areaKey] || [];
     if (!shops.length) return;
+
+    // 表示
+    window.phase2Group.addTo(window.map);
 
     // =========================
     // ① 近い座標をグループ化
@@ -128,9 +132,6 @@ function showShop02(areaKey) {
             let lat = shop.lat;
             let lng = shop.lng;
 
-            // -----------------------
-            // 重なり回避
-            // -----------------------
             if (count > 1) {
                 const angle = (i / count) * Math.PI * 2;
                 const offset = 0.001;
@@ -140,24 +141,19 @@ function showShop02(areaKey) {
             }
 
             const iconId = getIconId(shop.icon);
-
             const noCircle = iconId === 'shop4';
 
             const html = noCircle
-                ? `
-<div class="shop-marker no-circle">
-    <svg class="shop-icon">
-        <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-    </svg>
-</div>
-`
-                : `
-<div class="shop-marker">
-    <svg class="shop-icon">
-        <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
-    </svg>
-</div>
-`;
+                ? `<div class="shop-marker no-circle">
+                        <svg class="shop-icon">
+                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                        </svg>
+                   </div>`
+                : `<div class="shop-marker">
+                        <svg class="shop-icon">
+                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                        </svg>
+                   </div>`;
 
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
@@ -179,19 +175,21 @@ function showShop02(areaKey) {
                 encodeURIComponent(title + ' ' + address);
 
             const popupHtml = `
-    <div class="shop-popup">
-        <div class="shop-popup-title">${title}</div>
-        <div class="shop-popup-address">${address}</div>
-        <div class="shop-popup-footer">
-            <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-                Googleで検索
-            </a>
-        </div>
-    </div>
-`;
+                <div class="shop-popup">
+                    <div class="shop-popup-title">${title}</div>
+                    <div class="shop-popup-address">${address}</div>
+                    <div class="shop-popup-footer">
+                        <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
+                            Googleで検索
+                        </a>
+                    </div>
+                </div>
+            `;
 
             marker.bindPopup(popupHtml);
-            marker.addTo(markerControl.shop02Layer);
+
+            // ★ここ変更（重要）
+            window.phase2Group.addLayer(marker);
         });
     });
 }
