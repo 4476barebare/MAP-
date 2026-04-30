@@ -232,12 +232,12 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
         // ★初期はGSI固定（ここだけ）
         window.gsiLayer = L.tileLayer(
-    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-    {
-        attribution: '© 国土地理院',
-        keepBuffer: 8
-    }
-).addTo(window.map);
+            'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+            {
+                attribution: '© 国土地理院',
+                keepBuffer: 8
+            }
+        ).addTo(window.map);
         
         if (window.currentAreaId === null) {
             showPrefSpots();
