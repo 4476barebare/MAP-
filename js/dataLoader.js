@@ -799,6 +799,7 @@ const popupHtml = `
 }
 
 function zoomToSpot(safeSpot) {
+    alert("呼び出し");
 
     // -------------------------
     // Phase2停止
@@ -840,6 +841,9 @@ function zoomToSpot(safeSpot) {
         safeSpot.lng,
         safeSpot.zoom
     );
+    alert(safeSpot.name);
+
+    
 
     resetSpotLayers();
 
