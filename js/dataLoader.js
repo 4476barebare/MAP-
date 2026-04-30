@@ -998,8 +998,8 @@ if (window.areaSpotLayer) {
         
         const s = window.mapStateSnapshot;
         
- //       window.map.setMinZoom(0);
-//window.map.setMaxZoom(18); // 元の値に合わせろ
+      window.map.setMinZoom(0);
+window.map.setMaxZoom(18); // 元の値に合わせろ
 
 window.map.setMaxBounds(null);
 window.map.options.maxBoundsViscosity = 0;
