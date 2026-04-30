@@ -839,24 +839,26 @@ function normalizeSpot(raw) {
 
 function zoomToSpot(spot) {
 
-    // -------------------------
-    // Phase2停止
-    // -------------------------
-    disablePhase2(window.map);
+    showDebug("zoomToSpot: " + spot.name);
 
-    // -------------------------
-    // タイル完全整理
-    // -------------------------
     window.map.eachLayer(layer => {
         if (layer instanceof L.TileLayer) {
             window.map.removeLayer(layer);
         }
     });
 
-    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
-        window.map.removeLayer(window.osmLayer);
-    }
+    // -------------------------
+    // Phase2停止
+    // -------------------------
+    disablePhase2(window.map);
 
+    showDebug("phase2 disabled");
+
+    alert(spot.name);
+
+    // -------------------------
+    // GSIレイヤー（使い回し）
+    // -------------------------
     if (!window.gsiLayer) {
         window.gsiLayer = L.tileLayer(
             'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
@@ -866,59 +868,77 @@ function zoomToSpot(spot) {
         );
     }
 
-    window.gsiLayer.addTo(window.map);
+    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+        window.map.removeLayer(window.osmLayer);
+    }
+
+    if (window.gsiLayer && !window.map.hasLayer(window.gsiLayer)) {
+        window.gsiLayer.addTo(window.map);
+    }
+
+    showDebug("tile switched (gsi active)");
 
     // -------------------------
-    // 操作ロック（先に統一）
+    // 操作ロック
     // -------------------------
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
+    showDebug("controls locked");
+
     // -------------------------
-    // データ正規化
+    // 正規化
     // -------------------------
     const safe = normalizeSpot(spot);
 
+    showDebug("normalized: " + safe.lat + "," + safe.lng + " zoom=" + safe.zoom);
+
     // -------------------------
-    // 移動（ここが主）
+    // 移動
     // -------------------------
     window.map.stop();
 
-    window.map.setView(
-        [safe.lat, safe.lng],
-        safe.zoom,
-        { animate: false }
+    drawLocation(
+        safe.name,
+        safe.lat,
+        safe.lng,
+        safe.zoom
     );
 
     resetSpotLayers();
 
-    // -------------------------
-    // 復帰処理（1本化）
-    // -------------------------
-    function restore() {
+    applySpotView(safe);
 
-        window.map.setMinZoom(safe.zoom);
+    showDebug("move requested");
+
+    // -------------------------
+    // moveend監視（死んでるか確認用）
+    // -------------------------
+    window.map.once('moveend', function () {
+
+        showDebug("moveend fired");
+
+        window.map.setMinZoom(spot.zoom || 15);
         window.map.setMaxZoom(18);
 
         const bounds = window.map.getBounds();
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
 
-        window._zoomGuardBase = safe.zoom;
+        window._zoomGuardBase = spot.zoom || 15;
         window._zoomGuardActive = true;
 
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-    }
 
-    // moveend依存やめる（重要）
-    requestAnimationFrame(() => {
-        setTimeout(restore, 0);
+        showDebug("restore complete");
     });
+
+    showDebug("zoomToSpot end");
 }
 
 function resetSpotLayers() {
