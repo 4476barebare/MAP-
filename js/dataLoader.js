@@ -940,8 +940,6 @@ function updateStateFromHash() {
 }
 
 function goBack() {
-    
-
 
     const area = window.areaData.find(a =>
         String(a.individualId) === String(window.currentAreaId?.split('_')[1])
@@ -974,7 +972,6 @@ function goBack() {
         location.hash = location.hash.replace('/' + spotKey, '');
         updateStateFromHash();
 
-        // ★ここはそのまま維持
         selectSpot(area.name, spot.name, spot.lat, spot.lng);
         return;
     }
@@ -982,79 +979,88 @@ function goBack() {
     // =====================================================
     // area → pref
     // =====================================================
-    
-
     const z = window.map.getZoom();
-    if (z  === 13) {
-    
-    const s = window.mapStateSnapshot;
-    
-    window.map.setMinZoom(0);
-    window.map.setMaxZoom(18);
 
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-    
-    if (window.phase2Group) {
-        window.phase2Group.clearLayers();
-    }
-    if (window.phase1Group) {
-        window.phase1Group.addTo(window.map);
-    }
+    if (z === 13) {
 
-    if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
-        window.map.removeLayer(window.gsiLayer);
-    }
-    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
-        window.map.removeLayer(window.osmLayer);
-    }
+        const s = window.mapStateSnapshot;
 
-    if (s && s.tileLayer) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
 
-        s.tileLayer.addTo(window.map);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
 
-        window.map.once('layeradd', () => {
-            window.map.setView(
-                [area.lat, area.lng],
-                area.zoom || window.prefData.zoom
+        if (window.phase2Group) {
+            window.phase2Group.clearLayers();
+        }
+        if (window.phase1Group) {
+            window.phase1Group.addTo(window.map);
+        }
+
+        // タイル全削除
+        if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
+            window.map.removeLayer(window.gsiLayer);
+        }
+        if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+            window.map.removeLayer(window.osmLayer);
+        }
+
+        if (s && s.tileLayer) {
+
+            s.tileLayer.addTo(window.map);
+
+            // ★ area復元やめて spotで再構築
+            const firstSpot = window.spotData.find(
+                sp => String(sp.areaId) === String(window.currentAreaId)
             );
-        });
-        
+
+            if (firstSpot) {
+
+                window.currentSpotId =
+                    `spot_${window.currentAreaId.split('_')[1]}_${firstSpot.individualId}`;
+
+                selectSpot(
+                    area.name,
+                    firstSpot.name,
+                    firstSpot.lat,
+                    firstSpot.lng
+                );
+            }
+
+        } else {
+            alert("保存されてない");
+            selectArea(area);
+        }
+
+        return;
 
     } else {
-        alert("保存されてない");
-        selectArea(area);
+
+        // =========================
+        // pref 初期化ブロック
+        // =========================
+        if (window.phase1Group) {
+            window.phase1Group.clearLayers();
+        }
+
+        if (window.areaSpotLayer) {
+            window.areaSpotLayer.clearLayers();
+        }
+
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom
+        );
+
+        location.hash = '';
+        showPrefSpots();
+
+        window.map.invalidateSize(true);
+
+        document.getElementById('map-back-btn').style.display = 'none';
+        initAreaUI();
     }
-
-} else {
-
-    // =========================
-    // pref 初期化ブロック
-    // =========================
-    if (window.phase1Group) {
-    window.phase1Group.clearLayers();
-}
-
-// エリアマーカーも再利用前提
-if (window.areaSpotLayer) {
-    window.areaSpotLayer.clearLayers();
-}
-
-
-    drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom
-    );
-
-    location.hash = '';
-    showPrefSpots();
-
-    window.map.invalidateSize(true);
-
-    document.getElementById('map-back-btn').style.display = 'none';
-    initAreaUI();
-}
-
 }
