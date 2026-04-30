@@ -1010,9 +1010,17 @@ window.map.options.maxBoundsViscosity = 0;
         if (window.phase1Group) {
             window.phase1Group.addTo(window.map);
         }
+        if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
+    window.map.removeLayer(window.gsiLayer);
+}
+if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+    window.map.removeLayer(window.osmLayer);
+}
+
 
 
 if (s && s.tileLayer) {
+
 
     s.tileLayer.addTo(window.map);
 
