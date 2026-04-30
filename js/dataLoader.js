@@ -232,12 +232,12 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 
         // ★初期はGSI固定（ここだけ）
         window.gsiLayer = L.tileLayer(
-            'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
-            {
-                attribution: '© 国土地理院',
-                keepBuffer: 8
-            }
-        ).addTo(window.map);
+    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+    {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }
+).addTo(window.map);
         
         if (window.currentAreaId === null) {
             showPrefSpots();
@@ -867,13 +867,10 @@ function resetGsiLayer() {
 
 function zoomToSpot(spot) {
 
-    // =====================================================
-    // ① Phase2停止
-    // =====================================================
     disablePhase2(window.map);
 
     // =====================================================
-    // ② タイル完全リセット（ここが重要）
+    // ① タイル完全リセット（GSI/OSM含む）
     // =====================================================
     window.map.eachLayer(layer => {
         if (layer instanceof L.TileLayer) {
@@ -882,36 +879,25 @@ function zoomToSpot(spot) {
     });
 
     if (window.gsiLayer) {
-        if (window.map.hasLayer(window.gsiLayer)) {
-            window.map.removeLayer(window.gsiLayer);
-        }
+        window.map.removeLayer(window.gsiLayer);
         window.gsiLayer = null;
     }
 
-    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+    if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
     }
 
-    // =====================================================
-    // ③ GSI再生成（クリーン状態）
-    // =====================================================
     window.gsiLayer = L.tileLayer(
         'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
         {
             attribution: '国土地理院',
-            maxZoom: 18,
-            keepBuffer: 0
+            maxZoom: 18
         }
     ).addTo(window.map);
 
     // =====================================================
-    // ④ デバッグ
-    // =====================================================
-    alert(spot.name);
-
-    // =====================================================
-    // ⑤ 操作ロック
+    // ② 操作ロック（ここは移動前に固定）
     // =====================================================
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
@@ -919,33 +905,31 @@ function zoomToSpot(spot) {
     window.map.touchZoom.disable();
 
     // =====================================================
-    // ⑥ 座標正規化
+    // ③ データ正規化
     // =====================================================
     const safe = normalizeSpot(spot);
 
     // =====================================================
-    // ⑦ 移動（drawLocation排除：競合防止）
+    // ④ 移動（drawLocationのみ責務）
     // =====================================================
-    window.map.stop();
-
-    window.map.setView(
-        [safe.lat, safe.lng],
-        safe.zoom,
-        { animate: false }
+    drawLocation(
+        safe.name,
+        safe.lat,
+        safe.lng,
+        safe.zoom
     );
 
     resetSpotLayers();
 
     // =====================================================
-    // ⑧ 復帰処理
+    // ⑤ 復帰（moveend一回だけ）
     // =====================================================
     window.map.once('moveend', function () {
 
         window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
 
-        const bounds = window.map.getBounds();
-        window.map.setMaxBounds(bounds);
+        window.map.setMaxBounds(window.map.getBounds());
         window.map.options.maxBoundsViscosity = 1.0;
 
         window._zoomGuardBase = safe.zoom || 15;
