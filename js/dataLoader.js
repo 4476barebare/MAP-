@@ -990,7 +990,7 @@ function goBack() {
     const s = window.mapStateSnapshot;
     
     window.map.setMinZoom(0);
-    window.map.setMaxZoom(12.8);
+    window.map.setMaxZoom(18);
 
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
@@ -1014,11 +1014,10 @@ function goBack() {
         s.tileLayer.addTo(window.map);
 
         window.map.once('layeradd', () => {
-            window.map.setView(
-                [area.lat, area.lng],
-                area.zoom || window.prefData.zoom
+            selectArea(area);
             );
         });
+        
 
     } else {
         alert("保存されてない");
