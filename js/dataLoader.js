@@ -502,8 +502,13 @@ function selectSpot(spot) {
         zoom,
         individualId
     } = spot;
+    
+    if (window.markerControl) {
+        markerControl.showShop02(window.currentAreaId);
+    }
 
     const currentZoom = window.map.getZoom();
+    
 
     if (currentZoom === 13) {
         //disablePhase2(window.map);
@@ -525,9 +530,7 @@ function selectSpot(spot) {
         updateWhenIdle: true
     }).addTo(window.map);
 
-    if (window.markerControl) {
-        markerControl.showShop02(window.currentAreaId);
-    }
+
 
     disableAreaSwipe();
 
@@ -1015,10 +1018,10 @@ location.hash = location.hash.replace('/' + spotKey, '');
 updateStateFromHash();
 
 // phase2へ戻すなら再描画
-selectSpot(restoreSpot);
+
     showSpotsForArea(window.currentAreaId);
     
-showShop02(window.currentAreaId);
+selectSpot(restoreSpot);
     
     return;
 }
