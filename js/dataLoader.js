@@ -796,6 +796,8 @@ const popupHtml = `
 }
 
 function zoomToSpot(spot) {
+window.map.setMaxBounds(null);
+window.map.options.maxBoundsViscosity = 0;
 
     // -------------------------
     // Phase2停止
