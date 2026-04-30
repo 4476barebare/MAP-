@@ -231,7 +231,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map.attributionControl.setPosition('topright');
 
         // ★初期はGSI固定（ここだけ）
-        window.currentTileLayer = L.tileLayer(
+        window.gsiLayer = L.tileLayer(
             'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
             {
                 attribution: '© 国土地理院',
@@ -351,6 +351,8 @@ function prefetchAround(area) {
     });
 }
 
+
+
 function selectArea(area) {
 
     const areaObj = typeof area === 'string'
@@ -421,12 +423,17 @@ function selectArea(area) {
     disablePhase2(window.map);
 }
 
+
 function saveMapState() {
 
-    if (!window.map.hasLayer(window.tileLayers.gsi)) return;
+    let tile = null;
+
+    if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
+        tile = window.gsiLayer;
+    }
 
     window.mapStateSnapshot = {
-        tileLayer: window.tileLayers.gsi,
+        tileLayer: tile,
         center: window.map.getCenter(),
         zoom: window.map.getZoom()
     };
@@ -523,11 +530,7 @@ function selectSpot(spot) {
 
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
-
-    window.currentTileLayer = L.tileLayer(tileUrl, {
+    window.osmLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors',
         keepBuffer: 8,
         updateWhenIdle: true
@@ -1006,14 +1009,11 @@ if (window.areaSpotLayer) {
 
 if (s && s.tileLayer) {
 
-    Object.values(window.tileLayers).forEach(layer => {
-        if (window.map.hasLayer(layer)) {
-            window.map.removeLayer(layer);
-        }
-    });
+    if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
+        window.map.removeLayer(window.gsiLayer);
+    }
 
     s.tileLayer.addTo(window.map);
-
     window.map.setView(s.center, s.zoom);
 }
 
