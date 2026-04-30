@@ -526,8 +526,13 @@ function selectSpot(spot) {
 
     window.osmLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors',
-        keepBuffer: 8,
-        updateWhenIdle: true
+        keepBuffer: 16,
+
+    updateWhenIdle: true,
+
+    updateWhenZooming: false,
+
+    updateWhenDragging: false
     }).addTo(window.map);
 
 
@@ -992,6 +997,7 @@ function goBack() {
     // =====================================================
     if (z >= 14) {
 
+        // map操作復帰
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
@@ -1003,37 +1009,35 @@ function goBack() {
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
+        // レイヤ整理
         if (window.phase2Group) window.phase2Group.clearLayers();
         if (window.phase1Group) window.phase1Group.addTo(window.map);
 
-        // z >= 14 の戻り処理内など
+        const restoreSpot = buildSpotRestoreObject();
+        if (!restoreSpot) return;
 
-const restoreSpot = buildSpotRestoreObject();
+        // ★ spotキー除去
+        const spotKey = window.currentSpotId?.split('_')[2];
 
-if (restoreSpot) {
-    const spotKey = window.currentSpotId?.split('_')[2];
-        // spotキー削除
-location.hash = location.hash.replace('/' + spotKey, '');
+        if (spotKey) {
+            location.hash = location.hash.replace('/' + spotKey, '');
+        }
 
-// state更新
-updateStateFromHash();
+        updateStateFromHash();
 
-// phase2へ戻すなら再描画
+        // phase2再構築
+        showSpotsForArea(window.currentAreaId);
 
-    showSpotsForArea(window.currentAreaId);
-    
-selectSpot(restoreSpot);
-    
-    return;
-}
+        // スポット復帰
+        selectSpot(restoreSpot);
 
-
+        return;
     }
 
     // =====================================================
     // ② phase1維持（z === 13）
     // =====================================================
-    else if (z === 13) {
+    if (z === 13) {
 
         const s = window.mapStateSnapshot;
 
@@ -1049,11 +1053,12 @@ selectSpot(restoreSpot);
         if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
             window.map.removeLayer(window.gsiLayer);
         }
+
         if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
             window.map.removeLayer(window.osmLayer);
         }
 
-        if (s && s.tileLayer) {
+        if (s?.tileLayer) {
             s.tileLayer.addTo(window.map);
         }
 
@@ -1065,28 +1070,23 @@ selectSpot(restoreSpot);
     // =====================================================
     // ③ prefへ戻る（z <= 12）
     // =====================================================
-    else {
+    if (window.phase1Group) window.phase1Group.clearLayers();
+    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
-        if (window.phase1Group) window.phase1Group.clearLayers();
-        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
 
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom
-        );
+    location.hash = '';
+    showPrefSpots();
 
-        location.hash = '';
-        showPrefSpots();
+    window.map.invalidateSize(true);
 
-        window.map.invalidateSize(true);
-
-        document.getElementById('map-back-btn').style.display = 'none';
-        initAreaUI();
-
-        return;
-    }
+    document.getElementById('map-back-btn').style.display = 'none';
+    initAreaUI();
 }
 
 function buildSpotRestoreObject() {
