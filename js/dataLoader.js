@@ -1016,10 +1016,12 @@ if (s && s.tileLayer) {
 
     s.tileLayer.addTo(window.map);
 
-    window.map.setView(
-        [area.lat, area.lng],
-        area.zoom || window.prefData.zoom
-    );
+    window.map.once('layeradd', () => {
+        window.map.setView(
+            [area.lat, area.lng],
+            area.zoom || window.prefData.zoom
+        );
+    });
 
 } else {
     alert("保存されてない");
