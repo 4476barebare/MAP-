@@ -983,6 +983,8 @@ function updateStateFromHash() {
 }
 
 function goBack() {
+    map.touchZoom.disable();
+    map.dragging.disable();
 
     const area = window.areaData.find(a =>
         String(a.individualId) === String(window.currentAreaId?.split('_')[1])
