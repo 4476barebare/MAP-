@@ -835,30 +835,45 @@ function normalizeSpot(raw) {
     };
 }
 
-window.gsiStdLayer = L.tileLayer(
-    'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-    {
-        attribution: '国土地理院',
-        maxZoom: 18
-    }
-);
+function resetGsiLayer() {
 
-window.gsiPhotoLayer = L.tileLayer(
-    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-    {
-        attribution: '国土地理院',
-        maxZoom: 18
+    // ① 既存レイヤ完全削除
+    if (window.gsiLayer) {
+        if (window.map.hasLayer(window.gsiLayer)) {
+            window.map.removeLayer(window.gsiLayer);
+        }
+        window.gsiLayer = null;
     }
-);
+
+    // ② 念のため tileLayer 全掃除（残留対策）
+    window.map.eachLayer(layer => {
+        if (layer instanceof L.TileLayer) {
+            window.map.removeLayer(layer);
+        }
+    });
+
+    // ③ 新規生成（クリーン状態）
+    window.gsiLayer = L.tileLayer(
+        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+        {
+            attribution: '国土地理院',
+            maxZoom: 18,
+            keepBuffer: 0
+        }
+    );
+
+    window.gsiLayer.addTo(window.map);
+}
 
 function zoomToSpot(spot) {
 
-    showDebug("zoomToSpot: " + spot.name);
-
+    // =====================================================
+    // ① Phase2停止
+    // =====================================================
     disablePhase2(window.map);
 
     // =====================================================
-    // ① 既存タイル全削除（GSI含め完全リセット）
+    // ② タイル完全リセット（ここが重要）
     // =====================================================
     window.map.eachLayer(layer => {
         if (layer instanceof L.TileLayer) {
@@ -866,53 +881,50 @@ function zoomToSpot(spot) {
         }
     });
 
+    if (window.gsiLayer) {
+        if (window.map.hasLayer(window.gsiLayer)) {
+            window.map.removeLayer(window.gsiLayer);
+        }
+        window.gsiLayer = null;
+    }
+
     if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
         window.map.removeLayer(window.osmLayer);
-    }
-
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-        window.currentTileLayer = null;
+        window.osmLayer = null;
     }
 
     // =====================================================
-    // ② GSI標準タイル（std固定）
+    // ③ GSI再生成（クリーン状態）
     // =====================================================
-    if (!window.gsiStdLayer) {
-        window.gsiStdLayer = L.tileLayer(
-            'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-            {
-                attribution: '国土地理院',
-                maxZoom: 18,
-                keepBuffer: 8
-            }
-        );
-    }
-
-    window.currentTileLayer = window.gsiStdLayer;
-    window.currentTileLayer.addTo(window.map);
-
-    showDebug("tile switched (GSI std)");
+    window.gsiLayer = L.tileLayer(
+        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+        {
+            attribution: '国土地理院',
+            maxZoom: 18,
+            keepBuffer: 0
+        }
+    ).addTo(window.map);
 
     // =====================================================
-    // ③ 操作ロック
+    // ④ デバッグ
+    // =====================================================
+    alert(spot.name);
+
+    // =====================================================
+    // ⑤ 操作ロック
     // =====================================================
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    showDebug("controls locked");
-
     // =====================================================
-    // ④ 座標正規化
+    // ⑥ 座標正規化
     // =====================================================
     const safe = normalizeSpot(spot);
 
-    showDebug("normalized: " + safe.lat + "," + safe.lng + " zoom=" + safe.zoom);
-
     // =====================================================
-    // ⑤ 地図移動（ここが基準点）
+    // ⑦ 移動（drawLocation排除：競合防止）
     // =====================================================
     window.map.stop();
 
@@ -922,89 +934,28 @@ function zoomToSpot(spot) {
         { animate: false }
     );
 
-    showDebug("setView done");
+    resetSpotLayers();
 
     // =====================================================
-    // ⑥ 1フレーム待ってからレイヤ処理
+    // ⑧ 復帰処理
     // =====================================================
-    requestAnimationFrame(() => {
+    window.map.once('moveend', function () {
 
-        showDebug("post frame processing");
+        window.map.setMinZoom(safe.zoom || 15);
+        window.map.setMaxZoom(18);
 
-        resetSpotLayers();
+        const bounds = window.map.getBounds();
+        window.map.setMaxBounds(bounds);
+        window.map.options.maxBoundsViscosity = 1.0;
 
-        window.map.invalidateSize(true);
+        window._zoomGuardBase = safe.zoom || 15;
+        window._zoomGuardActive = true;
 
-        // =================================================
-        // ⑦ 復帰制御（moveend）
-        // =================================================
-        window.map.once('moveend', function () {
-
-            showDebug("moveend fired");
-
-            window.map.setMinZoom(safe.zoom || 15);
-            window.map.setMaxZoom(18);
-
-            const bounds = window.map.getBounds();
-            window.map.setMaxBounds(bounds);
-            window.map.options.maxBoundsViscosity = 1.0;
-
-            window._zoomGuardBase = safe.zoom || 15;
-            window._zoomGuardActive = true;
-
-            window.map.dragging.enable();
-            window.map.scrollWheelZoom.enable();
-            window.map.doubleClickZoom.enable();
-            window.map.touchZoom.enable();
-
-            showDebug("restore complete");
-        });
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
     });
-    
-    requestAnimationFrame(() => {
-
-    // =========================
-    // 切替ボタン（初回のみ生成）
-    // =========================
-    if (!document.getElementById("map-toggle-btn")) {
-
-        const btn = document.createElement("button");
-        btn.id = "map-toggle-btn";
-        btn.textContent = "航空写真";
-
-        btn.style.position = "absolute";
-        btn.style.bottom = "20px";
-        btn.style.right = "20px";
-        btn.style.zIndex = 9999;
-        btn.style.padding = "6px 10px";
-        btn.style.background = "#fff";
-        btn.style.border = "1px solid #ccc";
-        btn.style.borderRadius = "4px";
-
-        document.body.appendChild(btn);
-
-        let isPhoto = false;
-
-        btn.addEventListener("click", () => {
-
-            // 現在レイヤ削除
-            if (window.currentTileLayer) {
-                window.map.removeLayer(window.currentTileLayer);
-            }
-
-            // 切替
-            isPhoto = !isPhoto;
-
-            window.currentTileLayer = isPhoto
-                ? window.gsiPhotoLayer
-                : window.gsiStdLayer;
-
-            window.currentTileLayer.addTo(window.map);
-
-            btn.textContent = isPhoto ? "標準地図" : "航空写真";
-        });
-    }
-});
 }
 
 function resetSpotLayers() {
