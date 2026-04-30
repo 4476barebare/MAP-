@@ -592,27 +592,17 @@ function disablePhase2(map) {
 
     if (!map) return;
 
-    // -------------------------
-    // イベント解除
-    // -------------------------
     if (typeof map._phase2Handler === "function") {
         map.off('dragend', map._phase2Handler);
+        map._phase2Handler = null;
     }
 
-    // ★全部消す（安全策）
-    map.off('dragend');
+    // ★これ削除
+    // map.off('dragend');
 
-    map._phase2Handler = null;
+    window.phase2Initialized = false;
+    window.lastVisibleSet = new Set();
 
-    // -------------------------
-    // 状態リセット
-    // -------------------------
-    phase2Initialized = false;
-    lastVisibleSet = new Set();
-
-    // -------------------------
-    // UIクリア
-    // -------------------------
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
 
