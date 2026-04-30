@@ -502,7 +502,7 @@ function selectSpot(spot) {
 
     if (currentZoom === 13) {
     // ★ ここでspotオブジェクトを渡して呼び出す
-    zoomToSpot(Spot);
+    zoomToSpot(spot);
     return;
 }
     if (window.phase1Group) {
