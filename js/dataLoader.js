@@ -1011,6 +1011,7 @@ function goBack() {
 const restoreSpot = buildSpotRestoreObject();
 
 if (restoreSpot) {
+    const spotKey = window.currentSpotId?.split('_')[2];
         // spotキー削除
 location.hash = location.hash.replace('/' + spotKey, '');
 
