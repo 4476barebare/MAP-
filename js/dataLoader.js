@@ -1014,7 +1014,9 @@ function goBack() {
         s.tileLayer.addTo(window.map);
 
         window.map.once('layeradd', () => {
-            selectArea(area);
+            window.map.setView(
+                [area.lat, area.lng],
+                area.zoom || window.prefData.zoom
             );
         });
         
