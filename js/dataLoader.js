@@ -590,13 +590,19 @@ function enablePhase2(map) {
 
 function disablePhase2(map) {
 
+    if (!map) return;
+
     // -------------------------
     // イベント解除
     // -------------------------
-    if (map._phase2Handler) {
+    if (typeof map._phase2Handler === "function") {
         map.off('dragend', map._phase2Handler);
-        map._phase2Handler = null;
     }
+
+    // ★全部消す（安全策）
+    map.off('dragend');
+
+    map._phase2Handler = null;
 
     // -------------------------
     // 状態リセット
@@ -605,7 +611,7 @@ function disablePhase2(map) {
     lastVisibleSet = new Set();
 
     // -------------------------
-    // UIクリア（ここを統合）
+    // UIクリア
     // -------------------------
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
@@ -804,7 +810,7 @@ function zoomToSpot(spot) {
     // -------------------------
     // Phase2停止
     // -------------------------
-    //disablePhase2(window.map);
+    disablePhase2(window.map);
 alert(spot.name);
     // -------------------------
     // GSIレイヤー（使い回し）
