@@ -407,10 +407,8 @@ function selectArea(area) {
     // 移動後処理
     // -------------------------
     window.map.once('moveend', () => {
-        saveMapState();
-
         window.map.invalidateSize(true);
-
+        saveMapState();
         showSpotsForArea(window.currentAreaId);
 
         enableAreaSwipe();
