@@ -940,6 +940,7 @@ function updateStateFromHash() {
 }
 
 function goBack() {
+    
 
 
     const area = window.areaData.find(a =>
@@ -984,7 +985,7 @@ function goBack() {
     
 
     const z = window.map.getZoom();
-if (z >= 12.8) {
+    if (z  === 13) {
     
     const s = window.mapStateSnapshot;
     
@@ -1029,7 +1030,6 @@ if (z >= 12.8) {
     // =========================
     // pref 初期化ブロック
     // =========================
-    
     if (window.phase1Group) {
     window.phase1Group.clearLayers();
 }
@@ -1038,7 +1038,8 @@ if (z >= 12.8) {
 if (window.areaSpotLayer) {
     window.areaSpotLayer.clearLayers();
 }
-    
+
+
     drawLocation(
         window.prefData.name,
         window.prefData.lat,
