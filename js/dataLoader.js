@@ -843,9 +843,9 @@ function zoomToSpot(spot) {
 
     disablePhase2(window.map);
 
-    // -------------------------
-    // タイル全削除
-    // -------------------------
+    // =====================================================
+    // ① 既存タイル全削除（GSI含め完全リセット）
+    // =====================================================
     window.map.eachLayer(layer => {
         if (layer instanceof L.TileLayer) {
             window.map.removeLayer(layer);
@@ -856,26 +856,33 @@ function zoomToSpot(spot) {
         window.map.removeLayer(window.osmLayer);
     }
 
-    // -------------------------
-    // GSIレイヤー準備
-    // -------------------------
-    if (!window.gsiLayer) {
-        window.gsiLayer = L.tileLayer(
-            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+    if (window.currentTileLayer) {
+        window.map.removeLayer(window.currentTileLayer);
+        window.currentTileLayer = null;
+    }
+
+    // =====================================================
+    // ② GSI標準タイル（std固定）
+    // =====================================================
+    if (!window.gsiStdLayer) {
+        window.gsiStdLayer = L.tileLayer(
+            'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
             {
                 attribution: '国土地理院',
+                maxZoom: 18,
                 keepBuffer: 8
             }
         );
     }
 
-    window.gsiLayer.addTo(window.map);
+    window.currentTileLayer = window.gsiStdLayer;
+    window.currentTileLayer.addTo(window.map);
 
-    showDebug("tile switched");
+    showDebug("tile switched (GSI std)");
 
-    // -------------------------
-    // 操作ロック
-    // -------------------------
+    // =====================================================
+    // ③ 操作ロック
+    // =====================================================
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
@@ -883,16 +890,16 @@ function zoomToSpot(spot) {
 
     showDebug("controls locked");
 
-    // -------------------------
-    // 座標正規化
-    // -------------------------
+    // =====================================================
+    // ④ 座標正規化
+    // =====================================================
     const safe = normalizeSpot(spot);
 
     showDebug("normalized: " + safe.lat + "," + safe.lng + " zoom=" + safe.zoom);
 
-    // -------------------------
-    // 地図移動（ここが基準）
-    // -------------------------
+    // =====================================================
+    // ⑤ 地図移動（ここが基準点）
+    // =====================================================
     window.map.stop();
 
     window.map.setView(
@@ -903,9 +910,9 @@ function zoomToSpot(spot) {
 
     showDebug("setView done");
 
-    // -------------------------
-    // ★重要：1フレーム遅延で後処理
-    // -------------------------
+    // =====================================================
+    // ⑥ 1フレーム待ってからレイヤ処理
+    // =====================================================
     requestAnimationFrame(() => {
 
         showDebug("post frame processing");
@@ -914,9 +921,9 @@ function zoomToSpot(spot) {
 
         window.map.invalidateSize(true);
 
-        // -------------------------
-        // 復帰処理
-        // -------------------------
+        // =================================================
+        // ⑦ 復帰制御（moveend）
+        // =================================================
         window.map.once('moveend', function () {
 
             showDebug("moveend fired");
