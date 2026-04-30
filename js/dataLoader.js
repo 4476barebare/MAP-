@@ -835,7 +835,21 @@ function normalizeSpot(raw) {
     };
 }
 
+window.gsiStdLayer = L.tileLayer(
+    'https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+    {
+        attribution: '国土地理院',
+        maxZoom: 18
+    }
+);
 
+window.gsiPhotoLayer = L.tileLayer(
+    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+    {
+        attribution: '国土地理院',
+        maxZoom: 18
+    }
+);
 
 function zoomToSpot(spot) {
 
@@ -946,6 +960,51 @@ function zoomToSpot(spot) {
             showDebug("restore complete");
         });
     });
+    
+    requestAnimationFrame(() => {
+
+    // =========================
+    // 切替ボタン（初回のみ生成）
+    // =========================
+    if (!document.getElementById("map-toggle-btn")) {
+
+        const btn = document.createElement("button");
+        btn.id = "map-toggle-btn";
+        btn.textContent = "航空写真";
+
+        btn.style.position = "absolute";
+        btn.style.bottom = "20px";
+        btn.style.right = "20px";
+        btn.style.zIndex = 9999;
+        btn.style.padding = "6px 10px";
+        btn.style.background = "#fff";
+        btn.style.border = "1px solid #ccc";
+        btn.style.borderRadius = "4px";
+
+        document.body.appendChild(btn);
+
+        let isPhoto = false;
+
+        btn.addEventListener("click", () => {
+
+            // 現在レイヤ削除
+            if (window.currentTileLayer) {
+                window.map.removeLayer(window.currentTileLayer);
+            }
+
+            // 切替
+            isPhoto = !isPhoto;
+
+            window.currentTileLayer = isPhoto
+                ? window.gsiPhotoLayer
+                : window.gsiStdLayer;
+
+            window.currentTileLayer.addTo(window.map);
+
+            btn.textContent = isPhoto ? "標準地図" : "航空写真";
+        });
+    }
+});
 }
 
 function resetSpotLayers() {
