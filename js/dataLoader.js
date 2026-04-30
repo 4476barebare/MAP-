@@ -423,7 +423,6 @@ function selectArea(area) {
     disablePhase2(window.map);
 }
 
-
 function saveMapState() {
 
     let tile = null;
@@ -433,11 +432,10 @@ function saveMapState() {
     }
 
     window.mapStateSnapshot = {
-        tileLayer: tile,
-        center: window.map.getCenter(),
-        zoom: window.map.getZoom()
+        tileLayer: tile
     };
 }
+
 
 function showSpotsForArea(areaKey) {
 
@@ -1000,8 +998,8 @@ if (window.areaSpotLayer) {
         
         const s = window.mapStateSnapshot;
         
-        window.map.setMinZoom(0);
-window.map.setMaxZoom(18); // 元の値に合わせろ
+ //       window.map.setMinZoom(0);
+//window.map.setMaxZoom(18); // 元の値に合わせろ
 
 window.map.setMaxBounds(null);
 window.map.options.maxBoundsViscosity = 0;
@@ -1013,15 +1011,14 @@ window.map.options.maxBoundsViscosity = 0;
             window.phase1Group.addTo(window.map);
         }
 
-if (s && s.tileLayer) {
 
-    if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
-        window.map.removeLayer(window.gsiLayer);
-    }
+s.tileLayer.addTo(window.map);
 
-    s.tileLayer.addTo(window.map);
-    window.map.setView(s.center, s.zoom);
-}
+    // ★ここが変更点
+    window.map.setView(
+        [area.lat, area.lng],
+        area.zoom || window.prefData.zoom
+    );
 
         else{
         alert("保存されてない");
