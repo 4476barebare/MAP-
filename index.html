@@ -353,7 +353,10 @@ document.addEventListener('touchmove', (e) => {
             if (isZoomGuardFailed()) return;
 
             if (!isPrefView) {
-                goBack(window.currentHash);
+
+                setTimeout(() => {
+                    goBack(window.currentHash);
+                }, 0);
             }
         }
     }
