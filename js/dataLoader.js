@@ -8,8 +8,6 @@ window.prefData = null;
 window.areaData = [];
 window.spotData = []
 window.currentAreaId = null;
-window.phase1Group = L.layerGroup().addTo(map);
-window.phase2Group = L.layerGroup().addTo(map);
 window.gsiLayers = {
   ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
   photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
@@ -233,6 +231,10 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map.options.zoomSnap = 0.5;
         window.map.options.zoomDelta = 0.5;
         window.map.attributionControl.setPosition('topright');
+        
+        window.phase1Group = L.layerGroup().addTo(map);
+window.phase2Group = L.layerGroup().addTo(map);
+
 
 window.gsiLayer = L.tileLayer(
     window.gsiLayers.ort,
