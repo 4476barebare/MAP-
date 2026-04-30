@@ -360,15 +360,7 @@ function selectArea(area) {
         : area;
 
     if (!areaObj) return;
-
-    // -------------------------
-    // phase2停止
-    // -------------------------
     
-
-    // -------------------------
-    // レイヤー削除
-    // -------------------------
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
@@ -382,16 +374,9 @@ function selectArea(area) {
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
-    }
-
-    // -------------------------
-    // prefetch
-    // -------------------------
+    }--
     prefetchAround(areaObj);
-
-    // -------------------------
-    // 地図移動
-    // -------------------------
+    
     drawLocation(
         areaObj.name,
         areaObj.lat,
@@ -424,13 +409,10 @@ function selectArea(area) {
 }
 
 function saveMapState() {
-
     let tile = null;
-
     if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
         tile = window.gsiLayer;
     }
-
     window.mapStateSnapshot = {
         tileLayer: tile
     };
@@ -570,15 +552,7 @@ let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
 
-    showDebug("P2: enter");
-    showDebug("P2: map exists=" + !!map);
-    showDebug("P2: spotData=" + !!window.spotData);
-
-    //if (map._phase2Handler) return;
-    showDebug("ここまで");
     const runPhase2 = () => {
-
-        showDebug("P2: runPhase2 fired");
 
         requestAnimationFrame(() => {
 
@@ -602,10 +576,8 @@ function enablePhase2(map) {
     map._phase2Handler = runPhase2;
 
     map.on('dragend', runPhase2);
-    map.on('dragend', () => showDebug("P2: dragend fired"));
 
     map.once('moveend', () => {
-        showDebug("P2: moveend fired");
         runPhase2();
     });
 
@@ -1014,7 +986,6 @@ function goBack() {
             selectArea(area);
 
         } else {
-            alert("保存されてない");
             selectArea(area);
         }
 
