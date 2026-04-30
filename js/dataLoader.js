@@ -374,7 +374,7 @@ function selectArea(area) {
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
-    }--
+    }
     prefetchAround(areaObj);
     
     drawLocation(
