@@ -796,8 +796,11 @@ const popupHtml = `
 }
 
 function zoomToSpot(spot) {
-window.map.setMaxBounds(null);
-window.map.options.maxBoundsViscosity = 0;
+window.map.eachLayer(layer => {
+    if (layer instanceof L.TileLayer) {
+        window.map.removeLayer(layer);
+    }
+});
 
     // -------------------------
     // Phase2停止
@@ -842,7 +845,7 @@ window.map.options.maxBoundsViscosity = 0;
         spot.name,
         spot.lat,
         spot.lng,
-        spot.zoom || 15
+        spot.zoom
     );
 
     resetSpotLayers();
