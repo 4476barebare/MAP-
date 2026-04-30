@@ -10,6 +10,10 @@ window.spotData = []
 window.currentAreaId = null;
 window.phase1Group = L.layerGroup().addTo(map);
 window.phase2Group = L.layerGroup().addTo(map);
+window.gsiLayers = {
+  ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
+};
 
 function loadLocationCSV(csvUrl) {
 
@@ -230,14 +234,13 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map.options.zoomDelta = 0.5;
         window.map.attributionControl.setPosition('topright');
 
-        // ★初期はGSI固定（ここだけ）
-        window.gsiLayer = L.tileLayer(
-            'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
-            {
-                attribution: '© 国土地理院',
-                keepBuffer: 8
-            }
-        ).addTo(window.map);
+window.gsiLayer = L.tileLayer(
+    window.gsiLayers.ort,
+    {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }
+).addTo(window.map);
         
         if (window.currentAreaId === null) {
             showPrefSpots();
@@ -616,6 +619,11 @@ function disablePhase2(map) {
     }
 }
 
+window.gsiLayers = {
+  ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
+};
+
 function processSpotUtils(map, spots, mode) {
 
     if (mode === "prefetch") {
@@ -627,9 +635,9 @@ function processSpotUtils(map, spots, mode) {
         const targets = spots.filter(s => s.icon === "spot");
         if (!targets.length) return;
 
+        // ★ここを統一
         const baseUrl =
-            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/' +
-            zoom + '/{x}/{y}.jpg';
+            window.gsiLayers.photo.replace('{z}', zoom);
 
         for (const s of targets) {
 
@@ -645,7 +653,7 @@ function processSpotUtils(map, spots, mode) {
                 (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
             );
 
-            // ★ここだけ変更（1枚 → 2×2）
+            // ★2×2プリフェッチ
             for (let dx = 0; dx <= 1; dx++) {
                 for (let dy = 0; dy <= 1; dy++) {
 
@@ -677,7 +685,6 @@ function processSpotUtils(map, spots, mode) {
         return boundsList;
     }
 }
-
 function updateSpotMenu(spots, map) {
 
     const menu = document.getElementById("map-menu");
@@ -835,36 +842,6 @@ function normalizeSpot(raw) {
     };
 }
 
-function resetGsiLayer() {
-
-    // ① 既存レイヤ完全削除
-    if (window.gsiLayer) {
-        if (window.map.hasLayer(window.gsiLayer)) {
-            window.map.removeLayer(window.gsiLayer);
-        }
-        window.gsiLayer = null;
-    }
-
-    // ② 念のため tileLayer 全掃除（残留対策）
-    window.map.eachLayer(layer => {
-        if (layer instanceof L.TileLayer) {
-            window.map.removeLayer(layer);
-        }
-    });
-
-    // ③ 新規生成（クリーン状態）
-    window.gsiLayer = L.tileLayer(
-        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-        {
-            attribution: '国土地理院',
-            maxZoom: 18,
-            keepBuffer: 0
-        }
-    );
-
-    window.gsiLayer.addTo(window.map);
-}
-
 function zoomToSpot(spot) {
 
     disablePhase2(window.map);
@@ -878,6 +855,7 @@ function zoomToSpot(spot) {
         }
     });
 
+    // ★レイヤ参照も完全リセット
     if (window.gsiLayer) {
         window.map.removeLayer(window.gsiLayer);
         window.gsiLayer = null;
@@ -888,8 +866,11 @@ function zoomToSpot(spot) {
         window.osmLayer = null;
     }
 
+    // =====================================================
+    // ② 新しいベース（航空写真＝photo）
+    // =====================================================
     window.gsiLayer = L.tileLayer(
-        'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+        window.gsiLayers.photo,
         {
             attribution: '国土地理院',
             maxZoom: 18
@@ -897,7 +878,7 @@ function zoomToSpot(spot) {
     ).addTo(window.map);
 
     // =====================================================
-    // ② 操作ロック（ここは移動前に固定）
+    // ③ 操作ロック
     // =====================================================
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
@@ -905,12 +886,12 @@ function zoomToSpot(spot) {
     window.map.touchZoom.disable();
 
     // =====================================================
-    // ③ データ正規化
+    // ④ 正規化
     // =====================================================
     const safe = normalizeSpot(spot);
 
     // =====================================================
-    // ④ 移動（drawLocationのみ責務）
+    // ⑤ 移動
     // =====================================================
     drawLocation(
         safe.name,
@@ -922,7 +903,7 @@ function zoomToSpot(spot) {
     resetSpotLayers();
 
     // =====================================================
-    // ⑤ 復帰（moveend一回だけ）
+    // ⑥ 復帰処理
     // =====================================================
     window.map.once('moveend', function () {
 
@@ -941,7 +922,6 @@ function zoomToSpot(spot) {
         window.map.touchZoom.enable();
     });
 }
-
 function resetSpotLayers() {
 
     if (window.markerControl) {
