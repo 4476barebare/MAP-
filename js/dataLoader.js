@@ -501,6 +501,7 @@ function selectSpot(spot) {
     const currentZoom = window.map.getZoom();
 
     if (currentZoom === 13) {
+        disablePhase2(window.map);
     // ★ ここでspotオブジェクトを渡して呼び出す
     zoomToSpot(spot);
     return;
@@ -799,13 +800,12 @@ const popupHtml = `
 }
 
 function zoomToSpot(safeSpot) {
-    alert("呼び出し");
-
+  
     // -------------------------
     // Phase2停止
     // -------------------------
-    disablePhase2(window.map);
-
+    //disablePhase2(window.map);
+alert(safeSpot.name);
     // -------------------------
     // GSIレイヤー（使い回し）
     // -------------------------
