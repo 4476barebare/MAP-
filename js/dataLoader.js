@@ -929,6 +929,17 @@ function resetSpotLayers() {
     if (window.phase2Group) {
         window.phase2Group.clearLayers();
     }
+
+    if (window.areaSpotLayer) {
+        window.areaSpotLayer.clearLayers();
+        window.map.removeLayer(window.areaSpotLayer);
+        window.areaSpotLayer = null;
+    }
+
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
+    }
 }
 
 function updateStateFromHash() {
