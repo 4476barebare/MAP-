@@ -1008,7 +1008,18 @@ function goBack() {
 const restoreSpot = buildSpotRestoreObject();
 
 if (restoreSpot) {
-    selectSpot(restoreSpot);
+        // spotキー削除
+location.hash = location.hash.replace('/' + spotKey, '');
+
+// state更新
+updateStateFromHash();
+
+// phase2へ戻すなら再描画
+selectSpot(restoreSpot);
+    showSpotsForArea(window.currentAreaId);
+    
+showShop02(window.currentAreaId);
+    
     return;
 }
 
