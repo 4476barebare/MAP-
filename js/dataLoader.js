@@ -835,6 +835,24 @@ function normalizeSpot(raw) {
     };
 }
 
+function applySpotView(spot) {
+
+    window.map.setMinZoom(spot.zoom);
+    window.map.setMaxZoom(18);
+
+    const bounds = window.map.getBounds();
+    window.map.setMaxBounds(bounds);
+    window.map.options.maxBoundsViscosity = 1.0;
+
+    window._zoomGuardBase = spot.zoom;
+    window._zoomGuardActive = true;
+
+    window.map.dragging.enable();
+    window.map.scrollWheelZoom.enable();
+    window.map.doubleClickZoom.enable();
+    window.map.touchZoom.enable();
+}
+
 function zoomToSpot(spot) {
 window.map.eachLayer(layer => {
     if (layer instanceof L.TileLayer) {
@@ -890,27 +908,10 @@ drawLocation(
     safe.zoom
 );
     resetSpotLayers();
+    
+    applySpotView(safe);
 
-    // -------------------------
-    // 復帰処理
-    // -------------------------
-    window.map.once('moveend', function () {
-
-        window.map.setMinZoom(spot.zoom || 15);
-        window.map.setMaxZoom(18);
-
-        const bounds = window.map.getBounds();
-        window.map.setMaxBounds(bounds);
-        window.map.options.maxBoundsViscosity = 1.0;
-
-        window._zoomGuardBase = spot.zoom || 15;
-        window._zoomGuardActive = true;
-
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-    });
+    
 }
 
 function resetSpotLayers() {
