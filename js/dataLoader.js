@@ -835,41 +835,28 @@ function normalizeSpot(raw) {
     };
 }
 
-function applySpotView(spot) {
 
-    window.map.setMinZoom(spot.zoom);
-    window.map.setMaxZoom(18);
-
-    const bounds = window.map.getBounds();
-    window.map.setMaxBounds(bounds);
-    window.map.options.maxBoundsViscosity = 1.0;
-
-    window._zoomGuardBase = spot.zoom;
-    window._zoomGuardActive = true;
-
-    window.map.dragging.enable();
-    window.map.scrollWheelZoom.enable();
-    window.map.doubleClickZoom.enable();
-    window.map.touchZoom.enable();
-}
 
 function zoomToSpot(spot) {
-window.map.eachLayer(layer => {
-    if (layer instanceof L.TileLayer) {
-        window.map.removeLayer(layer);
-    }
-});
 
     // -------------------------
     // Phase2停止
     // -------------------------
     disablePhase2(window.map);
 
-    alert(spot.name);
+    // -------------------------
+    // タイル完全整理
+    // -------------------------
+    window.map.eachLayer(layer => {
+        if (layer instanceof L.TileLayer) {
+            window.map.removeLayer(layer);
+        }
+    });
 
-    // -------------------------
-    // GSIレイヤー（使い回し）
-    // -------------------------
+    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+        window.map.removeLayer(window.osmLayer);
+    }
+
     if (!window.gsiLayer) {
         window.gsiLayer = L.tileLayer(
             'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
@@ -879,17 +866,10 @@ window.map.eachLayer(layer => {
         );
     }
 
-    // ★タイル整理（今の構造に合わせる）
-    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
-        window.map.removeLayer(window.osmLayer);
-    }
-
-    if (window.gsiLayer && !window.map.hasLayer(window.gsiLayer)) {
-        window.gsiLayer.addTo(window.map);
-    }
+    window.gsiLayer.addTo(window.map);
 
     // -------------------------
-    // 操作ロック
+    // 操作ロック（先に統一）
     // -------------------------
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
@@ -897,21 +877,48 @@ window.map.eachLayer(layer => {
     window.map.touchZoom.disable();
 
     // -------------------------
-    // 移動
+    // データ正規化
     // -------------------------
     const safe = normalizeSpot(spot);
 
-drawLocation(
-    safe.name,
-    safe.lat,
-    safe.lng,
-    safe.zoom
-);
-    resetSpotLayers();
-    
-    applySpotView(safe);
+    // -------------------------
+    // 移動（ここが主）
+    // -------------------------
+    window.map.stop();
 
-    
+    window.map.setView(
+        [safe.lat, safe.lng],
+        safe.zoom,
+        { animate: false }
+    );
+
+    resetSpotLayers();
+
+    // -------------------------
+    // 復帰処理（1本化）
+    // -------------------------
+    function restore() {
+
+        window.map.setMinZoom(safe.zoom);
+        window.map.setMaxZoom(18);
+
+        const bounds = window.map.getBounds();
+        window.map.setMaxBounds(bounds);
+        window.map.options.maxBoundsViscosity = 1.0;
+
+        window._zoomGuardBase = safe.zoom;
+        window._zoomGuardActive = true;
+
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+    }
+
+    // moveend依存やめる（重要）
+    requestAnimationFrame(() => {
+        setTimeout(restore, 0);
+    });
 }
 
 function resetSpotLayers() {
