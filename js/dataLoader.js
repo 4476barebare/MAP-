@@ -619,10 +619,6 @@ function disablePhase2(map) {
     }
 }
 
-window.gsiLayers = {
-  ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
-  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
-};
 
 function processSpotUtils(map, spots, mode) {
 
