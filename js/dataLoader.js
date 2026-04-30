@@ -983,7 +983,7 @@ function goBack() {
     // =====================================================
     
 
-
+    const z = window.map.getZoom();
 if (z >= 12.8) {
     
     const s = window.mapStateSnapshot;
