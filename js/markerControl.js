@@ -1,8 +1,6 @@
 window.markerControl = {
     shop01Cache: {},
     shop01AreaCache: {},
-    shop01Layer: null,
-    shop02Layer: null
 };
 
 function preloadShop01(url) {
@@ -207,27 +205,7 @@ function getIconId(raw) {
         .replace(/[^\w-]/g, '');
 }
 
-// -----------------------
-// clear
-// -----------------------
-function clearShop01() {
-    if (markerControl.shop01Layer) {
-        markerControl.shop01Layer.clearLayers();
-    }
-}
-
-function clearShop02() {
-    if (markerControl.shop02Layer) {
-        markerControl.shop02Layer.clearLayers();
-    }
-}
-
-// -----------------------
-// bind
-// -----------------------
 markerControl.preloadShop01 = preloadShop01;
 markerControl.showShop01 = showShop01;
 markerControl.showShop02 = showShop02;
 markerControl.getIconId = getIconId;
-markerControl.clearShop01 = clearShop01;
-markerControl.clearShop02 = clearShop02;
