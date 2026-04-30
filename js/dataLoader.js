@@ -929,16 +929,6 @@ function resetSpotLayers() {
     if (window.phase2Group) {
         window.phase2Group.clearLayers();
     }
-
-    if (window.markerControl) {
-        markerControl.clearShop01();
-        markerControl.clearShop02();
-    }
-
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
 }
 
 function updateStateFromHash() {
