@@ -977,7 +977,7 @@ function goBack() {
     }
 
     // =====================================================
-    // area → pref
+    // area → area（復元）
     // =====================================================
     const z = window.map.getZoom();
 
@@ -998,7 +998,7 @@ function goBack() {
             window.phase1Group.addTo(window.map);
         }
 
-        // タイル全削除
+        // タイルリセット
         if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
             window.map.removeLayer(window.gsiLayer);
         }
@@ -1010,23 +1010,8 @@ function goBack() {
 
             s.tileLayer.addTo(window.map);
 
-            // ★ area復元やめて spotで再構築
-            const firstSpot = window.spotData.find(
-                sp => String(sp.areaId) === String(window.currentAreaId)
-            );
-
-            if (firstSpot) {
-
-                window.currentSpotId =
-                    `spot_${window.currentAreaId.split('_')[1]}_${firstSpot.individualId}`;
-
-                selectSpot(
-                    area.name,
-                    firstSpot.name,
-                    firstSpot.lat,
-                    firstSpot.lng
-                );
-            }
+            // ★ここが本質：areaを再構築
+            selectArea(area);
 
         } else {
             alert("保存されてない");
@@ -1034,33 +1019,31 @@ function goBack() {
         }
 
         return;
-
-    } else {
-
-        // =========================
-        // pref 初期化ブロック
-        // =========================
-        if (window.phase1Group) {
-            window.phase1Group.clearLayers();
-        }
-
-        if (window.areaSpotLayer) {
-            window.areaSpotLayer.clearLayers();
-        }
-
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom
-        );
-
-        location.hash = '';
-        showPrefSpots();
-
-        window.map.invalidateSize(true);
-
-        document.getElementById('map-back-btn').style.display = 'none';
-        initAreaUI();
     }
+
+    // =====================================================
+    // area → pref
+    // =====================================================
+    if (window.phase1Group) {
+        window.phase1Group.clearLayers();
+    }
+
+    if (window.areaSpotLayer) {
+        window.areaSpotLayer.clearLayers();
+    }
+
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+
+    location.hash = '';
+    showPrefSpots();
+
+    window.map.invalidateSize(true);
+
+    document.getElementById('map-back-btn').style.display = 'none';
+    initAreaUI();
 }
