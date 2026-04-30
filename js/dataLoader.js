@@ -408,10 +408,11 @@ function selectArea(area) {
     // -------------------------
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-        saveMapState();
+
         showSpotsForArea(window.currentAreaId);
 
         enableAreaSwipe();
+        saveMapState();
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
