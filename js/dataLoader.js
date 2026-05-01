@@ -528,7 +528,7 @@ function selectSpot(spot) {
 } else{
     saveMapState();
     //return;
-};
+}
     
     
     if (window.phase1Group) {
