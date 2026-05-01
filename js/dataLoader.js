@@ -525,7 +525,7 @@ function selectSpot(spot) {
     zoomToSpot(spot);
     return;
 }
-    saveMapState();
+    
     
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
@@ -554,6 +554,7 @@ function selectSpot(spot) {
 
 // ① 移動完了後に制御をかける
 window.map.once('moveend', () => {
+    saveMapState();
     window.map.dragging.enable();
     window.map.scrollWheelZoom.enable();
     window.map.doubleClickZoom.enable();
