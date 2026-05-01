@@ -520,6 +520,7 @@ function selectSpot(spot) {
 
     if (currentZoom === 13) {
         //disablePhase2(window.map);
+    window.mapStateSnapshot = null;
     // ★ ここでspotオブジェクトを渡して呼び出す
     zoomToSpot(spot);
     return;
