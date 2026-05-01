@@ -858,7 +858,9 @@ function normalizeSpot(raw) {
 }
 
 function zoomToSpot(spot) {
+    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     window.mapStateSnapshot = null;
+    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
 
     disablePhase2(window.map);
     resetSpotLayers();
@@ -1008,6 +1010,7 @@ function goBack() {
     // ① phase2 → phase1（z >= 14）
     // =====================================================
     if (z >= 14) {
+        stopZoomGuard();
 
         // map操作復帰
         window.map.dragging.enable();
