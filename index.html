@@ -7,7 +7,7 @@
 
   <!-- SEO -->
   <title>釣り行こNAVI | 釣りスポットを地図で探す</title>
-  <meta name="description" content="釣り行こNAVIは、千葉を中心に釣りスポットを地図で探せる情報サイトです。エリア別に釣りポイントを簡単に確認できます。">
+  <meta name="description" content="釣り行こNAVIは、釣りスポットを地図で探せる情報サイトです。エリア別に釣りポイントを簡単に確認できます。">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://turiiko-navi.com/">
 
@@ -29,6 +29,8 @@
 <link rel="stylesheet" href="/css/main.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
+
+
 <body>
 
 <header>
@@ -71,8 +73,49 @@
   </div>
 </div>
 
+<div id="policyModal" class="modal">
+  <div class="modal-content">
 
-<footer>© 釣り行こNAVI</footer>
+    <section>
+      <h1>サイトポリシー</h1>
+
+      <h2>1. 免責事項</h2>
+      <p>
+        当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、
+        その完全性・正確性・最新性を保証するものではありません。
+        当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。
+      </p>
+
+      <h2>2. 掲載情報について</h2>
+      <p>
+        掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、
+        現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。
+        利用前に必ず現地の最新情報をご確認ください。
+      </p>
+
+      <h2>3. 釣行データについて</h2>
+      <p>
+        当サイトの釣行データは過去の記録に基づくものであり、
+        現在の釣果や釣りの可否を保証するものではありません。
+        また海洋環境や生態系の状態を保証するものではありません。
+      </p>
+
+      <h2>4. 安全について</h2>
+      <p>
+        釣りを行う際は安全に十分配慮してください。
+        釣り場所によっては管理者の許可が必要な場合があります。
+        必ず現地のルールに従ってください。
+      </p>
+
+      <p>最終更新日：2026年5月</p>
+    </section>
+
+  </div>
+</div>
+<footer class="site-footer">
+  <div>© 釣り行こNAVI</div>
+  <a href="#" id="policyLink" class="policy-link">サイトポリシー</a>
+</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/js/header.js"></script>
@@ -279,47 +322,6 @@ function routeUpdate() {
 }
 
 // =======================
-// DOM INIT
-// =======================
-document.addEventListener('DOMContentLoaded', () => {
-
-    const url = new URL(location.href);
-
-    if (!url.searchParams.get('pref')) {
-        url.searchParams.set('pref', 'CHIBA');
-        history.replaceState(null, '', url);
-    }
-
-    window.currentPref = url.searchParams.get('pref');
-    
-    const csvUrl = `/KANTO/${window.currentPref}_location.csv`;
-    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
-
-    loadLocationCSV(csvUrl, window.currentPref).then(() => {
-
-        updateStateFromHash();
-        routeUpdate();
-
-        window.markerControl.preloadShop01(shopUrl);
-    });
-
-    document.getElementById('map-back-btn')
-        .addEventListener('click', () => {
-            goBack(window.currentHash);
-        });
-
-    fetch('/icon/back.svg')
-        .then(res => res.text())
-        .then(svg => {
-            const btn = document.getElementById('map-back-btn');
-            btn.innerHTML = svg;
-
-            const svgEl = btn.querySelector('svg');
-            if (svgEl) svgEl.classList.add('back-icon');
-        });
-});
-
-// =======================
 // ZOOM GUARD
 // =======================
 function startZoomGuard() {
@@ -401,6 +403,74 @@ document.addEventListener('touchend', (e) => {
 
     pinchStartDistance = 0;
     pinchTriggered = false;
+
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    const url = new URL(location.href);
+
+    if (!url.searchParams.get('pref')) {
+        url.searchParams.set('pref', 'CHIBA');
+        history.replaceState(null, '', url);
+    }
+
+    window.currentPref = url.searchParams.get('pref');
+
+    const csvUrl = `/KANTO/${window.currentPref}_location.csv`;
+    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
+
+    loadLocationCSV(csvUrl, window.currentPref).then(() => {
+
+        updateStateFromHash();
+        routeUpdate();
+
+        window.markerControl.preloadShop01(shopUrl);
+    });
+
+    document.getElementById('map-back-btn')
+        ?.addEventListener('click', () => {
+            goBack(window.currentHash);
+        });
+
+    fetch('/icon/back.svg')
+        .then(res => res.text())
+        .then(svg => {
+            const btn = document.getElementById('map-back-btn');
+            if (!btn) return;
+
+            btn.innerHTML = svg;
+
+            const svgEl = btn.querySelector('svg');
+            if (svgEl) svgEl.classList.add('back-icon');
+        });
+
+    // ===== ポリシーモーダル（安全版） =====
+
+    const policyLink = document.getElementById("policyLink");
+    const policyModal = document.getElementById("policyModal");
+
+    if (policyLink && policyModal) {
+
+        // 開く
+
+        policyLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            policyModal.style.display = "block";
+
+        });
+
+        // 背景クリックで閉じる（中身クリックは無効）
+
+        policyModal.addEventListener("click", (e) => {
+            if (e.target === policyModal) {
+                policyModal.style.display = "none";
+            }
+        });
+
+    }
+
+
 
 });
 
