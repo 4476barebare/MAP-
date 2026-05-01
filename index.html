@@ -318,17 +318,18 @@ function stopZoomGuard() {
     window._zoomGuardBase = null;
 }
 
-// =======================
-// PINCH CONTROL
-// =======================
 
-// 既存変数を流用
+// =======================
+// STATE
+// =======================
 let pinchStartDistance = 0;
+let pinchTriggered = false;
+let pinchPendingGoBack = false;
+let isMapMoving = false;
 
-// goBack要求フラグ（追加）
-let pinchRequestGoBack = false;
-
-// 距離計算
+// =======================
+// DISTANCE
+// =======================
 function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
@@ -336,11 +337,29 @@ function getDistance(touches) {
 }
 
 // =======================
+// MAP MOVE LOCK
+// =======================
+window.map.on('movestart', () => {
+    isMapMoving = true;
+});
+
+window.map.on('moveend', () => {
+    isMapMoving = false;
+
+    // 移動終わった後に保留実行
+    if (pinchPendingGoBack) {
+        pinchPendingGoBack = false;
+        goBack(window.currentHash);
+    }
+});
+
+// =======================
 // START
 // =======================
 document.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
         pinchStartDistance = getDistance(e.touches);
+        pinchTriggered = false;
     }
 }, { passive: true });
 
@@ -350,43 +369,42 @@ document.addEventListener('touchstart', (e) => {
 document.addEventListener('touchmove', (e) => {
     if (e.touches.length !== 2) return;
 
-    e.preventDefault();
-
     const currentDistance = getDistance(e.touches);
 
     const isPinchIn = currentDistance < pinchStartDistance - 20;
 
     if (!isPinchIn) return;
+    if (pinchTriggered) return;
+
+    pinchTriggered = true;
 
     if (isZoomGuardFailed()) return;
 
     const isPrefView = !window.currentAreaId && !window.currentSpotId;
     if (isPrefView) return;
 
-    pinchRequestGoBack = true;
-}, { passive: false });
+    // ★ここでは実行しない
+    pinchPendingGoBack = true;
+
+}, { passive: true });
 
 // =======================
-// END（リセット）
+// END
 // =======================
 document.addEventListener('touchend', (e) => {
-    if (e.touches.length === 0) {
-        pinchStartDistance = 0;
-    }
-});
 
-// =======================
-// ZOOM確定後に実行
-// =======================
-window.map.on('zoomend', () => {
+    if (e.touches.length !== 0) return;
 
-    if (!pinchRequestGoBack) return;
+    pinchStartDistance = 0;
 
-    pinchRequestGoBack = false;
+    // mapが動いてるなら待つ
+    if (isMapMoving) return;
 
-    requestAnimationFrame(() => {
-        goBack(window.currentHash);
-    });
+    if (!pinchPendingGoBack) return;
+
+    pinchPendingGoBack = false;
+
+    goBack(window.currentHash);
 });
 
 </script>
