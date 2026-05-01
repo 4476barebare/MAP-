@@ -1090,8 +1090,13 @@ if (!window.gsiLayer) {
     // =====================================================
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-    
-    window.baseTile.setUrl(window.gsiLayers.ort);
+
+if (!window.gsiLayer) {
+    window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+} else {
+    window.gsiLayer.setUrl(window.gsiLayers.ort);
+}
+
 
     drawLocation(
         window.prefData.name,
