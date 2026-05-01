@@ -858,6 +858,7 @@ function normalizeSpot(raw) {
 }
 
 function zoomToSpot(spot) {
+    window.mapStateSnapshot = null;
 
     disablePhase2(window.map);
     resetSpotLayers();
@@ -1064,7 +1065,8 @@ if (window.gsiLayer) {
     // ② phase1維持（z === 13）
     // =====================================================
 if (z === 13) {
-    window.mapStateSnapshot = null;
+    
+    
     
     window.map.eachLayer(layer => {
 
