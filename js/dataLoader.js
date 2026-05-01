@@ -1088,6 +1088,20 @@ window.map.eachLayer(layer => {
         }
     }
 });
+
+
+window.map.eachLayer(layer => {
+
+    if (!(layer instanceof L.TileLayer)) return;
+
+    const url = layer._url || '';
+
+    // OSMだけ消す
+    if (url.includes('openstreetmap')) {
+        window.map.removeLayer(layer);
+    }
+
+});
 //alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     
     window.map.setMinZoom(0);
