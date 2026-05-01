@@ -462,7 +462,7 @@ function showSpotsForArea(areaKey) {
                 html: `
                     <div class="spot-label ${iconId}">
                         <svg width="16" height="16">
-                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                            <use href="/icon/sprite.svg#icon-${iconId}"></use>
                         </svg>
                         <span>${spot.name}</span>
                     </div>
