@@ -703,6 +703,8 @@ li {
   margin: 5vh auto;        /* 中央寄せ */
   padding: 10px;
   border-radius: 8px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* =========================
