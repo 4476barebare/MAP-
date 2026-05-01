@@ -1037,18 +1037,20 @@ function goBack() {
         updateStateFromHash();
         
 
-if (!window.osmLayer) {
+
+        // phase2再構築
+        showSpotsForArea(window.currentAreaId);
+
+        // スポット復帰
+        selectSpot(restoreSpot);
+        
+        if (!window.osmLayer) {
     window.osmLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     );
 }
 
 window.osmLayer.addTo(window.map);
-        // phase2再構築
-        showSpotsForArea(window.currentAreaId);
-
-        // スポット復帰
-        selectSpot(restoreSpot);
 
         return;
     }
