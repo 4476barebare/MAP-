@@ -1125,7 +1125,14 @@ if (s?.isOrt) {
 
 window.gsiLayer.addTo(window.map);
 
-alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+
+window.map.eachLayer(layer => {
+    if (layer instanceof L.TileLayer) {
+        alert(layer._url);
+    }
+});
+
+
     selectArea(area);
 
     return;
