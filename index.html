@@ -272,8 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.currentPref = url.searchParams.get('pref');
     
-    const csvUrl = `/MAP-/KANTO/${window.currentPref}_location.csv`;
-    const shopUrl = `/MAP-/KANTO/${window.currentPref}_shop.csv`;
+    const csvUrl = `/KANTO/${window.currentPref}_location.csv`;
+    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
 
     loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             goBack(window.currentHash);
         });
 
-    fetch('/MAP-/icon/back.svg')
+    fetch('/icon/back.svg')
         .then(res => res.text())
         .then(svg => {
             const btn = document.getElementById('map-back-btn');
