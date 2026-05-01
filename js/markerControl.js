@@ -144,12 +144,12 @@ function showShop02(areaKey) {
             const html = noCircle
                 ? `<div class="shop-marker no-circle">
                         <svg class="shop-icon">
-                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                            <use href="/icon/sprite.svg#icon-${iconId}"></use>
                         </svg>
                    </div>`
                 : `<div class="shop-marker">
                         <svg class="shop-icon">
-                            <use href="/MAP-/icon/sprite.svg#icon-${iconId}"></use>
+                            <use href="/icon/sprite.svg#icon-${iconId}"></use>
                         </svg>
                    </div>`;
 
