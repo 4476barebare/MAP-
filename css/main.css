@@ -693,20 +693,23 @@ li {
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   z-index: 9999;
-  overflow: auto;
+ overflow: hidden;
 }
 
 .modal-content {
-  background: #fff;
-  width: 90vw;              /* 画面の90% */
-  max-width: 700px;        /* PC制限 */
-  margin: 5vh auto;        /* 中央寄せ */
-  padding: 10px;
-  border-radius: 8px;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
 
+  width: min(90vw, 700px);
+
+  margin: 5vh auto;
+
+  padding: 10px;
+
+  border-radius: 8px;
+  background: #fff;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+
+}
 /* =========================
 
    ポリシー本文
