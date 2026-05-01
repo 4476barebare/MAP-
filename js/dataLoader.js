@@ -527,7 +527,7 @@ function selectSpot(spot) {
     return;
 } else{
     saveMapState();
-    return;
+    //return;
 };
     
     
