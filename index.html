@@ -318,12 +318,12 @@ function stopZoomGuard() {
     window._zoomGuardBase = null;
 }
 
+
 // =======================
 // STATE
 // =======================
 let pinchStartDistance = 0;
 let pinchTriggered = false;
-let dragLocked = false;
 
 // =======================
 // DISTANCE
@@ -335,26 +335,20 @@ function getDistance(touches) {
 }
 
 // =======================
-// START
+// TOUCH START
 // =======================
 document.addEventListener('touchstart', (e) => {
 
     if (e.touches.length !== 2) return;
-    if (!window.currentAreaId && !window.currentSpotId) return;
 
-    // dragだけロック
-    if (!dragLocked) {
-        window.map.dragging.disable();
-        dragLocked = true;
-    }
-
+    // 状態だけ記録（Leafletには触らない）
     pinchStartDistance = getDistance(e.touches);
     pinchTriggered = false;
 
 }, { passive: true });
 
 // =======================
-// MOVE
+// TOUCH MOVE
 // =======================
 document.addEventListener('touchmove', (e) => {
 
@@ -370,13 +364,16 @@ document.addEventListener('touchmove', (e) => {
 
         if (isZoomGuardFailed()) return;
 
+        const isPrefView = !window.currentAreaId && !window.currentSpotId;
+        if (isPrefView) return;
+
         goBack(window.currentHash);
     }
 
 }, { passive: true });
 
 // =======================
-// END
+// RESET
 // =======================
 document.addEventListener('touchend', (e) => {
 
@@ -385,25 +382,6 @@ document.addEventListener('touchend', (e) => {
     pinchStartDistance = 0;
     pinchTriggered = false;
 
-    if (dragLocked) {
-        window.map.dragging.enable();
-        dragLocked = false;
-    }
-
-});
-
-// =======================
-// CANCEL
-// =======================
-document.addEventListener('touchcancel', () => {
-
-    pinchStartDistance = 0;
-    pinchTriggered = false;
-
-    if (dragLocked) {
-        window.map.dragging.enable();
-        dragLocked = false;
-    }
 });
 
 </script>
