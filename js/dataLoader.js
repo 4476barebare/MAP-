@@ -1017,7 +1017,6 @@ function goBack() {
     // =====================================================
     if (z >= 14) {
         stopZoomGuard();
-       // alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
 
         // map操作復帰
         window.map.dragging.enable();
@@ -1027,43 +1026,26 @@ function goBack() {
 
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
-
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
         // レイヤ整理
         if (window.phase2Group) window.phase2Group.clearLayers();
-        //if (window.phase1Group) window.phase1Group.addTo(window.map);
 
         const restoreSpot = buildSpotRestoreObject();
         if (!restoreSpot) return;
 
-        // ★ spotキー除去
+        // spotキー除去
         const spotKey = window.currentSpotId?.split('_')[2];
-
         if (spotKey) {
             location.hash = location.hash.replace('/' + spotKey, '');
         }
 
         updateStateFromHash();
-        
-           // alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
-        
-// phase2再構築
-showSpotsForArea(window.currentAreaId);
 
-// スポット復帰
-selectSpot(restoreSpot);
-
-// =====================
-// 最後にタイル確定
-// =====================
-if (!window.osmLayer) {
-    window.osmLayer = L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-    );
-}
-   // alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+        // 再構築
+        showSpotsForArea(window.currentAreaId);
+        selectSpot(restoreSpot);
 
         return;
     }
@@ -1071,86 +1053,51 @@ if (!window.osmLayer) {
     // =====================================================
     // ② phase1維持（z === 13）
     // =====================================================
-if (z === 13) {
-   //     alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
-    
-    
-window.map.eachLayer(layer => {
+    if (z === 13) {
 
-    if (layer === window.gsiLayer) return; // ★これ
+        // photo削除
+        window.map.eachLayer(layer => {
+            if (layer === window.gsiLayer) return;
 
-    if (layer instanceof L.TileLayer) {
+            if (layer instanceof L.TileLayer) {
+                const url = layer._url || '';
+                if (url.includes('seamlessphoto')) {
+                    window.map.removeLayer(layer);
+                }
+            }
+        });
 
-        const url = layer._url || '';
+        // OSM削除
+        window.map.eachLayer(layer => {
+            if (!(layer instanceof L.TileLayer)) return;
 
-        if (url.includes('seamlessphoto')) {
-            window.map.removeLayer(layer);
+            const url = layer._url || '';
+            if (url.includes('openstreetmap')) {
+                window.map.removeLayer(layer);
+            }
+        });
+
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        if (window.phase2Group) window.phase2Group.clearLayers();
+
+        // タイル確定（ort）
+        const s = window.mapStateSnapshot;
+
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
+        } else {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
         }
+
+        window.gsiLayer.addTo(window.map);
+
+        selectArea(area);
+        return;
     }
-});
-
-
-window.map.eachLayer(layer => {
-
-    if (!(layer instanceof L.TileLayer)) return;
-
-    const url = layer._url || '';
-
-    // OSMだけ消す
-    if (url.includes('openstreetmap')) {
-        window.map.removeLayer(layer);
-    }
-
-});
-//alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
-    
-    window.map.setMinZoom(0);
-    window.map.setMaxZoom(18);
-
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-
-    if (window.phase2Group) window.phase2Group.clearLayers();
-
-    // =========================
-    // タイル復元（ここが本体）
-    // =========================
-alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
-
-const s = window.mapStateSnapshot;
-
-if (s?.isOrt) {
-
-    if (!window.gsiLayer) {
-        window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
-    } else {
-        window.gsiLayer.setUrl(window.gsiLayers.ort);
-    }
-
-} else {
-
-    if (!window.gsiLayer) {
-        window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
-    } else {
-        window.gsiLayer.setUrl(window.gsiLayers.ort);
-    }
-
-}
-
-window.gsiLayer.addTo(window.map);
-
-
-window.map.eachLayer(layer => {
-    if (layer instanceof L.TileLayer) {
-        alert(layer._url);
-    }
-});
-
-
-    selectArea(area);
-
-    return;
-}
 
     // =====================================================
     // ③ prefへ戻る（z <= 12）
@@ -1158,12 +1105,11 @@ window.map.eachLayer(layer => {
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
-if (!window.gsiLayer) {
-    window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-} else {
-    window.gsiLayer.setUrl(window.gsiLayers.ort);
-}
-
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+    } else {
+        window.gsiLayer.setUrl(window.gsiLayers.ort);
+    }
 
     drawLocation(
         window.prefData.name,
