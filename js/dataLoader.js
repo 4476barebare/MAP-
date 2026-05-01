@@ -858,9 +858,9 @@ function normalizeSpot(raw) {
 }
 
 function zoomToSpot(spot) {
-    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+
     window.mapStateSnapshot = null;
-    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+
 
     disablePhase2(window.map);
     resetSpotLayers();
@@ -1011,6 +1011,7 @@ function goBack() {
     // =====================================================
     if (z >= 14) {
         stopZoomGuard();
+        alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
 
         // map操作復帰
         window.map.dragging.enable();
@@ -1040,6 +1041,8 @@ function goBack() {
 
         updateStateFromHash();
         
+            alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+        
 // phase2再構築
 showSpotsForArea(window.currentAreaId);
 
@@ -1060,7 +1063,7 @@ window.osmLayer.addTo(window.map);
 if (window.gsiLayer) {
     window.map.removeLayer(window.gsiLayer);
 }
-
+    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
         return;
     }
 
@@ -1068,7 +1071,7 @@ if (window.gsiLayer) {
     // ② phase1維持（z === 13）
     // =====================================================
 if (z === 13) {
-    
+        alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     
     
     window.map.eachLayer(layer => {
@@ -1097,6 +1100,7 @@ if (z === 13) {
     // =========================
     // タイル復元（ここが本体）
     // =========================
+        alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
 
     if (s?.isOrt) {
 
