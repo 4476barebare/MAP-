@@ -1038,15 +1038,12 @@ function goBack() {
         
 
 if (!window.osmLayer) {
-
     window.osmLayer = L.tileLayer(
-
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-
-    ).addTo(window.map);
-
+    );
 }
 
+window.osmLayer.addTo(window.map);
         // phase2再構築
         showSpotsForArea(window.currentAreaId);
 
@@ -1060,6 +1057,19 @@ if (!window.osmLayer) {
     // ② phase1維持（z === 13）
     // =====================================================
 if (z === 13) {
+    
+    window.map.eachLayer(layer => {
+
+    if (layer instanceof L.TileLayer) {
+
+        const url = layer._url || '';
+
+        // photoタイルだけ消す
+        if (url.includes('seamlessphoto')) {
+            window.map.removeLayer(layer);
+        }
+    }
+});
 
     const s = window.mapStateSnapshot;
 
