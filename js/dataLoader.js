@@ -1066,7 +1066,7 @@ if (!window.osmLayer) {
     // ② phase1維持（z === 13）
     // =====================================================
 if (z === 13) {
-        alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+   //     alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     
     
 window.map.eachLayer(layer => {
@@ -1082,9 +1082,8 @@ window.map.eachLayer(layer => {
         }
     }
 });
-alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
-    const s = window.mapStateSnapshot;
-
+//alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+    
     window.map.setMinZoom(0);
     window.map.setMaxZoom(18);
 
