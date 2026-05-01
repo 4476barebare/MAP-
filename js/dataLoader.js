@@ -1058,12 +1058,7 @@ if (!window.osmLayer) {
     );
 }
     alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
-window.osmLayer.addTo(window.map);
 
-if (window.gsiLayer) {
-    window.map.removeLayer(window.gsiLayer);
-}
-    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
         return;
     }
 
@@ -1086,7 +1081,7 @@ if (z === 13) {
         }
     }
 });
-
+alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     const s = window.mapStateSnapshot;
 
     window.map.setMinZoom(0);
@@ -1132,7 +1127,7 @@ if (z === 13) {
             window.map.removeLayer(window.gsiLayer);
         }
     }
-
+alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     selectArea(area);
 
     return;
