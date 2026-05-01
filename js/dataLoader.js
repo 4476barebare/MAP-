@@ -403,7 +403,6 @@ function selectArea(area) {
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         showSpotsForArea(window.currentAreaId);
-        saveMapState();
         enableAreaSwipe();
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -526,6 +525,8 @@ function selectSpot(spot) {
     zoomToSpot(spot);
     return;
 }
+    saveMapState();
+    
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
