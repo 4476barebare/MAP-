@@ -319,52 +319,91 @@ function stopZoomGuard() {
 }
 
 // =======================
-// PINCH
+// STATE
 // =======================
 let pinchStartDistance = 0;
 let pinchTriggered = false;
+let dragLocked = false;
 
+// =======================
+// DISTANCE
+// =======================
 function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
 }
 
+// =======================
+// START
+// =======================
 document.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-        pinchStartDistance = getDistance(e.touches);
-        pinchTriggered = false;
-    }
-}, { passive: false });
 
+    if (e.touches.length !== 2) return;
+    if (!window.currentAreaId && !window.currentSpotId) return;
+
+    // dragだけロック
+    if (!dragLocked) {
+        window.map.dragging.disable();
+        dragLocked = true;
+    }
+
+    pinchStartDistance = getDistance(e.touches);
+    pinchTriggered = false;
+
+}, { passive: true });
+
+// =======================
+// MOVE
+// =======================
 document.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2) {
 
-        e.preventDefault();
+    if (e.touches.length !== 2) return;
 
-        const currentDistance = getDistance(e.touches);
+    const currentDistance = getDistance(e.touches);
 
-        if (!pinchTriggered && currentDistance < pinchStartDistance - 20) {
+    const isPinchIn = currentDistance < pinchStartDistance - 20;
 
-            pinchTriggered = true;
+    if (!pinchTriggered && isPinchIn) {
 
-            const isPrefView = !window.currentAreaId && !window.currentSpotId;
+        pinchTriggered = true;
 
-            if (isZoomGuardFailed()) return;
+        if (isZoomGuardFailed()) return;
 
-            if (!isPrefView) {
-
-                //setTimeout(() => {
-                    goBack();
-                //}, 0);
-            }
-        }
+        goBack(window.currentHash);
     }
-}, { passive: false });
 
-document.addEventListener('touchend', () => {
+}, { passive: true });
+
+// =======================
+// END
+// =======================
+document.addEventListener('touchend', (e) => {
+
+    if (e.touches.length > 0) return;
+
     pinchStartDistance = 0;
     pinchTriggered = false;
+
+    if (dragLocked) {
+        window.map.dragging.enable();
+        dragLocked = false;
+    }
+
+});
+
+// =======================
+// CANCEL
+// =======================
+document.addEventListener('touchcancel', () => {
+
+    pinchStartDistance = 0;
+    pinchTriggered = false;
+
+    if (dragLocked) {
+        window.map.dragging.enable();
+        dragLocked = false;
+    }
 });
 
 </script>
