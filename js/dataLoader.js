@@ -1097,37 +1097,27 @@ alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     // タイル復元（ここが本体）
     // =========================
         alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+const s = window.mapStateSnapshot;
 
-    if (s?.isOrt) {
+if (s?.isOrt) {
 
-        // GSIにする
-        if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
-        } else {
-            window.gsiLayer.setUrl(window.gsiLayers.ort);
-        }
-
-        window.gsiLayer.addTo(window.map);
-
-        if (window.osmLayer) {
-            window.map.removeLayer(window.osmLayer);
-        }
-
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
     } else {
-
-        // OSMにする（= snapshotなし or false）
-        if (!window.osmLayer) {
-            window.osmLayer = L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            );
-        }
-
-        window.osmLayer.addTo(window.map);
-
-        if (window.gsiLayer) {
-            window.map.removeLayer(window.gsiLayer);
-        }
+        window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
+
+} else {
+
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
+    } else {
+        window.gsiLayer.setUrl(window.gsiLayers.ort);
+    }
+
+}
+
+window.gsiLayer.addTo(window.map);
 alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     selectArea(area);
 
