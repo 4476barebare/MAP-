@@ -318,93 +318,53 @@ function stopZoomGuard() {
     window._zoomGuardBase = null;
 }
 
-
 // =======================
-// STATE
+// PINCH
 // =======================
 let pinchStartDistance = 0;
 let pinchTriggered = false;
-let pinchPendingGoBack = false;
-let isMapMoving = false;
 
-// =======================
-// DISTANCE
-// =======================
 function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
 }
 
-// =======================
-// MAP MOVE LOCK
-// =======================
-window.map.on('movestart', () => {
-    isMapMoving = true;
-});
-
-window.map.on('moveend', () => {
-    isMapMoving = false;
-
-    // 移動終わった後に保留実行
-    if (pinchPendingGoBack) {
-        pinchPendingGoBack = false;
-        goBack(window.currentHash);
-    }
-});
-
-// =======================
-// START
-// =======================
 document.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
         pinchStartDistance = getDistance(e.touches);
         pinchTriggered = false;
     }
-}, { passive: true });
+}, { passive: false });
 
-// =======================
-// MOVE（検知のみ）
-// =======================
 document.addEventListener('touchmove', (e) => {
-    if (e.touches.length !== 2) return;
+    if (e.touches.length === 2) {
 
-    const currentDistance = getDistance(e.touches);
+        e.preventDefault();
 
-    const isPinchIn = currentDistance < pinchStartDistance - 20;
+        const currentDistance = getDistance(e.touches);
 
-    if (!isPinchIn) return;
-    if (pinchTriggered) return;
+        if (!pinchTriggered && currentDistance < pinchStartDistance - 20) {
 
-    pinchTriggered = true;
+            pinchTriggered = true;
 
-    if (isZoomGuardFailed()) return;
+            const isPrefView = !window.currentAreaId && !window.currentSpotId;
 
-    const isPrefView = !window.currentAreaId && !window.currentSpotId;
-    if (isPrefView) return;
+            if (isZoomGuardFailed()) return;
 
-    // ★ここでは実行しない
-    pinchPendingGoBack = true;
+            if (!isPrefView) {
 
-}, { passive: true });
+                //setTimeout(() => {
+                    goBack();
+                //}, 0);
+            }
+        }
+    }
+}, { passive: false });
 
-// =======================
-// END
-// =======================
-document.addEventListener('touchend', (e) => {
-
-    if (e.touches.length !== 0) return;
-
+document.addEventListener('touchend', () => {
     pinchStartDistance = 0;
-
-    // mapが動いてるなら待つ
-    if (isMapMoving) return;
-
-    if (!pinchPendingGoBack) return;
-
-    pinchPendingGoBack = false;
-
-    goBack(window.currentHash);
+    pinchTriggered = false;
 });
 
 </script>
