@@ -1096,7 +1096,8 @@ alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     // =========================
     // タイル復元（ここが本体）
     // =========================
-        alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+
 const s = window.mapStateSnapshot;
 
 if (s?.isOrt) {
@@ -1118,6 +1119,7 @@ if (s?.isOrt) {
 }
 
 window.gsiLayer.addTo(window.map);
+
 alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     selectArea(area);
 
