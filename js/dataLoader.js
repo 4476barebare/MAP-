@@ -1011,7 +1011,7 @@ function goBack() {
     // =====================================================
     if (z >= 14) {
         stopZoomGuard();
-        alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+       // alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
 
         // map操作復帰
         window.map.dragging.enable();
@@ -1041,7 +1041,7 @@ function goBack() {
 
         updateStateFromHash();
         
-            alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+           // alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
         
 // phase2再構築
 showSpotsForArea(window.currentAreaId);
@@ -1057,7 +1057,7 @@ if (!window.osmLayer) {
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     );
 }
-    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
+   // alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
 
         return;
     }
