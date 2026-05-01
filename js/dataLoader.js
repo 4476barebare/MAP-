@@ -520,7 +520,7 @@ function selectSpot(spot) {
 
     if (currentZoom === 13) {
         //disablePhase2(window.map);
-    window.mapStateSnapshot = null;
+
     // ★ ここでspotオブジェクトを渡して呼び出す
     zoomToSpot(spot);
     return;
@@ -1036,21 +1036,26 @@ function goBack() {
 
         updateStateFromHash();
         
+// phase2再構築
+showSpotsForArea(window.currentAreaId);
 
+// スポット復帰
+selectSpot(restoreSpot);
 
-        // phase2再構築
-        showSpotsForArea(window.currentAreaId);
-
-        // スポット復帰
-        selectSpot(restoreSpot);
-        
-        if (!window.osmLayer) {
+// =====================
+// 最後にタイル確定
+// =====================
+if (!window.osmLayer) {
     window.osmLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     );
 }
-
+alert('OSM ADD');
 window.osmLayer.addTo(window.map);
+
+if (window.gsiLayer) {
+    window.map.removeLayer(window.gsiLayer);
+}
 
         return;
     }
@@ -1059,6 +1064,7 @@ window.osmLayer.addTo(window.map);
     // ② phase1維持（z === 13）
     // =====================================================
 if (z === 13) {
+    window.mapStateSnapshot = null;
     
     window.map.eachLayer(layer => {
 
