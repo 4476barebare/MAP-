@@ -1013,7 +1013,7 @@ function goBack() {
 
         // レイヤ整理
         if (window.phase2Group) window.phase2Group.clearLayers();
-        if (window.phase1Group) window.phase1Group.addTo(window.map);
+        //if (window.phase1Group) window.phase1Group.addTo(window.map);
 
         const restoreSpot = buildSpotRestoreObject();
         if (!restoreSpot) return;
@@ -1026,6 +1026,17 @@ function goBack() {
         }
 
         updateStateFromHash();
+        
+
+if (!window.osmLayer) {
+
+    window.osmLayer = L.tileLayer(
+
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+
+    ).addTo(window.map);
+
+}
 
         // phase2再構築
         showSpotsForArea(window.currentAreaId);
@@ -1055,7 +1066,11 @@ function goBack() {
         //if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
             //window.map.removeLayer(window.gsiLayer);
         //}
-
+if (!window.gsiLayer) {
+    window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+} else {
+    window.gsiLayer.setUrl(window.gsiLayers.ort);
+}
         if (window.osmLayer) {
             window.map.removeLayer(window.osmLayer);
             window.osmLayer = null;
@@ -1063,6 +1078,7 @@ function goBack() {
         if (s?.tileLayer) {
             s.tileLayer.addTo(window.map);
         }
+        
 
         selectArea(area);
 
@@ -1074,6 +1090,8 @@ function goBack() {
     // =====================================================
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+    
+    window.baseTile.setUrl(window.gsiLayers.ort);
 
     drawLocation(
         window.prefData.name,
