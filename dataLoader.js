@@ -1036,21 +1036,26 @@ function goBack() {
 
         updateStateFromHash();
         
+// phase2再構築
+showSpotsForArea(window.currentAreaId);
 
+// スポット復帰
+selectSpot(restoreSpot);
 
-        // phase2再構築
-        showSpotsForArea(window.currentAreaId);
-
-        // スポット復帰
-        selectSpot(restoreSpot);
-        
-        if (!window.osmLayer) {
+// =====================
+// 最後にタイル確定
+// =====================
+if (!window.osmLayer) {
     window.osmLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     );
 }
 
 window.osmLayer.addTo(window.map);
+
+if (window.gsiLayer) {
+    window.map.removeLayer(window.gsiLayer);
+}
 
         return;
     }
