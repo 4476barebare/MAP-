@@ -513,6 +513,7 @@ function selectSpot(spot) {
     
     if (window.markerControl) {
         markerControl.showShop02(window.currentAreaId);
+        
     }
 
     const currentZoom = window.map.getZoom();
@@ -524,7 +525,10 @@ function selectSpot(spot) {
     // ★ ここでspotオブジェクトを渡して呼び出す
     zoomToSpot(spot);
     return;
-}
+} else{
+    saveMapState();
+    return;
+};
     
     
     if (window.phase1Group) {
@@ -554,7 +558,6 @@ function selectSpot(spot) {
 
 // ① 移動完了後に制御をかける
 window.map.once('moveend', () => {
-    saveMapState();
     window.map.dragging.enable();
     window.map.scrollWheelZoom.enable();
     window.map.doubleClickZoom.enable();
