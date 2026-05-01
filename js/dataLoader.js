@@ -414,6 +414,21 @@ function selectArea(area) {
 }
 
 function saveMapState() {
+
+    // GSIが存在して、かつ現在マップに載っているかだけを見る
+    const isOrt = !!(window.gsiLayer && window.map.hasLayer(window.gsiLayer));
+
+    window.mapStateSnapshot = {
+        isOrt: isOrt
+    };
+}
+
+function showSpotsForArea(areaKey) {
+
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
+    }function saveMapState() {
     let tile = null;
     if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
         tile = window.gsiLayer;
@@ -423,13 +438,6 @@ function saveMapState() {
     };
 }
 
-
-function showSpotsForArea(areaKey) {
-
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
 
     if (!window.areaSpotLayer) {
         window.areaSpotLayer = L.layerGroup().addTo(window.map);
@@ -1050,40 +1058,57 @@ if (!window.osmLayer) {
     // =====================================================
     // ② phase1維持（z === 13）
     // =====================================================
-    if (z === 13) {
+if (z === 13) {
 
-        const s = window.mapStateSnapshot;
+    const s = window.mapStateSnapshot;
 
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
+    window.map.setMinZoom(0);
+    window.map.setMaxZoom(18);
 
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
 
-        if (window.phase2Group) window.phase2Group.clearLayers();
-        //if (window.phase1Group) window.phase1Group.addTo(window.map);
+    if (window.phase2Group) window.phase2Group.clearLayers();
 
-        //if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
-            //window.map.removeLayer(window.gsiLayer);
-        //}
-if (!window.gsiLayer) {
-    window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-} else {
-    window.gsiLayer.setUrl(window.gsiLayers.ort);
-}
+    // =========================
+    // タイル復元（ここが本体）
+    // =========================
+
+    if (s?.isOrt) {
+
+        // GSIにする
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
+        } else {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
+        }
+
+        window.gsiLayer.addTo(window.map);
+
         if (window.osmLayer) {
             window.map.removeLayer(window.osmLayer);
-            window.osmLayer = null;
         }
-        if (s?.tileLayer) {
-            s.tileLayer.addTo(window.map);
+
+    } else {
+
+        // OSMにする（= snapshotなし or false）
+        if (!window.osmLayer) {
+            window.osmLayer = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            );
         }
-        
 
-        selectArea(area);
+        window.osmLayer.addTo(window.map);
 
-        return;
+        if (window.gsiLayer) {
+            window.map.removeLayer(window.gsiLayer);
+        }
     }
+
+    selectArea(area);
+
+    return;
+}
 
     // =====================================================
     // ③ prefへ戻る（z <= 12）
