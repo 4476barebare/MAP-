@@ -1069,13 +1069,14 @@ if (z === 13) {
         alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
     
     
-    window.map.eachLayer(layer => {
+window.map.eachLayer(layer => {
+
+    if (layer === window.gsiLayer) return; // ★これ
 
     if (layer instanceof L.TileLayer) {
 
         const url = layer._url || '';
 
-        // photoタイルだけ消す
         if (url.includes('seamlessphoto')) {
             window.map.removeLayer(layer);
         }
