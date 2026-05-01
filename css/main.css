@@ -666,51 +666,20 @@ li {
 
 
 /* =========================
-
    フッター
-
 ========================= */
 
 .site-footer {
-
-  text-align: center;
-
-  padding: 20px 10px;
-
-  font-size: 14px;
-
-  color: #666;
-
-  border-top: 1px solid #eee;
+  text-align: center
 
 }
 
-.policy-link {
-
+.policy-link 
   display: inline-block;
-
-  margin-top: 8px;
-
-  padding: 8px 14px;
-
-  border: 1px solid #ccc;
-
-  border-radius: 6px;
-
-  text-decoration: none;
-
-  color: #333;
-
-  font-size: 13px;
-
-  background: #fff;
-
 }
 
 .policy-link:active {
-
   background: #f0f0f0;
-
 }
 
 /* =========================
@@ -720,19 +689,12 @@ li {
 ========================= */
 
 .modal {
-
   display: none;
-
   position: fixed;
-
   inset: 0;
-
   background: rgba(0, 0, 0, 0.6);
-
   z-index: 9999;
-
   overflow: auto;
-
 }
 
 .modal-content {
@@ -741,14 +703,10 @@ li {
 
   max-width: 700px;
 
-  margin: 10% auto;
-
-  padding: 20px;
-
+  margin: 5vh 5vw;
+  padding: 10px;
   border-radius: 8px;
-
-  width: 92%;
-
+  width: 90vw;
 }
 
 /* =========================
@@ -759,15 +717,14 @@ li {
 
 .modal-content h1 {
 
-  font-size: 18px;
-
+  font-size: 14px;
   margin-bottom: 16px;
 
 }
 
 .modal-content h2 {
 
-  font-size: 15px;
+  font-size:12px;
 
   margin-top: 16px;
 
@@ -777,7 +734,7 @@ li {
 
 .modal-content p {
 
-  font-size: 13px;
+  font-size: 10px;
 
   margin-bottom: 10px;
 
@@ -795,7 +752,7 @@ li {
 
   .modal-content {
 
-    margin: 20% auto;
+    margin: 5vh 5vw;
 
     padding: 16px;
 
