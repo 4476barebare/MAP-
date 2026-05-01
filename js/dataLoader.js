@@ -559,9 +559,9 @@ function selectSpot(spot) {
 // ① 移動完了後に制御をかける
 window.map.once('moveend', () => {
     window.map.dragging.enable();
-    window.map.scrollWheelZoom.enable();
-    window.map.doubleClickZoom.enable();
-    window.map.touchZoom.enable();
+    //window.map.scrollWheelZoom.enable();
+    //window.map.doubleClickZoom.enable();
+    //window.map.touchZoom.enable();
     window.map.setMaxBounds(window.areaBounds);
     window.map.options.maxBoundsViscosity = 1.0;
 });
