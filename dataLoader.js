@@ -8,8 +8,10 @@ window.prefData = null;
 window.areaData = [];
 window.spotData = []
 window.currentAreaId = null;
-window.phase1Group = L.layerGroup().addTo(map);
-window.phase2Group = L.layerGroup().addTo(map);
+window.gsiLayers = {
+  ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
+};
 
 function loadLocationCSV(csvUrl) {
 
@@ -229,15 +231,18 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         window.map.options.zoomSnap = 0.5;
         window.map.options.zoomDelta = 0.5;
         window.map.attributionControl.setPosition('topright');
+        
+        window.phase1Group = L.layerGroup().addTo(map);
+window.phase2Group = L.layerGroup().addTo(map);
 
-        // ★初期はGSI固定（ここだけ）
-        window.currentTileLayer = L.tileLayer(
-            'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
-            {
-                attribution: '© 国土地理院',
-                keepBuffer: 8
-            }
-        ).addTo(window.map);
+
+window.gsiLayer = L.tileLayer(
+    window.gsiLayers.ort,
+    {
+        attribution: '© 国土地理院',
+        keepBuffer: 8
+    }
+).addTo(window.map);
         
         if (window.currentAreaId === null) {
             showPrefSpots();
@@ -351,6 +356,8 @@ function prefetchAround(area) {
     });
 }
 
+
+
 function selectArea(area) {
 
     const areaObj = typeof area === 'string'
@@ -358,15 +365,7 @@ function selectArea(area) {
         : area;
 
     if (!areaObj) return;
-
-    // -------------------------
-    // phase2停止
-    // -------------------------
     
-
-    // -------------------------
-    // レイヤー削除
-    // -------------------------
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
@@ -381,21 +380,16 @@ function selectArea(area) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
     }
-
-    // -------------------------
-    // prefetch
-    // -------------------------
     prefetchAround(areaObj);
-
-    // -------------------------
-    // 地図移動
-    // -------------------------
+    
     drawLocation(
         areaObj.name,
         areaObj.lat,
         areaObj.lng,
         areaObj.zoom || window.prefData.zoom
     );
+    
+    saveMapState();
 
     // -------------------------
     // UI更新
@@ -407,17 +401,12 @@ function selectArea(area) {
     // 移動後処理
     // -------------------------
     window.map.once('moveend', () => {
-
         window.map.invalidateSize(true);
-
         showSpotsForArea(window.currentAreaId);
-
         enableAreaSwipe();
-
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
-                saveMapState();
             });
         });
     });
@@ -425,13 +414,12 @@ function selectArea(area) {
 }
 
 function saveMapState() {
-    window.mapStateSnapshot = {
-        tileLayer: window.map.hasLayer(window.tileLayers.gsi)
-        ? window.tileLayers.gsi
-        : window.tileLayers.osm,
 
-    center: window.map.getCenter(),
-    zoom: window.map.getZoom()
+    // GSIが存在して、かつ現在マップに載っているかだけを見る
+    const isOrt = !!(window.gsiLayer && window.map.hasLayer(window.gsiLayer));
+
+    window.mapStateSnapshot = {
+        isOrt: isOrt
     };
 }
 
@@ -440,7 +428,16 @@ function showSpotsForArea(areaKey) {
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
+    }function saveMapState() {
+    let tile = null;
+    if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
+        tile = window.gsiLayer;
     }
+    window.mapStateSnapshot = {
+        tileLayer: tile
+    };
+}
+
 
     if (!window.areaSpotLayer) {
         window.areaSpotLayer = L.layerGroup().addTo(window.map);
@@ -513,11 +510,21 @@ function selectSpot(spot) {
         zoom,
         individualId
     } = spot;
+    
+    if (window.markerControl) {
+        markerControl.showShop02(window.currentAreaId);
+    }
 
     const currentZoom = window.map.getZoom();
+    
 
-    if (currentZoom === 13) return;
+    if (currentZoom === 13) {
+        //disablePhase2(window.map);
 
+    // ★ ここでspotオブジェクトを渡して呼び出す
+    zoomToSpot(spot);
+    return;
+}
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
@@ -526,19 +533,18 @@ function selectSpot(spot) {
 
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
-    }
-
-    window.currentTileLayer = L.tileLayer(tileUrl, {
+    window.osmLayer = L.tileLayer(tileUrl, {
         attribution: '© OpenStreetMap contributors',
-        keepBuffer: 8,
-        updateWhenIdle: true
+        keepBuffer: 16,
+
+    updateWhenIdle: true,
+
+    updateWhenZooming: false,
+
+    updateWhenDragging: false
     }).addTo(window.map);
 
-    if (window.markerControl) {
-        markerControl.showShop02(window.currentAreaId);
-    }
+
 
     disableAreaSwipe();
 
@@ -554,7 +560,7 @@ window.map.once('moveend', () => {
     window.map.options.maxBoundsViscosity = 1.0;
 });
 
-enablePhase2(map);
+enablePhase2(window.map);
 
 }
 
@@ -572,15 +578,7 @@ let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
 
-    showDebug("P2: enter");
-    showDebug("P2: map exists=" + !!map);
-    showDebug("P2: spotData=" + !!window.spotData);
-
-    //if (map._phase2Handler) return;
-    showDebug("ここまで");
     const runPhase2 = () => {
-
-        showDebug("P2: runPhase2 fired");
 
         requestAnimationFrame(() => {
 
@@ -604,10 +602,8 @@ function enablePhase2(map) {
     map._phase2Handler = runPhase2;
 
     map.on('dragend', runPhase2);
-    map.on('dragend', () => showDebug("P2: dragend fired"));
 
     map.once('moveend', () => {
-        showDebug("P2: moveend fired");
         runPhase2();
     });
 
@@ -616,23 +612,19 @@ function enablePhase2(map) {
 
 function disablePhase2(map) {
 
-    // -------------------------
-    // イベント解除
-    // -------------------------
-    if (map._phase2Handler) {
+    if (!map) return;
+
+    if (typeof map._phase2Handler === "function") {
         map.off('dragend', map._phase2Handler);
         map._phase2Handler = null;
     }
 
-    // -------------------------
-    // 状態リセット
-    // -------------------------
-    phase2Initialized = false;
-    lastVisibleSet = new Set();
+    // ★これ削除
+    // map.off('dragend');
 
-    // -------------------------
-    // UIクリア（ここを統合）
-    // -------------------------
+    window.phase2Initialized = false;
+    window.lastVisibleSet = new Set();
+
     const menu = document.getElementById("map-menu");
     const ul = document.querySelector("#map-menu ul");
 
@@ -646,6 +638,7 @@ function disablePhase2(map) {
     }
 }
 
+
 function processSpotUtils(map, spots, mode) {
 
     if (mode === "prefetch") {
@@ -657,9 +650,9 @@ function processSpotUtils(map, spots, mode) {
         const targets = spots.filter(s => s.icon === "spot");
         if (!targets.length) return;
 
+        // ★ここを統一
         const baseUrl =
-            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/' +
-            zoom + '/{x}/{y}.jpg';
+            window.gsiLayers.photo.replace('{z}', zoom);
 
         for (const s of targets) {
 
@@ -675,7 +668,7 @@ function processSpotUtils(map, spots, mode) {
                 (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
             );
 
-            // ★ここだけ変更（1枚 → 2×2）
+            // ★2×2プリフェッチ
             for (let dx = 0; dx <= 1; dx++) {
                 for (let dy = 0; dy <= 1; dy++) {
 
@@ -707,7 +700,6 @@ function processSpotUtils(map, spots, mode) {
         return boundsList;
     }
 }
-
 function updateSpotMenu(spots, map) {
 
     const menu = document.getElementById("map-menu");
@@ -825,64 +817,117 @@ const popupHtml = `
     }).openPopup();
 }
 
-function zoomToSpot(safeSpot) {
+function normalizeSpot(raw) {
+
+    // 数値化
+    let lat = Number(raw.lat);
+    let lng = Number(raw.lng);
+    let zoom = Number(raw.zoom);
 
     // -------------------------
-    // Phase2停止
+    // NaN対策
     // -------------------------
+    if (!Number.isFinite(lat)) lat = 0;
+    if (!Number.isFinite(lng)) lng = 0;
+    if (!Number.isFinite(zoom)) zoom = window.map.getZoom();
+
+    // -------------------------
+    // 座標クランプ（WGS84）
+    // -------------------------
+    lat = Math.max(-90, Math.min(90, lat));
+    lng = Math.max(-180, Math.min(180, lng));
+
+    // -------------------------
+    // 小数精度統一（Leaflet安定化）
+    // -------------------------
+    lat = +lat.toFixed(6);
+    lng = +lng.toFixed(6);
+
+    // -------------------------
+    // ズームクランプ
+    // -------------------------
+    zoom = Math.round(zoom);
+    zoom = Math.max(0, Math.min(18, zoom));
+
+    return {
+        ...raw,
+        lat,
+        lng,
+        zoom
+    };
+}
+
+function zoomToSpot(spot) {
+
     disablePhase2(window.map);
+    resetSpotLayers();
 
-    // -------------------------
-    // GSIレイヤー（使い回し）
-    // -------------------------
-    if (!window.gsiPhotoLayer) {
-        window.gsiPhotoLayer = L.tileLayer(
-            'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+    // =====================================================
+    // ① 正規化
+    // =====================================================
+    const safe = normalizeSpot(spot);
+
+    // =====================================================
+    // ② ベースレイヤ切替のみ
+    // （削除しない・再生成もしない）
+    // =====================================================
+    if (window.gsiLayer) {
+        window.gsiLayer.setUrl(window.gsiLayers.photo);
+    } else {
+        window.gsiLayer = L.tileLayer(
+            window.gsiLayers.photo,
             {
-                attribution: '国土地理院'
+                attribution: '国土地理院',
+                maxZoom: 18
             }
-        );
+        ).addTo(window.map);
     }
 
-    if (window.currentTileLayer) {
-        window.map.removeLayer(window.currentTileLayer);
+    // OSMが残っていたら消す（任意・UI整合性だけ）
+    if (window.osmLayer) {
+        window.map.removeLayer(window.osmLayer);
+        window.osmLayer = null;
     }
 
-    window.currentTileLayer = window.gsiPhotoLayer.addTo(window.map);
-
-    // -------------------------
-    // 操作ロック
-    // -------------------------
+    // =====================================================
+    // ③ 操作ロック
+    // =====================================================
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // -------------------------
-    // 移動
-    // -------------------------
-    drawLocation(
-        safeSpot.name,
-        safeSpot.lat,
-        safeSpot.lng,
-        safeSpot.zoom
-    );
+    // =====================================================
+    // ④ 移動のみ
+    // =====================================================
+    window.map.flyTo([safe.lat, safe.lng], safe.zoom, {
+        duration: 0.5
+    });
 
-    resetSpotLayers();
+    
+    
+    // ★ハッシュ更新（末尾追加）
+if (spot && spot.individualId != null) {
 
-    // -------------------------
-    // 復帰処理
-    // -------------------------
+    const base = location.hash || '';
+
+    location.hash = base + '/' + spot.individualId;
+
+    updateStateFromHash();
+}
+
+    // =====================================================
+    // ⑤ 復帰処理
+    // =====================================================
     window.map.once('moveend', function () {
 
-        window.map.setMinZoom(safeSpot.zoom);
+        window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
 
-        const bounds = window.map.getBounds();
-        window.map.setMaxBounds(bounds);
+        window.map.setMaxBounds(window.map.getBounds());
         window.map.options.maxBoundsViscosity = 1.0;
 
-        window._zoomGuardBase = safeSpot.zoom;
+        window._zoomGuardBase = safe.zoom || 15;
         window._zoomGuardActive = true;
 
         window.map.dragging.enable();
@@ -894,18 +939,23 @@ function zoomToSpot(safeSpot) {
 
 function resetSpotLayers() {
 
-    if (window.markerControl) {
-        markerControl.clearShop01();
-        markerControl.clearShop02();
+    if (window.phase1Group) {
+        window.phase1Group.clearLayers();
     }
 
-    if (window.spotMarkers) {
-        window.spotMarkers.forEach(m => window.map.removeLayer(m));
-        window.spotMarkers = [];
+    if (window.phase2Group) {
+        window.phase2Group.clearLayers();
     }
 
-    if (window.prefSpotLayer && window.map.hasLayer(window.prefSpotLayer)) {
+    if (window.areaSpotLayer) {
+        window.areaSpotLayer.clearLayers();
+        window.map.removeLayer(window.areaSpotLayer);
+        window.areaSpotLayer = null;
+    }
+
+    if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
     }
 }
 
@@ -942,7 +992,8 @@ function updateStateFromHash() {
 }
 
 function goBack() {
-
+    map.touchZoom.disable();
+    map.dragging.disable();
 
     const area = window.areaData.find(a =>
         String(a.individualId) === String(window.currentAreaId?.split('_')[1])
@@ -950,75 +1001,141 @@ function goBack() {
 
     if (!area) return;
 
+    const z = window.map.getZoom();
+
     // =====================================================
-    // spot → area
+    // ① phase2 → phase1（z >= 14）
     // =====================================================
-    if (window.currentSpotId) {
+    if (z >= 14) {
 
-        const spotKey = window.currentSpotId.split('_')[2];
-
-        const spot = window.spotData.find(
-            s =>
-                String(s.individualId) === String(spotKey) &&
-                String(s.areaId) === String(window.currentAreaId)
-        );
-
-        if (!spot) return;
-
+        // map操作復帰
         window.map.dragging.enable();
-        window.map.scrollWheelZoom.disable();
-        window.map.doubleClickZoom.disable();
-        window.map.touchZoom.disable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
 
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        // レイヤ整理
+        if (window.phase2Group) window.phase2Group.clearLayers();
+        //if (window.phase1Group) window.phase1Group.addTo(window.map);
+
+        const restoreSpot = buildSpotRestoreObject();
+        if (!restoreSpot) return;
+
+        // ★ spotキー除去
+        const spotKey = window.currentSpotId?.split('_')[2];
+
+        if (spotKey) {
+            location.hash = location.hash.replace('/' + spotKey, '');
+        }
+
+        updateStateFromHash();
+        
+
+
+        // phase2再構築
         showSpotsForArea(window.currentAreaId);
 
-        location.hash = location.hash.replace('/' + spotKey, '');
-        updateStateFromHash();
+        // スポット復帰
+        selectSpot(restoreSpot);
+        
+        if (!window.osmLayer) {
+    window.osmLayer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    );
+}
 
-        // ★ここはそのまま維持
-        selectSpot(area.name, spot.name, spot.lat, spot.lng);
+window.osmLayer.addTo(window.map);
+
         return;
     }
 
     // =====================================================
-    // area → pref
+    // ② phase1維持（z === 13）
     // =====================================================
+if (z === 13) {
+    window.mapStateSnapshot = null;
     
-if (window.phase1Group) {
-    window.phase1Group.clearLayers();
-}
+    window.map.eachLayer(layer => {
 
-// エリアマーカーも再利用前提
-if (window.areaSpotLayer) {
-    window.areaSpotLayer.clearLayers();
-}
+    if (layer instanceof L.TileLayer) {
 
+        const url = layer._url || '';
 
-    const z = window.map.getZoom();
-
-    if (z >= 12.8) {
-        
-        const s = window.mapStateSnapshot;
-        
-        if (window.phase2Group) {
-            window.phase2Group.clearLayers();
-        }
-        if (window.phase1Group) {
-            window.phase1Group.addTo(window.map);
-        }
-        if (s && s.tileLayer) {
-            Object.values(window.tileLayers).forEach(layer => {
-                if (window.map.hasLayer(layer)) {
-                    window.map.removeLayer(layer);
-                }
-            });
-        s.tileLayer.addTo(window.map);
-        }
-        window.map.setView(s.center, s.zoom);
-        }else{
-            selectArea(area);
+        // photoタイルだけ消す
+        if (url.includes('seamlessphoto')) {
+            window.map.removeLayer(layer);
         }
     }
+});
+
+    const s = window.mapStateSnapshot;
+
+    window.map.setMinZoom(0);
+    window.map.setMaxZoom(18);
+
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
+
+    if (window.phase2Group) window.phase2Group.clearLayers();
+
+    // =========================
+    // タイル復元（ここが本体）
+    // =========================
+
+    if (s?.isOrt) {
+
+        // GSIにする
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
+        } else {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
+        }
+
+        window.gsiLayer.addTo(window.map);
+
+        if (window.osmLayer) {
+            window.map.removeLayer(window.osmLayer);
+        }
+
+    } else {
+
+        // OSMにする（= snapshotなし or false）
+        if (!window.osmLayer) {
+            window.osmLayer = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            );
+        }
+
+        window.osmLayer.addTo(window.map);
+
+        if (window.gsiLayer) {
+            window.map.removeLayer(window.gsiLayer);
+        }
+    }
+
+    selectArea(area);
+
+    return;
+}
+
+    // =====================================================
+    // ③ prefへ戻る（z <= 12）
+    // =====================================================
+    if (window.phase1Group) window.phase1Group.clearLayers();
+    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+if (!window.gsiLayer) {
+    window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+} else {
+    window.gsiLayer.setUrl(window.gsiLayers.ort);
+}
+
 
     drawLocation(
         window.prefData.name,
@@ -1027,9 +1144,6 @@ if (window.areaSpotLayer) {
         window.prefData.zoom
     );
 
-    window.currentAreaId = null;
-    window.currentSpotId = null;
-
     location.hash = '';
     showPrefSpots();
 
@@ -1037,4 +1151,29 @@ if (window.areaSpotLayer) {
 
     document.getElementById('map-back-btn').style.display = 'none';
     initAreaUI();
+}
+
+function buildSpotRestoreObject() {
+
+    const areaId = window.currentAreaId;
+    const spotId = window.currentSpotId;
+
+    if (!areaId || !spotId) return null;
+
+    const spotKey = spotId.split('_')[2];
+
+    const spot = window.spotData.find(s =>
+        String(s.individualId) === String(spotKey) &&
+        String(s.areaId) === String(areaId)
+    );
+
+    if (!spot) return null;
+
+    return {
+        name: spot.name,
+        lat: Number(spot.lat),
+        lng: Number(spot.lng),
+        zoom: 13,
+        individualId: spot.individualId || spot.id || ''
+    };
 }
