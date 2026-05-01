@@ -1057,7 +1057,7 @@ if (!window.osmLayer) {
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     );
 }
-alert('OSM ADD');
+    alert('GSI on map: ' + window.map.hasLayer(window.gsiLayer));
 window.osmLayer.addTo(window.map);
 
 if (window.gsiLayer) {
