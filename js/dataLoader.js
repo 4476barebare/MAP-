@@ -389,7 +389,7 @@ function selectArea(area) {
         areaObj.zoom || window.prefData.zoom
     );
     
-    saveMapState();
+    
 
     // -------------------------
     // UI更新
@@ -403,6 +403,7 @@ function selectArea(area) {
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         showSpotsForArea(window.currentAreaId);
+        saveMapState();
         enableAreaSwipe();
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
