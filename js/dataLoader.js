@@ -1043,23 +1043,23 @@ function goBack() {
 
         const s = window.mapStateSnapshot;
 
-        //window.map.setMinZoom(0);
-        //window.map.setMaxZoom(18);
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
 
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
         if (window.phase2Group) window.phase2Group.clearLayers();
-        if (window.phase1Group) window.phase1Group.addTo(window.map);
+        //if (window.phase1Group) window.phase1Group.addTo(window.map);
 
-        if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
-            window.map.removeLayer(window.gsiLayer);
-        }
+        //if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
+            //window.map.removeLayer(window.gsiLayer);
+        //}
 
-        if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
+        if (window.osmLayer) {
             window.map.removeLayer(window.osmLayer);
+            window.osmLayer = null;
         }
-
         if (s?.tileLayer) {
             s.tileLayer.addTo(window.map);
         }
