@@ -791,6 +791,7 @@ li {
   width: 320px;
   height: 50px;
   overflow: hidden;
+  margin-bottom: 8px;
 }
 .news-item a {
   color: inherit;
