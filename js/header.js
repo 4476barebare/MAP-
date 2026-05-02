@@ -19,9 +19,11 @@ function fetchRSS(url) {
 // ニュース読み込み
 // =========================
 function loadNews() {
+    alert("呼び出し");
 
   const newsList = document.getElementById("newsList");
   if (!newsList) return;
+  alert("呼び出し2");
 
   newsList.innerHTML = "読み込み中...";
 
