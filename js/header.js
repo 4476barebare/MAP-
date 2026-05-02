@@ -107,18 +107,14 @@ el.innerHTML = `
 }
 
 
+
 function getThumbnail(item) {
 
   const link = item.link || "";
 
-  // YouTube
-  if (link.includes("youtube.com")) {
-    return item.thumbnail ||
-           item.media?.group?.mediaThumbnail?.[0]?.url ||
-           "https://placehold.jp/90x60.png";
-  }
-
-  // .php系（RSS系サイトまとめ）
+  // ======================
+  // .php系（専用ルール）
+  // ======================
   if (link.includes(".php")) {
 
     return item.media?.content?.[0]?.url ||
@@ -128,13 +124,39 @@ function getThumbnail(item) {
            "https://placehold.jp/90x60.png";
   }
 
-  // その他
-  return item.enclosure?.link ||
-         item.thumbnail ||
-         extractImg(item) ||
-         "https://placehold.jp/90x60.png";
-}
+  let url = "";
 
+  // ======================
+  // 通常RSS2JSON
+  // ======================
+  if (item.thumbnail) {
+    url = item.thumbnail;
+  }
+
+  // ======================
+  // YouTube RSS2JSON
+  // ======================
+  else if (item.enclosure?.link) {
+    url = item.enclosure.link;
+  }
+
+  // ======================
+  // YouTube media系
+  // ======================
+  else if (item["media:thumbnail"]?.url) {
+    url = item["media:thumbnail"].url;
+  }
+
+  // ======================
+  // 最終救済
+  // ======================
+  else if (item.description) {
+    const match = item.description.match(/https?:\/\/[^"]+\.(jpg|png|jpeg)/);
+    if (match) url = match[0];
+  }
+
+  return url || "https://placehold.jp/90x60.png";
+}
 
 // 共通
 function extractImg(item) {
