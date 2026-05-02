@@ -70,14 +70,18 @@ function renderNews(items) {
     const el = document.createElement("div");
     el.className = "news-item";
 
-    el.innerHTML = `
+el.innerHTML = `
   <a href="${item.link}" target="_blank">
     <div class="news-row">
       <img src="${thumb}">
-      <div class="news-title">${item.title}</div>
+      <div class="news-text">
+        <div class="news-title">${item.title}</div>
+        <div class="news-source">${item.author || "RSS"}</div>
+      </div>
     </div>
   </a>
 `;
+
 
     newsList.appendChild(el);
   });
