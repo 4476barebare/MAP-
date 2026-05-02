@@ -112,30 +112,34 @@ function getThumbnail(item) {
 
   try {
 
-    // ① media（配列 or 単体両対応）
-    if (item.media?.content) {
-      const mc = item.media.content;
-      if (Array.isArray(mc)) {
-        url = mc[0]?.url;
-      } else {
-        url = mc?.url;
-      }
+    // ======================
+    // YouTube専用
+    // ======================
+    if (item.link && item.link.includes("youtube.com")) {
+
+      url =
+        item.thumbnail ||
+        item.media?.group?.mediaThumbnail?.[0]?.url;
+
     }
 
-    // ② enclosure
-    if (!url && item.enclosure) {
-      url = item.enclosure.url || item.enclosure.link;
-    }
-
-    // ③ thumbnail
+    // ======================
+    // 通常RSS系
+    // ======================
     if (!url) {
-      url = item.thumbnail;
+      url =
+        item.thumbnail ||
+        item.enclosure?.link ||
+        item.media?.content?.[0]?.url ||
+        item["media:thumbnail"]?.url;
     }
 
-    // ④ description
+    // ======================
+    // HTMLから抜く
+    // ======================
     if (!url && item.description) {
-      const match = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
-      if (match) url = match[1];
+      const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
+      if (m) url = m[1];
     }
 
   } catch (e) {}
@@ -144,6 +148,7 @@ function getThumbnail(item) {
 
   return url.replace(/^http:\/\//, "https://");
 }
+
 
 function formatTimeAgo(pubDate) {
   const now = new Date();
