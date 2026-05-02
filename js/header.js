@@ -92,7 +92,7 @@ el.innerHTML = `
         <div class="news-title">${item.title}</div>
 
         <div class="news-meta">
-          <div class="news-source">${item.author || "RSS"}</div>
+          <div class="news-source">${getSource(item)}</div>
           <div class="news-date">${timeText}</div>
         </div>
 
@@ -107,6 +107,33 @@ el.innerHTML = `
 }
 
 
+function getSource(item) {
+
+  // ① RSSがちゃんとしてる場合（最優先）
+  if (item.source?.title) return item.source.title;
+
+  // ② RSS2JSONのauthor（弱いが一応）
+  if (item.author && item.author.length < 30) return item.author;
+
+  // ③ dc系
+  if (item["dc:creator"]) return item["dc:creator"];
+
+  // ④ descriptionから無理やり拾う（最後の手段）
+  if (item.description) {
+    const clean = item.description.replace(/<[^>]*>/g, "").trim();
+    if (clean && clean.length < 20) {
+      return clean;
+    }
+  }
+
+  // ⑤ linkからドメインだけ抜く（完全フォールバック）
+  try {
+    const host = new URL(item.link).hostname;
+    return host.replace(/^www\./, "");
+  } catch (e) {
+    return "RSS";
+  }
+}
 
 function getThumbnail(item) {
 
@@ -164,6 +191,8 @@ function extractImg(item) {
   const m = item.description.match(/<img[^>]+src="([^">]+)"/);
   return m ? m[1] : "";
 }
+
+
 
 
 
