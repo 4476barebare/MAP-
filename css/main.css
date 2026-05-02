@@ -820,7 +820,7 @@ li {
 
 .news-title {
   font-size: 13px;
-  padding: 0 8px;
+  padding: 0 0 0 0px;
   margin: 0;
 
   line-height: 1.2;
@@ -835,6 +835,7 @@ li {
 .news-source {
   padding-left: 10px;
   margin-right: 8px;
+  color: #aaa;
 }
 
 .news-date {
