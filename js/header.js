@@ -5,7 +5,9 @@ const RSS_LIST = [
   "https://www.youtube.com/feeds/videos.xml?user=yoorai0121"
 ];
 
-
+const SOURCE_LABELS = [
+  { match: "fishingjapan.jp", label: "フィッシングジャパン" }
+];
 
 // =========================
 // RSS取得
@@ -107,33 +109,7 @@ el.innerHTML = `
 }
 
 
-function getSource(item) {
 
-  // ① RSSがちゃんとしてる場合（最優先）
-  if (item.source?.title) return item.source.title;
-
-  // ② RSS2JSONのauthor（弱いが一応）
-  if (item.author && item.author.length < 30) return item.author;
-
-  // ③ dc系
-  if (item["dc:creator"]) return item["dc:creator"];
-
-  // ④ descriptionから無理やり拾う（最後の手段）
-  if (item.description) {
-    const clean = item.description.replace(/<[^>]*>/g, "").trim();
-    if (clean && clean.length < 20) {
-      return clean;
-    }
-  }
-
-  // ⑤ linkからドメインだけ抜く（完全フォールバック）
-  try {
-    const host = new URL(item.link).hostname;
-    return host.replace(/^www\./, "");
-  } catch (e) {
-    return "RSS";
-  }
-}
 
 function getThumbnail(item) {
 
@@ -193,7 +169,39 @@ function extractImg(item) {
 }
 
 
+function getSource(item) {
 
+  const link = item.link || "";
+
+  let host = "";
+
+  try {
+    host = new URL(link).hostname.replace(/^www\./, "");
+  } catch (e) {
+    return "RSS";
+  }
+
+  // ======================
+  // リスト一致チェック
+  // ======================
+  for (const rule of SOURCE_LABELS) {
+    if (host.includes(rule.match)) {
+      return rule.label;
+    }
+  }
+
+  // ======================
+  // RSS author（補助）
+  // ======================
+  if (item.author && item.author.length < 20 && !item.author.includes("<")) {
+    return item.author;
+  }
+
+  // ======================
+  // デフォルト（ドメインそのまま）
+  // ======================
+  return host;
+}
 
 
 function formatTimeAgo(pubDate) {
