@@ -786,6 +786,13 @@ li {
 /* テキスト */
 .news-text {
   flex: 1;
+  padding-left: 10px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+  height: 50px; /* ←これが重要（全体固定） */
 }
 
 .news-item {
@@ -814,6 +821,9 @@ li {
 .news-title {
   font-size: 13px;
   padding: 0 8px;
+  margin: 0;
+
+  line-height: 1.2;
   
   /* ★はみ出し防止 */
   overflow: hidden;
@@ -823,27 +833,20 @@ li {
 }
 
 .news-source {
-  font-size: 8px;
-  color: #888;
- 
-
   padding-left: 10px;
-  /* はみ出し防止 */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-    display: inline-block;
+  margin-right: 8px;
 }
+
 .news-date {
-
-  font-size: 8px;
-
   color: #aaa;
-
-
+}
+.news-source,
+.news-date {
+  font-size: 8px;
+  line-height: 1;
 
   display: inline-block;
-
-  margin-left: 8px;
-
+  margin: 0;
+  padding: 0;
 }
+
