@@ -106,36 +106,43 @@ el.innerHTML = `
   });
 }
 
+
 function getThumbnail(item) {
 
-  // YouTube系（最優先）
-  if (item.link?.includes("youtube.com")) {
+  const link = item.link || "";
+
+  // YouTube
+  if (link.includes("youtube.com")) {
     return item.thumbnail ||
            item.media?.group?.mediaThumbnail?.[0]?.url ||
            "https://placehold.jp/90x60.png";
   }
 
-  // RSS標準系
-  if (item.media?.content?.[0]?.url) {
-    return item.media.content[0].url;
+  // .php系（RSS系サイトまとめ）
+  if (link.includes(".php")) {
+
+    return item.media?.content?.[0]?.url ||
+           item.enclosure?.link ||
+           item.thumbnail ||
+           extractImg(item) ||
+           "https://placehold.jp/90x60.png";
   }
 
-  if (item.enclosure?.link) {
-    return item.enclosure.link;
-  }
-
-  if (item.thumbnail) {
-    return item.thumbnail;
-  }
-
-  // HTML fallback
-  if (item.description) {
-    const m = item.description.match(/<img[^>]+src="([^">]+)"/);
-    if (m) return m[1];
-  }
-
-  return "https://placehold.jp/90x60.png";
+  // その他
+  return item.enclosure?.link ||
+         item.thumbnail ||
+         extractImg(item) ||
+         "https://placehold.jp/90x60.png";
 }
+
+
+// 共通
+function extractImg(item) {
+  if (!item.description) return "";
+  const m = item.description.match(/<img[^>]+src="([^">]+)"/);
+  return m ? m[1] : "";
+}
+
 
 
 function formatTimeAgo(pubDate) {
