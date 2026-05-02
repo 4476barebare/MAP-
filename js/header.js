@@ -83,29 +83,26 @@ function renderNews(items) {
   });
 }
 
-
 function getThumbnail(item) {
 
   let url = "";
 
-  if (item.enclosure && item.enclosure.link) {
-    url = item.enclosure.link;
-
-  } else if (item.thumbnail) {
-    url = item.thumbnail;
-
-  } else if (item.description) {
-    const match = item.description.match(/<img[^>]+src="([^">]+)"/);
-    if (match) url = match[1];
+  if (item.enclosure?.link) url = item.enclosure.link;
+  else if (item.thumbnail) url = item.thumbnail;
+  else if (item.description) {
+    const match = item.description.match(/https?:\/\/[^"]+\.(jpg|png|jpeg)/);
+    if (match) url = match[0];
   }
 
-  // ★ここが重要
-  if (url.startsWith("http://")) {
-    url = url.replace("http://", "https://");
+  // 最終 fallback
+  if (!url) {
+    return "https://placehold.jp/90x60.png";
   }
 
-  return url || "https://placehold.jp/90x60.png";
+  return url;
 }
+
+
 
 
 // =========================
