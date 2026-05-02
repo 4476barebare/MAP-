@@ -1,93 +1,67 @@
-// header.js
-document.addEventListener('DOMContentLoaded', ()=>{const newsOverlay = document.getElementById("newsOverlay");
 
-if (newsOverlay) {
-  newsOverlay.addEventListener("click", (e)=>{
-    if (e.target === newsOverlay) {
-      newsOverlay.style.display = "none";
-    }
-  });
-}
 
 
 // =========================
-// RSS設定
-// =========================
-const RSS_FEEDS = [
-  {
-    name: "LureNewsR",
-    url: "https://www.lurenewsr.com/feed/"
-  }
-];
-
-const newsList = document.getElementById("newsList");
-
-
-// =========================
-// RSS取得（Promise版）
+// RSS取得
 // =========================
 function fetchRSS(url) {
   const api = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url);
 
   return fetch(api)
-    .then(res => {
+    .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
       return res.json();
     });
 }
 
+
 // =========================
-// 読み込み
+// ニュース読み込み
 // =========================
 function loadNews() {
+
+  const newsList = document.getElementById("newsList");
   if (!newsList) return;
 
   newsList.innerHTML = "読み込み中...";
 
-  let allItems = [];
+  const RSS_URL = "https://www.lurenewsr.com/feed/";
+  let items = [];
 
-  // 複数RSS対応
-  const tasks = RSS_FEEDS.map(feed => {
-    return fetchRSS(feed.url)
-      .then(data => {
+  fetchRSS(RSS_URL)
+    .then(function (data) {
 
-        // ★画面デバッグ
-        newsList.innerHTML = "status: " + data.status;
+      if (!data.items || data.items.length === 0) {
+        newsList.innerHTML = "記事がありません";
+        return;
+      }
 
-        if (data.items) {
-          allItems = allItems.concat(data.items);
-        }
+      items = data.items;
 
-      })
-      .catch(err => {
-        newsList.innerHTML = "RSS取得失敗";
+      // 日付順ソート
+      items.sort(function (a, b) {
+        return new Date(b.pubDate) - new Date(a.pubDate);
       });
-  });
 
-  Promise.all(tasks).then(() => {
-
-    // ★件数確認
-    newsList.innerHTML = "件数: " + allItems.length;
-
-    if (!allItems.length) {
-      newsList.innerHTML = "記事が取得できません";
-      return;
-    }
-
-    // 日付順
-    allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-
-    renderNews(allItems.slice(0, 20));
-  });
+      renderNews(items.slice(0, 20));
+    })
+    .catch(function () {
+      newsList.innerHTML = "取得失敗";
+    });
 }
+
 
 // =========================
 // 描画
 // =========================
 function renderNews(items) {
+
+  const newsList = document.getElementById("newsList");
+  if (!newsList) return;
+
   newsList.innerHTML = "";
 
-  items.forEach(item => {
+  items.forEach(function (item) {
 
     const thumb = item.thumbnail || "https://placehold.jp/90x60.png";
 
@@ -112,8 +86,9 @@ function renderNews(items) {
   });
 }
 
+
 // =========================
-// HTML除去
+// HTMLタグ除去
 // =========================
 function stripHTML(html) {
   const tmp = document.createElement("div");
@@ -121,14 +96,29 @@ function stripHTML(html) {
   return tmp.textContent || "";
 }
 
+
 // =========================
-// 実行
+// DOM読み込み後に1回だけ実行
 // =========================
-if (newsList) {
+document.addEventListener("DOMContentLoaded", function () {
+
+  const newsOverlay = document.getElementById("newsOverlay");
+  const newsList = document.getElementById("newsList");
+
+  // 要素チェック
+  if (!newsList) return;
+
+  // オーバーレイクリックで閉じる
+  if (newsOverlay) {
+    newsOverlay.addEventListener("click", function (e) {
+      if (e.target === newsOverlay) {
+        newsOverlay.style.display = "none";
+      }
+    });
+  }
+
+  // 初期表示
   loadNews();
-}
-
-
   // =========================
   // カレンダー（オーバーレイ）
   // =========================
