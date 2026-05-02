@@ -19,11 +19,11 @@ function fetchRSS(url) {
 // ニュース読み込み
 // =========================
 function loadNews() {
-    alert("呼び出し");
+  //  alert("呼び出し");
 
   const newsList = document.getElementById("newsList");
   if (!newsList) return;
-  alert("呼び出し2");
+  //alert("呼び出し2");
 
   newsList.innerHTML = "読み込み中...";
 
@@ -65,29 +65,30 @@ function renderNews(items) {
 
   items.forEach(function (item) {
 
-    const thumb = item.thumbnail || "https://placehold.jp/90x60.png";
-
+    const thumb = getThumbnail(item);
+    
     const el = document.createElement("div");
     el.className = "news-item";
 
     el.innerHTML = `
-      <a href="${item.link}" target="_blank">
-        <div class="news-row">
-          <img src="${thumb}">
-          <div class="news-text">
-            <div class="news-title">${item.title}</div>
-            <div class="news-desc">
-              ${stripHTML(item.description || "").slice(0, 80)}...
-            </div>
-          </div>
-        </div>
-      </a>
-    `;
+  <a href="${item.link}" target="_blank">
+    <div class="news-row">
+      <img src="${thumb}">
+      <div class="news-title">${item.title}</div>
+    </div>
+  </a>
+`;
 
     newsList.appendChild(el);
   });
 }
 
+function getThumbnail(item) {
+  if (item.thumbnail) return item.thumbnail;
+
+  const match = item.description.match(/<img[^>]+src="([^">]+)"/);
+  return match ? match[1] : "https://placehold.jp/90x60.png";
+}
 
 // =========================
 // HTMLタグ除去
