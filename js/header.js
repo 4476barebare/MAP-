@@ -1,6 +1,6 @@
 const RSS_LIST = [
   "https://www.lurenewsr.com/feed/",
-//  "https://fishingjapan.jp/fishing/rss.php",
+  "https://fishingjapan.jp/fishing/rss.php",
   "https://www.youtube.com/feeds/videos.xml?channel_id=UChHUhF5bgoeS1Z-uE_HRQfQ",
   "https://www.youtube.com/feeds/videos.xml?user=yoorai0121"
 ];
@@ -112,28 +112,37 @@ function getThumbnail(item) {
 
   let url = "";
 
-  // RSS2JSON（通常RSS）
-  if (item.thumbnail) {
-    url = item.thumbnail;
+  try {
+
+    if (item.thumbnail) {
+      url = item.thumbnail;
+
+    } else if (item.enclosure?.link) {
+      url = item.enclosure.link;
+
+    } else if (item["media:thumbnail"]?.url) {
+      url = item["media:thumbnail"].url;
+
+    } else if (item["content:encoded"]) {
+      const match = item["content:encoded"].match(/<img[^>]+src="([^">]+)"/);
+      if (match) url = match[1];
+
+    } else if (item.description) {
+      const match = item.description.match(/<img[^>]+src="([^">]+)"/);
+      if (match) url = match[1];
+    }
+
+  } catch (e) {
+    url = "";
   }
 
-  // YouTube RSS2JSON
-  else if (item.enclosure && item.enclosure.link) {
-    url = item.enclosure.link;
+  if (!url) return "https://placehold.jp/90x60.png";
+
+  if (url.startsWith("http://")) {
+    url = url.replace("http://", "https://");
   }
 
-  // YouTube系で一番確実
-  else if (item["media:thumbnail"] && item["media:thumbnail"].url) {
-    url = item["media:thumbnail"].url;
-  }
-
-  // descriptionから最終救済
-  else if (item.description) {
-    const match = item.description.match(/https?:\/\/[^"]+\.(jpg|png|jpeg)/);
-    if (match) url = match[0];
-  }
-
-  return url || "https://placehold.jp/90x60.png";
+  return url;
 }
 
 function formatTimeAgo(pubDate) {
