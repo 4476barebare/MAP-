@@ -67,30 +67,28 @@ document.addEventListener('DOMContentLoaded', ()=>{
     if (!locationList) return;
     locationList.innerHTML = '<li class="location-none">登録なし</li>';
   }
+  
+  
+  
+  
+const newsBtn = document.getElementById("newsBtn");
+const newsModal = document.getElementById("newsModal");
 
-  // =========================
-  // ニュースオーバーレイ
-  // =========================
-  const newsBtn = document.getElementById("newsBtn");
-  const newsOverlay = document.getElementById("newsOverlay");
-  const closeNews = document.getElementById("closeNews");
+if (newsBtn && newsModal) {
 
-  if (newsBtn && newsOverlay && closeNews) {
-    newsBtn.addEventListener("click", e=>{
-      e.preventDefault();
-      newsOverlay.style.display="flex";
-    });
+  // 開く
+  newsBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    newsModal.style.display = "block";
+  });
 
-    closeNews.addEventListener("click", ()=>{
-      newsOverlay.style.display="none";
-    });
-
-    newsOverlay.addEventListener("click", e=>{
-      if (e.target === newsOverlay) {
-        newsOverlay.style.display = "none";
-      }
-    });
-  }
+  // 外側クリックで閉じる
+  newsModal.addEventListener("click", (e) => {
+    if (e.target === newsModal) {
+      newsModal.style.display = "none";
+    }
+  });
+}
 
   // =========================
   // カレンダー（オーバーレイ）
