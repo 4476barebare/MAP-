@@ -120,9 +120,7 @@ function getThumbnail(item) {
       url =
         item.thumbnail ||
         item.media?.group?.mediaThumbnail?.[0]?.url;
-
     }
-
     // ======================
     // 通常RSS系
     // ======================
@@ -137,9 +135,10 @@ function getThumbnail(item) {
     // ======================
     // ★追加（ルアーニュース対策：media構造揺れ救済）
     // ======================
-    if (!url && item.media?.content?.length > 0) {
-      url = item.media.content[0].url;
-    }
+    if (item.media?.content?.[0]?.url) {
+  url = item.media.content[0].url;
+}
+
 
     // ======================
     // HTMLから抜く
