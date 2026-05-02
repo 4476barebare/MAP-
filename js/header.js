@@ -90,6 +90,79 @@ if (newsBtn && newsModal) {
   });
 }
 
+// feeds.js
+const RSS_FEEDS = [
+  {
+    name: "Fishing Japan",
+    url: "https://fishingjapan.jp/feed/", // ※動かない場合は後で差し替え
+    type: "media"
+  }
+];
+
+const newsList = document.getElementById("newsList");
+
+// RSS → JSON
+async function fetchRSS(url) {
+  const api = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url);
+  const res = await fetch(api);
+  return res.json();
+}
+
+// 全取得
+async function loadNews() {
+  newsList.innerHTML = "読み込み中...";
+
+  let allItems = [];
+
+  for (const feed of RSS_FEEDS) {
+    try {
+      const data = await fetchRSS(feed.url);
+      allItems = allItems.concat(data.items || []);
+    } catch (e) {
+      console.log("RSS error:", feed.name);
+    }
+  }
+
+  // 日付順ソート
+  allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+  renderNews(allItems.slice(0, 20)); // 上位20件
+}
+
+// 描画
+function renderNews(items) {
+  newsList.innerHTML = "";
+
+  items.forEach(item => {
+
+    const el = document.createElement("div");
+    el.className = "news-item";
+
+    el.innerHTML = `
+      <a href="${item.link}" target="_blank">
+        <div class="news-row">
+          <img src="${item.thumbnail || ""}">
+          <div class="news-text">
+            <div class="news-title">${item.title}</div>
+            <div class="news-desc">${stripHTML(item.description).slice(0, 80)}...</div>
+          </div>
+        </div>
+      </a>
+    `;
+
+    newsList.appendChild(el);
+  });
+}
+
+// HTMLタグ除去
+function stripHTML(html) {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || "";
+}
+
+
+
   // =========================
   // カレンダー（オーバーレイ）
   // =========================
