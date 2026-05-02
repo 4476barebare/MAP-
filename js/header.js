@@ -1,7 +1,7 @@
 const RSS_LIST = [
   "https://www.lurenewsr.com/feed/",
-  "https://example.com/rss2.xml",
-  "https://example.com/rss3.xml"
+  "https://youtube.com/channel/UChHUhF5bgoeS1Z-uE_HRQfQ?si=NT5tQFUEFizOb3Qu",
+  "https://youtube.com/@yoorai0121?si=doWYfAA3ksJn7_TH"
 ];
 
 
