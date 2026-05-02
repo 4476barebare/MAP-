@@ -106,35 +106,29 @@ el.innerHTML = `
   });
 }
 
-
-
 function getThumbnail(item) {
 
   let url = "";
 
   try {
 
-    if (item.thumbnail) {
-      url = item.thumbnail;
+    url =
+      item.thumbnail ||
+      item.enclosure?.link ||
+      item["media:thumbnail"]?.url ||
+      item["media:content"]?.url;
 
-    } else if (item.enclosure?.link) {
-      url = item.enclosure.link;
-
-    } else if (item["media:thumbnail"]?.url) {
-      url = item["media:thumbnail"].url;
-
-    } else if (item["content:encoded"]) {
-      const match = item["content:encoded"].match(/<img[^>]+src="([^">]+)"/);
-      if (match) url = match[1];
-
-    } else if (item.description) {
-      const match = item.description.match(/<img[^>]+src="([^">]+)"/);
-      if (match) url = match[1];
+    if (!url && item["content:encoded"]) {
+      const m = item["content:encoded"].match(/<img[^>]+src="([^">]+)"/);
+      if (m) url = m[1];
     }
 
-  } catch (e) {
-    url = "";
-  }
+    if (!url && item.description) {
+      const m = item.description.match(/<img[^>]+src="([^">]+)"/);
+      if (m) url = m[1];
+    }
+
+  } catch (e) {}
 
   if (!url) return "https://placehold.jp/90x60.png";
 
@@ -144,6 +138,7 @@ function getThumbnail(item) {
 
   return url;
 }
+
 
 function formatTimeAgo(pubDate) {
   const now = new Date();
