@@ -115,9 +115,9 @@ const newsOverlay = document.getElementById("newsModal");
     });
   }
 
- if (newsList) {
+ 
   loadNews();
-}
+
   // =========================
   // カレンダー（オーバーレイ）
   // =========================
