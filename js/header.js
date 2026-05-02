@@ -108,51 +108,33 @@ el.innerHTML = `
 
 function getThumbnail(item) {
 
-  let url = "";
+  // YouTube系（最優先）
+  if (item.link?.includes("youtube.com")) {
+    return item.thumbnail ||
+           item.media?.group?.mediaThumbnail?.[0]?.url ||
+           "https://placehold.jp/90x60.png";
+  }
 
-  try {
+  // RSS標準系
+  if (item.media?.content?.[0]?.url) {
+    return item.media.content[0].url;
+  }
 
-    // ======================
-    // YouTube専用
-    // ======================
-    if (item.link && item.link.includes("youtube.com")) {
+  if (item.enclosure?.link) {
+    return item.enclosure.link;
+  }
 
-      url =
-        item.thumbnail ||
-        item.media?.group?.mediaThumbnail?.[0]?.url;
-    }
-    // ======================
-    // 通常RSS系
-    // ======================
-    if (!url) {
-      url =
-        item.thumbnail ||
-        item.enclosure?.link ||
-        item.media?.content?.[0]?.url ||
-        item["media:thumbnail"]?.url;
-    }
+  if (item.thumbnail) {
+    return item.thumbnail;
+  }
 
-    // ======================
-    // ★追加（ルアーニュース対策：media構造揺れ救済）
-    // ======================
-    if (item.media?.content?.[0]?.url) {
-  url = item.media.content[0].url;
-}
+  // HTML fallback
+  if (item.description) {
+    const m = item.description.match(/<img[^>]+src="([^">]+)"/);
+    if (m) return m[1];
+  }
 
-
-    // ======================
-    // HTMLから抜く
-    // ======================
-    if (!url && item.description) {
-      const m = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
-      if (m) url = m[1];
-    }
-
-  } catch (e) {}
-
-  if (!url) return "https://placehold.jp/90x60.png";
-
-  return url.replace(/^http:\/\//, "https://");
+  return "https://placehold.jp/90x60.png";
 }
 
 
