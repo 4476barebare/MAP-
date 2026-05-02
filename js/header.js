@@ -102,11 +102,9 @@ function stripHTML(html) {
 // =========================
 document.addEventListener("DOMContentLoaded", function () {
 
-  const newsOverlay = document.getElementById("newsOverlay");
+const newsOverlay = document.getElementById("newsModal");
   const newsList = document.getElementById("newsList");
 
-  // 要素チェック
-  if (!newsList) return;
 
   // オーバーレイクリックで閉じる
   if (newsOverlay) {
@@ -117,8 +115,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // 初期表示
+ if (newsList) {
   loadNews();
+}
   // =========================
   // カレンダー（オーバーレイ）
   // =========================
