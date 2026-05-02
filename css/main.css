@@ -821,3 +821,15 @@ li {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+
+.news-source {
+  font-size: 8px;
+  color: #888;
+  line-height: 1;
+  margin-top: 2px;
+
+  /* はみ出し防止 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
