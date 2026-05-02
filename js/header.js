@@ -86,25 +86,27 @@ function renderNews(items) {
 
 function getThumbnail(item) {
 
-  // ① enclosure（最優先）
+  let url = "";
+
   if (item.enclosure && item.enclosure.link) {
-    return item.enclosure.link;
-  }
+    url = item.enclosure.link;
 
-  // ② thumbnail
-  if (item.thumbnail) {
-    return item.thumbnail;
-  }
+  } else if (item.thumbnail) {
+    url = item.thumbnail;
 
-  // ③ description内img
-  if (item.description) {
+  } else if (item.description) {
     const match = item.description.match(/<img[^>]+src="([^">]+)"/);
-    if (match) return match[1];
+    if (match) url = match[1];
   }
 
-  // ④ 最終 fallback
-  return "https://placehold.jp/90x60.png";
+  // ★ここが重要
+  if (url.startsWith("http://")) {
+    url = url.replace("http://", "https://");
+  }
+
+  return url || "https://placehold.jp/90x60.png";
 }
+
 
 // =========================
 // HTMLタグ除去
