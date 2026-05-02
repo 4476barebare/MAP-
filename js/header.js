@@ -70,13 +70,22 @@ function renderNews(items) {
     const el = document.createElement("div");
     el.className = "news-item";
 
+//const date = new Date(item.pubDate);
+//const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+const timeText = formatTimeAgo(item.pubDate);
+
 el.innerHTML = `
   <a href="${item.link}" target="_blank">
     <div class="news-row">
       <img src="${thumb}">
       <div class="news-text">
         <div class="news-title">${item.title}</div>
-        <div class="news-source">${item.author || "RSS"}</div>
+
+        <div class="news-meta">
+          <div class="news-source">${item.author || "RSS"}</div>
+          <div class="news-date">${timeText}</div>
+        </div>
+
       </div>
     </div>
   </a>
@@ -115,6 +124,27 @@ function getThumbnail(item) {
 
   // fallback
   return "https://placehold.jp/90x60.png";
+}
+
+function formatTimeAgo(pubDate) {
+  const now = new Date();
+  const date = new Date(pubDate);
+  const diff = now - date;
+
+  const sec = Math.floor(diff / 1000);
+  const min = Math.floor(sec / 60);
+  const hour = Math.floor(min / 60);
+  const day = Math.floor(hour / 24);
+  const month = Math.floor(day / 30);
+
+  if (sec < 60) return "たった今";
+  if (min < 60) return `${min}分前`;
+  if (hour < 24) return `${hour}時間前`;
+  if (day === 1) return "昨日";
+  if (day < 30) return `${day}日前`;
+  if (month < 12) return `${month}ヶ月前`;
+
+  return `${Math.floor(month / 12)}年前`;
 }
 
 
