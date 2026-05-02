@@ -1,104 +1,14 @@
 // header.js
 document.addEventListener('DOMContentLoaded', ()=>{
 
-  // =========================
-  // アコーディオン処理
-  // =========================
-  const accordionBtn = document.querySelector('.accordion-btn');
-  const panel = document.querySelector('.accordion-panel');
-
-  if (accordionBtn && panel) {
-    accordionBtn.addEventListener('click', ()=>{
-      document.querySelectorAll('.accordion-panel').forEach(p=>{
-        if(p!==panel) p.style.display='none';
-      });
-      panel.style.display = (panel.style.display==='block') ? 'none':'block';
-    });
-
-    document.addEventListener('click', e=>{
-      if(!e.target.closest('.accordion-wrapper')){
-        document.querySelectorAll('.accordion-panel').forEach(p=>p.style.display='none');
-      }
-    });
-  }
-
-  // =========================
-  // 登録地点操作
-  // =========================
-  const locationList = document.getElementById('locationList');
-
-  function attachDeleteEvents() {
-    if (!locationList) return;
-
-    locationList.querySelectorAll('.delete-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const li = btn.parentElement;
-        li.remove();
-
-        if(locationList.children.length === 0){
-          locationList.innerHTML = '<li class="location-none">登録なし</li>';
-        }
-      });
-    });
-  }
-
-  attachDeleteEvents();
-
-  window.addLocation = function(name){
-    if (!locationList) return;
-
-    const noneItem = locationList.querySelector('.location-none');
-    if(noneItem) noneItem.remove();
-
-    const li = document.createElement('li');
-    li.textContent = name + ' ';
-
-    const btn = document.createElement('button');
-    btn.textContent = '✖️';
-    btn.className = 'delete-btn';
-
-    li.appendChild(btn);
-    locationList.appendChild(li);
-
-    attachDeleteEvents();
-  }
-
-  window.resetLocations = function(){
-    if (!locationList) return;
-    locationList.innerHTML = '<li class="location-none">登録なし</li>';
-  }
-  
-  
-  
-  
-const newsBtn = document.getElementById("newsBtn");
-const newsModal = document.getElementById("newsModal");
-
-if (newsBtn && newsModal) {
-
-  // 開く
-  newsBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    newsModal.style.display = "block";
-  });
-
-  // 外側クリックで閉じる
-  newsModal.addEventListener("click", (e) => {
-    if (e.target === newsModal) {
-      newsModal.style.display = "none";
-    }
-  });
-}
-
-// feeds.js
 const RSS_FEEDS = [
   {
-    name: "Fishing Japan",
-    url: "https://fishingjapan.jp/feed/", // ※動かない場合は後で差し替え
-    type: "media"
+    name: "LureNewsR",
+    url: "https://www.lurenewsr.com/feed/"
   }
 ];
-
+  
+  
 const newsList = document.getElementById("newsList");
 
 // RSS → JSON
@@ -108,7 +18,7 @@ async function fetchRSS(url) {
   return res.json();
 }
 
-// 全取得
+// 読み込み
 async function loadNews() {
   newsList.innerHTML = "読み込み中...";
 
@@ -117,16 +27,25 @@ async function loadNews() {
   for (const feed of RSS_FEEDS) {
     try {
       const data = await fetchRSS(feed.url);
-      allItems = allItems.concat(data.items || []);
+      console.log("RSS:", data);
+
+      if (data.items) {
+        allItems = allItems.concat(data.items);
+      }
     } catch (e) {
-      console.log("RSS error:", feed.name);
+      console.log("RSS error:", e);
     }
   }
 
-  // 日付順ソート
+  if (!allItems.length) {
+    newsList.innerHTML = "記事が取得できません";
+    return;
+  }
+
+  // 日付順
   allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
-  renderNews(allItems.slice(0, 20)); // 上位20件
+  renderNews(allItems.slice(0, 20));
 }
 
 // 描画
@@ -135,16 +54,20 @@ function renderNews(items) {
 
   items.forEach(item => {
 
+    const thumb = item.thumbnail || "";
+
     const el = document.createElement("div");
     el.className = "news-item";
 
     el.innerHTML = `
       <a href="${item.link}" target="_blank">
         <div class="news-row">
-          <img src="${item.thumbnail || ""}">
+          <img src="${thumb}">
           <div class="news-text">
             <div class="news-title">${item.title}</div>
-            <div class="news-desc">${stripHTML(item.description).slice(0, 80)}...</div>
+            <div class="news-desc">
+              ${stripHTML(item.description).slice(0, 80)}...
+            </div>
           </div>
         </div>
       </a>
@@ -154,12 +77,13 @@ function renderNews(items) {
   });
 }
 
-// HTMLタグ除去
+// HTML除去
 function stripHTML(html) {
   const tmp = document.createElement("div");
   tmp.innerHTML = html;
-  return tmp.textContent || tmp.innerText || "";
+  return tmp.textContent || "";
 }
+
 
 
 
@@ -333,4 +257,9 @@ function createMonth(year, month) {
       }
     });
   }
+  
+  loadNews();
 });
+
+
+
