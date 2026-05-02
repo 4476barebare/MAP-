@@ -474,6 +474,11 @@ function showSpotsForArea(areaKey) {
         });
 
         marker.on('click', function () {
+            
+            const iconId = spot.icon || 'spot';
+        const isFish = iconId.startsWith('fish');
+        if (isFish) return;
+    
             selectSpot({
                 name: spot.name,
                 lat: spot.lat,
