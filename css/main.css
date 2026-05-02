@@ -827,7 +827,7 @@ li {
   color: #888;
   line-height: 1;
   margin-top: 2px;
-
+  padding-left: 10px;
   /* はみ出し防止 */
   white-space: nowrap;
   overflow: hidden;
