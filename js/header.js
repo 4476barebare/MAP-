@@ -1,7 +1,7 @@
 const RSS_LIST = [
   "https://www.lurenewsr.com/feed/",
-  "https://youtube.com/channel/UChHUhF5bgoeS1Z-uE_HRQfQ?si=NT5tQFUEFizOb3Qu",
-  "https://youtube.com/@yoorai0121?si=doWYfAA3ksJn7_TH"
+  "https://www.youtube.com/feeds/videos.xml?channel_id=UChHUhF5bgoeS1Z-uE_HRQfQ",
+  "https://www.youtube.com/feeds/videos.xml?user=yoorai0121"
 ];
 
 
