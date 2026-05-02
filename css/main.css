@@ -826,7 +826,7 @@ li {
   font-size: 8px;
   color: #888;
   line-height: 1;
-  margin-top: 2px;
+
   padding-left: 10px;
   /* はみ出し防止 */
   white-space: nowrap;
@@ -840,7 +840,7 @@ li {
 
   color: #aaa;
 
-  line-height: 1;
+
 
   display: inline-block;
 
