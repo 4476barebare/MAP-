@@ -104,21 +104,30 @@ function stripHTML(html) {
 // =========================
 document.addEventListener("DOMContentLoaded", function () {
 
-const newsOverlay = document.getElementById("newsModal");
-  const newsList = document.getElementById("newsList");
+// ===== ニュースモーダル =====
 
+const newsLink = document.getElementById("newsBtn");
+const newsModal = document.getElementById("newsModal");
 
-  // オーバーレイクリックで閉じる
-  if (newsOverlay) {
-    newsOverlay.addEventListener("click", function (e) {
-      if (e.target === newsOverlay) {
-        newsOverlay.style.display = "none";
-      }
-    });
-  }
+if (newsLink && newsModal) {
 
- 
-  loadNews();
+  // 開く
+  newsLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    newsModal.style.display = "block";
+
+    // ★開いたタイミングで読み込む
+    loadNews();
+  });
+
+  // 背景クリックで閉じる
+  newsModal.addEventListener("click", (e) => {
+    if (e.target === newsModal) {
+      newsModal.style.display = "none";
+    }
+  });
+
+}
 
   // =========================
   // カレンダー（オーバーレイ）
