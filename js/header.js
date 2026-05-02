@@ -107,32 +107,32 @@ el.innerHTML = `
 
 
 
-
 function getThumbnail(item) {
 
-  // ① media.content（最重要）
-  if (item.media && item.media.content && item.media.content.length > 0) {
-    return item.media.content[0].url;
-  }
+  let url = "";
 
-  // ② enclosure
-  if (item.enclosure && item.enclosure.link) {
-    return item.enclosure.link;
-  }
-
-  // ③ thumbnail
+  // RSS2JSON（通常RSS）
   if (item.thumbnail) {
-    return item.thumbnail;
+    url = item.thumbnail;
   }
 
-  // ④ description
-  if (item.description) {
-    const match = item.description.match(/<img[^>]+src="([^">]+)"/);
-    if (match) return match[1];
+  // YouTube RSS2JSON
+  else if (item.enclosure && item.enclosure.link) {
+    url = item.enclosure.link;
   }
 
-  // fallback
-  return "https://placehold.jp/90x60.png";
+  // YouTube系で一番確実
+  else if (item["media:thumbnail"] && item["media:thumbnail"].url) {
+    url = item["media:thumbnail"].url;
+  }
+
+  // descriptionから最終救済
+  else if (item.description) {
+    const match = item.description.match(/https?:\/\/[^"]+\.(jpg|png|jpeg)/);
+    if (match) url = match[0];
+  }
+
+  return url || "https://placehold.jp/90x60.png";
 }
 
 function formatTimeAgo(pubDate) {
