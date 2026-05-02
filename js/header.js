@@ -1,5 +1,15 @@
 // header.js
-document.addEventListener('DOMContentLoaded', ()=>{
+document.addEventListener('DOMContentLoaded', ()=>{const newsOverlay = document.getElementById("newsOverlay");
+
+if (newsOverlay) {
+  newsOverlay.addEventListener("click", (e)=>{
+    if (e.target === newsOverlay) {
+      newsOverlay.style.display = "none";
+    }
+  });
+}
+
+
 // =========================
 // RSS設定
 // =========================
@@ -11,6 +21,7 @@ const RSS_FEEDS = [
 ];
 
 const newsList = document.getElementById("newsList");
+
 
 // =========================
 // RSS取得（Promise版）
