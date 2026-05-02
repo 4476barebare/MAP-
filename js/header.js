@@ -1,17 +1,25 @@
+const RSS_LIST = [
+  "https://www.lurenewsr.com/feed/",
+  "https://example.com/rss2.xml",
+  "https://example.com/rss3.xml"
+];
 
 
 
 // =========================
 // RSS取得
 // =========================
-function fetchRSS(url) {
-  const api = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url);
-
-  return fetch(api)
-    .then(function (res) {
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    });
+function fetchAllRSS(urls) {
+  return Promise.all(
+    urls.map(url =>
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url))
+        .then(res => {
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return res.json();
+        })
+        .catch(() => null) // 1つ死んでも全体は止めない
+    )
+  );
 }
 
 
@@ -19,35 +27,36 @@ function fetchRSS(url) {
 // ニュース読み込み
 // =========================
 function loadNews() {
-  //  alert("呼び出し");
 
   const newsList = document.getElementById("newsList");
   if (!newsList) return;
-  //alert("呼び出し2");
 
   newsList.innerHTML = "読み込み中...";
 
-  const RSS_URL = "https://www.lurenewsr.com/feed/";
-  let items = [];
+  fetchAllRSS(RSS_LIST)
+    .then(results => {
 
-  fetchRSS(RSS_URL)
-    .then(function (data) {
+      let items = [];
 
-      if (!data.items || data.items.length === 0) {
+      results.forEach(data => {
+        if (data && data.items) {
+          items = items.concat(data.items);
+        }
+      });
+
+      if (items.length === 0) {
         newsList.innerHTML = "記事がありません";
         return;
       }
 
-      items = data.items;
+      // 日付順ソート（統合後）
+      items.sort((a, b) =>
+        new Date(b.pubDate) - new Date(a.pubDate)
+      );
 
-      // 日付順ソート
-      items.sort(function (a, b) {
-        return new Date(b.pubDate) - new Date(a.pubDate);
-      });
-
-      renderNews(items.slice(0, 20));
+      renderNews(items.slice(0, 30));
     })
-    .catch(function () {
+    .catch(() => {
       newsList.innerHTML = "取得失敗";
     });
 }
