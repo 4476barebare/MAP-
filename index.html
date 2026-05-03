@@ -434,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateStateFromHash();
         routeUpdate();
+        renderAreaGuide();
 
         window.markerControl.preloadShop01(shopUrl);
     });
@@ -484,7 +485,8 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderAreaGuide() {
 
   const container = document.getElementById('area-guide');
-  container.innerHTML = '';
+
+  container.innerHTML = `<h1>${window.prefData.name}の釣りエリアガイド</h1>`;
 
   window.areaData.forEach(area => {
 
@@ -505,7 +507,7 @@ function renderAreaGuide() {
   });
 
 }
-    renderAreaGuide();
+
 });
 
 function openArea(areaKey) {
