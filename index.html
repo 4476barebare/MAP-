@@ -512,13 +512,20 @@ function renderAreaGuide() {
 
 function openArea(areaKey) {
 
+  const container = document.getElementById('area-guide');
+
   document.querySelectorAll('#area-guide .area').forEach(area => {
 
     const text = area.querySelector('.text');
 
     if (area.id === areaKey) {
+
       area.classList.add('active');
       text.classList.add('open');
+
+      // ★ 先頭に移動（h1の次）
+      container.insertBefore(area, container.children[1]);
+
       area.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     } else {
