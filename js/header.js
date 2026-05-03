@@ -249,19 +249,21 @@ function renderAdBlock() {
   ad.className = "ad-block";
 
   ad.innerHTML = `
-    <div style="
-      height:80px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#f2f2f2;
-      margin:10px 0;
-      font-size:12px;
-      color:#666;
-    ">
-      広告枠
-    </div>
-  `;
+  <div style="
+    width:100%;
+    max-width:320px;
+    height:50px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#f2f2f2;
+    margin:10px auto;
+    font-size:12px;
+    color:#666;
+  ">
+    広告枠
+  </div>
+`;
 
   return ad;
 }
