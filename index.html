@@ -491,11 +491,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     }
+    
+    
+function renderAreaGuide() {
 
+  const container = document.getElementById('area-guide');
+  container.innerHTML = '';
 
+  window.areaData.forEach(area => {
 
+    const div = document.createElement('div');
+    div.className = 'area';
+    div.id = area.individualId; // ←ここ重要
+
+    div.innerHTML = `
+      <h2>${area.name}</h2>
+      <p class="text">${area.description}</p>
+    `;
+
+    div.querySelector('h2').addEventListener('click', () => {
+      openArea(area.individualId);
+    });
+
+    container.appendChild(div);
+  });
+
+}
+    
 });
 
+function openArea(areaKey) {
+
+  document.querySelectorAll('#area-guide .area').forEach(area => {
+
+    const text = area.querySelector('.text');
+
+    if (area.id === areaKey) {
+      area.classList.add('active');
+      text.classList.add('open');
+      area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } else {
+      area.classList.remove('active');
+      text.classList.remove('open');
+    }
+
+  });
+
+}
 </script>
 
 </body>
