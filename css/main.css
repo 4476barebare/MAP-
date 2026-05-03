@@ -851,3 +851,7 @@ li {
   padding: 0;
 }
 
+.ad-block,
+.ad-placeholder {
+  display: none;
+}
