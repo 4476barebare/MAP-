@@ -54,12 +54,15 @@ function loadNews() {
         return;
       }
 
-      // 日付順ソート（統合後）
+      // ★ここで日付ソートしてる
       items.sort((a, b) =>
         new Date(b.pubDate) - new Date(a.pubDate)
       );
 
-      renderNews(items.slice(0, 30));
+      // ←ここに入れる
+      items = items.slice(0, 100);
+
+      renderNews(items);
     })
     .catch(() => {
       newsList.innerHTML = "取得失敗";
@@ -77,40 +80,40 @@ function renderNews(items) {
 
   newsList.innerHTML = "";
 
-  items.forEach(function (item) {
+  items.forEach(function (item, index) {
 
     const thumb = getThumbnail(item);
-    
+
     const el = document.createElement("div");
     el.className = "news-item";
 
-//const date = new Date(item.pubDate);
-//const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-const timeText = formatTimeAgo(item.pubDate);
+    const timeText = formatTimeAgo(item.pubDate);
 
-el.innerHTML = `
-  <a href="${item.link}" target="_blank">
-    <div class="news-row">
-      <img src="${thumb}">
-      <div class="news-text">
-        <div class="news-title">${item.title}</div>
+    el.innerHTML = `
+      <a href="${item.link}" target="_blank">
+        <div class="news-row">
+          <img src="${thumb}">
+          <div class="news-text">
+            <div class="news-title">${item.title}</div>
 
-        <div class="news-meta">
-          <div class="news-source">${getSource(item)}</div>
-          <div class="news-date">${timeText}</div>
+            <div class="news-meta">
+              <div class="news-source">${getSource(item)}</div>
+              <div class="news-date">${timeText}</div>
+            </div>
+
+          </div>
         </div>
-
-      </div>
-    </div>
-  </a>
-`;
-
+      </a>
+    `;
 
     newsList.appendChild(el);
+
+    // ★ここだけ追加（5件ごと）
+    if ((index + 1) % 5 === 0) {
+      newsList.appendChild(renderAdBlock());
+    }
   });
 }
-
-
 
 
 function getThumbnail(item) {
@@ -236,6 +239,35 @@ function stripHTML(html) {
   tmp.innerHTML = html;
   return tmp.textContent || "";
 }
+
+// =========================
+// 広告関数まだ未使用
+// =========================
+
+function renderAdBlock() {
+  const ad = document.createElement("div");
+  ad.className = "ad-block";
+
+  ad.innerHTML = `
+    <div style="
+      height:80px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f2f2f2;
+      margin:10px 0;
+      font-size:12px;
+      color:#666;
+    ">
+      広告枠
+    </div>
+  `;
+
+  return ad;
+}
+
+
+
 
 
 // =========================
