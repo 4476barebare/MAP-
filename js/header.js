@@ -1,8 +1,10 @@
 const RSS_LIST = [
   "https://www.lurenewsr.com/feed/",
   "https://fishingjapan.jp/fishing/rss.php",
+  "https://tsurihack.com/feed/",
   "https://www.youtube.com/feeds/videos.xml?channel_id=UChHUhF5bgoeS1Z-uE_HRQfQ",
-  "https://www.youtube.com/feeds/videos.xml?user=yoorai0121"
+  "https://www.youtube.com/feeds/videos.xml?user=yoorai0121",
+  "https://www.youtube.com/feeds/videos.xml?channel_id=UCwmAyvxNTirU4uaDxwoveDA"
 ];
 
 const SOURCE_LABELS = [
