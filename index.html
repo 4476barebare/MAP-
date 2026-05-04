@@ -30,29 +30,17 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 
-
 <body>
 
 <header>
   <div class="header-inner">
     <div class="logo">釣り行こNAVI</div>
     <nav class="nav">
-        <a href="#" id="calendarBtn">カレンダー</a>
-      <a href="#" id="newsBtn">釣りNEWS</a>
-      <div class="accordion-wrapper">
-        <button class="accordion-btn">登録地点 ▼</button>
-        <div class="accordion-panel">
-          <ul class="location-list" id="locationList">
-            <li>新潟 <button class="delete-btn">✖️</button></li>
-            <li>群馬 <button class="delete-btn">✖️</button></li>
-            <li>飯岡漁港(千葉) <button class="delete-btn">✖️</button></li>
-          </ul>
-        </div>
-      </div>
+    <a href="#" id="calendarBtn">カレンダー</a>
+    <a href="#" id="newsBtn">釣りNEWS</a>
     </nav>
   </div>
 </header>
-
 
 <div id="lf-map">
   <div class="map-ad">
@@ -62,13 +50,9 @@
   <button id="map-back-btn" class="map-back-btn"></button>
 </div>
 
-<!-- ↓ここに入れる -->
 <section id="area-guide" class="collapsed-mode">
   <h1>千葉県の釣りエリアガイド</h1>
 </section>
-
-
-<div id="weather-wave-tide-container"></div>
 
 <div id="newsModal" class="modal">
   <div class="modal-content">
@@ -85,41 +69,34 @@
 
 <div id="policyModal" class="modal">
   <div class="modal-content">
-
     <section>
       <h1>サイトポリシー</h1>
-
       <h2>1. 免責事項</h2>
       <p>
         当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、
         その完全性・正確性・最新性を保証するものではありません。
         当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。
       </p>
-
       <h2>2. 掲載情報について</h2>
       <p>
         掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、
         現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。
         利用前に必ず現地の最新情報をご確認ください。
       </p>
-
       <h2>3. 釣行データについて</h2>
       <p>
         当サイトの釣行データは過去の記録に基づくものであり、
         現在の釣果や釣りの可否を保証するものではありません。
         また海洋環境や生態系の状態を保証するものではありません。
       </p>
-
       <h2>4. 安全について</h2>
       <p>
         釣りを行う際は安全に十分配慮してください。
         釣り場所によっては管理者の許可が必要な場合があります。
         必ず現地のルールに従ってください。
       </p>
-
       <p>最終更新日：2026年5月</p>
     </section>
-
   </div>
 </div>
 <footer class="site-footer" id="policyLink">
@@ -133,28 +110,18 @@
 <script src="/js/dataLoader.js"></script>
 
 <script>
-
-// =======================
-// グローバル
-// =======================
 window.prefData = null;
 window.areaData = [];
 window.spotData = [];
-
 window.currentHash = '';
 window.currentAreaId = null;
 window.currentSpotId = null;
 window.currentPref = null;
-
 window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
-// =======================
-// デバッグ
-// =======================
 function showDebug(msg) {
     let debugEl = document.getElementById('debug');
-
     if (!debugEl) {
         debugEl = document.createElement('div');
         debugEl.id = 'debug';
@@ -171,7 +138,6 @@ function showDebug(msg) {
         debugEl.style.overflow = 'auto';
         document.body.appendChild(debugEl);
     }
-
     debugEl.textContent += msg + "\n";
 }
 
@@ -179,29 +145,21 @@ function showDebug(msg) {
 // PREF / AREA UI
 // =======================
 function initAreaUI() {
-
     document.getElementById('map-menu').style.display = 'block';
-
     const menuUl = document.querySelector('#map-menu ul');
     if (!menuUl) return;
-
     menuUl.innerHTML = '';
-
     window.areaData.forEach(area => {
-
         const li = document.createElement('li');
         const btn = document.createElement('button');
-
         const areaName = (area.name || '').trim();
         btn.textContent = areaName;
-
         btn.onclick = () => {
             location.hash = encodeURIComponent(areaName);
             updateStateFromHash();
             destroyAreaUI();
             selectArea(area);
         };
-
         li.appendChild(btn);
         menuUl.appendChild(li);
     });
@@ -251,15 +209,12 @@ window.nearestClickHandler = function(e) {
 // UI解除
 // =======================
 function destroyAreaUI() {
-
     const menuUl = document.querySelector('#map-menu ul');
     if (menuUl) menuUl.innerHTML = '';
-
     if (window.nearestClickHandler) {
         window.map.off('click', window.nearestClickHandler);
         window.nearestClickHandler = null;
     }
-
     window.nearestClickEnabled = false;
     document.getElementById('map-menu').style.display = 'none';
 }
