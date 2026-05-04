@@ -52,24 +52,15 @@
 }
 
 /* =======================
-   本文（折りたたみ）
+   デフォルト（初期状態）
 ======================= */
 .area .text {
-  position: relative;
   max-height: 4.5em;
   overflow: hidden;
-
-  transition: max-height 0.5s ease, opacity 0.3s ease;
+  transition: max-height 0.5s ease;
 }
 
-/* 開いた状態 */
-.area .text.open {
-  max-height: 600px;
-}
-
-/* =======================
-   フェード（閉じてる時）
-======================= */
+/* フェード */
 .area .text::after {
   content: "";
   position: absolute;
@@ -77,21 +68,27 @@
   bottom: 0;
   width: 100%;
   height: 40px;
-
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0),
-    rgba(255,255,255,1)
-  );
-
-  pointer-events: none;
-  transition: opacity 0.3s ease;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
 }
 
-/* 開いたらフェード消す */
-.area .text.open::after {
-  opacity: 0;
+/* =======================
+   エリア選択中モード
+======================= */
+#area-guide.active-mode .area .text {
+  max-height: 0;
 }
+
+/* 開いてるやつだけ表示 */
+#area-guide.active-mode .area .text.open {
+  max-height: 600px;
+}
+
+/* 開いてる時はフェード消す */
+#area-guide.active-mode .area .text.open::after {
+  display: none;
+}
+
+
 
 /* =======================
    スマホ最適化
