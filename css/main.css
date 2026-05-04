@@ -41,12 +41,25 @@
   transition: max-height 0.3s ease, opacity 0.2s ease;
 }
 
-/* =========================
-   初期状態（全て半開き）
-========================= */
+
+/* 半開き時だけフェードを乗せる */
 #area-guide.collapsed-mode .area .text {
-  max-height: 48px;   /* ← 半開き高さ（調整可） */
+  position: relative;
+  max-height: 48px;
   opacity: 0.8;
+}
+
+/* フェード部分 */
+#area-guide.collapsed-mode .area .text::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 24px;
+
+  /* 背景と同じ色でフェード */
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
 }
 
 /* =========================
