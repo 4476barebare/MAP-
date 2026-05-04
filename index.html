@@ -63,7 +63,7 @@
 </div>
 
 <!-- ↓ここに入れる -->
-<section id="area-guide">
+<section id="area-guide" class="collapsed-mode">
   <h1>千葉県の釣りエリアガイド</h1>
 </section>
 
@@ -514,6 +514,9 @@ function openArea(areaKey) {
 
   const container = document.getElementById('area-guide');
 
+  // ★ モード切替
+  container.classList.add('active-mode');
+
   document.querySelectorAll('#area-guide .area').forEach(area => {
 
     const text = area.querySelector('.text');
@@ -523,10 +526,9 @@ function openArea(areaKey) {
       area.classList.add('active');
       text.classList.add('open');
 
-      // ★ 先頭に移動（h1の次）
       container.insertBefore(area, container.children[1]);
 
-      area.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      area.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     } else {
       area.classList.remove('active');
@@ -536,6 +538,9 @@ function openArea(areaKey) {
   });
 
 }
+
+
+
 </script>
 
 </body>
