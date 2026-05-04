@@ -23,46 +23,47 @@
 
 /* タイトル */
 .area h2 {
+    color: #191970;
   font-size: 16px;
   margin: 0;
   cursor: pointer;
 }
 
-/* 本文 */
+/* =========================
+   本文 共通
+========================= */
 .area .text {
   font-size: 14px;
   margin-top: 8px;
   line-height: 1.6;
 
-  /* アニメーション用 */
-  max-height: 500px;
   overflow: hidden;
   transition: max-height 0.3s ease, opacity 0.2s ease;
-  opacity: 1;
 }
 
 /* =========================
-   選択モード時
+   初期状態（全て半開き）
+========================= */
+#area-guide.collapsed-mode .area .text {
+  max-height: 48px;   /* ← 半開き高さ（調整可） */
+  opacity: 0.8;
+}
+
+/* =========================
+   選択中モード
 ========================= */
 
-/* 非選択エリアは完全に閉じる */
+/* 選択対象 → 全開 */
+#area-guide.active-mode .area.active .text {
+  max-height: 500px;
+  opacity: 1;
+}
+
+/* 選択外 → 完全に閉じる */
 #area-guide.active-mode .area:not(.active) .text {
   max-height: 0;
   opacity: 0;
   margin-top: 0;
-}
-
-/* 選択エリアは強調 */
-#area-guide.active-mode .area.active {
-  padding-top: 16px;
-}
-
-/* =========================
-   初期モード（全開）
-========================= */
-#area-guide:not(.active-mode) .area .text {
-  max-height: 500px;
-  opacity: 1;
 }
 
 /* =======================
