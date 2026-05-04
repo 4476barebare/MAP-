@@ -514,7 +514,8 @@ function openArea(areaKey) {
 
   const container = document.getElementById('area-guide');
 
-  // ★ モード切替
+  // モード切替（これ必須）
+  container.classList.remove('collapsed-mode');
   container.classList.add('active-mode');
 
   document.querySelectorAll('#area-guide .area').forEach(area => {
@@ -536,7 +537,6 @@ function openArea(areaKey) {
     }
 
   });
-
 }
 
 
