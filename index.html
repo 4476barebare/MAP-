@@ -231,6 +231,7 @@ function routeUpdate() {
     // SPOT
     // -----------------------
     if (window.currentSpotId) {
+        alert(window.currentSpotId);
 
         const spotId = window.currentSpotId.split('_').pop();
 
@@ -246,7 +247,7 @@ function routeUpdate() {
 
     const spot = list.find(s =>
 
-        String(s.individualId) === String(spotId)
+        String(s.individualId) === String(spotId[0])
 
     );
 
