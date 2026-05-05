@@ -1018,8 +1018,8 @@ function showFishMarkers(url) {
         icon = L.divIcon({
           className: 'fish-dot',
           html: '',
-          iconSize: [6, 2],
-          iconAnchor: [3, 1]
+          iconSize: [5, 2],
+          iconAnchor: [2.5, 1]
         });
       }
 
