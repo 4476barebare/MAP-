@@ -947,25 +947,30 @@ li {
 .fish-text {
   white-space: nowrap;
   font-weight: bold;
-  border: 1px solid #191970;
 }
 
 /* zoom ≥ 18（大） */
 .zoom-18 .fish-text {
   font-size: 10px;
   color: #fff;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #191970;
 }
 
 /* zoom = 17（中） */
 .zoom-17 .fish-text {
   font-size: 8px;
   color: #fff;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #191970;
 }
 
 /* zoom = 16 */
 .zoom-16 .fish-text {
   font-size: 6px;
   color: #fff;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #191970;
 }
 
 /* ■ドット */
