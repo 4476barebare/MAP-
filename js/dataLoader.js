@@ -897,28 +897,10 @@ function zoomToSpot(spot) {
     window.mapStateSnapshot = null;
     disablePhase2(window.map);
     resetSpotLayers();
-    
-    
-// ★ URL未生成なら先に準備してspot取り直し
-let safe = spot;
 
-if (!safe.URL) {
-    const areaId = safe.areaId || window.currentAreaId;
-
-    if (areaId) {
-        prepareFishForArea(areaId);
-
-        // ★ 更新後のspotDataから再取得
-        const newSpot = window.spotData.find(s =>
-            (s.individualId || s.id) === window.currentSpotId.split('_').pop()
-        );
-
-        if (newSpot) {
-            safe = newSpot;
-        }
-    }
-}
-    
+    // ========================
+    // ★ レイヤー統一（ここで1回だけ）
+    // ========================
     if (window.gsiLayer) {
         window.gsiLayer.setUrl(window.gsiLayers.photo);
     } else {
@@ -931,38 +913,54 @@ if (!safe.URL) {
         ).addTo(window.map);
     }
 
-    // OSMが残っていたら消す（任意・UI整合性だけ）
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
     }
 
-    // =====================================================
-    // ③ 操作ロック
-    // =====================================================
+    // ========================
+    // データ補完
+    // ========================
+    let safe = spot;
+
+    if (!safe.URL) {
+        const areaId = safe.areaId || window.currentAreaId;
+
+        if (areaId) {
+            prepareFishForArea(areaId);
+
+            const newSpot = window.spotData.find(s =>
+                (s.individualId || s.id) === window.currentSpotId.split('_').pop()
+            );
+
+            if (newSpot) safe = newSpot;
+        }
+
+        // drawLocationルート
+        drawLocation(safe.name, safe.lat, safe.lng, safe.zoom || 15);
+        showFishMarkers(safe.URL);
+
+        return;
+    }
+
+    // ========================
+    // 通常ルート
+    // ========================
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // =====================================================
-    // ④ 移動のみ
-    // =====================================================
     window.map.flyTo([safe.lat, safe.lng], safe.zoom, {
         duration: 0.5
     });
-    
-    
-    // ★ハッシュ更新（末尾追加）
-if (spot && spot.individualId != null) {
-    const base = location.hash || '';
-    location.hash = base + '/' + spot.individualId;
-    updateStateFromHash();
-}
 
-    // =====================================================
-    // ⑤ 復帰処理
-    // =====================================================
+    if (safe && safe.individualId != null) {
+        const base = location.hash || '';
+        location.hash = base + '/' + safe.individualId;
+        updateStateFromHash();
+    }
+
     window.map.once('moveend', function () {
         showFishMarkers(safe.URL);
 
