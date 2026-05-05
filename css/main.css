@@ -947,32 +947,18 @@ li {
 .fish-text {
   white-space: nowrap;
   font-weight: bold;
-}
-
-/* zoom ≥ 18（大） */
-.zoom-18 .fish-text {
-  font-size: 10px;
   color: #fff;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #191970;
-}
 
-/* zoom = 17（中） */
-.zoom-17 .fish-text {
-  font-size: 8px;
-  color: #fff;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #191970;
+  /* 外側だけに縁を作る */
+  text-shadow:
+    -1px -1px 0 #191970,
+     1px -1px 0 #191970,
+    -1px  1px 0 #191970,
+     1px  1px 0 #191970;
 }
-
-/* zoom = 16 */
-.zoom-16 .fish-text {
-  font-size: 6px;
-  color: #fff;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #191970;
-}
-
+.zoom-18 .fish-text { font-size: 10px; }
+.zoom-17 .fish-text { font-size: 8px; }
+.zoom-16 .fish-text { font-size: 6px; }
 /* ■ドット */
 .fish-dot {
   width: 5px;
