@@ -961,8 +961,8 @@ li {
 .zoom-16 .fish-text { font-size: 6px; }
 /* ■ドット */
 .fish-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 3px;
   background: #fff;
   border: 1px solid #191970;
 }
