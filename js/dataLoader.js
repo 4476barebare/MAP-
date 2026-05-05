@@ -1012,48 +1012,25 @@ showFishMarkers(spot);
 }
 
 function showFishMarkers(spots) {
-    alert(spots.URL);
 
   if (!window.map) return;
 
-  // 既存レイヤー削除
-  if (window.fishLayer) {
-    window.map.removeLayer(window.fishLayer);
-  }
+  // ★ 強制可視化
+  let debugText = "";
 
-  window.fishLayer = L.layerGroup();
-
-  spots.forEach(spot => {
-
-    if (!spot.fish) return;
-
-    spot.fish.forEach(f => {
-
-      if (isNaN(f.lat) || isNaN(f.lng)) return;
-
-      // ★ テキストマーカー（中央基準）
-      const icon = L.divIcon({
-        className: 'fish-label',
-        html: `<div class="fish-text">${f.name}</div>`,
-        iconSize: null
-      });
-
-      const marker = L.marker([f.lat, f.lng], { icon });
-
-      marker.bindPopup(`
-        <b>${f.name}</b><br>
-        ${spot.name}
-      `);
-
-      window.fishLayer.addLayer(marker);
-
-    });
-
+  spots.forEach((s, i) => {
+    debugText += `#${i}\n`;
+    for (let key in s) {
+      debugText += `${key} : ${s[key]}\n`;
+    }
+    debugText += "------\n";
   });
 
-  window.map.addLayer(window.fishLayer);
-}
+  alert(debugText);
 
+  return; // ←ここで止める（確認用）
+
+}
 
 function resetSpotLayers() {
 
