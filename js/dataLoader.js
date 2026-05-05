@@ -924,9 +924,7 @@ function zoomToSpot(spot) {
     let safe = spot;
 
     if (!safe.URL) {
-        prepareFishForArea(window.currentAreaId;);
-
-
+        prepareFishForArea(window.currentAreaId);
        
         const spotId = window.currentSpotId.split("_");
         const list = window.spotData.filter(s =>
