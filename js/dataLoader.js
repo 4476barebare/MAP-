@@ -1013,15 +1013,51 @@ showFishMarkers(spot);
 
 function showFishMarkers(spots) {
 
-  alert("関数開始");
+  if (!window.map) return;
 
-  if (!spots) {
-    alert("spotsが無い");
-    return;
+  if (window.fishLayer) {
+    window.map.removeLayer(window.fishLayer);
   }
 
-  alert("spots件数: " + spots.length);
+  window.fishLayer = L.layerGroup();
 
+  spots.forEach(spot => {
+
+    if (!spot.URL) return;
+
+    const fishList = spot.URL.split(',');
+
+    fishList.forEach(item => {
+
+      const parts = item.split('|');
+      if (parts.length < 3) return;
+
+      const name = parts[0];
+      const lat = parseFloat(parts[1]);
+      const lng = parseFloat(parts[2]);
+
+      if (isNaN(lat) || isNaN(lng)) return;
+
+      const icon = L.divIcon({
+        className: 'fish-label',
+        html: `<div class="fish-text">${name}</div>`,
+        iconSize: null
+      });
+
+      const marker = L.marker([lat, lng], { icon });
+
+      marker.bindPopup(`
+        <b>${name}</b><br>
+        ${spot.name}
+      `);
+
+      window.fishLayer.addLayer(marker);
+
+    });
+
+  });
+
+  window.map.addLayer(window.fishLayer);
 }
 
 function resetSpotLayers() {
