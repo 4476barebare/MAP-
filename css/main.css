@@ -965,5 +965,14 @@ li {
   width: 5px;
   height: 2px;
   background: #fff;
-  border: 1px solid #191970;
+  box-shadow:
+
+    1px 0 #191970,
+
+   -1px 0 #191970,
+
+    0 1px #191970,
+
+    0 -1px #191970;
+  border-radius: 1px;
 }
