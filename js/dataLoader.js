@@ -924,17 +924,18 @@ function zoomToSpot(spot) {
     let safe = spot;
 
     if (!safe.URL) {
-        const areaId = safe.areaId || window.currentAreaId;
+        prepareFishForArea(window.currentAreaId;);
 
-        if (areaId) {
-            prepareFishForArea(areaId);
 
-            const newSpot = window.spotData.find(s =>
-                (s.individualId || s.id) === window.currentSpotId.split('_').pop()
-            );
-
-            if (newSpot) safe = newSpot;
-        }
+       
+        const spotId = window.currentSpotId.split("_");
+        const list = window.spotData.filter(s =>
+        String(s.areaId) === String(window.currentAreaId)
+        );
+        const safe = list.find(s =>
+        String(s.individualId) === String(spotId[2])
+        );
+        
 
         showFishMarkers(safe.URL);
 
