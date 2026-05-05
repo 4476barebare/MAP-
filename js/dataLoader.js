@@ -975,83 +975,48 @@ if (spot && spot.individualId != null) {
     });
 }
 
+function renderMarkers() {
+  window.fishLayer.clearLayers();
 
-function showFishMarkers(url) {
-  if (!window.map) return;
+  const zoom = Math.round(window.map.getZoom()); // ★これが重要
+  const el = window.map.getContainer();
 
-  if (window.fishLayer) {
-    window.map.removeLayer(window.fishLayer);
+  el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
+
+  if (zoom >= 18) {
+    el.classList.add('zoom-18');
+  } else if (zoom === 17) {
+    el.classList.add('zoom-17');
+  } else if (zoom === 16) {
+    el.classList.add('zoom-16');
+  } else {
+    el.classList.add('zoom-low');
   }
 
-  window.fishLayer = L.layerGroup();
+  markers.forEach(fish => {
 
-  const fishList = url.split(',');
+    let icon;
 
-  const markers = fishList.map(item => {
-    const parts = item.split('|');
-    return {
-      name: parts[0],
-      lat: parts[1],
-      lng: parts[2]
-    };
-  });
-
-  function renderMarkers() {
-    window.fishLayer.clearLayers();
-
-    const zoom = window.map.getZoom();
-    const el = window.map.getContainer();
-
-    // ★ 4パターン
-    el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
-
-    if (zoom >= 18) {
-      el.classList.add('zoom-18');
-    } else if (zoom === 17) {
-      el.classList.add('zoom-17');
-    } else if (zoom === 16) {
-      el.classList.add('zoom-16');
+    if (zoom >= 16) {
+      icon = L.divIcon({
+        className: 'fish-label',
+        html: `<div class="fish-text">${fish.name}</div>`,
+        iconSize: null
+      });
     } else {
-      el.classList.add('zoom-low');
+      icon = L.divIcon({
+        className: 'fish-dot',
+        html: '',
+        iconSize: [5, 5],
+        iconAnchor: [2.5, 2.5]
+      });
     }
 
-    markers.forEach(fish => {
+    const marker = L.marker([fish.lat, fish.lng], { icon });
 
-      let icon;
-
-      if (zoom >= 16) {
-        // テキスト（3段階）
-        icon = L.divIcon({
-          className: 'fish-label',
-          html: `<div class="fish-text">${fish.name}</div>`,
-          iconSize: null
-        });
-
-      } else {
-        // ■ドット
-        icon = L.divIcon({
-          className: 'fish-dot',
-          html: '',
-          iconSize: [5, 5],
-          iconAnchor: [2.5, 2.5]
-        });
-      }
-
-      const marker = L.marker([fish.lat, fish.lng], { icon });
-
-      window.fishLayer.addLayer(marker);
-
-    });
-  }
-
-  window.map.addLayer(window.fishLayer);
-
-  renderMarkers();
-
-  window.map.off('zoomend', renderMarkers);
-  window.map.on('zoomend', renderMarkers);
+    window.fishLayer.addLayer(marker);
+  });
 }
-
 
 function resetSpotLayers() {
 
