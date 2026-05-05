@@ -947,7 +947,7 @@ li {
 .fish-text {
   white-space: nowrap;
   font-weight: bold;
-  background: #191970;
+  border: 1px solid #191970;
 }
 
 /* zoom ≥ 18（大） */
@@ -959,6 +959,12 @@ li {
 /* zoom = 17（中） */
 .zoom-17 .fish-text {
   font-size: 8px;
+  color: #fff;
+}
+
+/* zoom = 16 */
+.zoom-16 .fish-text {
+  font-size: 6px;
   color: #fff;
 }
 
