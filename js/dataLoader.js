@@ -95,14 +95,26 @@ function loadLocationCSV(csvUrl) {
 
 function prepareFishForArea(areaId) {
 
+  alert("①開始");
   alert(areaId);
   alert(window.fishUrl);
 
   const loadPromise = window.fishData
-    ? Promise.resolve()
+    ? Promise.resolve("既に読み込み済み")
     : fetch(window.fishUrl)
-        .then(res => res.text())
+        .then(res => {
+          alert("②fetch応答きた");
+
+          if (!res.ok) {
+            alert("fetch失敗: " + res.status);
+            throw new Error("fetch失敗");
+          }
+
+          return res.text();
+        })
         .then(text => {
+          alert("③text取得");
+
           const lines = text.trim().split('\n');
           const headers = lines[0].split(',');
 
@@ -116,12 +128,24 @@ function prepareFishForArea(areaId) {
 
             return obj;
           });
+
+          alert("④fishData作成完了: " + window.fishData.length);
         });
 
   return loadPromise.then(() => {
 
+    alert("⑤then突入");
+
+    if (!window.locationData) {
+      alert("locationDataが無い");
+      return;
+    }
+
     const targetSpots = window.locationData.filter(s => s.areaId === areaId);
     const targetFish = window.fishData.filter(f => f.registration === areaId);
+
+    alert("⑥spot数:" + targetSpots.length);
+    alert("⑦fish数:" + targetFish.length);
 
     targetSpots.forEach(spot => {
       spot.fish = targetFish
@@ -133,7 +157,8 @@ function prepareFishForArea(areaId) {
         }));
     });
 
-    // ===== デバッグ出力（ここに入れる）=====
+    alert("⑧結合完了");
+
     let debugText = `areaId: ${areaId}\n\n`;
 
     targetSpots.forEach(spot => {
@@ -141,8 +166,11 @@ function prepareFishForArea(areaId) {
       debugText += `【${spot.name}】\n${fishNames}\n\n`;
     });
 
+    alert("⑨出力直前");
     alert(debugText);
 
+  }).catch(err => {
+    alert("エラー発生: " + err.message);
   });
 }
 
