@@ -932,12 +932,12 @@ function zoomToSpot(spot) {
         const list = window.spotData.filter(s =>
         String(s.areaId) === String(window.currentAreaId)
         );
-        const safe = list.find(s =>
+        const safe2 = list.find(s =>
         String(s.individualId) === String(spotId[2])
         );
         
 
-        showFishMarkers(safe.URL);
+        showFishMarkers(safe2.URL);
 
         window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
