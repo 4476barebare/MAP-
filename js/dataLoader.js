@@ -95,7 +95,7 @@ function loadLocationCSV(csvUrl) {
 
 function prepareFishForArea(areaId) {
 alert(areaId);
-
+alert(window.fishUrl);
   // ① 未ロードなら読み込み
   const loadPromise = window.fishData
     ? Promise.resolve()
