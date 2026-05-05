@@ -990,11 +990,12 @@ if (spot && spot.individualId != null) {
 
     updateStateFromHash();
 }
-showFishMarkers(safe);
+
     // =====================================================
     // ⑤ 復帰処理
     // =====================================================
     window.map.once('moveend', function () {
+        showFishMarkers(safe);
 
         window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
@@ -1030,23 +1031,15 @@ function showFishMarkers(spots) {
     fishList.forEach(item => {
 
       const parts = item.split('|');
-      if (parts.length !== 3) return;
 
-      const name = parts[0].trim();
-      const lat = Number(parts[1]);
-      const lng = Number(parts[2]);
+      const name = parts[0];
+      const lat = parts[1];
+      const lng = parts[2];
 
-      if (!name || Number.isNaN(lat) || Number.isNaN(lng)) return;
+      // ★ ここで確認
+      alert(name + "\n" + lat + "\n" + lng);
 
-      const marker = L.marker([lat, lng], {
-        icon: L.divIcon({
-          className: 'fish-label',
-          html: `<div class="fish-text">${name}</div>`,
-          iconSize: null
-        })
-      });
-
-      marker.bindPopup(`<b>${name}</b><br>${spot.name}`);
+      const marker = L.marker([lat, lng]);
 
       window.fishLayer.addLayer(marker);
 
@@ -1056,6 +1049,8 @@ function showFishMarkers(spots) {
 
   window.map.addLayer(window.fishLayer);
 }
+
+
 
 function resetSpotLayers() {
 
