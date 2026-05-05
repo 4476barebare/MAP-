@@ -975,7 +975,10 @@ if (spot && spot.individualId != null) {
     });
 }
 
+
 function showFishMarkers(url) {
+  if (!window.map) return;
+
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
   }
@@ -999,13 +1002,15 @@ function showFishMarkers(url) {
     const zoom = window.map.getZoom();
     const el = window.map.getContainer();
 
-    // ★ クラス3パターン
-    el.classList.remove('zoom-18', 'zoom-17', 'zoom-low');
+    // ★ 4パターン
+    el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
 
     if (zoom >= 18) {
       el.classList.add('zoom-18');
     } else if (zoom === 17) {
       el.classList.add('zoom-17');
+    } else if (zoom === 16) {
+      el.classList.add('zoom-16');
     } else {
       el.classList.add('zoom-low');
     }
@@ -1014,8 +1019,8 @@ function showFishMarkers(url) {
 
       let icon;
 
-      if (zoom >= 17) {
-        // テキスト
+      if (zoom >= 16) {
+        // テキスト（3段階）
         icon = L.divIcon({
           className: 'fish-label',
           html: `<div class="fish-text">${fish.name}</div>`,
@@ -1046,6 +1051,7 @@ function showFishMarkers(url) {
   window.map.off('zoomend', renderMarkers);
   window.map.on('zoomend', renderMarkers);
 }
+
 
 function resetSpotLayers() {
 
