@@ -1013,22 +1013,14 @@ showFishMarkers(spot);
 
 function showFishMarkers(spots) {
 
-  if (!window.map) return;
+  alert("関数開始");
 
-  // ★ 強制可視化
-  let debugText = "";
+  if (!spots) {
+    alert("spotsが無い");
+    return;
+  }
 
-  spots.forEach((s, i) => {
-    debugText += `#${i}\n`;
-    for (let key in s) {
-      debugText += `${key} : ${s[key]}\n`;
-    }
-    debugText += "------\n";
-  });
-
-  alert(debugText);
-
-  return; // ←ここで止める（確認用）
+  alert("spots件数: " + spots.length);
 
 }
 
