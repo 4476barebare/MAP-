@@ -230,28 +230,29 @@ function routeUpdate() {
     // -----------------------
     // SPOT
     // -----------------------
-    if (window.currentSpotId) {
-        const spotId = window.currentSpotId.split("_");
-        const list = window.spotData.filter(s =>
+if (window.currentSpotId) {
 
+    const spotId = window.currentSpotId.split("_");
+
+    const list = window.spotData.filter(s =>
         String(s.areaId) === String(window.currentAreaId)
-
     );
-
-    // ② その中から個体ID一致
-    //alert(spotId[2]);
 
     const spot = list.find(s =>
         String(s.individualId) === String(spotId[2])
     );
-    //alert(spot.name);
 
+    drawLocation(
+        spot.name,
+        spot.lat,
+        spot.lng,
+        spot.zoom
+    );
 
-    drawLocation(spot.name,spot.lat,spot.lng,spot.zoom);
-        zoomToSpot(spot);
-        return;
-    }
+    zoomToSpot(spot);
 
+    return;
+}
     // -----------------------
     // AREA
     // -----------------------
