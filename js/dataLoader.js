@@ -923,36 +923,40 @@ function zoomToSpot(spot) {
     // ========================
     let safe = spot;
 
-    if (!safe.URL) {
-        prepareFishForArea(window.currentAreaId);
-       
-        const spotId = window.currentSpotId.split("_");
-        const list = window.spotData.filter(s =>
-        String(s.areaId) === String(window.currentAreaId)
-        );
-        const safe2 = list.find(s =>
-        String(s.individualId) === String(spotId[2])
-        );
-        
+if (!safe.URL) {
 
-        showFishMarkers(safe2.URL);
+    Promise.resolve(prepareFishForArea(window.currentAreaId))
+        .then(() => {
 
-        window.map.setMinZoom(safe.zoom || 15);
-        window.map.setMaxZoom(18);
+            const spotId = window.currentSpotId.split("_");
 
-        window.map.setMaxBounds(window.map.getBounds());
-        window.map.options.maxBoundsViscosity = 1.0;
+            const list = window.spotData.filter(s =>
+                String(s.areaId) === String(window.currentAreaId)
+            );
 
-        window._zoomGuardBase = safe.zoom || 15;
-        window._zoomGuardActive = true;
+            const safe2 = list.find(s =>
+                String(s.individualId) === String(spotId[2])
+            );
 
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
+            showFishMarkers(safe2.URL);
 
-        return;
-    }
+            window.map.setMinZoom(safe.zoom || 15);
+            window.map.setMaxZoom(18);
+
+            window.map.setMaxBounds(window.map.getBounds());
+            window.map.options.maxBoundsViscosity = 1.0;
+
+            window._zoomGuardBase = safe.zoom || 15;
+            window._zoomGuardActive = true;
+
+            window.map.dragging.enable();
+            window.map.scrollWheelZoom.enable();
+            window.map.doubleClickZoom.enable();
+            window.map.touchZoom.enable();
+        });
+
+    return;
+}
 
     // ========================
     // 通常ルート
