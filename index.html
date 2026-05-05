@@ -384,6 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const csvUrl = `/KANTO/${window.currentPref}_location.csv`;
     const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
+    window.fishUrl = `/KANTO/${window.currentPref}_fish.csv`; // ←追加
 
     loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
