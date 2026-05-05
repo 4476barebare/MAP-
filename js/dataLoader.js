@@ -899,7 +899,7 @@ function zoomToSpot(spot) {
     resetSpotLayers();
 
     // ========================
-    // ★ レイヤー統一（ここで1回だけ）
+    // ★ レイヤー統一
     // ========================
     if (window.gsiLayer) {
         window.gsiLayer.setUrl(window.gsiLayers.photo);
@@ -935,7 +935,7 @@ function zoomToSpot(spot) {
 
             if (newSpot) safe = newSpot;
         }
-        
+
         showFishMarkers(safe.URL);
 
         window.map.setMinZoom(safe.zoom || 15);
@@ -951,9 +951,8 @@ function zoomToSpot(spot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-        return;
 
-        
+        return;
     }
 
     // ========================
@@ -968,12 +967,11 @@ function zoomToSpot(spot) {
         duration: 0.5
     });
 
-
     if (safe && safe.individualId != null) {
         const base = location.hash || '';
         location.hash = base + '/' + safe.individualId;
         updateStateFromHash();
-    }}
+    }
 
     window.map.once('moveend', function () {
         showFishMarkers(safe.URL);
