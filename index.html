@@ -239,16 +239,16 @@ function routeUpdate() {
     );
 
     // ② その中から個体ID一致
-    alert(spotId[2]);
+    //alert(spotId[2]);
 
     const spot = list.find(s =>
         String(s.individualId) === String(spotId[2])
     );
-    alert(spot.name);
+    //alert(spot.name);
 
 
     drawLocation(spot.name,spot.lat,spot.lng,spot.zoom);
-        //zoomToSpot(spot);
+        zoomToSpot(spot);
         return;
     }
 
