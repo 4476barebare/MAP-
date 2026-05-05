@@ -93,6 +93,64 @@ function loadLocationCSV(csvUrl) {
         });
 }
 
+function prepareFishForArea(areaId) {
+
+
+  // ① 未ロードなら読み込み
+  const loadPromise = window.fishData
+    ? Promise.resolve()
+    : fetch(window.fishUrl)
+        .then(res => res.text())
+        .then(text => {
+          const lines = text.trim().split('\n');
+          const headers = lines[0].split(',');
+
+          window.fishData = lines.slice(1).map(line => {
+            const cols = line.split(',');
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = cols[i]);
+
+            obj.lat = parseFloat(obj.lat);
+            obj.lng = parseFloat(obj.lng);
+
+            return obj;
+          });
+        });
+
+  // ② ロード後に結合
+  return loadPromise.then(() => {
+
+    const targetSpots = window.locationData.filter(s => s.areaId === areaId);
+    const targetFish = window.fishData.filter(f => f.registration === areaId);
+
+    targetSpots.forEach(spot => {
+      spot.fish = targetFish
+        .filter(f => f.parent === spot.name)
+        .map(f => ({
+          name: f.name,
+          lat: f.lat,
+          lng: f.lng
+        }));
+    });
+
+  });
+  
+   // ===== デバッグ出力 =====
+
+  let debugText = `areaId: ${areaId}\n\n`;
+
+  targetSpots.forEach(spot => {
+
+    const fishNames = (spot.fish || []).map(f => f.name).join(', ') || 'なし';
+
+    debugText += `【${spot.name}】\n${fishNames}\n\n`;
+
+  });
+
+  alert(debugText);
+}
+
+
 function buildAreaGraphFromGrid(areas) {
 
     const gridMap = {};
@@ -410,6 +468,8 @@ function selectArea(area) {
             });
         });
     });
+
+    prepareFishForArea(window.currentAreaId);
     disablePhase2(window.map);
 }
 
