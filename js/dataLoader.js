@@ -94,7 +94,7 @@ function loadLocationCSV(csvUrl) {
 }
 
 function prepareFishForArea(areaId) {
-
+alert(areaId);
 
   // ① 未ロードなら読み込み
   const loadPromise = window.fishData
@@ -454,6 +454,7 @@ function selectArea(area) {
     // -------------------------
     document.getElementById('map-menu').style.display = 'none';
     document.getElementById('map-back-btn').style.display = 'block';
+    prepareFishForArea(window.currentAreaId);
 
     // -------------------------
     // 移動後処理
@@ -468,8 +469,7 @@ function selectArea(area) {
             });
         });
     });
-
-    prepareFishForArea(window.currentAreaId);
+    
     disablePhase2(window.map);
 }
 
