@@ -937,3 +937,32 @@ li {
 .ad-placeholder {
   display: none;
 }
+
+/* 共通 */
+.fish-label {
+  transform: translate(-50%, -50%);
+}
+
+.fish-text {
+  white-space: nowrap;
+  font-weight: bold;
+  text-shadow: 0 0 3px #fff;
+}
+
+/* zoom >= 18 */
+.zoom-18 .fish-text {
+  font-size: 16px;
+  color: #000;
+}
+
+/* zoom == 17 */
+.zoom-17 .fish-text {
+  font-size: 13px;
+  color: #333;
+}
+
+/* zoom < 17 */
+.zoom-low .fish-text {
+  font-size: 10px;
+  color: #666;
+}
