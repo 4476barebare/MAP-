@@ -95,26 +95,21 @@ function loadLocationCSV(csvUrl) {
 
 function prepareFishForArea(areaId) {
 
-  alert("①開始");
-  alert(areaId);
-  alert(window.fishUrl);
+  alert("①開始: " + areaId);
 
+  // =========================
+  // fishData 読み込み
+  // =========================
   const loadPromise = window.fishData
-    ? Promise.resolve("既に読み込み済み")
+    ? Promise.resolve()
     : fetch(window.fishUrl)
         .then(res => {
-          alert("②fetch応答きた");
-
           if (!res.ok) {
-            alert("fetch失敗: " + res.status);
-            throw new Error("fetch失敗");
+            throw new Error("fetch失敗: " + res.status);
           }
-
           return res.text();
         })
         .then(text => {
-          alert("③text取得");
-
           const lines = text.trim().split('\n');
           const headers = lines[0].split(',');
 
@@ -129,27 +124,35 @@ function prepareFishForArea(areaId) {
             return obj;
           });
 
-          alert("④fishData作成完了: " + window.fishData.length);
+          alert("②fishData読込完了: " + window.fishData.length);
         });
 
+  // =========================
+  // 結合処理
+  // =========================
   return loadPromise.then(() => {
 
-    alert("⑤then突入");
-
-    if (!window.locationData) {
-      alert("locationDataが無い");
+    if (!window.spotData) {
+      alert("spotDataが無い");
       return;
     }
 
-    const targetSpots = window.locationData.filter(s => s.areaId === areaId);
-    const targetFish = window.fishData.filter(f => f.registration === areaId);
+    // ★ areaIdで絞り込み（安全版）
+    const targetSpots = window.spotData.filter(
+      s => s.areaId && s.areaId.trim() === areaId.trim()
+    );
 
-    alert("⑥spot数:" + targetSpots.length);
-    alert("⑦fish数:" + targetFish.length);
+    const targetFish = window.fishData.filter(
+      f => f.registration && f.registration.trim() === areaId.trim()
+    );
 
+    alert("③spot数: " + targetSpots.length);
+    alert("④fish数: " + targetFish.length);
+
+    // ★ 紐付け
     targetSpots.forEach(spot => {
       spot.fish = targetFish
-        .filter(f => f.parent === spot.name)
+        .filter(f => f.parent && f.parent.trim() === spot.name.trim())
         .map(f => ({
           name: f.name,
           lat: f.lat,
@@ -157,8 +160,11 @@ function prepareFishForArea(areaId) {
         }));
     });
 
-    alert("⑧結合完了");
+    alert("⑤結合完了");
 
+    // =========================
+    // デバッグ出力
+    // =========================
     let debugText = `areaId: ${areaId}\n\n`;
 
     targetSpots.forEach(spot => {
@@ -166,13 +172,19 @@ function prepareFishForArea(areaId) {
       debugText += `【${spot.name}】\n${fishNames}\n\n`;
     });
 
-    alert("⑨出力直前");
+    alert("⑥出力");
     alert(debugText);
 
+    // 必要なら返す
+    return targetSpots;
+
   }).catch(err => {
-    alert("エラー発生: " + err.message);
+    alert("エラー: " + err.message);
   });
 }
+
+
+
 
 function buildAreaGraphFromGrid(areas) {
 
