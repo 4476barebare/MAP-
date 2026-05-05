@@ -976,7 +976,7 @@ if (spot && spot.individualId != null) {
 }
 
 function showFishMarkers(url) {
-  alert(url);
+  if (!window.map) return;
 
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
@@ -986,9 +986,6 @@ function showFishMarkers(url) {
 
   const fishList = url.split(',');
 
-  // ★ ここで確認
-  alert("fishList:\n" + fishList.join("\n"));
-
   fishList.forEach(item => {
 
     const parts = item.split('|');
@@ -997,15 +994,42 @@ function showFishMarkers(url) {
     const lat = parts[1];
     const lng = parts[2];
 
-    alert(name + "\n" + lat + "\n" + lng);
+    const icon = L.divIcon({
+      className: 'fish-label',
+      html: `<div class="fish-text">${name}</div>`,
+      iconSize: null
+    });
 
-    const marker = L.marker([lat, lng]);
+    const marker = L.marker([lat, lng], { icon });
 
     window.fishLayer.addLayer(marker);
 
   });
 
   window.map.addLayer(window.fishLayer);
+
+  // ★ ズームクラス更新関数（内包）
+  function updateZoomClass() {
+    const zoom = window.map.getZoom();
+    const el = window.map.getContainer();
+
+    el.classList.remove('zoom-18', 'zoom-17', 'zoom-low');
+
+    if (zoom >= 18) {
+      el.classList.add('zoom-18');
+    } else if (zoom === 17) {
+      el.classList.add('zoom-17');
+    } else {
+      el.classList.add('zoom-low');
+    }
+  }
+
+  // ★ 初回適用
+  updateZoomClass();
+
+  // ★ イベント（重複防止してから登録）
+  window.map.off('zoomend', updateZoomClass);
+  window.map.on('zoomend', updateZoomClass);
 }
 
 function resetSpotLayers() {
