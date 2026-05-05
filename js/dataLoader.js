@@ -94,9 +94,10 @@ function loadLocationCSV(csvUrl) {
 }
 
 function prepareFishForArea(areaId) {
-alert(areaId);
-alert(window.fishUrl);
-  // ① 未ロードなら読み込み
+
+  alert(areaId);
+  alert(window.fishUrl);
+
   const loadPromise = window.fishData
     ? Promise.resolve()
     : fetch(window.fishUrl)
@@ -117,7 +118,6 @@ alert(window.fishUrl);
           });
         });
 
-  // ② ロード後に結合
   return loadPromise.then(() => {
 
     const targetSpots = window.locationData.filter(s => s.areaId === areaId);
@@ -133,23 +133,18 @@ alert(window.fishUrl);
         }));
     });
 
-  });
-  
-   // ===== デバッグ出力 =====
+    // ===== デバッグ出力（ここに入れる）=====
+    let debugText = `areaId: ${areaId}\n\n`;
 
-  let debugText = `areaId: ${areaId}\n\n`;
+    targetSpots.forEach(spot => {
+      const fishNames = (spot.fish || []).map(f => f.name).join(', ') || 'なし';
+      debugText += `【${spot.name}】\n${fishNames}\n\n`;
+    });
 
-  targetSpots.forEach(spot => {
-
-    const fishNames = (spot.fish || []).map(f => f.name).join(', ') || 'なし';
-
-    debugText += `【${spot.name}】\n${fishNames}\n\n`;
+    alert(debugText);
 
   });
-
-  alert(debugText);
 }
-
 
 function buildAreaGraphFromGrid(areas) {
 
