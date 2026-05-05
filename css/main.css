@@ -951,18 +951,17 @@ li {
 
 /* zoom >= 18 */
 .zoom-18 .fish-text {
-  font-size: 16px;
+  font-size: 10px;
   color: #000;
 }
 
 /* zoom == 17 */
 .zoom-17 .fish-text {
-  font-size: 13px;
+  font-size: 8px;
   color: #333;
 }
 
 /* zoom < 17 */
-.zoom-low .fish-text {
-  font-size: 10px;
+.fish-dot {
   color: #666;
 }
