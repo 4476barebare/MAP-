@@ -975,44 +975,38 @@ if (spot && spot.individualId != null) {
     });
 }
 
-function showFishMarkers(spots) {
-  alert(spots);
-  
+function showFishMarkers(url) {
+  alert(url);
+
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
   }
 
   window.fishLayer = L.layerGroup();
 
-  spots.forEach(spot => {
+  const fishList = url.split(',');
 
+  // ★ ここで確認
+  alert("fishList:\n" + fishList.join("\n"));
 
+  fishList.forEach(item => {
 
-    const fishList = spots.split(',');
+    const parts = item.split('|');
 
-    fishList.forEach(item => {
+    const name = parts[0];
+    const lat = parts[1];
+    const lng = parts[2];
 
-      const parts = item.split('|');
+    alert(name + "\n" + lat + "\n" + lng);
 
-      const name = parts[0];
-      const lat = parts[1];
-      const lng = parts[2];
+    const marker = L.marker([lat, lng]);
 
-      // ★ ここで確認
-      alert(name + "\n" + lat + "\n" + lng);
-
-      const marker = L.marker([lat, lng]);
-
-      window.fishLayer.addLayer(marker);
-
-    });
+    window.fishLayer.addLayer(marker);
 
   });
 
   window.map.addLayer(window.fishLayer);
 }
-
-
 
 function resetSpotLayers() {
 
