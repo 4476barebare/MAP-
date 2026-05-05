@@ -99,9 +99,7 @@ function prepareFishForArea(areaId) {
     ? Promise.resolve()
     : fetch(window.fishUrl)
         .then(res => {
-          if (!res.ok) {
-            throw new Error("fetch失敗: " + res.status);
-          }
+          if (!res.ok) throw new Error("fetch失敗: " + res.status);
           return res.text();
         })
         .then(text => {
@@ -133,13 +131,14 @@ function prepareFishForArea(areaId) {
     );
 
     targetSpots.forEach(spot => {
-      spot.fish = targetFish
+
+      const fishList = targetFish
         .filter(f => f.parent && f.parent.trim() === spot.name.trim())
-        .map(f => ({
-          name: f.name,
-          lat: f.lat,
-          lng: f.lng
-        }));
+        .map(f => `${f.name}|${f.lat}|${f.lng}`);
+
+      // ★ここが本体（URLに格納）
+      spot.URL = fishList.join(',');
+
     });
 
     return targetSpots;
