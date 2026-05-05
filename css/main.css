@@ -947,24 +947,25 @@ li {
 .fish-text {
   white-space: nowrap;
   font-weight: bold;
-  text-shadow: 0 0 3px #fff;
+  background: #191970;
 }
 
 /* zoom ≥ 18（大） */
 .zoom-18 .fish-text {
-  font-size: 16px;
-  color: #000;
+  font-size: 10px;
+  color: #fff;
 }
 
 /* zoom = 17（中） */
 .zoom-17 .fish-text {
-  font-size: 13px;
-  color: #333;
+  font-size: 8px;
+  color: #fff;
 }
 
 /* ■ドット */
 .fish-dot {
   width: 5px;
   height: 5px;
-  background: #000;
+  background: #fff;
+  border: 1px solid #191970;
 }
