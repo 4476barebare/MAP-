@@ -966,13 +966,9 @@ li {
   height: 2px;
   background: #fff;
   box-shadow:
-
     1px 0 #191970,
-
    -1px 0 #191970,
-
     0 1px #191970,
-
     0 -1px #191970;
   border-radius: 1px;
 }
