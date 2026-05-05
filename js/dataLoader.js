@@ -986,6 +986,9 @@ function showFishMarkers(url) {
 
   const fishList = url.split(',');
 
+  // ★ マーカー配列保持（再描画用）
+  const markers = [];
+
   fishList.forEach(item => {
 
     const parts = item.split('|');
@@ -994,43 +997,54 @@ function showFishMarkers(url) {
     const lat = parts[1];
     const lng = parts[2];
 
-    const icon = L.divIcon({
-      className: 'fish-label',
-      html: `<div class="fish-text">${name}</div>`,
-      iconSize: null
-    });
-
-    const marker = L.marker([lat, lng], { icon });
-
-    window.fishLayer.addLayer(marker);
+    markers.push({ name, lat, lng });
 
   });
 
-  window.map.addLayer(window.fishLayer);
+  function renderMarkers() {
+    window.fishLayer.clearLayers();
 
-  // ★ ズームクラス更新関数（内包）
-  function updateZoomClass() {
     const zoom = window.map.getZoom();
-    const el = window.map.getContainer();
 
-    el.classList.remove('zoom-18', 'zoom-17', 'zoom-low');
+    markers.forEach(fish => {
 
-    if (zoom >= 18) {
-      el.classList.add('zoom-18');
-    } else if (zoom === 17) {
-      el.classList.add('zoom-17');
-    } else {
-      el.classList.add('zoom-low');
-    }
+      let marker;
+
+      if (zoom >= 17) {
+        // ★ テキスト
+        const icon = L.divIcon({
+          className: 'fish-label',
+          html: `<div class="fish-text">${fish.name}</div>`,
+          iconSize: null
+        });
+
+        marker = L.marker([fish.lat, fish.lng], { icon });
+
+      } else {
+        // ★ ドット（5px）
+        marker = L.circleMarker([fish.lat, fish.lng], {
+          radius: 5,
+          color: '#000',
+          fillColor: '#000',
+          fillOpacity: 1
+        });
+      }
+
+      window.fishLayer.addLayer(marker);
+
+    });
   }
 
-  // ★ 初回適用
-  updateZoomClass();
+  window.map.addLayer(window.fishLayer);
 
-  // ★ イベント（重複防止してから登録）
-  window.map.off('zoomend', updateZoomClass);
-  window.map.on('zoomend', updateZoomClass);
+  // ★ 初回描画
+  renderMarkers();
+
+  // ★ ズームで再描画
+  window.map.off('zoomend', renderMarkers);
+  window.map.on('zoomend', renderMarkers);
 }
+
 
 function resetSpotLayers() {
 
