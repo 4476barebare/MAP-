@@ -1013,8 +1013,6 @@ showFishMarkers(safe);
 }
 
 function showFishMarkers(spots) {
-    alert(spots.URL);
-
   if (!window.map) return;
 
   if (window.fishLayer) {
@@ -1032,26 +1030,23 @@ function showFishMarkers(spots) {
     fishList.forEach(item => {
 
       const parts = item.split('|');
-      if (parts.length < 3) return;
+      if (parts.length !== 3) return;
 
-      const name = parts[0];
-      const lat = parseFloat(parts[1]);
-      const lng = parseFloat(parts[2]);
+      const name = parts[0].trim();
+      const lat = Number(parts[1]);
+      const lng = Number(parts[2]);
 
-      if (isNaN(lat) || isNaN(lng)) return;
+      if (!name || Number.isNaN(lat) || Number.isNaN(lng)) return;
 
-      const icon = L.divIcon({
-        className: 'fish-label',
-        html: `<div class="fish-text">${name}</div>`,
-        iconSize: null
+      const marker = L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: 'fish-label',
+          html: `<div class="fish-text">${name}</div>`,
+          iconSize: null
+        })
       });
 
-      const marker = L.marker([lat, lng], { icon });
-
-      marker.bindPopup(`
-        <b>${name}</b><br>
-        ${spot.name}
-      `);
+      marker.bindPopup(`<b>${name}</b><br>${spot.name}`);
 
       window.fishLayer.addLayer(marker);
 
