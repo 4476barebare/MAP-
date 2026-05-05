@@ -234,7 +234,6 @@ function routeUpdate() {
         
 
         const spotId = window.currentSpotId.split("_");
-alert(spotId);
     // ① エリア一致で先に絞る
 
     const list = window.spotData.filter(s =>
@@ -247,7 +246,7 @@ alert(spotId);
 
     const spot = list.find(s =>
 
-        String(s.individualId) === String(spotId[2])
+        String(s.individualId) === String(spotId)
 
     );
 
