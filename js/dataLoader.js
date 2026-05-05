@@ -1014,8 +1014,8 @@ if (spot && spot.individualId != null) {
 }
 
 function showFishMarkers(spots) {
-  if (!window.map) return;
-
+  alert(spots.URL);
+  
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
   }
