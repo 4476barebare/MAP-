@@ -889,45 +889,7 @@ const popupHtml = `
     }).openPopup();
 }
 
-function normalizeSpot(raw) {
 
-    // 数値化
-    let lat = Number(raw.lat);
-    let lng = Number(raw.lng);
-    let zoom = Number(raw.zoom);
-
-    // -------------------------
-    // NaN対策
-    // -------------------------
-    if (!Number.isFinite(lat)) lat = 0;
-    if (!Number.isFinite(lng)) lng = 0;
-    if (!Number.isFinite(zoom)) zoom = window.map.getZoom();
-
-    // -------------------------
-    // 座標クランプ（WGS84）
-    // -------------------------
-    lat = Math.max(-90, Math.min(90, lat));
-    lng = Math.max(-180, Math.min(180, lng));
-
-    // -------------------------
-    // 小数精度統一（Leaflet安定化）
-    // -------------------------
-    lat = +lat.toFixed(6);
-    lng = +lng.toFixed(6);
-
-    // -------------------------
-    // ズームクランプ
-    // -------------------------
-    zoom = Math.round(zoom);
-    zoom = Math.max(0, Math.min(18, zoom));
-
-    return {
-        ...raw,
-        lat,
-        lng,
-        zoom
-    };
-}
 
 function zoomToSpot(spot) {
 
@@ -940,7 +902,7 @@ function zoomToSpot(spot) {
     // =====================================================
     // ① 正規化
     // =====================================================
-    const safe = normalizeSpot(spot);
+    const safe = spot;
 
     // =====================================================
     // ② ベースレイヤ切替のみ
@@ -995,6 +957,7 @@ if (spot && spot.individualId != null) {
     // ⑤ 復帰処理
     // =====================================================
     window.map.once('moveend', function () {
+        alert(safe.URL);
         showFishMarkers(safe);
 
         window.map.setMinZoom(safe.zoom || 15);
