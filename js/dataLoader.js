@@ -95,11 +95,6 @@ function loadLocationCSV(csvUrl) {
 
 function prepareFishForArea(areaId) {
 
-  alert("①開始: " + areaId);
-
-  // =========================
-  // fishData 読み込み
-  // =========================
   const loadPromise = window.fishData
     ? Promise.resolve()
     : fetch(window.fishUrl)
@@ -123,21 +118,12 @@ function prepareFishForArea(areaId) {
 
             return obj;
           });
-
-          alert("②fishData読込完了: " + window.fishData.length);
         });
 
-  // =========================
-  // 結合処理
-  // =========================
   return loadPromise.then(() => {
 
-    if (!window.spotData) {
-      alert("spotDataが無い");
-      return;
-    }
+    if (!window.spotData) return [];
 
-    // ★ areaIdで絞り込み（安全版）
     const targetSpots = window.spotData.filter(
       s => s.areaId && s.areaId.trim() === areaId.trim()
     );
@@ -146,10 +132,6 @@ function prepareFishForArea(areaId) {
       f => f.registration && f.registration.trim() === areaId.trim()
     );
 
-    alert("③spot数: " + targetSpots.length);
-    alert("④fish数: " + targetFish.length);
-
-    // ★ 紐付け
     targetSpots.forEach(spot => {
       spot.fish = targetFish
         .filter(f => f.parent && f.parent.trim() === spot.name.trim())
@@ -160,30 +142,13 @@ function prepareFishForArea(areaId) {
         }));
     });
 
-    alert("⑤結合完了");
-
-    // =========================
-    // デバッグ出力
-    // =========================
-    let debugText = `areaId: ${areaId}\n\n`;
-
-    targetSpots.forEach(spot => {
-      const fishNames = (spot.fish || []).map(f => f.name).join(', ') || 'なし';
-      debugText += `【${spot.name}】\n${fishNames}\n\n`;
-    });
-
-    alert("⑥出力");
-    alert(debugText);
-
-    // 必要なら返す
     return targetSpots;
 
   }).catch(err => {
-    alert("エラー: " + err.message);
+    console.error(err);
+    return [];
   });
 }
-
-
 
 
 function buildAreaGraphFromGrid(areas) {
@@ -1024,7 +989,7 @@ if (spot && spot.individualId != null) {
 
     updateStateFromHash();
 }
-
+showFishMarkers(spot);
     // =====================================================
     // ⑤ 復帰処理
     // =====================================================
@@ -1045,6 +1010,50 @@ if (spot && spot.individualId != null) {
         window.map.touchZoom.enable();
     });
 }
+
+function showFishMarkers(spots) {
+    alert(spots.URL);
+
+  if (!window.map) return;
+
+  // 既存レイヤー削除
+  if (window.fishLayer) {
+    window.map.removeLayer(window.fishLayer);
+  }
+
+  window.fishLayer = L.layerGroup();
+
+  spots.forEach(spot => {
+
+    if (!spot.fish) return;
+
+    spot.fish.forEach(f => {
+
+      if (isNaN(f.lat) || isNaN(f.lng)) return;
+
+      // ★ テキストマーカー（中央基準）
+      const icon = L.divIcon({
+        className: 'fish-label',
+        html: `<div class="fish-text">${f.name}</div>`,
+        iconSize: null
+      });
+
+      const marker = L.marker([f.lat, f.lng], { icon });
+
+      marker.bindPopup(`
+        <b>${f.name}</b><br>
+        ${spot.name}
+      `);
+
+      window.fishLayer.addLayer(marker);
+
+    });
+
+  });
+
+  window.map.addLayer(window.fishLayer);
+}
+
 
 function resetSpotLayers() {
 
