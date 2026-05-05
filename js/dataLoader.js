@@ -935,12 +935,25 @@ function zoomToSpot(spot) {
 
             if (newSpot) safe = newSpot;
         }
-
-        // drawLocationルート
-        drawLocation(safe.name, safe.lat, safe.lng, safe.zoom || 15);
+        
         showFishMarkers(safe.URL);
 
+        window.map.setMinZoom(safe.zoom || 15);
+        window.map.setMaxZoom(18);
+
+        window.map.setMaxBounds(window.map.getBounds());
+        window.map.options.maxBoundsViscosity = 1.0;
+
+        window._zoomGuardBase = safe.zoom || 15;
+        window._zoomGuardActive = true;
+
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
         return;
+
+        
     }
 
     // ========================
@@ -955,11 +968,12 @@ function zoomToSpot(spot) {
         duration: 0.5
     });
 
+
     if (safe && safe.individualId != null) {
         const base = location.hash || '';
         location.hash = base + '/' + safe.individualId;
         updateStateFromHash();
-    }
+    }}
 
     window.map.once('moveend', function () {
         showFishMarkers(safe.URL);
