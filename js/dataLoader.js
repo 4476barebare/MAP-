@@ -544,6 +544,7 @@ function showSpotsForArea(areaKey) {
                 lat: spot.lat,
                 lng: spot.lng,
                 zoom: spot.zoom,
+                URL: spot.URL,
                 individualId: spot.individualId || spot.id || ''
             });
         });
@@ -573,6 +574,7 @@ function selectSpot(spot) {
         lat,
         lng,
         zoom,
+        URL,
         individualId
     } = spot;
     
@@ -989,7 +991,7 @@ if (spot && spot.individualId != null) {
 
     updateStateFromHash();
 }
-showFishMarkers(spot);
+showFishMarkers(safe);
     // =====================================================
     // ⑤ 復帰処理
     // =====================================================
@@ -1012,6 +1014,7 @@ showFishMarkers(spot);
 }
 
 function showFishMarkers(spots) {
+    alert(spots.URL);
 
   if (!window.map) return;
 
