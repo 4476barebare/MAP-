@@ -894,14 +894,8 @@ const popupHtml = `
 function zoomToSpot(spot) {
 
     window.mapStateSnapshot = null;
-
-
     disablePhase2(window.map);
     resetSpotLayers();
-
-    // =====================================================
-    // ① 正規化
-    // =====================================================
     const safe = spot;
 
     // =====================================================
@@ -940,16 +934,12 @@ function zoomToSpot(spot) {
     window.map.flyTo([safe.lat, safe.lng], safe.zoom, {
         duration: 0.5
     });
-
     
     
     // ★ハッシュ更新（末尾追加）
 if (spot && spot.individualId != null) {
-
     const base = location.hash || '';
-
     location.hash = base + '/' + spot.individualId;
-
     updateStateFromHash();
 }
 
@@ -975,47 +965,77 @@ if (spot && spot.individualId != null) {
     });
 }
 
-function renderMarkers() {
-  window.fishLayer.clearLayers();
+function showFishMarkers(url) {
+  if (!window.map) return;
 
-  const zoom = Math.round(window.map.getZoom()); // ★これが重要
-  const el = window.map.getContainer();
-
-  el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
-
-  if (zoom >= 18) {
-    el.classList.add('zoom-18');
-  } else if (zoom === 17) {
-    el.classList.add('zoom-17');
-  } else if (zoom === 16) {
-    el.classList.add('zoom-16');
-  } else {
-    el.classList.add('zoom-low');
+  if (window.fishLayer) {
+    window.map.removeLayer(window.fishLayer);
   }
 
-  markers.forEach(fish => {
+  window.fishLayer = L.layerGroup();
 
-    let icon;
+  const fishList = url.split(',');
 
-    if (zoom >= 16) {
-      icon = L.divIcon({
-        className: 'fish-label',
-        html: `<div class="fish-text">${fish.name}</div>`,
-        iconSize: null
-      });
+  const markers = fishList.map(item => {
+    const parts = item.split('|');
+    return {
+      name: parts[0],
+      lat: parts[1],
+      lng: parts[2]
+    };
+  });
+
+  function renderMarkers() {
+    window.fishLayer.clearLayers();
+
+    const zoom = Math.round(window.map.getZoom()); // ★ここだけ変更
+    const el = window.map.getContainer();
+
+    el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
+
+    if (zoom >= 18) {
+      el.classList.add('zoom-18');
+    } else if (zoom === 17) {
+      el.classList.add('zoom-17');
+    } else if (zoom === 16) {
+      el.classList.add('zoom-16');
     } else {
-      icon = L.divIcon({
-        className: 'fish-dot',
-        html: '',
-        iconSize: [5, 5],
-        iconAnchor: [2.5, 2.5]
-      });
+      el.classList.add('zoom-low');
     }
 
-    const marker = L.marker([fish.lat, fish.lng], { icon });
+    markers.forEach(fish => {
 
-    window.fishLayer.addLayer(marker);
-  });
+      let icon;
+
+      if (zoom >= 16) {
+        icon = L.divIcon({
+          className: 'fish-label',
+          html: `<div class="fish-text">${fish.name}</div>`,
+          iconSize: null
+        });
+
+      } else {
+        icon = L.divIcon({
+          className: 'fish-dot',
+          html: '',
+          iconSize: [5, 5],
+          iconAnchor: [2.5, 2.5]
+        });
+      }
+
+      const marker = L.marker([fish.lat, fish.lng], { icon });
+
+      window.fishLayer.addLayer(marker);
+
+    });
+  }
+
+  window.map.addLayer(window.fishLayer);
+
+  renderMarkers();
+
+  window.map.off('zoomend', renderMarkers);
+  window.map.on('zoomend', renderMarkers);
 }
 
 function resetSpotLayers() {
