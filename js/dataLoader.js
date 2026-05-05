@@ -958,7 +958,7 @@ if (spot && spot.individualId != null) {
     // =====================================================
     window.map.once('moveend', function () {
         alert(safe.URL);
-        showFishMarkers(safe);
+        showFishMarkers(safe.URL);
 
         window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
@@ -977,7 +977,7 @@ if (spot && spot.individualId != null) {
 }
 
 function showFishMarkers(spots) {
-  alert(spots.URL);
+  alert(spots);
   
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
