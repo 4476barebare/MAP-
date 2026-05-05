@@ -3,7 +3,7 @@ window.selectSpot = selectSpot;
 window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
-window._preparedFishAreas = window._preparedFishAreas || new Set();
+//window._preparedFishAreas = window._preparedFishAreas || new Set();
 // グローバル
 window.prefData = null;
 window.areaData = [];
@@ -897,12 +897,26 @@ function zoomToSpot(spot) {
     window.mapStateSnapshot = null;
     disablePhase2(window.map);
     resetSpotLayers();
-    const safe = spot;
     
-    // ★ fish準備（未実行なら）
-if (safe.areaId && !window._preparedFishAreas.has(safe.areaId)) {
-    prepareFishForArea(safe.areaId);
-    window._preparedFishAreas.add(safe.areaId);
+    
+// ★ URL未生成なら先に準備してspot取り直し
+let safe = spot;
+
+if (!safe.URL) {
+    const areaId = safe.areaId || window.currentAreaId;
+
+    if (areaId) {
+        prepareFishForArea(areaId);
+
+        // ★ 更新後のspotDataから再取得
+        const newSpot = window.spotData.find(s =>
+            (s.individualId || s.id) === window.currentSpotId.split('_').pop()
+        );
+
+        if (newSpot) {
+            safe = newSpot;
+        }
+    }
 }
     
     if (window.gsiLayer) {
