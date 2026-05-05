@@ -957,7 +957,6 @@ if (spot && spot.individualId != null) {
     // ⑤ 復帰処理
     // =====================================================
     window.map.once('moveend', function () {
-        alert(safe.URL);
         showFishMarkers(safe.URL);
 
         window.map.setMinZoom(safe.zoom || 15);
@@ -987,9 +986,9 @@ function showFishMarkers(spots) {
 
   spots.forEach(spot => {
 
-    if (!spot.URL) return;
 
-    const fishList = spot.URL.split(',');
+
+    const fishList = spots.split(',');
 
     fishList.forEach(item => {
 
