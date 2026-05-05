@@ -250,19 +250,8 @@ function routeUpdate() {
 
     );
 
-    if (!spot) return;
 
-    drawLocation(
-
-        spot.name,
-
-        Number(spot.lat),
-
-        Number(spot.lng),
-
-        spot.zoom || 15
-
-    );
+    drawLocation(spot.name,spot.lat,spot.lng,spot.zoom);
         //zoomToSpot(spot);
         return;
     }
