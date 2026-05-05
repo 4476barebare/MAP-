@@ -986,19 +986,16 @@ function showFishMarkers(url) {
 
   const fishList = url.split(',');
 
-  // ★ マーカー配列保持（再描画用）
   const markers = [];
 
   fishList.forEach(item => {
-
     const parts = item.split('|');
 
-    const name = parts[0];
-    const lat = parts[1];
-    const lng = parts[2];
-
-    markers.push({ name, lat, lng });
-
+    markers.push({
+      name: parts[0],
+      lat: parts[1],
+      lng: parts[2]
+    });
   });
 
   function renderMarkers() {
@@ -1021,13 +1018,15 @@ function showFishMarkers(url) {
         marker = L.marker([fish.lat, fish.lng], { icon });
 
       } else {
-        // ★ ドット（5px）
-        marker = L.circleMarker([fish.lat, fish.lng], {
-          radius: 5,
-          color: '#000',
-          fillColor: '#000',
-          fillOpacity: 1
+        // ★ ■ドット（5px）
+        const icon = L.divIcon({
+          className: '',
+          html: `<div class="fish-dot"></div>`,
+          iconSize: [5, 5],
+          iconAnchor: [2.5, 2.5]
         });
+
+        marker = L.marker([fish.lat, fish.lng], { icon });
       }
 
       window.fishLayer.addLayer(marker);
@@ -1037,14 +1036,11 @@ function showFishMarkers(url) {
 
   window.map.addLayer(window.fishLayer);
 
-  // ★ 初回描画
   renderMarkers();
 
-  // ★ ズームで再描画
   window.map.off('zoomend', renderMarkers);
   window.map.on('zoomend', renderMarkers);
 }
-
 
 function resetSpotLayers() {
 
@@ -1117,7 +1113,7 @@ function goBack() {
     // =====================================================
     if (z >= 14) {
         stopZoomGuard();
-
+        
         // map操作復帰
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -1130,6 +1126,11 @@ function goBack() {
         window.map.options.maxBoundsViscosity = 0;
 
         // レイヤ整理
+        
+        if (window.fishLayer) {
+            window.map.removeLayer(window.fishLayer);
+        }
+        
         if (window.phase2Group) window.phase2Group.clearLayers();
 
         const restoreSpot = buildSpotRestoreObject();
