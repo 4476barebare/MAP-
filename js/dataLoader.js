@@ -3,6 +3,7 @@ window.selectSpot = selectSpot;
 window.goBack = goBack;
 window.drawLocation = drawLocation;
 window.loadLocationCSV = loadLocationCSV;
+window._preparedFishAreas = window._preparedFishAreas || new Set();
 // グローバル
 window.prefData = null;
 window.areaData = [];
@@ -897,11 +898,13 @@ function zoomToSpot(spot) {
     disablePhase2(window.map);
     resetSpotLayers();
     const safe = spot;
-
-    // =====================================================
-    // ② ベースレイヤ切替のみ
-    // （削除しない・再生成もしない）
-    // =====================================================
+    
+    // ★ fish準備（未実行なら）
+if (safe.areaId && !window._preparedFishAreas.has(safe.areaId)) {
+    prepareFishForArea(safe.areaId);
+    window._preparedFishAreas.add(safe.areaId);
+}
+    
     if (window.gsiLayer) {
         window.gsiLayer.setUrl(window.gsiLayers.photo);
     } else {
