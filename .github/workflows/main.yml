@@ -1,27 +1,29 @@
-name: Fetch KANTO load.php
+name: KANTO Load Test
 
 on:
+  workflow_dispatch:   # 手動実行用
   schedule:
-    - cron: '0 16 * * *'  # JST 1:00（UTC 16:00）
-  workflow_dispatch:
+    - cron: '0 16 * * *'  # 1:00 JST（テスト後そのまま運用可）
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Fetch load.php
+      - name: Fetch API
         run: |
           mkdir -p data
+
+          echo "Fetching..."
 
           curl -s "https://turiiko.shop/actions/KANTO/load.php" \
             -H "Accept: application/json" \
             -o data/kanto_load.json
 
-          echo "Downloaded:"
+          echo "Result:"
           cat data/kanto_load.json
 
       - name: Commit result
@@ -33,5 +35,5 @@ jobs:
 
           git diff --cached --quiet && echo "No changes" && exit 0
 
-          git commit -m "update kanto load data (1:00 JST)"
+          git commit -m "test: update kanto load"
           git push
