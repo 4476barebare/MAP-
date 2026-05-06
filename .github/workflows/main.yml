@@ -1,0 +1,37 @@
+name: Fetch KANTO load.php
+
+on:
+  schedule:
+    - cron: '0 16 * * *'  # JST 1:00（UTC 16:00）
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch load.php
+        run: |
+          mkdir -p data
+
+          curl -s "https://turiiko.shop/actions/KANTO/load.php" \
+            -H "Accept: application/json" \
+            -o data/kanto_load.json
+
+          echo "Downloaded:"
+          cat data/kanto_load.json
+
+      - name: Commit result
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add data/kanto_load.json
+
+          git diff --cached --quiet && echo "No changes" && exit 0
+
+          git commit -m "update kanto load data (1:00 JST)"
+          git push
