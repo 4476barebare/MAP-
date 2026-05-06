@@ -1,11 +1,12 @@
-steps:
-  - name: Call PHP
-    run: |
-      TS=$(date +%s)
-      SECRET=${{ secrets.XREA_SECRET }}
+name: Daily XREA Trigger
 
-      SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
+on:
+  workflow_dispatch:
 
-      echo "URL=${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG"
+jobs:
+  run:
+    runs-on: ubuntu-latest
 
-      curl -v "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG"
+    steps:
+      - name: Call PHP
+        run: echo "test"
