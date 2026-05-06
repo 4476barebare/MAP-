@@ -12,4 +12,9 @@ jobs:
     steps:
       - name: Call PHP
         run: |
-          echo "test"
+          TS=$(date +%s)
+          SECRET=${{ secrets.XREA_SECRET }}
+
+          SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
+
+          curl -s "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG"
