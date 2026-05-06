@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>API実行テスト</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>load.php 実行テスト</h2>
+
+<button id="runBtn">実行</button>
+
+<div id="result">ここに結果が表示されます</div>
+
+<script>
+const btn = document.getElementById("runBtn");
+const result = document.getElementById("result");
+
+btn.addEventListener("click", async () => {
+  btn.disabled = true;
+  btn.textContent = "実行中...";
+
+  result.textContent = "処理中...";
+
+  try {
+    const res = await fetch("https://www.turiiko.shop/actions/KANTO/load.php");
+
+    const text = await res.text();
+
+    result.textContent = text || "（レスポンスなし）";
+
+  } catch (err) {
+    console.error(err);
+    result.textContent = "エラーが発生しました";
+  }
+
+  btn.disabled = false;
+  btn.textContent = "実行";
+});
+</script>
+
+</body>
+</html>
