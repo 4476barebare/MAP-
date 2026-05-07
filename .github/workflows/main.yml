@@ -1,4 +1,4 @@
-name: KANTO Load Test
+name: KANTO Load CSV
 
 on:
   workflow_dispatch:   # 手動実行用
