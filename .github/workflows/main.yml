@@ -21,10 +21,10 @@ jobs:
 
           curl -s "https://turiiko.shop/actions/KANTO/load.php" \
             -H "Accept: application/json" \
-            -o data/kanto_load.json
+            -o data/KANTO_load.json
 
           echo "Result:"
-          cat data/kanto_load.json
+          cat data/KANTO_load.json
 
       - name: Commit result
         run: |
