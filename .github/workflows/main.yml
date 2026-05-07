@@ -31,7 +31,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          git add data/kanto_load.json
+          git add data/KANTO_load.json
 
           git diff --cached --quiet && echo "No changes" && exit 0
 
