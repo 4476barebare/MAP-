@@ -568,7 +568,7 @@ function selectSpot(spot) {
         if (spot.icon === "spot") {
             zoomToSpot(spot);
         } else {
-            showFishPopupFromSpot(spot);
+            showFishPopup(spot);
         }
         return;
     }
