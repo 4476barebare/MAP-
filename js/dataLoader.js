@@ -532,6 +532,8 @@ function showSpotsForArea(areaKey) {
                 ? 600 + Math.floor(Math.random() * 50)
                 : Math.floor(Math.random() * 500)
         });
+spot.marker = marker;
+
 
 marker.on('click', function () {
 
