@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: '0 16 * * *'
     - cron: '0 17 * * *' # 1:00 JST（テスト後そのまま運用可）
-
+    - cron: '0 18 * * *'
 jobs:
   fetch:
     runs-on: ubuntu-latest
