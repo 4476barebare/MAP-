@@ -537,7 +537,7 @@ function showSpotsForArea(areaKey) {
             
             const iconId = spot.icon || 'spot';
         const isFish = iconId.startsWith('fish');
-        if (isFish) return;
+//        if (isFish) return;
     
             selectSpot({
                 name: spot.name,
@@ -547,7 +547,7 @@ function showSpotsForArea(areaKey) {
                 URL: spot.URL,
                 individualId: spot.individualId || spot.id || ''
             });
-        });
+//        });
 
         window.areaSpotLayer.addLayer(marker);
 
@@ -587,21 +587,16 @@ function selectSpot(spot) {
     
 
     if (currentZoom === 13) {
-        //disablePhase2(window.map);
-
-    // ★ ここでspotオブジェクトを渡して呼び出す
-    zoomToSpot(spot);
-    return;
-} else{
-    saveMapState();
-    //return;
-}
+        zoomToSpot(spot);
+        return;
+    } else{
+        saveMapState();
+    }
     
     
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
-
     //drawLocation(name, lat, lng, 13);
 
     const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -626,9 +621,6 @@ function selectSpot(spot) {
 // ① 移動完了後に制御をかける
 window.map.once('moveend', () => {
     window.map.dragging.enable();
-    //window.map.scrollWheelZoom.enable();
-    //window.map.doubleClickZoom.enable();
-    //window.map.touchZoom.enable();
     window.map.setMaxBounds(window.areaBounds);
     window.map.options.maxBoundsViscosity = 1.0;
 });
