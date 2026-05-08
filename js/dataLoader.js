@@ -830,6 +830,8 @@ function updateSpotMenu(spots, map) {
 }
 
 function showFishPopup(spot) {
+    alert(spot.name);
+
 
     const googleUrl =
         'https://www.google.com/search?q=' +
