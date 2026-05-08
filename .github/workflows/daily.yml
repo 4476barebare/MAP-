@@ -3,9 +3,9 @@ name: Daily XREA Trigger
 on:
   workflow_dispatch:
   schedule:
-    - cron: "5 15 * * *"
-    - cron: "0 17 * * *"
-
+  - cron: "5 15 * * *"
+  - cron: "13 15 * * *"
+  
 jobs:
   run:
     runs-on: ubuntu-latest
