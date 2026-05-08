@@ -829,37 +829,34 @@ function updateSpotMenu(spots, map) {
     });
 }
 
-function showFishPopup(marker, spot) {
+function showFishPopup(spot) {
 
     const googleUrl =
         'https://www.google.com/search?q=' +
         encodeURIComponent(spot.name);
 
-
-const popupHtml = `
-    <div class="shop-popup">
-        <div class="shop-popup-title"></div>
-        <div class="shop-popup-address dummy">${spot.notes || ''}</div>
-
-        <div class="shop-popup-footer">
-            <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-                Googleで検索
-            </a>
+    const popupHtml = `
+        <div class="shop-popup">
+            <div class="shop-popup-title"></div>
+            <div class="shop-popup-address dummy">${spot.notes || ''}</div>
+            <div class="shop-popup-footer">
+                <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
+                    Googleで検索
+                </a>
+            </div>
         </div>
-    </div>
-`;
+    `;
 
+    spot.marker
+        ?.closePopup?.();
 
+    spot.marker
+        ?.unbindPopup?.();
 
-    // ★ここが本質
-    marker.closePopup();
-    marker.unbindPopup();
-
-    marker.bindPopup(popupHtml, {
-        offset: [0, 0] // 必要なら微調整
-    }).openPopup();
+    spot.marker
+        ?.bindPopup(popupHtml)
+        ?.openPopup();
 }
-
 
 
 function zoomToSpot(spot) {
