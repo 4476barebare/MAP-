@@ -533,21 +533,13 @@ function showSpotsForArea(areaKey) {
                 : Math.floor(Math.random() * 500)
         });
 
-        marker.on('click', function () {
-            
-            const iconId = spot.icon || 'spot';
-        const isFish = iconId.startsWith('fish');
-        if (isFish) return;
-    
-            selectSpot({
-                name: spot.name,
-                lat: spot.lat,
-                lng: spot.lng,
-                zoom: spot.zoom,
-                URL: spot.URL,
-                individualId: spot.individualId || spot.id || ''
-            });
-        });
+marker.on('click', function () {
+
+//    const iconId = spot.icon || 'spot';
+//    const isFish = iconId.startsWith('fish');
+
+    selectSpot(spot); // ←これだけ
+});
 
         window.areaSpotLayer.addLayer(marker);
 
@@ -566,75 +558,53 @@ function showSpotsForArea(areaKey) {
     );
 }
 
-
 function selectSpot(spot) {
 
-    const {
-        name,
-        lat,
-        lng,
-        zoom,
-        URL,
-        individualId
-    } = spot;
-    
-    if (window.markerControl) {
-        markerControl.showShop02(window.currentAreaId);
-        
+    const currentZoom = window.map.getZoom();
+
+    // ★ズーム13のみ分岐
+    if (currentZoom === 13) {
+
+        if (spot.icon === "spot") {
+            zoomToSpot(spot);
+        } else {
+            showFishPopupFromSpot(spot);
+        }
+        return;
     }
 
-    const currentZoom = window.map.getZoom();
-    
+    if (window.markerControl) {
+        markerControl.showShop02(window.currentAreaId);
+    }
 
-    if (currentZoom === 13) {
-        //disablePhase2(window.map);
-
-    // ★ ここでspotオブジェクトを渡して呼び出す
-    zoomToSpot(spot);
-    return;
-} else{
     saveMapState();
-    //return;
-}
-    
-    
+
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
 
-    //drawLocation(name, lat, lng, 13);
-
-    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-    window.osmLayer = L.tileLayer(tileUrl, {
-        attribution: '© OpenStreetMap contributors',
-        keepBuffer: 16,
-
-    updateWhenIdle: true,
-
-    updateWhenZooming: false,
-
-    updateWhenDragging: false
-    }).addTo(window.map);
-
-
+    window.osmLayer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '© OpenStreetMap contributors',
+            keepBuffer: 16,
+            updateWhenIdle: true,
+            updateWhenZooming: false,
+            updateWhenDragging: false
+        }
+    ).addTo(window.map);
 
     disableAreaSwipe();
 
-    drawLocation(name, lat, lng, 13);
+    drawLocation(spot.name, spot.lat, spot.lng, 13);
 
-// ① 移動完了後に制御をかける
-window.map.once('moveend', () => {
-    window.map.dragging.enable();
-    //window.map.scrollWheelZoom.enable();
-    //window.map.doubleClickZoom.enable();
-    //window.map.touchZoom.enable();
-    window.map.setMaxBounds(window.areaBounds);
-    window.map.options.maxBoundsViscosity = 1.0;
-});
+    window.map.once('moveend', () => {
+        window.map.dragging.enable();
+        window.map.setMaxBounds(window.areaBounds);
+        window.map.options.maxBoundsViscosity = 1.0;
+    });
 
-enablePhase2(window.map);
-
+    enablePhase2(window.map);
 }
 
 function enableDragForArea() {
