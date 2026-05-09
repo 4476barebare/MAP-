@@ -420,20 +420,17 @@ function applyThirdStage(spots) {
     return spots;
 }
 
-
 function downloadSpotCSV(spots) {
 
-    let csv = "icon,name,lat,lng,whether\n";
+    let csv = "name,icon,whether\n";
 
     for (const s of spots) {
 
         const w = s.whether;
 
         csv += [
-            s.icon || "",
             s.name || "",
-            s.lat ?? "",
-            s.lng ?? "",
+            s.icon || "",
             w ? "OK" : "EMPTY"
         ].join(",") + "\n";
     }
