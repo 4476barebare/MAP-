@@ -405,16 +405,17 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
     showDebug("=== 天気データ処理開始 ===", true);
 
 loadAreaData("KANTO")
-showDebug("=== 天気データ処理開始 ===", true);
     .then(stations => {
 
-        showDebug("stations読み込み完了: " + stations.length);
+    showDebug("stations読み込み完了: " + stations.length);
+    showDebug("spotData件数: " + window.spotData.length);
 
-        applyFirstStage(window.spotData, stations);
+    applyFirstStage(window.spotData, stations);
 
-        showDebug("FirstStage適用完了");
+    showDebug("FirstStage適用完了");
 
-    })
+})
+
     .catch(e => {
 
         showDebug("🔥 loadAreaDataエラー: " + e.message);
