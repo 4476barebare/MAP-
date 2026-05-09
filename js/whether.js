@@ -420,6 +420,7 @@ function applyThirdStage(spots) {
     return spots;
 }
 
+
 function downloadSpotCSV(spots) {
 
     let csv = "name,icon,whether\n";
@@ -431,7 +432,7 @@ function downloadSpotCSV(spots) {
         csv += [
             s.name || "",
             s.icon || "",
-            w ? "OK" : "EMPTY"
+            w ? JSON.stringify(w) : ""
         ].join(",") + "\n";
     }
 
