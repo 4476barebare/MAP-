@@ -420,13 +420,21 @@ function applySecondStage(spots) {
 
     showDebug("=== SecondStage START ===", true);
 
-    if (!Array.isArray(spots)) return spots;
+    if (!Array.isArray(spots)) {
+        showDebug("⚠ spots不正");
+        return spots;
+    }
 
     const usableSpots = spots.filter(s =>
         s.icon === "spot" &&
         s.whether &&
         s.lat != null &&
         s.lng != null
+    );
+
+    showDebug(
+        "spot総数=" + spots.length +
+        " usable=" + usableSpots.length
     );
 
     const spotMap = buildSpotMapByName(spots);
@@ -454,29 +462,15 @@ function applySecondStage(spots) {
             const nearest = findNearestTwoSpots(spot, usableSpots);
             if (!nearest) continue;
 
-            const r = interpolateStation(
-                nearest[0].whether,
-                nearest[1].whether,
+            const wA = nearest[0].whether;
+            const wB = nearest[1].whether;
+
+            spot.whether = interpolateStation(
+                wA.hourly,
+                wB.hourly,
                 calcGeoDistance(spot.lat, spot.lng, nearest[0].lat, nearest[0].lng),
                 calcGeoDistance(spot.lat, spot.lng, nearest[1].lat, nearest[1].lng)
             );
-
-            // ★ここでインライントリム
-            spot.whether = (r && r.hourly && r.daily)
-                ? {
-                    hourly: r.hourly.map(h => ({
-                        weather: h.weather.map(row =>
-                            row.map(v => Number.isFinite(v) ? v : 0)
-                        ),
-                        water: Number.isFinite(h.water) ? h.water : 0,
-                        tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
-                    })),
-                    daily: r.daily.map(d => ({
-                        weather: d.weather.map(v => Number.isFinite(v) ? v : 0),
-                        tide: d.tide.map(v => Number.isFinite(v) ? v : 0)
-                    }))
-                }
-                : null;
 
             continue;
         }
@@ -490,33 +484,19 @@ function applySecondStage(spots) {
         if (!s1 || !s2) continue;
         if (!s1.whether || !s2.whether) continue;
 
-        const r = interpolateStation(
-            s1.whether,
-            s2.whether,
+        spot.whether = interpolateStation(
+            s1.whether.hourly,
+            s2.whether.hourly,
             calcGeoDistance(spot.lat, spot.lng, s1.lat, s1.lng),
             calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng)
         );
-
-        spot.whether = (r && r.hourly && r.daily)
-            ? {
-                hourly: r.hourly.map(h => ({
-                    weather: h.weather.map(row =>
-                        row.map(v => Number.isFinite(v) ? v : 0)
-                    ),
-                    water: Number.isFinite(h.water) ? h.water : 0,
-                    tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
-                })),
-                daily: r.daily.map(d => ({
-                    weather: d.weather.map(v => Number.isFinite(v) ? v : 0),
-                    tide: d.tide.map(v => Number.isFinite(v) ? v : 0)
-                }))
-            }
-            : null;
     }
 
     showDebug(`=== SecondStage 完了: ${count}件 ===`);
+
     return spots;
 }
+
 
 function buildSpotMapByName(spots) {
 
@@ -555,7 +535,10 @@ function applyThirdStage(spots) {
 
     showDebug("=== ThirdStage START ===", true);
 
-    if (!Array.isArray(spots)) return spots;
+    if (!Array.isArray(spots)) {
+        showDebug("⚠ spots不正");
+        return spots;
+    }
 
     const baseSpots = spots.filter(s =>
         s.icon === "spot" &&
@@ -578,33 +561,22 @@ function applyThirdStage(spots) {
         const nearest = findNearestTwoSpots(spot, baseSpots);
         if (!nearest) continue;
 
-        const r = interpolateStation(
-            nearest[0].whether,
-            nearest[1].whether,
+        const wA = nearest[0].whether;
+        const wB = nearest[1].whether;
+
+        spot.whether = interpolateStation(
+            wA.hourly,
+            wB.hourly,
             calcGeoDistance(spot.lat, spot.lng, nearest[0].lat, nearest[0].lng),
             calcGeoDistance(spot.lat, spot.lng, nearest[1].lat, nearest[1].lng)
         );
-
-        spot.whether = (r && r.hourly && r.daily)
-            ? {
-                hourly: r.hourly.map(h => ({
-                    weather: h.weather.map(row =>
-                        row.map(v => Number.isFinite(v) ? v : 0)
-                    ),
-                    water: Number.isFinite(h.water) ? h.water : 0,
-                    tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
-                })),
-                daily: r.daily.map(d => ({
-                    weather: d.weather.map(v => Number.isFinite(v) ? v : 0),
-                    tide: d.tide.map(v => Number.isFinite(v) ? v : 0)
-                }))
-            }
-            : null;
     }
 
     showDebug(`=== ThirdStage 完了: ${count}件 ===`);
+
     return spots;
 }
+
 
 function downloadSpotCSV(spots) {
 
