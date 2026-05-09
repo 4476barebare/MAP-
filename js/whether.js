@@ -1,65 +1,80 @@
+
 // ================================
-// ■ 第一段階：適用エントリ
+// ■ 第一段階：適用エントリ（完全修正版）
 // ================================
 function applyFirstStage(spots, stations) {
 
     showDebug("=== FirstStage START ===", true);
+
+    if (!Array.isArray(spots) || !Array.isArray(stations)) {
+        showDebug("⚠ 入力不正");
+        return spots;
+    }
 
     const stationMap = buildStationMap(stations);
     showDebug("stationMap作成: " + Object.keys(stationMap).length + "件");
 
     let count = 0;
 
-    spots.forEach((spot, idx) => {
+    for (let i = 0; i < spots.length; i++) {
 
-        if (spot.icon !== "spot") return;
+        const spot = spots[i];
 
-        const parts = (spot.notes || "").split("/");
+        // ■ 対象フィルタ（ここ重要：後段破壊防止）
+        if (spot.icon !== "spot") continue;
+        if (!spot.lat || !spot.lng) continue;
 
-        if (parts[0] !== "First") return;
+        const note = spot.notes || "";
+        const parts = note.split("/");
+
+        if (parts[0] !== "First") continue;
 
         count++;
 
-        const code1 = parts[1];
-        const code2 = parts[2];
+        const code1 = parts[1] || "";
+        const code2 = parts[2] || "";
 
-        showDebug(`[${idx}] First検出: ${code1}${code2 ? " & " + code2 : ""}`);
+        showDebug(`[${i}] First検出: ${code1}${code2 ? " & " + code2 : ""}`);
 
-        const st1 = stationMap[code1];
-        if (!st1) {
+        const s1 = stationMap[code1];
+        if (!s1) {
             showDebug(`⚠ station未検出: ${code1}`);
-            return;
+            continue;
         }
 
+        const w1 = normalizeStationToWeather(s1);
+
+        // =========================
         // ■ 単一
+        // =========================
         if (!code2) {
-            spot.whether = structuredClone(st1);
+            spot.whether = structuredClone(w1);
             showDebug(`→ 単一適用: ${code1}`);
-            return;
+            continue;
         }
 
-        // ■ 補間
-        const st2 = stationMap[code2];
-        if (!st2) {
+        const s2 = stationMap[code2];
+        if (!s2) {
             showDebug(`⚠ station未検出: ${code2}`);
-            return;
+            continue;
         }
 
-        const d1 = calcGeoDistance(spot.lat, spot.lng, st1.lat, st1.lng);
-        const d2 = calcGeoDistance(spot.lat, spot.lng, st2.lat, st2.lng);
+        const w2 = normalizeStationToWeather(s2);
+
+        const d1 = calcGeoDistance(spot.lat, spot.lng, w1.lat, w1.lng);
+        const d2 = calcGeoDistance(spot.lat, spot.lng, w2.lat, w2.lng);
 
         showDebug(`距離: ${code1}=${d1.toFixed(2)}km / ${code2}=${d2.toFixed(2)}km`);
 
-        spot.whether = interpolateStation(st1, st2, d1, d2);
+        spot.whether = interpolateStation(w1, w2, d1, d2);
 
-        showDebug("→ 補間適用");
-    });
+        showDebug("→ 補間適用完了");
+    }
 
-    showDebug(`=== 完了: ${count}件処理 ===`);
+    showDebug(`=== FirstStage 完了: ${count}件処理 ===`);
 
     return spots;
 }
-
 
 // ================================
 // ■ stationCode → Map化
@@ -70,6 +85,34 @@ function buildStationMap(stations) {
         map[s.stationCode] = s;
     });
     return map;
+}
+
+function normalizeStationToWeather(st) {
+
+    if (!st || !st.latlng) return null;
+
+    return {
+        stationCode: st.stationCode || "",
+
+        lat: Number(st.latlng.split(";")[0]),
+        lng: Number(st.latlng.split(";")[1]),
+
+        hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => ({
+            weather: (h.weather || []).map(w => w.split("|").map(Number)),
+            water: Number(h.water || 0),
+            tide: (h.tide || []).map(Number)
+        })),
+
+        daily: (st.daily || "").split(";").filter(Boolean).map(str => {
+
+            const parts = str.split("|");
+
+            return {
+                weather: parts.slice(0, 3).map(Number),
+                tide: parts.slice(3).join("|").split(",").map(Number)
+            };
+        })
+    };
 }
 
 
