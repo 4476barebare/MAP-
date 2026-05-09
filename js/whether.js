@@ -241,22 +241,25 @@ function applySecondStage(spots) {
 
     showDebug("=== SecondStage START ===", true);
 
-    if (!spots || !spots.length) {
-        showDebug("⚠ spotsなし");
-        return;
+    if (!Array.isArray(spots)) {
+        showDebug("⚠ spots不正");
+        return spots;
     }
 
     const usableSpots = spots.filter(s => s.whether);
+
     showDebug("計算済みスポット数: " + usableSpots.length);
 
     const spotMap = buildSpotMapByName(spots);
 
     let count = 0;
 
-    spots.forEach((spot, idx) => {
+    for (let i = 0; i < spots.length; i++) {
 
+        const spot = spots[i];
         const note = spot.notes || "";
-        if (!note.startsWith("Second")) return;
+
+        if (!note.startsWith("Second")) continue;
 
         count++;
 
@@ -264,19 +267,14 @@ function applySecondStage(spots) {
         const code1 = parts[1] || "";
         const code2 = parts[2] || "";
 
-        showDebug(`[${idx}] Second検出: ${code1 || "//"} / ${code2 || "//"}`);
-
-        // =========================
-        // ■ Second//
-        // =========================
+        // =====================
+        // Second//
+        // =====================
         if (!code1 && !code2) {
 
             const nearest = findNearestTwoSpots(spot, usableSpots);
 
-            if (!nearest) {
-                showDebug("⚠ 近傍2点なし");
-                return;
-            }
+            if (!nearest) continue;
 
             spot.whether = interpolateFromSpots(
                 nearest[0],
@@ -284,32 +282,24 @@ function applySecondStage(spots) {
                 spot
             );
 
-            showDebug("→ 近傍2点補間");
-            return;
+            continue;
         }
 
-        // =========================
-        // ■ Second/A/B
-        // =========================
+        // =====================
+        // Second/A/B
+        // =====================
         const s1 = spotMap[code1];
         const s2 = spotMap[code2];
 
-        if (!s1 || !s2) {
-            showDebug(`⚠ 指定スポット未検出: ${code1} / ${code2}`);
-            return;
-        }
-
-        if (!s1.whether || !s2.whether) {
-            showDebug("⚠ whether未計算");
-            return;
-        }
+        if (!s1 || !s2) continue;
+        if (!s1.whether || !s2.whether) continue;
 
         spot.whether = interpolateFromSpots(s1, s2, spot);
-
-        showDebug("→ 指定2点補間");
-    });
+    }
 
     showDebug(`=== SecondStage 完了: ${count}件 ===`);
+
+    return spots;
 }
 
 function buildSpotMapByName(spots) {
