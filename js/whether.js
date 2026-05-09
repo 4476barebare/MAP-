@@ -344,3 +344,23 @@ function findNearestTwoSpots(target, list) {
 
     return [sorted[0].spot, sorted[1].spot];
 }
+
+function interpolateFromSpots(s1, s2, target) {
+
+    const d1 = calcGeoDistance(target.lat, target.lng, s1.lat, s1.lng);
+    const d2 = calcGeoDistance(target.lat, target.lng, s2.lat, s2.lng);
+
+    if (d1 === 0) return structuredClone(s1);
+    if (d2 === 0) return structuredClone(s2);
+
+    const w1 = 1 / d1;
+    const w2 = 1 / d2;
+
+    const lerp = (a, b) => (a * w1 + b * w2) / (w1 + w2);
+
+    return {
+        ...s1,
+        lat: lerp(s1.lat, s2.lat),
+        lng: lerp(s1.lng, s2.lng)
+    };
+}
