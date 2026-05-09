@@ -415,8 +415,9 @@ window.applyFirstStage = applyFirstStage;
 window.loadAreaData = loadAreaData;
 
 
+
 // ================================
-// ■ SecondStage：メイン処理（統一版）
+// ■ SecondStage：メイン処理（トリム統一版）
 // ================================
 function applySecondStage(spots) {
 
@@ -427,7 +428,6 @@ function applySecondStage(spots) {
         return spots;
     }
 
-    // whetherを持つスポット
     const usableSpots = spots.filter(s =>
         s.icon === "spot" &&
         s.whether &&
@@ -458,25 +458,26 @@ function applySecondStage(spots) {
         const code2 = parts[2] || "";
 
         // =====================
-        // ■ Second//（近傍2点補間）
+        // ■ Second//（近傍2点）
         // =====================
         if (!code1 && !code2) {
 
             const nearest = findNearestTwoSpots(spot, usableSpots);
             if (!nearest) continue;
 
-            spot.whether = interpolateStation(
+            const result = interpolateStation(
                 nearest[0].whether,
                 nearest[1].whether,
                 calcGeoDistance(spot.lat, spot.lng, nearest[0].lat, nearest[0].lng),
                 calcGeoDistance(spot.lat, spot.lng, nearest[1].lat, nearest[1].lng)
             );
 
+            spot.whether = trimWhether(result);
             continue;
         }
 
         // =====================
-        // ■ Second/A/B（指定スポット補間）
+        // ■ Second/A/B（指定スポット）
         // =====================
         const s1 = spotMap[code1];
         const s2 = spotMap[code2];
@@ -484,12 +485,14 @@ function applySecondStage(spots) {
         if (!s1 || !s2) continue;
         if (!s1.whether || !s2.whether) continue;
 
-        spot.whether = interpolateStation(
+        const result = interpolateStation(
             s1.whether,
             s2.whether,
             calcGeoDistance(spot.lat, spot.lng, s1.lat, s1.lng),
             calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng)
         );
+
+        spot.whether = trimWhether(result);
     }
 
     showDebug(`=== SecondStage 完了: ${count}件 ===`);
@@ -531,7 +534,7 @@ function findNearestTwoSpots(target, list) {
 }
 
 // ================================
-// ■ ThirdStage：残り補完（統一版）
+// ■ ThirdStage：残り補完（トリム統一版）
 // ================================
 function applyThirdStage(spots) {
 
@@ -542,7 +545,6 @@ function applyThirdStage(spots) {
         return spots;
     }
 
-    // 基準（whetherあり）
     const baseSpots = spots.filter(s =>
         s.icon === "spot" &&
         s.whether &&
@@ -564,18 +566,19 @@ function applyThirdStage(spots) {
         count++;
 
         const nearest = findNearestTwoSpots(spot, baseSpots);
-
         if (!nearest) {
             showDebug("⚠ 近傍不足: " + (spot.name || i));
             continue;
         }
 
-        spot.whether = interpolateStation(
+        const result = interpolateStation(
             nearest[0].whether,
             nearest[1].whether,
             calcGeoDistance(spot.lat, spot.lng, nearest[0].lat, nearest[0].lng),
             calcGeoDistance(spot.lat, spot.lng, nearest[1].lat, nearest[1].lng)
         );
+
+        spot.whether = trimWhether(result);
     }
 
     showDebug(`=== ThirdStage 完了: ${count}件 ===`);
