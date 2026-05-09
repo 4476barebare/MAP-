@@ -412,19 +412,19 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
             // -------------------------
             // ■ SecondStage
             // -------------------------
-            applySecondStage(window.spotData);
+           applySecondStage(window.spotData);
 
             // -------------------------
             // ■ ThirdStage（追加）
             // -------------------------
             applyThirdStage(window.spotData);
 
-            downloadSpotCSV(window.spotData);
+//             downloadSpotCSV(window.spotData);
 
-        })
-        .catch(e => {
-            console.error("loadAreaData error:", e);
-        });
+       })
+         .catch(e => {
+             console.error("loadAreaData error:", e);
+         });
 
 });
 
