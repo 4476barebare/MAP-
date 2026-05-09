@@ -132,39 +132,52 @@ function interpolateStation(s1, s2, d1, d2) {
 // ================================
 // ■ 汎用データローダー
 // ================================
-export async function loadAreaData(area) {
+function loadAreaData(area) {
 
     showDebug("データ取得開始: " + area, true);
 
-    try {
-
-        const url = `/data/${area}_load.json`;
-
-        const res = await fetch(url);
-
-        showDebug("fetch status: " + res.status);
-
-        const text = await res.text();
-
-        showDebug("raw取得OK");
-
-        const json = JSON.parse(text);
-
-        if (json.status !== "ok") {
-            showDebug("❌ データ取得失敗");
-            return [];
-        }
-
-        showDebug("取得成功: " + json.data.length + "件");
-
-        return json.data.map(normalizeStation);
-
-    } catch (e) {
-        showDebug("🔥 エラー発生: " + e.message);
-        return [];
+    if (!area) {
+        showDebug("❌ area未指定");
+        return Promise.resolve([]);
     }
-}
 
+    const url = `/data/${area}_load.json`;
+
+    return fetch(url)
+        .then(res => {
+
+            showDebug("fetch status: " + res.status);
+
+            return res.text();
+        })
+        .then(text => {
+
+            showDebug("raw取得OK");
+
+            let json;
+
+            try {
+                json = JSON.parse(text);
+            } catch (e) {
+                showDebug("🔥 JSONパース失敗");
+                return [];
+            }
+
+            if (json.status !== "ok") {
+                showDebug("❌ データ取得失敗");
+                return [];
+            }
+
+            showDebug("取得成功: " + json.data.length + "件");
+
+            return json.data.map(normalizeStation);
+        })
+        .catch(e => {
+
+            showDebug("🔥 fetchエラー: " + e.message);
+            return [];
+        });
+}
 // ================================
 // ■ ステーション正規化
 // ================================
