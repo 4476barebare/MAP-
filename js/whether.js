@@ -240,10 +240,7 @@ window.loadAreaData = loadAreaData;
 function applySecondStage(spots) {
 
     showDebug("=== SecondStage START ===", true);
-    showDebug(
-    "spot総数=" + spots.length +
-    " usable=" + usableSpots.length
-);
+
 
     if (!Array.isArray(spots)) {
         showDebug("⚠ spots不正");
@@ -255,6 +252,10 @@ function applySecondStage(spots) {
     s.whether &&
     s.lat != null &&
     s.lng != null
+);
+    showDebug(
+    "spot総数=" + spots.length +
+    " usable=" + usableSpots.length
 );
 
     showDebug("計算済みスポット数: " + usableSpots.length);
