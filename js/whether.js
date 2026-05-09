@@ -134,7 +134,7 @@ function interpolateStation(s1, s2, d1, d2) {
 // ================================
 function loadAreaData(area) {
 
-    showDebug("データ取得開始: " + area, true);
+    showDebug("データ取得開始: ");
 
     if (!area) {
         showDebug("❌ area未指定");
