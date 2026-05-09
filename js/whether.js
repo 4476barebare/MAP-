@@ -364,3 +364,85 @@ function interpolateFromSpots(s1, s2, target) {
         lng: lerp(s1.lng, s2.lng)
     };
 }
+
+
+
+// ================================
+// ■ ThirdStage：残り補完
+// ================================
+function applyThirdStage(spots) {
+
+    showDebug("=== ThirdStage START ===", true);
+
+    if (!Array.isArray(spots)) {
+        showDebug("⚠ spots不正");
+        return spots;
+    }
+
+    // whetherありの基準スポット
+    const baseSpots = spots.filter(s =>
+        s.icon === "spot" &&
+        s.whether &&
+        s.lat != null &&
+        s.lng != null
+    );
+
+    showDebug("基準スポット数: " + baseSpots.length);
+
+    let count = 0;
+
+    for (let i = 0; i < spots.length; i++) {
+
+        const spot = spots[i];
+
+        // ★条件：spotでwhether未設定
+        if (spot.icon !== "spot") continue;
+        if (spot.whether) continue;
+
+        count++;
+
+        const nearest = findNearestTwoSpots(spot, baseSpots);
+
+        if (!nearest) {
+            showDebug("⚠ 近傍不足: " + (spot.name || i));
+            continue;
+        }
+
+        spot.whether = interpolateFromSpots(
+            nearest[0],
+            nearest[1],
+            spot
+        );
+    }
+
+    showDebug(`=== ThirdStage 完了: ${count}件 ===`);
+
+    return spots;
+}
+
+function dumpAllSpots(spots) {
+
+    showDebug("=== DUMP START ===", true);
+
+    let text = "";
+
+    for (const s of spots) {
+
+        text += [
+            s.name || "NO_NAME",
+            s.icon,
+            s.lat,
+            s.lng,
+            s.whether ? "OK" : "NULL"
+        ].join(" | ");
+
+        text += "\n";
+    }
+
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    window.open(url, "_blank");
+
+    showDebug("=== DUMP OPENED ===");
+}
