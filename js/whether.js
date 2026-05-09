@@ -420,29 +420,34 @@ function applyThirdStage(spots) {
     return spots;
 }
 
-function dumpAllSpots(spots) {
 
-    showDebug("=== DUMP START ===", true);
+function downloadSpotCSV(spots) {
 
-    let text = "";
+    let csv = "icon,name,lat,lng,whether\n";
 
     for (const s of spots) {
 
-        text += [
-            s.name || "NO_NAME",
-            s.icon,
-            s.lat,
-            s.lng,
-            s.whether ? "OK" : "NULL"
-        ].join(" | ");
+        const w = s.whether;
 
-        text += "\n";
+        csv += [
+            s.icon || "",
+            s.name || "",
+            s.lat ?? "",
+            s.lng ?? "",
+            w ? "OK" : "EMPTY"
+        ].join(",") + "\n";
     }
 
-    const blob = new Blob([text], { type: "text/plain" });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
 
-    window.open(url, "_blank");
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "spot_weather_dump.csv";
 
-    showDebug("=== DUMP OPENED ===");
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
