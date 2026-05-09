@@ -1,4 +1,3 @@
-
 // ================================
 // ■ 第一段階：適用エントリ（完全修正版）
 // ================================
@@ -20,7 +19,7 @@ function applyFirstStage(spots, stations) {
 
         const spot = spots[i];
 
-        // ■ 対象フィルタ（ここ重要：後段破壊防止）
+        // ■ フィルタ
         if (spot.icon !== "spot") continue;
         if (!spot.lat || !spot.lng) continue;
 
@@ -48,7 +47,7 @@ function applyFirstStage(spots, stations) {
         // ■ 単一
         // =========================
         if (!code2) {
-            spot.whether = structuredClone(w1);
+            spot.whether = stripStationMeta(structuredClone(w1));
             showDebug(`→ 単一適用: ${code1}`);
             continue;
         }
@@ -66,7 +65,9 @@ function applyFirstStage(spots, stations) {
 
         showDebug(`距離: ${code1}=${d1.toFixed(2)}km / ${code2}=${d2.toFixed(2)}km`);
 
-        spot.whether = interpolateStation(w1, w2, d1, d2);
+        spot.whether = stripStationMeta(
+            interpolateStation(w1, w2, d1, d2)
+        );
 
         showDebug("→ 補間適用完了");
     }
@@ -87,6 +88,7 @@ function buildStationMap(stations) {
     return map;
 }
 
+
 function normalizeStationToWeather(st) {
 
     if (!st || !st.latlng) return null;
@@ -104,7 +106,6 @@ function normalizeStationToWeather(st) {
         })),
 
         daily: (st.daily || "").split(";").filter(Boolean).map(str => {
-
             const parts = str.split("|");
 
             return {
@@ -115,7 +116,15 @@ function normalizeStationToWeather(st) {
     };
 }
 
+function stripStationMeta(st) {
 
+    if (!st) return null;
+
+    return {
+        hourly: st.hourly,
+        daily: st.daily
+    };
+}
 // ================================
 // ■ 補間処理
 // ================================
@@ -158,9 +167,6 @@ function interpolateStation(s1, s2, d1, d2) {
     };
 }
 
-
-
-
 // ================================
 // ■ データ取得
 // ================================
@@ -177,31 +183,19 @@ function loadAreaData(area) {
 
     return fetch(url)
         .then(res => {
-
             showDebug("fetch status: " + res.status);
-
-            // ここで必ずJSON化（text経由をやめる）
-            return res.json();
+            return res.json(); // ★text完全廃止
         })
         .then(json => {
 
-            // -------------------------
-            // ■ 外枠は完全に捨てる
-            // -------------------------
-            if (!json) {
-                showDebug("❌ 空レスポンス");
-                return [];
-            }
-
-            if (!Array.isArray(json.data)) {
-                showDebug("❌ data配列なし");
+            if (!json || !Array.isArray(json.data)) {
+                showDebug("❌ dataなし");
                 return [];
             }
 
             showDebug("取得成功: " + json.data.length + "件");
 
-            // ★ここが本体だけになる
-            return json.data;
+            return json.data; // ★ここはrawのまま渡す
 
         })
         .catch(e => {
@@ -209,8 +203,6 @@ function loadAreaData(area) {
             return [];
         });
 }
-
-
 // ================================
 // ■ 正規化
 // ================================
