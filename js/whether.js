@@ -444,7 +444,7 @@ function interpolateFromSpots(s1, s2, target) {
 
 
 // ================================
-// ■ ThirdStage：残り補完
+// ■ ThirdStage：残り補完（完全修正版）
 // ================================
 function applyThirdStage(spots) {
 
@@ -455,7 +455,7 @@ function applyThirdStage(spots) {
         return spots;
     }
 
-    // whetherありの基準スポット
+    // whether専用ベース（spotは使うが参照専用）
     const baseSpots = spots.filter(s =>
         s.icon === "spot" &&
         s.whether &&
@@ -471,20 +471,18 @@ function applyThirdStage(spots) {
 
         const spot = spots[i];
 
-        // ★条件：spotでwhether未設定
         if (spot.icon !== "spot") continue;
         if (spot.whether) continue;
 
         count++;
 
         const nearest = findNearestTwoSpots(spot, baseSpots);
-
         if (!nearest) {
             showDebug("⚠ 近傍不足: " + (spot.name || i));
             continue;
         }
 
-        spot.whether = interpolateFromSpots(
+        spot.whether = buildWhetherFromSpotsThird(
             nearest[0],
             nearest[1],
             spot
@@ -496,6 +494,45 @@ function applyThirdStage(spots) {
     return spots;
 }
 
+function buildWhetherFromSpotsThird(s1, s2, target) {
+
+    const d1 = calcGeoDistance(target.lat, target.lng, s1.lat, s1.lng);
+    const d2 = calcGeoDistance(target.lat, target.lng, s2.lat, s2.lng);
+
+    if (d1 === 0) return structuredClone(s1.whether);
+    if (d2 === 0) return structuredClone(s2.whether);
+
+    const w1 = 1 / d1;
+    const w2 = 1 / d2;
+
+    const lerp = (a, b) => (a * w1 + b * w2) / (w1 + w2);
+
+    const wA = s1.whether;
+    const wB = s2.whether;
+
+    return {
+        hourly: wA.hourly.map((h1, i) => {
+            const h2 = wB.hourly[i];
+
+            return {
+                weather: h1.weather.map((row, j) =>
+                    row.map((v, k) => lerp(v, h2.weather[j][k]))
+                ),
+                water: lerp(h1.water, h2.water),
+                tide: h1.tide.map((t, j) => lerp(t, h2.tide[j]))
+            };
+        }),
+
+        daily: wA.daily.map((d1, i) => {
+            const d2 = wB.daily[i];
+
+            return {
+                weather: d1.weather.map((v, j) => lerp(v, d2.weather[j])),
+                tide: d1.tide.map((t, j) => lerp(t, d2.tide[j]))
+            };
+        })
+    };
+}
 
 function downloadSpotCSV(spots) {
 
