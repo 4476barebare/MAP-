@@ -136,25 +136,34 @@ export async function loadAreaData(area) {
 
     showDebug("データ取得開始: " + area, true);
 
-    if (!area) {
-        throw new Error("area指定が必要");
-    }
+    try {
 
-    const url = `/data/${area}_load.json`;
+        const url = `/data/${area}_load.json`;
 
-    const res = await fetch(url);
-    const json = await res.json();
+        const res = await fetch(url);
 
-    if (json.status !== "ok") {
-        showDebug("❌ データ取得失敗");
+        showDebug("fetch status: " + res.status);
+
+        const text = await res.text();
+
+        showDebug("raw取得OK");
+
+        const json = JSON.parse(text);
+
+        if (json.status !== "ok") {
+            showDebug("❌ データ取得失敗");
+            return [];
+        }
+
+        showDebug("取得成功: " + json.data.length + "件");
+
+        return json.data.map(normalizeStation);
+
+    } catch (e) {
+        showDebug("🔥 エラー発生: " + e.message);
         return [];
     }
-
-    showDebug("取得成功: " + json.data.length + "件");
-
-    return json.data.map(normalizeStation);
 }
-
 
 // ================================
 // ■ ステーション正規化
