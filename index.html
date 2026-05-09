@@ -419,10 +419,7 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
             // -------------------------
             applyThirdStage(window.spotData);
 
-            // -------------------------
-            // ■ 最終確認（新規タブ出力）
-            // -------------------------
-            outputAllSpotWeather(window.spotData);
+            downloadSpotCSV(window.spotData);
 
         })
         .catch(e => {
