@@ -450,26 +450,24 @@ function applySecondStage(spots) {
         const code2 = parts[2] || "";
 
         // =====================
-        // ■ Second//
+        // ■ Second//（近傍）
         // =====================
         if (!code1 && !code2) {
 
             const nearest = findNearestTwoSpots(spot, usableSpots);
             if (!nearest) continue;
 
-            const result = interpolateStation(
+            let result = interpolateStation(
                 nearest[0].whether,
                 nearest[1].whether,
                 calcGeoDistance(spot.lat, spot.lng, nearest[0].lat, nearest[0].lng),
                 calcGeoDistance(spot.lat, spot.lng, nearest[1].lat, nearest[1].lng)
             );
 
-            // ★ここが本体（代入時トリム）
-            spot.whether = {
-                hourly: result.hourly,
-                daily: result.daily
-            };
+            // ★ 代入時トリム（ここだけ）
+            if (result?.stationCode) delete result.stationCode;
 
+            spot.whether = result;
             continue;
         }
 
@@ -482,22 +480,20 @@ function applySecondStage(spots) {
         if (!s1 || !s2) continue;
         if (!s1.whether || !s2.whether) continue;
 
-        const result = interpolateStation(
+        let result = interpolateStation(
             s1.whether,
             s2.whether,
             calcGeoDistance(spot.lat, spot.lng, s1.lat, s1.lng),
             calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng)
         );
 
-        // ★ここが本体（代入時トリム）
-        spot.whether = {
-            hourly: result.hourly,
-            daily: result.daily
-        };
+        // ★ 代入時トリム（ここだけ）
+        if (result?.stationCode) delete result.stationCode;
+
+        spot.whether = result;
     }
 
     showDebug(`=== SecondStage 完了: ${count}件 ===`);
-
     return spots;
 }
 
@@ -537,84 +533,56 @@ function findNearestTwoSpots(target, list) {
 // ================================
 // ■ ThirdStage：残り補完（トリム統一版）
 // ================================
-function applySecondStage(spots) {
+// ================================
+// ■ ThirdStage：残り補完（統一版）
+// ================================
+function applyThirdStage(spots) {
 
-    showDebug("=== SecondStage START ===", true);
+    showDebug("=== ThirdStage START ===", true);
 
-    if (!Array.isArray(spots)) return spots;
+    if (!Array.isArray(spots)) {
+        showDebug("⚠ spots不正");
+        return spots;
+    }
 
-    const usableSpots = spots.filter(s =>
+    // 基準（whetherあり）
+    const baseSpots = spots.filter(s =>
         s.icon === "spot" &&
         s.whether &&
         s.lat != null &&
         s.lng != null
     );
 
-    const spotMap = buildSpotMapByName(spots);
+    showDebug("基準スポット数: " + baseSpots.length);
 
     let count = 0;
 
     for (let i = 0; i < spots.length; i++) {
 
         const spot = spots[i];
-        const note = spot.notes || "";
 
-        if (!note.startsWith("Second")) continue;
+        if (spot.icon !== "spot") continue;
+        if (spot.whether) continue;
 
         count++;
 
-        const parts = note.split("/");
-        const code1 = parts[1] || "";
-        const code2 = parts[2] || "";
+        const nearest = findNearestTwoSpots(spot, baseSpots);
+        if (!nearest) continue;
 
-        // =====================
-        // ■ Second//
-        // =====================
-        if (!code1 && !code2) {
-
-            const nearest = findNearestTwoSpots(spot, usableSpots);
-            if (!nearest) continue;
-
-            const result = interpolateStation(
-                nearest[0].whether,
-                nearest[1].whether,
-                calcGeoDistance(spot.lat, spot.lng, nearest[0].lat, nearest[0].lng),
-                calcGeoDistance(spot.lat, spot.lng, nearest[1].lat, nearest[1].lng)
-            );
-
-            // ★ここが本体（代入時トリム）
-            spot.whether = {
-                hourly: result.hourly,
-                daily: result.daily
-            };
-
-            continue;
-        }
-
-        // =====================
-        // ■ Second/A/B
-        // =====================
-        const s1 = spotMap[code1];
-        const s2 = spotMap[code2];
-
-        if (!s1 || !s2) continue;
-        if (!s1.whether || !s2.whether) continue;
-
-        const result = interpolateStation(
-            s1.whether,
-            s2.whether,
-            calcGeoDistance(spot.lat, spot.lng, s1.lat, s1.lng),
-            calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng)
+        let result = interpolateStation(
+            nearest[0].whether,
+            nearest[1].whether,
+            calcGeoDistance(spot.lat, spot.lng, nearest[0].lat, nearest[0].lng),
+            calcGeoDistance(spot.lat, spot.lng, nearest[1].lat, nearest[1].lng)
         );
 
-        // ★ここが本体（代入時トリム）
-        spot.whether = {
-            hourly: result.hourly,
-            daily: result.daily
-        };
+        // ★ 代入時トリム（Secondと完全統一）
+        if (result?.stationCode) delete result.stationCode;
+
+        spot.whether = result;
     }
 
-    showDebug(`=== SecondStage 完了: ${count}件 ===`);
+    showDebug(`=== ThirdStage 完了: ${count}件 ===`);
 
     return spots;
 }
