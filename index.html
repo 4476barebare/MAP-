@@ -393,7 +393,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
     window.fishUrl = `/KANTO/${window.currentPref}_fish.csv`; // ←追加
 
-
 loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
     updateStateFromHash();
@@ -402,32 +401,33 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
     window.markerControl.preloadShop01(shopUrl);
 
-    // ▼ ここ追加
-    showDebug("=== 天気データ処理開始 ===");
+    loadAreaData("KANTO")
+        .then(stations => {
 
-loadAreaData("KANTO")
-    .then(stations => {
+            // -------------------------
+            // ■ FirstStage
+            // -------------------------
+            applyFirstStage(window.spotData, stations);
 
-        showDebug("stations読み込み完了: " + stations.length);
-        showDebug("spotData件数: " + window.spotData.length);
+            // -------------------------
+            // ■ SecondStage
+            // -------------------------
+            applySecondStage(window.spotData);
 
-        // =========================
-        // ■ FirstStage
-        // =========================
-        applyFirstStage(window.spotData, stations);
-        showDebug("FirstStage適用完了");
+            // -------------------------
+            // ■ ThirdStage（追加）
+            // -------------------------
+            applyThirdStage(window.spotData);
 
-        // =========================
-        // ■ SecondStage（ここで開始）
-        // =========================
-        applySecondStage(window.spotData);
-        showDebug("SecondStage適用完了");
+            // -------------------------
+            // ■ 最終確認（新規タブ出力）
+            // -------------------------
+            outputAllSpotWeather(window.spotData);
 
-    })
-    .catch(e => {
-        showDebug("🔥 loadAreaDataエラー: " + e.message);
-        console.error(e);
-    });
+        })
+        .catch(e => {
+            console.error("loadAreaData error:", e);
+        });
 
 });
 
