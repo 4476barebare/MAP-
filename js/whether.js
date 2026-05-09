@@ -31,22 +31,22 @@ function applyFirstStage(spots, stations) {
             return;
         }
 
-        // ■ パターン①：単一
+        // ■ 単一
         if (!code2) {
             spot.whether = structuredClone(st1);
             showDebug(`→ 単一適用: ${code1}`);
             return;
         }
 
-        // ■ パターン②：補間
+        // ■ 補間
         const st2 = stationMap[code2];
         if (!st2) {
             showDebug(`⚠ station未検出: ${code2}`);
             return;
         }
 
-        const d1 = getDistance(spot.lat, spot.lng, st1.lat, st1.lng);
-        const d2 = getDistance(spot.lat, spot.lng, st2.lat, st2.lng);
+        const d1 = calcGeoDistance(spot.lat, spot.lng, st1.lat, st1.lng);
+        const d2 = calcGeoDistance(spot.lat, spot.lng, st2.lat, st2.lng);
 
         showDebug(`距離: ${code1}=${d1.toFixed(2)}km / ${code2}=${d2.toFixed(2)}km`);
 
@@ -117,7 +117,7 @@ function interpolateStation(s1, s2, d1, d2) {
 
 
 // ================================
-// ■ テスト関数
+// ■ テスト
 // ================================
 function test() {
     showDebug("✅ test実行された");
@@ -214,9 +214,9 @@ function normalizeDaily(str) {
 
 
 // ================================
-// ■ 距離計算
+// ■ 距離計算（名前変更済み）
 // ================================
-function getDistance(lat1, lng1, lat2, lng2) {
+function calcGeoDistance(lat1, lng1, lat2, lng2) {
 
     const R = 6371;
 
@@ -234,7 +234,7 @@ function getDistance(lat1, lng1, lat2, lng2) {
 
 
 // ================================
-// ■ グローバル公開（重要）
+// ■ グローバル公開
 // ================================
 window.applyFirstStage = applyFirstStage;
 window.loadAreaData = loadAreaData;
