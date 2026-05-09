@@ -331,7 +331,7 @@ function findNearestTwoSpots(target, list) {
         .filter(s => s !== target)
         .map(s => ({
             spot: s,
-            dist: getDistance(
+            dist: calcGeoDistance(
                 target.lat,
                 target.lng,
                 s.lat,
