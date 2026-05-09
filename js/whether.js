@@ -1,7 +1,7 @@
 // ================================
 // ■ 第一段階：適用エントリ
 // ================================
-export function applyFirstStage(spots, stations) {
+function applyFirstStage(spots, stations) {
 
     showDebug("=== FirstStage START ===", true);
 
@@ -31,18 +31,14 @@ export function applyFirstStage(spots, stations) {
             return;
         }
 
-        // =========================
-        // ■ パターン①：そのまま
-        // =========================
+        // ■ パターン①：単一
         if (!code2) {
             spot.whether = structuredClone(st1);
             showDebug(`→ 単一適用: ${code1}`);
             return;
         }
 
-        // =========================
-        // ■ パターン②：2点補間
-        // =========================
+        // ■ パターン②：補間
         const st2 = stationMap[code2];
         if (!st2) {
             showDebug(`⚠ station未検出: ${code2}`);
@@ -78,26 +74,17 @@ function buildStationMap(stations) {
 
 
 // ================================
-// ■ ステーション補間（コア）
+// ■ 補間処理
 // ================================
 function interpolateStation(s1, s2, d1, d2) {
 
-    if (d1 === 0) {
-        showDebug("距離0 → s1採用");
-        return structuredClone(s1);
-    }
-
-    if (d2 === 0) {
-        showDebug("距離0 → s2採用");
-        return structuredClone(s2);
-    }
+    if (d1 === 0) return structuredClone(s1);
+    if (d2 === 0) return structuredClone(s2);
 
     const w1 = 1 / d1;
     const w2 = 1 / d2;
 
-    function lerp(v1, v2) {
-        return (v1 * w1 + v2 * w2) / (w1 + w2);
-    }
+    const lerp = (v1, v2) => (v1 * w1 + v2 * w2) / (w1 + w2);
 
     return {
         stationCode: "interpolated",
@@ -127,17 +114,22 @@ function interpolateStation(s1, s2, d1, d2) {
         })
     };
 }
-function test() {
 
-showDebug("test");
-}
 
 // ================================
-// ■ 汎用データローダー
+// ■ テスト関数
+// ================================
+function test() {
+    showDebug("✅ test実行された");
+}
+
+
+// ================================
+// ■ データ取得
 // ================================
 function loadAreaData(area) {
 
-    showDebug("データ取得開始: ");
+    showDebug("データ取得開始");
 
     if (!area) {
         showDebug("❌ area未指定");
@@ -148,9 +140,7 @@ function loadAreaData(area) {
 
     return fetch(url)
         .then(res => {
-
             showDebug("fetch status: " + res.status);
-
             return res.text();
         })
         .then(text => {
@@ -176,13 +166,14 @@ function loadAreaData(area) {
             return json.data.map(normalizeStation);
         })
         .catch(e => {
-
             showDebug("🔥 fetchエラー: " + e.message);
             return [];
         });
 }
+
+
 // ================================
-// ■ ステーション正規化
+// ■ 正規化
 // ================================
 function normalizeStation(st) {
 
@@ -195,14 +186,11 @@ function normalizeStation(st) {
         lng,
 
         hourly: [0, 1, 2].map(i => normalizeHourly(st[`hourly${i}`])),
-
         daily: st.daily.split(";").map(normalizeDaily)
     };
 }
 
 
-// ================================
-// ■ hourly整形
 // ================================
 function normalizeHourly(h) {
     return {
@@ -213,8 +201,6 @@ function normalizeHourly(h) {
 }
 
 
-// ================================
-// ■ daily整形
 // ================================
 function normalizeDaily(str) {
 
@@ -228,9 +214,10 @@ function normalizeDaily(str) {
 
 
 // ================================
-// ■ 距離計算（Haversine）
+// ■ 距離計算
 // ================================
 function getDistance(lat1, lng1, lat2, lng2) {
+
     const R = 6371;
 
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -244,3 +231,11 @@ function getDistance(lat1, lng1, lat2, lng2) {
 
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
+
+
+// ================================
+// ■ グローバル公開（重要）
+// ================================
+window.applyFirstStage = applyFirstStage;
+window.loadAreaData = loadAreaData;
+window.test = test;
