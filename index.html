@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -402,15 +401,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.markerControl.preloadShop01(shopUrl);
         
         
-        showDebug("=== 天気データ処理開始 ===", true);
-
-    const stations = await loadAreaData("KANTO");
-
-    showDebug("stations読み込み完了: " + stations.length);
+        showDebug("stations読み込み完了: " + stations.length);
 
     applyFirstStage(window.spotData, stations);
 
     showDebug("FirstStage適用完了");
+    
     
     });
 
