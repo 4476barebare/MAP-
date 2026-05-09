@@ -177,30 +177,32 @@ function loadAreaData(area) {
 
     return fetch(url)
         .then(res => {
+
             showDebug("fetch status: " + res.status);
-            return res.text();
+
+            // ここで必ずJSON化（text経由をやめる）
+            return res.json();
         })
-        .then(text => {
+        .then(json => {
 
-            showDebug("raw取得OK");
-
-            let json;
-
-            try {
-                json = JSON.parse(text);
-            } catch (e) {
-                showDebug("🔥 JSONパース失敗");
+            // -------------------------
+            // ■ 外枠は完全に捨てる
+            // -------------------------
+            if (!json) {
+                showDebug("❌ 空レスポンス");
                 return [];
             }
 
-            if (json.status !== "ok") {
-                showDebug("❌ データ取得失敗");
+            if (!Array.isArray(json.data)) {
+                showDebug("❌ data配列なし");
                 return [];
             }
 
             showDebug("取得成功: " + json.data.length + "件");
 
-            return json.data.map(normalizeStation);
+            // ★ここが本体だけになる
+            return json.data;
+
         })
         .catch(e => {
             showDebug("🔥 fetchエラー: " + e.message);
