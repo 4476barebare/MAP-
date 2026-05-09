@@ -82,56 +82,6 @@ function applyFirstStage(spots, stations) {
     return spots;
 }
 
-// ================================
-// ■ stationCode → Map化
-// ================================
-function buildStationMap(stations) {
-    const map = {};
-    stations.forEach(s => {
-        map[s.stationCode] = s;
-    });
-    return map;
-}
-
-
-// ================================
-// ■ station → weather変換
-// ================================
-function normalizeStationToWeather(st) {
-
-    if (!st || !st.latlng) return null;
-
-    return {
-        stationCode: st.stationCode || "",
-
-        lat: Number(st.latlng.split(";")[0]),
-        lng: Number(st.latlng.split(";")[1]),
-
-        hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => {
-
-            if (!h) return { weather: [], water: 0, tide: [] };
-
-            return {
-                weather: (h.weather || []).map(w => w.split("|").map(Number)),
-                water: Number(h.water || 0),
-                tide: (h.tide || []).map(Number)
-            };
-        }),
-
-        daily: (st.daily || "")
-            .split(";")
-            .filter(Boolean)
-            .map(str => {
-
-                const parts = str.split("|");
-
-                return {
-                    weather: parts.slice(0, 3).map(Number),
-                    tide: parts.slice(3).join("|").split(",").map(Number)
-                };
-            })
-    };
-}
 
 
 // ================================
@@ -199,24 +149,7 @@ function interpolateStation(s1, s2, d1, d2) {
     };
 }
 
-
-// ================================
-// ■ 風向き補間（円環）
-// ================================
-function lerpWind(a, b) {
-
-    const radA = a * Math.PI / 180;
-    const radB = b * Math.PI / 180;
-
-    const x = Math.cos(radA) + Math.cos(radB);
-    const y = Math.sin(radA) + Math.sin(radB);
-
-    let deg = Math.atan2(y, x) * 180 / Math.PI;
-
-    if (deg < 0) deg += 360;
-
-    return deg;
-}
+ 
 // ================================
 // ■ stationCode → Map化
 // ================================
