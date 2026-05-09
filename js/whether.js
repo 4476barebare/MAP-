@@ -127,7 +127,10 @@ function interpolateStation(s1, s2, d1, d2) {
         })
     };
 }
+function test() {
 
+showDebug("test");
+}
 
 // ================================
 // ■ 汎用データローダー
