@@ -392,23 +392,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
     window.fishUrl = `/KANTO/${window.currentPref}_fish.csv`; // ←追加
 
-    loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
-        updateStateFromHash();
-        routeUpdate();
-        renderAreaGuide();
+loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
-        window.markerControl.preloadShop01(shopUrl);
-        
-        
+    updateStateFromHash();
+    routeUpdate();
+    renderAreaGuide();
+
+    window.markerControl.preloadShop01(shopUrl);
+
+    // ▼ ここ追加
+    showDebug("=== 天気データ処理開始 ===", true);
+
+    loadAreaData("KANTO").then(stations => {
+
         showDebug("stations読み込み完了: " + stations.length);
 
-    applyFirstStage(window.spotData, stations);
+        applyFirstStage(window.spotData, stations);
 
-    showDebug("FirstStage適用完了");
-    
-    
+        showDebug("FirstStage適用完了");
+
     });
+
+});
+
 
     document.getElementById('map-back-btn')
         ?.addEventListener('click', () => {
