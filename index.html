@@ -401,30 +401,30 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
     window.markerControl.preloadShop01(shopUrl);
 
-//     loadAreaData("KANTO")
-//         .then(stations => {
+    loadAreaData("KANTO")
+        .then(stations => {
 
             // -------------------------
             // ■ FirstStage
             // -------------------------
-//             applyFirstStage(window.spotData, stations);
+            applyFirstStage(window.spotData, stations);
 
             // -------------------------
             // ■ SecondStage
             // -------------------------
-//             applySecondStage(window.spotData);
+            applySecondStage(window.spotData);
 
             // -------------------------
             // ■ ThirdStage（追加）
             // -------------------------
-//             applyThirdStage(window.spotData);
+            applyThirdStage(window.spotData);
 
-//             downloadSpotCSV(window.spotData);
+            downloadSpotCSV(window.spotData);
 
-//         })
-//         .catch(e => {
-//             console.error("loadAreaData error:", e);
-//         });
+        })
+        .catch(e => {
+            console.error("loadAreaData error:", e);
+        });
 
 });
 
