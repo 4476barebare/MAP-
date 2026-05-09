@@ -116,12 +116,6 @@ function interpolateStation(s1, s2, d1, d2) {
 }
 
 
-// ================================
-// ■ テスト
-// ================================
-function test() {
-    showDebug("✅ test実行された");
-}
 
 
 // ================================
@@ -238,4 +232,115 @@ function calcGeoDistance(lat1, lng1, lat2, lng2) {
 // ================================
 window.applyFirstStage = applyFirstStage;
 window.loadAreaData = loadAreaData;
-window.test = test;
+
+
+// ================================
+// ■ SecondStage：メイン処理
+// ================================
+function applySecondStage(spots) {
+
+    showDebug("=== SecondStage START ===", true);
+
+    if (!spots || !spots.length) {
+        showDebug("⚠ spotsなし");
+        return;
+    }
+
+    const usableSpots = spots.filter(s => s.whether);
+    showDebug("計算済みスポット数: " + usableSpots.length);
+
+    const spotMap = buildSpotMapByName(spots);
+
+    let count = 0;
+
+    spots.forEach((spot, idx) => {
+
+        const note = spot.notes || "";
+        if (!note.startsWith("Second")) return;
+
+        count++;
+
+        const parts = note.split("/");
+        const code1 = parts[1] || "";
+        const code2 = parts[2] || "";
+
+        showDebug(`[${idx}] Second検出: ${code1 || "//"} / ${code2 || "//"}`);
+
+        // =========================
+        // ■ Second//
+        // =========================
+        if (!code1 && !code2) {
+
+            const nearest = findNearestTwoSpots(spot, usableSpots);
+
+            if (!nearest) {
+                showDebug("⚠ 近傍2点なし");
+                return;
+            }
+
+            spot.whether = interpolateFromSpots(
+                nearest[0],
+                nearest[1],
+                spot
+            );
+
+            showDebug("→ 近傍2点補間");
+            return;
+        }
+
+        // =========================
+        // ■ Second/A/B
+        // =========================
+        const s1 = spotMap[code1];
+        const s2 = spotMap[code2];
+
+        if (!s1 || !s2) {
+            showDebug(`⚠ 指定スポット未検出: ${code1} / ${code2}`);
+            return;
+        }
+
+        if (!s1.whether || !s2.whether) {
+            showDebug("⚠ whether未計算");
+            return;
+        }
+
+        spot.whether = interpolateFromSpots(s1, s2, spot);
+
+        showDebug("→ 指定2点補間");
+    });
+
+    showDebug(`=== SecondStage 完了: ${count}件 ===`);
+}
+
+function buildSpotMapByName(spots) {
+
+    const map = {};
+
+    spots.forEach(s => {
+        if (s.name) {
+            map[s.name] = s;
+        }
+    });
+
+    return map;
+}
+
+function findNearestTwoSpots(target, list) {
+
+    const sorted = list
+        .filter(s => s !== target)
+        .map(s => ({
+            spot: s,
+            dist: getDistance(
+                target.lat,
+                target.lng,
+                s.lat,
+                s.lng
+            )
+        }))
+        .sort((a, b) => a.dist - b.dist);
+
+    if (sorted.length < 2) return null;
+
+    return [sorted[0].spot, sorted[1].spot];
+}
