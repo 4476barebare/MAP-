@@ -271,31 +271,31 @@ window.applyFirstStage = applyFirstStage;
 window.loadAreaData = loadAreaData;
 
 
+
 // ================================
-// ■ SecondStage：メイン処理
+// ■ SecondStage：メイン処理（完全修正版）
 // ================================
 function applySecondStage(spots) {
 
     showDebug("=== SecondStage START ===", true);
-
 
     if (!Array.isArray(spots)) {
         showDebug("⚠ spots不正");
         return spots;
     }
 
+    // whetherを持つスポットだけ抽出（参照はそのまま）
     const usableSpots = spots.filter(s =>
-    s.icon === "spot" &&
-    s.whether &&
-    s.lat != null &&
-    s.lng != null
-);
-    showDebug(
-    "spot総数=" + spots.length +
-    " usable=" + usableSpots.length
-);
+        s.icon === "spot" &&
+        s.whether &&
+        s.lat != null &&
+        s.lng != null
+    );
 
-    showDebug("計算済みスポット数: " + usableSpots.length);
+    showDebug(
+        "spot総数=" + spots.length +
+        " usable=" + usableSpots.length
+    );
 
     const spotMap = buildSpotMapByName(spots);
 
@@ -315,15 +315,14 @@ function applySecondStage(spots) {
         const code2 = parts[2] || "";
 
         // =====================
-        // Second//
+        // ■ Second//（近傍2点補間）
         // =====================
         if (!code1 && !code2) {
 
             const nearest = findNearestTwoSpots(spot, usableSpots);
-
             if (!nearest) continue;
 
-            spot.whether = interpolateFromSpots(
+            spot.whether = buildWhetherFromSpots(
                 nearest[0],
                 nearest[1],
                 spot
@@ -333,7 +332,7 @@ function applySecondStage(spots) {
         }
 
         // =====================
-        // Second/A/B
+        // ■ Second/A/B（指定スポット補間）
         // =====================
         const s1 = spotMap[code1];
         const s2 = spotMap[code2];
@@ -341,7 +340,7 @@ function applySecondStage(spots) {
         if (!s1 || !s2) continue;
         if (!s1.whether || !s2.whether) continue;
 
-        spot.whether = interpolateFromSpots(s1, s2, spot);
+        spot.whether = buildWhetherFromSpots(s1, s2, spot);
     }
 
     showDebug(`=== SecondStage 完了: ${count}件 ===`);
@@ -380,6 +379,46 @@ function findNearestTwoSpots(target, list) {
     if (sorted.length < 2) return null;
 
     return [sorted[0].spot, sorted[1].spot];
+}
+
+function buildWhetherFromSpots(s1, s2, target) {
+
+    const d1 = calcGeoDistance(target.lat, target.lng, s1.lat, s1.lng);
+    const d2 = calcGeoDistance(target.lat, target.lng, s2.lat, s2.lng);
+
+    if (d1 === 0) return structuredClone(s1.whether);
+    if (d2 === 0) return structuredClone(s2.whether);
+
+    const w1 = 1 / d1;
+    const w2 = 1 / d2;
+
+    const lerp = (a, b) => (a * w1 + b * w2) / (w1 + w2);
+
+    const wA = s1.whether;
+    const wB = s2.whether;
+
+    return {
+        hourly: wA.hourly.map((h1, i) => {
+            const h2 = wB.hourly[i];
+
+            return {
+                weather: h1.weather.map((row, j) =>
+                    row.map((v, k) => lerp(v, h2.weather[j][k]))
+                ),
+                water: lerp(h1.water, h2.water),
+                tide: h1.tide.map((t, j) => lerp(t, h2.tide[j]))
+            };
+        }),
+
+        daily: wA.daily.map((d1, i) => {
+            const d2 = wB.daily[i];
+
+            return {
+                weather: d1.weather.map((v, j) => lerp(v, d2.weather[j])),
+                tide: d1.tide.map((t, j) => lerp(t, d2.tide[j]))
+            };
+        })
+    };
 }
 
 function interpolateFromSpots(s1, s2, target) {
