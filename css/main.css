@@ -997,7 +997,7 @@ li {
 
 .pref-name {
     position: absolute;
-    bottom: 1px;
+    bottom: -6px;
     right: 0;
     font-size: 6px;
     opacity: 0.6;
