@@ -493,7 +493,10 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
             // ■ FirstStage
             // -------------------------
             applyFirstStage(window.spotData, stations);
-            renderPrefWeather();
+            setTimeout(() => {
+    renderPrefWeather();
+}, 50);
+            
 
             // -------------------------
             // ■ SecondStage
