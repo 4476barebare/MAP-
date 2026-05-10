@@ -994,3 +994,16 @@ li {
    text-align: right;
    vertical-align: baseline;
 }
+
+/* nameだけ浮かせる */
+
+.pref-name {
+
+    position: absolute;
+    top: -6px;
+    right: 0;
+    font-size: 6px;
+    opacity: 0.6;
+    pointer-events: none;
+
+}
