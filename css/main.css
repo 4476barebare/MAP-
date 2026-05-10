@@ -993,6 +993,7 @@ li {
 }
 
 .pref-weather div {
+   text-align: right;
    margin-left: 0;
     margin-right: 0;
 }
