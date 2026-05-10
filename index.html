@@ -415,6 +415,34 @@ document.addEventListener('touchend', (e) => {
 
 });
 
+function renderPrefWeather() {
+
+    const elements = document.getElementsByClassName('pref-weather');
+
+    for (let i = 0; i < elements.length; i++) {
+
+        const el = elements[i];
+        const id = el.id;
+
+        if (!id) continue;
+
+        const areaId = id.split('_')[0];
+
+        const spot = window.spotData.find(s =>
+            s.areaId === areaId &&
+            s.type === 'representative'
+        );
+
+        if (!spot) {
+            el.textContent = 'no data';
+            continue;
+        }
+
+        // ★ 今はダミー
+        el.textContent = 'TEST';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const url = new URL(location.href);
@@ -445,6 +473,7 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
             // ■ FirstStage
             // -------------------------
             applyFirstStage(window.spotData, stations);
+            renderPrefWeather();
 
             // -------------------------
             // ■ SecondStage
