@@ -448,13 +448,14 @@ function renderPrefWeather() {
         const name = rep.name; // ←これ追加
 
 el.innerHTML = `
-    <span><span class="pref-name">${name}</span>${icon}</span>
+    <span>${icon}</span>
     <div style="width: 12px">${temp}</div>
     <span style="font-size: 8px;">°C 降水</span>
     <div style="width: 12px">${pop}</div>
     <span style="font-size: 8px;">%</span>
     <div style="width: 12px">${wind}</div>
     <span style="font-size: 8px;">m/s</span>
+    <span class="pref-name">${name}</span>
 `;
 
     }
