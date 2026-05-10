@@ -166,6 +166,13 @@ function initAreaUI() {
         const row = document.createElement('div');
         row.style.display = 'flex';
         row.style.alignItems = 'center';
+        
+        btn.onclick = () => {
+            location.hash = encodeURIComponent(areaName);
+            updateStateFromHash();
+            destroyAreaUI();
+            selectArea(area);
+        };
 
         // =====================
         // 左：ボタン
@@ -178,13 +185,6 @@ function initAreaUI() {
 
         btn.textContent = areaName;
         btn.style.width = '100%'; // ★ 横いっぱい使う
-
-        btn.onclick = () => {
-            location.hash = encodeURIComponent(areaName);
-            updateStateFromHash();
-            destroyAreaUI();
-            selectArea(area);
-        };
 
         left.appendChild(btn);
 
