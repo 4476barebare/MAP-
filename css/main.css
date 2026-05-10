@@ -972,3 +972,11 @@ li {
     0 -1px #191970;
   border-radius: 1px;
 }
+
+.pref-weather {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+}
