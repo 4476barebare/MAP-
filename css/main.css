@@ -979,24 +979,22 @@ li {
     top: 50%;
     transform: translateY(-50%);
 
-    display: grid;
-    grid-template-columns: 12px 24px 16px 16px 24px 16px 24px 16px;
-    column-gap: 6px;
+    display: flex;
+    gap: 10px;
     align-items: center;
 
     font-size: 12px;
     white-space: nowrap;
 }
 
-.pref-weather span {
-    display: inline-block;
-}
+/* 列固定 */
+.pref-weather .icon { width: 18px; text-align: center; }
+.pref-weather .temp { width: 52px; text-align: right; }
+.pref-weather .pop  { width: 70px; text-align: right; }
+.pref-weather .wind { width: 50px; text-align: right; }
 
-.pref-weather span:nth-child(1) { width: 12px; text-align: right; }
-.pref-weather span:nth-child(2) { width: 24px; text-align: right; }
-.pref-weather span:nth-child(3) { width: 16px; text-align: right; }
-.pref-weather span:nth-child(4) { width: 16px; text-align: right; }
-.pref-weather span:nth-child(5) { width: 24px; text-align: right; }
-.pref-weather span:nth-child(6) { width: 16px; text-align: right; }
-.pref-weather span:nth-child(7) { width: 24px; text-align: right; }
-.pref-weather span:nth-child(8) { width: 16px; text-align: right; }
+/* ★ ここが本題（8pxは保持） */
+.pref-weather .unit {
+    font-size: 8px;
+    opacity: 0.8;
+}
