@@ -988,9 +988,11 @@ li {
 }
 
 .pref-weather span {
+   margin-left: 0;
     margin-right: 0;
 }
 
 .pref-weather div {
+   margin-left: 0;
     margin-right: 0;
 }
