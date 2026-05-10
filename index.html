@@ -186,11 +186,10 @@ function initAreaUI() {
         // =====================
         const right = document.createElement('div');
 
-        right.style.minWidth = '80px';
-        right.style.textAlign = 'right';
-        right.style.fontSize = '12px';
-        right.textContent = "loading…";
-
+        right.style.position = 'absolute'
+        right.style.right = '10px';
+        right.style.top = '50%';
+        right.style.transform = 'translateY(-50%)';
         // 仮：簡易表示（あとで差し替え）
         //right.textContent = getSimpleWeather(area);
 
@@ -432,12 +431,12 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
             // -------------------------
             // ■ SecondStage
             // -------------------------
-           applySecondStage(window.spotData);
+           //applySecondStage(window.spotData);
 
             // -------------------------
             // ■ ThirdStage（追加）
             // -------------------------
-            applyThirdStage(window.spotData);
+            //applyThirdStage(window.spotData);
 
 //             downloadSpotCSV(window.spotData);
 
