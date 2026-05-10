@@ -978,16 +978,11 @@ li {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-
     display: flex;
-    
     align-items: center;
-
     font-size: 12px;
     white-space: nowrap;
 }
-
-
 
 .pref-weather div {
    display: inline-block;
@@ -1001,5 +996,5 @@ li {
     right: 0;
     font-size: 6px;
     opacity: 0.6;
-    pointer-events: none;
+
 }
