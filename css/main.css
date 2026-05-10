@@ -979,13 +979,12 @@ li {
     top: 50%;
     transform: translateY(-50%);
 
-    display: flex;
-    justify-content: flex-end;
+    display: grid;
+    grid-template-columns: 12px 24px 16px 16px 24px 16px 24px 16px;
+    column-gap: 6px;
     align-items: center;
-    gap: 6px;
 
     font-size: 12px;
-
     white-space: nowrap;
 }
 
