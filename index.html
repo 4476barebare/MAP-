@@ -441,32 +441,22 @@ function renderPrefWeather() {
             continue;
         }
 
-        // =========================
-        // ■ 表示整形（JS内完結）
-        // =========================
-
         const icon = toWeatherIcon(w.icon);
 
-        const temp = String(Math.round(w.temp));
-        const pop  = String(Math.round(w.pop));
-        const wind = String(Math.round(w.wind));
-
-        // ★ 視覚幅補正（1桁だけ空白追加）
-        const fix = (v) => (v.length === 1 ? " " + v : v);
-
-        const tempFix = fix(temp);
-        const popFix  = fix(pop);
-        const windFix = fix(wind);
+        const temp = Math.round(w.temp);
+        const pop  = Math.round(w.pop);
+        const wind = Math.round(w.wind);
 
         // =========================
-        // ■ 出力（固定フォーマット）
+        // ■ 完全分離レイアウト
         // =========================
 
-        el.textContent =
-            icon + " " +
-            tempFix + "°C " +
-            "降水" + popFix + "% " +
-            windFix + "m/s";
+        el.innerHTML = `
+            <span style="display:inline-block; width:18px;">${icon}</span>
+            <span style="display:inline-block; width:42px; text-align:right;">${temp}°C</span>
+            <span style="display:inline-block; width:55px; text-align:right;">降水${pop}%</span>
+            <span style="display:inline-block; width:40px; text-align:right;">${wind}m/s</span>
+        `;
     }
 }
 
