@@ -146,6 +146,8 @@ function showDebug(msg, clear = false) {
     debugEl.textContent += msg + "\n";
 }
 // =======================
+// PREF / AREA UI
+// =======================
 function initAreaUI() {
     document.getElementById('map-menu').style.display = 'block';
     const menuUl = document.querySelector('#map-menu ul');
@@ -156,22 +158,27 @@ function initAreaUI() {
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
+        li.style.position = 'relative'; // ★ これ必須
 
-        // ★ ラッパー（左右分割）
+        // =====================
+        // ラッパー
+        // =====================
         const row = document.createElement('div');
         row.style.display = 'flex';
-        row.style.justifyContent = 'space-between';
         row.style.alignItems = 'center';
 
         // =====================
         // 左：ボタン
         // =====================
         const left = document.createElement('div');
+        left.style.flex = '1'; // ★ 幅確保
 
         const btn = document.createElement('button');
         const areaName = (area.name || '').trim();
 
         btn.textContent = areaName;
+        btn.style.width = '100%'; // ★ 横いっぱい使う
+
         btn.onclick = () => {
             location.hash = encodeURIComponent(areaName);
             updateStateFromHash();
@@ -186,19 +193,20 @@ function initAreaUI() {
         // =====================
         const right = document.createElement('div');
 
-        right.style.position = 'absolute'
+        right.style.position = 'absolute';
         right.style.right = '10px';
         right.style.top = '50%';
         right.style.transform = 'translateY(-50%)';
-        // 仮：簡易表示（あとで差し替え）
-        //right.textContent = getSimpleWeather(area);
+
+        right.style.fontSize = '12px';
+        right.textContent = "loading…";
 
         // =====================
         // 組み立て
         // =====================
         row.appendChild(left);
-        row.appendChild(right);
         li.appendChild(row);
+        li.appendChild(right);
         menuUl.appendChild(li);
     });
 
@@ -242,6 +250,21 @@ function initAreaUI() {
     window.nearestClickEnabled = true;
     window.map.on('click', window.nearestClickHandler);
 }
+
+// =======================
+// UI解除
+// =======================
+function destroyAreaUI() {
+    const menuUl = document.querySelector('#map-menu ul');
+    if (menuUl) menuUl.innerHTML = '';
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
+        window.nearestClickHandler = null;
+    }
+    window.nearestClickEnabled = false;
+    document.getElementById('map-menu').style.display = 'none';
+}
+
 // =======================
 // ROUTE UPDATE
 // =======================
@@ -430,12 +453,10 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
             // -------------------------
             // ■ SecondStage
-            // -------------------------
-           //applySecondStage(window.spotData);
+            //applySecondStage(window.spotData);
 
             // -------------------------
             // ■ ThirdStage（追加）
-            // -------------------------
             //applyThirdStage(window.spotData);
 
 //             downloadSpotCSV(window.spotData);
