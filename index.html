@@ -163,6 +163,7 @@ function initAreaUI() {
         // =====================
         // ラッパー
         // =====================
+        const areaName = (area.name || '').trim();
         const row = document.createElement('div');
         row.style.display = 'flex';
         row.style.alignItems = 'center';
@@ -181,7 +182,6 @@ function initAreaUI() {
         left.style.flex = '1'; // ★ 幅確保
 
         const btn = document.createElement('button');
-        const areaName = (area.name || '').trim();
 
         btn.textContent = areaName;
         btn.style.width = '100%'; // ★ 横いっぱい使う
