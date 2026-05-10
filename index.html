@@ -441,11 +441,32 @@ function renderPrefWeather() {
             continue;
         }
 
-        el.innerHTML =
-            `${toWeatherIcon(w.icon)} ` +
-            `${String(w.temp ?? 0).padStart(2, " ")}°C ` +
-            `降水${String(w.pop ?? 0).padStart(2, " ")}% ` +
-            `風速${String(w.wind ?? 0).padStart(2, " ")}m/s`;
+        // =========================
+        // ■ 表示整形（JS内完結）
+        // =========================
+
+        const icon = toWeatherIcon(w.icon);
+
+        const temp = String(Math.round(w.temp));
+        const pop  = String(Math.round(w.pop));
+        const wind = String(Math.round(w.wind));
+
+        // ★ 視覚幅補正（1桁だけ空白追加）
+        const fix = (v) => (v.length === 1 ? " " + v : v);
+
+        const tempFix = fix(temp);
+        const popFix  = fix(pop);
+        const windFix = fix(wind);
+
+        // =========================
+        // ■ 出力（固定フォーマット）
+        // =========================
+
+        el.textContent =
+            icon + " " +
+            tempFix + "°C " +
+            "降水" + popFix + "% " +
+            windFix + "m/s";
     }
 }
 
