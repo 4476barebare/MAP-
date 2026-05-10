@@ -992,5 +992,5 @@ li {
 .pref-weather div {
    display: inline-block;
    text-align: right;
-   vertical-align: bottom
+   vertical-align: baseline;
 }
