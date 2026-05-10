@@ -980,7 +980,7 @@ li {
     transform: translateY(-50%);
 
     display: flex;
-    gap: 8px;
+    
     align-items: center;
 
     font-size: 12px;
