@@ -979,21 +979,25 @@ li {
     top: 50%;
     transform: translateY(-50%);
 
-    display: flex;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 18px 54px 70px 50px;
+    column-gap: 8px;
     align-items: center;
 
     font-size: 12px;
     white-space: nowrap;
+
+    justify-content: end; /* ←これで右端に密着 */
 }
 
-/* 列固定 */
-.pref-weather .icon { width: 18px; text-align: center; }
-.pref-weather .temp { width: 52px; text-align: right; }
-.pref-weather .pop  { width: 70px; text-align: right; }
-.pref-weather .wind { width: 50px; text-align: right; }
+/* 数値の右揃え（桁ズレ対策の本体） */
+.pref-weather .temp,
+.pref-weather .pop,
+.pref-weather .wind {
+    text-align: right;
+}
 
-/* ★ ここが本題（8pxは保持） */
+/* 単位は小さく */
 .pref-weather .unit {
     font-size: 8px;
     opacity: 0.8;
