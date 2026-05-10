@@ -984,7 +984,11 @@ li {
     font-size: 12px;
 }
 
-.pref-weather span:nth-child(1) { width: 18px; text-align: center; }
-.pref-weather span:nth-child(2) { width: 45px; text-align: right; }
-.pref-weather span:nth-child(3) { width: 55px; text-align: right; }
-.pref-weather span:nth-child(4) { width: 40px; text-align: right; }
+.pref-weather span:nth-child(1) { width: 12px; text-align: right; }
+.pref-weather span:nth-child(2) { width: 24px; text-align: right; }
+.pref-weather span:nth-child(3) { width: 16px; text-align: right; }
+.pref-weather span:nth-child(4) { width: 16px; text-align: right; }
+.pref-weather span:nth-child(5) { width: 24px; text-align: right; }
+.pref-weather span:nth-child(6) { width: 16px; text-align: right; }
+.pref-weather span:nth-child(7) { width: 24px; text-align: right; }
+.pref-weather span:nth-child(8) { width: 16px; text-align: right; }
