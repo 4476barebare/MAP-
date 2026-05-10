@@ -442,20 +442,29 @@ function renderPrefWeather() {
         }
 
         const icon = toWeatherIcon(w.icon);
-
         const temp = Math.round(w.temp);
         const pop  = Math.round(w.pop);
         const wind = Math.round(w.wind);
 
         // =========================
-        // ■ 完全分離レイアウト
+        // ■ 完全分離UI（崩れない）
         // =========================
 
         el.innerHTML = `
-            <span style="display:inline-block; width:18px;">${icon}</span>
-            <span style="display:inline-block; width:42px; text-align:right;">${temp}°C</span>
-            <span style="display:inline-block; width:55px; text-align:right;">降水${pop}%</span>
-            <span style="display:inline-block; width:40px; text-align:right;">${wind}m/s</span>
+            <span>${icon}</span>
+
+            <span>${temp}<span class="unit">°C</span></span>
+
+            <span>
+                <span style="font-size: 8px;">降水</span>
+                <span>${pop}</span>
+                <span>%</span>
+            </span>
+
+            <spa>
+                <span>${wind}</span>
+                <span>m/s</span>
+            </span>
         `;
     }
 }
