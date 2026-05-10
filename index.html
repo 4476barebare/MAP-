@@ -447,7 +447,7 @@ function renderPrefWeather() {
         const wind = Math.round(w.wind);
 
 el.innerHTML = `
-    <div class="icon">${icon}</div>
+    <div>${icon}</div>
 
     <div class="temp">
         ${temp}<span class="unit">°C</span>
@@ -462,6 +462,7 @@ el.innerHTML = `
         ${wind}<span class="unit">m/s</span>
     </div>
 `;
+
     }
 }
 
