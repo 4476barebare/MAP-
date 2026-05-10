@@ -447,20 +447,14 @@ function renderPrefWeather() {
         const wind = Math.round(w.wind);
 
 el.innerHTML = `
-    <div>${icon}</div>
-
-    <div class="temp">
-        ${temp}<span class="unit">°C</span>
-    </div>
-
-    <div class="pop">
-        <span class="unit">降水</span>
-        ${pop}<span class="unit">%</span>
-    </div>
-
-    <div class="wind">
-        ${wind}<span class="unit">m/s</span>
-    </div>
+    <span>${icon}</span>
+    <div style="width: 24px">${temp}</div>
+    <span style="font-size: 8px;">°C</span>
+    <span style="font-size: 8px;">降水</span>
+    <div style="width: 24px">${pop}</div>
+    <span style="font-size: 8px;">%</span>
+    <div style="width: 24px">${wind}</div>
+    <span style="font-size: 8px;">m/s</span>
 `;
 
     }
