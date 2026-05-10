@@ -419,39 +419,35 @@ function renderPrefWeather() {
 
     const elements = document.getElementsByClassName('pref-weather');
 
-    const byArea = {};
-
-    for (const s of window.spotData) {
-
-        if ((s.type || '').trim() !== 'representative') continue;
-
-        if (!s.whether) continue;
-
-        byArea[s.areaId] = s.whether;
-    }
-
     for (let i = 0; i < elements.length; i++) {
 
         const el = elements[i];
         const areaId = el.id;
 
-        const whether = byArea[areaId];
+        const spot = window.spotData.find(s =>
+            s.areaId === areaId &&
+            s.type === 'representative'
+        );
 
-        const summary = buildPrefWeatherSummary(whether);
-
-        if (!summary) {
-            el.textContent = "no data";
+        if (!spot || !spot.whether) {
+            el.textContent = 'no data';
             continue;
         }
 
-        // 表示（仮）
-        el.textContent =
-            `☀${summary.code} ${summary.maxTemp.toFixed(1)}° ` +
-            `💧${summary.maxRain}% 💨${summary.maxWind.toFixed(1)}`;
+        const w = formatPrefWeather(spot.whether);
+
+        if (!w) {
+            el.textContent = 'no data';
+            continue;
+        }
+
+        // 仮表示（UIは後でCSS調整）
+        el.innerHTML =
+            `${Math.round(w.weatherCode)} ${w.temp}°C ${w.pop}% ${w.wind}m/s`;
     }
 }
 
-function buildPrefWeatherSummary(whether) {
+function formatPrefWeather(whether) {
 
     if (!whether || !whether.hourly || !whether.hourly[0]) {
         return null;
@@ -460,35 +456,38 @@ function buildPrefWeatherSummary(whether) {
     const today = whether.hourly[0];
 
     let maxTemp = -Infinity;
-    let maxRain = -Infinity;
+    let maxPop = -Infinity;
     let maxWind = -Infinity;
-
-    let weatherCode = null;
+    let weatherCode = 0;
 
     for (const row of today.weather) {
 
-        // row構造:
-        // [天気コード, 気温, 降水確率, 降水量, 風速, 風向, 波高]
+        const code = row[0];   // 天気コード（補間で小数OK）
+        const temp = row[1];   // 気温
+        const pop  = row[2];   // 降水確率
+        const wind = row[4];   // 風速
 
-        const code = row[0];
-        const temp = row[1];
-        const rainProb = row[2];
-        const wind = row[4];
-
-        if (weatherCode === null) {
+        if (temp > maxTemp) {
+            maxTemp = temp;
             weatherCode = code;
         }
 
-        if (temp > maxTemp) maxTemp = temp;
-        if (rainProb > maxRain) maxRain = rainProb;
+        if (pop > maxPop) maxPop = pop;
         if (wind > maxWind) maxWind = wind;
     }
 
     return {
-        code: weatherCode,
-        maxTemp,
-        maxRain,
-        maxWind
+        // ★ 天気コードは補間対策で丸める or 範囲分類用に保持
+        weatherCode,
+
+        // 気温：四捨五入
+        temp: Math.round(maxTemp),
+
+        // 降水確率
+        pop: Math.round(maxPop),
+
+        // 風速
+        wind: Math.round(maxWind)
     };
 }
 
