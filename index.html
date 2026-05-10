@@ -441,54 +441,75 @@ function renderPrefWeather() {
             continue;
         }
 
-        // 仮表示（UIは後でCSS調整）
-        el.innerHTML =
-            `${Math.round(w.weatherCode)} ${w.temp}°C ${w.pop}% ${w.wind}m/s`;
+        el.innerHTML = `
+    <span class="pf-icon">${toWeatherIcon(w.icon)}</span>
+    <span class="pf-temp">${w.temp}°C</span>
+    <span class="pf-pop">降水${w.pop}%</span>
+    <span class="pf-wind">${w.wind}m/s</span>
+`;
+
     }
 }
 
 function formatPrefWeather(whether) {
 
-    if (!whether || !whether.hourly || !whether.hourly[0]) {
+    const today = whether?.hourly?.[0];
+    if (!today || !Array.isArray(today.weather)) {
         return null;
     }
-
-    const today = whether.hourly[0];
 
     let maxTemp = -Infinity;
     let maxPop = -Infinity;
     let maxWind = -Infinity;
-    let weatherCode = 0;
+
+    let codeSum = 0;
+    let codeCount = 0;
 
     for (const row of today.weather) {
 
-        const code = row[0];   // 天気コード（補間で小数OK）
-        const temp = row[1];   // 気温
-        const pop  = row[2];   // 降水確率
-        const wind = row[4];   // 風速
+        const code = row[0];
+        const temp = row[1];
+        const pop = row[2];
+        const wind = row[4];
 
-        if (temp > maxTemp) {
-            maxTemp = temp;
-            weatherCode = code;
+        // ■ 天気コード（平均化対応）
+        if (typeof code === "number") {
+            codeSum += code;
+            codeCount++;
         }
 
-        if (pop > maxPop) maxPop = pop;
-        if (wind > maxWind) maxWind = wind;
+        // ■ 気温（最高）
+        if (typeof temp === "number") {
+            maxTemp = Math.max(maxTemp, temp);
+        }
+
+        // ■ 降水確率（最大）
+        if (typeof pop === "number") {
+            maxPop = Math.max(maxPop, pop);
+        }
+
+        // ■ 風速（最大）
+        if (typeof wind === "number") {
+            maxWind = Math.max(maxWind, wind);
+        }
     }
 
+    const avgCode = codeCount ? (codeSum / codeCount) : 0;
+
     return {
-        // ★ 天気コードは補間対策で丸める or 範囲分類用に保持
-        weatherCode,
-
-        // 気温：四捨五入
+        icon: Math.round(avgCode),   // 後で☀️変換用
         temp: Math.round(maxTemp),
-
-        // 降水確率
         pop: Math.round(maxPop),
-
-        // 風速
         wind: Math.round(maxWind)
     };
+}
+
+function toWeatherIcon(code) {
+
+    if (code >= 60) return "☔";
+    if (code >= 30) return "☁️";
+    if (code >= 10) return "⛅";
+    return "☀️";
 }
 
 document.addEventListener('DOMContentLoaded', () => {
