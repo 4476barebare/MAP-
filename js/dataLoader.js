@@ -51,6 +51,8 @@ function loadLocationCSV(csvUrl) {
                     url: cols[6] ? cols[6].trim() : '',
                     notes: cols[7] ? cols[7].trim() : '',
                     icon: cols[8] ? cols[8].trim().toLowerCase() : null,
+                    whether: cols[9] ? cols[9].trim() : '',
+                    type: cols[10] ? cols[10].trim() : '',
                     squareX: null,
                     squareY: null
                 };
