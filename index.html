@@ -451,15 +451,21 @@ function renderPrefWeather() {
         // =========================
 
         el.innerHTML = `
-            <span>${icon}</span>
-            <span>${temp}</span>
-            <span style="font-size: 8px;">°C</span>
-            <span style="font-size: 8px;">降水</span>
-            <span>${pop}</span>
-            <span style="font-size: 8px;">%</span>
-            <span>${wind}</span>
-            <span style="font-size: 8px;">m/s</span>
-        `;
+    <div>${icon}</div>
+
+    <div>
+        <span>${temp}</span><span style="font-size:8px;">°C</span>
+    </div>
+
+    <div>
+        <span style="font-size:8px;">降水</span>
+        <span>${pop}</span><span style="font-size:8px;">%</span>
+    </div>
+
+    <div>
+        <span>${wind}</span><span style="font-size:8px;">m/s</span>
+    </div>
+`;
     }
 }
 
