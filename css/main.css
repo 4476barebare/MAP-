@@ -978,10 +978,19 @@ li {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
+
     display: flex;
+    justify-content: flex-end;
+    align-items: center;
     gap: 6px;
-    align-items: right;
+
     font-size: 12px;
+
+    white-space: nowrap;
+}
+
+.pref-weather span {
+    display: inline-block;
 }
 
 .pref-weather span:nth-child(1) { width: 12px; text-align: right; }
