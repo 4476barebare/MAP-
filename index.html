@@ -445,8 +445,10 @@ function renderPrefWeather() {
         const temp = Math.round(w.temp);
         const pop  = Math.round(w.pop);
         const wind = Math.round(w.wind);
+        const name = rep.name; // ←これ追加
 
 el.innerHTML = `
+<span class="pref-name">${name}</span>
     <span>${icon}</span>
     <div style="width: 12px">${temp}</div>
     <span style="font-size: 8px;">°C 降水</span>
