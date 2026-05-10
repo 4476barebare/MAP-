@@ -979,26 +979,10 @@ li {
     top: 50%;
     transform: translateY(-50%);
 
-    display: grid;
-    grid-template-columns: 18px 54px 70px 50px;
-    column-gap: 8px;
+    display: flex;
+    gap: 8px;
     align-items: center;
 
     font-size: 12px;
     white-space: nowrap;
-
-    justify-content: end; /* ←これで右端に密着 */
-}
-
-/* 数値の右揃え（桁ズレ対策の本体） */
-.pref-weather .temp,
-.pref-weather .pop,
-.pref-weather .wind {
-    text-align: right;
-}
-
-/* 単位は小さく */
-.pref-weather .unit {
-    font-size: 8px;
-    opacity: 0.8;
 }
