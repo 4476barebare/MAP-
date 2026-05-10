@@ -424,11 +424,11 @@ function renderPrefWeather() {
     for (let i = 0; i < elements.length; i++) {
 
         const el = elements[i];
-        const areaId = el.id;
+        const areaId = el.id; // ★ そのまま使う
 
         if (!areaId) continue;
 
-        showDebug('---');
+        showDebug(`---`);
         showDebug(`areaId: ${areaId}`);
 
         const matches = window.spotData.filter(s => s.areaId === areaId);
@@ -436,34 +436,23 @@ function renderPrefWeather() {
         showDebug(`match数: ${matches.length}`);
 
         if (matches.length === 0) {
-            el.textContent = 'NG(area)';
-            showDebug('→ NG: area一致なし');
+            el.textContent = 'no area match';
             continue;
         }
 
-        // representative抽出
         const rep = matches.find(s =>
             (s.type || '').trim().toLowerCase() === 'representative'
         );
 
         if (!rep) {
-            el.textContent = 'NG(type)';
-            showDebug('→ NG: representativeなし');
+            el.textContent = 'no rep';
             continue;
         }
 
-        // whether確認
-        if (!rep.whether || rep.whether.trim() === '') {
-            el.textContent = 'NG(whether)';
-            showDebug('→ NG: whether空');
-            continue;
-        }
-
-        // OK
-        el.textContent = 'OK';
-        showDebug(`→ OK: whether="${rep.whether}"`);
+        el.textContent = 'TEST WEATHER';
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
