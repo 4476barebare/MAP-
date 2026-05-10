@@ -986,3 +986,11 @@ li {
     font-size: 12px;
     white-space: nowrap;
 }
+
+.pref-weather span {
+    margin-right: 0;
+}
+
+.pref-weather div {
+    margin-right: 0;
+}
