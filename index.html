@@ -424,30 +424,28 @@ function renderPrefWeather() {
         const el = elements[i];
         const areaId = el.id;
 
-        const spot = window.spotData.find(s =>
+        const rep = window.spotData.find(s =>
             s.areaId === areaId &&
             s.type === 'representative'
         );
 
-        if (!spot || !spot.whether) {
+        if (!rep || !rep.whether) {
             el.textContent = 'no data';
             continue;
         }
 
-        const w = formatPrefWeather(spot.whether);
+        const w = formatPrefWeather(rep.whether);
 
         if (!w) {
             el.textContent = 'no data';
             continue;
         }
 
-        el.innerHTML = `
-    <span class="pf-icon">${toWeatherIcon(w.icon)}</span>
-    <span class="pf-temp">${w.temp}°C</span>
-    <span class="pf-pop">降水${w.pop}%</span>
-    <span class="pf-wind">${w.wind}m/s</span>
-`;
-
+        el.innerHTML =
+            `${toWeatherIcon(w.icon)} ` +
+            `${String(w.temp ?? 0).padStart(2, " ")}°C ` +
+            `降水${String(w.pop ?? 0).padStart(2, " ")}% ` +
+            `風速${String(w.wind ?? 0).padStart(2, " ")}m/s`;
     }
 }
 
@@ -467,37 +465,39 @@ function formatPrefWeather(whether) {
 
     for (const row of today.weather) {
 
+        if (!Array.isArray(row)) continue;
+
         const code = row[0];
         const temp = row[1];
         const pop = row[2];
         const wind = row[4];
 
-        // ■ 天気コード（平均化対応）
+        // 天気コード（補間対応で平均化）
         if (typeof code === "number") {
             codeSum += code;
             codeCount++;
         }
 
-        // ■ 気温（最高）
+        // 気温（最大）
         if (typeof temp === "number") {
             maxTemp = Math.max(maxTemp, temp);
         }
 
-        // ■ 降水確率（最大）
+        // 降水確率（最大）
         if (typeof pop === "number") {
             maxPop = Math.max(maxPop, pop);
         }
 
-        // ■ 風速（最大）
+        // 風速（最大）
         if (typeof wind === "number") {
             maxWind = Math.max(maxWind, wind);
         }
     }
 
-    const avgCode = codeCount ? (codeSum / codeCount) : 0;
+    if (codeCount === 0) return null;
 
     return {
-        icon: Math.round(avgCode),   // 後で☀️変換用
+        icon: Math.round(codeSum / codeCount),
         temp: Math.round(maxTemp),
         pop: Math.round(maxPop),
         wind: Math.round(maxWind)
