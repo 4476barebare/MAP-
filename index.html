@@ -419,66 +419,78 @@ function renderPrefWeather() {
 
     const elements = document.getElementsByClassName('pref-weather');
 
+    const byArea = {};
+
+    for (const s of window.spotData) {
+
+        if ((s.type || '').trim() !== 'representative') continue;
+
+        if (!s.whether) continue;
+
+        byArea[s.areaId] = s.whether;
+    }
+
     for (let i = 0; i < elements.length; i++) {
 
-        try {
+        const el = elements[i];
+        const areaId = el.id;
 
-            const el = elements[i];
-            const areaId = el.id;
+        const whether = byArea[areaId];
 
-            const matches = window.spotData.filter(s => s.areaId === areaId);
+        const summary = buildPrefWeatherSummary(whether);
 
-            const rep = matches.find(s =>
-                (s.type || '').trim().toLowerCase() === 'representative'
-            );
-
-            if (rep) {
-
-                el.textContent = 'TEST WEATHER';
-
-                // ★ クリックでwhetherを別タブ表示
-                el.style.cursor = 'pointer';
-
-                el.onclick = () => {
-
-                    const w = window.open('', '_blank');
-
-                    if (!w) return;
-
-                    w.document.write(`
-                        <html>
-                        <head>
-                        <title>whether debug</title>
-                        <style>
-                            body {
-                                font-family: monospace;
-                                font-size: 12px;
-                                padding: 10px;
-                                white-space: pre-wrap;
-                            }
-                        </style>
-                        </head>
-                        <body>
-                        ${JSON.stringify(rep.whether, null, 2)}
-                        </body>
-                        </html>
-                    `);
-                };
-
-            } else {
-
-                el.textContent = 'no data';
-                el.onclick = null;
-                el.style.cursor = 'default';
-            }
-
-        } catch (e) {
-            // 完全無音（showDebug削除済み）
-            console.error(e);
+        if (!summary) {
+            el.textContent = "no data";
+            continue;
         }
+
+        // 表示（仮）
+        el.textContent =
+            `☀${summary.code} ${summary.maxTemp.toFixed(1)}° ` +
+            `💧${summary.maxRain}% 💨${summary.maxWind.toFixed(1)}`;
     }
 }
 
+function buildPrefWeatherSummary(whether) {
+
+    if (!whether || !whether.hourly || !whether.hourly[0]) {
+        return null;
+    }
+
+    const today = whether.hourly[0];
+
+    let maxTemp = -Infinity;
+    let maxRain = -Infinity;
+    let maxWind = -Infinity;
+
+    let weatherCode = null;
+
+    for (const row of today.weather) {
+
+        // row構造:
+        // [天気コード, 気温, 降水確率, 降水量, 風速, 風向, 波高]
+
+        const code = row[0];
+        const temp = row[1];
+        const rainProb = row[2];
+        const wind = row[4];
+
+        if (weatherCode === null) {
+            weatherCode = code;
+        }
+
+        if (temp > maxTemp) maxTemp = temp;
+        if (rainProb > maxRain) maxRain = rainProb;
+        if (wind > maxWind) maxWind = wind;
+    }
+
+    return {
+        code: weatherCode,
+        maxTemp,
+        maxRain,
+        maxWind
+    };
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
