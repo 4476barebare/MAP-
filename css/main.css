@@ -978,5 +978,13 @@ li {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
+    display: flex;
+    gap: 6px;
+    align-items: center;
     font-size: 12px;
 }
+
+.pref-weather span:nth-child(1) { width: 18px; text-align: center; }
+.pref-weather span:nth-child(2) { width: 45px; text-align: right; }
+.pref-weather span:nth-child(3) { width: 55px; text-align: right; }
+.pref-weather span:nth-child(4) { width: 40px; text-align: right; }
