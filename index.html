@@ -167,7 +167,7 @@ function initAreaUI() {
         row.style.display = 'flex';
         row.style.alignItems = 'center';
         
-        btn.onclick = () => {
+        row.onclick = () => {
             location.hash = encodeURIComponent(areaName);
             updateStateFromHash();
             destroyAreaUI();
@@ -185,6 +185,7 @@ function initAreaUI() {
 
         btn.textContent = areaName;
         btn.style.width = '100%'; // ★ 横いっぱい使う
+        btn.onclick = null;
 
         left.appendChild(btn);
 
