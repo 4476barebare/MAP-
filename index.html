@@ -446,24 +446,20 @@ function renderPrefWeather() {
         const pop  = Math.round(w.pop);
         const wind = Math.round(w.wind);
 
-        // =========================
-        // ■ 完全分離UI（崩れない）
-        // =========================
+el.innerHTML = `
+    <div class="icon">${icon}</div>
 
-        el.innerHTML = `
-    <div>${icon}</div>
-
-    <div>
-        <span>${temp}</span><span style="font-size:8px;">°C</span>
+    <div class="temp">
+        ${temp}<span class="unit">°C</span>
     </div>
 
-    <div>
-        <span style="font-size:8px;">降水</span>
-        <span>${pop}</span><span style="font-size:8px;">%</span>
+    <div class="pop">
+        <span class="unit">降水</span>
+        ${pop}<span class="unit">%</span>
     </div>
 
-    <div>
-        <span>${wind}</span><span style="font-size:8px;">m/s</span>
+    <div class="wind">
+        ${wind}<span class="unit">m/s</span>
     </div>
 `;
     }
