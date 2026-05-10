@@ -453,17 +453,17 @@ function renderPrefWeather() {
         el.innerHTML = `
             <span>${icon}</span>
 
-            <span>${temp}<span class="unit">°C</span></span>
+            <span>${temp}<span style="font-size: 8px;">°C</span></span>
 
             <span>
                 <span style="font-size: 8px;">降水</span>
                 <span>${pop}</span>
-                <span>%</span>
+                <span style="font-size: 8px;">%</span>
             </span>
 
             <spa>
                 <span>${wind}</span>
-                <span>m/s</span>
+                <span style="font-size: 8px;">m/s</span>
             </span>
         `;
     }
