@@ -419,9 +419,6 @@ function renderPrefWeather() {
 
     const elements = document.getElementsByClassName('pref-weather');
 
-    showDebug('=== renderPrefWeather ===', true);
-    showDebug(`要素数: ${elements.length}`);
-
     for (let i = 0; i < elements.length; i++) {
 
         try {
@@ -429,36 +426,59 @@ function renderPrefWeather() {
             const el = elements[i];
             const areaId = el.id;
 
-            showDebug('---');
-            showDebug(`index: ${i}`);
-            showDebug(`areaId: ${areaId}`);
-
             const matches = window.spotData.filter(s => s.areaId === areaId);
-
-            showDebug(`match数: ${matches.length}`);
 
             const rep = matches.find(s =>
                 (s.type || '').trim().toLowerCase() === 'representative'
             );
 
             if (rep) {
+
                 el.textContent = 'TEST WEATHER';
 
-                showDebug(`type: ${rep.type}`);
-                showDebug(`whether: ${rep.whether}`);
+                // ★ クリックでwhetherを別タブ表示
+                el.style.cursor = 'pointer';
+
+                el.onclick = () => {
+
+                    const w = window.open('', '_blank');
+
+                    if (!w) return;
+
+                    w.document.write(`
+                        <html>
+                        <head>
+                        <title>whether debug</title>
+                        <style>
+                            body {
+                                font-family: monospace;
+                                font-size: 12px;
+                                padding: 10px;
+                                white-space: pre-wrap;
+                            }
+                        </style>
+                        </head>
+                        <body>
+                        ${JSON.stringify(rep.whether, null, 2)}
+                        </body>
+                        </html>
+                    `);
+                };
+
             } else {
+
                 el.textContent = 'no data';
-                showDebug('repなし');
+                el.onclick = null;
+                el.style.cursor = 'default';
             }
 
         } catch (e) {
-
-            showDebug(`❌ ERROR at index ${i}`);
-            showDebug(e.message);
-
+            // 完全無音（showDebug削除済み）
+            console.error(e);
         }
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
