@@ -987,16 +987,10 @@ li {
     white-space: nowrap;
 }
 
-.pref-weather span {
-   margin-left: 0;
-    margin-right: 0;
-}
+
 
 .pref-weather div {
    display: inline-block;
    text-align: right;
-   margin-left: 0;
-    margin-right: 0;
-   padding-right: 0;
-   padding-left: 0;
+   vertical-align: bottom
 }
