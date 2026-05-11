@@ -1,7 +1,6 @@
 // ================================
 // ■ 第一段階：適用エントリ（完全修正版）
 // ================================
-
 function applyFirstStage(spots, stations) {
 
     if (!Array.isArray(spots) || !Array.isArray(stations)) {
@@ -59,9 +58,6 @@ function applyFirstStage(spots, stations) {
 
     return spots;
 }
-
-
-
 // ================================
 // ■ メタ削除（統一用）
 // ================================
@@ -74,9 +70,6 @@ function stripStationMeta(st) {
         daily: st.daily
     };
 }
-
-
-
 // ================================
 // ■ stationCode → Map化
 // ================================
