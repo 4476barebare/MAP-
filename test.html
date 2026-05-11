@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Whether Debug</title>
+<style>
+body {
+    font-family: monospace;
+    background: #111;
+    color: #0f0;
+    padding: 10px;
+}
+pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+</style>
+</head>
+<body>
+
+<h3>Whether Debug</h3>
+<pre id="debug"></pre>
+
+<script src="./whetherNode.js"></script>
+
+<script>
+// ================================
+// ■ 設定
+// ================================
+const region = "KANTO";
+
+const prefs = [
+    "CHIBA"
+];
+
+// ================================
+// ■ デバッグ出力
+// ================================
+function debugLog(...args) {
+
+    const el = document.getElementById("debug");
+
+    const msg = args.map(a =>
+        typeof a === "object"
+            ? JSON.stringify(a, null, 2)
+            : String(a)
+    ).join(" ");
+
+    console.log(msg);
+    el.textContent += msg + "\n";
+}
+
+// ================================
+// ■ JSON読み込み（station用）
+// ================================
+async function loadJSON(path) {
+
+    try {
+        const res = await fetch(path);
+
+        if (!res.ok) {
+            debugLog("❌ JSON fetch失敗:", path);
+            return null;
+        }
+
+        const json = await res.json();
+
+        const data = json.data || json;
+
+        debugLog("✅ JSON:", path, Array.isArray(data) ? data.length : "不明");
+
+        return data;
+
+    } catch (e) {
+        debugLog("❌ JSON例外:", path, e);
+        return null;
+    }
+}
+
+// ================================
+// ■ CSV読み込み（spots用）
+// ================================
+async function loadCSV(path) {
+
+    try {
+        const res = await fetch(path);
+
+        if (!res.ok) {
+            debugLog("❌ CSV fetch失敗:", path);
+            return [];
+        }
+
+        const text = await res.text();
+
+        const lines = text.split("\n").filter(Boolean);
+
+        const header = lines.shift().split(",");
+
+        const data = lines.map(line => {
+
+            const cols = line.split(",");
+
+            const obj = {};
+
+            header.forEach((h, i) => {
+                obj[h] = cols[i];
+            });
+
+            // 型補正（重要）
+            obj.lat = Number(obj.lat);
+            obj.lng = Number(obj.lng);
+
+            return obj;
+        });
+
+        debugLog("✅ CSV:", path, data.length);
+
+        return data;
+
+    } catch (e) {
+        debugLog("❌ CSV例外:", path, e);
+        return [];
+    }
+}
+
+// ================================
+// ■ spots読み込み
+// ================================
+async function loadSpots(pref) {
+
+    const path = `./${region}/${pref}_location.csv`;
+
+    const data = await loadCSV(path);
+
+    if (!data.length) {
+        debugLog("❌ spotsなし:", pref);
+        return [];
+    }
+
+    return data;
+}
+
+// ================================
+// ■ メイン処理
+// ================================
+async function runTest() {
+
+    debugLog("=== START ===");
+
+    // ----------------
+    // station（1回だけ）
+    // ----------------
+    const stations = await loadJSON(`./data/${region}_load.json`);
+
+    if (!stations) {
+        debugLog("❌ station読み込み失敗");
+        return;
+    }
+
+    debugLog("stations:", stations.length);
+
+    // ----------------
+    // prefループ
+    // ----------------
+    for (const pref of prefs) {
+
+        debugLog("----", pref, "----");
+
+        let spots = await loadSpots(pref);
+
+        if (spots.length === 0) continue;
+
+        // ----------------
+        // whether実行
+        // ----------------
+        runWhether(spots, stations);
+
+        const count = spots.filter(s => s.whether).length;
+
+        debugLog("取得:", count, "/", spots.length);
+
+        // ----------------
+        // 未取得チェック
+        // ----------------
+        const missing = spots.filter(s =>
+            s.icon === "spot" && !s.whether
+        );
+
+        if (missing.length > 0) {
+            debugLog("未取得:", missing.length);
+            debugLog("例:", missing.slice(0, 2));
+        }
+
+        // ----------------
+        // サンプル確認
+        // ----------------
+        const sample = spots.find(s => s.whether);
+
+        if (sample) {
+            debugLog("sample:", sample.name);
+        }
+
+        // ----------------
+        // メモリ解放
+        // ----------------
+        spots = null;
+    }
+
+    debugLog("=== END ===");
+}
+
+// ================================
+runTest();
+
+</script>
+
+</body>
+</html>
