@@ -199,23 +199,7 @@ function loadAreaData(area) {
             return [];
         });
 }
-// ================================
-// ■ 正規化
-// ================================
-function normalizeStation(st) {
 
-    const [lat, lng] = st.latlng.split(";").map(Number);
-
-    return {
-        stationCode: st.stationCode,
-        date: st.date,
-        lat,
-        lng,
-
-        hourly: [0, 1, 2].map(i => normalizeHourly(st[`hourly${i}`])),
-        daily: st.daily.split(";").map(normalizeDaily)
-    };
-}
 // ================================
 function normalizeHourly(h) {
     return {
