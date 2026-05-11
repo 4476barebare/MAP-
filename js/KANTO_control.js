@@ -99,14 +99,20 @@ function loadCSV(filePath) {
 // ================================
 function saveCSV(filePath, spots) {
 
+    const today = new Date()
+        .toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+
     let csv = "name,date,whether\n";
 
     for (const s of spots) {
 
+        // whetherがないものは出さない（前提維持）
+        if (!s.whether) continue;
+
         csv += [
             s.name || "",
-            s.date || "",
-            s.whether ? JSON.stringify(s.whether) : ""
+            today, // ★ここが重要（出力日固定）
+            JSON.stringify(s.whether)
         ].join(",") + "\n";
     }
 
