@@ -62,45 +62,6 @@ function applyFirstStage(spots, stations) {
     return spots;
 }
 // ================================
-// ■ station → weather変換
-// ================================
-function normalizeStationToWeather(st) {
-
-    if (!st || !st.latlng) return null;
-
-    return {
-        stationCode: st.stationCode || "",
-
-        lat: Number(st.latlng.split(";")[0]),
-        lng: Number(st.latlng.split(";")[1]),
-
-        hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => {
-
-            if (!h) return { weather: [], water: 0, tide: [] };
-
-            return {
-                weather: (h.weather || []).map(w => w.split("|").map(Number)),
-                water: Number(h.water || 0),
-                tide: (h.tide || []).map(Number)
-            };
-        }),
-
-        daily: (st.daily || "")
-            .split(";")
-            .filter(Boolean)
-            .map(str => {
-
-                const parts = str.split("|");
-
-                return {
-                    weather: parts.slice(0, 3).map(Number),
-                    tide: parts.slice(3).join("|").split(",").map(Number)
-                };
-            })
-    };
-}
-
-// ================================
 // ■ メタ削除（統一用）
 // ================================
 function stripStationMeta(st) {
@@ -111,75 +72,6 @@ function stripStationMeta(st) {
         hourly: st.hourly,
         daily: st.daily
     };
-}
-
-// ================================
-// ■ 補間処理（共通コア）
-// ================================
-function interpolateStation(s1, s2, d1, d2) {
-
-    if (d1 === 0) return structuredClone(s1);
-    if (d2 === 0) return structuredClone(s2);
-
-    const w1 = 1 / d1;
-    const w2 = 1 / d2;
-
-    const lerp = (v1, v2) => (v1 * w1 + v2 * w2) / (w1 + w2);
-
-    return {
-        stationCode: "interpolated",
-
-        lat: lerp(s1.lat, s2.lat),
-        lng: lerp(s1.lng, s2.lng),
-
-        hourly: s1.hourly.map((h1, i) => {
-            const h2 = s2.hourly[i];
-
-            return {
-                weather: h1.weather.map((row, j) =>
-                    row.map((v, k) => {
-
-                        // 風向きだけ円環
-                        if (k === 5) {
-                            return lerpWind(v, h2.weather[j][k]);
-                        }
-
-                        return lerp(v, h2.weather[j][k]);
-                    })
-                ),
-
-                water: lerp(h1.water, h2.water),
-                tide: h1.tide.map((t, j) => lerp(t, h2.tide[j]))
-            };
-        }),
-
-        daily: s1.daily.map((d1_, i) => {
-            const d2_ = s2.daily[i];
-
-            return {
-                weather: d1_.weather.map((v, j) => lerp(v, d2_.weather[j])),
-                tide: d1_.tide.map((t, j) => lerp(t, d2_.tide[j]))
-            };
-        })
-    };
-}
-
-// ================================
-// ■ 風向き補間（円環）
-// ================================
-function lerpWind(a, b) {
-
-    const radA = a * Math.PI / 180;
-    const radB = b * Math.PI / 180;
-
-    const x = Math.cos(radA) + Math.cos(radB);
-    const y = Math.sin(radA) + Math.sin(radB);
-
-    let deg = Math.atan2(y, x) * 180 / Math.PI;
-
-    if (deg < 0) deg += 360;
-
-    return deg;
 }
 
 // ================================
