@@ -1,0 +1,47 @@
+name: KANTO Whether Control
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 18 * * *"  # JST 03:00 相当（UTC基準）
+    - cron: "30 18 * * *" # 03:30
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      # =========================
+      # ■ リポジトリ取得
+      # =========================
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # =========================
+      # ■ Node.jsセットアップ
+      # =========================
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # =========================
+      # ■ 実行
+      # =========================
+      - name: Run KANTO Control
+        run: |
+          node js/KANTO_control.js
+
+      # =========================
+      # ■ 生成結果をコミット
+      # =========================
+      - name: Commit results
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add data/*.csv || true
+
+          git commit -m "update whether csv" || exit 0
+
+          git push
