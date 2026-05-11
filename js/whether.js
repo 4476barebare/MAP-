@@ -85,8 +85,9 @@ function buildStationMap(stations) {
     return map;
 }
 
+
 // ================================
-// ■ station → weather変換（簡略版そのまま保持）
+// ■ station → weather変換
 // ================================
 function normalizeStationToWeather(st) {
 
@@ -98,20 +99,29 @@ function normalizeStationToWeather(st) {
         lat: Number(st.latlng.split(";")[0]),
         lng: Number(st.latlng.split(";")[1]),
 
-        hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => ({
-            weather: (h.weather || []).map(w => w.split("|").map(Number)),
-            water: Number(h.water || 0),
-            tide: (h.tide || []).map(Number)
-        })),
+        hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => {
 
-        daily: (st.daily || "").split(";").filter(Boolean).map(str => {
-            const parts = str.split("|");
+            if (!h) return { weather: [], water: 0, tide: [] };
 
             return {
-                weather: parts.slice(0, 3).map(Number),
-                tide: parts.slice(3).join("|").split(",").map(Number)
+                weather: (h.weather || []).map(w => w.split("|").map(Number)),
+                water: Number(h.water || 0),
+                tide: (h.tide || []).map(Number)
             };
-        })
+        }),
+
+        daily: (st.daily || "")
+            .split(";")
+            .filter(Boolean)
+            .map(str => {
+
+                const parts = str.split("|");
+
+                return {
+                    weather: parts.slice(0, 3).map(Number),
+                    tide: parts.slice(3).join("|").split(",").map(Number)
+                };
+            })
     };
 }
 
