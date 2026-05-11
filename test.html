@@ -203,12 +203,49 @@ async function runTest() {
         // ----------------
         // メモリ解放
         // ----------------
+        exportWhether100CSV(spots);
+
         spots = null;
     }
 
     debugLog("=== END ===");
+    
+    
 }
+function exportWhether100CSV(spots) {
 
+    const target = spots.filter(s =>
+        s.icon === "spot" && s.whether
+    );
+
+    let csv = "name,lat,lng,whether\n";
+
+    for (const s of target) {
+
+        csv += [
+            s.name || "",
+            s.lat ?? "",
+            s.lng ?? "",
+            s.whether ? JSON.stringify(s.whether) : ""
+        ].join(",") + "\n";
+    }
+
+    const blob = new Blob([csv], {
+        type: "text/csv;charset=utf-8"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "whether_100_compare.csv";
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+}
 // ================================
 runTest();
 
