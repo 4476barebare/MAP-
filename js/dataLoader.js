@@ -1198,6 +1198,10 @@ function goBack() {
     }
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
+    window.map.dragging.enable();
+    window.map.scrollWheelZoom.enable();
+    window.map.doubleClickZoom.enable();
+    window.map.touchZoom.enable();
     
     drawLocation(
         window.prefData.name,
