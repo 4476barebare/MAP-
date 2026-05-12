@@ -1002,3 +1002,20 @@ li {
 #map-menu li {
     overflow: visible;
 }
+
+.menu-header-row {
+    all: unset;              /* ← 既存のliスタイル全部無効化 */
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 8px;
+}
+
+.menu-header-row > div {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    font-size: 12px;
+    white-space: nowrap;
+}
