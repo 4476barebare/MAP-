@@ -158,8 +158,8 @@ function initAreaUI() {
     // ★ 1行目：日付＋潮名（右寄せ・常に表示）
     // =====================
     const todayTide = window.tideWeek?.[0];
-
     const headerLi = document.createElement('li');
+    headerLi.className = 'menu-header-row';
 
     const headerRow = document.createElement('div');
     headerRow.style.display = 'flex';
