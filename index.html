@@ -588,6 +588,18 @@ document.getElementById('map-back-btn')
         goBack(window.currentHash);
     }); // ← 正常に閉じてる
 
+fetch('/icon/back.svg')
+    .then(res => res.text())
+    .then(svg => {
+        const btn = document.getElementById('map-back-btn');
+        if (!btn) return;
+
+        btn.innerHTML = svg;
+
+        const svgEl = btn.querySelector('svg');
+        if (svgEl) svgEl.classList.add('back-icon');
+    }); // ← これも閉じてる
+
     // ===== ポリシーモーダル（安全版） =====
 
     const policyLink = document.getElementById("policyLink");
