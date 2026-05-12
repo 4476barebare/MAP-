@@ -521,6 +521,7 @@ li {
    BACK BUTTON
 ========================= */
 .map-back-btn {
+    display: none;
     margin-left: auto;
     margin-right: 20px;
     background: none;
