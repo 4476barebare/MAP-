@@ -546,6 +546,7 @@ li {
         black 60%,
         transparent
     );
+    pointer-events: none;
 }
 
 /* =========================
