@@ -487,19 +487,25 @@ li {
 }
 
 /* =========================
-   AD
+   map-ui-top
 ========================= */
-.map-ad {
-    display: none;
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1500;
-    pointer-events: none;
+.map-ui-top {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  left: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 2000;
+  pointer-events: none;
 }
 
-.map-ad .ad-box {
+/* =========================
+   AD
+========================= */
+.ad-box {
+    position: absolute;
     width: 320px;
     height: 50px;
     background: rgba(255, 255, 255, 0.9);
@@ -524,12 +530,12 @@ li {
     position: absolute;
     bottom: 40px;
     right: 20px;
-    z-index: 2000;
     background: none;
     border: none;
     padding: 0;
     -webkit-appearance: none;
     appearance: none;
+    pointer-events: auto;
 }
 
 .back-icon {
