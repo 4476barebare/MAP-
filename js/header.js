@@ -482,9 +482,6 @@ window.tideWeek = generateWeeklyTide();
   
 });
 
-// ==========================
-// ■ 1週間分の潮名を生成
-// ==========================
 function generateWeeklyTide() {
 
   const result = [];
@@ -500,12 +497,24 @@ function generateWeeklyTide() {
     const month = d.getMonth() + 1;
     const day = d.getDate();
 
+    // ★ここで死んでるか確認
+    if (typeof calcMoonAge !== "function") {
+      alert("calcMoonAge が未定義");
+      return [];
+    }
+
     const moonAge = calcMoonAge(d);
+
+    if (typeof getTideName !== "function") {
+      alert("getTideName が未定義");
+      return [];
+    }
+
     const tide = getTideName(moonAge);
 
     result.push({
-      date: toKey(year, month, day), // "YYYY-MM-DD"
-      tide: tide
+      date: `${year}-${month}-${day}`,
+      tide
     });
   }
 
