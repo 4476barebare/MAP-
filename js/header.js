@@ -476,5 +476,37 @@ function createMonth(year, month) {
   
 });
 
+// ==========================
+// ■ 1週間分の潮名を生成
+// ==========================
+function generateWeeklyTide() {
 
+  const result = [];
 
+  const today = new Date();
+
+  for (let i = 0; i < 7; i++) {
+
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+
+    const moonAge = calcMoonAge(d);
+    const tide = getTideName(moonAge);
+
+    result.push({
+      date: toKey(year, month, day), // "YYYY-MM-DD"
+      tide: tide
+    });
+  }
+
+  return result;
+}
+
+// ==========================
+// ■ グローバル定義
+// ==========================
+window.tideWeek = generateWeeklyTide();
