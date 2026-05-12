@@ -522,6 +522,7 @@ li {
 ========================= */
 .map-back-btn {
     display: none;
+    top: 20px;
     margin-left: auto;
     margin-right: 20px;
     background: none;
