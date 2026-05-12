@@ -453,6 +453,7 @@ function selectArea(area) {
         window.map.invalidateSize(true);
         showSpotsForArea(window.currentAreaId);
         enableAreaSwipe();
+        phase1menu(window.currentAreaId);
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
@@ -548,6 +549,27 @@ marker.on('click', function () {
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
+}
+
+function phase1menu(areaId) {
+    const menu = document.getElementById("map-menu");
+    const ul = menu?.querySelector("ul");
+    if (!ul) return;
+
+    // 仮：areaIdを使ったダミー
+    const items = [
+        { key: "dummy1", text: `${areaId} スポットA` },
+        { key: "dummy2", text: `${areaId} スポットB` },
+        { key: "dummy3", text: `${areaId} スポットC` }
+    ];
+
+    ul.innerHTML = items.map(i => `
+        <li data-key="${i.key}">
+            <span class="spot-text">${i.text}</span>
+        </li>
+    `).join("");
+
+    menu.style.display = "block";
 }
 
 function selectSpot(spot) {
