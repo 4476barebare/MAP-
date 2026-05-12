@@ -522,33 +522,20 @@ li {
 ========================= */
 .map-back-btn {
     display: none;
+    width: 36px;
+    height: 36px;
     margin-left: auto;
     margin-right: 20px;
-    background: none;
+
     border: none;
     padding: 0;
     -webkit-appearance: none;
     appearance: none;
     pointer-events: auto;
+    background: url('/icon/back.svg') center / contain no-repeat;
 }
 
-.back-icon {
-    width: 36px;
-    height: 36px;
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
-    -webkit-mask-image: linear-gradient(
-        to right,
-        black 40%,
-        rgba(0, 0, 0, 0.5) 70%,
-        transparent
-    );
-    mask-image: linear-gradient(
-        to right,
-        black 60%,
-        transparent
-    );
-    pointer-events: none;
-}
+
 
 /* =========================
    SPOT LABEL
