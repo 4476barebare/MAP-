@@ -575,16 +575,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const whetherUrl = `/data/${window.currentPref}_whether.csv`;
 
 loadLocationCSV(csvUrl, window.currentPref).then(() => {
-loadWhetherCSV(whetherUrl).then(csv => {
-    applyWhetherToSpots(csv);
-    updateStateFromHash();
-    routeUpdate();
-    renderAreaGuide();
-
-    window.markerControl.preloadShop01(shopUrl);
-
-    
-        
+    loadWhetherCSV(whetherUrl).then(csv => {
+        applyWhetherToSpots(csv);
+        updateStateFromHash();
+        routeUpdate();
+        renderAreaGuide();
+        window.markerControl.preloadShop01(shopUrl);
         renderPrefWeather();
     });
 });
