@@ -1196,8 +1196,7 @@ function goBack() {
     } else {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
-    window.map.invalidateSize(true);
-
+    
     drawLocation(
         window.prefData.name,
         window.prefData.lat,
@@ -1211,6 +1210,7 @@ function goBack() {
     initAreaUI();
     renderPrefWeather();
     document.getElementById('map-back-btn').style.display = 'none';
+    window.map.invalidateSize(true);
 }
 
 function buildSpotRestoreObject() {
