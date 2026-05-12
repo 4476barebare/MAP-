@@ -400,7 +400,6 @@ li {
     bottom: 5px;
     left: 5px;
     right: 5px;
-    
     overflow-y: auto;
     z-index: 1980;
     padding: 2px 5px;
@@ -504,10 +503,10 @@ li {
 ========================= */
 .ad-box {
     display: flex;
-    position: absolute;
     width: 320px;
     height: 50px;
     left: 50%;
+    margin-bottom: 5px;
     transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #ccc;
@@ -524,7 +523,6 @@ li {
    BACK BUTTON
 ========================= */
 .map-back-btn {
-    position: absolute;
     right: 20px;
     background: none;
     border: none;
