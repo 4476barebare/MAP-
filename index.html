@@ -583,22 +583,10 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
 });
 
 
-    document.getElementById('map-back-btn')
-        ?.addEventListener('click', () => {
-            goBack(window.currentHash);
-        });
-
-    fetch('/icon/back.svg')
-        .then(res => res.text())
-        .then(svg => {
-            const btn = document.getElementById('map-back-btn');
-            if (!btn) return;
-
-            btn.innerHTML = svg;
-
-            const svgEl = btn.querySelector('svg');
-            if (svgEl) svgEl.classList.add('back-icon');
-        });
+document.getElementById('map-back-btn')
+    ?.addEventListener('click', () => {
+        goBack(window.currentHash);
+    }); // ← 正常に閉じてる
 
     // ===== ポリシーモーダル（安全版） =====
 
