@@ -1196,12 +1196,7 @@ function goBack() {
     } else {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-    window.map.dragging.enable();
-    window.map.scrollWheelZoom.enable();
-    window.map.doubleClickZoom.enable();
-    window.map.touchZoom.enable();
+
     
     drawLocation(
         window.prefData.name,
@@ -1216,7 +1211,7 @@ function goBack() {
     initAreaUI();
     renderPrefWeather();
     document.getElementById('map-back-btn').style.display = 'none';
-    window.map.invalidateSize(true);
+    //window.map.invalidateSize(true);
 }
 
 function buildSpotRestoreObject() {
