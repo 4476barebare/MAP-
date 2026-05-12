@@ -554,22 +554,29 @@ marker.on('click', function () {
 function phase1menu(areaId) {
     const menu = document.getElementById("map-menu");
     const ul = menu?.querySelector("ul");
-    if (!ul) return;
+    if (!ul || !window.spotData) return;
 
-    // 仮：areaIdを使ったダミー
-    const items = [
-        { key: "dummy1", text: `${areaId} スポットA` },
-        { key: "dummy2", text: `${areaId} スポットB` },
-        { key: "dummy3", text: `${areaId} スポットC` }
-    ];
+    const items = window.spotData
+        .filter(s =>
+            s.areaId === areaId &&
+            (s.type === "representative" || s.type === "assistant")
+        )
+        .map(s => ({
+            key: s.id || s.name,
+            text: s.name,
+            lat: s.lat,
+            lng: s.lng
+        }));
 
     ul.innerHTML = items.map(i => `
-        <li data-key="${i.key}">
+        <li data-key="${i.key}"
+            data-lat="${i.lat}"
+            data-lng="${i.lng}">
             <span class="spot-text">${i.text}</span>
         </li>
     `).join("");
 
-    menu.style.display = "block";
+    menu.style.display = items.length ? "block" : "none";
 }
 
 function selectSpot(spot) {
