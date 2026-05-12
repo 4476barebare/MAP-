@@ -33,7 +33,6 @@ function loadLocationCSV(csvUrl) {
         .then(text => {
 
             const lines = text.trim().split('\n');
-
             let main = null;
             const areas = [];
             const spots = [];
@@ -122,26 +121,19 @@ function prepareFishForArea(areaId) {
         });
 
   return loadPromise.then(() => {
-
     if (!window.spotData) return [];
-
     const targetSpots = window.spotData.filter(
       s => s.areaId && s.areaId.trim() === areaId.trim()
     );
-
     const targetFish = window.fishData.filter(
       f => f.registration && f.registration.trim() === areaId.trim()
     );
 
     targetSpots.forEach(spot => {
-
       const fishList = targetFish
         .filter(f => f.parent && f.parent.trim() === spot.name.trim())
         .map(f => `${f.name}|${f.lat}|${f.lng}`);
-
-      // ★ここが本体（URLに格納）
-      spot.URL = fishList.join(',');
-
+        spot.URL = fishList.join(',');
     });
 
     return targetSpots;
@@ -151,7 +143,6 @@ function prepareFishForArea(areaId) {
     return [];
   });
 }
-
 
 function buildAreaGraphFromGrid(areas) {
 
@@ -269,73 +260,70 @@ function disableAreaSwipe() {
 
 function drawLocation(name, lat, lng, zoom, options = {}) {
 
-    const defaultOptions = {
-        center: [lat, lng],
-        zoom,
-        zoomControl: false,
-        scrollWheelZoom: false,
-        dragging: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        touchZoom: false,
-    };
+  const defaultOptions = {
+    center: [lat, lng],
+    zoom,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    dragging: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    touchZoom: false,
+  };
 
-    const mapOptions = { ...defaultOptions, ...options };
+  const mapOptions = { ...defaultOptions, ...options };
 
-    // 初回のみ生成
-    if (!window.map) {
+  if (!window.map) {
 
-        window.map = L.map('lf-map', mapOptions);
+    window.map = L.map('lf-map', mapOptions);
 
-        window.map.options.zoomSnap = 0.5;
-        window.map.options.zoomDelta = 0.5;
-        window.map.attributionControl.setPosition('topright');
-        
-        window.phase1Group = L.layerGroup().addTo(map);
-window.phase2Group = L.layerGroup().addTo(map);
+    window.map.options.zoomSnap = 0.5;
+    window.map.options.zoomDelta = 0.5;
+    window.map.attributionControl.setPosition('topright');
 
+    window.phase1Group = L.layerGroup().addTo(map);
+    window.phase2Group = L.layerGroup().addTo(map);
 
-window.gsiLayer = L.tileLayer(
-    window.gsiLayers.ort,
-    {
+    window.gsiLayer = L.tileLayer(
+      window.gsiLayers.ort,
+      {
         attribution: '© 国土地理院',
         keepBuffer: 8
+      }
+    ).addTo(window.map);
+
+    if (window.currentAreaId === null) {
+      showPrefSpots();
     }
-).addTo(window.map);
-        
-        if (window.currentAreaId === null) {
-            showPrefSpots();
-        }
-        return;
-    }
+    return;
+  }
 
-    window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+  window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
 
-    // UI制御だけ
-    mapOptions.scrollWheelZoom
-        ? window.map.scrollWheelZoom.enable()
-        : window.map.scrollWheelZoom.disable();
+  mapOptions.scrollWheelZoom
+    ? window.map.scrollWheelZoom.enable()
+    : window.map.scrollWheelZoom.disable();
 
-    mapOptions.dragging
-        ? window.map.dragging.enable()
-        : window.map.dragging.disable();
+  mapOptions.dragging
+    ? window.map.dragging.enable()
+    : window.map.dragging.disable();
 
-    mapOptions.doubleClickZoom
-        ? window.map.doubleClickZoom.enable()
-        : window.map.doubleClickZoom.disable();
+  mapOptions.doubleClickZoom
+    ? window.map.doubleClickZoom.enable()
+    : window.map.doubleClickZoom.disable();
 
-    mapOptions.boxZoom
-        ? window.map.boxZoom.enable()
-        : window.map.boxZoom.disable();
+  mapOptions.boxZoom
+    ? window.map.boxZoom.enable()
+    : window.map.boxZoom.disable();
 
-    mapOptions.keyboard
-        ? window.map.keyboard.enable()
-        : window.map.keyboard.disable();
+  mapOptions.keyboard
+    ? window.map.keyboard.enable()
+    : window.map.keyboard.disable();
 
-    mapOptions.touchZoom
-        ? window.map.touchZoom.enable()
-        : window.map.touchZoom.disable();
+  mapOptions.touchZoom
+    ? window.map.touchZoom.enable()
+    : window.map.touchZoom.disable();
 }
 
 function showPrefSpots() {
