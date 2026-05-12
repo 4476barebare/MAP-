@@ -502,7 +502,7 @@ li {
    AD
 ========================= */
 .ad-box {
-    display: flex;
+    display: none;
     width: 320px;
     height: 50px;
     margin: auto;
