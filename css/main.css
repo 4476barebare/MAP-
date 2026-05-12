@@ -400,7 +400,7 @@ li {
     bottom: 5px;
     left: 5px;
     right: 5px;
-    max-height: 200px;
+    
     overflow-y: auto;
     z-index: 1980;
     padding: 2px 5px;
