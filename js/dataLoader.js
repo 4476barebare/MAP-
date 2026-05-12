@@ -640,6 +640,10 @@ function renderPhase1Weather() {
         }
 
         const icon = toWeatherIcon(w.icon);
+        
+        el.style.display = "flex";
+el.style.alignItems = "center";
+el.style.gap = "2px";
 
         el.innerHTML = `
         <span>${icon}</span>
