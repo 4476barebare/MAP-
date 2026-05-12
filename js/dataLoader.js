@@ -560,23 +560,54 @@ function phase1menu(areaId) {
         .filter(s =>
             s.areaId === areaId &&
             (s.type === "representative" || s.type === "assistant")
-        )
-        .map(s => ({
-            key: s.id || s.name,
-            text: s.name,
-            lat: s.lat,
-            lng: s.lng
-        }));
+        );
 
-    ul.innerHTML = items.map(i => `
-        <li data-key="${i.key}"
-            data-lat="${i.lat}"
-            data-lng="${i.lng}">
-            <span class="spot-text">${i.text}</span>
+    ul.innerHTML = items.map(s => `
+        <li data-key="${s.id || s.name}"
+            data-area="${s.areaId}">
+            
+            <div class="row-top">${s.name}</div>
+            <div class="row-weather" id="weather-${s.areaId}"></div>
+            
         </li>
     `).join("");
 
     menu.style.display = items.length ? "block" : "none";
+
+    renderPhase1Weather();
+}
+
+function renderPhase1Weather() {
+    const elements = document.querySelectorAll('.row-weather');
+
+    elements.forEach(el => {
+        const areaId = el.id.replace('weather-', '');
+
+        const rep = window.spotData.find(s =>
+            s.areaId === areaId &&
+            s.type === 'representative'
+        );
+
+        if (!rep || !rep.whether) {
+            el.textContent = 'no data';
+            return;
+        }
+
+        const w = formatPrefWeather(rep.whether);
+        if (!w) {
+            el.textContent = 'no data';
+            return;
+        }
+
+        const icon = toWeatherIcon(w.icon);
+
+        el.innerHTML = `
+            <span>${icon}</span>
+            <span>${w.temp}°</span>
+            <span>${w.pop}%</span>
+            <span>${w.wind}m/s</span>
+        `;
+    });
 }
 
 function selectSpot(spot) {
