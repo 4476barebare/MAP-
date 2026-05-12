@@ -1196,6 +1196,8 @@ function goBack() {
     } else {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
     
     drawLocation(
         window.prefData.name,
