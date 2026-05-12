@@ -387,11 +387,13 @@ function createMonth(year, month) {
     today.getDate()
   );
 
+  let debugShown = false; // ★追加（今日検出1回だけ）
+
   let html = `<div class="month">`;
   html += `<div class="month-title">${year} ${month}月</div>`;
   html += `<div class="calendar-grid">`;
 
-  // ★曜日ヘッダー（ここだけ追加）
+  // ★曜日ヘッダー
   html += WEEK_LABELS.map(d => `<div class="cell week-head">${d}</div>`).join("");
 
   // 空白
@@ -413,6 +415,17 @@ function createMonth(year, month) {
     if (key < todayStr) cls += " past";
     if (key === todayStr) cls += " today";
 
+    // ★今日だけアラート（1回だけ）
+    if (key === todayStr && !debugShown) {
+      debugShown = true;
+
+      alert(
+        `今日検出OK\n` +
+        `日付: ${key}\n` +
+        `潮名: ${tide}`
+      );
+    }
+
     html += `
       <div class="${cls}">
         <div class="day">${d}</div>
@@ -424,7 +437,6 @@ function createMonth(year, month) {
   html += `</div></div>`;
   return html;
 }
-
   // -------------------------
   // カレンダー描画
   // -------------------------
@@ -476,48 +488,11 @@ function createMonth(year, month) {
   // ==========================
 // ■ グローバル定義
 // ==========================
-window.tideWeek = generateWeeklyTide();
+
   
   
   
 });
 
-function generateWeeklyTide() {
 
-  const result = [];
-
-  const today = new Date();
-
-  for (let i = 0; i < 7; i++) {
-
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-
-    const year = d.getFullYear();
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-
-    // ★ここで死んでるか確認
-    if (typeof calcMoonAge !== "function") {
-      alert("calcMoonAge が未定義");
-      return [];
-    }
-
-    const moonAge = calcMoonAge(d);
-
-    if (typeof getTideName !== "function") {
-      alert("getTideName が未定義");
-      return [];
-    }
-
-    const tide = getTideName(moonAge);
-
-    result.push({
-      date: `${year}-${month}-${day}`,
-      tide
-    });
-  }
-
-  return result;
-}
 
