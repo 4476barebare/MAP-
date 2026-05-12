@@ -1196,13 +1196,8 @@ function goBack() {
     } else {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
+    document.getElementById('map-back-btn').style.display = 'none';
 
-    // ① UIを先に確定させる
-document.getElementById('map-back-btn').style.display = 'none';
-
-initAreaUI();
-showPrefSpots();
-renderPrefWeather();
 
 // ② 1フレーム待つ
 requestAnimationFrame(() => {
@@ -1217,6 +1212,11 @@ requestAnimationFrame(() => {
         window.prefData.lng,
         window.prefData.zoom
     );
+    location.hash = '';
+    updateStateFromHash();
+    initAreaUI();
+    showPrefSpots();
+    renderPrefWeather();
 
 });
 }
