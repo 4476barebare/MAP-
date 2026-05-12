@@ -271,76 +271,49 @@ function renderAdBlock() {
 
 
 
-
-// =========================
-// DOM読み込み後に1回だけ実行
-// =========================
 document.addEventListener("DOMContentLoaded", function () {
-
-// ===== ニュースモーダル =====
 
 const newsLink = document.getElementById("newsBtn");
 const newsModal = document.getElementById("newsModal");
 
 if (newsLink && newsModal) {
-
-  // 開く
   newsLink.addEventListener("click", (e) => {
     e.preventDefault();
     newsModal.style.display = "block";
-
-    // ★開いたタイミングで読み込む
     loadNews();
   });
 
-  // 背景クリックで閉じる
   newsModal.addEventListener("click", (e) => {
     if (e.target === newsModal) {
       newsModal.style.display = "none";
     }
   });
-
 }
 
-  // =========================
-  // カレンダー（オーバーレイ）
-  // =========================
-  const calendarBtn = document.getElementById("calendarBtn");
-  const calendarOverlay = document.getElementById("calendarOverlay");
-  const closeCalendar = document.getElementById("closeCalendar");
-  const calendarWrapper = document.getElementById("calendarWrapper");
+const calendarBtn = document.getElementById("calendarBtn");
+const calendarOverlay = document.getElementById("calendarOverlay");
+const closeCalendar = document.getElementById("closeCalendar");
+const calendarWrapper = document.getElementById("calendarWrapper");
 
-  // -------------------------
-  // 日付ユーティリティ
-  // -------------------------
-  function pad(n){ return n.toString().padStart(2,'0'); }
+function pad(n){ return n.toString().padStart(2,"0"); }
 
-  function toKey(y,m,d){
-    return `${y}-${pad(m)}-${pad(d)}`;
-  }
+function toKey(y,m,d){
+  return `${y}-${pad(m)}-${pad(d)}`;
+}
 
-  // -------------------------
-  // 月齢（簡易）
-  // -------------------------
-  function calcMoonAge(date) {
-    const synodicMonth = 29.53058867;
-    const base = new Date(2000, 0, 6);
-    const diff = date - base;
-    const days = diff / (1000 * 60 * 60 * 24);
+function calcMoonAge(date) {
+  const synodicMonth = 29.53058867;
+  const base = new Date(2000, 0, 6);
+  const diff = date - base;
+  const days = diff / (1000 * 60 * 60 * 24);
+  return (days % synodicMonth + synodicMonth) % synodicMonth;
+}
 
-    return (days % synodicMonth + synodicMonth) % synodicMonth;
-  }
-
-  // -------------------------
-  // 5潮分類
-  // -------------------------
 function getTideName(moonAge) {
   const age = Math.floor(moonAge);
 
-  // 大潮（新月・満月付近）
   if (age === 0 || age === 14 || age === 15) return "大潮";
 
-  // 中潮
   if (
     (age >= 1 && age <= 2) ||
     (age >= 12 && age <= 13) ||
@@ -348,7 +321,6 @@ function getTideName(moonAge) {
     (age >= 27 && age <= 28)
   ) return "中潮";
 
-  // 小潮
   if (
     (age >= 3 && age <= 4) ||
     (age >= 10 && age <= 11) ||
@@ -356,7 +328,6 @@ function getTideName(moonAge) {
     (age >= 25 && age <= 26)
   ) return "小潮";
 
-  // 長潮
   if (
     (age >= 5 && age <= 6) ||
     (age >= 8 && age <= 9) ||
@@ -364,14 +335,10 @@ function getTideName(moonAge) {
     (age >= 23 && age <= 24)
   ) return "長潮";
 
-  // 残り
   return "若潮";
 }
 
-  // -------------------------
-  // 月生成
-  // -------------------------
-const WEEK_LABELS = ["日", "月", "火", "水", "木", "金", "土"];
+const WEEK_LABELS = ["日","月","火","水","木","金","土"];
 
 function createMonth(year, month) {
   const first = new Date(year, month - 1, 1);
@@ -387,21 +354,18 @@ function createMonth(year, month) {
     today.getDate()
   );
 
-  let debugShown = false; // ★追加（今日検出1回だけ）
+  let debugShown = false;
 
   let html = `<div class="month">`;
   html += `<div class="month-title">${year} ${month}月</div>`;
   html += `<div class="calendar-grid">`;
 
-  // ★曜日ヘッダー
   html += WEEK_LABELS.map(d => `<div class="cell week-head">${d}</div>`).join("");
 
-  // 空白
   for (let i = 0; i < startDay; i++) {
     html += `<div class="cell empty"></div>`;
   }
 
-  // 日付
   for (let d = 1; d <= daysInMonth; d++) {
 
     const date = new Date(year, month - 1, d);
@@ -415,15 +379,13 @@ function createMonth(year, month) {
     if (key < todayStr) cls += " past";
     if (key === todayStr) cls += " today";
 
-    // ★今日だけアラート（1回だけ）
     if (key === todayStr && !debugShown) {
       debugShown = true;
 
-      alert(
-        `今日検出OK\n` +
-        `日付: ${key}\n` +
-        `潮名: ${tide}`
-      );
+      window.todayTide = {
+        date: key,
+        tide: tide
+      };
     }
 
     html += `
@@ -437,62 +399,42 @@ function createMonth(year, month) {
   html += `</div></div>`;
   return html;
 }
-  // -------------------------
-  // カレンダー描画
-  // -------------------------
-  function renderCalendar(year, month) {
-    if (!calendarWrapper) return;
 
-    calendarWrapper.innerHTML =
-      createMonth(year, month - 1) +
-      createMonth(year, month) +
-      createMonth(year, month + 1);
-      
-      
+function renderCalendar(year, month) {
+  if (!calendarWrapper) return;
 
-  }
+  calendarWrapper.innerHTML =
+    createMonth(year, month - 1) +
+    createMonth(year, month) +
+    createMonth(year, month + 1);
+}
 
-  // -------------------------
-  // 初期化＆イベント
-  // -------------------------
-  if (calendarBtn && calendarOverlay && closeCalendar && calendarWrapper) {
+if (calendarBtn && calendarOverlay && closeCalendar && calendarWrapper) {
 
-    const today = new Date();
-    const baseYear = today.getFullYear();
-    const baseMonth = today.getMonth() + 1;
+  const today = new Date();
+  const baseYear = today.getFullYear();
+  const baseMonth = today.getMonth() + 1;
 
-    renderCalendar(baseYear, baseMonth);
+  renderCalendar(baseYear, baseMonth);
 
-    calendarBtn.addEventListener("click", (e)=>{
-      e.preventDefault();
-      calendarOverlay.style.display = "flex";
-        // ★ここでやる
-  requestAnimationFrame(() => {
-    calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
+  calendarBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    calendarOverlay.style.display = "flex";
+
+    requestAnimationFrame(() => {
+      calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
+    });
   });
-      
-      
-    });
 
-    closeCalendar.addEventListener("click", ()=>{
+  closeCalendar.addEventListener("click", () => {
+    calendarOverlay.style.display = "none";
+  });
+
+  calendarOverlay.addEventListener("click", (e) => {
+    if (e.target === calendarOverlay) {
       calendarOverlay.style.display = "none";
-    });
+    }
+  });
+}
 
-    calendarOverlay.addEventListener("click", (e)=>{
-      if (e.target === calendarOverlay) {
-        calendarOverlay.style.display = "none";
-      }
-    });
-  }
-  
-  // ==========================
-// ■ グローバル定義
-// ==========================
-
-  
-  
-  
 });
-
-
-
