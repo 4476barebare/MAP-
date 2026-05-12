@@ -998,3 +998,7 @@ li {
     opacity: 0.6;
 
 }
+
+#map-menu li {
+    overflow: visible;
+}
