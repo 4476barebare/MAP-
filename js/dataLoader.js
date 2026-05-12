@@ -1223,6 +1223,7 @@ function goBack() {
 
     document.getElementById('map-back-btn').style.display = 'none';
     initAreaUI();
+    renderPrefWeather();
 }
 
 function buildSpotRestoreObject() {
