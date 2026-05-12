@@ -174,14 +174,9 @@ function initAreaUI() {
     const headerText = document.createElement('div');
     headerText.style.fontSize = '12px';
     headerText.style.whiteSpace = 'nowrap';
-if (!window.tideWeek) {
-  headerText.textContent = "tideWeek: undefined";
-} else if (!window.tideWeek[0]) {
-  headerText.textContent = "tideWeek[0]: undefined";
-} else {
-  const t = window.tideWeek[0];
-  headerText.textContent = t.date + " " + t.tide;
-}
+
+  headerText.textContent = "test";
+
 
     headerRow.appendChild(headerText);
     headerLi.appendChild(headerRow);
