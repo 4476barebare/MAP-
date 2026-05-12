@@ -148,68 +148,98 @@ function showDebug(msg, clear = false) {
 // PREF / AREA UI
 // =======================
 function initAreaUI() {
-    document.getElementById('map-menu').style.display = 'block';
-    const menuUl = document.querySelector('#map-menu ul');
-    if (!menuUl) return;
+    const menu = document.getElementById('map-menu');
+    menu.style.display = 'block';
 
-    menuUl.innerHTML = '';
+    const ul = menu.querySelector('ul');
+    if (!ul) return;
 
-    // =====================
-    // ★ 1行目：日付＋潮名（統一構造）
-    // =====================
+    ul.innerHTML = '';
+
     const todayTide = window.tideWeek?.[0];
 
+    // =====================
+    // ★ 1行目（ヘッダー）
+    // =====================
     const headerLi = document.createElement('li');
     headerLi.className = 'menu-header-row';
+    headerLi.style.pointerEvents = 'none';
+    headerLi.style.padding = '4px 8px';
 
-    const headerText = document.createElement('span');
-    headerText.className = 'spot-text';
+    const headerRow = document.createElement('div');
+    headerRow.style.display = 'flex';
+    headerRow.style.justifyContent = 'flex-end';
+    headerRow.style.width = '100%';
+
+    const headerText = document.createElement('div');
+    headerText.style.fontSize = '12px';
+    headerText.style.whiteSpace = 'nowrap';
     headerText.textContent = todayTide
         ? `${todayTide.date.slice(5)} ${todayTide.tide}`
         : '';
 
-    headerLi.appendChild(headerText);
+    headerRow.appendChild(headerText);
+    headerLi.appendChild(headerRow);
 
-    headerLi.style.pointerEvents = 'none';
-    headerLi.style.padding = '4px 8px';
-
-    menuUl.appendChild(headerLi);
+    ul.appendChild(headerLi);
 
     // =====================
-    // ★ 各エリア行（spot-menuと完全統一構造）
+    // ★ 各エリア行（元構造維持）
     // =====================
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
-        li.dataset.key = area.id || area.name;
+        li.style.position = 'relative';
 
-        const text = document.createElement('span');
-        text.className = 'spot-text';
-        text.textContent = area.name;
+        const areaName = (area.name || '').trim();
 
-        li.appendChild(text);
+        // 左右レイアウト
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.width = '100%';
+        row.style.cursor = 'pointer';
 
-        // クリック処理（li単位に統一）
-        li.onclick = () => {
-            const areaName = (area.name || '').trim();
-
+        row.onclick = () => {
             location.hash = encodeURIComponent(areaName);
             updateStateFromHash();
             destroyAreaUI();
             selectArea(area);
         };
 
-        menuUl.appendChild(li);
+        // 左（ボタン）
+        const left = document.createElement('div');
+        left.style.flex = '1';
+
+        const btn = document.createElement('button');
+        btn.textContent = areaName;
+        btn.style.width = '100%';
+        btn.onclick = null;
+
+        left.appendChild(btn);
+
+        // 右（天気）
+        const right = document.createElement('div');
+        right.id = area.areaId + '_' + area.individualId;
+        right.className = 'pref-weather';
+        right.textContent = "loading…";
+
+        row.appendChild(left);
+        row.appendChild(right);
+
+        li.appendChild(row);
+
+        ul.appendChild(li);
     });
 
     // =====================
-    // ★ クリックで最寄りエリア選択
+    // クリック処理
     // =====================
     window.nearestClickHandler = function(e) {
 
         if (!window.nearestClickEnabled) return;
 
-        const rect = document.getElementById('map-menu').getBoundingClientRect();
+        const rect = menu.getBoundingClientRect();
 
         if (
             e.originalEvent.clientX >= rect.left &&
@@ -235,12 +265,9 @@ function initAreaUI() {
 
         if (!nearest) return;
 
-        const name = (nearest.name || '').trim();
-
-        location.hash = encodeURIComponent(name);
+        location.hash = encodeURIComponent(nearest.name);
         updateStateFromHash();
         destroyAreaUI();
-
         selectArea(nearest);
     };
 
