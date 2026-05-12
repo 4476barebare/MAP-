@@ -144,6 +144,11 @@ function showDebug(msg, clear = false) {
 
     debugEl.textContent += msg + "\n";
 }
+
+function formatDate(str) {
+  const [y, m, d] = str.split("-");
+  return `${y} ${Number(m)}/${Number(d)}`;
+}
 // =======================
 // PREF / AREA UI
 // =======================
@@ -174,7 +179,8 @@ function initAreaUI() {
     const headerText = document.createElement('div');
     headerText.style.fontSize = '12px';
     headerText.style.whiteSpace = 'nowrap';
-  headerText.textContent = window.todayTide.date+" "+window.todayTide.tide;
+
+  headerText.textContent = formatDate(window.todayTide.date)+" "+window.todayTide.tide;
 
 
     headerRow.appendChild(headerText);
