@@ -495,9 +495,6 @@ li {
   width: 100%;
   margin-right: auto;
   margin-left: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   z-index: 2000;
   pointer-events: none;
 }
@@ -510,6 +507,8 @@ li {
     position: absolute;
     width: 320px;
     height: 50px;
+    left: 50%;
+    transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #ccc;
     align-items: center;
