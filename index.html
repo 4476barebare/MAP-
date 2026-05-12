@@ -105,7 +105,6 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/js/header.js"></script>
-<script src="/js/whether.js"></script>
 <script src="/js/markerControl.js"></script>
 <script src="/js/dataLoader.js"></script>
 
@@ -540,7 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const csvUrl = `/KANTO/${window.currentPref}_location.csv`;
     const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
-    window.fishUrl = `/KANTO/${window.currentPref}_fish.csv`; // ←追加
+    window.fishUrl = `/KANTO/${window.currentPref}_fish.csv`;
+    const whetherUrl = `/data/${window.currentPref}_whether.csv`;
 
 loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
@@ -550,32 +550,22 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
     window.markerControl.preloadShop01(shopUrl);
 
-    loadAreaData("KANTO")
-        .then(stations => {
+    loadWhetherCSV(whetherUrl)
 
-            // -------------------------
-            // ■ FirstStage
-            // -------------------------
-            applyFirstStage(window.spotData, stations);
-           setTimeout(() => {
-   renderPrefWeather();
-}, 50);
-            
+        .then(csv => {
 
-            // -------------------------
-            // ■ SecondStage
-            //applySecondStage(window.spotData);
+            applyWhetherToSpots(csv);
 
-            // -------------------------
-            // ■ ThirdStage（追加）
-            //applyThirdStage(window.spotData);
+            renderPrefWeather();
 
-          //downloadSpotCSV(window.spotData);
+        })
 
-       })
-         .catch(e => {
-             console.error("loadAreaData error:", e);
-         });
+        .catch(e => {
+
+            console.error("whether csv load error:", e);
+
+        });
+
 
 });
 
@@ -650,6 +640,79 @@ function renderAreaGuide() {
 }
 
 });
+
+function loadWhetherCSV(url) {
+
+    return fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error("whether csv fetch失敗");
+            return res.text();
+        })
+        .then(text => {
+
+            const lines = text.trim().split("\n");
+
+            // ヘッダーは使わない（固定3列前提）
+            lines.shift();
+
+            return lines.map(line => {
+
+                const obj = splitCSVLine(line);
+
+                if (!obj) return null;
+
+                return obj;
+
+            }).filter(Boolean);
+        });
+}
+
+
+// ================================
+// ■ CSV → spotへ反映
+// ================================
+function applyWhetherToSpots(csvData) {
+
+    const map = {};
+
+    for (const row of csvData) {
+
+        if (!row.name || !row.whether) continue;
+
+        try {
+            map[row.name] = JSON.parse(row.whether);
+        } catch (e) {
+            continue;
+        }
+    }
+
+    for (const spot of window.spotData) {
+
+        // ★ undefinedチェックに変更
+        if (map[spot.name] !== undefined) {
+            spot.whether = map[spot.name];
+        }
+    }
+}
+
+
+// ================================
+// ■ 安全CSV分割（3カラム固定）
+// ================================
+function splitCSVLine(line) {
+
+    const first = line.indexOf(",");
+    if (first === -1) return null;
+
+    const second = line.indexOf(",", first + 1);
+    if (second === -1) return null;
+
+    const name = line.slice(0, first);
+    const date = line.slice(first + 1, second);
+    const whether = line.slice(second + 1);
+
+    return { name, date, whether };
+}
 
 function openArea(areaKey) {
 
