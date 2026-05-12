@@ -154,10 +154,32 @@ function initAreaUI() {
 
     menuUl.innerHTML = '';
 
+    // ★ 今日の潮データ（header.jsで生成済み前提）
+    const todayTide = window.tideWeek?.[0];
+    const tideText = todayTide
+        ? `${todayTide.date.slice(5)} ${todayTide.tide}`
+        : '';
+
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
         li.style.position = 'relative'; // ★ これ必須
+
+        // =====================
+        // ★ 上：日付＋潮名
+        // =====================
+        const topRight = document.createElement('div');
+
+        topRight.style.position = 'absolute';
+        topRight.style.top = '-14px';
+        topRight.style.right = '4px';
+        topRight.style.fontSize = '11px';
+        topRight.style.whiteSpace = 'nowrap';
+        topRight.style.pointerEvents = 'none';
+
+        topRight.textContent = tideText;
+
+        li.appendChild(topRight);
 
         // =====================
         // ラッパー
@@ -180,12 +202,11 @@ function initAreaUI() {
         // 左：ボタン
         // =====================
         const left = document.createElement('div');
-        left.style.flex = '1'; // ★ 幅確保
+        left.style.flex = '1';
 
         const btn = document.createElement('button');
-
         btn.textContent = areaName;
-        btn.style.width = '100%'; // ★ 横いっぱい使う
+        btn.style.width = '100%';
         btn.onclick = null;
 
         left.appendChild(btn);
