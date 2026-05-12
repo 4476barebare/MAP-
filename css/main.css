@@ -505,9 +505,7 @@ li {
     display: flex;
     width: 320px;
     height: 50px;
-    left: 50%;
-    margin-bottom: 5px;
-    transform: translateX(-50%);
+    margin: auto;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid #ccc;
     align-items: center;
