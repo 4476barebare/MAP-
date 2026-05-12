@@ -556,21 +556,41 @@ function phase1menu(areaId) {
     const ul = menu?.querySelector("ul");
     if (!ul || !window.spotData) return;
 
-    const items = window.spotData
-        .filter(s =>
-            s.areaId === areaId &&
-            (s.type === "representative" || s.type === "assistant")
-        );
+    // -------------------------
+    // データ抽出
+    // -------------------------
+    const items = window.spotData.filter(s =>
+        s.areaId === areaId &&
+        (s.type === "representative" || s.type === "assistant")
+    );
 
-    ul.innerHTML = items.map(s => `
-        <li data-key="${s.id || s.name}"
-            data-area="${s.areaId}">
-            
+    // -------------------------
+    // ヘッダー生成（prefと同じ）
+    // -------------------------
+    const header = `
+        <li class="menu-header-row" style="pointer-events:none; padding:4px 8px;">
+            <div style="display:flex; justify-content:flex-end; width:100%;">
+                <div>
+                    ${formatDate(window.todayTide?.date)} ${window.todayTide?.tide}
+                </div>
+            </div>
+        </li>
+    `;
+
+    // -------------------------
+    // 各行
+    // -------------------------
+    const list = items.map(s => `
+        <li data-key="${s.id || s.name}">
             <div class="row-top">${s.name}</div>
             <div class="row-weather" id="weather-${s.areaId}"></div>
-            
         </li>
     `).join("");
+
+    // -------------------------
+    // DOM反映
+    // -------------------------
+    ul.innerHTML = header + list;
 
     menu.style.display = items.length ? "block" : "none";
 
