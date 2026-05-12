@@ -1016,4 +1016,9 @@ li {
     width: 100%;
     font-size: 12px;
     white-space: nowrap;
+    box-shadow:
+    1px 0 #191970,
+   -1px 0 #191970,
+    0 1px #191970,
+    0 -1px #191970;
 }
