@@ -565,7 +565,7 @@ function phase1menu(areaId) {
     );
 
     // -------------------------
-    // ヘッダー生成（prefと同じ）
+    // ヘッダー（pref流用）
     // -------------------------
     const header = `
         <li class="menu-header-row" style="pointer-events:none; padding:4px 8px;">
@@ -578,7 +578,7 @@ function phase1menu(areaId) {
     `;
 
     // -------------------------
-    // 各行
+    // 各行（名前＋天気用DIV）
     // -------------------------
     const list = items.map(s => `
         <li data-key="${s.id || s.name}">
@@ -588,13 +588,33 @@ function phase1menu(areaId) {
     `).join("");
 
     // -------------------------
-    // DOM反映
+    // 描画
     // -------------------------
     ul.innerHTML = header + list;
-
     menu.style.display = items.length ? "block" : "none";
 
+    // -------------------------
+    // 天気描画（既存流用）
+    // -------------------------
     renderPhase1Weather();
+
+    // -------------------------
+    // クリックイベント（委譲）
+    // -------------------------
+    ul.onclick = (e) => {
+        const li = e.target.closest("li");
+        if (!li || li.classList.contains("menu-header-row")) return;
+
+        const key = li.dataset.key;
+
+        const spot = window.spotData.find(s =>
+            (s.id || s.name) === key
+        );
+
+        if (!spot) return;
+
+        selectSpot(spot);
+    };
 }
 
 function renderPhase1Weather() {
