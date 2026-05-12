@@ -1196,6 +1196,7 @@ function goBack() {
     } else {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
+    window.map.invalidateSize(true);
 
     drawLocation(
         window.prefData.name,
@@ -1206,7 +1207,7 @@ function goBack() {
 
     location.hash = '';
     showPrefSpots();
-    window.map.invalidateSize(true);
+    
     initAreaUI();
     renderPrefWeather();
     document.getElementById('map-back-btn').style.display = 'none';
