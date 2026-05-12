@@ -473,6 +473,12 @@ function createMonth(year, month) {
     });
   }
   
+  // ==========================
+// ■ グローバル定義
+// ==========================
+window.tideWeek = generateWeeklyTide();
+  
+  
   
 });
 
@@ -506,7 +512,3 @@ function generateWeeklyTide() {
   return result;
 }
 
-// ==========================
-// ■ グローバル定義
-// ==========================
-window.tideWeek = generateWeeklyTide();
