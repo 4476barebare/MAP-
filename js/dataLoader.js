@@ -621,10 +621,10 @@ function renderPhase1Weather() {
     const elements = document.querySelectorAll('.row-weather');
 
     elements.forEach(el => {
-        const areaId = el.id.replace('weather-', '');
+        const key = el.id.replace('weather-', '');
 
         const rep = window.spotData.find(s =>
-            s.areaId === areaId &&
+            (s.id || s.name) === key &&
             s.type === 'representative'
         );
 
@@ -640,12 +640,19 @@ function renderPhase1Weather() {
         }
 
         const icon = toWeatherIcon(w.icon);
+        const temp = Math.round(w.temp);
+        const pop  = Math.round(w.pop);
+        const wind = Math.round(w.wind);
 
+        // ★ prefと完全同一レイアウト
         el.innerHTML = `
             <span>${icon}</span>
-            <span>${w.temp}°</span>
-            <span>${w.pop}%</span>
-            <span>${w.wind}m/s</span>
+            <div style="width: 12px">${temp}</div>
+            <span style="font-size: 8px;">°C 降水</span>
+            <div style="width: 12px">${pop}</div>
+            <span style="font-size: 8px;">%</span>
+            <div style="width: 12px">${wind}</div>
+            <span style="font-size: 8px;">m/s</span>
         `;
     });
 }
