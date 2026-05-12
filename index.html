@@ -154,22 +154,44 @@ function initAreaUI() {
 
     menuUl.innerHTML = '';
 
-    // ★ 今日の潮データ（header.jsで生成済み前提）
+    // =====================
+    // ★ 1行目：日付＋潮名（右寄せ）
+    // =====================
     const todayTide = window.tideWeek?.[0];
-    const tideText = todayTide
-        ? `${todayTide.date.slice(5)} ${todayTide.tide}`
-        : '';
 
+    if (todayTide) {
+        const headerLi = document.createElement('li');
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'flex-end';
+        row.style.alignItems = 'center';
+        row.style.width = '100%';
+
+        const text = document.createElement('div');
+        text.textContent = `${todayTide.date.slice(5)} ${todayTide.tide}`;
+        text.style.fontSize = '12px';
+        text.style.whiteSpace = 'nowrap';
+
+        row.appendChild(text);
+        headerLi.appendChild(row);
+
+        headerLi.style.pointerEvents = 'none';
+        headerLi.style.padding = '4px 8px';
+
+        menuUl.appendChild(headerLi);
+    }
+
+    // =====================
+    // ★ 各エリア行（既存そのまま）
+    // =====================
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
-        li.style.position = 'relative'; // ★ これ必須
+        li.style.position = 'relative';
 
-        // =====================
-        // ★ 上：日付＋潮名
-        // =====================
+        // ---（※各行の潮表示を残す場合はここそのまま）---
         const topRight = document.createElement('div');
-
         topRight.style.position = 'absolute';
         topRight.style.top = '-14px';
         topRight.style.right = '4px';
@@ -177,30 +199,29 @@ function initAreaUI() {
         topRight.style.whiteSpace = 'nowrap';
         topRight.style.pointerEvents = 'none';
 
-        topRight.textContent = tideText;
+        topRight.textContent = todayTide
+            ? `${todayTide.date.slice(5)} ${todayTide.tide}`
+            : '';
 
         li.appendChild(topRight);
+        // ---ここまで---
 
-        // =====================
-        // ラッパー
-        // =====================
         const areaName = (area.name || '').trim();
+
         const row = document.createElement('div');
         row.style.display = 'flex';
         row.style.alignItems = 'center';
-        
+        row.style.cursor = 'pointer';
+        row.style.width = '100%';
+
         row.onclick = () => {
             location.hash = encodeURIComponent(areaName);
             updateStateFromHash();
             destroyAreaUI();
             selectArea(area);
         };
-        row.style.cursor = 'pointer';
-        row.style.width = '100%';
 
-        // =====================
         // 左：ボタン
-        // =====================
         const left = document.createElement('div');
         left.style.flex = '1';
 
@@ -211,23 +232,22 @@ function initAreaUI() {
 
         left.appendChild(btn);
 
-        // =====================
-        // 右：天気スペース
-        // =====================
+        // 右：天気
         const right = document.createElement('div');
         right.id = area.areaId + '_' + area.individualId;
         right.className = 'pref-weather';
         right.textContent = "loading…";
 
-        // =====================
         // 組み立て
-        // =====================
         row.appendChild(left);
         li.appendChild(row);
         li.appendChild(right);
         menuUl.appendChild(li);
     });
 
+    // =====================
+    // ★ クリックで最寄りエリア選択
+    // =====================
     window.nearestClickHandler = function(e) {
 
         if (!window.nearestClickEnabled) return;
