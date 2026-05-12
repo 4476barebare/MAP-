@@ -1197,7 +1197,20 @@ function goBack() {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
 
-    
+    // ① UIを先に確定させる
+document.getElementById('map-back-btn').style.display = 'none';
+
+initAreaUI();
+showPrefSpots();
+renderPrefWeather();
+
+// ② 1フレーム待つ
+requestAnimationFrame(() => {
+
+    // ③ サイズ確定後に通知
+    window.map.invalidateSize(true);
+
+    // ④ その後に移動
     drawLocation(
         window.prefData.name,
         window.prefData.lat,
@@ -1205,13 +1218,7 @@ function goBack() {
         window.prefData.zoom
     );
 
-    location.hash = '';
-    showPrefSpots();
-    
-    initAreaUI();
-    renderPrefWeather();
-    document.getElementById('map-back-btn').style.display = 'none';
-    //window.map.invalidateSize(true);
+});
 }
 
 function buildSpotRestoreObject() {
