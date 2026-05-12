@@ -1197,6 +1197,7 @@ function goBack() {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
 
+alert("1");
     drawLocation(
         window.prefData.name,
         window.prefData.lat,
@@ -1205,13 +1206,16 @@ function goBack() {
     );
 
     location.hash = '';
+alert("2");
     showPrefSpots();
 
     window.map.invalidateSize(true);
-
+alert("3");
     document.getElementById('map-back-btn').style.display = 'none';
     initAreaUI();
+    alert("4");
     renderPrefWeather();
+    alert("5");
 }
 
 function buildSpotRestoreObject() {
