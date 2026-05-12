@@ -174,9 +174,7 @@ function initAreaUI() {
     const headerText = document.createElement('div');
     headerText.style.fontSize = '12px';
     headerText.style.whiteSpace = 'nowrap';
-    headerText.textContent = 'test'+todayTide
-        ? `${todayTide.date.slice(5)} ${todayTide.tide}`
-        : '';
+    headerText.textContent = "test";
 
     headerRow.appendChild(headerText);
     headerLi.appendChild(headerRow);
