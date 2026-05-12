@@ -155,42 +155,43 @@ function initAreaUI() {
     menuUl.innerHTML = '';
 
     // =====================
-    // ★ 1行目：日付＋潮名（右寄せ）
+    // ★ 1行目：日付＋潮名（右寄せ・常に表示）
     // =====================
     const todayTide = window.tideWeek?.[0];
 
-    if (todayTide) {
-        const headerLi = document.createElement('li');
+    const headerLi = document.createElement('li');
 
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.justifyContent = 'flex-end';
-        row.style.alignItems = 'center';
-        row.style.width = '100%';
+    const headerRow = document.createElement('div');
+    headerRow.style.display = 'flex';
+    headerRow.style.justifyContent = 'flex-end';
+    headerRow.style.alignItems = 'center';
+    headerRow.style.width = '100%';
 
-        const text = document.createElement('div');
-        text.textContent = `${todayTide.date.slice(5)} ${todayTide.tide}`;
-        text.style.fontSize = '12px';
-        text.style.whiteSpace = 'nowrap';
+    const headerText = document.createElement('div');
+    headerText.textContent = todayTide
+        ? `${todayTide.date.slice(5)} ${todayTide.tide}`
+        : '';
 
-        row.appendChild(text);
-        headerLi.appendChild(row);
+    headerText.style.fontSize = '12px';
+    headerText.style.whiteSpace = 'nowrap';
 
-        headerLi.style.pointerEvents = 'none';
-        headerLi.style.padding = '4px 8px';
+    headerRow.appendChild(headerText);
+    headerLi.appendChild(headerRow);
 
-        menuUl.appendChild(headerLi);
-    }
+    headerLi.style.pointerEvents = 'none';
+    headerLi.style.padding = '4px 8px';
+
+    menuUl.appendChild(headerLi);
 
     // =====================
-    // ★ 各エリア行（既存そのまま）
+    // ★ 各エリア行（既存）
     // =====================
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
         li.style.position = 'relative';
 
-        // ---（※各行の潮表示を残す場合はここそのまま）---
+        // --- 各行の右上：潮表示 ---
         const topRight = document.createElement('div');
         topRight.style.position = 'absolute';
         topRight.style.top = '-14px';
@@ -204,7 +205,6 @@ function initAreaUI() {
             : '';
 
         li.appendChild(topRight);
-        // ---ここまで---
 
         const areaName = (area.name || '').trim();
 
@@ -288,6 +288,8 @@ function initAreaUI() {
     window.nearestClickEnabled = true;
     window.map.on('click', window.nearestClickHandler);
 }
+
+
 
 // =======================
 // UI解除
