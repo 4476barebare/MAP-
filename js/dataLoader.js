@@ -1192,6 +1192,7 @@ function goBack() {
     // ① phase2 → phase1（z >= 14）
     // =====================================================
     if (z >= 14) {
+        document.getElementById("nearest-spot")?.textContent = "";
         stopZoomGuard();
         
         // map操作復帰
@@ -1236,6 +1237,7 @@ function goBack() {
     // =====================================================
     if (z === 13) {
         disablePhase2(map);
+        document.getElementById("nearest-spot")?.textContent = "";
 
         // photo削除
         window.map.eachLayer(layer => {
