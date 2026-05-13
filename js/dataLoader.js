@@ -812,11 +812,11 @@ function processSpotUtils(map) {
                 tileCount++;
             }
         }
+        swapWithSubstitute(visibleSpots);
     }
-    swapWithSubstitute(map, visibleSpots);
 }
 
-function swapWithSubstitute(map, spot) {
+function swapWithSubstitute(spot) {
 
     const ul = document.querySelector("#map-menu ul");
     if (!ul) return;
