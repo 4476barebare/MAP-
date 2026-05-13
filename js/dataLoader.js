@@ -948,7 +948,7 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
 
     window.mapStateSnapshot = null;
-    disablePhase2(window.map);
+    
     resetSpotLayers();
 
     // ========================
@@ -1046,6 +1046,7 @@ if (!safe.URL) {
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
     });
+    disablePhase2(window.map);
 }
 
 function showFishMarkers(url) {
