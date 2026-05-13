@@ -534,8 +534,6 @@ li {
   align-items: center;
   margin-top: 15px;
   width: 100%;
-  justify-content: space-between;
-
   pointer-events: none;
 }
 
@@ -543,6 +541,8 @@ li {
    nearest spot
 ========================= */
 .nearest-spot {
+    width: 380px;
+    margin-right: 0;
   background: rgba(0, 0, 0, 0.65);
   color: #fff;
 
