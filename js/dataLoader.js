@@ -618,23 +618,23 @@ function phase1menu(areaId) {
 }
 
 function renderPhase1Weather() {
+
     const elements = document.querySelectorAll('.pref-weather');
 
     elements.forEach(el => {
 
-        const areaId = el.id.split('-')[1];
+        const key = el.dataset.spot;
 
-        const rep = window.spotData.find(s =>
-            s.areaId === areaId &&
-            s.type === 'representative'
+        const spot = window.spotData.find(s =>
+            (s.id || s.name) === key
         );
 
-        if (!rep || !rep.whether) {
+        if (!spot || !spot.whether) {
             el.textContent = 'no data';
             return;
         }
 
-        const w = formatPrefWeather(rep.whether);
+        const w = formatPrefWeather(spot.whether);
         if (!w) {
             el.textContent = 'no data';
             return;
@@ -653,7 +653,6 @@ function renderPhase1Weather() {
         `;
     });
 }
-
 
 function selectSpot(spot) {
 
