@@ -534,11 +534,7 @@ li {
   display: flex;
   align-items: center;
   margin-top: 15px;
-
   width: 100%;
-  max-width: 420px;
-
-
   justify-content: space-between;
 
   pointer-events: none;
