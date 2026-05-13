@@ -7,7 +7,7 @@ CHIBA,9,parent,35.4,140.3,,,千葉県,,,
 飯岡漁港,15,1,35.690764,140.731924,CHIBA_CHOUSHI,,Second//,spot,,assistant
 銚子漁港,15,2,35.738604,140.866978,CHIBA_CHOUSHI,,First/1202/,spot,,representative
 片貝漁港,15,3,35.536696,140.460098,CHIBA_CHOUSHI,,First/1202/1205,spot,,assistant
-栗山川河口,16,4,35.609668,140.532764,CHIBA_CHOUSHI,,Second//,spot,,Substitute
+栗山川河口,16,4,35.609668,140.532764,CHIBA_CHOUSHI,,Second//,spot,,substitute
 波崎新港,15,5,35.75076,140.842216,CHIBA_CHOUSHI,,First/0804/1202,spot,,
 外川漁港,16,6,35.695505,140.85184,CHIBA_CHOUSHI,,,spot,,
 銚子マリーナ・犬若堤防,15,7,35.702927,140.839384,CHIBA_CHOUSHI,,Second//,spot,,
@@ -45,7 +45,7 @@ CHIBA,9,parent,35.4,140.3,,,千葉県,,,
 下原漁港,17,19,34.977689,139.806749,CHIBA_MINAMI,,,spot,,
 大賀堤防,18,20,34.981768,139.822679,CHIBA_MINAMI,,,spot,,
 北条桟橋,18,21,34.994513,139.856099,CHIBA_MINAMI,,,spot,,
-沖ノ島護岸,16,22,34.991912,139.833008,CHIBA_MINAMI,,Second/富津岬/洲崎西港,spot,,Substitute
+沖ノ島護岸,16,22,34.991912,139.833008,CHIBA_MINAMI,,Second/富津岬/洲崎西港,spot,,substitute
 館山港・築港堤防,16,23,34.98887,139.850925,CHIBA_MINAMI,,,spot,,
 西浜突堤,17,24,35.032451,139.828407,CHIBA_MINAMI,,,spot,,
 富浦新港,17,25,35.039519,139.821995,CHIBA_MINAMI,,Second/富津岬/洲崎西港,spot,,
@@ -93,7 +93,7 @@ CHIBA,9,parent,35.4,140.3,,,千葉県,,,
 夷隅川河口,15,5,35.296533,140.407741,CHIBA_SOTOBOU,,,spot,,
 大原港,16,6,35.254468,140.40449,CHIBA_SOTOBOU,,Second//,spot,,
 岩船港,17,7,35.209,140.3925,CHIBA_SOTOBOU,,,spot,,
-岩和田港,17,8,35.1803,140.366,CHIBA_SOTOBOU,,Second//,spot,,Substitute
+岩和田港,17,8,35.1803,140.366,CHIBA_SOTOBOU,,Second//,spot,,substitute
 御宿漁港,17,9,35.17893,140.348856,CHIBA_SOTOBOU,,,spot,,
 新官港・豊浜港,17,10,35.155109,140.330874,CHIBA_SOTOBOU,,,spot,,
 川津港,16,11,35.144776,140.326642,CHIBA_SOTOBOU,,,spot,,
