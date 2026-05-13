@@ -461,7 +461,7 @@ function selectArea(area) {
         });
     });
     
-    disablePhase2(window.map);
+    //disablePhase2(window.map);
 }
 
 function saveMapState() {
