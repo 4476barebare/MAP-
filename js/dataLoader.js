@@ -822,8 +822,8 @@ function swapWithSubstitute(map, spot) {
     if (!ul) return;
 
     const lis = Array.from(ul.children).filter(li =>
-    li.classList.contains("menu-item")
-);
+        li.classList.contains("menu-item")
+    );
 
     const targetLi = lis.find(li => {
         const top = li.querySelector(".row-top");
@@ -836,7 +836,6 @@ function swapWithSubstitute(map, spot) {
     }
 
     const removedName = targetLi.querySelector(".row-top")?.textContent;
-
     alert("削除対象: " + removedName);
 
     targetLi.remove();
