@@ -1072,7 +1072,7 @@ function showFishMarkers(url) {
     };
   });
 
-  function renderMarkers() {
+function renderMarkers() {
 
   window.fishLayer.clearLayers();
 
@@ -1080,22 +1080,25 @@ function showFishMarkers(url) {
   const el = window.map.getContainer();
 
   // -------------------------
-  // ズームクラス（低域統一）
+  // zoomクラス（そのまま維持）
   // -------------------------
-  el.classList.remove('zoom-18', 'zoom-17', 'zoom-low');
+  el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
 
   if (zoom >= 18) {
     el.classList.add('zoom-18');
 
-  } else if (zoom >= 17) {
+  } else if (zoom === 17) {
     el.classList.add('zoom-17');
+
+  } else if (zoom === 16) {
+    el.classList.add('zoom-16');
 
   } else {
     el.classList.add('zoom-low');
   }
 
   // -------------------------
-  // マーカー生成（完全統一）
+  // マーカー（ドット削除）
   // -------------------------
   for (const fish of markers) {
 
@@ -1109,6 +1112,8 @@ function showFishMarkers(url) {
     window.fishLayer.addLayer(marker);
   }
 }
+
+
   window.map.addLayer(window.fishLayer);
 
   renderMarkers();
