@@ -545,6 +545,7 @@ li {
   margin-right: 10px; /* backとの間隔 */
   font-size: 16px;
   color: #fff;
+  font-weight: bold;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: #191970;
   text-align: center;
