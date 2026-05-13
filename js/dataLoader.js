@@ -689,10 +689,17 @@ function enablePhase2(map) {
 
     showDebug("enablePhase2 called", true);
 
-    const runPhase2 = () => {
-        showDebug("runPhase2 fired");
+    let phase2Timer = null;
+
+const runPhase2 = () => {
+
+    clearTimeout(phase2Timer);
+
+    phase2Timer = setTimeout(() => {
         processSpotUtils(map);
-    };
+        showNearestSpotName(map);
+    }, 80);
+};
 
     map._phase2Handler = runPhase2;
 
@@ -783,6 +790,54 @@ function processSpotUtils(map) {
     if (typeof showDebug === "function") {
         showDebug(`photo preload tiles: ${tileCount}`);
     }
+}
+
+function showNearestSpotName(map) {
+
+    const bounds = map.getBounds();
+    const center = map.getCenter();
+
+    const visible = window.spotData.filter(s =>
+        bounds.contains([s.lat, s.lng])
+    );
+
+    if (!visible.length) return;
+
+    let nearest = null;
+    let minDist = Infinity;
+
+    for (const s of visible) {
+
+        const dLat = s.lat - center.lat;
+        const dLng = s.lng - center.lng;
+
+        const dist = dLat * dLat + dLng * dLng;
+
+        if (dist < minDist) {
+            minDist = dist;
+            nearest = s;
+        }
+    }
+
+    if (!nearest) return;
+
+    let el = document.getElementById("nearest-spot");
+
+    if (!el) {
+        el = document.createElement("div");
+        el.id = "nearest-spot";
+        el.style.position = "fixed";
+        el.style.bottom = "10px";
+        el.style.left = "10px";
+        el.style.background = "rgba(0,0,0,0.7)";
+        el.style.color = "#fff";
+        el.style.padding = "6px 10px";
+        el.style.fontSize = "12px";
+        el.style.zIndex = 9999;
+        document.body.appendChild(el);
+    }
+
+    el.textContent = nearest.name;
 }
 
 function updateSpotMenu(spots, map) {
