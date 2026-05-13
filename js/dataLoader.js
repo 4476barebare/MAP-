@@ -557,17 +557,12 @@ function phase1menu(areaId) {
     const ul = menu?.querySelector("ul");
     if (!ul || !window.spotData) return;
 
-    // -------------------------
-    // 対象データ
-    // -------------------------
+    // 表示対象（これが正）
     const items = window.spotData.filter(s =>
         s.areaId === areaId &&
         (s.type === "representative" || s.type === "assistant")
     );
 
-    // -------------------------
-    // ヘッダー
-    // -------------------------
     const header = `
         <li class="menu-header-row" style="pointer-events:none; padding:4px 8px;">
             <div style="display:flex; justify-content:flex-end; width:100%;">
@@ -578,17 +573,10 @@ function phase1menu(areaId) {
         </li>
     `;
 
-    // -------------------------
-    // 行生成（ここで天気まで完結）
-    // -------------------------
-    const list = items.map((s, i) => {
+    // ★ここが重要：itemsをそのまま使う
+    const list = items.map(s => {
 
-        const rep = window.spotData.find(x =>
-            x.areaId === s.areaId &&
-            x.type === "representative"
-        );
-
-        if (!rep || !rep.whether) {
+        if (!s.whether) {
             return `
                 <li data-key="${s.id || s.name}">
                     <div class="row-top">${s.name}</div>
@@ -597,7 +585,7 @@ function phase1menu(areaId) {
             `;
         }
 
-        const w = formatPrefWeather(rep.whether);
+        const w = formatPrefWeather(s.whether);
         const icon = toWeatherIcon(w.icon);
 
         return `
@@ -616,22 +604,16 @@ function phase1menu(areaId) {
         `;
     }).join("");
 
-    // -------------------------
-    // 描画
-    // -------------------------
     ul.innerHTML = header + list;
     menu.style.display = items.length ? "block" : "none";
 
-    // -------------------------
-    // クリック
-    // -------------------------
     ul.onclick = (e) => {
         const li = e.target.closest("li");
         if (!li || li.classList.contains("menu-header-row")) return;
 
         const key = li.dataset.key;
 
-        const spot = window.spotData.find(s =>
+        const spot = items.find(s =>
             (s.id || s.name) === key
         );
 
