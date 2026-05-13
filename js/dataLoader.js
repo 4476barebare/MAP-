@@ -708,26 +708,16 @@ function disablePhase2(map) {
 
     if (!map) return;
 
-    // -------------------------
-    // ① イベント解除
-    // -------------------------
-    if (typeof map._phase2Handler === "function") {
+    if (map._phase2Handler) {
         map.off('dragend', map._phase2Handler);
+        map.off('moveend', map._phase2Handler);
         map._phase2Handler = null;
     }
 
-    // moveendの一回実行も安全に除去
-    map.off('moveend');
-
-    // -------------------------
-    // ② 状態リセット
-    // -------------------------
     window.phase2Initialized = false;
     window.lastVisibleSet = new Set();
 
-    // -------------------------
-    // ③ UI系は最小限（触りすぎない）
-    // -------------------------
+    // UIは最小限だけ
     const menu = document.getElementById("map-menu");
     if (menu) {
         menu.classList.remove("phase2-lock");
@@ -737,33 +727,27 @@ function disablePhase2(map) {
 
 function processSpotUtils(map) {
 
-    showDebug("processSpotUtils start");
+    if (!map) return;
 
     const bounds = map.getBounds().pad(0.5);
 
+    // -------------------------
+    // 視界内スポット取得
+    // -------------------------
     const visibleSpots = window.spotData.filter(s =>
         bounds.contains([s.lat, s.lng])
     );
 
-    showDebug(`visible: ${visibleSpots.length}`);
-
-    const spotTargets = visibleSpots.filter(s => s.icon === "spot");
-
-    showDebug(`targets: ${spotTargets.length}`);
-
-    if (!spotTargets.length) {
-        showDebug("skip (no targets)");
-        return;
-    }
+    if (!visibleSpots.length) return;
 
     const zoom = map.getZoom();
-    showDebug(`zoom: ${zoom}`);
 
+    // ★ photo専用URL固定
     const baseUrl = window.gsiLayers.photo.replace('{z}', zoom);
 
     let tileCount = 0;
 
-    for (const s of spotTargets) {
+    for (const s of visibleSpots) {
 
         const n = Math.pow(2, zoom);
 
@@ -775,6 +759,9 @@ function processSpotUtils(map) {
             (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
         );
 
+        // -------------------------
+        // 2x2プリロード
+        // -------------------------
         for (let dx = 0; dx <= 1; dx++) {
             for (let dy = 0; dy <= 1; dy++) {
 
@@ -786,15 +773,16 @@ function processSpotUtils(map) {
                 img.src = url;
 
                 tileCount++;
-
-                if (tileCount <= 3) {
-                    showDebug(url);
-                }
             }
         }
     }
 
-    showDebug(`tiles: ${tileCount}`);
+    // -------------------------
+    // デバッグ（任意）
+    // -------------------------
+    if (typeof showDebug === "function") {
+        showDebug(`photo preload tiles: ${tileCount}`);
+    }
 }
 
 function updateSpotMenu(spots, map) {
