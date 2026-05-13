@@ -552,12 +552,13 @@ marker.on('click', function () {
 }
 
 function phase1menu(areaId) {
+
     const menu = document.getElementById("map-menu");
     const ul = menu?.querySelector("ul");
     if (!ul || !window.spotData) return;
 
     // -------------------------
-    // データ抽出
+    // 対象データ
     // -------------------------
     const items = window.spotData.filter(s =>
         s.areaId === areaId &&
@@ -565,7 +566,7 @@ function phase1menu(areaId) {
     );
 
     // -------------------------
-    // ヘッダー（pref流用）
+    // ヘッダー
     // -------------------------
     const header = `
         <li class="menu-header-row" style="pointer-events:none; padding:4px 8px;">
@@ -578,14 +579,42 @@ function phase1menu(areaId) {
     `;
 
     // -------------------------
-    // 各行（名前＋天気用DIV）
+    // 行生成（ここで天気まで完結）
     // -------------------------
-    const list = items.map((s, i) => `
-    <li data-key="${s.id || s.name}">
-        <div class="row-top">${s.name}</div>
-        <div class="pref-weather" id="weather-${s.areaId}-${i}"></div>
-    </li>
-`).join("");
+    const list = items.map((s, i) => {
+
+        const rep = window.spotData.find(x =>
+            x.areaId === s.areaId &&
+            x.type === "representative"
+        );
+
+        if (!rep || !rep.whether) {
+            return `
+                <li data-key="${s.id || s.name}">
+                    <div class="row-top">${s.name}</div>
+                    <div class="pref-weather">no data</div>
+                </li>
+            `;
+        }
+
+        const w = formatPrefWeather(rep.whether);
+        const icon = toWeatherIcon(w.icon);
+
+        return `
+            <li data-key="${s.id || s.name}">
+                <div class="row-top">${s.name}</div>
+                <div class="pref-weather">
+                    <span>${icon}</span>
+                    <div style="width:12px">${w.temp}</div>
+                    <span style="font-size:8px;">°C 降水</span>
+                    <div style="width:12px">${w.pop}</div>
+                    <span style="font-size:8px;">%</span>
+                    <div style="width:12px">${w.wind}</div>
+                    <span style="font-size:8px;">m/s</span>
+                </div>
+            </li>
+        `;
+    }).join("");
 
     // -------------------------
     // 描画
@@ -594,12 +623,7 @@ function phase1menu(areaId) {
     menu.style.display = items.length ? "block" : "none";
 
     // -------------------------
-    // 天気描画（既存流用）
-    // -------------------------
-    renderPhase1Weather();
-
-    // -------------------------
-    // クリックイベント（委譲）
+    // クリック
     // -------------------------
     ul.onclick = (e) => {
         const li = e.target.closest("li");
@@ -615,40 +639,6 @@ function phase1menu(areaId) {
 
         selectSpot(spot);
     };
-}
-
-function renderPhase1Weather() {
-
-    const elements = document.querySelectorAll('.pref-weather');
-
-    elements.forEach(el => {
-
-        const li = el.closest('li');
-        const name = li?.querySelector('.row-top')?.textContent?.trim();
-
-        const rep = window.spotData.find(s =>
-            s.name === name &&
-            s.type === 'representative'
-        );
-
-        if (!rep || !rep.whether) {
-            el.textContent = 'no data';
-            return;
-        }
-
-        const w = formatPrefWeather(rep.whether);
-        const icon = toWeatherIcon(w.icon);
-
-        el.innerHTML = `
-            <span>${icon}</span>
-            <div style="width: 12px">${w.temp}</div>
-            <span style="font-size: 8px;">°C 降水</span>
-            <div style="width: 12px">${w.pop}</div>
-            <span style="font-size: 8px;">%</span>
-            <div style="width: 12px">${w.wind}</div>
-            <span style="font-size: 8px;">m/s</span>
-        `;
-    });
 }
 
 function selectSpot(spot) {
