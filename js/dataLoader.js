@@ -558,11 +558,19 @@ function phase1menu(areaId) {
     if (!ul || !window.spotData) return;
 
     const items = window.spotData
-    .filter(s =>
+        .filter(s =>
+            s.areaId === areaId &&
+            (s.type === "representative" || s.type === "assistant")
+        )
+        .sort((a, b) => b.lat - a.lat);
+
+    // -------------------------
+    // ★補欠は1件だけ保持
+    // -------------------------
+    window.substitute = window.spotData.find(s =>
         s.areaId === areaId &&
-        (s.type === "representative" || s.type === "assistant")
-    )
-    .sort((a, b) => b.lat - a.lat);
+        s.type === "substitute"
+    ) || null;
 
     const header = `
         <li class="menu-header-row" style="pointer-events:none; padding:4px 8px;">
@@ -574,7 +582,6 @@ function phase1menu(areaId) {
         </li>
     `;
 
-    // ★ここが重要：itemsをそのまま使う
     const list = items.map(s => {
 
         if (!s.whether) {
@@ -607,21 +614,6 @@ function phase1menu(areaId) {
 
     ul.innerHTML = header + list;
     menu.style.display = items.length ? "block" : "none";
-
-    ul.onclick = (e) => {
-        const li = e.target.closest("li");
-        if (!li || li.classList.contains("menu-header-row")) return;
-
-        const key = li.dataset.key;
-
-        const spot = items.find(s =>
-            (s.id || s.name) === key
-        );
-
-        if (!spot) return;
-
-        selectSpot(spot);
-    };
 }
 
 function selectSpot(spot) {
