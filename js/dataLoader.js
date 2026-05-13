@@ -552,6 +552,7 @@ marker.on('click', function () {
 }
 
 function phase1menu(areaId) {
+
     window.substitute = null;
 
     const menu = document.getElementById("map-menu");
@@ -573,47 +574,35 @@ function phase1menu(areaId) {
         s.type === "substitute"
     ) || null;
 
-    const header = `
-        <li class="menu-header-row" style="pointer-events:none; padding:4px 8px;">
-            <div style="display:flex; justify-content:flex-end; width:100%;">
-                <div>
-                    ${formatDate(window.todayTide?.date)} ${window.todayTide?.tide}
-                </div>
-            </div>
-        </li>
-    `;
+    // -------------------------
+    // ヘッダー（DOM化）
+    // -------------------------
+    const header = document.createElement("li");
+    header.className = "menu-header-row";
+    header.style.cssText = "pointer-events:none; padding:4px 8px;";
 
-    const list = items.map(s => {
+    const headerInner = document.createElement("div");
+    headerInner.style.cssText = "display:flex; justify-content:flex-end; width:100%;";
 
-        if (!s.whether) {
-            return `
-                <li data-key="${s.id || s.name}">
-                    <div class="row-top">${s.name}</div>
-                    <div class="pref-weather">no data</div>
-                </li>
-            `;
-        }
+    const headerText = document.createElement("div");
+    headerText.textContent =
+        `${formatDate(window.todayTide?.date)} ${window.todayTide?.tide}`;
 
-        const w = formatPrefWeather(s.whether);
-        const icon = toWeatherIcon(w.icon);
+    headerInner.appendChild(headerText);
+    header.appendChild(headerInner);
 
-        return `
-            <li data-key="${s.id || s.name}">
-                <div class="row-top">${s.name}</div>
-                <div class="pref-weather">
-                    <span>${icon}</span>
-                    <div style="width:12px">${w.temp}</div>
-                    <span style="font-size:8px;">°C 降水</span>
-                    <div style="width:12px">${w.pop}</div>
-                    <span style="font-size:8px;">%</span>
-                    <div style="width:12px">${w.wind}</div>
-                    <span style="font-size:8px;">m/s</span>
-                </div>
-            </li>
-        `;
-    }).join("");
+    // -------------------------
+    // リスト生成（完全DOM化）
+    // -------------------------
+    ul.innerHTML = ""; // 一旦クリア
+    ul.appendChild(header);
 
-    ul.innerHTML = header + list;
+    for (const s of items) {
+
+        const li = createMenuItem(s);
+        ul.appendChild(li);
+    }
+
     menu.style.display = items.length ? "block" : "none";
 }
 
@@ -649,6 +638,20 @@ function createMenuItem(s) {
 
     li.appendChild(top);
     li.appendChild(bottom);
+
+    // -------------------------
+    // ★ここでイベント付与
+    // -------------------------
+    li.addEventListener("click", () => {
+
+        const spot = window.spotData.find(x =>
+            (x.id || x.name) === li.dataset.key
+        );
+
+        if (!spot) return;
+
+        selectSpot(spot);
+    });
 
     return li;
 }
@@ -813,47 +816,46 @@ function processSpotUtils(map) {
 
 function swapWithSubstitute(map, visibleSpots) {
 
-    if (!map || !visibleSpots?.length) return;
-    if (!window.substitute) return;
+    if (!map || !visibleSpots) return;
 
-    const center = map.getCenter();
+    const spot = Array.isArray(visibleSpots)
+        ? visibleSpots[0]
+        : visibleSpots;
 
-    let nearest = null;
-    let minDist = Infinity;
-
-    for (const s of visibleSpots) {
-
-        if (window.substitute && s.name === window.substitute.name) continue;
-
-        const dLat = s.lat - center.lat;
-        const dLng = s.lng - center.lng;
-
-        const dist = dLat * dLat + dLng * dLng;
-
-        if (dist < minDist) {
-            minDist = dist;
-            nearest = s;
-        }
-    }
-
-    if (!nearest) return;
-
-    const oldSubstitute = window.substitute;
-    window.substitute = nearest;
+    if (!spot) return;
 
     // -------------------------
-    // ★UI差し替え
+    // typeチェック
+    // -------------------------
+    if (
+        spot.type !== "representative" &&
+        spot.type !== "assistant" &&
+        spot.type !== "substitute"
+    ) return;
+
+    // -------------------------
+    // UI処理
     // -------------------------
     const ul = document.querySelector("#map-menu ul");
     if (!ul) return;
 
-    const targetLi = ul.querySelector(`li[data-key="${nearest.id || nearest.name}"]`);
+    const targetKey = spot.id || spot.name;
+    const targetLi = ul.querySelector(`li[data-key="${targetKey}"]`);
 
     if (!targetLi) return;
 
-    const newLi = createMenuItem(oldSubstitute);
+    const substitute = window.substitute;
 
-    targetLi.replaceWith(newLi);
+    // substituteをUIに挿入
+    if (substitute) {
+        const newLi = createMenuItem(substitute);
+        targetLi.replaceWith(newLi);
+    }
+
+    // -------------------------
+    // 状態更新
+    // -------------------------
+    window.substitute = spot;
 }
 
 function showNearestSpotName(map) {
