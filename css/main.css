@@ -553,6 +553,8 @@ li {
     -1px -1px 0 #191970;
   text-align: center;
   white-space: nowrap;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+  
 }
 
 /* =========================
