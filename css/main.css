@@ -531,8 +531,7 @@ li {
 ========================= */
 .map-ui-sub {
   display: flex;
-  text-align: right;
-  margin-top: 15px;
+  margin:0 0 0 auto;
   width: 100%;
   pointer-events: none;
 }
