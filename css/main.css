@@ -546,8 +546,11 @@ li {
   font-size: 16px;
   color: #fff;
   font-weight: bold;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #191970;
+  text-shadow:
+    0.5px 0.5px 0 #191970,
+    -0.5px 0.5px 0 #191970,
+    0.5px -0.5px 0 #191970,
+    -0.5px -0.5px 0 #191970;
   text-align: center;
   white-space: nowrap;
 }
