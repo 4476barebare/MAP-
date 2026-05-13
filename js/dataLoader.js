@@ -1191,10 +1191,7 @@ function goBack() {
     // ① phase2 → phase1（z >= 14）
     // =====================================================
     if (z >= 14) {
-        document.getElementById("nearest-spot").textContent = "";
         stopZoomGuard();
-        
-        // map操作復帰
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
@@ -1235,8 +1232,8 @@ function goBack() {
     // ② phase1維持（z === 13）
     // =====================================================
     if (z === 13) {
-        document.getElementById("nearest-spot").textContent = "";
         disablePhase2(window.map);
+        document.getElementById("nearest-spot").textContent = "";
         
         window.map.eachLayer(layer => {
             if (layer === window.gsiLayer) return;
