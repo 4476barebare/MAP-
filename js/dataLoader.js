@@ -948,7 +948,7 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
 
     window.mapStateSnapshot = null;
-    
+    disablePhase2(window.map);
     resetSpotLayers();
 
     // ========================
@@ -990,6 +990,8 @@ if (!safe.URL) {
             const safe2 = list.find(s =>
                 String(s.individualId) === String(spotId[2])
             );
+            
+            document.getElementById("nearest-spot").textContent = safe2.name;
 
             showFishMarkers(safe2.URL);
 
@@ -1022,6 +1024,7 @@ if (!safe.URL) {
     window.map.flyTo([safe.lat, safe.lng], safe.zoom, {
         duration: 0.5
     });
+    document.getElementById("nearest-spot").textContent = safe.name;
 
     if (safe && safe.individualId != null) {
         const base = location.hash || '';
@@ -1046,7 +1049,6 @@ if (!safe.URL) {
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
     });
-    disablePhase2(window.map);
 }
 
 function showFishMarkers(url) {
