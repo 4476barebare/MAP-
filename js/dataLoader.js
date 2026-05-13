@@ -623,10 +623,18 @@ function renderPhase1Weather() {
 
     elements.forEach(el => {
 
-        const areaId = el.id.replace('weather-', '');
+        // ★ここが本体：行のスポット名を取得
+        const li = el.closest('li');
+        const name = li?.querySelector('.row-top')?.textContent?.trim();
 
+        if (!name) {
+            el.textContent = 'no data';
+            return;
+        }
+
+        // ★nameで一致検索
         const rep = window.spotData.find(s =>
-            s.areaId === areaId &&
+            s.name === name &&
             s.type === 'representative'
         );
 
