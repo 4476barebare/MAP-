@@ -618,11 +618,16 @@ function phase1menu(areaId) {
 }
 
 function renderPhase1Weather() {
+
+    // ★変更①：row-weather → pref-weather に統一（既存CSS流用のため）
     const elements = document.querySelectorAll('.pref-weather');
 
     elements.forEach(el => {
+
+        // ★変更②：idは維持（weather-xxx形式はそのまま利用）
         const areaId = el.id.replace('weather-', '');
 
+        // ★変更なし：対象データ取得ロジック
         const rep = window.spotData.find(s =>
             s.areaId === areaId &&
             s.type === 'representative'
@@ -633,6 +638,7 @@ function renderPhase1Weather() {
             return;
         }
 
+        // ★変更なし：天気整形処理（共通関数）
         const w = formatPrefWeather(rep.whether);
         if (!w) {
             el.textContent = 'no data';
@@ -641,6 +647,7 @@ function renderPhase1Weather() {
 
         const icon = toWeatherIcon(w.icon);
 
+        // ★変更③：prefと完全同一のHTML構造に統一
         el.innerHTML = `
             <span>${icon}</span>
             <div style="width: 12px">${w.temp}</div>
