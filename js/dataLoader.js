@@ -948,7 +948,8 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
 
     window.mapStateSnapshot = null;
-    disablePhase2(window.map);
+    disablePhase2(map);
+
     resetSpotLayers();
 
     // ========================
@@ -1234,6 +1235,7 @@ function goBack() {
     // ② phase1維持（z === 13）
     // =====================================================
     if (z === 13) {
+        disablePhase2(map);
 
         // photo削除
         window.map.eachLayer(layer => {
