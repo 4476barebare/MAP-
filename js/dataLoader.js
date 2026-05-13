@@ -992,6 +992,7 @@ if (!safe.URL) {
             );
             
             document.getElementById("nearest-spot").textContent = safe2.name;
+            document.getElementById('map-back-btn').style.display = 'block';
 
             showFishMarkers(safe2.URL);
 
