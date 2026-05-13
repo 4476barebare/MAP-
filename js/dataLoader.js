@@ -1223,6 +1223,7 @@ function goBack() {
         // 再構築
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
+        enablePhase2(window.map);
 
         return;
     }
