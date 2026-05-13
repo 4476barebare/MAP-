@@ -557,11 +557,12 @@ function phase1menu(areaId) {
     const ul = menu?.querySelector("ul");
     if (!ul || !window.spotData) return;
 
-    // 表示対象（これが正）
-    const items = window.spotData.filter(s =>
+    const items = window.spotData
+    .filter(s =>
         s.areaId === areaId &&
         (s.type === "representative" || s.type === "assistant")
-    );
+    )
+    .sort((a, b) => b.lat - a.lat);
 
     const header = `
         <li class="menu-header-row" style="pointer-events:none; padding:4px 8px;">
