@@ -687,15 +687,19 @@ let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
 
+    showDebug("enablePhase2 called", true);
+
     const runPhase2 = () => {
+        showDebug("runPhase2 fired");
         processSpotUtils(map);
     };
 
     map._phase2Handler = runPhase2;
 
     map.on('dragend', runPhase2);
+    map.on('moveend', runPhase2);
 
-    map.once('moveend', runPhase2);
+    showDebug("handlers registered");
 
     phase2Initialized = true;
 }
@@ -733,27 +737,27 @@ function disablePhase2(map) {
 
 function processSpotUtils(map) {
 
+    showDebug("processSpotUtils start");
+
     const bounds = map.getBounds().pad(0.5);
 
     const visibleSpots = window.spotData.filter(s =>
         bounds.contains([s.lat, s.lng])
     );
 
+    showDebug(`visible: ${visibleSpots.length}`);
+
     const spotTargets = visibleSpots.filter(s => s.icon === "spot");
 
-    // -------------------------
-    // DEBUG: 入り口確認
-    // -------------------------
-    showDebug(`phase2 run`);
-    showDebug(`visible: ${visibleSpots.length}`);
     showDebug(`targets: ${spotTargets.length}`);
 
-    if (!map || !spotTargets.length) {
-        showDebug(`skip`);
+    if (!spotTargets.length) {
+        showDebug("skip (no targets)");
         return;
     }
 
     const zoom = map.getZoom();
+    showDebug(`zoom: ${zoom}`);
 
     const baseUrl = window.gsiLayers.photo.replace('{z}', zoom);
 
@@ -783,10 +787,7 @@ function processSpotUtils(map) {
 
                 tileCount++;
 
-                // -------------------------
-                // DEBUG: 軽量ログ
-                // -------------------------
-                if (tileCount <= 5) {
+                if (tileCount <= 3) {
                     showDebug(url);
                 }
             }
