@@ -1224,6 +1224,7 @@ function goBack() {
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
         enablePhase2(window.map);
+        phase1menu(window.currentAreaId);
 
         return;
     }
