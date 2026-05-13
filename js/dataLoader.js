@@ -610,6 +610,8 @@ function createMenuItem(s) {
 
     const li = document.createElement("li");
     li.dataset.key = s.id || s.name;
+    
+    li.classList.add("menu-item");
 
     const top = document.createElement("div");
     top.className = "row-top";
@@ -819,7 +821,9 @@ function swapWithSubstitute(map, spot) {
     const ul = document.querySelector("#map-menu ul");
     if (!ul) return;
 
-    const lis = Array.from(ul.children);
+    const lis = Array.from(ul.children).filter(li =>
+    li.classList.contains("menu-item")
+);
 
     const targetLi = lis.find(li => {
         const top = li.querySelector(".row-top");
