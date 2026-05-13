@@ -552,6 +552,7 @@ marker.on('click', function () {
 }
 
 function phase1menu(areaId) {
+    window.substitute = null;
 
     const menu = document.getElementById("map-menu");
     const ul = menu?.querySelector("ul");
@@ -614,6 +615,42 @@ function phase1menu(areaId) {
 
     ul.innerHTML = header + list;
     menu.style.display = items.length ? "block" : "none";
+}
+
+function createMenuItem(s) {
+
+    const li = document.createElement("li");
+    li.dataset.key = s.id || s.name;
+
+    const top = document.createElement("div");
+    top.className = "row-top";
+    top.textContent = s.name;
+
+    const bottom = document.createElement("div");
+    bottom.className = "pref-weather";
+
+    if (!s.whether) {
+        bottom.textContent = "no data";
+    } else {
+
+        const w = formatPrefWeather(s.whether);
+        const icon = toWeatherIcon(w.icon);
+
+        bottom.innerHTML = `
+            <span>${icon}</span>
+            <div style="width:12px">${w.temp}</div>
+            <span style="font-size:8px;">°C 降水</span>
+            <div style="width:12px">${w.pop}</div>
+            <span style="font-size:8px;">%</span>
+            <div style="width:12px">${w.wind}</div>
+            <span style="font-size:8px;">m/s</span>
+        `;
+    }
+
+    li.appendChild(top);
+    li.appendChild(bottom);
+
+    return li;
 }
 
 function selectSpot(spot) {
@@ -771,6 +808,52 @@ function processSpotUtils(map) {
             }
         }
     }
+    swapWithSubstitute(map, visibleSpots);
+}
+
+function swapWithSubstitute(map, visibleSpots) {
+
+    if (!map || !visibleSpots?.length) return;
+    if (!window.substitute) return;
+
+    const center = map.getCenter();
+
+    let nearest = null;
+    let minDist = Infinity;
+
+    for (const s of visibleSpots) {
+
+        if (window.substitute && s.name === window.substitute.name) continue;
+
+        const dLat = s.lat - center.lat;
+        const dLng = s.lng - center.lng;
+
+        const dist = dLat * dLat + dLng * dLng;
+
+        if (dist < minDist) {
+            minDist = dist;
+            nearest = s;
+        }
+    }
+
+    if (!nearest) return;
+
+    const oldSubstitute = window.substitute;
+    window.substitute = nearest;
+
+    // -------------------------
+    // ★UI差し替え
+    // -------------------------
+    const ul = document.querySelector("#map-menu ul");
+    if (!ul) return;
+
+    const targetLi = ul.querySelector(`li[data-key="${nearest.id || nearest.name}"]`);
+
+    if (!targetLi) return;
+
+    const newLi = createMenuItem(oldSubstitute);
+
+    targetLi.replaceWith(newLi);
 }
 
 function showNearestSpotName(map) {
