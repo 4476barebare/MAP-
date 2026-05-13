@@ -1082,7 +1082,7 @@ function renderMarkers() {
   // -------------------------
   // zoomクラス（そのまま維持）
   // -------------------------
-  el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
+  el.classList.remove('zoom-18', 'zoom-17', 'zoom-16');
 
   if (zoom >= 18) {
     el.classList.add('zoom-18');
@@ -1090,11 +1090,9 @@ function renderMarkers() {
   } else if (zoom === 17) {
     el.classList.add('zoom-17');
 
-  } else if (zoom === 16) {
+  } else if (zoom <= 16) {
     el.classList.add('zoom-16');
 
-  } else {
-    el.classList.add('zoom-low');
   }
 
   // -------------------------
