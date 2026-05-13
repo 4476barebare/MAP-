@@ -543,13 +543,8 @@ li {
 .nearest-spot {
     width: 380px;
     margin-right: 0;
-  background: rgba(0, 0, 0, 0.65);
-  color: #fff;
-
   font-size: 12px;
-  padding: 4px 8px;
 
-  border-radius: 4px;
 
   pointer-events: none;
 
