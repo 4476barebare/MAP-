@@ -814,47 +814,27 @@ function processSpotUtils(map) {
     swapWithSubstitute(map, visibleSpots);
 }
 
-function swapWithSubstitute(map, visibleSpots) {
+function swapWithSubstitute(map, spot) {
 
-    if (!map || !visibleSpots) return;
-
-    const spot = Array.isArray(visibleSpots)
-        ? visibleSpots[0]
-        : visibleSpots;
-
-    if (!spot) return;
-
-    // -------------------------
-    // typeチェック
-    // -------------------------
-    if (
-        spot.type !== "representative" &&
-        spot.type !== "assistant" &&
-        spot.type !== "substitute"
-    ) return;
-
-    // -------------------------
-    // UI処理
-    // -------------------------
     const ul = document.querySelector("#map-menu ul");
     if (!ul) return;
 
-    const targetKey = spot.id || spot.name;
-    const targetLi = ul.querySelector(`li[data-key="${targetKey}"]`);
+    const lis = Array.from(ul.children);
+
+    const targetLi = lis.find(li => {
+        const top = li.querySelector(".row-top");
+        return top?.textContent === spot.name;
+    });
 
     if (!targetLi) return;
 
     const substitute = window.substitute;
 
-    // substituteをUIに挿入
     if (substitute) {
         const newLi = createMenuItem(substitute);
         targetLi.replaceWith(newLi);
     }
 
-    // -------------------------
-    // 状態更新
-    // -------------------------
     window.substitute = spot;
 }
 
