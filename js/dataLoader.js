@@ -812,7 +812,7 @@ function processSpotUtils(map) {
                 tileCount++;
             }
         }
-        swapWithSubstitute(visibleSpots);
+        swapWithSubstitute(s);
     }
 }
 
