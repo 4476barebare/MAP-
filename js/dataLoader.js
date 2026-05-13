@@ -580,12 +580,12 @@ function phase1menu(areaId) {
     // -------------------------
     // 各行（名前＋天気用DIV）
     // -------------------------
-    const list = items.map(s => `
-        <li data-key="${s.id || s.name}">
-            <div class="row-top">${s.name}</div>
-            <div class="row-weather" id="weather-${s.areaId}"></div>
-        </li>
-    `).join("");
+    const list = items.map((s, i) => `
+    <li data-key="${s.id || s.name}">
+        <div class="row-top">${s.name}</div>
+        <div class="pref-weather" id="weather-${s.areaId}-${i}"></div>
+    </li>
+`).join("");
 
     // -------------------------
     // 描画
@@ -618,16 +618,12 @@ function phase1menu(areaId) {
 }
 
 function renderPhase1Weather() {
-
-    // ★変更①：row-weather → pref-weather に統一（既存CSS流用のため）
     const elements = document.querySelectorAll('.pref-weather');
 
     elements.forEach(el => {
 
-        // ★変更②：idは維持（weather-xxx形式はそのまま利用）
-        const areaId = el.id.replace('weather-', '');
+        const areaId = el.id.split('-')[1];
 
-        // ★変更なし：対象データ取得ロジック
         const rep = window.spotData.find(s =>
             s.areaId === areaId &&
             s.type === 'representative'
@@ -638,7 +634,6 @@ function renderPhase1Weather() {
             return;
         }
 
-        // ★変更なし：天気整形処理（共通関数）
         const w = formatPrefWeather(rep.whether);
         if (!w) {
             el.textContent = 'no data';
@@ -647,7 +642,6 @@ function renderPhase1Weather() {
 
         const icon = toWeatherIcon(w.icon);
 
-        // ★変更③：prefと完全同一のHTML構造に統一
         el.innerHTML = `
             <span>${icon}</span>
             <div style="width: 12px">${w.temp}</div>
@@ -659,6 +653,7 @@ function renderPhase1Weather() {
         `;
     });
 }
+
 
 function selectSpot(spot) {
 
