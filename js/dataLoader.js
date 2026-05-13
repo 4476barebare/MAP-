@@ -618,7 +618,7 @@ function phase1menu(areaId) {
 }
 
 function renderPhase1Weather() {
-    const elements = document.querySelectorAll('.row-weather');
+    const elements = document.querySelectorAll('.pref-weather');
 
     elements.forEach(el => {
         const areaId = el.id.replace('weather-', '');
@@ -640,19 +640,15 @@ function renderPhase1Weather() {
         }
 
         const icon = toWeatherIcon(w.icon);
-        
-        el.style.display = "flex";
-el.style.alignItems = "center";
-el.style.gap = "2px";
 
         el.innerHTML = `
-        <span>${icon}</span>
-        <div style="width: 12px">${w.temp}</div>
-        <span style="font-size: 8px;">°C 降水</span>
-        <div style="width: 12px">${w.pop}</div>
-        <span style="font-size: 8px;">%</span>
-        <div style="width: 12px">${w.wind}</div>
-        <span style="font-size: 8px;">m/s</span>
+            <span>${icon}</span>
+            <div style="width: 12px">${w.temp}</div>
+            <span style="font-size: 8px;">°C 降水</span>
+            <div style="width: 12px">${w.pop}</div>
+            <span style="font-size: 8px;">%</span>
+            <div style="width: 12px">${w.wind}</div>
+            <span style="font-size: 8px;">m/s</span>
         `;
     });
 }
