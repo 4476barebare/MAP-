@@ -532,9 +532,10 @@ li {
 .map-ui-sub {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* ←これ必須 */
-  flex: 1; /* ←これが重要 */
+  justify-content: space-between; /* 両端寄せ */
   width: 100%;
+  margin-top: 15px;
+  padding: 0 20px 0 40px; /* ←左を広めにする */
 }
 
 /* =========================
