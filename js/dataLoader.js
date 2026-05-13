@@ -948,7 +948,7 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
 
     window.mapStateSnapshot = null;
-    disablePhase2(window.map);
+    //disablePhase2(window.map);
 
     resetSpotLayers();
 
@@ -1236,7 +1236,7 @@ function goBack() {
     // ② phase1維持（z === 13）
     // =====================================================
     if (z === 13) {
-        disablePhase2(window.map);
+        //disablePhase2(window.map);
         document.getElementById("nearest-spot")?.textContent = "";
 
         // photo削除
