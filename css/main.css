@@ -543,7 +543,11 @@ li {
 ========================= */
 .nearest-spot {
   margin-right: 10px; /* backとの間隔 */
-  font-size: 12px;
+  font-size: 16px;
+  color: #fff;
+  -webkit-text-stroke-width: 3px;
+  -webkit-text-stroke-color: #191970;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -562,7 +566,6 @@ li {
 
   pointer-events: auto;
 
-  margin-right: 20px;
 }
 
 .back-icon {
