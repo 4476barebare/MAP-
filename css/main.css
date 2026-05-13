@@ -533,7 +533,7 @@ li {
   display: flex;
   align-items: center;
   justify-content: flex-end; /* ←これ必須 */
-
+  flex: 1; /* ←これが重要 */
   width: 100%;
 }
 
