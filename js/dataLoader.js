@@ -700,8 +700,8 @@ function enablePhase2(map) {
             const spotTargets = visibleSpots.filter(s => s.icon === "spot");
 
             if (spotTargets.length > 0) {
-                processSpotUtils(map, spotTargets, "prefetch");
-                updateSpotMenu(spotTargets, map);
+                //processSpotUtils(map, spotTargets, "prefetch");
+                //updateSpotMenu(spotTargets, map);
             }
 
             lastVisibleSet = new Set(visibleSpots.map(s => s.name));
