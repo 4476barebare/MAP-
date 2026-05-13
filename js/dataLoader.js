@@ -1073,50 +1073,42 @@ function showFishMarkers(url) {
   });
 
   function renderMarkers() {
-    window.fishLayer.clearLayers();
 
-    const zoom = Math.round(window.map.getZoom()); // ★ここだけ変更
-    const el = window.map.getContainer();
+  window.fishLayer.clearLayers();
 
-    el.classList.remove('zoom-18', 'zoom-17', 'zoom-16', 'zoom-low');
+  const zoom = Math.round(window.map.getZoom());
+  const el = window.map.getContainer();
 
-    if (zoom >= 18) {
-      el.classList.add('zoom-18');
-    } else if (zoom === 17) {
-      el.classList.add('zoom-17');
-    } else if (zoom === 16) {
-      el.classList.add('zoom-16');
-    } else {
-      el.classList.add('zoom-low');
-    }
+  // -------------------------
+  // ズームクラス（低域統一）
+  // -------------------------
+  el.classList.remove('zoom-18', 'zoom-17', 'zoom-low');
 
-    markers.forEach(fish => {
+  if (zoom >= 18) {
+    el.classList.add('zoom-18');
 
-      let icon;
+  } else if (zoom >= 17) {
+    el.classList.add('zoom-17');
 
-      if (zoom >= 16) {
-        icon = L.divIcon({
-          className: 'fish-label',
-          html: `<div class="fish-text">${fish.name}</div>`,
-          iconSize: null
-        });
-
-      } else {
-        icon = L.divIcon({
-          className: 'fish-dot',
-          html: '',
-          iconSize: [5, 2],
-          iconAnchor: [2.5, 1]
-        });
-      }
-
-      const marker = L.marker([fish.lat, fish.lng], { icon });
-
-      window.fishLayer.addLayer(marker);
-
-    });
+  } else {
+    el.classList.add('zoom-low');
   }
 
+  // -------------------------
+  // マーカー生成（完全統一）
+  // -------------------------
+  for (const fish of markers) {
+
+    const icon = L.divIcon({
+      className: 'fish-label',
+      html: `<div class="fish-text">${fish.name}</div>`,
+      iconSize: null
+    });
+
+    const marker = L.marker([fish.lat, fish.lng], { icon });
+    window.fishLayer.addLayer(marker);
+  }
+}
   window.map.addLayer(window.fishLayer);
 
   renderMarkers();
