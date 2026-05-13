@@ -830,13 +830,7 @@ function swapWithSubstitute(spot) {
         return top?.textContent === spot.name;
     });
 
-    if (!targetLi) {
-        alert("削除対象なし: " + spot.name);
-        return;
-    }
-
-    const removedName = targetLi.querySelector(".row-top")?.textContent;
-    alert("削除対象: " + removedName);
+    if (!targetLi) return;
 
     targetLi.remove();
 
@@ -896,92 +890,6 @@ function showNearestSpotName(map) {
     }
 
     el.textContent = nearest.name;
-}
-
-function updateSpotMenu(spots, map) {
-
-    const menu = document.getElementById("map-menu");
-    const ul = menu.querySelector("ul");
-    if (!ul) return;
-
-    menu.classList.add("phase2-lock");
-
-    const MAX = 6;
-    const center = map.getCenter();
-
-    const existing = new Set(
-        Array.from(ul.children).map(li => li.dataset.key)
-    );
-
-    const buffer = Array.from(ul.children).map(li => ({
-        key: li.dataset.key,
-        text: li.textContent,
-        lat: +li.dataset.lat,
-        lng: +li.dataset.lng,
-        dist: (li.dataset.lat - center.lat) ** 2 + (li.dataset.lng - center.lng) ** 2
-    }));
-
-    for (const s of spots) {
-
-        const key = s.id || s.name;
-
-        if (existing.has(key)) continue;
-
-        buffer.push({
-            key,
-            text: s.name,
-            lat: s.lat,
-            lng: s.lng,
-            dist: (s.lat - center.lat) ** 2 + (s.lng - center.lng) ** 2
-        });
-    }
-
-    while (buffer.length > MAX) {
-
-        let far = 0;
-
-        for (let i = 1; i < buffer.length; i++) {
-            if (buffer[i].dist > buffer[far].dist) {
-                far = i;
-            }
-        }
-
-        buffer.splice(far, 1);
-    }
-
-    ul.innerHTML = buffer.map(i => `
-        <li class="new-item"
-            data-key="${i.key}"
-            data-lat="${i.lat}"
-            data-lng="${i.lng}">
-            <span class="spot-text">${i.text}</span>
-        </li>
-    `).join("");
-
-    if (buffer.length > 0) {
-        menu.style.display = "block";
-    }
-
-    // -------------------------
-    // ここで統合クリック
-    // -------------------------
-    ul.onclick = (e) => {
-        const text = e.target.closest(".spot-text");
-        if (!text) return;
-
-        const li = text.closest("li");
-
-        window.map.flyTo(
-            [Number(li.dataset.lat), Number(li.dataset.lng)],
-            13,
-            { animate: true, duration: 0.6 }
-        );
-    };
-
-    requestAnimationFrame(() => {
-        ul.querySelectorAll("li.new-item")
-            .forEach(el => el.classList.add("show"));
-    });
 }
 
 function showFishPopup(spot) {
