@@ -687,8 +687,6 @@ let lastVisibleSet = new Set();
 
 function enablePhase2(map) {
 
-    showDebug("enablePhase2 called", true);
-
     let phase2Timer = null;
 
 const runPhase2 = () => {
@@ -705,9 +703,7 @@ const runPhase2 = () => {
 
     map.on('dragend', runPhase2);
     map.on('moveend', runPhase2);
-
-    showDebug("handlers registered");
-
+    
     phase2Initialized = true;
 }
 
@@ -782,13 +778,6 @@ function processSpotUtils(map) {
                 tileCount++;
             }
         }
-    }
-
-    // -------------------------
-    // デバッグ（任意）
-    // -------------------------
-    if (typeof showDebug === "function") {
-        showDebug(`photo preload tiles: ${tileCount}`);
     }
 }
 
