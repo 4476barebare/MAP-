@@ -485,17 +485,19 @@ li {
     text-align: left;
 }
 
-
 /* =========================
-   map-ui-top
+   map-ui-top（全体）
 ========================= */
 .map-ui-top {
   position: absolute;
   top: 12px;
   width: 100%;
-  margin-right: auto;
-  margin-left: auto;
   z-index: 3000;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   pointer-events: none;
 }
 
@@ -503,19 +505,60 @@ li {
    AD
 ========================= */
 .ad-box {
-    display: none;
-    width: 320px;
-    height: 50px;
-    margin: auto;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid #ccc;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    color: #333;
-    pointer-events: auto;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+  display: none;
+  width: 320px;
+  height: 50px;
+
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ccc;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+  color: #333;
+
+  pointer-events: auto;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+
+  margin-bottom: 6px;
+}
+
+/* =========================
+   sub row（新規追加）
+========================= */
+.map-ui-sub {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+
+  width: 100%;
+  max-width: 420px;
+
+
+  justify-content: space-between;
+
+  pointer-events: none;
+}
+
+/* =========================
+   nearest spot
+========================= */
+.nearest-spot {
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+
+  font-size: 12px;
+  padding: 4px 8px;
+
+  border-radius: 4px;
+
+  pointer-events: none;
+
+  white-space: nowrap;
 }
 
 /* =========================
@@ -523,34 +566,39 @@ li {
 ========================= */
 .map-back-btn {
     display: none;
-    margin-top: 20px;
-    margin-left: auto;
-    margin-right: 20px;
-    background: none;
-    border: none;
-    padding: 0;
-    -webkit-appearance: none;
-    appearance: none;
-    pointer-events: auto;
-    
+  background: none;
+  border: none;
+
+  padding: 0;
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  pointer-events: auto;
+
+  margin-right: 20px;
 }
 
 .back-icon {
-    width: 36px;
-    height: 36px;
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
-    -webkit-mask-image: linear-gradient(
-        to right,
-        black 40%,
-        rgba(0, 0, 0, 0.5) 70%,
-        transparent
-    );
-    mask-image: linear-gradient(
-        to right,
-        black 60%,
-        transparent
-    );
-    pointer-events: none;
+  width: 36px;
+  height: 36px;
+
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+
+  -webkit-mask-image: linear-gradient(
+    to right,
+    black 40%,
+    rgba(0, 0, 0, 0.5) 70%,
+    transparent
+  );
+
+  mask-image: linear-gradient(
+    to right,
+    black 60%,
+    transparent
+  );
+
+  pointer-events: none;
 }
 
 /* =========================
