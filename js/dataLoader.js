@@ -623,18 +623,19 @@ function renderPhase1Weather() {
 
     elements.forEach(el => {
 
-        const key = el.dataset.spot;
+        const areaId = el.id.replace('weather-', '');
 
-        const spot = window.spotData.find(s =>
-            (s.id || s.name) === key
+        const rep = window.spotData.find(s =>
+            s.areaId === areaId &&
+            s.type === 'representative'
         );
 
-        if (!spot || !spot.whether) {
+        if (!rep || !rep.whether) {
             el.textContent = 'no data';
             return;
         }
 
-        const w = formatPrefWeather(spot.whether);
+        const w = formatPrefWeather(rep.whether);
         if (!w) {
             el.textContent = 'no data';
             return;
