@@ -1236,6 +1236,7 @@ function goBack() {
     // =====================================================
     if (z === 13) {
         document.getElementById("nearest-spot").textContent = "";
+        disablePhase2(window.map);
         
         window.map.eachLayer(layer => {
             if (layer === window.gsiLayer) return;
