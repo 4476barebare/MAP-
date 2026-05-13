@@ -542,8 +542,8 @@ li {
    nearest spot
 ========================= */
 .nearest-spot {
-    max-width: 70vw;
-  margin-right: 10px; /* backとの間隔 */
+  max-width: 70vw;
+  margin-right: 10px;
   font-size: 16px;
   color: #fff;
   font-weight: bold;
@@ -552,9 +552,10 @@ li {
     -1px 1px 0 #191970,
     1px -1px 0 #191970,
     -1px -1px 0 #191970;
-  text-align: center;
   white-space: nowrap;
+  overflow: hidden;              /* ←これ必須 */
   text-overflow: ellipsis;
+  text-align: center;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
 
