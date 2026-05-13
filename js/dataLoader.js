@@ -623,16 +623,9 @@ function renderPhase1Weather() {
 
     elements.forEach(el => {
 
-        // ★ここが本体：行のスポット名を取得
         const li = el.closest('li');
         const name = li?.querySelector('.row-top')?.textContent?.trim();
 
-        if (!name) {
-            el.textContent = 'no data';
-            return;
-        }
-
-        // ★nameで一致検索
         const rep = window.spotData.find(s =>
             s.name === name &&
             s.type === 'representative'
@@ -644,11 +637,6 @@ function renderPhase1Weather() {
         }
 
         const w = formatPrefWeather(rep.whether);
-        if (!w) {
-            el.textContent = 'no data';
-            return;
-        }
-
         const icon = toWeatherIcon(w.icon);
 
         el.innerHTML = `
