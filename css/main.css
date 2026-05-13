@@ -541,8 +541,9 @@ li {
    nearest spot
 ========================= */
 .nearest-spot {
-    width: 380px;
+    width: 350px;
     margin-right: 0;
+    margin-left: 0;
   font-size: 12px;
 
 
