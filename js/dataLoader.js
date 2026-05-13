@@ -688,33 +688,14 @@ let lastVisibleSet = new Set();
 function enablePhase2(map) {
 
     const runPhase2 = () => {
-
-        requestAnimationFrame(() => {
-
-            const bounds = map.getBounds().pad(0.5);
-
-            const visibleSpots = window.spotData.filter(s =>
-                bounds.contains([s.lat, s.lng])
-            );
-
-            const spotTargets = visibleSpots.filter(s => s.icon === "spot");
-
-            if (spotTargets.length > 0) {
-                //processSpotUtils(map, spotTargets, "prefetch");
-                //updateSpotMenu(spotTargets, map);
-            }
-
-            lastVisibleSet = new Set(visibleSpots.map(s => s.name));
-        });
+        processSpotUtils(map);
     };
 
     map._phase2Handler = runPhase2;
 
     map.on('dragend', runPhase2);
 
-    map.once('moveend', () => {
-        runPhase2();
-    });
+    map.once('moveend', runPhase2);
 
     phase2Initialized = true;
 }
@@ -723,92 +704,98 @@ function disablePhase2(map) {
 
     if (!map) return;
 
+    // -------------------------
+    // ① イベント解除
+    // -------------------------
     if (typeof map._phase2Handler === "function") {
         map.off('dragend', map._phase2Handler);
         map._phase2Handler = null;
     }
 
-    // ★これ削除
-    // map.off('dragend');
+    // moveendの一回実行も安全に除去
+    map.off('moveend');
 
+    // -------------------------
+    // ② 状態リセット
+    // -------------------------
     window.phase2Initialized = false;
     window.lastVisibleSet = new Set();
 
+    // -------------------------
+    // ③ UI系は最小限（触りすぎない）
+    // -------------------------
     const menu = document.getElementById("map-menu");
-    const ul = document.querySelector("#map-menu ul");
-
     if (menu) {
         menu.classList.remove("phase2-lock");
         menu.style.display = "none";
     }
-
-    if (ul) {
-        ul.innerHTML = "";
-    }
 }
 
+function processSpotUtils(map) {
 
-function processSpotUtils(map, spots, mode) {
+    const bounds = map.getBounds().pad(0.5);
 
-    if (mode === "prefetch") {
+    const visibleSpots = window.spotData.filter(s =>
+        bounds.contains([s.lat, s.lng])
+    );
 
-        if (!map || !spots || !spots.length) return;
+    const spotTargets = visibleSpots.filter(s => s.icon === "spot");
 
-        const zoom = map.getZoom();
+    // -------------------------
+    // DEBUG: 入り口確認
+    // -------------------------
+    showDebug(`phase2 run`);
+    showDebug(`visible: ${visibleSpots.length}`);
+    showDebug(`targets: ${spotTargets.length}`);
 
-        const targets = spots.filter(s => s.icon === "spot");
-        if (!targets.length) return;
+    if (!map || !spotTargets.length) {
+        showDebug(`skip`);
+        return;
+    }
 
-        // ★ここを統一
-        const baseUrl =
-            window.gsiLayers.photo.replace('{z}', zoom);
+    const zoom = map.getZoom();
 
-        for (const s of targets) {
+    const baseUrl = window.gsiLayers.photo.replace('{z}', zoom);
 
-            const lat = s.lat;
-            const lng = s.lng;
+    let tileCount = 0;
 
-            const n = Math.pow(2, zoom);
+    for (const s of spotTargets) {
 
-            const tileX = Math.floor((lng + 180) / 360 * n);
+        const n = Math.pow(2, zoom);
 
-            const latRad = lat * Math.PI / 180;
-            const tileY = Math.floor(
-                (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
-            );
+        const tileX = Math.floor((s.lng + 180) / 360 * n);
 
-            // ★2×2プリフェッチ
-            for (let dx = 0; dx <= 1; dx++) {
-                for (let dy = 0; dy <= 1; dy++) {
+        const latRad = s.lat * Math.PI / 180;
 
-                    const url = baseUrl
-                        .replace('{x}', tileX + dx)
-                        .replace('{y}', tileY + dy);
+        const tileY = Math.floor(
+            (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
+        );
 
-                    const img = new Image();
-                    img.src = url;
+        for (let dx = 0; dx <= 1; dx++) {
+            for (let dy = 0; dy <= 1; dy++) {
+
+                const url = baseUrl
+                    .replace('{x}', tileX + dx)
+                    .replace('{y}', tileY + dy);
+
+                const img = new Image();
+                img.src = url;
+
+                tileCount++;
+
+                // -------------------------
+                // DEBUG: 軽量ログ
+                // -------------------------
+                if (tileCount <= 5) {
+                    showDebug(url);
                 }
             }
         }
     }
 
-    if (mode === "bounds") {
-
-        const buffer = 0.002;
-        const boundsList = [];
-
-        for (const s of spots) {
-            boundsList.push(
-                L.latLngBounds(
-                    [s.lat - buffer, s.lng - buffer],
-                    [s.lat + buffer, s.lng + buffer]
-                )
-            );
-        }
-
-        return boundsList;
-    }
+    showDebug(`tiles: ${tileCount}`);
 }
+
 function updateSpotMenu(spots, map) {
 
     const menu = document.getElementById("map-menu");
