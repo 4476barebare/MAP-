@@ -830,16 +830,20 @@ function swapWithSubstitute(spot) {
         return top?.textContent === spot.name;
     });
 
-    if (!targetLi) {
-        alert("削除対象なし: " + spot.name);
-        return;
-    }
+
 
     const removedName = targetLi.querySelector(".row-top")?.textContent;
     alert("削除対象: " + removedName);
 
     targetLi.remove();
 
+    // ★ここで必ず追加
+    if (window.substitute) {
+        const newLi = createMenuItem(window.substitute);
+        ul.appendChild(newLi);
+    }
+
+    // ★最後に更新
     window.substitute = spot;
 }
 
