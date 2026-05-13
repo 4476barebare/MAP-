@@ -407,6 +407,31 @@ li {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+#map-menu li {
+    overflow: visible;
+}
+
+.menu-header-row {
+    display: block !important;
+    padding: 2px 8px !important;
+    background: transparent !important;
+}
+
+.menu-header-row > div {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    font-size: 12px;
+    white-space: nowrap;
+    text-shadow:
+    1px 0 #191970,
+   -1px 0 #191970,
+    0 1px #191970,
+    0 -1px #191970;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+}
+
 /* pointer-events統一 */
 #map-menu,
 #map-menu ul,
@@ -1011,17 +1036,7 @@ li {
 .zoom-17 .fish-text { font-size: 8px; }
 .zoom-16 .fish-text { font-size: 6px; }
 
-.fish-dot {
-  width: 5px;
-  height: 2px;
-  background: #fff;
-  box-shadow:
-    1px 0 #191970,
-   -1px 0 #191970,
-    0 1px #191970,
-    0 -1px #191970;
-  border-radius: 1px;
-}
+
 
 .pref-weather {
     position: absolute;
@@ -1047,29 +1062,4 @@ li {
     font-size: 6px;
     opacity: 0.6;
 
-}
-
-#map-menu li {
-    overflow: visible;
-}
-
-.menu-header-row {
-    display: block !important;
-    padding: 2px 8px !important;
-    background: transparent !important;
-}
-
-.menu-header-row > div {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100%;
-    font-size: 12px;
-    white-space: nowrap;
-    text-shadow:
-    1px 0 #191970,
-   -1px 0 #191970,
-    0 1px #191970,
-    0 -1px #191970;
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
