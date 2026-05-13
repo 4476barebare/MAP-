@@ -718,43 +718,67 @@ function enableDragForArea() {
 
 let phase2Initialized = false;
 let lastVisibleSet = new Set();
+// -------------------------
+// ★グローバルで管理
+// -------------------------
+let phase2Timer = null;
 
 function enablePhase2(map) {
 
-    let phase2Timer = null;
+    if (!map) return;
 
-const runPhase2 = () => {
+    // ★二重登録防止
+    if (map._phase2Handler) {
+        map.off('dragend', map._phase2Handler);
+        map.off('moveend', map._phase2Handler);
+    }
 
-    clearTimeout(phase2Timer);
+    const runPhase2 = () => {
 
-    phase2Timer = setTimeout(() => {
-        processSpotUtils(map);
-        showNearestSpotName(map);
-    }, 80);
-};
+        // ★無効状態なら何もしない
+        if (!window.phase2Initialized) return;
+
+        clearTimeout(phase2Timer);
+
+        phase2Timer = setTimeout(() => {
+
+            // ★ここでもガード（遅延対策）
+            if (!window.phase2Initialized) return;
+
+            processSpotUtils(map);
+            showNearestSpotName(map);
+
+        }, 80);
+    };
 
     map._phase2Handler = runPhase2;
 
     map.on('dragend', runPhase2);
     map.on('moveend', runPhase2);
-    
-    phase2Initialized = true;
+
+    window.phase2Initialized = true;
 }
 
 function disablePhase2(map) {
 
     if (!map) return;
 
+    // ★イベント解除
     if (map._phase2Handler) {
         map.off('dragend', map._phase2Handler);
         map.off('moveend', map._phase2Handler);
         map._phase2Handler = null;
     }
 
+    // ★タイマー完全停止
+    clearTimeout(phase2Timer);
+    phase2Timer = null;
+
+    // ★フラグOFF
     window.phase2Initialized = false;
     window.lastVisibleSet = new Set();
 
-    // UIは最小限だけ
+    // UIリセット
     const menu = document.getElementById("map-menu");
     if (menu) {
         menu.classList.remove("phase2-lock");
