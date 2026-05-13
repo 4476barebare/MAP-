@@ -531,23 +531,18 @@ li {
 ========================= */
 .map-ui-sub {
   display: flex;
-  margin:0 0 0 auto;
+  align-items: center;
+  justify-content: flex-end; /* ←これ必須 */
+
   width: 100%;
-  pointer-events: none;
 }
 
 /* =========================
    nearest spot
 ========================= */
 .nearest-spot {
-    width: 350px;
-    margin-right: 0;
-    margin-left: 0;
+  margin-right: 10px; /* backとの間隔 */
   font-size: 12px;
-
-
-  pointer-events: none;
-
   white-space: nowrap;
 }
 
