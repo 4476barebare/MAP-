@@ -826,14 +826,16 @@ function swapWithSubstitute(map, spot) {
         return top?.textContent === spot.name;
     });
 
-    if (!targetLi) return;
-
-    const substitute = window.substitute;
-
-    if (substitute) {
-        const newLi = createMenuItem(substitute);
-        targetLi.replaceWith(newLi);
+    if (!targetLi) {
+        alert("削除対象なし: " + spot.name);
+        return;
     }
+
+    const removedName = targetLi.querySelector(".row-top")?.textContent;
+
+    alert("削除対象: " + removedName);
+
+    targetLi.remove();
 
     window.substitute = spot;
 }
