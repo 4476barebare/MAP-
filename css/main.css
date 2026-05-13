@@ -495,7 +495,7 @@ li {
   z-index: 3000;
 
   display: flex;
-  flex-direction: column;
+
   align-items: center;
 
   pointer-events: none;
@@ -512,7 +512,6 @@ li {
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
 
-  display: flex;
   align-items: center;
   justify-content: center;
 
