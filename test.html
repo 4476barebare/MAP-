@@ -2,252 +2,196 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>Whether Debug</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天気テーブル（フェード付き）</title>
+
 <style>
 body {
-    font-family: monospace;
-    background: #111;
-    color: #0f0;
-    padding: 10px;
+  margin: 0;
+  font-family: sans-serif;
 }
-pre {
-    white-space: pre-wrap;
-    word-break: break-all;
+
+.wrapper {
+  padding: 10px;
+}
+
+/* 全体 */
+.weather-wrap {
+  display: flex;
+  font-size: 12px;
+  position: relative;
+}
+
+/* 左ラベル */
+.labels {
+  flex-shrink: 0;
+  background: #f5f5f5;
+  z-index: 2;
+}
+
+.label-cell {
+  padding: 6px 8px;
+  border-bottom: 1px solid #ccc;
+  white-space: nowrap;
+}
+
+/* スクロール領域 */
+.scroll {
+  position: relative;
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* テーブル */
+.weather-table {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  min-width: 50px;
+  text-align: center;
+  padding: 6px 4px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* 現在時刻 */
+.now {
+  background: #ffeeba;
+}
+
+/* ===== フェード（重要） ===== */
+
+/* 共通 */
+.fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 左側フェード */
+.fade-left {
+  left: 0;
+  background: linear-gradient(to right, #fff, rgba(255,255,255,0));
+}
+
+/* 右側フェード */
+.fade-right {
+  right: 0;
+  background: linear-gradient(to left, #fff, rgba(255,255,255,0));
 }
 </style>
 </head>
+
 <body>
 
-<h3>Whether Debug</h3>
-<pre id="debug"></pre>
+<div class="wrapper">
+  <div class="weather-wrap">
 
-<script src="./whetherNode.js"></script>
+    <!-- 左ラベル -->
+    <div class="labels" id="labels"></div>
+
+    <!-- スクロール -->
+    <div class="scroll" id="scroll">
+
+      <!-- フェード -->
+      <div class="fade fade-left"></div>
+      <div class="fade fade-right"></div>
+
+      <!-- テーブル -->
+      <div class="weather-table" id="weatherTable"></div>
+    </div>
+
+  </div>
+</div>
 
 <script>
-// ================================
-// ■ 設定
-// ================================
-const region = "KANTO";
+// 時刻
+const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
 
-const prefs = [
-    "CHIBA"
+// ダミーデータ
+const data = {
+  weather: ["☀️","☁️","🌧️","🌧️","☁️","☀️","☀️","☀️","☁️","🌧️","🌧️","☁️"],
+  temp: [18,17,16,16,18,21,24,25,23,21,20,19],
+  rain: [0,0,10,20,10,0,0,0,10,30,40,20],
+  pop: [0,0,20,40,30,10,0,0,20,50,60,40],
+  wind: ["2m","2m","3m","4m","3m","2m","2m","3m","4m","5m","4m","3m"],
+  dir: ["北","北東","東","南東","南","南西","西","北西","北","北","北東","東"],
+  wave: [0.5,0.5,1,1,1,0.5,0.5,0.5,1,1.5,1.5,1]
+};
+
+// ラベル
+const labels = [
+  "時刻","天気","気温","降水量","降水確率","風速","風向","波高"
 ];
 
-// ================================
-// ■ デバッグ出力
-// ================================
-function debugLog(...args) {
+// ラベル生成
+const labelBox = document.getElementById("labels");
+labels.forEach(text => {
+  const div = document.createElement("div");
+  div.className = "label-cell";
+  div.textContent = text;
+  labelBox.appendChild(div);
+});
 
-    const el = document.getElementById("debug");
+// 現在時刻ブロック
+const now = new Date();
+const currentHourBlock = Math.floor(now.getHours() / 2) * 2;
 
-    const msg = args.map(a =>
-        typeof a === "object"
-            ? JSON.stringify(a, null, 2)
-            : String(a)
-    ).join(" ");
+// テーブル
+const table = document.getElementById("weatherTable");
 
-    console.log(msg);
-    el.textContent += msg + "\n";
-}
+// 行生成
+function createRow(values) {
+  const row = document.createElement("div");
+  row.className = "row";
 
-// ================================
-// ■ JSON読み込み（station用）
-// ================================
-async function loadJSON(path) {
+  values.forEach((v, i) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
 
-    try {
-        const res = await fetch(path);
-
-        if (!res.ok) {
-            debugLog("❌ JSON fetch失敗:", path);
-            return null;
-        }
-
-        const json = await res.json();
-
-        const data = json.data || json;
-
-        debugLog("✅ JSON:", path, Array.isArray(data) ? data.length : "不明");
-
-        return data;
-
-    } catch (e) {
-        debugLog("❌ JSON例外:", path, e);
-        return null;
-    }
-}
-
-// ================================
-// ■ CSV読み込み（spots用）
-// ================================
-async function loadCSV(path) {
-
-    try {
-        const res = await fetch(path);
-
-        if (!res.ok) {
-            debugLog("❌ CSV fetch失敗:", path);
-            return [];
-        }
-
-        const text = await res.text();
-
-        const lines = text.split("\n").filter(Boolean);
-
-        const header = lines.shift().split(",");
-
-        const data = lines.map(line => {
-
-            const cols = line.split(",");
-
-            const obj = {};
-
-            header.forEach((h, i) => {
-                obj[h] = cols[i];
-            });
-
-            // 型補正（重要）
-            obj.lat = Number(obj.lat);
-            obj.lng = Number(obj.lng);
-
-            return obj;
-        });
-
-        debugLog("✅ CSV:", path, data.length);
-
-        return data;
-
-    } catch (e) {
-        debugLog("❌ CSV例外:", path, e);
-        return [];
-    }
-}
-
-// ================================
-// ■ spots読み込み
-// ================================
-async function loadSpots(pref) {
-
-    const path = `./${region}/${pref}_location.csv`;
-
-    const data = await loadCSV(path);
-
-    if (!data.length) {
-        debugLog("❌ spotsなし:", pref);
-        return [];
+    if (hours[i] === currentHourBlock) {
+      cell.classList.add("now");
     }
 
-    return data;
+    cell.innerHTML = v;
+    row.appendChild(cell);
+  });
+
+  return row;
 }
 
-// ================================
-// ■ メイン処理
-// ================================
-async function runTest() {
+// 組み立て
+table.appendChild(createRow(hours));
+table.appendChild(createRow(data.weather));
+table.appendChild(createRow(data.temp.map(v => v + "℃")));
+table.appendChild(createRow(data.rain.map(v => v + "mm")));
+table.appendChild(createRow(data.pop.map(v => v + "%")));
+table.appendChild(createRow(data.wind));
+table.appendChild(createRow(data.dir));
+table.appendChild(createRow(data.wave.map(v => v + "m")));
 
-    debugLog("=== START ===");
+// 初期スクロール
+function scrollToNow() {
+  const scroll = document.getElementById("scroll");
+  const index = hours.findIndex(h => h === currentHourBlock);
 
-    // ----------------
-    // station（1回だけ）
-    // ----------------
-    const stations = await loadJSON(`./data/${region}_load.json`);
+  const cell = document.querySelector(".cell");
+  const cellWidth = cell.offsetWidth;
 
-    if (!stations) {
-        debugLog("❌ station読み込み失敗");
-        return;
-    }
-
-    debugLog("stations:", stations.length);
-
-    // ----------------
-    // prefループ
-    // ----------------
-    for (const pref of prefs) {
-
-        debugLog("----", pref, "----");
-
-        let spots = await loadSpots(pref);
-
-        if (spots.length === 0) continue;
-
-        // ----------------
-        // whether実行
-        // ----------------
-        runWhether(spots, stations);
-
-        const count = spots.filter(s => s.whether).length;
-
-        debugLog("取得:", count, "/", spots.length);
-
-        // ----------------
-        // 未取得チェック
-        // ----------------
-        const missing = spots.filter(s =>
-            s.icon === "spot" && !s.whether
-        );
-
-        if (missing.length > 0) {
-            debugLog("未取得:", missing.length);
-            debugLog("例:", missing.slice(0, 2));
-        }
-
-        // ----------------
-        // サンプル確認
-        // ----------------
-        const sample = spots.find(s => s.whether);
-
-        if (sample) {
-            debugLog("sample:", sample.name);
-        }
-
-        // ----------------
-        // メモリ解放
-        // ----------------
-        exportWhether100CSV(spots);
-
-        spots = null;
-    }
-
-    debugLog("=== END ===");
-    
-    
+  scroll.scrollLeft = index * cellWidth;
 }
-function exportWhether100CSV(spots) {
 
-    const target = spots.filter(s =>
-        s.icon === "spot" && s.whether
-    );
-
-    let csv = "name,lat,lng,whether\n";
-
-    for (const s of target) {
-
-        csv += [
-            s.name || "",
-            s.lat ?? "",
-            s.lng ?? "",
-            s.whether ? JSON.stringify(s.whether) : ""
-        ].join(",") + "\n";
-    }
-
-    const blob = new Blob([csv], {
-        type: "text/csv;charset=utf-8"
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "whether_100_compare.csv";
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-}
-// ================================
-runTest();
+// 少し遅らせて確実にスクロール
+setTimeout(scrollToNow, 50);
 
 </script>
 
