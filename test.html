@@ -29,9 +29,23 @@ body {
 }
 
 .weather-label {
-  padding: 6px 8px;
-  border-bottom: 1px solid #ccc;
-  white-space: nowrap;
+  padding: 2px 6px;   /* ←詰める */
+  line-height: 1.1;   /* ←重要：行高を圧縮 */
+  font-size: 11px;
+}
+
+.weather-cell {
+  min-width: 52px;
+  padding: 2px 2px;   /* ←詰める */
+  line-height: 1.1;
+  font-size: 11px;
+}
+
+/* アイコンだけ少しだけ余裕残す */
+.weather-cell img,
+.weather-cell span {
+  display: inline-block;
+  line-height: 1;
 }
 
 /* スクロールラッパー（ここにフェード固定） */
@@ -56,38 +70,39 @@ body {
   display: flex;
 }
 
-.weather-cell {
-  min-width: 52px;
-  text-align: center;
-  padding: 6px 4px;
-  border-bottom: 1px solid #ccc;
-}
+
 
 /* 現在時刻 */
 .is-now {
   background: #ffeeba;
 }
 
-/* ===== フェード ===== */
 .weather-fade {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 28px;
-  pointer-events: none;
-  z-index: 5;
+  width: 60px;  /* ←ここを大きく */
 }
 
 /* 左 */
 .weather-fade-left {
-  left: 0;
-  background: linear-gradient(to right, #fff, rgba(255,255,255,0));
+  background: linear-gradient(
+    to right,
+    #fff 0%,
+    rgba(255,255,255,0.9) 30%,
+    rgba(255,255,255,0.6) 55%,
+    rgba(255,255,255,0.3) 75%,
+    rgba(255,255,255,0) 100%
+  );
 }
 
 /* 右 */
 .weather-fade-right {
-  right: 0;
-  background: linear-gradient(to left, #fff, rgba(255,255,255,0));
+  background: linear-gradient(
+    to left,
+    #fff 0%,
+    rgba(255,255,255,0.9) 30%,
+    rgba(255,255,255,0.6) 55%,
+    rgba(255,255,255,0.3) 75%,
+    rgba(255,255,255,0) 100%
+  );
 }
 </style>
 </head>
@@ -133,7 +148,7 @@ const DATA = {
 
 // ===== ラベル =====
 const LABELS = [
-  "時刻","天気","気温","降水量","降水確率","風速","風向","波高"
+  "時刻","天気","気温","降水","確率","風速","風向","波高"
 ];
 
 // ===== DOM =====
