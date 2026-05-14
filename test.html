@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>天気テーブル（フェード付き）</title>
+<title>天気テーブル完成版</title>
 
 <style>
 body {
@@ -15,27 +15,35 @@ body {
   padding: 10px;
 }
 
-/* 全体 */
-.weather-wrap {
+/* ===== レイアウト ===== */
+.weather {
   display: flex;
   font-size: 12px;
-  position: relative;
 }
 
 /* 左ラベル */
-.labels {
+.weather-labels {
   flex-shrink: 0;
   background: #f5f5f5;
   z-index: 2;
 }
 
-.label-cell {
+.weather-label {
   padding: 6px 8px;
   border-bottom: 1px solid #ccc;
   white-space: nowrap;
 }
 
+/* スクロールラッパー（ここにフェード固定） */
+.weather-scroll-wrap {
+  position: relative;
+  width: 100%;
+}
 
+/* スクロール本体 */
+.weather-scroll {
+  overflow-x: auto;
+}
 
 /* テーブル */
 .weather-table {
@@ -44,50 +52,40 @@ body {
   min-width: max-content;
 }
 
-.row {
+.weather-row {
   display: flex;
 }
 
-.cell {
-  min-width: 50px;
+.weather-cell {
+  min-width: 52px;
   text-align: center;
   padding: 6px 4px;
   border-bottom: 1px solid #ccc;
 }
 
 /* 現在時刻 */
-.now {
+.is-now {
   background: #ffeeba;
 }
 
-.scroll-wrap {
-  position: relative;
-  width: 100%;
-}
-
-/* スクロール本体 */
-.scroll {
-  overflow-x: auto;
-}
-
-/* フェード */
-.fade {
+/* ===== フェード ===== */
+.weather-fade {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 24px;
+  width: 28px;
   pointer-events: none;
   z-index: 5;
 }
 
 /* 左 */
-.fade-left {
+.weather-fade-left {
   left: 0;
   background: linear-gradient(to right, #fff, rgba(255,255,255,0));
 }
 
 /* 右 */
-.fade-right {
+.weather-fade-right {
   right: 0;
   background: linear-gradient(to left, #fff, rgba(255,255,255,0));
 }
@@ -96,30 +94,34 @@ body {
 
 <body>
 
-<div class="weather-wrap">
+<div class="wrapper">
+  <div class="weather">
 
-  <div class="labels"></div>
+    <!-- 左ラベル -->
+    <div class="weather-labels" id="labels"></div>
 
-  <!-- ★ここがラッパー -->
-  <div class="scroll-wrap">
+    <!-- 右スクロール -->
+    <div class="weather-scroll-wrap">
 
-    <div class="scroll" id="scroll">
-      <div class="weather-table" id="weatherTable"></div>
+      <div class="weather-scroll" id="scroll">
+        <div class="weather-table" id="table"></div>
+      </div>
+
+      <!-- フェード（スクロールの外） -->
+      <div class="weather-fade weather-fade-left" id="fadeLeft"></div>
+      <div class="weather-fade weather-fade-right" id="fadeRight"></div>
+
     </div>
-
-    <!-- ★フェードはここ（外側） -->
-    <div class="fade fade-left"></div>
-    <div class="fade fade-right"></div>
 
   </div>
 </div>
 
 <script>
-// 時刻
-const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
+// ===== 時刻 =====
+const HOURS = [0,2,4,6,8,10,12,14,16,18,20,22];
 
-// ダミーデータ
-const data = {
+// ===== ダミーデータ =====
+const DATA = {
   weather: ["☀️","☁️","🌧️","🌧️","☁️","☀️","☀️","☀️","☁️","🌧️","🌧️","☁️"],
   temp: [18,17,16,16,18,21,24,25,23,21,20,19],
   rain: [0,0,10,20,10,0,0,0,10,30,40,20],
@@ -129,38 +131,41 @@ const data = {
   wave: [0.5,0.5,1,1,1,0.5,0.5,0.5,1,1.5,1.5,1]
 };
 
-// ラベル
-const labels = [
+// ===== ラベル =====
+const LABELS = [
   "時刻","天気","気温","降水量","降水確率","風速","風向","波高"
 ];
 
-// ラベル生成
+// ===== DOM =====
 const labelBox = document.getElementById("labels");
-labels.forEach(text => {
+const table = document.getElementById("table");
+const scroll = document.getElementById("scroll");
+const fadeLeft = document.getElementById("fadeLeft");
+const fadeRight = document.getElementById("fadeRight");
+
+// ===== ラベル生成 =====
+LABELS.forEach(text => {
   const div = document.createElement("div");
-  div.className = "label-cell";
+  div.className = "weather-label";
   div.textContent = text;
   labelBox.appendChild(div);
 });
 
-// 現在時刻ブロック
+// ===== 現在時刻ブロック =====
 const now = new Date();
-const currentHourBlock = Math.floor(now.getHours() / 2) * 2;
+const currentBlock = Math.floor(now.getHours() / 2) * 2;
 
-// テーブル
-const table = document.getElementById("weatherTable");
-
-// 行生成
-function createRow(values) {
+// ===== 行生成 =====
+function createRow(values, isHeader = false) {
   const row = document.createElement("div");
-  row.className = "row";
+  row.className = "weather-row";
 
   values.forEach((v, i) => {
     const cell = document.createElement("div");
-    cell.className = "cell";
+    cell.className = "weather-cell";
 
-    if (hours[i] === currentHourBlock) {
-      cell.classList.add("now");
+    if (HOURS[i] === currentBlock) {
+      cell.classList.add("is-now");
     }
 
     cell.innerHTML = v;
@@ -170,29 +175,40 @@ function createRow(values) {
   return row;
 }
 
-// 組み立て
-table.appendChild(createRow(hours));
-table.appendChild(createRow(data.weather));
-table.appendChild(createRow(data.temp.map(v => v + "℃")));
-table.appendChild(createRow(data.rain.map(v => v + "mm")));
-table.appendChild(createRow(data.pop.map(v => v + "%")));
-table.appendChild(createRow(data.wind));
-table.appendChild(createRow(data.dir));
-table.appendChild(createRow(data.wave.map(v => v + "m")));
+// ===== テーブル構築 =====
+table.appendChild(createRow(HOURS, true));
+table.appendChild(createRow(DATA.weather));
+table.appendChild(createRow(DATA.temp.map(v => v + "℃")));
+table.appendChild(createRow(DATA.rain.map(v => v + "mm")));
+table.appendChild(createRow(DATA.pop.map(v => v + "%")));
+table.appendChild(createRow(DATA.wind));
+table.appendChild(createRow(DATA.dir));
+table.appendChild(createRow(DATA.wave.map(v => v + "m")));
 
-// 初期スクロール
+// ===== 初期スクロール =====
 function scrollToNow() {
-  const scroll = document.getElementById("scroll");
-  const index = hours.findIndex(h => h === currentHourBlock);
+  const index = HOURS.findIndex(h => h === currentBlock);
+  const cell = document.querySelector(".weather-cell");
+  const width = cell.offsetWidth;
 
-  const cell = document.querySelector(".cell");
-  const cellWidth = cell.offsetWidth;
-
-  scroll.scrollLeft = index * cellWidth;
+  scroll.scrollLeft = index * width;
 }
 
-// 少し遅らせて確実にスクロール
-setTimeout(scrollToNow, 50);
+// ===== フェード制御 =====
+function updateFade() {
+  const max = scroll.scrollWidth - scroll.clientWidth;
+
+  fadeLeft.style.opacity = scroll.scrollLeft > 0 ? "1" : "0";
+  fadeRight.style.opacity = scroll.scrollLeft < max ? "1" : "0";
+}
+
+scroll.addEventListener("scroll", updateFade);
+
+// ===== 実行 =====
+setTimeout(() => {
+  scrollToNow();
+  updateFade();
+}, 50);
 
 </script>
 
