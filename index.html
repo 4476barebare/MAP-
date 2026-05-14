@@ -682,22 +682,48 @@ function loadWhetherCSV(url) {
 
             const lines = text.trim().split("\n");
 
-            // ヘッダーは使わない（固定3列前提）
             lines.shift();
 
             return lines.map(line => {
 
                 const obj = splitCSVLine(line);
-
                 if (!obj) return null;
+
+                // ===== ここから追加 =====
+
+                // ★ 今日・昨日を判定
+                const today = new Date();
+                const yesterday = new Date();
+                yesterday.setDate(today.getDate() - 1);
+
+                const csvDate = new Date(obj.date);
+
+                const isYesterday =
+                    csvDate.getFullYear() === yesterday.getFullYear() &&
+                    csvDate.getMonth() === yesterday.getMonth() &&
+                    csvDate.getDate() === yesterday.getDate();
+
+                if (isYesterday) {
+
+                    // ★ hourly を1つ前に詰める
+                    obj.hourly0 = obj.hourly1;
+                    obj.water0  = obj.water1;
+
+                    obj.hourly1 = obj.hourly2;
+                    obj.water1  = obj.water2;
+
+                    // 必要なら hourly2 は空にする
+                    obj.hourly2 = null;
+                    obj.water2  = null;
+                }
+
+                // ===== ここまで追加 =====
 
                 return obj;
 
             }).filter(Boolean);
         });
 }
-
-
 // ================================
 // ■ CSV → spotへ反映
 // ================================
