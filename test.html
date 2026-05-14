@@ -11,148 +11,60 @@ body {
   font-family: sans-serif;
 }
 
-.wrapper {
-  padding: 10px;
-}
-
-/* ===== レイアウト ===== */
 .weather {
   display: flex;
   font-size: 12px;
 }
 
-/* 左ラベル */
 .weather-labels {
   flex-shrink: 0;
   background: #f5f5f5;
-  z-index: 2;
 }
 
 .weather-label {
-  padding: 2px 6px;   /* ←詰める */
-  line-height: 1.1;   /* ←重要：行高を圧縮 */
-  font-size: 11px;
-}
-
-.weather-cell {
-  min-width: 52px;
-  padding: 2px 2px;   /* ←詰める */
-  line-height: 1.1;
-  font-size: 11px;
-}
-
-/* アイコンだけ少しだけ余裕残す */
-.weather-cell img,
-.weather-cell span {
-  display: inline-block;
+  padding: 2px 6px;
+  font-size: 10px;
   line-height: 1;
-}
-
-/* スクロールラッパー（ここにフェード固定） */
-.weather-scroll-wrap {
-  position: relative;
-  width: 100%;
-}
-
-/* スクロール本体 */
-.weather-scroll {
-  overflow-x: auto;
-}
-
-/* テーブル */
-.weather-table {
-  display: flex;
-  flex-direction: column;
-  min-width: max-content;
-}
-
-.weather-row {
-  display: flex;
-}
-
-
-
-/* 現在時刻 */
-.is-now {
-  background: #ffeeba;
-}
-
-.weather-fade {
-  width: 60px;  /* ←ここを大きく */
-}
-
-/* 左 */
-.weather-fade-left {
-  background: linear-gradient(
-    to right,
-    #fff 0%,
-    rgba(255,255,255,0.9) 30%,
-    rgba(255,255,255,0.6) 55%,
-    rgba(255,255,255,0.3) 75%,
-    rgba(255,255,255,0) 100%
-  );
-}
-
-/* 右 */
-.weather-fade-right {
-  background: linear-gradient(
-    to left,
-    #fff 0%,
-    rgba(255,255,255,0.9) 30%,
-    rgba(255,255,255,0.6) 55%,
-    rgba(255,255,255,0.3) 75%,
-    rgba(255,255,255,0) 100%
-  );
-}
-/* ===== 追加・修正 ===== */
-
-.weather-row {
+  height: 20px;
   display: flex;
   align-items: center;
 }
 
+.weather-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.weather-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  height: 20px;
+  align-items: center;
+}
+
 .weather-cell {
-  min-width: 52px;
-  padding: 2px 2px;
-  line-height: 1.1;
-  font-size: 11px;
+  font-size: 10px;
   text-align: center;
   border-bottom: 1px solid #ccc;
 }
 
-.weather-fade {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 60px;
-  pointer-events: none;
-  z-index: 5;
+.is-now {
+  background: #ffeeba;
 }
 </style>
 </head>
 
 <body>
 
-<div class="wrapper">
-  <div class="weather">
+<div class="weather">
 
-    <!-- 左ラベル -->
-    <div class="weather-labels" id="labels"></div>
+  <!-- 左ラベル -->
+  <div class="weather-labels" id="labels"></div>
 
-    <!-- 右スクロール -->
-    <div class="weather-scroll-wrap">
+  <!-- ★これが必要 -->
+  <div class="weather-table" id="table"></div>
 
-      <div class="weather-scroll" id="scroll">
-        <div class="weather-table" id="table"></div>
-      </div>
-
-      <!-- フェード（スクロールの外） -->
-      <div class="weather-fade weather-fade-left" id="fadeLeft"></div>
-      <div class="weather-fade weather-fade-right" id="fadeRight"></div>
-
-    </div>
-
-  </div>
 </div>
 
 <script>
@@ -224,30 +136,7 @@ table.appendChild(createRow(DATA.wind));
 table.appendChild(createRow(DATA.dir));
 table.appendChild(createRow(DATA.wave.map(v => v + "m")));
 
-// ===== 初期スクロール =====
-function scrollToNow() {
-  const index = HOURS.findIndex(h => h === currentBlock);
-  const cell = document.querySelector(".weather-cell");
-  const width = cell.offsetWidth;
 
-  scroll.scrollLeft = index * width;
-}
-
-// ===== フェード制御 =====
-function updateFade() {
-  const max = scroll.scrollWidth - scroll.clientWidth;
-
-  fadeLeft.style.opacity = scroll.scrollLeft > 0 ? "1" : "0";
-  fadeRight.style.opacity = scroll.scrollLeft < max ? "1" : "0";
-}
-
-scroll.addEventListener("scroll", updateFade);
-
-// ===== 実行 =====
-setTimeout(() => {
-  scrollToNow();
-  updateFade();
-}, 50);
 
 </script>
 
