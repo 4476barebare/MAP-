@@ -104,6 +104,30 @@ body {
     rgba(255,255,255,0) 100%
   );
 }
+/* ===== 追加・修正 ===== */
+
+.weather-row {
+  display: flex;
+  align-items: center;
+}
+
+.weather-cell {
+  min-width: 52px;
+  padding: 2px 2px;
+  line-height: 1.1;
+  font-size: 11px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.weather-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  pointer-events: none;
+  z-index: 5;
+}
 </style>
 </head>
 
