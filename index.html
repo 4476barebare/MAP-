@@ -539,10 +539,27 @@ function formatPrefWeather(whether) {
 
     if (codeCount === 0) return null;
 
+    // ===== ここから追加 =====
+
+    let displayPop = null;
+
+    if (maxPop !== -Infinity) {
+
+        // ★ ノイズカット（微小な確率は0扱い）
+        if (maxPop < 5) {
+            displayPop = 0;
+        } else {
+            // ★ 10%刻みに丸め（気象庁フォーマット）
+            displayPop = Math.round(maxPop / 10) * 10;
+        }
+    }
+
+    // ===== ここまで追加 =====
+
     return {
         icon: Math.round(codeSum / codeCount),
         temp: Math.round(maxTemp),
-        pop: Math.round(maxPop),
+        pop: displayPop, // ★ 修正：maxPop → displayPop
         wind: Math.round(maxWind)
     };
 }
