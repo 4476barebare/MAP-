@@ -35,12 +35,7 @@ body {
   white-space: nowrap;
 }
 
-/* スクロール領域 */
-.scroll {
-  position: relative;
-  overflow-x: auto;
-  width: 100%;
-}
+
 
 /* テーブル */
 .weather-table {
@@ -65,25 +60,33 @@ body {
   background: #ffeeba;
 }
 
-/* ===== フェード（重要） ===== */
+.scroll-wrap {
+  position: relative;
+  width: 100%;
+}
 
-/* 共通 */
+/* スクロール本体 */
+.scroll {
+  overflow-x: auto;
+}
+
+/* フェード */
 .fade {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 24px;
   pointer-events: none;
-  z-index: 3;
+  z-index: 5;
 }
 
-/* 左側フェード */
+/* 左 */
 .fade-left {
   left: 0;
   background: linear-gradient(to right, #fff, rgba(255,255,255,0));
 }
 
-/* 右側フェード */
+/* 右 */
 .fade-right {
   right: 0;
   background: linear-gradient(to left, #fff, rgba(255,255,255,0));
@@ -93,22 +96,20 @@ body {
 
 <body>
 
-<div class="wrapper">
-  <div class="weather-wrap">
+<div class="weather-wrap">
 
-    <!-- 左ラベル -->
-    <div class="labels" id="labels"></div>
+  <div class="labels"></div>
 
-    <!-- スクロール -->
+  <!-- ★ここがラッパー -->
+  <div class="scroll-wrap">
+
     <div class="scroll" id="scroll">
-
-      <!-- フェード -->
-      <div class="fade fade-left"></div>
-      <div class="fade fade-right"></div>
-
-      <!-- テーブル -->
       <div class="weather-table" id="weatherTable"></div>
     </div>
+
+    <!-- ★フェードはここ（外側） -->
+    <div class="fade fade-left"></div>
+    <div class="fade fade-right"></div>
 
   </div>
 </div>
