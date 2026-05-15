@@ -763,27 +763,30 @@ function disablePhase2(map) {
 
     if (!map) return;
 
-    // ★イベント解除
+    // ★まず「これ以上実行させない」
+    window.phase2Initialized = false;
+
+    // ★イベント解除（今後の発火を止める）
     if (map._phase2Handler) {
         map.off('dragend', map._phase2Handler);
         map.off('moveend', map._phase2Handler);
         map._phase2Handler = null;
     }
 
-    // ★タイマー完全停止
-    clearTimeout(phase2Timer);
-    phase2Timer = null;
+    // ★タイマーは“潰さない”
+    // → 最後の1回を自然に流すため
 
-    // ★フラグOFF
-    window.phase2Initialized = false;
+    // 状態リセット（軽量）
     window.lastVisibleSet = new Set();
 
-    // UIリセット
-    const menu = document.getElementById("map-menu");
-    if (menu) {
-        menu.classList.remove("phase2-lock");
-        menu.style.display = "none";
-    }
+    // UIは即消さない（これがカクつき原因）
+    requestAnimationFrame(() => {
+        const menu = document.getElementById("map-menu");
+        if (menu) {
+            menu.classList.remove("phase2-lock");
+            menu.style.display = "none";
+        }
+    });
 }
 
 function processSpotUtils(map) {
@@ -996,6 +999,7 @@ if (!safe.URL) {
             document.getElementById('map-back-btn').style.display = 'block';
 
             showFishMarkers(safe2.URL);
+            createWeekItem(safe2.whether);
 
             window.map.setMinZoom(safe.zoom || 15);
             window.map.setMaxZoom(18);
@@ -1036,6 +1040,7 @@ if (!safe.URL) {
 
     window.map.once('moveend', function () {
         showFishMarkers(safe.URL);
+        createWeekItem(safe.whether);
 
         window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
@@ -1119,6 +1124,52 @@ function renderMarkers() {
 
   window.map.off('zoomend', renderMarkers);
   window.map.on('zoomend', renderMarkers);
+}
+
+function createWeekItem(weekData) {
+  const labelsContainer = document.getElementById("weekLabels");
+  const tableContainer = document.getElementById("weekTable");
+
+  labelsContainer.innerHTML = "";
+  tableContainer.innerHTML = "";
+
+  const hasHourly2 = weekData[0].hourly2 != null;
+
+  for (let i = 0; i < 7; i++) {
+    let value;
+    let date;
+
+    if (i === 0) {
+      value = weekData[0].hourly0;
+      date = weekData[0].date;
+
+    } else if (i === 1) {
+      value = weekData[1].hourly1;
+      date = weekData[1].date;
+
+    } else if (i === 2 && hasHourly2) {
+      value = weekData[2].hourly2;
+      date = weekData[2].date;
+
+    } else {
+      const offset = hasHourly2 ? 3 : 2;
+      const index = i;
+
+      value = weekData[index].daily;
+      date = weekData[index].date;
+    }
+
+    // DOM生成
+    const label = document.createElement("div");
+    label.className = "week-label";
+    label.textContent = date;
+    labelsContainer.appendChild(label);
+
+    const cell = document.createElement("div");
+    cell.className = "week-cell";
+    cell.textContent = value ?? "-";
+    tableContainer.appendChild(cell);
+  }
 }
 
 function resetSpotLayers() {
