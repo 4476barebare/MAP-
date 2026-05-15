@@ -187,7 +187,7 @@ header {
   left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.55);
+  background:rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
@@ -1063,4 +1063,102 @@ li {
     font-size: 6px;
     opacity: 0.6;
 
+}
+
+
+
+
+/* ===== hourlyテーブル ===== */
+.weather {
+  display: flex;
+  font-size: 8px;
+  margin-left: 4px;
+  margin-right: 4px;
+  color: #fff;
+}
+
+.weather-labels {
+  flex-shrink: 0;
+  border-radius: 4px 0px 0px 4px;
+  background-color: rgba(0,0,0,0.7);
+}
+
+.weather-label {
+  height:14px;
+  display:flex;
+  align-items:center;
+  padding:0 2px;
+  font-size:6px;
+}
+
+.weather-table {
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  border-radius: 0px 4px 4px 0px;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.weather-row {
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  height:14px;
+  gap:2px;
+}
+
+.weather-cell {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.is-now { background-color: rgba(0,0,0,0.4); }
+
+/* =====週間7枠 ===== */
+.week {
+  display:flex;
+  font-size:8px;
+  color:#fff;
+  margin: 4px;
+}
+
+.week-labels {
+  flex-shrink:0;
+  border-radius: 4px 0px 0px 4px;
+  background-color: rgba(0,0,0,0.7);
+}
+
+.week-label {
+  height:14px;
+  display:flex;
+  align-items:center;
+  padding:0 2px;
+  font-size:6px;
+  
+}
+
+.week-table {
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  border-radius: 0px 4px 4px 0px;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.week-row {
+  display:grid;
+  grid-template-columns:repeat(7, minmax(0,1fr));
+  height:14px;
+}
+
+.week-cell {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  white-space:nowrap;
+}
+
+.week-cell.active {
+    background-color: rgba(0,0,0,0.4);
 }
