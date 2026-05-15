@@ -77,28 +77,44 @@ body {
   margin-left: 1px;
 }
 
+.week-buttons {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin: 4px;
+}
 
-
-
-/* 横スクロール */
-.weather-scroll {
+.week-btn {
   display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  flex-direction: column;
+  height: 42px; /* 14px × 3行 */
+  background: rgba(0,0,0,0.5);
+  border-radius: 4px;
+  overflow: hidden;
+  font-size: 8px;
 }
 
-/* 各ブロック */
-.weather-block {
-  flex-shrink: 0;
-  scroll-snap-align: start;
+.week-btn.hourly {
+  background: rgba(30, 41, 59, 0.8);
 }
+
+.week-btn.daily {
+  background: rgba(51, 65, 85, 0.8);
+}
+
+.week-row {
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="weather-scroll">
-<div class="weather weather-block">
+<div class="weather">
 
   <!-- 左ラベル -->
   <div class="weather-labels" id="labels"></div>
@@ -107,49 +123,15 @@ body {
   <div class="weather-table" id="table"></div>
 
 </div>
-<div class="weather weather-block">
-  <!-- 左ラベル -->
-  <div class="weather-labels">
-    <div class="weather-label">日</div>
-    <div class="weather-label">天気</div>
-    <div class="weather-label">最高</div>
-    <div class="weather-label">最低</div>
-  </div>
 
-  <!-- 右 -->
-  <div class="weather-table">
 
-    <div class="weather-row">
-      <div class="weather-cell">月</div>
-      <div class="weather-cell">火</div>
-      <div class="weather-cell">水</div>
-      <div class="weather-cell">木</div>
-    </div>
 
-    <div class="weather-row">
-      <div class="weather-cell">☀️</div>
-      <div class="weather-cell">☁️</div>
-      <div class="weather-cell">🌧️</div>
-      <div class="weather-cell">☀️</div>
-    </div>
 
-    <div class="weather-row">
-      <div class="weather-cell">28℃</div>
-      <div class="weather-cell">26℃</div>
-      <div class="weather-cell">24℃</div>
-      <div class="weather-cell">27℃</div>
-    </div>
+<!-- ★ここに追加 -->
+<div class="week-buttons" id="weekButtons"></div>
 
-    <div class="weather-row">
-      <div class="weather-cell">21℃</div>
-      <div class="weather-cell">20℃</div>
-      <div class="weather-cell">19℃</div>
-      <div class="weather-cell">21℃</div>
-    </div>
-
-  </div>
-</div>
-</div>
+<div class="weather">
+    
 
 <script>
 // ===== 時刻 =====
@@ -220,7 +202,64 @@ table.appendChild(createRow(DATA.wind));
 table.appendChild(createRow(DATA.dir));
 table.appendChild(createRow(DATA.wave.map(v => v + "m")));
 
+// ===== 週間ボタン =====
+const weekBox = document.getElementById("weekButtons");
 
+// ▼ パターン切替（true: hourly3 / false: hourly2）
+const hasHourly3 = true;
+
+// ===== ダミーデータ =====
+const hourlyBlocks = [
+  { weather: "☀️", max: 25, min: 25 },
+  { weather: "☁️", max: 23, min: 23 },
+  hasHourly3 ? { weather: "🌧️", max: 22, min: 22 } : null
+].filter(Boolean);
+
+const dailyBlocks = [
+  { weather: "☀️", max: 26, min: 18 },
+  { weather: "☁️", max: 24, min: 17 },
+  { weather: "🌧️", max: 22, min: 16 },
+  { weather: "🌧️", max: 21, min: 16 },
+  { weather: "☀️", max: 25, min: 18 }
+];
+
+// ===== 組み立て =====
+const blocks = [];
+
+// hourly優先
+hourlyBlocks.forEach((h, i) => {
+  blocks.push({ type: "hourly", data: h });
+});
+
+// 残りをdailyで埋める
+const remain = 7 - blocks.length;
+dailyBlocks.slice(0, remain).forEach(d => {
+  blocks.push({ type: "daily", data: d });
+});
+
+// ===== 描画 =====
+blocks.forEach(b => {
+  const btn = document.createElement("div");
+  btn.className = `week-btn ${b.type}`;
+
+  const r1 = document.createElement("div");
+  r1.className = "week-row";
+  r1.textContent = b.data.weather;
+
+  const r2 = document.createElement("div");
+  r2.className = "week-row";
+  r2.textContent = b.data.max + "℃";
+
+  const r3 = document.createElement("div");
+  r3.className = "week-row";
+  r3.textContent = b.data.min + "℃";
+
+  btn.appendChild(r1);
+  btn.appendChild(r2);
+  btn.appendChild(r3);
+
+  weekBox.appendChild(btn);
+});
 
 </script>
 
