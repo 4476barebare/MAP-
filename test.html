@@ -87,14 +87,16 @@ body { margin:0; font-family:sans-serif; }
 
 .week-row {
   display:grid;
-  grid-template-columns:repeat(7,1fr);
-  height:14px
+  grid-template-columns:repeat(7, minmax(0,1fr));
+  height:14px;
 }
 
 .week-cell {
   display:flex;
   align-items:center;
   justify-content:center;
+  overflow:hidden;
+  white-space:nowrap;
 }
 
 .week-cell.active {
