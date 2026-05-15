@@ -3,48 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>weather type</title>
+<title>weather scroll snap</title>
 
 <style>
 body {
   margin: 0;
-  font-family: sans-serif;
   background: #111;
+  font-family: sans-serif;
 }
 
-/* =======================
-  横スクロール全体
-======================= */
+/* ================================
+   横スクロール全体
+================================ */
 .weather-scroll {
   display: flex;
   overflow-x: auto;
-  gap: 6px;
-  padding: 6px;
   scroll-snap-type: x mandatory;
+  gap: 8px;
+  padding: 8px;
 }
 
-/* 各ブロック */
+/* スクロールバー消す（iOS対策） */
+.weather-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================================
+   共通ブロック
+================================ */
 .weather-block {
-  flex-shrink: 0;
   scroll-snap-align: start;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-/* =======================
-  共通BOX（hourly用）
-======================= */
-.weather {
+/* ================================
+   HOURLY
+================================ */
+.hourly {
   display: flex;
   font-size: 8px;
   color: #fff;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
+  background: rgba(0,0,0,0.5);
+  height: 70px; /* ★基準高さ */
+  min-width: 260px;
 }
 
 /* 左ラベル */
 .weather-labels {
   flex-shrink: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background: rgba(0,0,0,0.3);
 }
 
 .weather-label {
@@ -53,17 +62,15 @@ body {
   align-items: center;
   padding: 0 2px;
   font-size: 6px;
-  line-height: 1;
-  box-sizing: border-box;
 }
 
-/* 右テーブル */
+/* 右 */
 .weather-table {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
-/* 行 */
 .weather-row {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
@@ -71,47 +78,51 @@ body {
   gap: 2px;
 }
 
-/* セル */
 .weather-cell {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
 }
 
-/* 現在時刻 */
-.is-now {
-  background-color: rgba(0,0,0,0.3);
-}
-
-/* =======================
-  daily（ボタン列）
-======================= */
-.weather.daily {
+/* ================================
+   DAILY
+================================ */
+.daily {
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  height: 70px; /* ★hourlyと完全一致 */
   display: flex;
+  gap: 4px;
+  padding: 4px;
 }
 
-.weather.daily .weather-row {
-  display: flex;
-  gap: 2px;
-  height: 42px;
-}
-
-.weather.daily .weather-cell {
-  flex: 0 0 36px;
-  height: 42px;
+/* 各日ボタン */
+.day {
+  width: 50px; /* ★固定幅 */
+  flex-shrink: 0;
+  background: rgba(0,0,0,0.3);
+  border-radius: 4px;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
-  font-size: 8px;
-  cursor: pointer;
+  font-size: 10px;
 }
 
-.weather.daily .weather-cell:active {
-  background-color: rgba(255,255,255,0.1);
+/* 天気アイコン */
+.icon {
+  font-size: 14px;
+}
+
+/* 気温 */
+.max {
+  color: #ff6b6b;
+}
+
+.min {
+  color: #6bbcff;
 }
 </style>
 </head>
@@ -120,157 +131,85 @@ body {
 
 <div class="weather-scroll">
 
-  <!-- hourly① -->
-  <div class="weather-block">
-    <div class="weather">
-      <div class="weather-labels">
-        <div class="weather-label">気温</div>
-        <div class="weather-label">風</div>
-        <div class="weather-label">波</div>
-      </div>
-
-      <div class="weather-table">
-        <div class="weather-row">
-          <div class="weather-cell is-now">22°</div>
-          <div class="weather-cell">23°</div>
-          <div class="weather-cell">24°</div>
-          <div class="weather-cell">25°</div>
-          <div class="weather-cell">25°</div>
-          <div class="weather-cell">24°</div>
-          <div class="weather-cell">23°</div>
-          <div class="weather-cell">22°</div>
-          <div class="weather-cell">21°</div>
-          <div class="weather-cell">20°</div>
-          <div class="weather-cell">20°</div>
-          <div class="weather-cell">19°</div>
-        </div>
-
-        <div class="weather-row">
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">3m</div>
-          <div class="weather-cell">3m</div>
-          <div class="weather-cell">4m</div>
-          <div class="weather-cell">3m</div>
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">1m</div>
-          <div class="weather-cell">1m</div>
-          <div class="weather-cell">1m</div>
-        </div>
-
-        <div class="weather-row">
-          <div class="weather-cell">0.8</div>
-          <div class="weather-cell">0.9</div>
-          <div class="weather-cell">1.0</div>
-          <div class="weather-cell">1.2</div>
-          <div class="weather-cell">1.3</div>
-          <div class="weather-cell">1.2</div>
-          <div class="weather-cell">1.0</div>
-          <div class="weather-cell">0.9</div>
-          <div class="weather-cell">0.8</div>
-          <div class="weather-cell">0.7</div>
-          <div class="weather-cell">0.7</div>
-          <div class="weather-cell">0.6</div>
-        </div>
-      </div>
+  <!-- HOURLY 1 -->
+  <div class="weather-block hourly">
+    <div class="weather-labels">
+      <div class="weather-label">時</div>
+      <div class="weather-label">天気</div>
+      <div class="weather-label">気温</div>
+      <div class="weather-label">風</div>
+      <div class="weather-label">波</div>
     </div>
-  </div>
 
-  <!-- hourly②（同構造で追加するだけ） -->
-  <div class="weather-block">
-    <div class="weather">
-      <div class="weather-labels">
-        <div class="weather-label">気温</div>
-        <div class="weather-label">風</div>
-        <div class="weather-label">波</div>
-      </div>
-      <div class="weather-table">
-        <div class="weather-row">
-          <div class="weather-cell">21°</div>
-          <div class="weather-cell">22°</div>
-          <div class="weather-cell">23°</div>
-          <div class="weather-cell">24°</div>
-          <div class="weather-cell">25°</div>
-          <div class="weather-cell">26°</div>
-          <div class="weather-cell">26°</div>
-          <div class="weather-cell">25°</div>
-          <div class="weather-cell">24°</div>
-          <div class="weather-cell">23°</div>
-          <div class="weather-cell">22°</div>
-          <div class="weather-cell">21°</div>
-        </div>
-
-        <div class="weather-row">
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">3m</div>
-          <div class="weather-cell">3m</div>
-          <div class="weather-cell">4m</div>
-          <div class="weather-cell">4m</div>
-          <div class="weather-cell">3m</div>
-          <div class="weather-cell">3m</div>
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">2m</div>
-          <div class="weather-cell">1m</div>
-          <div class="weather-cell">1m</div>
-        </div>
-
-        <div class="weather-row">
-          <div class="weather-cell">0.7</div>
-          <div class="weather-cell">0.8</div>
-          <div class="weather-cell">1.0</div>
-          <div class="weather-cell">1.2</div>
-          <div class="weather-cell">1.4</div>
-          <div class="weather-cell">1.3</div>
-          <div class="weather-cell">1.1</div>
-          <div class="weather-cell">1.0</div>
-          <div class="weather-cell">0.9</div>
-          <div class="weather-cell">0.8</div>
-          <div class="weather-cell">0.7</div>
-          <div class="weather-cell">0.6</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- daily -->
-  <div class="weather-block">
-    <div class="weather daily">
+    <div class="weather-table">
       <div class="weather-row">
-
-        <div class="weather-cell">
-          <div>☀</div>
-          <div>26°</div>
-          <div>18°</div>
-        </div>
-
-        <div class="weather-cell">
-          <div>☁</div>
-          <div>24°</div>
-          <div>17°</div>
-        </div>
-
-        <div class="weather-cell">
-          <div>🌧</div>
-          <div>22°</div>
-          <div>16°</div>
-        </div>
-
-        <div class="weather-cell">
-          <div>☀</div>
-          <div>25°</div>
-          <div>18°</div>
-        </div>
-
-        <div class="weather-cell">
-          <div>☀</div>
-          <div>27°</div>
-          <div>19°</div>
-        </div>
-
+        <div class="weather-cell">0</div><div class="weather-cell">1</div><div class="weather-cell">2</div>
+        <div class="weather-cell">3</div><div class="weather-cell">4</div><div class="weather-cell">5</div>
+        <div class="weather-cell">6</div><div class="weather-cell">7</div><div class="weather-cell">8</div>
+        <div class="weather-cell">9</div><div class="weather-cell">10</div><div class="weather-cell">11</div>
       </div>
+
+      <div class="weather-row">
+        <div class="weather-cell">☀</div><div class="weather-cell">☀</div><div class="weather-cell">☁</div>
+        <div class="weather-cell">☁</div><div class="weather-cell">☂</div><div class="weather-cell">☂</div>
+        <div class="weather-cell">☁</div><div class="weather-cell">☀</div><div class="weather-cell">☀</div>
+        <div class="weather-cell">☀</div><div class="weather-cell">☀</div><div class="weather-cell">☀</div>
+      </div>
+
+      <div class="weather-row">
+        <div class="weather-cell">20</div><div class="weather-cell">20</div><div class="weather-cell">19</div>
+        <div class="weather-cell">19</div><div class="weather-cell">18</div><div class="weather-cell">18</div>
+        <div class="weather-cell">19</div><div class="weather-cell">21</div><div class="weather-cell">23</div>
+        <div class="weather-cell">24</div><div class="weather-cell">25</div><div class="weather-cell">26</div>
+      </div>
+
+      <div class="weather-row">
+        <div class="weather-cell">北</div><div class="weather-cell">北</div><div class="weather-cell">北東</div>
+        <div class="weather-cell">東</div><div class="weather-cell">東</div><div class="weather-cell">東</div>
+        <div class="weather-cell">南東</div><div class="weather-cell">南</div><div class="weather-cell">南</div>
+        <div class="weather-cell">南西</div><div class="weather-cell">西</div><div class="weather-cell">北西</div>
+      </div>
+
+      <div class="weather-row">
+        <div class="weather-cell">1.0</div><div class="weather-cell">1.0</div><div class="weather-cell">1.2</div>
+        <div class="weather-cell">1.3</div><div class="weather-cell">1.5</div><div class="weather-cell">1.6</div>
+        <div class="weather-cell">1.4</div><div class="weather-cell">1.2</div><div class="weather-cell">1.1</div>
+        <div class="weather-cell">1.0</div><div class="weather-cell">0.9</div><div class="weather-cell">0.8</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOURLY 2（ダミー） -->
+  <div class="weather-block hourly"></div>
+
+  <!-- DAILY -->
+  <div class="weather-block daily">
+    <div class="day">
+      <div>月</div>
+      <div class="icon">☀</div>
+      <div class="max">28</div>
+      <div class="min">21</div>
+    </div>
+
+    <div class="day">
+      <div>火</div>
+      <div class="icon">☁</div>
+      <div class="max">26</div>
+      <div class="min">20</div>
+    </div>
+
+    <div class="day">
+      <div>水</div>
+      <div class="icon">☂</div>
+      <div class="max">24</div>
+      <div class="min">19</div>
+    </div>
+
+    <div class="day">
+      <div>木</div>
+      <div class="icon">☀</div>
+      <div class="max">27</div>
+      <div class="min">21</div>
     </div>
   </div>
 
