@@ -35,7 +35,7 @@ body {
   font-size: 6px;
   line-height: 1;
   box-sizing: border-box;
-  border-right: 1px solid transparent;
+  gap: 2px;
 }
 
 /* 右テーブル */
@@ -51,6 +51,7 @@ body {
   grid-template-columns: repeat(12, 1fr);
   height: 14px;              /* ★基準高さ（ラベルと一致） */
   box-sizing: border-box;
+  gap: 2px;
 }
 
 /* セル */
@@ -62,12 +63,9 @@ body {
   padding: 0;                /* 縦paddingなし */
   font-size: 8px;
   box-sizing: border-box;
-  border-right: 1px solid transparent;
 }
 
-.weather-cell:last-child {
-  border-right: none;
-}
+
 /* 現在時刻 */
 .is-now {
   background-color: rgba(0, 0, 0, 0.3);
