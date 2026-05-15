@@ -3,217 +3,201 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>weather scroll snap</title>
+<title>天気テーブル完成版</title>
 
 <style>
 body {
   margin: 0;
-  background: #111;
   font-family: sans-serif;
 }
 
-/* ================================
-   横スクロール全体
-================================ */
-.weather-scroll {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  gap: 8px;
-  padding: 8px;
-}
-
-/* スクロールバー消す（iOS対策） */
-.weather-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-/* ================================
-   共通ブロック
-================================ */
-.weather-block {
-  scroll-snap-align: start;
-  flex-shrink: 0;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-/* ================================
-   HOURLY
-================================ */
-.hourly {
+.weather {
   display: flex;
   font-size: 8px;
+  margin: 4px;
   color: #fff;
-  background: rgba(0,0,0,0.5);
-  height: 70px; /* ★基準高さ */
-  min-width: 260px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* 左ラベル */
 .weather-labels {
   flex-shrink: 0;
-  background: rgba(0,0,0,0.3);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .weather-label {
-  height: 14px;
+  height: 14px;              /* ★基準高さ */
   display: flex;
   align-items: center;
-  padding: 0 2px;
+  padding: 0 2px;            /* 縦paddingなし */
   font-size: 6px;
+  line-height: 1;
+  box-sizing: border-box;
+  gap: 2px;
 }
 
-/* 右 */
+/* 右テーブル */
 .weather-table {
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
+/* 行 */
 .weather-row {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  height: 14px;
+  height: 14px;              /* ★基準高さ（ラベルと一致） */
+  box-sizing: border-box;
   gap: 2px;
 }
 
+/* セル */
 .weather-cell {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;              /* ★親に合わせる */
+  padding: 0;                /* 縦paddingなし */
+  font-size: 8px;
+  box-sizing: border-box;
 }
 
-/* ================================
-   DAILY
-================================ */
-.daily {
-  background: rgba(0,0,0,0.5);
-  color: #fff;
-  height: 70px; /* ★hourlyと完全一致 */
+
+/* 現在時刻 */
+.is-now {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.unit {
+  font-size: 0.65em;
+  opacity: 0.7;
+  margin-left: 1px;
+}
+
+
+
+
+/* 横スクロール */
+.weather-scroll {
   display: flex;
-  gap: 4px;
-  padding: 4px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
 }
 
-/* 各日ボタン */
-.day {
-  width: 50px; /* ★固定幅 */
+/* 各ブロック */
+.weather-block {
   flex-shrink: 0;
-  background: rgba(0,0,0,0.3);
-  border-radius: 4px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 10px;
-}
-
-/* 天気アイコン */
-.icon {
-  font-size: 14px;
-}
-
-/* 気温 */
-.max {
-  color: #ff6b6b;
-}
-
-.min {
-  color: #6bbcff;
+  scroll-snap-align: start;
 }
 </style>
 </head>
 
 <body>
 
+<div class="weather">
+
+  <!-- 左ラベル -->
+  <div class="weather-labels" id="labels"></div>
+
+  <!-- ★これが必要 -->
+  <div class="weather-table" id="table"></div>
+
+</div>
 <div class="weather-scroll">
 
-  <!-- HOURLY 1 -->
-  <div class="weather-block hourly">
-    <div class="weather-labels">
-      <div class="weather-label">時</div>
-      <div class="weather-label">天気</div>
-      <div class="weather-label">気温</div>
-      <div class="weather-label">風</div>
-      <div class="weather-label">波</div>
-    </div>
-
-    <div class="weather-table">
-      <div class="weather-row">
-        <div class="weather-cell">0</div><div class="weather-cell">1</div><div class="weather-cell">2</div>
-        <div class="weather-cell">3</div><div class="weather-cell">4</div><div class="weather-cell">5</div>
-        <div class="weather-cell">6</div><div class="weather-cell">7</div><div class="weather-cell">8</div>
-        <div class="weather-cell">9</div><div class="weather-cell">10</div><div class="weather-cell">11</div>
-      </div>
-
-      <div class="weather-row">
-        <div class="weather-cell">☀</div><div class="weather-cell">☀</div><div class="weather-cell">☁</div>
-        <div class="weather-cell">☁</div><div class="weather-cell">☂</div><div class="weather-cell">☂</div>
-        <div class="weather-cell">☁</div><div class="weather-cell">☀</div><div class="weather-cell">☀</div>
-        <div class="weather-cell">☀</div><div class="weather-cell">☀</div><div class="weather-cell">☀</div>
-      </div>
-
-      <div class="weather-row">
-        <div class="weather-cell">20</div><div class="weather-cell">20</div><div class="weather-cell">19</div>
-        <div class="weather-cell">19</div><div class="weather-cell">18</div><div class="weather-cell">18</div>
-        <div class="weather-cell">19</div><div class="weather-cell">21</div><div class="weather-cell">23</div>
-        <div class="weather-cell">24</div><div class="weather-cell">25</div><div class="weather-cell">26</div>
-      </div>
-
-      <div class="weather-row">
-        <div class="weather-cell">北</div><div class="weather-cell">北</div><div class="weather-cell">北東</div>
-        <div class="weather-cell">東</div><div class="weather-cell">東</div><div class="weather-cell">東</div>
-        <div class="weather-cell">南東</div><div class="weather-cell">南</div><div class="weather-cell">南</div>
-        <div class="weather-cell">南西</div><div class="weather-cell">西</div><div class="weather-cell">北西</div>
-      </div>
-
-      <div class="weather-row">
-        <div class="weather-cell">1.0</div><div class="weather-cell">1.0</div><div class="weather-cell">1.2</div>
-        <div class="weather-cell">1.3</div><div class="weather-cell">1.5</div><div class="weather-cell">1.6</div>
-        <div class="weather-cell">1.4</div><div class="weather-cell">1.2</div><div class="weather-cell">1.1</div>
-        <div class="weather-cell">1.0</div><div class="weather-cell">0.9</div><div class="weather-cell">0.8</div>
-      </div>
-    </div>
+  <div class="weather weather-block">
+    <!-- 今のhourlyそのまま -->
   </div>
 
-  <!-- HOURLY 2（ダミー） -->
-  <div class="weather-block hourly"></div>
+  <div class="weather weather-block">
+    <!-- 2個目のhourly -->
+  </div>
 
-  <!-- DAILY -->
-  <div class="weather-block daily">
-    <div class="day">
-      <div>月</div>
-      <div class="icon">☀</div>
-      <div class="max">28</div>
-      <div class="min">21</div>
-    </div>
+  <div class="weather weather-block">
+    <!-- 3個目（あれば） -->
+  </div>
 
-    <div class="day">
-      <div>火</div>
-      <div class="icon">☁</div>
-      <div class="max">26</div>
-      <div class="min">20</div>
-    </div>
-
-    <div class="day">
-      <div>水</div>
-      <div class="icon">☂</div>
-      <div class="max">24</div>
-      <div class="min">19</div>
-    </div>
-
-    <div class="day">
-      <div>木</div>
-      <div class="icon">☀</div>
-      <div class="max">27</div>
-      <div class="min">21</div>
-    </div>
+  <div class="weather weather-block">
+    <!-- daily（後で追加） -->
   </div>
 
 </div>
+
+<script>
+// ===== 時刻 =====
+const HOURS = [0,2,4,6,8,10,12,14,16,18,20,22];
+
+// ===== ダミーデータ =====
+const DATA = {
+  weather: ["☀️","☁️","🌧️","🌧️","☁️","☀️","☀️","☀️","☁️","🌧️","🌧️","☁️"],
+  temp: [18,17,16,16,18,21,24,25,23,21,20,19],
+  rain: [0,0,10,20,10,0,0,0,10,30,40,20],
+  pop: [0,0,20,40,30,10,0,0,20,50,60,40],
+  wind: ["2m","2m","3m","4m","3m","2m","2m","3m","4m","5m","4m","3m"],
+  dir: ["北","北東","東","南東","南","南西","西","北西","北","北","北東","東"],
+  wave: [0.5,0.5,1,1,1,0.5,0.5,0.5,1,1.5,1.5,1]
+};
+
+// ===== ラベル =====
+const LABELS = [
+  "時刻","天気","気温","降水","確率","風速","風向","波高"
+];
+
+// ===== DOM =====
+const labelBox = document.getElementById("labels");
+const table = document.getElementById("table");
+const scroll = document.getElementById("scroll");
+const fadeLeft = document.getElementById("fadeLeft");
+const fadeRight = document.getElementById("fadeRight");
+
+// ===== ラベル生成 =====
+LABELS.forEach(text => {
+  const div = document.createElement("div");
+  div.className = "weather-label";
+  div.textContent = text;
+  labelBox.appendChild(div);
+});
+
+// ===== 現在時刻ブロック =====
+const now = new Date();
+const currentBlock = Math.floor(now.getHours() / 2) * 2;
+
+// ===== 行生成 =====
+function createRow(values, isHeader = false) {
+  const row = document.createElement("div");
+  row.className = "weather-row";
+
+  values.forEach((v, i) => {
+    const cell = document.createElement("div");
+    cell.className = "weather-cell";
+
+    if (HOURS[i] === currentBlock) {
+      cell.classList.add("is-now");
+    }
+
+    cell.innerHTML = v;
+    row.appendChild(cell);
+  });
+
+  return row;
+}
+
+// ===== テーブル構築 =====
+table.appendChild(createRow(HOURS, true));
+table.appendChild(createRow(DATA.weather));
+table.appendChild(createRow(DATA.temp.map(v => v + "℃")));
+table.appendChild(createRow(DATA.rain.map(v => v + "mm")));
+table.appendChild(createRow(DATA.pop.map(v => v + "%")));
+table.appendChild(createRow(DATA.wind));
+table.appendChild(createRow(DATA.dir));
+table.appendChild(createRow(DATA.wave.map(v => v + "m")));
+
+
+
+</script>
 
 </body>
 </html>
