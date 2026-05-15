@@ -1070,7 +1070,7 @@ li {
 
 /* ===== hourlyテーブル ===== */
 .weather {
-  display: flex;
+  display: none;
   font-size: 8px;
   margin-left: 4px;
   margin-right: 4px;
@@ -1116,7 +1116,7 @@ li {
 
 /* =====週間7枠 ===== */
 .week {
-  display:flex;
+  display:none;
   font-size:8px;
   color:#fff;
   margin: 4px;
