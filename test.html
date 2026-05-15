@@ -18,6 +18,7 @@ body {
   color: #fff;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 4px;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* 左ラベル */
@@ -34,6 +35,7 @@ body {
   font-size: 6px;
   line-height: 1;
   box-sizing: border-box;
+  border-right: 1px solid transparent;
 }
 
 /* 右テーブル */
@@ -60,11 +62,21 @@ body {
   padding: 0;                /* 縦paddingなし */
   font-size: 8px;
   box-sizing: border-box;
+  border-right: 1px solid transparent;
 }
 
+.weather-cell:last-child {
+  border-right: none;
+}
 /* 現在時刻 */
 .is-now {
   background-color: rgba(0, 0, 0, 0.3);
+}
+
+.unit {
+  font-size: 0.65em;
+  opacity: 0.7;
+  margin-left: 1px;
 }
 </style>
 </head>
