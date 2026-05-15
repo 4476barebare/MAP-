@@ -12,7 +12,8 @@ body { margin:0; font-family:sans-serif; }
 .weather {
   display: flex;
   font-size: 8px;
-  margin: 4px;
+  margin-left: 4px;
+  margin-right: 4px;
   color: #fff;
   background-color: rgba(0,0,0,0.5);
   border-radius: 4px;
@@ -57,6 +58,7 @@ body { margin:0; font-family:sans-serif; }
   display:flex;
   font-size:8px;
   color:#fff;
+  margin: 4px;
   background:rgba(0,0,0,0.5);
   border-radius:4px;
 }
@@ -99,18 +101,18 @@ body { margin:0; font-family:sans-serif; }
 </head>
 
 <body>
-
-<!-- ===== 上：7枠 ===== -->
+<!-- ===== ：テーブル ===== -->
+<div class="weather" id="weatherBox">
+  <div class="weather-labels" id="labels"></div>
+  <div class="weather-table" id="table"></div>
+</div>
+<!-- ===== ：7枠 ===== -->
 <div class="week">
   <div class="week-labels" id="weekLabels"></div>
   <div class="week-table" id="weekTable"></div>
 </div>
 
-<!-- ===== 下：テーブル ===== -->
-<div class="weather" id="weatherBox">
-  <div class="weather-labels" id="labels"></div>
-  <div class="weather-table" id="table"></div>
-</div>
+
 
 <script>
 // =====================
