@@ -6,295 +6,277 @@
 <title>天気テーブル完成版</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: sans-serif;
-}
+body { margin:0; font-family:sans-serif; }
 
+/* ===== 下：hourlyテーブル ===== */
 .weather {
   display: flex;
   font-size: 8px;
   margin: 4px;
   color: #fff;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0,0,0,0.5);
   border-radius: 4px;
-  -webkit-font-smoothing: antialiased;
 }
 
-/* 左ラベル */
 .weather-labels {
   flex-shrink: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0,0,0,0.3);
 }
 
 .weather-label {
-  height: 14px;              /* ★基準高さ */
-  display: flex;
-  align-items: center;
-  padding: 0 2px;            /* 縦paddingなし */
-  font-size: 6px;
-  line-height: 1;
-  box-sizing: border-box;
-  gap: 2px;
+  height:14px;
+  display:flex;
+  align-items:center;
+  padding:0 2px;
+  font-size:6px;
 }
 
-/* 右テーブル */
 .weather-table {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  display:flex;
+  flex-direction:column;
+  width:100%;
 }
 
-/* 行 */
 .weather-row {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  height: 14px;              /* ★基準高さ（ラベルと一致） */
-  box-sizing: border-box;
-  gap: 2px;
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  height:14px;
+  gap:2px;
 }
 
-/* セル */
 .weather-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;              /* ★親に合わせる */
-  padding: 0;                /* 縦paddingなし */
-  font-size: 8px;
-  box-sizing: border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
+.is-now { background:rgba(0,0,0,0.3); }
 
-/* 現在時刻 */
-.is-now {
-  background-color: rgba(0, 0, 0, 0.3);
-}
-
-.unit {
-  font-size: 0.65em;
-  opacity: 0.7;
-  margin-left: 1px;
-}
-
-/* ===== 週間ブロック ===== */
+/* ===== 上：7枠 ===== */
 .week {
-  display: flex;
-  font-size: 8px;
-  margin: 4px;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 4px;
+  display:flex;
+  font-size:8px;
+  margin:4px;
+  color:#fff;
+  background:rgba(0,0,0,0.5);
+  border-radius:4px;
 }
 
-/* 左ラベル */
 .week-labels {
-  flex-shrink: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  flex-shrink:0;
+  background:rgba(0,0,0,0.3);
 }
 
 .week-label {
-  height: 14px;
-  display: flex;
-  align-items: center;
-  padding: 0 2px;
-  font-size: 6px;
-  box-sizing: border-box;
+  height:14px;
+  display:flex;
+  align-items:center;
+  padding:0 2px;
+  font-size:6px;
 }
 
-/* 右 */
 .week-table {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+  display:flex;
+  flex-direction:column;
+  width:100%;
 }
 
-/* 行（4行） */
 .week-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  height: 14px;
-  gap: 2px;
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  height:14px;
+  gap:2px;
 }
 
-/* セル */
 .week-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-/* 種別差 */
-.week-cell.hourly {
-  background: rgba(30, 41, 59, 0.8);
-}
+.week-cell.hourly { background:rgba(30,41,59,0.8); }
+.week-cell.daily  { background:rgba(51,65,85,0.8); }
 
-.week-cell.daily {
-  background: rgba(51, 65, 85, 0.8);
+.week-cell.active {
+  outline:1px solid #fff;
+  background:rgba(255,255,255,0.15);
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="weather">
-
-  <!-- 左ラベル -->
-  <div class="weather-labels" id="labels"></div>
-
-  <!-- ★これが必要 -->
-  <div class="weather-table" id="table"></div>
-
-</div>
-
-
+<!-- ===== 上：7枠 ===== -->
 <div class="week">
-
-  <!-- 左ラベル -->
   <div class="week-labels" id="weekLabels"></div>
-
-  <!-- 右7枠 -->
   <div class="week-table" id="weekTable"></div>
-
 </div>
-    
 
-
+<!-- ===== 下：テーブル ===== -->
+<div class="weather" id="weatherBox">
+  <div class="weather-labels" id="labels"></div>
+  <div class="weather-table" id="table"></div>
 </div>
 
 <script>
-// ===== 時刻 =====
+// =====================
+// 基本データ
+// =====================
 const HOURS = [0,2,4,6,8,10,12,14,16,18,20,22];
 
-// ===== ダミーデータ =====
 const DATA = {
-  weather: ["☀️","☁️","🌧️","🌧️","☁️","☀️","☀️","☀️","☁️","🌧️","🌧️","☁️"],
-  temp: [18,17,16,16,18,21,24,25,23,21,20,19],
-  rain: [0,0,10,20,10,0,0,0,10,30,40,20],
-  pop: [0,0,20,40,30,10,0,0,20,50,60,40],
-  wind: ["2m","2m","3m","4m","3m","2m","2m","3m","4m","5m","4m","3m"],
-  dir: ["北","北東","東","南東","南","南西","西","北西","北","北","北東","東"],
-  wave: [0.5,0.5,1,1,1,0.5,0.5,0.5,1,1.5,1.5,1]
+  weather:["☀️","☁️","🌧️","🌧️","☁️","☀️","☀️","☀️","☁️","🌧️","🌧️","☁️"],
+  temp:[18,17,16,16,18,21,24,25,23,21,20,19],
+  rain:[0,0,10,20,10,0,0,0,10,30,40,20],
+  pop:[0,0,20,40,30,10,0,0,20,50,60,40],
+  wind:["2m","2m","3m","4m","3m","2m","2m","3m","4m","5m","4m","3m"],
+  dir:["北","北東","東","南東","南","南西","西","北西","北","北","北東","東"],
+  wave:[0.5,0.5,1,1,1,0.5,0.5,0.5,1,1.5,1.5,1]
 };
 
-// ===== ラベル =====
-const LABELS = [
-  "時刻","天気","気温","降水","確率","風速","風向","波高"
-];
-
-// ===== DOM =====
-const labelBox = document.getElementById("labels");
+// =====================
+// テーブル生成
+// =====================
 const table = document.getElementById("table");
-const scroll = document.getElementById("scroll");
-const fadeLeft = document.getElementById("fadeLeft");
-const fadeRight = document.getElementById("fadeRight");
+const labelBox = document.getElementById("labels");
 
-// ===== ラベル生成 =====
-LABELS.forEach(text => {
-  const div = document.createElement("div");
-  div.className = "weather-label";
-  div.textContent = text;
-  labelBox.appendChild(div);
+["時刻","天気","気温","降水","確率","風速","風向","波高"]
+.forEach(t=>{
+  const d=document.createElement("div");
+  d.className="weather-label";
+  d.textContent=t;
+  labelBox.appendChild(d);
 });
 
-// ===== 現在時刻ブロック =====
 const now = new Date();
-const currentBlock = Math.floor(now.getHours() / 2) * 2;
+const currentBlock = Math.floor(now.getHours()/2)*2;
 
-// ===== 行生成 =====
-function createRow(values, isHeader = false) {
-  const row = document.createElement("div");
-  row.className = "weather-row";
+function row(values){
+  const r=document.createElement("div");
+  r.className="weather-row";
 
-  values.forEach((v, i) => {
-    const cell = document.createElement("div");
-    cell.className = "weather-cell";
-
-    if (HOURS[i] === currentBlock) {
-      cell.classList.add("is-now");
-    }
-
-    cell.innerHTML = v;
-    row.appendChild(cell);
+  values.forEach((v,i)=>{
+    const c=document.createElement("div");
+    c.className="weather-cell";
+    if(HOURS[i]===currentBlock) c.classList.add("is-now");
+    c.textContent=v;
+    r.appendChild(c);
   });
-
-  return row;
+  return r;
 }
 
-// ===== テーブル構築 =====
-table.appendChild(createRow(HOURS, true));
-table.appendChild(createRow(DATA.weather));
-table.appendChild(createRow(DATA.temp.map(v => v + "℃")));
-table.appendChild(createRow(DATA.rain.map(v => v + "mm")));
-table.appendChild(createRow(DATA.pop.map(v => v + "%")));
-table.appendChild(createRow(DATA.wind));
-table.appendChild(createRow(DATA.dir));
-table.appendChild(createRow(DATA.wave.map(v => v + "m")));
+table.appendChild(row(HOURS.map(h=>h+"時")));
+table.appendChild(row(DATA.weather));
+table.appendChild(row(DATA.temp.map(v=>v+"℃")));
+table.appendChild(row(DATA.rain.map(v=>v+"mm")));
+table.appendChild(row(DATA.pop.map(v=>v+"%")));
+table.appendChild(row(DATA.wind));
+table.appendChild(row(DATA.dir));
+table.appendChild(row(DATA.wave.map(v=>v+"m")));
 
-// ===== ラベル =====
-const WEEK_LABELS = ["日付","天気","最高","最低"];
-const weekLabels = document.getElementById("weekLabels");
+// =====================
+// 7枠データ生成
+// =====================
+const today = new Date();
+const todayStr = (today.getMonth()+1)+"/"+today.getDate();
 
-WEEK_LABELS.forEach(t => {
-  const d = document.createElement("div");
-  d.className = "week-label";
-  d.textContent = t;
-  weekLabels.appendChild(d);
-});
-
-// ===== データ =====
 const hasHourly3 = true;
 
 const hourly = [
-  { date:"15時", weather:"☀️", max:25, min:25 },
-  { date:"17時", weather:"☁️", max:23, min:23 },
-  hasHourly3 ? { date:"19時", weather:"🌧️", max:22, min:22 } : null
+  {date:todayStr+" 15時",weather:"☀️",max:25,min:25},
+  {date:todayStr+" 17時",weather:"☁️",max:23,min:23},
+  hasHourly3 ? {date:todayStr+" 19時",weather:"🌧️",max:22,min:22} : null
 ].filter(Boolean);
 
 const daily = [
-  { date:"5/16", weather:"☀️", max:26, min:18 },
-  { date:"5/17", weather:"☁️", max:24, min:17 },
-  { date:"5/18", weather:"🌧️", max:22, min:16 },
-  { date:"5/19", weather:"🌧️", max:21, min:16 },
-  { date:"5/20", weather:"☀️", max:25, min:18 }
+  {date:"5/16",weather:"☀️",max:26,min:18},
+  {date:"5/17",weather:"☁️",max:24,min:17},
+  {date:"5/18",weather:"🌧️",max:22,min:16},
+  {date:"5/19",weather:"🌧️",max:21,min:16},
+  {date:"5/20",weather:"☀️",max:25,min:18}
 ];
 
-// ===== 7枠構築 =====
-const blocks = [];
+const blocks = [...hourly, ...daily].slice(0,7);
 
-hourly.forEach(h => blocks.push({type:"hourly", ...h}));
+// =====================
+// 7枠描画
+// =====================
+const weekTable = document.getElementById("weekTable");
+const weekLabels = document.getElementById("weekLabels");
 
-const remain = 7 - blocks.length;
-daily.slice(0, remain).forEach(d => {
-  blocks.push({type:"daily", ...d});
+["日付","天気","最高","最低"].forEach(t=>{
+  const d=document.createElement("div");
+  d.className="week-label";
+  d.textContent=t;
+  weekLabels.appendChild(d);
 });
 
-// ===== 行データ化 =====
 const rows = [
-  blocks.map(b => b.date),
-  blocks.map(b => b.weather),
-  blocks.map(b => b.max + "℃"),
-  blocks.map(b => b.min + "℃")
+  blocks.map(b=>b.date),
+  blocks.map(b=>b.weather),
+  blocks.map(b=>b.max+"℃"),
+  blocks.map(b=>b.min+"℃")
 ];
 
-// ===== 描画 =====
-const weekTable = document.getElementById("weekTable");
+let activeIndex = null;
 
-rows.forEach(rowData => {
-  const row = document.createElement("div");
-  row.className = "week-row";
+function updateActive(){
+  document.querySelectorAll(".week-cell").forEach((el,i)=>{
+    const col = i % 7;
+    el.classList.toggle("active", col===activeIndex);
+  });
+}
 
-  rowData.forEach((val, i) => {
-    const cell = document.createElement("div");
-    cell.className = "week-cell " + blocks[i].type;
-    cell.textContent = val;
-    row.appendChild(cell);
+function showWeather(){ 
+  document.getElementById("weatherBox").style.display="flex";
+}
+function hideWeather(){
+  document.getElementById("weatherBox").style.display="none";
+}
+
+rows.forEach((rowData)=>{
+  const r=document.createElement("div");
+  r.className="week-row";
+
+  rowData.forEach((val,i)=>{
+    const c=document.createElement("div");
+    c.className="week-cell "+(i<hourly.length?"hourly":"daily");
+    c.textContent=val;
+
+    c.onclick=()=>{
+      if(activeIndex===i){
+        activeIndex=null;
+        hideWeather();
+      }else{
+        activeIndex=i;
+        showWeather();
+      }
+      updateActive();
+    };
+
+    r.appendChild(c);
   });
 
-  weekTable.appendChild(row);
+  weekTable.appendChild(r);
 });
+
+// =====================
+// 初期選択（現在時刻）
+// =====================
+(function init(){
+  const nowH = new Date().getHours();
+
+  let target = 0;
+  blocks.forEach((b,i)=>{
+    if(b.date.includes("時")){
+      const h = parseInt(b.date.match(/(\d+)時/)[1]);
+      if(Math.abs(h-nowH)<=2) target=i;
+    }
+  });
+
+  activeIndex = target;
+  updateActive();
+})();
 </script>
 
 </body>
