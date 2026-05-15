@@ -77,36 +77,61 @@ body {
   margin-left: 1px;
 }
 
-.week-buttons {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  margin: 4px;
-}
-
-.week-btn {
+/* ===== 週間ブロック ===== */
+.week {
   display: flex;
-  flex-direction: column;
-  height: 42px; /* 14px × 3行 */
-  background: rgba(0,0,0,0.5);
-  border-radius: 4px;
-  overflow: hidden;
   font-size: 8px;
+  margin: 4px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
 }
 
-.week-btn.hourly {
-  background: rgba(30, 41, 59, 0.8);
+/* 左ラベル */
+.week-labels {
+  flex-shrink: 0;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
-.week-btn.daily {
-  background: rgba(51, 65, 85, 0.8);
-}
-
-.week-row {
+.week-label {
   height: 14px;
   display: flex;
   align-items: center;
+  padding: 0 2px;
+  font-size: 6px;
+  box-sizing: border-box;
+}
+
+/* 右 */
+.week-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* 行（4行） */
+.week-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  height: 14px;
+  gap: 2px;
+}
+
+/* セル */
+.week-cell {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  font-size: 8px;
+}
+
+/* 種別差 */
+.week-cell.hourly {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.week-cell.daily {
+  background: rgba(51, 65, 85, 0.8);
 }
 
 </style>
@@ -125,13 +150,19 @@ body {
 </div>
 
 
+<div class="week">
 
+  <!-- 左ラベル -->
+  <div class="week-labels" id="weekLabels"></div>
 
-<!-- ★ここに追加 -->
-<div class="week-buttons" id="weekButtons"></div>
+  <!-- 右7枠 -->
+  <div class="week-table" id="weekTable"></div>
 
-<div class="weather">
+</div>
     
+
+
+</div>
 
 <script>
 // ===== 時刻 =====
@@ -202,65 +233,68 @@ table.appendChild(createRow(DATA.wind));
 table.appendChild(createRow(DATA.dir));
 table.appendChild(createRow(DATA.wave.map(v => v + "m")));
 
-// ===== 週間ボタン =====
-const weekBox = document.getElementById("weekButtons");
+// ===== ラベル =====
+const WEEK_LABELS = ["日付","天気","最高","最低"];
+const weekLabels = document.getElementById("weekLabels");
 
-// ▼ パターン切替（true: hourly3 / false: hourly2）
+WEEK_LABELS.forEach(t => {
+  const d = document.createElement("div");
+  d.className = "week-label";
+  d.textContent = t;
+  weekLabels.appendChild(d);
+});
+
+// ===== データ =====
 const hasHourly3 = true;
 
-// ===== ダミーデータ =====
-const hourlyBlocks = [
-  { weather: "☀️", max: 25, min: 25 },
-  { weather: "☁️", max: 23, min: 23 },
-  hasHourly3 ? { weather: "🌧️", max: 22, min: 22 } : null
+const hourly = [
+  { date:"15時", weather:"☀️", max:25, min:25 },
+  { date:"17時", weather:"☁️", max:23, min:23 },
+  hasHourly3 ? { date:"19時", weather:"🌧️", max:22, min:22 } : null
 ].filter(Boolean);
 
-const dailyBlocks = [
-  { weather: "☀️", max: 26, min: 18 },
-  { weather: "☁️", max: 24, min: 17 },
-  { weather: "🌧️", max: 22, min: 16 },
-  { weather: "🌧️", max: 21, min: 16 },
-  { weather: "☀️", max: 25, min: 18 }
+const daily = [
+  { date:"5/16", weather:"☀️", max:26, min:18 },
+  { date:"5/17", weather:"☁️", max:24, min:17 },
+  { date:"5/18", weather:"🌧️", max:22, min:16 },
+  { date:"5/19", weather:"🌧️", max:21, min:16 },
+  { date:"5/20", weather:"☀️", max:25, min:18 }
 ];
 
-// ===== 組み立て =====
+// ===== 7枠構築 =====
 const blocks = [];
 
-// hourly優先
-hourlyBlocks.forEach((h, i) => {
-  blocks.push({ type: "hourly", data: h });
+hourly.forEach(h => blocks.push({type:"hourly", ...h}));
+
+const remain = 7 - blocks.length;
+daily.slice(0, remain).forEach(d => {
+  blocks.push({type:"daily", ...d});
 });
 
-// 残りをdailyで埋める
-const remain = 7 - blocks.length;
-dailyBlocks.slice(0, remain).forEach(d => {
-  blocks.push({ type: "daily", data: d });
-});
+// ===== 行データ化 =====
+const rows = [
+  blocks.map(b => b.date),
+  blocks.map(b => b.weather),
+  blocks.map(b => b.max + "℃"),
+  blocks.map(b => b.min + "℃")
+];
 
 // ===== 描画 =====
-blocks.forEach(b => {
-  const btn = document.createElement("div");
-  btn.className = `week-btn ${b.type}`;
+const weekTable = document.getElementById("weekTable");
 
-  const r1 = document.createElement("div");
-  r1.className = "week-row";
-  r1.textContent = b.data.weather;
+rows.forEach(rowData => {
+  const row = document.createElement("div");
+  row.className = "week-row";
 
-  const r2 = document.createElement("div");
-  r2.className = "week-row";
-  r2.textContent = b.data.max + "℃";
+  rowData.forEach((val, i) => {
+    const cell = document.createElement("div");
+    cell.className = "week-cell " + blocks[i].type;
+    cell.textContent = val;
+    row.appendChild(cell);
+  });
 
-  const r3 = document.createElement("div");
-  r3.className = "week-row";
-  r3.textContent = b.data.min + "℃";
-
-  btn.appendChild(r1);
-  btn.appendChild(r2);
-  btn.appendChild(r3);
-
-  weekBox.appendChild(btn);
+  weekTable.appendChild(row);
 });
-
 </script>
 
 </body>
