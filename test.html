@@ -65,6 +65,8 @@ body { margin:0; font-family:sans-serif; }
 
 .week-labels {
   flex-shrink:0;
+  border-radius: 4px 0px 0px 4px;
+  background-color: rgba(0,0,0,0.3);
 }
 
 .week-label {
@@ -73,14 +75,15 @@ body { margin:0; font-family:sans-serif; }
   align-items:center;
   padding:0 2px;
   font-size:6px;
-  background-color: rgba(0,0,0,0.3);
+  
 }
 
 .week-table {
   display:flex;
   flex-direction:column;
   width:100%;
-  background-color: rgba(0,0,0,0.5);
+  border-radius: 0px 4px 4px 0px;
+  background-color: rgba(0,0,0,0.3);
 }
 
 .week-row {
@@ -95,8 +98,6 @@ body { margin:0; font-family:sans-serif; }
   justify-content:center;
 }
 
-.week-cell.hourly { opacity: 0.5; }
-.week-cell.daily  { opacity: 0.5; }
 .week-cell.active { opacity: 0.2; }
 </style>
 </head>
