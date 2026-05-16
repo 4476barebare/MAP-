@@ -1143,12 +1143,14 @@ function createWeekItem(weekData) {
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
-  showDebug("containers OK");
+  const dataList = weekData?.hourly;
+
+  if (!Array.isArray(dataList)) return;
 
   // =========================
-  // labels（実データ対応）
+  // labels
   // =========================
-  const labels = ["気温", "気圧", "風", "降水"];
+  const labels = ["日付", "天気", "最高", "最低"];
 
   for (const text of labels) {
     const div = document.createElement("div");
@@ -1157,55 +1159,66 @@ function createWeekItem(weekData) {
     labelsContainer.appendChild(div);
   }
 
-  showDebug("labels rendered");
+  const today = new Date();
+  const getDate = i => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  };
+
+  const cols = dataList.length;
 
   // =========================
-  // データ本体
+  // rows
   // =========================
-  const dataList = weekData?.hourly;
+  for (let row = 0; row < 4; row++) {
+    const tr = document.createElement("div");
+    tr.className = "week-row";
 
-  if (!Array.isArray(dataList)) {
-    showDebug("hourly invalid");
-    return;
-  }
-
-  const rowsCount = 4; // 気温/気圧/風/降水
-  const colsCount = dataList.length;
-
-  // =========================
-  // table（実データ）
-  // =========================
-  for (let i = 0; i < rowsCount; i++) {
-    const row = document.createElement("div");
-    row.className = "week-row";
-
-    for (let j = 0; j < colsCount; j++) {
+    for (let col = 0; col < cols; col++) {
       const cell = document.createElement("div");
       cell.className = "week-cell";
 
-      const d = dataList[j];
+      const item = dataList[col];
 
       let value = "—";
 
-      // weather配列から必要値を抜く
-      if (i === 0) {
-        value = d?.weather?.[0]?.[1] ?? "—"; // 気温っぽい値
-      } else if (i === 1) {
-        value = d?.water ?? "—";
-      } else if (i === 2) {
-        value = d?.weather?.[0]?.[5] ?? "—"; // 風向/風速系
-      } else if (i === 3) {
-        value = d?.weather?.[0]?.[6] ?? "—"; // 降水系
+      if (row === 0) {
+        value = getDate(col);
+      }
+
+      if (row === 1) {
+        const summary = formatPrefWeather({
+          hourly: [item]
+        });
+
+        const icon = toWeatherIcon(summary?.icon ?? 0);
+        value = icon;
+      }
+
+      if (row === 2) {
+        value = item?.weather?.[0]?.[1] ?? "—"; // max温度候補
+      }
+
+      if (row === 3) {
+        value = item?.weather?.[0]?.[1] ?? "—"; // 仮で同じでもOK（後で修正）
       }
 
       cell.textContent = value;
-      row.appendChild(cell);
+      tr.appendChild(cell);
     }
 
-    tableContainer.appendChild(row);
+    tableContainer.appendChild(tr);
   }
+}
 
-  showDebug("table rendered");
+function getDailyWeatherSummary(hourlyItem) {
+    if (!hourlyItem) return null;
+
+    // formatPrefWeather互換にするため形を合わせる
+    return formatPrefWeather({
+        hourly: [hourlyItem]
+    });
 }
 
 function resetSpotLayers() {
