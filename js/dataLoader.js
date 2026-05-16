@@ -1144,6 +1144,7 @@ function createWeekItem(weekData) {
 
   const hourlyList = weekData?.hourly;
   const dailyList  = weekData?.daily;
+  const tideList   = window.tideWeek;
 
   if (!Array.isArray(hourlyList)) return;
 
@@ -1152,7 +1153,7 @@ function createWeekItem(weekData) {
   // =========================
   // labels
   // =========================
-  const labels = ["日付", "天気", "気温", "水温", "波高"];
+  const labels = ["日付", "潮", "天気", "気温", "水温", "波高"];
 
   for (const text of labels) {
     const div = document.createElement("div");
@@ -1175,7 +1176,7 @@ function createWeekItem(weekData) {
   // =========================
   // テーブル
   // =========================
-  for (let row = 0; row < 5; row++) {
+  for (let row = 0; row < 6; row++) {
 
     const tr = document.createElement("div");
     tr.className = "week-row";
@@ -1197,78 +1198,84 @@ function createWeekItem(weekData) {
       }
 
       // =========================
+      // 潮
+      // =========================
+      if (row === 1) {
+        value = tideList?.[col]?.tide ?? "—";
+      }
+
+      // =========================
       // 天気
       // =========================
-      
-      if (row === 1) {
+      if (row === 2) {
 
-  if (col <= 2 && hourly) {
+        if (col <= 2 && hourly) {
 
-    const list = hasHourly2
-      ? hourly?.hourly2
-      : hourly?.weather;
+          const list = hasHourly2
+            ? hourly?.hourly2
+            : hourly?.weather;
 
-    const map = {};
+          const map = {};
 
-    if (Array.isArray(list)) {
-      for (const r of list) {
-        const code = r?.[0];
-        if (code == null) continue;
-        map[code] = (map[code] || 0) + 1;
+          if (Array.isArray(list)) {
+            for (const r of list) {
+              const code = r?.[0];
+              if (code == null) continue;
+              map[code] = (map[code] || 0) + 1;
+            }
+          }
+
+          let bestCode = 0;
+          let maxCount = 0;
+
+          for (const k in map) {
+            if (map[k] > maxCount) {
+              maxCount = map[k];
+              bestCode = Number(k);
+            }
+          }
+
+          value = toWeatherIcon(bestCode);
+
+        } else if (daily) {
+          value = toWeatherIcon(daily?.weather?.[0] ?? 0);
+        }
       }
-    }
-
-    let bestCode = 0;
-    let maxCount = 0;
-
-    for (const k in map) {
-      if (map[k] > maxCount) {
-        maxCount = map[k];
-        bestCode = Number(k);
-      }
-    }
-
-    value = toWeatherIcon(bestCode);
-
-  } else if (daily) {
-    value = toWeatherIcon(daily?.weather?.[0] ?? 0);
-  }
-}
 
       // =========================
       // 気温
       // =========================
-if (row === 2) {
+      if (row === 3) {
 
-  if (col <= 2 && hourly) {
+        if (col <= 2 && hourly) {
 
-    let max = -Infinity;
+          let max = -Infinity;
 
-    const list = hasHourly2
-      ? hourly?.hourly2
-      : hourly?.weather;
+          const list = hasHourly2
+            ? hourly?.hourly2
+            : hourly?.weather;
 
-    if (Array.isArray(list)) {
-      for (const r of list) {
-        const t = r?.[1];
-        if (typeof t === "number" && t > max) {
-          max = t;
+          if (Array.isArray(list)) {
+            for (const r of list) {
+              const t = r?.[1];
+              if (typeof t === "number" && t > max) {
+                max = t;
+              }
+            }
+          }
+
+          value = max !== -Infinity ? Math.round(max) : "—";
+
+        } else if (daily) {
+          const temp = daily?.weather?.[1];
+          value = temp != null ? Math.round(temp) : "—";
         }
       }
-    }
-
-    value = max !== -Infinity ? Math.round(max) : "—";
-
-  } else if (daily) {
-    const temp = daily?.weather?.[1];
-    value = temp != null ? Math.round(temp) : "—";
-  }
-}
 
       // =========================
       // 水温
       // =========================
-      if (row === 3) {
+      if (row === 4) {
 
         if (col <= 2 && hourly) {
           const water = hourly?.water ?? hourly?.waterEx?.avg;
@@ -1283,7 +1290,7 @@ if (row === 2) {
       // =========================
       // 波高
       // =========================
-      if (row === 4) {
+      if (row === 5) {
 
         if (col <= 2 && hourly) {
           const wave = hourly?.waterEx?.wave;
