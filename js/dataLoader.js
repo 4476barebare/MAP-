@@ -1131,29 +1131,18 @@ function createWeekItem(weekData) {
   showDebug("start");
 
   const weekEl = document.querySelector(".week");
-  if (!weekEl) {
-    showDebug("weekEl: NG");
-    return;
-  }
-  showDebug("weekEl: OK");
+  if (!weekEl) return;
 
-  // 表示を有効化
   weekEl.style.display = "flex";
-  showDebug("display set: flex");
 
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
 
-  if (!labelsContainer || !tableContainer) {
-    showDebug("container missing");
-    return;
-  }
+  if (!labelsContainer || !tableContainer) return;
 
-  // 初期化
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
-  // ===== ラベル（固定）=====
   const labels = ["日付", "天気", "最高", "最低"];
 
   labels.forEach(text => {
@@ -1163,37 +1152,32 @@ function createWeekItem(weekData) {
     labelsContainer.appendChild(label);
   });
 
-  showDebug("labels created: " + labels.length);
+  const dataList = weekData; // ←ここが確定
 
-  // ===== データ整形 =====
-  const hasHourly2 = weekData[2] && weekData[2].hourly2 != null;
+  const hasHourly2 = dataList[2]?.hourly2 != null;
 
   const rows = [
-    weekData.map(d => d?.date ?? "-"),
-    weekData.map(d => d?.weather ?? "-"),
-    weekData.map(d => d?.max != null ? d.max + "℃" : "-"),
-    weekData.map(d => d?.min != null ? d.min + "℃" : "-")
+    dataList.map(d => d?.date ?? "-"),
+    dataList.map(d => d?.weather ?? "-"),
+    dataList.map(d => d?.max != null ? d.max + "℃" : "-"),
+    dataList.map(d => d?.min != null ? d.min + "℃" : "-")
   ];
 
-  showDebug("rows prepared");
-
-  // ===== 行生成 =====
   rows.forEach((rowData, rowIndex) => {
     const row = document.createElement("div");
     row.className = "week-row";
 
-    rowData.forEach((val, i) => {
+    rowData.forEach((val, colIndex) => {
+
       let value = val;
 
-      // 指定ロジック適用（hourly優先）
-      const data = weekData[i];
-      if (data) {
-        if (rowIndex === 1) { // 天気行だけ差し替え
-          if (i === 0) value = data.hourly0 ?? "-";
-          else if (i === 1) value = data.hourly1 ?? "-";
-          else if (i === 2 && hasHourly2) value = data.hourly2 ?? "-";
-          else value = data.daily ?? "-";
-        }
+      const data = dataList[colIndex];
+
+      if (data && rowIndex === 1) {
+        if (colIndex === 0) value = data.hourly0 ?? "-";
+        else if (colIndex === 1) value = data.hourly1 ?? "-";
+        else if (colIndex === 2 && hasHourly2) value = data.hourly2 ?? "-";
+        else value = data.daily ?? "-";
       }
 
       const cell = document.createElement("div");
@@ -1206,15 +1190,8 @@ function createWeekItem(weekData) {
     tableContainer.appendChild(row);
   });
 
-  showDebug("rows created: " + rows.length);
-
-
-  
-  // ===== 高さを強制的に合わせる =====
-const rowHeight = 14; // CSSと一致
-const totalRows = 4;  // 今は「日付・天気・最高・最低」
-
-labelsContainer.style.height = (rowHeight * totalRows) + "px";
+  const rowHeight = 14;
+  labelsContainer.style.height = (rowHeight * labels.length) + "px";
 }
 
 function resetSpotLayers() {
