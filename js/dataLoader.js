@@ -1128,6 +1128,8 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
+    
+    alert(JSON.stringify(window.tideWeek, null, 2));
 
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
