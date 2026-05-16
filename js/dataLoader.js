@@ -1040,7 +1040,19 @@ if (!safe.URL) {
 
     window.map.once('moveend', function () {
         showFishMarkers(safe.URL);
-        createWeekItem(safe.whether);
+
+window.map.once('zoomend', () => {
+
+        setTimeout(() => {
+
+            createWeekItem(safe.whether);
+
+        }, 100);
+
+    });
+
+
+
 
         window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
