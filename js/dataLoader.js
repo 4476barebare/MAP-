@@ -1129,6 +1129,7 @@ function renderMarkers() {
 function createWeekItem(weekData) {
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
+  document.getElementById("week").style.display = "flex";
 
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
