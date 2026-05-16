@@ -1075,6 +1075,7 @@ li {
   margin-left: 4px;
   margin-right: 4px;
   color: #fff;
+  z-index: 8500;
 }
 
 .weather-labels {
