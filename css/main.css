@@ -1122,6 +1122,7 @@ li {
   color:#fff;
   margin: 4px;
   z-index: 8500;
+  transform: translateZ(0);
 }
 
 .week-labels {
