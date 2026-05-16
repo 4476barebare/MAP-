@@ -1117,16 +1117,25 @@ li {
 
 /* =====週間7枠 ===== */
 .week {
-  display:none;
+  display: none;
   position: absolute;
-  font-size:8px;
-  color:#fff;
-  margin: 4px;
   bottom: 0;
   z-index: 8500;
+
+  display: flex;
+  flex-direction: row;   /* ←これ必須 */
+  align-items: flex-start;
+
+  font-size: 8px;
+  color: #fff;
+  margin: 4px;
+  width: max-content;    /* ←重要（中身基準にする） */
 }
 
 .week-labels {
+     display: flex;
+
+  flex-direction: column;
   flex-shrink:0;
   border-radius: 4px 0px 0px 4px;
   background-color: rgba(0,0,0,0.7);
