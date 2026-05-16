@@ -1199,46 +1199,71 @@ function createWeekItem(weekData) {
       // =========================
       // 天気
       // =========================
+      
       if (row === 1) {
 
-        if (col <= 2 && hourly) {
-          let code;
+  if (col <= 2 && hourly) {
 
-          if (hasHourly2 && hourly?.hourly2?.[0]) {
-            code = hourly.hourly2[0][0];
-          } else {
-            code = hourly?.weather?.[0]?.[0];
-          }
+    const list = hasHourly2
+      ? hourly?.hourly2
+      : hourly?.weather;
 
-          value = toWeatherIcon(code ?? 0);
+    const map = {};
 
-        } else if (daily) {
-          value = toWeatherIcon(daily?.weather?.[0] ?? 0);
-        }
+    if (Array.isArray(list)) {
+      for (const r of list) {
+        const code = r?.[0];
+        if (code == null) continue;
+        map[code] = (map[code] || 0) + 1;
       }
+    }
+
+    let bestCode = 0;
+    let maxCount = 0;
+
+    for (const k in map) {
+      if (map[k] > maxCount) {
+        maxCount = map[k];
+        bestCode = Number(k);
+      }
+    }
+
+    value = toWeatherIcon(bestCode);
+
+  } else if (daily) {
+    value = toWeatherIcon(daily?.weather?.[0] ?? 0);
+  }
+}
 
       // =========================
       // 気温
       // =========================
-      if (row === 2) {
+if (row === 2) {
 
-        if (col <= 2 && hourly) {
+  if (col <= 2 && hourly) {
 
-          let temp;
+    let max = -Infinity;
 
-          if (hasHourly2 && hourly?.hourly2?.[0]) {
-            temp = hourly.hourly2[0][1];
-          } else {
-            temp = hourly?.weather?.[0]?.[1];
-          }
+    const list = hasHourly2
+      ? hourly?.hourly2
+      : hourly?.weather;
 
-          value = temp != null ? Math.round(temp) : "—";
-
-        } else if (daily) {
-          const temp = daily?.weather?.[1];
-          value = temp != null ? Math.round(temp) : "—";
+    if (Array.isArray(list)) {
+      for (const r of list) {
+        const t = r?.[1];
+        if (typeof t === "number" && t > max) {
+          max = t;
         }
       }
+    }
+
+    value = max !== -Infinity ? Math.round(max) : "—";
+
+  } else if (daily) {
+    const temp = daily?.weather?.[1];
+    value = temp != null ? Math.round(temp) : "—";
+  }
+}
 
       // =========================
       // 水温
