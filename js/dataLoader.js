@@ -1127,10 +1127,10 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
+    document.querySelector(".week").style.display = "flex";
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
-  document.getElementById("week").style.display = "flex";
-
+  
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
