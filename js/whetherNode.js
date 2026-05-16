@@ -160,18 +160,20 @@ function sanitizeWeather(r) {
 
     return {
         hourly: r.hourly.map(h => ({
+
             weather: h.weather.map(row =>
                 row.map(v => Number.isFinite(v) ? v : 0)
             ),
 
-            // ★ここだけ拡張
+            // 旧互換
             water: Number.isFinite(h.water) ? h.water : 0,
 
+            // ★ここ追加（これがないのが原因）
             waterEx: {
-                avg: Number.isFinite(h.water?.avg) ? h.water.avg : 0,
-                wave: Number.isFinite(h.water?.wave) ? h.water.wave : 0,
-                sunrise: Number.isFinite(h.water?.sunrise) ? h.water.sunrise : 0,
-                sunset: Number.isFinite(h.water?.sunset) ? h.water.sunset : 0
+                avg: Number.isFinite(h.waterEx?.avg) ? h.waterEx.avg : 0,
+                wave: Number.isFinite(h.waterEx?.wave) ? h.waterEx.wave : 0,
+                sunrise: Number.isFinite(h.waterEx?.sunrise) ? h.waterEx.sunrise : 0,
+                sunset: Number.isFinite(h.waterEx?.sunset) ? h.waterEx.sunset : 0
             },
 
             tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
