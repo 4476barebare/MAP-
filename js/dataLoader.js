@@ -1128,8 +1128,6 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
-    
-    alert(JSON.stringify(window.tideWeek, null, 2));
 
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
@@ -1200,10 +1198,18 @@ function createWeekItem(weekData) {
       }
 
       // =========================
-      // 潮
+      // 潮（★ここだけ追加）
       // =========================
       if (row === 1) {
-        value = tideList?.[col]?.tide ?? "—";
+
+        const tide = tideList?.[col]?.tide;
+        value = tide ?? "—";
+
+        // ★ 大潮だけ強制赤
+        if (tide === "大潮") {
+          cell.style.color = "red";
+          cell.style.fontWeight = "bold";
+        }
       }
 
       // =========================
