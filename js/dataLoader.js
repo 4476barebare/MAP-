@@ -1146,7 +1146,7 @@ function createWeekItem(weekData) {
   const dataList = weekData?.hourly;
   const dailyList = weekData?.daily;
 
-  if (!Array.isArray(dataList) || !Array.isArray(dailyList)) return;
+  if (!Array.isArray(dataList)) return;
 
   // =========================
   // labels
@@ -1172,7 +1172,7 @@ function createWeekItem(weekData) {
   };
 
   // =========================
-  // 気温計算（hourly専用）
+  // 気温計算（hourly）
   // =========================
   function calcMaxMin(item) {
     let max = -Infinity;
@@ -1195,14 +1195,11 @@ function createWeekItem(weekData) {
     };
   }
 
-  // =========================
-  // 列構造（hourly2ルール）
-  // =========================
   const hasHourly2 = dataList?.[0]?.hourly2 != null;
 
-  // =========================
-  // rows
-  // =========================
+  // ★ここが重要：dailyは安全に扱う
+  const hasDaily = Array.isArray(dailyList);
+
   for (let row = 0; row < 4; row++) {
     const tr = document.createElement("div");
     tr.className = "week-row";
@@ -1211,7 +1208,7 @@ function createWeekItem(weekData) {
       const cell = document.createElement("div");
 
       const item = dataList[col];
-      const daily = dailyList[col];
+      const daily = hasDaily ? dailyList[col] : null;
 
       let value = "—";
 
@@ -1223,11 +1220,10 @@ function createWeekItem(weekData) {
       }
 
       // -------------------------
-      // 2行目：天気アイコン
+      // 2行目：天気
       // -------------------------
       if (row === 1) {
 
-        // hourly2があればそれ優先、なければdaily
         let code = null;
 
         if (hasHourly2 && item?.hourly2?.[0]) {
@@ -1240,7 +1236,7 @@ function createWeekItem(weekData) {
       }
 
       // -------------------------
-      // 3行目：最高気温（hourly）
+      // 3行目：最高気温
       // -------------------------
       if (row === 2) {
         const res = calcMaxMin(item);
@@ -1248,7 +1244,7 @@ function createWeekItem(weekData) {
       }
 
       // -------------------------
-      // 4行目：最低気温（hourly）
+      // 4行目：最低気温
       // -------------------------
       if (row === 3) {
         const res = calcMaxMin(item);
