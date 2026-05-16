@@ -1207,11 +1207,13 @@ function createWeekItem(weekData) {
 
   showDebug("rows created: " + rows.length);
 
-  // ===== サイズ確認 =====
-  const rect = weekEl.getBoundingClientRect();
-  showDebug("size: " + rect.width + " x " + rect.height);
 
-  showDebug("done");
+  
+  // ===== 高さを強制的に合わせる =====
+const rowHeight = 14; // CSSと一致
+const totalRows = 4;  // 今は「日付・天気・最高・最低」
+
+labelsContainer.style.height = (rowHeight * totalRows) + "px";
 }
 
 function resetSpotLayers() {
