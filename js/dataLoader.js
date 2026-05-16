@@ -1159,8 +1159,12 @@ function createWeekItem(weekData) {
     labelsContainer.appendChild(div);
   }
 
+  // =========================
+  // 日付生成
+  // =========================
   const today = new Date();
-  const getDate = i => {
+
+  const getDate = (i) => {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     return `${d.getMonth() + 1}/${d.getDate()}`;
@@ -1183,10 +1187,16 @@ function createWeekItem(weekData) {
 
       let value = "—";
 
+      // -------------------------
+      // 1行目：日付
+      // -------------------------
       if (row === 0) {
         value = getDate(col);
       }
 
+      // -------------------------
+      // 2行目：天気アイコン
+      // -------------------------
       if (row === 1) {
         const summary = formatPrefWeather({
           hourly: [item]
@@ -1196,12 +1206,18 @@ function createWeekItem(weekData) {
         value = icon;
       }
 
+      // -------------------------
+      // 3行目：最高気温（関数化）
+      // -------------------------
       if (row === 2) {
-        value = item?.weather?.[0]?.[1] ?? "—"; // max温度候補
+        value = getMaxTemp(item) ?? "—";
       }
 
+      // -------------------------
+      // 4行目：最低気温（関数化）
+      // -------------------------
       if (row === 3) {
-        value = item?.weather?.[0]?.[1] ?? "—"; // 仮で同じでもOK（後で修正）
+        value = getMinTemp(item) ?? "—";
       }
 
       cell.textContent = value;
@@ -1210,6 +1226,8 @@ function createWeekItem(weekData) {
 
     tableContainer.appendChild(tr);
   }
+
+  showDebug("render done");
 }
 
 function getDailyWeatherSummary(hourlyItem) {
@@ -1219,6 +1237,46 @@ function getDailyWeatherSummary(hourlyItem) {
     return formatPrefWeather({
         hourly: [hourlyItem]
     });
+}
+
+function getMinTemp(hourlyItem) {
+    if (!hourlyItem?.weather) return null;
+
+    let minTemp = Infinity;
+
+    for (const row of hourlyItem.weather) {
+        if (!Array.isArray(row)) continue;
+
+        const temp = row[1];
+
+        if (typeof temp === "number") {
+            minTemp = Math.min(minTemp, temp);
+        }
+    }
+
+    if (minTemp === Infinity) return null;
+
+    return Math.round(minTemp);
+}
+
+function getMaxTemp(hourlyItem) {
+    if (!hourlyItem?.weather) return null;
+
+    let maxTemp = -Infinity;
+
+    for (const row of hourlyItem.weather) {
+        if (!Array.isArray(row)) continue;
+
+        const temp = row[1];
+
+        if (typeof temp === "number") {
+            maxTemp = Math.max(maxTemp, temp);
+        }
+    }
+
+    if (maxTemp === -Infinity) return null;
+
+    return Math.round(maxTemp);
 }
 
 function resetSpotLayers() {
