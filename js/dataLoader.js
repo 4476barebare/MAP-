@@ -1130,31 +1130,46 @@ function renderMarkers() {
 function createWeekItem(weekData) {
   showDebug("start");
 
-  const weekEl = document.querySelector(".week");
-  if (!weekEl) return;
+  if (!weekData) {
+    showDebug("weekData: NULL/UNDEFINED");
+    return;
+  }
 
-  weekEl.style.display = "flex";
+  showDebug("weekData OK");
+
+  const weekEl = document.querySelector(".week");
+  if (!weekEl) {
+    showDebug(".week missing");
+    return;
+  }
+
+  showDebug(".week OK");
 
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
 
-  if (!labelsContainer || !tableContainer) return;
+  if (!labelsContainer) {
+    showDebug("weekLabels missing");
+    return;
+  }
 
-  labelsContainer.innerHTML = "";
-  tableContainer.innerHTML = "";
+  if (!tableContainer) {
+    showDebug("weekTable missing");
+    return;
+  }
 
-  const labels = ["日付", "天気", "最高", "最低"];
+  showDebug("containers OK");
 
-  labels.forEach(text => {
-    const label = document.createElement("div");
-    label.className = "week-label";
-    label.textContent = text;
-    labelsContainer.appendChild(label);
-  });
+  if (!Array.isArray(weekData)) {
+    showDebug("weekData is NOT array");
+    return;
+  }
 
-  const dataList = weekData; // ←ここが確定
+  showDebug("weekData is array");
 
-  const hasHourly2 = dataList[2]?.hourly2 != null;
+  const dataList = weekData;
+
+  showDebug("dataList set");
 
   const rows = [
     dataList.map(d => d?.date ?? "-"),
@@ -1163,35 +1178,9 @@ function createWeekItem(weekData) {
     dataList.map(d => d?.min != null ? d.min + "℃" : "-")
   ];
 
-  rows.forEach((rowData, rowIndex) => {
-    const row = document.createElement("div");
-    row.className = "week-row";
+  showDebug("rows built");
 
-    rowData.forEach((val, colIndex) => {
-
-      let value = val;
-
-      const data = dataList[colIndex];
-
-      if (data && rowIndex === 1) {
-        if (colIndex === 0) value = data.hourly0 ?? "-";
-        else if (colIndex === 1) value = data.hourly1 ?? "-";
-        else if (colIndex === 2 && hasHourly2) value = data.hourly2 ?? "-";
-        else value = data.daily ?? "-";
-      }
-
-      const cell = document.createElement("div");
-      cell.className = "week-cell";
-      cell.textContent = value;
-
-      row.appendChild(cell);
-    });
-
-    tableContainer.appendChild(row);
-  });
-
-  const rowHeight = 14;
-  labelsContainer.style.height = (rowHeight * labels.length) + "px";
+  // ここから先は省略でもOK
 }
 
 function resetSpotLayers() {
