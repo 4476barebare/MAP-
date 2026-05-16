@@ -1144,7 +1144,9 @@ function createWeekItem(weekData) {
   tableContainer.innerHTML = "";
 
   const dataList = weekData?.hourly;
-  if (!Array.isArray(dataList)) return;
+  const dailyList = weekData?.daily;
+
+  if (!Array.isArray(dataList) || !Array.isArray(dailyList)) return;
 
   // =========================
   // labels
@@ -1170,6 +1172,30 @@ function createWeekItem(weekData) {
   };
 
   // =========================
+  // 気温計算（hourly専用）
+  // =========================
+  function calcMaxMin(item) {
+    let max = -Infinity;
+    let min = Infinity;
+
+    const rows = item?.weather;
+    if (!Array.isArray(rows)) return { max: null, min: null };
+
+    for (const r of rows) {
+      const t = r?.[1];
+      if (typeof t !== "number") continue;
+
+      if (t > max) max = t;
+      if (t < min) min = t;
+    }
+
+    return {
+      max: max === -Infinity ? null : Math.round(max),
+      min: min === Infinity ? null : Math.round(min)
+    };
+  }
+
+  // =========================
   // 列構造（hourly2ルール）
   // =========================
   const hasHourly2 = dataList?.[0]?.hourly2 != null;
@@ -1183,9 +1209,10 @@ function createWeekItem(weekData) {
 
     for (let col = 0; col < dataList.length; col++) {
       const cell = document.createElement("div");
-      cell.className = "week-cell";
 
       const item = dataList[col];
+      const daily = dailyList[col];
+
       let value = "—";
 
       // -------------------------
@@ -1200,26 +1227,32 @@ function createWeekItem(weekData) {
       // -------------------------
       if (row === 1) {
 
-        const summary = formatPrefWeather({
-          hourly: [item]
-        });
+        // hourly2があればそれ優先、なければdaily
+        let code = null;
 
-        const icon = toWeatherIcon(summary?.icon ?? 0);
-        value = icon;
+        if (hasHourly2 && item?.hourly2?.[0]) {
+          code = item.hourly2[0][0];
+        } else {
+          code = daily?.weather?.[0];
+        }
+
+        value = toWeatherIcon(code ?? 0);
       }
 
       // -------------------------
-      // 3行目：最高気温
+      // 3行目：最高気温（hourly）
       // -------------------------
       if (row === 2) {
-        value = getMaxTemp(item) ?? "—";
+        const res = calcMaxMin(item);
+        value = res.max ?? "—";
       }
 
       // -------------------------
-      // 4行目：最低気温
+      // 4行目：最低気温（hourly）
       // -------------------------
       if (row === 3) {
-        value = getMinTemp(item) ?? "—";
+        const res = calcMaxMin(item);
+        value = res.min ?? "—";
       }
 
       cell.textContent = value;
@@ -1230,55 +1263,6 @@ function createWeekItem(weekData) {
   }
 
   showDebug("render done");
-}
-
-function getDailyWeatherSummary(hourlyItem) {
-    if (!hourlyItem) return null;
-
-    // formatPrefWeather互換にするため形を合わせる
-    return formatPrefWeather({
-        hourly: [hourlyItem]
-    });
-}
-
-function getMinTemp(hourlyItem) {
-    if (!hourlyItem?.weather) return null;
-
-    let minTemp = Infinity;
-
-    for (const row of hourlyItem.weather) {
-        if (!Array.isArray(row)) continue;
-
-        const temp = row[1];
-
-        if (typeof temp === "number") {
-            minTemp = Math.min(minTemp, temp);
-        }
-    }
-
-    if (minTemp === Infinity) return null;
-
-    return Math.round(minTemp);
-}
-
-function getMaxTemp(hourlyItem) {
-    if (!hourlyItem?.weather) return null;
-
-    let maxTemp = -Infinity;
-
-    for (const row of hourlyItem.weather) {
-        if (!Array.isArray(row)) continue;
-
-        const temp = row[1];
-
-        if (typeof temp === "number") {
-            maxTemp = Math.max(maxTemp, temp);
-        }
-    }
-
-    if (maxTemp === -Infinity) return null;
-
-    return Math.round(maxTemp);
 }
 
 function resetSpotLayers() {
