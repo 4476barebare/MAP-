@@ -1118,6 +1118,7 @@ li {
 /* =====週間7枠 ===== */
 .week {
   display:none;
+  position: absolute;
   font-size:8px;
   color:#fff;
   margin: 4px;
