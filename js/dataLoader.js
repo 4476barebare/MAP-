@@ -1250,8 +1250,10 @@ function createWeekItem(weekData) {
           const res = calcMaxMin(item);
           value = res.max ?? "—";
         } else if (daily) {
-          value = daily?.weather?.[1] ?? "—";
-        }
+  value = daily?.weather?.[1] != null
+    ? Math.round(daily.weather[1])
+    : "—";
+}
       }
 
       // -------------------------
@@ -1263,8 +1265,10 @@ function createWeekItem(weekData) {
           const res = calcMaxMin(item);
           value = res.min ?? "—";
         } else if (daily) {
-          value = daily?.weather?.[2] ?? "—";
-        }
+  value = daily?.weather?.[2] != null
+    ? Math.round(daily.weather[2])
+    : "—";
+}
       }
 
       cell.textContent = value;
