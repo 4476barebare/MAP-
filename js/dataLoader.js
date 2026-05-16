@@ -1128,7 +1128,6 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
-  showDebug("start");
 
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
@@ -1196,10 +1195,8 @@ function createWeekItem(weekData) {
   }
 
   const hasHourly2 = dataList?.[0]?.hourly2 != null;
-
   const hasDaily = Array.isArray(dailyList);
 
-  // ★重要：daily開始位置だけ決める
   const dailyOffset = hasHourly2 ? 3 : 2;
 
   for (let row = 0; row < 4; row++) {
@@ -1214,18 +1211,11 @@ function createWeekItem(weekData) {
 
       let value = "—";
 
-      // -------------------------
-      // 1行目：日付
-      // -------------------------
       if (row === 0) {
         value = getDate(col);
       }
 
-      // -------------------------
-      // 2行目：天気
-      // -------------------------
       if (row === 1) {
-
         let code = null;
 
         if (col <= 2 && item) {
@@ -1241,34 +1231,26 @@ function createWeekItem(weekData) {
         value = toWeatherIcon(code ?? 0);
       }
 
-      // -------------------------
-      // 3行目：最高気温
-      // -------------------------
       if (row === 2) {
-
         if (col <= 2 && item) {
           const res = calcMaxMin(item);
           value = res.max ?? "—";
         } else if (daily) {
-  value = daily?.weather?.[1] != null
-    ? Math.round(daily.weather[1])
-    : "—";
-}
+          value = daily?.weather?.[1] != null
+            ? Math.round(daily.weather[1])
+            : "—";
+        }
       }
 
-      // -------------------------
-      // 4行目：最低気温
-      // -------------------------
       if (row === 3) {
-
         if (col <= 2 && item) {
           const res = calcMaxMin(item);
           value = res.min ?? "—";
         } else if (daily) {
-  value = daily?.weather?.[2] != null
-    ? Math.round(daily.weather[2])
-    : "—";
-}
+          value = daily?.weather?.[2] != null
+            ? Math.round(daily.weather[2])
+            : "—";
+        }
       }
 
       cell.textContent = value;
@@ -1277,8 +1259,6 @@ function createWeekItem(weekData) {
 
     tableContainer.appendChild(tr);
   }
-
-  showDebug("render done");
 }
 
 function resetSpotLayers() {
