@@ -1146,9 +1146,9 @@ function createWeekItem(weekData) {
   showDebug("containers OK");
 
   // =========================
-  // labels（ダミー）
+  // labels（実データ対応）
   // =========================
-  const labels = ["日付", "天気", "最高", "最低"];
+  const labels = ["気温", "気圧", "風", "降水"];
 
   for (const text of labels) {
     const div = document.createElement("div");
@@ -1160,11 +1160,21 @@ function createWeekItem(weekData) {
   showDebug("labels rendered");
 
   // =========================
-  // table（ダミー）
+  // データ本体
   // =========================
-  const rowsCount = 7;
-  const colsCount = 4;
+  const dataList = weekData?.hourly;
 
+  if (!Array.isArray(dataList)) {
+    showDebug("hourly invalid");
+    return;
+  }
+
+  const rowsCount = 4; // 気温/気圧/風/降水
+  const colsCount = dataList.length;
+
+  // =========================
+  // table（実データ）
+  // =========================
   for (let i = 0; i < rowsCount; i++) {
     const row = document.createElement("div");
     row.className = "week-row";
@@ -1172,7 +1182,23 @@ function createWeekItem(weekData) {
     for (let j = 0; j < colsCount; j++) {
       const cell = document.createElement("div");
       cell.className = "week-cell";
-      cell.textContent = "—";
+
+      const d = dataList[j];
+
+      let value = "—";
+
+      // weather配列から必要値を抜く
+      if (i === 0) {
+        value = d?.weather?.[0]?.[1] ?? "—"; // 気温っぽい値
+      } else if (i === 1) {
+        value = d?.water ?? "—";
+      } else if (i === 2) {
+        value = d?.weather?.[0]?.[5] ?? "—"; // 風向/風速系
+      } else if (i === 3) {
+        value = d?.weather?.[0]?.[6] ?? "—"; // 降水系
+      }
+
+      cell.textContent = value;
       row.appendChild(cell);
     }
 
@@ -1180,8 +1206,6 @@ function createWeekItem(weekData) {
   }
 
   showDebug("table rendered");
-
-  // weekDataは今は未使用（保持だけ）
 }
 
 function resetSpotLayers() {
