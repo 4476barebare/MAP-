@@ -1167,7 +1167,7 @@ function createWeekItem(weekData) {
 
   showDebug("weekData is array");
 
-  const dataList = weekData;
+  const dataList = weekData.hourly;
 
   showDebug("dataList set");
 
