@@ -1127,6 +1127,8 @@ li {
   font-size:8px;
   color:#fff;
   margin: 4px;
+  left: 0;
+  right: 0;
 }
 
 .week-labels {
@@ -1148,6 +1150,7 @@ li {
   display:flex;
   flex-direction:column;
   width:100%;
+  min-width: 100%;
   border-radius: 0px 4px 4px 0px;
   background-color: rgba(0,0,0,0.5);
 }
