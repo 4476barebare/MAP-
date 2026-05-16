@@ -1130,57 +1130,58 @@ function renderMarkers() {
 function createWeekItem(weekData) {
   showDebug("start");
 
-  if (!weekData) {
-    showDebug("weekData: NULL/UNDEFINED");
-    return;
-  }
-
-  showDebug("weekData OK");
-
   const weekEl = document.querySelector(".week");
-  if (!weekEl) {
-    showDebug(".week missing");
-    return;
-  }
+  if (!weekEl) return;
 
-  showDebug(".week OK");
+  weekEl.style.display = "flex";
 
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
 
-  if (!labelsContainer) {
-    showDebug("weekLabels missing");
-    return;
-  }
+  if (!labelsContainer || !tableContainer) return;
 
-  if (!tableContainer) {
-    showDebug("weekTable missing");
-    return;
-  }
+  labelsContainer.innerHTML = "";
+  tableContainer.innerHTML = "";
 
   showDebug("containers OK");
 
-  if (!Array.isArray(weekData)) {
-    showDebug("weekData is NOT array");
-    return;
+  // =========================
+  // labels（ダミー）
+  // =========================
+  const labels = ["日付", "天気", "最高", "最低"];
+
+  for (const text of labels) {
+    const div = document.createElement("div");
+    div.className = "week-label";
+    div.textContent = text;
+    labelsContainer.appendChild(div);
   }
 
-  showDebug("weekData is array");
+  showDebug("labels rendered");
 
-  const dataList = weekData.hourly;
+  // =========================
+  // table（ダミー）
+  // =========================
+  const rowsCount = 7;
+  const colsCount = 4;
 
-  showDebug("dataList set");
+  for (let i = 0; i < rowsCount; i++) {
+    const row = document.createElement("div");
+    row.className = "week-row";
 
-  const rows = [
-    dataList.map(d => d?.date ?? "-"),
-    dataList.map(d => d?.weather ?? "-"),
-    dataList.map(d => d?.max != null ? d.max + "℃" : "-"),
-    dataList.map(d => d?.min != null ? d.min + "℃" : "-")
-  ];
+    for (let j = 0; j < colsCount; j++) {
+      const cell = document.createElement("div");
+      cell.className = "week-cell";
+      cell.textContent = "—";
+      row.appendChild(cell);
+    }
 
-  showDebug("rows built");
+    tableContainer.appendChild(row);
+  }
 
-  // ここから先は省略でもOK
+  showDebug("table rendered");
+
+  // weekDataは今は未使用（保持だけ）
 }
 
 function resetSpotLayers() {
