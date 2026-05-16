@@ -1138,6 +1138,7 @@ function createWeekItem(weekData) {
 
   // 表示を有効化
   weekEl.style.display = "flex";
+  showDebug("display set: flex");
 
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
@@ -1151,50 +1152,66 @@ function createWeekItem(weekData) {
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
-  const hasHourly2 = weekData[2] && weekData[2].hourly2 != null;
+  // ===== ラベル（固定）=====
+  const labels = ["日付", "天気", "最高", "最低"];
 
-  // ===== ラベル生成 =====
-  for (let i = 0; i < 7; i++) {
-    const data = weekData[i];
-    if (!data) continue;
-
+  labels.forEach(text => {
     const label = document.createElement("div");
     label.className = "week-label";
-    label.textContent = data.date ?? "-";
-
+    label.textContent = text;
     labelsContainer.appendChild(label);
-  }
+  });
+
+  showDebug("labels created: " + labels.length);
+
+  // ===== データ整形 =====
+  const hasHourly2 = weekData[2] && weekData[2].hourly2 != null;
+
+  const rows = [
+    weekData.map(d => d?.date ?? "-"),
+    weekData.map(d => d?.weather ?? "-"),
+    weekData.map(d => d?.max != null ? d.max + "℃" : "-"),
+    weekData.map(d => d?.min != null ? d.min + "℃" : "-")
+  ];
+
+  showDebug("rows prepared");
 
   // ===== 行生成 =====
-  const row = document.createElement("div");
-  row.className = "week-row";
+  rows.forEach((rowData, rowIndex) => {
+    const row = document.createElement("div");
+    row.className = "week-row";
 
-  for (let i = 0; i < 7; i++) {
-    const data = weekData[i];
-    let value = "-";
+    rowData.forEach((val, i) => {
+      let value = val;
 
-    if (data) {
-      if (i === 0) value = data.hourly0;
-      else if (i === 1) value = data.hourly1;
-      else if (i === 2 && hasHourly2) value = data.hourly2;
-      else value = data.daily;
-    }
+      // 指定ロジック適用（hourly優先）
+      const data = weekData[i];
+      if (data) {
+        if (rowIndex === 1) { // 天気行だけ差し替え
+          if (i === 0) value = data.hourly0 ?? "-";
+          else if (i === 1) value = data.hourly1 ?? "-";
+          else if (i === 2 && hasHourly2) value = data.hourly2 ?? "-";
+          else value = data.daily ?? "-";
+        }
+      }
 
-    const cell = document.createElement("div");
-    cell.className = "week-cell";
-    cell.textContent = value ?? "-";
+      const cell = document.createElement("div");
+      cell.className = "week-cell";
+      cell.textContent = value;
 
-    row.appendChild(cell);
-  }
+      row.appendChild(cell);
+    });
 
-  tableContainer.appendChild(row);
+    tableContainer.appendChild(row);
+  });
 
-  // ===== 高さ確認 =====
+  showDebug("rows created: " + rows.length);
+
+  // ===== サイズ確認 =====
   const rect = weekEl.getBoundingClientRect();
   showDebug("size: " + rect.width + " x " + rect.height);
 
-  console.log(getComputedStyle(weekEl).display);
-  console.log(rect);
+  showDebug("done");
 }
 
 function resetSpotLayers() {
