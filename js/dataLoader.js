@@ -1127,6 +1127,7 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
+    alert("呼び出し");
     document.querySelector(".week").style.display = "flex";
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
