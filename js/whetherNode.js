@@ -164,7 +164,10 @@ function sanitizeWeather(r) {
                 row.map(v => Number.isFinite(v) ? v : 0)
             ),
 
-            water: {
+            // ★ここだけ拡張
+            water: Number.isFinite(h.water) ? h.water : 0,
+
+            waterEx: {
                 avg: Number.isFinite(h.water?.avg) ? h.water.avg : 0,
                 wave: Number.isFinite(h.water?.wave) ? h.water.wave : 0,
                 sunrise: Number.isFinite(h.water?.sunrise) ? h.water.sunrise : 0,
@@ -229,11 +232,15 @@ function normalizeStationToWeather(st) {
                     w.split("|").map(Number)
                 ),
 
-                water: {
-                    avg: waterParts[0] ?? 0,
-                    wave: waterParts[1] ?? 0,
-                    sunrise: waterParts[2] ?? 0,
-                    sunset: waterParts[3] ?? 0
+                // ★旧互換（絶対維持）
+                water: Number(waterParts[0] || 0),
+
+                // ★新拡張
+                waterEx: {
+                    avg: waterParts[0] || 0,
+                    wave: waterParts[1] || 0,
+                    sunrise: waterParts[2] || 0,
+                    sunset: waterParts[3] || 0
                 },
 
                 tide: (h.tide || []).map(Number)
@@ -261,7 +268,11 @@ function interpolateStation(s1, s2, d1, d2) {
     const w1 = 1 / d1;
     const w2 = 1 / d2;
 
-    const lerp = (a, b) => (a * w1 + b * w2) / (w1 + w2);
+    const lerp = (a, b) => {
+        const x = (a ?? 0);
+        const y = (b ?? 0);
+        return (x * w1 + y * w2) / (w1 + w2);
+    };
 
     return {
         stationCode: "interpolated",
@@ -274,30 +285,65 @@ function interpolateStation(s1, s2, d1, d2) {
 
             return {
                 weather: h1.weather.map((row, j) =>
-                    row.map((v, k) =>
-                        k === 5
-                            ? lerpWind(v, h2.weather[j][k])
-                            : lerp(v, h2.weather[j][k])
-                    )
+                    row.map((v, k) => {
+                        const v2 = h2.weather[j][k];
+
+                        // 風向だけ円形補間
+                        if (k === 5) {
+                            return lerpWind(v, v2);
+                        }
+
+                        return lerp(v, v2);
+                    })
                 ),
 
-                water: {
-                    avg: lerp(h1.water.avg, h2.water.avg),
-                    wave: lerp(h1.water.wave, h2.water.wave),
-                    sunrise: lerp(h1.water.sunrise, h2.water.sunrise),
-                    sunset: lerp(h1.water.sunset, h2.water.sunset)
+                // =========================
+                // ■ 旧互換（水：単一値）
+                // =========================
+                water: lerp(h1.water, h2.water),
+
+                // =========================
+                // ■ 拡張（水詳細）
+                // =========================
+                waterEx: {
+                    avg: lerp(
+                        h1.waterEx?.avg,
+                        h2.waterEx?.avg
+                    ),
+
+                    wave: lerp(
+                        h1.waterEx?.wave,
+                        h2.waterEx?.wave
+                    ),
+
+                    sunrise: lerp(
+                        h1.waterEx?.sunrise,
+                        h2.waterEx?.sunrise
+                    ),
+
+                    sunset: lerp(
+                        h1.waterEx?.sunset,
+                        h2.waterEx?.sunset
+                    )
                 },
 
-                tide: h1.tide.map((t, j) => lerp(t, h2.tide[j]))
+                tide: h1.tide.map((t, j) =>
+                    lerp(t, h2.tide[j])
+                )
             };
         }),
 
         daily: s1.daily.map((d1_, i) => {
+
             const d2_ = s2.daily[i];
 
             return {
-                weather: d1_.weather.map((v, j) => lerp(v, d2_.weather[j])),
-                tide: d1_.tide.map((t, j) => lerp(t, d2_.tide[j]))
+                weather: d1_.weather.map((v, j) =>
+                    lerp(v, d2_.weather[j])
+                ),
+                tide: d1_.tide.map((t, j) =>
+                    lerp(t, d2_.tide[j])
+                )
             };
         })
     };
