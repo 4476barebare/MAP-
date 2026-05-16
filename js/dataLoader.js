@@ -1144,7 +1144,6 @@ function createWeekItem(weekData) {
   tableContainer.innerHTML = "";
 
   const dataList = weekData?.hourly;
-
   if (!Array.isArray(dataList)) return;
 
   // =========================
@@ -1170,7 +1169,10 @@ function createWeekItem(weekData) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
-  const cols = dataList.length;
+  // =========================
+  // 列構造（hourly2ルール）
+  // =========================
+  const hasHourly2 = dataList?.[0]?.hourly2 != null;
 
   // =========================
   // rows
@@ -1179,12 +1181,11 @@ function createWeekItem(weekData) {
     const tr = document.createElement("div");
     tr.className = "week-row";
 
-    for (let col = 0; col < cols; col++) {
+    for (let col = 0; col < dataList.length; col++) {
       const cell = document.createElement("div");
       cell.className = "week-cell";
 
       const item = dataList[col];
-
       let value = "—";
 
       // -------------------------
@@ -1198,6 +1199,7 @@ function createWeekItem(weekData) {
       // 2行目：天気アイコン
       // -------------------------
       if (row === 1) {
+
         const summary = formatPrefWeather({
           hourly: [item]
         });
@@ -1207,14 +1209,14 @@ function createWeekItem(weekData) {
       }
 
       // -------------------------
-      // 3行目：最高気温（関数化）
+      // 3行目：最高気温
       // -------------------------
       if (row === 2) {
         value = getMaxTemp(item) ?? "—";
       }
 
       // -------------------------
-      // 4行目：最低気温（関数化）
+      // 4行目：最低気温
       // -------------------------
       if (row === 3) {
         value = getMinTemp(item) ?? "—";
