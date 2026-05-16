@@ -1197,18 +1197,20 @@ function createWeekItem(weekData) {
 
   const hasHourly2 = dataList?.[0]?.hourly2 != null;
 
-  // ★ここが重要：dailyは安全に扱う
   const hasDaily = Array.isArray(dailyList);
+
+  // ★重要：daily開始位置だけ決める
+  const dailyOffset = hasHourly2 ? 3 : 2;
 
   for (let row = 0; row < 4; row++) {
     const tr = document.createElement("div");
     tr.className = "week-row";
 
-    for (let col = 0; col < dataList.length; col++) {
+    for (let col = 0; col < 7; col++) {
       const cell = document.createElement("div");
 
       const item = dataList[col];
-      const daily = hasDaily ? dailyList[col] : null;
+      const daily = hasDaily ? dailyList[col - dailyOffset] : null;
 
       let value = "—";
 
@@ -1226,9 +1228,13 @@ function createWeekItem(weekData) {
 
         let code = null;
 
-        if (hasHourly2 && item?.hourly2?.[0]) {
-          code = item.hourly2[0][0];
-        } else {
+        if (col <= 2 && item) {
+          if (hasHourly2 && item?.hourly2?.[0]) {
+            code = item.hourly2[0][0];
+          } else {
+            code = item?.weather?.[0]?.[0];
+          }
+        } else if (daily) {
           code = daily?.weather?.[0];
         }
 
@@ -1239,16 +1245,26 @@ function createWeekItem(weekData) {
       // 3行目：最高気温
       // -------------------------
       if (row === 2) {
-        const res = calcMaxMin(item);
-        value = res.max ?? "—";
+
+        if (col <= 2 && item) {
+          const res = calcMaxMin(item);
+          value = res.max ?? "—";
+        } else if (daily) {
+          value = daily?.weather?.[1] ?? "—";
+        }
       }
 
       // -------------------------
       // 4行目：最低気温
       // -------------------------
       if (row === 3) {
-        const res = calcMaxMin(item);
-        value = res.min ?? "—";
+
+        if (col <= 2 && item) {
+          const res = calcMaxMin(item);
+          value = res.min ?? "—";
+        } else if (daily) {
+          value = daily?.weather?.[2] ?? "—";
+        }
       }
 
       cell.textContent = value;
