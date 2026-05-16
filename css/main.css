@@ -1133,7 +1133,7 @@ li {
 }
 
 .week-labels {
-     width: 40px;   /* ←ここ超重要 */
+     width: 24px;   /* ←ここ超重要 */
 
   flex-shrink: 0;
 
@@ -1164,6 +1164,9 @@ li {
   display:grid;
   grid-template-columns:repeat(7, minmax(0,1fr));
   height:14px;
+    min-height: 14px;
+
+  max-height: 14px;
 }
 
 .week-cell {
@@ -1172,6 +1175,22 @@ li {
   justify-content:center;
   overflow:hidden;
   white-space:nowrap;
+  height: 100%;
+
+  line-height: 14px;
+}
+
+.week-label,
+.week-cell {
+  display: flex;
+  align-items: center;
+  height: 14px;
+  padding: 0;
+}
+
+.week-cell span,
+.week-cell div {
+  line-height: 1;
 }
 
 .week-cell.active {
