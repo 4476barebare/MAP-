@@ -1130,6 +1130,7 @@ li {
   left: 0;
   right: 0;
   flex-direction: row;
+  text-align: center;
 }
 
 .week-labels {
