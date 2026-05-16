@@ -341,6 +341,7 @@ function getTideName(moonAge) {
 const WEEK_LABELS = ["日","月","火","水","木","金","土"];
 
 function createMonth(year, month) {
+
   const first = new Date(year, month - 1, 1);
   const last = new Date(year, month, 0);
 
@@ -348,11 +349,18 @@ function createMonth(year, month) {
   const daysInMonth = last.getDate();
 
   const today = new Date();
+  today.setHours(0,0,0,0);
+
   const todayStr = toKey(
     today.getFullYear(),
     today.getMonth() + 1,
     today.getDate()
   );
+
+  // ★ 週間潮 初期化（未定義時のみ）
+  if (!window.tideWeek) {
+    window.tideWeek = [];
+  }
 
   let debugShown = false;
 
@@ -369,6 +377,8 @@ function createMonth(year, month) {
   for (let d = 1; d <= daysInMonth; d++) {
 
     const date = new Date(year, month - 1, d);
+    date.setHours(0,0,0,0);
+
     const key = toKey(year, month, d);
 
     const moonAge = calcMoonAge(date);
@@ -379,6 +389,7 @@ function createMonth(year, month) {
     if (key < todayStr) cls += " past";
     if (key === todayStr) cls += " today";
 
+    // ★ 今日の潮
     if (key === todayStr && !debugShown) {
       debugShown = true;
 
@@ -386,6 +397,21 @@ function createMonth(year, month) {
         date: key,
         tide: tide
       };
+    }
+
+    // ★ 週間潮（今日〜6日後）
+    const diff = Math.floor((date - today) / 86400000);
+
+    if (diff >= 0 && diff < 7) {
+
+      // 重複防止（前月・来月ループ対策）
+      if (!window.tideWeek.find(v => v.date === key)) {
+        window.tideWeek.push({
+          date: key,
+          tide: tide
+        });
+      }
+
     }
 
     html += `
