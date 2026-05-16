@@ -155,6 +155,7 @@ function applyThirdStage(spots) {
 // ■ ユーティリティ
 // ================================
 function sanitizeWeather(r) {
+
     if (!r || !r.hourly || !r.daily) return null;
 
     return {
@@ -162,9 +163,17 @@ function sanitizeWeather(r) {
             weather: h.weather.map(row =>
                 row.map(v => Number.isFinite(v) ? v : 0)
             ),
-            water: Number.isFinite(h.water) ? h.water : 0,
+
+            water: {
+                avg: Number.isFinite(h.water?.avg) ? h.water.avg : 0,
+                wave: Number.isFinite(h.water?.wave) ? h.water.wave : 0,
+                sunrise: Number.isFinite(h.water?.sunrise) ? h.water.sunrise : 0,
+                sunset: Number.isFinite(h.water?.sunset) ? h.water.sunset : 0
+            },
+
             tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
         })),
+
         daily: r.daily.map(d => ({
             weather: d.weather.map(v => Number.isFinite(v) ? v : 0),
             tide: d.tide.map(v => Number.isFinite(v) ? v : 0)
@@ -211,19 +220,36 @@ function normalizeStationToWeather(st) {
         lat: Number(st.latlng.split(";")[0]),
         lng: Number(st.latlng.split(";")[1]),
 
-        hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => ({
-            weather: (h.weather || []).map(w => w.split("|").map(Number)),
-            water: Number(h.water || 0),
-            tide: (h.tide || []).map(Number)
-        })),
+        hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => {
 
-        daily: (st.daily || "").split(";").filter(Boolean).map(str => {
-            const parts = str.split("|");
+            const waterParts = (h.water || "").split("|").map(Number);
+
             return {
-                weather: parts.slice(0, 3).map(Number),
-                tide: parts.slice(3).join("|").split(",").map(Number)
+                weather: (h.weather || []).map(w =>
+                    w.split("|").map(Number)
+                ),
+
+                water: {
+                    avg: waterParts[0] ?? 0,
+                    wave: waterParts[1] ?? 0,
+                    sunrise: waterParts[2] ?? 0,
+                    sunset: waterParts[3] ?? 0
+                },
+
+                tide: (h.tide || []).map(Number)
             };
-        })
+        }),
+
+        daily: (st.daily || "")
+            .split(";")
+            .filter(Boolean)
+            .map(str => {
+                const parts = str.split("|");
+                return {
+                    weather: parts.slice(0, 3).map(Number),
+                    tide: parts.slice(3).join("|").split(",").map(Number)
+                };
+            })
     };
 }
 
@@ -235,7 +261,7 @@ function interpolateStation(s1, s2, d1, d2) {
     const w1 = 1 / d1;
     const w2 = 1 / d2;
 
-    const lerp = (v1, v2) => (v1 * w1 + v2 * w2) / (w1 + w2);
+    const lerp = (a, b) => (a * w1 + b * w2) / (w1 + w2);
 
     return {
         stationCode: "interpolated",
@@ -243,22 +269,32 @@ function interpolateStation(s1, s2, d1, d2) {
         lng: lerp(s1.lng, s2.lng),
 
         hourly: s1.hourly.map((h1, i) => {
+
             const h2 = s2.hourly[i];
 
             return {
                 weather: h1.weather.map((row, j) =>
-                    row.map((v, k) => k === 5
-                        ? lerpWind(v, h2.weather[j][k])
-                        : lerp(v, h2.weather[j][k])
+                    row.map((v, k) =>
+                        k === 5
+                            ? lerpWind(v, h2.weather[j][k])
+                            : lerp(v, h2.weather[j][k])
                     )
                 ),
-                water: lerp(h1.water, h2.water),
+
+                water: {
+                    avg: lerp(h1.water.avg, h2.water.avg),
+                    wave: lerp(h1.water.wave, h2.water.wave),
+                    sunrise: lerp(h1.water.sunrise, h2.water.sunrise),
+                    sunset: lerp(h1.water.sunset, h2.water.sunset)
+                },
+
                 tide: h1.tide.map((t, j) => lerp(t, h2.tide[j]))
             };
         }),
 
         daily: s1.daily.map((d1_, i) => {
             const d2_ = s2.daily[i];
+
             return {
                 weather: d1_.weather.map((v, j) => lerp(v, d2_.weather[j])),
                 tide: d1_.tide.map((t, j) => lerp(t, d2_.tide[j]))
