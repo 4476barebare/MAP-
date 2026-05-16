@@ -1261,6 +1261,19 @@ function createWeekItem(weekData) {
   }
 }
 
+function removeWeekItem() {
+  const weekEl = document.querySelector(".week");
+  if (!weekEl) return;
+
+  weekEl.style.display = "none";
+
+  const labelsContainer = document.getElementById("weekLabels");
+  const tableContainer = document.getElementById("weekTable");
+
+  if (labelsContainer) labelsContainer.innerHTML = "";
+  if (tableContainer) tableContainer.innerHTML = "";
+}
+
 function resetSpotLayers() {
 
     if (window.phase1Group) {
@@ -1360,7 +1373,7 @@ function goBack() {
         }
 
         updateStateFromHash();
-
+        removeWeekItem();
         // 再構築
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
