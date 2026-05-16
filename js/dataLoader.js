@@ -1142,15 +1142,13 @@ function createWeekItem(weekData) {
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
-  const dataList = weekData?.hourly;
   const dailyList = weekData?.daily;
-
-  if (!Array.isArray(dataList)) return;
+  if (!Array.isArray(dailyList)) return;
 
   // =========================
   // labels
   // =========================
-  const labels = ["日付", "天気", "最高", "最低"];
+  const labels = ["日付", "天気", "気温", "水温", "波高"];
 
   for (const text of labels) {
     const div = document.createElement("div");
@@ -1160,7 +1158,7 @@ function createWeekItem(weekData) {
   }
 
   // =========================
-  // 日付生成
+  // 日付
   // =========================
   const today = new Date();
 
@@ -1171,86 +1169,47 @@ function createWeekItem(weekData) {
   };
 
   // =========================
-  // 気温計算（hourly）
+  // テーブル
   // =========================
-  function calcMaxMin(item) {
-    let max = -Infinity;
-    let min = Infinity;
+  for (let row = 0; row < 5; row++) {
 
-    const rows = item?.weather;
-    if (!Array.isArray(rows)) return { max: null, min: null };
-
-    for (const r of rows) {
-      const t = r?.[1];
-      if (typeof t !== "number") continue;
-
-      if (t > max) max = t;
-      if (t < min) min = t;
-    }
-
-    return {
-      max: max === -Infinity ? null : Math.round(max),
-      min: min === Infinity ? null : Math.round(min)
-    };
-  }
-
-  const hasHourly2 = dataList?.[0]?.hourly2 != null;
-  const hasDaily = Array.isArray(dailyList);
-
-  const dailyOffset = hasHourly2 ? 3 : 2;
-
-  for (let row = 0; row < 4; row++) {
     const tr = document.createElement("div");
     tr.className = "week-row";
 
     for (let col = 0; col < 7; col++) {
-      const cell = document.createElement("div");
 
-      const item = dataList[col];
-      const daily = hasDaily ? dailyList[col - dailyOffset] : null;
+      const cell = document.createElement("div");
+      const daily = dailyList[col];
 
       let value = "—";
 
+      // 日付
       if (row === 0) {
         value = getDate(col);
       }
 
-      if (row === 1) {
-        let code = null;
-
-        if (col <= 2 && item) {
-          if (hasHourly2 && item?.hourly2?.[0]) {
-            code = item.hourly2[0][0];
-          } else {
-            code = item?.weather?.[0]?.[0];
-          }
-        } else if (daily) {
-          code = daily?.weather?.[0];
-        }
-
+      // 天気
+      if (row === 1 && daily) {
+        const code = daily?.weather?.[0];
         value = toWeatherIcon(code ?? 0);
       }
 
-      if (row === 2) {
-        if (col <= 2 && item) {
-          const res = calcMaxMin(item);
-          value = res.max ?? "—";
-        } else if (daily) {
-          value = daily?.weather?.[1] != null
-            ? Math.round(daily.weather[1])
-            : "—";
-        }
+      // 気温
+      if (row === 2 && daily) {
+        const temp = daily?.weather?.[1];
+        value = temp != null ? Math.round(temp) : "—";
       }
 
-      if (row === 3) {
-        if (col <= 2 && item) {
-          const res = calcMaxMin(item);
-          value = res.min ?? "—";
-        } else if (daily) {
-          value = daily?.weather?.[2] != null
-            ? Math.round(daily.weather[2])
-            : "—";
-        }
+      // 水温
+      if (row === 3 && daily) {
+        const water = daily?.dailyEx?.avg;
+        value = water != null ? Math.round(water) : "—";
+      }
+
+      // 波高
+      if (row === 4 && daily) {
+        const wave = daily?.dailyEx?.wave;
+        value = wave != null ? wave.toFixed(1) : "—";
       }
 
       cell.textContent = value;
