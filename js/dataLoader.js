@@ -1127,9 +1127,19 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
-  // 表示ON
+  showDebug("start");
+
   const weekEl = document.querySelector(".week");
+  showDebug("weekEl: " + (weekEl ? "OK" : "NG"));
+
   weekEl.style.display = "flex";
+
+  showDebug("display after: " + getComputedStyle(weekEl).display);
+
+  const rect = weekEl.getBoundingClientRect();
+  showDebug("size: " + rect.width + " x " + rect.height);
+
+  // ↓ 既存処理 ↓
 
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
