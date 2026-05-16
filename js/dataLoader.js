@@ -1130,65 +1130,54 @@ function createWeekItem(weekData) {
   showDebug("start");
 
   const weekEl = document.querySelector(".week");
-  showDebug("weekEl: " + (weekEl ? "OK" : "NG"));
+  if (!weekEl) {
+    showDebug("weekEl: NG");
+    return;
+  }
+  showDebug("weekEl: OK");
 
+  // 表示を有効化
   weekEl.style.display = "flex";
-
-  showDebug("display after: " + getComputedStyle(weekEl).display);
-
-  const rect = weekEl.getBoundingClientRect();
-  showDebug("size: " + rect.width + " x " + rect.height);
-
-  // ↓ 既存処理 ↓
 
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
+
+  if (!labelsContainer || !tableContainer) {
+    showDebug("container missing");
+    return;
+  }
 
   // 初期化
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
-  const hasHourly2 = weekData[0].hourly2 != null;
+  const hasHourly2 = weekData[2] && weekData[2].hourly2 != null;
 
-  // ラベルは縦に7個
+  // ===== ラベル生成 =====
   for (let i = 0; i < 7; i++) {
-    let date;
-
-    if (i === 0) {
-      date = weekData[0].date;
-    } else if (i === 1) {
-      date = weekData[1].date;
-    } else if (i === 2 && hasHourly2) {
-      date = weekData[2].date;
-    } else {
-      const index = i;
-      date = weekData[index].date;
-    }
+    const data = weekData[i];
+    if (!data) continue;
 
     const label = document.createElement("div");
     label.className = "week-label";
-    label.textContent = date;
+    label.textContent = data.date ?? "-";
 
     labelsContainer.appendChild(label);
   }
 
-  // ===== ここが重要 =====
-  // 1行（横7列）を作る
+  // ===== 行生成 =====
   const row = document.createElement("div");
   row.className = "week-row";
 
   for (let i = 0; i < 7; i++) {
-    let value;
+    const data = weekData[i];
+    let value = "-";
 
-    if (i === 0) {
-      value = weekData[0].hourly0;
-    } else if (i === 1) {
-      value = weekData[1].hourly1;
-    } else if (i === 2 && hasHourly2) {
-      value = weekData[2].hourly2;
-    } else {
-      const index = i;
-      value = weekData[index].daily;
+    if (data) {
+      if (i === 0) value = data.hourly0;
+      else if (i === 1) value = data.hourly1;
+      else if (i === 2 && hasHourly2) value = data.hourly2;
+      else value = data.daily;
     }
 
     const cell = document.createElement("div");
@@ -1200,9 +1189,12 @@ function createWeekItem(weekData) {
 
   tableContainer.appendChild(row);
 
-  // デバッグ用（必要なら）
+  // ===== 高さ確認 =====
+  const rect = weekEl.getBoundingClientRect();
+  showDebug("size: " + rect.width + " x " + rect.height);
+
   console.log(getComputedStyle(weekEl).display);
-  console.log(weekEl.getBoundingClientRect());
+  console.log(rect);
 }
 
 function resetSpotLayers() {
