@@ -1041,15 +1041,12 @@ if (!safe.URL) {
     window.map.once('moveend', function () {
         showFishMarkers(safe.URL);
 
-window.map.once('zoomend', () => {
+    setTimeout(() => {
 
-        setTimeout(() => {
+        createWeekItem(safe.whether);
 
-            createWeekItem(safe.whether);
+    }, 200);
 
-        }, 100);
-
-    });
 
 
 
