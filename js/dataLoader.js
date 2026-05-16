@@ -1127,51 +1127,72 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
-    alert("呼び出し");
-    document.querySelector(".week").style.display = "flex";
+  // 表示ON
+  const weekEl = document.querySelector(".week");
+  weekEl.style.display = "flex";
+
   const labelsContainer = document.getElementById("weekLabels");
   const tableContainer = document.getElementById("weekTable");
-  
+
+  // 初期化
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
   const hasHourly2 = weekData[0].hourly2 != null;
 
+  // ラベルは縦に7個
   for (let i = 0; i < 7; i++) {
-    let value;
     let date;
 
     if (i === 0) {
-      value = weekData[0].hourly0;
       date = weekData[0].date;
-
     } else if (i === 1) {
-      value = weekData[1].hourly1;
       date = weekData[1].date;
-
     } else if (i === 2 && hasHourly2) {
-      value = weekData[2].hourly2;
       date = weekData[2].date;
-
     } else {
-      const offset = hasHourly2 ? 3 : 2;
       const index = i;
-
-      value = weekData[index].daily;
       date = weekData[index].date;
     }
 
-    // DOM生成
     const label = document.createElement("div");
     label.className = "week-label";
     label.textContent = date;
+
     labelsContainer.appendChild(label);
+  }
+
+  // ===== ここが重要 =====
+  // 1行（横7列）を作る
+  const row = document.createElement("div");
+  row.className = "week-row";
+
+  for (let i = 0; i < 7; i++) {
+    let value;
+
+    if (i === 0) {
+      value = weekData[0].hourly0;
+    } else if (i === 1) {
+      value = weekData[1].hourly1;
+    } else if (i === 2 && hasHourly2) {
+      value = weekData[2].hourly2;
+    } else {
+      const index = i;
+      value = weekData[index].daily;
+    }
 
     const cell = document.createElement("div");
     cell.className = "week-cell";
     cell.textContent = value ?? "-";
-    tableContainer.appendChild(cell);
+
+    row.appendChild(cell);
   }
+
+  tableContainer.appendChild(row);
+
+  // デバッグ用（必要なら）
+  console.log(getComputedStyle(weekEl).display);
+  console.log(weekEl.getBoundingClientRect());
 }
 
 function resetSpotLayers() {
