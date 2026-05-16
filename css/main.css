@@ -1118,83 +1118,69 @@ li {
 /* =====週間7枠 ===== */
 
 
-/* =====週間7枠 ===== */
 .week {
-  display: none;
+  display: flex;
   position: absolute;
-  bottom: 0;
-  z-index: 8500;
-  font-size:8px;
-  color:#fff;
-  margin: 4px;
   left: 0;
   right: 0;
-  flex-direction: row;
-  text-align: center;
+  bottom: 0;
+
+  font-size: 8px;
+  color: #fff;
+  z-index: 8500;
 }
 
+/* 左ラベル列 */
 .week-labels {
-     width: 24px;   /* ←ここ超重要 */
-
+  width: 24px;
   flex-shrink: 0;
-  
-  border-radius: 4px 0px 0px 4px;
+
+  display: flex;
+  flex-direction: column;
+
   background-color: rgba(0,0,0,0.7);
+  border-radius: 4px 0 0 4px;
 }
 
+/* ラベル行 */
 .week-label {
-  height:14px;
-  display:flex;
-  align-items:center;
-  padding:0 2px;
-  font-size:6px;
-  text-align: center;
-  
+  height: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 6px;
 }
 
+/* 右テーブル */
 .week-table {
-  display:flex;
-  flex-direction:column;
-  width:100%;
   flex: 1;
   min-width: 0;
-  border-radius: 0px 4px 4px 0px;
+
+  display: flex;
+  flex-direction: column;
+
   background-color: rgba(0,0,0,0.5);
+  border-radius: 0 4px 4px 0;
 }
 
+/* 1行 */
 .week-row {
-  display:grid;
-  grid-template-columns:repeat(7, minmax(0,1fr));
-  height:14px;
-    min-height: 14px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 
-  max-height: 14px;
+  height: 14px;
 }
 
-.week-cell {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  white-space:nowrap;
-  height: 100%;
-
-  line-height: 14px;
-}
-
-.week-label,
+/* セル */
 .week-cell {
   display: flex;
   align-items: center;
+  justify-content: center;
+
   height: 14px;
-  padding: 0;
-}
+  min-width: 0;
 
-.week-cell span,
-.week-cell div {
-  line-height: 1;
-}
-
-.week-cell.active {
-    background-color: rgba(0,0,0,0.4);
+  white-space: nowrap;
 }
