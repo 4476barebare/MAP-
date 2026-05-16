@@ -180,9 +180,18 @@ function sanitizeWeather(r) {
         })),
 
         daily: r.daily.map(d => ({
-            weather: d.weather.map(v => Number.isFinite(v) ? v : 0),
-            tide: d.tide.map(v => Number.isFinite(v) ? v : 0)
-        }))
+    weather: d.weather.map(v => Number.isFinite(v) ? v : 0),
+
+    tide: d.tide.map(v => Number.isFinite(v) ? v : 0),
+
+    dailyEx: {
+        avg: Number.isFinite(d.dailyEx?.avg) ? d.dailyEx.avg : 0,
+        wave: Number.isFinite(d.dailyEx?.wave) ? d.dailyEx.wave : 0,
+        sunrise: Number.isFinite(d.dailyEx?.sunrise) ? d.dailyEx.sunrise : 0,
+        sunset: Number.isFinite(d.dailyEx?.sunset) ? d.dailyEx.sunset : 0
+    }
+}))
+
     };
 }
 
@@ -250,15 +259,34 @@ function normalizeStationToWeather(st) {
         }),
 
         daily: (st.daily || "")
-            .split(";")
-            .filter(Boolean)
-            .map(str => {
-                const parts = str.split("|");
-                return {
-                    weather: parts.slice(0, 3).map(Number),
-                    tide: parts.slice(3).join("|").split(",").map(Number)
-                };
-            })
+    .split(";")
+    .filter(Boolean)
+    .map(str => {
+
+        const p = str.split("|");
+
+        return {
+            // 既存互換（2要素で維持）
+            weather: [
+                Number(p[0] || 0),
+                Number(p[1] || 0)
+            ],
+
+            // ★潮汐（ここが今回の重要点）
+            tide: (p[6] || "")
+                .split(",")
+                .map(v => Number(v || 0)),
+
+            // ★拡張
+            dailyEx: {
+                avg: Number(p[2] || 0),       // 平均水温
+                wave: Number(p[3] || 0),      // 波高
+                sunrise: Number(p[4] || 0),   // 日の出
+                sunset: Number(p[5] || 0)     // 日の入
+            }
+        };
+    })
+    
     };
 }
 
@@ -335,19 +363,29 @@ function interpolateStation(s1, s2, d1, d2) {
             };
         }),
 
+        
         daily: s1.daily.map((d1_, i) => {
 
-            const d2_ = s2.daily[i];
+    const d2_ = s2.daily[i];
 
-            return {
-                weather: d1_.weather.map((v, j) =>
-                    lerp(v, d2_.weather[j])
-                ),
-                tide: d1_.tide.map((t, j) =>
-                    lerp(t, d2_.tide[j])
-                )
-            };
-        })
+    return {
+        weather: d1_.weather.map((v, j) =>
+            lerp(v, d2_.weather[j])
+        ),
+
+        tide: d1_.tide.map((t, j) =>
+            lerp(t, d2_.tide[j])
+        ),
+
+        dailyEx: {
+            avg: lerp(d1_.dailyEx?.avg, d2_.dailyEx?.avg),
+            wave: lerp(d1_.dailyEx?.wave, d2_.dailyEx?.wave),
+            sunrise: lerp(d1_.dailyEx?.sunrise, d2_.dailyEx?.sunrise),
+            sunset: lerp(d1_.dailyEx?.sunset, d2_.dailyEx?.sunset)
+        }
+    };
+})
+
     };
 }
 
