@@ -1072,7 +1072,7 @@ li {
 
 .week {
   display: flex;
-  position: absolute;
+  position: relative;
   left: 0;
   right: 0;
   bottom: 0;
@@ -1141,7 +1141,7 @@ li {
 /* ===== hourlyテーブル ===== */
 .weather {
   display: flex;
-  position: absolute;   /* ← これ追加 */
+  position: relative;
   left: 0;              /* ← これ追加 */
   right: 0;             /* ← これ追加 */
   bottom: 22px;         /* ← weekと重ならないよう少し上に */
