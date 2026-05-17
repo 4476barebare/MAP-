@@ -1401,9 +1401,7 @@ function createHourlyWeather(hourlyData) {
 
   const degToDir = (deg) => {
     if (deg == null || isNaN(deg)) return "—";
-
     const d = (deg % 360 + 360) % 360;
-
     const dirs = ["↑","↗","→","↘","↓","↙","←","↖"];
     return dirs[Math.round(d / 45) % 8];
   };
@@ -1412,7 +1410,7 @@ function createHourlyWeather(hourlyData) {
   // labels
   // =========================
 
-  const labels = ["TIME","天気","気温","降水","確率","風力","風向"];
+  const labels = ["TIME","天気","気温","降水","確率","風速","風向"];
 
   const labelsEl = document.createElement("div");
   labelsEl.className = "weather-labels";
@@ -1445,60 +1443,46 @@ function createHourlyWeather(hourlyData) {
     const wind = r?.[4];
     const dir  = r?.[5];
 
-    // =========================
-    // 時刻
-    // =========================
+    // ===== 時刻 =====
     const c0 = document.createElement("div");
     c0.className = "weather-cell";
     c0.textContent = `${hours[i]}`;
     rows[0].appendChild(c0);
 
-    // =========================
-    // 天気
-    // =========================
+    // ===== 天気 =====
     const c1 = document.createElement("div");
     c1.className = "weather-cell";
     c1.textContent = toWeatherIcon(code);
     rows[1].appendChild(c1);
 
-    // =========================
-    // 気温
-    // =========================
+    // ===== 気温 =====
     const c2 = document.createElement("div");
     c2.className = "weather-cell";
-    c2.innerHTML = unitSpan(temp, "°C");
+    c2.innerHTML = `<span class="value-wrap">${unitSpan(temp, "°C")}</span>`;
     rows[2].appendChild(c2);
 
-    // =========================
-    // 降水量
-    // =========================
+    // ===== 降水量 =====
     const c3 = document.createElement("div");
     c3.className = "weather-cell";
-    c3.innerHTML = unitSpan(rain, "mm");
+    c3.innerHTML = `<span class="value-wrap">${unitSpan(rain, "mm")}</span>`;
     rows[3].appendChild(c3);
 
-    // =========================
-    // 降水確率
-    // =========================
+    // ===== 降水確率 =====
     const c4 = document.createElement("div");
     c4.className = "weather-cell";
     c4.innerHTML =
       pop != null
-        ? `${Math.round(pop)}<span class="unit">%</span>`
+        ? `<span class="value-wrap">${Math.round(pop)}<span class="unit">%</span></span>`
         : "—";
     rows[4].appendChild(c4);
 
-    // =========================
-    // 風力
-    // =========================
+    // ===== 風力 =====
     const c5 = document.createElement("div");
     c5.className = "weather-cell";
-    c5.innerHTML = unitSpan(wind, "m/s");
+    c5.innerHTML = `<span class="value-wrap">${unitSpan(wind, "m/s")}</span>`;
     rows[5].appendChild(c5);
 
-    // =========================
-    // 風向（太字＋8pxはCSS側）
-    // =========================
+    // ===== 風向 =====
     const c6 = document.createElement("div");
     c6.className = "weather-cell wind-dir";
     c6.textContent = degToDir(dir);
