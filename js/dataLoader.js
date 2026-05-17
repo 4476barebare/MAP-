@@ -1153,7 +1153,7 @@ function createWeekItem(weekData) {
   // =========================
   // labels
   // =========================
-  const labels = ["click","→","", "気温", "水温", "波高"];
+  const labels = ["","潮周","", "気温", "水温", "波高"];
 
   for (const text of labels) {
     const div = document.createElement("div");
