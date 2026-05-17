@@ -1150,9 +1150,6 @@ function createWeekItem(weekData) {
 
   const hasHourly2 = hourlyList?.[0]?.hourly2 != null;
 
-  // =========================
-  // labels
-  // =========================
   const labels = ["","潮周","", "気温", "水温", "波高"];
 
   for (const text of labels) {
@@ -1162,9 +1159,6 @@ function createWeekItem(weekData) {
     labelsContainer.appendChild(div);
   }
 
-  // =========================
-  // 日付
-  // =========================
   const today = new Date();
 
   const getDate = (i) => {
@@ -1173,9 +1167,9 @@ function createWeekItem(weekData) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
-  // =========================
-  // テーブル
-  // =========================
+  // ★ スポット名（適宜変更）
+  const spotName = window.currentSpotName || "不明";
+
   for (let row = 0; row < 6; row++) {
 
     const tr = document.createElement("div");
@@ -1198,14 +1192,13 @@ function createWeekItem(weekData) {
       }
 
       // =========================
-      // 潮（★ここだけ追加）
+      // 潮
       // =========================
       if (row === 1) {
 
         const tide = tideList?.[col]?.tide;
         value = tide ?? "—";
 
-        // ★ 大潮だけ強制赤
         if (tide === "大潮") {
           cell.style.color = "red";
           cell.style.fontWeight = "bold";
@@ -1309,6 +1302,23 @@ function createWeekItem(weekData) {
           value = wave != null ? wave.toFixed(1) : "—";
         }
       }
+
+      // =========================
+      // ★クリックイベント（全セル共通）
+      // =========================
+      cell.style.cursor = "pointer";
+
+      cell.addEventListener("click", () => {
+
+        const date = getDate(col);
+        const tide = tideList?.[col]?.tide ?? "—";
+
+        alert(
+          `日付: ${date}\n` +
+          `スポット: ${spotName}\n` +
+          `潮: ${tide}`
+        );
+      });
 
       cell.textContent = value;
       tr.appendChild(cell);
