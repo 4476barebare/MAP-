@@ -1067,54 +1067,6 @@ li {
 
 
 
-
-/* ===== hourlyテーブル ===== */
-.weather {
-  display: none;
-  font-size: 8px;
-  margin-left: 4px;
-  margin-right: 4px;
-  color: #fff;
-  z-index: 8500;
-}
-
-.weather-labels {
-  flex-shrink: 0;
-  border-radius: 4px 0px 0px 4px;
-  background-color: rgba(0,0,0,0.7);
-}
-
-.weather-label {
-  height:14px;
-  display:flex;
-  align-items:center;
-  padding:0 2px;
-  font-size:6px;
-}
-
-.weather-table {
-  display:flex;
-  flex-direction:column;
-  width:100%;
-  border-radius: 0px 4px 4px 0px;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.weather-row {
-  display:grid;
-  grid-template-columns:repeat(12,1fr);
-  height:14px;
-  gap:2px;
-}
-
-.weather-cell {
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.is-now { background-color: rgba(0,0,0,0.4); }
-
 /* =====週間7枠 ===== */
 
 
@@ -1186,19 +1138,23 @@ li {
   white-space: nowrap;
 }
 
-
 /* ===== hourlyテーブル ===== */
 .weather {
   display: flex;
+  position: absolute;   /* ← これ追加 */
+  left: 0;              /* ← これ追加 */
+  right: 0;             /* ← これ追加 */
+  bottom: 22px;         /* ← weekと重ならないよう少し上に */
+  margin: 4px;
+
   font-size: 8px;
-  margin-left: 4px;
-  margin-right: 4px;
   color: #fff;
+  z-index: 8600;        /* ← week(8500)より上 */
 }
 
 .weather-labels {
   flex-shrink: 0;
-  border-radius: 4px 0px 0px 4px;
+  border-radius: 4px 0 0 4px;
   background-color: rgba(0,0,0,0.7);
 }
 
@@ -1206,6 +1162,7 @@ li {
   height:14px;
   display:flex;
   align-items:center;
+  justify-content:center;
   padding:0 2px;
   font-size:6px;
 }
@@ -1214,63 +1171,19 @@ li {
   display:flex;
   flex-direction:column;
   width:100%;
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 0 4px 4px 0;
   background-color: rgba(0,0,0,0.5);
 }
 
 .weather-row {
   display:grid;
-  grid-template-columns:repeat(12,1fr);
+  grid-template-columns:repeat(12, minmax(0, 1fr)); /* ← weekと揃える */
   height:14px;
-  gap:2px;
 }
 
 .weather-cell {
   display:flex;
   align-items:center;
   justify-content:center;
-}
-
-/* ===== hourlyテーブル ===== */
-.weather {
-  display: flex;
-  font-size: 8px;
-  margin-left: 4px;
-  margin-right: 4px;
-  color: #fff;
-}
-
-.weather-labels {
-  flex-shrink: 0;
-  border-radius: 4px 0px 0px 4px;
-  background-color: rgba(0,0,0,0.7);
-}
-
-.weather-label {
-  height:14px;
-  display:flex;
-  align-items:center;
-  padding:0 2px;
-  font-size:6px;
-}
-
-.weather-table {
-  display:flex;
-  flex-direction:column;
-  width:100%;
-  border-radius: 0px 4px 4px 0px;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.weather-row {
-  display:grid;
-  grid-template-columns:repeat(12,1fr);
-  height:14px;
-  gap:2px;
-}
-
-.weather-cell {
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  min-width:0;
 }
