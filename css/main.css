@@ -1188,3 +1188,9 @@ li {
   justify-content:center;
   min-width:0;
 }
+
+.unit {
+  font-size: 6px;
+  margin-left: 1px;
+  opacity: 0.8;
+}
