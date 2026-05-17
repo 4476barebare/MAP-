@@ -54,7 +54,7 @@ body { margin:0; font-family:sans-serif; }
 
 .is-now { background-color: rgba(0,0,0,0.4); }
 
-/* =====：7枠 ===== */
+/* =====週間7枠 ===== */
 .week {
   display:flex;
   font-size:8px;
@@ -131,8 +131,7 @@ const DATA = {
   rain:[0,0,10,20,10,0,0,0,10,30,40,20],
   pop:[0,0,20,40,30,10,0,0,20,50,60,40],
   wind:["2m","2m","3m","4m","3m","2m","2m","3m","4m","5m","4m","3m"],
-  dir:["北","北東","東","南東","南","南西","西","北西","北","北","北東","東"],
-  wave:[0.5,0.5,1,1,1,0.5,0.5,0.5,1,1.5,1.5,1]
+  dir:["北","北東","東","南東","南","南西","西","北西","北","北","北東","東"]
 };
 
 // =====================
@@ -141,7 +140,7 @@ const DATA = {
 const table = document.getElementById("table");
 const labelBox = document.getElementById("labels");
 
-["時刻","天気","気温","降水","確率","風速","風向","波高"]
+["時刻","天気","気温","降水","確率","風速","風向"]
 .forEach(t=>{
   const d=document.createElement("div");
   d.className="weather-label";
@@ -173,7 +172,7 @@ table.appendChild(row(DATA.rain.map(v=>v+"mm")));
 table.appendChild(row(DATA.pop.map(v=>v+"%")));
 table.appendChild(row(DATA.wind));
 table.appendChild(row(DATA.dir));
-table.appendChild(row(DATA.wave.map(v=>v+"m")));
+)));
 
 // =====================
 // 7枠データ生成
