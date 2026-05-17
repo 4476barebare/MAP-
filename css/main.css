@@ -1141,15 +1141,15 @@ li {
 /* ===== hourlyテーブル ===== */
 .weather {
   display: flex;
-  position: absolute;   /* ← これ追加 */
-  left: 0;              /* ← これ追加 */
-  right: 0;             /* ← これ追加 */
-  bottom: 22px;         /* ← weekと重ならないよう少し上に */
-  margin: 4px;
 
-  font-size: 8px;
-  color: #fff;
-  z-index: 8600;        /* ← week(8500)より上 */
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  bottom: 100px; /* ← 仮でいいが固定値前提をやめる */
+
+  margin: 4px;
+  z-index: 8600;
 }
 
 .weather-labels {
