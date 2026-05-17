@@ -1354,7 +1354,7 @@ window.activeWeekIndex = null;
 
 function createHourlyWeather(hourlyData) {
 
-  alert("click");
+ 
   const root = document.querySelector(".weather");
   if (!root || !hourlyData) return;
 
