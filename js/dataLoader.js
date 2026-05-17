@@ -1359,14 +1359,10 @@ function createHourlyWeather(hourlyData) {
 
   root.innerHTML = "";
 
-  // =========================
-  // ★ここが重要：データ型チェック
-  // =========================
   const isHourly =
     Array.isArray(hourlyData?.hourly2) ||
     Array.isArray(hourlyData?.weather);
 
-  // hourly構造じゃない場合は終了
   if (!isHourly) return;
 
   const list = Array.isArray(hourlyData.hourly2)
@@ -1376,20 +1372,29 @@ function createHourlyWeather(hourlyData) {
   if (!Array.isArray(list)) return;
 
   // =========================
-  // 12分割に整形
+  // 固定時間（12枠）
   // =========================
+  const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
+
   const step = Math.floor(list.length / 12) || 1;
 
   const sliced = [];
-  for (let i = 0; i < list.length; i += step) {
-    sliced.push(list[i]);
-    if (sliced.length >= 12) break;
+  for (let i = 0; i < 12; i++) {
+    sliced.push(list[i * step] ?? null);
   }
 
   // =========================
   // ラベル
   // =========================
-  const labels = ["時刻", "天気", "気温"];
+  const labels = [
+    "時刻",
+    "天気",
+    "気温",
+    "降水量",
+    "降水確率",
+    "風力",
+    "風向"
+  ];
 
   const labelsEl = document.createElement("div");
   labelsEl.className = "weather-labels";
@@ -1407,42 +1412,83 @@ function createHourlyWeather(hourlyData) {
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
 
-  const rowTime = document.createElement("div");
-  rowTime.className = "weather-row";
+  const rows = Array.from({ length: labels.length }, () => {
+    const row = document.createElement("div");
+    row.className = "weather-row";
+    return row;
+  });
 
-  const rowWeather = document.createElement("div");
-  rowWeather.className = "weather-row";
-
-  const rowTemp = document.createElement("div");
-  rowTemp.className = "weather-row";
-
-  for (let i = 0; i < sliced.length; i++) {
+  for (let i = 0; i < 12; i++) {
 
     const r = sliced[i];
 
-    const hour = r?.[2] ?? (i * step);
     const code = r?.[0];
     const temp = r?.[1];
 
+    // 想定拡張フィールド（無ければnull扱い）
+    const rain = r?.[3];      // 降水量
+    const pop  = r?.[4];      // 降水確率
+    const wind = r?.[5];      // 風力
+    const dir  = r?.[6];      // 風向き
+
+    // =========================
+    // 時刻
+    // =========================
+    const c0 = document.createElement("div");
+    c0.className = "weather-cell";
+    c0.textContent = `${hours[i]}h`;
+    rows[0].appendChild(c0);
+
+    // =========================
+    // 天気
+    // =========================
     const c1 = document.createElement("div");
     c1.className = "weather-cell";
-    c1.textContent = `${hour}h`;
-    rowTime.appendChild(c1);
+    c1.textContent = toWeatherIcon(code);
+    rows[1].appendChild(c1);
 
+    // =========================
+    // 気温
+    // =========================
     const c2 = document.createElement("div");
     c2.className = "weather-cell";
-    c2.textContent = toWeatherIcon(code);
-    rowWeather.appendChild(c2);
+    c2.textContent = temp != null ? Math.round(temp) : "—";
+    rows[2].appendChild(c2);
 
+    // =========================
+    // 降水量
+    // =========================
     const c3 = document.createElement("div");
     c3.className = "weather-cell";
-    c3.textContent = temp != null ? Math.round(temp) : "—";
-    rowTemp.appendChild(c3);
+    c3.textContent = rain != null ? rain : "—";
+    rows[3].appendChild(c3);
+
+    // =========================
+    // 降水確率
+    // =========================
+    const c4 = document.createElement("div");
+    c4.className = "weather-cell";
+    c4.textContent = pop != null ? `${pop}%` : "—";
+    rows[4].appendChild(c4);
+
+    // =========================
+    // 風力
+    // =========================
+    const c5 = document.createElement("div");
+    c5.className = "weather-cell";
+    c5.textContent = wind != null ? wind : "—";
+    rows[5].appendChild(c5);
+
+    // =========================
+    // 風向
+    // =========================
+    const c6 = document.createElement("div");
+    c6.className = "weather-cell";
+    c6.textContent = dir ?? "—";
+    rows[6].appendChild(c6);
   }
 
-  tableEl.appendChild(rowTime);
-  tableEl.appendChild(rowWeather);
-  tableEl.appendChild(rowTemp);
+  rows.forEach(r => tableEl.appendChild(r));
 
   root.appendChild(labelsEl);
   root.appendChild(tableEl);
