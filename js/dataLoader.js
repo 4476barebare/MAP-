@@ -1354,14 +1354,24 @@ window.activeWeekIndex = null;
 
 function createHourlyWeather(hourlyData) {
 
- 
   const root = document.querySelector(".weather");
   if (!root || !hourlyData) return;
 
   root.innerHTML = "";
 
-  const hasHourly2 = hourlyData?.hourly2 != null;
-  const list = hasHourly2 ? hourlyData.hourly2 : hourlyData.weather;
+  // =========================
+  // ★ここが重要：データ型チェック
+  // =========================
+  const isHourly =
+    Array.isArray(hourlyData?.hourly2) ||
+    Array.isArray(hourlyData?.weather);
+
+  // hourly構造じゃない場合は終了
+  if (!isHourly) return;
+
+  const list = Array.isArray(hourlyData.hourly2)
+    ? hourlyData.hourly2
+    : hourlyData.weather;
 
   if (!Array.isArray(list)) return;
 
@@ -1397,15 +1407,12 @@ function createHourlyWeather(hourlyData) {
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
 
-  // --- 時刻 ---
   const rowTime = document.createElement("div");
   rowTime.className = "weather-row";
 
-  // --- 天気 ---
   const rowWeather = document.createElement("div");
   rowWeather.className = "weather-row";
 
-  // --- 気温 ---
   const rowTemp = document.createElement("div");
   rowTemp.className = "weather-row";
 
@@ -1413,23 +1420,20 @@ function createHourlyWeather(hourlyData) {
 
     const r = sliced[i];
 
-    const hour = r?.[2] ?? (i * step); // 時刻（なければ擬似）
+    const hour = r?.[2] ?? (i * step);
     const code = r?.[0];
     const temp = r?.[1];
 
-    // ===== 時刻 =====
     const c1 = document.createElement("div");
     c1.className = "weather-cell";
     c1.textContent = `${hour}h`;
     rowTime.appendChild(c1);
 
-    // ===== 天気 =====
     const c2 = document.createElement("div");
     c2.className = "weather-cell";
     c2.textContent = toWeatherIcon(code);
     rowWeather.appendChild(c2);
 
-    // ===== 気温 =====
     const c3 = document.createElement("div");
     c3.className = "weather-cell";
     c3.textContent = temp != null ? Math.round(temp) : "—";
