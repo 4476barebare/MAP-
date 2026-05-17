@@ -1355,13 +1355,15 @@ window.activeWeekIndex = null;
 function degToDir(deg) {
   if (deg == null || isNaN(deg)) return "—";
 
-  const dirs = [
-    "↑", "↗", "→", "↘",
-    "↓", "↙", "←", "↖"
-  ];
+  const dirs = ["↑","↗","→","↘","↓","↙","←","↖"];
+  return dirs[Math.round(deg / 45) % 8];
+}
 
-  const index = Math.round(deg / 45) % 8;
-  return dirs[index];
+// 単位付き表示ヘルパー
+function withUnit(value, unit, round = true) {
+  if (value == null || isNaN(value)) return "—";
+  const v = round ? Math.round(value) : value;
+  return `${v}<span class="unit">${unit}</span>`;
 }
 
 function createHourlyWeather(hourlyData) {
@@ -1371,9 +1373,6 @@ function createHourlyWeather(hourlyData) {
 
   root.innerHTML = "";
 
-  // =========================
-  // hourly判定（ここで弾く）
-  // =========================
   const list = Array.isArray(hourlyData.hourly2)
     ? hourlyData.hourly2
     : Array.isArray(hourlyData.weather)
@@ -1382,12 +1381,8 @@ function createHourlyWeather(hourlyData) {
 
   if (!Array.isArray(list)) return;
 
-  // =========================
-  // 固定時間
-  // =========================
   const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
 
-  // データが多い/疎でも破綻しないよう間引き
   const step = Math.floor(list.length / 12) || 1;
 
   const sliced = [];
@@ -1395,18 +1390,7 @@ function createHourlyWeather(hourlyData) {
     sliced.push(list[i * step] ?? null);
   }
 
-  // =========================
-  // ラベル
-  // =========================
-  const labels = [
-    "時刻",
-    "天気",
-    "気温",
-    "降水量",
-    "降水確率",
-    "風力",
-    "風向"
-  ];
+  const labels = ["時刻","天気","気温","降水","確率","風力","風向"];
 
   const labelsEl = document.createElement("div");
   labelsEl.className = "weather-labels";
@@ -1418,9 +1402,6 @@ function createHourlyWeather(hourlyData) {
     labelsEl.appendChild(div);
   }
 
-  // =========================
-  // テーブル
-  // =========================
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
 
@@ -1433,68 +1414,52 @@ function createHourlyWeather(hourlyData) {
   for (let i = 0; i < 12; i++) {
 
     const r = sliced[i];
-
     if (!r) continue;
 
-    // ===== データ定義（重要）=====
-    const code = r?.[0]; // 天気
-    const temp = r?.[1]; // 気温
-    const rain = r?.[2]; // 降水量
-    const pop  = r?.[3]; // 降水確率
-    const wind = r?.[4]; // 風力
-    const dir  = r?.[5]; // 風向（deg）
+    const code = r?.[0];
+    const temp = r?.[1];
+    const rain = r?.[2];
+    const pop  = r?.[3];
+    const wind = r?.[4];
+    const dir  = r?.[5];
 
-    // =========================
-    // 時刻
-    // =========================
+    // ===== 時刻 =====
     const c0 = document.createElement("div");
     c0.className = "weather-cell";
     c0.textContent = `${hours[i]}h`;
     rows[0].appendChild(c0);
 
-    // =========================
-    // 天気
-    // =========================
+    // ===== 天気 =====
     const c1 = document.createElement("div");
     c1.className = "weather-cell";
     c1.textContent = toWeatherIcon(code);
     rows[1].appendChild(c1);
 
-    // =========================
-    // 気温（丸め）
-    // =========================
+    // ===== 気温（°C）=====
     const c2 = document.createElement("div");
     c2.className = "weather-cell";
-    c2.textContent = temp != null ? Math.round(temp) : "—";
+    c2.innerHTML = temp != null ? withUnit(temp, "°C") : "—";
     rows[2].appendChild(c2);
 
-    // =========================
-    // 降水量（丸め）
-    // =========================
+    // ===== 降水量（mm）=====
     const c3 = document.createElement("div");
     c3.className = "weather-cell";
-    c3.textContent = rain != null ? Math.round(rain) : "—";
+    c3.innerHTML = rain != null ? withUnit(rain, "mm") : "—";
     rows[3].appendChild(c3);
 
-    // =========================
-    // 降水確率
-    // =========================
+    // ===== 降水確率（%）=====
     const c4 = document.createElement("div");
     c4.className = "weather-cell";
-    c4.textContent = pop != null ? `${Math.round(pop)}%` : "—";
+    c4.innerHTML = pop != null ? `${Math.round(pop)}<span class="unit">%</span>` : "—";
     rows[4].appendChild(c4);
 
-    // =========================
-    // 風力（丸め）
-    // =========================
+    // ===== 風力（m/s）=====
     const c5 = document.createElement("div");
     c5.className = "weather-cell";
-    c5.textContent = wind != null ? Math.round(wind) : "—";
+    c5.innerHTML = wind != null ? withUnit(wind, "m/s") : "—";
     rows[5].appendChild(c5);
 
-    // =========================
-    // 風向（deg → 方位）
-    // =========================
+    // ===== 風向 =====
     const c6 = document.createElement("div");
     c6.className = "weather-cell";
     c6.textContent = degToDir(dir);
