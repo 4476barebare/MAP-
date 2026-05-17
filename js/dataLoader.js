@@ -1304,21 +1304,30 @@ function createWeekItem(weekData) {
       }
 
       // =========================
-      // ★クリックイベント（全セル共通）
-      // =========================
-      cell.style.cursor = "pointer";
+// ★クリックイベント（トグル）
+// =========================
+cell.style.cursor = "pointer";
 
-      cell.addEventListener("click", () => {
+cell.addEventListener("click", () => {
 
-        const date = getDate(col);
-        const tide = tideList?.[col]?.tide ?? "—";
+  const weatherRoot = document.querySelector(".weather");
+  if (!weatherRoot) return;
 
-        alert(
-          `日付: ${date}\n` +
-          `スポット: ${spotName}\n` +
-          `潮: ${tide}`
-        );
-      });
+  // 同じ列をもう一度クリック → 閉じる
+  if (window.activeWeekIndex === col) {
+    weatherRoot.innerHTML = "";
+    window.activeWeekIndex = null;
+    return;
+  }
+
+  // 別の列クリック → 上書き表示
+  window.activeWeekIndex = col;
+
+  const hourly = hourlyList[col];
+  if (!hourly) return;
+
+  createHourlyWeather(hourly);
+});
 
       cell.textContent = value;
       tr.appendChild(cell);
@@ -1339,6 +1348,97 @@ function removeWeekItem() {
 
   if (labelsContainer) labelsContainer.innerHTML = "";
   if (tableContainer) tableContainer.innerHTML = "";
+}
+
+function createHourlyWeather(hourlyData) {
+
+  const root = document.querySelector(".weather");
+  if (!root || !hourlyData) return;
+
+  root.innerHTML = "";
+
+  const hasHourly2 = hourlyData?.hourly2 != null;
+  const list = hasHourly2 ? hourlyData.hourly2 : hourlyData.weather;
+
+  if (!Array.isArray(list)) return;
+
+  // =========================
+  // 12分割に整形
+  // =========================
+  const step = Math.floor(list.length / 12) || 1;
+
+  const sliced = [];
+  for (let i = 0; i < list.length; i += step) {
+    sliced.push(list[i]);
+    if (sliced.length >= 12) break;
+  }
+
+  // =========================
+  // ラベル
+  // =========================
+  const labels = ["時刻", "天気", "気温"];
+
+  const labelsEl = document.createElement("div");
+  labelsEl.className = "weather-labels";
+
+  for (const text of labels) {
+    const div = document.createElement("div");
+    div.className = "weather-label";
+    div.textContent = text;
+    labelsEl.appendChild(div);
+  }
+
+  // =========================
+  // テーブル
+  // =========================
+  const tableEl = document.createElement("div");
+  tableEl.className = "weather-table";
+
+  // --- 時刻 ---
+  const rowTime = document.createElement("div");
+  rowTime.className = "weather-row";
+
+  // --- 天気 ---
+  const rowWeather = document.createElement("div");
+  rowWeather.className = "weather-row";
+
+  // --- 気温 ---
+  const rowTemp = document.createElement("div");
+  rowTemp.className = "weather-row";
+
+  for (let i = 0; i < sliced.length; i++) {
+
+    const r = sliced[i];
+
+    const hour = r?.[2] ?? (i * step); // 時刻（なければ擬似）
+    const code = r?.[0];
+    const temp = r?.[1];
+
+    // ===== 時刻 =====
+    const c1 = document.createElement("div");
+    c1.className = "weather-cell";
+    c1.textContent = `${hour}h`;
+    rowTime.appendChild(c1);
+
+    // ===== 天気 =====
+    const c2 = document.createElement("div");
+    c2.className = "weather-cell";
+    c2.textContent = toWeatherIcon(code);
+    rowWeather.appendChild(c2);
+
+    // ===== 気温 =====
+    const c3 = document.createElement("div");
+    c3.className = "weather-cell";
+    c3.textContent = temp != null ? Math.round(temp) : "—";
+    rowTemp.appendChild(c3);
+  }
+
+  tableEl.appendChild(rowTime);
+  tableEl.appendChild(rowWeather);
+  tableEl.appendChild(rowTemp);
+
+  root.appendChild(labelsEl);
+  root.appendChild(tableEl);
 }
 
 function resetSpotLayers() {
