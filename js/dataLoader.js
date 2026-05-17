@@ -1422,14 +1422,16 @@ function createHourlyWeather(hourlyData) {
 
     const r = sliced[i];
 
-    const code = r?.[0];
-    const temp = r?.[1];
+const code = r?.[0];
 
-    // 想定拡張フィールド（無ければnull扱い）
-    const rain = r?.[3];      // 降水量
-    const pop  = r?.[4];      // 降水確率
-    const wind = r?.[5];      // 風力
-    const dir  = r?.[6];      // 風向き
+// ★全部ここで丸める
+const temp = r?.[1] != null ? Math.round(r[1]) : null;
+
+const rain = r?.[3] != null ? Math.round(r[3]) : null;
+const pop  = r?.[4] != null ? Math.round(r[4]) : null;
+const wind = r?.[5] != null ? Math.round(r[5]) : null;
+
+const dir  = r?.[6] ?? null;
 
     // =========================
     // 時刻
