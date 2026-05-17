@@ -1450,7 +1450,7 @@ function createHourlyWeather(hourlyData) {
     // =========================
     const c0 = document.createElement("div");
     c0.className = "weather-cell";
-    c0.textContent = `${hours[i]}h`;
+    c0.textContent = `${hours[i]}`;
     rows[0].appendChild(c0);
 
     // =========================
