@@ -1187,6 +1187,7 @@ li {
   align-items: flex-end;
   justify-content:center;
   min-width:0;
+  font-variant-numeric: tabular-nums;
 }
 
 /* 数値全体を右揃え */
