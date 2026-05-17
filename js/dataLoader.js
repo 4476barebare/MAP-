@@ -1394,9 +1394,10 @@ function createHourlyWeather(hourlyData) {
   // util
   // =========================
 
+  // ★ ここが重要：numとunitを分離
   const unitSpan = (value, unit) => {
     if (value == null || value === "—") return "—";
-    return `${Math.round(value)}<span class="unit">${unit}</span>`;
+    return `<span class="num">${Math.round(value)}</span><span class="unit">${unit}</span>`;
   };
 
   const degToDir = (deg) => {
@@ -1472,11 +1473,11 @@ function createHourlyWeather(hourlyData) {
     c4.className = "weather-cell";
     c4.innerHTML =
       pop != null
-        ? `<span class="value-wrap">${Math.round(pop)}<span class="unit">%</span></span>`
+        ? `<span class="value-wrap"><span class="num">${Math.round(pop)}</span><span class="unit">%</span></span>`
         : "—";
     rows[4].appendChild(c4);
 
-    // ===== 風力 =====
+    // ===== 風速 =====
     const c5 = document.createElement("div");
     c5.className = "weather-cell";
     c5.innerHTML = `<span class="value-wrap">${unitSpan(wind, "m/s")}</span>`;
@@ -1494,6 +1495,7 @@ function createHourlyWeather(hourlyData) {
   root.appendChild(labelsEl);
   root.appendChild(tableEl);
 }
+
 
 function resetSpotLayers() {
 
