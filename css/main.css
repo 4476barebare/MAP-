@@ -1194,12 +1194,17 @@ li {
 
 .value-wrap {
   display: inline-flex;
-  justify-content: flex-end;
   align-items: flex-end;
-  min-width: 2.5em; /* ←ここで揃う */
-  font-variant-numeric: tabular-nums; /* ←重要 */
 }
 
+/* ←ここが揃えの本体 */
+
+.num {
+  display: inline-block
+  width: 2ch;              /* ←固定幅にする（重要） */
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
 
 .unit {
   font-size: 6px;
