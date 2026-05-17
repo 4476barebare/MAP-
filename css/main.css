@@ -1184,7 +1184,7 @@ li {
 
 .weather-cell {
   display:flex;
-  align-items:center;
+  align-items: flex-end;
   justify-content:center;
   min-width:0;
 }
@@ -1193,4 +1193,11 @@ li {
   font-size: 6px;
   margin-left: 1px;
   opacity: 0.8;
+}
+
+.wind-dir {
+  font-family: system-ui, sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 14px;
 }
