@@ -1146,8 +1146,9 @@ li {
   left: 0;
   right: 0;
 
-  bottom: 100px; /* ← 仮でいいが固定値前提をやめる */
-
+  bottom: 90px;
+  font-size: 10px;
+  color: #fff;
   margin: 4px;
   z-index: 8600;
 }
