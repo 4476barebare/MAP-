@@ -1126,7 +1126,7 @@ li {
   bottom: 0;
   margin: 4px;
   text-align: center;
-  font-size: 8px;
+  font-size: 10px;
   color: #fff;
   z-index: 8500;
 }
@@ -1151,7 +1151,7 @@ li {
   align-items: center;
   justify-content: center;
 
-  font-size: 6px;
+  font-size: 8px;
 }
 
 /* 右テーブル */
