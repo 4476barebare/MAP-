@@ -625,8 +625,7 @@ function createMenuItem(s) {
     } else {
 
         const raw = s.whether;
-
-
+        const w = formatPrefWeather(s.whether);
 
 let iconCode = 0;
 
@@ -639,7 +638,7 @@ if (Array.isArray(raw)) {
   for (const r of raw) {
 
     const code = r?.[0];
-    const pop = Number(r?.[3]);
+    const pop = Number(r?.[2]);
 
     // ★ weekと同じ補正ルール（ここが統一点）
     const adjusted =
