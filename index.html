@@ -503,11 +503,14 @@ function renderPrefWeather() {
                 const code = r?.[0];
                 const pop = Number(r?.[2]);
 
-                const adjusted =
-                    code >= 60 ? code :
-                    pop >= 70 ? 30 :
-                    pop >= 50 ? 10 :
-                    code;
+const adjusted =
+    code >= 60
+        ? (pop >= 80 ? 70 :   // 強い雨
+           pop >= 60 ? 60 :   // 普通の雨
+           60)                // 弱い雨（最低でも雨扱い維持）
+    : pop >= 70 ? 30
+    : pop >= 50 ? 10
+    : code;
 
                 map[adjusted] = (map[adjusted] || 0) + 1;
             }
