@@ -626,16 +626,12 @@ function formatPrefWeather(whether) {
     };
 }
 
-function toWeatherIcon(code) {
-
-  if (code >= 60) return "☔";   // 雨
+function toWeatherIcon(code) 
+  if (code >= 60) return "☂️";   // 雨
   if (code >= 30) return "☁️";  // 曇り
   if (code >= 10) return "⛅";  // 晴れ時々曇り
-
-  // ▼ここを厳密化
   if (code === 1) return "🌤";  // 主に晴れ
   if (code === 2) return "⛅";  // 薄曇り
-
   return "☀️"; // 0 = 快晴
 }
 
