@@ -1394,14 +1394,13 @@ cell.addEventListener("click", () => {
   const weatherRoot = document.querySelector(".weather");
   if (!weatherRoot) return;
 
-  // 同じ列をもう一度クリック → 閉じる
+  // 同じ列 → 閉じる
   if (window.activeWeekIndex === col) {
-    weatherRoot.innerHTML = "";
-    window.activeWeekIndex = null;
+    closeHourlyWeather();
     return;
   }
 
-  // 別の列クリック → 上書き表示
+  // 切り替え
   window.activeWeekIndex = col;
 
   const hourly = hourlyList[col];
@@ -1416,6 +1415,15 @@ cell.addEventListener("click", () => {
 
     tableContainer.appendChild(tr);
   }
+}
+
+function closeHourlyWeather() {
+
+  const weatherRoot = document.querySelector(".weather");
+  if (!weatherRoot) return;
+
+  weatherRoot.innerHTML = "";
+  window.activeWeekIndex = null;
 }
 
 function removeWeekItem() {
@@ -1713,6 +1721,8 @@ function goBack() {
 
         updateStateFromHash();
         removeWeekItem();
+        closeHourlyWeather();
+
         // 再構築
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
