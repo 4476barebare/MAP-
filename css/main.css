@@ -1191,22 +1191,23 @@ li {
 }
 
 .value-wrap {
-  display: inline-flex;
+  display: flex;
   align-items: flex-end;
-  justify-content: flex-end;
-  width: 100%;
+  justify-content: center;
 }
 
+/* 数値カラム（固定幅） */
 .num {
-  display: inline-block;
-  width: 3ch;   /* ← ここを増やす */
+  width: 3ch;              /* 最大桁に合わせる */
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
+/* 単位カラム（固定幅） */
 .unit {
+  width: 2ch;              /* ←これが効く */
   font-size: 6px;
-  margin-left: 1px;
+  text-align: left;
   opacity: 0.8;
 }
 
