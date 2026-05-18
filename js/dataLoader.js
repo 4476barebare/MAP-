@@ -1472,8 +1472,8 @@ function createHourlyWeather(hourlyData) {
 
     const code = r?.[0];
     const temp = r?.[1];
-    const rain = r?.[2];
-    const pop  = r?.[3];
+    const rain = r?.[3];
+    const pop  = r?.[2];
     const wind = r?.[4];
     const dir  = r?.[5];
 
