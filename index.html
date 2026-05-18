@@ -486,30 +486,71 @@ function renderPrefWeather() {
             continue;
         }
 
-        const w = formatPrefWeather(rep.whether);
+        const raw = rep.whether;
 
-        if (!w) {
-            el.textContent = 'no data';
-            continue;
+        const w = formatPrefWeather(raw);
+
+        let iconCode = 0;
+
+        if (Array.isArray(raw)) {
+
+            const map = {};
+            let maxCount = -1;
+            let tied = [];
+
+            for (const r of raw) {
+
+                const code = r?.[0];
+                const pop = Number(r?.[2]);
+
+                const adjusted =
+                    code >= 60 ? code :
+                    pop >= 70 ? 30 :
+                    pop >= 50 ? 10 :
+                    code;
+
+                map[adjusted] = (map[adjusted] || 0) + 1;
+            }
+
+            for (const k in map) {
+
+                const count = map[k];
+                const code = Number(k);
+
+                if (count > maxCount) {
+                    maxCount = count;
+                    tied = [code];
+                } else if (count === maxCount) {
+                    tied.push(code);
+                }
+            }
+
+            iconCode =
+                tied.length > 1
+                    ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
+                    : tied[0];
+
+        } else {
+            iconCode = raw?.[0] ?? 0;
         }
 
-        const icon = toWeatherIcon(w.icon);
+        const icon = toWeatherIcon(iconCode);
+
         const temp = Math.round(w.temp);
         const pop  = Math.round(w.pop);
         const wind = Math.round(w.wind);
-        const name = rep.name; // ←これ追加
+        const name = rep.name;
 
-el.innerHTML = `
-    <span>${icon}</span>
-    <div style="width: 12px">${temp}</div>
-    <span style="font-size: 8px;">°C 降水</span>
-    <div style="width: 12px">${pop}</div>
-    <span style="font-size: 8px;">%</span>
-    <div style="width: 12px">${wind}</div>
-    <span style="font-size: 8px;">m/s</span>
-    <span class="pref-name">${name}</span>
-`;
-
+        el.innerHTML = `
+            <span>${icon}</span>
+            <div style="width: 12px">${temp}</div>
+            <span style="font-size: 8px;">°C 降水</span>
+            <div style="width: 12px">${pop}</div>
+            <span style="font-size: 8px;">%</span>
+            <div style="width: 12px">${wind}</div>
+            <span style="font-size: 8px;">m/s</span>
+            <span class="pref-name">${name}</span>
+        `;
     }
 }
 
