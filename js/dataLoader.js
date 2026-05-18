@@ -1205,9 +1205,8 @@ function createWeekItem(weekData) {
         }
       }
 
-
 // =========================
-// 天気
+// 天気（正規化後で最頻出）
 // =========================
 if (row === 2) {
 
@@ -1219,13 +1218,27 @@ if (row === 2) {
 
     const map = {};
 
+    const adjustCode = (code, pop) => {
+
+      const p = Number(pop);
+
+      if (code >= 60) return code;
+
+      if (p >= 70) return 30;
+      if (p >= 50) return 10;
+
+      return code;
+    };
+
     if (Array.isArray(list)) {
       for (const r of list) {
 
-        const codeRaw = r?.[0];
-        const code = Number(codeRaw);
+        const rawCode = Number(r?.[0]);
+        const pop = r?.[3];
 
-        if (!Number.isFinite(code)) continue;
+        if (!Number.isFinite(rawCode)) continue;
+
+        const code = adjustCode(rawCode, pop);
 
         map[code] = (map[code] || 0) + 1;
       }
@@ -1235,11 +1248,11 @@ if (row === 2) {
     let maxCount = -1;
 
     for (const k in map) {
-      const numKey = Number(k);
+      const code = Number(k);
 
       if (map[k] > maxCount) {
         maxCount = map[k];
-        bestCode = numKey;
+        bestCode = code;
       }
     }
 
