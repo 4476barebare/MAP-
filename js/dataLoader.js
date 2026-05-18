@@ -624,8 +624,57 @@ function createMenuItem(s) {
         bottom.textContent = "no data";
     } else {
 
-        const w = formatPrefWeather(s.whether);
-        const icon = toWeatherIcon(w.icon);
+        const raw = s.whether;
+
+
+
+let iconCode = 0;
+
+if (Array.isArray(raw)) {
+
+  const map = {};
+  let maxCount = -1;
+  let tied = [];
+
+  for (const r of raw) {
+
+    const code = r?.[0];
+    const pop = Number(r?.[3]);
+
+    // ★ weekと同じ補正ルール（ここが統一点）
+    const adjusted =
+      code >= 60 ? code :
+      pop >= 70 ? 30 :
+      pop >= 50 ? 10 :
+      code;
+
+    map[adjusted] = (map[adjusted] || 0) + 1;
+  }
+
+  for (const k in map) {
+    const count = map[k];
+    const code = Number(k);
+
+    if (count > maxCount) {
+      maxCount = count;
+      tied = [code];
+    } else if (count === maxCount) {
+      tied.push(code);
+    }
+  }
+
+  iconCode =
+    tied.length > 1
+      ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
+      : tied[0];
+
+} else {
+  iconCode = raw?.[0] ?? 0;
+}
+
+const icon = toWeatherIcon(iconCode);
+
+
 
         bottom.innerHTML = `
             <span>${icon}</span>
