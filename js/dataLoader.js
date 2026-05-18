@@ -1244,17 +1244,31 @@ if (row === 2) {
       }
     }
 
-    let bestCode = 0;
-    let maxCount = -1;
+let bestCode = 0;
+let maxCount = -1;
+let tiedCodes = [];
 
-    for (const k in map) {
-      const code = Number(k);
+for (const k in map) {
+  const count = map[k];
+  const code = Number(k);
 
-      if (map[k] > maxCount) {
-        maxCount = map[k];
-        bestCode = code;
-      }
-    }
+  if (count > maxCount) {
+    maxCount = count;
+    tiedCodes = [code];
+  } else if (count === maxCount) {
+    tiedCodes.push(code);
+  }
+}
+
+// ★同率処理（ここが追加本体）
+if (tiedCodes.length > 1) {
+  const avg = tiedCodes.reduce((a, b) => a + b, 0) / tiedCodes.length;
+
+  // 再正規化（既存ルールに寄せる）
+  bestCode = Math.round(avg);
+} else {
+  bestCode = tiedCodes[0] ?? 0;
+}
 
     value = toWeatherIcon(bestCode);
 
