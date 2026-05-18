@@ -1394,20 +1394,16 @@ function createHourlyWeather(hourlyData) {
   // util
   // =========================
 
-  // 降水確率補正（←追加）
   const normalizePop = (pop) => {
     if (pop == null || pop === "—") return pop;
 
-    // 0〜1 → %
     if (pop <= 1) {
       return Math.round(pop * 100);
     }
 
-    // そのまま%
     return Math.round(pop);
   };
 
-  // 表示ラップ
   const createValueWrap = (value, unit) => {
 
     if (value == null || value === "—") {
@@ -1440,8 +1436,6 @@ function createHourlyWeather(hourlyData) {
     return dirs[Math.round(d / 45) % 8];
   };
 
-  // =========================
-  // labels
   // =========================
 
   const labels = ["TIME","天気","気温","降水","確率","風速","風向"];
@@ -1477,44 +1471,44 @@ function createHourlyWeather(hourlyData) {
     const wind = r?.[4];
     const dir  = r?.[5];
 
-    // ===== 時刻 =====
+    // TIME
     const c0 = document.createElement("div");
     c0.className = "weather-cell";
     c0.textContent = `${hours[i]}`;
     rows[0].appendChild(c0);
 
-    // ===== 天気 =====
+    // 天気（←ここは呼び出すだけ）
     const c1 = document.createElement("div");
     c1.className = "weather-cell";
     c1.textContent = toWeatherIcon(code);
     rows[1].appendChild(c1);
 
-    // ===== 気温 =====
+    // 気温
     const c2 = document.createElement("div");
     c2.className = "weather-cell";
     c2.appendChild(createValueWrap(temp, "°C"));
     rows[2].appendChild(c2);
 
-    // ===== 降水量 =====
+    // 降水量
     const c3 = document.createElement("div");
     c3.className = "weather-cell";
     c3.appendChild(createValueWrap(rain, "mm"));
     rows[3].appendChild(c3);
 
-    // ===== 降水確率（←ここ修正） =====
+    // 降水確率
     const c4 = document.createElement("div");
     c4.className = "weather-cell";
     const fixedPop = normalizePop(pop);
     c4.appendChild(createValueWrap(fixedPop, "%"));
     rows[4].appendChild(c4);
 
-    // ===== 風速 =====
+    // 風速
     const c5 = document.createElement("div");
     c5.className = "weather-cell";
     c5.appendChild(createValueWrap(wind, "m/s"));
     rows[5].appendChild(c5);
 
-    // ===== 風向 =====
+    // 風向
     const c6 = document.createElement("div");
     c6.className = "weather-cell wind-dir";
     c6.textContent = degToDir(dir);
