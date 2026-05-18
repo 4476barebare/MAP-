@@ -1394,7 +1394,20 @@ function createHourlyWeather(hourlyData) {
   // util
   // =========================
 
-  // ★ span廃止 → div構造で生成
+  // 降水確率補正（←追加）
+  const normalizePop = (pop) => {
+    if (pop == null || pop === "—") return pop;
+
+    // 0〜1 → %
+    if (pop <= 1) {
+      return Math.round(pop * 100);
+    }
+
+    // そのまま%
+    return Math.round(pop);
+  };
+
+  // 表示ラップ
   const createValueWrap = (value, unit) => {
 
     if (value == null || value === "—") {
@@ -1488,10 +1501,11 @@ function createHourlyWeather(hourlyData) {
     c3.appendChild(createValueWrap(rain, "mm"));
     rows[3].appendChild(c3);
 
-    // ===== 降水確率 =====
+    // ===== 降水確率（←ここ修正） =====
     const c4 = document.createElement("div");
     c4.className = "weather-cell";
-    c4.appendChild(createValueWrap(pop, "%"));
+    const fixedPop = normalizePop(pop);
+    c4.appendChild(createValueWrap(fixedPop, "%"));
     rows[4].appendChild(c4);
 
     // ===== 風速 =====
