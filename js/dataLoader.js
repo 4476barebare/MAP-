@@ -1205,44 +1205,50 @@ function createWeekItem(weekData) {
         }
       }
 
-      // =========================
-      // 天気
-      // =========================
-      if (row === 2) {
 
-        if (col <= 2 && hourly) {
+// =========================
+// 天気
+// =========================
+if (row === 2) {
 
-          const list = hasHourly2
-            ? hourly?.hourly2
-            : hourly?.weather;
+  if (col <= 2 && hourly) {
 
-          const map = {};
+    const list = hasHourly2
+      ? hourly?.hourly2
+      : hourly?.weather;
 
-          if (Array.isArray(list)) {
-            for (const r of list) {
-              const code = r?.[0];
-              if (code == null) continue;
-              map[code] = (map[code] || 0) + 1;
-            }
-          }
+    const map = {};
 
-          let bestCode = 0;
-          let maxCount = 0;
+    if (Array.isArray(list)) {
+      for (const r of list) {
 
-          for (const k in map) {
-            if (map[k] > maxCount) {
-              maxCount = map[k];
-              bestCode = Number(k);
-            }
-          }
+        const codeRaw = r?.[0];
+        const code = Number(codeRaw);
 
-          value = toWeatherIcon(bestCode);
+        if (!Number.isFinite(code)) continue;
 
-        } else if (daily) {
-          value = toWeatherIcon(daily?.weather?.[0] ?? 0);
-        }
+        map[code] = (map[code] || 0) + 1;
       }
+    }
 
+    let bestCode = 0;
+    let maxCount = -1;
+
+    for (const k in map) {
+      const numKey = Number(k);
+
+      if (map[k] > maxCount) {
+        maxCount = map[k];
+        bestCode = numKey;
+      }
+    }
+
+    value = toWeatherIcon(bestCode);
+
+  } else if (daily) {
+    value = toWeatherIcon(daily?.weather?.[0] ?? 0);
+  }
+}
       // =========================
       // 気温
       // =========================
