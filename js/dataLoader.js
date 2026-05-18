@@ -1394,10 +1394,30 @@ function createHourlyWeather(hourlyData) {
   // util
   // =========================
 
-  // ★ ここが重要：numとunitを分離
-  const unitSpan = (value, unit) => {
-    if (value == null || value === "—") return "—";
-    return `<span class="num">${Math.round(value)}</span><span class="unit">${unit}</span>`;
+  // ★ span廃止 → div構造で生成
+  const createValueWrap = (value, unit) => {
+
+    if (value == null || value === "—") {
+      const dash = document.createElement("div");
+      dash.textContent = "—";
+      return dash;
+    }
+
+    const wrap = document.createElement("div");
+    wrap.className = "value-wrap";
+
+    const num = document.createElement("div");
+    num.className = "num";
+    num.textContent = Math.round(value);
+
+    const u = document.createElement("div");
+    u.className = "unit";
+    u.textContent = unit;
+
+    wrap.appendChild(num);
+    wrap.appendChild(u);
+
+    return wrap;
   };
 
   const degToDir = (deg) => {
@@ -1459,28 +1479,25 @@ function createHourlyWeather(hourlyData) {
     // ===== 気温 =====
     const c2 = document.createElement("div");
     c2.className = "weather-cell";
-    c2.innerHTML = `<span class="value-wrap">${unitSpan(temp, "°C")}</span>`;
+    c2.appendChild(createValueWrap(temp, "°C"));
     rows[2].appendChild(c2);
 
     // ===== 降水量 =====
     const c3 = document.createElement("div");
     c3.className = "weather-cell";
-    c3.innerHTML = `<span class="value-wrap">${unitSpan(rain, "mm")}</span>`;
+    c3.appendChild(createValueWrap(rain, "mm"));
     rows[3].appendChild(c3);
 
     // ===== 降水確率 =====
     const c4 = document.createElement("div");
     c4.className = "weather-cell";
-    c4.innerHTML =
-      pop != null
-        ? `<span class="value-wrap"><span class="num">${Math.round(pop)}</span><span class="unit">%</span></span>`
-        : "—";
+    c4.appendChild(createValueWrap(pop, "%"));
     rows[4].appendChild(c4);
 
     // ===== 風速 =====
     const c5 = document.createElement("div");
     c5.className = "weather-cell";
-    c5.innerHTML = `<span class="value-wrap">${unitSpan(wind, "m/s")}</span>`;
+    c5.appendChild(createValueWrap(wind, "m/s"));
     rows[5].appendChild(c5);
 
     // ===== 風向 =====
@@ -1495,7 +1512,6 @@ function createHourlyWeather(hourlyData) {
   root.appendChild(labelsEl);
   root.appendChild(tableEl);
 }
-
 
 function resetSpotLayers() {
 
