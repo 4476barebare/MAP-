@@ -1396,16 +1396,11 @@ function createHourlyWeather(hourlyData) {
 
   const normalizePop = (pop) => {
     if (pop == null || pop === "—") return pop;
-
-    if (pop <= 1) {
-      return Math.round(pop * 100);
-    }
-
+    if (pop <= 1) return Math.round(pop * 100);
     return Math.round(pop);
   };
 
   const createValueWrap = (value, unit) => {
-
     if (value == null || value === "—") {
       const dash = document.createElement("div");
       dash.textContent = "—";
@@ -1434,6 +1429,21 @@ function createHourlyWeather(hourlyData) {
     const d = (deg % 360 + 360) % 360;
     const dirs = ["↑","↗","→","↘","↓","↙","←","↖"];
     return dirs[Math.round(d / 45) % 8];
+  };
+
+  // ★追加：降水確率によるコード補正（☔は出さない）
+  const adjustWeatherCodeForPop = (code, pop) => {
+
+    const p = normalizePop(pop);
+
+    // すでに雨系ならそのまま（toWeatherIconに任せる）
+    if (code >= 60) return code;
+
+    // 確率ベースで曇り方向へ寄せる
+    if (p >= 70) return 30; // ☁️
+    if (p >= 50) return 10; // ⛅
+
+    return code;
   };
 
   // =========================
@@ -1466,8 +1476,8 @@ function createHourlyWeather(hourlyData) {
 
     const code = r?.[0];
     const temp = r?.[1];
-    const rain = r?.[3];
     const pop  = r?.[2];
+    const rain = r?.[3];
     const wind = r?.[4];
     const dir  = r?.[5];
 
@@ -1477,10 +1487,11 @@ function createHourlyWeather(hourlyData) {
     c0.textContent = `${hours[i]}`;
     rows[0].appendChild(c0);
 
-    // 天気（←ここは呼び出すだけ）
+    // 天気（★ここだけ変更）
     const c1 = document.createElement("div");
     c1.className = "weather-cell";
-    c1.textContent = toWeatherIcon(code);
+    const adjustedCode = adjustWeatherCodeForPop(code, pop);
+    c1.textContent = toWeatherIcon(adjustedCode);
     rows[1].appendChild(c1);
 
     // 気温
