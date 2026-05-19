@@ -1076,12 +1076,15 @@ li {
 
 /* 左ラベル列 */
 .week-labels {
-  width: 4px;
+ 
   flex-shrink: 0;
 
   display: flex;
   flex-direction: column;
 
+  overflow: visible;
+  transform: translateX(5px);
+  width: 4px;
   background-color: rgba(0,0,0,0.7);
   border-radius: 4px 0 0 4px;
 }
@@ -1145,9 +1148,10 @@ li {
 }
 
 .weather-labels {
-    width: 0;
-    overflow: visible;
-  transform: translateX(5px);
+　overflow: visible;
+  width: 4px;
+  background-color: rgba(0,0,0,0.7);
+  border-radius: 4px 0 0 4px;
 }
 
 .weather-label {
