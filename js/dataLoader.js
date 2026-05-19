@@ -1637,19 +1637,17 @@ function normalizeGraphInput(input) {
   });
 }
 
-function createTideGraph(input) {
-
-  const data = normalizeGraphInput(input);
-  if (!data.length || data.length < 2) return;
+function createTideGraph() {
 
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
 
-  // ★これが最重要
+  // ★サイズを必ず確定させる
   const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width;
   canvas.height = rect.height;
 
+  // ★表示
   canvas.style.display = "block";
 
   const ctx = canvas.getContext("2d");
@@ -1659,36 +1657,13 @@ function createTideGraph(input) {
 
   ctx.clearRect(0, 0, w, h);
 
-  const stepX = w / (data.length - 1);
-
-  const allValues = data.flatMap(d => [d.tide, d.water, d.wave]);
-
-  const min = Math.min(...allValues);
-  const max = Math.max(...allValues);
-  const range = max - min || 1;
-
-  const scaleY = v => h - ((v - min) / range) * h;
-
-  const drawLine = (key, color) => {
-
-    ctx.beginPath();
-
-    data.forEach((d, i) => {
-      const x = i * stepX;
-      const y = scaleY(d[key]);
-
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    });
-
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  };
-
-  drawLine("tide", "#00aaff");
-  drawLine("water", "#00ff88");
-  drawLine("wave", "#ffcc00");
+  // -------------------------
+  // テスト：中央に円を描く
+  // -------------------------
+  ctx.beginPath();
+  ctx.arc(w / 2, h / 2, 40, 0, Math.PI * 2);
+  ctx.fillStyle = "red";
+  ctx.fill();
 }
 
 function resetSpotLayers() {
