@@ -610,7 +610,7 @@ function createMenuItem(s) {
 
     const li = document.createElement("li");
     li.dataset.key = s.id || s.name;
-    
+
     li.classList.add("menu-item");
 
     const top = document.createElement("div");
@@ -627,63 +627,71 @@ function createMenuItem(s) {
         const raw = s.whether;
         const w = formatPrefWeather(s.whether);
 
-let iconCode = 0;
+        let iconCode = 0;
 
-if (Array.isArray(raw)) {
+        // =========================
+        // week完全統一ロジック
+        // =========================
+        if (Array.isArray(raw)) {
 
-  const map = {};
-  let maxCount = -1;
-  let tied = [];
+            const adjustCode = (code, pop) => {
+                const p = Number(pop);
 
-for (const r of raw) {
+                if (code >= 60) {
+                    if (p >= 80) return 70;
+                    if (p >= 60) return 60;
+                    return 60;
+                }
 
-  const code = Number(r?.[0]);
-  const pop  = Number(r?.[2]);
+                if (p >= 70) return 30;
+                if (p >= 50) return 10;
 
-  const adjustCode = (code, pop) => {
-    const p = Number(pop);
+                return code;
+            };
 
-    if (code >= 60) {
-      if (p >= 80) return 70;
-      if (p >= 60) return 60;
-      return 60;
-    }
+            const map = {};
+            let maxCount = -1;
+            let tied = [];
 
-    if (p >= 70) return 30;
-    if (p >= 50) return 10;
+            // ■ 集計（weekと同じ）
+            for (const r of raw) {
 
-    return code;
-  };
+                const code = Number(r?.[0]);
+                const pop  = Number(r?.[2]);
 
-  const adjusted = adjustCode(code, pop);
+                if (!Number.isFinite(code)) continue;
 
-  map[adjusted] = (map[adjusted] || 0) + 1;
-}
+                const adjusted = adjustCode(code, pop);
 
-  for (const k in map) {
-    const count = map[k];
-    const code = Number(k);
+                map[adjusted] = (map[adjusted] || 0) + 1;
+            }
 
-    if (count > maxCount) {
-      maxCount = count;
-      tied = [code];
-    } else if (count === maxCount) {
-      tied.push(code);
-    }
-  }
+            // ■ 最頻値抽出（weekと同じ）
+            for (const k in map) {
 
-  iconCode =
-    tied.length > 1
-      ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
-      : tied[0];
+                const count = map[k];
+                const code = Number(k);
 
-} else {
-  iconCode = raw?.[0] ?? 0;
-}
+                if (count > maxCount) {
+                    maxCount = count;
+                    tied = [code];
+                } else if (count === maxCount) {
+                    tied.push(code);
+                }
+            }
 
-const icon = toWeatherIcon(iconCode);
+            // ■ 同率処理（weekと同じ）
+            iconCode =
+                tied.length > 1
+                    ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
+                    : tied[0];
 
+        } else {
 
+            iconCode = raw?.[0] ?? 0;
+        }
+
+        const icon = toWeatherIcon(iconCode);
 
         bottom.innerHTML = `
             <span>${icon}</span>
@@ -700,7 +708,7 @@ const icon = toWeatherIcon(iconCode);
     li.appendChild(bottom);
 
     // -------------------------
-    // ★ここでイベント付与
+    // クリックイベント
     // -------------------------
     li.addEventListener("click", () => {
 
