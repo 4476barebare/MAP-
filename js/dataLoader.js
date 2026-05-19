@@ -1545,17 +1545,21 @@ const adjustWeatherCodeForPop = (code, pop) => {
 };
   // =========================
 
-  const labels = ["TIME","天気","気温","降水","確率","風速","風向"];
+const labels = [
+  "時間 / 天気",
+  "気温 / 降水 / 確率",
+  "風速 / 風向"
+];
 
-  const labelsEl = document.createElement("div");
-  labelsEl.className = "weather-labels";
+const labelsEl = document.createElement("div");
+labelsEl.className = "weather-labels";
 
-  for (const text of labels) {
-    const div = document.createElement("div");
-    div.className = "weather-label";
-    div.textContent = text;
-    labelsEl.appendChild(div);
-  }
+labels.forEach(text => {
+  const div = document.createElement("div");
+  div.className = "weather-label";
+  div.textContent = text;
+  labelsEl.appendChild(div);
+});
 
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
