@@ -530,7 +530,7 @@ li {
    AD
 ========================= */
 .ad-box {
-  display: block;
+  display: flex;
   width: 320px;
   height: 50px;
 
