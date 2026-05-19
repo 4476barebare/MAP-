@@ -1078,10 +1078,8 @@ li {
 .week-labels {
  
   flex-shrink: 0;
-
   display: flex;
   flex-direction: column;
-
   overflow: visible;
  
   width: 6px;
@@ -1139,7 +1137,7 @@ li {
   left: 0;
   right: 0;
 
-  bottom: 48px;
+  bottom: 45px;
   font-size: 10px;
   color: #fff;
   margin: 4px;
