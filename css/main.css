@@ -518,11 +518,10 @@ li {
   top: 12px;
   width: 100%;
   z-index: 3000;
-
   display: flex;
   flex-direction: column; /* ←これが本体 */
-
   align-items: center;
+  box-sizing: border-box;
 }
 
 /* =========================
@@ -560,6 +559,7 @@ li {
   width: 100%;
   margin-top: 15px;
   padding: 0 20px 0 40px; /* ←左を広めにする */
+  box-sizing: border-box;
 }
 
 /* =========================
