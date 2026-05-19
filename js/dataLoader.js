@@ -640,16 +640,26 @@ if (Array.isArray(raw)) {
 const code = r?.[0];
 const pop  = Number(r?.[2]);
 
-const adjusted =
-    code >= 60
-        ? (pop >= 80 ? 70 :
-           pop >= 60 ? 60 :
-           60)
-    : pop >= 70 ? 30
-    : pop >= 50 ? 10
-    : code;
+const adjustCode = (code, pop) => {
 
-    map[adjusted] = (map[adjusted] || 0) + 1;
+  const p = Number(pop);
+
+  if (code >= 60) {
+    if (p >= 80) return 70;
+    if (p >= 60) return 60;
+    return 60;
+  }
+
+  if (p >= 70) return 30;
+  if (p >= 50) return 10;
+
+  return code;
+};
+
+const code = adjustCode(Number(r?.[0]), r?.[3]);
+
+map[code] = (map[code] || 0) + 1;
+
   }
 
   for (const k in map) {
