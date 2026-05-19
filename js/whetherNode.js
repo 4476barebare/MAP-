@@ -165,13 +165,10 @@ function sanitizeWeather(r) {
                 row.map(v => Number.isFinite(v) ? v : 0)
             ),
 
-            // 旧互換
-            water: Number.isFinite(h.water) ? h.water : 0,
-
-waterEx: {
-    avg: Number(h.waterEx?.avg) || 0,
-    sunrise: toMinutes(h.waterEx?.sunrise),
-    sunset: toMinutes(h.waterEx?.sunset)
+oneday: {
+    avg: Number(h.oneday?.avg) || 0,
+    sunrise: toMinutes(h.oneday?.sunrise),
+    sunset: toMinutes(h.oneday?.sunset)
 },
 
             tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
@@ -262,19 +259,12 @@ return {
         w.split("|").map(Number)
     ),
 
-    // 旧互換
-    water: Number(waterParts[0] || 0),
-
-    // ★ここが本体修正
-    waterEx: {
+    oneday: {
         avg: Number(waterParts[0] || 0),
-
-        // 日の出・日の入りはISO文字列 → 分に変換
         sunrise: toMinutes(waterParts[1]),
         sunset: toMinutes(waterParts[2])
     },
-
-    tide: (h.tide || []).map(Number)
+    tide: (h.tide || []).map(Number),
 };
 
         }),
@@ -347,30 +337,11 @@ function interpolateStation(s1, s2, d1, d2) {
                     })
                 ),
 
-                // =========================
-                // ■ 旧互換（水：単一値）
-                // =========================
-                water: lerp(h1.water, h2.water),
-
-                // =========================
-                // ■ 拡張（水詳細）
-                // =========================
-                waterEx: {
-                    avg: lerp(
-                        h1.waterEx?.avg,
-                        h2.waterEx?.avg
-                    ),
-
-                    sunrise: lerp(
-                        h1.waterEx?.sunrise,
-                        h2.waterEx?.sunrise
-                    ),
-
-                    sunset: lerp(
-                        h1.waterEx?.sunset,
-                        h2.waterEx?.sunset
-                    )
-                },
+oneday: {
+    avg: lerp(h1.oneday?.avg, h2.oneday?.avg),
+    sunrise: lerp(h1.oneday?.sunrise, h2.oneday?.sunrise),
+    sunset: lerp(h1.oneday?.sunset, h2.oneday?.sunset)
+},
 
                 tide: h1.tide.map((t, j) =>
                     lerp(t, h2.tide[j])
