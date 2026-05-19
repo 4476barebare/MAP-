@@ -1638,6 +1638,7 @@ function normalizeGraphInput(input) {
 }
 
 function createTideGraph(input) {
+    alert("input");
 
   const data = normalizeGraphInput(input);
   if (!data.length) return;
