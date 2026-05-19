@@ -1151,6 +1151,7 @@ li {
   color: #fff;
   margin: 4px;
   z-index: 8600;
+  align-items: stretch; /* 重要 */
 }
 
 .weather-labels {
