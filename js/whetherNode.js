@@ -168,13 +168,13 @@ function sanitizeWeather(r) {
             // 旧互換
             water: Number.isFinite(h.water) ? h.water : 0,
 
-            // ★ここ追加（これがないのが原因）
-            waterEx: {
-                avg: Number.isFinite(h.waterEx?.avg) ? h.waterEx.avg : 0,
-                wave: Number.isFinite(h.waterEx?.wave) ? h.waterEx.wave : 0,
-                sunrise: Number.isFinite(h.waterEx?.sunrise) ? h.waterEx.sunrise : 0,
-                sunset: Number.isFinite(h.waterEx?.sunset) ? h.waterEx.sunset : 0
-            },
+waterEx: {
+    avg: Number(h.waterEx?.avg ?? 0),
+    wave: Number(h.waterEx?.wave ?? 0),
+
+    sunrise: Number(h.waterEx?.sunrise ?? 0),
+    sunset: Number(h.waterEx?.sunset ?? 0)
+},
 
             tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
         })),
@@ -198,9 +198,11 @@ dailyEx: {
 }
 
 function toMinutes(timeStr) {
-    if (!timeStr) return 0;
+    if (!timeStr || typeof timeStr !== "string") return 0;
 
     const d = new Date(timeStr);
+    if (isNaN(d.getTime())) return 0;
+
     return d.getHours() * 60 + d.getMinutes();
 }
 
@@ -245,29 +247,31 @@ function normalizeStationToWeather(st) {
 
         hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => {
 
-            const waterParts = (h.water || "").split("|").map(Number);
+const waterParts = (h.water || "").split("|");
 
-            return {
-                weather: (h.weather || []).map(w =>
-                    w.split("|").map(Number)
-                ),
+return {
+    weather: (h.weather || []).map(w =>
+        w.split("|").map(Number)
+    ),
 
-                // ★旧互換（絶対維持）
-                water: Number(waterParts[0] || 0),
+    // 旧互換
+    water: Number(waterParts[0] || 0),
 
-                // ★新拡張
-                waterEx: {
-                    avg: waterParts[0] || 0,
-                    wave: waterParts[1] || 0,
-                    sunrise: waterParts[2] || 0,
-                    sunset: waterParts[3] || 0
-                },
+    // ★ここが本体修正
+    waterEx: {
+        avg: Number(waterParts[0] || 0),
 
-                tide: (h.tide || []).map(Number)
-            };
+        // 日の出・日の入りはISO文字列 → 分に変換
+        sunrise: toMinutes(waterParts[1]),
+        sunset: toMinutes(waterParts[2])
+    },
+
+    tide: (h.tide || []).map(Number)
+};
+
         }),
 
-        daily: (st.daily || "")
+daily: (st.daily || "")
     .split(";")
     .filter(Boolean)
     .map(str => {
@@ -275,23 +279,22 @@ function normalizeStationToWeather(st) {
         const p = str.split("|");
 
         return {
-            // 既存互換（2要素で維持）
             weather: [
                 Number(p[0] || 0),
                 Number(p[1] || 0)
             ],
 
-            // ★潮汐（ここが今回の重要点）
             tide: (p[6] || "")
                 .split(",")
                 .map(v => Number(v || 0)),
 
-            // ★拡張
             dailyEx: {
-                avg: Number(p[2] || 0),       // 平均水温
-                wave: Number(p[3] || 0),      // 波高
-                sunrise: Number(p[4] || 0),   // 日の出
-                sunset: Number(p[5] || 0)     // 日の入
+                avg: Number(p[2] || 0),
+                wave: Number(p[3] || 0),
+
+                // ★ここで数値化
+                sunrise: toMinutes(p[4]),
+                sunset: toMinutes(p[5])
             }
         };
     })
@@ -386,12 +389,14 @@ function interpolateStation(s1, s2, d1, d2) {
             lerp(t, d2_.tide[j])
         ),
 
-        dailyEx: {
-            avg: lerp(d1_.dailyEx?.avg, d2_.dailyEx?.avg),
-            wave: lerp(d1_.dailyEx?.wave, d2_.dailyEx?.wave),
-            sunrise: lerp(d1_.dailyEx?.sunrise, d2_.dailyEx?.sunrise),
-            sunset: lerp(d1_.dailyEx?.sunset, d2_.dailyEx?.sunset)
-        }
+dailyEx: {
+    avg: lerp(d1_.dailyEx?.avg, d2_.dailyEx?.avg),
+    wave: lerp(d1_.dailyEx?.wave, d2_.dailyEx?.wave),
+
+    sunrise: lerp(d1_.dailyEx?.sunrise, d2_.dailyEx?.sunrise),
+    sunset: lerp(d1_.dailyEx?.sunset, d2_.dailyEx?.sunset)
+}
+
     };
 })
 
