@@ -1640,30 +1640,32 @@ function normalizeGraphInput(input) {
 function createTideGraph() {
 
   const canvas = document.getElementById("tideCanvas");
-  if (!canvas) return;
+  if (!canvas) {
+    alert("canvas無し");
+    return;
+  }
 
-  // ★サイズを必ず確定させる
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
+  // ★強制サイズ（これで0問題を排除）
+  canvas.width = 300;
+  canvas.height = 150;
 
-  // ★表示
   canvas.style.display = "block";
+  canvas.style.background = "rgba(255,0,0,0.2)"; // 見えるか確認
 
   const ctx = canvas.getContext("2d");
 
-  const w = canvas.width;
-  const h = canvas.height;
+  if (!ctx) {
+    alert("ctx取れない");
+    return;
+  }
 
-  ctx.clearRect(0, 0, w, h);
-
-  // -------------------------
-  // テスト：中央に円を描く
-  // -------------------------
+  // 円
   ctx.beginPath();
-  ctx.arc(w / 2, h / 2, 40, 0, Math.PI * 2);
-  ctx.fillStyle = "red";
+  ctx.arc(150, 75, 50, 0, Math.PI * 2);
+  ctx.fillStyle = "blue";
   ctx.fill();
+
+  alert("描画完了");
 }
 
 function resetSpotLayers() {
