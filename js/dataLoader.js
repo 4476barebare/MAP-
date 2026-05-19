@@ -1342,23 +1342,53 @@ function createWeekItem(weekData) {
       // =========================
       cell.style.cursor = "pointer";
 
-      cell.addEventListener("click", () => {
+   cell.addEventListener("click", () => {
 
-        const weatherRoot = document.querySelector(".weather");
-        if (!weatherRoot) return;
+  const hourly = hourlyList[col];
+  if (!hourly) return;
 
-        if (window.activeWeekIndex === col) {
-          closeHourlyWeather();
-          return;
-        }
+  const same = window.activeWeekIndex === col;
 
-        window.activeWeekIndex = col;
+  // -------------------------
+  // 別セルクリック：初期化
+  // -------------------------
+  if (!same) {
+    window.activeWeekIndex = col;
+    window.weekViewMode = 1;
 
-        const hourly = hourlyList[col];
-        if (!hourly) return;
+    createHourlyWeather(hourly);
+    hideTideGraph();
+    return;
+  }
 
-        createHourlyWeather(hourly);
-      });
+  // -------------------------
+  // 同セルクリック：状態トグル
+  // -------------------------
+  window.weekViewMode++;
+
+  if (window.weekViewMode > 2) {
+    window.weekViewMode = 0;
+  }
+
+  if (window.weekViewMode === 0) {
+    closeHourlyWeather();
+    hideTideGraph();
+    window.activeWeekIndex = null;
+    return;
+  }
+
+  if (window.weekViewMode === 1) {
+    createHourlyWeather(hourly);
+    hideTideGraph();
+    return;
+  }
+
+  if (window.weekViewMode === 2) {
+    createHourlyWeather(hourly);
+    createTideGraph(hourly);
+    return;
+  }
+});
 
       cell.textContent = value;
       tr.appendChild(cell);
@@ -1366,6 +1396,14 @@ function createWeekItem(weekData) {
 
     tableContainer.appendChild(tr);
   }
+}
+
+window.weekViewMode = 0; // 0:none 1:hourly 2:hourly+tide
+window.activeWeekIndex = null;
+
+function hideTideGraph() {
+  const canvas = document.getElementById("tideCanvas");
+  if (canvas) canvas.style.display = "none";
 }
 
 function closeHourlyWeather() {
@@ -1571,6 +1609,89 @@ const adjustWeatherCodeForPop = (code, pop) => {
 
   root.appendChild(labelsEl);
   root.appendChild(tableEl);
+}
+
+function normalizeGraphInput(input) {
+
+  const src = input?.hourly ? input.hourly : input?.daily ? input.daily : [];
+
+  const isHourly = !!input?.hourly;
+
+  return src.map((d, i) => {
+
+    if (isHourly) {
+      return {
+        x: i,
+        tide: Number(d?.tide ?? 0),
+        water: Number(d?.oneday?.avg ?? 0),
+        wave: Number(d?.[6] ?? d?.waterEx?.wave ?? 0),
+      };
+    }
+
+    return {
+      x: i,
+      tide: Number(d?.tide ?? d?.dailyEx?.tide ?? 0),
+      water: Number(d?.dailyEx?.avg ?? 0),
+      wave: Number(d?.dailyEx?.wave ?? 0),
+    };
+  });
+}
+
+function createTideGraph(input) {
+
+  const data = normalizeGraphInput(input);
+  if (!data.length) return;
+
+  const canvas = document.getElementById("tideCanvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  const stepX = w / (data.length - 1);
+
+  // -------------------------
+  // スケール（3系統まとめて）
+  // -------------------------
+  const allValues = data.flatMap(d => [d.tide, d.water, d.wave]);
+
+  const min = Math.min(...allValues);
+  const max = Math.max(...allValues);
+  const range = max - min || 1;
+
+  const scaleY = v => h - ((v - min) / range) * h;
+
+  // -------------------------
+  // 描画関数
+  // -------------------------
+  const drawLine = (key, color) => {
+
+    ctx.beginPath();
+
+    data.forEach((d, i) => {
+
+      const x = i * stepX;
+      const y = scaleY(d[key]);
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  };
+
+  // -------------------------
+  // 3本描画
+  // -------------------------
+  drawLine("tide", "#00aaff");
+  drawLine("water", "#00ff88");
+  drawLine("wave", "#ffcc00");
 }
 
 function resetSpotLayers() {
