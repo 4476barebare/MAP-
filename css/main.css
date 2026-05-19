@@ -1154,7 +1154,6 @@ li {
 }
 
 .weather-labels {
-    font-size: 6px;
     width: 0;
     overflow: visible;
   transform: translateX(5px);
@@ -1165,7 +1164,7 @@ li {
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:8px;
+  font-size:6px;
   transform: translateY(50%);
 }
 
