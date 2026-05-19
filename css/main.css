@@ -530,7 +530,7 @@ li {
    AD
 ========================= */
 .ad-box {
-  display: none;
+  display: block;
   width: 320px;
   height: 50px;
 
@@ -1146,7 +1146,7 @@ li {
   left: 0;
   right: 0;
 
-  bottom: 90px;
+  bottom: 86px;
   font-size: 10px;
   color: #fff;
   margin: 4px;
