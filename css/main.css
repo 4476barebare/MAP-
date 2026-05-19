@@ -1166,7 +1166,7 @@ li {
   justify-content:center;
   padding:0 2px;
   font-size:8px;
-  transform: translateY(-50%);
+  transform: translateY(50%);
 }
 
 .weather-table {
