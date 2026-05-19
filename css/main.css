@@ -1104,6 +1104,7 @@ li {
 .week-table {
   flex: 1;
   min-width: 0;
+  padding-bottom: 2px;
 
   display: flex;
   flex-direction: column;
