@@ -1151,30 +1151,22 @@ li {
   color: #fff;
   margin: 4px;
   z-index: 8600;
-  align-items: stretch; /* 重要 */
 }
 
 .weather-labels {
   flex-shrink: 0;
   border-radius: 4px 0 0 4px;
   background-color: rgba(0,0,0,0.7);
-
-  display: flex;
-  flex-direction: column;
 }
 
-
 .weather-label {
+  height:14px;
   display:flex;
   align-items:center;
   justify-content:center;
   padding:0 2px;
   font-size:8px;
 }
-
-.weather-label:nth-child(1) { flex: 2; }
-.weather-label:nth-child(2) { flex: 3; }
-.weather-label:nth-child(3) { flex: 2; }
 
 .weather-table {
   display:flex;
