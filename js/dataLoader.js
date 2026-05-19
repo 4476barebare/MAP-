@@ -624,7 +624,7 @@ function createMenuItem(s) {
         bottom.textContent = "no data";
     } else {
 
-        const raw = s.whether;
+        const raw = s.whether.hourly?.[0]?.weather;
         const w = formatPrefWeather(s.whether);
 
         let iconCode = 0;
