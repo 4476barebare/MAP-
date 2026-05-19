@@ -1211,3 +1211,21 @@ li {
   font-weight: 700;
   line-height: 14px;
 }
+
+#weatherBox {
+  position: relative;
+}
+
+#tideCanvas {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 120px; /* 好きに調整 */
+
+  pointer-events: none;
+  display: none;
+  z-index: 10;
+}
