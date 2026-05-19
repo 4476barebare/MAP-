@@ -486,31 +486,44 @@ function renderPrefWeather() {
             continue;
         }
 
-        const raw = rep.whether;
+        const w = formatPrefWeather(rep.whether);
 
-        const w = formatPrefWeather(raw);
+        // =========================
+        // ★ week統一：hourly0固定
+        // =========================
+        const hourly = rep.whether?.hourly?.[0]?.weather;
 
         let iconCode = 0;
 
-        if (Array.isArray(raw)) {
+        if (Array.isArray(hourly)) {
+
+            const adjustCode = (code, pop) => {
+                const p = Number(pop);
+
+                if (code >= 60) {
+                    if (p >= 80) return 70;
+                    if (p >= 60) return 60;
+                    return 60;
+                }
+
+                if (p >= 70) return 30;
+                if (p >= 50) return 10;
+
+                return code;
+            };
 
             const map = {};
             let maxCount = -1;
             let tied = [];
 
-            for (const r of raw) {
+            for (const r of hourly) {
 
-                const code = r?.[0];
-                const pop = Number(r?.[3]);
+                const code = Number(r?.[0]);
+                const pop  = Number(r?.[2]);
 
-const adjusted =
-    code >= 60
-        ? (pop >= 80 ? 70 :   // 強い雨
-           pop >= 60 ? 60 :   // 普通の雨
-           60)                // 弱い雨（最低でも雨扱い維持）
-    : pop >= 70 ? 30
-    : pop >= 50 ? 10
-    : code;
+                if (!Number.isFinite(code)) continue;
+
+                const adjusted = adjustCode(code, pop);
 
                 map[adjusted] = (map[adjusted] || 0) + 1;
             }
@@ -534,7 +547,7 @@ const adjusted =
                     : tied[0];
 
         } else {
-            iconCode = raw?.[0] ?? 0;
+            iconCode = rep.whether?.hourly?.[0]?.weather?.[0]?.[0] ?? 0;
         }
 
         const icon = toWeatherIcon(iconCode);
