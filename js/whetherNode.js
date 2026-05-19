@@ -169,11 +169,10 @@ function sanitizeWeather(r) {
             water: Number.isFinite(h.water) ? h.water : 0,
 
 waterEx: {
-    avg: Number(h.waterEx?.avg ?? 0),
-    wave: Number(h.waterEx?.wave ?? 0),
-
-    sunrise: Number(h.waterEx?.sunrise ?? 0),
-    sunset: Number(h.waterEx?.sunset ?? 0)
+    avg: Number(h.waterEx?.avg) || 0,
+    wave: Number(h.waterEx?.wave) || 0,
+    sunrise: toMinutes(h.waterEx?.sunrise),
+    sunset: toMinutes(h.waterEx?.sunset)
 },
 
             tide: h.tide.map(v => Number.isFinite(v) ? v : 0)
@@ -197,13 +196,23 @@ dailyEx: {
     };
 }
 
-function toMinutes(timeStr) {
-    if (!timeStr || typeof timeStr !== "string") return 0;
+function toMinutes(v) {
 
-    const d = new Date(timeStr);
-    if (isNaN(d.getTime())) return 0;
+    if (v == null || v === "") return 0;
 
-    return d.getHours() * 60 + d.getMinutes();
+    // すでに数値（minutes想定）
+    if (typeof v === "number") return v;
+
+    // 数値文字列
+    if (!isNaN(v)) return Number(v);
+
+    // ISO or Date文字列
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) {
+        return d.getHours() * 60 + d.getMinutes();
+    }
+
+    return 0;
 }
 
 function stripStationMeta(st) {
