@@ -1154,11 +1154,10 @@ li {
 }
 
 .weather-labels {
-  width: 4px;
+
   transform: translateX(100%);
   flex-shrink: 0;
-  border-radius: 4px 0 0 4px;
-  background-color: rgba(0,0,0,0.5);
+
 }
 
 .weather-label {
@@ -1174,7 +1173,7 @@ li {
   display:flex;
   flex-direction:column;
   width:100%;
-  border-radius: 0 4px 4px 0;
+  border-radius: 4px 4px 4px 4px;
   background-color: rgba(0,0,0,0.5);
 }
 
