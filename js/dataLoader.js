@@ -1638,13 +1638,19 @@ function normalizeGraphInput(input) {
 }
 
 function createTideGraph(input) {
-    alert("input");
 
   const data = normalizeGraphInput(input);
-  if (!data.length) return;
+  if (!data.length || data.length < 2) return;
 
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
+
+  // ★これが最重要
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  canvas.style.display = "block";
 
   const ctx = canvas.getContext("2d");
 
@@ -1655,9 +1661,6 @@ function createTideGraph(input) {
 
   const stepX = w / (data.length - 1);
 
-  // -------------------------
-  // スケール（3系統まとめて）
-  // -------------------------
   const allValues = data.flatMap(d => [d.tide, d.water, d.wave]);
 
   const min = Math.min(...allValues);
@@ -1666,15 +1669,11 @@ function createTideGraph(input) {
 
   const scaleY = v => h - ((v - min) / range) * h;
 
-  // -------------------------
-  // 描画関数
-  // -------------------------
   const drawLine = (key, color) => {
 
     ctx.beginPath();
 
     data.forEach((d, i) => {
-
       const x = i * stepX;
       const y = scaleY(d[key]);
 
@@ -1687,9 +1686,6 @@ function createTideGraph(input) {
     ctx.stroke();
   };
 
-  // -------------------------
-  // 3本描画
-  // -------------------------
   drawLine("tide", "#00aaff");
   drawLine("water", "#00ff88");
   drawLine("wave", "#ffcc00");
