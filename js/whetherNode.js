@@ -170,7 +170,6 @@ function sanitizeWeather(r) {
 
 waterEx: {
     avg: Number(h.waterEx?.avg) || 0,
-    wave: Number(h.waterEx?.wave) || 0,
     sunrise: toMinutes(h.waterEx?.sunrise),
     sunset: toMinutes(h.waterEx?.sunset)
 },
@@ -360,11 +359,6 @@ function interpolateStation(s1, s2, d1, d2) {
                     avg: lerp(
                         h1.waterEx?.avg,
                         h2.waterEx?.avg
-                    ),
-
-                    wave: lerp(
-                        h1.waterEx?.wave,
-                        h2.waterEx?.wave
                     ),
 
                     sunrise: lerp(
