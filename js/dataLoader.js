@@ -638,7 +638,7 @@ if (Array.isArray(raw)) {
   for (const r of raw) {
 
     const code = r?.[0];
-    const pop = Number(r?.[2]);
+    const pop = Number(r?.[3]);
 
     // ★ weekと同じ補正ルール（ここが統一点）
 const adjusted =
