@@ -531,22 +531,15 @@ li {
   display: flex;
   width: 320px;
   height: 50px;
-
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
-
   align-items: center;
   justify-content: center;
-
   font-size: 12px;
   color: #333;
-
   pointer-events: auto;
-
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
-
-  margin-bottom: 6px;
 }
 
 /* =========================
@@ -557,7 +550,6 @@ li {
   align-items: center;
   justify-content: space-between; /* 両端寄せ */
   width: 100%;
-  margin-top: 15px;
   padding: 0 20px 0 40px; /* ←左を広めにする */
   box-sizing: border-box;
 }
