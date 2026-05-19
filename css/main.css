@@ -1225,5 +1225,5 @@ li {
 
   pointer-events: none;
   display: none;
-  z-index: 10;
+  z-index: 8300;
 }
