@@ -635,32 +635,30 @@ if (Array.isArray(raw)) {
   let maxCount = -1;
   let tied = [];
 
-  for (const r of raw) {
+for (const r of raw) {
 
-const code = r?.[0];
-const pop  = Number(r?.[2]);
+  const code = Number(r?.[0]);
+  const pop  = Number(r?.[2]);
 
-const adjustCode = (code, pop) => {
+  const adjustCode = (code, pop) => {
+    const p = Number(pop);
 
-  const p = Number(pop);
+    if (code >= 60) {
+      if (p >= 80) return 70;
+      if (p >= 60) return 60;
+      return 60;
+    }
 
-  if (code >= 60) {
-    if (p >= 80) return 70;
-    if (p >= 60) return 60;
-    return 60;
-  }
+    if (p >= 70) return 30;
+    if (p >= 50) return 10;
 
-  if (p >= 70) return 30;
-  if (p >= 50) return 10;
+    return code;
+  };
 
-  return code;
-};
+  const adjusted = adjustCode(code, pop);
 
-const code = adjustCode(Number(r?.[0]), r?.[3]);
-
-map[code] = (map[code] || 0) + 1;
-
-  }
+  map[adjusted] = (map[adjusted] || 0) + 1;
+}
 
   for (const k in map) {
     const count = map[k];
