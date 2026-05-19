@@ -641,11 +641,14 @@ if (Array.isArray(raw)) {
     const pop = Number(r?.[2]);
 
     // ★ weekと同じ補正ルール（ここが統一点）
-    const adjusted =
-      code >= 60 ? code :
-      pop >= 70 ? 30 :
-      pop >= 50 ? 10 :
-      code;
+const adjusted =
+    code >= 60
+        ? (pop >= 80 ? 70 :   // 強い雨
+           pop >= 60 ? 60 :   // 普通の雨
+           60)                // 弱い雨（最低でも雨扱い維持）
+    : pop >= 70 ? 30
+    : pop >= 50 ? 10
+    : code;
 
     map[adjusted] = (map[adjusted] || 0) + 1;
   }
@@ -1266,17 +1269,21 @@ if (row === 2) {
 
     const map = {};
 
-    const adjustCode = (code, pop) => {
+const adjustCode = (code, pop) => {
 
-      const p = Number(pop);
+  const p = Number(pop);
 
-      if (code >= 60) return code;
+  if (code >= 60) {
+    if (p >= 80) return 70; // 強い雨
+    if (p >= 60) return 60; // 普通の雨
+    return 60;              // 弱い雨（雨扱いは維持）
+  }
 
-      if (p >= 70) return 30;
-      if (p >= 50) return 10;
+  if (p >= 70) return 30;
+  if (p >= 50) return 10;
 
-      return code;
-    };
+  return code;
+};
 
     if (Array.isArray(list)) {
       for (const r of list) {
@@ -1520,20 +1527,31 @@ function createHourlyWeather(hourlyData) {
     return dirs[Math.round(d / 45) % 8];
   };
 
-  // ★追加：降水確率によるコード補正（☔は出さない）
-  const adjustWeatherCodeForPop = (code, pop) => {
+// ★追加：降水確率によるコード補正（過剰に☔へ上げない）
+const adjustWeatherCodeForPop = (code, pop) => {
 
-    const p = normalizePop(pop);
+  const p = normalizePop(pop);
 
-    // すでに雨系ならそのまま（toWeatherIconに任せる）
-    if (code >= 60) return code;
+  // ■ 雨系
+  if (code >= 60) {
 
-    // 確率ベースで曇り方向へ寄せる
-    if (p >= 70) return 30; // ☁️
-    if (p >= 50) return 10; // ⛅
+    // 強い雨に“引き上げる条件”だけ制御
+    if (code >= 70) {
+      // 元が強い雨でも、確率が低ければ下げる
+      if (p < 80) return 60;
+      return code; // ☔️維持
+    }
 
+    // 60台はそのまま（☂️）
     return code;
-  };
+  }
+
+  // ■ 非雨系
+  if (p >= 70) return 30; // ☁️
+  if (p >= 50) return 10; // ⛅
+
+  return code;
+};
 
   // =========================
 
