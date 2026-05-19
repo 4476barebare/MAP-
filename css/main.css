@@ -1076,7 +1076,7 @@ li {
 
 /* 左ラベル列 */
 .week-labels {
-  width: 24px;
+  width: 4px;
   flex-shrink: 0;
 
   display: flex;
@@ -1089,12 +1089,12 @@ li {
 /* ラベル行 */
 .week-label {
   height: 14px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 8px;
+  font-size:6px;
+  font-weight: bold;
+  transform: rotate(270deg) translateX(7px);
 }
 
 /* 右テーブル */
