@@ -1072,7 +1072,6 @@ li {
   font-size: 10px;
   color: #fff;
   z-index: 8500;
-  padding-bottom: 4px;
 }
 
 /* 左ラベル列 */
@@ -1138,7 +1137,7 @@ li {
   left: 0;
   right: 0;
 
-  bottom: 56px;
+  bottom: 48px;
   font-size: 10px;
   color: #fff;
   margin: 4px;
