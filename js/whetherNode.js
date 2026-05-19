@@ -184,15 +184,24 @@ function sanitizeWeather(r) {
 
     tide: d.tide.map(v => Number.isFinite(v) ? v : 0),
 
-    dailyEx: {
-        avg: Number.isFinite(d.dailyEx?.avg) ? d.dailyEx.avg : 0,
-        wave: Number.isFinite(d.dailyEx?.wave) ? d.dailyEx.wave : 0,
-        sunrise: Number.isFinite(d.dailyEx?.sunrise) ? d.dailyEx.sunrise : 0,
-        sunset: Number.isFinite(d.dailyEx?.sunset) ? d.dailyEx.sunset : 0
-    }
+dailyEx: {
+    avg: Number(d.dailyEx?.avg) || 0,
+    wave: Number(d.dailyEx?.wave) || 0,
+
+    sunrise: toMinutes(d.dailyEx?.sunrise),
+    sunset: toMinutes(d.dailyEx?.sunset)
+}
+
 }))
 
     };
+}
+
+function toMinutes(timeStr) {
+    if (!timeStr) return 0;
+
+    const d = new Date(timeStr);
+    return d.getHours() * 60 + d.getMinutes();
 }
 
 function stripStationMeta(st) {
