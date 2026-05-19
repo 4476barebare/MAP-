@@ -252,7 +252,8 @@ function normalizeStationToWeather(st) {
 
         hourly: [st.hourly0, st.hourly1, st.hourly2].map(h => {
 
-const waterParts = (h.water || "").split("|");
+const raw = h.oneday ?? h.water ?? "";
+const waterParts = String(raw).split("|");
 
 return {
     weather: (h.weather || []).map(w =>
