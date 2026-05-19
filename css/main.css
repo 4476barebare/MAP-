@@ -1154,6 +1154,8 @@ li {
 }
 
 .weather-labels {
+  width: 0;
+  transform: translateY(50%);
   flex-shrink: 0;
   border-radius: 4px 0 0 4px;
   background-color: rgba(0,0,0,0.5);
