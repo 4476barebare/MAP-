@@ -1217,7 +1217,7 @@ function createWeekItem(weekData) {
   const hasHourly2 = hourlyList?.[0]?.hourly2 != null;
 
   // ★テスト用（3列だけ）
-  const labels = ["", "潮周", "天気"];
+  const labels = ["", "", "WEEK"];
 
   for (const text of labels) {
     const div = document.createElement("div");
