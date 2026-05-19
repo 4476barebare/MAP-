@@ -1577,7 +1577,7 @@ const adjustWeatherCodeForPop = (code, pop) => {
 };
   // =========================
 
-  const labels = ["","","","RAIN","","WIND",""];
+  const labels = ["","","","","RAIN","","WIND"];
 
   const labelsEl = document.createElement("div");
   labelsEl.className = "weather-labels";
