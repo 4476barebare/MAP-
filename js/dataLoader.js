@@ -1216,10 +1216,8 @@ function createWeekItem(weekData) {
 
   const hasHourly2 = hourlyList?.[0]?.hourly2 != null;
 
-  // =========================
-  // ■ 最小表示（検証用）
-  // =========================
-  const labels = ["日付", "潮", "天気"];
+  // ★テスト用（3列だけ）
+  const labels = ["", "潮周", "天気"];
 
   for (const text of labels) {
     const div = document.createElement("div");
@@ -1246,6 +1244,7 @@ function createWeekItem(weekData) {
       const cell = document.createElement("div");
 
       const hourly = hourlyList[col];
+      const daily  = dailyList?.[col - 3];
 
       let value = "—";
 
@@ -1270,7 +1269,7 @@ function createWeekItem(weekData) {
       }
 
       // =========================
-      // 天気（week統一ロジックそのまま）
+      // 天気（week統一ロジック）
       // =========================
       if (row === 2) {
 
@@ -1297,7 +1296,7 @@ function createWeekItem(weekData) {
 
           const map = {};
           let maxCount = -1;
-          let tiedCodes = [];
+          let tied = [];
 
           if (Array.isArray(list)) {
             for (const r of list) {
@@ -1307,9 +1306,8 @@ function createWeekItem(weekData) {
 
               if (!Number.isFinite(rawCode)) continue;
 
-              const code = adjustCode(rawCode, pop);
-
-              map[code] = (map[code] || 0) + 1;
+              const adjusted = adjustCode(rawCode, pop);
+              map[adjusted] = (map[adjusted] || 0) + 1;
             }
           }
 
@@ -1320,23 +1318,47 @@ function createWeekItem(weekData) {
 
             if (count > maxCount) {
               maxCount = count;
-              tiedCodes = [code];
+              tied = [code];
             } else if (count === maxCount) {
-              tiedCodes.push(code);
+              tied.push(code);
             }
           }
 
-          const bestCode =
-            tiedCodes.length > 1
-              ? Math.round(tiedCodes.reduce((a, b) => a + b, 0) / tiedCodes.length)
-              : tiedCodes[0] ?? 0;
+          const best =
+            tied.length > 1
+              ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
+              : tied[0];
 
-          value = toWeatherIcon(bestCode);
+          value = toWeatherIcon(best ?? 0);
 
-        } else if (hourly) {
-          value = toWeatherIcon(hourly?.weather?.[0]?.[0] ?? 0);
+        } else if (daily) {
+
+          value = toWeatherIcon(daily?.weather?.[0] ?? 0);
         }
       }
+
+      // =========================
+      // クリックイベント（残す）
+      // =========================
+      cell.style.cursor = "pointer";
+
+      cell.addEventListener("click", () => {
+
+        const weatherRoot = document.querySelector(".weather");
+        if (!weatherRoot) return;
+
+        if (window.activeWeekIndex === col) {
+          closeHourlyWeather();
+          return;
+        }
+
+        window.activeWeekIndex = col;
+
+        const hourly = hourlyList[col];
+        if (!hourly) return;
+
+        createHourlyWeather(hourly);
+      });
 
       cell.textContent = value;
       tr.appendChild(cell);
