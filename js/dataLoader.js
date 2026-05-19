@@ -1527,32 +1527,22 @@ function createHourlyWeather(hourlyData) {
     return dirs[Math.round(d / 45) % 8];
   };
 
-// ★追加：降水確率によるコード補正（過剰に☔へ上げない）
+// ★追加：降水確率によるコード補正（☔あり・三項版と同一仕様）
 const adjustWeatherCodeForPop = (code, pop) => {
 
   const p = normalizePop(pop);
 
-  // ■ 雨系
   if (code >= 60) {
-
-    // 強い雨に“引き上げる条件”だけ制御
-    if (code >= 70) {
-      // 元が強い雨でも、確率が低ければ下げる
-      if (p < 80) return 60;
-      return code; // ☔️維持
-    }
-
-    // 60台はそのまま（☂️）
-    return code;
+    if (p >= 80) return 70; // 強い雨
+    if (p >= 60) return 60; // 普通の雨
+    return 60;              // 弱い雨（雨扱い維持）
   }
 
-  // ■ 非雨系
-  if (p >= 70) return 30; // ☁️
-  if (p >= 50) return 10; // ⛅
+  if (p >= 70) return 30;
+  if (p >= 50) return 10;
 
   return code;
 };
-
   // =========================
 
   const labels = ["TIME","天気","気温","降水","確率","風速","風向"];
