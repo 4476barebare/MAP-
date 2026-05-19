@@ -637,15 +637,14 @@ if (Array.isArray(raw)) {
 
   for (const r of raw) {
 
-    const code = r?.[0];
-    const pop = Number(r?.[3]);
+const code = r?.[0];
+const pop  = Number(r?.[2]);
 
-    // ★ weekと同じ補正ルール（ここが統一点）
 const adjusted =
     code >= 60
-        ? (pop >= 80 ? 70 :   // 強い雨
-           pop >= 60 ? 60 :   // 普通の雨
-           60)                // 弱い雨（最低でも雨扱い維持）
+        ? (pop >= 80 ? 70 :
+           pop >= 60 ? 60 :
+           60)
     : pop >= 70 ? 30
     : pop >= 50 ? 10
     : code;
