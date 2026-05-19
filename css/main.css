@@ -1212,18 +1212,19 @@ li {
   line-height: 14px;
 }
 
-
-
 #tideCanvas {
-  display:flex;
+  position: absolute;
+
   left: 0;
   right: 0;
-  bottom: 0;
+
+  bottom: 45px; /* weatherと同じ位置に揃える */
 
   width: 100%;
-  height: 120px; /* 好きに調整 */
+  height: 120px;
 
   pointer-events: none;
   display: none;
-  z-index: 8300;
+
+  z-index: 8000; /* weather(8600)の下、week(8500)の上 */
 }
