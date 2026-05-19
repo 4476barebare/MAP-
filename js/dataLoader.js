@@ -1545,7 +1545,7 @@ const adjustWeatherCodeForPop = (code, pop) => {
 };
   // =========================
 
-  const labels = ["TIME","天気","気温","降水","確率","風速","風向"];
+  const labels = ["","","","雨","","風",""];
 
   const labelsEl = document.createElement("div");
   labelsEl.className = "weather-labels";
