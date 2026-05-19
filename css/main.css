@@ -520,10 +520,9 @@ li {
   z-index: 3000;
 
   display: flex;
+  flex-direction: column; /* ←これが本体 */
 
   align-items: center;
-
-  pointer-events: none;
 }
 
 /* =========================
