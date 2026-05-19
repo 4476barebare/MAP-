@@ -1367,7 +1367,7 @@ if (tiedCodes.length > 1) {
       if (row === 4) {
 
         if (col <= 2 && hourly) {
-          const water = hourly?.water ?? hourly?.waterEx?.avg;
+          const water = hourly?.oneday?.avg;
           value = water != null ? Math.round(water) : "—";
 
         } else if (daily) {
@@ -1382,13 +1382,30 @@ if (tiedCodes.length > 1) {
       if (row === 5) {
 
         if (col <= 2 && hourly) {
-          const wave = hourly?.waterEx?.wave;
-          value = wave != null ? wave.toFixed(1) : "—";
 
-        } else if (daily) {
-          const wave = daily?.dailyEx?.wave;
-          value = wave != null ? wave.toFixed(1) : "—";
-        }
+  const list = hasHourly2
+    ? hourly?.hourly2
+    : hourly?.weather;
+
+  let max = -Infinity;
+
+  if (Array.isArray(list)) {
+    for (const r of list) {
+      const wave = r?.[6]; // ← 最後列
+      if (typeof wave === "number" && wave > max) {
+        max = wave;
+      }
+    }
+  }
+
+  value = max !== -Infinity ? max.toFixed(1) : "—";
+
+} else if (daily) {
+
+  const wave = daily?.dailyEx?.wave;
+  value = wave != null ? wave.toFixed(1) : "—";
+
+}
       }
 
       // =========================
