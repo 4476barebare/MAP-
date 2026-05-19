@@ -1216,7 +1216,10 @@ function createWeekItem(weekData) {
 
   const hasHourly2 = hourlyList?.[0]?.hourly2 != null;
 
-  const labels = ["","潮周","", "気温", "水温", "波高"];
+  // =========================
+  // ■ 最小表示（検証用）
+  // =========================
+  const labels = ["日付", "潮", "天気"];
 
   for (const text of labels) {
     const div = document.createElement("div");
@@ -1233,10 +1236,7 @@ function createWeekItem(weekData) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
-  // ★ スポット名（適宜変更）
-  const spotName = window.currentSpotName || "不明";
-
-  for (let row = 0; row < 6; row++) {
+  for (let row = 0; row < 3; row++) {
 
     const tr = document.createElement("div");
     tr.className = "week-row";
@@ -1246,7 +1246,6 @@ function createWeekItem(weekData) {
       const cell = document.createElement("div");
 
       const hourly = hourlyList[col];
-      const daily  = dailyList?.[col - 3];
 
       let value = "—";
 
@@ -1261,7 +1260,6 @@ function createWeekItem(weekData) {
       // 潮
       // =========================
       if (row === 1) {
-
         const tide = tideList?.[col]?.tide;
         value = tide ?? "—";
 
@@ -1271,182 +1269,74 @@ function createWeekItem(weekData) {
         }
       }
 
-// =========================
-// 天気（正規化後で最頻出）
-// =========================
-if (row === 2) {
-
-  if (col <= 2 && hourly) {
-
-    const list = hasHourly2
-      ? hourly?.hourly2
-      : hourly?.weather;
-
-    const map = {};
-
-const adjustCode = (code, pop) => {
-
-  const p = Number(pop);
-
-  if (code >= 60) {
-    if (p >= 80) return 70; // 強い雨
-    if (p >= 60) return 60; // 普通の雨
-    return 60;              // 弱い雨（雨扱いは維持）
-  }
-
-  if (p >= 70) return 30;
-  if (p >= 50) return 10;
-
-  return code;
-};
-
-    if (Array.isArray(list)) {
-      for (const r of list) {
-
-        const rawCode = Number(r?.[0]);
-        const pop = r?.[3];
-
-        if (!Number.isFinite(rawCode)) continue;
-
-        const code = adjustCode(rawCode, pop);
-
-        map[code] = (map[code] || 0) + 1;
-      }
-    }
-
-let bestCode = 0;
-let maxCount = -1;
-let tiedCodes = [];
-
-for (const k in map) {
-  const count = map[k];
-  const code = Number(k);
-
-  if (count > maxCount) {
-    maxCount = count;
-    tiedCodes = [code];
-  } else if (count === maxCount) {
-    tiedCodes.push(code);
-  }
-}
-
-// ★同率処理（ここが追加本体）
-if (tiedCodes.length > 1) {
-  const avg = tiedCodes.reduce((a, b) => a + b, 0) / tiedCodes.length;
-
-  // 再正規化（既存ルールに寄せる）
-  bestCode = Math.round(avg);
-} else {
-  bestCode = tiedCodes[0] ?? 0;
-}
-
-    value = toWeatherIcon(bestCode);
-
-  } else if (daily) {
-    value = toWeatherIcon(daily?.weather?.[0] ?? 0);
-  }
-}
       // =========================
-      // 気温
+      // 天気（week統一ロジックそのまま）
       // =========================
-      if (row === 3) {
+      if (row === 2) {
 
         if (col <= 2 && hourly) {
-
-          let max = -Infinity;
 
           const list = hasHourly2
             ? hourly?.hourly2
             : hourly?.weather;
 
+          const adjustCode = (code, pop) => {
+            const p = Number(pop);
+
+            if (code >= 60) {
+              if (p >= 80) return 70;
+              if (p >= 60) return 60;
+              return 60;
+            }
+
+            if (p >= 70) return 30;
+            if (p >= 50) return 10;
+
+            return code;
+          };
+
+          const map = {};
+          let maxCount = -1;
+          let tiedCodes = [];
+
           if (Array.isArray(list)) {
             for (const r of list) {
-              const t = r?.[1];
-              if (typeof t === "number" && t > max) {
-                max = t;
-              }
+
+              const rawCode = Number(r?.[0]);
+              const pop = r?.[3];
+
+              if (!Number.isFinite(rawCode)) continue;
+
+              const code = adjustCode(rawCode, pop);
+
+              map[code] = (map[code] || 0) + 1;
             }
           }
 
-          value = max !== -Infinity ? Math.round(max) : "—";
+          for (const k in map) {
 
-        } else if (daily) {
-          const temp = daily?.weather?.[1];
-          value = temp != null ? Math.round(temp) : "—";
+            const count = map[k];
+            const code = Number(k);
+
+            if (count > maxCount) {
+              maxCount = count;
+              tiedCodes = [code];
+            } else if (count === maxCount) {
+              tiedCodes.push(code);
+            }
+          }
+
+          const bestCode =
+            tiedCodes.length > 1
+              ? Math.round(tiedCodes.reduce((a, b) => a + b, 0) / tiedCodes.length)
+              : tiedCodes[0] ?? 0;
+
+          value = toWeatherIcon(bestCode);
+
+        } else if (hourly) {
+          value = toWeatherIcon(hourly?.weather?.[0]?.[0] ?? 0);
         }
       }
-
-      // =========================
-      // 水温
-      // =========================
-      if (row === 4) {
-
-        if (col <= 2 && hourly) {
-          const water = hourly?.oneday?.avg;
-          value = water != null ? Math.round(water) : "—";
-
-        } else if (daily) {
-          const water = daily?.dailyEx?.avg;
-          value = water != null ? Math.round(water) : "—";
-        }
-      }
-
-      // =========================
-      // 波高
-      // =========================
-      if (row === 5) {
-
-        if (col <= 2 && hourly) {
-
-  const list = hasHourly2
-    ? hourly?.hourly2
-    : hourly?.weather;
-
-  let max = -Infinity;
-
-  if (Array.isArray(list)) {
-    for (const r of list) {
-      const wave = r?.[6]; // ← 最後列
-      if (typeof wave === "number" && wave > max) {
-        max = wave;
-      }
-    }
-  }
-
-  value = max !== -Infinity ? max.toFixed(1) : "—";
-
-} else if (daily) {
-
-  const wave = daily?.dailyEx?.wave;
-  value = wave != null ? wave.toFixed(1) : "—";
-
-}
-      }
-
-      // =========================
-// ★クリックイベント（トグル）
-// =========================
-cell.style.cursor = "pointer";
-
-cell.addEventListener("click", () => {
-
-  const weatherRoot = document.querySelector(".weather");
-  if (!weatherRoot) return;
-
-  // 同じ列 → 閉じる
-  if (window.activeWeekIndex === col) {
-    closeHourlyWeather();
-    return;
-  }
-
-  // 切り替え
-  window.activeWeekIndex = col;
-
-  const hourly = hourlyList[col];
-  if (!hourly) return;
-
-  createHourlyWeather(hourly);
-});
 
       cell.textContent = value;
       tr.appendChild(cell);
