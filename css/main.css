@@ -1157,7 +1157,8 @@ li {
   justify-content:center;
   font-size:6px;
   font-weight: bold;
-  transform: rotate(270de);
+  transform: rotate(270deg);
+  
 }
 
 .weather-table {
