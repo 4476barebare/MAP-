@@ -1154,9 +1154,9 @@ li {
 }
 
 .weather-labels {
-
+    width: 0;
+    overflow: visible;
   transform: translateX(100%);
-  
 
 }
 
