@@ -1622,8 +1622,10 @@ function createTideGraph(data) {
   canvas.width = 320;
   canvas.height = 240;
   canvas.style.display = "block";
-  canvas.style.background = "red"; // ← これだけで判定
 
+ctx.font = "10px monospace";
+
+ctx.fillText(String(data), 5, 20);
 }
 
 function resetSpotLayers() {
