@@ -1356,7 +1356,6 @@ cell.addEventListener("click", () => {
 
     window.activeWeekIndex = col;
     window.weekViewMode = 1;
-    resetWeatherUI();
     createHourlyWeather(hourly);
     return;
   }
