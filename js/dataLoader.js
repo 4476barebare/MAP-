@@ -1328,6 +1328,85 @@ function createWeekItem(weekData) {
           }
         }
       }
+      
+      
+           // =========================
+      // 気温
+      // =========================
+      if (row === 3) {
+
+        if (col <= 2 && hourly) {
+
+          let max = -Infinity;
+
+          const list = hasHourly2
+            ? hourly?.hourly2
+            : hourly?.weather;
+
+          if (Array.isArray(list)) {
+            for (const r of list) {
+              const t = r?.[1];
+              if (typeof t === "number" && t > max) {
+                max = t;
+              }
+            }
+          }
+
+          value = max !== -Infinity ? Math.round(max) : "—";
+
+        } else if (daily) {
+          const temp = daily?.weather?.[1];
+          value = temp != null ? Math.round(temp) : "—";
+        }
+      }
+
+      // =========================
+      // 水温
+      // =========================
+      if (row === 4) {
+
+        if (col <= 2 && hourly) {
+          const water = hourly?.oneday?.avg;
+          value = water != null ? Math.round(water) : "—";
+
+        } else if (daily) {
+          const water = daily?.dailyEx?.avg;
+          value = water != null ? Math.round(water) : "—";
+        }
+      }
+
+      // =========================
+      // 波高
+      // =========================
+      if (row === 5) {
+
+        if (col <= 2 && hourly) {
+
+  const list = hasHourly2
+    ? hourly?.hourly2
+    : hourly?.weather;
+
+  let max = -Infinity;
+
+  if (Array.isArray(list)) {
+    for (const r of list) {
+      const wave = r?.[6]; // ← 最後列
+      if (typeof wave === "number" && wave > max) {
+        max = wave;
+      }
+    }
+  }
+
+  value = max !== -Infinity ? max.toFixed(1) : "—";
+
+} else if (daily) {
+
+  const wave = daily?.dailyEx?.wave;
+  value = wave != null ? wave.toFixed(1) : "—";
+
+}
+      } 
+      
 
       cell.style.cursor = "pointer";
 
