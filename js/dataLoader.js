@@ -1194,7 +1194,7 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
-
+    window.activeCol = null;
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
 
@@ -1226,7 +1226,7 @@ function createWeekItem(weekData) {
     ...dailyList.map(v => ({ type: "daily", data: v }))
   ].filter(v => v && v.data);
 
-  const labels = ["","","","WEEK","","WAV TEMP"];
+  const labels = ["","","","WEEKLY","","WAV TEMP"];
 
   for (const text of labels) {
     const div = document.createElement("div");
@@ -1251,7 +1251,9 @@ function createWeekItem(weekData) {
 
       const cell = document.createElement("div");
       const item = list[col];
-
+      if (window.activeCol === col) {
+          cell.classList.add("active");
+      }
       let value = "—";
 
       // =========================
@@ -1436,6 +1438,8 @@ function createWeekItem(weekData) {
       cell.addEventListener("click", () => {
         const it = list[col];
         if (!it) return;
+        window.activeCol = col;
+        createWeekItem(weekData);
 
         const data = it.data;
 
