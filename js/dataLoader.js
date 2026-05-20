@@ -1226,7 +1226,7 @@ function createWeekItem(weekData) {
     ...dailyList.map(v => ({ type: "daily", data: v }))
   ].filter(v => v && v.data);
 
-  const labels = ["","","WEEK","","SST","WAVE"];
+  const labels = ["","","WEEK",""," TEMP","WAVE"];
 
   for (const text of labels) {
     const div = document.createElement("div");
