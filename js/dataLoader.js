@@ -1657,17 +1657,24 @@ for (let i = 0; i < data.length; i++) {
 
   if (i === 0) {
     ctx.moveTo(x, y);
-  } else {
-    const prevX = (i - 1) * stepX;
-    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-    const prevY = scaleY(prevV);
-
-    const cx = (prevX + x) / 2;
-
-    // ベジェ（中点制御）
-    ctx.quadraticCurveTo(cx, prevY, x, y);
+    continue;
   }
+
+  const prevX = (i - 1) * stepX;
+  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+  const prevY = scaleY(prevV);
+
+  const midX = (prevX + x) / 2;
+  const midY = (prevY + y) / 2;
+
+  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
 }
+
+// 最後の点を補完
+const last = data.length - 1;
+const lx = last * stepX;
+const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
+ctx.lineTo(lx, ly);
 
 // 面を閉じる
 ctx.lineTo(w, h);
