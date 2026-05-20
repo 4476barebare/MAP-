@@ -1619,21 +1619,11 @@ function createTideGraph(data) {
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
 
-  const ctx = canvas.getContext("2d");
-
   canvas.width = 320;
   canvas.height = 240;
+  canvas.style.display = "block";
+  canvas.style.background = "red"; // ← これだけで判定
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "white";
-  ctx.font = "6px monospace";
-
-  // ★そのまま流す
-  ctx.fillText(String(data), 5, 10);
 }
 
 function resetSpotLayers() {
