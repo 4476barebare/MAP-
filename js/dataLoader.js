@@ -1193,8 +1193,8 @@ function renderMarkers() {
   window.map.on('zoomend', renderMarkers);
 }
 
+window.activeCol = null;
 function createWeekItem(weekData) {
-    window.activeCol = null;
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
 
