@@ -1640,10 +1640,31 @@ function createTideGraph(input) {
   ctx.clearRect(0, 0, w, h);
 
   // -------------------------
-  // normalize（数値配列）
+  // 背景（必ず見える）
+  // -------------------------
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle = "white";
+  ctx.font = "10px monospace";
+
+  // -------------------------
+  // normalize
   // -------------------------
   const data = normalizeGraphInput(input);
+
+  ctx.fillText("LEN:" + data.length, 5, 12);
+
   if (!data.length) return;
+
+  // -------------------------
+  // 数値チェック（直接表示）
+  // -------------------------
+  ctx.fillText(
+    data.slice(0, 5).join(","),
+    5,
+    24
+  );
 
   // -------------------------
   // スケール
@@ -1652,16 +1673,37 @@ function createTideGraph(input) {
   const max = Math.max(...data);
   const range = max - min || 1;
 
-  const scaleY = v => h - ((v - min) / range) * h;
+  ctx.fillText("MIN:" + min, 5, 36);
+  ctx.fillText("MAX:" + max, 5, 48);
+
+  const padding = 20;
+
+  const scaleY = v =>
+    h - padding - ((v - min) / range) * (h - padding * 2);
+
   const stepX = w / (data.length - 1);
 
   // -------------------------
-  // 線描画
+  // 点だけ描く（まずここ）
+  // -------------------------
+  ctx.fillStyle = "red";
+
+  data.forEach((v, i) => {
+
+    const x = i * stepX;
+    const y = scaleY(v);
+
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // -------------------------
+  // 線（あとで）
   // -------------------------
   ctx.beginPath();
 
   data.forEach((v, i) => {
-
     const x = i * stepX;
     const y = scaleY(v);
 
@@ -1669,16 +1711,9 @@ function createTideGraph(input) {
     else ctx.lineTo(x, y);
   });
 
-  ctx.strokeStyle = "#00aaff";
+  ctx.strokeStyle = "cyan";
   ctx.lineWidth = 2;
   ctx.stroke();
-
-  // -------------------------
-  // デバッグ（最小限）
-  // -------------------------
-  ctx.fillStyle = "white";
-  ctx.font = "10px monospace";
-  ctx.fillText("LEN:" + data.length, 5, 12);
 }
 
 function resetSpotLayers() {
