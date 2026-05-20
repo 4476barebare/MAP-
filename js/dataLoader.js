@@ -1384,10 +1384,13 @@ function createWeekItem(weekData) {
   }
 
   if (window.weekViewMode === 2) {
-    createHourlyWeather(hourly);
-    createTideGraph(hourly);
-    return;
-  }
+  createHourlyWeather(hourly);
+
+  const tide = tideList?.[col];
+  createTideGraph(tide);
+
+  return;
+}
 });
 
       cell.textContent = value;
