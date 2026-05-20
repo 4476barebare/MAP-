@@ -1302,18 +1302,74 @@ if (row === 1) {
       // -------------------------
       // 天気
       // -------------------------
-      if (row === 2 && item) {
+if (row === 2) {
 
-        if (item.type === "hourly") {
+  const hourly = hourlyList[col];
+  const daily  = dailyList[col];
 
-          const list2 = item.data?.hourly2 || item.data?.weather;
-          value = toWeatherIcon(list2?.[0]?.[0] ?? 0);
+  if (hourly) {
 
-        } else if (item.type === "daily") {
+    const list = hasHourly2
+      ? hourly?.hourly2
+      : hourly?.weather;
 
-          value = toWeatherIcon(item.data?.weather?.[0] ?? 0);
-        }
+    const adjustCode = (code, pop) => {
+      const p = Number(pop);
+
+      if (code >= 60) {
+        if (p >= 80) return 70;
+        if (p >= 60) return 60;
+        return 60;
       }
+
+      if (p >= 70) return 30;
+      if (p >= 50) return 10;
+
+      return code;
+    };
+
+    const map = {};
+    let maxCount = -1;
+    let tied = [];
+
+    if (Array.isArray(list)) {
+      for (const r of list) {
+
+        const rawCode = Number(r?.[0]);
+        const pop = r?.[3];
+
+        if (!Number.isFinite(rawCode)) continue;
+
+        const adjusted = adjustCode(rawCode, pop);
+        map[adjusted] = (map[adjusted] || 0) + 1;
+      }
+    }
+
+    for (const k in map) {
+
+      const count = map[k];
+      const code = Number(k);
+
+      if (count > maxCount) {
+        maxCount = count;
+        tied = [code];
+      } else if (count === maxCount) {
+        tied.push(code);
+      }
+    }
+
+    const best =
+      tied.length > 1
+        ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
+        : tied[0];
+
+    value = toWeatherIcon(best ?? 0);
+
+  } else if (daily) {
+
+    value = toWeatherIcon(daily?.weather?.[0] ?? 0);
+  }
+}
 
       // -------------------------------------------------
       // クリック（完全統一）
