@@ -1612,6 +1612,7 @@ const adjustWeatherCodeForPop = (code, pop) => {
   root.appendChild(tableEl);
 }
 
+
 function createTideGraph(data) {
 
   const canvas = document.getElementById("tideCanvas");
@@ -1619,15 +1620,13 @@ function createTideGraph(data) {
 
   const ctx = canvas.getContext("2d");
 
-  // ★先に表示
+  // 表示
   canvas.style.display = "block";
 
-  // サイズ取得
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
   const h = rect.height;
 
-  // 念のためガード
   if (w === 0 || h === 0) return;
 
   canvas.width = w;
@@ -1639,7 +1638,6 @@ function createTideGraph(data) {
 
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
-
   const range = MAX_LEVEL - MIN_LEVEL;
 
   const padding = 10;
@@ -1651,6 +1649,7 @@ function createTideGraph(data) {
 
   ctx.beginPath();
 
+  // 上側ライン
   data.forEach((v, i) => {
     const x = i * stepX;
     const clamped = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v));
@@ -1660,6 +1659,20 @@ function createTideGraph(data) {
     else ctx.lineTo(x, y);
   });
 
+  // ★右下へ
+  ctx.lineTo(w, h);
+
+  // ★左下へ
+  ctx.lineTo(0, h);
+
+  // 閉じる
+  ctx.closePath();
+
+  // 塗り
+  ctx.fillStyle = "rgba(0, 255, 255, 0.25)";
+  ctx.fill();
+
+  // 輪郭（任意）
   ctx.strokeStyle = "cyan";
   ctx.lineWidth = 2;
   ctx.stroke();
