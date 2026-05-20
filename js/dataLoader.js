@@ -1614,16 +1614,7 @@ const adjustWeatherCodeForPop = (code, pop) => {
   root.appendChild(tableEl);
 }
 
-function normalizeGraphInput(input) {
-
-  if (!Array.isArray(input?.tide)) return [];
-
-  return input.tide
-    .map(v => Number(v))
-    .filter(v => isFinite(v));
-}
-
-function createTideGraph(input) {
+function createTideGraph(tide) {
 
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
@@ -1639,81 +1630,26 @@ function createTideGraph(input) {
 
   ctx.clearRect(0, 0, w, h);
 
-  // -------------------------
-  // 背景（必ず見える）
-  // -------------------------
+  // 背景
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, w, h);
 
+  // フォント（小さく）
   ctx.fillStyle = "white";
-  ctx.font = "10px monospace";
+  ctx.font = "6px monospace";
 
-  // -------------------------
-  // normalize
-  // -------------------------
-  const data = normalizeGraphInput(input);
+  if (!Array.isArray(tide)) {
+    ctx.fillText("NOT ARRAY", 5, 10);
+    return;
+  }
 
-  ctx.fillText("LEN:" + data.length, 5, 12);
-
-  if (!data.length) return;
-
-  // -------------------------
-  // 数値チェック（直接表示）
-  // -------------------------
-  ctx.fillText(
-    data.slice(0, 5).join(","),
-    5,
-    24
-  );
-
-  // -------------------------
-  // スケール
-  // -------------------------
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-
-  ctx.fillText("MIN:" + min, 5, 36);
-  ctx.fillText("MAX:" + max, 5, 48);
-
-  const padding = 20;
-
-  const scaleY = v =>
-    h - padding - ((v - min) / range) * (h - padding * 2);
-
-  const stepX = w / (data.length - 1);
-
-  // -------------------------
-  // 点だけ描く（まずここ）
-  // -------------------------
-  ctx.fillStyle = "red";
-
-  data.forEach((v, i) => {
-
-    const x = i * stepX;
-    const y = scaleY(v);
-
-    ctx.beginPath();
-    ctx.arc(x, y, 2, 0, Math.PI * 2);
-    ctx.fill();
+  // そのまま縦に並べる
+  tide.forEach((v, i) => {
+    ctx.fillText(String(v), 5, 8 + i * 8);
   });
 
-  // -------------------------
-  // 線（あとで）
-  // -------------------------
-  ctx.beginPath();
-
-  data.forEach((v, i) => {
-    const x = i * stepX;
-    const y = scaleY(v);
-
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-
-  ctx.strokeStyle = "cyan";
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // 長さ確認
+  ctx.fillText("LEN:" + tide.length, 200, 10);
 }
 
 function resetSpotLayers() {
