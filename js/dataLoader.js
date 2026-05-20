@@ -1613,49 +1613,11 @@ const adjustWeatherCodeForPop = (code, pop) => {
 
 function normalizeGraphInput(input) {
 
-  if (!input) return [];
+  if (!Array.isArray(input?.tide)) return [];
 
-  const result = [];
-
-  // =========================
-  // hourly
-  // =========================
-  if (Array.isArray(input.hourly)) {
-
-    input.hourly.forEach(day => {
-
-      if (!Array.isArray(day.tide)) return;
-
-      day.tide.forEach((tideValue, i) => {
-        result.push({
-          tide: Number(tideValue),
-          time: i
-        });
-      });
-
-    });
-  }
-
-  // =========================
-  // daily
-  // =========================
-  if (Array.isArray(input.daily)) {
-
-    input.daily.forEach(day => {
-
-      if (!Array.isArray(day.tide)) return;
-
-      day.tide.forEach((tideValue, i) => {
-        result.push({
-          tide: Number(tideValue),
-          time: i
-        });
-      });
-
-    });
-  }
-
-  return result.filter(d => isFinite(d.tide));
+  return input.tide
+    .map(v => ({ tide: Number(v) }))
+    .filter(d => isFinite(d.tide));
 }
 
 function createTideGraph(input) {
@@ -1675,18 +1637,26 @@ function createTideGraph(input) {
   ctx.font = "6px monospace";
 
   // -------------------------
-  // inputそのまま
+  // normalize
   // -------------------------
-  let text = JSON.stringify(input);
+  const data = normalizeGraphInput(input);
+
+  // -------------------------
+  // 表示用テキスト
+  // -------------------------
+  let text = JSON.stringify(data);
 
   // 長すぎるので制限
   text = text.slice(0, 1500);
 
-  // 1行ずつ分割して描画
+  // 1行ずつ分割
   const lines = text.match(/.{1,80}/g) || [];
 
+  // 先頭に長さも出す
+  ctx.fillText("LEN:" + data.length, 5, 8);
+
   lines.forEach((line, i) => {
-    ctx.fillText(line, 5, 10 + i * 8);
+    ctx.fillText(line, 5, 16 + i * 8);
   });
 }
 
