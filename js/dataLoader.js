@@ -1668,14 +1668,10 @@ function createTideGraph(data) {
   // 閉じる
   ctx.closePath();
 
-  // 塗り
-  ctx.fillStyle = "rgba(0, 255, 255, 0.25)";
-  ctx.fill();
+// 塗り
+ctx.fillStyle = "rgba(0,0,0,0.5)";
+ctx.fill();
 
-  // 輪郭（任意）
-  ctx.strokeStyle = "cyan";
-  ctx.lineWidth = 2;
-  ctx.stroke();
 }
 
 function resetSpotLayers() {
