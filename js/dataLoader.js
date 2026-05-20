@@ -1619,20 +1619,24 @@ function createTideGraph(data) {
 
   const ctx = canvas.getContext("2d");
 
-  // ■ 表示サイズ取得（←ここが重要）
+  // ★先に表示
+  canvas.style.display = "block";
+
+  // サイズ取得
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
   const h = rect.height;
 
+  // 念のためガード
+  if (w === 0 || h === 0) return;
+
   canvas.width = w;
   canvas.height = h;
-  canvas.style.display = "block";
 
   ctx.clearRect(0, 0, w, h);
 
   if (!data || data.length < 2) return;
 
-  // ■ 固定レンジ
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
 
@@ -1645,15 +1649,11 @@ function createTideGraph(data) {
 
   const stepX = w / (data.length - 1);
 
-  // 線
   ctx.beginPath();
 
   data.forEach((v, i) => {
     const x = i * stepX;
-
-    // クランプ
     const clamped = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v));
-
     const y = scaleY(clamped);
 
     if (i === 0) ctx.moveTo(x, y);
