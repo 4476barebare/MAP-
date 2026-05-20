@@ -1614,47 +1614,65 @@ const adjustWeatherCodeForPop = (code, pop) => {
 
 function createTideGraph(data) {
 
-  showDebug("START", true);
-
   const canvas = document.getElementById("tideCanvas");
-  showDebug("canvas: " + (canvas ? "OK" : "NG"));
-
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-  showDebug("ctx: " + (ctx ? "OK" : "NG"));
 
-  canvas.width = 320;
-  canvas.height = 240;
+  const w = 320;
+  const h = 240;
 
+  canvas.width = w;
+  canvas.height = h;
   canvas.style.display = "block";
 
-  showDebug("data type: " + typeof data);
+  ctx.clearRect(0, 0, w, h);
 
-  try {
-    showDebug("data value: " + JSON.stringify(data));
-  } catch(e) {
-    showDebug("data stringify error");
-  }
+  // 背景
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, w, h);
 
-  if (!data) {
-    showDebug("data is NULL");
-    return;
-  }
+  // データチェック
+  if (!data || !data.length) return;
 
-  if (!data.length) {
-    showDebug("data length = 0");
-    return;
-  }
+  // スケール計算
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
 
-  showDebug("data length: " + data.length);
+  const padding = 20;
 
-  // 最低限描画
-  ctx.fillStyle = "white";
-  ctx.font = "10px monospace";
-  ctx.fillText("OK", 10, 20);
+  const scaleY = v =>
+    h - padding - ((v - min) / range) * (h - padding * 2);
 
-  showDebug("DRAW END");
+  const stepX = w / (data.length - 1);
+
+  // 線
+  ctx.beginPath();
+
+  data.forEach((v, i) => {
+    const x = i * stepX;
+    const y = scaleY(v);
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+
+  ctx.strokeStyle = "cyan";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 点（任意）
+  ctx.fillStyle = "red";
+
+  data.forEach((v, i) => {
+    const x = i * stepX;
+    const y = scaleY(v);
+
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  });
 }
 
 function resetSpotLayers() {
