@@ -1647,26 +1647,32 @@ function createTideGraph(data) {
 
   const stepX = w / (data.length - 1);
 
-  ctx.beginPath();
+ctx.beginPath();
 
-  // 上側ライン
-  data.forEach((v, i) => {
-    const x = i * stepX;
-    const clamped = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v));
-    const y = scaleY(clamped);
+for (let i = 0; i < data.length; i++) {
 
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
+  const x = i * stepX;
+  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+  const y = scaleY(v);
 
-  // ★右下へ
-  ctx.lineTo(w, h);
+  if (i === 0) {
+    ctx.moveTo(x, y);
+  } else {
+    const prevX = (i - 1) * stepX;
+    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+    const prevY = scaleY(prevV);
 
-  // ★左下へ
-  ctx.lineTo(0, h);
+    const cx = (prevX + x) / 2;
 
-  // 閉じる
-  ctx.closePath();
+    // ベジェ（中点制御）
+    ctx.quadraticCurveTo(cx, prevY, x, y);
+  }
+}
+
+// 面を閉じる
+ctx.lineTo(w, h);
+ctx.lineTo(0, h);
+ctx.closePath();
 
 // 塗り
 ctx.fillStyle = "rgba(0,0,0,0.5)";
