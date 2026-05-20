@@ -1350,47 +1350,41 @@ cell.addEventListener("click", () => {
   const same = window.activeWeekIndex === col;
 
   // -------------------------
-  // 別セルクリック：完全リセット→hourly表示
+  // 別セルクリック
   // -------------------------
   if (!same) {
 
     window.activeWeekIndex = col;
     window.weekViewMode = 1;
 
+    resetWeatherUI();
     createHourlyWeather(hourly);
-    hideTideGraph();
 
     return;
   }
 
   // -------------------------
-  // 同セルクリック：状態遷移
+  // 同セルクリック
   // -------------------------
-  window.weekViewMode++;
+  window.weekViewMode = (window.weekViewMode + 1) % 3;
 
-  if (window.weekViewMode > 2) {
-    window.weekViewMode = 0;
+  if (window.weekViewMode === 0) {
+    resetWeatherUI();
+    return;
   }
 
-  switch (window.weekViewMode) {
+  if (window.weekViewMode === 1) {
+    createHourlyWeather(hourly);
+    return;
+  }
 
-    case 0:
-      closeHourlyWeather();
-      hideTideGraph();
-      window.activeWeekIndex = null;
-      break;
-
-    case 1:
-      createHourlyWeather(hourly);
-      hideTideGraph();
-      break;
-
-    case 2:
-      createHourlyWeather(hourly);
-      createTideGraph(hourly.tide);
-      break;
+  if (window.weekViewMode === 2) {
+    createHourlyWeather(hourly);
+    createTideGraph(hourly.tide);
+    return;
   }
 });
+
       cell.textContent = value;
       tr.appendChild(cell);
     }
@@ -1807,7 +1801,7 @@ function goBack() {
 
         updateStateFromHash();
         removeWeekItem();
-        closeHourlyWeather();
+        resetWeatherUI();
 
         // 再構築
         showSpotsForArea(window.currentAreaId);
