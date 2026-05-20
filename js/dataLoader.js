@@ -1616,14 +1616,47 @@ const adjustWeatherCodeForPop = (code, pop) => {
 
 function createTideGraph(data) {
 
+  showDebug("START", true);
+
   const canvas = document.getElementById("tideCanvas");
+  showDebug("canvas: " + (canvas ? "OK" : "NG"));
+
   if (!canvas) return;
 
-  canvas.style.display = "block";
-ctx.fillStyle = "white";
-ctx.font = "10px monospace";
+  const ctx = canvas.getContext("2d");
+  showDebug("ctx: " + (ctx ? "OK" : "NG"));
 
-ctx.fillText("TYPE:" + typeof data, 5, 20);
+  canvas.width = 320;
+  canvas.height = 240;
+
+  canvas.style.display = "block";
+
+  showDebug("data type: " + typeof data);
+
+  try {
+    showDebug("data value: " + JSON.stringify(data));
+  } catch(e) {
+    showDebug("data stringify error");
+  }
+
+  if (!data) {
+    showDebug("data is NULL");
+    return;
+  }
+
+  if (!data.length) {
+    showDebug("data length = 0");
+    return;
+  }
+
+  showDebug("data length: " + data.length);
+
+  // 最低限描画
+  ctx.fillStyle = "white";
+  ctx.font = "10px monospace";
+  ctx.fillText("OK", 10, 20);
+
+  showDebug("DRAW END");
 }
 
 function resetSpotLayers() {
