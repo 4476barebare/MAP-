@@ -1663,66 +1663,32 @@ function createTideGraph(input) {
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
 
-  const rect = canvas.getBoundingClientRect();
+  const ctx = canvas.getContext("2d");
 
-  const w = rect.width || 300;
-  const h = rect.height || 150;
-
-  canvas.width = w;
-  canvas.height = h;
-
+  canvas.width = 320;
+  canvas.height = 240;
   canvas.style.display = "block";
 
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const data = normalizeGraphInput(input);
-  if (!data.length) return;
 
   // -------------------------
-  // スケール（tideだけ）
-  // -------------------------
-  const values = data.map(d => d.tide);
-
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-
-  const scaleY = v => h - ((v - min) / range) * h;
-  const stepX = w / (data.length - 1);
-
-  // -------------------------
-  // 線
-  // -------------------------
-  ctx.beginPath();
-
-  data.forEach((d, i) => {
-    const x = i * stepX;
-    const y = scaleY(d.tide);
-
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-
-  ctx.strokeStyle = "#00aaff";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // -------------------------
-  // デバッグテキスト
+  // ここだけ確認
   // -------------------------
   ctx.fillStyle = "white";
-  ctx.font = "10px monospace";
+  ctx.font = "12px monospace";
 
-  data.forEach((d, i) => {
-    const x = i * stepX;
-    const y = scaleY(d.tide);
+  ctx.fillText("LEN: " + data.length, 10, 20);
 
-    ctx.fillText(
-      d.tide.toFixed(1),
-      x - 10,
-      y - 5
-    );
+  // 先頭だけ表示（長すぎると描画されない）
+  const text = JSON.stringify(data.slice(0, 10));
+
+  // 改行っぽく分割して描画
+  const lines = text.match(/.{1,40}/g) || [];
+
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 10, 40 + i * 14);
   });
 }
 
