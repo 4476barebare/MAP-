@@ -1638,7 +1638,10 @@ function createTideGraph(data) {
 
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
-  const range = MAX_LEVEL - MIN_LEVEL;
+  
+  const SCALE = 0.7; // ← 70%表示
+
+const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
 
   const padding = 10;
 
