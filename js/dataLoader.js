@@ -1208,15 +1208,45 @@ function createWeekItem(weekData) {
   labelsContainer.innerHTML = "";
   tableContainer.innerHTML = "";
 
-  const hourlyList = weekData?.hourly;
-  const dailyList  = weekData?.daily;
-  const tideList   = window.tideWeek;
+  const hourlyList = weekData?.hourly || [];
+  const rawDaily   = weekData?.daily || [];
 
-  if (!Array.isArray(hourlyList)) return;
+  // -------------------------------------------------
+  // dailyをここで展開（|区切り or 配列想定）
+  // -------------------------------------------------
+  const dailyList = rawDaily.map(d => {
 
-  const hasHourly2 = hourlyList?.[0]?.hourly2 != null;
+    if (!d) return null;
 
-  // ★テスト用（3列だけ）
+    // すでに配列ならそのまま
+    if (Array.isArray(d)) return d;
+
+    // "|"区切りなら展開
+    if (typeof d === "string") {
+      return d.split("|").map(v => Number(v));
+    }
+
+    return d;
+  });
+
+  // -------------------------------------------------
+  // 1本リスト化（UIはこれしか見ない）
+  // -------------------------------------------------
+  const list = [
+    ...hourlyList.map(v => ({
+      type: "hourly",
+      data: v
+    })),
+
+    ...dailyList.map(v => ({
+      type: "daily",
+      data: v
+    }))
+  ].filter(v => v && v.data);
+
+  // -------------------------------------------------
+  // ラベル
+  // -------------------------------------------------
   const labels = ["", "", "WEEK"];
 
   for (const text of labels) {
@@ -1234,6 +1264,9 @@ function createWeekItem(weekData) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
+  // -------------------------------------------------
+  // UI生成（list基準）
+  // -------------------------------------------------
   for (let row = 0; row < 3; row++) {
 
     const tr = document.createElement("div");
@@ -1243,23 +1276,22 @@ function createWeekItem(weekData) {
 
       const cell = document.createElement("div");
 
-      const hourly = hourlyList[col];
-      const daily  = dailyList?.[col - 3];
+      const item = list[col];
 
       let value = "—";
 
-      // =========================
+      // -------------------------
       // 日付
-      // =========================
+      // -------------------------
       if (row === 0) {
         value = getDate(col);
       }
 
-      // =========================
+      // -------------------------
       // 潮
-      // =========================
+      // -------------------------
       if (row === 1) {
-        const tide = tideList?.[col]?.tide;
+        const tide = item?.data?.tide;
         value = tide ?? "—";
 
         if (tide === "大潮") {
@@ -1268,131 +1300,46 @@ function createWeekItem(weekData) {
         }
       }
 
-      // =========================
-      // 天気（week統一ロジック）
-      // =========================
-      if (row === 2) {
+      // -------------------------
+      // 天気
+      // -------------------------
+      if (row === 2 && item) {
 
-        if (col <= 2 && hourly) {
+        if (item.type === "hourly") {
 
-          const list = hasHourly2
-            ? hourly?.hourly2
-            : hourly?.weather;
+          const list2 = item.data?.hourly2 || item.data?.weather;
+          value = toWeatherIcon(list2?.[0]?.[0] ?? 0);
 
-          const adjustCode = (code, pop) => {
-            const p = Number(pop);
+        } else if (item.type === "daily") {
 
-            if (code >= 60) {
-              if (p >= 80) return 70;
-              if (p >= 60) return 60;
-              return 60;
-            }
-
-            if (p >= 70) return 30;
-            if (p >= 50) return 10;
-
-            return code;
-          };
-
-          const map = {};
-          let maxCount = -1;
-          let tied = [];
-
-          if (Array.isArray(list)) {
-            for (const r of list) {
-
-              const rawCode = Number(r?.[0]);
-              const pop = r?.[3];
-
-              if (!Number.isFinite(rawCode)) continue;
-
-              const adjusted = adjustCode(rawCode, pop);
-              map[adjusted] = (map[adjusted] || 0) + 1;
-            }
-          }
-
-          for (const k in map) {
-
-            const count = map[k];
-            const code = Number(k);
-
-            if (count > maxCount) {
-              maxCount = count;
-              tied = [code];
-            } else if (count === maxCount) {
-              tied.push(code);
-            }
-          }
-
-          const best =
-            tied.length > 1
-              ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
-              : tied[0];
-
-          value = toWeatherIcon(best ?? 0);
-
-        } else if (daily) {
-
-          value = toWeatherIcon(daily?.weather?.[0] ?? 0);
+          value = toWeatherIcon(item.data?.weather?.[0] ?? 0);
         }
       }
 
-      // =========================
+      // -------------------------------------------------
+      // クリック（完全統一）
+      // -------------------------------------------------
       cell.style.cursor = "pointer";
-cell.addEventListener("click", () => {
 
-  const hourly = hourlyList[col];
-  const daily  = dailyList?.[col];
+      cell.addEventListener("click", () => {
 
-  const same = window.activeWeekIndex === col;
+        const it = list[col];
+        if (!it) return;
 
-  // =========================
-  // 別セルクリック（初期化）
-  // =========================
-  if (!same) {
+        const data = it.data;
+        const tide = data?.tide;
 
-    window.activeWeekIndex = col;
-    window.isDetailVisible = true;
+        if (it.type === "hourly") {
+          createHourlyWeather(data);
+        } else if (it.type === "daily") {
+          createHourlyWeather(data);
+        }
 
-    // hourly優先（存在するなら）
-    if (hourly) {
-      window.activeSourceType = "hourly";
-      createHourlyWeather(hourly);
-      createTideGraph(hourly.tide);
-    } else if (daily) {
-      window.activeSourceType = "daily";
-      createTideGraph(daily.tide);
-    }
+        if (tide) {
+          createTideGraph(tide);
+        }
+      });
 
-    return;
-  }
-
-  // =========================
-  // 同セルクリック（トグル）
-  // =========================
-  if (window.isDetailVisible) {
-
-    resetWeatherUI();
-
-    window.activeWeekIndex = null;
-    window.activeSourceType = null;
-    window.isDetailVisible = false;
-
-  } else {
-
-    window.isDetailVisible = true;
-
-    if (window.activeSourceType === "hourly" && hourly) {
-      createHourlyWeather(hourly);
-      createTideGraph(hourly.tide);
-    }
-
-    if (window.activeSourceType === "daily" && daily) {
-      createHourlyWeather(daily);
-      createTideGraph(daily.tide);
-    }
-  }
-});
       cell.textContent = value;
       tr.appendChild(cell);
     }
