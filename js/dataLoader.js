@@ -1242,7 +1242,7 @@ function createWeekItem(weekData) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
-  for (let row = 0; row < 3; row++) {
+  for (let row = 0; row < 6; row++) {
     const tr = document.createElement("div");
     tr.className = "week-row";
 
