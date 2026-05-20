@@ -1221,7 +1221,8 @@ li {
   bottom: 45px; /* weatherと同じ位置に揃える */
 
   width: 100%;
-  height: 100%;
+  height: 500px;
+  background-color: rgba(0,0,0,0.5);
 
   pointer-events: none;
   display: none;
