@@ -1614,26 +1614,26 @@ const adjustWeatherCodeForPop = (code, pop) => {
   root.appendChild(tableEl);
 }
 
-function createTideGraph(tide) {
+function createTideGraph(data) {
 
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
 
-  const w = 320;
-  const h = 240;
+  canvas.width = 320;
+  canvas.height = 240;
 
-  canvas.width = w;
-  canvas.height = h;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = "white";
   ctx.font = "6px monospace";
 
-  // 配列をそのまま文字列化して出す
-  ctx.fillText(String(tide), 5, 10);
+  // ★そのまま流す
+  ctx.fillText(String(data), 5, 10);
 }
 
 function resetSpotLayers() {
