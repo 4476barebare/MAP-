@@ -1626,30 +1626,14 @@ function createTideGraph(tide) {
 
   canvas.width = w;
   canvas.height = h;
-  canvas.style.display = "block";
 
   ctx.clearRect(0, 0, w, h);
 
-  // 背景
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, w, h);
-
-  // フォント（小さく）
   ctx.fillStyle = "white";
   ctx.font = "6px monospace";
 
-  if (!Array.isArray(tide)) {
-    ctx.fillText("NOT ARRAY", 5, 10);
-    return;
-  }
-
-  // そのまま縦に並べる
-  tide.forEach((v, i) => {
-    ctx.fillText(String(v), 5, 8 + i * 8);
-  });
-
-  // 長さ確認
-  ctx.fillText("LEN:" + tide.length, 200, 10);
+  // 配列をそのまま文字列化して出す
+  ctx.fillText(String(tide), 5, 10);
 }
 
 function resetSpotLayers() {
