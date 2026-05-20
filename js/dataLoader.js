@@ -1378,24 +1378,42 @@ if (row === 2) {
       // -------------------------------------------------
       cell.style.cursor = "pointer";
 
-      cell.addEventListener("click", () => {
+cell.addEventListener("click", () => {
 
-        const it = list[col];
-        if (!it) return;
+  const it = list[col];
+  if (!it) return;
 
-        const data = it.data;
-        const tide = data?.tide;
+  const data = it.data;
 
-        if (it.type === "hourly") {
-          createHourlyWeather(data);
-        } else if (it.type === "daily") {
-          createHourlyWeather(data);
-        }
+  // -------------------------
+  // hourly
+  // -------------------------
+  if (it.type === "hourly") {
 
-        if (tide) {
-          createTideGraph(tide);
-        }
-      });
+    createHourlyWeather(data);
+
+    if (data?.tide) {
+      createTideGraph(data.tide);
+    }
+
+    return;
+  }
+
+  // -------------------------
+  // daily
+  // -------------------------
+  if (it.type === "daily") {
+
+    // ★ hourlyは絶対に出さない
+    // createHourlyWeather は呼ばない
+
+    if (data?.tide) {
+      createTideGraph(data.tide);
+    }
+
+    return;
+  }
+});
 
       cell.textContent = value;
       tr.appendChild(cell);
