@@ -1630,24 +1630,29 @@ function createTideGraph(data) {
 
   if (!data || data.length < 2) return;
 
-  // スケール
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
+  // ■ 固定レンジ（ここ調整ポイント）
+  const MIN_LEVEL = -30;
+  const MAX_LEVEL = 170;
+
+  const range = MAX_LEVEL - MIN_LEVEL;
 
   const padding = 10;
 
   const scaleY = v =>
-    h - padding - ((v - min) / range) * (h - padding * 2);
+    h - padding - ((v - MIN_LEVEL) / range) * (h - padding * 2);
 
   const stepX = w / (data.length - 1);
 
-  // 線のみ
+  // 線
   ctx.beginPath();
 
   data.forEach((v, i) => {
     const x = i * stepX;
-    const y = scaleY(v);
+
+    // ★はみ出し防止（重要）
+    const clamped = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v));
+
+    const y = scaleY(clamped);
 
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
