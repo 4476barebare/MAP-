@@ -1645,8 +1645,10 @@ const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
 
   const padding = 10;
 
-  const scaleY = v =>
-    h - padding - ((v - MIN_LEVEL) / range) * (h - padding * 2);
+  const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
+
+const scaleY = v =>
+  h / 2 + ((v - mid) / range) * (h * 0.7);
 
   const stepX = w / (data.length - 1);
 
