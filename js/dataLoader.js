@@ -1665,31 +1665,19 @@ function createTideGraph(input) {
 
   const ctx = canvas.getContext("2d");
 
-  canvas.width = 320;
-  canvas.height = 240;
+  canvas.width = 300;
+  canvas.height = 150;
   canvas.style.display = "block";
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const data = normalizeGraphInput(input);
 
-  // -------------------------
-  // ここだけ確認
-  // -------------------------
   ctx.fillStyle = "white";
-  ctx.font = "12px monospace";
+  ctx.font = "16px monospace";
 
-  ctx.fillText("LEN: " + data.length, 10, 20);
-
-  // 先頭だけ表示（長すぎると描画されない）
-  const text = JSON.stringify(data.slice(0, 10));
-
-  // 改行っぽく分割して描画
-  const lines = text.match(/.{1,40}/g) || [];
-
-  lines.forEach((line, i) => {
-    ctx.fillText(line, 10, 40 + i * 14);
-  });
+  // ★これ
+  ctx.fillText(String(data.length), 10, 30);
 }
 
 function resetSpotLayers() {
