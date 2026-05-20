@@ -1210,10 +1210,7 @@ function createWeekItem(weekData) {
 
   const hourlyList = weekData?.hourly || [];
   const rawDaily   = weekData?.daily || [];
-
-  // -------------------------------------------------
-  // dailyをここで展開（|区切り or 配列想定）
-  // -------------------------------------------------
+  const tideList = window.tideWeek || [];
   const dailyList = rawDaily.map(d => {
 
     if (!d) return null;
@@ -1290,15 +1287,17 @@ function createWeekItem(weekData) {
       // -------------------------
       // 潮
       // -------------------------
-      if (row === 1) {
-        const tide = item?.data?.tide;
-        value = tide ?? "—";
+if (row === 1) {
 
-        if (tide === "大潮") {
-          cell.style.color = "red";
-          cell.style.fontWeight = "bold";
-        }
-      }
+  const tide = tideList[col]; // ← ここが正しい
+
+  value = tide ?? "—";
+
+  if (tide === "大潮") {
+    cell.style.color = "red";
+    cell.style.fontWeight = "bold";
+  }
+}
 
       // -------------------------
       // 天気
