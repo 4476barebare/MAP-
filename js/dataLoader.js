@@ -1385,7 +1385,7 @@ function createWeekItem(weekData) {
 
   if (window.weekViewMode === 2) {
   createHourlyWeather(hourly);
-  createTideGraph(hourly[col].tide);
+  createTideGraph(hourly.tide);
 
   return;
 }
