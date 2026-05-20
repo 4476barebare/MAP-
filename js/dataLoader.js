@@ -1194,7 +1194,6 @@ function renderMarkers() {
 }
 
 function createWeekItem(weekData) {
-
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
 
@@ -1209,41 +1208,23 @@ function createWeekItem(weekData) {
   tableContainer.innerHTML = "";
 
   const hourlyList = weekData?.hourly || [];
-  const rawDaily   = weekData?.daily || [];
+  const rawDaily = weekData?.daily || [];
   const tideList = window.tideWeek || [];
+
   const dailyList = rawDaily.map(d => {
-
     if (!d) return null;
-
-    // すでに配列ならそのまま
     if (Array.isArray(d)) return d;
-
-    // "|"区切りなら展開
     if (typeof d === "string") {
       return d.split("|").map(v => Number(v));
     }
-
     return d;
   });
 
-  // -------------------------------------------------
-  // 1本リスト化（UIはこれしか見ない）
-  // -------------------------------------------------
   const list = [
-    ...hourlyList.map(v => ({
-      type: "hourly",
-      data: v
-    })),
-
-    ...dailyList.map(v => ({
-      type: "daily",
-      data: v
-    }))
+    ...hourlyList.map(v => ({ type: "hourly", data: v })),
+    ...dailyList.map(v => ({ type: "daily", data: v }))
   ].filter(v => v && v.data);
 
-  // -------------------------------------------------
-  // ラベル
-  // -------------------------------------------------
   const labels = ["", "", "WEEK"];
 
   for (const text of labels) {
@@ -1261,158 +1242,122 @@ function createWeekItem(weekData) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
-  // -------------------------------------------------
-  // UI生成（list基準）
-  // -------------------------------------------------
   for (let row = 0; row < 3; row++) {
-
     const tr = document.createElement("div");
     tr.className = "week-row";
 
     for (let col = 0; col < 7; col++) {
-
       const cell = document.createElement("div");
-
       const item = list[col];
-
       let value = "—";
 
-      // -------------------------
-      // 日付
-      // -------------------------
       if (row === 0) {
         value = getDate(col);
       }
 
-      // -------------------------
-      // 潮
-      // -------------------------
-if (row === 1) {
+      if (row === 1) {
+        const tide = tideList?.[col]?.tide ?? tideList?.[col];
+        value = tide ?? "—";
 
-  const tide = tideList?.[col]?.tide ?? tideList?.[col];
-
-  value = tide ?? "—";
-
-  if (tide === "大潮") {
-    cell.style.color = "red";
-    cell.style.fontWeight = "bold";
-  }
-}
-
-      // -------------------------
-      // 天気
-      // -------------------------
-if (row === 2) {
-
-  const item = list[col];
-  if (!item) {
-    value = "—";
-  } else {
-
-    const data = item.data;
-
-    if (item.type === "hourly") {
-
-      const weatherList =
-        data?.hourly2 ?? data?.weather ?? [];
-
-      const adjustCode = (code, pop) => {
-        const p = Number(pop);
-
-        if (code >= 60) {
-          if (p >= 80) return 70;
-          if (p >= 60) return 60;
-          return 60;
-        }
-
-        if (p >= 70) return 30;
-        if (p >= 50) return 10;
-
-        return code;
-      };
-
-      const map = {};
-      let maxCount = -1;
-      let tied = [];
-
-      for (const r of weatherList) {
-
-        const rawCode = Number(r?.[0]);
-        const pop = r?.[3];
-
-        if (!Number.isFinite(rawCode)) continue;
-
-        const adjusted = adjustCode(rawCode, pop);
-        map[adjusted] = (map[adjusted] || 0) + 1;
-      }
-
-      for (const k in map) {
-
-        const count = map[k];
-        const code = Number(k);
-
-        if (count > maxCount) {
-          maxCount = count;
-          tied = [code];
-        } else if (count === maxCount) {
-          tied.push(code);
+        if (tide === "大潮") {
+          cell.style.color = "red";
+          cell.style.fontWeight = "bold";
         }
       }
 
-      const best =
-        tied.length > 1
-          ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
-          : tied[0];
+      if (row === 2) {
+        const item = list[col];
 
-      value = toWeatherIcon(best ?? 0);
+        if (!item) {
+          value = "—";
+        } else {
+          const data = item.data;
 
-    } else if (item.type === "daily") {
+          if (item.type === "hourly") {
+            const weatherList = data?.hourly2 ?? data?.weather ?? [];
 
-      value = toWeatherIcon(data?.weather?.[0] ?? 0);
-    }
-  }
-}
+            const adjustCode = (code, pop) => {
+              const p = Number(pop);
 
-      // -------------------------------------------------
-      // クリック（完全統一）
-      // -------------------------------------------------
+              if (code >= 60) {
+                if (p >= 80) return 70;
+                if (p >= 60) return 60;
+                return 60;
+              }
+
+              if (p >= 70) return 30;
+              if (p >= 50) return 10;
+
+              return code;
+            };
+
+            const map = {};
+            let maxCount = -1;
+            let tied = [];
+
+            for (const r of weatherList) {
+              const rawCode = Number(r?.[0]);
+              const pop = r?.[3];
+
+              if (!Number.isFinite(rawCode)) continue;
+
+              const adjusted = adjustCode(rawCode, pop);
+              map[adjusted] = (map[adjusted] || 0) + 1;
+            }
+
+            for (const k in map) {
+              const count = map[k];
+              const code = Number(k);
+
+              if (count > maxCount) {
+                maxCount = count;
+                tied = [code];
+              } else if (count === maxCount) {
+                tied.push(code);
+              }
+            }
+
+            const best =
+              tied.length > 1
+                ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
+                : tied[0];
+
+            value = toWeatherIcon(best ?? 0);
+          } else if (item.type === "daily") {
+            value = toWeatherIcon(data?.weather?.[0] ?? 0);
+          }
+        }
+      }
+
       cell.style.cursor = "pointer";
 
-cell.addEventListener("click", () => {
+      cell.addEventListener("click", () => {
+        const it = list[col];
+        if (!it) return;
 
-  const it = list[col];
-  if (!it) return;
+        const data = it.data;
 
-  const data = it.data;
+        if (it.type === "hourly") {
+          createHourlyWeather(data);
 
-  // -------------------------
-  // hourly
-  // -------------------------
-  if (it.type === "hourly") {
+          if (data?.tide) {
+            createTideGraph(data.tide);
+          }
 
-    createHourlyWeather(data);
+          return;
+        }
 
-    if (data?.tide) {
-      createTideGraph(data.tide);
-    }
+        if (it.type === "daily") {
+          const weatherRoot = document.querySelector(".weather");
+          weatherRoot.innerHTML = "";
 
-    return;
-  }
+          if (data?.tide) {
+            createTideGraph(data.tide);
+          }
 
-  // -------------------------
-  // daily
-  // -------------------------
-  if (it.type === "daily") {
-
-    const weatherRoot = document.querySelector(".weather");
-    weatherRoot.innerHTML = "";
-    if (data?.tide) {
-      createTideGraph(data.tide);
-    }
-
-    return;
-  }
-});
+          return;
+        }
+      });
 
       cell.textContent = value;
       tr.appendChild(cell);
@@ -1421,10 +1366,6 @@ cell.addEventListener("click", () => {
     tableContainer.appendChild(tr);
   }
 }
-
-window.activeSourceType = null;
-window.activeWeekIndex = null;
-window.isDetailVisible = false;
 
 function resetWeatherUI() {
 
@@ -1452,7 +1393,6 @@ function removeWeekItem() {
   if (tableContainer) tableContainer.innerHTML = "";
 }
 
-window.activeWeekIndex = null;
 
 function degToDir(deg) {
   if (deg == null || isNaN(deg)) return "—";
