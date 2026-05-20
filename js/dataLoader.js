@@ -1637,35 +1637,72 @@ function normalizeGraphInput(input) {
   });
 }
 
-function createTideGraph() {
+function createTideGraph(input) {
 
   const canvas = document.getElementById("tideCanvas");
-  if (!canvas) {
-    alert("canvas無し");
-    return;
-  }
+  if (!canvas) return;
 
-  // ★強制サイズ（これで0問題を排除）
-  canvas.width = 300;
-  canvas.height = 150;
+  const rect = canvas.getBoundingClientRect();
+
+  const w = rect.width || 300;
+  const h = rect.height || 150;
+
+  canvas.width = w;
+  canvas.height = h;
 
   canvas.style.display = "block";
-  canvas.style.background = "rgba(255,0,0,0.2)"; // 見えるか確認
 
   const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, w, h);
 
-  if (!ctx) {
-    alert("ctx取れない");
-    return;
-  }
+  const data = normalizeGraphInput(input);
+  if (!data.length) return;
 
-  // 円
+  // -------------------------
+  // スケール（tideだけ）
+  // -------------------------
+  const values = data.map(d => d.tide);
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+
+  const scaleY = v => h - ((v - min) / range) * h;
+  const stepX = w / (data.length - 1);
+
+  // -------------------------
+  // 線
+  // -------------------------
   ctx.beginPath();
-  ctx.arc(150, 75, 50, 0, Math.PI * 2);
-  ctx.fillStyle = "blue";
-  ctx.fill();
 
-  alert("描画完了");
+  data.forEach((d, i) => {
+    const x = i * stepX;
+    const y = scaleY(d.tide);
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+
+  ctx.strokeStyle = "#00aaff";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // -------------------------
+  // デバッグテキスト
+  // -------------------------
+  ctx.fillStyle = "white";
+  ctx.font = "10px monospace";
+
+  data.forEach((d, i) => {
+    const x = i * stepX;
+    const y = scaleY(d.tide);
+
+    ctx.fillText(
+      d.tide.toFixed(1),
+      x - 10,
+      y - 5
+    );
+  });
 }
 
 function resetSpotLayers() {
