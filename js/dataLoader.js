@@ -1339,28 +1339,60 @@ function createWeekItem(weekData) {
 
       // =========================
       cell.style.cursor = "pointer";
-      cell.addEventListener("click", () => {
-          const hourly = hourlyList[col];
-          if (!hourly) return;
-          const same = window.activeWeekIndex === col;
-          if (!same) {
-              window.activeWeekIndex = col;
-              window.isDetailVisible = true;
-              createHourlyWeather(hourly);
-              createTideGraph(hourly.tide);
-              return;
-          }
-          // 同セルトグル
-          if (window.isDetailVisible) {
-              resetWeatherUI();
-              window.activeWeekIndex = null;
-              window.isDetailVisible = false;
-          } else {
-              window.isDetailVisible = true;
-              createHourlyWeather(hourly);
-              createTideGraph(hourly.tide);
-          }
-      });
+cell.addEventListener("click", () => {
+
+  const hourly = hourlyList[col];
+  const daily  = dailyList?.[col];
+
+  const same = window.activeWeekIndex === col;
+
+  // =========================
+  // 別セルクリック（初期化）
+  // =========================
+  if (!same) {
+
+    window.activeWeekIndex = col;
+    window.isDetailVisible = true;
+
+    // hourly優先（存在するなら）
+    if (hourly) {
+      window.activeSourceType = "hourly";
+      createHourlyWeather(hourly);
+      createTideGraph(hourly.tide);
+    } else if (daily) {
+      window.activeSourceType = "daily";
+      createTideGraph(daily.tide);
+    }
+
+    return;
+  }
+
+  // =========================
+  // 同セルクリック（トグル）
+  // =========================
+  if (window.isDetailVisible) {
+
+    resetWeatherUI();
+
+    window.activeWeekIndex = null;
+    window.activeSourceType = null;
+    window.isDetailVisible = false;
+
+  } else {
+
+    window.isDetailVisible = true;
+
+    if (window.activeSourceType === "hourly" && hourly) {
+      createHourlyWeather(hourly);
+      createTideGraph(hourly.tide);
+    }
+
+    if (window.activeSourceType === "daily" && daily) {
+      createHourlyWeather(daily);
+      createTideGraph(daily.tide);
+    }
+  }
+});
       cell.textContent = value;
       tr.appendChild(cell);
     }
@@ -1369,6 +1401,7 @@ function createWeekItem(weekData) {
   }
 }
 
+window.activeSourceType = null;
 window.activeWeekIndex = null;
 window.isDetailVisible = false;
 
