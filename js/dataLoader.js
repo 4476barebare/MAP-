@@ -1619,8 +1619,8 @@ function normalizeGraphInput(input) {
   if (!Array.isArray(input?.tide)) return [];
 
   return input.tide
-    .map(v => ({ tide: Number(v) }))
-    .filter(d => isFinite(d.tide));
+    .map(v => Number(v))
+    .filter(v => isFinite(v));
 }
 
 function createTideGraph(input) {
@@ -1630,37 +1630,55 @@ function createTideGraph(input) {
 
   const ctx = canvas.getContext("2d");
 
-  canvas.width = 320;
-  canvas.height = 240;
+  const w = 320;
+  const h = 240;
+
+  canvas.width = w;
+  canvas.height = h;
   canvas.style.display = "block";
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  ctx.fillStyle = "white";
-  ctx.font = "6px monospace";
+  ctx.clearRect(0, 0, w, h);
 
   // -------------------------
-  // normalize
+  // normalize（数値配列）
   // -------------------------
   const data = normalizeGraphInput(input);
+  if (!data.length) return;
 
   // -------------------------
-  // 表示用テキスト
+  // スケール
   // -------------------------
-  let text = JSON.stringify(data);
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = max - min || 1;
 
-  // 長すぎるので制限
-  text = text.slice(0, 1500);
+  const scaleY = v => h - ((v - min) / range) * h;
+  const stepX = w / (data.length - 1);
 
-  // 1行ずつ分割
-  const lines = text.match(/.{1,80}/g) || [];
+  // -------------------------
+  // 線描画
+  // -------------------------
+  ctx.beginPath();
 
-  // 先頭に長さも出す
-  ctx.fillText("LEN:" + data.length, 5, 8);
+  data.forEach((v, i) => {
 
-  lines.forEach((line, i) => {
-    ctx.fillText(line, 5, 16 + i * 8);
+    const x = i * stepX;
+    const y = scaleY(v);
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
   });
+
+  ctx.strokeStyle = "#00aaff";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // -------------------------
+  // デバッグ（最小限）
+  // -------------------------
+  ctx.fillStyle = "white";
+  ctx.font = "10px monospace";
+  ctx.fillText("LEN:" + data.length, 5, 12);
 }
 
 function resetSpotLayers() {
