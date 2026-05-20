@@ -1685,6 +1685,10 @@ ctx.closePath();
 ctx.fillStyle = "rgba(0,0,0,0.5)";
 ctx.fill();
 
+ctx.strokeStyle = "#191970";
+ctx.lineWidth = 1;
+ctx.stroke();
+
 }
 
 function resetSpotLayers() {
