@@ -1628,26 +1628,21 @@ function createTideGraph(data) {
 
   ctx.clearRect(0, 0, w, h);
 
-  // 背景
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 0, w, h);
+  if (!data || data.length < 2) return;
 
-  // データチェック
-  if (!data || !data.length) return;
-
-  // スケール計算
+  // スケール
   const min = Math.min(...data);
   const max = Math.max(...data);
   const range = max - min || 1;
 
-  const padding = 20;
+  const padding = 10;
 
   const scaleY = v =>
     h - padding - ((v - min) / range) * (h - padding * 2);
 
   const stepX = w / (data.length - 1);
 
-  // 線
+  // 線のみ
   ctx.beginPath();
 
   data.forEach((v, i) => {
@@ -1661,18 +1656,6 @@ function createTideGraph(data) {
   ctx.strokeStyle = "cyan";
   ctx.lineWidth = 2;
   ctx.stroke();
-
-  // 点（任意）
-  ctx.fillStyle = "red";
-
-  data.forEach((v, i) => {
-    const x = i * stepX;
-    const y = scaleY(v);
-
-    ctx.beginPath();
-    ctx.arc(x, y, 2, 0, Math.PI * 2);
-    ctx.fill();
-  });
 }
 
 function resetSpotLayers() {
