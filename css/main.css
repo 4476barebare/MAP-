@@ -1218,10 +1218,10 @@ li {
   left: 0;
   right: 0;
 
-  bottom: 45px; /* weatherと同じ位置に揃える */
+  bottom: 0px; /* weatherと同じ位置に揃える */
 
   width: 100%;
-  height: 500px;
+  height: 400px;
   background-color: rgba(0,0,0,0.5);
 
   pointer-events: none;
