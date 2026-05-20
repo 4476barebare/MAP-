@@ -1613,28 +1613,49 @@ const adjustWeatherCodeForPop = (code, pop) => {
 
 function normalizeGraphInput(input) {
 
-  const src = input?.hourly ? input.hourly : input?.daily ? input.daily : [];
+  if (!input) return [];
 
-  const isHourly = !!input?.hourly;
+  const result = [];
 
-  return src.map((d, i) => {
+  // =========================
+  // hourly
+  // =========================
+  if (Array.isArray(input.hourly)) {
 
-    if (isHourly) {
-      return {
-        x: i,
-        tide: Number(d?.tide ?? 0),
-        water: Number(d?.oneday?.avg ?? 0),
-        wave: Number(d?.[6] ?? d?.waterEx?.wave ?? 0),
-      };
-    }
+    input.hourly.forEach(day => {
 
-    return {
-      x: i,
-      tide: Number(d?.tide ?? d?.dailyEx?.tide ?? 0),
-      water: Number(d?.dailyEx?.avg ?? 0),
-      wave: Number(d?.dailyEx?.wave ?? 0),
-    };
-  });
+      if (!Array.isArray(day.tide)) return;
+
+      day.tide.forEach((tideValue, i) => {
+        result.push({
+          tide: Number(tideValue),
+          time: i
+        });
+      });
+
+    });
+  }
+
+  // =========================
+  // daily
+  // =========================
+  if (Array.isArray(input.daily)) {
+
+    input.daily.forEach(day => {
+
+      if (!Array.isArray(day.tide)) return;
+
+      day.tide.forEach((tideValue, i) => {
+        result.push({
+          tide: Number(tideValue),
+          time: i
+        });
+      });
+
+    });
+  }
+
+  return result.filter(d => isFinite(d.tide));
 }
 
 function createTideGraph(input) {
