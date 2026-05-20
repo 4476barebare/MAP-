@@ -1338,50 +1338,29 @@ function createWeekItem(weekData) {
       }
 
       // =========================
-      // クリックイベント（残す）
-      // =========================
       cell.style.cursor = "pointer";
-
-cell.addEventListener("click", () => {
-
-  const hourly = hourlyList[col];
-  if (!hourly) return;
-
-  const same = window.activeWeekIndex === col;
-
-  // -------------------------
-  // 別セルクリック
-  // -------------------------
-  if (!same) {
-
-    window.activeWeekIndex = col;
-    window.weekViewMode = 1;
-    createHourlyWeather(hourly);
-    return;
-  }
-
-  // -------------------------
-  // 同セルクリック
-  // -------------------------
-  window.weekViewMode = (window.weekViewMode + 1) % 3;
-
-  if (window.weekViewMode === 0) {
-    resetWeatherUI();
-    return;
-  }
-
-  if (window.weekViewMode === 1) {
-    createHourlyWeather(hourly);
-    return;
-  }
-
-  if (window.weekViewMode === 2) {
-    createHourlyWeather(hourly);
-    createTideGraph(hourly.tide);
-    return;
-  }
-});
-
+      cell.addEventListener("click", () => {
+          const hourly = hourlyList[col];
+          if (!hourly) return;
+          const same = window.activeWeekIndex === col;
+          if (!same) {
+              window.activeWeekIndex = col;
+              window.isDetailVisible = true;
+              createHourlyWeather(hourly);
+              createTideGraph(hourly.tide);
+              return;
+          }
+          // 同セルトグル
+          if (window.isDetailVisible) {
+              resetWeatherUI();
+              window.activeWeekIndex = null;
+              window.isDetailVisible = false;
+          } else {
+              window.isDetailVisible = true;
+              createHourlyWeather(hourly);
+              createTideGraph(hourly.tide);
+          }
+      });
       cell.textContent = value;
       tr.appendChild(cell);
     }
@@ -1390,32 +1369,20 @@ cell.addEventListener("click", () => {
   }
 }
 
-window.weekViewMode = 0; // 0:none 1:hourly 2:hourly+tide
 window.activeWeekIndex = null;
+window.isDetailVisible = false;
 
 function resetWeatherUI() {
 
-  // -------------------------
-  // hourly削除
-  // -------------------------
   const weatherRoot = document.querySelector(".weather");
   if (weatherRoot) {
     weatherRoot.innerHTML = "";
   }
 
-  // -------------------------
-  // tide非表示
-  // -------------------------
   const canvas = document.getElementById("tideCanvas");
   if (canvas) {
     canvas.style.display = "none";
   }
-
-  // -------------------------
-  // 状態リセット
-  // -------------------------
-  window.activeWeekIndex = null;
-  window.viewMode = 0;
 }
 
 function removeWeekItem() {
