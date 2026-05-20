@@ -1130,6 +1130,16 @@ li {
   padding-bottom: 2px;
 }
 
+.week-row div.active {
+  background: rgba(0, 150, 255, 0.15);
+  border: 1px solid #0096ff;
+  box-sizing: border-box;
+}
+
+.week-row div.active:first-child {
+  border-left: 1px solid #0096ff;
+}
+
 /* ===== hourlyテーブル ===== */
 .weather {
   display: flex;
