@@ -1404,9 +1404,8 @@ cell.addEventListener("click", () => {
   // -------------------------
   if (it.type === "daily") {
 
-    // ★ hourlyは絶対に出さない
-    // createHourlyWeather は呼ばない
-
+    const weatherRoot = document.querySelector(".weather");
+    weatherRoot.innerHTML = "";
     if (data?.tide) {
       createTideGraph(data.tide);
     }
