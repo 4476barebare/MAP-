@@ -1289,7 +1289,7 @@ function createWeekItem(weekData) {
       // -------------------------
 if (row === 1) {
 
-  const tide = tideList[col]; // ← ここが正しい
+  const tide = tideList?.[col]?.tide ?? tideList?.[col];
 
   value = tide ?? "—";
 
