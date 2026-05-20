@@ -1623,7 +1623,7 @@ function createTideGraph(data) {
 ctx.fillStyle = "white";
 ctx.font = "10px monospace";
 
-ctx.fillText(String(data), 5, 20);
+ctx.fillText("TYPE:" + typeof data, 5, 20);
 }
 
 function resetSpotLayers() {
