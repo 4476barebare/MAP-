@@ -1619,10 +1619,8 @@ function createTideGraph(data) {
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
 
-  canvas.width = 320;
-  canvas.height = 240;
   canvas.style.display = "block";
-
+ctx.fillStyle = "white";
 ctx.font = "10px monospace";
 
 ctx.fillText(String(data), 5, 20);
