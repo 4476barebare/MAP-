@@ -1304,36 +1304,38 @@ if (row === 1) {
       // -------------------------
 if (row === 2) {
 
-  const hourly = hourlyList[col];
-  const daily  = dailyList[col];
+  const item = list[col];
+  if (!item) {
+    value = "—";
+  } else {
 
-  if (hourly) {
+    const data = item.data;
 
-    const list = hasHourly2
-      ? hourly?.hourly2
-      : hourly?.weather;
+    if (item.type === "hourly") {
 
-    const adjustCode = (code, pop) => {
-      const p = Number(pop);
+      const weatherList =
+        data?.hourly2 ?? data?.weather ?? [];
 
-      if (code >= 60) {
-        if (p >= 80) return 70;
-        if (p >= 60) return 60;
-        return 60;
-      }
+      const adjustCode = (code, pop) => {
+        const p = Number(pop);
 
-      if (p >= 70) return 30;
-      if (p >= 50) return 10;
+        if (code >= 60) {
+          if (p >= 80) return 70;
+          if (p >= 60) return 60;
+          return 60;
+        }
 
-      return code;
-    };
+        if (p >= 70) return 30;
+        if (p >= 50) return 10;
 
-    const map = {};
-    let maxCount = -1;
-    let tied = [];
+        return code;
+      };
 
-    if (Array.isArray(list)) {
-      for (const r of list) {
+      const map = {};
+      let maxCount = -1;
+      let tied = [];
+
+      for (const r of weatherList) {
 
         const rawCode = Number(r?.[0]);
         const pop = r?.[3];
@@ -1343,31 +1345,31 @@ if (row === 2) {
         const adjusted = adjustCode(rawCode, pop);
         map[adjusted] = (map[adjusted] || 0) + 1;
       }
-    }
 
-    for (const k in map) {
+      for (const k in map) {
 
-      const count = map[k];
-      const code = Number(k);
+        const count = map[k];
+        const code = Number(k);
 
-      if (count > maxCount) {
-        maxCount = count;
-        tied = [code];
-      } else if (count === maxCount) {
-        tied.push(code);
+        if (count > maxCount) {
+          maxCount = count;
+          tied = [code];
+        } else if (count === maxCount) {
+          tied.push(code);
+        }
       }
+
+      const best =
+        tied.length > 1
+          ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
+          : tied[0];
+
+      value = toWeatherIcon(best ?? 0);
+
+    } else if (item.type === "daily") {
+
+      value = toWeatherIcon(data?.weather?.[0] ?? 0);
     }
-
-    const best =
-      tied.length > 1
-        ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
-        : tied[0];
-
-    value = toWeatherIcon(best ?? 0);
-
-  } else if (daily) {
-
-    value = toWeatherIcon(daily?.weather?.[0] ?? 0);
   }
 }
 
