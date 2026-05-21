@@ -1096,7 +1096,7 @@ li {
   font-size:6px;
   font-weight: bold;
   white-space: nowrap;
-  transform: rotate(270deg) translateX(1px);
+  transform: rotate(270deg) translateX(20px);
 }
 
 /* 右テーブル */
