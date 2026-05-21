@@ -1154,16 +1154,15 @@ li {
 
 .weather-labels {
     display: flex;
+    overflow: hidden;
     flex-shrink: 0;
     flex-direction: column; /* ★これが本質 */
   width: 6px;
-  background: rgba(255,0,0,0.2) !important;
-  
+  border-radius: 0px 0px 0px 4px;
 }
 
 .weather-label {
   display: flex;
-  overflow: hidden;
   width: 6px;
   height: 14px;
   line-height: 14px;
