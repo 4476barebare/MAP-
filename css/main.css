@@ -1302,16 +1302,16 @@ li {
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0px,
-    black 12px,
-    black calc(100% - 12px),
+    black 14px,
+    black calc(100% - 20px),
     transparent 100%
   );
 
   mask-image: linear-gradient(
     to right,
     transparent 0px,
-    black 12px,
-    black calc(100% - 12px),
+    black 14px,
+    black calc(100% - 20px),
     transparent 100%
   );
 }
