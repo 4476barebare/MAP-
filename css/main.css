@@ -1156,7 +1156,6 @@ li {
     display: flex;
     flex-shrink: 0;
     flex-direction: column; /* ★これが本質 */
-    overflow: hidden;
   width: 6px;
   background: rgba(255,0,0,0.2) !important;
   
@@ -1175,7 +1174,34 @@ li {
   font-size:6px;
   font-weight: bold;
   transform: rotate(270deg) translateX(7px);
+  transform-origin: center;
 }
+
+.weather-labels .weather-label:nth-child(1) {
+  display: flex;
+  background-color: transparent;
+  height: 14px;
+  line-height: 14px;
+  
+  align-items:center;
+  justify-content:center;
+  overflow: hidden;
+  width: 6px;
+}
+/* ラベル側 */
+.weather-labels .weather-label:nth-child(2) {
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  background-color: rgba(0,0,0,0.7);
+  border-radius: 4px 0px 0px 0px;
+  height: 14px;
+  line-height: 14px;
+  overflow: hidden;
+  width: 6px;
+}
+
+
 
 .weather-table {
   display:flex;
@@ -1194,36 +1220,12 @@ li {
   background-color: transparent;
 }
 
-/* ラベル側 */
-.weather-labels .weather-label:nth-child(1) {
-  display: flex;
-  background-color: transparent;
-  height: 14px;
-  line-height: 14px;
-  
-  align-items:center;
-  justify-content:center;
-  overflow: hidden;
-  width: 6px;
-}
 
 /* テーブル側 */
 .weather-table .weather-row:nth-child(2) {
   border-radius: 0px 4px 0px 0px;
 }
 
-/* ラベル側 */
-.weather-labels .weather-label:nth-child(2) {
-  display: flex;
-  align-items:center;
-  justify-content:center;
-  background-color: rgba(0,0,0,0.7);
-  border-radius: 4px 0px 0px 0px;
-  height: 14px;
-  line-height: 14px;
-  overflow: hidden;
-  width: 6px;
-}
 
 .weather-row {
   display:grid;
