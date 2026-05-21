@@ -1939,6 +1939,8 @@ const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
 ctx.lineTo(lx, ly);
 
+ctx.shadowColor = "rgba(0, 120, 255, 0.6)";
+ctx.shadowBlur = 6;
 // =====================================================
 // ★発光レイヤー（外側）
 // =====================================================
