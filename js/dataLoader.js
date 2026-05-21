@@ -1579,22 +1579,23 @@ function createHourlyWeather(hourlyData) {
     return dirs[Math.round(d / 45) % 8];
   };
 
-// ★追加：降水確率によるコード補正（☔あり・三項版と同一仕様）
-const adjustWeatherCodeForPop = (code, pop) => {
+  const adjustWeatherCodeForPop = (code, pop) => {
+    const p = normalizePop(pop);
 
-  const p = normalizePop(pop);
+    if (code >= 60) {
+      if (p >= 80) return 70;
+      if (p >= 60) return 60;
+      return 60;
+    }
 
-  if (code >= 60) {
-    if (p >= 80) return 70; // 強い雨
-    if (p >= 60) return 60; // 普通の雨
-    return 60;              // 弱い雨（雨扱い維持）
-  }
+    if (p >= 70) return 30;
+    if (p >= 50) return 10;
 
-  if (p >= 70) return 30;
-  if (p >= 50) return 10;
+    return code;
+  };
 
-  return code;
-};
+  // =========================
+  // ラベル
   // =========================
 
   const labels = ["","","","","RAIN","","WIND"];
@@ -1609,16 +1610,26 @@ const adjustWeatherCodeForPop = (code, pop) => {
     labelsEl.appendChild(div);
   }
 
+  // =========================
+  // テーブル
+  // =========================
+
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
-  const rows = Array.from({ length: labels.length }, (_, i) => {
-      const row = document.createElement("div");
-      row.className = "weather-row";
-      if (i === 0) {
-          row.classList.add("time-row");
-      }
-      return row;
-  })
+
+  const rows = Array.from({ length: labels.length }, () => {
+    const row = document.createElement("div");
+    row.className = "weather-row";
+    return row;
+  });
+
+  // ★TIMEは別レイヤー
+  const timeRow = document.createElement("div");
+  timeRow.className = "weather-row time-row";
+
+  // =========================
+  // データ埋め
+  // =========================
 
   for (let i = 0; i < 12; i++) {
 
@@ -1632,57 +1643,59 @@ const adjustWeatherCodeForPop = (code, pop) => {
     const wind = r?.[4];
     const dir  = r?.[5];
 
-    // TIME
+    // TIME（★別）
     const c0 = document.createElement("div");
     c0.className = "weather-cell";
     c0.textContent = `${hours[i]}`;
-    rows[0].appendChild(c0);
+    timeRow.appendChild(c0);
 
-    // 天気（★ここだけ変更）
+    // 天気
     const c1 = document.createElement("div");
     c1.className = "weather-cell";
-    const adjustedCode = adjustWeatherCodeForPop(code, pop);
-    c1.textContent = toWeatherIcon(adjustedCode);
-    rows[1].appendChild(c1);
+    c1.textContent = toWeatherIcon(adjustWeatherCodeForPop(code, pop));
+    rows[0].appendChild(c1);
 
     // 気温
     const c2 = document.createElement("div");
     c2.className = "weather-cell";
     c2.appendChild(createValueWrap(temp, "°C"));
-    rows[2].appendChild(c2);
+    rows[1].appendChild(c2);
 
     // 降水量
     const c3 = document.createElement("div");
     c3.className = "weather-cell";
     c3.appendChild(createValueWrap(rain, "mm"));
-    rows[3].appendChild(c3);
+    rows[2].appendChild(c3);
 
     // 降水確率
     const c4 = document.createElement("div");
     c4.className = "weather-cell";
-    const fixedPop = normalizePop(pop);
-    c4.appendChild(createValueWrap(fixedPop, "%"));
-    rows[4].appendChild(c4);
+    c4.appendChild(createValueWrap(normalizePop(pop), "%"));
+    rows[3].appendChild(c4);
 
     // 風速
     const c5 = document.createElement("div");
     c5.className = "weather-cell";
     c5.appendChild(createValueWrap(wind, "m/s"));
-    rows[5].appendChild(c5);
+    rows[4].appendChild(c5);
 
     // 風向
     const c6 = document.createElement("div");
     c6.className = "weather-cell wind-dir";
     c6.textContent = degToDir(dir);
-    rows[6].appendChild(c6);
+    rows[5].appendChild(c6);
   }
 
   rows.forEach(r => tableEl.appendChild(r));
 
+  // =========================
+  // 追加
+  // =========================
+
   root.appendChild(labelsEl);
+  root.appendChild(timeRow);   // ★先に追加（浮く）
   root.appendChild(tableEl);
 }
-
 
 function createTideGraph(data) {
 
