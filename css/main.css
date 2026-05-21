@@ -1177,18 +1177,19 @@ li {
   border-radius: 0px 0px 4px 0px;
   background-color: rgba(0,0,0,0.5);
   position: relative; /* ★追加 */
+  overflow: hidden; /* ★追加 */
 }
 
 /* ===== 1行目（TIME） ===== */
 
 /* テーブル側 */
 .weather-table .weather-row:nth-child(1) {
-  background-color: none;
+  background-color: transparent;
 }
 
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(1) {
-  background-color: none;
+  background-color: transparent;
 }
 
 /* テーブル側 */
