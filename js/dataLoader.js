@@ -1529,7 +1529,7 @@ function createHourlyWeather(hourlyData) {
 
   if (!Array.isArray(list)) return;
 
-  const hours = [0,"",4,"",8,"",12,"",16,"",20,""];
+  const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
 
   const step = Math.floor(list.length / 12) || 1;
 
