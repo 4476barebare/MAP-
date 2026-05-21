@@ -1939,24 +1939,18 @@ const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
 ctx.lineTo(lx, ly);
 
-ctx.shadowColor = "rgba(0, 120, 255, 0.6)";
-ctx.shadowBlur = 6;
+
 // =====================================================
-// ★発光レイヤー（外側）
+// ★視認性レイヤー（白の下地）
 // =====================================================
-ctx.strokeStyle = "rgba(0, 140, 255, 0.25)";
-ctx.lineWidth = 6;
+ctx.strokeStyle = "rgba(255,255,255,0.35)";
+ctx.lineWidth = 2.5;
+ctx.lineJoin = "round";
+ctx.lineCap = "round";
 ctx.stroke();
 
 // =====================================================
-// ★発光レイヤー（中）
-// =====================================================
-ctx.strokeStyle = "rgba(0, 140, 255, 0.45)";
-ctx.lineWidth = 3;
-ctx.stroke();
-
-// =====================================================
-// ★コアライン（本線）
+// ★本線
 // =====================================================
 ctx.strokeStyle = "#191970";
 ctx.lineWidth = 1.2;
