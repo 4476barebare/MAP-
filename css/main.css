@@ -1096,7 +1096,7 @@ li {
   font-size:6px;
   font-weight: bold;
   white-space: nowrap;
-  transform: rotate(270deg) translateX(20px);
+  transform: rotate(270deg) translateX(24px);
 }
 
 /* 右テーブル */
@@ -1222,16 +1222,12 @@ li {
 
 #tideCanvas {
   position: absolute;
-
   left: 0;
   right: 0;
-
   bottom: 0px; /* weatherと同じ位置に揃える */
 
   width: 100%;
   height: 80vh;
-  
-
   pointer-events: none;
   display: none;
 
