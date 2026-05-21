@@ -1510,6 +1510,11 @@ function resetWeatherUI() {
   if (canvas) {
     canvas.style.display = "none";
   }
+  // ★これ追加（重要）
+
+  document.querySelectorAll(".week-cell.active")
+
+    .forEach(el => el.classList.remove("active"));
 }
 
 function removeWeekItem() {
