@@ -1155,7 +1155,7 @@ li {
 .weather-labels {
     display: flex;
     flex-shrink: 0;   /* ★これが本命 */
-    overflow: visible;
+    overflow: hidden;   /* ★visibleやめる */
     flex-direction: column; /* ★これが本質 */
   width: 6px;
   background: none; /* ★これが必須 */
