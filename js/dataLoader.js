@@ -1526,12 +1526,7 @@ function removeWeekItem() {
 }
 
 
-function degToDir(deg) {
-  if (deg == null || isNaN(deg)) return "—";
 
-  const dirs = ["↑","↗","→","↘","↓","↙","←","↖"];
-  return dirs[Math.round(deg / 45) % 8];
-}
 
 // 単位付き表示ヘルパー
 function withUnit(value, unit, round = true) {
