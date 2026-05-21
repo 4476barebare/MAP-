@@ -1310,17 +1310,17 @@ li {
 -webkit-mask-image: linear-gradient(
   to right,
   transparent 0px,
-  black 8px,
-  black calc(100% - 8px),
-  rgba(0,0,0,0.6) calc(100% - 8px),
+  black 4px,
+  black calc(100% - 4px),
+  rgba(0,0,0,0.6) calc(100% - 4px),
   transparent 100%
 );
 
   mask-image: linear-gradient(
     to right,
     transparent 0px,
-    black 8px,
-    black calc(100% - 8px),
+    black 4px,
+    black calc(100% - 4px),
     transparent 100%
   );
 }
