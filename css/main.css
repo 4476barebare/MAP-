@@ -1153,8 +1153,8 @@ li {
 }
 
 .weather-labels {
-　overflow: visible;
-　flex-direction: column; /* ★これが本質 */
+    overflow: visible;
+    flex-direction: column; /* ★これが本質 */
   width: 6px;
   background: none; /* ★これが必須 */
   border-radius: 0px 0px 0px 4px;
