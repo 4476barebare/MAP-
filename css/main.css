@@ -1170,7 +1170,7 @@ li {
   overflow: visible;
   align-items:center;
   justify-content:center;
-  background-color: rgba(0,0,0,0.7);
+  background-color: #000;
 
 }
 
@@ -1199,7 +1199,6 @@ li {
   display: flex;
   align-items:center;
   justify-content:center;
-  background-color: rgba(0,0,0,0.7);
   border-radius: 4px 0px 0px 0px;
   height: 14px;
   line-height: 14px;
