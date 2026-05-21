@@ -1435,34 +1435,53 @@ function createWeekItem(weekData) {
 
       cell.style.cursor = "pointer";
 
-      cell.addEventListener("click", () => {
-        const it = list[col];
-        if (!it) return;
-        window.activeCol = col;
-        createWeekItem(weekData);
+cell.addEventListener("click", () => {
+  const it = list[col];
+  if (!it) return;
 
-        const data = it.data;
+  // =========================
+  // トグル判定（ここ追加）
+  // =========================
+  const isSame = window.activeCol === col;
 
-        if (it.type === "hourly") {
-          createHourlyWeather(data, "hourly");
+  if (isSame) {
+    window.activeCol = null;
 
-          if (data?.tide) {
-            createTideGraph(data.tide);
-          }
+    const weatherRoot = document.querySelector(".weather");
+    if (weatherRoot) weatherRoot.innerHTML = "";
 
-          return;
-        }
+    const tideRoot = document.querySelector(".tide"); // 仮
+    if (tideRoot) tideRoot.innerHTML = "";
 
-        if (it.type === "daily") {
-          createHourlyWeather(data, "daily");
+    return;
+  }
 
-          if (data?.tide) {
-            createTideGraph(data.tide);
-          }
+  window.activeCol = col;
 
-          return;
-        }
-      });
+  createWeekItem(weekData);
+
+  const data = it.data;
+
+  if (it.type === "hourly") {
+    createHourlyWeather(data, "hourly");
+
+    if (data?.tide) {
+      createTideGraph(data.tide);
+    }
+
+    return;
+  }
+
+  if (it.type === "daily") {
+    createHourlyWeather(data, "daily");
+
+    if (data?.tide) {
+      createTideGraph(data.tide);
+    }
+
+    return;
+  }
+});
 
       cell.textContent = value;
       tr.appendChild(cell);
