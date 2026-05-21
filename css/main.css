@@ -1096,7 +1096,7 @@ li {
   font-size:6px;
   font-weight: bold;
   white-space: nowrap;
-  transform: rotate(270deg) translateX(11px);
+  transform: rotate(270deg) translateX(1px);
 }
 
 /* 右テーブル */
@@ -1166,7 +1166,7 @@ li {
   justify-content:center;
   font-size:6px;
   font-weight: bold;
-  transform: rotate(270deg) translateX(-10px);
+  transform: rotate(270deg) translateX(7px);
   
 }
 
