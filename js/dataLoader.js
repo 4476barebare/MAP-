@@ -1906,42 +1906,59 @@ function createTideGraph(data, sun) {
   ctx.fill(graphPath);
   ctx.restore();
 
-  // =====================================================
-  // グラフ線
-  // =====================================================
-  ctx.beginPath();
+// =====================================================
+// グラフ線（発光版）
+// =====================================================
+ctx.beginPath();
 
-  for (let i = 0; i < data.length; i++) {
+for (let i = 0; i < data.length; i++) {
 
-    const x = i * stepX;
+  const x = i * stepX;
 
-    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-    const y = scaleY(v);
+  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+  const y = scaleY(v);
 
-    if (i === 0) {
-      ctx.moveTo(x, y);
-      continue;
-    }
-
-    const prevX = (i - 1) * stepX;
-    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-    const prevY = scaleY(prevV);
-
-    const midX = (prevX + x) / 2;
-    const midY = (prevY + y) / 2;
-
-    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
+  if (i === 0) {
+    ctx.moveTo(x, y);
+    continue;
   }
 
-  const last = data.length - 1;
-  const lx = last * stepX;
-  const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
+  const prevX = (i - 1) * stepX;
+  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+  const prevY = scaleY(prevV);
 
-  ctx.lineTo(lx, ly);
+  const midX = (prevX + x) / 2;
+  const midY = (prevY + y) / 2;
 
-  ctx.strokeStyle = "#191970";
-  ctx.lineWidth = 1;
-  ctx.stroke();
+  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
+}
+
+const last = data.length - 1;
+const lx = last * stepX;
+const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
+
+ctx.lineTo(lx, ly);
+
+// =====================================================
+// ★発光レイヤー（外側）
+// =====================================================
+ctx.strokeStyle = "rgba(0, 140, 255, 0.25)";
+ctx.lineWidth = 6;
+ctx.stroke();
+
+// =====================================================
+// ★発光レイヤー（中）
+// =====================================================
+ctx.strokeStyle = "rgba(0, 140, 255, 0.45)";
+ctx.lineWidth = 3;
+ctx.stroke();
+
+// =====================================================
+// ★コアライン（本線）
+// =====================================================
+ctx.strokeStyle = "#191970";
+ctx.lineWidth = 1.2;
+ctx.stroke();
 }
 
 function resetSpotLayers() {
