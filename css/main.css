@@ -1114,6 +1114,7 @@ li {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   height: 14px;
+  overflow: hidden;
 }
 
 /* セル */
@@ -1122,6 +1123,7 @@ li {
   align-items: center;
   justify-content: center;
   height: 14px;
+  line-height: 14px;
   min-width: 0;
   white-space: nowrap;
 }
@@ -1131,9 +1133,7 @@ li {
 }
 
 .week-row div.active {
-    
   background: rgba(255, 255, 255, 0.35);
-
 }
 
 /* ===== hourlyテーブル ===== */
