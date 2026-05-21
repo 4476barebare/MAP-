@@ -1196,6 +1196,7 @@ li {
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(1) {
   background-color: transparent;
+  height:14px;
 }
 
 /* テーブル側 */
@@ -1206,6 +1207,7 @@ li {
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(2) {
   border-radius: 4px 0px 0px 0px;
+  height:14px;
 }
 
 .weather-row {
