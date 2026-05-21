@@ -1604,11 +1604,16 @@ function createHourlyWeather(hourlyData) {
   labelsEl.className = "weather-labels";
 
   for (const text of labels) {
-    const div = document.createElement("div");
-    div.className = "weather-label";
-    div.textContent = text;
-    labelsEl.appendChild(div);
-  }
+  const div = document.createElement("div");
+  div.className = "weather-label";
+
+  const span = document.createElement("span");
+  span.className = "label-text";
+  span.textContent = text;
+
+  div.appendChild(span);
+  labelsEl.appendChild(div);
+}
 
   // =========================
   // テーブル
