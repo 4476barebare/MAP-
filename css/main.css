@@ -1197,6 +1197,7 @@ li {
   display:grid;
   grid-template-columns:repeat(12, minmax(0, 1fr)); /* ← weekと揃える */
   height:14px;
+  position: relative;
 }
 
 .weather-cell {
