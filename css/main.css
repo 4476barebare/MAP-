@@ -1155,7 +1155,8 @@ li {
 .weather-labels {
 　overflow: visible;
   width: 6px;
-  background-color: rgba(0,0,0,0.7);
+  background: none; /* ★これが必須 */
+  
   border-radius: 0px 0px 0px 4px;
 }
 
@@ -1164,6 +1165,7 @@ li {
   display:flex;
   align-items:center;
   justify-content:center;
+  background-color: rgba(0,0,0,0.7);
   font-size:6px;
   font-weight: bold;
   transform: rotate(270deg) translateX(7px);
@@ -1175,7 +1177,7 @@ li {
   flex-direction:column;
   width:100%;
   border-radius: 0px 0px 4px 0px;
-  background-color: rgba(0,0,0,0.5);
+  background: none; /* ★これが重要 */
   position: relative; /* ★追加 */
   overflow: hidden; /* ★追加 */
 }
@@ -1204,6 +1206,7 @@ li {
 
 .weather-row {
   display:grid;
+  background-color: rgba(0,0,0,0.5);
   grid-template-columns:repeat(12, minmax(0, 1fr)); /* ← weekと揃える */
   height:14px;
   position: relative;
