@@ -1444,7 +1444,7 @@ function createWeekItem(weekData) {
         const data = it.data;
 
         if (it.type === "hourly") {
-          createHourlyWeather(data);
+          createHourlyWeather(data, "hourly");
 
           if (data?.tide) {
             createTideGraph(data.tide);
@@ -1454,8 +1454,7 @@ function createWeekItem(weekData) {
         }
 
         if (it.type === "daily") {
-          const weatherRoot = document.querySelector(".weather");
-          if (weatherRoot) weatherRoot.innerHTML = "";
+          createHourlyWeather(data, "daily");
 
           if (data?.tide) {
             createTideGraph(data.tide);
@@ -1514,7 +1513,7 @@ function withUnit(value, unit, round = true) {
   return `${v}<span class="unit">${unit}</span>`;
 }
 
-function createHourlyWeather(hourlyData) {
+function createHourlyWeather(hourlyData,type) {
 
   const root = document.querySelector(".weather");
   if (!root || !hourlyData) return;
@@ -1530,6 +1529,33 @@ function createHourlyWeather(hourlyData) {
   if (!Array.isArray(list)) return;
 
   const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
+  
+  if (type === "daily") {
+  const root = document.querySelector(".weather");
+  if (!root || !hourlyData) return;
+
+  root.innerHTML = "";
+
+  const timeRow = document.createElement("div");
+  timeRow.className = "weather-row time-row";
+
+  const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
+
+  for (let i = 0; i < 12; i++) {
+    const cell = document.createElement("div");
+    cell.className = "weather-cell";
+    cell.textContent = `${hours[i]}`;
+    timeRow.appendChild(cell);
+  }
+
+  const tableEl = document.createElement("div");
+  tableEl.className = "weather-table";
+  tableEl.appendChild(timeRow);
+
+  root.appendChild(tableEl);
+
+  return;
+}
 
   const step = Math.floor(list.length / 12) || 1;
 
