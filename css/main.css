@@ -1176,6 +1176,21 @@ li {
   width:100%;
   border-radius: 0px 4px 4px 0px;
   background-color: rgba(0,0,0,0.5);
+  position: relative; /* ★追加 */
+}
+
+/* ★追加：1行目（時刻）を浮かせる */
+.time-row {
+  position: absolute;
+  top: -10px;   /* ←位置調整ポイント */
+  left: 0;
+  right: 0;
+  z-index: 5;
+}
+
+/* ★追加：背景の影響を消す */
+.time-row .weather-cell {
+  background: transparent;
 }
 
 .weather-row {
