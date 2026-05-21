@@ -1447,11 +1447,7 @@ cell.addEventListener("click", () => {
   if (isSame) {
     window.activeCol = null;
 
-    const weatherRoot = document.querySelector(".weather");
-    if (weatherRoot) weatherRoot.innerHTML = "";
-
-    const tideRoot = document.querySelector(".tide"); // 仮
-    if (tideRoot) tideRoot.innerHTML = "";
+    resetWeatherUI();
 
     return;
   }
