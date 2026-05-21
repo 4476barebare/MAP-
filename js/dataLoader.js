@@ -1482,9 +1482,17 @@ cell.addEventListener("click", () => {
 
     tableContainer.appendChild(tr);
   }
-  
-  if (window.activeCol == null && list.length > 0) {
+
+if (window.activeCol == null && list.length > 0) {
   window.activeCol = 0;
+
+  // ★これ追加：初期セルにactive付与
+  const firstCell = tableContainer.querySelectorAll(".week-row")[0]
+    ?.querySelectorAll(".week-cell")[0];
+
+  if (firstCell) {
+    firstCell.classList.add("active");
+  }
 
   const data = list[0].data;
 
@@ -1494,6 +1502,7 @@ cell.addEventListener("click", () => {
     createTideGraph(data.tide);
   }
 }
+
 }
 
 function resetWeatherUI() {
