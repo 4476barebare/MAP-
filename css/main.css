@@ -1298,4 +1298,20 @@ li {
   position: relative; /* absolute禁止 */
 
   z-index: 8010; /* weather(8600)の下、week(8500)の上 */
+  /* ★変更：左右フェードを4pxで統一 */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0px,
+    black 4px,
+    black calc(100% - 4px),
+    transparent 100%
+  );
+
+  mask-image: linear-gradient(
+    to right,
+    transparent 0px,
+    black 4px,
+    black calc(100% - 4px),
+    transparent 100%
+  );
 }
