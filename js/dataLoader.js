@@ -1617,13 +1617,13 @@ function createHourlyWeather(hourlyData) {
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
 
-  const rows = Array.from({ length: labels.length }, () => {
+  const rows = Array.from({ length: labels.length - 1 }, () => {
     const row = document.createElement("div");
     row.className = "weather-row";
     return row;
   });
 
-  // ★TIMEは別レイヤー
+  // ★TIME行（table内に入れる）
   const timeRow = document.createElement("div");
   timeRow.className = "weather-row time-row";
 
@@ -1643,7 +1643,7 @@ function createHourlyWeather(hourlyData) {
     const wind = r?.[4];
     const dir  = r?.[5];
 
-    // TIME（★別）
+    // TIME
     const c0 = document.createElement("div");
     c0.className = "weather-cell";
     c0.textContent = `${hours[i]}`;
@@ -1686,6 +1686,8 @@ function createHourlyWeather(hourlyData) {
     rows[5].appendChild(c6);
   }
 
+  // ★ここ重要：同じコンテナ内で順番に積む
+  tableEl.appendChild(timeRow);
   rows.forEach(r => tableEl.appendChild(r));
 
   // =========================
@@ -1693,7 +1695,6 @@ function createHourlyWeather(hourlyData) {
   // =========================
 
   root.appendChild(labelsEl);
-  root.appendChild(timeRow);   // ★先に追加（浮く）
   root.appendChild(tableEl);
 }
 
