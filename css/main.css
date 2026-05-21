@@ -1191,9 +1191,6 @@ li {
   justify-content:center;
   overflow: hidden;
   width: 6px;
-  text-shadow:
-    0 1px 2px rgba(0,0,0,0.9),
-    0 0 3px rgba(0,0,0,0.8);
 }
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(2) {
@@ -1225,6 +1222,7 @@ li {
 /* テーブル側 */
 .weather-table .weather-row:nth-child(1) {
   background-color: transparent;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9),0 0 3px rgba(0,0,0,0.8);
 }
 
 
