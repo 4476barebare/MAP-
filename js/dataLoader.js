@@ -1445,10 +1445,7 @@ cell.addEventListener("click", () => {
   const isSame = window.activeCol === col;
 
   if (isSame) {
-    window.activeCol = null;
-
     resetWeatherUI();
-
     return;
   }
 
@@ -1510,11 +1507,9 @@ function resetWeatherUI() {
   if (canvas) {
     canvas.style.display = "none";
   }
-  // ★これ追加（重要）
-
   document.querySelectorAll(".week-cell.active")
-
-    .forEach(el => el.classList.remove("active"));
+  .forEach(el => el.classList.remove("active"));
+  window.activeCol = null;
 }
 
 function removeWeekItem() {
