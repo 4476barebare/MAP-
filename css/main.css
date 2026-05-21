@@ -1083,7 +1083,7 @@ li {
   overflow: visible;
  
   width: 6px;
-  background-color: rgba(0,0,0,0.7);
+  background-color: #000;
   border-radius: 4px 0 0 4px;
 }
 
@@ -1289,7 +1289,7 @@ li {
   bottom: 0px;
   width: 100%;
   height: 80vh;
-  padding-left: 10px;
+  padding-left: 4px;
   padding-right: 4px;
   box-sizing: border-box;
   display: none;
@@ -1311,7 +1311,7 @@ li {
   to right,
   transparent 0px,
   black 14px,
-  black calc(100% - 20px),
+  black calc(100% - 14px),
   rgba(0,0,0,0.6) calc(100% - 14px),
   transparent 100%
 );
@@ -1320,7 +1320,7 @@ li {
     to right,
     transparent 0px,
     black 14px,
-    black calc(100% - 20px),
+    black calc(100% - 14px),
     transparent 100%
   );
 }
