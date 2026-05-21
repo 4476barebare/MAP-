@@ -1299,13 +1299,16 @@ li {
 
   z-index: 8010; /* weather(8600)の下、week(8500)の上 */
 
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0px,
-    black 14px,
-    black calc(100% - 20px),
-    transparent 100%
-  );
+
+
+-webkit-mask-image: linear-gradient(
+  to right,
+  transparent 0px,
+  black 14px,
+  black calc(100% - 20px),
+  rgba(0,0,0,0.6) calc(100% - 14px),
+  transparent 100%
+);
 
   mask-image: linear-gradient(
     to right,
