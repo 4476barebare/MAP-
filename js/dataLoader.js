@@ -1486,14 +1486,6 @@ cell.addEventListener("click", () => {
 if (window.activeCol == null && list.length > 0) {
   window.activeCol = 0;
 
-  // ★これ追加：初期セルにactive付与
-  const firstCell = tableContainer.querySelectorAll(".week-row")[0]
-    ?.querySelectorAll(".week-cell")[0];
-
-  if (firstCell) {
-    firstCell.classList.add("active");
-  }
-
   const data = list[0].data;
 
   createHourlyWeather(data, "hourly");
@@ -1501,6 +1493,17 @@ if (window.activeCol == null && list.length > 0) {
   if (data?.tide) {
     createTideGraph(data.tide);
   }
+
+  // ★これを最後にずらす（描画完了後）
+  requestAnimationFrame(() => {
+    const first = tableContainer
+      .querySelectorAll(".week-row")[0]
+      ?.querySelectorAll("div")[0];
+
+    if (first) {
+      first.classList.add("active");
+    }
+  });
 }
 
 }
