@@ -1156,7 +1156,7 @@ li {
 　overflow: visible;
   width: 6px;
   background-color: rgba(0,0,0,0.7);
-  border-radius: 4px 0 0 4px;
+  border-radius: 0px 0px 0px 4px;
 }
 
 .weather-label {
@@ -1174,7 +1174,7 @@ li {
   display:flex;
   flex-direction:column;
   width:100%;
-  border-radius: 0px 4px 4px 0px;
+  border-radius: 0px 0px 4px 0px;
   background-color: rgba(0,0,0,0.5);
   position: relative; /* ★追加 */
 }
@@ -1183,27 +1183,22 @@ li {
 
 /* テーブル側 */
 .weather-table .weather-row:nth-child(1) {
-  margin-top: -10px;
-  opacity: 0.8;
-  font-size: 9px;
+  background-color: none;
 }
 
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(1) {
-  margin-top: -10px;
-  opacity: 0.8;
+  background-color: none;
 }
 
 /* テーブル側 */
 .weather-table .weather-row:nth-child(2) {
-  margin-top: 4px;
-  padding-top: 2px;
-  border-top: 1px solid rgba(255,255,255,0.2);
+  border-radius: 0px 4px 0px 0px;
 }
 
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(2) {
-  margin-top: 4px;
+  border-radius: 4px 0px 0px 0px;
 }
 
 .weather-row {
