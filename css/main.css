@@ -1154,9 +1154,9 @@ li {
 
 .weather-labels {
 　overflow: visible;
+　flex-direction: column; /* ★これが本質 */
   width: 6px;
   background: none; /* ★これが必須 */
-  
   border-radius: 0px 0px 0px 4px;
 }
 
@@ -1169,7 +1169,7 @@ li {
   font-size:6px;
   font-weight: bold;
   transform: rotate(270deg) translateX(7px);
-  
+  transform-origin: center; /* ★追加 */
 }
 
 .weather-table {
