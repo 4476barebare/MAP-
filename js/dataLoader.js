@@ -1769,7 +1769,6 @@ function createTideGraph(data) {
 
   const ctx = canvas.getContext("2d");
 
-  // 表示
   canvas.style.display = "block";
 
   const rect = canvas.getBoundingClientRect();
@@ -1778,8 +1777,17 @@ function createTideGraph(data) {
 
   if (w === 0 || h === 0) return;
 
-  canvas.width = w;
-  canvas.height = h;
+  // ==============================
+  // ★重要：DPI対策（ズレ防止）
+  // ==============================
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+
+  canvas.style.width = w + "px";
+  canvas.style.height = h + "px";
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   ctx.clearRect(0, 0, w, h);
 
@@ -1788,37 +1796,29 @@ function createTideGraph(data) {
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
 
-  const SCALE = 0.7; // 70%表示
+  const SCALE = 0.7;
   const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
 
   const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
 
   // ==============================
-  // ★変更：描画余白を追加
+  // ★変更：余白を更新（左10px・右4px）
   // ==============================
-  const paddingLeft = 8;
+  const paddingLeft = 10;
   const paddingRight = 4;
 
-  // ==============================
-  // ★変更：描画可能幅を制限
-  // ==============================
   const plotW = w - paddingLeft - paddingRight;
 
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  // ==============================
-  // ★変更：stepXを描画領域基準に
-  // ==============================
   const stepX = plotW / (data.length - 1);
 
   ctx.beginPath();
 
   for (let i = 0; i < data.length; i++) {
 
-    // ==============================
-    // ★変更：xをpadding込み座標に変更
-    // ==============================
+    // ★変更：左10px反映
     const x = paddingLeft + i * stepX;
 
     const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
@@ -1829,9 +1829,7 @@ function createTideGraph(data) {
       continue;
     }
 
-    // ==============================
-    // ★変更：prevXも同じ基準に統一
-    // ==============================
+    // ★変更：prevXも統一
     const prevX = paddingLeft + (i - 1) * stepX;
     const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
     const prevY = scaleY(prevV);
@@ -1844,9 +1842,7 @@ function createTideGraph(data) {
 
   const last = data.length - 1;
 
-  // ==============================
-  // ★変更：最後のxもpadding反映
-  // ==============================
+  // ★変更：左10px反映
   const lx = paddingLeft + last * stepX;
 
   const ly = scaleY(
@@ -1855,12 +1851,11 @@ function createTideGraph(data) {
 
   ctx.lineTo(lx, ly);
 
-  // 面を閉じる
+  // 下を閉じる（ここは全幅でOK）
   ctx.lineTo(w, h);
   ctx.lineTo(0, h);
   ctx.closePath();
 
-  // 塗り
   ctx.fillStyle = "rgba(0,0,0,0.5)";
   ctx.fill();
 
