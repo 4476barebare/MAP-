@@ -1175,9 +1175,9 @@ li {
 
 .label-text {
   display: inline-block;
-  transform: rotate(270deg);
+  transform: rotate(270deg) translateX(7px);
   transform-origin: center;
-    font-size:6px;
+  font-size:6px;
   font-weight: bold;
 }
 
