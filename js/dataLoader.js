@@ -1787,62 +1787,86 @@ function createTideGraph(data) {
 
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
-  
-  const SCALE = 0.7; // ← 70%表示
 
-const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
-
-  const padding = 10;
+  const SCALE = 0.7; // 70%表示
+  const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
 
   const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
 
-const scaleY = v =>
-  h / 2 + ((v - mid) / range) * (h * 0.7);
+  // ==============================
+  // ★変更：描画余白を追加
+  // ==============================
+  const paddingLeft = 8;
+  const paddingRight = 4;
 
-  const stepX = w / (data.length - 1);
+  // ==============================
+  // ★変更：描画可能幅を制限
+  // ==============================
+  const plotW = w - paddingLeft - paddingRight;
 
-ctx.beginPath();
+  const scaleY = v =>
+    h / 2 + ((v - mid) / range) * (h * 0.7);
 
-for (let i = 0; i < data.length; i++) {
+  // ==============================
+  // ★変更：stepXを描画領域基準に
+  // ==============================
+  const stepX = plotW / (data.length - 1);
 
-  const x = i * stepX;
-  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-  const y = scaleY(v);
+  ctx.beginPath();
 
-  if (i === 0) {
-    ctx.moveTo(x, y);
-    continue;
+  for (let i = 0; i < data.length; i++) {
+
+    // ==============================
+    // ★変更：xをpadding込み座標に変更
+    // ==============================
+    const x = paddingLeft + i * stepX;
+
+    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+    const y = scaleY(v);
+
+    if (i === 0) {
+      ctx.moveTo(x, y);
+      continue;
+    }
+
+    // ==============================
+    // ★変更：prevXも同じ基準に統一
+    // ==============================
+    const prevX = paddingLeft + (i - 1) * stepX;
+    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+    const prevY = scaleY(prevV);
+
+    const midX = (prevX + x) / 2;
+    const midY = (prevY + y) / 2;
+
+    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
   }
 
-  const prevX = (i - 1) * stepX;
-  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-  const prevY = scaleY(prevV);
+  const last = data.length - 1;
 
-  const midX = (prevX + x) / 2;
-  const midY = (prevY + y) / 2;
+  // ==============================
+  // ★変更：最後のxもpadding反映
+  // ==============================
+  const lx = paddingLeft + last * stepX;
 
-  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
-}
+  const ly = scaleY(
+    Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last]))
+  );
 
-// 最後の点を補完
-const last = data.length - 1;
-const lx = last * stepX;
-const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
-ctx.lineTo(lx, ly);
+  ctx.lineTo(lx, ly);
 
-// 面を閉じる
-ctx.lineTo(w, h);
-ctx.lineTo(0, h);
-ctx.closePath();
+  // 面を閉じる
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
 
-// 塗り
-ctx.fillStyle = "rgba(0,0,0,0.5)";
-ctx.fill();
+  // 塗り
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
+  ctx.fill();
 
-ctx.strokeStyle = "#191970";
-ctx.lineWidth = 1;
-ctx.stroke();
-
+  ctx.strokeStyle = "#191970";
+  ctx.lineWidth = 1;
+  ctx.stroke();
 }
 
 function resetSpotLayers() {
