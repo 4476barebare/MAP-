@@ -1166,7 +1166,7 @@ li {
   justify-content:center;
   font-size:6px;
   font-weight: bold;
-  transform: rotate(270deg) translateX(20px);
+  transform: rotate(270deg) translateX(-10px);
   
 }
 
