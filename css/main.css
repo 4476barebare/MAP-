@@ -1167,7 +1167,7 @@ li {
   width: 6px;
   height: 14px;
   line-height: 14px;
-  display:flex;
+  
   align-items:center;
   justify-content:center;
   background-color: rgba(0,0,0,0.7);
@@ -1198,7 +1198,7 @@ li {
   background-color: transparent;
   height: 14px;
   line-height: 14px;
-  display:flex;
+  
   align-items:center;
   justify-content:center;
   overflow: hidden;
@@ -1212,7 +1212,7 @@ li {
 
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(2) {
-  display:flex;
+  
   align-items:center;
   justify-content:center;
   background-color: rgba(0,0,0,0.7);
