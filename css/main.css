@@ -1131,13 +1131,9 @@ li {
 }
 
 .week-row div.active {
-  background: rgba(0, 150, 255, 0.15);
-  border: 1px solid #0096ff;
-  box-sizing: border-box;
-}
+    
+  background: rgba(255, 255, 255, 0.35);
 
-.week-row div.active:first-child {
-  border-left: 1px solid #0096ff;
 }
 
 /* ===== hourlyテーブル ===== */
