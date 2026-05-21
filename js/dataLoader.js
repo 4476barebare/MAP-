@@ -1611,12 +1611,14 @@ const adjustWeatherCodeForPop = (code, pop) => {
 
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
-
-  const rows = Array.from({ length: labels.length }, () => {
-    const row = document.createElement("div");
-    row.className = "weather-row";
-    return row;
-  });
+  const rows = Array.from({ length: labels.length }, (_, i) => {
+      const row = document.createElement("div");
+      row.className = "weather-row";
+      if (i === 0) {
+          row.classList.add("time-row");
+      }
+      return row;
+  })
 
   for (let i = 0; i < 12; i++) {
 
