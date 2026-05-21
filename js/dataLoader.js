@@ -1778,13 +1778,13 @@ function createHourlyWeather(hourlyData,type) {
   root.appendChild(tableEl);
 }
 
-function createTideGraph(data,sun) {
+
+function createTideGraph(data, sun) {
 
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
 
   const wrapper = document.querySelector(".tide-wrapper");
-
   const ctx = canvas.getContext("2d");
 
   if (wrapper) {
@@ -1806,7 +1806,6 @@ function createTideGraph(data,sun) {
   canvas.style.height = h + "px";
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
   ctx.clearRect(0, 0, w, h);
 
   if (!data || data.length < 2) return;
@@ -1816,7 +1815,6 @@ function createTideGraph(data,sun) {
 
   const SCALE = 0.7;
   const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
-
   const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
 
   const scaleY = v =>
@@ -1824,30 +1822,92 @@ function createTideGraph(data,sun) {
 
   const stepX = w / (data.length - 1);
 
+  // =====================================================
+  // グラフパス生成（共通）
+  // =====================================================
+  const buildPath = () => {
+    const path = new Path2D();
+
+    for (let i = 0; i < data.length; i++) {
+      const x = i * stepX;
+
+      const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+      const y = scaleY(v);
+
+      if (i === 0) {
+        path.moveTo(x, y);
+        continue;
+      }
+
+      const prevX = (i - 1) * stepX;
+      const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+      const prevY = scaleY(prevV);
+
+      const midX = (prevX + x) / 2;
+      const midY = (prevY + y) / 2;
+
+      path.quadraticCurveTo(prevX, prevY, midX, midY);
+    }
+
+    const last = data.length - 1;
+    const lx = last * stepX;
+    const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
+
+    path.lineTo(lx, ly);
+    path.lineTo(w, h);
+    path.lineTo(0, h);
+    path.closePath();
+
+    return path;
+  };
+
+  const graphPath = buildPath();
 
   // =====================================================
-  // ★変更：sunを引数で受け取る
+  // 日の出・日の入り
   // =====================================================
-  if (sun?.sunrise != null && sun?.sunset != null) {
+  const sunriseX = sun?.sunrise != null ? (sun.sunrise / 1440) * w : 0;
+  const sunsetX  = sun?.sunset  != null ? (sun.sunset  / 1440) * w : w;
 
-    const sunriseX = (sun.sunrise / 1440) * w;
-    const sunsetX = (sun.sunset / 1440) * w;
-
-    // 夜（左）
-    ctx.fillStyle = "rgba(0, 10, 40, 0.25)";
-    ctx.fillRect(0, 0, sunriseX, h);
-
-    // 昼
-    ctx.fillStyle = "rgba(255, 220, 150, 0.08)";
-    ctx.fillRect(sunriseX, 0, sunsetX - sunriseX, h);
-
-    // 夜（右）
-    ctx.fillStyle = "rgba(0, 10, 40, 0.25)";
-    ctx.fillRect(sunsetX, 0, w - sunsetX, h);
-  }
+  const nightColor = "rgba(0, 10, 40, 0.25)";
+  const dayColor   = "rgba(255, 220, 150, 0.08)";
 
   // =====================================================
-  // ★既存：潮位グラフ
+  // ★重要：線の下だけを3分割して塗る
+  // =====================================================
+
+  // 左（夜）
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, sunriseX, h);
+  ctx.clip();
+
+  ctx.fillStyle = nightColor;
+  ctx.fill(graphPath);
+  ctx.restore();
+
+  // 中（昼）
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sunriseX, 0, sunsetX - sunriseX, h);
+  ctx.clip();
+
+  ctx.fillStyle = dayColor;
+  ctx.fill(graphPath);
+  ctx.restore();
+
+  // 右（夜）
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sunsetX, 0, w - sunsetX, h);
+  ctx.clip();
+
+  ctx.fillStyle = nightColor;
+  ctx.fill(graphPath);
+  ctx.restore();
+
+  // =====================================================
+  // グラフ線
   // =====================================================
   ctx.beginPath();
 
@@ -1875,25 +1935,14 @@ function createTideGraph(data,sun) {
 
   const last = data.length - 1;
   const lx = last * stepX;
-
-  const ly = scaleY(
-    Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last]))
-  );
+  const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
   ctx.lineTo(lx, ly);
-
-  ctx.lineTo(w, h);
-  ctx.lineTo(0, h);
-  ctx.closePath();
-
-  ctx.fillStyle = "rgba(0,0,0,0.5)";
-  ctx.fill();
 
   ctx.strokeStyle = "#191970";
   ctx.lineWidth = 1;
   ctx.stroke();
 }
-
 
 function resetSpotLayers() {
 
