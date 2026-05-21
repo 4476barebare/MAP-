@@ -1860,7 +1860,9 @@ function createTideGraph(data) {
   ctx.lineTo(w, h);
   ctx.lineTo(0, h);
   ctx.closePath();
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
 
+  ctx.fill();
 
   ctx.strokeStyle = "#191970";
   ctx.lineWidth = 1;
