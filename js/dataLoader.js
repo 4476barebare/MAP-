@@ -1515,9 +1515,24 @@ function resetWeatherUI() {
     weatherRoot.innerHTML = "";
   }
 
+  // ==============================
+  // ★変更：canvasではなくwrapperを制御対象に統一
+  // ==============================
+  const wrapper = document.querySelector(".tide-wrapper");
+  if (wrapper) {
+    wrapper.style.display = "none";
+  }
+
+  // ==============================
+  // ★変更：canvasは初期化のみ（非表示制御しない）
+  // ==============================
   const canvas = document.getElementById("tideCanvas");
   if (canvas) {
-    canvas.style.display = "none";
+    const ctx = canvas.getContext("2d");
+
+    // 破棄ではなくクリアだけにする（再表示時の事故防止）
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
   }
 
   window.activeCol = null;
@@ -1767,10 +1782,14 @@ function createTideGraph(data) {
   const canvas = document.getElementById("tideCanvas");
   if (!canvas) return;
 
+  const wrapper = document.querySelector(".tide-wrapper"); // ★追加
+
   const ctx = canvas.getContext("2d");
 
-  // 表示
-  canvas.style.display = "block";
+  // 表示制御（JS管理）
+  if (wrapper) {
+    wrapper.style.display = "block";
+  }
 
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
@@ -1778,8 +1797,15 @@ function createTideGraph(data) {
 
   if (w === 0 || h === 0) return;
 
-  canvas.width = w;
-  canvas.height = h;
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+
+  canvas.style.width = w + "px";
+  canvas.style.height = h + "px";
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   ctx.clearRect(0, 0, w, h);
 
@@ -1787,62 +1813,58 @@ function createTideGraph(data) {
 
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
-  
-  const SCALE = 0.7; // ← 70%表示
 
-const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
-
-  const padding = 10;
+  const SCALE = 0.7;
+  const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
 
   const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
 
-const scaleY = v =>
-  h / 2 + ((v - mid) / range) * (h * 0.7);
+  const scaleY = v =>
+    h / 2 + ((v - mid) / range) * (h * 0.7);
 
   const stepX = w / (data.length - 1);
 
-ctx.beginPath();
+  ctx.beginPath();
 
-for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < data.length; i++) {
 
-  const x = i * stepX;
-  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-  const y = scaleY(v);
+    const x = i * stepX;
 
-  if (i === 0) {
-    ctx.moveTo(x, y);
-    continue;
+    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+    const y = scaleY(v);
+
+    if (i === 0) {
+      ctx.moveTo(x, y);
+      continue;
+    }
+
+    const prevX = (i - 1) * stepX;
+    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+    const prevY = scaleY(prevV);
+
+    const midX = (prevX + x) / 2;
+    const midY = (prevY + y) / 2;
+
+    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
   }
 
-  const prevX = (i - 1) * stepX;
-  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-  const prevY = scaleY(prevV);
+  const last = data.length - 1;
+  const lx = last * stepX;
 
-  const midX = (prevX + x) / 2;
-  const midY = (prevY + y) / 2;
+  const ly = scaleY(
+    Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last]))
+  );
 
-  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
-}
+  ctx.lineTo(lx, ly);
 
-// 最後の点を補完
-const last = data.length - 1;
-const lx = last * stepX;
-const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
-ctx.lineTo(lx, ly);
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
 
-// 面を閉じる
-ctx.lineTo(w, h);
-ctx.lineTo(0, h);
-ctx.closePath();
 
-// 塗り
-ctx.fillStyle = "rgba(0,0,0,0.5)";
-ctx.fill();
-
-ctx.strokeStyle = "#191970";
-ctx.lineWidth = 1;
-ctx.stroke();
-
+  ctx.strokeStyle = "#191970";
+  ctx.lineWidth = 1;
+  ctx.stroke();
 }
 
 function resetSpotLayers() {
