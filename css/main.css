@@ -1150,6 +1150,7 @@ li {
   color: #fff;
   margin: 4px;
   z-index: 8600;
+  
 }
 
 .weather-labels {
@@ -1158,8 +1159,9 @@ li {
     overflow: hidden;   /* ★visibleやめる */
     flex-direction: column; /* ★これが本質 */
   width: 6px;
-  background: none; /* ★これが必須 */
+
   border-radius: 0px 0px 0px 4px;
+  background: rgba(255,0,0,0.2) !important;
 }
 
 .weather-label {
