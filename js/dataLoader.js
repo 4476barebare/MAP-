@@ -1494,16 +1494,16 @@ if (window.activeCol == null && list.length > 0) {
     createTideGraph(data.tide);
   }
 
-  // ★これを最後にずらす（描画完了後）
-  requestAnimationFrame(() => {
-    const first = tableContainer
-      .querySelectorAll(".week-row")[0]
-      ?.querySelectorAll("div")[0];
+requestAnimationFrame(() => {
+  const rows = tableContainer.querySelectorAll(".week-row");
 
-    if (first) {
-      first.classList.add("active");
+  rows.forEach(row => {
+    const cells = row.querySelectorAll("div");
+    if (cells[0]) {
+      cells[0].classList.add("active");
     }
   });
+});
 }
 
 }
