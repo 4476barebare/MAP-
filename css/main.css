@@ -1165,7 +1165,8 @@ li {
 }
 
 .weather-label {
-  height:14px;
+  height: 14px;
+  line-height: 14px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1196,7 +1197,8 @@ li {
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(1) {
   background-color: transparent;
-  height:14px;
+  height: 14px;
+  line-height: 14px;
 }
 
 /* テーブル側 */
@@ -1207,7 +1209,8 @@ li {
 /* ラベル側 */
 .weather-labels .weather-label:nth-child(2) {
   border-radius: 4px 0px 0px 0px;
-  height:14px;
+  height: 14px;
+  line-height: 14px;
 }
 
 .weather-row {
