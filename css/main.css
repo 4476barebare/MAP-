@@ -1186,6 +1186,8 @@ li {
   left: 0;
   right: 0;
   z-index: 5;
+  height: 0;          /* ★これ追加 */
+  overflow: visible;  /* ★これ追加 */
 }
 
 /* ★追加：背景の影響を消す */
