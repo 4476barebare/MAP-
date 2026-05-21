@@ -1507,8 +1507,7 @@ function resetWeatherUI() {
   if (canvas) {
     canvas.style.display = "none";
   }
-  document.querySelectorAll(".week-cell.active")
-  .forEach(el => el.classList.remove("active"));
+
   window.activeCol = null;
 }
 
