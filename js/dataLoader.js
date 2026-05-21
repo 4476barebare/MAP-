@@ -1485,6 +1485,18 @@ cell.addEventListener("click", () => {
 
     tableContainer.appendChild(tr);
   }
+  
+  if (window.activeCol == null && list.length > 0) {
+  window.activeCol = 0;
+
+  const data = list[0].data;
+
+  createHourlyWeather(data, "hourly");
+
+  if (data?.tide) {
+    createTideGraph(data.tide);
+  }
+}
 }
 
 function resetWeatherUI() {
