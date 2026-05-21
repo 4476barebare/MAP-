@@ -1172,6 +1172,8 @@ li {
   background-color: rgba(0,0,0,0.7);
   font-size:6px;
   font-weight: bold;
+  transform: rotate(270deg);
+  transform-origin: center center;
   
 }
 
