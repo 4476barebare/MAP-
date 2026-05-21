@@ -1160,6 +1160,7 @@ li {
   width: 6px;
   border-radius: 0px 0px 0px 4px;
   position: absolute;
+  z-index: 8601;
 }
 
 .weather-label {
@@ -1200,10 +1201,6 @@ li {
   align-items:center;
   justify-content:center;
   border-radius: 4px 0px 0px 0px;
-  height: 14px;
-  line-height: 14px;
-  overflow: hidden;
-  width: 6px;
 }
 
 .weather-labels .weather-label:nth-child(7) {
@@ -1211,10 +1208,6 @@ li {
   align-items:center;
   justify-content:center;
   border-radius: 0px 0px 0px 4px;
-  height: 14px;
-  line-height: 14px;
-  overflow: hidden;
-  width: 6px;
 }
 
 .weather-table {
