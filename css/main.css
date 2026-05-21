@@ -1140,7 +1140,6 @@ li {
 /* ===== hourlyテーブル ===== */
 .weather {
   display: flex;
-
   position: absolute;
   left: 0;
   right: 0;
@@ -1157,9 +1156,10 @@ li {
     display: flex;
     flex-shrink: 0
     flex-direction: column; /* ★これが本質 */
-    overflow: visible;
+    overflow: hidden;
   width: 6px;
   background: rgba(255,0,0,0.2) !important;
+  
 }
 
 .weather-label {
