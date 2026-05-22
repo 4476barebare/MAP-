@@ -169,6 +169,8 @@ function formatDate(str) {
 // =======================
 function initAreaUI() {
     const menu = document.getElementById('map-menu');
+    if (!menu) return;
+
     menu.style.display = 'block';
 
     const ul = menu.querySelector('ul');
@@ -177,28 +179,37 @@ function initAreaUI() {
     ul.innerHTML = '';
 
     // =====================
-    // ★ ヘッダー
+    // ■ ヘッダー
     // =====================
     const headerLi = document.createElement('li');
     headerLi.className = 'menu-header-row';
+    headerLi.style.pointerEvents = 'none';
+
+    const headerRow = document.createElement('div');
+    headerRow.style.display = 'flex';
+    headerRow.style.justifyContent = 'flex-end';
+    headerRow.style.width = '100%';
 
     const headerText = document.createElement('div');
     headerText.textContent =
         formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-    headerLi.appendChild(headerText);
+    headerRow.appendChild(headerText);
+    headerLi.appendChild(headerRow);
     ul.appendChild(headerLi);
 
     // =====================
-    // ★ エリア行
+    // ■ エリア行
     // =====================
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
-        li.className = 'menu-item';
 
         const row = document.createElement('div');
-        row.className = 'menu-row';
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.width = '100%';
+        row.style.cursor = 'pointer';
 
         row.onclick = () => {
             location.hash = encodeURIComponent(area.name);
@@ -209,33 +220,85 @@ function initAreaUI() {
 
         // 左
         const left = document.createElement('div');
-        left.className = 'menu-left';
+        left.style.flex = '1';
 
         const btn = document.createElement('button');
         btn.textContent = area.name;
+        btn.style.width = '100%';
 
         left.appendChild(btn);
 
         // 右
         const right = document.createElement('div');
-        right.className = 'pref-weather';
         right.id = area.areaId + '_' + area.individualId;
+        right.className = 'pref-weather';
         right.textContent = "loading…";
 
         row.appendChild(left);
         row.appendChild(right);
         li.appendChild(row);
-
         ul.appendChild(li);
     });
 
-    // ★ 最後にクラス付与（これが重要）
-    const items = ul.querySelectorAll('li');
-
-    if (items.length > 0) {
-        items[0].classList.add('is-first');
-        items[items.length - 1].classList.add('is-last');
+    // =====================
+    // ■ 既存handler削除（重要）
+    // =====================
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
     }
+
+    // =====================
+    // ■ nearest処理（完全版）
+    // =====================
+    window.nearestClickHandler = function(e) {
+
+        if (!window.nearestClickEnabled) return;
+
+        // ★ メニュー内クリックは無視
+        const rect = menu.getBoundingClientRect();
+        const x = e.originalEvent.clientX;
+        const y = e.originalEvent.clientY;
+
+        if (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+        ) {
+            return;
+        }
+
+        // ★ 最近傍探索
+        let nearest = null;
+        let minDist = Infinity;
+
+        for (const area of window.areaData) {
+
+            const dLat = e.latlng.lat - area.lat;
+            const dLng = e.latlng.lng - area.lng;
+            const dist = dLat * dLat + dLng * dLng;
+
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = area;
+            }
+        }
+
+        if (!nearest) return;
+
+        // ★ 選択処理
+        location.hash = encodeURIComponent(nearest.name);
+        updateStateFromHash();
+        destroyAreaUI();
+        selectArea(nearest);
+    };
+
+    // =====================
+    // ■ 有効化
+    // =====================
+    window.nearestClickEnabled = true;
+    // ★ここが抜けると動かない
+    window.map.on('click', window.nearestClickHandler);
 }
 
 // =======================
