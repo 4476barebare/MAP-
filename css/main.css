@@ -1246,8 +1246,6 @@ li {
   grid-template-columns:repeat(12, minmax(0, 1fr)); /* ← weekと揃える */
   height:14px;
   position: relative;
-  touch-action: auto;
-  pointer-events: auto;
 }
 
 .weather-cell {
@@ -1256,14 +1254,14 @@ li {
   justify-content:center;
   min-width:0;
   font-variant-numeric: tabular-nums;
-  touch-action: auto;
-  pointer-events: auto;
 }
 
 .value-wrap {
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  touch-action: auto;
+  pointer-events: auto;
 }
 
 /* 数値カラム（固定幅） */
