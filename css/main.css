@@ -1060,31 +1060,42 @@ li {
     cursor: pointer;
 }
 
-
+/* =========================
+   右側天気（修正版）
+========================= */
 .pref-weather {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    /* ★ absolute禁止 */
+    position: static;
+
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+
     font-size: 12px;
     white-space: nowrap;
+
+    /* ★ 右寄せ */
+    margin-left: auto;
+
+    /* ★ タッチ有効 */
+    pointer-events: auto;
+    touch-action: pan-y;
 }
 
+/* 中身 */
 .pref-weather div {
-   display: inline-block;
-   text-align: right;
-   vertical-align: baseline;
+    display: inline-block;
+    text-align: right;
 }
 
+/* 地名 */
 .pref-name {
-    position: absolute;
-    bottom: -6px;
-    right: 0;
+    position: static; /* ★これも解除 */
+
     font-size: 6px;
     opacity: 0.6;
 
+    margin-left: 4px;
 }
 
 
