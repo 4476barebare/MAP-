@@ -956,8 +956,7 @@ li {
 /* UL */
 .map-menu ul {
     list-style: none;
-    margin: 0;
-    padding: 0;
+    width: 100%;
     background: none;
 }
 
