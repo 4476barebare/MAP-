@@ -1005,16 +1005,8 @@ li {
     justify-content: flex-end;
     align-items: center;
     width: 100%;
-
     font-size: 12px;
     white-space: nowrap;
-
-    text-shadow:
-        1px 0 #191970,
-       -1px 0 #191970,
-        0 1px #191970,
-        0 -1px #191970;
-
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
 
