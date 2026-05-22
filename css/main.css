@@ -1148,8 +1148,7 @@ li {
   color: #fff;
   margin: 4px;
   z-index: 8600;
-  pointer-events: auto;
-  cursor: pointer;
+  touch-action: auto;
 }
 
 .weather-labels {
