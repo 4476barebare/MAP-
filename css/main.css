@@ -1143,13 +1143,13 @@ li {
   position: absolute;
   left: 0;
   right: 0;
-
   bottom: 88px;
   font-size: 10px;
   color: #fff;
   margin: 4px;
   z-index: 8600;
-  
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .weather-labels {
