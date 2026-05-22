@@ -1150,6 +1150,7 @@ li {
   z-index: 8600;
   touch-action: auto;
   pointer-events: auto;
+  max-height: 40vh; /* 適当 */
 }
 
 .weather-labels {
@@ -1260,8 +1261,6 @@ li {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  touch-action: auto;
-  pointer-events: auto;
 }
 
 /* 数値カラム（固定幅） */
