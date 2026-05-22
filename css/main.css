@@ -1140,7 +1140,7 @@ li {
 /* ===== hourlyテーブル ===== */
 .weather {
   display: flex;
-  position: relative;
+  position: absolute;
   left: 0;
   right: 0;
   bottom: 88px;
@@ -1218,6 +1218,8 @@ li {
   background: none; /* ★これが重要 */
   position: relative; /* ★追加 */
   overflow: hidden; /* ★追加 */
+  touch-action: auto;
+  pointer-events: auto;
 }
 
 /* ===== 1行目（TIME） ===== */
