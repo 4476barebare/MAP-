@@ -176,120 +176,66 @@ function initAreaUI() {
 
     ul.innerHTML = '';
 
-    const todayTide = window.tideWeek?.[0];
-
     // =====================
-    // ★ 1行目（ヘッダー）
+    // ★ ヘッダー
     // =====================
     const headerLi = document.createElement('li');
     headerLi.className = 'menu-header-row';
-    headerLi.style.pointerEvents = 'none';
-    headerLi.style.padding = '4px 8px';
-
-    const headerRow = document.createElement('div');
-    headerRow.style.display = 'flex';
-    headerRow.style.justifyContent = 'flex-end';
-    headerRow.style.width = '100%';
 
     const headerText = document.createElement('div');
-    headerText.textContent = formatDate(window.todayTide.date)+" "+window.todayTide.tide;
+    headerText.textContent =
+        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-
-    headerRow.appendChild(headerText);
-    headerLi.appendChild(headerRow);
-
+    headerLi.appendChild(headerText);
     ul.appendChild(headerLi);
 
     // =====================
-    // ★ 各エリア行（元構造維持）
+    // ★ エリア行
     // =====================
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
-        li.style.position = 'relative';
+        li.className = 'menu-item';
 
-        const areaName = (area.name || '').trim();
-
-        // 左右レイアウト
         const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.alignItems = 'center';
-        row.style.width = '100%';
-        row.style.cursor = 'pointer';
+        row.className = 'menu-row';
 
         row.onclick = () => {
-            location.hash = encodeURIComponent(areaName);
+            location.hash = encodeURIComponent(area.name);
             updateStateFromHash();
             destroyAreaUI();
             selectArea(area);
         };
 
-        // 左（ボタン）
+        // 左
         const left = document.createElement('div');
-        left.style.flex = '1';
+        left.className = 'menu-left';
 
         const btn = document.createElement('button');
-        btn.textContent = areaName;
-        btn.style.width = '100%';
-        btn.onclick = null;
+        btn.textContent = area.name;
 
         left.appendChild(btn);
 
-        // 右（天気）
+        // 右
         const right = document.createElement('div');
-        right.id = area.areaId + '_' + area.individualId;
         right.className = 'pref-weather';
+        right.id = area.areaId + '_' + area.individualId;
         right.textContent = "loading…";
 
         row.appendChild(left);
         row.appendChild(right);
-
         li.appendChild(row);
 
         ul.appendChild(li);
     });
 
-    // =====================
-    // クリック処理
-    // =====================
-    window.nearestClickHandler = function(e) {
+    // ★ 最後にクラス付与（これが重要）
+    const items = ul.querySelectorAll('li');
 
-        if (!window.nearestClickEnabled) return;
-
-        const rect = menu.getBoundingClientRect();
-
-        if (
-            e.originalEvent.clientX >= rect.left &&
-            e.originalEvent.clientX <= rect.right &&
-            e.originalEvent.clientY >= rect.top &&
-            e.originalEvent.clientY <= rect.bottom
-        ) return;
-
-        let nearest = null;
-        let minDist = Infinity;
-
-        for (const area of window.areaData) {
-
-            const dLat = e.latlng.lat - area.lat;
-            const dLng = e.latlng.lng - area.lng;
-            const dist = dLat * dLat + dLng * dLng;
-
-            if (dist < minDist) {
-                minDist = dist;
-                nearest = area;
-            }
-        }
-
-        if (!nearest) return;
-
-        location.hash = encodeURIComponent(nearest.name);
-        updateStateFromHash();
-        destroyAreaUI();
-        selectArea(nearest);
-    };
-
-    window.nearestClickEnabled = true;
-    window.map.on('click', window.nearestClickHandler);
+    if (items.length > 0) {
+        items[0].classList.add('is-first');
+        items[items.length - 1].classList.add('is-last');
+    }
 }
 
 // =======================
