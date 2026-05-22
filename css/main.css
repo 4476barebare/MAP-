@@ -911,19 +911,89 @@ li {
 ========================= */
 .map-menu {
     display: none;
+
     position: absolute;
     bottom: 4px;
+    left: 0;
+    right: 0;
+
     margin: 0 4px;
+
+    /* ★スクロール成立条件 */
     overflow-y: auto;
+    overflow-x: hidden;
+
+    /* ★iOSスクロール */
+    -webkit-overflow-scrolling: touch;
+
+    /* ★タッチ操作許可 */
+    touch-action: pan-y;
+
     z-index: 1980;
+
     pointer-events: auto;
+
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-#map-menu li {
-    overflow: visible;
+/* =========================
+   POINTER EVENTS 統一
+========================= */
+#map-menu,
+#map-menu ul,
+#map-menu li,
+#map-menu button {
+    pointer-events: auto;
 }
 
+/* =========================
+   UL
+========================= */
+.map-menu ul {
+    list-style: none;
+    width: 100%;
+    background: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* =========================
+   LI
+========================= */
+.map-menu li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 4px 8px;
+    margin: 2px 0;
+
+    font-size: 13px;
+    color: #fff;
+
+    cursor: pointer;
+
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+
+    /* アニメーション初期値 */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.2s ease;
+}
+
+/* 最後の要素 */
+.map-menu li:last-child {
+    border-bottom: none;
+    padding-bottom: 3px;
+}
+
+/* =========================
+   HEADER ROW
+========================= */
 .menu-header-row {
     display: block !important;
     padding: 2px 8px !important;
@@ -935,61 +1005,22 @@ li {
     justify-content: flex-end;
     align-items: center;
     width: 100%;
+
     font-size: 12px;
     white-space: nowrap;
+
     text-shadow:
-    1px 0 #191970,
-   -1px 0 #191970,
-    0 1px #191970,
-    0 -1px #191970;
+        1px 0 #191970,
+       -1px 0 #191970,
+        0 1px #191970,
+        0 -1px #191970;
+
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
 
-/* pointer-events統一 */
-#map-menu,
-#map-menu ul,
-#map-menu li,
-#map-menu button {
-    pointer-events: auto;
-}
-
-/* UL */
-.map-menu ul {
-    list-style: none;
-    width: 100%;
-    background: none;
-}
-
-/* LI */
-.map-menu li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    font-size: 13px;
-    color: #fff;
-
-    padding: 4px 8px;
-    width: 100%;
-    box-sizing: border-box;
-
-    cursor: pointer;
-
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 4px;
-    margin: 2px 0;
-
-    opacity: 1;
-    transform: translateY(0);
-    transition: all 0.2s ease;
-}
-
-.map-menu li:last-child {
-    border-bottom: none;
-    padding-bottom: 3px;
-}
-
-/* アニメーション */
+/* =========================
+   アニメーション
+========================= */
 .map-menu li.new-item {
     opacity: 0;
     transform: translateY(6px);
@@ -1000,7 +1031,9 @@ li {
     transform: translateY(0);
 }
 
-/* phase lock */
+/* =========================
+   PHASE LOCK
+========================= */
 #map-menu.phase2-lock li {
     pointer-events: none;
 }
@@ -1010,16 +1043,21 @@ li {
     cursor: pointer;
 }
 
-/* ボタン */
+/* =========================
+   BUTTON
+========================= */
 #map-menu button {
     width: 100%;
     background: transparent;
     border: none;
     color: inherit;
-    cursor: pointer;
-    padding: 0;
+
     font-size: inherit;
     text-align: left;
+
+    padding: 0;
+
+    cursor: pointer;
 }
 
 
