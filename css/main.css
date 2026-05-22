@@ -1092,6 +1092,7 @@ li {
 .pref-name {
     position: absolute;
     font-size: 6px;
+    bottom: 0;
     opacity: 0.6;
     margin-left: 4px;
 }
