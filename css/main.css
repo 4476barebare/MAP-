@@ -1090,11 +1090,9 @@ li {
 
 /* 地名 */
 .pref-name {
-    position: static; /* ★これも解除 */
-
+    position: absolute;
     font-size: 6px;
     opacity: 0.6;
-
     margin-left: 4px;
 }
 
