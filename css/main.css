@@ -1181,9 +1181,19 @@ li {
   color: #fff;
   margin: 4px;
   z-index: 8600;
-  touch-action: auto;
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+  /* ★iOSスクロール */
+
+  -webkit-overflow-scrolling: touch;
+
+  /* ★タッチ許可 */
+
+  touch-action: pan-x;
+
   pointer-events: auto;
-  max-height: 40vh; /* 適当 */
 }
 
 .weather-labels {
