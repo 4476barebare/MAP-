@@ -474,13 +474,11 @@ li {
    map-ui-top（全体）
 ========================= */
 .map-ui-top {
-  position: absolute;
   top: 12px;
   width: 100%;
   z-index: 9000;
   display: flex;
   flex-direction: column; /* ←これが本体 */
-  align-items: center;
   box-sizing: border-box;
 }
 
@@ -488,13 +486,13 @@ li {
    AD
 ========================= */
 .ad-box {
-  display: none;
+  display: flex;
   width: 320px;
   height: 50px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid #ccc;
-  align-items: center;
-  justify-content: center;
+  margin-left: auto;    /* 左右の余白を自動に */
+  margin-right: auto;
   font-size: 12px;
   color: #333;
   pointer-events: auto;
