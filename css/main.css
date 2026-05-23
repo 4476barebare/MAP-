@@ -573,7 +573,7 @@ li {
   align-items: center;
   min-width: 100px;
   padding: 4px 8px;
-  margin: 2px 40;
+  margin-left: 40px;
   font-size: 13px;
   color: #fff;
   background-color: rgba(0, 0, 0, 0.5);
