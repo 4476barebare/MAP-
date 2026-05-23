@@ -572,10 +572,10 @@ li {
 .map-ui-sub2 {
   display: flex;
   align-items: center;
-  height: 14px;
+  height: 18px;
   width: 100%;
   margin-top: 5px;
-  padding: 0 20px 0 40px; /* ←左を広めにする */
+  margin-left: 40px; /* ←左を広めにする */
   background-color: #666;
   box-sizing: border-box;
 }
