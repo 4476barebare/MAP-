@@ -573,13 +573,13 @@ li {
   box-sizing: border-box;
   align-items: center;
   width: 100%;
+  min-width: 100px;
   padding: 4px 8px;
   margin: 2px 40;
   font-size: 13px;
   color: #fff;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 4px;
-
     /* アニメーション初期値 */
   opacity: 1;
   transform: translateY(0);
