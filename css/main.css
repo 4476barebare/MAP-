@@ -567,10 +567,10 @@ li {
   display: block;
   height: 18px;
   box-sizing: border-box;
+  max-width: 70vw;
   min-width: 100px;
-  float: left;
   padding: 4px 8px;
-  margin-left: 20px;
+  margin-left: 24px;
   font-size: 13px;
   color: #fff;
   background-color: rgba(0, 0, 0, 0.5);
