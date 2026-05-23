@@ -567,7 +567,7 @@ li {
 }
 
 .map-ui-sub2 {
-  display: flex;
+  display: block;
   height: 18px;
   box-sizing: border-box;
   align-items: center;
