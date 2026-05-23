@@ -508,7 +508,7 @@ li {
   display: flex;
   align-items: center;
   justify-content: space-between; /* 両端寄せ */
-  width: 100%;
+  width: auto;
   margin: 5px 20px;
   box-sizing: border-box;
 }
