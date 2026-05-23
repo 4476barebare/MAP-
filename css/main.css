@@ -570,7 +570,7 @@ li {
   display: flex;
   align-items: center;
   height: 18px;
-  max-width: 300px;
+  min-width: 100px;
   margin-top: 5px;
   margin-left: 40px;
   background-color: #666;
