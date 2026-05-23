@@ -510,6 +510,7 @@ li {
   align-items: center;
   justify-content: space-between; /* 両端寄せ */
   width: 100%;
+  margin-top: 20px;
   padding: 0 20px 0 40px; /* ←左を広めにする */
   box-sizing: border-box;
 }
@@ -1182,16 +1183,9 @@ li {
   margin: 4px;
   z-index: 8600;
   overflow-x: hidden;
-
   overflow-y: auto;
-  /* ★iOSスクロール */
-
   -webkit-overflow-scrolling: touch;
-
-  /* ★タッチ許可 */
-
   touch-action: pan-y;
-
   pointer-events: auto;
 }
 
