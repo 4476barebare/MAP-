@@ -477,7 +477,8 @@ li {
   top: 12px;
   width: 100%;
   z-index: 9000;
-  display: block;
+  display: flex;
+  position: absolute;
   flex-direction: column; /* ←これが本体 */
   box-sizing: border-box;
 }
