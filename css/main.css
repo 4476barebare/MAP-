@@ -1181,17 +1181,16 @@ li {
   color: #fff;
   margin: 4px;
   z-index: 8600;
-  overflow-x: auto;
+  overflow-x: hidden;
 
-  overflow-y: hidden;
-
+  overflow-y: auto;
   /* ★iOSスクロール */
 
   -webkit-overflow-scrolling: touch;
 
   /* ★タッチ許可 */
 
-  touch-action: pan-x;
+  touch-action: pan-y;
 
   pointer-events: auto;
 }
