@@ -575,7 +575,8 @@ li {
   height: 18px;
   width: 100%;
   margin-top: 5px;
-  margin-left: 40px; /* ←左を広めにする */
+  margin-left: 40px;
+  margin-right: 40px;
   background-color: #666;
   box-sizing: border-box;
 }
