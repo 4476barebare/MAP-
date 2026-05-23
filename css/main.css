@@ -568,13 +568,22 @@ li {
 
 .map-ui-sub2 {
   display: flex;
-  left: 0;
   height: 18px;
-  min-width: 100px;
-  margin-top: 5px;
-  margin-left: 40px;
-  background-color: #666;
   box-sizing: border-box;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 4px 8px;
+  margin: 2px 40;
+  font-size: 13px;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+
+    /* アニメーション初期値 */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.2s ease;
 }
 /* =========================
    SPOT LABEL
