@@ -572,6 +572,7 @@ li {
   box-sizing: border-box;
   align-items: center;
   min-width: 100px;
+  float: left;
   padding: 4px 8px;
   margin-left: 40px;
   font-size: 13px;
