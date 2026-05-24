@@ -451,15 +451,13 @@ if (calendarBtn && calendarOverlay && calendarWrapper) {
     });
   });
 
-  calendarOverlay.addEventListener("click", (e) => {
-    if (e.target === calendarOverlay) {
-      calendarOverlay.style.display = "none";
-    }
-  });
-  
-  calendarWrapper.addEventListener("click", (e) => {
-  e.stopPropagation();
+calendarOverlay.addEventListener("click", (e) => {
+  if (!e.target.closest(".overlay-content")) {
+    calendarOverlay.style.display = "none";
+  }
 });
+  
+
 }
 
 });
