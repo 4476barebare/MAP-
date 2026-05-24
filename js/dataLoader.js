@@ -1823,7 +1823,7 @@ function createTideGraph(data, sun) {
   const stepX = w / (data.length - 1);
 
   // =====================================================
-  // グラフパス生成（共通）
+  // グラフパス生成
   // =====================================================
   const buildPath = () => {
     const path = new Path2D();
@@ -1864,151 +1864,92 @@ function createTideGraph(data, sun) {
   const graphPath = buildPath();
 
   // =====================================================
-  // 日の出・日の入り
+  // 日の出・日の入り位置
   // =====================================================
   const sunriseX = sun?.sunrise != null ? (sun.sunrise / 1440) * w : 0;
   const sunsetX  = sun?.sunset  != null ? (sun.sunset  / 1440) * w : w;
 
   const nightColor = "rgba(0,0,0,0.5)";
-  const dayColor   = "rgba(255, 220, 150, 0.08)";
+  const dayAlpha   = 0.06; // ←ここ重要（強すぎると不自然）
 
   // =====================================================
-  // ★重要：線の下だけを3分割して塗る
+  // ★① ベース：全部「夜」
   // =====================================================
-
-  // 左（夜）
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, 0, sunriseX, h);
-  ctx.clip();
-
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
-  ctx.restore();
 
-  // 中（昼）
+  // =====================================================
+  // ★② 昼を「透明度グラデーション」で重ねる
+  // =====================================================
+  const fade = 25; // ←自然さのコアパラメータ
+
+  const grad = ctx.createLinearGradient(0, 0, w, 0);
+
+  // 左の夜
+  grad.addColorStop(0, `rgba(255,220,150,0)`);
+
+  // 日の出フェード
+  grad.addColorStop(Math.max(0, (sunriseX - fade) / w), `rgba(255,220,150,0)`);
+  grad.addColorStop(Math.min(1, sunriseX / w), `rgba(255,220,150,${dayAlpha})`);
+
+  // 昼維持
+  grad.addColorStop(Math.min(1, sunsetX / w), `rgba(255,220,150,${dayAlpha})`);
+
+  // 日の入りフェード
+  grad.addColorStop(Math.min(1, (sunsetX + fade) / w), `rgba(255,220,150,0)`);
+
+  // 右の夜
+  grad.addColorStop(1, `rgba(255,220,150,0)`);
+
   ctx.save();
-  ctx.beginPath();
-  ctx.rect(sunriseX, 0, sunsetX - sunriseX, h);
-  ctx.clip();
-
-  ctx.fillStyle = dayColor;
+  ctx.fillStyle = grad;
   ctx.fill(graphPath);
   ctx.restore();
 
-  // 右（夜）
-  ctx.save();
+  // =====================================================
+  // グラフ線
+  // =====================================================
   ctx.beginPath();
-  ctx.rect(sunsetX, 0, w - sunsetX, h);
-  ctx.clip();
 
-  ctx.fillStyle = nightColor;
-  ctx.fill(graphPath);
-  ctx.restore();
+  for (let i = 0; i < data.length; i++) {
 
-// =====================================================
-// グラフ線（発光版）
-// =====================================================
-ctx.beginPath();
+    const x = i * stepX;
 
-for (let i = 0; i < data.length; i++) {
+    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+    const y = scaleY(v);
 
-  const x = i * stepX;
+    if (i === 0) {
+      ctx.moveTo(x, y);
+      continue;
+    }
 
-  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-  const y = scaleY(v);
+    const prevX = (i - 1) * stepX;
+    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+    const prevY = scaleY(prevV);
 
-  if (i === 0) {
-    ctx.moveTo(x, y);
-    continue;
+    const midX = (prevX + x) / 2;
+    const midY = (prevY + y) / 2;
+
+    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
   }
 
-  const prevX = (i - 1) * stepX;
-  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-  const prevY = scaleY(prevV);
+  const last = data.length - 1;
+  const lx = last * stepX;
+  const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
-  const midX = (prevX + x) / 2;
-  const midY = (prevY + y) / 2;
+  ctx.lineTo(lx, ly);
 
-  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
-}
+  // 下地
+  ctx.strokeStyle = "rgba(255,255,255,0.35)";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
 
-const last = data.length - 1;
-const lx = last * stepX;
-const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
-
-ctx.lineTo(lx, ly);
-
-
-// =====================================================
-// ★視認性レイヤー（白の下地）
-// =====================================================
-ctx.strokeStyle = "rgba(255,255,255,0.35)";
-ctx.lineWidth = 2.5;
-ctx.lineJoin = "round";
-ctx.lineCap = "round";
-ctx.stroke();
-
-// =====================================================
-// ★日の出・日の入り グラデーションライン
-// =====================================================
-const fadeWidth = 6; // ★フェードの幅（px）
-
-// ■ 日の出（夜 → 昼）
-if (sunriseX > 0) {
-  const grad = ctx.createLinearGradient(
-    sunriseX - fadeWidth,
-    0,
-    sunriseX + fadeWidth,
-    0
-  );
-
-  grad.addColorStop(0, "rgba(0,0,0,0.5)");
-  grad.addColorStop(0.5, "rgba(255,220,150,0.08)");
-  grad.addColorStop(1, "rgba(255,220,150,0.08)");
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(sunriseX - fadeWidth, 0, fadeWidth * 2, h);
-  ctx.clip();
-
-  ctx.fillStyle = grad;
-  ctx.fill(graphPath);
-  ctx.restore();
-}
-
-// ■ 日の入り（昼 → 夜）
-if (sunsetX < w) {
-  const grad = ctx.createLinearGradient(
-    sunsetX - fadeWidth,
-    0,
-    sunsetX + fadeWidth,
-    0
-  );
-
-  grad.addColorStop(0, "rgba(255,220,150,0.08)");
-  grad.addColorStop(0.5, "rgba(0,0,0,0.5)");
-  grad.addColorStop(1, "rgba(0,0,0,0.5)");
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(sunsetX - fadeWidth, 0, fadeWidth * 2, h);
-  ctx.clip();
-
-  ctx.fillStyle = grad;
-  ctx.fill(graphPath);
-  ctx.restore();
-}
-
-// =====================================================
-// ★本線
-// =====================================================
-ctx.strokeStyle = "#191970";
-ctx.lineWidth = 1.2;
-ctx.stroke();
-
-
-
+  // 本線
+  ctx.strokeStyle = "#191970";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
 }
 
 function resetSpotLayers() {
