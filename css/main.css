@@ -1,84 +1,4 @@
 
-/* =========================
-   エリアガイド全体
-========================= */
-#area-guide {
-  padding: 16px;
-  background: #fff;
-}
-
-#area-guide h1 {
-    color: #191970;
-  font-size: 18px;
-  margin-bottom: 12px;
-}
-
-/* =========================
-   各エリア
-========================= */
-.area {
-  border-bottom: 1px solid #ddd;
-  padding: 12px 0;
-  transition: all 0.25s ease;
-}
-
-/* タイトル */
-.area h2 {
-    color: #191970;
-  font-size: 16px;
-  margin: 0;
-  cursor: pointer;
-}
-
-/* =========================
-   本文 共通
-========================= */
-.area .text {
-  font-size: 14px;
-  margin-top: 8px;
-  line-height: 1.6;
-
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.2s ease;
-}
-
-
-/* 半開き時だけフェードを乗せる */
-#area-guide.collapsed-mode .area .text {
-  position: relative;
-  max-height: 48px;
-  opacity: 0.8;
-}
-
-/* フェード部分 */
-#area-guide.collapsed-mode .area .text::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 24px;
-
-  /* 背景と同じ色でフェード */
-  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
-}
-
-/* =========================
-   選択中モード
-========================= */
-
-/* 選択対象 → 全開 */
-#area-guide.active-mode .area.active .text {
-  max-height: 500px;
-  opacity: 1;
-}
-
-/* 選択外 → 完全に閉じる */
-#area-guide.active-mode .area:not(.active) .text {
-  max-height: 0;
-  opacity: 0;
-  margin-top: 0;
-}
 
 /* =======================
    ヘッダー全体
@@ -119,64 +39,6 @@ header {
   font-size:0.8rem;
 }
 
-/* =======================
-   アコーディオン
-======================= */
-.accordion-wrapper {
-  position:relative;
-  z-index: 2600;
-}
-
-.accordion-btn {
-  background:none;
-  border:none;
-  font-size:0.8rem;
-  color:#191970;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-}
-
-.accordion-panel {
-  display:none;
-  position:absolute;
-  top:30px;
-  left:0;
-  background:#f9f9f9;
-  border:1px solid #ddd;
-  border-radius:4px;
-  padding:8px;
-  min-width:150px;
-}
-
-/* =======================
-   登録地点
-======================= */
-.location-list {
-  list-style:none;
-  padding:0;
-  margin:0;
-}
-
-.location-list li {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:3px 0;
-  font-size:14px;
-}
-
-.delete-btn {
-  background:none;
-  border:none;
-  cursor:pointer;
-  color:#c00;
-}
-
-.location-none {
-  color:#888;
-  font-style:italic;
-}
 
 /* =======================
    ニュースオーバーレイ
@@ -450,6 +312,166 @@ li {
     cursor: pointer;
 }
 
+
+/* =========================
+   エリアガイド全体
+========================= */
+#area-guide {
+  padding: 16px;
+  background: #fff;
+}
+
+#area-guide h1 {
+    color: #191970;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* =========================
+   各エリア
+========================= */
+.area {
+  border-bottom: 1px solid #ddd;
+  padding: 12px 0;
+  transition: all 0.25s ease;
+}
+
+/* タイトル */
+.area h2 {
+    color: #191970;
+  font-size: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* =========================
+   本文 共通
+========================= */
+.area .text {
+  font-size: 14px;
+  margin-top: 8px;
+  line-height: 1.6;
+
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.2s ease;
+}
+
+
+/* 半開き時だけフェードを乗せる */
+#area-guide.collapsed-mode .area .text {
+  position: relative;
+  max-height: 48px;
+  opacity: 0.8;
+}
+
+/* フェード部分 */
+#area-guide.collapsed-mode .area .text::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 24px;
+
+  /* 背景と同じ色でフェード */
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
+}
+
+/* =========================
+   選択中モード
+========================= */
+
+/* 選択対象 → 全開 */
+#area-guide.active-mode .area.active .text {
+  max-height: 500px;
+  opacity: 1;
+}
+
+/* 選択外 → 完全に閉じる */
+#area-guide.active-mode .area:not(.active) .text {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+}
+
+
+/* =========================
+   フッター
+========================= */
+
+.site-footer {
+  text-align: center;
+  padding: 10px 10px;
+  font-size: 12px;
+  color: #191970;
+  cursor: pointer;
+  user-select: none;
+}
+
+.site-footer:active {
+  background: #f0f0f0;
+}
+/* =========================
+   モーダル（サイトポリシー）
+========================= */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+ overflow: hidden;
+}
+
+.modal-content {
+  width: min(90vw, 700px);
+  margin: 5vh auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+
+}
+/* ========================
+   ポリシー本文
+========================= */
+
+.modal-content h1 {
+      text-align: center;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.modal-content h2 {
+  font-size:12px;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+.modal-content p {
+  font-size: 12px;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+/* =========================
+   レスポンシブ
+========================= */
+
+@media (max-width: 600px) {
+  .modal-content {
+    margin: 5vh 5vw;
+    padding: 16px;
+  }
+
+  .policy-link {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
 /* =========================
    Leaflet
 ========================= */
@@ -487,7 +509,7 @@ li {
    AD
 ========================= */
 .ad-box {
-  display: none;
+  display: flex;
   width: 320px;
   height: 50px;
   background: rgba(255, 255, 255, 0.9);
@@ -564,7 +586,7 @@ li {
 }
 
 .map-ui-sub2 {
-  display: none;
+  display: block;
   height: 20px;
   line-height: 20px;
   box-sizing: border-box;
@@ -776,109 +798,6 @@ li {
 }
 
 
-/* =========================
-   フッター
-========================= */
-
-.site-footer {
-  text-align: center;
-  padding: 10px 10px;
-  font-size: 12px;
-  color: #191970;
-  cursor: pointer;
-  user-select: none;
-}
-
-.site-footer:active {
-  background: #f0f0f0;
-}
-/* =========================
-
-   モーダル（サイトポリシー）
-
-========================= */
-
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 9999;
- overflow: hidden;
-}
-
-.modal-content {
-
-  width: min(90vw, 700px);
-
-  margin: 5vh auto;
-
-  padding: 10px;
-
-  border-radius: 8px;
-  background: #fff;
-  box-sizing: border-box;
-  overflow-wrap: anywhere;
-
-}
-/* =========================
-
-   ポリシー本文
-
-========================= */
-
-.modal-content h1 {
-      text-align: center;
-  font-size: 12px;
-  margin-bottom: 16px;
-
-}
-
-.modal-content h2 {
-
-  font-size:12px;
-
-  margin-top: 16px;
-
-  margin-bottom: 6px;
-
-}
-
-.modal-content p {
-
-  font-size: 12px;
-
-  margin-bottom: 10px;
-
-  color: #444;
-
-}
-
-/* =========================
-
-   レスポンシブ
-
-========================= */
-
-@media (max-width: 600px) {
-
-  .modal-content {
-
-    margin: 5vh 5vw;
-
-    padding: 16px;
-
-  }
-
-  .policy-link {
-
-    padding: 10px 16px;
-
-    font-size: 14px;
-
-  }
-
-}
 
 
 
