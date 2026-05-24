@@ -202,14 +202,10 @@ function toMinutes(v) {
     // 数値文字列
     if (!isNaN(v)) return Number(v);
 
-    // ★ JST前提 → 文字列は直接パース
-
-    if (typeof v === "string" && v.includes(":")) {
-
-        const [h, m] = v.split(":").map(Number);
-
-        return h * 60 + m;
-
+    // ISO or Date文字列
+    const d = new Date(v);
+    if (!isNaN(d.getTime())) {
+        return d.getHours() * 60 + d.getMinutes();
     }
 
     return 0;
