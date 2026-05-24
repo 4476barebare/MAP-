@@ -1878,33 +1878,37 @@ function createTideGraph(data, sun) {
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
 
-  // =====================================================
-  // ★② 昼を「透明度グラデーション」で重ねる
-  // =====================================================
-  const fade = 25; // ←自然さのコアパラメータ
+// =====================================================
+// ★② 昼グラデーション（安定版）
+// =====================================================
+const fade = 25;
+const dayAlpha = 0.06;
 
-  const grad = ctx.createLinearGradient(0, 0, w, 0);
+const safe = v => Math.max(0, Math.min(1, v));
 
-  // 左の夜
-  grad.addColorStop(0, `rgba(255,220,150,0)`);
+const s0 = safe((sunriseX - fade) / w);
+const s1 = safe(sunriseX / w);
+const s2 = safe(sunsetX / w);
+const s3 = safe((sunsetX + fade) / w);
 
-  // 日の出フェード
-  grad.addColorStop(Math.max(0, (sunriseX - fade) / w), `rgba(255,220,150,0)`);
-  grad.addColorStop(Math.min(1, sunriseX / w), `rgba(255,220,150,${dayAlpha})`);
+// 順序保証（これが重要）
+if (s1 <= s0) s1 = s0 + 0.001;
+if (s2 <= s1) s2 = s1 + 0.001;
+if (s3 <= s2) s3 = s2 + 0.001;
 
-  // 昼維持
-  grad.addColorStop(Math.min(1, sunsetX / w), `rgba(255,220,150,${dayAlpha})`);
+const grad = ctx.createLinearGradient(0, 0, w, 0);
 
-  // 日の入りフェード
-  grad.addColorStop(Math.min(1, (sunsetX + fade) / w), `rgba(255,220,150,0)`);
+grad.addColorStop(0, `rgba(255,220,150,0)`);
+grad.addColorStop(s0, `rgba(255,220,150,0)`);
+grad.addColorStop(s1, `rgba(255,220,150,${dayAlpha})`);
+grad.addColorStop(s2, `rgba(255,220,150,${dayAlpha})`);
+grad.addColorStop(s3, `rgba(255,220,150,0)`);
+grad.addColorStop(1, `rgba(255,220,150,0)`);
 
-  // 右の夜
-  grad.addColorStop(1, `rgba(255,220,150,0)`);
-
-  ctx.save();
-  ctx.fillStyle = grad;
-  ctx.fill(graphPath);
-  ctx.restore();
+ctx.save();
+ctx.fillStyle = grad;
+ctx.fill(graphPath);
+ctx.restore();
 
   // =====================================================
   // グラフ線
