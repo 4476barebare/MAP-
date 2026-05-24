@@ -91,7 +91,7 @@ header {
   border-radius: 4px;
   overflow: hidden;
   position: relative;
-  margin-top: 30px;  /* ボタン高さ＋余裕 */
+  margin-top: 10px;  /* ボタン高さ＋余裕 */
 }
 
 
@@ -509,7 +509,7 @@ li {
    AD
 ========================= */
 .ad-box {
-  display: flex;
+  display: none;
   width: 320px;
   height: 50px;
   background: rgba(255, 255, 255, 0.9);
@@ -586,7 +586,7 @@ li {
 }
 
 .map-ui-sub2 {
-  display: block;
+  display: none;
   height: 20px;
   line-height: 20px;
   box-sizing: border-box;
