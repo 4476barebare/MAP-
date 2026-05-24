@@ -1878,36 +1878,56 @@ function createTideGraph(data, sun) {
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
 
-  // =====================================================
-  // ★昼グラデーション（安全版）
-  // =====================================================
-  const fade = 25;
+// =====================================================
+// ★境界フェード（自然版）
+// =====================================================
+const fade = 16;
 
-  const clamp = v => Math.max(0, Math.min(1, v));
+// -------- 日の出（夜 → 昼）
+if (sunriseX > 0 && sunriseX < w) {
 
-  let s0 = clamp((sunriseX - fade) / w);
-  let s1 = clamp(sunriseX / w);
-  let s2 = clamp(sunsetX / w);
-  let s3 = clamp((sunsetX + fade) / w);
+  const g = ctx.createLinearGradient(
+    sunriseX - fade, 0,
+    sunriseX + fade, 0
+  );
 
-  // 順序保証（重要）
-  if (s1 <= s0) s1 = s0 + 0.001;
-  if (s2 <= s1) s2 = s1 + 0.001;
-  if (s3 <= s2) s3 = s2 + 0.001;
-
-  const grad = ctx.createLinearGradient(0, 0, w, 0);
-
-  grad.addColorStop(0, `rgba(255,220,150,0)`);
-  grad.addColorStop(s0, `rgba(255,220,150,0)`);
-  grad.addColorStop(s1, `rgba(255,220,150,${dayAlpha})`);
-  grad.addColorStop(s2, `rgba(255,220,150,${dayAlpha})`);
-  grad.addColorStop(s3, `rgba(255,220,150,0)`);
-  grad.addColorStop(1, `rgba(255,220,150,0)`);
+  // 夜 → 透明 → 昼
+  g.addColorStop(0,   "rgba(0,0,0,0.5)");
+  g.addColorStop(0.5, "rgba(0,0,0,0)");
+  g.addColorStop(1,   "rgba(255,220,150,0.08)");
 
   ctx.save();
-  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.rect(sunriseX - fade, 0, fade * 2, h);
+  ctx.clip();
+
+  ctx.fillStyle = g;
   ctx.fill(graphPath);
   ctx.restore();
+}
+
+// -------- 日の入り（昼 → 夜）
+if (sunsetX > 0 && sunsetX < w) {
+
+  const g = ctx.createLinearGradient(
+    sunsetX - fade, 0,
+    sunsetX + fade, 0
+  );
+
+  // 昼 → 透明 → 夜
+  g.addColorStop(0,   "rgba(255,220,150,0.08)");
+  g.addColorStop(0.5, "rgba(0,0,0,0)");
+  g.addColorStop(1,   "rgba(0,0,0,0.5)");
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sunsetX - fade, 0, fade * 2, h);
+  ctx.clip();
+
+  ctx.fillStyle = g;
+  ctx.fill(graphPath);
+  ctx.restore();
+}
 
   // =====================================================
   // グラフ線
