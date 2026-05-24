@@ -451,8 +451,16 @@ if (calendarBtn && calendarOverlay && calendarWrapper) {
     });
   });
 
-calendarOverlay.addEventListener("click", (e) => {
-  if (!e.target.closest(".overlay-content")) {
+calendarOverlay.addEventListener("mousedown", (e) => {
+  const rect = calendarWrapper.getBoundingClientRect();
+
+  const inside =
+    e.clientX >= rect.left &&
+    e.clientX <= rect.right &&
+    e.clientY >= rect.top &&
+    e.clientY <= rect.bottom;
+
+  if (!inside) {
     calendarOverlay.style.display = "none";
   }
 });
