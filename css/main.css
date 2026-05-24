@@ -85,13 +85,13 @@ header {
 
 /* 中身 */
 .overlay-content {
-  width: 95%;
-  height: 90%;
+  width: 92%;  /* 少し小さく */
+  height: 88%;
   background: transparent;
   border-radius: 4px;
   overflow: hidden;
   position: relative;
-  padding-top: 30px; /* ボタン高さ＋余裕 */
+  margin-top: 30px;  /* ボタン高さ＋余裕 */
 }
 
 
