@@ -1878,12 +1878,13 @@ function createTideGraph(data, sun) {
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
 
-// =====================================================
-// ★境界フェード（自然版）
-// =====================================================
-const fade = 16;
 
-// -------- 日の出（夜 → 昼）
+// =====================================================
+// ★境界フェード（自然版：黒を抜く）
+// =====================================================
+const fade = 20;
+
+// ---------- 日の出（夜を薄くする）
 if (sunriseX > 0 && sunriseX < w) {
 
   const g = ctx.createLinearGradient(
@@ -1891,22 +1892,20 @@ if (sunriseX > 0 && sunriseX < w) {
     sunriseX + fade, 0
   );
 
-  // 夜 → 透明 → 昼
+  // 黒 → 透明（＝昼を見せる）
   g.addColorStop(0,   "rgba(0,0,0,0.5)");
-  g.addColorStop(0.5, "rgba(0,0,0,0)");
-  g.addColorStop(1,   "rgba(255,220,150,0.08)");
+  g.addColorStop(1,   "rgba(0,0,0,0)");
 
   ctx.save();
+  ctx.globalCompositeOperation = "destination-out"; // ★ここ重要
   ctx.beginPath();
   ctx.rect(sunriseX - fade, 0, fade * 2, h);
-  ctx.clip();
-
   ctx.fillStyle = g;
-  ctx.fill(graphPath);
+  ctx.fill();
   ctx.restore();
 }
 
-// -------- 日の入り（昼 → 夜）
+// ---------- 日の入り（同じく夜を抜く）
 if (sunsetX > 0 && sunsetX < w) {
 
   const g = ctx.createLinearGradient(
@@ -1914,18 +1913,15 @@ if (sunsetX > 0 && sunsetX < w) {
     sunsetX + fade, 0
   );
 
-  // 昼 → 透明 → 夜
-  g.addColorStop(0,   "rgba(255,220,150,0.08)");
-  g.addColorStop(0.5, "rgba(0,0,0,0)");
-  g.addColorStop(1,   "rgba(0,0,0,0.5)");
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(1, "rgba(0,0,0,0.5)");
 
   ctx.save();
+  ctx.globalCompositeOperation = "destination-out";
   ctx.beginPath();
   ctx.rect(sunsetX - fade, 0, fade * 2, h);
-  ctx.clip();
-
   ctx.fillStyle = g;
-  ctx.fill(graphPath);
+  ctx.fill();
   ctx.restore();
 }
 
