@@ -1950,11 +1950,65 @@ ctx.lineCap = "round";
 ctx.stroke();
 
 // =====================================================
+// ★日の出・日の入り グラデーションライン
+// =====================================================
+const fadeWidth = 20; // ★フェードの幅（px）
+
+// ■ 日の出（夜 → 昼）
+if (sunriseX > 0) {
+  const grad = ctx.createLinearGradient(
+    sunriseX - fadeWidth,
+    0,
+    sunriseX + fadeWidth,
+    0
+  );
+
+  grad.addColorStop(0, "rgba(0,0,0,0.5)");
+  grad.addColorStop(0.5, "rgba(255,220,150,0.08)");
+  grad.addColorStop(1, "rgba(255,220,150,0.08)");
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sunriseX - fadeWidth, 0, fadeWidth * 2, h);
+  ctx.clip();
+
+  ctx.fillStyle = grad;
+  ctx.fill(graphPath);
+  ctx.restore();
+}
+
+// ■ 日の入り（昼 → 夜）
+if (sunsetX < w) {
+  const grad = ctx.createLinearGradient(
+    sunsetX - fadeWidth,
+    0,
+    sunsetX + fadeWidth,
+    0
+  );
+
+  grad.addColorStop(0, "rgba(255,220,150,0.08)");
+  grad.addColorStop(0.5, "rgba(0,0,0,0.5)");
+  grad.addColorStop(1, "rgba(0,0,0,0.5)");
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sunsetX - fadeWidth, 0, fadeWidth * 2, h);
+  ctx.clip();
+
+  ctx.fillStyle = grad;
+  ctx.fill(graphPath);
+  ctx.restore();
+}
+
+// =====================================================
 // ★本線
 // =====================================================
 ctx.strokeStyle = "#191970";
 ctx.lineWidth = 1.2;
 ctx.stroke();
+
+
+
 }
 
 function resetSpotLayers() {
