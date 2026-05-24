@@ -564,12 +564,13 @@ li {
 }
 
 .map-ui-sub2 {
+  position: absolute;
   display: block;
   height: 20px;
   box-sizing: border-box;
   max-width: 70vw;
   min-width: 100px;
-  padding: 0px 8px;
+  padding: 3px 8px;
   margin-left: 24px;
   font-size: 14px;
   color: #fff;
