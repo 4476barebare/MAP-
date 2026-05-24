@@ -1864,51 +1864,50 @@ function createTideGraph(data, sun) {
   const graphPath = buildPath();
 
   // =====================================================
-  // 日の出・日の入り位置
+  // 日の出・日の入り
   // =====================================================
   const sunriseX = sun?.sunrise != null ? (sun.sunrise / 1440) * w : 0;
   const sunsetX  = sun?.sunset  != null ? (sun.sunset  / 1440) * w : w;
 
   const nightColor = "rgba(0,0,0,0.5)";
-  const dayAlpha   = 0.06; // ←ここ重要（強すぎると不自然）
+  const dayAlpha = 0.06;
 
   // =====================================================
-  // ★① ベース：全部「夜」
+  // ★ベース：夜
   // =====================================================
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
 
-// =====================================================
-// ★② 昼グラデーション（安定版）
-// =====================================================
-const fade = 25;
-const dayAlpha = 0.06;
+  // =====================================================
+  // ★昼グラデーション（安全版）
+  // =====================================================
+  const fade = 25;
 
-const safe = v => Math.max(0, Math.min(1, v));
+  const clamp = v => Math.max(0, Math.min(1, v));
 
-const s0 = safe((sunriseX - fade) / w);
-const s1 = safe(sunriseX / w);
-const s2 = safe(sunsetX / w);
-const s3 = safe((sunsetX + fade) / w);
+  let s0 = clamp((sunriseX - fade) / w);
+  let s1 = clamp(sunriseX / w);
+  let s2 = clamp(sunsetX / w);
+  let s3 = clamp((sunsetX + fade) / w);
 
-// 順序保証（これが重要）
-if (s1 <= s0) s1 = s0 + 0.001;
-if (s2 <= s1) s2 = s1 + 0.001;
-if (s3 <= s2) s3 = s2 + 0.001;
+  // 順序保証（重要）
+  if (s1 <= s0) s1 = s0 + 0.001;
+  if (s2 <= s1) s2 = s1 + 0.001;
+  if (s3 <= s2) s3 = s2 + 0.001;
 
-const grad = ctx.createLinearGradient(0, 0, w, 0);
+  const grad = ctx.createLinearGradient(0, 0, w, 0);
 
-grad.addColorStop(0, `rgba(255,220,150,0)`);
-grad.addColorStop(s0, `rgba(255,220,150,0)`);
-grad.addColorStop(s1, `rgba(255,220,150,${dayAlpha})`);
-grad.addColorStop(s2, `rgba(255,220,150,${dayAlpha})`);
-grad.addColorStop(s3, `rgba(255,220,150,0)`);
-grad.addColorStop(1, `rgba(255,220,150,0)`);
+  grad.addColorStop(0, `rgba(255,220,150,0)`);
+  grad.addColorStop(s0, `rgba(255,220,150,0)`);
+  grad.addColorStop(s1, `rgba(255,220,150,${dayAlpha})`);
+  grad.addColorStop(s2, `rgba(255,220,150,${dayAlpha})`);
+  grad.addColorStop(s3, `rgba(255,220,150,0)`);
+  grad.addColorStop(1, `rgba(255,220,150,0)`);
 
-ctx.save();
-ctx.fillStyle = grad;
-ctx.fill(graphPath);
-ctx.restore();
+  ctx.save();
+  ctx.fillStyle = grad;
+  ctx.fill(graphPath);
+  ctx.restore();
 
   // =====================================================
   // グラフ線
