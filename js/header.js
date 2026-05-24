@@ -292,7 +292,6 @@ if (newsLink && newsModal) {
 
 const calendarBtn = document.getElementById("calendarBtn");
 const calendarOverlay = document.getElementById("calendarOverlay");
-const closeCalendar = document.getElementById("closeCalendar");
 const calendarWrapper = document.getElementById("calendarWrapper");
 
 function pad(n){ return n.toString().padStart(2,"0"); }
@@ -435,7 +434,7 @@ function renderCalendar(year, month) {
     createMonth(year, month + 1);
 }
 
-if (calendarBtn && calendarOverlay && closeCalendar && calendarWrapper) {
+if (calendarBtn && calendarOverlay && calendarWrapper) {
 
   const today = new Date();
   const baseYear = today.getFullYear();
@@ -452,15 +451,15 @@ if (calendarBtn && calendarOverlay && closeCalendar && calendarWrapper) {
     });
   });
 
-  closeCalendar.addEventListener("click", () => {
-    calendarOverlay.style.display = "none";
-  });
-
   calendarOverlay.addEventListener("click", (e) => {
     if (e.target === calendarOverlay) {
       calendarOverlay.style.display = "none";
     }
   });
+  
+  calendarWrapper.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
 }
 
 });
