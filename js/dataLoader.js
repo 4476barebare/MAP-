@@ -1786,9 +1786,7 @@ function createTideGraph(data, sun) {
   const wrapper = document.querySelector(".tide-wrapper");
   const ctx = canvas.getContext("2d");
 
-  if (wrapper) {
-    wrapper.style.display = "block";
-  }
+  if (wrapper) wrapper.style.display = "block";
 
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
@@ -1820,99 +1818,136 @@ function createTideGraph(data, sun) {
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
   // ============================
-  // ★描画レンジ再定義（核心）
+  // 描画レンジ（中央〜中央）
   // ============================
   const cellWidth = w / 24;
   const drawStart = cellWidth / 2;
   const drawWidth = w - cellWidth;
 
-  const stepX = drawWidth / (data.length - 1);
+  // 時間→X変換
+  const toX = (minutes) =>
+    drawStart + (minutes / 1440) * drawWidth;
+
+  // dataが単なる配列前提
+  const minutePerStep = 1440 / (data.length - 1);
 
   // =====================================================
-  // グラフパス生成
+  // パス生成
   // =====================================================
-  const buildPath = () => {
-    const path = new Path2D();
+  const path = new Path2D();
 
-    for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < data.length; i++) {
 
-      const x = drawStart + i * stepX;
+    const minutes = i * minutePerStep;
+    const x = toX(minutes);
 
-      const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-      const y = scaleY(v);
+    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+    const y = scaleY(v);
 
-      if (i === 0) {
-        path.moveTo(x, y);
-        continue;
-      }
-
-      const prevX = drawStart + (i - 1) * stepX;
-      const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-      const prevY = scaleY(prevV);
-
-      const midX = (prevX + x) / 2;
-      const midY = (prevY + y) / 2;
-
-      path.quadraticCurveTo(prevX, prevY, midX, midY);
+    if (i === 0) {
+      path.moveTo(x, y);
+      continue;
     }
 
-    const last = data.length - 1;
-    const lx = drawStart + last * stepX;
-    const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
+    const prevMinutes = (i - 1) * minutePerStep;
+    const prevX = toX(prevMinutes);
 
-    path.lineTo(lx, ly);
+    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+    const prevY = scaleY(prevV);
 
-    // ★閉じる範囲もdrawStart基準
-    path.lineTo(drawStart + drawWidth, h);
-    path.lineTo(drawStart, h);
+    const midX = (prevX + x) / 2;
+    const midY = (prevY + y) / 2;
 
-    path.closePath();
+    path.quadraticCurveTo(prevX, prevY, midX, midY);
+  }
 
-    return path;
-  };
+  const lastMin = 1440;
+  const lx = toX(lastMin);
+  const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[data.length - 1])));
 
-  const graphPath = buildPath();
+  path.lineTo(lx, ly);
+  path.lineTo(drawStart + drawWidth, h);
+  path.lineTo(drawStart, h);
+  path.closePath();
 
   // =====================================================
-  // 日の出・日の入り（同じレンジに乗せる）
+  // 日の出日の入り
   // =====================================================
-  const sunriseX = sun?.sunrise != null
-    ? drawStart + (sun.sunrise / 1440) * drawWidth
-    : 0;
-
-  const sunsetX = sun?.sunset != null
-    ? drawStart + (sun.sunset / 1440) * drawWidth
-    : w;
+  const sunriseX = sun?.sunrise != null ? toX(sun.sunrise) : 0;
+  const sunsetX  = sun?.sunset  != null ? toX(sun.sunset)  : w;
 
   const nightColor = "rgba(0,0,0,0.5)";
-  const dayColor   = "rgba(255, 220, 150, 0.08)";
+  const dayColor   = "rgba(255,220,150,0.08)";
+
+  const fade = cellWidth;
 
   // =====================================================
-  // 塗り分け
+  // 塗り（夜）
   // =====================================================
-
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, sunriseX, h);
   ctx.clip();
   ctx.fillStyle = nightColor;
-  ctx.fill(graphPath);
+  ctx.fill(path);
   ctx.restore();
 
+  // =====================================================
+  // 塗り（昼）
+  // =====================================================
   ctx.save();
   ctx.beginPath();
   ctx.rect(sunriseX, 0, sunsetX - sunriseX, h);
   ctx.clip();
   ctx.fillStyle = dayColor;
-  ctx.fill(graphPath);
+  ctx.fill(path);
   ctx.restore();
 
+  // =====================================================
+  // 塗り（夜）
+  // =====================================================
   ctx.save();
   ctx.beginPath();
   ctx.rect(sunsetX, 0, w - sunsetX, h);
   ctx.clip();
   ctx.fillStyle = nightColor;
-  ctx.fill(graphPath);
+  ctx.fill(path);
+  ctx.restore();
+
+  // =====================================================
+  // フェード（左）
+  // =====================================================
+  const gradLeft = ctx.createLinearGradient(
+    sunriseX - fade, 0,
+    sunriseX + fade, 0
+  );
+  gradLeft.addColorStop(0, nightColor);
+  gradLeft.addColorStop(1, dayColor);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sunriseX - fade, 0, fade * 2, h);
+  ctx.clip();
+  ctx.fillStyle = gradLeft;
+  ctx.fill(path);
+  ctx.restore();
+
+  // =====================================================
+  // フェード（右）
+  // =====================================================
+  const gradRight = ctx.createLinearGradient(
+    sunsetX - fade, 0,
+    sunsetX + fade, 0
+  );
+  gradRight.addColorStop(0, dayColor);
+  gradRight.addColorStop(1, nightColor);
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(sunsetX - fade, 0, fade * 2, h);
+  ctx.clip();
+  ctx.fillStyle = gradRight;
+  ctx.fill(path);
   ctx.restore();
 
   // =====================================================
@@ -1922,7 +1957,8 @@ function createTideGraph(data, sun) {
 
   for (let i = 0; i < data.length; i++) {
 
-    const x = drawStart + i * stepX;
+    const minutes = i * minutePerStep;
+    const x = toX(minutes);
 
     const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
     const y = scaleY(v);
@@ -1932,7 +1968,9 @@ function createTideGraph(data, sun) {
       continue;
     }
 
-    const prevX = drawStart + (i - 1) * stepX;
+    const prevMinutes = (i - 1) * minutePerStep;
+    const prevX = toX(prevMinutes);
+
     const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
     const prevY = scaleY(prevV);
 
@@ -1941,12 +1979,6 @@ function createTideGraph(data, sun) {
 
     ctx.quadraticCurveTo(prevX, prevY, midX, midY);
   }
-
-  const last = data.length - 1;
-  const lx = drawStart + last * stepX;
-  const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
-
-  ctx.lineTo(lx, ly);
 
   ctx.strokeStyle = "rgba(255,255,255,0.35)";
   ctx.lineWidth = 2.5;
