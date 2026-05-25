@@ -1956,8 +1956,8 @@ const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[last])));
 
 ctx.lineTo(lx, ly);
 
-// ★ 0.5セル分フェード
-const fade = (stepX / 2) / w;
+const fadeCell = 1.5; // ← フェードを何セル分にするか
+const fade = (stepX * fadeCell) / w;
 
 // グラデーション（透明→表示→透明）
 const grad = ctx.createLinearGradient(0, 0, w, 0);
