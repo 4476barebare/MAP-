@@ -1819,19 +1819,16 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-// ============================
-// ★描画レンジ（これが本質）
-// ============================
-const cellWidth = w / 24;
+  // ============================
+  // ★描画レンジ（統一版）
+  // ============================
+  const cellWidth = w / 24;
 
-// ★開始をセル中心へ
-const drawStart = cellWidth / 2;
+  const drawStart = cellWidth / 2;
+  const drawEnd = w - cellWidth / 2;
 
-// ★終了もセル中心で止める
-const drawEnd = w - cellWidth / 2;
+  const stepX = (drawEnd - drawStart) / (data.length - 1);
 
-// ★レンジ全体を使って再計算
-const stepX = (drawEnd - drawStart) / (data.length - 1);
   // =====================================================
   // グラフパス生成
   // =====================================================
@@ -1840,7 +1837,7 @@ const stepX = (drawEnd - drawStart) / (data.length - 1);
 
     for (let i = 0; i < data.length; i++) {
 
-      const x = i * stepX + offset;
+      const x = drawStart + i * stepX;
 
       const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
       const y = scaleY(v);
@@ -1850,7 +1847,7 @@ const stepX = (drawEnd - drawStart) / (data.length - 1);
         continue;
       }
 
-      const prevX = (i - 1) * stepX + offset;
+      const prevX = drawStart + (i - 1) * stepX;
       const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
       const prevY = scaleY(prevV);
 
@@ -1861,13 +1858,13 @@ const stepX = (drawEnd - drawStart) / (data.length - 1);
     }
 
     const last = data.length - 1;
-    const lx = last * stepX + offset;
+    const lx = drawStart + last * stepX;
     const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
     path.lineTo(lx, ly);
 
     path.lineTo(lx, h);
-    path.lineTo(offset, h);
+    path.lineTo(drawStart, h);
 
     path.closePath();
 
@@ -1877,7 +1874,7 @@ const stepX = (drawEnd - drawStart) / (data.length - 1);
   const graphPath = buildPath();
 
   // =====================================================
-  // 日の出・日の入り（ここはそのままでOK）
+  // 日の出・日の入り
   // =====================================================
   const sunriseX = sun?.sunrise != null
     ? (sun.sunrise / 1440) * w
@@ -1924,7 +1921,7 @@ const stepX = (drawEnd - drawStart) / (data.length - 1);
 
   for (let i = 0; i < data.length; i++) {
 
-    const x = i * stepX + offset;
+    const x = drawStart + i * stepX;
 
     const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
     const y = scaleY(v);
@@ -1934,7 +1931,7 @@ const stepX = (drawEnd - drawStart) / (data.length - 1);
       continue;
     }
 
-    const prevX = (i - 1) * stepX + offset;
+    const prevX = drawStart + (i - 1) * stepX;
     const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
     const prevY = scaleY(prevV);
 
@@ -1947,7 +1944,7 @@ const stepX = (drawEnd - drawStart) / (data.length - 1);
   const last = data.length - 1;
 
   ctx.lineTo(
-    last * stepX + offset,
+    drawStart + last * stepX,
     scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])))
   );
 
