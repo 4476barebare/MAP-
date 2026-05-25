@@ -1921,6 +1921,86 @@ function createTideGraph(data, sun) {
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
   ctx.restore();
+  
+  
+  // =====================================================
+// ★線の両端フェード用マスク（0.5セル幅）
+// =====================================================
+
+// 0.5セル分の幅
+const fadeW = stepX / 2;
+
+// 一時レイヤーに線を描く
+ctx.save();
+ctx.globalCompositeOperation = "source-over";
+
+// 既存のパスをもう一度描くための関数化が理想だが、
+// ここでは現在のパスをそのまま使う前提で直前に再構築してもOK
+const strokePath = new Path2D();
+
+for (let i = 0; i < drawData.length; i++) {
+
+  const x = i * stepX;
+
+  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i]));
+  const y = scaleY(v);
+
+  if (i === 0) {
+    strokePath.moveTo(x, y);
+    continue;
+  }
+
+  const prevX = (i - 1) * stepX;
+  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i - 1]));
+  const prevY = scaleY(prevV);
+
+  const midX = (prevX + x) / 2;
+  const midY = (prevY + y) / 2;
+
+  strokePath.quadraticCurveTo(prevX, prevY, midX, midY);
+}
+
+const last = drawData.length - 1;
+const lx = last * stepX;
+const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[last])));
+strokePath.lineTo(lx, ly);
+
+// まず通常通りストローク（白下地＋本線）を描く
+ctx.lineJoin = "round";
+ctx.lineCap = "round";
+
+// 下地
+ctx.strokeStyle = "rgba(255,255,255,0.35)";
+ctx.lineWidth = 2.5;
+ctx.stroke(strokePath);
+
+// 本線
+ctx.strokeStyle = "#191970";
+ctx.lineWidth = 1.2;
+ctx.stroke(strokePath);
+
+// -----------------------------------------------------
+// マスク適用（destination-in）
+// -----------------------------------------------------
+ctx.globalCompositeOperation = "destination-in";
+
+// 左→右のアルファグラデーション
+const grad = ctx.createLinearGradient(0, 0, w, 0);
+
+// 左端フェード（0〜0.5セル）
+grad.addColorStop(0, "rgba(0,0,0,0)");
+grad.addColorStop(fadeW / w, "rgba(0,0,0,1)");
+
+// 中央は完全表示
+grad.addColorStop(1 - (fadeW / w), "rgba(0,0,0,1)");
+
+// 右端フェード
+grad.addColorStop(1, "rgba(0,0,0,0)");
+
+ctx.fillStyle = grad;
+ctx.fillRect(0, 0, w, h);
+
+ctx.restore();
 
   // =====================================================
   // グラフ線
