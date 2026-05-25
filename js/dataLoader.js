@@ -1778,7 +1778,6 @@ function createHourlyWeather(hourlyData,type) {
   root.appendChild(tableEl);
 }
 
-
 function createTideGraph(data, sun) {
 
   const canvas = document.getElementById("tideCanvas");
@@ -1808,8 +1807,24 @@ function createTideGraph(data, sun) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, w, h);
 
-  if (!data || data.length < 2) return;
+  if (!data || data.length < 3) return;
 
+  // =====================================================
+  // ★ 0番目データを外挿で補完（25点化）
+  // =====================================================
+  // 傾き：1番目 → 2番目
+  const diff = data[1] - data[2];
+
+  // その傾きをそのまま逆方向へ延長
+  // → 上昇ならさらに上昇、下降ならさらに下降
+  const pseudo0 = data[1] + diff;
+
+  // 描画用データ（元データはそのまま保持）
+  const drawData = [pseudo0, ...data];
+
+  // =====================================================
+  // スケール設定
+  // =====================================================
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
 
@@ -1820,18 +1835,20 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  const stepX = w / (data.length - 1);
+  // ★ 25点に対するstep
+  const stepX = w / (drawData.length - 1);
 
   // =====================================================
-  // グラフパス生成（共通）
+  // グラフパス生成（塗り用）
   // =====================================================
   const buildPath = () => {
     const path = new Path2D();
 
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < drawData.length; i++) {
+
       const x = i * stepX;
 
-      const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+      const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i]));
       const y = scaleY(v);
 
       if (i === 0) {
@@ -1840,18 +1857,20 @@ function createTideGraph(data, sun) {
       }
 
       const prevX = (i - 1) * stepX;
-      const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+      const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i - 1]));
       const prevY = scaleY(prevV);
 
+      // 中点補間（滑らかカーブ）
       const midX = (prevX + x) / 2;
       const midY = (prevY + y) / 2;
 
       path.quadraticCurveTo(prevX, prevY, midX, midY);
     }
 
-    const last = data.length - 1;
+    // 下側を閉じて塗りつぶし用パスにする
+    const last = drawData.length - 1;
     const lx = last * stepX;
-    const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
+    const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[last])));
 
     path.lineTo(lx, ly);
     path.lineTo(w, h);
@@ -1864,7 +1883,7 @@ function createTideGraph(data, sun) {
   const graphPath = buildPath();
 
   // =====================================================
-  // 日の出・日の入り
+  // 日の出・日の入り（時間→X座標）
   // =====================================================
   const sunriseX = sun?.sunrise != null ? (sun.sunrise / 1440) * w : 0;
   const sunsetX  = sun?.sunset  != null ? (sun.sunset  / 1440) * w : w;
@@ -1873,88 +1892,84 @@ function createTideGraph(data, sun) {
   const dayColor   = "rgba(255, 220, 150, 0.08)";
 
   // =====================================================
-  // ★重要：線の下だけを3分割して塗る
+  // 背景塗り（線の下のみ）
   // =====================================================
 
-  // 左（夜）
+  // 夜（左）
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, sunriseX, h);
   ctx.clip();
-
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
   ctx.restore();
 
-  // 中（昼）
+  // 昼
   ctx.save();
   ctx.beginPath();
   ctx.rect(sunriseX, 0, sunsetX - sunriseX, h);
   ctx.clip();
-
   ctx.fillStyle = dayColor;
   ctx.fill(graphPath);
   ctx.restore();
 
-  // 右（夜）
+  // 夜（右）
   ctx.save();
   ctx.beginPath();
   ctx.rect(sunsetX, 0, w - sunsetX, h);
   ctx.clip();
-
   ctx.fillStyle = nightColor;
   ctx.fill(graphPath);
   ctx.restore();
 
-// =====================================================
-// グラフ線（発光版）
-// =====================================================
-ctx.beginPath();
+  // =====================================================
+  // グラフ線
+  // =====================================================
+  ctx.beginPath();
 
-for (let i = 0; i < data.length; i++) {
+  for (let i = 0; i < drawData.length; i++) {
 
-  const x = i * stepX;
+    const x = i * stepX;
 
-  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-  const y = scaleY(v);
+    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i]));
+    const y = scaleY(v);
 
-  if (i === 0) {
-    ctx.moveTo(x, y);
-    continue;
+    if (i === 0) {
+      ctx.moveTo(x, y);
+      continue;
+    }
+
+    const prevX = (i - 1) * stepX;
+    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i - 1]));
+    const prevY = scaleY(prevV);
+
+    const midX = (prevX + x) / 2;
+    const midY = (prevY + y) / 2;
+
+    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
   }
 
-  const prevX = (i - 1) * stepX;
-  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-  const prevY = scaleY(prevV);
+  const last = drawData.length - 1;
+  const lx = last * stepX;
+  const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[last])));
 
-  const midX = (prevX + x) / 2;
-  const midY = (prevY + y) / 2;
+  ctx.lineTo(lx, ly);
 
-  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
-}
+  // =====================================================
+  // 下地（視認性）
+  // =====================================================
+  ctx.strokeStyle = "rgba(255,255,255,0.35)";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke();
 
-const last = data.length - 1;
-const lx = last * stepX;
-const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
-
-ctx.lineTo(lx, ly);
-
-
-// =====================================================
-// ★視認性レイヤー（白の下地）
-// =====================================================
-ctx.strokeStyle = "rgba(255,255,255,0.35)";
-ctx.lineWidth = 2.5;
-ctx.lineJoin = "round";
-ctx.lineCap = "round";
-ctx.stroke();
-
-// =====================================================
-// ★本線
-// =====================================================
-ctx.strokeStyle = "#191970";
-ctx.lineWidth = 1.2;
-ctx.stroke();
+  // =====================================================
+  // 本線
+  // =====================================================
+  ctx.strokeStyle = "#191970";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
 }
 
 function resetSpotLayers() {
