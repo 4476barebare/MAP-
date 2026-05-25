@@ -1819,11 +1819,14 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  const stepX = w / (data.length - 1);
-
-  // ★追加：1セル分のオフセット
+  // ============================
+  // ★描画レンジ再定義（核心）
+  // ============================
   const cellWidth = w / 24;
-  const offsetX = cellWidth;
+  const drawStart = cellWidth / 2;
+  const drawWidth = w - cellWidth;
+
+  const stepX = drawWidth / (data.length - 1);
 
   // =====================================================
   // グラフパス生成
@@ -1833,7 +1836,7 @@ function createTideGraph(data, sun) {
 
     for (let i = 0; i < data.length; i++) {
 
-      const x = i * stepX + offsetX;
+      const x = drawStart + i * stepX;
 
       const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
       const y = scaleY(v);
@@ -1843,7 +1846,7 @@ function createTideGraph(data, sun) {
         continue;
       }
 
-      const prevX = (i - 1) * stepX + offsetX;
+      const prevX = drawStart + (i - 1) * stepX;
       const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
       const prevY = scaleY(prevV);
 
@@ -1854,14 +1857,14 @@ function createTideGraph(data, sun) {
     }
 
     const last = data.length - 1;
-    const lx = last * stepX + offsetX;
+    const lx = drawStart + last * stepX;
     const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
     path.lineTo(lx, ly);
 
-    // ★下部閉じもオフセット考慮
-    path.lineTo(w + offsetX, h);
-    path.lineTo(offsetX, h);
+    // ★閉じる範囲もdrawStart基準
+    path.lineTo(drawStart + drawWidth, h);
+    path.lineTo(drawStart, h);
 
     path.closePath();
 
@@ -1871,10 +1874,15 @@ function createTideGraph(data, sun) {
   const graphPath = buildPath();
 
   // =====================================================
-  // 日の出・日の入り（そのままでOK）
+  // 日の出・日の入り（同じレンジに乗せる）
   // =====================================================
-  const sunriseX = sun?.sunrise != null ? (sun.sunrise / 1440) * w + offsetX : 0;
-  const sunsetX  = sun?.sunset  != null ? (sun.sunset  / 1440) * w + offsetX : w;
+  const sunriseX = sun?.sunrise != null
+    ? drawStart + (sun.sunrise / 1440) * drawWidth
+    : 0;
+
+  const sunsetX = sun?.sunset != null
+    ? drawStart + (sun.sunset / 1440) * drawWidth
+    : w;
 
   const nightColor = "rgba(0,0,0,0.5)";
   const dayColor   = "rgba(255, 220, 150, 0.08)";
@@ -1914,7 +1922,7 @@ function createTideGraph(data, sun) {
 
   for (let i = 0; i < data.length; i++) {
 
-    const x = i * stepX + offsetX;
+    const x = drawStart + i * stepX;
 
     const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
     const y = scaleY(v);
@@ -1924,7 +1932,7 @@ function createTideGraph(data, sun) {
       continue;
     }
 
-    const prevX = (i - 1) * stepX + offsetX;
+    const prevX = drawStart + (i - 1) * stepX;
     const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
     const prevY = scaleY(prevV);
 
@@ -1935,7 +1943,7 @@ function createTideGraph(data, sun) {
   }
 
   const last = data.length - 1;
-  const lx = last * stepX + offsetX;
+  const lx = drawStart + last * stepX;
   const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
   ctx.lineTo(lx, ly);
