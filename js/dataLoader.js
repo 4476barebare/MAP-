@@ -1820,14 +1820,18 @@ function createTideGraph(data, sun) {
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
 // ============================
-// ★ここだけが重要（修正版）
+// ★描画レンジ（これが本質）
 // ============================
 const cellWidth = w / 24;
 
-// ★中央ではなく右へ1セル分オフセット
-const offset = cellWidth;
+// ★開始をセル中心へ
+const drawStart = cellWidth / 2;
 
-const stepX = cellWidth; // 1時間 = 1セル
+// ★終了もセル中心で止める
+const drawEnd = w - cellWidth / 2;
+
+// ★レンジ全体を使って再計算
+const stepX = (drawEnd - drawStart) / (data.length - 1);
   // =====================================================
   // グラフパス生成
   // =====================================================
