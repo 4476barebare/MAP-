@@ -1235,6 +1235,7 @@ li {
   display: block;
   width: calc(100% * 23 / 24);
   height: 100%;
+  margin-left: auto; /* ★これ */
   pointer-events: none;
   position: relative;
   z-index: 8010;
