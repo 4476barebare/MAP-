@@ -1778,189 +1778,85 @@ function createHourlyWeather(hourlyData,type) {
   root.appendChild(tableEl);
 }
 
-function createTideGraph(data, sun) {
-
-  const canvas = document.getElementById("tideCanvas");
-  if (!canvas) return;
-
-  const wrapper = document.querySelector(".tide-wrapper");
+function drawWaveGraph(canvas, data, sunrise, sunset) {
   const ctx = canvas.getContext("2d");
 
-  if (wrapper) {
-    wrapper.style.display = "block";
-  }
+  const w = canvas.width;
+  const h = canvas.height;
 
-  const rect = canvas.getBoundingClientRect();
-  const w = rect.width;
-  const h = rect.height;
-
-  if (w === 0 || h === 0) return;
-
-  const dpr = window.devicePixelRatio || 1;
-
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
-
-  canvas.style.width = w + "px";
-  canvas.style.height = h + "px";
-
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, w, h);
 
-  if (!data || data.length < 2) return;
-
-  const MIN_LEVEL = -30;
-  const MAX_LEVEL = 170;
-
-  const SCALE = 0.7;
-  const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
-  const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
-
-  const scaleY = v =>
-    h / 2 + ((v - mid) / range) * (h * 0.7);
-
   // ============================
-  // ★描画レンジ + UI補正
+  // ★ パディング（ここが本質）
   // ============================
   const cellWidth = w / 24;
 
-  const drawStart = cellWidth / 2;
-  const drawEnd   = w - cellWidth / 2;
+  const paddingLeft  = cellWidth / 2;
+  const paddingRight = cellWidth / 2;
 
-  // ★ここでUIズレ補正（必須）
-  const offset = cellWidth * 0.5;
+  const graphWidth = w - paddingLeft - paddingRight;
 
-  const stepX = (drawEnd - drawStart) / (data.length - 1);
+  // ============================
+  // ★ Yスケール
+  // ============================
+  const values = data.map(d => d);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
 
-  // =====================================================
-  // グラフパス生成
-  // =====================================================
-  const buildPath = () => {
-    const path = new Path2D();
+  function getY(v) {
+    return h - ((v - min) / range) * h;
+  }
 
-    for (let i = 0; i < data.length; i++) {
+  // ============================
+  // ★ Xスケール（純粋な線形）
+  // ============================
+  const stepX = graphWidth / (data.length - 1);
 
-      const x = drawStart + i * stepX + offset;
+  function getX(i) {
+    return paddingLeft + i * stepX;
+  }
 
-      const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-      const y = scaleY(v);
-
-      if (i === 0) {
-        path.moveTo(x, y);
-        continue;
-      }
-
-      const prevX = drawStart + (i - 1) * stepX + offset;
-      const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-      const prevY = scaleY(prevV);
-
-      const midX = (prevX + x) / 2;
-      const midY = (prevY + y) / 2;
-
-      path.quadraticCurveTo(prevX, prevY, midX, midY);
-    }
-
-    const last = data.length - 1;
-
-    const lx = drawStart + last * stepX + offset;
-    const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
-
-    path.lineTo(lx, ly);
-
-    path.lineTo(lx, h);
-    path.lineTo(drawStart + offset, h);
-
-    path.closePath();
-
-    return path;
-  };
-
-  const graphPath = buildPath();
-
-  // =====================================================
-  // 日の出・日の入り
-  // =====================================================
-  const sunriseX = sun?.sunrise != null
-    ? (sun.sunrise / 1440) * w
-    : 0;
-
-  const sunsetX = sun?.sunset != null
-    ? (sun.sunset / 1440) * w
-    : w;
-
-  const nightColor = "rgba(0,0,0,0.5)";
-  const dayColor   = "rgba(255, 220, 150, 0.08)";
-
-  // =====================================================
-  // 塗り分け
-  // =====================================================
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, 0, sunriseX, h);
-  ctx.clip();
-  ctx.fillStyle = nightColor;
-  ctx.fill(graphPath);
-  ctx.restore();
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(sunriseX, 0, sunsetX - sunriseX, h);
-  ctx.clip();
-  ctx.fillStyle = dayColor;
-  ctx.fill(graphPath);
-  ctx.restore();
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(sunsetX, 0, w - sunsetX, h);
-  ctx.clip();
-  ctx.fillStyle = nightColor;
-  ctx.fill(graphPath);
-  ctx.restore();
-
-  // =====================================================
-  // 線描画
-  // =====================================================
+  // ============================
+  // ★ グラフ描画
+  // ============================
   ctx.beginPath();
 
   for (let i = 0; i < data.length; i++) {
-
-    const x = drawStart + i * stepX + offset;
-
-    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-    const y = scaleY(v);
+    const x = getX(i);
+    const y = getY(data[i]);
 
     if (i === 0) {
       ctx.moveTo(x, y);
-      continue;
+    } else {
+      ctx.lineTo(x, y);
     }
-
-    const prevX = drawStart + (i - 1) * stepX + offset;
-    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-    const prevY = scaleY(prevV);
-
-    const midX = (prevX + x) / 2;
-    const midY = (prevY + y) / 2;
-
-    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
   }
 
-  const last = data.length - 1;
+  // 下に閉じる
+  const lastX = getX(data.length - 1);
 
-  ctx.lineTo(
-    drawStart + last * stepX + offset,
-    scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])))
-  );
+  ctx.lineTo(lastX, h);
+  ctx.lineTo(getX(0), h);
+  ctx.closePath();
 
-  ctx.strokeStyle = "rgba(255,255,255,0.35)";
-  ctx.lineWidth = 2.5;
-  ctx.lineJoin = "round";
-  ctx.lineCap = "round";
+  ctx.fillStyle = "rgba(0,150,255,0.2)";
+  ctx.fill();
+
+  ctx.strokeStyle = "#0096ff";
+  ctx.lineWidth = 2;
   ctx.stroke();
 
-  ctx.strokeStyle = "#191970";
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
+  // ============================
+  // ★ 日の出・日の入り（そのまま）
+  // ============================
+  if (sunrise != null && sunset != null) {
+    const sunriseX = paddingLeft + (sunrise / 24) * graphWidth;
+    const sunsetX  = paddingLeft + (sunset  / 24) * graphWidth;
+
+    ctx.fillStyle = "rgba(255, 200, 0, 0.15)";
+    ctx.fillRect(sunriseX, 0, sunsetX - sunriseX, h);
+  }
 }
 
 function resetSpotLayers() {
