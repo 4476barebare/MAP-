@@ -1778,6 +1778,7 @@ function createHourlyWeather(hourlyData,type) {
   root.appendChild(tableEl);
 }
 
+
 function createTideGraph(data, sun) {
 
   const canvas = document.getElementById("tideCanvas");
@@ -1809,9 +1810,6 @@ function createTideGraph(data, sun) {
 
   if (!data || data.length < 2) return;
 
-  // ============================
-  // Yスケール（そのまま）
-  // ============================
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
 
@@ -1822,130 +1820,141 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  // ============================
-  // ★パディング方式（ここが本体）
-  // ============================
-  const cellWidth = w / 24;
-
-  const paddingLeft  = cellWidth / 2;
-  const paddingRight = cellWidth / 2;
-
-  const graphWidth = w - paddingLeft - paddingRight;
-
-  const stepX = graphWidth / (data.length - 1);
-
-  const getX = (i) => paddingLeft + i * stepX;
+  const stepX = w / (data.length - 1);
 
   // =====================================================
-  // グラフパス生成
+  // グラフパス生成（共通）
   // =====================================================
-  const path = new Path2D();
+  const buildPath = () => {
+    const path = new Path2D();
 
-  for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
+      const x = i * stepX;
 
-    const x = getX(i);
+      const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+      const y = scaleY(v);
 
-    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-    const y = scaleY(v);
+      if (i === 0) {
+        path.moveTo(x, y);
+        continue;
+      }
 
-    if (i === 0) {
-      path.moveTo(x, y);
-      continue;
+      const prevX = (i - 1) * stepX;
+      const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+      const prevY = scaleY(prevV);
+
+      const midX = (prevX + x) / 2;
+      const midY = (prevY + y) / 2;
+
+      path.quadraticCurveTo(prevX, prevY, midX, midY);
     }
 
-    const prevX = getX(i - 1);
-    const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
-    const prevY = scaleY(prevV);
+    const last = data.length - 1;
+    const lx = last * stepX;
+    const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
-    const midX = (prevX + x) / 2;
-    const midY = (prevY + y) / 2;
+    path.lineTo(lx, ly);
+    path.lineTo(w, h);
+    path.lineTo(0, h);
+    path.closePath();
 
-    path.quadraticCurveTo(prevX, prevY, midX, midY);
-  }
+    return path;
+  };
 
-  const last = data.length - 1;
-  const lx = getX(last);
-  const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
-
-  path.lineTo(lx, ly);
-  path.lineTo(lx, h);
-  path.lineTo(getX(0), h);
-  path.closePath();
+  const graphPath = buildPath();
 
   // =====================================================
   // 日の出・日の入り
   // =====================================================
-  const sunriseX = sun?.sunrise != null
-    ? paddingLeft + (sun.sunrise / 1440) * graphWidth
-    : 0;
-
-  const sunsetX = sun?.sunset != null
-    ? paddingLeft + (sun.sunset / 1440) * graphWidth
-    : w;
+  const sunriseX = sun?.sunrise != null ? (sun.sunrise / 1440) * w : 0;
+  const sunsetX  = sun?.sunset  != null ? (sun.sunset  / 1440) * w : w;
 
   const nightColor = "rgba(0,0,0,0.5)";
-  const dayColor   = "rgba(255,220,150,0.08)";
+  const dayColor   = "rgba(255, 220, 150, 0.08)";
 
-  // 夜
+  // =====================================================
+  // ★重要：線の下だけを3分割して塗る
+  // =====================================================
+
+  // 左（夜）
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, sunriseX, h);
   ctx.clip();
+
   ctx.fillStyle = nightColor;
-  ctx.fill(path);
+  ctx.fill(graphPath);
   ctx.restore();
 
-  // 昼
+  // 中（昼）
   ctx.save();
   ctx.beginPath();
   ctx.rect(sunriseX, 0, sunsetX - sunriseX, h);
   ctx.clip();
+
   ctx.fillStyle = dayColor;
-  ctx.fill(path);
+  ctx.fill(graphPath);
   ctx.restore();
 
-  // 夜
+  // 右（夜）
   ctx.save();
   ctx.beginPath();
   ctx.rect(sunsetX, 0, w - sunsetX, h);
   ctx.clip();
+
   ctx.fillStyle = nightColor;
-  ctx.fill(path);
+  ctx.fill(graphPath);
   ctx.restore();
 
-  // =====================================================
-  // 線
-  // =====================================================
-  ctx.beginPath();
+// =====================================================
+// グラフ線（発光版）
+// =====================================================
+ctx.beginPath();
 
-  for (let i = 0; i < data.length; i++) {
+for (let i = 0; i < data.length; i++) {
 
-    const x = getX(i);
+  const x = i * stepX;
 
-    const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
-    const y = scaleY(v);
+  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
+  const y = scaleY(v);
 
-    if (i === 0) {
-      ctx.moveTo(x, y);
-      continue;
-    }
-
-    const prevX = getX(i - 1);
-    const prevY = scaleY(data[i - 1]);
-
-    const midX = (prevX + x) / 2;
-    const midY = (prevY + y) / 2;
-
-    ctx.quadraticCurveTo(prevX, prevY, midX, midY);
+  if (i === 0) {
+    ctx.moveTo(x, y);
+    continue;
   }
 
-  ctx.strokeStyle = "rgba(255,255,255,0.35)";
-  ctx.lineWidth = 2.5;
-  ctx.stroke();
+  const prevX = (i - 1) * stepX;
+  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
+  const prevY = scaleY(prevV);
 
-  ctx.strokeStyle = "#191970";
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
+  const midX = (prevX + x) / 2;
+  const midY = (prevY + y) / 2;
+
+  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
+}
+
+const last = data.length - 1;
+const lx = last * stepX;
+const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
+
+ctx.lineTo(lx, ly);
+
+
+// =====================================================
+// ★視認性レイヤー（白の下地）
+// =====================================================
+ctx.strokeStyle = "rgba(255,255,255,0.35)";
+ctx.lineWidth = 2.5;
+ctx.lineJoin = "round";
+ctx.lineCap = "round";
+ctx.stroke();
+
+// =====================================================
+// ★本線
+// =====================================================
+ctx.strokeStyle = "#191970";
+ctx.lineWidth = 1.2;
+ctx.stroke();
 }
 
 function resetSpotLayers() {
