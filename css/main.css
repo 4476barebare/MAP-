@@ -1233,7 +1233,7 @@ li {
 
 #tideCanvas {
   display: block;
-  width: calc(100% * 23 / 24);
+  width: 100%;
   height: 100%;
   margin-left: auto; /* ★これ */
   pointer-events: none;
