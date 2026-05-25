@@ -1820,12 +1820,15 @@ function createTideGraph(data, sun) {
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
   // ============================
-  // ★描画レンジ（統一版）
+  // ★描画レンジ + UI補正
   // ============================
   const cellWidth = w / 24;
 
   const drawStart = cellWidth / 2;
-  const drawEnd = w - cellWidth / 2;
+  const drawEnd   = w - cellWidth / 2;
+
+  // ★ここでUIズレ補正（必須）
+  const offset = cellWidth * 0.5;
 
   const stepX = (drawEnd - drawStart) / (data.length - 1);
 
@@ -1837,7 +1840,7 @@ function createTideGraph(data, sun) {
 
     for (let i = 0; i < data.length; i++) {
 
-      const x = drawStart + i * stepX;
+      const x = drawStart + i * stepX + offset;
 
       const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
       const y = scaleY(v);
@@ -1847,7 +1850,7 @@ function createTideGraph(data, sun) {
         continue;
       }
 
-      const prevX = drawStart + (i - 1) * stepX;
+      const prevX = drawStart + (i - 1) * stepX + offset;
       const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
       const prevY = scaleY(prevV);
 
@@ -1858,13 +1861,14 @@ function createTideGraph(data, sun) {
     }
 
     const last = data.length - 1;
-    const lx = drawStart + last * stepX;
+
+    const lx = drawStart + last * stepX + offset;
     const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])));
 
     path.lineTo(lx, ly);
 
     path.lineTo(lx, h);
-    path.lineTo(drawStart, h);
+    path.lineTo(drawStart + offset, h);
 
     path.closePath();
 
@@ -1921,7 +1925,7 @@ function createTideGraph(data, sun) {
 
   for (let i = 0; i < data.length; i++) {
 
-    const x = drawStart + i * stepX;
+    const x = drawStart + i * stepX + offset;
 
     const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i]));
     const y = scaleY(v);
@@ -1931,7 +1935,7 @@ function createTideGraph(data, sun) {
       continue;
     }
 
-    const prevX = drawStart + (i - 1) * stepX;
+    const prevX = drawStart + (i - 1) * stepX + offset;
     const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[i - 1]));
     const prevY = scaleY(prevV);
 
@@ -1944,7 +1948,7 @@ function createTideGraph(data, sun) {
   const last = data.length - 1;
 
   ctx.lineTo(
-    drawStart + last * stepX,
+    drawStart + last * stepX + offset,
     scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[last])))
   );
 
