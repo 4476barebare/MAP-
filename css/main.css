@@ -1223,7 +1223,7 @@ li {
   bottom: 0px;
   width: 100%;
   height: 80vh;
-  padding-left: 4px;
+  padding-left: calc(4px + (100% / 24 / 2));
   padding-right: 4px;
   box-sizing: border-box;
   display: none;
