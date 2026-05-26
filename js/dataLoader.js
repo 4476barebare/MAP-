@@ -1940,16 +1940,6 @@ for (let i = 0; i < drawData.length; i++) {
     continue;
   }
   
-// ★最初の2本は直線
-
-if (i === 1 || i === 2) {
-
-  ctx.lineTo(x, y);
-
-  continue;
-
-}
-
   const prevX = (i - 1) * stepX;
   const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i - 1]));
   const prevY = scaleY(prevV);
@@ -1957,7 +1947,7 @@ if (i === 1 || i === 2) {
   const midX = (prevX + x) / 2;
   const midY = (prevY + y) / 2;
 
-  ctx.quadraticCurveTo(prevX, prevY, midX, midY);
+  ctx.quadraticCurveTo(prevX, prevY, x, y);
 }
 
 const last = drawData.length - 1;
