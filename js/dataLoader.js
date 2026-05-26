@@ -1939,6 +1939,11 @@ for (let i = 0; i < drawData.length; i++) {
     ctx.moveTo(x, y);
     continue;
   }
+  
+  if (i === 1) {
+  ctx.lineTo(x, y);
+  continue;
+}
 
   const prevX = (i - 1) * stepX;
   const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i - 1]));
