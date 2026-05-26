@@ -1870,8 +1870,8 @@ function createTideGraph(data, sun) {
   // =====================================================
   // 昼夜
   // =====================================================
-  const sunriseX = (sun.sunrise / 1440) * w - stepX;
-  const sunsetX  = (sun.sunset  / 1440) * w - stepX;
+  const sunriseX = (sun.sunrise / 1440) * w + stepX;
+  const sunsetX  = (sun.sunset  / 1440) * w + stepX;
 
   const nightColor = "rgba(0,0,0,0.5)";
   const dayColor   = "rgba(255,220,150,0.08)";
