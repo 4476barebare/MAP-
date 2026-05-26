@@ -1274,7 +1274,7 @@ function createWeekItem(weekData) {
         value = tide ?? "—";
 
         if (tide === "大潮") {
-          cell.style.color = #dc143c;
+          cell.style.color = "#dc143c";
           cell.style.fontWeight = "bold";
         }
       }
