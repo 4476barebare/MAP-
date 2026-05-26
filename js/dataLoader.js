@@ -1940,9 +1940,14 @@ for (let i = 0; i < drawData.length; i++) {
     continue;
   }
   
-  if (i === 1) {
+// ★最初の2本は直線
+
+if (i === 1 || i === 2) {
+
   ctx.lineTo(x, y);
+
   continue;
+
 }
 
   const prevX = (i - 1) * stepX;
