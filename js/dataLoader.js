@@ -1786,21 +1786,16 @@ function createTideGraph(data, sun) {
   const wrapper = document.querySelector(".tide-wrapper");
   const ctx = canvas.getContext("2d");
 
-  if (wrapper) {
-    wrapper.style.display = "block";
-  }
+  if (wrapper) wrapper.style.display = "block";
 
   const rect = canvas.getBoundingClientRect();
   const w = rect.width;
   const h = rect.height;
-
-  if (w === 0 || h === 0) return;
+  if (!w || !h) return;
 
   const dpr = window.devicePixelRatio || 1;
-
   canvas.width = w * dpr;
   canvas.height = h * dpr;
-
   canvas.style.width = w + "px";
   canvas.style.height = h + "px";
 
@@ -1810,20 +1805,7 @@ function createTideGraph(data, sun) {
   if (!data || data.length < 3) return;
 
   // =====================================================
-  // ★ 0番目データを外挿で補完（25点化）
-  // =====================================================
-  // 傾き：1番目 → 2番目
-  const diff = data[1] - data[2];
-
-  // その傾きをそのまま逆方向へ延長
-  // → 上昇ならさらに上昇、下降ならさらに下降
-  const pseudo0 = data[1] + diff;
-
-  // 描画用データ（元データはそのまま保持）
-  const drawData = [pseudo0, ...data];
-
-  // =====================================================
-  // スケール設定
+  // スケール
   // =====================================================
   const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
@@ -1835,148 +1817,129 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  // ★ 25点に対するstep
-  const stepX = w / (drawData.length - 1);
+  const stepX = w / (data.length - 1);
+
+  // 点配列
+  const pts = data.map((v, i) => ({
+    x: i * stepX,
+    y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
+  }));
 
   // =====================================================
-  // グラフパス生成（塗り用）
+  // Catmull-Rom → Bezier
   // =====================================================
-  const buildPath = () => {
+  const buildStrokePath = () => {
     const path = new Path2D();
 
-    for (let i = 0; i < drawData.length; i++) {
+    for (let i = 0; i < pts.length; i++) {
 
-      const x = i * stepX;
-
-      const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i]));
-      const y = scaleY(v);
+      const p = pts[i];
 
       if (i === 0) {
-        path.moveTo(x, y);
+        path.moveTo(p.x, p.y);
         continue;
       }
 
-      const prevX = (i - 1) * stepX;
-      const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i - 1]));
-      const prevY = scaleY(prevV);
+      const p0 = pts[i - 1];
+      const p1 = pts[i];
+      const p_1 = pts[i - 2] || p0;
+      const p2 = pts[i + 1] || p1;
 
-      // 中点補間（滑らかカーブ）
-      const midX = (prevX + x) / 2;
-      const midY = (prevY + y) / 2;
+      const cp1x = p0.x + (p1.x - p_1.x) / 6;
+      const cp1y = p0.y + (p1.y - p_1.y) / 6;
 
-      path.quadraticCurveTo(prevX, prevY, midX, midY);
+      const cp2x = p1.x - (p2.x - p0.x) / 6;
+      const cp2y = p1.y - (p2.y - p0.y) / 6;
+
+      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
     }
-
-    // 下側を閉じて塗りつぶし用パスにする
-    const last = drawData.length - 1;
-    const lx = last * stepX;
-    const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[last])));
-
-    path.lineTo(lx, ly);
-    path.lineTo(w, h);
-    path.lineTo(0, h);
-    path.closePath();
 
     return path;
   };
 
-  const graphPath = buildPath();
+  const strokePath = buildStrokePath();
 
   // =====================================================
-  // 日の出・日の入り（時間→X座標）
+  // 塗りパス
+  // =====================================================
+  const fillPath = new Path2D(strokePath);
+  fillPath.lineTo(w, h);
+  fillPath.lineTo(0, h);
+  fillPath.closePath();
+
+  // =====================================================
+  // 昼夜
   // =====================================================
   const sunriseX = sun?.sunrise != null ? (sun.sunrise / 1440) * w : 0;
   const sunsetX  = sun?.sunset  != null ? (sun.sunset  / 1440) * w : w;
 
   const nightColor = "rgba(0,0,0,0.5)";
-  const dayColor   = "rgba(255, 220, 150, 0.08)";
+  const dayColor   = "rgba(255,220,150,0.08)";
+
+  const fillArea = (x, width, color) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, 0, width, h);
+    ctx.clip();
+    ctx.fillStyle = color;
+    ctx.fill(fillPath);
+    ctx.restore();
+  };
+
+  fillArea(0, sunriseX, nightColor);
+  fillArea(sunriseX, sunsetX - sunriseX, dayColor);
+  fillArea(sunsetX, w - sunsetX, nightColor);
 
   // =====================================================
-  // 背景塗り（線の下のみ）
+  // フェード付き線
   // =====================================================
+  const fadeCell = 2;
+  const fade = (stepX * fadeCell) / w;
 
-  // 夜（左）
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, 0, sunriseX, h);
-  ctx.clip();
-  ctx.fillStyle = nightColor;
-  ctx.fill(graphPath);
-  ctx.restore();
+  const grad = ctx.createLinearGradient(0, 0, w, 0);
+  grad.addColorStop(0, "rgba(25,25,112,0)");
+  grad.addColorStop(fade, "rgba(25,25,112,1)");
+  grad.addColorStop(1 - fade, "rgba(25,25,112,1)");
+  grad.addColorStop(1, "rgba(25,25,112,0)");
 
-  // 昼
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(sunriseX, 0, sunsetX - sunriseX, h);
-  ctx.clip();
-  ctx.fillStyle = dayColor;
-  ctx.fill(graphPath);
-  ctx.restore();
+  // 下地
+  ctx.strokeStyle = "rgba(255,255,255,0.35)";
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.stroke(strokePath);
 
-  // 夜（右）
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(sunsetX, 0, w - sunsetX, h);
-  ctx.clip();
-  ctx.fillStyle = nightColor;
-  ctx.fill(graphPath);
-  ctx.restore();
-  
-// =====================================================
-// グラフ線（両端フェード）
-// =====================================================
-
-ctx.beginPath();
-
-for (let i = 0; i < drawData.length; i++) {
-
-  const x = i * stepX;
-
-  const v = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i]));
-  const y = scaleY(v);
-
-  if (i === 0) {
-    ctx.moveTo(x, y);
-    continue;
-  }
-  
-  const prevX = (i - 1) * stepX;
-  const prevV = Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[i - 1]));
-  const prevY = scaleY(prevV);
-
-  const midX = (prevX + x) / 2;
-  const midY = (prevY + y) / 2;
-
-  ctx.quadraticCurveTo(prevX, prevY, x, y);
+  // 本線
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 1.2;
+  ctx.stroke(strokePath);
 }
 
-const last = drawData.length - 1;
-const lx = last * stepX;
-const ly = scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, drawData[last])));
+function drawSmooth(ctx, pts) {
+  ctx.beginPath();
 
-ctx.lineTo(lx, ly);
+  for (let i = 0; i < pts.length; i++) {
 
-const fadeCell = 2; // ← フェードを何セル分にするか
-const fade = (stepX * fadeCell) / w;
+    const p = pts[i];
 
-const grad = ctx.createLinearGradient(0, 0, w, 0);
+    if (i === 0) {
+      ctx.moveTo(p.x, p.y);
+      continue;
+    }
 
-grad.addColorStop(0, "rgba(25,25,112,0)");
-grad.addColorStop(fade, "rgba(25,25,112,1)");
-grad.addColorStop(1 - fade, "rgba(25,25,112,1)");
-grad.addColorStop(1, "rgba(25,25,112,0)");
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const p_1 = pts[i - 2] || p0;
+    const p2 = pts[i + 1] || p1;
 
-// 下地
-ctx.strokeStyle = "rgba(255,255,255,0.35)";
-ctx.lineWidth = 2.5;
-ctx.lineJoin = "round";
-ctx.lineCap = "round";
-ctx.stroke();
+    const cp1x = p0.x + (p1.x - p_1.x) / 6;
+    const cp1y = p0.y + (p1.y - p_1.y) / 6;
 
-// 本線（フェード）
-ctx.strokeStyle = grad;
-ctx.lineWidth = 1.2;
-ctx.stroke();
+    const cp2x = p1.x - (p2.x - p0.x) / 6;
+    const cp2y = p1.y - (p2.y - p0.y) / 6;
+
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
+  }
 }
 
 function resetSpotLayers() {
@@ -2000,6 +1963,8 @@ function resetSpotLayers() {
         window.prefSpotLayer = null;
     }
 }
+
+
 
 function updateStateFromHash() {
 
