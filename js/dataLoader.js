@@ -1821,7 +1821,7 @@ function createTideGraph(data, sun) {
 
   // 点配列
   const pts = data.map((v, i) => ({
-    x: i * stepX,
+    x: (i + 0.5) * stepX,
     y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
   }));
 
