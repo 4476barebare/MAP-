@@ -1046,44 +1046,44 @@ function zoomToSpot(spot) {
     // ========================
     let safe = spot;
 
-if (!safe.URL) {
+    if (!safe.URL) {
 
-    Promise.resolve(prepareFishForArea(window.currentAreaId))
-        .then(() => {
+        Promise.resolve(prepareFishForArea(window.currentAreaId))
+            .then(() => {
 
-            const spotId = window.currentSpotId.split("_");
+                const spotId = window.currentSpotId.split("_");
 
-            const list = window.spotData.filter(s =>
-                String(s.areaId) === String(window.currentAreaId)
-            );
+                const list = window.spotData.filter(s =>
+                    String(s.areaId) === String(window.currentAreaId)
+                );
 
-            const safe2 = list.find(s =>
-                String(s.individualId) === String(spotId[2])
-            );
-            
-            document.getElementById("nearest-spot").textContent = safe2.name;
-            document.getElementById('map-back-btn').style.display = 'block';
+                const safe2 = list.find(s =>
+                    String(s.individualId) === String(spotId[2])
+                );
+                
+                document.getElementById("nearest-spot").textContent = safe2.name;
+                document.getElementById('map-back-btn').style.display = 'block';
 
-            showFishMarkers(safe2.URL);
-            createWeekItem(safe2.whether);
+                showFishMarkers(safe2.URL);
+                createWeekItem(safe2.whether);
 
-            window.map.setMinZoom(safe.zoom || 15);
-            window.map.setMaxZoom(18);
+                // ❌ 削除：window.map.setMinZoom(safe.zoom || 15);
+                window.map.setMaxZoom(18);
 
-            window.map.setMaxBounds(window.map.getBounds());
-            window.map.options.maxBoundsViscosity = 1.0;
+                window.map.setMaxBounds(window.map.getBounds());
+                window.map.options.maxBoundsViscosity = 1.0;
 
-            window._zoomGuardBase = safe.zoom || 15;
-            window._zoomGuardActive = true;
+                window._zoomGuardBase = safe.zoom || 15;
+                window._zoomGuardActive = true;
 
-            window.map.dragging.enable();
-            window.map.scrollWheelZoom.enable();
-            window.map.doubleClickZoom.enable();
-            window.map.touchZoom.enable();
-        });
+                window.map.dragging.enable();
+                window.map.scrollWheelZoom.enable();
+                window.map.doubleClickZoom.enable();
+                window.map.touchZoom.enable();
+            });
 
-    return;
-}
+        return;
+    }
 
     // ========================
     // 通常ルート
@@ -1096,6 +1096,7 @@ if (!safe.URL) {
     window.map.flyTo([safe.lat, safe.lng], safe.zoom, {
         duration: 0.5
     });
+
     document.getElementById("nearest-spot").textContent = safe.name;
 
     if (safe && safe.individualId != null) {
@@ -1105,11 +1106,11 @@ if (!safe.URL) {
     }
 
     window.map.once('moveend', function () {
-        showFishMarkers(safe.URL);
 
+        showFishMarkers(safe.URL);
         createWeekItem(safe.whether);
 
-        window.map.setMinZoom(safe.zoom || 15);
+        // ❌ 削除：window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
 
         window.map.setMaxBounds(window.map.getBounds());
