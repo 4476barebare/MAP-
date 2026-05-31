@@ -777,16 +777,29 @@ li {
 
 
 /* 共通 */
+/* 魚マーカーの親枠（Leafletが配置する基準点） */
 .fish-label {
-  transform: translate(-50%, -50%);
+  position: absolute !important;
+  width: 0 !important;      /* 枠の幅をゼロにする */
+  height: 0 !important;     /* 枠の高さをゼロにする */
+  overflow: visible !important; /* 中身の文字は消さずに表示する */
 }
 
+/* 実際に魚の名前が表示される文字部分 */
 .fish-text {
-  white-space: nowrap;
+  position: absolute !important;
+  display: inline-block;
+  white-space: nowrap;      /* 文字の折り返しを防ぐ */
+  
+  /* 【最重要】文字の塊の「真ん中」を、上で設定した基準点（0,0）に強制的に一致させる */
+  top: 0 !important;
+  left: 0 !important;
+  transform: translate(-50%, -50%) !important; 
+  
+  /* 以下は見やすさのための装飾（既存のスタイルに合わせて調整してください） */
+
   font-weight: bold;
   color: #fff;
-
-  /* 外側だけに縁を作る */
   text-shadow:
     -1px -1px 0 #191970,
      1px -1px 0 #191970,
