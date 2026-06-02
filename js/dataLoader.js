@@ -1819,66 +1819,50 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  const hoursPerStep = 24 / (data.length - 1);
+  const stepX = w / (data.length - 1);
+
+  // 全25点（等間隔）をそのままプロット
+  const pts = data.map((v, i) => ({
+    x: i * stepX,
+    y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
+  }));
 
   // =====================================================
-  // 【改良】本物の満干潮だけを抽出するロジック
-  // =====================================================
-  const keepIndices = new Set([0, data.length - 1]); // 最初と最後は必須
-
-  // 微小なガタつきを無視するため、前後2時間（計4時間）の範囲で最大・最小かをチェックする
-  const windowSize = 2; 
-
-  for (let i = 1; i < data.length - 1; i++) {
-    const curr = data[i];
-    
-    let isMax = true;
-    let isMin = true;
-
-    // 前後数時間の中で、自分が本当に一番高い(低い)かを確認
-    for (let g = -windowSize; g <= windowSize; g++) {
-      const idx = i + g;
-      if (idx >= 0 && idx < data.length && idx !== i) {
-        if (data[idx] > curr) isMax = false;
-        if (data[idx] < curr) isMin = false;
-      }
-    }
-
-    // 完全に平坦なデータが連続する場合、その「中央」をピークの代表点とする処理
-    if (isMax || isMin) {
-      // 同じ値が連続している場合の重複判定を回避
-      let left = i;
-      while (left > 0 && data[left - 1] === curr) left--;
-      let right = i;
-      while (right < data.length - 1 && data[right + 1] === curr) right++;
-      
-      const centerIdx = Math.floor((left + right) / 2);
-      
-      // 厳選した本物のピークとその前後1時間だけを登録
-      if (centerIdx - 1 >= 0) keepIndices.add(centerIdx - 1);
-      keepIndices.add(centerIdx);
-      if (centerIdx + 1 < data.length) keepIndices.add(centerIdx + 1);
-    }
-  }
-
-  // インデックスをソートして点配列化
-  const sortedIndices = Array.from(keepIndices).sort((a, b) => a - b);
-  
-  const pts = sortedIndices.map(idx => {
-    const hour = idx * hoursPerStep;
-    return {
-      x: (hour / 24) * w,
-      y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[idx])))
-    };
-  });
-
-  // =====================================================
-  // 非等間隔対応 Catmull-Rom → Bezier
+  // 【完全解決】単調3次スプライン（Monotone Cubic Spline）
   // =====================================================
   const buildStrokePath = () => {
     const path = new Path2D();
+    const n = pts.length;
 
-    for (let i = 0; i < pts.length; i++) {
+    // 1. 各区間の直線的な傾き（秒速）を計算
+    const secSlope = [];
+    for (let i = 0; i < n - 1; i++) {
+      secSlope.push((pts[i + 1].y - pts[i].y) / stepX);
+    }
+
+    // 2. 各点における「滑らかな傾き（接線ベクトル）」を計算
+    const tangents = new Array(n);
+    
+    // 始点と終点の傾き
+    tangents[0] = secSlope[0];
+    tangents[n - 1] = secSlope[n - 2];
+
+    // 中間点の傾きを、絶対に暴れない（単調性を保つ）ように計算
+    for (let i = 1; i < n - 1; i++) {
+      const alpha = secSlope[i - 1];
+      const beta = secSlope[i];
+
+      // 山の頂点や谷の底（あるいは平坦な場所）は、傾きを「完全に0」にする
+      if (alpha * beta <= 0) {
+        tangents[i] = 0;
+      } else {
+        // 通常の斜面は、前後の傾きの「調和平均」をとることで、急激なカーブのハミ出しを防ぐ
+        tangents[i] = (2 * alpha * beta) / (alpha + beta);
+      }
+    }
+
+    // 3. 算出した安全な傾き（tangents）を使って、ベジェ曲線の制御点を配置
+    for (let i = 0; i < n; i++) {
       const p = pts[i];
 
       if (i === 0) {
@@ -1888,31 +1872,13 @@ function createTideGraph(data, sun) {
 
       const p0 = pts[i - 1];
       const p1 = pts[i];
-      const p_1 = pts[i - 2] || p0;
-      const p2 = pts[i + 1] || p1;
 
-      const dt1 = p1.x - p0.x;
+      // X方向の引っ張りは等間隔なので 1/3 ずつ
+      const cp1x = p0.x + stepX / 3;
+      const cp1y = p0.y + (tangents[i - 1] * stepX) / 3;
 
-      // 前後の区間の傾き
-      const dYA = p1.y - p_1.y;
-      const dYB = p2.y - p0.y;
-
-      let cp1y_diff = dYA / 6;
-      let cp2y_diff = dYB / 6;
-
-      // 【長潮対策】もし隣り合う点がほぼ同じ高さ（潮止まり）なら、傾きの勢いを殺す
-      // 1px未満の微小な差も平坦とみなす
-      if (Math.abs(p0.y - p1.y) < 1.0) {
-        cp1y_diff = 0;
-        cp2y_diff = 0;
-      }
-
-      // X方向の引っ張る力を距離（dt1）の1/3に綺麗に分散
-      const cp1x = p0.x + dt1 / 3;
-      const cp1y = p0.y + cp1y_diff;
-
-      const cp2x = p1.x - dt1 / 3;
-      const cp2y = p1.y - cp2y_diff;
+      const cp2x = p1.x - stepX / 3;
+      const cp2y = p1.y - (tangents[i] * stepX) / 3;
 
       path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
     }
@@ -1933,9 +1899,8 @@ function createTideGraph(data, sun) {
   // =====================================================
   // 昼夜
   // =====================================================
-  const baseStepX = w / 24; 
-  const sunriseX = (sun.sunrise / 1440) * w + baseStepX;
-  const sunsetX  = (sun.sunset  / 1440) * w + baseStepX;
+  const sunriseX = (sun.sunrise / 1440) * w + stepX;
+  const sunsetX  = (sun.sunset  / 1440) * w + stepX;
 
   const nightColor = "rgba(0,0,0,0.5)";
   const dayColor   = "rgba(255,220,150,0.08)";
@@ -1958,7 +1923,7 @@ function createTideGraph(data, sun) {
   // フェード付き線
   // =====================================================
   const fadeCell = 2;
-  const fade = (baseStepX * fadeCell) / w;
+  const fade = (stepX * fadeCell) / w;
 
   const grad = ctx.createLinearGradient(0, 0, w, 0);
   grad.addColorStop(0, "rgba(25,25,112,0)");
