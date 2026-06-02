@@ -1805,27 +1805,37 @@ function createTideGraph(data, sun) {
 
   if (!data || data.length < 3) return;
 
-  // =====================================================
-  // スケール
-  // =====================================================
-  const MIN_LEVEL = -60;
-  const MAX_LEVEL = 170;
+// =====================================================
+// スケール
+// =====================================================
+const MIN_LEVEL = -60;
+const MAX_LEVEL = 170;
 
-  const SCALE = 0.7;
-  const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
-  const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
+const SCALE = 0.7;
+const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
+const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
 
-  const scaleY = v =>
-    h / 2 + ((v - mid) / range) * (h * 0.7);
+const scaleY = v =>
+  h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  const stepX = w / (data.length - 1);
+// =====================================================
+// X座標（インデックス→時間補正）
+// =====================================================
 
-  // 点配列
-  const pts = data.map((v, i) => ({
-    x: i * stepX,
+// 「1ステップ＝一定時間」と仮定（例：1時間刻み）
+const TIME_STEP = 1; // 必要なら 2 や 0.5 に調整
+
+const totalTime = (data.length - 1) * TIME_STEP;
+
+// 点配列
+const pts = data.map((v, i) => {
+  const t = i * TIME_STEP;
+
+  return {
+    x: (t / totalTime) * w,
     y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
-  }));
-
+  };
+});
   // =====================================================
   // Catmull-Rom → Bezier
   // =====================================================
