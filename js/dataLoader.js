@@ -1827,17 +1827,64 @@ function createTideGraph(data, sun) {
   }));
 
 // =====================================================
-// 直線パス（補間なし）
+// Monotone Cubic 補間パス（オーバーシュート防止）
 // =====================================================
-const strokePath = new Path2D();
+const buildMonotonePath = () => {
+  const path = new Path2D();
 
-pts.forEach((p, i) => {
-  if (i === 0) {
-    strokePath.moveTo(p.x, p.y);
-  } else {
-    strokePath.lineTo(p.x, p.y);
+  const n = pts.length;
+  if (n < 2) return path;
+
+  const dx = [];
+  const dy = [];
+  const m  = [];
+
+  // 傾き
+  for (let i = 0; i < n - 1; i++) {
+    const dxi = pts[i + 1].x - pts[i].x;
+    const dyi = pts[i + 1].y - pts[i].y;
+    dx.push(dxi);
+    dy.push(dyi);
+    m.push(dyi / dxi);
   }
-});
+
+  // 接線（Fritsch-Carlson）
+  const t = [m[0]];
+
+  for (let i = 1; i < n - 1; i++) {
+    if (m[i - 1] * m[i] <= 0) {
+      t.push(0);
+    } else {
+      const w1 = 2 * dx[i] + dx[i - 1];
+      const w2 = dx[i] + 2 * dx[i - 1];
+      t.push((w1 + w2) / (w1 / m[i - 1] + w2 / m[i]));
+    }
+  }
+
+  t.push(m[n - 2]);
+
+  // パス生成
+  path.moveTo(pts[0].x, pts[0].y);
+
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = pts[i];
+    const p1 = pts[i + 1];
+
+    const h = dx[i];
+
+    const cp1x = p0.x + h / 3;
+    const cp1y = p0.y + t[i] * h / 3;
+
+    const cp2x = p1.x - h / 3;
+    const cp2y = p1.y - t[i + 1] * h / 3;
+
+    path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
+  }
+
+  return path;
+};
+
+const strokePath = buildMonotonePath();
 
   // =====================================================
   // 塗りパス
