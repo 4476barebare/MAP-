@@ -1808,33 +1808,24 @@ function createTideGraph(data, sun) {
   // =====================================================
   // スケール
   // =====================================================
-// =====================================================
-// スケール
-// =====================================================
-const MIN_LEVEL = -60;
-const MAX_LEVEL = 170;
+  const MIN_LEVEL = -30;
+  const MAX_LEVEL = 170;
 
-const SCALE = 0.7;
-const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
-const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
+  const SCALE = 0.7;
+  const range = (MAX_LEVEL - MIN_LEVEL) / SCALE;
+  const mid = (MAX_LEVEL + MIN_LEVEL) / 2;
 
-const scaleY = v =>
-  h / 2 + ((v - mid) / range) * (h * 0.7);
+  const scaleY = v =>
+    h / 2 + ((v - mid) / range) * (h * 0.7);
 
-// =====================================================
-// X座標（安全版）
-// =====================================================
-const len = data.length;
+  const stepX = w / (data.length - 1);
 
-if (!len) return;
+  // 点配列
+  const pts = data.map((v, i) => ({
+    x: i * stepX,
+    y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
+  }));
 
-const total = len > 1 ? (len - 1) : 1;
-
-// 点配列
-const pts = data.map((v, i) => ({
-  x: (i / total) * w,
-  y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
-}));
   // =====================================================
   // Catmull-Rom → Bezier
   // =====================================================
