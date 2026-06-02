@@ -1808,7 +1808,7 @@ function createTideGraph(data, sun) {
   // =====================================================
   // スケール
   // =====================================================
-  const MIN_LEVEL = -60;
+  const MIN_LEVEL = -30;
   const MAX_LEVEL = 170;
 
   const SCALE = 0.7;
@@ -1818,69 +1818,91 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  const stepX = w / (data.length - 1);
-
-  // 点配列
-  const pts = data.map((v, i) => ({
-    x: i * stepX,
-    y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
-  }));
+  // 元データの時間間隔（25個のデータであれば、1データの進みは 24 / (data.length - 1) 時間）
+  const hoursPerStep = 24 / (data.length - 1);
 
   // =====================================================
-  // Catmull-Rom → Bezier (改良版)
+  // 満干潮とその前後を抽出するロジック
   // =====================================================
-const buildStrokePath = () => {
-  const path = new Path2D();
+  const keepIndices = new Set([0, data.length - 1]); // 最初と最後は必ず含める
 
-  for (let i = 0; i < pts.length; i++) {
-    const p = pts[i];
+  for (let i = 1; i < data.length - 1; i++) {
+    const prev = data[i - 1];
+    const curr = data[i];
+    const next = data[i + 1];
 
-    if (i === 0) {
-      path.moveTo(p.x, p.y);
-      continue;
+    // 満潮（山の頂点）または 干潮（谷の底）を検知
+    const isHigh = curr >= prev && curr >= next && prev !== next;
+    const isLow  = curr <= prev && curr <= next && prev !== next;
+
+    if (isHigh || isLow) {
+      // 該当する満干潮の「1時間前、当日、1時間後」のインデックスを登録
+      if (i - 1 >= 0) keepIndices.add(i - 1);
+      keepIndices.add(i);
+      if (i + 1 < data.length) keepIndices.add(i + 1);
     }
-
-    const p0 = pts[i - 1];
-    const p1 = pts[i];
-    const p_1 = pts[i - 2] || p0;
-    const p2 = pts[i + 1] || p1;
-
-    // 1. 各区間の純粋な傾き（差分）を計算
-    const d0 = p0.y - p_1.y; // 前々回 → 前回
-    const d1 = p1.y - p0.y;  // 前回 → 今回 (現在の区間)
-    const d2 = p2.y - p1.y;  // 今回 → 次回
-
-    // 2. 隣り合う傾きの「変化の度合い」を見て、制御点の傾きを滑らかにブレンドする
-    // 片方が平坦（0）に近づくと、制御点の傾きも自然に0へスムーズに減速する（Monotone補正の応用）
-    let m1 = 0;
-    if (d0 * d1 > 0) {
-      m1 = (2 * d0 * d1) / (d0 + d1); // 調和平均を使って滑らかに繋ぐ
-    } else {
-      m1 = d1 * 0.5; // 反転、または片方が平坦なら動きをマイルドに
-    }
-
-    let m2 = 0;
-    if (d1 * d2 > 0) {
-      m2 = (2 * d1 * d2) / (d1 + d2);
-    } else {
-      m2 = d1 * 0.5;
-    }
-
-    // 3. 算出したマイルドな傾きを制御点に適用（/6 で突っ張りを調整）
-    const cp1x = p0.x + stepX / 3;
-    const cp1y = p0.y + m1 / 3;
-
-    const cp2x = p1.x - stepX / 3;
-    const cp2y = p1.y - m2 / 3;
-
-    path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
   }
 
-  return path;
-};
+  // インデックスを昇順にソートして、描画用の特徴点配列を作成
+  const sortedIndices = Array.from(keepIndices).sort((a, b) => a - b);
+  
+  // 時間軸（0〜24h）をベースに、正確なX座標とY座標を持つ点配列を作る
+  const pts = sortedIndices.map(idx => {
+    const hour = idx * hoursPerStep;
+    return {
+      x: (hour / 24) * w,
+      y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, data[idx])))
+    };
+  });
 
+  // =====================================================
+  // 非等間隔対応 Catmull-Rom → Bezier
+  // =====================================================
+  const buildStrokePath = () => {
+    const path = new Path2D();
 
-  // ★ここで関数を実行して strokePath 変数を作ります
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+
+      if (i === 0) {
+        path.moveTo(p.x, p.y);
+        continue;
+      }
+
+      const p0 = pts[i - 1];
+      const p1 = pts[i];
+      const p_1 = pts[i - 2] || p0;
+      const p2 = pts[i + 1] || p1;
+
+      // 点と点の間の「時間的な距離（Xの差分）」を計算
+      const dt1 = p1.x - p0.x;
+
+      // 前後の区間の傾き
+      const dYA = p1.y - p_1.y;
+      const dYB = p2.y - p0.y;
+
+      let cp1y_diff = dYA / 6;
+      let cp2y_diff = dYB / 6;
+
+      // 【長潮・潮止まり対策】隣り合う抽出点が同じ高さ（完全に平坦）なら、傾きを0にする
+      if (p0.y === p1.y) {
+        cp1y_diff = 0;
+        cp2y_diff = 0;
+      }
+
+      // X方向の引っ張る力（制御点）を、点同士の距離（dt1）の 1/3 に合わせる
+      const cp1x = p0.x + dt1 / 3;
+      const cp1y = p0.y + cp1y_diff;
+
+      const cp2x = p1.x - dt1 / 3;
+      const cp2y = p1.y - cp2y_diff;
+
+      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
+    }
+
+    return path;
+  };
+
   const strokePath = buildStrokePath();
 
   // =====================================================
@@ -1894,8 +1916,10 @@ const buildStrokePath = () => {
   // =====================================================
   // 昼夜
   // =====================================================
-  const sunriseX = (sun.sunrise / 1440) * w + stepX;
-  const sunsetX  = (sun.sunset  / 1440) * w + stepX;
+  // 元の1時間ごとのstepXに依存しないよう、24時間全体の幅を基準に計算
+  const baseStepX = w / 24; 
+  const sunriseX = (sun.sunrise / 1440) * w + baseStepX;
+  const sunsetX  = (sun.sunset  / 1440) * w + baseStepX;
 
   const nightColor = "rgba(0,0,0,0.5)";
   const dayColor   = "rgba(255,220,150,0.08)";
@@ -1918,7 +1942,7 @@ const buildStrokePath = () => {
   // フェード付き線
   // =====================================================
   const fadeCell = 2;
-  const fade = (stepX * fadeCell) / w;
+  const fade = (baseStepX * fadeCell) / w;
 
   const grad = ctx.createLinearGradient(0, 0, w, 0);
   grad.addColorStop(0, "rgba(25,25,112,0)");
@@ -1938,6 +1962,7 @@ const buildStrokePath = () => {
   ctx.lineWidth = 1.2;
   ctx.stroke(strokePath);
 }
+
 
 
 function drawSmooth(ctx, pts) {
