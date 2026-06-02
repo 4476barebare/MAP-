@@ -1821,47 +1821,53 @@ function createTideGraph(data, sun) {
 
   const stepX = w / (data.length - 1);
 
-  // 全25点（等間隔）をそのままプロット
-  const pts = data.map((v, i) => ({
+  // =====================================================
+  // 【ガクつき防止】元データの急激な「角」を丸めるクッション処理
+  // =====================================================
+  // 長潮の「平坦から急に動き出す瞬間」の折れ曲がりを防ぐため、
+  // 前後のデータを少しだけブレンドして、データ自体に滑らかな助走（クッション）を作ります。
+  const smoothedData = data.map((v, i) => {
+    if (i === 0 || i === data.length - 1) return v;
+    
+    // 自分と、前後のデータの重み付け平均（マイルドに角を丸める）
+    const prev = data[i - 1];
+    const next = data[i + 1];
+    return v * 0.6 + prev * 0.2 + next * 0.2;
+  });
+
+  // クッションを入れたデータで点配列を作成
+  const pts = smoothedData.map((v, i) => ({
     x: i * stepX,
     y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
   }));
 
   // =====================================================
-  // 【完全解決】単調3次スプライン（Monotone Cubic Spline）
+  // 単調3次スプライン（Monotone Cubic Spline）
   // =====================================================
   const buildStrokePath = () => {
     const path = new Path2D();
     const n = pts.length;
 
-    // 1. 各区間の直線的な傾き（秒速）を計算
     const secSlope = [];
     for (let i = 0; i < n - 1; i++) {
       secSlope.push((pts[i + 1].y - pts[i].y) / stepX);
     }
 
-    // 2. 各点における「滑らかな傾き（接線ベクトル）」を計算
     const tangents = new Array(n);
-    
-    // 始点と終点の傾き
     tangents[0] = secSlope[0];
     tangents[n - 1] = secSlope[n - 2];
 
-    // 中間点の傾きを、絶対に暴れない（単調性を保つ）ように計算
     for (let i = 1; i < n - 1; i++) {
       const alpha = secSlope[i - 1];
       const beta = secSlope[i];
 
-      // 山の頂点や谷の底（あるいは平坦な場所）は、傾きを「完全に0」にする
       if (alpha * beta <= 0) {
         tangents[i] = 0;
       } else {
-        // 通常の斜面は、前後の傾きの「調和平均」をとることで、急激なカーブのハミ出しを防ぐ
         tangents[i] = (2 * alpha * beta) / (alpha + beta);
       }
     }
 
-    // 3. 算出した安全な傾き（tangents）を使って、ベジェ曲線の制御点を配置
     for (let i = 0; i < n; i++) {
       const p = pts[i];
 
@@ -1873,7 +1879,6 @@ function createTideGraph(data, sun) {
       const p0 = pts[i - 1];
       const p1 = pts[i];
 
-      // X方向の引っ張りは等間隔なので 1/3 ずつ
       const cp1x = p0.x + stepX / 3;
       const cp1y = p0.y + (tangents[i - 1] * stepX) / 3;
 
