@@ -1826,50 +1826,50 @@ function createTideGraph(data, sun) {
     y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
   }));
 
-const buildStrokePath = () => {
-  const path = new Path2D();
+  // =====================================================
+  // Catmull-Rom → Bezier (改良版)
+  // =====================================================
+  const buildStrokePath = () => {
+    const path = new Path2D();
 
-  for (let i = 0; i < pts.length; i++) {
-    const p = pts[i];
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
 
-    if (i === 0) {
-      path.moveTo(p.x, p.y);
-      continue;
+      if (i === 0) {
+        path.moveTo(p.x, p.y);
+        continue;
+      }
+
+      const p0 = pts[i - 1];
+      const p1 = pts[i];
+      const p_1 = pts[i - 2] || p0;
+      const p2 = pts[i + 1] || p1;
+
+      // 前の区間と次の区間のYの差分
+      const dYA = p1.y - p_1.y;
+      const dYB = p2.y - p0.y;
+
+      let cp1y_diff = dYA / 6;
+      let cp2y_diff = dYB / 6;
+
+      // 長潮対策：隣り合う点同士が同じ高さ（平坦部）なら傾きを0にする
+      if ((p0.y === p1.y) || (p_1.y === p0.y)) cp1y_diff = 0;
+      if ((p1.y === p2.y) || (p0.y === p1.y)) cp2y_diff = 0;
+
+      const cp1x = p0.x + (p1.x - p_1.x) / 6;
+      const cp1y = p0.y + cp1y_diff;
+
+      const cp2x = p1.x - (p2.x - p0.x) / 6;
+      const cp2y = p1.y - cp2y_diff;
+
+      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
     }
 
-    const p0 = pts[i - 1];
-    const p1 = pts[i];
-    const p_1 = pts[i - 2] || p0;
-    const p2 = pts[i + 1] || p1;
+    return path;
+  };
 
-    // --- 改良：前後のデータの「傾き」をチェック ---
-    // 前の区間と次の区間のYの差分
-    const dYA = p1.y - p_1.y;
-    const dYB = p2.y - p0.y;
-
-    // 長潮対策：もし「直前」または「直後」が完全に平坦（タイドが動かない）なら、
-    // 制御点のY方向の勢いを殺す（0に近づける）
-    let cp1y_diff = dYA / 6;
-    let cp2y_diff = dYB / 6;
-
-    // 隣り合う点同士がほぼ同じ高さ（潮止まり・長潮の平坦部）の場合のケア
-    if ((p0.y === p1.y) || (p_1.y === p0.y)) cp1y_diff = 0;
-    if ((p1.y === p2.y) || (p0.y === p1.y)) cp2y_diff = 0;
-
-    // X軸の制御点は時間軸（等間隔）なので元のままでOK
-    const cp1x = p0.x + (p1.x - p_1.x) / 6;
-    const cp1y = p0.y + cp1y_diff;
-
-    const cp2x = p1.x - (p2.x - p0.x) / 6;
-    const cp2y = p1.y - cp2y_diff;
-    // --------------------------------------------
-
-    path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
-  }
-
-  return path;
-};
-
+  // ★ここで関数を実行して strokePath 変数を作ります
+  const strokePath = buildStrokePath();
 
   // =====================================================
   // 塗りパス
@@ -1926,6 +1926,7 @@ const buildStrokePath = () => {
   ctx.lineWidth = 1.2;
   ctx.stroke(strokePath);
 }
+
 
 function drawSmooth(ctx, pts) {
   ctx.beginPath();
