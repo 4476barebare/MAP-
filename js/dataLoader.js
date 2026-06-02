@@ -1819,71 +1819,86 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  const stepX = w / (data.length - 1);
+  const hoursPerStep = 24 / (data.length - 1);
 
   // =====================================================
-  // 【ガクつき防止】元データの急激な「角」を丸めるクッション処理
+  // 1. 本物の「満潮点」と「干潮点」を精密に抽出する
   // =====================================================
-  // 長潮の「平坦から急に動き出す瞬間」の折れ曲がりを防ぐため、
-  // 前後のデータを少しだけブレンドして、データ自体に滑らかな助走（クッション）を作ります。
-  const smoothedData = data.map((v, i) => {
-    if (i === 0 || i === data.length - 1) return v;
-    
-    // 自分と、前後のデータの重み付け平均（マイルドに角を丸める）
-    const prev = data[i - 1];
-    const next = data[i + 1];
-    return v * 0.6 + prev * 0.2 + next * 0.2;
-  });
+  const peaks = [];
+  
+  // 0時の状態を最初の点として登録
+  peaks.push({ hour: 0, level: data[0] });
 
-  // クッションを入れたデータで点配列を作成
-  const pts = smoothedData.map((v, i) => ({
-    x: i * stepX,
-    y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
+  // 前後2時間を見て、そこが「地域最高値（満潮）」か「地域最安値（干潮）」かを判定
+  const windowSize = 2;
+  for (let i = 1; i < data.length - 1; i++) {
+    const curr = data[i];
+    let isMax = true;
+    let isMin = true;
+
+    for (let g = -windowSize; g <= windowSize; g++) {
+      const idx = i + g;
+      if (idx >= 0 && idx < data.length && idx !== i) {
+        if (data[idx] > curr) isMax = false;
+        if (data[idx] < curr) isMin = false;
+      }
+    }
+
+    if (isMax || isMin) {
+      // 隣り合う重複を平滑化するため、同じ値が並んでいたらその中央を採用
+      let left = i;
+      while (left > 0 && data[left - 1] === curr) left--;
+      let right = i;
+      while (right < data.length - 1 && data[right + 1] === curr) right++;
+      const centerIdx = Math.floor((left + right) / 2);
+
+      // すでに同じ時間が登録されていなければ追加
+      const hour = centerIdx * hoursPerStep;
+      if (!peaks.some(p => p.hour === hour)) {
+        peaks.push({ hour: hour, level: data[centerIdx] });
+      }
+    }
+  }
+
+  // 24時の状態を最後の点として登録
+  const lastHour = 24;
+  if (!peaks.some(p => p.hour === lastHour)) {
+    peaks.push({ hour: lastHour, level: data[data.length - 1] });
+  }
+
+  // 時間順にソート
+  peaks.sort((a, b) => a.hour - b.hour);
+
+  // 描画用の座標(x, y)に変換
+  const pts = peaks.map(p => ({
+    x: (p.hour / 24) * w,
+    y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, p.level)))
   }));
 
   // =====================================================
-  // 単調3次スプライン（Monotone Cubic Spline）
+  // 2. 極値ベースの完全平滑化ベジェ曲線 (Hermiteベース)
   // =====================================================
   const buildStrokePath = () => {
     const path = new Path2D();
-    const n = pts.length;
+    
+    path.moveTo(pts[0].x, pts[0].y);
 
-    const secSlope = [];
-    for (let i = 0; i < n - 1; i++) {
-      secSlope.push((pts[i + 1].y - pts[i].y) / stepX);
-    }
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[i];
+      const p1 = pts[i + 1];
 
-    const tangents = new Array(n);
-    tangents[0] = secSlope[0];
-    tangents[n - 1] = secSlope[n - 2];
+      // この区間の横幅
+      const dx = p1.x - p0.x;
 
-    for (let i = 1; i < n - 1; i++) {
-      const alpha = secSlope[i - 1];
-      const beta = secSlope[i];
+      // 【魔法のロジック】
+      // 満潮・干潮の頂点では、潮の動きが「完全に一瞬止まる（傾き0）」になります。
+      // 制御点のY座標をそれぞれの点のY座標と「完全に同じ」にすることで、
+      // どんな大潮でも長潮でも、頂点と底が完璧に滑らかな「お椀型」になります。
+      const cp1x = p0.x + dx / 3;
+      const cp1y = p0.y; // 傾き0
 
-      if (alpha * beta <= 0) {
-        tangents[i] = 0;
-      } else {
-        tangents[i] = (2 * alpha * beta) / (alpha + beta);
-      }
-    }
-
-    for (let i = 0; i < n; i++) {
-      const p = pts[i];
-
-      if (i === 0) {
-        path.moveTo(p.x, p.y);
-        continue;
-      }
-
-      const p0 = pts[i - 1];
-      const p1 = pts[i];
-
-      const cp1x = p0.x + stepX / 3;
-      const cp1y = p0.y + (tangents[i - 1] * stepX) / 3;
-
-      const cp2x = p1.x - stepX / 3;
-      const cp2y = p1.y - (tangents[i] * stepX) / 3;
+      const cp2x = p1.x - dx / 3;
+      const cp2y = p1.y; // 傾き0
 
       path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
     }
@@ -1904,8 +1919,9 @@ function createTideGraph(data, sun) {
   // =====================================================
   // 昼夜
   // =====================================================
-  const sunriseX = (sun.sunrise / 1440) * w + stepX;
-  const sunsetX  = (sun.sunset  / 1440) * w + stepX;
+  const baseStepX = w / 24; 
+  const sunriseX = (sun.sunrise / 1440) * w + baseStepX;
+  const sunsetX  = (sun.sunset  / 1440) * w + baseStepX;
 
   const nightColor = "rgba(0,0,0,0.5)";
   const dayColor   = "rgba(255,220,150,0.08)";
@@ -1928,7 +1944,7 @@ function createTideGraph(data, sun) {
   // フェード付き線
   // =====================================================
   const fadeCell = 2;
-  const fade = (stepX * fadeCell) / w;
+  const fade = (baseStepX * fadeCell) / w;
 
   const grad = ctx.createLinearGradient(0, 0, w, 0);
   grad.addColorStop(0, "rgba(25,25,112,0)");
@@ -1948,6 +1964,7 @@ function createTideGraph(data, sun) {
   ctx.lineWidth = 1.2;
   ctx.stroke(strokePath);
 }
+
 
 
 function drawSmooth(ctx, pts) {
