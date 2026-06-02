@@ -1826,57 +1826,43 @@ function createTideGraph(data, sun) {
     y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
   }));
 
-// =====================================================
-// Monotone Cubic 補間パス（オーバーシュート防止）
-// =====================================================
-const buildMonotonePath = () => {
+const buildStrokePath = () => {
   const path = new Path2D();
 
-  const n = pts.length;
-  if (n < 2) return path;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
 
-  const dx = [];
-  const dy = [];
-  const m  = [];
-
-  // 傾き
-  for (let i = 0; i < n - 1; i++) {
-    const dxi = pts[i + 1].x - pts[i].x;
-    const dyi = pts[i + 1].y - pts[i].y;
-    dx.push(dxi);
-    dy.push(dyi);
-    m.push(dyi / dxi);
-  }
-
-  // 接線（Fritsch-Carlson）
-  const t = [m[0]];
-
-  for (let i = 1; i < n - 1; i++) {
-    if (m[i - 1] * m[i] <= 0) {
-      t.push(0);
-    } else {
-      const w1 = 2 * dx[i] + dx[i - 1];
-      const w2 = dx[i] + 2 * dx[i - 1];
-      t.push((w1 + w2) / (w1 / m[i - 1] + w2 / m[i]));
+    if (i === 0) {
+      path.moveTo(p.x, p.y);
+      continue;
     }
-  }
 
-  t.push(m[n - 2]);
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const p_1 = pts[i - 2] || p0;
+    const p2 = pts[i + 1] || p1;
 
-  // パス生成
-  path.moveTo(pts[0].x, pts[0].y);
+    // --- 改良：前後のデータの「傾き」をチェック ---
+    // 前の区間と次の区間のYの差分
+    const dYA = p1.y - p_1.y;
+    const dYB = p2.y - p0.y;
 
-  for (let i = 0; i < n - 1; i++) {
-    const p0 = pts[i];
-    const p1 = pts[i + 1];
+    // 長潮対策：もし「直前」または「直後」が完全に平坦（タイドが動かない）なら、
+    // 制御点のY方向の勢いを殺す（0に近づける）
+    let cp1y_diff = dYA / 6;
+    let cp2y_diff = dYB / 6;
 
-    const h = dx[i];
+    // 隣り合う点同士がほぼ同じ高さ（潮止まり・長潮の平坦部）の場合のケア
+    if ((p0.y === p1.y) || (p_1.y === p0.y)) cp1y_diff = 0;
+    if ((p1.y === p2.y) || (p0.y === p1.y)) cp2y_diff = 0;
 
-    const cp1x = p0.x + h / 3;
-    const cp1y = p0.y + t[i] * h / 3;
+    // X軸の制御点は時間軸（等間隔）なので元のままでOK
+    const cp1x = p0.x + (p1.x - p_1.x) / 6;
+    const cp1y = p0.y + cp1y_diff;
 
-    const cp2x = p1.x - h / 3;
-    const cp2y = p1.y - t[i + 1] * h / 3;
+    const cp2x = p1.x - (p2.x - p0.x) / 6;
+    const cp2y = p1.y - cp2y_diff;
+    // --------------------------------------------
 
     path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
   }
@@ -1884,7 +1870,6 @@ const buildMonotonePath = () => {
   return path;
 };
 
-const strokePath = buildMonotonePath();
 
   // =====================================================
   // 塗りパス
