@@ -1829,44 +1829,56 @@ function createTideGraph(data, sun) {
   // =====================================================
   // Catmull-Rom → Bezier (改良版)
   // =====================================================
-  const buildStrokePath = () => {
-    const path = new Path2D();
+const buildStrokePath = () => {
+  const path = new Path2D();
 
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
 
-      if (i === 0) {
-        path.moveTo(p.x, p.y);
-        continue;
-      }
-
-      const p0 = pts[i - 1];
-      const p1 = pts[i];
-      const p_1 = pts[i - 2] || p0;
-      const p2 = pts[i + 1] || p1;
-
-      // 前の区間と次の区間のYの差分
-      const dYA = p1.y - p_1.y;
-      const dYB = p2.y - p0.y;
-
-      let cp1y_diff = dYA / 6;
-      let cp2y_diff = dYB / 6;
-
-      // 長潮対策：隣り合う点同士が同じ高さ（平坦部）なら傾きを0にする
-      if ((p0.y === p1.y) || (p_1.y === p0.y)) cp1y_diff = 0;
-      if ((p1.y === p2.y) || (p0.y === p1.y)) cp2y_diff = 0;
-
-      const cp1x = p0.x + (p1.x - p_1.x) / 6;
-      const cp1y = p0.y + cp1y_diff;
-
-      const cp2x = p1.x - (p2.x - p0.x) / 6;
-      const cp2y = p1.y - cp2y_diff;
-
-      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
+    if (i === 0) {
+      path.moveTo(p.x, p.y);
+      continue;
     }
 
-    return path;
-  };
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const p_1 = pts[i - 2] || p0;
+    const p2 = pts[i + 1] || p1;
+
+    // 1. 各区間の純粋な傾き（差分）を計算
+    const d0 = p0.y - p_1.y; // 前々回 → 前回
+    const d1 = p1.y - p0.y;  // 前回 → 今回 (現在の区間)
+    const d2 = p2.y - p1.y;  // 今回 → 次回
+
+    // 2. 隣り合う傾きの「変化の度合い」を見て、制御点の傾きを滑らかにブレンドする
+    // 片方が平坦（0）に近づくと、制御点の傾きも自然に0へスムーズに減速する（Monotone補正の応用）
+    let m1 = 0;
+    if (d0 * d1 > 0) {
+      m1 = (2 * d0 * d1) / (d0 + d1); // 調和平均を使って滑らかに繋ぐ
+    } else {
+      m1 = d1 * 0.5; // 反転、または片方が平坦なら動きをマイルドに
+    }
+
+    let m2 = 0;
+    if (d1 * d2 > 0) {
+      m2 = (2 * d1 * d2) / (d1 + d2);
+    } else {
+      m2 = d1 * 0.5;
+    }
+
+    // 3. 算出したマイルドな傾きを制御点に適用（/6 で突っ張りを調整）
+    const cp1x = p0.x + stepX / 3;
+    const cp1y = p0.y + m1 / 3;
+
+    const cp2x = p1.x - stepX / 3;
+    const cp2y = p1.y - m2 / 3;
+
+    path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
+  }
+
+  return path;
+};
+
 
   // ★ここで関数を実行して strokePath 変数を作ります
   const strokePath = buildStrokePath();
