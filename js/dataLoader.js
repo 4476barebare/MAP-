@@ -1779,6 +1779,7 @@ function createHourlyWeather(hourlyData,type) {
   root.appendChild(tableEl);
 }
 
+
 function createTideGraph(data, sun) {
 
   const canvas = document.getElementById("tideCanvas");
@@ -1818,35 +1819,51 @@ function createTideGraph(data, sun) {
   const scaleY = v =>
     h / 2 + ((v - mid) / range) * (h * 0.7);
 
-  // 元データの時間間隔（25個のデータであれば、1データの進みは 24 / (data.length - 1) 時間）
   const hoursPerStep = 24 / (data.length - 1);
 
   // =====================================================
-  // 満干潮とその前後を抽出するロジック
+  // 【改良】本物の満干潮だけを抽出するロジック
   // =====================================================
-  const keepIndices = new Set([0, data.length - 1]); // 最初と最後は必ず含める
+  const keepIndices = new Set([0, data.length - 1]); // 最初と最後は必須
+
+  // 微小なガタつきを無視するため、前後2時間（計4時間）の範囲で最大・最小かをチェックする
+  const windowSize = 2; 
 
   for (let i = 1; i < data.length - 1; i++) {
-    const prev = data[i - 1];
     const curr = data[i];
-    const next = data[i + 1];
+    
+    let isMax = true;
+    let isMin = true;
 
-    // 満潮（山の頂点）または 干潮（谷の底）を検知
-    const isHigh = curr >= prev && curr >= next && prev !== next;
-    const isLow  = curr <= prev && curr <= next && prev !== next;
+    // 前後数時間の中で、自分が本当に一番高い(低い)かを確認
+    for (let g = -windowSize; g <= windowSize; g++) {
+      const idx = i + g;
+      if (idx >= 0 && idx < data.length && idx !== i) {
+        if (data[idx] > curr) isMax = false;
+        if (data[idx] < curr) isMin = false;
+      }
+    }
 
-    if (isHigh || isLow) {
-      // 該当する満干潮の「1時間前、当日、1時間後」のインデックスを登録
-      if (i - 1 >= 0) keepIndices.add(i - 1);
-      keepIndices.add(i);
-      if (i + 1 < data.length) keepIndices.add(i + 1);
+    // 完全に平坦なデータが連続する場合、その「中央」をピークの代表点とする処理
+    if (isMax || isMin) {
+      // 同じ値が連続している場合の重複判定を回避
+      let left = i;
+      while (left > 0 && data[left - 1] === curr) left--;
+      let right = i;
+      while (right < data.length - 1 && data[right + 1] === curr) right++;
+      
+      const centerIdx = Math.floor((left + right) / 2);
+      
+      // 厳選した本物のピークとその前後1時間だけを登録
+      if (centerIdx - 1 >= 0) keepIndices.add(centerIdx - 1);
+      keepIndices.add(centerIdx);
+      if (centerIdx + 1 < data.length) keepIndices.add(centerIdx + 1);
     }
   }
 
-  // インデックスを昇順にソートして、描画用の特徴点配列を作成
+  // インデックスをソートして点配列化
   const sortedIndices = Array.from(keepIndices).sort((a, b) => a - b);
   
-  // 時間軸（0〜24h）をベースに、正確なX座標とY座標を持つ点配列を作る
   const pts = sortedIndices.map(idx => {
     const hour = idx * hoursPerStep;
     return {
@@ -1874,7 +1891,6 @@ function createTideGraph(data, sun) {
       const p_1 = pts[i - 2] || p0;
       const p2 = pts[i + 1] || p1;
 
-      // 点と点の間の「時間的な距離（Xの差分）」を計算
       const dt1 = p1.x - p0.x;
 
       // 前後の区間の傾き
@@ -1884,13 +1900,14 @@ function createTideGraph(data, sun) {
       let cp1y_diff = dYA / 6;
       let cp2y_diff = dYB / 6;
 
-      // 【長潮・潮止まり対策】隣り合う抽出点が同じ高さ（完全に平坦）なら、傾きを0にする
-      if (p0.y === p1.y) {
+      // 【長潮対策】もし隣り合う点がほぼ同じ高さ（潮止まり）なら、傾きの勢いを殺す
+      // 1px未満の微小な差も平坦とみなす
+      if (Math.abs(p0.y - p1.y) < 1.0) {
         cp1y_diff = 0;
         cp2y_diff = 0;
       }
 
-      // X方向の引っ張る力（制御点）を、点同士の距離（dt1）の 1/3 に合わせる
+      // X方向の引っ張る力を距離（dt1）の1/3に綺麗に分散
       const cp1x = p0.x + dt1 / 3;
       const cp1y = p0.y + cp1y_diff;
 
@@ -1916,7 +1933,6 @@ function createTideGraph(data, sun) {
   // =====================================================
   // 昼夜
   // =====================================================
-  // 元の1時間ごとのstepXに依存しないよう、24時間全体の幅を基準に計算
   const baseStepX = w / 24; 
   const sunriseX = (sun.sunrise / 1440) * w + baseStepX;
   const sunsetX  = (sun.sunset  / 1440) * w + baseStepX;
@@ -1962,7 +1978,6 @@ function createTideGraph(data, sun) {
   ctx.lineWidth = 1.2;
   ctx.stroke(strokePath);
 }
-
 
 
 function drawSmooth(ctx, pts) {
