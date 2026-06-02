@@ -1808,7 +1808,7 @@ function createTideGraph(data, sun) {
   // =====================================================
   // スケール
   // =====================================================
-  const MIN_LEVEL = -30;
+  const MIN_LEVEL = -60;
   const MAX_LEVEL = 170;
 
   const SCALE = 0.7;
