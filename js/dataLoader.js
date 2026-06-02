@@ -1826,39 +1826,18 @@ function createTideGraph(data, sun) {
     y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
   }));
 
-  // =====================================================
-  // Catmull-Rom → Bezier
-  // =====================================================
-  const buildStrokePath = () => {
-    const path = new Path2D();
+// =====================================================
+// 直線パス（補間なし）
+// =====================================================
+const strokePath = new Path2D();
 
-    for (let i = 0; i < pts.length; i++) {
-
-      const p = pts[i];
-
-      if (i === 0) {
-        path.moveTo(p.x, p.y);
-        continue;
-      }
-
-      const p0 = pts[i - 1];
-      const p1 = pts[i];
-      const p_1 = pts[i - 2] || p0;
-      const p2 = pts[i + 1] || p1;
-
-      const cp1x = p0.x + (p1.x - p_1.x) / 6;
-      const cp1y = p0.y + (p1.y - p_1.y) / 6;
-
-      const cp2x = p1.x - (p2.x - p0.x) / 6;
-      const cp2y = p1.y - (p2.y - p0.y) / 6;
-
-      path.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
-    }
-
-    return path;
-  };
-
-  const strokePath = buildStrokePath();
+pts.forEach((p, i) => {
+  if (i === 0) {
+    strokePath.moveTo(p.x, p.y);
+  } else {
+    strokePath.lineTo(p.x, p.y);
+  }
+});
 
   // =====================================================
   // 塗りパス
