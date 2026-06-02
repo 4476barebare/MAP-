@@ -1805,6 +1805,9 @@ function createTideGraph(data, sun) {
 
   if (!data || data.length < 3) return;
 
+  // =====================================================
+  // スケール
+  // =====================================================
 // =====================================================
 // スケール
 // =====================================================
@@ -1819,23 +1822,19 @@ const scaleY = v =>
   h / 2 + ((v - mid) / range) * (h * 0.7);
 
 // =====================================================
-// X座標（インデックス→時間補正）
+// X座標（安全版）
 // =====================================================
+const len = data.length;
 
-// 「1ステップ＝一定時間」と仮定（例：1時間刻み）
-const TIME_STEP = 1; // 必要なら 2 や 0.5 に調整
+if (!len) return;
 
-const totalTime = (data.length - 1) * TIME_STEP;
+const total = len > 1 ? (len - 1) : 1;
 
 // 点配列
-const pts = data.map((v, i) => {
-  const t = i * TIME_STEP;
-
-  return {
-    x: (t / totalTime) * w,
-    y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
-  };
-});
+const pts = data.map((v, i) => ({
+  x: (i / total) * w,
+  y: scaleY(Math.max(MIN_LEVEL, Math.min(MAX_LEVEL, v)))
+}));
   // =====================================================
   // Catmull-Rom → Bezier
   // =====================================================
