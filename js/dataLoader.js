@@ -1806,22 +1806,23 @@ function createTideGraph(data, sun) {
   if (!data || data.length < 3) return;
 
 // =====================================================
-// スケール（動的 + マージン）
+// スケール（固定 + はみ出し対応）
 // =====================================================
-const values = data.filter(v => v != null);
+const BASE_MIN = -60;
+const BASE_MAX = 170;
 
+// 実データ
+const values = data.filter(v => v != null);
 const dataMin = Math.min(...values);
 const dataMax = Math.max(...values);
 
-// ★余裕（20%）
-const margin = (dataMax - dataMin) * 0.2;
+// ★必要なときだけ拡張
+const min = Math.min(BASE_MIN, dataMin - 10);
+const max = Math.max(BASE_MAX, dataMax + 10);
 
-// ★最終レンジ
-const min = dataMin - margin;
-const max = dataMax + margin;
 const range = max - min;
 
-// Y変換
+// Y変換（シンプル）
 const scaleY = v =>
   h - ((v - min) / range) * h;
 
