@@ -1916,15 +1916,20 @@ function createTideGraph(data, sun) {
   fillPath.lineTo(0, h);
   fillPath.closePath();
 
+
+
   // =====================================================
-  // 昼夜（マズメ対応グラデーション）
+  // 昼夜（マズメ対応グラデーション・日の入り30分前倒し）
   // =====================================================
   // 24時間全体の幅をベースに計算
   const baseStepX = w / 24; 
   const sunriseX = (sun.sunrise / 1440) * w + baseStepX;
-  const sunsetX  = (sun.sunset  / 1440) * w + baseStepX;
 
-  // マズメ時（薄明）のグラデーション幅（24時間のうちの約1時間分をグラデーションにする）
+  // ★日の入り時刻（分）から30分を引き算して前倒しにする
+  const adjustedSunset = Math.max(sun.sunrise, sun.sunset - 30); 
+  const sunsetX  = (adjustedSunset / 1440) * w + baseStepX;
+
+  // マズメ時（薄明）のグラデーション幅（約1時間分）
   const twilightWidth = (60 / 1440) * w; 
 
   // キャンバス全体をカバーする横方向のグラデーションを作成
@@ -1942,7 +1947,7 @@ function createTideGraph(data, sun) {
   skyGrad.addColorStop(sunriseStart, nightColor);
   skyGrad.addColorStop(sunriseEnd, dayColor);
 
-  // 3. 夕マズメ（日の入りの前後でジワッと暗くする）
+  // 3. 夕マズメ（30分前倒しした日の入りの前後でジワッと暗くする）
   const sunsetStart = Math.max(0, (sunsetX - twilightWidth / 2) / w);
   const sunsetEnd   = Math.min(1, (sunsetX + twilightWidth / 2) / w);
   skyGrad.addColorStop(sunsetStart, dayColor);
@@ -1951,11 +1956,12 @@ function createTideGraph(data, sun) {
   // 4. 24時までの夜
   skyGrad.addColorStop(1, nightColor);
 
-  // 潮位の塗りつぶしパス（fillPath）にグラデーションを一発で適用
+  // 潮位の塗りつぶしパス（fillPath）にグラデーションを適用
   ctx.save();
   ctx.fillStyle = skyGrad;
   ctx.fill(fillPath);
   ctx.restore();
+
 
 
   // =====================================================
