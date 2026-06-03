@@ -331,7 +331,7 @@ li {
    各エリア
 ========================= */
 .area {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #191970;
   padding: 12px 0;
   transition: all 0.25s ease;
 }
