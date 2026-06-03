@@ -210,6 +210,35 @@
   <div class="footer-policy">サイトポリシー</div>
 </footer>
 <script src="../js/header.js"></script>
+<script>
+  // ===== ポリシーモーダル =====
 
+  const policyLink = document.getElementById("policyLink");
+  const policyModal = document.getElementById("policyModal");
+
+  if (policyLink && policyModal) {
+
+    // 開く
+    policyLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      policyModal.style.display = "block";
+    });
+
+    // 背景クリックで閉じる
+    policyModal.addEventListener("click", (e) => {
+      if (e.target === policyModal) {
+        policyModal.style.display = "none";
+      }
+    });
+
+    // ESCで閉じる（任意）
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        policyModal.style.display = "none";
+      }
+    });
+
+  }
+</script>
 </body>
 </html>
