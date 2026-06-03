@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>記事タイトル | 釣り行こNAVI</title>
+  <meta name="description" content="この記事の要約を書く">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="記事タイトル">
+  <meta property="og:description" content="この記事の要約">
+  <meta property="og:url" content="記事URL">
+
+  <link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/main.css">
+
+  <style>
+    .article-header h1 {
+      border-left: 4px solid #191970;
+      padding-left: 10px;
+    }
+
+    .article-body h2 {
+      color: #191970;
+    }
+
+    .article {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.9;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .article-body p {
+      margin: 15px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="logo">釣り行こNAVI</div>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="beginner rod light-game choinage sabiki seabass">
+
+    <header class="article-header">
+      <h1>それぞれの釣りに適した竿の選び方</h1>
+
+      <div class="article-meta">
+        <time datetime="2026-06-03">2026.06.03</time>
+      </div>
+    </header>
+
+    <section>
+      <h2>1. ライトルアー（アジングなど）に適した竿</h2>
+      <p>
+        1g前後の極小ルアーを投げ、魚の繊細なアタリを捉えるために、「軽さ」と「感度」に特化した竿が必要です。
+      </p>
+
+      <h3>おすすめのスペック</h3>
+      <ul>
+        <li>長さ：5フィート台〜6フィート台（約1.5m〜2.1m）</li>
+        <li>竿の種類：アジングロッド、メバリングロッド（ライトゲーム専用竿）</li>
+      </ul>
+
+      <h3>選び方のポイント</h3>
+      <p>
+        非常に細くて軽い竿なので、持った瞬間に「おもちゃのよう」と感じるかもしれませんが、それが現在のルアーロッドの性能です。
+        長さは6フィート（約1.8m）前後が最も扱いやすくおすすめです。
+        リールをセットしたときに、手元に自然に馴染む軽量なものを選びましょう。
+      </p>
+    </section>
+
+    <section>
+      <h2>2. ちょい投げ釣りに適した竿</h2>
+      <p>
+        ある程度の重さがあるオモリ（3号〜10号程度／約11g〜37g）をしっかり遠くへ投げられる「適度な硬さ」と、
+        仕掛けを扱いやすい「長さ」が必要です。
+      </p>
+
+      <h3>おすすめのスペック</h3>
+      <ul>
+        <li>長さ：2m〜2.7m前後</li>
+        <li>竿の種類：コンパクトロッド（テレスコピック／振出竿）、シーバスロッド（ライトクラス）</li>
+      </ul>
+
+      <h3>選び方のポイント</h3>
+      <p>
+        オモリの重さを竿にしっかり乗せて投げるためのパワーが必要です。
+        コンパクトロッド（リール付きセットなど）はこの釣りに適しています。
+        また、柔らかめのシーバスロッドも代用しやすく、ちょい投げに適しています。
+      </p>
+    </section>
+
+    <section>
+      <h2>3. サビキ釣りに適した竿</h2>
+      <p>
+        サビキ釣りは仕掛け自体が1m〜1.5mと長いため、短すぎる竿では扱いにくくなります。
+        足元まで魚を寄せるための「長さ」と、引きを吸収する「しなやかさ」が重要です。
+      </p>
+
+      <h3>おすすめのスペック</h3>
+      <ul>
+        <li>長さ：2.4m〜3.6m前後</li>
+        <li>竿の種類：万能振出竿、磯竿（1.5号〜2号）、サビキ専用竿</li>
+      </ul>
+
+      <h3>選び方のポイント</h3>
+      <p>
+        短すぎる竿では堤防の壁に仕掛けが当たりやすくなります。
+        初心者には扱いやすさと長さのバランスが良い「3m前後」が最適です。
+        魚が掛かったときに竿全体がしなり、バラシを防ぐ柔らかめの竿を選びましょう。
+      </p>
+    </section>
+
+    <section>
+      <h2>1本で使い回すならシーバスロッド</h2>
+      <p>
+        「最初は1本でいろいろ試したい」と考える人は多いですが、
+        一般的な万能コンパクトロッドは重く感度が鈍いため中途半端になりがちです。
+      </p>
+      <p>
+        そこでおすすめしたいのがシーバスロッドです。
+        軽さ・感度・パワーのバランスが良く、選び方次第で幅広い釣りに対応できます。
+      </p>
+
+      <h3>パターンA：アジング × ちょい投げ</h3>
+      <p>
+        「短め・柔らかめ」のシーバスロッドを選ぶことで、
+        軽いルアーも扱いやすく、繊細なアタリも感じ取れます。
+        また、ちょい投げでも食い込みが良く、幅広く対応できます。
+      </p>
+
+      <h3>パターンB：ちょい投げ × サビキ</h3>
+      <p>
+        「長め・張りのある」シーバスロッドを選ぶことで、
+        重めのオモリやコマセカゴも扱いやすくなります。
+        9フィート（約2.7m）前後でML〜Mクラスが目安です。
+      </p>
+
+      <p>
+        「何でもできる1本」を探すのではなく、
+        自分がやりたい釣りの組み合わせに合わせて選ぶことが重要です。
+      </p>
+<p>
+  <a href="/articles/rod-selection.html">
+    → 釣りに必要な竿の選び方はこちら
+  </a>
+</p>
+    </section>
+
+  </article>
+</main>
+
+  <div id="policyModal" class="modal">
+    <div class="modal-content">
+      <section>
+        <h1>サイトポリシー</h1>
+
+        <h2>1. 免責事項</h2>
+        <p>
+          当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、
+          その完全性・正確性・最新性を保証するものではありません。
+          当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。
+        </p>
+
+        <h2>2. 掲載情報について</h2>
+        <p>
+          掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、
+          現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。
+          利用前に必ず現地の最新情報をご確認ください。
+        </p>
+
+        <h2>3. 釣行データについて</h2>
+        <p>
+          当サイトの釣行データは過去の記録に基づくものであり、
+          現在の釣果や釣りの可否を保証するものではありません。
+          また海洋環境や生態系の状態を保証するものではありません。
+        </p>
+
+        <h2>4. 安全について</h2>
+        <p>
+          釣りを行う際は安全に十分配慮してください。
+          釣り場所によっては管理者の許可が必要な場合があります。
+          必ず現地のルールに従ってください。
+        </p>
+
+        <p>最終更新日：2026年5月</p>
+      </section>
+    </div>
+  </div>
+
+  <footer class="site-footer" id="policyLink">
+    <div>© 釣り行こNAVI</div>
+    <div class="footer-policy">サイトポリシー</div>
+  </footer>
+
+  <script src="/js/header.js"></script>
+
+</body>
+</html>
