@@ -50,7 +50,7 @@ function renderNews(items) {
             <div class="news-title">${item.title}</div>
 
             <div class="news-meta">
-              <div class="news-source">${item.source || "RSS"}</div>
+              <div class="news-source">${item.author || "RSS"}</div>
               <div class="news-date">${timeText}</div>
             </div>
           </div>
