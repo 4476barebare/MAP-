@@ -395,6 +395,33 @@ li {
 }
 
 
+.article-list {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+}
+
+.article-card {
+  flex: 1;
+  text-decoration: none;
+  color: #000;
+}
+
+.article-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.article-card h2 {
+  font-size: 16px;
+  margin: 8px 0 4px;
+}
+
+.article-card p {
+  font-size: 13px;
+  color: #555;
+}
 /* =========================
    フッター
 ========================= */
