@@ -5,30 +5,30 @@ function loadNews() {
 
   newsList.innerHTML = "読み込み中...";
 
-fetch("../data/news.json", { cache: "no-store" })
+fetch("../data/news.json")
   .then(async (res) => {
-
-    console.log("STATUS:", res.status);
-    console.log("CONTENT-TYPE:", res.headers.get("content-type"));
 
     const text = await res.text();
 
-    console.log("RAW HEAD:", text.slice(0, 300));
+    document.getElementById("newsList").innerHTML = `
+      <pre style="font-size:10px; white-space:pre-wrap;">
+STATUS: ${res.status}
+OK: ${res.ok}
 
-    // ★ここで必ず分岐確認
-    if (!text.trim().startsWith("[")) {
-      throw new Error("JSONじゃないレスポンス");
-    }
+RAW:
+${text.slice(0, 300)}
+      </pre>
+    `;
 
     return JSON.parse(text);
   })
   .then(data => {
-    console.log("OK:", data.length);
     renderNews(data);
   })
   .catch(err => {
-    console.error("ERROR:", err);
-    document.getElementById("newsList").innerHTML = "取得失敗";
+    document.getElementById("newsList").innerHTML = `
+      <pre>ERROR: ${err}</pre>
+    `;
   });
 }
 
