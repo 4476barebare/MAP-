@@ -411,8 +411,9 @@ li {
   border-radius: 10px;
   overflow: hidden;
 
-  /* 初期状態 */
-  transform: translateY(0);
+  /* ★ 最初から少し浮かせる */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 /* 画像 */
@@ -429,16 +430,14 @@ li {
   line-height: 1.4;
 }
 
-/* ホバー（浮く） */
 .article-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
 }
 
-/* クリック（沈む） */
 .article-card:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 
