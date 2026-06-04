@@ -26,7 +26,7 @@ jobs:
 
       # スクリプト実行
       - name: Run script
-        run: node newsNode.js
+        run: node js/newsNode.js
 
       # 変更があればコミット＆プッシュ
       - name: Commit & Push
