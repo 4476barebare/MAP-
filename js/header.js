@@ -5,23 +5,25 @@ function loadNews() {
 
   newsList.innerHTML = "読み込み中...";
 
-  fetch("../data/news.json")
-    .then(res => {
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    })
-    .then(items => {
+fetch("/data/news.json")
+  .then(async res => {
 
-      if (!Array.isArray(items) || items.length === 0) {
-        newsList.innerHTML = "記事がありません";
-        return;
-      }
+    console.log("STATUS:", res.status);
+    console.log("CONTENT-TYPE:", res.headers.get("content-type"));
 
-      renderNews(items.slice(0, 100));
-    })
-    .catch(() => {
-      newsList.innerHTML = "取得失敗";
-    });
+    const text = await res.text();
+
+    console.log("RAW HEAD:", text.slice(0, 200));
+
+    return JSON.parse(text);
+  })
+  .then(data => {
+    renderNews(data);
+  })
+  .catch(err => {
+    console.error("ERROR:", err);
+    document.getElementById("newsList").innerHTML = "取得失敗";
+  });
 }
 
 function renderNews(items) {
