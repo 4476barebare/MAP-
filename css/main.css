@@ -405,34 +405,40 @@ li {
   flex: 1;
   text-decoration: none;
   color: #000;
-  transition: 0.2s;
+  transition: 0.15s ease;
 
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
+
+  /* 初期状態 */
+  transform: translateY(0);
 }
 
+/* 画像 */
 .article-card img {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-radius: 6px;
 }
 
+/* タイトル */
 .article-card h2 {
   font-size: 16px;
   margin: 8px 10px 12px;
   line-height: 1.4;
 }
 
-.article-card p {
-  font-size: 13px;
-  color: #555;
+/* ホバー（浮く） */
+.article-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
 }
 
-.article-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+/* クリック（沈む） */
+.article-card:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 
