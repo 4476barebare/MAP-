@@ -15,7 +15,7 @@ const OUTPUT_PATH = "./data/news.json";
 const MAX_ITEMS = 100;
 
 // =========================
-// RSS取得（安全化）
+// RSS取得
 // =========================
 async function fetchAllRSS(urls) {
   const results = await Promise.all(
@@ -31,7 +31,6 @@ async function fetchAllRSS(urls) {
       }
     })
   );
-
   return results;
 }
 
@@ -59,6 +58,81 @@ function saveData(data) {
 }
 
 // =========================
+// サムネ処理（フロント移植）
+// =========================
+function extractImg(item) {
+  if (!item.description) return "";
+  const m = item.description.match(/<img[^>]+src="([^">]+)"/);
+  return m ? m[1] : "";
+}
+
+function cleanUrl(url) {
+  if (!url) return "";
+  return url.split("?")[0];
+}
+
+function getThumbnail(item) {
+
+  const link = item.link || "";
+
+  // .php系
+  if (link.includes(".php")) {
+    const url =
+      item.media?.content?.[0]?.url ||
+      item.enclosure?.link ||
+      item.thumbnail ||
+      extractImg(item);
+
+    return cleanUrl(url) || null;
+  }
+
+  let url = "";
+
+  // 通常
+  if (item.thumbnail) {
+    url = item.thumbnail;
+  }
+
+  // enclosure
+  else if (item.enclosure?.link) {
+    url = item.enclosure.link;
+  }
+
+  // media
+  else if (item["media:thumbnail"]?.url) {
+    url = item["media:thumbnail"].url;
+  }
+
+  // description fallback
+  else if (item.description) {
+    const match = item.description.match(/https?:\/\/[^"]+\.(jpg|png|jpeg|webp)/);
+    if (match) url = match[0];
+  }
+
+  url = cleanUrl(url);
+
+  // 最終チェック
+  if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(url)) {
+    return null;
+  }
+
+  return url;
+}
+
+// =========================
+// 軽量化（必要フィールドだけ）
+// =========================
+function normalizeItem(item) {
+  return {
+    title: item.title,
+    link: item.link,
+    pubDate: item.pubDate,
+    thumbnail: getThumbnail(item),
+    author: item.author || ""
+  };
+}
+
+// =========================
 // メイン処理
 // =========================
 async function main() {
@@ -79,19 +153,21 @@ async function main() {
   const oldLinks = new Set(oldItems.map(i => i.link));
 
   // =========================
-  // 新着だけ抽出（ここが重要）
+  // 新着抽出
   // =========================
-  const newItems = fetchedItems.filter(item =>
+  const newItemsRaw = fetchedItems.filter(item =>
     item.link && !oldLinks.has(item.link)
   );
 
-  // 新着なしなら終了（高速化）
-  if (newItems.length === 0) {
+  if (newItemsRaw.length === 0) {
     console.log("新着なし → スキップ");
     return;
   }
 
-  console.log("新着:", newItems.length);
+  console.log("新着:", newItemsRaw.length);
+
+  // 正規化（ここで軽量化＆サムネ確定）
+  const newItems = newItemsRaw.map(normalizeItem);
 
   // =========================
   // マージ
@@ -109,14 +185,14 @@ async function main() {
   let merged = Array.from(map.values());
 
   // =========================
-  // ソート（新しい順）
+  // ソート
   // =========================
   merged.sort((a, b) =>
     new Date(b.pubDate) - new Date(a.pubDate)
   );
 
   // =========================
-  // 100件制限
+  // 上限
   // =========================
   merged = merged.slice(0, MAX_ITEMS);
 
