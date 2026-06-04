@@ -2,33 +2,35 @@ name: Update News JSON
 
 on:
   schedule:
-    - cron: '0 */3 * * *'  # 3時間ごと（毎時0分）
-  workflow_dispatch:       # 手動実行も可能
+    - cron: '0 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # リポジトリ取得
       - name: Checkout
         uses: actions/checkout@v3
 
-      # Node環境
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # 依存インストール（最小）
+      # ★ ここが重要
+      - name: Enable ES Modules
+        run: echo '{"type":"module"}' > package.json
+
       - name: Install dependencies
         run: npm install node-fetch
 
-      # スクリプト実行
       - name: Run script
         run: node js/newsNode.js
 
-      # 変更があればコミット＆プッシュ
       - name: Commit & Push
         run: |
           git config user.name "github-actions"
