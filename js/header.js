@@ -5,31 +5,23 @@ function loadNews() {
 
   newsList.innerHTML = "読み込み中...";
 
-fetch("../data/news.json")
-  .then(async (res) => {
+  fetch("../data/news.json")
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(items => {
 
-    const text = await res.text();
+      if (!Array.isArray(items) || items.length === 0) {
+        newsList.innerHTML = "記事がありません";
+        return;
+      }
 
-    document.getElementById("newsList").innerHTML = `
-      <pre style="font-size:10px; white-space:pre-wrap;">
-STATUS: ${res.status}
-OK: ${res.ok}
-
-RAW:
-${text.slice(0, 300)}
-      </pre>
-    `;
-
-    return JSON.parse(text);
-  })
-  .then(data => {
-    renderNews(data);
-  })
-  .catch(err => {
-    document.getElementById("newsList").innerHTML = `
-      <pre>ERROR: ${err}</pre>
-    `;
-  });
+      renderNews(items.slice(0, 100));
+    })
+    .catch(() => {
+      newsList.innerHTML = "取得失敗";
+    });
 }
 
 function renderNews(items) {
@@ -102,6 +94,29 @@ function formatTimeAgo(pubDate) {
   return `${Math.floor(month / 12)}年前`;
 }
 
+function renderAdBlock() {
+  const ad = document.createElement("div");
+  ad.className = "ad-block";
+
+  ad.innerHTML = `
+    <div style="
+      width:100%;
+      max-width:320px;
+      height:50px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f2f2f2;
+      margin:10px auto;
+      font-size:12px;
+      color:#666;
+    ">
+      広告枠
+    </div>
+  `;
+
+  return ad;
+}
 
 document.addEventListener("DOMContentLoaded", function () {
 
