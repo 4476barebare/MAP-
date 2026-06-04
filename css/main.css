@@ -405,11 +405,13 @@ li {
   flex: 1;
   text-decoration: none;
   color: #000;
+  transition: 0.2s;
 }
 
 .article-card img {
   width: 100%;
-  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
   border-radius: 6px;
 }
 
@@ -421,6 +423,10 @@ li {
 .article-card p {
   font-size: 13px;
   color: #555;
+}
+
+.article-card:hover {
+  opacity: 0.8;
 }
 /* =========================
    フッター
