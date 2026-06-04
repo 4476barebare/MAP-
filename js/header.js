@@ -1,36 +1,3 @@
-const RSS_LIST = [
-  "https://www.lurenewsr.com/feed/",
-  "https://fishingjapan.jp/fishing/rss.php",
-  "https://www.youtube.com/feeds/videos.xml?channel_id=UCLhAzbPvfaD7zQE1ybS6kLg",
-  "https://www.youtube.com/feeds/videos.xml?channel_id=UChHUhF5bgoeS1Z-uE_HRQfQ",
-  "https://www.youtube.com/feeds/videos.xml?user=yoorai0121",
-  "https://www.youtube.com/feeds/videos.xml?channel_id=UCwmAyvxNTirU4uaDxwoveDA"
-];
-
-const SOURCE_LABELS = [
-  { match: "fishingjapan.jp", label: "フィッシングジャパン" }
-];
-
-// =========================
-// RSS取得
-// =========================
-function fetchAllRSS(urls) {
-  return Promise.all(
-    urls.map(url =>
-      fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url))
-        .then(res => {
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          return res.json();
-        })
-        .catch(() => null) // 1つ死んでも全体は止めない
-    )
-  );
-}
-
-
-// =========================
-// ニュース読み込み
-// =========================
 function loadNews() {
 
   const newsList = document.getElementById("newsList");
@@ -38,41 +5,25 @@ function loadNews() {
 
   newsList.innerHTML = "読み込み中...";
 
-  fetchAllRSS(RSS_LIST)
-    .then(results => {
+  fetch("../data/news.json")
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(items => {
 
-      let items = [];
-
-      results.forEach(data => {
-        if (data && data.items) {
-          items = items.concat(data.items);
-        }
-      });
-
-      if (items.length === 0) {
+      if (!Array.isArray(items) || items.length === 0) {
         newsList.innerHTML = "記事がありません";
         return;
       }
 
-      // ★ここで日付ソートしてる
-      items.sort((a, b) =>
-        new Date(b.pubDate) - new Date(a.pubDate)
-      );
-
-      // ←ここに入れる
-      items = items.slice(0, 100);
-
-      renderNews(items);
+      renderNews(items.slice(0, 100));
     })
     .catch(() => {
       newsList.innerHTML = "取得失敗";
     });
 }
 
-
-// =========================
-// 描画
-// =========================
 function renderNews(items) {
 
   const newsList = document.getElementById("newsList");
@@ -80,195 +31,68 @@ function renderNews(items) {
 
   newsList.innerHTML = "";
 
-  items.forEach(function (item, index) {
-
-    const thumb = getThumbnail(item);
+  items.forEach((item, index) => {
 
     const el = document.createElement("div");
     el.className = "news-item";
 
     const timeText = formatTimeAgo(item.pubDate);
 
+    const thumb = item.thumbnail || "";
+
     el.innerHTML = `
-      <a href="${item.link}" target="_blank">
+      <a href="${item.link}" target="_blank" rel="noopener">
         <div class="news-row">
-          <img src="${thumb}">
+
+          <img class="news-thumb" src="${thumb}" loading="lazy">
+
           <div class="news-text">
             <div class="news-title">${item.title}</div>
 
             <div class="news-meta">
-              <div class="news-source">${getSource(item)}</div>
+              <div class="news-source">${item.source || "RSS"}</div>
               <div class="news-date">${timeText}</div>
             </div>
-
           </div>
+
         </div>
       </a>
     `;
 
+    const img = el.querySelector(".news-thumb");
+
+    // ★画像死んだら完全に削除（レイアウト維持）
+    img.onerror = () => {
+      el.classList.add("no-image");
+      img.remove();
+    };
+
     newsList.appendChild(el);
 
-    // ★ここだけ追加（5件ごと）
     if ((index + 1) % 5 === 0) {
       newsList.appendChild(renderAdBlock());
     }
   });
 }
 
-
-function getThumbnail(item) {
-
-  const link = item.link || "";
-
-  // ======================
-  // .php系（専用ルール）
-  // ======================
-  if (link.includes(".php")) {
-
-    return item.media?.content?.[0]?.url ||
-           item.enclosure?.link ||
-           item.thumbnail ||
-           extractImg(item) ||
-           "https://placehold.jp/90x60.png";
-  }
-
-  let url = "";
-
-  // ======================
-  // 通常RSS2JSON
-  // ======================
-  if (item.thumbnail) {
-    url = item.thumbnail;
-  }
-
-  // ======================
-  // YouTube RSS2JSON
-  // ======================
-  else if (item.enclosure?.link) {
-    url = item.enclosure.link;
-  }
-
-  // ======================
-  // YouTube media系
-  // ======================
-  else if (item["media:thumbnail"]?.url) {
-    url = item["media:thumbnail"].url;
-  }
-
-  // ======================
-  // 最終救済
-  // ======================
-  else if (item.description) {
-    const match = item.description.match(/https?:\/\/[^"]+\.(jpg|png|jpeg)/);
-    if (match) url = match[0];
-  }
-
-  return url || "https://placehold.jp/90x60.png";
-}
-
-// 共通
-function extractImg(item) {
-  if (!item.description) return "";
-  const m = item.description.match(/<img[^>]+src="([^">]+)"/);
-  return m ? m[1] : "";
-}
-
-
-function getSource(item) {
-
-  const link = item.link || "";
-
-  let host = "";
-
-  try {
-    host = new URL(link).hostname.replace(/^www\./, "");
-  } catch (e) {
-    return "RSS";
-  }
-
-  // ======================
-  // リスト一致チェック
-  // ======================
-  for (const rule of SOURCE_LABELS) {
-    if (host.includes(rule.match)) {
-      return rule.label;
-    }
-  }
-
-  // ======================
-  // RSS author（補助）
-  // ======================
-  if (item.author && item.author.length < 20 && !item.author.includes("<")) {
-    return item.author;
-  }
-
-  // ======================
-  // デフォルト（ドメインそのまま）
-  // ======================
-  return host;
-}
-
-
 function formatTimeAgo(pubDate) {
-  const now = new Date();
-  const date = new Date(pubDate);
-  const diff = now - date;
 
-  const sec = Math.floor(diff / 1000);
-  const min = Math.floor(sec / 60);
-  const hour = Math.floor(min / 60);
-  const day = Math.floor(hour / 24);
-  const month = Math.floor(day / 30);
+  const diff = Date.now() - new Date(pubDate);
+
+  const sec = diff / 1000;
+  const min = sec / 60;
+  const hour = min / 60;
+  const day = hour / 24;
+  const month = day / 30;
 
   if (sec < 60) return "たった今";
-  if (min < 60) return `${min}分前`;
-  if (hour < 24) return `${hour}時間前`;
-  if (day === 1) return "昨日";
-  if (day < 30) return `${day}日前`;
-  if (month < 12) return `${month}ヶ月前`;
+  if (min < 60) return `${Math.floor(min)}分前`;
+  if (hour < 24) return `${Math.floor(hour)}時間前`;
+  if (day < 30) return `${Math.floor(day)}日前`;
+  if (month < 12) return `${Math.floor(month)}ヶ月前`;
 
   return `${Math.floor(month / 12)}年前`;
 }
-
-
-// =========================
-// HTMLタグ除去
-// =========================
-function stripHTML(html) {
-  const tmp = document.createElement("div");
-  tmp.innerHTML = html;
-  return tmp.textContent || "";
-}
-
-// =========================
-// 広告関数まだ未使用
-// =========================
-
-function renderAdBlock() {
-  const ad = document.createElement("div");
-  ad.className = "ad-block";
-
-  ad.innerHTML = `
-  <div style="
-    width:100%;
-    max-width:320px;
-    height:50px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#f2f2f2;
-    margin:10px auto;
-    font-size:12px;
-    color:#666;
-  ">
-    広告枠
-  </div>
-`;
-
-  return ad;
-}
-
-
 
 
 document.addEventListener("DOMContentLoaded", function () {
