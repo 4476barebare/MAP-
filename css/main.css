@@ -406,6 +406,10 @@ li {
   text-decoration: none;
   color: #000;
   transition: 0.2s;
+
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .article-card img {
@@ -417,7 +421,8 @@ li {
 
 .article-card h2 {
   font-size: 16px;
-  margin: 8px 0 4px;
+  margin: 8px 10px 12px;
+  line-height: 1.4;
 }
 
 .article-card p {
@@ -426,7 +431,14 @@ li {
 }
 
 .article-card:hover {
-  opacity: 0.8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 600px) {
+  .article-list {
+    flex-direction: column;
+  }
 }
 /* =========================
    フッター
