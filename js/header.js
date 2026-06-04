@@ -5,7 +5,7 @@ function loadNews() {
 
   newsList.innerHTML = "読み込み中...";
 
-fetch("/data/news.json")
+fetch("../data/news.json")
   .then(async res => {
 
     console.log("STATUS:", res.status);
