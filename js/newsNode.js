@@ -15,18 +15,21 @@ const OUTPUT_PATH = "./data/news.json";
 const MAX_ITEMS = 100;
 
 // =========================
-// RSS取得（そのまま移植）
+// RSS取得（安全化）
 // =========================
 async function fetchAllRSS(urls) {
   const results = await Promise.all(
-    urls.map(url =>
-      fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url))
-        .then(res => {
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          return res.json();
-        })
-        .catch(() => null)
-    )
+    urls.map(async (url) => {
+      try {
+        const res = await fetch(
+          "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url)
+        );
+        if (!res.ok) return null;
+        return await res.json();
+      } catch {
+        return null;
+      }
+    })
   );
 
   return results;
@@ -63,23 +66,35 @@ async function main() {
 
   const results = await fetchAllRSS(RSS_LIST);
 
-  let newItems = [];
+  let fetchedItems = [];
 
   results.forEach(data => {
     if (data && data.items) {
-      newItems = newItems.concat(data.items);
+      fetchedItems = fetchedItems.concat(data.items);
     }
   });
 
-  if (newItems.length === 0) {
-    console.log("新規記事なし");
-  }
-
   // 既存
   const oldItems = loadOldData();
+  const oldLinks = new Set(oldItems.map(i => i.link));
 
   // =========================
-  // マージ（linkで重複排除）
+  // 新着だけ抽出（ここが重要）
+  // =========================
+  const newItems = fetchedItems.filter(item =>
+    item.link && !oldLinks.has(item.link)
+  );
+
+  // 新着なしなら終了（高速化）
+  if (newItems.length === 0) {
+    console.log("新着なし → スキップ");
+    return;
+  }
+
+  console.log("新着:", newItems.length);
+
+  // =========================
+  // マージ
   // =========================
   const map = new Map();
 
