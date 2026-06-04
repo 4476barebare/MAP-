@@ -123,12 +123,38 @@ function getThumbnail(item) {
 // 軽量化（必要フィールドだけ）
 // =========================
 function normalizeItem(item) {
+
+  const link = item.link || "";
+
+  let author = item.author || "";
+
+  // =========================
+  // FISHING JAPAN
+  // =========================
+  if (link.includes("fishingjapan.jp")) {
+    author = "FISHING JAPAN";
+  }
+
+  // =========================
+  // LureNews
+  // =========================
+  else if (link.includes("lurenewsr.com")) {
+    author = "ルアーニュース";
+  }
+
+  // =========================
+  // YouTube（必要なら）
+  // =========================
+  else if (link.includes("youtube.com")) {
+    // そのまま or チャンネル名維持
+  }
+
   return {
     title: item.title,
-    link: item.link,
+    link,
     pubDate: item.pubDate,
     thumbnail: getThumbnail(item),
-    author: item.author || ""
+    author
   };
 }
 
