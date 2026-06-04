@@ -5,19 +5,25 @@ function loadNews() {
 
   newsList.innerHTML = "読み込み中...";
 
-fetch("../data/news.json")
-  .then(async res => {
+fetch("../data/news.json", { cache: "no-store" })
+  .then(async (res) => {
 
     console.log("STATUS:", res.status);
     console.log("CONTENT-TYPE:", res.headers.get("content-type"));
 
     const text = await res.text();
 
-    console.log("RAW HEAD:", text.slice(0, 200));
+    console.log("RAW HEAD:", text.slice(0, 300));
+
+    // ★ここで必ず分岐確認
+    if (!text.trim().startsWith("[")) {
+      throw new Error("JSONじゃないレスポンス");
+    }
 
     return JSON.parse(text);
   })
   .then(data => {
+    console.log("OK:", data.length);
     renderNews(data);
   })
   .catch(err => {
