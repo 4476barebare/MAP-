@@ -13,14 +13,9 @@ const RSS_LIST = [
   "https://bunbun-fishing.com/feed/"
 ];
 
-// サイト別設定
 const SITE_CONFIG = {
   "bunbun-fishing.com": {
     encoding: "utf-8",
-    mode: "raw"
-  },
-  "old-site.jp": {
-    encoding: "shift_jis",
     mode: "raw"
   }
 };
@@ -32,43 +27,25 @@ const MAX_ITEMS = 100;
 // RSS取得
 // =========================
 async function fetchAllRSS(urls) {
-  const parser = new XMLParser({
-    ignoreAttributes: false
-  });
+  const parser = new XMLParser({ ignoreAttributes: false });
 
   const results = await Promise.all(
     urls.map(async (url) => {
       try {
-        const config = Object.entries(SITE_CONFIG).find(([domain]) =>
-          url.includes(domain)
+        const config = Object.entries(SITE_CONFIG).find(([d]) =>
+          url.includes(d)
         )?.[1];
 
-        // =========================
-        // RAW取得（自前パース）
-        // =========================
+        // RAW処理（WordPress系）
         if (config?.mode === "raw") {
-
           const res = await fetch(url, {
-            headers: {
-              "User-Agent": "Mozilla/5.0"
-            }
+            headers: { "User-Agent": "Mozilla/5.0" }
           });
 
           const buffer = await res.arrayBuffer();
-
-          // ヘッダから文字コード判定
-          const contentType = res.headers.get("content-type") || "";
-
-          let encoding = config?.encoding || "utf-8";
-
-          if (contentType.includes("shift_jis") || contentType.includes("sjis")) {
-            encoding = "shift_jis";
-          }
-
-          const text = iconv.decode(Buffer.from(buffer), encoding);
+          const text = iconv.decode(Buffer.from(buffer), config.encoding);
 
           const json = parser.parse(text);
-
           const items = json.rss?.channel?.item || [];
 
           return {
@@ -76,23 +53,24 @@ async function fetchAllRSS(urls) {
               title: i.title,
               link: i.link,
               pubDate: i.pubDate || i["dc:date"] || i.date,
-              description: i.description
+              description: i.description,
+              content: i["content:encoded"],
+              media: i["media:thumbnail"],
+              enclosure: i.enclosure,
+              creator: i["dc:creator"]
             }))
           };
         }
 
-        // =========================
         // 通常（rss2json）
-        // =========================
         const res = await fetch(
           "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url)
         );
 
         if (!res.ok) return null;
-
         return await res.json();
 
-      } catch (e) {
+      } catch {
         return null;
       }
     })
@@ -102,42 +80,23 @@ async function fetchAllRSS(urls) {
 }
 
 // =========================
-// 既存JSON読み込み
+// ユーティリティ
 // =========================
-function loadOldData() {
-  try {
-    if (fs.existsSync(OUTPUT_PATH)) {
-      const raw = fs.readFileSync(OUTPUT_PATH, "utf-8");
-      return JSON.parse(raw);
-    }
-  } catch (e) {
-    console.error("旧データ読み込み失敗", e);
-  }
-  return [];
-}
-
-// =========================
-// 保存
-// =========================
-function saveData(data) {
-  fs.mkdirSync("./data", { recursive: true });
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(data, null, 2));
-}
-
-// =========================
-// サムネ抽出
-// =========================
-function extractImg(item) {
-  if (!item.description) return "";
-  const m = item.description.match(/<img[^>]+src="([^">]+)"/);
-  return m ? m[1] : "";
-}
-
 function cleanUrl(url) {
   if (!url) return "";
   return url.split("?")[0];
 }
 
+function pickText(v) {
+  if (!v) return "";
+  if (typeof v === "string") return v;
+  if (typeof v === "object") return v["#text"] || "";
+  return "";
+}
+
+// =========================
+// サムネ取得（統合版）
+// =========================
 function getThumbnail(item) {
 
   // rss2json
@@ -145,50 +104,40 @@ function getThumbnail(item) {
     return cleanUrl(item.thumbnail);
   }
 
-  let url = "";
-
-  if (item["media:thumbnail"]?.url) {
-    url = item["media:thumbnail"].url;
+  // media
+  if (item.media?.url) {
+    return cleanUrl(item.media.url);
   }
 
-  else if (item.enclosure?.link) {
-    url = item.enclosure.link;
+  // enclosure
+  if (item.enclosure?.link) {
+    return cleanUrl(item.enclosure.link);
   }
 
-  else if (item["content:encoded"]) {
-    const html =
-      typeof item["content:encoded"] === "string"
-        ? item["content:encoded"]
-        : item["content:encoded"]?.["#text"] || "";
+  // content（ブンブン）
+  let html = pickText(item.content);
 
-    url = extractImgFromHtml(html);
+  if (!html) {
+    html = pickText(item.description);
   }
 
-  else if (item.description) {
-    const html =
-      typeof item.description === "string"
-        ? item.description
-        : item.description?.["#text"] || "";
-
-    url = extractImgFromHtml(html);
+  if (html) {
+    const m = html.match(/<img[^>]*src=["']([^"']+)["']/i);
+    if (m) return cleanUrl(m[1]);
   }
 
-  return cleanUrl(url);
+  return "";
 }
 
 // =========================
-// 正規化
+// author取得（統合版）
 // =========================
-function normalizeItem(item) {
-  const link = item.link || "";
-
+function getAuthor(item, link) {
   let author =
     item.author ||
-    item["dc:creator"] ||
     item.creator ||
     "";
 
-  // サイト別上書き
   if (link.includes("fishingjapan.jp")) {
     author = "FISHING JAPAN";
   } else if (link.includes("lurenewsr.com")) {
@@ -197,103 +146,52 @@ function normalizeItem(item) {
     author = author || "釣具のブンブン";
   }
 
+  return author;
+}
+
+// =========================
+// 正規化
+// =========================
+function normalizeItem(item) {
+  const link = item.link || "";
+
   return {
     title: item.title,
     link,
     pubDate: item.pubDate,
     thumbnail: getThumbnail(item),
-    author
+    author: getAuthor(item, link)
   };
 }
 
 // =========================
-// 1サイト1件保持
-// =========================
-function ensureOnePerSite(items) {
-  const map = new Map();
-
-  items.forEach(item => {
-    try {
-      const domain = new URL(item.link).hostname;
-
-      if (!map.has(domain)) {
-        map.set(domain, item);
-      } else {
-        const existing = map.get(domain);
-        if (new Date(item.pubDate) < new Date(existing.pubDate)) {
-          map.set(domain, item);
-        }
-      }
-    } catch {}
-  });
-
-  return Array.from(map.values());
-}
-
-// =========================
-// メイン処理
+// メイン
 // =========================
 async function main() {
   console.log("RSS取得開始");
 
   const results = await fetchAllRSS(RSS_LIST);
 
-  let fetchedItems = [];
+  let items = [];
 
   results.forEach(data => {
-    if (data && data.items) {
-      fetchedItems = fetchedItems.concat(data.items);
+    if (data?.items) {
+      items = items.concat(data.items);
     }
   });
 
-  const oldItems = loadOldData();
-  const oldLinks = new Set(oldItems.map(i => i.link));
+  const normalized = items.map(normalizeItem);
 
-  const newItemsRaw = fetchedItems.filter(item =>
-    item.link && !oldLinks.has(item.link)
-  );
-
-  if (newItemsRaw.length === 0) {
-    console.log("新着なし → スキップ");
-    return;
-  }
-
-  console.log("新着:", newItemsRaw.length);
-
-  const newItems = newItemsRaw.map(normalizeItem);
-
-  const map = new Map();
-
-  oldItems.forEach(item => {
-    if (item.link) map.set(item.link, item);
-  });
-
-  newItems.forEach(item => {
-    if (item.link) map.set(item.link, item);
-  });
-
-  let merged = Array.from(map.values());
-
-  merged.sort((a, b) =>
+  normalized.sort((a, b) =>
     new Date(b.pubDate) - new Date(a.pubDate)
   );
 
-  // ★ 各サイト1件保持
-  const keepItems = ensureOnePerSite(merged);
+  const finalData = normalized.slice(0, MAX_ITEMS);
 
-  merged = [...merged, ...keepItems];
+  fs.mkdirSync("./data", { recursive: true });
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(finalData, null, 2));
 
-  // 重複排除
-  merged = Array.from(
-    new Map(merged.map(i => [i.link, i])).values()
-  );
-
-  // 上限
-  merged = merged.slice(0, MAX_ITEMS);
-
-  saveData(merged);
-
-  console.log(`完了: ${merged.length}件保存`);
+  console.log("完了:", finalData.length);
 }
 
 main();
