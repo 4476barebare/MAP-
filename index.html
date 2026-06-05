@@ -691,12 +691,15 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
         renderAreaGuide();
         window.markerControl.preloadShop01(shopUrl);
         renderPrefWeather();
+
+        // ★ ここ
         getAlertText(window.prefData).then(function(text) {
             const el = document.getElementById("alert-bar");
             if (el) el.textContent = text;
+        });
 
-});
     });
+});
 });
 
 
