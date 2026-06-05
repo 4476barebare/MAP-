@@ -1,7 +1,7 @@
 #alert-bar {
   font-size: 12px;
   padding: 6px 10px;
-  background: #111;
+  background-color: #111;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;
