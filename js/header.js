@@ -1,7 +1,7 @@
 function getAlertText(pref, callback) {
   var messages = [];
   var areaId = pref.url;
-  var prefix = pref.notes + ":";
+  var prefix = String(pref.notes) + ":";
 
   var hasTsunami = false;
   var hasThunder = false;
