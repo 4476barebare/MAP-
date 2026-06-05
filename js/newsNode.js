@@ -181,12 +181,20 @@ function getThumbnail(item) {
 // =========================
 function normalizeItem(item) {
   const link = item.link || "";
-  let author = item.author || "";
 
+  let author =
+    item.author ||
+    item["dc:creator"] ||
+    item.creator ||
+    "";
+
+  // サイト別上書き
   if (link.includes("fishingjapan.jp")) {
     author = "FISHING JAPAN";
   } else if (link.includes("lurenewsr.com")) {
     author = "ルアーニュース";
+  } else if (link.includes("bunbun-fishing.com")) {
+    author = author || "釣具のブンブン";
   }
 
   return {
