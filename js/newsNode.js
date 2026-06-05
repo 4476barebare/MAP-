@@ -139,29 +139,32 @@ function cleanUrl(url) {
 }
 
 function getThumbnail(item) {
+
   const link = item.link || "";
-
-  if (link.includes(".php")) {
-    const url =
-      item.media?.content?.[0]?.url ||
-      item.enclosure?.link ||
-      item.thumbnail ||
-      extractImg(item);
-
-    return cleanUrl(url) || null;
-  }
 
   let url = "";
 
-  if (item.thumbnail) {
-    url = item.thumbnail;
-  } else if (item.enclosure?.link) {
-    url = item.enclosure.link;
-  } else if (item["media:thumbnail"]?.url) {
+  // ① media系
+  if (item["media:thumbnail"]?.url) {
     url = item["media:thumbnail"].url;
-  } else if (item.description) {
-    const match = item.description.match(/https?:\/\/[^"]+\.(jpg|png|jpeg|webp)/);
-    if (match) url = match[0];
+  }
+
+  // ② enclosure
+  else if (item.enclosure?.link) {
+    url = item.enclosure.link;
+  }
+
+  // ③ ★ content:encoded（最重要）
+  else if (item["content:encoded"]) {
+    const html = item["content:encoded"];
+    const match = html.match(/<img[^>]+src="([^">]+)"/);
+    if (match) url = match[1];
+  }
+
+  // ④ description fallback
+  else if (item.description) {
+    const match = item.description.match(/<img[^>]+src="([^">]+)"/);
+    if (match) url = match[1];
   }
 
   url = cleanUrl(url);
