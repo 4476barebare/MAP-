@@ -6,8 +6,17 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  position: relative;
 }
 
+#alert-signature {
+  position: absolute;
+  right: 6px;
+  bottom: 2px;
+
+  font-size: 8px;
+  opacity: 0.5;
+}
 /* =======================
    ヘッダー全体
 ======================= */
