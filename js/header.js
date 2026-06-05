@@ -1,6 +1,6 @@
 function getAlertText(pref) {
   var messages = [];
-  var areaId = pref.areaId;
+  var areaId = pref.URL;
 
   var p1 = fetch("https://www.jma.go.jp/bosai/warning/data/warning/" + areaId + ".json")
     .then(function(res) { return res.json(); })
