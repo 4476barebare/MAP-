@@ -81,19 +81,24 @@ function getAlertText(pref, callback) {
             .catch(function() {})
             .finally(function() {
 
-              // ---------------------
-              // 重複削除
-              // ---------------------
-              messages = messages.filter(function(v, i, self) {
-                return self.indexOf(v) === i;
-              });
+// ---------------------
+// 重複削除
+// ---------------------
+messages = messages.filter(function(v, i, self) {
+  return self.indexOf(v) === i;
+});
 
-              var text =
-                prefix +
-                (messages.length
-                  ? messages.join(" / ")
-                  : "現在警報はありません"
-                );
+// ★ 強制文字列化（ここが要求部分）
+var msgText = Array.isArray(messages)
+  ? messages.join(" / ")
+  : String(messages);
+
+var text =
+  String(prefix) +
+  (msgText.length > 0
+    ? msgText
+    : "現在警報はありません"
+  );
 
               // ---------------------
               // 色決定（優先順位あり）
