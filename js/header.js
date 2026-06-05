@@ -1,3 +1,74 @@
+function getAlertText(pref) {
+  var messages = [];
+  var areaId = pref.areaId;
+
+  // =========================
+  // ① 雷（警報のみ）
+  // =========================
+  var p1 = fetch("https://www.jma.go.jp/bosai/warning/data/warning/" + areaId + ".json")
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      data.forEach(function(area) {
+        area.warnings.forEach(function(w) {
+          // 33 = 雷
+          if (w.code === "33" && w.status === "issue") {
+            messages.push("雷警報");
+          }
+        });
+      });
+    });
+
+  // =========================
+  // ② 津波
+  // =========================
+  var p2 = fetch("https://www.jma.go.jp/bosai/tsunami/data/list.json")
+    .then(function(res) { return res.json(); })
+    .then(function(list) {
+      if (!list.length) return;
+
+      return fetch("https://www.jma.go.jp/bosai/tsunami/data/" + list[0].id + ".json")
+        .then(function(res) { return res.json(); })
+        .then(function(detail) {
+          if (!detail.areas) return;
+
+          detail.areas.forEach(function(a) {
+            // エリアコード一致で判定
+            if (a.code === areaId && a.grade && a.grade !== "None") {
+              messages.push("津波警報");
+            }
+          });
+        });
+    });
+
+  // =========================
+  // ③ 台風（簡易）
+  // =========================
+  var p3 = fetch("https://www.jma.go.jp/bosai/typhoon/data/list.json")
+    .then(function(res) { return res.json(); })
+    .then(function(list) {
+      if (list.length > 0) {
+        messages.push("台風接近中");
+      }
+    });
+
+  // =========================
+  // 統合
+  // =========================
+  return Promise.all([p1, p2, p3]).then(function() {
+
+    // 重複削除
+    messages = messages.filter(function(v, i, self) {
+      return self.indexOf(v) === i;
+    });
+
+    if (messages.length === 0) {
+      return "現在警報はありません";
+    }
+
+    return messages.join(" / ");
+  });
+}
+
 function loadNews() {
 
   const newsList = document.getElementById("newsList");
