@@ -694,10 +694,7 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
 
         // ★ ここ
         alert(window.prefData.url);
-        getAlertText(window.prefData).then(function(text) {
-            const el = document.getElementById("alert-bar");
-            if (el) el.textContent = text;
-        });
+
 
     });
 });
