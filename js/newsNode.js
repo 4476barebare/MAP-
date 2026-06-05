@@ -149,6 +149,10 @@ function getAuthor(item, link) {
     return "釣具のブンブン";
   }
 
+  if (url.includes("tsurinews.jp")) {
+    return "TSURINEWS";
+  }
+
   // ■ それ以外はRSSの値を使う
   const author =
     item.author ||
