@@ -693,7 +693,7 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
         renderPrefWeather();
 
         // ★ ここ
-        alert(window.prefData.URL);
+        alert(window.prefData.url);
         getAlertText(window.prefData).then(function(text) {
             const el = document.getElementById("alert-bar");
             if (el) el.textContent = text;
