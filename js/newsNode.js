@@ -10,7 +10,7 @@ const RSS_LIST = [
   "https://www.youtube.com/feeds/videos.xml?channel_id=UChHUhF5bgoeS1Z-uE_HRQfQ",
   "https://www.youtube.com/feeds/videos.xml?user=yoorai0121",
   "https://www.youtube.com/feeds/videos.xml?channel_id=UCwmAyvxNTirU4uaDxwoveDA",
-  "https://bunbun-fishing.com/fishing/feed/"
+  "https://bunbun-fishing.com/feed/"
 ];
 
 // サイト別設定
