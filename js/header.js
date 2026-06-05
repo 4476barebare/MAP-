@@ -2,6 +2,10 @@ function getAlertText(pref, callback) {
   var messages = [];
   var areaId = pref.url;
 
+  var hasTsunami = false;
+  var hasThunder = false;
+  var hasTyphoon = false;
+
   // ---------------------
   // ① 雷
   // ---------------------
@@ -16,13 +20,14 @@ function getAlertText(pref, callback) {
           area.warnings.forEach(function(w) {
             if (w.code === "33" && w.status === "issue") {
               messages.push("雷警報");
+              hasThunder = true;
             }
           });
         });
       }
 
     })
-    .catch(function(){})
+    .catch(function() {})
     .finally(function() {
 
       // ---------------------
@@ -42,6 +47,7 @@ function getAlertText(pref, callback) {
                   detail.areas.forEach(function(a) {
                     if (a.code === areaId && a.grade && a.grade !== "None") {
                       messages.push("津波警報");
+                      hasTsunami = true;
                     }
                   });
                 }
@@ -50,7 +56,7 @@ function getAlertText(pref, callback) {
           }
 
         })
-        .catch(function(){})
+        .catch(function() {})
         .finally(function() {
 
           // ---------------------
@@ -59,27 +65,52 @@ function getAlertText(pref, callback) {
           fetch("https://www.jma.go.jp/bosai/typhoon/data/list.json")
             .then(function(res) { return res.json(); })
             .then(function(list) {
+
               if (Array.isArray(list) && list.length > 0) {
                 messages.push("台風接近中");
+                hasTyphoon = true;
               }
+
             })
-            .catch(function(){})
+            .catch(function() {})
             .finally(function() {
 
               // ---------------------
-              // 結果返却
+              // 重複削除
               // ---------------------
               messages = messages.filter(function(v, i, self) {
                 return self.indexOf(v) === i;
               });
 
-              if (!callback) return;
+              var prefix = (pref && pref.notes) ? pref.notes + ":" : "";
 
-              callback(
-                messages.length
+              var text =
+                prefix +
+                (messages.length
                   ? messages.join(" / ")
                   : "現在警報はありません"
-              );
+                );
+
+              // ---------------------
+              // 色決定（優先順位あり）
+              // 津波 > 雷 > 台風
+              // ---------------------
+              var color = "#ffffff"; // 台風 or 通常
+
+              if (hasTsunami) {
+                color = "#ff0000"; // 赤
+              } else if (hasThunder) {
+                color = "#ffd400"; // 黄
+              } else if (hasTyphoon) {
+                color = "#ffffff"; // 白
+              }
+
+              if (!callback) return;
+
+              callback({
+                text: text,
+                color: color
+              });
 
             });
 
