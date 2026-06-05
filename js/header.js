@@ -5,39 +5,50 @@ function getAlertText(pref) {
   var p1 = fetch("https://www.jma.go.jp/bosai/warning/data/warning/" + areaId + ".json")
     .then(function(res) { return res.json(); })
     .then(function(data) {
+
+      if (!Array.isArray(data)) return;
+
       data.forEach(function(area) {
+        if (!area.warnings) return;
+
         area.warnings.forEach(function(w) {
           if (w.code === "33" && w.status === "issue") {
             messages.push("雷警報");
           }
         });
       });
+
     });
 
   var p2 = fetch("https://www.jma.go.jp/bosai/tsunami/data/list.json")
     .then(function(res) { return res.json(); })
     .then(function(list) {
-      if (!list.length) return;
+
+      if (!Array.isArray(list) || !list.length) return;
 
       return fetch("https://www.jma.go.jp/bosai/tsunami/data/" + list[0].id + ".json")
         .then(function(res) { return res.json(); })
         .then(function(detail) {
-          if (!detail.areas) return;
+
+          if (!detail || !Array.isArray(detail.areas)) return;
 
           detail.areas.forEach(function(a) {
             if (a.code === areaId && a.grade && a.grade !== "None") {
               messages.push("津波警報");
             }
           });
+
         });
     });
 
   var p3 = fetch("https://www.jma.go.jp/bosai/typhoon/data/list.json")
     .then(function(res) { return res.json(); })
     .then(function(list) {
-      if (list.length > 0) {
+
+      if (Array.isArray(list) && list.length > 0) {
         messages.push("台風接近中");
       }
+
     });
 
   return Promise.all([p1, p2, p3]).then(function() {
@@ -46,11 +57,7 @@ function getAlertText(pref) {
       return self.indexOf(v) === i;
     });
 
-    if (messages.length === 0) {
-      return "現在警報はありません";
-    }
-
-    return messages.join(" / ");
+    return messages.length ? messages.join(" / ") : "現在警報はありません";
   });
 }
 
