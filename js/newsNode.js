@@ -140,43 +140,37 @@ function cleanUrl(url) {
 
 function getThumbnail(item) {
 
-  let url = "";
-
-  // 0. rss2json系
+  // rss2json
   if (item.thumbnail) {
     return cleanUrl(item.thumbnail);
   }
 
-  // ① media
+  let url = "";
+
   if (item["media:thumbnail"]?.url) {
     url = item["media:thumbnail"].url;
   }
 
-  // ② enclosure
   else if (item.enclosure?.link) {
     url = item.enclosure.link;
   }
 
-  // ③ content
   else if (item["content:encoded"]) {
     const html =
       typeof item["content:encoded"] === "string"
         ? item["content:encoded"]
         : item["content:encoded"]?.["#text"] || "";
 
-    const match = html.match(/<img[^>]+src="([^">]+)"/);
-    if (match) url = match[1];
+    url = extractImgFromHtml(html);
   }
 
-  // ④ description
   else if (item.description) {
     const html =
       typeof item.description === "string"
         ? item.description
         : item.description?.["#text"] || "";
 
-    const match = html.match(/<img[^>]+src="([^">]+)"/);
-    if (match) url = match[1];
+    url = extractImgFromHtml(html);
   }
 
   return cleanUrl(url);
