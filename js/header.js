@@ -1,7 +1,12 @@
 function getAlertText(pref, callback) {
   var messages = [];
   var areaId = pref.url;
-  var prefix = String(pref.notes) + ":";
+
+  // ★ ここだけ安全化（Objectでも崩れない）
+  var prefix =
+    (pref && typeof pref.notes === "string")
+      ? pref.notes + ":"
+      : "";
 
   var hasTsunami = false;
   var hasThunder = false;
