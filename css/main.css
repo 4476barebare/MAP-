@@ -1,24 +1,4 @@
-#alert-bar {
-  font-size: 12px;
-  padding: 6px 10px;
-  background-color: #111;
-  color: #fff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  z-index: 1; /* ★これが重要 */
-}
 
-#alert-signature {
-  position: absolute;
-  right: 6px;
-  bottom: 2px;
-  color: #fff;
-  font-size: 8px;
-  opacity: 0.5;
-  z-index: 10; /* ★これが重要 */
-}
 /* =======================
    ヘッダー全体
 ======================= */
@@ -343,6 +323,31 @@ header {
   display: none;
 }
 
+.alert-wrap {
+  position: relative;
+  font-size: 12px;
+  padding: 6px 10px;
+  padding-right: 48px; /* ★署名分の逃げ */
+  background: #111;
+  color: #fff;
+}
+
+#alert-bar {
+  display: block;              /* ★spanのままだと詰むのでブロック化 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#alert-signature {
+  position: absolute;
+  right: 6px;
+  bottom: 2px;
+  font-size: 8px;
+  opacity: 0.5;
+  z-index: 10;
+  pointer-events: none;
+}
 
 html,
 body {
