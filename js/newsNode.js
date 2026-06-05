@@ -10,7 +10,9 @@ const RSS_LIST = [
   "https://www.youtube.com/feeds/videos.xml?channel_id=UChHUhF5bgoeS1Z-uE_HRQfQ",
   "https://www.youtube.com/feeds/videos.xml?user=yoorai0121",
   "https://www.youtube.com/feeds/videos.xml?channel_id=UCwmAyvxNTirU4uaDxwoveDA",
-  "https://bunbun-fishing.com/feed/"
+  "https://bunbun-fishing.com/feed/",
+  "https://tsurinews.jp/feed/",
+  "https://castingnet.jp/sp/news/rss.php"
 ];
 
 const SITE_CONFIG = {
