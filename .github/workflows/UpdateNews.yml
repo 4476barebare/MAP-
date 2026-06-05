@@ -21,12 +21,13 @@ jobs:
         with:
           node-version: '18'
 
-      # ★ ここが重要
-      - name: Enable ES Modules
-        run: echo '{"type":"module"}' > package.json
+      # ❌ これ削除
+      # - name: Enable ES Modules
+      #   run: echo '{"type":"module"}' > package.json
 
+      # ここでちゃんと全部入る
       - name: Install dependencies
-        run: npm install node-fetch
+        run: npm install
 
       - name: Run script
         run: node js/newsNode.js
