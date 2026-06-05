@@ -129,26 +129,32 @@ function getThumbnail(item) {
   return "";
 }
 
-// =========================
-// author取得（統合版）
-// =========================
 function getAuthor(item, link) {
-  let author =
+
+  // 安全に文字列化
+  const url = (link || "").toLowerCase();
+
+  // ■ ドメイン優先（完全固定）
+  if (url.includes("fishingjapan.jp")) {
+    return "FISHING JAPAN";
+  }
+
+  if (url.includes("lurenewsr.com")) {
+    return "ルアーニュース";
+  }
+
+  if (url.includes("bunbun-fishing.com")) {
+    return "釣具のブンブン";
+  }
+
+  // ■ それ以外はRSSの値を使う
+  const author =
     item.author ||
     item.creator ||
     "";
 
-  if (link.includes("fishingjapan.jp")) {
-    author = "FISHING JAPAN";
-  } else if (link.includes("lurenewsr.com")) {
-    author = "ルアーニュース";
-  } else if (link.includes("bunbun-fishing.com")) {
-    author = author || "釣具のブンブン";
-  }
-
-  return author;
+  return author || "RSS";
 }
-
 // =========================
 // 正規化
 // =========================
