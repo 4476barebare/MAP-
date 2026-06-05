@@ -1,6 +1,7 @@
 function getAlertText(pref, callback) {
   var messages = [];
   var areaId = pref.url;
+  var prefix = pref.notes + ":";
 
   var hasTsunami = false;
   var hasThunder = false;
@@ -82,8 +83,6 @@ function getAlertText(pref, callback) {
                 return self.indexOf(v) === i;
               });
 
-              var prefix = (pref && pref.notes) ? pref.notes + ":" : "";
-
               var text =
                 prefix +
                 (messages.length
@@ -95,14 +94,14 @@ function getAlertText(pref, callback) {
               // 色決定（優先順位あり）
               // 津波 > 雷 > 台風
               // ---------------------
-              var color = "#ffffff"; // 台風 or 通常
+              var color = "#ffffff";
 
               if (hasTsunami) {
-                color = "#ff0000"; // 赤
+                color = "#ff0000";
               } else if (hasThunder) {
-                color = "#ffd400"; // 黄
+                color = "#ffd400";
               } else if (hasTyphoon) {
-                color = "#ffffff"; // 白
+                color = "#ffffff";
               }
 
               if (!callback) return;
