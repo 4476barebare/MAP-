@@ -692,10 +692,12 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
         window.markerControl.preloadShop01(shopUrl);
         renderPrefWeather();
 
-        //alert(window.prefData.url);
-getAlertText(window.prefData, function(text) {
+getAlertText(window.prefData, function(result) {
     const el = document.getElementById("alert-bar");
-    if (el) el.textContent = text;
+    if (!el) return;
+
+    el.textContent = result.text;
+    el.style.color = result.color;
 });
 
     });
