@@ -140,11 +140,14 @@ function cleanUrl(url) {
 
 function getThumbnail(item) {
 
-  const link = item.link || "";
-
   let url = "";
 
-  // ① media系
+  // 0. rss2json系
+  if (item.thumbnail) {
+    return cleanUrl(item.thumbnail);
+  }
+
+  // ① media
   if (item["media:thumbnail"]?.url) {
     url = item["media:thumbnail"].url;
   }
@@ -154,26 +157,29 @@ function getThumbnail(item) {
     url = item.enclosure.link;
   }
 
-  // ③ ★ content:encoded（最重要）
+  // ③ content
   else if (item["content:encoded"]) {
-    const html = item["content:encoded"];
+    const html =
+      typeof item["content:encoded"] === "string"
+        ? item["content:encoded"]
+        : item["content:encoded"]?.["#text"] || "";
+
     const match = html.match(/<img[^>]+src="([^">]+)"/);
     if (match) url = match[1];
   }
 
-  // ④ description fallback
+  // ④ description
   else if (item.description) {
-    const match = item.description.match(/<img[^>]+src="([^">]+)"/);
+    const html =
+      typeof item.description === "string"
+        ? item.description
+        : item.description?.["#text"] || "";
+
+    const match = html.match(/<img[^>]+src="([^">]+)"/);
     if (match) url = match[1];
   }
 
-  url = cleanUrl(url);
-
-  if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(url)) {
-    return null;
-  }
-
-  return url;
+  return cleanUrl(url);
 }
 
 // =========================
