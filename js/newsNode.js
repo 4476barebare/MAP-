@@ -153,6 +153,10 @@ function getAuthor(item, link) {
     return "TSURINEWS";
   }
 
+  if (url.includes("castingnet.jp")) {
+    return "キャスティング";
+  }
+
   // ■ それ以外はRSSの値を使う
   const author =
     item.author ||
