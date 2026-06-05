@@ -40,6 +40,7 @@
     </nav>
   </div>
 </header>
+<div id="alert-bar"></div>
 
 <div id="lf-map">
   <div class="map-ui-top">
@@ -690,6 +691,11 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
         renderAreaGuide();
         window.markerControl.preloadShop01(shopUrl);
         renderPrefWeather();
+        getAlertText(window.prefData).then(function(text) {
+            const el = document.getElementById("alert-bar");
+            if (el) el.textContent = text;
+
+});
     });
 });
 
