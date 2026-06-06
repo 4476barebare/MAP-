@@ -1021,6 +1021,7 @@ function zoomToSpot(spot) {
     window.mapStateSnapshot = null;
     disablePhase2(window.map);
     resetSpotLayers();
+    openArea(window.currentAreaId);
 
     // ========================
     // ★ レイヤー統一
