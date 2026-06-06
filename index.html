@@ -775,7 +775,7 @@ div.querySelector('h2').addEventListener('click', () => {
   updateStateFromHash();
   routeUpdate();
 
-  openArea(area.individualId);
+openArea(area.individualId, true);
 
 });
 
@@ -885,11 +885,11 @@ function splitCSVLine(line) {
     return { name, date, whether };
 }
 
-function openArea(areaKey) {
+function openArea(areaKey, isUserAction = false) {
 
   const container = document.getElementById('area-guide');
 
-  // モード切替（これ必須）
+  // モード切替
   container.classList.remove('collapsed-mode');
   container.classList.add('active-mode');
 
@@ -902,9 +902,13 @@ function openArea(areaKey) {
       area.classList.add('active');
       text.classList.add('open');
 
+      // 先頭寄せ
       container.insertBefore(area, container.children[1]);
 
-      area.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      // ★ ユーザー操作時のみスクロール
+      if (isUserAction) {
+        area.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
 
     } else {
       area.classList.remove('active');
