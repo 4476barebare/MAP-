@@ -378,7 +378,11 @@ li {
 
 .banner {
   max-width: 728px;
-  margin-top: 10px;
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
 .banner img {
