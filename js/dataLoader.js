@@ -1083,7 +1083,7 @@ function zoomToSpot(spot) {
                 window.map.doubleClickZoom.enable();
                 window.map.touchZoom.enable();
                 
-                const area = window.areaId.split("_");
+                const area = window.currentAreaId.split("_");
                 openArea(area[1]);
             });
 
