@@ -3,7 +3,7 @@
 // ================================
 // ■ 第一段階
 // ================================
-function applyFirstStage(spots, stations) {
+export function applyFirstStage(spots, stations) {
 
     if (!Array.isArray(spots) || !Array.isArray(stations)) {
         return spots;
@@ -51,11 +51,10 @@ function applyFirstStage(spots, stations) {
 
     return spots;
 }
-
 // ================================
 // ■ 第二段階
 // ================================
-function applySecondStage(spots) {
+export function applySecondStage(spots) {
 
     if (!Array.isArray(spots)) return spots;
 
@@ -113,11 +112,10 @@ function applySecondStage(spots) {
 
     return spots;
 }
-
 // ================================
 // ■ 第三段階
 // ================================
-function applyThirdStage(spots) {
+export function applyThirdStage(spots) {
 
     if (!Array.isArray(spots)) return spots;
 
@@ -150,7 +148,6 @@ function applyThirdStage(spots) {
 
     return spots;
 }
-
 // ================================
 // ■ ユーティリティ
 // ================================
@@ -410,19 +407,10 @@ function calcGeoDistance(lat1, lng1, lat2, lng2) {
 // ================================
 // ■ 実行ラッパー
 // ================================
-function runWhether(spots, stations) {
+export function runWhether(spots, stations) {
     applyFirstStage(spots, stations);
     applySecondStage(spots);
     applyThirdStage(spots);
     return spots;
 }
 
-// ================================
-// ■ export
-// ================================
-module.exports = {
-    runWhether,
-    applyFirstStage,
-    applySecondStage,
-    applyThirdStage
-};
