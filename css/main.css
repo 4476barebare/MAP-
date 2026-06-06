@@ -378,6 +378,7 @@ li {
 
 .banner {
   max-width: 728px;
+  margin-top: 10px;
 }
 
 .banner img {
