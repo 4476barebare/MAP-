@@ -1021,8 +1021,7 @@ function zoomToSpot(spot) {
     window.mapStateSnapshot = null;
     disablePhase2(window.map);
     resetSpotLayers();
-    const area = window.currentSpotId.split("_");
-    openArea(area[0]);
+
 
     // ========================
     // ★ レイヤー統一
@@ -1083,6 +1082,9 @@ function zoomToSpot(spot) {
                 window.map.scrollWheelZoom.enable();
                 window.map.doubleClickZoom.enable();
                 window.map.touchZoom.enable();
+                
+                const area = window.areaId.split("_");
+                openArea(area[1]);
             });
 
         return;
