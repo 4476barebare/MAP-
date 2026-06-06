@@ -377,6 +377,7 @@ li {
 }
 
 .banner {
+  display: block;
   max-width: 728px;
   margin: 20px 5px 0;
   background: #fff;
