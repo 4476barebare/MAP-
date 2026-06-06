@@ -768,9 +768,15 @@ function renderAreaGuide() {
       <p class="text">${area.notes}</p>
     `;
 
-    div.querySelector('h2').addEventListener('click', () => {
-      openArea(area.individualId);
-    });
+div.querySelector('h2').addEventListener('click', () => {
+
+  location.hash = encodeURIComponent(area.name);
+  updateStateFromHash();
+  routeUpdate();
+
+  openArea(area.individualId);
+
+});
 
     container.appendChild(div);
   });
