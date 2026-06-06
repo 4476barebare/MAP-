@@ -383,7 +383,7 @@ li {
   background: #fff;
   border-radius: 4px;
   overflow: hidden; /* ←これが本体 */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
 
 .banner img {
@@ -396,7 +396,7 @@ li {
    エリアガイド全体
 ========================= */
 #area-guide {
-  padding: 16px;
+  padding: 5px 16px 16px 16px;
   background: #fff;
 }
 
