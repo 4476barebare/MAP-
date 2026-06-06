@@ -1021,7 +1021,9 @@ function zoomToSpot(spot) {
     window.mapStateSnapshot = null;
     disablePhase2(window.map);
     resetSpotLayers();
-    
+    const area = window.currentSpotId.split("_");
+    openArea(area[0]);
+
     // ========================
     // ★ レイヤー統一
     // ========================
@@ -1067,8 +1069,6 @@ function zoomToSpot(spot) {
 
                 showFishMarkers(safe2.URL);
                 createWeekItem(safe2.whether);
-                const area = window.areaId.split("_");
-                openArea(area[1]);
 
                 // ❌ 削除：window.map.setMinZoom(safe.zoom || 15);
                 window.map.setMaxZoom(18);
