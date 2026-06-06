@@ -2218,6 +2218,7 @@ requestAnimationFrame(() => {
     initAreaUI();
     showPrefSpots();
     renderPrefWeather();
+    resetAreaGuide();
 
 });
 }
