@@ -376,6 +376,16 @@ li {
     cursor: pointer;
 }
 
+.banner {
+  max-width: 728px;
+}
+
+.banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 
 /* =========================
    エリアガイド全体
