@@ -451,6 +451,7 @@ function selectArea(area) {
     // -------------------------
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
+        openArea(areaObj.individualId);
         showSpotsForArea(window.currentAreaId);
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
