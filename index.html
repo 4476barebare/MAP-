@@ -398,6 +398,7 @@ if (window.currentSpotId) {
 
     document.getElementById('map-back-btn').style.display = 'none';
     initAreaUI();
+    
 }
 
 // =======================
@@ -911,6 +912,18 @@ function openArea(areaKey) {
     }
 
   });
+}
+
+function resetAreaGuide() {
+
+  const container = document.getElementById('area-guide');
+
+  container.classList.remove('active-mode');
+  container.classList.add('collapsed-mode');
+
+  // ★ DOMを初期状態に戻す
+  renderAreaGuide();
+
 }
 
 
