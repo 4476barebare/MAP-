@@ -383,7 +383,7 @@ li {
   background: #fff;
   border-radius: 4px;
   overflow: hidden; /* ←これが本体 */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
 
 .banner img {
