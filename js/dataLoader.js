@@ -1219,20 +1219,69 @@ function createWeekItem(weekData) {
   const rawDaily = weekData?.daily || [];
   const tideList = window.tideWeek || [];
 
-  // 【修正1】dailyListの変換を安全に（オブジェクトならそのまま通す）
   const dailyList = rawDaily.map(d => {
     if (!d) return null;
-    // 文字列のパイプ区切りデータだった場合のみ配列変換、それ以外はオブジェクトとして扱う
+    if (Array.isArray(d)) return d;
     if (typeof d === "string") {
       return d.split("|").map(v => Number(v));
     }
     return d;
   });
 
-  const list = [
-    ...hourlyList.map(v => ({ type: "hourly", data: v })),
-    ...dailyList.map(v => ({ type: "daily", data: v }))
-  ].filter(v => v && v.data);
+  // =========================
+  // list生成（修正ポイント）
+  // =========================
+  const today = new Date();
+
+  const isSameDay = (d1, d2) => {
+    return d1.getFullYear() === d2.getFullYear() &&
+           d1.getMonth() === d2.getMonth() &&
+           d1.getDate() === d2.getDate();
+  };
+
+  let todayFirst = false;
+  if (hourlyList[0]?.time) {
+    todayFirst = isSameDay(new Date(hourlyList[0].time), today);
+  }
+
+  const list = new Array(7).fill(null);
+
+  if (todayFirst) {
+    // hourly×3 + daily×4
+    let h = 0;
+    for (let i = 0; i < 3; i++) {
+      if (hourlyList[h]) {
+        list[i] = { type: "hourly", data: hourlyList[h] };
+        h++;
+      }
+    }
+
+    let d = 0;
+    for (let i = 3; i < 7; i++) {
+      if (dailyList[d]) {
+        list[i] = { type: "daily", data: dailyList[d] };
+        d++;
+      }
+    }
+
+  } else {
+    // hourly×2 + daily×5
+    let h = 0;
+    for (let i = 0; i < 2; i++) {
+      if (hourlyList[h]) {
+        list[i] = { type: "hourly", data: hourlyList[h] };
+        h++;
+      }
+    }
+
+    let d = 0;
+    for (let i = 2; i < 7; i++) {
+      if (dailyList[d]) {
+        list[i] = { type: "daily", data: dailyList[d] };
+        d++;
+      }
+    }
+  }
 
   const labels = ["", "", "", "", "", "WAV TEMP WEEKLY"];
 
@@ -1243,20 +1292,18 @@ function createWeekItem(weekData) {
     labelsContainer.appendChild(div);
   }
 
-  const today = new Date();
-
   const getDate = (i) => {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
-  // 1行ずつ生成
   for (let row = 0; row < 6; row++) {
     const tr = document.createElement("div");
     tr.className = "week-row";
 
     for (let col = 0; col < 7; col++) {
+
       const cell = document.createElement("div");
       const item = list[col];
 
@@ -1266,18 +1313,14 @@ function createWeekItem(weekData) {
 
       let value = "—";
 
-      // =========================
-      // row0: 日付
-      // =========================
+      // 日付
       if (row === 0) {
         value = getDate(col);
       }
 
-      // =========================
-      // row1: 潮
-      // =========================
+      // 潮
       if (row === 1) {
-        const tide = tideList?.[col]?.tide ?? tideList?.[col];
+        const tide = item?.data?.tide ?? tideList?.[col]?.tide ?? tideList?.[col];
         value = tide ?? "—";
 
         if (tide === "大潮") {
@@ -1286,25 +1329,29 @@ function createWeekItem(weekData) {
         }
       }
 
-      // =========================
-      // row2: 天気
-      // =========================
+      // 天気
       if (row === 2) {
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
+
           if (item.type === "hourly") {
+
             const weatherList = data?.hourly2 ?? data?.weather ?? [];
+
             const adjustCode = (code, pop) => {
               const p = Number(pop);
+
               if (code >= 60) {
                 if (p >= 80) return 70;
                 if (p >= 60) return 60;
                 return 60;
               }
+
               if (p >= 70) return 30;
               if (p >= 50) return 10;
+
               return code;
             };
 
@@ -1315,7 +1362,9 @@ function createWeekItem(weekData) {
             for (const r of weatherList) {
               const rawCode = Number(r?.[0]);
               const pop = r?.[3];
+
               if (!Number.isFinite(rawCode)) continue;
+
               const adjusted = adjustCode(rawCode, pop);
               map[adjusted] = (map[adjusted] || 0) + 1;
             }
@@ -1323,6 +1372,7 @@ function createWeekItem(weekData) {
             for (const k in map) {
               const count = map[k];
               const code = Number(k);
+
               if (count > maxCount) {
                 maxCount = count;
                 tied = [code];
@@ -1337,31 +1387,33 @@ function createWeekItem(weekData) {
                 : tied[0];
 
             value = toWeatherIcon(best ?? 0);
+
           } else {
-            // dailyの場合
             value = toWeatherIcon(data?.weather?.[0] ?? 0);
           }
         }
       }
 
-      // =========================
-      // row3: 気温
-      // =========================
+      // 気温
       if (row === 3) {
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
+
           if (item.type === "hourly") {
             let max = -Infinity;
-            const list = data?.hourly2 ?? data?.weather ?? [];
-            for (const r of list) {
+            const list2 = data?.hourly2 ?? data?.weather ?? [];
+
+            for (const r of list2) {
               const t = r?.[1];
               if (typeof t === "number" && t > max) {
                 max = t;
               }
             }
+
             value = max !== -Infinity ? Math.round(max) : "—";
+
           } else {
             const temp = data?.weather?.[1];
             value = temp != null ? Math.round(temp) : "—";
@@ -1369,14 +1421,13 @@ function createWeekItem(weekData) {
         }
       }
 
-      // =========================
-      // row4: 水温
-      // =========================
+      // 水温
       if (row === 4) {
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
+
           if (item.type === "hourly") {
             const water = data?.oneday?.avg;
             value = water != null ? Math.round(water) : "—";
@@ -1387,24 +1438,26 @@ function createWeekItem(weekData) {
         }
       }
 
-      // =========================
-      // row5: 波高
-      // =========================
+      // 波高
       if (row === 5) {
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
+
           if (item.type === "hourly") {
             let max = -Infinity;
-            const list = data?.hourly2 ?? data?.weather ?? [];
-            for (const r of list) {
+            const list2 = data?.hourly2 ?? data?.weather ?? [];
+
+            for (const r of list2) {
               const wave = r?.[6];
               if (typeof wave === "number" && wave > max) {
                 max = wave;
               }
             }
+
             value = max !== -Infinity ? max.toFixed(1) : "—";
+
           } else {
             const wave = data?.dailyEx?.wave;
             value = wave != null ? wave.toFixed(1) : "—";
@@ -1412,35 +1465,46 @@ function createWeekItem(weekData) {
         }
       }
 
-      // =========================
-      // 【修正2】clickイベントの管理
-      // =========================
+      // click
       cell.style.cursor = "pointer";
-      
-      // マス単体のクリックで「その列（col）全体」を選択した状態にする
+
       cell.addEventListener("click", () => {
         const it = list[col];
         if (!it) return;
 
         const isSame = window.activeCol === col;
+
         if (isSame) {
           resetWeatherUI();
           return;
         }
 
         window.activeCol = col;
-        
-        // 再描画してクラス（active）を更新
         createWeekItem(weekData);
 
         const data = it.data;
+        if (!data) return;
+
         const sun = data?.oneday || data?.dailyEx;
 
-        // typeがhourlyかdailyかに応じて引数を正しく渡す
-        createHourlyWeather(data, it.type);
+        if (it.type === "hourly") {
+          createHourlyWeather(data, "hourly");
 
-        if (data?.tide) {
-          createTideGraph(data.tide, sun);
+          if (data?.tide || tideList[col]) {
+            createTideGraph(data.tide || tideList[col], sun);
+          }
+
+          return;
+        }
+
+        if (it.type === "daily") {
+          createHourlyWeather(data, "daily");
+
+          if (data?.tide || tideList[col]) {
+            createTideGraph(data.tide || tideList[col], sun);
+          }
+
+          return;
         }
       });
 
@@ -1451,25 +1515,27 @@ function createWeekItem(weekData) {
     tableContainer.appendChild(tr);
   }
 
-  // =========================
-  // 初期描画（未選択の場合のデフォルト処理）
-  // =========================
+  // 初期描画
   if (window.activeCol == null && list.length > 0) {
     window.activeCol = 0;
 
-    const firstItem = list[0];
-    const data = firstItem.data;
+    const first = list[0];
+    if (!first) return;
+
+    const data = first.data;
+    if (!data) return;
+
     const sun = data?.oneday || data?.dailyEx;
 
-    // 【修正3】初期要素がdailyの場合もあるため、固定文字列ではなくtypeを動的に渡す
-    createHourlyWeather(data, firstItem.type);
+    createHourlyWeather(data, first.type);
 
-    if (data?.tide) {
-      createTideGraph(data.tide, sun);
+    if (data?.tide || tideList[0]) {
+      createTideGraph(data.tide || tideList[0], sun);
     }
 
     requestAnimationFrame(() => {
       const rows = tableContainer.querySelectorAll(".week-row");
+
       rows.forEach(row => {
         const cells = row.querySelectorAll("div");
         if (cells[0]) {
@@ -1479,7 +1545,6 @@ function createWeekItem(weekData) {
     });
   }
 }
-
 
 function resetWeatherUI() {
 
