@@ -1202,6 +1202,7 @@ function renderMarkers() {
 window.activeCol = null;
 
 function createWeekItem(weekData) {
+    const baseDate = new Date(window.startDate); // ← CSVの2列目を事前に入れておく
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
 
@@ -1292,11 +1293,11 @@ function createWeekItem(weekData) {
     labelsContainer.appendChild(div);
   }
 
-  const getDate = (i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    return `${d.getMonth() + 1}/${d.getDate()}`;
-  };
+const getDate = (i) => {
+  const d = new Date(baseDate);
+  d.setDate(baseDate.getDate() + i);
+  return `${d.getMonth() + 1}/${d.getDate()}`;
+};
 
   for (let row = 0; row < 6; row++) {
     const tr = document.createElement("div");
