@@ -790,6 +790,9 @@ openArea(area.individualId, true);
 
 });
 
+// ================================
+// ■ CSV読み込み
+// ================================
 function loadWhetherCSV(url) {
 
     return fetch(url)
@@ -800,7 +803,6 @@ function loadWhetherCSV(url) {
         .then(text => {
 
             const lines = text.trim().split("\n");
-
             lines.shift();
 
             return lines.map(line => {
@@ -808,41 +810,25 @@ function loadWhetherCSV(url) {
                 const obj = splitCSVLine(line);
                 if (!obj) return null;
 
-                // ===== ここから追加 =====
-
-                // ★ 今日・昨日を判定
-                const today = new Date();
-                const yesterday = new Date();
-                yesterday.setDate(today.getDate() - 1);
-
-                const csvDate = new Date(obj.date);
-
-                const isYesterday =
-                    csvDate.getFullYear() === yesterday.getFullYear() &&
-                    csvDate.getMonth() === yesterday.getMonth() &&
-                    csvDate.getDate() === yesterday.getDate();
-
-                if (isYesterday) {
-
-                    // ★ hourly を1つ前に詰める
-                    obj.hourly0 = obj.hourly1;
-                    obj.water0  = obj.water1;
-
-                    obj.hourly1 = obj.hourly2;
-                    obj.water1  = obj.water2;
-
-                    // 必要なら hourly2 は空にする
-                    obj.hourly2 = null;
-                    obj.water2  = null;
+                let parsed;
+                try {
+                    parsed = JSON.parse(obj.whether);
+                } catch (e) {
+                    return null;
                 }
 
-                // ===== ここまで追加 =====
-
-                return obj;
+                // ★ dateも含めて1オブジェクト化
+                return {
+                    name: obj.name,
+                    date: obj.date,
+                    ...parsed
+                };
 
             }).filter(Boolean);
         });
 }
+
+
 // ================================
 // ■ CSV → spotへ反映
 // ================================
@@ -852,18 +838,14 @@ function applyWhetherToSpots(csvData) {
 
     for (const row of csvData) {
 
-        if (!row.name || !row.whether) continue;
+        if (!row.name) continue;
 
-        try {
-            map[row.name] = JSON.parse(row.whether);
-        } catch (e) {
-            continue;
-        }
+        // ★ そのまま保持（上書き）
+        map[row.name] = row;
     }
 
     for (const spot of window.spotData) {
 
-        // ★ undefinedチェックに変更
         if (map[spot.name] !== undefined) {
             spot.whether = map[spot.name];
         }
