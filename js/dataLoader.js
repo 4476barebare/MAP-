@@ -1228,62 +1228,10 @@ function createWeekItem(weekData) {
     return d;
   });
 
-  // =========================
-  // list生成（ここだけ修正）
-  // =========================
-  const today = new Date();
-
-  // CSVの基準日（事前に window.startDate = "2026-06-08" を入れておく）
-  const baseDate = new Date(window.startDate);
-
-  const isSameDay = (d1, d2) => {
-    return d1.getFullYear() === d2.getFullYear() &&
-           d1.getMonth() === d2.getMonth() &&
-           d1.getDate() === d2.getDate();
-  };
-
-  let todayFirst = false;
-  if (hourlyList[0]?.time) {
-    // ★ここだけ変更（today → baseDate）
-    todayFirst = isSameDay(new Date(hourlyList[0].time), baseDate);
-  }
-
-  const list = new Array(7).fill(null);
-
-  if (todayFirst) {
-    let h = 0;
-    for (let i = 0; i < 3; i++) {
-      if (hourlyList[h]) {
-        list[i] = { type: "hourly", data: hourlyList[h] };
-        h++;
-      }
-    }
-
-    let d = 0;
-    for (let i = 3; i < 7; i++) {
-      if (dailyList[d]) {
-        list[i] = { type: "daily", data: dailyList[d] };
-        d++;
-      }
-    }
-
-  } else {
-    let h = 0;
-    for (let i = 0; i < 2; i++) {
-      if (hourlyList[h]) {
-        list[i] = { type: "hourly", data: hourlyList[h] };
-        h++;
-      }
-    }
-
-    let d = 0;
-    for (let i = 2; i < 7; i++) {
-      if (dailyList[d]) {
-        list[i] = { type: "daily", data: dailyList[d] };
-        d++;
-      }
-    }
-  }
+  const list = [
+    ...hourlyList.map(v => ({ type: "hourly", data: v })),
+    ...dailyList.map(v => ({ type: "daily", data: v }))
+  ].filter(v => v && v.data);
 
   const labels = ["", "", "", "", "", "WAV TEMP WEEKLY"];
 
@@ -1293,6 +1241,8 @@ function createWeekItem(weekData) {
     div.textContent = text;
     labelsContainer.appendChild(div);
   }
+
+  const today = new Date();
 
   const getDate = (i) => {
     const d = new Date(today);
@@ -1315,10 +1265,16 @@ function createWeekItem(weekData) {
 
       let value = "—";
 
+      // =========================
+      // row0: 日付
+      // =========================
       if (row === 0) {
         value = getDate(col);
       }
 
+      // =========================
+      // row1: 潮
+      // =========================
       if (row === 1) {
         const tide = tideList?.[col]?.tide ?? tideList?.[col];
         value = tide ?? "—";
@@ -1329,6 +1285,9 @@ function createWeekItem(weekData) {
         }
       }
 
+      // =========================
+      // row2: 天気
+      // =========================
       if (row === 2) {
         if (!item) {
           value = "—";
@@ -1393,17 +1352,23 @@ function createWeekItem(weekData) {
         }
       }
 
+      // =========================
+      // row3: 気温
+      // =========================
       if (row === 3) {
+
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
 
           if (item.type === "hourly") {
-            let max = -Infinity;
-            const list2 = data?.hourly2 ?? data?.weather ?? [];
 
-            for (const r of list2) {
+            let max = -Infinity;
+
+            const list = data?.hourly2 ?? data?.weather ?? [];
+
+            for (const r of list) {
               const t = r?.[1];
               if (typeof t === "number" && t > max) {
                 max = t;
@@ -1419,7 +1384,11 @@ function createWeekItem(weekData) {
         }
       }
 
+      // =========================
+      // row4: 水温
+      // =========================
       if (row === 4) {
+
         if (!item) {
           value = "—";
         } else {
@@ -1435,17 +1404,23 @@ function createWeekItem(weekData) {
         }
       }
 
+      // =========================
+      // row5: 波高
+      // =========================
       if (row === 5) {
+
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
 
           if (item.type === "hourly") {
-            let max = -Infinity;
-            const list2 = data?.hourly2 ?? data?.weather ?? [];
 
-            for (const r of list2) {
+            let max = -Infinity;
+
+            const list = data?.hourly2 ?? data?.weather ?? [];
+
+            for (const r of list) {
               const wave = r?.[6];
               if (typeof wave === "number" && wave > max) {
                 max = wave;
@@ -1461,6 +1436,9 @@ function createWeekItem(weekData) {
         }
       }
 
+      // =========================
+      // click
+      // =========================
       cell.style.cursor = "pointer";
 
       cell.addEventListener("click", () => {
@@ -1475,28 +1453,29 @@ function createWeekItem(weekData) {
         }
 
         window.activeCol = col;
+
         createWeekItem(weekData);
 
         const data = it.data;
-        if (!data) return;
-
         const sun = data?.oneday || data?.dailyEx;
 
         if (it.type === "hourly") {
           createHourlyWeather(data, "hourly");
 
-          if (data?.tide || tideList[col]) {
-            createTideGraph(data.tide || tideList[col], sun);
+          if (data?.tide) {
+            createTideGraph(data.tide, sun);
           }
+
           return;
         }
 
         if (it.type === "daily") {
           createHourlyWeather(data, "daily");
 
-          if (data?.tide || tideList[col]) {
-            createTideGraph(data.tide || tideList[col], sun);
+          if (data?.tide) {
+            createTideGraph(data.tide, sun);
           }
+
           return;
         }
       });
@@ -1508,21 +1487,19 @@ function createWeekItem(weekData) {
     tableContainer.appendChild(tr);
   }
 
+  // =========================
+  // 初期描画
+  // =========================
   if (window.activeCol == null && list.length > 0) {
     window.activeCol = 0;
 
-    const first = list[0];
-    if (!first) return;
-
-    const data = first.data;
-    if (!data) return;
-
+    const data = list[0].data;
     const sun = data?.oneday || data?.dailyEx;
 
-    createHourlyWeather(data, first.type);
+    createHourlyWeather(data, "hourly");
 
-    if (data?.tide || tideList[0]) {
-      createTideGraph(data.tide || tideList[0], sun);
+    if (data?.tide) {
+      createTideGraph(data.tide, sun);
     }
 
     requestAnimationFrame(() => {
