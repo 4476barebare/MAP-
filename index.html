@@ -790,6 +790,7 @@ openArea(area.individualId, true);
 
 });
 
+
 function loadWhetherCSV(url) {
 
     return fetch(url)
@@ -808,16 +809,26 @@ function loadWhetherCSV(url) {
                 const obj = splitCSVLine(line);
                 if (!obj) return null;
 
-                // ===== ここから追加 =====
+                // ===== ここから追加（修正版） =====
 
-                // ★ 今日・昨日を判定
+                // 1. 今日の日付（時分秒をリセットして純粋な「年月日」にする）
                 const today = new Date();
-                const yesterday = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                // 2. 昨日の日付（時分秒をリセットして純粋な「年月日」にする）
+                const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
 
-                const csvDate = new Date(obj.date);
+                // 3. CSVの日付（ハイフンをスラッシュに置換してJSTとして正しく解釈させる）
+                let csvDate = null;
+                if (obj.date) {
+                    const safeDateStr = obj.date.replace(/-/g, "/"); // "2026-06-08" -> "2026/06/08"
+                    csvDate = new Date(safeDateStr);
+                    csvDate.setHours(0, 0, 0, 0); // 比較用に時分秒をリセット
+                }
 
-                const isYesterday =
+                // 4. 安全に昨日かどうかを比較
+                const isYesterday = csvDate && 
                     csvDate.getFullYear() === yesterday.getFullYear() &&
                     csvDate.getMonth() === yesterday.getMonth() &&
                     csvDate.getDate() === yesterday.getDate();
@@ -843,6 +854,7 @@ function loadWhetherCSV(url) {
             }).filter(Boolean);
         });
 }
+
 // ================================
 // ■ CSV → spotへ反映
 // ================================
