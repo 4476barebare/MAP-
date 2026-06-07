@@ -816,7 +816,7 @@ function loadWhetherCSV(url) {
                     return null;
                 }
 
-                // ===== ここからデータ整形・付与（確定ルール版） =====
+                // ===== ここからデータ整形・付与（データ構造維持版） =====
 
                 // 1. 今日の日付（時分秒を0にリセット）
                 const today = new Date();
@@ -839,19 +839,19 @@ function loadWhetherCSV(url) {
                 const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
 
                 if (isToday) {
-                    // 【当日ルール】hourly(3個) + dailyの最後を削った4個
+                    // 【当日ルール】構造は変えず、dailyの5個目（インデックス4）の中身だけをnullにする
                     if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
-                        parsed.daily.pop(); // 最後の5個目（インデックス4）を削除して4個にする
+                        parsed.daily[4] = null; 
                     }
                 } 
                 else if (isYesterday) {
-                    // 【昨日ルール】hourlyを1つずつ前に詰め、hourly2はnull、dailyは5個すべて残す
+                    // 【昨日ルール】要素数は3個のまま維持し、中身だけをスライドして最後をnullにする
                     if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
                         parsed.hourly[0] = parsed.hourly[1]; // hourly1 → 0
                         parsed.hourly[1] = parsed.hourly[2]; // hourly2 → 1
                         parsed.hourly[2] = null;             // hourly2 を null にする
                     }
-                    // daily は5個のまま何もしない
+                    // daily は5個のまま（中身もそのまま）
                 }
 
                 // ===== ここまで追加・修正 =====
