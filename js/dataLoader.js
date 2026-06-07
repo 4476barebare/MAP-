@@ -1320,8 +1320,8 @@ function createWeekItem(weekData) {
 
       // 潮
       if (row === 1) {
-        const tide = item?.data?.tide ?? tideList?.[col]?.tide ?? tideList?.[col];
-        value = tide ?? "—";
+          const tide = tideList?.[col]?.tide ?? tideList?.[col];
+          value = tide ?? "—";
 
         if (tide === "大潮") {
           cell.style.color = "#ff4500";
