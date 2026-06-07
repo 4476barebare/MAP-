@@ -790,7 +790,6 @@ openArea(area.individualId, true);
 
 });
 
-
 function loadWhetherCSV(url) {
 
     return fetch(url)
@@ -816,7 +815,7 @@ function loadWhetherCSV(url) {
                     return null;
                 }
 
-                // ===== ここからデータ整形・付与（date除外版） =====
+                // ===== ここからデータ整形・付与 =====
 
                 // 1. 今日の日付（時分秒を0にリセット）
                 const today = new Date();
@@ -856,17 +855,17 @@ function loadWhetherCSV(url) {
 
                 // ===== ここまで追加・修正 =====
 
-                // ★ 【変更点】dateは含めず、name と 綺麗に整形した parsed の中身だけを結合して返す
+                // ★ 次の applyWhetherToSpots が壊れないように、型を合わせて返す
+                // ただし whether の中身はすでにパース＆整形済みのオブジェクトにする
                 return {
                     name: obj.name,
-                    ...parsed
+                    date: obj.date,
+                    whether: parsed 
                 };
 
             }).filter(Boolean);
         });
 }
-
-
 
 // ================================
 // ■ CSV → spotへ反映
@@ -877,13 +876,12 @@ function applyWhetherToSpots(csvData) {
 
     for (const row of csvData) {
 
+        // row.whether が undefined、または null でないかチェック
         if (!row.name || !row.whether) continue;
 
-        try {
-            map[row.name] = JSON.parse(row.whether);
-        } catch (e) {
-            continue;
-        }
+        // 【修正】loadWhetherCSV 側ですでにオブジェクト化されているため、
+        // JSON.parse は行わず、そのまま map に格納します。
+        map[row.name] = row.whether;
     }
 
     for (const spot of window.spotData) {
