@@ -816,7 +816,7 @@ function loadWhetherCSV(url) {
                     return null;
                 }
 
-                // ===== ここからデータ整形・付与（データ構造維持版） =====
+                // ===== ここからデータ整形・付与（date除外版） =====
 
                 // 1. 今日の日付（時分秒を0にリセット）
                 const today = new Date();
@@ -856,16 +856,16 @@ function loadWhetherCSV(url) {
 
                 // ===== ここまで追加・修正 =====
 
-                // ★ parsed の中身を展開し、name などを結合して返す
+                // ★ 【変更点】dateは含めず、name と 綺麗に整形した parsed の中身だけを結合して返す
                 return {
                     name: obj.name,
-                    date: obj.date ? obj.date.replace(/-/g, "/") : obj.date, 
                     ...parsed
                 };
 
             }).filter(Boolean);
         });
 }
+
 
 
 // ================================
