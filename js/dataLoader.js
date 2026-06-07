@@ -1202,7 +1202,6 @@ function renderMarkers() {
 window.activeCol = null;
 
 function createWeekItem(weekData) {
-    const baseDate = new Date(window.startDate); // ← CSVの2列目を事前に入れておく
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
 
@@ -1230,9 +1229,12 @@ function createWeekItem(weekData) {
   });
 
   // =========================
-  // list生成（修正ポイント）
+  // list生成（ここだけ修正）
   // =========================
   const today = new Date();
+
+  // CSVの基準日（事前に window.startDate = "2026-06-08" を入れておく）
+  const baseDate = new Date(window.startDate);
 
   const isSameDay = (d1, d2) => {
     return d1.getFullYear() === d2.getFullYear() &&
@@ -1242,13 +1244,13 @@ function createWeekItem(weekData) {
 
   let todayFirst = false;
   if (hourlyList[0]?.time) {
-    todayFirst = isSameDay(new Date(hourlyList[0].time), today);
+    // ★ここだけ変更（today → baseDate）
+    todayFirst = isSameDay(new Date(hourlyList[0].time), baseDate);
   }
 
   const list = new Array(7).fill(null);
 
   if (todayFirst) {
-    // hourly×3 + daily×4
     let h = 0;
     for (let i = 0; i < 3; i++) {
       if (hourlyList[h]) {
@@ -1266,7 +1268,6 @@ function createWeekItem(weekData) {
     }
 
   } else {
-    // hourly×2 + daily×5
     let h = 0;
     for (let i = 0; i < 2; i++) {
       if (hourlyList[h]) {
@@ -1293,11 +1294,11 @@ function createWeekItem(weekData) {
     labelsContainer.appendChild(div);
   }
 
-const getDate = (i) => {
-  const d = new Date(baseDate);
-  d.setDate(baseDate.getDate() + i);
-  return `${d.getMonth() + 1}/${d.getDate()}`;
-};
+  const getDate = (i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  };
 
   for (let row = 0; row < 6; row++) {
     const tr = document.createElement("div");
@@ -1314,15 +1315,13 @@ const getDate = (i) => {
 
       let value = "—";
 
-      // 日付
       if (row === 0) {
         value = getDate(col);
       }
 
-      // 潮
       if (row === 1) {
-          const tide = tideList?.[col]?.tide ?? tideList?.[col];
-          value = tide ?? "—";
+        const tide = tideList?.[col]?.tide ?? tideList?.[col];
+        value = tide ?? "—";
 
         if (tide === "大潮") {
           cell.style.color = "#ff4500";
@@ -1330,7 +1329,6 @@ const getDate = (i) => {
         }
       }
 
-      // 天気
       if (row === 2) {
         if (!item) {
           value = "—";
@@ -1395,7 +1393,6 @@ const getDate = (i) => {
         }
       }
 
-      // 気温
       if (row === 3) {
         if (!item) {
           value = "—";
@@ -1422,7 +1419,6 @@ const getDate = (i) => {
         }
       }
 
-      // 水温
       if (row === 4) {
         if (!item) {
           value = "—";
@@ -1439,7 +1435,6 @@ const getDate = (i) => {
         }
       }
 
-      // 波高
       if (row === 5) {
         if (!item) {
           value = "—";
@@ -1466,7 +1461,6 @@ const getDate = (i) => {
         }
       }
 
-      // click
       cell.style.cursor = "pointer";
 
       cell.addEventListener("click", () => {
@@ -1494,7 +1488,6 @@ const getDate = (i) => {
           if (data?.tide || tideList[col]) {
             createTideGraph(data.tide || tideList[col], sun);
           }
-
           return;
         }
 
@@ -1504,7 +1497,6 @@ const getDate = (i) => {
           if (data?.tide || tideList[col]) {
             createTideGraph(data.tide || tideList[col], sun);
           }
-
           return;
         }
       });
@@ -1516,7 +1508,6 @@ const getDate = (i) => {
     tableContainer.appendChild(tr);
   }
 
-  // 初期描画
   if (window.activeCol == null && list.length > 0) {
     window.activeCol = 0;
 
