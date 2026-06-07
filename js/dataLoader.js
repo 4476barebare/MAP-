@@ -1219,9 +1219,10 @@ function createWeekItem(weekData) {
   const rawDaily = weekData?.daily || [];
   const tideList = window.tideWeek || [];
 
+  // 【修正1】dailyListの変換を安全に（オブジェクトならそのまま通す）
   const dailyList = rawDaily.map(d => {
     if (!d) return null;
-    if (Array.isArray(d)) return d;
+    // 文字列のパイプ区切りデータだった場合のみ配列変換、それ以外はオブジェクトとして扱う
     if (typeof d === "string") {
       return d.split("|").map(v => Number(v));
     }
@@ -1250,12 +1251,12 @@ function createWeekItem(weekData) {
     return `${d.getMonth() + 1}/${d.getDate()}`;
   };
 
+  // 1行ずつ生成
   for (let row = 0; row < 6; row++) {
     const tr = document.createElement("div");
     tr.className = "week-row";
 
     for (let col = 0; col < 7; col++) {
-
       const cell = document.createElement("div");
       const item = list[col];
 
@@ -1293,23 +1294,17 @@ function createWeekItem(weekData) {
           value = "—";
         } else {
           const data = item.data;
-
           if (item.type === "hourly") {
-
             const weatherList = data?.hourly2 ?? data?.weather ?? [];
-
             const adjustCode = (code, pop) => {
               const p = Number(pop);
-
               if (code >= 60) {
                 if (p >= 80) return 70;
                 if (p >= 60) return 60;
                 return 60;
               }
-
               if (p >= 70) return 30;
               if (p >= 50) return 10;
-
               return code;
             };
 
@@ -1320,9 +1315,7 @@ function createWeekItem(weekData) {
             for (const r of weatherList) {
               const rawCode = Number(r?.[0]);
               const pop = r?.[3];
-
               if (!Number.isFinite(rawCode)) continue;
-
               const adjusted = adjustCode(rawCode, pop);
               map[adjusted] = (map[adjusted] || 0) + 1;
             }
@@ -1330,7 +1323,6 @@ function createWeekItem(weekData) {
             for (const k in map) {
               const count = map[k];
               const code = Number(k);
-
               if (count > maxCount) {
                 maxCount = count;
                 tied = [code];
@@ -1345,8 +1337,8 @@ function createWeekItem(weekData) {
                 : tied[0];
 
             value = toWeatherIcon(best ?? 0);
-
           } else {
+            // dailyの場合
             value = toWeatherIcon(data?.weather?.[0] ?? 0);
           }
         }
@@ -1356,27 +1348,20 @@ function createWeekItem(weekData) {
       // row3: 気温
       // =========================
       if (row === 3) {
-
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
-
           if (item.type === "hourly") {
-
             let max = -Infinity;
-
             const list = data?.hourly2 ?? data?.weather ?? [];
-
             for (const r of list) {
               const t = r?.[1];
               if (typeof t === "number" && t > max) {
                 max = t;
               }
             }
-
             value = max !== -Infinity ? Math.round(max) : "—";
-
           } else {
             const temp = data?.weather?.[1];
             value = temp != null ? Math.round(temp) : "—";
@@ -1388,12 +1373,10 @@ function createWeekItem(weekData) {
       // row4: 水温
       // =========================
       if (row === 4) {
-
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
-
           if (item.type === "hourly") {
             const water = data?.oneday?.avg;
             value = water != null ? Math.round(water) : "—";
@@ -1408,27 +1391,20 @@ function createWeekItem(weekData) {
       // row5: 波高
       // =========================
       if (row === 5) {
-
         if (!item) {
           value = "—";
         } else {
           const data = item.data;
-
           if (item.type === "hourly") {
-
             let max = -Infinity;
-
             const list = data?.hourly2 ?? data?.weather ?? [];
-
             for (const r of list) {
               const wave = r?.[6];
               if (typeof wave === "number" && wave > max) {
                 max = wave;
               }
             }
-
             value = max !== -Infinity ? max.toFixed(1) : "—";
-
           } else {
             const wave = data?.dailyEx?.wave;
             value = wave != null ? wave.toFixed(1) : "—";
@@ -1437,46 +1413,34 @@ function createWeekItem(weekData) {
       }
 
       // =========================
-      // click
+      // 【修正2】clickイベントの管理
       // =========================
       cell.style.cursor = "pointer";
-
+      
+      // マス単体のクリックで「その列（col）全体」を選択した状態にする
       cell.addEventListener("click", () => {
         const it = list[col];
         if (!it) return;
 
         const isSame = window.activeCol === col;
-
         if (isSame) {
           resetWeatherUI();
           return;
         }
 
         window.activeCol = col;
-
+        
+        // 再描画してクラス（active）を更新
         createWeekItem(weekData);
 
         const data = it.data;
         const sun = data?.oneday || data?.dailyEx;
 
-        if (it.type === "hourly") {
-          createHourlyWeather(data, "hourly");
+        // typeがhourlyかdailyかに応じて引数を正しく渡す
+        createHourlyWeather(data, it.type);
 
-          if (data?.tide) {
-            createTideGraph(data.tide, sun);
-          }
-
-          return;
-        }
-
-        if (it.type === "daily") {
-          createHourlyWeather(data, "daily");
-
-          if (data?.tide) {
-            createTideGraph(data.tide, sun);
-          }
-
-          return;
+        if (data?.tide) {
+          createTideGraph(data.tide, sun);
         }
       });
 
@@ -1488,15 +1452,17 @@ function createWeekItem(weekData) {
   }
 
   // =========================
-  // 初期描画
+  // 初期描画（未選択の場合のデフォルト処理）
   // =========================
   if (window.activeCol == null && list.length > 0) {
     window.activeCol = 0;
 
-    const data = list[0].data;
+    const firstItem = list[0];
+    const data = firstItem.data;
     const sun = data?.oneday || data?.dailyEx;
 
-    createHourlyWeather(data, "hourly");
+    // 【修正3】初期要素がdailyの場合もあるため、固定文字列ではなくtypeを動的に渡す
+    createHourlyWeather(data, firstItem.type);
 
     if (data?.tide) {
       createTideGraph(data.tide, sun);
@@ -1504,7 +1470,6 @@ function createWeekItem(weekData) {
 
     requestAnimationFrame(() => {
       const rows = tableContainer.querySelectorAll(".week-row");
-
       rows.forEach(row => {
         const cells = row.querySelectorAll("div");
         if (cells[0]) {
@@ -1514,6 +1479,7 @@ function createWeekItem(weekData) {
     });
   }
 }
+
 
 function resetWeatherUI() {
 
