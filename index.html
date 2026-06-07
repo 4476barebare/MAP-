@@ -809,51 +809,64 @@ function loadWhetherCSV(url) {
                 const obj = splitCSVLine(line);
                 if (!obj) return null;
 
-                // ===== ここから追加（修正版） =====
+                let parsed;
+                try {
+                    parsed = JSON.parse(obj.whether);
+                } catch (e) {
+                    return null;
+                }
 
-                // 1. 今日の日付（時分秒をリセットして純粋な「年月日」にする）
+                // ===== ここからデータ整形・付与（確定ルール版） =====
+
+                // 1. 今日の日付（時分秒を0にリセット）
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
-                // 2. 昨日の日付（時分秒をリセットして純粋な「年月日」にする）
+                // 2. 昨日の日付（時分秒を0にリセット）
                 const yesterday = new Date(today);
                 yesterday.setDate(today.getDate() - 1);
 
-                // 3. CSVの日付（ハイフンをスラッシュに置換してJSTとして正しく解釈させる）
+                // 3. CSVのdateをJST（日本時間午前0時）として正しくパース
                 let csvDate = null;
                 if (obj.date) {
                     const safeDateStr = obj.date.replace(/-/g, "/"); // "2026-06-08" -> "2026/06/08"
                     csvDate = new Date(safeDateStr);
-                    csvDate.setHours(0, 0, 0, 0); // 比較用に時分秒をリセット
+                    csvDate.setHours(0, 0, 0, 0);
                 }
 
-                // 4. 安全に昨日かどうかを比較
-                const isYesterday = csvDate && 
-                    csvDate.getFullYear() === yesterday.getFullYear() &&
-                    csvDate.getMonth() === yesterday.getMonth() &&
-                    csvDate.getDate() === yesterday.getDate();
+                // 4. 安全に昨日・今日を判定
+                const isToday = csvDate && csvDate.getTime() === today.getTime();
+                const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
 
-                if (isYesterday) {
-
-                    // ★ hourly を1つ前に詰める
-                    obj.hourly0 = obj.hourly1;
-                    obj.water0  = obj.water1;
-
-                    obj.hourly1 = obj.hourly2;
-                    obj.water1  = obj.water2;
-
-                    // 必要なら hourly2 は空にする
-                    obj.hourly2 = null;
-                    obj.water2  = null;
+                if (isToday) {
+                    // 【当日ルール】hourly(3個) + dailyの最後を削った4個
+                    if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
+                        parsed.daily.pop(); // 最後の5個目（インデックス4）を削除して4個にする
+                    }
+                } 
+                else if (isYesterday) {
+                    // 【昨日ルール】hourlyを1つずつ前に詰め、hourly2はnull、dailyは5個すべて残す
+                    if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
+                        parsed.hourly[0] = parsed.hourly[1]; // hourly1 → 0
+                        parsed.hourly[1] = parsed.hourly[2]; // hourly2 → 1
+                        parsed.hourly[2] = null;             // hourly2 を null にする
+                    }
+                    // daily は5個のまま何もしない
                 }
 
-                // ===== ここまで追加 =====
+                // ===== ここまで追加・修正 =====
 
-                return obj;
+                // ★ parsed の中身を展開し、name などを結合して返す
+                return {
+                    name: obj.name,
+                    date: obj.date ? obj.date.replace(/-/g, "/") : obj.date, 
+                    ...parsed
+                };
 
             }).filter(Boolean);
         });
 }
+
 
 // ================================
 // ■ CSV → spotへ反映
