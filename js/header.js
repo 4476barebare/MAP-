@@ -285,34 +285,36 @@ function calcMoonAge(date) {
   return (days % synodicMonth + synodicMonth) % synodicMonth;
 }
 
+// getTideName関数を以下のように修正
 function getTideName(moonAge) {
-  const age = Math.floor(moonAge);
+  // 月齢に1を足して、1〜30の「旧暦の日付（目安）」に変換する
+  // 30を超えたら1に戻す（1周29.53日なので約30日サイクル）
+  let approxKyureki = Math.floor(moonAge) + 1;
+  if (approxKyureki > 30) approxKyureki = 1;
 
-  if (age === 0 || age === 14 || age === 15) return "大潮";
+  // 旧暦の日付ベースの一般的な潮名判定
+  if (approxKyureki >= 1 && approxKyureki <= 3 || approxKyureki >= 15 && approxKyureki <= 18) {
+    return "大潮";
+  }
+  if ((approxKyureki >= 4 && approxKyureki <= 6) || 
+      (approxKyureki >= 12 && approxKyureki <= 14) || 
+      (approxKyureki >= 19 && approxKyureki <= 22) || 
+      approxKyureki === 29 || approxKyureki === 30) {
+    return "中潮";
+  }
+  if ((approxKyureki >= 7 && approxKyureki <= 9) || (approxKyureki >= 23 && approxKyureki <= 25)) {
+    return "小潮";
+  }
+  if (approxKyureki === 10 || approxKyureki === 26) {
+    return "長潮";
+  }
+  if (approxKyureki === 11 || approxKyureki === 27) {
+    return "若潮";
+  }
 
-  if (
-    (age >= 1 && age <= 2) ||
-    (age >= 12 && age <= 13) ||
-    (age === 16) ||
-    (age >= 27 && age <= 28)
-  ) return "中潮";
-
-  if (
-    (age >= 3 && age <= 4) ||
-    (age >= 10 && age <= 11) ||
-    (age >= 17 && age <= 18) ||
-    (age >= 25 && age <= 26)
-  ) return "小潮";
-
-  if (
-    (age >= 5 && age <= 6) ||
-    (age >= 8 && age <= 9) ||
-    (age >= 19 && age <= 20) ||
-    (age >= 23 && age <= 24)
-  ) return "長潮";
-
-  return "若潮";
+  return "中潮"; // 例外処理用（基本はここを通らない）
 }
+
 
 const WEEK_LABELS = ["日","月","火","水","木","金","土"];
 
