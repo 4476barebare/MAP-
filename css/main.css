@@ -478,13 +478,13 @@ li {
 
 .article-list {
   display: flex;
-  flex-wrap: wrap;   /* ←これを追加 */
+  flex-wrap: wrap;
   gap: 16px;
   padding: 16px;
 }
 
 .article-card {
-  flex: 1;
+  flex: 1 1 calc(50% - 8px); /* 縦＝2列 */
   text-decoration: none;
   color: #000;
   transition: 0.15s ease;
@@ -493,7 +493,6 @@ li {
   border-radius: 10px;
   overflow: hidden;
 
-  /* ★ 最初から少し浮かせる */
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
