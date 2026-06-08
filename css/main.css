@@ -478,6 +478,7 @@ li {
 
 .article-list {
   display: flex;
+  flex-wrap: wrap;   /* ←これを追加 */
   gap: 16px;
   padding: 16px;
 }
