@@ -110,12 +110,20 @@ function getTileUrl(time, z, x, y) {
 }
 
 async function fetchTile(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+  });
+  if (!res.ok) {
+    console.error(`Fetch failed: ${res.status} for ${url}`); // エラーログを出して追跡しやすくする
+    return null;
+  }
 
   const buf = await res.arrayBuffer();
   return Buffer.from(buf);
 }
+
 
 export async function generateJmaCloud(area) {
   const time = area.time ?? getLatestTime();
