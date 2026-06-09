@@ -12,8 +12,8 @@ const AREA_PROFILES = {
     latMax: 36.0,
     lonMin: 139.6,
     lonMax: 141.1,
-    step: 0.1,    // 千葉専用のデータ粒度
-    zoom: 9       // 千葉専用のLeafletズームレベル
+    step: 0.1,
+    zoom: 9
   },
   tokyo: {
     prefname: "tokyo",
@@ -21,8 +21,8 @@ const AREA_PROFILES = {
     latMax: 35.9,
     lonMin: 138.9,
     lonMax: 139.9,
-    step: 0.05,   // 東京は狭いので細かく
-    zoom: 10      // ズームレベルも高めに
+    step: 0.05,
+    zoom: 10
   },
   kanto_all: {
     prefname: "kanto",
@@ -30,23 +30,18 @@ const AREA_PROFILES = {
     latMax: 38.0,
     lonMin: 138.0,
     lonMax: 142.0,
-    step: 0.15,   // 関東全域はActions節約のため粗め
-    zoom: 7       // 広域なのでズームは低め
+    step: 0.15,
+    zoom: 7
   }
 };
 
-// 現在アクティブにするエリアを指定
 const activeArea = AREA_PROFILES.chiba;
-
-// 設定の展開
 const bbox = activeArea;
 const step = activeArea.step;
 const ZOOM = activeArea.zoom;
 
-// 429エラー回避用のウェイト
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ===== 緯度経度をWebメルカトルの絶対ピクセル座標に変換 =====
 function latLonToPixel(lat, lon, zoom) {
   const size = 256 * Math.pow(2, zoom);
   const x = ((lon + 180) / 360) * size;
@@ -55,7 +50,6 @@ function latLonToPixel(lat, lon, zoom) {
   return { x, y };
 }
 
-// ===== JST → UTC変換 =====
 function getTargetUTCClean() {
   const now = new Date();
   const currentJstHour = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(11, 13) * 1;
@@ -71,7 +65,6 @@ function getTargetUTCClean() {
   return { utcISO: targetUtc.toISOString().slice(0, 13), jstDate: targetJst };
 }
 
-// ===== グリッド生成 =====
 function generatePoints() {
   const points = [];
   const latMinInt = Math.round(bbox.latMin * 100);
@@ -88,7 +81,6 @@ function generatePoints() {
   return points;
 }
 
-// 4分割ロジック
 function splitIntoFour(arr) {
   const chunkSize = Math.ceil(arr.length / 4);
   return [
@@ -99,7 +91,6 @@ function splitIntoFour(arr) {
   ];
 }
 
-// ===== API取得 =====
 async function fetchQuarterBatch(points) {
   const url = "https://api.open-meteo.com/v1/forecast";
   const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
@@ -119,24 +110,19 @@ async function fetchQuarterBatch(points) {
   return Array.isArray(res.data) ? res.data : [res.data];
 }
 
-// ===== メイン =====
 (async () => {
   const { utcISO, jstDate } = getTargetUTCClean();
   console.log(`探索する対象UTC時間: ${utcISO}:00 (選択エリア: ${bbox.prefname.toUpperCase()})`);
 
   const points = generatePoints();
   const quarters = splitIntoFour(points);
-
   const gridData = [];
-
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (4分割ロジック稼働)`);
 
   try {
     for (let q = 0; q < quarters.length; q++) {
       const subBatch = quarters[q];
       if (subBatch.length === 0) continue;
 
-      console.log(`-> 分割リクエスト中... (${q + 1}/4) - ${subBatch.length}地点`);
       const dataArray = await fetchQuarterBatch(subBatch);
 
       for (let i = 0; i < subBatch.length; i++) {
@@ -161,7 +147,6 @@ async function fetchQuarterBatch(points) {
       }
     }
 
-    // ===== 出力時だけLeaflet基準のピクセルサイズに引き伸ばし配置 =====
     const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
     const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
 
@@ -174,28 +159,24 @@ async function fetchQuarterBatch(points) {
 
     const outWidth = pixelBBox.xMax - pixelBBox.xMin + 1;
     const outHeight = pixelBBox.yMax - pixelBBox.yMin + 1;
-    
-    console.log(`-> キャンバスサイズ: ${outWidth} x ${outHeight} px (ZOOM ${ZOOM})`);
 
     const finalCanvas = createCanvas(outWidth, outHeight);
     const finalCtx = finalCanvas.getContext("2d");
 
-    // ★【修正のキモ】ドットサイズが0ピクセルに潰れないよう、最低サイズ（Math.max）を保証
     const latSpan = bbox.latMax - bbox.latMin;
     const lonSpan = bbox.lonMax - bbox.lonMin;
-    
-    // 計算上小さくなっても、最低横4px、縦4pxの存在感を保証する（stepに応じて動的拡張）
-    const dotWidth = Math.max(Math.ceil(outWidth / (lonSpan / step)), 4);
-    const dotHeight = Math.max(Math.ceil(outHeight / (latSpan / step)), 4);
+    const dotWidth = Math.max(Math.ceil(outWidth / (lonSpan / step)), 6); // 視認性向上のため最低6px
+    const dotHeight = Math.max(Math.ceil(outHeight / (latSpan / step)), 6);
 
-    console.log(`-> 1マスの描画スタンプサイズ: ${dotWidth}x${dotHeight} px でマッピングします`);
+    console.log(`-> テスト描画中... 総ポイント数: ${gridData.length}`);
 
     for (const item of gridData) {
-      if (item.rain < 0.2) continue;
-
-      let color = "rgba(100,180,255,0.5)";
-      if (item.rain > 2) color = "rgba(0,120,255,0.7)";
-      if (item.rain > 5) color = "rgba(255,80,0,0.8)";
+      // 🛠️ 【テスト用変更】雨が降っていなくても、データの生存確認として薄いグレーで必ず塗る！
+      let color = "rgba(200, 200, 200, 0.4)"; // 雨なし地点は薄いグレー
+      
+      if (item.rain >= 0.2) color = "rgba(100,180,255,0.6)";
+      if (item.rain > 2) color = "rgba(0,120,255,0.8)";
+      if (item.rain > 5) color = "rgba(255,80,0,0.9)";
       if (item.rain > 10) color = "rgba(255,0,0,1)";
 
       const p = latLonToPixel(item.lat, item.lon, ZOOM);
@@ -204,7 +185,6 @@ async function fetchQuarterBatch(points) {
 
       if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
         finalCtx.fillStyle = color;
-        // マスの中心がズレないようにスタンプ
         finalCtx.fillRect(
           drawX - Math.floor(dotWidth / 2), 
           drawY - Math.floor(dotHeight / 2), 
@@ -214,7 +194,6 @@ async function fetchQuarterBatch(points) {
       }
     }
 
-    // ファイル名生成
     const jstISO = jstDate.toISOString();
     const datePart = jstISO.slice(0, 10);
     const hourPart = jstISO.slice(11, 13);
@@ -222,14 +201,10 @@ async function fetchQuarterBatch(points) {
 
     fs.mkdirSync("./output", { recursive: true });
     fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-    console.log(`【完全大成功】白飛び・消失を防止し、画像を正常に出力しました: ${filename}`);
+    console.log(`【テスト出力完了】ファイルを確認してください: ${filename}`);
 
   } catch (e) {
-    if (e.response) {
-      console.error(`データ取得中にエラーが発生しました (Status: ${e.response.status}):`, e.message);
-    } else {
-      console.error("エラーが発生しました:", e.message);
-    }
+    console.error("エラー:", e.message);
     process.exit(1);
   }
 })();
