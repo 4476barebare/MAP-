@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "0 */3 * * *"
 
+permissions:
+  contents: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -33,14 +36,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 実行（ログ依存なし）
+      # 生成実行
       - name: Run generator
         run: node js/JMA_cloudsGenerate.js
 
-      # 成果物をGitHubに保存（ここが本体）
-      - name: Upload generated images
-        uses: actions/upload-artifact@v4
-        with:
-          name: jma-clouds
-          path: output/
-          if-no-files-found: error
+      # outputをリポジトリに保存
+      - name: Commit output images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add output/
+
+          git commit -m "update JMA clouds [skip ci]" || exit 0
+
+          git push
