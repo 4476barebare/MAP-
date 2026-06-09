@@ -14,24 +14,6 @@ const AREA_PROFILES = {
     lonMax: 141.1,
     step: 0.1,
     zoom: 9
-  },
-  tokyo: {
-    prefname: "tokyo",
-    latMin: 35.5,
-    latMax: 35.9,
-    lonMin: 138.9,
-    lonMax: 139.9,
-    step: 0.05,
-    zoom: 10
-  },
-  kanto_all: {
-    prefname: "kanto",
-    latMin: 34.0,
-    latMax: 38.0,
-    lonMin: 138.0,
-    lonMax: 142.0,
-    step: 0.15,
-    zoom: 7
   }
 };
 
@@ -50,33 +32,17 @@ function latLonToPixel(lat, lon, zoom) {
   return { x, y };
 }
 
-function getTargetUTCClean() {
-  const now = new Date();
-  const currentJstHour = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(11, 13) * 1;
-  const nextJstHour = Math.ceil((currentJstHour === 0 ? 24 : currentJstHour) / 3) * 3;
-  
-  const targetJst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  targetJst.setUTCHours(nextJstHour % 24, 0, 0, 0);
-  if (nextJstHour >= 24) {
-    targetJst.setTime(targetJst.getTime() + 24 * 60 * 60 * 1000);
-  }
-  
-  const targetUtc = new Date(targetJst.getTime() - 9 * 60 * 60 * 1000);
-  return { utcISO: targetUtc.toISOString().slice(0, 13), jstDate: targetJst };
-}
-
+// ★【修正】絶対にポイントを生成する安全なグリッド生成ロジック
 function generatePoints() {
   const points = [];
-  const latMinInt = Math.round(bbox.latMin * 100);
-  const latMaxInt = Math.round(bbox.latMax * 100);
-  const lonMinInt = Math.round(bbox.lonMin * 100);
-  const lonMaxInt = Math.round(bbox.lonMax * 100);
-  const stepInt = Math.round(step * 100);
-
-  for (let lat = latMaxInt; lat >= latMinInt; lat -= stepInt) {
-    for (let lon = lonMinInt; lon <= lonMaxInt; lon += stepInt) {
-      points.push({ lat: lat / 100, lon: lon / 100 });
+  let lat = bbox.latMax;
+  while (lat >= bbox.latMin - 0.001) { // 誤差対策
+    let lon = bbox.lonMin;
+    while (lon <= bbox.lonMax + 0.001) {
+      points.push({ lat: lat, lon: lon });
+      lon += step;
     }
+    lat -= step;
   }
   return points;
 }
@@ -111,97 +77,51 @@ async function fetchQuarterBatch(points) {
 }
 
 (async () => {
-  const { utcISO, jstDate } = getTargetUTCClean();
-  console.log(`探索する対象UTC時間: ${utcISO}:00 (選択エリア: ${bbox.prefname.toUpperCase()})`);
-
+  const now = new Date();
+  const utcISO = now.toISOString().slice(0, 13); // 現在のUTC時刻で取得
   const points = generatePoints();
+  
+  console.log(`探索UTC: ${utcISO}:00 | エリア: ${bbox.prefname} | 総ポイント数: ${points.length}`);
+
   const quarters = splitIntoFour(points);
   const gridData = [];
 
   try {
-    for (let q = 0; q < quarters.length; q++) {
-      const subBatch = quarters[q];
+    for (const subBatch of quarters) {
       if (subBatch.length === 0) continue;
-
       const dataArray = await fetchQuarterBatch(subBatch);
-
+      
       for (let i = 0; i < subBatch.length; i++) {
         const p = subBatch[i];
         const pointData = dataArray[i];
-        if (!pointData) continue;
-
-        const times = pointData.hourly?.time;
-        const prec = pointData.hourly?.precipitation;
-
-        if (!times || !prec) continue;
-
-        const idx = times.findIndex(t => t.startsWith(utcISO));
-        if (idx === -1) continue;
-
-        const rain = prec[idx] ?? 0;
-        gridData.push({ lat: p.lat, lon: p.lon, rain });
+        if (!pointData?.hourly) continue;
+        
+        const idx = pointData.hourly.time.findIndex(t => t.startsWith(utcISO));
+        if (idx !== -1) {
+          gridData.push({ lat: p.lat, lon: p.lon, rain: pointData.hourly.precipitation[idx] ?? 0 });
+        }
       }
-
-      if (q < quarters.length - 1) {
-        await sleep(1500);
-      }
+      await sleep(1500);
     }
 
     const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
     const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
-
-    const pixelBBox = {
-      xMin: Math.floor(pMax.x),
-      xMax: Math.floor(pMin.x),
-      yMin: Math.floor(pMax.y),
-      yMax: Math.floor(pMin.y)
-    };
-
-    const outWidth = pixelBBox.xMax - pixelBBox.xMin + 1;
-    const outHeight = pixelBBox.yMax - pixelBBox.yMin + 1;
+    const outWidth = Math.floor(pMin.x - pMax.x) + 1;
+    const outHeight = Math.floor(pMin.y - pMax.y) + 1;
 
     const finalCanvas = createCanvas(outWidth, outHeight);
-    const finalCtx = finalCanvas.getContext("2d");
+    const ctx = finalCanvas.getContext("2d");
 
-    const latSpan = bbox.latMax - bbox.latMin;
-    const lonSpan = bbox.lonMax - bbox.lonMin;
-    const dotWidth = Math.max(Math.ceil(outWidth / (lonSpan / step)), 6); // 視認性向上のため最低6px
-    const dotHeight = Math.max(Math.ceil(outHeight / (latSpan / step)), 6);
-
-    console.log(`-> テスト描画中... 総ポイント数: ${gridData.length}`);
-
+    // テスト描画：データがあれば青、なければ薄いグレーで確実に打つ
     for (const item of gridData) {
-      // 🛠️ 【テスト用変更】雨が降っていなくても、データの生存確認として薄いグレーで必ず塗る！
-      let color = "rgba(200, 200, 200, 0.4)"; // 雨なし地点は薄いグレー
-      
-      if (item.rain >= 0.2) color = "rgba(100,180,255,0.6)";
-      if (item.rain > 2) color = "rgba(0,120,255,0.8)";
-      if (item.rain > 5) color = "rgba(255,80,0,0.9)";
-      if (item.rain > 10) color = "rgba(255,0,0,1)";
-
       const p = latLonToPixel(item.lat, item.lon, ZOOM);
-      const drawX = Math.round(p.x - pixelBBox.xMin);
-      const drawY = Math.round(p.y - pixelBBox.yMin);
-
-      if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
-        finalCtx.fillStyle = color;
-        finalCtx.fillRect(
-          drawX - Math.floor(dotWidth / 2), 
-          drawY - Math.floor(dotHeight / 2), 
-          dotWidth, 
-          dotHeight
-        );
-      }
+      ctx.fillStyle = item.rain > 0.2 ? "rgba(0,120,255,0.8)" : "rgba(200,200,200,0.3)";
+      ctx.fillRect(Math.round(p.x - pMax.x) - 2, Math.round(p.y - pMax.y) - 2, 4, 4);
     }
 
-    const jstISO = jstDate.toISOString();
-    const datePart = jstISO.slice(0, 10);
-    const hourPart = jstISO.slice(11, 13);
-    const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
-
     fs.mkdirSync("./output", { recursive: true });
-    fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-    console.log(`【テスト出力完了】ファイルを確認してください: ${filename}`);
+    fs.writeFileSync(`./output/${bbox.prefname}.png`, finalCanvas.toBuffer("image/png"));
+    console.log("【成功】ポイントが生成され、描画されました");
 
   } catch (e) {
     console.error("エラー:", e.message);
