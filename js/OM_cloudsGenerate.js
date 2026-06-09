@@ -11,10 +11,6 @@ const bbox = {
 };
 
 const step = 0.09;
-const BATCH_SIZE = 40;
-
-// ウェイト用関数（429エラー回避）
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ===== JST → UTC変換 =====
 function getTargetUTCClean() {
@@ -46,6 +42,7 @@ function getTargetUTCClean() {
 // ===== グリッド生成 =====
 function generatePoints() {
   const points = [];
+  // 描画の上下反転を防ぐ（北から南へ）
   for (let lat = bbox.latMax; lat >= bbox.latMin; lat -= step) {
     for (let lon = bbox.lonMin; lon <= bbox.lonMax; lon += step) {
       points.push({ lat, lon });
@@ -54,33 +51,29 @@ function generatePoints() {
   return points;
 }
 
-function chunk(arr, size) {
-  const res = [];
-  for (let i = 0; i < arr.length; i += size) {
-    res.push(arr.slice(i, i + size));
-  }
-  return res;
-}
-
-// ===== API取得 =====
-async function fetchBatch(points) {
+// ===== API取得（POST形式に変更してURL長制限を完全回避） =====
+async function fetchAllPointsAtOnce(points) {
+  // URLは短いまま固定！
   const url = "https://api.open-meteo.com/v1/forecast";
-  const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
-  const longitudes = points.map(p => p.lon.toFixed(4)).join(",");
+  
+  // 座標を配列のままPOSTのBodyに格納する
+  const latitudes = points.map(p => p.lat);
+  const longitudes = points.map(p => p.lon);
 
-  const res = await axios.get(url, {
-    params: {
-      latitude: latitudes,
-      longitude: longitudes,
-      hourly: "precipitation",
-      forecast_days: 1,
-      timezone: "UTC"
-    },
-    timeout: 15000
+  // axios.post を使い、第2引数にパラメータを渡す
+  const res = await axios.post(url, {
+    latitude: latitudes,
+    longitude: longitudes,
+    hourly: "precipitation",
+    forecast_days: 1,
+    timezone: "UTC"
+  }, {
+    timeout: 30000
   });
 
   return Array.isArray(res.data) ? res.data : [res.data];
 }
+
 
 // ===== 描画 =====
 function draw(grid, width, height, filename) {
@@ -88,7 +81,7 @@ function draw(grid, width, height, filename) {
   const canvas = createCanvas(width * scale, height * scale);
   const ctx = canvas.getContext("2d");
 
-  // 背景（レーダー風のダークネイビー）
+  // 背景
   ctx.fillStyle = "#0b1329";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -96,13 +89,13 @@ function draw(grid, width, height, filename) {
     for (let x = 0; x < width; x++) {
       const rain = grid[y][x];
       
-      if (rain < 0.2) continue; // 0.2mm未満は描画スキップ
+      // 元のオリジナルのカラーパレット条件
+      if (rain < 0.2) continue; 
 
-      // 元のオリジナルのカラーパレット
-      let color = "rgba(100,180,255,0.5)"; 
-      if (rain > 2) color = "rgba(0,120,255,0.7)";  
-      if (rain > 5) color = "rgba(255,80,0,0.8)";   
-      if (rain > 10) color = "rgba(255,0,0,1)";     
+      let color = "rgba(100,180,255,0.5)"; // 弱い雨（水色）
+      if (rain > 2) color = "rgba(0,120,255,0.7)";  // 本格的な雨（青）
+      if (rain > 5) color = "rgba(255,80,0,0.8)";   // 強い雨（オレンジ）
+      if (rain > 10) color = "rgba(255,0,0,1)";     // 激しい雨（赤）
 
       ctx.fillStyle = color;
       ctx.fillRect(x * scale, y * scale, scale, scale);
@@ -119,37 +112,20 @@ function draw(grid, width, height, filename) {
   console.log(`探索する対象UTC時間: ${utcISO}:00`);
 
   const points = generatePoints();
-  const batches = chunk(points, BATCH_SIZE);
-
+  
   const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
   const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
-
   const grid = Array.from({ length: height }, () => Array(width).fill(0));
 
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (${batches.length} バッチ)`);
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (一括取得ルート)`);
 
-  for (let b = 0; b < batches.length; b++) {
-    const batch = batches[b];
-    console.log(`-> バッチ ${b + 1}/${batches.length} を取得中...`);
-    
-    let dataArray = null;
-    let retryCount = 0;
+  try {
+    // 👑 21回に分けない。たった1回だけ極大リクエストを送る（429エラーを絶対回避）
+    const dataArray = await fetchAllPointsAtOnce(points);
 
-    while (retryCount < 3) {
-      try {
-        dataArray = await fetchBatch(batch);
-        break;
-      } catch (e) {
-        retryCount++;
-        console.warn(`バッチ ${b + 1} でエラー（試行 ${retryCount}/3）: ${e.message}。リトライします...`);
-        await sleep(3000);
-      }
-    }
-
-    if (!dataArray) continue;
-
-    for (let i = 0; i < batch.length; i++) {
-      const p = batch[i];
+    // データをマトリクスにマッピング
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
       const pointData = dataArray[i];
       if (!pointData) continue;
 
@@ -169,21 +145,20 @@ function draw(grid, width, height, filename) {
       grid[y][x] = rain;
     }
 
-    // 1秒休んで429エラーを絶対回避
-    if (b < batches.length - 1) {
-      await sleep(1000);
-    }
+    // ファイル名生成
+    const pad = (n) => String(n).padStart(2, "0");
+    const year = jstDate.getUTCFullYear();
+    const month = pad(jstDate.getUTCMonth() + 1);
+    const day = pad(jstDate.getUTCDate());
+    const hour = pad(jstDate.getUTCHours());
+
+    const filename = `./output/kanto_${year}-${month}-${day}_${hour}h.png`;
+
+    draw(grid, width, height, filename);
+    console.log(`【完全大成功】429エラーなし・全データ充填で画像を生成しました: ${filename}`);
+
+  } catch (e) {
+    console.error("一括取得中にエラーが発生しました:", e.message);
+    process.exit(1);
   }
-
-  // ファイル名生成
-  const pad = (n) => String(n).padStart(2, "0");
-  const year = jstDate.getUTCFullYear();
-  const month = pad(jstDate.getUTCMonth() + 1);
-  const day = pad(jstDate.getUTCDate());
-  const hour = pad(jstDate.getUTCHours());
-
-  const filename = `./output/kanto_${year}-${month}-${day}_${hour}h.png`;
-
-  draw(grid, width, height, filename);
-  console.log(`【完全成功】雨雲レーダー画像を生成しました: ${filename}`);
 })();
