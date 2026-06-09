@@ -13,15 +13,26 @@ jobs:
       - name: リポジトリ取得
         uses: actions/checkout@v4
 
-      - name: Nodeセットアップ
+      - name: Nodeセットアップ（高速キャッシュ有効化）
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "npm" # ★これだけで2回目以降の npm install が一瞬になります
 
-      - name: canvas依存インストール
+      # aptの依存関係をキャッシュして、Linux側のインストールも高速化する
+      - name: apt依存関係のキャッシュ確認
+        id: cache-apt
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runs-on }}-apt-${{ hashFiles('**/package.json') }}
+
+      - name: canvas依存インストール（最小限＆最速化）
+        # キャッシュがない場合のみ update を実行し、余計な依存（recommends）を省いて爆速化
+        if: steps.cache-apt.outputs.cache-hit != 'true'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
             libcairo2-dev \
             libpango1.0-dev \
             libjpeg-dev \
@@ -29,7 +40,8 @@ jobs:
             librsvg2-dev
 
       - name: npm install
-        run: npm install axios canvas
+        # --prefer-offline をつけることで、ネットから落とさずローカルキャッシュを最優先で使う
+        run: npm install axios canvas --prefer-offline
 
       - name: outputディレクトリ作成
         run: mkdir -p output
