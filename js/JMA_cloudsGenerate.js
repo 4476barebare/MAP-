@@ -4,7 +4,7 @@ import fs from "fs";
 
 const TILE = 256;
 
-// 千葉県周辺を綺麗に捉える座標と、確実なデータが存在するズームレベル7
+// 関東エリアが綺麗に収まるズームレベル7
 const area = {
   prefName: "CHIBA",
   lat: 35.6,
@@ -22,34 +22,43 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 気象庁のデータ更新周期（5分刻み）に合わせた最新の基準時刻（JST）を計算
-function getLatestNowcBasetimeJST() {
+// 確実に存在する「最新の正時（00分）」のベース時刻（JST）を計算
+function getLatestRasfcBasetimeJST() {
   const d = new Date();
-  // 配信ラグ（約5分）を考慮して5分前にずらし、5分刻みに丸める
-  d.setMinutes(d.getMinutes() - 5);
-  const min = Math.floor(d.getMinutes() / 5) * 5;
-  d.setMinutes(min, 0, 0);
-  return d;
+  // 配信のラグ（約20〜30分）を考慮し、現在の分が30分未満なら「1時間前の正時」にする
+  if (d.getMinutes() < 30) {
+    d.setHours(d.getHours() - 1);
+  }
+  d.setMinutes(0, 0, 0); // 〇時00分00秒に固定
+
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    d.getFullYear() +
+    pad(d.getMonth() + 1) +
+    pad(d.getDate()) +
+    pad(d.getHours()) +
+    "0000"
+  );
 }
 
-// 【公式実績No.1】高解像度降水ナウキャスト（nowc）タイルURL構造
-function getNowcTileUrl(timeStrJST, z, x, y) {
-  return `https://www.jma.go.jp/bosai/jmatile/data/nowc/${timeStrJST}/none/nowc/${z}/${x}/{y}.png`;
+// 【公式・テレビ予報仕様】降水短時間予報（rasfc）のURL構造
+function getRasfcForecastUrl(basetimeStrJST, minutesAhead, z, x, y) {
+  // 構造: /rasfc/{発表正時}/none/{経過分数}/{z}/{x}/{y}.png
+  return `https://www.jma.go.jp/bosai/jmatile/data/rasfc/${basetimeStrJST}/none/${minutesAhead}/${z}/{x}/{y}.png`;
 }
 
 async function fetchTile(url) {
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
   });
-  if (!res.ok) return null; // 404（雨がない空のタイル）は安全にスキップ
+  if (!res.ok) return null; // 雨が降っていない空のエリア（404）は安全にスキップ
   const buf = await res.arrayBuffer();
   return Buffer.from(buf);
 }
 
-export async function generateJmaNowcForecast(area, timeStrJST) {
+export async function generateJma3HourForecast(area, basetimeStrJST, minutesAhead) {
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
-  // ズーム7に合わせて周辺を描画
   const rangeX = 1;
   const rangeY = 1;
 
@@ -65,7 +74,7 @@ export async function generateJmaNowcForecast(area, timeStrJST) {
 
   for (let tx = xMin; tx <= xMax; tx++) {
     for (let ty = yMin; ty <= yMax; ty++) {
-      const url = getNowcTileUrl(timeStrJST, area.zoom, tx, ty);
+      const url = getRasfcForecastUrl(basetimeStrJST, minutesAhead, area.zoom, tx, ty);
       const buf = await fetchTile(url);
       if (!buf) continue;
 
@@ -86,35 +95,37 @@ export function saveImage(canvas, name) {
 }
 
 async function main() {
-  console.log("--- [実績最優先仕様] 高解像度ナウキャスト雨雲データ生成 ---");
+  console.log("--- [テレビ天気予報仕様] 3時間ごと・今後の雨雲予測生成 ---");
   
-  const baseDate = getLatestNowcBasetimeJST();
-  const pad = (n) => String(n).padStart(2, "0");
+  const basetimeStrJST = getLatestRasfcBasetimeJST();
+  console.log(`予報発表ベース時刻 (JST): ${basetimeStrJST}`);
 
-  // 未来の予測ステップ（5分後、15分後、30分後、45分後、60分後）の5区分
-  const intervals = [5, 15, 30, 45, 60];
+  // 3時間ごと、5区分（3時間後、6時間後、9時間後、12時間後、15時間後）
+  const intervals = [180, 360, 540, 720, 900];
+
+  // ベース時刻をパースして、ログに「〇時の予報」と綺麗に出すための準備
+  const baseYear = parseInt(basetimeStrJST.substring(0, 4));
+  const baseMonth = parseInt(basetimeStrJST.substring(4, 6)) - 1;
+  const baseDay = parseInt(basetimeStrJST.substring(6, 8));
+  const baseHour = parseInt(basetimeStrJST.substring(8, 10));
+  const baseDate = new Date(baseYear, baseMonth, baseDay, baseHour, 0, 0);
+
+  const pad = (n) => String(n).padStart(2, "0");
 
   for (let i = 0; i < intervals.length; i++) {
     const minutesAhead = intervals[i];
-    const targetTime = new Date(baseDate.getTime() + minutesAhead * 60 * 1000);
     
-    const timeStrJST = 
-      targetTime.getFullYear() +
-      pad(targetTime.getMonth() + 1) +
-      pad(targetTime.getDate()) +
-      pad(targetTime.getHours()) +
-      pad(targetTime.getMinutes()) +
-      "00";
+    // 予測対象の実際の時刻を計算
+    const targetDate = new Date(baseDate.getTime() + minutesAhead * 60 * 1000);
+    const displayHour = pad(targetDate.getHours());
 
-    console.log(`[区分 ${i + 1}/${intervals.length}] 現在から ${minutesAhead}分後 の予測画像（対象キー: ${timeStrJST}）を生成中...`);
+    console.log(`[区分 ${i + 1}/${intervals.length}] 日本時間 ${displayHour}時（${minutesAhead / 60}時間先）のテレビ風・雨雲予測を取得中...`);
 
-    const result = await generateJmaNowcForecast(area, timeStrJST);
+    const result = await generateJma3HourForecast(area, basetimeStrJST, minutesAhead);
 
-    // ナウキャストはデータ（雨）がない場所は404を返してくる仕様のため、
-    // 画像が1枚も取得できなかった場合は、真っ白（透明）な空のキャンバスをそのまま保存してActionsのコミットエラーを防ぎます
-    const fileName = `${area.prefName}_slot${i + 1}_plus${minutesAhead}m`;
+    const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
     saveImage(result.canvas, fileName);
-    console.log(`保存完了: ${fileName}.png (データ有り: ${result.hasData})`);
+    console.log(`保存完了: ${fileName}.png (雨雲データ検知: ${result.hasData})`);
   }
 }
 
