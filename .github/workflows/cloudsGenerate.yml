@@ -1,5 +1,8 @@
 name: JMA Cloud Generator
 
+env:
+  TZ: 'Asia/Tokyo'
+
 on:
   workflow_dispatch:
   schedule:
