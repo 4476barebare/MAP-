@@ -14,6 +14,14 @@ const bbox = activeArea;
 const step = activeArea.step;
 const ZOOM = activeArea.zoom;
 
+// 調整用：降水量レベルリスト（上から順に判定）
+const precipitationLevels = [
+  { min: 10.0, color: "rgba(255, 0, 0, 1.0)" },    // 激しい雨
+  { min: 5.0,  color: "rgba(255, 120, 0, 0.8)" },  // 強い雨
+  { min: 2.0,  color: "rgba(0, 120, 255, 0.7)" },  // 中程度の雨
+  { min: 0.1,  color: "rgba(100, 180, 255, 0.4)" } // 弱い雨
+];
+
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function latLonToPixel(lat, lon, zoom) {
@@ -55,7 +63,7 @@ async function fetchQuarterBatch(points) {
 
 // ===== メイン =====
 (async () => {
-  const utcISO = "2026-06-09T21:00"; // デバッグ固定時間
+  const utcISO = "2026-06-09T21:00"; 
   console.log(`【実行中】UTC: ${utcISO}:00 (エリア: ${bbox.prefname.toUpperCase()})`);
 
   const points = generatePoints();
@@ -92,13 +100,18 @@ async function fetchQuarterBatch(points) {
     const dotWidth = Math.max(Math.ceil(outWidth / ((bbox.lonMax - bbox.lonMin) / step)), 4);
     const dotHeight = Math.max(Math.ceil(outHeight / ((bbox.latMax - bbox.latMin) / step)), 4);
 
+    // 枠線を確実に排除
+    ctx.lineWidth = 0;
+
     for (const item of gridData) {
-      if (item.rain < 0.2) continue;
+      const level = precipitationLevels.find(l => item.rain >= l.min);
+      if (!level) continue;
+
       const p = latLonToPixel(item.lat, item.lon, ZOOM);
       const drawX = Math.round(p.x - xOffset);
       const drawY = Math.round(p.y - yOffset);
 
-      ctx.fillStyle = item.rain > 5 ? "rgba(255,0,0,0.8)" : "rgba(0,120,255,0.7)";
+      ctx.fillStyle = level.color;
       ctx.fillRect(drawX - dotWidth / 2, drawY - dotHeight / 2, dotWidth, dotHeight);
     }
 
