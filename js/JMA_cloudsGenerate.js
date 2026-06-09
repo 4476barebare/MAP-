@@ -9,7 +9,7 @@ const area = {
   lat: 35.6,
   lng: 140.1,
   grid: { w: 150, h: 100 },
-  zoom: 6 // zoom: 6 で未来データも存在することが確認できました！
+  zoom: 5 // 未来の広域予測が確実に存在するズームレベル
 };
 
 function latLngToTile(lat, lng, z) {
@@ -21,38 +21,57 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 1. 気象庁のサーバーから、今利用可能な「最新のベース時刻」と「予測分数リスト」を取得する
-async function getLatestForecastMeta() {
-  const res = await fetch("https://www.jma.go.jp/bosai/jmatile/data/rasrf/targetTimes.json", {
-    headers: { "User-Agent": "Mozilla/5.0" }
-  });
-  if (!res.ok) throw new Error("気象庁のメタデータ(targetTimes.json)を取得できませんでした。");
-  
-  const json = await res.json();
-  // 配列の先頭[0]が常に最新のデータです
-  return json[0]; 
+// 確実に存在する最新の「予報作成ベース時刻（JST）」を計算
+// 気象庁の3時間ごと広域予測データは、毎日 03:00 と 15:00 に一括生成されます
+function getLatestOfficialBasetimeJST() {
+  const d = new Date(); // Actions (TZ: Asia/Tokyo) のローカル時間
+  const hour = d.getHours();
+
+  // 配信のタイムラグを考慮し、5時を過ぎたら3時、17時を過ぎたら15時のデータをベースにする
+  if (hour >= 5 && hour < 17) {
+    d.setHours(3, 0, 0, 0);
+  } else {
+    if (hour < 5) {
+      d.setDate(d.getDate() - 1); // 日付を昨日に戻す
+    }
+    d.setHours(15, 0, 0, 0);
+  }
+
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    d.getFullYear() +
+    pad(d.getMonth() + 1) +
+    pad(d.getDate()) +
+    pad(d.getHours()) +
+    "0000"
+  );
 }
 
-// 2. 正しいURL組み立て関数
-function getForecastTileUrl(basetime, validtime, z, x, y) {
-  // 正解は /rasrf/{basetime}/none/{validtime}/{z}/{x}/{y}.png
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${basetime}/none/${validtime}/${z}/${x}/${y}.png`;
+// 気象庁公式の未来予測タイルURL（hrpns = 高解像度降水ナウキャスト予測層）
+function getOfficialForecastTileUrl(basetime, validtime, z, x, y) {
+  // 構造: /hrpns/{生成されたベース時間}/none/{見たい未来の時間}/{z}/{x}/{y}.png
+  return `https://www.jma.go.jp/bosai/jmatile/data/hrpns/${basetime}/none/${validtime}/${z}/${x}/${y}.png`;
 }
 
 async function fetchTile(url) {
   const res = await fetch(url, {
     headers: { "User-Agent": "Mozilla/5.0" }
   });
-  if (!res.ok) return null; // 404の時はnullを返す
+  if (!res.ok) {
+    // 404の場合のデバッグ用
+    console.error(`Fetch failed: ${res.status} -> ${url}`);
+    return null;
+  }
   const buf = await res.arrayBuffer();
   return Buffer.from(buf);
 }
 
-export async function generateJmaForecastCloud(area, basetime, validtime) {
+export async function generateJmaOfficialForecast(area, basetime, validtime) {
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
-  const rangeX = Math.ceil(area.grid.w / 2 / 50);
-  const rangeY = Math.ceil(area.grid.h / 2 / 50);
+  // zoom:5 なので周辺1マスで十分関東一円をカバー可能
+  const rangeX = 1;
+  const rangeY = 1;
 
   const xMin = x - rangeX;
   const xMax = x + rangeX;
@@ -66,7 +85,7 @@ export async function generateJmaForecastCloud(area, basetime, validtime) {
 
   for (let tx = xMin; tx <= xMax; tx++) {
     for (let ty = yMin; ty <= yMax; ty++) {
-      const url = getForecastTileUrl(basetime, validtime, area.zoom, tx, ty);
+      const url = getOfficialForecastTileUrl(basetime, validtime, area.zoom, tx, ty);
       const buf = await fetchTile(url);
       if (!buf) continue;
 
@@ -86,34 +105,13 @@ export function saveImage(canvas, name) {
   return path;
 }
 
-// 文字列(YYYYMMDDHHmmss)をDateオブジェクトに変換（JSTとして解釈）
-function parseJmaTimeToDate(timeStr) {
-  const y = parseInt(timeStr.substring(0, 4));
-  const m = parseInt(timeStr.substring(4, 6)) - 1;
-  const d = parseInt(timeStr.substring(6, 8));
-  const h = parseInt(timeStr.substring(8, 10));
-  const min = parseInt(timeStr.substring(10, 12));
-  
-  // タイムゾーンによるブレを防ぐため、一度UTCでオブジェクトを作ってJST相当に調整
-  const date = new Date(Date.UTC(y, m, d, h, min));
-  date.setUTCHours(date.getUTCHours() - 9); // 日本時間として扱うためのパース
-  return date;
-}
-
 async function main() {
-  console.log("--- 気象庁から最新の予報スケジュールを取得中 ---");
+  console.log("--- 気象庁公式仕様に基づく未来予測イメージ生成 ---");
   
-  // 気象庁のデータ状況をロード
-  const meta = await getLatestForecastMeta();
-  const basetime = meta.basetime; // 例: "20260609022000" など
-  const validtimes = meta.validtime; // 利用可能な未来の「分」の配列
-  
-  console.log(`最新発表ベース時刻 (JST): ${basetime}`);
-  
-  // ベース時刻を Date オブジェクト化
-  const baseDate = parseJmaTimeToDate(basetime);
+  const basetime = getLatestOfficialBasetimeJST();
+  console.log(`データ生成ベース時刻 (JST): ${basetime}`);
 
-  // 現在時刻から「次の3時間区切り（0,3,6,9,12,15,18,21時）」の最初の時間を計算
+  // 現在時刻から「次の3時間区切り」を起点にする
   const now = new Date();
   const currentHour = now.getHours();
   const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
@@ -123,29 +121,29 @@ async function main() {
 
   const pad = (n) => String(n).padStart(2, "0");
 
-  // 3時間ごと、6区分（18時間分）を処理
+  // 3時間ごと、6区分（18時間分）を正確にローテーション
   for (let i = 0; i < 6; i++) {
     const targetTime = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
     
-    // 予報発表ベース時刻（baseDate）から、ターゲットの未来時刻までの「必要な分数」
-    const requiredDiffMinutes = Math.floor((targetTime.getTime() - baseDate.getTime()) / 1000 / 60);
-
-    // 気象庁が提供している未来の「分リスト(validtimes)」の中から、一番近い「分」を探す
-    const closestValidtime = validtimes.reduce((prev, curr) => {
-      return Math.abs(parseInt(curr) - requiredDiffMinutes) < Math.abs(parseInt(prev) - requiredDiffMinutes) ? curr : prev;
-    });
+    // 見たい未来の時間をそのまま YYYYMMDDHH0000 形式にする
+    const validtimeStr = 
+      targetTime.getFullYear() +
+      pad(targetTime.getMonth() + 1) +
+      pad(targetTime.getDate()) +
+      pad(targetTime.getHours()) +
+      "0000";
 
     const displayHour = pad(targetTime.getHours());
-    console.log(`[区分 ${i + 1}/6] 日本時間 ${displayHour}時（計算上の差: ${requiredDiffMinutes}分 -> 採用する配信キー: ${closestValidtime}分後）の予報を生成中...`);
+    console.log(`[区分 ${i + 1}/6] 日本時間 ${displayHour}時（対象予測ターゲット: ${validtimeStr}）を生成中...`);
 
-    const result = await generateJmaForecastCloud(area, basetime, closestValidtime);
+    const result = await generateJmaOfficialForecast(area, basetime, validtimeStr);
 
     if (result.hasData) {
       const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
       saveImage(result.canvas, fileName);
       console.log(`保存完了: ${fileName}.png`);
     } else {
-      console.warn(`[Warning] ${displayHour}時のタイル画像が1枚も取得できませんでした。`);
+      console.warn(`[Warning] ${displayHour}時の予報画像が生成できませんでした。`);
     }
   }
 }
