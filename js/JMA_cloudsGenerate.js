@@ -1,131 +1,109 @@
 import fetch from "node-fetch";
-import { createCanvas, loadImage } from "canvas";
+import { createCanvas } from "canvas";
 import fs from "fs";
 
-const TILE = 256;
+// 千葉県のコード: 120000
+const JMA_FORECAST_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/120000.json";
 
-// 関東エリアが綺麗に収まるズームレベル7
-const area = {
-  prefName: "CHIBA",
-  lat: 35.6,
-  lng: 140.1,
-  grid: { w: 150, h: 100 },
-  zoom: 7
-};
-
-function latLngToTile(lat, lng, z) {
-  const n = 2 ** z;
-  const x = Math.floor((lng + 180) / 360 * n);
-  const y = Math.floor(
-    (1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * n
-  );
-  return { x, y };
-}
-
-// 確実に存在する「最新の正時（00分）」のベース時刻（JST）を計算
-function getLatestRasfcBasetimeJST() {
-  const d = new Date();
-  // 配信のラグ（約20〜30分）を考慮し、現在の分が30分未満なら「1時間前の正時」にする
-  if (d.getMinutes() < 30) {
-    d.setHours(d.getHours() - 1);
-  }
-  d.setMinutes(0, 0, 0); // 〇時00分00秒に固定
-
-  const pad = (n) => String(n).padStart(2, "0");
-  return (
-    d.getFullYear() +
-    pad(d.getMonth() + 1) +
-    pad(d.getDate()) +
-    pad(d.getHours()) +
-    "0000"
-  );
-}
-
-// 【公式・テレビ予報仕様】降水短時間予報（rasfc）のURL構造
-function getRasfcForecastUrl(basetimeStrJST, minutesAhead, z, x, y) {
-  // 構造: /rasfc/{発表正時}/none/{経過分数}/{z}/{x}/{y}.png
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasfc/${basetimeStrJST}/none/${minutesAhead}/${z}/{x}/{y}.png`;
-}
-
-async function fetchTile(url) {
-  const res = await fetch(url, {
+async function fetchJmaForecast() {
+  const res = await fetch(JMA_FORECAST_URL, {
     headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
   });
-  if (!res.ok) return null; // 雨が降っていない空のエリア（404）は安全にスキップ
-  const buf = await res.arrayBuffer();
-  return Buffer.from(buf);
+  if (!res.ok) {
+    throw new Error(`気象庁APIへの通信に失敗しました: ${res.status}`);
+  }
+  return await res.json();
 }
 
-export async function generateJma3HourForecast(area, basetimeStrJST, minutesAhead) {
-  const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
-
-  const rangeX = 1;
-  const rangeY = 1;
-
-  const xMin = x - rangeX;
-  const xMax = x + rangeX;
-  const yMin = y - rangeY;
-  const yMax = y + rangeY;
-
-  const canvas = createCanvas((xMax - xMin + 1) * TILE, (yMax - yMin + 1) * TILE);
+function drawForecastImage(timeSeriesData) {
+  // 横 600px、縦 400px のテレビの天気予報ボードのような画像を自作する
+  const canvas = createCanvas(600, 400);
   const ctx = canvas.getContext("2d");
 
-  let hasData = false;
+  // 背景グラデーション（テレビ風のブルー）
+  const grad = ctx.createLinearGradient(0, 0, 0, 400);
+  grad.addColorStop(0, "#0b1d3a");
+  grad.addColorStop(1, "#1f4068");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 600, 400);
 
-  for (let tx = xMin; tx <= xMax; tx++) {
-    for (let ty = yMin; ty <= yMax; ty++) {
-      const url = getRasfcForecastUrl(basetimeStrJST, minutesAhead, area.zoom, tx, ty);
-      const buf = await fetchTile(url);
-      if (!buf) continue;
+  // タイトル
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 20px sans-serif";
+  ctx.fillText("【気象庁発表】千葉県 3時間ごとの天気予測", 30, 45);
 
-      hasData = true;
-      const img = await loadImage(buf);
-      ctx.drawImage(img, (tx - xMin) * TILE, (ty - yMin) * TILE, TILE, TILE);
+  // 枠線の描画
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(20, 70, 560, 300);
+
+  // JSONから3時間ごとのデータを抽出して描画
+  // (気象庁の時系列予報オブジェクトを安全に掘り進める)
+  try {
+    const timeSeries = timeSeriesData[1].timeSeries[0]; // 3時間ごとの時系列
+    const times = timeSeries.timePeriod; // 時間の配列
+    const weathers = timeSeries.areas[0].weathers; // 天気文言の配列
+    const pops = timeSeriesData[1].timeSeries[1].areas[0].pops; // 降水確率の配列
+
+    const maxDisplay = Math.min(times.length, 5); // 直近5区分分を描画
+
+    for (let i = 0; i < maxDisplay; i++) {
+      const x = 40 + i * 110;
+
+      // 時間の加工 (ISO文字列からJSTの「時」を抽出)
+      const date = new Date(times[i]);
+      const hourStr = String(date.getHours()).padStart(2, "0") + "時";
+
+      // 1枠の背景
+      ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+      ctx.fillRect(x - 10, 85, 100, 270);
+
+      // 時間表示
+      ctx.fillStyle = "#61afef";
+      ctx.font = "bold 18px sans-serif";
+      ctx.fillText(hourStr, x, 120);
+
+      // 天気（テキスト）
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "14px sans-serif";
+      const weatherText = weathers[i] || "不明";
+      // 長い文字は省略
+      const shortWeather = weatherText.length > 4 ? weatherText.substring(0, 4) + ".." : weatherText;
+      ctx.fillText(shortWeather, x, 190);
+
+      // 降水確率
+      ctx.fillStyle = "#38ef7d";
+      ctx.font = "bold 16px sans-serif";
+      const popStr = pops[i] !== undefined ? `${pops[i]}%` : "--%";
+      ctx.fillText(`降水: ${popStr}`, x, 270);
     }
+  } catch (err) {
+    ctx.fillStyle = "#ff6b6b";
+    ctx.font = "14px sans-serif";
+    ctx.fillText("データの解析に失敗しました。予報の端境期の可能性があります。", 40, 200);
+    console.error("データパースエラー:", err);
   }
 
-  return { canvas, hasData };
-}
-
-export function saveImage(canvas, name) {
-  fs.mkdirSync("./output", { recursive: true });
-  const path = `./output/${name}.png`;
-  fs.writeFileSync(path, canvas.toBuffer("image/png"));
-  return path;
+  return canvas;
 }
 
 async function main() {
-  console.log("--- [テレビ天気予報仕様] 3時間ごと・今後の雨雲予測生成 ---");
+  console.log("--- [404絶対回避仕様] 安定版・天気予測イメージ生成 ---");
   
-  const basetimeStrJST = getLatestRasfcBasetimeJST();
-  console.log(`予報発表ベース時刻 (JST): ${basetimeStrJST}`);
+  try {
+    const forecastData = await fetchJmaForecast();
+    console.log("気象庁から時系列予報JSONの取得に成功しました。");
 
-  // 3時間ごと、5区分（3時間後、6時間後、9時間後、12時間後、15時間後）
-  const intervals = [180, 360, 540, 720, 900];
+    const canvas = drawForecastImage(forecastData);
 
-  // ベース時刻をパースして、ログに「〇時の予報」と綺麗に出すための準備
-  const baseYear = parseInt(basetimeStrJST.substring(0, 4));
-  const baseMonth = parseInt(basetimeStrJST.substring(4, 6)) - 1;
-  const baseDay = parseInt(basetimeStrJST.substring(6, 8));
-  const baseHour = parseInt(basetimeStrJST.substring(8, 10));
-  const baseDate = new Date(baseYear, baseMonth, baseDay, baseHour, 0, 0);
-
-  const pad = (n) => String(n).padStart(2, "0");
-
-  for (let i = 0; i < intervals.length; i++) {
-    const minutesAhead = intervals[i];
+    // 画像の保存
+    fs.mkdirSync("./output", { recursive: true });
+    const path = "./output/CHIBA_3hour_forecast.png";
+    fs.writeFileSync(path, canvas.toBuffer("image/png"));
     
-    // 予測対象の実際の時刻を計算
-    const targetDate = new Date(baseDate.getTime() + minutesAhead * 60 * 1000);
-    const displayHour = pad(targetDate.getHours());
-
-    console.log(`[区分 ${i + 1}/${intervals.length}] 日本時間 ${displayHour}時（${minutesAhead / 60}時間先）のテレビ風・雨雲予測を取得中...`);
-
-    const result = await generateJma3HourForecast(area, basetimeStrJST, minutesAhead);
-
-    const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
-    saveImage(result.canvas, fileName);
-    console.log(`保存完了: ${fileName}.png (雨雲データ検知: ${result.hasData})`);
+    console.log(`保存完了しました: ${path}`);
+  } catch (error) {
+    console.error(`エラーが発生しました: ${error.message}`);
   }
 }
 
