@@ -35,7 +35,7 @@ const AREA_PROFILES = {
   }
 };
 
-// ★現在アクティブにするエリアを指定（ここを切り替えるだけで設定が全同期します）
+// 現在アクティブにするエリアを指定
 const activeArea = AREA_PROFILES.chiba;
 
 // 設定の展開
@@ -43,7 +43,7 @@ const bbox = activeArea;
 const step = activeArea.step;
 const ZOOM = activeArea.zoom;
 
-// 429エラー回避用のウェイト（1.5秒に短縮）
+// 429エラー回避用のウェイト
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ===== 緯度経度をWebメルカトルの絶対ピクセル座標に変換 =====
@@ -74,7 +74,6 @@ function getTargetUTCClean() {
 // ===== グリッド生成 =====
 function generatePoints() {
   const points = [];
-  // 浮動小数点の演算誤差を防ぐため100倍して細かく制御
   const latMinInt = Math.round(bbox.latMin * 100);
   const latMaxInt = Math.round(bbox.latMax * 100);
   const lonMinInt = Math.round(bbox.lonMin * 100);
@@ -89,7 +88,7 @@ function generatePoints() {
   return points;
 }
 
-// 保守された4分割ロジック
+// 4分割ロジック
 function splitIntoFour(arr) {
   const chunkSize = Math.ceil(arr.length / 4);
   return [
@@ -126,7 +125,7 @@ async function fetchQuarterBatch(points) {
   console.log(`探索する対象UTC時間: ${utcISO}:00 (選択エリア: ${bbox.prefname.toUpperCase()})`);
 
   const points = generatePoints();
-  const quarters = splitIntoFour(points); // 4分割構造の維持
+  const quarters = splitIntoFour(points);
 
   const gridData = [];
 
@@ -157,7 +156,6 @@ async function fetchQuarterBatch(points) {
         gridData.push({ lat: p.lat, lon: p.lon, rain });
       }
 
-      // 次のループへ移る前の1.5秒待機（step弄りでの429を保険回避）
       if (q < quarters.length - 1) {
         await sleep(1500);
       }
@@ -177,16 +175,20 @@ async function fetchQuarterBatch(points) {
     const outWidth = pixelBBox.xMax - pixelBBox.xMin + 1;
     const outHeight = pixelBBox.yMax - pixelBBox.yMin + 1;
     
-    console.log(`-> 粒度(step: ${step})を維持したまま、Leaflet ZOOM ${ZOOM} サイズ (${outWidth}x${outHeight} px) に引き伸ばし描画中...`);
+    console.log(`-> キャンバスサイズ: ${outWidth} x ${outHeight} px (ZOOM ${ZOOM})`);
 
     const finalCanvas = createCanvas(outWidth, outHeight);
     const finalCtx = finalCanvas.getContext("2d");
 
-    // 現在のBBox幅と現在のstepからドットスタンプサイズを動的計算
+    // ★【修正のキモ】ドットサイズが0ピクセルに潰れないよう、最低サイズ（Math.max）を保証
     const latSpan = bbox.latMax - bbox.latMin;
     const lonSpan = bbox.lonMax - bbox.lonMin;
-    const dotWidth = Math.ceil(outWidth / (lonSpan / step));
-    const dotHeight = Math.ceil(outHeight / (latSpan / step));
+    
+    // 計算上小さくなっても、最低横4px、縦4pxの存在感を保証する（stepに応じて動的拡張）
+    const dotWidth = Math.max(Math.ceil(outWidth / (lonSpan / step)), 4);
+    const dotHeight = Math.max(Math.ceil(outHeight / (latSpan / step)), 4);
+
+    console.log(`-> 1マスの描画スタンプサイズ: ${dotWidth}x${dotHeight} px でマッピングします`);
 
     for (const item of gridData) {
       if (item.rain < 0.2) continue;
@@ -202,11 +204,12 @@ async function fetchQuarterBatch(points) {
 
       if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
         finalCtx.fillStyle = color;
+        // マスの中心がズレないようにスタンプ
         finalCtx.fillRect(
           drawX - Math.floor(dotWidth / 2), 
           drawY - Math.floor(dotHeight / 2), 
-          dotWidth + 1, // 隙間埋め補正
-          dotHeight + 1
+          dotWidth, 
+          dotHeight
         );
       }
     }
@@ -219,7 +222,7 @@ async function fetchQuarterBatch(points) {
 
     fs.mkdirSync("./output", { recursive: true });
     fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-    console.log(`【ミッション完了】プロファイル定義に基づき、Leafletサイズ画像を書き出しました: ${filename}`);
+    console.log(`【完全大成功】白飛び・消失を防止し、画像を正常に出力しました: ${filename}`);
 
   } catch (e) {
     if (e.response) {
