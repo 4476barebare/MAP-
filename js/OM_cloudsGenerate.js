@@ -6,47 +6,18 @@ import { createCanvas } from "canvas";
 // 👑 エリア別プロファイル定義
 // ==========================================
 const AREA_PROFILES = {
-  chiba: {
-    prefname: "chiba",
-    latMin: 34.7,
-    latMax: 36.0,
-    lonMin: 139.6,
-    lonMax: 141.1,
-    step: 0.1,    // 千葉専用のデータ粒度
-    zoom: 9       // 千葉専用のLeafletズームレベル
-  },
-  tokyo: {
-    prefname: "tokyo",
-    latMin: 35.5,
-    latMax: 35.9,
-    lonMin: 138.9,
-    lonMax: 139.9,
-    step: 0.05,   // 東京は狭いので細かく
-    zoom: 10      // ズームレベルも高めに
-  },
-  kanto_all: {
-    prefname: "kanto",
-    latMin: 34.0,
-    latMax: 38.0,
-    lonMin: 138.0,
-    lonMax: 142.0,
-    step: 0.15,   // 関東全域はActions節約のため粗め
-    zoom: 7       // 広域なのでズームは低め
-  }
+  chiba: { prefname: "chiba", latMin: 34.7, latMax: 36.0, lonMin: 139.6, lonMax: 141.1, step: 0.1, zoom: 9 },
+  tokyo: { prefname: "tokyo", latMin: 35.5, latMax: 35.9, lonMin: 138.9, lonMax: 139.9, step: 0.05, zoom: 10 },
+  kanto_all: { prefname: "kanto", latMin: 34.0, latMax: 38.0, lonMin: 138.0, lonMax: 142.0, step: 0.15, zoom: 7 }
 };
 
-// ★現在アクティブにするエリアを指定（ここを切り替えるだけで設定が全同期します）
 const activeArea = AREA_PROFILES.chiba;
-
-// 設定の展開
 const bbox = activeArea;
 const step = activeArea.step;
 const ZOOM = activeArea.zoom;
 
-// 429エラー回避用のウェイト（1.5秒に短縮）
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ===== 緯度経度をWebメルカトルの絶対ピクセル座標に変換 =====
 function latLonToPixel(lat, lon, zoom) {
   const size = 256 * Math.pow(2, zoom);
   const x = ((lon + 180) / 360) * size;
@@ -55,32 +26,13 @@ function latLonToPixel(lat, lon, zoom) {
   return { x, y };
 }
 
-// ===== JST → UTC変換 =====
-function getTargetUTCClean() {
-  const now = new Date();
-  const currentJstHour = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(11, 13) * 1;
-  const nextJstHour = Math.ceil((currentJstHour === 0 ? 24 : currentJstHour) / 3) * 3;
-  
-  const targetJst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  targetJst.setUTCHours(nextJstHour % 24, 0, 0, 0);
-  if (nextJstHour >= 24) {
-    targetJst.setTime(targetJst.getTime() + 24 * 60 * 60 * 1000);
-  }
-  
-  const targetUtc = new Date(targetJst.getTime() - 9 * 60 * 60 * 1000);
-  return { utcISO: targetUtc.toISOString().slice(0, 13), jstDate: targetJst };
-}
-
-// ===== グリッド生成 =====
 function generatePoints() {
   const points = [];
-  // 浮動小数点の演算誤差を防ぐため100倍して細かく制御
   const latMinInt = Math.round(bbox.latMin * 100);
   const latMaxInt = Math.round(bbox.latMax * 100);
   const lonMinInt = Math.round(bbox.lonMin * 100);
   const lonMaxInt = Math.round(bbox.lonMax * 100);
   const stepInt = Math.round(step * 100);
-
   for (let lat = latMaxInt; lat >= latMinInt; lat -= stepInt) {
     for (let lon = lonMinInt; lon <= lonMaxInt; lon += stepInt) {
       points.push({ lat: lat / 100, lon: lon / 100 });
@@ -89,137 +41,79 @@ function generatePoints() {
   return points;
 }
 
-// 保守された4分割ロジック
 function splitIntoFour(arr) {
   const chunkSize = Math.ceil(arr.length / 4);
-  return [
-    arr.slice(0, chunkSize),
-    arr.slice(chunkSize, chunkSize * 2),
-    arr.slice(chunkSize * 2, chunkSize * 3),
-    arr.slice(chunkSize * 3)
-  ];
+  return [arr.slice(0, chunkSize), arr.slice(chunkSize, chunkSize * 2), arr.slice(chunkSize * 2, chunkSize * 3), arr.slice(chunkSize * 3)];
 }
 
-// ===== API取得 =====
 async function fetchQuarterBatch(points) {
   const url = "https://api.open-meteo.com/v1/forecast";
-  const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
-  const longitudes = points.map(p => p.lon.toFixed(4)).join(",");
-
   const res = await axios.get(url, {
-    params: {
-      latitude: latitudes,
-      longitude: longitudes,
-      hourly: "precipitation",
-      forecast_days: 1,
-      timezone: "UTC"
-    },
+    params: { latitude: points.map(p => p.lat.toFixed(4)).join(","), longitude: points.map(p => p.lon.toFixed(4)).join(","), hourly: "precipitation", forecast_days: 1, timezone: "UTC" },
     timeout: 20000
   });
-
   return Array.isArray(res.data) ? res.data : [res.data];
 }
 
 // ===== メイン =====
 (async () => {
-  const { utcISO, jstDate } = getTargetUTCClean();
-  console.log(`探索する対象UTC時間: ${utcISO}:00 (選択エリア: ${bbox.prefname.toUpperCase()})`);
+  // ★デバッグ用：今日の午前6時 JST = 2026-06-09T21:00 UTC
+  const utcISO = "2026-06-09T21:00";
+  console.log(`【デバッグ】対象: ${utcISO} (UTC) | エリア: ${bbox.prefname.toUpperCase()}`);
 
   const points = generatePoints();
-  const quarters = splitIntoFour(points); // 4分割構造の維持
-
+  const quarters = splitIntoFour(points);
   const gridData = [];
-
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (4分割ロジック稼働)`);
 
   try {
     for (let q = 0; q < quarters.length; q++) {
       const subBatch = quarters[q];
-      if (subBatch.length === 0) continue;
-
-      console.log(`-> 分割リクエスト中... (${q + 1}/4) - ${subBatch.length}地点`);
       const dataArray = await fetchQuarterBatch(subBatch);
-
       for (let i = 0; i < subBatch.length; i++) {
         const p = subBatch[i];
-        const pointData = dataArray[i];
-        if (!pointData) continue;
-
-        const times = pointData.hourly?.time;
-        const prec = pointData.hourly?.precipitation;
-
-        if (!times || !prec) continue;
-
-        const idx = times.findIndex(t => t.startsWith(utcISO));
-        if (idx === -1) continue;
-
-        const rain = prec[idx] ?? 0;
-        gridData.push({ lat: p.lat, lon: p.lon, rain });
+        const prec = dataArray[i]?.hourly?.precipitation;
+        const timeList = dataArray[i]?.hourly?.time;
+        const idx = timeList?.findIndex(t => t.startsWith(utcISO));
+        if (idx !== -1 && prec) {
+          gridData.push({ lat: p.lat, lon: p.lon, rain: prec[idx] ?? 0 });
+        }
       }
-
-      // 次のループへ移る前の1.5秒待機（step弄りでの429を保険回避）
-      if (q < quarters.length - 1) {
-        await sleep(1500);
-      }
+      if (q < quarters.length - 1) await sleep(1500);
     }
-    // ===== 出力時だけLeaflet基準のピクセルサイズに引き伸ばし配置 =====
-    // 重要な変更: 範囲外への描画を防ぐため、グリッドの最大/最小ピクセル位置を計算して確定させる
+
+    if (gridData.length === 0) {
+      console.log("-> 降水データなしのため終了します。");
+      return;
+    }
+
+    // 座標補正
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     const pixelPoints = gridData.map(item => {
       const p = latLonToPixel(item.lat, item.lon, ZOOM);
-      if (p.x < minX) minX = p.x;
-      if (p.x > maxX) maxX = p.x;
-      if (p.y < minY) minY = p.y;
-      if (p.y > maxY) maxY = p.y;
+      if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y;
       return { x: p.x, y: p.y, rain: item.rain };
     });
 
     const outWidth = Math.ceil(maxX - minX) + 50;
     const outHeight = Math.ceil(maxY - minY) + 50;
-    
-    console.log(`-> 描画範囲: ${outWidth}x${outHeight} px`);
-
     const finalCanvas = createCanvas(outWidth, outHeight);
-    const finalCtx = finalCanvas.getContext("2d");
-
-    // ドットサイズ計算
-    const dotWidth = 8;
-    const dotHeight = 8;
+    const ctx = finalCanvas.getContext("2d");
 
     for (const item of pixelPoints) {
-      if (item.rain < 0.2) continue;
-
-      let color = "rgba(100,180,255,0.5)";
-      if (item.rain > 2) color = "rgba(0,120,255,0.7)";
-      if (item.rain > 5) color = "rgba(255,80,0,0.8)";
-      if (item.rain > 10) color = "rgba(255,0,0,1)";
-
-      // 絶対座標から「このCanvas内での相対座標」へ変換
-      const drawX = Math.round(item.x - minX + 25);
-      const drawY = Math.round(item.y - minY + 25);
-
-      finalCtx.fillStyle = color;
-      finalCtx.fillRect(drawX - dotWidth/2, drawY - dotHeight/2, dotWidth, dotHeight);
-    
-
+      // 0.2mm未満でもグレーで描画（デバッグ用）
+      let color = item.rain > 0.2 ? (item.rain > 10 ? "red" : (item.rain > 5 ? "orange" : "blue")) : "rgba(200,200,200,0.3)";
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(item.x - minX + 25) - 4, Math.round(item.y - minY + 25) - 4, 8, 8);
     }
-
-    // ファイル名生成
-    const jstISO = jstDate.toISOString();
-    const datePart = jstISO.slice(0, 10);
-    const hourPart = jstISO.slice(11, 13);
-    const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
 
     fs.mkdirSync("./output", { recursive: true });
+    const filename = `./output/${bbox.prefname}_DEBUG.png`;
     fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-    console.log(`【ミッション完了】プロファイル定義に基づき、Leafletサイズ画像を書き出しました: ${filename}`);
+    console.log(`【完了】生成しました: ${filename}`);
 
   } catch (e) {
-    if (e.response) {
-      console.error(`データ取得中にエラーが発生しました (Status: ${e.response.status}):`, e.message);
-    } else {
-      console.error("エラーが発生しました:", e.message);
-    }
+    console.error("エラー:", e.message);
     process.exit(1);
   }
 })();
