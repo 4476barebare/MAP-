@@ -12,9 +12,10 @@ const bbox = {
 
 const step = 0.09;
 
+// 429エラー回避用のウェイト
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ===== JST → UTC変換 =====
+// ===== JST → UTC変換（システムの誤作動を完全に回避） =====
 function getTargetUTCClean() {
   const now = new Date();
   
@@ -22,17 +23,13 @@ function getTargetUTCClean() {
   const currentJstHour = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(11, 13) * 1;
   const nextJstHour = Math.ceil((currentJstHour === 0 ? 24 : currentJstHour) / 3) * 3;
   
-  // ターゲットとなるJSTのベース時刻を作成
   const targetJst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
   targetJst.setUTCHours(nextJstHour % 24, 0, 0, 0);
   if (nextJstHour >= 24) {
     targetJst.setTime(targetJst.getTime() + 24 * 60 * 60 * 1000);
   }
   
-  // そこから9時間引いてUTCを確定
   const targetUtc = new Date(targetJst.getTime() - 9 * 60 * 60 * 1000);
-  
-  // API比較用の文字列 (YYYY-MM-DDTHH)
   const utcISO = targetUtc.toISOString().slice(0, 13);
 
   return {
@@ -41,7 +38,7 @@ function getTargetUTCClean() {
   };
 }
 
-// ===== グリッド生成 =====
+// ===== グリッド生成（北から南へ） =====
 function generatePoints() {
   const points = [];
   for (let lat = bbox.latMax; lat >= bbox.latMin; lat -= step) {
@@ -78,13 +75,13 @@ async function fetchHalfBatch(points) {
   return Array.isArray(res.data) ? res.data : [res.data];
 }
 
-// ===== 描画（★最初期パレット・透過・2x2サイズに完全復元） =====
+// ===== 描画（元の2枚目画像と同じ：完全透過＋元祖カラー） =====
 function draw(grid, width, height, filename) {
-  const scale = 2; // 元のサイズに戻す
+  const scale = 2; // 元のサイズに固定
   const canvas = createCanvas(width * scale, height * scale);
   const ctx = canvas.getContext("2d");
 
-  // 背景の塗りつぶしは行わない（元のコード通りの背景透過）
+  // 背景の塗りつぶしは一切しない（これで2枚目の画像のように真っ白/透明になります）
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -92,11 +89,11 @@ function draw(grid, width, height, filename) {
       
       if (rain < 0.2) continue; 
 
-      // ★★★ あなたの最初期のカラーパレット設定と完全に一致 ★★★
-      let color = "rgba(100,180,255,0.5)"; 
-      if (rain > 2) color = "rgba(0,120,255,0.7)";  
-      if (rain > 5) color = "rgba(255,80,0,0.8)";   
-      if (rain > 10) color = "rgba(255,0,0,1)";     
+      // 2枚目の透過画像で綺麗に映えていた、元々のカラーパレット定義
+      let color = "rgba(100,180,255,0.5)"; // 弱い雨（半透明の水色）
+      if (rain > 2) color = "rgba(0,120,255,0.7)";  // 本格的な雨（青）
+      if (rain > 5) color = "rgba(255,80,0,0.8)";   // 強い雨（オレンジ）
+      if (rain > 10) color = "rgba(255,0,0,1)";     // 激しい雨（赤）
 
       ctx.fillStyle = color;
       ctx.fillRect(x * scale, y * scale, scale, scale);
@@ -154,7 +151,7 @@ function draw(grid, width, height, filename) {
       }
     }
 
-    // ファイル名生成（誤作動するメソッドを徹底排除したクリーンな実装）
+    // ファイル名生成
     const jstISO = jstDate.toISOString(); 
     const datePart = jstISO.slice(0, 10);  
     const hourPart = jstISO.slice(11, 13); 
@@ -162,7 +159,7 @@ function draw(grid, width, height, filename) {
     const filename = `./output/kanto_${datePart}_${hourPart}h.png`;
 
     draw(grid, width, height, filename);
-    console.log(`【完全大成功】元の色・サイズのまま画像を書き出しました: ${filename}`);
+    console.log(`【完全終了】元通りの透過＆カラー画像で書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("データ取得または描画中にエラーが発生しました:", e.message);
