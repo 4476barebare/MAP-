@@ -12,7 +12,10 @@ const bbox = {
 
 const step = 0.1;
 
-// ===== JST → UTC変換 =====
+// 429エラー回避用のウェイト
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// ===== JST → UTC変換（システムの誤作動を完全に回避） =====
 function getTargetUTCClean() {
   const now = new Date();
   
@@ -35,7 +38,7 @@ function getTargetUTCClean() {
   };
 }
 
-// ===== グリッド生成 =====
+// ===== グリッド生成（北から南へ） =====
 function generatePoints() {
   const points = [];
   for (let lat = bbox.latMax; lat >= bbox.latMin; lat -= step) {
@@ -46,46 +49,54 @@ function generatePoints() {
   return points;
 }
 
-// ===== 緯度をメルカトルY座標に変換する補正ロジック =====
-function latToMercatorY(lat) {
-  const sinLat = Math.sin((lat * Math.PI) / 180);
-  return 0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI);
+// 2分割
+function splitIntoTwo(arr) {
+  const half = Math.ceil(arr.length / 2);
+  return [arr.slice(0, half), arr.slice(half)];
 }
 
-// ===== 描画（完全透過＋元祖カラー＋出力時メルカトル補正） =====
-function drawCorrected(gridData, width, height, filename) {
-  const scale = 2; // 元のサイズ
+// ===== API取得 =====
+async function fetchHalfBatch(points) {
+  const url = "https://api.open-meteo.com/v1/forecast";
+  const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
+  const longitudes = points.map(p => p.lon.toFixed(4)).join(",");
+
+  const res = await axios.get(url, {
+    params: {
+      latitude: latitudes,
+      longitude: longitudes,
+      hourly: "precipitation",
+      forecast_days: 1,
+      timezone: "UTC"
+    },
+    timeout: 20000
+  });
+
+  return Array.isArray(res.data) ? res.data : [res.data];
+}
+
+// ===== 描画（元の2枚目画像と同じ：完全透過＋元祖カラー） =====
+function draw(grid, width, height, filename) {
+  const scale = 2; // 元のサイズに固定
   const canvas = createCanvas(width * scale, height * scale);
   const ctx = canvas.getContext("2d");
 
-  // 背景透過
+  // 背景の塗りつぶしは一切しない（これで2枚目の画像のように真っ白/透明になります）
 
-  const mercatorYMax = latToMercatorY(bbox.latMax);
-  const mercatorYMin = latToMercatorY(bbox.latMin);
-  const mercatorYRange = mercatorYMin - mercatorYMax;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const rain = grid[y][x];
+      
+      if (rain < 0.2) continue; 
 
-  for (const item of gridData) {
-    const rain = item.rain;
-    if (rain < 0.2) continue;
+      // 2枚目の透過画像で綺麗に映えていた、元々のカラーパレット定義
+      let color = "rgba(100,180,255,0.5)"; // 弱い雨（半透明の水色）
+      if (rain > 2) color = "rgba(0,120,255,0.7)";  // 本格的な雨（青）
+      if (rain > 5) color = "rgba(255,80,0,0.8)";   // 強い雨（オレンジ）
+      if (rain > 10) color = "rgba(255,0,0,1)";     // 激しい雨（赤）
 
-    // 元々のカラーパレット定義
-    let color = "rgba(100,180,255,0.5)"; 
-    if (rain > 2) color = "rgba(0,120,255,0.7)";  
-    if (rain > 5) color = "rgba(255,80,0,0.8)";   
-    if (rain > 10) color = "rgba(255,0,0,1)";     
-
-    // 経度の位置計算
-    const xRatio = (item.lon - bbox.lonMin) / (bbox.lonMax - bbox.lonMin);
-    const drawX = Math.round(xRatio * (width - 1));
-
-    // 緯度のメルカトル補正計算
-    const currentMercatorY = latToMercatorY(item.lat);
-    const yRatio = (currentMercatorY - mercatorYMax) / mercatorYRange;
-    const drawY = Math.round(yRatio * (height - 1));
-
-    if (drawX >= 0 && drawX < width && drawY >= 0 && drawY < height) {
       ctx.fillStyle = color;
-      ctx.fillRect(drawX * scale, drawY * scale, scale, scale);
+      ctx.fillRect(x * scale, y * scale, scale, scale);
     }
   }
 
@@ -99,53 +110,45 @@ function drawCorrected(gridData, width, height, filename) {
   console.log(`探索する対象UTC時間: ${utcISO}:00`);
 
   const points = generatePoints();
+  const halves = splitIntoTwo(points);
 
   const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
   const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
-  
-  const gridData = [];
+  const grid = Array.from({ length: height }, () => Array(width).fill(0));
 
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (POSTによる超安定1発ルート)`);
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安全2分割ルート)`);
 
   try {
-    const url = "https://api.open-meteo.com/v1/forecast";
-    const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
-    const longitudes = points.map(p => p.lon.toFixed(4)).join(",");
+    for (let h = 0; h < halves.length; h++) {
+      const subBatch = halves[h];
+      console.log(`-> 分割リクエスト中... (${h + 1}/2)`);
+      
+      const dataArray = await fetchHalfBatch(subBatch);
 
-    // ★GETではなくPOSTを使う（中身は元のパラメータのままなので400エラーも出ません）
-    const res = await axios.post(url, null, {
-      params: {
-        latitude: latitudes,
-        longitude: longitudes,
-        hourly: "precipitation",
-        forecast_days: 1,
-        timezone: "UTC"
-      },
-      timeout: 30000
-    });
+      for (let i = 0; i < subBatch.length; i++) {
+        const p = subBatch[i];
+        const pointData = dataArray[i];
+        if (!pointData) continue;
 
-    const dataArray = Array.isArray(res.data) ? res.data : [res.data];
+        const times = pointData.hourly?.time;
+        const prec = pointData.hourly?.precipitation;
 
-    for (let i = 0; i < points.length; i++) {
-      const p = points[i];
-      const pointData = dataArray[i];
-      if (!pointData) continue;
+        if (!times || !prec) continue;
 
-      const times = pointData.hourly?.time;
-      const prec = pointData.hourly?.precipitation;
+        const idx = times.findIndex(t => t.startsWith(utcISO));
+        if (idx === -1) continue;
 
-      if (!times || !prec) continue;
+        const rain = prec[idx] ?? 0;
 
-      const idx = times.findIndex(t => t.startsWith(utcISO));
-      if (idx === -1) continue;
+        const x = Math.min(Math.max(Math.round((p.lon - bbox.lonMin) / step), 0), width - 1);
+        const y = Math.min(Math.max(Math.round((bbox.latMax - p.lat) / step), 0), height - 1);
 
-      const rain = prec[idx] ?? 0;
+        grid[y][x] = rain;
+      }
 
-      gridData.push({
-        lat: p.lat,
-        lon: p.lon,
-        rain: rain
-      });
+      if (h === 0) {
+        await sleep(1500);
+      }
     }
 
     // ファイル名生成
@@ -155,9 +158,8 @@ function drawCorrected(gridData, width, height, filename) {
     
     const filename = `./output/kanto_${datePart}_${hourPart}h.png`;
 
-    // 補正をかけながら描画
-    drawCorrected(gridData, width, height, filename);
-    console.log(`【完全大成功】すべてのエラーを消し去り、透過画像を書き出しました: ${filename}`);
+    draw(grid, width, height, filename);
+    console.log(`【完全終了】元通りの透過＆カラー画像で書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("データ取得または描画中にエラーが発生しました:", e.message);
