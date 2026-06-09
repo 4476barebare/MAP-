@@ -12,14 +12,24 @@ const bbox = {
 
 const step = 0.1;
 
+// 👑 Leafletの解像度基準（ZOOM 7のピクセル幅に画像を合わせる）
+const ZOOM = 7;
+
 // 429エラー回避用のウェイト
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// ===== 緯度経度をWebメルカトルの絶対ピクセル座標に変換 =====
+function latLonToPixel(lat, lon, zoom) {
+  const size = 256 * Math.pow(2, zoom);
+  const x = ((lon + 180) / 360) * size;
+  const sinLat = Math.sin((lat * Math.PI) / 180);
+  const y = (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * size;
+  return { x, y };
+}
 
 // ===== JST → UTC変換 =====
 function getTargetUTCClean() {
   const now = new Date();
-  
-  // 3時間刻みの切り上げ計算
   const currentJstHour = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(11, 13) * 1;
   const nextJstHour = Math.ceil((currentJstHour === 0 ? 24 : currentJstHour) / 3) * 3;
   
@@ -30,12 +40,10 @@ function getTargetUTCClean() {
   }
   
   const targetUtc = new Date(targetJst.getTime() - 9 * 60 * 60 * 1000);
-  const utcISO = targetUtc.toISOString().slice(0, 13);
-
-  return { utcISO, jstDate: targetJst };
+  return { utcISO: targetUtc.toISOString().slice(0, 13), jstDate: targetJst };
 }
 
-// ===== グリッド生成 =====
+// ===== グリッド生成（北から南へ：1640地点の丁度いい粒度） =====
 function generatePoints() {
   const points = [];
   for (let lat = bbox.latMax; lat >= bbox.latMin; lat -= step) {
@@ -46,7 +54,7 @@ function generatePoints() {
   return points;
 }
 
-// データを均等に4分割するロジック
+// 4分割
 function splitIntoFour(arr) {
   const chunkSize = Math.ceil(arr.length / 4);
   return [
@@ -77,29 +85,18 @@ async function fetchQuarterBatch(points) {
   return Array.isArray(res.data) ? res.data : [res.data];
 }
 
-// ===== 緯度をメルカトルY座標に変換する補正用数式 =====
-function latToMercatorY(lat) {
-  const sinLat = Math.sin((lat * Math.PI) / 180);
-  return 0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI);
-}
-
 // ===== メイン =====
 (async () => {
   const { utcISO, jstDate } = getTargetUTCClean();
   console.log(`探索する対象UTC時間: ${utcISO}:00`);
 
   const points = generatePoints();
-  const quarters = splitIntoFour(points); // 4分割
+  const quarters = splitIntoFour(points);
 
-  const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
-  const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
-  const scale = 2;
+  // 1640地点の格子データ（低粒度）を保持する用の配列
+  const gridData = [];
 
-  // 4枚の独立した Canvas（レイヤー）を用意
-  const subCanvases = Array.from({ length: 4 }, () => createCanvas(width * scale, height * scale));
-  const subContexts = subCanvases.map(c => c.getContext("2d"));
-
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安全4分割Canvas統合ルート)`);
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安定4分割・粒度維持ルート)`);
 
   try {
     for (let q = 0; q < quarters.length; q++) {
@@ -108,7 +105,6 @@ function latToMercatorY(lat) {
 
       console.log(`-> 分割リクエスト中... (${q + 1}/4) - ${subBatch.length}地点`);
       const dataArray = await fetchQuarterBatch(subBatch);
-      const ctx = subContexts[q];
 
       for (let i = 0; i < subBatch.length; i++) {
         const p = subBatch[i];
@@ -124,20 +120,9 @@ function latToMercatorY(lat) {
         if (idx === -1) continue;
 
         const rain = prec[idx] ?? 0;
-        if (rain < 0.2) continue;
-
-        // 元々のカラーパレット定義
-        let color = "rgba(100,180,255,0.5)";
-        if (rain > 2) color = "rgba(0,120,255,0.7)";
-        if (rain > 5) color = "rgba(255,80,0,0.8)";
-        if (rain > 10) color = "rgba(255,0,0,1)";
-
-        // 各キャンバス内での単純な格子インデックス
-        const x = Math.min(Math.max(Math.round((p.lon - bbox.lonMin) / step), 0), width - 1);
-        const y = Math.min(Math.max(Math.round((bbox.latMax - p.lat) / step), 0), height - 1);
-
-        ctx.fillStyle = color;
-        ctx.fillRect(x * scale, y * scale, scale, scale);
+        
+        // データを緯度経度付きで一旦ストック
+        gridData.push({ lat: p.lat, lon: p.lon, rain });
       }
 
       if (q < quarters.length - 1) {
@@ -145,40 +130,55 @@ function latToMercatorY(lat) {
       }
     }
 
-    // ===== 最終統合 Canvas の生成とメルカトル位置補正 =====
-    console.log("-> 4枚のCanvasをメルカトル補正を掛けながら1枚に統合中...");
-    const finalCanvas = createCanvas(width * scale, height * scale);
+    // ===== 👑 出力時だけLeaflet基準のピクセルサイズ（大判）に引き伸ばし配置 =====
+    const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
+    const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
+
+    const pixelBBox = {
+      xMin: Math.floor(pMax.x),
+      xMax: Math.floor(pMin.x),
+      yMin: Math.floor(pMax.y),
+      yMax: Math.floor(pMin.y)
+    };
+
+    const outWidth = pixelBBox.xMax - pixelBBox.xMin + 1;
+    const outHeight = pixelBBox.yMax - pixelBBox.yMin + 1;
+    
+    console.log(`-> 1640点の粒度のまま、Leafletサイズ (${outWidth}x${outHeight} px) に引き伸ばし描画中...`);
+
+    const finalCanvas = createCanvas(outWidth, outHeight);
     const finalCtx = finalCanvas.getContext("2d");
 
-    const mercatorYMax = latToMercatorY(bbox.latMax);
-    const mercatorYMin = latToMercatorY(bbox.latMin);
-    const mercatorYRange = mercatorYMin - mercatorYMax;
+    // Leaflet側の1ピクセルあたりの経度・緯度（メルカトル）の範囲比率を計算
+    const mercatorYMax = (0.5 - Math.log((1 + Math.sin((bbox.latMax * Math.PI) / 180))) / (1 - Math.sin((bbox.latMax * Math.PI) / 180))) / (4 * Math.PI));
+    const mercatorYMin = (0.5 - Math.log((1 + Math.sin((bbox.latMin * Math.PI) / 180))) / (1 - Math.sin((bbox.latMin * Math.PI) / 180))) / (4 * Math.PI));
+    
+    // 格子を少し太めにスタンプして、荒いデータの粒度感を表現（隙間が空かないように適正補正）
+    const dotWidth = Math.ceil(outWidth / (4 / step));
+    const dotHeight = Math.ceil(outHeight / (4 / step));
 
-    // 4枚のキャンバスからピクセルデータを読み取って統合
-    for (let q = 0; q < 4; q++) {
-      const srcCtx = subContexts[q];
-      
-      // グリッド上の全ノードを走査し、スタンプされていたドットの位置をメルカトルへ再配置
-      for (const p of quarters[q]) {
-        const gridX = Math.min(Math.max(Math.round((p.lon - bbox.lonMin) / step), 0), width - 1);
-        const gridY = Math.min(Math.max(Math.round((bbox.latMax - p.lat) / step), 0), height - 1);
+    for (const item of gridData) {
+      if (item.rain < 0.2) continue;
 
-        // 元キャンバスから打たれている色を取得
-        const pixel = srcCtx.getImageData(gridX * scale, gridY * scale, 1, 1).data;
-        if (pixel[3] === 0) continue; // 透明ならスキップ
+      let color = "rgba(100,180,255,0.5)";
+      if (item.rain > 2) color = "rgba(0,120,255,0.7)";
+      if (item.rain > 5) color = "rgba(255,80,0,0.8)";
+      if (item.rain > 10) color = "rgba(255,0,0,1)";
 
-        // 正しい出力位置の計算（メルカトル補正）
-        const xRatio = (p.lon - bbox.lonMin) / (bbox.lonMax - bbox.lonMin);
-        const drawX = Math.round(xRatio * (width - 1));
+      // 各地点の経度・緯度から、Leaflet画像内の正確なX, Y（メルカトル位置）を計算
+      const p = latLonToPixel(item.lat, item.lon, ZOOM);
+      const drawX = Math.round(p.x - pixelBBox.xMin);
+      const drawY = Math.round(p.y - pixelBBox.yMin);
 
-        const currentMercatorY = latToMercatorY(p.lat);
-        const yRatio = (currentMercatorY - mercatorYMax) / mercatorYRange;
-        const drawY = Math.round(yRatio * (height - 1));
-
-        if (drawX >= 0 && drawX < width && drawY >= 0 && drawY < height) {
-          finalCtx.fillStyle = `rgba(${pixel[0]}, ${pixel[1]}, ${pixel[2]}, ${pixel[3] / 255})`;
-          finalCtx.fillRect(drawX * scale, drawY * scale, scale, scale);
-        }
+      if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
+        finalCtx.fillStyle = color;
+        // 荒い粒度（0.1度マス）に応じたサイズで、ピンポイントに配置
+        finalCtx.fillRect(
+          drawX - Math.floor(dotWidth / 2), 
+          drawY - Math.floor(dotHeight / 2), 
+          dotWidth, 
+          dotHeight
+        );
       }
     }
 
@@ -190,7 +190,7 @@ function latToMercatorY(lat) {
 
     fs.mkdirSync("./output", { recursive: true });
     fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-    console.log(`【完全大成功】4枚のCanvasを1枚に統合し、位置補正された透過画像を書き出しました: ${filename}`);
+    console.log(`【完全大成功】ちょうどいい粒度のまま、Leafletサイズで透過画像を書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("データ取得または描画中にエラーが発生しました:", e.message);
