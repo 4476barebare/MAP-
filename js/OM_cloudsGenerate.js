@@ -1,7 +1,6 @@
-// index.js
-const axios = require("axios");
-const { createCanvas } = require("canvas");
-const fs = require("fs");
+import axios from "axios";
+import fs from "fs";
+import { createCanvas } from "canvas";
 
 // ===== 設定 =====
 const bbox = {
