@@ -2,20 +2,48 @@ import axios from "axios";
 import fs from "fs";
 import { createCanvas } from "canvas";
 
-// ===== 設定 =====
-const bbox = {
-  latMin: 34,
-  latMax: 38,
-  lonMin: 138,
-  lonMax: 142
+// ==========================================
+// 👑 エリア別プロファイル定義
+// ==========================================
+const AREA_PROFILES = {
+  chiba: {
+    prefname: "chiba",
+    latMin: 34.7,
+    latMax: 36.0,
+    lonMin: 139.6,
+    lonMax: 141.1,
+    step: 0.1,    // 千葉専用のデータ粒度
+    zoom: 9       // 千葉専用のLeafletズームレベル
+  },
+  tokyo: {
+    prefname: "tokyo",
+    latMin: 35.5,
+    latMax: 35.9,
+    lonMin: 138.9,
+    lonMax: 139.9,
+    step: 0.05,   // 東京は狭いので細かく
+    zoom: 10      // ズームレベルも高めに
+  },
+  kanto_all: {
+    prefname: "kanto",
+    latMin: 34.0,
+    latMax: 38.0,
+    lonMin: 138.0,
+    lonMax: 142.0,
+    step: 0.15,   // 関東全域はActions節約のため粗め
+    zoom: 7       // 広域なのでズームは低め
+  }
 };
 
-const step = 0.1;
+// ★現在アクティブにするエリアを指定（ここを切り替えるだけで設定が全同期します）
+const activeArea = AREA_PROFILES.chiba;
 
-// 👑 Leafletの解像度基準（ZOOM 7のピクセル幅に画像を合わせる）
-const ZOOM = 7;
+// 設定の展開
+const bbox = activeArea;
+const step = activeArea.step;
+const ZOOM = activeArea.zoom;
 
-// ★429エラーを確実に回避するため、ウェイトを4秒（4000ms）に延長
+// 429エラー回避用のウェイト（1.5秒に短縮）
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ===== 緯度経度をWebメルカトルの絶対ピクセル座標に変換 =====
@@ -43,18 +71,25 @@ function getTargetUTCClean() {
   return { utcISO: targetUtc.toISOString().slice(0, 13), jstDate: targetJst };
 }
 
-// ===== グリッド生成（北から南へ：1640地点の丁度いい粒度） =====
+// ===== グリッド生成 =====
 function generatePoints() {
   const points = [];
-  for (let lat = bbox.latMax; lat >= bbox.latMin; lat -= step) {
-    for (let lon = bbox.lonMin; lon <= bbox.lonMax; lon += step) {
-      points.push({ lat, lon });
+  // 浮動小数点の演算誤差を防ぐため100倍して細かく制御
+  const latMinInt = Math.round(bbox.latMin * 100);
+  const latMaxInt = Math.round(bbox.latMax * 100);
+  const lonMinInt = Math.round(bbox.lonMin * 100);
+  const lonMaxInt = Math.round(bbox.lonMax * 100);
+  const stepInt = Math.round(step * 100);
+
+  for (let lat = latMaxInt; lat >= latMinInt; lat -= stepInt) {
+    for (let lon = lonMinInt; lon <= lonMaxInt; lon += stepInt) {
+      points.push({ lat: lat / 100, lon: lon / 100 });
     }
   }
   return points;
 }
 
-// 4分割
+// 保守された4分割ロジック
 function splitIntoFour(arr) {
   const chunkSize = Math.ceil(arr.length / 4);
   return [
@@ -88,15 +123,14 @@ async function fetchQuarterBatch(points) {
 // ===== メイン =====
 (async () => {
   const { utcISO, jstDate } = getTargetUTCClean();
-  console.log(`探索する対象UTC時間: ${utcISO}:00`);
+  console.log(`探索する対象UTC時間: ${utcISO}:00 (選択エリア: ${bbox.prefname.toUpperCase()})`);
 
   const points = generatePoints();
-  const quarters = splitIntoFour(points);
+  const quarters = splitIntoFour(points); // 4分割構造の維持
 
-  // 1640地点の格子データを保持する用の配列
   const gridData = [];
 
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安定4分割・粒度維持ルート)`);
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (4分割ロジック稼働)`);
 
   try {
     for (let q = 0; q < quarters.length; q++) {
@@ -120,19 +154,16 @@ async function fetchQuarterBatch(points) {
         if (idx === -1) continue;
 
         const rain = prec[idx] ?? 0;
-        
-        // データを緯度経度付きで一旦ストック
         gridData.push({ lat: p.lat, lon: p.lon, rain });
       }
 
-      // ★次の分割リクエストへ移る前に、4秒間しっかり待機してサーバーの制限を回避
+      // 次のループへ移る前の1.5秒待機（step弄りでの429を保険回避）
       if (q < quarters.length - 1) {
-        console.log(`   --> 429回避のため4秒間待機します...`);
-        await sleep(4000);
+        await sleep(1500);
       }
     }
 
-    // ===== 出力時だけLeaflet基準のピクセルサイズ（大判）に引き伸ばし配置 =====
+    // ===== 出力時だけLeaflet基準のピクセルサイズに引き伸ばし配置 =====
     const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
     const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
 
@@ -146,14 +177,16 @@ async function fetchQuarterBatch(points) {
     const outWidth = pixelBBox.xMax - pixelBBox.xMin + 1;
     const outHeight = pixelBBox.yMax - pixelBBox.yMin + 1;
     
-    console.log(`-> 1640点の粒度のまま、Leafletサイズ (${outWidth}x${outHeight} px) に引き伸ばし描画中...`);
+    console.log(`-> 粒度(step: ${step})を維持したまま、Leaflet ZOOM ${ZOOM} サイズ (${outWidth}x${outHeight} px) に引き伸ばし描画中...`);
 
     const finalCanvas = createCanvas(outWidth, outHeight);
     const finalCtx = finalCanvas.getContext("2d");
 
-    // 格子を少し太めにスタンプして、荒いデータの粒度感を表現
-    const dotWidth = Math.ceil(outWidth / (4 / step));
-    const dotHeight = Math.ceil(outHeight / (4 / step));
+    // 現在のBBox幅と現在のstepからドットスタンプサイズを動的計算
+    const latSpan = bbox.latMax - bbox.latMin;
+    const lonSpan = bbox.lonMax - bbox.lonMin;
+    const dotWidth = Math.ceil(outWidth / (lonSpan / step));
+    const dotHeight = Math.ceil(outHeight / (latSpan / step));
 
     for (const item of gridData) {
       if (item.rain < 0.2) continue;
@@ -163,7 +196,6 @@ async function fetchQuarterBatch(points) {
       if (item.rain > 5) color = "rgba(255,80,0,0.8)";
       if (item.rain > 10) color = "rgba(255,0,0,1)";
 
-      // 各地点の経度・緯度から、Leaflet画像内の正確なX, Y（メルカトル位置）を計算
       const p = latLonToPixel(item.lat, item.lon, ZOOM);
       const drawX = Math.round(p.x - pixelBBox.xMin);
       const drawY = Math.round(p.y - pixelBBox.yMin);
@@ -173,8 +205,8 @@ async function fetchQuarterBatch(points) {
         finalCtx.fillRect(
           drawX - Math.floor(dotWidth / 2), 
           drawY - Math.floor(dotHeight / 2), 
-          dotWidth, 
-          dotHeight
+          dotWidth + 1, // 隙間埋め補正
+          dotHeight + 1
         );
       }
     }
@@ -183,11 +215,11 @@ async function fetchQuarterBatch(points) {
     const jstISO = jstDate.toISOString();
     const datePart = jstISO.slice(0, 10);
     const hourPart = jstISO.slice(11, 13);
-    const filename = `./output/kanto_${datePart}_${hourPart}h.png`;
+    const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
 
     fs.mkdirSync("./output", { recursive: true });
     fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-    console.log(`【完全大成功】ちょうどいい粒度のまま、Leafletサイズで透過画像を書き出しました: ${filename}`);
+    console.log(`【ミッション完了】プロファイル定義に基づき、Leafletサイズ画像を書き出しました: ${filename}`);
 
   } catch (e) {
     if (e.response) {
