@@ -18,7 +18,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install system deps (canvas)
+      # canvas用のLinux依存（必須）
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -29,8 +30,17 @@ jobs:
             libgif-dev \
             librsvg2-dev
 
-      - name: Install npm deps
+      - name: Install dependencies
         run: npm install
 
+      # 実行（ログ依存なし）
       - name: Run generator
         run: node js/JMA_cloudsGenerate.js
+
+      # 成果物をGitHubに保存（ここが本体）
+      - name: Upload generated images
+        uses: actions/upload-artifact@v4
+        with:
+          name: jma-clouds
+          path: output/
+          if-no-files-found: error
