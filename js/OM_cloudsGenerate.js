@@ -16,6 +16,19 @@ const step = 0.09;
 const BATCH_SIZE = 40;
 const CONCURRENCY = 5;
 
+// ===== 時刻ターゲット =====
+function getTargetISOHour() {
+  const now = new Date();
+  const d = new Date(now);
+
+  const h = d.getUTCHours();
+  const next = Math.ceil(h / 3) * 3;
+
+  d.setUTCHours(next, 0, 0, 0);
+
+  return d.toISOString().slice(0, 13); // YYYY-MM-DDTHH
+}
+
 // ===== グリッド生成 =====
 function generatePoints() {
   const points = [];
@@ -38,7 +51,7 @@ function chunk(arr, size) {
   return res;
 }
 
-// ===== API取得（複数地点）=====
+// ===== API取得 =====
 async function fetchBatch(points) {
   const url = "https://api.open-meteo.com/v1/forecast";
 
@@ -56,7 +69,7 @@ async function fetchBatch(points) {
     timeout: 10000
   });
 
-  // ★ 複数 or 単一どちらにも対応
+  // 複数地点対応
   return Array.isArray(res.data) ? res.data : [res.data];
 }
 
@@ -105,6 +118,8 @@ function draw(grid, width, height, filename) {
 
 // ===== メイン =====
 (async () => {
+  const targetHour = getTargetISOHour();
+
   const points = generatePoints();
   const batches = chunk(points, BATCH_SIZE);
 
@@ -129,11 +144,21 @@ function draw(grid, width, height, filename) {
       const pointData = dataArray[i];
       if (!pointData) continue;
 
+      const times = pointData.hourly?.time;
+      const prec = pointData.hourly?.precipitation;
+
+      if (!times || !prec) continue;
+
+      const idx = times.findIndex(t =>
+        t.startsWith(targetHour)
+      );
+
+      if (idx === -1) continue;
+
+      const rain = prec[idx] ?? 0;
+
       const x = Math.round((p.lon - bbox.lonMin) / step);
       const y = Math.round((p.lat - bbox.latMin) / step);
-
-      // ★ 先頭時刻だけ使う（最速）
-      const rain = pointData.hourly?.precipitation?.[0] ?? 0;
 
       grid[y][x] = rain;
     }
