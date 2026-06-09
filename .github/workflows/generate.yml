@@ -25,7 +25,7 @@ jobs:
         run: mkdir -p output
 
       - name: スクリプト実行
-        run: node OM_cloudsGenerate.js
+        run: node js/OM_cloudsGenerate.js
 
       - name: 変更をコミット
         run: |
