@@ -60,6 +60,23 @@ function getTargetUTCClean() {
   return { utcISO: targetUtc.toISOString().slice(0, 13), jstDate: targetJst };
 }
 
+// ===== Leafletピクセル基準の全座標を生成 =====
+function generatePoints() {
+  const points = [];
+  for (let y = pixelBBox.yMin; y <= pixelBBox.yMax; y++) {
+    for (let x = pixelBBox.xMin; x <= pixelBBox.xMax; x++) {
+      const pos = pixelToLatLon(x, y, ZOOM);
+      points.push({
+        lat: pos.lat,
+        lon: pos.lon,
+        px: x - pixelBBox.xMin,
+        py: y - pixelBBox.yMin
+      });
+    }
+  }
+  return points;
+}
+
 // ===== 描画（完全透過・元祖パレット） =====
 function draw(grid, width, height, filename) {
   const canvas = createCanvas(width, height);
@@ -78,7 +95,7 @@ function draw(grid, width, height, filename) {
       if (rain > 10) color = "rgba(255,0,0,1)";     
 
       ctx.fillStyle = color;
-      ctx.fillRect(x, y, 1, 1); // 1ピクセル等倍マッピング
+      ctx.fillRect(x, y, 1, 1); // 1ピクセル等倍
     }
   }
 
@@ -92,38 +109,37 @@ function draw(grid, width, height, filename) {
   console.log(`探索対象UTC: ${utcISO}:00 (Leaflet ZOOM: ${ZOOM})`);
   console.log(`キャンバスサイズ: ${width} x ${height} = 総計 ${width * height} ピクセル`);
 
+  const points = generatePoints();
   const grid = Array.from({ length: height }, () => Array(width).fill(0));
 
-  // グリッドの両端（BBox）の緯度経度を精密に算出
-  const topLeft = pixelToLatLon(pixelBBox.xMin, pixelBBox.yMin, ZOOM);
-  const bottomRight = pixelToLatLon(pixelBBox.xMax, pixelBBox.yMax, ZOOM);
-
-  console.log("APIリクエスト開始... (グリッド一括取得ルート / URL長固定)");
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (POST形式で一括取得)`);
 
   try {
     const url = "https://api.open-meteo.com/v1/forecast";
     
-    // 【最重要】個別座標を並べるのではなく、エリアの矩形（長方形）を指定して1撃で抜く
-    const res = await axios.get(url, {
-      params: {
-        latitude: `${bottomRight.lat.toFixed(4)},${topLeft.lat.toFixed(4)}`,
-        longitude: `${topLeft.lon.toFixed(4)},${bottomRight.lon.toFixed(4)}`,
-        cell_selection: "grid", // これにより範囲内を自動で格子状に取得
-        hourly: "precipitation",
-        forecast_days: 1,
-        timezone: "UTC"
-      },
-      timeout: 30000
+    // 緯度と経度の配列をそれぞれ綺麗に分離
+    const latitudes = points.map(p => p.lat);
+    const longitudes = points.map(p => p.lon);
+
+    // 【完全解決】Open-MeteoのPOST用仕様（URLは短いまま、BodyにJSONとして流し込む）
+    const res = await axios.post(url, {
+      latitude: latitudes,
+      longitude: longitudes,
+      hourly: ["precipitation"], // 配列で指定するのがOpen-MeteoのPOSTの厳格ルール
+      forecast_days: 1,
+      timezone: "UTC"
+    }, {
+      timeout: 60000 // 量が多いので1分までタイムアウトを緩和
     });
 
     const dataArray = Array.isArray(res.data) ? res.data : [res.data];
 
-    // 取得したグリッドデータをLeafletのピクセル位置に正しくマッピング
-    for (const pointData of dataArray) {
+    // 取得した正確な配列データをグリッドにマッピング
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const pointData = dataArray[i];
       if (!pointData) continue;
 
-      const lat = pointData.latitude;
-      const lon = pointData.longitude;
       const times = pointData.hourly?.time;
       const prec = pointData.hourly?.precipitation;
 
@@ -134,14 +150,8 @@ function draw(grid, width, height, filename) {
 
       const rain = prec[idx] ?? 0;
 
-      // 該当の緯度経度が、Leaflet上でどのピクセルに該当するか逆算
-      const p = latLonToPixel(lat, lon, ZOOM);
-      const px = Math.round(p.x) - pixelBBox.xMin;
-      const py = Math.round(p.y) - pixelBBox.yMin;
-
-      if (px >= 0 && px < width && py >= 0 && py < height) {
-        // 最も近いピクセル座標に雨量データをマッピング（最大値を採用して雨雲の歯抜け防止）
-        grid[py][px] = Math.max(grid[py][px], rain);
+      if (p.px >= 0 && p.px < width && p.py >= 0 && p.py < height) {
+        grid[p.py][p.px] = rain;
       }
     }
 
@@ -149,12 +159,12 @@ function draw(grid, width, height, filename) {
     const filename = `./output/kanto_${jstISO.slice(0, 10)}_${jstISO.slice(11, 13)}h.png`;
 
     draw(grid, width, height, filename);
-    console.log(`【完全大成功】414エラーを完璧に回避し、Leaflet完全一致画像を生成しました: ${filename}`);
+    console.log(`【完全大成功】すべてのエラーを回避し、Leaflet完全一致の透過画像を書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("エラーが発生しました:", e.message);
     if (e.response) {
-      console.error("サーバーからのレスポンス:", e.response.data);
+      console.error("サーバーからのレスポンス:", JSON.stringify(e.response.data));
     }
     process.exit(1);
   }
