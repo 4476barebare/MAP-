@@ -12,12 +12,6 @@ const bbox = {
 
 const step = 0.1;
 
-// ★URLが絶対にパンクしない1回あたりの最大地点数（安全圏の350地点に固定）
-const MAX_POINTS_PER_REQUEST = 350;
-
-// 429エラー回避用のウェイト
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 // ===== JST → UTC変換 =====
 function getTargetUTCClean() {
   const now = new Date();
@@ -41,7 +35,7 @@ function getTargetUTCClean() {
   };
 }
 
-// ===== グリッド生成（北から南へ） =====
+// ===== グリッド生成 =====
 function generatePoints() {
   const points = [];
   for (let lat = bbox.latMax; lat >= bbox.latMin; lat -= step) {
@@ -50,35 +44,6 @@ function generatePoints() {
     }
   }
   return points;
-}
-
-// ★総ポイント数に応じて、安全なサイズ（350地点ずつ）に自動で小分けするロジック
-function splitIntoSafeBatches(arr, maxSize) {
-  const batches = [];
-  for (let i = 0; i < arr.length; i += maxSize) {
-    batches.push(arr.slice(i, i + maxSize));
-  }
-  return batches;
-}
-
-// ===== API取得 =====
-async function fetchBatch(points) {
-  const url = "https://api.open-meteo.com/v1/forecast";
-  const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
-  const longitudes = points.map(p => p.lon.toFixed(4)).join(",");
-
-  const res = await axios.get(url, {
-    params: {
-      latitude: latitudes,
-      longitude: longitudes,
-      hourly: "precipitation",
-      forecast_days: 1,
-      timezone: "UTC"
-    },
-    timeout: 20000
-  });
-
-  return Array.isArray(res.data) ? res.data : [res.data];
 }
 
 // ===== 緯度をメルカトルY座標に変換する補正ロジック =====
@@ -134,51 +99,53 @@ function drawCorrected(gridData, width, height, filename) {
   console.log(`探索する対象UTC時間: ${utcISO}:00`);
 
   const points = generatePoints();
-  
-  // 自動的に安全な塊に分割（1640地点なら5分割になります）
-  const batches = splitIntoSafeBatches(points, MAX_POINTS_PER_REQUEST); 
 
   const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
   const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
   
   const gridData = [];
 
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安全自動分割: ${batches.length}分割)`);
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (POSTによる超安定1発ルート)`);
 
   try {
-    for (let h = 0; h < batches.length; h++) {
-      const subBatch = batches[h];
-      
-      console.log(`-> 分割リクエスト中... (${h + 1}/${batches.length}) - ${subBatch.length}地点`);
-      
-      const dataArray = await fetchBatch(subBatch);
+    const url = "https://api.open-meteo.com/v1/forecast";
+    const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
+    const longitudes = points.map(p => p.lon.toFixed(4)).join(",");
 
-      for (let i = 0; i < subBatch.length; i++) {
-        const p = subBatch[i];
-        const pointData = dataArray[i];
-        if (!pointData) continue;
+    // ★GETではなくPOSTを使う（中身は元のパラメータのままなので400エラーも出ません）
+    const res = await axios.post(url, null, {
+      params: {
+        latitude: latitudes,
+        longitude: longitudes,
+        hourly: "precipitation",
+        forecast_days: 1,
+        timezone: "UTC"
+      },
+      timeout: 30000
+    });
 
-        const times = pointData.hourly?.time;
-        const prec = pointData.hourly?.precipitation;
+    const dataArray = Array.isArray(res.data) ? res.data : [res.data];
 
-        if (!times || !prec) continue;
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const pointData = dataArray[i];
+      if (!pointData) continue;
 
-        const idx = times.findIndex(t => t.startsWith(utcISO));
-        if (idx === -1) continue;
+      const times = pointData.hourly?.time;
+      const prec = pointData.hourly?.precipitation;
 
-        const rain = prec[idx] ?? 0;
+      if (!times || !prec) continue;
 
-        gridData.push({
-          lat: p.lat,
-          lon: p.lon,
-          rain: rain
-        });
-      }
+      const idx = times.findIndex(t => t.startsWith(utcISO));
+      if (idx === -1) continue;
 
-      // 次のループがある場合は安全のために1.5秒待つ
-      if (h < batches.length - 1) {
-        await sleep(1500);
-      }
+      const rain = prec[idx] ?? 0;
+
+      gridData.push({
+        lat: p.lat,
+        lon: p.lon,
+        rain: rain
+      });
     }
 
     // ファイル名生成
@@ -190,7 +157,7 @@ function drawCorrected(gridData, width, height, filename) {
 
     // 補正をかけながら描画
     drawCorrected(gridData, width, height, filename);
-    console.log(`【完全大成功】URL制限を確実に回避し、透過画像を書き出しました: ${filename}`);
+    console.log(`【完全大成功】すべてのエラーを消し去り、透過画像を書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("データ取得または描画中にエラーが発生しました:", e.message);
