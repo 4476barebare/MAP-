@@ -3,7 +3,7 @@ name: JMA Cloud Generator
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */3 * * *" # 3時間ごと
+    - cron: "0 */3 * * *"
 
 jobs:
   run:
@@ -18,7 +18,18 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install system deps (canvas)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libjpeg-dev \
+            libgif-dev \
+            librsvg2-dev
+
+      - name: Install npm deps
         run: npm install
 
       - name: Run generator
