@@ -21,50 +21,57 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 気象庁の予報基準時刻（30分単位で更新される直近の時刻）をJST基準の文字列で取得
-function getLatestBasetimeJST() {
-  // GitHub Actions(UTC)でも日本時間(JST)ベースで計算できるようにする
-  const d = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
+// 実行時から「次の3時間区切り」から始まる、6区分（3時間ごと）のJST日時リストを生成
+function getForecastTimesJST() {
+  const times = [];
+  const d = new Date(); // Actions環境では TZ: Asia/Tokyo が効いている前提
+
+  // 現在の時から、次の3時間区切り（0, 3, 6, 9, 12, 15, 18, 21）を計算
+  const currentHour = d.getHours();
+  const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
   
-  // 予報のベース時間は30分単位
-  d.setMinutes(Math.floor(d.getMinutes() / 30) * 30);
-  d.setSeconds(0);
-  d.setMilliseconds(0);
+  // 開始時間にセット（分・秒は00）
+  d.setHours(nextTargetHour, 0, 0, 0);
 
   const pad = (n) => String(n).padStart(2, "0");
-  return (
-    d.getUTCFullYear() +
-    pad(d.getUTCMonth() + 1) +
-    pad(d.getUTCDate()) +
-    pad(d.getUTCHours()) +
-    pad(d.getUTCMinutes()) +
-    "00"
-  );
+
+  // 3時間ごと、6区分（18時間分）の時間を配列に入れる
+  for (let i = 0; i < 6; i++) {
+    const targetDate = new Date(d.getTime() + i * 3 * 60 * 60 * 1000);
+    const timeStr = 
+      targetDate.getFullYear() +
+      pad(targetDate.getMonth() + 1) +
+      pad(targetDate.getDate()) +
+      pad(targetDate.getHours()) +
+      "0000";
+    times.push(timeStr);
+  }
+
+  return times;
 }
 
-// 予報URLの組み立て（rasrf を使用）
-// validtime: 基準時刻から何分後か（"060" = 1時間後, "120" = 2時間後 など）
-function getForecastTileUrl(basetime, validtime, z, x, y) {
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${basetime}/none/${validtime}/${z}/${x}/${y}.png`;
+// 3時間ごとの未来予報URL（validtime自体が YYYYMMDDHH0000 になる）
+function get3HourForecastTileUrl(validtime, z, x, y) {
+  // 3時間予報などの広域未来予測データは、通常「none」の後に有効時間（予測時間）が入ります
+  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/none/none/${validtime}/${z}/${x}/${y}.png`;
 }
 
 async function fetchTile(url) {
-  // GitHub Actionsからのブロックを防ぐため User-Agent を設定
   const res = await fetch(url, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
   });
   if (!res.ok) {
-    // 404などのエラーが出た場合はログに出力
-    console.error(`Fetch failed: ${res.status} for URL: ${url}`);
+    // 404の時はログを出してスキップできるようにする
+    console.error(`Fetch failed: ${res.status} -> ${url}`);
     return null;
   }
   const buf = await res.arrayBuffer();
   return Buffer.from(buf);
 }
 
-export async function generateJmaForecastCloud(area, basetime, validtime) {
+export async function generateJma3HourForecast(area, validtime) {
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
   const rangeX = Math.ceil(area.grid.w / 2 / 50);
@@ -82,7 +89,7 @@ export async function generateJmaForecastCloud(area, basetime, validtime) {
 
   for (let tx = xMin; tx <= xMax; tx++) {
     for (let ty = yMin; ty <= yMax; ty++) {
-      const url = getForecastTileUrl(basetime, validtime, area.zoom, tx, ty);
+      const url = get3HourForecastTileUrl(validtime, area.zoom, tx, ty);
       const buf = await fetchTile(url);
       if (!buf) continue;
 
@@ -92,11 +99,7 @@ export async function generateJmaForecastCloud(area, basetime, validtime) {
     }
   }
 
-  if (!hasData) {
-    console.warn(`[Warning] ${validtime}分後のタイルデータが1枚も取得できませんでした。`);
-  }
-
-  return { canvas };
+  return { canvas, hasData };
 }
 
 export function saveImage(canvas, name) {
@@ -106,26 +109,26 @@ export function saveImage(canvas, name) {
   return path;
 }
 
-// 未来の予測を実行するメイン関数
-async function runForecast(area) {
-  const basetime = getLatestBasetimeJST();
-  console.log(`ベース予報時刻 (JST): ${basetime}`);
+async function main() {
+  const targetTimes = getForecastTimesJST();
+  console.log("取得対象の予報時刻リスト (JST):", targetTimes);
 
-  // 例として「1時間後」「2時間後」「3時間後」の予測画像を作る
-  // 降水短時間予報（rasrf）の引数は、"060", "120", "180" のように3桁の分単位の文字列
-  const forecastHours = [1, 2, 3];
+  for (let i = 0; i < targetTimes.length; i++) {
+    const validtime = targetTimes[i];
+    const displayHour = validtime.substring(8, 10);
+    console.log(`[区分 ${i + 1}/6] ${displayHour}時（対象時刻: ${validtime}）の予報を生成中...`);
 
-  for (const hour of forecastHours) {
-    const minutesStr = String(hour * 60).padStart(3, "0"); // "060", "120" ...
-    console.log(`生成中: ${hour}時間後 (${minutesStr}分後) の予報`);
+    const result = await generateJma3HourForecast(area, validtime);
 
-    const result = await generateJmaForecastCloud(area, basetime, minutesStr);
-    
-    const fileName = `${area.prefName}_forecast_${hour}h`;
-    saveImage(result.canvas, fileName);
-    
-    console.log(`保存完了: ${fileName}.png`);
+    if (result.hasData) {
+      // ファイル名は CHIBA_1_12h.png のように「何番目の区分か」と「対象の時刻」がわかるように
+      const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
+      saveImage(result.canvas, fileName);
+      console.log(`保存完了: ${fileName}.png`);
+    } else {
+      console.warn(`[Warning] ${displayHour}時のデータがないため、画像をスキップしました。`);
+    }
   }
 }
 
-runForecast(area);
+main();
