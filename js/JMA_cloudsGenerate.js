@@ -21,39 +21,28 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 実行時から「次の3時間区切り」から始まる、6区分（3時間ごと）のJST日時リストを生成
-function getForecastTimesJST() {
-  const times = [];
-  const d = new Date(); // Actions環境では TZ: Asia/Tokyo が効いている前提
-
-  // 現在の時から、次の3時間区切り（0, 3, 6, 9, 12, 15, 18, 21）を計算
-  const currentHour = d.getHours();
-  const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
-  
-  // 開始時間にセット（分・秒は00）
-  d.setHours(nextTargetHour, 0, 0, 0);
-
-  const pad = (n) => String(n).padStart(2, "0");
-
-  // 3時間ごと、6区分（18時間分）の時間を配列に入れる
-  for (let i = 0; i < 6; i++) {
-    const targetDate = new Date(d.getTime() + i * 3 * 60 * 60 * 1000);
-    const timeStr = 
-      targetDate.getFullYear() +
-      pad(targetDate.getMonth() + 1) +
-      pad(targetDate.getDate()) +
-      pad(targetDate.getHours()) +
-      "0000";
-    times.push(timeStr);
-  }
-
-  return times;
+// 確実に存在する最新の予報発表時刻（JST）を取得（1時間前の正時）
+function getLatestBasetimeDate() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - 45); // 反映ラグ考慮
+  d.setMinutes(0, 0, 0);
+  return d;
 }
 
-// 3時間ごとの未来予報URL（validtime自体が YYYYMMDDHH0000 になる）
-function get3HourForecastTileUrl(validtime, z, x, y) {
-  // 3時間予報などの広域未来予測データは、通常「none」の後に有効時間（予測時間）が入ります
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/none/none/${validtime}/${z}/${x}/${y}.png`;
+function formatDateToJMA(d) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return (
+    d.getFullYear() +
+    pad(d.getMonth() + 1) +
+    pad(d.getDate()) +
+    pad(d.getHours()) +
+    "0000"
+  );
+}
+
+// 正しい未来予報URL（basetime は最新の発表時、validtime はそこからの総経過分数）
+function getForecastTileUrl(basetimeStr, validtimeStr, z, x, y) {
+  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${basetimeStr}/none/${validtimeStr}/${z}/${x}/${y}.png`;
 }
 
 async function fetchTile(url) {
@@ -63,7 +52,6 @@ async function fetchTile(url) {
     }
   });
   if (!res.ok) {
-    // 404の時はログを出してスキップできるようにする
     console.error(`Fetch failed: ${res.status} -> ${url}`);
     return null;
   }
@@ -71,7 +59,7 @@ async function fetchTile(url) {
   return Buffer.from(buf);
 }
 
-export async function generateJma3HourForecast(area, validtime) {
+export async function generateJmaForecastCloud(area, basetimeStr, validtimeStr) {
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
   const rangeX = Math.ceil(area.grid.w / 2 / 50);
@@ -89,7 +77,7 @@ export async function generateJma3HourForecast(area, validtime) {
 
   for (let tx = xMin; tx <= xMax; tx++) {
     for (let ty = yMin; ty <= yMax; ty++) {
-      const url = get3HourForecastTileUrl(validtime, area.zoom, tx, ty);
+      const url = getForecastTileUrl(basetimeStr, validtimeStr, area.zoom, tx, ty);
       const buf = await fetchTile(url);
       if (!buf) continue;
 
@@ -110,23 +98,42 @@ export function saveImage(canvas, name) {
 }
 
 async function main() {
-  const targetTimes = getForecastTimesJST();
-  console.log("取得対象の予報時刻リスト (JST):", targetTimes);
+  const basetimeDate = getLatestBasetimeDate();
+  const basetimeStr = formatDateToJMA(basetimeDate);
+  console.log(`ベース予報時刻 (JST): ${basetimeStr}`);
 
-  for (let i = 0; i < targetTimes.length; i++) {
-    const validtime = targetTimes[i];
-    const displayHour = validtime.substring(8, 10);
-    console.log(`[区分 ${i + 1}/6] ${displayHour}時（対象時刻: ${validtime}）の予報を生成中...`);
+  // 現在時刻から「次の3時間区切り」の時間を計算
+  const now = new Date();
+  const currentHour = now.getHours();
+  const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
+  
+  const startTime = new Date(now.getTime());
+  startTime.setHours(nextTargetHour, 0, 0, 0);
 
-    const result = await generateJma3HourForecast(area, validtime);
+  const pad = (n) => String(n).padStart(2, "0");
+
+  // 3時間ごと、6区分を処理
+  for (let i = 0; i < 6; i++) {
+    const targetTime = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
+    
+    // ベース時刻（予報発表時間）から、ターゲット時刻（未来）までの差分（分）を計算
+    const diffMs = targetTime.getTime() - basetimeDate.getTime();
+    const diffMinutes = Math.floor(diffMs / 1000 / 60);
+
+    // 気象庁URL用のパラメータ（例: "180", "360"）
+    const validtimeStr = String(diffMinutes);
+    const displayHour = pad(targetTime.getHours());
+
+    console.log(`[区分 ${i + 1}/6] ${displayHour}時（ベースから ${validtimeStr} 分後）の予報を生成中...`);
+
+    const result = await generateJmaForecastCloud(area, basetimeStr, validtimeStr);
 
     if (result.hasData) {
-      // ファイル名は CHIBA_1_12h.png のように「何番目の区分か」と「対象の時刻」がわかるように
       const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
       saveImage(result.canvas, fileName);
       console.log(`保存完了: ${fileName}.png`);
     } else {
-      console.warn(`[Warning] ${displayHour}時のデータがないため、画像をスキップしました。`);
+      console.warn(`[Warning] ${displayHour}時（${validtimeStr}分後）のデータが取得できませんでした。`);
     }
   }
 }
