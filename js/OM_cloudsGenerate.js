@@ -2,16 +2,12 @@ import axios from "axios";
 import fs from "fs";
 import { createCanvas } from "canvas";
 
+// ===== 設定 =====
 const bbox = {
-
   latMin: 34,
-
   latMax: 38,
-
   lonMin: 138,
-
   lonMax: 142
-
 };
 
 const step = 0.1;
@@ -53,14 +49,18 @@ function generatePoints() {
   return points;
 }
 
-// 2分割
-function splitIntoTwo(arr) {
-  const half = Math.ceil(arr.length / 2);
-  return [arr.slice(0, half), arr.slice(half)];
+// ★ご提案通りの「総ポイント/3」による均等3分割ロジック
+function splitIntoThree(arr) {
+  const chunkSize = Math.ceil(arr.length / 3);
+  return [
+    arr.slice(0, chunkSize),
+    arr.slice(chunkSize, chunkSize * 2),
+    arr.slice(chunkSize * 2)
+  ];
 }
 
 // ===== API取得 =====
-async function fetchHalfBatch(points) {
+async function fetchBatch(points) {
   const url = "https://api.open-meteo.com/v1/forecast";
   const latitudes = points.map(p => p.lat.toFixed(4)).join(",");
   const longitudes = points.map(p => p.lon.toFixed(4)).join(",");
@@ -79,7 +79,7 @@ async function fetchHalfBatch(points) {
   return Array.isArray(res.data) ? res.data : [res.data];
 }
 
-// ===== 緯度をメルカトルY座標（比率0〜1）に変換する補正ロジック =====
+// ===== 緯度をメルカトルY座標に変換する補正ロジック =====
 function latToMercatorY(lat) {
   const sinLat = Math.sin((lat * Math.PI) / 180);
   return 0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI);
@@ -93,7 +93,6 @@ function drawCorrected(gridData, width, height, filename) {
 
   // 背景透過
 
-  // 描画時にWeb地図（メルカトル）の歪みを補正するための基準値を計算
   const mercatorYMax = latToMercatorY(bbox.latMax);
   const mercatorYMin = latToMercatorY(bbox.latMin);
   const mercatorYRange = mercatorYMin - mercatorYMax;
@@ -108,11 +107,11 @@ function drawCorrected(gridData, width, height, filename) {
     if (rain > 5) color = "rgba(255,80,0,0.8)";   
     if (rain > 10) color = "rgba(255,0,0,1)";     
 
-    // 経度は直線的（そのままでOK）
+    // 経度の位置計算
     const xRatio = (item.lon - bbox.lonMin) / (bbox.lonMax - bbox.lonMin);
     const drawX = Math.round(xRatio * (width - 1));
 
-    // ★緯度はメルカトル歪みを補正してY座標を決定（これで地図と完全一致します）
+    // 緯度のメルカトル補正計算
     const currentMercatorY = latToMercatorY(item.lat);
     const yRatio = (currentMercatorY - mercatorYMax) / mercatorYRange;
     const drawY = Math.round(yRatio * (height - 1));
@@ -133,22 +132,23 @@ function drawCorrected(gridData, width, height, filename) {
   console.log(`探索する対象UTC時間: ${utcISO}:00`);
 
   const points = generatePoints();
-  const halves = splitIntoTwo(points);
+  const thirds = splitIntoThree(points); // 3分割を実行
 
   const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
   const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
   
-  // 描画時に精密な位置補正を行うため、配列データとして rain, lat, lon を保持する形に変更
   const gridData = [];
 
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安全2分割ルート)`);
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (ご提案の3分割ルート)`);
 
   try {
-    for (let h = 0; h < halves.length; h++) {
-      const subBatch = halves[h];
-      console.log(`-> 分割リクエスト中... (${h + 1}/2)`);
+    for (let h = 0; h < thirds.length; h++) {
+      const subBatch = thirds[h];
+      if (subBatch.length === 0) continue;
       
-      const dataArray = await fetchHalfBatch(subBatch);
+      console.log(`-> 分割リクエスト中... (${h + 1}/3) - ${subBatch.length}地点`);
+      
+      const dataArray = await fetchBatch(subBatch);
 
       for (let i = 0; i < subBatch.length; i++) {
         const p = subBatch[i];
@@ -165,7 +165,6 @@ function drawCorrected(gridData, width, height, filename) {
 
         const rain = prec[idx] ?? 0;
 
-        // 座標情報と一緒にデータをストック
         gridData.push({
           lat: p.lat,
           lon: p.lon,
@@ -173,7 +172,8 @@ function drawCorrected(gridData, width, height, filename) {
         });
       }
 
-      if (h === 0) {
+      // ループの合間に安全のためのウェイトを入れる
+      if (h < thirds.length - 1) {
         await sleep(1500);
       }
     }
@@ -187,7 +187,7 @@ function drawCorrected(gridData, width, height, filename) {
 
     // 補正をかけながら描画
     drawCorrected(gridData, width, height, filename);
-    console.log(`【完全大成功】安定ルートのまま、位置補正された画像を透過で書き出しました: ${filename}`);
+    console.log(`【完全大成功】3分割でエラーを回避し、透過画像を書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("データ取得または描画中にエラーが発生しました:", e.message);
