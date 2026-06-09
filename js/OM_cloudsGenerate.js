@@ -12,6 +12,9 @@ const bbox = {
 
 const step = 0.1;
 
+// ★URLが絶対にパンクしない1回あたりの最大地点数（安全圏の350地点に固定）
+const MAX_POINTS_PER_REQUEST = 350;
+
 // 429エラー回避用のウェイト
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -49,14 +52,13 @@ function generatePoints() {
   return points;
 }
 
-// ★ご提案通りの「総ポイント/3」による均等3分割ロジック
-function splitIntoThree(arr) {
-  const chunkSize = Math.ceil(arr.length / 3);
-  return [
-    arr.slice(0, chunkSize),
-    arr.slice(chunkSize, chunkSize * 2),
-    arr.slice(chunkSize * 2)
-  ];
+// ★総ポイント数に応じて、安全なサイズ（350地点ずつ）に自動で小分けするロジック
+function splitIntoSafeBatches(arr, maxSize) {
+  const batches = [];
+  for (let i = 0; i < arr.length; i += maxSize) {
+    batches.push(arr.slice(i, i + maxSize));
+  }
+  return batches;
 }
 
 // ===== API取得 =====
@@ -132,21 +134,22 @@ function drawCorrected(gridData, width, height, filename) {
   console.log(`探索する対象UTC時間: ${utcISO}:00`);
 
   const points = generatePoints();
-  const thirds = splitIntoThree(points); // 3分割を実行
+  
+  // 自動的に安全な塊に分割（1640地点なら5分割になります）
+  const batches = splitIntoSafeBatches(points, MAX_POINTS_PER_REQUEST); 
 
   const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
   const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
   
   const gridData = [];
 
-  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (ご提案の3分割ルート)`);
+  console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安全自動分割: ${batches.length}分割)`);
 
   try {
-    for (let h = 0; h < thirds.length; h++) {
-      const subBatch = thirds[h];
-      if (subBatch.length === 0) continue;
+    for (let h = 0; h < batches.length; h++) {
+      const subBatch = batches[h];
       
-      console.log(`-> 分割リクエスト中... (${h + 1}/3) - ${subBatch.length}地点`);
+      console.log(`-> 分割リクエスト中... (${h + 1}/${batches.length}) - ${subBatch.length}地点`);
       
       const dataArray = await fetchBatch(subBatch);
 
@@ -172,8 +175,8 @@ function drawCorrected(gridData, width, height, filename) {
         });
       }
 
-      // ループの合間に安全のためのウェイトを入れる
-      if (h < thirds.length - 1) {
+      // 次のループがある場合は安全のために1.5秒待つ
+      if (h < batches.length - 1) {
         await sleep(1500);
       }
     }
@@ -187,7 +190,7 @@ function drawCorrected(gridData, width, height, filename) {
 
     // 補正をかけながら描画
     drawCorrected(gridData, width, height, filename);
-    console.log(`【完全大成功】3分割でエラーを回避し、透過画像を書き出しました: ${filename}`);
+    console.log(`【完全大成功】URL制限を確実に回避し、透過画像を書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("データ取得または描画中にエラーが発生しました:", e.message);
