@@ -15,7 +15,7 @@ const step = 0.1;
 // 👑 Leafletの解像度基準（ZOOM 7のピクセル幅に画像を合わせる）
 const ZOOM = 7;
 
-// 429エラー回避用のウェイト
+// ★429エラーを確実に回避するため、ウェイトを4秒（4000ms）に延長
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // ===== 緯度経度をWebメルカトルの絶対ピクセル座標に変換 =====
@@ -125,12 +125,14 @@ async function fetchQuarterBatch(points) {
         gridData.push({ lat: p.lat, lon: p.lon, rain });
       }
 
+      // ★次の分割リクエストへ移る前に、4秒間しっかり待機してサーバーの制限を回避
       if (q < quarters.length - 1) {
-        await sleep(1500);
+        console.log(`   --> 429回避のため4秒間待機します...`);
+        await sleep(4000);
       }
     }
 
-    // ===== 👑 出力時だけLeaflet基準のピクセルサイズ（大判）に引き伸ばし配置 =====
+    // ===== 出力時だけLeaflet基準のピクセルサイズ（大判）に引き伸ばし配置 =====
     const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
     const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
 
@@ -149,7 +151,7 @@ async function fetchQuarterBatch(points) {
     const finalCanvas = createCanvas(outWidth, outHeight);
     const finalCtx = finalCanvas.getContext("2d");
 
-    // 格子を少し太めにスタンプして、荒いデータの粒度感を表現（隙間が空かないように適正補正）
+    // 格子を少し太めにスタンプして、荒いデータの粒度感を表現
     const dotWidth = Math.ceil(outWidth / (4 / step));
     const dotHeight = Math.ceil(outHeight / (4 / step));
 
@@ -168,7 +170,6 @@ async function fetchQuarterBatch(points) {
 
       if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
         finalCtx.fillStyle = color;
-        // 荒い粒度（0.1度マス）に応じたサイズで配置
         finalCtx.fillRect(
           drawX - Math.floor(dotWidth / 2), 
           drawY - Math.floor(dotHeight / 2), 
@@ -189,7 +190,11 @@ async function fetchQuarterBatch(points) {
     console.log(`【完全大成功】ちょうどいい粒度のまま、Leafletサイズで透過画像を書き出しました: ${filename}`);
 
   } catch (e) {
-    console.error("データ取得または描画中にエラーが発生しました:", e.message);
+    if (e.response) {
+      console.error(`データ取得中にエラーが発生しました (Status: ${e.response.status}):`, e.message);
+    } else {
+      console.error("エラーが発生しました:", e.message);
+    }
     process.exit(1);
   }
 })();
