@@ -1,12 +1,11 @@
 import fetch from "node-fetch";
 import { createCanvas, registerFont } from "canvas";
 import fs from "fs";
-import { os } from "os";
 
-// 千葉県の確定天気予報JSON（一番エラーが起きない超安定ルート）
+// 千葉県の確定天気予報JSON
 const JMA_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/120000.json";
 
-// 【文字化け対策の決定版】GitHub Actions環境でも確実に日本語を出すため、Googleからフォントを落とす
+// GitHub Actions環境でも確実に日本語を出すため、Googleからフォントを落とす
 async function setupJapaneseFont() {
   const fontUrl = "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf";
   const fontPath = "./output/NotoSans-Regular.ttf";
@@ -19,7 +18,7 @@ async function setupJapaneseFont() {
     const buf = await res.arrayBuffer();
     fs.writeFileSync(fontPath, Buffer.from(buf));
   }
-  // Node-canvasにフォントを登録。これで「sans-serif」を指定すれば日本語が絶対に弾かれない！
+  // Node-canvasにフォントを登録
   registerFont(fontPath, { family: "NotoSans" });
 }
 
@@ -37,7 +36,7 @@ async function main() {
     // エラーの起きない最も確実な一般予報レイヤーをパース
     const reportDate = data[0].reportDatetime;
     const areaName = data[0].timeSeries[0].areas[0].area.name; // "千葉県"
-    const weathers = data[0].timeSeries[0].areas[0].weathers;   // ["今日の本物の天気", "明日の本物の天気"]
+    const weathers = data[0].timeSeries[0].areas[0].weathers;   // ["今日の天気", "明日の天気"]
 
     // 3. 画面の描画（横600px、縦350px）
     const canvas = createCanvas(600, 350);
@@ -76,7 +75,6 @@ async function main() {
 
     ctx.fillStyle = "#ffffff";
     ctx.font = "15px NotoSans";
-    // 長い天気テキストを綺麗に収めるために折り返し処理
     const weatherToday = weathers[0] || "データなし";
     ctx.fillText(weatherToday.substring(0, 15), 50, 190);
     if (weatherToday.length > 15) ctx.fillText(weatherToday.substring(15, 30), 50, 215);
