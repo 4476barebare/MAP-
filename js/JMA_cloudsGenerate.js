@@ -21,11 +21,24 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 確実に存在する最新の予報発表時刻（JST）を取得（1時間前の正時）
-function getLatestBasetimeDate() {
+// GSM（天気予報モデル）の発表時間を計算（3時、9時、15時、21時のJSTに更新されます）
+function getLatestGsmBasetimeDate() {
   const d = new Date();
-  d.setMinutes(d.getMinutes() - 45); // 反映ラグ考慮
-  d.setMinutes(0, 0, 0);
+  const currentHour = d.getHours();
+  
+  // 安全にデータが存在する最新の配信時間を割り振る（配信ラグを考慮）
+  let baseHour = 3;
+  if (currentHour >= 7 && currentHour < 13) baseHour = 3;
+  else if (currentHour >= 13 && currentHour < 19) baseHour = 9;
+  else if (currentHour >= 19 && currentHour < 1) baseHour = 15;
+  else baseHour = 21;
+
+  // 日またぎの調整
+  if (currentHour < 1) {
+    d.setDate(d.getDate() - 1);
+  }
+
+  d.setHours(baseHour, 0, 0, 0);
   return d;
 }
 
@@ -40,9 +53,10 @@ function formatDateToJMA(d) {
   );
 }
 
-// 正しい未来予報URL（basetime は最新の発表時、validtime はそこからの総経過分数）
+// GSM未来予報URL（validtimeStr は "180", "360" など）
 function getForecastTileUrl(basetimeStr, validtimeStr, z, x, y) {
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${basetimeStr}/none/${validtimeStr}/${z}/${x}/${y}.png`;
+  // 3時間ごとの広域予測は gsm エンドポイントを使用します
+  return `https://www.jma.go.jp/bosai/jmatile/data/gsm/${basetimeStr}/none/${validtimeStr}/${z}/${x}/${y}.png`;
 }
 
 async function fetchTile(url) {
@@ -52,6 +66,7 @@ async function fetchTile(url) {
     }
   });
   if (!res.ok) {
+    // 404が出た場合、検証しやすいようにログを残す
     console.error(`Fetch failed: ${res.status} -> ${url}`);
     return null;
   }
@@ -98,11 +113,11 @@ export function saveImage(canvas, name) {
 }
 
 async function main() {
-  const basetimeDate = getLatestBasetimeDate();
+  const basetimeDate = getLatestGsmBasetimeDate();
   const basetimeStr = formatDateToJMA(basetimeDate);
-  console.log(`ベース予報時刻 (JST): ${basetimeStr}`);
+  console.log(`GSMベース予報時刻 (JST): ${basetimeStr}`);
 
-  // 現在時刻から「次の3時間区切り」の時間を計算
+  // 現在時刻から「次の3時間区切り（0,3,6,9,12,15,18,21）」の時間を計算
   const now = new Date();
   const currentHour = now.getHours();
   const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
@@ -112,15 +127,14 @@ async function main() {
 
   const pad = (n) => String(n).padStart(2, "0");
 
-  // 3時間ごと、6区分を処理
+  // 3時間ごと、6区分（18時間先まで）を処理
   for (let i = 0; i < 6; i++) {
     const targetTime = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
     
-    // ベース時刻（予報発表時間）から、ターゲット時刻（未来）までの差分（分）を計算
+    // 計算したベース時刻からターゲット時刻までの差分（分）
     const diffMs = targetTime.getTime() - basetimeDate.getTime();
     const diffMinutes = Math.floor(diffMs / 1000 / 60);
 
-    // 気象庁URL用のパラメータ（例: "180", "360"）
     const validtimeStr = String(diffMinutes);
     const displayHour = pad(targetTime.getHours());
 
