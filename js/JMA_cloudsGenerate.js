@@ -9,7 +9,6 @@ const area = {
   lat: 35.6,
   lng: 140.1,
   grid: { w: 150, h: 100 },
-  // 未来予測データが確実に存在するズームレベル5に設定
   zoom: 5 
 };
 
@@ -22,10 +21,9 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 完全に正しい気象庁の未来予測タイルURL構造
-// 欲しい予報時刻（YYYYMMDDHH0000）をそのままリクエストします
-function getForecastTileUrl(targetTimeStr, z, x, y) {
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${targetTimeStr}/none/none/${z}/${x}/${y}.png`;
+// ★最重要: 気象庁の未来予測タイルURL（wdist を使用、時刻はUTC）
+function getForecastTileUrl(targetTimeStrUTC, z, x, y) {
+  return `https://www.jma.go.jp/bosai/jmatile/data/wdist/${targetTimeStrUTC}/none/none/${z}/${x}/${y}.png`;
 }
 
 async function fetchTile(url) {
@@ -42,11 +40,9 @@ async function fetchTile(url) {
   return Buffer.from(buf);
 }
 
-export async function generateJmaForecastCloud(area, targetTimeStr) {
-  // zoom: 5 に応じた X, Y 座標を自動計算
+export async function generateJmaForecastCloud(area, targetTimeStrUTC) {
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
-  // ズームレベル5に合わせた周辺タイルの描画範囲
   const rangeX = 1;
   const rangeY = 1;
 
@@ -62,7 +58,7 @@ export async function generateJmaForecastCloud(area, targetTimeStr) {
 
   for (let tx = xMin; tx <= xMax; tx++) {
     for (let ty = yMin; ty <= yMax; ty++) {
-      const url = getForecastTileUrl(targetTimeStr, area.zoom, tx, ty);
+      const url = getForecastTileUrl(targetTimeStrUTC, area.zoom, tx, ty);
       const buf = await fetchTile(url);
       if (!buf) continue;
 
@@ -85,8 +81,7 @@ export function saveImage(canvas, name) {
 async function main() {
   console.log("--- 未来の雨雲予測イメージ生成を開始します ---");
 
-  // 現在のJST時刻をベースに「次の3時間区切り」を計算
-  const now = new Date();
+  const now = new Date(); // Actions環境(TZ: Asia/Tokyo)の現在時刻
   const currentHour = now.getHours();
   const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
   
@@ -97,27 +92,27 @@ async function main() {
 
   // 3時間ごと、6区分（18時間先まで）をループ処理
   for (let i = 0; i < 6; i++) {
-    const targetTime = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
+    const targetTimeJST = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
     
-    // 気象庁のURLに渡す文字列を作成（例: 20260609150000）
-    const targetTimeStr = 
-      targetTime.getFullYear() +
-      pad(targetTime.getMonth() + 1) +
-      pad(targetTime.getDate()) +
-      pad(targetTime.getHours()) +
+    // 気象庁URL用に「UTC（世界協定時）」に変換して文字列を作る
+    const targetTimeStrUTC = 
+      targetTimeJST.getUTCFullYear() +
+      pad(targetTimeJST.getUTCMonth() + 1) +
+      pad(targetTimeJST.getUTCDate()) +
+      pad(targetTimeJST.getUTCHours()) +
       "0000";
 
-    const displayHour = pad(targetTime.getHours());
-    console.log(`[区分 ${i + 1}/6] 日本時間 ${displayHour}時（対象URLキー: ${targetTimeStr}）の予報を生成中...`);
+    const displayJSTHour = pad(targetTimeJST.getHours());
+    console.log(`[区分 ${i + 1}/6] 日本時間 ${displayJSTHour}時（URL送信UTCキー: ${targetTimeStrUTC}）の予報を生成中...`);
 
-    const result = await generateJmaForecastCloud(area, targetTimeStr);
+    const result = await generateJmaForecastCloud(area, targetTimeStrUTC);
 
     if (result.hasData) {
-      const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
+      const fileName = `${area.prefName}_slot${i + 1}_${displayJSTHour}h`;
       saveImage(result.canvas, fileName);
       console.log(`保存完了: ${fileName}.png`);
     } else {
-      console.warn(`[Warning] JST ${displayHour}時のデータが取得できませんでした。`);
+      console.warn(`[Warning] 日本時間 ${displayJSTHour}時のデータが取得できませんでした。`);
     }
   }
 }
