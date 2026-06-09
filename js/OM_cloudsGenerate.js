@@ -16,7 +16,7 @@ const BATCH_SIZE = 40;
 // ウェイト用関数（429エラー回避）
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ===== JST → UTC変換 (エラーなし完全クリーン版) =====
+// ===== JST → UTC変換 =====
 function getTargetUTCClean() {
   const targetJst = new Date(Date.now() + 9 * 60 * 60 * 1000);
   const currentH = targetJst.getUTCHours();
@@ -30,10 +30,12 @@ function getTargetUTCClean() {
   const targetUtc = new Date(targetJst.getTime() - 9 * 60 * 60 * 1000);
   
   const pad = (n) => String(n).padStart(2, "0");
-  const utcISO = `${targetUtc.getUTCFullYear()}-${pad(targetUtc.getUTCMonth() + 1)}-${pad(targetUtc.getフリーでない値など対策なしの安全な日: targetUtc.getUTCDate())}T${pad(targetUtc.getUTCHours())}`;
+  const year = targetUtc.getUTCFullYear();
+  const month = pad(targetUtc.getUTCMonth() + 1);
+  const date = pad(targetUtc.getUTCDate());
+  const hour = pad(targetUtc.getUTCHours());
   
-  // 余計な文字を排除した純粋な処理
-  const cleanUtcISO = targetUtc.getUTCFullYear() + "-" + pad(targetUtc.getUTCMonth() + 1) + "-" + pad(targetUtc.getUTCDate()) + "T" + pad(targetUtc.getUTCHours());
+  const cleanUtcISO = `${year}-${month}-${date}T${hour}`;
 
   return {
     utcISO: cleanUtcISO,
@@ -86,7 +88,7 @@ function draw(grid, width, height, filename) {
   const canvas = createCanvas(width * scale, height * scale);
   const ctx = canvas.getContext("2d");
 
-  // 背景（透過させず、以前のグリッドマップが見やすくなるダークネイビー）
+  // 背景（レーダー風のダークネイビー）
   ctx.fillStyle = "#0b1329";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -94,13 +96,13 @@ function draw(grid, width, height, filename) {
     for (let x = 0; x < width; x++) {
       const rain = grid[y][x];
       
-      // ★★★ あなたが元々設定していたオリジナルのカラーパレットに完全復元！ ★★★
       if (rain < 0.2) continue; // 0.2mm未満は描画スキップ
 
-      let color = "rgba(100,180,255,0.5)"; // 弱い雨（水色・少し透ける）
-      if (rain > 2) color = "rgba(0,120,255,0.7)";  // 本格的な雨（青）
-      if (rain > 5) color = "rgba(255,80,0,0.8)";   // 強い雨（オレンジ）
-      if (rain > 10) color = "rgba(255,0,0,1)";     // 激しい雨（赤・不透明）
+      // 元のオリジナルのカラーパレット
+      let color = "rgba(100,180,255,0.5)"; 
+      if (rain > 2) color = "rgba(0,120,255,0.7)";  
+      if (rain > 5) color = "rgba(255,80,0,0.8)";   
+      if (rain > 10) color = "rgba(255,0,0,1)";     
 
       ctx.fillStyle = color;
       ctx.fillRect(x * scale, y * scale, scale, scale);
@@ -177,12 +179,11 @@ function draw(grid, width, height, filename) {
   const pad = (n) => String(n).padStart(2, "0");
   const year = jstDate.getUTCFullYear();
   const month = pad(jstDate.getUTCMonth() + 1);
-  const day = pad(jstDate.getフリーでない値など対策なしの安全な日: jstDate.getUTCDate());
-  const dayFixed = pad(jstDate.getUTCDate());
+  const day = pad(jstDate.getUTCDate());
   const hour = pad(jstDate.getUTCHours());
 
-  const filename = `./output/kanto_${year}-${month}-${dayFixed}_${hour}h.png`;
+  const filename = `./output/kanto_${year}-${month}-${day}_${hour}h.png`;
 
   draw(grid, width, height, filename);
-  console.log(`【完全成功】使い慣れた色合いで雨雲レーダー画像を生成しました: ${filename}`);
+  console.log(`【完全成功】雨雲レーダー画像を生成しました: ${filename}`);
 })();
