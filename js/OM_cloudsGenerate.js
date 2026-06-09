@@ -93,7 +93,7 @@ async function fetchQuarterBatch(points) {
   const points = generatePoints();
   const quarters = splitIntoFour(points);
 
-  // 1640地点の格子データ（低粒度）を保持する用の配列
+  // 1640地点の格子データを保持する用の配列
   const gridData = [];
 
   console.log(`APIリクエスト開始... 総ポイント数: ${points.length} (安定4分割・粒度維持ルート)`);
@@ -149,10 +149,6 @@ async function fetchQuarterBatch(points) {
     const finalCanvas = createCanvas(outWidth, outHeight);
     const finalCtx = finalCanvas.getContext("2d");
 
-    // Leaflet側の1ピクセルあたりの経度・緯度（メルカトル）の範囲比率を計算
-    const mercatorYMax = (0.5 - Math.log((1 + Math.sin((bbox.latMax * Math.PI) / 180))) / (1 - Math.sin((bbox.latMax * Math.PI) / 180))) / (4 * Math.PI));
-    const mercatorYMin = (0.5 - Math.log((1 + Math.sin((bbox.latMin * Math.PI) / 180))) / (1 - Math.sin((bbox.latMin * Math.PI) / 180))) / (4 * Math.PI));
-    
     // 格子を少し太めにスタンプして、荒いデータの粒度感を表現（隙間が空かないように適正補正）
     const dotWidth = Math.ceil(outWidth / (4 / step));
     const dotHeight = Math.ceil(outHeight / (4 / step));
@@ -172,7 +168,7 @@ async function fetchQuarterBatch(points) {
 
       if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
         finalCtx.fillStyle = color;
-        // 荒い粒度（0.1度マス）に応じたサイズで、ピンポイントに配置
+        // 荒い粒度（0.1度マス）に応じたサイズで配置
         finalCtx.fillRect(
           drawX - Math.floor(dotWidth / 2), 
           drawY - Math.floor(dotHeight / 2), 
