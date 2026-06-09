@@ -1,2 +1,25 @@
-target: js/JMA_cloudsGenerate.js
-entry: runForecast
+name: JMA Cloud Generator
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */3 * * *" # 3時間ごと
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run generator
+        run: node js/JMA_cloudsGenerate.js
