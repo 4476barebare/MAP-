@@ -157,15 +157,25 @@ async function fetchQuarterBatch(points) {
       if (item.rain > 5) color = "rgba(255,80,0,0.8)";
       if (item.rain > 10) color = "rgba(255,0,0,1)";
 
+// ... (前略：生成部分の最後の方を以下に差し替えてください)
+
+    // 正しいメルカトル座標からピクセルへ
+    for (const item of gridData) {
+      if (item.rain < 0.2) continue;
+
+      let color = "rgba(100,180,255,0.5)";
+      if (item.rain > 2) color = "rgba(0,120,255,0.7)";
+      if (item.rain > 5) color = "rgba(255,80,0,0.8)";
+      if (item.rain > 10) color = "rgba(255,0,0,1)";
+
       // 正しいメルカトル座標からピクセルへ
       const p = latLonToPixel(item.lat, item.lon, ZOOM);
       const drawX = Math.round(p.x - xOffset);
-      const drawY = Math.round(p.y - pixelBBox.yMin);
+      const drawY = Math.round(p.y - yOffset); // ★ここを修正（pixelBBoxを参照しないように変更）
 
       // マスの中心がズレないようにスタンプ
       if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
         finalCtx.fillStyle = color;
-        // マス目（ブロック）として描画
         finalCtx.fillRect(
           drawX - Math.floor(dotWidth / 2), 
           drawY - Math.floor(dotHeight / 2), 
@@ -176,10 +186,13 @@ async function fetchQuarterBatch(points) {
     }
 
     // ファイル名生成（JSTの日付と時間を反映）
-    const jstISO = new Date(new Date("2026-06-09T21:00Z").getTime()).toISOString(); // 今日6時に固定
+    const jstISO = "2026-06-10T06:00:00"; // 6/10 06:00固定
     const datePart = jstISO.slice(0, 10);
-    const hourPart = new Date(new Date("2026-06-09T21:00Z").getTime() + 9 * 60 * 60 * 1000).getHours().toString().padStart(2, '0');
+    const hourPart = jstISO.slice(11, 13);
     const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
+    
+    // ... (以下略)
+
 
     fs.mkdirSync("./output", { recursive: true });
     fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
