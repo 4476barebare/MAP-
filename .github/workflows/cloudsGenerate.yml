@@ -1,0 +1,2 @@
+target: js/JMA_cloudsGenerate.js
+entry: runForecast
