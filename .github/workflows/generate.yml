@@ -1,0 +1,39 @@
+name: Generate Rain Images
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # 6時間ごと
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリ取得
+        uses: actions/checkout@v4
+
+      - name: Nodeセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 依存インストール
+        run: npm install axios canvas
+
+      - name: outputディレクトリ作成
+        run: mkdir -p output
+
+      - name: スクリプト実行
+        run: node OM_cloudsGenerate.js
+
+      - name: 変更をコミット
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add output/*.png || true
+
+          git commit -m "update rain images" || echo "no changes"
+
+          git push
