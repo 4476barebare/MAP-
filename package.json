@@ -8,3 +8,9 @@
     "fast-xml-parser": "^4.3.6"
   }
 }
+{
+  "dependencies": {
+    "canvas": "^2.11.2",
+    "node-fetch": "^3.0.0"
+  }
+}
