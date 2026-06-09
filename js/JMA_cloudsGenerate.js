@@ -9,7 +9,8 @@ const area = {
   lat: 35.6,
   lng: 140.1,
   grid: { w: 150, h: 100 },
-  zoom: 6
+  // ★最重要: 未来予測はzoom: 4以下しかサーバーに存在しません
+  zoom: 4 
 };
 
 function latLngToTile(lat, lng, z) {
@@ -21,41 +22,28 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 確実に存在する最新のGSM発表時刻（UTC）を計算
-function getLatestGsmBasetimeDateUTC() {
-  const d = new Date(); // 実行時の生の時間（中身はUTC）
-  const utcHour = d.getUTCHours();
-  
-  // GSMのUTC発表タイミングは 00, 06, 12, 18 時の4回（配信ラグを考慮して4時間バッファ）
-  let baseHourUTC = 0;
-  if (utcHour >= 4 && utcHour < 10) baseHourUTC = 0;
-  else if (utcHour >= 10 && utcHour < 16) baseHourUTC = 6;
-  else if (utcHour >= 16 && utcHour < 22) baseHourUTC = 12;
-  else {
-    baseHourUTC = 18;
-    if (utcHour < 4) {
-      d.setUTCDate(d.getUTCDate() - 1);
-    }
-  }
-
-  d.setUTCHours(baseHourUTC, 0, 0, 0);
+// 確実に存在する最新の予報発表時刻（JST）を取得（1時間前の正時）
+function getLatestBasetimeDate() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - 45); // 配信ラグ考慮
+  d.setMinutes(0, 0, 0);
   return d;
 }
 
-function formatDateToJMAUTC(d) {
+function formatDateToJMA(d) {
   const pad = (n) => String(n).padStart(2, "0");
   return (
-    d.getUTCFullYear() +
-    pad(d.getUTCMonth() + 1) +
-    pad(d.getUTCDate()) +
-    pad(d.getUTCHours()) +
+    d.getFullYear() +
+    pad(d.getMonth() + 1) +
+    pad(d.getDate()) +
+    pad(d.getHours()) +
     "0000"
   );
 }
 
-// GSM未来予報URL
+// 降水短時間予報URL（validtimeStr は "240" などの分文字列）
 function getForecastTileUrl(basetimeStr, validtimeStr, z, x, y) {
-  return `https://www.jma.go.jp/bosai/jmatile/data/gsm/${basetimeStr}/none/${validtimeStr}/${z}/${x}/${y}.png`;
+  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${basetimeStr}/none/${validtimeStr}/${z}/${x}/${y}.png`;
 }
 
 async function fetchTile(url) {
@@ -65,6 +53,7 @@ async function fetchTile(url) {
     }
   });
   if (!res.ok) {
+    // 予報の限界時間を超えた場合などのチェック用ログ
     console.error(`Fetch failed: ${res.status} -> ${url}`);
     return null;
   }
@@ -73,10 +62,12 @@ async function fetchTile(url) {
 }
 
 export async function generateJmaForecastCloud(area, basetimeStr, validtimeStr) {
+  // zoom: 4 に応じた X, Y 座標がここで自動計算されます
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
-  const rangeX = Math.ceil(area.grid.w / 2 / 50);
-  const rangeY = Math.ceil(area.grid.h / 2 / 50);
+  // ズームが引き（広域）になったため、範囲は前後1タイルずつで十分カバーできます
+  const rangeX = 1;
+  const rangeY = 1;
 
   const xMin = x - rangeX;
   const xMax = x + rangeX;
@@ -111,49 +102,41 @@ export function saveImage(canvas, name) {
 }
 
 async function main() {
-  // すべてUTC基準でベース時刻を作成
-  const basetimeDateUTC = getLatestGsmBasetimeDateUTC();
-  const basetimeStrUTC = formatDateToJMAUTC(basetimeDateUTC);
-  
-  // ログ表示用（JST）
-  const jstBaseHour = (basetimeDateUTC.getUTCHours() + 9) % 24;
-  console.log(`GSMベース予報時刻 (UTC): ${basetimeStrUTC} (JSTの約 ${jstBaseHour}時発表データ)`);
+  const basetimeDate = getLatestBasetimeDate();
+  const basetimeStr = formatDateToJMA(basetimeDate);
+  console.log(`ベース予射時刻 (JST): ${basetimeStr}`);
 
-  // ターゲットの開始時間を計算（次の3時間区切りのJST）
+  // 現在のJST時刻から、次の3時間区切りの時間をターゲットにする
   const now = new Date();
-  // 現在のJSTの時間を取得
-  const currentJstHour = (now.getUTCHours() + 9) % 24;
-  const nextTargetJstHour = Math.ceil((currentJstHour + 1) / 3) * 3;
-
-  // 開始となるターゲット日時（UTCで設定）
-  const startTargetDateUTC = new Date(now.getTime());
-  // JSTの時間から9引いてUTCの時間を算出し、分以下は00に固定
-  startTargetDateUTC.setUTCHours(nextTargetJstHour - 9, 0, 0, 0);
+  const currentHour = now.getHours();
+  const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
+  
+  const startTime = new Date(now.getTime());
+  startTime.setHours(nextTargetHour, 0, 0, 0);
 
   const pad = (n) => String(n).padStart(2, "0");
 
-  // 3時間ごと、6区分を処理
+  // 3時間ごと、6区分（18時間先まで）をループ
   for (let i = 0; i < 6; i++) {
-    const targetDateUTC = new Date(startTargetDateUTC.getTime() + i * 3 * 60 * 60 * 1000);
+    const targetTime = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
     
-    // UTCのベース時刻から、UTCのターゲット時刻までの差分（分）を計算
-    const diffMs = targetDateUTC.getTime() - basetimeDateUTC.getTime();
+    // 発表ベース時刻からの経過分数（分）
+    const diffMs = targetTime.getTime() - basetimeDate.getTime();
     const diffMinutes = Math.floor(diffMs / 1000 / 60);
 
     const validtimeStr = String(diffMinutes);
-    // 保存ファイル名用にJSTの時間を計算
-    const displayJstHour = pad((targetDateUTC.getUTCHours() + 9) % 24);
+    const displayHour = pad(targetTime.getHours());
 
-    console.log(`[区分 ${i + 1}/6] 日本時間 ${displayJstHour}時（ベースUTCから ${validtimeStr} 分後）の予報を生成中...`);
+    console.log(`[区分 ${i + 1}/6] ${displayHour}時（発表から ${validtimeStr} 分後）の予報を生成中...`);
 
-    const result = await generateJmaForecastCloud(area, basetimeStrUTC, validtimeStr);
+    const result = await generateJmaForecastCloud(area, basetimeStr, validtimeStr);
 
     if (result.hasData) {
-      const fileName = `${area.prefName}_slot${i + 1}_${displayJstHour}h`;
+      const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
       saveImage(result.canvas, fileName);
       console.log(`保存完了: ${fileName}.png`);
     } else {
-      console.warn(`[Warning] JST ${displayJstHour}時（${validtimeStr}分後）のデータが取得できませんでした。`);
+      console.warn(`[Warning] ${displayHour}時（${validtimeStr}分後）のデータが取得できませんでした。`);
     }
   }
 }
