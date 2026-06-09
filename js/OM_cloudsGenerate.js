@@ -10,63 +10,80 @@ const bbox = {
   lonMax: 141.2
 };
 
-// 10km ≒ 0.09度
 const step = 0.09;
 
-// ===== 時刻計算 =====
-function getNextBaseTime() {
-  const now = new Date();
-  const d = new Date(now);
-  const h = d.getUTCHours();
-
-  const next = Math.ceil(h / 3) * 3;
-  d.setUTCHours(next, 0, 0, 0);
-
-  return d;
-}
+// ★チューニング
+const BATCH_SIZE = 40;   // 1リクエストあたり座標数
+const CONCURRENCY = 5;   // 同時リクエスト数
 
 // ===== グリッド生成 =====
-function generateGridPoints() {
-  const lats = [];
-  const lons = [];
+function generatePoints() {
+  const points = [];
 
   for (let lat = bbox.latMin; lat <= bbox.latMax; lat += step) {
-    lats.push(lat);
+    for (let lon = bbox.lonMin; lon <= bbox.lonMax; lon += step) {
+      points.push({ lat, lon });
+    }
   }
 
-  for (let lon = bbox.lonMin; lon <= bbox.lonMax; lon += step) {
-    lons.push(lon);
-  }
-
-  return { lats, lons };
+  return points;
 }
 
-// ===== API取得（1点ずつ・まずは確実に）=====
-async function fetchRain(lat, lon) {
+// ===== 分割 =====
+function chunk(arr, size) {
+  const res = [];
+  for (let i = 0; i < arr.length; i += size) {
+    res.push(arr.slice(i, i + size));
+  }
+  return res;
+}
+
+// ===== API取得（複数点まとめ）=====
+async function fetchBatch(points) {
   const url = "https://api.open-meteo.com/v1/forecast";
+
+  const latitudes = points.map(p => p.lat).join(",");
+  const longitudes = points.map(p => p.lon).join(",");
 
   const res = await axios.get(url, {
     params: {
-      latitude: lat,
-      longitude: lon,
+      latitude: latitudes,
+      longitude: longitudes,
       hourly: "precipitation",
       forecast_days: 1,
       timezone: "UTC"
     }
   });
 
-  return res.data.hourly;
+  return res.data;
+}
+
+// ===== 並列制御 =====
+async function runPool(tasks, limit) {
+  const results = [];
+  let i = 0;
+
+  async function worker() {
+    while (i < tasks.length) {
+      const idx = i++;
+      results[idx] = await tasks[idx]();
+    }
+  }
+
+  const workers = Array.from({ length: limit }, worker);
+  await Promise.all(workers);
+
+  return results;
 }
 
 // ===== 描画 =====
 function draw(grid, width, height, filename) {
-  const canvas = createCanvas(width * 2, height * 2); // 2倍拡大
+  const canvas = createCanvas(width * 2, height * 2);
   const ctx = canvas.getContext("2d");
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const rain = grid[y][x];
-
       if (rain < 0.2) continue;
 
       let color = "rgba(100,180,255,0.5)";
@@ -84,48 +101,54 @@ function draw(grid, width, height, filename) {
 
 // ===== メイン =====
 (async () => {
-  const base = getNextBaseTime();
+  const points = generatePoints();
+  console.log("points:", points.length);
 
-  const targets = Array.from({ length: 5 }, (_, i) => {
-    const t = new Date(base);
-    t.setUTCHours(base.getUTCHours() + i * 3);
-    return t.toISOString().slice(0, 13); // YYYY-MM-DDTHH
+  const batches = chunk(points, BATCH_SIZE);
+
+  const tasks = batches.map(batch => async () => {
+    try {
+      return await fetchBatch(batch);
+    } catch (e) {
+      return null;
+    }
   });
 
-  const { lats, lons } = generateGridPoints();
+  const results = await runPool(tasks, CONCURRENCY);
 
-  const width = lons.length;
-  const height = lats.length;
+  // ===== グリッド復元 =====
+  const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
+  const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
 
-  console.log("grid:", width, height);
+  const grid = Array.from({ length: height }, () =>
+    Array(width).fill(0)
+  );
 
-  // 全地点のデータ取得
-  const gridData = [];
+  let idx = 0;
 
-  for (let y = 0; y < height; y++) {
-    const row = [];
-    for (let x = 0; x < width; x++) {
-      const lat = lats[y];
-      const lon = lons[x];
+  for (let b = 0; b < results.length; b++) {
+    const data = results[b];
+    if (!data) continue;
 
-      try {
-        const data = await fetchRain(lat, lon);
+    const batch = batches[b];
 
-        // 対象時刻に一番近いindex
-        const idx = data.time.findIndex(t =>
-          targets[0].startsWith(t.slice(0, 13))
-        );
+    for (let i = 0; i < batch.length; i++) {
+      const p = batch[i];
 
-        row.push(data.precipitation[idx] || 0);
-      } catch (e) {
-        row.push(0);
-      }
+      const x = Math.round((p.lon - bbox.lonMin) / step);
+      const y = Math.round((p.lat - bbox.latMin) / step);
+
+      const rain =
+        data.hourly?.precipitation?.[0]?.[0] ??
+        data.hourly?.precipitation?.[0] ??
+        0;
+
+      grid[y][x] = rain;
+      idx++;
     }
-    gridData.push(row);
   }
 
-  // とりあえず1枚だけ生成（まず確認）
-  draw(gridData, width, height, "./output/kanto_0.png");
+  draw(grid, width, height, "./output/kanto_fast.png");
 
   console.log("done");
 })();
