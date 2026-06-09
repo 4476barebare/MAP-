@@ -9,8 +9,8 @@ const area = {
   lat: 35.6,
   lng: 140.1,
   grid: { w: 150, h: 100 },
-  // ★最重要: 未来予測はzoom: 4以下しかサーバーに存在しません
-  zoom: 4 
+  // 未来予測データが確実に存在するズームレベル5に設定
+  zoom: 5 
 };
 
 function latLngToTile(lat, lng, z) {
@@ -22,28 +22,10 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 確実に存在する最新の予報発表時刻（JST）を取得（1時間前の正時）
-function getLatestBasetimeDate() {
-  const d = new Date();
-  d.setMinutes(d.getMinutes() - 45); // 配信ラグ考慮
-  d.setMinutes(0, 0, 0);
-  return d;
-}
-
-function formatDateToJMA(d) {
-  const pad = (n) => String(n).padStart(2, "0");
-  return (
-    d.getFullYear() +
-    pad(d.getMonth() + 1) +
-    pad(d.getDate()) +
-    pad(d.getHours()) +
-    "0000"
-  );
-}
-
-// 降水短時間予報URL（validtimeStr は "240" などの分文字列）
-function getForecastTileUrl(basetimeStr, validtimeStr, z, x, y) {
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${basetimeStr}/none/${validtimeStr}/${z}/${x}/${y}.png`;
+// 完全に正しい気象庁の未来予測タイルURL構造
+// 欲しい予報時刻（YYYYMMDDHH0000）をそのままリクエストします
+function getForecastTileUrl(targetTimeStr, z, x, y) {
+  return `https://www.jma.go.jp/bosai/jmatile/data/rasrf/${targetTimeStr}/none/none/${z}/${x}/${y}.png`;
 }
 
 async function fetchTile(url) {
@@ -53,7 +35,6 @@ async function fetchTile(url) {
     }
   });
   if (!res.ok) {
-    // 予報の限界時間を超えた場合などのチェック用ログ
     console.error(`Fetch failed: ${res.status} -> ${url}`);
     return null;
   }
@@ -61,11 +42,11 @@ async function fetchTile(url) {
   return Buffer.from(buf);
 }
 
-export async function generateJmaForecastCloud(area, basetimeStr, validtimeStr) {
-  // zoom: 4 に応じた X, Y 座標がここで自動計算されます
+export async function generateJmaForecastCloud(area, targetTimeStr) {
+  // zoom: 5 に応じた X, Y 座標を自動計算
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
-  // ズームが引き（広域）になったため、範囲は前後1タイルずつで十分カバーできます
+  // ズームレベル5に合わせた周辺タイルの描画範囲
   const rangeX = 1;
   const rangeY = 1;
 
@@ -81,7 +62,7 @@ export async function generateJmaForecastCloud(area, basetimeStr, validtimeStr) 
 
   for (let tx = xMin; tx <= xMax; tx++) {
     for (let ty = yMin; ty <= yMax; ty++) {
-      const url = getForecastTileUrl(basetimeStr, validtimeStr, area.zoom, tx, ty);
+      const url = getForecastTileUrl(targetTimeStr, area.zoom, tx, ty);
       const buf = await fetchTile(url);
       if (!buf) continue;
 
@@ -102,11 +83,9 @@ export function saveImage(canvas, name) {
 }
 
 async function main() {
-  const basetimeDate = getLatestBasetimeDate();
-  const basetimeStr = formatDateToJMA(basetimeDate);
-  console.log(`ベース予射時刻 (JST): ${basetimeStr}`);
+  console.log("--- 未来の雨雲予測イメージ生成を開始します ---");
 
-  // 現在のJST時刻から、次の3時間区切りの時間をターゲットにする
+  // 現在のJST時刻をベースに「次の3時間区切り」を計算
   const now = new Date();
   const currentHour = now.getHours();
   const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
@@ -116,27 +95,29 @@ async function main() {
 
   const pad = (n) => String(n).padStart(2, "0");
 
-  // 3時間ごと、6区分（18時間先まで）をループ
+  // 3時間ごと、6区分（18時間先まで）をループ処理
   for (let i = 0; i < 6; i++) {
     const targetTime = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
     
-    // 発表ベース時刻からの経過分数（分）
-    const diffMs = targetTime.getTime() - basetimeDate.getTime();
-    const diffMinutes = Math.floor(diffMs / 1000 / 60);
+    // 気象庁のURLに渡す文字列を作成（例: 20260609150000）
+    const targetTimeStr = 
+      targetTime.getFullYear() +
+      pad(targetTime.getMonth() + 1) +
+      pad(targetTime.getDate()) +
+      pad(targetTime.getHours()) +
+      "0000";
 
-    const validtimeStr = String(diffMinutes);
     const displayHour = pad(targetTime.getHours());
+    console.log(`[区分 ${i + 1}/6] 日本時間 ${displayHour}時（対象URLキー: ${targetTimeStr}）の予報を生成中...`);
 
-    console.log(`[区分 ${i + 1}/6] ${displayHour}時（発表から ${validtimeStr} 分後）の予報を生成中...`);
-
-    const result = await generateJmaForecastCloud(area, basetimeStr, validtimeStr);
+    const result = await generateJmaForecastCloud(area, targetTimeStr);
 
     if (result.hasData) {
       const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
       saveImage(result.canvas, fileName);
       console.log(`保存完了: ${fileName}.png`);
     } else {
-      console.warn(`[Warning] ${displayHour}時（${validtimeStr}分後）のデータが取得できませんでした。`);
+      console.warn(`[Warning] JST ${displayHour}時のデータが取得できませんでした。`);
     }
   }
 }
