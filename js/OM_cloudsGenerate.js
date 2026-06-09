@@ -162,39 +162,31 @@ async function fetchQuarterBatch(points) {
         await sleep(1500);
       }
     }
-
     // ===== 出力時だけLeaflet基準のピクセルサイズに引き伸ばし配置 =====
-    const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
-    const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
+    // 重要な変更: 範囲外への描画を防ぐため、グリッドの最大/最小ピクセル位置を計算して確定させる
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    const pixelPoints = gridData.map(item => {
+      const p = latLonToPixel(item.lat, item.lon, ZOOM);
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+      return { x: p.x, y: p.y, rain: item.rain };
+    });
 
-    const pixelBBox = {
-      xMin: Math.floor(pMax.x),
-      xMax: Math.floor(pMin.x),
-      yMin: Math.floor(pMax.y),
-      yMax: Math.floor(pMin.y)
-    };
-
-    // 北西(pMax)を基点にしてキャンバスサイズを算出
-    const outWidth = Math.ceil(pMin.x - pMax.x) + 20; // 余裕を持たせる
-    const outHeight = Math.ceil(pMin.y - pMax.y) + 20;
-    const xOffset = pMax.x;
-    const yOffset = pMax.y;
-
+    const outWidth = Math.ceil(maxX - minX) + 50;
+    const outHeight = Math.ceil(maxY - minY) + 50;
     
-    console.log(`-> 粒度(step: ${step})を維持したまま、Leaflet ZOOM ${ZOOM} サイズ (${outWidth}x${outHeight} px) に引き伸ばし描画中...`);
+    console.log(`-> 描画範囲: ${outWidth}x${outHeight} px`);
 
     const finalCanvas = createCanvas(outWidth, outHeight);
     const finalCtx = finalCanvas.getContext("2d");
 
-    // 現在のBBox幅と現在のstepからドットスタンプサイズを動的計算
-    const latSpan = bbox.latMax - bbox.latMin;
-    const lonSpan = bbox.lonMax - bbox.lonMin;
-    // どんなズームレベルでも最低4pxの太さを保証
-    const dotWidth = Math.max(Math.ceil(outWidth / (lonSpan / step)), 4);
-    const dotHeight = Math.max(Math.ceil(outHeight / (latSpan / step)), 4);
+    // ドットサイズ計算
+    const dotWidth = 8;
+    const dotHeight = 8;
 
-
-    for (const item of gridData) {
+    for (const item of pixelPoints) {
       if (item.rain < 0.2) continue;
 
       let color = "rgba(100,180,255,0.5)";
@@ -202,20 +194,14 @@ async function fetchQuarterBatch(points) {
       if (item.rain > 5) color = "rgba(255,80,0,0.8)";
       if (item.rain > 10) color = "rgba(255,0,0,1)";
 
-      const p = latLonToPixel(item.lat, item.lon, ZOOM);
-      const drawX = Math.round(p.x - xOffset + 10); // 余裕分を含めてオフセット
-      const drawY = Math.round(p.y - yOffset + 10);
+      // 絶対座標から「このCanvas内での相対座標」へ変換
+      const drawX = Math.round(item.x - minX + 25);
+      const drawY = Math.round(item.y - minY + 25);
 
+      finalCtx.fillStyle = color;
+      finalCtx.fillRect(drawX - dotWidth/2, drawY - dotHeight/2, dotWidth, dotHeight);
+    
 
-      if (drawX >= 0 && drawX < outWidth && drawY >= 0 && drawY < outHeight) {
-        finalCtx.fillStyle = color;
-        finalCtx.fillRect(
-          drawX - Math.floor(dotWidth / 2), 
-          drawY - Math.floor(dotHeight / 2), 
-          dotWidth + 1, // 隙間埋め補正
-          dotHeight + 1
-        );
-      }
     }
 
     // ファイル名生成
