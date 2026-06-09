@@ -2,7 +2,7 @@ name: Generate Rain Images
 
 on:
   schedule:
-    - cron: "0 */6 * * *"   # 6時間ごと
+    - cron: "0 */6 * * *"
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,17 @@ jobs:
         with:
           node-version: "20"
 
-      - name: 依存インストール
+      - name: canvas依存インストール
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libjpeg-dev \
+            libgif-dev \
+            librsvg2-dev
+
+      - name: npm install
         run: npm install axios canvas
 
       - name: outputディレクトリ作成
@@ -33,7 +43,5 @@ jobs:
           git config user.email "actions@github.com"
 
           git add output/*.png || true
-
           git commit -m "update rain images" || echo "no changes"
-
           git push
