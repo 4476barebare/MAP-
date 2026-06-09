@@ -17,7 +17,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm" # ← これだけで2回目以降の npm install が一瞬になります
+          cache: "npm"
+          # package-lock.jsonの代わりに、このpackage.jsonの変更を監視してキャッシュさせます
+          cache-dependency-path: "**/package.json"
 
       - name: canvas依存インストール
         run: |
@@ -30,7 +32,7 @@ jobs:
             librsvg2-dev
 
       - name: npm install
-        # --prefer-offline をつけることでネットからの重複ダウンロードを避けます
+        # --prefer-offline でネット接続を最小限にし、キャッシュから一瞬で引き出します
         run: npm install axios canvas --prefer-offline
 
       - name: outputディレクトリ作成
