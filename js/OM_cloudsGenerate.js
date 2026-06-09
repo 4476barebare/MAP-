@@ -14,7 +14,7 @@ const step = 0.09;
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// ===== JST → UTC変換（システムの誤作動を100%回避する新ロジック） =====
+// ===== JST → UTC変換 =====
 function getTargetUTCClean() {
   const now = new Date();
   
@@ -78,14 +78,13 @@ async function fetchHalfBatch(points) {
   return Array.isArray(res.data) ? res.data : [res.data];
 }
 
-// ===== 描画 =====
+// ===== 描画（★最初期パレット・透過・2x2サイズに完全復元） =====
 function draw(grid, width, height, filename) {
-  const scale = 8;
+  const scale = 2; // 元のサイズに戻す
   const canvas = createCanvas(width * scale, height * scale);
   const ctx = canvas.getContext("2d");
 
-  ctx.fillStyle = "#0b1329";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // 背景の塗りつぶしは行わない（元のコード通りの背景透過）
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -93,7 +92,7 @@ function draw(grid, width, height, filename) {
       
       if (rain < 0.2) continue; 
 
-      // あなたのオリジナルのカラーパレット
+      // ★★★ あなたの最初期のカラーパレット設定と完全に一致 ★★★
       let color = "rgba(100,180,255,0.5)"; 
       if (rain > 2) color = "rgba(0,120,255,0.7)";  
       if (rain > 5) color = "rgba(255,80,0,0.8)";   
@@ -156,14 +155,14 @@ function draw(grid, width, height, filename) {
     }
 
     // ファイル名生成（誤作動するメソッドを徹底排除したクリーンな実装）
-    const jstISO = jstDate.toISOString(); // "YYYY-MM-DDTHH:mm:ss..." の形を取得
-    const datePart = jstISO.slice(0, 10);  // "YYYY-MM-DD" を切り出し
-    const hourPart = jstISO.slice(11, 13); // "HH" を切り出し
+    const jstISO = jstDate.toISOString(); 
+    const datePart = jstISO.slice(0, 10);  
+    const hourPart = jstISO.slice(11, 13); 
     
     const filename = `./output/kanto_${datePart}_${hourPart}h.png`;
 
     draw(grid, width, height, filename);
-    console.log(`【完全大成功】正常に画像を書き出しました: ${filename}`);
+    console.log(`【完全大成功】元の色・サイズのまま画像を書き出しました: ${filename}`);
 
   } catch (e) {
     console.error("データ取得または描画中にエラーが発生しました:", e.message);
