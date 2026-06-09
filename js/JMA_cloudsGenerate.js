@@ -4,12 +4,13 @@ import fs from "fs";
 
 const TILE = 256;
 
+// 千葉県周辺を綺麗に捉える座標と、確実なデータが存在するズームレベル7
 const area = {
   prefName: "CHIBA",
   lat: 35.6,
   lng: 140.1,
   grid: { w: 150, h: 100 },
-  zoom: 6
+  zoom: 7
 };
 
 function latLngToTile(lat, lng, z) {
@@ -21,42 +22,36 @@ function latLngToTile(lat, lng, z) {
   return { x, y };
 }
 
-// 【公式確定】今利用可能な最新の「今後の雨」のベース時刻と予測ステップを取得
-async function getJmaLiveMeta() {
-  // 気象庁公式HPが実際にインデックス取得に使っている正確なエンドポイント
-  const url = "https://www.jma.go.jp/bosai/jmatile/data/rasfc/targetTimes.json";
-  
-  const res = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
-  });
-  
-  if (!res.ok) {
-    throw new Error(`気象庁メタデータ取得失敗: ${res.status} -> ${url}`);
-  }
-  
-  const data = await res.json();
-  // 最も新しい予報[0]を返す
-  return data[0];
+// 気象庁のデータ更新周期（5分刻み）に合わせた最新の基準時刻（JST）を計算
+function getLatestNowcBasetimeJST() {
+  const d = new Date();
+  // 配信ラグ（約5分）を考慮して5分前にずらし、5分刻みに丸める
+  d.setMinutes(d.getMinutes() - 5);
+  const min = Math.floor(d.getMinutes() / 5) * 5;
+  d.setMinutes(min, 0, 0);
+  return d;
 }
 
-function getForecastTileUrl(basetime, validtime, z, x, y) {
-  return `https://www.jma.go.jp/bosai/jmatile/data/rasfc/${basetime}/none/${validtime}/${z}/${x}/${y}.png`;
+// 【公式実績No.1】高解像度降水ナウキャスト（nowc）タイルURL構造
+function getNowcTileUrl(timeStrJST, z, x, y) {
+  return `https://www.jma.go.jp/bosai/jmatile/data/nowc/${timeStrJST}/none/nowc/${z}/${x}/{y}.png`;
 }
 
 async function fetchTile(url) {
   const res = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0" }
+    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" }
   });
-  if (!res.ok) return null; // 404（雨がない・空）の場合はスキップ
+  if (!res.ok) return null; // 404（雨がない空のタイル）は安全にスキップ
   const buf = await res.arrayBuffer();
   return Buffer.from(buf);
 }
 
-export async function generateJmaForecast(area, basetime, validtime) {
+export async function generateJmaNowcForecast(area, timeStrJST) {
   const { x, y } = latLngToTile(area.lat, area.lng, area.zoom);
 
-  const rangeX = Math.ceil(area.grid.w / 2 / 50);
-  const rangeY = Math.ceil(area.grid.h / 2 / 50);
+  // ズーム7に合わせて周辺を描画
+  const rangeX = 1;
+  const rangeY = 1;
 
   const xMin = x - rangeX;
   const xMax = x + rangeX;
@@ -70,7 +65,7 @@ export async function generateJmaForecast(area, basetime, validtime) {
 
   for (let tx = xMin; tx <= xMax; tx++) {
     for (let ty = yMin; ty <= yMax; ty++) {
-      const url = getForecastTileUrl(basetime, validtime, area.zoom, tx, ty);
+      const url = getNowcTileUrl(timeStrJST, area.zoom, tx, ty);
       const buf = await fetchTile(url);
       if (!buf) continue;
 
@@ -90,82 +85,36 @@ export function saveImage(canvas, name) {
   return path;
 }
 
-// 14桁の文字列(JST/UTC混在回避)を確実なエポックミリ秒に変換
-function parseJmaTimeToMs(timeStr) {
-  const y = parseInt(timeStr.substring(0, 4));
-  const m = parseInt(timeStr.substring(4, 6)) - 1;
-  const d = parseInt(timeStr.substring(6, 8));
-  const h = parseInt(timeStr.substring(8, 10));
-  const min = parseInt(timeStr.substring(10, 12));
-  // タイムゾーンのブレをなくすためUTCとして計算
-  return Date.UTC(y, m, d, h, min);
-}
-
 async function main() {
-  console.log("--- [インデックス自動解決版] 今後の雨データ生成 ---");
+  console.log("--- [実績最優先仕様] 高解像度ナウキャスト雨雲データ生成 ---");
   
-  let meta;
-  try {
-    meta = await getJmaLiveMeta();
-  } catch (e) {
-    console.error(e.message);
-    return;
-  }
-
-  const basetime = meta.basetime;
-  // validtimeが配列か単一文字列か不明なため、一律で配列にキャストしてセーフティをかける
-  const validtimes = Array.isArray(meta.validtime) ? meta.validtime : [meta.validtime];
-  
-  console.log(`サーバー上の最新ベース時刻: ${basetime}`);
-  const baseMs = parseJmaTimeToMs(basetime);
-
-  // 現在の次の3時間区切りのJST
-  const now = new Date();
-  const currentHour = now.getHours();
-  const nextTargetHour = Math.ceil((currentHour + 1) / 3) * 3;
-  
-  const startTime = new Date(now.getTime());
-  startTime.setHours(nextTargetHour, 0, 0, 0);
-
+  const baseDate = getLatestNowcBasetimeJST();
   const pad = (n) => String(n).padStart(2, "0");
 
-  for (let i = 0; i < 6; i++) {
-    const targetTime = new Date(startTime.getTime() + i * 3 * 60 * 60 * 1000);
+  // 未来の予測ステップ（5分後、15分後、30分後、45分後、60分後）の5区分
+  const intervals = [5, 15, 30, 45, 60];
+
+  for (let i = 0; i < intervals.length; i++) {
+    const minutesAhead = intervals[i];
+    const targetTime = new Date(baseDate.getTime() + minutesAhead * 60 * 1000);
     
-    // ターゲット時間までの必要分数（UTCベースでの差分）
-    const targetTimeMs = Date.UTC(
-      targetTime.getFullYear(),
-      targetTime.getMonth(),
-      targetTime.getDate(),
-      targetTime.getHours(),
-      targetTime.getMinutes()
-    );
-    const targetDiffMinutes = Math.floor((targetTimeMs - baseMs) / 1000 / 60);
+    const timeStrJST = 
+      targetTime.getFullYear() +
+      pad(targetTime.getMonth() + 1) +
+      pad(targetTime.getDate()) +
+      pad(targetTime.getHours()) +
+      pad(targetTime.getMinutes()) +
+      "00";
 
-    // 有効な分数リストから一番近いものを安全に選択
-    let closestValidtime = validtimes[0];
-    let minDiff = Math.abs(parseInt(closestValidtime) - targetDiffMinutes);
+    console.log(`[区分 ${i + 1}/${intervals.length}] 現在から ${minutesAhead}分後 の予測画像（対象キー: ${timeStrJST}）を生成中...`);
 
-    for (const vt of validtimes) {
-      const diff = Math.abs(parseInt(vt) - targetDiffMinutes);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestValidtime = vt;
-      }
-    }
+    const result = await generateJmaNowcForecast(area, timeStrJST);
 
-    const displayHour = pad(targetTime.getHours());
-    console.log(`[区分 ${i + 1}/6] 日本時間 ${displayHour}時頃 (計算上の差: ${targetDiffMinutes}分 -> 配信中の最寄キー: ${closestValidtime}分後) を生成中...`);
-
-    const result = await generateJmaForecast(area, basetime, closestValidtime);
-
-    if (result.hasData) {
-      const fileName = `${area.prefName}_slot${i + 1}_${displayHour}h`;
-      saveImage(result.canvas, fileName);
-      console.log(`保存完了: ${fileName}.png`);
-    } else {
-      console.warn(`[Warning] ${displayHour}時の位置に色付きの雨雲データがありませんでした。`);
-    }
+    // ナウキャストはデータ（雨）がない場所は404を返してくる仕様のため、
+    // 画像が1枚も取得できなかった場合は、真っ白（透明）な空のキャンバスをそのまま保存してActionsのコミットエラーを防ぎます
+    const fileName = `${area.prefName}_slot${i + 1}_plus${minutesAhead}m`;
+    saveImage(result.canvas, fileName);
+    console.log(`保存完了: ${fileName}.png (データ有り: ${result.hasData})`);
   }
 }
 
