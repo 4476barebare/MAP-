@@ -12,9 +12,9 @@ const bbox = {
 
 const step = 0.09;
 
-// ★チューニング
-const BATCH_SIZE = 40;   // 1リクエストあたり座標数
-const CONCURRENCY = 5;   // 同時リクエスト数
+// チューニング
+const BATCH_SIZE = 40;
+const CONCURRENCY = 5;
 
 // ===== グリッド生成 =====
 function generatePoints() {
@@ -29,7 +29,7 @@ function generatePoints() {
   return points;
 }
 
-// ===== 分割 =====
+// ===== 配列分割 =====
 function chunk(arr, size) {
   const res = [];
   for (let i = 0; i < arr.length; i += size) {
@@ -38,7 +38,7 @@ function chunk(arr, size) {
   return res;
 }
 
-// ===== API取得（複数点まとめ）=====
+// ===== API取得（複数地点）=====
 async function fetchBatch(points) {
   const url = "https://api.open-meteo.com/v1/forecast";
 
@@ -52,10 +52,12 @@ async function fetchBatch(points) {
       hourly: "precipitation",
       forecast_days: 1,
       timezone: "UTC"
-    }
+    },
+    timeout: 10000
   });
 
-  return res.data;
+  // ★ 複数 or 単一どちらにも対応
+  return Array.isArray(res.data) ? res.data : [res.data];
 }
 
 // ===== 並列制御 =====
@@ -66,13 +68,15 @@ async function runPool(tasks, limit) {
   async function worker() {
     while (i < tasks.length) {
       const idx = i++;
-      results[idx] = await tasks[idx]();
+      try {
+        results[idx] = await tasks[idx]();
+      } catch {
+        results[idx] = null;
+      }
     }
   }
 
-  const workers = Array.from({ length: limit }, worker);
-  await Promise.all(workers);
-
+  await Promise.all(Array.from({ length: limit }, worker));
   return results;
 }
 
@@ -102,21 +106,11 @@ function draw(grid, width, height, filename) {
 // ===== メイン =====
 (async () => {
   const points = generatePoints();
-  console.log("points:", points.length);
-
   const batches = chunk(points, BATCH_SIZE);
 
-  const tasks = batches.map(batch => async () => {
-    try {
-      return await fetchBatch(batch);
-    } catch (e) {
-      return null;
-    }
-  });
-
+  const tasks = batches.map(batch => () => fetchBatch(batch));
   const results = await runPool(tasks, CONCURRENCY);
 
-  // ===== グリッド復元 =====
   const width = Math.floor((bbox.lonMax - bbox.lonMin) / step) + 1;
   const height = Math.floor((bbox.latMax - bbox.latMin) / step) + 1;
 
@@ -124,31 +118,26 @@ function draw(grid, width, height, filename) {
     Array(width).fill(0)
   );
 
-  let idx = 0;
-
   for (let b = 0; b < results.length; b++) {
-    const data = results[b];
-    if (!data) continue;
+    const dataArray = results[b];
+    if (!dataArray) continue;
 
     const batch = batches[b];
 
     for (let i = 0; i < batch.length; i++) {
       const p = batch[i];
+      const pointData = dataArray[i];
+      if (!pointData) continue;
 
       const x = Math.round((p.lon - bbox.lonMin) / step);
       const y = Math.round((p.lat - bbox.latMin) / step);
 
-      const rain =
-        data.hourly?.precipitation?.[0]?.[0] ??
-        data.hourly?.precipitation?.[0] ??
-        0;
+      // ★ 先頭時刻だけ使う（最速）
+      const rain = pointData.hourly?.precipitation?.[0] ?? 0;
 
       grid[y][x] = rain;
-      idx++;
     }
   }
 
   draw(grid, width, height, "./output/kanto_fast.png");
-
-  console.log("done");
 })();
