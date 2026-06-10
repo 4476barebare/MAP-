@@ -77,15 +77,21 @@ async function fetchQuarterBatch(points) {
   const quarters = splitIntoFour(points);
 
   for (const jstTargetHour of targetJstHours) {
+
     // 日本時間のターゲット日付オブジェクトを作成
     const targetDate = new Date(now);
     targetDate.setHours(jstTargetHour, 0, 0, 0);
+    // 日付またぎ（24時以降）の処理
     if (jstTargetHour >= 24) targetDate.setDate(targetDate.getDate() + 1);
 
-    // API用に「JSTから9時間引いたUTC」の文字列を作成
+    // ★修正：正しいUTC文字列の生成
+    // ISOString()は自動的にUTCに変換してくれます
+    // ただし、Dateオブジェクトそのものが「日本時間」を保持しているため、
+    // 一旦UTCにずらしてからISO文字列化します
     const utcTime = new Date(targetDate.getTime() - 9 * 60 * 60 * 1000);
     const utcISO = utcTime.toISOString().slice(0, 13);
-    
+
+ 
     console.log(`-> 生成中: JST ${targetDate.getHours()}時 (API指定: ${utcISO}:00)`);
 
     const gridData = [];
