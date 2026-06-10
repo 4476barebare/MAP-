@@ -17,9 +17,9 @@ const ZOOM = activeArea.zoom;
 // 調整用：降水量レベルリスト（上から順に判定）
 const precipitationLevels = [
   { min: 10.0, color: "rgba(255, 0, 0, 1.0)" },    // 激しい雨
-  { min: 5.0,  color: "rgba(255, 120, 0, 0.8)" },  // 強い雨
-  { min: 2.0,  color: "rgba(0, 120, 255, 0.7)" },  // 中程度の雨
-  { min: 0.1,  color: "rgba(100, 180, 255, 0.4)" } // 弱い雨
+  { min: 5.0,  color: "rgba(255, 120, 0, 1.0)" },  // 強い雨
+  { min: 2.0,  color: "rgba(0, 120, 255, 1.0)" },  // 中程度の雨
+  { min: 0.1,  color: "rgba(100, 180, 255, 1.0)" } // 弱い雨
 ];
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
