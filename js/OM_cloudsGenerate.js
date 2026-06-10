@@ -42,30 +42,33 @@ function generatePoints() {
 
 // ===== メイン =====
 (async () => {
+  // 現在の日本時間（JST）を厳密に取得
   const now = new Date();
-  // +4時間後の時刻をベースにフェーズを判定
-  const startTarget = new Date(now.getTime() + 4 * 60 * 60 * 1000);
-  const nextBase = (startTarget.getHours() >= 9 && startTarget.getHours() < 21) ? 21 : 9;
+  const jstOffset = 9 * 60 * 60 * 1000;
+  const jstNow = new Date(now.getTime() + jstOffset);
+  
+  // +4時間後のJST基準でフェーズ判定
+  const startTargetJst = new Date(jstNow.getTime() + 4 * 60 * 60 * 1000);
+  const nextBase = (startTargetJst.getUTCHours() >= 9 && startTargetJst.getUTCHours() < 21) ? 21 : 9;
   const targetJstHours = [nextBase, nextBase + 3, nextBase + 6, nextBase + 9];
 
-  console.log(`【本番実行】現在(JST): ${now.toLocaleString()}。次フェーズ(${nextBase}時)の4枚を生成します`);
+  console.log(`【本番実行】現在(JST): ${jstNow.toISOString().replace('T', ' ').slice(0, 16)}。次フェーズ(${nextBase}時)の4枚を生成します`);
 
   const points = generatePoints();
   
-  for (const jstTargetHour of targetJstHours) {
-    // 1. 日本時間のターゲット日時を厳密に作成
-    const targetDate = new Date(now);
-    targetDate.setHours(jstTargetHour, 0, 0, 0);
-    // 24時/48時をまたぐ場合の日付加算
-    if (jstTargetHour >= 24) targetDate.setDate(targetDate.getDate() + Math.floor(jstTargetHour / 24));
+  for (const jstHour of targetJstHours) {
+    // 日本時間基準のターゲット日時を「年月日時」から組み立てる
+    const targetJst = new Date(jstNow);
+    targetJst.setUTCHours(jstHour, 0, 0, 0); // JST基準なのでUTCメソッドでセット
+    if (jstHour >= 24) targetJst.setUTCDate(targetJst.getUTCDate() + Math.floor(jstHour / 24));
 
-    // 2. API用：JSTから9時間引いたUTC時間を計算
-    const utcTime = new Date(targetDate.getTime() - (9 * 60 * 60 * 1000));
+    // API送信用：日本時間から9時間引いたUTC時間を生成
+    const utcTime = new Date(targetJst.getTime() - jstOffset);
     const utcISO = utcTime.toISOString().slice(0, 13);
     
-    // 3. ファイル名用：日本日付（ISO形式はUTC基準だが、targetDateはJSTの時をセット済み）
-    const datePart = targetDate.toISOString().slice(0, 10);
-    const hourPart = String(targetDate.getHours()).padStart(2, '0');
+    // ファイル名用：JSTをそのまま文字列化（今日の日付を保持）
+    const datePart = targetJst.toISOString().slice(0, 10);
+    const hourPart = String(targetJst.getUTCHours()).padStart(2, '0');
     
     console.log(`-> 生成中: JST ${datePart} ${hourPart}時 (API指定: ${utcISO}:00)`);
 
@@ -118,7 +121,7 @@ function generatePoints() {
       fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
       
       console.log(`   書き出し成功: ${filename}`);
-      await sleep(3000); // 1枚ごとに休憩
+      await sleep(3000); 
     } catch (e) {
       console.error(`エラー (${hourPart}時):`, e.message);
     }
