@@ -6,7 +6,7 @@ import { createCanvas } from "canvas";
 // 👑 エリア別プロファイル定義
 // ==========================================
 const AREA_PROFILES = {
-  chiba: { prefname: "chiba", latMin: 34.7, latMax: 36.0, lonMin: 139.6, lonMax: 141.1, step: 0.1, zoom: 9 }
+  chiba: { prefname: "CHIBA", latMin: 34.7, latMax: 36.0, lonMin: 139.6, lonMax: 141.1, step: 0.1, zoom: 9 }
 };
 
 const activeArea = AREA_PROFILES.chiba;
@@ -14,7 +14,6 @@ const bbox = activeArea;
 const step = activeArea.step;
 const ZOOM = activeArea.zoom;
 
-// 調整用：降水量レベルリスト（すべて不透明度1.0に設定）
 const precipitationLevels = [
   { min: 10.0, color: "rgba(255, 0, 0, 1.0)" },    // 激しい雨
   { min: 5.0,  color: "rgba(255, 120, 0, 1.0)" },  // 強い雨
@@ -55,13 +54,7 @@ function splitIntoFour(arr) {
 async function fetchQuarterBatch(points) {
   const url = "https://api.open-meteo.com/v1/forecast";
   const res = await axios.get(url, {
-    params: { 
-        latitude: points.map(p => p.lat.toFixed(4)).join(","), 
-        longitude: points.map(p => p.lon.toFixed(4)).join(","), 
-        hourly: "precipitation", 
-        forecast_days: 1, 
-        timezone: "UTC" 
-    },
+    params: { latitude: points.map(p => p.lat.toFixed(4)).join(","), longitude: points.map(p => p.lon.toFixed(4)).join(","), hourly: "precipitation", forecast_days: 2, timezone: "UTC" },
     timeout: 20000
   });
   return Array.isArray(res.data) ? res.data : [res.data];
@@ -69,77 +62,81 @@ async function fetchQuarterBatch(points) {
 
 // ===== メイン =====
 (async () => {
-  // 自動時間取得（直近の1時間単位）
   const now = new Date();
-  const utcISO = now.toISOString().slice(0, 13);
-  console.log(`【本番実行】UTC: ${utcISO}:00 (エリア: ${bbox.prefname.toUpperCase()})`);
+  // +4時間後の時刻を基準にする
+  const startTarget = new Date(now.getTime() + 4 * 60 * 60 * 1000);
+  const startHour = startTarget.getHours();
+
+  // 次の9時または21時のフェーズを判定
+  let nextBase = (startHour >= 9 && startHour < 21) ? 21 : 9;
+  const targetJstHours = [nextBase, nextBase + 3, nextBase + 6, nextBase + 9];
+
+  console.log(`【本番実行】現在JST: ${now.getHours()}時。+4時間後の基準: ${startTarget.getHours()}時。次フェーズ(${nextBase}時開始)の4枚を生成します`);
 
   const points = generatePoints();
   const quarters = splitIntoFour(points);
-  const gridData = [];
 
-  try {
-    for (let q = 0; q < quarters.length; q++) {
-      const dataArray = await fetchQuarterBatch(quarters[q]);
-      for (let i = 0; i < quarters[q].length; i++) {
-        const p = quarters[q][i];
-        // APIレスポンスは地点数により単体または配列で返るため適宜対応
-        const pointData = Array.isArray(dataArray) ? dataArray[i] : dataArray;
-        const prec = pointData?.hourly?.precipitation;
-        const timeList = pointData?.hourly?.time;
-        const idx = timeList?.findIndex(t => t.startsWith(utcISO));
-        if (idx !== -1 && prec) {
-          gridData.push({ lat: p.lat, lon: p.lon, rain: prec[idx] ?? 0 });
+  for (const jstTargetHour of targetJstHours) {
+    // 日本時間のターゲット日付オブジェクトを作成
+    const targetDate = new Date(now);
+    targetDate.setHours(jstTargetHour, 0, 0, 0);
+    if (jstTargetHour >= 24) targetDate.setDate(targetDate.getDate() + 1);
+
+    // API用に「JSTから9時間引いたUTC」の文字列を作成
+    const utcTime = new Date(targetDate.getTime() - 9 * 60 * 60 * 1000);
+    const utcISO = utcTime.toISOString().slice(0, 13);
+    
+    console.log(`-> 生成中: JST ${targetDate.getHours()}時 (API指定: ${utcISO}:00)`);
+
+    const gridData = [];
+    try {
+      for (let q = 0; q < quarters.length; q++) {
+        const dataArray = await fetchQuarterBatch(quarters[q]);
+        for (let i = 0; i < quarters[q].length; i++) {
+          const p = quarters[q][i];
+          const pointData = Array.isArray(dataArray) ? dataArray[i] : dataArray;
+          const idx = pointData?.hourly?.time?.findIndex(t => t.startsWith(utcISO));
+          if (idx !== -1 && pointData?.hourly?.precipitation) {
+            gridData.push({ lat: p.lat, lon: p.lon, rain: pointData.hourly.precipitation[idx] ?? 0 });
+          }
         }
+        if (q < quarters.length - 1) await sleep(1500);
       }
-      if (q < quarters.length - 1) await sleep(1500);
-    }
 
-    if (gridData.length === 0) return console.log("データなしのため終了");
+      if (gridData.length === 0) continue;
 
-    const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
-    const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
-    const outWidth = Math.ceil(pMin.x - pMax.x) + 10;
-    const outHeight = Math.ceil(pMin.y - pMax.y) + 10;
-    const xOffset = pMax.x;
-    const yOffset = pMax.y;
+      const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
+      const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
+      const outWidth = Math.ceil(pMin.x - pMax.x) + 10;
+      const outHeight = Math.ceil(pMin.y - pMax.y) + 10;
+      const xOffset = pMax.x;
+      const yOffset = pMax.y;
 
-    const finalCanvas = createCanvas(outWidth, outHeight);
-    const ctx = finalCanvas.getContext("2d");
+      const finalCanvas = createCanvas(outWidth, outHeight);
+      const ctx = finalCanvas.getContext("2d");
+      const blockWidth = outWidth / Math.round((bbox.lonMax - bbox.lonMin) / step);
+      const blockHeight = outHeight / Math.round((bbox.latMax - bbox.latMin) / step);
 
-    // グリッド計算（面として塗りつぶすためのサイズ）
-    const lonPoints = Math.round((bbox.lonMax - bbox.lonMin) / step);
-    const latPoints = Math.round((bbox.latMax - bbox.latMin) / step);
-    const blockWidth = outWidth / lonPoints;
-    const blockHeight = outHeight / latPoints;
+      ctx.lineWidth = 0;
+      for (const item of gridData) {
+        const level = precipitationLevels.find(l => item.rain >= l.min);
+        if (!level) continue;
+        const xIdx = Math.round((item.lon - bbox.lonMin) / step);
+        const yIdx = Math.round((bbox.latMax - item.lat) / step);
+        ctx.fillStyle = level.color;
+        ctx.fillRect(Math.round(xIdx * blockWidth), Math.round(yIdx * blockHeight), Math.ceil(blockWidth) + 1, Math.ceil(blockHeight) + 1);
+      }
 
-    ctx.lineWidth = 0;
-
-    for (const item of gridData) {
-      const level = precipitationLevels.find(l => item.rain >= l.min);
-      if (!level) continue;
-
-      const xIdx = Math.round((item.lon - bbox.lonMin) / step);
-      const yIdx = Math.round((bbox.latMax - item.lat) / step);
-
-      const drawX = Math.round(xIdx * blockWidth);
-      const drawY = Math.round(yIdx * blockHeight);
+      const datePart = targetDate.toISOString().slice(0, 10);
+      const hourPart = String(targetDate.getHours()).padStart(2, '0');
+      const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
       
-      // 1ピクセル重ねて描画し、隙間を防止
-      ctx.fillStyle = level.color;
-      ctx.fillRect(drawX, drawY, Math.ceil(blockWidth) + 1, Math.ceil(blockHeight) + 1);
+      fs.mkdirSync("./output", { recursive: true });
+      fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
+      console.log(`   書き出し完了: ${filename}`);
+      
+    } catch (e) {
+      console.error(`エラー (${jstTargetHour}時):`, e.message);
     }
-
-    const jstDate = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-    const datePart = jstDate.toISOString().slice(0, 10);
-    const hourPart = jstDate.toISOString().slice(11, 13);
-    const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
-
-    fs.mkdirSync("./output", { recursive: true });
-    fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-    console.log(`【成功】最新画像を書き出しました: ${filename}`);
-  } catch (e) {
-    console.error("エラーが発生しました:", e.message);
-    process.exit(1);
   }
 })();
