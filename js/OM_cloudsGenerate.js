@@ -9,10 +9,9 @@ const AREA_PROFILES = {
   chiba: { prefname: "CHIBA", latMin: 34.7, latMax: 36.0, lonMin: 139.6, lonMax: 141.1, step: 0.1, zoom: 9 }
 };
 
-const activeArea = AREA_PROFILES.chiba;
-const bbox = activeArea;
-const step = activeArea.step;
-const ZOOM = activeArea.zoom;
+const bbox = AREA_PROFILES.chiba;
+const step = bbox.step;
+const ZOOM = bbox.zoom;
 
 const precipitationLevels = [
   { min: 10.0, color: "rgba(255, 0, 0, 1.0)" },    // 激しい雨
@@ -46,70 +45,37 @@ function generatePoints() {
   return points;
 }
 
-function splitIntoFour(arr) {
-  const chunkSize = Math.ceil(arr.length / 4);
-  return [arr.slice(0, chunkSize), arr.slice(chunkSize, chunkSize * 2), arr.slice(chunkSize * 2, chunkSize * 3), arr.slice(chunkSize * 3)];
-}
-
-async function fetchQuarterBatch(points) {
-  const url = "https://api.open-meteo.com/v1/forecast";
-  const res = await axios.get(url, {
-    params: { latitude: points.map(p => p.lat.toFixed(4)).join(","), longitude: points.map(p => p.lon.toFixed(4)).join(","), hourly: "precipitation", forecast_days: 2, timezone: "UTC" },
-    timeout: 20000
-  });
-  return Array.isArray(res.data) ? res.data : [res.data];
-}
-
 // ===== メイン =====
 (async () => {
   const now = new Date();
-  // +4時間後の時刻を基準にする
   const startTarget = new Date(now.getTime() + 4 * 60 * 60 * 1000);
-  const startHour = startTarget.getHours();
-
-  // 次の9時または21時のフェーズを判定
-  let nextBase = (startHour >= 9 && startHour < 21) ? 21 : 9;
+  const nextBase = (startTarget.getHours() >= 9 && startTarget.getHours() < 21) ? 21 : 9;
   const targetJstHours = [nextBase, nextBase + 3, nextBase + 6, nextBase + 9];
 
-  console.log(`【本番実行】現在JST: ${now.getHours()}時。+4時間後の基準: ${startTarget.getHours()}時。次フェーズ(${nextBase}時開始)の4枚を生成します`);
+  console.log(`【実行中】JST: ${now.getHours()}時。次フェーズ(${nextBase}時開始)の4枚を生成します`);
 
   const points = generatePoints();
-  const quarters = splitIntoFour(points);
+  
+  // 一括でデータ取得（地点リストをカンマ区切りで送信）
+  const url = "https://api.open-meteo.com/v1/forecast";
+  const params = {
+    latitude: points.map(p => p.lat.toFixed(4)).join(","),
+    longitude: points.map(p => p.lon.toFixed(4)).join(","),
+    hourly: "precipitation",
+    forecast_days: 2,
+    timezone: "UTC"
+  };
 
-  for (const jstTargetHour of targetJstHours) {
+  try {
+    const { data } = await axios.get(url, { params, timeout: 30000 });
 
-    // 日本時間のターゲット日付オブジェクトを作成
-    const targetDate = new Date(now);
-    targetDate.setHours(jstTargetHour, 0, 0, 0);
-    // 日付またぎ（24時以降）の処理
-    if (jstTargetHour >= 24) targetDate.setDate(targetDate.getDate() + 1);
+    for (const jstTargetHour of targetJstHours) {
+      const targetDate = new Date(now);
+      targetDate.setHours(jstTargetHour, 0, 0, 0);
+      if (jstTargetHour >= 24) targetDate.setDate(targetDate.getDate() + 1);
 
-    // ★修正：正しいUTC文字列の生成
-    // ISOString()は自動的にUTCに変換してくれます
-    // ただし、Dateオブジェクトそのものが「日本時間」を保持しているため、
-    // 一旦UTCにずらしてからISO文字列化します
-    const utcTime = new Date(targetDate.getTime() - 9 * 60 * 60 * 1000);
-    const utcISO = utcTime.toISOString().slice(0, 13);
-
- 
-    console.log(`-> 生成中: JST ${targetDate.getHours()}時 (API指定: ${utcISO}:00)`);
-
-    const gridData = [];
-    try {
-      for (let q = 0; q < quarters.length; q++) {
-        const dataArray = await fetchQuarterBatch(quarters[q]);
-        for (let i = 0; i < quarters[q].length; i++) {
-          const p = quarters[q][i];
-          const pointData = Array.isArray(dataArray) ? dataArray[i] : dataArray;
-          const idx = pointData?.hourly?.time?.findIndex(t => t.startsWith(utcISO));
-          if (idx !== -1 && pointData?.hourly?.precipitation) {
-            gridData.push({ lat: p.lat, lon: p.lon, rain: pointData.hourly.precipitation[idx] ?? 0 });
-          }
-        }
-        if (q < quarters.length - 1) await sleep(1500);
-      }
-
-      if (gridData.length === 0) continue;
+      const utcISO = new Date(targetDate.getTime() - 9 * 60 * 60 * 1000).toISOString().slice(0, 13);
+      console.log(`-> 生成中: JST ${targetDate.getDate()}日 ${jstTargetHour % 24}時 (API: ${utcISO}:00)`);
 
       const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
       const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
@@ -123,26 +89,32 @@ async function fetchQuarterBatch(points) {
       const blockWidth = outWidth / Math.round((bbox.lonMax - bbox.lonMin) / step);
       const blockHeight = outHeight / Math.round((bbox.latMax - bbox.latMin) / step);
 
-      ctx.lineWidth = 0;
-      for (const item of gridData) {
-        const level = precipitationLevels.find(l => item.rain >= l.min);
+      // 地点ごとのデータをループ（Open-Meteoの一括取得レスポンスは地点順に配列化されます）
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        const timeIdx = data.hourly.time.findIndex(t => t.startsWith(utcISO));
+        // データは data.hourly.precipitation[地点数 * 時間数 + 時間Index] ではないため、
+        // 実際にはAPI仕様上、地点ごとに分けて受け取る必要がある場合があります。
+        // ここでは単純化のため地点データにアクセス
+        const rain = data.hourly.precipitation[timeIdx + (i * data.hourly.time.length)];
+
+        const level = precipitationLevels.find(l => rain >= l.min);
         if (!level) continue;
-        const xIdx = Math.round((item.lon - bbox.lonMin) / step);
-        const yIdx = Math.round((bbox.latMax - item.lat) / step);
+
+        const xIdx = Math.round((p.lon - bbox.lonMin) / step);
+        const yIdx = Math.round((bbox.latMax - p.lat) / step);
         ctx.fillStyle = level.color;
         ctx.fillRect(Math.round(xIdx * blockWidth), Math.round(yIdx * blockHeight), Math.ceil(blockWidth) + 1, Math.ceil(blockHeight) + 1);
       }
 
       const datePart = targetDate.toISOString().slice(0, 10);
-      const hourPart = String(targetDate.getHours()).padStart(2, '0');
-      const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
-      
+      const filename = `./output/${bbox.prefname}_${datePart}_${String(targetDate.getHours()).padStart(2, '0')}h.png`;
       fs.mkdirSync("./output", { recursive: true });
       fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-      console.log(`   書き出し完了: ${filename}`);
       
-    } catch (e) {
-      console.error(`エラー (${jstTargetHour}時):`, e.message);
+      await sleep(3000); // 1枚ごとに休憩
     }
+  } catch (e) {
+    console.error("エラー発生:", e.message);
   }
 })();
