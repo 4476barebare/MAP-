@@ -1,19 +1,23 @@
 name: Generate Weather Maps
 
 on:
-  workflow_dispatch:   # 手動実行用
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # 日本時間の9時に実行（UTC 0:00）
+    - cron: '0 */3 * * *'  # 3時間ごと実行
 
 jobs:
   generate:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        area:
+          - "CHIBA,34.7,36.0,139.6,141.1,0.15,9"
+          # - "TOKYO,..."
+
     steps:
-      - name: Trigger XREA Generation
+      - name: Trigger XREA run.php
         run: |
-          # XREA上のPHPを叩いてバックグラウンドで画像生成を実行させる
-          # 必要に応じて、XREA側で設定したシークレットトークンを付与してください
-          curl -s "https://turiiko.shop/cloudGenerator/generate.php"
+          curl -s "https://turiiko.shop/cloudGenerator/run.php?area=$(echo '${{ matrix.area }}' | sed 's/,/%2C/g')"
           
-          echo "Generation triggered successfully."
+          echo "Triggered: ${{ matrix.area }}"
