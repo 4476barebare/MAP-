@@ -3,7 +3,7 @@ name: Generate Weather Maps
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */3 * * *'  # 3時間ごと実行
+    - cron: '0 9,21 * * *'  # 毎日 09:00 と 21:00
 
 jobs:
   generate:
@@ -18,6 +18,6 @@ jobs:
     steps:
       - name: Trigger XREA run.php
         run: |
-          curl -s "https://turiiko.shop/cloudGenerator/run.php?area=$(echo '${{ matrix.area }}' | sed 's/,/%2C/g')"
+          curl -s --max-time 10 "https://turiiko.shop/cloudGenerator/run.php?area=$(echo '${{ matrix.area }}' | sed 's/,/%2C/g')" > /dev/null &
           
           echo "Triggered: ${{ matrix.area }}"
