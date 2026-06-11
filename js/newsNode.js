@@ -38,7 +38,6 @@ async function fetchAllRSS(urls) {
           url.includes(d)
         )?.[1];
 
-        // RAW処理（WordPress系）
         if (config?.mode === "raw") {
           const res = await fetch(url, {
             headers: { "User-Agent": "Mozilla/5.0" }
@@ -64,14 +63,12 @@ async function fetchAllRSS(urls) {
           };
         }
 
-        // 通常（rss2json）
         const res = await fetch(
           "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(url)
         );
 
         if (!res.ok) return null;
         return await res.json();
-
       } catch {
         return null;
       }
@@ -97,80 +94,38 @@ function pickText(v) {
 }
 
 // =========================
-// サムネ取得（統合版）
+// サムネ取得
 // =========================
 function getThumbnail(item) {
+  if (item.thumbnail) return cleanUrl(item.thumbnail);
+  if (item.media?.url) return cleanUrl(item.media.url);
+  if (item.enclosure?.link) return cleanUrl(item.enclosure.link);
 
-  // rss2json
-  if (item.thumbnail) {
-    return cleanUrl(item.thumbnail);
-  }
-
-  // media
-  if (item.media?.url) {
-    return cleanUrl(item.media.url);
-  }
-
-  // enclosure
-  if (item.enclosure?.link) {
-    return cleanUrl(item.enclosure.link);
-  }
-
-  // content（ブンブン）
   let html = pickText(item.content);
-
-  if (!html) {
-    html = pickText(item.description);
-  }
-
+  if (!html) html = pickText(item.description);
   if (html) {
     const m = html.match(/<img[^>]*src=["']([^"']+)["']/i);
     if (m) return cleanUrl(m[1]);
   }
-
   return "";
 }
 
 function getAuthor(item, link) {
-
-  // 安全に文字列化
   const url = (link || "").toLowerCase();
+  if (url.includes("fishingjapan.jp")) return "FISHING JAPAN";
+  if (url.includes("lurenewsr.com")) return "ルアーニュース";
+  if (url.includes("bunbun-fishing.com")) return "釣具のブンブン";
+  if (url.includes("tsurinews.jp")) return "TSURINEWS";
+  if (url.includes("castingnet.jp")) return "キャスティング";
 
-  // ■ ドメイン優先（完全固定）
-  if (url.includes("fishingjapan.jp")) {
-    return "FISHING JAPAN";
-  }
-
-  if (url.includes("lurenewsr.com")) {
-    return "ルアーニュース";
-  }
-
-  if (url.includes("bunbun-fishing.com")) {
-    return "釣具のブンブン";
-  }
-
-  if (url.includes("tsurinews.jp")) {
-    return "TSURINEWS";
-  }
-
-  if (url.includes("castingnet.jp")) {
-    return "キャスティング";
-  }
-
-  // ■ それ以外はRSSの値を使う
-  const author =
-    item.author ||
-    item.creator ||
-    "";
-
-  return author || "RSS";
+  return item.author || item.creator || "RSS";
 }
+
 // =========================
 // 正規化
 // =========================
 function normalizeItem(item) {
   const link = item.link || "";
-
   return {
     title: item.title,
     link,
@@ -181,33 +136,64 @@ function normalizeItem(item) {
 }
 
 // =========================
+// 保存用フィルタリング処理
+// =========================
+function processData(newItems) {
+  let existingItems = [];
+  try {
+    if (fs.existsSync(OUTPUT_PATH)) {
+      existingItems = JSON.parse(fs.readFileSync(OUTPUT_PATH, "utf-8"));
+    }
+  } catch (e) {
+    console.warn("既存データの読み込みに失敗しました。新規作成します。");
+  }
+
+  const map = new Map();
+  [...existingItems, ...newItems].forEach(item => {
+    if (!map.has(item.link)) map.set(item.link, item);
+  });
+  
+  const allItems = Array.from(map.values()).sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+  const finalData = [];
+  const addedAuthors = new Set();
+  const remainder = [];
+
+  for (const item of allItems) {
+    if (!addedAuthors.has(item.author) && finalData.length < MAX_ITEMS) {
+      finalData.push(item);
+      addedAuthors.add(item.author);
+    } else {
+      remainder.push(item);
+    }
+  }
+
+  for (const item of remainder) {
+    if (finalData.length >= MAX_ITEMS) break;
+    finalData.push(item);
+  }
+
+  return finalData;
+}
+
+// =========================
 // メイン
 // =========================
 async function main() {
   console.log("RSS取得開始");
 
   const results = await fetchAllRSS(RSS_LIST);
-
   let items = [];
-
   results.forEach(data => {
-    if (data?.items) {
-      items = items.concat(data.items);
-    }
+    if (data?.items) items = items.concat(data.items.map(normalizeItem));
   });
 
-  const normalized = items.map(normalizeItem);
-
-  normalized.sort((a, b) =>
-    new Date(b.pubDate) - new Date(a.pubDate)
-  );
-
-  const finalData = normalized.slice(0, MAX_ITEMS);
+  const finalData = processData(items);
 
   fs.mkdirSync("./data", { recursive: true });
   fs.writeFileSync(OUTPUT_PATH, JSON.stringify(finalData, null, 2));
 
-  console.log("完了:", finalData.length);
+  console.log("完了: 保存件数", finalData.length);
 }
 
 main();
