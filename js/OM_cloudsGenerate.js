@@ -12,7 +12,7 @@ const AREA_PROFILES = {
 const bbox = AREA_PROFILES.chiba;
 const step = bbox.step;
 const ZOOM = bbox.zoom;
-const MAX_POINTS_PER_REQUEST = 50; // API制限に合わせ、1リクエストあたりの地点数を制限
+const MAX_POINTS_PER_REQUEST = 100; // API制限に合わせ、1リクエストあたりの地点数を制限
 
 const precipitationLevels = [
   { min: 10.0, color: "rgba(255, 0, 0, 1.0)" },
