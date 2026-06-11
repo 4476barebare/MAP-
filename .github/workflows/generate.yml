@@ -1,51 +1,19 @@
-name: Generate Rain Images
+name: Generate Weather Maps
 
 on:
+  workflow_dispatch:   # 手動実行用
   schedule:
-    - cron: "0 */6 * * *"
-  workflow_dispatch:
+    - cron: '0 0 * * *' # 日本時間の9時に実行（UTC 0:00）
 
 jobs:
-  run:
+  generate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: リポジトリ取得
-        uses: actions/checkout@v4
-
-      - name: Nodeセットアップ（高速キャッシュ有効化）
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          # package-lock.jsonの代わりに、このpackage.jsonの変更を監視してキャッシュさせます
-          cache-dependency-path: "**/package.json"
-
-      - name: canvas依存インストール
+      - name: Trigger XREA Generation
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libcairo2-dev \
-            libpango1.0-dev \
-            libjpeg-dev \
-            libgif-dev \
-            librsvg2-dev
-
-      - name: npm install
-        # --prefer-offline でネット接続を最小限にし、キャッシュから一瞬で引き出します
-        run: npm install axios canvas --prefer-offline
-
-      - name: outputディレクトリ作成
-        run: mkdir -p output
-
-      - name: スクリプト実行
-        run: node js/OM_cloudsGenerate.js
-
-      - name: 変更をコミット
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
-          git add output/*.png || true
-          git commit -m "update rain images" || echo "no changes"
-          git push
+          # XREA上のPHPを叩いてバックグラウンドで画像生成を実行させる
+          # 必要に応じて、XREA側で設定したシークレットトークンを付与してください
+          curl -s "https://あなたのドメイン.xrea.com/generate.php"
+          
+          echo "Generation triggered successfully."
