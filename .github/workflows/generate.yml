@@ -14,6 +14,6 @@ jobs:
         run: |
           # XREA上のPHPを叩いてバックグラウンドで画像生成を実行させる
           # 必要に応じて、XREA側で設定したシークレットトークンを付与してください
-          curl -s "https://あなたのドメイン.xrea.com/generate.php"
+          curl -s "https://turiiko.shop/cloudGenerator/generate.php"
           
           echo "Generation triggered successfully."
