@@ -42,31 +42,35 @@ function generatePoints() {
 
 // ===== メイン =====
 (async () => {
-  // 現在の日本時間（JST）を厳密に取得
   const now = new Date();
   const jstOffset = 9 * 60 * 60 * 1000;
   const jstNow = new Date(now.getTime() + jstOffset);
   
-  // +4時間後のJST基準でフェーズ判定
-  const startTargetJst = new Date(jstNow.getTime() + 4 * 60 * 60 * 1000);
-  const nextBase = (startTargetJst.getUTCHours() >= 9 && startTargetJst.getUTCHours() < 21) ? 21 : 9;
-  const targetJstHours = [nextBase, nextBase + 3, nextBase + 6, nextBase + 9];
+  // 次の基準時間を決定 (現在の時間が9時未満なら9時、9〜21時なら21時、21時以降なら翌日9時)
+  const currentHour = jstNow.getUTCHours();
+  let nextBase = (currentHour >= 9 && currentHour < 21) ? 21 : 9;
+  
+  // 基準時間が現在より過去なら翌日にする
+  let baseDate = new Date(jstNow);
+  baseDate.setUTCHours(nextBase, 0, 0, 0);
+  if (baseDate <= jstNow) {
+    baseDate.setUTCDate(baseDate.getUTCDate() + 1);
+  }
 
-  console.log(`【本番実行】現在(JST): ${jstNow.toISOString().replace('T', ' ').slice(0, 16)}。次フェーズ(${nextBase}時)の4枚を生成します`);
+  console.log(`【本番実行】現在(JST): ${jstNow.toISOString().replace('T', ' ').slice(0, 16)}。${baseDate.toISOString().slice(0, 10)} ${nextBase}時からの4枚を生成します`);
 
   const points = generatePoints();
   
-  for (const jstHour of targetJstHours) {
-    // 日本時間基準のターゲット日時を「年月日時」から組み立てる
-    const targetJst = new Date(jstNow);
-    targetJst.setUTCHours(jstHour, 0, 0, 0); // JST基準なのでUTCメソッドでセット
-    if (jstHour >= 24) targetJst.setUTCDate(targetJst.getUTCDate() + Math.floor(jstHour / 24));
+  for (let i = 0; i < 4; i++) {
+    // 3時間ずつ加算（24時、27時、30時と進む）
+    const targetJst = new Date(baseDate);
+    targetJst.setUTCHours(nextBase + (i * 3));
 
-    // API送信用：日本時間から9時間引いたUTC時間を生成
+    // API送信用：日本時間から9時間引いたUTC時間
     const utcTime = new Date(targetJst.getTime() - jstOffset);
     const utcISO = utcTime.toISOString().slice(0, 13);
     
-    // ファイル名用：JSTをそのまま文字列化（今日の日付を保持）
+    // ファイル名用：自動的に翌日などを反映した日付を取得
     const datePart = targetJst.toISOString().slice(0, 10);
     const hourPart = String(targetJst.getUTCHours()).padStart(2, '0');
     
@@ -79,7 +83,7 @@ function generatePoints() {
           latitude: points.map(p => p.lat).join(","),
           longitude: points.map(p => p.lon).join(","),
           hourly: "precipitation",
-          forecast_days: 3,
+          forecast_days: 7, // 日付またぎに対応するため余裕を持つ
           timezone: "UTC"
         }
       });
@@ -95,7 +99,6 @@ function generatePoints() {
         if (rain >= 0.1) gridData.push({ ...p, rain });
       }
 
-      // 描画処理
       const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
       const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
       const outWidth = Math.ceil(pMin.x - pMax.x) + 10;
@@ -105,7 +108,6 @@ function generatePoints() {
 
       const finalCanvas = createCanvas(outWidth, outHeight);
       const ctx = finalCanvas.getContext("2d");
-      ctx.lineWidth = 0;
 
       for (const item of gridData) {
         const level = precipitationLevels.find(l => item.rain >= l.min);
