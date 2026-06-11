@@ -12,6 +12,7 @@ const AREA_PROFILES = {
 const bbox = AREA_PROFILES.chiba;
 const step = bbox.step;
 const ZOOM = bbox.zoom;
+const MAX_POINTS_PER_REQUEST = 50; // API制限に合わせ、1リクエストあたりの地点数を制限
 
 const precipitationLevels = [
   { min: 10.0, color: "rgba(255, 0, 0, 1.0)" },
@@ -40,92 +41,100 @@ function generatePoints() {
   return points;
 }
 
+const chunkArray = (array, size) => {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += size) {
+    chunks.push(array.slice(i, i + size));
+  }
+  return chunks;
+};
+
 // ===== メイン =====
 (async () => {
   const now = new Date();
   const jstOffset = 9 * 60 * 60 * 1000;
   const jstNow = new Date(now.getTime() + jstOffset);
   
-  // 次の基準時間を決定 (現在の時間が9時未満なら9時、9〜21時なら21時、21時以降なら翌日9時)
   const currentHour = jstNow.getUTCHours();
   let nextBase = (currentHour >= 9 && currentHour < 21) ? 21 : 9;
   
-  // 基準時間が現在より過去なら翌日にする
   let baseDate = new Date(jstNow);
   baseDate.setUTCHours(nextBase, 0, 0, 0);
   if (baseDate <= jstNow) {
     baseDate.setUTCDate(baseDate.getUTCDate() + 1);
   }
 
-  console.log(`【本番実行】現在(JST): ${jstNow.toISOString().replace('T', ' ').slice(0, 16)}。${baseDate.toISOString().slice(0, 10)} ${nextBase}時からの4枚を生成します`);
-
-  const points = generatePoints();
+  const allPoints = generatePoints();
+  const pointGroups = chunkArray(allPoints, MAX_POINTS_PER_REQUEST);
   
+  console.log(`【本番実行】${allPoints.length}地点を${pointGroups.length}グループに分割して処理します。`);
+
   for (let i = 0; i < 4; i++) {
-    // 3時間ずつ加算（24時、27時、30時と進む）
     const targetJst = new Date(baseDate);
     targetJst.setUTCHours(nextBase + (i * 3));
 
-    // API送信用：日本時間から9時間引いたUTC時間
     const utcTime = new Date(targetJst.getTime() - jstOffset);
     const utcISO = utcTime.toISOString().slice(0, 13);
-    
-    // ファイル名用：自動的に翌日などを反映した日付を取得
     const datePart = targetJst.toISOString().slice(0, 10);
     const hourPart = String(targetJst.getUTCHours()).padStart(2, '0');
     
-    console.log(`-> 生成中: JST ${datePart} ${hourPart}時 (API指定: ${utcISO}:00)`);
+    console.log(`-> 生成中: JST ${datePart} ${hourPart}時`);
 
-    try {
-      const url = "https://api.open-meteo.com/v1/forecast";
-      const { data } = await axios.get(url, {
-        params: {
-          latitude: points.map(p => p.lat).join(","),
-          longitude: points.map(p => p.lon).join(","),
-          hourly: "precipitation",
-          forecast_days: 7, // 日付またぎに対応するため余裕を持つ
-          timezone: "UTC"
-        }
-      });
+    const gridData = [];
 
-      const gridData = [];
-      const results = Array.isArray(data) ? data : [data];
-      
-      for (let i = 0; i < points.length; i++) {
-        const p = points[i];
-        const res = results[i] || results[0];
-        const idx = res.hourly.time.findIndex(t => t.startsWith(utcISO));
-        const rain = res.hourly.precipitation[idx] ?? 0;
-        if (rain >= 0.1) gridData.push({ ...p, rain });
+    // グループごとにリクエストを実行
+    for (const group of pointGroups) {
+      try {
+        const { data } = await axios.get("https://api.open-meteo.com/v1/forecast", {
+          params: {
+            latitude: group.map(p => p.lat).join(","),
+            longitude: group.map(p => p.lon).join(","),
+            hourly: "precipitation",
+            forecast_days: 7,
+            timezone: "UTC"
+          }
+        });
+
+        // 戻り値が配列なら各地点にマッピング、単一オブジェクトならそのまま処理
+        const results = Array.isArray(data) ? data : [data];
+        
+        group.forEach((p, idx) => {
+          const res = results[idx] || results[0];
+          const timeIdx = res.hourly.time.findIndex(t => t.startsWith(utcISO));
+          const rain = res.hourly.precipitation[timeIdx] ?? 0;
+          if (rain >= 0.1) gridData.push({ ...p, rain });
+        });
+        
+        await sleep(1000); // APIレート制限対策
+      } catch (e) {
+        console.error(`   グループ取得エラー:`, e.message);
       }
-
-      const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
-      const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
-      const outWidth = Math.ceil(pMin.x - pMax.x) + 10;
-      const outHeight = Math.ceil(pMin.y - pMax.y) + 10;
-      const blockWidth = outWidth / Math.round((bbox.lonMax - bbox.lonMin) / step);
-      const blockHeight = outHeight / Math.round((bbox.latMax - bbox.latMin) / step);
-
-      const finalCanvas = createCanvas(outWidth, outHeight);
-      const ctx = finalCanvas.getContext("2d");
-
-      for (const item of gridData) {
-        const level = precipitationLevels.find(l => item.rain >= l.min);
-        if (!level) continue;
-        const xIdx = Math.round((item.lon - bbox.lonMin) / step);
-        const yIdx = Math.round((bbox.latMax - item.lat) / step);
-        ctx.fillStyle = level.color;
-        ctx.fillRect(Math.round(xIdx * blockWidth), Math.round(yIdx * blockHeight), Math.ceil(blockWidth) + 1, Math.ceil(blockHeight) + 1);
-      }
-
-      const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
-      fs.mkdirSync("./output", { recursive: true });
-      fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
-      
-      console.log(`   書き出し成功: ${filename}`);
-      await sleep(3000); 
-    } catch (e) {
-      console.error(`エラー (${hourPart}時):`, e.message);
     }
+
+    // 描画処理
+    const pMax = latLonToPixel(bbox.latMax, bbox.lonMin, ZOOM);
+    const pMin = latLonToPixel(bbox.latMin, bbox.lonMax, ZOOM);
+    const outWidth = Math.ceil(pMin.x - pMax.x) + 10;
+    const outHeight = Math.ceil(pMin.y - pMax.y) + 10;
+    const blockWidth = outWidth / Math.round((bbox.lonMax - bbox.lonMin) / step);
+    const blockHeight = outHeight / Math.round((bbox.latMax - bbox.latMin) / step);
+
+    const finalCanvas = createCanvas(outWidth, outHeight);
+    const ctx = finalCanvas.getContext("2d");
+
+    for (const item of gridData) {
+      const level = precipitationLevels.find(l => item.rain >= l.min);
+      if (!level) continue;
+      const xIdx = Math.round((item.lon - bbox.lonMin) / step);
+      const yIdx = Math.round((bbox.latMax - item.lat) / step);
+      ctx.fillStyle = level.color;
+      ctx.fillRect(Math.round(xIdx * blockWidth), Math.round(yIdx * blockHeight), Math.ceil(blockWidth) + 1, Math.ceil(blockHeight) + 1);
+    }
+
+    const filename = `./output/${bbox.prefname}_${datePart}_${hourPart}h.png`;
+    fs.mkdirSync("./output", { recursive: true });
+    fs.writeFileSync(filename, finalCanvas.toBuffer("image/png"));
+    
+    console.log(`   書き出し成功: ${filename}`);
   }
 })();
