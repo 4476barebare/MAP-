@@ -6,13 +6,21 @@ import { createCanvas } from "canvas";
 // 👑 エリア別プロファイル定義
 // ==========================================
 const AREA_PROFILES = {
-  chiba: { prefname: "CHIBA", latMin: 34.7, latMax: 36.0, lonMin: 139.6, lonMax: 141.1, step: 0.1, zoom: 9 }
+  chiba: {
+      prefname: "CHIBA",
+      latMin: 34.7,
+      latMax: 36.0,
+      lonMin: 139.6,
+      lonMax: 141.1,
+      step: 0.2,
+      zoom: 9
+  }
 };
 
 const bbox = AREA_PROFILES.chiba;
 const step = bbox.step;
 const ZOOM = bbox.zoom;
-const MAX_POINTS_PER_REQUEST = 100; // API制限に合わせ、1リクエストあたりの地点数を制限
+const MAX_POINTS_PER_REQUEST = 50; // API制限に合わせ、1リクエストあたりの地点数を制限
 
 const precipitationLevels = [
   { min: 10.0, color: "rgba(255, 0, 0, 1.0)" },
