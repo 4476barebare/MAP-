@@ -12,7 +12,7 @@ const AREA_PROFILES = {
       latMax: 36.0,
       lonMin: 139.6,
       lonMax: 141.1,
-      step: 0.2,
+      step: 0.15,
       zoom: 9
   }
 };
