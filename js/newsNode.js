@@ -11,6 +11,7 @@ const RSS_LIST = [
   "https://www.youtube.com/feeds/videos.xml?user=yoorai0121",
   "https://www.youtube.com/feeds/videos.xml?channel_id=UCwmAyvxNTirU4uaDxwoveDA",
   "https://bunbun-fishing.com/feed/",
+  "https://tsurigu-np.jp/feed/",
   "https://tsurinews.jp/feed/",
   "https://castingnet.jp/sp/news/rss.php"
 ];
