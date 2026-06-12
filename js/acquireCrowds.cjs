@@ -6,14 +6,20 @@ const BASE_URL = "https://turiiko.shop";
 const LOG_URL = "https://turiiko.shop/cloudGenerator/run_log.txt";
 const FETCHED_LOG = "fetched_log.txt";
 
+// ★ グローバルに出す（cleanupでも使う）
+const outDir = path.join(__dirname, "crowdsimg");
+
+// ==========================================
+// メイン取得処理
+// ==========================================
 async function main() {
-  // XREAログ取得
+  // ログ取得
   const res = await fetch(LOG_URL);
   const text = await res.text();
 
   const lines = text.trim().split("\n");
 
-  // ログをパース（time, path）
+  // パース
   const logs = lines.map(line => {
     const [time, filePath] = line.split(",");
     return { time, filePath, raw: line };
@@ -28,15 +34,14 @@ async function main() {
     });
   }
 
-  // 保存先
-  const outDir = path.join(__dirname, "crowdsimg");
+  // 保存先作成
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir);
   }
 
   let newFetched = [];
 
-  // 新しい順に処理（無駄なアクセス減らす）
+  // 新しい順
   const sorted = logs
     .filter(l => l.filePath && !l.filePath.includes("ERROR"))
     .map(l => ({
@@ -46,7 +51,7 @@ async function main() {
     .sort((a, b) => b.date - a.date);
 
   for (const log of sorted) {
-    if (fetched.has(log.raw)) continue; // 既取得スキップ
+    if (fetched.has(log.raw)) continue;
 
     const url = BASE_URL + log.filePath;
     const fileName = path.basename(log.filePath);
@@ -71,10 +76,79 @@ async function main() {
     }
   }
 
-  // 取得ログ更新（追記）
+  // ログ追記
   if (newFetched.length > 0) {
     fs.appendFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
   }
 }
 
-main();
+// ==========================================
+// クリーンアップ（過去ブロック削除）
+// ==========================================
+function cleanup() {
+
+  const now = new Date();
+
+  // 現在時刻を「時」で丸める
+  const currentBlock = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours(),
+    0, 0
+  );
+
+  // fetched_log読み込み
+  let fetchedLines = [];
+  if (fs.existsSync(FETCHED_LOG)) {
+    fetchedLines = fs.readFileSync(FETCHED_LOG, "utf-8")
+      .split("\n")
+      .filter(l => l.trim());
+  }
+
+  let newFetched = [];
+
+  for (const line of fetchedLines) {
+
+    const parts = line.split(",");
+    if (parts.length < 2) continue;
+
+    const filePath = parts[1];
+    const fileName = path.basename(filePath);
+
+    // ファイル名から日時抽出
+    const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
+    if (!m) continue;
+
+    const dateStr = m[1];
+    const hour = parseInt(m[2], 10);
+
+    // ★ ローカル時間で確実に生成
+    const [y, mo, d] = dateStr.split("-").map(Number);
+    const fileTime = new Date(y, mo - 1, d, hour, 0, 0);
+
+    const localPath = path.join(outDir, fileName);
+
+    if (fileTime < currentBlock) {
+      // 過去ブロック → 削除
+      if (fs.existsSync(localPath)) {
+        fs.unlinkSync(localPath);
+        console.log("delete:", fileName);
+      }
+    } else {
+      // 残す
+      newFetched.push(line);
+    }
+  }
+
+  // fetched_logを再構築
+  fs.writeFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
+}
+
+// ==========================================
+// 実行
+// ==========================================
+(async () => {
+  await main();   // ★ 先に取得を確実に終わらせる
+  cleanup();      // ★ その後クリーンアップ
+})();
