@@ -29,7 +29,7 @@ async function main() {
   }
 
   // 保存先
-  const outDir = path.join(__dirname, "output");
+  const outDir = path.join(__dirname, "crowdsimg");
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir);
   }
