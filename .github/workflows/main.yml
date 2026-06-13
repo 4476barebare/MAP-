@@ -4,8 +4,8 @@ on:
   workflow_dispatch:   # 手動実行用
   schedule:
     - cron: '0 16 * * *'
-    - cron: '0 17 * * *' # 1:00 JST（テスト後そのまま運用可）
-    - cron: '0 18 * * *'
+    - cron: '5 16 * * *' # 1:00 JST（テスト後そのまま運用可）
+    - cron: '10 16 * * *'
 jobs:
   fetch:
     runs-on: ubuntu-latest
