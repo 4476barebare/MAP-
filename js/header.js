@@ -141,6 +141,8 @@ function loadNews() {
       return res.json();
     })
     .then(items => {
+// ★ ここにソートの一文を追加
+      items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 
       if (!Array.isArray(items) || items.length === 0) {
         newsList.innerHTML = "記事がありません";
