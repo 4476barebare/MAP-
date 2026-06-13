@@ -3,8 +3,8 @@ name: KANTO Whether Control
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 18 * * *"  # JST 03:00 相当（UTC基準）
-    - cron: "30 18 * * *" # 03:30
+    - cron: "0 16 * * *"  # JST 03:00 相当（UTC基準）
+    - cron: "30 16 * * *" # 03:30
 
 jobs:
   run:
