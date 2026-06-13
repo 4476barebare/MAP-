@@ -1,4 +1,4 @@
-// acquireCrowds.js
+// acquireCrowds.cjs
 const fs = require("fs");
 const path = require("path");
 
@@ -19,10 +19,11 @@ async function main() {
 
   const lines = text.trim().split("\n");
 
-  // パース
+  // パース（新しい形式: prefname,latMax,lonMin,zoom,filePath に対応）
   const logs = lines.map(line => {
-    const [time, filePath] = line.split(",");
-    return { time, filePath, raw: line };
+    const parts = line.split(",");
+    const filePath = parts[4]; // インデックス4がファイルパス
+    return { filePath, raw: line };
   });
 
   // 取得済みログ読み込み
@@ -41,13 +42,15 @@ async function main() {
 
   let newFetched = [];
 
-  // 新しい順
+  // ファイル名から日付を抽出してソートする
   const sorted = logs
     .filter(l => l.filePath && !l.filePath.includes("ERROR"))
-    .map(l => ({
-      ...l,
-      date: new Date(l.time)
-    }))
+    .map(l => {
+      const fileName = path.basename(l.filePath);
+      const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
+      const date = m ? new Date(m[1].replace(/-/g, '/') + ' ' + m[2] + ':00:00') : new Date(0);
+      return { ...l, date };
+    })
     .sort((a, b) => b.date - a.date);
 
   for (const log of sorted) {
@@ -86,7 +89,6 @@ async function main() {
 // クリーンアップ（過去ブロック削除）
 // ==========================================
 function cleanup() {
-
   const now = new Date();
 
   // 現在時刻を「時」で丸める
@@ -109,11 +111,10 @@ function cleanup() {
   let newFetched = [];
 
   for (const line of fetchedLines) {
-
     const parts = line.split(",");
-    if (parts.length < 2) continue;
+    if (parts.length < 5) continue; // 5項目あることを確認
 
-    const filePath = parts[1];
+    const filePath = parts[4]; // 4番目のインデックスにファイルパス
     const fileName = path.basename(filePath);
 
     // ファイル名から日時抽出
