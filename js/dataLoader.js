@@ -2224,10 +2224,10 @@ requestAnimationFrame(() => {
     initAreaUI();
     showPrefSpots();
     renderPrefWeather();
-    resetAreaGuide();
     renderCrowdImage();
+    resetAreaGuide();
     
-
+    
 });
 }
 
