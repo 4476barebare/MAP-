@@ -685,20 +685,20 @@ function toWeatherIcon(code) {
 
 function renderCrowdImage() {
 
+    // 既存を完全に消す
+    removeCrowdImage();
+
     fetch("js/fetched_log.txt")
         .then(res => res.text())
         .then(text => {
 
             const lines = text.trim().split("\n");
 
-            // ===== JST現在時刻 =====
             const now = new Date();
             const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
 
             const hour = nowJST.getHours();
-
-            // ===== 3時間スロット =====
-            const slots = [0, 3, 6, 9, 12, 15, 18, 21];
+            const slots = [0,3,6,9,12,15,18,21];
 
             let targetHour = slots.find(h => h > hour);
             let targetDate = new Date(nowJST);
@@ -708,19 +708,13 @@ function renderCrowdImage() {
                 targetDate.setDate(targetDate.getDate() + 1);
             }
 
-            function formatDateJST(date) {
-                const y = date.getFullYear();
-                const m = String(date.getMonth() + 1).padStart(2, "0");
-                const d = String(date.getDate()).padStart(2, "0");
-                return `${y}-${m}-${d}`;
-            }
+            const y = targetDate.getFullYear();
+            const m = String(targetDate.getMonth()+1).padStart(2,"0");
+            const d = String(targetDate.getDate()).padStart(2,"0");
 
-            const dateStr = formatDateJST(targetDate);
-            const hourStr = String(targetHour).padStart(2, "0");
-
+            const dateStr = `${y}-${m}-${d}`;
+            const hourStr = String(targetHour).padStart(2,"0");
             const targetKey = "_" + dateStr + "_" + hourStr + "h";
-
-            
 
             let best = null;
 
@@ -731,17 +725,12 @@ function renderCrowdImage() {
                 const parts = line.split(",");
                 if (parts.length < 5) continue;
 
-                const pref = parts[0];
-                if (pref !== window.currentPref) continue;
+                if (parts[0] !== window.currentPref) continue;
 
                 const lat = parseFloat(parts[1]);
                 const lng = parseFloat(parts[2]);
-                const baseZoom = parseInt(parts[3], 10); // ★ここ重要
-                const serverPath = parts[4];
-
-                const fileName = serverPath.split("/").pop();
-
-            
+                const baseZoom = parseInt(parts[3],10);
+                const fileName = parts[4].split("/").pop();
 
                 if (fileName.includes(targetKey)) {
                     best = { lat, lng, fileName, baseZoom };
@@ -749,75 +738,60 @@ function renderCrowdImage() {
                 }
             }
 
-            if (!best) {
-                
-                return;
-            }
+            if (!best) return;
 
             const imageUrl = "js/crowdsimg/" + best.fileName;
 
-            
-
-            // ===== サイズ計算関数 =====
             function calcSize() {
-                const currentZoom = window.map.getZoom();
-
-                const scale = Math.pow(2, currentZoom - best.baseZoom);
-
-                const baseSize = 512; // ★生成時サイズ
-                return baseSize * scale;
+                const z = window.map.getZoom();
+                return 512 * Math.pow(2, z - best.baseZoom);
             }
 
-            // ===== 既存削除 =====
-            if (window.crowdLayer) {
-                window.map.removeLayer(window.crowdLayer);
-            }
-
-            // ===== 初期サイズ =====
-            let size = calcSize();
-
+            // 初期生成
             const icon = L.icon({
                 iconUrl: imageUrl,
-                iconSize: [size, size],
-                iconAnchor: [0, 0],
+                iconSize: [calcSize(), calcSize()],
+                iconAnchor: [0,0],
                 className: "crowd-img-icon"
             });
 
-            window.crowdLayer = L.marker(
-                [best.lat, best.lng],
-                {
-                    icon,
-                    zIndexOffset: 10000
-                }
-            ).addTo(window.map);
+            window.crowdLayer = L.marker([best.lat, best.lng], {
+                icon,
+                zIndexOffset: 10000
+            }).addTo(window.map);
 
-            // ===== ズーム追従 =====
-            window.map.on("zoomend", function () {
+            // ★ handlerを保存
+            window.crowdZoomHandler = function() {
 
-                const newSize = calcSize();
+                if (!window.crowdLayer) return;
+
+                const size = calcSize();
 
                 const newIcon = L.icon({
                     iconUrl: imageUrl,
-                    iconSize: [newSize, newSize],
-                    iconAnchor: [0, 0],
+                    iconSize: [size, size],
+                    iconAnchor: [0,0],
                     className: "crowd-img-icon"
                 });
 
                 window.crowdLayer.setIcon(newIcon);
-            });
+            };
 
+            window.map.on("zoomend", window.crowdZoomHandler);
         });
 }
 
 function removeCrowdImage() {
 
-    if (!window.crowdLayer) return;
+    if (window.crowdLayer) {
+        window.map.removeLayer(window.crowdLayer);
+        window.crowdLayer = null;
+    }
 
-    // マップから削除
-    window.map.removeLayer(window.crowdLayer);
-
-    // 参照クリア
-    window.crowdLayer = null;
+    if (window.crowdZoomHandler) {
+        window.map.off("zoomend", window.crowdZoomHandler);
+        window.crowdZoomHandler = null;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
