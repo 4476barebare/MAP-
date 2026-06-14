@@ -685,22 +685,19 @@ function toWeatherIcon(code) {
 
 function renderCrowdImage() {
 
-    alert("renderCrowdImage start");
-
     fetch("js/fetched_log.txt")
         .then(res => res.text())
         .then(text => {
 
-            alert("log loaded");
-
             const lines = text.trim().split("\n");
 
+            // JST現在時刻
             const now = new Date();
-            const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-            const todayStr = jst.toISOString().slice(0, 10);
+            const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+            const currentHour = nowJST.getHours();
 
-            let best = null;
-            let minDiff = Infinity;
+            // ★ 時間スロット辞書
+            const slots = {};
 
             lines.forEach(line => {
 
@@ -708,7 +705,6 @@ function renderCrowdImage() {
                 if (parts.length < 5) return;
 
                 const pref = parts[0];
-
                 if (pref !== window.currentPref) return;
 
                 const lat = parseFloat(parts[1]);
@@ -717,29 +713,31 @@ function renderCrowdImage() {
 
                 const fileName = serverPath.split("/").pop();
 
-                alert("file: " + fileName);
-
                 const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h/);
                 if (!m) return;
 
-                const dateStr = m[1];
                 const hour = parseInt(m[2], 10);
 
-                if (dateStr !== todayStr) return;
-
-                const target = new Date(dateStr + "T00:00:00+09:00");
-                target.setHours(hour);
-
-                const diff = target - now;
-
-                if (diff >= 0 && diff < minDiff) {
-                    minDiff = diff;
-                    best = { lat, lng, fileName };
-                }
+                // 同じhourが複数あっても最後でOK
+                slots[hour] = {
+                    lat,
+                    lng,
+                    fileName
+                };
             });
 
+            // ★ 未来スロット検索
+            let best = null;
+
+            for (let h = currentHour + 1; h < 24; h++) {
+                if (slots[h]) {
+                    best = slots[h];
+                    break;
+                }
+            }
+
             if (!best) {
-                alert("no match");
+                alert("no future slot");
                 return;
             }
 
@@ -747,7 +745,6 @@ function renderCrowdImage() {
 
             alert("use: " + imageUrl);
 
-            // 既存削除
             if (window.crowdLayer) {
                 window.map.removeLayer(window.crowdLayer);
             }
@@ -763,11 +760,10 @@ function renderCrowdImage() {
                 [best.lat, best.lng],
                 {
                     icon,
-                    zIndexOffset: 10000   // ← 重要
+                    zIndexOffset: 10000
                 }
             ).addTo(window.map);
 
-            alert("marker added");
         });
 }
 
