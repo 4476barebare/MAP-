@@ -407,6 +407,7 @@ function prefetchAround(area) {
 
 
 function selectArea(area) {
+    removeCrowdImage();
 
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
@@ -458,6 +459,8 @@ function selectArea(area) {
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
+                
+        renderCrowdImage();
             });
         });
     });
@@ -726,6 +729,7 @@ function createMenuItem(s) {
 }
 
 function selectSpot(spot) {
+    removeCrowdImage();
 
     const currentZoom = window.map.getZoom();
 
@@ -2132,6 +2136,7 @@ function goBack() {
         selectSpot(restoreSpot);
         enablePhase2(window.map);
         phase1menu(window.currentAreaId);
+        
 
         return;
     }
@@ -2202,6 +2207,7 @@ function goBack() {
 
 // ② 1フレーム待つ
 requestAnimationFrame(() => {
+    removeCrowdImage();
 
     // ③ サイズ確定後に通知
     window.map.invalidateSize(true);
@@ -2219,6 +2225,8 @@ requestAnimationFrame(() => {
     showPrefSpots();
     renderPrefWeather();
     resetAreaGuide();
+    renderCrowdImage();
+    
 
 });
 }
