@@ -691,15 +691,38 @@ function renderCrowdImage() {
 
             const lines = text.trim().split("\n");
 
-            // JST現在時刻
+            // ===== JST現在時刻 =====
             const now = new Date();
             const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-            const currentHour = nowJST.getHours();
 
-            // ★ 時間スロット辞書
-            const slots = {};
+            let hour = nowJST.getHours();
+
+            // ===== 次の3時間スロットに切り上げ =====
+            let targetHour = Math.ceil((hour + 1) / 3) * 3;
+
+            let targetDate = new Date(nowJST);
+
+            // 24時 → 翌日0時
+            if (targetHour >= 24) {
+                targetHour = 0;
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+
+            // YYYY-MM-DD
+            const dateStr = targetDate.toISOString().slice(0, 10);
+
+            // "00", "03", ...
+            const hourStr = String(targetHour).padStart(2, "0");
+
+            // 検索キー
+            const targetKey = "_" + dateStr + "_" + hourStr + "h";
+
+            // ===== ログから1件取得 =====
+            let best = null;
 
             lines.forEach(line => {
+
+                if (!line) return;
 
                 const parts = line.split(",");
                 if (parts.length < 5) return;
@@ -713,31 +736,13 @@ function renderCrowdImage() {
 
                 const fileName = serverPath.split("/").pop();
 
-                const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h/);
-                if (!m) return;
-
-                const hour = parseInt(m[2], 10);
-
-                // 同じhourが複数あっても最後でOK
-                slots[hour] = {
-                    lat,
-                    lng,
-                    fileName
-                };
+                if (fileName.includes(targetKey)) {
+                    best = { lat, lng, fileName };
+                }
             });
 
-            // ★ 未来スロット検索
-            let best = null;
-
-            for (let h = currentHour + 1; h < 24; h++) {
-                if (slots[h]) {
-                    best = slots[h];
-                    break;
-                }
-            }
-
             if (!best) {
-                alert("no future slot");
+                alert("no match: " + targetKey);
                 return;
             }
 
@@ -745,10 +750,12 @@ function renderCrowdImage() {
 
             alert("use: " + imageUrl);
 
+            // 既存削除
             if (window.crowdLayer) {
                 window.map.removeLayer(window.crowdLayer);
             }
 
+            // アイコン生成
             const icon = L.icon({
                 iconUrl: imageUrl,
                 iconSize: [512, 512],
@@ -756,6 +763,7 @@ function renderCrowdImage() {
                 className: "crowd-img-icon"
             });
 
+            // マーカーとして固定表示
             window.crowdLayer = L.marker(
                 [best.lat, best.lng],
                 {
