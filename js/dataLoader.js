@@ -2093,8 +2093,7 @@ function goBack() {
     if (!area) return;
 
     const z = window.map.getZoom();
-    removeCrowdImage();
-
+    
     // =====================================================
     // ① phase2 → phase1（z >= 14）
     // =====================================================
@@ -2205,7 +2204,7 @@ function goBack() {
     }
     document.getElementById('map-back-btn').style.display = 'none';
 
-
+removeCrowdImage();
 // ② 1フレーム待つ
 requestAnimationFrame(() => {
     
