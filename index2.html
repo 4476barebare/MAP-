@@ -703,13 +703,11 @@ function renderCrowdImage() {
             let targetHour = slots.find(h => h > hour);
             let targetDate = new Date(nowJST);
 
-            // 21時以降 → 翌日0時
             if (targetHour === undefined) {
                 targetHour = 0;
                 targetDate.setDate(targetDate.getDate() + 1);
             }
 
-            // ===== JST日付フォーマット（UTC使わない） =====
             function formatDateJST(date) {
                 const y = date.getFullYear();
                 const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -722,9 +720,8 @@ function renderCrowdImage() {
 
             const targetKey = "_" + dateStr + "_" + hourStr + "h";
 
-            alert("targetKey: " + targetKey);
+            
 
-            // ===== ログから一致を探す =====
             let best = null;
 
             for (let line of lines) {
@@ -739,42 +736,53 @@ function renderCrowdImage() {
 
                 const lat = parseFloat(parts[1]);
                 const lng = parseFloat(parts[2]);
+                const baseZoom = parseInt(parts[3], 10); // ★ここ重要
                 const serverPath = parts[4];
 
                 const fileName = serverPath.split("/").pop();
 
-                // デバッグ
-                alert("check: " + fileName);
+            
 
                 if (fileName.includes(targetKey)) {
-                    best = { lat, lng, fileName };
+                    best = { lat, lng, fileName, baseZoom };
                     break;
                 }
             }
 
             if (!best) {
-                alert("no match: " + targetKey);
+                
                 return;
             }
 
             const imageUrl = "js/crowdsimg/" + best.fileName;
 
-            alert("use: " + imageUrl);
+            
+
+            // ===== サイズ計算関数 =====
+            function calcSize() {
+                const currentZoom = window.map.getZoom();
+
+                const scale = Math.pow(2, currentZoom - best.baseZoom);
+
+                const baseSize = 512; // ★生成時サイズ
+                return baseSize * scale;
+            }
 
             // ===== 既存削除 =====
             if (window.crowdLayer) {
                 window.map.removeLayer(window.crowdLayer);
             }
 
-            // ===== アイコン生成 =====
+            // ===== 初期サイズ =====
+            let size = calcSize();
+
             const icon = L.icon({
                 iconUrl: imageUrl,
-                iconSize: [512, 512],
+                iconSize: [size, size],
                 iconAnchor: [0, 0],
                 className: "crowd-img-icon"
             });
 
-            // ===== マーカー表示 =====
             window.crowdLayer = L.marker(
                 [best.lat, best.lng],
                 {
@@ -783,7 +791,35 @@ function renderCrowdImage() {
                 }
             ).addTo(window.map);
 
+            // ===== ズーム追従 =====
+            window.map.on("zoomend", function () {
+
+                const newSize = calcSize();
+
+                const newIcon = L.icon({
+                    iconUrl: imageUrl,
+                    iconSize: [newSize, newSize],
+                    iconAnchor: [0, 0],
+                    className: "crowd-img-icon"
+                });
+
+                window.crowdLayer.setIcon(newIcon);
+            });
+
         });
+}
+
+function removeCrowdImage() {
+
+    if (!window.crowdLayer) return;
+
+    window.map.removeLayer(window.crowdLayer);
+    window.crowdLayer = null;
+
+    if (window.crowdZoomHandler) {
+        window.map.off("zoomend", window.crowdZoomHandler);
+        window.crowdZoomHandler = null;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -810,6 +846,7 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
         renderAreaGuide();
         window.markerControl.preloadShop01(shopUrl);
         renderPrefWeather();
+        removeCrowdImage();
         renderCrowdImage();
 
 getAlertText(window.prefData, function(result) {
