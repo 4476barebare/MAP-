@@ -2211,6 +2211,7 @@ requestAnimationFrame(() => {
 
     // ③ サイズ確定後に通知
     window.map.invalidateSize(true);
+    removeCrowdImage();
 
     // ④ その後に移動
     drawLocation(
