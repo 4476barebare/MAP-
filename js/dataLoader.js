@@ -2093,6 +2093,7 @@ function goBack() {
     if (!area) return;
 
     const z = window.map.getZoom();
+    removeCrowdImage();
 
     // =====================================================
     // ① phase2 → phase1（z >= 14）
@@ -2193,7 +2194,7 @@ function goBack() {
     // =====================================================
     // ③ prefへ戻る（z <= 12）
     // =====================================================
-    removeCrowdImage();
+
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
