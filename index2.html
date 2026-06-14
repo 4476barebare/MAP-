@@ -685,15 +685,17 @@ function toWeatherIcon(code) {
 
 function renderCrowdImage() {
 
+    alert("renderCrowdImage start");
+
     fetch("js/fetched_log.txt")
         .then(res => res.text())
         .then(text => {
 
+            alert("log loaded");
+
             const lines = text.trim().split("\n");
 
             const now = new Date();
-
-            // JST日付
             const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
             const todayStr = jst.toISOString().slice(0, 10);
 
@@ -702,12 +704,11 @@ function renderCrowdImage() {
 
             lines.forEach(line => {
 
-                if (!line) return;
-
                 const parts = line.split(",");
                 if (parts.length < 5) return;
 
                 const pref = parts[0];
+
                 if (pref !== window.currentPref) return;
 
                 const lat = parseFloat(parts[1]);
@@ -715,6 +716,8 @@ function renderCrowdImage() {
                 const serverPath = parts[4];
 
                 const fileName = serverPath.split("/").pop();
+
+                alert("file: " + fileName);
 
                 const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h/);
                 if (!m) return;
@@ -735,11 +738,16 @@ function renderCrowdImage() {
                 }
             });
 
-            if (!best) return;
+            if (!best) {
+                alert("no match");
+                return;
+            }
 
-            const imageUrl = `js/crowdsimg/${best.fileName}`;
+            const imageUrl = "js/crowdsimg/" + best.fileName;
 
-            // 既存削除（重要）
+            alert("use: " + imageUrl);
+
+            // 既存削除
             if (window.crowdLayer) {
                 window.map.removeLayer(window.crowdLayer);
             }
@@ -747,14 +755,19 @@ function renderCrowdImage() {
             const icon = L.icon({
                 iconUrl: imageUrl,
                 iconSize: [512, 512],
-                iconAnchor: [0, 0]
+                iconAnchor: [0, 0],
+                className: "crowd-img-icon"
             });
 
             window.crowdLayer = L.marker(
                 [best.lat, best.lng],
-                { icon }
+                {
+                    icon,
+                    zIndexOffset: 10000   // ← 重要
+                }
             ).addTo(window.map);
 
+            alert("marker added");
         });
 }
 
