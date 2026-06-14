@@ -1,7 +1,11 @@
 .crowd-img-icon {
     opacity: 0.5;
+    pointer-events: none;
 }
 
+.crowd-img-icon img {
+    pointer-events: none;
+}
 /* =======================
    ヘッダー全体
 ======================= */
