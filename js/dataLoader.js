@@ -2193,7 +2193,7 @@ function goBack() {
     // =====================================================
     // ③ prefへ戻る（z <= 12）
     // =====================================================
-    resetCrowdImage();
+    removeCrowdImage();
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
@@ -2207,7 +2207,7 @@ function goBack() {
 
 // ② 1フレーム待つ
 requestAnimationFrame(() => {
-    removeCrowdImage();
+    
 
     // ③ サイズ確定後に通知
     window.map.invalidateSize(true);
