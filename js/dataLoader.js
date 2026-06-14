@@ -2193,6 +2193,7 @@ function goBack() {
     // =====================================================
     // ③ prefへ戻る（z <= 12）
     // =====================================================
+    resetCrowdImage();
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
