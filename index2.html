@@ -695,40 +695,47 @@ function renderCrowdImage() {
             const now = new Date();
             const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
 
-            let hour = nowJST.getHours();
+            const hour = nowJST.getHours();
 
-            // ===== 次の3時間スロットに切り上げ =====
-            let targetHour = Math.ceil((hour + 1) / 3) * 3;
+            // ===== 3時間スロット =====
+            const slots = [0, 3, 6, 9, 12, 15, 18, 21];
 
+            let targetHour = slots.find(h => h > hour);
             let targetDate = new Date(nowJST);
 
-            // 24時 → 翌日0時
-            if (targetHour >= 24) {
+            // 21時以降 → 翌日0時
+            if (targetHour === undefined) {
                 targetHour = 0;
                 targetDate.setDate(targetDate.getDate() + 1);
             }
 
-            // YYYY-MM-DD
-            const dateStr = targetDate.toISOString().slice(0, 10);
+            // ===== JST日付フォーマット（UTC使わない） =====
+            function formatDateJST(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, "0");
+                const d = String(date.getDate()).padStart(2, "0");
+                return `${y}-${m}-${d}`;
+            }
 
-            // "00", "03", ...
+            const dateStr = formatDateJST(targetDate);
             const hourStr = String(targetHour).padStart(2, "0");
 
-            // 検索キー
             const targetKey = "_" + dateStr + "_" + hourStr + "h";
 
-            // ===== ログから1件取得 =====
+            alert("targetKey: " + targetKey);
+
+            // ===== ログから一致を探す =====
             let best = null;
 
-            lines.forEach(line => {
+            for (let line of lines) {
 
-                if (!line) return;
+                if (!line) continue;
 
                 const parts = line.split(",");
-                if (parts.length < 5) return;
+                if (parts.length < 5) continue;
 
                 const pref = parts[0];
-                if (pref !== window.currentPref) return;
+                if (pref !== window.currentPref) continue;
 
                 const lat = parseFloat(parts[1]);
                 const lng = parseFloat(parts[2]);
@@ -736,10 +743,14 @@ function renderCrowdImage() {
 
                 const fileName = serverPath.split("/").pop();
 
+                // デバッグ
+                alert("check: " + fileName);
+
                 if (fileName.includes(targetKey)) {
                     best = { lat, lng, fileName };
+                    break;
                 }
-            });
+            }
 
             if (!best) {
                 alert("no match: " + targetKey);
@@ -750,12 +761,12 @@ function renderCrowdImage() {
 
             alert("use: " + imageUrl);
 
-            // 既存削除
+            // ===== 既存削除 =====
             if (window.crowdLayer) {
                 window.map.removeLayer(window.crowdLayer);
             }
 
-            // アイコン生成
+            // ===== アイコン生成 =====
             const icon = L.icon({
                 iconUrl: imageUrl,
                 iconSize: [512, 512],
@@ -763,7 +774,7 @@ function renderCrowdImage() {
                 className: "crowd-img-icon"
             });
 
-            // マーカーとして固定表示
+            // ===== マーカー表示 =====
             window.crowdLayer = L.marker(
                 [best.lat, best.lng],
                 {
