@@ -813,13 +813,11 @@ function removeCrowdImage() {
 
     if (!window.crowdLayer) return;
 
+    // マップから削除
     window.map.removeLayer(window.crowdLayer);
-    window.crowdLayer = null;
 
-    if (window.crowdZoomHandler) {
-        window.map.off("zoomend", window.crowdZoomHandler);
-        window.crowdZoomHandler = null;
-    }
+    // 参照クリア
+    window.crowdLayer = null;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
