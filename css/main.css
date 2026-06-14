@@ -4,6 +4,7 @@
 }
 
 .crowd-img-icon img {
+    transition: opacity 0.2s ease;
     pointer-events: none;
 }
 /* =======================
