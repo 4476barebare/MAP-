@@ -3,3 +3,5 @@ CHIBA,36,139.6,9,/cloudGenerator/output/CHIBA_2026-06-15_15h.png
 CHIBA,36,139.6,9,/cloudGenerator/output/CHIBA_2026-06-15_12h.png
 CHIBA,36,139.6,9,/cloudGenerator/output/CHIBA_2026-06-15_09h.png
 CHIBA,36,139.6,9,/cloudGenerator/output/CHIBA_2026-06-15_00h.png
+CHIBA,36,139.6,9,/cloudGenerator/output/CHIBA_2026-06-15_03h.png
+CHIBA,36,139.6,9,/cloudGenerator/output/CHIBA_2026-06-15_06h.png
