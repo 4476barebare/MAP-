@@ -456,11 +456,10 @@ function selectArea(area) {
         showSpotsForArea(window.currentAreaId);
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
+        renderCrowdImage();
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
-                
-        renderCrowdImage();
             });
         });
     });
