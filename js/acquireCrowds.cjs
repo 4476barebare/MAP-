@@ -1,4 +1,3 @@
-// acquireCrowds.cjs
 const fs = require("fs");
 const path = require("path");
 
@@ -19,18 +18,14 @@ async function main() {
 
   const lines = text.trim().split("\n");
 
-  // パース部分を以下のように修正
+  // パース（新形式: prefname,latMax,lonMin,zoom,filePath,id,time）
   const logs = lines.map(line => {
     const parts = line.split(",");
+    if (parts[0] === 'ERROR') return { filePath: null, raw: line };
     
-    // ★新旧対応: ファイルパスはどちらの形式でもparts[4]に入っている
-    const filePath = parts[4]; 
-    
-    // ★重要: 比較用に「旧形式相当」の文字列をrawとして扱う
-    // これにより、fetched_log.txt が旧形式でも新形式でも、パスが同じなら「取得済み」と判定される
-    const raw = parts.slice(0, 5).join(","); 
-    
-    return { filePath, raw };
+    // 比較キーとして「パスまでの5項目」を抽出（新旧形式共通のIDとして利用）
+    const comparisonKey = parts.slice(0, 5).join(",");
+    return { filePath: parts[4], raw: line, comparisonKey };
   });
 
   // 取得済みログ読み込み
@@ -38,7 +33,11 @@ async function main() {
   if (fs.existsSync(FETCHED_LOG)) {
     const f = fs.readFileSync(FETCHED_LOG, "utf-8");
     f.split("\n").forEach(l => {
-      if (l.trim()) fetched.add(l.trim());
+      if (l.trim()) {
+        // 過去の形式(5項目)でも新形式でも、パスまでのキーを生成して判定
+        const parts = l.trim().split(",");
+        fetched.add(parts.slice(0, 5).join(","));
+      }
     });
   }
 
@@ -51,7 +50,7 @@ async function main() {
 
   // ファイル名から日付を抽出してソートする
   const sorted = logs
-    .filter(l => l.filePath && !l.filePath.includes("ERROR"))
+    .filter(l => l.filePath)
     .map(l => {
       const fileName = path.basename(l.filePath);
       const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
@@ -61,7 +60,8 @@ async function main() {
     .sort((a, b) => b.date - a.date);
 
   for (const log of sorted) {
-    if (fetched.has(log.raw)) continue;
+    // 比較キーで判定（これで新旧入り混じっても重複を防げる）
+    if (fetched.has(log.comparisonKey)) continue;
 
     const url = BASE_URL + log.filePath;
     const fileName = path.basename(log.filePath);
@@ -79,6 +79,7 @@ async function main() {
 
       console.log("saved:", fileName);
 
+      // 保存済みリストには最新形式(raw)を追加
       newFetched.push(log.raw);
 
     } catch (e) {
@@ -119,7 +120,14 @@ function cleanup() {
 
   for (const line of fetchedLines) {
     const parts = line.split(",");
-    if (parts.length < 5) continue; // 5項目あることを確認
+    
+    // エラー行は画像パスがないため削除対象外（保持）
+    if (parts[0] === 'ERROR') {
+      newFetched.push(line);
+      continue;
+    }
+
+    if (parts.length < 5) continue;
 
     const filePath = parts[4]; // 4番目のインデックスにファイルパス
     const fileName = path.basename(filePath);
@@ -131,7 +139,6 @@ function cleanup() {
     const dateStr = m[1];
     const hour = parseInt(m[2], 10);
 
-    // ★ ローカル時間で確実に生成
     const [y, mo, d] = dateStr.split("-").map(Number);
     const fileTime = new Date(y, mo - 1, d, hour, 0, 0);
 
@@ -157,6 +164,6 @@ function cleanup() {
 // 実行
 // ==========================================
 (async () => {
-  await main();   // ★ 先に取得を確実に終わらせる
-  cleanup();      // ★ その後クリーンアップ
+  await main();
+  cleanup();
 })();
