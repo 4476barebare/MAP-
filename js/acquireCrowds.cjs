@@ -5,25 +5,23 @@ const BASE_URL = "https://turiiko.shop";
 const LOG_URL = "https://turiiko.shop/cloudGenerator/run_log.txt";
 const FETCHED_LOG = path.join(__dirname, "fetched_log.txt");
 
-// ★ グローバルに出す（cleanupでも使う）
 const outDir = path.join(__dirname, "crowdsimg");
 
 // ==========================================
 // メイン取得処理
 // ==========================================
 async function main() {
-  // ログ取得
   const res = await fetch(LOG_URL);
   const text = await res.text();
-
   const lines = text.trim().split("\n");
 
-  // パース（新形式: prefname,latMax,lonMin,zoom,filePath,id,time）
+  // パース：新形式・旧形式に対応
   const logs = lines.map(line => {
     const parts = line.split(",");
+    // ERROR行はパスがないので画像ダウンロード対象外
     if (parts[0] === 'ERROR') return { filePath: null, raw: line };
     
-    // 比較キーとして「パスまでの5項目」を抽出（新旧形式共通のIDとして利用）
+    // パスまでの5項目を比較キーとする（新旧共通）
     const comparisonKey = parts.slice(0, 5).join(",");
     return { filePath: parts[4], raw: line, comparisonKey };
   });
@@ -34,33 +32,33 @@ async function main() {
     const f = fs.readFileSync(FETCHED_LOG, "utf-8");
     f.split("\n").forEach(l => {
       if (l.trim()) {
-        // 過去の形式(5項目)でも新形式でも、パスまでのキーを生成して判定
         const parts = l.trim().split(",");
+        // 過去のログもパスまでの5項目をキーとしてセットに登録
         fetched.add(parts.slice(0, 5).join(","));
       }
     });
   }
 
-  // 保存先作成
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir);
   }
 
   let newFetched = [];
-
-  // ファイル名から日付を抽出してソートする
+  
+  // ソートして重複チェック
   const sorted = logs
     .filter(l => l.filePath)
-    .map(l => {
-      const fileName = path.basename(l.filePath);
-      const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
-      const date = m ? new Date(m[1].replace(/-/g, '/') + ' ' + m[2] + ':00:00') : new Date(0);
-      return { ...l, date };
-    })
-    .sort((a, b) => b.date - a.date);
+    .sort((a, b) => {
+      // 日付によるソート（ファイル名から抽出）
+      const getD = (p) => {
+        const m = path.basename(p).match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
+        return m ? new Date(m[1].replace(/-/g, '/') + ' ' + m[2] + ':00:00') : new Date(0);
+      };
+      return getD(b.filePath) - getD(a.filePath);
+    });
 
   for (const log of sorted) {
-    // 比較キーで判定（これで新旧入り混じっても重複を防げる）
+    // 比較キーで重複判定
     if (fetched.has(log.comparisonKey)) continue;
 
     const url = BASE_URL + log.filePath;
@@ -69,100 +67,66 @@ async function main() {
 
     try {
       const imgRes = await fetch(url);
-      if (!imgRes.ok) {
-        console.log("skip:", url, imgRes.status);
-        continue;
-      }
+      if (!imgRes.ok) continue;
 
       const buffer = Buffer.from(await imgRes.arrayBuffer());
       fs.writeFileSync(savePath, buffer);
-
       console.log("saved:", fileName);
 
-      // 保存済みリストには最新形式(raw)を追加
+      // 最新のraw形式を追記リストへ
       newFetched.push(log.raw);
-
     } catch (e) {
-      console.log("error:", url, e.message);
+      console.error("error:", url, e.message);
     }
   }
 
-  // ログ追記
+  // ログ追記（安全にファイルを開く）
   if (newFetched.length > 0) {
     fs.appendFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
+    console.log(`Updated fetched_log with ${newFetched.length} entries.`);
   }
 }
 
 // ==========================================
-// クリーンアップ（過去ブロック削除）
+// クリーンアップ
 // ==========================================
 function cleanup() {
   const now = new Date();
+  const currentBlock = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0);
 
-  // 現在時刻を「時」で丸める
-  const currentBlock = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    now.getHours(),
-    0, 0
-  );
+  if (!fs.existsSync(FETCHED_LOG)) return;
 
-  // fetched_log読み込み
-  let fetchedLines = [];
-  if (fs.existsSync(FETCHED_LOG)) {
-    fetchedLines = fs.readFileSync(FETCHED_LOG, "utf-8")
-      .split("\n")
-      .filter(l => l.trim());
-  }
-
+  const fetchedLines = fs.readFileSync(FETCHED_LOG, "utf-8").split("\n").filter(l => l.trim());
   let newFetched = [];
 
   for (const line of fetchedLines) {
     const parts = line.split(",");
     
-    // エラー行は画像パスがないため削除対象外（保持）
+    // ERROR行は保持してスルー
     if (parts[0] === 'ERROR') {
       newFetched.push(line);
       continue;
     }
 
     if (parts.length < 5) continue;
-
-    const filePath = parts[4]; // 4番目のインデックスにファイルパス
+    const filePath = parts[4];
     const fileName = path.basename(filePath);
-
-    // ファイル名から日時抽出
     const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
     if (!m) continue;
 
-    const dateStr = m[1];
-    const hour = parseInt(m[2], 10);
-
-    const [y, mo, d] = dateStr.split("-").map(Number);
-    const fileTime = new Date(y, mo - 1, d, hour, 0, 0);
+    const [y, mo, d] = m[1].split("-").map(Number);
+    const fileTime = new Date(y, mo - 1, d, parseInt(m[2], 10), 0, 0);
 
     const localPath = path.join(outDir, fileName);
-
     if (fileTime < currentBlock) {
-      // 過去ブロック → 削除
-      if (fs.existsSync(localPath)) {
-        fs.unlinkSync(localPath);
-        console.log("delete:", fileName);
-      }
+      if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
     } else {
-      // 残す
       newFetched.push(line);
     }
   }
-
-  // fetched_logを再構築
   fs.writeFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
 }
 
-// ==========================================
-// 実行
-// ==========================================
 (async () => {
   await main();
   cleanup();
