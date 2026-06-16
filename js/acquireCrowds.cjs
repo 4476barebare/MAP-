@@ -13,29 +13,20 @@ const outDir = path.join(__dirname, "crowdsimg");
 async function main() {
   const res = await fetch(LOG_URL);
   const text = await res.text();
+
   const lines = text.trim().split("\n");
 
-  // パース：新形式・旧形式に対応
   const logs = lines.map(line => {
     const parts = line.split(",");
-    // ERROR行はパスがないので画像ダウンロード対象外
-    if (parts[0] === 'ERROR') return { filePath: null, raw: line };
-    
-    // パスまでの5項目を比較キーとする（新旧共通）
-    const comparisonKey = parts.slice(0, 5).join(",");
-    return { filePath: parts[4], raw: line, comparisonKey };
+    const filePath = parts[4]; 
+    return { filePath, raw: line };
   });
 
-  // 取得済みログ読み込み
   let fetched = new Set();
   if (fs.existsSync(FETCHED_LOG)) {
     const f = fs.readFileSync(FETCHED_LOG, "utf-8");
     f.split("\n").forEach(l => {
-      if (l.trim()) {
-        const parts = l.trim().split(",");
-        // 過去のログもパスまでの5項目をキーとしてセットに登録
-        fetched.add(parts.slice(0, 5).join(","));
-      }
+      if (l.trim()) fetched.add(l.trim());
     });
   }
 
@@ -44,22 +35,19 @@ async function main() {
   }
 
   let newFetched = [];
-  
-  // ソートして重複チェック
+
   const sorted = logs
-    .filter(l => l.filePath)
-    .sort((a, b) => {
-      // 日付によるソート（ファイル名から抽出）
-      const getD = (p) => {
-        const m = path.basename(p).match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
-        return m ? new Date(m[1].replace(/-/g, '/') + ' ' + m[2] + ':00:00') : new Date(0);
-      };
-      return getD(b.filePath) - getD(a.filePath);
-    });
+    .filter(l => l.filePath && !l.filePath.includes("ERROR"))
+    .map(l => {
+      const fileName = path.basename(l.filePath);
+      const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
+      const date = m ? new Date(m[1].replace(/-/g, '/') + ' ' + m[2] + ':00:00') : new Date(0);
+      return { ...l, date };
+    })
+    .sort((a, b) => b.date - a.date);
 
   for (const log of sorted) {
-    // 比較キーで重複判定
-    if (fetched.has(log.comparisonKey)) continue;
+    if (fetched.has(log.raw)) continue;
 
     const url = BASE_URL + log.filePath;
     const fileName = path.basename(log.filePath);
@@ -73,17 +61,15 @@ async function main() {
       fs.writeFileSync(savePath, buffer);
       console.log("saved:", fileName);
 
-      // 最新のraw形式を追記リストへ
       newFetched.push(log.raw);
     } catch (e) {
-      console.error("error:", url, e.message);
+      console.log("error:", url, e.message);
     }
   }
 
-  // ログ追記（安全にファイルを開く）
+  // ★ログ追記：追記がある場合のみ、既存ファイルに追記する
   if (newFetched.length > 0) {
     fs.appendFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
-    console.log(`Updated fetched_log with ${newFetched.length} entries.`);
   }
 }
 
@@ -96,19 +82,16 @@ function cleanup() {
 
   if (!fs.existsSync(FETCHED_LOG)) return;
 
-  const fetchedLines = fs.readFileSync(FETCHED_LOG, "utf-8").split("\n").filter(l => l.trim());
+  let fetchedLines = fs.readFileSync(FETCHED_LOG, "utf-8")
+      .split("\n")
+      .filter(l => l.trim());
+
   let newFetched = [];
 
   for (const line of fetchedLines) {
     const parts = line.split(",");
-    
-    // ERROR行は保持してスルー
-    if (parts[0] === 'ERROR') {
-      newFetched.push(line);
-      continue;
-    }
-
     if (parts.length < 5) continue;
+
     const filePath = parts[4];
     const fileName = path.basename(filePath);
     const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})h\.png$/);
@@ -118,13 +101,25 @@ function cleanup() {
     const fileTime = new Date(y, mo - 1, d, parseInt(m[2], 10), 0, 0);
 
     const localPath = path.join(outDir, fileName);
+
     if (fileTime < currentBlock) {
-      if (fs.existsSync(localPath)) fs.unlinkSync(localPath);
+      if (fs.existsSync(localPath)) {
+        fs.unlinkSync(localPath);
+        console.log("delete:", fileName);
+      }
     } else {
       newFetched.push(line);
     }
   }
-  fs.writeFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
+
+  // ★クリーンアップ書き込み：安全にリライトする
+  // 内容が空になる場合は、ファイルそのものを削除するか何もしないことで、中身が真っ白になるのを防ぐ
+  if (newFetched.length > 0) {
+    fs.writeFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
+  } else {
+    // データが空ならファイル自体を削除（次回の実行で自動生成される）
+    if (fs.existsSync(FETCHED_LOG)) fs.unlinkSync(FETCHED_LOG);
+  }
 }
 
 (async () => {
