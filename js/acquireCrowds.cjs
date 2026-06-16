@@ -19,11 +19,18 @@ async function main() {
 
   const lines = text.trim().split("\n");
 
-  // パース（新しい形式: prefname,latMax,lonMin,zoom,filePath に対応）
+  // パース部分を以下のように修正
   const logs = lines.map(line => {
     const parts = line.split(",");
-    const filePath = parts[4]; // インデックス4がファイルパス
-    return { filePath, raw: line };
+    
+    // ★新旧対応: ファイルパスはどちらの形式でもparts[4]に入っている
+    const filePath = parts[4]; 
+    
+    // ★重要: 比較用に「旧形式相当」の文字列をrawとして扱う
+    // これにより、fetched_log.txt が旧形式でも新形式でも、パスが同じなら「取得済み」と判定される
+    const raw = parts.slice(0, 5).join(","); 
+    
+    return { filePath, raw };
   });
 
   // 取得済みログ読み込み
