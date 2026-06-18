@@ -79,17 +79,29 @@ function cleanup() {
   const now = Date.now();
   const threshold = now - (KEEP_HOURS * 60 * 60 * 1000);
 
-  if (!fs.existsSync(outDir)) return;
+  if (!fs.existsSync(FETCHED_LOG)) return;
 
-  const files = fs.readdirSync(outDir);
-  const keptLogs = [];
+  const lines = fs.readFileSync(FETCHED_LOG, "utf-8")
+    .split("\n")
+    .filter(l => l.trim());
 
-  for (const fileName of files) {
-    const filePath = path.join(outDir, fileName);
+  const result = [];
+
+  for (const line of lines) {
+    const parts = line.split(",");
+    if (parts.length < 5) {
+      // フォーマット崩れはそのまま残す
+      result.push(line);
+      continue;
+    }
+
+    const filePath = parts[4];
+    const fileName = path.basename(filePath);
 
     const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})\.png$/);
     if (!m) {
-      // 想定外ファイルは触らない
+      // パースできないものは残す
+      result.push(line);
       continue;
     }
 
@@ -97,30 +109,30 @@ function cleanup() {
     const hour = Number(m[2]);
 
     const fileTime = new Date(y, mo - 1, d, hour).getTime();
+    const localPath = path.join(outDir, fileName);
 
     if (fileTime < threshold) {
+      // 対象：ファイル削除＋ログから除外
       try {
-        fs.unlinkSync(filePath);
-        console.log("delete:", fileName);
+        if (fs.existsSync(localPath)) {
+          fs.unlinkSync(localPath);
+          console.log("delete:", fileName);
+        }
       } catch (err) {
         console.error("delete error:", fileName, err.message);
       }
+      // ← ここで result に入れない＝この行だけ消える
     } else {
-      // 残すファイル → ログ再構築用に積む
-      const fakeLogLine = `,,,,${
-        "/cloudGenerator/" + fileName
-      }`;
-      keptLogs.push(fakeLogLine);
+      // 残す行はそのまま維持
+      result.push(line);
     }
   }
 
-  // ログ再構築（完全上書き）
-  if (keptLogs.length > 0) {
-    fs.writeFileSync(FETCHED_LOG, keptLogs.join("\n") + "\n");
+  // 上書き（差し替え）
+  if (result.length > 0) {
+    fs.writeFileSync(FETCHED_LOG, result.join("\n") + "\n");
   } else {
-    if (fs.existsSync(FETCHED_LOG)) {
-      fs.unlinkSync(FETCHED_LOG);
-    }
+    fs.unlinkSync(FETCHED_LOG);
   }
 }
 
