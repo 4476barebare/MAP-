@@ -73,65 +73,54 @@ async function main() {
   }
 }
 
-// ==========================================
-// クリーンアップ
-// ==========================================
 function cleanup() {
-  const now = new Date();
-  // 現在の時間を基準に、それより古いものを削除対象とする
-  const currentBlock = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0);
+  const KEEP_HOURS = 3;
 
-  if (!fs.existsSync(FETCHED_LOG)) return;
+  const now = Date.now();
+  const threshold = now - (KEEP_HOURS * 60 * 60 * 1000);
 
-  let fetchedLines = fs.readFileSync(FETCHED_LOG, "utf-8")
-      .split("\n")
-      .filter(l => l.trim());
+  if (!fs.existsSync(outDir)) return;
 
-  let newFetched = [];
+  const files = fs.readdirSync(outDir);
+  const keptLogs = [];
 
-  for (const line of fetchedLines) {
-    const parts = line.split(",");
-    if (parts.length < 5) continue;
+  for (const fileName of files) {
+    const filePath = path.join(outDir, fileName);
 
-    const filePath = parts[4];
-    const fileName = path.basename(filePath);
-    
-    // 【修正】正規表現から「h」を除去し、_HH.png に対応させました
     const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})\.png$/);
-    
     if (!m) {
-      // マッチしないものはそのまま保持（意図しないファイル形式を消さないため）
-      newFetched.push(line);
+      // 想定外ファイルは触らない
       continue;
     }
 
     const [y, mo, d] = m[1].split("-").map(Number);
-    const fileTime = new Date(y, mo - 1, d, parseInt(m[2], 10), 0, 0);
+    const hour = Number(m[2]);
 
-    const localPath = path.join(outDir, fileName);
+    const fileTime = new Date(y, mo - 1, d, hour).getTime();
 
-    // fileTime が現在より前なら削除対象
-    if (fileTime < currentBlock) {
+    if (fileTime < threshold) {
       try {
-        if (fs.existsSync(localPath)) {
-          fs.unlinkSync(localPath);
-          console.log("delete:", fileName);
-        }
+        fs.unlinkSync(filePath);
+        console.log("delete:", fileName);
       } catch (err) {
         console.error("delete error:", fileName, err.message);
       }
-      // newFetched には追加しない（これでリストから除外される）
     } else {
-      newFetched.push(line);
+      // 残すファイル → ログ再構築用に積む
+      const fakeLogLine = `,,,,${
+        "/cloudGenerator/" + fileName
+      }`;
+      keptLogs.push(fakeLogLine);
     }
   }
 
-  // ファイルの書き戻し
-  if (newFetched.length > 0) {
-    fs.writeFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
+  // ログ再構築（完全上書き）
+  if (keptLogs.length > 0) {
+    fs.writeFileSync(FETCHED_LOG, keptLogs.join("\n") + "\n");
   } else {
-    // 完全に空になった場合はファイルを削除
-    if (fs.existsSync(FETCHED_LOG)) fs.unlinkSync(FETCHED_LOG);
+    if (fs.existsSync(FETCHED_LOG)) {
+      fs.unlinkSync(FETCHED_LOG);
+    }
   }
 }
 
