@@ -684,48 +684,46 @@ function toWeatherIcon(code) {
 }
 
 function renderCrowdImage() {
-    //alert("start"); // ←これが出るか
 
     removeCrowdImage();
 
-    // ===== pane作成（1回だけ）
     if (!window.map.getPane('rainPane')) {
         window.map.createPane('rainPane');
         const pane = window.map.getPane('rainPane');
         pane.style.zIndex = 350;
-        pane.style.pointerEvents = 'none'; // ←クリック透過
+        pane.style.pointerEvents = 'none';
     }
 
+    const now = new Date();
+    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+
+    const hour = nowJST.getHours();
+    const slots = [0,3,6,9,12,15,18,21];
+
+    let targetHour = [...slots].reverse().find(h => h <= hour);
+    let targetDate = new Date(nowJST);
+
+    if (targetHour === undefined) {
+        targetHour = 21;
+        targetDate.setDate(targetDate.getDate() - 1);
+    }
+
+    const y = targetDate.getFullYear();
+    const m = String(targetDate.getMonth()+1).padStart(2,"0");
+    const d = String(targetDate.getDate()).padStart(2,"0");
+
+    const dateStr = `${y}-${m}-${d}`;
+    const hourStr = String(targetHour).padStart(2,"0");
+
+    const fileName = `${window.currentPref}_${dateStr}_${hourStr}h.png`;
+    const imageUrl = "js/crowdsimg/" + fileName;
+
+    // ===== ここだけログ使う
     fetch("js/fetched_log.txt")
-        .then(res => {
-            //alert("fetch ok");
-            return res.text();
-        })
+        .then(res => res.text())
         .then(text => {
 
             const lines = text.trim().split("\n");
-
-            const now = new Date();
-            const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-
-            const hour = nowJST.getHours();
-            const slots = [0,3,6,9,12,15,18,21];
-
-            let targetHour = slots.find(h => h > hour);
-            let targetDate = new Date(nowJST);
-
-            if (targetHour === undefined) {
-                targetHour = 0;
-                targetDate.setDate(targetDate.getDate() + 1);
-            }
-
-            const y = targetDate.getFullYear();
-            const m = String(targetDate.getMonth()+1).padStart(2,"0");
-            const d = String(targetDate.getDate()).padStart(2,"0");
-
-            const dateStr = `${y}-${m}-${d}`;
-            const hourStr = String(targetHour).padStart(2,"0");
-            const targetKey = "_" + dateStr + "_" + hourStr + "h";
 
             let best = null;
 
@@ -734,38 +732,29 @@ function renderCrowdImage() {
                 if (!line) continue;
 
                 const parts = line.split(",");
-                if (parts.length < 5) continue;
+                if (parts.length < 4) continue;
 
                 if (parts[0] !== window.currentPref) continue;
 
                 const lat = parseFloat(parts[1]);
                 const lng = parseFloat(parts[2]);
-                const baseZoom = parseInt(parts[3],10);
-                const fileName = parts[4].split("/").pop();
+                const baseZoom = parseInt(parts[3], 10);
 
-                if (fileName.includes(targetKey)) {
-                    best = { lat, lng, fileName, baseZoom };
-                    break;
-                }
+                best = { lat, lng, baseZoom };
+                break;
             }
-alert(targetKey);
-alert(lines.length);
 
+            if (!best) {
+                console.warn("座標が見つからない");
+                return;
+            }
 
-            if (!best) return;
-
-            const imageUrl = "js/crowdsimg/" + best.fileName;
-            alert(imageUrl);
-
-            // ===== サイズ計算（ズーム追従）
             function calcBounds() {
 
                 const z = window.map.getZoom();
                 const scale = Math.pow(2, z - best.baseZoom);
-
                 const size = 512 * scale;
 
-                // ピクセル → 地理座標に変換
                 const topLeft = window.map.project([best.lat, best.lng], z);
                 const bottomRight = topLeft.add([size, size]);
 
@@ -775,7 +764,6 @@ alert(lines.length);
                 );
             }
 
-            // 初期描画
             window.crowdLayer = L.imageOverlay(
                 imageUrl,
                 calcBounds(),
@@ -785,7 +773,6 @@ alert(lines.length);
                 }
             ).addTo(window.map);
 
-            // ズーム時更新
             window.crowdZoomHandler = function() {
                 if (!window.crowdLayer) return;
                 window.crowdLayer.setBounds(calcBounds());
