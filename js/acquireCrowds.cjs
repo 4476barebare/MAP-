@@ -109,7 +109,7 @@ function cleanup() {
     const hour = Number(m[2]);
 
     
-    const fileTime = Date.UTC(y, mo - 1, d, hour);
+    const fileTime = new Date(y, mo - 1, d, hour).getTime();
     const localPath = path.join(outDir, fileName);
 
     if (fileTime < threshold) {
