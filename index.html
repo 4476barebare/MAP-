@@ -715,7 +715,7 @@ function renderCrowdImage() {
     const dateStr = `${y}-${m}-${d}`;
     const hourStr = String(targetHour).padStart(2,"0");
 
-    const fileName = `${window.currentPref}_${dateStr}_${hourStr}h.png`;
+    const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
     const imageUrl = "js/crowdsimg/" + fileName;
     alert(imageUrl);
 
