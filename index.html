@@ -717,6 +717,7 @@ function renderCrowdImage() {
 
     const fileName = `${window.currentPref}_${dateStr}_${hourStr}h.png`;
     const imageUrl = "js/crowdsimg/" + fileName;
+    alert(imageUrl);
 
     // ===== ここだけログ使う
     fetch("js/fetched_log.txt")
