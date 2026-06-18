@@ -700,12 +700,13 @@ function renderCrowdImage() {
     const hour = nowJST.getHours();
     const slots = [0,3,6,9,12,15,18,21];
 
-    let targetHour = [...slots].reverse().find(h => h <= hour);
+    // ===== 未来スロット選択
+    let targetHour = slots.find(h => h > hour);
     let targetDate = new Date(nowJST);
 
     if (targetHour === undefined) {
-        targetHour = 21;
-        targetDate.setDate(targetDate.getDate() - 1);
+        targetHour = 0;
+        targetDate.setDate(targetDate.getDate() + 1);
     }
 
     const y = targetDate.getFullYear();
@@ -717,9 +718,8 @@ function renderCrowdImage() {
 
     const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
     const imageUrl = "js/crowdsimg/" + fileName;
-    alert(imageUrl);
 
-    // ===== ここだけログ使う
+    // ===== ログから座標取得
     fetch("js/fetched_log.txt")
         .then(res => res.text())
         .then(text => {
@@ -739,7 +739,7 @@ function renderCrowdImage() {
 
                 const lat = parseFloat(parts[1]);
                 const lng = parseFloat(parts[2]);
-                const baseZoom = parseInt(parts[3], 10);
+                const baseZoom = parseFloat(parts[3]);
 
                 best = { lat, lng, baseZoom };
                 break;
@@ -753,6 +753,8 @@ function renderCrowdImage() {
             function calcBounds() {
 
                 const z = window.map.getZoom();
+
+                // ===== 正しいスケール計算
                 const scale = Math.pow(2, z - best.baseZoom);
                 const size = 512 * scale;
 
