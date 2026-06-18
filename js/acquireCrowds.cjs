@@ -22,13 +22,18 @@ async function main() {
     return { filePath, raw: line };
   });
 
-  let fetched = new Set();
-  if (fs.existsSync(FETCHED_LOG)) {
-    const f = fs.readFileSync(FETCHED_LOG, "utf-8");
-    f.split("\n").forEach(l => {
-      if (l.trim()) fetched.add(l.trim());
-    });
-  }
+let fetched = new Set();
+if (fs.existsSync(FETCHED_LOG)) {
+  const f = fs.readFileSync(FETCHED_LOG, "utf-8");
+  f.split("\n").forEach(l => {
+    if (!l.trim()) return;
+
+    const parts = l.split(",");
+    if (parts.length >= 5) {
+      fetched.add(parts[4]); // ← filePathだけ保持
+    }
+  });
+}
 
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir);
@@ -47,8 +52,8 @@ async function main() {
     .sort((a, b) => b.date - a.date);
 
   for (const log of sorted) {
-    if (fetched.has(log.raw)) continue;
-
+    if (fetched.has(log.filePath)) continue;
+    
     const url = BASE_URL + log.filePath;
     const fileName = path.basename(log.filePath);
     const savePath = path.join(outDir, fileName);
