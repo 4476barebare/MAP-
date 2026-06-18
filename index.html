@@ -684,7 +684,7 @@ function toWeatherIcon(code) {
 }
 
 function renderCrowdImage() {
-    alert("start"); // ←これが出るか
+    //alert("start"); // ←これが出るか
 
     removeCrowdImage();
 
@@ -698,7 +698,7 @@ function renderCrowdImage() {
 
     fetch("js/fetched_log.txt")
         .then(res => {
-            alert("fetch ok");
+            //alert("fetch ok");
             return res.text();
         })
         .then(text => {
@@ -748,6 +748,9 @@ function renderCrowdImage() {
                     break;
                 }
             }
+alert(targetKey);
+alert(lines.length);
+
 
             if (!best) return;
 
