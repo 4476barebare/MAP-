@@ -727,6 +727,7 @@ li {
   box-sizing: border-box;
   max-width: 70vw;
   width: fit-content;
+  padding: 0 3px;
   margin-top: -3px;
   margin-left: 24px;
   font-size: 14px;
