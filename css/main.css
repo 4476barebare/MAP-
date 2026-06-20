@@ -1357,6 +1357,12 @@ li {
   opacity: 0.8;
 }
 
+.unit-text {
+  font-size: 6px;
+  opacity: 0.8;
+  /* width指定なし */
+}
+
 .wind-dir {
   font-family: system-ui, sans-serif;
   font-size: 8px;
