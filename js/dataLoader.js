@@ -662,7 +662,7 @@ if (Array.isArray(raw)) {
         if (!Number.isFinite(code)) continue;
 
         const adj = adjustCode(code, pop);
-        const hour = 6 + i * 2;
+        const hour = i * 2;
 
         if (hour <= 12) {
             m[adj] = (m[adj] || 0) + 1;
