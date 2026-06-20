@@ -546,20 +546,12 @@ function renderPrefWeather() {
 
         let icon = '';
 
-let icon = '';
-
         if (iconMorning && iconAfternoon) {
-
             icon = iconMorning === iconAfternoon
-
                 ? iconMorning
-
                 : `${iconMorning}<span class="unit">→</span>${iconAfternoon}`;
-
         } else {
-
             icon = iconMorning || iconAfternoon || '';
-
         }
 
         const temp = w.temp;
@@ -568,7 +560,7 @@ let icon = '';
         const name = rep.name;
 
         el.innerHTML = `
-            ${icon}
+            <span>${icon}</span>
             <div style="width: 12px">${withUnit(temp, '°C')}</div>
             <span class="unit">降水</span>
             <div style="width: 12px">${withUnit(pop, '%')}</div>
