@@ -696,15 +696,25 @@ function createMenuItem(s) {
 
         const icon = toWeatherIcon(iconCode);
 
-        bottom.innerHTML = `
-            <span>${icon}</span>
-            <div style="width:12px">${w.temp}</div>
-            <span style="font-size:8px;">°C 降水</span>
-            <div style="width:12px">${w.pop}</div>
-            <span style="font-size:8px;">%</span>
-            <div style="width:12px">${w.wind}</div>
-            <span style="font-size:8px;">m/s</span>
-        `;
+bottom.innerHTML = `
+    <span class="col-icon">${icon}</span>
+
+    <div class="col-temp">
+        <span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span>
+    </div>
+
+    <div class="col-label">
+        <span class="unit-text">降水</span>
+    </div>
+
+    <div class="col-pop">
+        <span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span>
+    </div>
+
+    <div class="col-wind">
+        <span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span>
+    </div>
+`;
     }
 
     li.appendChild(top);
@@ -2204,7 +2214,6 @@ function goBack() {
     }
     document.getElementById('map-back-btn').style.display = 'none';
 
-removeCrowdImage();
 // ② 1フレーム待つ
 requestAnimationFrame(() => {
     
