@@ -1116,6 +1116,14 @@ function renderSub2Weather(spot) {
     `;
 }
 
+function clearSub2Weather() {
+
+    const container = document.querySelector(".map-ui-sub2");
+    if (!container) return;
+
+    container.innerHTML = "";
+    container.style.display = "none";
+}
 
 function showFishPopup(spot) {
     
@@ -1152,6 +1160,7 @@ function zoomToSpot(spot) {
     window.mapStateSnapshot = null;
     disablePhase2(window.map);
     resetSpotLayers();
+    clearSub2Weather();
 
 
     // ========================
@@ -2273,6 +2282,7 @@ function goBack() {
     // =====================================================
     if (z === 13) {
         disablePhase2(window.map);
+        clearSub2Weather();
         document.getElementById("nearest-spot").textContent = "";
         
         window.map.eachLayer(layer => {
