@@ -613,7 +613,6 @@ function createMenuItem(s) {
 
     const li = document.createElement("li");
     li.dataset.key = s.id || s.name;
-
     li.classList.add("menu-item");
 
     const top = document.createElement("div");
@@ -630,105 +629,110 @@ function createMenuItem(s) {
         const raw = s.whether.hourly?.[0]?.weather;
         const w = formatPrefWeather(s.whether);
 
-let iconMorning = null;
-let iconAfternoon = null;
+        let iconMorning = null;
+        let iconAfternoon = null;
 
-if (Array.isArray(raw)) {
+        // =========================
+        // 2時間刻みデータ集計
+        // =========================
+        if (Array.isArray(raw)) {
 
-    const adjustCode = (code, pop) => {
-        const p = Number(pop);
+            const adjustCode = (code, pop) => {
+                const p = Number(pop);
 
-        if (code >= 60) {
-            if (p >= 80) return 70;
-            if (p >= 60) return 60;
-            return 60;
-        }
+                if (code >= 60) {
+                    if (p >= 80) return 70;
+                    if (p >= 60) return 60;
+                    return 60;
+                }
 
-        if (p >= 70) return 30;
-        if (p >= 50) return 10;
+                if (p >= 70) return 30;
+                if (p >= 50) return 10;
 
-        return code;
-    };
+                return code;
+            };
 
-    const m = {};
-    const a = {};
+            const m = {};
+            const a = {};
 
-    for (let i = 0; i < raw.length; i++) {
+            for (let i = 0; i < raw.length; i++) {
 
-        const r = raw[i];
-        const code = Number(r?.[0]);
-        const pop = Number(r?.[2]);
+                const r = raw[i];
+                const code = Number(r?.[0]);
+                const pop = Number(r?.[2]);
 
-        if (!Number.isFinite(code)) continue;
+                if (!Number.isFinite(code)) continue;
 
-        const adj = adjustCode(code, pop);
-        const hour = i * 2;
+                const adj = adjustCode(code, pop);
+                const hour = i * 2;
 
-        if (hour <= 12) {
-            m[adj] = (m[adj] || 0) + 1;
-        } 
-        else if (hour >= 14 && hour <= 20) {
-            a[adj] = (a[adj] || 0) + 1;
-        }
-    }
-
-    const pick = (map) => {
-        let max = -1;
-        let res = [];
-
-        for (const k in map) {
-            const v = map[k];
-            const n = Number(k);
-
-            if (v > max) {
-                max = v;
-                res = [n];
-            } else if (v === max) {
-                res.push(n);
+                if (hour <= 12) {
+                    m[adj] = (m[adj] || 0) + 1;
+                } 
+                else if (hour >= 14 && hour <= 20) {
+                    a[adj] = (a[adj] || 0) + 1;
+                }
             }
+
+            const pick = (map) => {
+                let max = -1;
+                let res = [];
+
+                for (const k in map) {
+                    const v = map[k];
+                    const n = Number(k);
+
+                    if (v > max) {
+                        max = v;
+                        res = [n];
+                    } else if (v === max) {
+                        res.push(n);
+                    }
+                }
+
+                return res.length > 1
+                    ? Math.round(res.reduce((s, x) => s + x, 0) / res.length)
+                    : res[0];
+            };
+
+            iconMorning = pick(m);
+            iconAfternoon = pick(a);
         }
 
-        return res.length > 1
-            ? Math.round(res.reduce((s, x) => s + x, 0) / res.length)
-            : res[0];
-    };
+        // =========================
+        // prefと完全統一の表示ロジック
+        // =========================
+        const mIcon = iconMorning != null ? formatWeatherIcon(iconMorning) : '';
+        const aIcon = iconAfternoon != null ? formatWeatherIcon(iconAfternoon) : '';
 
-    iconMorning = pick(m);
-    iconAfternoon = pick(a);
-}
+        const icon = (mIcon && aIcon && mIcon !== aIcon)
+            ? `${mIcon}<span class="unit-text">→</span>${aIcon}`
+            : (mIcon || aIcon);
 
-const icon = formatWeatherIcon(
-    iconMorning ? toWeatherIcon(iconMorning) : '',
-    iconAfternoon ? toWeatherIcon(iconAfternoon) : ''
-);
+        bottom.innerHTML = `
+            <span class="col-icon">${icon}</span>
 
-bottom.innerHTML = `
-    <span class="col-icon">${icon}</span>
+            <div class="col-temp">
+                <span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span>
+            </div>
 
-    <div class="col-temp">
-        <span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span>
-    </div>
+            <div class="col-label">
+                <span class="unit-text">降水</span>
+            </div>
 
-    <div class="col-label">
-        <span class="unit-text">降水</span>
-    </div>
+            <div class="col-pop">
+                <span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span>
+            </div>
 
-    <div class="col-pop">
-        <span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span>
-    </div>
-
-    <div class="col-wind">
-        <span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span>
-    </div>
-`;
+            <div class="col-wind">
+                <span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span>
+            </div>
+        `;
     }
 
     li.appendChild(top);
     li.appendChild(bottom);
 
-    // -------------------------
-    // クリックイベント
-    // -------------------------
     li.addEventListener("click", () => {
 
         const spot = window.spotData.find(x =>
