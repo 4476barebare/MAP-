@@ -1,5 +1,19 @@
 [
   {
+    "title": "【さらなる太軸も登場…？】50cm超えのテラアジにも対応するバチコン専用ジグヘッド「VCジグヘッド」",
+    "link": "https://www.lurenewsr.com/435464/",
+    "pubDate": "2026-06-20 09:00:09",
+    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/S__47169540_0-e1781511517931.jpg",
+    "author": "ルアーニュース"
+  },
+  {
+    "title": "危険外来種「カミツキガメ」の駆除に手応えあり　千葉県は外来生物銀座だった？",
+    "link": "https://tsurinews.jp/402127/",
+    "pubDate": "2026-06-20 08:00:01",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/31758658_m-1.jpg",
+    "author": "TSURINEWS"
+  },
+  {
     "title": "初心者の堤防釣りにもオススメ！仕掛けが絡みにくく扱いやすい「カゴ釣りショート仕掛」【マルシン漁具・Dragon】",
     "link": "https://tsurigu-np.jp/products/31069/",
     "pubDate": "2026-06-20 03:34:00",
@@ -7,18 +21,11 @@
     "author": "釣具新聞"
   },
   {
-    "title": "【リアルボイスvol.12】泉南フロートアジング最前線",
-    "link": "https://www.lurenewsr.com/436188/",
-    "pubDate": "2026-06-19 22:00:44",
-    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/04/c2515fa3257915045a6e0d68676c23b2.jpg",
-    "author": "ルアーニュース"
-  },
-  {
-    "title": "初夏の三河湾ボートシーバスゲームで65cm頭に8尾！　熱中症予防の強い味方は時計？",
-    "link": "https://tsurinews.jp/402397/",
-    "pubDate": "2026-06-19 21:00:25",
-    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/202606201web00.jpg",
-    "author": "TSURINEWS"
+    "title": "開幕から良型ぞろいで絶好調激うまイサキは今が行きどき！",
+    "link": "https://fishingjapan.jp/fishing/29242",
+    "pubDate": "2026-06-20 03:00:00",
+    "thumbnail": "https://fishingjapan.jp/cmsimg/tpc29242-main.png",
+    "author": "FISHING JAPAN"
   },
   {
     "title": "海底に潜むあの高級魚が釣れまくる事件が起きた！！",
@@ -42,13 +49,6 @@
     "author": "キャスティング"
   },
   {
-    "title": "【釣果速報】立派すぎ！静岡県南伊豆忠兵衛丸で11.00kgの巨大カンパチゲット！海に引きずり込まれそうな勢いの引きを体感せよ！",
-    "link": "https://fishingjapan.jp/fishing/29289",
-    "pubDate": "2026-06-18 09:17:26",
-    "thumbnail": "https://fishingjapan.jp/cmsimg/tpc29289-main.jpg",
-    "author": "FISHING JAPAN"
-  },
-  {
     "title": "どうやって使う？この謎袋を釣り人が愛し続ける理由とは",
     "link": "https://www.youtube.com/watch?v=gffifaM3_Hg",
     "pubDate": "2026-06-18 09:00:16",
@@ -70,11 +70,102 @@
     "author": "釣具のブンブン"
   },
   {
+    "title": "【レボMGXガンマ】レボMGXが6年ぶりにリニューアル！　軽量化ほかブラッシュアップされ2026年7月下旬登場",
+    "link": "https://www.lurenewsr.com/435931/",
+    "pubDate": "2026-06-20 08:00:36",
+    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/b6720b3efe9bae8dd944b4b0896d7005.jpg",
+    "author": "ルアーニュース"
+  },
+  {
+    "title": "春エギングで1800g級アオリイカをキャッチ！【熊本】エギを抱かせるためのテクニックとは？",
+    "link": "https://tsurinews.jp/402551/",
+    "pubDate": "2026-06-20 07:30:59",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/IMG_6552.jpeg",
+    "author": "TSURINEWS"
+  },
+  {
+    "title": "キス投げ釣りの代表的なエサの付け方「ちょん掛け」を理解しよう　丁寧な作業が釣果に直結！",
+    "link": "https://tsurinews.jp/402687/",
+    "pubDate": "2026-06-20 07:30:13",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/2026062010web01.jpg",
+    "author": "TSURINEWS"
+  },
+  {
+    "title": "明石沖で良型交じりにマダコが好ヒット中！　関西エリアの【船釣り特選釣果7選】",
+    "link": "https://tsurinews.jp/402582/",
+    "pubDate": "2026-06-20 07:00:08",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/202606207web01.jpg",
+    "author": "TSURINEWS"
+  },
+  {
+    "title": "【もっと釣りたい方へ】ネイティブトラウトゲームの新選択肢として「スピナーベイト」を提案",
+    "link": "https://www.lurenewsr.com/435732/",
+    "pubDate": "2026-06-20 03:00:23",
+    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2025/03/75c140d3601436d9bf49d9f8aa3af58a-5.jpg",
+    "author": "ルアーニュース"
+  },
+  {
+    "title": "北海道の釣り遠征は移動も楽しい！ 釣りとセットで満喫したい【3つの楽しみ方】",
+    "link": "https://tsurinews.jp/402529/",
+    "pubDate": "2026-06-20 02:30:37",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/f7571017ef05aa90555a73d288433a25.jpeg",
+    "author": "TSURINEWS"
+  },
+  {
+    "title": "釣り・グルメ・音楽をまとめて満喫！「三河湾釣りフェス」開催　哀川翔さんも参加予定",
+    "link": "https://tsurinews.jp/402532/",
+    "pubDate": "2026-06-20 02:30:16",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/4-5.jpg",
+    "author": "TSURINEWS"
+  },
+  {
+    "title": "ボルティックVOLTIQを酷使しての実釣インプレ！！ 陸っぱりヘビーバーサタイルにはボルティックしか勝たん 編【岸本ゆうあ・釣りで天下獲ったろかいや！】",
+    "link": "https://www.lurenewsr.com/435797/",
+    "pubDate": "2026-06-20 02:00:45",
+    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2025/03/a90f529d7e9cc4153d267d7350d80f5c.jpg",
+    "author": "ルアーニュース"
+  },
+  {
+    "title": "ウナギ釣り釣果レポート：河川の橋ゲタ周りを狙って本命3匹キャッチ成功【筏川・愛知】",
+    "link": "https://tsurinews.jp/402571/",
+    "pubDate": "2026-06-20 02:00:43",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/20260612cb0800.jpg",
+    "author": "TSURINEWS"
+  },
+  {
+    "title": "【アヴァンギャルド・インドミタス70】小沼正弥 監修！MAX280gのジャイアントベイトまで扱えるハイパワーロッドが2026年8月登場",
+    "link": "https://www.lurenewsr.com/435894/",
+    "pubDate": "2026-06-20 01:00:57",
+    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/a6.jpg",
+    "author": "ルアーニュース"
+  },
+  {
+    "title": "【池内修次の毎日イカ曜日♪】初場所！宮崎沖磯エギング",
+    "link": "https://www.lurenewsr.com/435781/",
+    "pubDate": "2026-06-19 23:00:49",
+    "thumbnail": "https://i0.wp.com/www.lurenewsr.com/lnr/wp-content/uploads/2018/11/s-1.jpg",
+    "author": "ルアーニュース"
+  },
+  {
+    "title": "【リアルボイスvol.12】泉南フロートアジング最前線",
+    "link": "https://www.lurenewsr.com/436188/",
+    "pubDate": "2026-06-19 22:00:44",
+    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/04/c2515fa3257915045a6e0d68676c23b2.jpg",
+    "author": "ルアーニュース"
+  },
+  {
     "title": "【薄くて大容量/遠征時に重宝】三原直之が“プラグをまとめて収納する時”に愛用しているケースとは？",
     "link": "https://www.lurenewsr.com/435590/",
     "pubDate": "2026-06-19 21:00:58",
     "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/aaaa-4.jpg",
     "author": "ルアーニュース"
+  },
+  {
+    "title": "初夏の三河湾ボートシーバスゲームで65cm頭に8尾！　熱中症予防の強い味方は時計？",
+    "link": "https://tsurinews.jp/402397/",
+    "pubDate": "2026-06-19 21:00:25",
+    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/202606201web00.jpg",
+    "author": "TSURINEWS"
   },
   {
     "title": "【津本式×鬼絞め】予約開始！冷水の力で熟成と保存をより安定させる水冷熟成庫「水熟」/ハピソン",
@@ -299,6 +390,13 @@
     "pubDate": "2026-06-18 09:30:06",
     "thumbnail": "https://i1.ytimg.com/vi/TG0r8Ucw66k/hqdefault.jpg",
     "author": "釣りよかでしょう。"
+  },
+  {
+    "title": "【釣果速報】立派すぎ！静岡県南伊豆忠兵衛丸で11.00kgの巨大カンパチゲット！海に引きずり込まれそうな勢いの引きを体感せよ！",
+    "link": "https://fishingjapan.jp/fishing/29289",
+    "pubDate": "2026-06-18 09:17:26",
+    "thumbnail": "https://fishingjapan.jp/cmsimg/tpc29289-main.jpg",
+    "author": "FISHING JAPAN"
   },
   {
     "title": "【釣果速報】神奈川県ちがさき丸で朝からキス好調！竿頭は32匹！今なら一日中数釣りが楽しめます！",
@@ -600,103 +698,5 @@
     "pubDate": "2026-06-17 07:00:32",
     "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/af52d6a6693cbe3ac5fc6e08e8cc076a.jpg",
     "author": "ルアーニュース"
-  },
-  {
-    "title": "【ディープタイラバを考える】STARTテスター坂本真人のケース／丹後エリア",
-    "link": "https://www.lurenewsr.com/435466/",
-    "pubDate": "2026-06-17 03:00:51",
-    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/LINE_NOTE_260615_10.jpg",
-    "author": "ルアーニュース"
-  },
-  {
-    "title": "炎天下でもスーッと涼しさ続く！ハヤブサが放つ新感覚の冷感アンダーウエア「HYOON Ventilation」",
-    "link": "https://tsurigu-np.jp/products/31068/",
-    "pubDate": "2026-06-17 02:44:00",
-    "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/06/8094b83cfe475ab7fa4f9e1ff9eac318.jpg",
-    "author": "釣具新聞"
-  },
-  {
-    "title": "【釣果速報】三重県三幸丸でマダイ・ウマズラハギGET！安定した釣果を狙いたいなら三重県三幸丸にお任せ！",
-    "link": "https://fishingjapan.jp/fishing/29271",
-    "pubDate": "2026-06-17 02:33:50",
-    "thumbnail": "https://fishingjapan.jp/cmsimg/tpc29271-main.jpg",
-    "author": "FISHING JAPAN"
-  },
-  {
-    "title": "「イサキ好機到来！」SLJで本命23匹に79cm大型マダイまでヒット【じらまる・山口】",
-    "link": "https://tsurinews.jp/402219/",
-    "pubDate": "2026-06-17 02:30:12",
-    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/202606176web00.jpg",
-    "author": "TSURINEWS"
-  },
-  {
-    "title": "秋山川アユ釣り解禁情報2026【山梨】 おすすめポイント5選を紹介",
-    "link": "https://tsurinews.jp/402209/",
-    "pubDate": "2026-06-17 02:30:10",
-    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/20260605kt2001.jpg",
-    "author": "TSURINEWS"
-  },
-  {
-    "title": "【釣果速報】神奈川県大松丸でイサキ好調！TOP100匹！ダブル、トリプルGETで連日好調！質も量も大満足の釣行を楽しもう！",
-    "link": "https://fishingjapan.jp/fishing/29270",
-    "pubDate": "2026-06-17 02:16:21",
-    "thumbnail": "https://fishingjapan.jp/cmsimg/tpc29270-main.jpg",
-    "author": "FISHING JAPAN"
-  },
-  {
-    "title": "【釣果速報】神奈川県せどおと丸でイサキ好調！TOP110匹！質も量も大満足の釣行を楽しもう！",
-    "link": "https://fishingjapan.jp/fishing/29269",
-    "pubDate": "2026-06-17 02:07:07",
-    "thumbnail": "https://fishingjapan.jp/cmsimg/tpc29269-main.jpg",
-    "author": "FISHING JAPAN"
-  },
-  {
-    "title": "チャビングはじめました！ 超お手軽なルアーフィッシング！【編集長のチャビング体験記】",
-    "link": "https://www.lurenewsr.com/435328/",
-    "pubDate": "2026-06-17 02:00:21",
-    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2025/11/8838188994904b00e2657348572c7ad5.jpg",
-    "author": "ルアーニュース"
-  },
-  {
-    "title": "梅雨の大阪湾沿岸ではどんな魚が釣れる？ オススメの釣りターゲットと攻略法を紹介",
-    "link": "https://tsurinews.jp/402199/",
-    "pubDate": "2026-06-17 02:00:21",
-    "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/06/2026173web01.jpg",
-    "author": "TSURINEWS"
-  },
-  {
-    "title": "【釣果速報】神奈川県正海丸でイサキ&amp;amp;アジ好調！クーラーにぎっしり！今すぐ乗船してこの波に乗ろう！",
-    "link": "https://fishingjapan.jp/fishing/29268",
-    "pubDate": "2026-06-17 01:58:08",
-    "thumbnail": "https://fishingjapan.jp/cmsimg/tpc29268-main.jpg",
-    "author": "FISHING JAPAN"
-  },
-  {
-    "title": "千載一遇のチャンスをより確実に。キャスティングプラグ専用アシスト「TARSAL CLAW FRONT/REAR」",
-    "link": "https://www.lurenewsr.com/435012/",
-    "pubDate": "2026-06-17 01:00:28",
-    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/S__46956588.jpg",
-    "author": "ルアーニュース"
-  },
-  {
-    "title": "6/17（水）～6/23（火）【ポイント活用7daysキャンペーン】",
-    "link": "https://castingnet.jp/news/detail.php?no=255144",
-    "pubDate": "2026-06-17 00:52:08",
-    "thumbnail": "https://castingnet.jp/cmsimg/tpc255144-6.png",
-    "author": "キャスティング"
-  },
-  {
-    "title": "今江克隆のルアーニュースクラブR「プロップボール！？一番ショックを受けたのは自分だった…TOP50弥栄湖戦レポート」 第1290回",
-    "link": "https://www.lurenewsr.com/435557/",
-    "pubDate": "2026-06-16 22:30:18",
-    "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/image-1.jpg",
-    "author": "ルアーニュース"
-  },
-  {
-    "title": "釣り場清掃を行いました！！",
-    "link": "https://castingnet.jp/news/detail.php?no=257331",
-    "pubDate": "2026-06-16 21:50:07",
-    "thumbnail": "https://castingnet.jp/cmsimg/tpc257331-3.JPG",
-    "author": "キャスティング"
   }
 ]
