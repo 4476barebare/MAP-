@@ -1101,20 +1101,15 @@ function renderSub2Weather(spot) {
 
             <span class="col-icon">${icon}</span>
 
-            <div class="col-temp">
-                <span class="num-fixed">最高気温${w.temp}</span><span class="unit-text">°C</span>
+            <div class="col-temp">最高気温
+                <span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span>
             </div>
-
-            <div class="col-label">
-                <span class="num-fixed">降水確率</span>
-            </div>
-
-            <div class="col-pop">
+            <div class="col-pop">降水確率
                 <span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span>
             </div>
 
-            <div class="col-wind">
-                <span class="num-fixed">最大風速${w.wind}</span><span class="unit-text">m/s</span>
+            <div class="col-wind">最大風速
+                <span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span>
             </div>
 
         </div>
