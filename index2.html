@@ -549,7 +549,7 @@ function renderPrefWeather() {
         if (iconMorning && iconAfternoon) {
             icon = iconMorning === iconAfternoon
                 ? iconMorning
-                : `${iconMorning}<span class="unit">→</span>${iconAfternoon}`;
+                : `${iconMorning}<span class="unit-text">→</span>${iconAfternoon}`;
         } else {
             icon = iconMorning || iconAfternoon || '';
         }
@@ -562,7 +562,7 @@ function renderPrefWeather() {
         el.innerHTML = `
             <span>${icon}</span>
             <div style="width: 12px">${withUnit(temp, '°C')}</div>
-            <span class="unit">降水</span>
+            <span class="unit-text">降水</span>
             <div style="width: 12px">${withUnit(pop, '%')}</div>
             <div style="width: 12px">${withUnit(wind, 'm/s')}</div>
             <span class="pref-name">${name}</span>
