@@ -726,7 +726,7 @@ li {
   line-height: 20px;
   box-sizing: border-box;
   max-width: 70vw;
-  min-width: 100px;
+  width: fit-content;
   padding: 0 8px;
   margin-top: -3px;
   margin-left: 24px;
