@@ -562,21 +562,21 @@ function renderPrefWeather() {
 el.innerHTML = `
     <span class="col-icon">${icon}</span>
 
-    <div class="col-temp">
-        ${temp}<span class="unit-text">°C</span>
-    </div>
+<div class="col-temp">
+    <span class="num-fixed">${temp}</span><span class="unit-text">°C</span>
+</div>
 
-    <div class="col-label">
-        <span class="unit-text">降水</span>
-    </div>
+<div class="col-label">
+    <span class="unit-text">降水</span>
+</div>
 
-    <div class="col-pop">
-        ${Math.min(pop, 99)}<span class="unit-text">%</span>
-    </div>
+<div class="col-pop">
+    <span class="num-fixed">${Math.min(pop, 99)}</span><span class="unit-text">%</span>
+</div>
 
-    <div class="col-wind">
-        ${wind}<span class="unit-text">m/s</span>
-    </div>
+<div class="col-wind">
+    <span class="num-fixed">${wind}</span><span class="unit-text">m/s</span>
+</div>
 
     <span class="pref-name">${name}</span>
 `;
