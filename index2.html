@@ -518,70 +518,44 @@ function renderPrefWeather() {
         }
 
         const w = formatPrefWeather(rep.whether);
+        const rows = rep.whether?.hourly?.[0]?.weather || [];
 
         // =========================
-        // ★ week統一：hourly0固定
+        // ★ 時刻オフセット（必要なら調整）
         // =========================
-        const hourly = rep.whether?.hourly?.[0]?.weather;
+        const startHour = 0; // ← ここを変えればズレ補正できる
 
-        let iconCode = 0;
+        const morningRows = [];
+        const afternoonRows = [];
 
-        if (Array.isArray(hourly)) {
+        for (let i = 0; i < rows.length; i++) {
 
-            const adjustCode = (code, pop) => {
-                const p = Number(pop);
+            const hour = startHour + i * 2;
 
-                if (code >= 60) {
-                    if (p >= 80) return 70;
-                    if (p >= 60) return 60;
-                    return 60;
-                }
-
-                if (p >= 70) return 30;
-                if (p >= 50) return 10;
-
-                return code;
-            };
-
-            const map = {};
-            let maxCount = -1;
-            let tied = [];
-
-            for (const r of hourly) {
-
-                const code = Number(r?.[0]);
-                const pop  = Number(r?.[2]);
-
-                if (!Number.isFinite(code)) continue;
-
-                const adjusted = adjustCode(code, pop);
-
-                map[adjusted] = (map[adjusted] || 0) + 1;
+            if (hour >= 5 && hour <= 12) {
+                morningRows.push(rows[i]);
+            } else if (hour >= 13 && hour <= 20) {
+                afternoonRows.push(rows[i]);
             }
-
-            for (const k in map) {
-
-                const count = map[k];
-                const code = Number(k);
-
-                if (count > maxCount) {
-                    maxCount = count;
-                    tied = [code];
-                } else if (count === maxCount) {
-                    tied.push(code);
-                }
-            }
-
-            iconCode =
-                tied.length > 1
-                    ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
-                    : tied[0];
-
-        } else {
-            iconCode = rep.whether?.hourly?.[0]?.weather?.[0]?.[0] ?? 0;
         }
 
-        const icon = toWeatherIcon(iconCode);
+        const getIconSafe = (r) => {
+            if (!Array.isArray(r) || r.length === 0) return null;
+            return calcRepresentativeIcon(r);
+        };
+
+        const iconMorning = getIconSafe(morningRows);
+        const iconAfternoon = getIconSafe(afternoonRows);
+
+        let icon = '';
+
+        if (iconMorning && iconAfternoon) {
+            icon = iconMorning === iconAfternoon
+                ? iconMorning
+                : `${iconMorning}→${iconAfternoon}`;
+        } else {
+            icon = iconMorning || iconAfternoon || '';
+        }
 
         const temp = Math.round(w.temp);
         const pop  = Math.round(w.pop);
@@ -673,6 +647,60 @@ function formatPrefWeather(whether) {
     };
 }
 
+function calcRepresentativeIcon(rows) {
+
+    const adjustCode = (code, pop) => {
+        const p = Number(pop);
+
+        if (code >= 60) {
+            if (p >= 80) return 70;
+            if (p >= 60) return 60;
+            return 60;
+        }
+
+        if (p >= 70) return 30;
+        if (p >= 50) return 10;
+
+        return code;
+    };
+
+    const map = {};
+    let maxCount = -1;
+    let tied = [];
+
+    for (const r of rows) {
+
+        const code = Number(r?.[0]);
+        const pop  = Number(r?.[2]);
+
+        if (!Number.isFinite(code)) continue;
+
+        const adjusted = adjustCode(code, pop);
+
+        map[adjusted] = (map[adjusted] || 0) + 1;
+    }
+
+    for (const k in map) {
+
+        const count = map[k];
+        const code = Number(k);
+
+        if (count > maxCount) {
+            maxCount = count;
+            tied = [code];
+        } else if (count === maxCount) {
+            tied.push(code);
+        }
+    }
+
+    const iconCode =
+        tied.length > 1
+            ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
+            : tied[0];
+
+    return toWeatherIcon(iconCode);
+}
+
 function toWeatherIcon(code) {
     if (code >= 70) return "☔️";
     if (code >= 60) return "☂️";   // 雨
@@ -685,42 +713,46 @@ function toWeatherIcon(code) {
 
 function renderCrowdImage() {
 
+    removeCrowdImage();
+
+    if (!window.map.getPane('rainPane')) {
+        window.map.createPane('rainPane');
+        const pane = window.map.getPane('rainPane');
+        pane.style.zIndex = 350;
+        pane.style.pointerEvents = 'none';
+    }
+
+    const now = new Date();
+    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+
+    const hour = nowJST.getHours();
+    const slots = [0,3,6,9,12,15,18,21];
+
+    // ===== 未来スロット選択
+    let targetHour = slots.find(h => h > hour);
+    let targetDate = new Date(nowJST);
+
+    if (targetHour === undefined) {
+        targetHour = 0;
+        targetDate.setDate(targetDate.getDate() + 1);
+    }
+
+    const y = targetDate.getFullYear();
+    const m = String(targetDate.getMonth()+1).padStart(2,"0");
+    const d = String(targetDate.getDate()).padStart(2,"0");
+
+    const dateStr = `${y}-${m}-${d}`;
+    const hourStr = String(targetHour).padStart(2,"0");
+
+    const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
+    const imageUrl = "js/crowdsimg/" + fileName;
+
+    // ===== ログから座標取得
     fetch("js/fetched_log.txt")
         .then(res => res.text())
         .then(text => {
 
             const lines = text.trim().split("\n");
-
-            // ===== JST現在時刻 =====
-            const now = new Date();
-            const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-
-            const hour = nowJST.getHours();
-
-            // ===== 3時間スロット =====
-            const slots = [0, 3, 6, 9, 12, 15, 18, 21];
-
-            let targetHour = slots.find(h => h > hour);
-            let targetDate = new Date(nowJST);
-
-            if (targetHour === undefined) {
-                targetHour = 0;
-                targetDate.setDate(targetDate.getDate() + 1);
-            }
-
-            function formatDateJST(date) {
-                const y = date.getFullYear();
-                const m = String(date.getMonth() + 1).padStart(2, "0");
-                const d = String(date.getDate()).padStart(2, "0");
-                return `${y}-${m}-${d}`;
-            }
-
-            const dateStr = formatDateJST(targetDate);
-            const hourStr = String(targetHour).padStart(2, "0");
-
-            const targetKey = "_" + dateStr + "_" + hourStr + "h";
-
-            
 
             let best = null;
 
@@ -729,92 +761,64 @@ function renderCrowdImage() {
                 if (!line) continue;
 
                 const parts = line.split(",");
-                if (parts.length < 5) continue;
+                if (parts.length < 4) continue;
 
-                const pref = parts[0];
-                if (pref !== window.currentPref) continue;
+                if (parts[0] !== window.currentPref) continue;
 
                 const lat = parseFloat(parts[1]);
                 const lng = parseFloat(parts[2]);
-                const baseZoom = parseInt(parts[3], 10); // ★ここ重要
-                const serverPath = parts[4];
+                const baseZoom = parseFloat(parts[3]);
 
-                const fileName = serverPath.split("/").pop();
-
-            
-
-                if (fileName.includes(targetKey)) {
-                    best = { lat, lng, fileName, baseZoom };
-                    break;
-                }
+                best = { lat, lng, baseZoom };
+                break;
             }
 
             if (!best) {
-                
+                console.warn("座標が見つからない");
                 return;
             }
 
-            const imageUrl = "js/crowdsimg/" + best.fileName;
+            function calcBounds() {
 
-            
+                const z = window.map.getZoom();
 
-            // ===== サイズ計算関数 =====
-            function calcSize() {
-                const currentZoom = window.map.getZoom();
+                // ===== 正しいスケール計算
+                const scale = Math.pow(2, z - best.baseZoom);
+                const size = 512 * scale;
 
-                const scale = Math.pow(2, currentZoom - best.baseZoom);
+                const topLeft = window.map.project([best.lat, best.lng], z);
+                const bottomRight = topLeft.add([size, size]);
 
-                const baseSize = 512; // ★生成時サイズ
-                return baseSize * scale;
+                return L.latLngBounds(
+                    window.map.unproject(topLeft, z),
+                    window.map.unproject(bottomRight, z)
+                );
             }
 
-            // ===== 既存削除 =====
-            if (window.crowdLayer) {
-                window.map.removeLayer(window.crowdLayer);
-            }
-
-            // ===== 初期サイズ =====
-            let size = calcSize();
-
-            const icon = L.icon({
-                iconUrl: imageUrl,
-                iconSize: [size, size],
-                iconAnchor: [0, 0],
-                className: "crowd-img-icon"
-            });
-
-            window.crowdLayer = L.marker(
-                [best.lat, best.lng],
+            window.crowdLayer = L.imageOverlay(
+                imageUrl,
+                calcBounds(),
                 {
-                    icon,
-                    zIndexOffset: 10000
+                    pane: 'rainPane',
+                    opacity: 0.6
                 }
             ).addTo(window.map);
 
-            // ===== ズーム追従 =====
-            window.map.on("zoomend", function () {
+            window.crowdZoomHandler = function() {
+                if (!window.crowdLayer) return;
+                window.crowdLayer.setBounds(calcBounds());
+            };
 
-                const newSize = calcSize();
-
-                const newIcon = L.icon({
-                    iconUrl: imageUrl,
-                    iconSize: [newSize, newSize],
-                    iconAnchor: [0, 0],
-                    className: "crowd-img-icon"
-                });
-
-                window.crowdLayer.setIcon(newIcon);
-            });
-
+            window.map.on("zoomend", window.crowdZoomHandler);
         });
 }
 
 function removeCrowdImage() {
 
-    if (!window.crowdLayer) return;
-
-    window.map.removeLayer(window.crowdLayer);
-    window.crowdLayer = null;
+    if (window.crowdLayer) {
+        window.map.removeLayer(window.crowdLayer);
+        window.crowdLayer = null;
+    }
 
     if (window.crowdZoomHandler) {
         window.map.off("zoomend", window.crowdZoomHandler);
