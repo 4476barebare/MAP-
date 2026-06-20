@@ -520,10 +520,7 @@ function renderPrefWeather() {
         const w = formatPrefWeather(rep.whether);
         const rows = rep.whether?.hourly?.[0]?.weather || [];
 
-        // =========================
-        // ★ 時刻オフセット（必要なら調整）
-        // =========================
-        const startHour = 0; // ← ここを変えればズレ補正できる
+        const startHour = 0;
 
         const morningRows = [];
         const afternoonRows = [];
@@ -551,25 +548,24 @@ function renderPrefWeather() {
 
         if (iconMorning && iconAfternoon) {
             icon = iconMorning === iconAfternoon
-                ? iconMorning
-                : `${iconMorning}→${iconAfternoon}`;
+                ? `<span class="unit">${iconMorning}</span>`
+                : `<span class="unit">${iconMorning}</span><span class="unit">→</span><span class="unit">${iconAfternoon}</span>`;
         } else {
-            icon = iconMorning || iconAfternoon || '';
+            const single = iconMorning || iconAfternoon || '';
+            icon = single ? `<span class="unit">${single}</span>` : '';
         }
 
-        const temp = Math.round(w.temp);
-        const pop  = Math.round(w.pop);
-        const wind = Math.round(w.wind);
+        const temp = w.temp;
+        const pop  = w.pop;
+        const wind = w.wind;
         const name = rep.name;
 
         el.innerHTML = `
-            <span>${icon}</span>
-            <div style="width: 12px">${temp}</div>
-            <span style="font-size: 8px;">°C 降水</span>
-            <div style="width: 12px">${pop}</div>
-            <span style="font-size: 8px;">%</span>
-            <div style="width: 12px">${wind}</div>
-            <span style="font-size: 8px;">m/s</span>
+            ${icon}
+            <div style="width: 12px">${withUnit(temp, '°C')}</div>
+            <span class="unit">降水</span>
+            <div style="width: 12px">${withUnit(pop, '%')}</div>
+            <div style="width: 12px">${withUnit(wind, 'm/s')}</div>
             <span class="pref-name">${name}</span>
         `;
     }
