@@ -1124,6 +1124,26 @@ li {
     text-align: right;
 }
 
+/* 列幅固定 */
+.pref-weather .col-icon {
+    width: 20px;              /* 少し余裕持たせる */
+    display: inline-flex;     /* ←重要 */
+    justify-content: center;  /* 中央寄せ */
+    align-items: center;      /* 縦中央 */
+    flex-shrink: 0;           /* ←潰れ防止 */
+}
+.pref-weather .col-temp  { width: 36px; }
+.pref-weather .col-label { width: 28px; }
+.pref-weather .col-pop   { width: 36px; }
+.pref-weather .col-wind  { width: 42px; }
+
+/* 中身右寄せ維持 */
+.pref-weather .col-temp,
+.pref-weather .col-pop,
+.pref-weather .col-wind {
+    text-align: right;
+}
+
 /* 地名 */
 .pref-name {
     position: absolute;
