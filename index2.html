@@ -555,7 +555,7 @@ function renderPrefWeather() {
         }
 
         const temp = w.temp;
-        const pop  = w.pop;
+        const pop = Math.min(99, Math.round(w.pop));
         const wind = w.wind;
         const name = rep.name;
 
