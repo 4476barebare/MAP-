@@ -630,71 +630,77 @@ function createMenuItem(s) {
         const raw = s.whether.hourly?.[0]?.weather;
         const w = formatPrefWeather(s.whether);
 
-        let iconCode = 0;
+let iconMorning = null;
+let iconAfternoon = null;
 
-        // =========================
-        // week完全統一ロジック
-        // =========================
-        if (Array.isArray(raw)) {
+if (Array.isArray(raw)) {
 
-            const adjustCode = (code, pop) => {
-                const p = Number(pop);
+    const adjustCode = (code, pop) => {
+        const p = Number(pop);
 
-                if (code >= 60) {
-                    if (p >= 80) return 70;
-                    if (p >= 60) return 60;
-                    return 60;
-                }
-
-                if (p >= 70) return 30;
-                if (p >= 50) return 10;
-
-                return code;
-            };
-
-            const map = {};
-            let maxCount = -1;
-            let tied = [];
-
-            // ■ 集計（weekと同じ）
-            for (const r of raw) {
-
-                const code = Number(r?.[0]);
-                const pop  = Number(r?.[2]);
-
-                if (!Number.isFinite(code)) continue;
-
-                const adjusted = adjustCode(code, pop);
-
-                map[adjusted] = (map[adjusted] || 0) + 1;
-            }
-
-            // ■ 最頻値抽出（weekと同じ）
-            for (const k in map) {
-
-                const count = map[k];
-                const code = Number(k);
-
-                if (count > maxCount) {
-                    maxCount = count;
-                    tied = [code];
-                } else if (count === maxCount) {
-                    tied.push(code);
-                }
-            }
-
-            // ■ 同率処理（weekと同じ）
-            iconCode =
-                tied.length > 1
-                    ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
-                    : tied[0];
-
-        } else {
-
-            iconCode = raw?.[0] ?? 0;
+        if (code >= 60) {
+            if (p >= 80) return 70;
+            if (p >= 60) return 60;
+            return 60;
         }
 
-        const icon = toWeatherIcon(iconCode);
+        if (p >= 70) return 30;
+        if (p >= 50) return 10;
+
+        return code;
+    };
+
+    const m = {};
+    const a = {};
+
+    for (let i = 0; i < raw.length; i++) {
+
+        const r = raw[i];
+        const code = Number(r?.[0]);
+        const pop = Number(r?.[2]);
+
+        if (!Number.isFinite(code)) continue;
+
+        const adj = adjustCode(code, pop);
+        const hour = 6 + i * 2;
+
+        if (hour <= 12) {
+            m[adj] = (m[adj] || 0) + 1;
+        } 
+        else if (hour >= 14 && hour <= 20) {
+            a[adj] = (a[adj] || 0) + 1;
+        }
+    }
+
+    const pick = (map) => {
+        let max = -1;
+        let res = [];
+
+        for (const k in map) {
+            const v = map[k];
+            const n = Number(k);
+
+            if (v > max) {
+                max = v;
+                res = [n];
+            } else if (v === max) {
+                res.push(n);
+            }
+        }
+
+        return res.length > 1
+            ? Math.round(res.reduce((s, x) => s + x, 0) / res.length)
+            : res[0];
+    };
+
+    iconMorning = pick(m);
+    iconAfternoon = pick(a);
+}
+
+const icon = formatWeatherIcon(
+    iconMorning ? toWeatherIcon(iconMorning) : '',
+    iconAfternoon ? toWeatherIcon(iconAfternoon) : ''
+);
 
 bottom.innerHTML = `
     <span class="col-icon">${icon}</span>
