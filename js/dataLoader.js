@@ -1002,7 +1002,126 @@ function showNearestSpotName(map) {
     }
 
     el.textContent = nearest.name;
+    renderSub2Weather(nearest);
+    
 }
+
+function renderSub2Weather(spot) {
+
+    const container = document.querySelector(".map-ui-sub2");
+    if (!container) return;
+
+    container.style.display = "block";
+    container.innerHTML = "";
+
+    if (!spot || !spot.whether) {
+        container.textContent = "no data";
+        return;
+    }
+
+    const raw = spot.whether.hourly?.[0]?.weather;
+    const w = formatPrefWeather(spot.whether);
+
+    let icon = '';
+
+    // =========================
+    // prefと完全同一ロジック
+    // =========================
+    if (Array.isArray(raw)) {
+
+        const adjustCode = (code, pop) => {
+            const p = Number(pop);
+
+            if (code >= 60) {
+                if (p >= 80) return 70;
+                if (p >= 60) return 60;
+                return 60;
+            }
+
+            if (p >= 70) return 30;
+            if (p >= 50) return 10;
+
+            return code;
+        };
+
+        const m = {};
+        const a = {};
+
+        for (let i = 0; i < raw.length; i++) {
+
+            const r = raw[i];
+            const code = Number(r?.[0]);
+            const pop = Number(r?.[2]);
+
+            if (!Number.isFinite(code)) continue;
+
+            const adj = adjustCode(code, pop);
+            const hour = i * 2;
+
+            if (hour <= 12) {
+                m[adj] = (m[adj] || 0) + 1;
+            } else if (hour >= 14 && hour <= 20) {
+                a[adj] = (a[adj] || 0) + 1;
+            }
+        }
+
+        const pick = (map) => {
+            let max = -1;
+            let res = [];
+
+            for (const k in map) {
+                const v = map[k];
+                const n = Number(k);
+
+                if (v > max) {
+                    max = v;
+                    res = [n];
+                } else if (v === max) {
+                    res.push(n);
+                }
+            }
+
+            return res.length > 1
+                ? Math.round(res.reduce((s, x) => s + x, 0) / res.length)
+                : res[0];
+        };
+
+        const iconMorning = pick(m);
+        const iconAfternoon = pick(a);
+
+        const mIcon = iconMorning != null ? toWeatherIcon(iconMorning) : '';
+        const aIcon = iconAfternoon != null ? toWeatherIcon(iconAfternoon) : '';
+
+        icon = (mIcon && aIcon && mIcon !== aIcon)
+            ? `${mIcon}<span class="unit-text">→</span>${aIcon}`
+            : (mIcon || aIcon);
+    }
+
+    container.innerHTML = `
+        <div class="sub2-weather">
+
+            <span class="col-icon">${icon}</span>
+
+            <div class="col-temp">
+                <span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span>
+            </div>
+
+            <div class="col-label">
+                <span class="unit-text">降水</span>
+            </div>
+
+            <div class="col-pop">
+                <span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span>
+            </div>
+
+            <div class="col-wind">
+                <span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span>
+            </div>
+
+        </div>
+    `;
+}
+
 
 function showFishPopup(spot) {
     
