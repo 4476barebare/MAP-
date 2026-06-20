@@ -559,14 +559,21 @@ function renderPrefWeather() {
         const wind = w.wind;
         const name = rep.name;
 
-        el.innerHTML = `
-            <span>${icon}</span>
-            <div style="width: 12px">${withUnit(temp, '°C')}</div>
-            <span class="unit-text">降水</span>
-            <div style="width: 12px">${withUnit(pop, '%')}</div>
-            <div style="width: 12px">${withUnit(wind, 'm/s')}</div>
-            <span class="pref-name">${name}</span>
-        `;
+el.innerHTML = `
+    <span>${icon}</span>
+    <div class="value">
+        ${temp}<span class="unit-text">°C</span>
+    </div>
+    <span class="unit-text">降水</span>
+    <div class="value">
+        ${Math.min(pop, 99)}<span class="unit-text">%</span>
+    </div>
+    <div class="value">
+        ${wind}<span class="unit-text">m/s</span>
+    </div>
+    <span class="pref-name">${name}</span>
+`;
+
     }
 }
 
