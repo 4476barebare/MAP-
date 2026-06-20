@@ -1011,7 +1011,9 @@ function renderSub2Weather(spot) {
     const container = document.querySelector(".map-ui-sub2");
     if (!container) return;
 
-    container.style.display = "block";
+    // ★ここが本体
+    container.style.display = "inline-flex";
+
     container.innerHTML = "";
 
     if (!spot || !spot.whether) {
@@ -1024,9 +1026,6 @@ function renderSub2Weather(spot) {
 
     let icon = '';
 
-    // =========================
-    // prefと完全同一ロジック
-    // =========================
     if (Array.isArray(raw)) {
 
         const adjustCode = (code, pop) => {
