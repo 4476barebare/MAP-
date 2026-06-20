@@ -518,86 +518,69 @@ function renderPrefWeather() {
         }
 
         const w = formatPrefWeather(rep.whether);
+        const rows = rep.whether?.hourly?.[0]?.weather || [];
 
-        // =========================
-        // ★ week統一：hourly0固定
-        // =========================
-        const hourly = rep.whether?.hourly?.[0]?.weather;
+        const startHour = 0;
 
-        let iconCode = 0;
+        const morningRows = [];
+        const afternoonRows = [];
 
-        if (Array.isArray(hourly)) {
+        for (let i = 0; i < rows.length; i++) {
 
-            const adjustCode = (code, pop) => {
-                const p = Number(pop);
+            const hour = startHour + i * 2;
 
-                if (code >= 60) {
-                    if (p >= 80) return 70;
-                    if (p >= 60) return 60;
-                    return 60;
-                }
-
-                if (p >= 70) return 30;
-                if (p >= 50) return 10;
-
-                return code;
-            };
-
-            const map = {};
-            let maxCount = -1;
-            let tied = [];
-
-            for (const r of hourly) {
-
-                const code = Number(r?.[0]);
-                const pop  = Number(r?.[2]);
-
-                if (!Number.isFinite(code)) continue;
-
-                const adjusted = adjustCode(code, pop);
-
-                map[adjusted] = (map[adjusted] || 0) + 1;
+            if (hour >= 5 && hour <= 12) {
+                morningRows.push(rows[i]);
+            } else if (hour >= 13 && hour <= 20) {
+                afternoonRows.push(rows[i]);
             }
-
-            for (const k in map) {
-
-                const count = map[k];
-                const code = Number(k);
-
-                if (count > maxCount) {
-                    maxCount = count;
-                    tied = [code];
-                } else if (count === maxCount) {
-                    tied.push(code);
-                }
-            }
-
-            iconCode =
-                tied.length > 1
-                    ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
-                    : tied[0];
-
-        } else {
-            iconCode = rep.whether?.hourly?.[0]?.weather?.[0]?.[0] ?? 0;
         }
 
-        const icon = toWeatherIcon(iconCode);
+        const getIconSafe = (r) => {
+            if (!Array.isArray(r) || r.length === 0) return null;
+            return calcRepresentativeIcon(r);
+        };
 
-        const temp = Math.round(w.temp);
-        const pop  = Math.round(w.pop);
-        const wind = Math.round(w.wind);
+        const iconMorning = getIconSafe(morningRows);
+        const iconAfternoon = getIconSafe(afternoonRows);
+
+        let icon = '';
+
+        if (iconMorning && iconAfternoon) {
+            icon = iconMorning === iconAfternoon
+                ? iconMorning
+                : `${iconMorning}<span class="unit-text">→</span>${iconAfternoon}`;
+        } else {
+            icon = iconMorning || iconAfternoon || '';
+        }
+
+        const temp = w.temp;
+        const pop = Math.min(99, Math.round(w.pop));
+        const wind = w.wind;
         const name = rep.name;
 
-        el.innerHTML = `
-            <span>${icon}</span>
-            <div style="width: 12px">${temp}</div>
-            <span style="font-size: 8px;">°C 降水</span>
-            <div style="width: 12px">${pop}</div>
-            <span style="font-size: 8px;">%</span>
-            <div style="width: 12px">${wind}</div>
-            <span style="font-size: 8px;">m/s</span>
-            <span class="pref-name">${name}</span>
-        `;
+el.innerHTML = `
+    <span class="col-icon">${icon}</span>
+
+<div class="col-temp">
+    <span class="num-fixed">${temp}</span><span class="unit-text">°C</span>
+</div>
+
+<div class="col-label">
+    <span class="unit-text">降水</span>
+</div>
+
+<div class="col-pop">
+    <span class="num-fixed">${Math.min(pop, 99)}</span><span class="unit-text">%</span>
+</div>
+
+<div class="col-wind">
+    <span class="num-fixed">${wind}</span><span class="unit-text">m/s</span>
+</div>
+
+    <span class="pref-name">${name}</span>
+`;
+
     }
 }
 
@@ -671,6 +654,60 @@ function formatPrefWeather(whether) {
         pop: displayPop, // ★ 修正：maxPop → displayPop
         wind: Math.round(maxWind)
     };
+}
+
+function calcRepresentativeIcon(rows) {
+
+    const adjustCode = (code, pop) => {
+        const p = Number(pop);
+
+        if (code >= 60) {
+            if (p >= 80) return 70;
+            if (p >= 60) return 60;
+            return 60;
+        }
+
+        if (p >= 70) return 30;
+        if (p >= 50) return 10;
+
+        return code;
+    };
+
+    const map = {};
+    let maxCount = -1;
+    let tied = [];
+
+    for (const r of rows) {
+
+        const code = Number(r?.[0]);
+        const pop  = Number(r?.[2]);
+
+        if (!Number.isFinite(code)) continue;
+
+        const adjusted = adjustCode(code, pop);
+
+        map[adjusted] = (map[adjusted] || 0) + 1;
+    }
+
+    for (const k in map) {
+
+        const count = map[k];
+        const code = Number(k);
+
+        if (count > maxCount) {
+            maxCount = count;
+            tied = [code];
+        } else if (count === maxCount) {
+            tied.push(code);
+        }
+    }
+
+    const iconCode =
+        tied.length > 1
+            ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
+            : tied[0];
+
+    return toWeatherIcon(iconCode);
 }
 
 function toWeatherIcon(code) {
