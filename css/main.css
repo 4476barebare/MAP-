@@ -1133,20 +1133,11 @@ li {
     flex-shrink: 0;           /* ←潰れ防止 */
 }
 
-
-
 .num-fixed {
-
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-
-    font-variant-numeric: tabular-nums; /* 重要：数字幅を揃える */
-
     display: inline-block;
-
-    min-width: 2.2em; /* 桁揃え用（調整ポイント） */
-
+    width: 2ch;          /* 数字3桁分で固定（1の幅基準） */
     text-align: right;
-
+    white-space: nowrap;
 }
 
 /* 中身右寄せ維持 */
