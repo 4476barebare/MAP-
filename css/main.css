@@ -735,6 +735,13 @@ li {
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: 4px;
 }
+
+.map-ui-sub2 .sub2-weather {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
 /* =========================
    SPOT LABEL
 ========================= */
