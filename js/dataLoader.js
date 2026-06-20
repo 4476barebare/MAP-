@@ -1092,7 +1092,7 @@ function renderSub2Weather(spot) {
         const aIcon = iconAfternoon != null ? toWeatherIcon(iconAfternoon) : '';
 
         icon = (mIcon && aIcon && mIcon !== aIcon)
-            ? `${mIcon}<span class="unit-text">→</span>${aIcon}`
+            ? `${mIcon}<span>→</span>${aIcon}`
             : (mIcon || aIcon);
     }
 
@@ -1102,11 +1102,11 @@ function renderSub2Weather(spot) {
             <span class="col-icon">${icon}</span>
 
             <div class="col-temp">
-                <span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span>
+                <span class="num-fixed">最高気温${w.temp}</span><span class="unit-text">°C</span>
             </div>
 
             <div class="col-label">
-                <span class="unit-text">降水</span>
+                <span class="num-fixed">降水確率</span>
             </div>
 
             <div class="col-pop">
@@ -1114,7 +1114,7 @@ function renderSub2Weather(spot) {
             </div>
 
             <div class="col-wind">
-                <span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span>
+                <span class="num-fixed">最大風速${w.wind}</span><span class="unit-text">m/s</span>
             </div>
 
         </div>
