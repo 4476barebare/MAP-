@@ -1124,13 +1124,14 @@ li {
     text-align: right;
 }
 
-/* 列幅固定 */
 .pref-weather .col-icon {
-    width: 20px;              /* 少し余裕持たせる */
-    display: inline-flex;     /* ←重要 */
-    justify-content: center;  /* 中央寄せ */
-    align-items: center;      /* 縦中央 */
-    flex-shrink: 0;           /* ←潰れ防止 */
+    width: 20px;
+    flex: 0 0 20px;        /* ←これ抜けると事故る */
+    display: flex;         /* inline-flexやめる */
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    overflow: hidden;      /* ←はみ出し防止 */
 }
 
 .num-fixed {
