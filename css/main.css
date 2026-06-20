@@ -1125,13 +1125,13 @@ li {
 }
 
 .pref-weather .col-icon {
-    width: 20px;
+    width: 32px;
     flex: 0 0 20px;        /* ←これ抜けると事故る */
     display: flex;         /* inline-flexやめる */
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-    overflow: hidden;      /* ←はみ出し防止 */
+    overflow: visible;
 }
 
 .num-fixed {
