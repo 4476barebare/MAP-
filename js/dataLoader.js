@@ -629,11 +629,10 @@ function createMenuItem(s) {
         const raw = s.whether.hourly?.[0]?.weather;
         const w = formatPrefWeather(s.whether);
 
-        let iconMorning = null;
-        let iconAfternoon = null;
+        let icon = '';
 
         // =========================
-        // 2時間刻みデータ集計
+        // 2時間刻み集計（prefと同一ロジック）
         // =========================
         if (Array.isArray(raw)) {
 
@@ -668,8 +667,7 @@ function createMenuItem(s) {
 
                 if (hour <= 12) {
                     m[adj] = (m[adj] || 0) + 1;
-                } 
-                else if (hour >= 14 && hour <= 20) {
+                } else if (hour >= 14 && hour <= 20) {
                     a[adj] = (a[adj] || 0) + 1;
                 }
             }
@@ -695,19 +693,16 @@ function createMenuItem(s) {
                     : res[0];
             };
 
-            iconMorning = pick(m);
-            iconAfternoon = pick(a);
+            const iconMorning = pick(m);
+            const iconAfternoon = pick(a);
+
+            const mIcon = iconMorning != null ? toWeatherIcon(iconMorning) : '';
+            const aIcon = iconAfternoon != null ? toWeatherIcon(iconAfternoon) : '';
+
+            icon = (mIcon && aIcon && mIcon !== aIcon)
+                ? `${mIcon}<span class="unit-text">→</span>${aIcon}`
+                : (mIcon || aIcon);
         }
-
-        // =========================
-        // prefと完全統一の表示ロジック
-        // =========================
-        const mIcon = iconMorning != null ? formatWeatherIcon(iconMorning) : '';
-        const aIcon = iconAfternoon != null ? formatWeatherIcon(iconAfternoon) : '';
-
-        const icon = (mIcon && aIcon && mIcon !== aIcon)
-            ? `${mIcon}<span class="unit-text">→</span>${aIcon}`
-            : (mIcon || aIcon);
 
         bottom.innerHTML = `
             <span class="col-icon">${icon}</span>
