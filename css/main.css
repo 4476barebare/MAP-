@@ -1132,10 +1132,22 @@ li {
     align-items: center;      /* 縦中央 */
     flex-shrink: 0;           /* ←潰れ防止 */
 }
-.pref-weather .col-temp  { width: 36px; }
-.pref-weather .col-label { width: 28px; }
-.pref-weather .col-pop   { width: 36px; }
-.pref-weather .col-wind  { width: 42px; }
+
+
+
+.num-fixed {
+
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+    font-variant-numeric: tabular-nums; /* 重要：数字幅を揃える */
+
+    display: inline-block;
+
+    min-width: 2.2em; /* 桁揃え用（調整ポイント） */
+
+    text-align: right;
+
+}
 
 /* 中身右寄せ維持 */
 .pref-weather .col-temp,
