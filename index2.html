@@ -546,13 +546,20 @@ function renderPrefWeather() {
 
         let icon = '';
 
+let icon = '';
+
         if (iconMorning && iconAfternoon) {
+
             icon = iconMorning === iconAfternoon
-                ? `<span class="unit">${iconMorning}</span>`
-                : `<span class="unit">${iconMorning}</span><span class="unit">→</span><span class="unit">${iconAfternoon}</span>`;
+
+                ? iconMorning
+
+                : `${iconMorning}<span class="unit">→</span>${iconAfternoon}`;
+
         } else {
-            const single = iconMorning || iconAfternoon || '';
-            icon = single ? `<span class="unit">${single}</span>` : '';
+
+            icon = iconMorning || iconAfternoon || '';
+
         }
 
         const temp = w.temp;
