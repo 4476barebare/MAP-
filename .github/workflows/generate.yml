@@ -3,7 +3,7 @@ name: Generate Weather Maps
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 9,21 * * *'  # 毎日 09:00 と 21:00
+    - cron: '0 6,18 * * *'  # 毎日 09:00 と 21:00
 
 jobs:
   generate:
