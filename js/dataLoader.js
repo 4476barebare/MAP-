@@ -1011,13 +1011,13 @@ function renderSub2Weather(spot) {
     const container = document.querySelector(".map-ui-sub2");
     if (!container) return;
 
-    // ★ここが本体
     container.style.display = "inline-flex";
-
     container.innerHTML = "";
 
+    // ★ここを先に判定する
     if (!spot || !spot.whether) {
-        container.textContent = "no data";
+        container.style.display = "none";
+        container.textContent = "";
         return;
     }
 
