@@ -937,53 +937,7 @@ fetch('/icon/back.svg')
         if (svgEl) svgEl.classList.add('back-icon');
     }); // ← これも閉じてる
 
-// ===== ポリシーモーダル（タブ切替付き） =====
-
-const policyLink = document.getElementById("policyLink");
-const policyModal = document.getElementById("policyModal");
-
-const showPolicyBtn = document.getElementById("showPolicy");
-const showContactBtn = document.getElementById("showContact");
-
-const policySection = document.getElementById("policySection");
-const contactSection = document.getElementById("contactSection");
-
-if (policyLink && policyModal) {
-
-    // 開く
-    policyLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        policyModal.style.display = "block";
-    });
-
-    // 背景クリックで閉じる
-    policyModal.addEventListener("click", (e) => {
-        if (e.target === policyModal) {
-            policyModal.style.display = "none";
-        }
-    });
-}
-
-// タブ切替
-if (showPolicyBtn && showContactBtn) {
-
-    showPolicyBtn.addEventListener("click", () => {
-        policySection.style.display = "block";
-        contactSection.style.display = "none";
-
-        showPolicyBtn.classList.add("active");
-        showContactBtn.classList.remove("active");
-    });
-
-    showContactBtn.addEventListener("click", () => {
-        policySection.style.display = "none";
-        contactSection.style.display = "block";
-
-        showContactBtn.classList.add("active");
-        showPolicyBtn.classList.remove("active");
-    });
-}
-    
+  
     
 function renderAreaGuide() {
 
