@@ -593,20 +593,37 @@ li {
 
 .policy-toggle {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
+/* ベースボタン（白背景前提） */
 .policy-btn {
-  padding: 6px 10px;
+  padding: 8px 12px;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  color: #333;              /* 水色排除 */
+  font-size: 14px;
+  border-radius: 6px;
   cursor: pointer;
-  border: 1px solid #ccc;
-  background: #f5f5f5;
+  transition: all 0.15s ease;
 }
 
+/* ホバー */
+.policy-btn:hover {
+  background: #f3f3f3;
+}
+
+/* アクティブ（選択中） */
 .policy-btn.active {
-  background: #ddd;
-  font-weight: bold;
+  background: #2f3b4a;      /* 落ち着いた濃いグレー系 */
+  color: #fff;
+  border-color: #2f3b4a;
+}
+
+/* フォーカス（スマホ/キーボード対策） */
+.policy-btn:focus {
+  outline: none;
 }
 
 /* =========================
