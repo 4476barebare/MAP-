@@ -591,6 +591,24 @@ li {
   color: #444;
 }
 
+.policy-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.policy-btn {
+  padding: 6px 10px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+}
+
+.policy-btn.active {
+  background: #ddd;
+  font-weight: bold;
+}
+
 /* =========================
    レスポンシブ
 ========================= */
