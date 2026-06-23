@@ -591,40 +591,46 @@ li {
   color: #444;
 }
 
-.policy-toggle {
+/* ===== ポリシーモーダル追加UI（既存非干渉） ===== */
+
+/* タブ領域 */
+#policyModal .policy-toggle {
   display: flex;
   gap: 10px;
   margin-bottom: 14px;
 }
 
-/* ベースボタン（白背景前提） */
-.policy-btn {
+/* ボタン（スコープ限定） */
+#policyModal .policy-btn {
   padding: 8px 12px;
   border: 1px solid #d0d0d0;
   background: #fff;
-  color: #333;              /* 水色排除 */
+  color: #333;
   font-size: 14px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 /* ホバー */
-.policy-btn:hover {
+#policyModal .policy-btn:hover {
   background: #f3f3f3;
 }
 
-/* アクティブ（選択中） */
-.policy-btn.active {
-  background: #2f3b4a;      /* 落ち着いた濃いグレー系 */
+/* アクティブ */
+#policyModal .policy-btn.active {
+  background: #2f3b4a;
   color: #fff;
   border-color: #2f3b4a;
 }
 
-/* フォーカス（スマホ/キーボード対策） */
-.policy-btn:focus {
-  outline: none;
+/* 念のため：モーダル内セクション暴走防止 */
+#policyModal #contactSection,
+#policyModal #policySection {
+  box-sizing: border-box;
 }
+
+
 
 /* =========================
    レスポンシブ
