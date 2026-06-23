@@ -217,70 +217,132 @@
 
 <div id="policyModal" class="modal">
   <div class="modal-content">
-    <section>
+
+    <!-- タブ切替 -->
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+
+    <!-- サイトポリシー -->
+    <section id="policySection">
       <h1>サイトポリシー</h1>
+
       <h2>1. 免責事項</h2>
       <p>
         当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、
         その完全性・正確性・最新性を保証するものではありません。
         当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。
       </p>
+
       <h2>2. 掲載情報について</h2>
       <p>
         掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、
         現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。
         利用前に必ず現地の最新情報をご確認ください。
       </p>
+
       <h2>3. 釣行データについて</h2>
       <p>
         当サイトの釣行データは過去の記録に基づくものであり、
         現在の釣果や釣りの可否を保証するものではありません。
         また海洋環境や生態系の状態を保証するものではありません。
       </p>
+
       <h2>4. 安全について</h2>
       <p>
         釣りを行う際は安全に十分配慮してください。
         釣り場所によっては管理者の許可が必要な場合があります。
         必ず現地のルールに従ってください。
       </p>
+
       <p>最終更新日：2026年5月</p>
     </section>
+
+    <!-- お問い合わせ -->
+    <section id="contactSection" style="display:none;">
+      <h1>お問い合わせ</h1>
+
+      <p>
+        当サイトへのご連絡は以下の用途に限ります。<br>
+        ・バグ報告<br>
+        ・その他の連絡事項
+      </p>
+
+      <p>
+        ※すべての内容に返信・個別対応は行いません。<br>
+        内容は確認のみ行い、必要に応じてサイト改善に反映します。
+      </p>
+
+      <h2>連絡先</h2>
+
+      <p>
+        <a href="mailto:info@turiiko.shop?subject=バグ報告&body=【発生場所】%0A【内容】%0A【再現手順】%0A">
+          バグ報告を送る
+        </a>
+      </p>
+
+      <p>
+        <a href="mailto:info@turiiko.shop?subject=その他&body=【内容】%0A">
+          その他の連絡
+        </a>
+      </p>
+    </section>
+
   </div>
 </div>
 <footer class="site-footer" id="policyLink">
   <div>© 釣り行こNAVI</div>
   <div class="footer-policy">サイトポリシー</div>
 </footer>
+
 <script src="../js/header.js"></script>
 <script>
-  // ===== ポリシーモーダル =====
+const policyLink = document.getElementById("policyLink");
+const policyModal = document.getElementById("policyModal");
 
-  const policyLink = document.getElementById("policyLink");
-  const policyModal = document.getElementById("policyModal");
+const showPolicyBtn = document.getElementById("showPolicy");
+const showContactBtn = document.getElementById("showContact");
 
-  if (policyLink && policyModal) {
+const policySection = document.getElementById("policySection");
+const contactSection = document.getElementById("contactSection");
+
+if (policyLink && policyModal) {
 
     // 開く
     policyLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      policyModal.style.display = "block";
+        e.preventDefault();
+        policyModal.style.display = "block";
     });
 
     // 背景クリックで閉じる
     policyModal.addEventListener("click", (e) => {
-      if (e.target === policyModal) {
-        policyModal.style.display = "none";
-      }
+        if (e.target === policyModal) {
+            policyModal.style.display = "none";
+        }
+    });
+}
+
+// タブ切替
+if (showPolicyBtn && showContactBtn) {
+
+    showPolicyBtn.addEventListener("click", () => {
+        policySection.style.display = "block";
+        contactSection.style.display = "none";
+
+        showPolicyBtn.classList.add("active");
+        showContactBtn.classList.remove("active");
     });
 
-    // ESCで閉じる（任意）
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        policyModal.style.display = "none";
-      }
-    });
+    showContactBtn.addEventListener("click", () => {
+        policySection.style.display = "none";
+        contactSection.style.display = "block";
 
-  }
+        showContactBtn.classList.add("active");
+        showPolicyBtn.classList.remove("active");
+    });
+}
+    
 </script>
 </body>
 </html>
