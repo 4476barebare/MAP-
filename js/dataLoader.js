@@ -1192,49 +1192,7 @@ function zoomToSpot(spot) {
     // データ補完
     // ========================
     let safe = spot;
-    alert(safe.URL);
 
-    if (!safe.URL) {
-
-        Promise.resolve(prepareFishForArea(window.currentAreaId))
-            .then(() => {
-
-                const spotId = window.currentSpotId.split("_");
-
-                const list = window.spotData.filter(s =>
-                    String(s.areaId) === String(window.currentAreaId)
-                );
-
-                const safe2 = list.find(s =>
-                    String(s.individualId) === String(spotId[2])
-                );
-                
-                document.getElementById("nearest-spot").textContent = safe2.name;
-                document.getElementById('map-back-btn').style.display = 'block';
-
-                showFishMarkers(safe2.URL);
-                createWeekItem(safe2.whether);
-
-                // ❌ 削除：window.map.setMinZoom(safe.zoom || 15);
-                window.map.setMaxZoom(18);
-
-                window.map.setMaxBounds(window.map.getBounds());
-                window.map.options.maxBoundsViscosity = 1.0;
-
-                window._zoomGuardBase = safe.zoom || 15;
-                window._zoomGuardActive = true;
-
-                window.map.dragging.enable();
-                window.map.scrollWheelZoom.enable();
-                window.map.doubleClickZoom.enable();
-                window.map.touchZoom.enable();
-                
-                const area = window.currentAreaId.split("_");
-                openArea(area[1]);
-            });
-
-        return;
-    }
 
     // ========================
     // 通常ルート
