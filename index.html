@@ -415,9 +415,11 @@ if (window.currentSpotId) {
         spot.lng,
         spot.zoom
     );
-    alert(spot.URL);
-
-    zoomToSpot(spot);
+    
+    prepareFishForArea(window.currentAreaId).then(() => {
+        alert(spot.URL);
+        zoomToSpot(spot);
+    });
 
     return;
 }
