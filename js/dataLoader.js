@@ -562,11 +562,11 @@ function selectSpot(spot) {
     // ★ズーム13のみ分岐
     if (currentZoom === 13) {
 
-        if (spot.zoom != null) {
-            zoomToSpot(spot);
-        } else {
-            showFishPopup(spot);
-        }
+if (spot.zoom !== null && spot.zoom !== undefined && spot.zoom !== "") {
+    zoomToSpot(spot);
+} else {
+    showFishPopup(spot);
+}
         return;
     }
 
