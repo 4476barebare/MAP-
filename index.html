@@ -900,12 +900,13 @@ loadLocationCSV(csvUrl, window.currentPref).then(() => {
     loadWhetherCSV(whetherUrl).then(csv => {
         applyWhetherToSpots(csv);
         updateStateFromHash();
-        routeUpdate();
-        renderAreaGuide();
+        
         window.markerControl.preloadShop01(shopUrl);
         renderPrefWeather();
         removeCrowdImage();
         renderCrowdImage();
+        routeUpdate();
+        renderAreaGuide();
 
 getAlertText(window.prefData, function(result) {
     const el = document.getElementById("alert-bar");
