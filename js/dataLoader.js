@@ -554,6 +554,56 @@ marker.on('click', function () {
     );
 }
 
+function selectSpot(spot) {
+    removeCrowdImage();
+
+    const currentZoom = window.map.getZoom();
+
+    // ★ズーム13のみ分岐
+    if (currentZoom === 13) {
+
+        if (spot.zoom != null) {
+            zoomToSpot(spot);
+        } else {
+            showFishPopup(spot);
+        }
+        return;
+    }
+
+    if (window.markerControl) {
+        markerControl.showShop02(window.currentAreaId);
+    }
+
+    saveMapState();
+
+    if (window.phase1Group) {
+        window.phase1Group.clearLayers();
+    }
+
+    window.osmLayer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '© OpenStreetMap contributors',
+            keepBuffer: 16,
+            updateWhenIdle: true,
+            updateWhenZooming: false,
+            updateWhenDragging: false
+        }
+    ).addTo(window.map);
+
+    disableAreaSwipe();
+
+    drawLocation(spot.name, spot.lat, spot.lng, 13);
+
+    window.map.once('moveend', () => {
+        window.map.dragging.enable();
+        window.map.setMaxBounds(window.areaBounds);
+        window.map.options.maxBoundsViscosity = 1.0;
+    });
+
+    enablePhase2(window.map);
+}
+
 function phase1menu(areaId) {
 
     window.substitute = null;
@@ -742,55 +792,6 @@ function createMenuItem(s) {
     return li;
 }
 
-function selectSpot(spot) {
-    removeCrowdImage();
-
-    const currentZoom = window.map.getZoom();
-
-    // ★ズーム13のみ分岐
-    if (currentZoom === 13) {
-
-        if (spot.icon === "spot") {
-            zoomToSpot(spot);
-        } else {
-            showFishPopup(spot);
-        }
-        return;
-    }
-
-    if (window.markerControl) {
-        markerControl.showShop02(window.currentAreaId);
-    }
-
-    saveMapState();
-
-    if (window.phase1Group) {
-        window.phase1Group.clearLayers();
-    }
-
-    window.osmLayer = L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-            attribution: '© OpenStreetMap contributors',
-            keepBuffer: 16,
-            updateWhenIdle: true,
-            updateWhenZooming: false,
-            updateWhenDragging: false
-        }
-    ).addTo(window.map);
-
-    disableAreaSwipe();
-
-    drawLocation(spot.name, spot.lat, spot.lng, 13);
-
-    window.map.once('moveend', () => {
-        window.map.dragging.enable();
-        window.map.setMaxBounds(window.areaBounds);
-        window.map.options.maxBoundsViscosity = 1.0;
-    });
-
-    enablePhase2(window.map);
-}
 
 function enableDragForArea() {
     if (!window.areaBounds) return;
