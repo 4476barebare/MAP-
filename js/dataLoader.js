@@ -1192,6 +1192,7 @@ function zoomToSpot(spot) {
     // データ補完
     // ========================
     let safe = spot;
+    alert(safe.URL);
 
     if (!safe.URL) {
 
