@@ -1314,6 +1314,11 @@ function renderMarkers() {
 window.activeCol = null;
 
 function createWeekItem(weekData) {
+    if (
+  !weekData ||
+  (!weekData.hourly && !weekData.daily)
+) return;
+    
   const weekEl = document.querySelector(".week");
   if (!weekEl) return;
 
