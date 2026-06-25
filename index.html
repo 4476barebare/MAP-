@@ -415,16 +415,22 @@ if (window.currentSpotId) {
         spot.lng,
         spot.zoom
     );
+
+
+window.map.once("moveend", () => {
+
     removeCrowdImage();
+
     prepareFishForArea(window.currentAreaId).then(() => {
-        //alert(spot.URL);
-        document.getElementById('map-back-btn').style.display = 'block';
-requestAnimationFrame(() => {
 
-        zoomToSpot(spot);
+        requestAnimationFrame(() => {
+            window.map.stop();
+            zoomToSpot(spot);
+        });
 
     });
-    });
+
+});
 
     return;
 }
