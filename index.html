@@ -415,9 +415,10 @@ if (window.currentSpotId) {
         spot.lng,
         spot.zoom
     );
-    
+    removeCrowdImage();
     prepareFishForArea(window.currentAreaId).then(() => {
-        alert(spot.URL);
+        //alert(spot.URL);
+        document.getElementById('map-back-btn').style.display = 'block';
         zoomToSpot(spot);
     });
 
