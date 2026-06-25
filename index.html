@@ -416,18 +416,14 @@ if (window.currentSpotId) {
         spot.zoom
     );
 
-
-
-
-
-
+if (!window.gsiLayer) {
+    window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+}
     prepareFishForArea(window.currentAreaId).then(() => {
 
 
             
             zoomToSpot(spot);
-
-
     });
 
 
