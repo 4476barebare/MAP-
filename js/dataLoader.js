@@ -1212,14 +1212,12 @@ function zoomToSpot(spot) {
 
 if (safe?.individualId != null) {
 
-    const current = location.hash.replace('#', '');
-    const parts = current.split('/').filter(Boolean);
+    const hash = location.hash.replace('#', '');
 
-    const alreadyHasSpot = parts.includes(String(safe.individualId));
+    // すでにspotが含まれているか“文字列で”確認
+    if (!hash.endsWith('/' + safe.individualId)) {
 
-    if (!alreadyHasSpot) {
-        parts.push(safe.individualId);
-        location.hash = '/' + parts.join('/');
+        location.hash = hash + '/' + safe.individualId;
         updateStateFromHash();
     }
 }
