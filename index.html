@@ -419,7 +419,11 @@ if (window.currentSpotId) {
     prepareFishForArea(window.currentAreaId).then(() => {
         //alert(spot.URL);
         document.getElementById('map-back-btn').style.display = 'block';
+requestAnimationFrame(() => {
+
         zoomToSpot(spot);
+
+    });
     });
 
     return;
