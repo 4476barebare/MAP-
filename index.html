@@ -424,7 +424,7 @@ window.map.once("moveend", () => {
     prepareFishForArea(window.currentAreaId).then(() => {
 
         requestAnimationFrame(() => {
-            window.map.stop();
+            
             zoomToSpot(spot);
         });
 
