@@ -1210,11 +1210,19 @@ function zoomToSpot(spot) {
 
     document.getElementById("nearest-spot").textContent = safe.name;
 
-    if (safe && safe.individualId != null) {
-        const base = location.hash || '';
-        location.hash = base + '/' + safe.individualId;
+if (safe?.individualId != null) {
+
+    const current = location.hash.replace('#', '');
+    const parts = current.split('/').filter(Boolean);
+
+    const alreadyHasSpot = parts.includes(String(safe.individualId));
+
+    if (!alreadyHasSpot) {
+        parts.push(safe.individualId);
+        location.hash = '/' + parts.join('/');
         updateStateFromHash();
     }
+}
 
     window.map.once('moveend', function () {
 
