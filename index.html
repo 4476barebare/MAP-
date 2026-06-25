@@ -409,12 +409,35 @@ if (window.currentSpotId) {
         String(s.individualId) === String(spotId[2])
     );
 
-    drawLocation(
-        spot.name,
-        spot.lat,
-        spot.lng,
-    "13"
-    );
+window.map = L.map('lf-map', {
+
+    center: [spot.lat, spot.lng],
+
+    zoom: spot.zoom,
+
+    zoomControl: false,
+    scrollWheelZoom: false,
+    dragging: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    touchZoom: false,
+});
+
+window.map.options.zoomSnap = 0.5;
+window.map.options.zoomDelta = 0.5;
+window.map.attributionControl.setPosition('topright');
+
+window.phase1Group = L.layerGroup().addTo(window.map);
+window.phase2Group = L.layerGroup().addTo(window.map);
+
+window.gsiLayer = L.tileLayer(
+  window.gsiLayers.photo,
+  {
+    attribution: '© 国土地理院',
+    keepBuffer: 8
+  }
+).addTo(window.map);
 
     prepareFishForArea(window.currentAreaId).then(() => {
 
