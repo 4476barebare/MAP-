@@ -409,20 +409,24 @@ if (window.currentSpotId) {
         String(s.individualId) === String(spotId[2])
     );
 
+    drawLocation(
+        spot.name,
+        spot.lat,
+        spot.lng,
+        spot.zoom
+    );
 
 
-window.map.setView([spot.lat, spot.lng], spot.zoom, {
-    animate: false
-});
 
-    removeCrowdImage();
+
+
 
     prepareFishForArea(window.currentAreaId).then(() => {
 
-        requestAnimationFrame(() => {
+
             
             zoomToSpot(spot);
-        });
+
 
     });
 
