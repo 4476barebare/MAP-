@@ -294,7 +294,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     ).addTo(window.map);
 
     if (window.currentAreaId === null) {
-      showPrefSpots();
+    
     }
     return;
   }
@@ -1161,11 +1161,13 @@ function showFishPopup(spot) {
 
 
 function zoomToSpot(spot) {
+    
 
     window.mapStateSnapshot = null;
     disablePhase2(window.map);
     resetSpotLayers();
     clearSub2Weather();
+    removeCrowdImage();
 
 
     // ========================
