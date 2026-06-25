@@ -407,7 +407,7 @@ function prefetchAround(area) {
 
 
 function selectArea(area) {
-    removeCrowdImage();
+    
 
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
@@ -456,7 +456,7 @@ function selectArea(area) {
         showSpotsForArea(window.currentAreaId);
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
-        renderCrowdImage();
+        
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 markerControl.showShop01(window.currentAreaId);
@@ -2291,6 +2291,7 @@ function goBack() {
         window.gsiLayer.addTo(window.map);
 
         selectArea(area);
+        renderCrowdImage();
         return;
     }
 
@@ -2314,7 +2315,7 @@ requestAnimationFrame(() => {
 
     // ③ サイズ確定後に通知
     window.map.invalidateSize(true);
-    removeCrowdImage();
+
 
     // ④ その後に移動
     drawLocation(
@@ -2328,7 +2329,7 @@ requestAnimationFrame(() => {
     initAreaUI();
     showPrefSpots();
     renderPrefWeather();
-    renderCrowdImage();
+
     resetAreaGuide();
     
     
