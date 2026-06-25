@@ -413,12 +413,9 @@ if (window.currentSpotId) {
         spot.name,
         spot.lat,
         spot.lng,
-        spot.zoom
+    "13"
     );
 
-if (!window.gsiLayer) {
-    window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-}
     prepareFishForArea(window.currentAreaId).then(() => {
 
 
