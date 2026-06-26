@@ -3,8 +3,7 @@ name: Acquire Crowd Images
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 8 * * *'   # 午前7:30
-    - cron: '30 20 * * *'  # 午後7:30
+    - cron: '10 21,9 * * *'  # JST 06:00 と 18:00
 
 jobs:
   acquire:
