@@ -1,130 +1,65 @@
 function getAlertText(pref, callback) {
-  var messages = [];
-  var areaId = pref.url;
+  var areaId = pref.url; // "120000" を想定
+  var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
+  
+  // 新しいエンドポイント
+  var url = "https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json";
 
-  // ★ ここだけ安全化（Objectでも崩れない）
-  var prefix =
-    (pref && typeof pref.notes === "string")
-      ? pref.notes + ":"
-      : "";
+  // コードと名称のマッピング表（主要なもの）
+  var codeMap = {
+    "02": "暴風雪警報", "03": "大雨警報", "04": "洪水警報", "05": "暴風警報",
+    "06": "大雪警報", "07": "波浪警報", "08": "高潮警報",
+    "10": "大雨注意報", "12": "大雪注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報"
+  };
 
-  var hasTsunami = false;
-  var hasThunder = false;
-  var hasTyphoon = false;
-
-  // ---------------------
-  // ① 雷
-  // ---------------------
-  fetch("https://www.jma.go.jp/bosai/warning/data/warning/" + areaId + ".json")
+  fetch(url)
     .then(function(res) { return res.json(); })
     .then(function(data) {
+      if (!Array.isArray(data) || data.length === 0) return;
 
-      if (Array.isArray(data)) {
-        data.forEach(function(area) {
-          if (!area.warnings) return;
+      // 最新の発表データを取得（配列の最後を最新と仮定するか、日付でソートする）
+      var latestReport = data.reduce((a, b) => (new Date(a.reportDatetime) > new Date(b.reportDatetime) ? a : b));
+      
+      var activeAlerts = new Set();
+      var hasWarning = false;
+      var hasAdvisory = false;
 
-          area.warnings.forEach(function(w) {
-            if (w.code === "33" && w.status === "issue") {
-              messages.push("雷警報");
-              hasThunder = true;
+      // class10Items (北西部、北東部、南部など) を走査
+      if (latestReport.warning && latestReport.warning.class10Items) {
+        latestReport.warning.class10Items.forEach(function(area) {
+          area.kinds.forEach(function(kind) {
+            // "発表" または "継続" のものを抽出
+            if (kind.status === "発表" || kind.status === "継続") {
+              var alertName = codeMap[kind.code] || "不明な警報(" + kind.code + ")";
+              activeAlerts.add(alertName);
+              
+              // 警報（コード02〜08）か注意報（10〜）かの判定
+              var codeNum = parseInt(kind.code, 10);
+              if (codeNum >= 2 && codeNum <= 8) hasWarning = true;
+              else hasAdvisory = true;
             }
           });
         });
       }
 
+      var messages = Array.from(activeAlerts);
+      var text = prefix + (messages.length > 0 ? messages.join(" / ") : "現在警報・注意報はありません");
+
+      // 色の決定（警報優先）
+      var color = "#ffffff";
+      if (hasWarning) {
+        color = "#ff0000"; // 警報は赤
+      } else if (hasAdvisory) {
+        color = "#ffd400"; // 注意報は黄
+      }
+
+      if (callback) {
+        callback({ text: text, color: color });
+      }
     })
-    .catch(function() {})
-    .finally(function() {
-
-      // ---------------------
-      // ② 津波
-      // ---------------------
-      fetch("https://www.jma.go.jp/bosai/tsunami/data/list.json")
-        .then(function(res) { return res.json(); })
-        .then(function(list) {
-
-          if (Array.isArray(list) && list.length) {
-
-            return fetch("https://www.jma.go.jp/bosai/tsunami/data/" + list[0].id + ".json")
-              .then(function(res) { return res.json(); })
-              .then(function(detail) {
-
-                if (detail && Array.isArray(detail.areas)) {
-                  detail.areas.forEach(function(a) {
-                    if (a.code === areaId && a.grade && a.grade !== "None") {
-                      messages.push("津波警報");
-                      hasTsunami = true;
-                    }
-                  });
-                }
-
-              });
-          }
-
-        })
-        .catch(function() {})
-        .finally(function() {
-
-          // ---------------------
-          // ③ 台風
-          // ---------------------
-          fetch("https://www.jma.go.jp/bosai/typhoon/data/list.json")
-            .then(function(res) { return res.json(); })
-            .then(function(list) {
-
-              if (Array.isArray(list) && list.length > 0) {
-                messages.push("台風接近中");
-                hasTyphoon = true;
-              }
-
-            })
-            .catch(function() {})
-            .finally(function() {
-
-// ---------------------
-// 重複削除
-// ---------------------
-messages = messages.filter(function(v, i, self) {
-  return self.indexOf(v) === i;
-});
-
-// ★ 強制文字列化（ここが要求部分）
-var msgText = Array.isArray(messages)
-  ? messages.join(" / ")
-  : String(messages);
-
-var text =
-  String(prefix) +
-  (msgText.length > 0
-    ? msgText
-    : "現在警報はありません"
-  );
-
-              // ---------------------
-              // 色決定（優先順位あり）
-              // 津波 > 雷 > 台風
-              // ---------------------
-              var color = "#ffffff";
-
-              if (hasTsunami) {
-                color = "#ff0000";
-              } else if (hasThunder) {
-                color = "#ffd400";
-              } else if (hasTyphoon) {
-                color = "#ffffff";
-              }
-
-              if (!callback) return;
-
-              callback({
-                text: text,
-                color: color
-              });
-
-            });
-
-        });
-
+    .catch(function(err) {
+      console.error("警報取得エラー:", err);
+      if (callback) callback({ text: prefix + "情報取得失敗", color: "#808080" });
     });
 }
 
