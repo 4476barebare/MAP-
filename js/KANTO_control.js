@@ -16,7 +16,7 @@ import {
 const region = "KANTO";
 
 const prefs = [
-    "CHIBA"
+    "CHIBA","KNAGAWA"
 ];
 
 // ================================
