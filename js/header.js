@@ -1,56 +1,81 @@
 function getAlertText(pref, callback) {
-  var areaId = pref.url; // "120000" を想定
+  var areaId = pref.url; 
   var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
   
   // 新しいエンドポイント
   var url = "https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json";
 
-  // コードと名称のマッピング表（主要なもの）
+  // 気象庁のコード表（主要なもの網羅）
   var codeMap = {
     "02": "暴風雪警報", "03": "大雨警報", "04": "洪水警報", "05": "暴風警報",
     "06": "大雪警報", "07": "波浪警報", "08": "高潮警報",
-    "10": "大雨注意報", "12": "大雪注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報"
+    "10": "大雨注意報", "12": "大雪注意報", "13": "風雪注意報", "14": "雷注意報", 
+    "15": "強風注意報", "16": "波浪注意報", "17": "融雪注意報", "18": "洪水注意報", 
+    "19": "高潮注意報", "20": "濃霧注意報", "21": "乾燥注意報", "22": "なだれ注意報", 
+    "23": "低温注意報", "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報",
+    "33": "雷注意報"
   };
 
   fetch(url)
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      if (!Array.isArray(data) || data.length === 0) return;
+      if (!Array.isArray(data) || data.length === 0) {
+        if (callback) callback({ text: prefix + "現在警報はありません", color: "#ffffff" });
+        return;
+      }
 
-      // 最新の発表データを取得（配列の最後を最新と仮定するか、日付でソートする）
-      var latestReport = data.reduce((a, b) => (new Date(a.reportDatetime) > new Date(b.reportDatetime) ? a : b));
-      
-      var activeAlerts = new Set();
+      // 1. 時間が古い順（過去→現在）に並べ替える
+      data.sort(function(a, b) {
+        return new Date(a.reportDatetime).getTime() - new Date(b.reportDatetime).getTime();
+      });
+
+      var statusMap = {};
+
+      // 2. 全ての履歴を古い順からチェックし、最新のステータスで上書きしていく
+      data.forEach(function(report) {
+        if (report.warning && report.warning.class10Items) {
+          report.warning.class10Items.forEach(function(area) {
+            if (area.kinds) {
+              area.kinds.forEach(function(kind) {
+                if (kind.status === "発表" || kind.status === "継続") {
+                  statusMap[kind.code] = true;  // 有効になった
+                } else if (kind.status === "解除") {
+                  statusMap[kind.code] = false; // 解除された
+                }
+              });
+            }
+          });
+        }
+      });
+
+      var messages = [];
       var hasWarning = false;
       var hasAdvisory = false;
 
-      // class10Items (北西部、北東部、南部など) を走査
-      if (latestReport.warning && latestReport.warning.class10Items) {
-        latestReport.warning.class10Items.forEach(function(area) {
-          area.kinds.forEach(function(kind) {
-            // "発表" または "継続" のものを抽出
-            if (kind.status === "発表" || kind.status === "継続") {
-              var alertName = codeMap[kind.code] || "不明な警報(" + kind.code + ")";
-              activeAlerts.add(alertName);
-              
-              // 警報（コード02〜08）か注意報（10〜）かの判定
-              var codeNum = parseInt(kind.code, 10);
-              if (codeNum >= 2 && codeNum <= 8) hasWarning = true;
-              else hasAdvisory = true;
-            }
-          });
-        });
+      // 3. 最終的に「true（現在も有効）」なものだけを抽出
+      for (var code in statusMap) {
+        if (statusMap[code] === true) {
+          var alertName = codeMap[code] || "不明な警報(" + code + ")";
+          messages.push(alertName);
+          
+          // 02〜08を警報(赤)、それ以外を注意報(黄)とする
+          var codeNum = parseInt(code, 10);
+          if (codeNum >= 2 && codeNum <= 8) {
+            hasWarning = true;
+          } else {
+            hasAdvisory = true;
+          }
+        }
       }
 
-      var messages = Array.from(activeAlerts);
-      var text = prefix + (messages.length > 0 ? messages.join(" / ") : "現在警報・注意報はありません");
-
+      var text = prefix + (messages.length > 0 ? messages.join(" / ") : "現在警報はありません");
+      
       // 色の決定（警報優先）
       var color = "#ffffff";
       if (hasWarning) {
-        color = "#ff0000"; // 警報は赤
+        color = "#ff0000";
       } else if (hasAdvisory) {
-        color = "#ffd400"; // 注意報は黄
+        color = "#ffd400";
       }
 
       if (callback) {
@@ -58,10 +83,11 @@ function getAlertText(pref, callback) {
       }
     })
     .catch(function(err) {
-      console.error("警報取得エラー:", err);
-      if (callback) callback({ text: prefix + "情報取得失敗", color: "#808080" });
+      // 万が一エラーが起きてもシステムを止めない
+      if (callback) callback({ text: prefix + "現在警報はありません", color: "#ffffff" });
     });
 }
+
 
 function loadNews() {
 
