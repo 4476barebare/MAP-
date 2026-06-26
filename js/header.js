@@ -1,74 +1,49 @@
 function getAlertText(pref, callback) {
-  var areaId = pref.url; // 例: "120000"
+  var areaId = pref.url;
   var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
   var url = "https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json";
 
-  // 気象庁コード対応表
-  var codeMap = {
-    "02": "暴風雪警報", "03": "大雨警報", "04": "洪水警報", "05": "暴風警報",
-    "06": "大雪警報", "07": "波浪警報", "08": "高潮警報",
-    "10": "大雨注意報", "12": "大雪注意報", "13": "風雪注意報", "14": "雷注意報", 
-    "15": "強風注意報", "16": "波浪注意報", "17": "融雪注意報", "18": "洪水注意報", 
-    "19": "高潮注意報", "20": "濃霧注意報", "21": "乾燥注意報", "22": "なだれ注意報", 
-    "23": "低温注意報", "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報"
-  };
+  // 警報・注意報の定義（警報は02〜08、注意報は10以降）
+  function isWarning(code) {
+    var c = parseInt(code, 10);
+    return c >= 2 && c <= 8;
+  }
 
   fetch(url)
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      if (!Array.isArray(data) || data.length === 0) {
-        throw new Error("Empty data");
-      }
-
-      // 最新のレポートを取得（配列の最後が最新）
+      // 1. 最新のレポート(配列の最後)を取得
       var latest = data[data.length - 1];
       var alerts = [];
       var hasWarning = false;
-      var hasAdvisory = false;
 
-      // エリアごとの警報・注意報を確認
+      // 2. class10Items をすべて走査して、発表中のものを集める
       if (latest.warning && latest.warning.class10Items) {
-        for (var i = 0; i < latest.warning.class10Items.length; i++) {
-          var area = latest.warning.class10Items[i];
-          if (area.kinds) {
-            for (var j = 0; j < area.kinds.length; j++) {
-              var kind = area.kinds[j];
-              // 発表中または継続中のものだけを抽出
-              if (kind.status === "発表" || kind.status === "継続") {
-                var name = codeMap[kind.code] || "警報(" + kind.code + ")";
-                
-                // 重複排除してリストに追加
-                var exists = false;
-                for (var k = 0; k < alerts.length; k++) {
-                  if (alerts[k] === name) exists = true;
-                }
-                if (!exists) {
-                  alerts.push(name);
-                  // コード番号で警報か注意報か判定
-                  var c = parseInt(kind.code, 10);
-                  if (c >= 2 && c <= 8) hasWarning = true;
-                  else hasAdvisory = true;
-                }
-              }
+        latest.warning.class10Items.forEach(function(area) {
+          area.kinds.forEach(function(kind) {
+            // "発表" または "継続" のみ有効とみなす
+            if (kind.status === "発表" || kind.status === "継続") {
+              // 警報のみを対象にする場合はここでフィルタリング
+              // 今回は「暴風警報がない」を確認するため、すべて取得
+              alerts.push({ code: kind.code, name: "警報・注意報(" + kind.code + ")" });
+              if (isWarning(kind.code)) hasWarning = true;
             }
-          }
-        }
+          });
+        });
       }
 
-      var msgText = alerts.join(" / ");
-      var text = prefix + (msgText.length > 0 ? msgText : "現在警報はありません");
+      // 3. 結果の出力
+      var text = alerts.length > 0 ? alerts.map(function(a){ return a.name; }).join(" / ") : "現在警報はありません";
       
-      // 色の決定（警報があれば赤、注意報だけなら黄色）
-      var color = hasWarning ? "#ff0000" : (hasAdvisory ? "#ffd400" : "#ffffff");
-
       if (callback) {
-        callback({ text: text, color: color });
+        callback({
+          text: prefix + text,
+          color: hasWarning ? "#ff0000" : "#ffd400"
+        });
       }
     })
-    .catch(function(err) {
-      if (callback) {
-        callback({ text: prefix + "現在警報はありません", color: "#ffffff" });
-      }
+    .catch(function() {
+      if (callback) callback({ text: prefix + "取得失敗", color: "#808080" });
     });
 }
 
