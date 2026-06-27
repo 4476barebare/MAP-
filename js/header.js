@@ -2,7 +2,6 @@ function getAlertText(pref, callback) {
   var areaId = pref.url;
   var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
   
-  // 警報・注意報の名称マップ
   var codeMap = {
     "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
     "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "20": "濃霧注意報"
@@ -11,51 +10,49 @@ function getAlertText(pref, callback) {
   fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      // 1. 最新のレポートのインデックスを取得
-      var latest = data[data.length - 1];
-      var alertSet = { warnings: {}, advisories: {} }; // 重複を防ぐSet的なオブジェクト
-
-      if (latest.warning && latest.warning.class10Items) {
-        latest.warning.class10Items.forEach(function(area) {
-          area.kinds.forEach(function(kind) {
-            if (kind.status === "発表" || kind.status === "継続") {
-              var code = kind.code;
-              var name = codeMap[code] || "警報(" + code + ")";
-              var cNum = parseInt(code, 10);
-              
-              // 警報(02-09)ならwarnings、それ以外ならadvisoriesに格納
-              if (cNum >= 2 && cNum <= 9) {
-                alertSet.warnings[name] = true;
-              } else {
-                alertSet.advisories[name] = true;
-              }
-            }
-          });
-        });
-      }
-
-      var warningNames = Object.keys(alertSet.warnings);
-      var advisoryNames = Object.keys(alertSet.advisories);
-
-      // 2. 表示ロジック（警報優先、重複なし）
-      var finalMsgs = [];
-      var color = "#ffffff";
-
-      if (warningNames.length > 0) {
-        finalMsgs = warningNames; // 警報があるなら警報のみ表示
-        color = "#ff0000";        // 【重要】ここで赤色を強制セット
-      } else if (advisoryNames.length > 0) {
-        finalMsgs = advisoryNames.slice(0, 3); // 注意報は3つまで
-        if (advisoryNames.length > 3) finalMsgs.push("他" + (advisoryNames.length - 3) + "件");
-        color = "#ffd400";
-      } else {
-        finalMsgs = ["現在警報はありません"];
-      }
-
-      callback({
-        text: prefix + finalMsgs.join(" / "),
-        color: color
+      // 1. すべてのデータを時系列で昇順に並べ替え
+      data.sort(function(a, b) {
+        return new Date(a.reportDatetime) - new Date(b.reportDatetime);
       });
+
+      // 2. 警報の状態を保持するMap（キー：コード、値：true/false）
+      var statusMap = {};
+
+      // 3. 全データを順に処理（過去の発表 → 現在の解除 をすべて反映）
+      data.forEach(function(report) {
+        if (report.warning && report.warning.class10Items) {
+          report.warning.class10Items.forEach(function(area) {
+            area.kinds.forEach(function(kind) {
+              if (kind.status === "発表" || kind.status === "継続") {
+                statusMap[kind.code] = true;
+              } else if (kind.status === "解除") {
+                statusMap[kind.code] = false;
+              }
+            });
+          });
+        }
+      });
+
+      // 4. 生きているものだけを振り分け
+      var warnings = [];
+      var advisories = [];
+      for (var code in statusMap) {
+        if (statusMap[code] === true) {
+          var name = codeMap[code] || "警報(" + code + ")";
+          var c = parseInt(code, 10);
+          if (c >= 3 && c <= 8) warnings.push(name);
+          else advisories.push(name);
+        }
+      }
+
+      // 5. 優先表示（警報があれば警報のみ、なければ注意報）
+      var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
+      var color = (warnings.length > 0) ? "#ff0000" : "#ffd400";
+      
+      // 警報/注意報がない場合のケア
+      var text = (warnings.length === 0 && advisories.length === 0) ? "現在警報・注意報はありません" : finalMsgs.join(" / ");
+
+      callback({ text: prefix + text, color: color });
     })
     .catch(function() {
       callback({ text: prefix + "現在警報はありません", color: "#ffffff" });
