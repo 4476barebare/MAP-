@@ -1224,6 +1224,7 @@ if (typeParts[0] === 'special') {
 window.gsiLayer = L.tileLayer(tileUrl, {
 
     attribution: '国土地理院',
+    detectRetina: false
 
 
 
