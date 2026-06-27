@@ -1225,9 +1225,6 @@ window.gsiLayer = L.tileLayer(tileUrl, {
 
     attribution: '国土地理院',
 
-    maxZoom: 18,
-
-    tileSize: 256
 
 
 
