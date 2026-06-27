@@ -10,15 +10,9 @@ function getAlertText(pref, callback) {
   fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      // 1. すべてのデータを時系列で昇順に並べ替え
-      data.sort(function(a, b) {
-        return new Date(a.reportDatetime) - new Date(b.reportDatetime);
-      });
+      data.sort(function(a, b) { return new Date(a.reportDatetime) - new Date(b.reportDatetime); });
 
-      // 2. 警報の状態を保持するMap（キー：コード、値：true/false）
       var statusMap = {};
-
-      // 3. 全データを順に処理（過去の発表 → 現在の解除 をすべて反映）
       data.forEach(function(report) {
         if (report.warning && report.warning.class10Items) {
           report.warning.class10Items.forEach(function(area) {
@@ -33,23 +27,24 @@ function getAlertText(pref, callback) {
         }
       });
 
-      // 4. 生きているものだけを振り分け
       var warnings = [];
       var advisories = [];
       for (var code in statusMap) {
         if (statusMap[code] === true) {
-          var name = codeMap[code] || "警報(" + code + ")";
-          var c = parseInt(code, 10);
-          if (c >= 3 && c <= 8) warnings.push(name);
-          else advisories.push(name);
+          var name = codeMap[code] || "不明(" + code + ")";
+          // 【改良】名前の中に「警報」という文字があるかで判定する
+          if (name.indexOf("警報") !== -1) {
+            warnings.push(name);
+          } else {
+            advisories.push(name);
+          }
         }
       }
 
-      // 5. 優先表示（警報があれば警報のみ、なければ注意報）
+      // 警報があれば警報、なければ注意報（最大3つ）
       var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
       var color = (warnings.length > 0) ? "#ff0000" : "#ffd400";
       
-      // 警報/注意報がない場合のケア
       var text = (warnings.length === 0 && advisories.length === 0) ? "現在警報・注意報はありません" : finalMsgs.join(" / ");
 
       callback({ text: prefix + text, color: color });
