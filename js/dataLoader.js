@@ -2219,11 +2219,12 @@ function goBack() {
 
     const z = window.map.getZoom();
     const restoreSpot = buildSpotRestoreObject();
-    
+    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
+
     // =====================================================
     // ① phase2 → phase1（z >= 14）
     // =====================================================
-    if (z >= 14) {
+    if (z >= 14 || isSpecial) {
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -2376,10 +2377,12 @@ function buildSpotRestoreObject() {
     if (!spot) return null;
 
     return {
-        name: spot.name,
-        lat: Number(spot.lat),
-        lng: Number(spot.lng),
-        zoom: 13,
-        individualId: spot.individualId || spot.id || ''
-    };
+    name: spot.name,
+    lat: Number(spot.lat),
+    lng: Number(spot.lng),
+    zoom: 13,
+    individualId: spot.individualId || spot.id || '',
+    type: spot.type || ''
+};
+    
 }
