@@ -1185,22 +1185,13 @@ function zoomToSpot(spot) {
     removeCrowdImage();
 
     // ========================
-    // レイヤー再構築（512対応）
+    // レイヤー再構築
     // ========================
     if (window.gsiLayer) {
         window.map.removeLayer(window.gsiLayer);
     }
 
-    window.gsiLayer = L.tileLayer(
-        window.gsiLayers.photo,
-        {
-            attribution: '国土地理院',
-            maxZoom: 18,
-            tileSize: 512,
-            zoomOffset: -1,
-            updateWhenZooming: false
-        }
-    ).addTo(window.map);
+
 
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
@@ -1212,23 +1203,39 @@ function zoomToSpot(spot) {
     // ========================
     const safe = spot;
 
-    const zoom = Number(safe.zoom);
-    const finalZoom = Number.isNaN(zoom) ? 15 : zoom;
 
-    const typeParts = (safe.type || '').split('$');
+const typeParts = (safe.type || '').split('$');
 
-    let targetLat, targetLng;
+let targetLat, targetLng;
 
-    if (typeParts[0] === 'special') {
-        targetLat = Number(typeParts[1]);
-        targetLng = Number(typeParts[2]);
-    } else {
-        targetLat = Number(safe.lat);
-        targetLng = Number(safe.lng);
-    }
+let tileUrl;
 
-    if (Number.isNaN(targetLat) || Number.isNaN(targetLng)) return;
+if (typeParts[0] === 'special') {
 
+    tileUrl = window.gsiLayers.ort;
+
+    targetLat = typeParts[1];
+
+    targetLng = typeParts[2];
+
+} else {
+
+    tileUrl = window.gsiLayers.photo;
+
+    targetLat = safe.lat;
+
+    targetLng = safe.lng;
+
+}
+
+    window.gsiLayer = L.tileLayer(
+        window.gsiLayers.photo,
+        {
+            attribution: '国土地理院',
+            maxZoom: 18,
+            updateWhenZooming: false
+        }
+    ).addTo(window.map);
     // ========================
     // 操作ロック
     // ========================
@@ -1242,7 +1249,7 @@ function zoomToSpot(spot) {
     // ========================
     window.map.flyTo(
         [targetLat, targetLng],
-        finalZoom,
+        safe.zoom,
         { duration: 0.5 }
     );
 
