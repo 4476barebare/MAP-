@@ -1193,7 +1193,7 @@ function zoomToSpot(spot) {
 // ========================
 // データ補完
 // ========================
-let safe = { ...spot };
+let safe = spot;
 alert(safe.URL);
 // ★ special分岐（副作用なし）
 const typeParts = (safe.type || '').split('$');
