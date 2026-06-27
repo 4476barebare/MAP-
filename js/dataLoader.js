@@ -2218,6 +2218,7 @@ function goBack() {
     if (!area) return;
 
     const z = window.map.getZoom();
+    const restoreSpot = buildSpotRestoreObject();
     
     // =====================================================
     // ① phase2 → phase1（z >= 14）
@@ -2242,7 +2243,7 @@ function goBack() {
         
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        const restoreSpot = buildSpotRestoreObject();
+        //const restoreSpot = buildSpotRestoreObject();
         if (!restoreSpot) return;
 
         // spotキー除去
