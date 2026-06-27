@@ -894,20 +894,32 @@ function processSpotUtils(map) {
 
     if (!visibleSpots.length) return;
 
-    const zoom = map.getZoom();
+    // -------------------------
+    // ズーム分離（ここが重要）
+    // -------------------------
+    const rawZoom = map.getZoom();              // 小数ズーム（表示用）
+    const tileZoomBase = Math.floor(rawZoom);   // タイル計算用（整数）
 
-    // ★ photo専用URL固定
-    const baseUrl = window.gsiLayers.photo.replace('{z}', zoom);
+    // 512 + zoomOffset:-1 の補正
+    const effectiveZoom = tileZoomBase + 1;
+
+    // URL生成
+    const baseUrl = window.gsiLayers.photo.replace('{z}', effectiveZoom);
+
+    const n = Math.pow(2, effectiveZoom);
 
     let tileCount = 0;
 
     for (const s of visibleSpots) {
 
-        const n = Math.pow(2, zoom);
+        const lat = Number(s.lat);
+        const lng = Number(s.lng);
 
-        const tileX = Math.floor((s.lng + 180) / 360 * n);
+        if (Number.isNaN(lat) || Number.isNaN(lng)) continue;
 
-        const latRad = s.lat * Math.PI / 180;
+        const tileX = Math.floor((lng + 180) / 360 * n);
+
+        const latRad = lat * Math.PI / 180;
 
         const tileY = Math.floor(
             (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
@@ -929,6 +941,7 @@ function processSpotUtils(map) {
                 tileCount++;
             }
         }
+
         swapWithSubstitute(s);
     }
 }
@@ -1161,95 +1174,113 @@ function showFishPopup(spot) {
 
 
 function zoomToSpot(spot) {
-    
+
+    if (!window.map || !spot) return;
 
     window.mapStateSnapshot = null;
+
     disablePhase2(window.map);
     resetSpotLayers();
     clearSub2Weather();
     removeCrowdImage();
 
-
     // ========================
-    // ★ レイヤー統一
+    // レイヤー再構築（512対応）
     // ========================
     if (window.gsiLayer) {
-        window.gsiLayer.setUrl(window.gsiLayers.photo);
-    } else {
-        window.gsiLayer = L.tileLayer(
-            window.gsiLayers.photo,
-            {
-                attribution: '国土地理院',
-                maxZoom: 18
-            }
-        ).addTo(window.map);
+        window.map.removeLayer(window.gsiLayer);
     }
+
+    window.gsiLayer = L.tileLayer(
+        window.gsiLayers.photo,
+        {
+            attribution: '国土地理院',
+            maxZoom: 18,
+            tileSize: 512,
+            zoomOffset: -1,
+            updateWhenZooming: false
+        }
+    ).addTo(window.map);
 
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
     }
 
-// ========================
-// データ補完
-// ========================
-let safe = spot;
+    // ========================
+    // データ整形
+    // ========================
+    const safe = spot;
 
-// ★ special分岐（副作用なし）
-const typeParts = (safe.type || '').split('$');
+    const zoom = Number(safe.zoom);
+    const finalZoom = Number.isNaN(zoom) ? 15 : zoom;
 
-window.map.dragging.disable();
-window.map.scrollWheelZoom.disable();
-window.map.doubleClickZoom.disable();
-window.map.touchZoom.disable();
+    const typeParts = (safe.type || '').split('$');
 
-if (typeParts[0] === 'special') {
-    window.map.flyTo(
-        [Number(typeParts[1]), Number(typeParts[2])],
-        safe.zoom,
-        { duration: 0.5 }
-    );
-} else {
-    window.map.flyTo(
-        [safe.lat, safe.lng],
-        safe.zoom,
-        { duration: 0.5 }
-    );
-}
+    let targetLat, targetLng;
+
+    if (typeParts[0] === 'special') {
+        targetLat = Number(typeParts[1]);
+        targetLng = Number(typeParts[2]);
+    } else {
+        targetLat = Number(safe.lat);
+        targetLng = Number(safe.lng);
+    }
+
+    if (Number.isNaN(targetLat) || Number.isNaN(targetLng)) return;
 
     // ========================
+    // 操作ロック
+    // ========================
+    window.map.dragging.disable();
+    window.map.scrollWheelZoom.disable();
+    window.map.doubleClickZoom.disable();
+    window.map.touchZoom.disable();
 
+    // ========================
+    // 移動
+    // ========================
+    window.map.flyTo(
+        [targetLat, targetLng],
+        finalZoom,
+        { duration: 0.5 }
+    );
 
-    
+    // ========================
+    // UI更新
+    // ========================
+    const el = document.getElementById("nearest-spot");
+    if (el) el.textContent = safe.name || '';
 
-    document.getElementById("nearest-spot").textContent = safe.name;
+    if (safe?.individualId != null) {
+        const hash = location.hash.replace('#', '');
 
-if (safe?.individualId != null) {
-
-    const hash = location.hash.replace('#', '');
-
-    // すでにspotが含まれているか“文字列で”確認
-    if (!hash.endsWith('/' + safe.individualId)) {
-
-        location.hash = hash + '/' + safe.individualId;
-        updateStateFromHash();
+        if (!hash.endsWith('/' + safe.individualId)) {
+            location.hash = hash + '/' + safe.individualId;
+            updateStateFromHash();
+        }
     }
-}
 
+    // ========================
+    // 移動完了後処理
+    // ========================
     window.map.once('moveend', function () {
 
         showFishMarkers(safe.URL);
         createWeekItem(safe.whether);
 
-        // ❌ 削除：window.map.setMinZoom(safe.zoom || 15);
         window.map.setMaxZoom(18);
 
-        window.map.setMaxBounds(window.map.getBounds());
+        // 現在ビューをロック
+        const bounds = window.map.getBounds();
+        window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0;
 
-        window._zoomGuardBase = safe.zoom || 15;
+        // ズームガード
+        window._zoomGuardBase = finalZoom;
         window._zoomGuardActive = true;
 
+        // 操作復帰
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
