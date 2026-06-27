@@ -105,7 +105,7 @@ function prepareFishForArea(areaId) {
           return res.text();
         })
         .then(text => {
-          const lines = text.trim().split('\n');
+          const lines = text.split('\n'); // ★ trim削除
           const headers = lines[0].split(',');
 
           window.fishData = lines.slice(1).map(line => {
@@ -122,18 +122,21 @@ function prepareFishForArea(areaId) {
 
   return loadPromise.then(() => {
     if (!window.spotData) return [];
+
     const targetSpots = window.spotData.filter(
-      s => s.areaId && s.areaId.trim() === areaId.trim()
+      s => s.areaId && s.areaId === areaId   // ★ trim削除
     );
+
     const targetFish = window.fishData.filter(
-      f => f.registration && f.registration.trim() === areaId.trim()
+      f => f.registration && f.registration === areaId  // ★ trim削除
     );
 
     targetSpots.forEach(spot => {
       const fishList = targetFish
-        .filter(f => f.parent && f.parent.trim() === spot.name.trim())
+        .filter(f => f.parent && f.parent === spot.name) // ★ trim削除
         .map(f => `${f.name}|${f.lat}|${f.lng}`);
-        spot.URL = fishList.join(',');
+
+      spot.URL = fishList.join(',');
     });
 
     return targetSpots;
@@ -1199,8 +1202,8 @@ alert(safe.URL);
 const typeParts = (safe.type || '').split('$');
 
 if (typeParts[0] === 'special') {
-    safe.lat = parseFloat(typeParts[1]);
-    safe.lng = parseFloat(typeParts[2]);
+    safe.lat = typeParts[1];
+    safe.lng = typeParts[2];
 }
 
 
