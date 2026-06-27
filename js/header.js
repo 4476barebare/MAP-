@@ -2,14 +2,12 @@ function getAlertText(pref, callback) {
   var areaId = pref.url;
   var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
   
- // codeMapに追加すべき重要コード
-var codeMap = {
-  // 既存のコードに加え、以下を必ず追加してください
-  "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
-  "09": "土砂災害警戒情報", // ← これが今回の犯人です
-  "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "20": "濃霧注意報"
-};
-
+  // 【重要】正式なコード表のみに絞ります
+  var codeMap = {
+    "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
+    "09": "土砂災害警戒情報",
+    "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "20": "濃霧注意報"
+  };
 
   fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
     .then(function(res) { return res.json(); })
@@ -33,32 +31,25 @@ var codeMap = {
 
       var warnings = [];
       var advisories = [];
+      
       for (var code in statusMap) {
         if (statusMap[code] === true) {
-          // 判定ロジックを微修正
-          var name = codeMap[code]; 
-          
-          // codeMapにない場合の補完
-          if (!name) {
-              if (code === "09") name = "土砂災害警戒情報";
-              else if (code === "01") name = "大雨警報（浸水害）"; // 今後の備え
-              else name = "警報(" + code + ")"; // 名前が不明でも「警報(数字)」として処理
-          }
-
-          // 判定ロジック（そのまま活用）
-          if (name.indexOf("警報") !== -1 || name.indexOf("警戒") !== -1) {
-            warnings.push(name);
-          } else {
-            advisories.push(name);
+          // 【改良】定義されているものだけを拾う。不明なコードは無視する
+          if (codeMap[code]) {
+            var name = codeMap[code];
+            // 「警報」「警戒」という文字が含まれるか判定
+            if (name.indexOf("警報") !== -1 || name.indexOf("警戒") !== -1) {
+              warnings.push(name);
+            } else {
+              advisories.push(name);
+            }
           }
         }
       }
 
-
-      // 警報があれば警報、なければ注意報（最大3つ）
+      // 表示ロジック
       var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
       var color = (warnings.length > 0) ? "#ff0000" : "#ffd400";
-      
       var text = (warnings.length === 0 && advisories.length === 0) ? "現在警報・注意報はありません" : finalMsgs.join(" / ");
 
       callback({ text: prefix + text, color: color });
