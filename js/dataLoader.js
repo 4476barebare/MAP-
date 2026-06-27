@@ -105,7 +105,7 @@ function prepareFishForArea(areaId) {
           return res.text();
         })
         .then(text => {
-          const lines = text.split('\n'); // ★ trim削除
+          const lines = text.split(/\r?\n/);
           const headers = lines[0].split(',');
 
           window.fishData = lines.slice(1).map(line => {
