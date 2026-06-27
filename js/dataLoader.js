@@ -1191,51 +1191,43 @@ function zoomToSpot(spot) {
         window.map.removeLayer(window.gsiLayer);
     }
 
-
+    window.gsiLayer = L.tileLayer(
+        window.gsiLayers.photo,
+        {
+            attribution: '国土地理院',
+            maxZoom: 18,
+            tileSize: 512,
+            zoomOffset: -1,
+            updateWhenZooming: false
+        }
+    ).addTo(window.map);
 
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
     }
 
-// ========================
-// データ整形
-// ========================
-const safe = spot;
+    // ========================
+    // データ整形
+    // ========================
+    const safe = spot;
 
-const zoom = safe.zoom;
-if (zoom == null) return;
+    const zoom = Number(safe.zoom);
+    const finalZoom = Number.isNaN(zoom) ? 15 : zoom;
 
-const typeParts = (safe.type || '').split('$');
+    const typeParts = (safe.type || '').split('$');
 
-let targetLat, targetLng;
-let tileUrl;
+    let targetLat, targetLng;
 
-if (typeParts[0] === 'special') {
-    tileUrl = window.gsiLayers.ort;
-    targetLat = Number(typeParts[1]);
-    targetLng = Number(typeParts[2]);
-} else {
-    tileUrl = window.gsiLayers.photo;
-    targetLat = Number(safe.lat);
-    targetLng = Number(safe.lng);
-}
+    if (typeParts[0] === 'special') {
+        targetLat = Number(typeParts[1]);
+        targetLng = Number(typeParts[2]);
+    } else {
+        targetLat = Number(safe.lat);
+        targetLng = Number(safe.lng);
+    }
 
-if (Number.isNaN(targetLat) || Number.isNaN(targetLng)) return;
-
-// ========================
-// レイヤー再構築
-// ========================
-if (window.gsiLayer) {
-    window.map.removeLayer(window.gsiLayer);
-}
-
-window.gsiLayer = L.tileLayer(tileUrl, {
-    attribution: '国土地理院',
-    maxZoom: 18,
-    tileSize: 256,
-    updateWhenZooming: false
-}).addTo(window.map);
+    if (Number.isNaN(targetLat) || Number.isNaN(targetLng)) return;
 
     // ========================
     // 操作ロック
@@ -1248,15 +1240,11 @@ window.gsiLayer = L.tileLayer(tileUrl, {
     // ========================
     // 移動
     // ========================
-window.map.flyTo(
-
-    [targetLat, targetLng],
-
-    zoom,
-
-    { duration: 0.5 }
-
-);
+    window.map.flyTo(
+        [targetLat, targetLng],
+        finalZoom,
+        { duration: 0.5 }
+    );
 
     // ========================
     // UI更新
