@@ -1282,7 +1282,7 @@ window.gsiLayer = L.tileLayer(tileUrl, {
         window.map.options.maxBoundsViscosity = 1.0;
 
         // ズームガード
-        window._zoomGuardBase = finalZoom;
+        window._zoomGuardBase = safe.zoom;
         window._zoomGuardActive = true;
 
         // 操作復帰
