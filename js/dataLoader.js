@@ -562,14 +562,11 @@ function selectSpot(spot) {
 
     const currentZoom = window.map.getZoom();
 
-    // ★ズーム13のみ分岐
-// ★ズーム13のみ分岐
 if (currentZoom === 13) {
 
     const zoom = Number(spot.zoom);
 
-    // 数値で、かつ13以上（小数OK）
-    if (!Number.isNaN(zoom) && zoom >= 13) {
+    if (!Number.isNaN(zoom)) {
         zoomToSpot(spot);
     } else {
         showFishPopup(spot);
