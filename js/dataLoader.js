@@ -1196,8 +1196,8 @@ function zoomToSpot(spot) {
         {
             attribution: '国土地理院',
             maxZoom: 18,
-            tileSize: 512,
-            zoomOffset: -1,
+            tileSize: 256
+// zoomOffset 削除
             updateWhenZooming: false
         }
     ).addTo(window.map);
