@@ -1201,23 +1201,29 @@ let safe = spot;
 // ★ special分岐（副作用なし）
 const typeParts = (safe.type || '').split('$');
 
+window.map.dragging.disable();
+window.map.scrollWheelZoom.disable();
+window.map.doubleClickZoom.disable();
+window.map.touchZoom.disable();
+
 if (typeParts[0] === 'special') {
-    safe.lat = typeParts[1];
-    safe.lng = typeParts[2];
+    window.map.flyTo(
+        [Number(typeParts[1]), Number(typeParts[2])],
+        safe.zoom,
+        { duration: 0.5 }
+    );
+} else {
+    window.map.flyTo(
+        [safe.lat, safe.lng],
+        safe.zoom,
+        { duration: 0.5 }
+    );
 }
 
-
     // ========================
-    // 通常ルート
-    // ========================
-    window.map.dragging.disable();
-    window.map.scrollWheelZoom.disable();
-    window.map.doubleClickZoom.disable();
-    window.map.touchZoom.disable();
 
-    window.map.flyTo([safe.lat, safe.lng], safe.zoom, {
-        duration: 0.5
-    });
+
+    
 
     document.getElementById("nearest-spot").textContent = safe.name;
 
