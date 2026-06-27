@@ -2,10 +2,14 @@ function getAlertText(pref, callback) {
   var areaId = pref.url;
   var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
   
-  var codeMap = {
-    "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
-    "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "20": "濃霧注意報"
-  };
+ // codeMapに追加すべき重要コード
+var codeMap = {
+  // 既存のコードに加え、以下を必ず追加してください
+  "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
+  "09": "土砂災害警戒情報", // ← これが今回の犯人です
+  "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "20": "濃霧注意報"
+};
+
 
   fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
     .then(function(res) { return res.json(); })
@@ -31,15 +35,25 @@ function getAlertText(pref, callback) {
       var advisories = [];
       for (var code in statusMap) {
         if (statusMap[code] === true) {
-          var name = codeMap[code] || "不明(" + code + ")";
-          // 【改良】名前の中に「警報」という文字があるかで判定する
-          if (name.indexOf("警報") !== -1) {
+          // 判定ロジックを微修正
+          var name = codeMap[code]; 
+          
+          // codeMapにない場合の補完
+          if (!name) {
+              if (code === "09") name = "土砂災害警戒情報";
+              else if (code === "01") name = "大雨警報（浸水害）"; // 今後の備え
+              else name = "警報(" + code + ")"; // 名前が不明でも「警報(数字)」として処理
+          }
+
+          // 判定ロジック（そのまま活用）
+          if (name.indexOf("警報") !== -1 || name.indexOf("警戒") !== -1) {
             warnings.push(name);
           } else {
             advisories.push(name);
           }
         }
       }
+
 
       // 警報があれば警報、なければ注意報（最大3つ）
       var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
