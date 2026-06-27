@@ -1190,10 +1190,18 @@ function zoomToSpot(spot) {
         window.osmLayer = null;
     }
 
-    // ========================
-    // データ補完
-    // ========================
-    let safe = spot;
+// ========================
+// データ補完
+// ========================
+let safe = { ...spot };
+
+// ★ special分岐（副作用なし）
+const typeParts = (safe.type || '').split('$');
+
+if (typeParts[0] === 'special') {
+    safe.lat = parseFloat(typeParts[1]);
+    safe.lng = parseFloat(typeParts[2]);
+}
 
 
     // ========================
