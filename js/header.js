@@ -2,63 +2,67 @@ function getAlertText(pref, callback) {
   var areaId = pref.url;
   var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
   
-  // 気象警報・注意報の名称（夏場に対応）
   var codeMap = {
     "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "08": "高潮警報",
-    "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報",
-    "18": "洪水注意報", "19": "高潮注意報", "20": "濃霧注意報", "21": "乾燥注意報"
+    "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪警報" // ※波浪警報は07
   };
+  // 修正：波浪警報のコードを追加
+  codeMap["07"] = "波浪警報";
 
   fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      // 最新のレポート(配列の最後)を取得
-      var latest = data[data.length - 1];
+      // 1. 全てのレポートを時間順に並べる（古い→新しい）
+      data.sort(function(a, b) {
+        return new Date(a.reportDatetime).getTime() - new Date(b.reportDatetime).getTime();
+      });
+
+      var activeCodes = {}; // 現在有効なコードを保持するMap
+
+      // 2. 全履歴をたどって、状態を更新していく
+      data.forEach(function(report) {
+        if (report.warning && report.warning.class10Items) {
+          report.warning.class10Items.forEach(function(area) {
+            area.kinds.forEach(function(kind) {
+              if (kind.status === "発表" || kind.status === "継続") {
+                activeCodes[kind.code] = true;
+              } else if (kind.status === "解除") {
+                activeCodes[kind.code] = false;
+              }
+            });
+          });
+        }
+      });
+
+      // 3. activeCodesがtrueのものだけを抽出
       var warningList = [];
       var advisoryList = [];
-
-      if (latest.warning && latest.warning.class10Items) {
-        latest.warning.class10Items.forEach(function(area) {
-          area.kinds.forEach(function(kind) {
-            if (kind.status === "発表" || kind.status === "継続") {
-              var name = codeMap[kind.code];
-              if (!name) return; // 定義外は無視
-
-              // 警報(03-08)か注意報(10-)で振り分け
-              var c = parseInt(kind.code, 10);
-              if (c >= 3 && c <= 8) {
-                if (warningList.indexOf(name) === -1) warningList.push(name);
-              } else {
-                if (advisoryList.indexOf(name) === -1) advisoryList.push(name);
-              }
-            }
-          });
-        });
+      
+      for (var code in activeCodes) {
+        if (activeCodes[code] === true) {
+          var name = codeMap[code] || "警報(" + code + ")";
+          var c = parseInt(code, 10);
+          if (c >= 3 && c <= 8) warningList.push(name);
+          else advisoryList.push(name);
+        }
       }
 
-      // 表示ロジック：警報があれば警報のみ、なければ注意報を3つまで
-      var finalMsgs = [];
-      var color = "#ffffff";
-
-      if (warningList.length > 0) {
-        finalMsgs = warningList;
-        color = "#ff0000"; // 警報は赤
-      } else if (advisoryList.length > 0) {
-        finalMsgs = advisoryList.slice(0, 3);
-        color = "#ffd400"; // 注意報は黄
-      } else {
-        finalMsgs = ["現在警報はありません"];
-      }
+      // 4. 表示決定
+      var finalMsgs = (warningList.length > 0) ? warningList : advisoryList;
+      var color = (warningList.length > 0) ? "#ff0000" : "#ffd400";
+      
+      var text = (finalMsgs.length > 0) ? finalMsgs.join(" / ") : "現在警報はありません";
 
       callback({
-        text: prefix + finalMsgs.join(" / "),
-        color: color
+        text: prefix + text,
+        color: (finalMsgs.length > 0) ? color : "#ffffff"
       });
     })
     .catch(function() {
       callback({ text: prefix + "現在警報はありません", color: "#ffffff" });
     });
 }
+
 
 
 function loadNews() {
