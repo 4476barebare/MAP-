@@ -1198,6 +1198,11 @@ function zoomToSpot(spot) {
         window.osmLayer = null;
     }
 
+// ========================
+// データ整形
+// ========================
+const safe = spot;
+
 const zoom = safe.zoom;
 if (zoom == null) return;
 
@@ -1208,13 +1213,15 @@ let tileUrl;
 
 if (typeParts[0] === 'special') {
     tileUrl = window.gsiLayers.ort;
-    targetLat = typeParts[1];
-    targetLng = typeParts[2];
+    targetLat = Number(typeParts[1]);
+    targetLng = Number(typeParts[2]);
 } else {
     tileUrl = window.gsiLayers.photo;
-    targetLat = safe.lat;
-    targetLng = safe.lng;
+    targetLat = Number(safe.lat);
+    targetLng = Number(safe.lng);
 }
+
+if (Number.isNaN(targetLat) || Number.isNaN(targetLng)) return;
 
 // ========================
 // レイヤー再構築
@@ -1230,8 +1237,6 @@ window.gsiLayer = L.tileLayer(tileUrl, {
     updateWhenZooming: false
 }).addTo(window.map);
 
-    if (Number.isNaN(targetLat) || Number.isNaN(targetLng)) return;
-
     // ========================
     // 操作ロック
     // ========================
@@ -1243,11 +1248,15 @@ window.gsiLayer = L.tileLayer(tileUrl, {
     // ========================
     // 移動
     // ========================
-    window.map.flyTo(
-        [targetLat, targetLng],
-        finalZoom,
-        { duration: 0.5 }
-    );
+window.map.flyTo(
+
+    [targetLat, targetLng],
+
+    zoom,
+
+    { duration: 0.5 }
+
+);
 
     // ========================
     // UI更新
