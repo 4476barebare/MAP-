@@ -668,6 +668,14 @@ li {
     z-index: 0;
 }
 
+/* Leafletのタイル画像を強制的に綺麗に補間する設定 */
+.leaflet-container .leaflet-tile {
+    /* ぼやけを抑えるためのブラウザ設定 */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
 /* =========================
    map-ui-top（全体）
 ========================= */
