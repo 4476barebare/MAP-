@@ -1221,15 +1221,16 @@ if (typeParts[0] === 'special') {
  if (window.gsiLayer) {
         window.map.removeLayer(window.gsiLayer);
     }
+// 修正箇所：L.tileLayer の設定部分
 window.gsiLayer = L.tileLayer(tileUrl, {
-
     attribution: '国土地理院',
-    detectRetina: false
-
-
-
-
+    detectRetina: false, // 一旦falseでOK
+    // 【重要】広域で見てもタイルがボヤけないようにする設定
+    // ズームレベルに関わらず、最も詳細なタイルを綺麗に表示させるためのヒントです
+    maxNativeZoom: 18, 
+    minZoom: 2
 }).addTo(window.map);
+
     
         if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
