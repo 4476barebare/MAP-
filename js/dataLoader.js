@@ -1186,17 +1186,7 @@ function zoomToSpot(spot) {
 
     // ========================
     // レイヤー再構築
-    // ========================
-    if (window.gsiLayer) {
-        window.map.removeLayer(window.gsiLayer);
-    }
 
-
-
-    if (window.osmLayer) {
-        window.map.removeLayer(window.osmLayer);
-        window.osmLayer = null;
-    }
 
     // ========================
     // データ整形
@@ -1228,14 +1218,25 @@ if (typeParts[0] === 'special') {
 
 }
 
-    window.gsiLayer = L.tileLayer(
-        window.gsiLayers.photo,
-        {
-            attribution: '国土地理院',
-            maxZoom: 18,
-            updateWhenZooming: false
-        }
-    ).addTo(window.map);
+ if (window.gsiLayer) {
+        window.map.removeLayer(window.gsiLayer);
+    }
+window.gsiLayer = L.tileLayer(tileUrl, {
+
+    attribution: '国土地理院',
+
+    maxZoom: 18,
+
+    tileSize: 256,
+
+    updateWhenZooming: false
+
+}).addTo(window.map);
+    
+        if (window.osmLayer) {
+        window.map.removeLayer(window.osmLayer);
+        window.osmLayer = null;
+    }
     // ========================
     // 操作ロック
     // ========================
