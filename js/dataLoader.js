@@ -1227,9 +1227,9 @@ window.gsiLayer = L.tileLayer(tileUrl, {
 
     maxZoom: 18,
 
-    tileSize: 256,
+    tileSize: 256
 
-    updateWhenZooming: false
+
 
 }).addTo(window.map);
     
