@@ -2424,6 +2424,7 @@ requestAnimationFrame(() => {
     initAreaUI();
     showPrefSpots();
     renderPrefWeather();
+    renderCrowdImage();
 
     resetAreaGuide();
     
