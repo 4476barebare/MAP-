@@ -250,25 +250,34 @@ function initAreaUI() {
 
     ul.innerHTML = '';
 
-    // =====================
-    // ■ ヘッダー
-    // =====================
-    const headerLi = document.createElement('li');
-    headerLi.className = 'menu-header-row';
-    headerLi.style.pointerEvents = 'none';
+// =====================
+// ■ ヘッダー
+// =====================
+const headerLi = document.createElement('li');
+headerLi.className = 'menu-header-row';
+headerLi.style.pointerEvents = 'none';
 
-    const headerRow = document.createElement('div');
-    headerRow.style.display = 'flex';
-    headerRow.style.justifyContent = 'flex-end';
-    headerRow.style.width = '100%';
+const headerRow = document.createElement('div');
+headerRow.style.display = 'flex';
+headerRow.style.justifyContent = 'space-between'; // ★変更
+headerRow.style.alignItems = 'center';
+headerRow.style.width = '100%';
 
-    const headerText = document.createElement('div');
-    headerText.textContent =
-        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+// ★ 左：cloudsUI
+const cloudsUI = document.createElement('div');
+cloudsUI.id = 'cloudsUI';
+cloudsUI.style.minWidth = '40px'; // 任意（崩れ防止）
 
-    headerRow.appendChild(headerText);
-    headerLi.appendChild(headerRow);
-    ul.appendChild(headerLi);
+// ★ 右：日付＋潮名
+const headerText = document.createElement('div');
+headerText.textContent =
+    formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+
+// 組み立て
+headerRow.appendChild(cloudsUI);
+headerRow.appendChild(headerText);
+headerLi.appendChild(headerRow);
+ul.appendChild(headerLi);
 
     // =====================
     // ■ エリア行
