@@ -949,11 +949,11 @@ function removeCrowdImage() {
     }
 
     // =======================
-    // cloudsUIは消さない（非表示だけ）
+    // ■ headerごと非表示（左右まとめて）
     // =======================
-    const cloudsUI = document.getElementById('cloudsUI');
-    if (cloudsUI) {
-        cloudsUI.style.display = 'none';
+    const header = document.querySelector('.menu-header-row');
+    if (header) {
+        header.style.display = 'none';
     }
 }
 
