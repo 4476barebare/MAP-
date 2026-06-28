@@ -533,7 +533,7 @@ spot.marker = marker;
 
 
 marker.on('click', function () {
-    removeCrowdImage();
+    
     selectSpot(spot); // ←これだけ
     
 });
@@ -840,6 +840,7 @@ function enablePhase2(map) {
         map.off('dragend', map._phase2Handler);
         map.off('moveend', map._phase2Handler);
     }
+    removeCrowdImage();
 
     const runPhase2 = () => {
 
