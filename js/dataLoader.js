@@ -538,6 +538,7 @@ marker.on('click', function () {
 //    const isFish = iconId.startsWith('fish');
 
     selectSpot(spot); // ←これだけ
+    removeCrowdImage();
 });
 
         window.areaSpotLayer.addLayer(marker);
@@ -568,7 +569,7 @@ if (currentZoom === 13) {
     if (!Number.isNaN(zoom)) {
         zoomToSpot(spot);
     } else {
-        removeCrowdImage();
+    
         showFishPopup(spot);
     }
     return;
