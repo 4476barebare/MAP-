@@ -1269,51 +1269,52 @@ window.map.flyTo(
         }
     }
 
-// ========================
-// 移動完了後処理
-// ========================
-window.map.once('moveend', function () {
+    // ========================
+    // 移動完了後処理
+    // ========================
+    window.map.once('moveend', function () {
 
-    showFishMarkers(safe.URL);
-    createWeekItem(safe.whether);
+        showFishMarkers(safe.URL);
+        createWeekItem(safe.whether);
 
-    window.map.setMaxZoom(18);
+        window.map.setMaxZoom(18);
 
-    // 1. 現在の表示範囲を取得
-    let bounds = window.map.getBounds();
-    
-    // 【修正】zoomLimit を if 文の外で宣言しておく（後から書き換えるので let を使う）
-    let zoomLimit;
+        let bounds;
+        let zoomLimit;
 
-    // 2. 13.5未満のときだけ、差分に応じた係数で範囲を広げる
-    if (safe.zoom < 13.5) {
-        // 差分を計算（例：12.5なら 13.5 - 12.5 = 1.0）
-        const paddingDiff = 13.5 - safe.zoom; 
-        
-        // pad()メソッドを使って新しい範囲を代入する
-        bounds = bounds.pad(paddingDiff);
-        
-        // 値を代入
-        zoomLimit = 13.5;
-    } else {
-        // 値を代入
-        zoomLimit = safe.zoom;
-    }
+        if (safe.zoom < 13.5) {
+            // 【13.5未満のとき】
+            // タイル画質のために13.5で表示されているので、画面の範囲を取得して pad で広げる
+            bounds = window.map.getBounds();
+            const paddingDiff = 13.5 - safe.zoom; 
+            bounds = bounds.pad(paddingDiff);
+            
+            zoomLimit = 13.5;
+        } else {
+            // 【13.5以上のとき】★ここを修正
+            // 移動後の getBounds() がバグるのを防ぐため、
+            // 目的地の座標（targetLat, targetLng）だけの「点」の範囲を作成する
+            // これにより、1ミリもドラッグできなくなります
+            bounds = L.latLngBounds([targetLat, targetLng], [targetLat, targetLng]);
+            
+            zoomLimit = safe.zoom;
+        }
 
-    // 3. 確定した範囲でドラッグをロック
-    window.map.setMaxBounds(bounds);
-    window.map.options.maxBoundsViscosity = 1.0;
+        // 確定した範囲でドラッグをロック
+        window.map.setMaxBounds(bounds);
+        window.map.options.maxBoundsViscosity = 1.0;
 
-    // ズームガード（これでエラーにならず正しく値が渡ります）
-    window._zoomGuardBase = zoomLimit;
-    window._zoomGuardActive = true;
+        // ズームガード
+        window._zoomGuardBase = zoomLimit;
+        window._zoomGuardActive = true;
 
-    // 操作復帰
-    window.map.dragging.enable();
-    window.map.scrollWheelZoom.enable();
-    window.map.doubleClickZoom.enable();
-    window.map.touchZoom.enable();
-});
+        // 操作復帰
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+    });
+
 
 
 }
