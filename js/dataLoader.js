@@ -632,32 +632,42 @@ function phase1menu(areaId) {
     ) || null;
 
 
-const header = document.createElement("li");
-header.className = "menu-header-row";
-header.style.cssText = "pointer-events:none; padding:4px 8px;";
+// =====================
+// ■ 既存リスト削除（header除く）
+// =====================
+const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
+oldItems.forEach(el => el.remove());
 
-const headerInner = document.createElement("div");
-headerInner.style.cssText = `
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    width:100%;
-`;
+// =====================
+// ■ header枠だけ保証
+// =====================
+let header = ul.querySelector('.menu-header-row');
 
-// cloudsUI
-const cloudsUI = document.getElementById('cloudsUI');
-if (cloudsUI) {
-    cloudsUI.style.display = '';
-    headerInner.appendChild(cloudsUI);
+if (!header) {
+    header = document.createElement('li');
+    header.className = 'menu-header-row';
+    header.style.pointerEvents = 'none';
+    ul.prepend(header);
 }
 
-// 右側
-const headerText = document.createElement("div");
-headerText.textContent =
-    `${formatDate(window.todayTide?.date)} ${window.todayTide?.tide}`;
+header.style.display = '';
 
-headerInner.appendChild(headerText);
-header.appendChild(headerInner);
+// =====================
+// ■ headerInner（枠だけ）
+// =====================
+let headerInner = header.querySelector('.header-row');
+
+if (!headerInner) {
+    headerInner = document.createElement('div');
+    headerInner.className = 'header-row';
+    headerInner.style.display = 'flex';
+    headerInner.style.justifyContent = 'space-between';
+    headerInner.style.alignItems = 'center';
+    headerInner.style.width = '100%';
+    header.appendChild(headerInner);
+}
+
+// ※ここでは中身（cloudsUI / text）は一切触らない
     // -------------------------
     // リスト生成（完全DOM化）
     // -------------------------
