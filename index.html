@@ -382,16 +382,26 @@ ul.appendChild(headerLi);
     window.map.on('click', window.nearestClickHandler);
 }
 
-// =======================
-// UI解除
-// =======================
 function destroyAreaUI() {
     const menuUl = document.querySelector('#map-menu ul');
-    if (menuUl) menuUl.innerHTML = '';
+
+    // ★ headerだけ非表示
+    const header = document.querySelector('.menu-header-row');
+    if (header) {
+        header.style.display = 'none';
+    }
+
+    // ★ リストだけ削除
+    if (menuUl) {
+        const items = menuUl.querySelectorAll('li:not(.menu-header-row)');
+        items.forEach(el => el.remove());
+    }
+
     if (window.nearestClickHandler) {
         window.map.off('click', window.nearestClickHandler);
         window.nearestClickHandler = null;
     }
+
     window.nearestClickEnabled = false;
     document.getElementById('map-menu').style.display = 'none';
 }
