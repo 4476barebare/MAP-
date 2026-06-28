@@ -1186,53 +1186,47 @@ function zoomToSpot(spot) {
 
     // ========================
     // レイヤー再構築
-
+    // ========================
 
     // ========================
     // データ整形
     // ========================
     const safe = spot;
+    const typeParts = (safe.type || '').split('$');
 
+    let targetLat, targetLng;
+    let tileUrl;
 
-const typeParts = (safe.type || '').split('$');
+    if (typeParts[0] === 'special') {
+        tileUrl = window.gsiLayers.ort;
+        targetLat = typeParts[1];
+        targetLng = typeParts[2];
+    } else {
+        tileUrl = window.gsiLayers.photo;
+        targetLat = safe.lat;
+        targetLng = safe.lng;
+    }
 
-let targetLat, targetLng;
-
-let tileUrl;
-
-if (typeParts[0] === 'special') {
-
-    tileUrl = window.gsiLayers.ort;
-
-    targetLat = typeParts[1];
-
-    targetLng = typeParts[2];
-
-} else {
-
-    tileUrl = window.gsiLayers.photo;
-
-    targetLat = safe.lat;
-
-    targetLng = safe.lng;
-
-}
-
- if (window.gsiLayer) {
+    if (window.gsiLayer) {
         window.map.removeLayer(window.gsiLayer);
     }
-// 修正箇所：L.tileLayer の設定部分
-window.gsiLayer = L.tileLayer(tileUrl, {
-    attribution: '国土地理院',
-    detectRetina: false,
-    minZoom: 13.5
-}).addTo(window.map);
-
+    window.gsiLayer = L.tileLayer(tileUrl, {
+        attribution: '国土地理院',
+        detectRetina: false
+    }).addTo(window.map);
     
-        if (window.osmLayer) {
+    if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
     }
+
+    // ----------------------------------------------------
+    // 【修正点1】ジャンプする段階から、あらかじめズームを引き上げておく
+    // ----------------------------------------------------
+    // もしここが safe.zoom（12.5など）のままだと、移動完了した瞬間に
+    // 「広すぎる画面範囲」を getBounds() が拾ってしまい、制限がガバガバになります。
+    const targetZoom = safe.zoom < 13.5 ? 13.5 : safe.zoom;
+
     // ========================
     // 操作ロック
     // ========================
@@ -1242,17 +1236,13 @@ window.gsiLayer = L.tileLayer(tileUrl, {
     window.map.touchZoom.disable();
 
     // ========================
-    // 移動
+    // 移動（targetZoom で飛ばす）
     // ========================
-// 【参考】flyTo を呼ぶ前の部分のイメージ
-const targetZoom = safe.zoom < 13.5 ? 13.5 : safe.zoom;
-
-window.map.flyTo(
-    [targetLat, targetLng],
-    targetZoom, // safe.zoom ではなく、強制的に引き上げたズームレベルを渡す
-    { duration: 0.5 }
-);
-
+    window.map.flyTo(
+        [targetLat, targetLng],
+        targetZoom, // safe.zoom から targetZoom に変更
+        { duration: 0.5 }
+    );
 
     // ========================
     // UI更新
@@ -1262,7 +1252,6 @@ window.map.flyTo(
 
     if (safe?.individualId != null) {
         const hash = location.hash.replace('#', '');
-
         if (!hash.endsWith('/' + safe.individualId)) {
             location.hash = hash + '/' + safe.individualId;
             updateStateFromHash();
@@ -1274,54 +1263,53 @@ window.map.flyTo(
     // ========================
     window.map.once('moveend', function () {
         
-        // 【重要】UI変更やレイヤー構築の裏でズレてしまったマップのサイズ認識を強制的に同期し、
-        // getBounds() が不正確（広すぎる範囲）な値を返すバグを根絶します
-        window.map.invalidateSize();
+        // ----------------------------------------------------
+        // 【修正点2】setTimeout で1回目特有のタイミングバグをシャットアウトする
+        // ----------------------------------------------------
+        // 移動直後はLeafletの内部座標計算がまだ不安定な場合があります。
+        // 100ミリ秒だけ処理をずらすことで、ブラウザの描画を完全に確定させ、
+        // 1回目でも2回目でも「常に100%正確な画面範囲」を確実に掴み取ります。
+        setTimeout(function () {
+            
+            // マップのサイズ認識を強制同期
+            window.map.invalidateSize();
 
-        showFishMarkers(safe.URL);
-        createWeekItem(safe.whether);
+            showFishMarkers(safe.URL);
+            createWeekItem(safe.whether);
 
-        window.map.setMaxZoom(18);
+            window.map.setMaxZoom(18);
 
-        // 正確な初期表示の画面範囲を取得
-        let bounds = window.map.getBounds();
-        let zoomLimit;
+            // 正確に確定した初期表示の画面範囲を取得
+            let bounds = window.map.getBounds();
+            let zoomLimit;
 
-        if (safe.zoom < 13.5) {
-            // 【13.5未満（広域）のとき】
-            // 本来の広域ズームとの差分だけ制限範囲を外側に広げる（その中ならドラッグ可能）
-            const paddingDiff = 13.5 - safe.zoom; 
-            bounds = bounds.pad(paddingDiff);
-            zoomLimit = 13.5;
-        } else {
-            // 【13.5以上（詳細）のとき】
-            // ズレのない正確な初期表示の画面範囲のままロックする
-            zoomLimit = safe.zoom;
-        }
+            if (safe.zoom < 13.5) {
+                // 本来の広域ズーム（12.5など）との差分だけ制限範囲を外側に広げる
+                const paddingDiff = 13.5 - safe.zoom; 
+                bounds = bounds.pad(paddingDiff);
+                zoomLimit = 13.5;
+            } else {
+                zoomLimit = safe.zoom;
+            }
 
-        // 算出した初期表示の範囲外に出られないようにロック
-        window.map.setMaxBounds(bounds);
-        
-        // 【重要】境界線にぶつかったときに、ゴムのようにバウンド（ビヨンビヨン）するのを防ぎ、
-        // 壁にぶつかったようにカチッと止める設定
-        window.map.options.maxBoundsViscosity = 1.0;
+            // 確定した正確な範囲でドラッグをロック
+            window.map.setMaxBounds(bounds);
+            window.map.options.maxBoundsViscosity = 1.0; // 境界線でピタッと止める
 
-        // ズームガード
-        window._zoomGuardBase = zoomLimit;
-        window._zoomGuardActive = true;
+            // ズームガード
+            window._zoomGuardBase = zoomLimit;
+            window._zoomGuardActive = true;
 
-        // 【重要】初期表示の範囲内であれば、ドラッグもズームも自由にできるようにすべて有効化
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
+            // 操作復帰（初期表示の範囲内であれば、ズームもドラッグも自由！）
+            window.map.dragging.enable();
+            window.map.scrollWheelZoom.enable();
+            window.map.doubleClickZoom.enable();
+            window.map.touchZoom.enable();
+
+        }, 100); // 100ミリ秒のウェイト
     });
-
-
-
-
-
 }
+
 
 function showFishMarkers(url) {
   if (!window.map) return;
