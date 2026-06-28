@@ -1273,48 +1273,50 @@ window.map.flyTo(
     // 移動完了後処理
     // ========================
     window.map.once('moveend', function () {
+        
+        // 【重要】UI変更やレイヤー構築の裏でズレてしまったマップのサイズ認識を強制的に同期し、
+        // getBounds() が不正確（広すぎる範囲）な値を返すバグを根絶します
+        window.map.invalidateSize();
 
         showFishMarkers(safe.URL);
         createWeekItem(safe.whether);
 
         window.map.setMaxZoom(18);
 
+        // 正確な初期表示の画面範囲を取得
+        let bounds = window.map.getBounds();
         let zoomLimit;
 
         if (safe.zoom < 13.5) {
             // 【13.5未満（広域）のとき】
-            // ユーザーがドラッグして周りを見られるようにする
-            let bounds = window.map.getBounds();
+            // 本来の広域ズームとの差分だけ制限範囲を外側に広げる（その中ならドラッグ可能）
             const paddingDiff = 13.5 - safe.zoom; 
             bounds = bounds.pad(paddingDiff);
-            
-            // 範囲制限を設定し、操作を有効化する
-            window.map.setMaxBounds(bounds);
-            window.map.options.maxBoundsViscosity = 1.0; // 境界線でピタッと止める（ビヨンビヨンを抑える）
-
-            window.map.dragging.enable();
-            window.map.scrollWheelZoom.enable();
-            window.map.doubleClickZoom.enable();
-            window.map.touchZoom.enable();
-
             zoomLimit = 13.5;
         } else {
-            // 【13.5以上（詳細）のとき】★ここを修正
-            // 不安定なsetMaxBoundsは一切使わず、ドラッグ・ズームの全操作を【完全に禁止】する
-            window.map.setMaxBounds(null); // 過去の制限をリセット
-            
-            window.map.dragging.disable();
-            window.map.scrollWheelZoom.disable();
-            window.map.doubleClickZoom.disable();
-            window.map.touchZoom.disable();
-
+            // 【13.5以上（詳細）のとき】
+            // ズレのない正確な初期表示の画面範囲のままロックする
             zoomLimit = safe.zoom;
         }
+
+        // 算出した初期表示の範囲外に出られないようにロック
+        window.map.setMaxBounds(bounds);
+        
+        // 【重要】境界線にぶつかったときに、ゴムのようにバウンド（ビヨンビヨン）するのを防ぎ、
+        // 壁にぶつかったようにカチッと止める設定
+        window.map.options.maxBoundsViscosity = 1.0;
 
         // ズームガード
         window._zoomGuardBase = zoomLimit;
         window._zoomGuardActive = true;
+
+        // 【重要】初期表示の範囲内であれば、ドラッグもズームも自由にできるようにすべて有効化
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
     });
+
 
 
 
