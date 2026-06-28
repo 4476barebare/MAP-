@@ -927,14 +927,28 @@ function renderCrowdImage() {
 
 function removeCrowdImage() {
 
+    // =======================
+    // レイヤー削除
+    // =======================
     if (window.crowdLayer) {
         window.map.removeLayer(window.crowdLayer);
         window.crowdLayer = null;
     }
 
+    // =======================
+    // zoomイベント解除
+    // =======================
     if (window.crowdZoomHandler) {
         window.map.off("zoomend", window.crowdZoomHandler);
         window.crowdZoomHandler = null;
+    }
+
+    // =======================
+    // cloudsUIは消さない（非表示だけ）
+    // =======================
+    const cloudsUI = document.getElementById('cloudsUI');
+    if (cloudsUI) {
+        cloudsUI.style.display = 'none';
     }
 }
 
