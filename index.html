@@ -949,11 +949,16 @@ function removeCrowdImage() {
     }
 
     // =======================
-    // ■ headerごと非表示（左右まとめて）
+    // ■ headerを確実に取得して非表示
     // =======================
-    const header = document.querySelector('.menu-header-row');
-    if (header) {
-        header.style.display = 'none';
+    const menu = document.getElementById("map-menu");
+    const ul = menu?.querySelector("ul");
+
+    if (ul) {
+        const header = ul.querySelector(':scope > .menu-header-row');
+        if (header) {
+            header.style.display = 'none';
+        }
     }
 }
 
