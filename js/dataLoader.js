@@ -1224,11 +1224,8 @@ if (typeParts[0] === 'special') {
 // 修正箇所：L.tileLayer の設定部分
 window.gsiLayer = L.tileLayer(tileUrl, {
     attribution: '国土地理院',
-    detectRetina: false, // 一旦falseでOK
-    // 【重要】広域で見てもタイルがボヤけないようにする設定
-    // ズームレベルに関わらず、最も詳細なタイルを綺麗に表示させるためのヒントです
-    maxNativeZoom: 18, 
-    minZoom: 2
+    detectRetina: false,
+    minZoom: 13.5
 }).addTo(window.map);
 
     
@@ -1247,11 +1244,15 @@ window.gsiLayer = L.tileLayer(tileUrl, {
     // ========================
     // 移動
     // ========================
-    window.map.flyTo(
-        [targetLat, targetLng],
-        safe.zoom,
-        { duration: 0.5 }
-    );
+// 【参考】flyTo を呼ぶ前の部分のイメージ
+const targetZoom = safe.zoom < 13.5 ? 13.5 : safe.zoom;
+
+window.map.flyTo(
+    [targetLat, targetLng],
+    targetZoom, // safe.zoom ではなく、強制的に引き上げたズームレベルを渡す
+    { duration: 0.5 }
+);
+
 
     // ========================
     // UI更新
@@ -1268,31 +1269,53 @@ window.gsiLayer = L.tileLayer(tileUrl, {
         }
     }
 
-    // ========================
-    // 移動完了後処理
-    // ========================
-    window.map.once('moveend', function () {
+// ========================
+// 移動完了後処理
+// ========================
+window.map.once('moveend', function () {
 
-        showFishMarkers(safe.URL);
-        createWeekItem(safe.whether);
+    showFishMarkers(safe.URL);
+    createWeekItem(safe.whether);
 
-        window.map.setMaxZoom(18);
+    window.map.setMaxZoom(18);
 
-        // 現在ビューをロック
-        const bounds = window.map.getBounds();
-        window.map.setMaxBounds(bounds);
-        window.map.options.maxBoundsViscosity = 1.0;
+    // 1. 現在の表示範囲を取得
+    let bounds = window.map.getBounds();
+    
+    // 【修正】zoomLimit を if 文の外で宣言しておく（後から書き換えるので let を使う）
+    let zoomLimit;
 
-        // ズームガード
-        window._zoomGuardBase = safe.zoom;
-        window._zoomGuardActive = true;
+    // 2. 13.5未満のときだけ、差分に応じた係数で範囲を広げる
+    if (safe.zoom < 13.5) {
+        // 差分を計算（例：12.5なら 13.5 - 12.5 = 1.0）
+        const paddingDiff = 13.5 - safe.zoom; 
+        
+        // pad()メソッドを使って新しい範囲を代入する
+        bounds = bounds.pad(paddingDiff);
+        
+        // 値を代入
+        zoomLimit = 13.5;
+    } else {
+        // 値を代入
+        zoomLimit = safe.zoom;
+    }
 
-        // 操作復帰
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-    });
+    // 3. 確定した範囲でドラッグをロック
+    window.map.setMaxBounds(bounds);
+    window.map.options.maxBoundsViscosity = 1.0;
+
+    // ズームガード（これでエラーにならず正しく値が渡ります）
+    window._zoomGuardBase = zoomLimit;
+    window._zoomGuardActive = true;
+
+    // 操作復帰
+    window.map.dragging.enable();
+    window.map.scrollWheelZoom.enable();
+    window.map.doubleClickZoom.enable();
+    window.map.touchZoom.enable();
+});
+
+
 }
 
 function showFishMarkers(url) {
