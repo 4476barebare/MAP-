@@ -558,8 +558,7 @@ marker.on('click', function () {
 }
 
 function selectSpot(spot) {
-    removeCrowdImage();
-
+    
     const currentZoom = window.map.getZoom();
 
 if (currentZoom === 13) {
@@ -569,6 +568,7 @@ if (currentZoom === 13) {
     if (!Number.isNaN(zoom)) {
         zoomToSpot(spot);
     } else {
+        removeCrowdImage();
         showFishPopup(spot);
     }
     return;
@@ -2424,7 +2424,7 @@ requestAnimationFrame(() => {
     initAreaUI();
     showPrefSpots();
     renderPrefWeather();
-    renderCrowdImage();
+    //renderCrowdImage();
 
     resetAreaGuide();
     
