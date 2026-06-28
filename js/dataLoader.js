@@ -622,62 +622,59 @@ function phase1menu(areaId) {
         .sort((a, b) => b.lat - a.lat);
 
     // -------------------------
-    // ★補欠は1件だけ保持
+    // 補欠
     // -------------------------
     window.substitute = window.spotData.find(s =>
         s.areaId === areaId &&
         s.type === "substitute"
     ) || null;
 
+    // =====================
+    // ■ header取得 or 生成
+    // =====================
+    let header = ul.querySelector(':scope > .menu-header-row');
 
-// =====================
-// ■ 既存リスト削除（header除く）
-// =====================
-const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
-oldItems.forEach(el => el.remove());
+    if (!header) {
+        header = document.createElement('li');
+        header.className = 'menu-header-row';
+        header.style.pointerEvents = 'none';
 
-// =====================
-// ■ header枠だけ保証
-// =====================
-let header = ul.querySelector('.menu-header-row');
+        // ★ここでは display を触らない（重要）
+        ul.prepend(header);
+    }
 
-if (!header) {
-    header = document.createElement('li');
-    header.className = 'menu-header-row';
-    header.style.pointerEvents = 'none';
-    ul.prepend(header);
-}
+    // =====================
+    // ■ headerInner保証
+    // =====================
+    let headerInner = header.querySelector('.header-row');
 
-header.style.display = '';
+    if (!headerInner) {
+        headerInner = document.createElement('div');
+        headerInner.className = 'header-row';
+        headerInner.style.display = 'flex';
+        headerInner.style.justifyContent = 'space-between';
+        headerInner.style.alignItems = 'center';
+        headerInner.style.width = '100%';
+        header.appendChild(headerInner);
+    }
 
-// =====================
-// ■ headerInner（枠だけ）
-// =====================
-let headerInner = header.querySelector('.header-row');
+    // =====================
+    // ■ 既存リスト削除（header以外）
+    // =====================
+    const oldItems = ul.querySelectorAll(':scope > li:not(.menu-header-row)');
+    oldItems.forEach(el => el.remove());
 
-if (!headerInner) {
-    headerInner = document.createElement('div');
-    headerInner.className = 'header-row';
-    headerInner.style.display = 'flex';
-    headerInner.style.justifyContent = 'space-between';
-    headerInner.style.alignItems = 'center';
-    headerInner.style.width = '100%';
-    header.appendChild(headerInner);
-}
-
-// ※ここでは中身（cloudsUI / text）は一切触らない
-    // -------------------------
-    // リスト生成（完全DOM化）
-    // -------------------------
-    ul.innerHTML = ""; // 一旦クリア
-    ul.appendChild(header);
-
+    // =====================
+    // ■ リスト再生成
+    // =====================
     for (const s of items) {
-
         const li = createMenuItem(s);
         ul.appendChild(li);
     }
 
+    // =====================
+    // ■ 表示制御
+    // =====================
     menu.style.display = items.length ? "block" : "none";
 }
 
