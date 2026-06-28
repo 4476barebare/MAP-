@@ -632,9 +632,6 @@ function phase1menu(areaId) {
     ) || null;
 
 
-// -------------------------
-// ヘッダー（DOM化）
-// -------------------------
 const header = document.createElement("li");
 header.className = "menu-header-row";
 header.style.cssText = "pointer-events:none; padding:4px 8px;";
@@ -647,23 +644,20 @@ headerInner.style.cssText = `
     width:100%;
 `;
 
-// ★ 左側：cloudsUI
-const cloudsUI = document.createElement("div");
-cloudsUI.id = "cloudsUI";
+// cloudsUI
+const cloudsUI = document.getElementById('cloudsUI');
+if (cloudsUI) {
+    cloudsUI.style.display = '';
+    headerInner.appendChild(cloudsUI);
+}
 
-// 必要なら最低幅だけ確保（任意）
-cloudsUI.style.minWidth = "40px";
-
-// ★ 右側：日付＋潮名
+// 右側
 const headerText = document.createElement("div");
 headerText.textContent =
     `${formatDate(window.todayTide?.date)} ${window.todayTide?.tide}`;
 
-// -------------------------
-headerInner.appendChild(cloudsUI);
 headerInner.appendChild(headerText);
 header.appendChild(headerInner);
-
     // -------------------------
     // リスト生成（完全DOM化）
     // -------------------------
