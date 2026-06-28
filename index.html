@@ -240,6 +240,7 @@ function formatDate(str) {
 // PREF / AREA UI
 // =======================
 function initAreaUI() {
+
     const menu = document.getElementById('map-menu');
     if (!menu) return;
 
@@ -248,36 +249,56 @@ function initAreaUI() {
     const ul = menu.querySelector('ul');
     if (!ul) return;
 
-    ul.innerHTML = '';
-
-const headerLi = document.createElement('li');
-headerLi.className = 'menu-header-row';
-headerLi.style.pointerEvents = 'none';
-
-const headerRow = document.createElement('div');
-headerRow.style.display = 'flex';
-headerRow.style.justifyContent = 'space-between';
-headerRow.style.alignItems = 'center';
-headerRow.style.width = '100%';
-
-// cloudsUI
-const cloudsUI = document.getElementById('cloudsUI');
-if (cloudsUI) {
-    cloudsUI.style.display = '';
-    headerRow.appendChild(cloudsUI);
-}
-
-// 右：日付＋潮名
-const headerText = document.createElement('div');
-headerText.textContent =
-    formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-
-headerRow.appendChild(headerText);
-headerLi.appendChild(headerRow);
-ul.appendChild(headerLi);
+    // =====================
+    // ■ 既存リスト削除（headerは残す）
+    // =====================
+    const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
+    oldItems.forEach(el => el.remove());
 
     // =====================
-    // ■ エリア行
+    // ■ header取得 or 作成
+    // =====================
+    let headerLi = ul.querySelector('.menu-header-row');
+
+    if (!headerLi) {
+        headerLi = document.createElement('li');
+        headerLi.className = 'menu-header-row';
+        headerLi.style.pointerEvents = 'none';
+        ul.prepend(headerLi);
+    }
+
+    headerLi.style.display = '';
+
+    // 中身リセット
+    headerLi.innerHTML = '';
+
+    const headerRow = document.createElement('div');
+    headerRow.style.display = 'flex';
+    headerRow.style.justifyContent = 'space-between';
+    headerRow.style.alignItems = 'center';
+    headerRow.style.width = '100%';
+
+    // =====================
+    // ■ cloudsUI（再アタッチ）
+    // =====================
+    const cloudsUI = document.getElementById('cloudsUI');
+    if (cloudsUI) {
+        cloudsUI.style.display = '';
+        headerRow.appendChild(cloudsUI);
+    }
+
+    // =====================
+    // ■ 右：日付＋潮
+    // =====================
+    const headerText = document.createElement('div');
+    headerText.textContent =
+        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+
+    headerRow.appendChild(headerText);
+    headerLi.appendChild(headerRow);
+
+    // =====================
+    // ■ エリアリスト
     // =====================
     window.areaData.forEach(area => {
 
@@ -319,20 +340,17 @@ ul.appendChild(headerLi);
     });
 
     // =====================
-    // ■ 既存handler削除（重要）
+    // ■ handler再設定
     // =====================
     if (window.nearestClickHandler) {
         window.map.off('click', window.nearestClickHandler);
     }
 
-    // =====================
-    // ■ nearest処理（完全版）
-    // =====================
     window.nearestClickHandler = function(e) {
 
         if (!window.nearestClickEnabled) return;
 
-        // ★ メニュー内クリックは無視
+        // メニュー内クリック無視
         const rect = menu.getBoundingClientRect();
         const x = e.originalEvent.clientX;
         const y = e.originalEvent.clientY;
@@ -346,7 +364,7 @@ ul.appendChild(headerLi);
             return;
         }
 
-        // ★ 最近傍探索
+        // 最近傍探索
         let nearest = null;
         let minDist = Infinity;
 
@@ -364,18 +382,13 @@ ul.appendChild(headerLi);
 
         if (!nearest) return;
 
-        // ★ 選択処理
         location.hash = encodeURIComponent(nearest.name);
         updateStateFromHash();
         destroyAreaUI();
         selectArea(nearest);
     };
 
-    // =====================
-    // ■ 有効化
-    // =====================
     window.nearestClickEnabled = true;
-    // ★ここが抜けると動かない
     window.map.on('click', window.nearestClickHandler);
 }
 
