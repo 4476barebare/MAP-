@@ -533,12 +533,9 @@ spot.marker = marker;
 
 
 marker.on('click', function () {
-
-//    const iconId = spot.icon || 'spot';
-//    const isFish = iconId.startsWith('fish');
-
-    selectSpot(spot); // ←これだけ
     removeCrowdImage();
+    selectSpot(spot); // ←これだけ
+    
 });
 
         window.areaSpotLayer.addLayer(marker);
