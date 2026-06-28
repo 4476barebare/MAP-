@@ -250,31 +250,28 @@ function initAreaUI() {
 
     ul.innerHTML = '';
 
-// =====================
-// ■ ヘッダー
-// =====================
 const headerLi = document.createElement('li');
 headerLi.className = 'menu-header-row';
 headerLi.style.pointerEvents = 'none';
 
 const headerRow = document.createElement('div');
 headerRow.style.display = 'flex';
-headerRow.style.justifyContent = 'space-between'; // ★変更
+headerRow.style.justifyContent = 'space-between';
 headerRow.style.alignItems = 'center';
 headerRow.style.width = '100%';
 
-// ★ 左：cloudsUI
-const cloudsUI = document.createElement('div');
-cloudsUI.id = 'cloudsUI';
-cloudsUI.style.minWidth = '40px'; // 任意（崩れ防止）
+// cloudsUI
+const cloudsUI = document.getElementById('cloudsUI');
+if (cloudsUI) {
+    cloudsUI.style.display = '';
+    headerRow.appendChild(cloudsUI);
+}
 
-// ★ 右：日付＋潮名
+// 右：日付＋潮名
 const headerText = document.createElement('div');
 headerText.textContent =
     formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-// 組み立て
-headerRow.appendChild(cloudsUI);
 headerRow.appendChild(headerText);
 headerLi.appendChild(headerRow);
 ul.appendChild(headerLi);
@@ -800,6 +797,9 @@ function renderCrowdImage() {
 
     removeCrowdImage();
 
+    // =======================
+    // Pane準備
+    // =======================
     if (!window.map.getPane('rainPane')) {
         window.map.createPane('rainPane');
         const pane = window.map.getPane('rainPane');
@@ -807,13 +807,15 @@ function renderCrowdImage() {
         pane.style.pointerEvents = 'none';
     }
 
+    // =======================
+    // 時刻計算
+    // =======================
     const now = new Date();
     const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
 
     const hour = nowJST.getHours();
     const slots = [0,3,6,9,12,15,18,21];
 
-    // ===== 未来スロット選択
     let targetHour = slots.find(h => h > hour);
     let targetDate = new Date(nowJST);
 
@@ -830,13 +832,36 @@ function renderCrowdImage() {
     const hourStr = String(targetHour).padStart(2,"0");
 
     const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
-    const cloudsUI = document.getElementById('cloudsUI');
+    const imageUrl = "js/crowdsimg/" + fileName;
+
+    // =======================
+    // cloudsUI（ここで生成保証）
+    // =======================
+    let cloudsUI = document.getElementById('cloudsUI');
+
+    if (!cloudsUI) {
+
+        const header = document.querySelector('.menu-header-row');
+
+        if (header) {
+            const row = header.firstChild; // headerInner想定
+
+            cloudsUI = document.createElement('div');
+            cloudsUI.id = 'cloudsUI';
+
+            // 左側に追加
+            row.insertBefore(cloudsUI, row.firstChild);
+        }
+    }
+
+    // テキスト更新
     if (cloudsUI) {
         cloudsUI.textContent = `雨雲レーダー ${parseInt(hourStr, 10)}時`;
     }
-    const imageUrl = "js/crowdsimg/" + fileName;
 
-    // ===== ログから座標取得
+    // =======================
+    // ログから座標取得
+    // =======================
     fetch("js/fetched_log.txt")
         .then(res => res.text())
         .then(text => {
@@ -851,7 +876,6 @@ function renderCrowdImage() {
 
                 const parts = line.split(",");
                 if (parts.length < 4) continue;
-
                 if (parts[0] !== window.currentPref) continue;
 
                 const lat = parseFloat(parts[1]);
@@ -871,7 +895,6 @@ function renderCrowdImage() {
 
                 const z = window.map.getZoom();
 
-                // ===== 正しいスケール計算
                 const scale = Math.pow(2, z - best.baseZoom);
                 const size = 512 * scale;
 
