@@ -820,6 +820,10 @@ function renderCrowdImage() {
     const hourStr = String(targetHour).padStart(2,"0");
 
     const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
+    const cloudsUI = document.getElementById('cloudsUI');
+    if (cloudsUI) {
+        cloudsUI.textContent = `雨雲レーダー ${parseInt(hourStr, 10)}時`;
+    }
     const imageUrl = "js/crowdsimg/" + fileName;
 
     // ===== ログから座標取得
