@@ -236,9 +236,7 @@ function formatDate(str) {
   const [y, m, d] = str.split("-");
   return `${y} ${Number(m)}/${Number(d)}`;
 }
-// =======================
-// PREF / AREA UI
-// =======================
+
 function initAreaUI() {
 
     const menu = document.getElementById('map-menu');
@@ -250,13 +248,13 @@ function initAreaUI() {
     if (!ul) return;
 
     // =====================
-    // ■ リスト削除（header除く）
+    // ■ リスト削除（headerは残す）
     // =====================
     const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
     oldItems.forEach(el => el.remove());
 
     // =====================
-    // ■ header取得 or 作成
+    // ■ header枠だけ保証
     // =====================
     let headerLi = ul.querySelector('.menu-header-row');
 
@@ -269,9 +267,7 @@ function initAreaUI() {
 
     headerLi.style.display = '';
 
-    // =====================
-    // ■ headerRow取得 or 作成
-    // =====================
+    // headerRow（中身の入れ物だけ）
     let headerRow = headerLi.querySelector('.header-row');
 
     if (!headerRow) {
@@ -284,28 +280,7 @@ function initAreaUI() {
         headerLi.appendChild(headerRow);
     }
 
-    // =====================
-    // ■ cloudsUI（触らない）
-    // =====================
-    const cloudsUI = document.getElementById('cloudsUI');
-    if (cloudsUI && cloudsUI.parentNode !== headerRow) {
-        cloudsUI.style.display = '';
-        headerRow.prepend(cloudsUI);
-    }
-
-    // =====================
-    // ■ 右テキストだけ更新
-    // =====================
-    let headerText = headerRow.querySelector('.header-text');
-
-    if (!headerText) {
-        headerText = document.createElement('div');
-        headerText.className = 'header-text';
-        headerRow.appendChild(headerText);
-    }
-
-    headerText.textContent =
-        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+    // ※ここでは中身を触らない（cloudsUIも入れない）
 
     // =====================
     // ■ エリアリスト
@@ -828,7 +803,9 @@ function renderCrowdImage() {
     // 時刻計算
     // =======================
     const now = new Date();
-    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    const nowJST = new Date(
+        now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" })
+    );
 
     const hour = nowJST.getHours();
     const slots = [0,3,6,9,12,15,18,21];
@@ -851,30 +828,41 @@ function renderCrowdImage() {
     const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
     const imageUrl = "js/crowdsimg/" + fileName;
 
-    // =======================
-    // cloudsUI（ここで生成保証）
-    // =======================
-    let cloudsUI = document.getElementById('cloudsUI');
+// =======================
+// header UI（左右まとめて管理）
+// =======================
+const headerRow = document.querySelector('.menu-header-row .header-row');
 
-    if (!cloudsUI) {
+if (!headerRow) {
+    console.warn('headerRow not found');
+    return;
+}
 
-        const header = document.querySelector('.menu-header-row');
+// --- 左：cloudsUI ---
+let cloudsUI = document.getElementById('cloudsUI');
 
-        if (header) {
-            const row = header.firstChild; // headerInner想定
+if (!cloudsUI) {
+    cloudsUI = document.createElement('div');
+    cloudsUI.id = 'cloudsUI';
+    headerRow.prepend(cloudsUI);
+} else if (cloudsUI.parentNode !== headerRow) {
+    headerRow.prepend(cloudsUI);
+}
 
-            cloudsUI = document.createElement('div');
-            cloudsUI.id = 'cloudsUI';
+cloudsUI.textContent = `雨雲レーダー ${Number(hourStr)}時`;
 
-            // 左側に追加
-            row.insertBefore(cloudsUI, row.firstChild);
-        }
-    }
 
-    // テキスト更新
-    if (cloudsUI) {
-        cloudsUI.textContent = `雨雲レーダー ${parseInt(hourStr, 10)}時`;
-    }
+// --- 右：headerText ---
+let headerText = headerRow.querySelector('.header-text');
+
+if (!headerText) {
+    headerText = document.createElement('div');
+    headerText.className = 'header-text';
+    headerRow.appendChild(headerText);
+}
+
+headerText.textContent =
+    formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
     // =======================
     // ログから座標取得
