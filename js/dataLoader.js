@@ -1202,7 +1202,11 @@ function zoomToSpot(spot) {
         targetLat = typeParts[1];
         targetLng = typeParts[2];
     } else {
-        tileUrl = window.gsiLayers.photo;
+        if (typeParts[0] === 'ort') {
+            tileUrl = window.gsiLayers.ort;
+        } else {
+            tileUrl = window.gsiLayers.photo;
+        }
         targetLat = safe.lat;
         targetLng = safe.lng;
     }
