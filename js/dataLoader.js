@@ -1279,41 +1279,43 @@ window.map.flyTo(
 
         window.map.setMaxZoom(18);
 
-        let bounds;
         let zoomLimit;
 
         if (safe.zoom < 13.5) {
-            // 【13.5未満のとき】
-            // タイル画質のために13.5で表示されているので、画面の範囲を取得して pad で広げる
-            bounds = window.map.getBounds();
+            // 【13.5未満（広域）のとき】
+            // ユーザーがドラッグして周りを見られるようにする
+            let bounds = window.map.getBounds();
             const paddingDiff = 13.5 - safe.zoom; 
             bounds = bounds.pad(paddingDiff);
             
+            // 範囲制限を設定し、操作を有効化する
+            window.map.setMaxBounds(bounds);
+            window.map.options.maxBoundsViscosity = 1.0; // 境界線でピタッと止める（ビヨンビヨンを抑える）
+
+            window.map.dragging.enable();
+            window.map.scrollWheelZoom.enable();
+            window.map.doubleClickZoom.enable();
+            window.map.touchZoom.enable();
+
             zoomLimit = 13.5;
         } else {
-            // 【13.5以上のとき】★ここを修正
-            // 移動後の getBounds() がバグるのを防ぐため、
-            // 目的地の座標（targetLat, targetLng）だけの「点」の範囲を作成する
-            // これにより、1ミリもドラッグできなくなります
-            bounds = L.latLngBounds([targetLat, targetLng], [targetLat, targetLng]);
+            // 【13.5以上（詳細）のとき】★ここを修正
+            // 不安定なsetMaxBoundsは一切使わず、ドラッグ・ズームの全操作を【完全に禁止】する
+            window.map.setMaxBounds(null); // 過去の制限をリセット
             
+            window.map.dragging.disable();
+            window.map.scrollWheelZoom.disable();
+            window.map.doubleClickZoom.disable();
+            window.map.touchZoom.disable();
+
             zoomLimit = safe.zoom;
         }
-
-        // 確定した範囲でドラッグをロック
-        window.map.setMaxBounds(bounds);
-        window.map.options.maxBoundsViscosity = 1.0;
 
         // ズームガード
         window._zoomGuardBase = zoomLimit;
         window._zoomGuardActive = true;
-
-        // 操作復帰
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
     });
+
 
 
 
