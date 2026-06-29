@@ -902,6 +902,9 @@ function renderCrowdImage() {
 
 function removeCrowdImage() {
 
+    // =======================
+    // レイヤ削除
+    // =======================
     if (window.crowdLayer) {
         window.map.removeLayer(window.crowdLayer);
         window.crowdLayer = null;
@@ -912,8 +915,19 @@ function removeCrowdImage() {
         window.crowdZoomHandler = null;
     }
 
+    // =======================
+    // headerリセット（中身だけ消す）
+    // =======================
     const header = document.querySelector('.menu-header-row');
-    if (header) header.style.display = 'none';
+    if (!header) return;
+
+    header.style.display = 'none';
+
+    const cloudsUI = document.getElementById('cloudsUI');
+    const headerText = document.querySelector('.header-text');
+
+    if (cloudsUI) cloudsUI.textContent = '';
+    if (headerText) headerText.textContent = '';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
