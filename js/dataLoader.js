@@ -629,34 +629,7 @@ function phase1menu(areaId) {
         s.type === "substitute"
     ) || null;
 
-    // =====================
-    // header取得 or 生成
-    // =====================
-    let header = ul.querySelector(':scope > .menu-header-row');
 
-    if (!header) {
-        header = document.createElement('li');
-        header.className = 'menu-header-row';
-        header.style.pointerEvents = 'none';
-        ul.prepend(header);
-    }
-
-    // ❗ここが重要：displayは一切触らない
-
-    // =====================
-    // headerInner保証
-    // =====================
-    let headerInner = header.querySelector('.header-row');
-
-    if (!headerInner) {
-        headerInner = document.createElement('div');
-        headerInner.className = 'header-row';
-        headerInner.style.display = 'flex';
-        headerInner.style.justifyContent = 'space-between';
-        headerInner.style.alignItems = 'center';
-        headerInner.style.width = '100%';
-        header.appendChild(headerInner);
-    }
 
     // =====================
     // header以外削除
