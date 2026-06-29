@@ -53,9 +53,12 @@
   </div>
 <div id="map-menu" class="map-menu">
   <ul>
-    <li class="menu-header-row" style="display:none;">
-      <div class="header-row"></div>
-    </li>
+<li class="menu-header-row" style="display:none;">
+  <div class="header-row">
+    <div id="cloudsUI"></div>
+    <div class="header-text"></div>
+  </div>
+</li>
   </ul>
 </div>
   
@@ -809,41 +812,27 @@ function renderCrowdImage() {
     const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
     const imageUrl = "js/crowdsimg/" + fileName;
 
-// =======================
-// header UI（左右まとめて管理）
-// =======================
-const headerRow = document.querySelector('.menu-header-row .header-row');
+    // =======================
+    // header UI（HTML直書き前提）
+    // =======================
+    const header = document.querySelector('.menu-header-row');
+    const cloudsUI = document.getElementById('cloudsUI');
+    const headerText = document.querySelector('.header-text');
 
-if (!headerRow) {
-    console.warn('headerRow not found');
-    return;
-}
+    if (!header || !cloudsUI || !headerText) {
+        console.warn('header elements missing');
+        return;
+    }
 
-// --- 左：cloudsUI ---
-let cloudsUI = document.getElementById('cloudsUI');
+    // 表示ON
+    header.style.display = '';
 
-if (!cloudsUI) {
-    cloudsUI = document.createElement('div');
-    cloudsUI.id = 'cloudsUI';
-    headerRow.prepend(cloudsUI);
-} else if (cloudsUI.parentNode !== headerRow) {
-    headerRow.prepend(cloudsUI);
-}
+    // 左
+    cloudsUI.textContent = `雨雲レーダー ${Number(hourStr)}時`;
 
-cloudsUI.textContent = `雨雲レーダー ${Number(hourStr)}時`;
-
-
-// --- 右：headerText ---
-let headerText = headerRow.querySelector('.header-text');
-
-if (!headerText) {
-    headerText = document.createElement('div');
-    headerText.className = 'header-text';
-    headerRow.appendChild(headerText);
-}
-
-headerText.textContent =
-    formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+    // 右
+    headerText.textContent =
+        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
     // =======================
     // ログから座標取得
@@ -913,34 +902,18 @@ headerText.textContent =
 
 function removeCrowdImage() {
 
-    // =======================
-    // レイヤー削除
-    // =======================
     if (window.crowdLayer) {
         window.map.removeLayer(window.crowdLayer);
         window.crowdLayer = null;
     }
 
-    // =======================
-    // zoomイベント解除
-    // =======================
     if (window.crowdZoomHandler) {
         window.map.off("zoomend", window.crowdZoomHandler);
         window.crowdZoomHandler = null;
     }
 
-    // =======================
-    // ■ headerを確実に取得して非表示
-    // =======================
-    const menu = document.getElementById("map-menu");
-    const ul = menu?.querySelector("ul");
-
-    if (ul) {
-        const header = ul.querySelector(':scope > .menu-header-row');
-        if (header) {
-            header.style.display = 'none';
-        }
-    }
+    const header = document.querySelector('.menu-header-row');
+    if (header) header.style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
