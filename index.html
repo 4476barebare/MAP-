@@ -916,18 +916,39 @@ function removeCrowdImage() {
     }
 
     // =======================
-    // headerリセット（中身だけ消す）
+    // header制御
     // =======================
     const header = document.querySelector('.menu-header-row');
     if (!header) return;
 
-    header.style.display = 'none';
+    const cloudsUI = document.getElementById('cloudsUI');   // 左
+    const headerText = document.querySelector('.header-text'); // 右
 
-    const cloudsUI = document.getElementById('cloudsUI');
-    const headerText = document.querySelector('.header-text');
+    if (window.phase2Initialized) {
+        // -----------------------
+        // phase2 → 左だけ消す
+        // -----------------------
+        if (cloudsUI) cloudsUI.textContent = '';
+        // 右は触らない
+    } else {
+        // -----------------------
+        // 通常 → 両方消す
+        // -----------------------
+        if (cloudsUI) cloudsUI.textContent = '';
+        if (headerText) headerText.textContent = '';
+    }
 
-    if (cloudsUI) cloudsUI.textContent = '';
-    if (headerText) headerText.textContent = '';
+    // =======================
+    // 表示制御
+    // =======================
+    const leftEmpty  = !cloudsUI || cloudsUI.textContent === '';
+    const rightEmpty = !headerText || headerText.textContent === '';
+
+    if (leftEmpty && rightEmpty) {
+        header.style.display = 'none';
+    } else {
+        header.style.display = '';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
