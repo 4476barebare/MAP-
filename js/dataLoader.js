@@ -630,7 +630,7 @@ function phase1menu(areaId) {
     ) || null;
 
     // =====================
-    // ■ header取得 or 生成
+    // header取得 or 生成
     // =====================
     let header = ul.querySelector(':scope > .menu-header-row');
 
@@ -638,13 +638,13 @@ function phase1menu(areaId) {
         header = document.createElement('li');
         header.className = 'menu-header-row';
         header.style.pointerEvents = 'none';
-
-        // ★ここでは display を触らない（重要）
         ul.prepend(header);
     }
 
+    // ❗ここが重要：displayは一切触らない
+
     // =====================
-    // ■ headerInner保証
+    // headerInner保証
     // =====================
     let headerInner = header.querySelector('.header-row');
 
@@ -659,13 +659,13 @@ function phase1menu(areaId) {
     }
 
     // =====================
-    // ■ 既存リスト削除（header以外）
+    // header以外削除
     // =====================
     const oldItems = ul.querySelectorAll(':scope > li:not(.menu-header-row)');
     oldItems.forEach(el => el.remove());
 
     // =====================
-    // ■ リスト再生成
+    // リスト生成
     // =====================
     for (const s of items) {
         const li = createMenuItem(s);
@@ -673,7 +673,7 @@ function phase1menu(areaId) {
     }
 
     // =====================
-    // ■ 表示制御
+    // menu表示
     // =====================
     menu.style.display = items.length ? "block" : "none";
 }
