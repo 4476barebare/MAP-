@@ -966,6 +966,14 @@ function renderCrowdImage() {
 function removeCrowdImage() {
 
     // =======================
+    // スライド停止（←これ追加）
+    // =======================
+    if (window.crowdSlideTimer) {
+        clearInterval(window.crowdSlideTimer);
+        window.crowdSlideTimer = null;
+    }
+
+    // =======================
     // レイヤ削除
     // =======================
     if (window.crowdLayer) {
@@ -988,15 +996,11 @@ function removeCrowdImage() {
     const headerText = document.querySelector('.header-text'); // 右
 
     if (window.phase2Initialized) {
-        // -----------------------
         // phase2 → 左だけ消す
-        // -----------------------
         if (cloudsUI) cloudsUI.textContent = '';
         // 右は触らない
     } else {
-        // -----------------------
         // 通常 → 両方消す
-        // -----------------------
         if (cloudsUI) cloudsUI.textContent = '';
         if (headerText) headerText.textContent = '';
     }
