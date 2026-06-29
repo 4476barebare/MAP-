@@ -836,7 +836,7 @@ function enablePhase2(map) {
     map.on('moveend', runPhase2);
 
     window.phase2Initialized = true;
-    removeCrowdImage();
+    renderCrowdImage();
 }
 
 function disablePhase2(map) {
