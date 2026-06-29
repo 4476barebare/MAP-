@@ -794,26 +794,44 @@ function renderCrowdImage() {
     const hour = nowJST.getHours();
     const slots = [0,3,6,9,12,15,18,21];
 
-    let targetHour = slots.find(h => h > hour);
-    let targetDate = new Date(nowJST);
+    // =======================
+    // スライド用データ作成
+    // =======================
+    const images = [];
 
-    if (targetHour === undefined) {
-        targetHour = 0;
-        targetDate.setDate(targetDate.getDate() + 1);
+    let baseIndex = slots.findIndex(h => h > hour);
+    let dayOffset = 0;
+
+    if (baseIndex === -1) {
+        baseIndex = 0;
+        dayOffset = 1;
     }
 
-    const y = targetDate.getFullYear();
-    const m = String(targetDate.getMonth()+1).padStart(2,"0");
-    const d = String(targetDate.getDate()).padStart(2,"0");
+    for (let i = 0; i < 4; i++) {
 
-    const dateStr = `${y}-${m}-${d}`;
-    const hourStr = String(targetHour).padStart(2,"0");
+        const idx = (baseIndex + i) % slots.length;
 
-    const fileName = `${window.currentPref}_${dateStr}_${hourStr}.png`;
-    const imageUrl = "js/crowdsimg/" + fileName;
+        if (i > 0 && idx === 0) {
+            dayOffset++;
+        }
+
+        const tmpDate = new Date(nowJST);
+        tmpDate.setDate(tmpDate.getDate() + dayOffset);
+
+        const y = tmpDate.getFullYear();
+        const m = String(tmpDate.getMonth()+1).padStart(2,"0");
+        const d = String(tmpDate.getDate()).padStart(2,"0");
+
+        const hh = String(slots[idx]).padStart(2,"0");
+
+        images.push({
+            url: `js/crowdsimg/${window.currentPref}_${y}-${m}-${d}_${hh}.png`,
+            displayHour: slots[idx] + (dayOffset * 24)
+        });
+    }
 
     // =======================
-    // header UI（HTML直書き前提）
+    // header UI
     // =======================
     const header = document.querySelector('.menu-header-row');
     const cloudsUI = document.getElementById('cloudsUI');
@@ -824,26 +842,24 @@ function renderCrowdImage() {
         return;
     }
 
-    // 表示ON// 表示ON
-header.style.display = '';
+    header.style.display = '';
 
-// フラグチェック（ここで分岐して終了）
-if (window.phase2Initialized) {
+    // フラグ分岐
+    if (window.phase2Initialized) {
 
-    // 左は消す
-    cloudsUI.textContent = '';
+        cloudsUI.textContent = '';
 
-    // 右だけ表示
-    headerText.textContent =
-        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        headerText.textContent =
+            formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-    return; // ★ここで完全終了
-}
+        return;
+    }
 
-    // 左
-    cloudsUI.textContent = `雨雲レーダー ${Number(hourStr)}時`;
+    // 初期表示
+    let currentIndex = 0;
 
-    // 右
+    cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
+
     headerText.textContent =
         formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
@@ -895,8 +911,9 @@ if (window.phase2Initialized) {
                 );
             }
 
+            // 初期レイヤー
             window.crowdLayer = L.imageOverlay(
-                imageUrl,
+                images[0].url,
                 calcBounds(),
                 {
                     pane: 'rainPane',
@@ -910,6 +927,39 @@ if (window.phase2Initialized) {
             };
 
             window.map.on("zoomend", window.crowdZoomHandler);
+
+            // =======================
+            // スライドショー
+            // =======================
+            if (window.crowdSlideTimer) {
+                clearInterval(window.crowdSlideTimer);
+            }
+
+            window.crowdSlideTimer = setInterval(() => {
+
+                currentIndex = (currentIndex + 1) % images.length;
+
+                const img = images[currentIndex];
+
+                // ヘッダー更新
+                cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
+
+                // レイヤー差し替え
+                if (window.crowdLayer) {
+                    window.map.removeLayer(window.crowdLayer);
+                }
+
+                window.crowdLayer = L.imageOverlay(
+                    img.url,
+                    calcBounds(),
+                    {
+                        pane: 'rainPane',
+                        opacity: 0.6
+                    }
+                ).addTo(window.map);
+
+            }, 1500);
+
         });
 }
 
