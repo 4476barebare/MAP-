@@ -51,7 +51,13 @@
     <div class="map-ui-sub"><div id="nearest-spot" class="nearest-spot"></div><button id="map-back-btn" class="map-back-btn"></button></div>
     <div class="map-ui-sub2"></div>
   </div>
-  <div id="map-menu" class="map-menu"><ul></ul></div>
+<div id="map-menu" class="map-menu">
+  <ul>
+    <li class="menu-header-row" style="display:none;">
+      <div class="header-row"></div>
+    </li>
+  </ul>
+</div>
   
  <!-- ★ここ重要：weatherを先に固定 -->
   <div class="weather" id="weatherBox">
@@ -250,35 +256,10 @@ function initAreaUI() {
     // =====================
     // ■ リスト削除（headerは残す）
     // =====================
-    const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
+const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
     oldItems.forEach(el => el.remove());
 
-    // =====================
-    // ■ header枠だけ保証
-    // =====================
-    let headerLi = ul.querySelector('.menu-header-row');
 
-    if (!headerLi) {
-        headerLi = document.createElement('li');
-        headerLi.className = 'menu-header-row';
-        headerLi.style.pointerEvents = 'none';
-        ul.prepend(headerLi);
-    }
-
-    headerLi.style.display = '';
-
-    // headerRow（中身の入れ物だけ）
-    let headerRow = headerLi.querySelector('.header-row');
-
-    if (!headerRow) {
-        headerRow = document.createElement('div');
-        headerRow.className = 'header-row';
-        headerRow.style.display = 'flex';
-        headerRow.style.justifyContent = 'space-between';
-        headerRow.style.alignItems = 'center';
-        headerRow.style.width = '100%';
-        headerLi.appendChild(headerRow);
-    }
 
     // ※ここでは中身を触らない（cloudsUIも入れない）
 
