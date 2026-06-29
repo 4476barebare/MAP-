@@ -824,8 +824,21 @@ function renderCrowdImage() {
         return;
     }
 
-    // 表示ON
-    header.style.display = '';
+    // 表示ON// 表示ON
+header.style.display = '';
+
+// フラグチェック（ここで分岐して終了）
+if (window.phase2Initialized) {
+
+    // 左は消す
+    cloudsUI.textContent = '';
+
+    // 右だけ表示
+    headerText.textContent =
+        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+
+    return; // ★ここで完全終了
+}
 
     // 左
     cloudsUI.textContent = `雨雲レーダー ${Number(hourStr)}時`;
