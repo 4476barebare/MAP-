@@ -3,22 +3,28 @@ name: Generate Weather Maps
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 21,9 * * *'   # JST 06:00 / 18:00
-    - cron: '5 21,9 * * *'   # JST 06:05 / 18:05（5分後）
+    - cron: '0 21 * * *'   # JST 06:00 → CHIBA
+    - cron: '5 21 * * *'   # JST 06:05 → KANAGAWA
+    - cron: '0 9 * * *'    # JST 18:00 → CHIBA
+    - cron: '5 9 * * *'    # JST 18:05 → KANAGAWA
 
 jobs:
-  generate:
+  chiba:
+    if: |
+      github.event.schedule == '0 21 * * *' ||
+      github.event.schedule == '0 9 * * *'
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        area:
-          - "CHIBA,34.7,36.0,139.6,141.1,0.15,9"
-          - "KANAGAWA,34.9,35.75,138.9,139.9,0.15,9.5"
-
     steps:
-      - name: Trigger XREA run.php
-        run: |
-          curl -s --max-time 10 "https://turiiko.shop/cloudGenerator/run.php?area=$(echo '${{ matrix.area }}' | sed 's/,/%2C/g')" > /dev/null &
-          
-          echo "Triggered: ${{ matrix.area }}"
+      - run: |
+          curl -s --max-time 10 "https://turiiko.shop/cloudGenerator/run.php?area=CHIBA%2C34.7%2C36.0%2C139.6%2C141.1%2C0.15%2C9" > /dev/null &
+          echo "Triggered: CHIBA"
+
+  kanagawa:
+    if: |
+      github.event.schedule == '5 21 * * *' ||
+      github.event.schedule == '5 9 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -s --max-time 10 "https://turiiko.shop/cloudGenerator/run.php?area=KANAGAWA%2C34.9%2C35.75%2C138.9%2C139.9%2C0.15%2C9.5" > /dev/null &
+          echo "Triggered: KANAGAWA"
