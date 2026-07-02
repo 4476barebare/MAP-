@@ -14,7 +14,7 @@ jobs:
       matrix:
         area:
           - "CHIBA,34.7,36.0,139.6,141.1,0.15,9"
-          - "KANAGAWA,35.75,138.9,34.9,139.9,0.15,9.5"
+          - "KANAGAWA,34.9,35.75,138.9,139.9,0.15,9.5"
 
     steps:
       - name: Trigger XREA run.php
