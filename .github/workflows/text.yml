@@ -14,4 +14,4 @@ jobs:
         with:
           node-version: 20
       - run: npm install node-fetch
-      - run: node test.js
+      - run: node js/testNode.js
