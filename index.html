@@ -809,26 +809,25 @@ function renderCrowdImage() {
 
     for (let i = 0; i < 4; i++) {
 
-        const idx = (baseIndex + i) % slots.length;
+    const rawIndex = baseIndex + i;
+    const idx = rawIndex % slots.length;
 
-        if (i > 0 && idx === 0) {
-            dayOffset++;
-        }
+    const extraDay = Math.floor(rawIndex / slots.length);
 
-        const tmpDate = new Date(nowJST);
-        tmpDate.setDate(tmpDate.getDate() + dayOffset);
+    const tmpDate = new Date(nowJST);
+    tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
 
-        const y = tmpDate.getFullYear();
-        const m = String(tmpDate.getMonth()+1).padStart(2,"0");
-        const d = String(tmpDate.getDate()).padStart(2,"0");
+    const y = tmpDate.getFullYear();
+    const m = String(tmpDate.getMonth()+1).padStart(2,"0");
+    const d = String(tmpDate.getDate()).padStart(2,"0");
 
-        const hh = String(slots[idx]).padStart(2,"0");
+    const hh = String(slots[idx]).padStart(2,"0");
 
-        images.push({
-            url: `js/crowdsimg/${window.currentPref}_${y}-${m}-${d}_${hh}.png`,
-            displayHour: slots[idx] + (dayOffset * 24)
-        });
-    }
+    images.push({
+        url: `js/crowdsimg/${window.currentPref}_${y}-${m}-${d}_${hh}.png`,
+        displayHour: slots[idx] + ((dayOffset + extraDay) * 24)
+    });
+}
 
     // =======================
     // header UI
