@@ -65,52 +65,48 @@ async function fetchWeather(p) {
 }
 
 // ===== 実行 =====
-async function run() {
-  console.log(`region: ${region}`);
+async function run(points) {
+  const concurrency = 5;   // ←ここ調整
+  const delayMs = 100;     // 軽く間引き
 
-  const allPoints = loadCsv(csvPath);
-
-  // notes 完全一致で First のみ
-  const targetPoints = allPoints.filter(
-    p => (p.notes || "") === "First"
-  );
-
-  console.log(`total: ${allPoints.length}`);
-  console.log(`target (First only): ${targetPoints.length}`);
-
+  let i = 0;
   const results = [];
 
-  for (let i = 0; i < targetPoints.length; i++) {
-    const p = targetPoints[i];
+  async function worker() {
+    while (i < points.length) {
+      const idx = i++;
+      const p = points[idx];
 
-    try {
-      const w = await fetchWeather(p);
+      try {
+        const w = await fetchWeather(p);
 
-      results.push({
-        ...p,
-        temp: w.temp,
-        status: w.status
-      });
+        results[idx] = {
+          ...p,
+          temp: w.temp,
+          status: w.status
+        };
 
-      console.log(`OK ${i + 1}/${targetPoints.length} ${p.name}`);
+        console.log(`OK ${idx + 1}/${points.length} ${p.name}`);
 
-    } catch (e) {
-      results.push({
-        ...p,
-        temp: "ERR",
-        status: "ERR"
-      });
+      } catch (e) {
+        results[idx] = {
+          ...p,
+          temp: "ERR",
+          status: "ERR"
+        };
 
-      console.log(`ERR ${i + 1}/${targetPoints.length} ${p.name}`);
+        console.log(`ERR ${idx + 1}/${points.length} ${p.name}`);
+      }
+
+      await new Promise(r => setTimeout(r, delayMs));
     }
-
-    // レート制御（200ms間隔）
-    await new Promise(r => setTimeout(r, 200));
   }
 
-  saveCsv(results, outPath);
+  await Promise.all(
+    Array.from({ length: concurrency }, worker)
+  );
 
-  console.log(`saved: ${outPath}`);
+  return results;
 }
 
 // ===== 実行開始 =====
