@@ -16,7 +16,9 @@ function loadCsv(file) {
   return rows.map(r => {
     const vals = r.split(",");
     const obj = {};
-    cols.forEach((c, i) => obj[c] = vals[i]);
+    cols.forEach((c, i) => {
+      obj[c] = (vals[i] || "").trim(); // ←ここ重要
+    });
     return obj;
   });
 }
