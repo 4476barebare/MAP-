@@ -944,18 +944,36 @@ function renderCrowdImage() {
                 cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
 
                 // レイヤー差し替え
-                if (window.crowdLayer) {
-                    window.map.removeLayer(window.crowdLayer);
-                }
+const newLayer = L.imageOverlay(
+    img.url,
+    calcBounds(),
+    {
+        pane: 'rainPane',
+        opacity: 0
+    }
+).addTo(window.map);
 
-                window.crowdLayer = L.imageOverlay(
-                    img.url,
-                    calcBounds(),
-                    {
-                        pane: 'rainPane',
-                        opacity: 0.6
-                    }
-                ).addTo(window.map);
+let opacity = 0;
+
+const fade = setInterval(() => {
+
+    opacity += 0.1;
+
+    if (opacity >= 1) {
+        opacity = 1;
+        clearInterval(fade);
+
+        // 古いレイヤー削除
+        if (window.crowdLayer) {
+            window.map.removeLayer(window.crowdLayer);
+        }
+
+        window.crowdLayer = newLayer;
+    }
+
+    newLayer.setOpacity(opacity);
+
+}, 50);
 
             }, 2500);
 
