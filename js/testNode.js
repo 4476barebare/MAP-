@@ -5,7 +5,14 @@ import fetch from "node-fetch";
 // ===== 設定 =====
 const region = process.env.REGION || "KANTO";
 const csvPath = `./${region}/${region}_region.csv`;
-const outPath = `./${region}/${region}_first_result.csv`;
+const outPath = `./data/${region}_inLand.csv`;
+
+// ===== フォルダ作成 =====
+function ensureDir(path) {
+  if (!fs.existsSync(path)) {
+    fs.mkdirSync(path, { recursive: true });
+  }
+}
 
 // ===== CSV読み込み =====
 function loadCsv(file) {
@@ -25,6 +32,8 @@ function loadCsv(file) {
 
 // ===== CSV書き出し =====
 function saveCsv(data, file) {
+  ensureDir("data");
+
   if (!data || data.length === 0) {
     console.log("no data");
     fs.writeFileSync(file, "", "utf-8");
@@ -40,6 +49,41 @@ function saveCsv(data, file) {
   }
 
   fs.writeFileSync(file, lines.join("\n"), "utf-8");
+}
+
+// ===== データ整形 =====
+function formatWeather(w) {
+  if (w.status !== 200) return {};
+
+  const result = {};
+
+  // ===== 今日〜3日（72時間）=====
+  for (let d = 0; d < 3; d++) {
+    const base = d * 24;
+
+    result[`day${d}_temp`] =
+      w.hourly.temp.slice(base, base + 24).join("|");
+
+    result[`day${d}_rain`] =
+      w.hourly.rain.slice(base, base + 24).join("|");
+
+    result[`day${d}_pop`] =
+      w.hourly.pop.slice(base, base + 24).join("|");
+
+    result[`day${d}_wind`] =
+      w.hourly.wind.slice(base, base + 24).join("|");
+
+    result[`day${d}_code`] =
+      w.hourly.code.slice(base, base + 24).join("|");
+  }
+
+  // ===== 3日後〜8日後 =====
+  for (let d = 3; d < 8; d++) {
+    result[`day${d}_code`] = w.daily.code[d] ?? "";
+    result[`day${d}_tmax`] = w.daily.tmax[d] ?? "";
+  }
+
+  return result;
 }
 
 // ===== API取得 =====
@@ -59,28 +103,20 @@ async function fetchWeather(p) {
 
     const res = await fetch(url, { signal: controller.signal });
 
-    if (!res.ok) {
-      return { status: res.status };
-    }
+    if (!res.ok) return { status: res.status };
 
     const j = await res.json();
 
     return {
       status: 200,
-
-      // ===== 0〜72時間 =====
       hourly: {
-        time: j.hourly?.time ?? [],
         temp: j.hourly?.temperature_2m ?? [],
         rain: j.hourly?.precipitation ?? [],
         pop: j.hourly?.precipitation_probability ?? [],
         wind: j.hourly?.windspeed_10m ?? [],
         code: j.hourly?.weathercode ?? []
       },
-
-      // ===== 日別 =====
       daily: {
-        time: j.daily?.time ?? [],
         code: j.daily?.weathercode ?? [],
         tmax: j.daily?.temperature_2m_max ?? []
       }
@@ -95,10 +131,6 @@ async function fetchWeather(p) {
 
 // ===== 並列実行 =====
 async function run(points) {
-  if (!points || !Array.isArray(points)) {
-    throw new Error("points is invalid");
-  }
-
   const concurrency = 5;
   const delayMs = 100;
 
@@ -115,19 +147,16 @@ async function run(points) {
 
         results[idx] = {
           ...p,
-          temp: w.temp,
+          ...formatWeather(w),
           status: w.status
         };
 
         console.log(`OK ${idx + 1}/${points.length} ${p.name}`);
-      } catch (e) {
+      } catch {
         results[idx] = {
           ...p,
-          temp: "ERR",
           status: "ERR"
         };
-
-        console.log(`ERR ${idx + 1}/${points.length} ${p.name}`);
       }
 
       await new Promise(r => setTimeout(r, delayMs));
@@ -145,30 +174,18 @@ async function run(points) {
 async function main() {
   console.log("region:", region);
 
-  // 1. CSV読み込み
   const all = loadCsv(csvPath);
-  console.log("total:", all.length);
-
-  // 2. First完全一致抽出
   const targetPoints = all.filter(p => p.notes === "First");
-  console.log("target (First only):", targetPoints.length);
 
   if (targetPoints.length === 0) {
-    console.log("no target");
     saveCsv([], outPath);
     return;
   }
 
-  // 3. API取得
   const results = await run(targetPoints);
 
-  // 4. 保存
   saveCsv(results, outPath);
   console.log("saved:", outPath);
 }
 
-// ===== 実行 =====
-main().catch(err => {
-  console.error("FATAL:", err);
-  process.exit(1);
-});
+main();
