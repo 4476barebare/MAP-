@@ -41,9 +41,6 @@ function saveCsv(data, file) {
 
 // ===== API取得 =====
 async function fetchWeather(p) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
-
   try {
     const url =
       `https://api.open-meteo.com/v1/forecast` +
@@ -54,16 +51,18 @@ async function fetchWeather(p) {
       `&forecast_days=8` +
       `&timezone=Asia/Tokyo`;
 
-    const res = await fetch(url, { signal: controller.signal });
+    const res = await fetch(url);
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.log("HTTP ERROR:", res.status);
+      return null;
+    }
 
     return await res.json();
 
-  } catch {
+  } catch (e) {
+    console.log("FETCH ERROR:", e.message);
     return null;
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
