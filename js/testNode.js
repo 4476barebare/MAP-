@@ -42,7 +42,7 @@ function saveCsv(data, file) {
 // ===== API取得（完全に元のまま） =====
 async function fetchWeather(p) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  const timeout = setTimeout(() => controller.abort(), 15000);
 
   try {
     const url =
@@ -79,8 +79,11 @@ async function fetchWeather(p) {
       }
     };
 
-  } catch {
-    return { status: "TIMEOUT" };
+  } catch (e) {
+    if (e.name === "AbortError") {
+      return { status: "TIMEOUT" };
+    }
+    return { status: "ERR" };
   } finally {
     clearTimeout(timeout);
   }
