@@ -40,9 +40,16 @@ function saveCsv(data, file) {
 }
 
 // ===== API取得（パラメータ修正＆ログ強化版） =====
+// ===== API取得（タイムアウト＆個別ログ追加版） =====
 async function fetchWeather(p) {
+  // リクエスト開始を知らせるログ（これでどこで止まっているか分かります）
+  console.log(`   [FETCH START] ${p.name} (lat: ${p.lat}, lng: ${p.lng})`);
+
+  // 5秒でタイムアウトさせるための設定
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
   try {
-    // windspeed_10m を現在のAPI仕様である wind_speed_10m に修正
     const url =
       `https://api.open-meteo.com/v1/forecast` +
       `?latitude=${p.lat}` +
@@ -52,12 +59,12 @@ async function fetchWeather(p) {
       `&forecast_days=8` +
       `&timezone=Asia/Tokyo`;
 
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId); // 成功したらタイムアウトを解除
 
     if (!res.ok) {
-      // エラー時にAPIから返ってきた具体的な理由（400エラーの理由など）をログに出す
       const errText = await res.text();
-      console.log(`[API_ERROR] ${p.name}: Status ${res.status} - ${errText}`);
+      console.log(`   [API_ERROR] ${p.name}: Status ${res.status} - ${errText}`);
       return { status: res.status };
     }
 
@@ -70,7 +77,7 @@ async function fetchWeather(p) {
         temp: j.hourly?.temperature_2m ?? [],
         rain: j.hourly?.precipitation ?? [],
         pop: j.hourly?.precipitation_probability ?? [],
-        wind: j.hourly?.wind_speed_10m ?? [], // 修正
+        wind: j.hourly?.wind_speed_10m ?? [],
         code: j.hourly?.weathercode ?? []
       },
       daily: {
@@ -81,10 +88,16 @@ async function fetchWeather(p) {
     };
 
   } catch (e) {
-    console.log("FETCH ERROR:", e.message);
+    clearTimeout(timeoutId);
+    if (e.name === 'AbortError') {
+      console.log(`   [TIMEOUT] ${p.name} へのリクエストが5秒間応答なしのため中断されました`);
+    } else {
+      console.log(`   [FETCH ERROR] ${p.name}: ${e.message}`);
+    }
     return { status: "ERR" };
   }
 }
+
 
 
 // ===== 整形 =====
