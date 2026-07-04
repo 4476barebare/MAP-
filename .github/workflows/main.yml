@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # リモートとの履歴の競合を防ぐため、すべての履歴を取得します
+          fetch-depth: 0
 
       - name: Fetch API
         id: fetch_api
@@ -31,6 +34,10 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+          
+          # 先にリモートの最新変更を取得し、手元のコミットをその上に安全に積み上げます
+          git pull --rebase origin main
+          
           git add data/KANTO_load.json
           
           # 変更があるかチェック
@@ -39,12 +46,11 @@ jobs:
             echo "No changes"
           else
             git commit -m "test: update kanto load"
-            git push
+            git push origin main
             echo "CHANGES=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Trigger KANTO Whether Control
-        # 「変更があった時のみ」実行するように条件を変更
         if: steps.commit_result.outputs.CHANGES == 'true'
         uses: actions/github-script@v7
         with:
