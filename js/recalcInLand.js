@@ -1,5 +1,5 @@
 import fs from "fs";
-import https from "https"; // Node.js標準モジュールなのでインストール不要
+import https from "https";
 import { applyFirstStage } from "./whetherNode.js";
 
 // ===== 1. 設定の定義 =====
@@ -9,12 +9,12 @@ const loadJsonPath = `data/${region}_load.json`;
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
-// 簡易CSVパース関数（JSON内のカンマを無視）
+// 簡易CSVパース関数
 function parseCsvLine(line) {
-    return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+    return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
 
-// Node.js標準のhttpsでURLからテキストを取得する関数
+// httpsでURLからテキストを取得する関数
 function fetchUrlText(url) {
     return new Promise((resolve, reject) => {
         https.get(url, (res) => {
@@ -47,7 +47,7 @@ async function run() {
     let inLandLines = [];
     try {
         console.log(`🌐 リモートCSVを取得中: ${inLandUrl}`);
-        const csvData = await fetchUrlText(inLandUrl); // 標準モジュールで取得
+        const csvData = await fetchUrlText(inLandUrl);
         inLandLines = csvData.split("\n").filter(Boolean);
         console.log(`📥 内陸CSVから ${inLandLines.length - 1} 行のデータを取得しました。`);
     } catch (error) {
@@ -55,7 +55,7 @@ async function run() {
         return;
     }
 
-    // ③ マスタデータ（KANTO_region.csv）から座標情報を取得
+    // ③ マスタデータ（KANTO_region.csv）から座標情報と notes 情報を取得
     if (!fs.existsSync(regionCsvPath)) {
         console.error(`❌ リージョンCSVが見つかりません: ${regionCsvPath}`);
         return;
@@ -68,10 +68,11 @@ async function run() {
         const r = parseCsvLine(line);
         if (r.length >= 8) {
             const id = r[2]; // individualId (F001など)
+            if (!id) continue;
             geoMap[id] = {
-                lat: parseFloat(r[3]),
-                lng: parseFloat(r[4]),
-                notes: r[7],
+                lat: parseFloat(r[3]) || 0,
+                lng: parseFloat(r[4]) || 0,
+                notes: r[7] ? r[7].trim() : "",
                 icon: r[8] || "station"
             };
         }
@@ -87,22 +88,34 @@ async function run() {
         }
     });
 
-    // CSV側の「First（取得済み）」の親データをJSON側と同じ構造にエミュレートして追加
-    const inLandHeader = inLandLines.shift(); // ヘッダー除去
-    const csvSpots = []; // 後で計算結果を詰めるための配列
+    // CSV側のデータをマッピング
+    inLandLines.shift(); // ヘッダー除去
+    const csvSpots = []; 
 
     for (const line of inLandLines) {
-        const [individualId, name, date, whetherStr] = parseCsvLine(line);
+        const parts = parseCsvLine(line);
+        if (parts.length < 3) continue;
+
+        const individualId = parts[0];
+        const name = parts[1];
+        const date = parts[2];
+        const whetherStr = parts[3] || "";
+
         if (!individualId) continue;
 
-        const geo = geoMap[individualId] || {};
+        const geo = geoMap[individualId] || { lat: 0, lng: 0, notes: "", icon: "station" };
+        
         let whether = null;
         if (whetherStr && whetherStr.startsWith("{")) {
-            try { whether = JSON.parse(whetherStr); } catch (e) { whether = null; }
+            try { 
+                whether = JSON.parse(whetherStr); 
+            } catch (e) { 
+                whether = null; 
+            }
         }
 
-        // 既存の「First単体」の行＝すでにAPI取得済みの親ステーション
-        if (geo.notes === "First" && whether) {
+        // ★【修正】geo.notes が "First" または CSV上に既に有効なデータがある場合、親ステーションとして登録
+        if (whether && (geo.notes === "First" || !geo.notes.includes("/"))) {
             stationMapForCalc[individualId] = {
                 stationCode: individualId,
                 latlng: `${geo.lat};${geo.lng}`, 
@@ -120,8 +133,8 @@ async function run() {
             date,
             lat: geo.lat,
             lng: geo.lng,
-            notes: geo.notes,
-            icon: "spot", // whetherNodeの判定を通過させるために一時的に"spot"にする
+            notes: geo.notes || "First", // 既存のルール判定に合わせるためデフォルトを埋める
+            icon: "spot", // whetherNodeのガード条件(spot.icon === "spot")を通過させる
             whether: whether
         });
     }
