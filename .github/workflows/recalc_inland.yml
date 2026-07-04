@@ -1,0 +1,64 @@
+name: Recalculate InLand Weather Data
+
+on:
+  # GitHubのActionsタブから手動でいつでも実行可能にします
+  workflow_dispatch:
+
+jobs:
+  recalculate:
+    runs-on: ubuntu-latest
+
+    # 処理結果をリポジトリへコミット・プッシュするための権限設定
+    permissions:
+      contents: write
+
+    steps:
+      # 1. リポジトリのコードをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Node.js 環境のセットアップ
+      - name: Setup Node.js
+        uses: actions/checkout@v4
+        with:
+          node-version: '20' # プロジェクトのバージョンに合わせて適宜変更してください
+
+      # 3. 依存パッケージのキャッシュ（処理の高速化）
+      - name: Cache Node.js modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # 4. 必要なパッケージのインストール
+      # ※ axios が package.json にない場合は一時的にインストールするか、事前に npm i axios --save しておいてください
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          else
+            npm install axios
+          fi
+
+      # 5. 再計算スクリプトの実行
+      - name: Run recalculation script
+        run: node js/recalcInLand.js
+        env:
+          TZ: 'Asia/Tokyo' # スクリプト内の日付処理をJSTに合わせる
+
+      # 6. 計算結果（data/KANTO_inLand_recalculated.csv）の自動コミット＆プッシュ
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 変更（新規追加含む）があった場合のみ処理
+          git add data/
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: [KANTO] 内陸補間データの再計算を反映"
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
