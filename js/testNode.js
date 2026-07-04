@@ -17,7 +17,7 @@ function loadCsv(file) {
     const vals = r.split(",");
     const obj = {};
     cols.forEach((c, i) => {
-      obj[c] = (vals[i] || "").trim(); // ←ここ重要
+      obj[c] = (vals[i] || "").trim();
     });
     return obj;
   });
@@ -25,8 +25,9 @@ function loadCsv(file) {
 
 // ===== CSV書き出し =====
 function saveCsv(data, file) {
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     console.log("no data");
+    fs.writeFileSync(file, "", "utf-8");
     return;
   }
 
@@ -64,13 +65,17 @@ async function fetchWeather(p) {
   };
 }
 
-// ===== 実行 =====
+// ===== 並列実行 =====
 async function run(points) {
-  const concurrency = 5;   // ←ここ調整
-  const delayMs = 100;     // 軽く間引き
+  if (!points || !Array.isArray(points)) {
+    throw new Error("points is invalid");
+  }
+
+  const concurrency = 5;
+  const delayMs = 100;
 
   let i = 0;
-  const results = [];
+  const results = new Array(points.length);
 
   async function worker() {
     while (i < points.length) {
@@ -87,7 +92,6 @@ async function run(points) {
         };
 
         console.log(`OK ${idx + 1}/${points.length} ${p.name}`);
-
       } catch (e) {
         results[idx] = {
           ...p,
@@ -103,11 +107,40 @@ async function run(points) {
   }
 
   await Promise.all(
-    Array.from({ length: concurrency }, worker)
+    Array.from({ length: concurrency }, () => worker())
   );
 
   return results;
 }
 
-// ===== 実行開始 =====
-run();
+// ===== メイン =====
+async function main() {
+  console.log("region:", region);
+
+  // 1. CSV読み込み
+  const all = loadCsv(csvPath);
+  console.log("total:", all.length);
+
+  // 2. First完全一致抽出
+  const targetPoints = all.filter(p => p.notes === "First");
+  console.log("target (First only):", targetPoints.length);
+
+  if (targetPoints.length === 0) {
+    console.log("no target");
+    saveCsv([], outPath);
+    return;
+  }
+
+  // 3. API取得
+  const results = await run(targetPoints);
+
+  // 4. 保存
+  saveCsv(results, outPath);
+  console.log("saved:", outPath);
+}
+
+// ===== 実行 =====
+main().catch(err => {
+  console.error("FATAL:", err);
+  process.exit(1);
+});
