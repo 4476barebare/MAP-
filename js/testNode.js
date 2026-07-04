@@ -23,7 +23,7 @@ function loadCsv(file) {
   });
 }
 
-// ===== CSV書き出し（専用形式） =====
+// ===== CSV書き出し（元の形式のまま変更なし） =====
 function saveCsv(data, file) {
   if (!fs.existsSync("data")) {
     fs.mkdirSync("data", { recursive: true });
@@ -39,14 +39,15 @@ function saveCsv(data, file) {
   fs.writeFileSync(file, lines.join("\n"), "utf-8");
 }
 
-// ===== API取得（安定版） =====
+// ===== API取得（パラメータ修正＆ログ強化版） =====
 async function fetchWeather(p) {
   try {
+    // windspeed_10m を現在のAPI仕様である wind_speed_10m に修正
     const url =
       `https://api.open-meteo.com/v1/forecast` +
       `?latitude=${p.lat}` +
       `&longitude=${p.lng}` +
-      `&hourly=temperature_2m,precipitation,precipitation_probability,windspeed_10m,weathercode` +
+      `&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,weathercode` +
       `&daily=weathercode,temperature_2m_max` +
       `&forecast_days=8` +
       `&timezone=Asia/Tokyo`;
@@ -54,6 +55,9 @@ async function fetchWeather(p) {
     const res = await fetch(url);
 
     if (!res.ok) {
+      // エラー時にAPIから返ってきた具体的な理由（400エラーの理由など）をログに出す
+      const errText = await res.text();
+      console.log(`[API_ERROR] ${p.name}: Status ${res.status} - ${errText}`);
       return { status: res.status };
     }
 
@@ -66,7 +70,7 @@ async function fetchWeather(p) {
         temp: j.hourly?.temperature_2m ?? [],
         rain: j.hourly?.precipitation ?? [],
         pop: j.hourly?.precipitation_probability ?? [],
-        wind: j.hourly?.windspeed_10m ?? [],
+        wind: j.hourly?.wind_speed_10m ?? [], // 修正
         code: j.hourly?.weathercode ?? []
       },
       daily: {
@@ -130,10 +134,11 @@ function formatWeather(w) {
   return { hourly, daily };
 }
 
-// ===== 並列実行（元のまま） =====
+// ===== 並列実行（ウェイトを少し安全に調整） =====
 async function run(points) {
   const concurrency = 5;
-  const delayMs = 100;
+  // 短時間でのリクエスト過多（429エラー）を防ぐため、念のためウェイトを100msから300msに緩和
+  const delayMs = 300; 
 
   let i = 0;
   const results = [];
@@ -148,7 +153,7 @@ async function run(points) {
         const formatted = formatWeather(w);
 
         if (!formatted) {
-          console.log(`ERR ${idx + 1}/${points.length} ${p.name}`);
+          console.log(`ERR ${idx + 1}/${points.length} ${p.name} (API Status: ${w.status})`);
         } else {
           results.push({
             name: p.name,
@@ -180,6 +185,8 @@ async function main() {
 
   const all = loadCsv(csvPath);
   const targetPoints = all.filter(p => p.notes === "First");
+
+  console.log(`Target points: ${targetPoints.length}`);
 
   const results = await run(targetPoints);
 
