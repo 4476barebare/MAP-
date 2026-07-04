@@ -1,5 +1,6 @@
 // testNode.js
 import fs from "fs";
+import fetch from "node-fetch";
 
 // ===== 設定 =====
 const region = process.env.REGION || "KANTO";
@@ -40,9 +41,6 @@ function saveCsv(data, file) {
 
 // ===== API取得（安定版） =====
 async function fetchWeather(p) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
-
   try {
     const url =
       `https://api.open-meteo.com/v1/forecast` +
@@ -53,7 +51,7 @@ async function fetchWeather(p) {
       `&forecast_days=8` +
       `&timezone=Asia/Tokyo`;
 
-    const res = await fetch(url, { signal: controller.signal });
+    const res = await fetch(url);
 
     if (!res.ok) {
       return { status: res.status };
@@ -79,15 +77,11 @@ async function fetchWeather(p) {
     };
 
   } catch (e) {
-    if (e.name === "AbortError") {
-      return { status: "TIMEOUT" };
-    }
     console.log("FETCH ERROR:", e.message);
     return { status: "ERR" };
-  } finally {
-    clearTimeout(timeout);
   }
 }
+
 
 // ===== 整形 =====
 function formatWeather(w) {
