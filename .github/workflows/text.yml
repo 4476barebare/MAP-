@@ -26,7 +26,7 @@ jobs:
         run: npm install node-fetch
 
       - name: Run script
-        run: node testNode.js
+        run: node js/testNode.js
         env:
           REGION: ${{ matrix.region }}
 
