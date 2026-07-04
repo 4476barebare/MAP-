@@ -22,8 +22,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install deps
-        run: npm install node-fetch
+      # 💡 npm install node-fetch のステップは不要になったので削除
 
       - name: Run script
         run: node js/testNode.js
