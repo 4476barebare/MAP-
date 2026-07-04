@@ -42,7 +42,7 @@ function saveCsv(data, file) {
 // ===== API取得 =====
 async function fetchWeather(p) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 20000);
 
   try {
     const url =
@@ -118,25 +118,32 @@ function formatWeather(j) {
 // ===== 並列実行 =====
 async function run(points) {
   const results = [];
+  const limit = 5; // 並列数
 
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i];
+  for (let i = 0; i < points.length; i += limit) {
+    const chunk = points.slice(i, i + limit);
 
-    const j = await fetchWeather(p);
-    const formatted = formatWeather(j);
+    const res = await Promise.all(
+      chunk.map(async (p, idx) => {
+        const j = await fetchWeather(p);
+        const formatted = formatWeather(j);
 
-    if (!formatted) {
-      console.log(`ERR ${i + 1}/${points.length} ${p.name}`);
-      continue;
-    }
+        if (!formatted) {
+          console.log(`ERR ${i + idx + 1}/${points.length} ${p.name}`);
+          return null;
+        }
 
-    results.push({
-      name: p.name,
-      date: new Date().toISOString().slice(0, 10),
-      whether: formatted
-    });
+        console.log(`OK ${i + idx + 1}/${points.length} ${p.name}`);
 
-    console.log(`OK ${i + 1}/${points.length} ${p.name}`);
+        return {
+          name: p.name,
+          date: new Date().toISOString().slice(0, 10),
+          whether: formatted
+        };
+      })
+    );
+
+    results.push(...res.filter(Boolean));
   }
 
   return results;
