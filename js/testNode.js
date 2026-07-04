@@ -23,7 +23,7 @@ function loadCsv(file) {
   });
 }
 
-// ===== CSV書き出し（★専用形式） =====
+// ===== CSV書き出し（変更） =====
 function saveCsv(data, file) {
   if (!fs.existsSync("data")) {
     fs.mkdirSync("data", { recursive: true });
@@ -39,8 +39,11 @@ function saveCsv(data, file) {
   fs.writeFileSync(file, lines.join("\n"), "utf-8");
 }
 
-// ===== API取得 =====
+// ===== API取得（完全に元のまま） =====
 async function fetchWeather(p) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
   try {
     const url =
       `https://api.open-meteo.com/v1/forecast` +
@@ -51,61 +54,79 @@ async function fetchWeather(p) {
       `&forecast_days=8` +
       `&timezone=Asia/Tokyo`;
 
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: controller.signal });
 
     if (!res.ok) {
-      console.log("HTTP ERROR:", res.status);
-      return null;
+      return { status: res.status };
     }
 
-    return await res.json();
+    const j = await res.json();
 
-  } catch (e) {
-    console.log("FETCH ERROR:", e.message);
-    return null;
+    return {
+      status: 200,
+      hourly: {
+        time: j.hourly?.time ?? [],
+        temp: j.hourly?.temperature_2m ?? [],
+        rain: j.hourly?.precipitation ?? [],
+        pop: j.hourly?.precipitation_probability ?? [],
+        wind: j.hourly?.windspeed_10m ?? [],
+        code: j.hourly?.weathercode ?? []
+      },
+      daily: {
+        time: j.daily?.time ?? [],
+        code: j.daily?.weathercode ?? [],
+        tmax: j.daily?.temperature_2m_max ?? []
+      }
+    };
+
+  } catch {
+    return { status: "TIMEOUT" };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
-// ===== 整形（★ここが本体） =====
-function formatWeather(j) {
-  if (!j) return null;
+// ===== 整形（追加） =====
+function formatWeather(w) {
+  if (!w || w.status !== 200) return null;
+
+  const h = w.hourly;
+  const d = w.daily;
 
   const hourly = [];
-  const h = j.hourly;
 
-  // ===== 3日分 =====
-  for (let d = 0; d < 3; d++) {
-    const day = [];
+  // 今日〜明後日（3日）
+  for (let day = 0; day < 3; day++) {
+    const arr = [];
 
     for (let i = 0; i < 24; i += 2) {
-      const idx = d * 24 + i;
+      const idx = day * 24 + i;
 
-      day.push([
-        h.weathercode?.[idx] ?? "",
-        h.temperature_2m?.[idx] ?? "",
-        h.precipitation?.[idx] ?? "",
-        h.precipitation_probability?.[idx] ?? "",
-        h.windspeed_10m?.[idx] ?? "",
-        "", // 風向
-        ""  // 波高
+      arr.push([
+        h.code[idx] ?? "",
+        h.temp[idx] ?? "",
+        h.rain[idx] ?? "",
+        h.pop[idx] ?? "",
+        h.wind[idx] ?? "",
+        "",
+        ""
       ]);
     }
 
     hourly.push({
-      weather: day,
-      oneday: {} // 空
+      weather: arr,
+      oneday: {}
     });
   }
 
-  // ===== daily =====
   const daily = [];
-  const d = j.daily;
 
+  // 3日後〜7日後
   for (let i = 3; i < 8; i++) {
     daily.push({
       weather: [
-        d.weathercode?.[i] ?? "",
-        d.temperature_2m_max?.[i] ?? ""
+        d.code[i] ?? "",
+        d.tmax[i] ?? ""
       ],
       dailyEx: {}
     });
@@ -114,36 +135,46 @@ function formatWeather(j) {
   return { hourly, daily };
 }
 
-// ===== 並列実行 =====
+// ===== 並列実行（最小変更） =====
 async function run(points) {
+  const concurrency = 5;
+  const delayMs = 100;
+
+  let i = 0;
   const results = [];
-  const limit = 5; // 並列数
 
-  for (let i = 0; i < points.length; i += limit) {
-    const chunk = points.slice(i, i + limit);
+  async function worker() {
+    while (i < points.length) {
+      const idx = i++;
+      const p = points[idx];
 
-    const res = await Promise.all(
-      chunk.map(async (p, idx) => {
-        const j = await fetchWeather(p);
-        const formatted = formatWeather(j);
+      try {
+        const w = await fetchWeather(p);
+        const formatted = formatWeather(w);
 
         if (!formatted) {
-          console.log(`ERR ${i + idx + 1}/${points.length} ${p.name}`);
-          return null;
+          console.log(`ERR ${idx + 1}/${points.length} ${p.name}`);
+        } else {
+          results.push({
+            name: p.name,
+            date: new Date().toISOString().slice(0, 10),
+            whether: formatted
+          });
+
+          console.log(`OK ${idx + 1}/${points.length} ${p.name}`);
         }
 
-        console.log(`OK ${i + idx + 1}/${points.length} ${p.name}`);
+      } catch {
+        console.log(`ERR ${idx + 1}/${points.length} ${p.name}`);
+      }
 
-        return {
-          name: p.name,
-          date: new Date().toISOString().slice(0, 10),
-          whether: formatted
-        };
-      })
-    );
-
-    results.push(...res.filter(Boolean));
+      await new Promise(r => setTimeout(r, delayMs));
+    }
   }
+
+  await Promise.all(
+    Array.from({ length: concurrency }, () => worker())
+  );
 
   return results;
 }
