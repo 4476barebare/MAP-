@@ -9,8 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 前段のプッシュがGitHub側に完全に生きて反映されるまで5秒間待ちます
+      - name: Wait for remote synchronization
+        run: sleep 5
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # 必ず最新のリモートの変更を強制的に持ってくるように設定します
+          fetch-depth: 0
+          ref: main
+
+      # 最新のファイルを確実に手元に持ってくるためのプル
+      - name: Pull latest changes
+        run: |
+          git pull origin main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -28,4 +41,4 @@ jobs:
           git add data/*.csv || true
           git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "update whether csv"
-          git push
+          git push origin main
