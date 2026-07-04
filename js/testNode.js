@@ -1,6 +1,5 @@
 // testNode.js
 import fs from "fs";
-import fetch from "node-fetch";
 
 // ===== 設定 =====
 const region = process.env.REGION || "KANTO";
@@ -23,7 +22,7 @@ function loadCsv(file) {
   });
 }
 
-// ===== CSV書き出し（変更） =====
+// ===== CSV書き出し（専用形式） =====
 function saveCsv(data, file) {
   if (!fs.existsSync("data")) {
     fs.mkdirSync("data", { recursive: true });
@@ -39,7 +38,7 @@ function saveCsv(data, file) {
   fs.writeFileSync(file, lines.join("\n"), "utf-8");
 }
 
-// ===== API取得（完全に元のまま） =====
+// ===== API取得（安定版） =====
 async function fetchWeather(p) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
@@ -83,13 +82,14 @@ async function fetchWeather(p) {
     if (e.name === "AbortError") {
       return { status: "TIMEOUT" };
     }
+    console.log("FETCH ERROR:", e.message);
     return { status: "ERR" };
   } finally {
     clearTimeout(timeout);
   }
 }
 
-// ===== 整形（追加） =====
+// ===== 整形 =====
 function formatWeather(w) {
   if (!w || w.status !== 200) return null;
 
@@ -98,7 +98,6 @@ function formatWeather(w) {
 
   const hourly = [];
 
-  // 今日〜明後日（3日）
   for (let day = 0; day < 3; day++) {
     const arr = [];
 
@@ -124,7 +123,6 @@ function formatWeather(w) {
 
   const daily = [];
 
-  // 3日後〜7日後
   for (let i = 3; i < 8; i++) {
     daily.push({
       weather: [
@@ -138,7 +136,7 @@ function formatWeather(w) {
   return { hourly, daily };
 }
 
-// ===== 並列実行（最小変更） =====
+// ===== 並列実行（元のまま） =====
 async function run(points) {
   const concurrency = 5;
   const delayMs = 100;
@@ -167,7 +165,7 @@ async function run(points) {
           console.log(`OK ${idx + 1}/${points.length} ${p.name}`);
         }
 
-      } catch {
+      } catch (e) {
         console.log(`ERR ${idx + 1}/${points.length} ${p.name}`);
       }
 
@@ -195,7 +193,8 @@ async function main() {
   console.log("saved:", outPath);
 }
 
+// ===== 実行 =====
 main().catch(err => {
-  console.error(err);
+  console.error("FATAL:", err);
   process.exit(1);
 });
