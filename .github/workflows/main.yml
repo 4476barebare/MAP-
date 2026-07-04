@@ -19,24 +19,33 @@ jobs:
         run: |
           mkdir -p data
           if curl -s -f "https://turiiko.shop/actions/KANTO/load.php" -o data/KANTO_load.json; then
-            echo "SUCCESS=true" >> $GITHUB_OUTPUT
+            echo "FETCHED=true" >> $GITHUB_OUTPUT
           else
-            echo "SUCCESS=false" >> $GITHUB_OUTPUT
+            echo "FETCHED=false" >> $GITHUB_OUTPUT
             exit 1
           fi
 
       - name: Commit result
-        if: steps.fetch_api.outputs.SUCCESS == 'true'
+        id: commit_result
+        if: steps.fetch_api.outputs.FETCHED == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data/KANTO_load.json
-          git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "test: update kanto load"
-          git push
+          
+          # 変更があるかチェック
+          if git diff --cached --quiet; then
+            echo "CHANGES=false" >> $GITHUB_OUTPUT
+            echo "No changes"
+          else
+            git commit -m "test: update kanto load"
+            git push
+            echo "CHANGES=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Trigger KANTO Whether Control
-        if: steps.fetch_api.outputs.SUCCESS == 'true'
+        # 「変更があった時のみ」実行するように条件を変更
+        if: steps.commit_result.outputs.CHANGES == 'true'
         uses: actions/github-script@v7
         with:
           script: |
