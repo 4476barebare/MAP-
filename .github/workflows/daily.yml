@@ -3,18 +3,36 @@ name: Daily XREA Trigger
 on:
   workflow_dispatch:
   schedule:
-  - cron: "5 15 * * *"
-  - cron: "13 15 * * *"
-  
+    - cron: "5 15 * * *"
+    - cron: "13 15 * * *"
+
 jobs:
   run:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call PHP
+      - name: 1st Call
         run: |
+          echo "=== First call start ==="
           TS=$(date +%s)
           SECRET=${{ secrets.XREA_SECRET }}
           SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
+          echo "Request: ts=$TS"
           curl -v "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG"
-      # force refresh
+          echo "=== First call end ==="
+
+      - name: Wait 5 seconds
+        run: |
+          echo "=== Waiting 5 seconds ==="
+          sleep 5
+          echo "=== Wait done ==="
+
+      - name: 2nd Call
+        run: |
+          echo "=== Second call start ==="
+          TS=$(date +%s)
+          SECRET=${{ secrets.XREA_SECRET }}
+          SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
+          echo "Request: ts=$TS"
+          curl -v "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG"
+          echo "=== Second call end ==="
