@@ -43,6 +43,6 @@ jobs:
             await github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              workflow_id: 'KANTO_Whether_Control.yml',
+              workflow_id: 'KANTO_Whether.yml',
               ref: 'main'
             })
