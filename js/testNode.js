@@ -1,6 +1,6 @@
 // testNode.js
 import fs from "fs";
-import fetch from "node-fetch";
+// 💡 import fetch from "node-fetch"; は削除（Node20標準のfetchを使用）
 
 // ===== 設定 =====
 const region = process.env.REGION || "KANTO";
@@ -38,67 +38,6 @@ function saveCsv(data, file) {
 
   fs.writeFileSync(file, lines.join("\n"), "utf-8");
 }
-
-// ===== API取得（パラメータ修正＆ログ強化版） =====
-// ===== API取得（タイムアウト＆個別ログ追加版） =====
-async function fetchWeather(p) {
-  // リクエスト開始を知らせるログ（これでどこで止まっているか分かります）
-  console.log(`   [FETCH START] ${p.name} (lat: ${p.lat}, lng: ${p.lng})`);
-
-  // 5秒でタイムアウトさせるための設定
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-  try {
-    const url =
-      `https://api.open-meteo.com/v1/forecast` +
-      `?latitude=${p.lat}` +
-      `&longitude=${p.lng}` +
-      `&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,weathercode` +
-      `&daily=weathercode,temperature_2m_max` +
-      `&forecast_days=8` +
-      `&timezone=Asia/Tokyo`;
-
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeoutId); // 成功したらタイムアウトを解除
-
-    if (!res.ok) {
-      const errText = await res.text();
-      console.log(`   [API_ERROR] ${p.name}: Status ${res.status} - ${errText}`);
-      return { status: res.status };
-    }
-
-    const j = await res.json();
-
-    return {
-      status: 200,
-      hourly: {
-        time: j.hourly?.time ?? [],
-        temp: j.hourly?.temperature_2m ?? [],
-        rain: j.hourly?.precipitation ?? [],
-        pop: j.hourly?.precipitation_probability ?? [],
-        wind: j.hourly?.wind_speed_10m ?? [],
-        code: j.hourly?.weathercode ?? []
-      },
-      daily: {
-        time: j.daily?.time ?? [],
-        code: j.daily?.weathercode ?? [],
-        tmax: j.daily?.temperature_2m_max ?? []
-      }
-    };
-
-  } catch (e) {
-    clearTimeout(timeoutId);
-    if (e.name === 'AbortError') {
-      console.log(`   [TIMEOUT] ${p.name} へのリクエストが5秒間応答なしのため中断されました`);
-    } else {
-      console.log(`   [FETCH ERROR] ${p.name}: ${e.message}`);
-    }
-    return { status: "ERR" };
-  }
-}
-
-
 
 // ===== 整形 =====
 function formatWeather(w) {
@@ -147,49 +86,95 @@ function formatWeather(w) {
   return { hourly, daily };
 }
 
-// ===== 並列実行（ウェイトを少し安全に調整） =====
-async function run(points) {
-  const concurrency = 5;
-  // 短時間でのリクエスト過多（429エラー）を防ぐため、念のためウェイトを100msから300msに緩和
-  const delayMs = 300; 
+// ===== 一括でAPIを取得して処理する関数 =====
+async function runBulk(points) {
+  if (points.length === 0) return [];
 
-  let i = 0;
-  const results = [];
+  // 全地点の緯度・経度をカンマ区切りで結合
+  const lats = points.map(p => p.lat).join(",");
+  const lngs = points.map(p => p.lng).join(",");
 
-  async function worker() {
-    while (i < points.length) {
-      const idx = i++;
-      const p = points[idx];
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒タイムアウト
 
-      try {
-        const w = await fetchWeather(p);
-        const formatted = formatWeather(w);
+  try {
+    console.log(`[FETCH START] ${points.length}件のデータを一括取得中...`);
+    
+    const url =
+      `https://api.open-meteo.com/v1/forecast` +
+      `?latitude=${lats}` +
+      `&longitude=${lngs}` +
+      `&hourly=temperature_2m,precipitation,precipitation_probability,wind_speed_10m,weathercode` +
+      `&daily=weathercode,temperature_2m_max` +
+      `&forecast_days=8` +
+      `&timezone=Asia/Tokyo`;
 
-        if (!formatted) {
-          console.log(`ERR ${idx + 1}/${points.length} ${p.name} (API Status: ${w.status})`);
-        } else {
-          results.push({
-            name: p.name,
-            date: new Date().toISOString().slice(0, 10),
-            whether: formatted
-          });
+    // Node.jsのグローバルfetchを使用
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
 
-          console.log(`OK ${idx + 1}/${points.length} ${p.name}`);
-        }
+    if (!res.ok) {
+      const errText = await res.text();
+      console.log(`[API_ERROR] Status ${res.status} - ${errText}`);
+      return [];
+    }
 
-      } catch (e) {
+    const jsonResult = await res.json();
+    // 1件だとオブジェクト、複数だと配列で返るため配列に統一
+    const apiDataArray = Array.isArray(jsonResult) ? jsonResult : [jsonResult];
+
+    const results = [];
+
+    points.forEach((p, idx) => {
+      const j = apiDataArray[idx];
+      if (!j) {
         console.log(`ERR ${idx + 1}/${points.length} ${p.name}`);
+        return;
       }
 
-      await new Promise(r => setTimeout(r, delayMs));
+      // 元の構造を再現
+      const mockWeatherResponse = {
+        status: 200,
+        hourly: {
+          time: j.hourly?.time ?? [],
+          temp: j.hourly?.temperature_2m ?? [],
+          rain: j.hourly?.precipitation ?? [],
+          pop: j.hourly?.precipitation_probability ?? [],
+          wind: j.hourly?.wind_speed_10m ?? [],
+          code: j.hourly?.weathercode ?? []
+        },
+        daily: {
+          time: j.daily?.time ?? [],
+          code: j.daily?.weathercode ?? [],
+          tmax: j.daily?.temperature_2m_max ?? []
+        }
+      };
+
+      const formatted = formatWeather(mockWeatherResponse);
+
+      if (formatted) {
+        results.push({
+          name: p.name,
+          date: new Date().toISOString().slice(0, 10),
+          whether: formatted
+        });
+        console.log(`OK ${idx + 1}/${points.length} ${p.name}`);
+      } else {
+        console.log(`ERR ${idx + 1}/${points.length} ${p.name} (Format Error)`);
+      }
+    });
+
+    return results;
+
+  } catch (e) {
+    clearTimeout(timeoutId);
+    if (e.name === 'AbortError') {
+      console.log(`[TIMEOUT] 一括リクエストがタイムアウトしました。`);
+    } else {
+      console.log(`[FETCH ERROR] ${e.message}`);
     }
+    return [];
   }
-
-  await Promise.all(
-    Array.from({ length: concurrency }, () => worker())
-  );
-
-  return results;
 }
 
 // ===== メイン =====
@@ -201,7 +186,7 @@ async function main() {
 
   console.log(`Target points: ${targetPoints.length}`);
 
-  const results = await run(targetPoints);
+  const results = await runBulk(targetPoints);
 
   saveCsv(results, outPath);
   console.log("saved:", outPath);
