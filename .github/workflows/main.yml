@@ -1,40 +1,48 @@
 name: KANTO Load CSV
 
 on:
-  workflow_dispatch:   # 手動実行用
+  workflow_dispatch:
   schedule:
     - cron: '0 16 * * *'
-    - cron: '5 16 * * *' # 1:00 JST（テスト後そのまま運用可）
+    - cron: '5 16 * * *'
     - cron: '10 16 * * *'
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Fetch API
+        id: fetch_api
         run: |
           mkdir -p data
-
-          echo "Fetching..."
-
-          curl -s "https://turiiko.shop/actions/KANTO/load.php" \
-            -H "Accept: application/json" \
-            -o data/KANTO_load.json
-
-          echo "Result:"
-          cat data/KANTO_load.json
+          if curl -s -f "https://turiiko.shop/actions/KANTO/load.php" -o data/KANTO_load.json; then
+            echo "SUCCESS=true" >> $GITHUB_OUTPUT
+          else
+            echo "SUCCESS=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
       - name: Commit result
+        if: steps.fetch_api.outputs.SUCCESS == 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-
           git add data/KANTO_load.json
-
           git diff --cached --quiet && echo "No changes" && exit 0
-
           git commit -m "test: update kanto load"
           git push
+
+      - name: Trigger KANTO Whether Control
+        if: steps.fetch_api.outputs.SUCCESS == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'KANTO_Whether_Control.yml',
+              ref: 'main'
+            })
