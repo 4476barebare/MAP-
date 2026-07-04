@@ -44,25 +44,35 @@ function saveCsv(data, file) {
 
 // ===== API取得 =====
 async function fetchWeather(p) {
-  const url =
-    `https://api.open-meteo.com/v1/forecast` +
-    `?latitude=${p.lat}` +
-    `&longitude=${p.lng}` +
-    `&hourly=temperature_2m` +
-    `&forecast_days=3`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000); // 5秒
 
-  const res = await fetch(url);
+  try {
+    const url =
+      `https://api.open-meteo.com/v1/forecast` +
+      `?latitude=${p.lat}` +
+      `&longitude=${p.lng}` +
+      `&hourly=temperature_2m` +
+      `&forecast_days=3`;
 
-  if (!res.ok) {
-    return { temp: "", status: res.status };
+    const res = await fetch(url, { signal: controller.signal });
+
+    if (!res.ok) {
+      return { temp: "", status: res.status };
+    }
+
+    const json = await res.json();
+
+    return {
+      temp: json.hourly?.temperature_2m?.[0] ?? "",
+      status: 200
+    };
+
+  } catch (e) {
+    return { temp: "TIMEOUT", status: "TIMEOUT" };
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const json = await res.json();
-
-  return {
-    temp: json.hourly?.temperature_2m?.[0] ?? "",
-    status: 200
-  };
 }
 
 // ===== 並列実行 =====
