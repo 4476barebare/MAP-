@@ -45,31 +45,49 @@ function saveCsv(data, file) {
 // ===== API取得 =====
 async function fetchWeather(p) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000); // 5秒
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
   try {
     const url =
       `https://api.open-meteo.com/v1/forecast` +
       `?latitude=${p.lat}` +
       `&longitude=${p.lng}` +
-      `&hourly=temperature_2m` +
-      `&forecast_days=3`;
+      `&hourly=temperature_2m,precipitation,precipitation_probability,windspeed_10m,weathercode` +
+      `&daily=weathercode,temperature_2m_max` +
+      `&forecast_days=8` +
+      `&timezone=Asia/Tokyo`;
 
     const res = await fetch(url, { signal: controller.signal });
 
     if (!res.ok) {
-      return { temp: "", status: res.status };
+      return { status: res.status };
     }
 
-    const json = await res.json();
+    const j = await res.json();
 
     return {
-      temp: json.hourly?.temperature_2m?.[0] ?? "",
-      status: 200
+      status: 200,
+
+      // ===== 0〜72時間 =====
+      hourly: {
+        time: j.hourly?.time ?? [],
+        temp: j.hourly?.temperature_2m ?? [],
+        rain: j.hourly?.precipitation ?? [],
+        pop: j.hourly?.precipitation_probability ?? [],
+        wind: j.hourly?.windspeed_10m ?? [],
+        code: j.hourly?.weathercode ?? []
+      },
+
+      // ===== 日別 =====
+      daily: {
+        time: j.daily?.time ?? [],
+        code: j.daily?.weathercode ?? [],
+        tmax: j.daily?.temperature_2m_max ?? []
+      }
     };
 
   } catch (e) {
-    return { temp: "TIMEOUT", status: "TIMEOUT" };
+    return { status: "TIMEOUT" };
   } finally {
     clearTimeout(timeout);
   }
