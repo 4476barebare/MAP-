@@ -1,17 +1,32 @@
 import fs from "fs";
-import axios from "axios"; // リモートCSV取得用（npm install axios してください）
+import https from "https"; // Node.js標準モジュールなのでインストール不要
 import { applyFirstStage } from "./whetherNode.js";
 
 // ===== 1. 設定の定義 =====
 const region = "KANTO";
 const regionCsvPath = `${region}/${region}_region.csv`;
-const loadJsonPath = `data/${region}_load.json`; // もし手元が.txtなら適宜リネームか変更してください
+const loadJsonPath = `data/${region}_load.json`; 
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
-const outCsvPath = `data/${region}_inLand_recalculated.csv`; // 計算結果の出力先
+const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
 // 簡易CSVパース関数（JSON内のカンマを無視）
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+}
+
+// Node.js標準のhttpsでURLからテキストを取得する関数
+function fetchUrlText(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, (res) => {
+            if (res.statusCode !== 200) {
+                reject(new Error(`Failed to get page, status code: ${res.statusCode}`));
+                return;
+            }
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => resolve(data));
+        }).on('error', (err) => reject(err));
+    });
 }
 
 // ===== 2. データの読み込みと整形 =====
@@ -32,8 +47,8 @@ async function run() {
     let inLandLines = [];
     try {
         console.log(`🌐 リモートCSVを取得中: ${inLandUrl}`);
-        const response = await axios.get(inLandUrl);
-        inLandLines = response.data.split("\n").filter(Boolean);
+        const csvData = await fetchUrlText(inLandUrl); // 標準モジュールで取得
+        inLandLines = csvData.split("\n").filter(Boolean);
         console.log(`📥 内陸CSVから ${inLandLines.length - 1} 行のデータを取得しました。`);
     } catch (error) {
         console.error("❌ リモートCSVの取得に失敗しました:", error.message);
@@ -90,10 +105,9 @@ async function run() {
         if (geo.notes === "First" && whether) {
             stationMapForCalc[individualId] = {
                 stationCode: individualId,
-                latlng: `${geo.lat};${geo.lng}`, // whetherNodeがバラして使う形式に合わせる
+                latlng: `${geo.lat};${geo.lng}`, 
                 lat: geo.lat,
                 lng: geo.lng,
-                // whetherNode.js の normalizeStationToWeather が期待する階層に合わせる
                 hourly0: { weather: whether.hourly[0].weather },
                 daily: whether.daily
             };
@@ -125,7 +139,6 @@ async function run() {
     const outLines = ["individualId,name,date,whether"];
 
     for (const spot of csvSpots) {
-        // 出力時は元の仕様（本来のアイコン状態など）を想定し、JSON文字列に戻す
         const whetherStr = spot.whether ? JSON.stringify(spot.whether).replace(/""/g, '') : "";
         outLines.push(`${spot.individualId},${spot.name},${spot.date},${whetherStr}`);
     }
