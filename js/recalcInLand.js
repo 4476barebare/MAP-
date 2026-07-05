@@ -33,6 +33,7 @@ function parsePHPDaily(dailyArr) {
     if (!dailyArr) return [];
     return dailyArr.map(day => {
         const w = day.weather || [];
+        // 計算用に7つの枠（天気,気温,水温,波高,日の出,日の入り,潮汐）を確保
         return [
             w[0] != null ? String(w[0]) : "",
             w[1] != null ? String(w[1]) : "",
@@ -80,20 +81,78 @@ function normalizeInlandStation(w) {
     return res;
 }
 
-// --- シリアライザー ---
-function serializeStation(s) {
-    const res = {};
+// --- シリアライザー（★ここが修正の要：CHIBA_whether.csv と完全一致させる） ---
+function timeToMinutes(tStr) {
+    if (!tStr) return null;
+    if (!isNaN(Number(tStr))) return Number(tStr); // すでに計算済みの数値の場合
+    const m = String(tStr).match(/T(\d{2}):(\d{2})/); // ISO文字から分単位に変換
+    if (m) {
+        return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+    }
+    return null;
+}
+
+function serializeToChibaFormat(s) {
+    const res = {
+        hourly: [],
+        daily: []
+    };
+
+    // hourly0, 1, 2 を 1つの配列(hourly) にまとめる
     for (const h of ['hourly0', 'hourly1', 'hourly2']) {
         if (s[h]) {
-            res[h] = {};
-            if (s[h].weather && s[h].weather.length) res[h].weather = s[h].weather.map(arr => arr.join('|'));
-            if (s[h].water && s[h].water.length) res[h].water = s[h].water.join('|');
-            if (s[h].tide && s[h].tide.length) res[h].tide = s[h].tide.map(String);
+            const hourObj = { weather: [] };
+            
+            if (s[h].weather && s[h].weather.length > 0) {
+                // 文字列をすべて数値配列にキャスト
+                hourObj.weather = s[h].weather.map(arr => arr.map(v => v === "" || v == null ? null : Number(v)));
+            }
+            
+            // oneday (水温、日の出、日の入り)
+            hourObj.oneday = { avg: null, sunrise: null, sunset: null };
+            if (s[h].water && s[h].water.length >= 3) {
+                hourObj.oneday = {
+                    avg: s[h].water[0] === "" || s[h].water[0] == null ? null : Number(s[h].water[0]),
+                    sunrise: timeToMinutes(s[h].water[1]),
+                    sunset: timeToMinutes(s[h].water[2])
+                };
+            } else if (s[h].water && s[h].water.length > 0) {
+                hourObj.oneday.avg = s[h].water[0] === "" || s[h].water[0] == null ? null : Number(s[h].water[0]);
+            }
+            
+            // tide
+            hourObj.tide = [];
+            if (s[h].tide && s[h].tide.length > 0) {
+                hourObj.tide = s[h].tide.map(v => Number(v) || 0);
+            }
+
+            res.hourly.push(hourObj);
         }
     }
-    if (s.daily && s.daily.length) {
-        res.daily = s.daily.map(arr => arr.join('|')).join(';');
+
+    // daily のフォーマット変換
+    if (s.daily && s.daily.length > 0) {
+        res.daily = s.daily.map(arr => {
+            const dObj = { weather: [], tide: [], dailyEx: { avg: null, wave: null, sunrise: null, sunset: null } };
+            
+            dObj.weather.push(arr[0] === "" || arr[0] == null ? null : Number(arr[0]));
+            dObj.weather.push(arr[1] === "" || arr[1] == null ? null : Number(arr[1]));
+            
+            if (arr[6]) {
+                dObj.tide = arr[6].split(',').map(v => Number(v) || 0);
+            }
+            
+            dObj.dailyEx = {
+                avg: arr[2] === "" || arr[2] == null ? null : Number(arr[2]),
+                wave: arr[3] === "" || arr[3] == null ? null : Number(arr[3]),
+                sunrise: timeToMinutes(arr[4]),
+                sunset: timeToMinutes(arr[5])
+            };
+            
+            return dObj;
+        });
     }
+
     return res;
 }
 
@@ -128,14 +187,13 @@ function lerpArray(arr1, dist1, arr2, dist2) {
         const el1 = arr1[i] !== undefined && arr1[i] !== null ? String(arr1[i]) : "";
         const el2 = arr2[i] !== undefined && arr2[i] !== null ? String(arr2[i]) : "";
 
-        // 日付やカンマ区切りの文字列（潮汐など）は計算せず、近い方の親のデータをそのまま引き継ぐ
         if (el1.includes('T') || el1.includes(',') || el1.includes(':') ||
             el2.includes('T') || el2.includes(',') || el2.includes(':')) {
             res.push(dist1 <= dist2 ? el1 : el2);
         } else {
             const val = lerp(el1, dist1, el2, dist2);
             if (val === "" || Number.isNaN(val)) res.push("");
-            else res.push(String(Math.round(val * 100) / 100)); // 小数点第2位で丸める
+            else res.push(String(Math.round(val * 100) / 100)); 
         }
     }
     return res;
@@ -171,14 +229,12 @@ async function run() {
 
     const stationMap = {}; 
 
-    // ① JSONから取得 (沿岸フォーマット)
     if (fs.existsSync(loadJsonPath)) {
         const rawJson = JSON.parse(fs.readFileSync(loadJsonPath, "utf-8"));
         const jsonStations = rawJson.data || rawJson;
         let jsonCount = 0;
         jsonStations.forEach(s => {
             if (s.stationCode) {
-                // ★ 修正箇所: "latlng" ("35.93;140.7" など) から座標をパースする
                 let lat = null, lng = null;
                 if (s.latlng) {
                     const pts = s.latlng.split(";");
@@ -194,7 +250,6 @@ async function run() {
         console.log(`📦 既存JSONから ${jsonCount} 件の親ステーションを登録`);
     }
 
-    // ② PHP CSVから取得 (内陸フォーマット)
     let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
     try {
         const csvData = await fetchUrlText(inLandUrl);
@@ -228,7 +283,6 @@ async function run() {
         return;
     }
 
-    // ③ マスターCSV読み込みとターゲット選定
     if (!fs.existsSync(regionCsvPath)) return console.error(`❌ マスターCSV不在: ${regionCsvPath}`);
     const regionLines = fs.readFileSync(regionCsvPath, "utf-8").split("\n").filter(Boolean);
     regionLines.shift(); 
@@ -245,8 +299,8 @@ async function run() {
         if (stationMap[id]) {
             stationMap[id].lat = lat;
             stationMap[id].lng = lng;
-            // 出力用にシリアライズ（文字列形式）して格納
-            finalRows.push({ id, name, date: targetDate, whether: serializeStation(stationMap[id].whether) });
+            // ★出力用に完全にCHIBA形式に変換してから格納
+            finalRows.push({ id, name, date: targetDate, whether: serializeToChibaFormat(stationMap[id].whether) });
         } else {
             const spot = { id, name, date: targetDate, lat, lng, notes, whether: null };
             calcTargets.push(spot);
@@ -254,7 +308,6 @@ async function run() {
         }
     }
 
-    // ④ 計算ステージ処理
     function processStage(stageName) {
         let count = 0;
         for (const spot of calcTargets) {
@@ -271,13 +324,13 @@ async function run() {
                     const d2 = calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng);
                     
                     const lerped = lerpStation(s1.whether, d1, s2.whether, d2);
-                    spot.whether = serializeStation(lerped);
+                    spot.whether = serializeToChibaFormat(lerped); // ★CHIBA形式に変換
                     stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped }; 
                     count++;
                 } 
                 else if (s1 && s1.lat != null && !p2) {
                     const cloned = JSON.parse(JSON.stringify(s1.whether));
-                    spot.whether = serializeStation(cloned);
+                    spot.whether = serializeToChibaFormat(cloned);
                     stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: cloned };
                     count++;
                 }
@@ -290,11 +343,11 @@ async function run() {
     console.log(`🧮 Secondステージ: ${processStage("Second")} 件 計算完了`);
     console.log(`🧮 Thirdステージ: ${processStage("Third")} 件 計算完了`);
 
-    // ⑤ 出力
     console.log("💾 計算結果をCSVに書き出し中...");
     const outLines = ["individualId,name,date,whether"];
     for (const row of finalRows) {
-        const whetherStr = row.whether ? JSON.stringify(row.whether).replace(/""/g, '') : "";
+        // ★ .replace(/""/g, '') はJSONの破壊に繋がるため削除し、安全に文字列化するだけに修正
+        const whetherStr = row.whether ? JSON.stringify(row.whether) : "";
         outLines.push(`${row.id},${row.name},${row.date},${whetherStr}`);
     }
 
