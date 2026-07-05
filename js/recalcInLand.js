@@ -1,6 +1,5 @@
 import fs from "fs";
 import https from "https";
-// Thirdも使えるようにあらかじめインポートしておきます
 import { applyFirstStage, applySecondStage, applyThirdStage } from "./whetherNode.js";
 
 // ===== 1. 設定の定義 =====
@@ -10,27 +9,21 @@ const loadJsonPath = `data/${region}_load.json`;
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
-// 簡易CSVパース関数
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
 
-// httpsでURLからテキストを取得
 function fetchUrlText(url) {
     return new Promise((resolve, reject) => {
         https.get(url, (res) => {
-            if (res.statusCode !== 200) {
-                reject(new Error(`Failed to get page, status code: ${res.statusCode}`));
-                return;
-            }
+            if (res.statusCode !== 200) reject(new Error(`Status: ${res.statusCode}`));
             let data = '';
-            res.on('data', (chunk) => data += chunk);
+            res.on('data', chunk => data += chunk);
             res.on('end', () => resolve(data));
-        }).on('error', (err) => reject(err));
+        }).on('error', err => reject(err));
     });
 }
 
-// whetherNode.js 用の形式変換ツール
 function formatForNode(data) {
     if (!data) return undefined;
     return {
@@ -53,9 +46,7 @@ function encodeDaily(dailyArray) {
     
     for (let j = 0; j < maxW; j++) {
         const vals = dailyArray.map(d => {
-            if (d.weather && d.weather[j] !== undefined && d.weather[j] !== null) {
-                return String(d.weather[j]);
-            }
+            if (d.weather && d.weather[j] !== undefined && d.weather[j] !== null) return String(d.weather[j]);
             return "";
         });
         parts.push(vals.join("|"));
@@ -63,7 +54,6 @@ function encodeDaily(dailyArray) {
     return parts.join(";");
 }
 
-// ★ 追加：計算済みのスポット(Spot)を、親ステーション(Station)の形式に擬態させる関数
 function spotToStation(spot) {
     if (!spot.whether) return null;
     return {
@@ -82,24 +72,16 @@ function spotToStation(spot) {
 async function run() {
     console.log(`🚀 [${region}] 再計算処理を開始します。`);
 
-    // ----------------------------------------------------------------
-    // 📦 親データ①: 既存の JSON ステーション
-    // ----------------------------------------------------------------
     const stationMapForCalc = {};
     if (fs.existsSync(loadJsonPath)) {
         const rawJson = JSON.parse(fs.readFileSync(loadJsonPath, "utf-8"));
         const jsonStations = rawJson.data || rawJson;
         jsonStations.forEach(s => {
-            if (s.stationCode) {
-                stationMapForCalc[s.stationCode] = s;
-            }
+            if (s.stationCode) stationMapForCalc[s.stationCode] = s;
         });
         console.log(`📦 既存JSONから ${Object.keys(stationMapForCalc).length} 件の親ステーションを登録しました。`);
     }
 
-    // ----------------------------------------------------------------
-    // 🌐 親データ②: サーバー側 PHP から天気入り内陸CSVを取得
-    // ----------------------------------------------------------------
     let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
     const phpWeatherMap = {}; 
 
@@ -107,7 +89,7 @@ async function run() {
         console.log(`🌐 リモートから天気取得済みの内陸CSVを取得中...`);
         const csvData = await fetchUrlText(inLandUrl);
         const inLandLines = csvData.split("\n").filter(Boolean);
-        inLandLines.shift(); // ヘッダー除去
+        inLandLines.shift(); 
 
         let csvParentCount = 0;
         for (const line of inLandLines) {
@@ -138,7 +120,6 @@ async function run() {
                 const whether = JSON.parse(whetherStr);
                 phpWeatherMap[individualId] = whether; 
                 
-                // 親ステーションとして登録
                 stationMapForCalc[individualId] = {
                     stationCode: individualId,
                     latlng: "", lat: null, lng: null,
@@ -148,9 +129,7 @@ async function run() {
                     daily: encodeDaily(whether.daily)
                 };
                 csvParentCount++;
-            } catch (e) {
-                console.error(`⚠️ [${individualId}] JSONパース失敗: ${e.message}`);
-            }
+            } catch (e) {}
         }
         console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーションを登録しました。`);
     } catch (error) {
@@ -158,9 +137,6 @@ async function run() {
         return;
     }
 
-    // ----------------------------------------------------------------
-    // 🗺 マスターCSV (KANTO_region.csv) を元に全てのスポットを配列化
-    // ----------------------------------------------------------------
     if (!fs.existsSync(regionCsvPath)) {
         console.error(`❌ リージョンCSVが見つかりません: ${regionCsvPath}`);
         return;
@@ -203,18 +179,16 @@ async function run() {
     }
 
     let allParentStations = Object.values(stationMapForCalc).filter(s => s.latlng && s.latlng !== "");
-    
     console.log(`📡 計算可能な初期親ステーション数: ${allParentStations.length} 件`);
 
     // ----------------------------------------------------------------
     // 🧮 ステージごとの段階的な再計算
     // ----------------------------------------------------------------
     if (calcTargetCount > 0) {
-        // --- 【Firstステージ】 ---
         console.log("🧮 距離補間（Firstステージ再計算）を実行中...");
         applyFirstStage(finalAllRows, allParentStations);
 
-        // ★重要: Firstで計算された結果を親ステーションリストに合流させる！
+        // First結果を stationMap にも合流させる（JSONの 1202 のような扱いで見つけさせるため）
         let newFirstParents = 0;
         finalAllRows.forEach(spot => {
             if (spot.notes.startsWith("First/") && spot.whether) {
@@ -227,27 +201,36 @@ async function run() {
         });
         console.log(`🔄 First結果 ${newFirstParents} 件をSecondのソースとして追加しました。`);
 
-        // --- 【Secondステージ】 ---
-        console.log("🧮 距離補間（Secondステージ再計算）を実行中...");
-        applySecondStage(finalAllRows, allParentStations);
+        // ★重要: whetherNode.js 内の stationMap キャッシュを強制更新させるダミー通信
+        applyFirstStage([], allParentStations);
 
-        // (将来用) Secondで計算された結果も親に合流させてThirdへ
-        // finalAllRows.forEach(spot => {
-        //     if (spot.notes.startsWith("Second/") && spot.whether) {
-        //         const newStation = spotToStation(spot);
-        //         if (newStation) allParentStations.push(newStation);
-        //     }
-        // });
-        // console.log("🧮 距離補間（Thirdステージ再計算）を実行中...");
-        // applyThirdStage(finalAllRows, allParentStations);
+        // =========================================================
+        // ★ 最大のトリック： whetherNode.js を騙す
+        // whetherNode.js は Second の対象を "name" で検索する仕様のため、
+        // 一時的にすべてのスポットの name を individualId にすり替える。
+        // =========================================================
+        const originalNames = {};
+        finalAllRows.forEach(spot => {
+            originalNames[spot.individualId] = spot.name;
+            spot.name = spot.individualId; // すり替え実行
+        });
+
+        console.log("🧮 距離補間（Secondステージ再計算）を実行中...");
+        applySecondStage(finalAllRows); // whetherNode.js はこれで騙されて S001 等を見つけ出す
+
+        // (必要になればコメントアウト解除してThirdも実行可能)
+        // applyThirdStage(finalAllRows);
+
+        // ★ トリック終了：すり替えていた name を元の正しい名前に戻す
+        finalAllRows.forEach(spot => {
+            spot.name = originalNames[spot.individualId];
+        });
+        // =========================================================
 
     } else {
         console.log("⚠️ 再計算対象のターゲット行が見つかりませんでした。");
     }
 
-    // ----------------------------------------------------------------
-    // 💾 保存
-    // ----------------------------------------------------------------
     console.log("💾 計算結果をCSVファイルに書き出しています...");
     const outLines = ["individualId,name,date,whether"];
 
