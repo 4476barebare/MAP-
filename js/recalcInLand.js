@@ -1,6 +1,7 @@
 import fs from "fs";
 import https from "https";
-import { applyFirstStage } from "./whetherNode.js";
+// Thirdは使わないのでインポートからも一時的に外す（必要になれば復活させる）
+import { applyFirstStage, applySecondStage } from "./whetherNode.js";
 
 // ===== 1. 設定の定義 =====
 const region = "KANTO";
@@ -41,19 +42,17 @@ function formatForNode(data) {
     };
 }
 
-// ★ whetherNode.js 用に daily 配列をセミコロン(;)とパイプ(|)区切りの文字列に変換（今回の修正の要）
+// whetherNode.js 用に daily 配列をセミコロン(;)とパイプ(|)区切りの文字列に変換
 function encodeDaily(dailyArray) {
     if (!dailyArray || !Array.isArray(dailyArray)) return "";
     const parts = [];
     
-    // weather配列の最大長を特定（欠損対策）
     let maxW = 0;
     for (const d of dailyArray) {
         if (d.weather && d.weather.length > maxW) maxW = d.weather.length;
     }
-    maxW = Math.max(maxW, 10); // 安全のために最低10項目分は枠を作る
+    maxW = Math.max(maxW, 10); 
     
-    // PHP側の縦のデータ(日ごと)を、横のデータ(項目ごと)に変換(転置)して結合
     for (let j = 0; j < maxW; j++) {
         const vals = dailyArray.map(d => {
             if (d.weather && d.weather[j] !== undefined && d.weather[j] !== null) {
@@ -111,7 +110,7 @@ async function run() {
             if (!individualId || !whetherStr) continue;
             if (date) targetDate = date;
 
-            // JSONの完全復元処理（空文字の復元）
+            // JSONの完全復元処理
             let prevStr;
             do {
                 prevStr = whetherStr;
@@ -126,9 +125,9 @@ async function run() {
 
             try {
                 const whether = JSON.parse(whetherStr);
-                phpWeatherMap[individualId] = whether; // 出力用に元のキレイな配列データを保持
+                phpWeatherMap[individualId] = whether; 
 
-                // whetherNode.js の計算用に構造を完全にエミュレートして登録
+                // whetherNode.js の計算用に構造をエミュレートして登録
                 stationMapForCalc[individualId] = {
                     stationCode: individualId,
                     latlng: "", 
@@ -137,7 +136,7 @@ async function run() {
                     hourly0: formatForNode(whether.hourly && whether.hourly[0]),
                     hourly1: formatForNode(whether.hourly && whether.hourly[1]),
                     hourly2: formatForNode(whether.hourly && whether.hourly[2]),
-                    daily: encodeDaily(whether.daily) // ★ここで専用文字列に変換！
+                    daily: encodeDaily(whether.daily)
                 };
                 csvParentCount++;
             } catch (e) {
@@ -151,7 +150,7 @@ async function run() {
     }
 
     // ----------------------------------------------------------------
-    // 🗺 マスターCSV (KANTO_region.csv) を元にターゲットを構築
+    // 🗺 マスターCSV (KANTO_region.csv) を元に全てのスポットを配列化
     // ----------------------------------------------------------------
     if (!fs.existsSync(regionCsvPath)) {
         console.error(`❌ リージョンCSVが見つかりません: ${regionCsvPath}`);
@@ -160,8 +159,8 @@ async function run() {
     const regionLines = fs.readFileSync(regionCsvPath, "utf-8").split("\n").filter(Boolean);
     regionLines.shift(); // ヘッダー除去
 
-    const spotsForCalc = []; 
     const finalAllRows = []; 
+    let calcTargetCount = 0;
 
     for (const line of regionLines) {
         const r = parseCsvLine(line);
@@ -182,46 +181,46 @@ async function run() {
             stationMapForCalc[individualId].latlng = `${lat};${lng}`;
         }
 
-        // 既に天気がある直接取得駅は計算を飛ばして結果配列へ入れる
+        // 全スポット（親も計算ターゲットも）を一旦フラットな配列にする
+        const spotObj = {
+            individualId,
+            name,
+            date: targetDate,
+            lat: lat,
+            lng: lng,
+            notes: notes,
+            icon: "spot",
+            whether: null
+        };
+
+        // 直接取得済みの親なら天気を入れ、未取得(/を含む)ならカウントする
         if (phpWeatherMap[individualId]) {
-            finalAllRows.push({
-                individualId,
-                name,
-                date: targetDate,
-                whether: phpWeatherMap[individualId]
-            });
-            continue;
+            spotObj.whether = phpWeatherMap[individualId];
+        } else if (notes.includes("/")) {
+            calcTargetCount++;
         }
 
-        // 再計算が必要なターゲット駅 (First/ID/ID)
-        if (notes.startsWith("First/")) {
-            const spotObj = {
-                individualId,
-                name,
-                date: targetDate,
-                lat: lat,
-                lng: lng,
-                notes: notes,
-                icon: "spot",
-                whether: null
-            };
-            spotsForCalc.push(spotObj);
-            finalAllRows.push(spotObj);
-        }
+        finalAllRows.push(spotObj);
     }
 
-    // latlngがセットされている有効な親ステーションだけを抽出
     const allParentStations = Object.values(stationMapForCalc).filter(s => s.latlng && s.latlng !== "");
     
     console.log(`📡 計算可能な総親ステーション数: ${allParentStations.length} 件`);
-    console.log(`🎯 再計算対象ターゲット (First/ID/ID) 数: ${spotsForCalc.length} 件`);
+    console.log(`🎯 再計算対象ターゲット (First/Second) 総数: ${calcTargetCount} 件`);
 
     // ----------------------------------------------------------------
-    // 🧮 whetherNode.js の First処理を実行
+    // 🧮 whetherNode.js の 各ステージ処理を順番に実行
     // ----------------------------------------------------------------
-    if (spotsForCalc.length > 0) {
+    if (calcTargetCount > 0) {
         console.log("🧮 距離補間（Firstステージ再計算）を実行中...");
-        applyFirstStage(spotsForCalc, allParentStations);
+        applyFirstStage(finalAllRows, allParentStations);
+
+        console.log("🧮 距離補間（Secondステージ再計算）を実行中...");
+        applySecondStage(finalAllRows, allParentStations);
+
+        // ★今回はまだThirdが不要なためコメントアウトしています
+        // console.log("🧮 距離補間（Thirdステージ再計算）を実行中...");
+        // applyThirdStage(finalAllRows, allParentStations);
     } else {
         console.log("⚠️ 再計算対象のターゲット行が見つかりませんでした。");
     }
