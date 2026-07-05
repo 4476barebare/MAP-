@@ -29,17 +29,41 @@ function fetchUrlText(url) {
     });
 }
 
-// whetherNode.js が期待する「パイプ(|)区切りの文字列」形式に変換するアダプター
+// whetherNode.js 用に hourly 配列をパイプ(|)区切りの文字列に変換
 function formatForNode(data) {
     if (!data) return undefined;
     return {
         ...data,
         weather: data.weather ? data.weather.map(w => {
-            // 配列なら '|' で結合して文字列化、すでに文字列ならそのまま
             if (Array.isArray(w)) return w.join("|");
             return w !== null && w !== undefined ? String(w) : "";
         }) : []
     };
+}
+
+// ★ whetherNode.js 用に daily 配列をセミコロン(;)とパイプ(|)区切りの文字列に変換（今回の修正の要）
+function encodeDaily(dailyArray) {
+    if (!dailyArray || !Array.isArray(dailyArray)) return "";
+    const parts = [];
+    
+    // weather配列の最大長を特定（欠損対策）
+    let maxW = 0;
+    for (const d of dailyArray) {
+        if (d.weather && d.weather.length > maxW) maxW = d.weather.length;
+    }
+    maxW = Math.max(maxW, 10); // 安全のために最低10項目分は枠を作る
+    
+    // PHP側の縦のデータ(日ごと)を、横のデータ(項目ごと)に変換(転置)して結合
+    for (let j = 0; j < maxW; j++) {
+        const vals = dailyArray.map(d => {
+            if (d.weather && d.weather[j] !== undefined && d.weather[j] !== null) {
+                return String(d.weather[j]);
+            }
+            return "";
+        });
+        parts.push(vals.join("|"));
+    }
+    return parts.join(";");
 }
 
 // ===== 2. メイン処理 =====
@@ -82,7 +106,6 @@ async function run() {
             const name = tokens[1].trim().replace(/^"|"$/g, '');
             const date = tokens[2].trim().replace(/^"|"$/g, '');
             
-            // 3列目以降すべてを結合させて完全なJSON文字列にする
             let whetherStr = tokens.slice(3).join(",").trim();
             
             if (!individualId || !whetherStr) continue;
@@ -103,18 +126,18 @@ async function run() {
 
             try {
                 const whether = JSON.parse(whetherStr);
-                phpWeatherMap[individualId] = whether; // 元の配列データは保持
+                phpWeatherMap[individualId] = whether; // 出力用に元のキレイな配列データを保持
 
-                // ★ whetherNode.js が読める構造(文字列化＆複数日セット)にエミュレート
+                // whetherNode.js の計算用に構造を完全にエミュレートして登録
                 stationMapForCalc[individualId] = {
                     stationCode: individualId,
                     latlng: "", 
                     lat: null, 
                     lng: null,
-                    hourly0: formatForNode(whether.hourly[0]),
-                    hourly1: formatForNode(whether.hourly[1]),
-                    hourly2: formatForNode(whether.hourly[2]),
-                    daily: whether.daily ? whether.daily.map(d => formatForNode(d)) : []
+                    hourly0: formatForNode(whether.hourly && whether.hourly[0]),
+                    hourly1: formatForNode(whether.hourly && whether.hourly[1]),
+                    hourly2: formatForNode(whether.hourly && whether.hourly[2]),
+                    daily: encodeDaily(whether.daily) // ★ここで専用文字列に変換！
                 };
                 csvParentCount++;
             } catch (e) {
@@ -152,14 +175,14 @@ async function run() {
 
         if (!individualId) continue;
 
-        // ★ 親の座標を補完（lat, lng, latlng 全てセットする）
+        // 親の座標を補完
         if (stationMapForCalc[individualId]) {
             stationMapForCalc[individualId].lat = lat;
             stationMapForCalc[individualId].lng = lng;
-            stationMapForCalc[individualId].latlng = `${lat};${lng}`; // ←前回のエラー解決箇所
+            stationMapForCalc[individualId].latlng = `${lat};${lng}`;
         }
 
-        // 既に天気がある直接取得駅
+        // 既に天気がある直接取得駅は計算を飛ばして結果配列へ入れる
         if (phpWeatherMap[individualId]) {
             finalAllRows.push({
                 individualId,
@@ -170,7 +193,7 @@ async function run() {
             continue;
         }
 
-        // 再計算が必要なターゲット駅
+        // 再計算が必要なターゲット駅 (First/ID/ID)
         if (notes.startsWith("First/")) {
             const spotObj = {
                 individualId,
