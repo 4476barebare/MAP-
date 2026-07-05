@@ -33,7 +33,6 @@ function parsePHPDaily(dailyArr) {
     if (!dailyArr) return [];
     return dailyArr.map(day => {
         const w = day.weather || [];
-        // 計算用に7つの枠（天気,気温,水温,波高,日の出,日の入り,潮汐）を確保
         return [
             w[0] != null ? String(w[0]) : "",
             w[1] != null ? String(w[1]) : "",
@@ -81,11 +80,11 @@ function normalizeInlandStation(w) {
     return res;
 }
 
-// --- シリアライザー（★ここが修正の要：CHIBA_whether.csv と完全一致させる） ---
+// --- シリアライザー ---
 function timeToMinutes(tStr) {
     if (!tStr) return null;
-    if (!isNaN(Number(tStr))) return Number(tStr); // すでに計算済みの数値の場合
-    const m = String(tStr).match(/T(\d{2}):(\d{2})/); // ISO文字から分単位に変換
+    if (!isNaN(Number(tStr))) return Number(tStr); 
+    const m = String(tStr).match(/T(\d{2}):(\d{2})/); 
     if (m) {
         return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
     }
@@ -98,17 +97,14 @@ function serializeToChibaFormat(s) {
         daily: []
     };
 
-    // hourly0, 1, 2 を 1つの配列(hourly) にまとめる
     for (const h of ['hourly0', 'hourly1', 'hourly2']) {
         if (s[h]) {
             const hourObj = { weather: [] };
             
             if (s[h].weather && s[h].weather.length > 0) {
-                // 文字列をすべて数値配列にキャスト
                 hourObj.weather = s[h].weather.map(arr => arr.map(v => v === "" || v == null ? null : Number(v)));
             }
             
-            // oneday (水温、日の出、日の入り)
             hourObj.oneday = { avg: null, sunrise: null, sunset: null };
             if (s[h].water && s[h].water.length >= 3) {
                 hourObj.oneday = {
@@ -120,7 +116,6 @@ function serializeToChibaFormat(s) {
                 hourObj.oneday.avg = s[h].water[0] === "" || s[h].water[0] == null ? null : Number(s[h].water[0]);
             }
             
-            // tide
             hourObj.tide = [];
             if (s[h].tide && s[h].tide.length > 0) {
                 hourObj.tide = s[h].tide.map(v => Number(v) || 0);
@@ -130,7 +125,6 @@ function serializeToChibaFormat(s) {
         }
     }
 
-    // daily のフォーマット変換
     if (s.daily && s.daily.length > 0) {
         res.daily = s.daily.map(arr => {
             const dObj = { weather: [], tide: [], dailyEx: { avg: null, wave: null, sunrise: null, sunset: null } };
@@ -227,6 +221,20 @@ function lerpStation(s1, d1, s2, d2) {
 async function run() {
     console.log(`🚀 [${region}] 共通フォーマット版・再計算処理を開始します。`);
 
+    // ★ 追加：本日の日付を取得し、すでに出力済みのCSVがあればスキップする
+    const todayStr = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+    if (fs.existsSync(outCsvPath)) {
+        const existingLines = fs.readFileSync(outCsvPath, "utf-8").split("\n").filter(Boolean);
+        if (existingLines.length > 1) {
+            // CSVの2行目（データ1行目）の3カラム目[2]がdate
+            const firstRowDate = existingLines[1].split(",")[2].replace(/^"|"$/g, '').trim();
+            if (firstRowDate === todayStr) {
+                console.log(`✅ すでに本日（${todayStr}）のデータで計算済みです。処理をスキップします。`);
+                return; // ここでスクリプトを終了
+            }
+        }
+    }
+
     const stationMap = {}; 
 
     if (fs.existsSync(loadJsonPath)) {
@@ -250,7 +258,7 @@ async function run() {
         console.log(`📦 既存JSONから ${jsonCount} 件の親ステーションを登録`);
     }
 
-    let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+    let targetDate = todayStr; // デフォルトは今日
     try {
         const csvData = await fetchUrlText(inLandUrl);
         const inLandLines = csvData.split("\n").filter(Boolean);
@@ -299,7 +307,6 @@ async function run() {
         if (stationMap[id]) {
             stationMap[id].lat = lat;
             stationMap[id].lng = lng;
-            // ★出力用に完全にCHIBA形式に変換してから格納
             finalRows.push({ id, name, date: targetDate, whether: serializeToChibaFormat(stationMap[id].whether) });
         } else {
             const spot = { id, name, date: targetDate, lat, lng, notes, whether: null };
@@ -324,7 +331,7 @@ async function run() {
                     const d2 = calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng);
                     
                     const lerped = lerpStation(s1.whether, d1, s2.whether, d2);
-                    spot.whether = serializeToChibaFormat(lerped); // ★CHIBA形式に変換
+                    spot.whether = serializeToChibaFormat(lerped);
                     stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped }; 
                     count++;
                 } 
@@ -346,7 +353,6 @@ async function run() {
     console.log("💾 計算結果をCSVに書き出し中...");
     const outLines = ["individualId,name,date,whether"];
     for (const row of finalRows) {
-        // ★ .replace(/""/g, '') はJSONの破壊に繋がるため削除し、安全に文字列化するだけに修正
         const whetherStr = row.whether ? JSON.stringify(row.whether) : "";
         outLines.push(`${row.id},${row.name},${row.date},${whetherStr}`);
     }
