@@ -809,25 +809,25 @@ function renderCrowdImage() {
 
     for (let i = 0; i < 4; i++) {
 
-    const rawIndex = baseIndex + i;
-    const idx = rawIndex % slots.length;
+        const rawIndex = baseIndex + i;
+        const idx = rawIndex % slots.length;
 
-    const extraDay = Math.floor(rawIndex / slots.length);
+        const extraDay = Math.floor(rawIndex / slots.length);
 
-    const tmpDate = new Date(nowJST);
-    tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
+        const tmpDate = new Date(nowJST);
+        tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
 
-    const y = tmpDate.getFullYear();
-    const m = String(tmpDate.getMonth()+1).padStart(2,"0");
-    const d = String(tmpDate.getDate()).padStart(2,"0");
+        const y = tmpDate.getFullYear();
+        const m = String(tmpDate.getMonth()+1).padStart(2,"0");
+        const d = String(tmpDate.getDate()).padStart(2,"0");
 
-    const hh = String(slots[idx]).padStart(2,"0");
+        const hh = String(slots[idx]).padStart(2,"0");
 
-    images.push({
-        url: `js/crowdsimg/${window.currentPref}_${y}-${m}-${d}_${hh}.png`,
-        displayHour: slots[idx] + ((dayOffset + extraDay) * 24)
-    });
-}
+        images.push({
+            url: `js/crowdsimg/${window.currentPref}_${y}-${m}-${d}_${hh}.png`,
+            displayHour: slots[idx] + ((dayOffset + extraDay) * 24)
+        });
+    }
 
     // =======================
     // header UI
@@ -843,14 +843,10 @@ function renderCrowdImage() {
 
     header.style.display = '';
 
-    // フラグ分岐
     if (window.phase2Initialized) {
-
         cloudsUI.textContent = '';
-
         headerText.textContent =
             formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-
         return;
     }
 
@@ -858,7 +854,6 @@ function renderCrowdImage() {
     let currentIndex = 0;
 
     cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
-
     headerText.textContent =
         formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
@@ -910,13 +905,15 @@ function renderCrowdImage() {
                 );
             }
 
+            const MAX_OPACITY = 0.6;
+
             // 初期レイヤー
             window.crowdLayer = L.imageOverlay(
                 images[0].url,
                 calcBounds(),
                 {
                     pane: 'rainPane',
-                    opacity: 0.6
+                    opacity: MAX_OPACITY
                 }
             ).addTo(window.map);
 
@@ -937,43 +934,41 @@ function renderCrowdImage() {
             window.crowdSlideTimer = setInterval(() => {
 
                 currentIndex = (currentIndex + 1) % images.length;
-
                 const img = images[currentIndex];
 
                 // ヘッダー更新
                 cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
 
-                // レイヤー差し替え
-const newLayer = L.imageOverlay(
-    img.url,
-    calcBounds(),
-    {
-        pane: 'rainPane',
-        opacity: 0
-    }
-).addTo(window.map);
+                // 新レイヤー
+                const newLayer = L.imageOverlay(
+                    img.url,
+                    calcBounds(),
+                    {
+                        pane: 'rainPane',
+                        opacity: 0
+                    }
+                ).addTo(window.map);
 
-let opacity = 0;
+                let opacity = 0;
 
-const fade = setInterval(() => {
+                const fade = setInterval(() => {
 
-    opacity += 0.1;
+                    opacity += 0.06; // 約10ステップ
 
-    if (opacity >= 1) {
-        opacity = 1;
-        clearInterval(fade);
+                    if (opacity >= MAX_OPACITY) {
+                        opacity = MAX_OPACITY;
+                        clearInterval(fade);
 
-        // 古いレイヤー削除
-        if (window.crowdLayer) {
-            window.map.removeLayer(window.crowdLayer);
-        }
+                        if (window.crowdLayer) {
+                            window.map.removeLayer(window.crowdLayer);
+                        }
 
-        window.crowdLayer = newLayer;
-    }
+                        window.crowdLayer = newLayer;
+                    }
 
-    newLayer.setOpacity(opacity);
+                    newLayer.setOpacity(opacity);
 
-}, 50);
+                }, 50);
 
             }, 2500);
 
