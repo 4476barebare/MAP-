@@ -9,18 +9,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 前段のプッシュがGitHub側に完全に生きて反映されるまで5秒間待ちます
+      # 【対策1】前段のプッシュがGitHubサーバー側に完全に反映されるまで10秒待ちます
       - name: Wait for remote synchronization
-        run: sleep 5
+        run: sleep 10
 
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # 必ず最新のリモートの変更を強制的に持ってくるように設定します
           fetch-depth: 0
           ref: main
 
-      # 最新のファイルを確実に手元に持ってくるためのプル
+      # 【対策2】前段で更新された最新の KANTO_load.json を確実にローカルに引っ張ってきます
       - name: Pull latest changes
         run: |
           git pull origin main
@@ -34,10 +33,18 @@ jobs:
         run: |
           node js/KANTO_control.js
 
+      # 【対策3】Node.jsのCSV書き込み処理が、OSのディスクに完全に保存・クローズされるのを3秒待ちます
+      - name: Wait for file write completion
+        run: sleep 3
+
       - name: Commit results
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
+          
+          # 同時実行による競合を防ぐため、プッシュ直前にもう一度リベースプルを挟みます
+          git pull --rebase origin main
+          
           git add data/*.csv || true
           git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "update whether csv"
