@@ -9,7 +9,7 @@ const loadJsonPath = `data/${region}_load.json`;
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
-// 簡易CSVパース関数（マスター用）
+// 簡易CSVパース関数
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
@@ -62,7 +62,6 @@ async function run() {
 
         let csvParentCount = 0;
         for (const line of inLandLines) {
-            // カンマで細かく分割せず、最初の3つのカンマ位置から前方を抜き出す
             const tokens = line.split(",");
             if (tokens.length < 4) continue;
 
@@ -70,17 +69,24 @@ async function run() {
             const name = tokens[1].trim().replace(/^"|"$/g, '');
             const date = tokens[2].trim().replace(/^"|"$/g, '');
             
-            // ★ご提案の通り、残りの要素をすべて結合して一つのJSONにする
+            // 3列目以降すべてを結合させて完全なJSON文字列にする
             let whetherStr = tokens.slice(3).join(",").trim();
             
             if (!individualId || !whetherStr) continue;
             if (date) targetDate = date;
 
-            // JSON内の不正な空カンマをパース可能な形式（null）に一括置換
+            // ★ JSONの完全復元処理（PHP側で消された空文字を元に戻す）
+            let prevStr;
+            do {
+                prevStr = whetherStr;
+                whetherStr = whetherStr.replace(/,,/g, ',"",'); // 連続カンマの間に空文字を復元
+            } while (whetherStr !== prevStr);
+
             whetherStr = whetherStr
-                .replace(/,+(?=\s*\])/g, '')   // 末尾の余分なカンマを除去
-                .replace(/,+(?=,)/g, ',null')   // 空カンマをnullに置換
-                .replace(/\[\s*,/g, '[null,');  // 配列直後の空カンマをケア
+                .replace(/:\s*,/g, ':"",')   // {"avg":, -> {"avg":"",
+                .replace(/:\s*}/g, ':""}')   // "sunset":} -> "sunset":""}
+                .replace(/\[\s*,/g, '["",')  // [, -> ["",
+                .replace(/,\s*\]/g, ']');    // ,] -> ] (配列末尾の余分なカンマを消去)
 
             try {
                 const whether = JSON.parse(whetherStr);
@@ -90,7 +96,7 @@ async function run() {
                 stationMapForCalc[individualId] = {
                     stationCode: individualId,
                     latlng: "", 
-                    lat: null, // 後でマスターCSVから紐付け
+                    lat: null, 
                     lng: null,
                     hourly0: { weather: whether.hourly[0].weather },
                     daily: whether.daily
