@@ -29,131 +29,153 @@ function fetchUrlText(url) {
     });
 }
 
-// ===== 2. データの読み込みと整形 =====
+// ===== 2. メイン処理 =====
 async function run() {
     console.log(`🚀 [${region}] 再計算処理を開始します。`);
 
-    // ① 既存の JSON ステーションデータを読み込み
-    let jsonStations = [];
+    // ----------------------------------------------------------------
+    // 📦 親データ①: 既存の JSON ステーションデータを読み込み
+    // ----------------------------------------------------------------
+    const stationMapForCalc = {};
     if (fs.existsSync(loadJsonPath)) {
         const rawJson = JSON.parse(fs.readFileSync(loadJsonPath, "utf-8"));
-        jsonStations = rawJson.data || rawJson;
-        console.log(`📦 既存JSONから ${jsonStations.length} 件のステーションを読み込みました。`);
-    } else {
-        console.log(`⚠️ 既存JSONファイルが見つかりません: ${loadJsonPath}`);
+        const jsonStations = rawJson.data || rawJson;
+        jsonStations.forEach(s => {
+            if (s.stationCode) {
+                stationMapForCalc[s.stationCode] = s;
+            }
+        });
+        console.log(`📦 既存JSONから ${Object.keys(stationMapForCalc).length} 件の親ステーションを登録しました。`);
     }
 
-    // ② サーバー側の PHP が生成した inLand.csv をダウンロード
-    let inLandLines = [];
+    // ----------------------------------------------------------------
+    // 🌐 親データ②: サーバー側 PHP が生成した天気入り内陸CSVをダウンロード
+    // ----------------------------------------------------------------
+    let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }); // フォールバック用今日の日付
+    
     try {
-        console.log(`🌐 リモートCSVを取得中: ${inLandUrl}`);
+        console.log(`🌐 リモートから天気取得済みの内陸CSVを取得中: ${inLandUrl}`);
         const csvData = await fetchUrlText(inLandUrl);
-        inLandLines = csvData.split("\n").filter(Boolean);
-        console.log(`📥 内陸CSVから ${inLandLines.length - 1} 行のデータを取得しました。`);
+        const inLandLines = csvData.split("\n").filter(Boolean);
+        inLandLines.shift(); // ヘッダー除去
+
+        let csvParentCount = 0;
+        for (const line of inLandLines) {
+            const parts = parseCsvLine(line);
+            if (parts.length < 4) continue;
+
+            const individualId = parts[0];
+            const name = parts[1];
+            const date = parts[2];
+            const whetherStr = parts[3];
+
+            if (!individualId || !whetherStr || !whetherStr.startsWith("{")) continue;
+
+            if (date) targetDate = date; // CSV内にある実際の日付を同期
+
+            const whether = JSON.parse(whetherStr);
+
+            // whetherNode.js の期待する親ステーションの構造にエミュレート
+            stationMapForCalc[individualId] = {
+                stationCode: individualId,
+                latlng: "", // whetherNode内部の補間では w1.lat / w1.lng を直接見るため空でも可
+                lat: null,  // 後ほどマスターCSVから座標を補完します
+                lng: null,
+                hourly0: { weather: whether.hourly[0].weather },
+                daily: whether.daily,
+                rawWhether: whether // 最終出力用に元のオブジェクトを保持
+            };
+            csvParentCount++;
+        }
+        console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーション(天気データ有り)を登録しました。`);
     } catch (error) {
         console.error("❌ リモートCSVの取得に失敗しました:", error.message);
         return;
     }
 
-    // ③ マスタデータ（KANTO_region.csv）から座標情報と notes 情報を取得
+    // ----------------------------------------------------------------
+    // 🗺 マスターCSV (KANTO_region.csv) を読み込み、親の座標補完 ＆ 計算ターゲットの抽出
+    // ----------------------------------------------------------------
     if (!fs.existsSync(regionCsvPath)) {
         console.error(`❌ リージョンCSVが見つかりません: ${regionCsvPath}`);
         return;
     }
     const regionLines = fs.readFileSync(regionCsvPath, "utf-8").split("\n").filter(Boolean);
     regionLines.shift(); // ヘッダー除去
-    
-    const geoMap = {};
+
+    const spotsForCalc = []; // whetherNodeに計算させるターゲット(First/ID/ID)を入れる配列
+    const finalAllRows = []; // 最終的にCSV出力するすべての行を保持する配列
+
     for (const line of regionLines) {
         const r = parseCsvLine(line);
-        if (r.length >= 8) {
-            const id = r[2]; // individualId (F001など)
-            if (!id) continue;
-            geoMap[id] = {
-                lat: parseFloat(r[3]) || 0,
-                lng: parseFloat(r[4]) || 0,
-                notes: r[7] ? r[7].trim() : "",
-                icon: r[8] || "station"
-            };
-        }
-    }
+        if (r.length < 8) continue;
 
-    // ④ すべての「親データ」を whetherNode.js が読めるオブジェクト形式に統合・一元化
-    const stationMapForCalc = {};
-
-    // JSON側の親データをマッピング
-    jsonStations.forEach(s => {
-        if (s.stationCode) {
-            stationMapForCalc[s.stationCode] = s;
-        }
-    });
-
-    // CSV側のデータをマッピング
-    inLandLines.shift(); // ヘッダー除去
-    const csvSpots = []; 
-
-    for (const line of inLandLines) {
-        const parts = parseCsvLine(line);
-        if (parts.length < 3) continue;
-
-        const individualId = parts[0];
-        const name = parts[1];
-        const date = parts[2];
-        const whetherStr = parts[3] || "";
+        const name = r[0];
+        const individualId = r[2];
+        const lat = parseFloat(r[3]) || 0;
+        const lng = parseFloat(r[4]) || 0;
+        const notes = r[7] ? r[7].trim() : "";
 
         if (!individualId) continue;
 
-        const geo = geoMap[individualId] || { lat: 0, lng: 0, notes: "", icon: "station" };
-        
-        let whether = null;
-        if (whetherStr && whetherStr.startsWith("{")) {
-            try { 
-                whether = JSON.parse(whetherStr); 
-            } catch (e) { 
-                whether = null; 
-            }
+        // ① もしこのIDが「天気取得済みの親ステーション」マップに存在する場合、座標を補完して最終出力用にキープ
+        if (stationMapForCalc[individualId]) {
+            stationMapForCalc[individualId].lat = lat;
+            stationMapForCalc[individualId].lng = lng;
+            
+            finalAllRows.push({
+                individualId,
+                name,
+                date: targetDate,
+                whetherStr: JSON.stringify(stationMapForCalc[individualId].rawWhether).replace(/""/g, '')
+            });
+            continue;
         }
 
-        // ★【修正】geo.notes が "First" または CSV上に既に有効なデータがある場合、親ステーションとして登録
-        if (whether && (geo.notes === "First" || !geo.notes.includes("/"))) {
-            stationMapForCalc[individualId] = {
-                stationCode: individualId,
-                latlng: `${geo.lat};${geo.lng}`, 
-                lat: geo.lat,
-                lng: geo.lng,
-                hourly0: { weather: whether.hourly[0].weather },
-                daily: whether.daily
+        // ② notesが 「First/ID/ID」 の形になっている行を、再計算ターゲット(spots)として登録
+        if (notes.startsWith("First/")) {
+            const spotObj = {
+                individualId,
+                name,
+                date: targetDate,
+                lat: lat,
+                lng: lng,
+                notes: notes,
+                icon: "spot", // whetherNodeのガード条件を通過させる
+                whether: null
             };
+            spotsForCalc.push(spotObj);
+            finalAllRows.push(spotObj); // 参照渡しで最終出力用リストにも入れておく
         }
-
-        // すべての地点（計算対象も含めて）を spots リストに保持
-        csvSpots.push({
-            individualId,
-            name,
-            date,
-            lat: geo.lat,
-            lng: geo.lng,
-            notes: geo.notes || "First", // 既存のルール判定に合わせるためデフォルトを埋める
-            icon: "spot", // whetherNodeのガード条件(spot.icon === "spot")を通過させる
-            whether: whether
-        });
     }
 
-    // `applyFirstStage` に渡すための親ステーションの配列化
     const allParentStations = Object.values(stationMapForCalc);
     console.log(`📡 総親ステーション数 (JSON + CSV内陸親): ${allParentStations.length} 件`);
+    console.log(`🎯 再計算対象ターゲット (First/ID/ID) 数: ${spotsForCalc.length} 件`);
 
-    // ===== 3. whetherNode.js の First処理を実行 =====
-    console.log("🧮 残りのステーション（First/ID/ID）の再計算を実行します...");
-    applyFirstStage(csvSpots, allParentStations);
+    // ----------------------------------------------------------------
+    // 🧮 whetherNode.js の First処理を実行
+    // ----------------------------------------------------------------
+    if (spotsForCalc.length > 0) {
+        console.log("🧮 距離補間（Firstステージ再計算）を実行中...");
+        applyFirstStage(spotsForCalc, allParentStations);
+    } else {
+        console.log("⚠️ 再計算対象のターゲット行が見つかりませんでした。");
+    }
 
-    // ===== 4. 計算された結果をCSVに整形して保存 =====
+    // ----------------------------------------------------------------
+    // 💾 計算結果をまとめてCSVファイルに保存
+    // ----------------------------------------------------------------
     console.log("💾 計算結果をCSVファイルに書き出しています...");
     const outLines = ["individualId,name,date,whether"];
 
-    for (const spot of csvSpots) {
-        const whetherStr = spot.whether ? JSON.stringify(spot.whether).replace(/""/g, '') : "";
-        outLines.push(`${spot.individualId},${spot.name},${spot.date},${whetherStr}`);
+    for (const row of finalAllRows) {
+        // row.whetherStr があれば親データ、なければ計算された spot オブジェクト
+        const whetherStr = row.whetherStr !== undefined 
+            ? row.whetherStr 
+            : (row.whether ? JSON.stringify(row.whether).replace(/""/g, '') : "");
+            
+        outLines.push(`${row.individualId},${row.name},${row.date},${whetherStr}`);
     }
 
     fs.writeFileSync(outCsvPath, outLines.join("\n") + "\n", "utf-8");
