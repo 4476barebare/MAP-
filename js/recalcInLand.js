@@ -29,6 +29,19 @@ function fetchUrlText(url) {
     });
 }
 
+// whetherNode.js が期待する「パイプ(|)区切りの文字列」形式に変換するアダプター
+function formatForNode(data) {
+    if (!data) return undefined;
+    return {
+        ...data,
+        weather: data.weather ? data.weather.map(w => {
+            // 配列なら '|' で結合して文字列化、すでに文字列ならそのまま
+            if (Array.isArray(w)) return w.join("|");
+            return w !== null && w !== undefined ? String(w) : "";
+        }) : []
+    };
+}
+
 // ===== 2. メイン処理 =====
 async function run() {
     console.log(`🚀 [${region}] 再計算処理を開始します。`);
@@ -49,7 +62,7 @@ async function run() {
     }
 
     // ----------------------------------------------------------------
-    // 🌐 親データ②: サーバー側 PHP から天気入り内陸CSVを取得 (残りの列を全て結合)
+    // 🌐 親データ②: サーバー側 PHP から天気入り内陸CSVを取得
     // ----------------------------------------------------------------
     let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
     const phpWeatherMap = {}; 
@@ -75,38 +88,40 @@ async function run() {
             if (!individualId || !whetherStr) continue;
             if (date) targetDate = date;
 
-            // ★ JSONの完全復元処理（PHP側で消された空文字を元に戻す）
+            // JSONの完全復元処理（空文字の復元）
             let prevStr;
             do {
                 prevStr = whetherStr;
-                whetherStr = whetherStr.replace(/,,/g, ',"",'); // 連続カンマの間に空文字を復元
+                whetherStr = whetherStr.replace(/,,/g, ',"",');
             } while (whetherStr !== prevStr);
 
             whetherStr = whetherStr
-                .replace(/:\s*,/g, ':"",')   // {"avg":, -> {"avg":"",
-                .replace(/:\s*}/g, ':""}')   // "sunset":} -> "sunset":""}
-                .replace(/\[\s*,/g, '["",')  // [, -> ["",
-                .replace(/,\s*\]/g, ']');    // ,] -> ] (配列末尾の余分なカンマを消去)
+                .replace(/:\s*,/g, ':"",')
+                .replace(/:\s*}/g, ':""}')
+                .replace(/\[\s*,/g, '["",')
+                .replace(/,\s*\]/g, ']');
 
             try {
                 const whether = JSON.parse(whetherStr);
-                phpWeatherMap[individualId] = whether;
+                phpWeatherMap[individualId] = whether; // 元の配列データは保持
 
-                // whetherNode.js が読める構造にエミュレート
+                // ★ whetherNode.js が読める構造(文字列化＆複数日セット)にエミュレート
                 stationMapForCalc[individualId] = {
                     stationCode: individualId,
                     latlng: "", 
                     lat: null, 
                     lng: null,
-                    hourly0: { weather: whether.hourly[0].weather },
-                    daily: whether.daily
+                    hourly0: formatForNode(whether.hourly[0]),
+                    hourly1: formatForNode(whether.hourly[1]),
+                    hourly2: formatForNode(whether.hourly[2]),
+                    daily: whether.daily ? whether.daily.map(d => formatForNode(d)) : []
                 };
                 csvParentCount++;
             } catch (e) {
                 console.error(`⚠️ [${individualId}] JSONパース失敗: ${e.message}`);
             }
         }
-        console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーション（直接取得分）を正しくパースして登録しました。`);
+        console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーション（直接取得分）を登録しました。`);
     } catch (error) {
         console.error("❌ リモートCSVの取得または処理に失敗しました:", error.message);
         return;
@@ -137,14 +152,12 @@ async function run() {
 
         if (!individualId) continue;
 
-        // 親の座標を補完
+        // ★ 親の座標を補完（lat, lng, latlng 全てセットする）
         if (stationMapForCalc[individualId]) {
             stationMapForCalc[individualId].lat = lat;
             stationMapForCalc[individualId].lng = lng;
-            // ★これを追加: whetherNode.js が読み取るための "lat;lng" 形式の文字列を作成
-            stationMapForCalc[individualId].latlng = `${lat};${lng}`; 
+            stationMapForCalc[individualId].latlng = `${lat};${lng}`; // ←前回のエラー解決箇所
         }
-
 
         // 既に天気がある直接取得駅
         if (phpWeatherMap[individualId]) {
@@ -174,10 +187,10 @@ async function run() {
         }
     }
 
-    // latlng がちゃんとセットされている親データだけを抽出（エラー回避）
+    // latlngがセットされている有効な親ステーションだけを抽出
     const allParentStations = Object.values(stationMapForCalc).filter(s => s.latlng && s.latlng !== "");
-
-    console.log(`📡 総親ステーション数 (JSON + 内陸CSV親): ${allParentStations.length} 件`);
+    
+    console.log(`📡 計算可能な総親ステーション数: ${allParentStations.length} 件`);
     console.log(`🎯 再計算対象ターゲット (First/ID/ID) 数: ${spotsForCalc.length} 件`);
 
     // ----------------------------------------------------------------
