@@ -8,7 +8,6 @@ const loadJsonPath = `data/${region}_load.json`;
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
-// --- ユーティリティ ---
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
@@ -24,39 +23,98 @@ function fetchUrlText(url) {
     });
 }
 
-// 既存JSONの "1|22" のような文字列を、PHPと同じ純粋な配列 [1, 22] に統一する関数
-function normalizeWeather(obj) {
-    if (obj == null) return obj;
-    if (Array.isArray(obj)) return obj.map(normalizeWeather);
-    if (typeof obj === 'object') {
-        const res = {};
-        for (const key in obj) res[key] = normalizeWeather(obj[key]);
-        return res;
-    }
-    if (typeof obj === 'string') {
-        if (obj.includes(';')) return obj.split(';').filter(Boolean).map(s => s.split('|').map(v => v === "" ? null : Number(v)));
-        if (obj.includes('|')) return obj.split('|').map(v => v === "" ? null : Number(v));
-    }
-    return obj;
+// --- パーサー（データを共通の配列形式に分解する） ---
+function parseDailyString(dailyStr) {
+    if (!dailyStr) return [];
+    return dailyStr.split(';').filter(Boolean).map(day => day.split('|'));
 }
 
-// --- 数学・補間ロジック（whetherNode.jsの代替） ---
+function parsePHPDaily(dailyArr) {
+    if (!dailyArr) return [];
+    return dailyArr.map(day => {
+        const w = day.weather || [];
+        // PHPのデータを既存JSONに合わせて7つの枠（天気,気温,水温,波高,日の出,日の入り,潮汐）に広げる
+        return [
+            w[0] != null ? String(w[0]) : "",
+            w[1] != null ? String(w[1]) : "",
+            "", "", "", "", "" 
+        ];
+    });
+}
 
-// 2点間の距離を計算（ハバシン公式）
+function parseHourlyString(arr) {
+    if (!arr) return [];
+    return arr.map(str => str.split('|'));
+}
+
+function parsePHPHourly(hourlyObj) {
+    if (!hourlyObj || !hourlyObj.weather) return [];
+    return hourlyObj.weather.map(arr => arr.map(v => v != null ? String(v) : ""));
+}
+
+function normalizeCoastalStation(s) {
+    const res = {};
+    for (const h of ['hourly0', 'hourly1', 'hourly2']) {
+        if (s[h]) {
+            res[h] = {
+                weather: parseHourlyString(s[h].weather),
+                water: s[h].water ? s[h].water.split('|') : [],
+                tide: s[h].tide || []
+            };
+        }
+    }
+    res.daily = parseDailyString(s.daily);
+    return res;
+}
+
+function normalizeInlandStation(w) {
+    const res = {};
+    for (const [i, h] of ['hourly0', 'hourly1', 'hourly2'].entries()) {
+        if (w.hourly && w.hourly[i]) {
+            res[h] = {
+                weather: parsePHPHourly(w.hourly[i]),
+                water: [], tide: [] // 内陸は水温や潮位がないので空
+            };
+        }
+    }
+    res.daily = parsePHPDaily(w.daily);
+    return res;
+}
+
+// --- シリアライザー（計算結果をKANTO_load.jsonの文字列形式に戻す） ---
+function serializeStation(s) {
+    const res = {};
+    for (const h of ['hourly0', 'hourly1', 'hourly2']) {
+        if (s[h]) {
+            res[h] = {};
+            if (s[h].weather && s[h].weather.length) res[h].weather = s[h].weather.map(arr => arr.join('|'));
+            if (s[h].water && s[h].water.length) res[h].water = s[h].water.join('|');
+            if (s[h].tide && s[h].tide.length) res[h].tide = s[h].tide.map(String);
+        }
+    }
+    if (s.daily && s.daily.length) {
+        res.daily = s.daily.map(arr => arr.join('|')).join(';');
+    }
+    return res;
+}
+
+// --- 数学・補間ロジック ---
 function calcGeoDistance(lat1, lng1, lat2, lng2) {
-    const R = 6371; 
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lng2 - lng1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-// 2つの数値を距離に応じて加重平均する
 function lerp(val1, dist1, val2, dist2) {
-    const v1 = val1 !== "" && val1 != null ? Number(val1) : NaN;
-    const v2 = val2 !== "" && val2 != null ? Number(val2) : NaN;
-    if (isNaN(v1) && isNaN(v2)) return val1 !== undefined ? val1 : val2;
-    if (isNaN(v1)) return val2;
+    const v1 = val1 !== "" && val1 != null && !isNaN(Number(val1)) ? Number(val1) : NaN;
+    const v2 = val2 !== "" && val2 != null && !isNaN(Number(val2)) ? Number(val2) : NaN;
+    if (isNaN(v1) && isNaN(v2)) {
+        if (val1 !== undefined && val1 !== "") return val1;
+        return val2 !== undefined && val2 !== "" ? val2 : "";
+    }
+    if (isNaN(v1)) return v2;
     if (isNaN(v2)) return v1;
     if (dist1 === 0) return v1;
     if (dist2 === 0) return v2;
@@ -64,59 +122,71 @@ function lerp(val1, dist1, val2, dist2) {
     return (v1 * (dist2 / total)) + (v2 * (dist1 / total));
 }
 
-// 天気JSONオブジェクト全体を再帰的に巡回し、すべての数値を一括で加重平均する強力な関数
-function deepLerp(obj1, dist1, obj2, dist2) {
-    if (obj1 == null && obj2 == null) return null;
-    if (obj1 == null) return JSON.parse(JSON.stringify(obj2));
-    if (obj2 == null) return JSON.parse(JSON.stringify(obj1));
+function lerpArray(arr1, dist1, arr2, dist2) {
+    const len = Math.max(arr1.length, arr2.length);
+    const res = [];
+    for (let i = 0; i < len; i++) {
+        const el1 = arr1[i] !== undefined && arr1[i] !== null ? String(arr1[i]) : "";
+        const el2 = arr2[i] !== undefined && arr2[i] !== null ? String(arr2[i]) : "";
 
-    if (Array.isArray(obj1) || Array.isArray(obj2)) {
-        const arr1 = Array.isArray(obj1) ? obj1 : [];
-        const arr2 = Array.isArray(obj2) ? obj2 : [];
-        const maxLen = Math.max(arr1.length, arr2.length);
-        const res = [];
-        for (let i = 0; i < maxLen; i++) res.push(deepLerp(arr1[i], dist1, arr2[i], dist2));
-        return res;
-    }
-
-    if (typeof obj1 === 'object' || typeof obj2 === 'object') {
-        const o1 = typeof obj1 === 'object' ? obj1 : {};
-        const o2 = typeof obj2 === 'object' ? obj2 : {};
-        const res = {};
-        const keys = new Set([...Object.keys(o1), ...Object.keys(o2)]);
-        for (const key of keys) {
-            if (key === 'stationCode' || key === 'name') continue; // メタデータは無視
-            res[key] = deepLerp(o1[key], dist1, o2[key], dist2);
+        // 日付やカンマ区切りの文字列（潮汐など）は計算せず、近い方の親のデータをそのまま引き継ぐ
+        if (el1.includes('T') || el1.includes(',') || el1.includes(':') ||
+            el2.includes('T') || el2.includes(',') || el2.includes(':')) {
+            res.push(dist1 <= dist2 ? el1 : el2);
+        } else {
+            const val = lerp(el1, dist1, el2, dist2);
+            if (val === "" || Number.isNaN(val)) res.push("");
+            else res.push(String(Math.round(val * 100) / 100)); // 数値は小数点第2位で丸める
         }
-        return res;
     }
+    return res;
+}
 
-    if (typeof obj1 === 'number' || typeof obj2 === 'number') {
-        return lerp(obj1, dist1, obj2, dist2);
+function lerpDayList(days1, dist1, days2, dist2) {
+    const len = Math.max(days1.length, days2.length);
+    const res = [];
+    for (let i = 0; i < len; i++) {
+        res.push(lerpArray(days1[i] || [], dist1, days2[i] || [], dist2));
     }
-    
-    return obj1 !== undefined && obj1 !== "" ? obj1 : obj2;
+    return res;
+}
+
+function lerpStation(s1, d1, s2, d2) {
+    const res = {};
+    for (const h of ['hourly0', 'hourly1', 'hourly2']) {
+        const h1 = s1[h] || {weather:[], water:[], tide:[]};
+        const h2 = s2[h] || {weather:[], water:[], tide:[]};
+        res[h] = {
+            weather: lerpDayList(h1.weather, d1, h2.weather, d2),
+            water: lerpArray(h1.water, d1, h2.water, d2),
+            tide: lerpArray(h1.tide, d1, h2.tide, d2)
+        };
+    }
+    res.daily = lerpDayList(s1.daily || [], d1, s2.daily || [], d2);
+    return res;
 }
 
 // ===== 2. メイン処理 =====
 async function run() {
-    console.log(`🚀 [${region}] 完全独立版の再計算処理を開始します。`);
+    console.log(`🚀 [${region}] 共通フォーマット版・再計算処理を開始します。`);
 
-    const stationMap = {}; // すべての親データをここに集約（構造は純粋なJSON）
+    const stationMap = {}; 
 
-    // ① JSONから取得
+    // ① JSONから取得 (沿岸フォーマット)
     if (fs.existsSync(loadJsonPath)) {
         const rawJson = JSON.parse(fs.readFileSync(loadJsonPath, "utf-8"));
         const jsonStations = rawJson.data || rawJson;
+        let jsonCount = 0;
         jsonStations.forEach(s => {
-            if (s.stationCode && s.lat != null) {
-                stationMap[s.stationCode] = { lat: parseFloat(s.lat), lng: parseFloat(s.lng), whether: normalizeWeather(s) };
+            if (s.stationCode) {
+                stationMap[s.stationCode] = { lat: null, lng: null, whether: normalizeCoastalStation(s) };
+                jsonCount++;
             }
         });
-        console.log(`📦 既存JSONから ${Object.keys(stationMap).length} 件の親ステーションを登録`);
+        console.log(`📦 既存JSONから ${jsonCount} 件の親ステーションを登録`);
     }
 
-    // ② PHP CSVから取得
+    // ② PHP CSVから取得 (内陸フォーマット)
     let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
     try {
         const csvData = await fetchUrlText(inLandUrl);
@@ -140,8 +210,7 @@ async function run() {
             whetherStr = whetherStr.replace(/:\s*,/g, ':"",').replace(/:\s*}/g, ':""}').replace(/\[\s*,/g, '["",').replace(/,\s*\]/g, ']');
 
             try {
-                // 座標は後でマスターから埋めるのでnull
-                stationMap[id] = { lat: null, lng: null, whether: normalizeWeather(JSON.parse(whetherStr)) };
+                stationMap[id] = { lat: null, lng: null, whether: normalizeInlandStation(JSON.parse(whetherStr)) };
                 phpCount++;
             } catch (e) {}
         }
@@ -168,7 +237,8 @@ async function run() {
         if (stationMap[id]) {
             stationMap[id].lat = lat;
             stationMap[id].lng = lng;
-            finalRows.push({ id, name, date: targetDate, whether: stationMap[id].whether });
+            // 出力用にシリアライズ（文字列形式）して格納
+            finalRows.push({ id, name, date: targetDate, whether: serializeStation(stationMap[id].whether) });
         } else {
             const spot = { id, name, date: targetDate, lat, lng, notes, whether: null };
             calcTargets.push(spot);
@@ -176,7 +246,7 @@ async function run() {
         }
     }
 
-    // ④ 計算ステージ処理の共通関数
+    // ④ 計算ステージ処理
     function processStage(stageName) {
         let count = 0;
         for (const spot of calcTargets) {
@@ -188,18 +258,19 @@ async function run() {
                 const s1 = stationMap[p1];
                 const s2 = stationMap[p2];
 
-                // 2つの親がいる場合は距離で加重平均
                 if (s1 && s2 && s1.lat != null && s2.lat != null) {
                     const d1 = calcGeoDistance(spot.lat, spot.lng, s1.lat, s1.lng);
                     const d2 = calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng);
-                    spot.whether = deepLerp(s1.whether, d1, s2.whether, d2);
-                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: spot.whether }; // ★次のステージのために親として登録！
+                    
+                    const lerped = lerpStation(s1.whether, d1, s2.whether, d2);
+                    spot.whether = serializeStation(lerped); // CSV出力用
+                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped }; // 次のステージの親用
                     count++;
                 } 
-                // 親が1つだけ指定されている場合はそのままコピー
                 else if (s1 && s1.lat != null && !p2) {
-                    spot.whether = JSON.parse(JSON.stringify(s1.whether));
-                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: spot.whether };
+                    const cloned = JSON.parse(JSON.stringify(s1.whether));
+                    spot.whether = serializeStation(cloned);
+                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: cloned };
                     count++;
                 }
             }
@@ -207,7 +278,6 @@ async function run() {
         return count;
     }
 
-    // 順番に実行（Firstの結果が自動的にSecondの親になり、SecondがThirdの親になる）
     console.log(`🧮 Firstステージ: ${processStage("First")} 件 計算完了`);
     console.log(`🧮 Secondステージ: ${processStage("Second")} 件 計算完了`);
     console.log(`🧮 Thirdステージ: ${processStage("Third")} 件 計算完了`);
