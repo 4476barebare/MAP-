@@ -24,36 +24,30 @@ function fetchUrlText(url) {
     });
 }
 
-function formatForNode(data) {
-    if (!data) return undefined;
+// 共通：hourlyデータを文字列に変換
+function encodeHourly(hourlyObj) {
+    if (!hourlyObj || !hourlyObj.weather) return undefined;
     return {
-        ...data,
-        weather: data.weather ? data.weather.map(w => {
-            if (Array.isArray(w)) return w.join("|");
-            return w !== null && w !== undefined ? String(w) : "";
-        }) : []
+        ...hourlyObj,
+        weather: hourlyObj.weather.map(arr => {
+            if (Array.isArray(arr)) return arr.join("|");
+            return String(arr);
+        })
     };
 }
 
+// ★修正箇所：余計な転置をやめ、PHP・Spot問わずシンプルに文字列化する共通関数に統一
 function encodeDaily(dailyArray) {
     if (!dailyArray || !Array.isArray(dailyArray)) return "";
-    const parts = [];
-    let maxW = 0;
-    for (const d of dailyArray) {
-        if (d.weather && d.weather.length > maxW) maxW = d.weather.length;
-    }
-    maxW = Math.max(maxW, 10); 
-    
-    for (let j = 0; j < maxW; j++) {
-        const vals = dailyArray.map(d => {
-            if (d.weather && d.weather[j] !== undefined && d.weather[j] !== null) return String(d.weather[j]);
-            return "";
-        });
-        parts.push(vals.join("|"));
-    }
-    return parts.join(";");
+    return dailyArray.map(day => {
+        if (day && Array.isArray(day.weather)) {
+            return day.weather.map(v => v !== null && v !== undefined ? String(v) : "").join("|");
+        }
+        return "";
+    }).join(";");
 }
 
+// 計算済みスポットを親ステーションとして再登録する関数
 function spotToStation(spot) {
     if (!spot.whether) return null;
     return {
@@ -61,10 +55,10 @@ function spotToStation(spot) {
         latlng: `${spot.lat};${spot.lng}`,
         lat: spot.lat,
         lng: spot.lng,
-        hourly0: formatForNode(spot.whether.hourly && spot.whether.hourly[0]),
-        hourly1: formatForNode(spot.whether.hourly && spot.whether.hourly[1]),
-        hourly2: formatForNode(spot.whether.hourly && spot.whether.hourly[2]),
-        daily: encodeDaily(spot.whether.daily)
+        hourly0: encodeHourly(spot.whether.hourly && spot.whether.hourly[0]),
+        hourly1: encodeHourly(spot.whether.hourly && spot.whether.hourly[1]),
+        hourly2: encodeHourly(spot.whether.hourly && spot.whether.hourly[2]),
+        daily: encodeDaily(spot.whether.daily) // ★共通関数を使用
     };
 }
 
@@ -123,10 +117,10 @@ async function run() {
                 stationMapForCalc[individualId] = {
                     stationCode: individualId,
                     latlng: "", lat: null, lng: null,
-                    hourly0: formatForNode(whether.hourly && whether.hourly[0]),
-                    hourly1: formatForNode(whether.hourly && whether.hourly[1]),
-                    hourly2: formatForNode(whether.hourly && whether.hourly[2]),
-                    daily: encodeDaily(whether.daily)
+                    hourly0: encodeHourly(whether.hourly && whether.hourly[0]),
+                    hourly1: encodeHourly(whether.hourly && whether.hourly[1]),
+                    hourly2: encodeHourly(whether.hourly && whether.hourly[2]),
+                    daily: encodeDaily(whether.daily) // ★共通関数を使用
                 };
                 csvParentCount++;
             } catch (e) {}
@@ -188,7 +182,6 @@ async function run() {
         console.log("🧮 距離補間（Firstステージ再計算）を実行中...");
         applyFirstStage(finalAllRows, allParentStations);
 
-        // First結果を stationMap にも合流させる（JSONの 1202 のような扱いで見つけさせるため）
         let newFirstParents = 0;
         finalAllRows.forEach(spot => {
             if (spot.notes.startsWith("First/") && spot.whether) {
@@ -201,31 +194,27 @@ async function run() {
         });
         console.log(`🔄 First結果 ${newFirstParents} 件をSecondのソースとして追加しました。`);
 
-        // ★重要: whetherNode.js 内の stationMap キャッシュを強制更新させるダミー通信
+        // キャッシュクリア
         applyFirstStage([], allParentStations);
 
-        // =========================================================
-        // ★ 最大のトリック： whetherNode.js を騙す
-        // whetherNode.js は Second の対象を "name" で検索する仕様のため、
-        // 一時的にすべてのスポットの name を individualId にすり替える。
-        // =========================================================
+        // トリック：whetherNode.js を騙すための name すり替え
         const originalNames = {};
         finalAllRows.forEach(spot => {
             originalNames[spot.individualId] = spot.name;
-            spot.name = spot.individualId; // すり替え実行
+            spot.name = spot.individualId; 
         });
 
         console.log("🧮 距離補間（Secondステージ再計算）を実行中...");
-        applySecondStage(finalAllRows); // whetherNode.js はこれで騙されて S001 等を見つけ出す
+        applySecondStage(finalAllRows);
 
-        // (必要になればコメントアウト解除してThirdも実行可能)
-        // applyThirdStage(finalAllRows);
+        // 後々を考えてThirdもオンにしておきます（該当がなければスキップされるだけです）
+        console.log("🧮 距離補間（Thirdステージ再計算）を実行中...");
+        applyThirdStage(finalAllRows);
 
-        // ★ トリック終了：すり替えていた name を元の正しい名前に戻す
+        // トリック終了：元の名前に戻す
         finalAllRows.forEach(spot => {
             spot.name = originalNames[spot.individualId];
         });
-        // =========================================================
 
     } else {
         console.log("⚠️ 再計算対象のターゲット行が見つかりませんでした。");
