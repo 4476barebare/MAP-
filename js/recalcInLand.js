@@ -9,7 +9,7 @@ const loadJsonPath = `data/${region}_load.json`;
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
-// 簡易CSVパース関数
+// 簡易CSVパース関数（マスター用）
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
@@ -27,22 +27,6 @@ function fetchUrlText(url) {
             res.on('end', () => resolve(data));
         }).on('error', (err) => reject(err));
     });
-}
-
-// 壊れたJSON（,, などの連続）を安全にパースするための関数
-function safeParseWhether(whetherStr) {
-    if (!whetherStr || !whetherStr.startsWith("{")) return null;
-    try {
-        // [,,] や [1,2,,] のようなJSONとして不正なカンマの連続を、仮のnullや0に置換してパース可能にする
-        let fixedStr = whetherStr
-            .replace(/,+(?=\s*\])/g, '') // 末尾の余分なカンマを消去
-            .replace(/,+(?=,)/g, ',null') // 連続するカンマの間にnullを挟む
-            .replace(/\[\s*,/g, '[null,'); // 配列開始直後のカンマをケア
-        return JSON.parse(fixedStr);
-    } catch (e) {
-        console.error(`⚠️ JSONパース失敗、文字を部分修復します: ${e.message}`);
-        return null;
-    }
 }
 
 // ===== 2. メイン処理 =====
@@ -65,10 +49,10 @@ async function run() {
     }
 
     // ----------------------------------------------------------------
-    // 🌐 親データ②: サーバー側 PHP が生成した天気入り内陸CSVをダウンロード
+    // 🌐 親データ②: サーバー側 PHP から天気入り内陸CSVを取得 (残りの列を全て結合)
     // ----------------------------------------------------------------
-    let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }); // フォールバック日付
-    const phpWeatherMap = {}; // サーバーから取得した天気をIDをキーにして保持
+    let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+    const phpWeatherMap = {}; 
 
     try {
         console.log(`🌐 リモートから天気取得済みの内陸CSVを取得中: ${inLandUrl}`);
@@ -78,41 +62,52 @@ async function run() {
 
         let csvParentCount = 0;
         for (const line of inLandLines) {
-            const parts = parseCsvLine(line);
-            if (parts.length < 4) continue;
+            // カンマで細かく分割せず、最初の3つのカンマ位置から前方を抜き出す
+            const tokens = line.split(",");
+            if (tokens.length < 4) continue;
 
-            const individualId = parts[0];
-            const date = parts[2];
-            const whetherStr = parts[3];
-
+            const individualId = tokens[0].trim().replace(/^"|"$/g, '');
+            const name = tokens[1].trim().replace(/^"|"$/g, '');
+            const date = tokens[2].trim().replace(/^"|"$/g, '');
+            
+            // ★ご提案の通り、残りの要素をすべて結合して一つのJSONにする
+            let whetherStr = tokens.slice(3).join(",").trim();
+            
             if (!individualId || !whetherStr) continue;
             if (date) targetDate = date;
 
-            // 安全なパース処理を通す
-            const whether = safeParseWhether(whetherStr);
-            if (!whether) continue;
+            // JSON内の不正な空カンマをパース可能な形式（null）に一括置換
+            whetherStr = whetherStr
+                .replace(/,+(?=\s*\])/g, '')   // 末尾の余分なカンマを除去
+                .replace(/,+(?=,)/g, ',null')   // 空カンマをnullに置換
+                .replace(/\[\s*,/g, '[null,');  // 配列直後の空カンマをケア
 
-            phpWeatherMap[individualId] = whether;
+            try {
+                const whether = JSON.parse(whetherStr);
+                phpWeatherMap[individualId] = whether;
 
-            // whetherNode.js が親として読める形式にエミュレートして登録
-            stationMapForCalc[individualId] = {
-                stationCode: individualId,
-                latlng: "", 
-                lat: null, // 後でマスターCSVから座標を紐付けます
-                lng: null,
-                hourly0: { weather: whether.hourly[0].weather },
-                daily: whether.daily
-            };
-            csvParentCount++;
+                // whetherNode.js が読める構造にエミュレート
+                stationMapForCalc[individualId] = {
+                    stationCode: individualId,
+                    latlng: "", 
+                    lat: null, // 後でマスターCSVから紐付け
+                    lng: null,
+                    hourly0: { weather: whether.hourly[0].weather },
+                    daily: whether.daily
+                };
+                csvParentCount++;
+            } catch (e) {
+                console.error(`⚠️ [${individualId}] JSONパース失敗: ${e.message}`);
+            }
         }
-        console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーション（直接取得分）を登録しました。`);
+        console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーション（直接取得分）を正しくパースして登録しました。`);
     } catch (error) {
         console.error("❌ リモートCSVの取得または処理に失敗しました:", error.message);
         return;
     }
 
     // ----------------------------------------------------------------
-    // 🗺 マスターCSV (KANTO_region.csv) を元にターゲット(First/ID/ID)を構築
+    // 🗺 マスターCSV (KANTO_region.csv) を元にターゲットを構築
     // ----------------------------------------------------------------
     if (!fs.existsSync(regionCsvPath)) {
         console.error(`❌ リージョンCSVが見つかりません: ${regionCsvPath}`);
@@ -136,13 +131,13 @@ async function run() {
 
         if (!individualId) continue;
 
-        // 親ステーションの座標をマスターから補完
+        // 親の座標を補完
         if (stationMapForCalc[individualId]) {
             stationMapForCalc[individualId].lat = lat;
             stationMapForCalc[individualId].lng = lng;
         }
 
-        // パターンA: サーバー側CSVに既に天気がある「直接取得した親駅」の場合
+        // 既に天気がある直接取得駅
         if (phpWeatherMap[individualId]) {
             finalAllRows.push({
                 individualId,
@@ -153,7 +148,7 @@ async function run() {
             continue;
         }
 
-        // パターンB: notesが「First/F016/F007」の形になっている「計算対象のターゲット駅」の場合
+        // 再計算が必要なターゲット駅
         if (notes.startsWith("First/")) {
             const spotObj = {
                 individualId,
@@ -162,11 +157,11 @@ async function run() {
                 lat: lat,
                 lng: lng,
                 notes: notes,
-                icon: "spot", // whetherNodeのガード条件を通過させる
+                icon: "spot",
                 whether: null
             };
             spotsForCalc.push(spotObj);
-            finalAllRows.push(spotObj); // 参照渡しで最終出力用にも追加
+            finalAllRows.push(spotObj);
         }
     }
 
