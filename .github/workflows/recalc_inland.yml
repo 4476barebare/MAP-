@@ -1,6 +1,11 @@
 name: Recalculate InLand Weather Data
 
 on:
+  # 定期実行（時間はUTCで指定。UTCの17:00 ＝ 日本時間の02:00）
+  schedule:
+    - cron: '0 17 * * *'  # 毎日 02:00 JST
+    - cron: '5 17 * * *'  # 毎日 02:05 JST
+  # 手動実行用ボタンも残しておきます
   workflow_dispatch:
 
 jobs:
@@ -15,47 +20,48 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4 # ※前回のタイポ(checkoutになっていた点)も併せて修正しました
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      # ======= ★ここを修正しました★ =======
       - name: Install dependencies
         run: |
           if [ -f package-lock.json ]; then
-            echo "package-lock.json が見つかったため npm ci を実行します。"
             npm ci
           elif [ -f package.json ]; then
-            echo "package.json のみ見つかったため npm install を実行します。"
             npm install
           else
-            echo "package.json が存在しないため axios を個別インストールします。"
-            npm install axios
+            echo "No package.json found. Skipping npm install."
           fi
-      # ====================================
 
+      # 1. PHPを叩いて10秒待機するステップ
+      - name: Trigger PHP script and wait
+        run: |
+          echo "🌐 PHPスクリプトを実行し、APIから最新の天気データをサーバーに生成させます..."
+          curl -sS https://turiiko.shop/actions/inLandwhether.php
+          
+          echo "⏳ データの書き込み完了を確実にするため、10秒間スリープします..."
+          sleep 10
+
+      # 2. Node.jsで補間計算を実行するステップ
       - name: Run recalculation script
         run: node js/recalcInLand.js
         env:
-          TZ: 'Asia/Tokyo'
+          TZ: 'Asia/Tokyo' # 日付判定を日本時間に合わせるため必須
 
+      # 3. 計算結果をリポジトリに保存（コミット＆プッシュ）
       - name: Commit and Push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
+          # dataディレクトリ以下の変更をステージング
           git add data/
+          
+          # 変更がある場合のみコミットしてプッシュ
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: [KANTO] 内陸補間データの再計算を反映"
             git push origin main
           else
-            echo "No changes to commit"
+            echo "✅ 変更がない（またはスキップされた）ため、コミットしませんでした。"
           fi
