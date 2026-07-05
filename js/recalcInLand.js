@@ -141,7 +141,10 @@ async function run() {
         if (stationMapForCalc[individualId]) {
             stationMapForCalc[individualId].lat = lat;
             stationMapForCalc[individualId].lng = lng;
+            // ★これを追加: whetherNode.js が読み取るための "lat;lng" 形式の文字列を作成
+            stationMapForCalc[individualId].latlng = `${lat};${lng}`; 
         }
+
 
         // 既に天気がある直接取得駅
         if (phpWeatherMap[individualId]) {
@@ -171,7 +174,9 @@ async function run() {
         }
     }
 
-    const allParentStations = Object.values(stationMapForCalc);
+    // latlng がちゃんとセットされている親データだけを抽出（エラー回避）
+    const allParentStations = Object.values(stationMapForCalc).filter(s => s.latlng && s.latlng !== "");
+
     console.log(`📡 総親ステーション数 (JSON + 内陸CSV親): ${allParentStations.length} 件`);
     console.log(`🎯 再計算対象ターゲット (First/ID/ID) 数: ${spotsForCalc.length} 件`);
 
