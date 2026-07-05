@@ -29,6 +29,22 @@ function fetchUrlText(url) {
     });
 }
 
+// 壊れたJSON（,, などの連続）を安全にパースするための関数
+function safeParseWhether(whetherStr) {
+    if (!whetherStr || !whetherStr.startsWith("{")) return null;
+    try {
+        // [,,] や [1,2,,] のようなJSONとして不正なカンマの連続を、仮のnullや0に置換してパース可能にする
+        let fixedStr = whetherStr
+            .replace(/,+(?=\s*\])/g, '') // 末尾の余分なカンマを消去
+            .replace(/,+(?=,)/g, ',null') // 連続するカンマの間にnullを挟む
+            .replace(/\[\s*,/g, '[null,'); // 配列開始直後のカンマをケア
+        return JSON.parse(fixedStr);
+    } catch (e) {
+        console.error(`⚠️ JSONパース失敗、文字を部分修復します: ${e.message}`);
+        return null;
+    }
+}
+
 // ===== 2. メイン処理 =====
 async function run() {
     console.log(`🚀 [${region}] 再計算処理を開始します。`);
@@ -51,8 +67,9 @@ async function run() {
     // ----------------------------------------------------------------
     // 🌐 親データ②: サーバー側 PHP が生成した天気入り内陸CSVをダウンロード
     // ----------------------------------------------------------------
-    let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }); // フォールバック用今日の日付
-    
+    let targetDate = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }); // フォールバック日付
+    const phpWeatherMap = {}; // サーバーから取得した天気をIDをキーにして保持
+
     try {
         console.log(`🌐 リモートから天気取得済みの内陸CSVを取得中: ${inLandUrl}`);
         const csvData = await fetchUrlText(inLandUrl);
@@ -65,36 +82,37 @@ async function run() {
             if (parts.length < 4) continue;
 
             const individualId = parts[0];
-            const name = parts[1];
             const date = parts[2];
             const whetherStr = parts[3];
 
-            if (!individualId || !whetherStr || !whetherStr.startsWith("{")) continue;
+            if (!individualId || !whetherStr) continue;
+            if (date) targetDate = date;
 
-            if (date) targetDate = date; // CSV内にある実際の日付を同期
+            // 安全なパース処理を通す
+            const whether = safeParseWhether(whetherStr);
+            if (!whether) continue;
 
-            const whether = JSON.parse(whetherStr);
+            phpWeatherMap[individualId] = whether;
 
-            // whetherNode.js の期待する親ステーションの構造にエミュレート
+            // whetherNode.js が親として読める形式にエミュレートして登録
             stationMapForCalc[individualId] = {
                 stationCode: individualId,
-                latlng: "", // whetherNode内部の補間では w1.lat / w1.lng を直接見るため空でも可
-                lat: null,  // 後ほどマスターCSVから座標を補完します
+                latlng: "", 
+                lat: null, // 後でマスターCSVから座標を紐付けます
                 lng: null,
                 hourly0: { weather: whether.hourly[0].weather },
-                daily: whether.daily,
-                rawWhether: whether // 最終出力用に元のオブジェクトを保持
+                daily: whether.daily
             };
             csvParentCount++;
         }
-        console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーション(天気データ有り)を登録しました。`);
+        console.log(`📥 内陸CSVから ${csvParentCount} 件の親ステーション（直接取得分）を登録しました。`);
     } catch (error) {
-        console.error("❌ リモートCSVの取得に失敗しました:", error.message);
+        console.error("❌ リモートCSVの取得または処理に失敗しました:", error.message);
         return;
     }
 
     // ----------------------------------------------------------------
-    // 🗺 マスターCSV (KANTO_region.csv) を読み込み、親の座標補完 ＆ 計算ターゲットの抽出
+    // 🗺 マスターCSV (KANTO_region.csv) を元にターゲット(First/ID/ID)を構築
     // ----------------------------------------------------------------
     if (!fs.existsSync(regionCsvPath)) {
         console.error(`❌ リージョンCSVが見つかりません: ${regionCsvPath}`);
@@ -103,8 +121,8 @@ async function run() {
     const regionLines = fs.readFileSync(regionCsvPath, "utf-8").split("\n").filter(Boolean);
     regionLines.shift(); // ヘッダー除去
 
-    const spotsForCalc = []; // whetherNodeに計算させるターゲット(First/ID/ID)を入れる配列
-    const finalAllRows = []; // 最終的にCSV出力するすべての行を保持する配列
+    const spotsForCalc = []; 
+    const finalAllRows = []; 
 
     for (const line of regionLines) {
         const r = parseCsvLine(line);
@@ -118,21 +136,24 @@ async function run() {
 
         if (!individualId) continue;
 
-        // ① もしこのIDが「天気取得済みの親ステーション」マップに存在する場合、座標を補完して最終出力用にキープ
+        // 親ステーションの座標をマスターから補完
         if (stationMapForCalc[individualId]) {
             stationMapForCalc[individualId].lat = lat;
             stationMapForCalc[individualId].lng = lng;
-            
+        }
+
+        // パターンA: サーバー側CSVに既に天気がある「直接取得した親駅」の場合
+        if (phpWeatherMap[individualId]) {
             finalAllRows.push({
                 individualId,
                 name,
                 date: targetDate,
-                whetherStr: JSON.stringify(stationMapForCalc[individualId].rawWhether).replace(/""/g, '')
+                whether: phpWeatherMap[individualId]
             });
             continue;
         }
 
-        // ② notesが 「First/ID/ID」 の形になっている行を、再計算ターゲット(spots)として登録
+        // パターンB: notesが「First/F016/F007」の形になっている「計算対象のターゲット駅」の場合
         if (notes.startsWith("First/")) {
             const spotObj = {
                 individualId,
@@ -145,12 +166,12 @@ async function run() {
                 whether: null
             };
             spotsForCalc.push(spotObj);
-            finalAllRows.push(spotObj); // 参照渡しで最終出力用リストにも入れておく
+            finalAllRows.push(spotObj); // 参照渡しで最終出力用にも追加
         }
     }
 
     const allParentStations = Object.values(stationMapForCalc);
-    console.log(`📡 総親ステーション数 (JSON + CSV内陸親): ${allParentStations.length} 件`);
+    console.log(`📡 総親ステーション数 (JSON + 内陸CSV親): ${allParentStations.length} 件`);
     console.log(`🎯 再計算対象ターゲット (First/ID/ID) 数: ${spotsForCalc.length} 件`);
 
     // ----------------------------------------------------------------
@@ -170,11 +191,7 @@ async function run() {
     const outLines = ["individualId,name,date,whether"];
 
     for (const row of finalAllRows) {
-        // row.whetherStr があれば親データ、なければ計算された spot オブジェクト
-        const whetherStr = row.whetherStr !== undefined 
-            ? row.whetherStr 
-            : (row.whether ? JSON.stringify(row.whether).replace(/""/g, '') : "");
-            
+        const whetherStr = row.whether ? JSON.stringify(row.whether).replace(/""/g, '') : "";
         outLines.push(`${row.individualId},${row.name},${row.date},${whetherStr}`);
     }
 
