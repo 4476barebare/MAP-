@@ -23,7 +23,7 @@ function fetchUrlText(url) {
     });
 }
 
-// --- パーサー（データを共通の配列形式に分解する） ---
+// --- パーサー ---
 function parseDailyString(dailyStr) {
     if (!dailyStr) return [];
     return dailyStr.split(';').filter(Boolean).map(day => day.split('|'));
@@ -33,7 +33,6 @@ function parsePHPDaily(dailyArr) {
     if (!dailyArr) return [];
     return dailyArr.map(day => {
         const w = day.weather || [];
-        // PHPのデータを既存JSONに合わせて7つの枠（天気,気温,水温,波高,日の出,日の入り,潮汐）に広げる
         return [
             w[0] != null ? String(w[0]) : "",
             w[1] != null ? String(w[1]) : "",
@@ -73,7 +72,7 @@ function normalizeInlandStation(w) {
         if (w.hourly && w.hourly[i]) {
             res[h] = {
                 weather: parsePHPHourly(w.hourly[i]),
-                water: [], tide: [] // 内陸は水温や潮位がないので空
+                water: [], tide: [] 
             };
         }
     }
@@ -81,7 +80,7 @@ function normalizeInlandStation(w) {
     return res;
 }
 
-// --- シリアライザー（計算結果をKANTO_load.jsonの文字列形式に戻す） ---
+// --- シリアライザー ---
 function serializeStation(s) {
     const res = {};
     for (const h of ['hourly0', 'hourly1', 'hourly2']) {
@@ -136,7 +135,7 @@ function lerpArray(arr1, dist1, arr2, dist2) {
         } else {
             const val = lerp(el1, dist1, el2, dist2);
             if (val === "" || Number.isNaN(val)) res.push("");
-            else res.push(String(Math.round(val * 100) / 100)); // 数値は小数点第2位で丸める
+            else res.push(String(Math.round(val * 100) / 100)); // 小数点第2位で丸める
         }
     }
     return res;
@@ -179,7 +178,16 @@ async function run() {
         let jsonCount = 0;
         jsonStations.forEach(s => {
             if (s.stationCode) {
-                stationMap[s.stationCode] = { lat: null, lng: null, whether: normalizeCoastalStation(s) };
+                // ★ 修正箇所: "latlng" ("35.93;140.7" など) から座標をパースする
+                let lat = null, lng = null;
+                if (s.latlng) {
+                    const pts = s.latlng.split(";");
+                    if (pts.length >= 2) {
+                        lat = parseFloat(pts[0]);
+                        lng = parseFloat(pts[1]);
+                    }
+                }
+                stationMap[s.stationCode] = { lat, lng, whether: normalizeCoastalStation(s) };
                 jsonCount++;
             }
         });
@@ -263,8 +271,8 @@ async function run() {
                     const d2 = calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng);
                     
                     const lerped = lerpStation(s1.whether, d1, s2.whether, d2);
-                    spot.whether = serializeStation(lerped); // CSV出力用
-                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped }; // 次のステージの親用
+                    spot.whether = serializeStation(lerped);
+                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped }; 
                     count++;
                 } 
                 else if (s1 && s1.lat != null && !p2) {
