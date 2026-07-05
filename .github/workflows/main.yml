@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 16 * * *'
+    - cron: '5 16 * * *'
+    - cron: '10 16 * * *'
 
 jobs:
   fetch:
@@ -32,22 +34,12 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           
-          # 1. 変更があるか「インデックスに追加する前」にチェック
           git add data/KANTO_load.json
           
           if git diff --cached --quiet; then
             echo "CHANGES=false" >> $GITHUB_OUTPUT
             echo "No changes"
           else
-            # 2. 変更があった場合、一度未ステージ状態の変更を一時退避させる
-            git stash
-            
-            # 3. リモートの最新状態を取り込む
-            git pull --rebase origin main
-            
-            # 4. 退避させた変更を戻して、改めてコミット・プッシュする
-            git stash pop
-            git add data/KANTO_load.json
             git commit -m "test: update kanto load"
             git push origin main
             echo "CHANGES=true" >> $GITHUB_OUTPUT
