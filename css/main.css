@@ -13,11 +13,11 @@
 /* ==================================
    雨雲レーダー トグルボタン用CSS
 ================================== */
+
 /* ① HTML上は後ろにあるボタンを、視覚的に一番左にワープさせる */
 #map-menu #radarToggleBtn {
-    order: -1;
-    margin-left: 4px;   /* ★追加：左側のシャドウ見切れ防止！ */
-    margin-right: 8px;
+    order: -1;          /* これが魔法：一番左に配置される */
+    margin-right: 8px;  /* 右側の文字との隙間 */
 
     width: auto;
     min-width: 44px;
@@ -25,26 +25,22 @@
     text-align: center;
     flex-shrink: 0;
     
-    /* 上品なミッドナイトブルーデザイン */
-    background: rgba(25, 25, 112, 0.85); /* #191970の半透明 */
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: #111;
+    color: #00e5ff;
+    border: 1px solid #00e5ff;
     font-size: 10px;
     font-weight: bold;
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* 落ち着いた影 */
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
 }
 
-/* ONの時のホバー（白黒反転して光る） */
 #map-menu #radarToggleBtn:hover {
-    background: #fff;
-    color: #191970;
-    border-color: #fff;
-    box-shadow: 0 2px 8px rgba(25, 25, 112, 0.5);
+    background: #00e5ff;
+    color: #111;
+    box-shadow: 0 0 15px #00e5ff;
 }
-
 
 /* ② cloudsUI（文字）が空っぽのとき、その【直後】にあるボタンを非表示にする */
 #cloudsUI:empty + #radarToggleBtn {
