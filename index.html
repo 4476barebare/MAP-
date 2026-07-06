@@ -933,13 +933,16 @@ function renderCrowdImage() {
 
             window.crowdSlideTimer = setInterval(() => {
 
+                // 現在表示中のレイヤーを退避保持
+                const oldLayer = window.crowdLayer;
+
                 currentIndex = (currentIndex + 1) % images.length;
                 const img = images[currentIndex];
 
                 // ヘッダー更新
                 cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
 
-                // 新レイヤー
+                // 新しいレイヤー（透明度0で初期化）
                 const newLayer = L.imageOverlay(
                     img.url,
                     calcBounds(),
@@ -959,14 +962,21 @@ function renderCrowdImage() {
                         opacity = MAX_OPACITY;
                         clearInterval(fade);
 
-                        if (window.crowdLayer) {
-                            window.map.removeLayer(window.crowdLayer);
+                        // フェード完了後に古いレイヤーを完全に削除
+                        if (oldLayer) {
+                            window.map.removeLayer(oldLayer);
                         }
 
                         window.crowdLayer = newLayer;
                     }
 
+                    // 新しいレイヤーはフェードイン
                     newLayer.setOpacity(opacity);
+
+                    // 古いレイヤーが残っていれば同時にフェードアウト
+                    if (oldLayer) {
+                        oldLayer.setOpacity(MAX_OPACITY - opacity);
+                    }
 
                 }, 50);
 
@@ -974,6 +984,7 @@ function renderCrowdImage() {
 
         });
 }
+
 
 function removeCrowdImage() {
 
