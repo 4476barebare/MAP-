@@ -55,8 +55,8 @@
   <ul>
 <li class="menu-header-row" style="display:none;">
   <div class="header-row">
-    <button id="radarToggleBtn" class="radar-toggle-btn">OFF</button>
     <div id="cloudsUI"></div>
+    <button id="radarToggleBtn" class="radar-toggle-btn" onclick="removeCrowdImage()">OFF</button>
     <div class="header-text"></div>
   </div>
 </li>
@@ -1058,6 +1058,7 @@ function removeCrowdImage() {
     const cloudsUI = document.getElementById('cloudsUI');
     const headerText = document.querySelector('.header-text');
 
+// 【抜粋】removeCrowdImage の中の後半部分は元通り、これだけでOK！
     if (window.phase2Initialized) {
         // phase2 → 左だけ消す
         if (cloudsUI) cloudsUI.textContent = '';
@@ -1066,6 +1067,7 @@ function removeCrowdImage() {
         if (cloudsUI) cloudsUI.textContent = '';
         if (headerText) headerText.textContent = '';
     }
+
 
     // =======================
     // 表示制御
