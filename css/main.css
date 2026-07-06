@@ -1147,32 +1147,31 @@ li {
 }
 
 /* =========================
-   HEADER ROW
-========================= */
-/* =========================
-   HEADER ROW
+   HEADER ROW (ul外出し版)
 ========================= */
 .menu-header-row {
-    display: block !important;
-    padding: 2px 8px !important;
-    background: transparent !important;
+    display: block;
+    padding: 4px 8px;
+    background: transparent;
+    color: #fff; /* ★ liから外れたので文字色を白に再設定 */
 }
 
-.menu-header-row > div {
+/* 中のレイアウト設定 */
+.menu-header-row .header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     font-size: 12px;
     white-space: nowrap;
-    /* ★ filter: drop-shadow(...) を完全に削除しました */
 }
 
-/* 雨雲レーダーの文字と、右側の日付だけに個別に影をつける */
+/* ★ 影は文字部分だけに直接かける（ボタンには影響しない） */
 #cloudsUI,
 .header-text {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
+
 
 
 /* =========================
