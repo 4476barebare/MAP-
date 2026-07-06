@@ -4,6 +4,11 @@
     margin-right: auto;  /* 日付を右端に押し出す魔法 */
 }
 
+/* 雨雲レーダーの文字と、右側の日付だけに個別に影をつける */
+#cloudsUI,
+.header-text {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
 
 /* ==================================
    雨雲レーダー トグルボタン用CSS
@@ -1144,6 +1149,9 @@ li {
 /* =========================
    HEADER ROW
 ========================= */
+/* =========================
+   HEADER ROW
+========================= */
 .menu-header-row {
     display: block !important;
     padding: 2px 8px !important;
@@ -1152,24 +1160,20 @@ li {
 
 .menu-header-row > div {
     display: flex;
-    justify-content: space-between; /* ★ flex-end から space-between に変更 */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
     font-size: 12px;
     white-space: nowrap;
-    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+    /* ★ filter: drop-shadow(...) を完全に削除しました */
 }
 
-/* 雨雲ボタンがある行全体のドロップシャドウを解除する */
-.menu-header-row > div:has(#radarToggleBtn) {
-    filter: none !important;
-}
-
-/* もし「文字（雨雲レーダー・日付）」が見えづらくなる場合は、文字にだけ影をつけ直す */
+/* 雨雲レーダーの文字と、右側の日付だけに個別に影をつける */
 #cloudsUI,
-.menu-header-row > div:has(#radarToggleBtn) .header-text {
+.header-text {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
+
 
 /* =========================
    アニメーション
