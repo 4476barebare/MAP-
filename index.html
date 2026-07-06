@@ -812,9 +812,15 @@ function renderCrowdImage() {
         // クリーンアップで非表示になったUIを「OFFモード」として再表示
         const header = document.querySelector('.menu-header-row');
         const cloudsUI = document.getElementById('cloudsUI');
+        const headerText = document.querySelector('.header-text'); // ★ 追加
         
         if (header) header.style.display = '';
         if (cloudsUI) cloudsUI.textContent = '雨雲レーダー 停止中';
+        
+        // ★ 追加：OFFでも右側の日付と潮名は表示したままにする
+        if (headerText && window.todayTide) {
+            headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        }
         
         if (btn) {
             btn.textContent = 'ON'; // 次にONにするためのボタン表記
@@ -822,6 +828,8 @@ function renderCrowdImage() {
         }
         return; // これ以降の画像読み込みやタイマー処理を通さずに終了
     }
+
+    
 
     // =======================
     // ON時のボタン表示リセット
