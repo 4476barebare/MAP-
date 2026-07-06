@@ -1103,13 +1103,14 @@ li {
 
 .menu-header-row > div {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between; /* ★ flex-end から space-between に変更 */
     align-items: center;
     width: 100%;
     font-size: 12px;
     white-space: nowrap;
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
+
 
 /* =========================
    アニメーション
