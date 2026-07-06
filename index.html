@@ -55,6 +55,7 @@
   <ul>
 <li class="menu-header-row" style="display:none;">
   <div class="header-row">
+    <button id="radarToggleBtn" class="radar-toggle-btn">OFF</button>
     <div id="cloudsUI"></div>
     <div class="header-text"></div>
   </div>
@@ -771,11 +772,71 @@ function toWeatherIcon(code) {
 
 function renderCrowdImage() {
 
-    removeCrowdImage();
+    // 初期状態の定義（未定義なら最初はON）
+    if (typeof window.radarEnabled === 'undefined') {
+        window.radarEnabled = true;
+    }
 
     // =======================
-    // Pane準備
+    // トグルボタンのクリックイベント（一度だけ登録）
     // =======================
+    const btn = document.getElementById('radarToggleBtn');
+    if (btn && !btn.dataset.listenerAdded) {
+        btn.dataset.listenerAdded = "true";
+        btn.addEventListener('click', function() {
+            // 状態を反転
+            window.radarEnabled = !window.radarEnabled;
+
+            if (!window.radarEnabled) {
+                // OFFにする時はタイマーとレイヤーを即座に停止・削除
+                if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
+                if (window.crowdLayer) window.map.removeLayer(window.crowdLayer);
+                if (window.crowdZoomHandler) window.map.off("zoomend", window.crowdZoomHandler);
+                window.crowdSlideTimer = null;
+                window.crowdLayer = null;
+                window.crowdZoomHandler = null;
+            }
+
+            // 状態が切り替わったので再描画
+            renderCrowdImage();
+        });
+    }
+
+    // =======================
+    // OFF時のガード処理
+    // =======================
+    if (!window.radarEnabled) {
+        // 画像やタイマーのクリーンアップを実行
+        removeCrowdImage();
+
+        // クリーンアップで非表示になったUIを「OFFモード」として再表示
+        const header = document.querySelector('.menu-header-row');
+        const cloudsUI = document.getElementById('cloudsUI');
+        
+        if (header) header.style.display = '';
+        if (cloudsUI) cloudsUI.textContent = '雨雲レーダー 停止中';
+        
+        if (btn) {
+            btn.textContent = 'ON'; // 次にONにするためのボタン表記
+            btn.classList.add('is-off'); // OFF用の渋いスタイルを適用
+        }
+        return; // これ以降の画像読み込みやタイマー処理を通さずに終了
+    }
+
+    // =======================
+    // ON時のボタン表示リセット
+    // =======================
+    if (btn) {
+        btn.textContent = 'OFF'; // 次にOFFにするためのボタン表記
+        btn.classList.remove('is-off'); // ON用の光るスタイルに戻す
+    }
+
+    // ---------------------------------------------------
+    // これより下は通常の雨雲レーダー描画・スライドショー処理（ON時のみ実行）
+    // ---------------------------------------------------
+    removeCrowdImage();
+
+    // Pane準備
     if (!window.map.getPane('rainPane')) {
         window.map.createPane('rainPane');
         const pane = window.map.getPane('rainPane');
@@ -783,9 +844,7 @@ function renderCrowdImage() {
         pane.style.pointerEvents = 'none';
     }
 
-    // =======================
     // 時刻計算
-    // =======================
     const now = new Date();
     const nowJST = new Date(
         now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" })
@@ -794,11 +853,8 @@ function renderCrowdImage() {
     const hour = nowJST.getHours();
     const slots = [0,3,6,9,12,15,18,21];
 
-    // =======================
     // スライド用データ作成
-    // =======================
     const images = [];
-
     let baseIndex = slots.findIndex(h => h > hour);
     let dayOffset = 0;
 
@@ -808,10 +864,8 @@ function renderCrowdImage() {
     }
 
     for (let i = 0; i < 4; i++) {
-
         const rawIndex = baseIndex + i;
         const idx = rawIndex % slots.length;
-
         const extraDay = Math.floor(rawIndex / slots.length);
 
         const tmpDate = new Date(nowJST);
@@ -820,7 +874,6 @@ function renderCrowdImage() {
         const y = tmpDate.getFullYear();
         const m = String(tmpDate.getMonth()+1).padStart(2,"0");
         const d = String(tmpDate.getDate()).padStart(2,"0");
-
         const hh = String(slots[idx]).padStart(2,"0");
 
         images.push({
@@ -829,9 +882,7 @@ function renderCrowdImage() {
         });
     }
 
-    // =======================
     // header UI
-    // =======================
     const header = document.querySelector('.menu-header-row');
     const cloudsUI = document.getElementById('cloudsUI');
     const headerText = document.querySelector('.header-text');
@@ -852,26 +903,19 @@ function renderCrowdImage() {
 
     // 初期表示
     let currentIndex = 0;
-
     cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
     headerText.textContent =
         formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-    // =======================
     // ログから座標取得
-    // =======================
     fetch("js/fetched_log.txt")
         .then(res => res.text())
         .then(text => {
-
             const lines = text.trim().split("\n");
-
             let best = null;
 
             for (let line of lines) {
-
                 if (!line) continue;
-
                 const parts = line.split(",");
                 if (parts.length < 4) continue;
                 if (parts[0] !== window.currentPref) continue;
@@ -890,9 +934,7 @@ function renderCrowdImage() {
             }
 
             function calcBounds() {
-
                 const z = window.map.getZoom();
-
                 const scale = Math.pow(2, z - best.baseZoom);
                 const size = 512 * scale;
 
@@ -924,25 +966,24 @@ function renderCrowdImage() {
 
             window.map.on("zoomend", window.crowdZoomHandler);
 
-            // =======================
-            // スライドショー
-            // =======================
+            // スライドショー開始
             if (window.crowdSlideTimer) {
                 clearInterval(window.crowdSlideTimer);
             }
 
             window.crowdSlideTimer = setInterval(() => {
+                // ガード：万が一タイマー作動中にOFFにされていたら即停止
+                if (!window.radarEnabled) {
+                    clearInterval(window.crowdSlideTimer);
+                    return;
+                }
 
-                // 現在表示中のレイヤーを退避保持
                 const oldLayer = window.crowdLayer;
-
                 currentIndex = (currentIndex + 1) % images.length;
                 const img = images[currentIndex];
 
-                // ヘッダー更新
                 cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
 
-                // 新しいレイヤー（透明度0で初期化）
                 const newLayer = L.imageOverlay(
                     img.url,
                     calcBounds(),
@@ -953,37 +994,29 @@ function renderCrowdImage() {
                 ).addTo(window.map);
 
                 let opacity = 0;
-
                 const fade = setInterval(() => {
-
-                    opacity += 0.06; // 約10ステップ
+                    opacity += 0.06;
 
                     if (opacity >= MAX_OPACITY) {
                         opacity = MAX_OPACITY;
                         clearInterval(fade);
 
-                        // フェード完了後に古いレイヤーを完全に削除
                         if (oldLayer) {
                             window.map.removeLayer(oldLayer);
                         }
-
                         window.crowdLayer = newLayer;
                     }
 
-                    // 新しいレイヤーはフェードイン
                     newLayer.setOpacity(opacity);
-
-                    // 古いレイヤーが残っていれば同時にフェードアウト
                     if (oldLayer) {
                         oldLayer.setOpacity(MAX_OPACITY - opacity);
                     }
-
                 }, 50);
 
             }, 2500);
-
         });
 }
+
 
 
 function removeCrowdImage() {
