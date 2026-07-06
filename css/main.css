@@ -1088,7 +1088,7 @@ li {
 
     pointer-events: auto;
 
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    
 }
 
 /* =========================
@@ -1138,6 +1138,7 @@ li {
     opacity: 1;
     transform: translateY(0);
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* 最後の要素 */
