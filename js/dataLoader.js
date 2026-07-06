@@ -629,14 +629,11 @@ function phase1menu(areaId) {
         s.type === "substitute"
     ) || null;
 
-
-
     // =====================
-    // header以外削除
+    // リスト削除（スッキリ書き換え）
     // =====================
-    const oldItems = ul.querySelectorAll(':scope > li:not(.menu-header-row)');
+    const oldItems = ul.querySelectorAll('li'); // 古い :scope > li:not(.menu-header-row) の指定を削除
     oldItems.forEach(el => el.remove());
-
     // =====================
     // リスト生成
     // =====================
