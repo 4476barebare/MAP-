@@ -1,3 +1,52 @@
+/* 雨雲文字のレイアウト調整 */
+#cloudsUI {
+    margin-left: 8px;    /* ボタンとの隙間 */
+    margin-right: auto;  /* 日付（header-text）を右端に押し出す魔法 */
+}
+
+/* イカしたネオン風トグルボタン */
+.radar-toggle-btn {
+    background: #111;
+    color: #00e5ff; /* 鮮やかなネオンシアン */
+    border: 1px solid #00e5ff;
+    padding: 2px 10px;
+    font-size: 10px;
+    font-weight: bold;
+    border-radius: 20px; /* カプセル型 */
+    cursor: pointer;
+    line-height: 1.2;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+    text-shadow: 0 0 3px rgba(0, 229, 255, 0.8);
+    outline: none;
+    letter-spacing: 0.5px;
+}
+
+/* ONの時のホバー（さらに発光） */
+.radar-toggle-btn:hover {
+    background: #00e5ff;
+    color: #111;
+    box-shadow: 0 0 15px #00e5ff;
+    text-shadow: none;
+}
+
+/* OFF状態のスタイル（消灯モード） */
+.radar-toggle-btn.is-off {
+    background: #222;
+    color: #666;
+    border-color: #444;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* OFFの時のホバー */
+.radar-toggle-btn.is-off:hover {
+    background: #333;
+    color: #ddd;
+    border-color: #666;
+}
+
+
 .crowd-img-icon {
     opacity: 0.5;
     pointer-events: none;
