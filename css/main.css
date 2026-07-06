@@ -4,13 +4,21 @@
     margin-right: auto;  /* 日付を右端に押し出す魔法 */
 }
 
-/* イカしたネオン風トグルボタン（サイズ修正版） */
+
+/* ==================================
+   雨雲レーダー トグルボタン用CSS
+================================== */
+
+/* ① HTML上は後ろにあるボタンを、視覚的に一番左にワープさせる */
 #map-menu #radarToggleBtn {
-    width: auto;           /* 既存の100%を解除 */
-    min-width: 44px;       /* ON/OFFで幅が変わらないように固定 */
-    padding: 2px 10px;     /* 既存のpadding:0を解除して余白を復活 */
-    text-align: center;    /* 既存の左寄せを解除して中央揃え */
-    flex-shrink: 0;        /* 画面が狭くてもボタンが潰れないようにする */
+    order: -1;          /* これが魔法：一番左に配置される */
+    margin-right: 8px;  /* 右側の文字との隙間 */
+
+    width: auto;
+    min-width: 44px;
+    padding: 2px 10px;
+    text-align: center;
+    flex-shrink: 0;
     
     background: #111;
     color: #00e5ff;
@@ -19,43 +27,23 @@
     font-weight: bold;
     border-radius: 20px;
     cursor: pointer;
-    line-height: 1.2;
     transition: all 0.2s ease-in-out;
     box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
-    text-shadow: 0 0 3px rgba(0, 229, 255, 0.8);
-    outline: none;
-    letter-spacing: 0.5px;
 }
 
-/* #cloudsUI の中身が空（:empty）のとき、その前にあるボタン（#radarToggleBtn）を消す */
-#map-menu #radarToggleBtn:has(+ #cloudsUI:empty) {
-    display: none;
-}
-
-
-/* ONの時のホバー */
 #map-menu #radarToggleBtn:hover {
     background: #00e5ff;
     color: #111;
     box-shadow: 0 0 15px #00e5ff;
-    text-shadow: none;
 }
 
-/* OFF状態のスタイル */
-#map-menu #radarToggleBtn.is-off {
-    background: #222;
-    color: #666;
-    border-color: #444;
-    box-shadow: none;
-    text-shadow: none;
+/* ② cloudsUI（文字）が空っぽのとき、その【直後】にあるボタンを非表示にする */
+#cloudsUI:empty + #radarToggleBtn {
+    display: none !important;
 }
 
-/* OFFの時のホバー */
-#map-menu #radarToggleBtn.is-off:hover {
-    background: #333;
-    color: #ddd;
-    border-color: #666;
-}
+
+
 
 
 
