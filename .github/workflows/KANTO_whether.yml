@@ -1,15 +1,14 @@
 name: KANTO Whether Control
 
 on:
-  workflow_dispatch:
-  workflow_call:
+  workflow_dispatch: # 前段からの連鎖トリガー、および手動実行用
 
 jobs:
   run:
     runs-on: ubuntu-latest
 
     steps:
-      # 【対策1】前段のプッシュがGitHubサーバー側に完全に反映されるまで10秒待ちます
+      # 前段のプッシュがGitHub側に反映されるまで10秒待ちます
       - name: Wait for remote synchronization
         run: sleep 10
 
@@ -19,7 +18,7 @@ jobs:
           fetch-depth: 0
           ref: main
 
-      # 【対策2】前段で更新された最新の KANTO_load.json を確実にローカルに引っ張ってきます
+      # 最新の KANTO_load.json を確実にローカルに引っ張ってきます
       - name: Pull latest changes
         run: |
           git pull origin main
@@ -33,7 +32,7 @@ jobs:
         run: |
           node js/KANTO_control.js
 
-      # 【対策3】Node.jsのCSV書き込み処理が、OSのディスクに完全に保存・クローズされるのを3秒待ちます
+      # ファイル書き込みが完全に終了してクローズされるのを3秒待ちます
       - name: Wait for file write completion
         run: sleep 3
 
@@ -42,8 +41,14 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           
-          # 同時実行による競合を防ぐため、プッシュ直前にもう一度リベースプルを挟みます
+          # 1. 生成されたCSVファイルを一度安全に退避させる
+          git stash --include-untracked
+          
+          # 2. プッシュ直前に最新のリモート状態を同期（エラー128対策）
           git pull --rebase origin main
+          
+          # 3. 退避させたCSVファイルを復元する
+          git stash pop || true
           
           git add data/*.csv || true
           git diff --cached --quiet && echo "No changes" && exit 0
