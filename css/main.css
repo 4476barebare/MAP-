@@ -1157,9 +1157,19 @@ li {
     width: 100%;
     font-size: 12px;
     white-space: nowrap;
-    /*filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));*/
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
 }
 
+/* 雨雲ボタンがある行全体のドロップシャドウを解除する */
+.menu-header-row > div:has(#radarToggleBtn) {
+    filter: none !important;
+}
+
+/* もし「文字（雨雲レーダー・日付）」が見えづらくなる場合は、文字にだけ影をつけ直す */
+#cloudsUI,
+.menu-header-row > div:has(#radarToggleBtn) .header-text {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
 
 /* =========================
    アニメーション
