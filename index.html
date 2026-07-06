@@ -262,14 +262,10 @@ function initAreaUI() {
     if (!ul) return;
 
     // =====================
-    // ■ リスト削除（headerは残す）
+    // ■ リスト削除（スッキリ書き換え）
     // =====================
-const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
+    const oldItems = ul.querySelectorAll('li'); // 古い :not(.menu-header-row) の指定を削除
     oldItems.forEach(el => el.remove());
-
-
-
-    // ※ここでは中身を触らない（cloudsUIも入れない）
 
     // =====================
     // ■ エリアリスト
@@ -363,15 +359,11 @@ const oldItems = ul.querySelectorAll('li:not(.menu-header-row)');
 function destroyAreaUI() {
     const menuUl = document.querySelector('#map-menu ul');
 
-    // ★ headerだけ非表示
-    const header = document.querySelector('.menu-header-row');
-    if (header) {
-        header.style.display = 'none';
-    }
+    // ★ headerを強制的に none にしていた古い記述を完全に削除しました
 
     // ★ リストだけ削除
     if (menuUl) {
-        const items = menuUl.querySelectorAll('li:not(.menu-header-row)');
+        const items = menuUl.querySelectorAll('li'); // headerが外に出たので、単純に li を全部消すだけでOK
         items.forEach(el => el.remove());
     }
 
@@ -383,6 +375,7 @@ function destroyAreaUI() {
     window.nearestClickEnabled = false;
     document.getElementById('map-menu').style.display = 'none';
 }
+
 
 // =======================
 // ROUTE UPDATE
