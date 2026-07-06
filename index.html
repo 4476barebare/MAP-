@@ -1025,6 +1025,7 @@ function renderCrowdImage() {
         });
 }
 
+// 【修正後の removeCrowdImage】
 function removeCrowdImage() {
 
     // =======================
@@ -1054,20 +1055,16 @@ function removeCrowdImage() {
     const header = document.querySelector('.menu-header-row');
     if (!header) return;
 
-    const cloudsUI = document.getElementById('cloudsUI');   // 左
-    const headerText = document.querySelector('.header-text'); // 右
-    const btn = document.getElementById('radarToggleBtn');  // ★ トグルボタン
+    const cloudsUI = document.getElementById('cloudsUI');
+    const headerText = document.querySelector('.header-text');
 
     if (window.phase2Initialized) {
         // phase2 → 左だけ消す
         if (cloudsUI) cloudsUI.textContent = '';
-        if (btn) btn.style.display = 'none'; // ★ 左側が消える時にボタンも隠す
-        // 右は触らない
     } else {
         // 通常 → 両方消す
         if (cloudsUI) cloudsUI.textContent = '';
         if (headerText) headerText.textContent = '';
-        if (btn) btn.style.display = 'none'; // ★ 左側が消える時にボタンも隠す
     }
 
     // =======================
@@ -1082,6 +1079,7 @@ function removeCrowdImage() {
         header.style.display = '';
     }
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
