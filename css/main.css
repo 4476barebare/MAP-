@@ -27,6 +27,12 @@
     letter-spacing: 0.5px;
 }
 
+/* #cloudsUI の中身が空（:empty）のとき、その前にあるボタン（#radarToggleBtn）を消す */
+#map-menu #radarToggleBtn:has(+ #cloudsUI:empty) {
+    display: none;
+}
+
+
 /* ONの時のホバー */
 #map-menu #radarToggleBtn:hover {
     background: #00e5ff;
