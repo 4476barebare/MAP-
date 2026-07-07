@@ -3,7 +3,13 @@ name: Acquire Crowd Images
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 21,9 * * *'  # JST 06:15 / 18:15（5分後）
+    - cron: '15 21,9 * * *'  # JST 06:15 / 18:15
+
+# GitHub Pagesへの直接デプロイに必要な権限を設定
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   acquire:
@@ -12,21 +18,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # 最新の履歴だけを取得して時短
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm' # npmのキャッシュを有効にして時短
 
       - name: Run acquire script
         run: node js/acquireCrowds.cjs
 
-      - name: Commit and push files
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+      # ========================================================
+      # GitHub Pages への直接デプロイ（Commit & Push は不要に！）
+      # ========================================================
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # 公開したいフォルダを指定します。リポジトリ全体なら './'
+          # もし特定のフォルダ（例: docs や public）だけ公開しているならそこを指定してください
+          path: './'
 
-          git add .
-          git commit -m "update images" || echo "no changes"
-
-          git push
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
