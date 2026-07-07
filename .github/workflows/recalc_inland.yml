@@ -1,57 +1,73 @@
-name: "Daily KANTO Trigger and Update"
+name: Recalculate InLand Weather Data
 
 on:
-  workflow_dispatch:
+  # 定期実行（時間はUTCで指定。UTCの17:00 ＝ 日本時間の02:00）
   schedule:
-    - cron: "0 15 * * *"
-    - cron: "5 15 * * *"
+    - cron: '0 17 * * *'  # 毎日 02:00 JST
+    - cron: '5 17 * * *'  # 毎日 02:05 JST
+  # 手動実行用ボタンも残しておきます
+  workflow_dispatch:
 
+# Gitへの書き込み権限と、Pagesへの直接デプロイ権限を設定
 permissions:
   contents: write
   pages: write
   id-token: write
 
 jobs:
-  run:
+  recalculate:
     runs-on: ubuntu-latest
-    steps:
-      - name: "Trigger XREA API"
-        run: |
-          TS=$(date +%s)
-          SECRET=${{ secrets.XREA_SECRET }}
-          SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
-          curl -s "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG" > /dev/null &
 
-      - name: "Checkout repository"
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: "Setup Node"
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: '20'
+          cache: 'npm' # npmキャッシュを有効化して時短
 
-      - name: "Install dependencies"
-        run: npm install
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f package.json ]; then
+            npm install
+          else
+            echo "No package.json found. Skipping npm install."
+          fi
 
-      - name: "Run News script"
-        run: node js/newsNode.js
+      # 1. Node.jsで補間計算を実行するステップ
+      - name: Run recalculation script
+        run: node js/recalcInLand.js
+        env:
+          TZ: 'Asia/Tokyo' # 日付判定を日本時間に合わせるため必須
 
-      - name: "Commit and Push"
+      # 2. 計算結果をリポジトリに保存（コミット＆プッシュ）
+      - name: Commit and Push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data/news.json
-          git diff --cached --quiet || git commit -m "update news json"
-          git push origin main
+          
+          # dataディレクトリ以下の変更をステージング
+          git add data/
+          
+          # 変更がある場合のみコミットしてプッシュ
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: [KANTO] 内陸補間データの再計算を反映"
+            git push origin main
+          else
+            echo "✅ 変更がない（またはスキップされた）ため、コミットしませんでした。"
+          fi
 
-      - name: "Trigger InLand PHP"
-        run: curl -sS https://turiiko.shop/actions/inLandwhether.php > /dev/null &
-
-      - name: "Upload Artifact"
+      # ========================================================
+      # GitHub Pages への直接デプロイ（新設！）
+      # ========================================================
+      - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: './' # 計算後の最新データを含むリポジトリ全体を公開
 
-      - name: "Deploy to GitHub Pages"
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
