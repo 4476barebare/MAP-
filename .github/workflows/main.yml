@@ -5,6 +5,12 @@ on:
   schedule:
     - cron: '0 16 * * *' # 1日1回のみ実行（JST 01:00 相当）
 
+# Gitへの書き込み権限と、Pagesへの直接デプロイ権限を設定
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
@@ -53,6 +59,22 @@ jobs:
             echo "CHANGES=true" >> $GITHUB_OUTPUT
           fi
 
+      # ========================================================
+      # GitHub Pages への直接デプロイ（新設！）
+      # ========================================================
+      - name: Upload Artifact
+        if: steps.commit_result.outputs.CHANGES == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './' # 更新された KANTO_load.json を含む全体を公開
+
+      - name: Deploy to GitHub Pages
+        if: steps.commit_result.outputs.CHANGES == 'true'
+        uses: actions/deploy-pages@v4
+
+      # ========================================================
+      # 次のワークフローへの連鎖トリガー
+      # ========================================================
       - name: Trigger KANTO Whether Control
         if: steps.commit_result.outputs.CHANGES == 'true'
         uses: actions/github-script@v7
