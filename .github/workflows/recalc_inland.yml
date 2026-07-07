@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm' # npmキャッシュを有効化して時短
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
@@ -80,7 +80,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './' # リポジトリ全体を公開
+          path: './'
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
