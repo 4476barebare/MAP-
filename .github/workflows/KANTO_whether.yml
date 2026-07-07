@@ -1,9 +1,8 @@
 name: KANTO Whether Control
 
 on:
-  workflow_dispatch: # 前段からの連鎖トリガー、および手動実行用
+  workflow_dispatch:
 
-# GitHub Pagesへの直接デプロイに必要な権限を設定
 permissions:
   contents: read
   pages: write
@@ -14,34 +13,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Gitへのプッシュを待つ必要がなくなったため「sleep 10」は削除
-
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1 # 最新の1コミットだけを取得して爆速化
-
-      # リモートへのコミット追従（git pull）も不要になったため削除
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm' # npmキャッシュを有効化（package.json等がある場合）
+          node-version: "24" # 20から24に変更し、cache: 'npm'を完全に削除
 
       - name: Run KANTO Control
         run: |
           node js/KANTO_control.js
 
-      # ファイルクローズを待つ「sleep 3」や、複雑な「Commit results」はすべて削除
-
-      # ========================================================
-      # GitHub Pages への直接デプロイ（一撃で反映！）
-      # ========================================================
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './' # リポジトリ全体をPagesに公開
+          path: './'
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
