@@ -2,9 +2,7 @@ name: Daily KANTO Trigger & Update News
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 15 * * *"
-    - cron: "5 15 * * *"
+
 
 permissions:
   contents: write
