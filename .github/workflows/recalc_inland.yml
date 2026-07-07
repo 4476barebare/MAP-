@@ -8,12 +8,15 @@ on:
   # 手動実行用ボタンも残しておきます
   workflow_dispatch:
 
+# Gitへの書き込み権限と、Pagesへの直接デプロイ権限を設定
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   recalculate:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout repository
@@ -23,6 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm' # npmキャッシュを有効化して時短
 
       - name: Install dependencies
         run: |
@@ -56,3 +60,14 @@ jobs:
           else
             echo "✅ 変更がない（またはスキップされた）ため、コミットしませんでした。"
           fi
+
+      # ========================================================
+      # GitHub Pages への直接デプロイ（新設！）
+      # ========================================================
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './' # 計算後の最新データを含むリポジトリ全体を公開
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
