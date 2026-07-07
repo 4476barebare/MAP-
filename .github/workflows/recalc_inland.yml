@@ -34,22 +34,13 @@ jobs:
             echo "No package.json found. Skipping npm install."
           fi
 
-      # 1. PHPを叩いて10秒待機するステップ
-      - name: Trigger PHP script and wait
-        run: |
-          echo "🌐 PHPスクリプトを実行し、APIから最新の天気データをサーバーに生成させます..."
-          curl -sS https://turiiko.shop/actions/inLandwhether.php
-          
-          echo "⏳ データの書き込み完了を確実にするため、10秒間スリープします..."
-          sleep 10
-
-      # 2. Node.jsで補間計算を実行するステップ
+      # 1. Node.jsで補間計算を実行するステップ
       - name: Run recalculation script
         run: node js/recalcInLand.js
         env:
           TZ: 'Asia/Tokyo' # 日付判定を日本時間に合わせるため必須
 
-      # 3. 計算結果をリポジトリに保存（コミット＆プッシュ）
+      # 2. 計算結果をリポジトリに保存（コミット＆プッシュ）
       - name: Commit and Push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
