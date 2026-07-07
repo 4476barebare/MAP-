@@ -5,9 +5,8 @@ on:
   schedule:
     - cron: '15 21,9 * * *'  # JST 06:15 / 18:15
 
-# GitHub Pagesへの直接デプロイに必要な権限を設定
 permissions:
-  contents: read
+  contents: write # 🌟 リポジトリへの書き込み権限に変更
   pages: write
   id-token: write
 
@@ -24,10 +23,29 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24' # 20から24に変更し、エラーの原因だった cache: 'npm' を完全に削除しました
+          node-version: '24'
 
       - name: Run acquire script
         run: node js/acquireCrowds.cjs
+
+      # ========================================================
+      # 🌟 新規追加：取得した画像をリポジトリに保存する処理
+      # ========================================================
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 取得した画像などの変更をすべてステージング
+          git add .
+          
+          # 変更がある場合のみコミットしてプッシュ
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: 群衆画像の取得を反映"
+            git push origin main
+          else
+            echo "✅ 画像に変更がなかったためコミットをスキップしました。"
+          fi
 
       # ========================================================
       # GitHub Pages への直接デプロイ
