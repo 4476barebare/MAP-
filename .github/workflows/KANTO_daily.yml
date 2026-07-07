@@ -1,0 +1,72 @@
+name: Daily KANTO Trigger & Update News
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 15 * * *"
+    - cron: "5 15 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ========================================================
+      # 1. XREA API トリガー（非同期・即終了）
+      # ========================================================
+      - name: Trigger XREA API (Async)
+        run: |
+          echo "=== XREA API call triggered (Async) ==="
+          TS=$(date +%s)
+          SECRET=${{ secrets.XREA_SECRET }}
+          SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
+          echo "Request: ts=$TS"
+          
+          curl -s "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG" > /dev/null &
+          
+          echo "=== XREA Trigger done ==="
+
+      # ========================================================
+      # 2. News JSON 更新のための事前準備
+      # ========================================================
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      # ========================================================
+      # 3. News JSON の更新処理＆コミット・プッシュ
+      # ========================================================
+      - name: Run News script
+        run: node js/newsNode.js
+
+      - name: Commit & Push News Changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git add data/news.json
+
+          git diff --cached --quiet || git commit -m "update news json"
+          git push origin main
+
+      # ========================================================
+      # 4. 内陸天気データ再計算のトリガー（非同期で叩いてワークフロー終了）
+      # ========================================================
+      - name: Trigger InLand PHP script (Async)
+        run: |
+          echo "🌐 PHPスクリプトをバックグラウンドで実行します（待ち時間なし）..."
+          
+          # 処理を非同期で走らせ、Actions自体は完了を待たずに即終了します
+          curl -sS https://turiiko.shop/actions/inLandwhether.php > /dev/null &
+          
+          echo "🤖 InLand PHP Triggered successfully."
