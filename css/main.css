@@ -45,15 +45,6 @@
 }
 
 
-/* ② cloudsUI（文字）が空っぽのとき、その【直後】にあるボタンを非表示にする */
-#cloudsUI:empty + #radarToggleBtn {
-    display: none !important;
-}
-
-
-
-
-
 
 .crowd-img-icon {
     opacity: 0.5;
