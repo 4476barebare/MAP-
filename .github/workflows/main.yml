@@ -5,11 +5,11 @@ on:
   schedule:
     - cron: '0 16 * * *' # 1日1回のみ実行（JST 01:00 相当）
 
-# Gitへの書き込み権限と、Pagesへの直接デプロイ権限を設定
 permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write # 🌟 コレを追加！別のymlを起動（トリガー）するために必須の権限です
 
 jobs:
   fetch:
@@ -60,7 +60,7 @@ jobs:
           fi
 
       # ========================================================
-      # GitHub Pages への直接デプロイ（新設！）
+      # GitHub Pages への直接デプロイ
       # ========================================================
       - name: Upload Artifact
         if: steps.commit_result.outputs.CHANGES == 'true'
