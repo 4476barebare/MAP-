@@ -775,48 +775,70 @@ function renderCrowdImage() {
     }
 
     // =======================
-    // トグルボタンのクリックイベント（OFFにするだけ）
+    // トグルボタンのクリックイベント（ON/OFFの切り替え）
     // =======================
     const btn = document.getElementById('radarToggleBtn');
     if (btn && !btn.dataset.listenerAdded) {
         btn.dataset.listenerAdded = "true";
         btn.addEventListener('click', function() {
-            // 内部システムを完全にOFFとして記録
-            window.radarEnabled = false;
-            
-            // レーダーのお掃除
-            removeCrowdImage();
-            
-            // ボタン自身を隠す
-            btn.style.display = 'none';
+            // 状態を反転 (ONならOFFに、OFFならONに)
+            window.radarEnabled = !window.radarEnabled;
+
+            if (!window.radarEnabled) {
+                // OFFにする時はタイマーとレイヤーを即座に停止
+                if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
+                if (window.crowdLayer) window.map.removeLayer(window.crowdLayer);
+                if (window.crowdZoomHandler) window.map.off("zoomend", window.crowdZoomHandler);
+                window.crowdSlideTimer = null;
+                window.crowdLayer = null;
+                window.crowdZoomHandler = null;
+            }
+
+            // 状態が切り替わったので再描画
+            renderCrowdImage();
         });
     }
 
     // =======================
-    // エリア移動時のガード（OFFなら二度と復活させない）
+    // OFF時のガード処理（エリア移動してもOFFをキープ）
     // =======================
     if (!window.radarEnabled) {
         removeCrowdImage(); 
+
         const header = document.querySelector('.menu-header-row');
+        const cloudsUI = document.getElementById('cloudsUI');
         const headerText = document.querySelector('.header-text');
         
-        // レーダーは消しても、右側の日付と潮汐だけは表示をキープ
+        if (header) header.style.display = '';
+        
+        // ★ OFFの時は文字をスッキリ消す
+        if (cloudsUI) cloudsUI.textContent = '';
+        
+        // 右側の日付と潮汐だけは表示をキープ
         if (headerText && window.todayTide) {
             headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-            if (header) header.style.display = '';
         }
         
-        // 念のためボタンを非表示に固定
-        if (btn) btn.style.display = 'none';
+        // ★ ボタンは「ON」として表示し続ける
+        if (btn) {
+            btn.style.display = ''; 
+            btn.textContent = 'ON'; 
+            btn.classList.add('is-off'); 
+        }
         
-        return; // ★ レーダーの処理をここで強制終了！
+        return; // これ以降のレーダー画像の読み込みやタイマー処理をブロック！
     }
 
     // =======================
-    // ここから下は通常のON時の処理
+    // ON時のボタン状態リセット（エリア移動してもONをキープ）
     // =======================
+    if (btn) {
+        btn.style.display = '';
+        btn.textContent = 'OFF';
+        btn.classList.remove('is-off');
+    }
+
     removeCrowdImage();
-    if (btn) btn.style.display = ''; // ON時はボタンを表示する
 
     // =======================
     // Pane準備
