@@ -3,54 +3,45 @@ name: KANTO Whether Control
 on:
   workflow_dispatch: # 前段からの連鎖トリガー、および手動実行用
 
+# GitHub Pagesへの直接デプロイに必要な権限を設定
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   run:
     runs-on: ubuntu-latest
 
     steps:
-      # 前段のプッシュがGitHub側に反映されるまで10秒待ちます
-      - name: Wait for remote synchronization
-        run: sleep 10
+      # Gitへのプッシュを待つ必要がなくなったため「sleep 10」は削除
 
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          ref: main
+          fetch-depth: 1 # 最新の1コミットだけを取得して爆速化
 
-      # 最新の KANTO_load.json を確実にローカルに引っ張ってきます
-      - name: Pull latest changes
-        run: |
-          git pull origin main
+      # リモートへのコミット追従（git pull）も不要になったため削除
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm' # npmキャッシュを有効化（package.json等がある場合）
 
       - name: Run KANTO Control
         run: |
           node js/KANTO_control.js
 
-      # ファイル書き込みが完全に終了してクローズされるのを3秒待ちます
-      - name: Wait for file write completion
-        run: sleep 3
+      # ファイルクローズを待つ「sleep 3」や、複雑な「Commit results」はすべて削除
 
-      - name: Commit results
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          
-          # 1. 生成されたCSVファイルを一度安全に退避させる
-          git stash --include-untracked
-          
-          # 2. プッシュ直前に最新のリモート状態を同期（エラー128対策）
-          git pull --rebase origin main
-          
-          # 3. 退避させたCSVファイルを復元する
-          git stash pop || true
-          
-          git add data/*.csv || true
-          git diff --cached --quiet && echo "No changes" && exit 0
-          git commit -m "update whether csv"
-          git push origin main
+      # ========================================================
+      # GitHub Pages への直接デプロイ（一撃で反映！）
+      # ========================================================
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './' # リポジトリ全体をPagesに公開
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
