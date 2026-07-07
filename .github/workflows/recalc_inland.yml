@@ -1,11 +1,9 @@
 name: Recalculate InLand Weather Data
 
 on:
-  # 定期実行（時間はUTCで指定。UTCの17:00 ＝ 日本時間の02:00）
   schedule:
     - cron: '0 17 * * *'  # 毎日 02:00 JST
     - cron: '5 17 * * *'  # 毎日 02:05 JST
-  # 手動実行用ボタンも残しておきます
   workflow_dispatch:
 
 # Gitへの書き込み権限と、Pagesへの直接デプロイ権限を設定
@@ -25,8 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm' # npmキャッシュを有効化して時短
+          node-version: '24' # ここを24にし、cache: 'npm' を完全に削除しました
 
       - name: Install dependencies
         run: |
@@ -38,22 +35,18 @@ jobs:
             echo "No package.json found. Skipping npm install."
           fi
 
-      # 1. Node.jsで補間計算を実行するステップ
       - name: Run recalculation script
         run: node js/recalcInLand.js
         env:
           TZ: 'Asia/Tokyo' # 日付判定を日本時間に合わせるため必須
 
-      # 2. 計算結果をリポジトリに保存（コミット＆プッシュ）
       - name: Commit and Push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # dataディレクトリ以下の変更をステージング
           git add data/
           
-          # 変更がある場合のみコミットしてプッシュ
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: [KANTO] 内陸補間データの再計算を反映"
             git push origin main
@@ -61,13 +54,10 @@ jobs:
             echo "✅ 変更がない（またはスキップされた）ため、コミットしませんでした。"
           fi
 
-      # ========================================================
-      # GitHub Pages への直接デプロイ（新設！）
-      # ========================================================
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './' # 計算後の最新データを含むリポジトリ全体を公開
+          path: './'
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
