@@ -3,6 +3,7 @@ name: Daily XREA Trigger
 on:
   workflow_dispatch:
   schedule:
+    - cron: "0 15 * * *"
     - cron: "5 15 * * *"
 
 jobs:
