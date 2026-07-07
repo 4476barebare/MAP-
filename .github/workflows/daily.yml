@@ -1,4 +1,4 @@
-name: Daily XREA Trigger
+name: Daily KANTO whether request
 
 on:
   workflow_dispatch:
@@ -11,28 +11,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 1st Call
+      - name: Trigger API
         run: |
-          echo "=== First call start ==="
+          echo "=== API call triggered (Async) ==="
           TS=$(date +%s)
           SECRET=${{ secrets.XREA_SECRET }}
           SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
           echo "Request: ts=$TS"
-          curl -v "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG"
-          echo "=== First call end ==="
-
-      - name: Wait 5 seconds
-        run: |
-          echo "=== Waiting 5 seconds ==="
-          sleep 5
-          echo "=== Wait done ==="
-
-      - name: 2nd Call
-        run: |
-          echo "=== Second call start ==="
-          TS=$(date +%s)
-          SECRET=${{ secrets.XREA_SECRET }}
-          SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
-          echo "Request: ts=$TS"
-          curl -v "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG"
-          echo "=== Second call end ==="
+          curl -s "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG" > /dev/null &
+          
+          echo "=== Trigger done ==="
