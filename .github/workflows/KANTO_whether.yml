@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # 🌟 リポジトリへの書き込み権限に変更
   pages: write
   id-token: write
 
@@ -21,12 +21,34 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "24" # 20から24に変更し、cache: 'npm'を完全に削除
+          node-version: "24"
 
       - name: Run KANTO Control
         run: |
           node js/KANTO_control.js
 
+      # ========================================================
+      # 🌟 新規追加：スクリプトが更新したデータをリポジトリに保存
+      # ========================================================
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 更新されたファイル（dataフォルダなど）をすべて追加
+          git add .
+          
+          # 変更がある場合のみコミットしてプッシュ
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: [KANTO] 天気コントロール処理の更新を反映"
+            git push origin main
+          else
+            echo "✅ データに変更がなかったためコミットをスキップしました。"
+          fi
+
+      # ========================================================
+      # GitHub Pages への直接デプロイ
+      # ========================================================
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
