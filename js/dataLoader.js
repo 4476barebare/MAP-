@@ -550,23 +550,18 @@ function showSpotsForArea(areaKey) {
     );
 }
 
-
 function selectSpot(spot) {
-    
     const currentZoom = window.map.getZoom();
 
-if (currentZoom === 13) {
-
-    const zoom = Number(spot.zoom);
-
-    if (!Number.isNaN(zoom)) {
-        zoomToSpot(spot);
-    } else {
-    
-        showFishPopup(spot);
+    if (currentZoom === 13) {
+        const zoom = Number(spot.zoom);
+        if (!Number.isNaN(zoom)) {
+            zoomToSpot(spot);
+        } else {
+            showFishPopup(spot);
+        }
+        return;
     }
-    return;
-}
 
     if (window.markerControl) {
         markerControl.showShop02(window.currentAreaId);
@@ -591,16 +586,30 @@ if (currentZoom === 13) {
 
     disableAreaSwipe();
 
+    // 【修正点①】移動前に一度 Bounds 制限を解除し、移動中の強制補正（引っ掛かり）を防ぐ
+    window.map.setMaxBounds(null);
+
+    // 目的地へ移動
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
+    // 移動が完全に終わった後の処理
     window.map.once('moveend', () => {
+        // 【修正点②】PC等の広い画面サイズをLeafletに正確に再認識させる
+        window.map.invalidateSize(true);
+        
         window.map.dragging.enable();
-        window.map.setMaxBounds(window.areaBounds);
         window.map.options.maxBoundsViscosity = 1.0;
+
+        // 【修正点③】1フレーム待ってから Bounds を設定する（跳ね返りの防止）
+        requestAnimationFrame(() => {
+            window.map.setMaxBounds(window.areaBounds);
+        });
     });
 
     enablePhase2(window.map);
 }
+
+
 
 function phase1menu(areaId) {
 
