@@ -42,7 +42,7 @@ function loadLocationCSV(csvUrl) {
 
                 return {
                     name: cols[0].trim(),
-                    zoom: parseFloat(cols[1]),
+                    zoom: cols[1] && cols[1].trim() !== '' ? parseFloat(cols[1]) : '',
                     individualId: cols[2] ? cols[2].trim() : '',
                     lat: parseFloat(cols[3]),
                     lng: parseFloat(cols[4]),
@@ -554,8 +554,8 @@ function selectSpot(spot) {
     const currentZoom = window.map.getZoom();
 
     if (currentZoom === 13) {
-        const zoom = Number(spot.zoom);
-        if (!Number.isNaN(zoom)) {
+        // ★ NaNではなく、「空欄（空文字）ではないか」で判別する
+        if (spot.zoom !== '') {
             zoomToSpot(spot);
         } else {
             showFishPopup(spot);
@@ -586,21 +586,16 @@ function selectSpot(spot) {
 
     disableAreaSwipe();
 
-    // 【修正点①】移動前に一度 Bounds 制限を解除し、移動中の強制補正（引っ掛かり）を防ぐ
     window.map.setMaxBounds(null);
 
-    // 目的地へ移動
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
-    // 移動が完全に終わった後の処理
     window.map.once('moveend', () => {
-        // 【修正点②】PC等の広い画面サイズをLeafletに正確に再認識させる
         window.map.invalidateSize(true);
         
         window.map.dragging.enable();
         window.map.options.maxBoundsViscosity = 1.0;
 
-        // 【修正点③】1フレーム待ってから Bounds を設定する（跳ね返りの防止）
         requestAnimationFrame(() => {
             window.map.setMaxBounds(window.areaBounds);
         });
@@ -608,7 +603,6 @@ function selectSpot(spot) {
 
     enablePhase2(window.map);
 }
-
 
 
 function phase1menu(areaId) {
