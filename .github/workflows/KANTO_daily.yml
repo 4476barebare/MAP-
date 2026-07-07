@@ -31,7 +31,8 @@ jobs:
           node-version: "24"
 
       - name: "Install dependencies"
-        run: npm install
+        # package.jsonを無視して、必要なこの3つだけをピンポイントでインストールします
+        run: npm install node-fetch iconv-lite fast-xml-parser
 
       - name: "Run News script"
         run: node js/newsNode.js
