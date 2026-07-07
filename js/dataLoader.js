@@ -485,16 +485,7 @@ function showSpotsForArea(areaKey) {
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
         window.prefSpotLayer = null;
-    }function saveMapState() {
-    let tile = null;
-    if (window.gsiLayer && window.map.hasLayer(window.gsiLayer)) {
-        tile = window.gsiLayer;
     }
-    window.mapStateSnapshot = {
-        tileLayer: tile
-    };
-}
-
 
     if (!window.areaSpotLayer) {
         window.areaSpotLayer = L.layerGroup().addTo(window.map);
@@ -502,15 +493,21 @@ function showSpotsForArea(areaKey) {
         window.areaSpotLayer.clearLayers();
     }
 
-    const spots = window.spotData.filter(s => s.areaId === areaKey);
+    // 【変更点1】エリアが一致し、かつ「icon列が空欄ではない（値が存在する）」ものだけを抽出
+    const spots = window.spotData.filter(s => 
+        s.areaId === areaKey && s.icon && s.icon.trim() !== ''
+    );
+    
     if (!spots.length) return;
 
     let minLat = Infinity, maxLat = -Infinity;
     let minLng = Infinity, maxLng = -Infinity;
 
     spots.forEach(spot => {
-
-        const iconId = spot.icon || 'spot';
+        // 【変更点2】空欄はすでに弾かれているので、入力されているiconの値をそのまま使う
+        const iconId = spot.icon; 
+        
+        // スタイル分岐の維持（例：fishから始まるかどうかでz-indexを変えるなど）
         const isFish = iconId.startsWith('fish');
 
         const marker = L.marker([spot.lat, spot.lng], {
@@ -529,14 +526,12 @@ function showSpotsForArea(areaKey) {
                 ? 600 + Math.floor(Math.random() * 50)
                 : Math.floor(Math.random() * 500)
         });
-spot.marker = marker;
+        
+        spot.marker = marker;
 
-
-marker.on('click', function () {
-    
-    selectSpot(spot); // ←これだけ
-    
-});
+        marker.on('click', function () {
+            selectSpot(spot);
+        });
 
         window.areaSpotLayer.addLayer(marker);
 
@@ -554,6 +549,7 @@ marker.on('click', function () {
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
 }
+
 
 function selectSpot(spot) {
     
