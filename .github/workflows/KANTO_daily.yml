@@ -6,8 +6,11 @@ on:
     - cron: "0 15 * * *"
     - cron: "5 15 * * *"
 
+# Gitへの書き込み権限と、Pagesへの直接デプロイ権限を両方セット[span_1](start_span)[span_1](end_span)
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   run:
@@ -15,58 +18,69 @@ jobs:
 
     steps:
       # ========================================================
-      # 1. XREA API トリガー（非同期・即終了）
+      # 1. XREA API トリガー（非同期・即終了）[span_2](start_span)[span_2](end_span)
       # ========================================================
-      - name: Trigger XREA API (Async)
+      - name: Trigger XREA API (Async)[span_3](start_span)[span_3](end_span)
         run: |
-          echo "=== XREA API call triggered (Async) ==="
-          TS=$(date +%s)
-          SECRET=${{ secrets.XREA_SECRET }}
-          SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
-          echo "Request: ts=$TS"
+          echo "=== XREA API call triggered (Async) ===[span_4](start_span)"[span_4](end_span)
+          TS=$(date +%s)[span_5](start_span)[span_5](end_span)
+          SECRET=${{ secrets.XREA_SECRET }}[span_6](start_span)[span_6](end_span)
+          SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')[span_7](start_span)[span_7](end_span)
+          echo "Request: ts=$TS[span_8](start_span)"[span_8](end_span)
           
-          curl -s "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG" > /dev/null &
+          curl -s "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG" > /dev/null &[span_9](start_span)[span_9](end_span)
           
-          echo "=== XREA Trigger done ==="
+          echo "=== XREA Trigger done ===[span_10](start_span)"[span_10](end_span)
 
       # ========================================================
-      # 2. News JSON 更新のための事前準備
+      # 2. News JSON 更新のための事前準備[span_11](start_span)[span_11](end_span)
       # ========================================================
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout repository[span_12](start_span)[span_12](end_span)
+        uses: actions/checkout@v4[span_13](start_span)[span_13](end_span)
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js[span_14](start_span)[span_14](end_span)
+        uses: actions/setup-node@v4[span_15](start_span)[span_15](end_span)
         with:
-          node-version: '20'
+          node-version: '20[span_16](start_span)'[span_16](end_span)
+          cache: 'npm' # npmキャッシュを有効化して時短
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install dependencies[span_17](start_span)[span_17](end_span)
+        run: npm install[span_18](start_span)[span_18](end_span)
 
       # ========================================================
-      # 3. News JSON の更新処理＆コミット・プッシュ
+      # 3. News JSON の更新処理＆コミット・プッシュ[span_19](start_span)[span_19](end_span)
       # ========================================================
-      - name: Run News script
-        run: node js/newsNode.js
+      - name: Run News script[span_20](start_span)[span_20](end_span)
+        run: node js/newsNode.js[span_21](start_span)[span_21](end_span)
 
-      - name: Commit & Push News Changes
+      - name: Commit & Push News Changes[span_22](start_span)[span_22](end_span)
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com[span_23](start_span)"[span_23](end_span)
+          git config --local user.name "github-actions[bot][span_24](start_span)"[span_24](end_span)
 
-          git add data/news.json
+          git add data/news.json[span_25](start_span)[span_25](end_span)
 
-          git diff --cached --quiet || git commit -m "update news json"
-          git push origin main
+          git diff --cached --quiet || git commit -m "update news json[span_26](start_span)"[span_26](end_span)
+          git push origin main[span_27](start_span)[span_27](end_span)
 
       # ========================================================
-      # 4. 内陸天気データ再計算のトリガー（非同期で叩いてワークフロー終了）
+      # 4. 内陸天気データ再計算のトリガー（非同期）[span_28](start_span)[span_28](end_span)
       # ========================================================
-      - name: Trigger InLand PHP script (Async)
+      - name: Trigger InLand PHP script (Async)[span_29](start_span)[span_29](end_span)
         run: |
-          echo "🌐 PHPスクリプトをバックグラウンドで実行します（待ち時間なし）..."
+          echo "🌐 PHPスクリプトをバックグラウンドで実行します（待ち時間なし）...[span_30](start_span)"[span_30](end_span)
           
-          # 処理を非同期で走らせ、Actions自体は完了を待たずに即終了します
-          curl -sS https://turiiko.shop/actions/inLandwhether.php > /dev/null &
+          curl -sS https://turiiko.shop/actions/inLandwhether.php > /dev/null &[span_31](start_span)[span_31](end_span)
           
-          echo "🤖 InLand PHP Triggered successfully."
+          echo "🤖 InLand PHP Triggered successfully.[span_32](start_span)"[span_32](end_span)
+
+      # ========================================================
+      # 5. GitHub Pages への直接デプロイ（新設！）
+      # ========================================================
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './' # リポジトリ全体（更新されたnews.json含む）を公開
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
