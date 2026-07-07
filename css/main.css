@@ -13,10 +13,11 @@
 /* ==================================
    雨雲レーダー トグルボタン用CSS
 ================================== */
-/* ① HTML上は後ろにあるボタンを、視覚的に一番左にワープさせる */
+
+/* ① 基本スタイル（マイルド・マリンブルー） */
 #map-menu #radarToggleBtn {
     order: -1;
-    margin-left: 4px;   /* ★追加：左側のシャドウ見切れ防止！ */
+    margin-left: 4px;   
     margin-right: 8px;
 
     width: auto;
@@ -25,16 +26,17 @@
     text-align: center;
     flex-shrink: 0;
     
-    /* マイルドな海色ネオンデザイン */
     background: rgba(0, 20, 40, 0.8);
-    color: #4ba3e3; /* 落ち着いたクリアブルー */
+    color: #4ba3e3; 
     border: 1px solid #4ba3e3;
     font-size: 10px;
     font-weight: bold;
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 0 6px rgba(75, 163, 227, 0.4); /* マイルドな発光 */
+    box-shadow: 0 0 6px rgba(75, 163, 227, 0.4); 
+    outline: none;
+    letter-spacing: 0.5px;
 }
 
 /* ONの時のホバー */
@@ -43,6 +45,23 @@
     color: #fff;
     box-shadow: 0 0 10px rgba(75, 163, 227, 0.6);
 }
+
+/* ② OFF状態のスタイル（システムOFF時に適用される消灯モード） */
+#map-menu #radarToggleBtn.is-off {
+    background: #222;
+    color: #666;
+    border-color: #444;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* OFFの時のホバー */
+#map-menu #radarToggleBtn.is-off:hover {
+    background: #333;
+    color: #ddd;
+    border-color: #666;
+}
+
 
 
 
