@@ -1,4 +1,4 @@
-name: Daily KANTO Trigger & Update News
+name: old Daily KANTO Trigger & Update News 
 
 on:
   workflow_dispatch:
