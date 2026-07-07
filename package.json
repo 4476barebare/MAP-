@@ -5,7 +5,6 @@
   "dependencies": {
     "node-fetch": "^3.3.2",
     "iconv-lite": "^0.6.3",
-    "fast-xml-parser": "^4.3.6",
-    "canvas": "^2.11.2"
+    "fast-xml-parser": "^4.3.6"
   }
 }
