@@ -19,7 +19,6 @@
     order: -1;
     margin-left: 4px;   
     margin-right: 8px;
-
     width: auto;
     min-width: 44px;
     padding: 2px 10px;
@@ -39,14 +38,7 @@
     letter-spacing: 0.5px;
 }
 
-/* ONの時のホバー */
-#map-menu #radarToggleBtn:hover {
-    background: #4ba3e3;
-    color: #fff;
-    box-shadow: 0 0 10px rgba(75, 163, 227, 0.6);
-}
-
-/* ② OFF状態のスタイル（システムOFF時に適用される消灯モード） */
+/* ② OFF状態のスタイル */
 #map-menu #radarToggleBtn.is-off {
     background: #222;
     color: #666;
@@ -55,12 +47,34 @@
     text-shadow: none;
 }
 
-/* OFFの時のホバー */
-#map-menu #radarToggleBtn.is-off:hover {
-    background: #333;
-    color: #ddd;
-    border-color: #666;
+/* ==================================
+   ③ ホバー・タップの制御
+================================== */
+
+/* スマホ等でタップした「瞬間」だけ、押し込んだ感触を出す */
+#map-menu #radarToggleBtn:active {
+    opacity: 0.7;
+    transform: scale(0.95);
 }
+
+/* 「マウスが使えるデバイス（PCなど）」でのみホバー効果をオンにする魔法 */
+@media (hover: hover) and (pointer: fine) {
+    
+    /* ONの時のホバー */
+    #map-menu #radarToggleBtn:hover {
+        background: #4ba3e3;
+        color: #fff;
+        box-shadow: 0 0 10px rgba(75, 163, 227, 0.6);
+    }
+
+    /* OFFの時のホバー */
+    #map-menu #radarToggleBtn.is-off:hover {
+        background: #333;
+        color: #ddd;
+        border-color: #666;
+    }
+}
+
 
 
 
