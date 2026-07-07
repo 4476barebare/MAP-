@@ -28,15 +28,8 @@ function loadLocationCSV(csvUrl) {
         };
     }
 
-    //  return fetch(csvUrl)
-   //       .then(r => r.text())
-        
-            // キャッシュ回避用に、URLの末尾に現在のタイムスタンプ（?t=123456...）を付与する
-    const noCacheUrl = csvUrl + (csvUrl.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-
-    return fetch(noCacheUrl)
-        .then(r => r.text())
-
+      return fetch(csvUrl)
+          .then(r => r.text())
         .then(text => {
 
             const lines = text.trim().split('\n');
