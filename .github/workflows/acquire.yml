@@ -19,25 +19,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1 # 最新の履歴だけを取得して時短
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm' # npmのキャッシュを有効にして時短
+          node-version: '24' # 20から24に変更し、エラーの原因だった cache: 'npm' を完全に削除しました
 
       - name: Run acquire script
         run: node js/acquireCrowds.cjs
 
       # ========================================================
-      # GitHub Pages への直接デプロイ（Commit & Push は不要に！）
+      # GitHub Pages への直接デプロイ
       # ========================================================
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 公開したいフォルダを指定します。リポジトリ全体なら './'
-          # もし特定のフォルダ（例: docs や public）だけ公開しているならそこを指定してください
           path: './'
 
       - name: Deploy to GitHub Pages
