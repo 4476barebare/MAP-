@@ -3,7 +3,7 @@ name: Recalculate InLand Weather Data
 on:
   schedule:
     - cron: '0 17 * * *'  # 毎日 02:00 JST
-    - cron: '5 17 * * *'  # 毎日 02:05 JST
+
   workflow_dispatch:
 
 # Gitへの書き込み権限と、Pagesへの直接デプロイ権限を設定
