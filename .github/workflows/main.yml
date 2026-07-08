@@ -6,77 +6,41 @@ on:
     - cron: '0 16 * * *' # 1日1回のみ実行（JST 01:00 相当）
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
-  actions: write # 🌟 コレを追加！別のymlを起動（トリガー）するために必須の権限です
+  actions: write # 🌟 別のymlを起動（トリガー）するために必須の権限のみに絞ります
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      # 💡 リポジトリへのファイル保存やコミットが不要になったため、ファイルのCheckout（ダウンロード）すら不要です！
 
-      - name: Fetch API
-        id: fetch_api
+      - name: Trigger XREA PHP API
+        id: check_api
         run: |
-          mkdir -p data
-          if curl -s -f "https://turiiko.shop/actions/KANTO/load.php" -o data/KANTO_load.json; then
-            echo "FETCHED=true" >> $GITHUB_OUTPUT
+          # 1. 現在のタイムスタンプを取得
+          TS=$(date +%s)
+          SECRET="mZ4vP1wL9q"
+          
+          # 2. SHA256で署名（sig）を自動生成（PHP側の $ts . "+" . $secret 判定に完全一致）
+          SIG=$(echo -n "${TS}+${SECRET}" | openssl dgst -sha256 | sed 's/^.* //')
+          
+          # 3. XREAサーバーの whether_run.php を叩き、レスポンスを取得
+          RESPONSE=$(curl -s -f "https://turiiko.shop/actions/whether_run.php?ts=${TS}&sig=${SIG}")
+          echo "Server Response: $RESPONSE"
+          
+          # 4. サーバー側が「OK（新規保存完了）」を返した時だけ、次をトリガーするフラグを立てる
+          # （もし「SKIPPED」なら、データ更新がないのでこれ以降のActions無駄撃ちを防ぎます）
+          if [ "$RESPONSE" = "OK" ]; then
+            echo "UPDATED=true" >> $GITHUB_OUTPUT
           else
-            echo "FETCHED=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-
-      - name: Commit result
-        id: commit_result
-        if: steps.fetch_api.outputs.FETCHED == 'true'
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          
-          # 1. ダウンロードした新データを一度退避（衝突防止）
-          git stash --include-untracked
-          
-          # 2. 最新のリモート状態を同期
-          git pull --rebase origin main
-          
-          # 3. 退避したデータを手元に復元
-          git stash pop || true
-          
-          # 4. 変更チェックとコミット
-          git add data/KANTO_load.json
-          
-          if git diff --cached --quiet; then
-            echo "CHANGES=false" >> $GITHUB_OUTPUT
-            echo "No changes"
-          else
-            git commit -m "test: update kanto load"
-            git push origin main
-            echo "CHANGES=true" >> $GITHUB_OUTPUT
+            echo "UPDATED=false" >> $GITHUB_OUTPUT
           fi
 
       # ========================================================
-      # GitHub Pages への直接デプロイ
-      # ========================================================
-      - name: Upload Artifact
-        if: steps.commit_result.outputs.CHANGES == 'true'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './' # 更新された KANTO_load.json を含む全体を公開
-
-      - name: Deploy to GitHub Pages
-        if: steps.commit_result.outputs.CHANGES == 'true'
-        uses: actions/deploy-pages@v4
-
-      # ========================================================
-      # 次のワークフローへの連鎖トリガー
+      # 次のワークフローへの連鎖トリガー（データが新しくなった時のみ連鎖）
       # ========================================================
       - name: Trigger KANTO Whether Control
-        if: steps.commit_result.outputs.CHANGES == 'true'
+        if: steps.check_api.outputs.UPDATED == 'true'
         uses: actions/github-script@v7
         with:
           script: |
