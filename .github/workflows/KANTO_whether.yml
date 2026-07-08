@@ -13,6 +13,10 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
+    
+    # 🌟 ここを追加！GitHub Pagesへのデプロイ権限を証明するために必須の記述です
+    environment:
+      name: github-pages
 
     steps:
       - name: Checkout
@@ -58,4 +62,5 @@ jobs:
           path: './'
 
       - name: Deploy to GitHub Pages
+        id: deployment # 🌟 デプロイIDを付与（推奨）
         uses: actions/deploy-pages@v4
