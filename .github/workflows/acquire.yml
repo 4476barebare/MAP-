@@ -6,13 +6,20 @@ on:
     - cron: '15 21,9 * * *'  # JST 06:15 / 18:15
 
 permissions:
-  contents: write # 🌟 リポジトリへの書き込み権限に変更
+  contents: write
   pages: write
   id-token: write
 
 jobs:
   acquire:
     runs-on: ubuntu-latest
+    
+    # ==========================================
+    # GitHub Pagesへのデプロイに必須の環境設定
+    # ==========================================
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -29,7 +36,7 @@ jobs:
         run: node js/acquireCrowds.cjs
 
       # ========================================================
-      # 🌟 新規追加：取得した画像をリポジトリに保存する処理
+      # 取得した画像をリポジトリに保存する処理
       # ========================================================
       - name: Commit and Push changes
         run: |
@@ -56,4 +63,5 @@ jobs:
           path: './'
 
       - name: Deploy to GitHub Pages
+        id: deployment # 🌟 URL出力を受け取るためにIDを追加
         uses: actions/deploy-pages@v4
