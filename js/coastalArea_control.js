@@ -95,7 +95,7 @@ function getFirstCSVDate(filePath) {
 }
 
 // ========================================================
-// ■ CSV読み込み
+// ■ CSV読み込み（🌟JSONデータを破壊しない安全なパース仕様）
 // ========================================================
 function loadCSV(filePath) {
     if (!fs.existsSync(filePath)) return null;
@@ -103,14 +103,28 @@ function loadCSV(filePath) {
     const lines = text.split("\n").filter(Boolean);
     if (lines.length === 0) return null;
 
+    // ヘッダーをカンマで分割
     const headers = lines[0].split(",").map(h => h.trim());
     const data = [];
 
     for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(",");
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // 🌟 正規表現を使って、ダブルクォーテーションで囲まれたJSONデータ（whether列）を1つの塊として安全に切り分ける
+        const matches = line.match(/(".*?"|[^,]+|(Prefectures|County))/g) || [];
+        const cols = matches.map(col => {
+            let val = col.trim();
+            // 前後の余計なダブルクォーテーションを綺麗に剥ぎ取る
+            if (val.startsWith('"') && val.endsWith('"')) {
+                val = val.slice(1, -1);
+            }
+            return val;
+        });
+
         const obj = {};
         headers.forEach((header, index) => {
-            obj[header] = cols[index] !== undefined ? cols[index].trim() : "";
+            obj[header] = cols[index] !== undefined ? cols[index] : "";
         });
         data.push(obj);
     }
@@ -118,7 +132,7 @@ function loadCSV(filePath) {
 }
 
 // ========================================================
-// ■ CSV書き出し（🌟 エスケープ処理を復元！）
+// ■ CSV書き出し（🌟元の正しい出力形式へ完全復元）
 // ========================================================
 function saveCSV(filePath, data) {
     if (!data || data.length === 0) return;
@@ -128,10 +142,15 @@ function saveCSV(filePath, data) {
 
     const rows = data.map(obj => {
         return headers.map(h => {
-            // 文字列の中にカンマが含まれている場合はダブルクォーテーションで囲む
             let val = obj[h] !== undefined ? String(obj[h]) : "";
-            if (val.includes(",")) {
-                val = `"${val}"`;
+            
+            // 🌟 whether列などの複雑なJSON文字列、またはカンマを含むデータの場合
+            //    前後にダブルクォーテーションをつけて安全にエスケープする
+            if (val.includes(",") || val.startsWith("{") || val.startsWith("[")) {
+                // すでに囲まれていない場合のみ囲む
+                if (!val.startsWith('"') || !val.endsWith('"')) {
+                    val = `"${val}"`;
+                }
             }
             return val;
         }).join(",");
@@ -139,6 +158,7 @@ function saveCSV(filePath, data) {
 
     fs.writeFileSync(filePath, [headerLine, ...rows].join("\n"), "utf-8");
 }
+
 
 
 // ========================================================
