@@ -35,13 +35,24 @@ if (!prefs) {
 // ========================================================
 // 🌟 変更：URLから直接JSONを取得（15秒タイムアウト付き）
 // ========================================================
+// ========================================================
+// 🌟 変更：URLから直接JSONを取得（ヘッダー偽装 ＆ 15秒タイムアウト付き）
+// ========================================================
 async function fetchJSON(url) {
-    // 15秒でタイムアウトさせるタイマーを設定
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
     try {
-        const response = await fetch(url, { signal: controller.signal });
+        const response = await fetch(url, { 
+            signal: controller.signal,
+            // 🌟 追加：普通のPCブラウザ（Chrome）のフリをしてXREAのセキュリティをすり抜ける
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/json, text/plain, */*",
+                "Accept-Language": "ja,en-US;q=0.9,en;q=0.8"
+            }
+        });
+        
         clearTimeout(timeoutId); // 成功したらタイマー解除
 
         if (!response.ok) {
@@ -58,6 +69,7 @@ async function fetchJSON(url) {
             console.error(`❌ エラー: リクエストがタイムアウトしました (15秒)`);
         } else {
             console.error(`❌ 通信エラー:`, error.message);
+            console.error(`💡 ヒント: XREAサーバー側でNode.jsからのアクセスが強制遮断されている可能性があります。`);
         }
         return null;
     }
