@@ -5,48 +5,26 @@ on:
   schedule:
     - cron: '0 16 * * *' # 1日1回のみ実行（JST 01:00 相当）
 
+# すべてのリポジトリ操作・Pages・連鎖起動が不要になったため、特別な権限は一切不要です
 permissions:
-  actions: write # 🌟 別のymlを起動（トリガー）するために必須の権限のみに絞ります
+  contents: read
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
-      # 💡 リポジトリへのファイル保存やコミットが不要になったため、ファイルのCheckout（ダウンロード）すら不要です！
-
-      - name: Trigger XREA PHP API
-        id: check_api
+      - name: Trigger XREA PHP API (Async)
         run: |
           # 1. 現在のタイムスタンプを取得
           TS=$(date +%s)
           SECRET="mZ4vP1wL9q"
           
-          # 2. SHA256で署名（sig）を自動生成（PHP側の $ts . "+" . $secret 判定に完全一致）
+          # 2. SHA256で署名（sig）を自動生成
           SIG=$(echo -n "${TS}+${SECRET}" | openssl dgst -sha256 | sed 's/^.* //')
           
-          # 3. XREAサーバーの whether_run.php を叩き、レスポンスを取得
-          RESPONSE=$(curl -s -f "https://turiiko.shop/actions/whether_run.php?ts=${TS}&sig=${SIG}")
-          echo "Server Response: $RESPONSE"
+          # 3. 2秒でタイムアウトを設定し、バックグラウンド(&)でXREAへリクエストを投げ捨ててすぐ終了する
+          curl -s --max-time 2 "https://turiiko.shop/actions/whether_run.php?ts=${TS}&sig=${SIG}" > /dev/null 2>&1 &
           
-          # 4. サーバー側が「OK（新規保存完了）」を返した時だけ、次をトリガーするフラグを立てる
-          # （もし「SKIPPED」なら、データ更新がないのでこれ以降のActions無駄撃ちを防ぎます）
-          if [ "$RESPONSE" = "OK" ]; then
-            echo "UPDATED=true" >> $GITHUB_OUTPUT
-          else
-            echo "UPDATED=false" >> $GITHUB_OUTPUT
-          fi
-
-      # ========================================================
-      # 次のワークフローへの連鎖トリガー（データが新しくなった時のみ連鎖）
-      # ========================================================
-      - name: Trigger KANTO Whether Control
-        if: steps.check_api.outputs.UPDATED == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'KANTO_whether.yml',
-              ref: 'main'
-            })
+          # 4. 完全に切り離すために1秒だけ待って終了
+          sleep 1
+          echo "XREA API triggered successfully."
