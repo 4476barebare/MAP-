@@ -1,13 +1,49 @@
 import fs from "fs";
 import https from "https";
 
-// ===== 1. 設定の定義 =====
-const region = "KANTO";
+// ========================================================
+// ===== 1. 設定の定義（引数受け取りに変更） =====
+// ========================================================
+const region = process.argv[2] || "KANTO";
+const jsonUrl = process.argv[3] || `https://turiiko.shop/actions/data/${region}_load.json`; 
+
 const regionCsvPath = `${region}/${region}_region.csv`;
-const loadJsonPath = `data/${region}_load.json`; 
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
+// ========================================================
+// 🌟 追加：URLからJSONを取得（15秒タイムアウト・ヘッダー偽装・キャッシュ回避）
+// ========================================================
+async function fetchJSON(url) {
+    const fetchUrl = url.includes("?") ? `${url}&t=${Date.now()}` : `${url}?t=${Date.now()}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    try {
+        const response = await fetch(fetchUrl, {
+            signal: controller.signal,
+            cache: "no-store",
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/json, text/plain, */*",
+                "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+                "Pragma": "no-cache",
+                "Cache-Control": "no-cache"
+            }
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) return null;
+        const json = await response.json();
+        return json.data || json;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        console.error("❌ 通信エラー:", error.message);
+        return null;
+    }
+}
+
+// ========================================================
+// ⚠️ 以下、既存のパース・計算・シリアライズ処理（一切変更なし）
+// ========================================================
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
@@ -220,26 +256,27 @@ function lerpStation(s1, d1, s2, d2) {
 // ===== 2. メイン処理 =====
 async function run() {
     console.log(`🚀 [${region}] 共通フォーマット版・再計算処理を開始します。`);
+    console.log(`🌐 参照JSON URL: ${jsonUrl}`);
 
-    // ★ 追加：本日の日付を取得し、すでに出力済みのCSVがあればスキップする
     const todayStr = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
     if (fs.existsSync(outCsvPath)) {
         const existingLines = fs.readFileSync(outCsvPath, "utf-8").split("\n").filter(Boolean);
         if (existingLines.length > 1) {
-            // CSVの2行目（データ1行目）の3カラム目[2]がdate
             const firstRowDate = existingLines[1].split(",")[2].replace(/^"|"$/g, '').trim();
             if (firstRowDate === todayStr) {
                 console.log(`✅ すでに本日（${todayStr}）のデータで計算済みです。処理をスキップします。`);
-                return; // ここでスクリプトを終了
+                return; 
             }
         }
     }
 
     const stationMap = {}; 
 
-    if (fs.existsSync(loadJsonPath)) {
-        const rawJson = JSON.parse(fs.readFileSync(loadJsonPath, "utf-8"));
-        const jsonStations = rawJson.data || rawJson;
+    // ========================================================
+    // 🌟 変更箇所：fs.readFileSync を URLからの fetchJSON に置き換え
+    // ========================================================
+    const jsonStations = await fetchJSON(jsonUrl);
+    if (jsonStations) {
         let jsonCount = 0;
         jsonStations.forEach(s => {
             if (s.stationCode) {
@@ -255,10 +292,12 @@ async function run() {
                 jsonCount++;
             }
         });
-        console.log(`📦 既存JSONから ${jsonCount} 件の親ステーションを登録`);
+        console.log(`📦 リモートJSONから ${jsonCount} 件の親ステーションを登録`);
+    } else {
+        console.error(`❌ リモートJSONの取得に失敗しました。処理を続行しますがデータが不足する可能性があります。`);
     }
 
-    let targetDate = todayStr; // デフォルトは今日
+    let targetDate = todayStr; 
     try {
         const csvData = await fetchUrlText(inLandUrl);
         const inLandLines = csvData.split("\n").filter(Boolean);
