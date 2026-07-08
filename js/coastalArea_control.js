@@ -3,29 +3,27 @@
 // ========================================================
 
 import fs from "fs";
-
 import {
     applyFirstStage,
     applySecondStage,
     applyThirdStage
-} from "./whetherNode.js"; // 既存の処理モジュール
+} from "./whetherNode.js"; 
 
 // ========================================================
-// 🌟 最重要：YAMLからの引数（Args）の受け取り
-// コマンド例: node js/coastalArea_control.js [地域名] [JSONパス]
+// 🌟 YAMLからの引数受け取り（第2引数にURLを直接指定）
 // ========================================================
 const region = process.argv[2] || "KANTO";
-const jsonPath = process.argv[3] || `./data/${region}_load.json`;
+// 引数がない場合はデフォルトのURLを自動生成
+const jsonUrl = process.argv[3] || `https://turiiko.shop/actions/data/${region}_load.json`;
 
 console.log(`\n==============================================`);
 console.log(`🤖 処理地域  : ${region}`);
-console.log(`📁 読込JSON  : ${jsonPath}`);
+console.log(`🌐 参照URL   : ${jsonUrl}`);
 console.log(`==============================================\n`);
 
-// 🌟 地域ごとの対象県マップ（将来別地域を増やす時はここに1行足すだけ！）
 const regionPrefsMap = {
     "KANTO": ["CHIBA", "KANAGAWA"],
-    "KANSAI": ["OSAKA", "HYOGO", "WAKAYAMA"], // 例: 関西用
+    "KANSAI": ["OSAKA", "HYOGO", "WAKAYAMA"],
 };
 
 const prefs = regionPrefsMap[region];
@@ -35,49 +33,55 @@ if (!prefs) {
 }
 
 // ========================================================
-// ■ JSON読み込み
+// 🌟 変更：URLから直接JSONを取得（15秒タイムアウト付き）
 // ========================================================
-function loadJSON(filePath) {
-    if (!fs.existsSync(filePath)) {
-        console.error(`❌ エラー: JSONファイルが見つかりません (${filePath})`);
+async function fetchJSON(url) {
+    // 15秒でタイムアウトさせるタイマーを設定
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    try {
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId); // 成功したらタイマー解除
+
+        if (!response.ok) {
+            console.error(`❌ HTTPエラー: ${response.status} ${response.statusText}`);
+            return null;
+        }
+
+        const json = await response.json();
+        return json.data || json;
+
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            console.error(`❌ エラー: リクエストがタイムアウトしました (15秒)`);
+        } else {
+            console.error(`❌ 通信エラー:`, error.message);
+        }
         return null;
     }
-    const raw = fs.readFileSync(filePath, "utf-8");
-    const json = JSON.parse(raw);
-    return json.data || json;
 }
 
 // ========================================================
 // ■ 今日の日付（JST）
 // ========================================================
 function getToday() {
-    return new Date()
-        .toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
+    return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
 }
 
-// ========================================================
-// ■ 出力CSVの先頭date取得
-// ========================================================
 function getFirstCSVDate(filePath) {
     if (!fs.existsSync(filePath)) return null;
-
     const text = fs.readFileSync(filePath, "utf-8");
     const lines = text.split("\n").filter(Boolean);
-
     if (lines.length < 2) return null;
-
     const header = lines[0].split(",");
     const dateIndex = header.indexOf("date");
-
     if (dateIndex === -1) return null;
-
     const firstData = lines[1].split(",");
     return firstData[dateIndex] || null;
 }
 
-// ========================================================
-// ■ CSV読み込み（オブジェクトの配列にパース）
-// ========================================================
 function loadCSV(filePath) {
     if (!fs.existsSync(filePath)) return null;
     const text = fs.readFileSync(filePath, "utf-8");
@@ -98,9 +102,6 @@ function loadCSV(filePath) {
     return data;
 }
 
-// ========================================================
-// ■ CSV書き出し
-// ========================================================
 function saveCSV(filePath, data) {
     if (!data || data.length === 0) return;
     const headers = Object.keys(data[0]);
@@ -110,34 +111,26 @@ function saveCSV(filePath, data) {
 }
 
 // ========================================================
-// ■ メイン実行処理
+// 🌟 メイン実行処理（async化）
 // ========================================================
-function run() {
-    // XREAからフェッチした最新のJSONデータを読み込む
-    const stations = loadJSON(jsonPath);
+async function run() {
+    // URLからフェッチ
+    const stations = await fetchJSON(jsonUrl);
 
     if (!stations) {
-        console.error("❌ ステーションデータの読み込みに失敗したため、処理を中断します。");
+        console.error("❌ ステーションデータの取得に失敗したため、処理を中断します。");
         process.exit(1);
     }
 
     console.log("stations:", stations.length);
     const today = getToday();
 
-    // ----------------
-    // prefループ
-    // ----------------
     for (const pref of prefs) {
-
         console.log("----", pref, "----");
 
-        // 引数の region（KANTO 等）をパスに自動結合
         const csvPath = `./${region}/${pref}_location.csv`;
         const outPath = `./data/${pref}_whether.csv`;
 
-        // =================================================
-        // ■ 先にスキップ判定
-        // =================================================
         const savedDate = getFirstCSVDate(outPath);
 
         if (savedDate === today) {
@@ -145,9 +138,6 @@ function run() {
             continue;
         }
 
-        // ----------------
-        // CSV読み込み
-        // ----------------
         let spots = loadCSV(csvPath);
 
         if (!spots) {
@@ -157,9 +147,6 @@ function run() {
 
         console.log("spots:", spots.length);
 
-        // ----------------
-        // 計算処理（既存ロジック）
-        // ----------------
         applyFirstStage(spots, stations);
         applySecondStage(spots);
         applyThirdStage(spots);
@@ -167,9 +154,6 @@ function run() {
         const ok = spots.filter(s => s.whether).length;
         console.log("completed:", ok, "/", spots.length);
 
-        // ----------------
-        // 出力
-        // ----------------
         saveCSV(outPath, spots);
         console.log("saved:", outPath);
     }
