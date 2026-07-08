@@ -94,6 +94,9 @@ function getFirstCSVDate(filePath) {
     return firstData[dateIndex] || null;
 }
 
+// ========================================================
+// ■ CSV読み込み
+// ========================================================
 function loadCSV(filePath) {
     if (!fs.existsSync(filePath)) return null;
     const text = fs.readFileSync(filePath, "utf-8");
@@ -107,20 +110,36 @@ function loadCSV(filePath) {
         const cols = lines[i].split(",");
         const obj = {};
         headers.forEach((header, index) => {
-            obj[header] = cols[index] ? cols[index].trim() : "";
+            obj[header] = cols[index] !== undefined ? cols[index].trim() : "";
         });
         data.push(obj);
     }
     return data;
 }
 
+// ========================================================
+// ■ CSV書き出し（🌟 エスケープ処理を復元！）
+// ========================================================
 function saveCSV(filePath, data) {
     if (!data || data.length === 0) return;
+
     const headers = Object.keys(data[0]);
     const headerLine = headers.join(",");
-    const rows = data.map(obj => headers.map(h => obj[h]).join(","));
+
+    const rows = data.map(obj => {
+        return headers.map(h => {
+            // 文字列の中にカンマが含まれている場合はダブルクォーテーションで囲む
+            let val = obj[h] !== undefined ? String(obj[h]) : "";
+            if (val.includes(",")) {
+                val = `"${val}"`;
+            }
+            return val;
+        }).join(",");
+    });
+
     fs.writeFileSync(filePath, [headerLine, ...rows].join("\n"), "utf-8");
 }
+
 
 // ========================================================
 // 🌟 メイン実行処理（async化）
