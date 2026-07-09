@@ -1171,18 +1171,17 @@ document.getElementById('map-back-btn')?.addEventListener('click', () => {
 
 
 function loadWhetherCSV(url) {
-    // ★ 変更：キャッシュがあれば即座に使い、なければフェッチ
-    const textPromise = window.fetchCache && window.fetchCache[url]
-        ? window.fetchCache[url]
-        : fetch(url).then(res => {
+    // プリロードされていればブラウザのキャッシュから一瞬で返ってくる
+    return fetch(url)
+        .then(res => {
             if (!res.ok) throw new Error("whether csv fetch失敗");
             return res.text();
-        });
+        })
+        .then(text => {
+            const lines = text.trim().split("\n");
+            lines.shift();
+            // ... (これ以降の map 処理等は既存のままでOK)
 
-    return textPromise.then(text => {
-        // --- 既存の lines などのパース処理はそのまま ---
-        const lines = text.trim().split("\n");
-        lines.shift();
         // ...
 
             return lines.map(line => {
