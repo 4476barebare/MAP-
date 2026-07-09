@@ -1,6 +1,7 @@
 name,zoom,individualId,lat,lng,areaId,URL,notes,icon,whether,type
-CHIBA,0.15/9,,34.7/36.0,139.6/141.1,120000,,千葉県,,,
-KANAGAWA,0.15/9.5,,34.9/35.75,138.9/139.9,140000,,神奈川県,,,
+KANTO,8.5,,35.729217,139.85857,,,関東地方,,,region
+CHIBA,0.15/9,,34.7/36.0,139.6/141.1,120000,KANTO/CHIBA_location.csv,千葉県,,,
+KANAGAWA,0.15/9.5,,34.9/35.75,138.9/139.9,140000,KANTO/KANAGAWA_location.csv,神奈川県,,,
 安中,,F000,36.327242,138.882651,,,First/F010/F006,station,,
 宇都宮,,F001,36.7163,139.990635,,,First/F025/F004,station,,
 奥多摩,,F002,35.876896,139.272048,,,First/F024/F018,station,,
