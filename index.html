@@ -1094,12 +1094,12 @@ function removeCrowdImage() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 初期表示：リージョン（関東全体など）のマップを描画
+    // 初期表示：URLは操作せず、リージョン（関東全体など）のマップを描画
     loadRegionMap();
 });
 
 // ================================
-// ■ 1. 初期画面のRegionマップ読み込み
+// ■ 1. 初期画面のRegionマップ読み込み（URL変更なし）
 // ================================
 function loadRegionMap() {
     const regionCsvUrl = '/KANTO/KANTO_region.csv';
@@ -1111,7 +1111,7 @@ function loadRegionMap() {
         })
         .then(text => {
             const lines = text.trim().split('\n');
-            if (lines.length < 2) return; // データがない場合は終了
+            if (lines.length < 2) return; 
 
             // ヘッダー行から各カラムのインデックスを取得
             const headers = lines[0].split(',').map(h => h.trim());
@@ -1137,9 +1137,9 @@ function loadRegionMap() {
                     const lng  = parseFloat(cols[lngIdx]);
                     const zoom = cols[zoomIdx];
 
-                    // 地図の初期描画関数を呼び出し
+                    // 地図の初期描画関数を呼び出し（URLはプレーンなまま）
                     drawLocation(name, lat, lng, zoom);
-                    break; // region行を見つけたらループを抜ける
+                    break; 
                 }
             }
         })
@@ -1149,14 +1149,11 @@ function loadRegionMap() {
 }
 
 // ================================
-// ■ 2. 県選択時に突入するメイン処理（元のDOMContentLoaded内処理）
+// ■ 2. 県選択時に突入するメイン処理（URL変更なし）
 // ================================
-// ※地図上のUIやボタン等から selectPrefecture('CHIBA') のように呼ばれる想定
+// ※地図上のポリゴンやボタンなどから selectPrefecture('CHIBA') のように呼び出します
 window.selectPrefecture = function(prefCode) {
-    const url = new URL(location.href);
-    url.searchParams.set('pref', prefCode);
-    history.replaceState(null, '', url);
-
+    // ★ URLの書き換え処理をすべて削除し、プレーンな状態を維持します
     window.currentPref = prefCode;
 
     const csvUrl     = `/KANTO/${window.currentPref}_location.csv`;
@@ -1186,7 +1183,7 @@ window.selectPrefecture = function(prefCode) {
 };
 
 // ================================
-// ■ 戻るボタンのSVGアイコン設定など（独立して実行）
+// ■ 戻るボタンの設定など（独立して実行）
 // ================================
 fetch('/icon/back.svg')
     .then(res => res.text())
@@ -1202,6 +1199,7 @@ fetch('/icon/back.svg')
 document.getElementById('map-back-btn')?.addEventListener('click', () => {
     goBack(window.currentHash);
 });
+
 
 
 function loadWhetherCSV(url) {
