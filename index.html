@@ -1013,9 +1013,15 @@ function removeCrowdImage() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 初期表示：URLは操作せず、リージョン（関東全体など）のマップを描画
-    loadRegionMap();
+    
+    // 1. まずURLのハッシュを解析して、現在の状態（AreaId等）を復元する
+    updateStateFromHash();
+
+
+        routeUpdate();
+    
 });
+
 
 
 
@@ -1421,11 +1427,27 @@ function resetAreaGuide() {
 }
 
 // =======================
-// ROUTE UPDATE (Region階層対応版)
+// ROUTE UPDATE (完全統合版)
 // =======================
 function routeUpdate() {
 
-    if (!window.prefData) return;
+
+    // =====================================
+    // ① データ未取得時のルーティング（URL直打ち等）
+    // =====================================
+    if (!window.prefData) {
+
+            document.getElementById('map-back-btn').style.display = 'none';
+            loadRegionMap();
+            return;
+        
+    }
+
+
+
+    // =====================================
+    // ③ 各階層の描画
+    // =====================================
 
     // -----------------------
     // SPOT
@@ -1439,12 +1461,14 @@ function routeUpdate() {
             String(s.individualId) === String(spotId[2])
         );
 
-        drawLocation(spot.name, spot.lat, spot.lng, "13");
+        if (spot) {
+            drawLocation(spot.name, spot.lat, spot.lng, "13");
 
-        prepareFishForArea(window.currentAreaId).then(() => {
-            document.getElementById('map-back-btn').style.display = 'block';
-            zoomToSpot(spot);
-        });
+            prepareFishForArea(window.currentAreaId).then(() => {
+                document.getElementById('map-back-btn').style.display = 'block';
+                zoomToSpot(spot);
+            });
+        }
         return;
     }
 
@@ -1462,12 +1486,12 @@ function routeUpdate() {
         selectArea(area.name);
         renderCrowdImage();
         
-        document.getElementById('map-back-btn').style.display = 'block'; // エリアでも表示
+        document.getElementById('map-back-btn').style.display = 'block';
         return;
     }
 
     // -----------------------
-    // PREF (県レベル)
+    // PREF (県トップ)
     // -----------------------
     drawLocation(
         window.prefData.name,
@@ -1476,7 +1500,7 @@ function routeUpdate() {
         window.prefData.zoom
     );
 
-    // ★今回の変更点：県レベルでも広域（Region）に戻るためにボタンを表示する
+    // Region階層へ戻るためのボタンを表示
     document.getElementById('map-back-btn').style.display = 'block';
 
     initAreaUI();
@@ -1484,6 +1508,8 @@ function routeUpdate() {
     renderPrefWeather();
     renderCrowdImage();
 }
+
+
 
 
 </script>
