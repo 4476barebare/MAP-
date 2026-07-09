@@ -15,7 +15,7 @@ export function applyFirstStage(spots, stations) {
 
         const spot = spots[i];
 
-        if (spot.icon !== "spot") continue;
+        if (spot.icon !== "spot" && spot.icon !== "fish1") continue;
         if (!spot.lat || !spot.lng) continue;
 
         const note = spot.notes || "";
@@ -59,7 +59,7 @@ export function applySecondStage(spots) {
     if (!Array.isArray(spots)) return spots;
 
     const usableSpots = spots.filter(s =>
-        s.icon === "spot" &&
+        (s.icon === "spot" || s.icon === "fish1") &&
         s.whether &&
         s.lat != null &&
         s.lng != null
@@ -120,7 +120,7 @@ export function applyThirdStage(spots) {
     if (!Array.isArray(spots)) return spots;
 
     const baseSpots = spots.filter(s =>
-        s.icon === "spot" &&
+        (s.icon === "spot" || s.icon === "fish1") &&
         s.whether &&
         s.lat != null &&
         s.lng != null
@@ -130,7 +130,7 @@ export function applyThirdStage(spots) {
 
         const spot = spots[i];
 
-        if (spot.icon !== "spot") continue;
+        if (spot.icon !== "spot" && spot.icon !== "fish1") continue;
         if (spot.whether) continue;
 
         const nearest = findNearestTwoSpots(spot, baseSpots);
