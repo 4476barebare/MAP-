@@ -2243,28 +2243,13 @@ function resetSpotLayers() {
 
 
 function updateStateFromHash() {
-    
-    // ==========================================
-    // 1. クエリパラメータ（?pref=）の解析と反映
-    // ==========================================
+
     const url = new URL(location.href);
     const prefCode = url.searchParams.get('pref');
-
-    if (prefCode) {
-        window.currentPref = prefCode;
-    } else {
-        // パラメータがない場合は、県情報をリセットする
-        window.currentPref = null;
-        window.prefData = null; 
-    }
-
-    // ==========================================
-    // 2. ハッシュ（#）の解析と反映
-    // ==========================================
     const hash = decodeURIComponent(location.hash.replace('#', ''));
-    
-    // ハッシュが空、もしくは県が選択されていない場合はエリア・スポットもリセット
-    if (!hash || !window.currentPref) {
+
+    // クエリ(pref)もハッシュもないプレーンな場合はすぐにリターン
+    if (!prefCode && !hash) {
         window.currentAreaId = null;
         window.currentSpotId = null;
         return;
@@ -2276,15 +2261,13 @@ function updateStateFromHash() {
 
     let resolvedAreaId = null;
 
-    // window.areaData が読み込まれているかチェック
-    if (areaName && window.areaData && window.areaData.length > 0) {
+    if (areaName && window.areaData) {
         const area = window.areaData.find(a => a.name === areaName);
         if (area) {
             resolvedAreaId = window.currentPref + "_" + area.individualId;
         }
     }
 
-    // 状態の更新
     if (!areaName) {
         window.currentAreaId = null;
         window.currentSpotId = null;
@@ -2295,10 +2278,10 @@ function updateStateFromHash() {
     }
     else if (areaName && spotKey) {
         window.currentAreaId = resolvedAreaId;
-        // resolvedAreaId が null の場合は spotId も作れないので null を維持
         window.currentSpotId = resolvedAreaId ? (resolvedAreaId + "_" + spotKey) : null;
     }
 }
+
 
 function goBack() {
     // =====================================================
@@ -2326,6 +2309,12 @@ function goBack() {
         if (window.phase1Group) window.phase1Group.clearLayers();
         if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
         
+        // ★ ここを追加：Pref特有のスポットマーカー（青いドット等）を完全に消去する
+        if (window.prefSpotLayer) {
+            window.map.removeLayer(window.prefSpotLayer);
+            window.prefSpotLayer = null;
+        }
+        
         // アラートバーのクリア
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
@@ -2337,6 +2326,9 @@ function goBack() {
         loadRegionMap();
         return;
     }
+    
+    // --- (以降は既存の処理そのまま) ---
+
 
     // --- ここから下は元の処理 ---
     
