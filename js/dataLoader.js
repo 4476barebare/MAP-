@@ -14,25 +14,21 @@ window.gsiLayers = {
   photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
 
+// --- dataLoader.js 内 ---
+
+// =====================
+// 1. Locationのキャッシュ対応
+// =====================
 function loadLocationCSV(csvUrl) {
+    // ★ 変更：キャッシュがあれば即座に使い、なければフェッチ
+    const textPromise = window.fetchCache && window.fetchCache[csvUrl]
+        ? window.fetchCache[csvUrl]
+        : fetch(csvUrl).then(r => r.text());
 
-    function parseGrid(str) {
-        if (!str) return { x: null, y: null };
-
-        const x = str.match(/x\s*:\s*(-?\d+)/);
-        const y = str.match(/y\s*:\s*(-?\d+)/);
-
-        return {
-            x: x ? parseInt(x[1]) : null,
-            y: y ? parseInt(y[1]) : null
-        };
-    }
-
-      return fetch(csvUrl)
-          .then(r => r.text())
-        .then(text => {
-
-            const lines = text.trim().split('\n');
+    return textPromise.then(text => {
+        // --- 既存のパース処理はそのまま ---
+        const lines = text.trim().split('\n');
+        // ...
             let main = null;
             const areas = [];
             const spots = [];
@@ -329,20 +325,30 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     : window.map.touchZoom.disable();
 }
 
-function showPrefSpots() {
+// =====================
+// 2. マーカーレイヤーの使い回し対応
+// =====================
+window.prefSpotLayerCache = window.prefSpotLayerCache || {};
 
+function showPrefSpots() {
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
     }
 
+    // ★ ここを追加：既に作成済みのレイヤーがあれば、使い回す（0秒で表示）
+    if (window.prefSpotLayerCache[window.currentPref]) {
+        window.prefSpotLayer = window.prefSpotLayerCache[window.currentPref];
+        window.prefSpotLayer.addTo(window.map);
+        return;
+    }
+
+    // キャッシュがない場合のみ新規作成
     window.prefSpotLayer = L.layerGroup();
 
     window.spotData.forEach(spot => {
-
         if (!spot.icon) return;
 
         let type = 'spot';
-
         if (spot.icon.startsWith('fish')) {
             const match = spot.icon.match(/fish\d+/);
             if (match) type = match[0];
@@ -361,8 +367,12 @@ function showPrefSpots() {
         window.prefSpotLayer.addLayer(marker);
     });
 
+    // ★ 作ったレイヤーを辞書に保存しておく
+    window.prefSpotLayerCache[window.currentPref] = window.prefSpotLayer;
+    
     window.prefSpotLayer.addTo(window.map);
 }
+
 
 function prefetchAround(area) {
 
