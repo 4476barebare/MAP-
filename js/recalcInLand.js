@@ -2,7 +2,7 @@ import fs from "fs";
 import https from "https";
 
 // ========================================================
-// ===== 1. 設定の定義（引数受け取りに変更） =====
+// ===== 1. 設定の定義（引数受け取り） =====
 // ========================================================
 const region = process.argv[2] || "KANTO";
 const jsonUrl = process.argv[3] || `https://turiiko.shop/actions/data/${region}_load.json`; 
@@ -11,8 +11,20 @@ const regionCsvPath = `${region}/${region}_region.csv`;
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
+// 🌟 新規追加：地域ごとの県リスト定義（他地域を追加する場合はここに追記）
+const regionPrefsMap = {
+    "KANTO": ["CHIBA", "KANAGAWA"],
+    "KANSAI": ["OSAKA", "HYOGO", "WAKAYAMA"]
+};
+const prefs = regionPrefsMap[region];
+
+if (!prefs) {
+    console.error(`❌ エラー: 地域「${region}」の県リストが定義されていません。`);
+    process.exit(1);
+}
+
 // ========================================================
-// 🌟 追加：URLからJSONを取得（15秒タイムアウト・ヘッダー偽装・キャッシュ回避）
+// URLからJSONを取得
 // ========================================================
 async function fetchJSON(url) {
     const fetchUrl = url.includes("?") ? `${url}&t=${Date.now()}` : `${url}?t=${Date.now()}`;
@@ -42,7 +54,7 @@ async function fetchJSON(url) {
 }
 
 // ========================================================
-// ⚠️ 以下、既存のパース・計算・シリアライズ処理（一切変更なし）
+// ⚠️ 以下、既存のパース・計算・シリアライズ処理（変更なし）
 // ========================================================
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
@@ -59,7 +71,6 @@ function fetchUrlText(url) {
     });
 }
 
-// --- パーサー ---
 function parseDailyString(dailyStr) {
     if (!dailyStr) return [];
     return dailyStr.split(';').filter(Boolean).map(day => day.split('|'));
@@ -116,7 +127,6 @@ function normalizeInlandStation(w) {
     return res;
 }
 
-// --- シリアライザー ---
 function timeToMinutes(tStr) {
     if (!tStr) return null;
     if (!isNaN(Number(tStr))) return Number(tStr); 
@@ -128,19 +138,13 @@ function timeToMinutes(tStr) {
 }
 
 function serializeToChibaFormat(s) {
-    const res = {
-        hourly: [],
-        daily: []
-    };
-
+    const res = { hourly: [], daily: [] };
     for (const h of ['hourly0', 'hourly1', 'hourly2']) {
         if (s[h]) {
             const hourObj = { weather: [] };
-            
             if (s[h].weather && s[h].weather.length > 0) {
                 hourObj.weather = s[h].weather.map(arr => arr.map(v => v === "" || v == null ? null : Number(v)));
             }
-            
             hourObj.oneday = { avg: null, sunrise: null, sunset: null };
             if (s[h].water && s[h].water.length >= 3) {
                 hourObj.oneday = {
@@ -151,42 +155,31 @@ function serializeToChibaFormat(s) {
             } else if (s[h].water && s[h].water.length > 0) {
                 hourObj.oneday.avg = s[h].water[0] === "" || s[h].water[0] == null ? null : Number(s[h].water[0]);
             }
-            
             hourObj.tide = [];
             if (s[h].tide && s[h].tide.length > 0) {
                 hourObj.tide = s[h].tide.map(v => Number(v) || 0);
             }
-
             res.hourly.push(hourObj);
         }
     }
-
     if (s.daily && s.daily.length > 0) {
         res.daily = s.daily.map(arr => {
             const dObj = { weather: [], tide: [], dailyEx: { avg: null, wave: null, sunrise: null, sunset: null } };
-            
             dObj.weather.push(arr[0] === "" || arr[0] == null ? null : Number(arr[0]));
             dObj.weather.push(arr[1] === "" || arr[1] == null ? null : Number(arr[1]));
-            
-            if (arr[6]) {
-                dObj.tide = arr[6].split(',').map(v => Number(v) || 0);
-            }
-            
+            if (arr[6]) dObj.tide = arr[6].split(',').map(v => Number(v) || 0);
             dObj.dailyEx = {
                 avg: arr[2] === "" || arr[2] == null ? null : Number(arr[2]),
                 wave: arr[3] === "" || arr[3] == null ? null : Number(arr[3]),
                 sunrise: timeToMinutes(arr[4]),
                 sunset: timeToMinutes(arr[5])
             };
-            
             return dObj;
         });
     }
-
     return res;
 }
 
-// --- 数学・補間ロジック ---
 function calcGeoDistance(lat1, lng1, lat2, lng2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -216,7 +209,6 @@ function lerpArray(arr1, dist1, arr2, dist2) {
     for (let i = 0; i < len; i++) {
         const el1 = arr1[i] !== undefined && arr1[i] !== null ? String(arr1[i]) : "";
         const el2 = arr2[i] !== undefined && arr2[i] !== null ? String(arr2[i]) : "";
-
         if (el1.includes('T') || el1.includes(',') || el1.includes(':') ||
             el2.includes('T') || el2.includes(',') || el2.includes(':')) {
             res.push(dist1 <= dist2 ? el1 : el2);
@@ -253,7 +245,118 @@ function lerpStation(s1, d1, s2, d2) {
     return res;
 }
 
+function findQuadrantStations(spotLat, spotLng, validStations, maxDistKm = 50) {
+    let q1 = null, q2 = null, q3 = null, q4 = null;
+    let d1 = Infinity, d2 = Infinity, d3 = Infinity, d4 = Infinity;
+
+    for (const s of validStations) {
+        const d = calcGeoDistance(spotLat, spotLng, s.lat, s.lng);
+        if (d > maxDistKm) continue;
+        if (d === 0) return [{ station: s, dist: d }]; 
+
+        const dLat = s.lat - spotLat;
+        const dLng = s.lng - spotLng;
+
+        if (dLat >= 0 && dLng >= 0) {
+            if (d < d1) { d1 = d; q1 = s; } 
+        } else if (dLat >= 0 && dLng < 0) {
+            if (d < d2) { d2 = d; q2 = s; } 
+        } else if (dLat < 0 && dLng >= 0) {
+            if (d < d3) { d3 = d; q3 = s; } 
+        } else {
+            if (d < d4) { d4 = d; q4 = s; } 
+        }
+    }
+
+    const res = [];
+    if (q1) res.push({ station: q1, dist: d1 });
+    if (q2) res.push({ station: q2, dist: d2 });
+    if (q3) res.push({ station: q3, dist: d3 });
+    if (q4) res.push({ station: q4, dist: d4 });
+    return res;
+}
+
+function lerpMultiple(vals, dists) {
+    let sumWeights = 0, sumVals = 0, validCount = 0;
+    let hasString = false, stringVal = "", minDistForStr = Infinity;
+
+    for (let i = 0; i < vals.length; i++) {
+        let v = vals[i];
+        let d = dists[i];
+        if (v === undefined || v === null || v === "") continue;
+
+        if (isNaN(Number(v))) {
+            hasString = true;
+            if (d < minDistForStr) {
+                minDistForStr = d;
+                stringVal = v;
+            }
+            continue;
+        }
+
+        v = Number(v);
+        if (d === 0) return v;
+
+        const w = 1 / d; 
+        sumWeights += w;
+        sumVals += v * w;
+        validCount++;
+    }
+    if (hasString && validCount === 0) return stringVal;
+    if (validCount === 0) return "";
+    return sumVals / sumWeights;
+}
+
+function lerpMultipleArray(arrs, dists) {
+    const maxLen = Math.max(...arrs.map(a => a ? a.length : 0));
+    const res = [];
+    for (let i = 0; i < maxLen; i++) {
+        const vals = arrs.map(a => (a && a[i] !== undefined ? a[i] : ""));
+        const hasTime = vals.some(v => String(v).includes('T') || String(v).includes(':') || String(v).includes(','));
+        if (hasTime) {
+            let closestVal = "", minDist = Infinity;
+            for (let j = 0; j < vals.length; j++) {
+                if (vals[j] && dists[j] < minDist) {
+                    minDist = dists[j];
+                    closestVal = vals[j];
+                }
+            }
+            res.push(closestVal);
+        } else {
+            const val = lerpMultiple(vals, dists);
+            if (val === "") res.push("");
+            else res.push(String(Math.round(val * 100) / 100));
+        }
+    }
+    return res;
+}
+
+function lerpMultipleDayList(daysListArr, dists) {
+    const maxLen = Math.max(...daysListArr.map(d => d ? d.length : 0));
+    const res = [];
+    for (let i = 0; i < maxLen; i++) {
+        const arrs = daysListArr.map(d => d && d[i] ? d[i] : []);
+        res.push(lerpMultipleArray(arrs, dists));
+    }
+    return res;
+}
+
+function lerpMultipleStations(stationObjs, dists) {
+    const res = {};
+    for (const h of ['hourly0', 'hourly1', 'hourly2']) {
+        res[h] = {
+            weather: lerpMultipleDayList(stationObjs.map(s => s[h] ? s[h].weather : []), dists),
+            water: lerpMultipleArray(stationObjs.map(s => s[h] ? s[h].water : []), dists),
+            tide: lerpMultipleArray(stationObjs.map(s => s[h] ? s[h].tide : []), dists)
+        };
+    }
+    res.daily = lerpMultipleDayList(stationObjs.map(s => s.daily || []), dists);
+    return res;
+}
+
+// ========================================================
 // ===== 2. メイン処理 =====
+// ========================================================
 async function run() {
     console.log(`🚀 [${region}] 共通フォーマット版・再計算処理を開始します。`);
     console.log(`🌐 参照JSON URL: ${jsonUrl}`);
@@ -271,11 +374,8 @@ async function run() {
     }
 
     const stationMap = {}; 
-
-    // ========================================================
-    // 🌟 変更箇所：fs.readFileSync を URLからの fetchJSON に置き換え
-    // ========================================================
     const jsonStations = await fetchJSON(jsonUrl);
+    
     if (jsonStations) {
         let jsonCount = 0;
         jsonStations.forEach(s => {
@@ -337,6 +437,7 @@ async function run() {
     const finalRows = []; 
     const calcTargets = [];
 
+    // ① マスターCSV（First, Second 計算用）の読み込み
     for (const line of regionLines) {
         const r = parseCsvLine(line);
         if (r.length < 8) continue;
@@ -354,21 +455,56 @@ async function run() {
         }
     }
 
-    function processStage(stageName) {
+    // 🌟 新規追加：② location.csv から 'L' で始まるスポットを抽出し、Thirdの計算対象とする
+    const thirdTargets = [];
+    for (const pref of prefs) {
+        const locPath = `${region}/${pref}_location.csv`;
+        if (fs.existsSync(locPath)) {
+            const lines = fs.readFileSync(locPath, "utf-8").split("\n").filter(Boolean);
+            if (lines.length < 2) continue;
+            
+            const headers = lines[0].split(",").map(h => h.trim());
+            const idIdx = headers.indexOf("individualId");
+            const nameIdx = headers.indexOf("name");
+            const latIdx = headers.indexOf("lat");
+            const lngIdx = headers.indexOf("lng");
+            const notesIdx = headers.indexOf("notes");
+
+            if (idIdx === -1) continue;
+
+            for (let i = 1; i < lines.length; i++) {
+                const r = parseCsvLine(lines[i]);
+                if (r.length <= idIdx) continue;
+                
+                const id = r[idIdx];
+                if (id && id.startsWith("L")) {
+                    const name = nameIdx !== -1 && r[nameIdx] ? r[nameIdx] : "";
+                    const lat = latIdx !== -1 ? parseFloat(r[latIdx]) || 0 : 0;
+                    const lng = lngIdx !== -1 ? parseFloat(r[lngIdx]) || 0 : 0;
+                    const notes = notesIdx !== -1 && r[notesIdx] ? r[notesIdx] : "";
+
+                    const spot = { id, name, date: targetDate, lat, lng, notes, whether: null };
+                    thirdTargets.push(spot);
+                    finalRows.push(spot); // Thirdの計算結果も最終出力CSVに含める
+                }
+            }
+        }
+    }
+
+    // --- First, Second 計算処理（元のロジック） ---
+    function processStageFirstSecond(stageName) {
         let count = 0;
         for (const spot of calcTargets) {
-            if (spot.notes.startsWith(`${stageName}/`) && !spot.whether) {
+            if (spot.notes && spot.notes.startsWith(`${stageName}/`) && !spot.whether) {
                 const parts = spot.notes.split("/");
                 const p1 = parts[1];
                 const p2 = parts[2];
-
                 const s1 = stationMap[p1];
                 const s2 = stationMap[p2];
 
                 if (s1 && s2 && s1.lat != null && s2.lat != null) {
                     const d1 = calcGeoDistance(spot.lat, spot.lng, s1.lat, s1.lng);
                     const d2 = calcGeoDistance(spot.lat, spot.lng, s2.lat, s2.lng);
-                    
                     const lerped = lerpStation(s1.whether, d1, s2.whether, d2);
                     spot.whether = serializeToChibaFormat(lerped);
                     stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped }; 
@@ -385,9 +521,41 @@ async function run() {
         return count;
     }
 
-    console.log(`🧮 Firstステージ: ${processStage("First")} 件 計算完了`);
-    console.log(`🧮 Secondステージ: ${processStage("Second")} 件 計算完了`);
-    console.log(`🧮 Thirdステージ: ${processStage("Third")} 件 計算完了`);
+    // 🌟 新規追加：--- Third 計算処理（4象限 空間自動検索） ---
+    function processStageThird() {
+        let count = 0;
+        // First/Secondで計算された結果も含めるため、実行直前に有効な基準点リストを生成
+        const validRefStations = Object.values(stationMap).filter(s => s.lat != null && s.lng != null && s.whether);
+
+        for (const spot of thirdTargets) {
+            if (!spot.whether) {
+                // notesに数字が含まれていればそれを最大距離（km）とし、無ければデフォルト50km
+                let maxDistKm = 50;
+                if (spot.notes) {
+                    const m = spot.notes.match(/\d+/);
+                    if (m) maxDistKm = Number(m[0]);
+                }
+
+                // 4方向から最も近い基準点を探す（最大4点）
+                const found = findQuadrantStations(spot.lat, spot.lng, validRefStations, maxDistKm);
+                
+                if (found.length > 0) {
+                    const stations = found.map(f => f.station.whether);
+                    const dists = found.map(f => f.dist);
+                    
+                    const lerped = lerpMultipleStations(stations, dists);
+                    spot.whether = serializeToChibaFormat(lerped);
+                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped };
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    console.log(`🧮 Firstステージ: ${processStageFirstSecond("First")} 件 計算完了`);
+    console.log(`🧮 Secondステージ: ${processStageFirstSecond("Second")} 件 計算完了`);
+    console.log(`🧮 Thirdステージ: ${processStageThird()} 件 計算完了`);
 
     console.log("💾 計算結果をCSVに書き出し中...");
     const outLines = ["individualId,name,date,whether"];
