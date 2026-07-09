@@ -1213,18 +1213,12 @@ function clearRegionMarkers() {
     }
 }
 
-// ================================
-// ■ 2. 県選択時に突入するメイン処理（クエリパラメータ付与を復活）
-// ================================
 window.selectPrefecture = function(csvParam) {
-    
-    // 引数（例: "CHIBA_location.csv"）から県コードを安全に抽出
     let prefCode = csvParam;
     let csvUrl = '';
 
     if (csvParam.includes('_location')) {
-        prefCode = csvParam.split('_')[0]; // "CHIBA"
-        // 拡張子が抜けている場合の補完
+        prefCode = csvParam.split('_')[0];
         csvUrl = csvParam.endsWith('.csv') ? `/KANTO/${csvParam}` : `/KANTO/${csvParam}.csv`;
     } else if (csvParam.includes('.csv')) {
         csvUrl = csvParam.startsWith('/') ? csvParam : `/KANTO/${csvParam}`;
@@ -1234,7 +1228,6 @@ window.selectPrefecture = function(csvParam) {
         csvUrl = `/KANTO/${prefCode}_location.csv`;
     }
 
-    // ★ 県を選択したタイミングで URL にクエリパラメータを付与
     const url = new URL(location.href);
     url.searchParams.set('pref', prefCode);
     history.replaceState(null, '', url);
@@ -1245,26 +1238,42 @@ window.selectPrefecture = function(csvParam) {
     window.fishUrl   = `/KANTO/${window.currentPref}_fish.csv`;
     const whetherUrl = `/data/${window.currentPref}_whether.csv`;
 
-    // データの読み込みと反映
-    loadLocationCSV(csvUrl, window.currentPref).then(() => {
-        loadWhetherCSV(whetherUrl).then(csv => {
-            applyWhetherToSpots(csv);
-            updateStateFromHash();
-            routeUpdate();
-            renderAreaGuide();
-            if (window.markerControl && window.markerControl.preloadShop01) {
-                window.markerControl.preloadShop01(shopUrl);
-            }
+    // データの読み込み
+    loadLocationCSV(csvUrl, window.currentPref)
+        .then(() => {
+            return loadWhetherCSV(whetherUrl);
+        })
+        .then(csv => {
+            // ▼ エラーをキャッチしてalertするブロック
+            try {
+                applyWhetherToSpots(csv);
+                updateStateFromHash();
+                routeUpdate();
+                renderAreaGuide();
+                
+                if (window.markerControl && window.markerControl.preloadShop01) {
+                    window.markerControl.preloadShop01(shopUrl);
+                }
 
-            getAlertText(window.prefData, function(result) {
-                const el = document.getElementById("alert-bar");
-                if (!el) return;
-                el.textContent = result.text;
-                el.style.color = result.color;
-            });
+                // ここまでエラーがなければ呼ばれる
+                getAlertText(window.prefData, function(result) {
+                    const el = document.getElementById("alert-bar");
+                    if (!el) return;
+                    el.textContent = result.text;
+                    el.style.color = result.color;
+                });
+
+            } catch (err) {
+                // 描画処理などでエラーが起きた場合
+                alert("描画中にエラー発生: " + err.message);
+            }
+        })
+        .catch(err => {
+            // CSVが見つからないなどの通信エラーが起きた場合
+            alert("CSV読み込みエラー: " + err.message);
         });
-    });
 };
+
 
 
 
