@@ -15,20 +15,15 @@ window.gsiLayers = {
 };
 
 // --- dataLoader.js 内 ---
-
 // =====================
-// 1. Locationのキャッシュ対応
+// 1. Locationの読み込み (ブラウザキャッシュを活用)
 // =====================
 function loadLocationCSV(csvUrl) {
-    // ★ 変更：キャッシュがあれば即座に使い、なければフェッチ
-    const textPromise = window.fetchCache && window.fetchCache[csvUrl]
-        ? window.fetchCache[csvUrl]
-        : fetch(csvUrl).then(r => r.text());
-
-    return textPromise.then(text => {
-        // --- 既存のパース処理はそのまま ---
-        const lines = text.trim().split('\n');
-        // ...
+    // プリロードの恩恵で、ここは高速に返ってくる（fetch自体はそのまま使うのが一番安全）
+    return fetch(csvUrl)
+        .then(r => r.text())
+        .then(text => {
+            const lines = text.trim().split('\n');
             let main = null;
             const areas = [];
             const spots = [];
@@ -61,13 +56,11 @@ function loadLocationCSV(csvUrl) {
 
             allRows.forEach(row => {
                 if ((row.areaId || '').trim() === window.currentPref) {
-
                     if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
                         const grid = parseGrid(row.url);
                         row.squareX = grid.x;
                         row.squareY = grid.y;
                     }
-
                     areas.push(row);
                 }
             });
@@ -75,7 +68,6 @@ function loadLocationCSV(csvUrl) {
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
-
                 if (icon === 'spot' || icon.startsWith('fish')) {
                     spots.push(row);
                 }
@@ -90,6 +82,9 @@ function loadLocationCSV(csvUrl) {
             return { main, areas, spots };
         });
 }
+
+
+
 
 function prepareFishForArea(areaId) {
 
@@ -331,18 +326,19 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 window.prefSpotLayerCache = window.prefSpotLayerCache || {};
 
 function showPrefSpots() {
+    // 既存のレイヤーがあればマップから外す
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
     }
 
-    // ★ ここを追加：既に作成済みのレイヤーがあれば、使い回す（0秒で表示）
-    if (window.prefSpotLayerCache[window.currentPref]) {
+    // ★ キャッシュの利用：現在の県用のレイヤーがすでに作られていれば、一瞬で表示して終わる
+    if (window.currentPref && window.prefSpotLayerCache[window.currentPref]) {
         window.prefSpotLayer = window.prefSpotLayerCache[window.currentPref];
         window.prefSpotLayer.addTo(window.map);
         return;
     }
 
-    // キャッシュがない場合のみ新規作成
+    // キャッシュがない場合のみ新規作成（ループ処理）
     window.prefSpotLayer = L.layerGroup();
 
     window.spotData.forEach(spot => {
@@ -367,8 +363,10 @@ function showPrefSpots() {
         window.prefSpotLayer.addLayer(marker);
     });
 
-    // ★ 作ったレイヤーを辞書に保存しておく
-    window.prefSpotLayerCache[window.currentPref] = window.prefSpotLayer;
+    // ★ 作成したレイヤーを辞書に保存
+    if (window.currentPref) {
+        window.prefSpotLayerCache[window.currentPref] = window.prefSpotLayer;
+    }
     
     window.prefSpotLayer.addTo(window.map);
 }
