@@ -1100,13 +1100,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-// 地域選択用マーカーを一括消去するヘルパー関数
-function clearRegionMarkers() {
-    if (window.regionMarkers) {
-        window.regionMarkers.forEach(m => window.map.removeLayer(m));
-        window.regionMarkers = [];
-    }
-}
 
 // ================================
 // ■ 1. 初期画面のRegionマップ読み込み & Prefマーカー配置
@@ -1221,7 +1214,7 @@ function clearRegionMarkers() {
 }
 
 // ================================
-// ■ 2. 県選択時に突入するメイン処理
+// ■ 2. 県選択時に突入するメイン処理（クエリパラメータ付与を復活）
 // ================================
 window.selectPrefecture = function(csvParam) {
     
@@ -1240,6 +1233,11 @@ window.selectPrefecture = function(csvParam) {
     } else {
         csvUrl = `/KANTO/${prefCode}_location.csv`;
     }
+
+    // ★ 県を選択したタイミングで URL にクエリパラメータを付与
+    const url = new URL(location.href);
+    url.searchParams.set('pref', prefCode);
+    history.replaceState(null, '', url);
 
     window.currentPref = prefCode;
 
@@ -1267,6 +1265,7 @@ window.selectPrefecture = function(csvParam) {
         });
     });
 };
+
 
 
 
