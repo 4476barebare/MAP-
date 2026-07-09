@@ -11,7 +11,6 @@ const regionCsvPath = `${region}/${region}_region.csv`;
 const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
-// 🌟 新規追加：地域ごとの県リスト定義（他地域を追加する場合はここに追記）
 const regionPrefsMap = {
     "KANTO": ["CHIBA", "KANAGAWA"],
     "KANSAI": ["OSAKA", "HYOGO", "WAKAYAMA"]
@@ -245,7 +244,7 @@ function lerpStation(s1, d1, s2, d2) {
     return res;
 }
 
-function findQuadrantStations(spotLat, spotLng, validStations, maxDistKm = 50) {
+function findQuadrantStations(spotLat, spotLng, validStations, maxDistKm = 100) {
     let q1 = null, q2 = null, q3 = null, q4 = null;
     let d1 = Infinity, d2 = Infinity, d3 = Infinity, d4 = Infinity;
 
@@ -455,7 +454,7 @@ async function run() {
         }
     }
 
-    // 🌟 新規追加：② location.csv から 'L' で始まるスポットを抽出し、Thirdの計算対象とする
+    // ② location.csv から 'L' で始まるスポットを抽出し、Thirdの計算対象とする
     const thirdTargets = [];
     for (const pref of prefs) {
         const locPath = `${region}/${pref}_location.csv`;
@@ -485,13 +484,13 @@ async function run() {
 
                     const spot = { id, name, date: targetDate, lat, lng, notes, whether: null };
                     thirdTargets.push(spot);
-                    finalRows.push(spot); // Thirdの計算結果も最終出力CSVに含める
+                    finalRows.push(spot); 
                 }
             }
         }
     }
 
-    // --- First, Second 計算処理（元のロジック） ---
+    // --- First, Second 計算処理 ---
     function processStageFirstSecond(stageName) {
         let count = 0;
         for (const spot of calcTargets) {
@@ -521,22 +520,16 @@ async function run() {
         return count;
     }
 
-    // 🌟 新規追加：--- Third 計算処理（4象限 空間自動検索） ---
+    // --- Third 計算処理（4象限 空間自動検索） ---
     function processStageThird() {
         let count = 0;
-        // First/Secondで計算された結果も含めるため、実行直前に有効な基準点リストを生成
         const validRefStations = Object.values(stationMap).filter(s => s.lat != null && s.lng != null && s.whether);
 
         for (const spot of thirdTargets) {
             if (!spot.whether) {
-                // notesに数字が含まれていればそれを最大距離（km）とし、無ければデフォルト50km
-                let maxDistKm = 50;
-                if (spot.notes) {
-                    const m = spot.notes.match(/\d+/);
-                    if (m) maxDistKm = Number(m[0]);
-                }
+                // 🌟 修正: notesへの依存をなくし、一律で十分な距離(100km)を検索
+                const maxDistKm = 100;
 
-                // 4方向から最も近い基準点を探す（最大4点）
                 const found = findQuadrantStations(spot.lat, spot.lng, validRefStations, maxDistKm);
                 
                 if (found.length > 0) {
@@ -545,7 +538,7 @@ async function run() {
                     
                     const lerped = lerpMultipleStations(stations, dists);
                     spot.whether = serializeToChibaFormat(lerped);
-                    stationMap[spot.id] = { lat: spot.lat, lng: spot.lng, whether: lerped };
+                    // 🌟 修正: ID被りによる上書きを防ぐため、stationMapには追加しない
                     count++;
                 }
             }
