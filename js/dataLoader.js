@@ -2242,25 +2242,49 @@ function resetSpotLayers() {
 }
 
 
-
 function updateStateFromHash() {
+    
+    // ==========================================
+    // 1. クエリパラメータ（?pref=）の解析と反映
+    // ==========================================
+    const url = new URL(location.href);
+    const prefCode = url.searchParams.get('pref');
 
+    if (prefCode) {
+        window.currentPref = prefCode;
+    } else {
+        // パラメータがない場合は、県情報をリセットする
+        window.currentPref = null;
+        window.prefData = null; 
+    }
+
+    // ==========================================
+    // 2. ハッシュ（#）の解析と反映
+    // ==========================================
     const hash = decodeURIComponent(location.hash.replace('#', ''));
-    const parts = hash.split('/');
+    
+    // ハッシュが空、もしくは県が選択されていない場合はエリア・スポットもリセット
+    if (!hash || !window.currentPref) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+        return;
+    }
 
+    const parts = hash.split('/');
     const areaName = parts[0] || null;
     const spotKey = parts[1] || null;
 
     let resolvedAreaId = null;
 
-    if (areaName) {
+    // window.areaData が読み込まれているかチェック
+    if (areaName && window.areaData && window.areaData.length > 0) {
         const area = window.areaData.find(a => a.name === areaName);
         if (area) {
-            resolvedAreaId =
-                window.currentPref + "_" + area.individualId;
+            resolvedAreaId = window.currentPref + "_" + area.individualId;
         }
     }
 
+    // 状態の更新
     if (!areaName) {
         window.currentAreaId = null;
         window.currentSpotId = null;
@@ -2271,7 +2295,8 @@ function updateStateFromHash() {
     }
     else if (areaName && spotKey) {
         window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = resolvedAreaId + "_" + spotKey;
+        // resolvedAreaId が null の場合は spotId も作れないので null を維持
+        window.currentSpotId = resolvedAreaId ? (resolvedAreaId + "_" + spotKey) : null;
     }
 }
 
