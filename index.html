@@ -377,88 +377,7 @@ function destroyAreaUI() {
 }
 
 
-// =======================
-// ROUTE UPDATE
-// =======================
-function routeUpdate() {
 
-    if (!window.prefData) return;
-
-    // -----------------------
-    // SPOT
-    // -----------------------
-if (window.currentSpotId) {
-
-    const spotId = window.currentSpotId.split("_");
-
-    const list = window.spotData.filter(s =>
-        String(s.areaId) === String(window.currentAreaId)
-    );
-
-    const spot = list.find(s =>
-        String(s.individualId) === String(spotId[2])
-    );
-
-    drawLocation(
-        spot.name,
-        spot.lat,
-        spot.lng,
-    "13"
-    );
-
-    prepareFishForArea(window.currentAreaId).then(() => {
-
-
-            document.getElementById('map-back-btn').style.display = 'block';
-            zoomToSpot(spot);
-    });
-
-
-
-    return;
-}
-    // -----------------------
-    // AREA
-    // -----------------------
-    if (window.currentAreaId) {
-
-        const area = window.areaData.find(a =>
-            window.currentAreaId.endsWith(a.individualId)
-        );
-
-        if (!area) return;
-
-        drawLocation(
-            area.name,
-            area.lat,
-            area.lng,
-            area.zoom || window.prefData.zoom
-        );
-
-        selectArea(area.name);
-        renderCrowdImage();
-
-        return;
-    }
-
-    // -----------------------
-    // PREF
-    // -----------------------
-    drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom
-    );
-
-    document.getElementById('map-back-btn').style.display = 'none';
-    initAreaUI();
-      showPrefSpots();
-              renderPrefWeather();
-       // removeCrowdImage();
-        renderCrowdImage();
-    
-}
 
 // =======================
 // ZOOM GUARD
@@ -1501,6 +1420,70 @@ function resetAreaGuide() {
 
 }
 
+// =======================
+// ROUTE UPDATE (Region階層対応版)
+// =======================
+function routeUpdate() {
+
+    if (!window.prefData) return;
+
+    // -----------------------
+    // SPOT
+    // -----------------------
+    if (window.currentSpotId) {
+        const spotId = window.currentSpotId.split("_");
+        const list = window.spotData.filter(s =>
+            String(s.areaId) === String(window.currentAreaId)
+        );
+        const spot = list.find(s =>
+            String(s.individualId) === String(spotId[2])
+        );
+
+        drawLocation(spot.name, spot.lat, spot.lng, "13");
+
+        prepareFishForArea(window.currentAreaId).then(() => {
+            document.getElementById('map-back-btn').style.display = 'block';
+            zoomToSpot(spot);
+        });
+        return;
+    }
+
+    // -----------------------
+    // AREA
+    // -----------------------
+    if (window.currentAreaId) {
+        const area = window.areaData.find(a =>
+            window.currentAreaId.endsWith(a.individualId)
+        );
+        if (!area) return;
+
+        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+
+        selectArea(area.name);
+        renderCrowdImage();
+        
+        document.getElementById('map-back-btn').style.display = 'block'; // エリアでも表示
+        return;
+    }
+
+    // -----------------------
+    // PREF (県レベル)
+    // -----------------------
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+
+    // ★今回の変更点：県レベルでも広域（Region）に戻るためにボタンを表示する
+    document.getElementById('map-back-btn').style.display = 'block';
+
+    initAreaUI();
+    showPrefSpots();
+    renderPrefWeather();
+    renderCrowdImage();
+}
 
 
 </script>
