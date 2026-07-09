@@ -1372,7 +1372,7 @@ function renderMarkers() {
 window.activeCol = null;
 
 function createWeekItem(weekData) {
-    // 文字列の場合はオブジェクトに変換
+    // 追加: 文字列で渡ってきた場合はオブジェクトに変換する
     if (typeof weekData === "string" && weekData !== "") {
         try {
             weekData = JSON.parse(weekData);
@@ -1382,8 +1382,13 @@ function createWeekItem(weekData) {
         }
     }
 
-    if (!weekData || (!weekData.hourly && !weekData.daily)) return;
+    if (
+        !weekData ||
+        (!weekData.hourly && !weekData.daily)
+    ) return;
+    
     // ...以降はそのまま
+
 
     
   const weekEl = document.querySelector(".week");
