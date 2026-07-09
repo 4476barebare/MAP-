@@ -1,4 +1,5 @@
 function getAlertText(pref, callback) {
+    alert(pref);
   var areaId = pref.url;
   var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
   
