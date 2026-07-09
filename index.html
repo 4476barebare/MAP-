@@ -1083,15 +1083,13 @@ function loadRegionMap() {
 
                     if (!urlVal) continue;
 
-                    // URL列を「/」でスプリット
                     const parts = urlVal.split('/');
 
-                    // 例: KANTO/CHIBA_location.csv/35.56/140.18 のような4分割に対応
                     let csvParam, lat, lng;
                     if (parts.length >= 4) {
-                        csvParam = parts[1];        // [1] "CHIBA_location.csv"
-                        lat = parseFloat(parts[2]); // [2] "35.56"
-                        lng = parseFloat(parts[3]); // [3] "140.18"
+                        csvParam = parts[1];
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
                     } else if (parts.length === 3) {
                         csvParam = parts[0];
                         lat = parseFloat(parts[1]);
@@ -1101,6 +1099,14 @@ function loadRegionMap() {
                     }
 
                     if (isNaN(lat) || isNaN(lng)) continue;
+
+                    // ★ ここを追加！ マーカーを作る裏でCSVを事前ダウンロード
+                    let tempPref = csvParam;
+                    if (tempPref.includes('_location')) tempPref = tempPref.split('_')[0];
+                    preloadCsvFiles(tempPref);
+
+                    // --- 以降は元のマーカー生成処理 ---
+
 
                     // 県名テキストを表示するためのカスタムDivIcon
                     const prefIcon = L.divIcon({
@@ -1165,17 +1171,19 @@ document.getElementById('map-back-btn')?.addEventListener('click', () => {
 
 
 function loadWhetherCSV(url) {
-
-    return fetch(url)
-        .then(res => {
+    // ★ 変更：キャッシュがあれば即座に使い、なければフェッチ
+    const textPromise = window.fetchCache && window.fetchCache[url]
+        ? window.fetchCache[url]
+        : fetch(url).then(res => {
             if (!res.ok) throw new Error("whether csv fetch失敗");
             return res.text();
-        })
-        .then(text => {
+        });
 
-            const lines = text.trim().split("\n");
-
-            lines.shift();
+    return textPromise.then(text => {
+        // --- 既存の lines などのパース処理はそのまま ---
+        const lines = text.trim().split("\n");
+        lines.shift();
+        // ...
 
             return lines.map(line => {
 
@@ -1539,6 +1547,26 @@ function routeUpdate() {
     }
 }
 
+// ==========================================
+// 爆速化：バックグラウンドCSVプリロード
+// ==========================================
+window.fetchCache = {};
+
+function preloadCsvFiles(prefCode) {
+    const csvUrl = `/KANTO/${prefCode}_location.csv`;
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+    const shopUrl = `/KANTO/${prefCode}_shop.csv`;
+
+    // まだキャッシュされていなければフェッチを開始し、テキスト化するPromiseを保持する
+    if (!window.fetchCache[csvUrl]) {
+        window.fetchCache[csvUrl] = fetch(csvUrl).then(res => res.text());
+    }
+    if (!window.fetchCache[whetherUrl]) {
+        window.fetchCache[whetherUrl] = fetch(whetherUrl).then(res => res.text());
+    }
+    // ショップデータはブラウザのディスクキャッシュに乗せるだけで効果あり
+    fetch(shopUrl, { priority: 'low' }).catch(()=>{});
+}
 
 
 
