@@ -1548,24 +1548,27 @@ function routeUpdate() {
 }
 
 // ==========================================
-// 爆速化：バックグラウンドCSVプリロード
+// 爆速化：バックグラウンドCSVプリロード（安全版）
 // ==========================================
-window.fetchCache = {};
+// Promiseではなく、単なる「読み込み済みフラグ」として使う
+window.fetchCacheStatus = {};
 
 function preloadCsvFiles(prefCode) {
-    const csvUrl = `/KANTO/${prefCode}_location.csv`;
+    if (!prefCode) return;
+    
+    const csvUrl     = `/KANTO/${prefCode}_location.csv`;
     const whetherUrl = `/data/${prefCode}_whether.csv`;
-    const shopUrl = `/KANTO/${prefCode}_shop.csv`;
+    const shopUrl    = `/KANTO/${prefCode}_shop.csv`;
 
-    // まだキャッシュされていなければフェッチを開始し、テキスト化するPromiseを保持する
-    if (!window.fetchCache[csvUrl]) {
-        window.fetchCache[csvUrl] = fetch(csvUrl).then(res => res.text());
+    // まだリクエストを投げていない場合のみ、裏でfetchを走らせてブラウザキャッシュに載せる
+    if (!window.fetchCacheStatus[prefCode]) {
+        window.fetchCacheStatus[prefCode] = true;
+        
+        // priority: 'low' を指定して、メインの描画（Regionマップ等）を邪魔しないようにする
+        fetch(csvUrl, { priority: 'low' }).catch(()=>{});
+        fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
+        fetch(shopUrl, { priority: 'low' }).catch(()=>{});
     }
-    if (!window.fetchCache[whetherUrl]) {
-        window.fetchCache[whetherUrl] = fetch(whetherUrl).then(res => res.text());
-    }
-    // ショップデータはブラウザのディスクキャッシュに乗せるだけで効果あり
-    fetch(shopUrl, { priority: 'low' }).catch(()=>{});
 }
 
 
