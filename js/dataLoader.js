@@ -2276,8 +2276,48 @@ function updateStateFromHash() {
 }
 
 function goBack() {
-    map.touchZoom.disable();
-    map.dragging.disable();
+    // =====================================================
+    // ★ 追加: ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
+    // =====================================================
+    if (!window.currentAreaId && !window.currentSpotId) {
+        
+        // 1. URLをプレーンに戻す
+        const url = new URL(location.href);
+        url.searchParams.delete('pref');
+        history.replaceState(null, '', url);
+
+        // 2. 状態のリセット
+        window.currentPref = null;
+        window.prefData = null;
+        location.hash = '';
+
+        // 3. UIとレイヤーのクリーンアップ
+        if (typeof destroyAreaUI === 'function') destroyAreaUI();
+        if (typeof removeCrowdImage === 'function') removeCrowdImage();
+        
+        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
+            window.markerControl.clearLayers();
+        }
+        if (window.phase1Group) window.phase1Group.clearLayers();
+        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+        
+        // アラートバーのクリア
+        const alertBar = document.getElementById("alert-bar");
+        if (alertBar) alertBar.textContent = "";
+
+        // Regionのトップなので戻るボタンを非表示
+        document.getElementById('map-back-btn').style.display = 'none';
+
+        // 4. Regionマップを再読み込み
+        loadRegionMap();
+        return;
+    }
+
+    // --- ここから下は元の処理 ---
+    
+    // ※エラー防止のため map → window.map に統一しています
+    window.map.touchZoom.disable();
+    window.map.dragging.disable();
 
     const area = window.areaData.find(a =>
         String(a.individualId) === String(window.currentAreaId?.split('_')[1])
@@ -2305,14 +2345,12 @@ function goBack() {
         window.map.options.maxBoundsViscosity = 0;
 
         // レイヤ整理
-        
         if (window.fishLayer) {
             window.map.removeLayer(window.fishLayer);
         }
         
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        //const restoreSpot = buildSpotRestoreObject();
         if (!restoreSpot) return;
 
         // spotキー除去
@@ -2331,7 +2369,6 @@ function goBack() {
         enablePhase2(window.map);
         phase1menu(window.currentAreaId);
         
-
         return;
     }
 
@@ -2399,35 +2436,32 @@ function goBack() {
     } else {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
-    document.getElementById('map-back-btn').style.display = 'none';
-
-// ② 1フレーム待つ
-requestAnimationFrame(() => {
     
+    // ★変更点：県レベルに戻ったとき、さらにRegionへ戻れるようボタンは「表示」したままにする
+    document.getElementById('map-back-btn').style.display = 'block';
 
-    // ③ サイズ確定後に通知
-    window.map.invalidateSize(true);
+    // ② 1フレーム待つ
+    requestAnimationFrame(() => {
+        // ③ サイズ確定後に通知
+        window.map.invalidateSize(true);
 
+        // ④ その後に移動
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            window.prefData.zoom
+        );
+        location.hash = '';
+        updateStateFromHash();
+        initAreaUI();
+        showPrefSpots();
+        renderPrefWeather();
 
-    // ④ その後に移動
-    drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom
-    );
-    location.hash = '';
-    updateStateFromHash();
-    initAreaUI();
-    showPrefSpots();
-    renderPrefWeather();
-    //renderCrowdImage();
-
-    resetAreaGuide();
-    
-    
-});
+        resetAreaGuide();
+    });
 }
+
 
 function buildSpotRestoreObject() {
 
