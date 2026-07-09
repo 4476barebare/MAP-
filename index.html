@@ -1453,6 +1453,42 @@ function openArea(areaKey, isUserAction = false) {
   });
 }
 
+// ================================
+// ■ エリアガイドの描画（グローバル関数として復活）
+// ================================
+function renderAreaGuide() {
+    const container = document.getElementById('area-guide');
+    if (!container) return; // コンテナがない場合はスキップ
+
+    // window.prefData がまだ無い場合は処理を抜ける
+    if (!window.prefData) return;
+
+    container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
+
+    if (!window.areaData) return;
+
+    window.areaData.forEach(area => {
+        const div = document.createElement('div');
+        div.className = 'area';
+        div.id = area.individualId; // ←ここ重要
+
+        div.innerHTML = `
+            <h2>${area.name}</h2>
+            <p class="text">${area.notes}</p>
+        `;
+
+        div.querySelector('h2').addEventListener('click', () => {
+            location.hash = encodeURIComponent(area.name);
+            updateStateFromHash();
+            routeUpdate();
+            openArea(area.individualId, true);
+        });
+
+        container.appendChild(div);
+    });
+}
+
+
 function resetAreaGuide() {
 
   const container = document.getElementById('area-guide');
