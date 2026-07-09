@@ -1304,62 +1304,69 @@ function zoomToSpot(spot) {
 function showFishMarkers(url) {
   if (!window.map) return;
 
+  // 1. 古い魚のマーカーが残っていればマップから削除する
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
+    window.fishLayer = null;
+  }
+
+  // =========================================================
+  // ★ 追加ガード：URLデータが存在しない、または空文字の場合は
+  // 古いマーカーを消した状態のまま、エラーを出さずに安全に終了する
+  // =========================================================
+  if (!url || typeof url !== 'string' || url.trim() === '') {
+    return;
   }
 
   window.fishLayer = L.layerGroup();
 
   const fishList = url.split(',');
 
+  // ★ 追加ガード：万が一「緯度・経度」が空の不正なデータが混ざっていても
+  // Leafletのマーカー生成エラー（NaNエラー）を回避するようフィルタリング
   const markers = fishList.map(item => {
     const parts = item.split('|');
     return {
       name: parts[0],
-      lat: parts[1],
-      lng: parts[2]
+      lat: parseFloat(parts[1]),
+      lng: parseFloat(parts[2])
     };
-  });
+  }).filter(fish => !isNaN(fish.lat) && !isNaN(fish.lng));
 
-function renderMarkers() {
+  function renderMarkers() {
+    if (!window.fishLayer) return;
+    window.fishLayer.clearLayers();
 
-  window.fishLayer.clearLayers();
+    const zoom = Math.round(window.map.getZoom());
+    const el = window.map.getContainer();
 
-  const zoom = Math.round(window.map.getZoom());
-  const el = window.map.getContainer();
+    // -------------------------
+    // zoomクラス（そのまま維持）
+    // -------------------------
+    el.classList.remove('zoom-18', 'zoom-17', 'zoom-16');
 
-  // -------------------------
-  // zoomクラス（そのまま維持）
-  // -------------------------
-  el.classList.remove('zoom-18', 'zoom-17', 'zoom-16');
+    if (zoom >= 18) {
+      el.classList.add('zoom-18');
+    } else if (zoom === 17) {
+      el.classList.add('zoom-17');
+    } else if (zoom <= 16) {
+      el.classList.add('zoom-16');
+    }
 
-  if (zoom >= 18) {
-    el.classList.add('zoom-18');
+    // -------------------------
+    // マーカー（ドット削除）
+    // -------------------------
+    for (const fish of markers) {
+      const icon = L.divIcon({
+        className: 'fish-label',
+        html: `<div class="fish-text">${fish.name}</div>`,
+        iconSize: null
+      });
 
-  } else if (zoom === 17) {
-    el.classList.add('zoom-17');
-
-  } else if (zoom <= 16) {
-    el.classList.add('zoom-16');
-
+      const marker = L.marker([fish.lat, fish.lng], { icon });
+      window.fishLayer.addLayer(marker);
+    }
   }
-
-  // -------------------------
-  // マーカー（ドット削除）
-  // -------------------------
-  for (const fish of markers) {
-
-    const icon = L.divIcon({
-      className: 'fish-label',
-      html: `<div class="fish-text">${fish.name}</div>`,
-      iconSize: null
-    });
-
-    const marker = L.marker([fish.lat, fish.lng], { icon });
-    window.fishLayer.addLayer(marker);
-  }
-}
-
 
   window.map.addLayer(window.fishLayer);
 
