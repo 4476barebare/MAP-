@@ -1094,48 +1094,100 @@ function removeCrowdImage() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 初期表示：リージョン（関東全体など）のマップを描画
+    loadRegionMap();
+});
 
+// ================================
+// ■ 1. 初期画面のRegionマップ読み込み
+// ================================
+function loadRegionMap() {
+    const regionCsvUrl = '/KANTO/KANTO_region.csv';
+
+    fetch(regionCsvUrl)
+        .then(res => {
+            if (!res.ok) throw new Error("Region CSV fetch failed");
+            return res.text();
+        })
+        .then(text => {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return; // データがない場合は終了
+
+            // ヘッダー行から各カラムのインデックスを取得
+            const headers = lines[0].split(',').map(h => h.trim());
+            const typeIdx = headers.indexOf('type');
+            const latIdx  = headers.indexOf('lat');
+            const lngIdx  = headers.indexOf('lng');
+            const zoomIdx = headers.indexOf('zoom');
+            const nameIdx = headers.indexOf('name');
+
+            // 必須カラムが存在するかチェック
+            if (typeIdx === -1 || latIdx === -1 || lngIdx === -1 || zoomIdx === -1) {
+                console.error("CSVに必須カラム (type, lat, lng, zoom) が不足しています。");
+                return;
+            }
+
+            // type列が 'region' の行を探して drawLocation を実行
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.trim());
+                
+                if (cols[typeIdx] === 'region') {
+                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
+                    const lat  = parseFloat(cols[latIdx]);
+                    const lng  = parseFloat(cols[lngIdx]);
+                    const zoom = cols[zoomIdx];
+
+                    // 地図の初期描画関数を呼び出し
+                    drawLocation(name, lat, lng, zoom);
+                    break; // region行を見つけたらループを抜ける
+                }
+            }
+        })
+        .catch(err => {
+            console.error("Regionマップの初期化エラー:", err);
+        });
+}
+
+// ================================
+// ■ 2. 県選択時に突入するメイン処理（元のDOMContentLoaded内処理）
+// ================================
+// ※地図上のUIやボタン等から selectPrefecture('CHIBA') のように呼ばれる想定
+window.selectPrefecture = function(prefCode) {
     const url = new URL(location.href);
+    url.searchParams.set('pref', prefCode);
+    history.replaceState(null, '', url);
 
-    if (!url.searchParams.get('pref')) {
-        url.searchParams.set('pref', 'CHIBA');
-        history.replaceState(null, '', url);
-    }
+    window.currentPref = prefCode;
 
-    window.currentPref = url.searchParams.get('pref');
-
-    const csvUrl = `/KANTO/${window.currentPref}_location.csv`;
-    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
-    window.fishUrl = `/KANTO/${window.currentPref}_fish.csv`;
+    const csvUrl     = `/KANTO/${window.currentPref}_location.csv`;
+    const shopUrl    = `/KANTO/${window.currentPref}_shop.csv`;
+    window.fishUrl   = `/KANTO/${window.currentPref}_fish.csv`;
     const whetherUrl = `/data/${window.currentPref}_whether.csv`;
 
-loadLocationCSV(csvUrl, window.currentPref).then(() => {
-    loadWhetherCSV(whetherUrl).then(csv => {
-        applyWhetherToSpots(csv);
-        updateStateFromHash();
-        routeUpdate();
-        renderAreaGuide();
-        window.markerControl.preloadShop01(shopUrl);
+    // データの読み込みと反映
+    loadLocationCSV(csvUrl, window.currentPref).then(() => {
+        loadWhetherCSV(whetherUrl).then(csv => {
+            applyWhetherToSpots(csv);
+            updateStateFromHash();
+            routeUpdate();
+            renderAreaGuide();
+            if (window.markerControl && window.markerControl.preloadShop01) {
+                window.markerControl.preloadShop01(shopUrl);
+            }
 
-
-getAlertText(window.prefData, function(result) {
-    const el = document.getElementById("alert-bar");
-    if (!el) return;
-
-    el.textContent = result.text;
-    el.style.color = result.color;
-});
-
+            getAlertText(window.prefData, function(result) {
+                const el = document.getElementById("alert-bar");
+                if (!el) return;
+                el.textContent = result.text;
+                el.style.color = result.color;
+            });
+        });
     });
+};
 
-});
-
-
-document.getElementById('map-back-btn')
-    ?.addEventListener('click', () => {
-        goBack(window.currentHash);
-    }); // ← 正常に閉じてる
-
+// ================================
+// ■ 戻るボタンのSVGアイコン設定など（独立して実行）
+// ================================
 fetch('/icon/back.svg')
     .then(res => res.text())
     .then(svg => {
@@ -1143,46 +1195,14 @@ fetch('/icon/back.svg')
         if (!btn) return;
 
         btn.innerHTML = svg;
-
         const svgEl = btn.querySelector('svg');
         if (svgEl) svgEl.classList.add('back-icon');
-    }); // ← これも閉じてる
+    });
 
-  
-    
-function renderAreaGuide() {
-
-  const container = document.getElementById('area-guide');
-
-  container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
-
-  window.areaData.forEach(area => {
-
-    const div = document.createElement('div');
-    div.className = 'area';
-    div.id = area.individualId; // ←ここ重要
-
-    div.innerHTML = `
-      <h2>${area.name}</h2>
-      <p class="text">${area.notes}</p>
-    `;
-
-div.querySelector('h2').addEventListener('click', () => {
-
-  location.hash = encodeURIComponent(area.name);
-  updateStateFromHash();
-  routeUpdate();
-
-openArea(area.individualId, true);
-
+document.getElementById('map-back-btn')?.addEventListener('click', () => {
+    goBack(window.currentHash);
 });
 
-    container.appendChild(div);
-  });
-
-}
-
-});
 
 function loadWhetherCSV(url) {
 
