@@ -52,6 +52,9 @@ async function fetchJSON(url) {
     }
 }
 
+// ========================================================
+// パーサー
+// ========================================================
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
@@ -124,8 +127,18 @@ function normalizeInlandStation(w) {
 }
 
 // ========================================================
-// 🌟 修正：内陸専用シリアライザー（海データを完全カット）
+// シリアライザー（海データ完全カット版）
 // ========================================================
+function timeToMinutes(tStr) {
+    if (!tStr) return null;
+    if (!isNaN(Number(tStr))) return Number(tStr); 
+    const m = String(tStr).match(/T(\d{2}):(\d{2})/); 
+    if (m) {
+        return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+    }
+    return null;
+}
+
 function serializeToChibaFormat(s) {
     const res = { hourly: [], daily: [] };
     
@@ -133,28 +146,22 @@ function serializeToChibaFormat(s) {
         if (s[h]) {
             const hourObj = { weather: [] };
             
-            // --- 1. hourly の weather ---
             if (s[h].weather && s[h].weather.length > 0) {
                 hourObj.weather = s[h].weather.map(arr => {
                     const w = arr.map(v => v === "" || v == null ? null : Number(v));
                     return [
-                        w[0] !== undefined ? w[0] : null, // [0] 天気コード
-                        w[1] !== undefined ? w[1] : null, // [1] 気温
-                        w[2] !== undefined ? w[2] : null, // [2] 降水量
-                        w[3] !== undefined ? w[3] : null, // [3] 降水確率
-                        w[4] !== undefined ? w[4] : null, // [4] 風速
-                        null,                             // [5] 風向き（カット）
-                        null                              // [6] 波高（カット）
+                        w[0] !== undefined ? w[0] : null,
+                        w[1] !== undefined ? w[1] : null,
+                        w[2] !== undefined ? w[2] : null,
+                        w[3] !== undefined ? w[3] : null,
+                        w[4] !== undefined ? w[4] : null,
+                        null,
+                        null 
                     ];
                 });
             }
             
-            // --- 2. hourly の oneday ---
-            // 平均水温、日の出、日の入りを完全カット
             hourObj.oneday = { avg: null, sunrise: null, sunset: null };
-            
-            // --- 3. hourly の tide ---
-            // 24個のブロックを確保したまま中身を空（null）にする
             hourObj.tide = Array(24).fill(null);
             
             res.hourly.push(hourObj);
@@ -165,23 +172,10 @@ function serializeToChibaFormat(s) {
         res.daily = s.daily.map(arr => {
             const dObj = { weather: [], tide: [], dailyEx: {} };
             
-            // --- 4. daily の weather ---
-            // [0] 天気コード, [1] 気温
             dObj.weather.push(arr[0] === "" || arr[0] == null ? null : Number(arr[0]));
             dObj.weather.push(arr[1] === "" || arr[1] == null ? null : Number(arr[1]));
-            
-            // --- 5. daily の tide ---
-            // 24個のブロックを確保したまま中身を空（null）にする
             dObj.tide = Array(24).fill(null);
-            
-            // --- 6. daily の dailyEx ---
-            // 平均水温、波高、日の出、日の入りを完全カット
-            dObj.dailyEx = {
-                avg: null,
-                wave: null,
-                sunrise: null,
-                sunset: null
-            };
+            dObj.dailyEx = { avg: null, wave: null, sunrise: null, sunset: null };
             
             return dObj;
         });
@@ -190,7 +184,7 @@ function serializeToChibaFormat(s) {
 }
 
 // ========================================================
-// --- 数学・補間ロジック ---
+// 数学・補間ロジック
 // ========================================================
 function calcGeoDistance(lat1, lng1, lat2, lng2) {
     const R = 6371;
@@ -377,7 +371,8 @@ async function run() {
     if (fs.existsSync(outCsvPath)) {
         const existingLines = fs.readFileSync(outCsvPath, "utf-8").split("\n").filter(Boolean);
         if (existingLines.length > 1) {
-            const firstRowDate = existingLines[1].split(",")[2].replace(/^"|"$/g, '').trim();
+            // 出力ヘッダーから individualId を消したため、インデックスを調整して日付をチェック
+            const firstRowDate = existingLines[1].split(",")[1]?.replace(/^"|"$/g, '').trim();
             if (firstRowDate === todayStr) {
                 console.log(`✅ すでに本日（${todayStr}）のデータで計算済みです。処理をスキップします。`);
                 return; 
@@ -446,7 +441,6 @@ async function run() {
     const regionLines = fs.readFileSync(regionCsvPath, "utf-8").split("\n").filter(Boolean);
     regionLines.shift(); 
 
-    const finalRows = []; 
     const calcTargets = [];
 
     // ① マスターCSV（First, Second 計算用）の読み込み
@@ -459,11 +453,9 @@ async function run() {
         if (stationMap[id]) {
             stationMap[id].lat = lat;
             stationMap[id].lng = lng;
-            finalRows.push({ id, name, date: targetDate, whether: serializeToChibaFormat(stationMap[id].whether) });
         } else {
             const spot = { id, name, date: targetDate, lat, lng, notes, whether: null };
             calcTargets.push(spot);
-            finalRows.push(spot);
         }
     }
 
@@ -497,7 +489,6 @@ async function run() {
 
                     const spot = { id, name, date: targetDate, lat, lng, notes, whether: null };
                     thirdTargets.push(spot);
-                    finalRows.push(spot); 
                 }
             }
         }
@@ -541,7 +532,6 @@ async function run() {
         for (const spot of thirdTargets) {
             if (!spot.whether) {
                 const maxDistKm = 100;
-
                 const found = findQuadrantStations(spot.lat, spot.lng, validRefStations, maxDistKm);
                 
                 if (found.length > 0) {
@@ -561,11 +551,19 @@ async function run() {
     console.log(`🧮 Secondステージ: ${processStageFirstSecond("Second")} 件 計算完了`);
     console.log(`🧮 Thirdステージ: ${processStageThird()} 件 計算完了`);
 
+    // ========================================================
+    // 🌟 修正：Thirdの計算結果のみを、指定のヘッダー構成でCSVに出力
+    // ========================================================
     console.log("💾 計算結果をCSVに書き出し中...");
-    const outLines = ["individualId,name,date,whether"];
-    for (const row of finalRows) {
-        const whetherStr = row.whether ? JSON.stringify(row.whether) : "";
-        outLines.push(`${row.id},${row.name},${row.date},${whetherStr}`);
+    const outLines = ["name,date,whether"];
+    
+    // thirdTargetsのみをループ
+    for (const row of thirdTargets) {
+        // 計算に失敗した（基準点が見つからなかった）スポットは出力しない
+        if (!row.whether) continue; 
+        
+        const whetherStr = JSON.stringify(row.whether);
+        outLines.push(`${row.name},${row.date},${whetherStr}`);
     }
 
     fs.writeFileSync(outCsvPath, outLines.join("\n") + "\n", "utf-8");
