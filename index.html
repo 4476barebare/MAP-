@@ -1098,6 +1098,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRegionMap();
 });
 
+
+
+// 地域選択用マーカーを一括消去するヘルパー関数
+function clearRegionMarkers() {
+    if (window.regionMarkers) {
+        window.regionMarkers.forEach(m => window.map.removeLayer(m));
+        window.regionMarkers = [];
+    }
+}
+
 // ================================
 // ■ 1. 初期画面のRegionマップ読み込み & Prefマーカー配置
 // ================================
@@ -1111,12 +1121,12 @@ function loadRegionMap() {
         })
         .then(text => {
             const lines = text.trim().split('\n');
-            if (lines.length < 2) return; 
+            if (lines.length < 2) return;
 
             // ヘッダー行から各カラムのインデックスを取得（大文字小文字を吸収）
             const headers = lines[0].split(',').map(h => h.trim());
             const headersLower = headers.map(h => h.toLowerCase());
-            
+
             const typeIdx  = headersLower.indexOf('type');
             const latIdx   = headersLower.indexOf('lat');
             const lngIdx   = headersLower.indexOf('lng');
@@ -1130,7 +1140,7 @@ function loadRegionMap() {
                 return;
             }
 
-            // 初期化時に古い地域選択マーカーがあればクリアするための配列
+            // 初期化時に古い地域選択マーカーがあればクリア
             window.regionMarkers = window.regionMarkers || [];
 
             for (let i = 1; i < lines.length; i++) {
@@ -1144,28 +1154,37 @@ function loadRegionMap() {
                     const lat  = parseFloat(cols[latIdx]);
                     const lng  = parseFloat(cols[lngIdx]);
                     const zoom = cols[zoomIdx];
-                    
+
                     drawLocation(name, lat, lng, zoom);
                 }
 
                 // ─── b. 県突入用のアイコンマーカーを配置 (type: pref) ───
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
-                    const urlVal = cols[urlIdx];     // 例: "CHIBA_location/35.6074/140.1065" など
-                    const prefName = cols[notesIdx]; // テキスト表記するpref Name
+                    const urlVal = cols[urlIdx];
+                    const prefName = cols[notesIdx];
 
                     if (!urlVal) continue;
-                    
+
                     // URL列を「/」でスプリット
                     const parts = urlVal.split('/');
-                    if (parts.length < 3) continue;
 
-                    const csvParam = parts[0]; // [0] がcsv関連のパラメータ（関数の引数にする）
-                    const lat = parseFloat(parts[1]); // [1] がlat
-                    const lng = parseFloat(parts[2]); // [2] がlng
+                    // 例: KANTO/CHIBA_location.csv/35.56/140.18 のような4分割に対応
+                    let csvParam, lat, lng;
+                    if (parts.length >= 4) {
+                        csvParam = parts[1];        // [1] "CHIBA_location.csv"
+                        lat = parseFloat(parts[2]); // [2] "35.56"
+                        lng = parseFloat(parts[3]); // [3] "140.18"
+                    } else if (parts.length === 3) {
+                        csvParam = parts[0];
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    } else {
+                        continue;
+                    }
 
                     if (isNaN(lat) || isNaN(lng)) continue;
 
-                    // 県名テキストを表示するためのカスタムDivIcon（CSSで装飾可能）
+                    // 県名テキストを表示するためのカスタムDivIcon
                     const prefIcon = L.divIcon({
                         className: 'pref-choice-marker',
                         html: `<div class="pref-choice-label">${prefName}</div>`,
@@ -1178,10 +1197,7 @@ function loadRegionMap() {
 
                     // クリックイベントで県選択関数を呼び出す
                     marker.on('click', () => {
-                        // 突入時に不要になる地域選択マーカーをすべて地図から削除
                         clearRegionMarkers();
-                        
-                        // .URLをスプリットした[0]を引数にして呼び出し
                         window.selectPrefecture(csvParam);
                     });
 
@@ -1194,34 +1210,34 @@ function loadRegionMap() {
         });
 }
 
-// 地域選択用マーカーを一括消去するヘルパー関数
+// ================================
+// ■ 地域選択用マーカーを一括消去する関数
+// ================================
 function clearRegionMarkers() {
-    if (window.regionMarkers) {
+    if (window.regionMarkers && window.map) {
         window.regionMarkers.forEach(m => window.map.removeLayer(m));
         window.regionMarkers = [];
     }
 }
 
 // ================================
-// ■ 2. 県選択時に突入するメイン処理（URL変更なし）
+// ■ 2. 県選択時に突入するメイン処理
 // ================================
 window.selectPrefecture = function(csvParam) {
     
-    // 引数（parts[0]）から県コード（例: 'CHIBA'）を安全に抽出・判定するロジック
+    // 引数（例: "CHIBA_location.csv"）から県コードを安全に抽出
     let prefCode = csvParam;
     let csvUrl = '';
 
     if (csvParam.includes('_location')) {
-        // "CHIBA_location" などの文字列が来た場合、アンダースコア前をprefCodeにする
-        prefCode = csvParam.split('_')[0];
-        csvUrl = `/KANTO/${csvParam}.csv`;
+        prefCode = csvParam.split('_')[0]; // "CHIBA"
+        // 拡張子が抜けている場合の補完
+        csvUrl = csvParam.endsWith('.csv') ? `/KANTO/${csvParam}` : `/KANTO/${csvParam}.csv`;
     } else if (csvParam.includes('.csv')) {
-        // パスやファイル名がそのまま入っている場合
         csvUrl = csvParam.startsWith('/') ? csvParam : `/KANTO/${csvParam}`;
-        const match = csvParam.match(/\/([A-Za-es-]+)_/) || csvParam.match(/^([A-Za-es-]+)_/);
+        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
         if (match) prefCode = match[1];
     } else {
-        // 単なる県コード（例: 'CHIBA'）が来た場合
         csvUrl = `/KANTO/${prefCode}_location.csv`;
     }
 
@@ -1251,6 +1267,7 @@ window.selectPrefecture = function(csvParam) {
         });
     });
 };
+
 
 
 // ================================
