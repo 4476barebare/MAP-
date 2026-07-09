@@ -52,9 +52,6 @@ async function fetchJSON(url) {
     }
 }
 
-// ========================================================
-// ⚠️ 以下、既存のパース・計算・シリアライズ処理（変更なし）
-// ========================================================
 function parseCsvLine(line) {
     return line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v ? v.trim().replace(/^"|"$/g, '') : "");
 }
@@ -126,59 +123,75 @@ function normalizeInlandStation(w) {
     return res;
 }
 
-function timeToMinutes(tStr) {
-    if (!tStr) return null;
-    if (!isNaN(Number(tStr))) return Number(tStr); 
-    const m = String(tStr).match(/T(\d{2}):(\d{2})/); 
-    if (m) {
-        return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-    }
-    return null;
-}
-
+// ========================================================
+// 🌟 修正：内陸専用シリアライザー（海データを完全カット）
+// ========================================================
 function serializeToChibaFormat(s) {
     const res = { hourly: [], daily: [] };
+    
     for (const h of ['hourly0', 'hourly1', 'hourly2']) {
         if (s[h]) {
             const hourObj = { weather: [] };
+            
+            // --- 1. hourly の weather ---
             if (s[h].weather && s[h].weather.length > 0) {
-                hourObj.weather = s[h].weather.map(arr => arr.map(v => v === "" || v == null ? null : Number(v)));
+                hourObj.weather = s[h].weather.map(arr => {
+                    const w = arr.map(v => v === "" || v == null ? null : Number(v));
+                    return [
+                        w[0] !== undefined ? w[0] : null, // [0] 天気コード
+                        w[1] !== undefined ? w[1] : null, // [1] 気温
+                        w[2] !== undefined ? w[2] : null, // [2] 降水量
+                        w[3] !== undefined ? w[3] : null, // [3] 降水確率
+                        w[4] !== undefined ? w[4] : null, // [4] 風速
+                        null,                             // [5] 風向き（カット）
+                        null                              // [6] 波高（カット）
+                    ];
+                });
             }
+            
+            // --- 2. hourly の oneday ---
+            // 平均水温、日の出、日の入りを完全カット
             hourObj.oneday = { avg: null, sunrise: null, sunset: null };
-            if (s[h].water && s[h].water.length >= 3) {
-                hourObj.oneday = {
-                    avg: s[h].water[0] === "" || s[h].water[0] == null ? null : Number(s[h].water[0]),
-                    sunrise: timeToMinutes(s[h].water[1]),
-                    sunset: timeToMinutes(s[h].water[2])
-                };
-            } else if (s[h].water && s[h].water.length > 0) {
-                hourObj.oneday.avg = s[h].water[0] === "" || s[h].water[0] == null ? null : Number(s[h].water[0]);
-            }
-            hourObj.tide = [];
-            if (s[h].tide && s[h].tide.length > 0) {
-                hourObj.tide = s[h].tide.map(v => Number(v) || 0);
-            }
+            
+            // --- 3. hourly の tide ---
+            // 24個のブロックを確保したまま中身を空（null）にする
+            hourObj.tide = Array(24).fill(null);
+            
             res.hourly.push(hourObj);
         }
     }
+    
     if (s.daily && s.daily.length > 0) {
         res.daily = s.daily.map(arr => {
-            const dObj = { weather: [], tide: [], dailyEx: { avg: null, wave: null, sunrise: null, sunset: null } };
+            const dObj = { weather: [], tide: [], dailyEx: {} };
+            
+            // --- 4. daily の weather ---
+            // [0] 天気コード, [1] 気温
             dObj.weather.push(arr[0] === "" || arr[0] == null ? null : Number(arr[0]));
             dObj.weather.push(arr[1] === "" || arr[1] == null ? null : Number(arr[1]));
-            if (arr[6]) dObj.tide = arr[6].split(',').map(v => Number(v) || 0);
+            
+            // --- 5. daily の tide ---
+            // 24個のブロックを確保したまま中身を空（null）にする
+            dObj.tide = Array(24).fill(null);
+            
+            // --- 6. daily の dailyEx ---
+            // 平均水温、波高、日の出、日の入りを完全カット
             dObj.dailyEx = {
-                avg: arr[2] === "" || arr[2] == null ? null : Number(arr[2]),
-                wave: arr[3] === "" || arr[3] == null ? null : Number(arr[3]),
-                sunrise: timeToMinutes(arr[4]),
-                sunset: timeToMinutes(arr[5])
+                avg: null,
+                wave: null,
+                sunrise: null,
+                sunset: null
             };
+            
             return dObj;
         });
     }
     return res;
 }
 
+// ========================================================
+// --- 数学・補間ロジック ---
+// ========================================================
 function calcGeoDistance(lat1, lng1, lat2, lng2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -527,7 +540,6 @@ async function run() {
 
         for (const spot of thirdTargets) {
             if (!spot.whether) {
-                // 🌟 修正: notesへの依存をなくし、一律で十分な距離(100km)を検索
                 const maxDistKm = 100;
 
                 const found = findQuadrantStations(spot.lat, spot.lng, validRefStations, maxDistKm);
@@ -538,7 +550,6 @@ async function run() {
                     
                     const lerped = lerpMultipleStations(stations, dists);
                     spot.whether = serializeToChibaFormat(lerped);
-                    // 🌟 修正: ID被りによる上書きを防ぐため、stationMapには追加しない
                     count++;
                 }
             }
