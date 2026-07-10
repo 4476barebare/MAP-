@@ -1510,20 +1510,26 @@ function routeUpdate() {
     // PREF (県トップ)
     // -----------------------
     if (window.prefData) {
+        // ① まずは地図の移動と最低限のUIだけを最優先で実行する
         drawLocation(
             window.prefData.name,
             window.prefData.lat,
             window.prefData.lng,
             window.prefData.zoom
         );
-
         document.getElementById('map-back-btn').style.display = 'block';
 
-        initAreaUI();
-        showPrefSpots();
-        renderPrefWeather();
-        renderCrowdImage();
+        // ② ブラウザの「地図の描画」が落ち着いた次の瞬間に、重い要素を乗せる
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                showPrefSpots();
+                initAreaUI();
+                renderPrefWeather();
+                renderCrowdImage();
+            });
+        });
     }
+
 }
 
 
