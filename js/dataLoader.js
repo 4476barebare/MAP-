@@ -14,24 +14,38 @@ window.gsiLayers = {
   photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
 
+// =====================
+// 1. Locationの読み込み (動的グローバル変数による爆速キャッシュ)
+// =====================
 function loadLocationCSV(csvUrl) {
+    const pref = window.currentPref; // 現在の県コード（例: "CHIBA"）
 
-    function parseGrid(str) {
-        if (!str) return { x: null, y: null };
+    // ==========================================
+    // ★ 分岐A：既に3件のデータが生成されていれば、リネーム（代入）して即リターン
+    // ==========================================
+    if (window[`${pref}_prefData`] && window[`${pref}_areaData`] && window[`${pref}_spotData`]) {
+        
+        window.prefData = window[`${pref}_prefData`];
+        window.areaData = window[`${pref}_areaData`];
+        window.spotData = window[`${pref}_spotData`];
 
-        const x = str.match(/x\s*:\s*(-?\d+)/);
-        const y = str.match(/y\s*:\s*(-?\d+)/);
+        // グラフ（隣接エリア情報）の再構築
+        buildAreaGraphFromGrid(window.areaData);
 
-        return {
-            x: x ? parseInt(x[1]) : null,
-            y: y ? parseInt(y[1]) : null
-        };
+        // 後続の .then() がそのまま動くように、解決済みのPromiseを返す
+        return Promise.resolve({
+            main: window.prefData,
+            areas: window.areaData,
+            spots: window.spotData
+        });
     }
 
-      return fetch(csvUrl)
-          .then(r => r.text())
+    // ==========================================
+    // ★ 分岐B：まだ無い場合は続行して fetch とパースを行う
+    // ==========================================
+    return fetch(csvUrl)
+        .then(r => r.text())
         .then(text => {
-
             const lines = text.trim().split('\n');
             let main = null;
             const areas = [];
@@ -65,13 +79,11 @@ function loadLocationCSV(csvUrl) {
 
             allRows.forEach(row => {
                 if ((row.areaId || '').trim() === window.currentPref) {
-
                     if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
                         const grid = parseGrid(row.url);
                         row.squareX = grid.x;
                         row.squareY = grid.y;
                     }
-
                     areas.push(row);
                 }
             });
@@ -79,21 +91,28 @@ function loadLocationCSV(csvUrl) {
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
-
                 if (icon === 'spot' || icon.startsWith('fish')) {
                     spots.push(row);
                 }
             });
 
+            // 1. 現在のグローバル変数にセット
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
 
+            // 2. ★ 次回以降のために、動的な変数名でストック（保存）しておく
+            window[`${pref}_prefData`] = main;
+            window[`${pref}_areaData`] = areas;
+            window[`${pref}_spotData`] = spots;
+
+            // グラフ構築
             buildAreaGraphFromGrid(areas);
 
             return { main, areas, spots };
         });
 }
+
 
 function prepareFishForArea(areaId) {
 
