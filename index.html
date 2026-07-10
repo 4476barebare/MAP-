@@ -1189,6 +1189,114 @@ function splitCSVLine(line) {
     return { name, date, whether };
 }
 
+// ================================
+// ■ 【内陸専用】天気CSVの読み込み
+// ================================
+function loadInlandWhetherCSV(regionCode) {
+    if (!regionCode) return Promise.resolve(null);
+
+    // 爆速キャッシュ対応（内陸用の別金庫）
+    const cacheKey = `${regionCode}_inlandWhetherData`;
+    if (window[cacheKey]) {
+        return Promise.resolve(window[cacheKey]);
+    }
+
+    // 指定されたパス構成: /data/{region}_inLand_recalculated.csv
+    const url = `/data/${regionCode}_inLand_recalculated.csv`;
+
+    return fetch(url).then(res => {
+        if (!res.ok) throw new Error("inland whether csv fetch失敗: " + url);
+        return res.text();
+    }).then(text => {
+        const lines = text.trim().split("\n");
+        lines.shift();
+
+        const parsedData = lines.map(line => {
+            const obj = splitCSVLine(line); // 既存関数を再利用
+            if (!obj) return null;
+
+            let parsed;
+            try {
+                parsed = JSON.parse(obj.whether);
+            } catch (e) {
+                return null;
+            }
+
+            // ===== 既存のパース・日付補正ロジックを再利用 =====
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            let csvDate = null;
+            if (obj.date) {
+                const safeDateStr = obj.date.replace(/-/g, "/");
+                csvDate = new Date(safeDateStr);
+                csvDate.setHours(0, 0, 0, 0);
+            }
+
+            const isToday = csvDate && csvDate.getTime() === today.getTime();
+            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
+
+            if (isToday) {
+                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
+                    parsed.daily[4] = null; 
+                }
+            } 
+            else if (isYesterday) {
+                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
+                    parsed.hourly[0] = parsed.hourly[1];
+                    parsed.hourly[1] = parsed.hourly[2];
+                    parsed.hourly[2] = null;
+                }
+            }
+
+            return {
+                name: obj.name,
+                date: obj.date,
+                whether: parsed 
+            };
+        }).filter(Boolean);
+
+        // 次回のためにキャッシュへ保存
+        window[cacheKey] = parsedData;
+
+        return parsedData;
+    }).catch(err => {
+        console.warn(err);
+        return null;
+    });
+}
+
+// ================================
+// ■ 【内陸専用】CSV → spotへ反映（大文字のLから始まるスポットのみ）
+// ================================
+function applyInlandWhetherToSpots(csvData) {
+    if (!csvData || !window.spotData) return;
+
+    // 内陸天気の辞書を作成
+    const map = {};
+    for (const row of csvData) {
+        if (!row.name || !row.whether) continue;
+        map[row.name] = row.whether;
+    }
+
+    // スポットを走査して付与
+    for (const spot of window.spotData) {
+        // IDを安全に文字列として取得
+        const spotId = String(spot.individualId || spot.id || "");
+
+        // ★ individualIdが大文字半角の「L」から始まる場合のみ上書き
+        if (spotId.startsWith("L")) {
+            if (map[spot.name] !== undefined) {
+                spot.whether = map[spot.name];
+            }
+        }
+    }
+}
+
+
 function openArea(areaKey, isUserAction = false) {
 
   const container = document.getElementById('area-guide');
@@ -1463,8 +1571,15 @@ async function loadPrefectureData(prefCode) {
 
     try {
         await loadLocationCSV(csvUrl);
+        
+        // 1. まず沿岸部（通常）の天気を取得して全スポットに付与
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
+
+        // 2. ★ 次に内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
+        const inlandCsv = await loadInlandWhetherCSV(region);
+        applyInlandWhetherToSpots(inlandCsv);
+
         return true; 
     } catch (err) {
         console.error("データ読み込みエラー:", err);
