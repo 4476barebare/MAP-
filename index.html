@@ -1487,12 +1487,15 @@ function loadRegionMap(regionCode = 'KANTO') {
         window.map.touchZoom.enable();
     }
 
+    // ★ 爆速カメラ移動：既にデータを持っていれば一瞬で広域に戻す
     if (window.regionData) {
         drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
     }
 
     if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
-        window.regionMarkers.forEach(m => m.addTo(window.map));
+        window.regionMarkers.forEach(m => {
+            if (window.map) m.addTo(window.map);
+        });
         return;
     }
 
@@ -1526,6 +1529,7 @@ function loadRegionMap(regionCode = 'KANTO') {
                 const cols = lines[i].split(',').map(c => c.trim());
                 const type = cols[typeIdx];
 
+                // ─── a. 広域マップの中心・ズームを設定 (type: region) ───
                 if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
                     const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
                     const lat = parseFloat(cols[latIdx]);
@@ -1533,8 +1537,14 @@ function loadRegionMap(regionCode = 'KANTO') {
                     const zoom = parseFloat(cols[zoomIdx]);
                     
                     window.regionData = { name, lat, lng, zoom };
+
+                    // ★【重要】ここで絶対にマップを生成する（真っ白フリーズの防止）
+                    if (!window.map) {
+                        drawLocation(name, lat, lng, zoom);
+                    }
                 }
 
+                // ─── b. 県突入用のアイコンマーカーを配置 (type: pref) ───
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
                     const urlVal = cols[urlIdx];
                     const prefName = cols[notesIdx];
@@ -1544,7 +1554,6 @@ function loadRegionMap(regionCode = 'KANTO') {
                     let prefCode = '';
                     let lat, lng;
                     
-                    // 例: KANTO/CHIBA_location.csv/35.5/140.1
                     if (parts.length >= 4) {
                         prefCode = parts[1].split('_')[0]; // "CHIBA"
                         lat = parseFloat(parts[2]);
@@ -1568,15 +1577,17 @@ function loadRegionMap(regionCode = 'KANTO') {
                         iconAnchor: [45, 17]
                     });
 
-                    const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
+                    // ★ マップが確実に存在する場合のみマーカーを置く
+                    if (window.map) {
+                        const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
 
-                    marker.on('click', () => {
-                        if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
-                        // ★ "KANTO_CHIBA" として関数に投げる
-                        window.selectPrefecture(`${regionCode}_${prefCode}`);
-                    });
+                        marker.on('click', () => {
+                            if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
+                            window.selectPrefecture(`${regionCode}_${prefCode}`);
+                        });
 
-                    window.regionMarkers.push(marker);
+                        window.regionMarkers.push(marker);
+                    }
                 }
             }
             isRegionLoaded = true;
