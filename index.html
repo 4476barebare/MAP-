@@ -1046,24 +1046,52 @@ function clearRegionMarkers() {
     }
 }
 
+
+
 // ================================
-// ■ 初期画面のRegionマップ読み込み
+// ■ 戻るボタンの設定など（独立して実行）
 // ================================
+fetch('/icon/back.svg')
+    .then(res => res.text())
+    .then(svg => {
+        const btn = document.getElementById('map-back-btn');
+        if (!btn) return;
+
+        btn.innerHTML = svg;
+        const svgEl = btn.querySelector('svg');
+        if (svgEl) svgEl.classList.add('back-icon');
+    });
+
+document.getElementById('map-back-btn')?.addEventListener('click', () => {
+    goBack(window.currentHash);
+});
+
 let isRegionLoaded = false;
 
-function loadRegionMap() {
-    // ★ 分岐：既にレイヤーがあれば表示に戻して即リターン
+// ★ 引数で regionCode を受け取る（デフォルトは 'KANTO'）
+function loadRegionMap(regionCode = 'KANTO') {
+    
+    if (window.map) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+    }
+
+    if (window.regionData) {
+        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
+    }
+
     if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
         window.regionMarkers.forEach(m => m.addTo(window.map));
-        
-        // ★ 修正：固定値ではなく、保存しておいた本来のRegionの座標とズームを使う
-        if (window.regionData) {
-            drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
-        }
         return;
     }
 
-    const regionCsvUrl = '/KANTO/KANTO_region.csv';
+    // ★ 読み込むCSV自体も動的にする
+    const regionCsvUrl = `/${regionCode}/${regionCode}_region.csv`;
 
     fetch(regionCsvUrl)
         .then(res => {
@@ -1094,38 +1122,39 @@ function loadRegionMap() {
                 const cols = lines[i].split(',').map(c => c.trim());
                 const type = cols[typeIdx];
 
-                // ─── a. 広域マップの中心・ズームを設定 (type: region) ───
                 if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
                     const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
                     const lat = parseFloat(cols[latIdx]);
                     const lng = parseFloat(cols[lngIdx]);
-                    const zoom = cols[zoomIdx];
+                    const zoom = parseFloat(cols[zoomIdx]);
                     
-                    // ★ 修正：次回戻ってくる時のために Region の状態を保存しておく
                     window.regionData = { name, lat, lng, zoom };
-                    drawLocation(name, lat, lng, zoom);
                 }
 
-                // ─── b. 県突入用のアイコンマーカーを配置 (type: pref) ───
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
                     const urlVal = cols[urlIdx];
                     const prefName = cols[notesIdx];
-
                     if (!urlVal) continue;
 
                     const parts = urlVal.split('/');
-                    let csvParam, lat, lng;
+                    let prefCode = '';
+                    let lat, lng;
+                    
+                    // URL列からプレフィックス（県コード）を抜く処理
                     if (parts.length >= 4) {
-                        csvParam = parts[1];
+                        prefCode = parts[1].split('_')[0]; // "CHIBA"
                         lat = parseFloat(parts[2]);
                         lng = parseFloat(parts[3]);
                     } else if (parts.length === 3) {
-                        csvParam = parts[0];
+                        prefCode = parts[0].split('_')[0];
                         lat = parseFloat(parts[1]);
                         lng = parseFloat(parts[2]);
                     } else continue;
 
                     if (isNaN(lat) || isNaN(lng)) continue;
+
+                    // プリロードも動的に発火
+                    preloadCsvFiles(regionCode, prefCode);
 
                     const prefIcon = L.divIcon({
                         className: 'pref-choice-marker',
@@ -1137,8 +1166,9 @@ function loadRegionMap() {
                     const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
 
                     marker.on('click', () => {
-                        clearRegionMarkers();
-                        window.selectPrefecture(csvParam);
+                        if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
+                        // ★ ここで "KANTO_CHIBA" という文字列を作って投げる
+                        window.selectPrefecture(`${regionCode}_${prefCode}`);
                     });
 
                     window.regionMarkers.push(marker);
@@ -1148,26 +1178,6 @@ function loadRegionMap() {
         })
         .catch(err => console.error("Regionマップの初期化エラー:", err));
 }
-
-
-// ================================
-// ■ 戻るボタンの設定など（独立して実行）
-// ================================
-fetch('/icon/back.svg')
-    .then(res => res.text())
-    .then(svg => {
-        const btn = document.getElementById('map-back-btn');
-        if (!btn) return;
-
-        btn.innerHTML = svg;
-        const svgEl = btn.querySelector('svg');
-        if (svgEl) svgEl.classList.add('back-icon');
-    });
-
-document.getElementById('map-back-btn')?.addEventListener('click', () => {
-    goBack(window.currentHash);
-});
-
 
 // ================================
 // ■ 天気CSVの読み込み（パース済みの爆速キャッシュ対応）
@@ -1373,30 +1383,6 @@ function resetAreaGuide() {
 
 }
 
-// ==========================================
-// 1. データ読み込み専用関数 (非同期)
-// ==========================================
-async function loadPrefectureData(prefCode) {
-    window.currentPref = prefCode;
-    
-    const csvUrl     = `/KANTO/${prefCode}_location.csv`;
-    window.fishUrl   = `/KANTO/${prefCode}_fish.csv`; // fishUrlは他で使うためグローバルに
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-
-    try {
-        // 1. ロケーションデータの読み込み
-        await loadLocationCSV(csvUrl, prefCode);
-        
-        // 2. 天気データの読み込みと反映
-        const whetherCsv = await loadWhetherCSV(whetherUrl);
-        applyWhetherToSpots(whetherCsv);
-
-        return true; // 読み込み成功
-    } catch (err) {
-        console.error("データ読み込みエラー:", err);
-        return false;
-    }
-}
 
 // ==========================================
 // 2. 県域UIの初期化関数
@@ -1428,78 +1414,72 @@ function renderPrefectureUI() {
     }
 }
 
+
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
 // ==========================================
-window.selectPrefecture = function(csvParam) {
-    let prefCode = csvParam;
-
-    // "CHIBA_location.csv" のようなパラメータから県コードを抽出
-    if (csvParam.includes('_location')) {
-        prefCode = csvParam.split('_')[0];
-    } else if (csvParam.includes('.csv')) {
-        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
-        if (match) prefCode = match[1];
-    }
-
-    // URLを書き換える
+window.selectPrefecture = function(regionAndPref) {
+    // regionAndPref には "KANTO_CHIBA" のような文字列が直接渡ってくる想定
     const url = new URL(location.href);
-    url.searchParams.set('pref', prefCode);
-    // ハッシュはクリアする（県のトップ画面に飛ぶため）
+    url.searchParams.set('pref', regionAndPref);
     url.hash = ''; 
     history.replaceState(null, '', url);
 
-    // すべてを routeUpdate に委ねる
     routeUpdate();
 };
 
 // ==========================================
-// 4. ハブとなる routeUpdate (完全版)
+// 4. ハブとなる routeUpdate (地方と県を分割)
 // ==========================================
 function routeUpdate() {
     const url = new URL(location.href);
-    const prefCode = url.searchParams.get('pref');
+    const prefQuery = url.searchParams.get('pref'); // 例: "KANTO_CHIBA"
+    
+    let regionCode = 'KANTO'; // デフォルト
+    let prefCode = null;
+
+    // URLから Region と Pref に分解する
+    if (prefQuery) {
+        const parts = prefQuery.split('_');
+        if (parts.length >= 2) {
+            regionCode = parts[0];
+            prefCode = parts[1];
+        } else {
+            prefCode = parts[0];
+        }
+    }
 
     // ─── A. データが未ロード、または別の県に切り替わった場合 ───
     if (prefCode && (!window.prefData || window.currentPref !== prefCode)) {
-        // 非同期でデータを読み込んでから再実行する
-        loadPrefectureData(prefCode).then(success => {
+        // regionCode も一緒に渡す
+        loadPrefectureData(regionCode, prefCode).then(success => {
             if (success) {
-                // ロード完了後、ハッシュを解析して最終的な状態を決定
-                if (typeof updateStateFromHash === 'function') {
-                    updateStateFromHash();
-                }
-                // UI周りのセットアップ
+                if (typeof updateStateFromHash === 'function') updateStateFromHash();
                 renderPrefectureUI();
-                // 自分自身をもう一度呼び出して、実際の描画分岐に進む
                 routeUpdate();
             }
         });
-        return; // データロード中はここで一旦ストップ
+        return; 
     }
 
     // ─── B. プレーンなURL（Region階層）の場合 ───
     if (!prefCode) {
         document.getElementById('map-back-btn').style.display = 'none';
-        loadRegionMap();
+        // URLに情報がなくても、直前まで持っていた regionCode を使って戻れる
+        loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
 
-    // ─── C. 描画フェーズ（データは既に揃っている状態） ───
-    
-    // 状態を最新化（同一県内でのハッシュ変更対応）
-    if (typeof updateStateFromHash === 'function') {
-        updateStateFromHash();
-    }
+    // ★ グローバルに現在のRegionを記憶しておく（戻る時のため）
+    window.currentRegion = regionCode;
 
-    // -----------------------
-    // SPOT
-    // -----------------------
+    // ─── C. 描画フェーズ（既存のまま） ───
+    if (typeof updateStateFromHash === 'function') updateStateFromHash();
+
     if (window.currentSpotId) {
         const spotId = window.currentSpotId.split("_");
         const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
         const spot = list.find(s => String(s.individualId) === String(spotId[2]));
-
         if (spot) {
             drawLocation(spot.name, spot.lat, spot.lng, "13");
             prepareFishForArea(window.currentAreaId).then(() => {
@@ -1510,32 +1490,19 @@ function routeUpdate() {
         return;
     }
 
-    // -----------------------
-    // AREA
-    // -----------------------
     if (window.currentAreaId) {
         const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
         if (!area) return;
-
         drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
         selectArea(area.name);
         renderCrowdImage();
-        
         document.getElementById('map-back-btn').style.display = 'block';
         return;
     }
 
-    // -----------------------
-    // PREF (県トップ)
-    // -----------------------
     if (window.prefData) {
         // ① まずは地図の移動と最低限のUIだけを最優先で実行する
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom
-        );
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
         document.getElementById('map-back-btn').style.display = 'block';
 
         // ② ブラウザの「地図の描画」が落ち着いた次の瞬間に、重い要素を乗せる
@@ -1548,10 +1515,49 @@ function routeUpdate() {
             });
         });
     }
-
 }
 
 
+// ==========================================
+// 1. データ読み込み専用関数 (index.html)
+// ==========================================
+async function loadPrefectureData(regionCode, prefCode) {
+    window.currentPref = prefCode;
+    window.currentRegion = regionCode;
+    
+    // ★ フォルダ名(KANTO)もURLから取得した regionCode を使う
+    const csvUrl     = `/${regionCode}/${prefCode}_location.csv`;
+    window.fishUrl   = `/${regionCode}/${prefCode}_fish.csv`; 
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+
+    try {
+        await loadLocationCSV(csvUrl); // 引数はcsvUrlだけでOK（内部でcurrentPrefを見るため）
+        const whetherCsv = await loadWhetherCSV(whetherUrl);
+        applyWhetherToSpots(whetherCsv);
+        return true; 
+    } catch (err) {
+        console.error("データ読み込みエラー:", err);
+        return false;
+    }
+}
+
+// ==========================================
+// 爆速化：バックグラウンドCSVプリロード (index.html)
+// ==========================================
+function preloadCsvFiles(regionCode, prefCode) {
+    if (!prefCode || !regionCode) return;
+    
+    const csvUrl     = `/${regionCode}/${prefCode}_location.csv`;
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+    const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
+
+    if (!window.fetchCacheStatus[prefCode]) {
+        window.fetchCacheStatus[prefCode] = true;
+        fetch(csvUrl, { priority: 'low' }).catch(()=>{});
+        fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
+        fetch(shopUrl, { priority: 'low' }).catch(()=>{});
+    }
+}
 
 
 
