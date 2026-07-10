@@ -1169,110 +1169,110 @@ document.getElementById('map-back-btn')?.addEventListener('click', () => {
 });
 
 
-
+// ================================
+// ■ 天気CSVの読み込み（パース済みの爆速キャッシュ対応）
+// ================================
 function loadWhetherCSV(url) {
+    const prefCode = window.currentPref; // 現在の県
 
-    return fetch(url)
-        .then(res => {
+    // ★ 分岐A：既に「パース済みの天気データ」が存在すれば、即座にそれを返す（JSON.parseを全スキップ）
+    if (prefCode && window[`${prefCode}_whetherData`]) {
+        return Promise.resolve(window[`${prefCode}_whetherData`]);
+    }
+
+    // ★ 分岐B：キャッシュが無ければ、フェッチして重いパース処理を実行する
+    const textPromise = window.fetchCache && window.fetchCache[url]
+        ? window.fetchCache[url]
+        : fetch(url).then(res => {
             if (!res.ok) throw new Error("whether csv fetch失敗");
             return res.text();
-        })
-        .then(text => {
-
-            const lines = text.trim().split("\n");
-
-            lines.shift();
-
-            return lines.map(line => {
-
-                const obj = splitCSVLine(line);
-                if (!obj) return null;
-
-                let parsed;
-                try {
-                    parsed = JSON.parse(obj.whether);
-                } catch (e) {
-                    return null;
-                }
-
-                // ===== ここからデータ整形・付与 =====
-
-                // 1. 今日の日付（時分秒を0にリセット）
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                // 2. 昨日の日付（時分秒を0にリセット）
-                const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
-
-                // 3. CSVのdateをJST（日本時間午前0時）として正しくパース
-                let csvDate = null;
-                if (obj.date) {
-                    const safeDateStr = obj.date.replace(/-/g, "/"); // "2026-06-08" -> "2026/06/08"
-                    csvDate = new Date(safeDateStr);
-                    csvDate.setHours(0, 0, 0, 0);
-                }
-
-                // 4. 安全に昨日・今日を判定
-                const isToday = csvDate && csvDate.getTime() === today.getTime();
-                const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
-
-                if (isToday) {
-                    // 【当日ルール】構造は変えず、dailyの5個目（インデックス4）の中身だけをnullにする
-                    if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
-                        parsed.daily[4] = null; 
-                    }
-                } 
-                else if (isYesterday) {
-                    // 【昨日ルール】要素数は3個のまま維持し、中身だけをスライドして最後をnullにする
-                    if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
-                        parsed.hourly[0] = parsed.hourly[1]; // hourly1 → 0
-                        parsed.hourly[1] = parsed.hourly[2]; // hourly2 → 1
-                        parsed.hourly[2] = null;             // hourly2 を null にする
-                    }
-                    // daily は5個のまま（中身もそのまま）
-                }
-
-                // ===== ここまで追加・修正 =====
-
-                // ★ 次の applyWhetherToSpots が壊れないように、型を合わせて返す
-                // ただし whether の中身はすでにパース＆整形済みのオブジェクトにする
-                return {
-                    name: obj.name,
-                    date: obj.date,
-                    whether: parsed 
-                };
-
-            }).filter(Boolean);
         });
+
+    return textPromise.then(text => {
+        const lines = text.trim().split("\n");
+        lines.shift();
+
+        const parsedData = lines.map(line => {
+            const obj = splitCSVLine(line);
+            if (!obj) return null;
+
+            let parsed;
+            try {
+                parsed = JSON.parse(obj.whether); // ←これが一番重い処理
+            } catch (e) {
+                return null;
+            }
+
+            // ===== ここからデータ整形・付与 =====
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            let csvDate = null;
+            if (obj.date) {
+                const safeDateStr = obj.date.replace(/-/g, "/");
+                csvDate = new Date(safeDateStr);
+                csvDate.setHours(0, 0, 0, 0);
+            }
+
+            const isToday = csvDate && csvDate.getTime() === today.getTime();
+            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
+
+            if (isToday) {
+                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
+                    parsed.daily[4] = null; 
+                }
+            } 
+            else if (isYesterday) {
+                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
+                    parsed.hourly[0] = parsed.hourly[1];
+                    parsed.hourly[1] = parsed.hourly[2];
+                    parsed.hourly[2] = null;
+                }
+            }
+            // ===== ここまで追加・修正 =====
+
+            return {
+                name: obj.name,
+                date: obj.date,
+                whether: parsed 
+            };
+        }).filter(Boolean);
+
+        // ★ 次回のために「パース済みの結果」を金庫に保存しておく
+        if (prefCode) {
+            window[`${prefCode}_whetherData`] = parsedData;
+        }
+
+        return parsedData;
+    });
 }
 
 // ================================
-// ■ CSV → spotへ反映
+// ■ CSV → spotへ反映（二重付与防止）
 // ================================
 function applyWhetherToSpots(csvData) {
+    // ★ 爆速化：スポットの先頭データにすでに天気が付与されていたら、
+    // 前回のキャッシュデータそのものなので、ループを一切回さずに即リターンする
+    if (window.spotData && window.spotData.length > 0 && window.spotData[0].whether) {
+        return;
+    }
 
     const map = {};
 
     for (const row of csvData) {
-
-        // row.whether が undefined、または null でないかチェック
         if (!row.name || !row.whether) continue;
-
-        // 【修正】loadWhetherCSV 側ですでにオブジェクト化されているため、
-        // JSON.parse は行わず、そのまま map に格納します。
         map[row.name] = row.whether;
     }
 
     for (const spot of window.spotData) {
-
-        // ★ undefinedチェックに変更
         if (map[spot.name] !== undefined) {
             spot.whether = map[spot.name];
         }
     }
 }
-
 
 // ================================
 // ■ 安全CSV分割（3カラム固定）
