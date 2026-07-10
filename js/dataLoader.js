@@ -2339,16 +2339,19 @@ function updateStateFromHash() {
 
 function goBack() {
     // =====================================================
-    // ★ 追加: ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
+    // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
         
+        // ★ URLを消す前に現在いる Region を控えておく
+        const regionToLoad = window.currentRegion || 'KANTO';
+
         // 1. URLをプレーンに戻す
         const url = new URL(location.href);
         url.searchParams.delete('pref');
         history.replaceState(null, '', url);
 
-        // 2. 状態のリセット
+        // 2. 状態のリセット (currentRegion は消さない)
         window.currentPref = null;
         window.prefData = null;
         location.hash = '';
@@ -2356,32 +2359,28 @@ function goBack() {
         // 3. UIとレイヤーのクリーンアップ
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
-        
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
             window.markerControl.clearLayers();
         }
         if (window.phase1Group) window.phase1Group.clearLayers();
         if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
         
-        // ★ ここを追加：Pref特有のスポットマーカー（青いドット等）を完全に消去する
         if (window.prefSpotLayer) {
             window.map.removeLayer(window.prefSpotLayer);
             window.prefSpotLayer = null;
         }
         
-        // アラートバーのクリア
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
-        // Regionのトップなので戻るボタンを非表示
         document.getElementById('map-back-btn').style.display = 'none';
 
-        // 4. Regionマップを再読み込み
-        loadRegionMap();
+        // 4. ★ 控えておいた Region を指定してマップを再読み込みする
+        loadRegionMap(regionToLoad);
         return;
     }
     
-    // --- (以降は既存の処理そのまま) ---
+    // ...以降既存のまま...
 
 
     // --- ここから下は元の処理 ---
