@@ -459,6 +459,9 @@ header {
   padding-right: 48px; /* ★署名分の逃げ */
   background: #111;
   color: #fff;
+  /* ★ 追加：枠の高さを固定して地図のガクつきを防ぐ */
+  min-height: 28px; 
+  box-sizing: border-box;
 }
 
 #alert-bar {
@@ -466,6 +469,8 @@ header {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* ★ 追加：テキストが空("")でも、必ず1行分の文字の高さをキープする */
+  min-height: 1.2em;
 }
 
 #alert-signature {
@@ -477,6 +482,7 @@ header {
   z-index: 10;
   pointer-events: none;
 }
+
 
 html,
 body {
