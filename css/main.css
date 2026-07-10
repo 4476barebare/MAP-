@@ -1448,28 +1448,66 @@ li {
   pointer-events: auto;
 }
 
+/* =========================
+   WEATHER LABELS (横書き・極小・背景なし)
+========================= */
 .weather-labels {
-    display: flex;
-    overflow: hidden;
-    flex-shrink: 0;
-    flex-direction: column; /* ★これが本質 */
-  width: 6px;
-  border-radius: 0px 0px 0px 4px;
-  position: absolute;
+  display: flex;
+  overflow: hidden;
+  flex-shrink: 0;
+  flex-direction: column;
+  width: 22px; /* ★ 横書きテキストが入る幅を確保 */
+  /* position: absolute; を削除（テーブルの左に自然に配置させるため） */
   z-index: 8601;
 }
 
 .weather-label {
   display: flex;
-  width: 6px;
+  width: 100%;
   height: 14px;
   line-height: 14px;
   overflow: visible;
-  align-items:center;
-  justify-content:center;
-  background-color: #000;
-
+  align-items: center;
+  justify-content: flex-start; /* ★ テキストを左寄せに */
+  background-color: transparent !important; /* ★ 背景色を完全に消す */
 }
+
+.label-text {
+  display: inline-block;
+  font-size: 10px; /* ベースサイズ（ブラウザ制限対策） */
+  transform: scale(0.8); /* ★ ここで極小化（80%のサイズ） */
+  transform-origin: left center; /* 左基準で縮小 */
+  color: rgba(255, 255, 255, 0.75); /* ★ 主張しすぎない色に */
+  font-weight: normal;
+  white-space: nowrap;
+  padding-left: 2px;
+  /* 縦向き用の rotate(270deg) などはすべて削除 */
+}
+
+/* 以前の nth-child / last-child 指定（背景や角丸）をすべて無効化 */
+.weather-labels .weather-label:nth-child(1),
+.weather-labels .weather-label:nth-child(2),
+.weather-labels .weather-label:last-child {
+  background-color: transparent;
+  border-radius: 0;
+  width: 100%;
+}
+
+/* =========================
+   WEATHER TABLE (ラベルと並べるための幅調整)
+========================= */
+.weather-table {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* ★ width: 100% をやめ、余った幅をすべて使う設定に変更 */
+  border-radius: 0px 0px 4px 0px;
+  background: none;
+  position: relative;
+  overflow: hidden;
+  touch-action: auto;
+  pointer-events: auto;
+}
+
 
 .label-text {
   display: inline-block;
