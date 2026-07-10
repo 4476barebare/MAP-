@@ -2041,8 +2041,19 @@ function createTideGraph(data, sun) {
   if (!canvas) return;
 
   const wrapper = document.querySelector(".tide-wrapper");
+  
+  // =====================================================
+  // ★ 追加ガード：データが無い、または中身がすべて null の場合は非表示にして終了
+  // =====================================================
+  const hasValidData = data && Array.isArray(data) && data.some(v => v !== null && !isNaN(v));
+  if (!hasValidData || data.length < 3) {
+      if (wrapper) wrapper.style.display = "none";
+      return;
+  }
+
   const ctx = canvas.getContext("2d");
 
+  // データが正常な場合のみ枠を表示する
   if (wrapper) wrapper.style.display = "block";
 
   const rect = canvas.getBoundingClientRect();
@@ -2058,8 +2069,6 @@ function createTideGraph(data, sun) {
 
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, w, h);
-
-  if (!data || data.length < 3) return;
 
   // =====================================================
   // スケール
@@ -2145,10 +2154,6 @@ function createTideGraph(data, sun) {
       // この区間の横幅
       const dx = p1.x - p0.x;
 
-      // 【魔法のロジック】
-      // 満潮・干潮の頂点では、潮の動きが「完全に一瞬止まる（傾き0）」になります。
-      // 制御点のY座標をそれぞれの点のY座標と「完全に同じ」にすることで、
-      // どんな大潮でも長潮でも、頂点と底が完璧に滑らかな「お椀型」になります。
       const cp1x = p0.x + dx / 3;
       const cp1y = p0.y; // 傾き0
 
@@ -2171,53 +2176,40 @@ function createTideGraph(data, sun) {
   fillPath.lineTo(0, h);
   fillPath.closePath();
 
-
-
   // =====================================================
   // 昼夜（マズメ対応グラデーション・日の入り30分前倒し）
   // =====================================================
-  // 24時間全体の幅をベースに計算
   const baseStepX = w / 24; 
   const sunriseX = (sun.sunrise / 1440) * w + baseStepX;
 
-  // ★日の入り時刻（分）から30分を引き算して前倒しにする
   const adjustedSunset = Math.max(sun.sunrise, sun.sunset - 30); 
   const sunsetX  = (adjustedSunset / 1440) * w + baseStepX;
 
-  // マズメ時（薄明）のグラデーション幅（約1時間分）
   const twilightWidth = (60 / 1440) * w; 
 
-  // キャンバス全体をカバーする横方向のグラデーションを作成
   const skyGrad = ctx.createLinearGradient(0, 0, w, 0);
 
-  const nightColor = "rgba(0,0,0,0.5)";          // 夜の色
-  const dayColor   = "rgba(255,220,150,0.08)";    // 昼の色
+  const nightColor = "rgba(0,0,0,0.5)";          
+  const dayColor   = "rgba(255,220,150,0.08)";    
 
-  // 1. 0時から日の出前までの夜
   skyGrad.addColorStop(0, nightColor);
   
-  // 2. 朝マズメ（日の出の前後でジワッと明るくする）
   const sunriseStart = Math.max(0, (sunriseX - twilightWidth / 2) / w);
   const sunriseEnd   = Math.min(1, (sunriseX + twilightWidth / 2) / w);
   skyGrad.addColorStop(sunriseStart, nightColor);
   skyGrad.addColorStop(sunriseEnd, dayColor);
 
-  // 3. 夕マズメ（30分前倒しした日の入りの前後でジワッと暗くする）
   const sunsetStart = Math.max(0, (sunsetX - twilightWidth / 2) / w);
   const sunsetEnd   = Math.min(1, (sunsetX + twilightWidth / 2) / w);
   skyGrad.addColorStop(sunsetStart, dayColor);
   skyGrad.addColorStop(sunsetEnd, nightColor);
 
-  // 4. 24時までの夜
   skyGrad.addColorStop(1, nightColor);
 
-  // 潮位の塗りつぶしパス（fillPath）にグラデーションを適用
   ctx.save();
   ctx.fillStyle = skyGrad;
   ctx.fill(fillPath);
   ctx.restore();
-
-
 
   // =====================================================
   // フェード付き線
@@ -2231,19 +2223,16 @@ function createTideGraph(data, sun) {
   grad.addColorStop(1 - fade, "rgba(25,25,112,1)");
   grad.addColorStop(1, "rgba(25,25,112,0)");
 
-  // 下地
   ctx.strokeStyle = "rgba(255,255,255,0.35)";
   ctx.lineWidth = 2.5;
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
   ctx.stroke(strokePath);
 
-  // 本線
   ctx.strokeStyle = grad;
   ctx.lineWidth = 1.2;
   ctx.stroke(strokePath);
 }
-
 
 
 function drawSmooth(ctx, pts) {
