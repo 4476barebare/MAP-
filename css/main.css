@@ -1499,7 +1499,7 @@ li {
   border-radius: 4px 0px 0px 0px;
 }
 
-.weather-labels .weather-label:nth-child(7) {
+.weather-labels .weather-label:last-child {
   display: flex;
   align-items:center;
   justify-content:center;
@@ -1532,7 +1532,7 @@ li {
   border-radius: 4px 4px 0px 0px;
 }
 /* テーブル側 */
-.weather-table .weather-row:nth-child(7) {
+.weather-table .weather-row:last-child {
   border-radius: 0px 0px 4px 4px;
 }
 
