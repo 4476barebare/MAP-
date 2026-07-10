@@ -15,13 +15,24 @@ window.gsiLayers = {
 };
 
 // =====================
-// 1. Locationの読み込み (動的グローバル変数による爆速キャッシュ)
+// 1. Locationの読み込み (動的グローバル変数による爆速キャッシュ・完全版)
 // =====================
 function loadLocationCSV(csvUrl) {
     const pref = window.currentPref; // 現在の県コード（例: "CHIBA"）
 
+    // ★ 前回の書き漏らし：これが無いとエラーで止まります
+    function parseGrid(str) {
+        if (!str) return { x: null, y: null };
+        const x = str.match(/x\s*:\s*(-?\d+)/);
+        const y = str.match(/y\s*:\s*(-?\d+)/);
+        return {
+            x: x ? parseInt(x[1]) : null,
+            y: y ? parseInt(y[1]) : null
+        };
+    }
+
     // ==========================================
-    // ★ 分岐A：既に3件のデータが生成されていれば、リネーム（代入）して即リターン
+    // ★ 分岐A：既にデータが生成されていれば、リネーム（代入）して即リターン
     // ==========================================
     if (window[`${pref}_prefData`] && window[`${pref}_areaData`] && window[`${pref}_spotData`]) {
         
@@ -29,10 +40,15 @@ function loadLocationCSV(csvUrl) {
         window.areaData = window[`${pref}_areaData`];
         window.spotData = window[`${pref}_spotData`];
 
-        // グラフ（隣接エリア情報）の再構築
-        buildAreaGraphFromGrid(window.areaData);
+        // ご指摘の通り再計算はせず、グラフもキャッシュから復元するだけにする
+        if (window[`${pref}_areaGraph`]) {
+            window.areaGraph = window[`${pref}_areaGraph`];
+        } else {
+            buildAreaGraphFromGrid(window.areaData);
+            window[`${pref}_areaGraph`] = window.areaGraph;
+        }
 
-        // 後続の .then() がそのまま動くように、解決済みのPromiseを返す
+        // 後続の処理が止まらないよう、解決済みのPromiseを返す
         return Promise.resolve({
             main: window.prefData,
             areas: window.areaData,
@@ -55,7 +71,7 @@ function loadLocationCSV(csvUrl) {
                 const cols = line.split(',');
 
                 return {
-                    name: cols[0].trim(),
+                    name: cols[0]?.trim() || '',
                     zoom: cols[1] && cols[1].trim() !== '' ? parseFloat(cols[1]) : '',
                     individualId: cols[2] ? cols[2].trim() : '',
                     lat: parseFloat(cols[3]),
@@ -72,13 +88,13 @@ function loadLocationCSV(csvUrl) {
             });
 
             allRows.forEach(row => {
-                if (!row.areaId && row.name === window.currentPref) {
+                if (!row.areaId && row.name === pref) {
                     main = row;
                 }
             });
 
             allRows.forEach(row => {
-                if ((row.areaId || '').trim() === window.currentPref) {
+                if ((row.areaId || '').trim() === pref) {
                     if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
                         const grid = parseGrid(row.url);
                         row.squareX = grid.x;
@@ -106,8 +122,9 @@ function loadLocationCSV(csvUrl) {
             window[`${pref}_areaData`] = areas;
             window[`${pref}_spotData`] = spots;
 
-            // グラフ構築
+            // 3. グラフも構築して保存しておく
             buildAreaGraphFromGrid(areas);
+            window[`${pref}_areaGraph`] = window.areaGraph;
 
             return { main, areas, spots };
         });
