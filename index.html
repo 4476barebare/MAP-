@@ -1455,81 +1455,6 @@ window.selectPrefecture = function(csvParam) {
     routeUpdate();
 };
 
-// ==========================================
-// 4. ハブとなる routeUpdate
-// ==========================================
-function routeUpdate() {
-    // ★ 抽出関数を使って、絶対に分解された状態で受け取る
-    const { region, pref: prefCode } = getParsedPrefQuery();
-
-    // ─── A. データが未ロード、または別の県に切り替わった場合 ───
-    if (prefCode && (!window.prefData || window.currentPref !== prefCode)) {
-        
-        // ★ ここで初めてグローバルに保存（currentPrefはCHIBAのまま！）
-        window.currentRegion = region || 'KANTO';
-        window.currentPref = prefCode;
-        
-        loadPrefectureData(prefCode).then(success => {
-            if (success) {
-                if (typeof updateStateFromHash === 'function') updateStateFromHash();
-                renderPrefectureUI();
-                routeUpdate();
-            }
-        });
-        return; 
-    }
-
-    // ─── B. プレーンなURL（Region階層）の場合 ───
-    if (!prefCode) {
-        document.getElementById('map-back-btn').style.display = 'none';
-        loadRegionMap(region || window.currentRegion || 'KANTO');
-        return;
-    }
-
-    window.currentRegion = region || 'KANTO';
-
-    // ─── C. 描画フェーズ ───
-    if (typeof updateStateFromHash === 'function') updateStateFromHash();
-
-    if (window.currentSpotId) {
-        const spotId = window.currentSpotId.split("_");
-        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
-        const spot = list.find(s => String(s.individualId) === String(spotId[2]));
-        if (spot) {
-            drawLocation(spot.name, spot.lat, spot.lng, "13");
-            prepareFishForArea(window.currentAreaId).then(() => {
-                document.getElementById('map-back-btn').style.display = 'block';
-                zoomToSpot(spot);
-            });
-        }
-        return;
-    }
-
-    if (window.currentAreaId) {
-        const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
-        if (!area) return;
-        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-        selectArea(area.name);
-        renderCrowdImage();
-        document.getElementById('map-back-btn').style.display = 'block';
-        return;
-    }
-
-    if (window.prefData) {
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        document.getElementById('map-back-btn').style.display = 'block';
-
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                showPrefSpots();
-                initAreaUI();
-                renderPrefWeather();
-                renderCrowdImage();
-            });
-        });
-    }
-}
-
 
 // ==========================================
 // 爆速化：バックグラウンドCSVプリロード (index.html)
@@ -1557,35 +1482,6 @@ function preloadCsvFiles(regionCode, prefCode) {
     }
 }
 
-// ==========================================
-// 1. データ読み込み専用関数 (index.html)
-// ==========================================
-async function loadPrefectureData(prefCode) {
-    window.currentPref = prefCode; // "CHIBA" のまま保たれる
-    const region = window.currentRegion || 'KANTO';
-    
-    // ★ フォルダ名に region を使う
-    const csvUrl     = `/${region}/${prefCode}_location.csv`;
-    window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-
-    try {
-        await loadLocationCSV(csvUrl);
-        
-        // 1. まず沿岸部（通常）の天気を取得して全スポットに付与
-        const whetherCsv = await loadWhetherCSV(whetherUrl);
-        applyWhetherToSpots(whetherCsv);
-
-        // 2. ★ 次に内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
-        const inlandCsv = await loadInlandWhetherCSV(region);
-        applyInlandWhetherToSpots(inlandCsv);
-
-        return true; 
-    } catch (err) {
-        console.error("データ読み込みエラー:", err);
-        return false;
-    }
-}
 
 
 // ================================
@@ -1717,6 +1613,168 @@ function loadRegionMap(regionCode = 'KANTO') {
             isRegionLoaded = true;
         })
         .catch(err => console.error("Regionマップの初期化エラー:", err));
+}
+
+// ==========================================
+// 1. データ読み込み専用関数
+// ==========================================
+async function loadPrefectureData(prefCode) {
+    window.currentPref = prefCode;
+    const region = window.currentRegion || 'KANTO';
+    
+    const csvUrl     = `/${region}/${prefCode}_location.csv`;
+    window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+
+    try {
+        await loadLocationCSV(csvUrl);
+        
+        // 沿岸部の天気を取得して全スポットに付与
+        const whetherCsv = await loadWhetherCSV(whetherUrl);
+        applyWhetherToSpots(whetherCsv);
+
+        // ★ 内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
+        if (typeof loadInlandWhetherCSV === 'function') {
+            const inlandCsv = await loadInlandWhetherCSV(region);
+            if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
+        }
+
+        return true; 
+    } catch (err) {
+        console.error("データ読み込みエラー:", err);
+        return false;
+    }
+}
+
+// ==========================================
+// ★ 新設：データの完全性チェック＆ロード関数
+// ==========================================
+async function checkAndLoadRouteData() {
+    const { region, pref: prefCode } = getParsedPrefQuery();
+    
+    // Region（広域）画面ならデータチェックは不要
+    if (!prefCode) return true; 
+
+    let needsBaseLoad = false;
+    let needsFishLoad = false;
+
+    // 1. 県の基本データ（ロケーション・天気）が揃っているか
+    if (!window.prefData || window.currentPref !== prefCode) {
+        needsBaseLoad = true;
+    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
+        needsBaseLoad = true;
+    }
+
+    // 2. エリア/スポット画面特有のチェック (魚データ)
+    let resolvedAreaId = null;
+    const hash = decodeURIComponent(location.hash.replace('#', ''));
+    if (hash) {
+        const areaName = hash.split('/')[0];
+        
+        if (!window.areaData) {
+            needsBaseLoad = true;
+        } else {
+            const area = window.areaData.find(a => a.name === areaName);
+            if (area) {
+                resolvedAreaId = prefCode + "_" + area.individualId;
+                if (!window.fishData) {
+                    needsFishLoad = true;
+                }
+            }
+        }
+    }
+
+    // --- データ不足時のロード処理 ---
+    if (needsBaseLoad || needsFishLoad) {
+        window.currentRegion = region || 'KANTO';
+        window.currentPref = prefCode;
+
+        // ① ロケーションと天気（沿岸・内陸）を一括ロード
+        if (needsBaseLoad) {
+            await loadPrefectureData(prefCode);
+            renderPrefectureUI(); // ロード完了時にUIを初期化
+        }
+        
+        // ② 魚データをロード (県データロード後に areaData が確定しているか再確認)
+        if (hash && !resolvedAreaId && window.areaData) {
+            const areaName = hash.split('/')[0];
+            const area = window.areaData.find(a => a.name === areaName);
+            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
+        }
+
+        if (resolvedAreaId) {
+            await prepareFishForArea(resolvedAreaId);
+        }
+
+        // ③ データの準備が完全に整ったので、改めてルート更新を最初からやり直す
+        routeUpdate();
+        return false; // 今回の「不完全な状態」での描画はキャンセル
+    }
+
+    return true; // 全データが完璧に揃っている
+}
+
+// ==========================================
+// 4. ハブとなる routeUpdate (リファクタリング版)
+// ==========================================
+async function routeUpdate() {
+    // ★ 1. データの完全性をガード（足りなければ裏でロードして再度呼び出される）
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return; // 準備中なのでストップ
+
+    // ★ 2. 以降の処理は「すべてのデータが100%揃っている」前提で安全に描画に専念できる
+    const { region, pref: prefCode } = getParsedPrefQuery();
+
+    if (!prefCode) {
+        document.getElementById('map-back-btn').style.display = 'none';
+        loadRegionMap(region || window.currentRegion || 'KANTO');
+        return;
+    }
+
+    window.currentRegion = region || 'KANTO';
+
+    if (typeof updateStateFromHash === 'function') updateStateFromHash();
+
+    // ─── スポット階層 ───
+    if (window.currentSpotId) {
+        const spotId = window.currentSpotId.split("_");
+        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
+        const spot = list.find(s => String(s.individualId) === String(spotId[2]));
+        if (spot) {
+            drawLocation(spot.name, spot.lat, spot.lng, "13");
+            document.getElementById('map-back-btn').style.display = 'block';
+            
+            // ★ データは揃っているので、Promiseを待たずに即座に描画へ飛べる！
+            zoomToSpot(spot);
+        }
+        return;
+    }
+
+    // ─── エリア階層 ───
+    if (window.currentAreaId) {
+        const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
+        if (!area) return;
+        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+        selectArea(area.name);
+        renderCrowdImage();
+        document.getElementById('map-back-btn').style.display = 'block';
+        return;
+    }
+
+    // ─── 県階層 ───
+    if (window.prefData) {
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+        document.getElementById('map-back-btn').style.display = 'block';
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                showPrefSpots();
+                initAreaUI();
+                renderPrefWeather();
+                renderCrowdImage();
+            });
+        });
+    }
 }
 
 </script>
