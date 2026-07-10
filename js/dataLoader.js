@@ -1836,31 +1836,31 @@ function createHourlyWeather(hourlyData,type) {
   const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
   
   if (type === "daily") {
-  const root = document.querySelector(".weather");
-  if (!root || !hourlyData) return;
+      const root = document.querySelector(".weather");
+      if (!root || !hourlyData) return;
 
-  root.innerHTML = "";
+      root.innerHTML = "";
 
-  const timeRow = document.createElement("div");
-  timeRow.className = "weather-row time-row";
+      const timeRow = document.createElement("div");
+      timeRow.className = "weather-row time-row";
 
-  const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
+      const hours = [0,2,4,6,8,10,12,14,16,18,20,22];
 
-  for (let i = 0; i < 12; i++) {
-    const cell = document.createElement("div");
-    cell.className = "weather-cell";
-    cell.textContent = `${hours[i]}`;
-    timeRow.appendChild(cell);
+      for (let i = 0; i < 12; i++) {
+        const cell = document.createElement("div");
+        cell.className = "weather-cell";
+        cell.textContent = `${hours[i]}`;
+        timeRow.appendChild(cell);
+      }
+
+      const tableEl = document.createElement("div");
+      tableEl.className = "weather-table";
+      tableEl.appendChild(timeRow);
+
+      root.appendChild(tableEl);
+
+      return;
   }
-
-  const tableEl = document.createElement("div");
-  tableEl.className = "weather-table";
-  tableEl.appendChild(timeRow);
-
-  root.appendChild(tableEl);
-
-  return;
-}
 
   const step = Math.floor(list.length / 12) || 1;
 
@@ -1868,6 +1868,11 @@ function createHourlyWeather(hourlyData,type) {
   for (let i = 0; i < 12; i++) {
     sliced.push(list[i * step] ?? null);
   }
+
+  // =====================================================
+  // ★ 追加：1日のうちに有効な「風向データ（r[5]）」が1つでも存在するか判定
+  // =====================================================
+  const hasWindDir = sliced.some(r => r && r[5] != null && !isNaN(r[5]));
 
   // =========================
   // util
@@ -1929,27 +1934,32 @@ function createHourlyWeather(hourlyData,type) {
   // ラベル
   // =========================
 
-  const labels = ["","","","","RAIN","","WIND"];
+  // ★ 修正：風向データが存在しない場合は、最後の "WIND" ラベルを配列から取り除く
+  const labels = ["","","","","RAIN",""];
+  if (hasWindDir) {
+      labels.push("WIND");
+  }
 
   const labelsEl = document.createElement("div");
   labelsEl.className = "weather-labels";
 
   for (const text of labels) {
-  const div = document.createElement("div");
-  div.className = "weather-label";
+      const div = document.createElement("div");
+      div.className = "weather-label";
 
-  const span = document.createElement("span");
-  span.className = "label-text";
-  span.textContent = text;
+      const span = document.createElement("span");
+      span.className = "label-text";
+      span.textContent = text;
 
-  div.appendChild(span);
-  labelsEl.appendChild(div);
-}
+      div.appendChild(span);
+      labelsEl.appendChild(div);
+  }
 
   // =========================
   // テーブル
   // =========================
 
+  // labels.length に連動して、風向がない場合は自動的に1行減る
   const tableEl = document.createElement("div");
   tableEl.className = "weather-table";
 
@@ -1959,7 +1969,6 @@ function createHourlyWeather(hourlyData,type) {
     return row;
   });
 
-  // ★TIME行（table内に入れる）
   const timeRow = document.createElement("div");
   timeRow.className = "weather-row time-row";
 
@@ -2015,20 +2024,17 @@ function createHourlyWeather(hourlyData,type) {
     c5.appendChild(createValueWrap(wind, "m/s"));
     rows[4].appendChild(c5);
 
-    // 風向
-    const c6 = document.createElement("div");
-    c6.className = "weather-cell wind-dir";
-    c6.textContent = degToDir(dir);
-    rows[5].appendChild(c6);
+    // ★ 修正：風向データが存在する場合のみ、セルを生成して6行目（rows[5]）に追加する
+    if (hasWindDir) {
+        const c6 = document.createElement("div");
+        c6.className = "weather-cell wind-dir";
+        c6.textContent = degToDir(dir);
+        rows[5].appendChild(c6);
+    }
   }
 
-  // ★ここ重要：同じコンテナ内で順番に積む
   tableEl.appendChild(timeRow);
   rows.forEach(r => tableEl.appendChild(r));
-
-  // =========================
-  // 追加
-  // =========================
 
   root.appendChild(labelsEl);
   root.appendChild(tableEl);
