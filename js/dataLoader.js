@@ -329,20 +329,32 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     : window.map.touchZoom.disable();
 }
 
-function showPrefSpots() {
+// =====================================
+// ■ マーカーレイヤーの保存用金庫
+// =====================================
+window.prefSpotLayerCache = window.prefSpotLayerCache || {};
 
+function showPrefSpots() {
+    // 既存のレイヤーがマップ上にあれば外す（非表示にする）
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
     }
 
+    // ★ ご提案の分岐：既にこの県のレイヤーが金庫にあれば、表示に戻して即リターン
+    if (window.currentPref && window.prefSpotLayerCache[window.currentPref]) {
+        window.prefSpotLayer = window.prefSpotLayerCache[window.currentPref];
+        window.prefSpotLayer.addTo(window.map);
+        return;
+    }
+
+    // 無ければ続行して生成（初回アクセス時のみ実行される重い処理）
     window.prefSpotLayer = L.layerGroup();
 
     window.spotData.forEach(spot => {
-
         if (!spot.icon) return;
 
         let type = 'spot';
-
         if (spot.icon.startsWith('fish')) {
             const match = spot.icon.match(/fish\d+/);
             if (match) type = match[0];
@@ -361,8 +373,14 @@ function showPrefSpots() {
         window.prefSpotLayer.addLayer(marker);
     });
 
+    // ★ 新しく作ったレイヤーを金庫に保存しておく
+    if (window.currentPref) {
+        window.prefSpotLayerCache[window.currentPref] = window.prefSpotLayer;
+    }
+
     window.prefSpotLayer.addTo(window.map);
 }
+
 
 function prefetchAround(area) {
 
