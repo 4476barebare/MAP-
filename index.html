@@ -1472,11 +1472,16 @@ async function loadPrefectureData(prefCode) {
     }
 }
 
+
+// ================================
+// ■ 初期画面のRegionマップ読み込み
+// ================================
 let isRegionLoaded = false;
 
 // ★ 引数で受け取る
 function loadRegionMap(regionCode = 'KANTO') {
     
+    // 1. マップの可動域・ズーム制限を完全にリセット
     if (window.map) {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -1485,13 +1490,17 @@ function loadRegionMap(regionCode = 'KANTO') {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
+        
+        // 移動アニメーション中の場合は一度ストップさせる
+        window.map.stop();
     }
 
-    // ★ 爆速カメラ移動：既にデータを持っていれば一瞬で広域に戻す
+    // 2. 既にデータを持っていれば一瞬で広域に戻す（通常の「戻る」用）
     if (window.regionData) {
         drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
     }
 
+    // 3. 既にロード済みならレイヤーを表示して終了
     if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
         window.regionMarkers.forEach(m => {
             if (window.map) m.addTo(window.map);
@@ -1499,7 +1508,7 @@ function loadRegionMap(regionCode = 'KANTO') {
         return;
     }
 
-    // ★ フォルダとファイル名を動的に指定
+    // 4. 初回 or URL直打ちからの戻り時は、CSVをフェッチする
     const regionCsvUrl = `/${regionCode}/${regionCode}_region.csv`;
 
     fetch(regionCsvUrl)
@@ -1536,12 +1545,12 @@ function loadRegionMap(regionCode = 'KANTO') {
                     const lng = parseFloat(cols[lngIdx]);
                     const zoom = parseFloat(cols[zoomIdx]);
                     
+                    // 次回のためにグローバルに保存
                     window.regionData = { name, lat, lng, zoom };
 
-                    // ★【重要】ここで絶対にマップを生成する（真っ白フリーズの防止）
-                    if (!window.map) {
-                        drawLocation(name, lat, lng, zoom);
-                    }
+                    // ★【ここが修正点】ストッパーを外し、ここで無条件に必ずカメラを動かす！
+                    // 初回ロード時も、URL直打ちから戻ってきた時も、確実に広域座標へ飛びます。
+                    drawLocation(name, lat, lng, zoom);
                 }
 
                 // ─── b. 県突入用のアイコンマーカーを配置 (type: pref) ───
@@ -1577,7 +1586,7 @@ function loadRegionMap(regionCode = 'KANTO') {
                         iconAnchor: [45, 17]
                     });
 
-                    // ★ マップが確実に存在する場合のみマーカーを置く
+                    // マップが確実に存在する場合のみマーカーを置く
                     if (window.map) {
                         const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
 
