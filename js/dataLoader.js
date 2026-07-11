@@ -631,15 +631,17 @@ function selectSpot(spot) {
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
             attribution: '© OpenStreetMap contributors',
-            
-            // ▼ 追加：CSSで背景色を塗って裏のGSIを隠す魔法のクラス
             className: 'osm-solid-layer',
             
-            // ▼ 変更：通信節約モードを解除し、ドラッグ中もガンガン先読みさせる爆速設定！
-            keepBuffer: 16,               // 既存の16を維持（先読み量としては超優秀です）
-            updateWhenIdle: false,        // 指が止まるのを「待たない」
-            updateWhenZooming: true,      // ズーム中も「待たない」
-            updateWhenDragging: true      // ドラッグ中も「待たない」！
+            updateWhenIdle: false,
+            updateWhenZooming: true,
+            updateWhenDragging: true,
+
+            // ▼ 限界突破のピース1：先読み量をあえて少し「減らす」
+            keepBuffer: 4, 
+            
+            // ▼ 限界突破のピース2：タイルの「フワッと表示」を強制オフ！
+            fadeAnimation: false
         }
     ).addTo(window.map);
 
