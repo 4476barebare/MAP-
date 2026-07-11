@@ -1356,40 +1356,77 @@ function renderAreaGuide() {
 
         div.querySelector('h2').addEventListener('click', () => {
             
-            // 目的のエリアへ飛ぶ「既存の処理（元のコード）」を関数化
-            const jumpToTargetArea = () => {
-                location.hash = encodeURIComponent(area.name);
-                if (typeof updateStateFromHash === 'function') updateStateFromHash();
-                if (typeof routeUpdate === 'function') routeUpdate();
-                openArea(area.individualId, true);
-            };
-
             // =====================================================
-            // ★ 厳密な状態判定：今が「スポット画面」か「それ以外」か
+            // ★ スポット画面から別のエリアへ飛ぶための「クリーンアップ処理」
             // =====================================================
             if (window.currentSpotId) {
-                // 【スポット画面にいる場合】
-                // 戻るボタンの関数を呼び出して、専用UIなどを安全にお掃除する
-                if (typeof goBack === 'function') {
-                    goBack(window.currentHash);
-                }
                 
-                // goBackの処理（UIの非表示やマーカー再描画）が落ち着くのを少し待つ
-                setTimeout(() => {
-                    jumpToTargetArea();
-                }, 150); // 100〜150ms程度が安全でスムーズです
+                // 1. ズーム・移動制限の解除
+                if (typeof stopZoomGuard === 'function') stopZoomGuard();
+                if (window.map) {
+                    window.map.dragging.enable();
+                    window.map.scrollWheelZoom.enable();
+                    window.map.doubleClickZoom.enable();
+                    window.map.touchZoom.enable();
+                    window.map.setMinZoom(0);
+                    window.map.setMaxZoom(18);
+                    window.map.setMaxBounds(null);
+                    if (window.map.options) window.map.options.maxBoundsViscosity = 0;
 
-            } else {
-                // 【それ以外（県画面や、他のエリア画面）にいる場合】
-                // 余計なことは一切せず、既存の処理だけで直接ジャンプする
-                jumpToTargetArea();
+                    // 2. 特殊レイヤー（魚・マーカー等）の消去
+                    if (window.fishLayer) window.map.removeLayer(window.fishLayer);
+                    if (window.phase2Group) window.phase2Group.clearLayers();
+                    if (window.phase1Group) window.phase1Group.clearLayers();
+                    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+                    // 3. 拡大用タイルの剥離と基本タイル（ort）への切り替え！
+                    window.map.eachLayer(layer => {
+                        if (layer === window.gsiLayer) return;
+                        if (layer instanceof L.TileLayer) {
+                            const url = layer._url || '';
+                            if (url.includes('seamlessphoto') || url.includes('openstreetmap')) {
+                                window.map.removeLayer(layer);
+                            }
+                        }
+                    });
+                    
+                    // Phase1に行くのだから確実にortタイルにする
+                    if (!window.gsiLayer) {
+                        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+                    } else {
+                        window.gsiLayer.setUrl(window.gsiLayers.ort);
+                        window.gsiLayer.addTo(window.map); // ★確実に再追加
+                    }
+                    
+                    // Phase2の無効化処理があれば呼ぶ
+                    if (typeof disablePhase2 === 'function') disablePhase2(window.map);
+                }
+
+                // 4. UI（DOM）の完全クリア
+                if (typeof removeWeekItem === 'function') removeWeekItem();
+                if (typeof resetWeatherUI === 'function') resetWeatherUI();
+                if (typeof clearSub2Weather === 'function') clearSub2Weather();
+                
+                const nearest = document.getElementById("nearest-spot");
+                if (nearest) nearest.textContent = "";
+
+                // 5. 状態のリセット
+                window.currentSpotId = null;
             }
-            
+
+            // =====================================================
+            // ★ 新しいエリアへのジャンプ処理
+            // =====================================================
+            location.hash = encodeURIComponent(area.name);
+            if (typeof updateStateFromHash === 'function') updateStateFromHash();
+            if (typeof routeUpdate === 'function') routeUpdate();
+            openArea(area.individualId, true);
         });
 
         container.appendChild(div);
     });
 }
+
 
 
 
