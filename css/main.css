@@ -1515,7 +1515,7 @@ li {
   height: 14px;
   position: relative;
   /* ★ 最重要ポイント：背景は左端から塗りつつ、データだけを右に22px逃がす */
-  padding-left: 10px;
+  padding-left: 4px;
   box-sizing: border-box; /* paddingを含めてwidth:100%にする魔法 */
 }
 
