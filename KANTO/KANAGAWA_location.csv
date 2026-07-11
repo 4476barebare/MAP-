@@ -2,7 +2,7 @@ name,zoom,individualId,lat,lng,areaId,URL,notes,icon,whether,type
 KANAGAWA,9.5,parent,35.33,139.45,,140000,神奈川県,,,
 川崎横浜エリア,11,YOKOHAMA,35.5165,139.7,KANAGAWA,x:2;y:0,,,,
 三浦半島エリア,11,MIURA,35.245,139.63,KANAGAWA,x:1;y:0,,,,
-湘南西湘エリア,10,SEISHO,35.351,139.295,KANAGAWA,x:0;y:0,,,,
+湘南西湘エリア,10,SEISHO,35.436,139.29,KANAGAWA,x:0;y:0,,,,
 観音崎,17.5,1,35.256762,139.745634,KANAGAWA_MIURA,,First/1410/1212,spot,,assistant
 伊勢山﨑・三軒家崎,16,2,35.26118,139.739732,KANAGAWA_MIURA,,,spot,,
 鴨居港・たたら浜,15.5,3,35.249036,139.738386,KANAGAWA_MIURA,,Second/久里浜港/観音崎,spot,,
