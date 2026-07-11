@@ -1353,7 +1353,6 @@ li {
 
 /* =====週間7枠 ===== */
 
-
 .week {
   display: flex;
   position: absolute;
@@ -1365,7 +1364,12 @@ li {
   font-size: 10px;
   color: #fff;
   z-index: 8500;
+  
+  /* ▼ これを追加！親枠で確実にタッチを受け止めて地図の誤爆を防ぐ */
+  pointer-events: auto;
+  touch-action: pan-y;
 }
+
 
 /* =========================
    WEEKLY LABELS (絶対配置で指定位置に浮かせる)
