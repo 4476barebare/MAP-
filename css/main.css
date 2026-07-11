@@ -1379,6 +1379,7 @@ li {
   width: 22px;           /* Hourly同様、パディング分の枠を用意 */
   z-index: 8505;
   pointer-events: none;
+  left: -1px;
 }
 
 .week-label {
@@ -1390,7 +1391,7 @@ li {
   justify-content: flex-start;
   background: transparent !important;
   border-radius: 0 !important;
-  left: -1px;
+  
 }
 
 /* =========================
@@ -1446,6 +1447,7 @@ li {
 /* テキストやアイコン行（日付・潮・天気）のみ中央揃えにするための追加クラス */
 .week-cell.text-center {
   align-items: center;
+  
 }
 
 .week-row div.active {
