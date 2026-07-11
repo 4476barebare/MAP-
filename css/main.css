@@ -1534,6 +1534,22 @@ li {
   border-radius: 0 0 4px 4px;
 }
 
+/* =========================
+   ラベルの位置微調整 (雨と風を2行の中間に配置)
+========================= */
+
+/* 4行目（雨）は常に半行分（7px）下にずらす */
+.weather-labels .weather-label:nth-child(4) {
+  position: relative;
+  top: 7px;
+}
+
+/* 6行目（風）は「全体が7行ある場合」のみ半行分（7px）下にずらす 
+  （＝6行目が、最後から2番目の要素である場合のみ適用する魔法） */
+.weather-labels .weather-label:nth-child(6):nth-last-child(2) {
+  position: relative;
+  top: 7px;
+}
 
 
 .value-wrap {
