@@ -1365,10 +1365,14 @@ li {
   color: #fff;
   z-index: 8500;
   
-  /* ▼ これを追加！親枠で確実にタッチを受け止めて地図の誤爆を防ぐ */
-  pointer-events: auto;
+  /* ▼ 追加：Hourly(.weather)と全く同じ「スクロール枠」としての性質を持たせる魔法 */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
+  pointer-events: auto;
 }
+
 
 
 /* =========================
