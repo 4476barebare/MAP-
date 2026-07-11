@@ -1415,17 +1415,21 @@ li {
   box-sizing: border-box;
 }
 
-/* ─── テーブル側の角丸・透明化コントロール ─── */
+/* ─── テーブル側の角丸・透明化コントロール（週間用） ─── */
+
+/* 1行目（日付）: 背景を透過せず、BOXの一番上として角を丸める */
 .week-table .week-row:nth-child(1) {
-  background-color: transparent !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,0.8);
-}
-.week-table .week-row:nth-child(2) {
+  /* background-color: transparent !important; を削除しました */
   border-radius: 4px 4px 0 0;
 }
+
+/* ※ 2行目の角丸指定は不要になったので削除します */
+
+/* 最終行: BOXの下の角を丸める */
 .week-table .week-row:last-child {
   border-radius: 0 0 4px 4px;
 }
+
 
 /* ─── セルのレイアウト ─── */
 .week-cell {
