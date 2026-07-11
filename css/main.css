@@ -1403,9 +1403,12 @@ li {
   width: 100%;
   background: transparent;
   position: relative;
-  touch-action: auto;
-  pointer-events: auto;
+  
+  /* ▼ ここが画面スクロールの足場にするための魔法の設定です */
+  pointer-events: auto; /* 指のタッチをしっかりキャッチ（クリックも維持） */
+  touch-action: pan-y;  /* 縦方向の画面スクロールを強制的に許可 */
 }
+
 
 .week-row {
   display: grid;
