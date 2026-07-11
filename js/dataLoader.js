@@ -1238,25 +1238,33 @@ function zoomToSpot(spot) {
     // ========================
     // データ整形
     // ========================
+    // ========================
+    // データ整形
+    // ========================
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
 
-    let targetLat, targetLng;
+    // 【変更】座標は type の中身に関わらず、常に spot の lat/lng を使う
+    const targetLat = safe.lat;
+    const targetLng = safe.lng;
     let tileUrl;
 
     if (typeParts[0] === 'special') {
-        tileUrl = window.gsiLayers.ort;
-        targetLat = typeParts[1];
-        targetLng = typeParts[2];
+        // specialの場合：2番目の要素（typeParts[1]）でタイルを判定する
+        if (typeParts[1] === 'ort') {
+            tileUrl = window.gsiLayers.ort;
+        } else {
+            tileUrl = window.gsiLayers.photo; // photo または空欄時のデフォルト
+        }
     } else {
+        // special以外の場合：従来通り最初の要素で判定
         if (typeParts[0] === 'ort') {
             tileUrl = window.gsiLayers.ort;
         } else {
             tileUrl = window.gsiLayers.photo;
         }
-        targetLat = safe.lat;
-        targetLng = safe.lng;
     }
+
 
     if (window.gsiLayer) {
         window.map.removeLayer(window.gsiLayer);
