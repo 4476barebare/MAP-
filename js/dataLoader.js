@@ -1935,9 +1935,9 @@ function createHourlyWeather(hourlyData,type) {
   // =========================
 
   // ★ 修正：風向データが存在しない場合は、最後の "WIND" ラベルを配列から取り除く
-  const labels = ["","","","降水","確率","風速"];
+  const labels = ["","","","雨","","風"];
   if (hasWindDir) {
-      labels.push("風向");
+      labels.push("");
   }
 
   const labelsEl = document.createElement("div");
