@@ -1355,40 +1355,43 @@ function renderAreaGuide() {
         `;
 
         div.querySelector('h2').addEventListener('click', () => {
-            // =====================================================
-            // ★ 1. スポット専用UIを安全にリセット（次回表示を壊さない魔法）
-            // =====================================================
-            if (typeof resetWeatherUI === 'function') resetWeatherUI();
             
-            // display:none は絶対に使わず、中身だけを空にする
-            ['labels', 'table', 'weekLabels', 'weekTable'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.innerHTML = '';
-            });
+            // 目的のエリアへ飛ぶ「既存の処理（元のコード）」を関数化
+            const jumpToTargetArea = () => {
+                location.hash = encodeURIComponent(area.name);
+                if (typeof updateStateFromHash === 'function') updateStateFromHash();
+                if (typeof routeUpdate === 'function') routeUpdate();
+                openArea(area.individualId, true);
+            };
 
-            const sub2 = document.querySelector('.map-ui-sub2');
-            if (sub2) {
-                sub2.innerHTML = '';
-                sub2.style.display = 'none'; // ※sub2は元々 none/flex 切り替え前提なので安全
+            // =====================================================
+            // ★ 厳密な状態判定：今が「スポット画面」か「それ以外」か
+            // =====================================================
+            if (window.currentSpotId) {
+                // 【スポット画面にいる場合】
+                // 戻るボタンの関数を呼び出して、専用UIなどを安全にお掃除する
+                if (typeof goBack === 'function') {
+                    goBack(window.currentHash);
+                }
+                
+                // goBackの処理（UIの非表示やマーカー再描画）が落ち着くのを少し待つ
+                setTimeout(() => {
+                    jumpToTargetArea();
+                }, 150); // 100〜150ms程度が安全でスムーズです
+
+            } else {
+                // 【それ以外（県画面や、他のエリア画面）にいる場合】
+                // 余計なことは一切せず、既存の処理だけで直接ジャンプする
+                jumpToTargetArea();
             }
-
-            // =====================================================
-            // ★ 2. 現在のスポット状態を強制リセットして迷子を防ぐ
-            // =====================================================
-            window.currentSpotId = null;
-
-            // =====================================================
-            // 3. 元の正常な画面遷移プロセス
-            // =====================================================
-            location.hash = encodeURIComponent(area.name);
-            updateStateFromHash();
-            routeUpdate();
-            openArea(area.individualId, true);
+            
         });
 
         container.appendChild(div);
     });
 }
+
+
 
 function resetAreaGuide() {
 
