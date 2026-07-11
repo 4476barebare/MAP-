@@ -1390,6 +1390,7 @@ li {
   justify-content: flex-start;
   background: transparent !important;
   border-radius: 0 !important;
+  left: -1px;
 }
 
 /* =========================
