@@ -1367,68 +1367,86 @@ li {
   z-index: 8500;
 }
 
-/* 左ラベル列 */
+/* =========================
+   WEEKLY LABELS (絶対配置で指定位置に浮かせる)
+========================= */
 .week-labels {
- 
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
-  overflow: visible;
- 
-  width: 6px;
-  background-color: #000;
-  border-radius: 4px 0 0 4px;
+  width: 22px;           /* Hourly同様、パディング分の枠を用意 */
+  z-index: 8505;
+  pointer-events: none;
 }
 
-/* ラベル行 */
 .week-label {
-  height: 14px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size:6px;
-  font-weight: bold;
-  white-space: nowrap;
-  transform: rotate(270deg) translateX(24px);
-}
-
-/* 右テーブル */
-.week-table {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  background-color: rgba(0,0,0,0.5);
-  border-radius: 0 4px 4px 0;
-  overflow: hidden;
-}
-
-/* 1行 */
-.week-row {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  height: 14px;
-  overflow: hidden;
-}
-
-/* セル */
-.week-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
   height: 14px;
   line-height: 14px;
-  min-width: 0;
-  white-space: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  background: transparent !important;
+  border-radius: 0 !important;
 }
 
-.week-row:last-child .week-cell {
-  padding-bottom: 2px;
+/* =========================
+   WEEKLY TABLE & ROWS (全幅維持 ＋ パディングで中身だけ逃がす)
+========================= */
+.week-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: transparent;
+  position: relative;
+  touch-action: auto;
+  pointer-events: auto;
+}
+
+.week-row {
+  display: grid;
+  background-color: rgba(0, 0, 0, 0.5);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  height: 14px;
+  position: relative;
+  padding-left: 14px;    /* ★ Hourlyに合わせてデータを右へ寄せる（微調整可能） */
+  box-sizing: border-box;
+}
+
+/* ─── テーブル側の角丸・透明化コントロール ─── */
+.week-table .week-row:nth-child(1) {
+  background-color: transparent !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,0.8);
+}
+.week-table .week-row:nth-child(2) {
+  border-radius: 4px 4px 0 0;
+}
+.week-table .week-row:last-child {
+  border-radius: 0 0 4px 4px;
+}
+
+/* ─── セルのレイアウト ─── */
+.week-cell {
+  display: flex;
+  align-items: flex-end; /* 数値と単位の「底」を揃える */
+  justify-content: center;
+  height: 14px;
+  min-width: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* テキストやアイコン行（日付・潮・天気）のみ中央揃えにするための追加クラス */
+.week-cell.text-center {
+  align-items: center;
 }
 
 .week-row div.active {
   background: rgba(255, 255, 255, 0.35);
 }
+
 
 /* ===== hourlyテーブル ===== */
 .weather {
