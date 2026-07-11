@@ -1333,9 +1333,6 @@ function openArea(areaKey, isUserAction = false) {
 // ================================
 // ■ エリアガイドの描画（グローバル関数として復活）
 // ================================
-// ================================
-// ■ エリアガイドの描画（グローバル関数として復活）
-// ================================
 function renderAreaGuide() {
     const container = document.getElementById('area-guide');
     if (!container) return; // コンテナがない場合はスキップ
@@ -1359,12 +1356,9 @@ function renderAreaGuide() {
 
         div.querySelector('h2').addEventListener('click', () => {
             // =====================================================
-            // ★ 追加：スポット階層からクリックされた場合に備え、専用UIを確実に消去する
+            // ★ 余計な関数は呼ばず、対象のDOMだけを安全に隠す
             // =====================================================
-            if (typeof resetWeatherUI === 'function') {
-                resetWeatherUI();
-            }
-            const weatherBox = document.querySelector('.weather');
+            const weatherBox = document.getElementById('weatherBox');
             const weekBox = document.querySelector('.week');
             const tideWrapper = document.querySelector('.tide-wrapper');
             const sub2 = document.querySelector('.map-ui-sub2');
@@ -1376,14 +1370,15 @@ function renderAreaGuide() {
             // =====================================================
 
             location.hash = encodeURIComponent(area.name);
-            updateStateFromHash();
-            routeUpdate();
+            if (typeof updateStateFromHash === 'function') updateStateFromHash();
+            if (typeof routeUpdate === 'function') routeUpdate();
             openArea(area.individualId, true);
         });
 
         container.appendChild(div);
     });
 }
+
 
 
 
