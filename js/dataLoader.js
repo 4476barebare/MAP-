@@ -1503,7 +1503,7 @@ function createWeekItem(weekData) {
     // =========================
     // ラベルの生成
     // =========================
-    const labels = ["", "潮", "天気", "気温", "水温", "波高"];
+    const labels = ["", "", "", "気温", "水温", "波高"];
     for (const text of labels) {
         const div = document.createElement("div");
         div.className = "week-label";
