@@ -1459,52 +1459,50 @@ li {
 }
 
 /* =========================
-   WEATHER LABELS (透明なスペースを確保して被りを防ぐ)
+   WEATHER LABELS (絶対配置で指定位置に浮かせる)
 ========================= */
 .weather-labels {
+  position: absolute;
+  left: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
-  width: 18px;           /* ★ 0pxから18pxに変更（データと被らないギリギリの隙間） */
-  overflow: visible;     
-  z-index: 8605;         
+  width: 22px;           /* ★ パディングと同じ幅を持たせる */
+  z-index: 8605;
+  pointer-events: none;
 }
 
 .weather-label {
   display: flex;
   width: 100%;
-  height: 14px;          
+  height: 14px;
   line-height: 14px;
   align-items: center;
   justify-content: flex-start;
-  background: transparent !important; 
-  border-radius: 0 !important;        
-  overflow: visible;
+  background: transparent !important;
+  border-radius: 0 !important;
 }
 
 .label-text {
   display: inline-block;
-  font-size: 10px; 
-  transform: scale(0.65); /* ★ 65%の極小化は維持 */
-  transform-origin: left center; 
+  font-size: 10px;
+  transform: scale(0.65);
+  transform-origin: left center;
   color: rgba(255, 255, 255, 0.9);
   font-weight: normal;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8); 
-  margin-left: 2px;      /* ★ 左端からほんの少しだけ離して整える */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  margin-left: 2px;
 }
 
-/* ※ .weather-table や .weather-row の設定は現在のままで完璧です！ */
-
 /* =========================
-   WEATHER TABLE & ROWS (2行目から角丸BOX化)
+   WEATHER TABLE & ROWS (全幅維持 ＋ パディングで中身だけ逃がす)
 ========================= */
 .weather-table {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-width: 0;
-  background: transparent; /* テーブル全体の下地は透明 */
+  width: 100%;
+  background: transparent;
   position: relative;
   touch-action: auto;
   pointer-events: auto;
@@ -1512,29 +1510,30 @@ li {
 
 .weather-row {
   display: grid;
-  background-color: rgba(0, 0, 0, 0.5); /* ★ 各行の基本背景色（これを積み重ねてBOXにする） */
+  background-color: rgba(0, 0, 0, 0.5);
   grid-template-columns: repeat(12, minmax(0, 1fr));
   height: 14px;
   position: relative;
+  /* ★ 最重要ポイント：背景は左端から塗りつつ、データだけを右に22px逃がす */
+  padding-left: 22px;
+  box-sizing: border-box; /* paddingを含めてwidth:100%にする魔法 */
 }
 
 /* ─── テーブル側の角丸・透明化コントロール ─── */
 
-/* 1行目（TIME）: 背景を消して地図を透けさせる */
 .weather-table .weather-row:nth-child(1) {
   background-color: transparent !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,0.8);
 }
 
-/* 2行目: BOXの上の角を丸める */
 .weather-table .weather-row:nth-child(2) {
   border-radius: 4px 4px 0 0;
 }
 
-/* 最終行: BOXの下の角を丸める */
 .weather-table .weather-row:last-child {
   border-radius: 0 0 4px 4px;
 }
+
 
 
 .value-wrap {
