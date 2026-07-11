@@ -1459,40 +1459,42 @@ li {
 }
 
 /* =========================
-   WEATHER LABELS (幅0・背景なし・極小テキスト)
+   WEATHER LABELS (透明なスペースを確保して被りを防ぐ)
 ========================= */
 .weather-labels {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  width: 0px;            /* ★ 幅を完全に0にしてテーブルに全幅を使わせる */
-  overflow: visible;     /* ★ 文字が右のテーブルへはみ出すのを許可 */
-  z-index: 8605;         /* テーブルより前面に表示 */
+  width: 18px;           /* ★ 0pxから18pxに変更（データと被らないギリギリの隙間） */
+  overflow: visible;     
+  z-index: 8605;         
 }
 
 .weather-label {
   display: flex;
-  width: 0px;
-  height: 14px;          /* テーブル行と高さを完全に同期させてズレを防止 */
+  width: 100%;
+  height: 14px;          
   line-height: 14px;
   align-items: center;
   justify-content: flex-start;
-  background: transparent !important; /* ★ 背景色を完全に消去 */
-  border-radius: 0 !important;        /* ★ 角丸も消去 */
+  background: transparent !important; 
+  border-radius: 0 !important;        
   overflow: visible;
 }
 
 .label-text {
   display: inline-block;
   font-size: 10px; 
-  transform: scale(0.65); /* ★ 65%までさらに縮小（極小化） */
+  transform: scale(0.65); /* ★ 65%の極小化は維持 */
   transform-origin: left center; 
   color: rgba(255, 255, 255, 0.9);
   font-weight: normal;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8); /* ★ 背景がないため、文字に影をつけて視認性を確保 */
-  margin-left: 1px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8); 
+  margin-left: 2px;      /* ★ 左端からほんの少しだけ離して整える */
 }
+
+/* ※ .weather-table や .weather-row の設定は現在のままで完璧です！ */
 
 /* =========================
    WEATHER TABLE & ROWS (2行目から角丸BOX化)
