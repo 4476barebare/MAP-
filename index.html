@@ -1357,9 +1357,24 @@ function renderAreaGuide() {
         div.querySelector('h2').addEventListener('click', () => {
             
             // =====================================================
-            // ★ スポット画面から別のエリアへ飛ぶための「クリーンアップ処理」
+            // ★ Phase2（ズーム13固定 ＆ OSMタイル）状態の判定
             // =====================================================
-            if (window.currentSpotId) {
+            let isPhase2OSM = false;
+            if (window.map && window.map.getZoom() === 13) {
+                window.map.eachLayer(layer => {
+                    if (layer instanceof L.TileLayer) {
+                        const url = layer._url || '';
+                        if (url.includes('openstreetmap')) {
+                            isPhase2OSM = true;
+                        }
+                    }
+                });
+            }
+
+            // =====================================================
+            // ★ スポット画面 または Phase2状態から別のエリアへ飛ぶ時のクリーンアップ処理
+            // =====================================================
+            if (window.currentSpotId || isPhase2OSM) {
                 
                 // 1. ズーム・移動制限の解除
                 if (typeof stopZoomGuard === 'function') stopZoomGuard();
@@ -1379,7 +1394,7 @@ function renderAreaGuide() {
                     if (window.phase1Group) window.phase1Group.clearLayers();
                     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
-                    // 3. 拡大用タイルの剥離と基本タイル（ort）への切り替え！
+                    // 3. 拡大用タイルの剥離と基本タイル（ort）への切り替え
                     window.map.eachLayer(layer => {
                         if (layer === window.gsiLayer) return;
                         if (layer instanceof L.TileLayer) {
@@ -1390,7 +1405,6 @@ function renderAreaGuide() {
                         }
                     });
                     
-                    // Phase1に行くのだから確実にortタイルにする
                     if (!window.gsiLayer) {
                         window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
                     } else {
@@ -1426,7 +1440,6 @@ function renderAreaGuide() {
         container.appendChild(div);
     });
 }
-
 
 
 
