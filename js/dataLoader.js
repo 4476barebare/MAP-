@@ -2372,7 +2372,7 @@ function goBack() {
     // =====================================================
     // ① phase2 → phase1（z >= 14）
     // =====================================================
-    if (z >= 14 || isSpecial) {
+    if (z > 13 || isSpecial) {
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
