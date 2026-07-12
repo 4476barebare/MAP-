@@ -2306,20 +2306,27 @@ function updateStateFromHash() {
     }
 }
 
+
 function goBack() {
     // =====================================================
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
+        
+        // ★ URLを消す前に現在いる Region を控えておく
         const regionToLoad = window.currentRegion || 'KANTO';
+
+        // 1. URLをプレーンに戻す
         const url = new URL(location.href);
         url.searchParams.delete('pref');
         history.replaceState(null, '', url);
 
+        // 2. 状態のリセット (currentRegion は消さない)
         window.currentPref = null;
         window.prefData = null;
         location.hash = '';
 
+        // 3. UIとレイヤーのクリーンアップ
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
@@ -2338,11 +2345,17 @@ function goBack() {
 
         document.getElementById('map-back-btn').style.display = 'none';
 
+        // 4. ★ 控えておいた Region を指定してマップを再読み込みする
         loadRegionMap(regionToLoad);
         return;
     }
+    
+    // ...以降既存のまま...
 
-    // --- マップ操作を一旦ロック ---
+
+    // --- ここから下は元の処理 ---
+    
+    // ※エラー防止のため map → window.map に統一しています
     window.map.touchZoom.disable();
     window.map.dragging.disable();
 
@@ -2354,17 +2367,12 @@ function goBack() {
 
     const z = window.map.getZoom();
     const restoreSpot = buildSpotRestoreObject();
-    
-    // 【判定の強化】不安定な数値ではなく「今の状態」でフェーズを特定する
-    // spot時は targetZoom が必ず 13.5 以上になるため、それ以上ならSpotフェーズ
-    const isSpotPhase = z >= 13.5;
-    // Phase2 は必ず OSM が表示されているため、OSMが有効なら Phase2
-    const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
+    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
 
     // =====================================================
-    // ① Spot (Phase3: photo/ort) → Area Phase2 (OSM) へ戻る
+    // ① phase2 → phase1（z >= 14）
     // =====================================================
-    if (isSpotPhase) {
+    if (z > 13 || isSpecial) {
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -2376,14 +2384,16 @@ function goBack() {
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
-        // レイヤーは「破棄」せず、マップから外す(キャッシュ)にとどめる
+        // レイヤ整理
         if (window.fishLayer) {
             window.map.removeLayer(window.fishLayer);
         }
+        
         if (window.phase2Group) window.phase2Group.clearLayers();
 
         if (!restoreSpot) return;
 
+        // spotキー除去
         const spotKey = window.currentSpotId?.split('_')[2];
         if (spotKey) {
             location.hash = location.hash.replace('/' + spotKey, '');
@@ -2393,9 +2403,8 @@ function goBack() {
         removeWeekItem();
         resetWeatherUI();
 
+        // 再構築
         showSpotsForArea(window.currentAreaId);
-        
-        // selectSpot が OSMレイヤーの追加とズーム13への移動を担当する
         selectSpot(restoreSpot);
         enablePhase2(window.map);
         phase1menu(window.currentAreaId);
@@ -2404,13 +2413,33 @@ function goBack() {
     }
 
     // =====================================================
-    // ② Area Phase2 (OSM) → Area Phase1 (ort) へ戻る
+    // ② phase1維持（z === 13）
     // =====================================================
-    if (isPhase2 || (z > 12.5 && z < 13.5)) {
+    if (z === 13) {
         disablePhase2(window.map);
         clearSub2Weather();
-        const nsEl = document.getElementById("nearest-spot");
-        if (nsEl) nsEl.textContent = "";
+        document.getElementById("nearest-spot").textContent = "";
+        
+        window.map.eachLayer(layer => {
+            if (layer === window.gsiLayer) return;
+
+            if (layer instanceof L.TileLayer) {
+                const url = layer._url || '';
+                if (url.includes('seamlessphoto')) {
+                    window.map.removeLayer(layer);
+                }
+            }
+        });
+
+        // OSM削除
+        window.map.eachLayer(layer => {
+            if (!(layer instanceof L.TileLayer)) return;
+
+            const url = layer._url || '';
+            if (url.includes('openstreetmap')) {
+                window.map.removeLayer(layer);
+            }
+        });
 
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -2419,21 +2448,16 @@ function goBack() {
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        // 【ルートアップデート1：Phase1用のタイルを確実にセットする】
-        // 1. キャッシュの概念を活かし、OSMは消さずに外すだけ
-        if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
-            window.map.removeLayer(window.osmLayer);
-        }
+        // タイル確定（ort）
+        const s = window.mapStateSnapshot;
 
-        // 2. ortタイルを表示状態にする
         if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
         } else {
             window.gsiLayer.setUrl(window.gsiLayers.ort);
-            if (!window.map.hasLayer(window.gsiLayer)) {
-                window.gsiLayer.addTo(window.map);
-            }
         }
+
+        window.gsiLayer.addTo(window.map);
 
         selectArea(area);
         renderCrowdImage();
@@ -2441,32 +2465,27 @@ function goBack() {
     }
 
     // =====================================================
-    // ③ Area Phase1 (ort) → Pref (ort) へ戻る
+    // ③ prefへ戻る（z <= 12）
     // =====================================================
-
-    // 【ルートアップデート2：フェイルセーフ】
-    // 万が一OSMが残っていたら確実に外して ort にする
-    if (window.osmLayer && window.map.hasLayer(window.osmLayer)) {
-        window.map.removeLayer(window.osmLayer);
-    }
-    
-    if (!window.gsiLayer) {
-        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-    } else {
-        window.gsiLayer.setUrl(window.gsiLayers.ort);
-        if (!window.map.hasLayer(window.gsiLayer)) {
-            window.gsiLayer.addTo(window.map);
-        }
-    }
 
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+    } else {
+        window.gsiLayer.setUrl(window.gsiLayers.ort);
+    }
+    
+    // ★変更点：県レベルに戻ったとき、さらにRegionへ戻れるようボタンは「表示」したままにする
     document.getElementById('map-back-btn').style.display = 'block';
 
+    // ② 1フレーム待つ
     requestAnimationFrame(() => {
+        // ③ サイズ確定後に通知
         window.map.invalidateSize(true);
 
+        // ④ その後に移動
         drawLocation(
             window.prefData.name,
             window.prefData.lat,
