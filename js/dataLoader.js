@@ -2314,35 +2314,53 @@ function updateStateFromHash() {
     }
 }
 
+// ★ グローバルにロック変数を追加（goBack関数の外、または一番上に）
+window._isGoingBack = false;
+
 function goBack() {
     // =====================================================
-    // ★ 戻るアクション開始時に、まずボタンをフェードアウト
+    // ★ 実行ロック（連打されたら2回目以降は弾く）
+    // =====================================================
+    if (window._isGoingBack) return;
+    window._isGoingBack = true;
+
+    // =====================================================
+    // ★ 戻るアクション開始時にボタンをフェードアウト＆物理ロック
     // =====================================================
     const backBtn = document.getElementById('map-back-btn');
     if (backBtn) {
+        backBtn.style.pointerEvents = 'none'; // ★ 透明な間の「見えないボタン」へのクリックを完全遮断
         backBtn.style.transition = 'opacity 0.3s ease';
         backBtn.style.opacity = '0';
     }
+
+    // ─── 処理完了後にボタンを復活させる共通関数 ───
+    const releaseLockAndShowBtn = () => {
+        window._isGoingBack = false; // ロック解除
+        if (backBtn) {
+            backBtn.style.display = 'block';
+            requestAnimationFrame(() => {
+                backBtn.style.transition = 'opacity 0.4s ease';
+                backBtn.style.opacity = '1';
+                backBtn.style.pointerEvents = 'auto'; // クリック受付再開
+            });
+        }
+    };
 
     // =====================================================
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
-        
-        // ★ URLを消す前に現在いる Region を控えておく
         const regionToLoad = window.currentRegion || 'KANTO';
 
-        // 1. URLをプレーンに戻す
         const url = new URL(location.href);
         url.searchParams.delete('pref');
         history.replaceState(null, '', url);
 
-        // 2. 状態のリセット (currentRegion は消さない)
         window.currentPref = null;
         window.prefData = null;
         location.hash = '';
 
-        // 3. UIとレイヤーのクリーンアップ
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
@@ -2359,19 +2377,21 @@ function goBack() {
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
-        // ★ フェードアウト完了(約0.3秒後)を待ってからDOMを非表示にする
+        // フェードアウト完了後に完全に消去し、ロックを解除
         setTimeout(() => {
-            if (backBtn) backBtn.style.display = 'none';
+            if (backBtn) {
+                backBtn.style.display = 'none';
+                backBtn.style.pointerEvents = 'auto';
+            }
+            window._isGoingBack = false; 
         }, 300);
 
-        // 4. ★ 控えておいた Region を指定してマップを再読み込みする
         loadRegionMap(regionToLoad);
         return;
     }
     
     // --- ここから下は元の処理 ---
     
-    // ※エラー防止のため map → window.map に統一しています
     window.map.touchZoom.disable();
     window.map.dragging.disable();
 
@@ -2379,16 +2399,14 @@ function goBack() {
         String(a.individualId) === String(window.currentAreaId?.split('_')[1])
     );
 
-    if (!area) return;
+    if (!area) {
+        window._isGoingBack = false;
+        return;
+    }
 
     const z = window.map.getZoom();
     const restoreSpot = buildSpotRestoreObject();
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
-
-    // -----------------------------------------------------
-    // ★ フェイルセーフフラグ
-    // より安全にするため、「変数が存在し、かつマップに表示されているか」で判定します
-    // -----------------------------------------------------
     const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
     // =====================================================
@@ -2406,16 +2424,16 @@ function goBack() {
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
-        // レイヤ整理
         if (window.fishLayer) {
             window.map.removeLayer(window.fishLayer);
         }
-        
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        if (!restoreSpot) return;
+        if (!restoreSpot) {
+            window._isGoingBack = false;
+            return;
+        }
 
-        // spotキー除去
         const spotKey = window.currentSpotId?.split('_')[2];
         if (spotKey) {
             location.hash = location.hash.replace('/' + spotKey, '');
@@ -2425,24 +2443,14 @@ function goBack() {
         removeWeekItem();
         resetWeatherUI();
 
-        // 再構築
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
 
-        // ★ 【修正】マップの移動完了を待ってからUI展開とフェードインを実行する
+        // マップの移動完了を待ってからUI展開とロック解除
         window.map.once('moveend', () => {
             enablePhase2(window.map);
             phase1menu(window.currentAreaId);
-            
-            requestAnimationFrame(() => {
-                if (backBtn) {
-                    backBtn.style.display = 'block';
-                    requestAnimationFrame(() => {
-                        backBtn.style.transition = 'opacity 0.4s ease';
-                        backBtn.style.opacity = '1';
-                    });
-                }
-            });
+            releaseLockAndShowBtn();
         });
         
         return;
@@ -2454,11 +2462,12 @@ function goBack() {
     if (z === 13 || isPhase2) {
         disablePhase2(window.map);
         clearSub2Weather();
-        document.getElementById("nearest-spot").textContent = "";
+        
+        const nsEl = document.getElementById("nearest-spot");
+        if (nsEl) nsEl.textContent = "";
         
         window.map.eachLayer(layer => {
             if (layer === window.gsiLayer) return;
-
             if (layer instanceof L.TileLayer) {
                 const url = layer._url || '';
                 if (url.includes('seamlessphoto')) {
@@ -2467,17 +2476,14 @@ function goBack() {
             }
         });
 
-        // OSM削除
         window.map.eachLayer(layer => {
             if (!(layer instanceof L.TileLayer)) return;
-
             const url = layer._url || '';
             if (url.includes('openstreetmap')) {
                 window.map.removeLayer(layer);
             }
         });
 
-        // ここで確実にフラグを解除（null化）する
         window.osmLayer = null;
 
         window.map.setMinZoom(0);
@@ -2487,20 +2493,20 @@ function goBack() {
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        // タイル確定（ort）
-        const s = window.mapStateSnapshot;
-
         if (!window.gsiLayer) {
             window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
         } else {
             window.gsiLayer.setUrl(window.gsiLayers.ort);
         }
-
         window.gsiLayer.addTo(window.map);
 
-        // ★ selectArea関数内でmoveend待ち＆フェードインが行われるのでこれだけでOK
         selectArea(area);
         renderCrowdImage();
+        
+        // selectArea側でも移動処理が走るため、着地後にロック解除
+        window.map.once('moveend', () => {
+            releaseLockAndShowBtn();
+        });
         
         return;
     }
@@ -2508,8 +2514,6 @@ function goBack() {
     // =====================================================
     // ③ prefへ戻る（z <= 12）
     // =====================================================
-
-    // ★ 念のため、ここでもOSMのフラグ解除を徹底
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
@@ -2524,7 +2528,6 @@ function goBack() {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
 
-    // 移動開始
     drawLocation(
         window.prefData.name,
         window.prefData.lat,
@@ -2533,7 +2536,6 @@ function goBack() {
     );
     location.hash = '';
 
-    // ★ 【修正】マップの移動完了を待ってからUI展開とフェードインを実行する
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         updateStateFromHash();
@@ -2542,20 +2544,9 @@ function goBack() {
         renderPrefWeather();
         resetAreaGuide();
 
-        requestAnimationFrame(() => {
-            if (backBtn) {
-                backBtn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    backBtn.style.transition = 'opacity 0.4s ease';
-                    backBtn.style.opacity = '1';
-                });
-            }
-        });
+        releaseLockAndShowBtn();
     });
 }
-
-
-
 
 function buildSpotRestoreObject() {
 
