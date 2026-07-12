@@ -2350,9 +2350,6 @@ function goBack() {
         return;
     }
     
-    // ...以降既存のまま...
-
-
     // --- ここから下は元の処理 ---
     
     // ※エラー防止のため map → window.map に統一しています
@@ -2369,10 +2366,17 @@ function goBack() {
     const restoreSpot = buildSpotRestoreObject();
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
 
+    // -----------------------------------------------------
+    // ★ ご提案のフェイルセーフフラグを1行追加！
+    // OSMレイヤーが存在していれば「確実にPhase2にいる」と判定できる
+    // -----------------------------------------------------
+    const isPhase2 = !!window.osmLayer;
+
     // =====================================================
-    // ① phase2 → phase1（z >= 14）
+    // ① phase2 → phase1（※実質：スポット詳細 → Phase2 へ戻る）
     // =====================================================
-    if (z > 13 || isSpecial) {
+    // isPhase2がtrue（OSM展開済み）の時はここをブロックし、isSpecialによる無限ループを防ぐ
+    if ((z > 13 || isSpecial) && !isPhase2) {
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -2413,9 +2417,10 @@ function goBack() {
     }
 
     // =====================================================
-    // ② phase1維持（z === 13）
+    // ② phase1維持（※実質：Phase2 → Phase1 へ戻る）
     // =====================================================
-    if (z === 13) {
+    // ズームが13.01などにブレていても、isPhase2がtrueなら確実にここを通しOSMを剥がす
+    if (z === 13 || isPhase2) {
         disablePhase2(window.map);
         clearSub2Weather();
         document.getElementById("nearest-spot").textContent = "";
@@ -2501,6 +2506,7 @@ function goBack() {
         resetAreaGuide();
     });
 }
+
 
 
 function buildSpotRestoreObject() {
