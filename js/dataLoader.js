@@ -2316,6 +2316,15 @@ function updateStateFromHash() {
 
 function goBack() {
     // =====================================================
+    // ★ 戻るアクション開始時に、まずボタンをフェードアウト
+    // =====================================================
+    const backBtn = document.getElementById('map-back-btn');
+    if (backBtn) {
+        backBtn.style.transition = 'opacity 0.3s ease';
+        backBtn.style.opacity = '0';
+    }
+
+    // =====================================================
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
@@ -2350,8 +2359,10 @@ function goBack() {
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
-        // 非表示にする時は即座に消す（アニメーション不要）
-        document.getElementById('map-back-btn').style.display = 'none';
+        // ★ フェードアウト完了(約0.3秒後)を待ってからDOMを非表示にする
+        setTimeout(() => {
+            if (backBtn) backBtn.style.display = 'none';
+        }, 300);
 
         // 4. ★ 控えておいた Region を指定してマップを再読み込みする
         loadRegionMap(regionToLoad);
@@ -2420,6 +2431,17 @@ function goBack() {
         enablePhase2(window.map);
         phase1menu(window.currentAreaId);
         
+        // ★ 分岐①の最後にフェードイン
+        requestAnimationFrame(() => {
+            if (backBtn) {
+                backBtn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    backBtn.style.transition = 'opacity 0.4s ease';
+                    backBtn.style.opacity = '1';
+                });
+            }
+        });
+        
         return;
     }
 
@@ -2452,7 +2474,7 @@ function goBack() {
             }
         });
 
-        // ★ ご指摘の通り、ここで確実にフラグを解除（null化）する
+        // ★ ここで確実にフラグを解除（null化）する
         window.osmLayer = null;
 
         window.map.setMinZoom(0);
@@ -2475,6 +2497,18 @@ function goBack() {
 
         selectArea(area);
         renderCrowdImage();
+        
+        // ★ 分岐②の最後にフェードイン
+        requestAnimationFrame(() => {
+            if (backBtn) {
+                backBtn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    backBtn.style.transition = 'opacity 0.4s ease';
+                    backBtn.style.opacity = '1';
+                });
+            }
+        });
+        
         return;
     }
 
@@ -2496,8 +2530,6 @@ function goBack() {
     } else {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
-    
-    // ★ ここにあった map-back-btn の即時表示を削除しました
 
     // ② 1フレーム待つ
     requestAnimationFrame(() => {
@@ -2516,23 +2548,21 @@ function goBack() {
         initAreaUI();
         showPrefSpots();
         renderPrefWeather();
-
         resetAreaGuide();
 
-        // ★ すべての描画・初期化処理が完了した最後のタイミングでボタンをフェードイン
+        // ★ 分岐③の最後にフェードイン
         requestAnimationFrame(() => {
-            const btn = document.getElementById('map-back-btn');
-            if (btn) {
-                btn.style.opacity = '0';
-                btn.style.display = 'block';
+            if (backBtn) {
+                backBtn.style.display = 'block';
                 requestAnimationFrame(() => {
-                    btn.style.transition = 'opacity 0.4s ease';
-                    btn.style.opacity = '1';
+                    backBtn.style.transition = 'opacity 0.4s ease';
+                    backBtn.style.opacity = '1';
                 });
             }
         });
     });
 }
+
 
 
 function buildSpotRestoreObject() {
