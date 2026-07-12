@@ -461,11 +461,7 @@ function prefetchAround(area) {
     });
 }
 
-
-
 function selectArea(area) {
-    
-
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
         : area;
@@ -495,13 +491,11 @@ function selectArea(area) {
         areaObj.zoom || window.prefData.zoom
     );
     
-    
-
     // -------------------------
     // UI更新
     // -------------------------
     document.getElementById('map-menu').style.display = 'none';
-    document.getElementById('map-back-btn').style.display = 'block';
+    // ★ ここにあった map-back-btn の即時表示を削除しました
     prepareFishForArea(window.currentAreaId);
 
     // -------------------------
@@ -516,13 +510,27 @@ function selectArea(area) {
         
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                markerControl.showShop01(window.currentAreaId);
+                if (window.markerControl) {
+                    markerControl.showShop01(window.currentAreaId);
+                }
+
+                // ★ すべての描画処理が完了した最後のタイミングでボタンをフェードイン
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.opacity = '0';
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        btn.style.transition = 'opacity 0.4s ease';
+                        btn.style.opacity = '1';
+                    });
+                }
             });
         });
     });
     
     //disablePhase2(window.map);
 }
+
 
 function saveMapState() {
 
@@ -2342,6 +2350,7 @@ function goBack() {
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
+        // 非表示にする時は即座に消す（アニメーション不要）
         document.getElementById('map-back-btn').style.display = 'none';
 
         // 4. ★ 控えておいた Region を指定してマップを再読み込みする
@@ -2488,7 +2497,7 @@ function goBack() {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
     
-    document.getElementById('map-back-btn').style.display = 'block';
+    // ★ ここにあった map-back-btn の即時表示を削除しました
 
     // ② 1フレーム待つ
     requestAnimationFrame(() => {
@@ -2509,6 +2518,19 @@ function goBack() {
         renderPrefWeather();
 
         resetAreaGuide();
+
+        // ★ すべての描画・初期化処理が完了した最後のタイミングでボタンをフェードイン
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.opacity = '0';
+                btn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    btn.style.transition = 'opacity 0.4s ease';
+                    btn.style.opacity = '1';
+                });
+            }
+        });
     });
 }
 
