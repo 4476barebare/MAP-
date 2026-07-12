@@ -1827,10 +1827,21 @@ async function routeUpdate() {
         const spot = list.find(s => String(s.individualId) === String(spotId[2]));
         if (spot) {
             drawLocation(spot.name, spot.lat, spot.lng, "13");
-            document.getElementById('map-back-btn').style.display = 'block';
             
             // ★ データは揃っているので、Promiseを待たずに即座に描画へ飛べる！
             zoomToSpot(spot);
+            
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.opacity = '0';
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        btn.style.transition = 'opacity 0.4s ease';
+                        btn.style.opacity = '1';
+                    });
+                }
+            });
         }
         return;
     }
@@ -1842,25 +1853,48 @@ async function routeUpdate() {
         drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
         selectArea(area.name);
         renderCrowdImage();
-        document.getElementById('map-back-btn').style.display = 'block';
+        
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.opacity = '0';
+                btn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    btn.style.transition = 'opacity 0.4s ease';
+                    btn.style.opacity = '1';
+                });
+            }
+        });
         return;
     }
 
     // ─── 県階層 ───
     if (window.prefData) {
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        document.getElementById('map-back-btn').style.display = 'block';
-
+        
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 showPrefSpots();
                 initAreaUI();
                 renderPrefWeather();
                 renderCrowdImage();
+                
+                requestAnimationFrame(() => {
+                    const btn = document.getElementById('map-back-btn');
+                    if (btn) {
+                        btn.style.opacity = '0';
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => {
+                            btn.style.transition = 'opacity 0.4s ease';
+                            btn.style.opacity = '1';
+                        });
+                    }
+                });
             });
         });
     }
 }
+
 
 </script>
 
