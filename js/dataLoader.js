@@ -2428,18 +2428,21 @@ function goBack() {
         // 再構築
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
-        enablePhase2(window.map);
-        phase1menu(window.currentAreaId);
-        
-        // ★ 分岐①の最後にフェードイン
-        requestAnimationFrame(() => {
-            if (backBtn) {
-                backBtn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    backBtn.style.transition = 'opacity 0.4s ease';
-                    backBtn.style.opacity = '1';
-                });
-            }
+
+        // ★ 【修正】マップの移動完了を待ってからUI展開とフェードインを実行する
+        window.map.once('moveend', () => {
+            enablePhase2(window.map);
+            phase1menu(window.currentAreaId);
+            
+            requestAnimationFrame(() => {
+                if (backBtn) {
+                    backBtn.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        backBtn.style.transition = 'opacity 0.4s ease';
+                        backBtn.style.opacity = '1';
+                    });
+                }
+            });
         });
         
         return;
@@ -2474,7 +2477,7 @@ function goBack() {
             }
         });
 
-        // ★ ここで確実にフラグを解除（null化）する
+        // ここで確実にフラグを解除（null化）する
         window.osmLayer = null;
 
         window.map.setMinZoom(0);
@@ -2495,19 +2498,9 @@ function goBack() {
 
         window.gsiLayer.addTo(window.map);
 
+        // ★ selectArea関数内でmoveend待ち＆フェードインが行われるのでこれだけでOK
         selectArea(area);
         renderCrowdImage();
-        
-        // ★ 分岐②の最後にフェードイン
-        requestAnimationFrame(() => {
-            if (backBtn) {
-                backBtn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    backBtn.style.transition = 'opacity 0.4s ease';
-                    backBtn.style.opacity = '1';
-                });
-            }
-        });
         
         return;
     }
@@ -2531,26 +2524,24 @@ function goBack() {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
 
-    // ② 1フレーム待つ
-    requestAnimationFrame(() => {
-        // ③ サイズ確定後に通知
-        window.map.invalidateSize(true);
+    // 移動開始
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+    location.hash = '';
 
-        // ④ その後に移動
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom
-        );
-        location.hash = '';
+    // ★ 【修正】マップの移動完了を待ってからUI展開とフェードインを実行する
+    window.map.once('moveend', () => {
+        window.map.invalidateSize(true);
         updateStateFromHash();
         initAreaUI();
         showPrefSpots();
         renderPrefWeather();
         resetAreaGuide();
 
-        // ★ 分岐③の最後にフェードイン
         requestAnimationFrame(() => {
             if (backBtn) {
                 backBtn.style.display = 'block';
@@ -2562,6 +2553,7 @@ function goBack() {
         });
     });
 }
+
 
 
 
