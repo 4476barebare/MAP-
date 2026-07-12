@@ -2306,7 +2306,6 @@ function updateStateFromHash() {
     }
 }
 
-
 function goBack() {
     // =====================================================
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
@@ -2367,15 +2366,14 @@ function goBack() {
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
 
     // -----------------------------------------------------
-    // ★ ご提案のフェイルセーフフラグを1行追加！
-    // OSMレイヤーが存在していれば「確実にPhase2にいる」と判定できる
+    // ★ フェイルセーフフラグ
+    // より安全にするため、「変数が存在し、かつマップに表示されているか」で判定します
     // -----------------------------------------------------
-    const isPhase2 = !!window.osmLayer;
+    const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
     // =====================================================
     // ① phase2 → phase1（※実質：スポット詳細 → Phase2 へ戻る）
     // =====================================================
-    // isPhase2がtrue（OSM展開済み）の時はここをブロックし、isSpecialによる無限ループを防ぐ
     if ((z > 13 || isSpecial) && !isPhase2) {
         stopZoomGuard();
         window.map.dragging.enable();
@@ -2419,7 +2417,6 @@ function goBack() {
     // =====================================================
     // ② phase1維持（※実質：Phase2 → Phase1 へ戻る）
     // =====================================================
-    // ズームが13.01などにブレていても、isPhase2がtrueなら確実にここを通しOSMを剥がす
     if (z === 13 || isPhase2) {
         disablePhase2(window.map);
         clearSub2Weather();
@@ -2445,6 +2442,9 @@ function goBack() {
                 window.map.removeLayer(layer);
             }
         });
+
+        // ★ ご指摘の通り、ここで確実にフラグを解除（null化）する
+        window.osmLayer = null;
 
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -2473,6 +2473,12 @@ function goBack() {
     // ③ prefへ戻る（z <= 12）
     // =====================================================
 
+    // ★ 念のため、ここでもOSMのフラグ解除を徹底
+    if (window.osmLayer) {
+        window.map.removeLayer(window.osmLayer);
+        window.osmLayer = null;
+    }
+
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
@@ -2482,7 +2488,6 @@ function goBack() {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
     
-    // ★変更点：県レベルに戻ったとき、さらにRegionへ戻れるようボタンは「表示」したままにする
     document.getElementById('map-back-btn').style.display = 'block';
 
     // ② 1フレーム待つ
@@ -2506,7 +2511,6 @@ function goBack() {
         resetAreaGuide();
     });
 }
-
 
 
 function buildSpotRestoreObject() {
