@@ -534,6 +534,76 @@ function goBack() {
 }
 
 // ==========================================
+// ★ 修正：データ整合性チェックとルート管理
+// ==========================================
+async function checkAndLoadRouteData() {
+    const { region, pref: prefCode } = getParsedPrefQuery();
+    
+    // ★ 変更：ここではロードが必要か（prefCodeがあるか）の判定だけに留め、
+    // 関数内で他関数の描画（loadRegionMap）を割り込ませない
+    if (!prefCode) return true; 
+
+    let needsBaseLoad = false;
+    let needsFishLoad = false;
+
+    if (window.currentPref !== prefCode) {
+        window.fishData = null;
+    }
+
+    if (!window.prefData || window.currentPref !== prefCode) {
+        needsBaseLoad = true;
+    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
+        needsBaseLoad = true;
+    }
+
+    let resolvedAreaId = null;
+    
+    const url = new URL(location.href);
+    const areaQuery = url.searchParams.get('area'); 
+    
+    if (areaQuery) {
+        if (!window.areaData) {
+            needsBaseLoad = true;
+        } else {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
+            if (area) {
+                resolvedAreaId = prefCode + "_" + area.individualId;
+                if (!window.fishData) {
+                    needsFishLoad = true;
+                }
+            }
+        }
+    }
+
+    if (needsBaseLoad || needsFishLoad) {
+        window.currentRegion = region || 'KANTO';
+        window.currentPref = prefCode;
+
+        if (needsBaseLoad) {
+            await loadPrefectureData(prefCode);
+        }
+        
+        if (areaQuery && !resolvedAreaId && window.areaData) {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
+            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
+        }
+
+        if (resolvedAreaId) {
+            await prepareFishForArea(resolvedAreaId);
+        }
+
+        routeUpdate();
+        return false; 
+    }
+
+    return true; 
+}
+
+// ==========================================
 // 4. ハブとなる routeUpdate (完成版)
 // ==========================================
 async function routeUpdate() {
@@ -542,7 +612,8 @@ async function routeUpdate() {
 
     const { region, pref: prefCode } = getParsedPrefQuery();
 
-    // ★ 初期画面（広域マップ）の描画ロジック
+    // ★ 修正：初期表示（広域マップ）の描画判定を routeUpdate 側の最優先位置に配置する。
+    // これにより、非同期データのチェック後に確実に安全なタイミングでマップが初期化されます。
     if (!prefCode) {
         document.getElementById('map-back-btn').style.display = 'none';
         loadRegionMap(region || window.currentRegion || 'KANTO');
@@ -620,6 +691,7 @@ async function routeUpdate() {
         });
     }
 }
+
 
 function formatDate(str) {
   const [y, m, d] = str.split("-");
@@ -1555,78 +1627,6 @@ async function loadPrefectureData(prefCode) {
         console.error("データ読み込みエラー:", err);
         return false;
     }
-}
-
-// ==========================================
-// ★ データ整合性チェックとルート管理
-// ==========================================
-async function checkAndLoadRouteData() {
-    const { region, pref: prefCode } = getParsedPrefQuery();
-    
-    // ★ 修正：Region（広域）画面ならデータチェックは不要。そのまま広域マップを描画して終了する
-    if (!prefCode) {
-        loadRegionMap(region || 'KANTO');
-        return false; // 以降の routeUpdate の処理を止める
-    }
-
-    let needsBaseLoad = false;
-    let needsFishLoad = false;
-
-    if (window.currentPref !== prefCode) {
-        window.fishData = null;
-    }
-
-    if (!window.prefData || window.currentPref !== prefCode) {
-        needsBaseLoad = true;
-    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
-        needsBaseLoad = true;
-    }
-
-    let resolvedAreaId = null;
-    
-    const url = new URL(location.href);
-    const areaQuery = url.searchParams.get('area'); 
-    
-    if (areaQuery) {
-        if (!window.areaData) {
-            needsBaseLoad = true;
-        } else {
-            let area = window.areaData.find(a => a.name === areaQuery);
-            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
-            
-            if (area) {
-                resolvedAreaId = prefCode + "_" + area.individualId;
-                if (!window.fishData) {
-                    needsFishLoad = true;
-                }
-            }
-        }
-    }
-
-    if (needsBaseLoad || needsFishLoad) {
-        window.currentRegion = region || 'KANTO';
-        window.currentPref = prefCode;
-
-        if (needsBaseLoad) {
-            await loadPrefectureData(prefCode);
-        }
-        
-        if (areaQuery && !resolvedAreaId && window.areaData) {
-            let area = window.areaData.find(a => a.name === areaQuery);
-            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
-            
-            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
-        }
-
-        if (resolvedAreaId) {
-            await prepareFishForArea(resolvedAreaId);
-        }
-
-        routeUpdate();
-        return false; 
-    }
-
-    return true; 
 }
 
 
