@@ -210,7 +210,9 @@
 <script src="/js/dataLoader.js"></script>
 
 
+
 <script>
+    
 window.prefData = null;
 window.areaData = [];
 window.spotData = [];
@@ -221,6 +223,7 @@ window.currentPref = null;
 window.fishUrl = null;
 window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
+window._isGoingBack = false;
 
 function showDebug(msg, clear = false) {
     let debugEl = document.getElementById('debug');
@@ -244,97 +247,6 @@ function showDebug(msg, clear = false) {
     debugEl.textContent += msg + "\n";
 }
 
-// ==========================================
-// ■ エリア名(日本語)から currentAreaId を生成する関数
-// ==========================================
-function getAreaIdFromQuery(areaQuery) {
-    if (!areaQuery || !window.areaData) return null;
-    let area = window.areaData.find(a => a.name === areaQuery);
-    if (!area) {
-        area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
-    }
-    if (area) return area.areaId + "_" + area.individualId;
-    return null;
-}
-
-// ==========================================
-// ■ スポット名(日本語)から currentSpotId を生成する関数
-// ==========================================
-function getSpotIdFromQuery(spotQuery, resolvedAreaId) {
-    if (!spotQuery || !resolvedAreaId || !window.spotData) return null;
-    let spot = window.spotData.find(s => s.name === spotQuery && s.areaId === resolvedAreaId);
-    if (!spot) {
-        spot = window.spotData.find(s => String(s.individualId) === String(spotQuery) && s.areaId === resolvedAreaId);
-    }
-    if (spot) return spot.individualId;
-    return null;
-}
-
-// ==========================================
-// ■ URLを書き換える共通ヘルパー関数
-// ==========================================
-function updateURLState(areaName, spotName) {
-    const url = new URL(location.href);
-    if (areaName) {
-        url.searchParams.set('area', areaName);
-    } else {
-        url.searchParams.delete('area');
-    }
-    if (spotName) {
-        url.searchParams.set('spot', spotName);
-    } else {
-        url.searchParams.delete('spot');
-    }
-    url.hash = ''; 
-    history.pushState(null, '', url);
-}
-
-function updateStateFromURL() {
-    const url = new URL(location.href);
-    const prefCode = url.searchParams.get('pref');
-    const areaQuery = url.searchParams.get('area'); 
-    const spotQuery = url.searchParams.get('spot'); 
-
-    if (!prefCode && !areaQuery) {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-        return;
-    }
-    if (!areaQuery || areaQuery.trim() === "") {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-        return;
-    }
-
-    const resolvedAreaId = getAreaIdFromQuery(areaQuery);
-
-    if (!resolvedAreaId) {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-    }
-    else if (resolvedAreaId && !spotQuery) {
-        window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = null;
-    }
-    else if (resolvedAreaId && spotQuery) {
-        window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = getSpotIdFromQuery(spotQuery, resolvedAreaId);
-    }
-}
-
-// ==========================================
-// ★ URLの pref クエリから Region と Pref を抽出する関数
-// ==========================================
-function getParsedPrefQuery() {
-    const url = new URL(location.href);
-    const query = url.searchParams.get('pref');
-    if (!query) return { region: null, pref: null };
-    const parts = query.split('_');
-    if (parts.length >= 2) {
-        return { region: parts[0], pref: parts[1] };
-    }
-    return { region: 'KANTO', pref: parts[0] };
-}
 
 window._isGoingBack = false;
 
@@ -532,174 +444,97 @@ function goBack() {
         releaseLockAndShowBtn();
     });
 }
+// ==========================================
+// ■ エリア名から currentAreaId を生成する関数
+// ==========================================
+function getAreaIdFromQuery(areaQuery) {
+    if (!areaQuery || !window.areaData) return null;
+    let area = window.areaData.find(a => a.name === areaQuery);
+    if (!area) {
+        area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+    }
+    if (area) return area.areaId + "_" + area.individualId;
+    return null;
+}
 
 // ==========================================
-// ★ データ整合性チェックとルート管理
+// ■ スポット名から currentSpotId を生成する関数
 // ==========================================
-async function checkAndLoadRouteData() {
-    const { region, pref: prefCode } = getParsedPrefQuery();
-    
-    // ★ 修正：Region（広域）画面ならデータチェックは不要。そのまま広域マップを描画して終了する
-    if (!prefCode) {
-        // ★ これを追加！初期画面の時にグローバル変数を確実に初期化する
-        window.currentRegion = region || 'KANTO';
-        
-        loadRegionMap(window.currentRegion);
-        return false; // 以降の routeUpdate の処理を止める
+function getSpotIdFromQuery(spotQuery, resolvedAreaId) {
+    if (!spotQuery || !resolvedAreaId || !window.spotData) return null;
+    let spot = window.spotData.find(s => s.name === spotQuery && s.areaId === resolvedAreaId);
+    if (!spot) {
+        spot = window.spotData.find(s => String(s.individualId) === String(spotQuery) && s.areaId === resolvedAreaId);
     }
+    if (spot) return spot.individualId;
+    return null;
+}
 
-    let needsBaseLoad = false;
-    let needsFishLoad = false;
-
-    if (window.currentPref !== prefCode) {
-        window.fishData = null;
-    }
-
-    if (!window.prefData || window.currentPref !== prefCode) {
-        needsBaseLoad = true;
-    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
-        needsBaseLoad = true;
-    }
-
-    let resolvedAreaId = null;
-    
+// ==========================================
+// ■ URLの状態を更新する関数（ハッシュからクエリへ変更）
+// ==========================================
+function updateURLState(areaName, spotName) {
     const url = new URL(location.href);
+    if (areaName) {
+        url.searchParams.set('area', areaName);
+    } else {
+        url.searchParams.delete('area');
+    }
+    if (spotName) {
+        url.searchParams.set('spot', spotName);
+    } else {
+        url.searchParams.delete('spot');
+    }
+    url.hash = ''; 
+    history.pushState(null, '', url);
+}
+
+// ==========================================
+// ■ URLから状態を復元する関数（旧 updateStateFromHash の代替）
+// ==========================================
+function updateStateFromURL() {
+    const url = new URL(location.href);
+    const prefCode = url.searchParams.get('pref');
     const areaQuery = url.searchParams.get('area'); 
+    const spotQuery = url.searchParams.get('spot'); 
+
+    // 初期画面、または県トップ画面の場合は状態をクリア
+    if (!prefCode || !areaQuery || areaQuery.trim() === "") {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+        return;
+    }
+
+    const resolvedAreaId = getAreaIdFromQuery(areaQuery);
+
+    if (!resolvedAreaId) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+    }
+    else if (resolvedAreaId && !spotQuery) {
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = null;
+    }
+    else if (resolvedAreaId && spotQuery) {
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = getSpotIdFromQuery(spotQuery, resolvedAreaId);
+    }
+}
+
+// ==========================================
+// ■ prefクエリからRegionとPrefを取得
+// ==========================================
+function getParsedPrefQuery() {
+    const url = new URL(location.href);
+    const query = url.searchParams.get('pref');
+    if (!query) return { region: null, pref: null };
     
-    if (areaQuery) {
-        if (!window.areaData) {
-            needsBaseLoad = true;
-        } else {
-            let area = window.areaData.find(a => a.name === areaQuery);
-            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
-            
-            if (area) {
-                resolvedAreaId = prefCode + "_" + area.individualId;
-                if (!window.fishData) {
-                    needsFishLoad = true;
-                }
-            }
-        }
+    const parts = query.split('_');
+    if (parts.length >= 2) {
+        return { region: parts[0], pref: parts[1] };
     }
-
-    if (needsBaseLoad || needsFishLoad) {
-        // ★ ここでも安全に初期化
-        window.currentRegion = region || 'KANTO';
-        window.currentPref = prefCode;
-
-        if (needsBaseLoad) {
-            await loadPrefectureData(prefCode);
-        }
-        
-        if (areaQuery && !resolvedAreaId && window.areaData) {
-            let area = window.areaData.find(a => a.name === areaQuery);
-            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
-            
-            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
-        }
-
-        if (resolvedAreaId) {
-            await prepareFishForArea(resolvedAreaId);
-        }
-
-        routeUpdate();
-        return false; 
-    }
-
-    return true; 
+    return { region: 'KANTO', pref: parts[0] };
 }
-
-// ==========================================
-// 4. ハブとなる routeUpdate (完成版)
-// ==========================================
-async function routeUpdate() {
-    const isReady = await checkAndLoadRouteData();
-    if (!isReady) return; 
-
-    const { region, pref: prefCode } = getParsedPrefQuery();
-
-    // ★ 初期画面（広域マップ）の描画ロジック
-    if (!prefCode) {
-        document.getElementById('map-back-btn').style.display = 'none';
-        
-        // ★ ここも追加！確実にグローバル変数を更新
-        window.currentRegion = region || 'KANTO';
-        loadRegionMap(window.currentRegion);
-        return;
-    }
-
-    window.currentRegion = region || 'KANTO';
-    updateStateFromURL();
-
-    // ─── スポット階層 ───
-    if (window.currentSpotId) {
-        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
-        const spot = list.find(s => String(s.individualId) === String(window.currentSpotId));
-        
-        if (spot) {
-            drawLocation(spot.name, spot.lat, spot.lng, "13");
-            zoomToSpot(spot);
-            requestAnimationFrame(() => {
-                const btn = document.getElementById('map-back-btn');
-                if (btn) {
-                    btn.style.opacity = '0';
-                    btn.style.display = 'block';
-                    requestAnimationFrame(() => {
-                        btn.style.transition = 'opacity 0.4s ease';
-                        btn.style.opacity = '1';
-                    });
-                }
-            });
-        }
-        return;
-    }
-
-    // ─── エリア階層 ───
-    if (window.currentAreaId) {
-        const area = window.areaData.find(a => window.currentAreaId === String(a.areaId + "_" + a.individualId));
-        if (!area) return;
-        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-        selectArea(area.name);
-        renderCrowdImage();
-        requestAnimationFrame(() => {
-            const btn = document.getElementById('map-back-btn');
-            if (btn) {
-                btn.style.opacity = '0';
-                btn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    btn.style.transition = 'opacity 0.4s ease';
-                    btn.style.opacity = '1';
-                });
-            }
-        });
-        return;
-    }
-
-    // ─── 県階層 ───
-    if (window.prefData) {
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                showPrefSpots();
-                initAreaUI();
-                renderPrefWeather();
-                renderCrowdImage();
-                requestAnimationFrame(() => {
-                    const btn = document.getElementById('map-back-btn');
-                    if (btn) {
-                        btn.style.opacity = '0';
-                        btn.style.display = 'block';
-                        requestAnimationFrame(() => {
-                            btn.style.transition = 'opacity 0.4s ease';
-                            btn.style.opacity = '1';
-                        });
-                    }
-                });
-            });
-        });
-    }
-}
-
 
 
 function formatDate(str) {
@@ -759,6 +594,7 @@ function initAreaUI() {
 
     window.nearestClickHandler = function(e) {
         if (!window.nearestClickEnabled) return;
+
         const rect = menu.getBoundingClientRect();
         const x = e.originalEvent.clientX;
         const y = e.originalEvent.clientY;
@@ -772,6 +608,7 @@ function initAreaUI() {
             const dLat = e.latlng.lat - area.lat;
             const dLng = e.latlng.lng - area.lng;
             const dist = dLat * dLat + dLng * dLng;
+
             if (dist < minDist) {
                 minDist = dist;
                 nearest = area;
@@ -779,6 +616,7 @@ function initAreaUI() {
         }
 
         if (!nearest) return;
+
         updateURLState(nearest.name, null);
         updateStateFromURL();
         destroyAreaUI();
@@ -792,16 +630,19 @@ function initAreaUI() {
 function destroyAreaUI() {
     const menuUl = document.querySelector('#map-menu ul');
     if (menuUl) {
-        const items = menuUl.querySelectorAll('li'); 
+        const items = menuUl.querySelectorAll('li');
         items.forEach(el => el.remove());
     }
+
     if (window.nearestClickHandler) {
         window.map.off('click', window.nearestClickHandler);
         window.nearestClickHandler = null;
     }
+
     window.nearestClickEnabled = false;
     document.getElementById('map-menu').style.display = 'none';
 }
+
 
 function startZoomGuard() {
     if (!window.map) return;
@@ -838,6 +679,7 @@ document.addEventListener('touchmove', (e) => {
     if (e.touches.length !== 2) return;
     const currentDistance = getDistance(e.touches);
     const isPinchIn = currentDistance < pinchStartDistance - 20;
+
     if (!pinchTriggered && isPinchIn) {
         pinchTriggered = true;
         if (isZoomGuardFailed()) return;
@@ -856,7 +698,12 @@ function renderPrefWeather() {
     for (let i = 0; i < elements.length; i++) {
         const el = elements[i];
         const areaId = el.id;
-        const rep = window.spotData.find(s => s.areaId === areaId && s.type === 'representative');
+
+        const rep = window.spotData.find(s =>
+            s.areaId === areaId &&
+            s.type === 'representative'
+        );
+
         if (!rep || !rep.whether) {
             el.textContent = 'no data';
             continue;
@@ -864,13 +711,18 @@ function renderPrefWeather() {
 
         const w = formatPrefWeather(rep.whether);
         const rows = rep.whether?.hourly?.[0]?.weather || [];
+
+        const startHour = 0;
         const morningRows = [];
         const afternoonRows = [];
 
-        for (let j = 0; j < rows.length; j++) {
-            const hour = j * 2;
-            if (hour >= 5 && hour <= 12) morningRows.push(rows[j]);
-            else if (hour >= 13 && hour <= 20) afternoonRows.push(rows[j]);
+        for (let i = 0; i < rows.length; i++) {
+            const hour = startHour + i * 2;
+            if (hour >= 5 && hour <= 12) {
+                morningRows.push(rows[i]);
+            } else if (hour >= 13 && hour <= 20) {
+                afternoonRows.push(rows[i]);
+            }
         }
 
         const getIconSafe = (r) => {
@@ -880,28 +732,45 @@ function renderPrefWeather() {
 
         const iconMorning = getIconSafe(morningRows);
         const iconAfternoon = getIconSafe(afternoonRows);
-        let icon = '';
 
+        let icon = '';
         if (iconMorning && iconAfternoon) {
-            icon = iconMorning === iconAfternoon ? iconMorning : `${iconMorning}<span class="unit-text">→</span>${iconAfternoon}`;
+            icon = iconMorning === iconAfternoon
+                ? iconMorning
+                : `${iconMorning}<span class="unit-text">→</span>${iconAfternoon}`;
         } else {
             icon = iconMorning || iconAfternoon || '';
         }
 
+        const temp = w.temp;
+        const pop = Math.min(99, Math.round(w.pop));
+        const wind = w.wind;
+        const name = rep.name;
+
         el.innerHTML = `
             <span class="col-icon">${icon}</span>
-            <div class="col-temp"><span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span></div>
-            <div class="col-label"><span class="unit-text">降水</span></div>
-            <div class="col-pop"><span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span></div>
-            <div class="col-wind"><span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span></div>
-            <span class="pref-name">${rep.name}</span>
+            <div class="col-temp">
+                <span class="num-fixed">${temp}</span><span class="unit-text">°C</span>
+            </div>
+            <div class="col-label">
+                <span class="unit-text">降水</span>
+            </div>
+            <div class="col-pop">
+                <span class="num-fixed">${Math.min(pop, 99)}</span><span class="unit-text">%</span>
+            </div>
+            <div class="col-wind">
+                <span class="num-fixed">${wind}</span><span class="unit-text">m/s</span>
+            </div>
+            <span class="pref-name">${name}</span>
         `;
     }
 }
 
 function formatPrefWeather(whether) {
     const today = whether?.hourly?.[0];
-    if (!today || !Array.isArray(today.weather)) return null;
+    if (!today || !Array.isArray(today.weather)) {
+        return null;
+    }
 
     let maxTemp = -Infinity;
     let maxPop = -Infinity;
@@ -911,20 +780,37 @@ function formatPrefWeather(whether) {
 
     for (const row of today.weather) {
         if (!Array.isArray(row)) continue;
+
         const code = row[0];
         const temp = row[1];
         const pop = row[2];
         const wind = row[4];
 
-        if (typeof code === "number") { codeSum += code; codeCount++; }
-        if (typeof temp === "number") maxTemp = Math.max(maxTemp, temp);
-        if (typeof pop === "number") maxPop = Math.max(maxPop, pop);
-        if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
+        if (typeof code === "number") {
+            codeSum += code;
+            codeCount++;
+        }
+        if (typeof temp === "number") {
+            maxTemp = Math.max(maxTemp, temp);
+        }
+        if (typeof pop === "number") {
+            maxPop = Math.max(maxPop, pop);
+        }
+        if (typeof wind === "number") {
+            maxWind = Math.max(maxWind, wind);
+        }
     }
 
     if (codeCount === 0) return null;
+
     let displayPop = null;
-    if (maxPop !== -Infinity) displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
+    if (maxPop !== -Infinity) {
+        if (maxPop < 5) {
+            displayPop = 0;
+        } else {
+            displayPop = Math.round(maxPop / 10) * 10;
+        }
+    }
 
     return {
         icon: Math.round(codeSum / codeCount),
@@ -937,7 +823,11 @@ function formatPrefWeather(whether) {
 function calcRepresentativeIcon(rows) {
     const adjustCode = (code, pop) => {
         const p = Number(pop);
-        if (code >= 60) return p >= 80 ? 70 : 60;
+        if (code >= 60) {
+            if (p >= 80) return 70;
+            if (p >= 60) return 60;
+            return 60;
+        }
         if (p >= 70) return 30;
         if (p >= 50) return 10;
         return code;
@@ -951,6 +841,7 @@ function calcRepresentativeIcon(rows) {
         const code = Number(r?.[0]);
         const pop  = Number(r?.[2]);
         if (!Number.isFinite(code)) continue;
+
         const adjusted = adjustCode(code, pop);
         map[adjusted] = (map[adjusted] || 0) + 1;
     }
@@ -966,28 +857,34 @@ function calcRepresentativeIcon(rows) {
         }
     }
 
-    const iconCode = tied.length > 1 ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length) : tied[0];
+    const iconCode = tied.length > 1
+            ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
+            : tied[0];
+
     return toWeatherIcon(iconCode);
 }
 
 function toWeatherIcon(code) {
     if (code >= 70) return "☔️";
-    if (code >= 60) return "☂️";   
-    if (code >= 30) return "☁️";  
-    if (code >= 10) return "⛅";  
-    if (code === 1) return "🌤";  
-    if (code === 2) return "⛅";  
-    return "☀️"; 
+    if (code >= 60) return "☂️";
+    if (code >= 30) return "☁️";
+    if (code >= 10) return "⛅";
+    if (code === 1) return "🌤";
+    if (code === 2) return "⛅";
+    return "☀️";
 }
 
 function renderCrowdImage() {
-    if (typeof window.radarEnabled === 'undefined') window.radarEnabled = true;
+    if (typeof window.radarEnabled === 'undefined') {
+        window.radarEnabled = true;
+    }
 
     const btn = document.getElementById('radarToggleBtn');
     if (btn && !btn.dataset.listenerAdded) {
         btn.dataset.listenerAdded = "true";
         btn.addEventListener('click', function() {
             window.radarEnabled = !window.radarEnabled;
+
             if (!window.radarEnabled) {
                 if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
                 if (window.crowdLayer) window.map.removeLayer(window.crowdLayer);
@@ -1008,12 +905,22 @@ function renderCrowdImage() {
         
         if (header) header.style.display = '';
         if (cloudsUI) cloudsUI.textContent = '';
-        if (headerText && window.todayTide) headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-        if (btn) { btn.style.display = ''; btn.textContent = 'ON'; btn.classList.add('is-off'); }
+        if (headerText && window.todayTide) {
+            headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        }
+        if (btn) {
+            btn.style.display = ''; 
+            btn.textContent = 'ON'; 
+            btn.classList.add('is-off'); 
+        }
         return; 
     }
 
-    if (btn) { btn.style.display = ''; btn.textContent = 'OFF'; btn.classList.remove('is-off'); }
+    if (btn) {
+        btn.style.display = '';
+        btn.textContent = 'OFF';
+        btn.classList.remove('is-off');
+    }
 
     removeCrowdImage();
 
@@ -1033,12 +940,16 @@ function renderCrowdImage() {
     let baseIndex = slots.findIndex(h => h > hour);
     let dayOffset = 0;
 
-    if (baseIndex === -1) { baseIndex = 0; dayOffset = 1; }
+    if (baseIndex === -1) {
+        baseIndex = 0;
+        dayOffset = 1;
+    }
 
     for (let i = 0; i < 4; i++) {
         const rawIndex = baseIndex + i;
         const idx = rawIndex % slots.length;
         const extraDay = Math.floor(rawIndex / slots.length);
+
         const tmpDate = new Date(nowJST);
         tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
 
@@ -1058,6 +969,7 @@ function renderCrowdImage() {
     const headerText = document.querySelector('.header-text');
 
     if (!header || !cloudsUI || !headerText) return;
+
     header.style.display = '';
 
     if (window.phase2Initialized) {
@@ -1070,70 +982,116 @@ function renderCrowdImage() {
     cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
     headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-    fetch("js/fetched_log.txt").then(res => res.text()).then(text => {
-        const lines = text.trim().split("\n");
-        let best = null;
-        for (let line of lines) {
-            if (!line) continue;
-            const parts = line.split(",");
-            if (parts.length < 4 || parts[0] !== window.currentPref) continue;
-            best = { lat: parseFloat(parts[1]), lng: parseFloat(parts[2]), baseZoom: parseFloat(parts[3]) };
-            break;
-        }
+    fetch("js/fetched_log.txt")
+        .then(res => res.text())
+        .then(text => {
+            const lines = text.trim().split("\n");
+            let best = null;
 
-        if (!best) return;
+            for (let line of lines) {
+                if (!line) continue;
+                const parts = line.split(",");
+                if (parts.length < 4) continue;
+                if (parts[0] !== window.currentPref) continue;
 
-        function calcBounds() {
-            const z = window.map.getZoom();
-            const scale = Math.pow(2, z - best.baseZoom);
-            const size = 512 * scale;
-            const topLeft = window.map.project([best.lat, best.lng], z);
-            const bottomRight = topLeft.add([size, size]);
-            return L.latLngBounds(window.map.unproject(topLeft, z), window.map.unproject(bottomRight, z));
-        }
+                const lat = parseFloat(parts[1]);
+                const lng = parseFloat(parts[2]);
+                const baseZoom = parseFloat(parts[3]);
 
-        const MAX_OPACITY = 0.6;
+                best = { lat, lng, baseZoom };
+                break;
+            }
 
-        window.crowdLayer = L.imageOverlay(images[0].url, calcBounds(), { pane: 'rainPane', opacity: MAX_OPACITY }).addTo(window.map);
-        window.crowdZoomHandler = function() {
-            if (!window.crowdLayer) return;
-            window.crowdLayer.setBounds(calcBounds());
-        };
-        window.map.on("zoomend", window.crowdZoomHandler);
+            if (!best) return;
 
-        if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
+            function calcBounds() {
+                const z = window.map.getZoom();
+                const scale = Math.pow(2, z - best.baseZoom);
+                const size = 512 * scale;
 
-        window.crowdSlideTimer = setInterval(() => {
-            if (!window.radarEnabled) { clearInterval(window.crowdSlideTimer); return; }
-            const oldLayer = window.crowdLayer;
-            currentIndex = (currentIndex + 1) % images.length;
-            const img = images[currentIndex];
-            cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
+                const topLeft = window.map.project([best.lat, best.lng], z);
+                const bottomRight = topLeft.add([size, size]);
 
-            const newLayer = L.imageOverlay(img.url, calcBounds(), { pane: 'rainPane', opacity: 0 }).addTo(window.map);
-            let opacity = 0;
-            const fade = setInterval(() => {
-                opacity += 0.06;
-                if (opacity >= MAX_OPACITY) {
-                    opacity = MAX_OPACITY;
-                    clearInterval(fade);
-                    if (oldLayer) window.map.removeLayer(oldLayer);
-                    window.crowdLayer = newLayer;
+                return L.latLngBounds(
+                    window.map.unproject(topLeft, z),
+                    window.map.unproject(bottomRight, z)
+                );
+            }
+
+            const MAX_OPACITY = 0.6;
+
+            window.crowdLayer = L.imageOverlay(
+                images[0].url,
+                calcBounds(),
+                { pane: 'rainPane', opacity: MAX_OPACITY }
+            ).addTo(window.map);
+
+            window.crowdZoomHandler = function() {
+                if (!window.crowdLayer) return;
+                window.crowdLayer.setBounds(calcBounds());
+            };
+
+            window.map.on("zoomend", window.crowdZoomHandler);
+
+            if (window.crowdSlideTimer) {
+                clearInterval(window.crowdSlideTimer);
+            }
+
+            window.crowdSlideTimer = setInterval(() => {
+                if (!window.radarEnabled) {
+                    clearInterval(window.crowdSlideTimer);
+                    return;
                 }
-                newLayer.setOpacity(opacity);
-                if (oldLayer) oldLayer.setOpacity(MAX_OPACITY - opacity);
-            }, 50);
-        }, 2500);
-    });
+
+                const oldLayer = window.crowdLayer;
+                currentIndex = (currentIndex + 1) % images.length;
+                const img = images[currentIndex];
+
+                cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
+
+                const newLayer = L.imageOverlay(
+                    img.url,
+                    calcBounds(),
+                    { pane: 'rainPane', opacity: 0 }
+                ).addTo(window.map);
+
+                let opacity = 0;
+                const fade = setInterval(() => {
+                    opacity += 0.06;
+
+                    if (opacity >= MAX_OPACITY) {
+                        opacity = MAX_OPACITY;
+                        clearInterval(fade);
+
+                        if (oldLayer) window.map.removeLayer(oldLayer);
+                        window.crowdLayer = newLayer;
+                    }
+
+                    newLayer.setOpacity(opacity);
+                    if (oldLayer) oldLayer.setOpacity(MAX_OPACITY - opacity);
+                }, 50);
+
+            }, 2500);
+        });
 }
 
 function removeCrowdImage() {
-    if (window.crowdSlideTimer) { clearInterval(window.crowdSlideTimer); window.crowdSlideTimer = null; }
-    if (window.crowdLayer) { window.map.removeLayer(window.crowdLayer); window.crowdLayer = null; }
-    if (window.crowdZoomHandler) { window.map.off("zoomend", window.crowdZoomHandler); window.crowdZoomHandler = null; }
+    if (window.crowdSlideTimer) {
+        clearInterval(window.crowdSlideTimer);
+        window.crowdSlideTimer = null;
+    }
+    if (window.crowdLayer) {
+        window.map.removeLayer(window.crowdLayer);
+        window.crowdLayer = null;
+    }
+    if (window.crowdZoomHandler) {
+        window.map.off("zoomend", window.crowdZoomHandler);
+        window.crowdZoomHandler = null;
+    }
 
     const header = document.querySelector('.menu-header-row');
     if (!header) return;
+
     const cloudsUI = document.getElementById('cloudsUI');
     const headerText = document.querySelector('.header-text');
 
@@ -1146,18 +1104,14 @@ function removeCrowdImage() {
 
     const leftEmpty  = !cloudsUI || cloudsUI.textContent === '';
     const rightEmpty = !headerText || headerText.textContent === '';
-    if (leftEmpty && rightEmpty) header.style.display = 'none';
-    else header.style.display = '';
+
+    if (leftEmpty && rightEmpty) {
+        header.style.display = 'none';
+    } else {
+        header.style.display = '';
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    updateStateFromURL();
-    routeUpdate();
-});
-
-window.addEventListener('popstate', () => {
-    routeUpdate(); 
-});
 
 function clearRegionMarkers() {
     if (window.regionMarkers && window.map) {
@@ -1191,305 +1145,14 @@ document.getElementById('map-back-btn')?.addEventListener('click', () => {
     goBack();
 });
 
-function loadWhetherCSV(url) {
-    const prefCode = window.currentPref; 
-    if (prefCode && window[`${prefCode}_whetherData`]) return Promise.resolve(window[`${prefCode}_whetherData`]);
-
-    const textPromise = window.fetchCache && window.fetchCache[url]
-        ? window.fetchCache[url]
-        : fetch(url).then(res => {
-            if (!res.ok) throw new Error("whether csv fetch失敗");
-            return res.text();
-        });
-
-    return textPromise.then(text => {
-        const lines = text.trim().split("\n");
-        lines.shift();
-        const parsedData = lines.map(line => {
-            const obj = splitCSVLine(line);
-            if (!obj) return null;
-            let parsed;
-            try { parsed = JSON.parse(obj.whether); } catch (e) { return null; }
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-
-            let csvDate = null;
-            if (obj.date) {
-                const safeDateStr = obj.date.replace(/-/g, "/");
-                csvDate = new Date(safeDateStr);
-                csvDate.setHours(0, 0, 0, 0);
-            }
-
-            const isToday = csvDate && csvDate.getTime() === today.getTime();
-            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
-
-            if (isToday) {
-                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) parsed.daily[4] = null; 
-            } 
-            else if (isYesterday) {
-                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
-                    parsed.hourly[0] = parsed.hourly[1];
-                    parsed.hourly[1] = parsed.hourly[2];
-                    parsed.hourly[2] = null;
-                }
-            }
-            return { name: obj.name, date: obj.date, whether: parsed };
-        }).filter(Boolean);
-
-        if (prefCode) window[`${prefCode}_whetherData`] = parsedData;
-        return parsedData;
-    });
-}
-
-function applyWhetherToSpots(csvData) {
-    if (window.spotData && window.spotData.length > 0 && window.spotData[0].whether) return;
-    const map = {};
-    for (const row of csvData) {
-        if (!row.name || !row.whether) continue;
-        map[row.name] = row.whether;
-    }
-    for (const spot of window.spotData) {
-        if (map[spot.name] !== undefined) spot.whether = map[spot.name];
-    }
-}
-
-function splitCSVLine(line) {
-    const first = line.indexOf(",");
-    if (first === -1) return null;
-    const second = line.indexOf(",", first + 1);
-    if (second === -1) return null;
-
-    const name = line.slice(0, first);
-    const date = line.slice(first + 1, second);
-    const whether = line.slice(second + 1);
-    return { name, date, whether };
-}
-
-function loadInlandWhetherCSV(regionCode) {
-    if (!regionCode) return Promise.resolve(null);
-    const cacheKey = `${regionCode}_inlandWhetherData`;
-    if (window[cacheKey]) return Promise.resolve(window[cacheKey]);
-    const url = `/data/${regionCode}_inLand_recalculated.csv`;
-
-    return fetch(url).then(res => {
-        if (!res.ok) throw new Error("inland whether csv fetch失敗: " + url);
-        return res.text();
-    }).then(text => {
-        const lines = text.trim().split("\n");
-        lines.shift();
-        const parsedData = lines.map(line => {
-            const obj = splitCSVLine(line); 
-            if (!obj) return null;
-            let parsed;
-            try { parsed = JSON.parse(obj.whether); } catch (e) { return null; }
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-
-            let csvDate = null;
-            if (obj.date) {
-                const safeDateStr = obj.date.replace(/-/g, "/");
-                csvDate = new Date(safeDateStr);
-                csvDate.setHours(0, 0, 0, 0);
-            }
-
-            const isToday = csvDate && csvDate.getTime() === today.getTime();
-            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
-
-            if (isToday) {
-                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) parsed.daily[4] = null; 
-            } 
-            else if (isYesterday) {
-                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
-                    parsed.hourly[0] = parsed.hourly[1];
-                    parsed.hourly[1] = parsed.hourly[2];
-                    parsed.hourly[2] = null;
-                }
-            }
-            return { name: obj.name, date: obj.date, whether: parsed };
-        }).filter(Boolean);
-
-        window[cacheKey] = parsedData;
-        return parsedData;
-    }).catch(err => {
-        console.warn(err);
-        return null;
-    });
-}
-
-function applyInlandWhetherToSpots(csvData) {
-    if (!csvData || !window.spotData) return;
-    const map = {};
-    for (const row of csvData) {
-        if (!row.name || !row.whether) continue;
-        map[row.name] = row.whether;
-    }
-    for (const spot of window.spotData) {
-        const spotId = String(spot.individualId || spot.id || "");
-        if (spotId.startsWith("L")) {
-            if (map[spot.name] !== undefined) spot.whether = map[spot.name];
-        }
-    }
-}
-
-function openArea(areaKey, isUserAction = false) {
-  const container = document.getElementById('area-guide');
-  container.classList.remove('collapsed-mode');
-  container.classList.add('active-mode');
-
-  document.querySelectorAll('#area-guide .area').forEach(area => {
-    const text = area.querySelector('.text');
-    if (area.id === areaKey) {
-      area.classList.add('active');
-      text.classList.add('open');
-      container.insertBefore(area, container.children[1]);
-      if (isUserAction) area.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    } else {
-      area.classList.remove('active');
-      text.classList.remove('open');
-    }
-  });
-}
-
-function renderAreaGuide() {
-    const container = document.getElementById('area-guide');
-    if (!container) return; 
-    if (!window.prefData) return;
-    container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
-    if (!window.areaData) return;
-
-    window.areaData.forEach(area => {
-        const div = document.createElement('div');
-        div.className = 'area';
-        div.id = area.individualId; 
-        div.innerHTML = `<h2>${area.name}</h2><p class="text">${area.notes}</p>`;
-
-        div.querySelector('h2').addEventListener('click', () => {
-            let isPhase2OSM = false;
-            if (window.map && window.map.getZoom() === 13) {
-                window.map.eachLayer(layer => {
-                    if (layer instanceof L.TileLayer) {
-                        const url = layer._url || '';
-                        if (url.includes('openstreetmap')) isPhase2OSM = true;
-                    }
-                });
-            }
-
-            if (window.currentSpotId || isPhase2OSM) {
-                if (typeof stopZoomGuard === 'function') stopZoomGuard();
-                if (window.map) {
-                    window.map.dragging.enable();
-                    window.map.scrollWheelZoom.enable();
-                    window.map.doubleClickZoom.enable();
-                    window.map.touchZoom.enable();
-                    window.map.setMinZoom(0);
-                    window.map.setMaxZoom(18);
-                    window.map.setMaxBounds(null);
-                    if (window.map.options) window.map.options.maxBoundsViscosity = 0;
-
-                    if (window.fishLayer) window.map.removeLayer(window.fishLayer);
-                    if (window.phase2Group) window.phase2Group.clearLayers();
-                    if (window.phase1Group) window.phase1Group.clearLayers();
-                    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-
-                    window.map.eachLayer(layer => {
-                        if (layer === window.gsiLayer) return;
-                        if (layer instanceof L.TileLayer) {
-                            const url = layer._url || '';
-                            if (url.includes('seamlessphoto') || url.includes('openstreetmap')) {
-                                window.map.removeLayer(layer);
-                            }
-                        }
-                    });
-                    
-                    if (!window.gsiLayer) {
-                        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-                    } else {
-                        window.gsiLayer.setUrl(window.gsiLayers.ort);
-                        window.gsiLayer.addTo(window.map); 
-                    }
-                    if (typeof disablePhase2 === 'function') disablePhase2(window.map);
-                }
-
-                if (typeof removeWeekItem === 'function') removeWeekItem();
-                if (typeof resetWeatherUI === 'function') resetWeatherUI();
-                if (typeof clearSub2Weather === 'function') clearSub2Weather();
-                
-                const nearest = document.getElementById("nearest-spot");
-                if (nearest) nearest.textContent = "";
-                window.currentSpotId = null;
-            }
-
-            updateURLState(area.name, null);
-            updateStateFromURL();
-            routeUpdate();
-            openArea(area.individualId, true);
-        });
-
-        container.appendChild(div);
-    });
-}
-
-function resetAreaGuide() {
-  const container = document.getElementById('area-guide');
-  container.classList.remove('active-mode');
-  container.classList.add('collapsed-mode');
-  renderAreaGuide();
-}
-
-function renderPrefectureUI() {
-    if (!window.prefData) return;
-    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
-
-    try {
-        renderAreaGuide();
-        if (window.markerControl && window.markerControl.preloadShop01) {
-            window.markerControl.preloadShop01(shopUrl);
-        }
-        getAlertText(window.prefData, function(result) {
-            const el = document.getElementById("alert-bar");
-            if (!el) return;
-            el.textContent = result.text;
-            el.style.color = result.color;
-        });
-    } catch (err) {
-        console.error("UI初期化エラー:", err);
-    }
-}
-
-window.selectPrefecture = function(csvParam) {
-    let region = window.currentRegion || 'KANTO';
-    let prefCode = csvParam;
-
-    if (csvParam.includes('_location')) {
-        prefCode = csvParam.split('_')[0];
-    } else if (csvParam.includes('_')) {
-        const parts = csvParam.split('_');
-        region = parts[0];
-        prefCode = parts[1];
-    } else if (csvParam.includes('.csv')) {
-        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
-        if (match) prefCode = match[1];
-    }
-
-    const url = new URL(location.href);
-    url.searchParams.set('pref', `${region}_${prefCode}`);
-    url.searchParams.delete('area');
-    url.searchParams.delete('spot');
-    url.hash = ''; 
-    history.replaceState(null, '', url);
-    routeUpdate();
-};
-
+// ==========================================
+// 爆速化：バックグラウンドCSVプリロード 
+// ==========================================
 window.fetchCacheStatus = window.fetchCacheStatus || {};
 
 function preloadCsvFiles(regionCode, prefCode) {
     if (!regionCode || !prefCode) return;
+    
     const csvUrl     = `/${regionCode}/${prefCode}_location.csv`;
     const whetherUrl = `/data/${prefCode}_whether.csv`;
     const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
@@ -1501,6 +1164,7 @@ function preloadCsvFiles(regionCode, prefCode) {
         fetch(shopUrl, { priority: 'low' }).catch(()=>{});
     }
 }
+
 // ================================
 // ■ 初期画面のRegionマップ読み込み
 // ================================
@@ -1508,7 +1172,6 @@ let isRegionLoaded = false;
 
 function loadRegionMap(regionCode = 'KANTO') {
     
-    // 1. マップの可動域・ズーム制限を完全にリセット
     if (window.map) {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -1520,12 +1183,10 @@ function loadRegionMap(regionCode = 'KANTO') {
         window.map.stop();
     }
 
-    // 2. 既にデータを持っていれば一瞬で広域に戻す（通常の「戻る」用）
     if (window.regionData) {
         drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
     }
 
-    // 3. 既にロード済みならレイヤーを表示して終了
     if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
         window.regionMarkers.forEach(m => {
             if (window.map) m.addTo(window.map);
@@ -1533,7 +1194,6 @@ function loadRegionMap(regionCode = 'KANTO') {
         return;
     }
 
-    // 4. 初回 or URL直打ちからの戻り時は、CSVをフェッチする
     const regionCsvUrl = `/${regionCode}/${regionCode}_region.csv`;
 
     fetch(regionCsvUrl)
@@ -1556,11 +1216,7 @@ function loadRegionMap(regionCode = 'KANTO') {
 
             if (typeIdx === -1) return;
 
-            // ==========================================
-            // ★ 手順1: 描画は一切行わず、CSVのパース（抽出）のみを完了させる
-            // ==========================================
-            let parsedRegion = null;
-            const parsedMarkers = [];
+            window.regionMarkers = window.regionMarkers || [];
 
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
@@ -1568,12 +1224,13 @@ function loadRegionMap(regionCode = 'KANTO') {
                 const type = cols[typeIdx];
 
                 if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
-                    parsedRegion = {
-                        name: nameIdx !== -1 ? cols[nameIdx] : '地域エリア',
-                        lat: parseFloat(cols[latIdx]),
-                        lng: parseFloat(cols[lngIdx]),
-                        zoom: parseFloat(cols[zoomIdx])
-                    };
+                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
+                    const lat = parseFloat(cols[latIdx]);
+                    const lng = parseFloat(cols[lngIdx]);
+                    const zoom = parseFloat(cols[zoomIdx]);
+                    
+                    window.regionData = { name, lat, lng, zoom };
+                    drawLocation(name, lat, lng, zoom);
                 }
 
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
@@ -1596,55 +1253,31 @@ function loadRegionMap(regionCode = 'KANTO') {
                     } else continue;
 
                     if (isNaN(lat) || isNaN(lng)) continue;
-                    
-                    // マーカー情報をストック
-                    parsedMarkers.push({
-                        prefCode, lat, lng, prefName
+
+                    if (typeof preloadCsvFiles === 'function') {
+                        preloadCsvFiles(regionCode, prefCode);
+                    }
+
+                    const prefIcon = L.divIcon({
+                        className: 'pref-choice-marker',
+                        html: `<div class="pref-choice-label">${prefName}</div>`,
+                        iconSize: [90, 35],
+                        iconAnchor: [45, 17]
                     });
+
+                    if (window.map) {
+                        const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
+
+                        marker.on('click', () => {
+                            if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
+                            window.selectPrefecture(`${regionCode}_${prefCode}`);
+                        });
+
+                        window.regionMarkers.push(marker);
+                    }
                 }
             }
-
-            // ==========================================
-            // ★ 手順2: データが完全に揃ってから、正しい順序で描画を行う
-            // ==========================================
-            
-            // ① まず広域マップを生成・移動させる
-            if (parsedRegion) {
-                window.regionData = parsedRegion;
-                drawLocation(parsedRegion.name, parsedRegion.lat, parsedRegion.lng, parsedRegion.zoom);
-            }
-
-            // ② マップが確実に存在した状態でマーカーを配置する
-            window.regionMarkers = window.regionMarkers || [];
-            
-            parsedMarkers.forEach(data => {
-                if (typeof preloadCsvFiles === 'function') {
-                    preloadCsvFiles(regionCode, data.prefCode);
-                }
-
-                const prefIcon = L.divIcon({
-                    className: 'pref-choice-marker',
-                    html: `<div class="pref-choice-label">${data.prefName}</div>`,
-                    iconSize: [90, 35],
-                    iconAnchor: [45, 17]
-                });
-
-                if (window.map) {
-                    const marker = L.marker([data.lat, data.lng], { icon: prefIcon }).addTo(window.map);
-                    marker.on('click', () => {
-                        if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
-                        window.selectPrefecture(`${regionCode}_${data.prefCode}`);
-                    });
-                    window.regionMarkers.push(marker);
-                }
-            });
-
             isRegionLoaded = true;
-
-            // ③ すべての描画要素を追加し終わった最後に、地図のサイズ計算を反映させる
-            if (window.map) {
-                window.map.invalidateSize(true);
-            }
         })
         .catch(err => console.error("Regionマップの初期化エラー:", err));
 }
@@ -1663,6 +1296,7 @@ async function loadPrefectureData(prefCode) {
 
     try {
         await loadLocationCSV(csvUrl);
+        
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
 
@@ -1670,7 +1304,7 @@ async function loadPrefectureData(prefCode) {
             const inlandCsv = await loadInlandWhetherCSV(region);
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
         }
-        renderPrefectureUI();
+
         return true; 
     } catch (err) {
         console.error("データ読み込みエラー:", err);
@@ -1678,6 +1312,225 @@ async function loadPrefectureData(prefCode) {
     }
 }
 
+// ==========================================
+// 2. 県域UIの初期化関数
+// ==========================================
+function renderPrefectureUI() {
+    if (!window.prefData) return;
+
+    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
+
+    try {
+        renderAreaGuide();
+
+        if (window.markerControl && window.markerControl.preloadShop01) {
+            window.markerControl.preloadShop01(shopUrl);
+        }
+
+        getAlertText(window.prefData, function(result) {
+            const el = document.getElementById("alert-bar");
+            if (!el) return;
+            el.textContent = result.text;
+            el.style.color = result.color;
+        });
+    } catch (err) {
+        console.error("UI初期化エラー:", err);
+    }
+}
+
+// ==========================================
+// 3. マーカー等から県が選択された時のトリガー
+// ==========================================
+window.selectPrefecture = function(csvParam) {
+    let region = window.currentRegion || 'KANTO';
+    let prefCode = csvParam;
+
+    if (csvParam.includes('_location')) {
+        prefCode = csvParam.split('_')[0];
+    } else if (csvParam.includes('_')) {
+        const parts = csvParam.split('_');
+        region = parts[0];
+        prefCode = parts[1];
+    } else if (csvParam.includes('.csv')) {
+        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
+        if (match) prefCode = match[1];
+    }
+
+    const url = new URL(location.href);
+    url.searchParams.set('pref', `${region}_${prefCode}`);
+    url.hash = ''; 
+    history.replaceState(null, '', url);
+
+    routeUpdate();
+};
+
+// ==========================================
+// ★ データの完全性チェック＆ロード関数
+// ==========================================
+async function checkAndLoadRouteData() {
+    const { region, pref: prefCode } = getParsedPrefQuery();
+    
+    // Region（広域）画面ならデータチェックは不要
+    if (!prefCode) return true; 
+
+    let needsBaseLoad = false;
+    let needsFishLoad = false;
+
+    if (window.currentPref !== prefCode) {
+        window.fishData = null;
+    }
+
+    if (!window.prefData || window.currentPref !== prefCode) {
+        needsBaseLoad = true;
+    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
+        needsBaseLoad = true;
+    }
+
+    let resolvedAreaId = null;
+    
+    // ハッシュではなくクエリから取得
+    const url = new URL(location.href);
+    const areaQuery = url.searchParams.get('area'); 
+    
+    if (areaQuery) {
+        if (!window.areaData) {
+            needsBaseLoad = true;
+        } else {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
+            if (area) {
+                resolvedAreaId = prefCode + "_" + area.individualId;
+                if (!window.fishData) {
+                    needsFishLoad = true;
+                }
+            }
+        }
+    }
+
+    if (needsBaseLoad || needsFishLoad) {
+        window.currentRegion = region || 'KANTO';
+        window.currentPref = prefCode;
+
+        if (needsBaseLoad) {
+            await loadPrefectureData(prefCode);
+            renderPrefectureUI(); 
+        }
+        
+        if (areaQuery && !resolvedAreaId && window.areaData) {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
+        }
+
+        if (resolvedAreaId) {
+            await prepareFishForArea(resolvedAreaId);
+        }
+
+        routeUpdate();
+        return false; 
+    }
+
+    return true; 
+}
+
+// ==========================================
+// 4. ハブとなる routeUpdate
+// ==========================================
+async function routeUpdate() {
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return; 
+
+    const { region, pref: prefCode } = getParsedPrefQuery();
+
+    if (!prefCode) {
+        document.getElementById('map-back-btn').style.display = 'none';
+        loadRegionMap(region || window.currentRegion || 'KANTO');
+        return;
+    }
+
+    window.currentRegion = region || 'KANTO';
+
+    updateStateFromURL();
+
+    if (window.currentSpotId) {
+        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
+        const spot = list.find(s => String(s.individualId) === String(window.currentSpotId));
+        if (spot) {
+            drawLocation(spot.name, spot.lat, spot.lng, "13");
+            zoomToSpot(spot);
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.opacity = '0';
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        btn.style.transition = 'opacity 0.4s ease';
+                        btn.style.opacity = '1';
+                    });
+                }
+            });
+        }
+        return;
+    }
+
+    if (window.currentAreaId) {
+        const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
+        if (!area) return;
+        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+        selectArea(area.name);
+        renderCrowdImage();
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.opacity = '0';
+                btn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    btn.style.transition = 'opacity 0.4s ease';
+                    btn.style.opacity = '1';
+                });
+            }
+        });
+        return;
+    }
+
+    if (window.prefData) {
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                showPrefSpots();
+                initAreaUI();
+                renderPrefWeather();
+                renderCrowdImage();
+                requestAnimationFrame(() => {
+                    const btn = document.getElementById('map-back-btn');
+                    if (btn) {
+                        btn.style.opacity = '0';
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => {
+                            btn.style.transition = 'opacity 0.4s ease';
+                            btn.style.opacity = '1';
+                        });
+                    }
+                });
+            });
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateStateFromURL();
+    routeUpdate();
+});
+
+window.addEventListener('popstate', () => {
+    updateStateFromURL();
+    routeUpdate(); 
+});
+</script>
+
+</body>
+</html>
 
 </script>
 
