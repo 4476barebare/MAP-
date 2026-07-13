@@ -282,17 +282,32 @@ document.addEventListener('DOMContentLoaded', () => {
     checkCurrentQuery();
 });
 
-// あなたの成功した手法（new URL）を完全に採用したデバッグ関数
+// 2. あなたの安全な手法を使ったクエリ判定関数（全パラメータ対応版）
 function checkCurrentQuery() {
     const url = new URL(location.href);
-    const prefQuery = url.searchParams.get('pref');
+    
+    // 4つのパラメータをすべて取得する
+    const region = url.searchParams.get('region');
+    const pref   = url.searchParams.get('pref');
+    const area   = url.searchParams.get('area');
+    const spot   = url.searchParams.get('spot');
 
-    if (!prefQuery) {
-        showdebug("クエリ無し");
-    } else {
-        showdebug("現在のクエリ: pref=" + prefQuery);
+    // 表示用のテキストを組み立てる（<br>で改行）
+    let msg = "【現在のURLクエリ】";
+    
+    if (region) msg += `<br>region: ${region}`;
+    if (pref)   msg += `<br>pref: ${pref}`;
+    if (area)   msg += `<br>area: ${area}`;
+    if (spot)   msg += `<br>spot: ${spot}`;
+
+    if (!region && !pref && !area && !spot) {
+        msg += "<br>※クエリ無し";
     }
+
+    // デバッグ画面を上書き更新
+    showdebug(msg);
 }
+
 
 
 // ==========================================
