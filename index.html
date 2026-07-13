@@ -2181,6 +2181,52 @@ async function loadPrefectureData(prefCode) {
     }
 }
 
+// ==========================================
+// ★ 復元必須：URLの pref クエリから Region と Pref を抽出する関数
+// ==========================================
+function getParsedPrefQuery() {
+    const url = new URL(location.href);
+    const query = url.searchParams.get('pref');
+    if (!query) return { region: null, pref: null };
+    
+    const parts = query.split('_');
+    if (parts.length >= 2) {
+        return { region: parts[0], pref: parts[1] };
+    }
+    return { region: 'KANTO', pref: parts[0] };
+}
+
+// ==========================================
+// ★ 復元必須：データ読み込み専用関数
+// ==========================================
+async function loadPrefectureData(prefCode) {
+    window.fishData = null; 
+    window.currentPref = prefCode;
+    const region = window.currentRegion || 'KANTO';
+    
+    const csvUrl     = `/${region}/${prefCode}_location.csv`;
+    window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+
+    try {
+        await loadLocationCSV(csvUrl);
+        
+        const whetherCsv = await loadWhetherCSV(whetherUrl);
+        applyWhetherToSpots(whetherCsv);
+
+        if (typeof loadInlandWhetherCSV === 'function') {
+            const inlandCsv = await loadInlandWhetherCSV(region);
+            if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
+        }
+
+        return true; 
+    } catch (err) {
+        console.error("データ読み込みエラー:", err);
+        return false;
+    }
+}
+
+
 async function checkAndLoadRouteData() {
     const { region, pref: prefCode } = getParsedPrefQuery();
     
