@@ -1079,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. まずURLのハッシュを解析して、現在の状態（AreaId等）を復元する
     updateStateFromHash();
 
-
+checkCurrentQuery();
         routeUpdate();
     
 });
@@ -1865,7 +1865,7 @@ async function checkAndLoadRouteData() {
 // 4. ハブとなる routeUpdate (リファクタリング版)
 // ==========================================
 async function routeUpdate() {
-    checkCurrentQuery();
+    
     // ★ 1. データの完全性をガード（足りなければ裏でロードして再度呼び出される）
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; // 準備中なのでストップ
