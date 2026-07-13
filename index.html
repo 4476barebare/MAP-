@@ -1575,8 +1575,8 @@ function renderPrefectureUI() {
 // ★ 追加：URLの pref クエリから Region と Pref を安全に抽出する関数
 // ==========================================
 function getParsedPrefQuery() {
-    //const url = new URL(location.href);
-    //const query = url.searchParams.get('pref');
+    const url = new URL(location.href);
+    const query = url.searchParams.get('pref');
     //if (!query) return { region: null, pref: null };
     
 
