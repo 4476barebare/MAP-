@@ -221,30 +221,52 @@ window.currentPref = null;
 window.fishUrl = null;
 window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
-function showDebug(msg, clear = false) {
-    let debugEl = document.getElementById('debug');
-
-    if (!debugEl) {
-        debugEl = document.createElement('div');
-        debugEl.id = 'debug';
-        debugEl.style.position = 'fixed';
-        debugEl.style.top = '0';
-        debugEl.style.left = '0';
-        debugEl.style.background = 'rgba(255,255,0,0.85)';
-        debugEl.style.zIndex = '9999';
-        debugEl.style.padding = '6px';
-        debugEl.style.fontSize = '12px';
-        debugEl.style.maxWidth = '320px';
-        debugEl.style.whiteSpace = 'pre-wrap';
-        debugEl.style.maxHeight = '40vh';
-        debugEl.style.overflow = 'auto';
-        document.body.appendChild(debugEl);
+// 1. デバッグ用のDOMを自動生成して文字を出す関数
+function showdebug(msg) {
+    // 既にデバッグボックスがあるか探す
+    let debugBox = document.getElementById('my-debug-box');
+    
+    // なければ勝手に作る（HTMLの編集不要）
+    if (!debugBox) {
+        debugBox = document.createElement('div');
+        debugBox.id = 'my-debug-box';
+        
+        // 画面の左上に固定表示するためのスタイル（黒背景・緑文字）
+        debugBox.style.position = 'fixed';
+        debugBox.style.top = '10px';
+        debugBox.style.left = '10px';
+        debugBox.style.zIndex = '9999'; // 地図より必ず手前に出す
+        debugBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        debugBox.style.color = '#00FF00';
+        debugBox.style.padding = '10px';
+        debugBox.style.borderRadius = '5px';
+        debugBox.style.fontSize = '14px';
+        debugBox.style.pointerEvents = 'none'; // タッチ操作の邪魔にならないようにする
+        
+        // bodyの最後に追加
+        document.body.appendChild(debugBox);
     }
 
-    if (clear) debugEl.textContent = "";
-
-    debugEl.textContent += msg + "\n";
+    // メッセージを追記する
+    debugBox.innerHTML += msg + '<br>';
 }
+
+// 2. あなたの安全な手法を使ったクエリ判定関数
+function checkCurrentQuery() {
+    const url = new URL(location.href);
+    const prefQuery = url.searchParams.get('pref');
+
+    if (!prefQuery) {
+        showdebug("【テスト結果】 クエリ無し");
+    } else {
+        showdebug("【テスト結果】 現在のクエリ: pref=" + prefQuery);
+    }
+}
+
+// 3. ページ読み込み時に実行する
+document.addEventListener('DOMContentLoaded', () => {
+    checkCurrentQuery();
+});
 
 // あなたの成功した手法（new URL）を完全に採用したデバッグ関数
 function checkCurrentQuery() {
@@ -1079,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. まずURLのハッシュを解析して、現在の状態（AreaId等）を復元する
     updateStateFromHash();
 
-//checkCurrentQuery();
+
         routeUpdate();
     
 });
@@ -1865,7 +1887,7 @@ async function checkAndLoadRouteData() {
 // 4. ハブとなる routeUpdate (リファクタリング版)
 // ==========================================
 async function routeUpdate() {
-    
+    checkCurrentQuery();
     // ★ 1. データの完全性をガード（足りなければ裏でロードして再度呼び出される）
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; // 準備中なのでストップ
