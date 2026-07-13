@@ -246,6 +246,447 @@ function showDebug(msg, clear = false) {
     debugEl.textContent += msg + "\n";
 }
 
+// ==========================================
+// ■ エリア名(日本語)から currentAreaId を生成する関数
+// ==========================================
+function getAreaIdFromQuery(areaQuery) {
+    if (!areaQuery || !window.areaData) return null;
+
+    let area = window.areaData.find(a => a.name === areaQuery);
+    
+    if (!area) {
+        area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+    }
+
+    // ★ 修正：グローバル変数ではなく、確実にそのエリアのデータ列から生成する
+    if (area) {
+        return area.areaId + "_" + area.individualId;
+    }
+
+    return null;
+}
+
+// ==========================================
+// ■ スポット名(日本語)から currentSpotId を生成する関数
+// ==========================================
+function getSpotIdFromQuery(spotQuery, resolvedAreaId) {
+    if (!spotQuery || !resolvedAreaId || !window.spotData) return null;
+
+    // ① CSV跨ぎの被りを防ぐため、必ず resolvedAreaId で絞り込んで検索する
+    let spot = window.spotData.find(s => 
+        s.name === spotQuery && 
+        s.areaId === resolvedAreaId
+    );
+
+    // ② ID直打ちのフォールバック時も同様に絞り込む
+    if (!spot) {
+        spot = window.spotData.find(s => 
+            String(s.individualId) === String(spotQuery) && 
+            s.areaId === resolvedAreaId
+        );
+    }
+
+    // ★ 結合せず、individualId列をそのまま返す
+    if (spot) {
+        return spot.individualId;
+    }
+
+    return null;
+}
+
+// ==========================================
+// ■ URLを書き換える共通ヘルパー関数
+// ==========================================
+function updateURLState(areaName, spotName) {
+    const url = new URL(location.href);
+    
+    if (areaName) {
+        url.searchParams.set('area', areaName);
+    } else {
+        url.searchParams.delete('area');
+    }
+
+    if (spotName) {
+        url.searchParams.set('spot', spotName);
+    } else {
+        url.searchParams.delete('spot');
+    }
+
+    url.hash = ''; // ハッシュは不要なのでクリア
+    history.pushState(null, '', url);
+}
+
+function updateStateFromURL() {
+    const url = new URL(location.href);
+    const prefCode = url.searchParams.get('pref');
+    
+    // ハッシュではなくクエリから取得（"外房エリア" や "勝浦港" などが入る）
+    const areaQuery = url.searchParams.get('area'); 
+    const spotQuery = url.searchParams.get('spot'); 
+
+    if (!prefCode && !areaQuery) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+        return;
+    }
+
+    // ★ 定義した関数を通して、安全にシステム用の areaId を生成
+    const resolvedAreaId = getAreaIdFromQuery(areaQuery);
+
+    if (!resolvedAreaId) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+    }
+    else if (resolvedAreaId && !spotQuery) {
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = null;
+    }
+    else if (resolvedAreaId && spotQuery) {
+        window.currentAreaId = resolvedAreaId;
+        // ★ 定義した関数を通して、安全にシステム用の spotId を生成
+        window.currentSpotId = getSpotIdFromQuery(spotQuery, resolvedAreaId);
+    }
+}
+
+// ★ グローバルにロック変数を追加（goBack関数の外、または一番上に）
+window._isGoingBack = false;
+
+function goBack() {
+    // =====================================================
+    // ★ 実行ロック（連打されたら2回目以降は弾く）
+    // =====================================================
+    if (window._isGoingBack) return;
+    window._isGoingBack = true;
+
+    // =====================================================
+    // ★ 戻るアクション開始時にボタンをフェードアウト＆物理ロック
+    // =====================================================
+    const backBtn = document.getElementById('map-back-btn');
+    if (backBtn) {
+        backBtn.style.pointerEvents = 'none'; // ★ 透明な間の「見えないボタン」へのクリックを完全遮断
+        backBtn.style.transition = 'opacity 0.3s ease';
+        backBtn.style.opacity = '0';
+    }
+
+    // ─── 処理完了後にボタンを復活させる共通関数 ───
+    const releaseLockAndShowBtn = () => {
+        window._isGoingBack = false; // ロック解除
+        if (backBtn) {
+            backBtn.style.display = 'block';
+            requestAnimationFrame(() => {
+                backBtn.style.transition = 'opacity 0.4s ease';
+                backBtn.style.opacity = '1';
+                backBtn.style.pointerEvents = 'auto'; // クリック受付再開
+            });
+        }
+    };
+
+    // =====================================================
+    // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
+    // =====================================================
+    if (!window.currentAreaId && !window.currentSpotId) {
+        const regionToLoad = window.currentRegion || 'KANTO';
+
+        const url = new URL(location.href);
+        url.searchParams.delete('pref');
+        history.replaceState(null, '', url);
+
+        window.currentPref = null;
+        window.prefData = null;
+        location.hash = '';
+
+        if (typeof destroyAreaUI === 'function') destroyAreaUI();
+        if (typeof removeCrowdImage === 'function') removeCrowdImage();
+        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
+            window.markerControl.clearLayers();
+        }
+        if (window.phase1Group) window.phase1Group.clearLayers();
+        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+        
+        if (window.prefSpotLayer) {
+            window.map.removeLayer(window.prefSpotLayer);
+            window.prefSpotLayer = null;
+        }
+        
+        const alertBar = document.getElementById("alert-bar");
+        if (alertBar) alertBar.textContent = "";
+
+        // フェードアウト完了後に完全に消去し、ロックを解除
+        setTimeout(() => {
+            if (backBtn) {
+                backBtn.style.display = 'none';
+                backBtn.style.pointerEvents = 'auto';
+            }
+            window._isGoingBack = false; 
+        }, 300);
+
+        loadRegionMap(regionToLoad);
+        return;
+    }
+    
+    // --- ここから下は元の処理 ---
+    
+    window.map.touchZoom.disable();
+    window.map.dragging.disable();
+
+    const area = window.areaData.find(a =>
+        String(a.individualId) === String(window.currentAreaId?.split('_')[1])
+    );
+
+    if (!area) {
+        window._isGoingBack = false;
+        return;
+    }
+
+    const z = window.map.getZoom();
+    const restoreSpot = buildSpotRestoreObject();
+    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
+    const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
+
+    // =====================================================
+    // ① phase2 → phase1（※実質：スポット詳細 → Phase2 へ戻る）
+    // =====================================================
+    if ((z > 13 || isSpecial) && !isPhase2) {
+        stopZoomGuard();
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        if (window.fishLayer) {
+            window.map.removeLayer(window.fishLayer);
+        }
+        if (window.phase2Group) window.phase2Group.clearLayers();
+
+        if (!restoreSpot) {
+            window._isGoingBack = false;
+            return;
+        }
+
+        const spotKey = window.currentSpotId?.split('_')[2];
+        if (spotKey) {
+            location.hash = location.hash.replace('/' + spotKey, '');
+        }
+
+        updateStateFromHash();
+        removeWeekItem();
+        resetWeatherUI();
+
+        showSpotsForArea(window.currentAreaId);
+        selectSpot(restoreSpot);
+
+        // マップの移動完了を待ってからUI展開とロック解除
+        window.map.once('moveend', () => {
+            enablePhase2(window.map);
+            phase1menu(window.currentAreaId);
+            releaseLockAndShowBtn();
+        });
+        
+        return;
+    }
+
+    // =====================================================
+    // ② phase1維持（※実質：Phase2 → Phase1 へ戻る）
+    // =====================================================
+    if (z === 13 || isPhase2) {
+        disablePhase2(window.map);
+        clearSub2Weather();
+        
+        const nsEl = document.getElementById("nearest-spot");
+        if (nsEl) nsEl.textContent = "";
+        
+        window.map.eachLayer(layer => {
+            if (layer === window.gsiLayer) return;
+            if (layer instanceof L.TileLayer) {
+                const url = layer._url || '';
+                if (url.includes('seamlessphoto')) {
+                    window.map.removeLayer(layer);
+                }
+            }
+        });
+
+        window.map.eachLayer(layer => {
+            if (!(layer instanceof L.TileLayer)) return;
+            const url = layer._url || '';
+            if (url.includes('openstreetmap')) {
+                window.map.removeLayer(layer);
+            }
+        });
+
+        window.osmLayer = null;
+
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        if (window.phase2Group) window.phase2Group.clearLayers();
+
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
+        } else {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
+        }
+        window.gsiLayer.addTo(window.map);
+
+        selectArea(area);
+        renderCrowdImage();
+        
+        // selectArea側でも移動処理が走るため、着地後にロック解除
+        window.map.once('moveend', () => {
+            releaseLockAndShowBtn();
+        });
+        
+        return;
+    }
+
+    // =====================================================
+    // ③ prefへ戻る（z <= 12）
+    // =====================================================
+    if (window.osmLayer) {
+        window.map.removeLayer(window.osmLayer);
+        window.osmLayer = null;
+    }
+
+    if (window.phase1Group) window.phase1Group.clearLayers();
+    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+    } else {
+        window.gsiLayer.setUrl(window.gsiLayers.ort);
+    }
+
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+    location.hash = '';
+
+    window.map.once('moveend', () => {
+        window.map.invalidateSize(true);
+        updateStateFromHash();
+        initAreaUI();
+        showPrefSpots();
+        renderPrefWeather();
+        resetAreaGuide();
+
+        releaseLockAndShowBtn();
+    });
+}
+
+// ==========================================
+// 4. ハブとなる routeUpdate (リファクタリング・URLパラメータ対応版)
+// ==========================================
+async function routeUpdate() {
+    // ★ 1. データの完全性をガード（足りなければ裏でロードして再度呼び出される）
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return; // 準備中なのでストップ
+
+    // ★ 2. 以降の処理は「すべてのデータが100%揃っている」前提で安全に描画に専念できる
+    const { region, pref: prefCode } = getParsedPrefQuery();
+
+    if (!prefCode) {
+        document.getElementById('map-back-btn').style.display = 'none';
+        loadRegionMap(region || window.currentRegion || 'KANTO');
+        return;
+    }
+
+    window.currentRegion = region || 'KANTO';
+
+    // ★ ハッシュではなくURLクエリ（?area=...&spot=...）から状態を更新する
+    if (typeof updateStateFromURL === 'function') {
+        updateStateFromURL();
+    } else if (typeof updateStateFromHash === 'function') {
+        // 移行中のエラー回避用（後で消してOKです）
+        updateStateFromHash();
+    }
+
+    // ─── スポット階層 ───
+    if (window.currentSpotId) {
+        // ★ currentSpotId は individualId そのものになったので、split は不要
+        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
+        const spot = list.find(s => String(s.individualId) === String(window.currentSpotId));
+        
+        if (spot) {
+            drawLocation(spot.name, spot.lat, spot.lng, "13");
+            
+            // ★ データは揃っているので、Promiseを待たずに即座に描画へ飛べる！
+            zoomToSpot(spot);
+            
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.opacity = '0';
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        btn.style.transition = 'opacity 0.4s ease';
+                        btn.style.opacity = '1';
+                    });
+                }
+            });
+        }
+        return;
+    }
+
+    // ─── エリア階層 ───
+    if (window.currentAreaId) {
+        // ★ currentAreaId は「areaId_individualId」の形式なので、厳密に一致するか判定
+        const area = window.areaData.find(a => window.currentAreaId === String(a.areaId + "_" + a.individualId));
+        
+        if (!area) return;
+        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+        selectArea(area.name);
+        renderCrowdImage();
+        
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.opacity = '0';
+                btn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    btn.style.transition = 'opacity 0.4s ease';
+                    btn.style.opacity = '1';
+                });
+            }
+        });
+        return;
+    }
+
+    // ─── 県階層 ───
+    if (window.prefData) {
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+        
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                showPrefSpots();
+                initAreaUI();
+                renderPrefWeather();
+                renderCrowdImage();
+                
+                requestAnimationFrame(() => {
+                    const btn = document.getElementById('map-back-btn');
+                    if (btn) {
+                        btn.style.opacity = '0';
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => {
+                            btn.style.transition = 'opacity 0.4s ease';
+                            btn.style.opacity = '1';
+                        });
+                    }
+                });
+            });
+        });
+    }
+}
+
 function formatDate(str) {
   const [y, m, d] = str.split("-");
   return `${y} ${Number(m)}/${Number(d)}`;
@@ -281,8 +722,10 @@ function initAreaUI() {
         row.style.cursor = 'pointer';
 
         row.onclick = () => {
-            location.hash = encodeURIComponent(area.name);
-            updateStateFromHash();
+            // ★ ハッシュ操作を削除し、クエリ化対応
+            updateURLState(area.name, null);
+            if (typeof updateStateFromURL === 'function') updateStateFromURL();
+            
             destroyAreaUI();
             selectArea(area);
         };
@@ -346,8 +789,10 @@ function initAreaUI() {
 
         if (!nearest) return;
 
-        location.hash = encodeURIComponent(nearest.name);
-        updateStateFromHash();
+        // ★ ハッシュ操作を削除し、クエリ化対応
+        updateURLState(nearest.name, null);
+        if (typeof updateStateFromURL === 'function') updateStateFromURL();
+        
         destroyAreaUI();
         selectArea(nearest);
     };
@@ -1011,16 +1456,17 @@ function removeCrowdImage() {
 }
 
 
-
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. まずURLのハッシュを解析して、現在の状態（AreaId等）を復元する
-    updateStateFromHash();
+    // ★ 旧関数 updateStateFromHash() を新関数に差し替え
+    if (typeof updateStateFromURL === 'function') {
+        updateStateFromURL();
+    }
 
-
-        routeUpdate();
+    routeUpdate();
     
 });
+
 
 // ================================
 // ■ 地域選択用マーカーを「フェードアウト」で非表示にする関数
@@ -1330,9 +1776,6 @@ function openArea(areaKey, isUserAction = false) {
   });
 }
 
-// ================================
-// ■ エリアガイドの描画（グローバル関数として復活）
-// ================================
 function renderAreaGuide() {
     const container = document.getElementById('area-guide');
     if (!container) return; // コンテナがない場合はスキップ
@@ -1429,19 +1872,18 @@ function renderAreaGuide() {
             }
 
             // =====================================================
-            // ★ 新しいエリアへのジャンプ処理
+            // ★ 新しいエリアへのジャンプ処理（ハッシュ操作を削除し、クエリ化対応）
             // =====================================================
-            location.hash = encodeURIComponent(area.name);
-            if (typeof updateStateFromHash === 'function') updateStateFromHash();
+            updateURLState(area.name, null);
+            if (typeof updateStateFromURL === 'function') updateStateFromURL();
             if (typeof routeUpdate === 'function') routeUpdate();
+            
             openArea(area.individualId, true);
         });
 
         container.appendChild(div);
     });
 }
-
-
 
 function resetAreaGuide() {
 
@@ -1504,9 +1946,6 @@ function getParsedPrefQuery() {
     return { region: 'KANTO', pref: parts[0] };
 }
 
-// ==========================================
-// 3. マーカー等から県が選択された時のトリガー
-// ==========================================
 window.selectPrefecture = function(csvParam) {
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
@@ -1526,12 +1965,16 @@ window.selectPrefecture = function(csvParam) {
     const url = new URL(location.href);
     // ★ URLの見た目だけを "KANTO_CHIBA" にする
     url.searchParams.set('pref', `${region}_${prefCode}`);
+    
+    // ★ 追加：エリアとスポットの古いクエリとハッシュを完全に消去
+    url.searchParams.delete('area');
+    url.searchParams.delete('spot');
     url.hash = ''; 
+    
     history.replaceState(null, '', url);
 
     routeUpdate();
 };
-
 
 // ==========================================
 // 爆速化：バックグラウンドCSVプリロード (index.html)
@@ -1725,9 +2168,6 @@ async function loadPrefectureData(prefCode) {
     }
 }
 
-// ==========================================
-// ★ データの完全性チェック＆ロード関数
-// ==========================================
 async function checkAndLoadRouteData() {
     const { region, pref: prefCode } = getParsedPrefQuery();
     
@@ -1737,8 +2177,7 @@ async function checkAndLoadRouteData() {
     let needsBaseLoad = false;
     let needsFishLoad = false;
 
-    // ★ 修正箇所：別の県から来た場合、前の県の魚データが残っているのでここで完全リセット！
-    // これにより、下の needsFishLoad の判定が正しく機能するようになります。
+    // 別の県から来た場合、前の県の魚データが残っているのでここで完全リセット
     if (window.currentPref !== prefCode) {
         window.fishData = null;
     }
@@ -1752,14 +2191,19 @@ async function checkAndLoadRouteData() {
 
     // 2. エリア/スポット画面特有のチェック (魚データ)
     let resolvedAreaId = null;
-    const hash = decodeURIComponent(location.hash.replace('#', ''));
-    if (hash) {
-        const areaName = hash.split('/')[0];
-        
+    
+    // ★ 修正：ハッシュではなく、URLのクエリからエリア名を取得
+    const url = new URL(location.href);
+    const areaQuery = url.searchParams.get('area'); 
+    
+    if (areaQuery) {
         if (!window.areaData) {
             needsBaseLoad = true;
         } else {
-            const area = window.areaData.find(a => a.name === areaName);
+            // エリア名、またはフォールバックとしてIDで検索
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
             if (area) {
                 resolvedAreaId = prefCode + "_" + area.individualId;
                 if (!window.fishData) {
@@ -1781,9 +2225,10 @@ async function checkAndLoadRouteData() {
         }
         
         // ② 魚データをロード
-        if (hash && !resolvedAreaId && window.areaData) {
-            const areaName = hash.split('/')[0];
-            const area = window.areaData.find(a => a.name === areaName);
+        if (areaQuery && !resolvedAreaId && window.areaData) {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
             if (area) resolvedAreaId = prefCode + "_" + area.individualId;
         }
 
@@ -1797,102 +2242,6 @@ async function checkAndLoadRouteData() {
     }
 
     return true; 
-}
-
-// ==========================================
-// 4. ハブとなる routeUpdate (リファクタリング版)
-// ==========================================
-async function routeUpdate() {
-    // ★ 1. データの完全性をガード（足りなければ裏でロードして再度呼び出される）
-    const isReady = await checkAndLoadRouteData();
-    if (!isReady) return; // 準備中なのでストップ
-
-    // ★ 2. 以降の処理は「すべてのデータが100%揃っている」前提で安全に描画に専念できる
-    const { region, pref: prefCode } = getParsedPrefQuery();
-
-    if (!prefCode) {
-        document.getElementById('map-back-btn').style.display = 'none';
-        loadRegionMap(region || window.currentRegion || 'KANTO');
-        return;
-    }
-
-    window.currentRegion = region || 'KANTO';
-
-    if (typeof updateStateFromHash === 'function') updateStateFromHash();
-
-    // ─── スポット階層 ───
-    if (window.currentSpotId) {
-        const spotId = window.currentSpotId.split("_");
-        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
-        const spot = list.find(s => String(s.individualId) === String(spotId[2]));
-        if (spot) {
-            drawLocation(spot.name, spot.lat, spot.lng, "13");
-            
-            // ★ データは揃っているので、Promiseを待たずに即座に描画へ飛べる！
-            zoomToSpot(spot);
-            
-            requestAnimationFrame(() => {
-                const btn = document.getElementById('map-back-btn');
-                if (btn) {
-                    btn.style.opacity = '0';
-                    btn.style.display = 'block';
-                    requestAnimationFrame(() => {
-                        btn.style.transition = 'opacity 0.4s ease';
-                        btn.style.opacity = '1';
-                    });
-                }
-            });
-        }
-        return;
-    }
-
-    // ─── エリア階層 ───
-    if (window.currentAreaId) {
-        const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
-        if (!area) return;
-        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-        selectArea(area.name);
-        renderCrowdImage();
-        
-        requestAnimationFrame(() => {
-            const btn = document.getElementById('map-back-btn');
-            if (btn) {
-                btn.style.opacity = '0';
-                btn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    btn.style.transition = 'opacity 0.4s ease';
-                    btn.style.opacity = '1';
-                });
-            }
-        });
-        return;
-    }
-
-    // ─── 県階層 ───
-    if (window.prefData) {
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                showPrefSpots();
-                initAreaUI();
-                renderPrefWeather();
-                renderCrowdImage();
-                
-                requestAnimationFrame(() => {
-                    const btn = document.getElementById('map-back-btn');
-                    if (btn) {
-                        btn.style.opacity = '0';
-                        btn.style.display = 'block';
-                        requestAnimationFrame(() => {
-                            btn.style.transition = 'opacity 0.4s ease';
-                            btn.style.opacity = '1';
-                        });
-                    }
-                });
-            });
-        });
-    }
 }
 
 
