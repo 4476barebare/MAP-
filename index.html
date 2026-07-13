@@ -534,14 +534,19 @@ function goBack() {
 }
 
 // ==========================================
-// ★ 修正：データ整合性チェックとルート管理
+// ★ データ整合性チェックとルート管理
 // ==========================================
 async function checkAndLoadRouteData() {
     const { region, pref: prefCode } = getParsedPrefQuery();
     
-    // ★ 変更：ここではロードが必要か（prefCodeがあるか）の判定だけに留め、
-    // 関数内で他関数の描画（loadRegionMap）を割り込ませない
-    if (!prefCode) return true; 
+    // ★ 修正：Region（広域）画面ならデータチェックは不要。そのまま広域マップを描画して終了する
+    if (!prefCode) {
+        // ★ これを追加！初期画面の時にグローバル変数を確実に初期化する
+        window.currentRegion = region || 'KANTO';
+        
+        loadRegionMap(window.currentRegion);
+        return false; // 以降の routeUpdate の処理を止める
+    }
 
     let needsBaseLoad = false;
     let needsFishLoad = false;
@@ -578,6 +583,7 @@ async function checkAndLoadRouteData() {
     }
 
     if (needsBaseLoad || needsFishLoad) {
+        // ★ ここでも安全に初期化
         window.currentRegion = region || 'KANTO';
         window.currentPref = prefCode;
 
@@ -612,11 +618,13 @@ async function routeUpdate() {
 
     const { region, pref: prefCode } = getParsedPrefQuery();
 
-    // ★ 修正：初期表示（広域マップ）の描画判定を routeUpdate 側の最優先位置に配置する。
-    // これにより、非同期データのチェック後に確実に安全なタイミングでマップが初期化されます。
+    // ★ 初期画面（広域マップ）の描画ロジック
     if (!prefCode) {
         document.getElementById('map-back-btn').style.display = 'none';
-        loadRegionMap(region || window.currentRegion || 'KANTO');
+        
+        // ★ ここも追加！確実にグローバル変数を更新
+        window.currentRegion = region || 'KANTO';
+        loadRegionMap(window.currentRegion);
         return;
     }
 
@@ -691,6 +699,7 @@ async function routeUpdate() {
         });
     }
 }
+
 
 
 function formatDate(str) {
@@ -1492,10 +1501,14 @@ function preloadCsvFiles(regionCode, prefCode) {
         fetch(shopUrl, { priority: 'low' }).catch(()=>{});
     }
 }
-
+// ================================
+// ■ 初期画面のRegionマップ読み込み
+// ================================
 let isRegionLoaded = false;
 
 function loadRegionMap(regionCode = 'KANTO') {
+    
+    // 1. マップの可動域・ズーム制限を完全にリセット
     if (window.map) {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -1507,10 +1520,12 @@ function loadRegionMap(regionCode = 'KANTO') {
         window.map.stop();
     }
 
+    // 2. 既にデータを持っていれば一瞬で広域に戻す（通常の「戻る」用）
     if (window.regionData) {
         drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
     }
 
+    // 3. 既にロード済みならレイヤーを表示して終了
     if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
         window.regionMarkers.forEach(m => {
             if (window.map) m.addTo(window.map);
@@ -1518,6 +1533,7 @@ function loadRegionMap(regionCode = 'KANTO') {
         return;
     }
 
+    // 4. 初回 or URL直打ちからの戻り時は、CSVをフェッチする
     const regionCsvUrl = `/${regionCode}/${regionCode}_region.csv`;
 
     fetch(regionCsvUrl)
@@ -1540,7 +1556,11 @@ function loadRegionMap(regionCode = 'KANTO') {
 
             if (typeIdx === -1) return;
 
-            window.regionMarkers = window.regionMarkers || [];
+            // ==========================================
+            // ★ 手順1: 描画は一切行わず、CSVのパース（抽出）のみを完了させる
+            // ==========================================
+            let parsedRegion = null;
+            const parsedMarkers = [];
 
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
@@ -1548,12 +1568,12 @@ function loadRegionMap(regionCode = 'KANTO') {
                 const type = cols[typeIdx];
 
                 if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
-                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
-                    const lat = parseFloat(cols[latIdx]);
-                    const lng = parseFloat(cols[lngIdx]);
-                    const zoom = parseFloat(cols[zoomIdx]);
-                    window.regionData = { name, lat, lng, zoom };
-                    drawLocation(name, lat, lng, zoom);
+                    parsedRegion = {
+                        name: nameIdx !== -1 ? cols[nameIdx] : '地域エリア',
+                        lat: parseFloat(cols[latIdx]),
+                        lng: parseFloat(cols[lngIdx]),
+                        zoom: parseFloat(cols[zoomIdx])
+                    };
                 }
 
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
@@ -1576,26 +1596,55 @@ function loadRegionMap(regionCode = 'KANTO') {
                     } else continue;
 
                     if (isNaN(lat) || isNaN(lng)) continue;
-                    if (typeof preloadCsvFiles === 'function') preloadCsvFiles(regionCode, prefCode);
-
-                    const prefIcon = L.divIcon({
-                        className: 'pref-choice-marker',
-                        html: `<div class="pref-choice-label">${prefName}</div>`,
-                        iconSize: [90, 35],
-                        iconAnchor: [45, 17]
+                    
+                    // マーカー情報をストック
+                    parsedMarkers.push({
+                        prefCode, lat, lng, prefName
                     });
-
-                    if (window.map) {
-                        const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
-                        marker.on('click', () => {
-                            if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
-                            window.selectPrefecture(`${regionCode}_${prefCode}`);
-                        });
-                        window.regionMarkers.push(marker);
-                    }
                 }
             }
+
+            // ==========================================
+            // ★ 手順2: データが完全に揃ってから、正しい順序で描画を行う
+            // ==========================================
+            
+            // ① まず広域マップを生成・移動させる
+            if (parsedRegion) {
+                window.regionData = parsedRegion;
+                drawLocation(parsedRegion.name, parsedRegion.lat, parsedRegion.lng, parsedRegion.zoom);
+            }
+
+            // ② マップが確実に存在した状態でマーカーを配置する
+            window.regionMarkers = window.regionMarkers || [];
+            
+            parsedMarkers.forEach(data => {
+                if (typeof preloadCsvFiles === 'function') {
+                    preloadCsvFiles(regionCode, data.prefCode);
+                }
+
+                const prefIcon = L.divIcon({
+                    className: 'pref-choice-marker',
+                    html: `<div class="pref-choice-label">${data.prefName}</div>`,
+                    iconSize: [90, 35],
+                    iconAnchor: [45, 17]
+                });
+
+                if (window.map) {
+                    const marker = L.marker([data.lat, data.lng], { icon: prefIcon }).addTo(window.map);
+                    marker.on('click', () => {
+                        if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
+                        window.selectPrefecture(`${regionCode}_${data.prefCode}`);
+                    });
+                    window.regionMarkers.push(marker);
+                }
+            });
+
             isRegionLoaded = true;
+
+            // ③ すべての描画要素を追加し終わった最後に、地図のサイズ計算を反映させる
+            if (window.map) {
+                window.map.invalidateSize(true);
+            }
         })
         .catch(err => console.error("Regionマップの初期化エラー:", err));
 }
