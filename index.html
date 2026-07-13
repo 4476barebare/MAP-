@@ -601,6 +601,10 @@ async function routeUpdate() {
     // ★ 2. 以降の処理は「すべてのデータが100%揃っている」前提で安全に描画に専念できる
     const { region, pref: prefCode } = getParsedPrefQuery();
 
+    // =================================================================
+    // ★【大修正】広域画面（prefCodeがない）の場合は、他の処理をすべてスキップして
+    // 最優先で loadRegionMap を実行し、ここで確実に処理を終了させる。
+    // =================================================================
     if (!prefCode) {
         document.getElementById('map-back-btn').style.display = 'none';
         loadRegionMap(region || window.currentRegion || 'KANTO');
@@ -694,6 +698,7 @@ async function routeUpdate() {
         });
     }
 }
+
 
 function formatDate(str) {
   const [y, m, d] = str.split("-");
