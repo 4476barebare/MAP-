@@ -324,13 +324,21 @@ function updateStateFromURL() {
     const areaQuery = url.searchParams.get('area'); 
     const spotQuery = url.searchParams.get('spot'); 
 
+    // ① prefもareaもない（完全な初期広域マップ）の時は状態をクリアして即終了
     if (!prefCode && !areaQuery) {
         window.currentAreaId = null;
         window.currentSpotId = null;
         return;
     }
 
-    // ★ 定義した関数を通して、安全にシステム用の areaId を生成
+    // ★追加のガード：prefCodeはあるが、areaQueryがない時（県トップ階層）も状態をクリアして即終了
+    if (prefCode && !areaQuery) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+        return;
+    }
+
+    // ★ここから下は、areaQueryが確実に存在する（エリアかスポットの階層）時のみ実行される
     const resolvedAreaId = getAreaIdFromQuery(areaQuery);
 
     if (!resolvedAreaId) {
@@ -343,10 +351,10 @@ function updateStateFromURL() {
     }
     else if (resolvedAreaId && spotQuery) {
         window.currentAreaId = resolvedAreaId;
-        // ★ 定義した関数を通して、安全にシステム用の spotId を生成
         window.currentSpotId = getSpotIdFromQuery(spotQuery, resolvedAreaId);
     }
 }
+
 
 // ★ グローバルにロック変数を追加（goBack関数の外、または一番上に）
 window._isGoingBack = false;
