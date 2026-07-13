@@ -2152,7 +2152,6 @@ function loadRegionMap(regionCode = 'KANTO') {
 // 1. データ読み込み専用関数
 // ==========================================
 async function loadPrefectureData(prefCode) {
-    // ★ 念のための二重ロック：ロード開始時に前の魚データを確実に消し去る
     window.fishData = null; 
     window.currentPref = prefCode;
     const region = window.currentRegion || 'KANTO';
@@ -2164,21 +2163,109 @@ async function loadPrefectureData(prefCode) {
     try {
         await loadLocationCSV(csvUrl);
         
-        // 沿岸部の天気を取得して全スポットに付与
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
 
-        // 内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
         if (typeof loadInlandWhetherCSV === 'function') {
             const inlandCsv = await loadInlandWhetherCSV(region);
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
         }
+
+        // ★ ここが重要：データ読み込み後に県UIを構築する
+        renderPrefectureUI();
 
         return true; 
     } catch (err) {
         console.error("データ読み込みエラー:", err);
         return false;
     }
+}
+
+// ==========================================
+// ★ URLの pref クエリから Region と Pref を抽出する関数
+// ==========================================
+function getParsedPrefQuery() {
+    const url = new URL(location.href);
+    const query = url.searchParams.get('pref');
+    if (!query) return { region: null, pref: null };
+    
+    const parts = query.split('_');
+    if (parts.length >= 2) {
+        return { region: parts[0], pref: parts[1] };
+    }
+    return { region: 'KANTO', pref: parts[0] };
+}
+
+// ==========================================
+// ★ データ整合性チェックとルート管理
+// ==========================================
+async function checkAndLoadRouteData() {
+    const { region, pref: prefCode } = getParsedPrefQuery();
+    
+    // ★ 修正：Region（広域）画面ならデータチェックは不要。そのまま広域マップを描画して終了する
+    if (!prefCode) {
+        loadRegionMap(region || 'KANTO');
+        return false; // 以降の routeUpdate の処理を止める
+    }
+
+    let needsBaseLoad = false;
+    let needsFishLoad = false;
+
+    if (window.currentPref !== prefCode) {
+        window.fishData = null;
+    }
+
+    if (!window.prefData || window.currentPref !== prefCode) {
+        needsBaseLoad = true;
+    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
+        needsBaseLoad = true;
+    }
+
+    let resolvedAreaId = null;
+    
+    const url = new URL(location.href);
+    const areaQuery = url.searchParams.get('area'); 
+    
+    if (areaQuery) {
+        if (!window.areaData) {
+            needsBaseLoad = true;
+        } else {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
+            if (area) {
+                resolvedAreaId = prefCode + "_" + area.individualId;
+                if (!window.fishData) {
+                    needsFishLoad = true;
+                }
+            }
+        }
+    }
+
+    if (needsBaseLoad || needsFishLoad) {
+        window.currentRegion = region || 'KANTO';
+        window.currentPref = prefCode;
+
+        if (needsBaseLoad) {
+            await loadPrefectureData(prefCode);
+        }
+        
+        if (areaQuery && !resolvedAreaId && window.areaData) {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
+            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
+        }
+
+        if (resolvedAreaId) {
+            await prepareFishForArea(resolvedAreaId);
+        }
+
+        routeUpdate();
+        return false; 
+    }
+
+    return true; 
 }
 
 // ==========================================
@@ -2196,35 +2283,6 @@ function getParsedPrefQuery() {
     return { region: 'KANTO', pref: parts[0] };
 }
 
-// ==========================================
-// ★ 復元必須：データ読み込み専用関数
-// ==========================================
-async function loadPrefectureData(prefCode) {
-    window.fishData = null; 
-    window.currentPref = prefCode;
-    const region = window.currentRegion || 'KANTO';
-    
-    const csvUrl     = `/${region}/${prefCode}_location.csv`;
-    window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-
-    try {
-        await loadLocationCSV(csvUrl);
-        
-        const whetherCsv = await loadWhetherCSV(whetherUrl);
-        applyWhetherToSpots(whetherCsv);
-
-        if (typeof loadInlandWhetherCSV === 'function') {
-            const inlandCsv = await loadInlandWhetherCSV(region);
-            if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
-        }
-
-        return true; 
-    } catch (err) {
-        console.error("データ読み込みエラー:", err);
-        return false;
-    }
-}
 
 
 async function checkAndLoadRouteData() {
