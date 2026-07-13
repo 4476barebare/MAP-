@@ -246,26 +246,18 @@ function showDebug(msg, clear = false) {
     debugEl.textContent += msg + "\n";
 }
 
-// クエリパラメータを判定してデバッグ表示する関数
+// あなたの成功した手法（new URL）を完全に採用したデバッグ関数
 function checkCurrentQuery() {
-    // 現在のURLのクエリ部分（?以降）を取得
-    const params = new URLSearchParams(window.location.search);
-    
-    // クエリが全く無い場合（?以降が空っぽの場合）
-    if (params.toString() === "") {
-        showdebug("クエリ無し");
-        return;
-    }
+    const url = new URL(location.href);
+    const prefQuery = url.searchParams.get('pref');
 
-    // クエリがある場合は、中身を組み立てて表示する
-    let queryText = "現在のクエリ: ";
-    for (const [key, value] of params.entries()) {
-        queryText += `${key}=${value} / `;
+    if (!prefQuery) {
+        showdebug("クエリ無し");
+    } else {
+        showdebug("現在のクエリ: pref=" + prefQuery);
     }
-    
-    // 最後の余分な「 / 」を削ってデバッグ出力
-    showdebug(queryText.slice(0, -3));
 }
+
 
 // ==========================================
 // ■ エリア名(日本語)から currentAreaId を生成する関数
