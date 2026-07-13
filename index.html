@@ -251,6 +251,24 @@ function showdebug(msg) {
     debugBox.innerHTML += msg + '<br>';
 }
 
+// ==========================================
+// ★ 新規追加：URLに日本語クエリを付与・更新する共通関数
+// ==========================================
+function setIdealQuery(type, value) {
+    const url = new URL(location.href);
+    
+    if (value) {
+        // 値が指定されていればセット（追加または上書き）
+        url.searchParams.set(type, value);
+    } else {
+        // 値が空（null や '' など）の場合は、そのクエリを削除
+        url.searchParams.delete(type);
+    }
+
+    // ページをリロードせずにURLバーだけを書き換える
+    window.history.replaceState(null, '', url);
+}
+
 // 2. あなたの安全な手法を使ったクエリ判定関数
 function checkCurrentQuery() {
     const url = new URL(location.href);
@@ -366,6 +384,12 @@ function initAreaUI() {
 
         row.onclick = () => {
             location.hash = encodeURIComponent(area.name);
+            
+            // ★ テスト追加：クリックされた本物の area オブジェクトから引用！
+            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            setIdealQuery('area', area.name);
+            setIdealQuery('spot', null);
+
             updateStateFromHash();
             destroyAreaUI();
             selectArea(area);
@@ -431,6 +455,12 @@ function initAreaUI() {
         if (!nearest) return;
 
         location.hash = encodeURIComponent(nearest.name);
+        
+        // ★ テスト追加：導き出された nearest オブジェクトから引用！
+        if (window.prefData) setIdealQuery('pref', window.prefData.name);
+        setIdealQuery('area', nearest.name);
+        setIdealQuery('spot', null);
+
         updateStateFromHash();
         destroyAreaUI();
         selectArea(nearest);
@@ -1516,9 +1546,16 @@ function renderAreaGuide() {
             // ★ 新しいエリアへのジャンプ処理
             // =====================================================
             location.hash = encodeURIComponent(area.name);
+            
+            // ★ テスト追加：クリックされた本物の area オブジェクトから引用！
+            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            setIdealQuery('area', area.name);
+            setIdealQuery('spot', null);
+
             if (typeof updateStateFromHash === 'function') updateStateFromHash();
             if (typeof routeUpdate === 'function') routeUpdate();
             openArea(area.individualId, true);
+
         });
 
         container.appendChild(div);
@@ -1886,6 +1923,9 @@ async function checkAndLoadRouteData() {
 // ==========================================
 // 4. ハブとなる routeUpdate (リファクタリング版)
 // ==========================================
+// ==========================================
+// 4. ハブとなる routeUpdate (クエリ連動テスト版)
+// ==========================================
 async function routeUpdate() {
     checkCurrentQuery();
     // ★ 1. データの完全性をガード（足りなければ裏でロードして再度呼び出される）
@@ -1911,6 +1951,15 @@ async function routeUpdate() {
         const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
         const spot = list.find(s => String(s.individualId) === String(spotId[2]));
         if (spot) {
+            
+            // =====================================
+            // ★ テスト：スポット階層のクエリセット（実データ引用）
+            // =====================================
+            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            const parentArea = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
+            if (parentArea) setIdealQuery('area', parentArea.name);
+            setIdealQuery('spot', spot.name); // 本物のスポット名をセット
+
             drawLocation(spot.name, spot.lat, spot.lng, "13");
             
             // ★ データは揃っているので、Promiseを待たずに即座に描画へ飛べる！
@@ -1935,6 +1984,14 @@ async function routeUpdate() {
     if (window.currentAreaId) {
         const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
         if (!area) return;
+        
+        // =====================================
+        // ★ テスト：エリア階層のクエリセット（実データ引用）
+        // =====================================
+        if (window.prefData) setIdealQuery('pref', window.prefData.name);
+        setIdealQuery('area', area.name); // 本物のエリア名をセット
+        setIdealQuery('spot', null);      // スポットは削除
+
         drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
         selectArea(area.name);
         renderCrowdImage();
@@ -1955,6 +2012,14 @@ async function routeUpdate() {
 
     // ─── 県階層 ───
     if (window.prefData) {
+        
+        // =====================================
+        // ★ テスト：県階層のクエリセット（実データ引用）
+        // =====================================
+        setIdealQuery('pref', window.prefData.name); // 本物の県名をセット
+        setIdealQuery('area', null);                 // エリアは削除
+        setIdealQuery('spot', null);                 // スポットは削除
+
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
         
         requestAnimationFrame(() => {
@@ -1979,6 +2044,7 @@ async function routeUpdate() {
         });
     }
 }
+
 
 
 </script>
