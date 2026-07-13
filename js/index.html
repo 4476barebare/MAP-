@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <title>釣り行こNAVI | 釣りスポットを地図で探す</title>
+  <meta name="description" content="釣り行こNAVIは、釣りスポットを空撮地図で探せる情報サイトです。エリア別に釣りポイントを簡単に確認できます。">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://turiiko-navi.com/">
+
+  <!-- OGP -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="釣り行こNAVI | 釣りスポットマップ">
+  <meta property="og:description" content="空撮地図で釣りポイントを簡単検索">
+  <meta property="og:url" content="https://turiiko-navi.com/">
+  <meta property="og:image" content="https://turiiko-navi.com/ogp.jpg">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="釣り行こNAVI">
+  <meta name="twitter:description" content="地図で釣りポイントを簡単検索">
+  <meta name="twitter:image" content="https://turiiko-navi.com/ogp.jpg">
+
+  <!-- favicon（まだ無いなら仮でもOK） -->
+<link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+    <a href="#" id="calendarBtn">カレンダー</a>
+    <a href="#" id="newsBtn">釣りNEWS</a>
+    </nav>
+  </div>
+</header>
+<div class="alert-wrap">
+  <span id="alert-bar"></span>
+  <span id="alert-signature">気象庁</span>
+</div>
+
+<div id="lf-map">
+  <div class="map-ui-top">
+    <div class="ad-box">AD 320×50</div>
+    <div class="map-ui-sub"><div id="nearest-spot" class="nearest-spot"></div><button id="map-back-btn" class="map-back-btn"></button></div>
+    <div class="map-ui-sub2"></div>
+  </div>
+<div id="map-menu" class="map-menu">
+  
+  <div class="menu-header-row" style="display:none;">
+    <div class="header-row">
+      <div id="cloudsUI"></div>
+<button id="radarToggleBtn" class="radar-toggle-btn">OFF</button>
+      <div class="header-text"></div>
+    </div>
+  </div>
+  
+  <ul>
+  </ul>
+  
+</div>
+
+  
+ <!-- ★ここ重要：weatherを先に固定 -->
+  <div class="weather" id="weatherBox">
+    <div class="weather-labels" id="labels"></div>
+    <div class="weather-table" id="table"></div>
+  </div>
+  <div class="tide-wrapper">
+  <canvas id="tideCanvas"></canvas>
+</div>
+  <!-- ★weekは必ず後ろ -->
+  <div class="week">
+    <div class="week-labels" id="weekLabels"></div>
+    <div class="week-table" id="weekTable"></div>
+  </div>
+
+</div>
+
+<div class="banner">
+    <img src="/articles/images/index.jpg" alt="海の空撮と堤防釣りのイメージ（釣り場・天気・潮汐情報サイト">
+</div>
+  
+<section id="area-guide" class="collapsed-mode">
+    <h1></h1>
+</section>
+
+<div id="newsModal" class="modal">
+  <div class="modal-content">
+    <div id="newsList"></div>
+  </div>
+</div>
+
+<div id="calendarOverlay" class="overlay">
+  <div class="overlay-content">
+  <div id="calendarWrapper"></div>
+  </div>
+</div>
+
+<section class="article-list">
+  <a href="articles/beginner-fishing.html" class="article-card">
+    <img src="articles/images/beginner-fishing.jpg" alt="初心者釣り">
+    <h2>初心者でも迷わない釣りの始め方</h2>
+  </a>
+  <a href="articles/rod-selection.html" class="article-card">
+    <img src="articles/images/rod-selection.jpg" alt="竿選び">
+    <h2>初心者向け失敗しない竿の選び方</h2>
+  </a>
+  <a href="articles/gofishing.html" class="article-card">
+    <img src="articles/images/gofishing.jpg" alt="潮と時間帯の解説">
+    <h2>いつ釣りに出掛けるべきか</h2>
+  </a>
+  <a href="articles/firstfishing.html" class="article-card">
+    <img src="articles/images/firstfishing.jpg" alt="場所選び">
+    <h2>失敗しない場所選び</h2>
+  </a>
+</section>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+
+    <!-- タブ切替 -->
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+
+    <!-- サイトポリシー -->
+    <section id="policySection">
+      <h1>サイトポリシー</h1>
+
+      <h2>1. 免責事項</h2>
+      <p>
+        当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、
+        その完全性・正確性・最新性を保証するものではありません。
+        当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。
+      </p>
+
+      <h2>2. 掲載情報について</h2>
+      <p>
+        掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、
+        現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。
+        利用前に必ず現地の最新情報をご確認ください。
+      </p>
+
+      <h2>3. 釣行データについて</h2>
+      <p>
+        当サイトの釣行データは過去の記録に基づくものであり、
+        現在の釣果や釣りの可否を保証するものではありません。
+        また海洋環境や生態系の状態を保証するものではありません。
+      </p>
+
+      <h2>4. 安全について</h2>
+      <p>
+        釣りを行う際は安全に十分配慮してください。
+        釣り場所によっては管理者の許可が必要な場合があります。
+        必ず現地のルールに従ってください。
+      </p>
+
+      <p>最終更新日：2026年5月</p>
+    </section>
+
+    <!-- お問い合わせ -->
+    <section id="contactSection" style="display:none;">
+      <h1>お問い合わせ</h1>
+
+      <p>
+        当サイトへのご連絡は以下の用途に限ります。<br>
+        ・バグ報告<br>
+        ・その他の連絡事項
+      </p>
+
+      <p>
+        ※すべての内容に返信・個別対応は行いません。<br>
+        内容は確認のみ行い、必要に応じてサイト改善に反映します。
+      </p>
+
+      <h2>連絡先</h2>
+
+      <p>
+        <a href="mailto:info@turiiko.shop?subject=バグ報告&body=【発生場所】%0A【内容】%0A【再現手順】%0A">
+          バグ報告を送る
+        </a>
+      </p>
+
+      <p>
+        <a href="mailto:info@turiiko.shop?subject=その他&body=【内容】%0A">
+          その他の連絡
+        </a>
+      </p>
+    </section>
+
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/markerControl.js"></script>
+<script src="/js/dataLoader.js"></script>
+
+
+<script>
+window.prefData = null;
+window.areaData = [];
+window.spotData = [];
+window.currentHash = '';
+window.currentAreaId = null;
+window.currentSpotId = null;
+window.currentPref = null;
+window.fishUrl = null;
+window.nearestClickEnabled = true;
+window.nearestClickHandler = null;
+
+function showDebug(msg, clear = false) {
+    let debugEl = document.getElementById('debug');
+    if (!debugEl) {
+        debugEl = document.createElement('div');
+        debugEl.id = 'debug';
+        debugEl.style.position = 'fixed';
+        debugEl.style.top = '0';
+        debugEl.style.left = '0';
+        debugEl.style.background = 'rgba(255,255,0,0.85)';
+        debugEl.style.zIndex = '9999';
+        debugEl.style.padding = '6px';
+        debugEl.style.fontSize = '12px';
+        debugEl.style.maxWidth = '320px';
+        debugEl.style.whiteSpace = 'pre-wrap';
+        debugEl.style.maxHeight = '40vh';
+        debugEl.style.overflow = 'auto';
+        document.body.appendChild(debugEl);
+    }
+    if (clear) debugEl.textContent = "";
+    debugEl.textContent += msg + "\n";
+}
+
+// ==========================================
+// ■ エリア名(日本語)から currentAreaId を生成する関数
+// ==========================================
+function getAreaIdFromQuery(areaQuery) {
+    if (!areaQuery || !window.areaData) return null;
+    let area = window.areaData.find(a => a.name === areaQuery);
+    if (!area) {
+        area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+    }
+    if (area) return area.areaId + "_" + area.individualId;
+    return null;
+}
+
+// ==========================================
+// ■ スポット名(日本語)から currentSpotId を生成する関数
+// ==========================================
+function getSpotIdFromQuery(spotQuery, resolvedAreaId) {
+    if (!spotQuery || !resolvedAreaId || !window.spotData) return null;
+    let spot = window.spotData.find(s => s.name === spotQuery && s.areaId === resolvedAreaId);
+    if (!spot) {
+        spot = window.spotData.find(s => String(s.individualId) === String(spotQuery) && s.areaId === resolvedAreaId);
+    }
+    if (spot) return spot.individualId;
+    return null;
+}
+
+// ==========================================
+// ■ URLを書き換える共通ヘルパー関数
+// ==========================================
+function updateURLState(areaName, spotName) {
+    const url = new URL(location.href);
+    if (areaName) {
+        url.searchParams.set('area', areaName);
+    } else {
+        url.searchParams.delete('area');
+    }
+    if (spotName) {
+        url.searchParams.set('spot', spotName);
+    } else {
+        url.searchParams.delete('spot');
+    }
+    url.hash = ''; 
+    history.pushState(null, '', url);
+}
+
+function updateStateFromURL() {
+    const url = new URL(location.href);
+    const prefCode = url.searchParams.get('pref');
+    const areaQuery = url.searchParams.get('area'); 
+    const spotQuery = url.searchParams.get('spot'); 
+
+    if (!prefCode && !areaQuery) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+        return;
+    }
+    if (!areaQuery || areaQuery.trim() === "") {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+        return;
+    }
+
+    const resolvedAreaId = getAreaIdFromQuery(areaQuery);
+
+    if (!resolvedAreaId) {
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+    }
+    else if (resolvedAreaId && !spotQuery) {
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = null;
+    }
+    else if (resolvedAreaId && spotQuery) {
+        window.currentAreaId = resolvedAreaId;
+        window.currentSpotId = getSpotIdFromQuery(spotQuery, resolvedAreaId);
+    }
+}
+
+// ==========================================
+// ★ URLの pref クエリから Region と Pref を抽出する関数
+// ==========================================
+function getParsedPrefQuery() {
+    const url = new URL(location.href);
+    const query = url.searchParams.get('pref');
+    if (!query) return { region: null, pref: null };
+    const parts = query.split('_');
+    if (parts.length >= 2) {
+        return { region: parts[0], pref: parts[1] };
+    }
+    return { region: 'KANTO', pref: parts[0] };
+}
+
+window._isGoingBack = false;
+
+function goBack() {
+    if (window._isGoingBack) return;
+    window._isGoingBack = true;
+
+    const backBtn = document.getElementById('map-back-btn');
+    if (backBtn) {
+        backBtn.style.pointerEvents = 'none'; 
+        backBtn.style.transition = 'opacity 0.3s ease';
+        backBtn.style.opacity = '0';
+    }
+
+    const releaseLockAndShowBtn = () => {
+        window._isGoingBack = false; 
+        if (backBtn) {
+            backBtn.style.display = 'block';
+            requestAnimationFrame(() => {
+                backBtn.style.transition = 'opacity 0.4s ease';
+                backBtn.style.opacity = '1';
+                backBtn.style.pointerEvents = 'auto'; 
+            });
+        }
+    };
+
+    if (!window.currentAreaId && !window.currentSpotId) {
+        const regionToLoad = window.currentRegion || 'KANTO';
+        const url = new URL(location.href);
+        url.searchParams.delete('pref');
+        url.searchParams.delete('area');
+        url.searchParams.delete('spot');
+        url.hash = '';
+        history.replaceState(null, '', url);
+
+        window.currentPref = null;
+        window.prefData = null;
+
+        if (typeof destroyAreaUI === 'function') destroyAreaUI();
+        if (typeof removeCrowdImage === 'function') removeCrowdImage();
+        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
+            window.markerControl.clearLayers();
+        }
+        if (window.phase1Group) window.phase1Group.clearLayers();
+        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+        if (window.prefSpotLayer) {
+            window.map.removeLayer(window.prefSpotLayer);
+            window.prefSpotLayer = null;
+        }
+        const alertBar = document.getElementById("alert-bar");
+        if (alertBar) alertBar.textContent = "";
+
+        setTimeout(() => {
+            if (backBtn) {
+                backBtn.style.display = 'none';
+                backBtn.style.pointerEvents = 'auto';
+            }
+            window._isGoingBack = false; 
+        }, 300);
+
+        loadRegionMap(regionToLoad);
+        return;
+    }
+    
+    window.map.touchZoom.disable();
+    window.map.dragging.disable();
+
+    const area = window.areaData.find(a =>
+        String(a.individualId) === String(window.currentAreaId?.split('_')[1])
+    );
+
+    if (!area) {
+        window._isGoingBack = false;
+        return;
+    }
+
+    const z = window.map.getZoom();
+    const restoreSpot = buildSpotRestoreObject();
+    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
+    const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
+
+    if ((z > 13 || isSpecial) && !isPhase2) {
+        stopZoomGuard();
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        if (window.fishLayer) window.map.removeLayer(window.fishLayer);
+        if (window.phase2Group) window.phase2Group.clearLayers();
+
+        if (!restoreSpot) {
+            window._isGoingBack = false;
+            return;
+        }
+
+        const currentAreaObj = window.areaData.find(a => window.currentAreaId === String(a.areaId + "_" + a.individualId));
+        updateURLState(currentAreaObj ? currentAreaObj.name : null, null);
+        updateStateFromURL();
+
+        removeWeekItem();
+        resetWeatherUI();
+        showSpotsForArea(window.currentAreaId);
+        selectSpot(restoreSpot);
+
+        window.map.once('moveend', () => {
+            enablePhase2(window.map);
+            phase1menu(window.currentAreaId);
+            releaseLockAndShowBtn();
+        });
+        return;
+    }
+
+    if (z === 13 || isPhase2) {
+        disablePhase2(window.map);
+        clearSub2Weather();
+        
+        const nsEl = document.getElementById("nearest-spot");
+        if (nsEl) nsEl.textContent = "";
+        
+        window.map.eachLayer(layer => {
+            if (layer === window.gsiLayer) return;
+            if (layer instanceof L.TileLayer) {
+                const url = layer._url || '';
+                if (url.includes('seamlessphoto')) {
+                    window.map.removeLayer(layer);
+                }
+            }
+        });
+        window.map.eachLayer(layer => {
+            if (!(layer instanceof L.TileLayer)) return;
+            const url = layer._url || '';
+            if (url.includes('openstreetmap')) {
+                window.map.removeLayer(layer);
+            }
+        });
+
+        window.osmLayer = null;
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        if (window.phase2Group) window.phase2Group.clearLayers();
+
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
+        } else {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
+        }
+        window.gsiLayer.addTo(window.map);
+
+        selectArea(area);
+        renderCrowdImage();
+        
+        window.map.once('moveend', () => {
+            releaseLockAndShowBtn();
+        });
+        return;
+    }
+
+    if (window.osmLayer) {
+        window.map.removeLayer(window.osmLayer);
+        window.osmLayer = null;
+    }
+    if (window.phase1Group) window.phase1Group.clearLayers();
+    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+    } else {
+        window.gsiLayer.setUrl(window.gsiLayers.ort);
+    }
+
+    drawLocation(
+        window.prefData.name,
+        window.prefData.lat,
+        window.prefData.lng,
+        window.prefData.zoom
+    );
+    
+    updateURLState(null, null);
+
+    window.map.once('moveend', () => {
+        window.map.invalidateSize(true);
+        updateStateFromURL();
+        initAreaUI();
+        showPrefSpots();
+        renderPrefWeather();
+        resetAreaGuide();
+        releaseLockAndShowBtn();
+    });
+}
+
+// ==========================================
+// ★ データ整合性チェックとルート管理
+// ==========================================
+async function checkAndLoadRouteData() {
+    const { region, pref: prefCode } = getParsedPrefQuery();
+    
+    // ★ 修正：Region（広域）画面ならデータチェックは不要。そのまま広域マップを描画して終了する
+    if (!prefCode) {
+        // ★ これを追加！初期画面の時にグローバル変数を確実に初期化する
+        window.currentRegion = region || 'KANTO';
+        
+        loadRegionMap(window.currentRegion);
+        return false; // 以降の routeUpdate の処理を止める
+    }
+
+    let needsBaseLoad = false;
+    let needsFishLoad = false;
+
+    if (window.currentPref !== prefCode) {
+        window.fishData = null;
+    }
+
+    if (!window.prefData || window.currentPref !== prefCode) {
+        needsBaseLoad = true;
+    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
+        needsBaseLoad = true;
+    }
+
+    let resolvedAreaId = null;
+    
+    const url = new URL(location.href);
+    const areaQuery = url.searchParams.get('area'); 
+    
+    if (areaQuery) {
+        if (!window.areaData) {
+            needsBaseLoad = true;
+        } else {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
+            if (area) {
+                resolvedAreaId = prefCode + "_" + area.individualId;
+                if (!window.fishData) {
+                    needsFishLoad = true;
+                }
+            }
+        }
+    }
+
+    if (needsBaseLoad || needsFishLoad) {
+        // ★ ここでも安全に初期化
+        window.currentRegion = region || 'KANTO';
+        window.currentPref = prefCode;
+
+        if (needsBaseLoad) {
+            await loadPrefectureData(prefCode);
+        }
+        
+        if (areaQuery && !resolvedAreaId && window.areaData) {
+            let area = window.areaData.find(a => a.name === areaQuery);
+            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+            
+            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
+        }
+
+        if (resolvedAreaId) {
+            await prepareFishForArea(resolvedAreaId);
+        }
+
+        routeUpdate();
+        return false; 
+    }
+
+    return true; 
+}
+
+// ==========================================
+// 4. ハブとなる routeUpdate (完成版)
+// ==========================================
+async function routeUpdate() {
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return; 
+
+    const { region, pref: prefCode } = getParsedPrefQuery();
+
+    // ★ 初期画面（広域マップ）の描画ロジック
+    if (!prefCode) {
+        document.getElementById('map-back-btn').style.display = 'none';
+        
+        // ★ ここも追加！確実にグローバル変数を更新
+        window.currentRegion = region || 'KANTO';
+        loadRegionMap(window.currentRegion);
+        return;
+    }
+
+    window.currentRegion = region || 'KANTO';
+    updateStateFromURL();
+
+    // ─── スポット階層 ───
+    if (window.currentSpotId) {
+        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
+        const spot = list.find(s => String(s.individualId) === String(window.currentSpotId));
+        
+        if (spot) {
+            drawLocation(spot.name, spot.lat, spot.lng, "13");
+            zoomToSpot(spot);
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.opacity = '0';
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        btn.style.transition = 'opacity 0.4s ease';
+                        btn.style.opacity = '1';
+                    });
+                }
+            });
+        }
+        return;
+    }
+
+    // ─── エリア階層 ───
+    if (window.currentAreaId) {
+        const area = window.areaData.find(a => window.currentAreaId === String(a.areaId + "_" + a.individualId));
+        if (!area) return;
+        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+        selectArea(area.name);
+        renderCrowdImage();
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.opacity = '0';
+                btn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    btn.style.transition = 'opacity 0.4s ease';
+                    btn.style.opacity = '1';
+                });
+            }
+        });
+        return;
+    }
+
+    // ─── 県階層 ───
+    if (window.prefData) {
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                showPrefSpots();
+                initAreaUI();
+                renderPrefWeather();
+                renderCrowdImage();
+                requestAnimationFrame(() => {
+                    const btn = document.getElementById('map-back-btn');
+                    if (btn) {
+                        btn.style.opacity = '0';
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => {
+                            btn.style.transition = 'opacity 0.4s ease';
+                            btn.style.opacity = '1';
+                        });
+                    }
+                });
+            });
+        });
+    }
+}
+
+
+
+function formatDate(str) {
+  const [y, m, d] = str.split("-");
+  return `${y} ${Number(m)}/${Number(d)}`;
+}
+
+function initAreaUI() {
+    const menu = document.getElementById('map-menu');
+    if (!menu) return;
+    menu.style.display = 'block';
+
+    const ul = menu.querySelector('ul');
+    if (!ul) return;
+
+    const oldItems = ul.querySelectorAll('li');
+    oldItems.forEach(el => el.remove());
+
+    window.areaData.forEach(area => {
+        const li = document.createElement('li');
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.width = '100%';
+        row.style.cursor = 'pointer';
+
+        row.onclick = () => {
+            updateURLState(area.name, null);
+            updateStateFromURL();
+            destroyAreaUI();
+            selectArea(area);
+        };
+
+        const left = document.createElement('div');
+        left.style.flex = '1';
+
+        const btn = document.createElement('button');
+        btn.textContent = area.name;
+        btn.style.width = '100%';
+
+        left.appendChild(btn);
+
+        const right = document.createElement('div');
+        right.id = area.areaId + '_' + area.individualId;
+        right.className = 'pref-weather';
+        right.textContent = "loading…";
+
+        row.appendChild(left);
+        row.appendChild(right);
+        li.appendChild(row);
+        ul.appendChild(li);
+    });
+
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
+    }
+
+    window.nearestClickHandler = function(e) {
+        if (!window.nearestClickEnabled) return;
+        const rect = menu.getBoundingClientRect();
+        const x = e.originalEvent.clientX;
+        const y = e.originalEvent.clientY;
+
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return;
+
+        let nearest = null;
+        let minDist = Infinity;
+
+        for (const area of window.areaData) {
+            const dLat = e.latlng.lat - area.lat;
+            const dLng = e.latlng.lng - area.lng;
+            const dist = dLat * dLat + dLng * dLng;
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = area;
+            }
+        }
+
+        if (!nearest) return;
+        updateURLState(nearest.name, null);
+        updateStateFromURL();
+        destroyAreaUI();
+        selectArea(nearest);
+    };
+
+    window.nearestClickEnabled = true;
+    window.map.on('click', window.nearestClickHandler);
+}
+
+function destroyAreaUI() {
+    const menuUl = document.querySelector('#map-menu ul');
+    if (menuUl) {
+        const items = menuUl.querySelectorAll('li'); 
+        items.forEach(el => el.remove());
+    }
+    if (window.nearestClickHandler) {
+        window.map.off('click', window.nearestClickHandler);
+        window.nearestClickHandler = null;
+    }
+    window.nearestClickEnabled = false;
+    document.getElementById('map-menu').style.display = 'none';
+}
+
+function startZoomGuard() {
+    if (!window.map) return;
+    window._zoomGuardBase = window.map.getZoom();
+    window._zoomGuardActive = true;
+}
+
+function isZoomGuardFailed(threshold = 0.3) {
+    if (!window._zoomGuardActive || !window.map) return false;
+    return (window.map.getZoom() - window._zoomGuardBase) > threshold;
+}
+
+function stopZoomGuard() {
+    window._zoomGuardActive = false;
+    window._zoomGuardBase = null;
+}
+
+let pinchStartDistance = 0;
+let pinchTriggered = false;
+
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 2) return;
+    pinchStartDistance = getDistance(e.touches);
+    pinchTriggered = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 2) return;
+    const currentDistance = getDistance(e.touches);
+    const isPinchIn = currentDistance < pinchStartDistance - 20;
+    if (!pinchTriggered && isPinchIn) {
+        pinchTriggered = true;
+        if (isZoomGuardFailed()) return;
+        goBack();
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+    if (e.touches.length > 0) return;
+    pinchStartDistance = 0;
+    pinchTriggered = false;
+});
+
+function renderPrefWeather() {
+    const elements = document.getElementsByClassName('pref-weather');
+    for (let i = 0; i < elements.length; i++) {
+        const el = elements[i];
+        const areaId = el.id;
+        const rep = window.spotData.find(s => s.areaId === areaId && s.type === 'representative');
+        if (!rep || !rep.whether) {
+            el.textContent = 'no data';
+            continue;
+        }
+
+        const w = formatPrefWeather(rep.whether);
+        const rows = rep.whether?.hourly?.[0]?.weather || [];
+        const morningRows = [];
+        const afternoonRows = [];
+
+        for (let j = 0; j < rows.length; j++) {
+            const hour = j * 2;
+            if (hour >= 5 && hour <= 12) morningRows.push(rows[j]);
+            else if (hour >= 13 && hour <= 20) afternoonRows.push(rows[j]);
+        }
+
+        const getIconSafe = (r) => {
+            if (!Array.isArray(r) || r.length === 0) return null;
+            return calcRepresentativeIcon(r);
+        };
+
+        const iconMorning = getIconSafe(morningRows);
+        const iconAfternoon = getIconSafe(afternoonRows);
+        let icon = '';
+
+        if (iconMorning && iconAfternoon) {
+            icon = iconMorning === iconAfternoon ? iconMorning : `${iconMorning}<span class="unit-text">→</span>${iconAfternoon}`;
+        } else {
+            icon = iconMorning || iconAfternoon || '';
+        }
+
+        el.innerHTML = `
+            <span class="col-icon">${icon}</span>
+            <div class="col-temp"><span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span></div>
+            <div class="col-label"><span class="unit-text">降水</span></div>
+            <div class="col-pop"><span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span></div>
+            <div class="col-wind"><span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span></div>
+            <span class="pref-name">${rep.name}</span>
+        `;
+    }
+}
+
+function formatPrefWeather(whether) {
+    const today = whether?.hourly?.[0];
+    if (!today || !Array.isArray(today.weather)) return null;
+
+    let maxTemp = -Infinity;
+    let maxPop = -Infinity;
+    let maxWind = -Infinity;
+    let codeSum = 0;
+    let codeCount = 0;
+
+    for (const row of today.weather) {
+        if (!Array.isArray(row)) continue;
+        const code = row[0];
+        const temp = row[1];
+        const pop = row[2];
+        const wind = row[4];
+
+        if (typeof code === "number") { codeSum += code; codeCount++; }
+        if (typeof temp === "number") maxTemp = Math.max(maxTemp, temp);
+        if (typeof pop === "number") maxPop = Math.max(maxPop, pop);
+        if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
+    }
+
+    if (codeCount === 0) return null;
+    let displayPop = null;
+    if (maxPop !== -Infinity) displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
+
+    return {
+        icon: Math.round(codeSum / codeCount),
+        temp: Math.round(maxTemp),
+        pop: displayPop,
+        wind: Math.round(maxWind)
+    };
+}
+
+function calcRepresentativeIcon(rows) {
+    const adjustCode = (code, pop) => {
+        const p = Number(pop);
+        if (code >= 60) return p >= 80 ? 70 : 60;
+        if (p >= 70) return 30;
+        if (p >= 50) return 10;
+        return code;
+    };
+
+    const map = {};
+    let maxCount = -1;
+    let tied = [];
+
+    for (const r of rows) {
+        const code = Number(r?.[0]);
+        const pop  = Number(r?.[2]);
+        if (!Number.isFinite(code)) continue;
+        const adjusted = adjustCode(code, pop);
+        map[adjusted] = (map[adjusted] || 0) + 1;
+    }
+
+    for (const k in map) {
+        const count = map[k];
+        const code = Number(k);
+        if (count > maxCount) {
+            maxCount = count;
+            tied = [code];
+        } else if (count === maxCount) {
+            tied.push(code);
+        }
+    }
+
+    const iconCode = tied.length > 1 ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length) : tied[0];
+    return toWeatherIcon(iconCode);
+}
+
+function toWeatherIcon(code) {
+    if (code >= 70) return "☔️";
+    if (code >= 60) return "☂️";   
+    if (code >= 30) return "☁️";  
+    if (code >= 10) return "⛅";  
+    if (code === 1) return "🌤";  
+    if (code === 2) return "⛅";  
+    return "☀️"; 
+}
+
+function renderCrowdImage() {
+    if (typeof window.radarEnabled === 'undefined') window.radarEnabled = true;
+
+    const btn = document.getElementById('radarToggleBtn');
+    if (btn && !btn.dataset.listenerAdded) {
+        btn.dataset.listenerAdded = "true";
+        btn.addEventListener('click', function() {
+            window.radarEnabled = !window.radarEnabled;
+            if (!window.radarEnabled) {
+                if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
+                if (window.crowdLayer) window.map.removeLayer(window.crowdLayer);
+                if (window.crowdZoomHandler) window.map.off("zoomend", window.crowdZoomHandler);
+                window.crowdSlideTimer = null;
+                window.crowdLayer = null;
+                window.crowdZoomHandler = null;
+            }
+            renderCrowdImage();
+        });
+    }
+
+    if (!window.radarEnabled) {
+        removeCrowdImage(); 
+        const header = document.querySelector('.menu-header-row');
+        const cloudsUI = document.getElementById('cloudsUI');
+        const headerText = document.querySelector('.header-text');
+        
+        if (header) header.style.display = '';
+        if (cloudsUI) cloudsUI.textContent = '';
+        if (headerText && window.todayTide) headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        if (btn) { btn.style.display = ''; btn.textContent = 'ON'; btn.classList.add('is-off'); }
+        return; 
+    }
+
+    if (btn) { btn.style.display = ''; btn.textContent = 'OFF'; btn.classList.remove('is-off'); }
+
+    removeCrowdImage();
+
+    if (!window.map.getPane('rainPane')) {
+        window.map.createPane('rainPane');
+        const pane = window.map.getPane('rainPane');
+        pane.style.zIndex = 350;
+        pane.style.pointerEvents = 'none';
+    }
+
+    const now = new Date();
+    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    const hour = nowJST.getHours();
+    const slots = [0,3,6,9,12,15,18,21];
+
+    const images = [];
+    let baseIndex = slots.findIndex(h => h > hour);
+    let dayOffset = 0;
+
+    if (baseIndex === -1) { baseIndex = 0; dayOffset = 1; }
+
+    for (let i = 0; i < 4; i++) {
+        const rawIndex = baseIndex + i;
+        const idx = rawIndex % slots.length;
+        const extraDay = Math.floor(rawIndex / slots.length);
+        const tmpDate = new Date(nowJST);
+        tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
+
+        const y = tmpDate.getFullYear();
+        const m = String(tmpDate.getMonth()+1).padStart(2,"0");
+        const d = String(tmpDate.getDate()).padStart(2,"0");
+        const hh = String(slots[idx]).padStart(2,"0");
+
+        images.push({
+            url: `js/crowdsimg/${window.currentPref}_${y}-${m}-${d}_${hh}.png`,
+            displayHour: slots[idx] + ((dayOffset + extraDay) * 24)
+        });
+    }
+
+    const header = document.querySelector('.menu-header-row');
+    const cloudsUI = document.getElementById('cloudsUI');
+    const headerText = document.querySelector('.header-text');
+
+    if (!header || !cloudsUI || !headerText) return;
+    header.style.display = '';
+
+    if (window.phase2Initialized) {
+        cloudsUI.textContent = '';
+        headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        return;
+    }
+
+    let currentIndex = 0;
+    cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
+    headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+
+    fetch("js/fetched_log.txt").then(res => res.text()).then(text => {
+        const lines = text.trim().split("\n");
+        let best = null;
+        for (let line of lines) {
+            if (!line) continue;
+            const parts = line.split(",");
+            if (parts.length < 4 || parts[0] !== window.currentPref) continue;
+            best = { lat: parseFloat(parts[1]), lng: parseFloat(parts[2]), baseZoom: parseFloat(parts[3]) };
+            break;
+        }
+
+        if (!best) return;
+
+        function calcBounds() {
+            const z = window.map.getZoom();
+            const scale = Math.pow(2, z - best.baseZoom);
+            const size = 512 * scale;
+            const topLeft = window.map.project([best.lat, best.lng], z);
+            const bottomRight = topLeft.add([size, size]);
+            return L.latLngBounds(window.map.unproject(topLeft, z), window.map.unproject(bottomRight, z));
+        }
+
+        const MAX_OPACITY = 0.6;
+
+        window.crowdLayer = L.imageOverlay(images[0].url, calcBounds(), { pane: 'rainPane', opacity: MAX_OPACITY }).addTo(window.map);
+        window.crowdZoomHandler = function() {
+            if (!window.crowdLayer) return;
+            window.crowdLayer.setBounds(calcBounds());
+        };
+        window.map.on("zoomend", window.crowdZoomHandler);
+
+        if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
+
+        window.crowdSlideTimer = setInterval(() => {
+            if (!window.radarEnabled) { clearInterval(window.crowdSlideTimer); return; }
+            const oldLayer = window.crowdLayer;
+            currentIndex = (currentIndex + 1) % images.length;
+            const img = images[currentIndex];
+            cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
+
+            const newLayer = L.imageOverlay(img.url, calcBounds(), { pane: 'rainPane', opacity: 0 }).addTo(window.map);
+            let opacity = 0;
+            const fade = setInterval(() => {
+                opacity += 0.06;
+                if (opacity >= MAX_OPACITY) {
+                    opacity = MAX_OPACITY;
+                    clearInterval(fade);
+                    if (oldLayer) window.map.removeLayer(oldLayer);
+                    window.crowdLayer = newLayer;
+                }
+                newLayer.setOpacity(opacity);
+                if (oldLayer) oldLayer.setOpacity(MAX_OPACITY - opacity);
+            }, 50);
+        }, 2500);
+    });
+}
+
+function removeCrowdImage() {
+    if (window.crowdSlideTimer) { clearInterval(window.crowdSlideTimer); window.crowdSlideTimer = null; }
+    if (window.crowdLayer) { window.map.removeLayer(window.crowdLayer); window.crowdLayer = null; }
+    if (window.crowdZoomHandler) { window.map.off("zoomend", window.crowdZoomHandler); window.crowdZoomHandler = null; }
+
+    const header = document.querySelector('.menu-header-row');
+    if (!header) return;
+    const cloudsUI = document.getElementById('cloudsUI');
+    const headerText = document.querySelector('.header-text');
+
+    if (window.phase2Initialized) {
+        if (cloudsUI) cloudsUI.textContent = '';
+    } else {
+        if (cloudsUI) cloudsUI.textContent = '';
+        if (headerText) headerText.textContent = '';
+    }
+
+    const leftEmpty  = !cloudsUI || cloudsUI.textContent === '';
+    const rightEmpty = !headerText || headerText.textContent === '';
+    if (leftEmpty && rightEmpty) header.style.display = 'none';
+    else header.style.display = '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateStateFromURL();
+    routeUpdate();
+});
+
+window.addEventListener('popstate', () => {
+    routeUpdate(); 
+});
+
+function clearRegionMarkers() {
+    if (window.regionMarkers && window.map) {
+        window.regionMarkers.forEach(m => {
+            const el = m.getElement(); 
+            if (el) {
+                el.style.transition = 'opacity 0.3s ease';
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    window.map.removeLayer(m);
+                    el.style.opacity = '1'; 
+                }, 300);
+            } else {
+                window.map.removeLayer(m);
+            }
+        });
+    }
+}
+
+fetch('/icon/back.svg')
+    .then(res => res.text())
+    .then(svg => {
+        const btn = document.getElementById('map-back-btn');
+        if (!btn) return;
+        btn.innerHTML = svg;
+        const svgEl = btn.querySelector('svg');
+        if (svgEl) svgEl.classList.add('back-icon');
+    });
+
+document.getElementById('map-back-btn')?.addEventListener('click', () => {
+    goBack();
+});
+
+function loadWhetherCSV(url) {
+    const prefCode = window.currentPref; 
+    if (prefCode && window[`${prefCode}_whetherData`]) return Promise.resolve(window[`${prefCode}_whetherData`]);
+
+    const textPromise = window.fetchCache && window.fetchCache[url]
+        ? window.fetchCache[url]
+        : fetch(url).then(res => {
+            if (!res.ok) throw new Error("whether csv fetch失敗");
+            return res.text();
+        });
+
+    return textPromise.then(text => {
+        const lines = text.trim().split("\n");
+        lines.shift();
+        const parsedData = lines.map(line => {
+            const obj = splitCSVLine(line);
+            if (!obj) return null;
+            let parsed;
+            try { parsed = JSON.parse(obj.whether); } catch (e) { return null; }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            let csvDate = null;
+            if (obj.date) {
+                const safeDateStr = obj.date.replace(/-/g, "/");
+                csvDate = new Date(safeDateStr);
+                csvDate.setHours(0, 0, 0, 0);
+            }
+
+            const isToday = csvDate && csvDate.getTime() === today.getTime();
+            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
+
+            if (isToday) {
+                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) parsed.daily[4] = null; 
+            } 
+            else if (isYesterday) {
+                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
+                    parsed.hourly[0] = parsed.hourly[1];
+                    parsed.hourly[1] = parsed.hourly[2];
+                    parsed.hourly[2] = null;
+                }
+            }
+            return { name: obj.name, date: obj.date, whether: parsed };
+        }).filter(Boolean);
+
+        if (prefCode) window[`${prefCode}_whetherData`] = parsedData;
+        return parsedData;
+    });
+}
+
+function applyWhetherToSpots(csvData) {
+    if (window.spotData && window.spotData.length > 0 && window.spotData[0].whether) return;
+    const map = {};
+    for (const row of csvData) {
+        if (!row.name || !row.whether) continue;
+        map[row.name] = row.whether;
+    }
+    for (const spot of window.spotData) {
+        if (map[spot.name] !== undefined) spot.whether = map[spot.name];
+    }
+}
+
+function splitCSVLine(line) {
+    const first = line.indexOf(",");
+    if (first === -1) return null;
+    const second = line.indexOf(",", first + 1);
+    if (second === -1) return null;
+
+    const name = line.slice(0, first);
+    const date = line.slice(first + 1, second);
+    const whether = line.slice(second + 1);
+    return { name, date, whether };
+}
+
+function loadInlandWhetherCSV(regionCode) {
+    if (!regionCode) return Promise.resolve(null);
+    const cacheKey = `${regionCode}_inlandWhetherData`;
+    if (window[cacheKey]) return Promise.resolve(window[cacheKey]);
+    const url = `/data/${regionCode}_inLand_recalculated.csv`;
+
+    return fetch(url).then(res => {
+        if (!res.ok) throw new Error("inland whether csv fetch失敗: " + url);
+        return res.text();
+    }).then(text => {
+        const lines = text.trim().split("\n");
+        lines.shift();
+        const parsedData = lines.map(line => {
+            const obj = splitCSVLine(line); 
+            if (!obj) return null;
+            let parsed;
+            try { parsed = JSON.parse(obj.whether); } catch (e) { return null; }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            let csvDate = null;
+            if (obj.date) {
+                const safeDateStr = obj.date.replace(/-/g, "/");
+                csvDate = new Date(safeDateStr);
+                csvDate.setHours(0, 0, 0, 0);
+            }
+
+            const isToday = csvDate && csvDate.getTime() === today.getTime();
+            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
+
+            if (isToday) {
+                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) parsed.daily[4] = null; 
+            } 
+            else if (isYesterday) {
+                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
+                    parsed.hourly[0] = parsed.hourly[1];
+                    parsed.hourly[1] = parsed.hourly[2];
+                    parsed.hourly[2] = null;
+                }
+            }
+            return { name: obj.name, date: obj.date, whether: parsed };
+        }).filter(Boolean);
+
+        window[cacheKey] = parsedData;
+        return parsedData;
+    }).catch(err => {
+        console.warn(err);
+        return null;
+    });
+}
+
+function applyInlandWhetherToSpots(csvData) {
+    if (!csvData || !window.spotData) return;
+    const map = {};
+    for (const row of csvData) {
+        if (!row.name || !row.whether) continue;
+        map[row.name] = row.whether;
+    }
+    for (const spot of window.spotData) {
+        const spotId = String(spot.individualId || spot.id || "");
+        if (spotId.startsWith("L")) {
+            if (map[spot.name] !== undefined) spot.whether = map[spot.name];
+        }
+    }
+}
+
+function openArea(areaKey, isUserAction = false) {
+  const container = document.getElementById('area-guide');
+  container.classList.remove('collapsed-mode');
+  container.classList.add('active-mode');
+
+  document.querySelectorAll('#area-guide .area').forEach(area => {
+    const text = area.querySelector('.text');
+    if (area.id === areaKey) {
+      area.classList.add('active');
+      text.classList.add('open');
+      container.insertBefore(area, container.children[1]);
+      if (isUserAction) area.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else {
+      area.classList.remove('active');
+      text.classList.remove('open');
+    }
+  });
+}
+
+function renderAreaGuide() {
+    const container = document.getElementById('area-guide');
+    if (!container) return; 
+    if (!window.prefData) return;
+    container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
+    if (!window.areaData) return;
+
+    window.areaData.forEach(area => {
+        const div = document.createElement('div');
+        div.className = 'area';
+        div.id = area.individualId; 
+        div.innerHTML = `<h2>${area.name}</h2><p class="text">${area.notes}</p>`;
+
+        div.querySelector('h2').addEventListener('click', () => {
+            let isPhase2OSM = false;
+            if (window.map && window.map.getZoom() === 13) {
+                window.map.eachLayer(layer => {
+                    if (layer instanceof L.TileLayer) {
+                        const url = layer._url || '';
+                        if (url.includes('openstreetmap')) isPhase2OSM = true;
+                    }
+                });
+            }
+
+            if (window.currentSpotId || isPhase2OSM) {
+                if (typeof stopZoomGuard === 'function') stopZoomGuard();
+                if (window.map) {
+                    window.map.dragging.enable();
+                    window.map.scrollWheelZoom.enable();
+                    window.map.doubleClickZoom.enable();
+                    window.map.touchZoom.enable();
+                    window.map.setMinZoom(0);
+                    window.map.setMaxZoom(18);
+                    window.map.setMaxBounds(null);
+                    if (window.map.options) window.map.options.maxBoundsViscosity = 0;
+
+                    if (window.fishLayer) window.map.removeLayer(window.fishLayer);
+                    if (window.phase2Group) window.phase2Group.clearLayers();
+                    if (window.phase1Group) window.phase1Group.clearLayers();
+                    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+                    window.map.eachLayer(layer => {
+                        if (layer === window.gsiLayer) return;
+                        if (layer instanceof L.TileLayer) {
+                            const url = layer._url || '';
+                            if (url.includes('seamlessphoto') || url.includes('openstreetmap')) {
+                                window.map.removeLayer(layer);
+                            }
+                        }
+                    });
+                    
+                    if (!window.gsiLayer) {
+                        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+                    } else {
+                        window.gsiLayer.setUrl(window.gsiLayers.ort);
+                        window.gsiLayer.addTo(window.map); 
+                    }
+                    if (typeof disablePhase2 === 'function') disablePhase2(window.map);
+                }
+
+                if (typeof removeWeekItem === 'function') removeWeekItem();
+                if (typeof resetWeatherUI === 'function') resetWeatherUI();
+                if (typeof clearSub2Weather === 'function') clearSub2Weather();
+                
+                const nearest = document.getElementById("nearest-spot");
+                if (nearest) nearest.textContent = "";
+                window.currentSpotId = null;
+            }
+
+            updateURLState(area.name, null);
+            updateStateFromURL();
+            routeUpdate();
+            openArea(area.individualId, true);
+        });
+
+        container.appendChild(div);
+    });
+}
+
+function resetAreaGuide() {
+  const container = document.getElementById('area-guide');
+  container.classList.remove('active-mode');
+  container.classList.add('collapsed-mode');
+  renderAreaGuide();
+}
+
+function renderPrefectureUI() {
+    if (!window.prefData) return;
+    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
+
+    try {
+        renderAreaGuide();
+        if (window.markerControl && window.markerControl.preloadShop01) {
+            window.markerControl.preloadShop01(shopUrl);
+        }
+        getAlertText(window.prefData, function(result) {
+            const el = document.getElementById("alert-bar");
+            if (!el) return;
+            el.textContent = result.text;
+            el.style.color = result.color;
+        });
+    } catch (err) {
+        console.error("UI初期化エラー:", err);
+    }
+}
+
+window.selectPrefecture = function(csvParam) {
+    let region = window.currentRegion || 'KANTO';
+    let prefCode = csvParam;
+
+    if (csvParam.includes('_location')) {
+        prefCode = csvParam.split('_')[0];
+    } else if (csvParam.includes('_')) {
+        const parts = csvParam.split('_');
+        region = parts[0];
+        prefCode = parts[1];
+    } else if (csvParam.includes('.csv')) {
+        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
+        if (match) prefCode = match[1];
+    }
+
+    const url = new URL(location.href);
+    url.searchParams.set('pref', `${region}_${prefCode}`);
+    url.searchParams.delete('area');
+    url.searchParams.delete('spot');
+    url.hash = ''; 
+    history.replaceState(null, '', url);
+    routeUpdate();
+};
+
+window.fetchCacheStatus = window.fetchCacheStatus || {};
+
+function preloadCsvFiles(regionCode, prefCode) {
+    if (!regionCode || !prefCode) return;
+    const csvUrl     = `/${regionCode}/${prefCode}_location.csv`;
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+    const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
+
+    if (!window.fetchCacheStatus[prefCode]) {
+        window.fetchCacheStatus[prefCode] = true;
+        fetch(csvUrl, { priority: 'low' }).catch(()=>{});
+        fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
+        fetch(shopUrl, { priority: 'low' }).catch(()=>{});
+    }
+}
+
+let isRegionLoaded = false;
+
+function loadRegionMap(regionCode = 'KANTO') {
+    if (window.map) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+        window.map.stop();
+    }
+
+    if (window.regionData) {
+        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
+    }
+
+    if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
+        window.regionMarkers.forEach(m => {
+            if (window.map) m.addTo(window.map);
+        });
+        return;
+    }
+
+    const regionCsvUrl = `/${regionCode}/${regionCode}_region.csv`;
+
+    fetch(regionCsvUrl)
+        .then(res => {
+            if (!res.ok) throw new Error("Region CSV fetch failed");
+            return res.text();
+        })
+        .then(text => {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return;
+
+            const headers = lines[0].split(',').map(h => h.trim());
+            const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
+            const latIdx   = headers.findIndex(h => h.toLowerCase() === 'lat');
+            const lngIdx   = headers.findIndex(h => h.toLowerCase() === 'lng');
+            const zoomIdx  = headers.findIndex(h => h.toLowerCase() === 'zoom');
+            const nameIdx  = headers.findIndex(h => h.toLowerCase() === 'name');
+            const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
+            const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
+
+            if (typeIdx === -1) return;
+
+            window.regionMarkers = window.regionMarkers || [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue;
+                const cols = lines[i].split(',').map(c => c.trim());
+                const type = cols[typeIdx];
+
+                if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
+                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
+                    const lat = parseFloat(cols[latIdx]);
+                    const lng = parseFloat(cols[lngIdx]);
+                    const zoom = parseFloat(cols[zoomIdx]);
+                    window.regionData = { name, lat, lng, zoom };
+                    drawLocation(name, lat, lng, zoom);
+                }
+
+                if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
+                    const urlVal = cols[urlIdx];
+                    const prefName = cols[notesIdx];
+                    if (!urlVal) continue;
+
+                    const parts = urlVal.split('/');
+                    let prefCode = '';
+                    let lat, lng;
+                    
+                    if (parts.length >= 4) {
+                        prefCode = parts[1].split('_')[0]; 
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
+                    } else if (parts.length === 3) {
+                        prefCode = parts[0].split('_')[0]; 
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    } else continue;
+
+                    if (isNaN(lat) || isNaN(lng)) continue;
+                    if (typeof preloadCsvFiles === 'function') preloadCsvFiles(regionCode, prefCode);
+
+                    const prefIcon = L.divIcon({
+                        className: 'pref-choice-marker',
+                        html: `<div class="pref-choice-label">${prefName}</div>`,
+                        iconSize: [90, 35],
+                        iconAnchor: [45, 17]
+                    });
+
+                    if (window.map) {
+                        const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
+                        marker.on('click', () => {
+                            if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
+                            window.selectPrefecture(`${regionCode}_${prefCode}`);
+                        });
+                        window.regionMarkers.push(marker);
+                    }
+                }
+            }
+            isRegionLoaded = true;
+        })
+        .catch(err => console.error("Regionマップの初期化エラー:", err));
+}
+
+// ==========================================
+// 1. データ読み込み専用関数
+// ==========================================
+async function loadPrefectureData(prefCode) {
+    window.fishData = null; 
+    window.currentPref = prefCode;
+    const region = window.currentRegion || 'KANTO';
+    
+    const csvUrl     = `/${region}/${prefCode}_location.csv`;
+    window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+
+    try {
+        await loadLocationCSV(csvUrl);
+        const whetherCsv = await loadWhetherCSV(whetherUrl);
+        applyWhetherToSpots(whetherCsv);
+
+        if (typeof loadInlandWhetherCSV === 'function') {
+            const inlandCsv = await loadInlandWhetherCSV(region);
+            if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
+        }
+        renderPrefectureUI();
+        return true; 
+    } catch (err) {
+        console.error("データ読み込みエラー:", err);
+        return false;
+    }
+}
+
+
+</script>
+
+
+
+</body>
+</html>
