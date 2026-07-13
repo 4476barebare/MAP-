@@ -1575,17 +1575,17 @@ function renderPrefectureUI() {
 // ★ 追加：URLの pref クエリから Region と Pref を安全に抽出する関数
 // ==========================================
 function getParsedPrefQuery() {
-    const url = new URL(location.href);
-    const query = url.searchParams.get('pref');
-    if (!query) return { region: null, pref: null };
+    //const url = new URL(location.href);
+    //const query = url.searchParams.get('pref');
+    //if (!query) return { region: null, pref: null };
     
-    // "KANTO_CHIBA" を安全に分割
-    const parts = query.split('_');
-    if (parts.length >= 2) {
-        return { region: parts[0], pref: parts[1] };
-    }
-    // "CHIBA" しか入っていなかった場合の保険
-    return { region: 'KANTO', pref: parts[0] };
+
+    //const parts = query.split('_');
+    //if (parts.length >= 2) {
+    //    return { region: parts[0], pref: parts[1] };
+    //}
+    //return { region: 'KANTO', pref: parts[0] };
+    return { region: 'KANTO', pref: 'CHIBA' };
 }
 
 // ==========================================
