@@ -264,9 +264,14 @@ function enableAreaSwipe() {
 
         disableAreaSwipe();
         
-        // ★ここが重要（順番固定）
-        location.hash = '#' + encodeURIComponent(nextArea.name);
-        updateStateFromHash();
+        // 1. クエリを更新（日本語名notesを使用）
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', nextArea.name);
+        setIdealQuery('spot', null);
+
+        // 2. システム変数を直接更新
+        window.currentAreaId = nextArea.areaId + '_' + nextArea.individualId;
+        window.currentSpotId = null;
         
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
@@ -1239,16 +1244,6 @@ function zoomToSpot(spot) {
     clearSub2Weather();
     removeCrowdImage();
 
-    // ========================
-    // レイヤー再構築
-    // ========================
-
-    // ========================
-    // データ整形
-    // ========================
-    // ========================
-    // データ整形
-    // ========================
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
 
@@ -1318,11 +1313,17 @@ function zoomToSpot(spot) {
     if (el) el.textContent = safe.name || '';
 
     if (safe?.individualId != null) {
-        const hash = location.hash.replace('#', '');
-        if (!hash.endsWith('/' + safe.individualId)) {
-            location.hash = hash + '/' + safe.individualId;
-            updateStateFromHash();
-        }
+        // 1. クエリを更新（日本語名notesを使用）
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        
+        // 親エリアの名前を探してセット
+        const parentArea = window.areaData.find(a => String(a.areaId + '_' + a.individualId) === String(safe.areaId));
+        if (parentArea) setIdealQuery('area', parentArea.name);
+        
+        setIdealQuery('spot', safe.name);
+
+        // 2. システム変数を直接更新（エリアは維持したままスポットIDを追加）
+        window.currentSpotId = safe.individualId;
     }
 
     // ========================
