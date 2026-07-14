@@ -1740,34 +1740,6 @@ function getParsedPrefQuery() {
     return { region: 'KANTO', pref: '千葉県' };
 }
 
-// ==========================================
-// 3. マーカー等から県が選択された時のトリガー
-// ==========================================
-window.selectPrefecture = function(csvParam) {
-    let region = window.currentRegion || 'KANTO';
-    let prefCode = csvParam;
-
-    // 様々な引数パターンに対応して確実に県コードだけを抜く
-    if (csvParam.includes('_location')) {
-        prefCode = csvParam.split('_')[0];
-    } else if (csvParam.includes('_')) {
-        const parts = csvParam.split('_');
-        region = parts[0];
-        prefCode = parts[1];
-    } else if (csvParam.includes('.csv')) {
-        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
-        if (match) prefCode = match[1];
-    }
-
-    const url = new URL(location.href);
-    // ★ URLの見た目だけを "KANTO_CHIBA" にする
-    url.searchParams.set('pref', `${region}_${prefCode}`);
-    url.hash = ''; 
-    history.replaceState(null, '', url);
-
-    routeUpdate();
-};
-
 
 // ==========================================
 // 爆速化：バックグラウンドCSVプリロード (index.html)
@@ -1928,6 +1900,49 @@ function loadRegionMap() {
         })
         .catch(err => console.error("Regionマップの初期化エラー:", err));
 }
+
+// ==========================================
+// 3. マーカー等から県が選択された時のトリガー
+// ==========================================
+window.selectPrefecture = function(csvParam, prefName) { // ★ 第2引数に prefName を追加
+    let region = window.currentRegion || 'KANTO';
+    let prefCode = csvParam;
+
+    // 様々な引数パターンに対応して確実に県コードだけを抜く
+    if (csvParam.includes('_location')) {
+        prefCode = csvParam.split('_')[0];
+    } else if (csvParam.includes('_')) {
+        const parts = csvParam.split('_');
+        region = parts[0];
+        prefCode = parts[1];
+    } else if (csvParam.includes('.csv')) {
+        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
+        if (match) prefCode = match[1];
+    }
+
+    // ★ 1. システム変数を確定させる
+    window.currentRegion = region;
+    window.currentPref = prefCode;
+    
+    // ★ 2. パスを一括でグローバル生成
+    window.prefLocationUrl      = `/${region}/${prefCode}_location.csv`;
+    window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
+    window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
+    window.fishUrl              = `/${region}/${prefCode}_fish.csv`;
+    window.prefShopUrl          = `/${region}/${prefCode}_shop.csv`;
+
+    // ★ 3. 古い英語クエリの直書きを廃止し、日本語のクエリをセット！
+    if (prefName) {
+        setIdealQuery('pref', prefName);
+    } else {
+        setIdealQuery('pref', prefCode); // 万が一の保険
+    }
+    setIdealQuery('area', null);
+    setIdealQuery('spot', null);
+
+    routeUpdate();
+};
+
 
 async function loadPrefectureData(prefCode) {
     window.fishData = null; 
