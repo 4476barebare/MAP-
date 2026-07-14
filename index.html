@@ -1801,10 +1801,12 @@ function preloadCsvFiles(regionCode, prefCode) {
 // ■ 初期画面のRegionマップ読み込み
 // ================================
 let isRegionLoaded = false;
-
 // ★ 引数 regionCode のデフォルト処理や再生成を廃止し、グローバル変数をそのまま fetch に使う
 function loadRegionMap() {
     
+    // ★ 追加：関数内で使うためにグローバル変数から取得しておく
+    const regionCode = window.currentRegion || 'KANTO';
+
     // 1. マップの可動域・ズーム制限を完全にリセット
     if (window.map) {
         window.map.setMinZoom(0);
@@ -1832,7 +1834,7 @@ function loadRegionMap() {
         return;
     }
 
-    // ★ 4. 重複作成していた regionUrl の生成処理を削除し、既存のグローバル変数で直接フェッチする
+    // 4. 既存のグローバル変数で直接フェッチする
     fetch(window.regionUrl) 
         .then(res => {
             if (!res.ok) throw new Error("Region CSV fetch failed");
@@ -1870,7 +1872,6 @@ function loadRegionMap() {
                     // 次回のためにグローバルに保存
                     window.regionData = { name, lat, lng, zoom };
 
-                    // ★【ここが修正点】ストッパーを外し、ここで無条件に必ずカメラを動かす！
                     // 初回ロード時も、URL直打ちから戻ってきた時も、確実に広域座標へ飛びます。
                     drawLocation(name, lat, lng, zoom);
                 }
@@ -1897,6 +1898,7 @@ function loadRegionMap() {
 
                     if (isNaN(lat) || isNaN(lng)) continue;
 
+                    // ★ regionCode が復活したのでここもエラーになりません
                     if (typeof preloadCsvFiles === 'function') {
                         preloadCsvFiles(regionCode, prefCode);
                     }
@@ -1914,6 +1916,7 @@ function loadRegionMap() {
 
                         marker.on('click', () => {
                             if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
+                            // ★ regionCode が復活したので正しく "KANTO_CHIBA" になります
                             window.selectPrefecture(`${regionCode}_${prefCode}`);
                         });
 
