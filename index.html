@@ -1978,49 +1978,44 @@ async function loadPrefectureData(prefCode) {
 // ★ データの完全性チェック＆ロード関数
 // ==========================================
 async function checkAndLoadRouteData() {
-    // getParsedPrefQuery() は呼ばない（日本語が返ってくるため）
-    // すでに DOMContentLoaded で applyQueryToStateFromCsv() が走り、
-    // window.currentPref (例: "CHIBA") などが確定している前提で動く。
-
     const prefCode = window.currentPref;
     const region = window.currentRegion || 'KANTO';
     
-    // Region（広域）画面ならデータチェックは不要
     if (!prefCode) return true; 
 
     let needsBaseLoad = false;
     let needsFishLoad = false;
 
-    // 1. 県の基本データ（ロケーション・天気）が揃っているか
     if (!window.prefData) {
         needsBaseLoad = true;
     } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
         needsBaseLoad = true;
     }
 
-    // 2. エリア/スポット画面特有のチェック (魚データ)
-    let resolvedAreaId = window.currentAreaId; // ハッシュではなく、確定済みの変数を使う
+    let resolvedAreaId = window.currentAreaId; 
     
-    // もし areaId が確定しているのに魚データが無ければロードフラグを立てる
     if (resolvedAreaId && !window.fishData) {
         needsFishLoad = true;
     }
 
-    // --- データ不足時のロード処理 ---
     if (needsBaseLoad || needsFishLoad) {
         
-        // ① ロケーションと天気（沿岸・内陸）を一括ロード
         if (needsBaseLoad) {
             await loadPrefectureData(prefCode);
             renderPrefectureUI(); 
+            
+            // ★【修正1】URL直打ち対策
+            // いきなりエリア階層からスタートした場合でも、県域のマーカーやメニューが
+            // 構築されるように、初回データロード完了時に確実に一度だけ実行する
+            if (typeof showPrefSpots === 'function') showPrefSpots();
+            if (typeof initAreaUI === 'function') initAreaUI();
+            if (typeof renderPrefWeather === 'function') renderPrefWeather();
         }
         
-        // ② 魚データをロード
         if (resolvedAreaId) {
             await prepareFishForArea(resolvedAreaId);
         }
 
-        // ③ データの準備が完全に整ったので、改めてルート更新を最初からやり直す
         routeUpdate();
         return false; 
     }
@@ -2031,15 +2026,10 @@ async function checkAndLoadRouteData() {
 // ==========================================
 // 4. ハブとなる routeUpdate (クエリ連動テスト版)
 // ==========================================
-// ==========================================
-// 4. ハブとなる routeUpdate (クエリ連動テスト版)
-// ==========================================
 async function routeUpdate() {
-    // ★ ここで初めてCSVが読み込まれ、window.prefData や window.spotData が作成される！
     const isReady = await checkAndLoadRouteData();
-    if (!isReady) return; // 読み込み完了（オブジェクト作成）までここでストップ[span_6](start_span)[span_6](end_span)
+    if (!isReady) return; 
 
-    // ★ 以降の処理は、window.prefData が100%作成し終わっていることが保証される！[span_7](start_span)[span_7](end_span)
     if (!window.currentPref) {
         document.getElementById('map-back-btn').style.display = 'none';
         loadRegionMap(window.currentRegion || 'KANTO');
@@ -2056,7 +2046,6 @@ async function routeUpdate() {
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
         
         if (spot) {
-            // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
             if (parentArea) setIdealQuery('area', parentArea.name);
@@ -2082,14 +2071,15 @@ async function routeUpdate() {
         const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
         if (!area) return;
         
-        // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
         setIdealQuery('pref', window.prefData.notes);
         setIdealQuery('area', area.name); 
         setIdealQuery('spot', null);      
 
         const safeZoom = area.zoom || window.prefData.zoom;
         drawLocation(area.name, area.lat, area.lng, safeZoom);
-        selectArea(area.name);
+        
+        // ★【修正2】area.name (文字列) ではなく、area (オブジェクト) 自身を渡す
+        selectArea(area); 
         renderCrowdImage();
         
         requestAnimationFrame(() => {
@@ -2101,12 +2091,9 @@ async function routeUpdate() {
         });
         return;
     }
-//alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
 
     // ─── 県階層 ───
     if (window.prefData) {
-
-        // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
         setIdealQuery('pref', window.prefData.notes); 
         setIdealQuery('area', null);                 
         setIdealQuery('spot', null);                 
@@ -2115,9 +2102,10 @@ async function routeUpdate() {
         
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                showPrefSpots();
-                initAreaUI();
-                renderPrefWeather();
+                // ここは「戻る」ボタン等で県画面に戻ってきた時の再構築用として残す
+                if (typeof showPrefSpots === 'function') showPrefSpots();
+                if (typeof initAreaUI === 'function') initAreaUI();
+                if (typeof renderPrefWeather === 'function') renderPrefWeather();
                 renderCrowdImage();
                 
                 requestAnimationFrame(() => {
@@ -2131,6 +2119,7 @@ async function routeUpdate() {
         });
     }
 }
+
 // ★ Region名の変換マッピング
 const REGION_MAP = {
     "関東地方": "KANTO",
