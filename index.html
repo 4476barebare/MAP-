@@ -409,15 +409,9 @@ async function applyQueryToStateFromCsv() {
                                 // name列を pref(現在の県)としてグローバル定義
                                 window.currentPref = cols[nameIdx];
                                 
-                                // URL列の処理 (例: KANTO/CHIBA_location.csv/35.56/140.18)
-                                const rawUrl = cols[urlIdx];
-                                
-                                // "/"でスプリット（先頭の"/"等の空文字エラーを防ぐためfilterを挟む）
-                                let parts = rawUrl.split('/').filter(p => p !== ''); 
-                                
-                                // 0と1を使ってURLを組み立てる（2と3の座標は排除される）
-                                if (parts.length >= 2) {
-                                    window.prefLocationUrl = `/${parts[0]}/${parts[1]}`;
+                                // ★ url列に何らかの値が入っているかだけをチェックし、パスを生成
+                                if (cols[urlIdx]) {
+                                    window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.csv`;
                                 }
                                 break;
                             }
@@ -1801,8 +1795,8 @@ function preloadCsvFiles(regionCode, prefCode) {
 // ================================
 let isRegionLoaded = false;
 
-// ★ 引数で受け取る
-function loadRegionMap(regionCode = 'KANTO') {
+// ★ 引数 regionCode のデフォルト処理や再生成を廃止し、グローバル変数をそのまま fetch に使う
+function loadRegionMap() {
     
     // 1. マップの可動域・ズーム制限を完全にリセット
     if (window.map) {
@@ -1831,10 +1825,8 @@ function loadRegionMap(regionCode = 'KANTO') {
         return;
     }
 
-    // 4. 初回 or URL直打ちからの戻り時は、CSVをフェッチする
-    window.regionUrl = `/${regionCode}/${regionCode}_region.csv`; // ★ const を window.regionUrl に変更
-
-    fetch(window.regionUrl) // ★ 引数も変
+    // ★ 4. 重複作成していた regionUrl の生成処理を削除し、既存のグローバル変数で直接フェッチする
+    fetch(window.regionUrl) 
         .then(res => {
             if (!res.ok) throw new Error("Region CSV fetch failed");
             return res.text();
@@ -1928,23 +1920,19 @@ function loadRegionMap(regionCode = 'KANTO') {
 }
 
 async function loadPrefectureData(prefCode) {
-    // ★ 念のための二重ロック：ロード開始時に前の魚データを確実に消し去る
     window.fishData = null; 
     window.currentPref = prefCode;
     const region = window.currentRegion || 'KANTO';
     
-    // ★ 追加：ここでグローバルにregionのURLを持たせる
+    // ★ 1. 重複していた regionUrl の生成コードを削除し、グローバル変数で上書き定義のみ残す
     window.regionUrl = `/${region}/${region}_region.csv`; 
-    
-    const csvUrl     = `/${region}/${prefCode}_location.csv`;
-    window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-
 
     try {
-        await loadLocationCSV(csvUrl);
+        // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
+        await loadLocationCSV(window.prefLocationUrl);
         
         // 沿岸部の天気を取得して全スポットに付与
+        const whetherUrl = `/data/${prefCode}_whether.csv`;
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
 
@@ -2118,22 +2106,37 @@ alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.cu
         });
     }
 }
+// ★ Region名の変換マッピング
+const REGION_MAP = {
+    "関東地方": "KANTO",
+    "KANTO": "KANTO" // 互換性のため
+};
+
+// URLクエリからRegionを取得する際、マッピングを通す
+function getRegionCode() {
+    const url = new URL(location.href);
+    const q = url.searchParams.get('region');
+    return REGION_MAP[q] || 'KANTO'; // デフォルトはKANTO
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
     
-    window.currentRegion = 'KANTO';
-    window.regionUrl = '/KANTO/KANTO_region.csv';
-
+    // ★ 1. URLにクエリが無い初回アクセス時、ここで「関東地方」を付ける
     const params = new URLSearchParams(window.location.search);
     if (!params.get('pref')) {
-        setIdealQuery('region', 'KANTO'); // ★ カンマを修正
+        setIdealQuery('region', '関東地方'); // ★ ここを日本語にする
         setIdealQuery('pref', '千葉県');
     }
-    
+
+    // ★ 2. マッピングを使ってグローバル変数を定義する
+    window.currentRegion = getRegionCode();
+    window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
+
+    // ★ 3. 変数が定義された状態で逆引きを実行
     await applyQueryToStateFromCsv();
     
     // データロード後の状態を確認
-    alert(`LOAD完了: pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
+    //alert(`LOAD完了: pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
 
     // ルート更新を実行
     routeUpdate();
