@@ -2019,34 +2019,33 @@ async function checkAndLoadRouteData() {
 // ==========================================
 // 4. ハブとなる routeUpdate (クエリ連動テスト版)
 // ==========================================
+// ==========================================
+// 4. ハブとなる routeUpdate (クエリ連動テスト版)
+// ==========================================
 async function routeUpdate() {
+    // ★ ここで初めてCSVが読み込まれ、window.prefData や window.spotData が作成される！
     const isReady = await checkAndLoadRouteData();
-    if (!isReady) return; 
+    if (!isReady) return; // 読み込み完了（オブジェクト作成）までここでストップ[span_6](start_span)[span_6](end_span)
 
-    const { region, pref: prefCode } = getParsedPrefQuery();
-
-    if (!prefCode) {
+    // ★ 以降の処理は、window.prefData が100%作成し終わっていることが保証される！[span_7](start_span)[span_7](end_span)
+    if (!window.currentPref) {
         document.getElementById('map-back-btn').style.display = 'none';
-        loadRegionMap(region || window.currentRegion || 'KANTO');
+        loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
-
-    window.currentRegion = region || 'KANTO';
-
-    if (typeof updateStateFromHash === 'function') updateStateFromHash();
 
     // ─── スポット階層 ───
     if (window.currentSpotId) {
         const spotId = String(window.currentSpotId).split("_");
-        const safeAreaId = window.currentAreaId || ""; // ★ エラー回避：null対策
+        const safeAreaId = window.currentAreaId || ""; 
         
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
-        // ★ エラー回避：配列の長さに依存しないフォールバック
         const targetIndivId = spotId[2] || spotId[0]; 
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
         
         if (spot) {
-            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
+            setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
             if (parentArea) setIdealQuery('area', parentArea.name);
             setIdealQuery('spot', spot.name);
@@ -2057,12 +2056,8 @@ async function routeUpdate() {
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
                 if (btn) {
-                    btn.style.opacity = '0';
                     btn.style.display = 'block';
-                    requestAnimationFrame(() => {
-                        btn.style.transition = 'opacity 0.4s ease';
-                        btn.style.opacity = '1';
-                    });
+                    requestAnimationFrame(() => { btn.style.opacity = '1'; });
                 }
             });
         }
@@ -2071,16 +2066,16 @@ async function routeUpdate() {
 
     // ─── エリア階層 ───
     if (window.currentAreaId) {
-        const safeAreaId = window.currentAreaId || ""; // ★ エラー回避：null対策
+        const safeAreaId = window.currentAreaId || ""; 
         const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
         if (!area) return;
         
-        if (window.prefData) setIdealQuery('pref', window.prefData.name);
+        // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
+        setIdealQuery('pref', window.prefData.notes);
         setIdealQuery('area', area.name); 
         setIdealQuery('spot', null);      
 
-        // ★ エラー回避：prefDataが万が一無い場合のデフォルトズームを設定
-        const safeZoom = area.zoom || (window.prefData ? window.prefData.zoom : 10);
+        const safeZoom = area.zoom || window.prefData.zoom;
         drawLocation(area.name, area.lat, area.lng, safeZoom);
         selectArea(area.name);
         renderCrowdImage();
@@ -2088,12 +2083,8 @@ async function routeUpdate() {
         requestAnimationFrame(() => {
             const btn = document.getElementById('map-back-btn');
             if (btn) {
-                btn.style.opacity = '0';
                 btn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    btn.style.transition = 'opacity 0.4s ease';
-                    btn.style.opacity = '1';
-                });
+                requestAnimationFrame(() => { btn.style.opacity = '1'; });
             }
         });
         return;
@@ -2101,7 +2092,8 @@ async function routeUpdate() {
 
     // ─── 県階層 ───
     if (window.prefData) {
-        setIdealQuery('pref', window.prefData.name); 
+        // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
+        setIdealQuery('pref', window.prefData.notes); 
         setIdealQuery('area', null);                 
         setIdealQuery('spot', null);                 
 
@@ -2117,18 +2109,15 @@ async function routeUpdate() {
                 requestAnimationFrame(() => {
                     const btn = document.getElementById('map-back-btn');
                     if (btn) {
-                        btn.style.opacity = '0';
                         btn.style.display = 'block';
-                        requestAnimationFrame(() => {
-                            btn.style.transition = 'opacity 0.4s ease';
-                            btn.style.opacity = '1';
-                        });
+                        requestAnimationFrame(() => { btn.style.opacity = '1'; });
                     }
                 });
             });
         });
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     
