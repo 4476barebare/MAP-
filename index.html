@@ -2031,6 +2031,9 @@ async function routeUpdate() {
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; 
 
+    // ★ 追加：routeUpdate が本番処理に入る瞬間のデータ状態をアラートで確認
+    alert(`【routeUpdate 通過時】\nprefData存在: ${!!window.prefData}\nspotData件数: ${window.spotData ? window.spotData.length : '0 または undefined'}`);
+
     if (!window.currentPref) {
         document.getElementById('map-back-btn').style.display = 'none';
         loadRegionMap(window.currentRegion || 'KANTO');
@@ -2079,7 +2082,7 @@ async function routeUpdate() {
         const safeZoom = area.zoom || window.prefData.zoom;
         drawLocation(area.name, area.lat, area.lng, safeZoom);
         
-        // ★【修正2】area.name (文字列) ではなく、area (オブジェクト) 自身を渡す
+        // ★ area (オブジェクト) 自身を渡す
         selectArea(area); 
         renderCrowdImage();
         
