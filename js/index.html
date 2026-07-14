@@ -222,484 +222,256 @@ window.fishUrl = null;
 window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
-function showDebug(msg, clear = false) {
-    let debugEl = document.getElementById('debug');
-    if (!debugEl) {
-        debugEl = document.createElement('div');
-        debugEl.id = 'debug';
-        debugEl.style.position = 'fixed';
-        debugEl.style.top = '0';
-        debugEl.style.left = '0';
-        debugEl.style.background = 'rgba(255,255,0,0.85)';
-        debugEl.style.zIndex = '9999';
-        debugEl.style.padding = '6px';
-        debugEl.style.fontSize = '12px';
-        debugEl.style.maxWidth = '320px';
-        debugEl.style.whiteSpace = 'pre-wrap';
-        debugEl.style.maxHeight = '40vh';
-        debugEl.style.overflow = 'auto';
-        document.body.appendChild(debugEl);
-    }
-    if (clear) debugEl.textContent = "";
-    debugEl.textContent += msg + "\n";
-}
-
-// ==========================================
-// ■ エリア名(日本語)から currentAreaId を生成する関数
-// ==========================================
-function getAreaIdFromQuery(areaQuery) {
-    if (!areaQuery || !window.areaData) return null;
-    let area = window.areaData.find(a => a.name === areaQuery);
-    if (!area) {
-        area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
-    }
-    if (area) return area.areaId + "_" + area.individualId;
-    return null;
-}
-
-// ==========================================
-// ■ スポット名(日本語)から currentSpotId を生成する関数
-// ==========================================
-function getSpotIdFromQuery(spotQuery, resolvedAreaId) {
-    if (!spotQuery || !resolvedAreaId || !window.spotData) return null;
-    let spot = window.spotData.find(s => s.name === spotQuery && s.areaId === resolvedAreaId);
-    if (!spot) {
-        spot = window.spotData.find(s => String(s.individualId) === String(spotQuery) && s.areaId === resolvedAreaId);
-    }
-    if (spot) return spot.individualId;
-    return null;
-}
-
-// ==========================================
-// ■ URLを書き換える共通ヘルパー関数
-// ==========================================
-function updateURLState(areaName, spotName) {
-    const url = new URL(location.href);
-    if (areaName) {
-        url.searchParams.set('area', areaName);
-    } else {
-        url.searchParams.delete('area');
-    }
-    if (spotName) {
-        url.searchParams.set('spot', spotName);
-    } else {
-        url.searchParams.delete('spot');
-    }
-    url.hash = ''; 
-    history.pushState(null, '', url);
-}
-
-function updateStateFromURL() {
-    const url = new URL(location.href);
-    const prefCode = url.searchParams.get('pref');
-    const areaQuery = url.searchParams.get('area'); 
-    const spotQuery = url.searchParams.get('spot'); 
-
-    if (!prefCode && !areaQuery) {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-        return;
-    }
-    if (!areaQuery || areaQuery.trim() === "") {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-        return;
-    }
-
-    const resolvedAreaId = getAreaIdFromQuery(areaQuery);
-
-    if (!resolvedAreaId) {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-    }
-    else if (resolvedAreaId && !spotQuery) {
-        window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = null;
-    }
-    else if (resolvedAreaId && spotQuery) {
-        window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = getSpotIdFromQuery(spotQuery, resolvedAreaId);
-    }
-}
-
-// ==========================================
-// ★ URLの pref クエリから Region と Pref を抽出する関数
-// ==========================================
-function getParsedPrefQuery() {
-    const url = new URL(location.href);
-    const query = url.searchParams.get('pref');
-    if (!query) return { region: null, pref: null };
-    const parts = query.split('_');
-    if (parts.length >= 2) {
-        return { region: parts[0], pref: parts[1] };
-    }
-    return { region: 'KANTO', pref: parts[0] };
-}
-
-window._isGoingBack = false;
-
-function goBack() {
-    if (window._isGoingBack) return;
-    window._isGoingBack = true;
-
-    const backBtn = document.getElementById('map-back-btn');
-    if (backBtn) {
-        backBtn.style.pointerEvents = 'none'; 
-        backBtn.style.transition = 'opacity 0.3s ease';
-        backBtn.style.opacity = '0';
-    }
-
-    const releaseLockAndShowBtn = () => {
-        window._isGoingBack = false; 
-        if (backBtn) {
-            backBtn.style.display = 'block';
-            requestAnimationFrame(() => {
-                backBtn.style.transition = 'opacity 0.4s ease';
-                backBtn.style.opacity = '1';
-                backBtn.style.pointerEvents = 'auto'; 
-            });
-        }
-    };
-
-    if (!window.currentAreaId && !window.currentSpotId) {
-        const regionToLoad = window.currentRegion || 'KANTO';
-        const url = new URL(location.href);
-        url.searchParams.delete('pref');
-        url.searchParams.delete('area');
-        url.searchParams.delete('spot');
-        url.hash = '';
-        history.replaceState(null, '', url);
-
-        window.currentPref = null;
-        window.prefData = null;
-
-        if (typeof destroyAreaUI === 'function') destroyAreaUI();
-        if (typeof removeCrowdImage === 'function') removeCrowdImage();
-        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
-            window.markerControl.clearLayers();
-        }
-        if (window.phase1Group) window.phase1Group.clearLayers();
-        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-        if (window.prefSpotLayer) {
-            window.map.removeLayer(window.prefSpotLayer);
-            window.prefSpotLayer = null;
-        }
-        const alertBar = document.getElementById("alert-bar");
-        if (alertBar) alertBar.textContent = "";
-
-        setTimeout(() => {
-            if (backBtn) {
-                backBtn.style.display = 'none';
-                backBtn.style.pointerEvents = 'auto';
-            }
-            window._isGoingBack = false; 
-        }, 300);
-
-        loadRegionMap(regionToLoad);
-        return;
-    }
+// 1. デバッグ用のDOMを自動生成して文字を出す関数（上書きモード）
+function showdebug(msg) {
+    let debugBox = document.getElementById('my-debug-box');
     
-    window.map.touchZoom.disable();
-    window.map.dragging.disable();
-
-    const area = window.areaData.find(a =>
-        String(a.individualId) === String(window.currentAreaId?.split('_')[1])
-    );
-
-    if (!area) {
-        window._isGoingBack = false;
-        return;
+    if (!debugBox) {
+        debugBox = document.createElement('div');
+        debugBox.id = 'my-debug-box';
+        debugBox.style.position = 'fixed';
+        debugBox.style.top = '10px';
+        debugBox.style.left = '10px';
+        debugBox.style.zIndex = '9999';
+        debugBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        debugBox.style.color = '#00FF00';
+        debugBox.style.padding = '10px';
+        debugBox.style.borderRadius = '5px';
+        debugBox.style.fontSize = '14px';
+        debugBox.style.pointerEvents = 'none';
+        document.body.appendChild(debugBox);
     }
 
-    const z = window.map.getZoom();
-    const restoreSpot = buildSpotRestoreObject();
-    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
-    const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
+    // ★ 追記（+=）ではなく上書き（=）に変更
+    debugBox.innerHTML = msg;
+}
 
-    if ((z > 13 || isSpecial) && !isPhase2) {
-        stopZoomGuard();
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
-
-        if (window.fishLayer) window.map.removeLayer(window.fishLayer);
-        if (window.phase2Group) window.phase2Group.clearLayers();
-
-        if (!restoreSpot) {
-            window._isGoingBack = false;
-            return;
-        }
-
-        const currentAreaObj = window.areaData.find(a => window.currentAreaId === String(a.areaId + "_" + a.individualId));
-        updateURLState(currentAreaObj ? currentAreaObj.name : null, null);
-        updateStateFromURL();
-
-        removeWeekItem();
-        resetWeatherUI();
-        showSpotsForArea(window.currentAreaId);
-        selectSpot(restoreSpot);
-
-        window.map.once('moveend', () => {
-            enablePhase2(window.map);
-            phase1menu(window.currentAreaId);
-            releaseLockAndShowBtn();
-        });
-        return;
+// ==========================================
+// ★ 新規追加：URLに日本語クエリを付与・更新する共通関数
+// ==========================================
+function setIdealQuery(type, value) {
+    const url = new URL(location.href);
+    
+    if (value) {
+        url.searchParams.set(type, value);
+    } else {
+        url.searchParams.delete(type);
     }
 
-    if (z === 13 || isPhase2) {
-        disablePhase2(window.map);
-        clearSub2Weather();
+    window.history.replaceState(null, '', url);
+
+    // ★ URLを書き換えた直後に、現在のクエリ状態をチェックして画面に表示！
+    checkCurrentQuery();
+}
+
+
+
+// 2. あなたの安全な手法を使ったクエリ判定関数（全パラメータ対応版）
+function checkCurrentQuery() {
+    const url = new URL(location.href);
+    
+    // 4つのパラメータをすべて取得する
+    const region = url.searchParams.get('region');
+    const pref   = url.searchParams.get('pref');
+    const area   = url.searchParams.get('area');
+    const spot   = url.searchParams.get('spot');
+
+    // 表示用のテキストを組み立てる（<br>で改行）
+    let msg = "【現在のURLクエリ】";
+    
+    if (region) msg += `<br>region: ${region}`;
+    if (pref)   msg += `<br>pref: ${pref}`;
+    if (area)   msg += `<br>area: ${area}`;
+    if (spot)   msg += `<br>spot: ${spot}`;
+
+    if (!region && !pref && !area && !spot) {
+        msg += "<br>※クエリ無し";
+    }
+
+    // デバッグ画面を上書き更新
+    showdebug(msg);
+}
+
+
+
+
+// ==========================================
+// ★ 新規追加：内部IDから日本語名を逆引きしてURLクエリにセットする関数
+// ==========================================
+async function updateQueryFromIds(pref, currentAreaId, currentSpotId) {
+    
+    // --------------------------------------------------
+    // パターン1：第一引数 (pref) のみ存在する場合
+    // --------------------------------------------------
+    if (pref && !currentAreaId && !currentSpotId) {
         
-        const nsEl = document.getElementById("nearest-spot");
-        if (nsEl) nsEl.textContent = "";
+        // ★ グローバル化されたURLをそのまま使う！
+        if (!window.regionUrl) return;
         
-        window.map.eachLayer(layer => {
-            if (layer === window.gsiLayer) return;
-            if (layer instanceof L.TileLayer) {
-                const url = layer._url || '';
-                if (url.includes('seamlessphoto')) {
-                    window.map.removeLayer(layer);
+        try {
+            const res = await fetch(window.regionUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length > 0) {
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    const nameIdx = headers.findIndex(h => h.toLowerCase() === 'name');
+                    const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
+                    
+                    if (nameIdx !== -1 && notesIdx !== -1) {
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            if (cols[nameIdx] === pref) {
+                                setIdealQuery('pref', cols[notesIdx]);
+                                // ★ regionもついでにセットできるならここで！
+                                // setIdealQuery('region', 取得したregion名など);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
-        });
-        window.map.eachLayer(layer => {
-            if (!(layer instanceof L.TileLayer)) return;
-            const url = layer._url || '';
-            if (url.includes('openstreetmap')) {
-                window.map.removeLayer(layer);
-            }
-        });
-
-        window.osmLayer = null;
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
-
-        if (window.phase2Group) window.phase2Group.clearLayers();
-
-        if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
-        } else {
-            window.gsiLayer.setUrl(window.gsiLayers.ort);
+        } catch (err) {
+            console.error("Region CSVフェッチエラー:", err);
         }
-        window.gsiLayer.addTo(window.map);
-
-        selectArea(area);
-        renderCrowdImage();
-        
-        window.map.once('moveend', () => {
-            releaseLockAndShowBtn();
-        });
-        return;
     }
 
-    if (window.osmLayer) {
-        window.map.removeLayer(window.osmLayer);
-        window.osmLayer = null;
-    }
-    if (window.phase1Group) window.phase1Group.clearLayers();
-    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-
-    if (!window.gsiLayer) {
-        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-    } else {
-        window.gsiLayer.setUrl(window.gsiLayers.ort);
-    }
-
-    drawLocation(
-        window.prefData.name,
-        window.prefData.lat,
-        window.prefData.lng,
-        window.prefData.zoom
-    );
-    
-    updateURLState(null, null);
-
-    window.map.once('moveend', () => {
-        window.map.invalidateSize(true);
-        updateStateFromURL();
-        initAreaUI();
-        showPrefSpots();
-        renderPrefWeather();
-        resetAreaGuide();
-        releaseLockAndShowBtn();
-    });
-}
-
-// ==========================================
-// ★ データ整合性チェックとルート管理
-// ==========================================
-async function checkAndLoadRouteData() {
-    const { region, pref: prefCode } = getParsedPrefQuery();
-    
-    // ★ 修正：Region（広域）画面ならデータチェックは不要。そのまま広域マップを描画して終了する
-    if (!prefCode) {
-        // ★ これを追加！初期画面の時にグローバル変数を確実に初期化する
-        window.currentRegion = region || 'KANTO';
-        
-        loadRegionMap(window.currentRegion);
-        return false; // 以降の routeUpdate の処理を止める
-    }
-
-    let needsBaseLoad = false;
-    let needsFishLoad = false;
-
-    if (window.currentPref !== prefCode) {
-        window.fishData = null;
-    }
-
-    if (!window.prefData || window.currentPref !== prefCode) {
-        needsBaseLoad = true;
-    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
-        needsBaseLoad = true;
-    }
-
-    let resolvedAreaId = null;
-    
-    const url = new URL(location.href);
-    const areaQuery = url.searchParams.get('area'); 
-    
-    if (areaQuery) {
-        if (!window.areaData) {
-            needsBaseLoad = true;
-        } else {
-            let area = window.areaData.find(a => a.name === areaQuery);
-            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+    // --------------------------------------------------
+    // パターン2：第二引数 (currentAreaId) まで存在する場合
+    // --------------------------------------------------
+    else if (pref && currentAreaId && !currentSpotId) {
+        if (window.areaData) {
+            // 第二引数を "_" でスプリットした [0] を取得
+            const splitAreaId = String(currentAreaId).split('_')[0]; 
+            
+            // window.areaDataの individualId 列と同じものを探す
+            const area = window.areaData.find(a => String(a.individualId) === splitAreaId);
             
             if (area) {
-                resolvedAreaId = prefCode + "_" + area.individualId;
-                if (!window.fishData) {
-                    needsFishLoad = true;
-                }
+                // name列を area クエリとしてセット
+                setIdealQuery('area', area.name);
             }
         }
     }
 
-    if (needsBaseLoad || needsFishLoad) {
-        // ★ ここでも安全に初期化
-        window.currentRegion = region || 'KANTO';
-        window.currentPref = prefCode;
-
-        if (needsBaseLoad) {
-            await loadPrefectureData(prefCode);
-        }
-        
-        if (areaQuery && !resolvedAreaId && window.areaData) {
-            let area = window.areaData.find(a => a.name === areaQuery);
-            if (!area) area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
+    // --------------------------------------------------
+    // パターン3：第三引数 (currentSpotId) まで存在する場合
+    // --------------------------------------------------
+    else if (pref && currentAreaId && currentSpotId) {
+        if (window.spotData) {
+            // areaId列が currentAreaId と同じで、さらに individualId が currentSpotId と同じ行を探す
+            const spot = window.spotData.find(s => 
+                String(s.areaId) === String(currentAreaId) && 
+                String(s.individualId) === String(currentSpotId)
+            );
             
-            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
-        }
-
-        if (resolvedAreaId) {
-            await prepareFishForArea(resolvedAreaId);
-        }
-
-        routeUpdate();
-        return false; 
-    }
-
-    return true; 
-}
-
-// ==========================================
-// 4. ハブとなる routeUpdate (完成版)
-// ==========================================
-async function routeUpdate() {
-    const isReady = await checkAndLoadRouteData();
-    if (!isReady) return; 
-
-    const { region, pref: prefCode } = getParsedPrefQuery();
-
-    // ★ 初期画面（広域マップ）の描画ロジック
-    if (!prefCode) {
-        document.getElementById('map-back-btn').style.display = 'none';
-        
-        // ★ ここも追加！確実にグローバル変数を更新
-        window.currentRegion = region || 'KANTO';
-        loadRegionMap(window.currentRegion);
-        return;
-    }
-
-    window.currentRegion = region || 'KANTO';
-    updateStateFromURL();
-
-    // ─── スポット階層 ───
-    if (window.currentSpotId) {
-        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
-        const spot = list.find(s => String(s.individualId) === String(window.currentSpotId));
-        
-        if (spot) {
-            drawLocation(spot.name, spot.lat, spot.lng, "13");
-            zoomToSpot(spot);
-            requestAnimationFrame(() => {
-                const btn = document.getElementById('map-back-btn');
-                if (btn) {
-                    btn.style.opacity = '0';
-                    btn.style.display = 'block';
-                    requestAnimationFrame(() => {
-                        btn.style.transition = 'opacity 0.4s ease';
-                        btn.style.opacity = '1';
-                    });
-                }
-            });
-        }
-        return;
-    }
-
-    // ─── エリア階層 ───
-    if (window.currentAreaId) {
-        const area = window.areaData.find(a => window.currentAreaId === String(a.areaId + "_" + a.individualId));
-        if (!area) return;
-        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
-        selectArea(area.name);
-        renderCrowdImage();
-        requestAnimationFrame(() => {
-            const btn = document.getElementById('map-back-btn');
-            if (btn) {
-                btn.style.opacity = '0';
-                btn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    btn.style.transition = 'opacity 0.4s ease';
-                    btn.style.opacity = '1';
-                });
+            if (spot) {
+                // name列を spot クエリとしてセット
+                setIdealQuery('spot', spot.name);
             }
-        });
-        return;
-    }
-
-    // ─── 県階層 ───
-    if (window.prefData) {
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                showPrefSpots();
-                initAreaUI();
-                renderPrefWeather();
-                renderCrowdImage();
-                requestAnimationFrame(() => {
-                    const btn = document.getElementById('map-back-btn');
-                    if (btn) {
-                        btn.style.opacity = '0';
-                        btn.style.display = 'block';
-                        requestAnimationFrame(() => {
-                            btn.style.transition = 'opacity 0.4s ease';
-                            btn.style.opacity = '1';
-                        });
-                    }
-                });
-            });
-        });
+        }
     }
 }
 
+// ==========================================
+// ★ 新規追加：URLクエリの日本語名から直接CSVを読んでシステム変数をセットする関数
+// ==========================================
+async function applyQueryToStateFromCsv() {
+    const params = new URLSearchParams(window.location.search);
+    const qPref = params.get('pref');
+    const qArea = params.get('area');
+    const qSpot = params.get('spot');
+
+    if (!qPref) return; // prefクエリが無い場合は何もしない
+
+    // --------------------------------------------------
+    // パターン1：prefクエリがある場合 (Region CSVの探索)
+    // --------------------------------------------------
+    if (window.regionUrl) {
+        try {
+            const res = await fetch(window.regionUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length > 0) {
+                    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                    const nameIdx  = headers.indexOf('name');
+                    const notesIdx = headers.indexOf('notes');
+                    const urlIdx   = headers.indexOf('url');
+                    
+                    if (nameIdx !== -1 && notesIdx !== -1 && urlIdx !== -1) {
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            
+                            // notes列(日本語名)がクエリと一致する行を探す
+                            if (cols[notesIdx] === qPref) {
+                                // name列を pref(現在の県)としてグローバル定義
+                                window.currentPref = cols[nameIdx];
+                                
+                                // URL列の処理 (例: KANTO/CHIBA_location.csv/35.56/140.18)
+                                const rawUrl = cols[urlIdx];
+                                
+                                // "/"でスプリット（先頭の"/"等の空文字エラーを防ぐためfilterを挟む）
+                                let parts = rawUrl.split('/').filter(p => p !== ''); 
+                                
+                                // 0と1を使ってURLを組み立てる（2と3の座標は排除される）
+                                if (parts.length >= 2) {
+                                    window.prefLocationUrl = `/${parts[0]}/${parts[1]}`;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Region CSV逆引きエラー:", err);
+        }
+    }
+
+    // --------------------------------------------------
+    // パターン2 & パターン3 (Location CSVの探索)
+    // --------------------------------------------------
+    // パターン1で prefLocationUrl が無事に定義されていて、かつ下位クエリがある場合のみ実行
+    if ((qArea || qSpot) && window.prefLocationUrl) {
+        try {
+            const res = await fetch(window.prefLocationUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length > 0) {
+                    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                    const nameIdx    = headers.indexOf('name');
+                    const areaIdIdx  = headers.indexOf('areaid');
+                    const indivIdIdx = headers.indexOf('individualid');
+                    
+                    if (nameIdx !== -1 && areaIdIdx !== -1 && indivIdIdx !== -1) {
+                        // 1回のループでエリアとスポットの両方を探す（爆速化）
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            const rowName = cols[nameIdx];
+                            
+                            // パターン2：エリアクエリと同一の行を探す
+                            if (qArea && rowName === qArea) {
+                                window.currentAreaId = cols[areaIdIdx] + "_" + cols[indivIdIdx];
+                            }
+                            
+                            // パターン3：スポットクエリと同一の行を探す
+                            if (qSpot && rowName === qSpot) {
+                                window.currentSpotId = cols[indivIdIdx];
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Location CSV逆引きエラー:", err);
+        }
+    }
+}
 
 
 function formatDate(str) {
@@ -708,18 +480,28 @@ function formatDate(str) {
 }
 
 function initAreaUI() {
+
     const menu = document.getElementById('map-menu');
     if (!menu) return;
+
     menu.style.display = 'block';
 
     const ul = menu.querySelector('ul');
     if (!ul) return;
 
-    const oldItems = ul.querySelectorAll('li');
+    // =====================
+    // ■ リスト削除（スッキリ書き換え）
+    // =====================
+    const oldItems = ul.querySelectorAll('li'); // 古い :not(.menu-header-row) の指定を削除
     oldItems.forEach(el => el.remove());
 
+    // =====================
+    // ■ エリアリスト
+    // =====================
     window.areaData.forEach(area => {
+
         const li = document.createElement('li');
+
         const row = document.createElement('div');
         row.style.display = 'flex';
         row.style.alignItems = 'center';
@@ -727,8 +509,14 @@ function initAreaUI() {
         row.style.cursor = 'pointer';
 
         row.onclick = () => {
-            updateURLState(area.name, null);
-            updateStateFromURL();
+            location.hash = encodeURIComponent(area.name);
+            
+            // ★ テスト追加：クリックされた本物の area オブジェクトから引用！
+            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            setIdealQuery('area', area.name);
+            setIdealQuery('spot', null);
+
+            updateStateFromHash();
             destroyAreaUI();
             selectArea(area);
         };
@@ -753,25 +541,37 @@ function initAreaUI() {
         ul.appendChild(li);
     });
 
+    // =====================
+    // ■ handler再設定
+    // =====================
     if (window.nearestClickHandler) {
         window.map.off('click', window.nearestClickHandler);
     }
 
     window.nearestClickHandler = function(e) {
+
         if (!window.nearestClickEnabled) return;
+
         const rect = menu.getBoundingClientRect();
         const x = e.originalEvent.clientX;
         const y = e.originalEvent.clientY;
 
-        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return;
+        if (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+        ) return;
 
         let nearest = null;
         let minDist = Infinity;
 
         for (const area of window.areaData) {
+
             const dLat = e.latlng.lat - area.lat;
             const dLng = e.latlng.lng - area.lng;
             const dist = dLat * dLat + dLng * dLng;
+
             if (dist < minDist) {
                 minDist = dist;
                 nearest = area;
@@ -779,8 +579,15 @@ function initAreaUI() {
         }
 
         if (!nearest) return;
-        updateURLState(nearest.name, null);
-        updateStateFromURL();
+
+        location.hash = encodeURIComponent(nearest.name);
+        
+        // ★ テスト追加：導き出された nearest オブジェクトから引用！
+        if (window.prefData) setIdealQuery('pref', window.prefData.name);
+        setIdealQuery('area', nearest.name);
+        setIdealQuery('spot', null);
+
+        updateStateFromHash();
         destroyAreaUI();
         selectArea(nearest);
     };
@@ -791,18 +598,30 @@ function initAreaUI() {
 
 function destroyAreaUI() {
     const menuUl = document.querySelector('#map-menu ul');
+
+    // ★ headerを強制的に none にしていた古い記述を完全に削除しました
+
+    // ★ リストだけ削除
     if (menuUl) {
-        const items = menuUl.querySelectorAll('li'); 
+        const items = menuUl.querySelectorAll('li'); // headerが外に出たので、単純に li を全部消すだけでOK
         items.forEach(el => el.remove());
     }
+
     if (window.nearestClickHandler) {
         window.map.off('click', window.nearestClickHandler);
         window.nearestClickHandler = null;
     }
+
     window.nearestClickEnabled = false;
     document.getElementById('map-menu').style.display = 'none';
 }
 
+
+
+
+// =======================
+// ZOOM GUARD
+// =======================
 function startZoomGuard() {
     if (!window.map) return;
     window._zoomGuardBase = window.map.getZoom();
@@ -819,44 +638,86 @@ function stopZoomGuard() {
     window._zoomGuardBase = null;
 }
 
+
+// =======================
+// STATE
+// =======================
 let pinchStartDistance = 0;
 let pinchTriggered = false;
 
+// =======================
+// DISTANCE
+// =======================
 function getDistance(touches) {
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
 }
 
+// =======================
+// TOUCH START
+// =======================
 document.addEventListener('touchstart', (e) => {
+
     if (e.touches.length !== 2) return;
+
+    // 状態だけ記録（Leafletには触らない）
     pinchStartDistance = getDistance(e.touches);
     pinchTriggered = false;
+
 }, { passive: true });
 
+// =======================
+// TOUCH MOVE
+// =======================
 document.addEventListener('touchmove', (e) => {
+
     if (e.touches.length !== 2) return;
+
     const currentDistance = getDistance(e.touches);
+
     const isPinchIn = currentDistance < pinchStartDistance - 20;
+
     if (!pinchTriggered && isPinchIn) {
+
         pinchTriggered = true;
+
         if (isZoomGuardFailed()) return;
-        goBack();
+
+        //const isPrefView = !window.currentAreaId && !window.currentSpotId;
+        //if (isPrefView) return;
+
+        goBack(window.currentHash);
     }
+
 }, { passive: true });
 
+// =======================
+// RESET
+// =======================
 document.addEventListener('touchend', (e) => {
+
     if (e.touches.length > 0) return;
+
     pinchStartDistance = 0;
     pinchTriggered = false;
+
 });
 
 function renderPrefWeather() {
+
     const elements = document.getElementsByClassName('pref-weather');
+
     for (let i = 0; i < elements.length; i++) {
+
         const el = elements[i];
         const areaId = el.id;
-        const rep = window.spotData.find(s => s.areaId === areaId && s.type === 'representative');
+
+        const rep = window.spotData.find(s =>
+            s.areaId === areaId &&
+            s.type === 'representative'
+        );
+
         if (!rep || !rep.whether) {
             el.textContent = 'no data';
             continue;
@@ -864,13 +725,21 @@ function renderPrefWeather() {
 
         const w = formatPrefWeather(rep.whether);
         const rows = rep.whether?.hourly?.[0]?.weather || [];
+
+        const startHour = 0;
+
         const morningRows = [];
         const afternoonRows = [];
 
-        for (let j = 0; j < rows.length; j++) {
-            const hour = j * 2;
-            if (hour >= 5 && hour <= 12) morningRows.push(rows[j]);
-            else if (hour >= 13 && hour <= 20) afternoonRows.push(rows[j]);
+        for (let i = 0; i < rows.length; i++) {
+
+            const hour = startHour + i * 2;
+
+            if (hour >= 5 && hour <= 12) {
+                morningRows.push(rows[i]);
+            } else if (hour >= 13 && hour <= 20) {
+                afternoonRows.push(rows[i]);
+            }
         }
 
         const getIconSafe = (r) => {
@@ -880,66 +749,133 @@ function renderPrefWeather() {
 
         const iconMorning = getIconSafe(morningRows);
         const iconAfternoon = getIconSafe(afternoonRows);
+
         let icon = '';
 
         if (iconMorning && iconAfternoon) {
-            icon = iconMorning === iconAfternoon ? iconMorning : `${iconMorning}<span class="unit-text">→</span>${iconAfternoon}`;
+            icon = iconMorning === iconAfternoon
+                ? iconMorning
+                : `${iconMorning}<span class="unit-text">→</span>${iconAfternoon}`;
         } else {
             icon = iconMorning || iconAfternoon || '';
         }
 
-        el.innerHTML = `
-            <span class="col-icon">${icon}</span>
-            <div class="col-temp"><span class="num-fixed">${w.temp}</span><span class="unit-text">°C</span></div>
-            <div class="col-label"><span class="unit-text">降水</span></div>
-            <div class="col-pop"><span class="num-fixed">${Math.min(w.pop, 99)}</span><span class="unit-text">%</span></div>
-            <div class="col-wind"><span class="num-fixed">${w.wind}</span><span class="unit-text">m/s</span></div>
-            <span class="pref-name">${rep.name}</span>
-        `;
+        const temp = w.temp;
+        const pop = Math.min(99, Math.round(w.pop));
+        const wind = w.wind;
+        const name = rep.name;
+
+el.innerHTML = `
+    <span class="col-icon">${icon}</span>
+
+<div class="col-temp">
+    <span class="num-fixed">${temp}</span><span class="unit-text">°C</span>
+</div>
+
+<div class="col-label">
+    <span class="unit-text">降水</span>
+</div>
+
+<div class="col-pop">
+    <span class="num-fixed">${Math.min(pop, 99)}</span><span class="unit-text">%</span>
+</div>
+
+<div class="col-wind">
+    <span class="num-fixed">${wind}</span><span class="unit-text">m/s</span>
+</div>
+
+    <span class="pref-name">${name}</span>
+`;
+
     }
 }
 
 function formatPrefWeather(whether) {
+
     const today = whether?.hourly?.[0];
-    if (!today || !Array.isArray(today.weather)) return null;
+    if (!today || !Array.isArray(today.weather)) {
+        return null;
+    }
 
     let maxTemp = -Infinity;
     let maxPop = -Infinity;
     let maxWind = -Infinity;
+
     let codeSum = 0;
     let codeCount = 0;
 
     for (const row of today.weather) {
+
         if (!Array.isArray(row)) continue;
+
         const code = row[0];
         const temp = row[1];
         const pop = row[2];
         const wind = row[4];
 
-        if (typeof code === "number") { codeSum += code; codeCount++; }
-        if (typeof temp === "number") maxTemp = Math.max(maxTemp, temp);
-        if (typeof pop === "number") maxPop = Math.max(maxPop, pop);
-        if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
+        // 天気コード（補間対応で平均化）
+        if (typeof code === "number") {
+            codeSum += code;
+            codeCount++;
+        }
+
+        // 気温（最大）
+        if (typeof temp === "number") {
+            maxTemp = Math.max(maxTemp, temp);
+        }
+
+        // 降水確率（最大）
+        if (typeof pop === "number") {
+            maxPop = Math.max(maxPop, pop);
+        }
+
+        // 風速（最大）
+        if (typeof wind === "number") {
+            maxWind = Math.max(maxWind, wind);
+        }
     }
 
     if (codeCount === 0) return null;
+
+    // ===== ここから追加 =====
+
     let displayPop = null;
-    if (maxPop !== -Infinity) displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
+
+    if (maxPop !== -Infinity) {
+
+        // ★ ノイズカット（微小な確率は0扱い）
+        if (maxPop < 5) {
+            displayPop = 0;
+        } else {
+            // ★ 10%刻みに丸め（気象庁フォーマット）
+            displayPop = Math.round(maxPop / 10) * 10;
+        }
+    }
+
+    // ===== ここまで追加 =====
 
     return {
         icon: Math.round(codeSum / codeCount),
         temp: Math.round(maxTemp),
-        pop: displayPop,
+        pop: displayPop, // ★ 修正：maxPop → displayPop
         wind: Math.round(maxWind)
     };
 }
 
 function calcRepresentativeIcon(rows) {
+
     const adjustCode = (code, pop) => {
         const p = Number(pop);
-        if (code >= 60) return p >= 80 ? 70 : 60;
+
+        if (code >= 60) {
+            if (p >= 80) return 70;
+            if (p >= 60) return 60;
+            return 60;
+        }
+
         if (p >= 70) return 30;
         if (p >= 50) return 10;
+
         return code;
     };
 
@@ -948,16 +884,22 @@ function calcRepresentativeIcon(rows) {
     let tied = [];
 
     for (const r of rows) {
+
         const code = Number(r?.[0]);
         const pop  = Number(r?.[2]);
+
         if (!Number.isFinite(code)) continue;
+
         const adjusted = adjustCode(code, pop);
+
         map[adjusted] = (map[adjusted] || 0) + 1;
     }
 
     for (const k in map) {
+
         const count = map[k];
         const code = Number(k);
+
         if (count > maxCount) {
             maxCount = count;
             tied = [code];
@@ -966,29 +908,43 @@ function calcRepresentativeIcon(rows) {
         }
     }
 
-    const iconCode = tied.length > 1 ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length) : tied[0];
+    const iconCode =
+        tied.length > 1
+            ? Math.round(tied.reduce((a,b)=>a+b,0)/tied.length)
+            : tied[0];
+
     return toWeatherIcon(iconCode);
 }
 
 function toWeatherIcon(code) {
     if (code >= 70) return "☔️";
-    if (code >= 60) return "☂️";   
-    if (code >= 30) return "☁️";  
-    if (code >= 10) return "⛅";  
-    if (code === 1) return "🌤";  
-    if (code === 2) return "⛅";  
-    return "☀️"; 
+    if (code >= 60) return "☂️";   // 雨
+    if (code >= 30) return "☁️";  // 曇り
+    if (code >= 10) return "⛅";  // 晴れ時々曇り
+    if (code === 1) return "🌤";  // 主に晴れ
+    if (code === 2) return "⛅";  // 薄曇り
+    return "☀️"; // 0 = 快晴
 }
 
 function renderCrowdImage() {
-    if (typeof window.radarEnabled === 'undefined') window.radarEnabled = true;
 
+    // 初期状態はON
+    if (typeof window.radarEnabled === 'undefined') {
+        window.radarEnabled = true;
+    }
+
+    // =======================
+    // トグルボタンのクリックイベント（ON/OFFの切り替え）
+    // =======================
     const btn = document.getElementById('radarToggleBtn');
     if (btn && !btn.dataset.listenerAdded) {
         btn.dataset.listenerAdded = "true";
         btn.addEventListener('click', function() {
+            // 状態を反転 (ONならOFFに、OFFならONに)
             window.radarEnabled = !window.radarEnabled;
+
             if (!window.radarEnabled) {
+                // OFFにする時はタイマーとレイヤーを即座に停止
                 if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
                 if (window.crowdLayer) window.map.removeLayer(window.crowdLayer);
                 if (window.crowdZoomHandler) window.map.off("zoomend", window.crowdZoomHandler);
@@ -996,27 +952,56 @@ function renderCrowdImage() {
                 window.crowdLayer = null;
                 window.crowdZoomHandler = null;
             }
+
+            // 状態が切り替わったので再描画
             renderCrowdImage();
         });
     }
 
+    // =======================
+    // OFF時のガード処理（エリア移動してもOFFをキープ）
+    // =======================
     if (!window.radarEnabled) {
         removeCrowdImage(); 
+
         const header = document.querySelector('.menu-header-row');
         const cloudsUI = document.getElementById('cloudsUI');
         const headerText = document.querySelector('.header-text');
         
         if (header) header.style.display = '';
+        
+        // ★ OFFの時は文字をスッキリ消す
         if (cloudsUI) cloudsUI.textContent = '';
-        if (headerText && window.todayTide) headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-        if (btn) { btn.style.display = ''; btn.textContent = 'ON'; btn.classList.add('is-off'); }
-        return; 
+        
+        // 右側の日付と潮汐だけは表示をキープ
+        if (headerText && window.todayTide) {
+            headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        }
+        
+        // ★ ボタンは「ON」として表示し続ける
+        if (btn) {
+            btn.style.display = ''; 
+            btn.textContent = 'ON'; 
+            btn.classList.add('is-off'); 
+        }
+        
+        return; // これ以降のレーダー画像の読み込みやタイマー処理をブロック！
     }
 
-    if (btn) { btn.style.display = ''; btn.textContent = 'OFF'; btn.classList.remove('is-off'); }
+    // =======================
+    // ON時のボタン状態リセット（エリア移動してもONをキープ）
+    // =======================
+    if (btn) {
+        btn.style.display = '';
+        btn.textContent = 'OFF';
+        btn.classList.remove('is-off');
+    }
 
     removeCrowdImage();
 
+    // =======================
+    // Pane準備
+    // =======================
     if (!window.map.getPane('rainPane')) {
         window.map.createPane('rainPane');
         const pane = window.map.getPane('rainPane');
@@ -1024,21 +1009,34 @@ function renderCrowdImage() {
         pane.style.pointerEvents = 'none';
     }
 
+    // =======================
+    // 時刻計算
+    // =======================
     const now = new Date();
-    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    const nowJST = new Date(
+        now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" })
+    );
+
     const hour = nowJST.getHours();
     const slots = [0,3,6,9,12,15,18,21];
 
+    // =======================
+    // スライド用データ作成
+    // =======================
     const images = [];
     let baseIndex = slots.findIndex(h => h > hour);
     let dayOffset = 0;
 
-    if (baseIndex === -1) { baseIndex = 0; dayOffset = 1; }
+    if (baseIndex === -1) {
+        baseIndex = 0;
+        dayOffset = 1;
+    }
 
     for (let i = 0; i < 4; i++) {
         const rawIndex = baseIndex + i;
         const idx = rawIndex % slots.length;
         const extraDay = Math.floor(rawIndex / slots.length);
+
         const tmpDate = new Date(nowJST);
         tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
 
@@ -1053,122 +1051,222 @@ function renderCrowdImage() {
         });
     }
 
+    // =======================
+    // header UI
+    // =======================
     const header = document.querySelector('.menu-header-row');
     const cloudsUI = document.getElementById('cloudsUI');
     const headerText = document.querySelector('.header-text');
 
-    if (!header || !cloudsUI || !headerText) return;
+    if (!header || !cloudsUI || !headerText) {
+        console.warn('header elements missing');
+        return;
+    }
+
     header.style.display = '';
 
     if (window.phase2Initialized) {
         cloudsUI.textContent = '';
-        headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        headerText.textContent =
+            formatDate(window.todayTide.date) + " " + window.todayTide.tide;
         return;
     }
 
+    // 初期表示
     let currentIndex = 0;
     cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
-    headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+    headerText.textContent =
+        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-    fetch("js/fetched_log.txt").then(res => res.text()).then(text => {
-        const lines = text.trim().split("\n");
-        let best = null;
-        for (let line of lines) {
-            if (!line) continue;
-            const parts = line.split(",");
-            if (parts.length < 4 || parts[0] !== window.currentPref) continue;
-            best = { lat: parseFloat(parts[1]), lng: parseFloat(parts[2]), baseZoom: parseFloat(parts[3]) };
-            break;
-        }
+    // =======================
+    // ログから座標取得
+    // =======================
+    fetch("js/fetched_log.txt")
+        .then(res => res.text())
+        .then(text => {
+            const lines = text.trim().split("\n");
+            let best = null;
 
-        if (!best) return;
+            for (let line of lines) {
+                if (!line) continue;
+                const parts = line.split(",");
+                if (parts.length < 4) continue;
+                if (parts[0] !== window.currentPref) continue;
 
-        function calcBounds() {
-            const z = window.map.getZoom();
-            const scale = Math.pow(2, z - best.baseZoom);
-            const size = 512 * scale;
-            const topLeft = window.map.project([best.lat, best.lng], z);
-            const bottomRight = topLeft.add([size, size]);
-            return L.latLngBounds(window.map.unproject(topLeft, z), window.map.unproject(bottomRight, z));
-        }
+                const lat = parseFloat(parts[1]);
+                const lng = parseFloat(parts[2]);
+                const baseZoom = parseFloat(parts[3]);
 
-        const MAX_OPACITY = 0.6;
+                best = { lat, lng, baseZoom };
+                break;
+            }
 
-        window.crowdLayer = L.imageOverlay(images[0].url, calcBounds(), { pane: 'rainPane', opacity: MAX_OPACITY }).addTo(window.map);
-        window.crowdZoomHandler = function() {
-            if (!window.crowdLayer) return;
-            window.crowdLayer.setBounds(calcBounds());
-        };
-        window.map.on("zoomend", window.crowdZoomHandler);
+            if (!best) {
+                console.warn("座標が見つからない");
+                return;
+            }
 
-        if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
+            function calcBounds() {
+                const z = window.map.getZoom();
+                const scale = Math.pow(2, z - best.baseZoom);
+                const size = 512 * scale;
 
-        window.crowdSlideTimer = setInterval(() => {
-            if (!window.radarEnabled) { clearInterval(window.crowdSlideTimer); return; }
-            const oldLayer = window.crowdLayer;
-            currentIndex = (currentIndex + 1) % images.length;
-            const img = images[currentIndex];
-            cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
+                const topLeft = window.map.project([best.lat, best.lng], z);
+                const bottomRight = topLeft.add([size, size]);
 
-            const newLayer = L.imageOverlay(img.url, calcBounds(), { pane: 'rainPane', opacity: 0 }).addTo(window.map);
-            let opacity = 0;
-            const fade = setInterval(() => {
-                opacity += 0.06;
-                if (opacity >= MAX_OPACITY) {
-                    opacity = MAX_OPACITY;
-                    clearInterval(fade);
-                    if (oldLayer) window.map.removeLayer(oldLayer);
-                    window.crowdLayer = newLayer;
+                return L.latLngBounds(
+                    window.map.unproject(topLeft, z),
+                    window.map.unproject(bottomRight, z)
+                );
+            }
+
+            const MAX_OPACITY = 0.6;
+
+            // 初期レイヤー
+            window.crowdLayer = L.imageOverlay(
+                images[0].url,
+                calcBounds(),
+                {
+                    pane: 'rainPane',
+                    opacity: MAX_OPACITY
                 }
-                newLayer.setOpacity(opacity);
-                if (oldLayer) oldLayer.setOpacity(MAX_OPACITY - opacity);
-            }, 50);
-        }, 2500);
-    });
+            ).addTo(window.map);
+
+            window.crowdZoomHandler = function() {
+                if (!window.crowdLayer) return;
+                window.crowdLayer.setBounds(calcBounds());
+            };
+
+            window.map.on("zoomend", window.crowdZoomHandler);
+
+            // =======================
+            // スライドショー開始
+            // =======================
+            if (window.crowdSlideTimer) {
+                clearInterval(window.crowdSlideTimer);
+            }
+
+            window.crowdSlideTimer = setInterval(() => {
+                // ガード：万が一タイマー作動中にOFFにされていたら即停止
+                if (!window.radarEnabled) {
+                    clearInterval(window.crowdSlideTimer);
+                    return;
+                }
+
+                const oldLayer = window.crowdLayer;
+                currentIndex = (currentIndex + 1) % images.length;
+                const img = images[currentIndex];
+
+                cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
+
+                const newLayer = L.imageOverlay(
+                    img.url,
+                    calcBounds(),
+                    {
+                        pane: 'rainPane',
+                        opacity: 0
+                    }
+                ).addTo(window.map);
+
+                let opacity = 0;
+                const fade = setInterval(() => {
+                    opacity += 0.06;
+
+                    if (opacity >= MAX_OPACITY) {
+                        opacity = MAX_OPACITY;
+                        clearInterval(fade);
+
+                        if (oldLayer) {
+                            window.map.removeLayer(oldLayer);
+                        }
+                        window.crowdLayer = newLayer;
+                    }
+
+                    newLayer.setOpacity(opacity);
+                    if (oldLayer) {
+                        oldLayer.setOpacity(MAX_OPACITY - opacity);
+                    }
+                }, 50);
+
+            }, 2500);
+        });
 }
 
-function removeCrowdImage() {
-    if (window.crowdSlideTimer) { clearInterval(window.crowdSlideTimer); window.crowdSlideTimer = null; }
-    if (window.crowdLayer) { window.map.removeLayer(window.crowdLayer); window.crowdLayer = null; }
-    if (window.crowdZoomHandler) { window.map.off("zoomend", window.crowdZoomHandler); window.crowdZoomHandler = null; }
 
+// 【修正後の removeCrowdImage】
+function removeCrowdImage() {
+
+    // =======================
+    // スライド停止
+    // =======================
+    if (window.crowdSlideTimer) {
+        clearInterval(window.crowdSlideTimer);
+        window.crowdSlideTimer = null;
+    }
+
+    // =======================
+    // レイヤ削除
+    // =======================
+    if (window.crowdLayer) {
+        window.map.removeLayer(window.crowdLayer);
+        window.crowdLayer = null;
+    }
+
+    if (window.crowdZoomHandler) {
+        window.map.off("zoomend", window.crowdZoomHandler);
+        window.crowdZoomHandler = null;
+    }
+
+    // =======================
+    // header制御
+    // =======================
     const header = document.querySelector('.menu-header-row');
     if (!header) return;
+
     const cloudsUI = document.getElementById('cloudsUI');
     const headerText = document.querySelector('.header-text');
 
+// 【抜粋】removeCrowdImage の中の後半部分は元通り、これだけでOK！
     if (window.phase2Initialized) {
+        // phase2 → 左だけ消す
         if (cloudsUI) cloudsUI.textContent = '';
     } else {
+        // 通常 → 両方消す
         if (cloudsUI) cloudsUI.textContent = '';
         if (headerText) headerText.textContent = '';
     }
 
+
+    // =======================
+    // 表示制御
+    // =======================
     const leftEmpty  = !cloudsUI || cloudsUI.textContent === '';
     const rightEmpty = !headerText || headerText.textContent === '';
-    if (leftEmpty && rightEmpty) header.style.display = 'none';
-    else header.style.display = '';
+
+    if (leftEmpty && rightEmpty) {
+        header.style.display = 'none';
+    } else {
+        header.style.display = '';
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    updateStateFromURL();
-    routeUpdate();
-});
 
-window.addEventListener('popstate', () => {
-    routeUpdate(); 
-});
-
+// ================================
+// ■ 地域選択用マーカーを「フェードアウト」で非表示にする関数
+// ================================
 function clearRegionMarkers() {
     if (window.regionMarkers && window.map) {
         window.regionMarkers.forEach(m => {
-            const el = m.getElement(); 
+            const el = m.getElement(); // マーカーのHTML要素を取得
             if (el) {
+                // CSSトランジションを当てて透明にする
                 el.style.transition = 'opacity 0.3s ease';
                 el.style.opacity = '0';
+                
+                // 0.3秒（フェードアウト完了）後にマップから取り外す
                 setTimeout(() => {
                     window.map.removeLayer(m);
-                    el.style.opacity = '1'; 
+                    el.style.opacity = '1'; // 次回表示時のために透明度を戻しておく
                 }, 300);
             } else {
                 window.map.removeLayer(m);
@@ -1177,24 +1275,38 @@ function clearRegionMarkers() {
     }
 }
 
+
+
+// ================================
+// ■ 戻るボタンの設定など（独立して実行）
+// ================================
 fetch('/icon/back.svg')
     .then(res => res.text())
     .then(svg => {
         const btn = document.getElementById('map-back-btn');
         if (!btn) return;
+
         btn.innerHTML = svg;
         const svgEl = btn.querySelector('svg');
         if (svgEl) svgEl.classList.add('back-icon');
     });
 
 document.getElementById('map-back-btn')?.addEventListener('click', () => {
-    goBack();
+    goBack(window.currentHash);
 });
 
+// ================================
+// ■ 天気CSVの読み込み（パース済みの爆速キャッシュ対応）
+// ================================
 function loadWhetherCSV(url) {
-    const prefCode = window.currentPref; 
-    if (prefCode && window[`${prefCode}_whetherData`]) return Promise.resolve(window[`${prefCode}_whetherData`]);
+    const prefCode = window.currentPref; // 現在の県
 
+    // ★ 分岐A：既に「パース済みの天気データ」が存在すれば、即座にそれを返す（JSON.parseを全スキップ）
+    if (prefCode && window[`${prefCode}_whetherData`]) {
+        return Promise.resolve(window[`${prefCode}_whetherData`]);
+    }
+
+    // ★ 分岐B：キャッシュが無ければ、フェッチして重いパース処理を実行する
     const textPromise = window.fetchCache && window.fetchCache[url]
         ? window.fetchCache[url]
         : fetch(url).then(res => {
@@ -1205,14 +1317,22 @@ function loadWhetherCSV(url) {
     return textPromise.then(text => {
         const lines = text.trim().split("\n");
         lines.shift();
+
         const parsedData = lines.map(line => {
             const obj = splitCSVLine(line);
             if (!obj) return null;
-            let parsed;
-            try { parsed = JSON.parse(obj.whether); } catch (e) { return null; }
 
+            let parsed;
+            try {
+                parsed = JSON.parse(obj.whether); // ←これが一番重い処理
+            } catch (e) {
+                return null;
+            }
+
+            // ===== ここからデータ整形・付与 =====
             const today = new Date();
             today.setHours(0, 0, 0, 0);
+
             const yesterday = new Date(today);
             yesterday.setDate(today.getDate() - 1);
 
@@ -1227,7 +1347,9 @@ function loadWhetherCSV(url) {
             const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
 
             if (isToday) {
-                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) parsed.daily[4] = null; 
+                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
+                    parsed.daily[4] = null; 
+                }
             } 
             else if (isYesterday) {
                 if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
@@ -1236,42 +1358,79 @@ function loadWhetherCSV(url) {
                     parsed.hourly[2] = null;
                 }
             }
-            return { name: obj.name, date: obj.date, whether: parsed };
+            // ===== ここまで追加・修正 =====
+
+            return {
+                name: obj.name,
+                date: obj.date,
+                whether: parsed 
+            };
         }).filter(Boolean);
 
-        if (prefCode) window[`${prefCode}_whetherData`] = parsedData;
+        // ★ 次回のために「パース済みの結果」を金庫に保存しておく
+        if (prefCode) {
+            window[`${prefCode}_whetherData`] = parsedData;
+        }
+
         return parsedData;
     });
 }
 
+// ================================
+// ■ CSV → spotへ反映（二重付与防止）
+// ================================
 function applyWhetherToSpots(csvData) {
-    if (window.spotData && window.spotData.length > 0 && window.spotData[0].whether) return;
+    // ★ 爆速化：スポットの先頭データにすでに天気が付与されていたら、
+    // 前回のキャッシュデータそのものなので、ループを一切回さずに即リターンする
+    if (window.spotData && window.spotData.length > 0 && window.spotData[0].whether) {
+        return;
+    }
+
     const map = {};
+
     for (const row of csvData) {
         if (!row.name || !row.whether) continue;
         map[row.name] = row.whether;
     }
+
     for (const spot of window.spotData) {
-        if (map[spot.name] !== undefined) spot.whether = map[spot.name];
+        if (map[spot.name] !== undefined) {
+            spot.whether = map[spot.name];
+        }
     }
 }
 
+// ================================
+// ■ 安全CSV分割（3カラム固定）
+// ================================
 function splitCSVLine(line) {
+
     const first = line.indexOf(",");
     if (first === -1) return null;
+
     const second = line.indexOf(",", first + 1);
     if (second === -1) return null;
 
     const name = line.slice(0, first);
     const date = line.slice(first + 1, second);
     const whether = line.slice(second + 1);
+
     return { name, date, whether };
 }
 
+// ================================
+// ■ 【内陸専用】天気CSVの読み込み
+// ================================
 function loadInlandWhetherCSV(regionCode) {
     if (!regionCode) return Promise.resolve(null);
+
+    // 爆速キャッシュ対応（内陸用の別金庫）
     const cacheKey = `${regionCode}_inlandWhetherData`;
-    if (window[cacheKey]) return Promise.resolve(window[cacheKey]);
+    if (window[cacheKey]) {
+        return Promise.resolve(window[cacheKey]);
+    }
+
+    // 指定されたパス構成: /data/{region}_inLand_recalculated.csv
     const url = `/data/${regionCode}_inLand_recalculated.csv`;
 
     return fetch(url).then(res => {
@@ -1280,14 +1439,22 @@ function loadInlandWhetherCSV(regionCode) {
     }).then(text => {
         const lines = text.trim().split("\n");
         lines.shift();
-        const parsedData = lines.map(line => {
-            const obj = splitCSVLine(line); 
-            if (!obj) return null;
-            let parsed;
-            try { parsed = JSON.parse(obj.whether); } catch (e) { return null; }
 
+        const parsedData = lines.map(line => {
+            const obj = splitCSVLine(line); // 既存関数を再利用
+            if (!obj) return null;
+
+            let parsed;
+            try {
+                parsed = JSON.parse(obj.whether);
+            } catch (e) {
+                return null;
+            }
+
+            // ===== 既存のパース・日付補正ロジックを再利用 =====
             const today = new Date();
             today.setHours(0, 0, 0, 0);
+
             const yesterday = new Date(today);
             yesterday.setDate(today.getDate() - 1);
 
@@ -1302,7 +1469,9 @@ function loadInlandWhetherCSV(regionCode) {
             const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
 
             if (isToday) {
-                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) parsed.daily[4] = null; 
+                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
+                    parsed.daily[4] = null; 
+                }
             } 
             else if (isYesterday) {
                 if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
@@ -1311,10 +1480,17 @@ function loadInlandWhetherCSV(regionCode) {
                     parsed.hourly[2] = null;
                 }
             }
-            return { name: obj.name, date: obj.date, whether: parsed };
+
+            return {
+                name: obj.name,
+                date: obj.date,
+                whether: parsed 
+            };
         }).filter(Boolean);
 
+        // 次回のためにキャッシュへ保存
         window[cacheKey] = parsedData;
+
         return parsedData;
     }).catch(err => {
         console.warn(err);
@@ -1322,65 +1498,114 @@ function loadInlandWhetherCSV(regionCode) {
     });
 }
 
+// ================================
+// ■ 【内陸専用】CSV → spotへ反映（大文字のLから始まるスポットのみ）
+// ================================
 function applyInlandWhetherToSpots(csvData) {
     if (!csvData || !window.spotData) return;
+
+    // 内陸天気の辞書を作成
     const map = {};
     for (const row of csvData) {
         if (!row.name || !row.whether) continue;
         map[row.name] = row.whether;
     }
+
+    // スポットを走査して付与
     for (const spot of window.spotData) {
+        // IDを安全に文字列として取得
         const spotId = String(spot.individualId || spot.id || "");
+
+        // ★ individualIdが大文字半角の「L」から始まる場合のみ上書き
         if (spotId.startsWith("L")) {
-            if (map[spot.name] !== undefined) spot.whether = map[spot.name];
+            if (map[spot.name] !== undefined) {
+                spot.whether = map[spot.name];
+            }
         }
     }
 }
 
+
 function openArea(areaKey, isUserAction = false) {
+
   const container = document.getElementById('area-guide');
+
+  // モード切替
   container.classList.remove('collapsed-mode');
   container.classList.add('active-mode');
 
   document.querySelectorAll('#area-guide .area').forEach(area => {
+
     const text = area.querySelector('.text');
+
     if (area.id === areaKey) {
+
       area.classList.add('active');
       text.classList.add('open');
+
+      // 先頭寄せ
       container.insertBefore(area, container.children[1]);
-      if (isUserAction) area.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+      // ★ ユーザー操作時のみスクロール
+      if (isUserAction) {
+        area.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+
     } else {
       area.classList.remove('active');
       text.classList.remove('open');
     }
+
   });
 }
 
+// ================================
+// ■ エリアガイドの描画（グローバル関数として復活）
+// ================================
 function renderAreaGuide() {
     const container = document.getElementById('area-guide');
-    if (!container) return; 
+    if (!container) return; // コンテナがない場合はスキップ
+
+    // window.prefData がまだ無い場合は処理を抜ける
     if (!window.prefData) return;
+
     container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
+
     if (!window.areaData) return;
 
     window.areaData.forEach(area => {
         const div = document.createElement('div');
         div.className = 'area';
-        div.id = area.individualId; 
-        div.innerHTML = `<h2>${area.name}</h2><p class="text">${area.notes}</p>`;
+        div.id = area.individualId; // ←ここ重要
+
+        div.innerHTML = `
+            <h2>${area.name}</h2>
+            <p class="text">${area.notes}</p>
+        `;
 
         div.querySelector('h2').addEventListener('click', () => {
+            
+            // =====================================================
+            // ★ Phase2（ズーム13固定 ＆ OSMタイル）状態の判定
+            // =====================================================
             let isPhase2OSM = false;
             if (window.map && window.map.getZoom() === 13) {
                 window.map.eachLayer(layer => {
                     if (layer instanceof L.TileLayer) {
                         const url = layer._url || '';
-                        if (url.includes('openstreetmap')) isPhase2OSM = true;
+                        if (url.includes('openstreetmap')) {
+                            isPhase2OSM = true;
+                        }
                     }
                 });
             }
 
+            // =====================================================
+            // ★ スポット画面 または Phase2状態から別のエリアへ飛ぶ時のクリーンアップ処理
+            // =====================================================
             if (window.currentSpotId || isPhase2OSM) {
+                
+                // 1. ズーム・移動制限の解除
                 if (typeof stopZoomGuard === 'function') stopZoomGuard();
                 if (window.map) {
                     window.map.dragging.enable();
@@ -1392,11 +1617,13 @@ function renderAreaGuide() {
                     window.map.setMaxBounds(null);
                     if (window.map.options) window.map.options.maxBoundsViscosity = 0;
 
+                    // 2. 特殊レイヤー（魚・マーカー等）の消去
                     if (window.fishLayer) window.map.removeLayer(window.fishLayer);
                     if (window.phase2Group) window.phase2Group.clearLayers();
                     if (window.phase1Group) window.phase1Group.clearLayers();
                     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
+                    // 3. 拡大用タイルの剥離と基本タイル（ort）への切り替え
                     window.map.eachLayer(layer => {
                         if (layer === window.gsiLayer) return;
                         if (layer instanceof L.TileLayer) {
@@ -1411,46 +1638,79 @@ function renderAreaGuide() {
                         window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
                     } else {
                         window.gsiLayer.setUrl(window.gsiLayers.ort);
-                        window.gsiLayer.addTo(window.map); 
+                        window.gsiLayer.addTo(window.map); // ★確実に再追加
                     }
+                    
+                    // Phase2の無効化処理があれば呼ぶ
                     if (typeof disablePhase2 === 'function') disablePhase2(window.map);
                 }
 
+                // 4. UI（DOM）の完全クリア
                 if (typeof removeWeekItem === 'function') removeWeekItem();
                 if (typeof resetWeatherUI === 'function') resetWeatherUI();
                 if (typeof clearSub2Weather === 'function') clearSub2Weather();
                 
                 const nearest = document.getElementById("nearest-spot");
                 if (nearest) nearest.textContent = "";
+
+                // 5. 状態のリセット
                 window.currentSpotId = null;
             }
 
-            updateURLState(area.name, null);
-            updateStateFromURL();
-            routeUpdate();
+            // =====================================================
+            // ★ 新しいエリアへのジャンプ処理
+            // =====================================================
+            location.hash = encodeURIComponent(area.name);
+            
+            // ★ テスト追加：クリックされた本物の area オブジェクトから引用！
+            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            setIdealQuery('area', area.name);
+            setIdealQuery('spot', null);
+
+            if (typeof updateStateFromHash === 'function') updateStateFromHash();
+            if (typeof routeUpdate === 'function') routeUpdate();
             openArea(area.individualId, true);
+
         });
 
         container.appendChild(div);
     });
 }
 
+
+
 function resetAreaGuide() {
+
   const container = document.getElementById('area-guide');
+
   container.classList.remove('active-mode');
   container.classList.add('collapsed-mode');
+
+  // ★ DOMを初期状態に戻す
   renderAreaGuide();
+
 }
 
+
+// ==========================================
+// 2. 県域UIの初期化関数
+// ==========================================
 function renderPrefectureUI() {
+    // データがない場合は何もしない
     if (!window.prefData) return;
+
     const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
 
     try {
+        // エリアガイドの描画
         renderAreaGuide();
+
+        // ショップマーカーのプリロード
         if (window.markerControl && window.markerControl.preloadShop01) {
             window.markerControl.preloadShop01(shopUrl);
         }
+
+        // 気象庁アラートの取得
         getAlertText(window.prefData, function(result) {
             const el = document.getElementById("alert-bar");
             if (!el) return;
@@ -1462,10 +1722,32 @@ function renderPrefectureUI() {
     }
 }
 
+
+// ==========================================
+// ★ 追加：URLの pref クエリから Region と Pref を安全に抽出する関数
+// ==========================================
+function getParsedPrefQuery() {
+    const url = new URL(location.href);
+    const query = url.searchParams.get('pref');
+    //if (!query) return { region: null, pref: null };
+    
+
+    //const parts = query.split('_');
+    //if (parts.length >= 2) {
+    //    return { region: parts[0], pref: parts[1] };
+    //}
+    //return { region: 'KANTO', pref: parts[0] };
+    return { region: 'KANTO', pref: '千葉県' };
+}
+
+// ==========================================
+// 3. マーカー等から県が選択された時のトリガー
+// ==========================================
 window.selectPrefecture = function(csvParam) {
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
 
+    // 様々な引数パターンに対応して確実に県コードだけを抜く
     if (csvParam.includes('_location')) {
         prefCode = csvParam.split('_')[0];
     } else if (csvParam.includes('_')) {
@@ -1478,33 +1760,52 @@ window.selectPrefecture = function(csvParam) {
     }
 
     const url = new URL(location.href);
+    // ★ URLの見た目だけを "KANTO_CHIBA" にする
     url.searchParams.set('pref', `${region}_${prefCode}`);
-    url.searchParams.delete('area');
-    url.searchParams.delete('spot');
     url.hash = ''; 
     history.replaceState(null, '', url);
+
     routeUpdate();
 };
 
+
+// ==========================================
+// 爆速化：バックグラウンドCSVプリロード (index.html)
+// ==========================================
+// 状態管理用のオブジェクトが未定義の場合は初期化
 window.fetchCacheStatus = window.fetchCacheStatus || {};
 
 function preloadCsvFiles(regionCode, prefCode) {
+    // どちらか片方でも欠けていたら処理をスキップ
     if (!regionCode || !prefCode) return;
+    
+    // パスを動的に生成
     const csvUrl     = `/${regionCode}/${prefCode}_location.csv`;
     const whetherUrl = `/data/${prefCode}_whether.csv`;
     const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
 
+    // ★ 純粋な県コード（"CHIBA"等）をキーにして二重フェッチを完璧に防ぐ
     if (!window.fetchCacheStatus[prefCode]) {
         window.fetchCacheStatus[prefCode] = true;
+        
+        // 低優先度でバックグラウンドフェッチし、ブラウザキャッシュに載せる
         fetch(csvUrl, { priority: 'low' }).catch(()=>{});
         fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
         fetch(shopUrl, { priority: 'low' }).catch(()=>{});
     }
 }
 
+
+
+// ================================
+// ■ 初期画面のRegionマップ読み込み
+// ================================
 let isRegionLoaded = false;
 
+// ★ 引数で受け取る
 function loadRegionMap(regionCode = 'KANTO') {
+    
+    // 1. マップの可動域・ズーム制限を完全にリセット
     if (window.map) {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -1513,13 +1814,17 @@ function loadRegionMap(regionCode = 'KANTO') {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
+        
+        // 移動アニメーション中の場合は一度ストップさせる
         window.map.stop();
     }
 
+    // 2. 既にデータを持っていれば一瞬で広域に戻す（通常の「戻る」用）
     if (window.regionData) {
         drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
     }
 
+    // 3. 既にロード済みならレイヤーを表示して終了
     if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
         window.regionMarkers.forEach(m => {
             if (window.map) m.addTo(window.map);
@@ -1527,9 +1832,10 @@ function loadRegionMap(regionCode = 'KANTO') {
         return;
     }
 
-    const regionCsvUrl = `/${regionCode}/${regionCode}_region.csv`;
+    // 4. 初回 or URL直打ちからの戻り時は、CSVをフェッチする
+    window.regionUrl = `/${regionCode}/${regionCode}_region.csv`; // ★ const を window.regionUrl に変更
 
-    fetch(regionCsvUrl)
+    fetch(window.regionUrl) // ★ 引数も変
         .then(res => {
             if (!res.ok) throw new Error("Region CSV fetch failed");
             return res.text();
@@ -1556,15 +1862,22 @@ function loadRegionMap(regionCode = 'KANTO') {
                 const cols = lines[i].split(',').map(c => c.trim());
                 const type = cols[typeIdx];
 
+                // ─── a. 広域マップの中心・ズームを設定 (type: region) ───
                 if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
                     const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
                     const lat = parseFloat(cols[latIdx]);
                     const lng = parseFloat(cols[lngIdx]);
                     const zoom = parseFloat(cols[zoomIdx]);
+                    
+                    // 次回のためにグローバルに保存
                     window.regionData = { name, lat, lng, zoom };
+
+                    // ★【ここが修正点】ストッパーを外し、ここで無条件に必ずカメラを動かす！
+                    // 初回ロード時も、URL直打ちから戻ってきた時も、確実に広域座標へ飛びます。
                     drawLocation(name, lat, lng, zoom);
                 }
 
+                // ─── b. 県突入用のアイコンマーカーを配置 (type: pref) ───
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
                     const urlVal = cols[urlIdx];
                     const prefName = cols[notesIdx];
@@ -1575,17 +1888,20 @@ function loadRegionMap(regionCode = 'KANTO') {
                     let lat, lng;
                     
                     if (parts.length >= 4) {
-                        prefCode = parts[1].split('_')[0]; 
+                        prefCode = parts[1].split('_')[0]; // "CHIBA"
                         lat = parseFloat(parts[2]);
                         lng = parseFloat(parts[3]);
                     } else if (parts.length === 3) {
-                        prefCode = parts[0].split('_')[0]; 
+                        prefCode = parts[0].split('_')[0]; // "CHIBA"
                         lat = parseFloat(parts[1]);
                         lng = parseFloat(parts[2]);
                     } else continue;
 
                     if (isNaN(lat) || isNaN(lng)) continue;
-                    if (typeof preloadCsvFiles === 'function') preloadCsvFiles(regionCode, prefCode);
+
+                    if (typeof preloadCsvFiles === 'function') {
+                        preloadCsvFiles(regionCode, prefCode);
+                    }
 
                     const prefIcon = L.divIcon({
                         className: 'pref-choice-marker',
@@ -1594,12 +1910,15 @@ function loadRegionMap(regionCode = 'KANTO') {
                         iconAnchor: [45, 17]
                     });
 
+                    // マップが確実に存在する場合のみマーカーを置く
                     if (window.map) {
                         const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
+
                         marker.on('click', () => {
                             if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
                             window.selectPrefecture(`${regionCode}_${prefCode}`);
                         });
+
                         window.regionMarkers.push(marker);
                     }
                 }
@@ -1609,28 +1928,33 @@ function loadRegionMap(regionCode = 'KANTO') {
         .catch(err => console.error("Regionマップの初期化エラー:", err));
 }
 
-// ==========================================
-// 1. データ読み込み専用関数
-// ==========================================
 async function loadPrefectureData(prefCode) {
+    // ★ 念のための二重ロック：ロード開始時に前の魚データを確実に消し去る
     window.fishData = null; 
     window.currentPref = prefCode;
     const region = window.currentRegion || 'KANTO';
+    
+    // ★ 追加：ここでグローバルにregionのURLを持たせる
+    window.regionUrl = `/${region}/${region}_region.csv`; 
     
     const csvUrl     = `/${region}/${prefCode}_location.csv`;
     window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
     const whetherUrl = `/data/${prefCode}_whether.csv`;
 
+
     try {
         await loadLocationCSV(csvUrl);
+        
+        // 沿岸部の天気を取得して全スポットに付与
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
 
+        // 内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
         if (typeof loadInlandWhetherCSV === 'function') {
             const inlandCsv = await loadInlandWhetherCSV(region);
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
         }
-        renderPrefectureUI();
+
         return true; 
     } catch (err) {
         console.error("データ読み込みエラー:", err);
@@ -1638,10 +1962,190 @@ async function loadPrefectureData(prefCode) {
     }
 }
 
+// ==========================================
+// ★ データの完全性チェック＆ロード関数
+// ==========================================
+async function checkAndLoadRouteData() {
+    // getParsedPrefQuery() は呼ばない（日本語が返ってくるため）
+    // すでに DOMContentLoaded で applyQueryToStateFromCsv() が走り、
+    // window.currentPref (例: "CHIBA") などが確定している前提で動く。
+
+    const prefCode = window.currentPref;
+    const region = window.currentRegion || 'KANTO';
+    
+    // Region（広域）画面ならデータチェックは不要
+    if (!prefCode) return true; 
+
+    let needsBaseLoad = false;
+    let needsFishLoad = false;
+
+    // 1. 県の基本データ（ロケーション・天気）が揃っているか
+    if (!window.prefData) {
+        needsBaseLoad = true;
+    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
+        needsBaseLoad = true;
+    }
+
+    // 2. エリア/スポット画面特有のチェック (魚データ)
+    let resolvedAreaId = window.currentAreaId; // ハッシュではなく、確定済みの変数を使う
+    
+    // もし areaId が確定しているのに魚データが無ければロードフラグを立てる
+    if (resolvedAreaId && !window.fishData) {
+        needsFishLoad = true;
+    }
+
+    // --- データ不足時のロード処理 ---
+    if (needsBaseLoad || needsFishLoad) {
+        
+        // ① ロケーションと天気（沿岸・内陸）を一括ロード
+        if (needsBaseLoad) {
+            await loadPrefectureData(prefCode);
+            renderPrefectureUI(); 
+        }
+        
+        // ② 魚データをロード
+        if (resolvedAreaId) {
+            await prepareFishForArea(resolvedAreaId);
+        }
+
+        // ③ データの準備が完全に整ったので、改めてルート更新を最初からやり直す
+        routeUpdate();
+        return false; 
+    }
+
+    return true; 
+}
+
+// ==========================================
+// 4. ハブとなる routeUpdate (クエリ連動テスト版)
+// ==========================================
+// ==========================================
+// 4. ハブとなる routeUpdate (クエリ連動テスト版)
+// ==========================================
+async function routeUpdate() {
+    // ★ ここで初めてCSVが読み込まれ、window.prefData や window.spotData が作成される！
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return; // 読み込み完了（オブジェクト作成）までここでストップ[span_6](start_span)[span_6](end_span)
+
+    // ★ 以降の処理は、window.prefData が100%作成し終わっていることが保証される！[span_7](start_span)[span_7](end_span)
+    if (!window.currentPref) {
+        document.getElementById('map-back-btn').style.display = 'none';
+        loadRegionMap(window.currentRegion || 'KANTO');
+        return;
+    }
+
+    // ─── スポット階層 ───
+    if (window.currentSpotId) {
+        const spotId = String(window.currentSpotId).split("_");
+        const safeAreaId = window.currentAreaId || ""; 
+        
+        const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
+        const targetIndivId = spotId[2] || spotId[0]; 
+        const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+        
+        if (spot) {
+            // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
+            setIdealQuery('pref', window.prefData.notes);
+            const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+            if (parentArea) setIdealQuery('area', parentArea.name);
+            setIdealQuery('spot', spot.name);
+
+            drawLocation(spot.name, spot.lat, spot.lng, "13");
+            zoomToSpot(spot);
+            
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                }
+            });
+        }
+        return;
+    }
+
+    // ─── エリア階層 ───
+    if (window.currentAreaId) {
+        const safeAreaId = window.currentAreaId || ""; 
+        const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+        if (!area) return;
+        
+        // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
+        setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', area.name); 
+        setIdealQuery('spot', null);      
+
+        const safeZoom = area.zoom || window.prefData.zoom;
+        drawLocation(area.name, area.lat, area.lng, safeZoom);
+        selectArea(area.name);
+        renderCrowdImage();
+        
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.display = 'block';
+                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+            }
+        });
+        return;
+    }
+alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
+
+    // ─── 県階層 ───
+    if (window.prefData) {
+
+        // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
+        setIdealQuery('pref', window.prefData.notes); 
+        setIdealQuery('area', null);                 
+        setIdealQuery('spot', null);                 
+
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+        
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                showPrefSpots();
+                initAreaUI();
+                renderPrefWeather();
+                renderCrowdImage();
+                
+                requestAnimationFrame(() => {
+                    const btn = document.getElementById('map-back-btn');
+                    if (btn) {
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                    }
+                });
+            });
+        });
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    // ★ 1. テスト環境のベースを強制定義（ユーザーの意図通り）
+    window.currentRegion = 'KANTO';
+    window.regionUrl = '/KANTO/KANTO_region.csv';
+
+    // ★ 2. URLにクエリが無い初回アクセス時、ここで強制的にベースを付ける（空振り防止）
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get('pref')) {
+        setIdealQuery('region', 'KANTO';
+        setIdealQuery('pref', '千葉県');
+    }
+    
+    // ★ 3. クエリが確実にある状態でCSVを直接読む
+    await applyQueryToStateFromCsv();
+    alert(`pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
+
+
+
+    // 5. ルート更新を実行
+    //routeUpdate();
+});
+
 
 </script>
-
-
 
 </body>
 </html>
