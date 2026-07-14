@@ -2001,21 +2001,22 @@ async function checkAndLoadRouteData() {
     if (needsBaseLoad || needsFishLoad) {
         
         if (needsBaseLoad) {
+            // ★ 1. await でしっかりと prefecture データのロード完了を待つ
             await loadPrefectureData(prefCode);
-            renderPrefectureUI(); 
             
-            // ★【修正1】URL直打ち対策
-            // いきなりエリア階層からスタートした場合でも、県域のマーカーやメニューが
-            // 構築されるように、初回データロード完了時に確実に一度だけ実行する
+            // ★ 2. ロードが完全に終わってから UI の初期化関数群を呼び出す
+            renderPrefectureUI(); 
             if (typeof showPrefSpots === 'function') showPrefSpots();
             if (typeof initAreaUI === 'function') initAreaUI();
             if (typeof renderPrefWeather === 'function') renderPrefWeather();
         }
         
         if (resolvedAreaId) {
+            // ★ 3. 魚データのロードも同様に完了を待つ
             await prepareFishForArea(resolvedAreaId);
         }
 
+        // 4. すべての非同期ロードが完了したことを保証した上でルート更新を再実行
         routeUpdate();
         return false; 
     }
