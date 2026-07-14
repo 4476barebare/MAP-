@@ -2032,7 +2032,7 @@ async function routeUpdate() {
     if (!isReady) return; 
 
     // ★ 追加：routeUpdate が本番処理に入る瞬間のデータ状態をアラートで確認
-    alert(`【routeUpdate 通過時】\nprefData存在: ${!!window.prefData}\nspotData件数: ${window.spotData ? window.spotData.length : '0 または undefined'}`);
+    //alert(`【routeUpdate 通過時】\nprefData存在: ${!!window.prefData}\nspotData件数: ${window.spotData ? window.spotData.length : '0 または undefined'}`);
 
     if (!window.currentPref) {
         document.getElementById('map-back-btn').style.display = 'none';
