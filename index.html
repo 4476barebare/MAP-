@@ -2017,17 +2017,12 @@ async function checkAndLoadRouteData() {
 }
 
 // ==========================================
-// 4. ハブとなる routeUpdate (リファクタリング版)
-// ==========================================
-// ==========================================
 // 4. ハブとなる routeUpdate (クエリ連動テスト版)
 // ==========================================
 async function routeUpdate() {
-    // ★ 1. データの完全性をガード（足りなければ裏でロードして再度呼び出される）
     const isReady = await checkAndLoadRouteData();
-    if (!isReady) return; // 準備中なのでストップ
+    if (!isReady) return; 
 
-    // ★ 2. 以降の処理は「すべてのデータが100%揃っている」前提で安全に描画に専念できる
     const { region, pref: prefCode } = getParsedPrefQuery();
 
     if (!prefCode) {
@@ -2042,22 +2037,21 @@ async function routeUpdate() {
 
     // ─── スポット階層 ───
     if (window.currentSpotId) {
-        const spotId = window.currentSpotId.split("_");
-        const list = window.spotData.filter(s => String(s.areaId) === String(window.currentAreaId));
-        const spot = list.find(s => String(s.individualId) === String(spotId[2]));
+        const spotId = String(window.currentSpotId).split("_");
+        const safeAreaId = window.currentAreaId || ""; // ★ エラー回避：null対策
+        
+        const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
+        // ★ エラー回避：配列の長さに依存しないフォールバック
+        const targetIndivId = spotId[2] || spotId[0]; 
+        const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+        
         if (spot) {
-            
-            // =====================================
-            // ★ テスト：スポット階層のクエリセット（実データ引用）
-            // =====================================
             if (window.prefData) setIdealQuery('pref', window.prefData.name);
-            const parentArea = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
+            const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
             if (parentArea) setIdealQuery('area', parentArea.name);
-            setIdealQuery('spot', spot.name); // 本物のスポット名をセット
+            setIdealQuery('spot', spot.name);
 
             drawLocation(spot.name, spot.lat, spot.lng, "13");
-            
-            // ★ データは揃っているので、Promiseを待たずに即座に描画へ飛べる！
             zoomToSpot(spot);
             
             requestAnimationFrame(() => {
@@ -2077,17 +2071,17 @@ async function routeUpdate() {
 
     // ─── エリア階層 ───
     if (window.currentAreaId) {
-        const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
+        const safeAreaId = window.currentAreaId || ""; // ★ エラー回避：null対策
+        const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
         if (!area) return;
         
-        // =====================================
-        // ★ テスト：エリア階層のクエリセット（実データ引用）
-        // =====================================
         if (window.prefData) setIdealQuery('pref', window.prefData.name);
-        setIdealQuery('area', area.name); // 本物のエリア名をセット
-        setIdealQuery('spot', null);      // スポットは削除
+        setIdealQuery('area', area.name); 
+        setIdealQuery('spot', null);      
 
-        drawLocation(area.name, area.lat, area.lng, area.zoom || window.prefData.zoom);
+        // ★ エラー回避：prefDataが万が一無い場合のデフォルトズームを設定
+        const safeZoom = area.zoom || (window.prefData ? window.prefData.zoom : 10);
+        drawLocation(area.name, area.lat, area.lng, safeZoom);
         selectArea(area.name);
         renderCrowdImage();
         
@@ -2107,13 +2101,9 @@ async function routeUpdate() {
 
     // ─── 県階層 ───
     if (window.prefData) {
-        
-        // =====================================
-        // ★ テスト：県階層のクエリセット（実データ引用）
-        // =====================================
-        setIdealQuery('pref', window.prefData.name); // 本物の県名をセット
-        setIdealQuery('area', null);                 // エリアは削除
-        setIdealQuery('spot', null);                 // スポットは削除
+        setIdealQuery('pref', window.prefData.name); 
+        setIdealQuery('area', null);                 
+        setIdealQuery('spot', null);                 
 
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
         
@@ -2139,6 +2129,7 @@ async function routeUpdate() {
         });
     }
 }
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     
