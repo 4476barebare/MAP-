@@ -2130,23 +2130,29 @@ async function routeUpdate() {
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // ★ 0. テスト用：一番最初に強制的にKANTOとRegionのURLを定義する
+    // ★ 1. テスト環境のベースを強制定義（ユーザーの意図通り）
     window.currentRegion = 'KANTO';
     window.regionUrl = '/KANTO/KANTO_region.csv';
-        // 2. 逆引きが終わった状態で、ハッシュによる復元処理を呼ぶ（まだ消さずに共存）
+
+    // ★ 2. URLにクエリが無い初回アクセス時、ここで強制的にベースを付ける（空振り防止）
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get('pref')) {
+        setIdealQuery('region', 'KANTO';
+        setIdealQuery('pref', '千葉県');
+    }
+    
+    // ★ 3. クエリが確実にある状態でCSVを直接読む
+    await applyQueryToStateFromCsv();
+    
+    // 4. ハッシュによる復元処理（まだ消さずに共存させる）
     if (typeof updateStateFromHash === 'function') {
         updateStateFromHash();
     }
-    // ★ 1. URLのクエリ(日本語)からシステム変数を直接逆引きしてセットする
-    await applyQueryToStateFromCsv();
-    
 
-    // 3. ルート更新を実行
+    // 5. ルート更新を実行
     routeUpdate();
-    
 });
 
 
