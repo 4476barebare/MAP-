@@ -2133,21 +2133,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const params = new URLSearchParams(window.location.search);
     
-    // ★ 1. 千葉県の固定処理を削除。クエリが無い場合はRegion（関東地方）のみセットする
+    // 1. 基本Regionの決定
     if (!params.get('region') && !params.get('pref')) {
         setIdealQuery('region', '関東地方'); 
     }
-
-    // ★ 2. マッピングを使ってグローバル変数を定義する
     window.currentRegion = getRegionCode();
     window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
 
-    // ★ 3. 変数が定義された状態で逆引きを実行（prefが無い場合は何もしないで通過）
+    // 2. 逆引き実行（ここで window.currentPref や window.prefLocationUrl が確定する）
     await applyQueryToStateFromCsv();
     
-    // ★ 4. ルート更新を実行
-    // prefが無い状態なので、内部で loadRegionMap(window.currentRegion) が呼ばれRegion画面が開く
-    routeUpdate();
+    // 3. prefが確定していなければ、Region画面（マップ上の県マーカー選択画面）を出して終了
+    if (!window.currentPref) {
+        routeUpdate(); // 内部でloadRegionMapが呼ばれる
+        return;
+    }
+
+    // 4. ★ここから本来の読み込みチェーン開始
+    // 確定した情報からパスを生成
+    const csvUrl = window.prefLocationUrl;
+    const whetherUrl = `/data/${window.currentPref}_whether.csv`;
+    const shopUrl = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
+
+    // このチェーン内で初めてロードと描画を完結させる
+    loadLocationCSV(csvUrl, window.currentPref).then(() => {
+        loadWhetherCSV(whetherUrl).then(csv => {
+            applyWhetherToSpots(csv);
+            
+            if (typeof loadInlandWhetherCSV === 'function') {
+                loadInlandWhetherCSV(window.currentRegion).then(inlandCsv => {
+                    applyInlandWhetherToSpots(inlandCsv);
+
+                    // データが全て揃った後に描画系を起動
+                    routeUpdate();
+                    renderAreaGuide();
+                    
+                    if (window.markerControl) {
+                        window.markerControl.preloadShop01(shopUrl);
+                    }
+                    
+                    getAlertText(window.prefData, function(result) {
+                        const el = document.getElementById("alert-bar");
+                        if (el) {
+                            el.textContent = result.text;
+                            el.style.color = result.color;
+                        }
+                    });
+                });
+            }
+        });
+    });
 });
 
 </script>
