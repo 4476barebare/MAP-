@@ -502,17 +502,19 @@ function initAreaUI() {
         row.style.cursor = 'pointer';
 
         row.onclick = () => {
-            // ★ location.hash を削除し、クエリ処理のみにする
-            
-            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            // 1. クエリを更新（日本語名notesを使用）
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
             setIdealQuery('area', area.name);
             setIdealQuery('spot', null);
 
-            // ★ ハッシュベースの状態更新関数は不要になるため削除（必要に応じて routeUpdate() 等に変更してください）
-            // updateStateFromHash(); 
-            
+            // 2. システム変数を直接更新
+            window.currentAreaId = area.areaId + '_' + area.individualId;
+            window.currentSpotId = null;
+
             destroyAreaUI();
-            selectArea(area);
+            
+            // 3. 状態更新とロードをハブに一任
+            routeUpdate();
         };
 
         const left = document.createElement('div');
@@ -574,21 +576,25 @@ function initAreaUI() {
 
         if (!nearest) return;
 
-        // ★ location.hash を削除し、クエリ処理のみにする
-        
-        if (window.prefData) setIdealQuery('pref', window.prefData.name);
+        // 1. クエリを更新（日本語名notesを使用）
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         setIdealQuery('area', nearest.name);
         setIdealQuery('spot', null);
 
-        // ★ updateStateFromHash() を削除
-        
+        // 2. システム変数を直接更新
+        window.currentAreaId = nearest.areaId + '_' + nearest.individualId;
+        window.currentSpotId = null;
+
         destroyAreaUI();
-        selectArea(nearest);
+        
+        // 3. 状態更新とロードをハブに一任
+        routeUpdate();
     };
 
     window.nearestClickEnabled = true;
     window.map.on('click', window.nearestClickHandler);
 }
+
 
 function destroyAreaUI() {
     const menuUl = document.querySelector('#map-menu ul');
