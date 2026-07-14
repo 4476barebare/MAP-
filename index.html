@@ -1975,53 +1975,45 @@ async function loadPrefectureData(prefCode) {
 }
 
 // ==========================================
-// ★ データの完全性チェック＆ロード関数
+// ★ デバッグ対応版：データの完全性チェック＆ロード関数
 // ==========================================
 async function checkAndLoadRouteData() {
-    const prefCode = window.currentPref;
-    const region = window.currentRegion || 'KANTO';
+    showdebug("ロード処理開始...");
     
+    const prefCode = window.currentPref;
     if (!prefCode) return true; 
 
-    let needsBaseLoad = false;
-    let needsFishLoad = false;
+    try {
+        let needsBaseLoad = false;
+        if (!window.prefData) {
+            needsBaseLoad = true;
+        } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
+            needsBaseLoad = true;
+        }
 
-    if (!window.prefData) {
-        needsBaseLoad = true;
-    } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
-        needsBaseLoad = true;
-    }
-
-    let resolvedAreaId = window.currentAreaId; 
-    
-    if (resolvedAreaId && !window.fishData) {
-        needsFishLoad = true;
-    }
-
-    if (needsBaseLoad || needsFishLoad) {
-        
         if (needsBaseLoad) {
-            // ★ 1. await でしっかりと prefecture データのロード完了を待つ
+            showdebug("CSVロード中: " + prefCode);
             await loadPrefectureData(prefCode);
             
-            // ★ 2. ロードが完全に終わってから UI の初期化関数群を呼び出す
+            showdebug("UI構築中...");
             renderPrefectureUI(); 
             if (typeof showPrefSpots === 'function') showPrefSpots();
             if (typeof initAreaUI === 'function') initAreaUI();
             if (typeof renderPrefWeather === 'function') renderPrefWeather();
         }
-        
-        if (resolvedAreaId) {
-            // ★ 3. 魚データのロードも同様に完了を待つ
-            await prepareFishForArea(resolvedAreaId);
+
+        if (window.currentAreaId && !window.fishData) {
+            showdebug("魚データロード中...");
+            await prepareFishForArea(window.currentAreaId);
         }
 
-        // 4. すべての非同期ロードが完了したことを保証した上でルート更新を再実行
-        routeUpdate();
-        return false; 
+        showdebug("ロード完了");
+        return true; 
+    } catch (err) {
+        // ★ エラー内容を画面に直出しする
+        showdebug("エラー発生: " + err.message);
+        return false;
     }
-
-    return true; 
 }
 
 // ==========================================
