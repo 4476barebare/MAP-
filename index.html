@@ -2119,28 +2119,24 @@ alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.cu
     }
 }
 
-
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // ★ 1. テスト環境のベースを強制定義（ユーザーの意図通り）
     window.currentRegion = 'KANTO';
     window.regionUrl = '/KANTO/KANTO_region.csv';
 
-    // ★ 2. URLにクエリが無い初回アクセス時、ここで強制的にベースを付ける（空振り防止）
     const params = new URLSearchParams(window.location.search);
     if (!params.get('pref')) {
-        setIdealQuery('region', 'KANTO';
+        setIdealQuery('region', 'KANTO'); // ★ カンマを修正
         setIdealQuery('pref', '千葉県');
     }
     
-    // ★ 3. クエリが確実にある状態でCSVを直接読む
     await applyQueryToStateFromCsv();
-    alert(`pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
+    
+    // データロード後の状態を確認
+    alert(`LOAD完了: pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
 
-
-
-    // 5. ルート更新を実行
-    //routeUpdate();
+    // ルート更新を実行
+    routeUpdate();
 });
 
 
