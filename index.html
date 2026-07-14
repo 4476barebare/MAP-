@@ -2145,14 +2145,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ★ 0. テスト用：一番最初に強制的にKANTOとRegionのURLを定義する
     window.currentRegion = 'KANTO';
     window.regionUrl = '/KANTO/KANTO_region.csv';
-    
-    // ★ 1. URLのクエリ(日本語)からシステム変数を直接逆引きしてセットする
-    await applyQueryToStateFromCsv();
-    
-    // 2. 逆引きが終わった状態で、ハッシュによる復元処理を呼ぶ（まだ消さずに共存）
+        // 2. 逆引きが終わった状態で、ハッシュによる復元処理を呼ぶ（まだ消さずに共存）
     if (typeof updateStateFromHash === 'function') {
         updateStateFromHash();
     }
+    // ★ 1. URLのクエリ(日本語)からシステム変数を直接逆引きしてセットする
+    await applyQueryToStateFromCsv();
+    
 
     // 3. ルート更新を実行
     routeUpdate();
