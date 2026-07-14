@@ -2502,18 +2502,30 @@ function goBack() {
         window.prefData.lng,
         window.prefData.zoom
     );
-    location.hash = '';
 
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-        updateStateFromHash();
+        
+        // ───【ここで初めて変数とクエリをクリアする】───
+        // 1. クエリを更新（県だけ残す）
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', null);
+        setIdealQuery('spot', null);
+
+        // 2. システム変数を直接更新
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+
+        // UIを県画面の構成に戻す
         initAreaUI();
         showPrefSpots();
         renderPrefWeather();
         resetAreaGuide();
 
+        // ロックを解除してボタンを復活
         releaseLockAndShowBtn();
     });
+
 }
 
 function buildSpotRestoreObject() {
