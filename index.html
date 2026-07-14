@@ -1737,7 +1737,7 @@ function getParsedPrefQuery() {
     //    return { region: parts[0], pref: parts[1] };
     //}
     //return { region: 'KANTO', pref: parts[0] };
-    return { region: 'KANTO', pref: 'CHIBA' };
+    return { region: 'KANTO', pref: '千葉県' };
 }
 
 // ==========================================
@@ -2089,9 +2089,12 @@ async function routeUpdate() {
         });
         return;
     }
+alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
 
     // ─── 県階層 ───
     if (window.prefData) {
+        alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
+
         // ★ 作成済みの window.prefData から安全に notes（千葉県）を引用
         setIdealQuery('pref', window.prefData.notes); 
         setIdealQuery('area', null);                 
