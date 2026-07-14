@@ -2146,10 +2146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ★ 3. クエリが確実にある状態でCSVを直接読む
     await applyQueryToStateFromCsv();
     
-    // 4. ハッシュによる復元処理（まだ消さずに共存させる）
-    if (typeof updateStateFromHash === 'function') {
-        updateStateFromHash();
-    }
+
 
     // 5. ルート更新を実行
     routeUpdate();
