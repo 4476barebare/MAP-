@@ -1966,7 +1966,12 @@ async function loadPrefectureData(prefCode) {
 // ★ データの完全性チェック＆ロード関数
 // ==========================================
 async function checkAndLoadRouteData() {
-    const { region, pref: prefCode } = getParsedPrefQuery();
+    // getParsedPrefQuery() は呼ばない（日本語が返ってくるため）
+    // すでに DOMContentLoaded で applyQueryToStateFromCsv() が走り、
+    // window.currentPref (例: "CHIBA") などが確定している前提で動く。
+
+    const prefCode = window.currentPref;
+    const region = window.currentRegion || 'KANTO';
     
     // Region（広域）画面ならデータチェックは不要
     if (!prefCode) return true; 
@@ -1974,43 +1979,24 @@ async function checkAndLoadRouteData() {
     let needsBaseLoad = false;
     let needsFishLoad = false;
 
-    // ★ 修正箇所：別の県から来た場合、前の県の魚データが残っているのでここで完全リセット！
-    // これにより、下の needsFishLoad の判定が正しく機能するようになります。
-    if (window.currentPref !== prefCode) {
-        window.fishData = null;
-    }
-
     // 1. 県の基本データ（ロケーション・天気）が揃っているか
-    if (!window.prefData || window.currentPref !== prefCode) {
+    if (!window.prefData) {
         needsBaseLoad = true;
     } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
         needsBaseLoad = true;
     }
 
     // 2. エリア/スポット画面特有のチェック (魚データ)
-    let resolvedAreaId = null;
-    const hash = decodeURIComponent(location.hash.replace('#', ''));
-    if (hash) {
-        const areaName = hash.split('/')[0];
-        
-        if (!window.areaData) {
-            needsBaseLoad = true;
-        } else {
-            const area = window.areaData.find(a => a.name === areaName);
-            if (area) {
-                resolvedAreaId = prefCode + "_" + area.individualId;
-                if (!window.fishData) {
-                    needsFishLoad = true;
-                }
-            }
-        }
+    let resolvedAreaId = window.currentAreaId; // ハッシュではなく、確定済みの変数を使う
+    
+    // もし areaId が確定しているのに魚データが無ければロードフラグを立てる
+    if (resolvedAreaId && !window.fishData) {
+        needsFishLoad = true;
     }
 
     // --- データ不足時のロード処理 ---
     if (needsBaseLoad || needsFishLoad) {
-        window.currentRegion = region || 'KANTO';
-        window.currentPref = prefCode;
-
+        
         // ① ロケーションと天気（沿岸・内陸）を一括ロード
         if (needsBaseLoad) {
             await loadPrefectureData(prefCode);
@@ -2018,12 +2004,6 @@ async function checkAndLoadRouteData() {
         }
         
         // ② 魚データをロード
-        if (hash && !resolvedAreaId && window.areaData) {
-            const areaName = hash.split('/')[0];
-            const area = window.areaData.find(a => a.name === areaName);
-            if (area) resolvedAreaId = prefCode + "_" + area.individualId;
-        }
-
         if (resolvedAreaId) {
             await prepareFishForArea(resolvedAreaId);
         }
