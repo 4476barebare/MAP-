@@ -2361,13 +2361,16 @@ function goBack() {
     if (!window.currentAreaId && !window.currentSpotId) {
         const regionToLoad = window.currentRegion || 'KANTO';
 
-        const url = new URL(location.href);
-        url.searchParams.delete('pref');
-        history.replaceState(null, '', url);
+        // 1. クエリをすべてクリア
+        setIdealQuery('pref', null);
+        setIdealQuery('area', null);
+        setIdealQuery('spot', null);
 
+        // 2. システム変数を完全リセット
         window.currentPref = null;
         window.prefData = null;
-        location.hash = '';
+        window.currentAreaId = null;
+        window.currentSpotId = null;
 
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
@@ -2442,12 +2445,15 @@ function goBack() {
             return;
         }
 
-        const spotKey = window.currentSpotId?.split('_')[2];
-        if (spotKey) {
-            location.hash = location.hash.replace('/' + spotKey, '');
-        }
+        // 1. クエリを更新（spotだけnullにする）
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
+        if (parentArea) setIdealQuery('area', parentArea.name);
+        setIdealQuery('spot', null);
 
-        updateStateFromHash();
+        // 2. システム変数を直接更新（エリアIDは維持）
+        window.currentSpotId = null;
+
         removeWeekItem();
         resetWeatherUI();
 
@@ -2542,11 +2548,18 @@ function goBack() {
         window.prefData.lng,
         window.prefData.zoom
     );
-    location.hash = '';
+    
+    // 1. クエリを更新（県だけ残す）
+    if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+    setIdealQuery('area', null);
+    setIdealQuery('spot', null);
+
+    // 2. システム変数を直接更新
+    window.currentAreaId = null;
+    window.currentSpotId = null;
 
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-        updateStateFromHash();
         initAreaUI();
         showPrefSpots();
         renderPrefWeather();
