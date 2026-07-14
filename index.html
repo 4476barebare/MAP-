@@ -485,7 +485,7 @@ function initAreaUI() {
     // =====================
     // ■ リスト削除（スッキリ書き換え）
     // =====================
-    const oldItems = ul.querySelectorAll('li'); // 古い :not(.menu-header-row) の指定を削除
+    const oldItems = ul.querySelectorAll('li'); 
     oldItems.forEach(el => el.remove());
 
     // =====================
@@ -502,14 +502,15 @@ function initAreaUI() {
         row.style.cursor = 'pointer';
 
         row.onclick = () => {
-            location.hash = encodeURIComponent(area.name);
+            // ★ location.hash を削除し、クエリ処理のみにする
             
-            // ★ テスト追加：クリックされた本物の area オブジェクトから引用！
             if (window.prefData) setIdealQuery('pref', window.prefData.name);
             setIdealQuery('area', area.name);
             setIdealQuery('spot', null);
 
-            updateStateFromHash();
+            // ★ ハッシュベースの状態更新関数は不要になるため削除（必要に応じて routeUpdate() 等に変更してください）
+            // updateStateFromHash(); 
+            
             destroyAreaUI();
             selectArea(area);
         };
@@ -573,14 +574,14 @@ function initAreaUI() {
 
         if (!nearest) return;
 
-        location.hash = encodeURIComponent(nearest.name);
+        // ★ location.hash を削除し、クエリ処理のみにする
         
-        // ★ テスト追加：導き出された nearest オブジェクトから引用！
         if (window.prefData) setIdealQuery('pref', window.prefData.name);
         setIdealQuery('area', nearest.name);
         setIdealQuery('spot', null);
 
-        updateStateFromHash();
+        // ★ updateStateFromHash() を削除
+        
         destroyAreaUI();
         selectArea(nearest);
     };
