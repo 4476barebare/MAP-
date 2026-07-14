@@ -358,6 +358,85 @@ function getSpotIdFromQuery(spotQuery, resolvedAreaId) {
     return null;
 }
 
+// ==========================================
+// ★ 新規追加：内部IDから日本語名を逆引きしてURLクエリにセットする関数
+// ==========================================
+async function updateQueryFromIds(pref, currentAreaId, currentSpotId) {
+    
+    // --------------------------------------------------
+    // パターン1：第一引数 (pref) のみ存在する場合
+    // --------------------------------------------------
+    if (pref && !currentAreaId && !currentSpotId) {
+        
+        // ★ グローバル化されたURLをそのまま使う！
+        if (!window.regionUrl) return;
+        
+        try {
+            const res = await fetch(window.regionUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length > 0) {
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    const nameIdx = headers.findIndex(h => h.toLowerCase() === 'name');
+                    const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
+                    
+                    if (nameIdx !== -1 && notesIdx !== -1) {
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            if (cols[nameIdx] === pref) {
+                                setIdealQuery('pref', cols[notesIdx]);
+                                // ★ regionもついでにセットできるならここで！
+                                // setIdealQuery('region', 取得したregion名など);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Region CSVフェッチエラー:", err);
+        }
+    }
+
+    // --------------------------------------------------
+    // パターン2：第二引数 (currentAreaId) まで存在する場合
+    // --------------------------------------------------
+    else if (pref && currentAreaId && !currentSpotId) {
+        if (window.areaData) {
+            // 第二引数を "_" でスプリットした [0] を取得
+            const splitAreaId = String(currentAreaId).split('_')[0]; 
+            
+            // window.areaDataの individualId 列と同じものを探す
+            const area = window.areaData.find(a => String(a.individualId) === splitAreaId);
+            
+            if (area) {
+                // name列を area クエリとしてセット
+                setIdealQuery('area', area.name);
+            }
+        }
+    }
+
+    // --------------------------------------------------
+    // パターン3：第三引数 (currentSpotId) まで存在する場合
+    // --------------------------------------------------
+    else if (pref && currentAreaId && currentSpotId) {
+        if (window.spotData) {
+            // areaId列が currentAreaId と同じで、さらに individualId が currentSpotId と同じ行を探す
+            const spot = window.spotData.find(s => 
+                String(s.areaId) === String(currentAreaId) && 
+                String(s.individualId) === String(currentSpotId)
+            );
+            
+            if (spot) {
+                // name列を spot クエリとしてセット
+                setIdealQuery('spot', spot.name);
+            }
+        }
+    }
+}
+
 
 function formatDate(str) {
   const [y, m, d] = str.split("-");
@@ -1729,9 +1808,9 @@ function loadRegionMap(regionCode = 'KANTO') {
     }
 
     // 4. 初回 or URL直打ちからの戻り時は、CSVをフェッチする
-    const regionCsvUrl = `/${regionCode}/${regionCode}_region.csv`;
+    window.regionUrl = `/${regionCode}/${regionCode}_region.csv`; // ★ const を window.regionUrl に変更
 
-    fetch(regionCsvUrl)
+    fetch(window.regionUrl) // ★ 引数も変
         .then(res => {
             if (!res.ok) throw new Error("Region CSV fetch failed");
             return res.text();
@@ -1824,18 +1903,19 @@ function loadRegionMap(regionCode = 'KANTO') {
         .catch(err => console.error("Regionマップの初期化エラー:", err));
 }
 
-// ==========================================
-// 1. データ読み込み専用関数
-// ==========================================
 async function loadPrefectureData(prefCode) {
     // ★ 念のための二重ロック：ロード開始時に前の魚データを確実に消し去る
     window.fishData = null; 
     window.currentPref = prefCode;
     const region = window.currentRegion || 'KANTO';
     
+    // ★ 追加：ここでグローバルにregionのURLを持たせる
+    window.regionUrl = `/${region}/${region}_region.csv`; 
+    
     const csvUrl     = `/${region}/${prefCode}_location.csv`;
     window.fishUrl   = `/${region}/${prefCode}_fish.csv`; 
     const whetherUrl = `/data/${prefCode}_whether.csv`;
+
 
     try {
         await loadLocationCSV(csvUrl);
