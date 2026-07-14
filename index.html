@@ -513,8 +513,8 @@ function initAreaUI() {
 
             destroyAreaUI();
             
-            // 3. 状態更新とロードをハブに一任
-            routeUpdate();
+            // 3. 直接個別描画関数を呼び出して即座にマーカーを描画する
+            selectArea(area);
         };
 
         const left = document.createElement('div');
@@ -587,8 +587,8 @@ function initAreaUI() {
 
         destroyAreaUI();
         
-        // 3. 状態更新とロードをハブに一任
-        routeUpdate();
+        // 3. 直接個別描画関数を呼び出して即座にマーカーを描画する
+        selectArea(nearest);
     };
 
     window.nearestClickEnabled = true;
@@ -2083,7 +2083,7 @@ async function routeUpdate() {
         });
         return;
     }
-alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
+//alert(`prefData:${!!window.prefData}|pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
 
     // ─── 県階層 ───
     if (window.prefData) {
