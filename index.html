@@ -2128,27 +2128,24 @@ function getRegionCode() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     
-    // ★ 1. URLにクエリが無い初回アクセス時、ここで「関東地方」を付ける
     const params = new URLSearchParams(window.location.search);
-    if (!params.get('pref')) {
-        setIdealQuery('region', '関東地方'); // ★ ここを日本語にする
-        setIdealQuery('pref', '千葉県');
+    
+    // ★ 1. 千葉県の固定処理を削除。クエリが無い場合はRegion（関東地方）のみセットする
+    if (!params.get('region') && !params.get('pref')) {
+        setIdealQuery('region', '関東地方'); 
     }
 
     // ★ 2. マッピングを使ってグローバル変数を定義する
     window.currentRegion = getRegionCode();
     window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
 
-    // ★ 3. 変数が定義された状態で逆引きを実行
+    // ★ 3. 変数が定義された状態で逆引きを実行（prefが無い場合は何もしないで通過）
     await applyQueryToStateFromCsv();
     
-    // データロード後の状態を確認
-    //alert(`LOAD完了: pref:${window.currentPref}|area:${window.currentAreaId}|spot:${window.currentSpotId}`);
-
-    // ルート更新を実行
+    // ★ 4. ルート更新を実行
+    // prefが無い状態なので、内部で loadRegionMap(window.currentRegion) が呼ばれRegion画面が開く
     routeUpdate();
 });
-
 
 </script>
 
