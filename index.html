@@ -1658,16 +1658,19 @@ function renderAreaGuide() {
             }
 
             // =====================================================
-            // ★ 新しいエリアへのジャンプ処理
+            // ★ 新しいエリアへのジャンプ処理（ハッシュ操作を完全削除）
             // =====================================================
-            location.hash = encodeURIComponent(area.name);
             
-            // ★ テスト追加：クリックされた本物の area オブジェクトから引用！
-            if (window.prefData) setIdealQuery('pref', window.prefData.name);
+            // クエリをセット（日本語名notesを確実に使う）
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
             setIdealQuery('area', area.name);
             setIdealQuery('spot', null);
 
-            if (typeof updateStateFromHash === 'function') updateStateFromHash();
+            // システム変数の更新
+            window.currentAreaId = area.areaId + '_' + area.individualId;
+            window.currentSpotId = null;
+
+            // ハッシュ由来の updateStateFromHash は不要になったので直接 routeUpdate を呼ぶ
             if (typeof routeUpdate === 'function') routeUpdate();
             openArea(area.individualId, true);
 
