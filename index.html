@@ -265,22 +265,6 @@ function setIdealQuery(type, value) {
 }
 
 
-// 2. あなたの安全な手法を使ったクエリ判定関数
-function checkCurrentQuery() {
-    const url = new URL(location.href);
-    const prefQuery = url.searchParams.get('pref');
-
-    if (!prefQuery) {
-        showdebug("【テスト結果】 クエリ無し");
-    } else {
-        showdebug("【テスト結果】 現在のクエリ: pref=" + prefQuery);
-    }
-}
-
-// 3. ページ読み込み時に実行する
-document.addEventListener('DOMContentLoaded', () => {
-    checkCurrentQuery();
-});
 
 // 2. あなたの安全な手法を使ったクエリ判定関数（全パラメータ対応版）
 function checkCurrentQuery() {
@@ -310,53 +294,6 @@ function checkCurrentQuery() {
 
 
 
-// ==========================================
-// ■ エリア名(日本語)から currentAreaId を生成する関数
-// ==========================================
-function getAreaIdFromQuery(areaQuery) {
-    if (!areaQuery || !window.areaData) return null;
-
-    let area = window.areaData.find(a => a.name === areaQuery);
-    
-    if (!area) {
-        area = window.areaData.find(a => String(a.individualId) === String(areaQuery));
-    }
-
-    // ★ 修正：グローバル変数ではなく、確実にそのエリアのデータ列から生成する
-    if (area) {
-        return area.areaId + "_" + area.individualId;
-    }
-
-    return null;
-}
-
-// ==========================================
-// ■ スポット名(日本語)から currentSpotId を生成する関数
-// ==========================================
-function getSpotIdFromQuery(spotQuery, resolvedAreaId) {
-    if (!spotQuery || !resolvedAreaId || !window.spotData) return null;
-
-    // ① CSV跨ぎの被りを防ぐため、必ず resolvedAreaId で絞り込んで検索する
-    let spot = window.spotData.find(s => 
-        s.name === spotQuery && 
-        s.areaId === resolvedAreaId
-    );
-
-    // ② ID直打ちのフォールバック時も同様に絞り込む
-    if (!spot) {
-        spot = window.spotData.find(s => 
-            String(s.individualId) === String(spotQuery) && 
-            s.areaId === resolvedAreaId
-        );
-    }
-
-    // ★ 結合せず、individualId列をそのまま返す
-    if (spot) {
-        return spot.individualId;
-    }
-
-    return null;
-}
 
 // ==========================================
 // ★ 新規追加：内部IDから日本語名を逆引きしてURLクエリにセットする関数
@@ -433,6 +370,105 @@ async function updateQueryFromIds(pref, currentAreaId, currentSpotId) {
                 // name列を spot クエリとしてセット
                 setIdealQuery('spot', spot.name);
             }
+        }
+    }
+}
+
+// ==========================================
+// ★ 新規追加：URLクエリの日本語名から直接CSVを読んでシステム変数をセットする関数
+// ==========================================
+async function applyQueryToStateFromCsv() {
+    const params = new URLSearchParams(window.location.search);
+    const qPref = params.get('pref');
+    const qArea = params.get('area');
+    const qSpot = params.get('spot');
+
+    if (!qPref) return; // prefクエリが無い場合は何もしない
+
+    // --------------------------------------------------
+    // パターン1：prefクエリがある場合 (Region CSVの探索)
+    // --------------------------------------------------
+    if (window.regionUrl) {
+        try {
+            const res = await fetch(window.regionUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length > 0) {
+                    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                    const nameIdx  = headers.indexOf('name');
+                    const notesIdx = headers.indexOf('notes');
+                    const urlIdx   = headers.indexOf('url');
+                    
+                    if (nameIdx !== -1 && notesIdx !== -1 && urlIdx !== -1) {
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            
+                            // notes列(日本語名)がクエリと一致する行を探す
+                            if (cols[notesIdx] === qPref) {
+                                // name列を pref(現在の県)としてグローバル定義
+                                window.currentPref = cols[nameIdx];
+                                
+                                // URL列の処理 (例: KANTO/CHIBA_location.csv/35.56/140.18)
+                                const rawUrl = cols[urlIdx];
+                                
+                                // "/"でスプリット（先頭の"/"等の空文字エラーを防ぐためfilterを挟む）
+                                let parts = rawUrl.split('/').filter(p => p !== ''); 
+                                
+                                // 0と1を使ってURLを組み立てる（2と3の座標は排除される）
+                                if (parts.length >= 2) {
+                                    window.prefLocationUrl = `/${parts[0]}/${parts[1]}`;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Region CSV逆引きエラー:", err);
+        }
+    }
+
+    // --------------------------------------------------
+    // パターン2 & パターン3 (Location CSVの探索)
+    // --------------------------------------------------
+    // パターン1で prefLocationUrl が無事に定義されていて、かつ下位クエリがある場合のみ実行
+    if ((qArea || qSpot) && window.prefLocationUrl) {
+        try {
+            const res = await fetch(window.prefLocationUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length > 0) {
+                    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                    const nameIdx    = headers.indexOf('name');
+                    const areaIdIdx  = headers.indexOf('areaid');
+                    const indivIdIdx = headers.indexOf('individualid');
+                    
+                    if (nameIdx !== -1 && areaIdIdx !== -1 && indivIdIdx !== -1) {
+                        // 1回のループでエリアとスポットの両方を探す（爆速化）
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            const rowName = cols[nameIdx];
+                            
+                            // パターン2：エリアクエリと同一の行を探す
+                            if (qArea && rowName === qArea) {
+                                window.currentAreaId = cols[areaIdIdx] + "_" + cols[indivIdIdx];
+                            }
+                            
+                            // パターン3：スポットクエリと同一の行を探す
+                            if (qSpot && rowName === qSpot) {
+                                window.currentSpotId = cols[indivIdIdx];
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Location CSV逆引きエラー:", err);
         }
     }
 }
@@ -1214,17 +1250,6 @@ function removeCrowdImage() {
     }
 }
 
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. まずURLのハッシュを解析して、現在の状態（AreaId等）を復元する
-    updateStateFromHash();
-
-
-        routeUpdate();
-    
-});
 
 // ================================
 // ■ 地域選択用マーカーを「フェードアウト」で非表示にする関数
@@ -2135,6 +2160,21 @@ async function routeUpdate() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    // ★ 1. まず、URLのクエリ(日本語)からシステム変数を直接逆引きしてセットする
+    await applyQueryToStateFromCsv();
+    
+    // 2. 逆引きが終わった状態で、ハッシュによる復元処理を呼ぶ
+    // (※ この関数は後々削れる可能性が高いですが、現状はテストのため残します)
+    if (typeof updateStateFromHash === 'function') {
+        updateStateFromHash();
+    }
+
+    // 3. ルート更新を実行
+    routeUpdate();
+    
+});
 
 
 </script>
