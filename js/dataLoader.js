@@ -2276,8 +2276,15 @@ function resetSpotLayers() {
 
 function updateStateFromHash() {
 
+    // ★これを最初に入れる
+    if (!window.areaData || window.areaData.length === 0) {
+        return;
+    }
+
     const url = new URL(location.href);
-    const prefCode = url.searchParams.get('pref');
+const prefCode = url.searchParams.get('pref');
+
+if (!prefCode) return;
     const hash = decodeURIComponent(location.hash.replace('#', ''));
 
     // クエリ(pref)もハッシュもないプレーンな場合はすぐにリターン
