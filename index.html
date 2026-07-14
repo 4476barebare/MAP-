@@ -2016,53 +2016,105 @@ async function checkAndLoadRouteData() {
     }
 }
 
+// ==========================================
+// 4. ハブとなる routeUpdate (クエリ連動テスト版)
+// ==========================================
 async function routeUpdate() {
-    // 1. データロード完了を待つ
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; 
 
-    // 2. マップ操作は一切行わず、状態に応じた「描画関数の呼び出し」のみ行う
-    
-    // ─── 県未選択（広域画面） ───
+    // ★ 追加：routeUpdate が本番処理に入る瞬間のデータ状態をアラートで確認
+    //alert(`【routeUpdate 通過時】\nprefData存在: ${!!window.prefData}\nspotData件数: ${window.spotData ? window.spotData.length : '0 または undefined'}`);
+
     if (!window.currentPref) {
-        // loadRegionMap() の中で中でマップ生成・操作が行われるためOK
-        loadRegionMap();
+        document.getElementById('map-back-btn').style.display = 'none';
+        loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
 
     // ─── スポット階層 ───
     if (window.currentSpotId) {
-        const spot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+        const spotId = String(window.currentSpotId).split("_");
+        const safeAreaId = window.currentAreaId || ""; 
+        
+        const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
+        const targetIndivId = spotId[2] || spotId[0]; 
+        const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+        
         if (spot) {
-            // drawLocation 呼び出しでマップ初期化と描画が行われる
+            setIdealQuery('pref', window.prefData.notes);
+            const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+            if (parentArea) setIdealQuery('area', parentArea.name);
+            setIdealQuery('spot', spot.name);
+
             drawLocation(spot.name, spot.lat, spot.lng, "13");
             zoomToSpot(spot);
+            
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                }
+            });
         }
         return;
     }
 
     // ─── エリア階層 ───
     if (window.currentAreaId) {
-        const area = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
-        if (area) {
-            // drawLocation と selectArea で初期化・描画が行われる
-            selectArea(area);
-        }
+        const safeAreaId = window.currentAreaId || ""; 
+        const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+        if (!area) return;
+        
+        setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', area.name); 
+        setIdealQuery('spot', null);      
+
+        const safeZoom = area.zoom || window.prefData.zoom;
+        drawLocation(area.name, area.lat, area.lng, safeZoom);
+        
+        // ★ area (オブジェクト) 自身を渡す
+        selectArea(area); 
+        renderCrowdImage();
+        
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.display = 'block';
+                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+            }
+        });
         return;
     }
 
     // ─── 県階層 ───
     if (window.prefData) {
+        setIdealQuery('pref', window.prefData.notes); 
+        setIdealQuery('area', null);                 
+        setIdealQuery('spot', null);                 
+
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
         
-        // UI構築系はマップ操作を伴わないためここでOK
-        showPrefSpots();
-        initAreaUI();
-        renderPrefWeather();
-        renderCrowdImage();
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                // ここは「戻る」ボタン等で県画面に戻ってきた時の再構築用として残す
+                if (typeof showPrefSpots === 'function') showPrefSpots();
+                if (typeof initAreaUI === 'function') initAreaUI();
+                if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                renderCrowdImage();
+                
+                requestAnimationFrame(() => {
+                    const btn = document.getElementById('map-back-btn');
+                    if (btn) {
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                    }
+                });
+            });
+        });
     }
 }
-
 
 // ★ Region名の変換マッピング
 const REGION_MAP = {
