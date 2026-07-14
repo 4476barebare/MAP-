@@ -2275,53 +2275,6 @@ function resetSpotLayers() {
 }
 
 
-function updateStateFromHash() {
-
-    // ★これを最初に入れる
-    if (!window.areaData || window.areaData.length === 0) {
-        return;
-    }
-
-    const url = new URL(location.href);
-const prefCode = url.searchParams.get('pref');
-
-if (!prefCode) return;
-    const hash = decodeURIComponent(location.hash.replace('#', ''));
-
-    // クエリ(pref)もハッシュもないプレーンな場合はすぐにリターン
-    if (!prefCode && !hash) {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-        return;
-    }
-
-    const parts = hash.split('/');
-    const areaName = parts[0] || null;
-    const spotKey = parts[1] || null;
-
-    let resolvedAreaId = null;
-
-    if (areaName && window.areaData) {
-        const area = window.areaData.find(a => a.name === areaName);
-        if (area) {
-            resolvedAreaId = window.currentPref + "_" + area.individualId;
-        }
-    }
-
-    if (!areaName) {
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-    }
-    else if (areaName && !spotKey) {
-        window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = null;
-    }
-    else if (areaName && spotKey) {
-        window.currentAreaId = resolvedAreaId;
-        window.currentSpotId = resolvedAreaId ? (resolvedAreaId + "_" + spotKey) : null;
-    }
-}
-
 // ★ グローバルにロック変数を追加（goBack関数の外、または一番上に）
 window._isGoingBack = false;
 
@@ -2440,19 +2393,11 @@ function goBack() {
         }
         if (window.phase2Group) window.phase2Group.clearLayers();
 
+        // ★ここで restoreSpot の判定をするため、この時点では currentSpotId を維持する必要がある
         if (!restoreSpot) {
             window._isGoingBack = false;
             return;
         }
-
-        // 1. クエリを更新（spotだけnullにする）
-        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-        const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
-        if (parentArea) setIdealQuery('area', parentArea.name);
-        setIdealQuery('spot', null);
-
-        // 2. システム変数を直接更新（エリアIDは維持）
-        window.currentSpotId = null;
 
         removeWeekItem();
         resetWeatherUI();
@@ -2460,8 +2405,18 @@ function goBack() {
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
 
-        // マップの移動完了を待ってからUI展開とロック解除
+        // マップの移動完了（着地）を待ってから、安全に変数とクエリをクリアする
         window.map.once('moveend', () => {
+            // ───【ここで初めて変数とクエリをクリアする】───
+            // 1. クエリを更新（spotだけnullにする）
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
+            if (parentArea) setIdealQuery('area', parentArea.name);
+            setIdealQuery('spot', null);
+
+            // 2. システム変数を直接更新
+            window.currentSpotId = null;
+
             enablePhase2(window.map);
             phase1menu(window.currentAreaId);
             releaseLockAndShowBtn();
@@ -2469,7 +2424,6 @@ function goBack() {
         
         return;
     }
-
     // =====================================================
     // ② phase1維持（※実質：Phase2 → Phase1 へ戻る）
     // =====================================================
@@ -2548,18 +2502,11 @@ function goBack() {
         window.prefData.lng,
         window.prefData.zoom
     );
-    
-    // 1. クエリを更新（県だけ残す）
-    if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-    setIdealQuery('area', null);
-    setIdealQuery('spot', null);
-
-    // 2. システム変数を直接更新
-    window.currentAreaId = null;
-    window.currentSpotId = null;
+    location.hash = '';
 
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
+        updateStateFromHash();
         initAreaUI();
         showPrefSpots();
         renderPrefWeather();
@@ -2576,7 +2523,9 @@ function buildSpotRestoreObject() {
 
     if (!areaId || !spotId) return null;
 
-    const spotKey = spotId.split('_')[2];
+    // ★ 修正：'_' が含まれていてもいなくても、確実に最後の部分（スポットキー）を抜く
+    const parts = String(spotId).split('_');
+    const spotKey = parts[parts.length - 1]; 
 
     const spot = window.spotData.find(s =>
         String(s.individualId) === String(spotKey) &&
@@ -2586,12 +2535,11 @@ function buildSpotRestoreObject() {
     if (!spot) return null;
 
     return {
-    name: spot.name,
-    lat: Number(spot.lat),
-    lng: Number(spot.lng),
-    zoom: 13,
-    individualId: spot.individualId || spot.id || '',
-    type: spot.type || ''
-};
-    
+        name: spot.name,
+        lat: Number(spot.lat),
+        lng: Number(spot.lng),
+        zoom: 13,
+        individualId: spot.individualId || spot.id || '',
+        type: spot.type || ''
+    };
 }
