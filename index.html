@@ -1753,15 +1753,12 @@ function preloadCsvFiles(regionCode, prefCode) {
 }
 
 
-
 // ================================
 // ■ 初期画面のRegionマップ読み込み
 // ================================
 let isRegionLoaded = false;
-// ★ 引数 regionCode のデフォルト処理や再生成を廃止し、グローバル変数をそのまま fetch に使う
 function loadRegionMap() {
     
-    // ★ 追加：関数内で使うためにグローバル変数から取得しておく
     const regionCode = window.currentRegion || 'KANTO';
 
     // 1. マップの可動域・ズーム制限を完全にリセット
@@ -1773,8 +1770,6 @@ function loadRegionMap() {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-        
-        // 移動アニメーション中の場合は一度ストップさせる
         window.map.stop();
     }
 
@@ -1788,6 +1783,12 @@ function loadRegionMap() {
         window.regionMarkers.forEach(m => {
             if (window.map) m.addTo(window.map);
         });
+        
+        // ★ 修正：キャッシュからRegion用のリストを復元（上書き）して終了
+        const titleSpan = document.getElementById('seo-list-title');
+        const linkContainer = document.getElementById('seo-link-container');
+        if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
+        if (linkContainer && window.regionSeoHtml) linkContainer.innerHTML = window.regionSeoHtml;
         return;
     }
 
@@ -1814,48 +1815,49 @@ function loadRegionMap() {
 
             window.regionMarkers = window.regionMarkers || [];
 
+            // ★ 追加：Region画面用リンク集のHTML文字列
+            let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
+
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
                 const cols = lines[i].split(',').map(c => c.trim());
                 const type = cols[typeIdx];
 
-                // ─── a. 広域マップの中心・ズームを設定 (type: region) ───
                 if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
                     const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
                     const lat = parseFloat(cols[latIdx]);
                     const lng = parseFloat(cols[lngIdx]);
                     const zoom = parseFloat(cols[zoomIdx]);
-                    
-                    // 次回のためにグローバルに保存
                     window.regionData = { name, lat, lng, zoom };
-
-                    // 初回ロード時も、URL直打ちから戻ってきた時も、確実に広域座標へ飛びます。
                     drawLocation(name, lat, lng, zoom);
                 }
 
-                // ─── b. 県突入用のアイコンマーカーを配置 (type: pref) ───
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
                     const urlVal = cols[urlIdx];
                     const prefName = cols[notesIdx];
                     if (!urlVal) continue;
+
+                    // ★ 追加：本物の <a> タグリンクを生成
+                    const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
+                    const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
+                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;" onmouseover="this.style.opacity=0.7; this.style.textDecoration='underline';" onmouseout="this.style.opacity=1; this.style.textDecoration='none';"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
 
                     const parts = urlVal.split('/');
                     let prefCode = '';
                     let lat, lng;
                     
                     if (parts.length >= 4) {
-                        prefCode = parts[1].split('_')[0]; // "CHIBA"
+                        prefCode = parts[1].split('_')[0]; 
                         lat = parseFloat(parts[2]);
                         lng = parseFloat(parts[3]);
                     } else if (parts.length === 3) {
-                        prefCode = parts[0].split('_')[0]; // "CHIBA"
+                        prefCode = parts[0].split('_')[0]; 
                         lat = parseFloat(parts[1]);
                         lng = parseFloat(parts[2]);
                     } else continue;
 
                     if (isNaN(lat) || isNaN(lng)) continue;
 
-                    // ★ regionCode が復活したのでここもエラーになりません
                     if (typeof preloadCsvFiles === 'function') {
                         preloadCsvFiles(regionCode, prefCode);
                     }
@@ -1867,24 +1869,35 @@ function loadRegionMap() {
                         iconAnchor: [45, 17]
                     });
 
-                    // マップが確実に存在する場合のみマーカーを置く
                     if (window.map) {
                         const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
-
                         marker.on('click', () => {
                             if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
-                            // ★ regionCode が復活したので正しく "KANTO_CHIBA" になります
                             window.selectPrefecture(`${regionCode}_${prefCode}`);
                         });
-
                         window.regionMarkers.push(marker);
                     }
                 }
             }
+            
+            regionHtml += '</ul>';
+            const regionTitle = (window.regionData ? window.regionData.name : '関東地方') + 'の釣りエリア一覧';
+            
+            // ★ 次回のためにキャッシュしておく
+            window.regionSeoHtml = regionHtml;
+            window.regionSeoTitle = regionTitle;
+
+            // ★ 共通の入れ物にRegion用のリンクを流し込む（上書き）
+            const titleSpan = document.getElementById('seo-list-title');
+            const linkContainer = document.getElementById('seo-link-container');
+            if (titleSpan) titleSpan.textContent = regionTitle;
+            if (linkContainer) linkContainer.innerHTML = regionHtml;
+
             isRegionLoaded = true;
         })
         .catch(err => console.error("Regionマップの初期化エラー:", err));
 }
+
 
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
