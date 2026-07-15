@@ -220,8 +220,36 @@ window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
 // ==========================================
-// ★ URLに日本語クエリを付与・更新する共通関数
+// ★ タイトル動的更新関数（SEO対応）
 // ==========================================
+function updateDocumentTitle() {
+    const params = new URLSearchParams(window.location.search);
+    const pref = params.get('pref');
+    const area = params.get('area');
+    const spot = params.get('spot');
+
+    let newTitle = "釣り行こNAVI | 釣りスポットを地図で探す"; // デフォルト
+
+    if (spot) {
+        // スポット画面（例：大原港の釣り場・天気・潮汐情報 | 釣り行こNAVI）
+        newTitle = `${spot}の釣り場・天気・潮汐情報 | 釣り行こNAVI`;
+    } else if (area) {
+        // エリア画面（例：外房エリア(千葉県)の釣り場ポイント一覧 | 釣り行こNAVI）
+        newTitle = `${area}${pref ? `(${pref})` : ''}の釣り場ポイント一覧 | 釣り行こNAVI`;
+    } else if (pref) {
+        // 県画面（例：千葉県の釣りスポット・天気マップ | 釣り行こNAVI）
+        newTitle = `${pref}の釣りスポット・天気マップ | 釣り行こNAVI`;
+    }
+
+    // 実際の<title>タグを書き換え
+    document.title = newTitle;
+}
+
+// ==========================================
+// ★ URLに日本語クエリを付与・更新する共通関数 (タイトル連動版)
+// ==========================================
+let _titleUpdateTimer = null; // 連続呼び出し時の重複実行を防ぐためのタイマー
+
 function setIdealQuery(type, value) {
     const url = new URL(location.href);
     
@@ -232,9 +260,11 @@ function setIdealQuery(type, value) {
     }
 
     window.history.replaceState(null, '', url);
-    // ※デバッグ用関数の呼び出し（checkCurrentQuery）を削除しました
-}
 
+    // ★ クエリが変更されたら、50ミリ秒だけ待ってからタイトルを更新する（3連続セット対策）
+    clearTimeout(_titleUpdateTimer);
+    _titleUpdateTimer = setTimeout(updateDocumentTitle, 50);
+}
 
 // ==========================================
 // ★ 新規追加：内部IDから日本語名を逆引きしてURLクエリにセットする関数
