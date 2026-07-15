@@ -230,35 +230,56 @@ window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
 // ==========================================
-// ★ タイトル動的更新関数（SEO対応）
+// ★ タイトル・メタタグ動的更新関数（SEO対応）
 // ==========================================
-function updateDocumentTitle() {
+function updateSeoMeta() {
     const params = new URLSearchParams(window.location.search);
     const pref = params.get('pref');
     const area = params.get('area');
     const spot = params.get('spot');
 
-    let newTitle = "釣り行こNAVI | 釣りスポットを地図で探す"; // デフォルト
+    // 1. タイトルと説明文の基本セット
+    let newTitle = "釣り行こNAVI | 釣りスポットを地図で探す";
+    let newDesc  = "釣り行こNAVIは、釣りスポットを空撮地図で探せる情報サイトです。エリア別に釣りポイントを簡単に確認できます。";
+    
+    // 現在の完全なURL（クエリ含む）を取得
+    const currentUrl = window.location.origin + window.location.pathname + window.location.search;
 
     if (spot) {
-        // スポット画面（例：大原港の釣り場・天気・潮汐情報 | 釣り行こNAVI）
         newTitle = `${spot}の釣り場・天気・潮汐情報 | 釣り行こNAVI`;
+        newDesc  = `${pref || ''}${area || ''}にある「${spot}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
     } else if (area) {
-        // エリア画面（例：外房エリア(千葉県)の釣り場ポイント一覧 | 釣り行こNAVI）
         newTitle = `${area}${pref ? `(${pref})` : ''}の釣り場ポイント一覧 | 釣り行こNAVI`;
+        newDesc  = `${pref || ''}「${area}」の釣りスポット一覧です。各釣り場のピンポイントな天気や潮汐情報、空撮マップを確認できます。`;
     } else if (pref) {
-        // 県画面（例：千葉県の釣りスポット・天気マップ | 釣り行こNAVI）
         newTitle = `${pref}の釣りスポット・天気マップ | 釣り行こNAVI`;
+        newDesc  = `${pref}の釣り場を地図で一覧表示。行きたいエリアの釣りスポットや天気・潮汐情報を簡単に検索できます。`;
     }
 
-    // 実際の<title>タグを書き換え
+    // 2. タイトルの書き換え
     document.title = newTitle;
+
+    // 3. メタタグ（Description等）の書き換え
+    const setMeta = (selector, attr, value) => {
+        const el = document.querySelector(selector);
+        if (el) el.setAttribute(attr, value);
+    };
+
+    setMeta('meta[name="description"]', 'content', newDesc);
+    
+    // 4. Canonical（超重要！）と OGP URL の書き換え
+    setMeta('link[rel="canonical"]', 'href', currentUrl);
+    setMeta('meta[property="og:url"]', 'content', currentUrl);
+    
+    // OGPのタイトルと説明も連動させる
+    setMeta('meta[property="og:title"]', 'content', newTitle);
+    setMeta('meta[property="og:description"]', 'content', newDesc);
 }
 
 // ==========================================
 // ★ URLに日本語クエリを付与・更新する共通関数 (タイトル連動版)
 // ==========================================
-let _titleUpdateTimer = null; // 連続呼び出し時の重複実行を防ぐためのタイマー
+let _titleUpdateTimer = null; 
 
 function setIdealQuery(type, value) {
     const url = new URL(location.href);
@@ -271,9 +292,9 @@ function setIdealQuery(type, value) {
 
     window.history.replaceState(null, '', url);
 
-    // ★ クエリが変更されたら、50ミリ秒だけ待ってからタイトルを更新する（3連続セット対策）
     clearTimeout(_titleUpdateTimer);
-    _titleUpdateTimer = setTimeout(updateDocumentTitle, 50);
+    // タイトル更新関数を新しい名前に変更
+    _titleUpdateTimer = setTimeout(updateSeoMeta, 50); 
 }
 
 // ==========================================
