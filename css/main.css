@@ -662,6 +662,88 @@ li {
 }
 
 
+/* =========================================
+   SEO対策用：スポット一覧（アコーディオン）
+========================================= */
+.seo-spot-list {
+    margin: 20px auto;
+    max-width: 800px;
+    padding: 0 16px;
+    color: #191970;
+}
+
+/* アコーディオンのトグルボタン部分 */
+.seo-spot-list summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 12px 16px;
+    background: #f0f4ff; /* テーマカラーに合わせた極薄いブルー */
+    border-radius: 8px;
+    color: #191970;
+    border: 1px solid rgba(25, 25, 112, 0.2);
+    transition: background 0.2s ease;
+    font-size: 14px;
+}
+
+.seo-spot-list summary:hover {
+    background: #e0e8ff;
+}
+
+/* 開いた中身のコンテナ */
+#seo-link-container {
+    padding: 10px;
+    background: #fff;
+}
+
+/* エリア名の見出し */
+#seo-link-container h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    font-size: 15px;
+    color: #191970;
+    border-bottom: 1px solid #191970; /* 境界線もミッドナイトブルー */
+}
+
+/* リスト全体 */
+#seo-link-container ul {
+    list-style-type: none;
+    padding-left: 5px;
+    margin: 0;
+}
+
+/* 各スポットの項目 */
+#seo-link-container li {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+/* スポットのリンク */
+#seo-link-container a {
+    color: #191970;
+    text-decoration: none;
+    position: relative;
+    padding-left: 12px;
+    transition: opacity 0.2s ease;
+}
+
+/* リンクの左側に小さなアクセントをつける */
+#seo-link-container a::before {
+    content: "▶";
+    font-size: 8px;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #191970;
+    opacity: 0.6;
+}
+
+#seo-link-container a:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
+
 /* =========================
    フッター
 ========================= */
