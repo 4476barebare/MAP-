@@ -2367,11 +2367,7 @@ function goBack() {
         window.prefData = null;
         window.currentAreaId = null;
         window.currentSpotId = null;
-
-        // ★ ここに追加：SEO用のリストを空にして、見出しをデフォルトに戻す
-        if (document.getElementById('seo-link-container')) document.getElementById('seo-link-container').innerHTML = '';
-        if (document.getElementById('seo-list-title')) document.getElementById('seo-list-title').textContent = '釣りスポット一覧を見る';
-
+        
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
