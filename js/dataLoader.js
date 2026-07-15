@@ -151,8 +151,13 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
     
     areasData.forEach(area => {
         const areaKey = area.areaId + '_' + area.individualId;
-        // このエリアに属し、アイコンが設定されているスポット
-        const areaSpots = spotsData.filter(s => s.areaId === areaKey && s.icon && s.icon.trim() !== '');
+        
+        // ★変更点：アイコンがあり、かつ zoom が空欄ではない（詳細情報がある）スポットだけを抽出
+        const areaSpots = spotsData.filter(s => 
+            s.areaId === areaKey && 
+            s.icon && s.icon.trim() !== '' &&
+            s.zoom !== '' 
+        );
         
         if (areaSpots.length > 0) {
             html += `<h3 style="margin-top:15px; border-bottom:1px solid #ccc;">${area.name}</h3>`;
@@ -2363,6 +2368,10 @@ function goBack() {
         window.currentAreaId = null;
         window.currentSpotId = null;
 
+        // ★ ここに追加：SEO用のリストを空にして、見出しをデフォルトに戻す
+        if (document.getElementById('seo-link-container')) document.getElementById('seo-link-container').innerHTML = '';
+        if (document.getElementById('seo-list-title')) document.getElementById('seo-list-title').textContent = '釣りスポット一覧を見る';
+
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
@@ -2391,8 +2400,6 @@ function goBack() {
         loadRegionMap(regionToLoad);
         return;
     }
-    
-    // --- ここから下は元の処理 ---
     
     window.map.touchZoom.disable();
     window.map.dragging.disable();
