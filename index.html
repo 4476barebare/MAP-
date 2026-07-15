@@ -216,34 +216,11 @@ window.currentSpotId = null;
 window.currentPref = null;
 window.fishUrl = null;
 window.nearestClickEnabled = true;
+
 window.nearestClickHandler = null;
 
-// 1. デバッグ用のDOMを自動生成して文字を出す関数（上書きモード）
-function showdebug(msg) {
-    let debugBox = document.getElementById('my-debug-box');
-    
-    if (!debugBox) {
-        debugBox = document.createElement('div');
-        debugBox.id = 'my-debug-box';
-        debugBox.style.position = 'fixed';
-        debugBox.style.top = '10px';
-        debugBox.style.left = '10px';
-        debugBox.style.zIndex = '9999';
-        debugBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        debugBox.style.color = '#00FF00';
-        debugBox.style.padding = '10px';
-        debugBox.style.borderRadius = '5px';
-        debugBox.style.fontSize = '14px';
-        debugBox.style.pointerEvents = 'none';
-        document.body.appendChild(debugBox);
-    }
-
-    // ★ 追記（+=）ではなく上書き（=）に変更
-    debugBox.innerHTML = msg;
-}
-
 // ==========================================
-// ★ 新規追加：URLに日本語クエリを付与・更新する共通関数
+// ★ URLに日本語クエリを付与・更新する共通関数
 // ==========================================
 function setIdealQuery(type, value) {
     const url = new URL(location.href);
@@ -255,40 +232,8 @@ function setIdealQuery(type, value) {
     }
 
     window.history.replaceState(null, '', url);
-
-    // ★ URLを書き換えた直後に、現在のクエリ状態をチェックして画面に表示！
-    checkCurrentQuery();
+    // ※デバッグ用関数の呼び出し（checkCurrentQuery）を削除しました
 }
-
-
-
-// 2. あなたの安全な手法を使ったクエリ判定関数（全パラメータ対応版）
-function checkCurrentQuery() {
-    const url = new URL(location.href);
-    
-    // 4つのパラメータをすべて取得する
-    const region = url.searchParams.get('region');
-    const pref   = url.searchParams.get('pref');
-    const area   = url.searchParams.get('area');
-    const spot   = url.searchParams.get('spot');
-
-    // 表示用のテキストを組み立てる（<br>で改行）
-    let msg = "【現在のURLクエリ】";
-    
-    if (region) msg += `<br>region: ${region}`;
-    if (pref)   msg += `<br>pref: ${pref}`;
-    if (area)   msg += `<br>area: ${area}`;
-    if (spot)   msg += `<br>spot: ${spot}`;
-
-    if (!region && !pref && !area && !spot) {
-        msg += "<br>※クエリ無し";
-    }
-
-    // デバッグ画面を上書き更新
-    showdebug(msg);
-}
-
-
 
 
 // ==========================================
@@ -1975,11 +1920,9 @@ async function loadPrefectureData(prefCode) {
 }
 
 // ==========================================
-// ★ デバッグ対応版：データの完全性チェック＆ロード関数
+// ★ データの完全性チェック＆ロード関数
 // ==========================================
 async function checkAndLoadRouteData() {
-    showdebug("ロード処理開始...");
-    
     const prefCode = window.currentPref;
     if (!prefCode) return true; 
 
@@ -1992,10 +1935,8 @@ async function checkAndLoadRouteData() {
         }
 
         if (needsBaseLoad) {
-            showdebug("CSVロード中: " + prefCode);
             await loadPrefectureData(prefCode);
             
-            showdebug("UI構築中...");
             renderPrefectureUI(); 
             if (typeof showPrefSpots === 'function') showPrefSpots();
             if (typeof initAreaUI === 'function') initAreaUI();
@@ -2003,15 +1944,12 @@ async function checkAndLoadRouteData() {
         }
 
         if (window.currentAreaId && !window.fishData) {
-            showdebug("魚データロード中...");
             await prepareFishForArea(window.currentAreaId);
         }
 
-        showdebug("ロード完了");
         return true; 
     } catch (err) {
-        // ★ エラー内容を画面に直出しする
-        showdebug("エラー発生: " + err.message);
+        console.error("データロードエラー:", err);
         return false;
     }
 }
