@@ -14,13 +14,9 @@ window.gsiLayers = {
   photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
 
-// =====================
-// 1. Locationの読み込み (動的グローバル変数による爆速キャッシュ・完全版)
-// =====================
 function loadLocationCSV(csvUrl) {
     const pref = window.currentPref; // 現在の県コード（例: "CHIBA"）
 
-    // ★ 前回の書き漏らし：これが無いとエラーで止まります
     function parseGrid(str) {
         if (!str) return { x: null, y: null };
         const x = str.match(/x\s*:\s*(-?\d+)/);
@@ -40,7 +36,6 @@ function loadLocationCSV(csvUrl) {
         window.areaData = window[`${pref}_areaData`];
         window.spotData = window[`${pref}_spotData`];
 
-        // ご指摘の通り再計算はせず、グラフもキャッシュから復元するだけにする
         if (window[`${pref}_areaGraph`]) {
             window.areaGraph = window[`${pref}_areaGraph`];
         } else {
@@ -48,7 +43,14 @@ function loadLocationCSV(csvUrl) {
             window[`${pref}_areaGraph`] = window.areaGraph;
         }
 
-        // 後続の処理が止まらないよう、解決済みのPromiseを返す
+        // ★ キャッシュからSEOリストを復元してDOMに即反映
+        const container = document.getElementById('seo-link-container');
+        const titleSpan = document.getElementById('seo-list-title');
+        if (container && titleSpan && window.prefData) {
+            titleSpan.textContent = `${window.prefData.notes}の釣りスポット一覧を見る`;
+            container.innerHTML = window[`${pref}_seoHtml`] || '';
+        }
+
         return Promise.resolve({
             main: window.prefData,
             areas: window.areaData,
@@ -112,24 +114,60 @@ function loadLocationCSV(csvUrl) {
                 }
             });
 
-            // 1. 現在のグローバル変数にセット
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
 
-            // 2. ★ 次回以降のために、動的な変数名でストック（保存）しておく
             window[`${pref}_prefData`] = main;
             window[`${pref}_areaData`] = areas;
             window[`${pref}_spotData`] = spots;
 
-            // 3. グラフも構築して保存しておく
             buildAreaGraphFromGrid(areas);
             window[`${pref}_areaGraph`] = window.areaGraph;
+
+            // ★ 4. SEO用HTML文字列を生成して金庫にキャッシュ
+            const seoHtml = buildSeoHtmlString(main, areas, spots);
+            window[`${pref}_seoHtml`] = seoHtml;
+
+            // ★ 5. 初回ロード時にDOMへ即座に書き出す
+            const container = document.getElementById('seo-link-container');
+            const titleSpan = document.getElementById('seo-list-title');
+            if (container && titleSpan && main) {
+                titleSpan.textContent = `${main.notes}の釣りスポット一覧を見る`;
+                container.innerHTML = seoHtml; // ここで一撃でDOMに反映
+            }
 
             return { main, areas, spots };
         });
 }
-
+// ==========================================
+// ★ SEO対策用：HTML文字列を一括生成する関数（爆速処理用）
+// ==========================================
+function buildSeoHtmlString(mainData, areasData, spotsData) {
+    if (!mainData) return '';
+    const regionName = window.currentRegion || '関東地方';
+    const prefName = mainData.notes;
+    let html = '';
+    
+    areasData.forEach(area => {
+        const areaKey = area.areaId + '_' + area.individualId;
+        // このエリアに属し、アイコンが設定されているスポット
+        const areaSpots = spotsData.filter(s => s.areaId === areaKey && s.icon && s.icon.trim() !== '');
+        
+        if (areaSpots.length > 0) {
+            html += `<h3 style="margin-top:15px; border-bottom:1px solid #ccc;">${area.name}</h3>`;
+            html += `<ul style="list-style-type:none; padding-left:10px;">`;
+            
+            areaSpots.forEach(spot => {
+                const url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName)}&area=${encodeURIComponent(area.name)}&spot=${encodeURIComponent(spot.name)}`;
+                html += `<li style="margin:5px 0;"><a href="${url}" style="color:#0066cc; text-decoration:underline;">${spot.name}</a></li>`;
+            });
+            
+            html += `</ul>`;
+        }
+    });
+    return html;
+}
 
 function prepareFishForArea(areaId) {
 
