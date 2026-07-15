@@ -119,23 +119,14 @@
 </section>
 
 <!-- トップページ下部などに追加 -->
-<details class="seo-spot-list" id="seo-region-list-wrap">
-  <summary>
-    <span id="seo-region-list-title">関東地方の釣りエリア一覧</span>
-  </summary>
-  <div id="seo-region-link-container">
-    <!-- ここに県へのリンクが生成されます -->
-  </div>
-</details>
-
-<!-- 先ほど作ったスポット一覧（そのまま） -->
-<details class="seo-spot-list" id="seo-pref-list-wrap" style="display: none;">
+<details class="seo-spot-list">
   <summary>
     <span id="seo-list-title">釣りスポット一覧を見る</span>
   </summary>
-  <div id="seo-link-container"></div>
+  <div id="seo-link-container">
+    <!-- ★ ロード時に一瞬でここにHTML文字列が流し込まれます -->
+  </div>
 </details>
-
 
 <div id="policyModal" class="modal">
   <div class="modal-content">
@@ -1762,6 +1753,7 @@ function preloadCsvFiles(regionCode, prefCode) {
 }
 
 
+
 // ================================
 // ■ 初期画面のRegionマップ読み込み
 // ================================
@@ -1771,12 +1763,6 @@ function loadRegionMap() {
     
     // ★ 追加：関数内で使うためにグローバル変数から取得しておく
     const regionCode = window.currentRegion || 'KANTO';
-
-    // ★ 追加：UIの切り替え（Region用のリストを出し、Spot用のリストを隠す）
-    const regionWrap = document.getElementById('seo-region-list-wrap');
-    const prefWrap = document.getElementById('seo-pref-list-wrap');
-    if (regionWrap) regionWrap.style.display = 'block';
-    if (prefWrap) prefWrap.style.display = 'none';
 
     // 1. マップの可動域・ズーム制限を完全にリセット
     if (window.map) {
@@ -1828,9 +1814,6 @@ function loadRegionMap() {
 
             window.regionMarkers = window.regionMarkers || [];
 
-            // ★ 追加：Region画面用リンク集のHTML文字列を入れる変数
-            let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
-
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
                 const cols = lines[i].split(',').map(c => c.trim());
@@ -1855,11 +1838,6 @@ function loadRegionMap() {
                     const urlVal = cols[urlIdx];
                     const prefName = cols[notesIdx];
                     if (!urlVal) continue;
-
-                    // ★ 追加：本物の <a> タグリンクを生成 (テーマカラー #191970 適用)
-                    const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
-                    const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
-                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;" onmouseover="this.style.opacity=0.7; this.style.textDecoration='underline';" onmouseout="this.style.opacity=1; this.style.textDecoration='none';"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
 
                     const parts = urlVal.split('/');
                     let prefCode = '';
@@ -1903,14 +1881,6 @@ function loadRegionMap() {
                     }
                 }
             }
-
-            // ★ 追加：ループが終わったらHTMLを閉じてDOMに流し込む
-            regionHtml += '</ul>';
-            const linkContainer = document.getElementById('seo-region-link-container');
-            if (linkContainer) {
-                linkContainer.innerHTML = regionHtml;
-            }
-
             isRegionLoaded = true;
         })
         .catch(err => console.error("Regionマップの初期化エラー:", err));
