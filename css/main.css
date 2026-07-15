@@ -309,12 +309,16 @@ header {
   text-align: right;
 }
 
-/* 潮名 */
+/* カレンダーの潮名 */
 .tide {
   font-size: 0.7rem;
   text-align: center;
-  color: #444;
+  color: #191970; /* ★ 修正：#444 から変更 */
+  opacity: 0.8;   /* ★ 追加：透明度で薄さを表現 */
 }
+
+
+
 
 /* 大潮（強調） */
 .tide-big {
@@ -430,12 +434,13 @@ header {
   margin-top: 2px;
 }
 
-/* 共通 */
+/* ニュースのメタ情報（日付など） */
 .news-source,
 .news-date {
   font-size: 10px;
   line-height: 1;
-  color: #aaa;
+  color: #191970; /* ★ 修正：#aaa から変更 */
+  opacity: 0.6;   /* ★ 追加：透明度で薄さを表現 */
 }
 
 /* ソースだけ少し強調 */
@@ -483,13 +488,13 @@ header {
   pointer-events: none;
 }
 
-
 html,
 body {
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     background: #fff;
+    color: #191970; /* ★ 追加：ベースのテキスト色をミッドナイトブルーに統一 */
     overflow-x: hidden;
 }
 
@@ -621,7 +626,7 @@ li {
 .article-card {
   flex: 1 1 calc(50% - 8px); /* 縦＝2列 */
   text-decoration: none;
-  color: #000;
+  color: #191970; /* ★ 修正：#000 から変更 */
   transition: 0.15s ease;
 
   background: #fff;
@@ -712,10 +717,12 @@ li {
   margin-bottom: 6px;
 }
 
+
 .modal-content p {
   font-size: 12px;
   margin-bottom: 10px;
-  color: #444;
+  color: #191970; /* ★ 修正：#444 から変更 */
+  opacity: 0.9;   /* 少しだけ柔らかくする */
 }
 
 /* ===== ポリシーモーダル追加UI（既存非干渉） ===== */
@@ -727,16 +734,17 @@ li {
   margin-bottom: 14px;
 }
 
+
 /* ボタン（スコープ限定） */
 #policyModal .policy-btn {
   padding: 8px 12px;
-  border: 1px solid #d0d0d0;
+  border: 1px solid #191970; /* ★ 修正：#d0d0d0 から変更 */
   background: #fff;
-  color: #333;
+  color: #191970; /* ★ 修正：#333 から変更 */
   font-size: 14px;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 /* ホバー */
@@ -744,12 +752,14 @@ li {
   background: #f3f3f3;
 }
 
+
 /* アクティブ */
 #policyModal .policy-btn.active {
-  background: #2f3b4a;
+  background: #191970; /* ★ 修正：#2f3b4a から変更 */
   color: #fff;
-  border-color: #2f3b4a;
+  border-color: #191970;
 }
+
 
 /* 念のため：モーダル内セクション暴走防止 */
 #policyModal #contactSection,
@@ -1038,11 +1048,7 @@ li {
     padding-right: 20px;
 }
 
-.shop-popup-address {
-    font-size: 12px;
-    color: #555;
-    margin-bottom: 6px;
-}
+
 
 .shop-popup-footer {
     display: flex;
@@ -1050,24 +1056,40 @@ li {
     margin-top: 4px;
 }
 
+
+
+.shop-popup-btn::after {
+    content: none !important;
+}
+.shop-popup-address {
+    font-size: 12px;
+    color: #191970; /* ★ 修正：#555 から変更 */
+    opacity: 0.8;
+    margin-bottom: 6px;
+}
+
+.shop-popup-address.dummy {
+    font-size: 12px;
+    color: #191970; /* ★ 修正：#555 から変更 */
+    opacity: 0.8;
+    margin-bottom: 6px;
+    padding-right: 20px;
+}
+
 .shop-popup-btn {
     display: inline-block;
     padding: 4px 8px;
     font-size: 12px;
     border-radius: 4px;
-    color: #555;
+    color: #191970; /* ★ 修正：#555 から変更 */
+    border: 1px solid #191970; /* ★ 追加：ボタンっぽく枠をつける */
     text-decoration: none;
+    transition: all 0.2s ease;
 }
 
-.shop-popup-address.dummy {
-    font-size: 12px;
-    color: #555;
-    margin-bottom: 6px;
-    padding-right: 20px;
-}
-
-.shop-popup-btn::after {
-    content: none !important;
+.shop-popup-btn:hover {
+    background: #191970;
+    color: #fff;
 }
 
 /* =========================
