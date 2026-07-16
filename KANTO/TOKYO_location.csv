@@ -1,8 +1,8 @@
 name,zoom,individualId,lat,lng,areaId,URL,notes,icon,whether,type
 TOKYO,9.5,parent,35.9492,139.615,,140000,東京都,,,
 晴海臨海エリア,11.5,HARUMI,35.6133,139.7988,TOKYO,x:0;y:0,,,,
-晴海臨海エリア,11.5,HARUMI,35.6133,139.7988,TOKYO,x:0;y:0,,,,
-奥多摩エリア,11.5,OKUTAMA,35.6133,139.7988,TOKYO,x:0;y:0,,,,
+都心23区エリア,11.5,TOSHIN,35.6133,139.7988,TOKYO,x:0;y:0,,,,
+奥多摩エリア,11.5,OKUTAMA,35.7205,139.4035,TOKYO,x:0;y:0,,,,
 清砂大橋,14,1,35.665531,139.846129,TOKYO_HARUMI,,, spot,,
 豊洲ぐるり公園,15,2,35.641290,139.778259,TOKYO_HARUMI,,, spot,,
 芝浦南ふ頭公園,16.5,4,35.636758,139.759347,TOKYO_HARUMI,,, spot,,
