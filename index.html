@@ -230,7 +230,7 @@ window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
 // ==========================================
-// ★ タイトル・メタタグ動的更新関数（SEO・魚種データ連動版）
+// ★ タイトル・メタタグ動的更新関数（完全版：SEO・魚種連動・マップalt・JSON-LD対応）
 // ==========================================
 function updateSeoMeta() {
     const params = new URLSearchParams(window.location.search);
@@ -242,32 +242,33 @@ function updateSeoMeta() {
     let newTitle = "釣り行こNAVI | 釣りスポットを地図で探す";
     let newDesc  = "釣り行こNAVIは、釣りスポットを空撮地図で探せる情報サイトです。エリア別に釣りポイントを簡単に確認できます。";
     const currentUrl = window.location.origin + window.location.pathname + window.location.search;
+    
+    // マップ用の代替テキスト（alt）の初期値
+    let mapAltText = "関東地方の釣りスポット空撮マップ";
+    let targetSpot = null;
 
+    // --------------------------------------------------
+    // ■ 階層ごとのテキスト出し分け＆魚種データ抽出
+    // --------------------------------------------------
     if (spotName) {
-        let targetSpot = null;
         if (window.spotData && window.spotData.length > 0) {
             targetSpot = window.spotData.find(s => s.name === spotName);
         }
 
         newTitle = `${spotName}の釣り場・天気・潮汐情報 | 釣り行こNAVI`;
         newDesc = `${pref || ''}${area || ''}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
+        mapAltText = `${pref || ''}${area || ''}にある「${spotName}」の釣り場と周辺環境を示す空撮マップ`;
 
         if (targetSpot) {
             let extraInfo = "";
 
-            // ★ notes は裏側の処理用データなので一切触らない
-
             // ★ spot.URL から魚種や貸しボートなどの名前を抽出
             if (targetSpot.URL && typeof targetSpot.URL === 'string') {
-                // "アジ|35.1|140.1,クロダイ|35.2|140.2" をカンマで分割
                 const items = targetSpot.URL.split(',');
-                
-                // "|" で分割し、0番目（名前）だけを取り出す
                 const names = items.map(item => item.split('|')[0]).filter(Boolean);
                 
-                // 重複を削除（例：アジのポイントが複数ある場合、「アジ」を1つにまとめる）
+                // 重複を削除して文字列化
                 const uniqueNames = [...new Set(names)];
-                
                 if (uniqueNames.length > 0) {
                     extraInfo += `対象魚や周辺情報: ${uniqueNames.join('、')}など。`;
                 }
@@ -280,15 +281,18 @@ function updateSeoMeta() {
     } else if (area) {
         newTitle = `${area}${pref ? `(${pref})` : ''}の釣り場ポイント一覧 | 釣り行こNAVI`;
         newDesc  = `${pref || ''}「${area}」の釣りスポット一覧です。各釣り場のピンポイントな天気や潮汐情報、空撮マップを確認できます。`;
+        mapAltText = `${pref || ''}「${area}」周辺の釣りスポット分布マップ`;
     } else if (pref) {
         newTitle = `${pref}の釣りスポット・天気マップ | 釣り行こNAVI`;
         newDesc  = `${pref}の釣り場を地図で一覧表示。行きたいエリアの釣りスポットや天気・潮汐情報を簡単に検索できます。`;
+        mapAltText = `${pref}の釣りスポット一覧マップ`;
     }
 
-    // 2. タイトルの書き換え
+    // --------------------------------------------------
+    // ■ HTMLへの反映処理（タイトル・メタタグ）
+    // --------------------------------------------------
     document.title = newTitle;
 
-    // 3. メタタグの書き換え実行
     const setMeta = (selector, attr, value) => {
         const el = document.querySelector(selector);
         if (el) el.setAttribute(attr, value);
@@ -299,7 +303,48 @@ function updateSeoMeta() {
     setMeta('meta[property="og:url"]', 'content', currentUrl);
     setMeta('meta[property="og:title"]', 'content', newTitle);
     setMeta('meta[property="og:description"]', 'content', newDesc);
+
+    // --------------------------------------------------
+    // ■ マップへの代替テキスト（aria-label）付与
+    // --------------------------------------------------
+    const mapContainer = document.getElementById('lf-map');
+    if (mapContainer) {
+        mapContainer.setAttribute('role', 'region'); // 意味のある領域として宣言
+        mapContainer.setAttribute('aria-label', mapAltText);
+    }
+
+    // --------------------------------------------------
+    // ■ 構造化データ（JSON-LD）の動的生成と更新
+    // --------------------------------------------------
+    // まず、過去のJSON-LDスクリプトが残っていれば削除
+    let oldScript = document.getElementById('seo-json-ld');
+    if (oldScript) {
+        oldScript.remove();
+    }
+
+    // スポット画面であり、かつ緯度経度のデータが揃っている場合のみJSON-LDを生成
+    if (targetSpot && targetSpot.lat && targetSpot.lng) {
+        const jsonLdData = {
+            "@context": "https://schema.org",
+            "@type": "Place",
+            "name": targetSpot.name,
+            "description": newDesc,
+            "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": parseFloat(targetSpot.lat),
+                "longitude": parseFloat(targetSpot.lng)
+            }
+        };
+
+        // 新しいscriptタグを作ってheadの最後に流し込む
+        const script = document.createElement('script');
+        script.setAttribute('type', 'application/ld+json');
+        script.setAttribute('id', 'seo-json-ld');
+        script.textContent = JSON.stringify(jsonLdData);
+        document.head.appendChild(script);
+    }
 }
+
 
 
 // ==========================================
