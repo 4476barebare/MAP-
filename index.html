@@ -255,12 +255,9 @@ function updateSeoMeta() {
         if (targetSpot) {
             let extraInfo = "";
 
-            // ① notes (説明文) の追加
-            if (targetSpot.notes) {
-                extraInfo += `【${targetSpot.notes}】`;
-            }
+            // ★ notes は裏側の処理用データなので一切触らない
 
-            // ② spot.URL から魚種や貸しボートなどの名前を抽出
+            // ★ spot.URL から魚種や貸しボートなどの名前を抽出
             if (targetSpot.URL && typeof targetSpot.URL === 'string') {
                 // "アジ|35.1|140.1,クロダイ|35.2|140.2" をカンマで分割
                 const items = targetSpot.URL.split(',');
@@ -303,6 +300,7 @@ function updateSeoMeta() {
     setMeta('meta[property="og:title"]', 'content', newTitle);
     setMeta('meta[property="og:description"]', 'content', newDesc);
 }
+
 
 // ==========================================
 // ★ URLに日本語クエリを付与・更新する共通関数 (タイトル連動版)
