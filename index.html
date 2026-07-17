@@ -230,24 +230,56 @@ window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
 // ==========================================
-// ★ タイトル・メタタグ動的更新関数（SEO対応）
+// ★ タイトル・メタタグ動的更新関数（SEO・魚種データ連動版）
 // ==========================================
 function updateSeoMeta() {
     const params = new URLSearchParams(window.location.search);
     const pref = params.get('pref');
     const area = params.get('area');
-    const spot = params.get('spot');
+    const spotName = params.get('spot');
 
-    // 1. タイトルと説明文の基本セット
+    // 1. 基本のセット
     let newTitle = "釣り行こNAVI | 釣りスポットを地図で探す";
     let newDesc  = "釣り行こNAVIは、釣りスポットを空撮地図で探せる情報サイトです。エリア別に釣りポイントを簡単に確認できます。";
-    
-    // 現在の完全なURL（クエリ含む）を取得
     const currentUrl = window.location.origin + window.location.pathname + window.location.search;
 
-    if (spot) {
-        newTitle = `${spot}の釣り場・天気・潮汐情報 | 釣り行こNAVI`;
-        newDesc  = `${pref || ''}${area || ''}にある「${spot}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
+    if (spotName) {
+        let targetSpot = null;
+        if (window.spotData && window.spotData.length > 0) {
+            targetSpot = window.spotData.find(s => s.name === spotName);
+        }
+
+        newTitle = `${spotName}の釣り場・天気・潮汐情報 | 釣り行こNAVI`;
+        newDesc = `${pref || ''}${area || ''}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
+
+        if (targetSpot) {
+            let extraInfo = "";
+
+            // ① notes (説明文) の追加
+            if (targetSpot.notes) {
+                extraInfo += `【${targetSpot.notes}】`;
+            }
+
+            // ② spot.URL から魚種や貸しボートなどの名前を抽出
+            if (targetSpot.URL && typeof targetSpot.URL === 'string') {
+                // "アジ|35.1|140.1,クロダイ|35.2|140.2" をカンマで分割
+                const items = targetSpot.URL.split(',');
+                
+                // "|" で分割し、0番目（名前）だけを取り出す
+                const names = items.map(item => item.split('|')[0]).filter(Boolean);
+                
+                // 重複を削除（例：アジのポイントが複数ある場合、「アジ」を1つにまとめる）
+                const uniqueNames = [...new Set(names)];
+                
+                if (uniqueNames.length > 0) {
+                    extraInfo += `対象魚や周辺情報: ${uniqueNames.join('、')}など。`;
+                }
+            }
+
+            // 抽出した情報を基本のDescriptionの先頭に合体させる
+            newDesc = extraInfo + newDesc;
+        }
+
     } else if (area) {
         newTitle = `${area}${pref ? `(${pref})` : ''}の釣り場ポイント一覧 | 釣り行こNAVI`;
         newDesc  = `${pref || ''}「${area}」の釣りスポット一覧です。各釣り場のピンポイントな天気や潮汐情報、空撮マップを確認できます。`;
@@ -259,19 +291,15 @@ function updateSeoMeta() {
     // 2. タイトルの書き換え
     document.title = newTitle;
 
-    // 3. メタタグ（Description等）の書き換え
+    // 3. メタタグの書き換え実行
     const setMeta = (selector, attr, value) => {
         const el = document.querySelector(selector);
         if (el) el.setAttribute(attr, value);
     };
 
     setMeta('meta[name="description"]', 'content', newDesc);
-    
-    // 4. Canonical（超重要！）と OGP URL の書き換え
     setMeta('link[rel="canonical"]', 'href', currentUrl);
     setMeta('meta[property="og:url"]', 'content', currentUrl);
-    
-    // OGPのタイトルと説明も連動させる
     setMeta('meta[property="og:title"]', 'content', newTitle);
     setMeta('meta[property="og:description"]', 'content', newDesc);
 }
