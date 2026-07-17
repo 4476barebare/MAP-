@@ -2233,10 +2233,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 4. ★ここから本来の読み込みチェーン開始
-    // 確定した情報からパスを生成
+    // 【修正点】直打ちの場合に備えて、魚データなどのパスをグローバル変数に確実にセットする
+    window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.csv`;
+    window.prefWeatherUrl       = `/data/${window.currentPref}_whether.csv`;
+    window.prefInlandWeatherUrl = `/data/${window.currentRegion}_inLand_recalculated.csv`;
+    window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.csv`; // ← これが抜けていた原因！
+    window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
+
     const csvUrl = window.prefLocationUrl;
-    const whetherUrl = `/data/${window.currentPref}_whether.csv`;
-    const shopUrl = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
+    const whetherUrl = window.prefWeatherUrl;
+    const shopUrl = window.prefShopUrl;
 
     // このチェーン内で初めてロードと描画を完結させる
     loadLocationCSV(csvUrl, window.currentPref).then(() => {
@@ -2267,6 +2273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 });
+
 
 </script>
 
