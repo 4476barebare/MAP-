@@ -5,8 +5,10 @@ on:
   schedule:
     - cron: '0 21 * * *'   # JST 06:00 → CHIBA
     - cron: '5 21 * * *'   # JST 06:05 → KANAGAWA
+    - cron: '10 21 * * *'  # JST 06:10 → TOKYO
     - cron: '0 9 * * *'    # JST 18:00 → CHIBA
     - cron: '5 9 * * *'    # JST 18:05 → KANAGAWA
+    - cron: '10 9 * * *'   # JST 18:10 → TOKYO
 
 jobs:
   chiba:
@@ -28,3 +30,13 @@ jobs:
       - run: |
           curl -s --max-time 10 "https://turiiko.shop/cloudGenerator/run.php?area=KANAGAWA%2C34.9%2C35.75%2C138.9%2C139.9%2C0.15%2C9.5" > /dev/null &
           echo "Triggered: KANAGAWA"
+
+  tokyo:
+    if: |
+      github.event.schedule == '10 21 * * *' ||
+      github.event.schedule == '10 9 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -s --max-time 10 "https://turiiko.shop/cloudGenerator/run.php?area=TOKYO%2C35.1448%2C36.3219%2C138.896%2C140.1677%2C0.15%2C9" > /dev/null &
+          echo "Triggered: TOKYO"
