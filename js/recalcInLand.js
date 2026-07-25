@@ -12,7 +12,7 @@ const inLandUrl = `https://turiiko.shop/actions/data/${region}_inLand.csv`;
 const outCsvPath = `data/${region}_inLand_recalculated.csv`; 
 
 const regionPrefsMap = {
-    "KANTO": ["CHIBA", "KANAGAWA"],
+    "KANTO": ["CHIBA", "KANAGAWA", "TOKYO"],
     "KANSAI": ["OSAKA", "HYOGO", "WAKAYAMA"]
 };
 const prefs = regionPrefsMap[region];
