@@ -6,6 +6,11 @@ on:
     - cron: "0 15 * * *"
     - cron: "5 15 * * *"
 
+# デプロイの衝突・エラーを防ぐための同時実行制御
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pages: write
@@ -23,12 +28,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      # 1. APIを叩き、バックグラウンドで実行させつつプロセスIDを記録
       - name: "Trigger XREA API"
         run: |
           TS=$(date +%s)
           SECRET=${{ secrets.XREA_SECRET }}
           SIG=$(echo -n "$TS+$SECRET" | sha256sum | awk '{print $1}')
           curl -s "${{ secrets.XREA_URL }}?ts=$TS&sig=$SIG" > /dev/null &
+          echo "XREA_PID=$!" >> $GITHUB_ENV
 
       - name: "Checkout repository"
         uses: actions/checkout@v4
@@ -42,9 +49,17 @@ jobs:
         # package.jsonを無視して、必要なこの3つだけをピンポイントでインストールします
         run: npm install node-fetch iconv-lite fast-xml-parser
 
+      # 2. newsのJSONを更新（APIの裏作業と並行して進める）
       - name: "Run News script"
         run: node js/newsNode.js
 
+      # 3. 1のAPI処理が終わるのを待ってから、InLand PHPを叩く
+      - name: "Wait XREA API and Trigger InLand PHP"
+        run: |
+          wait ${{ env.XREA_PID }}
+          curl -sS https://turiiko.shop/actions/inLandwhether.php > /dev/null &
+
+      # 4. 最後にまとめてCommit&Pushし、そのままデプロイへ
       - name: "Commit and Push"
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -53,14 +68,11 @@ jobs:
           git diff --cached --quiet || git commit -m "update news json"
           git push origin main
 
-      - name: "Trigger InLand PHP"
-        run: curl -sS https://turiiko.shop/actions/inLandwhether.php > /dev/null &
-
       - name: "Upload Artifact"
         uses: actions/upload-pages-artifact@v3
         with:
           path: "."
 
       - name: "Deploy to GitHub Pages"
-        id: deployment # 🌟 URL出力を受け取るためにIDを追加
+        id: deployment
         uses: actions/deploy-pages@v4
