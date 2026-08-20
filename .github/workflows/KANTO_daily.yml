@@ -56,7 +56,11 @@ jobs:
       # 3. 1のAPI処理が終わるのを待ってから、InLand PHPを叩く
       - name: "Wait XREA API and Trigger InLand PHP"
         run: |
-          wait ${{ env.XREA_PID }}
+          # waitコマンドの代わりに、裏側でプロセスがまだ動いているか監視して待つ
+          while ps -p ${{ env.XREA_PID }} > /dev/null 2>&1; do
+            sleep 1
+          done
+          echo "XREA API completed!"
           curl -sS https://turiiko.shop/actions/inLandwhether.php > /dev/null &
 
       # 4. 最後にまとめてCommit&Pushし、そのままデプロイへ
