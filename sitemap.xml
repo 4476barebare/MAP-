@@ -10,9 +10,15 @@
   <url>
     <loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県</loc>
   </url>
+  <url>
+    <loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県</loc>
+  </url>
+  <url>
+    <loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都</loc>
+  </url>
 
   <!-- ======================== -->
-  <!-- 東京湾内房エリア -->
+  <!-- 東京湾内房エリア（千葉県） -->
   <!-- ======================== -->
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=東京湾内房エリア&amp;spot=鳥居崎海浜公園・木更津塩浜公園</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=東京湾内房エリア&amp;spot=中の島公園・木更津内港公園</loc></url>
@@ -46,9 +52,11 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=東京湾内房エリア&amp;spot=trout pond NOIKE</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=東京湾内房エリア&amp;spot=Y's garden</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=東京湾内房エリア&amp;spot=清水公園マス釣り場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=東京湾内房エリア&amp;spot=木更津沖堤防</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=東京湾内房エリア&amp;spot=今井橋周辺</loc></url>
 
   <!-- ======================== -->
-  <!-- 南房総エリア -->
+  <!-- 南房総エリア（千葉県） -->
   <!-- ======================== -->
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=白子漁港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=太海港</loc></url>
@@ -70,7 +78,6 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=見物堤防</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=下原漁港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=大賀堤防</loc></url>
-  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=北条桟橋</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=沖ノ島護岸</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=館山港・築港堤防</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=西浜突堤</loc></url>
@@ -90,7 +97,6 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=野島東港・野島西港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=相浜港・布良港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=香谷堤防・塩見堤防</loc></url>
-  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=船方港・丸山堤防</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=金谷漁港・フェリー乗り場</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=富津岬</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=富津北港・富津みなと公園</loc></url>
@@ -99,9 +105,12 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=三島湖・豊英湖</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=亀山湖</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=磯源フィッシングパーク</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=北条海岸</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=丸山堤防</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=南房総エリア&amp;spot=船方港</loc></url>
 
   <!-- ======================== -->
-  <!-- 外房エリア -->
+  <!-- 外房エリア（千葉県） -->
   <!-- ======================== -->
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=外房エリア&amp;spot=浜荻港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=外房エリア&amp;spot=天津漁港</loc></url>
@@ -126,9 +135,11 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=外房エリア&amp;spot=大沢港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=外房エリア&amp;spot=高滝湖</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=外房エリア&amp;spot=養老渓谷釣堀センター</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=外房エリア&amp;spot=実入の磯</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=外房エリア&amp;spot=部原港</loc></url>
 
   <!-- ======================== -->
-  <!-- 銚子九十九里エリア -->
+  <!-- 銚子九十九里エリア（千葉県） -->
   <!-- ======================== -->
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=銚子九十九里エリア&amp;spot=飯岡漁港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=銚子九十九里エリア&amp;spot=銚子漁港</loc></url>
@@ -149,14 +160,7 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=千葉県&amp;area=銚子九十九里エリア&amp;spot=釣パラダイス</loc></url>
 
   <!-- ======================== -->
-  <!-- 神奈川県トップページ -->
-  <!-- ======================== -->
-  <url>
-    <loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県</loc>
-  </url>
-
-  <!-- ======================== -->
-  <!-- 川崎横浜エリア -->
+  <!-- 川崎横浜エリア（神奈川県） -->
   <!-- ======================== -->
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=浮島つり園</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=川崎新堤・東扇島西公園</loc></url>
@@ -176,9 +180,12 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=汽車道</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=根岸港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=杉田臨海緑地</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=鶴見川河口</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=大黒町岸壁</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=川崎横浜エリア&amp;spot=大岡川分水路</loc></url>
 
   <!-- ======================== -->
-  <!-- 三浦半島エリア -->
+  <!-- 三浦半島エリア（神奈川県） -->
   <!-- ======================== -->
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=観音崎</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=伊勢山﨑・三軒家崎</loc></url>
@@ -215,9 +222,15 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=ゴミ捨て下</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=久留和港</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=名向﨑</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=三浦海岸</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=金田湾</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=灯台下の磯</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=松輪港</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=小坪港</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=三浦半島エリア&amp;spot=三戸浜堤防</loc></url>
 
   <!-- ======================== -->
-  <!-- 湘南西湘エリア -->
+  <!-- 湘南西湘エリア（神奈川県） -->
   <!-- ======================== -->
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=江ノ島</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=国府津海岸</loc></url>
@@ -251,5 +264,84 @@
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=相模湖</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=宮ヶ瀬湖</loc></url>
   <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=津久井湖</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=七里ヶ浜</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=相模川</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=真鶴半島先端</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=湯河原海浜公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=真鶴港</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=御幸の浜突堤</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=八貫山下</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=神奈川県&amp;area=湘南西湘エリア&amp;spot=福浦港</loc></url>
+
+  <!-- ======================== -->
+  <!-- 臨海都心エリア（東京都） -->
+  <!-- ======================== -->
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=葛西臨海公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=お台場周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=大井周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=新川</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=隅田川周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=豊洲周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=新木場周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=江東区周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=芝浦周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=清砂大橋</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=辰巳運河周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=若洲海浜公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=城南島海浜公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=浮間公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=昭和島</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=清水池公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=多摩川ガス橋</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=六郷水門</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=多摩川ひょうたん池</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=舎人公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=市ヶ谷フィッシュセンター</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=つり堀 武蔵野園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=弁慶橋ﾎﾞｰﾄ場&amp;ﾌｨｯｼﾝｸﾞｸﾗﾌﾞ</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=大横川親水公園魚つり場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=墨田区立隅田公園 魚つり場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=釣り堀 ひょうたん池</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=石神井公園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=新葛飾橋周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=平井大橋周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=浮間橋周辺</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=臨海都心エリア&amp;spot=綾瀬川</loc></url>
+
+  <!-- ======================== -->
+  <!-- 奥多摩八王子エリア（東京都） -->
+  <!-- ======================== -->
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=多摩湖駅前フィッシングエリア</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=浅川国際マス釣場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=秋川国際マス釣場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=養沢フィッシングランド</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=北浅川恩方ます釣場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=釣り堀 八庵</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=辻野養魚場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=つりぼり入山</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=境渓谷キャンプ場つり堀</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=氷川国際ます釣場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=神戸国際マス釣場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=神戸園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=トラウトファーム秋川</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=峰谷川渓流釣場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=TOKYOトラウトカントリー</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=大丹波川国際ます釣り場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=奥多摩フィッシングセンター</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=みたけやまめの牧場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=高水山源流の釣り堀</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=さかな園</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=養沢毛鉤専用釣場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=多摩川養殖つり堀場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=郷土の森公園 釣り堀</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=府中へら鮒センター</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=常盤つり堀センター</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=森屋荘</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=恩方国際釣堀場</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=くじら池</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=奥多摩湖</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=平井川</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=多摩川日野</loc></url>
+  <url><loc>https://turiiko-navi.com/?region=関東地方&amp;pref=東京都&amp;area=奥多摩八王子エリア&amp;spot=多摩川是政橋</loc></url>
 
 </urlset>
