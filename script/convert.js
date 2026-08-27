@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 // 引数から入力ファイルと出力ファイルを取得 (デフォルト値も設定)
 const inputFile = process.argv[2] || 'json/input.geojson';
