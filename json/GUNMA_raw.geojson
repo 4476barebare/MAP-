@@ -1,0 +1,5751 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-08-26T10:33:05Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/167828500",
+        "highway": "services",
+        "landuse": "retail",
+        "name": "道の駅オアシスなんもく",
+        "toilets": "yes",
+        "wikidata": "Q11641015",
+        "wikipedia": "ja:道の駅オアシスなんもく",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7417924,
+          36.1781657
+        ]
+      },
+      "id": "way/167828500"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/184431750",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "道の駅 上州おにし",
+        "toilets": "yes",
+        "wikidata": "Q11641114",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0406579,
+          36.1430254
+        ]
+      },
+      "id": "way/184431750"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/245822335",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅藤岡 (ららん藤岡)",
+        "name_1": "道の駅ららん藤岡",
+        "operator": "藤岡クロスパーク",
+        "source": "GSI/KIBAN 2500;NARO;Bing",
+        "toilets": "yes",
+        "wikidata": "Q11640914",
+        "wikipedia": "ja:道の駅藤岡",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0736944,
+          36.272384
+        ]
+      },
+      "id": "way/245822335"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/248678745",
+        "highway": "services",
+        "landuse": "recreation_ground",
+        "name": "道の駅川場田園プラザ",
+        "website": "https://www.denenplaza.co.jp/",
+        "wikidata": "Q11641289",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1067736,
+          36.6869468
+        ]
+      },
+      "id": "way/248678745"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252168835",
+        "highway": "motorway_junction",
+        "name": "碓氷軽井沢ＩＣ",
+        "name:en": "Usui-Karuizawa",
+        "name:ja": "碓氷軽井沢IC",
+        "ref": "6",
+        "wikidata": "Q11587753",
+        "wikipedia": "ja:碓氷軽井沢インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.6711251,
+          36.2915347
+        ]
+      },
+      "id": "node/252168835"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252168888",
+        "highway": "motorway_junction",
+        "name": "富岡IC",
+        "name:en": "Tomioka IC",
+        "name:ja": "富岡IC",
+        "ref": "3",
+        "wikidata": "Q11456874",
+        "wikipedia": "ja:富岡インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8918255,
+          36.2399369
+        ]
+      },
+      "id": "node/252168888"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252169057",
+        "highway": "motorway_junction",
+        "name": "吉井IC",
+        "name:en": "Yoshii IC",
+        "name:ja": "吉井IC",
+        "ref": "2",
+        "wikidata": "Q11412572",
+        "wikipedia": "ja:吉井インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.988683,
+          36.2423523
+        ]
+      },
+      "id": "node/252169057"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252180089",
+        "highway": "motorway_junction",
+        "name": "昭和ＩＣ",
+        "name:en": "Showa IC",
+        "name:ja": "昭和IC",
+        "name:ja-Hira": "しょうわいんたーちぇんじ",
+        "ref": "12-2",
+        "wikipedia": "ja:昭和インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0654995,
+          36.6129896
+        ]
+      },
+      "id": "node/252180089"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252246560",
+        "highway": "motorway_junction",
+        "name": "富岡IC",
+        "name:en": "Tomioka IC",
+        "name:ja": "富岡IC",
+        "ref": "3"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8968795,
+          36.2403215
+        ]
+      },
+      "id": "node/252246560"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252340660",
+        "highway": "motorway_junction",
+        "name": "駒寄ＰＡ（上り）、スマートＩＣ",
+        "name:en": "komayose PA/SIC",
+        "name:ja": "駒寄PA (上り) 、スマートIC",
+        "name:ja-Hira": "こまよせぱーきんぐえりあ",
+        "name:ja_rm": "komayose PA/SIC",
+        "ref": "11-1",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:駒寄パーキングエリア"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0144576,
+          36.435482
+        ]
+      },
+      "id": "node/252340660"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252340730",
+        "highway": "motorway_junction",
+        "name": "赤城ＩＣ、赤城ＰＡ（上り）",
+        "name:en": "akagi IC/PA",
+        "name:ja": "赤城IC 、赤城PA (上り)",
+        "name:ja-Hira": "あかぎいんたーちぇんじ",
+        "name:ja_rm": "akagi IC/PA",
+        "ref": "12-1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0491695,
+          36.5398778
+        ]
+      },
+      "id": "node/252340730"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252341393",
+        "highway": "motorway_junction",
+        "name": "昭和ＩＣ",
+        "name:en": "Showa IC",
+        "name:ja": "昭和IC",
+        "name:ja_rm": "しょうわいんたーちぇんじ",
+        "ref": "12-2",
+        "wikipedia": "ja:昭和インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.068355,
+          36.6177875
+        ]
+      },
+      "id": "node/252341393"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252682201",
+        "highway": "motorway_junction",
+        "name": "吉井IC",
+        "name:en": "Yoshii IC",
+        "name:ja": "吉井IC",
+        "ref": "2",
+        "wikidata": "Q11412572",
+        "wikipedia": "ja:吉井インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.995758,
+          36.2437218
+        ]
+      },
+      "id": "node/252682201"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264415788",
+        "KSJ2:LIN": "両毛線",
+        "KSJ2:STN": "駒形",
+        "name": "駒形",
+        "name:en": "Komagata",
+        "name:ja": "駒形",
+        "name:ja_rm": "Komagata",
+        "name:ko": "고마가타",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6428058",
+        "wikipedia": "ja:駒形駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1397662,
+          36.3541169
+        ]
+      },
+      "id": "node/264415788"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264415837",
+        "KSJ2:LIN": "両毛線",
+        "KSJ2:STN": "前橋大島",
+        "name": "前橋大島",
+        "name:en": "Maebashi-Oshima",
+        "name:ja": "前橋大島",
+        "name:ja_rm": "Maebashi-Ōshima",
+        "name:ko": "마에바시오시마",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6729071",
+        "wikipedia": "ja:前橋大島駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1096721,
+          36.3705515
+        ]
+      },
+      "id": "node/264415837"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264460730",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "神戸",
+        "name": "神戸",
+        "name:en": "Godo",
+        "name:ja": "神戸",
+        "name:ja_rm": "Godo",
+        "name:ko": "고도",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5627753",
+        "wikipedia": "ja:神戸駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3563436,
+          36.5374168
+        ]
+      },
+      "id": "node/264460730"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264461214",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "沢入",
+        "name": "沢入",
+        "name:en": "Sori",
+        "name:ja": "沢入",
+        "name:ja_rm": "Sori",
+        "name:ko": "소리",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7667614",
+        "wikipedia": "ja:沢入駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3962433,
+          36.5807535
+        ]
+      },
+      "id": "node/264461214"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264461336",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "水沼",
+        "name": "水沼",
+        "name:en": "Mizunuma",
+        "name:ja": "水沼",
+        "name:ja_rm": "Mizunuma",
+        "name:ko": "미즈누마",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6884893",
+        "wikipedia": "ja:水沼駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2774596,
+          36.49994
+        ]
+      },
+      "id": "node/264461336"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264461777",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "小中",
+        "name": "小中",
+        "name:en": "Konaka",
+        "name:ja": "小中",
+        "name:ja_rm": "Konaka",
+        "name:ko": "고나카",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6428729",
+        "wikipedia": "ja:小中駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3378794,
+          36.5356866
+        ]
+      },
+      "id": "node/264461777"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264461907",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "中野",
+        "name": "中野",
+        "name:en": "Nakano",
+        "name:ja": "中野",
+        "name:ja_rm": "Nakano",
+        "name:ko": "나카노",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q6960274",
+        "wikipedia": "ja:中野駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3171296,
+          36.5241335
+        ]
+      },
+      "id": "node/264461907"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264462300",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "大間々",
+        "name": "大間々",
+        "name:en": "Omama",
+        "name:ja": "大間々",
+        "name:ja_rm": "Omama",
+        "name:ko": "오마마",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q8081605",
+        "wikipedia": "ja:大間々駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2774321,
+          36.4346091
+        ]
+      },
+      "id": "node/264462300"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264815149",
+        "KSJ2:LIN": "上越線",
+        "KSJ2:STN": "後閑",
+        "name": "後閑",
+        "name:en": "Gokan",
+        "name:ja": "後閑",
+        "name:ja-Hira": "ごかん",
+        "name:ja-Latn": "Gokan",
+        "name:ko": "고칸",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年 国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1770583",
+        "wikipedia": "ja:後閑駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0004095,
+          36.6792548
+        ]
+      },
+      "id": "node/264815149"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264817858",
+        "name": "井野",
+        "name:en": "Ino",
+        "name:ja": "井野",
+        "name:ja-Hira": "いの",
+        "name:ja-Latn": "Ino",
+        "name:ko": "이노",
+        "operator": "東日本旅客鉄道株式会社",
+        "operator:wikidata": "Q499071",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1652443",
+        "wikipedia": "ja:井野駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0230202,
+          36.3570844
+        ]
+      },
+      "id": "node/264817858"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/303075739",
+        "highway": "motorway_junction",
+        "name": "藤岡IC",
+        "name:en": "Fujioka IC",
+        "name:ja": "藤岡IC",
+        "ref": "1",
+        "wikidata": "Q11623857",
+        "wikipedia": "ja:藤岡インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0788682,
+          36.2727055
+        ]
+      },
+      "id": "node/303075739"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/306241849",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅 くらぶち小栗の里",
+        "phone": "027-384-8282",
+        "toilets": "yes",
+        "website": "http://www.kurabuchi-oguri.com/",
+        "wikidata": "Q17215519",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.793093,
+          36.4244375
+        ]
+      },
+      "id": "way/306241849"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/308840211",
+        "KSJ2:LIN": "伊勢崎線",
+        "KSJ2:RAS": "eb03_8501",
+        "KSJ2:STN": "川俣",
+        "KSJ2:segment": "eb02_18159",
+        "name": "川俣",
+        "name:en": "Kawamata",
+        "name:ja": "川俣",
+        "name:ja_rm": "Kawamata",
+        "name:ko": "가와마타",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6379607",
+        "wikipedia": "ja:川俣駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5264678,
+          36.2088339
+        ]
+      },
+      "id": "node/308840211"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/335660626",
+        "name": "丸山下",
+        "name:en": "Maruyama-shita",
+        "name:ja_rm": "Maruyamashita",
+        "name:ko": "마루야마시타",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q6778056",
+        "wikipedia": "ja:丸山下駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3216927,
+          36.4168086
+        ]
+      },
+      "id": "node/335660626"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/335660644",
+        "name": "樋越",
+        "name:en": "Higoshi",
+        "name:ja-Latn": "Higoshi",
+        "name:ko": "히고시",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q5760164",
+        "wikipedia": "ja:樋越駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1735854,
+          36.4155327
+        ]
+      },
+      "id": "node/335660644"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/335661082",
+        "name": "江木",
+        "name:en": "Egi",
+        "name:ja-Latn": "Egi",
+        "name:ko": "에기",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q5347958",
+        "wikipedia": "ja:江木駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1337267,
+          36.4073386
+        ]
+      },
+      "id": "node/335661082"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/335661322",
+        "name": "赤坂",
+        "name:en": "Akasaka",
+        "name:ja-Latn": "Akasaka",
+        "name:ko": "아카사카",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q4700319",
+        "wikipedia": "ja:赤坂駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1175449,
+          36.3975191
+        ]
+      },
+      "id": "node/335661322"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/335661607",
+        "name": "大胡",
+        "name:en": "Ogo",
+        "name:ja_rm": "Ōgo",
+        "name:ko": "오고",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "train": "yes",
+        "wikidata": "Q11438553",
+        "wikipedia": "ja:大胡駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1566521,
+          36.4130012
+        ]
+      },
+      "id": "node/335661607"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/335661612",
+        "name": "城東",
+        "name:en": "Joto",
+        "name:ja": "城東",
+        "name:ja-Latn": "Jōtō",
+        "name:ko": "조토",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q11426223",
+        "wikipedia": "ja:城東駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0810836,
+          36.3911926
+        ]
+      },
+      "id": "node/335661612"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/335661871",
+        "name": "心臓血管センター",
+        "name:en": "Shinzo-Kekkan Center",
+        "name:ja-Latn": "Shinzō-Kekkan Center",
+        "name:ko": "신조켓칸센터",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q7497852",
+        "wikipedia": "ja:心臓血管センター駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1288142,
+          36.405169
+        ]
+      },
+      "id": "node/335661871"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355840576",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "中之条",
+        "name": "中之条",
+        "name:en": "Nakanojo",
+        "name:ja": "中之条",
+        "name:ja_rm": "Nakanojō",
+        "name:ko": "나카노조",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6960282",
+        "wikipedia": "ja:中之条駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8521738,
+          36.5853523
+        ]
+      },
+      "id": "node/355840576"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355840633",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "金島",
+        "name": "金島",
+        "name:en": "Kanashima",
+        "name:ja": "金島",
+        "name:ja_rm": "Kanashima",
+        "name:ko": "가나시마",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "train": "yes",
+        "wikidata": "Q6360686",
+        "wikipedia": "ja:金島駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9765506,
+          36.5294462
+        ]
+      },
+      "id": "node/355840633"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355840643",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "郷原",
+        "name": "郷原",
+        "name:en": "Gobara",
+        "name:ja": "郷原",
+        "name:ja_rm": "Gōbara",
+        "name:ko": "고바라",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5627747",
+        "wikipedia": "ja:郷原駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8011866,
+          36.5488198
+        ]
+      },
+      "id": "node/355840643"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355840761",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "矢倉",
+        "name": "矢倉",
+        "name:en": "Yagura",
+        "name:ja": "矢倉",
+        "name:ja_rm": "Yagura",
+        "name:ko": "야구라",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q8046763",
+        "wikipedia": "ja:矢倉駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.784543,
+          36.552654
+        ]
+      },
+      "id": "node/355840761"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355840762",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "群馬原町",
+        "name": "群馬原町",
+        "name:en": "Gunma-Haramachi",
+        "name:ja": "群馬原町",
+        "name:ja_rm": "Gunma-Haramachi",
+        "name:ko": "군마하라마치",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5618867",
+        "wikipedia": "ja:群馬原町駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8243718,
+          36.5718153
+        ]
+      },
+      "id": "node/355840762"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355840764",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "小野上温泉",
+        "alt_name:ko": "오노가미온센",
+        "name": "小野上温泉",
+        "name:en": "Onogami-Onsen",
+        "name:ja": "小野上温泉",
+        "name:ja_rm": "Onogami-Onsen",
+        "name:ko": "오노가미온천",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7094463",
+        "wikipedia": "ja:小野上温泉駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.904724,
+          36.556897
+        ]
+      },
+      "id": "node/355840764"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355841473",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "祖母島",
+        "name": "祖母島",
+        "name:en": "Ubashima",
+        "name:ja": "祖母島",
+        "name:ja_rm": "Ubashima",
+        "name:ko": "우바시마",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "train": "yes",
+        "wikidata": "Q7876424",
+        "wikipedia": "ja:祖母島駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9570394,
+          36.5406141
+        ]
+      },
+      "id": "node/355841473"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355841574",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "小野上",
+        "name": "小野上",
+        "name:en": "Onogami",
+        "name:ja": "小野上",
+        "name:ja_rm": "Onogami",
+        "name:ko": "오노가미",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "train": "yes",
+        "wikidata": "Q7094460",
+        "wikipedia": "ja:小野上駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9222773,
+          36.5525161
+        ]
+      },
+      "id": "node/355841574"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355841781",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "市城",
+        "name": "市城",
+        "name:en": "Ichishiro",
+        "name:ja": "市城",
+        "name:ja_rm": "Ichishiro",
+        "name:ko": "이치시로",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5986324",
+        "wikipedia": "ja:市城駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.882592,
+          36.570457
+        ]
+      },
+      "id": "node/355841781"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355842284",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "群馬大津",
+        "name": "群馬大津",
+        "name:en": "Gunma-Otsu",
+        "name:ja": "群馬大津",
+        "name:ja_rm": "Gunma-Ōtsu",
+        "name:ko": "군마오쓰",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5618868",
+        "wikipedia": "ja:群馬大津駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.6278307,
+          36.5537582
+        ]
+      },
+      "id": "node/355842284"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355842296",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "大前",
+        "name": "大前",
+        "name:en": "Omae",
+        "name:ja": "大前",
+        "name:ja_rm": "Ōmae",
+        "name:ko": "오마에",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q3971398",
+        "wikipedia": "ja:大前駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.5291273,
+          36.5137508
+        ]
+      },
+      "id": "node/355842296"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355842392",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "羽根尾",
+        "name": "羽根尾",
+        "name:en": "Haneo",
+        "name:ja": "羽根尾",
+        "name:ja_rm": "Haneo",
+        "name:ko": "하네오",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11610220",
+        "wikipedia": "ja:羽根尾駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.6053878,
+          36.550006
+        ]
+      },
+      "id": "node/355842392"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355842393",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "袋倉",
+        "name": "袋倉",
+        "name:en": "Fukurogura",
+        "name:ja": "袋倉",
+        "name:ja_rm": "Fukurogura",
+        "name:ko": "후쿠로구라",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5507710",
+        "wikipedia": "ja:袋倉駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.5788983,
+          36.5440674
+        ]
+      },
+      "id": "node/355842393"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355842579",
+        "KSJ2:LIN": "吾妻線",
+        "KSJ2:STN": "万座・鹿沢口",
+        "name": "万座・鹿沢口",
+        "name:en": "Manza-Kazawaguchi",
+        "name:ja": "万座・鹿沢口",
+        "name:ja_rm": "Manza-Kazawaguchi",
+        "name:ko": "만자·카자와구치",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6753421",
+        "wikipedia": "ja:万座・鹿沢口駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.5511714,
+          36.5320685
+        ]
+      },
+      "id": "node/355842579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355842669",
+        "name": "岩島",
+        "name:en": "Iwashima",
+        "name:ja": "岩島",
+        "name:ja_rm": "Iwashima",
+        "name:ko": "이와시마",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q6100736",
+        "wikipedia": "ja:岩島駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7599489,
+          36.5632327
+        ]
+      },
+      "id": "node/355842669"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/355842841",
+        "name": "吾妻峡八ッ場",
+        "operator": "東吾妻町役場 まちづくり推進課",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7150316,
+          36.5592332
+        ]
+      },
+      "id": "node/355842841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370267174",
+        "highway": "motorway_junction",
+        "name": "館林IC",
+        "name:en": "Tatebayashi IC",
+        "ref": "6",
+        "wikidata": "Q11666955",
+        "wikipedia": "ja:館林インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5724205,
+          36.2280784
+        ]
+      },
+      "id": "node/370267174"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/370585585",
+        "addr:city": "高崎市",
+        "addr:country": "JP",
+        "addr:housenumber": "1400",
+        "addr:postcode": "370-3521",
+        "addr:province": "群馬県",
+        "addr:quarter": "棟高町",
+        "landuse": "retail",
+        "name": "イオンモール高崎",
+        "name:en": "Aeon Mall Takasaki",
+        "shop": "mall",
+        "website": "https://takasaki-aeonmall.com/",
+        "wikidata": "Q11286194",
+        "wikipedia": "ja:イオンモール高崎",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.006882,
+          36.3905501
+        ]
+      },
+      "id": "way/370585585"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/409220112",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅富弘美術館 商業ゾーン",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3732116,
+          36.5504628
+        ]
+      },
+      "id": "way/409220112"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/410223991",
+        "highway": "motorway_junction",
+        "name": "碓氷軽井沢ＩＣ",
+        "name:en": "Usui-Karuizawa",
+        "name:ja": "碓氷軽井沢IC",
+        "ref": "6",
+        "wikidata": "Q11587753",
+        "wikipedia": "ja:碓氷軽井沢インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.6720066,
+          36.2951642
+        ]
+      },
+      "id": "node/410223991"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/432830163",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅赤城の恵",
+        "wikidata": "Q11641510",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1286752,
+          36.4235423
+        ]
+      },
+      "id": "way/432830163"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/432830455",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅ふじみ",
+        "wikidata": "Q11640915",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0943479,
+          36.4691251
+        ]
+      },
+      "id": "way/432830455"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/432833211",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅中山盆地",
+        "wikidata": "Q11669400",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9550957,
+          36.6226719
+        ]
+      },
+      "id": "way/432833211"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/432835677",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅たくみの里",
+        "toilets": "yes",
+        "wikidata": "Q11640809",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9083409,
+          36.6961256
+        ]
+      },
+      "id": "way/432835677"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/432836427",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅水上町水紀行館",
+        "wikidata": "Q11641357",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9682295,
+          36.7644293
+        ]
+      },
+      "id": "way/432836427"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/432837865",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅月夜野矢瀬親水公園",
+        "wikidata": "Q11641320",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9811799,
+          36.6976223
+        ]
+      },
+      "id": "way/432837865"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/436795910",
+        "highway": "services",
+        "name": "道の駅白沢",
+        "wikidata": "Q11641417",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1204563,
+          36.6618918
+        ]
+      },
+      "id": "way/436795910"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/436800530",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅みょうぎ",
+        "wikidata": "Q11640958",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7656538,
+          36.2994547
+        ]
+      },
+      "id": "way/436800530"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/436801461",
+        "highway": "services",
+        "name": "道の駅しもにた",
+        "wikidata": "Q11640774",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8023226,
+          36.2240696
+        ]
+      },
+      "id": "way/436801461"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/436926506",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅くろほね・やまびこ",
+        "wikidata": "Q11640735",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2717088,
+          36.491305
+        ]
+      },
+      "id": "way/436926506"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/439329477",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅おおた",
+        "name:en": "Road Station Ota",
+        "name:ja": "道の駅 おおた",
+        "services": "road_station",
+        "wikidata": "Q11640674",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2961302,
+          36.2642587
+        ]
+      },
+      "id": "way/439329477"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/439335642",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅上野",
+        "wikidata": "Q11641119",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7839899,
+          36.0799763
+        ]
+      },
+      "id": "way/439335642"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/439765660",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅万葉の里",
+        "wikidata": "Q11641102",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8980598,
+          36.1095087
+        ]
+      },
+      "id": "way/439765660"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/439871787",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅甘楽",
+        "opening_hours": "Mo-Su 09:00-18:00",
+        "phone": "0274-74-5445",
+        "website": "town.kanra.gunma.jp",
+        "wikidata": "Q11641404",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9169653,
+          36.2338287
+        ]
+      },
+      "id": "way/439871787"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/439879243",
+        "building:levels": "1",
+        "check_date": "2026-03-08",
+        "drinking_water": "yes",
+        "highway": "services",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "道の駅玉村宿",
+        "toilets": "yes",
+        "wikidata": "Q21641050",
+        "wikimedia_commons": "File:Michinoeki Tamamurajuku.jpg",
+        "wikipedia": "ja:道の駅玉村宿",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.094491,
+          36.3082128
+        ]
+      },
+      "id": "way/439879243"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/443011417",
+        "highway": "services",
+        "name": "道の駅こもち",
+        "website": "https://komochi.com/",
+        "wikidata": "Q11640747",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.016523,
+          36.5147702
+        ]
+      },
+      "id": "way/443011417"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/492265067",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅 あぐりーむ昭和",
+        "wikidata": "Q11640612",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.069119,
+          36.6126427
+        ]
+      },
+      "id": "way/492265067"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/492367561",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅玉村宿",
+        "wikidata": "Q21641050",
+        "wikipedia": "ja:道の駅玉村宿",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0957732,
+          36.3081229
+        ]
+      },
+      "id": "way/492367561"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/499110135",
+        "building": "yes",
+        "name": "ジョイフル本田 新田",
+        "name:en": "Joyful Honda Nitta",
+        "name:ja": "ジョイフル本田",
+        "opening_hours": "Mo-Su 09:00-19:30",
+        "phone": "+81 276 57 7100",
+        "shop": "doityourself",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3023677,
+          36.3026288
+        ]
+      },
+      "id": "way/499110135"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/506045417",
+        "destination": "太田藪塚;桐生;みどり",
+        "highway": "motorway_junction",
+        "name": "太田藪塚IC",
+        "name:en": "Ota-Yabuzuka IC",
+        "name:ja": "太田藪塚IC",
+        "name:ja-Hira": "おおたやぶづかいんたーちぇんじ",
+        "name:ja_rm": "Ōta-Yabuzuka IC",
+        "ref": "4",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:太田藪塚インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2734416,
+          36.34701
+        ]
+      },
+      "id": "node/506045417"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/525401321",
+        "alt_name": "あがつまふれあい公園",
+        "highway": "services",
+        "leisure": "park",
+        "name": "道の駅あがつま峡",
+        "services": "road_station",
+        "wikidata": "Q18339447",
+        "wikipedia": "ja:道の駅あがつま峡",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.735884,
+          36.5699766
+        ]
+      },
+      "id": "way/525401321"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/549324134",
+        "highway": "motorway_junction",
+        "name": "波志江PA（西行き）;波志江スマートIC",
+        "name:en": "Hashie PA (westbound);Hashie SIC",
+        "name:ja": "波志江PA (西行き);波志江スマートIC",
+        "name:ja-Hira": "はしえぱーきんぐえりあ",
+        "name:ja_rm": "Hashie PA (westbound);Hashie SIC",
+        "source:name": "wikipedia",
+        "wikipedia": "ja:波志江パーキングエリア"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1929355,
+          36.3547106
+        ]
+      },
+      "id": "node/549324134"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/549344252",
+        "highway": "motorway_junction",
+        "name": "伊勢崎IC",
+        "name:en": "Isesaki IC",
+        "name:ja": "伊勢崎IC",
+        "name:ja-Hira": "いせさきいんたーちぇんじ",
+        "name:ja_rm": "Isesaki IC",
+        "ref": "3",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:伊勢崎インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2155703,
+          36.3554377
+        ]
+      },
+      "id": "node/549344252"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/549377635",
+        "exit_to": "前橋南 玉村",
+        "highway": "motorway_junction",
+        "name": "前橋南IC",
+        "name:en": "Maebashi-South IC",
+        "name:ja": "前橋南IC",
+        "name:ja-Hira": "まえばしみなみいんたーちぇんじ",
+        "name:ja_rm": "Maebashi-minami IC",
+        "ref": "1",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:前橋南インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.095188,
+          36.3335957
+        ]
+      },
+      "id": "node/549377635"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/549445260",
+        "highway": "motorway_junction",
+        "name": "高崎ＩＣ",
+        "name:en": "takasaki IC",
+        "name:ja": "高崎IC",
+        "name:ja-Hira": "たかさきいんたーちぇんじ",
+        "name:ja_rm": "takasaki IC",
+        "ref": "10",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:高崎インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0573914,
+          36.3402852
+        ]
+      },
+      "id": "node/549445260"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/620591284",
+        "highway": "services",
+        "name": "道の駅八ッ場ふるさと館",
+        "wikidata": "Q17224922",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.6846943,
+          36.5480398
+        ]
+      },
+      "id": "way/620591284"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/674915236",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅よしおか温泉",
+        "services": "road_station",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.034405,
+          36.4411405
+        ]
+      },
+      "id": "way/674915236"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/681352249",
+        "highway": "services",
+        "name": "道の駅尾瀬かたしな",
+        "wikidata": "Q56070873",
+        "wikipedia": "ja:道の駅尾瀬かたしな",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2259835,
+          36.7724106
+        ]
+      },
+      "id": "way/681352249"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/767355183",
+        "highway": "motorway_junction",
+        "name": "水上IC",
+        "name:en": "Minakami IC",
+        "name:ja": "水上IC",
+        "name:ja-Hira": "みなかみいんたーちぇんじ",
+        "name:ja_rm": "Minakami IC",
+        "ref": "15",
+        "wikidata": "Q11129404",
+        "wikipedia": "ja:水上インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9773906,
+          36.7430962
+        ]
+      },
+      "id": "node/767355183"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/767355444",
+        "exit_to": "水上 谷川岳",
+        "highway": "motorway_junction",
+        "name": "水上IC",
+        "name:en": "Minakami IC",
+        "name:ja": "水上IC",
+        "name:ja-Hira": "みなかみいんたーちぇんじ",
+        "ref": "15",
+        "wikipedia": "ja:水上インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9735408,
+          36.7494921
+        ]
+      },
+      "id": "node/767355444"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1092626371",
+        "highway": "motorway_junction",
+        "name": "前橋IC",
+        "name:en": "Maebashi IC",
+        "name:ja": "前橋IC",
+        "name:ja-Hira": "まえばしいんたーちぇんじ",
+        "name:ja_rm": "Maebashi IC",
+        "ref": "11",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:前橋インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0290986,
+          36.3706622
+        ]
+      },
+      "id": "node/1092626371"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1092626424",
+        "highway": "motorway_junction",
+        "name": "前橋IC",
+        "name:en": "Maebashi IC",
+        "name:ja": "前橋IC",
+        "name:ja-Hira": "まえばしいんたーちぇんじ",
+        "name:ja_rm": "Maebashi IC",
+        "ref": "11",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:前橋インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0273167,
+          36.3784232
+        ]
+      },
+      "id": "node/1092626424"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1092777186",
+        "exit_to": "沼田 尾瀬 老神",
+        "highway": "motorway_junction",
+        "name": "沼田ＩＣ",
+        "name:en": "numata IC",
+        "name:ja": "沼田IC",
+        "name:ja-Hira": "ぬまたいんたーちぇんじ",
+        "ref": "13",
+        "wikipedia": "ja:沼田インターチェンジ (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.068299,
+          36.6600893
+        ]
+      },
+      "id": "node/1092777186"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1092788078",
+        "exit_to": "月夜野 三国峠 猿ヶ京 苗場",
+        "highway": "motorway_junction",
+        "name": "月夜野IC",
+        "name:en": "Tsukiyono IC",
+        "name:ja": "月夜野IC",
+        "name:ja-Hira": "つきよのいんたーちぇんじ",
+        "ref": "14",
+        "wikipedia": "ja:月夜野インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0261531,
+          36.6753588
+        ]
+      },
+      "id": "node/1092788078"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1160810325",
+        "highway": "services",
+        "name": "道の駅まえばし赤城",
+        "toilets": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0532356,
+          36.4396625
+        ]
+      },
+      "id": "way/1160810325"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1250003765",
+        "highway": "motorway_junction",
+        "name": "太田桐生IC",
+        "name:en": "Ota-Kiryu IC",
+        "name:ja": "太田桐生IC",
+        "name:ja-Hira": "おおたきりゅういんたーちぇんじ",
+        "name:ja_rm": "Ōta-Kiryu IC",
+        "ref": "5",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:太田桐生インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3923898,
+          36.3316143
+        ]
+      },
+      "id": "node/1250003765"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1281700151",
+        "exit_to": "月夜野 三国峠 猿ヶ京",
+        "highway": "motorway_junction",
+        "name": "月夜野IC",
+        "name:en": "Tsukiyono IC",
+        "name:ja": "月夜野IC",
+        "name:ja-Hira": "つきよのいんたーちぇんじ",
+        "name:ja_rm": "Tsukiyono IC",
+        "ref": "14",
+        "wikipedia": "ja:月夜野インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0150572,
+          36.6772403
+        ]
+      },
+      "id": "node/1281700151"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1281991810",
+        "name": "細谷",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3489937,
+          36.2828979
+        ]
+      },
+      "id": "way/1281991810"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1438893204",
+        "monorail": "yes",
+        "public_transport": "station",
+        "railway": "station",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.340166,
+          36.4233582
+        ]
+      },
+      "id": "way/1438893204"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1517682118",
+        "highway": "motorway_junction",
+        "name": "波志江スマートIC",
+        "name:en": "Hashie SIC",
+        "ref": "2-1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.18909,
+          36.353198
+        ]
+      },
+      "id": "node/1517682118"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1517684635",
+        "highway": "motorway_junction",
+        "name": "波志江スマートIC",
+        "name:en": "Hashie SIC",
+        "ref": "2-1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1894233,
+          36.3546275
+        ]
+      },
+      "id": "node/1517684635"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1781526360",
+        "highway": "motorway_junction",
+        "name": "駒形IC",
+        "name:en": "Komagata IC",
+        "name:ja": "駒形IC",
+        "name:ja-Hira": "こまがたいんたーちぇんじ",
+        "name:ja_rm": "Komagata IC",
+        "ref": "2",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:駒形インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1470874,
+          36.3498154
+        ]
+      },
+      "id": "node/1781526360"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1782241269",
+        "highway": "motorway_junction",
+        "name": "館林IC",
+        "name:en": "Tatebayashi IC",
+        "ref": "6",
+        "wikidata": "Q11666955",
+        "wikipedia": "ja:館林インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5694958,
+          36.2218325
+        ]
+      },
+      "id": "node/1782241269"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2015223049",
+        "highway": "motorway_junction",
+        "name": "松井田妙義IC",
+        "name:en": "Matsuida-Myogi IC",
+        "name:ja": "松井田妙義IC",
+        "ref": "5",
+        "wikidata": "Q11104202",
+        "wikipedia": "ja:松井田妙義インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7739669,
+          36.3152355
+        ]
+      },
+      "id": "node/2015223049"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2023129170",
+        "highway": "motorway_junction",
+        "name": "下仁田IC",
+        "name:en": "Shimonita IC",
+        "name:ja": "下仁田IC",
+        "ref": "4"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8206846,
+          36.2369814
+        ]
+      },
+      "id": "node/2023129170"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2520524802",
+        "highway": "motorway_junction",
+        "name": "渋川伊香保IC",
+        "name:en": "shibukawa-ikaho IC",
+        "name:ja": "渋川伊香保IC",
+        "name:ja-Hira": "しぶかわいかほいんたーちぇんじ",
+        "name:ja_rm": "shibukawa-ikaho IC",
+        "ref": "12",
+        "wikipedia": "ja:渋川伊香保インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0185139,
+          36.4785599
+        ]
+      },
+      "id": "node/2520524802"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2584902721",
+        "highway": "motorway_junction",
+        "name": "波志江PA（東行き）;波志江スマートIC",
+        "name:en": "Hashie PA (eastbound);Hashie SIC",
+        "name:ja": "波志江PA (東行き);波志江スマートIC",
+        "name:ja-Hira": "はしえぱーきんぐえりあ",
+        "name:ja_rm": "Hashie PA (eastbound);Hashie SIC",
+        "source:name": "wikipedia",
+        "wikipedia": "ja:波志江パーキングエリア"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1857734,
+          36.3529824
+        ]
+      },
+      "id": "node/2584902721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2620776337",
+        "highspeed": "yes",
+        "name": "安中榛名",
+        "name:en": "Annaka-Haruna",
+        "name:ja": "安中榛名",
+        "name:ja-Hira": "あんなかはるな",
+        "name:ja_rm": "Annaka-Haruna",
+        "name:ko": "안나카하루나",
+        "operator": "東日本旅客鉄道株式会社",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing",
+        "wikidata": "Q1138259",
+        "wikipedia": "ja:安中榛名駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8493964,
+          36.3625792
+        ]
+      },
+      "id": "node/2620776337"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2689757131",
+        "highway": "motorway_junction",
+        "name": "高崎玉村スマートＩＣ",
+        "name:en": "takasaki-tamamura SIC",
+        "name:ja": "高崎玉村スマートＩＣ",
+        "name:ja-Hira": "たかさきたまむらすまーといんたーちぇんじ",
+        "name:ja_rm": "takasaki-tamamura SIC",
+        "ref": "9-1",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:高崎玉村スマートインターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0900913,
+          36.3089751
+        ]
+      },
+      "id": "node/2689757131"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2702296909",
+        "highway": "motorway_junction",
+        "name": "高崎玉村スマートＩＣ",
+        "name:en": "takasaki-tamamura SIC",
+        "name:ja": "高崎玉村スマートＩＣ",
+        "name:ja-Hira": "たかさきたまむらすまーといんたーちぇんじ",
+        "name:ja_rm": "takasaki-tamamura SIC",
+        "ref": "9-1",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:高崎玉村スマートインターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0902588,
+          36.3090201
+        ]
+      },
+      "id": "node/2702296909"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3032951488",
+        "highspeed": "yes",
+        "name": "上毛高原",
+        "name:de": "Jōmō-Kōgen",
+        "name:en": "Jomo-Kogen",
+        "name:ja": "上毛高原",
+        "name:ja-Hira": "じょうもうこうげん",
+        "name:ja_rm": "Jōmō-Kōgen",
+        "name:ko": "조모코겐",
+        "name:ru": "Дзёмо-Коген",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q1138087",
+        "wikipedia": "ja:上毛高原駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9775973,
+          36.6931647
+        ]
+      },
+      "id": "node/3032951488"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3110550365",
+        "alt_name:ko": "가와라유온센",
+        "end_date": "2014-9-24",
+        "name": "川原湯温泉",
+        "name:en": "Kawarayu-Onsen",
+        "name:ja": "川原湯温泉",
+        "name:ja_rm": "Kawarayu-Onsen",
+        "name:ko": "가와라유온천",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes",
+        "wikidata": "Q6379693",
+        "wikipedia": "ja:川原湯温泉駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.6974453,
+          36.5451
+        ]
+      },
+      "id": "node/3110550365"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3169858522",
+        "highway": "motorway_junction",
+        "name": "駒形IC",
+        "name:en": "Komagata IC",
+        "name:ja": "駒形IC",
+        "name:ja-Hira": "こまがたいんたーちぇんじ",
+        "name:ja_rm": "Komagata IC",
+        "ref": "2",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q11668353",
+        "wikipedia": "ja:駒形インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1403467,
+          36.3455533
+        ]
+      },
+      "id": "node/3169858522"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3402240963",
+        "name": "高崎問屋町",
+        "name:en": "Takasakitonyamachi",
+        "name:ja": "高崎問屋町",
+        "name:ja-Hira": "たかさきとんやまち",
+        "name:ja-Latn": "Takasakitonyamachi",
+        "name:ko": "다카사키톤야마치",
+        "operator": "東日本旅客鉄道株式会社",
+        "operator:wikidata": "Q499071",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "survey",
+        "wikidata": "Q1652478",
+        "wikipedia": "ja:高崎問屋町駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0170821,
+          36.3460185
+        ]
+      },
+      "id": "node/3402240963"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3402288118",
+        "highspeed": "yes",
+        "name": "高崎",
+        "name:de": "Takasaki",
+        "name:en": "Takasaki",
+        "name:ja": "高崎",
+        "name:ja_rm": "Takasaki",
+        "name:ko": "다카사키",
+        "name:ru": "Такасаки",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q801505",
+        "wikipedia": "ja:高崎駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0127191,
+          36.3223804
+        ]
+      },
+      "id": "node/3402288118"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3416345762",
+        "name": "敷島",
+        "name:en": "Shikishima",
+        "name:ja": "敷島",
+        "name:ja-Hira": "しきしま",
+        "name:ja-Latn": "Shikishima",
+        "name:ko": "시키시마",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2013",
+        "wikidata": "Q1705823",
+        "wikipedia": "ja:敷島駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0338283,
+          36.5383023
+        ]
+      },
+      "id": "node/3416345762"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3416345763",
+        "name": "津久田",
+        "name:en": "Tsukuda",
+        "name:ja": "津久田",
+        "name:ja-Hira": "つくだ",
+        "name:ja-Latn": "Tsukuda",
+        "name:ko": "쓰쿠다",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q1705789",
+        "wikipedia": "ja:津久田駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0428322,
+          36.5611315
+        ]
+      },
+      "id": "node/3416345763"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3442398476",
+        "name": "群馬八幡",
+        "name:en": "Gunma-Yawata",
+        "name:ja": "群馬八幡",
+        "name:ja_rm": "Gunma-Yawata",
+        "name:ko": "군마야와타",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q899937"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9574688,
+          36.3377009
+        ]
+      },
+      "id": "node/3442398476"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3505733714",
+        "name": "岩本",
+        "name:en": "Iwamoto",
+        "name:ja": "岩本",
+        "name:ja-Hira": "いわもと",
+        "name:ja-Latn": "Iwamoto",
+        "name:ko": "이와모토",
+        "public_transport": "station",
+        "railway": "station",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q775068",
+        "wikipedia": "ja:岩本駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0471049,
+          36.6030256
+        ]
+      },
+      "id": "node/3505733714"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3548915148",
+        "KSJ2:LIN": "上越線",
+        "KSJ2:STN": "土合",
+        "name": "土合",
+        "name:en": "Doai",
+        "name:ja": "土合",
+        "name:ja_rm": "Doai",
+        "name:ko": "도아이",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5286466",
+        "wikipedia": "ja:土合駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.964686,
+          36.8304169
+        ]
+      },
+      "id": "node/3548915148"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3548915151",
+        "KSJ2:LIN": "上越線",
+        "KSJ2:STN": "群馬総社",
+        "name": "群馬総社",
+        "name:en": "Gumma-Soja",
+        "name:ja": "群馬総社",
+        "name:ja-Hira": "ぐんまそうじゃ",
+        "name:ja-Latn": "Gunma-Sōja",
+        "name:ko": "군마소자",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年 国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1705804",
+        "wikipedia": "ja:群馬総社駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0322835,
+          36.4155807
+        ]
+      },
+      "id": "node/3548915151"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3548915154",
+        "KSJ2:LIN": "上越線",
+        "KSJ2:STN": "沼田",
+        "name": "沼田",
+        "name:en": "Numata",
+        "name:ja": "沼田",
+        "name:ja-Hira": "ぬまた",
+        "name:ja-Latn": "Numata",
+        "name:ko": "누마타",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年 国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1706459",
+        "wikipedia": "ja:沼田駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0356609,
+          36.6424053
+        ]
+      },
+      "id": "node/3548915154"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3548915155",
+        "name": "渋川",
+        "name:en": "Shibukawa",
+        "name:ja": "渋川",
+        "name:ja-Hira": "しぶかわ",
+        "name:ja-Latn": "Shibukawa",
+        "name:ko": "시부카와",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes",
+        "wikidata": "Q864146",
+        "wikipedia": "ja:渋川駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0085523,
+          36.4906867
+        ]
+      },
+      "id": "node/3548915155"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3548915156",
+        "KSJ2:LIN": "両毛線",
+        "KSJ2:STN": "新前橋",
+        "name": "新前橋",
+        "name:en": "Shim-Maebashi",
+        "name:ja": "新前橋",
+        "name:ja-Hira": "しんまえばし",
+        "name:ja-Latn": "Shinmaebashi",
+        "name:ko": "신마에바시",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年 国土交通省",
+        "operator": "東日本旅客鉄道株式会社",
+        "operator:wikidata": "Q499071",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1652844",
+        "wikimedia_commons": "Category:Maebashi Station",
+        "wikipedia": "ja:新前橋駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0471407,
+          36.3788486
+        ]
+      },
+      "id": "node/3548915156"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3548915158",
+        "KSJ2:LIN": "上越線",
+        "KSJ2:STN": "八木原",
+        "name": "八木原",
+        "name:en": "Yagihara",
+        "name:ja": "八木原",
+        "name:ja-Hira": "やぎはら",
+        "name:ja-Latn": "Yagihara",
+        "name:ko": "야기하라",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年 国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1706435",
+        "wikipedia": "ja:八木原駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0192174,
+          36.4636616
+        ]
+      },
+      "id": "node/3548915158"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3548915159",
+        "KSJ2:LIN": "上越線",
+        "KSJ2:STN": "湯檜曽",
+        "name": "湯檜曽",
+        "name:en": "Yubiso",
+        "name:ja": "湯檜曽",
+        "name:ja_rm": "Yubiso",
+        "name:ko": "유비소",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q3527453",
+        "wikipedia": "ja:湯檜曽駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9865728,
+          36.8027175
+        ]
+      },
+      "id": "node/3548915159"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3556466289",
+        "name": "群馬藤岡",
+        "name:en": "Gunma-Fujioka",
+        "name:ja": "群馬藤岡",
+        "name:ja_rm": "Gunma-Fujioka",
+        "name:ko": "군마후지오카",
+        "railway": "station",
+        "wikidata": "Q845730",
+        "wikipedia": "ja:群馬藤岡駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.083422,
+          36.2501545
+        ]
+      },
+      "id": "node/3556466289"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3556466291",
+        "name": "倉賀野",
+        "name:en": "Kuragano",
+        "name:ja": "倉賀野",
+        "name:ja_rm": "Kuragano",
+        "name:ko": "구라가노",
+        "operator": "東日本旅客鉄道",
+        "operator:ja": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "GSI/KIBAN 2500; NARO",
+        "wikidata": "Q910582",
+        "wikipedia": "ja:倉賀野駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.049137,
+          36.3002099
+        ]
+      },
+      "id": "node/3556466291"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3558006062",
+        "KSJ2:LIN": "両毛線",
+        "KSJ2:STN": "前橋",
+        "name": "前橋",
+        "name:en": "Maebashi",
+        "name:ja": "前橋",
+        "name:ja_rm": "Maebashi",
+        "name:ko": "마에바시",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1062416",
+        "wikipedia": "ja:前橋駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0726408,
+          36.3832125
+        ]
+      },
+      "id": "node/3558006062"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3558006066",
+        "name": "新町",
+        "name:en": "Shimmachi",
+        "name:ja": "新町",
+        "name:ja-Latn": "Shimmachi",
+        "name:ko": "산마치",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q845085",
+        "wikipedia": "ja:新町駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1053121,
+          36.2730572
+        ]
+      },
+      "id": "node/3558006066"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3705316801",
+        "name": "北高崎",
+        "name:en": "Kita-Takasaki",
+        "name:ja": "北高崎",
+        "name:ko": "기타타카사키",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes",
+        "website": "https://www.jreast.co.jp/estation/station/info.aspx?StationCd=574",
+        "wikidata": "Q900663",
+        "wikipedia": "ja:北高崎駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0013003,
+          36.3386912
+        ]
+      },
+      "id": "node/3705316801"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3721641449",
+        "name": "桐生",
+        "name:en": "Kiryu",
+        "name:ja": "桐生",
+        "name:ja_rm": "Kiryu",
+        "name:ko": "기류",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q6416343",
+        "wikipedia": "ja:桐生駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3326744,
+          36.4113225
+        ]
+      },
+      "id": "node/3721641449"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3721667220",
+        "KSJ2:LIN": "両毛線;伊勢崎線",
+        "KSJ2:RAS": "eb03_8498",
+        "KSJ2:STN": "伊勢崎",
+        "KSJ2:segment": "eb02_18228",
+        "name": "伊勢崎",
+        "name:en": "Isesaki",
+        "name:ja": "伊勢崎",
+        "name:ja_rm": "Isesaki",
+        "name:ko": "이세사키",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "operator": "東日本旅客鉄道;東武鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wheelchair": "yes",
+        "wikidata": "Q5963232",
+        "wikipedia": "ja:伊勢崎駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1942704,
+          36.3268395
+        ]
+      },
+      "id": "node/3721667220"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3771892729",
+        "highway": "motorway_junction",
+        "name": "藤岡IC;藤岡PA（上り）",
+        "name:en": "Fujioka IC;Fujioka PA (inbound)",
+        "name:ja": "藤岡IC;藤岡PA (上り)",
+        "ref": "1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0731081,
+          36.2698697
+        ]
+      },
+      "id": "node/3771892729"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3781558468",
+        "historic:name": "新大間々",
+        "historic:name:en": "Shin-Omama",
+        "name": "赤城",
+        "name:en": "Akagi",
+        "name:ja": "赤城",
+        "name:ja-Latn": "Akagi",
+        "name:ja_rm": "Akagi",
+        "name:ko": "아카기",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q4700146",
+        "wikipedia": "ja:赤城駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2762898,
+          36.4257745
+        ]
+      },
+      "id": "node/3781558468"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3781603406",
+        "name": "中央前橋",
+        "name:en": "Chuo-Maebashi",
+        "name:ja": "中央前橋",
+        "name:ja_rm": "Chūō-Maebashi",
+        "name:ko": "주오마에바시",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q5119036",
+        "wikipedia": "ja:中央前橋駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0749235,
+          36.3911832
+        ]
+      },
+      "id": "node/3781603406"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3781603409",
+        "name": "上泉",
+        "name:en": "Kamiizumi",
+        "name:ja-Latn": "Kamiizumi",
+        "name:ko": "가미이즈미",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q6357816",
+        "wikipedia": "ja:上泉駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1065811,
+          36.3942753
+        ]
+      },
+      "id": "node/3781603409"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3781603410",
+        "name": "片貝",
+        "name:en": "Katakai",
+        "name:ja-Latn": "Katakai",
+        "name:ko": "가타카이",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "train": "yes",
+        "wikidata": "Q6375029",
+        "wikipedia": "ja:片貝駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0955133,
+          36.3939498
+        ]
+      },
+      "id": "node/3781603410"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3781603411",
+        "name": "三俣",
+        "name:en": "Mitsumata",
+        "name:ja": "三俣",
+        "name:ja-Latn": "Mitsumata",
+        "name:ko": "미쓰마타",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q6883299",
+        "wikipedia": "ja:三俣駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0890263,
+          36.3937327
+        ]
+      },
+      "id": "node/3781603411"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3781603413",
+        "name": "西桐生",
+        "name:en": "Nishi-Kiryu",
+        "name:ja": "西桐生",
+        "name:ja_rm": "Nishi-Kiryū",
+        "name:ko": "니시키류",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q7040364",
+        "wikipedia": "ja:西桐生駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3338152,
+          36.4139311
+        ]
+      },
+      "id": "node/3781603413"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3824450761",
+        "name": "横川",
+        "name:en": "Yokokawa",
+        "name:ja": "横川",
+        "name:ja_rm": "Yokokawa",
+        "name:ko": "요코카와",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q5357064",
+        "wikipedia": "ja:横川駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7372548,
+          36.336178
+        ]
+      },
+      "id": "node/3824450761"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3824505339",
+        "name": "安中",
+        "name:en": "Annaka",
+        "name:ja": "安中",
+        "name:ja-Hira": "あんなか",
+        "name:ja_rm": "Annaka",
+        "name:ko": "안나카",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q861538",
+        "wikipedia": "ja:安中駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9145889,
+          36.3316945
+        ]
+      },
+      "id": "node/3824505339"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3824505341",
+        "name": "松井田",
+        "name:en": "Matsuida",
+        "name:ja": "松井田",
+        "name:ja_rm": "Matsuida",
+        "name:ko": "마쓰이다",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q5357126",
+        "wikipedia": "ja:松井田駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7974638,
+          36.3095681
+        ]
+      },
+      "id": "node/3824505341"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3824505344",
+        "name": "磯部",
+        "name:en": "Isobe",
+        "name:ja": "磯部",
+        "name:ja_rm": "Isobe",
+        "name:ko": "이소베",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q900685"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8497966,
+          36.2983921
+        ]
+      },
+      "id": "node/3824505344"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3824505347",
+        "name": "西松井田",
+        "name:en": "Nishi-Matsuida",
+        "name:ja": "西松井田",
+        "name:ja_rm": "Nishi-Matsuida",
+        "name:ko": "니시마쓰이다",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q5356946"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7863786,
+          36.3162479
+        ]
+      },
+      "id": "node/3824505347"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3830528959",
+        "name": "国定",
+        "name:en": "Kunisada",
+        "name:ja": "国定",
+        "name:ja_rm": "Kunisada",
+        "name:ko": "구니사다",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q426096",
+        "wikipedia": "ja:国定駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2421072,
+          36.3587439
+        ]
+      },
+      "id": "node/3830528959"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3830636503",
+        "highspeed": "yes",
+        "name": "高崎",
+        "name:en": "Takasaki",
+        "name:ja": "高崎",
+        "name:ja_rm": "Takasaki",
+        "name:ko": "다카사키",
+        "operator": "東日本旅客鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q801505",
+        "wikipedia": "ja:高崎駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0122633,
+          36.3208614
+        ]
+      },
+      "id": "node/3830636503"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3879947894",
+        "name": "北藤岡",
+        "name:en": "Kita-Fujioka",
+        "name:ja": "北藤岡",
+        "name:ja-Latn": "Kita-Fujioka",
+        "name:ko": "기타후지오카",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2013",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q844853",
+        "wikipedia": "ja:北藤岡駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0809068,
+          36.2824282
+        ]
+      },
+      "id": "node/3879947894"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3893494792",
+        "name": "南高崎",
+        "name:en": "Minami-Takasaki",
+        "name:ja": "南高崎",
+        "name:ja_rm": "Minami-Takasaki",
+        "name:ko": "미나미타카사키",
+        "network": "上信線",
+        "operator": "上信電鉄",
+        "operator:en": "Jōshin Dentetsu",
+        "operator:ja": "上信電鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2013",
+        "train": "yes",
+        "wikidata": "Q11408788"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0122646,
+          36.3123827
+        ]
+      },
+      "id": "node/3893494792"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3893504438",
+        "name": "佐野のわたし",
+        "name:en": "Sano-no-Watashi",
+        "name:ja": "佐野のわたし",
+        "name:ja_rm": "Sano-no-Watashi",
+        "name:ko": "사노노와타시",
+        "network": "上信線",
+        "operator": "上信電鉄",
+        "operator:en": "Jōshin Dentetsu",
+        "operator:ja": "上信電鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes",
+        "wikidata": "Q17220552",
+        "wikipedia": "ja:佐野のわたし駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0182837,
+          36.3025866
+        ]
+      },
+      "id": "node/3893504438"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3894565570",
+        "name": "根小屋",
+        "name:en": "Negoya",
+        "name:ja": "根小屋",
+        "name:ja_rm": "Negoya",
+        "name:ko": "네고야",
+        "network": "上信線",
+        "operator": "上信電鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q11536283",
+        "wikipedia": "ja:根小屋駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.018774,
+          36.2914111
+        ]
+      },
+      "id": "node/3894565570"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3894565571",
+        "alt_name:ko": "다카사키쇼카다이가쿠마에",
+        "name": "高崎商科大学前",
+        "name:en": "Takasaki-Shoka-Daigaku-mae",
+        "name:ja": "高崎商科大学前",
+        "name:ja_rm": "Takasaki-Shōka-Daigaku-mae",
+        "name:ko": "다카사키상과대학앞",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2013",
+        "wikidata": "Q11669741",
+        "wikipedia": "ja:高崎商科大学前駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.029513,
+          36.2843094
+        ]
+      },
+      "id": "node/3894565571"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3895228695",
+        "name": "山名",
+        "name:en": "Yamana",
+        "name:ja": "山名",
+        "name:ja_rm": "Yamana",
+        "name:ko": "야마나",
+        "network": "上信線",
+        "operator": "上信電鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q11467648",
+        "wikipedia": "ja:山名駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0381956,
+          36.277639
+        ]
+      },
+      "id": "node/3895228695"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3934184665",
+        "KSJ2:LIN": "桐生線",
+        "KSJ2:RAS": "eb03_8585",
+        "KSJ2:STN": "新桐生",
+        "KSJ2:segment": "eb02_18312",
+        "name": "新桐生",
+        "name:en": "Shin-Kiryu",
+        "name:ja": "新桐生",
+        "name:ja_rm": "Shin-kiryū",
+        "name:ko": "신키류",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2012",
+        "wikidata": "Q7497107",
+        "wikipedia": "ja:新桐生駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3202394,
+          36.3951077
+        ]
+      },
+      "id": "node/3934184665"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3936038295",
+        "KSJ2:LIN": "桐生線",
+        "KSJ2:RAS": "eb03_8582",
+        "KSJ2:STN": "阿左美",
+        "KSJ2:segment": "eb02_18308",
+        "name": "阿左美",
+        "name:en": "Azami",
+        "name:ja": "阿左美",
+        "name:ja_rm": "Azami",
+        "name:ko": "아자미",
+        "note": "The station moved 300m north in March 2020.",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "train": "yes",
+        "wikidata": "Q289670",
+        "wikipedia": "ja:阿左美駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3083378,
+          36.3869917
+        ]
+      },
+      "id": "node/3936038295"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4068930993",
+        "name": "境町",
+        "name:en": "Sakaimachi",
+        "name:ja": "境町",
+        "name:ja_rm": "Sakaimachi",
+        "name:ko": "사카이마치",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q258709",
+        "wikipedia": "ja:境町駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2563411,
+          36.2772141
+        ]
+      },
+      "id": "node/4068930993"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4239204667",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "上神梅",
+        "name": "上神梅",
+        "name:en": "Kami-Kambai",
+        "name:ja": "上神梅",
+        "name:ja_rm": "Kami-Kambai",
+        "name:ko": "가미칸바이",
+        "public_transport": "station",
+        "railway": "station",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6357152",
+        "wikipedia": "ja:上神梅駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2576786,
+          36.4700531
+        ]
+      },
+      "id": "node/4239204667"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4339418745",
+        "KSJ2:LIN": "両毛線",
+        "KSJ2:STN": "岩宿",
+        "name": "岩宿",
+        "name:en": "Iwajuku",
+        "name:ja": "岩宿",
+        "name:ja_rm": "Iwajuku",
+        "name:ko": "이와주쿠",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6100339",
+        "wikipedia": "ja:岩宿駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2967677,
+          36.3958085
+        ]
+      },
+      "id": "node/4339418745"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338272",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "東富岡",
+        "name": "東富岡",
+        "name:en": "Higashi-Tomioka",
+        "name:ja": "東富岡",
+        "name:ja_rm": "Higashi-Tomioka",
+        "name:ko": "히가시토미오카",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11526643",
+        "wikipedia": "ja:東富岡駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.901902,
+          36.2608367
+        ]
+      },
+      "id": "node/4351338272"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338273",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "上州福島",
+        "name": "上州福島",
+        "name:en": "Joshu-Fukushima",
+        "name:ja": "上州福島",
+        "name:ja_rm": "Jōshū-Fukushima",
+        "name:ko": "조슈후쿠시마",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11358979",
+        "wikipedia": "ja:上州福島駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9296803,
+          36.25629
+        ]
+      },
+      "id": "node/4351338273"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338274",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "上州一ノ宮",
+        "name": "上州一ノ宮",
+        "name:en": "Joshu-Ichinomiya",
+        "name:ja": "上州一ノ宮",
+        "name:ja_rm": "Jōshū-Ichinomiya",
+        "name:ko": "조슈이치노미야",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11358969",
+        "wikipedia": "ja:上州一ノ宮駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8637154,
+          36.2530369
+        ]
+      },
+      "id": "node/4351338274"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338275",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "上州七日市",
+        "name": "上州七日市",
+        "name:en": "Joshu-Nanokaichi",
+        "name:ja": "上州七日市",
+        "name:ja_rm": "Jōshū-Nanokaichi",
+        "name:ko": "조슈나노카이치",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11358971",
+        "wikipedia": "ja:上州七日市駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8748834,
+          36.258802
+        ]
+      },
+      "id": "node/4351338275"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338276",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "上州新屋",
+        "name": "上州新屋",
+        "name:en": "Joshu-Niiya",
+        "name:ja": "上州新屋",
+        "name:ja_rm": "Jōshū-Niiya",
+        "name:ko": "조슈니야",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11358976",
+        "wikipedia": "ja:上州新屋駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9516222,
+          36.2559546
+        ]
+      },
+      "id": "node/4351338276"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338277",
+        "name": "上州富岡",
+        "name:en": "Joshu-Tomioka",
+        "name:ja": "上州富岡",
+        "name:ja_rm": "Jōshū-Tomioka",
+        "name:ko": "조슈토미오카",
+        "network": "上信線",
+        "operator": "上信電鉄",
+        "operator:en": "Jōshin Dentetsu",
+        "operator:ja": "上信電鉄",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "survey 2014",
+        "wikidata": "Q11358973"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8919038,
+          36.2604237
+        ]
+      },
+      "id": "node/4351338277"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338278",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "神農原",
+        "name": "神農原",
+        "name:en": "Kanohara",
+        "name:ja": "神農原",
+        "name:ja_rm": "Kanohara",
+        "name:ko": "가노하라",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11590900",
+        "wikipedia": "ja:神農原駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8435266,
+          36.2426671
+        ]
+      },
+      "id": "node/4351338278"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338279",
+        "name": "馬庭",
+        "name:en": "Maniwa",
+        "name:ja": "馬庭",
+        "name:ja_rm": "Maniwa",
+        "name:ko": "마니와",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2013",
+        "wikidata": "Q11667961",
+        "wikipedia": "ja:馬庭駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0092091,
+          36.2614153
+        ]
+      },
+      "id": "node/4351338279"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338280",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "南蛇井",
+        "name": "南蛇井",
+        "name:en": "Nanjai",
+        "name:ja": "南蛇井",
+        "name:ja_rm": "Nanjai",
+        "name:ko": "난자이",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11408406",
+        "wikipedia": "ja:南蛇井駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8138092,
+          36.2380765
+        ]
+      },
+      "id": "node/4351338280"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338281",
+        "name": "西富岡",
+        "name:en": "Nishi-Tomioka",
+        "name:ja": "西富岡",
+        "name:ja_rm": "Nishi-Tomioka",
+        "name:ko": "니시토미오카",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2011",
+        "wikidata": "Q11627679",
+        "wikipedia": "ja:西富岡駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8831631,
+          36.2601721
+        ]
+      },
+      "id": "node/4351338281"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338282",
+        "name": "西山名",
+        "name:en": "Nishi-Yamana",
+        "name:ja": "西山名",
+        "name:ja_rm": "Nishi-Yamana",
+        "name:ko": "니시야마나",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2013",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11627819",
+        "wikipedia": "ja:西山名駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0323515,
+          36.2710412
+        ]
+      },
+      "id": "node/4351338282"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338283",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "西吉井",
+        "name": "西吉井",
+        "name:en": "Nishi-Yoshii",
+        "name:ja": "西吉井",
+        "name:ja_rm": "Nishi-Yoshii",
+        "name:ko": "니시요시이",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11627403",
+        "wikipedia": "ja:西吉井駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9663303,
+          36.2557231
+        ]
+      },
+      "id": "node/4351338283"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338284",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "千平",
+        "name": "千平",
+        "name:en": "Sendaira",
+        "name:ja": "千平",
+        "name:ja_rm": "Sendaira",
+        "name:ko": "센다이라",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7450197",
+        "wikipedia": "ja:千平駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7988431,
+          36.2301987
+        ]
+      },
+      "id": "node/4351338284"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338286",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "下仁田",
+        "name": "下仁田",
+        "name:en": "Shimonita",
+        "name:ja": "下仁田",
+        "name:ja_rm": "Shimonita",
+        "name:ko": "시모니타",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7497006",
+        "wikipedia": "ja:下仁田駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7864082,
+          36.2104653
+        ]
+      },
+      "id": "node/4351338286"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4351338287",
+        "KSJ2:LIN": "上信線",
+        "KSJ2:STN": "吉井",
+        "name": "吉井",
+        "name:en": "Yoshii",
+        "name:ja": "吉井",
+        "name:ja_rm": "Yoshii",
+        "name:ko": "요시이",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11412619",
+        "wikipedia": "ja:吉井駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9842924,
+          36.2560542
+        ]
+      },
+      "id": "node/4351338287"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4460550013",
+        "highway": "motorway_junction",
+        "name": "下仁田IC",
+        "name:en": "Shimonita IC",
+        "name:ja": "下仁田IC",
+        "ref": "4"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.8276357,
+          36.2349396
+        ]
+      },
+      "id": "node/4460550013"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4464730415",
+        "highway": "motorway_junction",
+        "name": "高崎ＩＣ",
+        "name:en": "takasaki IC",
+        "name:ja": "高崎IC",
+        "name:ja-Hira": "たかさきいんたーちぇんじ",
+        "name:ja_rm": "takasaki IC",
+        "ref": "10",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:高崎インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0610382,
+          36.3339557
+        ]
+      },
+      "id": "node/4464730415"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4464834932",
+        "highway": "motorway_junction",
+        "name": "駒寄ＰＡ（下り）、スマートＩＣ",
+        "name:en": "komayose PA/SIC",
+        "name:ja": "駒寄PA (下り) 、スマートIC",
+        "name:ja-Hira": "こまよせぱーきんぐえりあ",
+        "name:ja_rm": "komayose PA/SIC",
+        "ref": "11-1",
+        "source:name": "wikipedia",
+        "wikipedia": "ja:駒寄パーキングエリア"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0158593,
+          36.427452
+        ]
+      },
+      "id": "node/4464834932"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4464843020",
+        "highway": "motorway_junction",
+        "name": "渋川伊香保IC",
+        "name:en": "shibukawa-ikaho IC",
+        "name:ja": "渋川伊香保IC",
+        "name:ja-Hira": "しぶかわいかほいんたーちぇんじ",
+        "name:ja_rm": "shibukawa-ikaho IC",
+        "ref": "12",
+        "wikipedia": "ja:渋川伊香保インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0134843,
+          36.4726157
+        ]
+      },
+      "id": "node/4464843020"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4464869606",
+        "highway": "motorway_junction",
+        "name": "赤城ＩＣ、赤城ＰＡ（下り）",
+        "name:en": "akagi IC/PA",
+        "name:ja": "赤城IC、赤城PA (下り)",
+        "name:ja-Hira": "あかぎいんたーちぇんじ",
+        "name:ja_rm": "akagi IC/PA",
+        "ref": "12-1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0474545,
+          36.5345834
+        ]
+      },
+      "id": "node/4464869606"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4464921448",
+        "highway": "motorway_junction",
+        "name": "沼田ＩＣ",
+        "name:en": "numata IC",
+        "name:ja": "沼田IC",
+        "name:ja-Hira": "ぬまたいんたーちぇんじ",
+        "ref": "13",
+        "wikipedia": "ja:沼田インターチェンジ (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.0715321,
+          36.6550414
+        ]
+      },
+      "id": "node/4464921448"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4703818697",
+        "KSJ2:LIN": "伊勢崎線",
+        "KSJ2:RAS": "eb03_8505",
+        "KSJ2:STN": "多々良",
+        "KSJ2:segment": "eb02_18170",
+        "name": "多々良",
+        "name:en": "Tatara",
+        "name:ja": "多々良",
+        "name:ja_rm": "Tatara",
+        "name:ko": "다타라",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7687888",
+        "wikipedia": "ja:多々良駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5005392,
+          36.2734012
+        ]
+      },
+      "id": "node/4703818697"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4707087114",
+        "name": "長野原草津口",
+        "name:en": "Naganohara-Kusatsuguchi",
+        "name:ja": "長野原草津口",
+        "name:ja_rm": "Naganohara-Kusatsuguchi",
+        "name:ko": "나가노하라쿠사쓰구치",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q6958449",
+        "wikipedia": "ja:長野原草津口駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.6497771,
+          36.5463186
+        ]
+      },
+      "id": "node/4707087114"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4708704149",
+        "alt_name:ko": "이타쿠라토요다이마에",
+        "name": "板倉東洋大前",
+        "name:en": "Itakura Toyodai-mae",
+        "name:ja": "板倉東洋大前",
+        "name:ja_rm": "Itakura Tōyōdai Mae",
+        "name:ko": "이타쿠라토요대앞",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6092530",
+        "wikipedia": "ja:板倉東洋大前駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.648542,
+          36.2221334
+        ]
+      },
+      "id": "node/4708704149"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4732365628",
+        "highway": "motorway_junction",
+        "name": "伊勢崎IC",
+        "name:en": "Isesaki IC",
+        "name:ja": "伊勢崎IC",
+        "name:ja-Hira": "いせさきいんたーちぇんじ",
+        "name:ja_rm": "Isesaki IC",
+        "ref": "3",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:伊勢崎インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2237668,
+          36.3538855
+        ]
+      },
+      "id": "node/4732365628"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4732514168",
+        "exit_to": "前橋南 玉村",
+        "highway": "motorway_junction",
+        "name": "前橋南IC",
+        "name:en": "Maebashi-south IC",
+        "name:ja": "前橋南IC",
+        "name:ja-Hira": "まえばしみなみいんたーちぇんじ",
+        "name:ja_rm": "Maebashi-minami IC",
+        "ref": "1",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:前橋南インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1031357,
+          36.3341001
+        ]
+      },
+      "id": "node/4732514168"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4838508964",
+        "highway": "motorway_junction",
+        "name": "太田藪塚IC",
+        "name:en": "Ota-Yabuzuka IC",
+        "name:ja": "太田藪塚IC",
+        "name:ja-Hira": "おおたやぶづかいんたーちぇんじ",
+        "name:ja_rm": "Ōta-Yabuzuka IC",
+        "ref": "4",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:太田藪塚インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2812438,
+          36.3466576
+        ]
+      },
+      "id": "node/4838508964"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5021413969",
+        "name": "木崎",
+        "name:en": "Kizaki",
+        "name:ja": "木崎",
+        "name:ja-Latn": "Kizaki",
+        "name:ko": "기자키",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q6419173",
+        "wikipedia": "ja:木崎駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3125327,
+          36.2711282
+        ]
+      },
+      "id": "node/5021413969"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5038875022",
+        "name": "トライアル",
+        "name:ja": "トライアル館林小桑原店",
+        "opening_hours": "24/7",
+        "phone": "+81 276 76 2170",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5234826,
+          36.232419
+        ]
+      },
+      "id": "node/5038875022"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5106738122",
+        "addr:housenumber": "伊勢崎市三室町5330",
+        "branch": "UNY伊勢崎東店",
+        "brand": "ドン・キホーテ",
+        "brand:en": "Don Quijote",
+        "brand:ja": "ドン・キホーテ",
+        "brand:wikidata": "Q1185381",
+        "brand:wikipedia": "ja:ドン・キホーテ (企業)",
+        "name": "MEGAドン・キホーテ",
+        "name:en": "MEGA Don Quijote",
+        "name:ja": "MEGAドン・キホーテ",
+        "opening_hours": "24/7",
+        "phone": "0270-20-8111",
+        "shop": "supermarket",
+        "short_name": "MEGAドンキ",
+        "short_name:en": "MegaDonki",
+        "short_name:ja": "MEGAドンキ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2338881,
+          36.329168
+        ]
+      },
+      "id": "node/5106738122"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5384986724",
+        "branch": "高崎小鳥店",
+        "brand": "カインズホーム",
+        "brand:en": "Cainz Home",
+        "brand:ja": "カインズホーム",
+        "brand:wikidata": "Q11293852",
+        "name": "カインズホーム",
+        "name:en": "Cainz Home",
+        "name:ja": "カインズホーム",
+        "shop": "doityourself",
+        "website": "https://map.cainz.com/detail/52/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9928639,
+          36.3561272
+        ]
+      },
+      "id": "node/5384986724"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5436843082",
+        "highway": "motorway_junction",
+        "name": "松井田妙義IC",
+        "name:en": "Matsuida-Myogi IC",
+        "name:ja": "松井田妙義IC",
+        "ref": "5",
+        "wikidata": "Q11104202",
+        "wikipedia": "ja:松井田妙義インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7782936,
+          36.3113546
+        ]
+      },
+      "id": "node/5436843082"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5880197712",
+        "highway": "motorway_junction",
+        "name": "太田強戸ＰA ／ スマートＩＣ",
+        "name:en": "Ota-Godo PA / Smart IC",
+        "name:ja": "太田強戸ＰA ／ スマートＩＣ",
+        "ref": "4-1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3516846,
+          36.3370344
+        ]
+      },
+      "id": "node/5880197712"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5880197765",
+        "highway": "motorway_junction",
+        "name": "太田強戸ＰA ／ スマートＩＣ",
+        "name:en": "Ota-Godo PA / Smart IC",
+        "name:ja": "太田強戸ＰA ／ スマートＩＣ",
+        "ref": "4-1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3445361,
+          36.3411215
+        ]
+      },
+      "id": "node/5880197765"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6050938024",
+        "name": "下新田",
+        "name:en": "Shimo-Shinden",
+        "name:ja": "下新田",
+        "name:ja_rm": "Shimo-Shinden",
+        "name:ko": "시모신덴",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q7496933",
+        "wikipedia": "ja:下新田駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.31512,
+          36.4076202
+        ]
+      },
+      "id": "node/6050938024"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6050989579",
+        "name": "世良田",
+        "name:en": "Serada",
+        "name:ja": "世良田",
+        "name:ja_rm": "Serada",
+        "name:ko": "세라다",
+        "public_transport": "station",
+        "railway": "station",
+        "ref": "TI-21",
+        "wikidata": "Q7452609",
+        "wikipedia": "ja:世良田駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2815566,
+          36.2730451
+        ]
+      },
+      "id": "node/6050989579"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6057440277",
+        "name": "富士山下",
+        "name:en": "Fujiyamashita",
+        "name:ja_rm": "Fujiyamashita",
+        "name:ko": "후지야마시타",
+        "note": "NOT the station for Mt Fuji..",
+        "operator": "上毛電気鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q5507553",
+        "wikipedia": "ja:富士山下駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3159025,
+          36.4141075
+        ]
+      },
+      "id": "node/6057440277"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6057440278",
+        "name": "相老",
+        "name:en": "Aioi",
+        "name:ja": "相老",
+        "name:ja-Hira": "あいおい",
+        "name:ja_rm": "Aioi",
+        "name:ko": "아이오이",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q4697556",
+        "wikipedia": "ja:相老駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3044628,
+          36.4104667
+        ]
+      },
+      "id": "node/6057440278"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6057440279",
+        "name": "東新川",
+        "name:en": "Higashi-Nikkawa",
+        "name:ja-Latn": "Higashi-Nikkawa",
+        "name:ko": "히가시닛카와",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "train": "yes",
+        "wikidata": "Q11527073",
+        "wikipedia": "ja:東新川駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2676609,
+          36.4220498
+        ]
+      },
+      "id": "node/6057440279"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6571461520",
+        "KSJ2:LIN": "上毛線",
+        "KSJ2:STN": "新里",
+        "name": "新里",
+        "name:en": "Niisato",
+        "name:ja": "新里",
+        "name:ja_rm": "Niisato",
+        "name:ko": "니이사토",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7034481",
+        "wikipedia": "ja:新里駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2377038,
+          36.4185914
+        ]
+      },
+      "id": "node/6571461520"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6778376057",
+        "name": "新川",
+        "name:en": "Nikkawa",
+        "name:ko": "닛카와",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q11502115",
+        "wikipedia": "ja:新川駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2578184,
+          36.41821
+        ]
+      },
+      "id": "node/6778376057"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6786895956",
+        "exit_to": "太田桐生;足利",
+        "highway": "motorway_junction",
+        "name": "太田桐生IC",
+        "name:en": "Ota-Kiryu IC",
+        "name:ja": "太田桐生IC",
+        "name:ja-Hira": "おおたきりゅういんたーちぇんじ",
+        "name:ja_rm": "Ōta-Kiryu IC",
+        "ref": "5",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:太田桐生インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3847232,
+          36.3298604
+        ]
+      },
+      "id": "node/6786895956"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6804657899",
+        "KSJ2:LIN": "桐生線",
+        "KSJ2:RAS": "eb03_8584",
+        "KSJ2:STN": "治良門橋",
+        "KSJ2:segment": "eb02_18311",
+        "name": "治良門橋",
+        "name:en": "Jiroembashi",
+        "name:ja": "治良門橋",
+        "name:ja_rm": "Jiroembashi",
+        "name:ko": "지로엔바시",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6203113",
+        "wikipedia": "ja:治良門橋駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3411701,
+          36.3329724
+        ]
+      },
+      "id": "node/6804657899"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7170805914",
+        "KSJ2:LIN": "小泉線",
+        "KSJ2:RAS": "eb03_8599",
+        "KSJ2:STN": "成島",
+        "KSJ2:segment": "eb02_18353",
+        "name": "成島",
+        "name:en": "Narushima",
+        "name:ja": "成島",
+        "name:ja_rm": "Narushima",
+        "name:ko": "나루시마",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6966471",
+        "wikipedia": "ja:成島駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5058384,
+          36.2490518
+        ]
+      },
+      "id": "node/7170805914"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7370513070",
+        "KSJ2:LIN": "小泉線",
+        "KSJ2:RAS": "eb03_8603",
+        "KSJ2:STN": "本中野",
+        "KSJ2:segment": "eb02_18355",
+        "name": "本中野",
+        "name:en": "Hon-Nakano",
+        "name:ja": "本中野",
+        "name:ja_rm": "Hon-Nakano",
+        "name:ko": "혼나카노",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5891922",
+        "wikipedia": "ja:本中野駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4697452,
+          36.2585529
+        ]
+      },
+      "id": "node/7370513070"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7370988890",
+        "KSJ2:LIN": "小泉線",
+        "KSJ2:RAS": "eb03_8605",
+        "KSJ2:STN": "篠塚",
+        "KSJ2:segment": "eb02_18359",
+        "name": "篠塚",
+        "name:en": "Shinozuka",
+        "name:ja": "篠塚",
+        "name:ja_rm": "Shinozuka",
+        "name:ko": "시노즈카",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7497734",
+        "wikipedia": "ja:篠塚駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.44662,
+          36.256655
+        ]
+      },
+      "id": "node/7370988890"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7371039190",
+        "KSJ2:LIN": "小泉線",
+        "KSJ2:RAS": "eb03_8598",
+        "KSJ2:STN": "東小泉",
+        "KSJ2:segment": "eb02_18342",
+        "name": "東小泉",
+        "name:en": "Higashi-Koizumi",
+        "name:ja": "東小泉",
+        "name:ja_rm": "Higashi-Koizumi",
+        "name:ko": "히가시코이즈미",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5753636",
+        "wikipedia": "ja:東小泉駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4290909,
+          36.2594413
+        ]
+      },
+      "id": "node/7371039190"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7374373441",
+        "KSJ2:LIN": "小泉線",
+        "KSJ2:RAS": "eb03_8601",
+        "KSJ2:STN": "西小泉",
+        "KSJ2:segment": "eb02_18346",
+        "name": "西小泉",
+        "name:en": "Nishi-Koizumi",
+        "name:ja": "西小泉",
+        "name:ja_rm": "Nishi-Koizumi",
+        "name:ko": "니시코이즈미",
+        "name:pt": "Nishi-Koizumi",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q11627702",
+        "wikipedia": "ja:西小泉駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4083142,
+          36.2583064
+        ]
+      },
+      "id": "node/7374373441"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7377453616",
+        "KSJ2:LIN": "小泉線",
+        "KSJ2:RAS": "eb03_8602",
+        "KSJ2:STN": "小泉町",
+        "KSJ2:segment": "eb02_18358",
+        "name": "小泉町",
+        "name:en": "Koizumi-machi",
+        "name:ja": "小泉町",
+        "name:ja_rm": "Koizumi-machi",
+        "name:ko": "고이즈미마치",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q6426398",
+        "wikipedia": "ja:小泉町駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4199121,
+          36.2615161
+        ]
+      },
+      "id": "node/7377453616"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7379053850",
+        "KSJ2:LIN": "小泉線",
+        "KSJ2:RAS": "eb03_8600",
+        "KSJ2:STN": "竜舞",
+        "KSJ2:segment": "eb02_18354",
+        "name": "竜舞",
+        "name:en": "Ryumai",
+        "name:ja": "竜舞",
+        "name:ja_rm": "Ryūmai",
+        "name:ko": "류마이",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7385630",
+        "wikipedia": "ja:竜舞駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4088764,
+          36.2791804
+        ]
+      },
+      "id": "node/7379053850"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7392223332",
+        "KSJ2:LIN": "桐生線",
+        "KSJ2:RAS": "eb03_8586",
+        "KSJ2:STN": "三枚橋",
+        "KSJ2:segment": "eb02_18317",
+        "name": "三枚橋",
+        "name:en": "Sammaibashi",
+        "name:ja": "三枚橋",
+        "name:ja_rm": "Sammaibashi",
+        "name:ko": "산마이바시",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7409638",
+        "wikipedia": "ja:三枚橋駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3548272,
+          36.313581
+        ]
+      },
+      "id": "node/7392223332"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7400598540",
+        "KSJ2:LIN": "桐生線",
+        "KSJ2:RAS": "eb03_8581",
+        "KSJ2:STN": "藪塚",
+        "KSJ2:segment": "eb02_18307",
+        "name": "藪塚",
+        "name:en": "Yabuzuka",
+        "name:ja": "藪塚",
+        "name:ja_rm": "Yabuzuka",
+        "name:ko": "야부즈카",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q8046412",
+        "wikipedia": "ja:藪塚駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3152341,
+          36.3590056
+        ]
+      },
+      "id": "node/7400598540"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7403970198",
+        "highway": "motorway_junction",
+        "name": "箱島IC",
+        "name:en": "Hakoshima IC",
+        "name:ja": "箱島IC",
+        "name:ja-Hira": "はこしま"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9271494,
+          36.5478307
+        ]
+      },
+      "id": "node/7403970198"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7403970226",
+        "highway": "motorway_junction",
+        "name": "川島・高山IC",
+        "name:en": "Kawashima Takayama IC",
+        "name:ja": "川島・高山IC"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9828757,
+          36.5237949
+        ]
+      },
+      "id": "node/7403970226"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7403970260",
+        "highway": "motorway_junction",
+        "name": "岡崎IC",
+        "name:en": "Okazaki IC",
+        "name:ja": "岡崎IC"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9431984,
+          36.5445202
+        ]
+      },
+      "id": "node/7403970260"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7412912521",
+        "highway": "motorway_junction",
+        "name": "厚田IC",
+        "name:en": "Atsuda IC",
+        "name:ja": "厚田IC",
+        "name:ja-Hira": "あつだいんたーちぇんじ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.799082,
+          36.5449759
+        ]
+      },
+      "id": "node/7412912521"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7478301445",
+        "name": "太田",
+        "name:en": "Ota",
+        "name:ja": "太田",
+        "name:ja-Hira": "おおた",
+        "name:ja_rm": "Ota",
+        "name:ko": "오타",
+        "operator": "東武鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "wikidata": "Q8081729",
+        "wikipedia": "ja:太田駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3787733,
+          36.294102
+        ]
+      },
+      "id": "node/7478301445"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7598312147",
+        "highway": "motorway_junction",
+        "name": "金井IC",
+        "name:en": "Kanai IC",
+        "name:ja": "金井IC",
+        "name:ja-Hira": "かない"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9900282,
+          36.5114561
+        ]
+      },
+      "id": "node/7598312147"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7967515039",
+        "KSJ2:LIN": "伊勢崎線",
+        "KSJ2:RAS": "eb03_8509",
+        "KSJ2:STN": "剛志",
+        "KSJ2:segment": "eb02_18230",
+        "name": "剛志",
+        "name:en": "Goshi",
+        "name:ja": "剛志",
+        "name:ja_rm": "Gōshi",
+        "name:ko": "고시",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5627764",
+        "wikipedia": "ja:剛志駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2240882,
+          36.2954884
+        ]
+      },
+      "id": "node/7967515039"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7967515045",
+        "name": "新伊勢崎",
+        "name:en": "Shin-Isesaki",
+        "name:ja": "新伊勢崎",
+        "name:ja_rm": "Shin-Isesaki",
+        "name:ko": "신이세사키",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "Bing 2012",
+        "wikidata": "Q7497100",
+        "wikipedia": "ja:新伊勢崎駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2018357,
+          36.3181973
+        ]
+      },
+      "id": "node/7967515045"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7967910509",
+        "alt_name:ko": "모린지마에",
+        "name": "茂林寺前",
+        "name:en": "Morinji-mae",
+        "name:ja": "茂林寺前",
+        "name:ja_rm": "Morinji-mae",
+        "name:ko": "모린지앞",
+        "operator": "東武鉄道",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q8190293",
+        "wikipedia": "ja:茂林寺前駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5269854,
+          36.2254683
+        ]
+      },
+      "id": "node/7967910509"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7967910511",
+        "KSJ2:LIN": "小泉線;佐野線;伊勢崎線",
+        "KSJ2:STN": "館林",
+        "name": "館林",
+        "name:en": "Tatebayashi",
+        "name:ja": "館林",
+        "name:ja_rm": "Tatebayashi",
+        "name:ko": "다테바야시",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q865905",
+        "wikipedia": "ja:館林駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5277929,
+          36.2465491
+        ]
+      },
+      "id": "node/7967910511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7967910518",
+        "KSJ2:LIN": "伊勢崎線",
+        "KSJ2:RAS": "eb03_8500",
+        "KSJ2:STN": "韮川",
+        "KSJ2:segment": "eb02_18158",
+        "name": "韮川",
+        "name:en": "Niragawa",
+        "name:ja": "韮川",
+        "name:ja_rm": "Niragawa",
+        "name:ko": "니라가와",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q8191297",
+        "wikipedia": "ja:韮川駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4026154,
+          36.3083277
+        ]
+      },
+      "id": "node/7967910518"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7967910548",
+        "KSJ2:LIN": "伊勢崎線",
+        "KSJ2:RAS": "eb03_8499",
+        "KSJ2:STN": "細谷",
+        "KSJ2:segment": "eb02_18240",
+        "name": "細谷",
+        "name:en": "Hosoya",
+        "name:ja": "細谷",
+        "name:ja_rm": "Hosoya",
+        "name:ko": "호소야",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q5908238",
+        "wikipedia": "ja:細谷駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3490785,
+          36.2830305
+        ]
+      },
+      "id": "node/7967910548"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8059380834",
+        "name": "天王宿",
+        "name:en": "Tennojuku",
+        "name:ja": "天王宿",
+        "name:ja-Latn": "Tennōjuku",
+        "name:ko": "덴노주쿠",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q7700534",
+        "wikipedia": "ja:天王宿駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3081533,
+          36.4149545
+        ]
+      },
+      "id": "node/8059380834"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8059380836",
+        "name": "粕川",
+        "name:en": "Kasukawa",
+        "name:ja-Latn": "Kasukawa",
+        "name:ko": "가스카와",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q6374886",
+        "wikipedia": "ja:粕川駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2107507,
+          36.4167109
+        ]
+      },
+      "id": "node/8059380836"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8059417355",
+        "alt_name:ko": "기류큐조마에",
+        "name": "桐生球場前",
+        "name:en": "Kiryu-Kyujo-mae",
+        "name:ja": "桐生球場前",
+        "name:ja_rm": "Kiryū-Kyūjō-Mae",
+        "name:ko": "기류구장앞",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q6416345",
+        "wikipedia": "ja:桐生球場前駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2981167,
+          36.4192886
+        ]
+      },
+      "id": "node/8059417355"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8062047206",
+        "name": "北原",
+        "name:en": "Kitahara",
+        "name:ja-Latn": "Kitahara",
+        "name:ko": "기타하라",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q11401280",
+        "wikipedia": "ja:北原駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1848652,
+          36.413667
+        ]
+      },
+      "id": "node/8062047206"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8062047207",
+        "name": "新屋",
+        "name:en": "Araya",
+        "name:ja-Latn": "Araya",
+        "name:ko": "아라야",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q4784551",
+        "wikipedia": "ja:新屋駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1964359,
+          36.4138103
+        ]
+      },
+      "id": "node/8062047207"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8062047208",
+        "name": "膳",
+        "name:en": "Zen",
+        "name:ja": "膳",
+        "name:ja-Hira": "ぜん",
+        "name:ja-Latn": "Zen",
+        "name:ko": "젠",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "wikidata": "Q8192788",
+        "wikipedia": "ja:膳駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.221943,
+          36.4170901
+        ]
+      },
+      "id": "node/8062047208"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8062667105",
+        "KSJ2:LIN": "佐野線",
+        "KSJ2:RAS": "eb03_8589",
+        "KSJ2:STN": "渡瀬",
+        "KSJ2:segment": "eb02_18336",
+        "name": "渡瀬",
+        "name:en": "Watarase",
+        "name:ja": "渡瀬",
+        "name:ja_rm": "Watarase",
+        "name:ko": "와타라세",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年　国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q7973000",
+        "wikipedia": "ja:渡瀬駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5371537,
+          36.2616873
+        ]
+      },
+      "id": "node/8062667105"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8302447625",
+        "highway": "motorway_junction",
+        "name": "金井IC",
+        "name:en": "Kanai IC",
+        "name:ja": "金井IC",
+        "name:ja-Hira": "かない"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9900685,
+          36.5160356
+        ]
+      },
+      "id": "node/8302447625"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8582750621",
+        "highway": "motorway_junction",
+        "name": "岡崎IC",
+        "name:en": "Okazaki IC",
+        "name:ja": "岡崎IC"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.936998,
+          36.5455325
+        ]
+      },
+      "id": "node/8582750621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8582750728",
+        "highway": "motorway_junction",
+        "name": "川島・高山IC",
+        "name:en": "Kawashima Takayama IC",
+        "name:ja": "川島・高山IC",
+        "name:ja-Hira": "かわしま・たかやま"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9782263,
+          36.5238767
+        ]
+      },
+      "id": "node/8582750728"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8866262926",
+        "highway": "services",
+        "name": "道の駅草津運動茶屋公園",
+        "toilets": "yes",
+        "wikidata": "Q11641485"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.5901789,
+          36.6147932
+        ]
+      },
+      "id": "node/8866262926"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/9658525913",
+        "name": "雁ヶ沢",
+        "operator": "東吾妻町役場 まちづくり推進課",
+        "public_transport": "station",
+        "railway": "station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7345481,
+          36.573085
+        ]
+      },
+      "id": "node/9658525913"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11371147092",
+        "brand": "カインズホーム",
+        "brand:en": "Cainz Home",
+        "brand:ja": "カインズホーム",
+        "brand:wikidata": "Q11293852",
+        "brand:wikipedia": "ja:カインズ",
+        "name": "カインズホーム",
+        "name:en": "Cainz Home",
+        "name:ja": "カインズホーム",
+        "phone": "+81 27 230 4555",
+        "shop": "doityourself"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.175744,
+          36.4109036
+        ]
+      },
+      "id": "node/11371147092"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12098053134",
+        "addr:block_number": "10",
+        "addr:city": "桐生市",
+        "addr:neighbourhood": "5",
+        "addr:postcode": "376-0044",
+        "addr:province": "群馬県",
+        "addr:quarter": "永楽町",
+        "brand": "ドン・キホーテ",
+        "brand:en": "Don Quijote",
+        "brand:ja": "ドン・キホーテ",
+        "brand:wikidata": "Q1185381",
+        "covered": "yes",
+        "name": "MEGAドン・キホーテ",
+        "name:en": "MEGA Don Quijote",
+        "name:ja": "MEGAドン・キホーテ",
+        "opening_hours": "08:00-23:00",
+        "phone": "+81 277 47 3810",
+        "shop": "supermarket",
+        "short_name": "MEGAドンキ",
+        "short_name:en": "MegaDonki",
+        "short_name:ja": "MEGAドンキ",
+        "website": "https://www.donki.com/store/shop_detail.php?shop_id=237"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3357879,
+          36.4121336
+        ]
+      },
+      "id": "node/12098053134"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12597670270",
+        "KSJ2:LIN": "わたらせ渓谷線",
+        "KSJ2:STN": "花輪",
+        "name": "花輪",
+        "name:en": "Hanawa",
+        "name:ja": "花輪",
+        "name:ja_rm": "Hanawa",
+        "name:ko": "하나와",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes",
+        "wikidata": "Q5646950",
+        "wikipedia": "ja:花輪駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.307863,
+          36.5208404
+        ]
+      },
+      "id": "node/12597670270"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13070238464",
+        "name": "ジョイフル本田",
+        "name:en": "Joyful Honda",
+        "official_name": "ジョイフル本田千代田店",
+        "opening_hours": "09:00-19:30",
+        "shop": "doityourself",
+        "website": "https://www.joyfulhonda.com/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4725511,
+          36.2059242
+        ]
+      },
+      "id": "node/13070238464"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13676707682",
+        "brand": "トライアル",
+        "brand:en": "Trial",
+        "brand:ja": "トライアル",
+        "brand:wikidata": "Q11321723",
+        "name": "トライアル",
+        "name:en": "Trial",
+        "name:ja": "トライアル",
+        "official_name": "トライアル 笠懸店",
+        "opening_hours": "24/7",
+        "phone": "+81 277 40 5510",
+        "shop": "supermarket"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2726599,
+          36.3876381
+        ]
+      },
+      "id": "node/13676707682"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13953082008",
+        "name": "水上",
+        "name:en": "Minakami",
+        "name:ja": "水上",
+        "name:ja-Hira": "みなかみ",
+        "name:ja-Latn": "Minakami",
+        "operator": "東日本旅客鉄道株式会社",
+        "operator:wikidata": "Q499071",
+        "public_transport": "station",
+        "railway": "station",
+        "train": "yes",
+        "wikidata": "Q1770451",
+        "wikipedia": "ja:水上駅"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9689907,
+          36.7786288
+        ]
+      },
+      "id": "node/13953082008"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13956540216",
+        "KSJ2:LIN": "上越線",
+        "KSJ2:STN": "上牧",
+        "name": "上牧",
+        "name:en": "Kamimoku",
+        "name:ja": "上牧",
+        "name:ja-Hira": "かみもく",
+        "name:ja-Latn": "Kamimoku",
+        "name:ko": "가미모쿠",
+        "note": "National-Land Numerical Information (Railway) 2007, MLIT Japan",
+        "note:ja": "国土数値情報（鉄道データ）平成19年 国土交通省",
+        "public_transport": "station",
+        "railway": "station",
+        "source": "KSJ2",
+        "source_ref": "http://nlftp.mlit.go.jp/ksj/jpgis/datalist/KsjTmplt-N02-v1_1.html",
+        "wikidata": "Q1770591",
+        "wikipedia": "ja:上牧駅 (群馬県)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.9845462,
+          36.7354492
+        ]
+      },
+      "id": "node/13956540216"
+    }
+  ]
+}
