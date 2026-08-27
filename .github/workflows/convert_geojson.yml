@@ -1,0 +1,42 @@
+name: Convert GeoJSON to Slim JSON
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_file:
+        description: '変換元のGeoJSONファイルパス (例: json/CHIBA.geojson)'
+        required: true
+        default: 'json/CHIBA_raw.geojson'
+      output_file:
+        description: '出力するJSONファイルパス (例: json/CHIBA_slim.json)'
+        required: true
+        default: 'json/CHIBA.json'
+
+jobs:
+  convert_json:
+    runs-on: ubuntu-latest
+
+    steps:
+      # リポジトリのコードをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Node.jsの環境をセットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # 変換スクリプトを実行 (指定されたパスを引数として渡す)
+      - name: Run conversion script
+        run: |
+          node script/convert.js "${{ github.event.inputs.input_file }}" "${{ github.event.inputs.output_file }}"
+
+      # 変更されたファイルをコミットしてプッシュ
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add "${{ github.event.inputs.output_file }}"
+          git commit -m "Auto-convert: slimmed down ${{ github.event.inputs.input_file }}" || echo "No changes to commit"
+          git push
