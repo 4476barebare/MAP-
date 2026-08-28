@@ -3,7 +3,13 @@ name: Acquire Crowd Images
 on:
   workflow_dispatch:
   schedule:
-    - cron: '15 22,10 * * *'  # JST 06:15 / 18:15
+    - cron: '15 7,19 * * *'
+      timezone: 'Asia/Tokyo' # 🌟 日本時間の 06:15 と 18:15 にそのまま発火します
+
+# 🌟 追加: デプロイの渋滞エラーを防止する安全装置
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 permissions:
   contents: write
