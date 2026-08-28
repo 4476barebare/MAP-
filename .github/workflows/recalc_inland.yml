@@ -2,9 +2,14 @@ name: Recalculate InLand Weather Data
 
 on:
   schedule:
-    - cron: '0 17 * * *'
-      timezone: 'Asia/Tokyo'# 毎日 02:00 JST
+    - cron: '0 2 * * *' # 🌟 timezone指定があるため「そのまま日本時間の深夜2時」と書きます
+      timezone: 'Asia/Tokyo'
   workflow_dispatch:
+
+# 🌟 デプロイの渋滞エラーを防止する安全装置を追加
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 # Gitへの書き込み権限と、Pagesへの直接デプロイ権限を設定
 permissions:
@@ -16,9 +21,10 @@ jobs:
   recalculate:
     runs-on: ubuntu-latest
     
-    # 🌟 ここを追加！GitHub Pagesへのデプロイ権限を証明するために必須の記述です
+    # 🌟 GitHub Pagesへのデプロイ権限を証明するために必須の記述
     environment:
       name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # ← ログからURLへ飛べるように追加
 
     steps:
       - name: Checkout repository
