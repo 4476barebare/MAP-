@@ -3,7 +3,8 @@ name: KANTO Load CSV
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 16 * * *' # 1日1回のみ実行（JST 01:00 相当）
+    - cron: '0 1 * * *'
+      timezone: 'Asia/Tokyo' # 1日1回のみ実行（JST 01:00 相当）
 
 # すべてのリポジトリ操作・Pages・連鎖起動が不要になったため、特別な権限は一切不要です
 permissions:
