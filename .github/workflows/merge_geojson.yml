@@ -1,26 +1,30 @@
-name: Merge and Convert GeoJSON
+name: Merge Slimmed JSON
 
 on:
   workflow_dispatch:
     inputs:
       input_file_1:
-        description: '結合するGeoJSONファイル1 (例: json/TOKYO_jr.geojson)'
+        description: '結合ファイル1 (例: json/TOKYO1.json)'
         required: true
-        default: 'json/TOKYO1.json'
+        default: 'json/TOKYO1_raw.json'
       input_file_2:
-        description: '結合するGeoJSONファイル2 (例: json/TOKYO_private.geojson)'
+        description: '結合ファイル2 (例: json/TOKYO2.json)'
         required: true
         default: 'json/TOKYO2.json'
-      output_file:
-        description: '出力するJSONファイルパス (例: json/TOKYO.json)'
-        required: true
+      input_file_3:
+        description: '結合ファイル3 (任意・例: json/TOKYO4.json)'
+        required: false
         default: 'json/TOKYO4.json'
+      output_file:
+        description: '出力ファイルパス (例: json/TOKYO_merged.json)'
+        required: true
+        default: 'json/TOKYO_merged.json'
 
 jobs:
-  merge_and_convert:
+  merge_json:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # リポジトリへの書き込み権限
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -33,12 +37,17 @@ jobs:
 
       - name: Run merge script
         run: |
-          node script/merge_convert.js "${{ github.event.inputs.input_file_1 }}" "${{ github.event.inputs.input_file_2 }}" "${{ github.event.inputs.output_file }}"
+          # input_file_3が空欄の場合は1と2だけで結合する
+          if [ -z "${{ github.event.inputs.input_file_3 }}" ]; then
+            node script/merge_convert.js "${{ github.event.inputs.input_file_1 }}" "${{ github.event.inputs.input_file_2 }}" "${{ github.event.inputs.output_file }}"
+          else
+            node script/merge_convert.js "${{ github.event.inputs.input_file_1 }}" "${{ github.event.inputs.input_file_2 }}" "${{ github.event.inputs.input_file_3 }}" "${{ github.event.inputs.output_file }}"
+          fi
 
       - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add "${{ github.event.inputs.output_file }}"
-          git commit -m "Auto-merge and convert: ${{ github.event.inputs.input_file_1 }} & ${{ github.event.inputs.input_file_2 }}" || echo "No changes to commit"
+          git commit -m "Auto-merge: Combined JSON files into ${{ github.event.inputs.output_file }}" || echo "No changes to commit"
           git push
