@@ -3,7 +3,7 @@ name: Coastal Area Weather Control
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 16 * * *'
+    - cron: '30 1 * * *'
       timezone: 'Asia/Tokyo' # 1日1回自動実行（JST 01:30 相当）
 
 permissions:
