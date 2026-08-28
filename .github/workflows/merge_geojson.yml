@@ -6,15 +6,15 @@ on:
       input_file_1:
         description: '結合するGeoJSONファイル1 (例: json/TOKYO_jr.geojson)'
         required: true
-        default: 'json/TOKYO_jr.geojson'
+        default: 'json/TOKYO1.json'
       input_file_2:
         description: '結合するGeoJSONファイル2 (例: json/TOKYO_private.geojson)'
         required: true
-        default: 'json/TOKYO_private.geojson'
+        default: 'json/TOKYO2.json'
       output_file:
         description: '出力するJSONファイルパス (例: json/TOKYO.json)'
         required: true
-        default: 'json/TOKYO.json'
+        default: 'json/TOKYO4.json'
 
 jobs:
   merge_and_convert:
