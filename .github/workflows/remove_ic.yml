@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       target_file:
-        description: '処理対象のJSONファイル名（例: kanto.json）'
+        description: '処理対象のJSONファイル名（例: KANAGAWA完成.json）'
         required: true
-        default: 'data.json'
+        default: 'KANAGAWA完成.json'
 
 jobs:
   remove-ic:
@@ -20,9 +20,9 @@ jobs:
         with:
           node-version: '18'
 
-      # 入力されたファイル名を引数としてNode.jsスクリプトに渡す
+      # 修正: scriptディレクトリのJSを呼び出し、jsonディレクトリのファイルを指定する
       - name: Run script to remove IC
-        run: node remove_ic.js "${{ github.event.inputs.target_file }}"
+        run: node script/remove_ic.js "json/${{ github.event.inputs.target_file }}"
 
       - name: Commit and push changes
         run: |
@@ -32,7 +32,7 @@ jobs:
           
           # 変更がある場合のみコミット
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Chore: ${{ github.event.inputs.target_file }} からICデータを削除"
+            git commit -m "Chore: json/${{ github.event.inputs.target_file }} からICデータを削除"
             git push
           else
             echo "変更がありませんでした。"
