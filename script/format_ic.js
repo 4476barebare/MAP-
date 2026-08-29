@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const args = process.argv.slice(2);
 if (args.length === 0) {
@@ -15,7 +15,6 @@ if (!fs.existsSync(inputFile)) {
     process.exit(1);
 }
 
-// 出力ファイル名を生成 (例: input.geojson -> input_formatted.json)
 const parsedPath = path.parse(inputFile);
 const outputFile = path.join(parsedPath.dir, `${parsedPath.name}_formatted.json`);
 
@@ -28,7 +27,6 @@ try {
       process.exit(1);
   }
 
-  // N06_018(施設名) と coordinates(座標) を抽出
   const formattedData = geojson.features.map(feature => {
       const [lng, lat] = feature.geometry.coordinates;
       const name = feature.properties.N06_018 || "名称不明";
