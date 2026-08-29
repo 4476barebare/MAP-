@@ -1,7 +1,12 @@
 name: Remove IC from JSON
 
 on:
-  workflow_dispatch: # 管理画面からの手動実行用トリガー
+  workflow_dispatch:
+    inputs:
+      target_file:
+        description: '処理対象のJSONファイル名（例: kanto.json）'
+        required: true
+        default: 'data.json'
 
 jobs:
   remove-ic:
@@ -15,13 +20,20 @@ jobs:
         with:
           node-version: '18'
 
+      # 入力されたファイル名を引数としてNode.jsスクリプトに渡す
       - name: Run script to remove IC
-        run: node remove_ic.js
+        run: node remove_ic.js "${{ github.event.inputs.target_file }}"
 
       - name: Commit and push changes
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add .
-          git commit -m "Chore: 既存のJSONからICデータを削除"
-          git push
+          
+          # 変更がある場合のみコミット
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Chore: ${{ github.event.inputs.target_file }} からICデータを削除"
+            git push
+          else
+            echo "変更がありませんでした。"
+          fi
