@@ -20,13 +20,12 @@ jobs:
         with:
           node-version: '18'
 
-      # 追加: scriptディレクトリが存在しない場合は作成し、そこにJSファイルを書き出す
       - name: Create remove_ic.js
         run: |
           mkdir -p script
           cat << 'EOF' > script/remove_ic.js
-          const fs = require('fs');
-          const path = require('path');
+          import fs from 'fs';
+          import path from 'path';
           
           const args = process.argv.slice(2);
           if (args.length === 0) {
