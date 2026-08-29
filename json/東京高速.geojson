@@ -1,0 +1,7845 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-08-29T20:23:34Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31236584",
+        "highway": "motorway_junction",
+        "name": "台場",
+        "ref": "1101"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7686834,
+          35.6349354
+        ]
+      },
+      "id": "node/31236584"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31252897",
+        "highway": "motorway_junction",
+        "name": "有明ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7815555,
+          35.6335737
+        ]
+      },
+      "id": "node/31252897"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31252925",
+        "highway": "motorway_junction",
+        "name": "浜崎橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7584952,
+          35.6495854
+        ]
+      },
+      "id": "node/31252925"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31252934",
+        "highway": "motorway_junction",
+        "name": "芝浦JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7580882,
+          35.6484939
+        ]
+      },
+      "id": "node/31252934"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31252942",
+        "highway": "motorway_junction",
+        "name": "浜崎橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7573991,
+          35.6528795
+        ]
+      },
+      "id": "node/31252942"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31253688",
+        "highway": "motorway_junction",
+        "name": "汐留入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7629036,
+          35.6632827
+        ]
+      },
+      "id": "node/31253688"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31253977",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "芝浦",
+        "ref": "101"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7545699,
+          35.6414479
+        ]
+      },
+      "id": "node/31253977"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31254160",
+        "highway": "motorway_junction",
+        "name": "銀座",
+        "name:en": "Ginza",
+        "name:es": "Ginza",
+        "ref": "16"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7653422,
+          35.6647279
+        ]
+      },
+      "id": "node/31254160"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31254341",
+        "highway": "motorway_junction",
+        "name": "銀座",
+        "name:en": "Ginza",
+        "name:es": "Ginza",
+        "ref": "15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7717151,
+          35.6712636
+        ]
+      },
+      "id": "node/31254341"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31254353",
+        "highway": "motorway_junction",
+        "name": "新富町",
+        "name:en": "Shintomicho",
+        "name:es": "Shintomicho",
+        "ref": "13"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7722359,
+          35.6719894
+        ]
+      },
+      "id": "node/31254353"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31255230",
+        "highway": "motorway_junction",
+        "name": "東銀座",
+        "name:en": "Higashi-ginza",
+        "ref": "5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7714517,
+          35.6741521
+        ]
+      },
+      "id": "node/31255230"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31288751",
+        "highway": "motorway_junction",
+        "name": "有明ジャンクション",
+        "name:en": "Ariake Junction",
+        "name:es": "Salida Ariake"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7896091,
+          35.6339964
+        ]
+      },
+      "id": "node/31288751"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31288811",
+        "highway": "motorway_junction",
+        "name": "有明JCT",
+        "name:en": "Ariake JCT",
+        "name:es": "Ariake JCT",
+        "name:fr": "Ariake",
+        "name:ja-Hira": "ありあけ JCT",
+        "name:ja-Latn": "Ariake JCT",
+        "source": "URL 2013",
+        "wikidata": "Q11092105",
+        "wikipedia": "ja:有明ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7772036,
+          35.6272792
+        ]
+      },
+      "id": "node/31288811"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31288813",
+        "highway": "motorway_junction",
+        "name": "有明ジャンクション",
+        "name:en": "Ariake JCT",
+        "name:es": "Ariake JCT",
+        "name:fr": "Ariake",
+        "name:ja-Hira": "ありあけ JCT",
+        "name:ja-Latn": "Ariake JCT",
+        "source": "URL 2013"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7771064,
+          35.6274104
+        ]
+      },
+      "id": "node/31288813"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31288829",
+        "highway": "motorway_junction",
+        "name": "臨海副都心",
+        "name:en": "Rinkai-fukutoshin",
+        "name:fr": "Souterrain du front de mer",
+        "name:ja-Hira": "りんかい ふく としん",
+        "name:ja-Latn": "Rinkai-fukutoshin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7740382,
+          35.6251658
+        ]
+      },
+      "id": "node/31288829"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31288855",
+        "highway": "motorway_junction",
+        "name": "臨海副都心",
+        "name:en": "Rinkai-fukutoshin"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7695328,
+          35.6223976
+        ]
+      },
+      "id": "node/31288855"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31295430",
+        "highway": "motorway_junction",
+        "name": "芝公園入口",
+        "name:en": "Shibakoen",
+        "name:ja": "芝公園入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7529688,
+          35.6533664
+        ]
+      },
+      "id": "node/31295430"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31296943",
+        "highway": "motorway_junction",
+        "name": "芝公園出口",
+        "name:en": "Shibakoen",
+        "name:es": "Shibakoen",
+        "ref": "20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7459029,
+          35.6544714
+        ]
+      },
+      "id": "node/31296943"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31296958",
+        "highway": "motorway_junction",
+        "name": "芝公園出口",
+        "name:en": "Shibakoen",
+        "name:es": "Shibakoen",
+        "name:ja": "芝公園出口",
+        "ref": "19"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7499173,
+          35.6531722
+        ]
+      },
+      "id": "node/31296958"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31297000",
+        "highway": "motorway_junction",
+        "name": "一ノ橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7401234,
+          35.6554289
+        ]
+      },
+      "id": "node/31297000"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31297556",
+        "highway": "motorway_junction",
+        "name": "飯倉",
+        "name:en": "Iikura",
+        "name:es": "Iikura",
+        "ref": "21"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7364124,
+          35.6582083
+        ]
+      },
+      "id": "node/31297556"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31298908",
+        "highway": "motorway_junction",
+        "name": "大井",
+        "name:en": "Oi",
+        "name:ja": "大井",
+        "ref": "B21",
+        "source": "survey",
+        "survey:date": "2012-10-01",
+        "wikidata": "Q10933465",
+        "wikipedia": "ja:大井出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7577128,
+          35.6130837
+        ]
+      },
+      "id": "node/31298908"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31298983",
+        "highway": "motorway_junction",
+        "name": "中環大井南",
+        "ref": "C18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7552349,
+          35.5982388
+        ]
+      },
+      "id": "node/31298983"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31300414",
+        "highway": "motorway_junction",
+        "name": "辰巳ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8043746,
+          35.6416556
+        ]
+      },
+      "id": "node/31300414"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31300416",
+        "highway": "motorway_junction",
+        "name": "有明",
+        "name:en": "Ariake",
+        "name:es": "Ariake"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8005495,
+          35.6399135
+        ]
+      },
+      "id": "node/31300416"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31300420",
+        "highway": "motorway_junction",
+        "name": "有明",
+        "name:en": "Ariake",
+        "name:es": "Ariake"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7951276,
+          35.6375426
+        ]
+      },
+      "id": "node/31300420"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31300488",
+        "highway": "motorway_junction",
+        "name": "新木場",
+        "name:en": "Shinkiba",
+        "name:es": "Shinkiba",
+        "ref": "B24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.824128,
+          35.646446
+        ]
+      },
+      "id": "node/31300488"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31300491",
+        "highway": "motorway_junction",
+        "name": "辰巳JCT",
+        "name:en": "Tatsumi JCT",
+        "name:es": "JCT Tatsumi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.821596,
+          35.6460328
+        ]
+      },
+      "id": "node/31300491"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31330050",
+        "highway": "motorway_junction",
+        "name": "新木場",
+        "name:en": "Shinkiba",
+        "name:es": "Shinkiba",
+        "ref": "B24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8304121,
+          35.6465829
+        ]
+      },
+      "id": "node/31330050"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31330068",
+        "highway": "motorway_junction",
+        "name": "新木場",
+        "ref": "B25",
+        "source": "survey",
+        "survey:date": "2012-10-01"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8367195,
+          35.6474782
+        ]
+      },
+      "id": "node/31330068"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31330103",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.843399,
+          35.6473415
+        ]
+      },
+      "id": "node/31330103"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31337300",
+        "highway": "motorway_junction",
+        "name": "清新町",
+        "name:en": "Seishincho",
+        "name:ja": "清新町",
+        "ref": "C47"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8496293,
+          35.6692892
+        ]
+      },
+      "id": "node/31337300"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31337397",
+        "highway": "motorway_junction",
+        "name": "船堀橋",
+        "ref": "C46"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8553253,
+          35.6845708
+        ]
+      },
+      "id": "node/31337397"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31337476",
+        "highway": "motorway_junction",
+        "name": "枝川",
+        "name:en": "Edogawa",
+        "name:es": "Edogawa",
+        "ref": "906"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8088562,
+          35.6580447
+        ]
+      },
+      "id": "node/31337476"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/31337485",
+        "highway": "motorway_junction",
+        "name": "塩浜",
+        "name:en": "Shiohama",
+        "ref": "904"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8065504,
+          35.6613093
+        ]
+      },
+      "id": "node/31337485"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/35925775",
+        "highway": "motorway_junction",
+        "name": "空港中央",
+        "name:en": "Haneda Airport",
+        "name:es": "Aeropuerto de Haneda",
+        "name:ja": "空港中央",
+        "ref": "B16",
+        "source": "URL 2013",
+        "wikidata": "Q11122106",
+        "wikipedia": "ja:空港中央出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7794865,
+          35.5587246
+        ]
+      },
+      "id": "node/35925775"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/35926477",
+        "highway": "motorway_junction",
+        "name": "空港中央",
+        "name:en": "Haneda Airport",
+        "name:es": "Aeropuerto de Haneda",
+        "name:ja": "空港中央",
+        "name:ko": "공항중앙",
+        "ref": "B17",
+        "source": "URL 2013",
+        "wikidata": "Q11122106",
+        "wikipedia": "ja:空港中央出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.786047,
+          35.550291
+        ]
+      },
+      "id": "node/35926477"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/35937972",
+        "highway": "motorway_junction",
+        "name": "東海JCT",
+        "name:en": "Tokai JCT",
+        "name:ja": "東海JCT",
+        "name:ja_rm": "tōkai jankushon",
+        "source": "survey",
+        "survey:date": "2021-02-01",
+        "wikidata": "Q11103663",
+        "wikipedia": "ja:東海ジャンクション (東京都)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7553618,
+          35.5857739
+        ]
+      },
+      "id": "node/35937972"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/35937984",
+        "highway": "motorway_junction",
+        "name": "東海JCT",
+        "name:en": "Tokai JCT",
+        "name:ja": "東海JCT",
+        "name:ja_rm": "tōkai jankushon",
+        "source": "URL 2013",
+        "wikidata": "Q11103663",
+        "wikipedia": "ja:東海ジャンクション (東京都)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7551902,
+          35.5857704
+        ]
+      },
+      "id": "node/35937984"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/35938010",
+        "highway": "motorway_junction",
+        "name": "大井南",
+        "ref": "B18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7551815,
+          35.587111
+        ]
+      },
+      "id": "node/35938010"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36411896",
+        "highway": "motorway_junction",
+        "name": "湾岸環八",
+        "name:en": "Wangan Kanpachi",
+        "name:es": "Wangan Kanpachi",
+        "name:ja": "湾岸環八",
+        "ref": "B14",
+        "source": "URL 2013",
+        "wikidata": "Q11563821",
+        "wikipedia": "ja:湾岸環八出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7948545,
+          35.5374046
+        ]
+      },
+      "id": "node/36411896"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36411905",
+        "highway": "motorway_junction",
+        "name": "湾岸環八",
+        "name:en": "Wangan Kanpachi",
+        "name:es": "Wangan Kanpachi",
+        "name:ja": "湾岸環八",
+        "ref": "B14",
+        "source": "URL 2013",
+        "wikidata": "Q11563821",
+        "wikipedia": "ja:湾岸環八出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7946088,
+          35.5376075
+        ]
+      },
+      "id": "node/36411905"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36601707",
+        "highway": "motorway_junction",
+        "name": "平和島",
+        "ref": "106"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7476334,
+          35.5763958
+        ]
+      },
+      "id": "node/36601707"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36601711",
+        "highway": "motorway_junction",
+        "name": "平和島",
+        "ref": "106"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7476882,
+          35.5765352
+        ]
+      },
+      "id": "node/36601711"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36610838",
+        "highway": "motorway_junction",
+        "name": "空港西出入口",
+        "name:en": "Airport West",
+        "name:ja": "空港西出入口",
+        "ref": "107",
+        "source": "URL 2013"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7542858,
+          35.5589834
+        ]
+      },
+      "id": "node/36610838"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36610850",
+        "highway": "motorway_junction",
+        "name": "空港西出入口",
+        "name:en": "Airport West Desk",
+        "name:es": "Airport West Desk",
+        "name:ja": "空港西出入口",
+        "source": "URL 2013"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7544249,
+          35.5599149
+        ]
+      },
+      "id": "node/36610850"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36719769",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "鈴ケ森",
+        "ref": "103"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7415849,
+          35.5948143
+        ]
+      },
+      "id": "node/36719769"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36720848",
+        "highway": "motorway_junction",
+        "name": "羽田入口",
+        "name:ja": "羽田入口",
+        "source": "URL 2013"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7467071,
+          35.554349
+        ]
+      },
+      "id": "node/36720848"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36720852",
+        "highway": "motorway_junction",
+        "name": "羽田出口",
+        "name:en": "Haneda",
+        "name:ja": "羽田出口",
+        "ref": "109",
+        "source": "URL 2013"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7467995,
+          35.5542777
+        ]
+      },
+      "id": "node/36720852"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36721363",
+        "highway": "motorway_junction",
+        "name": "羽田入口",
+        "name:ja": "羽田入口",
+        "source": "URL 2013"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7443966,
+          35.549061
+        ]
+      },
+      "id": "node/36721363"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/36721365",
+        "highway": "motorway_junction",
+        "name": "羽田出口",
+        "name:ja": "羽田出口",
+        "ref": "150",
+        "source": "URL 2013"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7442472,
+          35.5491046
+        ]
+      },
+      "id": "node/36721365"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/107771168",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "代々木PA (上り)",
+        "name:en": "Yoyogi Parking Area",
+        "name:es": "Área de Aparcamiento Yoyogi",
+        "name:ja": "代々木PA (上り)",
+        "short_name": "代々木PA",
+        "toilets": "yes",
+        "wikidata": "Q10884390",
+        "wikipedia": "ja:代々木パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6981305,
+          35.6811941
+        ]
+      },
+      "id": "way/107771168"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/203110498",
+        "area": "yes",
+        "highway": "services",
+        "name": "道の駅 八王子滝山",
+        "source": "Bing",
+        "wikidata": "Q11641156",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3416015,
+          35.6864791
+        ]
+      },
+      "id": "way/203110498"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/224622935",
+        "highway": "motorway_junction",
+        "name": "大泉IC",
+        "ref": "50"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5990631,
+          35.7599568
+        ]
+      },
+      "id": "node/224622935"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/235321709",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "寒山寺駐車場",
+        "toilets": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1949671,
+          35.8027423
+        ]
+      },
+      "id": "way/235321709"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/235476602",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "町営 鳩ノ巣駐車場",
+        "name:ja": "町営 鳩ノ巣駐車場",
+        "source": "Bing",
+        "toilets": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.1278388,
+          35.8150854
+        ]
+      },
+      "id": "way/235476602"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/235476607",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "青梅柚木苑地 (Ome Yugi Park)",
+        "opening_hours": "Mar-Nov 07:00-19:00; Dec-Feb 07:00-18:00",
+        "source": "Bing",
+        "toilets": "yes",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2077209,
+          35.8029825
+        ]
+      },
+      "id": "way/235476607"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/250488075",
+        "abbr_name:en": "Kahei PA",
+        "abbr_name:es": "Kahei PA",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "加平PA (下り)",
+        "name:en": "Kahei Parking Area",
+        "name:es": "Área de aparcamiento Kahei",
+        "source": "Bing",
+        "toilets": "yes",
+        "wikidata": "Q10900785",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8247421,
+          35.7768584
+        ]
+      },
+      "id": "way/250488075"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252174740",
+        "highway": "motorway_junction",
+        "name": "中台",
+        "name:en": "Nakadai",
+        "name:es": "Nakadai",
+        "ref": "513",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6841423,
+          35.7747568
+        ]
+      },
+      "id": "node/252174740"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252174760",
+        "highway": "motorway_junction",
+        "name": "熊野町JCT",
+        "name:en": "Kumanocho Junction",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7079018,
+          35.7426502
+        ]
+      },
+      "id": "node/252174760"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252174819",
+        "highway": "motorway_junction",
+        "name": "竹橋ジャンクション",
+        "name:en": "Takebashi junction",
+        "name:es": "Intersección Takebashi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7528358,
+          35.6955479
+        ]
+      },
+      "id": "node/252174819"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252175042",
+        "highway": "motorway_junction",
+        "name": "谷町JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7400895,
+          35.668088
+        ]
+      },
+      "id": "node/252175042"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252175204",
+        "highway": "motorway_junction",
+        "name": "飯倉",
+        "name:en": "Iikura",
+        "ref": "21"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.737701,
+          35.6609038
+        ]
+      },
+      "id": "node/252175204"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252175582",
+        "highway": "motorway_junction",
+        "name": "天現寺出口",
+        "name:ja": "天現寺出口",
+        "name:ja-Hira": "てんげんじでぐち",
+        "ref": "201"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7295074,
+          35.6469499
+        ]
+      },
+      "id": "node/252175582"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252182168",
+        "highway": "motorway_junction",
+        "name": "片倉",
+        "name:en": "Katakura"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3463617,
+          35.6240673
+        ]
+      },
+      "id": "node/252182168"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252681869",
+        "highway": "motorway_junction",
+        "name": "東京IC",
+        "name:ja": "東京IC",
+        "ref": "1",
+        "source": "URL 2013",
+        "wikidata": "Q11102915",
+        "wikipedia": "ja:東京インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6178369,
+          35.6284198
+        ]
+      },
+      "id": "node/252681869"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252835371",
+        "highway": "motorway_junction",
+        "name": "東京IC",
+        "name:ja": "東京IC",
+        "ref": "1",
+        "source": "URL 2013",
+        "wikidata": "Q11102915",
+        "wikipedia": "ja:東京インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6180862,
+          35.6282679
+        ]
+      },
+      "id": "node/252835371"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/252836825",
+        "highway": "motorway_junction",
+        "name": "用賀",
+        "ref": "307"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6297981,
+          35.6267125
+        ]
+      },
+      "id": "node/252836825"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/253119965",
+        "highway": "motorway_junction",
+        "name": "鑓水",
+        "name:en": "Yarimizu",
+        "wikidata": "Q11651359"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3438464,
+          35.6178889
+        ]
+      },
+      "id": "node/253119965"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/253119971",
+        "highway": "motorway_junction",
+        "name": "相原",
+        "name:en": "Aihara"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3404541,
+          35.6115131
+        ]
+      },
+      "id": "node/253119971"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/255356817",
+        "highway": "services",
+        "name": "石川PA (下り)",
+        "name:en": "Ishikawa parking area",
+        "name:ja": "石川PA (下り)",
+        "source": "Bing",
+        "toilets": "yes",
+        "wikipedia": "ja:石川パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3713629,
+          35.6775857
+        ]
+      },
+      "id": "way/255356817"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/255356818",
+        "highway": "services",
+        "name": "石川PA (上り)",
+        "name:en": "Ishikawa parking area",
+        "name:ja": "石川PA (上り)",
+        "source": "Bing",
+        "wikipedia": "ja:石川パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3747867,
+          35.6798132
+        ]
+      },
+      "id": "way/255356818"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255513709",
+        "highway": "motorway_junction",
+        "name": "三宅坂ジャンクション",
+        "name:en": "Miyakezaka Junction",
+        "name:es": "Salida Miyakezaka",
+        "noref": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7442641,
+          35.6835359
+        ]
+      },
+      "id": "node/255513709"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255643884",
+        "highway": "motorway_junction",
+        "name": "葛西",
+        "ref": "B27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8721219,
+          35.6410975
+        ]
+      },
+      "id": "node/255643884"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/255644314",
+        "highway": "motorway_junction",
+        "name": "葛西",
+        "ref": "B26"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8676109,
+          35.6425494
+        ]
+      },
+      "id": "node/255644314"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/256426148",
+        "highway": "motorway_junction",
+        "name": "一ツ橋出口",
+        "name:en": "Hitotsubashi",
+        "ref": "27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7559984,
+          35.6934076
+        ]
+      },
+      "id": "node/256426148"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/256426172",
+        "highway": "motorway_junction",
+        "name": "江戸橋ジャンクション",
+        "name:en": "Edobashi junction",
+        "name:es": "Cruce Edobashi",
+        "name:ja": "江戸橋ジャンクション",
+        "name:ja-Hira": "えどばしじゃんくしょん"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7752829,
+          35.6841277
+        ]
+      },
+      "id": "node/256426172"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260710736",
+        "highway": "motorway_junction",
+        "name": "目黒",
+        "name:en": "Meguro",
+        "name:es": "Meguro",
+        "ref": "203"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7168521,
+          35.6379136
+        ]
+      },
+      "id": "node/260710736"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260710778",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7387733,
+          35.664966
+        ]
+      },
+      "id": "node/260710778"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260710789",
+        "highway": "motorway_junction",
+        "name": "霞が関",
+        "ref": "23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7451239,
+          35.672078
+        ]
+      },
+      "id": "node/260710789"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260710800",
+        "highway": "motorway_junction",
+        "name": "三宅坂ジャンクション",
+        "name:en": "Miyakezaka Junction",
+        "name:es": "Salida Miyakezaka"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7483918,
+          35.6777376
+        ]
+      },
+      "id": "node/260710800"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260710826",
+        "highway": "motorway_junction",
+        "name": "竹橋ジャンクション",
+        "name:en": "Takebashi Junction",
+        "name:es": "Salida Takebashi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7611985,
+          35.6910427
+        ]
+      },
+      "id": "node/260710826"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260710829",
+        "highway": "motorway_junction",
+        "name": "神田橋",
+        "name:en": "Kandabashi",
+        "name:ja": "神田橋",
+        "name:ja_rm": "Kandabashi",
+        "ref": "29"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7622957,
+          35.6904857
+        ]
+      },
+      "id": "node/260710829"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260710868",
+        "highway": "motorway_junction",
+        "name": "荏原",
+        "ref": "207"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7155352,
+          35.6187045
+        ]
+      },
+      "id": "node/260710868"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260714458",
+        "highway": "motorway_junction",
+        "name": "高井戸",
+        "name:en": "Takaido",
+        "name:ja": "高井戸",
+        "ref": "411"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6213954,
+          35.6732258
+        ]
+      },
+      "id": "node/260714458"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260715070",
+        "exit_to": "国立; 府中",
+        "exit_to:en": "Kunitachi; Fuchu",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "国立府中IC",
+        "name:en": "Kunitachi-Fuchu IC",
+        "name:ja": "国立府中IC",
+        "name:ja-Hira": "くにたちふちゅういんたーちぇんじ",
+        "name:ja_rm": "kunitachi fuchū IC",
+        "ref": "4",
+        "wikidata": "Q10927054",
+        "wikipedia": "ja:国立府中インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4443434,
+          35.6694967
+        ]
+      },
+      "id": "node/260715070"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260715110",
+        "highway": "motorway_junction",
+        "name": "石川ＰＡ（下り）",
+        "name:en": "Ishikawa PA",
+        "name:ja": "石川PA (下り)",
+        "name:ja-Hira": "いしかわぱーきんぐえりあ",
+        "wikipedia": "ja:石川パーキングエリア"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3740524,
+          35.6790853
+        ]
+      },
+      "id": "node/260715110"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/260715121",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "八王子 (第１出口)",
+        "name:en": "Hachioji",
+        "name:ja": "八王子 (第１出口)",
+        "ref": "5-1",
+        "wikidata": "Q10892296",
+        "wikipedia": "ja:八王子インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3589061,
+          35.6746499
+        ]
+      },
+      "id": "node/260715121"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/262595971",
+        "highway": "motorway_junction",
+        "name": "八王子ＪＣＴ",
+        "name:en": "Hachioji JCT",
+        "name:ja": "八王子JCT",
+        "name:ja-Hira": "はちおうじじゃんくしょん",
+        "name:ja_rm": "Hachioji JCT",
+        "official_name:en": "National Highway Route 468",
+        "ref": "6",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q10892298",
+        "wikipedia": "ja:八王子ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2525547,
+          35.6449904
+        ]
+      },
+      "id": "node/262595971"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/262595973",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2541976,
+          35.6421989
+        ]
+      },
+      "id": "node/262595973"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/262596241",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "八王子",
+        "name:en": "Hachioji",
+        "name:ja": "八王子ＩＣ",
+        "ref": "5",
+        "wikidata": "Q10892296",
+        "wikipedia": "ja:八王子インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3431119,
+          35.6771077
+        ]
+      },
+      "id": "node/262596241"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/263987757",
+        "highway": "motorway_junction",
+        "name": "竹橋ジャンクション",
+        "name:en": "Takebashi Junction",
+        "name:es": "Salida Takebashi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7527987,
+          35.6902816
+        ]
+      },
+      "id": "node/263987757"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/263987930",
+        "highway": "motorway_junction",
+        "name": "東池袋",
+        "name:en": "Higashi ikebukuro",
+        "name:es": "Higashi ikebukuro",
+        "name:ja": "東池袋",
+        "ref": "507"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7170755,
+          35.7274161
+        ]
+      },
+      "id": "node/263987930"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/263987949",
+        "highway": "motorway_junction",
+        "name": "熊野町JCT",
+        "name:en": "Kumanocho Junction",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7078785,
+          35.7426591
+        ]
+      },
+      "id": "node/263987949"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/263988109",
+        "highway": "motorway_junction",
+        "name": "板橋JCT",
+        "name:en": "Itabashi Junction",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7082667,
+          35.7474166
+        ]
+      },
+      "id": "node/263988109"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/263988137",
+        "highway": "motorway_junction",
+        "name": "王子南",
+        "name:en": "Oji-minami",
+        "ref": "C33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7402997,
+          35.7524644
+        ]
+      },
+      "id": "node/263988137"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/263988157",
+        "highway": "motorway_junction",
+        "name": "江北JCT",
+        "name:en": "Kohoku Junction",
+        "noref": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7599436,
+          35.765177
+        ]
+      },
+      "id": "node/263988157"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/263988636",
+        "highway": "motorway_junction",
+        "name": "鹿浜橋",
+        "name:en": "Shikahama-bashi",
+        "name:ja-Hira": "しかはまばし",
+        "ref": "S01"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.752396,
+          35.7744506
+        ]
+      },
+      "id": "node/263988636"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264009851",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4795193,
+          35.5057464
+        ]
+      },
+      "id": "node/264009851"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264871734",
+        "highway": "motorway_junction",
+        "name": "神田橋",
+        "name:en": "Kandabashi",
+        "name:es": "Kandabashi",
+        "name:ja": "神田橋"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7616741,
+          35.6906944
+        ]
+      },
+      "id": "node/264871734"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264871735",
+        "highway": "motorway_junction",
+        "name": "竹橋ジャンクション",
+        "name:en": "Takebashi Junction",
+        "name:es": "Salida Takebashi",
+        "noref": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7611383,
+          35.6909785
+        ]
+      },
+      "id": "node/264871735"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264871745",
+        "highway": "motorway_junction",
+        "name": "北の丸",
+        "name:en": "Kitanomaru",
+        "name:es": "Kitanomaru",
+        "name:ja": "北の丸",
+        "name:ja-Hira": "きたのまる",
+        "name:ja_rm": "Kitanomaru",
+        "ref": "26"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.754878,
+          35.6909471
+        ]
+      },
+      "id": "node/264871745"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264871771",
+        "highway": "motorway_junction",
+        "name": "江戸橋ジャンクション",
+        "name:en": "Edobashi Junction",
+        "name:ja": "江戸橋ジャンクション",
+        "wikidata": "Q11134495",
+        "wikipedia": "ja:江戸橋ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7773914,
+          35.6822965
+        ]
+      },
+      "id": "node/264871771"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/264877784",
+        "highway": "motorway_junction",
+        "name": "霞が関出口",
+        "name:en": "Kasumigaseki",
+        "name:es": "Kasumigaseki",
+        "name:ja": "霞が関出口",
+        "name:ja_rm": "Kasumigaseki",
+        "ref": "24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7492937,
+          35.6764066
+        ]
+      },
+      "id": "node/264877784"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/265887785",
+        "highway": "motorway_junction",
+        "name": "本町三丁目"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7755534,
+          35.6894263
+        ]
+      },
+      "id": "node/265887785"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267091414",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "八王子 (第２出口)",
+        "name:en": "Hachioji",
+        "name:ja": "八王子 (第２出口)",
+        "ref": "5-2",
+        "wikidata": "Q10892296",
+        "wikipedia": "ja:八王子インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3541001,
+          35.6752993
+        ]
+      },
+      "id": "node/267091414"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267776680",
+        "highway": "motorway_junction",
+        "name": "稲城IC",
+        "name:en": "Inagi IC",
+        "name:ja": "稲城IC",
+        "name:ja-Hira": "いなぎいんたーちぇんじ",
+        "ref": "3-1",
+        "wikipedia": "ja:稲城インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5198157,
+          35.6556855
+        ]
+      },
+      "id": "node/267776680"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267803464",
+        "highway": "motorway_junction",
+        "name": "石川ＰＡ（上り）",
+        "name:en": "Ishikawa PA",
+        "name:ja": "石川PA (下り)",
+        "name:ja-Hira": "いしかわぱーきんぐえりあ",
+        "wikipedia": "ja:石川パーキングエリア"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3719933,
+          35.6782691
+        ]
+      },
+      "id": "node/267803464"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267803495",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "国立府中IC",
+        "name:en": "Kunitachi Fuchu IC",
+        "name:ja": "国立府中IC",
+        "name:ja-Hira": "くにたちふちゅういんたーちぇんじ",
+        "name:ja_rm": "Kunitachi Fuchu IC",
+        "ref": "4",
+        "wikidata": "Q10927054",
+        "wikipedia": "ja:国立府中インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4381781,
+          35.6749677
+        ]
+      },
+      "id": "node/267803495"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267803515",
+        "highway": "motorway_junction",
+        "name": "府中スマートIC",
+        "name:en": "Fuchu SIC",
+        "name:ja": "府中スマートIC",
+        "name:ja-Hira": "ふちゅうすまーといんたーちぇんじ",
+        "ref": "3-2",
+        "wikipedia": "ja:府中バスストップ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4930844,
+          35.6601609
+        ]
+      },
+      "id": "node/267803515"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267805268",
+        "highway": "motorway_junction",
+        "name": "西新宿JCT",
+        "name:en": "Nishi Shinjuku Junction",
+        "name:ja": "西新宿JCT",
+        "wikidata": "Q11628311"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6855413,
+          35.6807621
+        ]
+      },
+      "id": "node/267805268"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267805281",
+        "highway": "motorway_junction",
+        "name": "代々木ＰＡ",
+        "name:en": "Yoyogi PA",
+        "name:es": "Yoyogi PA",
+        "note": "Rest Area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6970837,
+          35.6807353
+        ]
+      },
+      "id": "node/267805281"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267805296",
+        "highway": "motorway_junction",
+        "name": "外苑出口",
+        "name:en": "Gaien",
+        "name:es": "Gaien",
+        "name:ja": "外苑出口",
+        "name:ja-Hira": "がいえんでぐち",
+        "name:ja_rm": "Gaien",
+        "ref": "402"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7139224,
+          35.6807458
+        ]
+      },
+      "id": "node/267805296"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267810144",
+        "highway": "motorway_junction",
+        "name": "代々木出口",
+        "name:en": "Yoyogi",
+        "name:es": "Yoyogi",
+        "name:ja": "代々木出口",
+        "name:ja-Hira": "よよぎでぐち",
+        "name:ja_rm": "Yoyogi",
+        "ref": "403",
+        "wikidata": "Q10884391"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6968121,
+          35.6804647
+        ]
+      },
+      "id": "node/267810144"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/267810221",
+        "highway": "motorway_junction",
+        "name": "幡ヶ谷",
+        "name:en": "Hatagaya",
+        "ref": "407"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6783929,
+          35.6776052
+        ]
+      },
+      "id": "node/267810221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/270618091",
+        "highway": "motorway_junction",
+        "name": "あきる野ＩＣ",
+        "name:en": "Akiruno IC",
+        "name:ja": "あきる野IC",
+        "name:ja-Hira": "あきるのいんたーちぇんじ",
+        "name:ja_rm": "Akiruno IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "42",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q11257027",
+        "wikipedia": "ja:あきる野インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2830673,
+          35.716777
+        ]
+      },
+      "id": "node/270618091"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/270618096",
+        "highway": "motorway_junction",
+        "name": "日の出ＩＣ",
+        "name:en": "Hinode IC",
+        "name:ja": "日の出IC",
+        "name:ja-Hira": "ひのでいんたーちぇんじ",
+        "name:ja_rm": "Hinode IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "43",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q11086045",
+        "wikipedia": "ja:日の出インターチェンジ (東京都)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2827258,
+          35.732762
+        ]
+      },
+      "id": "node/270618096"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/270893792",
+        "highway": "motorway_junction",
+        "name": "八王子ＪＣＴ",
+        "name:en": "Hachioji JCT",
+        "name:ja": "八王子JCT",
+        "name:ja-Hira": "はちおうじじゃんくしょん",
+        "name:ja_rm": "Hachioji JCT",
+        "ref": "6",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q10892298",
+        "wikipedia": "ja:八王子ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2642154,
+          35.6425923
+        ]
+      },
+      "id": "node/270893792"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/270898294",
+        "highway": "motorway_junction",
+        "name": "八王子西ＩＣ",
+        "name:en": "hatiohji-west IC",
+        "name:ja": "八王子西IC",
+        "name:ja-Hira": "はちおうじにしいんたーちぇんじ",
+        "name:ja_rm": "hatiohji-nishi IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "41",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q10892300",
+        "wikipedia": "ja:八王子西インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2512742,
+          35.675478
+        ]
+      },
+      "id": "node/270898294"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/270898760",
+        "highway": "motorway_junction",
+        "name": "青梅IC",
+        "name:en": "Ome IC",
+        "name:ja": "青梅IC",
+        "name:ja-Hira": "おうめいんたーちぇんじ",
+        "name:ja_rm": "Ome IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "44",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q11661975",
+        "wikipedia": "ja:青梅インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3199245,
+          35.7965024
+        ]
+      },
+      "id": "node/270898760"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/278281739",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "調布IC",
+        "name:en": "Chofu IC",
+        "name:ja": "調布IC",
+        "name:ja-Hira": "ちょうふいんたーちぇんじ",
+        "name:ja_rm": "chōfu",
+        "ref": "3",
+        "wikipedia": "ja:調布インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5387812,
+          35.6623653
+        ]
+      },
+      "id": "node/278281739"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/279076842",
+        "highway": "motorway_junction",
+        "name": "永福出口",
+        "name:en": "Eifuku exit",
+        "ref": "408"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6453368,
+          35.668205
+        ]
+      },
+      "id": "node/279076842"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/281381090",
+        "highway": "motorway_junction",
+        "name": "玉川",
+        "name:en": "Tamagawa",
+        "ref": "1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6387115,
+          35.6052759
+        ]
+      },
+      "id": "node/281381090"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/281381359",
+        "highway": "motorway_junction",
+        "name": "玉川",
+        "name:en": "Tamagawa",
+        "ref": "1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6388025,
+          35.6051513
+        ]
+      },
+      "id": "node/281381359"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/287053602",
+        "highway": "services"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3744639,
+          35.6801949
+        ]
+      },
+      "id": "node/287053602"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/290524940",
+        "highway": "motorway_junction",
+        "name": "八王子ＪＣＴ",
+        "name:en": "Hachioji JCT",
+        "name:ja": "八王子JCT",
+        "name:ja-Hira": "はちおうじじゃんくしょん",
+        "name:ja_rm": "Hachioji JCT",
+        "ref": "6",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q10892298",
+        "wikipedia": "ja:八王子ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2469348,
+          35.640783
+        ]
+      },
+      "id": "node/290524940"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/295393445",
+        "highway": "motorway_junction",
+        "name": "初台出口",
+        "name:en": "Hatsudai",
+        "name:es": "Hatsudai",
+        "name:ja": "初台出口",
+        "name:ja_rm": "Hatsudai",
+        "ref": "406"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6804588,
+          35.6784453
+        ]
+      },
+      "id": "node/295393445"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/295393488",
+        "highway": "motorway_junction",
+        "name": "新宿出口",
+        "name:en": "Shinjuku",
+        "name:es": "Shinjuku",
+        "name:ja": "新宿出口",
+        "name:ja_rm": "Shinjuku",
+        "ref": "404"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6887155,
+          35.6827815
+        ]
+      },
+      "id": "node/295393488"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/295550844",
+        "highway": "motorway_junction",
+        "name": "打越",
+        "name:en": "Uchikoshi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3519254,
+          35.6399381
+        ]
+      },
+      "id": "node/295550844"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/295550882",
+        "highway": "motorway_junction",
+        "name": "中谷戸",
+        "name:en": "Nakayato"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.348465,
+          35.6346588
+        ]
+      },
+      "id": "node/295550882"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/296024326",
+        "highway": "motorway_junction",
+        "name": "稲城",
+        "name:en": "Inagi",
+        "name:ja": "稲城",
+        "name:ja-Hira": "いなぎ",
+        "name:ja_rm": "inagi",
+        "ref": "3-1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5157425,
+          35.6555599
+        ]
+      },
+      "id": "node/296024326"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/297945194",
+        "highway": "motorway_junction",
+        "name": "代官町",
+        "name:en": "Daikancho",
+        "name:es": "Daikancho",
+        "name:ja": "代官町",
+        "ref": "25"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7484498,
+          35.6893707
+        ]
+      },
+      "id": "node/297945194"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/308925199",
+        "highway": "motorway_junction",
+        "name": "西新宿JCT",
+        "name:en": "Nishi-shinjuku Junction",
+        "noref": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6823751,
+          35.6889467
+        ]
+      },
+      "id": "node/308925199"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/308929995",
+        "highway": "motorway_junction",
+        "name": "板橋JCT",
+        "name:en": "Itabashi Junction",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7083069,
+          35.7474153
+        ]
+      },
+      "id": "node/308929995"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/308930039",
+        "highway": "motorway_junction",
+        "name": "板橋JCT",
+        "name:en": "Itabashi Junction",
+        "name:es": "Salida Itabashi",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.71419,
+          35.7494502
+        ]
+      },
+      "id": "node/308930039"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/308933022",
+        "highway": "motorway_junction",
+        "name": "江北JCT",
+        "name:en": "Kohoku Junction",
+        "name:ja": "江北JCT",
+        "name:ja-Hira": "こうほくじゃんくしょん",
+        "source:name": "wikipedia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7618276,
+          35.7687912
+        ]
+      },
+      "id": "node/308933022"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/308934664",
+        "highway": "motorway_junction",
+        "name": "足立入谷",
+        "name:en": "Adachi-iriya",
+        "name:ja": "足立入谷",
+        "name:ja_rm": "Adachi-iriya",
+        "ref": "S06"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7588261,
+          35.8082088
+        ]
+      },
+      "id": "node/308934664"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309603951",
+        "highway": "motorway_junction",
+        "name": "扇大橋",
+        "name:ja": "扇大橋",
+        "name:ja-Hira": "おおぎおおはし",
+        "name:ja_rm": "Ogi-ohashi",
+        "ref": "C35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7653428,
+          35.7626586
+        ]
+      },
+      "id": "node/309603951"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309604026",
+        "highway": "motorway_junction",
+        "name": "千住新橋",
+        "ref": "C37"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7969988,
+          35.7621238
+        ]
+      },
+      "id": "node/309604026"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309609006",
+        "highway": "motorway_junction",
+        "name": "小菅JCT",
+        "name:en": "Kosuge Junction",
+        "name:ja": "小菅JCT",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf",
+        "wikidata": "Q10960401",
+        "wikipedia": "ja:小菅ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.817966,
+          35.7540854
+        ]
+      },
+      "id": "node/309609006"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309619251",
+        "highway": "motorway_junction",
+        "name": "福住",
+        "name:en": "Fukuzumi",
+        "name:es": "Fukuzumi",
+        "ref": "902"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7953062,
+          35.6744747
+        ]
+      },
+      "id": "node/309619251"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309619368",
+        "highway": "motorway_junction",
+        "name": "箱崎ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7872852,
+          35.6803643
+        ]
+      },
+      "id": "node/309619368"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309692515",
+        "highway": "motorway_junction",
+        "name": "小菅JCT",
+        "name:en": "Kosuge Junction",
+        "name:es": "Salida Kosuge",
+        "name:ja": "小菅JCT",
+        "name:ja-Hira": "こすげじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf",
+        "wikidata": "Q10960401",
+        "wikipedia": "ja:小菅ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8209394,
+          35.7517331
+        ]
+      },
+      "id": "node/309692515"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309692532",
+        "highway": "motorway_junction",
+        "name": "小菅JCT",
+        "name:en": "Kosuge Junction",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8181818,
+          35.7540443
+        ]
+      },
+      "id": "node/309692532"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309692554",
+        "highway": "motorway_junction",
+        "name": "千住新橋",
+        "name:en": "Senju-Shimbashi",
+        "ref": "C38"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8100899,
+          35.7592116
+        ]
+      },
+      "id": "node/309692554"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309692606",
+        "highway": "motorway_junction",
+        "name": "江北ジャンクション",
+        "name:en": "Kouhoku Junction",
+        "name:ja": "江北ジャンクション",
+        "name:ja-Hira": "こうほくじゃんくしょん",
+        "source:name": "wikipedia"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7648494,
+          35.7628029
+        ]
+      },
+      "id": "node/309692606"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/309695508",
+        "highway": "motorway_junction",
+        "name": "西池袋",
+        "name:en": "Nishi-ikebukuro",
+        "ref": "C26"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6984842,
+          35.7311776
+        ]
+      },
+      "id": "node/309695508"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370270147",
+        "highway": "motorway_junction",
+        "name": "小菅",
+        "name:en": "Kosuge",
+        "name:es": "Kosuge",
+        "ref": "C40",
+        "url": "http://www.shutoko.jp/use/network/map/route-c2/kosuge/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8210092,
+          35.7507722
+        ]
+      },
+      "id": "node/370270147"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370270206",
+        "highway": "motorway_junction",
+        "name": "堀切JCT",
+        "name:en": "Horikiri Junction",
+        "name:ja-Hira": "ほりきりじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf",
+        "wikidata": "Q10930485",
+        "wikipedia": "ja:堀切ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8224886,
+          35.7467503
+        ]
+      },
+      "id": "node/370270206"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370270234",
+        "highway": "motorway_junction",
+        "name": "堀切JCT",
+        "name:en": "Horikiri Junction",
+        "name:fr": "Horikiri",
+        "name:ja-Hira": "ほりきりじゃんくしょん",
+        "name:ja-Latn": "Horikiri-jankushon",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8255551,
+          35.7412499
+        ]
+      },
+      "id": "node/370270234"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370270524",
+        "highway": "motorway_junction",
+        "name": "小松川JCT",
+        "ref": "C45"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.859322,
+          35.701869
+        ]
+      },
+      "id": "node/370270524"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370270921",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8583013,
+          35.646231
+        ]
+      },
+      "id": "node/370270921"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370516863",
+        "highway": "motorway_junction",
+        "name": "四つ木",
+        "ref": "C42"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.83687,
+          35.7288636
+        ]
+      },
+      "id": "node/370516863"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/370516864",
+        "highway": "motorway_junction",
+        "name": "四つ木",
+        "ref": "C41"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8271817,
+          35.7386734
+        ]
+      },
+      "id": "node/370516864"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/414591151",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "大井PA (東行き)",
+        "short_name": "大井PA",
+        "source": "digitalglobe",
+        "wikipedia": "ja:大井パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7550024,
+          35.5926403
+        ]
+      },
+      "id": "way/414591151"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/414591154",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "大井PA (西行き)",
+        "short_name": "大井PA",
+        "source": "GSImaps/ort",
+        "wikipedia": "ja:大井パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7555107,
+          35.5941714
+        ]
+      },
+      "id": "way/414591154"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/439934610",
+        "highway": "motorway_junction",
+        "name": "板橋JCT",
+        "name:en": "Itabashi Junction",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7081487,
+          35.7544948
+        ]
+      },
+      "id": "node/439934610"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/460050999",
+        "highway": "motorway_junction",
+        "name": "本町三丁目"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7758273,
+          35.6895365
+        ]
+      },
+      "id": "node/460050999"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/484166486",
+        "highway": "motorway_junction",
+        "name": "加平",
+        "name:en": "Kahei",
+        "name:ja": "加平",
+        "ref": "651/653",
+        "source": "Bing",
+        "wikidata": "Q10900786",
+        "wikipedia": "ja:加平出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8227119,
+          35.7710226
+        ]
+      },
+      "id": "node/484166486"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/490619001",
+        "area": "yes",
+        "highway": "rest_area",
+        "layer": "3",
+        "name": "辰巳第二PA (上り)",
+        "name:en": "Tatsumi Second Parking Area",
+        "source": "GSImaps/std",
+        "wikidata": "Q11637887",
+        "wikipedia": "ja:辰巳第二パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8157161,
+          35.6452334
+        ]
+      },
+      "id": "way/490619001"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/492500504",
+        "highway": "rest_area",
+        "name": "ユアーズ・パーキング千鳥町第8",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6921023,
+          35.572861
+        ]
+      },
+      "id": "way/492500504"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/493584435",
+        "highway": "motorway_junction",
+        "name": "東雲ジャンクション",
+        "name:en": "Shinonome JCT",
+        "name:es": "Salida Shinonome"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7920685,
+          35.6355274
+        ]
+      },
+      "id": "node/493584435"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/493584453",
+        "highway": "motorway_junction",
+        "name": "豊洲",
+        "name:en": "Toyosu",
+        "name:es": "Toyosu"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7929483,
+          35.6430947
+        ]
+      },
+      "id": "node/493584453"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/499073450",
+        "highway": "motorway_junction",
+        "name": "豊洲"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.78947,
+          35.6478512
+        ]
+      },
+      "id": "node/499073450"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/499275905",
+        "highway": "motorway_junction",
+        "name": "東雲ジャンクション",
+        "name:en": "Shinonome Junction",
+        "name:es": "Cruce Shinonome"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7953701,
+          35.6404326
+        ]
+      },
+      "id": "node/499275905"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/499275976",
+        "highway": "motorway_junction",
+        "name": "江戸橋ジャンクション",
+        "name:en": "Edobashi Junction",
+        "name:ja": "江戸橋ジャンクション",
+        "name:ja-Hira": "えどばしじゃんくしょん",
+        "noref": "yes",
+        "wikidata": "Q11134495",
+        "wikipedia": "ja:江戸橋ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7807498,
+          35.6810898
+        ]
+      },
+      "id": "node/499275976"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/506053762",
+        "highway": "motorway_junction",
+        "name": "大泉IC/JCT",
+        "name:en": "Oizumi IC/Junction",
+        "name:es": "Salida Oizumi IC",
+        "name:ja": "大泉IC/JCT",
+        "name:ja-Hira": "おおいずみじゃんくしょん",
+        "name:ja-Latn": "Oizumi Junction",
+        "ref": "2",
+        "wikidata": "Q8081529",
+        "wikipedia": "ja:大泉ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5932173,
+          35.7623468
+        ]
+      },
+      "id": "node/506053762"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/507858409",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "駒形PA (上り)",
+        "name:en": "Komagata Parking Area",
+        "name:ja": "駒形PA (上り)",
+        "short_name": "駒形PA",
+        "short_name:en": "Komagata P. A.",
+        "wikidata": "Q11668354",
+        "wikipedia": "ja:駒形パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7964781,
+          35.7047268
+        ]
+      },
+      "id": "way/507858409"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/507859761",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "平和島PA (上り)",
+        "name:en": "Heiwajima Parking Area",
+        "name:ja": "平和島PA (上り)",
+        "short_name": "平和島PA",
+        "short_name:en": "Heiwajima P. A.",
+        "wikidata": "Q11060758",
+        "wikipedia": "ja:平和島パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.742256,
+          35.5862328
+        ]
+      },
+      "id": "way/507859761"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/507860076",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "辰巳第一PA (上り)",
+        "name:es": "Estacionamiento Tatsumi",
+        "name:ja": "辰巳第一パーキングエリア",
+        "short_name": "辰巳第一PA",
+        "wikidata": "Q11637885",
+        "wikipedia": "ja:辰巳第一パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8100588,
+          35.6434031
+        ]
+      },
+      "id": "way/507860076"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/529109989",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "用賀PA (上り)",
+        "name:ja": "用賀PA (上り)",
+        "short_name:ja": "用賀PA",
+        "wikidata": "Q11575094",
+        "wikipedia": "ja:用賀パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6314259,
+          35.6264627
+        ]
+      },
+      "id": "way/529109989"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/559443282",
+        "highway": "motorway_junction",
+        "name": "小菅JCT",
+        "name:en": "Kosuge Junction",
+        "name:es": "Salida Kosuge",
+        "name:ja": "小菅JCT",
+        "name:ja-Hira": "こすげじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf",
+        "wikidata": "Q10960401",
+        "wikipedia": "ja:小菅ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8210473,
+          35.7517415
+        ]
+      },
+      "id": "node/559443282"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/559445920",
+        "highway": "motorway_junction",
+        "name": "堀切JCT",
+        "name:en": "Horikiri Junction",
+        "name:fr": "Horikiri",
+        "name:ja-Hira": "ほりきりじゃんくしょん",
+        "name:ja-Latn": "Horikiri-jankushon",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8254685,
+          35.7412179
+        ]
+      },
+      "id": "node/559445920"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/559445932",
+        "highway": "motorway_junction",
+        "name": "小菅JCT",
+        "name:en": "Kosuge Junction",
+        "name:es": "Salida Kosuge",
+        "name:ja": "小菅JCT",
+        "name:ja-Hira": "こすげじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf",
+        "wikidata": "Q10960401",
+        "wikipedia": "ja:小菅ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8203529,
+          35.7576175
+        ]
+      },
+      "id": "node/559445932"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/559445943",
+        "highway": "motorway_junction",
+        "name": "小菅JCT",
+        "name:en": "Kosuge Junction",
+        "name:es": "Salida Kosuge",
+        "name:ja": "小菅JCT",
+        "name:ja-Hira": "こすげじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf",
+        "wikidata": "Q10960401",
+        "wikipedia": "ja:小菅ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8205333,
+          35.7570649
+        ]
+      },
+      "id": "node/559445943"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/562775195",
+        "highway": "motorway_junction",
+        "name": "板橋JCT",
+        "name:en": "Itabashi Junction",
+        "name:es": "Salida Itabashi",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7142002,
+          35.7494537
+        ]
+      },
+      "id": "node/562775195"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/562825892",
+        "highway": "motorway_junction",
+        "name": "板橋JCT",
+        "name:en": "Itabashi Junction",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7082435,
+          35.7545671
+        ]
+      },
+      "id": "node/562825892"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/564683261",
+        "highway": "motorway_junction",
+        "name": "堀切JCT",
+        "name:en": "Horikiri Junction",
+        "name:es": "Salida Horikiri",
+        "name:ja": "堀切JCT",
+        "name:ja-Hira": "ほりきりじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8205701,
+          35.7431392
+        ]
+      },
+      "id": "node/564683261"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/564683280",
+        "highway": "motorway_junction",
+        "name": "堀切JCT",
+        "name:en": "Horikiri Junction",
+        "name:es": "Salida Horikiri",
+        "name:ja": "堀切JCT",
+        "name:ja-Hira": "ほりきりじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8205347,
+          35.7432031
+        ]
+      },
+      "id": "node/564683280"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/565475973",
+        "highway": "motorway_junction",
+        "name": "堤通",
+        "name:en": "Tsutsumidori",
+        "name:ja": "堤通",
+        "ref": "609",
+        "wikidata": "Q10930613",
+        "wikipedia": "ja:堤通出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8118775,
+          35.731882
+        ]
+      },
+      "id": "node/565475973"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/565478790",
+        "highway": "motorway_junction",
+        "name": "堤通",
+        "name:en": "Tsutsumidori",
+        "name:ja": "堤通",
+        "ref": "609",
+        "wikidata": "Q10930613",
+        "wikipedia": "ja:堤通出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8117393,
+          35.7313098
+        ]
+      },
+      "id": "node/565478790"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/565479944",
+        "highway": "motorway_junction",
+        "name": "箱崎",
+        "name:en": "Hakozaki",
+        "name:es": "Hakozaki",
+        "ref": "602"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7860218,
+          35.6815214
+        ]
+      },
+      "id": "node/565479944"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/565480310",
+        "highway": "motorway_junction",
+        "name": "箱崎ジャンクション",
+        "name:en": "Hakozaki Junction",
+        "name:es": "Salida Hakozaki",
+        "noref": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7887553,
+          35.6827111
+        ]
+      },
+      "id": "node/565480310"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/567867780",
+        "highway": "motorway_junction",
+        "name": "早稲田",
+        "name:en": "Waseda",
+        "name:es": "Waseda",
+        "name:ja": "早稲田",
+        "ref": "503"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7323089,
+          35.7102054
+        ]
+      },
+      "id": "node/567867780"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/567872146",
+        "highway": "motorway_junction",
+        "name": "西神田",
+        "name:en": "Nishi-kanda",
+        "name:es": "Nishi-kanda",
+        "name:ja": "西神田",
+        "ref": "501"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7527594,
+          35.6954386
+        ]
+      },
+      "id": "node/567872146"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/567872147",
+        "highway": "motorway_junction",
+        "name": "西神田",
+        "name:en": "Nishi-kanda",
+        "name:es": "Nishi-kanda",
+        "name:ja": "西神田",
+        "ref": "501"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7528105,
+          35.6956532
+        ]
+      },
+      "id": "node/567872147"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/567872154",
+        "highway": "motorway_junction",
+        "name": "竹橋ジャンクション",
+        "name:en": "Takebashi junction",
+        "name:ja": "竹橋ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7546443,
+          35.6940211
+        ]
+      },
+      "id": "node/567872154"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/567878876",
+        "highway": "motorway_junction",
+        "name": "江戸橋ジャンクション",
+        "name:en": "Edobashi junction",
+        "name:es": "Edobashi",
+        "name:ja": "江戸橋ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7808879,
+          35.6811381
+        ]
+      },
+      "id": "node/567878876"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/567878928",
+        "highway": "motorway_junction",
+        "name": "江戸橋ジャンクション",
+        "name:en": "Edobashi junction",
+        "name:ja": "江戸橋ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7774898,
+          35.682251
+        ]
+      },
+      "id": "node/567878928"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/568090177",
+        "highway": "motorway_junction",
+        "name": "箱崎ジャンクション",
+        "name:en": "Hakozaki Junction",
+        "name:es": "Hakozaki",
+        "name:ja": "箱崎ジャンクション",
+        "name:ja-Latn": "Hakozaki jankushon",
+        "wikidata": "Q11603324",
+        "wikipedia": "ja:箱崎ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7821513,
+          35.6801912
+        ]
+      },
+      "id": "node/568090177"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/568092781",
+        "highway": "motorway_junction",
+        "name": "江戸橋",
+        "name:en": "Edobashi",
+        "name:es": "Edobashi",
+        "name:ja": "江戸橋"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7770931,
+          35.684801
+        ]
+      },
+      "id": "node/568092781"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/568094564",
+        "highway": "motorway_junction",
+        "name": "本町",
+        "name:en": "Honcho",
+        "name:es": "Honcho",
+        "name:ja": "本町",
+        "ref": "182"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7749968,
+          35.6927385
+        ]
+      },
+      "id": "node/568094564"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/569015558",
+        "highway": "motorway_junction",
+        "name": "東雲ジャンクション",
+        "name:en": "Shinonome Junction",
+        "name:es": "Cruce Shinonome"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8028708,
+          35.6409698
+        ]
+      },
+      "id": "node/569015558"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/569035382",
+        "highway": "motorway_junction",
+        "name": "辰巳ジャンクション",
+        "name:en": "Tatsumi Junction",
+        "name:es": "Salida Tatsumi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8122455,
+          35.6480517
+        ]
+      },
+      "id": "node/569035382"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/571468136",
+        "highway": "motorway_junction",
+        "name": "汐留",
+        "name:en": "Shiodome",
+        "name:es": "Shiodome",
+        "name:fr": "Shiodome",
+        "name:ja-Hira": "しおどめ",
+        "name:ja-Latn": "Shiodome",
+        "ref": "18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7600832,
+          35.6601507
+        ]
+      },
+      "id": "node/571468136"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/572570042",
+        "highway": "motorway_junction",
+        "name": "京橋",
+        "name:en": "Kyobashi",
+        "name:es": "Kyobashi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7744963,
+          35.6772111
+        ]
+      },
+      "id": "node/572570042"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/573233876",
+        "highway": "motorway_junction",
+        "name": "三宅坂ジャンクション",
+        "name:en": "Miyakezaka Junction",
+        "name:es": "Salida Miyakezaka"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7403781,
+          35.6787714
+        ]
+      },
+      "id": "node/573233876"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/574460605",
+        "highway": "motorway_junction",
+        "name": "一ノ橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7364593,
+          35.6580565
+        ]
+      },
+      "id": "node/574460605"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/574460620",
+        "highway": "motorway_junction",
+        "name": "一ノ橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7374026,
+          35.6536705
+        ]
+      },
+      "id": "node/574460620"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/577517536",
+        "highway": "motorway_junction",
+        "name": "代官町",
+        "name:en": "Daikancho",
+        "name:es": "Daikancho",
+        "ref": "25"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7486635,
+          35.6894225
+        ]
+      },
+      "id": "node/577517536"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/585884541",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "芝浦PA (上り)",
+        "name:en": "Shibaura parking area",
+        "name:es": "Área de aparcamiento Shibaura",
+        "wikidata": "Q11614678",
+        "wikipedia": "ja:芝浦パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7575705,
+          35.6439428
+        ]
+      },
+      "id": "way/585884541"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/588391376",
+        "highway": "motorway_junction",
+        "name": "新富町",
+        "name:en": "Shintomicho",
+        "name:es": "Shintomicho",
+        "ref": "14"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7708949,
+          35.6703692
+        ]
+      },
+      "id": "node/588391376"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/598514872",
+        "highway": "motorway_junction",
+        "name": "葛西",
+        "ref": "B26"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8613121,
+          35.6453521
+        ]
+      },
+      "id": "node/598514872"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/598514888",
+        "highway": "motorway_junction",
+        "name": "葛西",
+        "ref": "B27@"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8677238,
+          35.6431849
+        ]
+      },
+      "id": "node/598514888"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/600726158",
+        "highway": "motorway_junction",
+        "name": "小松川JCT",
+        "name:en": "Komatsugawa Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8649092,
+          35.6991133
+        ]
+      },
+      "id": "node/600726158"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/600726182",
+        "highway": "motorway_junction",
+        "name": "一之江",
+        "name:en": "Ichinoe",
+        "name:ja": "一之江",
+        "ref": "705",
+        "source": "survey",
+        "survey:date": "2012-10-01",
+        "wikidata": "Q10863798",
+        "wikipedia": "ja:一之江出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8774469,
+          35.697592
+        ]
+      },
+      "id": "node/600726182"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/603584647",
+        "highway": "motorway_junction",
+        "name": "小伝馬町",
+        "name:en": "Kodenmacho",
+        "name:ja": "小伝馬町"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.77846,
+          35.6907607
+        ]
+      },
+      "id": "node/603584647"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/623850525",
+        "highway": "motorway_junction",
+        "name": "篠崎IC",
+        "name:en": "Shinozaki",
+        "name:ja": "篠崎IC",
+        "ref": "1",
+        "wikidata": "Q11603721",
+        "wikipedia": "ja:篠崎インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.9144195,
+          35.7082809
+        ]
+      },
+      "id": "node/623850525"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/626659795",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2577404,
+          35.640774
+        ]
+      },
+      "id": "node/626659795"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/658997126",
+        "highway": "rest_area",
+        "layer": "2",
+        "name": "永福PA (上り)",
+        "name:ja": "永福PA (上り)",
+        "short_name": "永福PA",
+        "wikidata": "Q11132549",
+        "wikipedia": "ja:永福パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6438278,
+          35.6682186
+        ]
+      },
+      "id": "way/658997126"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/659036653",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "志村PA (上り)",
+        "name:en": "Shimura Parking Area",
+        "name:es": "Zona de aparcamiento Shimura",
+        "name:ja": "志村PA (上り)",
+        "short_name": "志村PA",
+        "wikidata": "Q11072236",
+        "wikipedia": "ja:志村パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6849698,
+          35.7741473
+        ]
+      },
+      "id": "way/659036653"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/659044511",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "南池袋PA (上り)",
+        "name:en": "Minami Ikebukuro parking area",
+        "name:es": "Área de aparcamiento Minami Ikebukuro",
+        "name:ja": "南池袋PA (上り)",
+        "short_name": "南池袋PA",
+        "wikidata": "Q10908285",
+        "wikipedia": "ja:南池袋パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7227974,
+          35.7232103
+        ]
+      },
+      "id": "way/659044511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/676408802",
+        "highway": "motorway_junction",
+        "name": "王子北",
+        "name:en": "Oji-kita",
+        "name:ja": "王子北",
+        "ref": "C34"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7461122,
+          35.7573624
+        ]
+      },
+      "id": "node/676408802"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/687049310",
+        "area": "yes",
+        "highway": "rest_area",
+        "name": "平和島PA (下り)",
+        "name:en": "Heiwajima Parking Area",
+        "name:ja": "平和島PA (下り)",
+        "short_name": "平和島PA",
+        "short_name:en": "Heiwajima P. A.",
+        "short_name:ja": "平和島PA",
+        "wikidata": "Q11060758",
+        "wikipedia": "ja:平和島パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7437855,
+          35.5842628
+        ]
+      },
+      "id": "way/687049310"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/698279318",
+        "highway": "motorway_junction",
+        "name": "平井大橋",
+        "name:en": "Hirai Ohashi",
+        "name:es": "Hirai Ohashi",
+        "ref": "C43"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8474099,
+          35.7176263
+        ]
+      },
+      "id": "node/698279318"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/729217365",
+        "area": "yes",
+        "highway": "rest_area",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7099574,
+          35.7789172
+        ]
+      },
+      "id": "way/729217365"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/739113434",
+        "highway": "motorway_junction",
+        "name": "小松川入口",
+        "ref": "703"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8628825,
+          35.6990592
+        ]
+      },
+      "id": "node/739113434"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/762825952",
+        "highway": "motorway_junction",
+        "name": "小菅",
+        "name:en": "Kosuge",
+        "name:es": "Kosuge",
+        "ref": "C40",
+        "url": "http://www.shutoko.jp/use/network/map/route-c2/kosuge/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8217273,
+          35.7479529
+        ]
+      },
+      "id": "node/762825952"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/762936855",
+        "highway": "motorway_junction",
+        "name": "加平",
+        "name:en": "Kahei",
+        "name:ja": "加平",
+        "ref": "652",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8254728,
+          35.7809864
+        ]
+      },
+      "id": "node/762936855"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/762936872",
+        "highway": "motorway_junction",
+        "name": "加平",
+        "name:en": "Kahei",
+        "name:ja": "加平",
+        "ref": "652/654",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8264452,
+          35.7841959
+        ]
+      },
+      "id": "node/762936872"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/762936883",
+        "highway": "motorway_junction",
+        "name": "加平",
+        "name:en": "Kahei",
+        "name:es": "Kahei",
+        "ref": "651",
+        "source": "Bing",
+        "wikidata": "Q10900786",
+        "wikipedia": "ja:加平出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8241457,
+          35.7755901
+        ]
+      },
+      "id": "node/762936883"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/794172694",
+        "highway": "motorway_junction",
+        "name": "中谷戸",
+        "name:en": "Nakayato"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3520923,
+          35.6401219
+        ]
+      },
+      "id": "node/794172694"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/800608566",
+        "area": "yes",
+        "bicycle": "designated",
+        "highway": "rest_area",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.744039,
+          35.7820057
+        ]
+      },
+      "id": "way/800608566"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/822928468",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2496434,
+          35.6411712
+        ]
+      },
+      "id": "node/822928468"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/833099762",
+        "highway": "rest_area",
+        "roof:shape": "pyramidal",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.718665,
+          35.6386774
+        ]
+      },
+      "id": "way/833099762"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/849136420",
+        "highway": "motorway_junction",
+        "name": "錦糸町",
+        "name:en": "Kinshicho",
+        "name:ja": "錦糸町",
+        "ref": "702",
+        "wikidata": "Q11650540",
+        "wikipedia": "ja:錦糸町出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8193681,
+          35.6932529
+        ]
+      },
+      "id": "node/849136420"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/850376340",
+        "highway": "motorway_junction",
+        "name": "錦糸町",
+        "name:en": "Kinshicho",
+        "name:es": "Kinshicho",
+        "name:ja": "錦糸町",
+        "ref": "701",
+        "source": "survey",
+        "survey:date": "2012-10-01",
+        "wikidata": "Q11650540",
+        "wikipedia": "ja:錦糸町出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8114528,
+          35.6929334
+        ]
+      },
+      "id": "node/850376340"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/919617354",
+        "highway": "motorway_junction",
+        "name": "初台南",
+        "ref": "C23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6875891,
+          35.6729149
+        ]
+      },
+      "id": "node/919617354"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/927641089",
+        "highway": "motorway_junction",
+        "name": "大橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6845169,
+          35.6507233
+        ]
+      },
+      "id": "node/927641089"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1041276946",
+        "highway": "motorway_junction",
+        "name": "入谷",
+        "name:en": "Iriya",
+        "name:es": "Iriya",
+        "name:ja": "入谷",
+        "ref": "184"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7832347,
+          35.7189828
+        ]
+      },
+      "id": "node/1041276946"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1041298833",
+        "highway": "motorway_junction",
+        "name": "入谷",
+        "name:en": "Iriya",
+        "name:es": "Iriya",
+        "name:ja": "入谷",
+        "ref": "184"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7831388,
+          35.7190339
+        ]
+      },
+      "id": "node/1041298833"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1054155404",
+        "highway": "motorway_junction",
+        "name": "小伝馬町三丁目",
+        "name:en": "Kodenmacho 3-chome"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7795772,
+          35.6914251
+        ]
+      },
+      "id": "node/1054155404"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1054597789",
+        "highway": "motorway_junction",
+        "name": "馬喰町",
+        "name:en": "Bakurocho"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7818542,
+          35.6929492
+        ]
+      },
+      "id": "node/1054597789"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1064064228",
+        "highway": "motorway_junction",
+        "name": "戸越",
+        "ref": "205"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7175451,
+          35.6169469
+        ]
+      },
+      "id": "node/1064064228"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1070863041",
+        "highway": "motorway_junction",
+        "name": "神田橋",
+        "name:en": "Kandabashi",
+        "name:es": "Kandabashi",
+        "ref": "28"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.766701,
+          35.6887461
+        ]
+      },
+      "id": "node/1070863041"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1072718252",
+        "highway": "motorway_junction",
+        "name": "日の出ＩＣ",
+        "name:en": "Hinode IC",
+        "name:ja-Hira": "ひのでいんたーちぇんじ",
+        "name:ja_rm": "Hinode IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "43",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q11086045",
+        "wikipedia": "ja:日の出インターチェンジ (東京都)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2820632,
+          35.7387353
+        ]
+      },
+      "id": "node/1072718252"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1082039923",
+        "highway": "motorway_junction",
+        "name": "一ツ橋",
+        "name:en": "Hitotsubashi",
+        "name:es": "Hitotsubashi",
+        "ref": "27"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7588896,
+          35.6908991
+        ]
+      },
+      "id": "node/1082039923"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1091725794",
+        "highway": "motorway_junction",
+        "name": "三軒茶屋",
+        "name:en": "Sangenjaya",
+        "name:ja": "三軒茶屋",
+        "ref": "305",
+        "source": "Bing",
+        "wikidata": "Q10866922",
+        "wikipedia": "ja:三軒茶屋出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6784991,
+          35.6475809
+        ]
+      },
+      "id": "node/1091725794"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1106211872",
+        "highway": "motorway_junction",
+        "name": "浜町出口",
+        "name:en": "Hamacho",
+        "name:es": "Hamacho",
+        "ref": "604"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.788458,
+          35.6827075
+        ]
+      },
+      "id": "node/1106211872"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1125926447",
+        "highway": "motorway_junction",
+        "name": "外苑出口",
+        "name:en": "Gaien",
+        "name:es": "Gaien",
+        "name:ja": "外苑出口",
+        "name:ja-Hira": "がいえんでぐち",
+        "ref": "401"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7220537,
+          35.6796288
+        ]
+      },
+      "id": "node/1125926447"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1143517119",
+        "highway": "motorway_junction",
+        "name": "西池袋",
+        "ref": "C25"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.692719,
+          35.7227303
+        ]
+      },
+      "id": "node/1143517119"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1156533647",
+        "highway": "rest_area",
+        "name": "箱崎PA",
+        "name:en": "Hakozaki Parking Area",
+        "name:es": "Área de aparcamiento Hakozaki",
+        "name:ja": "箱崎PA",
+        "name:zh": "箱崎停車區",
+        "short_name:en": "Hakozaki P. A.",
+        "wikidata": "Q11603326",
+        "wikipedia": "ja:箱崎パーキングエリア",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7890607,
+          35.6823086
+        ]
+      },
+      "id": "way/1156533647"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1237984803",
+        "highway": "motorway_junction",
+        "name": "新宿出口",
+        "name:en": "Shinjuku",
+        "name:ja": "新宿出口",
+        "name:ja_rm": "Shinjuku",
+        "ref": "405"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6928134,
+          35.6810578
+        ]
+      },
+      "id": "node/1237984803"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1320310466",
+        "highway": "motorway_junction",
+        "name": "東池袋",
+        "name:en": "Higashi ikebukuro",
+        "name:ja": "東池袋"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7186219,
+          35.7286428
+        ]
+      },
+      "id": "node/1320310466"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1320310480",
+        "highway": "motorway_junction",
+        "name": "東池袋",
+        "name:en": "Higashi ikebukuro",
+        "name:es": "Higashi ikebukuro",
+        "name:ja": "東池袋",
+        "ref": "508"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7168823,
+          35.7307352
+        ]
+      },
+      "id": "node/1320310480"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1415541514",
+        "highway": "motorway_junction",
+        "name": "向島",
+        "name:en": "Mukojima",
+        "name:es": "Mukojima",
+        "ref": "607",
+        "wikidata": "Q10918115",
+        "wikipedia": "ja:向島出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8100296,
+          35.7228646
+        ]
+      },
+      "id": "node/1415541514"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1415541524",
+        "highway": "motorway_junction",
+        "name": "向島",
+        "name:en": "Mukojima",
+        "name:es": "Mukojima",
+        "ref": "607",
+        "wikidata": "Q10918115",
+        "wikipedia": "ja:向島出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8105653,
+          35.7249733
+        ]
+      },
+      "id": "node/1415541524"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1436260533",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4795407,
+          35.5068656
+        ]
+      },
+      "id": "node/1436260533"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "way/1467922550",
+        "highway": "rest_area",
+        "@geometry": "center"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7731902,
+          33.1337919
+        ]
+      },
+      "id": "way/1467922550"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1640003720",
+        "highway": "motorway_junction",
+        "name": "木場",
+        "name:en": "Kiba",
+        "ref": "903"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7997999,
+          35.6730179
+        ]
+      },
+      "id": "node/1640003720"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1640003721",
+        "highway": "motorway_junction",
+        "name": "木場",
+        "name:en": "Kiba",
+        "ref": "903"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8010579,
+          35.6728741
+        ]
+      },
+      "id": "node/1640003721"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1640003732",
+        "highway": "motorway_junction",
+        "name": "福住",
+        "name:en": "Fukuzumi",
+        "name:es": "Fukuzumi",
+        "ref": "902"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7978449,
+          35.6735097
+        ]
+      },
+      "id": "node/1640003732"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1685515660",
+        "highway": "motorway_junction",
+        "name": "護国寺",
+        "name:en": "Gokokuji",
+        "name:ja": "護国寺",
+        "ref": "505"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7270748,
+          35.7179966
+        ]
+      },
+      "id": "node/1685515660"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1691781364",
+        "highway": "motorway_junction",
+        "name": "小伝馬町三丁目",
+        "name:en": "Kodenmacho 3-chome"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7796332,
+          35.6913582
+        ]
+      },
+      "id": "node/1691781364"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1691781389",
+        "highway": "motorway_junction",
+        "name": "馬喰町",
+        "name:en": "Bakurocho"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.78192,
+          35.6928885
+        ]
+      },
+      "id": "node/1691781389"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1691781711",
+        "highway": "motorway_junction",
+        "name": "小伝馬町",
+        "name:en": "Kodenmacho",
+        "name:ja": "小伝馬町"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7785147,
+          35.6906989
+        ]
+      },
+      "id": "node/1691781711"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1694306128",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2542783,
+          35.6407264
+        ]
+      },
+      "id": "node/1694306128"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1694306281",
+        "highway": "motorway_junction",
+        "name": "八王子ＪＣＴ",
+        "name:en": "Hachioji JCT",
+        "name:ja": "八王子JCT",
+        "name:ja-Hira": "はちおうじじゃんくしょん",
+        "name:ja_rm": "Hachioji JCT",
+        "official_name:en": "National Highway Route 468",
+        "ref": "6",
+        "wikidata": "Q10892298",
+        "wikipedia": "ja:八王子ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2557057,
+          35.6388214
+        ]
+      },
+      "id": "node/1694306281"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1694306286",
+        "highway": "motorway_junction",
+        "name": "高尾山ＩＣ",
+        "name:en": "Takaosan IC",
+        "name:ja": "高尾山IC",
+        "name:ja-Hira": "たかおさんいんたーちぇんじ",
+        "name:ja_rm": "Takaosan IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "35",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q10959056",
+        "wikipedia": "ja:高尾山インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2622296,
+          35.6261806
+        ]
+      },
+      "id": "node/1694306286"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1694328280",
+        "highway": "motorway_junction",
+        "name": "両国ジャンクション",
+        "name:en": "Ryogoku Junction",
+        "name:es": "Salida Ryogoku",
+        "name:ja": "両国ジャンクション",
+        "wikidata": "Q10891813",
+        "wikipedia": "ja:両国ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7897834,
+          35.6884051
+        ]
+      },
+      "id": "node/1694328280"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1694598821",
+        "highway": "motorway_junction",
+        "name": "箱崎出口",
+        "ref": "602",
+        "wikidata": "Q11603330",
+        "wikipedia": "ja:箱崎出入口 (東京都)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7860989,
+          35.6810972
+        ]
+      },
+      "id": "node/1694598821"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1694598881",
+        "highway": "motorway_junction",
+        "name": "清洲橋",
+        "name:en": "Kiyosubashi",
+        "name:es": "Kiyosubashi",
+        "ref": "603"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7899435,
+          35.6836582
+        ]
+      },
+      "id": "node/1694598881"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1694598897",
+        "highway": "motorway_junction",
+        "name": "箱崎ジャンクション",
+        "name:en": "Hakozaki JCT",
+        "name:ja": "箱崎ジャンクション",
+        "ref": "602",
+        "wikidata": "Q11603324",
+        "wikipedia": "ja:箱崎ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7919308,
+          35.6851845
+        ]
+      },
+      "id": "node/1694598897"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1697733832",
+        "highway": "motorway_junction",
+        "name": "四つ木",
+        "ref": "C42"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8360758,
+          35.7295174
+        ]
+      },
+      "id": "node/1697733832"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1700593263",
+        "highway": "motorway_junction",
+        "name": "堤通",
+        "name:en": "Tsutsumidori",
+        "name:ja": "堤通",
+        "ref": "610",
+        "wikidata": "Q10930613",
+        "wikipedia": "ja:堤通出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8161159,
+          35.7402952
+        ]
+      },
+      "id": "node/1700593263"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1700593265",
+        "highway": "motorway_junction",
+        "name": "堤通",
+        "name:en": "Tsutsumidori",
+        "name:ja": "堤通",
+        "ref": "610",
+        "wikidata": "Q10930613",
+        "wikipedia": "ja:堤通出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8158362,
+          35.7400583
+        ]
+      },
+      "id": "node/1700593265"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1744023982",
+        "highway": "motorway_junction",
+        "name": "江戸橋ジャンクション",
+        "name:en": "Edobashi junction",
+        "name:es": "Edobashi junction",
+        "name:ja": "江戸橋ジャンクション",
+        "name:ja-Hira": "えどばしじゃんくしょん"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7760438,
+          35.6841002
+        ]
+      },
+      "id": "node/1744023982"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1746139060",
+        "highway": "motorway_junction",
+        "name": "用賀",
+        "ref": "307"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6307484,
+          35.6262845
+        ]
+      },
+      "id": "node/1746139060"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1746785360",
+        "highway": "motorway_junction",
+        "name": "池尻出口",
+        "name:en": "Ikejiri",
+        "name:ja": "池尻出口",
+        "ref": "304",
+        "source": "Bing",
+        "wikidata": "Q11135696",
+        "wikipedia": "ja:池尻出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6787882,
+          35.6477383
+        ]
+      },
+      "id": "node/1746785360"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1781291445",
+        "highway": "motorway_junction",
+        "name": "大泉IC/JCT",
+        "name:en": "Oizumi IC/JCT",
+        "name:es": "Salida Oizumi IC",
+        "name:ja": "大泉IC/JCT",
+        "name:ja-Hira": "おおいずみいんたーちぇんじ／じゃんくしょん",
+        "name:ja-Latn": "Oizumi Junction",
+        "ref": "50",
+        "wikidata": "Q8081529",
+        "wikipedia": "ja:大泉ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5995444,
+          35.7633401
+        ]
+      },
+      "id": "node/1781291445"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1832672276",
+        "highway": "motorway_junction",
+        "name": "天現寺",
+        "ref": "201"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7293648,
+          35.6470107
+        ]
+      },
+      "id": "node/1832672276"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1834887185",
+        "highway": "motorway_junction",
+        "name": "銀座",
+        "name:en": "Ginza",
+        "name:es": "Ginza",
+        "ref": "16"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7674809,
+          35.6668783
+        ]
+      },
+      "id": "node/1834887185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1834887252",
+        "highway": "motorway_junction",
+        "name": "銀座",
+        "name:en": "Ginza",
+        "name:es": "Ginza",
+        "ref": "15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7708677,
+          35.6701365
+        ]
+      },
+      "id": "node/1834887252"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1858137841",
+        "highway": "motorway_junction",
+        "ref": "荏原"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7154868,
+          35.6185724
+        ]
+      },
+      "id": "node/1858137841"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1866081909",
+        "highway": "motorway_junction",
+        "name": "代官町",
+        "name:en": "Daikancho",
+        "name:es": "Daikancho",
+        "name:ja": "代官町"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7525295,
+          35.6893322
+        ]
+      },
+      "id": "node/1866081909"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1891818143",
+        "highway": "motorway_junction",
+        "name": "宝町",
+        "name:en": "Takaracho",
+        "name:ja": "宝町",
+        "ref": "11",
+        "wikidata": "Q10956315",
+        "wikipedia": "ja:宝町出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7761289,
+          35.6801667
+        ]
+      },
+      "id": "node/1891818143"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1919930849",
+        "highway": "motorway_junction",
+        "name": "飯田橋",
+        "name:en": "Iidabashi",
+        "name:es": "Iidabashi",
+        "name:ja": "飯田橋",
+        "ref": "502"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7415533,
+          35.7081809
+        ]
+      },
+      "id": "node/1919930849"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1928229738",
+        "highway": "motorway_junction",
+        "name": "北池袋",
+        "name:en": "Kita-Ikebukuro",
+        "name:ja": "北池袋",
+        "name:ja_rm": "Kitaikebukuro",
+        "ref": "509",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7105344,
+          35.7388729
+        ]
+      },
+      "id": "node/1928229738"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1928229739",
+        "highway": "motorway_junction",
+        "name": "北池袋",
+        "name:en": "Kita-Ikebukuro",
+        "name:ja": "北池袋",
+        "name:ja_rm": "Kitaikebukuro",
+        "ref": "509",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7106299,
+          35.7389296
+        ]
+      },
+      "id": "node/1928229739"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1928229742",
+        "highway": "motorway_junction",
+        "name": "高松",
+        "name:en": "Takamatsu",
+        "name:es": "Takamatsu",
+        "name:ja": "高松",
+        "name:ja_rm": "Takamatsu",
+        "note": "右から合流",
+        "ref": "C28",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.704512,
+          35.7387379
+        ]
+      },
+      "id": "node/1928229742"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1928885702",
+        "highway": "motorway_junction",
+        "name": "板橋本町",
+        "name:en": "Itabashi-honcho",
+        "ref": "511",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7082987,
+          35.7543421
+        ]
+      },
+      "id": "node/1928885702"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1928885706",
+        "highway": "motorway_junction",
+        "name": "板橋本町",
+        "name:en": "Itabashi-honcho",
+        "ref": "511",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7081052,
+          35.7546038
+        ]
+      },
+      "id": "node/1928885706"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/1928907427",
+        "highway": "motorway_junction",
+        "name": "新板橋出口",
+        "name:en": "Shin-Itabashi",
+        "name:es": "Shin-Itabashi",
+        "ref": "C29",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7159049,
+          35.7492281
+        ]
+      },
+      "id": "node/1928907427"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2068189807",
+        "highway": "motorway_junction",
+        "name": "五反田",
+        "ref": "C20",
+        "source": "Bing 2010"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7175551,
+          35.6254327
+        ]
+      },
+      "id": "node/2068189807"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2091157603",
+        "highway": "motorway_junction",
+        "name": "高島平",
+        "ref": "515",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6537987,
+          35.7841954
+        ]
+      },
+      "id": "node/2091157603"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2091157604",
+        "highway": "motorway_junction",
+        "name": "高島平",
+        "ref": "515",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6538219,
+          35.7842566
+        ]
+      },
+      "id": "node/2091157604"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2091867904",
+        "highway": "motorway_junction",
+        "name": "池尻",
+        "name:en": "Ikejiri",
+        "name:es": "Ikejiri",
+        "name:ja": "池尻",
+        "ref": "304",
+        "source": "Bing",
+        "wikidata": "Q11135696",
+        "wikipedia": "ja:池尻出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6811468,
+          35.6487788
+        ]
+      },
+      "id": "node/2091867904"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2093245827",
+        "highway": "motorway_junction",
+        "name": "本町",
+        "name:en": "Honcho",
+        "name:es": "Honcho",
+        "name:ja": "本町",
+        "ref": "181"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7766646,
+          35.6863618
+        ]
+      },
+      "id": "node/2093245827"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2093245861",
+        "highway": "motorway_junction",
+        "name": "上野",
+        "name:en": "Ueno",
+        "name:es": "Ueno",
+        "name:ja": "上野",
+        "ref": "183"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7762752,
+          35.7069536
+        ]
+      },
+      "id": "node/2093245861"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2110614958",
+        "highway": "motorway_junction",
+        "name": "中台",
+        "name:en": "Nakadai",
+        "name:es": "Nakadai",
+        "ref": "513",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6845096,
+          35.7744939
+        ]
+      },
+      "id": "node/2110614958"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2119233338",
+        "highway": "rest_area",
+        "name": "みはらし休憩場",
+        "source": "survey",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.435466,
+          34.687172
+        ]
+      },
+      "id": "node/2119233338"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2127484102",
+        "highway": "motorway_junction",
+        "name": "高樹町",
+        "ref": "301"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7226877,
+          35.6596756
+        ]
+      },
+      "id": "node/2127484102"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2127484104",
+        "highway": "motorway_junction",
+        "name": "高樹町出口",
+        "name:ja": "高樹町出口",
+        "name:ja-Hira": "たかぎちょうでぐち",
+        "ref": "301"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.722272,
+          35.6595528
+        ]
+      },
+      "id": "node/2127484104"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2128403168",
+        "highway": "motorway_junction",
+        "name": "本町",
+        "name:en": "Honcho",
+        "name:es": "Honcho",
+        "name:ja": "本町",
+        "ref": "182"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.77523,
+          35.6953368
+        ]
+      },
+      "id": "node/2128403168"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2130008048",
+        "highway": "motorway_junction",
+        "name": "西神田出入口",
+        "name:en": "Nishi-Kanda",
+        "name:es": "Nishi-Kanda",
+        "ref": "501"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7524944,
+          35.6978831
+        ]
+      },
+      "id": "node/2130008048"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2130008050",
+        "highway": "motorway_junction",
+        "name": "西神田出入口",
+        "name:en": "Nishi-Kanda",
+        "name:es": "Nishi-Kanda",
+        "ref": "501"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7522532,
+          35.6979158
+        ]
+      },
+      "id": "node/2130008050"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2177935859",
+        "highway": "motorway_junction",
+        "name": "目黒",
+        "name:en": "Meguro",
+        "name:es": "Meguro",
+        "ref": "203"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7169595,
+          35.6379178
+        ]
+      },
+      "id": "node/2177935859"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2359268395",
+        "highway": "motorway_junction",
+        "name": "三軒茶屋出入口",
+        "name:en": "Sangenjaya",
+        "name:es": "Sangenjaya",
+        "name:ja": "三軒茶屋出入口",
+        "ref": "305",
+        "source": "Bing",
+        "wikidata": "Q10866922",
+        "wikipedia": "ja:三軒茶屋出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6755077,
+          35.6457623
+        ]
+      },
+      "id": "node/2359268395"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2389061730",
+        "highway": "rest_area",
+        "name": "VIPラウンジ1号館"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.697222,
+          35.689833
+        ]
+      },
+      "id": "node/2389061730"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2569233223",
+        "highway": "motorway_junction",
+        "name": "加平",
+        "name:en": "Kahei",
+        "name:es": "Kahei",
+        "name:ja": "加平",
+        "ref": "654",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8250479,
+          35.7789027
+        ]
+      },
+      "id": "node/2569233223"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2569328633",
+        "highway": "motorway_junction",
+        "name": "中環大井南",
+        "name:en": "C2 Oi-minami",
+        "ref": "C18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7555577,
+          35.6032277
+        ]
+      },
+      "id": "node/2569328633"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2569334806",
+        "highway": "motorway_junction",
+        "name": "大井南出口",
+        "ref": "B19"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7554285,
+          35.6074222
+        ]
+      },
+      "id": "node/2569334806"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2689533477",
+        "highway": "motorway_junction",
+        "ref": "東京シティエアターミナル専用出口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7887383,
+          35.6823841
+        ]
+      },
+      "id": "node/2689533477"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2703511281",
+        "highway": "motorway_junction",
+        "name": "戸越",
+        "ref": "205"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7174282,
+          35.6169862
+        ]
+      },
+      "id": "node/2703511281"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/2936455511",
+        "highway": "motorway_junction",
+        "name": "高尾山ＩＣ",
+        "name:en": "Takaosan IC",
+        "name:ja": "高尾山IC",
+        "name:ja-Hira": "たかおさんいんたーちぇんじ",
+        "name:ja_rm": "Takaosan IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "35",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:高尾山インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2642751,
+          35.6217583
+        ]
+      },
+      "id": "node/2936455511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3017665448",
+        "highway": "motorway_junction",
+        "name": "宝町",
+        "name:en": "Takaracho",
+        "name:ja": "宝町",
+        "ref": "11",
+        "wikidata": "Q10956315",
+        "wikipedia": "ja:宝町出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7762439,
+          35.6801298
+        ]
+      },
+      "id": "node/3017665448"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3174589506",
+        "highway": "motorway_junction",
+        "name": "渋谷出口",
+        "name:en": "Shibuya Exit",
+        "name:ja": "渋谷出口",
+        "name:ja-Hira": "しぶやでぐち",
+        "ref": "303"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6974549,
+          35.6561884
+        ]
+      },
+      "id": "node/3174589506"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3174589518",
+        "highway": "motorway_junction",
+        "name": "渋谷",
+        "name:en": "Shibuya",
+        "name:es": "Shibuya",
+        "ref": "303"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6969796,
+          35.6561727
+        ]
+      },
+      "id": "node/3174589518"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3212719218",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4664711,
+          35.513606
+        ]
+      },
+      "id": "node/3212719218"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3218329762",
+        "highway": "motorway_junction",
+        "name": "浜崎橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7602257,
+          35.6550338
+        ]
+      },
+      "id": "node/3218329762"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3387909450",
+        "highway": "motorway_junction",
+        "name": "大井JCT",
+        "noref": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7528699,
+          35.6090956
+        ]
+      },
+      "id": "node/3387909450"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3387909578",
+        "highway": "motorway_junction",
+        "name": "五反田",
+        "ref": "C20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7096555,
+          35.6306912
+        ]
+      },
+      "id": "node/3387909578"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3387909707",
+        "highway": "motorway_junction",
+        "name": "大橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6906508,
+          35.6500715
+        ]
+      },
+      "id": "node/3387909707"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3387909708",
+        "highway": "motorway_junction",
+        "name": "大橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6905701,
+          35.6500324
+        ]
+      },
+      "id": "node/3387909708"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3767284426",
+        "highway": "motorway_junction",
+        "name": "上野",
+        "name:en": "Ueno",
+        "name:es": "Ueno",
+        "name:ja": "上野",
+        "ref": "183"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7763063,
+          35.708314
+        ]
+      },
+      "id": "node/3767284426"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3804851174",
+        "highway": "rest_area",
+        "name": "コインパーキング"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6804522,
+          35.6483068
+        ]
+      },
+      "id": "node/3804851174"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3804851175",
+        "highway": "rest_area",
+        "name": "コインパーキング"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6804718,
+          35.6479816
+        ]
+      },
+      "id": "node/3804851175"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3817924842",
+        "highway": "motorway_junction",
+        "name": "堀切JCT",
+        "name:en": "Horikiri Junction",
+        "name:ja-Hira": "ほりきりじゃんくしょん",
+        "url": "http://www.shutoko.jp/use/network/~/media/pdf/customer/use/network/b1_kosuge.pdf",
+        "wikidata": "Q10930485",
+        "wikipedia": "ja:堀切ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.822401,
+          35.7467203
+        ]
+      },
+      "id": "node/3817924842"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3828035657",
+        "highway": "rest_area",
+        "name": "コインパーキング"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6836274,
+          35.6495615
+        ]
+      },
+      "id": "node/3828035657"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3828036918",
+        "highway": "rest_area",
+        "name": "コインパーキング"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6832821,
+          35.6481739
+        ]
+      },
+      "id": "node/3828036918"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3828047858",
+        "highway": "rest_area",
+        "name": "世田谷公園駐車場",
+        "note": "利用時間制限あり"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6798986,
+          35.6450897
+        ]
+      },
+      "id": "node/3828047858"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3828048664",
+        "highway": "rest_area",
+        "name": "世田谷公園バイク駐輪場"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6823619,
+          35.6441578
+        ]
+      },
+      "id": "node/3828048664"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3828049457",
+        "highway": "rest_area",
+        "name": "コインパーキング",
+        "note": "期限付き 土地が売れ次第撤去"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6855779,
+          35.6414235
+        ]
+      },
+      "id": "node/3828049457"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3842157167",
+        "highway": "rest_area",
+        "name": "コインパーキング"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6817569,
+          35.6482482
+        ]
+      },
+      "id": "node/3842157167"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3842157453",
+        "highway": "rest_area",
+        "name": "コインパーキング"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6817336,
+          35.6481553
+        ]
+      },
+      "id": "node/3842157453"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3851530201",
+        "highway": "motorway_junction",
+        "name": "中野長者橋",
+        "ref": "C24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6823301,
+          35.6948015
+        ]
+      },
+      "id": "node/3851530201"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3851530202",
+        "highway": "motorway_junction",
+        "name": "中野長者橋",
+        "name:en": "Nakano-chojabashi",
+        "ref": "C24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6828501,
+          35.6961609
+        ]
+      },
+      "id": "node/3851530202"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3851577677",
+        "highway": "motorway_junction",
+        "name": "富ヶ谷",
+        "name:en": "Tomigaya",
+        "name:es": "Tomigaya",
+        "ref": "C22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6880295,
+          35.6659486
+        ]
+      },
+      "id": "node/3851577677"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3851809274",
+        "highway": "motorway_junction",
+        "name": "西新宿JCT",
+        "name:en": "Nishi-shinjuku Junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.687727,
+          35.6762998
+        ]
+      },
+      "id": "node/3851809274"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3854029357",
+        "highway": "motorway_junction",
+        "name": "渋谷出口",
+        "name:en": "Shibuya",
+        "name:es": "Shibuya",
+        "name:ja": "渋谷出口",
+        "name:ja-Hira": "しぶやでぐち",
+        "ref": "302"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7050949,
+          35.6582534
+        ]
+      },
+      "id": "node/3854029357"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/3935796666",
+        "highway": "motorway_junction",
+        "name": "駒形",
+        "name:en": "Komagata",
+        "name:es": "Komagata",
+        "name:ja": "駒形",
+        "ref": "605",
+        "wikidata": "Q11668356",
+        "wikipedia": "ja:駒形出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7961862,
+          35.704616
+        ]
+      },
+      "id": "node/3935796666"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4382903292",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8130089,
+          35.709858
+        ]
+      },
+      "id": "node/4382903292"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4557359592",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7645055,
+          35.6641654
+        ]
+      },
+      "id": "node/4557359592"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4557405290",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7660504,
+          35.6654575
+        ]
+      },
+      "id": "node/4557405290"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4583802785",
+        "highway": "motorway_junction",
+        "name": "八王子西ＩＣ",
+        "name:en": "hatiohji-west IC",
+        "name:ja": "八王子西IC",
+        "name:ja-Hira": "はちおうじにし",
+        "name:ja_rm": "hatiohji-nishi IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "41",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikipedia": "ja:八王子西インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2540159,
+          35.682604
+        ]
+      },
+      "id": "node/4583802785"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4597822558",
+        "highway": "motorway_junction",
+        "name": "滝野川入口",
+        "name:en": "Takinogawa",
+        "name:es": "Takinogawa",
+        "ref": "C31",
+        "source": "Bing"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7158918,
+          35.7492188
+        ]
+      },
+      "id": "node/4597822558"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4693971289",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7728382,
+          35.727167
+        ]
+      },
+      "id": "node/4693971289"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4972829162",
+        "highway": "motorway_junction",
+        "name": "箱崎PA",
+        "wikidata": "Q11603326",
+        "wikipedia": "ja:箱崎パーキングエリア"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.788931,
+          35.6825866
+        ]
+      },
+      "id": "node/4972829162"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5170541183",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6933049,
+          35.6902647
+        ]
+      },
+      "id": "node/5170541183"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5251905956",
+        "highway": "motorway_junction",
+        "name": "横浜町田IC"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.47675,
+          35.5086391
+        ]
+      },
+      "id": "node/5251905956"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5432829255",
+        "highway": "motorway_junction",
+        "name": "東領家",
+        "name:en": "Higashi-ryoke",
+        "name:ja-Hira": "ひがしりょうけ",
+        "ref": "S04"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7561356,
+          35.7907889
+        ]
+      },
+      "id": "node/5432829255"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5463281511",
+        "highway": "motorway_junction",
+        "name": "王子南",
+        "ref": "C33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7411066,
+          35.7527915
+        ]
+      },
+      "id": "node/5463281511"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5470031352",
+        "highway": "motorway_junction",
+        "name": "晴海",
+        "name:en": "Harumi",
+        "name:es": "Harumi",
+        "ref": "1002"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7825753,
+          35.6546181
+        ]
+      },
+      "id": "node/5470031352"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5470031356",
+        "highway": "motorway_junction",
+        "name": "晴海",
+        "name:en": "Harumi",
+        "name:es": "Harumi",
+        "ref": "1002"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7826955,
+          35.6542242
+        ]
+      },
+      "id": "node/5470031356"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5534805901",
+        "highway": "motorway_junction",
+        "name": "あきる野ＩＣ",
+        "name:en": "Akiruno IC",
+        "name:ja": "あきる野IC",
+        "name:ja-Hira": "あきるのいんたーちぇんじ",
+        "name:ja_rm": "Akiruno IC",
+        "official_name:en": "National Highway Route 468",
+        "ref": "42",
+        "source:name": "wikipedia",
+        "source:ref": "wikipedia",
+        "wikidata": "Q11257027",
+        "wikipedia": "ja:あきる野インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2842564,
+          35.7202783
+        ]
+      },
+      "id": "node/5534805901"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/5602284621",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.663758,
+          35.6128316
+        ]
+      },
+      "id": "node/5602284621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6067983625",
+        "amenity": "parking_entrance",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7317614,
+          35.6665307
+        ]
+      },
+      "id": "node/6067983625"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6195200085",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.3292049,
+          35.7274286
+        ]
+      },
+      "id": "node/6195200085"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6195200086",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4084633,
+          35.6875004
+        ]
+      },
+      "id": "node/6195200086"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6447380794",
+        "highway": "motorway_junction",
+        "name": "用賀",
+        "ref": "307"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6305978,
+          35.6266158
+        ]
+      },
+      "id": "node/6447380794"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6458437173",
+        "highway": "motorway_junction",
+        "name": "三宅坂ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.744299,
+          35.683879
+        ]
+      },
+      "id": "node/6458437173"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6534476215",
+        "highway": "motorway_junction",
+        "name": "大井JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7557543,
+          35.6105939
+        ]
+      },
+      "id": "node/6534476215"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6681511134",
+        "highway": "motorway_junction",
+        "name": "永福出口",
+        "name:en": "Eifuku exit",
+        "ref": "409"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.649777,
+          35.6699702
+        ]
+      },
+      "id": "node/6681511134"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6698927667",
+        "highway": "motorway_junction",
+        "name": "両国",
+        "name:en": "Ryogoku JCT",
+        "name:ja": "両国",
+        "name:ja-Hira": "りょうごく",
+        "source": "survey",
+        "source:name": "traffic_sign",
+        "survey:date": "2012-10-01",
+        "wikidata": "Q10891813",
+        "wikipedia": "ja:両国ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7886322,
+          35.6899716
+        ]
+      },
+      "id": "node/6698927667"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/6882442474",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "調布IC",
+        "name:en": "Chofu IC",
+        "name:ja": "調布IC",
+        "name:ja-Hira": "ちょうふいんたーちぇんじ",
+        "name:ja_rm": "Chōfu",
+        "ref": "3",
+        "wikipedia": "ja:調布インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.531175,
+          35.6595725
+        ]
+      },
+      "id": "node/6882442474"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7022713621",
+        "highway": "motorway_junction",
+        "name": "中環小松川入口",
+        "ref": "C45"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8641126,
+          35.6989875
+        ]
+      },
+      "id": "node/7022713621"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7107760409",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6091875,
+          35.6272537
+        ]
+      },
+      "id": "node/7107760409"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7107760424",
+        "highway": "motorway_junction",
+        "name": "東名JCT（仮称）",
+        "ref": "30"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5926679,
+          35.6371361
+        ]
+      },
+      "id": "node/7107760424"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7107824552",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6031933,
+          35.6252422
+        ]
+      },
+      "id": "node/7107824552"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7107981484",
+        "highway": "motorway_junction",
+        "name": "東名JCT",
+        "ref": "2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6028664,
+          35.6255216
+        ]
+      },
+      "id": "node/7107981484"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7107989696",
+        "highway": "motorway_junction",
+        "name": "東名JCT",
+        "ref": "2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.608817,
+          35.6267083
+        ]
+      },
+      "id": "node/7107989696"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108054289",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5981045,
+          35.7518057
+        ]
+      },
+      "id": "node/7108054289"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108100202",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.591409,
+          35.639556
+        ]
+      },
+      "id": "node/7108100202"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108120454",
+        "highway": "motorway_junction",
+        "name": "大泉IC/JCT",
+        "name:en": "Oizumi IC/JCT",
+        "name:es": "Salida Oizumi IC",
+        "name:ja": "大泉IC/JCT",
+        "name:ja-Hira": "おおいずみいんたーちぇんじ／じゃんくしょん",
+        "name:ja-Latn": "Oizumi Junction",
+        "ref": "50",
+        "wikidata": "Q8081529",
+        "wikipedia": "ja:大泉ジャンクション"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5993759,
+          35.7633867
+        ]
+      },
+      "id": "node/7108120454"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108632758",
+        "highway": "motorway_junction",
+        "name": "大泉JCT・目白通りIC（仮称）",
+        "ref": "50"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.597093,
+          35.7494248
+        ]
+      },
+      "id": "node/7108632758"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108632776",
+        "highway": "motorway_junction",
+        "name": "中央JCT・東八道路IC（仮称）",
+        "ref": "40"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5775987,
+          35.6645781
+        ]
+      },
+      "id": "node/7108632776"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108632778",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5777858,
+          35.6616505
+        ]
+      },
+      "id": "node/7108632778"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108644088",
+        "highway": "motorway_junction",
+        "name": "中央JCT・東八道路IC（仮称）",
+        "ref": "40"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5854562,
+          35.6846477
+        ]
+      },
+      "id": "node/7108644088"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108803829",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5862861,
+          35.6870265
+        ]
+      },
+      "id": "node/7108803829"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108805156",
+        "highway": "motorway_junction",
+        "name": "東八道路IC（仮称）"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5836067,
+          35.6774621
+        ]
+      },
+      "id": "node/7108805156"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108826548",
+        "highway": "motorway_junction",
+        "name": "目白通りIC（仮称）",
+        "ref": "42"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5981893,
+          35.7531429
+        ]
+      },
+      "id": "node/7108826548"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108836796",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.598354,
+          35.7563765
+        ]
+      },
+      "id": "node/7108836796"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108836800",
+        "highway": "motorway_junction",
+        "name": "目白通りIC（仮称）",
+        "ref": "42"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5984466,
+          35.7563972
+        ]
+      },
+      "id": "node/7108836800"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108930951",
+        "highway": "motorway_junction",
+        "name": "青梅街道IC（仮称）",
+        "ref": "41"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5920227,
+          35.7230163
+        ]
+      },
+      "id": "node/7108930951"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108930959",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5911545,
+          35.7321254
+        ]
+      },
+      "id": "node/7108930959"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108930960",
+        "highway": "motorway_junction",
+        "name": "青梅街道IC（仮称）",
+        "ref": "41"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5904596,
+          35.7299319
+        ]
+      },
+      "id": "node/7108930960"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7108930965",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5923713,
+          35.721958
+        ]
+      },
+      "id": "node/7108930965"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7111415496",
+        "highway": "motorway_junction",
+        "layer": "1",
+        "name": "高井戸IC",
+        "name:en": "Takaido IC",
+        "name:ja": "高井戸IC",
+        "name:ja-Hira": "たかいどいんたーちぇんじ",
+        "ref": "1",
+        "wikipedia": "ja:高井戸インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6047395,
+          35.6804894
+        ]
+      },
+      "id": "node/7111415496"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7119720207",
+        "highway": "motorway_junction",
+        "name": "小松川出口",
+        "name:en": "Komatsugawa",
+        "name:es": "Komatsugawa",
+        "name:ja": "小松川出口",
+        "ref": "703",
+        "wikidata": "Q10959115",
+        "wikipedia": "ja:小松川出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8636174,
+          35.6992607
+        ]
+      },
+      "id": "node/7119720207"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159015516",
+        "highway": "motorway_junction",
+        "name": "中央JCT・東八道路IC（仮称）",
+        "ref": "2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5876262,
+          35.6743035
+        ]
+      },
+      "id": "node/7159015516"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159015523",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5879896,
+          35.6745115
+        ]
+      },
+      "id": "node/7159015523"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159092802",
+        "highway": "motorway_junction",
+        "name": "中央JCT・東八道路IC（仮称）",
+        "ref": "2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5761722,
+          35.6733102
+        ]
+      },
+      "id": "node/7159092802"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159131690",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5760962,
+          35.673103
+        ]
+      },
+      "id": "node/7159131690"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159163179",
+        "highway": "motorway_junction",
+        "name": "東八道路IC（仮称）"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5810476,
+          35.6731194
+        ]
+      },
+      "id": "node/7159163179"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159201077",
+        "highway": "motorway_junction",
+        "name": "東八道路IC（仮称）"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5830499,
+          35.677273
+        ]
+      },
+      "id": "node/7159201077"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159280039",
+        "highway": "motorway_junction",
+        "name": "東八道路IC（仮称）"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5851712,
+          35.6811857
+        ]
+      },
+      "id": "node/7159280039"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7159280040",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5850522,
+          35.6811995
+        ]
+      },
+      "id": "node/7159280040"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7301483738",
+        "highway": "motorway_junction",
+        "name": "一之江",
+        "name:en": "Ichinoe",
+        "name:es": "Ichinoe",
+        "name:ja": "一之江",
+        "ref": "705",
+        "source": "survey",
+        "survey:date": "2012-10-01",
+        "wikidata": "Q10863798",
+        "wikipedia": "ja:一之江出入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8816883,
+          35.6973389
+        ]
+      },
+      "id": "node/7301483738"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7481980619",
+        "highway": "motorway_junction",
+        "name": "練馬IC",
+        "name:en": "Nerima IC",
+        "name:ja": "練馬IC",
+        "name:ja-Hira": "ねりまいんたーちぇんじ",
+        "ref": "1",
+        "wikidata": "Q6996247",
+        "wikipedia": "ja:練馬インターチェンジ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6068967,
+          35.7548052
+        ]
+      },
+      "id": "node/7481980619"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7549622953",
+        "highway": "motorway_junction",
+        "name": "大橋JCT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.6897659,
+          35.6540132
+        ]
+      },
+      "id": "node/7549622953"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7682073751",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7231331,
+          35.6323659
+        ]
+      },
+      "id": "node/7682073751"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/7777464386",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7650099,
+          32.4535076
+        ]
+      },
+      "id": "node/7777464386"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8022327185",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4856131,
+          35.7614453
+        ]
+      },
+      "id": "node/8022327185"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8022327385",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4919293,
+          35.7572551
+        ]
+      },
+      "id": "node/8022327385"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/8256670336",
+        "highway": "motorway_junction",
+        "name": "葛西ジャンクション",
+        "name:en": "Kasai",
+        "name:es": "Kasai",
+        "name:ja_rm": "Kasai jankushon",
+        "source": "survey",
+        "survey:date": "2012-10-01"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.8563908,
+          35.6464112
+        ]
+      },
+      "id": "node/8256670336"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10132686105",
+        "highway": "motorway_junction",
+        "name": "清洲橋出口",
+        "ref": "603",
+        "wikidata": "Q11561269",
+        "wikipedia": "ja:清洲橋出口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7887769,
+          35.6828845
+        ]
+      },
+      "id": "node/10132686105"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10711280805",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7456503,
+          35.6945327
+        ]
+      },
+      "id": "node/10711280805"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10711280905",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7434839,
+          35.6934596
+        ]
+      },
+      "id": "node/10711280905"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/10915496705",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7460242,
+          33.1242937
+        ]
+      },
+      "id": "node/10915496705"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11081664912",
+        "highway": "motorway_junction"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.4828297,
+          35.5051183
+        ]
+      },
+      "id": "node/11081664912"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11916225715",
+        "highway": "motorway_junction",
+        "name": "飯田橋",
+        "name:en": "Iidabashi",
+        "name:ja": "飯田橋",
+        "ref": "502"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7436263,
+          35.7067552
+        ]
+      },
+      "id": "node/11916225715"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11971584769",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          142.1561925,
+          26.6357778
+        ]
+      },
+      "id": "node/11971584769"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/11973982770",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          142.1960583,
+          27.0978944
+        ]
+      },
+      "id": "node/11973982770"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308879202",
+        "highway": "rest_area",
+        "name": "Shirobebashi green belt, Smoking area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.76693,
+          35.6754381
+        ]
+      },
+      "id": "node/12308879202"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308885701",
+        "highway": "rest_area",
+        "name": "Kaedegawa-Shintomibas Park, Smoking area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.772019,
+          35.6724884
+        ]
+      },
+      "id": "node/12308885701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308887101",
+        "highway": "rest_area",
+        "name:en": "Sukiyabashi Park, Smoking Area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.762073,
+          35.6725632
+        ]
+      },
+      "id": "node/12308887101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308887102",
+        "highway": "rest_area",
+        "name:en": "Ginzo Komazu (West 7F), Smoking Room"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7629961,
+          35.6702872
+        ]
+      },
+      "id": "node/12308887102"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308887702",
+        "highway": "rest_area",
+        "name:en": "Pocket of time, Ginza Smoking Room, 3F"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7642703,
+          35.6720543
+        ]
+      },
+      "id": "node/12308887702"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308894601",
+        "highway": "rest_area",
+        "name:en": "Ginza Six, 1F, Smoking Room"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7640102,
+          35.6695352
+        ]
+      },
+      "id": "node/12308894601"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308894602",
+        "highway": "rest_area",
+        "name:en": "Chuo City Ofiice, Smoking area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7721857,
+          35.6708312
+        ]
+      },
+      "id": "node/12308894602"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308897402",
+        "highway": "rest_area",
+        "name:en": "Tsukijigawa-Ginza Park, Smoking Area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7687022,
+          35.6686507
+        ]
+      },
+      "id": "node/12308897402"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308899101",
+        "highway": "rest_area",
+        "name:en": "Tsukijigawa-Iwaibashi Park, Smoking Area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7698192,
+          35.669516
+        ]
+      },
+      "id": "node/12308899101"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12308899701",
+        "highway": "rest_area",
+        "name:en": "Tsukijigawa kameibashi Park, Smoking area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7709156,
+          35.6704599
+        ]
+      },
+      "id": "node/12308899701"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12543298888",
+        "access": "yes",
+        "direction": "backward",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2314544,
+          35.6190762
+        ]
+      },
+      "id": "node/12543298888"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/12730449946",
+        "highway": "rest_area",
+        "name": "かしき谷園地"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.2466018,
+          35.6240736
+        ]
+      },
+      "id": "node/12730449946"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/13838191201",
+        "highway": "rest_area"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.5109779,
+          35.7160022
+        ]
+      },
+      "id": "node/13838191201"
+    }
+  ]
+}
