@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-// コマンドライン引数からファイル名を取得
+// コマンドライン引数からファイル名（パス）を取得
 const args = process.argv.slice(2);
 if (args.length === 0) {
   console.error('エラー: 処理対象のJSONファイルを指定してください。');
-  console.error('使用方法: node remove_ic.js <ファイル名>');
+  console.error('使用方法: node script/remove_ic.js <ファイルパス>');
   process.exit(1);
 }
 
@@ -16,7 +16,7 @@ if (!fs.existsSync(inputFile)) {
     process.exit(1);
 }
 
-// 出力ファイル名を自動生成 (例: kanto.json -> kanto_no_ic.json)
+// 出力ファイル名を生成 (例: json/KANAGAWA完成.json -> json/KANAGAWA完成_no_ic.json)
 const parsedPath = path.parse(inputFile);
 const outputFile = path.join(parsedPath.dir, `${parsedPath.name}_no_ic${parsedPath.ext}`);
 
