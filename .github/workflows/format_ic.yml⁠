@@ -20,7 +20,6 @@ jobs:
         with:
           node-version: '18'
 
-      # jsonディレクトリ内の指定されたファイルを処理
       - name: Run script to format IC GeoJSON
         run: node script/format_ic.js "json/${{ github.event.inputs.target_file }}"
 
