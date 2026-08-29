@@ -1,0 +1,97 @@
+name: Format IC GeoJSON
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_file:
+        description: '処理対象のGeoJSONファイル名（例: N06-25_Joint.geojson）'
+        required: true
+        default: 'N06-25_Joint.geojson'
+
+jobs:
+  format-ic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # ES Moduleとして script/format_ic.js を動的生成
+      - name: Create format_ic.js
+        run: |
+          mkdir -p script
+          cat << 'EOF' > script/format_ic.js
+          import fs from 'fs';
+          import path from 'path';
+          
+          const args = process.argv.slice(2);
+          if (args.length === 0) {
+            console.error('エラー: 処理対象のGeoJSONファイルを指定してください。');
+            process.exit(1);
+          }
+          
+          const inputFile = args[0];
+          
+          if (!fs.existsSync(inputFile)) {
+              console.error(`エラー: 指定されたファイルが見つかりません: ${inputFile}`);
+              process.exit(1);
+          }
+          
+          // 出力ファイル名を生成 (例: input.geojson -> input_formatted.json)
+          const parsedPath = path.parse(inputFile);
+          const outputFile = path.join(parsedPath.dir, `${parsedPath.name}_formatted.json`);
+          
+          try {
+            const rawData = fs.readFileSync(inputFile, 'utf-8');
+            const geojson = JSON.parse(rawData);
+          
+            if (!geojson.features || !Array.isArray(geojson.features)) {
+                console.error('エラー: 有効なGeoJSON形式（features配列）が見つかりません。');
+                process.exit(1);
+            }
+          
+            // スリム化処理
+            const formattedData = geojson.features.map(feature => {
+                const [lng, lat] = feature.geometry.coordinates;
+                const name = feature.properties.N06_018 || "名称不明";
+          
+                return {
+                    name: name,
+                    category: "IC",
+                    lat: lat,
+                    lng: lng
+                };
+            });
+          
+            fs.writeFileSync(outputFile, JSON.stringify(formattedData, null, 2), 'utf-8');
+          
+            console.log(`✅ スリム化処理完了`);
+            console.log(`- 元ファイル: ${inputFile}`);
+            console.log(`- 出力ファイル: ${outputFile}`);
+            console.log(`- 変換したデータ数: ${formattedData.length}件`);
+          
+          } catch (error) {
+            console.error('処理中にエラーが発生しました:', error);
+          }
+          EOF
+
+      # json/ディレクトリ内の指定されたファイルを処理
+      - name: Run script to format IC GeoJSON
+        run: node script/format_ic.js "json/${{ github.event.inputs.target_file }}"
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Chore: json/${{ github.event.inputs.target_file }} をスリム化"
+            git push
+          else
+            echo "変更がありませんでした。"
+          fi
