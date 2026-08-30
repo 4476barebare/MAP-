@@ -6,7 +6,6 @@ if (args.length < 2) {
   process.exit(1);
 }
 
-// YAMLから渡された引数を受け取る
 const inputFile = args[0];
 const outputFile = args[1];
 
@@ -24,26 +23,36 @@ try {
       process.exit(1);
   }
 
-  // 国交省データのプロパティ「N06_018」を名前として抽出
-  const formattedData = geojson.features.map(feature => {
-      const [lng, lat] = feature.geometry.coordinates;
-      const name = feature.properties.N06_018 || "名称不明";
+  // 関東周辺のおおよそのバウンディングボックス（緯度・経度）
+  const MIN_LAT = 34.8; // 南端（三浦半島・房総半島南端あたり）
+  const MAX_LAT = 37.2; // 北端（栃木・群馬の北端あたり）
+  const MIN_LNG = 138.3; // 西端（山梨・静岡の県境あたり）
+  const MAX_LNG = 141.0; // 東端（千葉・茨城の東端あたり）
 
-      return {
-          name: name,
-          category: "IC",
-          lat: lat,
-          lng: lng
-      };
+  const formattedData = [];
+
+  geojson.features.forEach(feature => {
+      const [lng, lat] = feature.geometry.coordinates;
+
+      // 指定した関東エリアの枠内に収まるものだけを抽出
+      if (lat >= MIN_LAT && lat <= MAX_LAT && lng >= MIN_LNG && lng <= MAX_LNG) {
+          const name = feature.properties.N06_018 || "名称不明";
+
+          formattedData.push({
+              name: name,
+              category: "IC",
+              lat: lat,
+              lng: lng
+          });
+      }
   });
 
-  // 指定された出力パスに保存
   fs.writeFileSync(outputFile, JSON.stringify(formattedData, null, 2), 'utf-8');
 
   console.log(`✅ 処理完了`);
   console.log(`- 入力: ${inputFile}`);
   console.log(`- 出力: ${outputFile}`);
-  console.log(`- 変換したデータ数: ${formattedData.length}件`);
+  console.log(`- 変換した関東圏のデータ数: ${formattedData.length}件`);
 
 } catch (error) {
   console.error('処理中にエラーが発生しました:', error);
