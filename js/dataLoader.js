@@ -1286,6 +1286,8 @@ function zoomToSpot(spot) {
     resetSpotLayers();
     clearSub2Weather();
     removeCrowdImage();
+    
+    testAccessInfo(spot);
 
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
@@ -2294,6 +2296,101 @@ function drawSmooth(ctx, pts) {
     ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p1.x, p1.y);
   }
 }
+
+// ==========================================
+// ★ アクセス情報算出ロジック (方位と距離を計算)
+// ==========================================
+function getBearing(lat1, lng1, lat2, lng2) {
+    const toRad = Math.PI / 180;
+    const toDeg = 180 / Math.PI;
+    const dLng = (lng2 - lng1) * toRad;
+    const y = Math.sin(dLng) * Math.cos(lat2 * toRad);
+    const x = Math.cos(lat1 * toRad) * Math.sin(lat2 * toRad) -
+              Math.sin(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.cos(dLng);
+    const bearing = Math.atan2(y, x) * toDeg;
+    return (bearing + 360) % 360; 
+}
+
+function getAngleDiff(b1, b2) {
+    let diff = Math.abs(b1 - b2);
+    if (diff > 180) diff = 360 - diff;
+    return diff;
+}
+
+function calcAccessInfo(spotLat, spotLng) {
+    if (!window.icData || window.icData.length === 0) return [];
+
+    const spotLatLng = L.latLng(spotLat, spotLng);
+    
+    // 全データに距離と方角を付与して距離順に並べ替え
+    const mappedData = window.icData.map(item => {
+        const itemLatLng = L.latLng(item.lat, item.lng);
+        const distance = spotLatLng.distanceTo(itemLatLng); // 単位: メートル
+        const bearing = getBearing(spotLat, spotLng, item.lat, item.lng);
+        return { ...item, distance, bearing };
+    });
+
+    mappedData.sort((a, b) => a.distance - b.distance);
+
+    // カテゴリごとに分類
+    const icList = mappedData.filter(d => d.category === 'IC');
+    const stationList = mappedData.filter(d => d.category === '駅');
+    const mallList = mappedData.filter(d => d.category === '商業施設' || d.category === '道の駅');
+
+    const results = [];
+    const firstIC = icList[0];
+    
+    if (firstIC) {
+        results.push(firstIC); // 1. 最寄りのIC
+        
+        if (firstIC.distance <= 15000) {
+            // パターンA: 15km以内なら「違う方角(90度以上)」にある2番目のIC
+            const secondIC = icList.find(ic => getAngleDiff(firstIC.bearing, ic.bearing) >= 90);
+            if (secondIC) results.push(secondIC);
+        } else {
+            // パターンB: 15km以上なら「最寄りの商業施設/道の駅」
+            if (mallList.length > 0) results.push(mallList[0]);
+        }
+    }
+    
+    // 3. 最寄り駅
+    if (stationList.length > 0) results.push(stationList[0]);
+
+    // テキストに変換
+    return results.map(item => {
+        const realDistKm = (item.distance * 1.35) / 1000; // 迂回率1.35倍
+        
+        if (item.category === '駅' && realDistKm < 2.0) {
+            const time = Math.round(realDistKm * 15);
+            return `🚶‍♂️ ${item.name}駅から徒歩 約${time}分`;
+        } else {
+            const time = Math.round(realDistKm * 1.5); // 車は時速40km想定
+            let icon = '🚗';
+            if (item.category === '商業施設') icon = '🛍️';
+            if (item.category === '道の駅') icon = '🅿️';
+            const suffix = item.category === 'IC' ? 'IC' : '';
+            return `${icon} ${item.name}${suffix}から約${time}分 (${realDistKm.toFixed(1)}km)`;
+        }
+    });
+}
+
+// ==========================================
+// ★ テスト用：デバッグ欄に出力する関数
+// ==========================================
+function testAccessInfo(spot) {
+    if (!spot || !spot.lat || !spot.lng) return;
+    
+    const accessTexts = calcAccessInfo(spot.lat, spot.lng);
+    
+    // デバッグに区切り線と一緒に出力
+    showdebug(`--- 📍 [${spot.name}] ---`);
+    if (accessTexts.length === 0) {
+        showdebug("該当する施設がありません");
+    } else {
+        accessTexts.forEach(text => showdebug(text));
+    }
+}
+
 
 function resetSpotLayers() {
 
