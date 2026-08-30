@@ -83,6 +83,13 @@
 
 </div>
 
+
+
+  <!-- 👇 ここに追加！ アクセス情報表示エリア (SEOを意識したsectionタグ) -->
+  <section class="access-info" id="accessInfoBox" aria-label="アクセス情報" style="display: none; background: rgba(0,0,0,0.7); color: #fff; padding: 10px; border-radius: 8px; margin: 10px; font-size: 14px; line-height: 1.6; z-index: 1000; position: relative;">
+      <!-- ここにJSで動的にリストが流し込まれます -->
+  </section>
+
 <section id="area-guide" class="collapsed-mode">
     <h1></h1>
 </section>
@@ -2199,6 +2206,9 @@ async function routeUpdate() {
     }
 }
 
+
+
+
 // ★ Region名の変換マッピング
 const REGION_MAP = {
     "関東地方": "KANTO",
@@ -2211,6 +2221,8 @@ function getRegionCode() {
     const q = url.searchParams.get('region');
     return REGION_MAP[q] || 'KANTO'; // デフォルトはKANTO
 }
+
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     
@@ -2256,6 +2268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // データが全て揃った後に描画系を起動
                     routeUpdate();
                     renderAreaGuide();
+                    loadICData();
                     
                     if (window.markerControl) {
                         window.markerControl.preloadShop01(shopUrl);
@@ -2274,6 +2287,57 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+// グローバルで保持
+window.icData = [];
+window.isIcLoaded = false;
+
+// 1. 初回アクセス時に非同期でロードし始める
+async function loadICData() {
+    try {
+        // パスは実際の環境に合わせてください
+        const res = await fetch('data/KANTO_geo.json'); 
+        if (res.ok) {
+            window.icData = await res.json();
+            window.isIcLoaded = true;
+            
+            // ロードが完了したらデバッグ関数で画面に表示
+            if (typeof showdebug === 'function') {
+                showdebug(`✅ ICデータロード完了: ${window.icData.length}件`);
+            } else {
+                console.log(`✅ ICデータロード完了: ${window.icData.length}件`);
+            }
+        }
+    } catch (err) {
+        console.error("ICデータのフェッチエラー:", err);
+        if (typeof showdebug === 'function') {
+            showdebug("❌ ICデータのロードに失敗しました");
+        }
+    }
+}
+
+// ==========================================
+// ★ 画面に文字を出すデバッグ用関数
+// ==========================================
+function showdebug(msg) {
+    let debugBox = document.getElementById('my-debug-box');
+    if (!debugBox) {
+        debugBox = document.createElement('div');
+        debugBox.id = 'my-debug-box';
+        debugBox.style.position = 'fixed';
+        debugBox.style.top = '10px';
+        debugBox.style.left = '10px';
+        debugBox.style.padding = '10px';
+        debugBox.style.background = 'rgba(0, 0, 0, 0.8)';
+        debugBox.style.color = '#00ff00';
+        debugBox.style.fontFamily = 'monospace';
+        debugBox.style.fontSize = '14px';
+        debugBox.style.zIndex = '999999';
+        debugBox.style.borderRadius = '5px';
+        debugBox.style.pointerEvents = 'none'; // クリックの邪魔にならないように
+        document.body.appendChild(debugBox);
+    }
+    debugBox.innerText = msg;
+}
 
 </script>
 
