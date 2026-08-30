@@ -1,22 +1,19 @@
 import fs from 'fs';
-import path from 'path';
 
 const args = process.argv.slice(2);
-if (args.length === 0) {
-  console.error('エラー: 処理対象のGeoJSONファイルを指定してください。');
-  console.error('使用方法: node script/format_ic.js <ファイル名>');
+if (args.length < 2) {
+  console.error('エラー: 処理対象の入力ファイルと出力ファイルを指定してください。');
   process.exit(1);
 }
 
+// YAMLから渡された引数を受け取る
 const inputFile = args[0];
+const outputFile = args[1];
 
 if (!fs.existsSync(inputFile)) {
     console.error(`エラー: 指定されたファイルが見つかりません: ${inputFile}`);
     process.exit(1);
 }
-
-const parsedPath = path.parse(inputFile);
-const outputFile = path.join(parsedPath.dir, `${parsedPath.name}_formatted.json`);
 
 try {
   const rawData = fs.readFileSync(inputFile, 'utf-8');
@@ -27,6 +24,7 @@ try {
       process.exit(1);
   }
 
+  // 国交省データのプロパティ「N06_018」を名前として抽出
   const formattedData = geojson.features.map(feature => {
       const [lng, lat] = feature.geometry.coordinates;
       const name = feature.properties.N06_018 || "名称不明";
@@ -39,11 +37,12 @@ try {
       };
   });
 
+  // 指定された出力パスに保存
   fs.writeFileSync(outputFile, JSON.stringify(formattedData, null, 2), 'utf-8');
 
-  console.log(`✅ スリム化処理完了`);
-  console.log(`- 元ファイル: ${inputFile}`);
-  console.log(`- 出力ファイル: ${outputFile}`);
+  console.log(`✅ 処理完了`);
+  console.log(`- 入力: ${inputFile}`);
+  console.log(`- 出力: ${outputFile}`);
   console.log(`- 変換したデータ数: ${formattedData.length}件`);
 
 } catch (error) {
