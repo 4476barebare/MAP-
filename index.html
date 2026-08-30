@@ -2335,7 +2335,10 @@ function showdebug(msg) {
         debugBox.style.pointerEvents = 'none'; // クリックの邪魔にならないように
         document.body.appendChild(debugBox);
     }
-    debugBox.innerText = msg;
+
+    // 変更後（改行タグを入れて下に追記していく）
+    debugBox.innerHTML += msg + '<br>';
+
 }
 
 </script>
