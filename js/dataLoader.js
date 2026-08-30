@@ -1287,7 +1287,7 @@ function zoomToSpot(spot) {
     clearSub2Weather();
     removeCrowdImage();
     
-    testAccessInfo(spot);
+    renderAccessInfo(spot);
 
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
@@ -2403,21 +2403,42 @@ function calcAccessInfo(spotLat, spotLng) {
 }
 
 // ==========================================
-// ★ テスト用：デバッグ欄に出力する関数
+// ★ 本番用：アクセス情報をHTML(DOM)に書き出す関数
 // ==========================================
-function testAccessInfo(spot) {
-    if (!spot || !spot.lat || !spot.lng) return;
-    
-    // 区切り線
-    showdebug(`\n--- 📍 [${spot.name}] をクリックしました ---`);
-    
+function renderAccessInfo(spot) {
+    const container = document.getElementById('accessInfoBox');
+    if (!container || !spot || !spot.lat || !spot.lng) {
+        if (container) container.style.display = 'none';
+        return;
+    }
+
+    // 先ほど完成した計算ロジックを実行
     const accessTexts = calcAccessInfo(spot.lat, spot.lng);
-    
-    showdebug(`--- 🎯 最終的に画面に表示される結果 ---`);
+
+    // 該当データがない場合は非表示にする
     if (accessTexts.length === 0) {
-        showdebug("該当する施設がありません");
-    } else {
-        accessTexts.forEach(text => showdebug(text));
+        container.style.display = 'none';
+        return;
+    }
+
+    // HTMLを組み立てる（CSSに合わせた構造）
+    let html = '<h3>周辺アクセス情報</h3>';
+    html += '<ul>';
+    accessTexts.forEach(text => {
+        html += `<li>${text}</li>`;
+    });
+    html += '</ul>';
+
+    container.innerHTML = html;
+    container.style.display = 'block'; // 準備ができたら表示！
+}
+
+// 画面を戻る（広域マップに戻る）時などに枠を隠す用
+function clearAccessInfo() {
+    const container = document.getElementById('accessInfoBox');
+    if (container) {
+        container.innerHTML = '';
+        container.style.display = 'none';
     }
 }
 
@@ -2570,6 +2591,7 @@ function goBack() {
 
         removeWeekItem();
         resetWeatherUI();
+        clearAccessInfo();
 
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
