@@ -2225,7 +2225,7 @@ function getRegionCode() {
 
 
 document.addEventListener('DOMContentLoaded', async () => {
-    
+    loadICData();
     const params = new URLSearchParams(window.location.search);
     
     // 1. 基本Regionの決定
@@ -2268,7 +2268,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // データが全て揃った後に描画系を起動
                     routeUpdate();
                     renderAreaGuide();
-                    loadICData();
                     
                     if (window.markerControl) {
                         window.markerControl.preloadShop01(shopUrl);
