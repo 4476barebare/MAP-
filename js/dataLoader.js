@@ -2410,7 +2410,8 @@ function renderAccessInfo(spot) {
         return;
     }
 
-    let html = '<h3>周辺アクセス情報</h3>';
+    // 🎯 改良：見出しにスポット名を挿入
+    let html = `<h3>${spot.name}の周辺アクセス情報</h3>`;
     html += '<ul>';
     accessTexts.forEach(text => {
         html += `<li>${text}</li>`;
@@ -2428,8 +2429,6 @@ function clearAccessInfo() {
         container.style.display = 'none';
     }
 }
-
-
 
 
 function resetSpotLayers() {
