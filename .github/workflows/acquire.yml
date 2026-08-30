@@ -3,7 +3,7 @@ name: Acquire Crowd Images
 on:
   workflow_dispatch:
   schedule:
-    - cron: '29 6,18 * * *'
+    - cron: '29 21,9 * * *'
       #timezone: 'Asia/Tokyo' # 🌟 日本時間の 06:15 と 18:15 にそのまま発火します
 
 # 🌟 追加: デプロイの渋滞エラーを防止する安全装置
