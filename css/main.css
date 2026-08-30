@@ -531,6 +531,43 @@ li {
   display: block;
 }
 
+/* =========================
+   アクセス情報（エリアガイド直上）
+========================= */
+#accessInfoBox {
+    display: none; /* 初期は非表示 */
+    background: #fff;
+    padding: 15px 16px 0 16px; /* 下にあるエリアガイドとシームレスに繋げる */
+    color: #191970;
+}
+
+#accessInfoBox h3 {
+    font-size: 16px;
+    color: #191970;
+    margin: 0 0 12px 0;
+    padding-left: 10px;
+    border-left: 4px solid #191970; /* エリアガイドと同じ左線デザイン */
+}
+
+#accessInfoBox ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#accessInfoBox li {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(25, 25, 112, 0.2); /* 控えめな区切り線 */
+}
+
+#accessInfoBox li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
 
 /* =========================
    エリアガイド全体
