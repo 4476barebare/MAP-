@@ -1732,6 +1732,10 @@ function renderAreaGuide() {
                 if (typeof resetWeatherUI === 'function') resetWeatherUI();
                 if (typeof clearSub2Weather === 'function') clearSub2Weather();
                 
+                // 👇 【ここに追加】エリア移動時にアクセス情報を必ず閉じる
+                if (typeof clearAccessInfo === 'function') clearAccessInfo();
+
+                
                 const nearest = document.getElementById("nearest-spot");
                 if (nearest) nearest.textContent = "";
 
@@ -2302,15 +2306,15 @@ async function loadICData() {
             
             // ロードが完了したらデバッグ関数で画面に表示
             if (typeof showdebug === 'function') {
-                showdebug(`✅ ICデータロード完了: ${window.icData.length}件`);
+                //showdebug(`✅ ICデータロード完了: ${window.icData.length}件`);
             } else {
-                console.log(`✅ ICデータロード完了: ${window.icData.length}件`);
+                //console.log(`✅ ICデータロード完了: ${window.icData.length}件`);
             }
         }
     } catch (err) {
-        console.error("ICデータのフェッチエラー:", err);
+        //console.error("ICデータのフェッチエラー:", err);
         if (typeof showdebug === 'function') {
-            showdebug("❌ ICデータのロードに失敗しました");
+            //showdebug("❌ ICデータのロードに失敗しました");
         }
     }
 }
