@@ -238,7 +238,7 @@ window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
 // ==========================================
-// ★ タイトル・メタタグ動的更新関数（完全版：SEO・魚種連動・マップalt・JSON-LD対応）
+// ★ タイトル・メタタグ動的更新関数（連携版）
 // ==========================================
 function updateSeoMeta() {
     const params = new URLSearchParams(window.location.search);
@@ -251,7 +251,6 @@ function updateSeoMeta() {
     let newDesc  = "釣り行こNAVIは、釣りスポットを空撮地図で探せる情報サイトです。エリア別に釣りポイントを簡単に確認できます。";
     const currentUrl = window.location.origin + window.location.pathname + window.location.search;
     
-    // マップ用の代替テキスト（alt）の初期値
     let mapAltText = "関東地方の釣りスポット空撮マップ";
     let targetSpot = null;
 
@@ -277,6 +276,12 @@ function updateSeoMeta() {
                 
                 // 重複を削除して文字列化
                 const uniqueNames = [...new Set(names)];
+                
+                // 👇 【ここに追加】抽出完了後、新しいfunctionを呼び出して発火！
+                if (typeof renderFishSection === 'function') {
+                    renderFishSection(uniqueNames);
+                }
+
                 if (uniqueNames.length > 0) {
                     extraInfo += `対象魚や周辺情報: ${uniqueNames.join('、')}など。`;
                 }
@@ -317,20 +322,18 @@ function updateSeoMeta() {
     // --------------------------------------------------
     const mapContainer = document.getElementById('lf-map');
     if (mapContainer) {
-        mapContainer.setAttribute('role', 'region'); // 意味のある領域として宣言
+        mapContainer.setAttribute('role', 'region');
         mapContainer.setAttribute('aria-label', mapAltText);
     }
 
     // --------------------------------------------------
     // ■ 構造化データ（JSON-LD）の動的生成と更新
     // --------------------------------------------------
-    // まず、過去のJSON-LDスクリプトが残っていれば削除
     let oldScript = document.getElementById('seo-json-ld');
     if (oldScript) {
         oldScript.remove();
     }
 
-    // スポット画面であり、かつ緯度経度のデータが揃っている場合のみJSON-LDを生成
     if (targetSpot && targetSpot.lat && targetSpot.lng) {
         const jsonLdData = {
             "@context": "https://schema.org",
@@ -344,7 +347,6 @@ function updateSeoMeta() {
             }
         };
 
-        // 新しいscriptタグを作ってheadの最後に流し込む
         const script = document.createElement('script');
         script.setAttribute('type', 'application/ld+json');
         script.setAttribute('id', 'seo-json-ld');
@@ -352,6 +354,7 @@ function updateSeoMeta() {
         document.head.appendChild(script);
     }
 }
+
 
 
 
@@ -2317,6 +2320,33 @@ async function loadICData() {
             //showdebug("❌ ICデータのロードに失敗しました");
         }
     }
+}
+
+// ==========================================
+// ★ 新規：対象魚種データを描画する関数
+// ==========================================
+function renderFishSection(uniqueNames) {
+    const accessBox = document.getElementById('accessInfoBox');
+    if (!accessBox) return;
+
+    // 既存の魚種エリアがあれば削除（重複防止）
+    const oldFishArea = document.getElementById('spot-fish-section');
+    if (oldFishArea) oldFishArea.remove();
+
+    if (!uniqueNames || uniqueNames.length === 0) return;
+
+    // 魚種表示用のコンテナを生成
+    const fishDiv = document.createElement('div');
+    fishDiv.id = 'spot-fish-section';
+    fishDiv.style.marginTop = '12px';
+    fishDiv.style.paddingTop = '10px';
+    fishDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
+
+    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🐟 主な対象魚・周辺情報</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">${uniqueNames.join('、')}</div>`;
+
+    fishDiv.innerHTML = html;
+    accessBox.appendChild(fishDiv);
 }
 
 // ==========================================
