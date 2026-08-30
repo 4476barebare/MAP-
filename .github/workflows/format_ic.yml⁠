@@ -3,35 +3,40 @@ name: Format IC GeoJSON
 on:
   workflow_dispatch:
     inputs:
-      target_file:
-        description: '処理対象のGeoJSONファイル名（例: N06-25_Joint.geojson）'
+      input_file:
+        description: '変換元のGeoJSONファイルパス (例: json/N06-25_Joint.geojson)'
         required: true
-        default: 'N06-25_Joint.geojson'
+        default: 'json/N06-25_Joint.geojson'
+      output_file:
+        description: '出力するJSONファイルパス (例: json/IC_formatted.json)'
+        required: true
+        default: 'json/IC_formatted.json'
 
 jobs:
-  format-ic:
+  format_json:
     runs-on: ubuntu-latest
+
     steps:
+      # リポジトリのコードをチェックアウト
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Node.jsの環境をセットアップ
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Run script to format IC GeoJSON
-        run: node script/format_ic.js "json/${{ github.event.inputs.target_file }}"
+      # 変換スクリプトを実行 (指定されたパスを引数として渡す)
+      - name: Run conversion script
+        run: |
+          node script/format_ic.js "${{ github.event.inputs.input_file }}" "${{ github.event.inputs.output_file }}"
 
+      # 変更されたファイルをコミットしてプッシュ
       - name: Commit and push changes
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          
-          if ! git diff-index --quiet HEAD; then
-            git commit -m "Chore: json/${{ github.event.inputs.target_file }} をスリム化"
-            git push
-          else
-            echo "変更がありませんでした。"
-          fi
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add "${{ github.event.inputs.output_file }}"
+          git commit -m "Auto-format: formatted ${{ github.event.inputs.input_file }}" || echo "No changes to commit"
+          git push
