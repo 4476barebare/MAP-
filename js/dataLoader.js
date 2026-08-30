@@ -2325,14 +2325,14 @@ function calcAccessInfo(spotLat, spotLng) {
     // 全データに距離と方角を付与して距離順に並べ替え
     const mappedData = window.icData.map(item => {
         const itemLatLng = L.latLng(item.lat, item.lng);
-        const distance = spotLatLng.distanceTo(itemLatLng); // 単位: メートル
+        const distance = spotLatLng.distanceTo(itemLatLng);
         const bearing = getBearing(spotLat, spotLng, item.lat, item.lng);
         return { ...item, distance, bearing };
     });
 
     mappedData.sort((a, b) => a.distance - b.distance);
 
-    // カテゴリごとに分類（完全一致ではなく、部分一致で柔軟に拾う）
+    // カテゴリごとに分類
     const icList = mappedData.filter(d => d.category && d.category.includes('IC'));
     const stationList = mappedData.filter(d => d.category && d.category.includes('駅'));
     const mallList = mappedData.filter(d => d.category && (d.category.includes('商業') || d.category.includes('道の駅')));
@@ -2341,57 +2341,59 @@ function calcAccessInfo(spotLat, spotLng) {
     const firstIC = icList[0];
     
     if (firstIC) {
-        // 1. 何が何でも最寄りのICを1件目に突っ込む
-        results.push(firstIC); 
-        showdebug(`[内部処理] 1件目確定: 最寄りIC -> ${firstIC.name} (直線 ${Math.round(firstIC.distance)}m)`);
+        results.push(firstIC); // 1件目: 最寄りIC
+        showdebug(`[内部処理] 1件目確定: 最寄りIC -> ${firstIC.name}`);
         
         if (firstIC.distance <= 15000) {
-            // パターンA: 15km以内なら「違う方角(90度以上)」にある2番目のIC
-            showdebug(`[内部処理] 分岐A: 最寄りICが15km以内のため、違う方角のICを探します...`);
             const secondIC = icList.find(ic => getAngleDiff(firstIC.bearing, ic.bearing) >= 90);
-            
             if (secondIC) {
-                results.push(secondIC);
-                showdebug(`[内部処理] 2件目確定: 違う方角のIC -> ${secondIC.name} (角度差 ${Math.round(getAngleDiff(firstIC.bearing, secondIC.bearing))}度)`);
-            } else {
-                showdebug(`[内部処理] 2件目スキップ: 角度差90度以上のICが見つかりませんでした`);
+                results.push(secondIC); // 2件目: 別方角のIC
+                showdebug(`[内部処理] 2件目確定: 違う方角のIC -> ${secondIC.name}`);
             }
         } else {
-            // パターンB: 15km以上なら「最寄りの商業施設/道の駅」
-            showdebug(`[内部処理] 分岐B: 最寄りICが遠い(15km以上)ため、買い出し拠点を優先します...`);
             if (mallList.length > 0) {
-                results.push(mallList[0]);
-                showdebug(`[内部処理] 2件目確定: 商業施設/道の駅 -> ${mallList[0].name} (直線 ${Math.round(mallList[0].distance)}m)`);
-            } else {
-                showdebug(`[内部処理] 2件目スキップ: 近くに商業施設がありませんでした`);
+                results.push(mallList[0]); // 2件目: 商業施設/道の駅
+                showdebug(`[内部処理] 2件目確定: 商業施設 -> ${mallList[0].name}`);
             }
         }
-    } else {
-        showdebug(`[内部処理] ⚠️異常: データにICが1件も存在しません！`);
     }
     
-    // 3. 最寄り駅
+    // 3件目: 最寄り駅
     if (stationList.length > 0) {
         results.push(stationList[0]);
-        showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${stationList[0].name} (直線 ${Math.round(stationList[0].distance)}m)`);
-    } else {
-        showdebug(`[内部処理] 3件目スキップ: 近くに駅がありませんでした`);
+        showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${stationList[0].name}`);
     }
 
-    // テキストに変換
+    // ★ 改良：テキストとアイコンの変換
     return results.map(item => {
         const realDistKm = (item.distance * 1.35) / 1000; // 迂回率1.35倍
         
-        if (item.category === '駅' && realDistKm < 2.0) {
-            const time = Math.round(realDistKm * 15);
-            return `🚶‍♂️ ${item.name}駅から徒歩 約${time}分`;
+        // 名前にカテゴリを補完（「昭和島」->「昭和島駅」にするため）
+        let displayName = item.name;
+        if (item.category === '駅' && !displayName.endsWith('駅')) {
+            displayName += '駅';
+        } else if (item.category === 'IC' && !displayName.includes('IC')) {
+            displayName += 'IC';
+        }
+
+        if (item.category === '駅') {
+            if (realDistKm < 2.0) {
+                const time = Math.round(realDistKm * 15);
+                return `🚶‍♂️ ${displayName}から徒歩 約${time}分`;
+            } else {
+                const time = Math.round(realDistKm * 1.5);
+                return `🚉 ${displayName}から車で 約${time}分 (${realDistKm.toFixed(1)}km)`;
+            }
+        } else if (item.category === '商業施設') {
+            const time = Math.round(realDistKm * 1.5);
+            return `🛍️ ${displayName}から車で 約${time}分 (${realDistKm.toFixed(1)}km)`;
+        } else if (item.category === '道の駅') {
+            const time = Math.round(realDistKm * 1.5);
+            return `🅿️ ${displayName}から車で 約${time}分 (${realDistKm.toFixed(1)}km)`;
         } else {
-            const time = Math.round(realDistKm * 1.5); // 車は時速40km想定
-            let icon = '🚗';
-            if (item.category === '商業施設') icon = '🛍️';
-            if (item.category === '道の駅') icon = '🅿️';
-            const suffix = item.category === 'IC' ? 'IC' : '';
-            return `${icon} ${item.name}${suffix}から約${time}分 (${realDistKm.toFixed(1)}km)`;
+            // ICの場合
+            const time = Math.round(realDistKm * 1.5);
+            return `🚗 ${displayName}から約${time}分 (${realDistKm.toFixed(1)}km)`;
         }
     });
 }
