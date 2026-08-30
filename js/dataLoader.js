@@ -2342,18 +2342,18 @@ function calcAccessInfo(spotLat, spotLng) {
     
     if (firstIC) {
         results.push(firstIC); // 1件目: 最寄りIC
-        showdebug(`[内部処理] 1件目確定: 最寄りIC -> ${firstIC.name}`);
+        //showdebug(`[内部処理] 1件目確定: 最寄りIC -> ${firstIC.name}`);
         
         if (firstIC.distance <= 15000) {
             const secondIC = icList.find(ic => getAngleDiff(firstIC.bearing, ic.bearing) >= 90);
             if (secondIC) {
                 results.push(secondIC); // 2件目: 別方角のIC
-                showdebug(`[内部処理] 2件目確定: 違う方角のIC -> ${secondIC.name}`);
+                //showdebug(`[内部処理] 2件目確定: 違う方角のIC -> ${secondIC.name}`);
             }
         } else {
             if (mallList.length > 0) {
                 results.push(mallList[0]); // 2件目: 商業施設/道の駅
-                showdebug(`[内部処理] 2件目確定: 商業施設 -> ${mallList[0].name}`);
+                //showdebug(`[内部処理] 2件目確定: 商業施設 -> ${mallList[0].name}`);
             }
         }
     }
@@ -2367,9 +2367,9 @@ function calcAccessInfo(spotLat, spotLng) {
         // 徒歩15分以内なら採用、それ以上なら除外して表示しない
         if (walkTime <= 15) {
             results.push(nearestStation);
-            showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${nearestStation.name} (徒歩${walkTime}分)`);
+            //showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${nearestStation.name} (徒歩${walkTime}分)`);
         } else {
-            showdebug(`[内部処理] 3件目スキップ: 最寄り駅(${nearestStation.name})が徒歩15分以上(${walkTime}分)のため除外`);
+            //showdebug(`[内部処理] 3件目スキップ: 最寄り駅(${nearestStation.name})が徒歩15分以上(${walkTime}分)のため除外`);
         }
     }
 
