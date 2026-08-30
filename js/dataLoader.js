@@ -2475,7 +2475,7 @@ function renderShopSection(spot) {
     shopDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
 
     let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🎣 最寄りの釣具店</div>`;
-    html += `<div style="font-size: 13px; line-height: 1.5;">${shopName} から車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">${shopName} まで車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
 
     shopDiv.innerHTML = html;
     accessBox.appendChild(shopDiv);
