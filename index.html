@@ -2335,6 +2335,12 @@ function renderFishSection(uniqueNames) {
 
     if (!uniqueNames || uniqueNames.length === 0) return;
 
+    // 👇 【ここを追加】全角カタカナ（と長音符）のみにフィルターし、周辺施設などを弾く
+    const fishOnly = uniqueNames.filter(name => /^[ァ-ヴー]+$/.test(name));
+
+    // 魚種が1つも残らなかった場合は表示せずに終了
+    if (fishOnly.length === 0) return;
+
     // 魚種表示用のコンテナを生成
     const fishDiv = document.createElement('div');
     fishDiv.id = 'spot-fish-section';
@@ -2342,8 +2348,9 @@ function renderFishSection(uniqueNames) {
     fishDiv.style.paddingTop = '10px';
     fishDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
 
-    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🐟 主な対象魚・周辺情報</div>`;
-    html += `<div style="font-size: 13px; line-height: 1.5;">${uniqueNames.join('、')}</div>`;
+    // タイトルを「主な対象魚・周辺情報」から「主な対象魚」へ変更
+    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🐟 主な対象魚</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">${fishOnly.join('、')}</div>`;
 
     fishDiv.innerHTML = html;
     accessBox.appendChild(fishDiv);
