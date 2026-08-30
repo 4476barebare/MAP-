@@ -2410,7 +2410,6 @@ function renderAccessInfo(spot) {
         return;
     }
 
-    // 🎯 改良：見出しにスポット名を挿入
     let html = `<h3>${spot.name}の周辺アクセス情報</h3>`;
     html += '<ul>';
     accessTexts.forEach(text => {
@@ -2420,6 +2419,66 @@ function renderAccessInfo(spot) {
 
     container.innerHTML = html;
     container.style.display = 'block';
+
+    // 👇 【ここに追加】アクセス情報を描画した直後に「最寄り釣具店」も追加描画する
+    if (typeof renderShopSection === 'function') {
+        renderShopSection(spot);
+    }
+}
+
+
+// ==========================================
+// ★ 新規：最寄りの釣具店を描画する関数
+// ==========================================
+function renderShopSection(spot) {
+    const accessBox = document.getElementById('accessInfoBox');
+    if (!accessBox || !spot || !spot.lat || !spot.lng) return;
+
+    // 既存の釣具店エリアがあれば削除（重複防止）
+    const oldShopArea = document.getElementById('spot-shop-section');
+    if (oldShopArea) oldShopArea.remove();
+
+    // ショップデータがまだ無い場合は終了
+    if (!window.markerControl || !window.markerControl.allShops || window.markerControl.allShops.length === 0) return;
+
+    const spotLatLng = L.latLng(spot.lat, spot.lng);
+
+    // ★ 100円均一(shop4)を除外し、緯度経度が正常な店舗だけを抽出
+    const validShops = window.markerControl.allShops.filter(s => s.icon !== 'shop4' && !isNaN(s.lat) && !isNaN(s.lng));
+    
+    // 対象店舗がない場合は終了
+    if (validShops.length === 0) return;
+
+    // 距離を計算して近い順に並び替え
+    const shopsWithDist = validShops.map(s => {
+        const dist = spotLatLng.distanceTo(L.latLng(s.lat, s.lng));
+        return { ...s, distance: dist };
+    });
+    
+    shopsWithDist.sort((a, b) => a.distance - b.distance);
+    
+    // 一番近い店舗を取得して時間を計算（車で時速40km想定）
+    const nearestShop = shopsWithDist[0];
+    const realDistKm = (nearestShop.distance * 1.35) / 1000;
+    const time = Math.round(realDistKm * 1.5); 
+    
+    // 店舗名（キャスティングや上州屋などのグループ名があればくっつける）
+    const shopName = nearestShop.group && nearestShop.group !== '個人商店' && nearestShop.group !== 'shop'
+        ? `${nearestShop.group} ${nearestShop.name}`
+        : nearestShop.name;
+
+    // HTML組み立て
+    const shopDiv = document.createElement('div');
+    shopDiv.id = 'spot-shop-section';
+    shopDiv.style.marginTop = '12px';
+    shopDiv.style.paddingTop = '10px';
+    shopDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
+
+    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🎣 最寄りの釣具店</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">${shopName} から車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
+
+    shopDiv.innerHTML = html;
+    accessBox.appendChild(shopDiv);
 }
 
 function clearAccessInfo() {

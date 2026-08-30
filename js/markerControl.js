@@ -1,12 +1,13 @@
 window.markerControl = {
     shop01Cache: {},
     shop01AreaCache: {},
+    allShops: [] // ★ 新規追加：距離計算用に全店舗をここにプールする
 };
 
 function preloadShop01(url) {
-    if (markerControl.shop01Cache[url]) return;
+    if (markerControl.shop01Cache[url]) return Promise.resolve(); // ★ Promiseを返すように変更
 
-    fetch(url)
+    return fetch(url)
         .then(res => res.text())
         .then(text => {
             const lines = text.trim().split('\n');
@@ -25,6 +26,9 @@ function preloadShop01(url) {
                 };
             });
 
+            // 👇 【ここを追加】パースした店舗データを全店舗リストに合流させる
+            markerControl.allShops = markerControl.allShops.concat(parsed);
+
             parsed.forEach(r => {
                 const key = r.areaId;
 
@@ -38,6 +42,7 @@ function preloadShop01(url) {
             markerControl.shop01Cache[url] = true;
         });
 }
+
 
 // -----------------------
 // phase1
