@@ -2322,7 +2322,7 @@ function calcAccessInfo(spotLat, spotLng) {
 
     const spotLatLng = L.latLng(spotLat, spotLng);
     
-    // 全データに距離と方角を付与して距離順に並べ替え
+    // 1. 全データに距離と方角を付与して「距離が近い順」に並べ替え
     const mappedData = window.icData.map(item => {
         const itemLatLng = L.latLng(item.lat, item.lng);
         const distance = spotLatLng.distanceTo(itemLatLng);
@@ -2332,48 +2332,73 @@ function calcAccessInfo(spotLat, spotLng) {
 
     mappedData.sort((a, b) => a.distance - b.distance);
 
-    // カテゴリごとに分類
+    // 2. カテゴリごとに分類
     const icList = mappedData.filter(d => d.category && d.category.includes('IC'));
     const stationList = mappedData.filter(d => d.category && d.category.includes('駅'));
     const mallList = mappedData.filter(d => d.category && (d.category.includes('商業') || d.category.includes('道の駅')));
 
     const results = [];
+    
+    // ★ 3. 最寄りのICを抽出（絶対に1件目に表示させる）
     const firstIC = icList[0];
     
     if (firstIC) {
-        results.push(firstIC); // 1件目: 最寄りIC
-        //showdebug(`[内部処理] 1件目確定: 最寄りIC -> ${firstIC.name}`);
+        results.push(firstIC); // 【確定】1件目にICを入れる
+        if (typeof showdebug === 'function') showdebug(`[内部処理] 1件目確定: 最寄りIC -> ${firstIC.name} (直線 ${Math.round(firstIC.distance)}m)`);
         
+        // ★ 4. 2件目の判定
         if (firstIC.distance <= 15000) {
+            if (typeof showdebug === 'function') showdebug(`[内部処理] 分岐A: 違う方角のICを探します...`);
+            
+            // 1件目と角度が90度以上違うICを探す
             const secondIC = icList.find(ic => getAngleDiff(firstIC.bearing, ic.bearing) >= 90);
-            if (secondIC) {
-                results.push(secondIC); // 2件目: 別方角のIC
-                //showdebug(`[内部処理] 2件目確定: 違う方角のIC -> ${secondIC.name}`);
+            
+            // ★ 追加ガード：2つ目のICが、1つ目より20km(20000m)以上遠ければ不採用とする
+            if (secondIC && (secondIC.distance - firstIC.distance) < 20000) {
+                results.push(secondIC); // 【確定】2件目に別方角のICを入れる
+                if (typeof showdebug === 'function') showdebug(`[内部処理] 2件目確定: 違う方角のIC -> ${secondIC.name}`);
+            } else {
+                if (secondIC) {
+                    if (typeof showdebug === 'function') showdebug(`[内部処理] 2件目破棄: ${secondIC.name} は1件目より20km以上遠いため除外します`);
+                } else {
+                    if (typeof showdebug === 'function') showdebug(`[内部処理] 2件目変更: 角度差90度以上のICが見つかりませんでした`);
+                }
+                
+                // 【代替】代わりに商業施設・道の駅を入れる
+                if (mallList.length > 0) {
+                    results.push(mallList[0]);
+                    if (typeof showdebug === 'function') showdebug(`[内部処理] 2件目確定(代替): 商業施設/道の駅 -> ${mallList[0].name}`);
+                } else {
+                    if (typeof showdebug === 'function') showdebug(`[内部処理] 2件目スキップ: 代わりの商業施設もありませんでした`);
+                }
             }
         } else {
+            if (typeof showdebug === 'function') showdebug(`[内部処理] 分岐B: 最寄りICが遠いため、買い出し拠点を優先します...`);
+            
             if (mallList.length > 0) {
-                results.push(mallList[0]); // 2件目: 商業施設/道の駅
-                //showdebug(`[内部処理] 2件目確定: 商業施設 -> ${mallList[0].name}`);
+                results.push(mallList[0]); // 【確定】2件目に商業施設を入れる
+                if (typeof showdebug === 'function') showdebug(`[内部処理] 2件目確定: 商業施設/道の駅 -> ${mallList[0].name}`);
+            } else {
+                if (typeof showdebug === 'function') showdebug(`[内部処理] 2件目スキップ: 近くに商業施設がありませんでした`);
             }
         }
     }
     
-    // ★ 3件目: 最寄り駅（徒歩15分以内のみ表示するガードを追加）
+    // ★ 5. 3件目の判定（最寄り駅：徒歩15分以内のみ）
     if (stationList.length > 0) {
         const nearestStation = stationList[0];
-        const realDistKm = (nearestStation.distance * 1.35) / 1000; // 迂回率1.35倍
-        const walkTime = Math.round(realDistKm * 15); // 時速4km = 1km15分
+        const realDistKm = (nearestStation.distance * 1.35) / 1000;
+        const walkTime = Math.round(realDistKm * 15);
         
-        // 徒歩15分以内なら採用、それ以上なら除外して表示しない
         if (walkTime <= 15) {
             results.push(nearestStation);
-            //showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${nearestStation.name} (徒歩${walkTime}分)`);
+            if (typeof showdebug === 'function') showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${nearestStation.name} (徒歩${walkTime}分)`);
         } else {
-            //showdebug(`[内部処理] 3件目スキップ: 最寄り駅(${nearestStation.name})が徒歩15分以上(${walkTime}分)のため除外`);
+            if (typeof showdebug === 'function') showdebug(`[内部処理] 3件目スキップ: 最寄り駅(${nearestStation.name})が徒歩15分以上の距離のため除外`);
         }
     }
 
-    // テキストとアイコンの変換
+    // ★ 6. テキストとアイコンの変換
     return results.map(item => {
         const realDistKm = (item.distance * 1.35) / 1000; 
         
@@ -2384,7 +2409,6 @@ function calcAccessInfo(spotLat, spotLng) {
             displayName += 'IC';
         }
 
-        // ここを通る駅は必ず「徒歩15分以内」の厳しいテストを通過したエリート駅のみ
         if (item.category === '駅') {
             const time = Math.round(realDistKm * 15);
             return `🚶‍♂️ ${displayName}から徒歩 約${time}分`;
@@ -2395,12 +2419,12 @@ function calcAccessInfo(spotLat, spotLng) {
             const time = Math.round(realDistKm * 1.5);
             return `🅿️ ${displayName}から車で 約${time}分 (${realDistKm.toFixed(1)}km)`;
         } else {
-            // ICの場合
             const time = Math.round(realDistKm * 1.5);
             return `🚗 ${displayName}から約${time}分 (${realDistKm.toFixed(1)}km)`;
         }
     });
 }
+
 
 // ==========================================
 // ★ 本番用：アクセス情報をHTML(DOM)に書き出す関数
