@@ -2358,17 +2358,25 @@ function calcAccessInfo(spotLat, spotLng) {
         }
     }
     
-    // 3件目: 最寄り駅
+    // ★ 3件目: 最寄り駅（徒歩15分以内のみ表示するガードを追加）
     if (stationList.length > 0) {
-        results.push(stationList[0]);
-        showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${stationList[0].name}`);
+        const nearestStation = stationList[0];
+        const realDistKm = (nearestStation.distance * 1.35) / 1000; // 迂回率1.35倍
+        const walkTime = Math.round(realDistKm * 15); // 時速4km = 1km15分
+        
+        // 徒歩15分以内なら採用、それ以上なら除外して表示しない
+        if (walkTime <= 15) {
+            results.push(nearestStation);
+            showdebug(`[内部処理] 3件目確定: 最寄り駅 -> ${nearestStation.name} (徒歩${walkTime}分)`);
+        } else {
+            showdebug(`[内部処理] 3件目スキップ: 最寄り駅(${nearestStation.name})が徒歩15分以上(${walkTime}分)のため除外`);
+        }
     }
 
-    // ★ 改良：テキストとアイコンの変換
+    // テキストとアイコンの変換
     return results.map(item => {
-        const realDistKm = (item.distance * 1.35) / 1000; // 迂回率1.35倍
+        const realDistKm = (item.distance * 1.35) / 1000; 
         
-        // 名前にカテゴリを補完（「昭和島」->「昭和島駅」にするため）
         let displayName = item.name;
         if (item.category === '駅' && !displayName.endsWith('駅')) {
             displayName += '駅';
@@ -2376,14 +2384,10 @@ function calcAccessInfo(spotLat, spotLng) {
             displayName += 'IC';
         }
 
+        // ここを通る駅は必ず「徒歩15分以内」の厳しいテストを通過したエリート駅のみ
         if (item.category === '駅') {
-            if (realDistKm < 2.0) {
-                const time = Math.round(realDistKm * 15);
-                return `🚶‍♂️ ${displayName}から徒歩 約${time}分`;
-            } else {
-                const time = Math.round(realDistKm * 1.5);
-                return `🚉 ${displayName}から車で 約${time}分 (${realDistKm.toFixed(1)}km)`;
-            }
+            const time = Math.round(realDistKm * 15);
+            return `🚶‍♂️ ${displayName}から徒歩 約${time}分`;
         } else if (item.category === '商業施設') {
             const time = Math.round(realDistKm * 1.5);
             return `🛍️ ${displayName}から車で 約${time}分 (${realDistKm.toFixed(1)}km)`;
