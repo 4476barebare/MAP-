@@ -17,7 +17,7 @@ const region = process.argv[2] || "KANTO";
 const jsonUrl = process.argv[3] || `https://turiiko.shop/actions/data/${region}_load.json`;
 
 const regionPrefsMap = {
-    "KANTO": ["CHIBA", "KANAGAWA", "TOKYO"],
+    "KANTO": ["CHIBA", "KANAGAWA", "TOKYO", "IBARAKI"],
     "KANSAI": ["OSAKA", "HYOGO", "WAKAYAMA"]
 };
 const prefs = regionPrefsMap[region];
