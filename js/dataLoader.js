@@ -730,26 +730,32 @@ function phase1menu(areaId) {
     const ul = menu?.querySelector("ul");
     if (!ul || !window.spotData) return;
 
+    // ==========================================
+    // ★ 修正1：メニュー項目の抽出（$で分割し、どれか1つでも含まれていればOK）
+    // ==========================================
     const items = window.spotData
-        .filter(s =>
-            s.areaId === areaId &&
-            (s.type === "representative" || s.type === "assistant")
-        )
+        .filter(s => {
+            if (s.areaId !== areaId) return false;
+            const typeParts = (s.type || "").split('$');
+            return typeParts.includes("representative") || typeParts.includes("assistant");
+        })
         .sort((a, b) => b.lat - a.lat);
 
-    // -------------------------
-    // 補欠
-    // -------------------------
-    window.substitute = window.spotData.find(s =>
-        s.areaId === areaId &&
-        s.type === "substitute"
-    ) || null;
+    // ==========================================
+    // ★ 修正2：補欠(substitute)の抽出（$で分割し、含まれているか判定）
+    // ==========================================
+    window.substitute = window.spotData.find(s => {
+        if (s.areaId !== areaId) return false;
+        const typeParts = (s.type || "").split('$');
+        return typeParts.includes("substitute");
+    }) || null;
 
     // =====================
     // リスト削除（スッキリ書き換え）
     // =====================
-    const oldItems = ul.querySelectorAll('li'); // 古い :scope > li:not(.menu-header-row) の指定を削除
+    const oldItems = ul.querySelectorAll('li');
     oldItems.forEach(el => el.remove());
+    
     // =====================
     // リスト生成
     // =====================
@@ -1275,7 +1281,6 @@ function showFishPopup(spot) {
         ?.openPopup();
 }
 
-
 function zoomToSpot(spot) {
 
     if (!window.map || !spot) return;
@@ -1292,27 +1297,19 @@ function zoomToSpot(spot) {
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
 
-    // 【変更】座標は type の中身に関わらず、常に spot の lat/lng を使う
+    // 座標は type の中身に関わらず、常に spot の lat/lng を使う
     const targetLat = safe.lat;
     const targetLng = safe.lng;
     let tileUrl;
 
-    if (typeParts[0] === 'special') {
-        // specialの場合：2番目の要素（typeParts[1]）でタイルを判定する
-        if (typeParts[1] === 'ort') {
-            tileUrl = window.gsiLayers.ort;
-        } else {
-            tileUrl = window.gsiLayers.photo; // photo または空欄時のデフォルト
-        }
+    // ==========================================
+    // ★ 修正：配列のどこかに 'ort' が含まれていれば ort を採用
+    // ==========================================
+    if (typeParts.includes('ort')) {
+        tileUrl = window.gsiLayers.ort;
     } else {
-        // special以外の場合：従来通り最初の要素で判定
-        if (typeParts[0] === 'ort') {
-            tileUrl = window.gsiLayers.ort;
-        } else {
-            tileUrl = window.gsiLayers.photo;
-        }
+        tileUrl = window.gsiLayers.photo; // photo または空欄時のデフォルト
     }
-
 
     if (window.gsiLayer) {
         window.map.removeLayer(window.gsiLayer);
@@ -1327,11 +1324,6 @@ function zoomToSpot(spot) {
         window.osmLayer = null;
     }
 
-    // ----------------------------------------------------
-    // 【修正点1】ジャンプする段階から、あらかじめズームを引き上げておく
-    // ----------------------------------------------------
-    // もしここが safe.zoom（12.5など）のままだと、移動完了した瞬間に
-    // 「広すぎる画面範囲」を getBounds() が拾ってしまい、制限がガバガバになります。
     const targetZoom = safe.zoom < 13.5 ? 13.5 : safe.zoom;
 
     // ========================
@@ -1347,7 +1339,7 @@ function zoomToSpot(spot) {
     // ========================
     window.map.flyTo(
         [targetLat, targetLng],
-        targetZoom, // safe.zoom から targetZoom に変更
+        targetZoom,
         { duration: 0.5 }
     );
 
@@ -1358,16 +1350,13 @@ function zoomToSpot(spot) {
     if (el) el.textContent = safe.name || '';
 
     if (safe?.individualId != null) {
-        // 1. クエリを更新（日本語名notesを使用）
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         
-        // 親エリアの名前を探してセット
         const parentArea = window.areaData.find(a => String(a.areaId + '_' + a.individualId) === String(safe.areaId));
         if (parentArea) setIdealQuery('area', parentArea.name);
         
         setIdealQuery('spot', safe.name);
 
-        // 2. システム変数を直接更新（エリアは維持したままスポットIDを追加）
         window.currentSpotId = safe.individualId;
     }
 
@@ -1375,16 +1364,7 @@ function zoomToSpot(spot) {
     // 移動完了後処理
     // ========================
     window.map.once('moveend', function () {
-        
-        // ----------------------------------------------------
-        // 【修正点2】setTimeout で1回目特有のタイミングバグをシャットアウトする
-        // ----------------------------------------------------
-        // 移動直後はLeafletの内部座標計算がまだ不安定な場合があります。
-        // 100ミリ秒だけ処理をずらすことで、ブラウザの描画を完全に確定させ、
-        // 1回目でも2回目でも「常に100%正確な画面範囲」を確実に掴み取ります。
         setTimeout(function () {
-            
-            // マップのサイズ認識を強制同期
             window.map.invalidateSize();
 
             showFishMarkers(safe.URL);
@@ -1392,12 +1372,10 @@ function zoomToSpot(spot) {
 
             window.map.setMaxZoom(18);
 
-            // 正確に確定した初期表示の画面範囲を取得
             let bounds = window.map.getBounds();
             let zoomLimit;
 
             if (safe.zoom < 13.5) {
-                // 本来の広域ズーム（12.5など）との差分だけ制限範囲を外側に広げる
                 const paddingDiff = 13.5 - safe.zoom; 
                 bounds = bounds.pad(paddingDiff);
                 zoomLimit = 13.5;
@@ -1405,24 +1383,20 @@ function zoomToSpot(spot) {
                 zoomLimit = safe.zoom;
             }
 
-            // 確定した正確な範囲でドラッグをロック
             window.map.setMaxBounds(bounds);
-            window.map.options.maxBoundsViscosity = 1.0; // 境界線でピタッと止める
+            window.map.options.maxBoundsViscosity = 1.0; 
 
-            // ズームガード
             window._zoomGuardBase = zoomLimit;
             window._zoomGuardActive = true;
 
-            // 操作復帰（初期表示の範囲内であれば、ズームもドラッグも自由！）
             window.map.dragging.enable();
             window.map.scrollWheelZoom.enable();
             window.map.doubleClickZoom.enable();
             window.map.touchZoom.enable();
 
-        }, 100); // 100ミリ秒のウェイト
+        }, 100);
     });
 }
-
 
 function showFishMarkers(url) {
   if (!window.map) return;
@@ -2512,7 +2486,6 @@ function resetSpotLayers() {
     }
 }
 
-
 // ★ グローバルにロック変数を追加（goBack関数の外、または一番上に）
 window._isGoingBack = false;
 
@@ -2606,7 +2579,11 @@ function goBack() {
 
     const z = window.map.getZoom();
     const restoreSpot = buildSpotRestoreObject();
-    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$')[0] === 'special';
+    
+    // =====================================================
+    // ★ 修正：[0]決め打ちをやめ、includesで special を探す
+    // =====================================================
+    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$').includes('special');
     const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
     // =====================================================
