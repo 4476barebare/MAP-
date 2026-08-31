@@ -1296,19 +1296,16 @@ function zoomToSpot(spot) {
 
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
+    const isSpecial = typeParts.includes('special'); // ★ Special判定を追加
 
-    // 座標は type の中身に関わらず、常に spot の lat/lng を使う
     const targetLat = safe.lat;
     const targetLng = safe.lng;
     let tileUrl;
 
-    // ==========================================
-    // ★ 修正：配列のどこかに 'ort' が含まれていれば ort を採用
-    // ==========================================
     if (typeParts.includes('ort')) {
         tileUrl = window.gsiLayers.ort;
     } else {
-        tileUrl = window.gsiLayers.photo; // photo または空欄時のデフォルト
+        tileUrl = window.gsiLayers.photo;
     }
 
     if (window.gsiLayer) {
@@ -1324,7 +1321,10 @@ function zoomToSpot(spot) {
         window.osmLayer = null;
     }
 
-    const targetZoom = safe.zoom < 13.5 ? 13.5 : safe.zoom;
+    // =====================================================
+    // ★ 修正1：Specialなら強制的に13.5、それ以外は従来通り
+    // =====================================================
+    const targetZoom = isSpecial ? 13.5 : (safe.zoom < 13.5 ? 13.5 : safe.zoom);
 
     // ========================
     // 操作ロック
@@ -1335,7 +1335,7 @@ function zoomToSpot(spot) {
     window.map.touchZoom.disable();
 
     // ========================
-    // 移動（targetZoom で飛ばす）
+    // 移動
     // ========================
     window.map.flyTo(
         [targetLat, targetLng],
@@ -1364,7 +1364,9 @@ function zoomToSpot(spot) {
     // 移動完了後処理
     // ========================
     window.map.once('moveend', function () {
+        
         setTimeout(function () {
+            
             window.map.invalidateSize();
 
             showFishMarkers(safe.URL);
@@ -1375,28 +1377,59 @@ function zoomToSpot(spot) {
             let bounds = window.map.getBounds();
             let zoomLimit;
 
-            if (safe.zoom < 13.5) {
+            // =====================================================
+            // ★ 修正2：Special用の可動範囲（バウンズ）計算ロジック
+            // =====================================================
+            if (isSpecial) {
+                // ① CSVの本来のzoom値との差分だけ、ベースの可動範囲を広げる
+                const paddingDiff = 13.5 - safe.zoom;
+                bounds = bounds.pad(paddingDiff);
+
+                // ② 魚のマーカーがはみ出す場合は、その座標までバウンズを拡張する
+                if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
+                    const fishList = safe.URL.split(',');
+                    fishList.forEach(item => {
+                        const parts = item.split('|');
+                        const fLat = parseFloat(parts[1]);
+                        const fLng = parseFloat(parts[2]);
+                        if (!isNaN(fLat) && !isNaN(fLng)) {
+                            bounds.extend([fLat, fLng]);
+                        }
+                    });
+                }
+                
+                // 境界ギリギリにマーカーが張り付かないよう、最後に少しだけ余白(5%)を足す
+                bounds = bounds.pad(0.05);
+                zoomLimit = 13.5;
+
+            } else if (safe.zoom < 13.5) {
+                // 通常スポット（広域）
                 const paddingDiff = 13.5 - safe.zoom; 
                 bounds = bounds.pad(paddingDiff);
                 zoomLimit = 13.5;
             } else {
+                // 通常スポット（ピンポイント）
                 zoomLimit = safe.zoom;
             }
 
+            // 確定した正確な範囲でドラッグをロック
             window.map.setMaxBounds(bounds);
             window.map.options.maxBoundsViscosity = 1.0; 
 
+            // ズームガード
             window._zoomGuardBase = zoomLimit;
             window._zoomGuardActive = true;
 
+            // 操作復帰
             window.map.dragging.enable();
             window.map.scrollWheelZoom.enable();
             window.map.doubleClickZoom.enable();
             window.map.touchZoom.enable();
 
-        }, 100);
+        }, 100); 
     });
 }
+
 
 function showFishMarkers(url) {
   if (!window.map) return;
