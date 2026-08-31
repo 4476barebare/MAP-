@@ -1,6 +1,6 @@
 name,zoom,individualId,lat,lng,areaId,URL,notes,icon,whether,type
 IBARAKI,9,parent,36.3638,140.2805,,080000,茨城県,,,
-北茨城エリア,9.5,HITACHI,36.6661,140.5075,IBARAKI,x:1;y:1,,,,
+北茨城エリア,9.5,HITACHI,36.504,140.512,IBARAKI,x:1;y:1,,,,
 霞ヶ浦エリア,9.5,KASUMIGAURA,36.115,140.48,IBARAKI,x:1;y:0,,,,
 つくばエリア,10,TSUKUBA,36.1423,139.9335,IBARAKI,x:0;y:0,,,,
 那珂川河口,15.5,1,36.336229,140.589523,IBARAKI_HITACHI,,First/0803/0804,spot,,
