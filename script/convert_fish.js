@@ -64,7 +64,29 @@ for (let i = 1; i < lines.length; i++) {
     fishData[fishName].push(lat, lng);
 }
 
-// 4. 出力
-fs.writeFileSync(outputPath, JSON.stringify(fishData));
+// --- 前半の読み込み処理などはそのまま ---
+
+// 4. 改行を入れて見やすく出力するための文字列組み立て
+let jsonString = '{\n';
+const fishNames = Object.keys(fishData);
+
+for (let i = 0; i < fishNames.length; i++) {
+    const name = fishNames[i];
+    const coordsArray = JSON.stringify(fishData[name]); // 座標配列は1行にする
+    
+    // "アジ": [35.1, 140.1, 35.2, 140.2], のような形式で改行して追加
+    jsonString += `  "${name}": ${coordsArray}`;
+    
+    // 最後の要素でなければカンマをつける
+    if (i < fishNames.length - 1) {
+        jsonString += ',\n';
+    } else {
+        jsonString += '\n';
+    }
+}
+jsonString += '}\n';
+
+// 5. JSONとして出力
+fs.writeFileSync(outputPath, jsonString);
 console.log(`✅ 変換成功: ${inputPath} -> ${outputPath}`);
-console.log(`抽出された魚種: ${Object.keys(fishData).join(', ')}`);
+console.log(`抽出された魚種: ${fishNames.join(', ')}`);
