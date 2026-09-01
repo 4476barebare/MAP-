@@ -175,62 +175,62 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
 }
 
 function prepareFishForArea(areaId) {
-  const loadPromise = window.fishData
-    ? Promise.resolve()
-    : fetch(window.fishUrl) // ※呼び出し元のパス定義を .json に変更しておいてください
-        .then(res => {
-          if (!res.ok) throw new Error("fetch失敗: " + res.status);
-          return res.json(); 
-        })
-        .then(jsonData => {
-          window.fishData = jsonData; 
+    // 🔍 デバッグ：関数内で受け取った引数を出力
+    if (typeof showdebug === 'function') {
+        showdebug(`[デバッグ] prepareFishForArea 内。受け取った areaId: ${areaId}`);
+    }
+
+    const loadPromise = window.fishData
+        ? Promise.resolve()
+        : fetch(window.fishUrl)
+            .then(res => {
+              if (!res.ok) throw new Error("fetch失敗: " + res.status);
+              return res.json(); 
+            })
+            .then(jsonData => {
+              window.fishData = jsonData; 
+            });
+
+    return loadPromise.then(() => {
+        if (!window.spotData) return [];
+
+        const targetSpots = window.spotData.filter(
+            s => s.areaId && s.areaId === areaId
+        );
+
+        const areaFishData = window.fishData[areaId] || {};
+
+        targetSpots.forEach(spot => {
+            const spotFishData = areaFishData[spot.name];
+            
+            if (spotFishData) {
+                const fishList = [];
+                for (const fishName in spotFishData) {
+                    const info = spotFishData[fishName];
+                    if (info && typeof info.coords === 'string' && info.coords !== '') {
+                        const points = info.coords.split('|');
+                        points.forEach(pt => {
+                            const [lat, lng] = pt.split(',');
+                            if (lat && lng) {
+                                fishList.push(`${fishName}|${lat}|${lng}`);
+                            }
+                        });
+                    }
+                }
+                spot.URL = fishList.join(',');
+            } else {
+                spot.URL = "";
+            }
         });
 
-  return loadPromise.then(() => {
-    if (!window.spotData) return [];
+        return targetSpots;
 
-    const targetSpots = window.spotData.filter(
-      s => s.areaId && s.areaId === areaId
-    );
-
-    const areaFishData = window.fishData[areaId] || {};
-
-    targetSpots.forEach(spot => {
-      const spotFishData = areaFishData[spot.name];
-      
-      if (spotFishData) {
-        const fishList = [];
-        
-        for (const fishName in spotFishData) {
-            const info = spotFishData[fishName];
-            
-            // ★ 修正：info 内の "coords" キーのデータのみを明示的に抽出。
-            // season や lure などの別キーが存在しても完全に無視されます。
-            if (info && typeof info.coords === 'string' && info.coords !== '') {
-                const points = info.coords.split('|');
-                
-                points.forEach(pt => {
-                    const [lat, lng] = pt.split(',');
-                    // 緯度経度が揃っている場合のみフォーマットして追加
-                    if (lat && lng) {
-                        fishList.push(`${fishName}|${lat}|${lng}`);
-                    }
-                });
-            }
-        }
-        spot.URL = fishList.join(',');
-      } else {
-        spot.URL = "";
-      }
+    }).catch(err => {
+        console.error(err);
+        return [];
     });
-
-    return targetSpots;
-
-  }).catch(err => {
-    console.error(err);
-    return [];
-  });
 }
+
 
 function buildAreaGraphFromGrid(areas) {
 
