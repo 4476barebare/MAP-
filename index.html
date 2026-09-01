@@ -2098,26 +2098,11 @@ async function checkAndLoadRouteData() {
         if (needsBaseLoad) {
             await loadPrefectureData(prefCode);
             
-            
             renderPrefectureUI(); 
             if (typeof showPrefSpots === 'function') showPrefSpots();
             if (typeof initAreaUI === 'function') initAreaUI();
             if (typeof renderPrefWeather === 'function') renderPrefWeather();
         }
-
-        // 🔍 デバッグ：判定直前の状態を出力
-        //  if (typeof showdebug === 'function') {
-     //         showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
-     //     }
-
-     //     if (window.currentAreaId && !window.fishData) {
-            // 🔍 デバッグ：呼び出し時の引数を出力
-   //           if (typeof showdebug === 'function') {
-           //       showdebug(`[デバッグ] prepareFishForArea を呼び出します。引数: ${window.currentAreaId}`);
-     //         }
-            
-     //     }
-
         return true; 
     } catch (err) {
         console.error("データロードエラー:", err);
@@ -2137,18 +2122,14 @@ async function routeUpdate() {
         loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
-
     // ─── スポット階層 ───
     if (window.currentSpotId) {
 
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
-        // ★ .then() ではなく await を使って待つ（これで変数がブロックに閉じ込められない）
-        if (safeAreaId) {
-            await prepareFishForArea(safeAreaId);
-        }
-
+        await prepareFishForArea(safeAreaId);
+        
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
@@ -2174,8 +2155,6 @@ async function routeUpdate() {
         }
         return;
     }
-
-
     // ─── エリア階層 ───
     if (window.currentAreaId) {
         const safeAreaId = window.currentAreaId || ""; 
@@ -2266,7 +2245,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         routeUpdate(); // 内部でloadRegionMapが呼ばれる
         return;
     }
-
     // 4. ★ここから本来の読み込みチェーン開始
     // 【修正点】直打ちの場合に備えて、魚データなどのパスをグローバル変数に確実にセットする
     window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.csv`;
@@ -2287,8 +2265,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof loadInlandWhetherCSV === 'function') {
                 loadInlandWhetherCSV(window.currentRegion).then(inlandCsv => {
                     applyInlandWhetherToSpots(inlandCsv);
-
-
                     // データが全て揃った後に描画系を起動
                     routeUpdate();
                     renderAreaGuide();
