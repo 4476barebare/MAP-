@@ -2096,6 +2096,7 @@ async function checkAndLoadRouteData() {
 
         if (needsBaseLoad) {
             await loadPrefectureData(prefCode);
+            await prepareFishForArea(window.currentAreaId);
             
             renderPrefectureUI(); 
             if (typeof showPrefSpots === 'function') showPrefSpots();
@@ -2104,17 +2105,17 @@ async function checkAndLoadRouteData() {
         }
 
         // 🔍 デバッグ：判定直前の状態を出力
-        if (typeof showdebug === 'function') {
-            showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
-        }
+        //  if (typeof showdebug === 'function') {
+     //         showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
+     //     }
 
-        if (window.currentAreaId && !window.fishData) {
+     //     if (window.currentAreaId && !window.fishData) {
             // 🔍 デバッグ：呼び出し時の引数を出力
-            if (typeof showdebug === 'function') {
-                showdebug(`[デバッグ] prepareFishForArea を呼び出します。引数: ${window.currentAreaId}`);
-            }
-            await prepareFishForArea(window.currentAreaId);
-        }
+   //           if (typeof showdebug === 'function') {
+           //       showdebug(`[デバッグ] prepareFishForArea を呼び出します。引数: ${window.currentAreaId}`);
+     //         }
+            
+     //     }
 
         return true; 
     } catch (err) {
