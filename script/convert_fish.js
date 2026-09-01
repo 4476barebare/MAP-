@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-// 1. GitHub Actionsから渡された引数を取得
-// process.argv[2] が入力ファイル、process.argv[3] が出力ファイル
+// 1. 引数を取得
 const inputPath = process.argv[2];
 const outputPath = process.argv[3];
 
@@ -11,43 +10,61 @@ if (!inputPath || !outputPath) {
     process.exit(1);
 }
 
-// 2. 入力ファイルが存在するかチェック
 if (!fs.existsSync(inputPath)) {
     console.error(`❌ エラー: 入力ファイルが見つかりません: ${inputPath}`);
     process.exit(1);
 }
 
-// 3. 出力先のディレクトリが存在しない場合は作成
 const outputDir = path.dirname(outputPath);
 if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
 }
 
-// 4. CSVを読み込んで処理
+// 2. CSVを読み込む
 const csvData = fs.readFileSync(inputPath, 'utf8');
 const lines = csvData.trim().split('\n');
 
+if (lines.length < 2) {
+    console.error('❌ エラー: データがありません。');
+    process.exit(1);
+}
+
+// 🌟 改良ポイント: ヘッダーから自動的に列番号を取得する
+const headers = lines[0].split(',').map(h => h.trim());
+const nameIdx = headers.indexOf('name');
+const latIdx = headers.indexOf('lat');
+const lngIdx = headers.indexOf('lng');
+
+if (nameIdx === -1 || latIdx === -1 || lngIdx === -1) {
+    console.error(`❌ エラー: CSV内に 'name', 'lat', 'lng' のいずれかの列が見つかりません。`);
+    console.error(`現在の列: ${headers.join(', ')}`);
+    process.exit(1);
+}
+
 const fishData = {};
 
+// 3. データ行のループ処理
 for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
     
     const cols = lines[i].split(',');
     
-    // ※ 0列目=名前, 1列目=lat, 2列目=lng と仮定しています。実際のCSVに合わせて調整してください。
-    const fishName = cols[0] ? cols[0].trim() : '';
-    const lat = cols[1] ? Number(cols[1].trim()) : null;
-    const lng = cols[2] ? Number(cols[2].trim()) : null;
+    // 見つけ出した列番号を使ってデータを取得
+    const fishName = cols[nameIdx] ? cols[nameIdx].trim() : '';
+    const lat = cols[latIdx] ? Number(cols[latIdx].trim()) : NaN;
+    const lng = cols[lngIdx] ? Number(cols[lngIdx].trim()) : NaN;
 
-    if (!fishName || !lat || !lng) continue;
+    // 名前がない、または緯度経度が数値に変換できない(NaN)場合はスキップ
+    if (!fishName || isNaN(lat) || isNaN(lng)) continue;
 
+    // 魚種ごとに配列を用意して座標を詰め込む
     if (!fishData[fishName]) {
         fishData[fishName] = [];
     }
-
     fishData[fishName].push(lat, lng);
 }
 
-// 5. JSONとして出力
+// 4. 出力
 fs.writeFileSync(outputPath, JSON.stringify(fishData));
 console.log(`✅ 変換成功: ${inputPath} -> ${outputPath}`);
+console.log(`抽出された魚種: ${Object.keys(fishData).join(', ')}`);
