@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // 1. GitHub Actionsから渡された引数を取得
 // process.argv[2] が入力ファイル、process.argv[3] が出力ファイル
@@ -34,8 +34,7 @@ for (let i = 1; i < lines.length; i++) {
     
     const cols = lines[i].split(',');
     
-    // ※ 列番号は実際の IBARAKI_fish.csv に合わせて調整してください
-    // ここでは 0列目=名前, 1列目=lat, 2列目=lng と仮定しています
+    // ※ 0列目=名前, 1列目=lat, 2列目=lng と仮定しています。実際のCSVに合わせて調整してください。
     const fishName = cols[0] ? cols[0].trim() : '';
     const lat = cols[1] ? Number(cols[1].trim()) : null;
     const lng = cols[2] ? Number(cols[2].trim()) : null;
