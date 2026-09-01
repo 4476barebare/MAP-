@@ -2143,13 +2143,19 @@ async function routeUpdate() {
         showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
+        prepareFishForArea(window.currentAreaId).then(() => {
+                    
         
 
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+        });
+        showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
+
         
         if (spot) {
+            
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
             if (parentArea) setIdealQuery('area', parentArea.name);
@@ -2282,9 +2288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof loadInlandWhetherCSV === 'function') {
                 loadInlandWhetherCSV(window.currentRegion).then(inlandCsv => {
                     applyInlandWhetherToSpots(inlandCsv);
-                    if (window.currentAreaId && !window.fishData) {
-                    prepareFishForArea(window.currentAreaId);
-                    }
+
 
                     // データが全て揃った後に描画系を起動
                     routeUpdate();
