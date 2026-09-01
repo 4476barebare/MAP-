@@ -175,8 +175,6 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
 }
 
 function prepareFishForArea(areaId) {
-
-
     const loadPromise = window.fishData
         ? Promise.resolve()
         : fetch(window.fishUrl)
@@ -189,11 +187,8 @@ function prepareFishForArea(areaId) {
             });
 
     return loadPromise.then(() => {
-        //if (!window.spotData) return [];
-        if (!window.spotData){
-            showdebug(`Data存在しない`);
-              return; 
-            };
+        if (!window.spotData) return [];
+
         const targetSpots = window.spotData.filter(
             s => s.areaId && s.areaId === areaId
         );
