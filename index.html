@@ -2275,7 +2275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.csv`;
     window.prefWeatherUrl       = `/data/${window.currentPref}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${window.currentRegion}_inLand_recalculated.csv`;
-    window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.csv`; // ← これが抜けていた原因！
+    window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.json`; // ← これが抜けていた原因！
     window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
 
     const csvUrl = window.prefLocationUrl;
