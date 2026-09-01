@@ -175,10 +175,7 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
 }
 
 function prepareFishForArea(areaId) {
-    // 🔍 デバッグ：関数内で受け取った引数を出力
-    if (typeof showdebug === 'function') {
-        showdebug(`[デバッグ] prepareFishForArea 内。受け取った areaId: ${areaId}`);
-    }
+
 
     const loadPromise = window.fishData
         ? Promise.resolve()
