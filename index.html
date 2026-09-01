@@ -2140,22 +2140,23 @@ async function routeUpdate() {
 
     // ─── スポット階層 ───
     if (window.currentSpotId) {
-        showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
+        if (typeof showdebug === 'function') showdebug(`[デバッグ1] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
+        
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
-        prepareFishForArea(window.currentAreaId).then(() => {
-                    
         
+        // ★ .then() ではなく await を使って待つ（これで変数がブロックに閉じ込められない）
+        if (safeAreaId) {
+            await prepareFishForArea(safeAreaId);
+        }
+
+        if (typeof showdebug === 'function') showdebug(`[デバッグ2] 通過後 currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
 
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
-        });
-        showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
-
         
         if (spot) {
-            
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
             if (parentArea) setIdealQuery('area', parentArea.name);
@@ -2176,6 +2177,7 @@ async function routeUpdate() {
         }
         return;
     }
+
 
     // ─── エリア階層 ───
     if (window.currentAreaId) {
