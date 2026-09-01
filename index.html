@@ -2121,9 +2121,6 @@ async function routeUpdate() {
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; 
 
-    // ★ 追加：routeUpdate が本番処理に入る瞬間のデータ状態をアラートで確認
-    //alert(`【routeUpdate 通過時】\nprefData存在: ${!!window.prefData}\nspotData件数: ${window.spotData ? window.spotData.length : '0 または undefined'}`);
-
     if (!window.currentPref) {
         document.getElementById('map-back-btn').style.display = 'none';
         loadRegionMap(window.currentRegion || 'KANTO');
@@ -2135,9 +2132,12 @@ async function routeUpdate() {
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
-        // ★ 追加：スポットを描画する前に、必ずそのエリアの魚データを準備して待つ！
-        if (safeAreaId && (!window.fishData || !window.fishData[safeAreaId])) {
-            await prepareFishForArea(safeAreaId);
+        // ★ 修正：スポット直リンク時、確実に魚データをロードして付与する
+        if (safeAreaId) {
+            // 魚データがまだロードされていなければフェッチして待つ
+            if (!window.fishData || !window.fishData[safeAreaId]) {
+                await prepareFishForArea(safeAreaId);
+            }
         }
 
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
@@ -2151,6 +2151,8 @@ async function routeUpdate() {
             setIdealQuery('spot', spot.name);
 
             drawLocation(spot.name, spot.lat, spot.lng, "13");
+            
+            // ★ ここでマーカー描画関数に飛び、その中で showFishMarkers(spot.URL) が呼ばれる
             zoomToSpot(spot);
             
             requestAnimationFrame(() => {
@@ -2177,7 +2179,7 @@ async function routeUpdate() {
         const safeZoom = area.zoom || window.prefData.zoom;
         drawLocation(area.name, area.lat, area.lng, safeZoom);
         
-        // ★ area (オブジェクト) 自身を渡す
+        // ★ area (オブジェクト) 自身を渡す（この中で prepareFishForArea が呼ばれる）
         selectArea(area); 
         renderCrowdImage();
         
@@ -2218,6 +2220,7 @@ async function routeUpdate() {
         });
     }
 }
+
 
 // ★ Region名の変換マッピング
 const REGION_MAP = {
