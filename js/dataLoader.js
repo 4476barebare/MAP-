@@ -175,8 +175,6 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
 }
 
 function prepareFishForArea(areaId) {
-
-
     const loadPromise = window.fishData
         ? Promise.resolve()
         : fetch(window.fishUrl)
@@ -189,6 +187,12 @@ function prepareFishForArea(areaId) {
             });
 
     return loadPromise.then(() => {
+        // ★ 追加：spotDataの存在と件数をデバッグ画面に出力
+        if (typeof showdebug === 'function') {
+            const spotCount = window.spotData ? window.spotData.length : 0;
+            showdebug(`[デバッグ] prepareFishForArea 内: spotData存在=${!!window.spotData}, 件数=${spotCount}`);
+        }
+
         if (!window.spotData) return [];
 
         const targetSpots = window.spotData.filter(
@@ -227,6 +231,7 @@ function prepareFishForArea(areaId) {
         return [];
     });
 }
+
 
 
 function buildAreaGraphFromGrid(areas) {
