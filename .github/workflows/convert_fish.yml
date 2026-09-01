@@ -6,11 +6,11 @@ on:
       input_csv:
         description: '入力するCSVファイル名 (例: data/IBARAKI_fish.csv)'
         required: true
-        default: 'data/IBARAKI_fish.csv'
+        default: 'KANTO/○○_fish.csv'
       output_json:
         description: '出力するJSONファイル名 (例: json/IBARAKI_fish.json)'
         required: true
-        default: 'json/IBARAKI_fish.json'
+        default: 'KANTO/IBARAKI_fish.json'
 
 permissions:
   contents: write # 変換したJSONをリポジトリに保存するために必要
