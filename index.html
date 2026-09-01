@@ -2103,7 +2103,16 @@ async function checkAndLoadRouteData() {
             if (typeof renderPrefWeather === 'function') renderPrefWeather();
         }
 
+        // 🔍 デバッグ：判定直前の状態を出力
+        if (typeof showdebug === 'function') {
+            showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
+        }
+
         if (window.currentAreaId && !window.fishData) {
+            // 🔍 デバッグ：呼び出し時の引数を出力
+            if (typeof showdebug === 'function') {
+                showdebug(`[デバッグ] prepareFishForArea を呼び出します。引数: ${window.currentAreaId}`);
+            }
             await prepareFishForArea(window.currentAreaId);
         }
 
@@ -2132,13 +2141,6 @@ async function routeUpdate() {
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
-        // ★ 修正：スポット直リンク時、確実に魚データをロードして付与する
-        if (safeAreaId) {
-            // 魚データがまだロードされていなければフェッチして待つ
-            if (!window.fishData || !window.fishData[safeAreaId]) {
-                await prepareFishForArea(safeAreaId);
-            }
-        }
 
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
