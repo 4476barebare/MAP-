@@ -2135,6 +2135,11 @@ async function routeUpdate() {
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
+        // ★ 追加：スポットを描画する前に、必ずそのエリアの魚データを準備して待つ！
+        if (safeAreaId && (!window.fishData || !window.fishData[safeAreaId])) {
+            await prepareFishForArea(safeAreaId);
+        }
+
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
@@ -2213,9 +2218,6 @@ async function routeUpdate() {
         });
     }
 }
-
-
-
 
 // ★ Region名の変換マッピング
 const REGION_MAP = {
