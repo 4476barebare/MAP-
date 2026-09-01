@@ -175,47 +175,53 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
 }
 
 function prepareFishForArea(areaId) {
-
   const loadPromise = window.fishData
     ? Promise.resolve()
-    : fetch(window.fishUrl)
+    : fetch(window.fishUrl) // ※呼び出し元のパス定義を .json に変更しておいてください
         .then(res => {
           if (!res.ok) throw new Error("fetch失敗: " + res.status);
-          return res.text();
+          return res.json(); // ★ .text() から .json() へ変更
         })
-        .then(text => {
-          const lines = text.split(/\r?\n/);
-          const headers = lines[0].split(',');
-
-          window.fishData = lines.slice(1).map(line => {
-            const cols = line.split(',');
-            const obj = {};
-            headers.forEach((h, i) => obj[h] = cols[i]);
-
-            obj.lat = parseFloat(obj.lat);
-            obj.lng = parseFloat(obj.lng);
-
-            return obj;
-          });
+        .then(jsonData => {
+          window.fishData = jsonData; // パース済みのJSONオブジェクトをそのまま保持
         });
 
   return loadPromise.then(() => {
     if (!window.spotData) return [];
 
     const targetSpots = window.spotData.filter(
-      s => s.areaId && s.areaId === areaId   // ★ trim削除
+      s => s.areaId && s.areaId === areaId
     );
 
-    const targetFish = window.fishData.filter(
-      f => f.registration && f.registration === areaId  // ★ trim削除
-    );
+    // ★ JSONの階層（大分類: registration）から該当エリアのデータを取得
+    // ※ CSVの registration 列が "AREA12_001" のようなIDだった場合はこのままでOK
+    // ※ もし "鹿行エリア" のような日本語だった場合は、window.areaData等から日本語名を引いて指定してください
+    const areaFishData = window.fishData[areaId] || {};
 
     targetSpots.forEach(spot => {
-      const fishList = targetFish
-        .filter(f => f.parent && f.parent === spot.name) // ★ trim削除
-        .map(f => `${f.name}|${f.lat}|${f.lng}`);
-
-      spot.URL = fishList.join(',');
+      // ★ 中分類（parent: スポット名）で魚データを取得
+      const spotFishData = areaFishData[spot.name];
+      
+      if (spotFishData) {
+        const fishList = [];
+        
+        // 小分類（魚種）をループ
+        for (const fishName in spotFishData) {
+            const info = spotFishData[fishName];
+            if (info && info.coords) {
+                // "35.912,140.645|35.915,140.648" を分割
+                const points = info.coords.split('|');
+                points.forEach(pt => {
+                    const [lat, lng] = pt.split(',');
+                    // ★ 既存システムが読める `魚種名|lat|lng` 形式に組み立て直す
+                    fishList.push(`${fishName}|${lat}|${lng}`);
+                });
+            }
+        }
+        spot.URL = fishList.join(',');
+      } else {
+        spot.URL = "";
+      }
     });
 
     return targetSpots;
