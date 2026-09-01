@@ -2139,6 +2139,7 @@ async function routeUpdate() {
 
     // ─── スポット階層 ───
     if (window.currentSpotId) {
+        showdebug(`[デバッグ] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
