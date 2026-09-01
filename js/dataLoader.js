@@ -180,10 +180,10 @@ function prepareFishForArea(areaId) {
     : fetch(window.fishUrl) // ※呼び出し元のパス定義を .json に変更しておいてください
         .then(res => {
           if (!res.ok) throw new Error("fetch失敗: " + res.status);
-          return res.json(); // ★ .text() から .json() へ変更
+          return res.json(); 
         })
         .then(jsonData => {
-          window.fishData = jsonData; // パース済みのJSONオブジェクトをそのまま保持
+          window.fishData = jsonData; 
         });
 
   return loadPromise.then(() => {
@@ -193,28 +193,28 @@ function prepareFishForArea(areaId) {
       s => s.areaId && s.areaId === areaId
     );
 
-    // ★ JSONの階層（大分類: registration）から該当エリアのデータを取得
-    // ※ CSVの registration 列が "AREA12_001" のようなIDだった場合はこのままでOK
-    // ※ もし "鹿行エリア" のような日本語だった場合は、window.areaData等から日本語名を引いて指定してください
     const areaFishData = window.fishData[areaId] || {};
 
     targetSpots.forEach(spot => {
-      // ★ 中分類（parent: スポット名）で魚データを取得
       const spotFishData = areaFishData[spot.name];
       
       if (spotFishData) {
         const fishList = [];
         
-        // 小分類（魚種）をループ
         for (const fishName in spotFishData) {
             const info = spotFishData[fishName];
-            if (info && info.coords) {
-                // "35.912,140.645|35.915,140.648" を分割
+            
+            // ★ 修正：info 内の "coords" キーのデータのみを明示的に抽出。
+            // season や lure などの別キーが存在しても完全に無視されます。
+            if (info && typeof info.coords === 'string' && info.coords !== '') {
                 const points = info.coords.split('|');
+                
                 points.forEach(pt => {
                     const [lat, lng] = pt.split(',');
-                    // ★ 既存システムが読める `魚種名|lat|lng` 形式に組み立て直す
-                    fishList.push(`${fishName}|${lat}|${lng}`);
+                    // 緯度経度が揃っている場合のみフォーマットして追加
+                    if (lat && lng) {
+                        fishList.push(`${fishName}|${lat}|${lng}`);
+                    }
                 });
             }
         }
