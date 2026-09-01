@@ -2140,8 +2140,7 @@ async function routeUpdate() {
 
     // ─── スポット階層 ───
     if (window.currentSpotId) {
-        if (typeof showdebug === 'function') showdebug(`[デバッグ1] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
-        
+
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
@@ -2149,8 +2148,6 @@ async function routeUpdate() {
         if (safeAreaId) {
             await prepareFishForArea(safeAreaId);
         }
-
-        if (typeof showdebug === 'function') showdebug(`[デバッグ2] 通過後 currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
 
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
