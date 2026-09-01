@@ -2065,7 +2065,7 @@ async function loadPrefectureData(prefCode) {
         const whetherUrl = `/data/${prefCode}_whether.csv`;
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
-        prepareFishForArea(window.currentAreaId);
+       
 
         // 内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
         if (typeof loadInlandWhetherCSV === 'function') {
@@ -2282,6 +2282,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (typeof loadInlandWhetherCSV === 'function') {
                 loadInlandWhetherCSV(window.currentRegion).then(inlandCsv => {
                     applyInlandWhetherToSpots(inlandCsv);
+                    if (window.currentAreaId && !window.fishData) {
+                    prepareFishForArea(window.currentAreaId);
+                    }
 
                     // データが全て揃った後に描画系を起動
                     routeUpdate();
