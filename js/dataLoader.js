@@ -1350,6 +1350,16 @@ function zoomToSpot(spot) {
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
 
+    // 👇 ここから追加：タイル切り替えボタンを表示する
+    const tileWrap = document.getElementById('tile-btn-wrap');
+    const tileBtn = document.getElementById('map-tile-btn');
+    if (tileWrap && tileBtn) {
+        tileWrap.style.display = 'flex';
+        requestAnimationFrame(() => {
+            tileBtn.style.opacity = '1';
+        });
+    }
+
     if (safe?.individualId != null) {
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         
@@ -2538,6 +2548,14 @@ function goBack() {
         backBtn.style.pointerEvents = 'none'; // ★ 透明な間の「見えないボタン」へのクリックを完全遮断
         backBtn.style.transition = 'opacity 0.3s ease';
         backBtn.style.opacity = '0';
+    }
+
+    // 👇 ここから追加：タイル切り替えボタンも一緒にフェードアウトして隠す
+    const tileWrap = document.getElementById('tile-btn-wrap');
+    const tileBtn = document.getElementById('map-tile-btn');
+    if (tileWrap && tileBtn) {
+        tileBtn.style.opacity = '0';
+        setTimeout(() => { tileWrap.style.display = 'none'; }, 300); // フェードアウト完了後にdisplay:none
     }
 
     // ─── 処理完了後にボタンを復活させる共通関数 ───
