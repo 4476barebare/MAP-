@@ -48,12 +48,13 @@
 <div id="lf-map">
   <div class="map-ui-top">
     <div class="ad-box">AD 320×50</div>
-        <div class="map-ui-sub">
+    <div class="map-ui-sub">
       <div id="nearest-spot" class="nearest-spot"></div>
-      <!-- 戻るボタン -->
-      <button id="map-back-btn" class="map-back-btn" aria-label="前の画面に戻る"></button>
-      <!-- 👇 追加: タイル切り替えボタン（初期は非表示） -->
-      <button id="map-tile-btn" class="map-tile-btn" aria-label="地図タイル切り替え" style="display: none; opacity: 0; margin-top: 8px;"></button>
+      <!-- 👇 2つのボタンを縦並び（flex-direction: column）の箱で囲む -->
+      <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+        <button id="map-back-btn" class="map-back-btn" aria-label="前の画面に戻る"></button>
+        <button id="map-tile-btn" class="map-tile-btn" aria-label="地図タイル切り替え" style="display: none; opacity: 0;"></button>
+      </div>
     </div>
     <div class="map-ui-sub2"></div>
   </div>
