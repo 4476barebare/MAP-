@@ -48,15 +48,20 @@
 <div id="lf-map">
   <div class="map-ui-top">
     <div class="ad-box">AD 320×50</div>
+    
+    <!-- ① 上段は元の綺麗な状態に戻す -->
     <div class="map-ui-sub">
       <div id="nearest-spot" class="nearest-spot"></div>
-      <!-- 👇 2つのボタンを縦並び（flex-direction: column）の箱で囲む -->
-      <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
-        <button id="map-back-btn" class="map-back-btn" aria-label="前の画面に戻る"></button>
-        <button id="map-tile-btn" class="map-tile-btn" aria-label="地図タイル切り替え" style="display: none; opacity: 0;"></button>
-      </div>
+      <button id="map-back-btn" class="map-back-btn" aria-label="前の画面に戻る"></button>
     </div>
+    
+    <!-- エリア画面用の天気UI (スポット画面では非表示になる) -->
     <div class="map-ui-sub2"></div>
+
+    <!-- 👇 ② 追加: スポット画面で空いたスペースに右揃えで差し込む -->
+    <div id="tile-btn-wrap" style="display: none; justify-content: flex-end; padding-right: 12px; margin-top: 4px;">
+      <button id="map-tile-btn" class="map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;"></button>
+    </div>
   </div>
 <div id="map-menu" class="map-menu">
   
@@ -2161,16 +2166,20 @@ async function routeUpdate() {
             
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
+                const tileWrap = document.getElementById('tile-btn-wrap'); // 追加
                 const tileBtn = document.getElementById('map-tile-btn'); // 追加
+                
                 if (btn) {
                     btn.style.display = 'block';
-                    if (tileBtn) tileBtn.style.display = 'block'; // 追加
+                    if (tileWrap) tileWrap.style.display = 'flex'; // 追加: 親枠を表示
+                    
                     requestAnimationFrame(() => { 
                         btn.style.opacity = '1'; 
-                        if (tileBtn) tileBtn.style.opacity = '1'; // 追加
+                        if (tileBtn) tileBtn.style.opacity = '1'; // 追加: ボタンをフェードイン
                     });
                 }
             });
+
         }
         return;
     }
