@@ -1396,7 +1396,6 @@ fetch('/icon/tile.svg')
         btn.innerHTML = svg;
         const svgEl = btn.querySelector('svg');
         if (svgEl) svgEl.classList.add('tile-icon');
-
         // =====================================
         // ▼ タイル切り替えのクリックイベントを追加
         // =====================================
@@ -1422,6 +1421,18 @@ fetch('/icon/tile.svg')
                 window.map.attributionControl.removeAttribution('国土地理院');
                 window.map.attributionControl.addAttribution('© OpenStreetMap contributors');
             }
+
+            // =====================================
+            // ★ グレー化防止のための強制リフレッシュ
+            // =====================================
+            // 画像の読み込みが始まる少し後に、見えないレベルで地図を揺らして再描画を強制する
+            setTimeout(() => {
+                // 地図のサイズを再計算
+                window.map.invalidateSize(true);
+                // ダミーの移動（1ピクセル動かしてすぐ戻す）を入れてタイル更新を確実にトリガー
+                window.map.panBy([1, 1], { animate: false });
+                window.map.panBy([-1, -1], { animate: false });
+            }, 100);
         });
 
     });
