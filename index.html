@@ -1410,29 +1410,23 @@ fetch('/icon/tile.svg')
                 const baseTile = window.currentSpotBaseTile || window.gsiLayers.photo;
                 window.gsiLayer.setUrl(baseTile);
                 
-                // コピーライトを国土地理院に戻す
                 window.map.attributionControl.removeAttribution('© OpenStreetMap contributors');
                 window.map.attributionControl.addAttribution('国土地理院');
             } else {
                 // 2. 本来のタイルからOSMに切り替える
                 window.gsiLayer.setUrl(osmUrl);
                 
-                // コピーライトをOSMに変更する
                 window.map.attributionControl.removeAttribution('国土地理院');
                 window.map.attributionControl.addAttribution('© OpenStreetMap contributors');
             }
 
             // =====================================
-            // ★ グレー化防止のための強制リフレッシュ
+            // ★ 最強の強制リフレッシュ
             // =====================================
-            // 画像の読み込みが始まる少し後に、見えないレベルで地図を揺らして再描画を強制する
             setTimeout(() => {
-                // 地図のサイズを再計算
-                window.map.invalidateSize(true);
-                // ダミーの移動（1ピクセル動かしてすぐ戻す）を入れてタイル更新を確実にトリガー
-                window.map.panBy([1, 1], { animate: false });
-                window.map.panBy([-1, -1], { animate: false });
-            }, 100);
+                // Leafletの内部メソッドを使ってコンテナを強制再構築
+                window.map._resetView(window.map.getCenter(), window.map.getZoom());
+            }, 50);
         });
 
     });
