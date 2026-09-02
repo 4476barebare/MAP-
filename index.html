@@ -48,7 +48,13 @@
 <div id="lf-map">
   <div class="map-ui-top">
     <div class="ad-box">AD 320×50</div>
-    <div class="map-ui-sub"><div id="nearest-spot" class="nearest-spot"></div><button id="map-back-btn" class="map-back-btn" aria-label="前の画面に戻る"></button></div>
+        <div class="map-ui-sub">
+      <div id="nearest-spot" class="nearest-spot"></div>
+      <!-- 戻るボタン -->
+      <button id="map-back-btn" class="map-back-btn" aria-label="前の画面に戻る"></button>
+      <!-- 👇 追加: タイル切り替えボタン（初期は非表示） -->
+      <button id="map-tile-btn" class="map-tile-btn" aria-label="地図タイル切り替え" style="display: none; opacity: 0; margin-top: 8px;"></button>
+    </div>
     <div class="map-ui-sub2"></div>
   </div>
 <div id="map-menu" class="map-menu">
@@ -1376,6 +1382,18 @@ fetch('/icon/back.svg')
         if (svgEl) svgEl.classList.add('back-icon');
     });
 
+// 👇 ここから追加：タイル切り替えボタンのSVG読み込み
+fetch('/icon/tile.svg')
+    .then(res => res.text())
+    .then(svg => {
+        const btn = document.getElementById('map-tile-btn');
+        if (!btn) return;
+
+        btn.innerHTML = svg;
+        const svgEl = btn.querySelector('svg');
+        if (svgEl) svgEl.classList.add('tile-icon');
+    });
+
 document.getElementById('map-back-btn')?.addEventListener('click', () => {
     goBack(window.currentHash);
 });
@@ -1769,8 +1787,6 @@ function renderAreaGuide() {
     });
 }
 
-
-
 function resetAreaGuide() {
 
   const container = document.getElementById('area-guide');
@@ -1782,7 +1798,6 @@ function resetAreaGuide() {
   renderAreaGuide();
 
 }
-
 
 // ==========================================
 // 2. 県域UIの初期化関数
@@ -1814,7 +1829,6 @@ function renderPrefectureUI() {
     }
 }
 
-
 // ==========================================
 // ★ 追加：URLの pref クエリから Region と Pref を安全に抽出する関数
 // ==========================================
@@ -1831,7 +1845,6 @@ function getParsedPrefQuery() {
     //return { region: 'KANTO', pref: parts[0] };
     return { region: 'KANTO', pref: '千葉県' };
 }
-
 
 // ==========================================
 // 爆速化：バックグラウンドCSVプリロード (index.html)
@@ -2147,9 +2160,14 @@ async function routeUpdate() {
             
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
+                const tileBtn = document.getElementById('map-tile-btn'); // 追加
                 if (btn) {
                     btn.style.display = 'block';
-                    requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                    if (tileBtn) tileBtn.style.display = 'block'; // 追加
+                    requestAnimationFrame(() => { 
+                        btn.style.opacity = '1'; 
+                        if (tileBtn) tileBtn.style.opacity = '1'; // 追加
+                    });
                 }
             });
         }
