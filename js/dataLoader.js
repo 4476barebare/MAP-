@@ -1297,7 +1297,7 @@ function zoomToSpot(spot) {
 
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
-    const isSpecial = typeParts.includes('special'); // ★ Special判定を追加
+    const isSpecial = typeParts.includes('special'); 
 
     const targetLat = safe.lat;
     const targetLng = safe.lng;
@@ -1322,39 +1322,30 @@ function zoomToSpot(spot) {
         window.osmLayer = null;
     }
 
-    // =====================================================
-    // ★ 修正1：Specialなら強制的に13.5、それ以外は従来通り
-    // =====================================================
     const targetZoom = isSpecial ? 13.5 : (safe.zoom < 13.5 ? 13.5 : safe.zoom);
 
-    // ========================
-    // 操作ロック
-    // ========================
     window.map.dragging.disable();
     window.map.scrollWheelZoom.disable();
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // ========================
-    // 移動
-    // ========================
     window.map.flyTo(
         [targetLat, targetLng],
         targetZoom,
         { duration: 0.5 }
     );
 
-    // ========================
-    // UI更新
-    // ========================
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
 
-    // 👇 ここから追加：タイル切り替えボタンを表示する
+    // =====================================
+    // ★ タイル切り替えボタンを表示する処理
+    // =====================================
     const tileWrap = document.getElementById('tile-btn-wrap');
     const tileBtn = document.getElementById('map-tile-btn');
     if (tileWrap && tileBtn) {
         tileWrap.style.display = 'flex';
+        tileBtn.style.display = 'block'; // ← ここで確実にblockにする
         requestAnimationFrame(() => {
             tileBtn.style.opacity = '1';
         });
@@ -1371,13 +1362,8 @@ function zoomToSpot(spot) {
         window.currentSpotId = safe.individualId;
     }
 
-    // ========================
-    // 移動完了後処理
-    // ========================
     window.map.once('moveend', function () {
-        
         setTimeout(function () {
-            
             window.map.invalidateSize();
 
             showFishMarkers(safe.URL);
@@ -1388,15 +1374,10 @@ function zoomToSpot(spot) {
             let bounds = window.map.getBounds();
             let zoomLimit;
 
-            // =====================================================
-            // ★ 修正2：Special用の可動範囲（バウンズ）計算ロジック
-            // =====================================================
             if (isSpecial) {
-                // ① CSVの本来のzoom値との差分だけ、ベースの可動範囲を広げる
                 const paddingDiff = 13.5 - safe.zoom;
                 bounds = bounds.pad(paddingDiff);
 
-                // ② 魚のマーカーがはみ出す場合は、その座標までバウンズを拡張する
                 if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
                     const fishList = safe.URL.split(',');
                     fishList.forEach(item => {
@@ -1409,29 +1390,23 @@ function zoomToSpot(spot) {
                     });
                 }
                 
-                // 境界ギリギリにマーカーが張り付かないよう、最後に少しだけ余白(5%)を足す
                 bounds = bounds.pad(0.05);
                 zoomLimit = 13.5;
 
             } else if (safe.zoom < 13.5) {
-                // 通常スポット（広域）
                 const paddingDiff = 13.5 - safe.zoom; 
                 bounds = bounds.pad(paddingDiff);
                 zoomLimit = 13.5;
             } else {
-                // 通常スポット（ピンポイント）
                 zoomLimit = safe.zoom;
             }
 
-            // 確定した正確な範囲でドラッグをロック
             window.map.setMaxBounds(bounds);
             window.map.options.maxBoundsViscosity = 1.0; 
 
-            // ズームガード
             window._zoomGuardBase = zoomLimit;
             window._zoomGuardActive = true;
 
-            // 操作復帰
             window.map.dragging.enable();
             window.map.scrollWheelZoom.enable();
             window.map.doubleClickZoom.enable();
@@ -1440,7 +1415,6 @@ function zoomToSpot(spot) {
         }, 100); 
     });
 }
-
 
 function showFishMarkers(url) {
   if (!window.map) return;
@@ -2530,59 +2504,52 @@ function resetSpotLayers() {
     }
 }
 
-// ★ グローバルにロック変数を追加（goBack関数の外、または一番上に）
+// ★ グローバルにロック変数を追加
 window._isGoingBack = false;
 
 function goBack() {
-    // =====================================================
-    // ★ 実行ロック（連打されたら2回目以降は弾く）
-    // =====================================================
     if (window._isGoingBack) return;
     window._isGoingBack = true;
 
-    // =====================================================
-    // ★ 戻るアクション開始時にボタンをフェードアウト＆物理ロック
-    // =====================================================
     const backBtn = document.getElementById('map-back-btn');
     if (backBtn) {
-        backBtn.style.pointerEvents = 'none'; // ★ 透明な間の「見えないボタン」へのクリックを完全遮断
+        backBtn.style.pointerEvents = 'none'; 
         backBtn.style.transition = 'opacity 0.3s ease';
         backBtn.style.opacity = '0';
     }
 
-    // 👇 ここから追加：タイル切り替えボタンも一緒にフェードアウトして隠す
+    // =====================================
+    // ★ タイル切り替えボタンも一緒にフェードアウトして隠す
+    // =====================================
     const tileWrap = document.getElementById('tile-btn-wrap');
     const tileBtn = document.getElementById('map-tile-btn');
     if (tileWrap && tileBtn) {
         tileBtn.style.opacity = '0';
-        setTimeout(() => { tileWrap.style.display = 'none'; }, 300); // フェードアウト完了後にdisplay:none
+        setTimeout(() => { 
+            tileWrap.style.display = 'none'; 
+            tileBtn.style.display = 'none'; // 念のためnoneに戻す
+        }, 300); 
     }
 
-    // ─── 処理完了後にボタンを復活させる共通関数 ───
     const releaseLockAndShowBtn = () => {
-        window._isGoingBack = false; // ロック解除
+        window._isGoingBack = false; 
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
                 backBtn.style.transition = 'opacity 0.4s ease';
                 backBtn.style.opacity = '1';
-                backBtn.style.pointerEvents = 'auto'; // クリック受付再開
+                backBtn.style.pointerEvents = 'auto'; 
             });
         }
     };
 
-    // =====================================================
-    // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
-    // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
         const regionToLoad = window.currentRegion || 'KANTO';
 
-        // 1. クエリをすべてクリア
         setIdealQuery('pref', null);
         setIdealQuery('area', null);
         setIdealQuery('spot', null);
 
-        // 2. システム変数を完全リセット
         window.currentPref = null;
         window.prefData = null;
         window.currentAreaId = null;
@@ -2604,7 +2571,6 @@ function goBack() {
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
-        // フェードアウト完了後に完全に消去し、ロックを解除
         setTimeout(() => {
             if (backBtn) {
                 backBtn.style.display = 'none';
@@ -2632,15 +2598,9 @@ function goBack() {
     const z = window.map.getZoom();
     const restoreSpot = buildSpotRestoreObject();
     
-    // =====================================================
-    // ★ 修正：[0]決め打ちをやめ、includesで special を探す
-    // =====================================================
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$').includes('special');
     const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
-    // =====================================================
-    // ① phase2 → phase1（※実質：スポット詳細 → Phase2 へ戻る）
-    // =====================================================
     if ((z > 13 || isSpecial) && !isPhase2) {
         stopZoomGuard();
         window.map.dragging.enable();
@@ -2658,7 +2618,6 @@ function goBack() {
         }
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        // ★ここで restoreSpot の判定をするため、この時点では currentSpotId を維持する必要がある
         if (!restoreSpot) {
             window._isGoingBack = false;
             return;
@@ -2671,16 +2630,12 @@ function goBack() {
         showSpotsForArea(window.currentAreaId);
         selectSpot(restoreSpot);
 
-        // マップの移動完了（着地）を待ってから、安全に変数とクエリをクリアする
         window.map.once('moveend', () => {
-            // ───【ここで初めて変数とクエリをクリアする】───
-            // 1. クエリを更新（spotだけnullにする）
             if (window.prefData) setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
             if (parentArea) setIdealQuery('area', parentArea.name);
             setIdealQuery('spot', null);
 
-            // 2. システム変数を直接更新
             window.currentSpotId = null;
 
             enablePhase2(window.map);
@@ -2690,9 +2645,7 @@ function goBack() {
         
         return;
     }
-    // =====================================================
-    // ② phase1維持（※実質：Phase2 → Phase1 へ戻る）
-    // =====================================================
+
     if (z === 13 || isPhase2) {
         disablePhase2(window.map);
         clearSub2Weather();
@@ -2737,7 +2690,6 @@ function goBack() {
         selectArea(area);
         renderCrowdImage();
         
-        // selectArea側でも移動処理が走るため、着地後にロック解除
         window.map.once('moveend', () => {
             releaseLockAndShowBtn();
         });
@@ -2745,9 +2697,6 @@ function goBack() {
         return;
     }
 
-    // =====================================================
-    // ③ prefへ戻る（z <= 12）
-    // =====================================================
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
@@ -2772,27 +2721,22 @@ function goBack() {
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         
-        // ───【ここで初めて変数とクエリをクリアする】───
-        // 1. クエリを更新（県だけ残す）
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         setIdealQuery('area', null);
         setIdealQuery('spot', null);
 
-        // 2. システム変数を直接更新
         window.currentAreaId = null;
         window.currentSpotId = null;
 
-        // UIを県画面の構成に戻す
         initAreaUI();
         showPrefSpots();
         renderPrefWeather();
         resetAreaGuide();
 
-        // ロックを解除してボタンを復活
         releaseLockAndShowBtn();
     });
-
 }
+
 
 function buildSpotRestoreObject() {
 
