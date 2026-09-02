@@ -1052,40 +1052,42 @@ li {
    TILE BUTTON (地図タイル切り替え)
 ========================= */
 .map-tile-btn {
-  display: none; /* JSで制御するため初期は非表示 */
-  background: rgba(255, 255, 255, 0.9); /* 白背景で少し透けさせる */
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 4px; /* 四角いボタンにする */
-  padding: 4px; /* アイコンの周りの余白 */
-  width: 34px; /* 戻るボタンより少し大きめにして押しやすく */
-  height: 34px;
+  display: none; 
+  background: none; /* ★ 白背景をなくす */
+  border: none;     /* ★ 枠線をなくす */
+  padding: 0;
+  width: 28px;      /* ★ 戻るボタンと同じ大きさに揃える */
+  height: 28px;
   cursor: pointer;
   pointer-events: auto;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3); /* 軽い影で浮き上がらせる */
-  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: none; /* ★ 四角い影をなくす */
+  -webkit-appearance: none;
+  appearance: none;
+  /* ★ 戻るボタンと同じ「アイコン自体への影」をつける */
+  filter: drop-shadow(0 1px 1.5px rgba(0,0,0,0.45)) drop-shadow(0 0 2px rgba(0,0,0,0.25));
+  transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
-/* アイコン自体の設定 */
+/* SVGアイコン自体の設定 */
 .tile-icon {
   width: 100%;
   height: 100%;
-  fill: #333; /* SVGの色をダークグレーに */
+  fill: #fff; /* ★ 戻るボタンに合わせて色を白にする（SVGに直接色が指定されていない場合） */
   display: block;
 }
 
 /* スマホ等でタップした時の反応 */
 .map-tile-btn:active {
-  background: #e0e0e0;
-  transform: scale(0.95);
+  transform: scale(0.9); /* タップ時に少しだけ縮むアクション */
 }
 
 /* PC等でのホバー効果 */
 @media (hover: hover) and (pointer: fine) {
   .map-tile-btn:hover {
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    transform: scale(1.1); /* ホバーで少しフワッと大きくなる */
   }
 }
+
 
 /* =========================
    SPOT LABEL
