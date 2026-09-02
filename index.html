@@ -1372,8 +1372,6 @@ function clearRegionMarkers() {
     }
 }
 
-
-
 // ================================
 // ■ 戻るボタンの設定など（独立して実行）
 // ================================
@@ -1388,7 +1386,7 @@ fetch('/icon/back.svg')
         if (svgEl) svgEl.classList.add('back-icon');
     });
 
-// 👇 ここから追加：タイル切り替えボタンのSVG読み込み
+// 👇 タイル切り替えボタンのSVG読み込みとクリックイベント
 fetch('/icon/tile.svg')
     .then(res => res.text())
     .then(svg => {
@@ -1420,10 +1418,10 @@ fetch('/icon/tile.svg')
         });
     });
 
-
 document.getElementById('map-back-btn')?.addEventListener('click', () => {
     goBack(window.currentHash);
 });
+
 
 // ================================
 // ■ 天気CSVの読み込み（パース済みの爆速キャッシュ対応）
@@ -2150,9 +2148,6 @@ async function checkAndLoadRouteData() {
     }
 }
 
-// ==========================================
-// 4. ハブとなる routeUpdate (クエリ連動テスト版)
-// ==========================================
 async function routeUpdate() {
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; 
@@ -2162,6 +2157,7 @@ async function routeUpdate() {
         loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
+
     // ─── スポット階層 ───
     if (window.currentSpotId) {
 
@@ -2181,22 +2177,24 @@ async function routeUpdate() {
             setIdealQuery('spot', spot.name);
 
             drawLocation(spot.name, spot.lat, spot.lng, "13");
-            
-            // ★ ここでマーカー描画関数に飛び、その中で showFishMarkers(spot.URL) が呼ばれる
             zoomToSpot(spot);
             
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
-                const tileWrap = document.getElementById('tile-btn-wrap'); // 追加
-                const tileBtn = document.getElementById('map-tile-btn'); // 追加
+                const tileWrap = document.getElementById('tile-btn-wrap'); 
+                const tileBtn = document.getElementById('map-tile-btn'); 
                 
                 if (btn) {
                     btn.style.display = 'block';
-                    if (tileWrap) tileWrap.style.display = 'flex'; // 追加: 親枠を表示
+                    // =====================================
+                    // ★ ここでも確実にblockにする
+                    // =====================================
+                    if (tileWrap) tileWrap.style.display = 'flex'; 
+                    if (tileBtn) tileBtn.style.display = 'block'; 
                     
                     requestAnimationFrame(() => { 
                         btn.style.opacity = '1'; 
-                        if (tileBtn) tileBtn.style.opacity = '1'; // 追加: ボタンをフェードイン
+                        if (tileBtn) tileBtn.style.opacity = '1'; 
                     });
                 }
             });
@@ -2204,6 +2202,7 @@ async function routeUpdate() {
         }
         return;
     }
+
     // ─── エリア階層 ───
     if (window.currentAreaId) {
         const safeAreaId = window.currentAreaId || ""; 
@@ -2217,7 +2216,6 @@ async function routeUpdate() {
         const safeZoom = area.zoom || window.prefData.zoom;
         drawLocation(area.name, area.lat, area.lng, safeZoom);
         
-        // ★ area (オブジェクト) 自身を渡す（この中で prepareFishForArea が呼ばれる）
         selectArea(area); 
         renderCrowdImage();
         
@@ -2241,7 +2239,6 @@ async function routeUpdate() {
         
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                // ここは「戻る」ボタン等で県画面に戻ってきた時の再構築用として残す
                 if (typeof showPrefSpots === 'function') showPrefSpots();
                 if (typeof initAreaUI === 'function') initAreaUI();
                 if (typeof renderPrefWeather === 'function') renderPrefWeather();
