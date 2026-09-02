@@ -1287,6 +1287,7 @@ function zoomToSpot(spot) {
     if (!window.map || !spot) return;
 
     window.mapStateSnapshot = null;
+    window.currentSpotBaseTile = null;
 
     disablePhase2(window.map);
     resetSpotLayers();
@@ -1308,6 +1309,9 @@ function zoomToSpot(spot) {
     } else {
         tileUrl = window.gsiLayers.photo;
     }
+
+    // 👇 追加: スポット本来のタイルURLを記憶しておく
+    window.currentSpotBaseTile = tileUrl;
 
     if (window.gsiLayer) {
         window.map.removeLayer(window.gsiLayer);
