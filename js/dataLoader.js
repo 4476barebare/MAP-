@@ -644,9 +644,18 @@ function showSpotsForArea(areaKey) {
             selectSpot(spot);
         });
 
-        window.areaSpotLayer.addLayer(marker);
-        
-        // ...（minLat/maxLat等のBounds計算はそのまま）
+window.areaSpotLayer.addLayer(marker);
+
+// Bounds計算
+const lat = Number(spot.lat);
+const lng = Number(spot.lng);
+
+if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    minLat = Math.min(minLat, lat);
+    maxLat = Math.max(maxLat, lat);
+    minLng = Math.min(minLng, lng);
+    maxLng = Math.max(maxLng, lng);
+}
     });
 
     const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
