@@ -1150,7 +1150,7 @@ li {
 
 /* スポット画面（osm-solid-layerが存在する状態）の時だけ、その中にあるspot-textを大きくする */
 .leaflet-layer.osm-solid-layer ~ .leaflet-pane .spot-text {
-    font-size: 13px !important;
+    font-size: 18px !important;
 }
 
 
