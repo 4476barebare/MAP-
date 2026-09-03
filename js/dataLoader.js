@@ -705,21 +705,27 @@ function selectSpot(spot) {
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
+    // =====================================================
+    // ★ 修正：moveend後のドラッグ制限（バウンズ）を確実に効かせる
+    // =====================================================
     window.map.once('moveend', () => {
-        window.map.invalidateSize(true);
-        
-        window.map.dragging.enable();
-        window.map.options.maxBoundsViscosity = 1.0;
-
-        requestAnimationFrame(() => {
+        // ★ requestAnimationFrame ではなく、100msの遅延を挟んでLeafletの計算ズレをなくす
+        setTimeout(() => {
+            window.map.invalidateSize(true);
+            
+            // ★ showSpotsForArea で計算済みの「同じエリアのスポット群の座標範囲」でガチッと固定
             window.map.setMaxBounds(window.areaBounds);
-        });
+            window.map.options.maxBoundsViscosity = 1.0;
+            
+            // 操作を許可
+            window.map.dragging.enable();
+        }, 100);
     });
 
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
-
 }
+
 
 
 function phase1menu(areaId) {
