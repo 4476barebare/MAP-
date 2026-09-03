@@ -699,43 +699,61 @@ function selectSpot(spot) {
         }
     ).addTo(window.map);
 
-    // ... （前半部分はそのまま） ...
-
+    // ... 前半はそのまま ...
     disableAreaSwipe();
-
     window.map.setMaxBounds(null);
 
-    // ★ drawLocation内の flyTo アニメーションは 0.5秒 (500ms) かかっている
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
     // =====================================================
-    // ★ 別のアプローチ：moveendに頼らず、アニメーション完了時間を基準にする
+    // ★ 修正：完全にロックされない、適切なエリアバウンズの再計算
     // =====================================================
-    setTimeout(() => {
-        window.map.invalidateSize(true);
-        
-        // 1. スポットが端にある場合、画面が areaBounds をはみ出してバグるのを防ぐため、
-        // 「現在の画面範囲」を取得する
-        const currentView = window.map.getBounds();
-        
-        // 2. 「元々のエリア範囲」に「現在の画面範囲」を足し合わせる（結合する）
-        // こうすることで、現在見えている画面が絶対に制限範囲内に収まるようになり、Leafletが壊れない
-        const safeBounds = window.areaBounds.pad(0).extend(currentView);
-        
-        // 3. 安全なバウンズでガチッと固定
-        window.map.setMaxBounds(safeBounds);
-        window.map.options.maxBoundsViscosity = 1.0;
-        
-        // 4. ドラッグ操作を許可
-        window.map.dragging.enable();
+    window.map.once('moveend', () => {
+        setTimeout(() => {
+            window.map.invalidateSize(true);
+            
+            // 1. エリア内の全スポット座標を集めて枠を自作する
+            const spotsInArea = window.spotData.filter(s => s.areaId === spot.areaId);
+            let areaBounds = L.latLngBounds();
+            spotsInArea.forEach(s => {
+                if (s.lat != null && s.lng != null) {
+                    areaBounds.extend([s.lat, s.lng]);
+                }
+            });
 
-    }, 600); // 500ms(アニメーション) + 100ms(余裕) = 600ms 後に確実に実行
+            // 2. スポット群の範囲に最低限の余白を付ける
+            if (areaBounds.isValid()) {
+                const latBuffer = Math.max((areaBounds.getNorth() - areaBounds.getSouth()) * 0.2, 0.05);
+                const lngBuffer = Math.max((areaBounds.getEast() - areaBounds.getWest()) * 0.2, 0.05);
+                areaBounds = L.latLngBounds(
+                    [areaBounds.getSouth() - latBuffer, areaBounds.getWest() - lngBuffer],
+                    [areaBounds.getNorth() + latBuffer, areaBounds.getEast() + lngBuffer]
+                );
+            } else {
+                areaBounds = window.map.getBounds();
+            }
+
+            // 3. 【最重要】「現在の画面サイズ ＋ 20%の遊び」を合成する
+            // これにより、枠が画面より小さくて1ミリも動けなくなるLeafletのフリーズ仕様を防ぐ
+            const viewWithPadding = window.map.getBounds().pad(0.2);
+            areaBounds = areaBounds.extend(viewWithPadding);
+
+            // 4. 安全な枠でガチッと固定
+            window.map.setMaxBounds(areaBounds);
+            window.map.options.maxBoundsViscosity = 1.0;
+            
+            // 操作を許可
+            window.map.dragging.enable();
+            window.map.scrollWheelZoom.enable();
+            window.map.doubleClickZoom.enable();
+            window.map.touchZoom.enable();
+            
+        }, 100);
+    });
 
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
 }
-
-
 
 
 function phase1menu(areaId) {
