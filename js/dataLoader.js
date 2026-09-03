@@ -717,10 +717,7 @@ function selectSpot(spot) {
     });
 
     enablePhase2(window.map);
-
-    // 👇ここを追加（スポット画面に入った証のクラスを付与）
     window.map.getContainer().classList.add('is-spot-mode');
-}
 
 }
 
