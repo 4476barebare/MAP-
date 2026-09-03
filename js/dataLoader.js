@@ -702,17 +702,19 @@ function selectSpot(spot) {
         spot.lng,
         13
     );
-    window.map.once('moveend', () => {
-        window.map.invalidateSize(true);
-        // areaBoundsが無ければ再構築
-        if (!window.areaBounds && window.currentAreaId) {
-            showSpotsForArea(window.currentAreaId);
-        }
-        // ★ ズーム13ではエリアBoundsを適用
-        requestAnimationFrame(() => {
+window.map.once('moveend', () => {
+    window.map.invalidateSize(true);
+    
+    if (!window.areaBounds && window.currentAreaId) {
+        showSpotsForArea(window.currentAreaId);
+    }
+    
+    requestAnimationFrame(() => {
+        if (typeof enableDragForArea === 'function') {
             enableDragForArea();
-        });
+        }
     });
+});
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
 }
