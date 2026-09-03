@@ -698,50 +698,51 @@ function selectSpot(spot) {
             fadeAnimation: false
         }
     ).addTo(window.map);
-    // ... 前半はそのまま ...
+
     disableAreaSwipe();
 
-    // ★ 移動前に必ず既存の制限を解除し、引っ掛かり（ブルンと揺れる現象）を消す
     window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
     // =====================================================
-    // ★ 修正：確実なエリアバウンズの適用とフリーズ回避
+    // ★ 修正：遅延処理を全廃止し、安全で厳格なバウンズを即座に適用
     // =====================================================
     window.map.once('moveend', () => {
-        setTimeout(() => {
-            window.map.invalidateSize(true);
-            
-            // 1. すでに showSpotsForArea で計算済みの「正しいエリア範囲」を複製
-            let safeBounds;
-            if (window.areaBounds && window.areaBounds.isValid()) {
-                safeBounds = L.latLngBounds(
-                    window.areaBounds.getSouthWest(), 
-                    window.areaBounds.getNorthEast()
-                );
-            } else {
-                safeBounds = window.map.getBounds();
+        window.map.invalidateSize(true);
+        
+        // 1. エリア内のスポットだけの厳格な範囲を作成
+        const spotsInArea = window.spotData.filter(s => s.areaId === spot.areaId);
+        let strictBounds = L.latLngBounds();
+        spotsInArea.forEach(s => {
+            if (s.lat != null && s.lng != null) {
+                strictBounds.extend([s.lat, s.lng]);
             }
+        });
 
-            // 2. 【最重要】「現在の画面サイズ」を足し合わせる
-            // Leafletは制限枠が画面より小さいとフリーズや激しいバウンドを起こすため、これを防ぐ
-            safeBounds.extend(window.map.getBounds());
+        // 2. スポット群に最低限の余白（10%）を持たせる
+        if (strictBounds.isValid()) {
+            strictBounds = strictBounds.pad(0.1);
+        } else {
+            strictBounds = window.map.getBounds();
+        }
 
-            // 3. 確定した安全な枠でロック
-            window.map.setMaxBounds(safeBounds);
-            window.map.options.maxBoundsViscosity = 1.0;
-            
-            // 4. 操作を許可
-            window.map.dragging.enable();
-            
-        }, 100);
+        // 3. 「1ミリもドラッグできない（完全フリーズ）」を防ぐため、
+        // 現在の画面サイズ＋少しの遊び（10%）を合成する
+        const viewWithPadding = window.map.getBounds().pad(0.1);
+        strictBounds.extend(viewWithPadding);
+
+        // 4. setTimeoutを使わず、ここで即座に適用（行ったり来たりした時のバグを完全に防止）
+        window.map.options.maxBoundsViscosity = 1.0;
+        window.map.setMaxBounds(strictBounds);
+        
+        // 5. 操作を許可
+        window.map.dragging.enable();
     });
 
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
 }
+
 
 
 function phase1menu(areaId) {
