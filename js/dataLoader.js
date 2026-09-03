@@ -590,6 +590,10 @@ function saveMapState() {
 
 function showSpotsForArea(areaKey) {
 
+    // 👇 修正：直リンク対策。ドットが無い場合は、キャッシュ確認と新規生成を兼ね備えた showPrefSpots を呼ぶ
+    if (!window.prefSpotLayer) {
+        if (typeof showPrefSpots === 'function') showPrefSpots();
+    }
 
     if (!window.areaSpotLayer) {
         window.areaSpotLayer = L.layerGroup().addTo(window.map);
@@ -603,6 +607,8 @@ function showSpotsForArea(areaKey) {
     );
     
     if (!spots.length) return;
+
+    // ...以下そのまま
 
     let minLat = Infinity, maxLat = -Infinity;
     let minLng = Infinity, maxLng = -Infinity;
