@@ -695,28 +695,26 @@ function selectSpot(spot) {
 
     disableAreaSwipe();
 
-    // ★ 移動中は制限を完全に外す
+    // ★ 変更点1: zoomToSpotなどで弄られた過去のBoundsを確実に【破棄】する
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
-    // ★ 移動アニメーション完了後に、必ずareaBoundsでロックする
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         
-        // 直リンク時など、areaBoundsが未計算の場合はここで生成
+        // ★ 変更点2: URL直打ち等で areaBounds が未計算の場合は再生成する
         if (!window.areaBounds && window.currentAreaId) {
             showSpotsForArea(window.currentAreaId);
         }
-
-        // 既存の正しいareaBoundsをそのまま適用
-        if (window.areaBounds && window.areaBounds.isValid()) {
-            window.map.setMaxBounds(window.areaBounds);
-            window.map.options.maxBoundsViscosity = 1.0;
-        }
         
-        window.map.dragging.enable();
+        // ★ 変更点3: 直接バラバラに設定せず、既存の専用関数を使って正しく【再設定】する
+        requestAnimationFrame(() => {
+            if (typeof enableDragForArea === 'function') {
+                enableDragForArea();
+            }
+        });
     });
 
     enablePhase2(window.map);
