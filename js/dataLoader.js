@@ -717,6 +717,11 @@ function selectSpot(spot) {
     });
 
     enablePhase2(window.map);
+
+    // 👇ここを追加（スポット画面に入った証のクラスを付与）
+    window.map.getContainer().classList.add('is-spot-mode');
+}
+
 }
 
 
@@ -1282,6 +1287,7 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
 
     if (!window.map || !spot) return;
+    window.map.getContainer().classList.add('is-spot-mode');
 
     window.mapStateSnapshot = null;
     window.currentSpotBaseTile = null;
@@ -2511,6 +2517,11 @@ window._isGoingBack = false;
 function goBack() {
     if (window._isGoingBack) return;
     window._isGoingBack = true;
+
+    // 👇ここを追加（戻る時にクラスを外す）
+    if (window.map) {
+        window.map.getContainer().classList.remove('is-spot-mode');
+    }
 
     const backBtn = document.getElementById('map-back-btn');
     if (backBtn) {
