@@ -1243,8 +1243,7 @@ li {
     padding: 4px 8px;
     font-size: 12px;
     border-radius: 4px;
-    color: #191970; /* ★ 修正：#555 から変更 */
-    border: 1px solid #191970; /* ★ 追加：ボタンっぽく枠をつける */
+
     text-decoration: none;
     transition: all 0.2s ease;
 }
