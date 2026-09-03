@@ -699,32 +699,42 @@ function selectSpot(spot) {
         }
     ).addTo(window.map);
 
+    // ... （前半部分はそのまま） ...
+
     disableAreaSwipe();
 
     window.map.setMaxBounds(null);
 
+    // ★ drawLocation内の flyTo アニメーションは 0.5秒 (500ms) かかっている
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
     // =====================================================
-    // ★ 修正：moveend後のドラッグ制限（バウンズ）を確実に効かせる
+    // ★ 別のアプローチ：moveendに頼らず、アニメーション完了時間を基準にする
     // =====================================================
-    window.map.once('moveend', () => {
-        // ★ requestAnimationFrame ではなく、100msの遅延を挟んでLeafletの計算ズレをなくす
-        setTimeout(() => {
-            window.map.invalidateSize(true);
-            
-            // ★ showSpotsForArea で計算済みの「同じエリアのスポット群の座標範囲」でガチッと固定
-            window.map.setMaxBounds(window.areaBounds);
-            window.map.options.maxBoundsViscosity = 1.0;
-            
-            // 操作を許可
-            window.map.dragging.enable();
-        }, 100);
-    });
+    setTimeout(() => {
+        window.map.invalidateSize(true);
+        
+        // 1. スポットが端にある場合、画面が areaBounds をはみ出してバグるのを防ぐため、
+        // 「現在の画面範囲」を取得する
+        const currentView = window.map.getBounds();
+        
+        // 2. 「元々のエリア範囲」に「現在の画面範囲」を足し合わせる（結合する）
+        // こうすることで、現在見えている画面が絶対に制限範囲内に収まるようになり、Leafletが壊れない
+        const safeBounds = window.areaBounds.pad(0).extend(currentView);
+        
+        // 3. 安全なバウンズでガチッと固定
+        window.map.setMaxBounds(safeBounds);
+        window.map.options.maxBoundsViscosity = 1.0;
+        
+        // 4. ドラッグ操作を許可
+        window.map.dragging.enable();
+
+    }, 600); // 500ms(アニメーション) + 100ms(余裕) = 600ms 後に確実に実行
 
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
 }
+
 
 
 
