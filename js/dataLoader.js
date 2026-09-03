@@ -698,55 +698,43 @@ function selectSpot(spot) {
             fadeAnimation: false
         }
     ).addTo(window.map);
-
     // ... 前半はそのまま ...
     disableAreaSwipe();
+
+    // ★ 移動前に必ず既存の制限を解除し、引っ掛かり（ブルンと揺れる現象）を消す
     window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
     // =====================================================
-    // ★ 修正：完全にロックされない、適切なエリアバウンズの再計算
+    // ★ 修正：確実なエリアバウンズの適用とフリーズ回避
     // =====================================================
     window.map.once('moveend', () => {
         setTimeout(() => {
             window.map.invalidateSize(true);
             
-            // 1. エリア内の全スポット座標を集めて枠を自作する
-            const spotsInArea = window.spotData.filter(s => s.areaId === spot.areaId);
-            let areaBounds = L.latLngBounds();
-            spotsInArea.forEach(s => {
-                if (s.lat != null && s.lng != null) {
-                    areaBounds.extend([s.lat, s.lng]);
-                }
-            });
-
-            // 2. スポット群の範囲に最低限の余白を付ける
-            if (areaBounds.isValid()) {
-                const latBuffer = Math.max((areaBounds.getNorth() - areaBounds.getSouth()) * 0.2, 0.05);
-                const lngBuffer = Math.max((areaBounds.getEast() - areaBounds.getWest()) * 0.2, 0.05);
-                areaBounds = L.latLngBounds(
-                    [areaBounds.getSouth() - latBuffer, areaBounds.getWest() - lngBuffer],
-                    [areaBounds.getNorth() + latBuffer, areaBounds.getEast() + lngBuffer]
+            // 1. すでに showSpotsForArea で計算済みの「正しいエリア範囲」を複製
+            let safeBounds;
+            if (window.areaBounds && window.areaBounds.isValid()) {
+                safeBounds = L.latLngBounds(
+                    window.areaBounds.getSouthWest(), 
+                    window.areaBounds.getNorthEast()
                 );
             } else {
-                areaBounds = window.map.getBounds();
+                safeBounds = window.map.getBounds();
             }
 
-            // 3. 【最重要】「現在の画面サイズ ＋ 20%の遊び」を合成する
-            // これにより、枠が画面より小さくて1ミリも動けなくなるLeafletのフリーズ仕様を防ぐ
-            const viewWithPadding = window.map.getBounds().pad(0.2);
-            areaBounds = areaBounds.extend(viewWithPadding);
+            // 2. 【最重要】「現在の画面サイズ」を足し合わせる
+            // Leafletは制限枠が画面より小さいとフリーズや激しいバウンドを起こすため、これを防ぐ
+            safeBounds.extend(window.map.getBounds());
 
-            // 4. 安全な枠でガチッと固定
-            window.map.setMaxBounds(areaBounds);
+            // 3. 確定した安全な枠でロック
+            window.map.setMaxBounds(safeBounds);
             window.map.options.maxBoundsViscosity = 1.0;
             
-            // 操作を許可
+            // 4. 操作を許可
             window.map.dragging.enable();
-            window.map.scrollWheelZoom.enable();
-            window.map.doubleClickZoom.enable();
-            window.map.touchZoom.enable();
             
         }, 100);
     });
