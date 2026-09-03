@@ -652,10 +652,21 @@ function showSpotsForArea(areaKey) {
     const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
     const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
 
+showdebug(
+    "★ Bounds生成前 " +
+    "minLat=" + minLat +
+    " maxLat=" + maxLat +
+    " minLng=" + minLng +
+    " maxLng=" + maxLng
+);
     window.areaBounds = L.latLngBounds(
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
+showdebug(
+    "★ Bounds生成後 " +
+    window.areaBounds.toBBoxString()
+);
 }
 
 function selectSpot(spot) {
