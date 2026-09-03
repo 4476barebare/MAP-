@@ -659,8 +659,12 @@ function showSpotsForArea(areaKey) {
 }
 
 function selectSpot(spot) {
+    if (!window.map || !spot) return;
     const currentZoom = window.map.getZoom();
-
+    // ==========================================
+    // ★ ズーム13
+    // エリア内をドラッグできる状態を維持する
+    // ==========================================
     if (currentZoom === 13) {
         if (spot.zoom !== '') {
             zoomToSpot(spot);
@@ -669,17 +673,13 @@ function selectSpot(spot) {
         }
         return;
     }
-
     if (window.markerControl) {
         markerControl.showShop02(window.currentAreaId);
     }
-
     saveMapState();
-
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
-
     window.osmLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
@@ -688,35 +688,31 @@ function selectSpot(spot) {
             updateWhenIdle: false,
             updateWhenZooming: true,
             updateWhenDragging: true,
-            keepBuffer: 4, 
+            keepBuffer: 4,
             fadeAnimation: false
         }
     ).addTo(window.map);
-
     disableAreaSwipe();
-
-    // ★ 変更点1: zoomToSpotなどで弄られた過去のBoundsを確実に【破棄】する
+    // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
-
-    drawLocation(spot.name, spot.lat, spot.lng, 13);
-
+    drawLocation(
+        spot.name,
+        spot.lat,
+        spot.lng,
+        13
+    );
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-        
-        // ★ 変更点2: URL直打ち等で areaBounds が未計算の場合は再生成する
+        // areaBoundsが無ければ再構築
         if (!window.areaBounds && window.currentAreaId) {
             showSpotsForArea(window.currentAreaId);
         }
-        
-        // ★ 変更点3: 直接バラバラに設定せず、既存の専用関数を使って正しく【再設定】する
+        // ★ ズーム13ではエリアBoundsを適用
         requestAnimationFrame(() => {
-            if (typeof enableDragForArea === 'function') {
-                enableDragForArea();
-            }
+            enableDragForArea();
         });
     });
-
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
 }
