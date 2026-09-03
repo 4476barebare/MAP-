@@ -2677,7 +2677,7 @@ function goBack() {
         return;
     }
 
-        if (z === 13 || isPhase2) {
+    if (z === 13 || isPhase2) {
         disablePhase2(window.map);
         clearSub2Weather();
         
@@ -2706,10 +2706,6 @@ function goBack() {
 
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
-        
-        // =====================================================
-        // ★ 修正：ここでエリアに戻った時の MAX bounds を再適用する
-        // =====================================================
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
@@ -2725,23 +2721,12 @@ function goBack() {
         selectArea(area);
         renderCrowdImage();
         
-        // エリア選択の移動が完全に終わったタイミングでバウンズを再設定
         window.map.once('moveend', () => {
-            if (window.areaBounds) {
-                let safeBounds = L.latLngBounds(
-                    window.areaBounds.getSouthWest(), 
-                    window.areaBounds.getNorthEast()
-                );
-                safeBounds.extend(window.map.getBounds());
-                window.map.setMaxBounds(safeBounds);
-                window.map.options.maxBoundsViscosity = 1.0;
-            }
             releaseLockAndShowBtn();
         });
         
         return;
     }
-
 
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
