@@ -590,7 +590,7 @@ function saveMapState() {
 
 function showSpotsForArea(areaKey) {
 
-    // 👇 修正：直リンク対策。ドットが無い場合は、キャッシュ確認と新規生成を兼ね備えた showPrefSpots を呼ぶ
+    // 直リンク対策。ドットが無い場合は、キャッシュ確認と新規生成を兼ね備えた showPrefSpots を呼ぶ
     if (!window.prefSpotLayer) {
         if (typeof showPrefSpots === 'function') showPrefSpots();
     }
@@ -601,22 +601,18 @@ function showSpotsForArea(areaKey) {
         window.areaSpotLayer.clearLayers();
     }
 
-    // 【変更点1】エリアが一致し、かつ「icon列が空欄ではない（値が存在する）」ものだけを抽出
+    // エリアが一致し、かつ「icon列が空欄ではない（値が存在する）」ものだけを抽出
     const spots = window.spotData.filter(s => 
         s.areaId === areaKey && s.icon && s.icon.trim() !== ''
     );
     
     if (!spots.length) return;
 
-    // ...以下そのまま
-
     let minLat = Infinity, maxLat = -Infinity;
     let minLng = Infinity, maxLng = -Infinity;
 
-  
-    // showSpotsForArea 関数内のループ部分
     spots.forEach(spot => {
-        // ★既存のドットマーカーと全く同じ判定ロジックを使い回す
+        // 既存のドットマーカーと全く同じ判定ロジックを使い回す
         let type = 'spot';
         if (spot.icon && spot.icon.startsWith('fish')) {
             const match = spot.icon.match(/fish\d+/);
@@ -628,7 +624,7 @@ function showSpotsForArea(areaKey) {
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
                 className: 'custom-text-marker',
-                // ★判定した type（spot や fish1 など）をクラスとして付与
+                // 判定した type（spot や fish1 など）をクラスとして付与
                 html: `<div class="spot-text ${type}">${spot.name}</div>`,
                 iconSize: [0, 0],
                 iconAnchor: [0, 0]
@@ -644,47 +640,34 @@ function showSpotsForArea(areaKey) {
             selectSpot(spot);
         });
 
-window.areaSpotLayer.addLayer(marker);
+        window.areaSpotLayer.addLayer(marker);
 
-// Bounds計算
-const lat = Number(spot.lat);
-const lng = Number(spot.lng);
+        // Bounds計算
+        const lat = Number(spot.lat);
+        const lng = Number(spot.lng);
 
-if (Number.isFinite(lat) && Number.isFinite(lng)) {
-    minLat = Math.min(minLat, lat);
-    maxLat = Math.max(maxLat, lat);
-    minLng = Math.min(minLng, lng);
-    maxLng = Math.max(maxLng, lng);
-}
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+            minLat = Math.min(minLat, lat);
+            maxLat = Math.max(maxLat, lat);
+            minLng = Math.min(minLng, lng);
+            maxLng = Math.max(maxLng, lng);
+        }
     });
 
     const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
     const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
 
-showdebug(
-    "★ Bounds生成前 " +
-    "minLat=" + minLat +
-    " maxLat=" + maxLat +
-    " minLng=" + minLng +
-    " maxLng=" + maxLng
-);
     window.areaBounds = L.latLngBounds(
         [minLat - latBuffer, minLng - lngBuffer],
         [maxLat + latBuffer, maxLng + lngBuffer]
     );
-showdebug(
-    "★ Bounds生成後 " +
-    window.areaBounds.toBBoxString()
-);
 }
 
 function selectSpot(spot) {
     if (!window.map || !spot) return;
+    
     const currentZoom = window.map.getZoom();
-showdebug(
-    "selectSpot: zoom=" + currentZoom +
-    " / spot=" + (spot.name || "")
-);
+
     // ==========================================
     // ★ ズーム13
     // エリア内をドラッグできる状態を維持する
@@ -697,13 +680,17 @@ showdebug(
         }
         return;
     }
+
     if (window.markerControl) {
         markerControl.showShop02(window.currentAreaId);
     }
+
     saveMapState();
+
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
+
     window.osmLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
@@ -716,118 +703,41 @@ showdebug(
             fadeAnimation: false
         }
     ).addTo(window.map);
+
     disableAreaSwipe();
+
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
-    drawLocation(
-        spot.name,
-        spot.lat,
-        spot.lng,
-        13
-    );
-window.map.once('moveend', () => {
 
-    showdebug("=== selectSpot moveend ===");
+    drawLocation(spot.name, spot.lat, spot.lng, 13);
 
-    showdebug(
-        "zoom = " +
-        window.map.getZoom()
-    );
+    window.map.once('moveend', () => {
+        window.map.invalidateSize(true);
 
-    showdebug(
-        "currentAreaId = " +
-        window.currentAreaId
-    );
-
-    showdebug(
-        "areaBounds = " +
-        (
-            window.areaBounds
-                ? window.areaBounds.toBBoxString()
-                : "NULL"
-        )
-    );
-
-    window.map.invalidateSize(true);
-
-    if (!window.areaBounds && window.currentAreaId) {
-        showdebug("★ areaBounds無し → showSpotsForArea");
-
-        showSpotsForArea(window.currentAreaId);
-
-        showdebug(
-            "再生成後 areaBounds = " +
-            (
-                window.areaBounds
-                    ? window.areaBounds.toBBoxString()
-                    : "NULL"
-            )
-        );
-    }
-
-    requestAnimationFrame(() => {
-
-        showdebug("★ requestAnimationFrame 実行");
-
-        if (typeof enableDragForArea === 'function') {
-            showdebug("★ enableDragForArea 呼び出し");
-            enableDragForArea();
-        } else {
-            showdebug("★ enableDragForArea が存在しない");
+        if (!window.areaBounds && window.currentAreaId) {
+            showSpotsForArea(window.currentAreaId);
         }
+
+        requestAnimationFrame(() => {
+            if (typeof enableDragForArea === 'function') {
+                enableDragForArea();
+            }
+        });
     });
-});
+
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
 }
 
 function enableDragForArea() {
-
-    showdebug("=== enableDragForArea START ===");
-
-    showdebug("zoom = " + window.map.getZoom());
-
-    showdebug(
-        "areaBounds = " +
-        (window.areaBounds
-            ? window.areaBounds.toBBoxString()
-            : "NULL")
-    );
-
-    showdebug(
-        "currentAreaId = " +
-        window.currentAreaId
-    );
-
     if (!window.areaBounds) {
-        showdebug("★ areaBounds が無いので終了");
         return;
     }
 
     window.map.dragging.enable();
-
-    showdebug("★ dragging.enable() 実行");
-
     window.map.setMaxBounds(window.areaBounds);
-
-    showdebug(
-        "★ setMaxBounds 実行: " +
-        (
-            window.map.options.maxBounds
-                ? window.map.options.maxBounds.toBBoxString()
-                : "NULL"
-        )
-    );
-
     window.map.options.maxBoundsViscosity = 1.0;
-
-    showdebug(
-        "★ viscosity = " +
-        window.map.options.maxBoundsViscosity
-    );
-
-    showdebug("=== enableDragForArea END ===");
 }
 
 function phase1menu(areaId) {
@@ -1010,9 +920,6 @@ function createMenuItem(s) {
 
     return li;
 }
-
-
-
 
 let phase2Initialized = false;
 let lastVisibleSet = new Set();
