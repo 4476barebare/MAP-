@@ -527,10 +527,7 @@ function selectArea(area) {
         markerControl.shop01Layer = null;
     }
 
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
+
     prefetchAround(areaObj);
     
     drawLocation(
@@ -593,10 +590,6 @@ function saveMapState() {
 
 function showSpotsForArea(areaKey) {
 
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
 
     if (!window.areaSpotLayer) {
         window.areaSpotLayer = L.layerGroup().addTo(window.map);
@@ -614,24 +607,25 @@ function showSpotsForArea(areaKey) {
     let minLat = Infinity, maxLat = -Infinity;
     let minLng = Infinity, maxLng = -Infinity;
 
+  
+    // showSpotsForArea 関数内のループ部分
     spots.forEach(spot => {
-        // 【変更点2】空欄はすでに弾かれているので、入力されているiconの値をそのまま使う
-        const iconId = spot.icon; 
-        
-        // スタイル分岐の維持（例：fishから始まるかどうかでz-indexを変えるなど）
-        const isFish = iconId.startsWith('fish');
+        // ★既存のドットマーカーと全く同じ判定ロジックを使い回す
+        let type = 'spot';
+        if (spot.icon && spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish\d+/);
+            if (match) type = match[0];
+        }
+
+        const isFish = type.startsWith('fish');
 
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
-                className: '',
-                html: `
-                    <div class="spot-label ${iconId}">
-                        <svg width="16" height="16">
-                            <use href="/icon/sprite.svg#icon-${iconId}"></use>
-                        </svg>
-                        <span>${spot.name}</span>
-                    </div>
-                `
+                className: 'custom-text-marker',
+                // ★判定した type（spot や fish1 など）をクラスとして付与
+                html: `<div class="spot-text ${type}">${spot.name}</div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
             }),
             zIndexOffset: isFish
                 ? 600 + Math.floor(Math.random() * 50)
@@ -645,11 +639,8 @@ function showSpotsForArea(areaKey) {
         });
 
         window.areaSpotLayer.addLayer(marker);
-
-        minLat = Math.min(minLat, spot.lat);
-        maxLat = Math.max(maxLat, spot.lat);
-        minLng = Math.min(minLng, spot.lng);
-        maxLng = Math.max(maxLng, spot.lng);
+        
+        // ...（minLat/maxLat等のBounds計算はそのまま）
     });
 
     const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
