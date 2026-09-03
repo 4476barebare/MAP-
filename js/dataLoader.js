@@ -695,42 +695,29 @@ function selectSpot(spot) {
 
     disableAreaSwipe();
 
-    // ★ 1. 過去のバウンズ（zoomToSpot等で作られたもの）を完全に破壊する
+    // ★ 移動中は制限を完全に外す
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
-    // ★ 2. バウンズ再構築と適用関数
-    const applyAreaBounds = () => {
+    // ★ 移動アニメーション完了後に、必ずareaBoundsでロックする
+    window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         
-        // 直リンク等で areaBounds が未計算の場合は確実に再生成する
+        // 直リンク時など、areaBoundsが未計算の場合はここで生成
         if (!window.areaBounds && window.currentAreaId) {
             showSpotsForArea(window.currentAreaId);
         }
-        
-        if (window.areaBounds) {
-            let safeBounds = L.latLngBounds(window.areaBounds.getSouthWest(), window.areaBounds.getNorthEast());
-            // 画面がはみ出す場合のフリーズ防止
-            safeBounds.extend(window.map.getBounds());
-            window.map.setMaxBounds(safeBounds);
+
+        // 既存の正しいareaBoundsをそのまま適用
+        if (window.areaBounds && window.areaBounds.isValid()) {
+            window.map.setMaxBounds(window.areaBounds);
             window.map.options.maxBoundsViscosity = 1.0;
-            window.map.dragging.enable();
         }
-    };
-
-    // ★ 3. 既に目的座標にいるならアニメーションは起きないため即時発火、そうでないなら moveend を待つ
-    const center = window.map.getCenter();
-    const isSame = Math.abs(center.lat - spot.lat) < 0.0001 && 
-                   Math.abs(center.lng - spot.lng) < 0.0001 && 
-                   window.map.getZoom() === 13;
-
-    if (isSame) {
-        applyAreaBounds();
-    } else {
-        window.map.once('moveend', applyAreaBounds);
-    }
+        
+        window.map.dragging.enable();
+    });
 
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
@@ -1329,7 +1316,7 @@ function zoomToSpot(spot) {
 
     const targetZoom = isSpecial ? 13.5 : (safe.zoom < 13.5 ? 13.5 : safe.zoom);
 
-    // ★ 1. 過去のバウンズを完全に破壊する
+    // ★ 移動前はロックを完全に外す
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     window.map.dragging.disable();
@@ -1358,8 +1345,8 @@ function zoomToSpot(spot) {
         window.currentSpotId = safe.individualId;
     }
 
-    // ★ 2. バウンズ再構築と適用関数
-    const applySpotBounds = () => {
+    // ★ 移動アニメーション完了後に、独自のスポットBoundsでロックする
+    window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         showFishMarkers(safe.URL);
         createWeekItem(safe.whether);
@@ -1402,19 +1389,7 @@ function zoomToSpot(spot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
-    };
-
-    // ★ 3. 既に目的座標にいるなら即時発火
-    const center = window.map.getCenter();
-    const isSame = Math.abs(center.lat - targetLat) < 0.0001 && 
-                   Math.abs(center.lng - targetLng) < 0.0001 && 
-                   window.map.getZoom() === targetZoom;
-
-    if (isSame) {
-        applySpotBounds();
-    } else {
-        window.map.once('moveend', applySpotBounds);
-    }
+    });
 }
 
 function showFishMarkers(url) {
@@ -1830,10 +1805,6 @@ function removeWeekItem() {
   if (tableContainer) tableContainer.innerHTML = "";
 }
 
-
-
-
-// 単位付き表示ヘルパー
 function withUnit(value, unit, round = true) {
   if (value == null || isNaN(value)) return "—";
   const v = round ? Math.round(value) : value;
@@ -2062,7 +2033,6 @@ function createHourlyWeather(hourlyData,type) {
   root.appendChild(tableEl);
 }
 
-
 function createTideGraph(data, sun) {
 
   const canvas = document.getElementById("tideCanvas");
@@ -2261,7 +2231,6 @@ function createTideGraph(data, sun) {
   ctx.lineWidth = 1.2;
   ctx.stroke(strokePath);
 }
-
 
 function drawSmooth(ctx, pts) {
   ctx.beginPath();
@@ -2593,8 +2562,10 @@ function goBack() {
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$').includes('special');
     const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
+// ... (goBackの前半部分は維持) ...
+
     // =====================================================
-    // ① Phase2 -> Phase1（スポット詳細からPhase1に戻る）
+    // ① Phase2 -> Phase1（スポット詳細からエリア画面に戻る）
     // =====================================================
     if ((z > 13 || isSpecial) && !isPhase2) {
         stopZoomGuard();
@@ -2606,7 +2577,7 @@ function goBack() {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
 
-        // ★ 過去のバウンズを完全に破壊する
+        // ★ 戻る直前に過去のバウンズ（zoomToSpotのもの）を破壊する
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
@@ -2622,7 +2593,6 @@ function goBack() {
         resetWeatherUI();
         clearAccessInfo();
 
-        // UIとクエリを先にクリア
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
         if (parentArea) setIdealQuery('area', parentArea.name);
@@ -2631,24 +2601,16 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
-        // ★ selectSpot に移動とバウンズの再設定をすべて任せる
+        // ★ selectSpot を呼べば、その中で flyTo と moveend時のバウンズ適用が確実に行われる
         selectSpot(restoreSpot);
 
-        // goBack側ではアニメーション完了を待ってロック解除とUI反映のみ行う
-        const center = window.map.getCenter();
-        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && Math.abs(center.lng - restoreSpot.lng) < 0.0001 && window.map.getZoom() === 13;
-        
-        const completePhase1Return = () => {
+        // UIの反映だけをアニメーション完了後に行う
+        window.map.once('moveend', () => {
             enablePhase2(window.map);
             phase1menu(window.currentAreaId);
             releaseLockAndShowBtn();
-        };
-
-        if (isSame) {
-            completePhase1Return();
-        } else {
-            window.map.once('moveend', completePhase1Return);
-        }
+        });
+        
         return;
     }
 
