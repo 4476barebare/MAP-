@@ -1148,11 +1148,13 @@ li {
 .spot-text.fish4 { color: #4B0082; }
 .spot-text.fish6 { color: #006400; }
 
-/* スポット画面（osm-solid-layerが存在する状態）の時だけ、その中にあるspot-textを大きくする */
-.leaflet-layer.osm-solid-layer ~ .leaflet-pane .spot-text {
-    font-size: 18px !important;
+/* スポット画面に入った時だけ文字を少し大きくする */
+.is-spot-mode .spot-text {
+    font-size: 13px !important; /* デフォルト11pxから拡大 */
+    
+    /* 文字が大きくなった分、ドットとの距離を微調整したい場合はコチラ */
+    /* left: 10px !important; */
 }
-
 
 /* =========================
    SHOP MARKER
