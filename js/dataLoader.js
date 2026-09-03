@@ -661,8 +661,6 @@ function showSpotsForArea(areaKey) {
 function selectSpot(spot) {
     if (!window.map || !spot) return;
     const currentZoom = window.map.getZoom();
-    const currentZoom = window.map.getZoom();
-
 showdebug(
     "selectSpot: zoom=" + currentZoom +
     " / spot=" + (spot.name || "")
@@ -762,6 +760,54 @@ window.map.once('moveend', () => {
 });
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
+}
+
+function enableDragForArea() {
+
+    showdebug("=== enableDragForArea START ===");
+
+    showdebug("zoom = " + window.map.getZoom());
+
+    showdebug(
+        "areaBounds = " +
+        (window.areaBounds
+            ? window.areaBounds.toBBoxString()
+            : "NULL")
+    );
+
+    showdebug(
+        "currentAreaId = " +
+        window.currentAreaId
+    );
+
+    if (!window.areaBounds) {
+        showdebug("★ areaBounds が無いので終了");
+        return;
+    }
+
+    window.map.dragging.enable();
+
+    showdebug("★ dragging.enable() 実行");
+
+    window.map.setMaxBounds(window.areaBounds);
+
+    showdebug(
+        "★ setMaxBounds 実行: " +
+        (
+            window.map.options.maxBounds
+                ? window.map.options.maxBounds.toBBoxString()
+                : "NULL"
+        )
+    );
+
+    window.map.options.maxBoundsViscosity = 1.0;
+
+    showdebug(
+        "★ viscosity = " +
+        window.map.options.maxBoundsViscosity
+    );
+
+    showdebug("=== enableDragForArea END ===");
 }
 
 function phase1menu(areaId) {
@@ -945,53 +991,7 @@ function createMenuItem(s) {
     return li;
 }
 
-function enableDragForArea() {
 
-    showdebug("=== enableDragForArea START ===");
-
-    showdebug("zoom = " + window.map.getZoom());
-
-    showdebug(
-        "areaBounds = " +
-        (window.areaBounds
-            ? window.areaBounds.toBBoxString()
-            : "NULL")
-    );
-
-    showdebug(
-        "currentAreaId = " +
-        window.currentAreaId
-    );
-
-    if (!window.areaBounds) {
-        showdebug("★ areaBounds が無いので終了");
-        return;
-    }
-
-    window.map.dragging.enable();
-
-    showdebug("★ dragging.enable() 実行");
-
-    window.map.setMaxBounds(window.areaBounds);
-
-    showdebug(
-        "★ setMaxBounds 実行: " +
-        (
-            window.map.options.maxBounds
-                ? window.map.options.maxBounds.toBBoxString()
-                : "NULL"
-        )
-    );
-
-    window.map.options.maxBoundsViscosity = 1.0;
-
-    showdebug(
-        "★ viscosity = " +
-        window.map.options.maxBoundsViscosity
-    );
-
-    showdebug("=== enableDragForArea END ===");
-}
 
 
 let phase2Initialized = false;
