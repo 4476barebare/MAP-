@@ -661,6 +661,12 @@ function showSpotsForArea(areaKey) {
 function selectSpot(spot) {
     if (!window.map || !spot) return;
     const currentZoom = window.map.getZoom();
+    const currentZoom = window.map.getZoom();
+
+showdebug(
+    "selectSpot: zoom=" + currentZoom +
+    " / spot=" + (spot.name || "")
+);
     // ==========================================
     // ★ ズーム13
     // エリア内をドラッグできる状態を維持する
@@ -703,15 +709,54 @@ function selectSpot(spot) {
         13
     );
 window.map.once('moveend', () => {
+
+    showdebug("=== selectSpot moveend ===");
+
+    showdebug(
+        "zoom = " +
+        window.map.getZoom()
+    );
+
+    showdebug(
+        "currentAreaId = " +
+        window.currentAreaId
+    );
+
+    showdebug(
+        "areaBounds = " +
+        (
+            window.areaBounds
+                ? window.areaBounds.toBBoxString()
+                : "NULL"
+        )
+    );
+
     window.map.invalidateSize(true);
-    
+
     if (!window.areaBounds && window.currentAreaId) {
+        showdebug("★ areaBounds無し → showSpotsForArea");
+
         showSpotsForArea(window.currentAreaId);
+
+        showdebug(
+            "再生成後 areaBounds = " +
+            (
+                window.areaBounds
+                    ? window.areaBounds.toBBoxString()
+                    : "NULL"
+            )
+        );
     }
-    
+
     requestAnimationFrame(() => {
+
+        showdebug("★ requestAnimationFrame 実行");
+
         if (typeof enableDragForArea === 'function') {
+            showdebug("★ enableDragForArea 呼び出し");
             enableDragForArea();
+        } else {
+            showdebug("★ enableDragForArea が存在しない");
         }
     });
 });
@@ -900,13 +945,52 @@ function createMenuItem(s) {
     return li;
 }
 
-
 function enableDragForArea() {
-    if (!window.areaBounds) return;
+
+    showdebug("=== enableDragForArea START ===");
+
+    showdebug("zoom = " + window.map.getZoom());
+
+    showdebug(
+        "areaBounds = " +
+        (window.areaBounds
+            ? window.areaBounds.toBBoxString()
+            : "NULL")
+    );
+
+    showdebug(
+        "currentAreaId = " +
+        window.currentAreaId
+    );
+
+    if (!window.areaBounds) {
+        showdebug("★ areaBounds が無いので終了");
+        return;
+    }
 
     window.map.dragging.enable();
+
+    showdebug("★ dragging.enable() 実行");
+
     window.map.setMaxBounds(window.areaBounds);
+
+    showdebug(
+        "★ setMaxBounds 実行: " +
+        (
+            window.map.options.maxBounds
+                ? window.map.options.maxBounds.toBBoxString()
+                : "NULL"
+        )
+    );
+
     window.map.options.maxBoundsViscosity = 1.0;
+
+    showdebug(
+        "★ viscosity = " +
+        window.map.options.maxBoundsViscosity
+    );
+
+    showdebug("=== enableDragForArea END ===");
 }
 
 
