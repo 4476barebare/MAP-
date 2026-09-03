@@ -1113,7 +1113,7 @@ li {
 .pref-dot.fish2 { background: #2E8B57; }
 .pref-dot.fish3 { background: #FF8C00; }
 .pref-dot.fish4 { background: #4B0082; }
-.pref-dot.fish6 { background: #008000; }
+.pref-dot.fish6 { background: #006400; }
 
 /* =========================
    テキストマーカー用
@@ -1146,7 +1146,12 @@ li {
 .spot-text.fish2 { color: #2E8B57; }
 .spot-text.fish3 { color: #FF8C00; }
 .spot-text.fish4 { color: #4B0082; }
-.spot-text.fish6 { color: #008000; }
+.spot-text.fish6 { color: #006400; }
+
+/* スポット画面（osm-solid-layerが存在する状態）の時だけ、その中にあるspot-textを大きくする */
+.leaflet-layer.osm-solid-layer ~ .leaflet-pane .spot-text {
+    font-size: 13px !important;
+}
 
 
 /* =========================
