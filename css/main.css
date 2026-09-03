@@ -1090,45 +1090,6 @@ li {
 
 
 /* =========================
-   SPOT LABEL
-========================= */
-.spot-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-
-    padding: 1px 4px;
-    font-size: 10px;
-    font-weight: bold;
-    white-space: nowrap;
-
-    border-radius: 2px;
-    background: #191970;
-    color: #fff;
-
-    border: none;
-    box-shadow: none;
-}
-
-.spot-label svg {
-    width: 12px;
-    height: 12px;
-    fill: currentColor;
-}
-
-/* spot default */
-.spot-label.spot {
-    background: #191970;
-}
-
-/* fish colors */
-.spot-label.fish1 { background: #6495ED; }
-.spot-label.fish2 { background: #2E8B57; }
-.spot-label.fish3 { background: #FF8C00; }
-.spot-label.fish4 { background: #4B0082; }
-.spot-label.fish6 { background: #008000; }
-
-/* =========================
    PREF DOT
 ========================= */
 .pref-dot {
@@ -1153,6 +1114,40 @@ li {
 .pref-dot.fish3 { background: #FF8C00; }
 .pref-dot.fish4 { background: #4B0082; }
 .pref-dot.fish6 { background: #008000; }
+
+/* =========================
+   テキストマーカー用
+========================= */
+.custom-text-marker {
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: visible !important;
+}
+
+.spot-text {
+    position: absolute;
+    left: 8px; /* 既存のドットの右横に配置 */
+    top: 0;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    /* 白フチをつけて読みやすくする */
+    text-shadow: 
+        1px 1px 0 #fff, -1px -1px 0 #fff, 
+        1px -1px 0 #fff, -1px 1px 0 #fff;
+}
+
+/* ★既存のCSS（ドットの色）と同じカラーコードを文字色に使い回す */
+.spot-text.spot  { color: #191970; }
+.spot-text.fish1 { color: #6495ED; }
+.spot-text.fish2 { color: #2E8B57; }
+.spot-text.fish3 { color: #FF8C00; }
+.spot-text.fish4 { color: #4B0082; }
+.spot-text.fish6 { color: #008000; }
+
 
 /* =========================
    SHOP MARKER
