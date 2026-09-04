@@ -1923,7 +1923,7 @@ if (!window.fetchCacheStatus[prefCode]) {
 // ================================
 let isRegionLoaded = false;
 function loadRegionMap() {
-    showdebug("▼ loadRegionMap 開始");
+   // showdebug("▼ loadRegionMap 開始");
     const regionCode = window.currentRegion || 'KANTO';
 
     // 1. マップのリセット
@@ -1953,7 +1953,7 @@ function loadRegionMap() {
         return;
     }
 
-    showdebug("▷ フェッチ先: " + window.regionUrl);
+  //  showdebug("▷ フェッチ先: " + window.regionUrl);
 
     fetch(window.regionUrl) 
         .then(res => {
@@ -1964,7 +1964,7 @@ function loadRegionMap() {
             const lines = text.trim().split('\n');
             showdebug("▷ CSV取得成功 行数: " + lines.length);
             if (lines.length < 2) {
-                showdebug("❌ 行数が足りません");
+               //  showdebug("❌ 行数が足りません");
                 return;
             }
 
@@ -1978,7 +1978,7 @@ function loadRegionMap() {
             const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
 
             if (typeIdx === -1) {
-                showdebug("❌ type列が見つからないため中断");
+               //  showdebug("❌ type列が見つからないため中断");
                 return;
             }
 
@@ -1996,7 +1996,7 @@ function loadRegionMap() {
                     const lat = parseFloat(cols[latIdx]);
                     const lng = parseFloat(cols[lngIdx]);
                     const zoom = parseFloat(cols[zoomIdx]);
-                    showdebug(`▷ 描画指示: lat=${lat}, lng=${lng}, zoom=${zoom}`);
+                  //   showdebug(`▷ 描画指示: lat=${lat}, lng=${lng}, zoom=${zoom}`);
                     window.regionData = { name, lat, lng, zoom };
                     drawLocation(name, lat, lng, zoom);
                     isMapDrawn = true;
@@ -2062,10 +2062,10 @@ function loadRegionMap() {
             if (linkContainer) linkContainer.innerHTML = regionHtml;
 
             isRegionLoaded = true;
-            showdebug("✅ loadRegionMap 完了");
+           //  showdebug("✅ loadRegionMap 完了");
         })
         .catch(err => {
-            showdebug("❌ loadRegionMap エラー: " + err.message);
+           //  showdebug("❌ loadRegionMap エラー: " + err.message);
             console.error("Regionマップの初期化エラー:", err);
         });
 }
@@ -2134,9 +2134,9 @@ async function loadPrefectureData(prefCode) {
 
     try {
         // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
-        showdebug("▷ loadLocationJSON を実行します...");
+       //  showdebug("▷ loadLocationJSON を実行します...");
         await loadLocationJSON(window.prefLocationUrl);
-        showdebug("✅ loadLocationJSON 完了");
+    //     showdebug("✅ loadLocationJSON 完了");
         
         // 沿岸部の天気を取得して全スポットに付与
         const whetherUrl = `/data/${prefCode}_whether.csv`;
@@ -2152,7 +2152,7 @@ async function loadPrefectureData(prefCode) {
         return true; 
     } catch (err) {
         // エラー内容をデバッグ画面に直接出力！
-        showdebug("❌ loadPrefectureDataエラー: " + err.message);
+ //        showdebug("❌ loadPrefectureDataエラー: " + err.message);
         console.error("データ読み込みエラー:", err);
         return false;
     }
@@ -2165,7 +2165,7 @@ async function checkAndLoadRouteData() {
     const prefCode = window.currentPref;
     showdebug("▼ checkAndLoadRouteData 開始: currentPref=" + prefCode);
     if (!prefCode) {
-        showdebug("❌ prefCodeが無いので return true");
+  //       showdebug("❌ prefCodeが無いので return true");
         return true; 
     }
 
@@ -2173,26 +2173,26 @@ async function checkAndLoadRouteData() {
         let needsBaseLoad = false;
         if (!window.prefData) {
             needsBaseLoad = true;
-            showdebug("▷ prefData が無いため BaseLoad=true");
+    //         showdebug("▷ prefData が無いため BaseLoad=true");
         } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
             needsBaseLoad = true;
-            showdebug("▷ 天気データが無いため BaseLoad=true");
+   //          showdebug("▷ 天気データが無いため BaseLoad=true");
         }
 
         if (needsBaseLoad) {
-            showdebug("▷ await loadPrefectureData() を呼び出し");
+    //         showdebug("▷ await loadPrefectureData() を呼び出し");
             await loadPrefectureData(prefCode);
             
-            showdebug("▷ UI描画系の呼び出し開始");
+  //           showdebug("▷ UI描画系の呼び出し開始");
             renderPrefectureUI(); 
             if (typeof showPrefSpots === 'function') showPrefSpots();
             if (typeof initAreaUI === 'function') initAreaUI();
             if (typeof renderPrefWeather === 'function') renderPrefWeather();
-            showdebug("✅ UI描画系の呼び出し完了");
+   //          showdebug("✅ UI描画系の呼び出し完了");
         }
         return true; 
     } catch (err) {
-        showdebug("❌ checkAndLoadRouteDataエラー: " + err.message);
+   //      showdebug("❌ checkAndLoadRouteDataエラー: " + err.message);
         console.error("データロードエラー:", err);
         return false;
     }
@@ -2460,7 +2460,7 @@ function showdebug(msg) {
         debugBox.style.background = 'rgba(0, 0, 0, 0.8)';
         debugBox.style.color = '#00ff00';
         debugBox.style.fontFamily = 'monospace';
-        debugBox.style.fontSize = '14px';
+        debugBox.style.fontSize = '10px';
         debugBox.style.zIndex = '999999';
         debugBox.style.borderRadius = '5px';
         debugBox.style.pointerEvents = 'none'; // クリックの邪魔にならないように
