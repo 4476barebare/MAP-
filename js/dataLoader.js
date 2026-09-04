@@ -520,11 +520,16 @@ function selectArea(area) {
         : area;
 
     if (!areaObj) return;
+
+    // ★ 追加: 前の画面(スポット等)のBoundsを確実に破棄
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
     
     if (window.spotLayer) {
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
     }
+    // ... 以下既存のコード ...
 
     if (window.markerControl?.shop01Layer) {
         window.map.removeLayer(markerControl.shop01Layer);
@@ -748,6 +753,9 @@ function selectSpot(spot) {
 }
 
 function enableDragForArea() {
+    // ★ 追加: 意図しない moveend 暴発時の防御。ズーム13以外では絶対に制限をかけない
+    if (window.map.getZoom() !== 13) return;
+
     // 1. 県全体のバウンズが未計算の場合、全スポットデータから算出する
     if (!window.prefBounds && window.spotData && window.spotData.length > 0) {
         let minLat = Infinity, maxLat = -Infinity;
@@ -2798,7 +2806,7 @@ function goBack() {
 
         // UIの反映だけをアニメーション完了後に行う
         window.map.once('moveend', () => {
-            enablePhase2(window.map);
+            //enablePhase2(window.map);
             phase1menu(window.currentAreaId);
             releaseLockAndShowBtn();
         });
