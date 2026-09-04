@@ -485,7 +485,7 @@ async function applyQueryToStateFromCsv() {
     if (!qPref) return; // prefクエリが無い場合は何もしない
 
     // --------------------------------------------------
-    // パターン1：prefクエリがある場合 (Region CSVの探索) - ここはCSVのまま
+    // パターン1：prefクエリがある場合 (Region CSVの探索)
     // --------------------------------------------------
     if (window.regionUrl) {
         try {
@@ -509,8 +509,9 @@ async function applyQueryToStateFromCsv() {
                                 // name列を pref(現在の県)としてグローバル定義
                                 window.currentPref = cols[nameIdx];
 
-                                // ★ url列に何らかの値が入っているかだけをチェックし、パスを生成（JSONとして）
+                                // ★ url列に何らかの値が入っているかだけをチェックし、パスを生成
                                 if (cols[urlIdx]) {
+                                    // 修正：必ず .json 拡張子でパスを生成する
                                     window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
                                 }
                                 break;
@@ -525,24 +526,28 @@ async function applyQueryToStateFromCsv() {
     }
 
     // --------------------------------------------------
-    // パターン2 & パターン3 (Location JSONの探索) ★ここをJSON用に修正！
+    // パターン2 & パターン3 (Location JSONの探索)
     // --------------------------------------------------
+    // パターン1で prefLocationUrl が無事に定義されていて、かつ下位クエリがある場合のみ実行
     if ((qArea || qSpot) && window.prefLocationUrl) {
         try {
             const res = await fetch(window.prefLocationUrl);
             if (res.ok) {
-                // ★ text() ではなく json() で受け取る
+                // ★ 修正：text() ではなく json() で受け取り、配列としてそのまま扱う
                 const allRows = await res.json();
                 
-                if (allRows && allRows.length > 0) {
+                if (Array.isArray(allRows) && allRows.length > 0) {
+                    // 1回のループでエリアとスポットの両方を探す（爆速化）
                     for (const row of allRows) {
+                        const rowName = row.name;
+                        
                         // パターン2：エリアクエリと同一の行を探す
-                        if (qArea && row.name === qArea) {
+                        if (qArea && rowName === qArea) {
                             window.currentAreaId = row.areaId + "_" + row.individualId;
                         }
                         
                         // パターン3：スポットクエリと同一の行を探す
-                        if (qSpot && row.name === qSpot) {
+                        if (qSpot && rowName === qSpot) {
                             window.currentSpotId = row.individualId;
                         }
                     }
@@ -553,7 +558,6 @@ async function applyQueryToStateFromCsv() {
         }
     }
 }
-
 
 function formatDate(str) {
   const [y, m, d] = str.split("-");
