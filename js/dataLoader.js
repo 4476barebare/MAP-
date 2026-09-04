@@ -725,10 +725,10 @@ function selectSpot(spot) {
     disableAreaSwipe();
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
-
+enablePhase2(window.map);
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-enablePhase2(window.map);
+//enablePhase2(window.map);
         requestAnimationFrame(() => {
 
                 enableDragForArea();
