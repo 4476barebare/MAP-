@@ -747,6 +747,7 @@ function selectSpot(spot) {
 
     enablePhase2(window.map);
     window.map.getContainer().classList.add('is-spot-mode');
+    window._selectSpotCompleted = true;
 }
 
 function enableDragForArea() {
@@ -2803,32 +2804,10 @@ function goBack() {
         
         // ★ selectSpot を呼んでマーカー等を復元
         selectSpot(restoreSpot);
-alert("");
-        // =====================================================
-        // ★ 修正: moveendに依存せず、確実にUIを復元してボタンを表示する
-        // =====================================================
-        const completePhase1Return = () => {
-            
-            phase1menu(window.currentAreaId);
-            alert("1");
-            releaseLockAndShowBtn();
-            alert("2");
-        };
-
-        // 地図のズームや中心が変わったかどうかを判定
-        const center = window.map.getCenter();
-        const targetZoom = 13;
-        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && 
-                       Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
-                       window.map.getZoom() === targetZoom;
-
-if (isSame) {
-    setTimeout(completePhase1Return, 100);
-} else {
-    window.map.once('moveend', () => {
-        alert("MOVEEND");
-        completePhase1Return();
-    });
+if (window._selectSpotCompleted) {
+    window._selectSpotCompleted = false;
+    phase1menu(window.currentAreaId);
+    releaseLockAndShowBtn();
 }
         
         return;
