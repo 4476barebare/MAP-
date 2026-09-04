@@ -2222,46 +2222,42 @@ async function routeUpdate() {
         if (spot) {
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
-            if (parentArea) {
-                setIdealQuery('area', parentArea.name);
-                openArea(parentArea.individualId);
-            }
+            if (parentArea) setIdealQuery('area', parentArea.name);
             setIdealQuery('spot', spot.name);
 
-            // =====================================
-            // ★ URL直打ちで「抜け落ちる」定義を完全に補完！
-            // =====================================
-            showSpotsForArea(safeAreaId);
-            phase1menu(safeAreaId);
-            if (window.markerControl) {
-                markerControl.showShop01(safeAreaId);
-            }
-            window._selectSpotCompleted = true;
-            // =====================================
-
-            // 1. まずズーム13でベースマップを生成
-            drawLocation(spot.name, spot.lat, spot.lng, 13);
+            // 1. まず元の状態と同じくベースマップを生成
+            drawLocation(spot.name, spot.lat, spot.lng, "13");
             
-            // 2. ★ご指摘の通り、移動完了を待って専用の処理（enableDragForArea）を挟む！
-            window.map.once('moveend', () => {
-                window.map.invalidateSize(true);
-                
-                // Bounds（可動域）の計算とドラッグを有効化
-                if (typeof enableDragForArea === 'function') {
-                    enableDragForArea();
-                }
-                
-                // 直打ち時のフェーズ2状態もここでセット
-                enablePhase2(window.map);
-                window.map.getContainer().classList.add('is-spot-mode');
+            // =====================================
+            // ★ 追加：enableDragForAreaと同等のBounds計算処理
+            // イベント(moveend)に依存せず、強制的に県域Boundsを生成して適用する
+            // =====================================
+            if (!window.prefBounds && window.spotData && window.spotData.length > 0) {
+                let minLat = Infinity, maxLat = -Infinity;
+                let minLng = Infinity, maxLng = -Infinity;
+                window.spotData.forEach(s => {
+                    const lat = Number(s.lat), lng = Number(s.lng);
+                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                        minLat = Math.min(minLat, lat); maxLat = Math.max(maxLat, lat);
+                        minLng = Math.min(minLng, lng); maxLng = Math.max(maxLng, lng);
+                    }
+                });
+                const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.05);
+                const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.05);
+                window.prefBounds = L.latLngBounds(
+                    [minLat - latBuffer, minLng - lngBuffer],
+                    [maxLat + latBuffer, maxLng + lngBuffer]
+                );
+            }
+            if (window.prefBounds && window.prefBounds.isValid()) {
+                window.map.dragging.enable();
+                window.map.setMaxBounds(window.prefBounds);
+                window.map.options.maxBoundsViscosity = 1.0;
+            }
+            // =====================================
 
-                // 通常クリック時と同じく、スポットごとに処理を分ける
-                if (spot.zoom !== '') {
-                    zoomToSpot(spot);
-                } else {
-                    showFishPopup(spot);
-                }
-            });
+            // 2. 元の状態と同じく、そのままズーム処理へ移行
+            zoomToSpot(spot);
             
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
@@ -2270,6 +2266,9 @@ async function routeUpdate() {
                 
                 if (btn) {
                     btn.style.display = 'block';
+                    // =====================================
+                    // ★ ここでも確実にblockにする
+                    // =====================================
                     if (tileWrap) tileWrap.style.display = 'flex'; 
                     if (tileBtn) tileBtn.style.display = 'block'; 
                     
