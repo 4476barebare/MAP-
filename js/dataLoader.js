@@ -14,7 +14,11 @@ window.gsiLayers = {
   photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
 
-function loadLocationCSV(csvUrl) {
+
+// ==========================================
+// ★ スポット用データをJSONから読み込む関数（爆速化版）
+// ==========================================
+function loadLocationJSON(jsonUrl) {
     const pref = window.currentPref; // 現在の県コード（例: "CHIBA"）
 
     function parseGrid(str) {
@@ -59,42 +63,30 @@ function loadLocationCSV(csvUrl) {
     }
 
     // ==========================================
-    // ★ 分岐B：まだ無い場合は続行して fetch とパースを行う
+    // ★ 分岐B：まだ無い場合は続行して fetch してJSONを直接使用する
     // ==========================================
-    return fetch(csvUrl)
-        .then(r => r.text())
-        .then(text => {
-            const lines = text.trim().split('\n');
+    return fetch(jsonUrl)
+        .then(r => r.json()) // ★ text() から json() に変更
+        .then(allRows => {   // ★ CSVをカンマでsplitするループが丸ごと消滅！
+            
             let main = null;
             const areas = [];
             const spots = [];
 
-            const allRows = lines.slice(1).map(line => {
-                const cols = line.split(',');
-
-                return {
-                    name: cols[0]?.trim() || '',
-                    zoom: cols[1] && cols[1].trim() !== '' ? parseFloat(cols[1]) : '',
-                    individualId: cols[2] ? cols[2].trim() : '',
-                    lat: parseFloat(cols[3]),
-                    lng: parseFloat(cols[4]),
-                    areaId: cols[5] ? cols[5].trim() : '',
-                    url: cols[6] ? cols[6].trim() : '',
-                    notes: cols[7] ? cols[7].trim() : '',
-                    icon: cols[8] ? cols[8].trim().toLowerCase() : null,
-                    whether: cols[9] ? cols[9].trim() : '',
-                    type: cols[10] ? cols[10].trim() : '',
-                    squareX: null,
-                    squareY: null
-                };
+            // 既存の squareX/Y を追加する処理
+            allRows.forEach(row => {
+                row.squareX = null;
+                row.squareY = null;
             });
 
+            // 県本体（main）の抽出
             allRows.forEach(row => {
                 if (!row.areaId && row.name === pref) {
                     main = row;
                 }
             });
 
+            // エリア（areas）の抽出とグリッド計算
             allRows.forEach(row => {
                 if ((row.areaId || '').trim() === pref) {
                     if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
@@ -106,6 +98,7 @@ function loadLocationCSV(csvUrl) {
                 }
             });
 
+            // スポット（spots）の抽出
             allRows.forEach(row => {
                 const icon = row.icon;
                 if (!icon) return;
@@ -114,14 +107,17 @@ function loadLocationCSV(csvUrl) {
                 }
             });
 
+            // グローバル変数へ代入
             window.prefData = main;
             window.areaData = areas;
             window.spotData = spots;
 
+            // キャッシュ用変数へ代入
             window[`${pref}_prefData`] = main;
             window[`${pref}_areaData`] = areas;
             window[`${pref}_spotData`] = spots;
 
+            // エリアグラフの構築とキャッシュ
             buildAreaGraphFromGrid(areas);
             window[`${pref}_areaGraph`] = window.areaGraph;
 
@@ -134,12 +130,13 @@ function loadLocationCSV(csvUrl) {
             const titleSpan = document.getElementById('seo-list-title');
             if (container && titleSpan && main) {
                 titleSpan.textContent = `${main.notes}の釣りスポット一覧を見る`;
-                container.innerHTML = seoHtml; // ここで一撃でDOMに反映
+                container.innerHTML = seoHtml;
             }
 
             return { main, areas, spots };
         });
 }
+
 // ==========================================
 // ★ SEO対策用：HTML文字列を一括生成する関数（爆速処理用）
 // ==========================================
