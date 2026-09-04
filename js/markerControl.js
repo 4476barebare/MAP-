@@ -158,6 +158,8 @@ function showShop02(areaKey) {
                         </svg>
                    </div>`;
 
+            // --- markerControl.js: showShop02内のマーカー生成ループ内 ---
+            
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
                     className: '',
@@ -167,35 +169,41 @@ function showShop02(areaKey) {
                 })
             });
 
-            const title = shop.group && shop.group !== '個人商店'
-                ? shop.group + ' ' + (shop.name || '')
-                : (shop.name || '');
+            // =====================================
+            // ★ 改善：ポップアップの「遅延生成（関数渡し）」
+            // =====================================
+            // marker.bindPopup(HTML文字列) ではなく、関数を渡すことで
+            // クリックされるまで内部の重い計算やHTML生成を一切行わない
+            marker.bindPopup(() => {
+                const title = shop.group && shop.group !== '個人商店'
+                    ? shop.group + ' ' + (shop.name || '')
+                    : (shop.name || '');
 
-            const address = shop.notes || '';
+                const address = shop.notes || '';
 
-            const googleUrl =
-                'https://www.google.com/search?q=' +
-                encodeURIComponent(title + ' ' + address);
+                const googleUrl =
+                    'https://www.google.com/search?q=' +
+                    encodeURIComponent(title + ' ' + address);
 
-            const popupHtml = `
-                <div class="shop-popup">
-                    <div class="shop-popup-title">${title}</div>
-                    <div class="shop-popup-address">${address}</div>
-                    <div class="shop-popup-footer">
-                        <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-                            Googleで検索
-                        </a>
+                return `
+                    <div class="shop-popup">
+                        <div class="shop-popup-title">${title}</div>
+                        <div class="shop-popup-address">${address}</div>
+                        <div class="shop-popup-footer">
+                            <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
+                                Googleで検索
+                            </a>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            });
 
-            marker.bindPopup(popupHtml);
-
-            // ★ここ変更（重要）
+            // ★ここ変更なし（維持）
             window.phase2Group.addLayer(marker);
         });
     });
 }
+
 // -----------------------
 // icon
 // -----------------------
