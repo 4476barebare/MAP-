@@ -741,12 +741,15 @@ function selectSpot(spot) {
                 enableDragForArea();
   
             showdebug("enableDragForArea完了");
+            
+    enablePhase2(window.map);
+     showdebug("enablePhase2完了");
+    window.map.getContainer().classList.add('is-spot-mode');
+    window._selectSpotCompleted = true;
+    showdebug("完了");
         });
     });
 
-    enablePhase2(window.map);
-    window.map.getContainer().classList.add('is-spot-mode');
-    window._selectSpotCompleted = true;
 }
 
 function enableDragForArea() {
