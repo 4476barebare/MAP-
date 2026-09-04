@@ -731,14 +731,14 @@ function selectSpot(spot) {
         // alert(window.currentAreaId);
         //       if (!window.areaBounds && window.currentAreaId) {
     //            alert("4");
-            showSpotsForArea(window.currentAreaId);
+
        //        }
 
         requestAnimationFrame(() => {
          //          if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
   
-        //           }
+            }
         });
     });
 
@@ -2797,7 +2797,7 @@ function goBack() {
         setIdealQuery('spot', null);
         window.currentSpotId = null;
 
-       //        showSpotsForArea(window.currentAreaId);
+        showSpotsForArea(window.currentAreaId);
         
         // ★ selectSpot を呼んでマーカー等を復元
         selectSpot(restoreSpot);
