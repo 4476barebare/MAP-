@@ -1906,14 +1906,14 @@ if (!window.fetchCacheStatus[prefCode]) {
 }
 
 // ================================
-// ■ 初期画面のRegionマップ読み込み
+// ■ 初期画面のRegionマップ読み込み（詳細デバッグ入り）
 // ================================
 let isRegionLoaded = false;
 function loadRegionMap() {
-    
+    showdebug("▼ loadRegionMap 開始");
     const regionCode = window.currentRegion || 'KANTO';
 
-    // 1. マップの可動域・ズーム制限を完全にリセット
+    // 1. マップのリセット
     if (window.map) {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -1925,18 +1925,14 @@ function loadRegionMap() {
         window.map.stop();
     }
 
-    // 2. 既にデータを持っていれば一瞬で広域に戻す（通常の「戻る」用）
     if (window.regionData) {
         drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
     }
 
-    // 3. 既にロード済みならレイヤーを表示して終了
     if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
         window.regionMarkers.forEach(m => {
             if (window.map) m.addTo(window.map);
         });
-        
-        // ★ 修正：キャッシュからRegion用のリストを復元（上書き）して終了
         const titleSpan = document.getElementById('seo-list-title');
         const linkContainer = document.getElementById('seo-link-container');
         if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
@@ -1944,15 +1940,20 @@ function loadRegionMap() {
         return;
     }
 
-    // 4. 既存のグローバル変数で直接フェッチする
+    showdebug("▷ フェッチ先: " + window.regionUrl);
+
     fetch(window.regionUrl) 
         .then(res => {
-            if (!res.ok) throw new Error("Region CSV fetch failed");
+            if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
             return res.text();
         })
         .then(text => {
             const lines = text.trim().split('\n');
-            if (lines.length < 2) return;
+            showdebug("▷ CSV取得成功 行数: " + lines.length);
+            if (lines.length < 2) {
+                showdebug("❌ 行数が足りません");
+                return;
+            }
 
             const headers = lines[0].split(',').map(h => h.trim());
             const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
@@ -1963,12 +1964,14 @@ function loadRegionMap() {
             const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
             const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
 
-            if (typeIdx === -1) return;
+            if (typeIdx === -1) {
+                showdebug("❌ type列が見つからないため中断");
+                return;
+            }
 
             window.regionMarkers = window.regionMarkers || [];
-
-            // ★ 追加：Region画面用リンク集のHTML文字列
             let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
+            let isMapDrawn = false;
 
             for (let i = 1; i < lines.length; i++) {
                 if (!lines[i]) continue;
@@ -1980,8 +1983,10 @@ function loadRegionMap() {
                     const lat = parseFloat(cols[latIdx]);
                     const lng = parseFloat(cols[lngIdx]);
                     const zoom = parseFloat(cols[zoomIdx]);
+                    showdebug(`▷ 描画指示: lat=${lat}, lng=${lng}, zoom=${zoom}`);
                     window.regionData = { name, lat, lng, zoom };
                     drawLocation(name, lat, lng, zoom);
+                    isMapDrawn = true;
                 }
 
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
@@ -1989,10 +1994,9 @@ function loadRegionMap() {
                     const prefName = cols[notesIdx];
                     if (!urlVal) continue;
 
-                    // ★ 追加：本物の <a> タグリンクを生成
                     const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
                     const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
-                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;" onmouseover="this.style.opacity=0.7; this.style.textDecoration='underline';" onmouseout="this.style.opacity=1; this.style.textDecoration='none';"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
+                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
 
                     const parts = urlVal.split('/');
                     let prefCode = '';
@@ -2032,24 +2036,26 @@ function loadRegionMap() {
                 }
             }
             
+            if (!isMapDrawn) showdebug("❌ type='region'の行が無いため地図が描画されません");
+            
             regionHtml += '</ul>';
             const regionTitle = (window.regionData ? window.regionData.name : '関東地方') + 'の釣りエリア一覧';
-            
-            // ★ 次回のためにキャッシュしておく
             window.regionSeoHtml = regionHtml;
             window.regionSeoTitle = regionTitle;
 
-            // ★ 共通の入れ物にRegion用のリンクを流し込む（上書き）
             const titleSpan = document.getElementById('seo-list-title');
             const linkContainer = document.getElementById('seo-link-container');
             if (titleSpan) titleSpan.textContent = regionTitle;
             if (linkContainer) linkContainer.innerHTML = regionHtml;
 
             isRegionLoaded = true;
+            showdebug("✅ loadRegionMap 完了");
         })
-        .catch(err => console.error("Regionマップの初期化エラー:", err));
+        .catch(err => {
+            showdebug("❌ loadRegionMap エラー: " + err.message);
+            console.error("Regionマップの初期化エラー:", err);
+        });
 }
-
 
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
