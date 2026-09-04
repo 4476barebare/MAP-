@@ -728,11 +728,11 @@ function selectSpot(spot) {
 
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-
+enablePhase2(window.map);
         requestAnimationFrame(() => {
 
                 enableDragForArea();
-                enablePhase2(window.map);
+                //enablePhase2(window.map);
 
     window.map.getContainer().classList.add('is-spot-mode');
     window._selectSpotCompleted = true;
@@ -1028,6 +1028,7 @@ window._isSnappingBack = false;
 
 function enablePhase2(map) {
     if (!map) return;
+    showdebug("enablePhase2開始");
 
     // ★二重登録防止
     if (map._phase2Handler) {
