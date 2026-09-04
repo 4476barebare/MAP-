@@ -426,45 +426,47 @@ function showPrefSpots() {
         window.prefSpotLayer = null;
     }
 
-    // ★ ご提案の分岐：既にこの県のレイヤーが金庫にあれば、表示に戻して即リターン
+    // 既にこの県のレイヤーが金庫にあれば、表示に戻して即リターン
     if (window.currentPref && window.prefSpotLayerCache[window.currentPref]) {
         window.prefSpotLayer = window.prefSpotLayerCache[window.currentPref];
         window.prefSpotLayer.addTo(window.map);
         return;
     }
 
-    // 無ければ続行して生成（初回アクセス時のみ実行される重い処理）
+    // 無ければ続行して生成
     window.prefSpotLayer = L.layerGroup();
 
-    window.spotData.forEach(spot => {
-        if (!spot.icon) return;
+// dataLoader.js: showPrefSpots() のマーカー生成部分
+window.spotData.forEach(spot => {
+    if (!spot.icon) return;
 
-        let type = 'spot';
-        if (spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
-        }
+    let type = 'spot';
+    if (spot.icon.startsWith('fish')) {
+        const match = spot.icon.match(/fish\d+/);
+        if (match) type = match[0];
+    }
 
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: '',
-                html: `<div class="pref-dot ${type}"></div>`,
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
-            }),
-            interactive: false
-        });
-
-        window.prefSpotLayer.addLayer(marker);
+    // ★ DOM(divIcon)から、軽量なベクター図形(circleMarker)へ変更しつつ、
+    // クラス名でCSSと連携させる
+    const marker = L.circleMarker([spot.lat, spot.lng], {
+        radius: 2.5,
+        stroke: false,
+        fillOpacity: 1,
+        className: `pref-dot ${type}`, // ← ここでCSSクラスを付与！
+        interactive: false
     });
 
-    // ★ 新しく作ったレイヤーを金庫に保存しておく
+    window.prefSpotLayer.addLayer(marker);
+});
+
+    // 新しく作ったレイヤーを金庫に保存しておく
     if (window.currentPref) {
         window.prefSpotLayerCache[window.currentPref] = window.prefSpotLayer;
     }
 
     window.prefSpotLayer.addTo(window.map);
 }
+
 
 
 function prefetchAround(area) {
