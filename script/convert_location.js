@@ -28,6 +28,7 @@ try {
 
     return {
       name: cols[0] ? cols[0].trim() : '',
+      // ★ zoomが空欄の場合は "" にする（フロントが空文字列チェックをしているため）
       zoom: cols[1] && cols[1].trim() !== '' ? parseFloat(cols[1]) : '',
       individualId: cols[2] ? cols[2].trim() : '',
       lat: cols[3] && cols[3].trim() !== '' ? parseFloat(cols[3]) : null,
@@ -37,9 +38,11 @@ try {
       notes: cols[7] ? cols[7].trim() : '',
       icon: cols[8] ? cols[8].trim().toLowerCase() : null,
       whether: cols[9] ? cols[9].trim() : '',
+      // ★ type が無い場合は確実に空文字列（""）にする
       type: cols[10] ? cols[10].trim() : ''
     };
   });
+
 
   // 3. 出力先のディレクトリが存在しない場合は作成
   const outputDir = path.dirname(outputPath);
