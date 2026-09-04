@@ -2764,8 +2764,6 @@ function goBack() {
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$').includes('special');
     const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
-// ... (goBackの前半部分は維持) ...
-
     // =====================================================
     // ① Phase2 -> Phase1（スポット詳細からエリア画面に戻る）
     // =====================================================
@@ -2803,15 +2801,31 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
-        // ★ selectSpot を呼べば、その中で flyTo と moveend時のバウンズ適用が確実に行われる
+        // ★ selectSpot を呼んでマーカー等を復元
         selectSpot(restoreSpot);
 
-        // UIの反映だけをアニメーション完了後に行う
-        window.map.once('moveend', () => {
-            //enablePhase2(window.map);
+        // =====================================================
+        // ★ 修正: moveendに依存せず、確実にUIを復元してボタンを表示する
+        // =====================================================
+        const completePhase1Return = () => {
             phase1menu(window.currentAreaId);
             releaseLockAndShowBtn();
-        });
+        };
+
+        // 地図のズームや中心が変わったかどうかを判定
+        const center = window.map.getCenter();
+        const targetZoom = 13;
+        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && 
+                       Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
+                       window.map.getZoom() === targetZoom;
+
+        if (isSame) {
+            // 既に同じ場所にいるならアニメーションは起きないので即時実行
+            setTimeout(completePhase1Return, 100);
+        } else {
+            // 動く場合はアニメーション完了を待つ
+            window.map.once('moveend', completePhase1Return);
+        }
         
         return;
     }
