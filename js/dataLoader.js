@@ -2726,6 +2726,11 @@ function goBack() {
         window.currentAreaId = null;
         window.currentSpotId = null;
         
+        // =====================================================
+        // ★ 追加: 他の県に移動した時に備えてBoundsのキャッシュを完全にリセット
+        // =====================================================
+        window.prefBounds = null;
+        window.areaBounds = null;
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
