@@ -725,14 +725,14 @@ function selectSpot(spot) {
     disableAreaSwipe();
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
-enablePhase2(window.map);
+//enablePhase2(window.map);早過ぎ
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-//enablePhase2(window.map);
+//enablePhase2(window.map);遅過ぎ
         requestAnimationFrame(() => {
 
                 enableDragForArea();
-                //enablePhase2(window.map);
+                enablePhase2(window.map);
 
     window.map.getContainer().classList.add('is-spot-mode');
     window._selectSpotCompleted = true;
@@ -2834,14 +2834,59 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
-        // ★ selectSpot を呼んでマーカー等を復元
-        selectSpot(restoreSpot);
-if (window._selectSpotCompleted) {
-    window._selectSpotCompleted = false;
-    phase1menu(window.currentAreaId);
-    releaseLockAndShowBtn();
- window.map.dragging.enable();    
-}
+        // =====================================================
+        // ★ 修正: selectSpot の使い回しをやめ、goBack内で確実に復元する
+        // =====================================================
+        
+        // 1. OSMタイルを確実に復元
+        if (!window.osmLayer) {
+            window.osmLayer = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                {
+                    attribution: '© OpenStreetMap contributors',
+                    className: 'osm-solid-layer',
+                    updateWhenIdle: false,
+                    updateWhenZooming: true,
+                    updateWhenDragging: true,
+                    keepBuffer: 4,
+                    fadeAnimation: false
+                }
+            ).addTo(window.map);
+        }
+
+        disableAreaSwipe();
+
+        // 2. 移動アニメーション完了後の復元処理を定義
+        const completePhase1Return = () => {
+            window.map.invalidateSize(true);
+            
+            // Bounds再計算とドラッグ設定
+            if (typeof enableDragForArea === 'function') {
+                enableDragForArea();
+            }
+            
+            // Phase2ハンドラの確実な再登録
+            enablePhase2(window.map);
+            window.map.getContainer().classList.add('is-spot-mode');
+            
+            // UI更新
+            phase1menu(window.currentAreaId);
+            releaseLockAndShowBtn();
+        };
+
+        // 3. 同じ場所なら即時実行、違う場所なら flyTo して moveend を待つ
+        const center = window.map.getCenter();
+        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && 
+                       Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
+                       window.map.getZoom() === 13;
+
+        if (isSame) {
+            drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
+            setTimeout(completePhase1Return, 50); // DOM構築待ちの微小な遅延
+        } else {
+            window.map.once('moveend', completePhase1Return);
+            drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
+        }
         
         return;
     }
