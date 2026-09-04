@@ -1406,12 +1406,13 @@ function zoomToSpot(spot) {
 function showFishMarkers(url) {
   if (!window.map) return;
 
-  // 1. 古い魚マーカーの削除
+  // 1. 古い魚のマーカーが残っていればマップから削除する
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
     window.fishLayer = null;
   }
 
+  // URLデータが存在しない、または空文字の場合は安全に終了する
   if (!url || typeof url !== 'string' || url.trim() === '') {
     return;
   }
@@ -1419,6 +1420,7 @@ function showFishMarkers(url) {
   window.fishLayer = L.layerGroup();
   const fishList = url.split(',');
 
+  // 緯度・経度が空の不正なデータをフィルタリング
   const markers = fishList.map(item => {
     const parts = item.split('|');
     return {
@@ -1429,7 +1431,7 @@ function showFishMarkers(url) {
   }).filter(fish => !isNaN(fish.lat) && !isNaN(fish.lng));
 
   // =====================================
-  // ★ テキストサイズの固定化（ズームイベントの廃止）
+  // ★ テキストサイズの固定化
   // =====================================
   const el = window.map.getContainer();
   // 拡大用クラスを剥がし、常に最小サイズ（zoom-16相当）に固定する
@@ -1437,12 +1439,14 @@ function showFishMarkers(url) {
   el.classList.add('zoom-16');
 
   // =====================================
-  // ★ 条件付きドット化（間引き）ロジック
+  // ★ マーカーの生成と間引きロジック
   // =====================================
   for (let i = 0; i < markers.length; i++) {
     const fish = markers[i];
     const currentLatLng = L.latLng(fish.lat, fish.lng);
 
+    /* 
+    // ▼▼▼ 分岐テスト用にコメントアウト中 ▼▼▼
     let hasSameNameWithin3m = false;
     let hasDiffNameWithin5m = false;
 
@@ -1461,14 +1465,19 @@ function showFishMarkers(url) {
       }
     }
 
-    // 条件判定: 3m以内に同名があり、かつ5m以内に別名がない場合のみドット化
-    const isDot = hasSameNameWithin3m && !hasDiffNameWithin5m;
+    // 条件判定: 3m以内に同名があり、かつ5m以内に別名がない場合
+    // const isDot = hasSameNameWithin3m && !hasDiffNameWithin5m;
+    // ▲▲▲ コメントアウトここまで ▲▲▲ 
+    */
+
+    // ★ 現在は強制的にテキスト表示とするため false に固定
+    const isDot = false;
 
     let icon;
     if (isDot) {
-      // 間引き用ドット（色は任意のもの、ここではfish1の青色を指定）
+      // 間引き用ドットマーカー
       icon = L.divIcon({
-        className: 'pref-dot fish1', 
+        className: 'pref-dot fish1', // ← 色を変えたい場合はクラス名を変更
         html: '',
         iconSize: [5, 5],
         iconAnchor: [2.5, 2.5]
