@@ -683,7 +683,7 @@ function showSpotsForArea(areaKey) {
     }
 }
 
-function selectSpot(spot) {
+async function selectSpot(spot) {
     if (!window.map || !spot) return;
     
     const currentZoom = window.map.getZoom();
