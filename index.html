@@ -249,14 +249,16 @@ window.currentSpotId = null;
 window.currentPref = null;
 window.fishUrl = null;
 window.nearestClickEnabled = true;
-
 window.nearestClickHandler = null;
 
-// 👇これを絶対に追加してください！
+// ▼ これらはすでに追加しましたね
 window.gsiLayers = {
   ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
   photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
+
+// 👇【ここに追加！】キャッシュ用の金庫を空っぽのオブジェクトとして定義しておく
+window.prefSpotLayerCache = {};
 
 // ==========================================
 // ★ タイトル・メタタグ動的更新関数（連携版）
