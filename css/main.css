@@ -1107,14 +1107,16 @@ li {
     margin-top: 2px;
 }
 
-/* fish */
-/* SVG図形に対する色の指定になるので fill を使う */
-.pref-dot.spot  { fill: #191970; }
-.pref-dot.fish1 { fill: #6495ED; }
-.pref-dot.fish2 { fill: #2E8B57; }
-.pref-dot.fish3 { fill: #D2691E; }
-.pref-dot.fish4 { fill: #4B0082; }
-.pref-dot.fish6 { fill: #006400; }
+
+/* ========================= PREF DOT ========================= */
+.pref-dot { width: 5px; height: 5px; }
+
+.pref-dot.spot  { background: #191970; }
+.pref-dot.fish1 { background: #6495ED; }
+.pref-dot.fish2 { background: #2E8B57; }
+.pref-dot.fish3 { background: #D2691E; }
+.pref-dot.fish4 { background: #4B0082; }
+.pref-dot.fish6 { background: #006400; }
 
 /* =========================
    テキストマーカー用
