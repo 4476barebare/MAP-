@@ -5,12 +5,8 @@
     "individualId": "parent",
     "lat": 36.3638,
     "lng": 140.2805,
-    "areaId": "",
     "url": "080000",
-    "notes": "茨城県",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "茨城県"
   },
   {
     "name": "北茨城エリア",
@@ -19,11 +15,7 @@
     "lat": 36.504,
     "lng": 140.512,
     "areaId": "IBARAKI",
-    "url": "x:1;y:1",
-    "notes": "",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "url": "x:1;y:1"
   },
   {
     "name": "霞ヶ浦エリア",
@@ -32,11 +24,7 @@
     "lat": 36.115,
     "lng": 140.48,
     "areaId": "IBARAKI",
-    "url": "x:1;y:0",
-    "notes": "",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "url": "x:1;y:0"
   },
   {
     "name": "つくばエリア",
@@ -45,11 +33,7 @@
     "lat": 36.1423,
     "lng": 139.9335,
     "areaId": "IBARAKI",
-    "url": "x:0;y:0",
-    "notes": "",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "url": "x:0;y:0"
   },
   {
     "name": "那珂川河口",
@@ -58,11 +42,8 @@
     "lat": 36.336229,
     "lng": 140.589523,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "First/0803/0804",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "平潟漁港",
@@ -71,10 +52,8 @@
     "lat": 36.857925,
     "lng": 140.795878,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "First/0706/0802",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -84,11 +63,7 @@
     "lat": 36.827286,
     "lng": 140.788443,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "川尻港",
@@ -97,10 +72,8 @@
     "lat": 36.650638,
     "lng": 140.70055,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "Second//",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -110,11 +83,7 @@
     "lat": 36.576919,
     "lng": 140.658592,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "日立港",
@@ -123,10 +92,8 @@
     "lat": 36.486081,
     "lng": 140.617137,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "First/0802/",
     "icon": "spot",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -136,11 +103,8 @@
     "lat": 36.38491,
     "lng": 140.621651,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "First/0802/0803",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "平磯港",
@@ -149,11 +113,8 @@
     "lat": 36.354503,
     "lng": 140.612694,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "First/0802/0803",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "那珂湊港",
@@ -162,10 +123,8 @@
     "lat": 36.34188,
     "lng": 140.599901,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "First/0803/",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -175,11 +134,7 @@
     "lat": 36.50134,
     "lng": 140.628937,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "九ノ﨑海岸",
@@ -188,10 +143,7 @@
     "lat": 36.849235,
     "lng": 140.798281,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -201,11 +153,8 @@
     "lat": 35.913941,
     "lng": 140.672507,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "First/0804/1202",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "鹿島釣り園",
@@ -214,10 +163,8 @@
     "lat": 35.937867,
     "lng": 140.702022,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "First/0804/",
     "icon": "fish1",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -227,10 +174,7 @@
     "lat": 36.105432,
     "lng": 140.529814,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$assistant"
   },
   {
@@ -240,10 +184,7 @@
     "lat": 36.033137,
     "lng": 140.567923,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -253,10 +194,7 @@
     "lat": 35.96577,
     "lng": 140.600538,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -266,10 +204,7 @@
     "lat": 36.149388,
     "lng": 140.32073,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -279,10 +214,7 @@
     "lat": 36.128283,
     "lng": 140.37755,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -292,10 +224,7 @@
     "lat": 36.075744,
     "lng": 140.214987,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$assistant"
   },
   {
@@ -305,10 +234,7 @@
     "lat": 36.05022,
     "lng": 140.303564,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -318,10 +244,7 @@
     "lat": 36.073107,
     "lng": 140.392313,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -331,10 +254,7 @@
     "lat": 35.902677,
     "lng": 140.596075,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -344,10 +264,7 @@
     "lat": 35.849758,
     "lng": 140.686705,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -357,11 +274,7 @@
     "lat": 35.932604,
     "lng": 140.637439,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "北利根川周辺",
@@ -370,10 +283,7 @@
     "lat": 35.94008,
     "lng": 140.524149,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -383,11 +293,7 @@
     "lat": 36.014816,
     "lng": 140.465784,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "霞ヶ浦南部",
@@ -396,10 +302,7 @@
     "lat": 35.960772,
     "lng": 140.460806,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -409,10 +312,7 @@
     "lat": 35.98578,
     "lng": 140.371714,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$substitute"
   },
   {
@@ -422,10 +322,7 @@
     "lat": 35.941202,
     "lng": 140.403397,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -435,10 +332,7 @@
     "lat": 35.894514,
     "lng": 140.352052,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -448,11 +342,7 @@
     "lat": 35.946262,
     "lng": 140.570496,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大利根飛行場周辺",
@@ -461,11 +351,7 @@
     "lat": 35.867418,
     "lng": 140.244405,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "川島橋",
@@ -474,10 +360,8 @@
     "lat": 36.292489,
     "lng": 139.909548,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "鬼怒川小貝漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -487,10 +371,7 @@
     "lat": 36.04823,
     "lng": 139.86869,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -500,10 +381,8 @@
     "lat": 36.20079,
     "lng": 139.831249,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "鬼怒川小貝漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -513,10 +392,8 @@
     "lat": 35.975409,
     "lng": 140.122692,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "牛久沼漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -526,11 +403,7 @@
     "lat": 36.1133,
     "lng": 139.785715,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "五霞落川",
@@ -539,752 +412,520 @@
     "lat": 36.082176,
     "lng": 139.765393,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "増渕魚園",
-    "zoom": "",
     "individualId": "L26",
     "lat": 36.86367,
     "lng": 140.633328,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒319-1531 茨城県北茨城市華川町花園４６９−３",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "TABIMASU BASE",
-    "zoom": "",
     "individualId": "L27",
     "lat": 36.86091,
     "lng": 140.58927,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒318-0106 茨城県高萩市下君田２０",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "若栗フィッシングの森",
-    "zoom": "",
     "individualId": "L28",
     "lat": 36.77173,
     "lng": 140.620191,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒318-0102 茨城県高萩市若栗６２",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "高萩ふれあいの里",
-    "zoom": "",
     "individualId": "L29",
     "lat": 36.777779,
     "lng": 140.597333,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒318-0105 茨城県高萩市上君田 １７９１",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "若駒釣り堀センター",
-    "zoom": "",
     "individualId": "L30",
     "lat": 36.803585,
     "lng": 140.525954,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒311-0501 茨城県常陸太田市里川町８４２",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "北沢ニジマスセンター",
-    "zoom": "",
     "individualId": "L31",
     "lat": 36.613091,
     "lng": 140.56372,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒311-0311 茨城県常陸太田市町屋町２３９７",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "舟生沢つり堀センター",
-    "zoom": "",
     "individualId": "L32",
     "lat": 36.655617,
     "lng": 140.376442,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒319-3107 茨城県常陸大宮市舟生１４９５",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "つりぼり芳山荘",
-    "zoom": "",
     "individualId": "L33",
     "lat": 36.744654,
     "lng": 140.290242,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒319-3534 茨城県久慈郡大子町相川２０６０",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "大子へら鮒センター",
-    "zoom": "",
     "individualId": "L34",
     "lat": 36.774377,
     "lng": 140.356771,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒319-3551 茨城県久慈郡大子町池田２６７６",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "へらセンター緒川",
-    "zoom": "",
     "individualId": "L35",
     "lat": 36.613297,
     "lng": 140.316254,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒319-2401 茨城県常陸大宮市上小瀬４１６２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "粟原釣り場",
-    "zoom": "",
     "individualId": "L36",
     "lat": 36.498206,
     "lng": 140.497454,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒311-0136 茨城県常陸太田市粟原町１７９７",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "ふれあいの里釣り堀",
-    "zoom": "",
     "individualId": "L37",
     "lat": 36.438819,
     "lng": 140.356763,
     "areaId": "IBARAKI_HITACHI",
-    "url": "",
     "notes": "〒311-4313 茨城県東茨城郡城里町上入野４３９７",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "富士見池 第二池",
-    "zoom": "",
     "individualId": "L38",
     "lat": 35.998208,
     "lng": 140.56225,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒311-2403 茨城県潮来市釜谷７３１",
-    "icon": "fish6",
-    "whether": "",
-    "type": ""
+    "icon": "fish6"
   },
   {
     "name": "富士見池 第一池",
-    "zoom": "",
     "individualId": "L39",
     "lat": 36.004222,
     "lng": 140.54643,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒311-2401 茨城県潮来市大賀１５８−２",
-    "icon": "fish6",
-    "whether": "",
-    "type": ""
+    "icon": "fish6"
   },
   {
     "name": "北浦・渚",
-    "zoom": "",
     "individualId": "L40",
     "lat": 35.999249,
     "lng": 140.563623,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒311-2403 茨城県潮来市釜谷７３１",
-    "icon": "fish6",
-    "whether": "",
-    "type": ""
+    "icon": "fish6"
   },
   {
     "name": "明神池へら鮒池",
-    "zoom": "",
     "individualId": "L41",
     "lat": 36.122152,
     "lng": 140.203756,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-0005 茨城県土浦市中貫",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "フィッシングＤｏＤｏｏ",
-    "zoom": "",
     "individualId": "L42",
     "lat": 36.189456,
     "lng": 140.2158,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒315-0076 茨城県かすみがうら市上志筑５０８",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "柏原池公園つり池",
-    "zoom": "",
     "individualId": "L43",
     "lat": 36.211408,
     "lng": 140.257685,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒315-0003 茨城県石岡市谷向町２１−３０",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "乙戸沼公園 釣り場",
-    "zoom": "",
     "individualId": "L44",
     "lat": 36.041289,
     "lng": 140.146462,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-0849 茨城県土浦市卸町 小山田１丁目２１５９−２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "宍塚大池",
-    "zoom": "",
     "individualId": "L45",
     "lat": 36.080781,
     "lng": 140.163043,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-0805 茨城県土浦市宍塚７２９",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "フィッシングエリアJ",
-    "zoom": "",
     "individualId": "L46",
     "lat": 36.086169,
     "lng": 140.159371,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-0805 茨城県土浦市宍塚１０１３",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "水と緑の里公園",
-    "zoom": "",
     "individualId": "L47",
     "lat": 36.068989,
     "lng": 140.193341,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-0813 茨城県土浦市富士崎２丁目７−１１",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "一杯館池",
-    "zoom": "",
     "individualId": "L48",
     "lat": 36.094583,
     "lng": 140.131873,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒305-0025 茨城県つくば市花室",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "金田池",
-    "zoom": "",
     "individualId": "L49",
     "lat": 36.098654,
     "lng": 140.132694,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒305-0018 茨城県つくば市金田１４９１−４",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "つりぼり62",
-    "zoom": "",
     "individualId": "L50",
     "lat": 36.078047,
     "lng": 140.114871,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒305-0032 茨城県つくば市竹園１丁目９−２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "梶ノ宮池",
-    "zoom": "",
     "individualId": "L51",
     "lat": 36.137958,
     "lng": 140.14434,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-4105 茨城県土浦市田宮１３０３",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "ミッドクリークフィッシングエリア",
-    "zoom": "",
     "individualId": "L52",
     "lat": 36.188421,
     "lng": 140.157441,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒315-0146 茨城県石岡市菖蒲沢８０",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "能場沼",
-    "zoom": "",
     "individualId": "L53",
     "lat": 35.880258,
     "lng": 140.317627,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-1403 茨城県稲敷郡河内町金江津８１３７",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "丸堀池",
-    "zoom": "",
     "individualId": "L54",
     "lat": 35.91142,
     "lng": 140.389212,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒300-0745 茨城県稲敷市清久島１０６４",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "福祉センター脇の池",
-    "zoom": "",
     "individualId": "L55",
     "lat": 36.124144,
     "lng": 140.11605,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒305-0001 茨城県つくば市栗原",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "友部 湯崎湖",
-    "zoom": "",
     "individualId": "L56",
     "lat": 36.308473,
     "lng": 140.325132,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒309-1715 茨城県笠間市湯崎１０９９−５",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "菜洗池",
-    "zoom": "",
     "individualId": "L57",
     "lat": 36.219003,
     "lng": 140.382738,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒311-3401 茨城県小美玉市佐才４１２",
-    "icon": "fish6",
-    "whether": "",
-    "type": ""
+    "icon": "fish6"
   },
   {
     "name": "湛沼",
-    "zoom": "",
     "individualId": "L58",
     "lat": 36.312845,
     "lng": 140.370115,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒311-3103 茨城県東茨城郡茨城町野曽",
-    "icon": "fish6",
-    "whether": "",
-    "type": ""
+    "icon": "fish6"
   },
   {
     "name": "中沢池",
-    "zoom": "",
     "individualId": "L59",
     "lat": 36.356862,
     "lng": 140.487397,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒310-0836 茨城県水戸市元吉田町２７３２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "TSURIBORI水戸南",
-    "zoom": "",
     "individualId": "L60",
     "lat": 36.322774,
     "lng": 140.487515,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒310-0843 茨城県水戸市元石川町２６１９",
-    "icon": "fish6",
-    "whether": "",
-    "type": ""
+    "icon": "fish6"
   },
   {
     "name": "レジャーパーク笠間",
-    "zoom": "",
     "individualId": "L61",
     "lat": 36.407646,
     "lng": 140.223838,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒309-1631 茨城県笠間市片庭２７４９−番地",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "武具池",
-    "zoom": "",
     "individualId": "L62",
     "lat": 36.387913,
     "lng": 140.334179,
     "areaId": "IBARAKI_KASUMIGAURA",
-    "url": "",
     "notes": "〒319-0306 茨城県水戸市杉崎町",
-    "icon": "fish6",
-    "whether": "",
-    "type": ""
+    "icon": "fish6"
   },
   {
     "name": "つり処 たぬき",
-    "zoom": "",
     "individualId": "L63",
     "lat": 36.052131,
     "lng": 139.813575,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒270-0213 千葉県野田市桐ケ作１７２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "森の里",
-    "zoom": "",
     "individualId": "L64",
     "lat": 36.082046,
     "lng": 139.864749,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒306-0657 茨城県坂東市借宿６７９",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "兎谷津へら鮒センター",
-    "zoom": "",
     "individualId": "L65",
     "lat": 36.067368,
     "lng": 139.831592,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒306-0417 茨城県猿島郡境町若林５０６４",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "すっぽん釣り堀",
-    "zoom": "",
     "individualId": "L66",
     "lat": 36.001354,
     "lng": 139.892046,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒306-0654 茨城県坂東市莚打２３５",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "皇帝池",
-    "zoom": "",
     "individualId": "L67",
     "lat": 36.068545,
     "lng": 139.973231,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒300-2512 茨城県常総市大輪町４１８",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "吉野公園",
-    "zoom": "",
     "individualId": "L68",
     "lat": 36.075362,
     "lng": 140.001692,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒300-2502 茨城県常総市上蛇町１８６３",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "四ツ谷池",
-    "zoom": "",
     "individualId": "L69",
     "lat": 36.071306,
     "lng": 140.009948,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒300-2502 茨城県つくば市高良田２１２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "谷和原大沼",
-    "zoom": "",
     "individualId": "L70",
     "lat": 36.026603,
     "lng": 140.023558,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒300-2406 茨城県つくばみらい市福岡２２８",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "つくば釣堀センター",
-    "zoom": "",
     "individualId": "L71",
     "lat": 36.015123,
     "lng": 140.062667,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒305-0876 茨城県つくば市西栗山７",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "三楽園",
-    "zoom": "",
     "individualId": "L72",
     "lat": 35.927154,
     "lng": 139.933693,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒278-0014 千葉県野田市上三ケ尾７０３−１",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "法師戸大池",
-    "zoom": "",
     "individualId": "L73",
     "lat": 35.984259,
     "lng": 139.917578,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒306-0623 茨城県坂東市法師戸",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "さくら湖",
-    "zoom": "",
     "individualId": "L74",
     "lat": 35.878446,
     "lng": 140.073318,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒302-0003 茨城県取手市小堀３９０７−１６ 16",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "筑波白水湖",
-    "zoom": "",
     "individualId": "L75",
     "lat": 36.162349,
     "lng": 140.017882,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒300-4205 茨城県つくば市安食２５５２−２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "筑波流源湖 釣り堀",
-    "zoom": "",
     "individualId": "L76",
     "lat": 36.225963,
     "lng": 139.88839,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒300-3512 茨城県結城郡八千代町小屋２１０",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "三和新池",
-    "zoom": "",
     "individualId": "L77",
     "lat": 36.212333,
     "lng": 139.831181,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒306-0101 茨城県古河市尾崎５６８",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "ネーブルパーク 釣り堀",
-    "zoom": "",
     "individualId": "L78",
     "lat": 36.165709,
     "lng": 139.753212,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒306-0225 茨城県古河市駒羽根６２０",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "小堤フィッシィングセンター",
-    "zoom": "",
     "individualId": "L79",
     "lat": 36.208866,
     "lng": 139.765859,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒306-0231 茨城県古河市小堤１４１１−３",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "弥五郎沼",
-    "zoom": "",
     "individualId": "L80",
     "lat": 36.076577,
     "lng": 139.797146,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒270-0202 千葉県野田市関宿台町１２７８",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "母子島遊水地",
-    "zoom": "",
     "individualId": "L81",
     "lat": 36.257303,
     "lng": 139.991516,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒308-0835 茨城県筑西市飯",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "弁天沼",
-    "zoom": "",
     "individualId": "L82",
     "lat": 36.344893,
     "lng": 140.072532,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "〒309-1246 茨城県桜川市高森９２６",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "五行川",
@@ -1293,10 +934,7 @@
     "lat": 36.309361,
     "lng": 139.983458,
     "areaId": "IBARAKI_TSUKUBA",
-    "url": "",
     "notes": "鬼怒川小貝漁業協同組合",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   }
 ]
