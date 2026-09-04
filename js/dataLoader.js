@@ -433,31 +433,33 @@ function showPrefSpots() {
         return;
     }
 
-    // 無ければ続行して生成
+    // ... 前略 ...
     window.prefSpotLayer = L.layerGroup();
 
-// dataLoader.js: showPrefSpots() のマーカー生成部分
-window.spotData.forEach(spot => {
-    if (!spot.icon) return;
+    window.spotData.forEach(spot => {
+        if (!spot.icon) return;
 
-    let type = 'spot';
-    if (spot.icon.startsWith('fish')) {
-        const match = spot.icon.match(/fish\d+/);
-        if (match) type = match[0];
-    }
+        let type = 'spot';
+        if (spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish\d+/);
+            if (match) type = match[0];
+        }
 
-    // ★ DOM(divIcon)から、軽量なベクター図形(circleMarker)へ変更しつつ、
-    // クラス名でCSSと連携させる
-    const marker = L.circleMarker([spot.lat, spot.lng], {
-        radius: 2.5,
-        stroke: false,
-        fillOpacity: 1,
-        className: `pref-dot ${type}`, // ← ここでCSSクラスを付与！
-        interactive: false
+        // ★ CanvasをやめてDOMマーカーに戻しつつ、極限まで軽量化する
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: `pref-dot ${type}`, // コンテナ自体に直接クラスを付与
+                html: '',                      // 中身を空にしてDOMノード数を半減
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
+            }),
+            interactive: false, // タップ判定をオフにしてブラウザ負荷を下げる
+            keyboard: false
+        });
+
+        window.prefSpotLayer.addLayer(marker);
     });
-
-    window.prefSpotLayer.addLayer(marker);
-});
+    // ... 後略 ...
 
     // 新しく作ったレイヤーを金庫に保存しておく
     if (window.currentPref) {
