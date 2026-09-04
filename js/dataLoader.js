@@ -2799,36 +2799,35 @@ function goBack() {
         setIdealQuery('spot', null);
         window.currentSpotId = null;
 
-showSpotsForArea(window.currentAreaId);
+        showSpotsForArea(window.currentAreaId);
+        
+        // ★ selectSpot を呼んでマーカー等を復元
+        selectSpot(restoreSpot);
 
-// =====================================================
-// ★ Phase1へ戻す
-// selectSpot()は使わず、明示的に13へ戻す
-// =====================================================
-const completePhase1Return = () => {
-    phase1menu(window.currentAreaId);
-    releaseLockAndShowBtn();
-};
+        // =====================================================
+        // ★ 修正: moveendに依存せず、確実にUIを復元してボタンを表示する
+        // =====================================================
+        const completePhase1Return = () => {
+            phase1menu(window.currentAreaId);
+            releaseLockAndShowBtn();
+        };
 
-const center = window.map.getCenter();
-const targetZoom = 13;
+        // 地図のズームや中心が変わったかどうかを判定
+        const center = window.map.getCenter();
+        const targetZoom = 13;
+        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && 
+                       Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
+                       window.map.getZoom() === targetZoom;
 
-const isSame =
-    Math.abs(center.lat - restoreSpot.lat) < 0.0001 &&
-    Math.abs(center.lng - restoreSpot.lng) < 0.0001 &&
-    window.map.getZoom() === targetZoom;
-
-if (isSame) {
-    setTimeout(completePhase1Return, 100);
-} else {
-    window.map.once('moveend', completePhase1Return);
-
-    window.map.flyTo(
-        [restoreSpot.lat, restoreSpot.lng],
-        targetZoom,
-        { duration: 0.5 }
-    );
-}
+        if (isSame) {
+            // 既に同じ場所にいるならアニメーションは起きないので即時実行
+            setTimeout(completePhase1Return, 100);
+        } else {
+            // 動く場合はアニメーション完了を待つ
+            window.map.once('moveend', completePhase1Return);
+        }
+        
+        return;
     }
 
     // =====================================================
