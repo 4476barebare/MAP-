@@ -683,7 +683,7 @@ function showSpotsForArea(areaKey) {
     }
 }
 
-async function selectSpot(spot) {
+function selectSpot(spot) {
     if (!window.map || !spot) return;
     
     const currentZoom = window.map.getZoom();
@@ -731,7 +731,7 @@ async function selectSpot(spot) {
         // alert(window.currentAreaId);
         //       if (!window.areaBounds && window.currentAreaId) {
     //            alert("4");
-          await showSpotsForArea(window.currentAreaId);
+            showSpotsForArea(window.currentAreaId);
        //        }
 
         requestAnimationFrame(() => {
@@ -2797,7 +2797,7 @@ function goBack() {
         setIdealQuery('spot', null);
         window.currentSpotId = null;
 
-        showSpotsForArea(window.currentAreaId);
+       //        showSpotsForArea(window.currentAreaId);
         
         // ★ selectSpot を呼んでマーカー等を復元
         selectSpot(restoreSpot);
