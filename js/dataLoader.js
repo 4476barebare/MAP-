@@ -740,7 +740,7 @@ function selectSpot(spot) {
          //          if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
   
-            
+            showdebug("enableDragForArea完了");
         });
     });
 
