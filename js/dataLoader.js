@@ -2822,13 +2822,14 @@ alert("");
                        Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
                        window.map.getZoom() === targetZoom;
 
-        if (isSame) {
-            // 既に同じ場所にいるならアニメーションは起きないので即時実行
-            setTimeout(completePhase1Return, 100);
-        } else {
-            // 動く場合はアニメーション完了を待つ
-            window.map.once('moveend', completePhase1Return);
-        }
+if (isSame) {
+    setTimeout(completePhase1Return, 100);
+} else {
+    window.map.once('moveend', () => {
+        alert("MOVEEND");
+        completePhase1Return();
+    });
+}
         
         return;
     }
