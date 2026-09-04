@@ -2810,6 +2810,7 @@ if (window._selectSpotCompleted) {
     window._selectSpotCompleted = false;
     phase1menu(window.currentAreaId);
     releaseLockAndShowBtn();
+ window.map.dragging.enable();    
 }
         
         return;
