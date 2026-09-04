@@ -2803,13 +2803,16 @@ function goBack() {
         
         // ★ selectSpot を呼んでマーカー等を復元
         selectSpot(restoreSpot);
-
+alert("");
         // =====================================================
         // ★ 修正: moveendに依存せず、確実にUIを復元してボタンを表示する
         // =====================================================
         const completePhase1Return = () => {
+            
             phase1menu(window.currentAreaId);
+            alert("1");
             releaseLockAndShowBtn();
+            alert("2");
         };
 
         // 地図のズームや中心が変わったかどうかを判定
