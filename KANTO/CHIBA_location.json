@@ -5,12 +5,8 @@
     "individualId": "parent",
     "lat": 35.4,
     "lng": 140.3,
-    "areaId": "",
     "url": "120000",
-    "notes": "千葉県",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "千葉県"
   },
   {
     "name": "東京湾内房エリア",
@@ -20,10 +16,7 @@
     "lng": 140.115,
     "areaId": "CHIBA",
     "url": "x:0;y:1",
-    "notes": "都心からちょい釣り気分で立ち寄れる、千葉市を中心とした東京湾内房エリアは日本の経済を牽引するダイナミックな工業地帯と、浦安から千葉市へと続くレジャーエリアが共存する内房。利便性と自然の潤いが両立し、市原の内陸部では養老川が育んだ里山文化に触れるスローライフも実現可能。食の面では、竹岡式や背脂系などの名店がひしめく「麺客」たちの聖地として、奥深い醤油文化が根付いています。さらに釣り人にとっては、日本屈指のシーバスストック量を誇るエキサイティングなフィールド。市原の海釣り施設では良型の青物やタチウオが姿を見せることもあります。都心至近でありながら、仕事帰りにサクッと大物を狙える「日常と隣り合わせの爆釣劇」が、多くのアングラーを惹きつけて止みません。",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "都心からちょい釣り気分で立ち寄れる、千葉市を中心とした東京湾内房エリアは日本の経済を牽引するダイナミックな工業地帯と、浦安から千葉市へと続くレジャーエリアが共存する内房。利便性と自然の潤いが両立し、市原の内陸部では養老川が育んだ里山文化に触れるスローライフも実現可能。食の面では、竹岡式や背脂系などの名店がひしめく「麺客」たちの聖地として、奥深い醤油文化が根付いています。さらに釣り人にとっては、日本屈指のシーバスストック量を誇るエキサイティングなフィールド。市原の海釣り施設では良型の青物やタチウオが姿を見せることもあります。都心至近でありながら、仕事帰りにサクッと大物を狙える「日常と隣り合わせの爆釣劇」が、多くのアングラーを惹きつけて止みません。"
   },
   {
     "name": "南房総エリア",
@@ -33,10 +26,7 @@
     "lng": 139.95,
     "areaId": "CHIBA",
     "url": "x:0;y:0",
-    "notes": "釣りとレジャーの千葉・南房総はアクアラインで1時間、南房総は家族旅行やドライブに最高のエリアです。「マザー牧場」の動物や「鴨川シーワールド」のシャチ、潮干狩りなどレジャーが満載。君津の「濃溝の滝」や「九十九谷展望公園」の雲海、富津岬から望む富士山など、SNS映えする絶景も尽きません。釣り人には、黒潮が育む豊かな魚影が魅力の聖地。磯でのヒラスズキや大型青物狙いから、足場の良い堤防でのファミリーフィッシングまで楽しめます。海と山のダイナミックな変化を走り抜け、遊び疲れたら古民家カフェや温泉宿へ。新鮮な地魚料理に舌鼓を打ち、1日中アクティブに遊び尽くせるフィールドが広がっています。",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "釣りとレジャーの千葉・南房総はアクアラインで1時間、南房総は家族旅行やドライブに最高のエリアです。「マザー牧場」の動物や「鴨川シーワールド」のシャチ、潮干狩りなどレジャーが満載。君津の「濃溝の滝」や「九十九谷展望公園」の雲海、富津岬から望む富士山など、SNS映えする絶景も尽きません。釣り人には、黒潮が育む豊かな魚影が魅力の聖地。磯でのヒラスズキや大型青物狙いから、足場の良い堤防でのファミリーフィッシングまで楽しめます。海と山のダイナミックな変化を走り抜け、遊び疲れたら古民家カフェや温泉宿へ。新鮮な地魚料理に舌鼓を打ち、1日中アクティブに遊び尽くせるフィールドが広がっています。"
   },
   {
     "name": "外房エリア",
@@ -46,10 +36,7 @@
     "lng": 140.273,
     "areaId": "CHIBA",
     "url": "x:1;y:0",
-    "notes": "千葉県外房エリアの釣りと見どころ。「日本三大朝市」、一般的に石川県の輪島、岐阜県の高山、そして千葉県の勝浦。外房の海は常に騒々しく、ここは観測史上、猛暑日になったことがほとんどない場所だ。夏でも湿った涼しい風が吹き抜け、都会のそれとは違う「生きた空気」が流れている。名物の勝浦タンタン麺はほとんどの街中のラーメン屋さんで味わう事ができ、それぞれの個性を訪れる度に味わえる。回遊魚の強烈な引きや、岩礁に潜む根魚との駆け引き。華やかなもてなしはないが、ただ海と対峙する。整えられたレジャー施設では決して味わえない、そんな無骨な時間を楽しめる。",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "千葉県外房エリアの釣りと見どころ。「日本三大朝市」、一般的に石川県の輪島、岐阜県の高山、そして千葉県の勝浦。外房の海は常に騒々しく、ここは観測史上、猛暑日になったことがほとんどない場所だ。夏でも湿った涼しい風が吹き抜け、都会のそれとは違う「生きた空気」が流れている。名物の勝浦タンタン麺はほとんどの街中のラーメン屋さんで味わう事ができ、それぞれの個性を訪れる度に味わえる。回遊魚の強烈な引きや、岩礁に潜む根魚との駆け引き。華やかなもてなしはないが、ただ海と対峙する。整えられたレジャー施設では決して味わえない、そんな無骨な時間を楽しめる。"
   },
   {
     "name": "銚子九十九里エリア",
@@ -59,10 +46,7 @@
     "lng": 140.645,
     "areaId": "CHIBA",
     "url": "x:1;y:1",
-    "notes": "銚子九十九里エリアの釣りと観光。日本で一番早く太陽が昇る千葉県銚子は、大地のダイナミズムを感じる絶景の宝庫です。白亜の犬吠埼灯台や断崖絶壁の屏風ケ浦、水平線が弧を描くパノラマに圧倒され、SNSで話題の犬吠テラステラスや、キャベツ畑を抜ける銚子電鉄のレトロな風景に心が和みます。一方、釣り人には一発大物の夢が詰まった至高のフィールド。利根川河口の巨大シーバス、九十九里の広大なサーフを歩き倒して狙うヒラメやマゴチなど、魚影の濃さは全国区です。朝マズメの静寂、竿を叩く強烈なアタリは、釣り人の特権。海辺の乗馬や焼きハマグリ、冷えた体に染みるイワシ団子汁など、五感で楽しむ感動のすべてが都心から数時間のこの場所に揃っています。",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "銚子九十九里エリアの釣りと観光。日本で一番早く太陽が昇る千葉県銚子は、大地のダイナミズムを感じる絶景の宝庫です。白亜の犬吠埼灯台や断崖絶壁の屏風ケ浦、水平線が弧を描くパノラマに圧倒され、SNSで話題の犬吠テラステラスや、キャベツ畑を抜ける銚子電鉄のレトロな風景に心が和みます。一方、釣り人には一発大物の夢が詰まった至高のフィールド。利根川河口の巨大シーバス、九十九里の広大なサーフを歩き倒して狙うヒラメやマゴチなど、魚影の濃さは全国区です。朝マズメの静寂、竿を叩く強烈なアタリは、釣り人の特権。海辺の乗馬や焼きハマグリ、冷えた体に染みるイワシ団子汁など、五感で楽しむ感動のすべてが都心から数時間のこの場所に揃っています。"
   },
   {
     "name": "飯岡漁港",
@@ -71,10 +55,8 @@
     "lat": 35.688508,
     "lng": 140.732512,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "Second//",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -84,10 +66,8 @@
     "lat": 35.739927,
     "lng": 140.865365,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "First/1202/",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -97,10 +77,8 @@
     "lat": 35.537569,
     "lng": 140.460398,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "First/1202/1205",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -110,10 +88,8 @@
     "lat": 35.611078,
     "lng": 140.532898,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "Second//",
     "icon": "spot",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -123,11 +99,8 @@
     "lat": 35.751879,
     "lng": 140.841744,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "First/0804/1202",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "外川漁港",
@@ -136,11 +109,7 @@
     "lat": 35.696788,
     "lng": 140.851467,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "銚子マリーナ・犬若堤防",
@@ -149,11 +118,8 @@
     "lat": 35.702125,
     "lng": 140.838912,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "新川河口",
@@ -162,11 +128,7 @@
     "lat": 35.666119,
     "lng": 140.614561,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "中谷里海岸",
@@ -175,11 +137,7 @@
     "lat": 35.687089,
     "lng": 140.654061,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "新堀川河口",
@@ -188,11 +146,7 @@
     "lat": 35.644094,
     "lng": 140.583522,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "尾垂浜",
@@ -201,11 +155,7 @@
     "lat": 35.62382,
     "lng": 140.554693,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "木戸川河口",
@@ -214,11 +164,7 @@
     "lat": 35.57566,
     "lng": 140.494097,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "真亀川河口",
@@ -227,11 +173,7 @@
     "lat": 35.497723,
     "lng": 140.43106,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "南白亀川河口",
@@ -240,11 +182,8 @@
     "lat": 35.449727,
     "lng": 140.402634,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "利根川河口",
@@ -253,11 +192,7 @@
     "lat": 35.734633,
     "lng": 140.836208,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "南白亀川",
@@ -266,10 +201,7 @@
     "lat": 35.458051,
     "lng": 140.378559,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -279,11 +211,7 @@
     "lat": 35.909839,
     "lng": 140.470698,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大網駅周辺",
@@ -292,11 +220,7 @@
     "lat": 35.522264,
     "lng": 140.310919,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "黒部川周辺水路",
@@ -305,11 +229,7 @@
     "lat": 35.856546,
     "lng": 140.617805,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "神崎水路",
@@ -318,128 +238,88 @@
     "lat": 35.903923,
     "lng": 140.395522,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "釣パラダイス",
-    "zoom": "",
     "individualId": "L06",
     "lat": 35.658621,
     "lng": 140.339653,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "千葉県山武市大木470-1",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "フィッシングクラブジョイバレー",
-    "zoom": "",
     "individualId": "L07",
     "lat": 35.751755,
     "lng": 140.41159,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "千葉県山武郡芝山町大里486-1",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "長熊釣堀センター",
-    "zoom": "",
     "individualId": "L08",
     "lat": 35.75064,
     "lng": 140.59494,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "千葉県旭市萬力3566-1",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "九十九里海釣りセンター",
-    "zoom": "",
     "individualId": "L09",
     "lat": 35.51452,
     "lng": 140.43793,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "千葉県山武郡九十九里町細屋敷663-5",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "道の駅くりもとニジマス釣り",
-    "zoom": "",
     "individualId": "L10",
     "lat": 35.80646,
     "lng": 140.47009,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "千葉県香取市沢1372-1",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "道の口沼",
-    "zoom": "",
     "individualId": "L11",
     "lat": 35.682453,
     "lng": 140.551342,
     "areaId": "CHIBA_CHOUSHI",
-    "url": "",
     "notes": "千葉県匝瑳市高801-6",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "釣り堀 亀山園",
-    "zoom": "",
     "individualId": "L12",
     "lat": 35.22886,
     "lng": 140.082968,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "千葉県君津市豊田30",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "太海フラワー磯釣りセンター",
-    "zoom": "",
     "individualId": "L13",
     "lat": 35.076664,
     "lng": 140.097672,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "千葉県鴨川市太海浜67",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "晴れパークたてやま",
-    "zoom": "",
     "individualId": "L14",
     "lat": 35.027179,
     "lng": 139.862213,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "千葉県館山市那古521",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "磯源フィッシングパーク",
@@ -448,11 +328,8 @@
     "lat": 35.271603,
     "lng": 139.99387,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "千葉県君津市大野台420-2",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "笹川湖",
@@ -461,10 +338,8 @@
     "lat": 35.196162,
     "lng": 140.072174,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "小櫃川漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -474,10 +349,7 @@
     "lat": 35.189556,
     "lng": 140.015913,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -487,10 +359,7 @@
     "lat": 35.207961,
     "lng": 140.029035,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -500,10 +369,8 @@
     "lat": 35.227591,
     "lng": 140.091807,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "小櫃川漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -513,10 +380,7 @@
     "lat": 35.172647,
     "lng": 139.961836,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -526,11 +390,8 @@
     "lat": 34.985811,
     "lng": 139.970868,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "太海港",
@@ -539,11 +400,7 @@
     "lat": 35.07732,
     "lng": 140.101739,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "小正月港",
@@ -552,11 +409,7 @@
     "lat": 35.069088,
     "lng": 140.082836,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "太夫崎漁港",
@@ -565,11 +418,7 @@
     "lat": 35.062102,
     "lng": 140.076915,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "江見港",
@@ -578,11 +427,7 @@
     "lat": 35.058404,
     "lng": 140.061656,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "和田港・小浦港",
@@ -591,11 +436,8 @@
     "lat": 35.034478,
     "lng": 140.014669,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "First/1206/1208",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "平舘港・千倉港",
@@ -604,11 +446,7 @@
     "lat": 34.956701,
     "lng": 139.96349,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "七浦漁港",
@@ -617,11 +455,8 @@
     "lat": 34.932116,
     "lng": 139.95403,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "First/1206/1208",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "乙浜漁港",
@@ -630,11 +465,7 @@
     "lat": 34.911257,
     "lng": 139.927529,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "原港・名倉港",
@@ -643,11 +474,7 @@
     "lat": 34.906314,
     "lng": 139.909452,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "川下港",
@@ -656,11 +483,7 @@
     "lat": 34.903203,
     "lng": 139.871687,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "根本港",
@@ -669,11 +492,7 @@
     "lat": 34.903488,
     "lng": 139.841535,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "伊戸港",
@@ -682,11 +501,7 @@
     "lat": 34.954143,
     "lng": 139.776196,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "川名漁港",
@@ -695,11 +510,7 @@
     "lat": 34.961611,
     "lng": 139.758425,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "洲崎西港",
@@ -708,11 +519,8 @@
     "lat": 34.969431,
     "lng": 139.754814,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "First/1208/1413",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "洲崎北港",
@@ -721,11 +529,7 @@
     "lat": 34.975605,
     "lng": 139.760443,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "坂田漁港",
@@ -734,11 +538,7 @@
     "lat": 34.97644,
     "lng": 139.777004,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "見物堤防",
@@ -747,11 +547,7 @@
     "lat": 34.973975,
     "lng": 139.792913,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "下原漁港",
@@ -760,11 +556,7 @@
     "lat": 34.97797,
     "lng": 139.806857,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大賀堤防",
@@ -773,11 +565,7 @@
     "lat": 34.98132,
     "lng": 139.822875,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "沖ノ島護岸",
@@ -786,10 +574,8 @@
     "lat": 34.990417,
     "lng": 139.833362,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "Second/富津岬/洲崎西港",
     "icon": "spot",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -799,11 +585,7 @@
     "lat": 34.98866,
     "lng": 139.850239,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "西浜突堤",
@@ -812,11 +594,7 @@
     "lat": 35.03236,
     "lng": 139.82825,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "富浦新港",
@@ -825,11 +603,8 @@
     "lat": 35.038874,
     "lng": 139.82189,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "Second/富津岬/洲崎西港",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "富浦旧港",
@@ -838,11 +613,7 @@
     "lat": 35.049346,
     "lng": 139.83127,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "岩井袋港",
@@ -851,11 +622,7 @@
     "lat": 35.101,
     "lng": 139.827681,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "勝山港",
@@ -864,11 +631,8 @@
     "lat": 35.113099,
     "lng": 139.825305,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "Second/富津岬/洲崎西港",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "龍島港・大六港",
@@ -877,11 +641,7 @@
     "lat": 35.120515,
     "lng": 139.829203,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "高崎港・小浦港",
@@ -890,11 +650,7 @@
     "lat": 35.084246,
     "lng": 139.841076,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "保田港",
@@ -903,11 +659,7 @@
     "lat": 35.136053,
     "lng": 139.835894,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "元名港",
@@ -916,11 +668,7 @@
     "lat": 35.146766,
     "lng": 139.830511,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "荻生港・新田浦港",
@@ -929,11 +677,7 @@
     "lat": 35.198217,
     "lng": 139.825774,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "竹岡漁港",
@@ -942,11 +686,8 @@
     "lat": 35.209265,
     "lng": 139.841505,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "Second/富津岬/洲崎西港",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大貫港",
@@ -955,11 +696,8 @@
     "lat": 35.278296,
     "lng": 139.848973,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "Second/富津岬/洲崎西港",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "下洲港",
@@ -968,11 +706,7 @@
     "lat": 35.302029,
     "lng": 139.819029,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "鴨川フィッシャリーナ・鴨川漁港",
@@ -981,10 +715,8 @@
     "lat": 35.095095,
     "lng": 140.106904,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "First/1206/",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -994,11 +726,7 @@
     "lat": 34.902405,
     "lng": 139.886996,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "相浜港・布良港",
@@ -1007,10 +735,8 @@
     "lat": 34.921814,
     "lng": 139.824404,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "First/1208/",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -1020,11 +746,7 @@
     "lat": 34.979026,
     "lng": 139.815799,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "金谷漁港・フェリー乗り場",
@@ -1033,10 +755,8 @@
     "lat": 35.166447,
     "lng": 139.818195,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "Second/富津岬/洲崎西港",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -1046,11 +766,8 @@
     "lat": 35.311833,
     "lng": 139.791305,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
     "notes": "First/1212/1410",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "富津北港・富津みなと公園",
@@ -1059,11 +776,7 @@
     "lat": 35.325254,
     "lng": 139.822125,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大川港・白間漁港",
@@ -1072,11 +785,7 @@
     "lat": 34.924292,
     "lng": 139.944676,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "北条海岸",
@@ -1085,11 +794,7 @@
     "lat": 35.001742,
     "lng": 139.857738,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "丸山堤防",
@@ -1098,11 +803,7 @@
     "lat": 35.028304,
     "lng": 139.83817,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "船方港",
@@ -1111,11 +812,7 @@
     "lat": 35.023391,
     "lng": 139.848855,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "花園海岸",
@@ -1124,11 +821,7 @@
     "lat": 35.042274,
     "lng": 140.024713,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "三島海岸",
@@ -1137,11 +830,7 @@
     "lat": 35.011579,
     "lng": 139.978738,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "湊川河口",
@@ -1150,11 +839,7 @@
     "lat": 35.215002,
     "lng": 139.871057,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "南無谷",
@@ -1163,11 +848,7 @@
     "lat": 35.060304,
     "lng": 139.825021,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "平砂浦",
@@ -1176,10 +857,7 @@
     "lat": 34.941682,
     "lng": 139.810715,
     "areaId": "CHIBA_MINAMI",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -1189,11 +867,7 @@
     "lat": 35.118522,
     "lng": 140.14386,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "天津漁港",
@@ -1202,11 +876,7 @@
     "lat": 35.122543,
     "lng": 140.161675,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "小湊港",
@@ -1215,10 +885,8 @@
     "lat": 35.120836,
     "lng": 140.195719,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "Second//",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -1228,11 +896,8 @@
     "lat": 35.328833,
     "lng": 140.401808,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "夷隅川河口",
@@ -1241,11 +906,7 @@
     "lat": 35.295512,
     "lng": 140.403578,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大原港",
@@ -1254,11 +915,8 @@
     "lat": 35.252728,
     "lng": 140.403261,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "岩船港",
@@ -1267,11 +925,7 @@
     "lat": 35.208959,
     "lng": 140.392608,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "岩和田港",
@@ -1280,10 +934,8 @@
     "lat": 35.179894,
     "lng": 140.365904,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "Second//",
     "icon": "spot",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -1293,11 +945,7 @@
     "lat": 35.178786,
     "lng": 140.349014,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "新官港・豊浜港",
@@ -1306,11 +954,7 @@
     "lat": 35.15501,
     "lng": 140.330833,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "川津港",
@@ -1319,11 +963,7 @@
     "lat": 35.144822,
     "lng": 140.326463,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "勝浦漁港",
@@ -1332,10 +972,8 @@
     "lat": 35.145934,
     "lng": 140.310742,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "First/1205/",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -1345,11 +983,7 @@
     "lat": 35.134288,
     "lng": 140.27967,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "守谷漁港",
@@ -1358,11 +992,7 @@
     "lat": 35.137423,
     "lng": 140.25978,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "興津東港・興津西港",
@@ -1371,11 +1001,7 @@
     "lat": 35.132333,
     "lng": 140.25036,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "松部港・吉尾港",
@@ -1384,11 +1010,7 @@
     "lat": 35.140318,
     "lng": 140.288675,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "浜行川港",
@@ -1397,11 +1019,7 @@
     "lat": 35.12148,
     "lng": 140.23488,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "一宮川河口",
@@ -1410,10 +1028,7 @@
     "lat": 35.392544,
     "lng": 140.391615,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -1423,10 +1038,8 @@
     "lat": 35.374073,
     "lng": 140.392647,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "First/1202/1205",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1436,11 +1049,7 @@
     "lat": 35.352306,
     "lng": 140.392973,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大沢港",
@@ -1449,11 +1058,7 @@
     "lat": 35.115748,
     "lng": 140.222379,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "実入の磯",
@@ -1462,11 +1067,7 @@
     "lat": 35.120757,
     "lng": 140.177462,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "部原港",
@@ -1475,63 +1076,43 @@
     "lat": 35.159407,
     "lng": 140.332527,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "新治堰",
-    "zoom": "",
     "individualId": "L21",
     "lat": 35.473296,
     "lng": 140.261605,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "千葉県茂原市上太田631",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "とり亀つりぼりカフェ",
-    "zoom": "",
     "individualId": "L22",
     "lat": 35.326507,
     "lng": 140.288236,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "千葉県長生郡睦沢町大上1508",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "親水公園フィッシングパーク",
-    "zoom": "",
     "individualId": "L23",
     "lat": 35.280365,
     "lng": 140.248301,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "千葉県夷隅郡大多喜町新丁298",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "養老渓谷釣堀センター",
-    "zoom": "",
     "individualId": "L24",
     "lat": 35.251578,
     "lng": 140.164178,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "千葉県夷隅郡大多喜町葛藤163-1",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "高滝湖",
@@ -1540,10 +1121,8 @@
     "lat": 35.342363,
     "lng": 140.158124,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
     "notes": "養老川漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1553,11 +1132,7 @@
     "lat": 35.377625,
     "lng": 140.369334,
     "areaId": "CHIBA_SOTOBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "手賀沼",
@@ -1566,10 +1141,8 @@
     "lat": 35.858751,
     "lng": 140.025473,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "手賀沼漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1579,11 +1152,7 @@
     "lat": 35.752575,
     "lng": 139.888562,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "将藍川",
@@ -1592,10 +1161,8 @@
     "lat": 35.836461,
     "lng": 140.204815,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "印旛沼漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1605,10 +1172,8 @@
     "lat": 35.837316,
     "lng": 140.242838,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "印旛沼漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1618,10 +1183,8 @@
     "lat": 35.739968,
     "lng": 140.136194,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "印旛沼漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1631,10 +1194,8 @@
     "lat": 35.742341,
     "lng": 140.205717,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "印旛沼漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "special$photo"
   },
   {
@@ -1644,10 +1205,8 @@
     "lat": 35.791588,
     "lng": 140.246813,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "印旛沼漁業協同組合",
     "icon": "spot",
-    "whether": "",
     "type": "special$photo"
   },
   {
@@ -1657,10 +1216,7 @@
     "lat": 35.54881,
     "lng": 140.122547,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1670,11 +1226,7 @@
     "lat": 35.656484,
     "lng": 139.898801,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "常夜灯公園",
@@ -1683,11 +1235,7 @@
     "lat": 35.691688,
     "lng": 139.914482,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "我孫子市民体育館周辺",
@@ -1696,11 +1244,7 @@
     "lat": 35.87518,
     "lng": 140.100253,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "横六間川周辺",
@@ -1709,11 +1253,7 @@
     "lat": 35.815363,
     "lng": 139.897056,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "手賀川周辺",
@@ -1722,11 +1262,7 @@
     "lat": 35.841148,
     "lng": 140.127949,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "流山IC周辺",
@@ -1735,11 +1271,7 @@
     "lat": 35.880914,
     "lng": 139.897563,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "今井橋周辺",
@@ -1748,11 +1280,7 @@
     "lat": 35.678147,
     "lng": 139.89044,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "根木名川周辺",
@@ -1761,11 +1289,7 @@
     "lat": 35.837889,
     "lng": 140.317672,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "二号排水路",
@@ -1774,11 +1298,7 @@
     "lat": 35.885992,
     "lng": 140.048035,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "八間堀",
@@ -1787,11 +1307,7 @@
     "lat": 35.985711,
     "lng": 139.88004,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "利根川木下",
@@ -1800,11 +1316,7 @@
     "lat": 35.842463,
     "lng": 140.147818,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "白旗川",
@@ -1813,11 +1325,7 @@
     "lat": 35.52538,
     "lng": 140.098504,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "長浦駅前水路",
@@ -1826,11 +1334,7 @@
     "lat": 35.450928,
     "lng": 139.995808,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "国府台",
@@ -1839,11 +1343,7 @@
     "lat": 35.73754,
     "lng": 139.901191,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "小櫃橋周辺",
@@ -1852,297 +1352,205 @@
     "lat": 35.425497,
     "lng": 139.937732,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "アート・ヘラ・ポンド",
-    "zoom": "",
     "individualId": "L50",
     "lat": 35.68686,
     "lng": 140.24068,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県佐倉市木野子39",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "千葉北スカイランド釣り堀センター",
-    "zoom": "",
     "individualId": "L51",
     "lat": 35.67212,
     "lng": 140.12909,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県千葉市稲毛区長沼原町261",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "FUJI養殖場",
-    "zoom": "",
     "individualId": "L52",
     "lat": 35.69211,
     "lng": 140.15234,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県四街道市大日2026-2",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "道野辺つり堀センター",
-    "zoom": "",
     "individualId": "L53",
     "lat": 35.75145,
     "lng": 139.99796,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県鎌ケ谷市東道野辺3-8-16",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "田園へら鮒釣堀",
-    "zoom": "",
     "individualId": "L54",
     "lat": 35.78678,
     "lng": 139.96469,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県松戸市五香西4丁目5",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "三楽園",
-    "zoom": "",
     "individualId": "L55",
     "lat": 35.9242,
     "lng": 139.92879,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県野田市上三ヶ尾703-1",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "鈴木園",
-    "zoom": "",
     "individualId": "L56",
     "lat": 35.8609,
     "lng": 140.04546,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県我孫子市岡発戸新田145",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "座間養魚場",
-    "zoom": "",
     "individualId": "L57",
     "lat": 35.85141,
     "lng": 139.99803,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県柏市大井1375",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "管理釣り場将監",
-    "zoom": "",
     "individualId": "L58",
     "lat": 35.84096,
     "lng": 140.22614,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県印旛郡栄町脇川96",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "富里乃堰",
-    "zoom": "",
     "individualId": "L59",
     "lat": 35.73066,
     "lng": 140.36075,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県富里市根木名197-1",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "放年園",
-    "zoom": "",
     "individualId": "L60",
     "lat": 35.82611,
     "lng": 140.24738,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県印旛郡栄町安食3797",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "小川園",
-    "zoom": "",
     "individualId": "L61",
     "lat": 35.86013,
     "lng": 140.03355,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県我孫子市高野山新田177",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "へら鮒　水光園",
-    "zoom": "",
     "individualId": "L62",
     "lat": 35.79435,
     "lng": 140.06,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県白井市復1436",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "真嶋園",
-    "zoom": "",
     "individualId": "L63",
     "lat": 35.83568,
     "lng": 140.21127,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県印西市将監34",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "へら鮒管理釣場 甚兵衛沼",
-    "zoom": "",
     "individualId": "L64",
     "lat": 35.81833,
     "lng": 140.22606,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県印西市甚兵衛31",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "清遊湖へら鮒つり堀",
-    "zoom": "",
     "individualId": "L65",
     "lat": 35.82297,
     "lng": 140.03569,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県柏市金山206-1",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "逆井へら鮒センター",
-    "zoom": "",
     "individualId": "L66",
     "lat": 35.81273,
     "lng": 139.98174,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県柏市逆井456",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "ウォルトンガーデン",
-    "zoom": "",
     "individualId": "L67",
     "lat": 35.860409,
     "lng": 140.285108,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県成田市竜台96",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "手賀沼フィッシングセンター",
-    "zoom": "",
     "individualId": "L68",
     "lat": 35.851892,
     "lng": 140.065193,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県柏市曙橋1",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "trout pond NOIKE",
-    "zoom": "",
     "individualId": "L69",
     "lat": 35.570935,
     "lng": 140.229661,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県千葉市若葉区野呂町1591",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "Y's garden",
-    "zoom": "",
     "individualId": "L70",
     "lat": 35.447626,
     "lng": 140.111129,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県市原市高坂２０２",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "清水公園マス釣り場",
-    "zoom": "",
     "individualId": "L71",
     "lat": 35.958793,
     "lng": 139.850968,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県野田市清水979-1",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "オリジナルメーカー海づり公園",
@@ -2151,10 +1559,8 @@
     "lat": 35.54215,
     "lng": 140.06082,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "千葉県市原市五井南海岸1-12",
     "icon": "fish1",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -2164,11 +1570,7 @@
     "lat": 35.412177,
     "lng": 139.90576,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "畔戸港・見立港",
@@ -2177,11 +1579,7 @@
     "lat": 35.426371,
     "lng": 139.901083,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "高須船溜・金田港",
@@ -2190,11 +1588,7 @@
     "lat": 35.43854,
     "lng": 139.916489,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "吞堀港・牛込港",
@@ -2203,11 +1597,7 @@
     "lat": 35.441687,
     "lng": 139.933398,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "長浦港",
@@ -2216,11 +1606,7 @@
     "lat": 35.469723,
     "lng": 139.988989,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "姉ヶ崎港",
@@ -2229,11 +1615,7 @@
     "lat": 35.467316,
     "lng": 140.022141,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "養老川河口",
@@ -2242,10 +1624,8 @@
     "lat": 35.535058,
     "lng": 140.0721,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "Second/千葉港・アクアリンク裏/袖ヶ浦海浜公園",
     "icon": "spot",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -2255,10 +1635,8 @@
     "lat": 35.600445,
     "lng": 140.08061,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "First/1216/",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -2268,11 +1646,8 @@
     "lat": 35.620994,
     "lng": 140.05389,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "茜浜",
@@ -2281,11 +1656,8 @@
     "lat": 35.658264,
     "lng": 140.008945,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "船橋港親水公園",
@@ -2294,11 +1666,8 @@
     "lat": 35.687836,
     "lng": 139.986173,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "First/1218/",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "猫実川・入船海岸",
@@ -2307,11 +1676,7 @@
     "lat": 35.655222,
     "lng": 139.918495,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "浦安市墓地公園",
@@ -2320,11 +1685,8 @@
     "lat": 35.640086,
     "lng": 139.937979,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "高州海浜公園",
@@ -2333,11 +1695,7 @@
     "lat": 35.633033,
     "lng": 139.92401,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "浦安電波塔",
@@ -2346,11 +1704,7 @@
     "lat": 35.619666,
     "lng": 139.903443,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "ディズニー裏",
@@ -2359,10 +1713,8 @@
     "lat": 35.622943,
     "lng": 139.88014,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "First/1218/1314",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -2372,11 +1724,7 @@
     "lat": 35.646425,
     "lng": 139.879539,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "花見川河口",
@@ -2385,11 +1733,7 @@
     "lat": 35.637502,
     "lng": 140.04905,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "行徳海岸",
@@ -2398,11 +1742,8 @@
     "lat": 35.666595,
     "lng": 139.935663,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "木更津沖堤防",
@@ -2411,11 +1752,7 @@
     "lat": 35.376805,
     "lng": 139.883294,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "木更津港周辺",
@@ -2424,11 +1761,8 @@
     "lat": 35.384186,
     "lng": 139.913142,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "First/1212/1216",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "袖ヶ浦海浜公園周辺",
@@ -2437,10 +1771,8 @@
     "lat": 35.448708,
     "lng": 139.958013,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "First/1212/1216",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -2450,11 +1782,7 @@
     "lat": 35.65137,
     "lng": 140.03382,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "江戸川河口周辺",
@@ -2463,11 +1791,8 @@
     "lat": 35.674188,
     "lng": 139.953522,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "江戸川放水路",
@@ -2476,10 +1801,7 @@
     "lat": 35.690311,
     "lng": 139.936187,
     "areaId": "CHIBA_UCHIBOU",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   }
 ]
