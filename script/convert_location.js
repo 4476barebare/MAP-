@@ -25,22 +25,19 @@ try {
   // 1行目(ヘッダー)をスキップしてパース
   const allRows = lines.slice(1).map(line => {
     const cols = line.split(',');
-
-    return {
-      name: cols[0] ? cols[0].trim() : '',
-      // ★ zoomが空欄の場合は "" にする（フロントが空文字列チェックをしているため）
-      zoom: cols[1] && cols[1].trim() !== '' ? parseFloat(cols[1]) : '',
-      individualId: cols[2] ? cols[2].trim() : '',
-      lat: cols[3] && cols[3].trim() !== '' ? parseFloat(cols[3]) : null,
-      lng: cols[4] && cols[4].trim() !== '' ? parseFloat(cols[4]) : null,
-      areaId: cols[5] ? cols[5].trim() : '',
-      url: cols[6] ? cols[6].trim() : '',
-      notes: cols[7] ? cols[7].trim() : '',
-      icon: cols[8] ? cols[8].trim().toLowerCase() : null,
-      whether: cols[9] ? cols[9].trim() : '',
-      // ★ type が無い場合は確実に空文字列（""）にする
-      type: cols[10] ? cols[10].trim() : ''
-    };
+return {
+  name: cols[0]?.trim() || undefined,
+  zoom: cols[1]?.trim() ? parseFloat(cols[1]) : undefined,
+  individualId: cols[2]?.trim() || undefined,
+  lat: cols[3]?.trim() ? parseFloat(cols[3]) : undefined,
+  lng: cols[4]?.trim() ? parseFloat(cols[4]) : undefined,
+  areaId: cols[5]?.trim() || undefined,
+  url: cols[6]?.trim() || undefined,
+  notes: cols[7]?.trim() || undefined,
+  icon: cols[8]?.trim() ? cols[8].trim().toLowerCase() : undefined,
+  whether: cols[9]?.trim() || undefined,
+  type: cols[10]?.trim() || undefined
+};
   });
 
 
