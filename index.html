@@ -474,7 +474,7 @@ async function updateQueryFromIds(pref, currentAreaId, currentSpotId) {
 }
 
 // ==========================================
-// ★ 新規追加：URLクエリの日本語名から直接CSVを読んでシステム変数をセットする関数
+// ★ 新規追加：URLクエリの日本語名から直接JSONを読んでシステム変数をセットする関数
 // ==========================================
 async function applyQueryToStateFromCsv() {
     const params = new URLSearchParams(window.location.search);
@@ -485,7 +485,7 @@ async function applyQueryToStateFromCsv() {
     if (!qPref) return; // prefクエリが無い場合は何もしない
 
     // --------------------------------------------------
-    // パターン1：prefクエリがある場合 (Region CSVの探索)
+    // パターン1：prefクエリがある場合 (Region CSVの探索) - ここはCSVのまま
     // --------------------------------------------------
     if (window.regionUrl) {
         try {
@@ -509,11 +509,10 @@ async function applyQueryToStateFromCsv() {
                                 // name列を pref(現在の県)としてグローバル定義
                                 window.currentPref = cols[nameIdx];
 
-// ★ url列に何らかの値が入っているかだけをチェックし、パスを生成
-if (cols[urlIdx]) {
-    window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.csv`;
-}
-
+                                // ★ url列に何らかの値が入っているかだけをチェックし、パスを生成（JSONとして）
+                                if (cols[urlIdx]) {
+                                    window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
+                                }
                                 break;
                             }
                         }
@@ -526,43 +525,31 @@ if (cols[urlIdx]) {
     }
 
     // --------------------------------------------------
-    // パターン2 & パターン3 (Location CSVの探索)
+    // パターン2 & パターン3 (Location JSONの探索) ★ここをJSON用に修正！
     // --------------------------------------------------
-    // パターン1で prefLocationUrl が無事に定義されていて、かつ下位クエリがある場合のみ実行
     if ((qArea || qSpot) && window.prefLocationUrl) {
         try {
             const res = await fetch(window.prefLocationUrl);
             if (res.ok) {
-                const text = await res.text();
-                const lines = text.trim().split('\n');
+                // ★ text() ではなく json() で受け取る
+                const allRows = await res.json();
                 
-                if (lines.length > 0) {
-                    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-                    const nameIdx    = headers.indexOf('name');
-                    const areaIdIdx  = headers.indexOf('areaid');
-                    const indivIdIdx = headers.indexOf('individualid');
-                    
-                    if (nameIdx !== -1 && areaIdIdx !== -1 && indivIdIdx !== -1) {
-                        // 1回のループでエリアとスポットの両方を探す（爆速化）
-                        for (let i = 1; i < lines.length; i++) {
-                            const cols = lines[i].split(',').map(c => c.trim());
-                            const rowName = cols[nameIdx];
-                            
-                            // パターン2：エリアクエリと同一の行を探す
-                            if (qArea && rowName === qArea) {
-                                window.currentAreaId = cols[areaIdIdx] + "_" + cols[indivIdIdx];
-                            }
-                            
-                            // パターン3：スポットクエリと同一の行を探す
-                            if (qSpot && rowName === qSpot) {
-                                window.currentSpotId = cols[indivIdIdx];
-                            }
+                if (allRows && allRows.length > 0) {
+                    for (const row of allRows) {
+                        // パターン2：エリアクエリと同一の行を探す
+                        if (qArea && row.name === qArea) {
+                            window.currentAreaId = row.areaId + "_" + row.individualId;
+                        }
+                        
+                        // パターン3：スポットクエリと同一の行を探す
+                        if (qSpot && row.name === qSpot) {
+                            window.currentSpotId = row.individualId;
                         }
                     }
                 }
             }
         } catch (err) {
-            console.error("Location CSV逆引きエラー:", err);
+            console.error("Location JSON逆引きエラー:", err);
         }
     }
 }
