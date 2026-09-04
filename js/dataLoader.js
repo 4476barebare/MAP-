@@ -735,10 +735,10 @@ function selectSpot(spot) {
        //        }
 
         requestAnimationFrame(() => {
-            if (typeof enableDragForArea === 'function') {
+         //          if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
   
-            }
+        //           }
         });
     });
 
