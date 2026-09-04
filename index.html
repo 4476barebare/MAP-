@@ -2153,26 +2153,36 @@ async function loadPrefectureData(prefCode) {
 // ==========================================
 async function checkAndLoadRouteData() {
     const prefCode = window.currentPref;
-    if (!prefCode) return true; 
+    showdebug("▼ checkAndLoadRouteData 開始: currentPref=" + prefCode);
+    if (!prefCode) {
+        showdebug("❌ prefCodeが無いので return true");
+        return true; 
+    }
 
     try {
         let needsBaseLoad = false;
         if (!window.prefData) {
             needsBaseLoad = true;
+            showdebug("▷ prefData が無いため BaseLoad=true");
         } else if (window.spotData && window.spotData.length > 0 && !window.spotData[0].whether) {
             needsBaseLoad = true;
+            showdebug("▷ 天気データが無いため BaseLoad=true");
         }
 
         if (needsBaseLoad) {
+            showdebug("▷ await loadPrefectureData() を呼び出し");
             await loadPrefectureData(prefCode);
             
+            showdebug("▷ UI描画系の呼び出し開始");
             renderPrefectureUI(); 
             if (typeof showPrefSpots === 'function') showPrefSpots();
             if (typeof initAreaUI === 'function') initAreaUI();
             if (typeof renderPrefWeather === 'function') renderPrefWeather();
+            showdebug("✅ UI描画系の呼び出し完了");
         }
         return true; 
     } catch (err) {
+        showdebug("❌ checkAndLoadRouteDataエラー: " + err.message);
         console.error("データロードエラー:", err);
         return false;
     }
