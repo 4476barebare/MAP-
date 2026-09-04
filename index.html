@@ -2222,47 +2222,68 @@ async function routeUpdate() {
         if (spot) {
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
-            
-            // ★ 自前で色々呼ぶのをやめ、通常操作と同じく selectArea に任せる！
             if (parentArea) {
                 setIdealQuery('area', parentArea.name);
-                
-                // 1. エリアを選択（ここで drawLocation, showSpotsForArea, phase1menu など必要なものが全て呼ばれる）
-                selectArea(parentArea);
+                openArea(parentArea.individualId);
             }
-            
             setIdealQuery('spot', spot.name);
-            window._selectSpotCompleted = true; // goBackで詰まらないようにフラグを立てる
 
-            // 2. selectArea のアニメーション完了を待ってから、確実に selectSpot を呼ぶ
-            // （※直接 zoomToSpot ではなく selectSpot を呼ぶことで enableDragForArea などが正しく走る）
+            // =====================================
+            // ★ URL直打ちで「抜け落ちる」定義を完全に補完！
+            // =====================================
+            showSpotsForArea(safeAreaId);
+            phase1menu(safeAreaId);
+            if (window.markerControl) {
+                markerControl.showShop01(safeAreaId);
+            }
+            window._selectSpotCompleted = true;
+            // =====================================
+
+            // 1. まずズーム13でベースマップを生成
+            drawLocation(spot.name, spot.lat, spot.lng, 13);
+            
+            // 2. ★ご指摘の通り、移動完了を待って専用の処理（enableDragForArea）を挟む！
             window.map.once('moveend', () => {
-                // selectArea内の処理と競合しないよう、少し遅延させてからスポット処理へ入る
-                setTimeout(() => {
-                    selectSpot(spot);
-                    
-                    // スポットの移動アニメーション完了後にボタンを出す
-                    window.map.once('moveend', () => {
-                        const btn = document.getElementById('map-back-btn');
-                        const tileWrap = document.getElementById('tile-btn-wrap'); 
-                        const tileBtn = document.getElementById('map-tile-btn'); 
-                        
-                        if (btn) {
-                            btn.style.display = 'block';
-                            if (tileWrap) tileWrap.style.display = 'flex'; 
-                            if (tileBtn) tileBtn.style.display = 'block'; 
-                            
-                            requestAnimationFrame(() => { 
-                                btn.style.opacity = '1'; 
-                                if (tileBtn) tileBtn.style.opacity = '1'; 
-                            });
-                        }
-                    });
-                }, 50);
+                window.map.invalidateSize(true);
+                
+                // Bounds（可動域）の計算とドラッグを有効化
+                if (typeof enableDragForArea === 'function') {
+                    enableDragForArea();
+                }
+                
+                // 直打ち時のフェーズ2状態もここでセット
+                enablePhase2(window.map);
+                window.map.getContainer().classList.add('is-spot-mode');
+
+                // 通常クリック時と同じく、スポットごとに処理を分ける
+                if (spot.zoom !== '') {
+                    zoomToSpot(spot);
+                } else {
+                    showFishPopup(spot);
+                }
             });
+            
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                const tileWrap = document.getElementById('tile-btn-wrap'); 
+                const tileBtn = document.getElementById('map-tile-btn'); 
+                
+                if (btn) {
+                    btn.style.display = 'block';
+                    if (tileWrap) tileWrap.style.display = 'flex'; 
+                    if (tileBtn) tileBtn.style.display = 'block'; 
+                    
+                    requestAnimationFrame(() => { 
+                        btn.style.opacity = '1'; 
+                        if (tileBtn) tileBtn.style.opacity = '1'; 
+                    });
+                }
+            });
+
         }
         return;
     }
+
 
     if (window.currentAreaId) {
         const safeAreaId = window.currentAreaId || ""; 
