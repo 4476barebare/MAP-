@@ -2083,6 +2083,12 @@ window.selectPrefecture = function(csvParam, prefName) { // ★ 第2引数に pr
     window.currentRegion = region;
     window.currentPref = prefCode;
     
+    // =====================================================
+    // ★ 追加: 新しい県を開く前に過去のBoundsキャッシュを確実に初期化
+    // =====================================================
+    window.prefBounds = null;
+    window.areaBounds = null;
+    
     // ★ 2. パスを一括でグローバル生成
     window.prefLocationUrl      = `/${region}/${prefCode}_location.csv`;
     window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
