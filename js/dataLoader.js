@@ -748,14 +748,44 @@ function selectSpot(spot) {
 }
 
 function enableDragForArea() {
-    if (!window.areaBounds) {
+    // 1. 県全体のバウンズが未計算の場合、全スポットデータから算出・キャッシュする
+    if (!window.prefBounds && window.spotData && window.spotData.length > 0) {
+        let minLat = Infinity, maxLat = -Infinity;
+        let minLng = Infinity, maxLng = -Infinity;
+
+        // エリアで絞り込まず、window.spotData（県内の全件）を走査する
+        window.spotData.forEach(spot => {
+            const lat = Number(spot.lat);
+            const lng = Number(spot.lng);
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                minLat = Math.min(minLat, lat);
+                maxLat = Math.max(maxLat, lat);
+                minLng = Math.min(minLng, lng);
+                maxLng = Math.max(maxLng, lng);
+            }
+        });
+
+        // 県全域をカバーするための余白（はみ出さないよう10%程度）
+        const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.05);
+        const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.05);
+
+        window.prefBounds = L.latLngBounds(
+            [minLat - latBuffer, minLng - lngBuffer],
+            [maxLat + latBuffer, maxLng + lngBuffer]
+        );
+    }
+
+    if (!window.prefBounds || !window.prefBounds.isValid()) {
         return;
     }
 
     window.map.dragging.enable();
-    window.map.setMaxBounds(window.areaBounds);
+    
+    // ★ 変更点: window.areaBounds ではなく、計算した window.prefBounds を適用する
+    window.map.setMaxBounds(window.prefBounds);
     window.map.options.maxBoundsViscosity = 1.0;
 }
+
 
 function phase1menu(areaId) {
 
