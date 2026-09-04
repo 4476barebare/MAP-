@@ -1406,26 +1406,19 @@ function zoomToSpot(spot) {
 function showFishMarkers(url) {
   if (!window.map) return;
 
-  // 1. 古い魚のマーカーが残っていればマップから削除する
+  // 1. 古い魚マーカーの削除
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
     window.fishLayer = null;
   }
 
-  // =========================================================
-  // ★ 追加ガード：URLデータが存在しない、または空文字の場合は
-  // 古いマーカーを消した状態のまま、エラーを出さずに安全に終了する
-  // =========================================================
   if (!url || typeof url !== 'string' || url.trim() === '') {
     return;
   }
 
   window.fishLayer = L.layerGroup();
-
   const fishList = url.split(',');
 
-  // ★ 追加ガード：万が一「緯度・経度」が空の不正なデータが混ざっていても
-  // Leafletのマーカー生成エラー（NaNエラー）を回避するようフィルタリング
   const markers = fishList.map(item => {
     const parts = item.split('|');
     return {
@@ -1435,48 +1428,74 @@ function showFishMarkers(url) {
     };
   }).filter(fish => !isNaN(fish.lat) && !isNaN(fish.lng));
 
-  function renderMarkers() {
-    if (!window.fishLayer) return;
-    window.fishLayer.clearLayers();
+  // =====================================
+  // ★ テキストサイズの固定化（ズームイベントの廃止）
+  // =====================================
+  const el = window.map.getContainer();
+  // 拡大用クラスを剥がし、常に最小サイズ（zoom-16相当）に固定する
+  el.classList.remove('zoom-18', 'zoom-17');
+  el.classList.add('zoom-16');
 
-    const zoom = Math.round(window.map.getZoom());
-    const el = window.map.getContainer();
+  // =====================================
+  // ★ 条件付きドット化（間引き）ロジック
+  // =====================================
+  for (let i = 0; i < markers.length; i++) {
+    const fish = markers[i];
+    const currentLatLng = L.latLng(fish.lat, fish.lng);
 
-    // -------------------------
-    // zoomクラス（そのまま維持）
-    // -------------------------
-    el.classList.remove('zoom-18', 'zoom-17', 'zoom-16');
+    let hasSameNameWithin3m = false;
+    let hasDiffNameWithin5m = false;
 
-    if (zoom >= 18) {
-      el.classList.add('zoom-18');
-    } else if (zoom === 17) {
-      el.classList.add('zoom-17');
-    } else if (zoom <= 16) {
-      el.classList.add('zoom-16');
+    // 他のすべてのマーカーとの距離を比較
+    for (let j = 0; j < markers.length; j++) {
+      if (i === j) continue; // 自分自身はスキップ
+      
+      const otherFish = markers[j];
+      const dist = currentLatLng.distanceTo([otherFish.lat, otherFish.lng]); // 距離(メートル)
+
+      if (fish.name === otherFish.name && dist <= 3) {
+        hasSameNameWithin3m = true;
+      }
+      if (fish.name !== otherFish.name && dist <= 5) {
+        hasDiffNameWithin5m = true;
+      }
     }
 
-    // -------------------------
-    // マーカー（ドット削除）
-    // -------------------------
-    for (const fish of markers) {
-      const icon = L.divIcon({
+    // 条件判定: 3m以内に同名があり、かつ5m以内に別名がない場合のみドット化
+    const isDot = hasSameNameWithin3m && !hasDiffNameWithin5m;
+
+    let icon;
+    if (isDot) {
+      // 間引き用ドット（色は任意のもの、ここではfish1の青色を指定）
+      icon = L.divIcon({
+        className: 'pref-dot fish1', 
+        html: '',
+        iconSize: [5, 5],
+        iconAnchor: [2.5, 2.5]
+      });
+    } else {
+      // 通常のテキスト表示
+      icon = L.divIcon({
         className: 'fish-label',
         html: `<div class="fish-text">${fish.name}</div>`,
         iconSize: null
       });
-
-      const marker = L.marker([fish.lat, fish.lng], { icon });
-      window.fishLayer.addLayer(marker);
     }
+
+    // マーカーの生成（タップ不可にして軽量化）
+    const marker = L.marker([fish.lat, fish.lng], { 
+        icon, 
+        interactive: false,
+        keyboard: false
+    });
+    
+    window.fishLayer.addLayer(marker);
   }
 
+  // 最後にまとめてマップへ追加
   window.map.addLayer(window.fishLayer);
-
-  renderMarkers();
-
-  window.map.off('zoomend', renderMarkers);
-  window.map.on('zoomend', renderMarkers);
 }
+
 
 window.activeCol = null;
 
