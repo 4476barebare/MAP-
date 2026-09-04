@@ -2121,7 +2121,7 @@ window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
 };
 
 async function loadPrefectureData(prefCode) {
-    showdebug("▼ loadPrefectureData 開始: prefCode=" + prefCode);
+  //     showdebug("▼ loadPrefectureData 開始: prefCode=" + prefCode);
 
     window.fishData = null; 
     window.currentPref = prefCode;
@@ -2130,7 +2130,7 @@ async function loadPrefectureData(prefCode) {
     // ★ 1. 重複していた regionUrl の生成コードを削除し、グローバル変数で上書き定義のみ残す
     window.regionUrl = `/${region}/${region}_region.csv`; 
 
-    showdebug("▷ prefLocationUrl: " + window.prefLocationUrl);
+  //     showdebug("▷ prefLocationUrl: " + window.prefLocationUrl);
 
     try {
         // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
@@ -2163,7 +2163,7 @@ async function loadPrefectureData(prefCode) {
 // ==========================================
 async function checkAndLoadRouteData() {
     const prefCode = window.currentPref;
-    showdebug("▼ checkAndLoadRouteData 開始: currentPref=" + prefCode);
+   // showdebug("▼ checkAndLoadRouteData 開始: currentPref=" + prefCode);
     if (!prefCode) {
   //       showdebug("❌ prefCodeが無いので return true");
         return true; 
