@@ -2223,31 +2223,36 @@ async function routeUpdate() {
         if (spot) {
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+            
             if (parentArea) {
                 setIdealQuery('area', parentArea.name);
-                // ★ 不足定義1: エリアガイドのアコーディオン展開
+
+                // =====================================
+                // ★ 直打ちの崩壊を防ぐ！トップから順に階層を構築する
+                // =====================================
+                
+                // 1. まず「県」レベルで地図の基礎コンテナを作る
+                drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+
+                // 2. 次に「エリア」レベルで境界(Bounds)とマーカーを生成する（アニメーションはしない）
+                window.map.options.maxBoundsViscosity = 0;
+                window.map.setMaxBounds(null);
+                prefetchAround(parentArea);
+                
+                showSpotsForArea(safeAreaId);
+                phase1menu(safeAreaId);
+                
+                if (window.markerControl) {
+                    markerControl.showShop01(safeAreaId);
+                }
+                
                 openArea(parentArea.individualId);
             }
+
             setIdealQuery('spot', spot.name);
+            window._selectSpotCompleted = true; // goBackで詰まらないようにフラグを立てる
 
-            // =====================================
-            // ★ URL直打ちで「抜け落ちる」定義を完全に補完！
-            // =====================================
-            // 不足定義2: エリア境界(Bounds)とテキストマーカーの生成
-            showSpotsForArea(safeAreaId);
-            
-            // 不足定義3: メニュー項目の生成
-            phase1menu(safeAreaId);
-            
-            // 不足定義4: 釣具店マーカーの初期化
-            if (window.markerControl) {
-                markerControl.showShop01(safeAreaId);
-            }
-
-            // 不足定義5: goBack内の独自フラグを確実に通過させるための担保
-            window._selectSpotCompleted = true;
-            // =====================================
-
+            // 3. 最後に「スポット」レベルへズームイン！
             drawLocation(spot.name, spot.lat, spot.lng, "13");
             zoomToSpot(spot);
             
@@ -2258,9 +2263,6 @@ async function routeUpdate() {
                 
                 if (btn) {
                     btn.style.display = 'block';
-                    // =====================================
-                    // ★ ここでも確実にblockにする
-                    // =====================================
                     if (tileWrap) tileWrap.style.display = 'flex'; 
                     if (tileBtn) tileBtn.style.display = 'block'; 
                     
@@ -2270,7 +2272,6 @@ async function routeUpdate() {
                     });
                 }
             });
-
         }
         return;
     }
