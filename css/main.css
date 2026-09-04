@@ -27,7 +27,6 @@
     color: #ffffff;
     backdrop-filter: blur(5px); /* 下の地図をすりガラス状にぼかす */
     -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.3); /* 光沢感のあるフチ */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
