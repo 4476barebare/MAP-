@@ -2110,8 +2110,9 @@ window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
     routeUpdate();
 };
 
-
 async function loadPrefectureData(prefCode) {
+    showdebug("▼ loadPrefectureData 開始: prefCode=" + prefCode);
+
     window.fishData = null; 
     window.currentPref = prefCode;
     const region = window.currentRegion || 'KANTO';
@@ -2119,17 +2120,19 @@ async function loadPrefectureData(prefCode) {
     // ★ 1. 重複していた regionUrl の生成コードを削除し、グローバル変数で上書き定義のみ残す
     window.regionUrl = `/${region}/${region}_region.csv`; 
 
-try {
-    // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
-    await loadLocationJSON(window.prefLocationUrl); // ← loadLocationJSON に変更
+    showdebug("▷ prefLocationUrl: " + window.prefLocationUrl);
 
+    try {
+        // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
+        showdebug("▷ loadLocationJSON を実行します...");
+        await loadLocationJSON(window.prefLocationUrl);
+        showdebug("✅ loadLocationJSON 完了");
         
         // 沿岸部の天気を取得して全スポットに付与
         const whetherUrl = `/data/${prefCode}_whether.csv`;
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
        
-
         // 内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
         if (typeof loadInlandWhetherCSV === 'function') {
             const inlandCsv = await loadInlandWhetherCSV(region);
@@ -2138,6 +2141,8 @@ try {
 
         return true; 
     } catch (err) {
+        // エラー内容をデバッグ画面に直接出力！
+        showdebug("❌ loadPrefectureDataエラー: " + err.message);
         console.error("データ読み込みエラー:", err);
         return false;
     }
