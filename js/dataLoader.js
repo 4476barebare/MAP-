@@ -1023,6 +1023,8 @@ let lastVisibleSet = new Set();
 // ★グローバルで管理
 // -------------------------
 let phase2Timer = null;
+// ★ グローバルで引き戻し中のフラグを管理（無限ループ防止）
+window._isSnappingBack = false;
 
 function enablePhase2(map) {
     if (!map) return;
@@ -1034,14 +1036,13 @@ function enablePhase2(map) {
     }
     
     const runPhase2 = () => {
-        // ★無効状態なら何もしない
-        if (!window.phase2Initialized) return;
+        // ★無効状態、または引き戻し（スナップバック）中なら何もしない
+        if (!window.phase2Initialized || window._isSnappingBack) return;
 
         clearTimeout(phase2Timer);
 
         phase2Timer = setTimeout(() => {
-            // ★ここでもガード（遅延対策）
-            if (!window.phase2Initialized) return;
+            if (!window.phase2Initialized || window._isSnappingBack) return;
 
             // 1. 既存の処理
             processSpotUtils(map);
@@ -1076,20 +1077,21 @@ function enablePhase2(map) {
                     });
 
                     if (nearestSpot) {
-                        // C. 【追加】1番近いスポットが現在のエリアに所属している場合（引き戻し）
+                        // C. 1番近いスポットが現在のエリアに所属している場合（引き戻し）
                         if (nearestSpot.areaId === window.currentAreaId) {
                             console.log("エリア外検知: 最寄りが同エリアのため強制引き戻します", nearestSpot.name);
                             
-                            // アニメーション中の無限ループ（moveendの連続発火）を防ぐため、一時的に監視を外す
-                            map.off('dragend', map._phase2Handler);
-                            map.off('moveend', map._phase2Handler);
+                            // ★ イベントリスナーは絶対に外さず、フラグで無限ループをガードする
+                            window._isSnappingBack = true;
                             
                             // スムーズに戻れるように一旦バウンズを解除
                             map.setMaxBounds(null);
+                            map.options.maxBoundsViscosity = 0;
                             
                             // そのスポットへ強制的に戻す
                             map.flyTo([nearestSpot.lat, nearestSpot.lng], 13, { duration: 0.5 });
                             
+                            // 移動完了を待つ
                             map.once('moveend', () => {
                                 map.invalidateSize(true);
                                 
@@ -1100,14 +1102,15 @@ function enablePhase2(map) {
                                     map.dragging.enable();
                                 }
                                 
-                                // 引き戻し完了後、再び監視を再開
-                                map.on('dragend', map._phase2Handler);
-                                map.on('moveend', map._phase2Handler);
+                                // 引き戻し完了後、フラグを下ろして判定を再開させる
+                                setTimeout(() => {
+                                    window._isSnappingBack = false;
+                                }, 100);
                             });
                             
                             return; // 引き戻し中はこれ以降の処理を中断
                         } 
-                        // D. 【既存】1番近いスポットが別のエリアに所属している場合（エリア更新）
+                        // D. 1番近いスポットが別のエリアに所属している場合（エリア更新）
                         else {
                             // 新しいエリアIDに上書き
                             window.currentAreaId = nearestSpot.areaId;
@@ -1156,8 +1159,6 @@ function enablePhase2(map) {
     window.phase2Initialized = true;
     renderCrowdImage();
 }
-
-
 
 function disablePhase2(map) {
 
