@@ -574,6 +574,7 @@ function selectArea(area) {
                     requestAnimationFrame(() => {
                         btn.style.transition = 'opacity 0.4s ease';
                         btn.style.opacity = '1';
+                        saveMapState();
                     });
                 }
             });
@@ -687,10 +688,6 @@ function selectSpot(spot) {
     
     const currentZoom = window.map.getZoom();
 
-    // ==========================================
-    // ★ ズーム13
-    // エリア内をドラッグできる状態を維持する
-    // ==========================================
     if (currentZoom === 13) {
         if (spot.zoom !== '') {
             zoomToSpot(spot);
@@ -703,9 +700,6 @@ function selectSpot(spot) {
     if (window.markerControl) {
         markerControl.showShop02(window.currentAreaId);
     }
-
-    saveMapState();
-
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
@@ -722,27 +716,28 @@ function selectSpot(spot) {
             fadeAnimation: false
         }
     ).addTo(window.map);
-alert("");    
 
-    disableAreaSwipe();
-alert("1");   
+
+
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
+    disableAreaSwipe();
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
-alert("2");
+
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-alert("3");   
+  
         if (!window.areaBounds && window.currentAreaId) {
+            alert("4");
             showSpotsForArea(window.currentAreaId);
         }
-alert("4");
+
         requestAnimationFrame(() => {
             if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
-                alert("5");
+  
             }
         });
     });
