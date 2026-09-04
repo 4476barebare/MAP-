@@ -728,19 +728,11 @@ function selectSpot(spot) {
 
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-        // alert(window.currentAreaId);
-        //       if (!window.areaBounds && window.currentAreaId) {
-    //            alert("4");
-
-       //        }
 
         requestAnimationFrame(() => {
 
                 enableDragForArea();
-  
-
-            
-    enablePhase2(window.map);
+                enablePhase2(window.map);
 
     window.map.getContainer().classList.add('is-spot-mode');
     window._selectSpotCompleted = true;
@@ -1056,63 +1048,100 @@ function enablePhase2(map) {
             showNearestSpotName(map);
 
             // =====================================================
-            // ★ 新規: エリア切り替わりの検知と、データ＆Boundsの更新
+            // ★ 新規: エリア内外の判定と、切り替え・強制引き戻し処理
             // =====================================================
-            if (window.map.getZoom() === 13 && window.spotData) {
+            if (window.map.getZoom() === 13 && window.spotData && window.currentAreaId) {
                 const center = window.map.getCenter();
-                let nearestSpot = null;
-                let minDistance = Infinity;
+                
+                // A. まず、今の座標が「現在のエリア内」かどうかを判定する
+                // （areaBounds が存在し、かつその枠内に中心座標が収まっているか）
+                const isInsideArea = window.areaBounds ? window.areaBounds.contains(center) : true;
 
-                // A. 画面中央に一番近いスポットを判定
-                window.spotData.forEach(spot => {
-                    const lat = Number(spot.lat);
-                    const lng = Number(spot.lng);
-                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                        const distance = center.distanceTo(L.latLng(lat, lng));
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            nearestSpot = spot;
+                // B. エリア外にはみ出している時の処理
+                if (!isInsideArea) {
+                    let nearestSpot = null;
+                    let minDistance = Infinity;
+
+                    // 1番近いスポットの座標を計算
+                    window.spotData.forEach(spot => {
+                        const lat = Number(spot.lat);
+                        const lng = Number(spot.lng);
+                        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                            const distance = center.distanceTo(L.latLng(lat, lng));
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                                nearestSpot = spot;
+                            }
+                        }
+                    });
+
+                    if (nearestSpot) {
+                        // C. 【追加】1番近いスポットが現在のエリアに所属している場合（引き戻し）
+                        if (nearestSpot.areaId === window.currentAreaId) {
+                            console.log("エリア外検知: 最寄りが同エリアのため強制引き戻します", nearestSpot.name);
+                            
+                            // アニメーション中の無限ループ（moveendの連続発火）を防ぐため、一時的に監視を外す
+                            map.off('dragend', map._phase2Handler);
+                            map.off('moveend', map._phase2Handler);
+                            
+                            // スムーズに戻れるように一旦バウンズを解除
+                            map.setMaxBounds(null);
+                            
+                            // そのスポットへ強制的に戻す
+                            map.flyTo([nearestSpot.lat, nearestSpot.lng], 13, { duration: 0.5 });
+                            
+                            map.once('moveend', () => {
+                                map.invalidateSize(true);
+                                
+                                // enableDragForAreaと同等のバウンズ再設定処理
+                                if (window.areaBounds && window.areaBounds.isValid()) {
+                                    map.setMaxBounds(window.areaBounds);
+                                    map.options.maxBoundsViscosity = 1.0;
+                                    map.dragging.enable();
+                                }
+                                
+                                // 引き戻し完了後、再び監視を再開
+                                map.on('dragend', map._phase2Handler);
+                                map.on('moveend', map._phase2Handler);
+                            });
+                            
+                            return; // 引き戻し中はこれ以降の処理を中断
+                        } 
+                        // D. 【既存】1番近いスポットが別のエリアに所属している場合（エリア更新）
+                        else {
+                            // 新しいエリアIDに上書き
+                            window.currentAreaId = nearestSpot.areaId;
+                            
+                            // 新しいエリアの areaBounds を裏側で計算・保存しておく
+                            const targetAreaSpots = window.spotData.filter(s => s.areaId === window.currentAreaId);
+                            if (targetAreaSpots.length > 0) {
+                                let minLat = Infinity, maxLat = -Infinity;
+                                let minLng = Infinity, maxLng = -Infinity;
+                                
+                                targetAreaSpots.forEach(s => {
+                                    minLat = Math.min(minLat, s.lat);
+                                    maxLat = Math.max(maxLat, s.lat);
+                                    minLng = Math.min(minLng, s.lng);
+                                    maxLng = Math.max(maxLng, s.lng);
+                                });
+                                
+                                const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.02);
+                                const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.02);
+                                
+                                window.areaBounds = L.latLngBounds(
+                                    [minLat - latBuffer, minLng - lngBuffer],
+                                    [maxLat + latBuffer, maxLng + lngBuffer]
+                                );
+                            }
+
+                            // エリア移動に伴う各種データの再ロード
+                            if (window.markerControl && typeof markerControl.showShop02 === 'function') {
+                                markerControl.showShop02(window.currentAreaId);
+                            }
+                            
+                            console.log("スワイプによるエリア変更を検知:", window.currentAreaId);
                         }
                     }
-                });
-
-                // B. エリアが切り替わっていた場合の処理
-                if (nearestSpot && nearestSpot.areaId !== window.currentAreaId) {
-                    
-                    // 新しいエリアIDに上書き
-                    window.currentAreaId = nearestSpot.areaId;
-                    
-                    // C. 新しいエリアの areaBounds を裏側で計算・保存しておく
-                    const targetAreaSpots = window.spotData.filter(s => s.areaId === window.currentAreaId);
-                    if (targetAreaSpots.length > 0) {
-                        let minLat = Infinity, maxLat = -Infinity;
-                        let minLng = Infinity, maxLng = -Infinity;
-                        
-                        targetAreaSpots.forEach(s => {
-                            minLat = Math.min(minLat, s.lat);
-                            maxLat = Math.max(maxLat, s.lat);
-                            minLng = Math.min(minLng, s.lng);
-                            maxLng = Math.max(maxLng, s.lng);
-                        });
-                        
-                        const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.02);
-                        const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.02);
-                        
-                        window.areaBounds = L.latLngBounds(
-                            [minLat - latBuffer, minLng - lngBuffer],
-                            [maxLat + latBuffer, maxLng + lngBuffer]
-                        );
-                    }
-
-                    // D. エリア移動に伴う各種データの再ロード
-                    if (window.markerControl && typeof markerControl.showShop02 === 'function') {
-                        markerControl.showShop02(window.currentAreaId);
-                    }
-                    
-                    // 魚データのロード等、他にもあればここに追加
-                    // if (typeof prepareFishForArea === 'function') prepareFishForArea(window.currentAreaId);
-                    
-                    console.log("スワイプによるエリア変更を検知:", window.currentAreaId);
                 }
             }
 
@@ -1127,6 +1156,7 @@ function enablePhase2(map) {
     window.phase2Initialized = true;
     renderCrowdImage();
 }
+
 
 
 function disablePhase2(map) {
