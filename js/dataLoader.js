@@ -729,10 +729,10 @@ function selectSpot(spot) {
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         // alert(window.currentAreaId);
-        if (!window.areaBounds && window.currentAreaId) {
+        //       if (!window.areaBounds && window.currentAreaId) {
     //            alert("4");
             showSpotsForArea(window.currentAreaId);
-        }
+       //        }
 
         requestAnimationFrame(() => {
             if (typeof enableDragForArea === 'function') {
