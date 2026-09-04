@@ -722,25 +722,27 @@ function selectSpot(spot) {
             fadeAnimation: false
         }
     ).addTo(window.map);
+alert("");    
 
     disableAreaSwipe();
-
+alert("1");   
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
-
+alert("2");
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
-
+alert("3");   
         if (!window.areaBounds && window.currentAreaId) {
             showSpotsForArea(window.currentAreaId);
         }
-
+alert("4");
         requestAnimationFrame(() => {
             if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
+                alert("5");
             }
         });
     });
