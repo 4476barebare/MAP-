@@ -2207,7 +2207,6 @@ async function routeUpdate() {
         loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
-
     // ─── スポット階層 ───
     if (window.currentSpotId) {
 
@@ -2224,60 +2223,47 @@ async function routeUpdate() {
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
             
+            // ★ 自前で色々呼ぶのをやめ、通常操作と同じく selectArea に任せる！
             if (parentArea) {
                 setIdealQuery('area', parentArea.name);
-
-                // =====================================
-                // ★ 直打ちの崩壊を防ぐ！トップから順に階層を構築する
-                // =====================================
                 
-                // 1. まず「県」レベルで地図の基礎コンテナを作る
-                drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-
-                // 2. 次に「エリア」レベルで境界(Bounds)とマーカーを生成する（アニメーションはしない）
-                window.map.options.maxBoundsViscosity = 0;
-                window.map.setMaxBounds(null);
-                prefetchAround(parentArea);
-                
-                showSpotsForArea(safeAreaId);
-                phase1menu(safeAreaId);
-                
-                if (window.markerControl) {
-                    markerControl.showShop01(safeAreaId);
-                }
-                
-                openArea(parentArea.individualId);
+                // 1. エリアを選択（ここで drawLocation, showSpotsForArea, phase1menu など必要なものが全て呼ばれる）
+                selectArea(parentArea);
             }
-
+            
             setIdealQuery('spot', spot.name);
             window._selectSpotCompleted = true; // goBackで詰まらないようにフラグを立てる
 
-            // 3. 最後に「スポット」レベルへズームイン！
-            drawLocation(spot.name, spot.lat, spot.lng, "13");
-            zoomToSpot(spot);
-            
-            requestAnimationFrame(() => {
-                const btn = document.getElementById('map-back-btn');
-                const tileWrap = document.getElementById('tile-btn-wrap'); 
-                const tileBtn = document.getElementById('map-tile-btn'); 
-                
-                if (btn) {
-                    btn.style.display = 'block';
-                    if (tileWrap) tileWrap.style.display = 'flex'; 
-                    if (tileBtn) tileBtn.style.display = 'block'; 
+            // 2. selectArea のアニメーション完了を待ってから、確実に selectSpot を呼ぶ
+            // （※直接 zoomToSpot ではなく selectSpot を呼ぶことで enableDragForArea などが正しく走る）
+            window.map.once('moveend', () => {
+                // selectArea内の処理と競合しないよう、少し遅延させてからスポット処理へ入る
+                setTimeout(() => {
+                    selectSpot(spot);
                     
-                    requestAnimationFrame(() => { 
-                        btn.style.opacity = '1'; 
-                        if (tileBtn) tileBtn.style.opacity = '1'; 
+                    // スポットの移動アニメーション完了後にボタンを出す
+                    window.map.once('moveend', () => {
+                        const btn = document.getElementById('map-back-btn');
+                        const tileWrap = document.getElementById('tile-btn-wrap'); 
+                        const tileBtn = document.getElementById('map-tile-btn'); 
+                        
+                        if (btn) {
+                            btn.style.display = 'block';
+                            if (tileWrap) tileWrap.style.display = 'flex'; 
+                            if (tileBtn) tileBtn.style.display = 'block'; 
+                            
+                            requestAnimationFrame(() => { 
+                                btn.style.opacity = '1'; 
+                                if (tileBtn) tileBtn.style.opacity = '1'; 
+                            });
+                        }
                     });
-                }
+                }, 50);
             });
         }
         return;
     }
 
-
-    // ─── エリア階層 ───
     if (window.currentAreaId) {
         const safeAreaId = window.currentAreaId || ""; 
         const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
