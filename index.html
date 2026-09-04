@@ -2224,6 +2224,7 @@ async function routeUpdate() {
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
             if (parentArea) setIdealQuery('area', parentArea.name);
             setIdealQuery('spot', spot.name);
+            window._selectSpotCompleted = true;
 
             // 1. まず元の状態と同じくベースマップを生成
             drawLocation(spot.name, spot.lat, spot.lng, "13");
