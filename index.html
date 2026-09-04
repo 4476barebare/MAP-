@@ -508,11 +508,12 @@ async function applyQueryToStateFromCsv() {
                             if (cols[notesIdx] === qPref) {
                                 // name列を pref(現在の県)としてグローバル定義
                                 window.currentPref = cols[nameIdx];
-                                
-                                // ★ url列に何らかの値が入っているかだけをチェックし、パスを生成
-                                if (cols[urlIdx]) {
-                                    window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.csv`;
-                                }
+
+// ★ url列に何らかの値が入っているかだけをチェックし、パスを生成
+if (cols[urlIdx]) {
+    window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.csv`;
+}
+
                                 break;
                             }
                         }
@@ -1897,22 +1898,21 @@ function preloadCsvFiles(regionCode, prefCode) {
     // どちらか片方でも欠けていたら処理をスキップ
     if (!regionCode || !prefCode) return;
     
-    // パスを動的に生成
-    const csvUrl     = `/${regionCode}/${prefCode}_location.csv`;
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-    const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
+// パスを動的に生成
+const jsonUrl    = `/${regionCode}/${prefCode}_location.json`; // ← 変数名と拡張子を変更
+const whetherUrl = `/data/${prefCode}_whether.csv`;
+const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
 
-    // ★ 純粋な県コード（"CHIBA"等）をキーにして二重フェッチを完璧に防ぐ
-    if (!window.fetchCacheStatus[prefCode]) {
-        window.fetchCacheStatus[prefCode] = true;
-        
-        // 低優先度でバックグラウンドフェッチし、ブラウザキャッシュに載せる
-        fetch(csvUrl, { priority: 'low' }).catch(()=>{});
-        fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
-        fetch(shopUrl, { priority: 'low' }).catch(()=>{});
-    }
+// ★ 純粋な県コード（"CHIBA"等）をキーにして二重フェッチを完璧に防ぐ
+if (!window.fetchCacheStatus[prefCode]) {
+    window.fetchCacheStatus[prefCode] = true;
+    
+    // 低優先度でバックグラウンドフェッチし、ブラウザキャッシュに載せる
+    fetch(jsonUrl, { priority: 'low' }).catch(()=>{}); // ← csvUrl から jsonUrl に変更
+    fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
+
 }
-
+}
 
 // ================================
 // ■ 初期画面のRegionマップ読み込み
@@ -2090,8 +2090,10 @@ window.selectPrefecture = function(csvParam, prefName) { // ★ 第2引数に pr
     window.areaBounds = null;
     
     // ★ 2. パスを一括でグローバル生成
-    window.prefLocationUrl      = `/${region}/${prefCode}_location.csv`;
-    window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
+// ★ 2. パスを一括でグローバル生成
+window.prefLocationUrl      = `/${region}/${prefCode}_location.json`; // ← .json に変更
+window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
+
     window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
     window.fishUrl              = `/${region}/${prefCode}_fish.json`;
     window.prefShopUrl          = `/${region}/${prefCode}_shop.csv`;
@@ -2117,9 +2119,10 @@ async function loadPrefectureData(prefCode) {
     // ★ 1. 重複していた regionUrl の生成コードを削除し、グローバル変数で上書き定義のみ残す
     window.regionUrl = `/${region}/${region}_region.csv`; 
 
-    try {
-        // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
-        await loadLocationCSV(window.prefLocationUrl);
+try {
+    // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
+    await loadLocationJSON(window.prefLocationUrl); // ← loadLocationJSON に変更
+
         
         // 沿岸部の天気を取得して全スポットに付与
         const whetherUrl = `/data/${prefCode}_whether.csv`;
@@ -2313,20 +2316,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         routeUpdate(); // 内部でloadRegionMapが呼ばれる
         return;
     }
-    // 4. ★ここから本来の読み込みチェーン開始
-    // 【修正点】直打ちの場合に備えて、魚データなどのパスをグローバル変数に確実にセットする
-    window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.csv`;
-    window.prefWeatherUrl       = `/data/${window.currentPref}_whether.csv`;
-    window.prefInlandWeatherUrl = `/data/${window.currentRegion}_inLand_recalculated.csv`;
-    window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.json`; // ← これが抜けていた原因！
-    window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
+// 4. ★ここから本来の読み込みチェーン開始
+// 【修正点】直打ちの場合に備えて、魚データなどのパスをグローバル変数に確実にセットする
+window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.json`; // ← .json に変更
+window.prefWeatherUrl       = `/data/${window.currentPref}_whether.csv`;
+window.prefInlandWeatherUrl = `/data/${window.currentRegion}_inLand_recalculated.csv`;
+window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.json`;
+window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
 
-    const csvUrl = window.prefLocationUrl;
-    const whetherUrl = window.prefWeatherUrl;
-    const shopUrl = window.prefShopUrl;
+const jsonUrl = window.prefLocationUrl; // ← jsonUrl に変更
+const whetherUrl = window.prefWeatherUrl;
+const shopUrl = window.prefShopUrl;
 
-    // このチェーン内で初めてロードと描画を完結させる
-    loadLocationCSV(csvUrl, window.currentPref).then(() => {
+// このチェーン内で初めてロードと描画を完結させる
+loadLocationJSON(jsonUrl).then(() => { // ← loadLocationJSON に変更（第2引数も削除）
+
         loadWhetherCSV(whetherUrl).then(csv => {
             applyWhetherToSpots(csv);
             
