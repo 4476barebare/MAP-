@@ -1962,7 +1962,7 @@ function loadRegionMap() {
         })
         .then(text => {
             const lines = text.trim().split('\n');
-            showdebug("▷ CSV取得成功 行数: " + lines.length);
+           //    showdebug("▷ CSV取得成功 行数: " + lines.length);
             if (lines.length < 2) {
                //  showdebug("❌ 行数が足りません");
                 return;
@@ -2223,8 +2223,30 @@ async function routeUpdate() {
         if (spot) {
             setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
-            if (parentArea) setIdealQuery('area', parentArea.name);
+            if (parentArea) {
+                setIdealQuery('area', parentArea.name);
+                // ★ 不足定義1: エリアガイドのアコーディオン展開
+                openArea(parentArea.individualId);
+            }
             setIdealQuery('spot', spot.name);
+
+            // =====================================
+            // ★ URL直打ちで「抜け落ちる」定義を完全に補完！
+            // =====================================
+            // 不足定義2: エリア境界(Bounds)とテキストマーカーの生成
+            showSpotsForArea(safeAreaId);
+            
+            // 不足定義3: メニュー項目の生成
+            phase1menu(safeAreaId);
+            
+            // 不足定義4: 釣具店マーカーの初期化
+            if (window.markerControl) {
+                markerControl.showShop01(safeAreaId);
+            }
+
+            // 不足定義5: goBack内の独自フラグを確実に通過させるための担保
+            window._selectSpotCompleted = true;
+            // =====================================
 
             drawLocation(spot.name, spot.lat, spot.lng, "13");
             zoomToSpot(spot);
@@ -2252,6 +2274,7 @@ async function routeUpdate() {
         }
         return;
     }
+
 
     // ─── エリア階層 ───
     if (window.currentAreaId) {
