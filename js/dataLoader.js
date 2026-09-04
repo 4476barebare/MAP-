@@ -594,7 +594,7 @@ function saveMapState() {
 
 function showSpotsForArea(areaKey) {
 
-    // 直リンク対策。ドットが無い場合は、キャッシュ確認と新規生成を兼ね備えた showPrefSpots を呼ぶ
+    // 直リンク対策などの初期化処理はそのまま
     if (!window.prefSpotLayer) {
         if (typeof showPrefSpots === 'function') showPrefSpots();
     }
@@ -605,18 +605,27 @@ function showSpotsForArea(areaKey) {
         window.areaSpotLayer.clearLayers();
     }
 
-    // エリアが一致し、かつ「icon列が空欄ではない（値が存在する）」ものだけを抽出
-    const spots = window.spotData.filter(s => 
-        s.areaId === areaKey && s.icon && s.icon.trim() !== ''
+    // =====================================================
+    // ★ 変更点1: マーカー表示用（エリア制限を外して県内全件抽出）
+    // =====================================================
+    const allPrefSpots = window.spotData.filter(s => 
+        s.icon && s.icon.trim() !== ''
     );
     
-    if (!spots.length) return;
+    // =====================================================
+    // ★ 変更点2: ズーム計算用（クリックされたエリアのみ抽出）
+    // =====================================================
+    const targetAreaSpots = window.spotData.filter(s => 
+        s.areaId === areaKey && s.icon && s.icon.trim() !== ''
+    );
+
+    if (!allPrefSpots.length) return;
 
     let minLat = Infinity, maxLat = -Infinity;
     let minLng = Infinity, maxLng = -Infinity;
 
-    spots.forEach(spot => {
-        // 既存のドットマーカーと全く同じ判定ロジックを使い回す
+    // 1. 県内の【全スポット】に対してテキストマーカーを生成して地図に追加
+    allPrefSpots.forEach(spot => {
         let type = 'spot';
         if (spot.icon && spot.icon.startsWith('fish')) {
             const match = spot.icon.match(/fish\d+/);
@@ -628,7 +637,6 @@ function showSpotsForArea(areaKey) {
         const marker = L.marker([spot.lat, spot.lng], {
             icon: L.divIcon({
                 className: 'custom-text-marker',
-                // 判定した type（spot や fish1 など）をクラスとして付与
                 html: `<div class="spot-text ${type}">${spot.name}</div>`,
                 iconSize: [0, 0],
                 iconAnchor: [0, 0]
@@ -645,26 +653,31 @@ function showSpotsForArea(areaKey) {
         });
 
         window.areaSpotLayer.addLayer(marker);
-
-        // Bounds計算
-        const lat = Number(spot.lat);
-        const lng = Number(spot.lng);
-
-        if (Number.isFinite(lat) && Number.isFinite(lng)) {
-            minLat = Math.min(minLat, lat);
-            maxLat = Math.max(maxLat, lat);
-            minLng = Math.min(minLng, lng);
-            maxLng = Math.max(maxLng, lng);
-        }
     });
 
-    const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
-    const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
+    // 2. カメラの枠（Bounds）計算は【対象エリア】の座標だけを使って行う
+    if (targetAreaSpots.length > 0) {
+        targetAreaSpots.forEach(spot => {
+            const lat = Number(spot.lat);
+            const lng = Number(spot.lng);
 
-    window.areaBounds = L.latLngBounds(
-        [minLat - latBuffer, minLng - lngBuffer],
-        [maxLat + latBuffer, maxLng + lngBuffer]
-    );
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                minLat = Math.min(minLat, lat);
+                maxLat = Math.max(maxLat, lat);
+                minLng = Math.min(minLng, lng);
+                maxLng = Math.max(maxLng, lng);
+            }
+        });
+
+        // 最低限の広さを保証する余白計算
+        const latBuffer = Math.max((maxLat - minLat) * 0.2, 0.05);
+        const lngBuffer = Math.max((maxLng - minLng) * 0.2, 0.05);
+
+        window.areaBounds = L.latLngBounds(
+            [minLat - latBuffer, minLng - lngBuffer],
+            [maxLat + latBuffer, maxLng + lngBuffer]
+        );
+    }
 }
 
 function selectSpot(spot) {
