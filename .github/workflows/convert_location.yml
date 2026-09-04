@@ -1,0 +1,40 @@
+name: Convert Location CSV to JSON
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_csv:
+        description: '入力するCSVファイル名 (例: KANTO/TOKYO_location.csv)'
+        required: true
+        default: 'KANTO/TOKYO_location.csv'
+      output_json:
+        description: '出力するJSONファイル名 (例: KANTO/TOKYO_location.json)'
+        required: true
+        default: 'KANTO/TOKYO_location.json'
+
+permissions:
+  contents: write
+
+jobs:
+  convert-location:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Converter Script
+        run: node script/convert_location.js "${{ github.event.inputs.input_csv }}" "${{ github.event.inputs.output_json }}"
+
+      - name: Commit and Push
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${{ github.event.inputs.output_json }}"
+          
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-converted: ${{ github.event.inputs.input_csv }} to JSON"
+          git push
