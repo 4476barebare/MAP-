@@ -5,12 +5,8 @@
     "individualId": "parent",
     "lat": 35.33,
     "lng": 139.45,
-    "areaId": "",
     "url": "140000",
-    "notes": "神奈川県",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "神奈川県"
   },
   {
     "name": "川崎横浜エリア",
@@ -20,10 +16,7 @@
     "lng": 139.68,
     "areaId": "KANAGAWA",
     "url": "x:1;y:1",
-    "notes": "都心から数十分。横浜・川崎は渡船で渡る川崎新堤などの上級者向けエリアがある一方で、大黒や本牧、磯子には安全な海釣り施設が整備され、ファミリーや初心者でも手ぶらでサビキ釣りが楽しめます。ターゲットは初夏のサバや秋のアジ、居付きの根魚まで幅広く、工業地帯の無機質な夜景をバックにする夜釣りも独特の風情があります。このエリアの良さは海と都市の近さにあります。釣行の前後には、横浜中華街の本格中華や臨海部のB級グルメ巡りへ。釣りの興奮と洗練された食文化という、二つの魅力を一日で欲張りに味わい尽くせるのが魅力です。",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "都心から数十分。横浜・川崎は渡船で渡る川崎新堤などの上級者向けエリアがある一方で、大黒や本牧、磯子には安全な海釣り施設が整備され、ファミリーや初心者でも手ぶらでサビキ釣りが楽しめます。ターゲットは初夏のサバや秋のアジ、居付きの根魚まで幅広く、工業地帯の無機質な夜景をバックにする夜釣りも独特の風情があります。このエリアの良さは海と都市の近さにあります。釣行の前後には、横浜中華街の本格中華や臨海部のB級グルメ巡りへ。釣りの興奮と洗練された食文化という、二つの魅力を一日で欲張りに味わい尽くせるのが魅力です。"
   },
   {
     "name": "三浦半島エリア",
@@ -33,10 +26,7 @@
     "lng": 139.63,
     "areaId": "KANAGAWA",
     "url": "x:1;y:0",
-    "notes": "東京湾側の内房と、相模湾に面した外房で、海の性格が180度変わるのが三浦半島の面白さです。歴史遺産や港町など異国情緒漂う文化的な魅力の内房は港湾部や砂浜でシーバスや投げ釣りを静かに楽しめます。一転して外房の城ヶ島周辺へと向かえば、激しい潮流が抜ける広大な岩礁帯が姿を現します。この外側の海は、一瞬の潮の変化を見極める魚と知恵比べが必須であり、サラシを狙うヒラスズキや大型の青物が回遊するダイナミックなフィールドが五感を刺激します。手軽な湾奥の釣りから波飛沫を浴びる本格的な磯釣りまで楽しめる、半島を横断するだけで全く異なる戦略を求められる網羅性の高さがこのエリアの本質といえます。",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "東京湾側の内房と、相模湾に面した外房で、海の性格が180度変わるのが三浦半島の面白さです。歴史遺産や港町など異国情緒漂う文化的な魅力の内房は港湾部や砂浜でシーバスや投げ釣りを静かに楽しめます。一転して外房の城ヶ島周辺へと向かえば、激しい潮流が抜ける広大な岩礁帯が姿を現します。この外側の海は、一瞬の潮の変化を見極める魚と知恵比べが必須であり、サラシを狙うヒラスズキや大型の青物が回遊するダイナミックなフィールドが五感を刺激します。手軽な湾奥の釣りから波飛沫を浴びる本格的な磯釣りまで楽しめる、半島を横断するだけで全く異なる戦略を求められる網羅性の高さがこのエリアの本質といえます。"
   },
   {
     "name": "湘南西湘エリア",
@@ -46,10 +36,7 @@
     "lng": 139.29,
     "areaId": "KANAGAWA",
     "url": "x:0;y:0",
-    "notes": "湘南から西湘はサーフィンのメッカとして華やかな一方、その奥には釣り人を翻弄するストイックな海と、静謐な歴史の影が同居している。湘南の遠浅な砂浜はフラットフィッシュとのシビアな駆け引きを強いるが、西湘へ移れば一転、国府津などの急深な砂利浜が広がり、青物を狙う遠投釣りの聖地へと姿を変える。さらに江の島や鎌倉の喧騒を離れて西へ進めば、県央の平野を経て、小田原城を擁する渋い歴史の町並みへと行き着く。繊細なイメージに隠された地形の荒々しさと冷徹な美しさ。そして西へ向かうほどに深まる静かで重厚な旅情もこのエリアが持つもう一つの顔です。",
-    "icon": null,
-    "whether": "",
-    "type": ""
+    "notes": "湘南から西湘はサーフィンのメッカとして華やかな一方、その奥には釣り人を翻弄するストイックな海と、静謐な歴史の影が同居している。湘南の遠浅な砂浜はフラットフィッシュとのシビアな駆け引きを強いるが、西湘へ移れば一転、国府津などの急深な砂利浜が広がり、青物を狙う遠投釣りの聖地へと姿を変える。さらに江の島や鎌倉の喧騒を離れて西へ進めば、県央の平野を経て、小田原城を擁する渋い歴史の町並みへと行き着く。繊細なイメージに隠された地形の荒々しさと冷徹な美しさ。そして西へ向かうほどに深まる静かで重厚な旅情もこのエリアが持つもう一つの顔です。"
   },
   {
     "name": "観音崎",
@@ -58,10 +45,8 @@
     "lat": 35.256762,
     "lng": 139.745634,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1410/1212",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -71,11 +56,7 @@
     "lat": 35.260807,
     "lng": 139.739539,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "鴨居港・たたら浜",
@@ -84,11 +65,8 @@
     "lat": 35.249036,
     "lng": 139.738386,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/久里浜港/観音崎",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "アシカ島",
@@ -97,11 +75,8 @@
     "lat": 35.212128,
     "lng": 139.735362,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1410/1208",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "旗山崎",
@@ -110,11 +85,8 @@
     "lat": 35.267175,
     "lng": 139.728554,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/猿島/観音崎",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "燈明崎・千代ヶ崎",
@@ -123,11 +95,7 @@
     "lat": 35.23108,
     "lng": 139.728425,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "東電防波堤",
@@ -136,11 +104,8 @@
     "lat": 35.213476,
     "lng": 139.724668,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/久里浜港/野比海岸",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "浦賀港",
@@ -149,11 +114,8 @@
     "lat": 35.240994,
     "lng": 139.721278,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/久里浜港/鴨居港・たたら浜",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "久里浜港",
@@ -162,11 +124,8 @@
     "lat": 35.224078,
     "lng": 139.716064,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1410/",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大津港新堤防",
@@ -175,11 +134,8 @@
     "lat": 35.265379,
     "lng": 139.694104,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/うみかぜ公園/観音崎",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "猿島",
@@ -188,11 +144,8 @@
     "lat": 35.28573,
     "lng": 139.694528,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1407/1212",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "横須賀海辺つり公園",
@@ -201,11 +154,7 @@
     "lat": 35.270168,
     "lng": 139.69025,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "野比海岸",
@@ -214,11 +163,8 @@
     "lat": 35.20725,
     "lng": 139.686474,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/アシカ島/灯台下の磯",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "うみかぜ公園",
@@ -227,11 +173,8 @@
     "lat": 35.278121,
     "lng": 139.683126,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1407/1212",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "野島防波堤",
@@ -240,10 +183,8 @@
     "lat": 35.323673,
     "lng": 139.668953,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1407/1212",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -253,11 +194,8 @@
     "lat": 35.347335,
     "lng": 139.653402,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "幸浦埋立地・長浜水路",
@@ -266,11 +204,8 @@
     "lat": 35.358886,
     "lng": 139.651283,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/野島防波堤/山下公園",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "アイクル横",
@@ -279,11 +214,8 @@
     "lat": 35.313258,
     "lng": 139.646305,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/野島防波堤/深浦湾",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "観音山下の磯",
@@ -292,11 +224,8 @@
     "lat": 35.138081,
     "lng": 139.640206,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/城ヶ島黒島堤防/灯台下の磯",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "海の公園",
@@ -305,11 +234,7 @@
     "lat": 35.337858,
     "lng": 139.638214,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "野島公園",
@@ -318,11 +243,8 @@
     "lat": 35.327907,
     "lng": 139.636477,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/山下公園/深浦湾",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "三崎港",
@@ -331,10 +253,8 @@
     "lat": 35.140931,
     "lng": 139.617412,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/灘ヶ崎/名向﨑",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -344,11 +264,8 @@
     "lat": 35.136581,
     "lng": 139.609827,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1419/1413",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "佐島港",
@@ -357,11 +274,8 @@
     "lat": 35.222403,
     "lng": 139.609818,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/逗子海岸/暮浜港",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "長井仮屋港",
@@ -370,11 +284,8 @@
     "lat": 35.207268,
     "lng": 139.608862,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second//",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "暮浜港",
@@ -383,11 +294,8 @@
     "lat": 35.193788,
     "lng": 139.608928,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1419/1413",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "逗子海岸",
@@ -396,10 +304,7 @@
     "lat": 35.289755,
     "lng": 139.573176,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -409,11 +314,8 @@
     "lat": 35.284356,
     "lng": 139.567078,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1419/1413",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "平潟湾",
@@ -422,11 +324,8 @@
     "lat": 35.329201,
     "lng": 139.625652,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/山下公園/深浦湾",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "深浦湾",
@@ -435,11 +334,8 @@
     "lat": 35.309444,
     "lng": 139.639284,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1403/1407",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "城ヶ島黒島堤防",
@@ -448,11 +344,8 @@
     "lat": 35.133176,
     "lng": 139.62688,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1413/",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "ゴミ捨て下",
@@ -461,11 +354,8 @@
     "lat": 35.139855,
     "lng": 139.658899,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/城ヶ島黒島堤防/灯台下の磯",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "久留和港",
@@ -474,11 +364,8 @@
     "lat": 35.246932,
     "lng": 139.591518,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1419/1413",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "名向﨑",
@@ -487,11 +374,8 @@
     "lat": 35.156513,
     "lng": 139.61355,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1419/1413",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "三浦海岸",
@@ -500,10 +384,7 @@
     "lat": 35.176046,
     "lng": 139.656998,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -513,10 +394,8 @@
     "lat": 35.162702,
     "lng": 139.665252,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/アシカ島/灯台下の磯",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -526,11 +405,8 @@
     "lat": 35.140178,
     "lng": 139.677542,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "First/1413/1208",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "松輪港",
@@ -539,11 +415,7 @@
     "lat": 35.143341,
     "lng": 139.667327,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "小坪港",
@@ -552,11 +424,8 @@
     "lat": 35.296898,
     "lng": 139.553436,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "Second/葉山あぶずり港/江ノ島",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "三戸浜堤防",
@@ -565,11 +434,7 @@
     "lat": 35.172931,
     "lng": 139.618126,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "宮川港",
@@ -578,11 +443,7 @@
     "lat": 35.141914,
     "lng": 139.637748,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "下山川",
@@ -591,167 +452,115 @@
     "lat": 35.261609,
     "lng": 139.580604,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "海上イケス釣堀J'sフィッシング",
-    "zoom": "",
     "individualId": "L02",
     "lat": 35.13348,
     "lng": 139.61708,
     "areaId": "KANAGAWA_MIURA",
-    "url": "",
     "notes": "神奈川県三浦市三崎町城ヶ島６５０−７０",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "道満ファミリー釣り場",
-    "zoom": "",
     "individualId": "L03",
     "lat": 35.4721827,
     "lng": 139.3600606,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県厚木市三田",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "下へら釣り場",
-    "zoom": "",
     "individualId": "L04",
     "lat": 35.431774,
     "lng": 139.3735671,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県海老名市中新田",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "大島へら釣場",
-    "zoom": "",
     "individualId": "L05",
     "lat": 35.5734377,
     "lng": 139.31067,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県相模原市緑区大島",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "相模川弁天釣り場",
-    "zoom": "",
     "individualId": "L06",
     "lat": 35.53988,
     "lng": 139.3342919,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県相模原市中央区相模川",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "八菅ヘラ釣り場",
-    "zoom": "",
     "individualId": "L07",
     "lat": 35.5099241,
     "lng": 139.3282693,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県愛甲郡愛川町中津",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "柏ふれあい釣り堀",
-    "zoom": "",
     "individualId": "L08",
     "lat": 35.46455,
     "lng": 139.40846,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県海老名市国分北４丁目１０−１",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "山本園",
-    "zoom": "",
     "individualId": "L09",
     "lat": 35.40153,
     "lng": 139.2925,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県伊勢原市白根４２４",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "草柳園フィッシングセンター",
-    "zoom": "",
     "individualId": "L10",
     "lat": 35.47557,
     "lng": 139.44777,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県大和市上草柳１０２１",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "厚木へら鮒センター",
-    "zoom": "",
     "individualId": "L11",
     "lat": 35.48684,
     "lng": 139.36037,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県厚木市関口１１２２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "釣って見つける ぼうけんの国 相模原上溝店",
-    "zoom": "",
     "individualId": "L12",
     "lat": 35.55976,
     "lng": 139.35501,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県相模原市中央区上溝４丁目９−１１",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "釣って見つけるぼうけんの国 湘南釣堀",
-    "zoom": "",
     "individualId": "L13",
     "lat": 35.39466,
     "lng": 139.381,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県高座郡寒川町倉見９３５−１",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "畑宿清流マス釣場",
@@ -760,11 +569,8 @@
     "lat": 35.2086,
     "lng": 139.061835,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県足柄下郡箱根町畑宿４７１",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "はこね宮城野国際ます釣場",
@@ -773,11 +579,8 @@
     "lat": 35.254793,
     "lng": 139.048567,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県足柄下郡箱根町宮城野９２２",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "白糸マス釣りセンター",
@@ -786,11 +589,8 @@
     "lat": 35.20171,
     "lng": 139.130513,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県小田原市根府川４８３",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "狩川渓谷ます釣り場",
@@ -799,11 +599,8 @@
     "lat": 35.323485,
     "lng": 139.052826,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県南足柄市矢倉沢１６８２",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "金太郎自然園",
@@ -812,11 +609,8 @@
     "lat": 35.331946,
     "lng": 139.051522,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県南足柄市矢倉沢１３４４",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "開成水辺フォレストスプリングス",
@@ -825,11 +619,8 @@
     "lat": 35.337893,
     "lng": 139.13171,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県足柄上郡開成町吉田島３３３８",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "寄清流マス釣り場",
@@ -838,10 +629,8 @@
     "lat": 35.38351,
     "lng": 139.130825,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県足柄上郡松田町寄５５７３",
     "icon": "fish3",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -851,11 +640,8 @@
     "lat": 35.470378,
     "lng": 139.062342,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県足柄上郡山北町中川８７４−３",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "うらたんざわ渓流釣場",
@@ -864,11 +650,8 @@
     "lat": 35.520351,
     "lng": 139.098527,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県相模原市緑区青根３７６９",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "神之川キャンプマス釣場",
@@ -877,11 +660,8 @@
     "lat": 35.527918,
     "lng": 139.107157,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県相模原市緑区青根３６８５",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "青根遊漁場",
@@ -890,11 +670,8 @@
     "lat": 35.541456,
     "lng": 139.122654,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県相模原市緑区青根２７１３",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "大山フィッシングセンター",
@@ -903,11 +680,8 @@
     "lat": 35.412353,
     "lng": 139.260048,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県伊勢原市子易９４４",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "日向渓谷マス釣り場",
@@ -916,11 +690,8 @@
     "lat": 35.437955,
     "lng": 139.265412,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県伊勢原市日向１７７０",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "伊勢原鱒釣場",
@@ -929,37 +700,26 @@
     "lat": 35.43577,
     "lng": 139.27811,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県伊勢原市日向１５８２",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "みのげマス釣りセンター",
-    "zoom": "",
     "individualId": "L28",
     "lat": 35.417184,
     "lng": 139.228891,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県秦野市蓑毛７０６",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "フリックフィッシングフィールド",
-    "zoom": "",
     "individualId": "L29",
     "lat": 35.447053,
     "lng": 139.212916,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県秦野市丹沢寺山７５",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "谷太郎川ます釣場",
@@ -968,11 +728,8 @@
     "lat": 35.464838,
     "lng": 139.268459,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県愛甲郡清川村煤ヶ谷５０１２",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "リヴァスポット早戸",
@@ -981,10 +738,8 @@
     "lat": 35.520889,
     "lng": 139.195063,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県相模原市緑区鳥屋3627",
     "icon": "fish3",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -994,11 +749,8 @@
     "lat": 35.525563,
     "lng": 139.283131,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県愛甲郡愛川町田代２４１１−１",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "清川リバーランド",
@@ -1007,24 +759,17 @@
     "lat": 35.479072,
     "lng": 139.269967,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県愛甲郡清川村煤ヶ谷２４５０",
-    "icon": "fish3",
-    "whether": "",
-    "type": ""
+    "icon": "fish3"
   },
   {
     "name": "清川つくしフィッシングセンター",
-    "zoom": "",
     "individualId": "L34",
     "lat": 35.48558,
     "lng": 139.273985,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "神奈川県愛甲郡清川村煤ヶ谷３５６８",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "丹沢湖",
@@ -1033,10 +778,7 @@
     "lat": 35.41647,
     "lng": 139.042368,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1046,10 +788,7 @@
     "lat": 35.212528,
     "lng": 139.007692,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1059,10 +798,7 @@
     "lat": 35.612874,
     "lng": 139.180598,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$photo"
   },
   {
@@ -1072,10 +808,7 @@
     "lat": 35.524684,
     "lng": 139.227762,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1085,10 +818,7 @@
     "lat": 35.595899,
     "lng": 139.252653,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special$ort"
   },
   {
@@ -1098,11 +828,7 @@
     "lat": 35.370252,
     "lng": 139.369078,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "引地川",
@@ -1111,11 +837,7 @@
     "lat": 35.325908,
     "lng": 139.46502,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "相模大橋",
@@ -1124,11 +846,8 @@
     "lat": 35.447284,
     "lng": 139.371121,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "相模川漁業協同組合連合会",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "鈴川",
@@ -1137,10 +856,7 @@
     "lat": 35.371836,
     "lng": 139.298357,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
     "icon": "spot",
-    "whether": "",
     "type": "special"
   },
   {
@@ -1150,11 +866,8 @@
     "lat": 35.278992,
     "lng": 139.163518,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "洒匂川漁業協同組合",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "江ノ島",
@@ -1163,10 +876,8 @@
     "lat": 35.302867,
     "lng": 139.483694,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "First/1419/",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -1176,11 +887,8 @@
     "lat": 35.278085,
     "lng": 139.210242,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/平塚新港・相模川河口/小田原早川港",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "小田原早川港",
@@ -1189,10 +897,8 @@
     "lat": 35.238776,
     "lng": 139.148546,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "First/1419/2219",
     "icon": "spot",
-    "whether": "",
     "type": "substitute$ort"
   },
   {
@@ -1202,11 +908,8 @@
     "lat": 35.314777,
     "lng": 139.379244,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/江ノ島/平塚新港・相模川河口",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "江ノ浦港",
@@ -1215,11 +918,8 @@
     "lat": 35.192129,
     "lng": 139.138614,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "First/1419/2219",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大磯港",
@@ -1228,11 +928,8 @@
     "lat": 35.306349,
     "lng": 139.318424,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/平塚新港・相模川河口/小田原早川港",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "平塚新港・相模川河口",
@@ -1241,10 +938,8 @@
     "lat": 35.315772,
     "lng": 139.366711,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "First/1419/2219",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -1254,10 +949,8 @@
     "lat": 35.305793,
     "lng": 139.493355,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/葉山あぶずり港/江ノ島",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1267,11 +960,8 @@
     "lat": 35.305986,
     "lng": 139.518278,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/葉山あぶずり港/江ノ島",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "真鶴半島先端",
@@ -1280,10 +970,8 @@
     "lat": 35.143897,
     "lng": 139.158272,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "First/1419/2219",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1293,10 +981,8 @@
     "lat": 35.144615,
     "lng": 139.113567,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "First/1419/2219",
     "icon": "spot",
-    "whether": "",
     "type": "assistant$ort"
   },
   {
@@ -1306,10 +992,8 @@
     "lat": 35.152577,
     "lng": 139.143587,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/真鶴半島先端/八貫山下",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1319,10 +1003,8 @@
     "lat": 35.243497,
     "lng": 139.157663,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/平塚新港・相模川河口/小田原早川港",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1332,10 +1014,8 @@
     "lat": 35.181859,
     "lng": 139.135934,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "First/1419/2219",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1345,10 +1025,8 @@
     "lat": 35.150493,
     "lng": 139.131505,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
     "notes": "Second/真鶴半島先端/湯河原海浜公園",
     "icon": "spot",
-    "whether": "",
     "type": "ort"
   },
   {
@@ -1358,11 +1036,8 @@
     "lat": 35.521024,
     "lng": 139.790173,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "First/1403/1314",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "川崎新堤・東扇島西公園",
@@ -1371,10 +1046,8 @@
     "lat": 35.486083,
     "lng": 139.748776,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "First/1403/1314",
     "icon": "spot",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -1384,11 +1057,7 @@
     "lat": 35.503858,
     "lng": 139.741143,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大黒海づり施設",
@@ -1397,11 +1066,8 @@
     "lat": 35.448989,
     "lng": 139.694555,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/本牧海釣り施設/川崎新堤・東扇島西公園",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "末広水際線プロムナード",
@@ -1410,11 +1076,8 @@
     "lat": 35.479007,
     "lng": 139.690227,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "First/1403/1314",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "横浜沖堤・第一新堤",
@@ -1423,11 +1086,8 @@
     "lat": 35.442421,
     "lng": 139.688281,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/本牧海釣り施設/川崎新堤・東扇島西公園",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "本牧海釣り施設",
@@ -1436,10 +1096,8 @@
     "lat": 35.428558,
     "lng": 139.686769,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "First/1403/1212",
     "icon": "fish1",
-    "whether": "",
     "type": "substitute"
   },
   {
@@ -1449,11 +1107,8 @@
     "lat": 35.457314,
     "lng": 139.676962,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/山下公園/川崎新堤・東扇島西公園",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "横浜沖堤・白灯テトラ堤",
@@ -1462,11 +1117,8 @@
     "lat": 35.45159,
     "lng": 139.673561,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/山下公園/川崎新堤・東扇島西公園",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "横浜沖堤・旧白灯",
@@ -1475,11 +1127,8 @@
     "lat": 35.453264,
     "lng": 139.658463,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/山下公園/大黒町岸壁",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "横浜沖堤・旧赤灯",
@@ -1488,11 +1137,8 @@
     "lat": 35.463309,
     "lng": 139.655961,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/山下公園/大黒町岸壁",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "山下公園",
@@ -1501,10 +1147,8 @@
     "lat": 35.447296,
     "lng": 139.649344,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "First/1403/",
     "icon": "spot",
-    "whether": "",
     "type": "representative"
   },
   {
@@ -1514,11 +1158,7 @@
     "lat": 35.451473,
     "lng": 139.644048,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "磯子海づり施設",
@@ -1527,10 +1167,8 @@
     "lat": 35.403482,
     "lng": 139.643472,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/本牧海釣り施設/大岡川分水路",
     "icon": "fish1",
-    "whether": "",
     "type": "assistant"
   },
   {
@@ -1540,11 +1178,7 @@
     "lat": 35.458659,
     "lng": 139.639074,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "汽車道",
@@ -1553,11 +1187,8 @@
     "lat": 35.452912,
     "lng": 139.637078,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/山下公園/大黒町岸壁",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "根岸港",
@@ -1566,11 +1197,8 @@
     "lat": 35.410353,
     "lng": 139.631447,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/山下公園/大岡川分水路",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "杉田臨海緑地",
@@ -1579,11 +1207,8 @@
     "lat": 35.385686,
     "lng": 139.628272,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "Second/大岡川分水路/深浦湾",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大黒町岸壁",
@@ -1592,11 +1217,8 @@
     "lat": 35.478722,
     "lng": 139.670386,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "First/1403/1314",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "大岡川分水路",
@@ -1605,11 +1227,8 @@
     "lat": 35.395501,
     "lng": 139.620637,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "First/1403/1407",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "鶴見川河口",
@@ -1618,102 +1237,70 @@
     "lat": 35.503059,
     "lng": 139.681399,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "緑水園",
-    "zoom": "",
     "individualId": "L46",
     "lat": 35.4350787,
     "lng": 139.4352202,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "神奈川県横浜市戸塚区名瀬町１６０１",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "熊の池",
-    "zoom": "",
     "individualId": "L47",
     "lat": 35.565155,
     "lng": 139.4956613,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "神奈川県横浜市青葉区寺家町８４８",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "等々力緑地釣池",
-    "zoom": "",
     "individualId": "L48",
     "lat": 35.58683,
     "lng": 139.64891,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "神奈川県川崎市中原区等々力１−１",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "多摩川へら鮒センター",
-    "zoom": "",
     "individualId": "L49",
     "lat": 35.61586,
     "lng": 139.57613,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "神奈川県川崎市多摩区宿河原２丁目５−１５",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "ベリーパーク in FISH ON! 王禅寺",
-    "zoom": "",
     "individualId": "L50",
     "lat": 35.58943,
     "lng": 139.52458,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "神奈川県川崎市麻生区王禅寺１２２７−２",
-    "icon": "fish4",
-    "whether": "",
-    "type": ""
+    "icon": "fish4"
   },
   {
     "name": "釣船茶屋 ざうお 横浜綱島店",
-    "zoom": "",
     "individualId": "L51",
     "lat": 35.52982,
     "lng": 139.64748,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "神奈川県横浜市鶴見区駒岡２丁目１４−１",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "横浜釣り堀王国",
-    "zoom": "",
     "individualId": "L52",
     "lat": 35.38149,
     "lng": 139.6395,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
     "notes": "神奈川県横浜市金沢区鳥浜町３−５",
-    "icon": "fish1",
-    "whether": "",
-    "type": ""
+    "icon": "fish1"
   },
   {
     "name": "大岡川",
@@ -1722,11 +1309,7 @@
     "lat": 35.439312,
     "lng": 139.623603,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "鶴見川橋",
@@ -1735,11 +1318,7 @@
     "lat": 35.51438,
     "lng": 139.680101,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "二ヶ領用水",
@@ -1748,11 +1327,7 @@
     "lat": 35.631837,
     "lng": 139.544445,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "柏尾川",
@@ -1761,11 +1336,7 @@
     "lat": 35.392566,
     "lng": 139.532809,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "富岡並木ふなだまり公園",
@@ -1774,11 +1345,7 @@
     "lat": 35.367408,
     "lng": 139.637509,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "エボシ岩",
@@ -1787,11 +1354,7 @@
     "lat": 35.303132,
     "lng": 139.416279,
     "areaId": "KANAGAWA_SEISHO",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   },
   {
     "name": "古市場サッカー場",
@@ -1800,10 +1363,6 @@
     "lat": 35.557332,
     "lng": 139.688641,
     "areaId": "KANAGAWA_YOKOHAMA",
-    "url": "",
-    "notes": "",
-    "icon": "spot",
-    "whether": "",
-    "type": ""
+    "icon": "spot"
   }
 ]
