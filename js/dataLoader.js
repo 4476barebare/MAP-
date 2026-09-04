@@ -731,7 +731,7 @@ function selectSpot(spot) {
         // alert(window.currentAreaId);
         //       if (!window.areaBounds && window.currentAreaId) {
     //            alert("4");
-            showSpotsForArea(window.currentAreaId);
+          await showSpotsForArea(window.currentAreaId);
        //        }
 
         requestAnimationFrame(() => {
