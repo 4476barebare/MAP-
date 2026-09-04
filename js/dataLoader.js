@@ -1028,7 +1028,7 @@ window._isSnappingBack = false;
 
 function enablePhase2(map) {
     if (!map) return;
-    showdebug("enablePhase2開始");
+    //showdebug("enablePhase2開始");
 
     // ★二重登録防止
     if (map._phase2Handler) {
