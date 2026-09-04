@@ -735,6 +735,8 @@ function selectSpot(spot) {
        //        }
 
         requestAnimationFrame(() => {
+            showdebug("enableDragForArea");
+  
          //          if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
   
