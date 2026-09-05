@@ -745,7 +745,7 @@ function selectSpot(spot) {
 
 function enableDragForArea() {
     // ★ 追加: 意図しない moveend 暴発時の防御。ズーム13以外では絶対に制限をかけない
-    if (window.map.getZoom() !== 13) return;
+   // if (window.map.getZoom() !== 13) return;
 
     // 1. 県全体のバウンズが未計算の場合、全スポットデータから算出する
     if (!window.prefBounds && window.spotData && window.spotData.length > 0) {
