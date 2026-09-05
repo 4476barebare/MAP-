@@ -2873,6 +2873,7 @@ function goBack() {
 
                 enableDragForArea();
                 enablePhase2(window.map);
+          releaseLockAndShowBtn();
 
     window.map.getContainer().classList.add('is-spot-mode');
     window._selectSpotCompleted = true;
