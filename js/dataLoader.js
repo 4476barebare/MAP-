@@ -1513,7 +1513,12 @@ function zoomToSpot(spot) {
         window.osmLayer = null;
     }
 
-    const targetZoom = isSpecial ? 13.5 : (safe.zoom < 13.5 ? 13.5 : safe.zoom);
+    // 【修正前】
+    // const targetZoom = isSpecial ? 13.5 : (safe.zoom < 13.5 ? 13.5 : safe.zoom);
+
+    // 【修正後】ベースを14に変更
+    const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
+
 
     // ★ 移動前はロックを完全に外す
     window.map.setMaxBounds(null);
@@ -1554,9 +1559,8 @@ function zoomToSpot(spot) {
 
         let bounds = window.map.getBounds();
         let zoomLimit;
-
         if (isSpecial) {
-            const paddingDiff = 13.5 - safe.zoom;
+            const paddingDiff = 14 - safe.zoom; // ★ 14に変更
             bounds = bounds.pad(paddingDiff);
 
             if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
@@ -1569,15 +1573,14 @@ function zoomToSpot(spot) {
                 });
             }
             bounds = bounds.pad(0.05);
-            zoomLimit = 13.5;
-        } else if (safe.zoom < 13.5) {
-            const paddingDiff = 13.5 - safe.zoom; 
+            zoomLimit = 14; // ★ 14に変更
+        } else if (safe.zoom < 14) { // ★ 14に変更
+            const paddingDiff = 14 - safe.zoom; // ★ 14に変更
             bounds = bounds.pad(paddingDiff);
-            zoomLimit = 13.5;
+            zoomLimit = 14; // ★ 14に変更
         } else {
             zoomLimit = safe.zoom;
         }
-
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0; 
 
