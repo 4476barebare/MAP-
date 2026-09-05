@@ -251,11 +251,16 @@ window.fishUrl = null;
 window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
 
-// ▼ これらはすでに追加しましたね
-window.gsiLayers = {
+// ▼ タイルURLをここに一元化して厳密管理
+window.TILE_URLS = {
   ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
-  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
+  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+  osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  pale: 'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png' // 拡張用
 };
+
+// 既存の gsiLayers も同じものを参照させる（互換性確保）
+window.gsiLayers = window.TILE_URLS;
 
 // 👇【ここに追加！】キャッシュ用の金庫を空っぽのオブジェクトとして定義しておく
 window.prefSpotLayerCache = {};
@@ -1410,12 +1415,13 @@ fetch('/icon/tile.svg')
         btn.addEventListener('click', () => {
             if (!window.map || !window.gsiLayer) return;
 
-            const osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+            // ★ 管理変数から取得
+            const osmUrl = window.TILE_URLS.osm;
             const currentUrl = window.gsiLayer._url;
 
             if (currentUrl === osmUrl) {
                 // 1. OSMから、記憶しているスポット本来のタイル（ort か photo）に戻す
-                const baseTile = window.currentSpotBaseTile || window.gsiLayers.photo;
+                const baseTile = window.currentSpotBaseTile || window.TILE_URLS.photo;
                 window.gsiLayer.setUrl(baseTile);
                 
                 window.map.attributionControl.removeAttribution('© OpenStreetMap contributors');
