@@ -936,5 +936,45 @@
     "areaId": "IBARAKI_TSUKUBA",
     "notes": "鬼怒川小貝漁業協同組合",
     "icon": "spot"
+  },
+  {
+    "name": "久慈川大子周辺",
+    "zoom": 12.5,
+    "individualId": "L90",
+    "lat": 36.787682,
+    "lng": 140.365829,
+    "areaId": "IBARAKI_HITACHI",
+    "notes": "久慈川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "久慈川大宮周辺",
+    "zoom": 13,
+    "individualId": "L89",
+    "lat": 36.645837,
+    "lng": 140.398149,
+    "areaId": "IBARAKI_HITACHI",
+    "notes": "久慈川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "花園川",
+    "zoom": 14,
+    "individualId": "L91",
+    "lat": 36.81067,
+    "lng": 140.721173,
+    "areaId": "IBARAKI_HITACHI",
+    "notes": "大北川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "大北川",
+    "zoom": 14.5,
+    "individualId": "L92",
+    "lat": 36.778814,
+    "lng": 140.701241,
+    "areaId": "IBARAKI_HITACHI",
+    "notes": "大北川漁業協同組合",
+    "icon": "spot"
   }
 ]
