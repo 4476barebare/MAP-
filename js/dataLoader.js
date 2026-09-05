@@ -1036,6 +1036,139 @@ function enablePhase2(map) {
     }
 
 
+    const runPhase2 = () => {
+        showdebug("1. runPhase2 イベント発火");
+
+        // ★無効状態、または引き戻し（スナップバック）中なら何もしない
+        if (!window.phase2Initialized) {
+            showdebug("ガード: phase2Initialized が false");
+            return;
+        }
+        if (window._isSnappingBack) {
+            showdebug("ガード: _isSnappingBack中");
+            return;
+        }
+
+        // =====================================================
+        // ★ 修正：変数未定義エラーで落ちるのを防ぐため、明示的に window. をつける
+        // =====================================================
+        if (window.phase2Timer) {
+            clearTimeout(window.phase2Timer);
+        }
+
+        window.phase2Timer = setTimeout(() => {
+            showdebug("2. setTimeout 内部へ到達");
+
+            if (!window.phase2Initialized || window._isSnappingBack) return;
+
+            // =====================================================
+            // ★ 修正：どこでエラーが起きているか画面に出す (try-catch)
+            // =====================================================
+            try {
+                processSpotUtils(map);
+                showdebug("3. processSpotUtils 完了");
+            } catch (err) {
+                showdebug("❌ processSpotUtils エラー: " + err.message);
+                console.error("processSpotUtilsエラー:", err);
+            }
+
+            try {
+                showNearestSpotName(map);
+            } catch (err) {
+                showdebug("❌ showNearestSpotName エラー: " + err.message);
+            }
+
+            // =====================================================
+            // エリア切り替わりの検知と、強制引き戻し処理（既存のまま）
+            // =====================================================
+            try {
+                if (window.map.getZoom() === 13 && window.spotData && window.currentAreaId) {
+                    const center = window.map.getCenter();
+                    
+                    const isInsideArea = window.areaBounds ? window.areaBounds.contains(center) : true;
+
+                    if (!isInsideArea) {
+                        let nearestSpot = null;
+                        let minDistance = Infinity;
+
+                        window.spotData.forEach(spot => {
+                            const lat = Number(spot.lat);
+                            const lng = Number(spot.lng);
+                            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                                const distance = center.distanceTo(L.latLng(lat, lng));
+                                if (distance < minDistance) {
+                                    minDistance = distance;
+                                    nearestSpot = spot;
+                                }
+                            }
+                        });
+
+                        if (nearestSpot) {
+                            if (nearestSpot.areaId === window.currentAreaId) {
+                                showdebug("エリア外検知: 強制引き戻し");
+                                window._isSnappingBack = true;
+                                
+                                map.setMaxBounds(null);
+                                map.options.maxBoundsViscosity = 0;
+                                
+                                map.flyTo([nearestSpot.lat, nearestSpot.lng], 13, { duration: 0.5 });
+                                
+                                map.once('moveend', () => {
+                                    map.invalidateSize(true);
+                                    
+                                    if (!window.areaBounds) {
+                                        showSpotsForArea(window.currentAreaId);
+                                    }
+                                    if (window.areaBounds && window.areaBounds.isValid()) {
+                                        map.setMaxBounds(window.areaBounds);
+                                        map.options.maxBoundsViscosity = 1.0;
+                                        map.dragging.enable();
+                                    }
+                                    
+                                    setTimeout(() => {
+                                        window._isSnappingBack = false;
+                                    }, 1000);
+                                });
+                                
+                                return;
+                            } else {
+                                window.currentAreaId = nearestSpot.areaId;
+                                
+                                const targetAreaSpots = window.spotData.filter(s => s.areaId === window.currentAreaId);
+                                if (targetAreaSpots.length > 0) {
+                                    let minLat = Infinity, maxLat = -Infinity;
+                                    let minLng = Infinity, maxLng = -Infinity;
+                                    
+                                    targetAreaSpots.forEach(s => {
+                                        minLat = Math.min(minLat, s.lat);
+                                        maxLat = Math.max(maxLat, s.lat);
+                                        minLng = Math.min(minLng, s.lng);
+                                        maxLng = Math.max(maxLng, s.lng);
+                                    });
+                                    
+                                    const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.02);
+                                    const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.02);
+                                    
+                                    window.areaBounds = L.latLngBounds(
+                                        [minLat - latBuffer, minLng - lngBuffer],
+                                        [maxLat + latBuffer, maxLng + lngBuffer]
+                                    );
+                                }
+
+                                if (window.markerControl && typeof markerControl.showShop02 === 'function') {
+                                    markerControl.showShop02(window.currentAreaId);
+                                }
+                                showdebug("エリア変更: " + window.currentAreaId);
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                showdebug("❌ エリア判定 エラー: " + err.message);
+            }
+
+        }, 80);
+    };
 
     map._phase2Handler = runPhase2;
 
