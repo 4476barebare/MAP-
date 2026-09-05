@@ -250,16 +250,14 @@ window.currentPref = null;
 window.fishUrl = null;
 window.nearestClickEnabled = true;
 window.nearestClickHandler = null;
-
-// ▼ タイルURLをここに一元化して厳密管理
 window.TILE_URLS = {
   ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
   photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
   osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  pale: 'https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png' // 拡張用
+  // 👇 新規追加（国土画像情報 と 森林基本図）
+  airphoto: 'https://cyberjapandata.gsi.go.jp/xyz/airphoto/{z}/{x}/{y}.png',
+  rinya: 'https://cyberjapandata.gsi.go.jp/xyz/rinya_m/{z}/{x}/{y}.png'
 };
-
-// 既存の gsiLayers も同じものを参照させる（互換性確保）
 window.gsiLayers = window.TILE_URLS;
 
 // 👇【ここに追加！】キャッシュ用の金庫を空っぽのオブジェクトとして定義しておく
