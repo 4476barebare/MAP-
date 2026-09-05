@@ -2832,9 +2832,9 @@ function goBack() {
         setIdealQuery('spot', null);
         window.currentSpotId = null;
 
-        // ★ これが本来の正しいあなたのロジック
-        showSpotsForArea(window.currentAreaId);
         
+        showSpotsForArea(window.currentAreaId);
+        phase1menu(window.currentAreaId);
         // selectSpot を呼び出す。
         // （selectSpot内で moveend 完了後に _selectSpotCompleted = true がセットされる）
         selectSpot(restoreSpot);
@@ -2850,15 +2850,9 @@ function goBack() {
                 window._selectSpotCompleted = false;
                 
                 // ★ あなたの書いた処理をそのまま実行
-                phase1menu(window.currentAreaId);
+                enableDragForArea();
                 releaseLockAndShowBtn();
-                
-                // 制限を再設定（ドラッグ有効化を含む）
-                if (typeof enableDragForArea === 'function') {
-                    enableDragForArea();
-                } else {
-                    window.map.dragging.enable();
-                }
+                window._selectSpotCompleted = true;
             }
         }, 50); // 50msごとに完了フラグをチェック
         
