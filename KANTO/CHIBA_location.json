@@ -505,10 +505,10 @@
   },
   {
     "name": "川名漁港",
-    "zoom": 17.5,
+    "zoom": 16.5,
     "individualId": "29",
-    "lat": 34.961611,
-    "lng": 139.758425,
+    "lat": 34.960436,
+    "lng": 139.758163,
     "areaId": "CHIBA_MINAMI",
     "icon": "spot"
   },
@@ -520,15 +520,6 @@
     "lng": 139.754814,
     "areaId": "CHIBA_MINAMI",
     "notes": "First/1208/1413",
-    "icon": "spot"
-  },
-  {
-    "name": "洲崎北港",
-    "zoom": 17.5,
-    "individualId": "31",
-    "lat": 34.975605,
-    "lng": 139.760443,
-    "areaId": "CHIBA_MINAMI",
     "icon": "spot"
   },
   {
@@ -721,10 +712,10 @@
   },
   {
     "name": "野島東港・野島西港",
-    "zoom": 16,
+    "zoom": 15.5,
     "individualId": "52",
-    "lat": 34.902405,
-    "lng": 139.886996,
+    "lat": 34.903539,
+    "lng": 139.886989,
     "areaId": "CHIBA_MINAMI",
     "icon": "spot"
   },
@@ -782,8 +773,8 @@
     "name": "大川港・白間漁港",
     "zoom": 15.5,
     "individualId": "58",
-    "lat": 34.924292,
-    "lng": 139.944676,
+    "lat": 34.923043,
+    "lng": 139.944646,
     "areaId": "CHIBA_MINAMI",
     "icon": "spot"
   },
@@ -1062,10 +1053,10 @@
   },
   {
     "name": "実入の磯",
-    "zoom": 17.5,
+    "zoom": 16,
     "individualId": "88",
-    "lat": 35.120757,
-    "lng": 140.177462,
+    "lat": 35.120331,
+    "lng": 140.179271,
     "areaId": "CHIBA_SOTOBOU",
     "icon": "spot"
   },
@@ -1803,5 +1794,52 @@
     "areaId": "CHIBA_UCHIBOU",
     "icon": "spot",
     "type": "ort"
+  },
+  {
+    "name": "養老川",
+    "zoom": 15.5,
+    "individualId": "L72",
+    "lat": 35.306064,
+    "lng": 140.148599,
+    "areaId": "CHIBA_SOTOBOU",
+    "notes": "養老川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "奏川",
+    "zoom": 15,
+    "individualId": "L71",
+    "lat": 35.221049,
+    "lng": 139.925416,
+    "areaId": "CHIBA_MINAMI",
+    "notes": "奏川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "八幡岬",
+    "zoom": 18,
+    "individualId": "116",
+    "lat": 35.13469,
+    "lng": 140.310626,
+    "areaId": "CHIBA_SOTOBOU",
+    "icon": "spot"
+  },
+  {
+    "name": "塩浦の磯",
+    "zoom": 16.5,
+    "individualId": "117",
+    "lat": 34.907583,
+    "lng": 139.919284,
+    "areaId": "CHIBA_MINAMI",
+    "icon": "spot"
+  },
+  {
+    "name": "灯台下の磯",
+    "zoom": 16,
+    "individualId": "31",
+    "lat": 34.976264,
+    "lng": 139.757348,
+    "areaId": "CHIBA_MINAMI",
+    "icon": "spot"
   }
 ]
