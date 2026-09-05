@@ -1501,34 +1501,65 @@ function zoomToSpot(spot) {
 
     const targetLat = safe.lat;
     const targetLng = safe.lng;
+    
+    // 目的のタイルURLを決定
     let tileUrl;
-
-    // ==========================================
-    // ★ 修正：タイル選択の分岐を増やして airphoto と rinya に対応
-    // ==========================================
     if (typeParts.includes('ort')) {
-        tileUrl = window.gsiLayers.ort;
+        tileUrl = window.TILE_URLS.ort;
     } else if (typeParts.includes('airphoto')) {
-        tileUrl = window.gsiLayers.airphoto;  // ★ airphotoを追加
+        tileUrl = window.TILE_URLS.airphoto;
     } else if (typeParts.includes('rinya')) {
-        tileUrl = window.gsiLayers.rinya;     // ★ 林野庁タイルを追加
+        tileUrl = window.TILE_URLS.rinya;
     } else {
-        tileUrl = window.gsiLayers.photo;     // どれも無ければ photo (デフォルト)
+        tileUrl = window.TILE_URLS.photo;
     }
 
-    // 👇 記憶する処理はそのまま
     window.currentSpotBaseTile = tileUrl;
 
-    if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
-    window.gsiLayer = L.tileLayer(tileUrl, { attribution: '国土地理院', detectRetina: false }).addTo(window.map);
+    // =====================================================
+    // ★ 修正：OSMから目的タイルへのフェードイントランジション
+    // =====================================================
+    const hasOSM = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
-    if (window.osmLayer) {
-        window.map.removeLayer(window.osmLayer);
-        window.osmLayer = null;
+    if (hasOSM) {
+        // --- 1. OSMが存在する場合（通常操作） ---
+        // 目的のタイル（gsiLayer）を透明（opacity: 0）で上に被せてロード開始
+        if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
+        window.gsiLayer = L.tileLayer(tileUrl, { 
+            attribution: '国土地理院', 
+            detectRetina: false,
+            opacity: 0, // 最初は透明
+            zIndex: 100 // OSM(通常1)より上に配置
+        }).addTo(window.map);
+
+        // ロード完了（またはアニメーション完了後）にフェードインさせる
+        window.gsiLayer.once('load', () => {
+            // CSSトランジションを付与してフワッと表示
+            const container = window.gsiLayer.getContainer();
+            if (container) {
+                container.style.transition = 'opacity 0.8s ease';
+                window.gsiLayer.setOpacity(1);
+                
+                // フェードインが終わったら裏のOSMを消去する
+                setTimeout(() => {
+                    if (window.osmLayer) {
+                        window.map.removeLayer(window.osmLayer);
+                        window.osmLayer = null;
+                    }
+                }, 800);
+            }
+        });
+    } else {
+        // --- 2. URL直打ち等でOSMが存在しない場合 ---
+        // 従来通り即座に目的のタイルをセットする
+        if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
+        window.gsiLayer = L.tileLayer(tileUrl, { 
+            attribution: '国土地理院', 
+            detectRetina: false 
+        }).addTo(window.map);
     }
 
     const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
-
 
     // ★ 移動前はロックを完全に外す
     window.map.setMaxBounds(null);
@@ -1538,7 +1569,10 @@ function zoomToSpot(spot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
+    // ズーム移動開始（OSMがある場合はOSMのままズームされていく）
     window.map.flyTo([targetLat, targetLng], targetZoom, { duration: 0.5 });
+
+    // ... (以下、`const el = document.getElementById("nearest-spot");` 以降はそのまま)
 
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
