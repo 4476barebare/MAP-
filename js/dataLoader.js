@@ -2858,31 +2858,45 @@ function goBack() {
 
 
 
+    disableAreaSwipe();
+
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     disableAreaSwipe();
 
     drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
-//enablePhase2(window.map);早過ぎ
-    window.map.once('moveend', () => {
-        window.map.invalidateSize(true);
-//enablePhase2(window.map);遅過ぎ
-        requestAnimationFrame(() => {
 
-
-                enableDragForArea();
-                enablePhase2(window.map);
-          releaseLockAndShowBtn();
-
-    window.map.getContainer().classList.add('is-spot-mode');
-    window._selectSpotCompleted = true;
-
-        });
-    });
+    // =====================================================
+    // ★ 修正: ピンチイン等で moveend が消滅した場合のフェイルセーフ
+    // =====================================================
+    let isCompleted = false;
+    const completePhase1Return = () => {
+        if (isCompleted) return;
+        isCompleted = true;
         
-        return;
-    }
+        window.map.off('moveend', completePhase1Return); // タイマーで呼ばれた場合にリスナーを外す
+        
+        window.map.invalidateSize(true);
+        requestAnimationFrame(() => {
+            enableDragForArea();
+            enablePhase2(window.map);
+            releaseLockAndShowBtn();
+
+            window.map.getContainer().classList.add('is-spot-mode');
+            window._selectSpotCompleted = true;
+        });
+    };
+
+    // 通常の移動完了イベント
+    window.map.once('moveend', completePhase1Return);
+    
+    // ピンチイン操作等でアニメーションが中断され moveend が来なかった場合の保険（フリーズ防止）
+    setTimeout(completePhase1Return, 600);
+        
+    return;
+}
+
 
     // =====================================================
     // ② Phase1 -> Area（エリア画面に戻る）
