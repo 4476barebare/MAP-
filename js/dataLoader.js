@@ -1466,6 +1466,18 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
     if (!window.map || !spot) return;
 
+    // =====================================================
+    // ★ 追加：zoomが空欄（ポップアップ専用）なら詳細画面に入らずポップアップを出して終了
+    // =====================================================
+    if (!spot.zoom || spot.zoom === '') {
+        if (typeof showFishPopup === 'function') {
+            showFishPopup(spot);
+        }
+        return;
+    }
+
+
+
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
     window.currentSpotBaseTile = null;
