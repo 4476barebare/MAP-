@@ -731,6 +731,7 @@ function selectSpot(spot) {
 //enablePhase2(window.map);遅過ぎ
         requestAnimationFrame(() => {
 
+
                 enableDragForArea();
                 enablePhase2(window.map);
 
@@ -2835,30 +2836,49 @@ function goBack() {
         
         showSpotsForArea(window.currentAreaId);
         phase1menu(window.currentAreaId);
-        // selectSpot を呼び出す。
-        // （selectSpot内で moveend 完了後に _selectSpotCompleted = true がセットされる）
-        selectSpot(restoreSpot);
-        showdebug("selectSpot");
+    if (window.markerControl) {
+        markerControl.showShop02(window.currentAreaId);
+    }
+    if (window.phase1Group) {
+        window.phase1Group.clearLayers();
+    }
 
-        // ★ 修正点: selectSpot の完了を確実に待ってから UI と Bounds の再設定を行う
-        // selectSpot は内部で setTimeout/moveend を使っているため、直後の行ではまだ完了していません。
-        // setInterval で完了フラグを待つか、moveend を待つ必要があります。
-        
-        const checkCompletion = setInterval(() => {
-            showdebug("checkCompletion");
-            if (window._selectSpotCompleted) {
-                showdebug(window._selectSpotCompleted);
-                clearInterval(checkCompletion);
-                
-                window._selectSpotCompleted = false;
-                showdebug(window._selectSpotCompleted);
-                // ★ あなたの書いた処理をそのまま実行
+    window.osmLayer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '© OpenStreetMap contributors',
+            className: 'osm-solid-layer',
+            updateWhenIdle: false,
+            updateWhenZooming: true,
+            updateWhenDragging: true,
+            keepBuffer: 4,
+            fadeAnimation: false
+        }
+    ).addTo(window.map);
+
+
+
+    // 過去のBoundsを解除
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
+    disableAreaSwipe();
+
+    drawLocation(spot.name, spot.lat, spot.lng, 13);
+//enablePhase2(window.map);早過ぎ
+    window.map.once('moveend', () => {
+        window.map.invalidateSize(true);
+//enablePhase2(window.map);遅過ぎ
+        requestAnimationFrame(() => {
+
+
                 enableDragForArea();
-                showdebug("enableDragForArea");
-                releaseLockAndShowBtn();
-                window._selectSpotCompleted = true;
-            }
-        }, 50); // 50msごとに完了フラグをチェック
+                enablePhase2(window.map);
+
+    window.map.getContainer().classList.add('is-spot-mode');
+    window._selectSpotCompleted = true;
+
+        });
+    });
         
         return;
     }
