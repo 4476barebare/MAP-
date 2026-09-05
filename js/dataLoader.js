@@ -820,16 +820,23 @@ function checkAreaChangeOnDrag() {
         // ▼ エリアが切り替わった時に実行したい関数群をここに並べる
         // =====================================================
 
+        // ★ 追加：URLクエリを新しいエリア名に更新し、スポットをリセットする
+        const newArea = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
+        if (newArea && typeof setIdealQuery === 'function') {
+            setIdealQuery('area', newArea.name);
+            setIdealQuery('spot', null);
+        }
+
         // 例: ショップマーカー（釣具店など）を新しいエリアのデータで出し直す
         if (window.markerControl && typeof markerControl.showShop02 === 'function') {
             markerControl.showShop02(window.currentAreaId);
         }
 
         // 例: fishdata のロードなど、必要な関数があればここに追加
-        // if (typeof loadFishData === 'function') loadFishData(window.currentAreaId);
+         if (typeof loadFishData === 'function') loadFishData(window.currentAreaId);
         
         // 例: エリア名などを更新するUI関数
-        // if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
+         if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
         
         console.log("スワイプ移動によりエリアが切り替わりました:", window.currentAreaId);
     }
