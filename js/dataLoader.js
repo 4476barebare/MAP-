@@ -1559,28 +1559,37 @@ function zoomToSpot(spot) {
 
         let bounds = window.map.getBounds();
         let zoomLimit;
-        if (isSpecial) {
-            const paddingDiff = 14 - safe.zoom; // ★ 14に変更
-            bounds = bounds.pad(paddingDiff);
 
-            if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
-                const fishList = safe.URL.split(',');
-                fishList.forEach(item => {
-                    const parts = item.split('|');
-                    const fLat = parseFloat(parts[1]);
-                    const fLng = parseFloat(parts[2]);
-                    if (!isNaN(fLat) && !isNaN(fLng)) bounds.extend([fLat, fLng]);
-                });
-            }
-            bounds = bounds.pad(0.05);
-            zoomLimit = 14; // ★ 14に変更
-        } else if (safe.zoom < 14) { // ★ 14に変更
-            const paddingDiff = 14 - safe.zoom; // ★ 14に変更
+        // =====================================================
+        // 1. ベースとなるズーム制限と可動範囲の設定
+        // =====================================================
+        if (isSpecial || safe.zoom < 14) {
+            const paddingDiff = 14 - safe.zoom;
             bounds = bounds.pad(paddingDiff);
-            zoomLimit = 14; // ★ 14に変更
+            zoomLimit = 14;
         } else {
             zoomLimit = safe.zoom;
         }
+
+        // =====================================================
+        // 2. ★ 修正：すべてのスポットで、魚マーカーが収まるように範囲を拡張する
+        // =====================================================
+        if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
+            const fishList = safe.URL.split(',');
+            fishList.forEach(item => {
+                const parts = item.split('|');
+                const fLat = parseFloat(parts[1]);
+                const fLng = parseFloat(parts[2]);
+                if (!isNaN(fLat) && !isNaN(fLng)) {
+                    bounds.extend([fLat, fLng]);
+                }
+            });
+        }
+        
+        // 3. 画面端ギリギリにならないよう、共通で全体に5%の余白を足す
+        bounds = bounds.pad(0.05);
+
+        // 確定した正確な範囲でドラッグをロック
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0; 
 
@@ -1592,6 +1601,7 @@ function zoomToSpot(spot) {
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
     });
+
 }
 
 function showFishMarkers(url) {
