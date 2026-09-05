@@ -1481,8 +1481,6 @@ function zoomToSpot(spot) {
         return;
     }
 
-
-
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
     window.currentSpotBaseTile = null;
@@ -1536,7 +1534,7 @@ function zoomToSpot(spot) {
             // CSSトランジションを付与してフワッと表示
             const container = window.gsiLayer.getContainer();
             if (container) {
-                container.style.transition = 'opacity 0.8s ease';
+                container.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(1);
                 
                 // フェードインが終わったら裏のOSMを消去する
