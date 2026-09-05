@@ -202,7 +202,7 @@
     "lng": 140.378559,
     "areaId": "CHIBA_CHOUSHI",
     "icon": "spot",
-    "type": "ort"
+    "type": "airphoto"
   },
   {
     "name": "大戸周辺水路",
@@ -340,7 +340,7 @@
     "areaId": "CHIBA_MINAMI",
     "notes": "小櫃川漁業協同組合",
     "icon": "spot",
-    "type": "ort"
+    "type": "airphoto"
   },
   {
     "name": "豊英湖",
@@ -1123,7 +1123,8 @@
     "lat": 35.377625,
     "lng": 140.369334,
     "areaId": "CHIBA_SOTOBOU",
-    "icon": "spot"
+    "icon": "spot",
+    "type": "airphoto"
   },
   {
     "name": "手賀沼",
