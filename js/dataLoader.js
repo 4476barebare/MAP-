@@ -1204,20 +1204,14 @@ function processSpotUtils(map) {
     if (!visibleSpots.length) return;
 
     // -------------------------
-    // ズーム分離（ここが重要）
+    // ズーム分離
     // -------------------------
-    const rawZoom = map.getZoom();              // 小数ズーム（表示用）
-    const tileZoomBase = Math.floor(rawZoom);   // タイル計算用（整数）
+    const rawZoom = map.getZoom();
+    const tileZoomBase = Math.floor(rawZoom);
 
     // 512 + zoomOffset:-1 の補正
     const effectiveZoom = tileZoomBase + 1;
-
-    // URL生成
-    const baseUrl = window.gsiLayers.photo.replace('{z}', effectiveZoom);
-
     const n = Math.pow(2, effectiveZoom);
-
-    let tileCount = 0;
 
     for (const s of visibleSpots) {
 
@@ -1226,10 +1220,25 @@ function processSpotUtils(map) {
 
         if (Number.isNaN(lat) || Number.isNaN(lng)) continue;
 
+        // =====================================================
+        // ★ 修正：スポットのtypeを見て、プリロードするURLを正確に決める
+        // =====================================================
+        const typeParts = (s.type || '').split('$');
+        let baseTileUrl;
+        if (typeParts.includes('ort')) {
+            baseTileUrl = window.TILE_URLS.ort;
+        } else if (typeParts.includes('airphoto')) {
+            baseTileUrl = window.TILE_URLS.airphoto;
+        } else if (typeParts.includes('rinya')) {
+            baseTileUrl = window.TILE_URLS.rinya;
+        } else {
+            baseTileUrl = window.TILE_URLS.photo;
+        }
+
+        const baseUrl = baseTileUrl.replace('{z}', effectiveZoom);
+
         const tileX = Math.floor((lng + 180) / 360 * n);
-
         const latRad = lat * Math.PI / 180;
-
         const tileY = Math.floor(
             (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
         );
@@ -1237,23 +1246,42 @@ function processSpotUtils(map) {
         // -------------------------
         // 2x2プリロード
         // -------------------------
+        let loadedCount = 0; // ★ このスポットの読み込み完了数をカウント
+        const totalTiles = 4; // 2x2 = 4枚
+
         for (let dx = 0; dx <= 1; dx++) {
             for (let dy = 0; dy <= 1; dy++) {
-
                 const url = baseUrl
                     .replace('{x}', tileX + dx)
                     .replace('{y}', tileY + dy);
 
                 const img = new Image();
-                img.src = url;
+                
+                // ★ 画像の読み込みが完了した時の処理を追加
+                img.onload = () => {
+                    loadedCount++;
+                    // 4枚すべて読み終わったら名前を表示する
+                    if (loadedCount === totalTiles) {
+                        if (typeof showdebug === 'function') {
+                            showdebug(`[Preload完了] ${s.name}`);
+                        }
+                    }
+                };
 
-                tileCount++;
+                // ★ 読み込みエラー時の処理（任意・エラーで止まらないように）
+                img.onerror = () => {
+                    loadedCount++;
+                };
+
+                img.src = url;
             }
         }
 
         swapWithSubstitute(s);
+
     }
 }
+
 
 function swapWithSubstitute(spot) {
 
@@ -1517,51 +1545,47 @@ function zoomToSpot(spot) {
     window.currentSpotBaseTile = tileUrl;
 
     // =====================================================
-    // ★ 修正：OSMから目的タイルへのフェードイントランジション（超速化版）
+    // ★ 修正：OSMから目的タイルへのフェードイントランジション
     // =====================================================
     const hasOSM = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
     if (hasOSM) {
         // --- 1. OSMが存在する場合（通常操作） ---
+        // 目的のタイル（gsiLayer）を透明（opacity: 0）で上に被せてロード開始
         if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
-        
-        // 透明（opacity: 0）でレイヤーを追加して裏でロードを開始
         window.gsiLayer = L.tileLayer(tileUrl, { 
             attribution: '国土地理院', 
             detectRetina: false,
-            opacity: 0, 
-            zIndex: 100 
+            opacity: 0, // 最初は透明
+            zIndex: 100 // OSM(通常1)より上に配置
         }).addTo(window.map);
 
-        // loadイベント(全完了)を待たずに、DOMの生成直後にすぐフェードインを開始する
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                const container = window.gsiLayer.getContainer();
-                if (container) {
-                    // flyToの動きに合わせるようにフワッと表示
-                    container.style.transition = 'opacity 0.6s ease-in-out';
-                    window.gsiLayer.setOpacity(1);
-                }
-            });
-        });
-
-        // ズーム移動(0.5秒) ＋ フェード(0.6秒) が確実に終わる頃に裏のOSMを消去
-        setTimeout(() => {
-            if (window.osmLayer) {
-                window.map.removeLayer(window.osmLayer);
-                window.osmLayer = null;
+        // ロード完了（またはアニメーション完了後）にフェードインさせる
+        window.gsiLayer.once('load', () => {
+            // CSSトランジションを付与してフワッと表示
+            const container = window.gsiLayer.getContainer();
+            if (container) {
+                container.style.transition = 'opacity 0.8s ease';
+                window.gsiLayer.setOpacity(1);
+                
+                // フェードインが終わったら裏のOSMを消去する
+                setTimeout(() => {
+                    if (window.osmLayer) {
+                        window.map.removeLayer(window.osmLayer);
+                        window.osmLayer = null;
+                    }
+                }, 800);
             }
-        }, 1200);
-
+        });
     } else {
         // --- 2. URL直打ち等でOSMが存在しない場合 ---
+        // 従来通り即座に目的のタイルをセットする
         if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
         window.gsiLayer = L.tileLayer(tileUrl, { 
             attribution: '国土地理院', 
             detectRetina: false 
         }).addTo(window.map);
     }
-
 
     const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
 
