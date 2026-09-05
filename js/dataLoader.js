@@ -2802,7 +2802,6 @@ function goBack() {
     // ① Phase2 -> Phase1（スポット詳細からエリア画面に戻る）
     // =====================================================
     if ((z > 13 || isSpecial) && !isPhase2) {
-        showdebug("[goBack] ①分岐開始");
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -2820,7 +2819,6 @@ function goBack() {
         if (window.phase2Group) window.phase2Group.clearLayers();
 
         if (!restoreSpot) {
-            showdebug("[goBack] restoreSpotなし、中断");
             window._isGoingBack = false;
             return;
         }
@@ -2862,31 +2860,23 @@ function goBack() {
         window.map.options.maxBoundsViscosity = 0;
         disableAreaSwipe();
 
-        showdebug("[goBack] drawLocation 実行前");
         drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
-        showdebug("[goBack] drawLocation 実行完了、moveend待機");
 
         window.map.once('moveend', () => {
-            showdebug("[goBack] moveend 発火！");
             window.map.invalidateSize(true);
 
             requestAnimationFrame(() => {
-                showdebug("[goBack] reqAnimationFrame 実行中");
-
                 enableDragForArea();
                 enablePhase2(window.map);
                 releaseLockAndShowBtn();
 
                 window.map.getContainer().classList.add('is-spot-mode');
                 window._selectSpotCompleted = true;
-                
-                showdebug("[goBack] 全処理完了！");
             });
         });
         
         return;
     }
-
 
     // =====================================================
     // ② Phase1 -> Area（エリア画面に戻る）
