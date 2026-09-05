@@ -2863,7 +2863,7 @@ function goBack() {
     window.map.options.maxBoundsViscosity = 0;
     disableAreaSwipe();
 
-    drawLocation(spot.name, spot.lat, spot.lng, 13);
+    drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
 //enablePhase2(window.map);早過ぎ
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
