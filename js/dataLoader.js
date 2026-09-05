@@ -9,10 +9,7 @@ window.prefData = null;
 window.areaData = [];
 window.spotData = []
 window.currentAreaId = null;
-window.gsiLayers = {
-  ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
-  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
-};
+
 
 
 // ==========================================
@@ -703,9 +700,8 @@ function selectSpot(spot) {
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
-
     window.osmLayer = L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        window.TILE_URLS.osm, // ★ ここを変数に置き換え
         {
             attribution: '© OpenStreetMap contributors',
             className: 'osm-solid-layer',
@@ -2841,14 +2837,12 @@ function goBack() {
         if (window.phase1Group) {
             window.phase1Group.clearLayers();
         }
-
         window.osmLayer = L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            window.TILE_URLS.osm, // ★ ここも変数に置き換え
             {
                 attribution: '© OpenStreetMap contributors',
                 className: 'osm-solid-layer',
                 updateWhenIdle: false,
-                updateWhenZooming: true,
                 updateWhenDragging: true,
                 keepBuffer: 4,
                 fadeAnimation: false
