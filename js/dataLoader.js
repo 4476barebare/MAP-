@@ -2838,19 +2838,23 @@ function goBack() {
         // selectSpot を呼び出す。
         // （selectSpot内で moveend 完了後に _selectSpotCompleted = true がセットされる）
         selectSpot(restoreSpot);
+        showdebug("selectSpot");
 
         // ★ 修正点: selectSpot の完了を確実に待ってから UI と Bounds の再設定を行う
         // selectSpot は内部で setTimeout/moveend を使っているため、直後の行ではまだ完了していません。
         // setInterval で完了フラグを待つか、moveend を待つ必要があります。
         
         const checkCompletion = setInterval(() => {
+            showdebug("checkCompletion");
             if (window._selectSpotCompleted) {
+                showdebug(window._selectSpotCompleted);
                 clearInterval(checkCompletion);
                 
                 window._selectSpotCompleted = false;
-                
+                showdebug(window._selectSpotCompleted);
                 // ★ あなたの書いた処理をそのまま実行
                 enableDragForArea();
+                showdebug("enableDragForArea");
                 releaseLockAndShowBtn();
                 window._selectSpotCompleted = true;
             }
