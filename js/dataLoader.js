@@ -1174,23 +1174,19 @@ function processSpotUtils(map) {
 
     const bounds = map.getBounds().pad(0.5);
 
+    // 画面内であり、ズームが設定されているスポットを抽出
     const visibleSpots = window.spotData.filter(s =>
         bounds.contains([s.lat, s.lng]) && s.zoom && s.zoom !== ''
     );
 
     if (!visibleSpots.length) return;
 
-    const rawZoom = map.getZoom();
-    const tileZoomBase = Math.floor(rawZoom);
-
-    // 512 + zoomOffset:-1 の補正
-    const effectiveZoom = tileZoomBase + 1;
-    const n = Math.pow(2, effectiveZoom);
+    // ★ トップ3に絞る制限を削除し、視界内の全スポットをプリロード対象にします
 
     for (const s of visibleSpots) {
         const spotKey = s.individualId || s.name;
         if (window._preloadedSpots.has(spotKey)) {
-            continue; 
+            continue; // 処理済みのものはスキップ
         }
         
         window._preloadedSpots.add(spotKey);
@@ -1212,7 +1208,16 @@ function processSpotUtils(map) {
             baseTileUrl = window.TILE_URLS.photo;
         }
 
-        const baseUrl = baseTileUrl.replace('{z}', effectiveZoom);
+        // =====================================================
+        // ★ 実際に飛ぶ先のズームレベルでキャッシュする処理は維持
+        // =====================================================
+        const isSpecial = typeParts.includes('special');
+        // 14未満は14、それ以外は設定値のズーム
+        const targetZoom = isSpecial ? 14 : (s.zoom < 14 ? 14 : s.zoom);
+        const fetchZoom = Math.floor(targetZoom); 
+
+        const n = Math.pow(2, fetchZoom);
+        const baseUrl = baseTileUrl.replace('{z}', fetchZoom);
 
         const tileX = Math.floor((lng + 180) / 360 * n);
         const latRad = lat * Math.PI / 180;
@@ -1220,7 +1225,7 @@ function processSpotUtils(map) {
             (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
         );
 
-        // 2x2プリロード
+        // 2x2プリロード（計4枚）
         for (let dx = 0; dx <= 1; dx++) {
             for (let dy = 0; dy <= 1; dy++) {
                 const url = baseUrl
@@ -1232,11 +1237,11 @@ function processSpotUtils(map) {
             }
         }
 
-        swapWithSubstitute(s);
+        if (typeof swapWithSubstitute === 'function') {
+            swapWithSubstitute(s);
+        }
     }
 }
-
-
 function swapWithSubstitute(spot) {
 
     const ul = document.querySelector("#map-menu ul");
