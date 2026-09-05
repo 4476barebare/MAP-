@@ -2832,61 +2832,35 @@ function goBack() {
         setIdealQuery('spot', null);
         window.currentSpotId = null;
 
+        // ★ これが本来の正しいあなたのロジック
         showSpotsForArea(window.currentAreaId);
         
-        // =====================================================
-        // ★ 修正: selectSpot の使い回しをやめ、goBack内で確実に復元する
-        // =====================================================
+        // selectSpot を呼び出す。
+        // （selectSpot内で moveend 完了後に _selectSpotCompleted = true がセットされる）
+        selectSpot(restoreSpot);
+
+        // ★ 修正点: selectSpot の完了を確実に待ってから UI と Bounds の再設定を行う
+        // selectSpot は内部で setTimeout/moveend を使っているため、直後の行ではまだ完了していません。
+        // setInterval で完了フラグを待つか、moveend を待つ必要があります。
         
-        // 1. OSMタイルを確実に復元
-        if (!window.osmLayer) {
-            window.osmLayer = L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                {
-                    attribution: '© OpenStreetMap contributors',
-                    className: 'osm-solid-layer',
-                    updateWhenIdle: false,
-                    updateWhenZooming: true,
-                    updateWhenDragging: true,
-                    keepBuffer: 4,
-                    fadeAnimation: false
+        const checkCompletion = setInterval(() => {
+            if (window._selectSpotCompleted) {
+                clearInterval(checkCompletion);
+                
+                window._selectSpotCompleted = false;
+                
+                // ★ あなたの書いた処理をそのまま実行
+                phase1menu(window.currentAreaId);
+                releaseLockAndShowBtn();
+                
+                // 制限を再設定（ドラッグ有効化を含む）
+                if (typeof enableDragForArea === 'function') {
+                    enableDragForArea();
+                } else {
+                    window.map.dragging.enable();
                 }
-            ).addTo(window.map);
-        }
-
-        disableAreaSwipe();
-
-        // 2. 移動アニメーション完了後の復元処理を定義
-        const completePhase1Return = () => {
-            window.map.invalidateSize(true);
-            
-            // Bounds再計算とドラッグ設定
-            if (typeof enableDragForArea === 'function') {
-                enableDragForArea();
             }
-            
-            // Phase2ハンドラの確実な再登録
-            enablePhase2(window.map);
-            window.map.getContainer().classList.add('is-spot-mode');
-            
-            // UI更新
-            phase1menu(window.currentAreaId);
-            releaseLockAndShowBtn();
-        };
-
-        // 3. 同じ場所なら即時実行、違う場所なら flyTo して moveend を待つ
-        const center = window.map.getCenter();
-        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && 
-                       Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
-                       window.map.getZoom() === 13;
-
-        if (isSame) {
-            drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
-            setTimeout(completePhase1Return, 50); // DOM構築待ちの微小な遅延
-        } else {
-            window.map.once('moveend', completePhase1Return);
-            drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
-        }
+        }, 50); // 50msごとに完了フラグをチェック
         
         return;
     }
