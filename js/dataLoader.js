@@ -1170,36 +1170,43 @@ function enablePhase2(map) {
         }, 80);
     };
 
+    // ... (enablePhase2 の中盤) ...
+    
     map._phase2Handler = runPhase2;
 
     map.on('dragend', runPhase2);
     map.on('moveend', runPhase2);
 
-    window.phase2Initialized = true;
+    // ★必ず実行前にtrueにする
+    window.phase2Initialized = true; 
+    
+    // ★ 初回として即座に1回実行させる（ここで初動のプリロードが走る！）
+    runPhase2();
+
     renderCrowdImage();
 }
 
-function disablePhase2(map) {
 
+function disablePhase2(map) {
     if (!map) return;
 
-    // ★まず「これ以上実行させない」
     window.phase2Initialized = false;
 
-    // ★イベント解除（今後の発火を止める）
     if (map._phase2Handler) {
         map.off('dragend', map._phase2Handler);
         map.off('moveend', map._phase2Handler);
         map._phase2Handler = null;
     }
 
-    // ★タイマーは“潰さない”
-    // → 最後の1回を自然に流すため
+    if (window.phase2Timer) {
+        clearTimeout(window.phase2Timer);
+    }
 
-    // 状態リセット（軽量）
     window.lastVisibleSet = new Set();
+    
+    // ★ 追加：広域に戻る時に、プリロード済み履歴をリセットする
+    window._preloadedSpots = new Set();
 
-    // UIは即消さない（これがカクつき原因）
     requestAnimationFrame(() => {
         const menu = document.getElementById("map-menu");
         if (menu) {
@@ -1209,24 +1216,21 @@ function disablePhase2(map) {
     });
 }
 
-function processSpotUtils(map) {
 
+function processSpotUtils(map) {
     if (!map) return;
+
+    // ★ グローバルでプリロード済みスポットを管理する箱（Set）を用意
+    window._preloadedSpots = window._preloadedSpots || new Set();
 
     const bounds = map.getBounds().pad(0.5);
 
-    // -------------------------
-    // 視界内スポット取得
-    // -------------------------
     const visibleSpots = window.spotData.filter(s =>
         bounds.contains([s.lat, s.lng])
     );
 
     if (!visibleSpots.length) return;
 
-    // -------------------------
-    // ズーム分離
-    // -------------------------
     const rawZoom = map.getZoom();
     const tileZoomBase = Math.floor(rawZoom);
 
@@ -1235,15 +1239,23 @@ function processSpotUtils(map) {
     const n = Math.pow(2, effectiveZoom);
 
     for (const s of visibleSpots) {
+        // =====================================================
+        // ★ 修正：すでに処理済みのスポットならスキップする
+        // =====================================================
+        const spotKey = s.individualId || s.name;
+        if (window._preloadedSpots.has(spotKey)) {
+            continue; // すでにプリロード済みならここで処理を抜ける
+        }
+        
+        // 処理済みリストに登録
+        window._preloadedSpots.add(spotKey);
 
         const lat = Number(s.lat);
         const lng = Number(s.lng);
 
         if (Number.isNaN(lat) || Number.isNaN(lng)) continue;
 
-        // =====================================================
-        // ★ 修正：スポットのtypeを見て、プリロードするURLを正確に決める
-        // =====================================================
+        // プリロードするURLを正確に決める
         const typeParts = (s.type || '').split('$');
         let baseTileUrl;
         if (typeParts.includes('ort')) {
@@ -1264,11 +1276,9 @@ function processSpotUtils(map) {
             (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
         );
 
-        // -------------------------
         // 2x2プリロード
-        // -------------------------
-        let loadedCount = 0; // ★ このスポットの読み込み完了数をカウント
-        const totalTiles = 4; // 2x2 = 4枚
+        let loadedCount = 0;
+        const totalTiles = 4;
 
         for (let dx = 0; dx <= 1; dx++) {
             for (let dy = 0; dy <= 1; dy++) {
@@ -1278,10 +1288,9 @@ function processSpotUtils(map) {
 
                 const img = new Image();
                 
-                // ★ 画像の読み込みが完了した時の処理を追加
+                // ★ 読み込み完了時にデバッグを表示
                 img.onload = () => {
                     loadedCount++;
-                    // 4枚すべて読み終わったら名前を表示する
                     if (loadedCount === totalTiles) {
                         if (typeof showdebug === 'function') {
                             showdebug(`[Preload完了] ${s.name}`);
@@ -1289,7 +1298,6 @@ function processSpotUtils(map) {
                     }
                 };
 
-                // ★ 読み込みエラー時の処理（任意・エラーで止まらないように）
                 img.onerror = () => {
                     loadedCount++;
                 };
@@ -1299,9 +1307,9 @@ function processSpotUtils(map) {
         }
 
         swapWithSubstitute(s);
-
     }
 }
+
 
 
 function swapWithSubstitute(spot) {
