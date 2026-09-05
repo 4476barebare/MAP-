@@ -1501,22 +1501,32 @@ function zoomToSpot(spot) {
 
     const targetLat = safe.lat;
     const targetLng = safe.lng;
-    let tileUrl = typeParts.includes('ort') ? window.gsiLayers.ort : window.gsiLayers.photo;
+    let tileUrl;
 
+    // ==========================================
+    // ★ 修正：タイル選択の分岐を増やして airphoto と rinya に対応
+    // ==========================================
+    if (typeParts.includes('ort')) {
+        tileUrl = window.gsiLayers.ort;
+    } else if (typeParts.includes('airphoto')) {
+        tileUrl = window.gsiLayers.airphoto;  // ★ airphotoを追加
+    } else if (typeParts.includes('rinya')) {
+        tileUrl = window.gsiLayers.rinya;     // ★ 林野庁タイルを追加
+    } else {
+        tileUrl = window.gsiLayers.photo;     // どれも無ければ photo (デフォルト)
+    }
+
+    // 👇 記憶する処理はそのまま
     window.currentSpotBaseTile = tileUrl;
 
     if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
     window.gsiLayer = L.tileLayer(tileUrl, { attribution: '国土地理院', detectRetina: false }).addTo(window.map);
-    
+
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
     }
 
-    // 【修正前】
-    // const targetZoom = isSpecial ? 13.5 : (safe.zoom < 13.5 ? 13.5 : safe.zoom);
-
-    // 【修正後】ベースを14に変更
     const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
 
 
