@@ -1027,179 +1027,148 @@ window._isSnappingBack = false;
 
 function enablePhase2(map) {
     if (!map) return;
-    showdebug("enablePhase2開始");
 
-    // ★二重登録防止
+    // 二重登録防止
     if (map._phase2Handler) {
         map.off('dragend', map._phase2Handler);
         map.off('moveend', map._phase2Handler);
     }
-
+    
     const runPhase2 = () => {
-        showdebug("1. runPhase2 イベント発火");
+        // 無効状態、または引き戻し（スナップバック）中なら何もしない
+        if (!window.phase2Initialized || window._isSnappingBack) return;
 
-        // ★無効状態、または引き戻し（スナップバック）中なら何もしない
-        if (!window.phase2Initialized) {
-            showdebug("ガード: phase2Initialized が false");
-            return;
-        }
-        if (window._isSnappingBack) {
-            showdebug("ガード: _isSnappingBack中");
-            return;
-        }
-
-        // =====================================================
-        // ★ 修正：変数未定義エラーで落ちるのを防ぐため、明示的に window. をつける
-        // =====================================================
+        // ★ 修正：タイマー変数を確実にグローバルで管理
         if (window.phase2Timer) {
             clearTimeout(window.phase2Timer);
         }
 
         window.phase2Timer = setTimeout(() => {
-            showdebug("2. setTimeout 内部へ到達");
-
             if (!window.phase2Initialized || window._isSnappingBack) return;
 
-            // =====================================================
-            // ★ 修正：どこでエラーが起きているか画面に出す (try-catch)
-            // =====================================================
-            try {
-                processSpotUtils(map);
-                showdebug("3. processSpotUtils 完了");
-            } catch (err) {
-                showdebug("❌ processSpotUtils エラー: " + err.message);
-                console.error("processSpotUtilsエラー:", err);
-            }
-
-            try {
-                showNearestSpotName(map);
-            } catch (err) {
-                showdebug("❌ showNearestSpotName エラー: " + err.message);
-            }
+            // 1. 既存の処理（タイルのプリロードと最寄りスポットの表示）
+            processSpotUtils(map);
+            showNearestSpotName(map);
 
             // =====================================================
-            // エリア切り替わりの検知と、強制引き戻し処理（既存のまま）
+            // エリア内外の判定と、切り替え・強制引き戻し処理
             // =====================================================
-            try {
-                if (window.map.getZoom() === 13 && window.spotData && window.currentAreaId) {
-                    const center = window.map.getCenter();
-                    
-                    const isInsideArea = window.areaBounds ? window.areaBounds.contains(center) : true;
+            if (window.map.getZoom() === 13 && window.spotData && window.currentAreaId) {
+                const center = window.map.getCenter();
+                
+                // A. 現在の座標がエリア内かどうか判定
+                const isInsideArea = window.areaBounds ? window.areaBounds.contains(center) : true;
 
-                    if (!isInsideArea) {
-                        let nearestSpot = null;
-                        let minDistance = Infinity;
+                // B. エリア外にはみ出している時の処理
+                if (!isInsideArea) {
+                    let nearestSpot = null;
+                    let minDistance = Infinity;
 
-                        window.spotData.forEach(spot => {
-                            const lat = Number(spot.lat);
-                            const lng = Number(spot.lng);
-                            if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                                const distance = center.distanceTo(L.latLng(lat, lng));
-                                if (distance < minDistance) {
-                                    minDistance = distance;
-                                    nearestSpot = spot;
-                                }
+                    window.spotData.forEach(spot => {
+                        const lat = Number(spot.lat);
+                        const lng = Number(spot.lng);
+                        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                            const distance = center.distanceTo(L.latLng(lat, lng));
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                                nearestSpot = spot;
                             }
-                        });
+                        }
+                    });
 
-                        if (nearestSpot) {
-                            if (nearestSpot.areaId === window.currentAreaId) {
-                                showdebug("エリア外検知: 強制引き戻し");
-                                window._isSnappingBack = true;
+                    if (nearestSpot) {
+                        // C. 最寄りスポットが同エリアなら強制引き戻し
+                        if (nearestSpot.areaId === window.currentAreaId) {
+                            window._isSnappingBack = true;
+                            
+                            map.setMaxBounds(null);
+                            map.options.maxBoundsViscosity = 0;
+                            
+                            map.flyTo([nearestSpot.lat, nearestSpot.lng], 13, { duration: 0.5 });
+                            
+                            map.once('moveend', () => {
+                                map.invalidateSize(true);
                                 
-                                map.setMaxBounds(null);
-                                map.options.maxBoundsViscosity = 0;
+                                if (!window.areaBounds) {
+                                    showSpotsForArea(window.currentAreaId);
+                                }
+                                if (window.areaBounds && window.areaBounds.isValid()) {
+                                    map.setMaxBounds(window.areaBounds);
+                                    map.options.maxBoundsViscosity = 1.0;
+                                    map.dragging.enable();
+                                }
                                 
-                                map.flyTo([nearestSpot.lat, nearestSpot.lng], 13, { duration: 0.5 });
+                                setTimeout(() => {
+                                    window._isSnappingBack = false;
+                                }, 1000);
+                            });
+                            return;
+                        } 
+                        // D. 別のエリアに所属している場合はエリア更新
+                        else {
+                            window.currentAreaId = nearestSpot.areaId;
+                            
+                            const targetAreaSpots = window.spotData.filter(s => s.areaId === window.currentAreaId);
+                            if (targetAreaSpots.length > 0) {
+                                let minLat = Infinity, maxLat = -Infinity;
+                                let minLng = Infinity, maxLng = -Infinity;
                                 
-                                map.once('moveend', () => {
-                                    map.invalidateSize(true);
-                                    
-                                    if (!window.areaBounds) {
-                                        showSpotsForArea(window.currentAreaId);
-                                    }
-                                    if (window.areaBounds && window.areaBounds.isValid()) {
-                                        map.setMaxBounds(window.areaBounds);
-                                        map.options.maxBoundsViscosity = 1.0;
-                                        map.dragging.enable();
-                                    }
-                                    
-                                    setTimeout(() => {
-                                        window._isSnappingBack = false;
-                                    }, 1000);
+                                targetAreaSpots.forEach(s => {
+                                    minLat = Math.min(minLat, s.lat);
+                                    maxLat = Math.max(maxLat, s.lat);
+                                    minLng = Math.min(minLng, s.lng);
+                                    maxLng = Math.max(maxLng, s.lng);
                                 });
                                 
-                                return;
-                            } else {
-                                window.currentAreaId = nearestSpot.areaId;
+                                const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.02);
+                                const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.02);
                                 
-                                const targetAreaSpots = window.spotData.filter(s => s.areaId === window.currentAreaId);
-                                if (targetAreaSpots.length > 0) {
-                                    let minLat = Infinity, maxLat = -Infinity;
-                                    let minLng = Infinity, maxLng = -Infinity;
-                                    
-                                    targetAreaSpots.forEach(s => {
-                                        minLat = Math.min(minLat, s.lat);
-                                        maxLat = Math.max(maxLat, s.lat);
-                                        minLng = Math.min(minLng, s.lng);
-                                        maxLng = Math.max(maxLng, s.lng);
-                                    });
-                                    
-                                    const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.02);
-                                    const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.02);
-                                    
-                                    window.areaBounds = L.latLngBounds(
-                                        [minLat - latBuffer, minLng - lngBuffer],
-                                        [maxLat + latBuffer, maxLng + lngBuffer]
-                                    );
-                                }
+                                window.areaBounds = L.latLngBounds(
+                                    [minLat - latBuffer, minLng - lngBuffer],
+                                    [maxLat + latBuffer, maxLng + lngBuffer]
+                                );
+                            }
 
-                                if (window.markerControl && typeof markerControl.showShop02 === 'function') {
-                                    markerControl.showShop02(window.currentAreaId);
-                                }
-                                showdebug("エリア変更: " + window.currentAreaId);
+                            if (window.markerControl && typeof markerControl.showShop02 === 'function') {
+                                markerControl.showShop02(window.currentAreaId);
                             }
                         }
                     }
                 }
-            } catch (err) {
-                showdebug("❌ エリア判定 エラー: " + err.message);
             }
-
         }, 80);
     };
-
 
     map._phase2Handler = runPhase2;
 
     map.on('dragend', runPhase2);
     map.on('moveend', runPhase2);
 
-    window.phase2Initialized = true;
+    window.phase2Initialized = true; // ★必ず実行前にtrueにする
+    
+    // ★ 初回として即座に1回実行させる（ここで初動のプリロードが走る！）
+    runPhase2();
+
     renderCrowdImage();
 }
 
 function disablePhase2(map) {
-
     if (!map) return;
 
-    // ★まず「これ以上実行させない」
     window.phase2Initialized = false;
 
-    // ★イベント解除（今後の発火を止める）
     if (map._phase2Handler) {
         map.off('dragend', map._phase2Handler);
         map.off('moveend', map._phase2Handler);
         map._phase2Handler = null;
     }
 
-    // ★タイマーは“潰さない”
-    // → 最後の1回を自然に流すため
+    if (window.phase2Timer) {
+        clearTimeout(window.phase2Timer);
+    }
 
-    // 状態リセット（軽量）
     window.lastVisibleSet = new Set();
 
-    // UIは即消さない（これがカクつき原因）
     requestAnimationFrame(() => {
         const menu = document.getElementById("map-menu");
         if (menu) {
@@ -1210,23 +1179,16 @@ function disablePhase2(map) {
 }
 
 function processSpotUtils(map) {
-
     if (!map) return;
 
     const bounds = map.getBounds().pad(0.5);
 
-    // -------------------------
-    // 視界内スポット取得
-    // -------------------------
     const visibleSpots = window.spotData.filter(s =>
         bounds.contains([s.lat, s.lng])
     );
 
     if (!visibleSpots.length) return;
 
-    // -------------------------
-    // ズーム分離
-    // -------------------------
     const rawZoom = map.getZoom();
     const tileZoomBase = Math.floor(rawZoom);
 
@@ -1235,15 +1197,12 @@ function processSpotUtils(map) {
     const n = Math.pow(2, effectiveZoom);
 
     for (const s of visibleSpots) {
-
         const lat = Number(s.lat);
         const lng = Number(s.lng);
 
         if (Number.isNaN(lat) || Number.isNaN(lng)) continue;
 
-        // =====================================================
-        // ★ 修正：スポットのtypeを見て、プリロードするURLを正確に決める
-        // =====================================================
+        // ★ プリロードするURLを正確に決める
         const typeParts = (s.type || '').split('$');
         let baseTileUrl;
         if (typeParts.includes('ort')) {
@@ -1264,12 +1223,7 @@ function processSpotUtils(map) {
             (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
         );
 
-        // -------------------------
         // 2x2プリロード
-        // -------------------------
-        let loadedCount = 0; // ★ このスポットの読み込み完了数をカウント
-        const totalTiles = 4; // 2x2 = 4枚
-
         for (let dx = 0; dx <= 1; dx++) {
             for (let dy = 0; dy <= 1; dy++) {
                 const url = baseUrl
@@ -1277,31 +1231,14 @@ function processSpotUtils(map) {
                     .replace('{y}', tileY + dy);
 
                 const img = new Image();
-                
-                // ★ 画像の読み込みが完了した時の処理を追加
-                img.onload = () => {
-                    loadedCount++;
-                    // 4枚すべて読み終わったら名前を表示する
-                    if (loadedCount === totalTiles) {
-                        if (typeof showdebug === 'function') {
-                            showdebug(`[Preload完了] ${s.name}`);
-                        }
-                    }
-                };
-
-                // ★ 読み込みエラー時の処理（任意・エラーで止まらないように）
-                img.onerror = () => {
-                    loadedCount++;
-                };
-
                 img.src = url;
             }
         }
 
         swapWithSubstitute(s);
-
     }
 }
+
 
 
 function swapWithSubstitute(spot) {
