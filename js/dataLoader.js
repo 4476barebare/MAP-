@@ -740,6 +740,8 @@ function selectSpot(spot) {
 }
 
 function enableDragForArea() {
+    showdebug("enableDragForArea");
+
     // ★ 追加: 意図しない moveend 暴発時の防御。ズーム13以外では絶対に制限をかけない
    // if (window.map.getZoom() !== 13) return;
 
