@@ -1,4 +1,4 @@
-name: Manual CSV to JSON Converter
+name: Fish CSV to JSON Converter
 
 on:
   workflow_dispatch:
