@@ -2481,7 +2481,7 @@ function renderFishSection(uniqueNames) {
 }
 
 // ==========================================
-// ★ 画面に文字を出すデバッグ用関数
+// ★ 画面に文字を出すデバッグ用関数（スクロール＆コピペ対応版）
 // ==========================================
 function showdebug(msg) {
     let debugBox = document.getElementById('my-debug-box');
@@ -2498,14 +2498,25 @@ function showdebug(msg) {
         debugBox.style.fontSize = '10px';
         debugBox.style.zIndex = '999999';
         debugBox.style.borderRadius = '5px';
-        debugBox.style.pointerEvents = 'none'; // クリックの邪魔にならないように
+        
+        // ★ スクロールとコピー操作を有効化
+        debugBox.style.maxHeight = '70vh';        // 縦幅の最大値を画面の70%に制限
+        debugBox.style.width = '80vw';            // 横幅も余裕を持たせる（任意）
+        debugBox.style.overflowY = 'auto';        // はみ出たら縦スクロール
+        debugBox.style.pointerEvents = 'auto';    // クリック・スクロールを許可
+        debugBox.style.userSelect = 'text';       // テキスト選択・コピーを許可
+        debugBox.style.WebkitUserSelect = 'text'; // iOS Safari用のコピペ許可
+        
         document.body.appendChild(debugBox);
     }
 
-    // 変更後（改行タグを入れて下に追記していく）
+    // メッセージの追記
     debugBox.innerHTML += msg + '<br>';
-
+    
+    // ★ 新しいログが追加されたら、自動的に一番下へスクロールする
+    debugBox.scrollTop = debugBox.scrollHeight;
 }
+
 
 </script>
 
