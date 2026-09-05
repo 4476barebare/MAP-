@@ -2802,6 +2802,7 @@ function goBack() {
     // ① Phase2 -> Phase1（スポット詳細からエリア画面に戻る）
     // =====================================================
     if ((z > 13 || isSpecial) && !isPhase2) {
+        showdebug("[goBack] ①分岐開始");
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -2819,6 +2820,7 @@ function goBack() {
         if (window.phase2Group) window.phase2Group.clearLayers();
 
         if (!restoreSpot) {
+            showdebug("[goBack] restoreSpotなし、中断");
             window._isGoingBack = false;
             return;
         }
@@ -2833,69 +2835,57 @@ function goBack() {
         setIdealQuery('spot', null);
         window.currentSpotId = null;
 
-        
         showSpotsForArea(window.currentAreaId);
         phase1menu(window.currentAreaId);
-    if (window.markerControl) {
-        markerControl.showShop02(window.currentAreaId);
-    }
-    if (window.phase1Group) {
-        window.phase1Group.clearLayers();
-    }
-
-    window.osmLayer = L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-            attribution: '© OpenStreetMap contributors',
-            className: 'osm-solid-layer',
-            updateWhenIdle: false,
-            updateWhenZooming: true,
-            updateWhenDragging: true,
-            keepBuffer: 4,
-            fadeAnimation: false
+        if (window.markerControl) {
+            markerControl.showShop02(window.currentAreaId);
         }
-    ).addTo(window.map);
+        if (window.phase1Group) {
+            window.phase1Group.clearLayers();
+        }
 
+        window.osmLayer = L.tileLayer(
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {
+                attribution: '© OpenStreetMap contributors',
+                className: 'osm-solid-layer',
+                updateWhenIdle: false,
+                updateWhenZooming: true,
+                updateWhenDragging: true,
+                keepBuffer: 4,
+                fadeAnimation: false
+            }
+        ).addTo(window.map);
 
+        // 過去のBoundsを解除
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+        disableAreaSwipe();
 
-    disableAreaSwipe();
+        showdebug("[goBack] drawLocation 実行前");
+        drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
+        showdebug("[goBack] drawLocation 実行完了、moveend待機");
 
-    // 過去のBoundsを解除
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-    disableAreaSwipe();
+        window.map.once('moveend', () => {
+            showdebug("[goBack] moveend 発火！");
+            window.map.invalidateSize(true);
 
-    drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
+            requestAnimationFrame(() => {
+                showdebug("[goBack] reqAnimationFrame 実行中");
 
-    // =====================================================
-    // ★ 修正: ピンチイン等で moveend が消滅した場合のフェイルセーフ
-    // =====================================================
-    let isCompleted = false;
-    const completePhase1Return = () => {
-        if (isCompleted) return;
-        isCompleted = true;
-        
-        window.map.off('moveend', completePhase1Return); // タイマーで呼ばれた場合にリスナーを外す
-        
-        window.map.invalidateSize(true);
-        requestAnimationFrame(() => {
-            enableDragForArea();
-            enablePhase2(window.map);
-            releaseLockAndShowBtn();
+                enableDragForArea();
+                enablePhase2(window.map);
+                releaseLockAndShowBtn();
 
-            window.map.getContainer().classList.add('is-spot-mode');
-            window._selectSpotCompleted = true;
+                window.map.getContainer().classList.add('is-spot-mode');
+                window._selectSpotCompleted = true;
+                
+                showdebug("[goBack] 全処理完了！");
+            });
         });
-    };
-
-    // 通常の移動完了イベント
-    window.map.once('moveend', completePhase1Return);
-    
-    // ピンチイン操作等でアニメーションが中断され moveend が来なかった場合の保険（フリーズ防止）
-    setTimeout(completePhase1Return, 600);
         
-    return;
-}
+        return;
+    }
 
 
     // =====================================================
