@@ -2830,9 +2830,37 @@ function goBack() {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
 
-        // ★ 戻る直前に過去のバウンズ（zoomToSpotのもの）を破壊する
+        // ★ 戻る直前に過去のバウンズを破壊する
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
+
+        // =====================================================
+        // ★ 修正：OSMを「最前面（z-index: 999等）」にかぶせてから flyTo する
+        // =====================================================
+        if (!window.osmLayer) {
+            window.osmLayer = L.tileLayer(
+                window.TILE_URLS.osm,
+                {
+                    attribution: '© OpenStreetMap contributors',
+                    className: 'osm-solid-layer',
+                    updateWhenIdle: false,
+                    updateWhenZooming: true,
+                    updateWhenDragging: true,
+                    keepBuffer: 4,
+                    fadeAnimation: false,
+                    zIndex: 999 // ★ 追加：確実に最前面へ被せる
+                }
+            ).addTo(window.map);
+        } else {
+            // 既に存在する場合は最前面に持ってくる
+            window.osmLayer.setZIndex(999);
+        }
+
+        // OSMが被さった裏で、ベースタイルを `ort` (標準) に切り替えておく
+        if (window.gsiLayer) {
+            // タイルのチラつきを見せずにURLだけすり替える
+            window.gsiLayer.setUrl(window.TILE_URLS.ort); 
+        }
 
         if (window.fishLayer) window.map.removeLayer(window.fishLayer);
         if (window.phase2Group) window.phase2Group.clearLayers();
@@ -2853,44 +2881,52 @@ function goBack() {
         window.currentSpotId = null;
 
         showSpotsForArea(window.currentAreaId);
-        phase1menu(window.currentAreaId);
-        if (window.markerControl) {
-            markerControl.showShop02(window.currentAreaId);
-        }
-        if (window.phase1Group) {
-            window.phase1Group.clearLayers();
-        }
-        window.osmLayer = L.tileLayer(
-            window.TILE_URLS.osm, // ★ ここも変数に置き換え
-            {
-                attribution: '© OpenStreetMap contributors',
-                className: 'osm-solid-layer',
-                updateWhenIdle: false,
-                updateWhenDragging: true,
-                keepBuffer: 4,
-                fadeAnimation: false
-            }
-        ).addTo(window.map);
-
-        // 過去のBoundsを解除
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
+        
         disableAreaSwipe();
+        
+        // OSMが敷かれた状態のまま、ズーム13へ引いていく
+        window.map.flyTo([restoreSpot.lat, restoreSpot.lng], 13, { duration: 0.5 });
+        window.map.getContainer().classList.add('is-spot-mode');
 
-        drawLocation(restoreSpot.name, restoreSpot.lat, restoreSpot.lng, 13);
-
-        window.map.once('moveend', () => {
+        const completePhase1Return = () => {
             window.map.invalidateSize(true);
-
-            requestAnimationFrame(() => {
+            
+            if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
-                enablePhase2(window.map);
-                releaseLockAndShowBtn();
+            }
+            enablePhase2(window.map); 
+            
+            phase1menu(window.currentAreaId);
+            
+            window._isGoingBack = false;
+            const backBtn = document.getElementById('map-back-btn');
+            const tileWrap = document.getElementById('tile-btn-wrap');
+            const tileBtn = document.getElementById('map-tile-btn');
+            
+            if (backBtn) {
+                backBtn.style.display = 'block';
+                if (tileWrap) tileWrap.style.display = 'flex';
+                if (tileBtn) tileBtn.style.display = 'block';
+                
+                requestAnimationFrame(() => {
+                    backBtn.style.transition = 'opacity 0.4s ease';
+                    backBtn.style.opacity = '1';
+                    backBtn.style.pointerEvents = 'auto';
+                    if (tileBtn) tileBtn.style.opacity = '1';
+                });
+            }
+        };
 
-                window.map.getContainer().classList.add('is-spot-mode');
-                window._selectSpotCompleted = true;
-            });
-        });
+        const center = window.map.getCenter();
+        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && 
+                       Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
+                       window.map.getZoom() === 13;
+
+        if (isSame) {
+            setTimeout(completePhase1Return, 50); 
+        } else {
+            window.map.once('moveend', completePhase1Return);
+        }
         
         return;
     }
