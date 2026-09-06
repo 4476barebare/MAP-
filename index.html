@@ -2286,11 +2286,12 @@ async function routeUpdate() {
 
         const targetZoom = window.prefData.zoom;
         
-        // ★ 修正：直打ち時（マップ未生成時）に getCenter() を呼んで真っ白にクラッシュするバグを修正
+        // ★ 修正：マップ未生成の初回ロード時は「即時描画(isSameLoc = true)」にする判定を追加
+        const isMapJustCreated = !window.map;
         const center = window.map ? window.map.getCenter() : null;
-        const isSameLoc = center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+        const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
                           Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
-                          window.map.getZoom() === targetZoom;
+                          window.map.getZoom() === targetZoom);
 
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
         
@@ -2302,7 +2303,7 @@ async function routeUpdate() {
                     if (typeof showPrefSpots === 'function') showPrefSpots();
                     if (typeof initAreaUI === 'function') initAreaUI();
                     if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                    renderCrowdImage();
+                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
                     
                     requestAnimationFrame(() => {
                         const btn = document.getElementById('map-back-btn');
@@ -2321,7 +2322,7 @@ async function routeUpdate() {
             window.map.once('moveend', finalizePref);
         }
     }
-
+}
 
 }
 
