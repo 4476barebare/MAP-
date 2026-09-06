@@ -221,8 +221,8 @@
     "name": "観音山下の磯",
     "zoom": 17,
     "individualId": "19",
-    "lat": 35.138081,
-    "lng": 139.640206,
+    "lat": 35.13766,
+    "lng": 139.640924,
     "areaId": "KANAGAWA_MIURA",
     "notes": "Second/城ヶ島黒島堤防/灯台下の磯",
     "icon": "spot"
@@ -261,8 +261,8 @@
     "name": "灘ヶ崎",
     "zoom": 16,
     "individualId": "23",
-    "lat": 35.136581,
-    "lng": 139.609827,
+    "lat": 35.134458,
+    "lng": 139.610578,
     "areaId": "KANAGAWA_MIURA",
     "notes": "First/1419/1413",
     "icon": "spot"
@@ -285,16 +285,6 @@
     "lng": 139.608862,
     "areaId": "KANAGAWA_MIURA",
     "notes": "Second//",
-    "icon": "spot"
-  },
-  {
-    "name": "暮浜港",
-    "zoom": 18,
-    "individualId": "26",
-    "lat": 35.193788,
-    "lng": 139.608928,
-    "areaId": "KANAGAWA_MIURA",
-    "notes": "First/1419/1413",
     "icon": "spot"
   },
   {
@@ -339,22 +329,12 @@
   },
   {
     "name": "城ヶ島黒島堤防",
-    "zoom": 17,
+    "zoom": 16,
     "individualId": "31",
-    "lat": 35.133176,
-    "lng": 139.62688,
+    "lat": 35.131544,
+    "lng": 139.626843,
     "areaId": "KANAGAWA_MIURA",
     "notes": "First/1413/",
-    "icon": "spot"
-  },
-  {
-    "name": "ゴミ捨て下",
-    "zoom": 17.5,
-    "individualId": "32",
-    "lat": 35.139855,
-    "lng": 139.658899,
-    "areaId": "KANAGAWA_MIURA",
-    "notes": "Second/城ヶ島黒島堤防/灯台下の磯",
     "icon": "spot"
   },
   {
@@ -369,10 +349,10 @@
   },
   {
     "name": "名向﨑",
-    "zoom": 15,
+    "zoom": 15.5,
     "individualId": "34",
-    "lat": 35.156513,
-    "lng": 139.61355,
+    "lat": 35.157887,
+    "lng": 139.613574,
     "areaId": "KANAGAWA_MIURA",
     "notes": "First/1419/1413",
     "icon": "spot"
@@ -400,10 +380,10 @@
   },
   {
     "name": "灯台下の磯",
-    "zoom": 17,
+    "zoom": 16.5,
     "individualId": "37",
-    "lat": 35.140178,
-    "lng": 139.677542,
+    "lat": 35.140704,
+    "lng": 139.678354,
     "areaId": "KANAGAWA_MIURA",
     "notes": "First/1413/1208",
     "icon": "spot"
@@ -537,9 +517,10 @@
   },
   {
     "name": "厚木へら鮒センター",
+    "zoom": 13.5,
     "individualId": "L11",
-    "lat": 35.48684,
-    "lng": 139.36037,
+    "lat": 35.494872,
+    "lng": 139.374191,
     "areaId": "KANAGAWA_SEISHO",
     "notes": "神奈川県厚木市関口１１２２",
     "icon": "fish4"
@@ -841,10 +822,10 @@
   },
   {
     "name": "相模大橋",
-    "zoom": 15,
+    "zoom": 15.5,
     "individualId": "L42",
-    "lat": 35.447284,
-    "lng": 139.371121,
+    "lat": 35.445988,
+    "lng": 139.371354,
     "areaId": "KANAGAWA_SEISHO",
     "notes": "相模川漁業協同組合連合会",
     "icon": "spot"
@@ -863,8 +844,8 @@
     "name": "酒匂川周辺",
     "zoom": 14,
     "individualId": "L44",
-    "lat": 35.278992,
-    "lng": 139.163518,
+    "lat": 35.278138,
+    "lng": 139.164891,
     "areaId": "KANAGAWA_SEISHO",
     "notes": "洒匂川漁業協同組合",
     "icon": "spot"
@@ -967,8 +948,8 @@
     "name": "真鶴半島先端",
     "zoom": 16,
     "individualId": "51",
-    "lat": 35.143897,
-    "lng": 139.158272,
+    "lat": 35.144073,
+    "lng": 139.159173,
     "areaId": "KANAGAWA_SEISHO",
     "notes": "First/1419/2219",
     "icon": "spot",
@@ -1364,5 +1345,113 @@
     "lng": 139.688641,
     "areaId": "KANAGAWA_YOKOHAMA",
     "icon": "spot"
+  },
+  {
+    "name": "相模川厚木周辺",
+    "zoom": 13.5,
+    "individualId": "L57",
+    "lat": 35.484683,
+    "lng": 139.373342,
+    "areaId": "KANAGAWA_SEISHO",
+    "notes": "相模川漁業協同組合連合会",
+    "icon": "spot"
+  },
+  {
+    "name": "中津川",
+    "zoom": 14,
+    "individualId": "L58",
+    "lat": 35.480941,
+    "lng": 139.357924,
+    "areaId": "KANAGAWA_SEISHO",
+    "notes": "相模川漁業協同組合連合会",
+    "icon": "spot"
+  },
+  {
+    "name": "酒匂川開成松田",
+    "zoom": 14,
+    "individualId": "L59",
+    "lat": 35.343912,
+    "lng": 139.125409,
+    "areaId": "KANAGAWA_SEISHO",
+    "notes": "洒匂川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "狩川",
+    "zoom": 14,
+    "individualId": "L60",
+    "lat": 35.304542,
+    "lng": 139.118028,
+    "areaId": "KANAGAWA_SEISHO",
+    "notes": "洒匂川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "箱根湯本",
+    "zoom": 16,
+    "individualId": "L61",
+    "lat": 35.233281,
+    "lng": 139.105185,
+    "areaId": "KANAGAWA_SEISHO",
+    "notes": "早川河川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "大畑﨑・東風﨑",
+    "zoom": 16,
+    "individualId": "32",
+    "lat": 35.139739,
+    "lng": 139.660445,
+    "areaId": "KANAGAWA_MIURA",
+    "notes": "Second/城ヶ島黒島堤防/灯台下の磯",
+    "icon": "spot"
+  },
+  {
+    "name": "屋志倉の磯",
+    "zoom": 17,
+    "individualId": "77",
+    "lat": 35.150399,
+    "lng": 139.614306,
+    "areaId": "KANAGAWA_MIURA",
+    "icon": "spot"
+  },
+  {
+    "name": "黒崎の鼻",
+    "zoom": 17,
+    "individualId": "78",
+    "lat": 35.182702,
+    "lng": 139.614832,
+    "areaId": "KANAGAWA_MIURA",
+    "icon": "spot"
+  },
+  {
+    "name": "荒崎周辺",
+    "zoom": 15.5,
+    "individualId": "26",
+    "lat": 35.193654,
+    "lng": 139.603833,
+    "areaId": "KANAGAWA_MIURA",
+    "notes": "First/1419/1413",
+    "icon": "spot"
+  },
+  {
+    "name": "米神周辺",
+    "zoom": 16.5,
+    "individualId": "79",
+    "lat": 35.21406,
+    "lng": 139.14213,
+    "areaId": "KANAGAWA_SEISHO",
+    "icon": "spot",
+    "type": "ort"
+  },
+  {
+    "name": "根府川大根",
+    "zoom": 18,
+    "individualId": "80",
+    "lat": 35.203721,
+    "lng": 139.14136,
+    "areaId": "KANAGAWA_SEISHO",
+    "icon": "spot",
+    "type": "ort"
   }
 ]
