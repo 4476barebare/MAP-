@@ -3039,7 +3039,7 @@ function goBack() {
     // =====================================================
     if (window.currentSpotId == null && window.currentAreaId != null && z < 12.5) {
         
-        // ★ 修正：OSMを削除せず、フェードアウトして裏側に保持する
+        // ★ OSMを削除せず、フェードアウトして裏側に保持する
         if (window.osmLayer) {
             const osmContainer = window.osmLayer.getContainer();
             if (osmContainer) {
@@ -3053,8 +3053,13 @@ function goBack() {
 
         if (window.phase1Group) window.phase1Group.clearLayers();
         if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+        
+        // ★ 追加：ショップマーカーのレイヤーを確実に消し去る
+        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
+            window.markerControl.clearLayers();
+        }
 
-        // ★ 修正：GSI(航空写真)を透明な状態で準備し、DOM反映後にフェードインさせる
+        // ★ GSI(航空写真)を透明な状態で準備し、DOM反映後にフェードインさせる
         if (!window.gsiLayer) {
             window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
         } else {
@@ -3073,6 +3078,7 @@ function goBack() {
             }
         });
 
+        // 過去のバウンズを完全に破壊する
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
