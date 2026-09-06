@@ -315,7 +315,7 @@ function enableAreaSwipe() {
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
         window.areaBounds = null;
-        
+        window.goBackGuard = true;
         selectArea(nextArea.name);
         
     }
@@ -569,9 +569,11 @@ function selectArea(area) {
                     requestAnimationFrame(() => {
                         btn.style.transition = 'opacity 0.4s ease';
                         btn.style.opacity = '1';
-                        saveMapState();
                     });
                 }
+                   window.goBackGuard = false;
+
+                   saveMapState();
             });
         });
     };
