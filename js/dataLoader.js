@@ -2809,7 +2809,7 @@ function clearSpotUI() {
     if (typeof removeWeekItem === 'function') removeWeekItem();
     if (typeof resetWeatherUI === 'function') resetWeatherUI();
     if (typeof clearAccessInfo === 'function') clearAccessInfo();
-    if (typeof clearSub2Weather === 'function') clearSub2Weather();
+
     
     if (window.map && window.fishLayer) {
         window.map.removeLayer(window.fishLayer);
@@ -2942,7 +2942,7 @@ function goBack() {
             window.goBackGuard = false; 
             return;
         }
-
+    if (typeof clearSub2Weather === 'function') clearSub2Weather();
         clearSpotUI();
 
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
