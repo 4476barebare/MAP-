@@ -2320,25 +2320,47 @@ async function routeUpdate() {
         setIdealQuery('area', null);                 
         setIdealQuery('spot', null);                 
 
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+        const targetZoom = window.prefData.zoom;
+        const center = window.map.getCenter();
+        const isSameLoc = center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                          window.map.getZoom() === targetZoom;
+
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
         
-        requestAnimationFrame(() => {
+        const finalizePref = () => {
+            window.map.invalidateSize(true);
+            
+            // ★ 追加：県画面を開いた直後も県全体のBoundsをセットする
+            if (typeof enableDragForArea === 'function') {
+                enableDragForArea();
+            }
+            
             requestAnimationFrame(() => {
-                if (typeof showPrefSpots === 'function') showPrefSpots();
-                if (typeof initAreaUI === 'function') initAreaUI();
-                if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                renderCrowdImage();
-                
                 requestAnimationFrame(() => {
-                    const btn = document.getElementById('map-back-btn');
-                    if (btn) {
-                        btn.style.display = 'block';
-                        requestAnimationFrame(() => { btn.style.opacity = '1'; });
-                    }
+                    if (typeof showPrefSpots === 'function') showPrefSpots();
+                    if (typeof initAreaUI === 'function') initAreaUI();
+                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                    renderCrowdImage();
+                    
+                    requestAnimationFrame(() => {
+                        const btn = document.getElementById('map-back-btn');
+                        if (btn) {
+                            btn.style.display = 'block';
+                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                        }
+                    });
                 });
             });
-        });
+        };
+
+        if (isSameLoc) {
+            finalizePref();
+        } else {
+            window.map.once('moveend', finalizePref);
+        }
     }
+
 }
 
 
