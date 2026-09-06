@@ -1499,6 +1499,8 @@ function zoomToSpot(spot) {
         }
         return;
     }
+    // ★ 名称を変更して汎用的なガードとして使い回す
+window.goBackGuard = true;
 
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
@@ -1660,6 +1662,9 @@ function zoomToSpot(spot) {
         window.map.scrollWheelZoom.enable();
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
+        
+        // ★ 名称を変更して汎用的なガードとして使い回す
+window.goBackGuard = false;
     });
 
 }
@@ -2793,12 +2798,13 @@ function clearSpotUI() {
     if (nsEl) nsEl.textContent = "";
 }
 
+// ★ 名称を変更して汎用的なガードとして使い回す
+window.goBackGuard = false;
 
-window._isGoingBack = false;
 
 function goBack() {
     if (window._isGoingBack) return;
-    window._isGoingBack = true;
+    window.goBackGuard = true;
 
     if (window.map) {
         window.map.getContainer().classList.remove('is-spot-mode');
@@ -2822,7 +2828,7 @@ function goBack() {
     }
 
     const releaseLockAndShowBtn = () => {
-        window._isGoingBack = false; 
+        window.goBackGuard = false;
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
