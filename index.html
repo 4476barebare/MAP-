@@ -2211,14 +2211,11 @@ async function routeUpdate() {
         loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
+
     // ─── スポット階層 ───
     if (window.currentSpotId) {
-
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
-        
-        await prepareFishForArea(safeAreaId);
-        
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
@@ -2230,38 +2227,9 @@ async function routeUpdate() {
             setIdealQuery('spot', spot.name);
             window._selectSpotCompleted = true;
 
-            // 1. まず元の状態と同じくベースマップを生成
             drawLocation(spot.name, spot.lat, spot.lng, "13");
             
-            // =====================================
-            // ★ 追加：enableDragForAreaと同等のBounds計算処理
-            // イベント(moveend)に依存せず、強制的に県域Boundsを生成して適用する
-            // =====================================
-            if (!window.prefBounds && window.spotData && window.spotData.length > 0) {
-                let minLat = Infinity, maxLat = -Infinity;
-                let minLng = Infinity, maxLng = -Infinity;
-                window.spotData.forEach(s => {
-                    const lat = Number(s.lat), lng = Number(s.lng);
-                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                        minLat = Math.min(minLat, lat); maxLat = Math.max(maxLat, lat);
-                        minLng = Math.min(minLng, lng); maxLng = Math.max(maxLng, lng);
-                    }
-                });
-                const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.05);
-                const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.05);
-                window.prefBounds = L.latLngBounds(
-                    [minLat - latBuffer, minLng - lngBuffer],
-                    [maxLat + latBuffer, maxLng + lngBuffer]
-                );
-            }
-            if (window.prefBounds && window.prefBounds.isValid()) {
-                window.map.dragging.enable();
-                window.map.setMaxBounds(window.prefBounds);
-                window.map.options.maxBoundsViscosity = 1.0;
-            }
-            // =====================================
-
-            // 2. 元の状態と同じく、そのままズーム処理へ移行
+            // ★ スポット詳細ではスポット用のBoundsに切り替わるのでここでは何もしない
             zoomToSpot(spot);
             
             requestAnimationFrame(() => {
@@ -2271,9 +2239,6 @@ async function routeUpdate() {
                 
                 if (btn) {
                     btn.style.display = 'block';
-                    // =====================================
-                    // ★ ここでも確実にblockにする
-                    // =====================================
                     if (tileWrap) tileWrap.style.display = 'flex'; 
                     if (tileBtn) tileBtn.style.display = 'block'; 
                     
@@ -2288,7 +2253,7 @@ async function routeUpdate() {
         return;
     }
 
-
+    // ─── エリア階層 ───
     if (window.currentAreaId) {
         const safeAreaId = window.currentAreaId || ""; 
         const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
@@ -2320,49 +2285,29 @@ async function routeUpdate() {
         setIdealQuery('area', null);                 
         setIdealQuery('spot', null);                 
 
-        const targetZoom = window.prefData.zoom;
-        const center = window.map.getCenter();
-        const isSameLoc = center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
-                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
-                          window.map.getZoom() === targetZoom;
-
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
         
-        const finalizePref = () => {
-            window.map.invalidateSize(true);
-            
-            // ★ 追加：県画面を開いた直後も県全体のBoundsをセットする
-            if (typeof enableDragForArea === 'function') {
-                enableDragForArea();
-            }
-            
+        requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+                if (typeof showPrefSpots === 'function') showPrefSpots();
+                if (typeof initAreaUI === 'function') initAreaUI();
+                if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                renderCrowdImage();
+                
+                // ★ 追加: 県画面を開いた際にもドラッグ範囲をセットして操作を解放する
+                if (typeof enableDragForArea === 'function') enableDragForArea();
+
                 requestAnimationFrame(() => {
-                    if (typeof showPrefSpots === 'function') showPrefSpots();
-                    if (typeof initAreaUI === 'function') initAreaUI();
-                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                    renderCrowdImage();
-                    
-                    requestAnimationFrame(() => {
-                        const btn = document.getElementById('map-back-btn');
-                        if (btn) {
-                            btn.style.display = 'block';
-                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
-                        }
-                    });
+                    const btn = document.getElementById('map-back-btn');
+                    if (btn) {
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                    }
                 });
             });
-        };
-
-        if (isSameLoc) {
-            finalizePref();
-        } else {
-            window.map.once('moveend', finalizePref);
-        }
+        });
     }
-
 }
-
 
 // ★ Region名の変換マッピング
 const REGION_MAP = {
