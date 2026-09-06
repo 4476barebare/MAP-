@@ -558,6 +558,8 @@ function selectArea(area) {
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
         clearSpotUI();
+        enableDragForArea();
+
         
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -806,11 +808,6 @@ async function selectSpot(spot) {
 }
 
 function enableDragForArea() {
-    //showdebug("enableDragForArea");
-
-    // ★ 追加: 意図しない moveend 暴発時の防御。ズーム13以外では絶対に制限をかけない
-   // if (window.map.getZoom() !== 13) return;
-
     // 1. 県全体のバウンズが未計算の場合、全スポットデータから算出する
     if (!window.prefBounds && window.spotData && window.spotData.length > 0) {
         let minLat = Infinity, maxLat = -Infinity;
@@ -842,12 +839,14 @@ function enableDragForArea() {
         return;
     }
 
-    window.map.dragging.enable();
-    
-    // ★ areaBounds ではなく、計算した prefBounds を適用する
-    window.map.setMaxBounds(window.prefBounds);
-    window.map.options.maxBoundsViscosity = 1.0;
+    // ★ 修正：余計なズーム解除を全削除し、ドラッグとバウンズの適用のみを行う
+    if (window.map) {
+        window.map.dragging.enable();
+        window.map.setMaxBounds(window.prefBounds);
+        window.map.options.maxBoundsViscosity = 1.0;
+    }
 }
+
 
 function phase1menu(areaId) {
 
