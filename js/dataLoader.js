@@ -3032,124 +3032,92 @@ function goBack() {
         }
         return;
     }
-
     // =====================================================
     // ③ Phase1 (エリアort) → Pref (県画面) へ戻る
     // 条件: currentSpotId は無く、areaId があり、ズームが 12.5 未満
     // =====================================================
     if (window.currentSpotId == null && window.currentAreaId != null && z < 12.5) {
-        try {
-            // ★ OSMを削除せず、フェードアウトして裏側に保持する
-            if (window.osmLayer) {
-                if (typeof window.osmLayer.getContainer === 'function') {
-                    const osmContainer = window.osmLayer.getContainer();
-                    if (osmContainer && osmContainer.style) {
-                        osmContainer.style.transition = 'opacity 2s ease';
-                    }
-                }
-                if (typeof window.osmLayer.setOpacity === 'function') {
-                    window.osmLayer.setOpacity(0);
-                }
+        
+        // ★ 修正：ピンチ操作の慣性等による goBack の連発（県選択まで戻ってしまうバグ）を止める
+        window.map.stop();
+
+        // OSMを削除せず、フェードアウトして裏側に保持する
+        if (window.osmLayer) {
+            const osmContainer = window.osmLayer.getContainer();
+            if (osmContainer) {
+                osmContainer.style.transition = 'opacity 2s ease';
+                window.osmLayer.setOpacity(0);
                 setTimeout(() => {
-                    if (window.osmLayer && typeof window.osmLayer.setZIndex === 'function') {
-                        window.osmLayer.setZIndex(1);
-                    }
+                    if (window.osmLayer) window.osmLayer.setZIndex(1);
                 }, 2000);
             }
+        }
 
-            if (window.phase1Group && typeof window.phase1Group.clearLayers === 'function') window.phase1Group.clearLayers();
-            if (window.areaSpotLayer && typeof window.areaSpotLayer.clearLayers === 'function') window.areaSpotLayer.clearLayers();
+        if (window.phase1Group) window.phase1Group.clearLayers();
+        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+        // ショップマーカーのレイヤーを確実に消し去る
+        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
+            window.markerControl.clearLayers();
+        }
+
+        // GSI(航空写真)を透明な状態で準備し、DOM反映後にフェードインさせる
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
+        } else {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
+            if (!window.map.hasLayer(window.gsiLayer)) {
+                window.gsiLayer.addTo(window.map);
+            }
+        }
+
+        requestAnimationFrame(() => {
+            const gsiContainer = window.gsiLayer.getContainer();
+            if (gsiContainer) {
+                gsiContainer.style.transition = 'opacity 2s ease';
+                window.gsiLayer.setZIndex(100);
+                window.gsiLayer.setOpacity(1);
+            }
+        });
+
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+
+        let isPrefReturned = false;
+        const completePrefReturn = () => {
+            if (isPrefReturned) return;
+            isPrefReturned = true;
+
+            window.map.invalidateSize(true);
             
-            // ★ ショップマーカーのレイヤーを確実に消し去る
-            if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
-                window.markerControl.clearLayers();
-            }
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            setIdealQuery('area', null);
+            setIdealQuery('spot', null);
 
-            // ★ GSI(航空写真)を透明な状態で準備し、DOM反映後にフェードインさせる
-            if (!window.gsiLayer) {
-                if (window.gsiLayers && window.gsiLayers.ort) {
-                    window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
-                }
-            } else {
-                if (window.gsiLayers && window.gsiLayers.ort && typeof window.gsiLayer.setUrl === 'function') {
-                    window.gsiLayer.setUrl(window.gsiLayers.ort);
-                }
-                if (window.map && !window.map.hasLayer(window.gsiLayer)) {
-                    window.gsiLayer.addTo(window.map);
-                }
-            }
+            window.currentAreaId = null;
+            window.currentSpotId = null;
 
-            requestAnimationFrame(() => {
-                if (window.gsiLayer && typeof window.gsiLayer.getContainer === 'function') {
-                    const gsiContainer = window.gsiLayer.getContainer();
-                    if (gsiContainer && gsiContainer.style) {
-                        gsiContainer.style.transition = 'opacity 2s ease';
-                    }
-                }
-                if (window.gsiLayer) {
-                    if (typeof window.gsiLayer.setZIndex === 'function') window.gsiLayer.setZIndex(100);
-                    if (typeof window.gsiLayer.setOpacity === 'function') window.gsiLayer.setOpacity(1);
-                }
-            });
+            initAreaUI();
+            showPrefSpots();
+            renderPrefWeather();
+            resetAreaGuide();
 
-            // 過去のバウンズを完全に破壊する
-            if (window.map) {
-                window.map.setMaxBounds(null);
-                if (window.map.options) window.map.options.maxBoundsViscosity = 0;
-            }
+            // ★ 修正：ロック解除を最後に少し遅らせることで、連続発火を確実にガードする
+            setTimeout(() => {
+                releaseLockAndShowBtn(); 
+            }, 100);
+        };
 
-            if (window.prefData) {
-                drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-            }
+        const centerPref = window.map.getCenter();
+        const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && window.map.getZoom() === window.prefData.zoom;
 
-            let isPrefReturned = false;
-            const completePrefReturn = () => {
-                if (isPrefReturned) return;
-                isPrefReturned = true;
-
-                if (window.map && typeof window.map.invalidateSize === 'function') window.map.invalidateSize(true);
-                
-                if (window.prefData && typeof setIdealQuery === 'function') setIdealQuery('pref', window.prefData.notes);
-                if (typeof setIdealQuery === 'function') {
-                    setIdealQuery('area', null);
-                    setIdealQuery('spot', null);
-                }
-
-                window.currentAreaId = null;
-                window.currentSpotId = null;
-
-                if (typeof initAreaUI === 'function') initAreaUI();
-                if (typeof showPrefSpots === 'function') showPrefSpots();
-                if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                if (typeof resetAreaGuide === 'function') resetAreaGuide();
-
-                if (typeof releaseLockAndShowBtn === 'function') releaseLockAndShowBtn(); 
-            };
-
-            if (window.prefData && window.map) {
-                const centerPref = window.map.getCenter();
-                const isSamePref = centerPref && 
-                                   Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && 
-                                   Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && 
-                                   window.map.getZoom() === window.prefData.zoom;
-
-                if (isSamePref) {
-                    setTimeout(completePrefReturn, 50);
-                } else {
-                    window.map.once('moveend', completePrefReturn);
-                    setTimeout(completePrefReturn, 800); 
-                }
-            } else {
-                completePrefReturn();
-            }
-
-        } catch (err) {
-            // 万が一エラーが起きてもスクリプトを止めず、画面に表示する
-            if (typeof showdebug === 'function') {
-                showdebug("goBack③エラー: " + err.message);
-            }
-            console.error("goBack③スクリプトエラー:", err);
-            window.goBackGuard = false; 
+        if (isSamePref) {
+            setTimeout(completePrefReturn, 50);
+        } else {
+            window.map.once('moveend', completePrefReturn);
+            setTimeout(completePrefReturn, 800); 
         }
         return;
     }
