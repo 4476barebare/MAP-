@@ -1570,11 +1570,22 @@ function zoomToSpot(spot) {
         }).addTo(window.map);
 
         window.gsiLayer.once('load', () => {
-            const container = window.gsiLayer.getContainer();
-            if (container) {
-                container.style.transition = 'opacity 2s ease';
+            const gsiContainer = window.gsiLayer.getContainer();
+            // OSMレイヤーのコンテナも取得
+            const osmContainer = window.osmLayer ? window.osmLayer.getContainer() : null;
+
+            if (gsiContainer) {
+                // 1. GSIタイルをフェードイン
+                gsiContainer.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(1);
                 
+                // 2. ★追加：OSMタイルを同時にフェードアウト
+                if (osmContainer) {
+                    osmContainer.style.transition = 'opacity 2s ease';
+                    window.osmLayer.setOpacity(0);
+                }
+                
+                // 3. フェード完了（2秒）を待ってから裏のOSMを完全に消去
                 setTimeout(() => {
                     if (window.osmLayer) {
                         window.map.removeLayer(window.osmLayer);
@@ -1582,7 +1593,7 @@ function zoomToSpot(spot) {
                     }
                     isFadeEnded = true;
                     checkAndUnlockGuard();
-                }, 800);
+                }, 2000); // transitionの2sに合わせて2000msに変更
             } else {
                 isFadeEnded = true;
                 checkAndUnlockGuard();
