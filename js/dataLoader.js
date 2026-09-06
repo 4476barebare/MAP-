@@ -783,65 +783,6 @@ function enableDragForArea() {
     window.map.options.maxBoundsViscosity = 1.0;
 }
 
-// =====================================================
-// ★ 新規: ドラッグ移動時にエリアの切り替わりを検知する関数
-// =====================================================
-function checkAreaChangeOnDrag() {
-    // ズーム13（スポット画面）の時だけ判定を走らせる
-    if (window.map.getZoom() !== 13) return;
-
-    const center = window.map.getCenter();
-    let nearestSpot = null;
-    let minDistance = Infinity;
-
-    // 1. 画面の中央に最も近いスポットを探す
-    if (window.spotData && window.spotData.length > 0) {
-        window.spotData.forEach(spot => {
-            const lat = Number(spot.lat);
-            const lng = Number(spot.lng);
-            if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                // Leafletの距離計算機能を使って一番近いスポットを割り出す
-                const distance = center.distanceTo(L.latLng(lat, lng));
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearestSpot = spot;
-                }
-            }
-        });
-    }
-
-    // 2. 最寄りスポットのエリアが「現在のエリア」と違っていたら更新処理を走らせる
-    if (nearestSpot && nearestSpot.areaId !== window.currentAreaId) {
-        
-        // 現在のエリアIDを上書き
-        window.currentAreaId = nearestSpot.areaId;
-
-        // =====================================================
-        // ▼ エリアが切り替わった時に実行したい関数群をここに並べる
-        // =====================================================
-
-        // ★ 追加：URLクエリを新しいエリア名に更新し、スポットをリセットする
-        const newArea = window.areaData.find(a => window.currentAreaId.endsWith(a.individualId));
-        if (newArea && typeof setIdealQuery === 'function') {
-            setIdealQuery('area', newArea.name);
-            setIdealQuery('spot', null);
-        }
-
-        // 例: ショップマーカー（釣具店など）を新しいエリアのデータで出し直す
-        if (window.markerControl && typeof markerControl.showShop02 === 'function') {
-            markerControl.showShop02(window.currentAreaId);
-        }
-
-        // 例: fishdata のロードなど、必要な関数があればここに追加
-         if (typeof loadFishData === 'function') loadFishData(window.currentAreaId);
-        
-        // 例: エリア名などを更新するUI関数
-         if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
-        
-        console.log("スワイプ移動によりエリアが切り替わりました:", window.currentAreaId);
-    }
-}
-
 function phase1menu(areaId) {
 
     window.substitute = null;
@@ -1100,7 +1041,21 @@ function enablePhase2(map) {
                             });
                             return;
                         } else {
+                            // =====================================================
+                            // ★ 修正：システム変数のリセットとクエリの同期
+                            // =====================================================
                             window.currentAreaId = nearestSpot.areaId;
+                            window.currentSpotId = null; // スポット選択状態を確実に解除
+                            
+                            // ★ ご指摘の通り、専用関数を使ってクエリを同期！
+                            if (typeof updateQueryFromIds === 'function') {
+                                updateQueryFromIds(window.currentPref, window.currentAreaId, null);
+                            }
+
+                            // UI（メニューやSEO）も新しいエリアに合わせて更新
+                            if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
+                            if (typeof updateSeoMeta === 'function') updateSeoMeta();
+                            // =====================================================
                             
                             const targetAreaSpots = window.spotData.filter(s => s.areaId === window.currentAreaId);
                             if (targetAreaSpots.length > 0) {
