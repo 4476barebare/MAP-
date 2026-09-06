@@ -2827,8 +2827,12 @@ function goBack() {
         }, 300); 
     }
 
+    // 二重発火しても安全にフラグを解除してボタンを戻す処理
+    let isReleased = false;
     const releaseLockAndShowBtn = () => {
-        window.goBackGuard = false; // ★ 統一
+        if (isReleased) return;
+        isReleased = true;
+        window.goBackGuard = false; // ★ ここで確実にロック解除
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
@@ -2873,7 +2877,7 @@ function goBack() {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
-            window.goBackGuard = false; // ★ 統一
+            window.goBackGuard = false; 
         }, 300);
 
         loadRegionMap(regionToLoad);
@@ -2885,7 +2889,7 @@ function goBack() {
 
     const area = window.areaData.find(a => String(a.individualId) === String(window.currentAreaId?.split('_')[1]));
     if (!area) { 
-        window.goBackGuard = false; // ★ 統一
+        window.goBackGuard = false; 
         return; 
     }
 
@@ -2913,7 +2917,7 @@ function goBack() {
         if (window.phase2Group) window.phase2Group.clearLayers();
 
         if (!restoreSpot) {
-            window.goBackGuard = false; // ★ 統一
+            window.goBackGuard = false; 
             return;
         }
 
@@ -2927,23 +2931,22 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
+        // ★ selectSpot を呼び出す
         selectSpot(restoreSpot);
 
-        const center = window.map.getCenter();
-        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && Math.abs(center.lng - restoreSpot.lng) < 0.0001 && window.map.getZoom() === 13;
+        // ★ ユーザー様が検証済みの「setIntervalによる確実な完了待機ロジック」を復活
+        const checkCompletion = setInterval(() => {
+            if (window._selectSpotCompleted) {
+                clearInterval(checkCompletion);
+                window._selectSpotCompleted = false;
+                
+                clearSpotUI();
+                enablePhase2(window.map);
+                phase1menu(window.currentAreaId);
+                releaseLockAndShowBtn(); // ここでフラグが解除される
+            }
+        }, 50);
         
-        const completePhase1Return = () => {
-            clearSpotUI();
-            enablePhase2(window.map);
-            phase1menu(window.currentAreaId);
-            releaseLockAndShowBtn();
-        };
-
-        if (isSame) {
-            completePhase1Return();
-        } else {
-            window.map.once('moveend', completePhase1Return);
-        }
         return;
     }
 
@@ -2995,10 +2998,12 @@ function goBack() {
         const center = window.map.getCenter();
         const isSame = Math.abs(center.lat - area.lat) < 0.0001 && Math.abs(center.lng - area.lng) < 0.0001 && window.map.getZoom() === targetZoom;
 
+        // ★ moveendのすっぽ抜けによるフリーズ（フラグの解除漏れ）を防ぐ
         if (isSame) {
-            releaseLockAndShowBtn();
+            setTimeout(releaseLockAndShowBtn, 50);
         } else {
             window.map.once('moveend', releaseLockAndShowBtn);
+            setTimeout(releaseLockAndShowBtn, 800); // 念のためのフェイルセーフ
         }
         return;
     }
@@ -3025,7 +3030,11 @@ function goBack() {
 
     drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
 
+    let isPrefReturned = false;
     const completePrefReturn = () => {
+        if (isPrefReturned) return;
+        isPrefReturned = true;
+
         window.map.invalidateSize(true);
         
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
@@ -3040,18 +3049,21 @@ function goBack() {
         renderPrefWeather();
         resetAreaGuide();
 
-        releaseLockAndShowBtn();
+        releaseLockAndShowBtn(); // ここでフラグが解除される
     };
 
     const centerPref = window.map.getCenter();
     const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && window.map.getZoom() === window.prefData.zoom;
 
+    // ★ ここでも moveend のすっぽ抜けによるフリーズを防ぐ
     if (isSamePref) {
-        completePrefReturn();
+        setTimeout(completePrefReturn, 50);
     } else {
         window.map.once('moveend', completePrefReturn);
+        setTimeout(completePrefReturn, 800); // 念のためのフェイルセーフ
     }
 }
+
 
 function buildSpotRestoreObject() {
 
