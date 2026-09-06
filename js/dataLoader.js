@@ -1490,17 +1490,15 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
     if (!window.map || !spot) return;
 
-    // =====================================================
-    // ★ 追加：zoomが空欄（ポップアップ専用）なら詳細画面に入らずポップアップを出して終了
-    // =====================================================
     if (!spot.zoom || spot.zoom === '') {
         if (typeof showFishPopup === 'function') {
             showFishPopup(spot);
         }
         return;
     }
-    // ★ 名称を変更して汎用的なガードとして使い回す
-window.goBackGuard = true;
+
+    // ★ ここでガードをONにする
+    window.goBackGuard = true;
 
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
@@ -1520,7 +1518,6 @@ window.goBackGuard = true;
     const targetLat = safe.lat;
     const targetLng = safe.lng;
     
-    // 目的のタイルURLを決定
     let tileUrl;
     if (typeParts.includes('ort')) {
         tileUrl = window.TILE_URLS.ort;
@@ -1533,43 +1530,57 @@ window.goBackGuard = true;
     }
 
     window.currentSpotBaseTile = tileUrl;
-
-    // =====================================================
-    // ★ 修正：OSMから目的タイルへのフェードイントランジション
-    // =====================================================
     const hasOSM = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
+    // =====================================================
+    // ★ 修正：ロック解除のタイミングを完璧に管理する
+    // =====================================================
+    let isMoveEnded = false;
+    let isFadeEnded = !hasOSM; // OSMがない場合はフェード待ちは不要
+
+    // アニメーションとフェードの両方が完了した時だけロックを解除する
+    const tryUnlockGuard = () => {
+        if (isMoveEnded && isFadeEnded) {
+            window.goBackGuard = false;
+            clearTimeout(safetyUnlock); // 完了したら保険タイマーを消す
+        }
+    };
+
+    // フェイルセーフ：万が一タイルのロードが失敗しても4秒後に必ずロック解除
+    const safetyUnlock = setTimeout(() => {
+        window.goBackGuard = false;
+    }, 4000);
+
     if (hasOSM) {
-        // --- 1. OSMが存在する場合（通常操作） ---
-        // 目的のタイル（gsiLayer）を透明（opacity: 0）で上に被せてロード開始
         if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
         window.gsiLayer = L.tileLayer(tileUrl, { 
             attribution: '国土地理院', 
             detectRetina: false,
-            opacity: 0, // 最初は透明
-            zIndex: 100 // OSM(通常1)より上に配置
+            opacity: 0, 
+            zIndex: 100 
         }).addTo(window.map);
 
-        // ロード完了（またはアニメーション完了後）にフェードインさせる
         window.gsiLayer.once('load', () => {
-            // CSSトランジションを付与してフワッと表示
             const container = window.gsiLayer.getContainer();
             if (container) {
                 container.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(1);
                 
-                // フェードインが終わったら裏のOSMを消去する
                 setTimeout(() => {
                     if (window.osmLayer) {
                         window.map.removeLayer(window.osmLayer);
                         window.osmLayer = null;
                     }
+                    // フェード処理完了
+                    isFadeEnded = true;
+                    tryUnlockGuard();
                 }, 800);
+            } else {
+                isFadeEnded = true;
+                tryUnlockGuard();
             }
         });
     } else {
-        // --- 2. URL直打ち等でOSMが存在しない場合 ---
-        // 従来通り即座に目的のタイルをセットする
         if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
         window.gsiLayer = L.tileLayer(tileUrl, { 
             attribution: '国土地理院', 
@@ -1579,7 +1590,6 @@ window.goBackGuard = true;
 
     const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
 
-    // ★ 移動前はロックを完全に外す
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     window.map.dragging.disable();
@@ -1587,10 +1597,7 @@ window.goBackGuard = true;
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // ズーム移動開始（OSMがある場合はOSMのままズームされていく）
     window.map.flyTo([targetLat, targetLng], targetZoom, { duration: 0.5 });
-
-    // ... (以下、`const el = document.getElementById("nearest-spot");` 以降はそのまま)
 
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
@@ -1611,7 +1618,6 @@ window.goBackGuard = true;
         window.currentSpotId = safe.individualId;
     }
 
-    // ★ 移動アニメーション完了後に、独自のスポットBoundsでロックする
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         showFishMarkers(safe.URL);
@@ -1622,9 +1628,6 @@ window.goBackGuard = true;
         let bounds = window.map.getBounds();
         let zoomLimit;
 
-        // =====================================================
-        // 1. ベースとなるズーム制限と可動範囲の設定
-        // =====================================================
         if (isSpecial || safe.zoom < 14) {
             const paddingDiff = 14 - safe.zoom;
             bounds = bounds.pad(paddingDiff);
@@ -1633,9 +1636,6 @@ window.goBackGuard = true;
             zoomLimit = safe.zoom;
         }
 
-        // =====================================================
-        // 2. ★ 修正：すべてのスポットで、魚マーカーが収まるように範囲を拡張する
-        // =====================================================
         if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
             const fishList = safe.URL.split(',');
             fishList.forEach(item => {
@@ -1648,10 +1648,8 @@ window.goBackGuard = true;
             });
         }
         
-        // 3. 画面端ギリギリにならないよう、共通で全体に5%の余白を足す
         bounds = bounds.pad(0.05);
 
-        // 確定した正確な範囲でドラッグをロック
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0; 
 
@@ -1663,10 +1661,10 @@ window.goBackGuard = true;
         window.map.doubleClickZoom.enable();
         window.map.touchZoom.enable();
         
-        // ★ 名称を変更して汎用的なガードとして使い回す
-window.goBackGuard = false;
+        // 移動処理完了
+        isMoveEnded = true;
+        tryUnlockGuard();
     });
-
 }
 
 function showFishMarkers(url) {
