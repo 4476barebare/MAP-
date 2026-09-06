@@ -1004,6 +1004,7 @@ function enablePhase2(map) {
     }
     
     const runPhase2 = () => {
+        clearSpotUI();
         // 無効状態、または引き戻し（スナップバック）中なら何もしない
         if (!window.phase2Initialized || window._isSnappingBack) return;
 
