@@ -1663,6 +1663,7 @@ function zoomToSpot(spot) {
 
         window._zoomGuardBase = zoomLimit;
         window._zoomGuardActive = true;
+        window.map.setMinZoom(zoomLimit);
 
         window.map.dragging.enable();
         
