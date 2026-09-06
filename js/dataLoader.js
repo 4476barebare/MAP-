@@ -682,8 +682,18 @@ function showSpotsForArea(areaKey) {
     }
 }
 
-function selectSpot(spot) {
+async function selectSpot(spot) {
     if (!window.map || !spot) return;
+
+    // =====================================================
+    // ★ 修正：未ロードエリアのスポットがクリックされた場合、
+    // 確実に魚データ(spot.URL)を生成してから処理を進める
+    // =====================================================
+    if (spot.areaId) {
+        if (typeof spot.URL === 'undefined') {
+            await prepareFishForArea(spot.areaId);
+        }
+    }
     
     const currentZoom = window.map.getZoom();
 
