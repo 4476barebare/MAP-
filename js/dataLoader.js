@@ -514,6 +514,7 @@ function selectArea(area) {
         : area;
 
     if (!areaObj) return;
+    
 
     // ★ 追加: 前の画面(スポット等)のBoundsを確実に破棄
     window.map.setMaxBounds(null);
@@ -556,6 +557,7 @@ function selectArea(area) {
         showSpotsForArea(window.currentAreaId);
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
+        clearSpotUI();
         
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
