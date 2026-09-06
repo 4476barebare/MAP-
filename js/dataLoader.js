@@ -1574,7 +1574,7 @@ function zoomToSpot(spot) {
     let isMoveEnded = false;
     let isFadeEnded = !hasOSM; 
 
-    // 保険：OSMタイルのロードが詰まっても3秒後に必ず解除する
+    // 保険：タイルのロードが詰まっても3秒後に必ず解除する
     const safetyTimer = setTimeout(() => {
         isFadeEnded = true;
         checkAndUnlockGuard();
@@ -1594,17 +1594,25 @@ function zoomToSpot(spot) {
     };
 
     if (hasOSM) {
-        if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
-        window.gsiLayer = L.tileLayer(tileUrl, { 
-            attribution: '国土地理院', 
-            detectRetina: false,
-            opacity: 0, 
-            zIndex: 100 
-        }).addTo(window.map);
+        // ★ 修正：GSI(航空写真)を最前面で透明に準備
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(tileUrl, { 
+                attribution: '国土地理院', 
+                detectRetina: false,
+                opacity: 0, 
+                zIndex: 100 
+            }).addTo(window.map);
+        } else {
+            window.gsiLayer.setUrl(tileUrl);
+            window.gsiLayer.setOpacity(0);
+            window.gsiLayer.setZIndex(100);
+            if (!window.map.hasLayer(window.gsiLayer)) {
+                window.gsiLayer.addTo(window.map);
+            }
+        }
 
         window.gsiLayer.once('load', () => {
             const gsiContainer = window.gsiLayer.getContainer();
-            // OSMレイヤーのコンテナも取得
             const osmContainer = window.osmLayer ? window.osmLayer.getContainer() : null;
 
             if (gsiContainer) {
@@ -1612,32 +1620,41 @@ function zoomToSpot(spot) {
                 gsiContainer.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(1);
                 
-                // 2. ★追加：OSMタイルを同時にフェードアウト
+                // 2. OSMタイルを同時にフェードアウト
                 if (osmContainer) {
                     osmContainer.style.transition = 'opacity 2s ease';
                     window.osmLayer.setOpacity(0);
                 }
                 
-                // 3. フェード完了（2秒）を待ってから裏のOSMを完全に消去
+                // 3. ★修正：OSMレイヤーを消さずに裏側へ回す
                 setTimeout(() => {
                     if (window.osmLayer) {
-                        window.map.removeLayer(window.osmLayer);
-                        window.osmLayer = null;
+                        window.osmLayer.setZIndex(1);
                     }
                     isFadeEnded = true;
                     checkAndUnlockGuard();
-                }, 2000); // transitionの2sに合わせて2000msに変更
+                }, 2000);
             } else {
                 isFadeEnded = true;
                 checkAndUnlockGuard();
             }
         });
     } else {
-        if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
-        window.gsiLayer = L.tileLayer(tileUrl, { 
-            attribution: '国土地理院', 
-            detectRetina: false 
-        }).addTo(window.map);
+        // OSMがない場合は即座にGSIを準備
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(tileUrl, { 
+                attribution: '国土地理院', 
+                detectRetina: false 
+            }).addTo(window.map);
+        } else {
+            window.gsiLayer.setUrl(tileUrl);
+            if (!window.map.hasLayer(window.gsiLayer)) {
+                window.gsiLayer.addTo(window.map);
+            }
+            // ZIndexや透明度を正常に戻す
+            window.gsiLayer.setZIndex(100);
+            window.gsiLayer.setOpacity(1);
+        }
     }
 
     const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
@@ -1707,6 +1724,7 @@ function zoomToSpot(spot) {
 
         window._zoomGuardBase = zoomLimit;
         window._zoomGuardActive = true;
+        // ★ 物理的にズームアウトを制限
         window.map.setMinZoom(zoomLimit);
 
         window.map.dragging.enable();
@@ -1715,6 +1733,7 @@ function zoomToSpot(spot) {
         checkAndUnlockGuard();
     });
 }
+
 
 function showFishMarkers(url) {
   if (!window.map) return;
