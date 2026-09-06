@@ -1493,9 +1493,6 @@ function showFishPopup(spot) {
 function zoomToSpot(spot) {
     if (!window.map || !spot) return;
 
-    // =====================================================
-    // ★ 追加：zoomが空欄（ポップアップ専用）なら詳細画面に入らずポップアップを出して終了
-    // =====================================================
     if (!spot.zoom || spot.zoom === '') {
         if (typeof showFishPopup === 'function') {
             showFishPopup(spot);
@@ -1524,7 +1521,6 @@ function zoomToSpot(spot) {
     const targetLat = safe.lat;
     const targetLng = safe.lng;
     
-    // 目的のタイルURLを決定
     let tileUrl;
     if (typeParts.includes('ort')) {
         tileUrl = window.TILE_URLS.ort;
@@ -1540,43 +1536,45 @@ function zoomToSpot(spot) {
     const hasOSM = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
     // =====================================================
-    // ★ 追加：2つの完了を待つためのフラグ管理
+    // ★ 修正：2つの完了を待つためのフラグ管理とフェイルセーフ
     // =====================================================
     let isMoveEnded = false;
-    let isFadeEnded = !hasOSM; // OSMがない場合はフェード待ち不要なので最初からtrue
+    let isFadeEnded = !hasOSM; 
+
+    // 保険：OSMタイルのロードが詰まっても3秒後に必ず解除する
+    const safetyTimer = setTimeout(() => {
+        isFadeEnded = true;
+        checkAndUnlockGuard();
+    }, 3000);
 
     const checkAndUnlockGuard = () => {
         if (isMoveEnded && isFadeEnded) {
-            window.goBackGuard = false;
-            window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
+            clearTimeout(safetyTimer);
+            // DOM反映を確実に待つために微小遅延させて解除
+            setTimeout(() => {
+                window.goBackGuard = false;
+                window.map.scrollWheelZoom.enable();
+                window.map.doubleClickZoom.enable();
+                window.map.touchZoom.enable();
+            }, 100);
         }
     };
 
-    // =====================================================
-    // ★ 修正：OSMから目的タイルへのフェードイントランジション
-    // =====================================================
     if (hasOSM) {
-        // --- 1. OSMが存在する場合（通常操作） ---
-        // 目的のタイル（gsiLayer）を透明（opacity: 0）で上に被せてロード開始
         if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
         window.gsiLayer = L.tileLayer(tileUrl, { 
             attribution: '国土地理院', 
             detectRetina: false,
-            opacity: 0, // 最初は透明
-            zIndex: 100 // OSM(通常1)より上に配置
+            opacity: 0, 
+            zIndex: 100 
         }).addTo(window.map);
 
-        // ロード完了（またはアニメーション完了後）にフェードインさせる
         window.gsiLayer.once('load', () => {
-            // CSSトランジションを付与してフワッと表示
             const container = window.gsiLayer.getContainer();
             if (container) {
                 container.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(1);
                 
-                // フェードインが終わったら裏のOSMを消去する（小フラグA）
                 setTimeout(() => {
                     if (window.osmLayer) {
                         window.map.removeLayer(window.osmLayer);
@@ -1591,8 +1589,6 @@ function zoomToSpot(spot) {
             }
         });
     } else {
-        // --- 2. URL直打ち等でOSMが存在しない場合 ---
-        // 従来通り即座に目的のタイルをセットする
         if (window.gsiLayer) window.map.removeLayer(window.gsiLayer);
         window.gsiLayer = L.tileLayer(tileUrl, { 
             attribution: '国土地理院', 
@@ -1602,7 +1598,6 @@ function zoomToSpot(spot) {
 
     const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
 
-    // ★ 移動前はロックを完全に外す
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     window.map.dragging.disable();
@@ -1610,10 +1605,7 @@ function zoomToSpot(spot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // ズーム移動開始（OSMがある場合はOSMのままズームされていく）
     window.map.flyTo([targetLat, targetLng], targetZoom, { duration: 0.5 });
-
-    // ... (以下、`const el = document.getElementById("nearest-spot");` 以降はそのまま)
 
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
@@ -1634,7 +1626,6 @@ function zoomToSpot(spot) {
         window.currentSpotId = safe.individualId;
     }
 
-    // ★ 移動アニメーション完了後に、独自のスポットBoundsでロックする（小フラグB）
     window.map.once('moveend', () => {
         window.map.invalidateSize(true);
         showFishMarkers(safe.URL);
@@ -1645,9 +1636,6 @@ function zoomToSpot(spot) {
         let bounds = window.map.getBounds();
         let zoomLimit;
 
-        // =====================================================
-        // 1. ベースとなるズーム制限と可動範囲の設定
-        // =====================================================
         if (isSpecial || safe.zoom < 14) {
             const paddingDiff = 14 - safe.zoom;
             bounds = bounds.pad(paddingDiff);
@@ -1656,9 +1644,6 @@ function zoomToSpot(spot) {
             zoomLimit = safe.zoom;
         }
 
-        // =====================================================
-        // 2. ★ 修正：すべてのスポットで、魚マーカーが収まるように範囲を拡張する
-        // =====================================================
         if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
             const fishList = safe.URL.split(',');
             fishList.forEach(item => {
@@ -1671,10 +1656,8 @@ function zoomToSpot(spot) {
             });
         }
         
-        // 3. 画面端ギリギリにならないよう、共通で全体に5%の余白を足す
         bounds = bounds.pad(0.05);
 
-        // 確定した正確な範囲でドラッグをロック
         window.map.setMaxBounds(bounds);
         window.map.options.maxBoundsViscosity = 1.0; 
 
@@ -1682,16 +1665,11 @@ function zoomToSpot(spot) {
         window._zoomGuardActive = true;
 
         window.map.dragging.enable();
-     //    window.map.scrollWheelZoom.enable();
-     //    window.map.doubleClickZoom.enable();
-     //    window.map.touchZoom.enable();
         
         isMoveEnded = true;
         checkAndUnlockGuard();
     });
-
 }
-
 
 function showFishMarkers(url) {
   if (!window.map) return;
@@ -1794,7 +1772,6 @@ function showFishMarkers(url) {
   // 最後にまとめてマップへ追加
   window.map.addLayer(window.fishLayer);
 }
-
 
 window.activeCol = null;
 
@@ -2089,7 +2066,6 @@ function createWeekItem(weekData) {
         });
     }
 }
-
 
 function resetWeatherUI() {
 
@@ -2780,7 +2756,6 @@ function clearAccessInfo() {
     }
 }
 
-
 function resetSpotLayers() {
 
     if (window.phase1Group) {
@@ -2803,7 +2778,6 @@ function resetSpotLayers() {
     }
 }
 
-
 // ==========================================
 // ★ スポット詳細UIの一括削除関数
 // ==========================================
@@ -2821,11 +2795,9 @@ function clearSpotUI() {
 
 }
 
-// ★ 名称を変更して汎用的なガードとして使い回す
 window.goBackGuard = false;
 
 function goBack() {
-    // ★ 古い _isGoingBack を廃止し、goBackGuard に完全統一
     if (window.goBackGuard) return;
     window.goBackGuard = true;
 
@@ -2850,12 +2822,11 @@ function goBack() {
         }, 300); 
     }
 
-    // 二重発火しても安全にフラグを解除してボタンを戻す処理
     let isReleased = false;
     const releaseLockAndShowBtn = () => {
         if (isReleased) return;
         isReleased = true;
-        window.goBackGuard = false; // ★ ここで確実にロック解除
+        window.goBackGuard = false; 
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
@@ -2916,15 +2887,13 @@ function goBack() {
         return; 
     }
 
-    const z = window.map.getZoom();
     const restoreSpot = buildSpotRestoreObject();
-    const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$').includes('special');
-    const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
     // =====================================================
-    // ① Phase2 -> Phase1（スポット詳細からPhase1に戻る）
+    // ★ 修正：階層の判定を「ズームレベル」から「システム変数」に変更
     // =====================================================
-    if ((z > 13 || isSpecial) && !isPhase2) {
+    // ① Phase2 -> Phase1（スポット詳細からエリア画面に戻る）
+    if (window.currentSpotId) {
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -2945,8 +2914,7 @@ function goBack() {
         }
  
         clearSpotUI();
-    const nsEl = document.getElementById("nearest-spot");
-    if (nsEl) nsEl.textContent = "";
+
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
         if (parentArea) setIdealQuery('area', parentArea.name);
@@ -2955,10 +2923,8 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
-        // ★ selectSpot を呼び出す
         selectSpot(restoreSpot);
 
-        // ★ ユーザー様が検証済みの「setIntervalによる確実な完了待機ロジック」を復活
         const checkCompletion = setInterval(() => {
             if (window._selectSpotCompleted) {
                 clearInterval(checkCompletion);
@@ -2967,7 +2933,7 @@ function goBack() {
                 clearSpotUI();
                 enablePhase2(window.map);
                 phase1menu(window.currentAreaId);
-                releaseLockAndShowBtn(); // ここでフラグが解除される
+                releaseLockAndShowBtn(); 
             }
         }, 50);
         
@@ -2976,8 +2942,7 @@ function goBack() {
 
     // =====================================================
     // ② Phase1 -> Area（エリア画面に戻る）
-    // =====================================================
-    if (z === 13 || isPhase2) {
+    if (window.currentAreaId) {
         disablePhase2(window.map);
         clearSub2Weather();
         
@@ -3022,72 +2987,16 @@ function goBack() {
         const center = window.map.getCenter();
         const isSame = Math.abs(center.lat - area.lat) < 0.0001 && Math.abs(center.lng - area.lng) < 0.0001 && window.map.getZoom() === targetZoom;
 
-        // ★ moveendのすっぽ抜けによるフリーズ（フラグの解除漏れ）を防ぐ
         if (isSame) {
             setTimeout(releaseLockAndShowBtn, 50);
         } else {
             window.map.once('moveend', releaseLockAndShowBtn);
-            setTimeout(releaseLockAndShowBtn, 800); // 念のためのフェイルセーフ
+            setTimeout(releaseLockAndShowBtn, 800); 
         }
         return;
     }
 
-    // =====================================================
-    // ③ Area -> Pref（県画面に戻る）
-    // =====================================================
-    if (window.osmLayer) {
-        window.map.removeLayer(window.osmLayer);
-        window.osmLayer = null;
-    }
-
-    if (window.phase1Group) window.phase1Group.clearLayers();
-    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-
-    if (!window.gsiLayer) {
-        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-    } else {
-        window.gsiLayer.setUrl(window.gsiLayers.ort);
-    }
-
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-
-    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-
-    let isPrefReturned = false;
-    const completePrefReturn = () => {
-        if (isPrefReturned) return;
-        isPrefReturned = true;
-
-        window.map.invalidateSize(true);
-        
-        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-        setIdealQuery('area', null);
-        setIdealQuery('spot', null);
-
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-
-        initAreaUI();
-        showPrefSpots();
-        renderPrefWeather();
-        resetAreaGuide();
-
-        releaseLockAndShowBtn(); // ここでフラグが解除される
-    };
-
-    const centerPref = window.map.getCenter();
-    const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && window.map.getZoom() === window.prefData.zoom;
-
-    // ★ ここでも moveend のすっぽ抜けによるフリーズを防ぐ
-    if (isSamePref) {
-        setTimeout(completePrefReturn, 50);
-    } else {
-        window.map.once('moveend', completePrefReturn);
-        setTimeout(completePrefReturn, 800); // 念のためのフェイルセーフ
-    }
 }
-
 
 function buildSpotRestoreObject() {
 
