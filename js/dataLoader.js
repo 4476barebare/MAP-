@@ -722,7 +722,7 @@ function selectSpot(spot) {
             }
         ).addTo(window.map);
     } else {
-        // すでに存在する場合も透明にリセットして被せる
+        // すでに存在する場合も透明にリセットして被せる[span_0](start_span)[span_0](end_span)
         if (!window.map.hasLayer(window.osmLayer)) {
             window.osmLayer.addTo(window.map);
         }
@@ -746,15 +746,18 @@ function selectSpot(spot) {
                 window.gsiLayer.setOpacity(0);
             }
             
-            // 3. フェード完了後に不要なGSIをDOMから取り除く
+            // 3. ★修正：GSIレイヤーを削除せず、透明なまま裏側で使い回す
             setTimeout(() => {
+                // removeLayer を廃止し、次回の切り替え（goBackなど）で即座に再利用できるように維持
+                // 必要であれば、確実に裏に回すために zIndex を下げることも可能です
                 if (window.gsiLayer) {
-                    window.map.removeLayer(window.gsiLayer);
-                    // goBack時に再生成されるため、ここでは剥がすだけでOK
+                    window.gsiLayer.setZIndex(1);
                 }
             }, 2000);
         }
     });
+
+
 
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
@@ -3003,13 +3006,17 @@ function goBack() {
             }
         });
 
-        window.map.eachLayer(layer => {
-            if (!(layer instanceof L.TileLayer)) return;
-            const url = layer._url || '';
-            if (url.includes('openstreetmap')) window.map.removeLayer(layer);
-        });
-
-        window.osmLayer = null;
+        // ★ 修正：OSMを削除せず、フェードアウトして裏側に保持する
+        if (window.osmLayer) {
+            const osmContainer = window.osmLayer.getContainer();
+            if (osmContainer) {
+                osmContainer.style.transition = 'opacity 2s ease';
+                window.osmLayer.setOpacity(0);
+                setTimeout(() => {
+                    if (window.osmLayer) window.osmLayer.setZIndex(1); // アニメ完了後に裏へ
+                }, 2000);
+            }
+        }
 
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -3019,12 +3026,25 @@ function goBack() {
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
+        // ★ 修正：GSI(航空写真)をフェードインして再利用する
         if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort);
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
         } else {
             window.gsiLayer.setUrl(window.gsiLayers.ort);
+            if (!window.map.hasLayer(window.gsiLayer)) {
+                window.gsiLayer.addTo(window.map);
+            }
         }
-        window.gsiLayer.addTo(window.map);
+        
+        // 描画サイクルを待ってからGSIの透明度を1に戻す（フェードイン）
+        requestAnimationFrame(() => {
+            const gsiContainer = window.gsiLayer.getContainer();
+            if (gsiContainer) {
+                gsiContainer.style.transition = 'opacity 2s ease';
+                window.gsiLayer.setZIndex(100);
+                window.gsiLayer.setOpacity(1);
+            }
+        });
 
         selectArea(area);
         renderCrowdImage();
@@ -3047,19 +3067,40 @@ function goBack() {
     // 条件: currentSpotId は無く、areaId があり、ズームが 12.5 未満
     // =====================================================
     if (window.currentSpotId == null && window.currentAreaId != null && z < 12.5) {
+        
+        // ★ 修正：OSMを削除せず、フェードアウトして裏側に保持する
         if (window.osmLayer) {
-            window.map.removeLayer(window.osmLayer);
-            window.osmLayer = null;
+            const osmContainer = window.osmLayer.getContainer();
+            if (osmContainer) {
+                osmContainer.style.transition = 'opacity 2s ease';
+                window.osmLayer.setOpacity(0);
+                setTimeout(() => {
+                    if (window.osmLayer) window.osmLayer.setZIndex(1);
+                }, 2000);
+            }
         }
 
         if (window.phase1Group) window.phase1Group.clearLayers();
         if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
 
+        // ★ 修正：GSI(航空写真)を透明な状態で準備し、DOM反映後にフェードインさせる
         if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
         } else {
             window.gsiLayer.setUrl(window.gsiLayers.ort);
+            if (!window.map.hasLayer(window.gsiLayer)) {
+                window.gsiLayer.addTo(window.map);
+            }
         }
+
+        requestAnimationFrame(() => {
+            const gsiContainer = window.gsiLayer.getContainer();
+            if (gsiContainer) {
+                gsiContainer.style.transition = 'opacity 2s ease';
+                window.gsiLayer.setZIndex(100);
+                window.gsiLayer.setOpacity(1);
+            }
+        });
 
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
