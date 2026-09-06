@@ -700,43 +700,64 @@ function selectSpot(spot) {
     if (window.phase1Group) {
         window.phase1Group.clearLayers();
     }
-    window.osmLayer = L.tileLayer(
-        window.TILE_URLS.osm, // ★ ここを変数に置き換え
-        {
-            attribution: '© OpenStreetMap contributors',
-            className: 'osm-solid-layer',
-            updateWhenIdle: false,
-            updateWhenZooming: true,
-            updateWhenDragging: true,
-            keepBuffer: 4,
-            fadeAnimation: false
-        }
-    ).addTo(window.map);
 
-
+    // =====================================================
+    // ★ 修正1：OSMレイヤーの無限増殖（チラつき）を防止し、再利用する
+    // =====================================================
+    if (!window.osmLayer) {
+        window.osmLayer = L.tileLayer(
+            window.TILE_URLS.osm,
+            {
+                attribution: '© OpenStreetMap contributors',
+                className: 'osm-solid-layer',
+                updateWhenIdle: false,
+                updateWhenZooming: true,
+                updateWhenDragging: true,
+                keepBuffer: 4,
+                fadeAnimation: false
+            }
+        );
+    }
+    
+    // まだ地図に追加されていなければ追加し、確実に最前面へ持ってくる
+    if (!window.map.hasLayer(window.osmLayer)) {
+        window.osmLayer.addTo(window.map);
+    }
+    window.osmLayer.bringToFront();
 
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     disableAreaSwipe();
 
+    // =====================================================
+    // ★ 修正2：moveendイベントのすっぽ抜け（フリーズ）を防止する
+    // =====================================================
+    const center = window.map.getCenter();
+    const isSameLoc = Math.abs(center.lat - spot.lat) < 0.0001 && 
+                      Math.abs(center.lng - spot.lng) < 0.0001 && 
+                      window.map.getZoom() === 13;
+
     drawLocation(spot.name, spot.lat, spot.lng, 13);
-//enablePhase2(window.map);早過ぎ
-    window.map.once('moveend', () => {
+
+    // アニメーション完了後に行う一連の処理
+    const finalizeSelectSpot = () => {
         window.map.invalidateSize(true);
-//enablePhase2(window.map);遅過ぎ
         requestAnimationFrame(() => {
-
-
-                enableDragForArea();
-                enablePhase2(window.map);
-
-    window.map.getContainer().classList.add('is-spot-mode');
-    window._selectSpotCompleted = true;
-
+            enableDragForArea();
+            enablePhase2(window.map);
+            window.map.getContainer().classList.add('is-spot-mode');
+            window._selectSpotCompleted = true;
         });
-    });
+    };
 
+    if (isSameLoc) {
+        // すでに目的地にいる場合はアニメーションが起きないため即時実行
+        finalizeSelectSpot();
+    } else {
+        // 移動が発生する場合はアニメーション完了を待つ
+        window.map.once('moveend', finalizeSelectSpot);
+    }
 }
 
 function enableDragForArea() {
