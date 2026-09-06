@@ -2285,7 +2285,9 @@ async function routeUpdate() {
         setIdealQuery('spot', null);                 
 
         const targetZoom = window.prefData.zoom;
-        const center = window.map.getCenter();
+        
+        // ★ 修正：直打ち時（マップ未生成時）に getCenter() を呼んで真っ白にクラッシュするバグを修正
+        const center = window.map ? window.map.getCenter() : null;
         const isSameLoc = center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
                           Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
                           window.map.getZoom() === targetZoom;
@@ -2294,8 +2296,6 @@ async function routeUpdate() {
         
         const finalizePref = () => {
             window.map.invalidateSize(true);
-            
-            // ★ 私が勝手に入れた enableDragForArea() を削除
             
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
@@ -2321,6 +2321,7 @@ async function routeUpdate() {
             window.map.once('moveend', finalizePref);
         }
     }
+
 
 }
 
