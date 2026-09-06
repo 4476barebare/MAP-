@@ -2278,35 +2278,50 @@ async function routeUpdate() {
         });
         return;
     }
-
     // ─── 県階層 ───
     if (window.prefData) {
         setIdealQuery('pref', window.prefData.notes); 
         setIdealQuery('area', null);                 
         setIdealQuery('spot', null);                 
 
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                if (typeof showPrefSpots === 'function') showPrefSpots();
-                if (typeof initAreaUI === 'function') initAreaUI();
-                if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                renderCrowdImage();
-                
-                // ★ 追加: 県画面を開いた際にもドラッグ範囲をセットして操作を解放する
-                if (typeof enableDragForArea === 'function') enableDragForArea();
+        const targetZoom = window.prefData.zoom;
+        const center = window.map.getCenter();
+        const isSameLoc = center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                          window.map.getZoom() === targetZoom;
 
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        
+        const finalizePref = () => {
+            window.map.invalidateSize(true);
+            
+            // ★ 私が勝手に入れた enableDragForArea() を削除
+            
+            requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    const btn = document.getElementById('map-back-btn');
-                    if (btn) {
-                        btn.style.display = 'block';
-                        requestAnimationFrame(() => { btn.style.opacity = '1'; });
-                    }
+                    if (typeof showPrefSpots === 'function') showPrefSpots();
+                    if (typeof initAreaUI === 'function') initAreaUI();
+                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                    renderCrowdImage();
+                    
+                    requestAnimationFrame(() => {
+                        const btn = document.getElementById('map-back-btn');
+                        if (btn) {
+                            btn.style.display = 'block';
+                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                        }
+                    });
                 });
             });
-        });
+        };
+
+        if (isSameLoc) {
+            finalizePref();
+        } else {
+            window.map.once('moveend', finalizePref);
+        }
     }
+
 }
 
 // ★ Region名の変換マッピング
