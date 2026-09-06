@@ -1187,7 +1187,7 @@ function enablePhase2(map) {
     // 初回として即座に1回実行させる
     runPhase2();
 
-    renderCrowdImage();
+    removeCrowdImage();
 }
 
 function disablePhase2(map) {
