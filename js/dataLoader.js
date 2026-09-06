@@ -717,12 +717,11 @@ function selectSpot(spot) {
                 updateWhenDragging: true,
                 keepBuffer: 4,
                 fadeAnimation: false,
-                opacity: 0, // ★ 最初は透明で追加
+                opacity: 0,
                 zIndex: 999 
             }
         ).addTo(window.map);
     } else {
-        // すでに存在する場合も透明にリセットして被せる[span_0](start_span)[span_0](end_span)
         if (!window.map.hasLayer(window.osmLayer)) {
             window.osmLayer.addTo(window.map);
         }
@@ -730,44 +729,48 @@ function selectSpot(spot) {
         window.osmLayer.setOpacity(0);
     }
 
-    // ★ ロード完了と同時にクロスフェード開始
-    window.osmLayer.once('load', () => {
+    // ★ 修正：キャッシュ済みで load イベントが発火しない対策
+    const doOsmFade = () => {
         const osmContainer = window.osmLayer.getContainer();
         const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
 
         if (osmContainer) {
-            // 1. OSMをフェードイン
             osmContainer.style.transition = 'opacity 2s ease';
             window.osmLayer.setOpacity(1);
 
-            // 2. 裏のGSI(航空写真)をフェードアウト
             if (gsiContainer && window.gsiLayer) {
                 gsiContainer.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(0);
             }
-            
-            // 3. ★修正：GSIレイヤーを削除せず、透明なまま裏側で使い回す
             setTimeout(() => {
-                // removeLayer を廃止し、次回の切り替え（goBackなど）で即座に再利用できるように維持
-                // 必要であれば、確実に裏に回すために zIndex を下げることも可能です
-                if (window.gsiLayer) {
-                    window.gsiLayer.setZIndex(1);
-                }
+                if (window.gsiLayer) window.gsiLayer.setZIndex(1);
             }, 2000);
         }
-    });
+    };
 
-
+    if (window.osmLayer.isLoading && window.osmLayer.isLoading()) {
+        let isLoaded = false;
+        window.osmLayer.once('load', () => {
+            if (isLoaded) return;
+            isLoaded = true;
+            doOsmFade();
+        });
+        // 1秒待っても来なければ強制実行
+        setTimeout(() => {
+            if (!isLoaded) {
+                isLoaded = true;
+                doOsmFade();
+            }
+        }, 1000);
+    } else {
+        requestAnimationFrame(doOsmFade);
+    }
 
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     disableAreaSwipe();
 
-
-    // =====================================================
-    // ★ 修正2：moveendイベントのすっぽ抜け（フリーズ）を防止する
-    // =====================================================
     const center = window.map.getCenter();
     const isSameLoc = Math.abs(center.lat - spot.lat) < 0.0001 && 
                       Math.abs(center.lng - spot.lng) < 0.0001 && 
@@ -775,7 +778,6 @@ function selectSpot(spot) {
 
     drawLocation(spot.name, spot.lat, spot.lng, 13);
 
-    // アニメーション完了後に行う一連の処理
     const finalizeSelectSpot = () => {
         window.map.invalidateSize(true);
         requestAnimationFrame(() => {
@@ -787,10 +789,8 @@ function selectSpot(spot) {
     };
 
     if (isSameLoc) {
-        // すでに目的地にいる場合はアニメーションが起きないため即時実行
         finalizeSelectSpot();
     } else {
-        // 移動が発生する場合はアニメーション完了を待つ
         window.map.once('moveend', finalizeSelectSpot);
     }
 }
@@ -1533,7 +1533,6 @@ function zoomToSpot(spot) {
         return;
     }
 
-    // ★ 名称を変更して汎用的なガードとして使い回す
     window.goBackGuard = true;
 
     window.map.getContainer().classList.add('is-spot-mode');
@@ -1568,13 +1567,9 @@ function zoomToSpot(spot) {
     window.currentSpotBaseTile = tileUrl;
     const hasOSM = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
-    // =====================================================
-    // ★ 修正：2つの完了を待つためのフラグ管理とフェイルセーフ
-    // =====================================================
     let isMoveEnded = false;
     let isFadeEnded = !hasOSM; 
 
-    // 保険：タイルのロードが詰まっても3秒後に必ず解除する
     const safetyTimer = setTimeout(() => {
         isFadeEnded = true;
         checkAndUnlockGuard();
@@ -1583,7 +1578,6 @@ function zoomToSpot(spot) {
     const checkAndUnlockGuard = () => {
         if (isMoveEnded && isFadeEnded) {
             clearTimeout(safetyTimer);
-            // DOM反映を確実に待つために微小遅延させて解除
             setTimeout(() => {
                 window.goBackGuard = false;
                 window.map.scrollWheelZoom.enable();
@@ -1594,7 +1588,6 @@ function zoomToSpot(spot) {
     };
 
     if (hasOSM) {
-        // ★ 修正：GSI(航空写真)を最前面で透明に準備
         if (!window.gsiLayer) {
             window.gsiLayer = L.tileLayer(tileUrl, { 
                 attribution: '国土地理院', 
@@ -1611,26 +1604,21 @@ function zoomToSpot(spot) {
             }
         }
 
-        window.gsiLayer.once('load', () => {
+        // ★ 修正：キャッシュ済みで load イベントが発火しない対策
+        const doGsiFade = () => {
             const gsiContainer = window.gsiLayer.getContainer();
             const osmContainer = window.osmLayer ? window.osmLayer.getContainer() : null;
 
             if (gsiContainer) {
-                // 1. GSIタイルをフェードイン
                 gsiContainer.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(1);
                 
-                // 2. OSMタイルを同時にフェードアウト
                 if (osmContainer) {
                     osmContainer.style.transition = 'opacity 2s ease';
                     window.osmLayer.setOpacity(0);
                 }
-                
-                // 3. ★修正：OSMレイヤーを消さずに裏側へ回す
                 setTimeout(() => {
-                    if (window.osmLayer) {
-                        window.osmLayer.setZIndex(1);
-                    }
+                    if (window.osmLayer) window.osmLayer.setZIndex(1);
                     isFadeEnded = true;
                     checkAndUnlockGuard();
                 }, 2000);
@@ -1638,9 +1626,25 @@ function zoomToSpot(spot) {
                 isFadeEnded = true;
                 checkAndUnlockGuard();
             }
-        });
+        };
+
+        if (window.gsiLayer.isLoading && window.gsiLayer.isLoading()) {
+            let isLoaded = false;
+            window.gsiLayer.once('load', () => {
+                if (isLoaded) return;
+                isLoaded = true;
+                doGsiFade();
+            });
+            setTimeout(() => {
+                if (!isLoaded) {
+                    isLoaded = true;
+                    doGsiFade();
+                }
+            }, 1000);
+        } else {
+            requestAnimationFrame(doGsiFade);
+        }
     } else {
-        // OSMがない場合は即座にGSIを準備
         if (!window.gsiLayer) {
             window.gsiLayer = L.tileLayer(tileUrl, { 
                 attribution: '国土地理院', 
@@ -1651,7 +1655,6 @@ function zoomToSpot(spot) {
             if (!window.map.hasLayer(window.gsiLayer)) {
                 window.gsiLayer.addTo(window.map);
             }
-            // ZIndexや透明度を正常に戻す
             window.gsiLayer.setZIndex(100);
             window.gsiLayer.setOpacity(1);
         }
@@ -1679,17 +1682,11 @@ function zoomToSpot(spot) {
         requestAnimationFrame(() => { tileBtn.style.opacity = '1'; });
     }
 
-    // =====================================================
-    // ★ 修正：システム変数(currentAreaId)の同期
-    // =====================================================
+    // ★ 修正：システム変数の強制上書きを削除し、純粋にセットだけ行うように戻す
     if (safe?.individualId != null) {
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => String(a.areaId + '_' + a.individualId) === String(safe.areaId));
-        if (parentArea) {
-            setIdealQuery('area', parentArea.name);
-            // ★ 追加：クリックしたスポットの所属エリアにシステム変数を強制上書き（隣のエリアのスポットを押した時のズレ解消）
-            window.currentAreaId = safe.areaId;
-        }
+        if (parentArea) setIdealQuery('area', parentArea.name);
         setIdealQuery('spot', safe.name);
         window.currentSpotId = safe.individualId;
     }
@@ -1731,7 +1728,6 @@ function zoomToSpot(spot) {
 
         window._zoomGuardBase = zoomLimit;
         window._zoomGuardActive = true;
-        // ★ 物理的にズームアウトを制限
         window.map.setMinZoom(zoomLimit);
 
         window.map.dragging.enable();
@@ -2958,7 +2954,6 @@ function goBack() {
     }
 
     const z = window.map.getZoom();
-
     // =====================================================
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
     // 条件: currentSpotId が存在する
@@ -2987,6 +2982,11 @@ function goBack() {
  
         clearSpotUI();
 
+        // ★ 追加：復元するスポットが別のエリアに属していたら、ここで安全にエリアを切り替える
+        if (restoreSpot.areaId && window.currentAreaId !== restoreSpot.areaId) {
+            window.currentAreaId = restoreSpot.areaId;
+        }
+
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
         if (parentArea) setIdealQuery('area', parentArea.name);
@@ -3011,7 +3011,6 @@ function goBack() {
         
         return;
     }
-
     // =====================================================
     // ② Phase2 (ズーム13 OSM) → Phase1 (ズーム13.5付近 エリアort) へ戻る
     // 条件: currentSpotId は無く、areaId があり、ズームが 12.5 〜 13.5 の間
@@ -3170,22 +3169,16 @@ function goBack() {
     window.goBackGuard = false;
 }
 
-
 function buildSpotRestoreObject() {
-
-    const areaId = window.currentAreaId;
     const spotId = window.currentSpotId;
 
-    if (!areaId || !spotId) return null;
+    if (!spotId) return null;
 
-    // ★ 修正：'_' が含まれていてもいなくても、確実に最後の部分（スポットキー）を抜く
     const parts = String(spotId).split('_');
     const spotKey = parts[parts.length - 1]; 
 
-    const spot = window.spotData.find(s =>
-        String(s.individualId) === String(spotKey) &&
-        String(s.areaId) === String(areaId)
-    );
+    // ★ 修正：現在の areaId に依存せず、全スポットからIDだけで検索する
+    const spot = window.spotData.find(s => String(s.individualId) === String(spotKey));
 
     if (!spot) return null;
 
@@ -3195,6 +3188,7 @@ function buildSpotRestoreObject() {
         lng: Number(spot.lng),
         zoom: 13,
         individualId: spot.individualId || spot.id || '',
+        areaId: spot.areaId || '', // ★ 追加：戻る時にエリアを更新するため
         type: spot.type || ''
     };
 }
