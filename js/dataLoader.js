@@ -785,6 +785,7 @@ async function selectSpot(spot) {
             enablePhase2(window.map);
             window.map.getContainer().classList.add('is-spot-mode');
             window._selectSpotCompleted = true;
+            window.goBackGuard = false;
         });
     };
 
@@ -2813,35 +2814,52 @@ function clearSpotUI() {
 window.goBackGuard = false;
 
 function goBack() {
+    // 実行中なら弾く
     if (window.goBackGuard) return;
-    window.goBackGuard = true;
 
-    if (window.map) {
-        window.map.getContainer().classList.remove('is-spot-mode');
-    }
+    // ★ 判定に使う変数を先に取得
+    const z = window.map ? window.map.getZoom() : 0;
+    const area = window.currentAreaId && window.areaData 
+        ? window.areaData.find(a => String(a.individualId) === String(window.currentAreaId.split('_')[1])) 
+        : null;
 
-    const backBtn = document.getElementById('map-back-btn');
-    if (backBtn) {
-        backBtn.style.pointerEvents = 'none'; 
-        backBtn.style.transition = 'opacity 0.3s ease';
-        backBtn.style.opacity = '0';
-    }
+    // =====================================
+    // 共通処理：各分岐に入った瞬間にガードをかけ、UIを隠す
+    // =====================================
+    const lockAndHideUI = () => {
+        window.goBackGuard = true; // ★ ご指示の通り、分岐の適切な開始位置でロック
 
-    const tileWrap = document.getElementById('tile-btn-wrap');
-    const tileBtn = document.getElementById('map-tile-btn');
-    if (tileWrap && tileBtn) {
-        tileBtn.style.opacity = '0';
-        setTimeout(() => { 
-            tileWrap.style.display = 'none'; 
-            tileBtn.style.display = 'none'; 
-        }, 300); 
-    }
+        if (window.map) {
+            window.map.getContainer().classList.remove('is-spot-mode');
+        }
 
+        const backBtn = document.getElementById('map-back-btn');
+        if (backBtn) {
+            backBtn.style.pointerEvents = 'none'; 
+            backBtn.style.transition = 'opacity 0.3s ease';
+            backBtn.style.opacity = '0';
+        }
+
+        const tileWrap = document.getElementById('tile-btn-wrap');
+        const tileBtn = document.getElementById('map-tile-btn');
+        if (tileWrap && tileBtn) {
+            tileBtn.style.opacity = '0';
+            setTimeout(() => { 
+                tileWrap.style.display = 'none'; 
+                tileBtn.style.display = 'none'; 
+            }, 300); 
+        }
+    };
+
+    // =====================================
+    // 共通処理：UIを再表示する（※ロック解除はしない）
+    // =====================================
     let isReleased = false;
-    const releaseLockAndShowBtn = () => {
+    const showBackBtnOnly = () => {
         if (isReleased) return;
         isReleased = true;
-        window.goBackGuard = false;
+        // ★ 削除：ここにあった window.goBackGuard = false; を消去
+        const backBtn = document.getElementById('map-back-btn');
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
@@ -2854,6 +2872,8 @@ function goBack() {
 
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     if (!window.currentAreaId && !window.currentSpotId) {
+        lockAndHideUI(); // ★ ガード開始
+
         const regionToLoad = window.currentRegion || 'KANTO';
 
         setIdealQuery('pref', null);
@@ -2882,10 +2902,12 @@ function goBack() {
         if (alertBar) alertBar.textContent = "";
 
         setTimeout(() => {
+            const backBtn = document.getElementById('map-back-btn');
             if (backBtn) {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
+            // ★ 例外：⓪は selectArea等に飛ばないので、ここで手動解除する
             window.goBackGuard = false; 
         }, 300);
 
@@ -2893,21 +2915,10 @@ function goBack() {
         return;
     }
 
-    window.map.touchZoom.disable();
-    window.map.dragging.disable();
-
-    const area = window.areaData.find(a => String(a.individualId) === String(window.currentAreaId?.split('_')[1]));
-    if (!area) { 
-        window.goBackGuard = false; 
-        return; 
-    }
-
-    const z = window.map.getZoom();
-    // =====================================================
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
-    // 条件: currentSpotId が存在する
-    // =====================================================
     if (window.currentSpotId != null) {
+        lockAndHideUI(); // ★ ガード開始
+
         const restoreSpot = buildSpotRestoreObject();
 
         stopZoomGuard();
@@ -2931,7 +2942,6 @@ function goBack() {
  
         clearSpotUI();
 
-        // ★ 追加：復元するスポットが別のエリアに属していたら、ここで安全にエリアを切り替える
         if (restoreSpot.areaId && window.currentAreaId !== restoreSpot.areaId) {
             window.currentAreaId = restoreSpot.areaId;
         }
@@ -2944,7 +2954,7 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
-        selectSpot(restoreSpot);
+        selectSpot(restoreSpot); // ★ ここに渡され、外部で false になる
 
         const checkCompletion = setInterval(() => {
             if (window._selectSpotCompleted) {
@@ -2954,17 +2964,17 @@ function goBack() {
                 clearSpotUI();
                 enablePhase2(window.map);
                 phase1menu(window.currentAreaId);
-                releaseLockAndShowBtn(); 
+                showBackBtnOnly(); 
             }
         }, 50);
         
         return;
     }
-    // =====================================================
+
     // ② Phase2 (ズーム13 OSM) → Phase1 (ズーム13.5付近 エリアort) へ戻る
-    // 条件: currentSpotId は無く、areaId があり、ズームが 12.5 〜 13.5 の間
-    // =====================================================
     if (window.currentSpotId == null && window.currentAreaId != null && z >= 12.5 && z <= 13.5) {
+        lockAndHideUI(); // ★ ガード開始
+
         disablePhase2(window.map);
         clearSub2Weather();
         
@@ -2979,14 +2989,13 @@ function goBack() {
             }
         });
 
-        // ★ 修正：OSMを削除せず、フェードアウトして裏側に保持する
         if (window.osmLayer) {
             const osmContainer = window.osmLayer.getContainer();
             if (osmContainer) {
                 osmContainer.style.transition = 'opacity 2s ease';
                 window.osmLayer.setOpacity(0);
                 setTimeout(() => {
-                    if (window.osmLayer) window.osmLayer.setZIndex(1); // アニメ完了後に裏へ
+                    if (window.osmLayer) window.osmLayer.setZIndex(1);
                 }, 2000);
             }
         }
@@ -2999,7 +3008,6 @@ function goBack() {
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        // ★ 修正：GSI(航空写真)をフェードインして再利用する
         if (!window.gsiLayer) {
             window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
         } else {
@@ -3009,7 +3017,6 @@ function goBack() {
             }
         }
         
-        // 描画サイクルを待ってからGSIの透明度を1に戻す（フェードイン）
         requestAnimationFrame(() => {
             const gsiContainer = window.gsiLayer.getContainer();
             if (gsiContainer) {
@@ -3019,7 +3026,7 @@ function goBack() {
             }
         });
 
-        selectArea(area);
+        selectArea(area); // ★ ここに渡され、外部で false になる
         renderCrowdImage();
         
         const targetZoom = area.zoom || window.prefData.zoom;
@@ -3027,23 +3034,20 @@ function goBack() {
         const isSame = Math.abs(center.lat - area.lat) < 0.0001 && Math.abs(center.lng - area.lng) < 0.0001 && window.map.getZoom() === targetZoom;
 
         if (isSame) {
-            setTimeout(releaseLockAndShowBtn, 50);
+            setTimeout(showBackBtnOnly, 50);
         } else {
-            window.map.once('moveend', releaseLockAndShowBtn);
-            setTimeout(releaseLockAndShowBtn, 800); 
+            window.map.once('moveend', showBackBtnOnly);
+            setTimeout(showBackBtnOnly, 800); 
         }
         return;
     }
-    // =====================================================
+
     // ③ Phase1 (エリアort) → Pref (県画面) へ戻る
-    // 条件: currentSpotId は無く、areaId があり、ズームが 12.5 未満
-    // =====================================================
     if (window.currentSpotId == null && window.currentAreaId != null && z < 12.5) {
+        lockAndHideUI(); // ★ ガード開始
         
-        // ★ 修正：ピンチ操作の慣性等による goBack の連発（県選択まで戻ってしまうバグ）を止める
         window.map.stop();
 
-        // OSMを削除せず、フェードアウトして裏側に保持する
         if (window.osmLayer) {
             const osmContainer = window.osmLayer.getContainer();
             if (osmContainer) {
@@ -3057,13 +3061,11 @@ function goBack() {
 
         if (window.phase1Group) window.phase1Group.clearLayers();
         if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-
-        // ショップマーカーのレイヤーを確実に消し去る
+        
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
             window.markerControl.clearLayers();
         }
 
-        // GSI(航空写真)を透明な状態で準備し、DOM反映後にフェードインさせる
         if (!window.gsiLayer) {
             window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
         } else {
@@ -3106,9 +3108,11 @@ function goBack() {
             renderPrefWeather();
             resetAreaGuide();
 
-            // ★ 修正：ロック解除を最後に少し遅らせることで、連続発火を確実にガードする
+            showBackBtnOnly();
+            
+            // ★ 例外：③は selectArea等に飛ばないので、ここで手動解除する
             setTimeout(() => {
-                releaseLockAndShowBtn(); 
+                window.goBackGuard = false; 
             }, 100);
         };
 
@@ -3123,10 +3127,8 @@ function goBack() {
         }
         return;
     }
-
-    // 万が一どの条件にも一致しなかった場合の保険（ロック解除）
-    window.goBackGuard = false;
 }
+
 
 function buildSpotRestoreObject() {
     const spotId = window.currentSpotId;
