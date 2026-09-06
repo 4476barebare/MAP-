@@ -96,11 +96,13 @@ TOKYOトラウトカントリー,18,L46,35.824995,139.07615,TOKYO_OKUTAMA,,東�
 くじら池,,L59,35.720678,139.327253,TOKYO_OKUTAMA,,,fish6,,
 奥多摩湖,12.5,L60,35.777519,139.01775,TOKYO_OKUTAMA,,,spot,,representative$special
 平井川,17,L61,35.740556,139.284706,TOKYO_OKUTAMA,,秋川漁業組合コンビニ発券対応,spot,,substitute
-多摩川日野,14.5,L62,35.687843,139.395039,TOKYO_OKUTAMA,,奥多摩漁業協同組合,spot,,
-多摩川是政橋,14.5,L63,35.653924,139.488625,TOKYO_OKUTAMA,,奥多摩漁業協同組合,spot,,assistant
+多摩川日野,13,L62,35.685740,139.397535,TOKYO_OKUTAMA,,多摩川漁業協同組合,spot,,
 落合川,15,L64,35.757411,139.536688,TOKYO_OKUTAMA,,,spot,,assistant
-府中郷土の森公園周辺,16,L65,35.652711,139.473614,TOKYO_OKUTAMA,,奥多摩漁業協同組合,spot,,
 北多摩一号水門周辺,15.5,L66,35.652272,139.510034,TOKYO_OKUTAMA,,奥多摩漁業協同組合,spot,,
 四ツ木駅周辺,16,L67,35.730679,139.832622,TOKYO_HARUMI,,,spot,,
 江戸川病院周辺,16.5,L68,35.730803,139.894522,TOKYO_HARUMI,,,spot,,
 多摩川六郷橋周辺,14.5,L18,35.538684,139.709906,TOKYO_HARUMI,,,spot,,special
+多摩川青梅周辺,13,L69,35.785792,139.255743,TOKYO_OKUTAMA,,奥多摩漁業協同組合,spot,,special
+御嶽・川井周辺,13,L70,35.814186,139.132662,TOKYO_OKUTAMA,,奥多摩漁業協同組合,spot,,special
+多摩川秋川合流,14,L71,35.715092,139.329772,TOKYO_OKUTAMA,,秋川漁業協同組合,spot,,
+多摩川競馬場周辺,14,L63,35.653105,139.484267,TOKYO_OKUTAMA,,多摩川漁業協同組合,spot,,assistant
