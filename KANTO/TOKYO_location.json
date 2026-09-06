@@ -919,24 +919,13 @@
   },
   {
     "name": "多摩川日野",
-    "zoom": 14.5,
+    "zoom": 13,
     "individualId": "L62",
-    "lat": 35.687843,
-    "lng": 139.395039,
+    "lat": 35.68574,
+    "lng": 139.397535,
     "areaId": "TOKYO_OKUTAMA",
-    "notes": "奥多摩漁業協同組合",
+    "notes": "多摩川漁業協同組合",
     "icon": "spot"
-  },
-  {
-    "name": "多摩川是政橋",
-    "zoom": 14.5,
-    "individualId": "L63",
-    "lat": 35.653924,
-    "lng": 139.488625,
-    "areaId": "TOKYO_OKUTAMA",
-    "notes": "奥多摩漁業協同組合",
-    "icon": "spot",
-    "type": "assistant"
   },
   {
     "name": "落合川",
@@ -947,16 +936,6 @@
     "areaId": "TOKYO_OKUTAMA",
     "icon": "spot",
     "type": "assistant"
-  },
-  {
-    "name": "府中郷土の森公園周辺",
-    "zoom": 16,
-    "individualId": "L65",
-    "lat": 35.652711,
-    "lng": 139.473614,
-    "areaId": "TOKYO_OKUTAMA",
-    "notes": "奥多摩漁業協同組合",
-    "icon": "spot"
   },
   {
     "name": "北多摩一号水門周辺",
@@ -995,5 +974,48 @@
     "areaId": "TOKYO_HARUMI",
     "icon": "spot",
     "type": "special"
+  },
+  {
+    "name": "多摩川青梅周辺",
+    "zoom": 13,
+    "individualId": "L69",
+    "lat": 35.785792,
+    "lng": 139.255743,
+    "areaId": "TOKYO_OKUTAMA",
+    "notes": "奥多摩漁業協同組合",
+    "icon": "spot",
+    "type": "special"
+  },
+  {
+    "name": "御嶽・川井周辺",
+    "zoom": 13,
+    "individualId": "L70",
+    "lat": 35.814186,
+    "lng": 139.132662,
+    "areaId": "TOKYO_OKUTAMA",
+    "notes": "奥多摩漁業協同組合",
+    "icon": "spot",
+    "type": "special"
+  },
+  {
+    "name": "多摩川秋川合流",
+    "zoom": 14,
+    "individualId": "L71",
+    "lat": 35.715092,
+    "lng": 139.329772,
+    "areaId": "TOKYO_OKUTAMA",
+    "notes": "秋川漁業協同組合",
+    "icon": "spot"
+  },
+  {
+    "name": "多摩川競馬場周辺",
+    "zoom": 14,
+    "individualId": "L63",
+    "lat": 35.653105,
+    "lng": 139.484267,
+    "areaId": "TOKYO_OKUTAMA",
+    "notes": "多摩川漁業協同組合",
+    "icon": "spot",
+    "type": "assistant"
   }
 ]
