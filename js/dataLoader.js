@@ -1679,10 +1679,17 @@ function zoomToSpot(spot) {
         requestAnimationFrame(() => { tileBtn.style.opacity = '1'; });
     }
 
+    // =====================================================
+    // ★ 修正：システム変数(currentAreaId)の同期
+    // =====================================================
     if (safe?.individualId != null) {
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => String(a.areaId + '_' + a.individualId) === String(safe.areaId));
-        if (parentArea) setIdealQuery('area', parentArea.name);
+        if (parentArea) {
+            setIdealQuery('area', parentArea.name);
+            // ★ 追加：クリックしたスポットの所属エリアにシステム変数を強制上書き（隣のエリアのスポットを押した時のズレ解消）
+            window.currentAreaId = safe.areaId;
+        }
         setIdealQuery('spot', safe.name);
         window.currentSpotId = safe.individualId;
     }
@@ -1733,7 +1740,6 @@ function zoomToSpot(spot) {
         checkAndUnlockGuard();
     });
 }
-
 
 function showFishMarkers(url) {
   if (!window.map) return;
