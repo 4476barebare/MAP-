@@ -2801,9 +2801,9 @@ function clearSpotUI() {
 // ★ 名称を変更して汎用的なガードとして使い回す
 window.goBackGuard = false;
 
-
 function goBack() {
-    if (window._isGoingBack) return;
+    // ★ 古い _isGoingBack を廃止し、goBackGuard に完全統一
+    if (window.goBackGuard) return;
     window.goBackGuard = true;
 
     if (window.map) {
@@ -2828,7 +2828,7 @@ function goBack() {
     }
 
     const releaseLockAndShowBtn = () => {
-        window.goBackGuard = false;
+        window.goBackGuard = false; // ★ 統一
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
@@ -2852,11 +2852,9 @@ function goBack() {
         window.currentAreaId = null;
         window.currentSpotId = null;
         
-        // =====================================================
-        // ★ 追加: 他の県に移動した時に備えてBoundsのキャッシュを完全にリセット
-        // =====================================================
         window.prefBounds = null;
         window.areaBounds = null;
+
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof removeCrowdImage === 'function') removeCrowdImage();
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
@@ -2875,7 +2873,7 @@ function goBack() {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
-            window._isGoingBack = false; 
+            window.goBackGuard = false; // ★ 統一
         }, 300);
 
         loadRegionMap(regionToLoad);
@@ -2886,12 +2884,16 @@ function goBack() {
     window.map.dragging.disable();
 
     const area = window.areaData.find(a => String(a.individualId) === String(window.currentAreaId?.split('_')[1]));
-    if (!area) { window._isGoingBack = false; return; }
+    if (!area) { 
+        window.goBackGuard = false; // ★ 統一
+        return; 
+    }
 
     const z = window.map.getZoom();
     const restoreSpot = buildSpotRestoreObject();
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$').includes('special');
     const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
+
     // =====================================================
     // ① Phase2 -> Phase1（スポット詳細からPhase1に戻る）
     // =====================================================
@@ -2905,21 +2907,18 @@ function goBack() {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
 
-        // ★ 過去のバウンズを完全に破壊する
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
         if (!restoreSpot) {
-            window._isGoingBack = false;
+            window.goBackGuard = false; // ★ 統一
             return;
         }
 
-        // ★ 作成した一括削除関数を呼び出す（移動前）
         clearSpotUI();
 
-        // UIとクエリを先にクリア
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
         if (parentArea) setIdealQuery('area', parentArea.name);
@@ -2928,17 +2927,13 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
-        // ★ selectSpot に移動とバウンズの再設定をすべて任せる
         selectSpot(restoreSpot);
 
-        // goBack側ではアニメーション完了を待ってロック解除とUI反映のみ行う
         const center = window.map.getCenter();
         const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && Math.abs(center.lng - restoreSpot.lng) < 0.0001 && window.map.getZoom() === 13;
         
         const completePhase1Return = () => {
-            // ★ アニメーション完了後にも念のため一括削除関数を呼び出し、確実にUIを消し去る
             clearSpotUI();
-
             enablePhase2(window.map);
             phase1menu(window.currentAreaId);
             releaseLockAndShowBtn();
@@ -2981,7 +2976,6 @@ function goBack() {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
 
-        // ★ 過去のバウンズを完全に破壊する
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
@@ -3026,7 +3020,6 @@ function goBack() {
         window.gsiLayer.setUrl(window.gsiLayers.ort);
     }
 
-    // ★ 過去のバウンズを完全に破壊する
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
 
