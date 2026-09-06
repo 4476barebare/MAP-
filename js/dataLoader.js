@@ -704,7 +704,7 @@ function selectSpot(spot) {
     }
 
     // =====================================================
-    // ★ 修正1：OSMレイヤーの無限増殖（チラつき）を防止し、再利用する
+    // ★ クロスフェード対応：OSMレイヤーを透明で追加し、ロード後にフェード
     // =====================================================
     if (!window.osmLayer) {
         window.osmLayer = L.tileLayer(
@@ -716,21 +716,51 @@ function selectSpot(spot) {
                 updateWhenZooming: true,
                 updateWhenDragging: true,
                 keepBuffer: 4,
-                fadeAnimation: false
+                fadeAnimation: false,
+                opacity: 0, // ★ 最初は透明で追加
+                zIndex: 999 
             }
-        );
+        ).addTo(window.map);
+    } else {
+        // すでに存在する場合も透明にリセットして被せる
+        if (!window.map.hasLayer(window.osmLayer)) {
+            window.osmLayer.addTo(window.map);
+        }
+        window.osmLayer.setZIndex(999);
+        window.osmLayer.setOpacity(0);
     }
-    
-    // まだ地図に追加されていなければ追加し、確実に最前面へ持ってくる
-    if (!window.map.hasLayer(window.osmLayer)) {
-        window.osmLayer.addTo(window.map);
-    }
-    window.osmLayer.bringToFront();
+
+    // ★ ロード完了と同時にクロスフェード開始
+    window.osmLayer.once('load', () => {
+        const osmContainer = window.osmLayer.getContainer();
+        const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
+
+        if (osmContainer) {
+            // 1. OSMをフェードイン
+            osmContainer.style.transition = 'opacity 2s ease';
+            window.osmLayer.setOpacity(1);
+
+            // 2. 裏のGSI(航空写真)をフェードアウト
+            if (gsiContainer && window.gsiLayer) {
+                gsiContainer.style.transition = 'opacity 2s ease';
+                window.gsiLayer.setOpacity(0);
+            }
+            
+            // 3. フェード完了後に不要なGSIをDOMから取り除く
+            setTimeout(() => {
+                if (window.gsiLayer) {
+                    window.map.removeLayer(window.gsiLayer);
+                    // goBack時に再生成されるため、ここでは剥がすだけでOK
+                }
+            }, 2000);
+        }
+    });
 
     // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     disableAreaSwipe();
+
 
     // =====================================================
     // ★ 修正2：moveendイベントのすっぽ抜け（フリーズ）を防止する
