@@ -2826,7 +2826,7 @@ function goBack() {
     const releaseLockAndShowBtn = () => {
         if (isReleased) return;
         isReleased = true;
-        window.goBackGuard = false; 
+        window.goBackGuard = false;
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
@@ -2837,7 +2837,7 @@ function goBack() {
         }
     };
 
-    // ⓪ 県トップ画面
+    // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     if (!window.currentAreaId && !window.currentSpotId) {
         const regionToLoad = window.currentRegion || 'KANTO';
 
@@ -2887,13 +2887,15 @@ function goBack() {
         return; 
     }
 
-    const restoreSpot = buildSpotRestoreObject();
+    const z = window.map.getZoom();
 
     // =====================================================
-    // ★ 修正：階層の判定を「ズームレベル」から「システム変数」に変更
+    // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
+    // 条件: currentSpotId が存在する
     // =====================================================
-    // ① Phase2 -> Phase1（スポット詳細からエリア画面に戻る）
-    if (window.currentSpotId) {
+    if (window.currentSpotId != null) {
+        const restoreSpot = buildSpotRestoreObject();
+
         stopZoomGuard();
         window.map.dragging.enable();
         window.map.scrollWheelZoom.enable();
@@ -2941,8 +2943,10 @@ function goBack() {
     }
 
     // =====================================================
-    // ② Phase1 -> Area（エリア画面に戻る）
-    if (window.currentAreaId) {
+    // ② Phase2 (ズーム13 OSM) → Phase1 (ズーム13.5付近 エリアort) へ戻る
+    // 条件: currentSpotId は無く、areaId があり、ズームが 12.5 〜 13.5 の間
+    // =====================================================
+    if (window.currentSpotId == null && window.currentAreaId != null && z >= 12.5 && z <= 13.5) {
         disablePhase2(window.map);
         clearSub2Weather();
         
@@ -2996,7 +3000,68 @@ function goBack() {
         return;
     }
 
+    // =====================================================
+    // ③ Phase1 (エリアort) → Pref (県画面) へ戻る
+    // 条件: currentSpotId は無く、areaId があり、ズームが 12.5 未満
+    // =====================================================
+    if (window.currentSpotId == null && window.currentAreaId != null && z < 12.5) {
+        if (window.osmLayer) {
+            window.map.removeLayer(window.osmLayer);
+            window.osmLayer = null;
+        }
+
+        if (window.phase1Group) window.phase1Group.clearLayers();
+        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+        if (!window.gsiLayer) {
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+        } else {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
+        }
+
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+
+        let isPrefReturned = false;
+        const completePrefReturn = () => {
+            if (isPrefReturned) return;
+            isPrefReturned = true;
+
+            window.map.invalidateSize(true);
+            
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            setIdealQuery('area', null);
+            setIdealQuery('spot', null);
+
+            window.currentAreaId = null;
+            window.currentSpotId = null;
+
+            initAreaUI();
+            showPrefSpots();
+            renderPrefWeather();
+            resetAreaGuide();
+
+            releaseLockAndShowBtn(); 
+        };
+
+        const centerPref = window.map.getCenter();
+        const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && window.map.getZoom() === window.prefData.zoom;
+
+        if (isSamePref) {
+            setTimeout(completePrefReturn, 50);
+        } else {
+            window.map.once('moveend', completePrefReturn);
+            setTimeout(completePrefReturn, 800); 
+        }
+        return;
+    }
+
+    // 万が一どの条件にも一致しなかった場合の保険（ロック解除）
+    window.goBackGuard = false;
 }
+
 
 function buildSpotRestoreObject() {
 
