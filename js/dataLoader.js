@@ -3088,7 +3088,6 @@ function goBack() {
         window.map.options.maxBoundsViscosity = 0;
 
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-
         let isPrefReturned = false;
         const completePrefReturn = () => {
             if (isPrefReturned) return;
@@ -3110,10 +3109,12 @@ function goBack() {
 
             showBackBtnOnly();
             
-            // ★ 例外：③は selectArea等に飛ばないので、ここで手動解除する
-            setTimeout(() => {
-                window.goBackGuard = false; 
-            }, 100);
+            // ★ 修正：時間指定(setTimeout)ではなく、ブラウザの描画完了を待ってからロックを解除する
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    window.goBackGuard = false; 
+                });
+            });
         };
 
         const centerPref = window.map.getCenter();
@@ -3123,10 +3124,12 @@ function goBack() {
             setTimeout(completePrefReturn, 50);
         } else {
             window.map.once('moveend', completePrefReturn);
+            // 保険としての強制実行
             setTimeout(completePrefReturn, 800); 
         }
         return;
     }
+
 }
 
 
