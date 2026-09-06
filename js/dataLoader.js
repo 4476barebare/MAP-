@@ -2885,7 +2885,7 @@ function goBack() {
         window.map.options.maxBoundsViscosity = 0;
 
         // =====================================================
-        // ★ 修正：OSMを「最前面（z-index: 999等）」にかぶせてから flyTo する
+        // ★ OSMを「最前面（z-index: 999等）」にかぶせてから flyTo する
         // =====================================================
         if (!window.osmLayer) {
             window.osmLayer = L.tileLayer(
@@ -2898,17 +2898,14 @@ function goBack() {
                     updateWhenDragging: true,
                     keepBuffer: 4,
                     fadeAnimation: false,
-                    zIndex: 999 // ★ 追加：確実に最前面へ被せる
+                    zIndex: 999
                 }
             ).addTo(window.map);
         } else {
-            // 既に存在する場合は最前面に持ってくる
             window.osmLayer.setZIndex(999);
         }
 
-        // OSMが被さった裏で、ベースタイルを `ort` (標準) に切り替えておく
         if (window.gsiLayer) {
-            // タイルのチラつきを見せずにURLだけすり替える
             window.gsiLayer.setUrl(window.TILE_URLS.ort); 
         }
 
@@ -2934,12 +2931,30 @@ function goBack() {
         
         disableAreaSwipe();
         
+        // =====================================================
+        // ★ 修正1: 直前の移動停止による「moveendの暴発」を完全に防ぐ
+        // flyToを呼ぶと、中断されたzoomToSpotの古いmoveendが強制発火して
+        // UIを再生成してしまうため、移動を開始する前にイベントを一度すべて剥がす。
+        // =====================================================
+        window.map.off('moveend');
+
         // OSMが敷かれた状態のまま、ズーム13へ引いていく
         window.map.flyTo([restoreSpot.lat, restoreSpot.lng], 13, { duration: 0.5 });
-        window.map.getContainer().classList.add('is-spot-mode');
+        
+        // =====================================================
+        // ★ 修正2: 間違って追加されていた is-spot-mode を削除
+        // Area画面（Phase1）に戻るので、スポット用のCSSクラスは外すのが正解
+        // =====================================================
+        window.map.getContainer().classList.remove('is-spot-mode');
 
         const completePhase1Return = () => {
             window.map.invalidateSize(true);
+            
+            // ★ 念のためのダメ押しUI消去（絶対に残さない）
+            removeWeekItem();
+            resetWeatherUI();
+            clearAccessInfo();
+            if (window.fishLayer) window.map.removeLayer(window.fishLayer);
             
             if (typeof enableDragForArea === 'function') {
                 enableDragForArea();
