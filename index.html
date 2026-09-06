@@ -2286,7 +2286,7 @@ async function routeUpdate() {
 
         const targetZoom = window.prefData.zoom;
         
-        // ★ 修正：マップ未生成の初回ロード時は「即時描画(isSameLoc = true)」にする判定を追加
+        // ★ マップ未生成の初回ロード時は「即時描画(isSameLoc = true)」にする判定を追加
         const isMapJustCreated = !window.map;
         const center = window.map ? window.map.getCenter() : null;
         const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
@@ -2324,7 +2324,6 @@ async function routeUpdate() {
     }
 }
 
-}
 
 // ★ Region名の変換マッピング
 const REGION_MAP = {
