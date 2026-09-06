@@ -2809,15 +2809,14 @@ function clearSpotUI() {
     if (typeof removeWeekItem === 'function') removeWeekItem();
     if (typeof resetWeatherUI === 'function') resetWeatherUI();
     if (typeof clearAccessInfo === 'function') clearAccessInfo();
-
+//   if (typeof clearSub2Weather === 'function') clearSub2Weather();
     
     if (window.map && window.fishLayer) {
         window.map.removeLayer(window.fishLayer);
         window.fishLayer = null;
     }
     
-    const nsEl = document.getElementById("nearest-spot");
-    if (nsEl) nsEl.textContent = "";
+
 }
 
 // ★ 名称を変更して汎用的なガードとして使い回す
@@ -2942,9 +2941,10 @@ function goBack() {
             window.goBackGuard = false; 
             return;
         }
-    if (typeof clearSub2Weather === 'function') clearSub2Weather();
+ 
         clearSpotUI();
-
+    const nsEl = document.getElementById("nearest-spot");
+    if (nsEl) nsEl.textContent = "";
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
         if (parentArea) setIdealQuery('area', parentArea.name);
