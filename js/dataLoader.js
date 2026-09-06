@@ -1546,6 +1546,9 @@ function zoomToSpot(spot) {
     const checkAndUnlockGuard = () => {
         if (isMoveEnded && isFadeEnded) {
             window.goBackGuard = false;
+            window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
         }
     };
 
@@ -1677,9 +1680,9 @@ function zoomToSpot(spot) {
         window._zoomGuardActive = true;
 
         window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
+     //    window.map.scrollWheelZoom.enable();
+     //    window.map.doubleClickZoom.enable();
+     //    window.map.touchZoom.enable();
         
         isMoveEnded = true;
         checkAndUnlockGuard();
