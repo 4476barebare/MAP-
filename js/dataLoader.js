@@ -531,7 +531,6 @@ function selectArea(area) {
 
     prefetchAround(areaObj);
     
-    // ★ 追加：すでに目的地にいるか判定
     const targetZoom = areaObj.zoom || window.prefData.zoom;
     const center = window.map.getCenter();
     const isSameLoc = center && Math.abs(center.lat - areaObj.lat) < 0.0001 && 
@@ -547,7 +546,6 @@ function selectArea(area) {
     
     document.getElementById('map-menu').style.display = 'none';
 
-    // ★ イベントに依存しない確実な終了処理
     const finalizeArea = () => {
         window.map.invalidateSize(true);
         openArea(areaObj.individualId);
@@ -556,10 +554,7 @@ function selectArea(area) {
         phase1menu(window.currentAreaId);
         clearSpotUI();
         
-        // ★ 軽量化されたBounds適用処理を確実に呼ぶ
-        if (typeof enableDragForArea === 'function') {
-            enableDragForArea();
-        }
+        // ★ 私が勝手に入れた enableDragForArea() を削除し、Phase1をドラッグ不可に戻す
         
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
@@ -689,8 +684,6 @@ function showSpotsForArea(areaKey) {
 async function selectSpot(spot) {
     if (!window.map || !spot) return;
 
-
-    
     const currentZoom = window.map.getZoom();
 
     if (currentZoom === 13) {
@@ -709,9 +702,6 @@ async function selectSpot(spot) {
         window.phase1Group.clearLayers();
     }
 
-    // =====================================================
-    // ★ クロスフェード対応：OSMレイヤーを透明で追加し、ロード後にフェード
-    // =====================================================
     if (!window.osmLayer) {
         window.osmLayer = L.tileLayer(
             window.TILE_URLS.osm,
@@ -735,7 +725,6 @@ async function selectSpot(spot) {
         window.osmLayer.setOpacity(0);
     }
 
-    // ★ 修正：キャッシュ済みで load イベントが発火しない対策
     const doOsmFade = () => {
         const osmContainer = window.osmLayer.getContainer();
         const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
@@ -761,7 +750,6 @@ async function selectSpot(spot) {
             isLoaded = true;
             doOsmFade();
         });
-        // 1秒待っても来なければ強制実行
         setTimeout(() => {
             if (!isLoaded) {
                 isLoaded = true;
@@ -772,13 +760,12 @@ async function selectSpot(spot) {
         requestAnimationFrame(doOsmFade);
     }
 
-    // 過去のBoundsを解除
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     disableAreaSwipe();
 
     const center = window.map.getCenter();
-    const isSameLoc = Math.abs(center.lat - spot.lat) < 0.0001 && 
+    const isSameLoc = center && Math.abs(center.lat - spot.lat) < 0.0001 && 
                       Math.abs(center.lng - spot.lng) < 0.0001 && 
                       window.map.getZoom() === 13;
 
@@ -786,8 +773,13 @@ async function selectSpot(spot) {
 
     const finalizeSelectSpot = () => {
         window.map.invalidateSize(true);
+        if (!window.areaBounds && window.currentAreaId) {
+            showSpotsForArea(window.currentAreaId);
+        }
         requestAnimationFrame(() => {
-            enableDragForArea();
+            // ★ ここで areaBounds の上書きを消し、純粋に県全体 (prefBounds) をセットする
+            if (typeof enableDragForArea === 'function') enableDragForArea();
+            
             enablePhase2(window.map);
             window.map.getContainer().classList.add('is-spot-mode');
             window._selectSpotCompleted = true;
@@ -1005,7 +997,6 @@ window._isSnappingBack = false;
 function enablePhase2(map) {
     if (!map) return;
 
-    // 二重登録防止
     if (map._phase2Handler) {
         map.off('dragend', map._phase2Handler);
         map.off('moveend', map._phase2Handler);
@@ -1013,7 +1004,6 @@ function enablePhase2(map) {
     
     const runPhase2 = () => {
         clearSpotUI();
-        // 無効状態、または引き戻し（スナップバック）中なら何もしない
         if (!window.phase2Initialized || window._isSnappingBack) return;
 
         if (window.phase2Timer) {
@@ -1023,20 +1013,13 @@ function enablePhase2(map) {
         window.phase2Timer = setTimeout(() => {
             if (!window.phase2Initialized || window._isSnappingBack) return;
 
-            // 1. 既存の処理（タイルのプリロードと最寄りスポットの表示）
             processSpotUtils(map);
             showNearestSpotName(map);
 
-            // =====================================================
-            // エリア内外の判定と、切り替え・強制引き戻し処理
-            // =====================================================
             if (window.map.getZoom() === 13 && window.spotData && window.currentAreaId) {
                 const center = window.map.getCenter();
-                
-                // A. 現在の座標がエリア内かどうか判定
                 const isInsideArea = window.areaBounds ? window.areaBounds.contains(center) : true;
 
-                // B. エリア外にはみ出している時の処理
                 if (!isInsideArea) {
                     let nearestSpot = null;
                     let minDistance = Infinity;
@@ -1069,10 +1052,10 @@ function enablePhase2(map) {
                                 if (!window.areaBounds) {
                                     showSpotsForArea(window.currentAreaId);
                                 }
-                                if (window.areaBounds && window.areaBounds.isValid()) {
-                                    map.setMaxBounds(window.areaBounds);
-                                    map.options.maxBoundsViscosity = 1.0;
-                                    map.dragging.enable();
+                                
+                                // ★ 修正: areaBounds で上書きせず、県全体 (prefBounds) を再セットする
+                                if (typeof enableDragForArea === 'function') {
+                                    enableDragForArea();
                                 }
                                 
                                 setTimeout(() => {
@@ -1085,11 +1068,9 @@ function enablePhase2(map) {
                         else {
                             console.log(`エリア変更: ${window.currentAreaId} -> ${nearestSpot.areaId}`);
                             
-                            // 1. システム変数の確実な更新
                             window.currentAreaId = nearestSpot.areaId;
-                            window.currentSpotId = null; // ★重要: スポット選択状態を解除
+                            window.currentSpotId = null; 
 
-                            // 2. URLクエリの更新 (バグを回避して直接 setIdealQuery を使用)
                             const newArea = window.areaData.find(a => String(a.areaId + '_' + a.individualId) === window.currentAreaId);
                             if (newArea && window.prefData && typeof setIdealQuery === 'function') {
                                 setIdealQuery('pref', window.prefData.notes);
@@ -1097,7 +1078,6 @@ function enablePhase2(map) {
                                 setIdealQuery('spot', null);
                             }
 
-                            // 3. ★重要: 過去のスポットのUIとレイヤーを徹底的に消去する（不安定さの元凶を絶つ）
                             if (window.fishLayer) {
                                 window.map.removeLayer(window.fishLayer);
                                 window.fishLayer = null;
@@ -1109,7 +1089,6 @@ function enablePhase2(map) {
                             const nsEl = document.getElementById("nearest-spot");
                             if (nsEl) nsEl.textContent = "";
 
-                            // 4. 新しいエリアの Bounds 計算と適用
                             const targetAreaSpots = window.spotData.filter(s => s.areaId === window.currentAreaId);
                             if (targetAreaSpots.length > 0) {
                                 let minLat = Infinity, maxLat = -Infinity;
@@ -1130,14 +1109,12 @@ function enablePhase2(map) {
                                     [maxLat + latBuffer, maxLng + lngBuffer]
                                 );
                                 
-                                // 移動制限を新しいエリアの枠に更新
-                                if (window.map && window.areaBounds.isValid()) {
-                                    window.map.setMaxBounds(window.areaBounds);
-                                    window.map.options.maxBoundsViscosity = 1.0;
+                                // ★ 修正: areaBounds で上書きせず、県全体 (prefBounds) のドラッグ範囲を維持する
+                                if (typeof enableDragForArea === 'function') {
+                                    enableDragForArea();
                                 }
                             }
 
-                            // 5. 新エリアのデータのロードとメニューの再構築
                             if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
                             if (window.markerControl && typeof markerControl.showShop02 === 'function') {
                                 markerControl.showShop02(window.currentAreaId);
@@ -1158,7 +1135,6 @@ function enablePhase2(map) {
 
     window.phase2Initialized = true; 
     
-    // 初回として即座に1回実行させる
     runPhase2();
 
     removeCrowdImage();
