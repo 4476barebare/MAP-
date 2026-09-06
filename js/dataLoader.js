@@ -2774,6 +2774,26 @@ function resetSpotLayers() {
     }
 }
 
+
+// ==========================================
+// ★ スポット詳細UIの一括削除関数
+// ==========================================
+function clearSpotUI() {
+    if (typeof removeWeekItem === 'function') removeWeekItem();
+    if (typeof resetWeatherUI === 'function') resetWeatherUI();
+    if (typeof clearAccessInfo === 'function') clearAccessInfo();
+    if (typeof clearSub2Weather === 'function') clearSub2Weather();
+    
+    if (window.map && window.fishLayer) {
+        window.map.removeLayer(window.fishLayer);
+        window.fishLayer = null;
+    }
+    
+    const nsEl = document.getElementById("nearest-spot");
+    if (nsEl) nsEl.textContent = "";
+}
+
+
 window._isGoingBack = false;
 
 function goBack() {
@@ -2866,9 +2886,8 @@ function goBack() {
     const restoreSpot = buildSpotRestoreObject();
     const isSpecial = restoreSpot && restoreSpot.type && restoreSpot.type.split('$').includes('special');
     const isPhase2 = window.osmLayer && window.map.hasLayer(window.osmLayer);
-
     // =====================================================
-    // ① Phase2 -> Phase1（スポット詳細からエリア画面に戻る）
+    // ① Phase2 -> Phase1（スポット詳細からPhase1に戻る）
     // =====================================================
     if ((z > 13 || isSpecial) && !isPhase2) {
         stopZoomGuard();
@@ -2880,36 +2899,10 @@ function goBack() {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
 
-        // ★ 戻る直前に過去のバウンズを破壊する
+        // ★ 過去のバウンズを完全に破壊する
         window.map.setMaxBounds(null);
         window.map.options.maxBoundsViscosity = 0;
 
-        // =====================================================
-        // ★ OSMを「最前面（z-index: 999等）」にかぶせてから flyTo する
-        // =====================================================
-        if (!window.osmLayer) {
-            window.osmLayer = L.tileLayer(
-                window.TILE_URLS.osm,
-                {
-                    attribution: '© OpenStreetMap contributors',
-                    className: 'osm-solid-layer',
-                    updateWhenIdle: false,
-                    updateWhenZooming: true,
-                    updateWhenDragging: true,
-                    keepBuffer: 4,
-                    fadeAnimation: false,
-                    zIndex: 999
-                }
-            ).addTo(window.map);
-        } else {
-            window.osmLayer.setZIndex(999);
-        }
-
-        if (window.gsiLayer) {
-            window.gsiLayer.setUrl(window.TILE_URLS.ort); 
-        }
-
-        if (window.fishLayer) window.map.removeLayer(window.fishLayer);
         if (window.phase2Group) window.phase2Group.clearLayers();
 
         if (!restoreSpot) {
@@ -2917,10 +2910,10 @@ function goBack() {
             return;
         }
 
-        removeWeekItem();
-        resetWeatherUI();
-        clearAccessInfo();
+        // ★ 作成した一括削除関数を呼び出す（移動前）
+        clearSpotUI();
 
+        // UIとクエリを先にクリア
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
         if (parentArea) setIdealQuery('area', parentArea.name);
@@ -2929,70 +2922,27 @@ function goBack() {
 
         showSpotsForArea(window.currentAreaId);
         
-        disableAreaSwipe();
-        
-        // =====================================================
-        // ★ 修正1: 直前の移動停止による「moveendの暴発」を完全に防ぐ
-        // flyToを呼ぶと、中断されたzoomToSpotの古いmoveendが強制発火して
-        // UIを再生成してしまうため、移動を開始する前にイベントを一度すべて剥がす。
-        // =====================================================
-        window.map.off('moveend');
+        // ★ selectSpot に移動とバウンズの再設定をすべて任せる
+        selectSpot(restoreSpot);
 
-        // OSMが敷かれた状態のまま、ズーム13へ引いていく
-        window.map.flyTo([restoreSpot.lat, restoreSpot.lng], 13, { duration: 0.5 });
+        // goBack側ではアニメーション完了を待ってロック解除とUI反映のみ行う
+        const center = window.map.getCenter();
+        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && Math.abs(center.lng - restoreSpot.lng) < 0.0001 && window.map.getZoom() === 13;
         
-        // =====================================================
-        // ★ 修正2: 間違って追加されていた is-spot-mode を削除
-        // Area画面（Phase1）に戻るので、スポット用のCSSクラスは外すのが正解
-        // =====================================================
-        window.map.getContainer().classList.remove('is-spot-mode');
-
         const completePhase1Return = () => {
-            window.map.invalidateSize(true);
-            
-            // ★ 念のためのダメ押しUI消去（絶対に残さない）
-            removeWeekItem();
-            resetWeatherUI();
-            clearAccessInfo();
-            if (window.fishLayer) window.map.removeLayer(window.fishLayer);
-            
-            if (typeof enableDragForArea === 'function') {
-                enableDragForArea();
-            }
-            enablePhase2(window.map); 
-            
+            // ★ アニメーション完了後にも念のため一括削除関数を呼び出し、確実にUIを消し去る
+            clearSpotUI();
+
+            enablePhase2(window.map);
             phase1menu(window.currentAreaId);
-            
-            window._isGoingBack = false;
-            const backBtn = document.getElementById('map-back-btn');
-            const tileWrap = document.getElementById('tile-btn-wrap');
-            const tileBtn = document.getElementById('map-tile-btn');
-            
-            if (backBtn) {
-                backBtn.style.display = 'block';
-                if (tileWrap) tileWrap.style.display = 'flex';
-                if (tileBtn) tileBtn.style.display = 'block';
-                
-                requestAnimationFrame(() => {
-                    backBtn.style.transition = 'opacity 0.4s ease';
-                    backBtn.style.opacity = '1';
-                    backBtn.style.pointerEvents = 'auto';
-                    if (tileBtn) tileBtn.style.opacity = '1';
-                });
-            }
+            releaseLockAndShowBtn();
         };
 
-        const center = window.map.getCenter();
-        const isSame = Math.abs(center.lat - restoreSpot.lat) < 0.0001 && 
-                       Math.abs(center.lng - restoreSpot.lng) < 0.0001 && 
-                       window.map.getZoom() === 13;
-
         if (isSame) {
-            setTimeout(completePhase1Return, 50); 
+            completePhase1Return();
         } else {
             window.map.once('moveend', completePhase1Return);
         }
-        
         return;
     }
 
