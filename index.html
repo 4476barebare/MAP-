@@ -668,7 +668,6 @@ async function showAllRegionSpots() {
     }
 }
 
-
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
 // ==========================================
@@ -707,9 +706,6 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
     window.fishUrl              = `/${region}/${prefCode}_fish.json`;
     window.prefShopUrl          = `/${region}/${prefCode}_shop.csv`;
 
-    // =====================================================
-    // ★ 修正：提供いただいたJSONの構造（individualId: "parent" かつ name: prefCode）を元に正しく prefData を確定する
-    // =====================================================
     let prefName = fallbackPrefName;
 
     if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
@@ -717,8 +713,8 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
         const targetPrefData = window.ALL_REGION_SPOTS.find(r => r.name === prefCode && r.individualId === "parent");
         
         if (targetPrefData) {
-            window.prefData = targetPrefData; // これにより lat, lng, zoom, notes が確実にセットされる
-            prefName = targetPrefData.notes;  // "茨城県" などの日本語名を取得
+            window.prefData = targetPrefData; 
+            prefName = targetPrefData.notes;  
         }
     }
 
@@ -731,9 +727,53 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-    // 画面遷移（ルート更新）を発火
-    if (typeof routeUpdate === 'function') {
-        routeUpdate();
+    // =====================================================
+    // ★ 修正：routeUpdateを呼ばずに、直接flyToしてUI関数を呼ぶ
+    // =====================================================
+    if (window.prefData && window.map) {
+        const targetZoom = window.prefData.zoom;
+
+        // 1. 指定の座標へ飛ぶ
+        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+
+        // 2. 移動アニメーション完了後に必要なUI関数を呼ぶ
+        const finalizePref = () => {
+            window.map.invalidateSize(true);
+            
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (typeof showPrefSpots === 'function') showPrefSpots();
+                    if (typeof initAreaUI === 'function') initAreaUI();
+                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
+
+                    // 県スワイプをON、エリアスワイプをOFFにする
+                    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                    if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                    
+                    requestAnimationFrame(() => {
+                        const btn = document.getElementById('map-back-btn');
+                        if (btn) {
+                            btn.style.display = 'block';
+                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                        }
+
+                        window.goBackGuard = false; 
+                    });
+                });
+            });
+        };
+
+        const center = window.map.getCenter();
+        const isSameLoc = Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                          window.map.getZoom() === targetZoom;
+
+        if (isSameLoc) {
+            finalizePref();
+        } else {
+            window.map.once('moveend', finalizePref);
+        }
     }
 };
 
