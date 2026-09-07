@@ -544,9 +544,9 @@ async function applyQueryToStateFromCsv() {
     if ((qArea || qSpot) && vaultData && vaultData.length > 0) {
         for (const row of vaultData) {
             const rowName = row.name;
-            if (qArea && rowName === qArea && row.type === 'area') {
-                window.currentAreaId = row.areaId + "_" + row.individualId;
-            }
+if (qArea && rowName === qArea && row.areaId && row.individualId) {
+    window.currentAreaId = row.areaId + "_" + row.individualId;
+}
             if (qSpot && rowName === qSpot && row.type !== 'pref' && row.type !== 'area') {
                 window.currentSpotId = row.individualId;
             }
