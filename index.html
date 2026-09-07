@@ -877,31 +877,33 @@ async function loadPrefectureData(prefCode) {
 // ★ ページ初期ロード時のメインフロー
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
+
     // ICデータ等の非同期ロード開始
     loadICData();
-    const params = new URLSearchParams(window.location.search);
-    
-    if (!params.get('region') && !params.get('pref')) {
-        setIdealQuery('region', '関東地方'); 
-    }
-    window.currentRegion = getRegionCode();
-    window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
 
-    // ★ 1. 何よりも先に「金庫（全県データ）」を生成・ロードする！
+    const params = new URLSearchParams(window.location.search);
+
+    if (!params.get('region') && !params.get('pref')) {
+        setIdealQuery('region', '関東地方');
+    }
+
+    window.currentRegion = getRegionCode();
+    window.regionUrl =
+        `/${window.currentRegion}/${window.currentRegion}_region.csv`;
+
+    // 1. 全県マスターデータをロード
     if (typeof fetchAllRegionSpots === 'function') {
         await fetchAllRegionSpots();
     }
 
-    // ★ 2. 金庫のデータを使って、URLクエリから currentPref, currentAreaId, currentSpotId を特定する！
+    // 2. URLから現在位置を決定
     await applyQueryToStateFromCsv();
-    
-    // ★ 3. 準備が整ったので、あとは「完全版の routeUpdate」に全てを任せる！
-    // (旧方式の余計な fetch チェーンは全て削除しました)
+
+    // 3. 初回ロード時のURL復元
     if (typeof routeUpdate === 'function') {
-        routeUpdate(); 
+        await routeUpdate();
     }
 });
-
 
 function initAreaUI() {
 
@@ -2461,7 +2463,7 @@ async function routeUpdate() {
         if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
-    await loadLocationJSON();
+
 
     // ─── スポット階層への直リンク復元 ───
     if (window.currentSpotId) {
