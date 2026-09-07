@@ -8,7 +8,7 @@ window.spotData = []
 window.currentAreaId = null;
 
 // ==========================================
-// ★ スポット用データをJSONから読み込む関数（爆速化版）
+// ★ スポット用データをJSONから読み込む関数（全データ抽出対応版）
 // ==========================================
 function loadLocationJSON(jsonUrl) {
     const pref = window.currentPref;
@@ -23,6 +23,7 @@ function loadLocationJSON(jsonUrl) {
         };
     }
 
+    // 既にキャッシュされていればそれを返す（変更なし）
     if (window[`${pref}_prefData`] && window[`${pref}_areaData`] && window[`${pref}_spotData`]) {
         window.prefData = window[`${pref}_prefData`];
         window.areaData = window[`${pref}_areaData`];
@@ -53,8 +54,15 @@ function loadLocationJSON(jsonUrl) {
         ? Promise.resolve(window.fishData) 
         : fetch(window.fishUrl).then(res => res.ok ? res.json() : null).catch(() => null);
 
+    // =====================================================
+    // ★ 変更点：全データ配列から現在の県データを抽出（無ければfetchへフォールバック）
+    // =====================================================
+    const locationFetch = (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0)
+        ? Promise.resolve(window.ALL_REGION_SPOTS.filter(s => s._prefCode === pref))
+        : fetch(jsonUrl).then(r => r.json());
+
     return Promise.all([
-        fetch(jsonUrl).then(r => r.json()),
+        locationFetch,
         fishFetch
     ]).then(([allRows, fishData]) => {
         
@@ -69,12 +77,14 @@ function loadLocationJSON(jsonUrl) {
             row.squareY = null;
         });
 
+        // main (県データ) の抽出
         allRows.forEach(row => {
             if (!row.areaId && row.name === pref) {
                 main = row;
             }
         });
 
+        // area (エリアデータ) の抽出
         allRows.forEach(row => {
             if ((row.areaId || '').trim() === pref) {
                 if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
@@ -86,6 +96,7 @@ function loadLocationJSON(jsonUrl) {
             }
         });
 
+        // spot (スポットデータ) の抽出
         allRows.forEach(row => {
             const icon = row.icon;
             if (!icon) return;
@@ -94,6 +105,7 @@ function loadLocationJSON(jsonUrl) {
             }
         });
 
+        // 魚データの付与
         if (fishData) {
             const fishDict = {};
             for (const regKey in fishData) {
@@ -127,7 +139,7 @@ function loadLocationJSON(jsonUrl) {
         }
 
         // ==========================================
-        // ★ 修正：ここで1回だけ県全体のBoundsを計算する
+        // ★ 県全体のBoundsを計算する
         // ==========================================
         window.prefBounds = null;
         if (spots.length > 0) {
@@ -175,6 +187,7 @@ function loadLocationJSON(jsonUrl) {
         return { main, areas, spots };
     });
 }
+
 
 // ==========================================
 // ★ SEO対策用：HTML文字列を一括生成する関数（対象魚非表示版）
