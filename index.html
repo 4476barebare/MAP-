@@ -546,38 +546,25 @@ async function applyQueryToStateFromCsv() {
         }
     }
 
+// ... applyQueryToStateFromCsv 関数の後半部分 ...
+
     // --------------------------------------------------
-    // パターン2 & パターン3 (Location JSONの探索)
+    // パターン2 & パターン3 (フェッチを廃止し全データから検索)
     // --------------------------------------------------
-    // パターン1で prefLocationUrl が無事に定義されていて、かつ下位クエリがある場合のみ実行
-    if ((qArea || qSpot) && window.prefLocationUrl) {
-        try {
-            const res = await fetch(window.prefLocationUrl);
-            if (res.ok) {
-                // ★ 修正：text() ではなく json() で受け取り、配列としてそのまま扱う
-                const allRows = await res.json();
-                
-                if (Array.isArray(allRows) && allRows.length > 0) {
-                    // 1回のループでエリアとスポットの両方を探す（爆速化）
-                    for (const row of allRows) {
-                        const rowName = row.name;
-                        
-                        // パターン2：エリアクエリと同一の行を探す
-                        if (qArea && rowName === qArea) {
-                            window.currentAreaId = row.areaId + "_" + row.individualId;
-                        }
-                        
-                        // パターン3：スポットクエリと同一の行を探す
-                        if (qSpot && rowName === qSpot) {
-                            window.currentSpotId = row.individualId;
-                        }
-                    }
-                }
+    if ((qArea || qSpot) && window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
+        for (const row of window.ALL_REGION_SPOTS) {
+            const rowName = row.name;
+            
+            if (qArea && rowName === qArea) {
+                window.currentAreaId = row.areaId + "_" + row.individualId;
             }
-        } catch (err) {
-            console.error("Location JSON逆引きエラー:", err);
+            if (qSpot && rowName === qSpot) {
+                window.currentSpotId = row.individualId;
+            }
         }
     }
+// } // 関数の閉じカッコ
+
 }
 
 function formatDate(str) {
@@ -1916,23 +1903,16 @@ function getParsedPrefQuery() {
 window.fetchCacheStatus = window.fetchCacheStatus || {};
 
 function preloadCsvFiles(regionCode, prefCode) {
-    // どちらか片方でも欠けていたら処理をスキップ
     if (!regionCode || !prefCode) return;
     
-// パスを動的に生成
-const jsonUrl    = `/${regionCode}/${prefCode}_location.json`; // ← 変数名と拡張子を変更
-const whetherUrl = `/data/${prefCode}_whether.csv`;
-const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+    const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
 
-// ★ 純粋な県コード（"CHIBA"等）をキーにして二重フェッチを完璧に防ぐ
-if (!window.fetchCacheStatus[prefCode]) {
-    window.fetchCacheStatus[prefCode] = true;
-    
-    // 低優先度でバックグラウンドフェッチし、ブラウザキャッシュに載せる
-    fetch(jsonUrl, { priority: 'low' }).catch(()=>{}); // ← csvUrl から jsonUrl に変更
-    fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
-
-}
+    if (!window.fetchCacheStatus[prefCode]) {
+        window.fetchCacheStatus[prefCode] = true;
+        fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
+        // fetch(shopUrl, { priority: 'low' }).catch(()=>{}); // 必要ならショップも
+    }
 }
 
 // ================================
@@ -2146,38 +2126,30 @@ window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
 };
 
 async function loadPrefectureData(prefCode) {
-  //     showdebug("▼ loadPrefectureData 開始: prefCode=" + prefCode);
-
     window.fishData = null; 
     window.currentPref = prefCode;
     const region = window.currentRegion || 'KANTO';
-    
-    // ★ 1. 重複していた regionUrl の生成コードを削除し、グローバル変数で上書き定義のみ残す
     window.regionUrl = `/${region}/${region}_region.csv`; 
 
-  //     showdebug("▷ prefLocationUrl: " + window.prefLocationUrl);
-
     try {
-        // ★ 2. 重複していた csvUrl の生成を削除し、既存のグローバル変数に置き換え
-       //  showdebug("▷ loadLocationJSON を実行します...");
-        await loadLocationJSON(window.prefLocationUrl);
-    //     showdebug("✅ loadLocationJSON 完了");
+        // ★ JSONのフェッチを完全廃止し、合体データから抽出するだけに！
+        if (!window.ALL_REGION_SPOTS || window.ALL_REGION_SPOTS.length === 0) {
+            await fetchAllRegionSpots();
+        }
+        window.spotData = window.ALL_REGION_SPOTS.filter(s => s._prefCode === prefCode);
         
-        // 沿岸部の天気を取得して全スポットに付与
+        // 沿岸部の天気を取得
         const whetherUrl = `/data/${prefCode}_whether.csv`;
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
        
-        // 内陸部の天気を取得して、Lから始まるスポットだけ上書き付与
+        // 内陸部の天気を取得
         if (typeof loadInlandWhetherCSV === 'function') {
             const inlandCsv = await loadInlandWhetherCSV(region);
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
         }
-
         return true; 
     } catch (err) {
-        // エラー内容をデバッグ画面に直接出力！
- //        showdebug("❌ loadPrefectureDataエラー: " + err.message);
         console.error("データ読み込みエラー:", err);
         return false;
     }
@@ -2434,61 +2406,46 @@ loadLocationJSON(jsonUrl).then(() => { // ← loadLocationJSON に変更（第2�
 // ■ 1. 全県データをバックグラウンドで取得・合体する専用関数
 // =====================================================
 async function fetchAllRegionSpots() {
-    // 既にデータが完成していればそのまま返す
     if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
         return window.ALL_REGION_SPOTS;
     }
-    
     window.ALL_REGION_SPOTS = [];
     
     try {
         const regionCode = window.currentRegion || 'KANTO';
         const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
         
-        // まずRegionのCSVを読んで県のリストを取得
         const res = await fetch(rUrl);
         if (!res.ok) throw new Error("Region CSV fetch failed");
         
         const text = await res.text();
         const lines = text.trim().split('\n');
         
-        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-        const typeIdx = headers.indexOf('type');
-        const urlIdx = headers.indexOf('url');
-        
-        if (typeIdx === -1 || urlIdx === -1) return [];
-        
-        const prefUrls = [];
+        const prefList = [];
         for (let i = 1; i < lines.length; i++) {
-            if (!lines[i]) continue;
             const cols = lines[i].split(',').map(c => c.trim());
-            if (cols[typeIdx] === 'pref') {
-                const urlVal = cols[urlIdx];
-                if (!urlVal) continue;
-                
-                const parts = urlVal.split('/');
-                let prefCode = '';
-                if (parts.length >= 4) {
-                    prefCode = parts[1].split('_')[0]; 
-                } else if (parts.length === 3) {
-                    prefCode = parts[0].split('_')[0]; 
-                }
-                
-                if (prefCode) {
-                    // 全県の location.json のURLをリスト化
-                    prefUrls.push(`/${regionCode}/${prefCode}_location.json`);
-                }
+            if (cols[0] === 'pref' && cols[5]) { // cols[5] = url列
+                const prefCode = cols[5].split('/')[1]?.split('_')[0] || cols[5].split('/')[0].split('_')[0];
+                if (prefCode) prefList.push(prefCode);
             }
         }
         
-        // 全県のJSONを一斉にフェッチ
-        const fetchPromises = prefUrls.map(url => 
-            fetch(url).then(r => r.ok ? r.json() : []).catch(() => [])
-        );
+        // 全県のJSONを一斉にフェッチして合体
+        const fetchPromises = prefList.map(prefCode => {
+            const url = `/${regionCode}/${prefCode}_location.json`;
+            return fetch(url)
+                .then(r => r.ok ? r.json() : [])
+                .then(data => {
+                    // ★ ここで「どの県のデータか」目印をつけておく
+                    if (Array.isArray(data)) {
+                        data.forEach(s => s._prefCode = prefCode);
+                    }
+                    return data;
+                })
+                .catch(() => []);
+        });
         
         const results = await Promise.all(fetchPromises);
-        
-        // 全データを1つの配列にガッチャンコする
         results.forEach(prefData => {
             if (Array.isArray(prefData)) {
                 window.ALL_REGION_SPOTS = window.ALL_REGION_SPOTS.concat(prefData);
@@ -2500,6 +2457,42 @@ async function fetchAllRegionSpots() {
         console.error("全県データ結合エラー:", err);
         return [];
     }
+}
+
+// =====================================================
+// ■ 2. 広域マップで全県のドットを描画する関数
+// =====================================================
+async function showAllRegionSpots() {
+    if (!window.map) return;
+    if (window.regionAllSpotLayer) window.map.removeLayer(window.regionAllSpotLayer);
+    window.regionAllSpotLayer = L.layerGroup();
+
+    const allSpots = await fetchAllRegionSpots();
+    const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
+
+    mergedSpots.forEach(spot => {
+        let type = 'spot';
+        if (spot.icon && spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish\d+/);
+            if (match) type = match[0];
+        }
+
+        // ★ 元の綺麗な四角（pref-dot）に戻す
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: `pref-dot ${type}`,
+                html: '', // 中身は空！
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
+            }),
+            interactive: false,
+            keyboard: false
+        });
+
+        window.regionAllSpotLayer.addLayer(marker);
+    });
+
+    window.regionAllSpotLayer.addTo(window.map);
 }
 
 // =====================================================
@@ -2529,50 +2522,7 @@ function filterMergedGridSpots(allSpots, map, gridSize = 5) {
     return result;
 }
 
-// =====================================================
-// ■ 3. 広域マップで全県のドットを描画する関数
-// =====================================================
-async function showAllRegionSpots() {
-    if (!window.map) return;
 
-    if (window.regionAllSpotLayer) {
-        window.map.removeLayer(window.regionAllSpotLayer);
-    }
-    window.regionAllSpotLayer = L.layerGroup();
-
-    // 先行ロード済みの全県データを取得（終わっていれば一瞬で返る）
-    const allSpots = await fetchAllRegionSpots();
-
-    const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
-
-    mergedSpots.forEach(spot => {
-        let type = 'spot';
-        if (spot.icon && spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
-        }
-
-        const isFish = type.startsWith('fish');
-
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: 'custom-text-marker',
-                html: `<div class="spot-text ${type}">■</div>`,
-                iconSize: [0, 0],
-                iconAnchor: [0, 0]
-            }),
-            interactive: false,
-            keyboard: false,
-            zIndexOffset: isFish ? 600 : 500
-        });
-
-        window.regionAllSpotLayer.addLayer(marker);
-    });
-
-    window.regionAllSpotLayer.addTo(window.map);
-}
-
-// グローバルで保持
 window.icData = [];
 window.isIcLoaded = false;
 
