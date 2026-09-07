@@ -598,15 +598,11 @@ function filterMergedGridSpots(allSpots, map, gridSize = 5) {
         const spot = allSpots[i];
         if (!spot.lat || !spot.lng) continue;
 
-        // 現在のズームに応じたピクセル座標を取得
         const p = map.latLngToLayerPoint([spot.lat, spot.lng]);
-
-        // グリッド座標を算出（5px単位で同じマスのものは弾く）
         const cellX = Math.floor(p.x / gridSize);
         const cellY = Math.floor(p.y / gridSize);
         const cellKey = `${cellX}_${cellY}`;
 
-        // まだ同じマスにスポットが登録されていなければ採用
         if (!occupiedCells.has(cellKey)) {
             occupiedCells.add(cellKey);
             result.push(spot);
@@ -617,63 +613,60 @@ function filterMergedGridSpots(allSpots, map, gridSize = 5) {
 }
 
 // =====================================================
-// ■ 広域マップで全県のドットを描画する関数
+// ■ 広域マップで全ドットを描画する関数（All Data 版）
 // =====================================================
-async function showAllRegionSpots(regionCode, prefList) {
+async function showAllRegionSpotsFromMaster(regionCode) {
     if (!window.map) return;
 
-    // 既にレイヤーがあれば消去
     if (window.regionAllSpotLayer) {
         window.map.removeLayer(window.regionAllSpotLayer);
     }
     window.regionAllSpotLayer = L.layerGroup();
 
-    let allSpots = [];
+    try {
+        // ★ 結合済みのマスターJSONを1回だけ読み込む
+        // 例: /KANTO/KANTO_all_locations.json
+        const masterUrl = `/${regionCode}/${regionCode}_all_locations.json`;
+        const res = await fetch(masterUrl);
+        if (!res.ok) throw new Error("Master JSON fetch failed");
+        
+        const allSpots = await res.json();
+        if (!Array.isArray(allSpots)) return;
 
-    // 1. 各県のデータを裏でフェッチして合体させる
-    // ※すでに全データを持ったJSONがある場合はこのフェッチ処理は不要です
-    const fetchPromises = prefList.map(pref => {
-        const jsonUrl = `/${regionCode}/${pref.prefCode}_location.json`;
-        return fetch(jsonUrl)
-            .then(res => res.ok ? res.json() : [])
-            .catch(() => []);
-    });
+        // グリッドで重なりを間引く
+        const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
 
-    const results = await Promise.all(fetchPromises);
-    results.forEach(prefData => {
-        if (Array.isArray(prefData)) {
-            allSpots = allSpots.concat(prefData);
-        }
-    });
+        // 間引いた結果だけをDOMマーカー化
+        mergedSpots.forEach(spot => {
+            let type = 'spot';
+            if (spot.icon && spot.icon.startsWith('fish')) {
+                const match = spot.icon.match(/fish\d+/);
+                if (match) type = match[0];
+            }
 
-    // 2. 重なっているドットを間引く（ここでDOM数を劇的に減らす）
-    const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
+            const isFish = type.startsWith('fish');
 
-    // 3. 間引かれたスポットだけを地図に描画
-    mergedSpots.forEach(spot => {
-        let type = 'spot';
-        if (spot.icon && spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
-        }
+            const marker = L.marker([spot.lat, spot.lng], {
+                icon: L.divIcon({
+                    className: 'custom-text-marker',
+                    html: `<div class="spot-text ${type}">■</div>`, // ★ テキストの ■ を使う
+                    iconSize: [0, 0],
+                    iconAnchor: [0, 0] // 必要に応じて [-2, 5] 等に微調整
+                }),
+                interactive: false,
+                keyboard: false,
+                zIndexOffset: isFish ? 600 : 500
+            });
 
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: `pref-dot ${type}`,
-                html: '', // 中身は空にして軽量化
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
-            }),
-            interactive: false, // タップ判定をオフにして負荷軽減
-            keyboard: false
+            window.regionAllSpotLayer.addLayer(marker);
         });
 
-        window.regionAllSpotLayer.addLayer(marker);
-    });
+        window.regionAllSpotLayer.addTo(window.map);
 
-    window.regionAllSpotLayer.addTo(window.map);
+    } catch (err) {
+        console.error("全スポット描画エラー:", err);
+    }
 }
-
 
 function initAreaUI() {
 
@@ -2156,6 +2149,8 @@ function loadRegionMap() {
             }
             
 // ... (loadRegionMap の中) ...
+// ... index.html : loadRegionMap の中の fetch.then の最後 ...
+
             if (!isMapDrawn) showdebug("❌ type='region'の行が無いため地図が描画されません");
             
             regionHtml += '</ul>';
@@ -2168,12 +2163,11 @@ function loadRegionMap() {
             if (titleSpan) titleSpan.textContent = regionTitle;
             if (linkContainer) linkContainer.innerHTML = regionHtml;
 
-            // 👇 【ここに追加】全県のドットを描画開始
-            // ※ prefList は loadRegionMap 内で構築した県のリストを渡す想定です
-            const currentPrefList = [{prefCode: 'CHIBA'}, {prefCode: 'TOKYO'}, {prefCode: 'KANAGAWA'}, {prefCode: 'IBARAKI'}];
-            showAllRegionSpots(regionCode, currentPrefList);
+            // 👇 【ここに追加】全県マスターデータを読み込んで描画する
+            showAllRegionSpotsFromMaster(regionCode);
 
             isRegionLoaded = true;
+
 // ...
 
         })
