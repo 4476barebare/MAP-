@@ -2461,6 +2461,7 @@ async function routeUpdate() {
         if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
+    await loadLocationJSON();
 
     // ─── スポット階層への直リンク復元 ───
     if (window.currentSpotId) {
