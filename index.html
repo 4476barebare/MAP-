@@ -768,40 +768,16 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
             function executeUI() {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        if (typeof showPrefSpots === 'function') {
-                            showPrefSpots();
-                        }
+                        if (typeof showPrefSpots === 'function') showPrefSpots();
+                        if (typeof initAreaUI === 'function') initAreaUI();
+                        if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                        
+                        // ★ 修正：エラーになっていた直書き処理を消し、アラートやエリアガイドを統合管理する専用関数を呼ぶ
+                        if (typeof renderPrefectureUI === 'function') renderPrefectureUI();
 
-                        if (typeof initAreaUI === 'function') {
-                            initAreaUI();
-                        }
-
-                        if (typeof renderPrefWeather === 'function') {
-                            renderPrefWeather();
-                        }
-
-                        if (typeof renderCrowdImage === 'function') {
-                            renderCrowdImage();
-                        }
-
-                        if (typeof disableAreaSwipe === 'function') {
-                            disableAreaSwipe();
-                        }
-
-                        if (typeof enablePrefSwipe === 'function') {
-                            enablePrefSwipe();
-                        }
-                    if (window.markerControl) {
-                        window.markerControl.preloadShop01(shopUrl);
-                    }
-                    
-                    getAlertText(window.prefData, function(result) {
-                        const el = document.getElementById("alert-bar");
-                        if (el) {
-                            el.textContent = result.text;
-                            el.style.color = result.color;
-                        }
-                    });
                         requestAnimationFrame(() => {
                             const btn = document.getElementById('map-back-btn');
 
@@ -834,6 +810,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
         }
     }
 };
+
 // =====================================================
 // ■ 3. 広域用のグリッド間引き関数
 // =====================================================
