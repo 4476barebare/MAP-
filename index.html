@@ -2345,7 +2345,6 @@ async function routeUpdate() {
             window.map.once('moveend', finalizePref);
         }
     }
-}
 
 }
 
@@ -2608,7 +2607,7 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     window.prefBounds = null;
     window.areaBounds = null;
     
-    // 👇【ここが原因！】古いデータを空っぽにしないと、新しいJSONを読み込みに行きません
+    // 👇 古いデータを空っぽにしないと、新しいJSONを読み込みに行きません
     window.prefData = null;
     window.areaData = [];
     window.spotData = [];
