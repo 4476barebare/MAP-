@@ -2753,7 +2753,6 @@ function renderFishSection(uniqueNames) {
     fishDiv.innerHTML = html;
     accessBox.appendChild(fishDiv);
 }
-
 // ==========================================
 // ★ Prefスワイプ用①：RegionのCSVから県リストと位置関係を取得・グラフ化する関数
 // ==========================================
@@ -2798,15 +2797,9 @@ async function getPrefListFromRegion() {
                 const areaIdVal = areaIdIdx !== -1 ? cols[areaIdIdx] : null;
                 if (!urlVal) continue;
                 
-                const parts = urlVal.split('/');
-                let prefCode = '';
+                // ★ 修正：パスの階層に依存せず、確実に県コード(CHIBA等)を抜き出す
+                const prefCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
                 let regionCode = window.currentRegion || 'KANTO';
-                
-                if (parts.length >= 4) {
-                    prefCode = parts[1].split('_')[0]; 
-                } else if (parts.length === 3) {
-                    prefCode = parts[0].split('_')[0]; 
-                }
                 
                 if (prefCode) {
                     // グリッド座標をパースして持たせる
@@ -2832,6 +2825,7 @@ async function getPrefListFromRegion() {
         return [];
     }
 }
+
 
 // ==========================================
 // ★ Prefスワイプ用②：グリッド座標から県同士の隣接関係（グラフ）を構築
