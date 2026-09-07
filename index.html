@@ -527,6 +527,7 @@ async function applyQueryToStateFromCsv() {
                                 window.currentPref = cols[nameIdx];
                                 if (cols[urlIdx]) {
                                     window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
+                                     
                                 }
                                 break;
                             }
@@ -745,6 +746,7 @@ window.selectPrefecture = async function(csvParam, fallbackPrefName) {
     if (window.prefData && window.map) {
         const targetZoom = window.prefData.zoom;
         if (typeof showdebug === 'function') showdebug(`[移動] drawLocation実行: zoom=${targetZoom}`);
+        await loadLocationJSON();
 
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
 
@@ -881,6 +883,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await applyQueryToStateFromCsv();
     
     if (!window.currentPref) {
+        
         routeUpdate(); 
         return;
     }
@@ -894,6 +897,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const jsonUrl = window.prefLocationUrl;
     const whetherUrl = window.prefWeatherUrl;
     const shopUrl = window.prefShopUrl;
+    
+
 
     loadLocationJSON(jsonUrl).then(() => {
         loadWhetherCSV(whetherUrl).then(csv => {
