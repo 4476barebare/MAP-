@@ -527,7 +527,6 @@ async function applyQueryToStateFromCsv() {
                                 window.currentPref = cols[nameIdx];
                                 if (cols[urlIdx]) {
                                     window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
-                                     
                                 }
                                 break;
                             }
@@ -540,9 +539,10 @@ async function applyQueryToStateFromCsv() {
         }
     }
 
-    // 2. エリア・スポットのID特定（フェッチを廃止し、合体した全データから一瞬で探す）
-    if ((qArea || qSpot) && window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
-        for (const row of window.ALL_REGION_SPOTS) {
+    // 2. エリア・スポットのID特定（フェッチを廃止し、合体した金庫データから一瞬で探す）
+    const vaultData = window.allspotData || window.ALL_REGION_SPOTS;
+    if ((qArea || qSpot) && vaultData && vaultData.length > 0) {
+        for (const row of vaultData) {
             const rowName = row.name;
             if (qArea && rowName === qArea && row.type === 'area') {
                 window.currentAreaId = row.areaId + "_" + row.individualId;
