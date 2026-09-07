@@ -2948,8 +2948,6 @@ function enablePrefSwipe() {
         // 誤動作防止のためスワイプを一時無効化
         disablePrefSwipe();
         
-        //if (typeof showdebug === 'function') showdebug(`スワイプ移動: ${nextPrefData.prefName} へ`);
-
         // 状態をリセットして次の県をロード
         refreshPrefGlobals(nextPrefData.regionCode, nextPrefData.prefCode, nextPrefData.prefName);
         
@@ -2959,7 +2957,10 @@ function enablePrefSwipe() {
         window.areaBounds = null;
         window.goBackGuard = true;
 
-        routeUpdate();
+        // 👇【修正】routeUpdate() をやめ、JSON読み込み～描画まで一貫して行ってくれる selectPrefecture を直接呼ぶ
+        if (typeof window.selectPrefecture === 'function') {
+            window.selectPrefecture(nextPrefData.prefCode, nextPrefData.prefName);
+        }
     }
 
     el.addEventListener('touchstart', onStart, { passive: true });
