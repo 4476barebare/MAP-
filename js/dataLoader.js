@@ -175,8 +175,9 @@ function loadLocationJSON(jsonUrl) {
         return { main, areas, spots };
     });
 }
+
 // ==========================================
-// ★ SEO対策用：HTML文字列を一括生成する関数（爆速処理用）
+// ★ SEO対策用：HTML文字列を一括生成する関数（対象魚非表示版）
 // ==========================================
 function buildSeoHtmlString(mainData, areasData, spotsData) {
     if (!mainData) return '';
@@ -200,20 +201,8 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
             areaSpots.forEach(spot => {
                 const url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName)}&area=${encodeURIComponent(area.name)}&spot=${encodeURIComponent(spot.name)}`;
                 
-                // ★ 新規追加：URLに格納された魚データを元に、対象魚種テキストを抽出して付与する
-                let fishText = '';
-                if (spot.URL && spot.URL.trim() !== '') {
-                    const fishItems = spot.URL.split(',');
-                    // カタカナのみ（魚種）を抽出して重複を削除
-                    const fishNames = [...new Set(fishItems.map(item => item.split('|')[0]))]
-                        .filter(name => /^[ァ-ヴー]+$/.test(name));
-                    
-                    if (fishNames.length > 0) {
-                        fishText = `<span style="font-size: 12px; color: #666; margin-left: 8px;">（対象魚: ${fishNames.join('、')}）</span>`;
-                    }
-                }
-                
-                html += `<li style="margin:5px 0;"><a href="${url}" style="color:#0066cc; text-decoration:underline;">${spot.name}</a>${fishText}</li>`;
+                // 対象魚種の抽出・結合処理を削除し、純粋にスポット名だけをリスト化する
+                html += `<li style="margin:5px 0;"><a href="${url}" style="color:#0066cc; text-decoration:underline;">${spot.name}</a></li>`;
             });
             
             html += `</ul>`;
