@@ -495,7 +495,7 @@ async function updateQueryFromIds(pref, currentAreaId, currentSpotId) {
 }
 
 // ==========================================
-// ★ 新規追加：URLクエリの日本語名から直接JSONを読んでシステム変数をセットする関数
+// ★ URLクエリから直接システム変数をセットする関数（全データ一括版）
 // ==========================================
 async function applyQueryToStateFromCsv() {
     const params = new URLSearchParams(window.location.search);
@@ -503,11 +503,9 @@ async function applyQueryToStateFromCsv() {
     const qArea = params.get('area');
     const qSpot = params.get('spot');
 
-    if (!qPref) return; // prefクエリが無い場合は何もしない
+    if (!qPref) return;
 
-    // --------------------------------------------------
-    // パターン1：prefクエリがある場合 (Region CSVの探索)
-    // --------------------------------------------------
+    // 1. Region CSVの探索 (現在の県を確定)
     if (window.regionUrl) {
         try {
             const res = await fetch(window.regionUrl);
@@ -525,14 +523,9 @@ async function applyQueryToStateFromCsv() {
                         for (let i = 1; i < lines.length; i++) {
                             const cols = lines[i].split(',').map(c => c.trim());
                             
-                            // notes列(日本語名)がクエリと一致する行を探す
                             if (cols[notesIdx] === qPref) {
-                                // name列を pref(現在の県)としてグローバル定義
                                 window.currentPref = cols[nameIdx];
-
-                                // ★ url列に何らかの値が入っているかだけをチェックし、パスを生成
                                 if (cols[urlIdx]) {
-                                    // 修正：必ず .json 拡張子でパスを生成する
                                     window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
                                 }
                                 break;
@@ -546,31 +539,225 @@ async function applyQueryToStateFromCsv() {
         }
     }
 
-// ... applyQueryToStateFromCsv 関数の後半部分 ...
-
-    // --------------------------------------------------
-    // パターン2 & パターン3 (フェッチを廃止し全データから検索)
-    // --------------------------------------------------
+    // 2. エリア・スポットのID特定（フェッチを廃止し、合体した全データから一瞬で探す）
     if ((qArea || qSpot) && window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
         for (const row of window.ALL_REGION_SPOTS) {
             const rowName = row.name;
-            
-            if (qArea && rowName === qArea) {
+            if (qArea && rowName === qArea && row.type === 'area') {
                 window.currentAreaId = row.areaId + "_" + row.individualId;
             }
-            if (qSpot && rowName === qSpot) {
+            if (qSpot && rowName === qSpot && row.type !== 'pref' && row.type !== 'area') {
                 window.currentSpotId = row.individualId;
             }
         }
     }
-// } // 関数の閉じカッコ
-
 }
 
 function formatDate(str) {
   const [y, m, d] = str.split("-");
   return `${y} ${Number(m)}/${Number(d)}`;
 }
+
+// =====================================================
+// ■ 1. 全県データをバックグラウンドで取得・合体する専用関数
+// =====================================================
+async function fetchAllRegionSpots() {
+    if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
+        return window.ALL_REGION_SPOTS;
+    }
+    window.ALL_REGION_SPOTS = [];
+    
+    try {
+        const regionCode = window.currentRegion || 'KANTO';
+        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
+        
+        const res = await fetch(rUrl);
+        if (!res.ok) throw new Error("Region CSV fetch failed");
+        
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        
+        // ★ 列の番号を決め打ちせず、必ず名前で探す（バグ防止）
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const typeIdx = headers.indexOf('type');
+        const urlIdx = headers.indexOf('url');
+        
+        if (typeIdx === -1 || urlIdx === -1) return [];
+
+        const prefList = [];
+        for (let i = 1; i < lines.length; i++) {
+            const cols = lines[i].split(',').map(c => c.trim());
+            if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
+                const urlVal = cols[urlIdx];
+                const prefCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
+                if (prefCode) prefList.push(prefCode);
+            }
+        }
+        
+        // 全県のJSONを一斉にフェッチして合体
+        const fetchPromises = prefList.map(prefCode => {
+            const url = `/${regionCode}/${prefCode}_location.json`;
+            return fetch(url)
+                .then(r => r.ok ? r.json() : [])
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        // どの県のデータか目印をつける
+                        data.forEach(s => s._prefCode = prefCode);
+                    }
+                    return data;
+                })
+                .catch(() => []);
+        });
+        
+        const results = await Promise.all(fetchPromises);
+        results.forEach(prefData => {
+            if (Array.isArray(prefData)) {
+                window.ALL_REGION_SPOTS = window.ALL_REGION_SPOTS.concat(prefData);
+            }
+        });
+        
+        return window.ALL_REGION_SPOTS;
+    } catch (err) {
+        console.error("全県データ結合エラー:", err);
+        return [];
+    }
+}
+
+// =====================================================
+// ■ 2. 広域マップで全県のドットを描画する関数
+// =====================================================
+async function showAllRegionSpots() {
+    if (!window.map) return;
+    if (window.regionAllSpotLayer) window.map.removeLayer(window.regionAllSpotLayer);
+    window.regionAllSpotLayer = L.layerGroup();
+
+    // 先に作っておいた全データ配列を使う
+    const allData = await fetchAllRegionSpots();
+
+    // ★ スポット（釣り場等）だけを抽出し、prefやareaの行を弾く！
+    const targetSpots = allData.filter(s => s.type !== 'pref' && s.type !== 'area');
+
+    // グリッドで重なりを間引く
+    const mergedSpots = filterMergedGridSpots(targetSpots, window.map, 5);
+
+    mergedSpots.forEach(spot => {
+        let type = 'spot';
+        if (spot.icon && spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish\d+/);
+            if (match) type = match[0];
+        }
+
+        const isFish = type.startsWith('fish');
+
+        // ★ 元の綺麗な四角（pref-dot）で描画！
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: `pref-dot ${type}`,
+                html: '', // 白フチを防ぐため中身は空
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
+            }),
+            interactive: false,
+            keyboard: false,
+            zIndexOffset: isFish ? 600 : 500
+        });
+
+        window.regionAllSpotLayer.addLayer(marker);
+    });
+
+    window.regionAllSpotLayer.addTo(window.map);
+}
+
+// =====================================================
+// ■ 3. 広域用のグリッド間引き関数
+// =====================================================
+function filterMergedGridSpots(allSpots, map, gridSize = 5) {
+    if (!map || !Array.isArray(allSpots) || allSpots.length === 0) return [];
+
+    const occupiedCells = new Set();
+    const result = [];
+
+    for (let i = 0; i < allSpots.length; i++) {
+        const spot = allSpots[i];
+        if (!spot.lat || !spot.lng) continue;
+
+        const p = map.latLngToLayerPoint([spot.lat, spot.lng]);
+        const cellX = Math.floor(p.x / gridSize);
+        const cellY = Math.floor(p.y / gridSize);
+        const cellKey = `${cellX}_${cellY}`;
+
+        if (!occupiedCells.has(cellKey)) {
+            occupiedCells.add(cellKey);
+            result.push(spot);
+        }
+    }
+
+    return result;
+}
+
+
+// 【県域データロード】完全にフェッチをなくし、メモリ上から抽出して各変数に「正しく振り分ける」
+async function loadPrefectureData(prefCode) {
+    window.fishData = null; 
+    window.currentPref = prefCode;
+    const region = window.currentRegion || 'KANTO';
+    window.regionUrl = `/${region}/${region}_region.csv`; 
+
+    try {
+        if (!window.ALL_REGION_SPOTS || window.ALL_REGION_SPOTS.length === 0) {
+            await fetchAllRegionSpots();
+        }
+
+        // ★ 修正：全データから対象県のものを抽出し、それぞれ正しい変数にセットする！
+        const targetRows = window.ALL_REGION_SPOTS.filter(s => s._prefCode === prefCode);
+        window.prefData = targetRows.find(row => row.type === 'pref') || null;
+        window.areaData = targetRows.filter(row => row.type === 'area');
+        window.spotData = targetRows.filter(row => row.type !== 'pref' && row.type !== 'area');
+        
+        // 沿岸部の天気を取得
+        const whetherUrl = `/data/${prefCode}_whether.csv`;
+        const whetherCsv = await loadWhetherCSV(whetherUrl);
+        applyWhetherToSpots(whetherCsv);
+       
+        // 内陸部の天気を取得
+        if (typeof loadInlandWhetherCSV === 'function') {
+            const inlandCsv = await loadInlandWhetherCSV(region);
+            if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
+        }
+
+        return true; 
+    } catch (err) {
+        console.error("データ読み込みエラー:", err);
+        return false;
+    }
+}
+
+
+// ==========================================
+// ★ ページの初期読み込み（超スッキリ版）
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
+    loadICData();
+    const params = new URLSearchParams(window.location.search);
+    
+    if (!params.get('region') && !params.get('pref')) {
+        setIdealQuery('region', '関東地方'); 
+    }
+    window.currentRegion = getRegionCode();
+    window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
+
+    // 1. 全県データを先にバックグラウンドで結合
+    await fetchAllRegionSpots();
+
+    // 2. URLからの逆引き実行
+    await applyQueryToStateFromCsv();
+    
+    // 3. あとは routeUpdate() に任せるだけで完璧に処理が分岐する
+    routeUpdate();
+});
+
+// （以下、既存の getAlertText などの関数群は維持されていればそのままでOKです）
+
 
 
 function initAreaUI() {
@@ -2340,187 +2527,6 @@ function getRegionCode() {
 }
 
 
-
-document.addEventListener('DOMContentLoaded', async () => {
-    loadICData();
-    const params = new URLSearchParams(window.location.search);
-    
-    // 1. 基本Regionの決定
-    if (!params.get('region') && !params.get('pref')) {
-        setIdealQuery('region', '関東地方'); 
-    }
-    window.currentRegion = getRegionCode();
-    window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
-
-    // 2. 逆引き実行（ここで window.currentPref や window.prefLocationUrl が確定する）
-    await applyQueryToStateFromCsv();
-    
-    // 3. prefが確定していなければ、Region画面（マップ上の県マーカー選択画面）を出して終了
-    if (!window.currentPref) {
-        routeUpdate(); // 内部でloadRegionMapが呼ばれる
-        return;
-    }
-// 4. ★ここから本来の読み込みチェーン開始
-// 【修正点】直打ちの場合に備えて、魚データなどのパスをグローバル変数に確実にセットする
-window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.json`; // ← .json に変更
-window.prefWeatherUrl       = `/data/${window.currentPref}_whether.csv`;
-window.prefInlandWeatherUrl = `/data/${window.currentRegion}_inLand_recalculated.csv`;
-window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.json`;
-window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
-
-const jsonUrl = window.prefLocationUrl; // ← jsonUrl に変更
-const whetherUrl = window.prefWeatherUrl;
-const shopUrl = window.prefShopUrl;
-fetchAllRegionSpots();
-// このチェーン内で初めてロードと描画を完結させる
-loadLocationJSON(jsonUrl).then(() => { // ← loadLocationJSON に変更（第2引数も削除）
-
-        loadWhetherCSV(whetherUrl).then(csv => {
-            applyWhetherToSpots(csv);
-            
-            if (typeof loadInlandWhetherCSV === 'function') {
-                loadInlandWhetherCSV(window.currentRegion).then(inlandCsv => {
-                    applyInlandWhetherToSpots(inlandCsv);
-                    // データが全て揃った後に描画系を起動
-                    routeUpdate();
-                    renderAreaGuide();
-                    
-                    if (window.markerControl) {
-                        window.markerControl.preloadShop01(shopUrl);
-                    }
-                    
-                    getAlertText(window.prefData, function(result) {
-                        const el = document.getElementById("alert-bar");
-                        if (el) {
-                            el.textContent = result.text;
-                            el.style.color = result.color;
-                        }
-                    });
-                });
-            }
-        });
-    });
-});
-
-// =====================================================
-// ■ 1. 全県データをバックグラウンドで取得・合体する専用関数
-// =====================================================
-async function fetchAllRegionSpots() {
-    if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
-        return window.ALL_REGION_SPOTS;
-    }
-    window.ALL_REGION_SPOTS = [];
-    
-    try {
-        const regionCode = window.currentRegion || 'KANTO';
-        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
-        
-        const res = await fetch(rUrl);
-        if (!res.ok) throw new Error("Region CSV fetch failed");
-        
-        const text = await res.text();
-        const lines = text.trim().split('\n');
-        
-        const prefList = [];
-        for (let i = 1; i < lines.length; i++) {
-            const cols = lines[i].split(',').map(c => c.trim());
-            if (cols[0] === 'pref' && cols[5]) { // cols[5] = url列
-                const prefCode = cols[5].split('/')[1]?.split('_')[0] || cols[5].split('/')[0].split('_')[0];
-                if (prefCode) prefList.push(prefCode);
-            }
-        }
-        
-        // 全県のJSONを一斉にフェッチして合体
-        const fetchPromises = prefList.map(prefCode => {
-            const url = `/${regionCode}/${prefCode}_location.json`;
-            return fetch(url)
-                .then(r => r.ok ? r.json() : [])
-                .then(data => {
-                    // ★ ここで「どの県のデータか」目印をつけておく
-                    if (Array.isArray(data)) {
-                        data.forEach(s => s._prefCode = prefCode);
-                    }
-                    return data;
-                })
-                .catch(() => []);
-        });
-        
-        const results = await Promise.all(fetchPromises);
-        results.forEach(prefData => {
-            if (Array.isArray(prefData)) {
-                window.ALL_REGION_SPOTS = window.ALL_REGION_SPOTS.concat(prefData);
-            }
-        });
-        
-        return window.ALL_REGION_SPOTS;
-    } catch (err) {
-        console.error("全県データ結合エラー:", err);
-        return [];
-    }
-}
-
-// =====================================================
-// ■ 2. 広域マップで全県のドットを描画する関数
-// =====================================================
-async function showAllRegionSpots() {
-    if (!window.map) return;
-    if (window.regionAllSpotLayer) window.map.removeLayer(window.regionAllSpotLayer);
-    window.regionAllSpotLayer = L.layerGroup();
-
-    const allSpots = await fetchAllRegionSpots();
-    const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
-
-    mergedSpots.forEach(spot => {
-        let type = 'spot';
-        if (spot.icon && spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
-        }
-
-        // ★ 元の綺麗な四角（pref-dot）に戻す
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: `pref-dot ${type}`,
-                html: '', // 中身は空！
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
-            }),
-            interactive: false,
-            keyboard: false
-        });
-
-        window.regionAllSpotLayer.addLayer(marker);
-    });
-
-    window.regionAllSpotLayer.addTo(window.map);
-}
-
-// =====================================================
-// ■ 2. 広域用のグリッド間引き関数
-// =====================================================
-function filterMergedGridSpots(allSpots, map, gridSize = 5) {
-    if (!map || !Array.isArray(allSpots) || allSpots.length === 0) return [];
-
-    const occupiedCells = new Set();
-    const result = [];
-
-    for (let i = 0; i < allSpots.length; i++) {
-        const spot = allSpots[i];
-        if (!spot.lat || !spot.lng) continue;
-
-        const p = map.latLngToLayerPoint([spot.lat, spot.lng]);
-        const cellX = Math.floor(p.x / gridSize);
-        const cellY = Math.floor(p.y / gridSize);
-        const cellKey = `${cellX}_${cellY}`;
-
-        if (!occupiedCells.has(cellKey)) {
-            occupiedCells.add(cellKey);
-            result.push(spot);
-        }
-    }
-
-    return result;
-}
 
 
 window.icData = [];
