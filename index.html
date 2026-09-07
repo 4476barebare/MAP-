@@ -791,7 +791,17 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
                         if (typeof enablePrefSwipe === 'function') {
                             enablePrefSwipe();
                         }
-
+                    if (window.markerControl) {
+                        window.markerControl.preloadShop01(shopUrl);
+                    }
+                    
+                    getAlertText(window.prefData, function(result) {
+                        const el = document.getElementById("alert-bar");
+                        if (el) {
+                            el.textContent = result.text;
+                            el.style.color = result.color;
+                        }
+                    });
                         requestAnimationFrame(() => {
                             const btn = document.getElementById('map-back-btn');
 
