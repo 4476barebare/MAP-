@@ -2873,6 +2873,7 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     window.areaData = [];
     window.spotData = [];
     window.fishData = null; 
+    await loadLocationJSON();
     
     if (typeof clearSpotUI === 'function') clearSpotUI();
     if (window.phase1Group) window.phase1Group.clearLayers();
