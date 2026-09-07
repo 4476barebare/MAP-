@@ -560,13 +560,13 @@ function formatDate(str) {
 }
 
 // =====================================================
-// ■ 1. 全県データをバックグラウンドで取得・合体する専用関数
+// ■ 1. 全県データをバックグラウンドで取得・合体する金庫生成関数
 // =====================================================
 async function fetchAllRegionSpots() {
-    if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
-        return window.ALL_REGION_SPOTS;
+    if (window.allspotData && window.allspotData.length > 0) {
+        return window.allspotData;
     }
-    window.ALL_REGION_SPOTS = [];
+    window.allspotData = [];
     
     try {
         const regionCode = window.currentRegion || 'KANTO';
@@ -577,8 +577,6 @@ async function fetchAllRegionSpots() {
         
         const text = await res.text();
         const lines = text.trim().split('\n');
-        
-        // ★ 列の番号を決め打ちせず、必ず名前で探す（バグ防止）
         const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
         const typeIdx = headers.indexOf('type');
         const urlIdx = headers.indexOf('url');
@@ -595,14 +593,12 @@ async function fetchAllRegionSpots() {
             }
         }
         
-        // 全県のJSONを一斉にフェッチして合体
         const fetchPromises = prefList.map(prefCode => {
             const url = `/${regionCode}/${prefCode}_location.json`;
             return fetch(url)
                 .then(r => r.ok ? r.json() : [])
                 .then(data => {
                     if (Array.isArray(data)) {
-                        // どの県のデータか目印をつける
                         data.forEach(s => s._prefCode = prefCode);
                     }
                     return data;
@@ -613,11 +609,12 @@ async function fetchAllRegionSpots() {
         const results = await Promise.all(fetchPromises);
         results.forEach(prefData => {
             if (Array.isArray(prefData)) {
-                window.ALL_REGION_SPOTS = window.ALL_REGION_SPOTS.concat(prefData);
+                window.allspotData = window.allspotData.concat(prefData);
             }
         });
         
-        return window.ALL_REGION_SPOTS;
+        window.ALL_REGION_SPOTS = window.allspotData; // 念のための後方互換
+        return window.allspotData;
     } catch (err) {
         console.error("全県データ結合エラー:", err);
         return [];
@@ -838,8 +835,9 @@ function filterMergedGridSpots(allSpots, map, gridSize = 5) {
     return result;
 }
 
-
-// 【県域データロード】完全にフェッチをなくし、メモリ上から抽出して各変数に「正しく振り分ける」
+// =====================================================
+// 【県域データロード】抽出は完全に loadLocationJSON に任せる
+// =====================================================
 async function loadPrefectureData(prefCode) {
     window.fishData = null; 
     window.currentPref = prefCode;
@@ -847,22 +845,23 @@ async function loadPrefectureData(prefCode) {
     window.regionUrl = `/${region}/${region}_region.csv`; 
 
     try {
-        if (!window.ALL_REGION_SPOTS || window.ALL_REGION_SPOTS.length === 0) {
-            await fetchAllRegionSpots();
+        // 1. 金庫の確認と準備
+        if (!window.allspotData || window.allspotData.length === 0) {
+            if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
+                window.allspotData = window.ALL_REGION_SPOTS;
+            } else {
+                await fetchAllRegionSpots();
+            }
         }
 
-        // ★ 修正：全データから対象県のものを抽出し、それぞれ正しい変数にセットする！
-        const targetRows = window.ALL_REGION_SPOTS.filter(s => s._prefCode === prefCode);
-        window.prefData = targetRows.find(row => row.type === 'pref') || null;
-        window.areaData = targetRows.filter(row => row.type === 'area');
-        window.spotData = targetRows.filter(row => row.type !== 'pref' && row.type !== 'area');
+        // 2. 抽出と振り分けはすべて loadLocationJSON に任せる
+        await loadLocationJSON();
         
-        // 沿岸部の天気を取得
+        // 3. 天気データの取得
         const whetherUrl = `/data/${prefCode}_whether.csv`;
         const whetherCsv = await loadWhetherCSV(whetherUrl);
         applyWhetherToSpots(whetherCsv);
        
-        // 内陸部の天気を取得
         if (typeof loadInlandWhetherCSV === 'function') {
             const inlandCsv = await loadInlandWhetherCSV(region);
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
@@ -874,7 +873,6 @@ async function loadPrefectureData(prefCode) {
         return false;
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', async () => {
     loadICData();
@@ -2437,37 +2435,6 @@ function loadRegionMap() {
         });
 }
 
-
-
-async function loadPrefectureData(prefCode) {
-    window.fishData = null; 
-    window.currentPref = prefCode;
-    const region = window.currentRegion || 'KANTO';
-    window.regionUrl = `/${region}/${region}_region.csv`; 
-
-    try {
-        // ★ JSONのフェッチを完全廃止し、合体データから抽出するだけに！
-        if (!window.ALL_REGION_SPOTS || window.ALL_REGION_SPOTS.length === 0) {
-            await fetchAllRegionSpots();
-        }
-        window.spotData = window.ALL_REGION_SPOTS.filter(s => s._prefCode === prefCode);
-        
-        // 沿岸部の天気を取得
-        const whetherUrl = `/data/${prefCode}_whether.csv`;
-        const whetherCsv = await loadWhetherCSV(whetherUrl);
-        applyWhetherToSpots(whetherCsv);
-       
-        // 内陸部の天気を取得
-        if (typeof loadInlandWhetherCSV === 'function') {
-            const inlandCsv = await loadInlandWhetherCSV(region);
-            if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
-        }
-        return true; 
-    } catch (err) {
-        console.error("データ読み込みエラー:", err);
-        return false;
-    }
-}
 
 // ==========================================
 // ★ データの完全性チェック＆ロード関数
