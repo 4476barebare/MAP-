@@ -55,10 +55,15 @@ jobs:
           # 変更がある場合のみコミットしてプッシュ
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: 群衆画像の取得を反映"
+            
+            # 🌟 プッシュ直前に最新のリモート状態と同期（リベース）する
+            git pull --rebase origin main
+            
             git push origin main
           else
             echo "✅ 画像に変更がなかったためコミットをスキップしました。"
           fi
+
 
       # ========================================================
       # GitHub Pages への直接デプロイ
