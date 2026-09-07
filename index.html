@@ -669,13 +669,14 @@ async function showAllRegionSpots() {
 }
 
 // ==========================================
-// 3. マーカー等から県が選択された時のトリガー
+// 3. マーカー等から県が選択された時のトリガー（デバッグ版）
 // ==========================================
-window.selectPrefecture = function(csvParam, fallbackPrefName) {
+window.selectPrefecture = async function(csvParam, fallbackPrefName) {
+    if (typeof showdebug === 'function') showdebug(`[開始] selectPrefecture: csvParam=${csvParam}, fallback=${fallbackPrefName}`);
+
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
 
-    // 1. 引数から県コード（IBARAKI等）を正しく抽出する
     if (csvParam.includes('_location')) {
         prefCode = csvParam.split('_')[0];
     } else if (csvParam.includes('_')) {
@@ -687,19 +688,18 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
         if (match) prefCode = match[1];
     }
 
+    if (typeof showdebug === 'function') showdebug(`[解析] region=${region}, prefCode=${prefCode}`);
+
     window.currentRegion = region;
-    window.currentPref = prefCode; // 例: "IBARAKI"
-    
+    window.currentPref = prefCode;
     window.prefBounds = null;
     window.areaBounds = null;
 
-    // 広域マップの全県ドットを消去
     if (window.regionAllSpotLayer && window.map) {
         window.map.removeLayer(window.regionAllSpotLayer);
         window.regionAllSpotLayer = null;
     }
     
-    // パスを一括でグローバル生成
     window.prefLocationUrl      = `/${region}/${prefCode}_location.json`;
     window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
@@ -708,17 +708,25 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
 
     let prefName = fallbackPrefName;
 
+    // =====================================================
+    // ★ 抽出テスト
+    // =====================================================
+    if (typeof showdebug === 'function') {
+        showdebug(`[データ確認] ALL_REGION_SPOTSの長さ: ${window.ALL_REGION_SPOTS ? window.ALL_REGION_SPOTS.length : '未定義'}`);
+    }
+
     if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
-        // ご提示のJSONにある親行の条件：「name === prefCode」かつ「individualId === "parent"」
         const targetPrefData = window.ALL_REGION_SPOTS.find(r => r.name === prefCode && r.individualId === "parent");
         
         if (targetPrefData) {
             window.prefData = targetPrefData; 
             prefName = targetPrefData.notes;  
+            if (typeof showdebug === 'function') showdebug(`[発見] prefData抽出成功: name=${prefName}, zoom=${targetPrefData.zoom}, lat=${targetPrefData.lat}, lng=${targetPrefData.lng}`);
+        } else {
+            if (typeof showdebug === 'function') showdebug(`[エラー] nameが ${prefCode} かつ individualId が parent の行が見つかりません`);
         }
     }
 
-    // クエリをセット（ここで正しい日本語名がURLに入る）
     if (prefName) {
         setIdealQuery('pref', prefName);
     } else {
@@ -727,41 +735,55 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-    // =====================================================
-    // ★ 修正：routeUpdateを呼ばずに、直接flyToしてUI関数を呼ぶ
-    // =====================================================
+    if (!window.prefData) {
+        if (typeof showdebug === 'function') showdebug(`[警告] prefDataが無いため loadPrefectureData を強制実行します`);
+        if (typeof loadPrefectureData === 'function') {
+            await loadPrefectureData(prefCode);
+        }
+    }
+
     if (window.prefData && window.map) {
         const targetZoom = window.prefData.zoom;
+        if (typeof showdebug === 'function') showdebug(`[移動] drawLocation実行: zoom=${targetZoom}`);
 
-        // 1. 指定の座標へ飛ぶ
         drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
 
-        // 2. 移動アニメーション完了後に必要なUI関数を呼ぶ
         const finalizePref = () => {
+            if (typeof showdebug === 'function') showdebug(`[移動完了] finalizePref実行`);
             window.map.invalidateSize(true);
             
-            requestAnimationFrame(() => {
+            if (typeof loadPrefectureData === 'function' && (!window.spotData || window.spotData.length === 0)) {
+                if (typeof showdebug === 'function') showdebug(`[UI処理] spotDataが無いため loadPrefectureData 実行後にUI展開`);
+                loadPrefectureData(prefCode).then(() => {
+                    executeUI();
+                });
+            } else {
+                executeUI();
+            }
+
+            function executeUI() {
+                if (typeof showdebug === 'function') showdebug(`[UI展開] 各種UI関数を呼び出し`);
                 requestAnimationFrame(() => {
-                    if (typeof showPrefSpots === 'function') showPrefSpots();
-                    if (typeof initAreaUI === 'function') initAreaUI();
-                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
-
-                    // 県スワイプをON、エリアスワイプをOFFにする
-                    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
-                    if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
-                    
                     requestAnimationFrame(() => {
-                        const btn = document.getElementById('map-back-btn');
-                        if (btn) {
-                            btn.style.display = 'block';
-                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
-                        }
+                        if (typeof showPrefSpots === 'function') showPrefSpots();
+                        if (typeof initAreaUI === 'function') initAreaUI();
+                        if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
 
-                        window.goBackGuard = false; 
+                        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                        
+                        requestAnimationFrame(() => {
+                            const btn = document.getElementById('map-back-btn');
+                            if (btn) {
+                                btn.style.display = 'block';
+                                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                            }
+                            window.goBackGuard = false; 
+                        });
                     });
                 });
-            });
+            }
         };
 
         const center = window.map.getCenter();
@@ -770,13 +792,16 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
                           window.map.getZoom() === targetZoom;
 
         if (isSameLoc) {
+            if (typeof showdebug === 'function') showdebug(`[移動判定] 同一座標のため即時完了`);
             finalizePref();
         } else {
+            if (typeof showdebug === 'function') showdebug(`[移動判定] moveend待機`);
             window.map.once('moveend', finalizePref);
         }
+    } else {
+        if (typeof showdebug === 'function') showdebug(`[致命的エラー] prefData か map が存在しません`);
     }
 };
-
 
 // =====================================================
 // ■ 3. 広域用のグリッド間引き関数
