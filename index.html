@@ -2320,6 +2320,13 @@ async function routeUpdate() {
                     if (typeof initAreaUI === 'function') initAreaUI();
                     if (typeof renderPrefWeather === 'function') renderPrefWeather();
                     if (typeof renderCrowdImage === 'function') renderCrowdImage();
+
+              
+                // 👇【ここに追加】県スワイプをON、エリアスワイプをOFFにする
+                if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                
+
                     
                     requestAnimationFrame(() => {
                         const btn = document.getElementById('map-back-btn');
@@ -2480,6 +2487,231 @@ function renderFishSection(uniqueNames) {
 }
 
 // ==========================================
+// ★ Prefスワイプ用①：RegionのCSVから県リストと位置関係を取得・グラフ化する関数
+// ==========================================
+async function getPrefListFromRegion() {
+    if (!window.regionUrl) return [];
+    
+    // x:1, y:2 の形式をパース
+    function parseGrid(str) {
+        if (!str) return { x: null, y: null };
+        const x = str.match(/x\s*:\s*(-?\d+)/);
+        const y = str.match(/y\s*:\s*(-?\d+)/);
+        return {
+            x: x ? parseInt(x[1]) : null,
+            y: y ? parseInt(y[1]) : null
+        };
+    }
+
+    try {
+        const res = await fetch(window.regionUrl);
+        if (!res.ok) throw new Error("Region CSV fetch failed");
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const typeIdx   = headers.indexOf('type');
+        const urlIdx    = headers.indexOf('url');
+        const notesIdx  = headers.indexOf('notes');
+        const areaIdIdx = headers.indexOf('areaid'); // ★ areaId列を探索
+
+        if (typeIdx === -1 || urlIdx === -1 || notesIdx === -1) return [];
+
+        const prefList = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i]) continue;
+            const cols = lines[i].split(',').map(c => c.trim());
+            
+            if (cols[typeIdx] === 'pref') {
+                const urlVal = cols[urlIdx];
+                const prefName = cols[notesIdx];
+                const areaIdVal = areaIdIdx !== -1 ? cols[areaIdIdx] : null;
+                if (!urlVal) continue;
+                
+                const parts = urlVal.split('/');
+                let prefCode = '';
+                let regionCode = window.currentRegion || 'KANTO';
+                
+                if (parts.length >= 4) {
+                    prefCode = parts[1].split('_')[0]; 
+                } else if (parts.length === 3) {
+                    prefCode = parts[0].split('_')[0]; 
+                }
+                
+                if (prefCode) {
+                    // グリッド座標をパースして持たせる
+                    const grid = parseGrid(areaIdVal);
+                    prefList.push({ 
+                        regionCode, 
+                        prefCode, 
+                        prefName,
+                        squareX: grid.x,
+                        squareY: grid.y
+                    });
+                }
+            }
+        }
+        
+        // ★ 取得したリストから隣接グラフを構築し、グローバルにキャッシュ
+        buildPrefGraphFromGrid(prefList);
+        window.prefListCache = prefList;
+
+        return prefList;
+    } catch (err) {
+        console.error("Prefリスト取得エラー:", err);
+        return [];
+    }
+}
+
+// ==========================================
+// ★ Prefスワイプ用②：グリッド座標から県同士の隣接関係（グラフ）を構築
+// ==========================================
+function buildPrefGraphFromGrid(prefList) {
+    const gridMap = {};
+    const graph = {};
+
+    // 座標 → 県データ のマッピング
+    prefList.forEach(row => {
+        if (row.squareX == null || row.squareY == null) return;
+        gridMap[row.squareX + "," + row.squareY] = row;
+    });
+
+    // 上下左右の隣接県を判定
+    prefList.forEach(row => {
+        if (row.squareX == null || row.squareY == null) return;
+        const x = row.squareX;
+        const y = row.squareY;
+
+        graph[row.prefCode] = {
+            up:    gridMap[x + "," + (y-1)]?.prefCode || null,
+            down:  gridMap[x + "," + (y+1)]?.prefCode || null,
+            left:  gridMap[(x-1) + "," + y]?.prefCode || null,
+            right: gridMap[(x+1) + "," + y]?.prefCode || null
+        };
+    });
+
+    window.prefGraph = graph; // 完成したグラフを保存
+}
+
+// ==========================================
+// ★ Prefスワイプ用③：状態リフレッシュ
+// ==========================================
+function refreshPrefGlobals(regionCode, prefCode, prefName) {
+    window.currentRegion = regionCode;
+    window.currentPref = prefCode;
+    window.currentAreaId = null;
+    window.currentSpotId = null;
+    window.prefBounds = null;
+    window.areaBounds = null;
+    window.fishData = null; 
+    
+    if (typeof clearSpotUI === 'function') clearSpotUI();
+    if (window.phase1Group) window.phase1Group.clearLayers();
+    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+    if (typeof destroyAreaUI === 'function') destroyAreaUI();
+    if (typeof removeCrowdImage === 'function') removeCrowdImage();
+    
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
+    }
+
+    window.prefLocationUrl      = `/${regionCode}/${prefCode}_location.json`;
+    window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
+    window.prefInlandWeatherUrl = `/data/${regionCode}_inLand_recalculated.csv`;
+    window.fishUrl              = `/${regionCode}/${prefCode}_fish.json`;
+    window.prefShopUrl          = `/${regionCode}/${prefCode}_shop.csv`;
+
+    setIdealQuery('pref', prefName || prefCode);
+    setIdealQuery('area', null);
+    setIdealQuery('spot', null);
+}
+
+// ==========================================
+// ★ Prefスワイプ用④：スワイプの有効化・無効化
+// ==========================================
+function enablePrefSwipe() {
+    if (window._prefSwipeEnabled) return;
+
+    let startX = 0;
+    let startY = 0;
+
+    const el = window.map.getContainer();
+
+    function onStart(e) {
+        const t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+    }
+
+    async function onEnd(e) {
+        const t = e.changedTouches[0];
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+
+        // スワイプ距離が短ければ無視
+        if (Math.abs(dx) < 50 && Math.abs(dy) < 50) return;
+
+        // 県リストとグラフがまだ無ければ裏で取得する
+        if (!window.prefGraph || !window.prefListCache) {
+            await getPrefListFromRegion();
+        }
+
+        const currentPrefCode = window.currentPref;
+        if (!currentPrefCode || !window.prefGraph[currentPrefCode]) return;
+
+        const graph = window.prefGraph[currentPrefCode];
+        let nextPrefCode = null;
+
+        // フリックの方向判定
+        if (Math.abs(dx) > Math.abs(dy)) {
+            nextPrefCode = dx > 0 ? graph.left : graph.right;
+        } else {
+            nextPrefCode = dy > 0 ? graph.down : graph.up;
+        }
+
+        if (!nextPrefCode) return; // 端っこなら何もしない
+
+        // 次の県の情報をキャッシュから取得
+        const nextPrefData = window.prefListCache.find(p => p.prefCode === nextPrefCode);
+        if (!nextPrefData) return;
+
+        // 誤動作防止のためスワイプを一時無効化
+        disablePrefSwipe();
+        
+        if (typeof showdebug === 'function') showdebug(`スワイプ移動: ${nextPrefData.prefName} へ`);
+
+        // 状態をリセットして次の県をロード
+        refreshPrefGlobals(nextPrefData.regionCode, nextPrefData.prefCode, nextPrefData.prefName);
+        
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+        window.prefBounds = null;
+        window.areaBounds = null;
+        window.goBackGuard = true;
+
+        routeUpdate();
+    }
+
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchend', onEnd, { passive: true });
+
+    window._prefSwipeStart = onStart;
+    window._prefSwipeEnd = onEnd;
+    window._prefSwipeEnabled = true;
+}
+
+function disablePrefSwipe() {
+    if (!window._prefSwipeEnabled) return;
+    const el = window.map.getContainer();
+    el.removeEventListener('touchstart', window._prefSwipeStart);
+    el.removeEventListener('touchend', window._prefSwipeEnd);
+    window._prefSwipeEnabled = false;
+}
+
+// ==========================================
 // ★ 画面に文字を出すデバッグ用関数（スクロール＆コピペ対応版）
 // ==========================================
 function showdebug(msg) {
@@ -2516,142 +2748,6 @@ function showdebug(msg) {
     debugBox.scrollTop = debugBox.scrollHeight;
 }
 
-// ==========================================
-// ★ Prefスワイプ用①：RegionのCSVから県リストの配列を取得する関数
-// ==========================================
-async function getPrefListFromRegion() {
-    if (!window.regionUrl) return [];
-    
-    try {
-        const res = await fetch(window.regionUrl);
-        if (!res.ok) throw new Error("Region CSV fetch failed");
-        const text = await res.text();
-        const lines = text.trim().split('\n');
-        
-        if (lines.length < 2) return [];
-
-        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-        const typeIdx  = headers.indexOf('type');
-        const urlIdx   = headers.indexOf('url');
-        const notesIdx = headers.indexOf('notes');
-
-        if (typeIdx === -1 || urlIdx === -1 || notesIdx === -1) return [];
-
-        const prefList = [];
-        for (let i = 1; i < lines.length; i++) {
-            if (!lines[i]) continue;
-            const cols = lines[i].split(',').map(c => c.trim());
-            
-            if (cols[typeIdx] === 'pref') {
-                const urlVal = cols[urlIdx];
-                const prefName = cols[notesIdx];
-                if (!urlVal) continue;
-                
-                // 県コードの抽出
-                const parts = urlVal.split('/');
-                let prefCode = '';
-                let regionCode = window.currentRegion || 'KANTO';
-                
-                if (parts.length >= 4) {
-                    prefCode = parts[1].split('_')[0]; 
-                } else if (parts.length === 3) {
-                    prefCode = parts[0].split('_')[0]; 
-                }
-                
-                if (prefCode) {
-                    prefList.push({ regionCode, prefCode, prefName });
-                }
-            }
-        }
-        return prefList;
-    } catch (err) {
-        if (typeof showdebug === 'function') showdebug("❌ Prefリスト取得エラー: " + err.message);
-        console.error("Prefリスト取得エラー:", err);
-        return [];
-    }
-}
-
-// ==========================================
-// ★ Prefスワイプ用②：グローバル定義と対象URL群をリフレッシュする関数
-// ==========================================
-function refreshPrefGlobals(regionCode, prefCode, prefName) {
-    // 1. システム変数の完全リセット
-    window.currentRegion = regionCode;
-    window.currentPref = prefCode;
-    window.currentAreaId = null;
-    window.currentSpotId = null;
-    window.prefBounds = null;
-    window.areaBounds = null;
-    window.fishData = null; // 魚データもリセット
-    
-    // UIや特殊レイヤーのクリーンアップ
-    if (typeof clearSpotUI === 'function') clearSpotUI();
-    if (window.phase1Group) window.phase1Group.clearLayers();
-    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-    if (typeof destroyAreaUI === 'function') destroyAreaUI();
-    if (typeof removeCrowdImage === 'function') removeCrowdImage();
-    
-    // マーカー類も一旦隠す
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
-
-    // 2. 次の県のパスを一括でグローバル生成
-    window.prefLocationUrl      = `/${regionCode}/${prefCode}_location.json`;
-    window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
-    window.prefInlandWeatherUrl = `/data/${regionCode}_inLand_recalculated.csv`;
-    window.fishUrl              = `/${regionCode}/${prefCode}_fish.json`;
-    window.prefShopUrl          = `/${regionCode}/${prefCode}_shop.csv`;
-
-    // 3. URLクエリの更新（日本語名notesを使用）
-    setIdealQuery('pref', prefName || prefCode);
-    setIdealQuery('area', null);
-    setIdealQuery('spot', null);
-}
-
-// ==========================================
-// ★ テスト用：リストが取れているかデバッグ出力する関数
-// ==========================================
-async function testPrefList() {
-    const list = await getPrefListFromRegion();
-    if (list.length > 0) {
-        showdebug(`✅ 県リスト取得成功: ${list.length}件`);
-        list.forEach(p => showdebug(` - ${p.prefName} (${p.prefCode})`));
-    } else {
-        showdebug("❌ 県リストが空です");
-    }
-}
-// ==========================================
-// ★ テスト用：画面左上にテストボタンを自動生成する
-// ==========================================
-window.addEventListener('DOMContentLoaded', () => {
-    const testBtn = document.createElement('button');
-    testBtn.textContent = '県リスト取得テスト';
-    
-    // 目立つように左上の手前に配置（デバッグボックスと被らないようにtopを少し下げる）
-    testBtn.style.position = 'fixed';
-    testBtn.style.top = '60px'; 
-    testBtn.style.left = '10px';
-    testBtn.style.zIndex = '999999';
-    testBtn.style.padding = '10px';
-    testBtn.style.background = '#ff4500'; // 目立つオレンジ色
-    testBtn.style.color = '#fff';
-    testBtn.style.fontWeight = 'bold';
-    testBtn.style.border = 'none';
-    testBtn.style.borderRadius = '5px';
-    testBtn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
-
-    // クリックしたらテスト関数を発火
-    testBtn.addEventListener('click', () => {
-        if (typeof showdebug === 'function') {
-            showdebug("🔘 テストボタンが押されました...");
-        }
-        testPrefList();
-    });
-    
-    document.body.appendChild(testBtn);
-});
 
 </script>
 
