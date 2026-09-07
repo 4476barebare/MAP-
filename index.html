@@ -2464,12 +2464,34 @@ async function routeUpdate() {
 
     // ─── スポット階層への直リンク復元 ───
     if (window.currentSpotId) {
+        // ★ 突入時の状態を出力
+        if (typeof showdebug === 'function') {
+            showdebug(`[スポット突入前] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
+        }
+
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
+
+        // ★ .then() で囲まず、await を使って直列で待機する
+        if (safeAreaId && typeof prepareFishForArea === 'function') {
+            await prepareFishForArea(safeAreaId);
+        }
+
+        // ★ await 待機後の状態を出力
+        if (typeof showdebug === 'function') {
+            showdebug(`[await通過後] currentAreaId: ${window.currentAreaId} / fishData存在: ${!!window.fishData}`);
+        }
+
+        // 変数をここで通常通り定義する
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
         
+        // ★ spotが見つかったかを出力
+        if (typeof showdebug === 'function') {
+            showdebug(`[spot検索結果] spot見つかったか: ${!!spot}`);
+        }
+
         if (spot) {
             if (window.prefData) setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
@@ -2478,14 +2500,12 @@ async function routeUpdate() {
                 setIdealQuery('area', parentArea.name);
 
                 // =====================================
-                // ★ 直打ちの崩壊を防ぐ！トップから順に階層を構築する
+                // ★ 直打ちの崩壊を防ぐ階層構築
                 // =====================================
-                // 1. まず「県」レベルで地図の基礎コンテナを作る
                 if (typeof drawLocation === 'function') {
                     drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
                 }
 
-                // 2. 次に「エリア」レベルで境界(Bounds)とマーカーを生成する
                 if (window.map) {
                     window.map.options.maxBoundsViscosity = 0;
                     window.map.setMaxBounds(null);
@@ -2502,14 +2522,12 @@ async function routeUpdate() {
             }
             
             setIdealQuery('spot', spot.name);
-            window._selectSpotCompleted = true; // 戻る(goBack)時のガードフラグ
+            window._selectSpotCompleted = true; 
 
-            // 3. 最後に「スポット」レベルへ移動！
             if (typeof drawLocation === 'function') {
                 drawLocation(spot.name, spot.lat, spot.lng, 13);
             }
             
-            // ★ 移動完了を待って専用の処理（enableDragForArea等）を挟む
             if (window.map) {
                 window.map.once('moveend', () => {
                     window.map.invalidateSize(true);
@@ -2517,13 +2535,11 @@ async function routeUpdate() {
                     if (typeof enableDragForArea === 'function') {
                         enableDragForArea();
                     }
-                    
                     if (typeof enablePhase2 === 'function') {
                         enablePhase2(window.map);
                     }
                     window.map.getContainer().classList.add('is-spot-mode');
 
-                    // 通常クリック時と同じく、スポットごとに処理を分ける
                     if (spot.zoom && spot.zoom !== '') {
                         if (typeof zoomToSpot === 'function') zoomToSpot(spot);
                     } else {
@@ -2585,8 +2601,6 @@ async function routeUpdate() {
         setIdealQuery('spot', null);                 
 
         const targetZoom = window.prefData.zoom;
-        
-        // ★ マップ未生成の初回ロード時は即時描画
         const isMapJustCreated = !window.map;
         const center = window.map ? window.map.getCenter() : null;
         const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
