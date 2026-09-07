@@ -2321,12 +2321,9 @@ async function routeUpdate() {
                     if (typeof renderPrefWeather === 'function') renderPrefWeather();
                     if (typeof renderCrowdImage === 'function') renderCrowdImage();
 
-              
-                // 👇【ここに追加】県スワイプをON、エリアスワイプをOFFにする
-                if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
-                if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
-                
-
+                    // 👇県スワイプをON、エリアスワイプをOFFにする
+                    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                    if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
                     
                     requestAnimationFrame(() => {
                         const btn = document.getElementById('map-back-btn');
@@ -2334,6 +2331,9 @@ async function routeUpdate() {
                             btn.style.display = 'block';
                             requestAnimationFrame(() => { btn.style.opacity = '1'; });
                         }
+
+                        // 👇【追加】これを入れないと、スワイプ後に広域マップ(REGION)へ戻るボタンが効かなくなります！
+                        window.goBackGuard = false; 
                     });
                 });
             });
@@ -2345,6 +2345,8 @@ async function routeUpdate() {
             window.map.once('moveend', finalizePref);
         }
     }
+}
+
 }
 
 
@@ -2605,6 +2607,11 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     window.currentSpotId = null;
     window.prefBounds = null;
     window.areaBounds = null;
+    
+    // 👇【ここが原因！】古いデータを空っぽにしないと、新しいJSONを読み込みに行きません
+    window.prefData = null;
+    window.areaData = [];
+    window.spotData = [];
     window.fishData = null; 
     
     if (typeof clearSpotUI === 'function') clearSpotUI();
