@@ -2957,9 +2957,65 @@ function enablePrefSwipe() {
         window.areaBounds = null;
         window.goBackGuard = true;
 
-        // 👇【修正】routeUpdate() をやめ、JSON読み込み～描画まで一貫して行ってくれる selectPrefecture を直接呼ぶ
-        if (typeof window.selectPrefecture === 'function') {
-            window.selectPrefecture(nextPrefData.prefCode, nextPrefData.prefName);
+        // 👇【修正】routeUpdateの代わりに、ここで直接ロードと描画を回す
+        try {
+            // 1. JSONや天気をロード
+            await loadPrefectureData(nextPrefData.prefCode);
+            await loadLocationJSON(window.prefLocationUrl);
+
+            if (!window.prefData) {
+                window.goBackGuard = false;
+                enablePrefSwipe();
+                return;
+            }
+
+            // 2. カメラを新しい県に移動
+            const targetZoom = window.prefData.zoom;
+            drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+
+            // 3. 移動完了後にUIを展開
+            const finalizePref = () => {
+                window.map.invalidateSize(true);
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        if (typeof showPrefSpots === 'function') showPrefSpots();
+                        if (typeof initAreaUI === 'function') initAreaUI();
+                        if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        if (typeof renderPrefectureUI === 'function') renderPrefectureUI();
+
+                        // 県スワイプをON、エリアスワイプをOFFにする
+                        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                        enablePrefSwipe();
+                        
+                        requestAnimationFrame(() => {
+                            const btn = document.getElementById('map-back-btn');
+                            if (btn) {
+                                btn.style.display = 'block';
+                                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                            }
+                            window.goBackGuard = false; 
+                        });
+                    });
+                });
+            };
+
+            const center = window.map.getCenter();
+            const isSameLoc = Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                              Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                              window.map.getZoom() === targetZoom;
+
+            if (isSameLoc) {
+                finalizePref();
+            } else {
+                window.map.once('moveend', finalizePref);
+            }
+
+        } catch (err) {
+            console.error("スワイプ時のロードエラー:", err);
+            window.goBackGuard = false;
+            enablePrefSwipe();
         }
     }
 
@@ -2970,6 +3026,7 @@ function enablePrefSwipe() {
     window._prefSwipeEnd = onEnd;
     window._prefSwipeEnabled = true;
 }
+
 
 function disablePrefSwipe() {
     if (!window._prefSwipeEnabled) return;
