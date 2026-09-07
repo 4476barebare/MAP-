@@ -2516,6 +2516,142 @@ function showdebug(msg) {
     debugBox.scrollTop = debugBox.scrollHeight;
 }
 
+// ==========================================
+// ★ Prefスワイプ用①：RegionのCSVから県リストの配列を取得する関数
+// ==========================================
+async function getPrefListFromRegion() {
+    if (!window.regionUrl) return [];
+    
+    try {
+        const res = await fetch(window.regionUrl);
+        if (!res.ok) throw new Error("Region CSV fetch failed");
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const typeIdx  = headers.indexOf('type');
+        const urlIdx   = headers.indexOf('url');
+        const notesIdx = headers.indexOf('notes');
+
+        if (typeIdx === -1 || urlIdx === -1 || notesIdx === -1) return [];
+
+        const prefList = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i]) continue;
+            const cols = lines[i].split(',').map(c => c.trim());
+            
+            if (cols[typeIdx] === 'pref') {
+                const urlVal = cols[urlIdx];
+                const prefName = cols[notesIdx];
+                if (!urlVal) continue;
+                
+                // 県コードの抽出
+                const parts = urlVal.split('/');
+                let prefCode = '';
+                let regionCode = window.currentRegion || 'KANTO';
+                
+                if (parts.length >= 4) {
+                    prefCode = parts[1].split('_')[0]; 
+                } else if (parts.length === 3) {
+                    prefCode = parts[0].split('_')[0]; 
+                }
+                
+                if (prefCode) {
+                    prefList.push({ regionCode, prefCode, prefName });
+                }
+            }
+        }
+        return prefList;
+    } catch (err) {
+        if (typeof showdebug === 'function') showdebug("❌ Prefリスト取得エラー: " + err.message);
+        console.error("Prefリスト取得エラー:", err);
+        return [];
+    }
+}
+
+// ==========================================
+// ★ Prefスワイプ用②：グローバル定義と対象URL群をリフレッシュする関数
+// ==========================================
+function refreshPrefGlobals(regionCode, prefCode, prefName) {
+    // 1. システム変数の完全リセット
+    window.currentRegion = regionCode;
+    window.currentPref = prefCode;
+    window.currentAreaId = null;
+    window.currentSpotId = null;
+    window.prefBounds = null;
+    window.areaBounds = null;
+    window.fishData = null; // 魚データもリセット
+    
+    // UIや特殊レイヤーのクリーンアップ
+    if (typeof clearSpotUI === 'function') clearSpotUI();
+    if (window.phase1Group) window.phase1Group.clearLayers();
+    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+    if (typeof destroyAreaUI === 'function') destroyAreaUI();
+    if (typeof removeCrowdImage === 'function') removeCrowdImage();
+    
+    // マーカー類も一旦隠す
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
+    }
+
+    // 2. 次の県のパスを一括でグローバル生成
+    window.prefLocationUrl      = `/${regionCode}/${prefCode}_location.json`;
+    window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
+    window.prefInlandWeatherUrl = `/data/${regionCode}_inLand_recalculated.csv`;
+    window.fishUrl              = `/${regionCode}/${prefCode}_fish.json`;
+    window.prefShopUrl          = `/${regionCode}/${prefCode}_shop.csv`;
+
+    // 3. URLクエリの更新（日本語名notesを使用）
+    setIdealQuery('pref', prefName || prefCode);
+    setIdealQuery('area', null);
+    setIdealQuery('spot', null);
+}
+
+// ==========================================
+// ★ テスト用：リストが取れているかデバッグ出力する関数
+// ==========================================
+async function testPrefList() {
+    const list = await getPrefListFromRegion();
+    if (list.length > 0) {
+        showdebug(`✅ 県リスト取得成功: ${list.length}件`);
+        list.forEach(p => showdebug(` - ${p.prefName} (${p.prefCode})`));
+    } else {
+        showdebug("❌ 県リストが空です");
+    }
+}
+// ==========================================
+// ★ テスト用：画面左上にテストボタンを自動生成する
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+    const testBtn = document.createElement('button');
+    testBtn.textContent = '県リスト取得テスト';
+    
+    // 目立つように左上の手前に配置（デバッグボックスと被らないようにtopを少し下げる）
+    testBtn.style.position = 'fixed';
+    testBtn.style.top = '60px'; 
+    testBtn.style.left = '10px';
+    testBtn.style.zIndex = '999999';
+    testBtn.style.padding = '10px';
+    testBtn.style.background = '#ff4500'; // 目立つオレンジ色
+    testBtn.style.color = '#fff';
+    testBtn.style.fontWeight = 'bold';
+    testBtn.style.border = 'none';
+    testBtn.style.borderRadius = '5px';
+    testBtn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+
+    // クリックしたらテスト関数を発火
+    testBtn.addEventListener('click', () => {
+        if (typeof showdebug === 'function') {
+            showdebug("🔘 テストボタンが押されました...");
+        }
+        testPrefList();
+    });
+    
+    document.body.appendChild(testBtn);
+});
 
 </script>
 
