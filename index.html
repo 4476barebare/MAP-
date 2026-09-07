@@ -873,8 +873,11 @@ async function loadPrefectureData(prefCode) {
         return false;
     }
 }
-
+// ==========================================
+// ★ ページ初期ロード時のメインフロー
+// ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
+    // ICデータ等の非同期ロード開始
     loadICData();
     const params = new URLSearchParams(window.location.search);
     
@@ -884,53 +887,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.currentRegion = getRegionCode();
     window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
 
-    await applyQueryToStateFromCsv();
-    
-    if (!window.currentPref) {
-        
-        routeUpdate(); 
-        return;
+    // ★ 1. 何よりも先に「金庫（全県データ）」を生成・ロードする！
+    if (typeof fetchAllRegionSpots === 'function') {
+        await fetchAllRegionSpots();
     }
 
-    window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.json`;
-    window.prefWeatherUrl       = `/data/${window.currentPref}_whether.csv`;
-    window.prefInlandWeatherUrl = `/data/${window.currentRegion}_inLand_recalculated.csv`;
-    window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.json`;
-    window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
-
-    const jsonUrl = window.prefLocationUrl;
-    const whetherUrl = window.prefWeatherUrl;
-    const shopUrl = window.prefShopUrl;
+    // ★ 2. 金庫のデータを使って、URLクエリから currentPref, currentAreaId, currentSpotId を特定する！
+    await applyQueryToStateFromCsv();
     
-
-
-    loadLocationJSON(jsonUrl).then(() => {
-        loadWhetherCSV(whetherUrl).then(csv => {
-            applyWhetherToSpots(csv);
-            
-            if (typeof loadInlandWhetherCSV === 'function') {
-                loadInlandWhetherCSV(window.currentRegion).then(inlandCsv => {
-                    applyInlandWhetherToSpots(inlandCsv);
-                    routeUpdate();
-                    renderAreaGuide();
-                    
-                    if (window.markerControl) {
-                        window.markerControl.preloadShop01(shopUrl);
-                    }
-                    
-                    getAlertText(window.prefData, function(result) {
-                        const el = document.getElementById("alert-bar");
-                        if (el) {
-                            el.textContent = result.text;
-                            el.style.color = result.color;
-                        }
-                    });
-                });
-            }
-        });
-    });
+    // ★ 3. 準備が整ったので、あとは「完全版の routeUpdate」に全てを任せる！
+    // (旧方式の余計な fetch チェーンは全て削除しました)
+    if (typeof routeUpdate === 'function') {
+        routeUpdate(); 
+    }
 });
-
 
 
 function initAreaUI() {
