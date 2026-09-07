@@ -1278,6 +1278,15 @@ function renderCrowdImage() {
 
                 let opacity = 0;
                 const fade = setInterval(() => {
+                    // 👇 【追加】もしフェード中に removeCrowdImage が呼ばれ、親タイマーが消滅していたりOFFになったら
+                    if (!window.crowdSlideTimer || !window.radarEnabled) {
+                        clearInterval(fade); // 自分自身（フェード）を止める
+                        if (window.map.hasLayer(newLayer)) {
+                            window.map.removeLayer(newLayer); // 追加してしまった作りかけのレイヤーも消す
+                        }
+                        return;
+                    }
+
                     opacity += 0.06;
 
                     if (opacity >= MAX_OPACITY) {
@@ -1300,8 +1309,6 @@ function renderCrowdImage() {
         });
 }
 
-
-// 【修正後の removeCrowdImage】
 function removeCrowdImage() {
 
     // =======================
