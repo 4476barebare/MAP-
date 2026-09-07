@@ -668,6 +668,7 @@ async function showAllRegionSpots() {
     }
 }
 
+
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
 // ==========================================
@@ -675,7 +676,7 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
 
-    // 様々な引数パターンに対応して確実に県コードだけを抜く
+    // 1. 引数から県コード（IBARAKI等）を正しく抽出する
     if (csvParam.includes('_location')) {
         prefCode = csvParam.split('_')[0];
     } else if (csvParam.includes('_')) {
@@ -687,20 +688,19 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
         if (match) prefCode = match[1];
     }
 
-    // 1. システム変数を確定させる
     window.currentRegion = region;
-    window.currentPref = prefCode;
+    window.currentPref = prefCode; // 例: "IBARAKI"
     
-    // 古いBoundsと広域ドットを消去
     window.prefBounds = null;
     window.areaBounds = null;
 
+    // 広域マップの全県ドットを消去
     if (window.regionAllSpotLayer && window.map) {
         window.map.removeLayer(window.regionAllSpotLayer);
         window.regionAllSpotLayer = null;
     }
     
-    // 2. パスを一括でグローバル生成
+    // パスを一括でグローバル生成
     window.prefLocationUrl      = `/${region}/${prefCode}_location.json`;
     window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
@@ -708,24 +708,21 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
     window.prefShopUrl          = `/${region}/${prefCode}_shop.csv`;
 
     // =====================================================
-    // ★ 修正：ALL_REGION_SPOTSから直接「県データ(pref行)」を探し出す
+    // ★ 修正：提供いただいたJSONの構造（individualId: "parent" かつ name: prefCode）を元に正しく prefData を確定する
     // =====================================================
     let prefName = fallbackPrefName;
 
     if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
-        // areaIdが空欄で、nameが「IBARAKI」等と一致する行（＝県データ）を探す
-        const targetPrefData = window.ALL_REGION_SPOTS.find(r => !r.areaId && r.name === prefCode);
+        // ご提示のJSONにある親行の条件：「name === prefCode」かつ「individualId === "parent"」
+        const targetPrefData = window.ALL_REGION_SPOTS.find(r => r.name === prefCode && r.individualId === "parent");
         
         if (targetPrefData) {
-            // 見つけたらシステム変数に即座にセット！
-            window.prefData = targetPrefData;
-            
-            // 日本語名（茨城県、東京都など）を確実に取得
-            prefName = targetPrefData.notes; 
+            window.prefData = targetPrefData; // これにより lat, lng, zoom, notes が確実にセットされる
+            prefName = targetPrefData.notes;  // "茨城県" などの日本語名を取得
         }
     }
 
-    // 3. クエリをセット（ここで確実に日本語がセットされる）
+    // クエリをセット（ここで正しい日本語名がURLに入る）
     if (prefName) {
         setIdealQuery('pref', prefName);
     } else {
@@ -734,12 +731,12 @@ window.selectPrefecture = function(csvParam, fallbackPrefName) {
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-    // 4. 確実に画面遷移を発火させる
-    // window.prefDataに lat, lng, zoom が入っているため、正常にズーム移動します
+    // 画面遷移（ルート更新）を発火
     if (typeof routeUpdate === 'function') {
         routeUpdate();
     }
 };
+
 
 // =====================================================
 // ■ 3. 広域用のグリッド間引き関数
