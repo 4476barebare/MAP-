@@ -2454,7 +2454,36 @@ async function loadICData() {
 }
 
 // ==========================================
-// ★ 新規：対象魚種データを描画する関数
+// ★ 魚種名おまとめ辞書（出世魚や別名を統一）
+// ==========================================
+const FISH_DICTIONARY = {
+    "ツバス": "ワカシ",
+    "ワカシ": "ワカシ",
+    "ハマチ": "イナダ",
+    "イナダ": "イナダ",
+    "メジロ": "ワラサ",
+    "ワラサ": "ワラサ",
+    "ブリ": "ブリ",
+    "セイゴ": "スズキ",
+    "フッコ": "スズキ",
+    "スズキ": "スズキ",
+    "サゴシ": "サワラ",
+    "サワラ": "サワラ",
+    "カイズ": "クロダイ",
+    "チヌ": "クロダイ",
+    "クロダイ": "クロダイ",
+    "コハダ": "コノシロ",
+    "コノシロ": "コノシロ",
+    "クチボソ": "モツゴ",
+    "モツゴ": "モツゴ",
+    "ヤマベ": "オイカワ",
+    "オイカワ": "オイカワ",
+    "グレ": "メジナ",
+    "メジナ": "メジナ"
+};
+
+// ==========================================
+// ★ 新規：対象魚種データを描画する関数（辞書変換＆ソート対応版）
 // ==========================================
 function renderFishSection(uniqueNames) {
     const accessBox = document.getElementById('accessInfoBox');
@@ -2466,11 +2495,20 @@ function renderFishSection(uniqueNames) {
 
     if (!uniqueNames || uniqueNames.length === 0) return;
 
-    // 👇 【ここを追加】全角カタカナ（と長音符）のみにフィルターし、周辺施設などを弾く
+    // 1. 全角カタカナ（と長音符）のみにフィルターし、周辺施設などを弾く
     const fishOnly = uniqueNames.filter(name => /^[ァ-ヴー]+$/.test(name));
 
+    // 2. 辞書を使って名称を変換（辞書にない魚はそのままの名前を使う）
+    const mappedFish = fishOnly.map(name => FISH_DICTIONARY[name] || name);
+
+    // 3. 変換した結果、重複したもの（例：セイゴとフッコが両方いて「スズキ」が2つになった場合）を再度まとめる
+    const finalFishList = [...new Set(mappedFish)];
+
+    // 4. あいうえお順（五十音順）にソートする
+    finalFishList.sort((a, b) => a.localeCompare(b, 'ja'));
+
     // 魚種が1つも残らなかった場合は表示せずに終了
-    if (fishOnly.length === 0) return;
+    if (finalFishList.length === 0) return;
 
     // 魚種表示用のコンテナを生成
     const fishDiv = document.createElement('div');
@@ -2479,9 +2517,8 @@ function renderFishSection(uniqueNames) {
     fishDiv.style.paddingTop = '10px';
     fishDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
 
-    // タイトルを「主な対象魚・周辺情報」から「主な対象魚」へ変更
     let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🐟 主な対象魚</div>`;
-    html += `<div style="font-size: 13px; line-height: 1.5;">${fishOnly.join('、')}</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">${finalFishList.join('、')}</div>`;
 
     fishDiv.innerHTML = html;
     accessBox.appendChild(fishDiv);
