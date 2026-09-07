@@ -670,11 +670,9 @@ async function showAllRegionSpots() {
 }
 
 // ==========================================
-// 3. マーカー等から県が選択された時のトリガー（デバッグ版）
+// 3. マーカー等から県が選択された時のトリガー
 // ==========================================
-window.selectPrefecture = async function(csvParam, fallbackPrefName) {
-  //   if (typeof showdebug === 'function') showdebug(`[開始] selectPrefecture: csvParam=${csvParam}, fallback=${fallbackPrefName}`);
-
+window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
 
@@ -685,11 +683,14 @@ window.selectPrefecture = async function(csvParam, fallbackPrefName) {
         region = parts[0];
         prefCode = parts[1];
     } else if (csvParam.includes('.csv')) {
-        const match = csvParam.match(/\/([A-Za-z-]+)_/) || csvParam.match(/^([A-Za-z-]+)_/);
-        if (match) prefCode = match[1];
-    }
+        const match =
+            csvParam.match(/\/([A-Za-z-]+)_/) ||
+            csvParam.match(/^([A-Za-z-]+)_/);
 
-  //   if (typeof showdebug === 'function') showdebug(`[解析] region=${region}, prefCode=${prefCode}`);
+        if (match) {
+            prefCode = match[1];
+        }
+    }
 
     window.currentRegion = region;
     window.currentPref = prefCode;
@@ -700,44 +701,39 @@ window.selectPrefecture = async function(csvParam, fallbackPrefName) {
         window.map.removeLayer(window.regionAllSpotLayer);
         window.regionAllSpotLayer = null;
     }
-    
-    window.prefLocationUrl      = `/${region}/${prefCode}_location.json`;
-    window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
+
+    window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
+    window.prefWeatherUrl = `/data/${prefCode}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
-    window.fishUrl              = `/${region}/${prefCode}_fish.json`;
-    window.prefShopUrl          = `/${region}/${prefCode}_shop.csv`;
+    window.fishUrl = `/${region}/${prefCode}_fish.json`;
+    window.prefShopUrl = `/${region}/${prefCode}_shop.csv`;
 
     let prefName = fallbackPrefName;
 
     // =====================================================
-    // ★ 抽出テスト
+    // 県データの抽出
     // =====================================================
-   //  if (typeof showdebug === 'function') {
- //        showdebug(`[データ確認] ALL_REGION_SPOTSの長さ: ${window.ALL_REGION_SPOTS ? window.ALL_REGION_SPOTS.length : '未定義'}`);
- //    }
-// 
     if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
-        const targetPrefData = window.ALL_REGION_SPOTS.find(r => r.name === prefCode && r.individualId === "parent");
-        
+        const targetPrefData = window.ALL_REGION_SPOTS.find(
+            r => r.name === prefCode && r.individualId === "parent"
+        );
+
         if (targetPrefData) {
-            window.prefData = targetPrefData; 
-            prefName = targetPrefData.notes;  
-          //   if (typeof showdebug === 'function') showdebug(`[発見] prefData抽出成功: name=${prefName}, zoom=${targetPrefData.zoom}, lat=${targetPrefData.lat}, lng=${targetPrefData.lng}`);
-        } else {
-           //  if (typeof showdebug === 'function') showdebug(`[エラー] nameが ${prefCode} かつ individualId が parent の行が見つかりません`);
+            window.prefData = targetPrefData;
+            prefName = targetPrefData.notes;
         }
     }
 
     if (prefName) {
         setIdealQuery('pref', prefName);
     } else {
-        setIdealQuery('pref', prefCode); 
+        setIdealQuery('pref', prefCode);
     }
+
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
     if (!window.prefData) {
-     //    if (typeof showdebug === 'function') showdebug(`[警告] prefDataが無いため loadPrefectureData を強制実行します`);
         if (typeof loadPrefectureData === 'function') {
             await loadPrefectureData(prefCode);
         }
@@ -745,17 +741,23 @@ window.selectPrefecture = async function(csvParam, fallbackPrefName) {
 
     if (window.prefData && window.map) {
         const targetZoom = window.prefData.zoom;
-     //    if (typeof showdebug === 'function') showdebug(`[移動] drawLocation実行: zoom=${targetZoom}`);
+
         await loadLocationJSON();
 
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        drawLocation(
+            window.prefData.name,
+            window.prefData.lat,
+            window.prefData.lng,
+            targetZoom
+        );
 
         const finalizePref = () => {
-     //        if (typeof showdebug === 'function') showdebug(`[移動完了] finalizePref実行`);
             window.map.invalidateSize(true);
-            
-            if (typeof loadPrefectureData === 'function' && (!window.spotData || window.spotData.length === 0)) {
-      //           if (typeof showdebug === 'function') showdebug(`[UI処理] spotDataが無いため loadPrefectureData 実行後にUI展開`);
+
+            if (
+                typeof loadPrefectureData === 'function' &&
+                (!window.spotData || window.spotData.length === 0)
+            ) {
                 loadPrefectureData(prefCode).then(() => {
                     executeUI();
                 });
@@ -764,24 +766,44 @@ window.selectPrefecture = async function(csvParam, fallbackPrefName) {
             }
 
             function executeUI() {
-       //          if (typeof showdebug === 'function') showdebug(`[UI展開] 各種UI関数を呼び出し`);
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
-                        if (typeof showPrefSpots === 'function') showPrefSpots();
-                        if (typeof initAreaUI === 'function') initAreaUI();
-                        if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        if (typeof showPrefSpots === 'function') {
+                            showPrefSpots();
+                        }
 
-                        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
-                        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
-                        
+                        if (typeof initAreaUI === 'function') {
+                            initAreaUI();
+                        }
+
+                        if (typeof renderPrefWeather === 'function') {
+                            renderPrefWeather();
+                        }
+
+                        if (typeof renderCrowdImage === 'function') {
+                            renderCrowdImage();
+                        }
+
+                        if (typeof disableAreaSwipe === 'function') {
+                            disableAreaSwipe();
+                        }
+
+                        if (typeof enablePrefSwipe === 'function') {
+                            enablePrefSwipe();
+                        }
+
                         requestAnimationFrame(() => {
                             const btn = document.getElementById('map-back-btn');
+
                             if (btn) {
                                 btn.style.display = 'block';
-                                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+
+                                requestAnimationFrame(() => {
+                                    btn.style.opacity = '1';
+                                });
                             }
-                            window.goBackGuard = false; 
+
+                            window.goBackGuard = false;
                         });
                     });
                 });
@@ -789,22 +811,19 @@ window.selectPrefecture = async function(csvParam, fallbackPrefName) {
         };
 
         const center = window.map.getCenter();
-        const isSameLoc = Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
-                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
-                          window.map.getZoom() === targetZoom;
+
+        const isSameLoc =
+            Math.abs(center.lat - window.prefData.lat) < 0.0001 &&
+            Math.abs(center.lng - window.prefData.lng) < 0.0001 &&
+            window.map.getZoom() === targetZoom;
 
         if (isSameLoc) {
-    //         if (typeof showdebug === 'function') showdebug(`[移動判定] 同一座標のため即時完了`);
             finalizePref();
         } else {
-       //      if (typeof showdebug === 'function') showdebug(`[移動判定] moveend待機`);
             window.map.once('moveend', finalizePref);
         }
-    } else {
-  //       if (typeof showdebug === 'function') showdebug(`[致命的エラー] prefData か map が存在しません`);
     }
 };
-
 // =====================================================
 // ■ 3. 広域用のグリッド間引き関数
 // =====================================================
