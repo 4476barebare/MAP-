@@ -2687,7 +2687,7 @@ function enablePrefSwipe() {
         // 誤動作防止のためスワイプを一時無効化
         disablePrefSwipe();
         
-        if (typeof showdebug === 'function') showdebug(`スワイプ移動: ${nextPrefData.prefName} へ`);
+        //if (typeof showdebug === 'function') showdebug(`スワイプ移動: ${nextPrefData.prefName} へ`);
 
         // 状態をリセットして次の県をロード
         refreshPrefGlobals(nextPrefData.regionCode, nextPrefData.prefCode, nextPrefData.prefName);
