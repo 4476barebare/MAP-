@@ -671,7 +671,7 @@ async function showAllRegionSpots() {
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
 // ==========================================
-window.selectPrefecture = function(csvParam, prefName) { // ★ 第2引数に prefName を追加
+window.selectPrefecture = function(csvParam, fallbackPrefName) {
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
 
@@ -687,13 +687,11 @@ window.selectPrefecture = function(csvParam, prefName) { // ★ 第2引数に pr
         if (match) prefCode = match[1];
     }
 
-    // ★ 1. システム変数を確定させる
+    // 1. システム変数を確定させる
     window.currentRegion = region;
     window.currentPref = prefCode;
     
-    // =====================================================
-    // ★ 修正: 新しい県を開く前に過去のBoundsと広域用ドットを確実に初期化・消去
-    // =====================================================
+    // 古いBoundsと広域ドットを消去
     window.prefBounds = null;
     window.areaBounds = null;
 
@@ -702,23 +700,42 @@ window.selectPrefecture = function(csvParam, prefName) { // ★ 第2引数に pr
         window.regionAllSpotLayer = null;
     }
     
-    // ★ 2. パスを一括でグローバル生成
+    // 2. パスを一括でグローバル生成
     window.prefLocationUrl      = `/${region}/${prefCode}_location.json`;
     window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
     window.fishUrl              = `/${region}/${prefCode}_fish.json`;
     window.prefShopUrl          = `/${region}/${prefCode}_shop.csv`;
 
-    // ★ 3. クエリをセット
+    // =====================================================
+    // ★ 修正：ALL_REGION_SPOTSから直接「県データ(pref行)」を探し出す
+    // =====================================================
+    let prefName = fallbackPrefName;
+
+    if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
+        // areaIdが空欄で、nameが「IBARAKI」等と一致する行（＝県データ）を探す
+        const targetPrefData = window.ALL_REGION_SPOTS.find(r => !r.areaId && r.name === prefCode);
+        
+        if (targetPrefData) {
+            // 見つけたらシステム変数に即座にセット！
+            window.prefData = targetPrefData;
+            
+            // 日本語名（茨城県、東京都など）を確実に取得
+            prefName = targetPrefData.notes; 
+        }
+    }
+
+    // 3. クエリをセット（ここで確実に日本語がセットされる）
     if (prefName) {
         setIdealQuery('pref', prefName);
     } else {
-        setIdealQuery('pref', prefCode); // 万が一の保険
+        setIdealQuery('pref', prefCode); 
     }
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-    // ★ 4. 確実に画面遷移を発火させる
+    // 4. 確実に画面遷移を発火させる
+    // window.prefDataに lat, lng, zoom が入っているため、正常にズーム移動します
     if (typeof routeUpdate === 'function') {
         routeUpdate();
     }
