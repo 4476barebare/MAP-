@@ -272,10 +272,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// ==========================================
-// ★ タイトル・メタタグ動的更新関数（連携版）
-// ==========================================
-
 
 // ==========================================
 // ★ タイトル・メタタグ動的更新関数（連携版）
@@ -588,6 +584,96 @@ function formatDate(str) {
   const [y, m, d] = str.split("-");
   return `${y} ${Number(m)}/${Number(d)}`;
 }
+
+// =====================================================
+// ■ 広域用のグリッド間引き（外部計算関数）
+// =====================================================
+function filterMergedGridSpots(allSpots, map, gridSize = 5) {
+    if (!map || !Array.isArray(allSpots) || allSpots.length === 0) return [];
+
+    const occupiedCells = new Set();
+    const result = [];
+
+    for (let i = 0; i < allSpots.length; i++) {
+        const spot = allSpots[i];
+        if (!spot.lat || !spot.lng) continue;
+
+        // 現在のズームに応じたピクセル座標を取得
+        const p = map.latLngToLayerPoint([spot.lat, spot.lng]);
+
+        // グリッド座標を算出（5px単位で同じマスのものは弾く）
+        const cellX = Math.floor(p.x / gridSize);
+        const cellY = Math.floor(p.y / gridSize);
+        const cellKey = `${cellX}_${cellY}`;
+
+        // まだ同じマスにスポットが登録されていなければ採用
+        if (!occupiedCells.has(cellKey)) {
+            occupiedCells.add(cellKey);
+            result.push(spot);
+        }
+    }
+
+    return result;
+}
+
+// =====================================================
+// ■ 広域マップで全県のドットを描画する関数
+// =====================================================
+async function showAllRegionSpots(regionCode, prefList) {
+    if (!window.map) return;
+
+    // 既にレイヤーがあれば消去
+    if (window.regionAllSpotLayer) {
+        window.map.removeLayer(window.regionAllSpotLayer);
+    }
+    window.regionAllSpotLayer = L.layerGroup();
+
+    let allSpots = [];
+
+    // 1. 各県のデータを裏でフェッチして合体させる
+    // ※すでに全データを持ったJSONがある場合はこのフェッチ処理は不要です
+    const fetchPromises = prefList.map(pref => {
+        const jsonUrl = `/${regionCode}/${pref.prefCode}_location.json`;
+        return fetch(jsonUrl)
+            .then(res => res.ok ? res.json() : [])
+            .catch(() => []);
+    });
+
+    const results = await Promise.all(fetchPromises);
+    results.forEach(prefData => {
+        if (Array.isArray(prefData)) {
+            allSpots = allSpots.concat(prefData);
+        }
+    });
+
+    // 2. 重なっているドットを間引く（ここでDOM数を劇的に減らす）
+    const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
+
+    // 3. 間引かれたスポットだけを地図に描画
+    mergedSpots.forEach(spot => {
+        let type = 'spot';
+        if (spot.icon && spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish\d+/);
+            if (match) type = match[0];
+        }
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: `pref-dot ${type}`,
+                html: '', // 中身は空にして軽量化
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
+            }),
+            interactive: false, // タップ判定をオフにして負荷軽減
+            keyboard: false
+        });
+
+        window.regionAllSpotLayer.addLayer(marker);
+    });
+
+    window.regionAllSpotLayer.addTo(window.map);
+}
+
 
 function initAreaUI() {
 
@@ -2069,6 +2155,7 @@ function loadRegionMap() {
                 }
             }
             
+// ... (loadRegionMap の中) ...
             if (!isMapDrawn) showdebug("❌ type='region'の行が無いため地図が描画されません");
             
             regionHtml += '</ul>';
@@ -2081,8 +2168,14 @@ function loadRegionMap() {
             if (titleSpan) titleSpan.textContent = regionTitle;
             if (linkContainer) linkContainer.innerHTML = regionHtml;
 
+            // 👇 【ここに追加】全県のドットを描画開始
+            // ※ prefList は loadRegionMap 内で構築した県のリストを渡す想定です
+            const currentPrefList = [{prefCode: 'CHIBA'}, {prefCode: 'TOKYO'}, {prefCode: 'KANAGAWA'}, {prefCode: 'IBARAKI'}];
+            showAllRegionSpots(regionCode, currentPrefList);
+
             isRegionLoaded = true;
-           //  showdebug("✅ loadRegionMap 完了");
+// ...
+
         })
         .catch(err => {
            //  showdebug("❌ loadRegionMap エラー: " + err.message);
