@@ -2482,7 +2482,6 @@ async function checkAndLoadRouteData() {
 // ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数
 // ==========================================
 async function routeUpdate() {
-    // データの準備確認（この中で loadLocationJSON が呼ばれ、金庫からデータが振り分けられる）
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; 
 
@@ -2507,24 +2506,61 @@ async function routeUpdate() {
             
             if (parentArea) {
                 setIdealQuery('area', parentArea.name);
-                // ★ 直リンク時に欠落する「エリアガイドのアコーディオン展開」を補完
+
+                // =====================================
+                // ★ 直打ちの崩壊を防ぐ！トップから順に階層を構築する
+                // =====================================
+                // 1. まず「県」レベルで地図の基礎コンテナを作る
+                if (typeof drawLocation === 'function') {
+                    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+                }
+
+                // 2. 次に「エリア」レベルで境界(Bounds)とマーカーを生成する
+                if (window.map) {
+                    window.map.options.maxBoundsViscosity = 0;
+                    window.map.setMaxBounds(null);
+                }
+                
+                if (typeof prefetchAround === 'function') prefetchAround(parentArea);
+                if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
+                if (typeof phase1menu === 'function') phase1menu(safeAreaId);
+                if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
+                    window.markerControl.showShop01(safeAreaId);
+                }
+                
                 if (typeof openArea === 'function') openArea(parentArea.individualId);
             }
+            
             setIdealQuery('spot', spot.name);
-
-            // =====================================
-            // ★ 通常操作（selectArea等）を通らない直リンクのために、欠落する必須UIを強制生成！
-            // =====================================
-            if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
-            if (typeof phase1menu === 'function') phase1menu(safeAreaId);
-            if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
-                window.markerControl.showShop01(safeAreaId);
-            }
             window._selectSpotCompleted = true; // 戻る(goBack)時のガードフラグ
 
-            // マップを描画してスポットへズーム
-            if (typeof drawLocation === 'function') drawLocation(spot.name, spot.lat, spot.lng, "13");
-            if (typeof zoomToSpot === 'function') zoomToSpot(spot);
+            // 3. 最後に「スポット」レベルへ移動！
+            if (typeof drawLocation === 'function') {
+                drawLocation(spot.name, spot.lat, spot.lng, 13);
+            }
+            
+            // ★ 移動完了を待って専用の処理（enableDragForArea等）を挟む
+            if (window.map) {
+                window.map.once('moveend', () => {
+                    window.map.invalidateSize(true);
+                    
+                    if (typeof enableDragForArea === 'function') {
+                        enableDragForArea();
+                    }
+                    
+                    if (typeof enablePhase2 === 'function') {
+                        enablePhase2(window.map);
+                    }
+                    window.map.getContainer().classList.add('is-spot-mode');
+
+                    // 通常クリック時と同じく、スポットごとに処理を分ける
+                    if (spot.zoom && spot.zoom !== '') {
+                        if (typeof zoomToSpot === 'function') zoomToSpot(spot);
+                    } else {
+                        if (typeof showFishPopup === 'function') showFishPopup(spot);
+                    }
+                });
+            }
             
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
@@ -2621,7 +2657,6 @@ async function routeUpdate() {
         }
     }
 }
-
 
 
 // ★ Region名の変換マッピング
