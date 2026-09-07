@@ -585,88 +585,6 @@ function formatDate(str) {
   return `${y} ${Number(m)}/${Number(d)}`;
 }
 
-// =====================================================
-// ■ 広域用のグリッド間引き（外部計算関数）
-// =====================================================
-function filterMergedGridSpots(allSpots, map, gridSize = 5) {
-    if (!map || !Array.isArray(allSpots) || allSpots.length === 0) return [];
-
-    const occupiedCells = new Set();
-    const result = [];
-
-    for (let i = 0; i < allSpots.length; i++) {
-        const spot = allSpots[i];
-        if (!spot.lat || !spot.lng) continue;
-
-        const p = map.latLngToLayerPoint([spot.lat, spot.lng]);
-        const cellX = Math.floor(p.x / gridSize);
-        const cellY = Math.floor(p.y / gridSize);
-        const cellKey = `${cellX}_${cellY}`;
-
-        if (!occupiedCells.has(cellKey)) {
-            occupiedCells.add(cellKey);
-            result.push(spot);
-        }
-    }
-
-    return result;
-}
-
-// =====================================================
-// ■ 広域マップで全ドットを描画する関数（All Data 版）
-// =====================================================
-async function showAllRegionSpotsFromMaster(regionCode) {
-    if (!window.map) return;
-
-    if (window.regionAllSpotLayer) {
-        window.map.removeLayer(window.regionAllSpotLayer);
-    }
-    window.regionAllSpotLayer = L.layerGroup();
-
-    try {
-        // ★ 結合済みのマスターJSONを1回だけ読み込む
-        // 例: /KANTO/KANTO_all_locations.json
-        const masterUrl = `/${regionCode}/${regionCode}_all_locations.json`;
-        const res = await fetch(masterUrl);
-        if (!res.ok) throw new Error("Master JSON fetch failed");
-        
-        const allSpots = await res.json();
-        if (!Array.isArray(allSpots)) return;
-
-        // グリッドで重なりを間引く
-        const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
-
-        // 間引いた結果だけをDOMマーカー化
-        mergedSpots.forEach(spot => {
-            let type = 'spot';
-            if (spot.icon && spot.icon.startsWith('fish')) {
-                const match = spot.icon.match(/fish\d+/);
-                if (match) type = match[0];
-            }
-
-            const isFish = type.startsWith('fish');
-
-            const marker = L.marker([spot.lat, spot.lng], {
-                icon: L.divIcon({
-                    className: 'custom-text-marker',
-                    html: `<div class="spot-text ${type}">■</div>`, // ★ テキストの ■ を使う
-                    iconSize: [0, 0],
-                    iconAnchor: [0, 0] // 必要に応じて [-2, 5] 等に微調整
-                }),
-                interactive: false,
-                keyboard: false,
-                zIndexOffset: isFish ? 600 : 500
-            });
-
-            window.regionAllSpotLayer.addLayer(marker);
-        });
-
-        window.regionAllSpotLayer.addTo(window.map);
-
-    } catch (err) {
-        console.error("全スポット描画エラー:", err);
-    }
-}
 
 function initAreaUI() {
 
@@ -2164,7 +2082,7 @@ function loadRegionMap() {
             if (linkContainer) linkContainer.innerHTML = regionHtml;
 
             // 👇 【ここに追加】全県マスターデータを読み込んで描画する
-            showAllRegionSpotsFromMaster(regionCode);
+            showAllRegionSpots();
 
             isRegionLoaded = true;
 
@@ -2481,7 +2399,7 @@ window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_sh
 const jsonUrl = window.prefLocationUrl; // ← jsonUrl に変更
 const whetherUrl = window.prefWeatherUrl;
 const shopUrl = window.prefShopUrl;
-
+fetchAllRegionSpots();
 // このチェーン内で初めてロードと描画を完結させる
 loadLocationJSON(jsonUrl).then(() => { // ← loadLocationJSON に変更（第2引数も削除）
 
@@ -2511,6 +2429,148 @@ loadLocationJSON(jsonUrl).then(() => { // ← loadLocationJSON に変更（第2�
         });
     });
 });
+
+// =====================================================
+// ■ 1. 全県データをバックグラウンドで取得・合体する専用関数
+// =====================================================
+async function fetchAllRegionSpots() {
+    // 既にデータが完成していればそのまま返す
+    if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
+        return window.ALL_REGION_SPOTS;
+    }
+    
+    window.ALL_REGION_SPOTS = [];
+    
+    try {
+        const regionCode = window.currentRegion || 'KANTO';
+        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
+        
+        // まずRegionのCSVを読んで県のリストを取得
+        const res = await fetch(rUrl);
+        if (!res.ok) throw new Error("Region CSV fetch failed");
+        
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        const typeIdx = headers.indexOf('type');
+        const urlIdx = headers.indexOf('url');
+        
+        if (typeIdx === -1 || urlIdx === -1) return [];
+        
+        const prefUrls = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i]) continue;
+            const cols = lines[i].split(',').map(c => c.trim());
+            if (cols[typeIdx] === 'pref') {
+                const urlVal = cols[urlIdx];
+                if (!urlVal) continue;
+                
+                const parts = urlVal.split('/');
+                let prefCode = '';
+                if (parts.length >= 4) {
+                    prefCode = parts[1].split('_')[0]; 
+                } else if (parts.length === 3) {
+                    prefCode = parts[0].split('_')[0]; 
+                }
+                
+                if (prefCode) {
+                    // 全県の location.json のURLをリスト化
+                    prefUrls.push(`/${regionCode}/${prefCode}_location.json`);
+                }
+            }
+        }
+        
+        // 全県のJSONを一斉にフェッチ
+        const fetchPromises = prefUrls.map(url => 
+            fetch(url).then(r => r.ok ? r.json() : []).catch(() => [])
+        );
+        
+        const results = await Promise.all(fetchPromises);
+        
+        // 全データを1つの配列にガッチャンコする
+        results.forEach(prefData => {
+            if (Array.isArray(prefData)) {
+                window.ALL_REGION_SPOTS = window.ALL_REGION_SPOTS.concat(prefData);
+            }
+        });
+        
+        return window.ALL_REGION_SPOTS;
+    } catch (err) {
+        console.error("全県データ結合エラー:", err);
+        return [];
+    }
+}
+
+// =====================================================
+// ■ 2. 広域用のグリッド間引き関数
+// =====================================================
+function filterMergedGridSpots(allSpots, map, gridSize = 5) {
+    if (!map || !Array.isArray(allSpots) || allSpots.length === 0) return [];
+
+    const occupiedCells = new Set();
+    const result = [];
+
+    for (let i = 0; i < allSpots.length; i++) {
+        const spot = allSpots[i];
+        if (!spot.lat || !spot.lng) continue;
+
+        const p = map.latLngToLayerPoint([spot.lat, spot.lng]);
+        const cellX = Math.floor(p.x / gridSize);
+        const cellY = Math.floor(p.y / gridSize);
+        const cellKey = `${cellX}_${cellY}`;
+
+        if (!occupiedCells.has(cellKey)) {
+            occupiedCells.add(cellKey);
+            result.push(spot);
+        }
+    }
+
+    return result;
+}
+
+// =====================================================
+// ■ 3. 広域マップで全県のドットを描画する関数
+// =====================================================
+async function showAllRegionSpots() {
+    if (!window.map) return;
+
+    if (window.regionAllSpotLayer) {
+        window.map.removeLayer(window.regionAllSpotLayer);
+    }
+    window.regionAllSpotLayer = L.layerGroup();
+
+    // 先行ロード済みの全県データを取得（終わっていれば一瞬で返る）
+    const allSpots = await fetchAllRegionSpots();
+
+    const mergedSpots = filterMergedGridSpots(allSpots, window.map, 5);
+
+    mergedSpots.forEach(spot => {
+        let type = 'spot';
+        if (spot.icon && spot.icon.startsWith('fish')) {
+            const match = spot.icon.match(/fish\d+/);
+            if (match) type = match[0];
+        }
+
+        const isFish = type.startsWith('fish');
+
+        const marker = L.marker([spot.lat, spot.lng], {
+            icon: L.divIcon({
+                className: 'custom-text-marker',
+                html: `<div class="spot-text ${type}">■</div>`,
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
+            }),
+            interactive: false,
+            keyboard: false,
+            zIndexOffset: isFish ? 600 : 500
+        });
+
+        window.regionAllSpotLayer.addLayer(marker);
+    });
+
+    window.regionAllSpotLayer.addTo(window.map);
+}
 
 // グローバルで保持
 window.icData = [];
