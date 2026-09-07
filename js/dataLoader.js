@@ -550,12 +550,17 @@ function selectArea(area) {
         window.map.invalidateSize(true);
         openArea(areaObj.individualId);
         showSpotsForArea(window.currentAreaId);
+        // 👇【ここに追加】県スワイプをOFFにしてから、エリアスワイプをONにする
+        if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
         clearSpotUI();
+
         
-        // ★ 私が勝手に入れた enableDragForArea() を削除し、Phase1をドラッグ不可に戻す
+
         
+
+
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 if (window.markerControl) {
@@ -764,7 +769,12 @@ async function selectSpot(spot) {
 
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
+
+    // 👇【ここに追加】スポット詳細では両方のスワイプをOFFにする
     disableAreaSwipe();
+    if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
+
+
 
     const center = window.map.getCenter();
     const isSameLoc = center && Math.abs(center.lat - spot.lat) < 0.0001 && 
