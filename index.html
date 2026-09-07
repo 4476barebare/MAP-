@@ -2624,8 +2624,8 @@ async function routeUpdate() {
                 spot.zoom &&
                 spot.zoom !== ''
             ) {
-                if (typeof zoomToSpot === 'function') {
-                    zoomToSpot(spot);
+                if (typeof selectSpot === 'function') {
+                  selectSpot(spot);
                 }
             } else {
                 if (typeof showFishPopup === 'function') {
