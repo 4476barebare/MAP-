@@ -733,9 +733,6 @@ async function loadPrefectureData(prefCode) {
 }
 
 
-// ==========================================
-// ★ ページの初期読み込み（超スッキリ版）
-// ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     loadICData();
     const params = new URLSearchParams(window.location.search);
@@ -746,17 +743,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.currentRegion = getRegionCode();
     window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
 
-    // 1. 全県データを先にバックグラウンドで結合
-    await fetchAllRegionSpots();
-
-    // 2. URLからの逆引き実行
     await applyQueryToStateFromCsv();
     
-    // 3. あとは routeUpdate() に任せるだけで完璧に処理が分岐する
-    routeUpdate();
-});
+    if (!window.currentPref) {
+        routeUpdate(); 
+        return;
+    }
 
-// （以下、既存の getAlertText などの関数群は維持されていればそのままでOKです）
+    window.prefLocationUrl      = window.prefLocationUrl || `/${window.currentRegion}/${window.currentPref}_location.json`;
+    window.prefWeatherUrl       = `/data/${window.currentPref}_whether.csv`;
+    window.prefInlandWeatherUrl = `/data/${window.currentRegion}_inLand_recalculated.csv`;
+    window.fishUrl              = `/${window.currentRegion}/${window.currentPref}_fish.json`;
+    window.prefShopUrl          = `/${window.currentRegion}/${window.currentPref}_shop.csv`;
+
+    const jsonUrl = window.prefLocationUrl;
+    const whetherUrl = window.prefWeatherUrl;
+    const shopUrl = window.prefShopUrl;
+
+    loadLocationJSON(jsonUrl).then(() => {
+        loadWhetherCSV(whetherUrl).then(csv => {
+            applyWhetherToSpots(csv);
+            
+            if (typeof loadInlandWhetherCSV === 'function') {
+                loadInlandWhetherCSV(window.currentRegion).then(inlandCsv => {
+                    applyInlandWhetherToSpots(inlandCsv);
+                    routeUpdate();
+                    renderAreaGuide();
+                    
+                    if (window.markerControl) {
+                        window.markerControl.preloadShop01(shopUrl);
+                    }
+                    
+                    getAlertText(window.prefData, function(result) {
+                        const el = document.getElementById("alert-bar");
+                        if (el) {
+                            el.textContent = result.text;
+                            el.style.color = result.color;
+                        }
+                    });
+                });
+            }
+        });
+    });
+});
 
 
 
