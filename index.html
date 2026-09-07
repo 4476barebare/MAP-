@@ -266,7 +266,7 @@ window.prefSpotLayerCache = {};
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     // さっき作った sw.js を裏側で起動させる
-    navigator.serviceWorker.register('js/sw.js')
+    navigator.serviceWorker.register('/sw.js')
       .then(() => console.log('ServiceWorkerの登録完了！タイルのキャッシュを開始します。'))
       .catch(err => console.log('ServiceWorkerの登録失敗:', err));
   });
