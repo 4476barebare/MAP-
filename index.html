@@ -2599,33 +2599,12 @@ async function routeUpdate() {
             if (!window.map) return;
 
             window.map.invalidateSize(true);
-
-            if (typeof enableDragForArea === 'function') {
-                enableDragForArea();
-            }
-
-            if (typeof enablePhase2 === 'function') {
-                enablePhase2(window.map);
-            }
-
+ 
             window.map
                 .getContainer()
                 .classList.add('is-spot-mode');
+zoomtoSpot(spot);
 
-
-            // ★ スポットの最終ズーム
-            if (
-                spot.zoom &&
-                spot.zoom !== ''
-            ) {
-                if (typeof selectSpot === 'function') {
-                  selectSpot(spot);
-                }
-            } else {
-                if (typeof showFishPopup === 'function') {
-                    showFishPopup(spot);
-                }
-            }
 
 
             window._selectSpotCompleted = true;
