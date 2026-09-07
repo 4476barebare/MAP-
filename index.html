@@ -671,10 +671,11 @@ async function showAllRegionSpots() {
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
 // ==========================================
-window.selectPrefecture = function(csvParam, prefName) {
+window.selectPrefecture = function(csvParam, prefName) { // ★ 第2引数に prefName を追加
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
 
+    // 様々な引数パターンに対応して確実に県コードだけを抜く
     if (csvParam.includes('_location')) {
         prefCode = csvParam.split('_')[0];
     } else if (csvParam.includes('_')) {
@@ -686,34 +687,38 @@ window.selectPrefecture = function(csvParam, prefName) {
         if (match) prefCode = match[1];
     }
 
+    // ★ 1. システム変数を確定させる
     window.currentRegion = region;
     window.currentPref = prefCode;
     
+    // =====================================================
+    // ★ 修正: 新しい県を開く前に過去のBoundsと広域用ドットを確実に初期化・消去
+    // =====================================================
     window.prefBounds = null;
     window.areaBounds = null;
-    
-    // ★ 修正：広域マップの全県ドット（regionAllSpotLayer）を確実に消す
+
     if (window.regionAllSpotLayer && window.map) {
         window.map.removeLayer(window.regionAllSpotLayer);
         window.regionAllSpotLayer = null;
     }
     
-    // パスを一括でグローバル生成
+    // ★ 2. パスを一括でグローバル生成
     window.prefLocationUrl      = `/${region}/${prefCode}_location.json`;
     window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
     window.fishUrl              = `/${region}/${prefCode}_fish.json`;
     window.prefShopUrl          = `/${region}/${prefCode}_shop.csv`;
 
+    // ★ 3. クエリをセット
     if (prefName) {
         setIdealQuery('pref', prefName);
     } else {
-        setIdealQuery('pref', prefCode); 
+        setIdealQuery('pref', prefCode); // 万が一の保険
     }
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-    // ★ 修正：確実に routeUpdate（チェック＆ロード） を呼んで画面遷移させる
+    // ★ 4. 確実に画面遷移を発火させる
     if (typeof routeUpdate === 'function') {
         routeUpdate();
     }
