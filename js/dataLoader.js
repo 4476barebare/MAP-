@@ -3107,12 +3107,14 @@ function goBack() {
             renderPrefWeather();
             resetAreaGuide();
 
-            showBackBtnOnly();
+          
             
             // ★ 修正：時間指定(setTimeout)ではなく、ブラウザの描画完了を待ってからロックを解除する
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
+                    
                     window.goBackGuard = false; 
+                    showBackBtnOnly();
                 });
             });
         };
