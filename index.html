@@ -2175,10 +2175,10 @@ function renderAreaGuide() {
             }
 
             // =====================================================
-            // ★ 新しいエリアへのジャンプ処理（ハッシュ操作を完全削除）
+            // ★ 新しいエリアへのジャンプ処理（routeUpdateは直打ち専用なので呼ばない）
             // =====================================================
             
-            // クエリをセット（日本語名notesを確実に使う）
+            // クエリをセット
             if (window.prefData) setIdealQuery('pref', window.prefData.notes);
             setIdealQuery('area', area.name);
             setIdealQuery('spot', null);
@@ -2187,9 +2187,11 @@ function renderAreaGuide() {
             window.currentAreaId = area.areaId + '_' + area.individualId;
             window.currentSpotId = null;
 
-            // ハッシュ由来の updateStateFromHash は不要になったので直接 routeUpdate を呼ぶ
-            if (typeof routeUpdate === 'function') routeUpdate();
+            // routeUpdateを完全に排除し、直接selectAreaを呼ぶ
+            if (typeof selectArea === 'function') selectArea(area);
+            
             openArea(area.individualId, true);
+
 
         });
 
@@ -2476,17 +2478,22 @@ async function checkAndLoadRouteData() {
     }
 }
 
+// ==========================================
+// ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数
+// ==========================================
 async function routeUpdate() {
+    // データの準備確認（この中で loadLocationJSON が呼ばれ、金庫からデータが振り分けられる）
     const isReady = await checkAndLoadRouteData();
     if (!isReady) return; 
 
     if (!window.currentPref) {
-        document.getElementById('map-back-btn').style.display = 'none';
-        loadRegionMap(window.currentRegion || 'KANTO');
+        const btn = document.getElementById('map-back-btn');
+        if (btn) btn.style.display = 'none';
+        if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
         return;
     }
 
-    // ─── スポット階層 ───
+    // ─── スポット階層への直リンク復元 ───
     if (window.currentSpotId) {
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
@@ -2495,16 +2502,29 @@ async function routeUpdate() {
         const spot = list.find(s => String(s.individualId) === String(targetIndivId));
         
         if (spot) {
-            setIdealQuery('pref', window.prefData.notes);
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
             const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
-            if (parentArea) setIdealQuery('area', parentArea.name);
-            setIdealQuery('spot', spot.name);
-            window._selectSpotCompleted = true;
-
-            drawLocation(spot.name, spot.lat, spot.lng, "13");
             
-            // ★ スポット詳細ではスポット用のBoundsに切り替わるのでここでは何もしない
-            zoomToSpot(spot);
+            if (parentArea) {
+                setIdealQuery('area', parentArea.name);
+                // ★ 直リンク時に欠落する「エリアガイドのアコーディオン展開」を補完
+                if (typeof openArea === 'function') openArea(parentArea.individualId);
+            }
+            setIdealQuery('spot', spot.name);
+
+            // =====================================
+            // ★ 通常操作（selectArea等）を通らない直リンクのために、欠落する必須UIを強制生成！
+            // =====================================
+            if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
+            if (typeof phase1menu === 'function') phase1menu(safeAreaId);
+            if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
+                window.markerControl.showShop01(safeAreaId);
+            }
+            window._selectSpotCompleted = true; // 戻る(goBack)時のガードフラグ
+
+            // マップを描画してスポットへズーム
+            if (typeof drawLocation === 'function') drawLocation(spot.name, spot.lat, spot.lng, "13");
+            if (typeof zoomToSpot === 'function') zoomToSpot(spot);
             
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
@@ -2522,26 +2542,25 @@ async function routeUpdate() {
                     });
                 }
             });
-
         }
         return;
     }
 
-    // ─── エリア階層 ───
+    // ─── エリア階層への直リンク復元 ───
     if (window.currentAreaId) {
         const safeAreaId = window.currentAreaId || ""; 
         const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
         if (!area) return;
         
-        setIdealQuery('pref', window.prefData.notes);
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         setIdealQuery('area', area.name); 
         setIdealQuery('spot', null);      
 
         const safeZoom = area.zoom || window.prefData.zoom;
-        drawLocation(area.name, area.lat, area.lng, safeZoom);
+        if (typeof drawLocation === 'function') drawLocation(area.name, area.lat, area.lng, safeZoom);
         
-        selectArea(area); 
-        renderCrowdImage();
+        if (typeof selectArea === 'function') selectArea(area); 
+        if (typeof renderCrowdImage === 'function') renderCrowdImage();
         
         requestAnimationFrame(() => {
             const btn = document.getElementById('map-back-btn');
@@ -2552,7 +2571,8 @@ async function routeUpdate() {
         });
         return;
     }
-    // ─── 県階層 ───
+
+    // ─── 県階層への直リンク復元 ───
     if (window.prefData) {
         setIdealQuery('pref', window.prefData.notes); 
         setIdealQuery('area', null);                 
@@ -2560,17 +2580,17 @@ async function routeUpdate() {
 
         const targetZoom = window.prefData.zoom;
         
-        // ★ マップ未生成の初回ロード時は「即時描画(isSameLoc = true)」にする判定を追加
+        // ★ マップ未生成の初回ロード時は即時描画
         const isMapJustCreated = !window.map;
         const center = window.map ? window.map.getCenter() : null;
         const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
                           Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
                           window.map.getZoom() === targetZoom);
 
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        if (typeof drawLocation === 'function') drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
         
         const finalizePref = () => {
-            window.map.invalidateSize(true);
+            if (window.map) window.map.invalidateSize(true);
             
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
@@ -2579,7 +2599,6 @@ async function routeUpdate() {
                     if (typeof renderPrefWeather === 'function') renderPrefWeather();
                     if (typeof renderCrowdImage === 'function') renderCrowdImage();
 
-                    // 👇県スワイプをON、エリアスワイプをOFFにする
                     if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
                     if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
                     
@@ -2589,8 +2608,6 @@ async function routeUpdate() {
                             btn.style.display = 'block';
                             requestAnimationFrame(() => { btn.style.opacity = '1'; });
                         }
-
-                        // 👇【追加】これを入れないと、スワイプ後に広域マップ(REGION)へ戻るボタンが効かなくなります！
                         window.goBackGuard = false; 
                     });
                 });
@@ -2600,11 +2617,11 @@ async function routeUpdate() {
         if (isSameLoc) {
             finalizePref();
         } else {
-            window.map.once('moveend', finalizePref);
+            if (window.map) window.map.once('moveend', finalizePref);
         }
     }
-
 }
+
 
 
 // ★ Region名の変換マッピング
