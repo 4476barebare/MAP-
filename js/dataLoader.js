@@ -8,10 +8,10 @@ window.spotData = []
 window.currentAreaId = null;
 
 // ==========================================
-// ★ スポット用データをJSONから読み込む関数（全データ一括配列からの抽出対応版）
+// ★ スポット用データを金庫(allspotData)から読み込む関数（完全脱却版）
 // ==========================================
-function loadLocationJSON(jsonUrl) {
-    const pref = window.currentPref; // 例: 'IBARAKI'
+async function loadLocationJSON() {
+    const pref = window.currentPref;
 
     function parseGrid(str) {
         if (!str) return { x: null, y: null };
@@ -23,7 +23,7 @@ function loadLocationJSON(jsonUrl) {
         };
     }
 
-    // 既にキャッシュされていればそれを返す（変更なし）
+    // 分岐A：既にデータが生成されていればキャッシュから復元して即リターン
     if (window[`${pref}_prefData`] && window[`${pref}_areaData`] && window[`${pref}_spotData`]) {
         window.prefData = window[`${pref}_prefData`];
         window.areaData = window[`${pref}_areaData`];
@@ -31,7 +31,7 @@ function loadLocationJSON(jsonUrl) {
 
         if (window[`${pref}_areaGraph`]) {
             window.areaGraph = window[`${pref}_areaGraph`];
-        } else {
+        } else if (typeof buildAreaGraphFromGrid === 'function') {
             buildAreaGraphFromGrid(window.areaData);
             window[`${pref}_areaGraph`] = window.areaGraph;
         }
@@ -43,142 +43,75 @@ function loadLocationJSON(jsonUrl) {
             container.innerHTML = window[`${pref}_seoHtml`] || '';
         }
 
-        return Promise.resolve({
-            main: window.prefData,
-            areas: window.areaData,
-            spots: window.spotData
-        });
+        return { main: window.prefData, areas: window.areaData, spots: window.spotData };
     }
 
-    const fishFetch = window.fishData 
-        ? Promise.resolve(window.fishData) 
-        : fetch(window.fishUrl).then(res => res.ok ? res.json() : null).catch(() => null);
+    // 分岐B：金庫（allspotData）から必要なprefデータだけを取り出す
+    const vaultData = window.allspotData || window.ALL_REGION_SPOTS || [];
+    
+    let main = null;
+    const areas = [];
+    const spots = [];
 
-    // =====================================================
-    // ★ 変更点：全データ配列(ALL_REGION_SPOTS)を使う。無ければ保険でjsonUrlをフェッチ
-    // =====================================================
-    const locationFetch = (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0)
-        ? Promise.resolve(window.ALL_REGION_SPOTS)
-        : fetch(jsonUrl).then(r => r.json());
+    // 対象県のデータを抽出
+    const targetRows = vaultData.filter(row => {
+        return row._prefCode === pref || 
+               (!row.areaId && row.name === pref) || 
+               (row.areaId === pref) || 
+               (row.areaId && typeof row.areaId === 'string' && row.areaId.startsWith(pref + '_'));
+    });
 
-    return Promise.all([
-        locationFetch,
-        fishFetch
-    ]).then(([allRows, fishData]) => {
-        
-        if (fishData) window.fishData = fishData;
+    targetRows.forEach(row => {
+        row.squareX = null;
+        row.squareY = null;
+    });
 
-        let main = null;
-        const areas = [];
-        const spots = [];
-
-        // 1. main (県データ) の抽出
-        allRows.forEach(row => {
-            // 既存仕様: areaIdが無く、nameが県コード(IBARAKI等)と一致するもの
-            if (!row.areaId && row.name === pref) {
-                main = row;
-            }
-        });
-
-        // 2. areas (エリアデータ) の抽出
-        allRows.forEach(row => {
-            // 既存仕様: areaIdが県コード(IBARAKI等)と完全に一致するもの
-            if ((row.areaId || '').trim() === pref) {
-                if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
-                    const grid = parseGrid(row.url);
-                    row.squareX = grid.x;
-                    row.squareY = grid.y;
-                } else {
-                    row.squareX = null;
-                    row.squareY = null;
-                }
-                areas.push(row);
-            }
-        });
-
-        // 3. spots (スポットデータ) の抽出
-        allRows.forEach(row => {
-            const icon = row.icon;
-            if (!icon) return;
-
-            // ★ 追加: 全県のデータが混ざっているため、areaIdが「IBARAKI_」等で始まるものだけに絞る
-            const rowAreaId = (row.areaId || '').trim();
-            if (rowAreaId.startsWith(pref + '_')) {
-                if (icon === 'spot' || icon.startsWith('fish')) {
-                    spots.push(row);
-                }
-            }
-        });
-
-        // 魚データの付与（既存のまま）
-        if (fishData) {
-            const fishDict = {};
-            for (const regKey in fishData) {
-                const areaSpots = fishData[regKey];
-                for (const spotName in areaSpots) {
-                    fishDict[spotName] = areaSpots[spotName];
-                }
-            }
-
-            spots.forEach(spot => {
-                const spotFishData = fishDict[spot.name];
-                if (spotFishData) {
-                    const fishList = [];
-                    for (const fishName in spotFishData) {
-                        const info = spotFishData[fishName];
-                        if (info && typeof info.coords === 'string' && info.coords !== '') {
-                            const points = info.coords.split('|');
-                            points.forEach(pt => {
-                                const [lat, lng] = pt.split(',');
-                                if (lat && lng) {
-                                    fishList.push(`${fishName}|${lat}|${lng}`);
-                                }
-                            });
-                        }
-                    }
-                    spot.URL = fishList.join(',');
-                } else {
-                    spot.URL = "";
-                }
-            });
+    // 県本体（main）の抽出
+    targetRows.forEach(row => {
+        if ((!row.areaId || row.individualId === "parent") && row.name === pref) {
+            main = row;
         }
+    });
 
-        // ==========================================
-        // ★ 県全体のBoundsを計算する（既存のまま）
-        // ==========================================
-        window.prefBounds = null;
-        if (spots.length > 0) {
-            let minLat = Infinity, maxLat = -Infinity;
-            let minLng = Infinity, maxLng = -Infinity;
-            spots.forEach(spot => {
-                const lat = Number(spot.lat);
-                const lng = Number(spot.lng);
-                if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                    minLat = Math.min(minLat, lat);
-                    maxLat = Math.max(maxLat, lat);
-                    minLng = Math.min(minLng, lng);
-                    maxLng = Math.max(maxLng, lng);
-                }
-            });
-            const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.05);
-            const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.05);
-            window.prefBounds = L.latLngBounds(
-                [minLat - latBuffer, minLng - lngBuffer],
-                [maxLat + latBuffer, maxLng + lngBuffer]
-            );
+    // エリア（areas）の抽出とグリッド計算
+    targetRows.forEach(row => {
+        if ((row.areaId || '').trim() === pref) {
+            if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
+                const grid = parseGrid(row.url);
+                row.squareX = grid.x;
+                row.squareY = grid.y;
+            }
+            areas.push(row);
         }
+    });
 
-        window.prefData = main;
-        window.areaData = areas;
-        window.spotData = spots;
+    // スポット（spots）の抽出
+    targetRows.forEach(row => {
+        const icon = row.icon;
+        if (!icon) return;
+        if (icon === 'spot' || icon.startsWith('fish') || icon === 'representative') {
+            spots.push(row);
+        }
+    });
 
-        window[`${pref}_prefData`] = main;
-        window[`${pref}_areaData`] = areas;
-        window[`${pref}_spotData`] = spots;
+    // グローバル変数へ代入
+    window.prefData = main;
+    window.areaData = areas;
+    window.spotData = spots;
 
+    // キャッシュ用変数へ代入
+    window[`${pref}_prefData`] = main;
+    window[`${pref}_areaData`] = areas;
+    window[`${pref}_spotData`] = spots;
+
+    // エリアグラフの構築とキャッシュ
+    if (typeof buildAreaGraphFromGrid === 'function') {
         buildAreaGraphFromGrid(areas);
         window[`${pref}_areaGraph`] = window.areaGraph;
+    }
 
+    // SEO用HTML文字列を生成してキャッシュ
+    if (typeof buildSeoHtmlString === 'function') {
         const seoHtml = buildSeoHtmlString(main, areas, spots);
         window[`${pref}_seoHtml`] = seoHtml;
 
@@ -188,9 +121,9 @@ function loadLocationJSON(jsonUrl) {
             titleSpan.textContent = `${main.notes}の釣りスポット一覧を見る`;
             container.innerHTML = seoHtml;
         }
+    }
 
-        return { main, areas, spots };
-    });
+    return { main, areas, spots };
 }
 
 // ==========================================
