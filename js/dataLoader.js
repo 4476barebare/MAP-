@@ -384,22 +384,20 @@ async function loadLocationJSON() {
     });
 
 
-    // ==========================================
-    // スポット(spots)の抽出
-    // ==========================================
-    targetRows.forEach(row => {
-        // pref や area などの親データは除外
-        if (row.type === 'pref' || row.type === 'area') return;
+// ==========================================
+// スポット(spots)の抽出
+// ==========================================
+targetRows.forEach(row => {
+    // pref や area などの親データは除外
+    if (row.type === 'pref' || row.type === 'area') return;
 
-        const icon = row.icon;
-        
-        // icon列に何かしらの文字が入っていれば全てスポットとして抽出する
-        if (icon === 'spot' ||
-            icon === 'fish1'
-        ) {
-            spots.push(row);
-        }
-    });
+    const icon = row.icon;
+
+    // iconが入っているものを全てスポットとして抽出
+    if (icon && icon.trim() !== '') {
+        spots.push(row);
+    }
+});
 
 
     // ==========================================
