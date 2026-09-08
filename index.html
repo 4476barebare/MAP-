@@ -835,14 +835,17 @@ function filterMergedGridSpots(allSpots, map, gridSize = 5) {
     return result;
 }
 
-// =====================================================
-// 【県域データロード】抽出は完全に loadLocationJSON に任せる
-// =====================================================
 async function loadPrefectureData(prefCode) {
+
     window.fishData = null; 
+
     window.currentPref = prefCode;
+
     const region = window.currentRegion || 'KANTO';
-    window.regionUrl = `/${region}/${region}_region.csv`; 
+
+    window.regionUrl = `/${region}/${region}_region.csv`;
+
+    window.fishUrl = `/${region}/${prefCode}_fish.json`;
 
     try {
         // 1. 金庫の確認と準備
