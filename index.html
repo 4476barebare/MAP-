@@ -694,6 +694,13 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     window.prefBounds = null;
     window.areaBounds = null;
 
+    // 👇これを絶対に追加する！古い県のデータを消して天気を再取得させるため
+    window.prefData = null;
+    window.areaData = [];
+    window.spotData = [];
+    window.fishData = null;
+    // 👆ここまで
+
     if (window.regionAllSpotLayer && window.map) {
         window.map.removeLayer(window.regionAllSpotLayer);
         window.regionAllSpotLayer = null;
@@ -2424,17 +2431,20 @@ async function checkAndLoadRouteData() {
     }
 
     try {
-        let needsBaseLoad = false;
-
+                let needsBaseLoad = false;
         if (!window.prefData) {
             needsBaseLoad = true;
-        } else if (
-            window.spotData &&
-            window.spotData.length > 0 &&
-            !window.spotData[0].whether
-        ) {
-            needsBaseLoad = true;
+        } else if (window.spotData && window.spotData.length > 0) {
+            // 🚨 [0]決め打ちをやめ、代表スポットに天気が入っているかを正確にチェックする
+            const rep = window.spotData.find(s => {
+                const typeParts = (s.type || '').split('$');
+                return typeParts.includes('representative');
+            });
+            if (rep && !rep.whether) {
+                needsBaseLoad = true;
+            }
         }
+
 
         if (needsBaseLoad) {
             await loadPrefectureData(prefCode);
