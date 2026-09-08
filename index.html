@@ -737,11 +737,9 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-    if (!window.prefData) {
-        if (typeof loadPrefectureData === 'function') {
-            await loadPrefectureData(prefCode);
-        }
-    }
+if (typeof loadPrefectureData === 'function') {
+    await loadPrefectureData(prefCode);
+}
 
     if (window.prefData && window.map) {
         const targetZoom = window.prefData.zoom;
@@ -2429,24 +2427,27 @@ async function checkAndLoadRouteData() {
     }
 
     try {
-                let needsBaseLoad = false;
-        if (!window.prefData) {
-            needsBaseLoad = true;
-        } else if (window.spotData && window.spotData.length > 0) {
-            // 🚨 [0]決め打ちをやめ、代表スポットに天気が入っているかを正確にチェックする
-            const rep = window.spotData.find(s => {
-                const typeParts = (s.type || '').split('$');
-                return typeParts.includes('representative');
-            });
-            if (rep && !rep.whether) {
-                needsBaseLoad = true;
-            }
-        }
+let needsBaseLoad = false;
 
+if (!window.prefData) {
+    needsBaseLoad = true;
+} else if (!Array.isArray(window.spotData) || window.spotData.length === 0) {
+    needsBaseLoad = true;
+} else {
+    const rep = window.spotData.find(s => {
+        const typeParts = (s.type || '').split('$');
+        return typeParts.includes('representative');
+    });
 
-        if (needsBaseLoad) {
-            await loadPrefectureData(prefCode);
-        }
+    if (rep && !rep.whether) {
+        needsBaseLoad = true;
+    }
+}
+
+if (needsBaseLoad) {
+    await loadPrefectureData(prefCode);
+}
+
 
         return true;
 
