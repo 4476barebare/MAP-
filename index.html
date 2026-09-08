@@ -2584,7 +2584,16 @@ showdebug(spot.type);
 zoomToSpot(spot);
 showdebug(`zoomtoSpot`);
 
+                    const btn =
+                        document.getElementById('map-back-btn');
 
+                    if (btn) {
+                        btn.style.display = 'block';
+
+                        requestAnimationFrame(() => {
+                            btn.style.opacity = '1';
+                        });
+                    }
             window._selectSpotCompleted = true;
 
 
