@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # XREA側でのマージ処理完了を待って、毎時45分に取りに行く
-    - cron: '45 */3 * * *'
+    - cron: '45 */6 * * *'
 
 # 同時実行によるデプロイ渋滞を防ぐ[span_3](start_span)[span_3](end_span)
 concurrency:
