@@ -2597,24 +2597,48 @@ if (window.currentSpotId) {
 
     return;
 }
+
 // ==================================================
 // エリア画面
 // ※ currentAreaIdあり / currentSpotIdなし
 // ==================================================
+showdebug(
+    `[エリア分岐判定] currentAreaId=${window.currentAreaId} / currentSpotId=${window.currentSpotId}`
+);
+
 if (window.currentAreaId && !window.currentSpotId) {
 
+    showdebug(
+        `[エリア分岐IN] currentAreaId=${window.currentAreaId}`
+    );
+
     const safeAreaId = window.currentAreaId;
+
+    showdebug(
+        `[エリア検索開始] areaData存在=${!!window.areaData} / 件数=${window.areaData?.length || 0}`
+    );
 
     const area = (window.areaData || []).find(
         a => safeAreaId.endsWith(String(a.individualId))
     );
 
-    if (!area) return;
+    showdebug(
+        `[エリア検索終了] area=${area ? area.name : '見つからない'}`
+    );
+
+    if (!area) {
+        showdebug(
+            `[エラー] currentAreaIdに一致するareaがありません: ${safeAreaId}`
+        );
+        return;
+    }
 
 
     // ------------------------------------------
     // URL状態
     // ------------------------------------------
+    showdebug(`[エリアURL設定開始]`);
+
     if (window.prefData) {
         setIdealQuery(
             'pref',
@@ -2632,17 +2656,36 @@ if (window.currentAreaId && !window.currentSpotId) {
         null
     );
 
+    showdebug(
+        `[エリアURL設定完了] ${area.name}`
+    );
+
 
     // ------------------------------------------
     // エリア画面を構築
     // selectAreaがdrawLocationからUIまで担当
     // ------------------------------------------
+    showdebug(
+        `[selectArea直前] function=${typeof selectArea}`
+    );
+
     if (typeof selectArea === 'function') {
         selectArea(area);
+
+        showdebug(
+            `[selectArea呼び出し完了] ${area.name}`
+        );
+    } else {
+        showdebug(
+            `[エラー] selectAreaが存在しません`
+        );
     }
+
+    showdebug(`[エリア画面return]`);
 
     return;
 }
+
     // ==================================================
     // 県画面
     // ==================================================
