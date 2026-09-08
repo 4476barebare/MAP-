@@ -2598,6 +2598,7 @@ if (window.currentSpotId) {
     return;
 }
 
+
 // ==================================================
 // エリア画面
 // ※ currentAreaIdあり / currentSpotIdなし
@@ -2614,6 +2615,9 @@ if (window.currentAreaId && !window.currentSpotId) {
 
     const safeAreaId = window.currentAreaId;
 
+    // ------------------------------------------
+    // エリア検索
+    // ------------------------------------------
     showdebug(
         `[エリア検索開始] areaData存在=${!!window.areaData} / 件数=${window.areaData?.length || 0}`
     );
@@ -2628,7 +2632,7 @@ if (window.currentAreaId && !window.currentSpotId) {
 
     if (!area) {
         showdebug(
-            `[エラー] currentAreaIdに一致するareaがありません: ${safeAreaId}`
+            `[エラー] currentAreaIdに対応するareaが見つかりません: ${safeAreaId}`
         );
         return;
     }
@@ -2662,26 +2666,50 @@ if (window.currentAreaId && !window.currentSpotId) {
 
 
     // ------------------------------------------
-    // エリア画面を構築
-    // selectAreaがdrawLocationからUIまで担当
+    // selectArea
     // ------------------------------------------
     showdebug(
-        `[selectArea直前] function=${typeof selectArea}`
+        `[selectArea直前] function=${typeof selectArea} / map=${!!window.map} / area=${area.name} / individualId=${area.individualId}`
     );
 
-    if (typeof selectArea === 'function') {
+    if (typeof selectArea !== 'function') {
+        showdebug(
+            `[エラー] selectAreaが関数ではありません`
+        );
+        return;
+    }
+
+
+    showdebug(
+        `[selectArea呼び出し] 開始`
+    );
+
+    try {
+
         selectArea(area);
 
         showdebug(
-            `[selectArea呼び出し完了] ${area.name}`
+            `[selectArea呼び出し] 完了`
         );
-    } else {
+
+    } catch (err) {
+
         showdebug(
-            `[エラー] selectAreaが存在しません`
+            `[selectAreaエラー] ${err?.message || err}`
         );
+
+        console.error(
+            'routeUpdate → selectArea エラー:',
+            err
+        );
+
+        return;
     }
 
-    showdebug(`[エリア画面return]`);
+
+    showdebug(
+        `[エリア画面完了] ${area.name}`
+    );
 
     return;
 }
