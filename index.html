@@ -2446,22 +2446,14 @@ async function checkAndLoadRouteData() {
 
 async function routeUpdate() {
 
-    showdebug("★ routeUpdate 開始");
-
     const isReady = await checkAndLoadRouteData();
-
-    showdebug("★ checkAndLoadRouteDataから戻った: " + isReady);
-
     if (!isReady) return;
-
 
     // ==================================================
     // 地域画面
     // ==================================================
     if (!window.currentPref) {
-
         const btn = document.getElementById('map-back-btn');
-
         if (btn) {
             btn.style.display = 'none';
         }
@@ -2469,196 +2461,134 @@ async function routeUpdate() {
         if (typeof loadRegionMap === 'function') {
             await loadRegionMap(window.currentRegion || 'KANTO');
         }
+        return;
+    }
+
+    // ==================================================
+    // スポット画面
+    // ==================================================
+    if (window.currentSpotId) {
+        const spotId = String(window.currentSpotId).split("_");
+        const safeAreaId = window.currentAreaId || "";
+
+        // ------------------------------------------
+        // スポット検索
+        // ------------------------------------------
+        const list = (window.spotData || []).filter(
+            s => String(s.areaId) === safeAreaId
+        );
+        const targetIndivId = spotId[2] || spotId[0];
+        const spot = list.find(
+            s => String(s.individualId) === String(targetIndivId)
+        );
+
+        if (!spot) return;
+
+        // ------------------------------------------
+        // 親エリア検索
+        // ------------------------------------------
+        const parentArea = (window.areaData || []).find(
+            a => safeAreaId.endsWith(String(a.individualId))
+        );
+
+        if (!parentArea) return;
+
+        // ------------------------------------------
+        // URL状態
+        // ------------------------------------------
+        if (window.prefData) {
+            setIdealQuery('pref', window.prefData.notes);
+        }
+        setIdealQuery('area', parentArea.name);
+        setIdealQuery('spot', spot.name);
+
+        // ------------------------------------------
+        // ① スポット位置を描画
+        // ------------------------------------------
+        drawLocation(spot.name, spot.lat, spot.lng, 13);
+
+        // ------------------------------------------
+        // ② 親エリアのPhase1を構築
+        // ------------------------------------------
+        if (window.map) {
+            window.map.options.maxBoundsViscosity = 0;
+            window.map.setMaxBounds(null);
+        }
+
+        // ------------------------------------------
+        // ③ 親エリアを開く
+        // ------------------------------------------
+        if (typeof openArea === 'function') {
+            openArea(parentArea.individualId);
+        }
+
+        // ------------------------------------------
+        // ④ スポットへズーム
+        // ------------------------------------------
+        requestAnimationFrame(() => {
+            window.map.invalidateSize(true);
+            zoomToSpot(spot);
+
+            // --------------------------------------
+            // 戻るボタンを表示
+            // --------------------------------------
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.display = 'block';
+                requestAnimationFrame(() => {
+                    btn.style.opacity = '1';
+                });
+            }
+
+            window._selectSpotCompleted = true;
+        });
 
         return;
     }
 
-// ==================================================
-// スポット画面
-// ==================================================
-if (window.currentSpotId) {
-
-    const spotId = String(window.currentSpotId).split("_");
-    const safeAreaId = window.currentAreaId || "";
-
-    // ------------------------------------------
-    // 魚データ準備
-    // ------------------------------------------
-//     if (
-        safeAreaId &&
-        typeof prepareFishForArea === 'function'
-//     ) {
-//         await prepareFishForArea(safeAreaId);
-//     }
-
-
-    // ------------------------------------------
-    // スポット検索
-    // ------------------------------------------
-    const list = (window.spotData || []).filter(
-        s => String(s.areaId) === safeAreaId
-    );
-
-    const targetIndivId = spotId[2] || spotId[0];
-
-    const spot = list.find(
-        s => String(s.individualId) === String(targetIndivId)
-    );
-
-    if (!spot) return;
-
-
-    // ------------------------------------------
-    // 親エリア検索
-    // ------------------------------------------
-    const parentArea = (window.areaData || []).find(
-        a => safeAreaId.endsWith(String(a.individualId))
-    );
-
-    if (!parentArea) return;
-
-
-    // ------------------------------------------
-    // URL状態
-    // ------------------------------------------
-    if (window.prefData) {
-        setIdealQuery(
-            'pref',
-            window.prefData.notes
+    // ==================================================
+    // エリア画面
+    // ※ currentAreaIdあり / currentSpotIdなし
+    // ==================================================
+    if (window.currentAreaId && !window.currentSpotId) {
+        const safeAreaId = window.currentAreaId;
+        const area = (window.areaData || []).find(
+            a => safeAreaId.endsWith(String(a.individualId))
         );
-    }
 
-    setIdealQuery(
-        'area',
-        parentArea.name
-    );
+        if (!area) return;
 
-    setIdealQuery(
-        'spot',
-        spot.name
-    );
+        if (window.prefData) {
+            setIdealQuery('pref', window.prefData.notes);
+        }
+        setIdealQuery('area', area.name);
+        setIdealQuery('spot', null);
 
+        // mapがまだ生成されていないため、
+        // まずエリア位置でdrawLocationしてmapを生成する
+        drawLocation(
+            area.name,
+            area.lat,
+            area.lng,
+            area.zoom || window.prefData.zoom
+        );
 
-    // ------------------------------------------
-    // スポット位置を描画
-    // ------------------------------------------
-    drawLocation(
-        spot.name,
-        spot.lat,
-        spot.lng,
-        13
-    );
-
-
-    // ------------------------------------------
-    // ② 親エリアのPhase1を構築
-    // ------------------------------------------
-    if (window.map) {
-        window.map.options.maxBoundsViscosity = 0;
-        window.map.setMaxBounds(null);
-    }
-
-
-    // ------------------------------------------
-    // ③ 親エリアを開く
-    // ------------------------------------------
-    if (typeof openArea === 'function') {
-        openArea(parentArea.individualId);
-    }
-
-
-    // ------------------------------------------
-    // ④ スポットへズーム
-    // ------------------------------------------
-    requestAnimationFrame(() => {
-
-        window.map.invalidateSize(true);
-
-        zoomToSpot(spot);
-
-
-        // --------------------------------------
-        // 戻るボタンを表示
-        // --------------------------------------
-        const btn =
-            document.getElementById('map-back-btn');
-
-        if (btn) {
-            btn.style.display = 'block';
-
-            requestAnimationFrame(() => {
-                btn.style.opacity = '1';
-            });
+        // その後は通常のselectAreaに任せる
+        if (typeof selectArea === 'function') {
+            selectArea(area);
+            renderCrowdImage();
         }
 
-
-        window._selectSpotCompleted = true;
-    });
-
-    return;
-}
-
-// ==================================================
-// エリア画面
-// ※ currentAreaIdあり / currentSpotIdなし
-// ==================================================
-if (window.currentAreaId && !window.currentSpotId) {
-
-    const safeAreaId = window.currentAreaId;
-
-    const area = (window.areaData || []).find(
-        a => safeAreaId.endsWith(String(a.individualId))
-    );
-
-    if (!area) return;
-
-    if (window.prefData) {
-        setIdealQuery(
-            'pref',
-            window.prefData.notes
-        );
+        return;
     }
 
-    setIdealQuery(
-        'area',
-        area.name
-    );
-
-    setIdealQuery(
-        'spot',
-        null
-    );
-
-    // mapがまだ生成されていないため、
-    // まずエリア位置でdrawLocationしてmapを生成する
-    drawLocation(
-        area.name,
-        area.lat,
-        area.lng,
-        area.zoom || window.prefData.zoom
-    );
-
-    // その後は通常のselectAreaに任せる
-    if (typeof selectArea === 'function') {
-        selectArea(area);
-          renderCrowdImage();
-    }
-
-    return;
-}
     // ==================================================
     // 県画面
     // ==================================================
     if (window.prefData) {
-
-        setIdealQuery(
-            'pref',
-            window.prefData.notes
-        );
-
+        setIdealQuery('pref', window.prefData.notes);
         setIdealQuery('area', null);
         setIdealQuery('spot', null);
-
 
         // ------------------------------------------
         // ① 県位置
@@ -2670,67 +2600,51 @@ if (window.currentAreaId && !window.currentSpotId) {
             window.prefData.zoom
         );
 
-
         // ------------------------------------------
         // ② 県画面UI
         // ------------------------------------------
         const finalizePref = () => {
-
             if (window.map) {
                 window.map.invalidateSize(true);
             }
 
             requestAnimationFrame(() => {
-
                 if (typeof showPrefSpots === 'function') {
                     showPrefSpots();
                 }
-
                 if (typeof initAreaUI === 'function') {
                     initAreaUI();
                 }
-
                 if (typeof renderPrefWeather === 'function') {
                     renderPrefWeather();
                 }
-
                 if (typeof renderCrowdImage === 'function') {
                     renderCrowdImage();
                 }
-
                 if (typeof disableAreaSwipe === 'function') {
                     disableAreaSwipe();
                 }
-
                 if (typeof enablePrefSwipe === 'function') {
                     enablePrefSwipe();
                 }
 
-
                 requestAnimationFrame(() => {
-
-                    const btn =
-                        document.getElementById('map-back-btn');
-
+                    const btn = document.getElementById('map-back-btn');
                     if (btn) {
                         btn.style.display = 'block';
-
                         requestAnimationFrame(() => {
                             btn.style.opacity = '1';
                         });
                     }
-
                     window.goBackGuard = false;
-
                 });
-
             });
         };
-
 
         requestAnimationFrame(finalizePref);
     }
 }
+
 // ★ Region名の変換マッピング
 const REGION_MAP = {
     "関東地方": "KANTO",
