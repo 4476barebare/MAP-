@@ -66,7 +66,7 @@ async function main() {
         if (fetched.has(log.comparisonKey)) continue;
 
         const fileName = path.basename(log.filePath);
-        const imgUrl = log.filePath.replace('./', `${BASE_URL}/cloudGenerator/`);
+        const imgUrl = log.filePath.replace('./', `${BASE_URL}/cloudGenerator2/`);
         const localPath = path.join(outDir, fileName);
 
         try {
