@@ -4,12 +4,16 @@ on:
   workflow_dispatch:
   schedule:
     # XREA側でのマージ処理完了を待って、毎時45分に取りに行く
-    - cron: '45 3 * * *'
+    - cron: '45 */3 * * *'
 
 # 同時実行によるデプロイ渋滞を防ぐ[span_3](start_span)[span_3](end_span)
 concurrency:
   group: "kanto-clouds"
   cancel-in-progress: true
+
+# 🌟 Gitへの書き込み（コミット＆プッシュ）権限を付与[span_4](start_span)[span_4](end_span)
+permissions:
+  contents: write
 
 jobs:
   acquire:
@@ -17,11 +21,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 🌟 pull --rebase が履歴不足でエラーになるのを防ぐ[span_5](start_span)[span_5](end_span)
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '24' # 最近のバージョンに合わせています[span_4](start_span)[span_4](end_span)
+          node-version: '24'
 
       - name: Run acquire script
         run: node js/acquireCrowds.cjs
@@ -35,19 +41,19 @@ jobs:
           if ! git diff-index --quiet HEAD; then
             git commit -m "🤖 auto: 関東全域の雨雲画像をフェッチ"
             
-            # リモートで別の更新があっても衝突しないようリベース[span_5](start_span)[span_5](end_span)
+            # リモートで別の更新があっても衝突しないようリベース[span_6](start_span)[span_6](end_span)
             git pull --rebase origin main
             
             git push origin main
           else
             echo "✅ 変更がなかったためコミットをスキップしました。"
           fi
-- name: Trigger Cleanup PHP (Async)
-run: |
+
+      - name: Trigger Cleanup PHP (Async)
+        run: |
           # 2秒でタイムアウトを設定し、バックグラウンド(&)でXREAへリクエストを投げ捨ててすぐ終了する
           curl -s --max-time 2 "https://turiiko.shop/cloudGenerator/cleanup.php" > /dev/null 2>&1 &
           
           # 完全に切り離すために1秒だけ待って終了
           sleep 1
           echo "Cleanup triggered successfully."
-
