@@ -42,3 +42,12 @@ jobs:
           else
             echo "✅ 変更がなかったためコミットをスキップしました。"
           fi
+- name: Trigger Cleanup PHP (Async)
+run: |
+          # 2秒でタイムアウトを設定し、バックグラウンド(&)でXREAへリクエストを投げ捨ててすぐ終了する
+          curl -s --max-time 2 "https://turiiko.shop/cloudGenerator/cleanup.php" > /dev/null 2>&1 &
+          
+          # 完全に切り離すために1秒だけ待って終了
+          sleep 1
+          echo "Cleanup triggered successfully."
+
