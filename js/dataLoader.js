@@ -388,21 +388,13 @@ async function loadLocationJSON() {
     // スポット(spots)の抽出
     // ==========================================
     targetRows.forEach(row => {
+        // pref や area などの親データは除外
+        if (row.type === 'pref' || row.type === 'area') return;
 
         const icon = row.icon;
-
-
-        if (!icon) {
-            return;
-        }
-
-
-        if (
-            icon === 'spot' ||
-            icon.startsWith('fish') ||
-            icon === 'representative'
-        ) {
-
+        
+        // icon列に何かしらの文字が入っていれば全てスポットとして抽出する
+        if (icon === 'spot') {
             spots.push(row);
         }
     });
