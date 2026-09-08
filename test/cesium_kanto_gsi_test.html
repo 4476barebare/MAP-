@@ -1,43 +1,44 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cesium × GSI 関東3D地形テスト</title>
-<script src="https://cesium.com/downloads/cesiumjs/releases/1.139/Build/Cesium/Cesium.js"></script>
-<link href="https://cesium.com/downloads/cesiumjs/releases/1.139/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cesium 関東3D地形 + GSI空中写真 テスト</title>
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Cesium.js"></script>
+<link href="https://cesium.com/downloads/cesiumjs/releases/1.145/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 <style>
-html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; overflow:hidden; }
-#info {
-    position:absolute; z-index:10; top:10px; left:10px;
-    padding:10px 14px; background:rgba(20,20,20,.82); color:#fff;
-    font:14px/1.5 sans-serif; border-radius:6px;
+html,body,#cesiumContainer{width:100%;height:100%;margin:0;overflow:hidden}
+#status{
+ position:absolute;z-index:20;top:10px;left:10px;max-width:420px;
+ padding:12px 14px;background:rgba(20,20,20,.88);color:#fff;
+ border-radius:7px;font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ white-space:pre-wrap
 }
-#loading {
-    position:absolute; z-index:20; inset:0; display:flex;
-    align-items:center; justify-content:center;
-    background:#111; color:#fff; font:16px sans-serif;
-}
+.ok{color:#8cff8c}.err{color:#ff7777}.wait{color:#ffe08a}
 </style>
 </head>
 <body>
-<div id="loading">Cesium World Terrain を読み込んでいます...</div>
-<div id="info">
-    <b>関東 3D地形テスト</b><br>
-    Cesium World Terrain + GSI 空中写真<br>
-    出典：国土地理院
-</div>
 <div id="cesiumContainer"></div>
+<div id="status" class="wait">初期化中...</div>
 
 <script>
-(async function () {
+(async () => {
+    const status = document.getElementById("status");
+
+    function log(text, cls="") {
+        status.className = cls;
+        status.textContent = text;
+    }
+
+    // ============================================================
+    // ここにCesium ionで作成したAccess Tokenを入れてください
+    // ============================================================
+    Cesium.Ion.defaultAccessToken = "ここにCesium ionのTokenを入力";
+
     try {
-        // Cesium ionのデフォルト公開資産を利用
-        // 環境によってはCesium ionのaccess token設定が必要です。
-        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IlJiTGxWa2syNEFST2gzcEUiLCJqdGkiOiI2M2MzMjMxMS01NmVmLTQxMTItODM1Yi01OTU0MzZmMzc3YzEiLCJpZCI6NDgzMjA2LCJpc3MiOiJodHRwczovL2FwaS5jZXNpdW0uY29tIiwiYXVkIjoidW5kZWZpbmVkX2RlZmF1bHQiLCJpYXQiOjE3ODg4NDk0NzF9.G-UoQhfCu7ICxTiz8XBW_hTPuD7ofeRO6ZdlQPYeEak";
+        log("① CesiumJS 起動中...", "wait");
 
         const viewer = new Cesium.Viewer("cesiumContainer", {
-            terrain: await Cesium.createWorldTerrainAsync(),
             animation: false,
             timeline: false,
             baseLayerPicker: false,
@@ -47,43 +48,90 @@ html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; ove
             navigationHelpButton: false,
             fullscreenButton: true,
             selectionIndicator: false,
-            infoBox: false
+            infoBox: false,
+            // World Terrainは下で明示的に設定
+            terrainProvider: new Cesium.EllipsoidTerrainProvider()
         });
 
-        // GSI「全国最新写真（シームレス）」。
-        // GSI公式の地理院タイル XYZ URL をそのままImageryProviderとして利用。
-        const gsiProvider = new Cesium.UrlTemplateImageryProvider({
+        log("② Cesium World Terrain を読み込み中...", "wait");
+
+        // 現行Cesium 1.145対応
+        const terrain = await Cesium.Terrain.fromWorldTerrainAsync();
+        viewer.scene.setTerrain(terrain);
+
+        log("③ World Terrain 読み込み成功\n④ GSI空中写真を読み込み中...", "wait");
+
+        // 国土地理院「全国最新写真（シームレス）」
+        // GSI公式のXYZタイル
+        const gsi = new Cesium.UrlTemplateImageryProvider({
             url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
             minimumLevel: 14,
             maximumLevel: 18,
             credit: new Cesium.Credit("出典：国土地理院")
         });
 
-        viewer.imageryLayers.addImageryProvider(gsiProvider);
+        const layer = viewer.imageryLayers.addImageryProvider(gsi);
 
-        // 関東を斜め上から表示
-        viewer.camera.flyTo({
+        // 初期状態ではGSI写真が14未満のズームでも地形を覆えるよう、
+        // レイヤーの表示はそのまま。タイル取得はGSIの提供範囲に従う。
+        layer.alpha = 1.0;
+
+        // 関東中心。最初は少し広めに俯瞰
+        viewer.camera.setView({
             destination: Cesium.Cartesian3.fromDegrees(
-                139.55, 36.05, 220000
+                139.35, 36.05, 240000
             ),
             orientation: {
-                heading: Cesium.Math.toRadians(5),
-                pitch: Cesium.Math.toRadians(-52),
+                heading: Cesium.Math.toRadians(0),
+                pitch: Cesium.Math.toRadians(-55),
                 roll: 0
-            },
-            duration: 2.5
+            }
         });
 
-        // 地形の見た目を少し強調
         viewer.scene.globe.enableLighting = true;
         viewer.scene.globe.depthTestAgainstTerrain = true;
 
-        document.getElementById("loading").style.display = "none";
+        log(
+            "⑤ 表示準備完了\n\n" +
+            "Cesium World Terrain：OK\n" +
+            "GSI 全国最新写真：OK\n\n" +
+            "関東を拡大・回転・傾斜して確認してください。\n" +
+            "出典：国土地理院",
+            "ok"
+        );
+
+        // GSI画像タイルのエラーを画面にも表示
+        if (gsi.errorEvent) {
+            gsi.errorEvent.addEventListener(function(error) {
+                console.warn("GSI imagery error:", error);
+                log(
+                    "World Terrain：OK\n" +
+                    "GSI空中写真：タイル取得エラー\n\n" +
+                    "詳細はブラウザのコンソールを確認してください。",
+                    "err"
+                );
+            });
+        }
 
     } catch (error) {
-        console.error(error);
-        document.getElementById("loading").textContent =
-            "読み込みに失敗しました。ブラウザの開発者コンソールを確認してください。";
+        console.error("Cesium initialization error:", error);
+
+        let message = "読み込みに失敗しました。\n\n";
+
+        if (error && error.message) {
+            message += error.message;
+        } else {
+            message += String(error);
+        }
+
+        message +=
+            "\n\n確認ポイント：" +
+            "\n・Cesium ionのTokenが正しいか" +
+            "\n・Tokenのassets:readが有効か" +
+            "\n・World TerrainをTokenで利用できる設定か" +
+            "\n・ブラウザのコンソールに詳細エラーがないか";
+
+        log(message, "err");
     }
 })();
 </script>
