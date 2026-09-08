@@ -394,7 +394,9 @@ async function loadLocationJSON() {
         const icon = row.icon;
         
         // icon列に何かしらの文字が入っていれば全てスポットとして抽出する
-        if (icon === 'spot') {
+        if (icon === 'spot' ||
+            icon === 'fish1'
+        ) {
             spots.push(row);
         }
     });
