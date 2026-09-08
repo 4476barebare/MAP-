@@ -2284,8 +2284,15 @@ function loadRegionMap() {
         const linkContainer = document.getElementById('seo-link-container');
         if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
         if (linkContainer && window.regionSeoHtml) linkContainer.innerHTML = window.regionSeoHtml;
+        
+        // 👇【ここに追加】再表示の際にも全県ドットマーカーを確実に描画・復活させる
+        if (typeof showAllRegionSpots === 'function') {
+            showAllRegionSpots();
+        }
+
         return;
     }
+
 
   //  showdebug("▷ フェッチ先: " + window.regionUrl);
 
