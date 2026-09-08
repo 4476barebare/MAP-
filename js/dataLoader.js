@@ -3463,97 +3463,65 @@ function goBack() {
         return;
     }
 
-    // ③ Phase1 (エリアort) → Pref (県画面) へ戻る
-    if (window.currentSpotId == null && window.currentAreaId != null && z < 12.5) {
-        lockAndHideUI(); // ★ ガード開始
-        
-        window.map.stop();
-
-        if (window.osmLayer) {
-            const osmContainer = window.osmLayer.getContainer();
-            if (osmContainer) {
-                osmContainer.style.transition = 'opacity 2s ease';
-                window.osmLayer.setOpacity(0);
-                setTimeout(() => {
-                    if (window.osmLayer) window.osmLayer.setZIndex(1);
-                }, 2000);
-            }
-        }
-
-        if (window.phase1Group) window.phase1Group.clearLayers();
-        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-        
-        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
-            window.markerControl.clearLayers();
-        }
-
-        if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
-        } else {
-            window.gsiLayer.setUrl(window.gsiLayers.ort);
-            if (!window.map.hasLayer(window.gsiLayer)) {
-                window.gsiLayer.addTo(window.map);
-            }
-        }
-
-        requestAnimationFrame(() => {
-            const gsiContainer = window.gsiLayer.getContainer();
-            if (gsiContainer) {
-                gsiContainer.style.transition = 'opacity 2s ease';
-                window.gsiLayer.setZIndex(100);
-                window.gsiLayer.setOpacity(1);
-            }
-        });
-
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
-
-        drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-        let isPrefReturned = false;
-        const completePrefReturn = () => {
-            if (isPrefReturned) return;
-            isPrefReturned = true;
-
-            window.map.invalidateSize(true);
-            
-            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-            setIdealQuery('area', null);
-            setIdealQuery('spot', null);
-
-            window.currentAreaId = null;
-            window.currentSpotId = null;
-
-            initAreaUI();
-            showPrefSpots();
-            renderPrefWeather();
-            resetAreaGuide();
-
-          
-            
-            // ★ 修正：時間指定(setTimeout)ではなく、ブラウザの描画完了を待ってからロックを解除する
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    
-                    window.goBackGuard = false; 
-                    showBackBtnOnly();
-                });
-            });
-        };
-
-        const centerPref = window.map.getCenter();
-        const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && window.map.getZoom() === window.prefData.zoom;
-
-        if (isSamePref) {
-            setTimeout(completePrefReturn, 50);
-        } else {
-            window.map.once('moveend', completePrefReturn);
-            // 保険としての強制実行
-            setTimeout(completePrefReturn, 800); 
-        }
-        return;
+    // =====================================================
+    // ③ Area -> Pref（県画面に戻る）
+    // =====================================================
+    if (window.osmLayer) {
+        window.map.removeLayer(window.osmLayer);
+        window.osmLayer = null;
     }
 
+    if (window.phase1Group) window.phase1Group.clearLayers();
+    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+    if (!window.gsiLayer) {
+        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+    } else {
+        window.gsiLayer.setUrl(window.gsiLayers.ort);
+    }
+
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
+
+    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+
+    let isPrefReturned = false;
+    const completePrefReturn = () => {
+        if (isPrefReturned) return;
+        isPrefReturned = true;
+
+        window.map.invalidateSize(true);
+        
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', null);
+        setIdealQuery('spot', null);
+
+        window.currentAreaId = null;
+        window.currentSpotId = null;
+
+        initAreaUI();
+        showPrefSpots();
+        renderPrefWeather();
+        resetAreaGuide();
+
+        // 👇【ここに追加！】エリアスワイプをOFFにし、県スワイプをONにする
+        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+
+        releaseLockAndShowBtn();
+    };
+
+    const centerPref = window.map.getCenter();
+    const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && window.map.getZoom() === window.prefData.zoom;
+
+    if (isSamePref) {
+        completePrefReturn();
+    } else {
+        window.map.once('moveend', completePrefReturn);
+    }
 }
+
+
 
 
 function buildSpotRestoreObject() {
