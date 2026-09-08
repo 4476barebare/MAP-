@@ -2668,9 +2668,20 @@ if (window.currentAreaId && !window.currentSpotId) {
     // ------------------------------------------
     // selectArea
     // ------------------------------------------
-    showdebug(
-        `[selectArea直前] function=${typeof selectArea} / map=${!!window.map} / area=${area.name} / individualId=${area.individualId}`
-    );
+showdebug(
+    `[drawLocation直前] map=${!!window.map} / lat=${area.lat} / lng=${area.lng} / zoom=${area.zoom}`
+);
+
+drawLocation(
+    area.name,
+    area.lat,
+    area.lng,
+    area.zoom || window.prefData.zoom
+);
+
+showdebug(
+    `[drawLocation直後] map=${!!window.map}`
+);
 
     if (typeof selectArea !== 'function') {
         showdebug(
