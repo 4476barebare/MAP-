@@ -2571,7 +2571,7 @@ showdebug(
             openArea(parentArea.individualId);
         }
 
-
+showdebug(spot.zoom);
 
         // 
         // ------------------------------------------
@@ -2579,17 +2579,12 @@ showdebug(
         // ------------------------------------------
         const finalizeSpot = () => {
 
-            if (!window.map) return;
+
 
             window.map.invalidateSize(true);
- 
-            window.map
-                .getContainer()
-                .classList.add('is-spot-mode');
+
 zoomtoSpot(spot);
-showdebug(
-            `zoomtoSpot`
-        );
+showdebug(`zoomtoSpot`);
 
 
             window._selectSpotCompleted = true;
