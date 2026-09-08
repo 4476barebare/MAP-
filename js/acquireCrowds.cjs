@@ -44,22 +44,20 @@ async function main() {
 
     let newFetched = [];
 
-    // ★ 日本時間(JST)の現在時刻を厳密に取得して「時」で丸める
-    const nowJST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-    nowJST.setMinutes(0, 0, 0);
-    const currentJstTime = nowJST.getTime();
+    // ★ タイムゾーンに一切依存しない「絶対ミリ秒」を取得
+    const currentAbsoluteTime = Date.now();
 
     const sorted = logs
         .filter(l => l.filePath && !l.filePath.includes("ERROR"))
         .map(l => {
             const fileName = path.basename(l.filePath);
             const m = fileName.match(/_(\d{4}-\d{2}-\d{2})_(\d{2})/);
-            // ★ JSTとして明示的にパース（ISO形式 +09:00を付与）
+            // ★ JST(+09:00)を明示してパース -> どこで実行しても正確な絶対ミリ秒になる
             const date = m ? new Date(`${m[1]}T${m[2]}:00:00+09:00`) : new Date(0);
             return { ...l, date };
         })
-        // ★ ここが超重要: 現在時刻(JST)より過去の画像は、ログにあっても弾く！
-        .filter(l => l.date.getTime() >= currentJstTime)
+        // ★ 絶対ミリ秒同士の比較で、確実に現在より未来(または現在)の画像だけ残す
+        .filter(l => l.date.getTime() >= currentAbsoluteTime)
         .sort((a, b) => b.date - a.date);
 
     for (const log of sorted) {
@@ -95,10 +93,8 @@ async function main() {
 // クリーンアップ（過去ブロック削除）
 // ==========================================
 function cleanup() {
-    // ★ ここでも日本時間(JST)で計算する
-    const nowJST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-    nowJST.setMinutes(0, 0, 0);
-    const currentJstTime = nowJST.getTime();
+    // ★ ここも絶対ミリ秒
+    const currentAbsoluteTime = Date.now();
 
     let fetchedLines = [];
     if (fs.existsSync(FETCHED_LOG)) {
@@ -121,8 +117,8 @@ function cleanup() {
             // JSTとしてパース
             const fileDate = new Date(`${m[1]}T${m[2]}:00:00+09:00`);
 
-            // ★ 現在時刻より過去の画像なら無慈悲に削除
-            if (fileDate.getTime() < currentJstTime) {
+            // ★ 完全に過去になった画像だけを正確に削除
+            if (fileDate.getTime() < currentAbsoluteTime) {
                 const localPath = path.join(outDir, fileName);
                 if (fs.existsSync(localPath)) {
                     try {
@@ -140,6 +136,9 @@ function cleanup() {
 
     if (newFetched.length > 0) {
         fs.writeFileSync(FETCHED_LOG, newFetched.join("\n") + "\n");
+    } else {
+        // 空になった場合はファイルをリセット
+        fs.writeFileSync(FETCHED_LOG, "");
     }
 }
 
