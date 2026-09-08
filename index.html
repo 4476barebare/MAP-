@@ -1872,11 +1872,10 @@ function loadWhetherCSV(url) {
     });
 }
 
-// ================================
-// ■ CSV → spotへ反映（二重付与防止）
-// ================================
 function applyWhetherToSpots(csvData) {
-    if (!csvData || !window.spotData) return;
+
+    if (!Array.isArray(csvData)) return;
+    if (!Array.isArray(window.spotData)) return;
 
     const map = {};
 
@@ -1891,7 +1890,6 @@ function applyWhetherToSpots(csvData) {
         }
     }
 }
-
 // ================================
 // ■ 安全CSV分割（3カラム固定）
 // ================================
