@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const BASE_URL = "https://turiiko.shop";
-const LOG_URL = "https://turiiko.shop/cloudGenerator/run_log.txt";
+const LOG_URL = "https://turiiko.shop/cloudGenerator2/run_log.txt";
 const FETCHED_LOG = path.join(__dirname, "fetched_log.txt");
 
 // ★ グローバルに出す（cleanupでも使う）
