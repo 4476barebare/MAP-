@@ -1,1 +1,91 @@
- test
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cesium × GSI 関東3D地形テスト</title>
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.139/Build/Cesium/Cesium.js"></script>
+<link href="https://cesium.com/downloads/cesiumjs/releases/1.139/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<style>
+html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; overflow:hidden; }
+#info {
+    position:absolute; z-index:10; top:10px; left:10px;
+    padding:10px 14px; background:rgba(20,20,20,.82); color:#fff;
+    font:14px/1.5 sans-serif; border-radius:6px;
+}
+#loading {
+    position:absolute; z-index:20; inset:0; display:flex;
+    align-items:center; justify-content:center;
+    background:#111; color:#fff; font:16px sans-serif;
+}
+</style>
+</head>
+<body>
+<div id="loading">Cesium World Terrain を読み込んでいます...</div>
+<div id="info">
+    <b>関東 3D地形テスト</b><br>
+    Cesium World Terrain + GSI 空中写真<br>
+    出典：国土地理院
+</div>
+<div id="cesiumContainer"></div>
+
+<script>
+(async function () {
+    try {
+        // Cesium ionのデフォルト公開資産を利用
+        // 環境によってはCesium ionのaccess token設定が必要です。
+        Cesium.Ion.defaultAccessToken = "";
+
+        const viewer = new Cesium.Viewer("cesiumContainer", {
+            terrain: await Cesium.createWorldTerrainAsync(),
+            animation: false,
+            timeline: false,
+            baseLayerPicker: false,
+            geocoder: false,
+            homeButton: true,
+            sceneModePicker: true,
+            navigationHelpButton: false,
+            fullscreenButton: true,
+            selectionIndicator: false,
+            infoBox: false
+        });
+
+        // GSI「全国最新写真（シームレス）」。
+        // GSI公式の地理院タイル XYZ URL をそのままImageryProviderとして利用。
+        const gsiProvider = new Cesium.UrlTemplateImageryProvider({
+            url: "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
+            minimumLevel: 14,
+            maximumLevel: 18,
+            credit: new Cesium.Credit("出典：国土地理院")
+        });
+
+        viewer.imageryLayers.addImageryProvider(gsiProvider);
+
+        // 関東を斜め上から表示
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(
+                139.55, 36.05, 220000
+            ),
+            orientation: {
+                heading: Cesium.Math.toRadians(5),
+                pitch: Cesium.Math.toRadians(-52),
+                roll: 0
+            },
+            duration: 2.5
+        });
+
+        // 地形の見た目を少し強調
+        viewer.scene.globe.enableLighting = true;
+        viewer.scene.globe.depthTestAgainstTerrain = true;
+
+        document.getElementById("loading").style.display = "none";
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById("loading").textContent =
+            "読み込みに失敗しました。ブラウザの開発者コンソールを確認してください。";
+    }
+})();
+</script>
+</body>
+</html>
