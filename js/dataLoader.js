@@ -209,14 +209,13 @@ async function loadLocationJSON() {
         window[`${pref}_spotData`]
     ) {
 
-        window.prefData =
-            window[`${pref}_prefData`];
+        window.prefData = window[`${pref}_prefData`];
+        window.areaData = window[`${pref}_areaData`];
+        window.spotData = window[`${pref}_spotData`];
+        
+        // 👇【ここに追加】キャッシュからBoundsも復元する
+        window.prefBounds = window[`${pref}_prefBounds`] || null;
 
-        window.areaData =
-            window[`${pref}_areaData`];
-
-        window.spotData =
-            window[`${pref}_spotData`];
 
 
         // ------------------------------------------
@@ -425,18 +424,41 @@ async function loadLocationJSON() {
     window.areaData = areas;
     window.spotData = spots;
 
+    // 👇【ここに追加】県全体の Bounds を計算して window.prefBounds に格納する
+    window.prefBounds = null;
+    if (spots.length > 0 && typeof L !== 'undefined') {
+        let minLat = Infinity, maxLat = -Infinity;
+        let minLng = Infinity, maxLng = -Infinity;
+        spots.forEach(spot => {
+            const lat = Number(spot.lat);
+            const lng = Number(spot.lng);
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                minLat = Math.min(minLat, lat);
+                maxLat = Math.max(maxLat, lat);
+                minLng = Math.min(minLng, lng);
+                maxLng = Math.max(maxLng, lng);
+            }
+        });
+        // 画面端のスポットも確実に入るように10%（0.1）の余白をつける
+        const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.05);
+        const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.05);
+        window.prefBounds = L.latLngBounds(
+            [minLat - latBuffer, minLng - lngBuffer],
+            [maxLat + latBuffer, maxLng + lngBuffer]
+        );
+    }
 
     // ==========================================
     // キャッシュ用変数へ保存
     // ==========================================
-    window[`${pref}_prefData`] =
-        main;
+    window[`${pref}_prefData`] = main;
+    window[`${pref}_areaData`] = areas;
+    window[`${pref}_spotData`] = spots;
+    
+    // 👇【ここに追加】計算したBoundsを次回のためにキャッシュしておく
+    window[`${pref}_prefBounds`] = window.prefBounds; 
 
-    window[`${pref}_areaData`] =
-        areas;
 
-    window[`${pref}_spotData`] =
-        spots;
 
 
     // ==========================================
