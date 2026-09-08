@@ -899,90 +899,32 @@ function prefetchAround(area) {
 }
 
 function selectArea(area) {
-
-    showdebug(`[selectArea開始]`);
-
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
         : area;
 
-    showdebug(
-        `[selectArea areaObj] ${areaObj ? areaObj.name : 'null'}`
-    );
-
-    if (!areaObj) {
-        showdebug(`[selectArea終了] areaObjなし`);
-        return;
-    }
-
-    showdebug(
-        `[selectArea] map存在=${!!window.map}`
-    );
-
+    if (!areaObj) return;
+    
     window.map.setMaxBounds(null);
-
-    showdebug(
-        `[selectArea] setMaxBounds完了`
-    );
-
     window.map.options.maxBoundsViscosity = 0;
-
-    showdebug(
-        `[selectArea] maxBoundsViscosity完了`
-    );
-
+    
     if (window.spotLayer) {
-        showdebug(`[selectArea] spotLayer削除開始`);
-
         window.map.removeLayer(window.spotLayer);
         window.spotLayer = null;
-
-        showdebug(`[selectArea] spotLayer削除完了`);
     }
 
     if (window.markerControl?.shop01Layer) {
-        showdebug(`[selectArea] shop01Layer削除開始`);
-
         window.map.removeLayer(markerControl.shop01Layer);
         markerControl.shop01Layer = null;
-
-        showdebug(`[selectArea] shop01Layer削除完了`);
     }
 
-    showdebug(`[selectArea] prefetchAround開始`);
-
     prefetchAround(areaObj);
-
-    showdebug(`[selectArea] prefetchAround完了`);
-
-
-    const targetZoom =
-        areaObj.zoom || window.prefData.zoom;
-
-    showdebug(
-        `[selectArea] targetZoom=${targetZoom}`
-    );
-
-
+    
+    const targetZoom = areaObj.zoom || window.prefData.zoom;
     const center = window.map.getCenter();
-
-    showdebug(
-        `[selectArea] center=${center.lat},${center.lng}`
-    );
-
-
-    const isSameLoc =
-        center &&
-        Math.abs(center.lat - areaObj.lat) < 0.0001 &&
-        Math.abs(center.lng - areaObj.lng) < 0.0001 &&
-        window.map.getZoom() === targetZoom;
-
-    showdebug(
-        `[selectArea] isSameLoc=${isSameLoc} / currentZoom=${window.map.getZoom()}`
-    );
-
-
-    showdebug(`[selectArea] drawLocation開始`);
+    const isSameLoc = center && Math.abs(center.lat - areaObj.lat) < 0.0001 && 
+                      Math.abs(center.lng - areaObj.lng) < 0.0001 && 
+                      window.map.getZoom() === targetZoom;
 
     drawLocation(
         areaObj.name,
@@ -990,114 +932,50 @@ function selectArea(area) {
         areaObj.lng,
         targetZoom
     );
-
-    showdebug(`[selectArea] drawLocation完了`);
-
-
+    
     document.getElementById('map-menu').style.display = 'none';
 
-    showdebug(`[selectArea] map-menu非表示完了`);
-
-
     const finalizeArea = () => {
-
-        showdebug(`[selectArea] finalizeArea開始`);
-
         window.map.invalidateSize(true);
-
-        showdebug(`[selectArea] invalidateSize完了`);
-
         openArea(areaObj.individualId);
-
-        showdebug(`[selectArea] openArea完了`);
-
         showSpotsForArea(window.currentAreaId);
-
-        showdebug(`[selectArea] showSpotsForArea完了`);
-
-        if (typeof disablePrefSwipe === 'function') {
-            disablePrefSwipe();
-        }
-
-        showdebug(`[selectArea] disablePrefSwipe完了`);
-
+        // 👇【ここに追加】県スワイプをOFFにしてから、エリアスワイプをONにする
+        if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
         enableAreaSwipe();
-
-        showdebug(`[selectArea] enableAreaSwipe完了`);
-
         phase1menu(window.currentAreaId);
-
-        showdebug(`[selectArea] phase1menu完了`);
-
         clearSpotUI();
 
-        showdebug(`[selectArea] clearSpotUI完了`);
+        
+
+        
 
 
         requestAnimationFrame(() => {
-
             requestAnimationFrame(() => {
-
-                showdebug(`[selectArea] 2回目RAF開始`);
-
                 if (window.markerControl) {
-                    markerControl.showShop01(
-                        window.currentAreaId
-                    );
+                    markerControl.showShop01(window.currentAreaId);
                 }
 
-                showdebug(`[selectArea] showShop01完了`);
-
-
-                const btn =
-                    document.getElementById('map-back-btn');
-
+                const btn = document.getElementById('map-back-btn');
                 if (btn) {
-
                     btn.style.opacity = '0';
                     btn.style.display = 'block';
-
                     requestAnimationFrame(() => {
-
-                        btn.style.transition =
-                            'opacity 0.4s ease';
-
+                        btn.style.transition = 'opacity 0.4s ease';
                         btn.style.opacity = '1';
                     });
                 }
+                   window.goBackGuard = false;
 
-                window.goBackGuard = false;
-
-                saveMapState();
-
-                showdebug(`[selectArea] finalizeArea完了`);
+                   saveMapState();
             });
         });
     };
 
-
     if (isSameLoc) {
-
-        showdebug(
-            `[selectArea] isSameLoc=true → finalizeArea直接実行`
-        );
-
         finalizeArea();
-
     } else {
-
-        showdebug(
-            `[selectArea] isSameLoc=false → moveend待機`
-        );
-
-        window.map.once(
-            'moveend',
-            finalizeArea
-        );
-
-        showdebug(
-            `[selectArea] moveend登録完了`
-        );
+        window.map.once('moveend', finalizeArea);
     }
 }
 
