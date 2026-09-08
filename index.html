@@ -1869,11 +1869,7 @@ function loadWhetherCSV(url) {
 // ■ CSV → spotへ反映（二重付与防止）
 // ================================
 function applyWhetherToSpots(csvData) {
-    // ★ 爆速化：スポットの先頭データにすでに天気が付与されていたら、
-    // 前回のキャッシュデータそのものなので、ループを一切回さずに即リターンする
-    if (window.spotData && window.spotData.length > 0 && window.spotData[0].whether) {
-        return;
-    }
+    if (!csvData || !window.spotData) return;
 
     const map = {};
 
