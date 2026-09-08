@@ -2562,12 +2562,21 @@ async function routeUpdate() {
             openArea(parentArea.individualId);
         }
 
+drawLocation(
 
-        // ------------------------------------------
-        // ④ スポット位置へ移動
-        // ------------------------------------------
+            window.spot.name,
 
+            window.spot.lat,
 
+            window.spot.lng,
+
+            13
+        );
+showdebug(
+            `drawLocation`
+        );
+
+        // 
         // ------------------------------------------
         // ⑤ スポット画面
         // ------------------------------------------
@@ -2581,7 +2590,9 @@ async function routeUpdate() {
                 .getContainer()
                 .classList.add('is-spot-mode');
 zoomtoSpot(spot);
-
+showdebug(
+            `zoomtoSpot`
+        );
 
 
             window._selectSpotCompleted = true;
