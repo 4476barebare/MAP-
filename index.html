@@ -2641,6 +2641,7 @@ if (window.currentAreaId && !window.currentSpotId) {
     // その後は通常のselectAreaに任せる
     if (typeof selectArea === 'function') {
         selectArea(area);
+          renderCrowdImage();
     }
 
     return;
