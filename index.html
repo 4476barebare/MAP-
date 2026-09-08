@@ -2541,17 +2541,11 @@ async function routeUpdate() {
 
         // ------------------------------------------
         // ① 県地図を生成
-        // ------------------------------------------
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom
-        );
+
+          selectSpot(spot);
 
 
-
-        // ------------------------------------------
+         // ------------------------------------------
         // ② 親エリアのPhase1を構築
         // ------------------------------------------
         if (window.map) {
@@ -2559,24 +2553,6 @@ async function routeUpdate() {
             window.map.setMaxBounds(null);
         }
 
-        if (typeof prefetchAround === 'function') {
-            prefetchAround(parentArea);
-        }
-
-        if (typeof showSpotsForArea === 'function') {
-            showSpotsForArea(safeAreaId);
-        }
-
-        if (typeof phase1menu === 'function') {
-            phase1menu(safeAreaId);
-        }
-
-        if (
-            window.markerControl &&
-            typeof window.markerControl.showShop01 === 'function'
-        ) {
-            window.markerControl.showShop01(safeAreaId);
-        }
 
 
         // ------------------------------------------
