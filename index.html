@@ -1149,10 +1149,11 @@ function renderPrefWeather() {
         const el = elements[i];
         const areaId = el.id;
 
-        const rep = window.spotData.find(s =>
-            s.areaId === areaId &&
-            s.type === 'representative'
-        );
+        const rep = window.spotData.find(s => {
+            if (s.areaId !== areaId) return false;
+            const typeParts = (s.type || '').split('$');
+            return typeParts.includes('representative');
+        });
 
         if (!rep || !rep.whether) {
             el.textContent = 'no data';
