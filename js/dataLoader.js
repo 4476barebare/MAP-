@@ -99,10 +99,85 @@ async function loadLocationJSON() {
     window.areaData = areas;
     window.spotData = spots;
 
+    // ==========================================
+    // ★ 魚データを読み込み、各スポットへURL形式で付与
+    // ==========================================
+
+    const fishFetch = window.fishData
+        ? Promise.resolve(window.fishData)
+        : (
+            window.fishUrl
+                ? fetch(window.fishUrl)
+                    .then(res => res.ok ? res.json() : null)
+                    .catch(() => null)
+                : Promise.resolve(null)
+        );
+
+    const fishData = await fishFetch;
+
+    if (fishData) {
+        window.fishData = fishData;
+
+        const fishDict = {};
+
+        for (const regKey in fishData) {
+            const areaSpots = fishData[regKey];
+
+            if (!areaSpots || typeof areaSpots !== 'object') {
+                continue;
+            }
+
+            for (const spotName in areaSpots) {
+                fishDict[spotName] = areaSpots[spotName];
+            }
+        }
+
+        spots.forEach(spot => {
+
+            const spotFishData = fishDict[spot.name];
+
+            if (!spotFishData) {
+                spot.URL = "";
+                return;
+            }
+
+            const fishList = [];
+
+            for (const fishName in spotFishData) {
+
+                const info = spotFishData[fishName];
+
+                if (
+                    info &&
+                    typeof info.coords === 'string' &&
+                    info.coords !== ''
+                ) {
+                    const points = info.coords.split('|');
+
+                    points.forEach(pt => {
+
+                        const [lat, lng] = pt.split(',');
+
+                        if (lat && lng) {
+                            fishList.push(
+                                `${fishName}|${lat}|${lng}`
+                            );
+                        }
+
+                    });
+                }
+            }
+
+            spot.URL = fishList.join(',');
+        });
+    }
+
     // キャッシュ用変数へ代入
     window[`${pref}_prefData`] = main;
     window[`${pref}_areaData`] = areas;
     window[`${pref}_spotData`] = spots;
+
+
 
     // エリアグラフの構築とキャッシュ
     if (typeof buildAreaGraphFromGrid === 'function') {
