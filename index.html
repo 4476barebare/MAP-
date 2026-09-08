@@ -2598,50 +2598,19 @@ if (window.currentSpotId) {
     return;
 }
 
-
 // ==================================================
 // エリア画面
 // ※ currentAreaIdあり / currentSpotIdなし
 // ==================================================
-showdebug(
-    `[エリア分岐判定] currentAreaId=${window.currentAreaId} / currentSpotId=${window.currentSpotId}`
-);
-
 if (window.currentAreaId && !window.currentSpotId) {
 
-    showdebug(
-        `[エリア分岐IN] currentAreaId=${window.currentAreaId}`
-    );
-
     const safeAreaId = window.currentAreaId;
-
-    // ------------------------------------------
-    // エリア検索
-    // ------------------------------------------
-    showdebug(
-        `[エリア検索開始] areaData存在=${!!window.areaData} / 件数=${window.areaData?.length || 0}`
-    );
 
     const area = (window.areaData || []).find(
         a => safeAreaId.endsWith(String(a.individualId))
     );
 
-    showdebug(
-        `[エリア検索終了] area=${area ? area.name : '見つからない'}`
-    );
-
-    if (!area) {
-        showdebug(
-            `[エラー] currentAreaIdに対応するareaが見つかりません: ${safeAreaId}`
-        );
-        return;
-    }
-
-
-    // ------------------------------------------
-    // URL状態
-    // ------------------------------------------
-    showdebug(`[エリアURL設定開始]`);
+    if (!area) return;
 
     if (window.prefData) {
         setIdealQuery(
@@ -2660,71 +2629,22 @@ if (window.currentAreaId && !window.currentSpotId) {
         null
     );
 
-    showdebug(
-        `[エリアURL設定完了] ${area.name}`
+    // mapがまだ生成されていないため、
+    // まずエリア位置でdrawLocationしてmapを生成する
+    drawLocation(
+        area.name,
+        area.lat,
+        area.lng,
+        area.zoom || window.prefData.zoom
     );
 
-
-    // ------------------------------------------
-    // selectArea
-    // ------------------------------------------
-showdebug(
-    `[drawLocation直前] map=${!!window.map} / lat=${area.lat} / lng=${area.lng} / zoom=${area.zoom}`
-);
-
-drawLocation(
-    area.name,
-    area.lat,
-    area.lng,
-    area.zoom || window.prefData.zoom
-);
-
-showdebug(
-    `[drawLocation直後] map=${!!window.map}`
-);
-
-    if (typeof selectArea !== 'function') {
-        showdebug(
-            `[エラー] selectAreaが関数ではありません`
-        );
-        return;
-    }
-
-
-    showdebug(
-        `[selectArea呼び出し] 開始`
-    );
-
-    try {
-
+    // その後は通常のselectAreaに任せる
+    if (typeof selectArea === 'function') {
         selectArea(area);
-
-        showdebug(
-            `[selectArea呼び出し] 完了`
-        );
-
-    } catch (err) {
-
-        showdebug(
-            `[selectAreaエラー] ${err?.message || err}`
-        );
-
-        console.error(
-            'routeUpdate → selectArea エラー:',
-            err
-        );
-
-        return;
     }
-
-
-    showdebug(
-        `[エリア画面完了] ${area.name}`
-    );
 
     return;
 }
-
     // ==================================================
     // 県画面
     // ==================================================
