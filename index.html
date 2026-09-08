@@ -2539,11 +2539,20 @@ async function routeUpdate() {
         setIdealQuery('spot', spot.name);
 
 
-        // ------------------------------------------
-        // ① 県地図を生成
 
-          selectSpot(spot);
+drawLocation(
 
+            window.spot.name,
+
+            window.spot.lat,
+
+            window.spot.lng,
+
+            13
+        );
+showdebug(
+            `drawLocation`
+        );
 
          // ------------------------------------------
         // ② 親エリアのPhase1を構築
@@ -2562,19 +2571,7 @@ async function routeUpdate() {
             openArea(parentArea.individualId);
         }
 
-drawLocation(
 
-            window.spot.name,
-
-            window.spot.lat,
-
-            window.spot.lng,
-
-            13
-        );
-showdebug(
-            `drawLocation`
-        );
 
         // 
         // ------------------------------------------
