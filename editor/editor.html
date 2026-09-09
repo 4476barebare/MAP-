@@ -2,9 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <!-- ★スマホ特化：勝手なズームを禁止し、アプリのように画面を固定する -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>スマホ用・コードエディタ</title>
+    <title>スマホ用・コードエディタ（カスタム版）</title>
     <style>
         /* 画像のiOSエディタ風の全体レイアウトと配色 */
         html, body {
@@ -16,44 +15,43 @@
             flex-direction: column;
             background-color: #121212;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; /* スマホ特有の余分なスクロールを防止 */
+            overflow: hidden;
         }
         
-        /* ツールバー（スマホで押しやすいよう高さを少し確保） */
+        /* ツールバー */
         #toolbar {
-            padding: 10px 12px;
+            padding: 8px 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #000000;
             border-bottom: 1px solid #333;
-            min-height: 44px; /* iOSの標準的なタップ領域 */
+            min-height: 44px;
+            user-select: none; /* ツールバーの誤選択を防止 */
         }
 
         .button-group {
             display: flex;
-            gap: 12px;
+            gap: 8px;
         }
 
-        /* iOS風の青いテキストボタン */
         button {
-            padding: 8px 12px;
-            font-size: 12px; /* スマホで押しやすいサイズ */
+            padding: 6px 10px;
+            font-size: 14px;
             cursor: pointer;
             background-color: transparent;
             color: #0A84FF;
             border: none;
             border-radius: 4px;
-            font-weight: 500;
+            font-weight: bold;
         }
         button:active { background-color: rgba(10, 132, 255, 0.2); }
         
-        /* ファイル名の表示部分 */
         #file-name-display {
             color: #ffffff;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
-            max-width: 120px;
+            max-width: 100px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -73,9 +71,9 @@
         <div class="button-group">
             <button onclick="document.getElementById('file-input').click()">📂 開く</button>
             <button onclick="downloadFile()">💾 保存</button>
+            <button onclick="copyText()">📋 コピー</button>
         </div>
         
-        <!-- ★スマホ標準のファイル選択を呼び出すための隠し要素 -->
         <input type="file" id="file-input" style="display: none;" onchange="loadFile(event)">
 
         <div>
@@ -110,7 +108,7 @@
 
         require(['vs/editor/editor.main'], function() {
             
-            // --- カスタムテーマ（画像配色） ---
+            // --- カスタムテーマ（前回と同じ配色） ---
             monaco.editor.defineTheme('my-custom-dark', {
                 base: 'vs-dark',
                 inherit: true,
@@ -133,28 +131,33 @@
                 }
             });
 
-            // ★スマホ向けに調整したエディタの生成
+            // エディタの生成
             editor = monaco.editor.create(document.getElementById('editor-container'), {
                 value: '// ここにコードをペーストするか、ファイルを開いてください',
                 language: 'javascript',
                 theme: 'my-custom-dark',
-                fontSize: 14, // スマホに合わせて少し小さく
+                
+                // ★ ご要望のカスタマイズ設定
+                fontSize: 8,                    // 文字サイズを8pxに変更
+                lineHeight: 14,                 // 8pxに合わせて行間を自動調整
+                folding: true,                  // ▼での開閉（フォールディング）をオン
+                showFoldingControls: 'always',  // 常に▼を表示する
+                
                 fontFamily: "Menlo, Monaco, 'Courier New', monospace",
-                lineHeight: 22,
                 minimap: { enabled: false },
                 renderWhitespace: 'all',
-                wordWrap: 'on', // ★画面幅で自動折り返し（スマホで横スクロールを防ぐ）
-                lineNumbersMinChars: 3, // 行番号の余白を詰める
-                folding: false, // 折りたたみ機能をオフにしてスッキリさせる
-                scrollBeyondLastLine: false
+                wordWrap: 'on',
+                lineNumbersMinChars: 3,
+                scrollBeyondLastLine: false,
+                contextmenu: true // 長押しでのコピペメニューを許可
             });
         });
 
         // ---------------------------------------------
-        // スマホ向けファイル操作
+        // ファイル操作・コピー機能
         // ---------------------------------------------
 
-        // 1. ファイルを読み込む（FileReader API）
+        // 1. ファイルを読み込む
         function loadFile(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -164,7 +167,6 @@
                 // エディタにテキストをセット
                 editor.setValue(e.target.result);
                 
-                // ファイル名を更新
                 currentFileName = file.name;
                 document.getElementById('file-name-display').textContent = currentFileName;
 
@@ -172,24 +174,45 @@
                 const ext = currentFileName.split('.').pop().toLowerCase();
                 const lang = extensionToLanguage[ext] || 'plaintext';
                 monaco.editor.setModelLanguage(editor.getModel(), lang);
+
+                // ★ ファイルを開いた初期状態で、すべて閉じる（折りたたむ）処理
+                // 言語の解析が完了するのを少し（0.5秒）待ってから閉じるコマンドを実行します
+                setTimeout(() => {
+                    editor.getAction('editor.foldAll').run();
+                }, 500);
             };
             
-            // ファイルをテキストとして読み込む
             reader.readAsText(file);
-            
-            // 同じファイルを再度選べるようにリセット
             event.target.value = '';
         }
 
-        // 2. ファイルをダウンロード形式で保存する
+        // 2. コピー機能
+        async function copyText() {
+            // エディタ上で現在選択されている範囲を取得
+            const selection = editor.getSelection();
+            const selectedText = editor.getModel().getValueInRange(selection);
+            
+            // 選択範囲があればその部分を、何も選択されていなければ全体のコードを対象にする
+            const textToCopy = selectedText ? selectedText : editor.getValue();
+            
+            if (!textToCopy) return;
+
+            try {
+                // スマホのクリップボードにコピー
+                await navigator.clipboard.writeText(textToCopy);
+                alert(selectedText ? '選択範囲をコピーしました！' : 'ファイル全体をコピーしました！');
+            } catch (err) {
+                // 万が一クリップボードAPIがブロックされた場合の代替手段
+                alert('コピー機能がブラウザに許可されていません。画面を長押しして手動でコピーしてください。');
+            }
+        }
+
+        // 3. ファイルを保存する
         function downloadFile() {
             const code = editor.getValue();
-            
-            // 文字列をファイル（Blob）に変換
             const blob = new Blob([code], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             
-            // ダウンロード用のリンクを裏側で作ってクリックさせる
             const a = document.createElement('a');
             a.href = url;
             a.download = currentFileName;
@@ -198,7 +221,6 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            // 保存成功エフェクト
             const nameDisplay = document.getElementById('file-name-display');
             nameDisplay.style.color = '#0A84FF';
             setTimeout(() => { nameDisplay.style.color = '#ffffff'; }, 1000);
