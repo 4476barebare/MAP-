@@ -3302,7 +3302,7 @@ function goBack() {
         window.areaBounds = null;
 
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
-        if (typeof removeCrowdImage === 'function') removeCrowdImage();
+        //if (typeof removeCrowdImage === 'function') removeCrowdImage();
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
         if (window.phase1Group) window.phase1Group.clearLayers();
         if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
