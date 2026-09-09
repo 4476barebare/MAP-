@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カスタム・コードエディタ</title>
+    <style>
+        /* 画像のiOSエディタ風の全体レイアウトと配色 */
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            background-color: #121212;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        /* ツールバー（上部の黒い帯部分） */
+        #toolbar {
+            padding: 8px 16px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background-color: #000000;
+            border-bottom: 1px solid #333;
+        }
+
+        /* iOS風の青いテキストボタン */
+        button {
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: transparent;
+            color: #0A84FF; /* iOS風ブルー */
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        button:hover { background-color: rgba(10, 132, 255, 0.1); }
+        
+        /* ファイル名とパスの表示部分 */
+        #file-info {
+            display: flex;
+            flex-direction: column;
+            margin-left: auto; /* 右寄せ */
+            text-align: right;
+        }
+        #file-name-display {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        #file-path-display {
+            color: #8e8e93;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        /* エディタのコンテナ */
+        #editor-container {
+            flex-grow: 1;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ツールバー -->
+    <div id="toolbar">
+        <button onclick="openFile()">📁 開く</button>
+        <button onclick="saveFile()">💾 保存 (Ctrl+S)</button>
+        
+        <div id="file-info">
+            <span id="file-name-display">新規ファイル</span>
+            <span id="file-path-display">未保存</span>
+        </div>
+    </div>
+
+    <!-- エディタ -->
+    <div id="editor-container"></div>
+
+    <!-- Monaco Editorの読み込み -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+
+        window.MonacoEnvironment = {
+            getWorkerUrl: function(workerId, label) {
+                return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+                    self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/' };
+                    importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/base/worker/workerMain.js');
+                `)}`;
+            }
+        };
+
+        let editor;
+        let currentFileHandle = null;
+
+        // 拡張子から言語を判別するためのマップ
+        const extensionToLanguage = {
+            'js': 'javascript',
+            'php': 'php',
+            'html': 'html',
+            'css': 'css',
+            'json': 'json',
+            'md': 'markdown',
+            'txt': 'plaintext',
+            'py': 'python'
+        };
+
+        // エディタの起動
+        require(['vs/editor/editor.main'], function() {
+            
+            // --- カスタムテーマの設定（画像の配色を再現） ---
+            monaco.editor.defineTheme('my-custom-dark', {
+                base: 'vs-dark', // ダークテーマをベース
+                inherit: true,
+                rules: [
+                    { token: 'comment', foreground: '7a7a7a', fontStyle: 'italic' },     // コメント（グレー・斜体）
+                    { token: 'string', foreground: 'c88251' },                           // 文字列（オレンジ/茶色系）
+                    { token: 'keyword', foreground: '569cd6' },                          // キーワード（if, function 等・水色）
+                    { token: 'variable.php', foreground: 'a381d6' },                     // PHPの変数（紫系）
+                    { token: 'variable.predefined', foreground: 'a381d6' },              // 組み込み変数 (window等)
+                    { token: 'constant', foreground: 'd16969' },                         // 定数（null, true 等・ピンク系）
+                    { token: 'number', foreground: 'b5cea8' },                           // 数値（薄緑）
+                    { token: 'type', foreground: '4ec9b0' }                              // 型など
+                ],
+                colors: {
+                    'editor.background': '#1a1a1c',               // エディタ背景色（画像の黒に近いグレー）
+                    'editorGutter.background': '#1a1a1c',         // 行番号エリアの背景
+                    'editorLineNumber.foreground': '#5a5a5f',     // 行番号の色
+                    'editorIndentGuide.background': '#333333',    // インデントの線
+                    'editorWhitespace.foreground': '#404040'      // 空白文字（ドット）の色
+                }
+            });
+
+            // エディタの生成
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: '// ファイルを開くか、ここにコードを書いてください',
+                language: 'javascript', // 初期設定
+                theme: 'my-custom-dark',// 作成したカスタムテーマを適用
+                fontSize: 15,
+                fontFamily: "Menlo, Monaco, 'Courier New', monospace",
+                lineHeight: 24,         // 行間を少し広めにとる（画像風）
+                minimap: { enabled: false },
+                renderWhitespace: 'all',// 空白をドットで表示する（画像風）
+                renderIndentGuides: true,
+                roundedSelection: false,
+                scrollBeyondLastLine: false
+            });
+
+            // Ctrl + S (Macは Cmd + S) のショートカット
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, function() {
+                saveFile();
+            });
+        });
+
+        // ---------------------------------------------
+        // ファイル操作と自動言語切り替え
+        // ---------------------------------------------
+
+        // 1. ファイルを開く
+        async function openFile() {
+            try {
+                [currentFileHandle] = await window.showOpenFilePicker();
+                const file = await currentFileHandle.getFile();
+                const contents = await file.text();
+                
+                // エディタに内容をセット
+                editor.setValue(contents);
+                
+                // 画面にファイル名を表示
+                document.getElementById('file-name-display').textContent = file.name;
+                document.getElementById('file-path-display').textContent = 'ローカルファイル (保存可能)';
+
+                // ★ 拡張子から言語を自動判別して切り替える
+                const ext = file.name.split('.').pop().toLowerCase();
+                const lang = extensionToLanguage[ext] || 'plaintext';
+                
+                // Monaco Editorの言語モデルを更新
+                const model = editor.getModel();
+                monaco.editor.setModelLanguage(model, lang);
+
+            } catch (err) {
+                console.log('キャンセルされました', err);
+            }
+        }
+
+        // 2. 上書き保存 (新規の場合は名前を付けて保存)
+        async function saveFile() {
+            try {
+                if (!currentFileHandle) {
+                    currentFileHandle = await window.showSaveFilePicker();
+                }
+                
+                const writable = await currentFileHandle.createWritable();
+                await writable.write(editor.getValue());
+                await writable.close();
+                
+                const file = await currentFileHandle.getFile();
+                document.getElementById('file-name-display').textContent = file.name;
+                
+                // 保存時にも念のため拡張子チェック＆言語切り替え
+                const ext = file.name.split('.').pop().toLowerCase();
+                const lang = extensionToLanguage[ext] || 'plaintext';
+                monaco.editor.setModelLanguage(editor.getModel(), lang);
+
+                // 保存成功エフェクト（ファイル名を一瞬青くする）
+                const nameDisplay = document.getElementById('file-name-display');
+                nameDisplay.style.color = '#0A84FF';
+                setTimeout(() => { nameDisplay.style.color = '#ffffff'; }, 1000);
+
+            } catch (err) {
+                console.error('保存エラー:', err);
+            }
+        }
+    </script>
+</body>
+</html>
