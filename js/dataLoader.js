@@ -687,60 +687,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     : window.map.touchZoom.disable();
 }
 
-// =====================================
-// ■ マーカーレイヤーの保存用金庫
-// =====================================
-window.prefSpotLayerCache = window.prefSpotLayerCache || {};
-
-function showPrefSpots() {
-    // 既存のレイヤーがマップ上にあれば外す（非表示にする）
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
-
-    // 既にこの県のレイヤーが金庫にあれば、表示に戻して即リターン
-    if (window.currentPref && window.prefSpotLayerCache[window.currentPref]) {
-        window.prefSpotLayer = window.prefSpotLayerCache[window.currentPref];
-        window.prefSpotLayer.addTo(window.map);
-        return;
-    }
-
-    // ... 前略 ...
-    window.prefSpotLayer = L.layerGroup();
-
-    window.spotData.forEach(spot => {
-        if (!spot.icon) return;
-
-        let type = 'spot';
-        if (spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
-        }
-
-        // ★ CanvasをやめてDOMマーカーに戻しつつ、極限まで軽量化する
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: `pref-dot ${type}`, // コンテナ自体に直接クラスを付与
-                html: '',                      // 中身を空にしてDOMノード数を半減
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
-            }),
-            interactive: false, // タップ判定をオフにしてブラウザ負荷を下げる
-            keyboard: false
-        });
-
-        window.prefSpotLayer.addLayer(marker);
-    });
-    // ... 後略 ...
-
-    // 新しく作ったレイヤーを金庫に保存しておく
-    if (window.currentPref) {
-        window.prefSpotLayerCache[window.currentPref] = window.prefSpotLayer;
-    }
-
-    window.prefSpotLayer.addTo(window.map);
-}
 
 
 
