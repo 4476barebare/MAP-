@@ -703,9 +703,34 @@ async function showAllRegionSpots() {
         marker._prefCode = spot._prefCode;
 
         // Pref画面用クリック処理
-        marker._spotClickHandler = function () {
-            selectSpot(spot);
-        };
+marker._spotClickHandler = function () {
+
+    const spotAreaId =
+        String(spot.areaId || '').trim();
+
+    const areaIndividualId =
+        spotAreaId.replace(
+            `${window.currentPref}_`,
+            ''
+        );
+
+    const area = (window.areaData || []).find(
+        a =>
+            String(a.individualId || '').trim() ===
+            areaIndividualId
+    );
+
+    if (!area) {
+        console.warn(
+            '所属Areaが見つかりません:',
+            spot.areaId,
+            spot
+        );
+        return;
+    }
+
+    selectArea(area);
+};
 
         // Region代表マーカー用クリック処理
         marker._regionClickHandler = function () {
