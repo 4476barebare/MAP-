@@ -3,69 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>スマホ用・コードエディタ（カスタム版）</title>
+    <title>スマホネイティブ・コードエディタ</title>
+    
+    <!-- CodeMirrorの基本CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.css">
+
     <style>
-        /* 画像のiOSエディタ風の全体レイアウトと配色 */
+        /* 画面全体のレイアウト */
         html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
+            width: 100%; height: 100%; margin: 0; padding: 0;
+            display: flex; flex-direction: column;
             background-color: #121212;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             overflow: hidden;
         }
         
         /* ツールバー */
         #toolbar {
             padding: 8px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #000000;
-            border-bottom: 1px solid #333;
-            min-height: 44px;
-            user-select: none; /* ツールバーの誤選択を防止 */
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: #000000; border-bottom: 1px solid #333;
+            min-height: 44px; user-select: none;
         }
-
-        .button-group {
-            display: flex;
-            gap: 8px;
-        }
-
+        .button-group { display: flex; gap: 8px; }
         button {
-            padding: 6px 10px;
-            font-size: 14px;
-            cursor: pointer;
-            background-color: transparent;
-            color: #0A84FF;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 6px 10px; font-size: 14px; cursor: pointer;
+            background-color: transparent; color: #0A84FF;
+            border: none; border-radius: 4px; font-weight: bold;
         }
         button:active { background-color: rgba(10, 132, 255, 0.2); }
-        
         #file-name-display {
-            color: #ffffff;
-            font-size: 12px;
-            font-weight: bold;
-            max-width: 100px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color: #ffffff; font-size: 12px; font-weight: bold;
+            max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        /* エディタのコンテナ */
-        #editor-container {
-            flex-grow: 1;
-            width: 100%;
+        #editor-container { flex-grow: 1; width: 100%; position: relative; }
+
+        /* ★ エディタ全体の調整 ★ */
+        .CodeMirror {
+            height: 100%;
+            font-family: Menlo, Monaco, "Courier New", monospace;
+            /* iOSネイティブの選択を強制的に許可する */
+            -webkit-user-select: auto !important; 
         }
+        
+        /* ★ カスタムテーマ（画像配色 + ご指定の8px文字） ★ */
+        .cm-s-custom.CodeMirror {
+            background-color: #1a1a1c;
+            color: #d4d4d4;
+            font-size: 8px;    /* ご要望の極小サイズ */
+            line-height: 14px; /* 8pxに合わせた行間 */
+        }
+        .cm-s-custom .CodeMirror-gutters { background-color: #1a1a1c; border-right: none; }
+        .cm-s-custom .CodeMirror-linenumber { color: #5a5a5f; }
+        
+        /* 構文の色分け設定 */
+        .cm-s-custom .cm-comment { color: #7a7a7a; font-style: italic; }
+        .cm-s-custom .cm-string { color: #c88251; }
+        .cm-s-custom .cm-keyword { color: #569cd6; }
+        .cm-s-custom .cm-variable-2 { color: #a381d6; }
+        .cm-s-custom .cm-def { color: #569cd6; }
+        .cm-s-custom .cm-number { color: #b5cea8; }
+        .cm-s-custom .cm-tag { color: #569cd6; }
+        .cm-s-custom .cm-attribute { color: #4ec9b0; }
+
+        /* ★ 折りたたみ（▼）の見た目調整 ★ */
+        .CodeMirror-foldmarker {
+            color: #0A84FF; text-shadow: none; font-family: sans-serif; cursor: pointer;
+            padding: 0 4px;
+        }
+        .CodeMirror-foldgutter-open:after { content: "▼"; color: #5a5a5f; font-size: 8px; }
+        .CodeMirror-foldgutter-folded:after { content: "▶"; color: #0A84FF; font-size: 8px; }
     </style>
 </head>
 <body>
-
     <!-- ツールバー -->
     <div id="toolbar">
         <div class="button-group">
@@ -73,141 +85,101 @@
             <button onclick="downloadFile()">💾 保存</button>
             <button onclick="copyText()">📋 コピー</button>
         </div>
-        
         <input type="file" id="file-input" style="display: none;" onchange="loadFile(event)">
-
-        <div>
-            <span id="file-name-display">新規ファイル</span>
-        </div>
+        <div><span id="file-name-display">新規ファイル</span></div>
     </div>
 
-    <!-- エディタ -->
+    <!-- エディタ本体 -->
     <div id="editor-container"></div>
 
-    <!-- Monaco Editorの読み込み -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <!-- CodeMirror のコアエンジン -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+    
+    <!-- 言語モード (PHP, JS, HTML, CSSなど) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/php/php.min.js"></script>
+
+    <!-- ▼ 折りたたみ機能の読み込み -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/xml-fold.min.js"></script>
+
     <script>
-        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
-
-        window.MonacoEnvironment = {
-            getWorkerUrl: function(workerId, label) {
-                return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-                    self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/' };
-                    importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/base/worker/workerMain.js');
-                `)}`;
-            }
-        };
-
-        let editor;
         let currentFileName = 'untitled.js';
 
-        const extensionToLanguage = {
-            'js': 'javascript', 'php': 'php', 'html': 'html',
-            'css': 'css', 'json': 'json', 'md': 'markdown', 'txt': 'plaintext'
+        const extensionToMode = {
+            'js': 'javascript', 'php': 'php', 'html': 'htmlmixed',
+            'css': 'css', 'json': 'javascript', 'txt': 'null'
         };
 
-        require(['vs/editor/editor.main'], function() {
+        // エディタの初期化
+        const editor = CodeMirror(document.getElementById('editor-container'), {
+            value: "// ここにコードをペーストするか、ファイルを開いてください",
+            mode: "javascript",
+            theme: "custom",
+            lineNumbers: true,
+            lineWrapping: true, // スマホ幅で自動折り返し
             
-            // --- カスタムテーマ（前回と同じ配色） ---
-            monaco.editor.defineTheme('my-custom-dark', {
-                base: 'vs-dark',
-                inherit: true,
-                rules: [
-                    { token: 'comment', foreground: '7a7a7a', fontStyle: 'italic' },
-                    { token: 'string', foreground: 'c88251' },
-                    { token: 'keyword', foreground: '569cd6' },
-                    { token: 'variable.php', foreground: 'a381d6' },
-                    { token: 'variable.predefined', foreground: 'a381d6' },
-                    { token: 'constant', foreground: 'd16969' },
-                    { token: 'number', foreground: 'b5cea8' },
-                    { token: 'type', foreground: '4ec9b0' }
-                ],
-                colors: {
-                    'editor.background': '#1a1a1c',
-                    'editorGutter.background': '#1a1a1c',
-                    'editorLineNumber.foreground': '#5a5a5f',
-                    'editorIndentGuide.background': '#333333',
-                    'editorWhitespace.foreground': '#404040'
-                }
-            });
+            // ★ スマホのネイティブな操作感（メモアプリ感）を実現する魔法の設定 ★
+            inputStyle: "contenteditable",
+            spellcheck: false,
 
-            // エディタの生成
-            editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: '// ここにコードをペーストするか、ファイルを開いてください',
-                language: 'javascript',
-                theme: 'my-custom-dark',
-                
-                // ★ ご要望のカスタマイズ設定
-                fontSize: 8,                    // 文字サイズを8pxに変更
-                lineHeight: 14,                 // 8pxに合わせて行間を自動調整
-                folding: true,                  // ▼での開閉（フォールディング）をオン
-                showFoldingControls: 'always',  // 常に▼を表示する
-                
-                fontFamily: "Menlo, Monaco, 'Courier New', monospace",
-                minimap: { enabled: false },
-                renderWhitespace: 'all',
-                wordWrap: 'on',
-                lineNumbersMinChars: 3,
-                scrollBeyondLastLine: false,
-                contextmenu: true // 長押しでのコピペメニューを許可
-            });
+            // 折りたたみ（▼）機能の有効化
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
         });
 
-        // ---------------------------------------------
-        // ファイル操作・コピー機能
-        // ---------------------------------------------
-
-        // 1. ファイルを読み込む
+        // 1. ファイルを開く処理
         function loadFile(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                // エディタにテキストをセット
+                // コードを流し込む
                 editor.setValue(e.target.result);
-                
                 currentFileName = file.name;
                 document.getElementById('file-name-display').textContent = currentFileName;
 
-                // 拡張子から言語を自動判別
+                // 言語切り替え
                 const ext = currentFileName.split('.').pop().toLowerCase();
-                const lang = extensionToLanguage[ext] || 'plaintext';
-                monaco.editor.setModelLanguage(editor.getModel(), lang);
+                const mode = extensionToMode[ext] || 'null';
+                editor.setOption("mode", mode);
 
-                // ★ ファイルを開いた初期状態で、すべて閉じる（折りたたむ）処理
-                // 言語の解析が完了するのを少し（0.5秒）待ってから閉じるコマンドを実行します
+                // ★ ファイルを開いた直後に「全て折りたたむ」処理
                 setTimeout(() => {
-                    editor.getAction('editor.foldAll').run();
-                }, 500);
+                    editor.operation(function() {
+                        // 全ての行をチェックして、たためる場所(functionやタグ)を強制的に閉じる
+                        for (var i = 0; i < editor.lineCount(); i++) {
+                            editor.foldCode(CodeMirror.Pos(i, 0), null, "fold");
+                        }
+                    });
+                }, 100); 
             };
-            
             reader.readAsText(file);
             event.target.value = '';
         }
 
-        // 2. コピー機能
+        // 2. コピー機能（選択時はその部分、未選択時は全体）
         async function copyText() {
-            // エディタ上で現在選択されている範囲を取得
-            const selection = editor.getSelection();
-            const selectedText = editor.getModel().getValueInRange(selection);
-            
-            // 選択範囲があればその部分を、何も選択されていなければ全体のコードを対象にする
-            const textToCopy = selectedText ? selectedText : editor.getValue();
-            
-            if (!textToCopy) return;
+            const selected = editor.getSelection();
+            const text = selected ? selected : editor.getValue();
+            if (!text) return;
 
             try {
-                // スマホのクリップボードにコピー
-                await navigator.clipboard.writeText(textToCopy);
-                alert(selectedText ? '選択範囲をコピーしました！' : 'ファイル全体をコピーしました！');
+                await navigator.clipboard.writeText(text);
+                alert(selected ? '選択範囲をコピーしました！' : 'ファイル全体をコピーしました！');
             } catch (err) {
-                // 万が一クリップボードAPIがブロックされた場合の代替手段
-                alert('コピー機能がブラウザに許可されていません。画面を長押しして手動でコピーしてください。');
+                alert('画面を長押ししてコピーしてください');
             }
         }
 
-        // 3. ファイルを保存する
+        // 3. 保存機能
         function downloadFile() {
             const code = editor.getValue();
             const blob = new Blob([code], { type: 'text/plain' });
