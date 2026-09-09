@@ -639,7 +639,7 @@ async function showAllRegionSpots() {
             window.regionAllSpotLayer.addTo(window.map);
         }
 
-        applyRegionMerge();
+        //applyRegionMerge();
         return;
     }
 
@@ -726,7 +726,7 @@ async function showAllRegionSpots() {
     // -----------------------------------------
     // Region状態へ
     // -----------------------------------------
-    applyRegionMerge();
+   // applyRegionMerge();
 
     // -----------------------------------------
     // 既存の県マーカーを最前面へ
@@ -739,92 +739,12 @@ async function showAllRegionSpots() {
         });
     }
 }
-// =====================================================
-// ■ Region画面用：マーカーを5pxグリッドで見た目だけマージ
-// =====================================================
-function applyRegionMerge() {
-    if (!window.map) return;
-    if (!window.regionSpotMarkers || !window.regionSpotMarkers.length) return;
 
-    const allSpots = window.regionSpotMarkers
-        .map(marker => marker._spotData)
-        .filter(Boolean);
 
-    // 現在の画面位置・ズームで代表を決定
-    const mergedSpots = filterMergedGridSpots(
-        allSpots,
-        window.map,
-        5
-    );
-
-    const representativeSet = new Set(mergedSpots);
-
-    window.regionSpotMarkers.forEach(marker => {
-
-        const el = marker.getElement();
-        const spot = marker._spotData;
-
-        if (!el || !spot) return;
-
-        const isRepresentative = representativeSet.has(spot);
-
-        // =========================================
-        // 代表マーカー
-        // =========================================
-        if (isRepresentative) {
-
-            el.style.opacity = '1';
-            el.style.pointerEvents = 'auto';
-
-            marker.off('click', marker._spotClickHandler);
-            marker.off('click', marker._regionClickHandler);
-
-            marker.on('click', marker._regionClickHandler);
-
-            marker._regionRepresentative = true;
-
-        }
-
-        // =========================================
-        // マージされた裏側のマーカー
-        // =========================================
-        else {
-
-            el.style.opacity = '0';
-            el.style.pointerEvents = 'none';
-
-            marker.off('click', marker._spotClickHandler);
-            marker.off('click', marker._regionClickHandler);
-
-            marker._regionRepresentative = false;
-        }
-    });
-}
-// =====================================================
-// ■ Regionマージ解除
-// =====================================================
-function clearRegionMerge() {
-    if (!window.regionSpotMarkers) return;
-
-    window.regionSpotMarkers.forEach(marker => {
-
-        const el = marker.getElement();
-        if (!el) return;
-
-        // 全マーカーを表示
-        el.style.opacity = '1';
-        el.style.pointerEvents = 'auto';
-
-        // Region用クリックを解除
-        if (marker._regionClickHandler) {
-            marker.off('click', marker._regionClickHandler);
-        }
-    });
-}
 // =====================================
 // ■ マーカーレイヤーの保存用金庫
 // =====================================
-window.prefSpotLayerCache = window.prefSpotLayerCache || {};
+//window.prefSpotLayerCache = window.prefSpotLayerCache || {};
 // =====================================================
 // ■ 全県共有スポットマーカーの画面状態を確定
 //
@@ -871,7 +791,7 @@ function showPrefSpots() {
     // =================================================
     if (!window.currentPref) {
 
-        applyRegionMerge();
+    //    applyRegionMerge();
         return;
     }
 
@@ -1157,7 +1077,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     window.currentPref = prefCode;
     window.prefBounds = null;
     window.areaBounds = null;
-clearRegionMerge();
+//clearRegionMerge();
 
     window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
     window.prefWeatherUrl = `/data/${prefCode}_whether.csv`;
