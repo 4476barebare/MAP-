@@ -2436,7 +2436,7 @@ async function routeUpdate() {
         if (typeof loadRegionMap === 'function') {
             await loadRegionMap(window.currentRegion || 'KANTO');
         }
-        //if (typeof renderCrowdImage === 'function') renderCrowdImage();
+        if (typeof renderCrowdImage === 'function') renderCrowdImage();
         return;
     }
 
@@ -2552,7 +2552,7 @@ async function routeUpdate() {
         // その後は通常のselectAreaに任せる
         if (typeof selectArea === 'function') {
             selectArea(area);
-           // renderCrowdImage();
+            if (typeof renderCrowdImage === 'function') renderCrowdImage();
         }
 
         return;
@@ -2601,6 +2601,7 @@ async function routeUpdate() {
                 if (typeof enablePrefSwipe === 'function') {
                     enablePrefSwipe();
                 }
+                if (typeof renderCrowdImage === 'function') renderCrowdImage();
 
                 requestAnimationFrame(() => {
                     const btn = document.getElementById('map-back-btn');
@@ -2614,10 +2615,8 @@ async function routeUpdate() {
                 });
             });
         };
-
         requestAnimationFrame(finalizePref);
     }
-    renderCrowdImage();
 }
 
 // ★ Region名の変換マッピング
