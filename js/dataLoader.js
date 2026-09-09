@@ -3144,6 +3144,7 @@ function goBack() {
         }, 300);
 
         loadRegionMap(regionToLoad);
+        showPrefSpots();
         return;
     }
 
