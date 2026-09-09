@@ -1714,7 +1714,7 @@ function zoomToSpot(spot) {
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
     window.currentSpotBaseTile = null;
-    showPrefSpots();
+    
 
     disablePhase2(window.map);
     resetSpotLayers();
@@ -1756,6 +1756,7 @@ function zoomToSpot(spot) {
         if (isMoveEnded && isFadeEnded) {
             clearTimeout(safetyTimer);
             setTimeout(() => {
+                
                 window.goBackGuard = false;
                 window.map.scrollWheelZoom.enable();
                 window.map.doubleClickZoom.enable();
@@ -1908,6 +1909,7 @@ function zoomToSpot(spot) {
         window.map.setMinZoom(zoomLimit);
 
         window.map.dragging.enable();
+        showPrefSpots();
         
         isMoveEnded = true;
         checkAndUnlockGuard();
