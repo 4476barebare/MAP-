@@ -37,131 +37,6 @@ async function loadLocationJSON() {
         };
     }
 
-
-    // ==========================================
-    // ★ 魚データを各スポットへ付与する処理
-    // ==========================================
-    function applyFishDataToSpots(spots, fishData) {
-
-        if (!Array.isArray(spots)) {
-            return;
-        }
-
-
-        // ------------------------------------------
-        // fishDataが無い場合
-        // ------------------------------------------
-        if (
-            !fishData ||
-            typeof fishData !== 'object'
-        ) {
-
-            spots.forEach(spot => {
-                spot.URL = "";
-            });
-
-            return;
-        }
-
-
-        // ------------------------------------------
-        // fishDataをスポット名で検索できる形に変換
-        // ------------------------------------------
-        const fishDict = {};
-
-
-        for (const regKey in fishData) {
-
-            const areaSpots = fishData[regKey];
-
-            if (
-                !areaSpots ||
-                typeof areaSpots !== 'object'
-            ) {
-                continue;
-            }
-
-
-            for (const spotName in areaSpots) {
-
-                fishDict[spotName] =
-                    areaSpots[spotName];
-            }
-        }
-
-
-        // ------------------------------------------
-        // 各スポットへ魚座標を付与
-        // ------------------------------------------
-        spots.forEach(spot => {
-
-            const spotFishData =
-                fishDict[spot.name];
-
-
-            // 魚データが存在しないスポット
-            if (!spotFishData) {
-
-                spot.URL = "";
-
-                return;
-            }
-
-
-            const fishList = [];
-
-
-            // --------------------------------------
-            // 魚種ごとのデータを処理
-            // --------------------------------------
-            for (const fishName in spotFishData) {
-
-                const info =
-                    spotFishData[fishName];
-
-
-                if (
-                    info &&
-                    typeof info.coords === 'string' &&
-                    info.coords !== ''
-                ) {
-
-                    const points =
-                        info.coords.split('|');
-
-
-                    points.forEach(pt => {
-
-                        const [
-                            lat,
-                            lng
-                        ] = pt.split(',');
-
-
-                        if (lat && lng) {
-
-                            fishList.push(
-                                `${fishName}|${lat}|${lng}`
-                            );
-                        }
-
-                    });
-                }
-            }
-
-
-            // --------------------------------------
-            // spot.URLへ格納
-            //
-            // 例：
-            // アジ|35.1|139.1,メバル|35.2|139.2
-            // --------------------------------------
-            spot.URL =
-                fishList.join(',');
-        });
-    }
-
-
     // ==========================================
     // ★ fishDataを準備
     //
@@ -1494,14 +1369,7 @@ function enablePhase2(map) {
                                 setIdealQuery('spot', null);
                             }
 
-                            if (window.fishLayer) {
-                                window.map.removeLayer(window.fishLayer);
-                                window.fishLayer = null;
-                            }
-                            if (typeof clearAccessInfo === 'function') clearAccessInfo();
-                            if (typeof clearSub2Weather === 'function') clearSub2Weather();
-                            if (typeof resetWeatherUI === 'function') resetWeatherUI();
-                            if (typeof removeWeekItem === 'function') removeWeekItem();
+                            clearSpotUI();
                             const nsEl = document.getElementById("nearest-spot");
                             if (nsEl) nsEl.textContent = "";
 
@@ -3208,20 +3076,23 @@ function resetSpotLayers() {
 }
 
 // ==========================================
-// ★ スポット詳細UIの一括削除関数
+// ★ スポット詳細UI・レイヤーの一括削除
 // ==========================================
 function clearSpotUI() {
-    if (typeof removeWeekItem === 'function') removeWeekItem();
-    if (typeof resetWeatherUI === 'function') resetWeatherUI();
-    if (typeof clearAccessInfo === 'function') clearAccessInfo();
-//   if (typeof clearSub2Weather === 'function') clearSub2Weather();
-    
+    // -------------------------
+    // UI
+    // -------------------------
+    if (typeof removeWeekItem === 'function') {removeWeekItem();}
+    if (typeof resetWeatherUI === 'function') {resetWeatherUI();}
+    if (typeof clearSub2Weather === 'function') {clearSub2Weather();}
+    if (typeof clearAccessInfo === 'function') {clearAccessInfo();}
+    // -------------------------
+    // スポット詳細レイヤー
+    // -------------------------
     if (window.map && window.fishLayer) {
         window.map.removeLayer(window.fishLayer);
         window.fishLayer = null;
     }
-    
-
 }
 
 window.goBackGuard = false;
@@ -3374,7 +3245,7 @@ function goBack() {
                 clearInterval(checkCompletion);
                 window._selectSpotCompleted = false;
                 
-                clearSpotUI();
+                //clearSpotUI();
                 enablePhase2(window.map);
                 phase1menu(window.currentAreaId);
                 showBackBtnOnly(); 
