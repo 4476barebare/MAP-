@@ -5,6 +5,8 @@ on:
   schedule:
     - cron: "1 0 * * *"
       timezone: 'Asia/Tokyo'
+    - cron: "6 0 * * *"
+      timezone: 'Asia/Tokyo'
 
 concurrency:
   group: "pages"
