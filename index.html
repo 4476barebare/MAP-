@@ -666,10 +666,199 @@ async function showAllRegionSpots() {
     }
 }
 
+// ================================
+// ■ 初期画面のRegionマップ読み込み（ニアレスト機能版）
+// ================================
+let isRegionLoaded = false;
+function loadRegionMap() {
+    const regionCode = window.currentRegion || 'KANTO';
+
+    // 1. マップのリセット
+    if (window.map) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+        window.map.stop();
+        
+        // 念のためエリア用のニアレスト機能が残っていれば外す
+        if (window.nearestClickHandler) {
+            window.map.off('click', window.nearestClickHandler);
+            window.nearestClickEnabled = false;
+        }
+    }
+
+    if (window.regionData) {
+        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
+    }
+
+    // すでにロード済みの場合（戻るボタン等での再描画）
+    if (isRegionLoaded && window.regionPrefData && window.regionPrefData.length > 0) {
+        const titleSpan = document.getElementById('seo-list-title');
+        const linkContainer = document.getElementById('seo-link-container');
+        if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
+        if (linkContainer && window.regionSeoHtml) linkContainer.innerHTML = window.regionSeoHtml;
+        
+        if (typeof showAllRegionSpots === 'function') {
+            showAllRegionSpots();
+        }
+
+        // ★ 再表示の際にもRegion用のニアレストクリックを再登録
+        if (window.map && window.regionNearestClickHandler) {
+            window.map.off('click', window.regionNearestClickHandler);
+            window.map.on('click', window.regionNearestClickHandler);
+        }
+
+        return;
+    }
+
+    return fetch(window.regionUrl) 
+        .then(res => {
+            if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
+            return res.text();
+        })
+        .then(text => {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return;
+
+            const headers = lines[0].split(',').map(h => h.trim());
+            const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
+            const latIdx   = headers.findIndex(h => h.toLowerCase() === 'lat');
+            const lngIdx   = headers.findIndex(h => h.toLowerCase() === 'lng');
+            const zoomIdx  = headers.findIndex(h => h.toLowerCase() === 'zoom');
+            const nameIdx  = headers.findIndex(h => h.toLowerCase() === 'name');
+            const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
+            const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
+
+            if (typeIdx === -1) return;
+
+            // ★ 県テキストマーカーの代わりにデータを保持する配列を用意
+            window.regionPrefData = [];
+            let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
+            let isMapDrawn = false;
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue;
+                const cols = lines[i].split(',').map(c => c.trim());
+                const type = cols[typeIdx];
+
+                if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
+                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
+                    const lat = parseFloat(cols[latIdx]);
+                    const lng = parseFloat(cols[lngIdx]);
+                    const zoom = parseFloat(cols[zoomIdx]);
+                    window.regionData = { name, lat, lng, zoom };
+                    drawLocation(name, lat, lng, zoom);
+                    isMapDrawn = true;
+                }
+
+                if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
+                    const urlVal = cols[urlIdx];
+                    const prefName = cols[notesIdx];
+                    if (!urlVal) continue;
+
+                    const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
+                    const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
+                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
+
+                    const parts = urlVal.split('/');
+                    let prefCode = '';
+                    let lat, lng;
+                    
+                    if (parts.length >= 4) {
+                        prefCode = parts[1].split('_')[0]; 
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
+                    } else if (parts.length === 3) {
+                        prefCode = parts[0].split('_')[0]; 
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    } else continue;
+
+                    if (isNaN(lat) || isNaN(lng)) continue;
+
+                    if (typeof preloadCsvFiles === 'function') {
+                        preloadCsvFiles(regionCode, prefCode);
+                    }
+
+                    // ★ テキストマーカーを描画せず、裏のデータベースとして座標を登録
+                    window.regionPrefData.push({
+                        regionCode: regionCode,
+                        prefCode: prefCode,
+                        prefName: prefName,
+                        lat: lat,
+                        lng: lng
+                    });
+                }
+            }
+            
+            regionHtml += '</ul>';
+            const regionTitle = (window.regionData ? window.regionData.name : '関東地方') + 'の釣りエリア一覧';
+            window.regionSeoHtml = regionHtml;
+            window.regionSeoTitle = regionTitle;
+
+            const titleSpan = document.getElementById('seo-list-title');
+            const linkContainer = document.getElementById('seo-link-container');
+            if (titleSpan) titleSpan.textContent = regionTitle;
+            if (linkContainer) linkContainer.innerHTML = regionHtml;
+
+            // 全県マスターデータを読み込んでドットを描画
+            showAllRegionSpots();
+
+            // ==========================================
+            // ★ Region画面専用のニアレスト機能（最も近い県を判定）
+            // ==========================================
+            window.regionNearestClickHandler = function(e) {
+                if (!window.regionPrefData || window.regionPrefData.length === 0) return;
+
+                let nearest = null;
+                let minDist = Infinity;
+
+                // タップされた場所から一番近い県を探す
+                for (const pref of window.regionPrefData) {
+                    const dist = window.map.distance(e.latlng, L.latLng(pref.lat, pref.lng));
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearest = pref;
+                    }
+                }
+
+                if (!nearest) return;
+
+                // 県画面へ移行するため、ニアレストイベントを即座に解除
+                if (window.regionNearestClickHandler) {
+                    window.map.off('click', window.regionNearestClickHandler);
+                }
+
+                // 決定した県へジャンプ
+                window.selectPrefecture(`${nearest.regionCode}_${nearest.prefCode}`);
+            };
+
+            // マップにニアレスト機能をバインド
+            if (window.map) {
+                window.map.off('click', window.regionNearestClickHandler); // 念のため解除
+                window.map.on('click', window.regionNearestClickHandler);
+            }
+
+            isRegionLoaded = true;
+        })
+        .catch(err => {
+            console.error("Regionマップの初期化エラー:", err);
+        });
+}
+
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
 // ==========================================
 window.selectPrefecture = async function (csvParam, fallbackPrefName) {
+    // ★ 追加：県画面に移行する際はRegion用のニアレストクリックを確実に解除する
+    if (window.regionNearestClickHandler && window.map) {
+        window.map.off('click', window.regionNearestClickHandler);
+    }
+
     let region = window.currentRegion || 'KANTO';
     let prefCode = csvParam;
 
@@ -693,13 +882,6 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     window.currentPref = prefCode;
     window.prefBounds = null;
     window.areaBounds = null;
-
-    // 👇これを絶対に追加する！古い県のデータを消して天気を再取得させるため
-    window.prefData = null;
-    window.areaData = [];
-    window.spotData = [];
-    window.fishData = null;
-    // 👆ここまで
 
     if (window.regionAllSpotLayer && window.map) {
         window.map.removeLayer(window.regionAllSpotLayer);
@@ -737,9 +919,11 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-if (typeof loadPrefectureData === 'function') {
-    await loadPrefectureData(prefCode);
-}
+    if (!window.prefData) {
+        if (typeof loadPrefectureData === 'function') {
+            await loadPrefectureData(prefCode);
+        }
+    }
 
     if (window.prefData && window.map) {
         const targetZoom = window.prefData.zoom;
@@ -773,12 +957,25 @@ if (typeof loadPrefectureData === 'function') {
                         if (typeof showPrefSpots === 'function') showPrefSpots();
                         if (typeof initAreaUI === 'function') initAreaUI();
                         if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                        //if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
                         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
                         if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
                         
-                        // ★ 修正：エラーになっていた直書き処理を消し、アラートやエリアガイドを統合管理する専用関数を呼ぶ
-                        if (typeof renderPrefectureUI === 'function') renderPrefectureUI();
+                        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+
+                        if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+                            window.markerControl.preloadShop01(window.prefShopUrl);
+                        }
+                        
+                        if (typeof getAlertText === 'function' && window.prefData) {
+                            getAlertText(window.prefData, function(result) {
+                                const el = document.getElementById("alert-bar");
+                                if (el) {
+                                    el.textContent = result.text;
+                                    el.style.color = result.color;
+                                }
+                            });
+                        }
 
                         requestAnimationFrame(() => {
                             const btn = document.getElementById('map-back-btn');
@@ -2234,172 +2431,6 @@ function preloadCsvFiles(regionCode, prefCode) {
     }
 }
 
-// ================================
-// ■ 初期画面のRegionマップ読み込み（詳細デバッグ入り）
-// ================================
-let isRegionLoaded = false;
-function loadRegionMap() {
-   // showdebug("▼ loadRegionMap 開始");
-    const regionCode = window.currentRegion || 'KANTO';
-
-    // 1. マップのリセット
-    if (window.map) {
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
-        window.map.setMaxBounds(null);
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-        window.map.stop();
-    }
-
-    if (window.regionData) {
-        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
-    }
-
-    if (isRegionLoaded && window.regionMarkers && window.regionMarkers.length > 0) {
-        window.regionMarkers.forEach(m => {
-            if (window.map) m.addTo(window.map);
-        });
-        const titleSpan = document.getElementById('seo-list-title');
-        const linkContainer = document.getElementById('seo-link-container');
-        if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
-        if (linkContainer && window.regionSeoHtml) linkContainer.innerHTML = window.regionSeoHtml;
-        
-        // 👇【ここに追加】再表示の際にも全県ドットマーカーを確実に描画・復活させる
-        if (typeof showAllRegionSpots === 'function') {
-            showAllRegionSpots();
-        }
-
-        return;
-    }
-
-
-  //  showdebug("▷ フェッチ先: " + window.regionUrl);
-
-    return fetch(window.regionUrl) 
-        .then(res => {
-            if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
-            return res.text();
-        })
-        .then(text => {
-            const lines = text.trim().split('\n');
-           //    showdebug("▷ CSV取得成功 行数: " + lines.length);
-            if (lines.length < 2) {
-               //  showdebug("❌ 行数が足りません");
-                return;
-            }
-
-            const headers = lines[0].split(',').map(h => h.trim());
-            const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
-            const latIdx   = headers.findIndex(h => h.toLowerCase() === 'lat');
-            const lngIdx   = headers.findIndex(h => h.toLowerCase() === 'lng');
-            const zoomIdx  = headers.findIndex(h => h.toLowerCase() === 'zoom');
-            const nameIdx  = headers.findIndex(h => h.toLowerCase() === 'name');
-            const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
-            const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
-
-            if (typeIdx === -1) {
-               //  showdebug("❌ type列が見つからないため中断");
-                return;
-            }
-
-            window.regionMarkers = window.regionMarkers || [];
-            let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
-            let isMapDrawn = false;
-
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i]) continue;
-                const cols = lines[i].split(',').map(c => c.trim());
-                const type = cols[typeIdx];
-
-                if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
-                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
-                    const lat = parseFloat(cols[latIdx]);
-                    const lng = parseFloat(cols[lngIdx]);
-                    const zoom = parseFloat(cols[zoomIdx]);
-                  //   showdebug(`▷ 描画指示: lat=${lat}, lng=${lng}, zoom=${zoom}`);
-                    window.regionData = { name, lat, lng, zoom };
-                    drawLocation(name, lat, lng, zoom);
-                    isMapDrawn = true;
-                }
-
-                if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
-                    const urlVal = cols[urlIdx];
-                    const prefName = cols[notesIdx];
-                    if (!urlVal) continue;
-
-                    const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
-                    const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
-                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
-
-                    const parts = urlVal.split('/');
-                    let prefCode = '';
-                    let lat, lng;
-                    
-                    if (parts.length >= 4) {
-                        prefCode = parts[1].split('_')[0]; 
-                        lat = parseFloat(parts[2]);
-                        lng = parseFloat(parts[3]);
-                    } else if (parts.length === 3) {
-                        prefCode = parts[0].split('_')[0]; 
-                        lat = parseFloat(parts[1]);
-                        lng = parseFloat(parts[2]);
-                    } else continue;
-
-                    if (isNaN(lat) || isNaN(lng)) continue;
-
-                    if (typeof preloadCsvFiles === 'function') {
-                        preloadCsvFiles(regionCode, prefCode);
-                    }
-
-                    const prefIcon = L.divIcon({
-                        className: 'pref-choice-marker',
-                        html: `<div class="pref-choice-label">${prefName}</div>`,
-                        iconSize: [90, 32],
-                        iconAnchor: [45, 17]
-                    });
-
-                    if (window.map) {
-                        const marker = L.marker([lat, lng], { icon: prefIcon }).addTo(window.map);
-                        marker.on('click', () => {
-                            if (typeof clearRegionMarkers === 'function') clearRegionMarkers();
-                            window.selectPrefecture(`${regionCode}_${prefCode}`);
-                        });
-                        window.regionMarkers.push(marker);
-                    }
-                }
-            }
-            
-// ... (loadRegionMap の中) ...
-// ... index.html : loadRegionMap の中の fetch.then の最後 ...
-
-            if (!isMapDrawn) showdebug("❌ type='region'の行が無いため地図が描画されません");
-            
-            regionHtml += '</ul>';
-            const regionTitle = (window.regionData ? window.regionData.name : '関東地方') + 'の釣りエリア一覧';
-            window.regionSeoHtml = regionHtml;
-            window.regionSeoTitle = regionTitle;
-
-            const titleSpan = document.getElementById('seo-list-title');
-            const linkContainer = document.getElementById('seo-link-container');
-            if (titleSpan) titleSpan.textContent = regionTitle;
-            if (linkContainer) linkContainer.innerHTML = regionHtml;
-
-            // 👇 【ここに追加】全県マスターデータを読み込んで描画する
-            showAllRegionSpots();
-
-            isRegionLoaded = true;
-
-// ...
-
-        })
-        .catch(err => {
-           //  showdebug("❌ loadRegionMap エラー: " + err.message);
-            console.error("Regionマップの初期化エラー:", err);
-        });
-}
 
 async function checkAndLoadRouteData() {
     const prefCode = window.currentPref;
