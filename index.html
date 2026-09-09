@@ -626,44 +626,297 @@ async function fetchAllRegionSpots() {
 // =====================================================
 async function showAllRegionSpots() {
     if (!window.map) return;
-    if (window.regionAllSpotLayer) window.map.removeLayer(window.regionAllSpotLayer);
+
+    // -----------------------------------------
+    // すでに全マーカーを生成済みなら再利用
+    // -----------------------------------------
+    if (
+        window.regionSpotMarkers &&
+        window.regionSpotMarkers.length > 0 &&
+        window.regionAllSpotLayer
+    ) {
+        if (!window.map.hasLayer(window.regionAllSpotLayer)) {
+            window.regionAllSpotLayer.addTo(window.map);
+        }
+
+        applyRegionMerge();
+        return;
+    }
+
+    // -----------------------------------------
+    // 初期化
+    // -----------------------------------------
+    window.regionSpotMarkers = [];
+    window.regionSpotMarkerMap = new Map();
+
+    if (window.regionAllSpotLayer) {
+        window.map.removeLayer(window.regionAllSpotLayer);
+    }
+
     window.regionAllSpotLayer = L.layerGroup();
 
     const allSpots = await fetchAllRegionSpots();
-    // prefとareaを弾いてスポットのみ抽出
-    const targetSpots = allSpots.filter(s => s.type !== 'pref' && s.type !== 'area');
-    const mergedSpots = filterMergedGridSpots(targetSpots, window.map, 5);
 
-    mergedSpots.forEach(spot => {
+    // pref / area は除外して釣りスポットだけ
+    const targetSpots = allSpots.filter(
+        s => s.type !== 'pref' && s.type !== 'area'
+    );
+
+    // -----------------------------------------
+    // 全スポットのマーカーを生成
+    // ※ Regionではまだ間引かない
+    // -----------------------------------------
+    targetSpots.forEach(spot => {
+
+        if (
+            !Number.isFinite(Number(spot.lat)) ||
+            !Number.isFinite(Number(spot.lng))
+        ) {
+            return;
+        }
+
         let type = 'spot';
+
         if (spot.icon && spot.icon.startsWith('fish')) {
             const match = spot.icon.match(/fish\d+/);
             if (match) type = match[0];
         }
 
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: `pref-dot ${type}`,
-                html: '',
-                iconSize: [5, 5],
-                iconAnchor: [2.5, 2.5]
-            }),
-            interactive: false, // ★ドットはクリック不要なのでfalseのまま
-            keyboard: false
-        });
+        const marker = L.marker(
+            [Number(spot.lat), Number(spot.lng)],
+            {
+                icon: L.divIcon({
+                    className: `pref-dot ${type}`,
+                    html: '',
+                    iconSize: [5, 5],
+                    iconAnchor: [2.5, 2.5]
+                }),
+                interactive: true,
+                keyboard: false
+            }
+        );
+
+        // -----------------------------------------
+        // マーカーに元データを保存
+        // -----------------------------------------
+        marker._spotData = spot;
+        marker._prefCode = spot._prefCode;
+
+        // Pref画面用クリック処理
+        marker._spotClickHandler = function () {
+            selectSpot(spot);
+        };
+
+        // Region代表マーカー用クリック処理
+        marker._regionClickHandler = function () {
+            handleRegionNearest(marker.getLatLng());
+        };
+
+        window.regionSpotMarkers.push(marker);
+        window.regionSpotMarkerMap.set(spot, marker);
 
         window.regionAllSpotLayer.addLayer(marker);
     });
 
-    // 描画
+    // -----------------------------------------
+    // マップへ追加
+    // -----------------------------------------
     window.regionAllSpotLayer.addTo(window.map);
-    
-    // ★ 修正：全県のドットを描画したあとに、既存の「県マーカー（CHIBAなど）」を最前面に持ってくる
+
+    // -----------------------------------------
+    // Region状態へ
+    // -----------------------------------------
+    applyRegionMerge();
+
+    // -----------------------------------------
+    // 既存の県マーカーを最前面へ
+    // -----------------------------------------
     if (window.regionMarkers && window.regionMarkers.length > 0) {
         window.regionMarkers.forEach(m => {
-            if (m.setZIndexOffset) m.setZIndexOffset(1000); 
+            if (m.setZIndexOffset) {
+                m.setZIndexOffset(1000);
+            }
         });
     }
+}
+// =====================================================
+// ■ Region画面用：マーカーを5pxグリッドで見た目だけマージ
+// =====================================================
+function applyRegionMerge() {
+    if (!window.map) return;
+    if (!window.regionSpotMarkers || !window.regionSpotMarkers.length) return;
+
+    const allSpots = window.regionSpotMarkers
+        .map(marker => marker._spotData)
+        .filter(Boolean);
+
+    // 現在の画面位置・ズームで代表を決定
+    const mergedSpots = filterMergedGridSpots(
+        allSpots,
+        window.map,
+        5
+    );
+
+    const representativeSet = new Set(mergedSpots);
+
+    window.regionSpotMarkers.forEach(marker => {
+
+        const el = marker.getElement();
+        const spot = marker._spotData;
+
+        if (!el || !spot) return;
+
+        const isRepresentative = representativeSet.has(spot);
+
+        // =========================================
+        // 代表マーカー
+        // =========================================
+        if (isRepresentative) {
+
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'auto';
+
+            marker.off('click', marker._spotClickHandler);
+            marker.off('click', marker._regionClickHandler);
+
+            marker.on('click', marker._regionClickHandler);
+
+            marker._regionRepresentative = true;
+
+        }
+
+        // =========================================
+        // マージされた裏側のマーカー
+        // =========================================
+        else {
+
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+
+            marker.off('click', marker._spotClickHandler);
+            marker.off('click', marker._regionClickHandler);
+
+            marker._regionRepresentative = false;
+        }
+    });
+}
+// =====================================================
+// ■ Regionマージ解除
+// =====================================================
+function clearRegionMerge() {
+    if (!window.regionSpotMarkers) return;
+
+    window.regionSpotMarkers.forEach(marker => {
+
+        const el = marker.getElement();
+        if (!el) return;
+
+        // 全マーカーを表示
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+
+        // Region用クリックを解除
+        if (marker._regionClickHandler) {
+            marker.off('click', marker._regionClickHandler);
+        }
+    });
+}
+// =====================================
+// ■ マーカーレイヤーの保存用金庫
+// =====================================
+window.prefSpotLayerCache = window.prefSpotLayerCache || {};
+// =====================================================
+// ■ 県画面：既存の全県マーカーを県別に制御
+// =====================================================
+function showPrefSpots() {
+
+    if (!window.regionSpotMarkers) return;
+
+    const selectedPref = String(window.currentPref || '');
+
+    // Regionのマージを解除
+    clearRegionMerge();
+
+    window.regionSpotMarkers.forEach(marker => {
+
+        const spot = marker._spotData;
+        const el = marker.getElement();
+
+        if (!spot || !el) return;
+
+        const markerPref = String(marker._prefCode || '');
+
+        // -----------------------------------------
+        // 既に登録されているクリックイベントを解除
+        // -----------------------------------------
+        if (marker._regionClickHandler) {
+            marker.off('click', marker._regionClickHandler);
+        }
+
+        if (marker._spotClickHandler) {
+            marker.off('click', marker._spotClickHandler);
+        }
+
+        // -----------------------------------------
+        // 選択中の県
+        // -----------------------------------------
+        if (markerPref === selectedPref) {
+
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'auto';
+
+            marker.on('click', marker._spotClickHandler);
+        }
+
+        // -----------------------------------------
+        // 選択外の県
+        // -----------------------------------------
+        else {
+
+            el.style.opacity = '0.35';
+            el.style.pointerEvents = 'none';
+        }
+    });
+}
+// =====================================================
+// ■ Region用ニアレスト処理
+//    座標から最も近い県を選択
+// =====================================================
+function handleRegionNearest(latlng) {
+
+    if (!window.map) return;
+    if (!window.regionPrefData || !window.regionPrefData.length) return;
+
+    let nearest = null;
+    let minDist = Infinity;
+
+    for (const pref of window.regionPrefData) {
+
+        const dist = window.map.distance(
+            latlng,
+            L.latLng(pref.lat, pref.lng)
+        );
+
+        if (dist < minDist) {
+            minDist = dist;
+            nearest = pref;
+        }
+    }
+
+    if (!nearest) return;
+
+    // Regionニアレストイベントを解除
+    if (window.regionNearestClickHandler) {
+        window.map.off(
+            'click',
+            window.regionNearestClickHandler
+        );
+    }
+
+    // 県画面へ
+    window.selectPrefecture(
+        `${nearest.regionCode}_${nearest.prefCode}`
+    );
 }
 
 // ================================
@@ -811,31 +1064,9 @@ function loadRegionMap() {
             // ==========================================
             // ★ Region画面専用のニアレスト機能（最も近い県を判定）
             // ==========================================
-            window.regionNearestClickHandler = function(e) {
-                if (!window.regionPrefData || window.regionPrefData.length === 0) return;
-
-                let nearest = null;
-                let minDist = Infinity;
-
-                // タップされた場所から一番近い県を探す
-                for (const pref of window.regionPrefData) {
-                    const dist = window.map.distance(e.latlng, L.latLng(pref.lat, pref.lng));
-                    if (dist < minDist) {
-                        minDist = dist;
-                        nearest = pref;
-                    }
-                }
-
-                if (!nearest) return;
-
-                // 県画面へ移行するため、ニアレストイベントを即座に解除
-                if (window.regionNearestClickHandler) {
-                    window.map.off('click', window.regionNearestClickHandler);
-                }
-
-                // 決定した県へジャンプ
-                window.selectPrefecture(`${nearest.regionCode}_${nearest.prefCode}`);
-            };
+window.regionNearestClickHandler = function(e) {
+    handleRegionNearest(e.latlng);
+};
 
             // マップにニアレスト機能をバインド
             if (window.map) {
@@ -882,11 +1113,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     window.currentPref = prefCode;
     window.prefBounds = null;
     window.areaBounds = null;
-
-    if (window.regionAllSpotLayer && window.map) {
-        window.map.removeLayer(window.regionAllSpotLayer);
-        window.regionAllSpotLayer = null;
-    }
+clearRegionMerge();
 
     window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
     window.prefWeatherUrl = `/data/${prefCode}_whether.csv`;
