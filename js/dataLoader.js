@@ -739,6 +739,7 @@ function selectArea(area) {
         : area;
 
     if (!areaObj) return;
+    showPrefSpots();
     
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
@@ -826,16 +827,13 @@ function saveMapState() {
 
 function showSpotsForArea(areaKey) {
 
-    // 直リンク対策などの初期化処理はそのまま
-    if (!window.prefSpotLayer) {
-        if (typeof showPrefSpots === 'function') showPrefSpots();
-    }
-
     if (!window.areaSpotLayer) {
         window.areaSpotLayer = L.layerGroup().addTo(window.map);
     } else {
         window.areaSpotLayer.clearLayers();
     }
+
+    // 以下そのまま
 
     // =====================================================
     // ★ 変更点1: マーカー表示用（エリア制限を外して県内全件抽出）
@@ -1709,12 +1707,14 @@ function zoomToSpot(spot) {
         }
         return;
     }
+    
 
     window.goBackGuard = true;
 
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
     window.currentSpotBaseTile = null;
+    showPrefSpots();
 
     disablePhase2(window.map);
     resetSpotLayers();
@@ -3185,6 +3185,7 @@ function goBack() {
         showSpotsForArea(window.currentAreaId);
         
         selectSpot(restoreSpot); // ★ ここに渡され、外部で false になる
+        showPrefSpots();
 
         const checkCompletion = setInterval(() => {
             if (window._selectSpotCompleted) {
