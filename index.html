@@ -1581,13 +1581,10 @@ function renderCrowdImage() {
         return;
     }
 
-    // 初期状態はON
+// 初回だけON
+if (typeof window.radarEnabled === 'undefined') {
     window.radarEnabled = true;
-
-    // 初期状態はON
-    if (typeof window.radarEnabled === 'undefined') {
-        window.radarEnabled = true;
-    }
+}}
 
     // =======================
     // トグルボタンのクリックイベント
@@ -1746,15 +1743,42 @@ if (window.todayTide) {
 
     const MAX_OPACITY = 0.6;
 
-    // 初期レイヤー描画
-    window.crowdLayer = L.imageOverlay(
-        images[0].url,
-        calcBounds(),
-        {
-            pane: 'rainPane',
-            opacity: MAX_OPACITY
+// ==================================================
+// 雨雲レイヤーの透過率を強制適用
+// ==================================================
+function applyCrowdOpacity(layer, opacity = MAX_OPACITY) {
+    if (!layer) return;
+
+    layer.setOpacity(opacity);
+
+    const el = layer.getElement();
+    if (el) {
+        el.style.opacity = String(opacity);
+    }
+}
+
+window.crowdLayer = L.imageOverlay(
+    images[0].url,
+    calcBounds(),
+    {
+        pane: 'rainPane',
+        opacity: MAX_OPACITY
+    }
+).addTo(window.map);
+
+// 念のため生成直後にも透過率を強制適用
+applyCrowdOpacity(window.crowdLayer);
+
+// 画像ロード後にも再適用
+const initialCrowdImage = window.crowdLayer.getElement();
+
+if (initialCrowdImage) {
+    initialCrowdImage.addEventListener('load', function() {
+        if (window.crowdLayer) {
+            applyCrowdOpacity(window.crowdLayer);
         }
-    ).addTo(window.map);
+    }, { once: true });
+}
 
     window.crowdZoomHandler = function() {
         if (!window.crowdLayer) return;
@@ -1790,7 +1814,11 @@ if (window.todayTide) {
                 opacity: 0
             }
         ).addTo(window.map);
+const newCrowdImage = newLayer.getElement();
 
+if (newCrowdImage) {
+    newCrowdImage.style.opacity = '0';
+}
         let opacity = 0;
         const fade = setInterval(() => {
             if (!window.crowdSlideTimer || !window.radarEnabled) {
@@ -1803,15 +1831,19 @@ if (window.todayTide) {
 
             opacity += 0.06;
 
-            if (opacity >= MAX_OPACITY) {
-                opacity = MAX_OPACITY;
-                clearInterval(fade);
+if (opacity >= MAX_OPACITY) {
+    opacity = MAX_OPACITY;
+    clearInterval(fade);
 
-                if (oldLayer) {
-                    window.map.removeLayer(oldLayer);
-                }
-                window.crowdLayer = newLayer;
-            }
+    if (oldLayer) {
+        window.map.removeLayer(oldLayer);
+    }
+
+    window.crowdLayer = newLayer;
+
+    // 最終状態を必ず0.6に固定
+    applyCrowdOpacity(window.crowdLayer, MAX_OPACITY);
+}
 
             newLayer.setOpacity(opacity);
             if (oldLayer) {
