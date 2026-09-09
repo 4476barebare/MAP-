@@ -477,10 +477,11 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
     areasData.forEach(area => {
         const areaKey = area.areaId + '_' + area.individualId;
         
+        // ★ 修正：null, undefined, 空文字('') をすべて弾き、確実にzoom値があるものだけを厳選
         const areaSpots = spotsData.filter(s => 
             s.areaId === areaKey && 
             s.icon && s.icon.trim() !== '' &&
-            s.zoom !== '' 
+            s.zoom != null && s.zoom !== '' 
         );
         
         if (areaSpots.length > 0) {
@@ -490,7 +491,6 @@ function buildSeoHtmlString(mainData, areasData, spotsData) {
             areaSpots.forEach(spot => {
                 const url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName)}&area=${encodeURIComponent(area.name)}&spot=${encodeURIComponent(spot.name)}`;
                 
-                // 対象魚種の抽出・結合処理を削除し、純粋にスポット名だけをリスト化する
                 html += `<li style="margin:5px 0;"><a href="${url}" style="color:#0066cc; text-decoration:underline;">${spot.name}</a></li>`;
             });
             
