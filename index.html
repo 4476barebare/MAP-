@@ -826,7 +826,12 @@ function clearRegionMerge() {
 // =====================================
 window.prefSpotLayerCache = window.prefSpotLayerCache || {};
 // =====================================================
-// ■ 県画面：既存の全県マーカーを県別に制御
+// ■ 全県共有スポットマーカーの画面状態を確定
+//
+// Region : 5pxグリッドでマージ
+// Pref   : 選択県=100%、他県=35%
+// Area   : 選択県=100%、他県=35%
+// Spot   : 全て非表示
 // =====================================================
 function showPrefSpots() {
 
@@ -834,9 +839,45 @@ function showPrefSpots() {
 
     const selectedPref = String(window.currentPref || '');
 
-    // Regionのマージを解除
-    clearRegionMerge();
+    // =================================================
+    // ① スポット詳細画面
+    // =================================================
+    if (window.currentSpotId) {
 
+        window.regionSpotMarkers.forEach(marker => {
+
+            const el = marker.getElement();
+            if (!el) return;
+
+            if (marker._regionClickHandler) {
+                marker.off('click', marker._regionClickHandler);
+            }
+
+            if (marker._spotClickHandler) {
+                marker.off('click', marker._spotClickHandler);
+            }
+
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+
+            marker._regionRepresentative = false;
+        });
+
+        return;
+    }
+
+    // =================================================
+    // ② Region画面
+    // =================================================
+    if (!window.currentPref) {
+
+        applyRegionMerge();
+        return;
+    }
+
+    // =================================================
+    // ③ Pref / Area画面
+    // =================================================
     window.regionSpotMarkers.forEach(marker => {
 
         const spot = marker._spotData;
@@ -846,9 +887,9 @@ function showPrefSpots() {
 
         const markerPref = String(marker._prefCode || '');
 
-        // -----------------------------------------
-        // 既に登録されているクリックイベントを解除
-        // -----------------------------------------
+        // ---------------------------------------------
+        // 既存のクリックイベントを一旦解除
+        // ---------------------------------------------
         if (marker._regionClickHandler) {
             marker.off('click', marker._regionClickHandler);
         }
@@ -857,25 +898,28 @@ function showPrefSpots() {
             marker.off('click', marker._spotClickHandler);
         }
 
-        // -----------------------------------------
-        // 選択中の県
-        // -----------------------------------------
+        // ---------------------------------------------
+        // 現在の県
+        // ---------------------------------------------
         if (markerPref === selectedPref) {
 
             el.style.opacity = '1';
             el.style.pointerEvents = 'auto';
 
             marker.on('click', marker._spotClickHandler);
+
         }
 
-        // -----------------------------------------
-        // 選択外の県
-        // -----------------------------------------
+        // ---------------------------------------------
+        // 他県
+        // ---------------------------------------------
         else {
 
             el.style.opacity = '0.35';
             el.style.pointerEvents = 'none';
         }
+
+        marker._regionRepresentative = false;
     });
 }
 // =====================================================
@@ -3305,19 +3349,25 @@ async function routeUpdate() {
     // ==================================================
     // 地域画面
     // ==================================================
-    if (!window.currentPref) {
-        const btn = document.getElementById('map-back-btn');
-        if (btn) {
-            btn.style.display = 'none';
-        }
+if (!window.currentPref) {
 
-        if (typeof loadRegionMap === 'function') {
-            await loadRegionMap(window.currentRegion || 'KANTO');
-        }
-        if (typeof renderCrowdImage === 'function') renderCrowdImage();
-        return;
+    const btn = document.getElementById('map-back-btn');
+    if (btn) {
+        btn.style.display = 'none';
     }
 
+    if (typeof loadRegionMap === 'function') {
+        await loadRegionMap(window.currentRegion || 'KANTO');
+    }
+
+    showPrefSpots();
+
+    if (typeof renderCrowdImage === 'function') {
+        renderCrowdImage();
+    }
+
+    return;
+}
     // ==================================================
     // スポット画面
     // ==================================================
@@ -3360,6 +3410,7 @@ async function routeUpdate() {
         // ① スポット位置を描画
         // ------------------------------------------
         drawLocation(spot.name, spot.lat, spot.lng, 13);
+        showAllRegionSpots();
 
         // ------------------------------------------
         // ② 親エリアのPhase1を構築
@@ -3426,6 +3477,7 @@ async function routeUpdate() {
             area.lng,
             area.zoom || window.prefData.zoom
         );
+        showAllRegionSpots();
 
         // その後は通常のselectAreaに任せる
         if (typeof selectArea === 'function') {
@@ -3453,6 +3505,7 @@ async function routeUpdate() {
             window.prefData.lng,
             window.prefData.zoom
         );
+        showAllRegionSpots();
 
         // ------------------------------------------
         // ② 県画面UI
@@ -3735,12 +3788,6 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
     if (typeof destroyAreaUI === 'function') destroyAreaUI();
-    //if (typeof removeCrowdImage === 'function') removeCrowdImage();
-    
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
 
     window.prefLocationUrl      = `/${regionCode}/${prefCode}_location.json`;
     window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
