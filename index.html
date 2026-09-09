@@ -919,11 +919,9 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
 
-    if (!window.prefData) {
-        if (typeof loadPrefectureData === 'function') {
-            await loadPrefectureData(prefCode);
-        }
-    }
+if (typeof loadPrefectureData === 'function') {
+    await loadPrefectureData(prefCode);
+}
 
     if (window.prefData && window.map) {
         const targetZoom = window.prefData.zoom;
@@ -3041,8 +3039,13 @@ let needsBaseLoad = false;
 
 if (!window.prefData) {
     needsBaseLoad = true;
-} else if (!Array.isArray(window.spotData) || window.spotData.length === 0) {
+
+} else if (
+    !Array.isArray(window.spotData) ||
+    window.spotData.length === 0
+) {
     needsBaseLoad = true;
+
 } else {
     const rep = window.spotData.find(s => {
         const typeParts = (s.type || '').split('$');
