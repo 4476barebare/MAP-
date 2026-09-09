@@ -1567,349 +1567,915 @@ function toWeatherIcon(code) {
 
 function renderCrowdImage() {
 
-    // マップ生成前に呼ばれた場合は、マップ生成後に再実行する
+    // ==================================================
+    // マップ生成前に呼ばれた場合
+    // ==================================================
     if (!window.map) {
+
         if (!window._crowdRenderRetry) {
+
             window._crowdRenderRetry = setInterval(() => {
+
                 if (window.map) {
+
                     clearInterval(window._crowdRenderRetry);
                     window._crowdRenderRetry = null;
+
                     renderCrowdImage();
                 }
+
             }, 100);
         }
+
         return;
     }
 
-// 初回だけON
-if (typeof window.radarEnabled === 'undefined') {
-    window.radarEnabled = true;
-}
-    // =======================
-    // トグルボタンのクリックイベント
-    // =======================
+
+    // ==================================================
+    // 雨雲レイヤーの描画世代を更新
+    //
+    // 古い renderCrowdImage() のタイマーが
+    // 新しいレイヤーへ干渉するのを防止する
+    // ==================================================
+    window.crowdRenderGeneration =
+        (window.crowdRenderGeneration || 0) + 1;
+
+    const myGeneration = window.crowdRenderGeneration;
+
+
+    // ==================================================
+    // 初回だけON
+    // ==================================================
+    if (typeof window.radarEnabled === 'undefined') {
+        window.radarEnabled = true;
+    }
+
+
+    // ==================================================
+    // トグルボタン
+    // ==================================================
     const btn = document.getElementById('radarToggleBtn');
+
     if (btn && !btn.dataset.listenerAdded) {
+
         btn.dataset.listenerAdded = "true";
+
         btn.addEventListener('click', function() {
+
             window.radarEnabled = !window.radarEnabled;
 
-            if (!window.radarEnabled) {
-                if (window.crowdSlideTimer) clearInterval(window.crowdSlideTimer);
-                if (window.crowdLayer) window.map.removeLayer(window.crowdLayer);
-                if (window.crowdZoomHandler) window.map.off("zoomend", window.crowdZoomHandler);
-                window.crowdSlideTimer = null;
-                window.crowdLayer = null;
-                window.crowdZoomHandler = null;
-            }
             renderCrowdImage();
+
         });
     }
 
-    // =======================
-    // OFF時のガード処理
-    // =======================
-    if (!window.radarEnabled) {
-        removeCrowdImage(); 
 
-        const header = document.querySelector('.menu-header-row');
-        const cloudsUI = document.getElementById('cloudsUI');
-        const headerText = document.querySelector('.header-text');
-        
-        if (header) header.style.display = '';
-        if (cloudsUI) cloudsUI.textContent = '';
-if (window.todayTide) {
-    headerText.textContent =
-        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-} else {
-    headerText.textContent = "";
-}
-        
-        if (btn) {
-            btn.style.display = ''; 
-            btn.textContent = 'ON'; 
-            btn.classList.add('is-off'); 
+    // ==================================================
+    // OFF時
+    // ==================================================
+    if (!window.radarEnabled) {
+
+        removeCrowdImage();
+
+        const header =
+            document.querySelector('.menu-header-row');
+
+        const cloudsUI =
+            document.getElementById('cloudsUI');
+
+        const headerText =
+            document.querySelector('.header-text');
+
+
+        if (header) {
+            header.style.display = '';
         }
-        return; 
+
+        if (cloudsUI) {
+            cloudsUI.textContent = '';
+        }
+
+        if (headerText) {
+
+            if (window.todayTide) {
+
+                headerText.textContent =
+                    formatDate(window.todayTide.date)
+                    + " "
+                    + window.todayTide.tide;
+
+            } else {
+
+                headerText.textContent = "";
+            }
+        }
+
+
+        if (btn) {
+
+            btn.style.display = '';
+            btn.textContent = 'ON';
+            btn.classList.add('is-off');
+        }
+
+        return;
     }
 
+
+    // ==================================================
+    // ON表示
+    // ==================================================
     if (btn) {
+
         btn.style.display = '';
         btn.textContent = 'OFF';
         btn.classList.remove('is-off');
     }
 
+
+    // ==================================================
+    // ★ここが重要
+    //
+    // renderCrowdImage() が再実行された場合、
+    // 現在存在する雨雲レイヤーとタイマーを
+    // 一度完全に破棄する
+    // ==================================================
     removeCrowdImage();
 
-    // =======================
+
+    // ==================================================
     // Pane準備
-    // =======================
+    // ==================================================
     if (!window.map.getPane('rainPane')) {
+
         window.map.createPane('rainPane');
-        const pane = window.map.getPane('rainPane');
+
+        const pane =
+            window.map.getPane('rainPane');
+
         pane.style.zIndex = 350;
         pane.style.pointerEvents = 'none';
     }
 
-    // =======================
+
+    // ==================================================
     // 時刻計算
-    // =======================
+    // ==================================================
     const now = new Date();
+
     const nowJST = new Date(
-        now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" })
+        now.toLocaleString(
+            "en-US",
+            { timeZone: "Asia/Tokyo" }
+        )
     );
 
     const hour = nowJST.getHours();
-    const slots = [0,3,6,9,12,15,18,21];
 
-    // =======================
-    // スライド用データ作成（★ KANTO 固定に変更）
-    // =======================
+    const slots = [
+        0, 3, 6, 9,
+        12, 15, 18, 21
+    ];
+
+
+    // ==================================================
+    // スライド用データ
+    // KANTO固定
+    // ==================================================
     const images = [];
-    let baseIndex = slots.findIndex(h => h > hour);
+
+    let baseIndex =
+        slots.findIndex(h => h > hour);
+
     let dayOffset = 0;
 
+
     if (baseIndex === -1) {
+
         baseIndex = 0;
         dayOffset = 1;
     }
 
+
     for (let i = 0; i < 4; i++) {
-        const rawIndex = baseIndex + i;
-        const idx = rawIndex % slots.length;
-        const extraDay = Math.floor(rawIndex / slots.length);
 
-        const tmpDate = new Date(nowJST);
-        tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
+        const rawIndex =
+            baseIndex + i;
 
-        const y = tmpDate.getFullYear();
-        const m = String(tmpDate.getMonth()+1).padStart(2,"0");
-        const d = String(tmpDate.getDate()).padStart(2,"0");
-        const hh = String(slots[idx]).padStart(2,"0");
+        const idx =
+            rawIndex % slots.length;
+
+        const extraDay =
+            Math.floor(
+                rawIndex / slots.length
+            );
+
+
+        const tmpDate =
+            new Date(nowJST);
+
+        tmpDate.setDate(
+            tmpDate.getDate()
+            + dayOffset
+            + extraDay
+        );
+
+
+        const y =
+            tmpDate.getFullYear();
+
+        const m =
+            String(
+                tmpDate.getMonth() + 1
+            ).padStart(2, "0");
+
+        const d =
+            String(
+                tmpDate.getDate()
+            ).padStart(2, "0");
+
+        const hh =
+            String(
+                slots[idx]
+            ).padStart(2, "0");
+
 
         images.push({
-            // ★ prefに依存せず、常に関東全域（KANTO）の画像を読み込む
-            url: `js/crowdsimg/KANTO_${y}-${m}-${d}_${hh}.png`,
-            displayHour: slots[idx] + ((dayOffset + extraDay) * 24)
+
+            url:
+                `js/crowdsimg/KANTO_${y}-${m}-${d}_${hh}.png`,
+
+            displayHour:
+                slots[idx]
+                + ((dayOffset + extraDay) * 24)
         });
     }
 
-    // =======================
+
+    // ==================================================
     // header UI
-    // =======================
-    const header = document.querySelector('.menu-header-row');
-    const cloudsUI = document.getElementById('cloudsUI');
-    const headerText = document.querySelector('.header-text');
+    // ==================================================
+    const header =
+        document.querySelector('.menu-header-row');
+
+    const cloudsUI =
+        document.getElementById('cloudsUI');
+
+    const headerText =
+        document.querySelector('.header-text');
+
 
     if (!header || !cloudsUI || !headerText) {
         return;
     }
 
+
     header.style.display = '';
 
+
+    // ==================================================
+    // Phase2では雨雲UIを出さない
+    // ==================================================
     if (window.phase2Initialized) {
+
         cloudsUI.textContent = '';
-        headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+
+        if (window.todayTide) {
+
+            headerText.textContent =
+                formatDate(window.todayTide.date)
+                + " "
+                + window.todayTide.tide;
+
+        } else {
+
+            headerText.textContent = "";
+        }
+
         return;
     }
 
-    let currentIndex = 0;
-    cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
-    headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
-    // =======================
-    // ★ 座標とズームの完全固定化（ログの fetch を廃止）
-    // =======================
+    // ==================================================
+    // 初期UI
+    // ==================================================
+    let currentIndex = 0;
+
+    cloudsUI.textContent =
+        `雨雲レーダー ${images[0].displayHour}時`;
+
+    if (window.todayTide) {
+
+        headerText.textContent =
+            formatDate(window.todayTide.date)
+            + " "
+            + window.todayTide.tide;
+
+    } else {
+
+        headerText.textContent = "";
+    }
+
+
+    // ==================================================
+    // 座標・ズーム固定
+    // ==================================================
     const best = {
-        lat: 37.25,    // 北端緯度 (latMax)
-        lng: 138.3,    // 西端経度 (lonMin)
-        baseZoom: 7    // 描画ベースのズームレベル
+
+        lat: 37.25,
+        lng: 138.3,
+        baseZoom: 7
     };
 
-    function calcBounds() {
-        const z = window.map.getZoom();
-        const scale = Math.pow(2, z - best.baseZoom);
-        const size = 512 * scale; // 既存のピクセル換算ロジック
 
-        const topLeft = window.map.project([best.lat, best.lng], z);
-        const bottomRight = topLeft.add([size, size]);
+    function calcBounds() {
+
+        const z =
+            window.map.getZoom();
+
+        const scale =
+            Math.pow(
+                2,
+                z - best.baseZoom
+            );
+
+        const size =
+            512 * scale;
+
+
+        const topLeft =
+            window.map.project(
+                [best.lat, best.lng],
+                z
+            );
+
+        const bottomRight =
+            topLeft.add([
+                size,
+                size
+            ]);
+
 
         return L.latLngBounds(
-            window.map.unproject(topLeft, z),
-            window.map.unproject(bottomRight, z)
+
+            window.map.unproject(
+                topLeft,
+                z
+            ),
+
+            window.map.unproject(
+                bottomRight,
+                z
+            )
         );
     }
 
+
+    // ==================================================
+    // 透過率
+    // ==================================================
     const MAX_OPACITY = 0.6;
 
-// ==================================================
-// 雨雲レイヤーの透過率を強制適用
-// ==================================================
-function applyCrowdOpacity(layer, opacity = MAX_OPACITY) {
-    if (!layer) return;
 
-    layer.setOpacity(opacity);
-
-    const el = layer.getElement();
-    if (el) {
-        el.style.opacity = String(opacity);
-    }
-}
-
-window.crowdLayer = L.imageOverlay(
-    images[0].url,
-    calcBounds(),
-    {
-        pane: 'rainPane',
-        opacity: MAX_OPACITY
-    }
-).addTo(window.map);
-
-// 念のため生成直後にも透過率を強制適用
-applyCrowdOpacity(window.crowdLayer);
-
-// 画像ロード後にも再適用
-const initialCrowdImage = window.crowdLayer.getElement();
-
-if (initialCrowdImage) {
-    initialCrowdImage.addEventListener('load', function() {
-        if (window.crowdLayer) {
-            applyCrowdOpacity(window.crowdLayer);
-        }
-    }, { once: true });
-}
-
-    window.crowdZoomHandler = function() {
-        if (!window.crowdLayer) return;
-        window.crowdLayer.setBounds(calcBounds());
-    };
-
-    window.map.on("zoomend", window.crowdZoomHandler);
-
-    // =======================
-    // スライドショー開始
-    // =======================
-    if (window.crowdSlideTimer) {
-        clearInterval(window.crowdSlideTimer);
+    // ==================================================
+    // ★ fadeタイマー管理庫
+    // ==================================================
+    if (!window.crowdFadeTimers) {
+        window.crowdFadeTimers = new Set();
     }
 
-    window.crowdSlideTimer = setInterval(() => {
-        if (!window.radarEnabled) {
-            clearInterval(window.crowdSlideTimer);
-            return;
-        }
 
-        const oldLayer = window.crowdLayer;
-        currentIndex = (currentIndex + 1) % images.length;
-        const img = images[currentIndex];
+    // ==================================================
+    // 初期レイヤー生成
+    // ==================================================
+    const initialLayer =
+        L.imageOverlay(
 
-        cloudsUI.textContent = `雨雲レーダー ${img.displayHour}時`;
+            images[0].url,
 
-        const newLayer = L.imageOverlay(
-            img.url,
             calcBounds(),
+
             {
                 pane: 'rainPane',
-                opacity: 0
+                opacity: MAX_OPACITY
             }
-        ).addTo(window.map);
-const newCrowdImage = newLayer.getElement();
 
-if (newCrowdImage) {
-    newCrowdImage.style.opacity = '0';
-}
-        let opacity = 0;
-        const fade = setInterval(() => {
-            if (!window.crowdSlideTimer || !window.radarEnabled) {
-                clearInterval(fade); 
-                if (window.map.hasLayer(newLayer)) {
-                    window.map.removeLayer(newLayer);
+        ).addTo(window.map);
+
+
+    window.crowdLayer =
+        initialLayer;
+
+
+    // 念のため透過率を即時固定
+    initialLayer.setOpacity(
+        MAX_OPACITY
+    );
+
+
+    // ==================================================
+    // 画像ロード後にも透過率を再固定
+    // ==================================================
+    const initialImage =
+        initialLayer.getElement();
+
+
+    if (initialImage) {
+
+        initialImage.addEventListener(
+            'load',
+            () => {
+
+                if (
+                    myGeneration !==
+                    window.crowdRenderGeneration
+                ) {
+                    return;
                 }
+
+                if (
+                    window.crowdLayer ===
+                    initialLayer
+                ) {
+
+                    initialLayer.setOpacity(
+                        MAX_OPACITY
+                    );
+                }
+
+            },
+            { once: true }
+        );
+    }
+
+
+    // ==================================================
+    // Zoom変更
+    // ==================================================
+    window.crowdZoomHandler =
+        function() {
+
+            if (
+                myGeneration !==
+                window.crowdRenderGeneration
+            ) {
                 return;
             }
 
-            opacity += 0.06;
-
-if (opacity >= MAX_OPACITY) {
-    opacity = MAX_OPACITY;
-    clearInterval(fade);
-
-    if (oldLayer) {
-        window.map.removeLayer(oldLayer);
-    }
-
-    window.crowdLayer = newLayer;
-
-    // 最終状態を必ず0.6に固定
-    applyCrowdOpacity(window.crowdLayer, MAX_OPACITY);
-}
-
-            newLayer.setOpacity(opacity);
-            if (oldLayer) {
-                oldLayer.setOpacity(MAX_OPACITY - opacity);
+            if (!window.crowdLayer) {
+                return;
             }
-        }, 50);
 
-    }, 2500);
+            window.crowdLayer.setBounds(
+                calcBounds()
+            );
+        };
+
+
+    window.map.on(
+        "zoomend",
+        window.crowdZoomHandler
+    );
+
+
+    // ==================================================
+    // スライドタイマー
+    // ==================================================
+    window.crowdSlideTimer =
+        setInterval(() => {
+
+            // ------------------------------------------
+            // 古い世代なら即終了
+            // ------------------------------------------
+            if (
+                myGeneration !==
+                window.crowdRenderGeneration
+            ) {
+
+                clearInterval(
+                    window.crowdSlideTimer
+                );
+
+                return;
+            }
+
+
+            // ------------------------------------------
+            // OFFなら終了
+            // ------------------------------------------
+            if (!window.radarEnabled) {
+
+                clearInterval(
+                    window.crowdSlideTimer
+                );
+
+                return;
+            }
+
+
+            // ------------------------------------------
+            // 現在のレイヤー
+            // ------------------------------------------
+            const oldLayer =
+                window.crowdLayer;
+
+
+            // ------------------------------------------
+            // 次画像
+            // ------------------------------------------
+            currentIndex =
+                (currentIndex + 1)
+                % images.length;
+
+
+            const img =
+                images[currentIndex];
+
+
+            cloudsUI.textContent =
+                `雨雲レーダー ${img.displayHour}時`;
+
+
+            // ------------------------------------------
+            // 新レイヤー
+            // ------------------------------------------
+            const newLayer =
+                L.imageOverlay(
+
+                    img.url,
+
+                    calcBounds(),
+
+                    {
+                        pane: 'rainPane',
+                        opacity: 0
+                    }
+
+                ).addTo(window.map);
+
+
+            let opacity = 0;
+
+
+            // ------------------------------------------
+            // フェード
+            // ------------------------------------------
+            const fade =
+                setInterval(() => {
+
+                    // ==============================
+                    // ★ 古いrenderなら完全破棄
+                    // ==============================
+                    if (
+                        myGeneration !==
+                        window.crowdRenderGeneration
+                    ) {
+
+                        clearInterval(fade);
+
+                        window.crowdFadeTimers.delete(
+                            fade
+                        );
+
+                        if (
+                            window.map.hasLayer(
+                                newLayer
+                            )
+                        ) {
+
+                            window.map.removeLayer(
+                                newLayer
+                            );
+                        }
+
+                        return;
+                    }
+
+
+                    // ==============================
+                    // OFF / タイマー消滅
+                    // ==============================
+                    if (
+                        !window.radarEnabled ||
+                        !window.crowdSlideTimer
+                    ) {
+
+                        clearInterval(fade);
+
+                        window.crowdFadeTimers.delete(
+                            fade
+                        );
+
+                        if (
+                            window.map.hasLayer(
+                                newLayer
+                            )
+                        ) {
+
+                            window.map.removeLayer(
+                                newLayer
+                            );
+                        }
+
+                        return;
+                    }
+
+
+                    // ==============================
+                    // フェード
+                    // ==============================
+                    opacity += 0.06;
+
+
+                    if (
+                        opacity >=
+                        MAX_OPACITY
+                    ) {
+
+                        opacity =
+                            MAX_OPACITY;
+
+
+                        clearInterval(fade);
+
+                        window.crowdFadeTimers.delete(
+                            fade
+                        );
+
+
+                        // --------------------------------
+                        // 旧レイヤー削除
+                        // --------------------------------
+                        if (
+                            oldLayer &&
+                            window.map.hasLayer(
+                                oldLayer
+                            )
+                        ) {
+
+                            window.map.removeLayer(
+                                oldLayer
+                            );
+                        }
+
+
+                        // --------------------------------
+                        // 新レイヤーを正式採用
+                        // --------------------------------
+                        window.crowdLayer =
+                            newLayer;
+
+
+                        // --------------------------------
+                        // ★最終透過率を強制固定
+                        // --------------------------------
+                        newLayer.setOpacity(
+                            MAX_OPACITY
+                        );
+                    }
+
+
+                    // ==============================
+                    // 新レイヤー
+                    // ==============================
+                    newLayer.setOpacity(
+                        opacity
+                    );
+
+
+                    // ==============================
+                    // 旧レイヤー
+                    // ==============================
+                    if (
+                        oldLayer &&
+                        window.map.hasLayer(
+                            oldLayer
+                        )
+                    ) {
+
+                        oldLayer.setOpacity(
+                            MAX_OPACITY
+                            - opacity
+                        );
+                    }
+
+                }, 50);
+
+
+            // fadeを管理庫へ登録
+            window.crowdFadeTimers.add(
+                fade
+            );
+
+
+        }, 2500);
 }
 
 function removeCrowdImage() {
 
-    // =======================
+    // ==================================================
+    // ★描画世代を無効化
+    //
+    // これにより、すでに動いている古い
+    // slide / fade のコールバックを無効化する
+    // ==================================================
+    window.crowdRenderGeneration =
+        (window.crowdRenderGeneration || 0) + 1;
+
+
+    // ==================================================
     // スライド停止
-    // =======================
+    // ==================================================
     if (window.crowdSlideTimer) {
-        clearInterval(window.crowdSlideTimer);
+
+        clearInterval(
+            window.crowdSlideTimer
+        );
+
         window.crowdSlideTimer = null;
     }
 
-    // =======================
-    // レイヤ削除
-    // =======================
-    if (window.crowdLayer) {
-        window.map.removeLayer(window.crowdLayer);
-        window.crowdLayer = null;
+
+    // ==================================================
+    // ★フェード処理を全停止
+    // ==================================================
+    if (window.crowdFadeTimers) {
+
+        window.crowdFadeTimers.forEach(
+            timer => {
+
+                clearInterval(timer);
+            }
+        );
+
+        window.crowdFadeTimers.clear();
     }
 
-    if (window.crowdZoomHandler) {
-        window.map.off("zoomend", window.crowdZoomHandler);
-        window.crowdZoomHandler = null;
+
+    // ==================================================
+    // Zoomイベント解除
+    // ==================================================
+    if (
+        window.map &&
+        window.crowdZoomHandler
+    ) {
+
+        window.map.off(
+            "zoomend",
+            window.crowdZoomHandler
+        );
     }
 
-    // =======================
+    window.crowdZoomHandler = null;
+
+
+    // ==================================================
+    // ★雨雲レイヤーを削除
+    // ==================================================
+    if (window.map) {
+
+        const layersToRemove = [];
+
+
+        // ----------------------------------------------
+        // 現在のcrowdLayer
+        // ----------------------------------------------
+        if (window.crowdLayer) {
+
+            layersToRemove.push(
+                window.crowdLayer
+            );
+        }
+
+
+        // ----------------------------------------------
+        // rainPane内に残っている
+        // ImageOverlayも全回収
+        //
+        // これが「無限増殖対策」の本丸
+        // ----------------------------------------------
+        window.map.eachLayer(
+            layer => {
+
+                if (
+                    layer instanceof L.ImageOverlay &&
+                    layer.options &&
+                    layer.options.pane === 'rainPane'
+                ) {
+
+                    if (
+                        !layersToRemove.includes(
+                            layer
+                        )
+                    ) {
+
+                        layersToRemove.push(
+                            layer
+                        );
+                    }
+                }
+            }
+        );
+
+
+        // ----------------------------------------------
+        // 一括削除
+        // ----------------------------------------------
+        layersToRemove.forEach(
+            layer => {
+
+                if (
+                    window.map.hasLayer(
+                        layer
+                    )
+                ) {
+
+                    window.map.removeLayer(
+                        layer
+                    );
+                }
+            }
+        );
+    }
+
+
+    window.crowdLayer = null;
+
+
+    // ==================================================
     // header制御
-    // =======================
-    const header = document.querySelector('.menu-header-row');
-    if (!header) return;
+    // ==================================================
+    const header =
+        document.querySelector(
+            '.menu-header-row'
+        );
 
-    const cloudsUI = document.getElementById('cloudsUI');
-    const headerText = document.querySelector('.header-text');
-
-// 【抜粋】removeCrowdImage の中の後半部分は元通り、これだけでOK！
-    if (window.phase2Initialized) {
-        // phase2 → 左だけ消す
-        if (cloudsUI) cloudsUI.textContent = '';
-    } else {
-        // 通常 → 両方消す
-        if (cloudsUI) cloudsUI.textContent = '';
-        if (headerText) headerText.textContent = '';
+    if (!header) {
+        return;
     }
 
 
-    // =======================
-    // 表示制御
-    // =======================
-    const leftEmpty  = !cloudsUI || cloudsUI.textContent === '';
-    const rightEmpty = !headerText || headerText.textContent === '';
+    const cloudsUI =
+        document.getElementById(
+            'cloudsUI'
+        );
 
-    if (leftEmpty && rightEmpty) {
-        header.style.display = 'none';
+    const headerText =
+        document.querySelector(
+            '.header-text'
+        );
+
+
+    // ==================================================
+    // Phase2
+    // ==================================================
+    if (window.phase2Initialized) {
+
+        // Phase2では左側だけ消す
+        if (cloudsUI) {
+
+            cloudsUI.textContent = '';
+        }
+
     } else {
+
+        // 通常画面では両方消す
+        if (cloudsUI) {
+
+            cloudsUI.textContent = '';
+        }
+
+        if (headerText) {
+
+            headerText.textContent = '';
+        }
+    }
+
+
+    // ==================================================
+    // 表示制御
+    // ==================================================
+    const leftEmpty =
+        !cloudsUI ||
+        cloudsUI.textContent === '';
+
+    const rightEmpty =
+        !headerText ||
+        headerText.textContent === '';
+
+
+    if (
+        leftEmpty &&
+        rightEmpty
+    ) {
+
+        header.style.display = 'none';
+
+    } else {
+
         header.style.display = '';
     }
 }
-
-
 // ================================
 // ■ 地域選択用マーカーを「フェードアウト」で非表示にする関数
 // ================================
