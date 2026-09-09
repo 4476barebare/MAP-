@@ -773,7 +773,7 @@ if (typeof loadPrefectureData === 'function') {
                         if (typeof showPrefSpots === 'function') showPrefSpots();
                         if (typeof initAreaUI === 'function') initAreaUI();
                         if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        //if (typeof renderCrowdImage === 'function') renderCrowdImage();
                         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
                         if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
                         
@@ -2436,6 +2436,7 @@ async function routeUpdate() {
         if (typeof loadRegionMap === 'function') {
             await loadRegionMap(window.currentRegion || 'KANTO');
         }
+        //if (typeof renderCrowdImage === 'function') renderCrowdImage();
         return;
     }
 
@@ -2551,7 +2552,7 @@ async function routeUpdate() {
         // その後は通常のselectAreaに任せる
         if (typeof selectArea === 'function') {
             selectArea(area);
-            renderCrowdImage();
+           // renderCrowdImage();
         }
 
         return;
@@ -2593,9 +2594,7 @@ async function routeUpdate() {
                 if (typeof renderPrefWeather === 'function') {
                     renderPrefWeather();
                 }
-                if (typeof renderCrowdImage === 'function') {
-                    renderCrowdImage();
-                }
+
                 if (typeof disableAreaSwipe === 'function') {
                     disableAreaSwipe();
                 }
@@ -2618,6 +2617,7 @@ async function routeUpdate() {
 
         requestAnimationFrame(finalizePref);
     }
+    renderCrowdImage();
 }
 
 // ★ Region名の変換マッピング
@@ -2962,7 +2962,7 @@ function enablePrefSwipe() {
                         if (typeof showPrefSpots === 'function') showPrefSpots();
                         if (typeof initAreaUI === 'function') initAreaUI();
                         if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        //if (typeof renderCrowdImage === 'function') renderCrowdImage();
                         if (typeof renderPrefectureUI === 'function') renderPrefectureUI();
 
                         // 県スワイプをON、エリアスワイプをOFFにする
