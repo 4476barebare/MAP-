@@ -2877,7 +2877,7 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
     if (typeof destroyAreaUI === 'function') destroyAreaUI();
-    if (typeof removeCrowdImage === 'function') removeCrowdImage();
+    //if (typeof removeCrowdImage === 'function') removeCrowdImage();
     
     if (window.prefSpotLayer) {
         window.map.removeLayer(window.prefSpotLayer);
