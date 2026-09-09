@@ -832,7 +832,7 @@ function selectArea(area) {
         if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
-        clearSpotUI();
+        //clearSpotUI();
 
         
 
@@ -1294,7 +1294,7 @@ function enablePhase2(map) {
     }
     
     const runPhase2 = () => {
-        clearSpotUI();
+        //clearSpotUI();
         if (!window.phase2Initialized || window._isSnappingBack) return;
 
         if (window.phase2Timer) {
