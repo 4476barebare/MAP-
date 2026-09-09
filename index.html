@@ -1370,6 +1370,23 @@ function toWeatherIcon(code) {
 
 function renderCrowdImage() {
 
+    // マップ生成前に呼ばれた場合は、マップ生成後に再実行する
+    if (!window.map) {
+        if (!window._crowdRenderRetry) {
+            window._crowdRenderRetry = setInterval(() => {
+                if (window.map) {
+                    clearInterval(window._crowdRenderRetry);
+                    window._crowdRenderRetry = null;
+                    renderCrowdImage();
+                }
+            }, 100);
+        }
+        return;
+    }
+
+    // 初期状態はON
+    window.radarEnabled = true;
+
     // 初期状態はON
     if (typeof window.radarEnabled === 'undefined') {
         window.radarEnabled = true;
@@ -1408,11 +1425,12 @@ function renderCrowdImage() {
         
         if (header) header.style.display = '';
         if (cloudsUI) cloudsUI.textContent = '';
-        
-        // ★ 修正: todayTide が存在しない初期ロード時のエラーをガード
-        if (headerText && window.todayTide && window.todayTide.date) {
-            headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-        }
+if (window.todayTide) {
+    headerText.textContent =
+        formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+} else {
+    headerText.textContent = "";
+}
         
         if (btn) {
             btn.style.display = ''; 
@@ -1433,7 +1451,6 @@ function renderCrowdImage() {
     // =======================
     // Pane準備
     // =======================
-    if (!window.map) return;
     if (!window.map.getPane('rainPane')) {
         window.map.createPane('rainPane');
         const pane = window.map.getPane('rainPane');
@@ -1453,7 +1470,7 @@ function renderCrowdImage() {
     const slots = [0,3,6,9,12,15,18,21];
 
     // =======================
-    // スライド用データ作成（KANTO 固定）
+    // スライド用データ作成（★ KANTO 固定に変更）
     // =======================
     const images = [];
     let baseIndex = slots.findIndex(h => h > hour);
@@ -1478,6 +1495,7 @@ function renderCrowdImage() {
         const hh = String(slots[idx]).padStart(2,"0");
 
         images.push({
+            // ★ prefに依存せず、常に関東全域（KANTO）の画像を読み込む
             url: `js/crowdsimg/KANTO_${y}-${m}-${d}_${hh}.png`,
             displayHour: slots[idx] + ((dayOffset + extraDay) * 24)
         });
@@ -1496,35 +1514,29 @@ function renderCrowdImage() {
 
     header.style.display = '';
 
-    // ★ 修正: todayTide が未定義でも処理を止めずに安全にテキストを組み立てる
-    let tideText = "";
-    if (window.todayTide && window.todayTide.date) {
-        tideText = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
-    }
-
     if (window.phase2Initialized) {
         cloudsUI.textContent = '';
-        headerText.textContent = tideText;
+        headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
         return;
     }
 
     let currentIndex = 0;
     cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
-    headerText.textContent = tideText;
+    headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
 
     // =======================
-    // 座標とズームの完全固定化
+    // ★ 座標とズームの完全固定化（ログの fetch を廃止）
     // =======================
     const best = {
-        lat: 37.25,    
-        lng: 138.3,    
-        baseZoom: 7    
+        lat: 37.25,    // 北端緯度 (latMax)
+        lng: 138.3,    // 西端経度 (lonMin)
+        baseZoom: 7    // 描画ベースのズームレベル
     };
 
     function calcBounds() {
         const z = window.map.getZoom();
         const scale = Math.pow(2, z - best.baseZoom);
-        const size = 512 * scale; 
+        const size = 512 * scale; // 既存のピクセル換算ロジック
 
         const topLeft = window.map.project([best.lat, best.lng], z);
         const bottomRight = topLeft.add([size, size]);
@@ -1612,7 +1624,6 @@ function renderCrowdImage() {
 
     }, 2500);
 }
-
 
 function removeCrowdImage() {
 
@@ -2267,7 +2278,7 @@ function loadRegionMap() {
 
   //  showdebug("▷ フェッチ先: " + window.regionUrl);
 
-    fetch(window.regionUrl) 
+    return fetch(window.regionUrl) 
         .then(res => {
             if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
             return res.text();
