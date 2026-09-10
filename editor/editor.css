@@ -1,270 +1,173 @@
-　* {
-    box-sizing: border-box;
+/* ベース設定：白黒でシンプルに */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --border-color: #e0e0e0;
+  --tag-color: #0066cc; /* タグの色だけ青系に */
+  --highlight-bg: #f5f5f5;
+  --btn-bg: #f0f0f0;
 }
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-html,
 body {
-
-    width: 100%;
-    height: 100%;
-
-    margin: 0;
-    padding: 0;
-
-    overflow: hidden;
-
-    background: #1a1a1c;
-
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  /* スマホのキーボード高さを考慮した高さ設定 */
+  height: 100dvh; 
+  overflow: hidden;
 }
 
-
-/* =====================================================
-   ツールバー
-===================================================== */
-
-#toolbar {
-
-    position: fixed;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    height: 44px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 0 10px;
-
-    background: #000;
-
-    border-bottom: 1px solid #333;
-
-    z-index: 100;
-}
-
-
-#toolbar-left {
-
-    display: flex;
-
-    gap: 8px;
-}
-
-
+/* ボタン共通 */
 button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px;
+}
+.icon-btn { font-size: 20px; font-weight: bold; }
+.text-btn { font-size: 14px; font-weight: bold; }
 
-    border: 0;
+/* ヘッダー */
+#main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  z-index: 100;
+}
+.file-title { font-weight: bold; font-size: 16px;}
+.header-actions { display: flex; gap: 12px; }
 
-    background: transparent;
+/* サブヘッダー（入力時専用ツールバー） */
+#sub-header {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--highlight-bg);
+  transition: all 0.2s ease;
+}
+#sub-header.hidden {
+  display: none;
+}
+.spacer { flex: 1; }
 
-    color: #0a84ff;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-    padding: 7px 9px;
-
-    -webkit-tap-highlight-color: transparent;
+/* メイン編集エリア */
+#editor-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.code-block {
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+.code-block.active {
+  background-color: var(--highlight-bg);
+  border-left: 3px solid var(--text-color);
+}
+.tag {
+  color: var(--tag-color);
+  font-weight: bold;
 }
 
-
-#file-name-display {
-
-    max-width: 150px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-
-    color: #888;
-
-    font-size: 12px;
+/* チャット風入力エリア */
+#chat-input-area {
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  padding-bottom: env(safe-area-inset-bottom, 12px); /* iPhoneの下部バー対応 */
+}
+#chat-textarea {
+  flex: 1;
+  min-height: 40px;
+  max-height: 120px; /* 広がりすぎないように */
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 16px; /* スマホでのズーム防止 */
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  background-color: var(--highlight-bg);
+}
+#btn-send {
+  margin-left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--text-color);
+  color: var(--bg-color);
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-
-/* =====================================================
-   エディター
-===================================================== */
-
-#editor-container {
-
-    position: fixed;
-
-    top: 44px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    overflow: hidden;
+/* ドリルダウンメニュー（左からスライド） */
+#drawer-menu {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 85%;
+  max-width: 300px;
+  background-color: var(--bg-color);
+  border-right: 1px solid var(--border-color);
+  z-index: 200;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
-
-
-.CodeMirror {
-
-    width: 100%;
-    height: 100%;
-
-    background: #1a1a1c;
-
-    color: #d4d4d4;
-
-    font-family:
-        Menlo,
-        Monaco,
-        "Courier New",
-        monospace;
-
-    font-size: 8px;
-
-    line-height: 14px;
-
-    /*
-     * テキスト選択はiOSに任せる
-     */
-
-    -webkit-user-select: text;
-    user-select: text;
-
-    -webkit-touch-callout: default;
-
-    touch-action: manipulation;
+#drawer-menu.open {
+  transform: translateX(0);
 }
-
-
-.CodeMirror-scroll {
-
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-
-    -webkit-overflow-scrolling: touch;
+.drawer-header {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--highlight-bg);
 }
-
-
-/* =====================================================
-   行番号
-===================================================== */
-
-.CodeMirror-gutters {
-
-    background: #1a1a1c;
-
-    border: 0;
+.breadcrumb {
+  margin-left: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-color);
 }
-
-
-.CodeMirror-linenumber {
-
-    color: #555;
-
-    font-size: 8px;
+.element-list {
+  list-style: none;
+  flex: 1;
+  overflow-y: auto;
 }
-
-
-/* =====================================================
-   ★ 展開対象行
-===================================================== */
-
-/*
- * ▼や−は表示しない。
- *
- * この行そのものがタップ領域。
- */
-
-.code-fold-row {
-
-    -webkit-tap-highlight-color:
-        rgba(10, 132, 255, 0.12);
-
-    cursor: pointer;
+.element-item {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  font-family: monospace;
 }
-
-
-/*
- * 折り畳み対象行に
- * 記号を一切追加しない。
- */
-
-.code-fold-row::before {
-
-    display: none;
-    content: none;
-}
-
-
-/* =====================================================
-   選択
-===================================================== */
-
-.CodeMirror-selected {
-
-    background:
-        rgba(10, 132, 255, 0.25) !important;
-}
-
-
-/* =====================================================
-   構文色
-===================================================== */
-
-.cm-s-default .cm-comment {
-    color: #777;
-}
-
-.cm-s-default .cm-string {
-    color: #c88251;
-}
-
-.cm-s-default .cm-keyword {
-    color: #569cd6;
-}
-
-.cm-s-default .cm-def {
-    color: #569cd6;
-}
-
-.cm-s-default .cm-number {
-    color: #b5cea8;
-}
-
-.cm-s-default .cm-variable-2 {
-    color: #a381d6;
-}
-
-.cm-s-default .cm-tag {
-    color: #569cd6;
-}
-
-.cm-s-default .cm-attribute {
-    color: #4ec9b0;
-}
-
-
-/* =====================================================
-   CodeMirror入力欄
-===================================================== */
-
-/*
- * 通常時はCodeMirrorの入力欄を
- * 編集対象として扱わない。
- */
-
-.CodeMirror textarea,
-.CodeMirror input {
-
-    -webkit-user-select: text !important;
-
-    user-select: text !important;
+.add-btn {
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
 }
