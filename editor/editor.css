@@ -2,31 +2,29 @@
   --bg-color: #ffffff;
   --text-color: #111111;
   --tag-color: #0066cc;
-  --highlight-bg: #f8f9fa; /* メイン背景の薄いグレー */
+  --highlight-bg: #f8f9fa;
   --icon-color: #444444;
-  
-  /* 統一されたグレーのアクティブ枠色（より静かで洗練されたトーン） */
   --active-ring: #bbbbbb; 
   
-  /* シャドウ定義 */
   --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-block: 0 1px 4px rgba(0, 0, 0, 0.05);
   --shadow-active: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --shadow-input-pill: 0 8px 24px rgba(0, 0, 0, 0.15); /* チャット欄専用の深い影 */
+  --shadow-input-pill: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* 画面全体のレイアウト固定（スクロールさせない） */
+/* 🌟重要：画面全体を絶対に動かさない設定（ヘッダー逃亡防止） */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--highlight-bg); 
   color: var(--text-color);
   display: flex;
   flex-direction: column;
-  height: 100dvh; 
-  overflow: hidden; /* body自体は絶対にスクロールしない */
-  position: relative; /* チャット欄を絶対配置するための基準 */
+  position: fixed; /* 物理的に画面をピン留め */
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100dvh; 
+  overflow: hidden; 
 }
 
 button {
@@ -41,15 +39,14 @@ button {
   stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
 }
 
-
-/* ヘッダー＆ツールバー（上部に完全に固定） */
+/* ヘッダー＆ツールバー */
 #main-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 12px;
   background-color: var(--bg-color);
   box-shadow: var(--shadow-header);
   z-index: 100;
-  flex-shrink: 0; /* ★追加：スクロールで押し出されず、絶対に高さを維持する */
+  flex-shrink: 0; /* 縮み防止 */
 }
 .file-title { font-weight: bold; font-size: 14px; }
 .header-actions { display: flex; gap: 12px; }
@@ -61,73 +58,54 @@ button {
   box-shadow: var(--shadow-header);
   transition: all 0.2s ease;
   z-index: 99;
-  flex-shrink: 0; /* ★追加：完全固定 */
-  
-  /* ★追加：ボタンが増えた時のために横スクロールを許可（スクロールバーは隠す） */
+  flex-shrink: 0;
+  /* スマホ画面よりボタンが多い場合は横スクロール */
   overflow-x: auto; 
   -webkit-overflow-scrolling: touch;
 }
 #sub-header.hidden { display: none; }
-#sub-header::-webkit-scrollbar { display: none; /* 見た目をスッキリさせる */ }
-
-.divider { width: 1px; height: 16px; background-color: #ddd; margin: 0 4px; flex-shrink: 0; }
+#sub-header::-webkit-scrollbar { display: none; }
+.divider { width: 1px; height: 16px; background-color: #ddd; margin: 0 4px; flex-shrink: 0;}
 .icon-btn { color: var(--icon-color); flex-shrink: 0; }
 
-/* メイン編集エリア（裏側でスクロールする） */
+/* メイン編集エリア */
 #editor-area {
   flex: 1; 
-  overflow-y: auto; /* ここだけがスクロールする */
+  overflow-y: auto; 
+  -webkit-overflow-scrolling: touch;
   padding: 6px; 
-  padding-bottom: 140px; /* 浮かんだチャット欄の下に文字が隠れないよう、底に大きな余白を確保 */
+  padding-bottom: 140px; /* チャット欄の下に隠れないための余白 */
   font-family: monospace;
   font-size: 8px; 
   line-height: 1.4;
   -webkit-text-size-adjust: none; 
 }
 
-/* コードブロック */
 .code-block {
-  margin-bottom: 6px;
-  padding: 6px;
-  border-radius: 6px;
-  background-color: var(--bg-color);
-  box-shadow: var(--shadow-block);
+  margin-bottom: 6px; padding: 6px; border-radius: 6px;
+  background-color: var(--bg-color); box-shadow: var(--shadow-block);
   transition: all 0.2s ease;
 }
-/* アクティブ時の色を黒からグレー（--active-ring）へ変更 */
 .code-block.active {
   box-shadow: 0 0 0 1.5px var(--active-ring), var(--shadow-active);
   transform: translateY(-1px);
 }
 .tag { color: var(--tag-color); font-weight: bold; }
 
-/* ーーーーーーーーーーーーーーーーーーーーーーーーー
-   チャット欄（フローティングUI）
-   ーーーーーーーーーーーーーーーーーーーーーーーーー */
+/* チャット欄（フローティング） */
 #chat-input-area {
-  position: absolute; /* 画面最下部に絶対配置して浮かせる */
-  bottom: 0; left: 0; width: 100%;
-  padding: 12px;
-  padding-bottom: env(safe-area-inset-bottom, 12px);
+  position: absolute; bottom: 0; left: 0; width: 100%;
+  padding: 12px; padding-bottom: env(safe-area-inset-bottom, 12px);
   z-index: 100;
-  
-  /* スクロールする文字が下部で自然に消えるようなグラデーションマスク */
   background: linear-gradient(to bottom, rgba(248,249,250,0) 0%, rgba(248,249,250,0.8) 30%, rgba(248,249,250,1) 100%);
-  pointer-events: none; /* 余白部分はタップを貫通させる */
+  pointer-events: none; 
 }
-
-/* 入力エリア本体（影をつけて浮かせる） */
-.chat-input-wrapper { 
-  position: relative; 
-  width: 100%; 
-  pointer-events: auto; /* ここだけタップを有効化 */
-}
+.chat-input-wrapper { position: relative; width: 100%; pointer-events: auto; }
 
 #chat-textarea {
   width: 100%;
   min-height: 40px; max-height: 120px;
   border: none;
-  /* 外側のボーダーを廃止し、美しい深い影（shadow-input-pill）だけを適用 */
   box-shadow: var(--shadow-input-pill); 
   border-radius: 20px;
   padding: 10px 44px 10px 16px; 
@@ -137,22 +115,17 @@ button {
   box-sizing: border-box; 
   transition: box-shadow 0.2s;
 }
-/* フォーカス時も統一グレー（--active-ring）を使用 */
-#chat-textarea:focus { 
-  box-shadow: 0 0 0 1.5px var(--active-ring), var(--shadow-input-pill); 
-}
+#chat-textarea:focus { box-shadow: 0 0 0 1.5px var(--active-ring), var(--shadow-input-pill); }
 
 #btn-send {
   position: absolute; right: 4px; bottom: 4px;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background-color: var(--text-color);
-  color: var(--bg-color);
+  width: 32px; height: 32px; border-radius: 50%;
+  background-color: var(--text-color); color: var(--bg-color);
   transition: transform 0.1s;
 }
 #btn-send:active { transform: scale(0.9); }
 
-/* ドリルダウンメニュー（変更なし） */
+/* メニュー */
 #drawer-menu { 
   position: absolute; top: 0; left: 0; bottom: 0; width: 85%; max-width: 300px;
   background-color: var(--bg-color); box-shadow: 4px 0 16px rgba(0,0,0,0.1);
