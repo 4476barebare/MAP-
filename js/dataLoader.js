@@ -3138,9 +3138,9 @@ function goBack() {
         if (alertBar) alertBar.textContent = "";
 
         setTimeout(() => {
-            showdebug('A');
+             //showdebug('A');
             loadRegionMap(regionToLoad);
-            showdebug('B');
+             //showdebug('B');
             
             if (typeof renderCrowdImage === 'function') {
                 renderCrowdImage();
@@ -3148,11 +3148,11 @@ function goBack() {
         }, 10);
 
         setTimeout(() => {
-            showdebug('C');
+             //showdebug('C');
             if (typeof showPrefSpots === 'function') {
                 showPrefSpots();
             }
-            showdebug('D');
+             //showdebug('D');
             
             // 👇 【修正】ここでちゃんと backBtn を定義してあげる
             const backBtn = document.getElementById('map-back-btn');
@@ -3160,7 +3160,7 @@ function goBack() {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
-            showdebug('E');
+             //showdebug('E');
             
             window.goBackGuard = false; 
         }, 300);
