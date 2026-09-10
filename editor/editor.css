@@ -41,6 +41,7 @@ button {
   stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
 }
 
+
 /* ヘッダー＆ツールバー（上部に完全に固定） */
 #main-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -48,6 +49,7 @@ button {
   background-color: var(--bg-color);
   box-shadow: var(--shadow-header);
   z-index: 100;
+  flex-shrink: 0; /* ★追加：スクロールで押し出されず、絶対に高さを維持する */
 }
 .file-title { font-weight: bold; font-size: 14px; }
 .header-actions { display: flex; gap: 12px; }
@@ -59,10 +61,17 @@ button {
   box-shadow: var(--shadow-header);
   transition: all 0.2s ease;
   z-index: 99;
+  flex-shrink: 0; /* ★追加：完全固定 */
+  
+  /* ★追加：ボタンが増えた時のために横スクロールを許可（スクロールバーは隠す） */
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch;
 }
 #sub-header.hidden { display: none; }
-.divider { width: 1px; height: 16px; background-color: #ddd; margin: 0 4px; }
-.icon-btn { color: var(--icon-color); }
+#sub-header::-webkit-scrollbar { display: none; /* 見た目をスッキリさせる */ }
+
+.divider { width: 1px; height: 16px; background-color: #ddd; margin: 0 4px; flex-shrink: 0; }
+.icon-btn { color: var(--icon-color); flex-shrink: 0; }
 
 /* メイン編集エリア（裏側でスクロールする） */
 #editor-area {
