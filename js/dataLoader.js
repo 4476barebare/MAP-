@@ -3089,27 +3089,34 @@ function goBack() {
     // 共通処理：UIを再表示する（※ロック解除はしない）
     // =====================================
     let isReleased = false;
-    const showBackBtnOnly = () => {
-        if (isReleased) return;
-        isReleased = true;
-        // ★ 削除：ここにあった window.goBackGuard = false; を消去
-        const backBtn = document.getElementById('map-back-btn');
-        if (backBtn) {
-            backBtn.style.display = 'block';
-            requestAnimationFrame(() => {
-                backBtn.style.transition = 'opacity 0.4s ease';
-                btn.style.pointerEvents = 'auto';
-                backBtn.style.opacity = '1';
-                backBtn.style.pointerEvents = 'auto'; 
-            });
-        }
-    };
+const showBackBtnOnly = () => {
+    if (isReleased) return;
+    isReleased = true;
+
+    const backBtn = document.getElementById('map-back-btn');
+
+    if (backBtn) {
+        backBtn.style.display = 'block';
+        backBtn.style.pointerEvents = 'auto';
+
+        requestAnimationFrame(() => {
+            backBtn.style.transition = 'opacity 0.4s ease';
+            backBtn.style.opacity = '1';
+        });
+    }
+};
 
 // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
 if (!window.currentAreaId && !window.currentSpotId) {
+
     lockAndHideUI();
 
     const regionToLoad = window.currentRegion || 'KANTO';
+
+    // Regionクリックを先に完全停止
+    if (window.map && window.regionNearestClickHandler) {
+        window.map.off('click', window.regionNearestClickHandler);
+    }
 
     setIdealQuery('pref', null);
     setIdealQuery('area', null);
@@ -3145,33 +3152,45 @@ if (!window.currentAreaId && !window.currentSpotId) {
     const alertBar = document.getElementById("alert-bar");
     if (alertBar) alertBar.textContent = "";
 
-    // -----------------------------------------
-    // Regionへの復帰が完全に終わってから後処理
-    // -----------------------------------------
-    Promise.resolve(loadRegionMap(regionToLoad))
-        .then(() => {
+    loadRegionMap(regionToLoad);
 
-            // Region用マーカー状態へ戻す
-            showPrefSpots();
+    showPrefSpots();
 
-            // 戻るボタンはRegionでは非表示
-            const backBtn = document.getElementById('map-back-btn');
+    // Regionの移動が終わってからクリックを復帰
+    const releaseRegion = () => {
 
-            if (backBtn) {
-                backBtn.style.opacity = '0';
-                backBtn.style.pointerEvents = 'none';
-                backBtn.style.display = 'none';
-            }
+        if (window.currentPref) return;
 
-            // 最後にガード解除
-            window.goBackGuard = false;
-        })
-        .catch(() => {
-            window.goBackGuard = false;
-        });
+        if (window.map && window.regionNearestClickHandler) {
+            window.map.off('click', window.regionNearestClickHandler);
+            window.map.on('click', window.regionNearestClickHandler);
+        }
+
+        const backBtn = document.getElementById('map-back-btn');
+
+        if (backBtn) {
+            backBtn.style.opacity = '0';
+            backBtn.style.pointerEvents = 'none';
+            backBtn.style.display = 'none';
+        }
+
+        window.goBackGuard = false;
+    };
+
+    window.map.once('moveend', releaseRegion);
+
+    // すでに目的地にいる場合
+    if (
+        window.map.getZoom() === window.regionData?.zoom &&
+        Math.abs(window.map.getCenter().lat - window.regionData?.lat) < 0.0001 &&
+        Math.abs(window.map.getCenter().lng - window.regionData?.lng) < 0.0001
+    ) {
+        setTimeout(releaseRegion, 50);
+    }
 
     return;
 }
+
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
     if (window.currentSpotId != null) {
         lockAndHideUI(); // ★ ガード開始
