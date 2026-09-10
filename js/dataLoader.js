@@ -3146,6 +3146,11 @@ function goBack() {
             if (typeof renderCrowdImage === 'function') {
                 renderCrowdImage();
             }
+            if (backBtn) {
+                backBtn.style.display = 'none';
+                backBtn.style.pointerEvents = 'auto';
+            }
+            showPrefSpots();
         }, 10);
 
         setTimeout(() => {
