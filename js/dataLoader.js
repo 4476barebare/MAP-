@@ -3102,52 +3102,73 @@ function goBack() {
         }
     };
 
-    // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
-    if (!window.currentAreaId && !window.currentSpotId) {
-        lockAndHideUI(); // ★ ガード開始
+// ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
+if (!window.currentAreaId && !window.currentSpotId) {
+    lockAndHideUI();
 
-        const regionToLoad = window.currentRegion || 'KANTO';
+    const regionToLoad = window.currentRegion || 'KANTO';
 
-        setIdealQuery('pref', null);
-        setIdealQuery('area', null);
-        setIdealQuery('spot', null);
+    setIdealQuery('pref', null);
+    setIdealQuery('area', null);
+    setIdealQuery('spot', null);
 
-        window.currentPref = null;
-        window.prefData = null;
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-        
-        window.prefBounds = null;
-        window.areaBounds = null;
+    window.currentPref = null;
+    window.prefData = null;
+    window.currentAreaId = null;
+    window.currentSpotId = null;
 
-        if (typeof destroyAreaUI === 'function') destroyAreaUI();
-        //if (typeof removeCrowdImage === 'function') removeCrowdImage();
-        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
-        if (window.phase1Group) window.phase1Group.clearLayers();
-        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-        if (window.prefSpotLayer) {
-            window.map.removeLayer(window.prefSpotLayer);
-            window.prefSpotLayer = null;
-        }
-        
-        const alertBar = document.getElementById("alert-bar");
-        if (alertBar) alertBar.textContent = "";
+    window.prefBounds = null;
+    window.areaBounds = null;
 
-        setTimeout(() => {
-            const backBtn = document.getElementById('map-back-btn');
-            if (backBtn) {
-                backBtn.style.display = 'none';
-                backBtn.style.pointerEvents = 'auto';
-            }
-            // ★ 例外：⓪は selectArea等に飛ばないので、ここで手動解除する
-            window.goBackGuard = false; 
-        }, 300);
+    if (typeof destroyAreaUI === 'function') destroyAreaUI();
 
-        loadRegionMap(regionToLoad);
-        showPrefSpots();
-        return;
+    if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
+        window.markerControl.clearLayers();
     }
 
+    if (window.phase1Group) {
+        window.phase1Group.clearLayers();
+    }
+
+    if (window.areaSpotLayer) {
+        window.areaSpotLayer.clearLayers();
+    }
+
+    if (window.prefSpotLayer) {
+        window.map.removeLayer(window.prefSpotLayer);
+        window.prefSpotLayer = null;
+    }
+
+    const alertBar = document.getElementById("alert-bar");
+    if (alertBar) alertBar.textContent = "";
+
+    // -----------------------------------------
+    // Regionへの復帰が完全に終わってから後処理
+    // -----------------------------------------
+    Promise.resolve(loadRegionMap(regionToLoad))
+        .then(() => {
+
+            // Region用マーカー状態へ戻す
+            showPrefSpots();
+
+            // 戻るボタンはRegionでは非表示
+            const backBtn = document.getElementById('map-back-btn');
+
+            if (backBtn) {
+                backBtn.style.opacity = '0';
+                backBtn.style.pointerEvents = 'none';
+                backBtn.style.display = 'none';
+            }
+
+            // 最後にガード解除
+            window.goBackGuard = false;
+        })
+        .catch(() => {
+            window.goBackGuard = false;
+        });
+
+    return;
+}
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
     if (window.currentSpotId != null) {
         lockAndHideUI(); // ★ ガード開始
