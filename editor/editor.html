@@ -14,7 +14,7 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.css">
     <style>
         /* =====================================================
-           画面全体
+           全体
         ====================================================== */
         html,
         body {
@@ -24,7 +24,7 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            background: #121212;
+            background-color: #121212;
             font-family:
                 -apple-system,
                 BlinkMacSystemFont,
@@ -32,7 +32,7 @@
             overflow: hidden;
         }
         /* =====================================================
-           ヘッダー
+           ツールバー
         ====================================================== */
         #toolbar {
             min-height: 44px;
@@ -41,7 +41,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #000;
+            background-color: #000000;
             border-bottom: 1px solid #333;
             user-select: none;
         }
@@ -53,18 +53,19 @@
             padding: 6px 10px;
             border: none;
             border-radius: 5px;
-            background: transparent;
+            background-color: transparent;
             color: #0A84FF;
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
         }
         button:active {
-            background: rgba(10, 132, 255, 0.2);
+            background-color:
+                rgba(10, 132, 255, 0.2);
         }
         #file-name-display {
             max-width: 110px;
-            color: #fff;
+            color: #ffffff;
             font-size: 12px;
             font-weight: bold;
             white-space: nowrap;
@@ -72,13 +73,12 @@
             text-overflow: ellipsis;
         }
         /* =====================================================
-           メインエディタ
+           エディタ
         ====================================================== */
         #editor-container {
-            position: relative;
             flex: 1;
-            width: 100%;
             min-height: 0;
+            width: 100%;
             overflow: hidden;
         }
         .CodeMirror {
@@ -91,11 +91,16 @@
                 monospace;
             font-size: 8px;
             line-height: 14px;
-            -webkit-user-select: auto !important;
-            user-select: text;
+            /*
+             * iOS標準のテキスト選択を優先
+             */
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            -webkit-touch-callout: default;
+            touch-action: manipulation;
         }
         /* =====================================================
-           メインエディタのスクロール
+           メインスクロール
         ====================================================== */
         .CodeMirror-scroll {
             overflow-x: auto !important;
@@ -103,16 +108,16 @@
             -webkit-overflow-scrolling: touch;
         }
         /* =====================================================
-           カスタムテーマ
+           テーマ
         ====================================================== */
         .cm-s-custom.CodeMirror {
-            background: #1a1a1c;
+            background-color: #1a1a1c;
             color: #d4d4d4;
             font-size: 8px;
             line-height: 14px;
         }
         .cm-s-custom .CodeMirror-gutters {
-            background: #1a1a1c;
+            background-color: #1a1a1c;
             border-right: none;
         }
         .cm-s-custom .CodeMirror-linenumber {
@@ -120,7 +125,7 @@
             font-size: 8px;
         }
         /* =====================================================
-           構文色
+           構文カラー
         ====================================================== */
         .cm-s-custom .cm-comment {
             color: #7a7a7a;
@@ -148,25 +153,25 @@
             color: #4ec9b0;
         }
         /* =====================================================
-           折り畳みマーカー
-           
-           通常の展開動作は使わない。
-           タップするとポップアップを開く。
+           折り畳みガター
         ====================================================== */
         .CodeMirror-foldgutter {
-            width: 22px;
+            width: 24px;
         }
+        /*
+         * ▼ / ▶ 自体は小さく表示
+         */
         .CodeMirror-foldgutter-open,
         .CodeMirror-foldgutter-folded {
-            width: 22px;
-            min-width: 22px;
+            width: 24px;
+            min-width: 24px;
             position: relative;
             cursor: pointer;
         }
         .CodeMirror-foldgutter-open:after {
             content: "▼";
             position: absolute;
-            left: 5px;
+            left: 7px;
             top: 50%;
             transform: translateY(-50%);
             color: #5a5a5f;
@@ -175,7 +180,7 @@
         .CodeMirror-foldgutter-folded:after {
             content: "▶";
             position: absolute;
-            left: 5px;
+            left: 7px;
             top: 50%;
             transform: translateY(-50%);
             color: #0A84FF;
@@ -187,114 +192,20 @@
             font-size: 8px;
             padding: 0 4px;
         }
-        /* =====================================================
-           ★ ポップアップ
-        ====================================================== */
-        #edit-popup {
-            display: none;
-            position: fixed;
-            z-index: 99999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.72);
-            box-sizing: border-box;
-            padding: 12px;
-        }
-        #edit-popup.active {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        /* =====================================================
-           ポップアップ本体
-        ====================================================== */
-        #edit-popup-inner {
-            width: 100%;
-            height: 88%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            background: #1a1a1c;
-            border: 1px solid #444;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow:
-                0 10px 40px rgba(0, 0, 0, 0.7);
-        }
-        /* =====================================================
-           ポップアップヘッダー
-        ====================================================== */
-        #edit-popup-header {
-            min-height: 42px;
-            padding: 0 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #000;
-            border-bottom: 1px solid #333;
-        }
-        #edit-popup-title {
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        #edit-popup-buttons {
-            display: flex;
-            gap: 4px;
-        }
-        #edit-popup-buttons button {
-            font-size: 13px;
-            padding: 6px 9px;
-        }
-        #popup-cancel {
-            color: #aaa;
-        }
-        #popup-apply {
-            color: #0A84FF;
-        }
-        /* =====================================================
-           ポップアップエディタ
-        ====================================================== */
-        #popup-editor-container {
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-        }
-        #popup-editor-container .CodeMirror {
-            width: 100%;
-            height: 100%;
-            font-size: 12px;
-            line-height: 18px;
-        }
-        #popup-editor-container .CodeMirror-scroll {
-            overflow-x: auto !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch;
-        }
-        #popup-editor-container .CodeMirror-linenumber {
-            font-size: 12px;
-        }
-        /* =====================================================
-           ポップアップ内の選択・入力
-        ====================================================== */
-        #popup-editor-container .CodeMirror {
-            -webkit-user-select: text !important;
-            user-select: text !important;
-        }
     </style>
 </head>
 <body>
     <!-- =====================================================
-         ヘッダー
+         ツールバー
     ====================================================== -->
     <div id="toolbar">
         <div class="button-group">
-            <button onclick="document.getElementById('file-input').click()">
+            <button
+                onclick="document.getElementById('file-input').click()">
                 📂 開く
             </button>
-            <button onclick="downloadFile()">
+            <button
+                onclick="downloadFile()">
                 💾 保存
             </button>
         </div>
@@ -311,34 +222,9 @@
         </div>
     </div>
     <!-- =====================================================
-         メインエディタ
+         エディタ
     ====================================================== -->
     <div id="editor-container"></div>
-    <!-- =====================================================
-         編集ポップアップ
-    ====================================================== -->
-    <div id="edit-popup">
-        <div id="edit-popup-inner">
-            <div id="edit-popup-header">
-                <div id="edit-popup-title">
-                    ブロック編集
-                </div>
-                <div id="edit-popup-buttons">
-                    <button
-                        id="popup-cancel"
-                        onclick="closeEditPopup(false)">
-                        キャンセル
-                    </button>
-                    <button
-                        id="popup-apply"
-                        onclick="closeEditPopup(true)">
-                        適用
-                    </button>
-                </div>
-            </div>
-            <div id="popup-editor-container"></div>
-        </div>
-    </div>
     <!-- =====================================================
          CodeMirror
     ====================================================== -->
@@ -357,7 +243,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/xml-fold.min.js"></script>
     <script>
         /* =====================================================
-           現在のファイル
+           ファイル名
         ====================================================== */
         let currentFileName = 'untitled.js';
         /* =====================================================
@@ -372,19 +258,31 @@
             'txt': 'null'
         };
         /* =====================================================
-           メインエディタ
+           エディタ
         ====================================================== */
         const editor = CodeMirror(
-            document.getElementById('editor-container'),
+            document.getElementById(
+                'editor-container'
+            ),
             {
                 value:
                     "// ここにコードをペーストするか、ファイルを開いてください",
                 mode: "javascript",
                 theme: "custom",
                 lineNumbers: true,
+                /*
+                 * 長いコードを横方向にも
+                 * スクロールできるようにする。
+                 */
                 lineWrapping: false,
+                /*
+                 * iOS標準入力
+                 */
                 inputStyle: "contenteditable",
                 spellcheck: false,
+                /*
+                 * 折り畳み
+                 */
                 foldGutter: true,
                 gutters: [
                     "CodeMirror-linenumbers",
@@ -393,258 +291,62 @@
             }
         );
         /* =====================================================
-           ポップアップ用エディタ
-        ====================================================== */
-        let popupEditor = null;
-        /* =====================================================
-           現在編集中の範囲
-        ====================================================== */
-        let popupFrom = null;
-        let popupTo = null;
-        /* =====================================================
-           折り畳みを全部閉じる
-        ====================================================== */
-        function foldAll() {
-            editor.operation(function() {
-                for (
-                    let i = 0;
-                    i < editor.lineCount();
-                    i++
-                ) {
-                    const widget =
-                        editor.getOption('foldGutter')
-                            ? editor.getLineHandle(i)
-                            : null;
-                    editor.foldCode(
-                        CodeMirror.Pos(i, 0),
-                        null,
-                        "fold"
-                    );
-                }
-            });
-        }
-        /* =====================================================
-           ★ 折り畳み部分をタップした時
+           ★ 折り畳みガターのタップ範囲を拡大
            
-           通常の展開はさせず、
-           その範囲をポップアップへ送る。
-        ====================================================== */
-        editor.on(
-            "gutterClick",
-            function(cm, line, gutter) {
-                if (
-                    gutter !== "CodeMirror-foldgutter"
-                ) {
-                    return;
-                }
-                const pos =
-                    CodeMirror.Pos(line, 0);
-                /*
-                 * 現在その位置に折り畳みがあるか確認
-                 */
-                const lineHandle =
-                    cm.getLineHandle(line);
-                const widgets =
-                    lineHandle.widgets;
-                if (
-                    widgets &&
-                    widgets.length
-                ) {
-                    for (
-                        let i = 0;
-                        i < widgets.length;
-                        i++
-                    ) {
-                        const widget =
-                            widgets[i];
-                        if (
-                            widget &&
-                            widget.__isCustomPopupFold
-                        ) {
-                            return;
-                        }
-                    }
-                }
-                /*
-                 * auto fold helperから
-                 * この位置の折り畳み範囲を取得
-                 */
-                let range = null;
-                if (
-                    CodeMirror.fold &&
-                    CodeMirror.fold.auto
-                ) {
-                    range =
-                        CodeMirror.fold.auto(
-                            cm,
-                            pos
-                        );
-                }
-                /*
-                 * 範囲が取得できなければ終了
-                 */
-                if (!range) {
-                    return;
-                }
-                /*
-                 * ポップアップ表示
-                 */
-                openEditPopup(
-                    range.from,
-                    range.to
-                );
-            }
-        );
-        /* =====================================================
-           ★ 通常の折り畳みクリックを阻止
+           ▼ / ▶ のある行全体をタップ対象にする。
            
-           foldGutterの通常動作を止める。
+           ただし通常のコード編集部分まで
+           折り畳み操作にはしない。
         ====================================================== */
-        editor.on(
-            "gutterClick",
-            function(cm, line, gutter) {
-                if (
-                    gutter === "CodeMirror-foldgutter"
-                ) {
+        editor.getWrapperElement()
+            .addEventListener(
+                "click",
+                function(event) {
+                    const target =
+                        event.target;
                     /*
-                     * CodeMirror標準の
-                     * fold/unfoldは使用しない。
+                     * 折り畳みガター内を
+                     * タップした場合だけ処理
                      */
-                }
-            }
-        );
-        /* =====================================================
-           ★ ポップアップを開く
-        ====================================================== */
-        function openEditPopup(from, to) {
-            popupFrom = from;
-            popupTo = to;
-            /*
-             * 折り畳み対象のコードを取得
-             *
-             * from行からto行まで。
-             */
-            const text =
-                editor.getRange(
-                    from,
-                    CodeMirror.Pos(
-                        to.line + 1,
-                        0
-                    )
-                );
-            /*
-             * ポップアップタイトル
-             */
-            document.getElementById(
-                'edit-popup-title'
-            ).textContent =
-                'ブロック編集　' +
-                (from.line + 1) +
-                '〜' +
-                (to.line + 1) +
-                '行';
-            /*
-             * 既存ポップアップエディタを破棄
-             */
-            if (popupEditor) {
-                popupEditor.toTextArea();
-                popupEditor = null;
-            }
-            /*
-             * ポップアップエディタ生成
-             */
-            popupEditor =
-                CodeMirror(
-                    document.getElementById(
-                        'popup-editor-container'
-                    ),
-                    {
-                        value: text,
-                        mode:
-                            editor.getOption(
-                                "mode"
-                            ),
-                        theme: "custom",
-                        lineNumbers: true,
-                        lineWrapping: false,
-                        inputStyle: "contenteditable",
-                        spellcheck: false
+                    const gutter =
+                        target.closest(
+                            ".CodeMirror-foldgutter"
+                        );
+                    if (!gutter) {
+                        return;
                     }
-                );
-            /*
-             * 表示
-             */
-            document
-                .getElementById('edit-popup')
-                .classList.add('active');
-            /*
-             * iPhoneで表示直後に
-             * サイズ計算させる。
-             */
-            setTimeout(function() {
-                if (popupEditor) {
-                    popupEditor.refresh();
-                    popupEditor.focus();
-                }
-            }, 50);
-        }
+                    /*
+                     * CodeMirror側の
+                     * 標準処理を利用する。
+                     */
+                },
+                true
+            );
         /* =====================================================
-           ★ ポップアップを閉じる
-           
-           apply=trueなら元コードへ反映。
+           ★ 折り畳みガターの幅を
+             実質的なタップ領域として確保
         ====================================================== */
-        function closeEditPopup(apply) {
-            if (!popupEditor) {
-                document
-                    .getElementById('edit-popup')
-                    .classList.remove('active');
-                return;
-            }
-            /*
-             * 変更を反映
-             */
-            if (
-                apply &&
-                popupFrom &&
-                popupTo
-            ) {
-                const newText =
-                    popupEditor.getValue();
-                editor.operation(function() {
-                    editor.replaceRange(
-                        newText,
-                        popupFrom,
-                        CodeMirror.Pos(
-                            popupTo.line + 1,
-                            0
-                        )
-                    );
-                });
-                /*
-                 * コードが変わったので
-                 * もう一度折り畳みを作り直す。
-                 */
-                setTimeout(function() {
-                    foldAll();
-                }, 100);
-            }
-            /*
-             * ポップアップを閉じる
-             */
-            document
-                .getElementById('edit-popup')
-                .classList.remove('active');
-            /*
-             * エディタ破棄
-             */
-            popupEditor = null;
-            popupFrom = null;
-            popupTo = null;
-            /*
-             * メインエディタへ戻す
-             */
-            editor.refresh();
-        }
+        editor.getWrapperElement()
+            .addEventListener(
+                "touchstart",
+                function(event) {
+                    const target =
+                        event.target;
+                    const gutter =
+                        target.closest(
+                            ".CodeMirror-foldgutter"
+                        );
+                    if (!gutter) {
+                        return;
+                    }
+                    /*
+                     * ガターに触れたことを
+                     * CodeMirrorへ伝える。
+                     */
+                    event.stopPropagation();
+                },
+                false
+            );
         /* =====================================================
            ファイル読み込み
         ====================================================== */
@@ -689,7 +391,8 @@
                         mode
                     );
                     /*
-                     * CodeMirrorの解析待ち
+                     * CodeMirrorの
+                     * モード解析を待つ
                      */
                     setTimeout(
                         function() {
@@ -700,11 +403,30 @@
                     );
                 };
             reader.readAsText(file);
-            /*
-             * 同じファイルを
-             * 再度選択可能にする。
-             */
             event.target.value = '';
+        }
+        /* =====================================================
+           全て折り畳む
+        ====================================================== */
+        function foldAll() {
+            editor.operation(
+                function() {
+                    for (
+                        let i = 0;
+                        i < editor.lineCount();
+                        i++
+                    ) {
+                        editor.foldCode(
+                            CodeMirror.Pos(
+                                i,
+                                0
+                            ),
+                            null,
+                            "fold"
+                        );
+                    }
+                }
+            );
         }
         /* =====================================================
            保存
@@ -723,16 +445,14 @@
                 URL.createObjectURL(blob);
             const a =
                 document.createElement('a');
-            a.href = url;
+            a.href =
+                url;
             a.download =
                 currentFileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            /*
-             * 保存表示
-             */
             const nameDisplay =
                 document.getElementById(
                     'file-name-display'
@@ -749,9 +469,6 @@
         }
         /* =====================================================
            初期表示
-           
-           最初からコードが入っている場合も
-           折り畳みを試す。
         ====================================================== */
         setTimeout(
             function() {
