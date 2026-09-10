@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let activeBlock = null;
 
-  // --- 本文をHTMLに戻すための装飾関数 ---
+  // テキストを安全にHTMLへ戻す関数
   function formatCode(text) {
     let html = text
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
@@ -21,42 +21,49 @@ document.addEventListener('DOMContentLoaded', () => {
     return html;
   }
 
-  // --- 1. 本文タップ時（チャット欄への読み込み） ---
-    // --- 1. 本文タップ時（チャット欄への読み込み ＋ 自動スクロール） ---
+  // --- 1. 本文タップ時（選択とフォーカス） ---
   codeBlocks.forEach(block => {
     block.addEventListener('click', () => {
+      // ハイライト切り替え
       codeBlocks.forEach(b => b.classList.remove('active'));
       block.classList.add('active');
       activeBlock = block;
 
+      // テキストを取得して入力欄へ
       let content = block.innerText.replace(/<\/?div[^>]*>|<\/?h2>|<\/?p>|function.*?{/g, '').trim();
       textarea.value = content;
       
+      // ツールバーを表示してキーボードを呼び出す
       subHeader.classList.remove('hidden');
       textarea.focus();
+      
       textarea.style.height = '40px'; 
       textarea.style.height = (textarea.scrollHeight) + 'px';
 
-      // 🚀 新機能：チャット欄の上にピタリと合わせる自動スクロール
+      // 🚀【修正ポイント】
+      // スマホのキーボード出現と、ツールバーの展開アニメーションが終わるのを待つ（300ミリ秒）
       setTimeout(() => {
         const editorArea = document.getElementById('editor-area');
         const chatArea = document.getElementById('chat-input-area');
         
-        // 展開後のチャットエリア全体の高さを取得
+        // 展開しきったチャットエリア（ツールバー含む）の最終的な高さを取得
         const chatHeight = chatArea.offsetHeight;
         
-        // 選択したブロックの下端が、チャットエリアの上端の少し上（余白20px）にくるように計算
-        const targetScrollTop = block.offsetTop + block.offsetHeight - (editorArea.clientHeight - chatHeight) + 20;
+        // 選択したブロックの「下端」の座標を計算
+        const blockBottom = block.offsetTop + block.offsetHeight;
+        
+        // ブロックの下端が、ツールバーの直上（24pxのゆとりを持たせる）にピタリと来るようにスクロール量を計算
+        const targetScrollTop = blockBottom - (editorArea.clientHeight - chatHeight) + 24; 
         
         editorArea.scrollTo({
           top: targetScrollTop,
           behavior: 'smooth'
         });
-      }, 100); // ツールバーが出現して高さが確定するのを一瞬待つ
+      }, 300); // 待機時間を100ms → 300msに延長し、確実性をアップ
     });
   });
 
-  // --- 2. 反映処理（↑ボタン） ---
+  // --- 2. 反映（↑ボタン）処理 ---
   if(btnSend) {
     btnSend.addEventListener('click', () => {
       if (!activeBlock || textarea.value.trim() === '') return;
@@ -71,10 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==========================================
-  // 💡 ツールバーの各種機能（安全設計版）
-  // ==========================================
-  
+  // --- 3. ツールバーの各種機能 ---
   const btnCopy = document.getElementById('btn-copy');
   if(btnCopy) {
     btnCopy.addEventListener('click', async () => {
@@ -103,7 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
         textarea.style.height = '40px'; 
         textarea.style.height = (textarea.scrollHeight) + 'px';
       } catch (err) {
-        alert("ペーストに失敗しました");
+        // OS側の制約でペーストできない場合の保険
+        console.warn("クリップボードAPIがブロックされました");
       }
       textarea.focus();
     });
