@@ -20,22 +20,37 @@
     </div>
   </header>
 
-  <!-- サブヘッダー（左詰め・SVGアイコン化） -->
+  <!-- サブヘッダー（左詰め・コピー＆ペースト追加） -->
   <div id="sub-header" class="hidden">
-    <button class="icon-btn" id="btn-undo">
+    
+    <!-- 既存：Undo / Redo -->
+    <button class="icon-btn" id="btn-undo" title="元に戻す">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a4 4 0 0 1 0 8h-1"/></svg>
     </button>
-    <button class="icon-btn" id="btn-redo">
+    <button class="icon-btn" id="btn-redo" title="やり直し">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a4 4 0 0 0 0 8h1"/></svg>
     </button>
     <div class="divider"></div>
-    <button class="icon-btn" id="btn-left">
+    
+    <!-- 既存：カーソル移動 -->
+    <button class="icon-btn" id="btn-left" title="左へ">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <button class="icon-btn" id="btn-right">
+    <button class="icon-btn" id="btn-right" title="右へ">
       <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
     </button>
+
+
+    <!-- 新規追加：コピー＆ペースト -->
+    <button class="icon-btn" id="btn-copy" title="コピー">
+      <svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+    </button>
+    <button class="icon-btn" id="btn-paste" title="ペースト">
+      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+    </button>
+    <div class="divider"></div>
   </div>
+
 
   <!-- ドリルダウン用メニュー -->
   <nav id="drawer-menu">
