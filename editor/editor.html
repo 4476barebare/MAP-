@@ -4,53 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>スマホ特化型コードエディタUI</title>
-  <link rel="stylesheet" href=" editor.css">
+  <!-- 💡 ファイル名を editor.css に変更 -->
+  <link rel="stylesheet" href="editor.css">
 </head>
 <body>
 
-  <!-- メインヘッダー（シャドウで浮かす） -->
+  <!-- メインヘッダー（常に上部に固定） -->
   <header id="main-header">
     <button class="icon-btn" id="btn-menu">
       <svg class="svg-icon" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
-    <div class="file-title">index.html</div>
+    <!-- タイトルも変更 -->
+    <div class="file-title">editor.html</div>
     <div class="header-actions">
       <button class="text-btn">ロード</button>
       <button class="text-btn">出力</button>
     </div>
   </header>
-
-  <!-- サブヘッダー（左詰め・コピー＆ペースト追加） -->
-  <div id="sub-header" class="hidden">
-    
-    <!-- 既存：Undo / Redo -->
-    <button class="icon-btn" id="btn-undo" title="元に戻す">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a4 4 0 0 1 0 8h-1"/></svg>
-    </button>
-    <button class="icon-btn" id="btn-redo" title="やり直し">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a4 4 0 0 0 0 8h1"/></svg>
-    </button>
-    <div class="divider"></div>
-    
-    <!-- 既存：カーソル移動 -->
-    <button class="icon-btn" id="btn-left" title="左へ">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <button class="icon-btn" id="btn-right" title="右へ">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
-
-
-    <!-- 新規追加：コピー＆ペースト -->
-    <button class="icon-btn" id="btn-copy" title="コピー">
-      <svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-    </button>
-    <button class="icon-btn" id="btn-paste" title="ペースト">
-      <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-    </button>
-    <div class="divider"></div>
-  </div>
-
 
   <!-- ドリルダウン用メニュー -->
   <nav id="drawer-menu">
@@ -67,7 +37,7 @@
     <button class="add-btn">＋ 子要素を追加</button>
   </nav>
 
-  <!-- メイン編集エリア（余白最小・フォント8px） -->
+  <!-- メイン編集エリア -->
   <main id="editor-area">
     <div class="code-block" id="block1">
       <span class="tag">&lt;div class="katsuura-area"&gt;</span><br>
@@ -83,8 +53,36 @@
     </div>
   </main>
 
-  <!-- チャット風入力欄（重ね付け＆上部シャドウ） -->
+  <!-- チャット風入力欄（画面下部にフローティング） -->
   <div id="chat-input-area">
+    
+    <!-- 💡 チャット欄の直上に移動してきたサブヘッダー（ツールバー） -->
+    <div id="sub-header" class="hidden">
+      <button class="icon-btn" id="btn-copy" title="コピー">
+        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </button>
+      <button class="icon-btn" id="btn-paste" title="ペースト">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+      </button>
+      <div class="divider"></div>
+      
+      <button class="icon-btn" id="btn-undo" title="元に戻す">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a4 4 0 0 1 0 8h-1"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-redo" title="やり直し">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9a4 4 0 0 0 0 8h1"/></svg>
+      </button>
+      <div class="divider"></div>
+      
+      <button class="icon-btn" id="btn-left" title="左へ">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-right" title="右へ">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <!-- テキスト入力エリア本体 -->
     <div class="chat-input-wrapper">
       <textarea id="chat-textarea" placeholder="テキストを編集・追記..."
                 name="dummy-random-string-xyz" 
@@ -101,6 +99,7 @@
     </div>
   </div>
 
-  <script src="editor.js"></script>
+  <!-- 💡 ファイル名を editor.js に変更（キャッシュ対策で?v=3を付与） -->
+  <script src="editor.js?v=3"></script>
 </body>
 </html>
