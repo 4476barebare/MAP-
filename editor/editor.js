@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
       subHeader.classList.remove('hidden');
     });
   });
-
   btnCloseChat.addEventListener('click', () => {
     subHeader.classList.add('hidden');
     if(activeBlock) activeBlock.classList.remove('active');
