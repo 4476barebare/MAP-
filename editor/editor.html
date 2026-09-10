@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- メインヘッダー（常に固定） -->
+  <!-- メインヘッダー -->
   <header id="main-header">
     <button class="icon-btn" id="btn-menu">＝</button>
     <div class="file-title">index.html</div>
@@ -18,18 +18,17 @@
     </div>
   </header>
 
-  <!-- サブヘッダー（チャット欄展開時のみ表示） -->
+  <!-- サブヘッダー（✖️ボタンを削除） -->
   <div id="sub-header" class="hidden">
     <button class="icon-btn" id="btn-undo">↩️</button>
     <button class="icon-btn" id="btn-redo">↪️</button>
     <div class="spacer"></div>
     <button class="icon-btn" id="btn-left">←</button>
     <button class="icon-btn" id="btn-right">→</button>
-    <div class="spacer"></div>
-    <button class="icon-btn" id="btn-close-chat">✖️</button>
+    <!-- キーボード側の閉じるUIを使うため、自前の✖️は不要 -->
   </div>
 
-  <!-- ドリルダウン用メニュー（左からスライドイン） -->
+  <!-- ドリルダウン用メニュー -->
   <nav id="drawer-menu">
     <div class="drawer-header">
       <button class="icon-btn" id="btn-back">＜</button>
@@ -43,7 +42,7 @@
     <button class="add-btn">＋ 子要素を追加</button>
   </nav>
 
-  <!-- メイン編集エリア（ビューワー兼ポインター） -->
+  <!-- メイン編集エリア -->
   <main id="editor-area">
     <div class="code-block" id="block1">
       <span class="tag">&lt;div class="header-section"&gt;</span><br>
@@ -64,6 +63,17 @@
       <span class="tag">}</span>
     </div>
   </main>
+
+  <!-- チャット風入力欄（復活＆邪魔なバー抑制策を追加） -->
+  <div id="chat-input-area">
+    <textarea id="chat-textarea" placeholder="テキストを編集・追記..."
+              autocomplete="off" 
+              autocorrect="off" 
+              autocapitalize="off" 
+              spellcheck="false" 
+              data-form-type="other"></textarea>
+    <button id="btn-send">↑</button>
+  </div>
 
   <script src="editor.js"></script>
 </body>
