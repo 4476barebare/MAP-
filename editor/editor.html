@@ -17,17 +17,13 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
 
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.css">
-
-    <link rel="stylesheet"
           href="editor.css">
 
 </head>
 
-
 <body>
 
-    <header id="toolbar">
+    <div id="toolbar">
 
         <div id="toolbar-left">
 
@@ -41,12 +37,11 @@
 
         </div>
 
-
         <div id="file-name-display">
             新規ファイル
         </div>
 
-    </header>
+    </div>
 
 
     <input
@@ -56,12 +51,8 @@
     >
 
 
-    <main id="editor-container"></main>
+    <div id="editor-container"></div>
 
-
-    <!-- =================================================
-         CodeMirror
-    ================================================== -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
 
@@ -76,14 +67,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/clike/clike.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/php/php.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldcode.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/brace-fold.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/xml-fold.min.js"></script>
 
 
     <script src="editor.js"></script>
