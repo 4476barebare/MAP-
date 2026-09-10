@@ -3106,10 +3106,13 @@ const showBackBtnOnly = () => {
     }
 };
 
-// ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
 if (!window.currentAreaId && !window.currentSpotId) {
-
     lockAndHideUI();
+
+    // PREF側のzoom / moveend監視を完全に停止
+    if (typeof stopZoomGuard === 'function') {
+        stopZoomGuard();
+    }
 
     const regionToLoad = window.currentRegion || 'KANTO';
 
