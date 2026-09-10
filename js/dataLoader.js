@@ -798,6 +798,7 @@ function selectArea(area) {
                     btn.style.display = 'block';
                     requestAnimationFrame(() => {
                         btn.style.transition = 'opacity 0.4s ease';
+                        btn.style.pointerEvents = 'auto';
                         btn.style.opacity = '1';
                     });
                 }
@@ -3096,6 +3097,7 @@ function goBack() {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
                 backBtn.style.transition = 'opacity 0.4s ease';
+                btn.style.pointerEvents = 'auto';
                 backBtn.style.opacity = '1';
                 backBtn.style.pointerEvents = 'auto'; 
             });
