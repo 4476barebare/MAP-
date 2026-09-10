@@ -798,7 +798,7 @@ function selectArea(area) {
                     btn.style.display = 'block';
                     requestAnimationFrame(() => {
                         btn.style.transition = 'opacity 0.4s ease';
-                        //btn.style.pointerEvents = 'auto';
+                        btn.style.pointerEvents = 'auto';
                         btn.style.opacity = '1';
                     });
                 }
@@ -916,7 +916,7 @@ async function selectSpot(spot) {
 
     const currentZoom = window.map.getZoom();
 
-    if (currentZoom === 13) {
+    if (currentZoom === 13 && !window._isRestoringSpot) {
         if (spot.zoom !== '') {
             zoomToSpot(spot);
         } else {
@@ -1017,6 +1017,7 @@ async function selectSpot(spot) {
             
             enablePhase2(window.map);
             window.map.getContainer().classList.add('is-spot-mode');
+            window._isRestoringSpot = false;
             window._selectSpotCompleted = true;
             window.goBackGuard = false;
         });
@@ -3209,7 +3210,7 @@ if (!window.currentAreaId && !window.currentSpotId) {
         window.currentSpotId = null;
 
         showSpotsForArea(window.currentAreaId);
-        
+        window._isRestoringSpot = true;
         selectSpot(restoreSpot); // ★ ここに渡され、外部で false になる
         showPrefSpots();
 
