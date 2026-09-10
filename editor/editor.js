@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- 1. 本文タップ時（チャット欄への読み込み） ---
+    // --- 1. 本文タップ時（チャット欄への読み込み ＋ 自動スクロール） ---
   codeBlocks.forEach(block => {
     block.addEventListener('click', () => {
       codeBlocks.forEach(b => b.classList.remove('active'));
@@ -33,9 +34,25 @@ document.addEventListener('DOMContentLoaded', () => {
       
       subHeader.classList.remove('hidden');
       textarea.focus();
-      
       textarea.style.height = '40px'; 
       textarea.style.height = (textarea.scrollHeight) + 'px';
+
+      // 🚀 新機能：チャット欄の上にピタリと合わせる自動スクロール
+      setTimeout(() => {
+        const editorArea = document.getElementById('editor-area');
+        const chatArea = document.getElementById('chat-input-area');
+        
+        // 展開後のチャットエリア全体の高さを取得
+        const chatHeight = chatArea.offsetHeight;
+        
+        // 選択したブロックの下端が、チャットエリアの上端の少し上（余白20px）にくるように計算
+        const targetScrollTop = block.offsetTop + block.offsetHeight - (editorArea.clientHeight - chatHeight) + 20;
+        
+        editorArea.scrollTo({
+          top: targetScrollTop,
+          behavior: 'smooth'
+        });
+      }, 100); // ツールバーが出現して高さが確定するのを一瞬待つ
     });
   });
 
