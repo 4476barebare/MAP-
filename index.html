@@ -1203,6 +1203,8 @@ if (typeof loadPrefectureData === 'function') {
 
                             if (btn) {
                                 btn.style.display = 'block';
+                                
+                                btn.style.pointerEvents = 'auto';
 
                                 requestAnimationFrame(() => {
                                     btn.style.opacity = '1';
