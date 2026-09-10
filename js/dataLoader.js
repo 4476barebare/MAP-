@@ -3153,6 +3153,8 @@ function goBack() {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
+            showPrefSpots();
+
             window.goBackGuard = false; 
         }, 300);
 
