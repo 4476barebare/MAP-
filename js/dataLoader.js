@@ -3089,38 +3089,27 @@ function goBack() {
     // 共通処理：UIを再表示する（※ロック解除はしない）
     // =====================================
     let isReleased = false;
-const showBackBtnOnly = () => {
-    if (isReleased) return;
-    isReleased = true;
+    const showBackBtnOnly = () => {
+        if (isReleased) return;
+        isReleased = true;
+        // ★ 削除：ここにあった window.goBackGuard = false; を消去
+        const backBtn = document.getElementById('map-back-btn');
+        if (backBtn) {
+            backBtn.style.display = 'block';
+            requestAnimationFrame(() => {
+                backBtn.style.transition = 'opacity 0.4s ease';
+                btn.style.pointerEvents = 'auto';
+                backBtn.style.opacity = '1';
+                backBtn.style.pointerEvents = 'auto'; 
+            });
+        }
+    };
 
-    const backBtn = document.getElementById('map-back-btn');
-
-    if (backBtn) {
-        backBtn.style.display = 'block';
-        backBtn.style.pointerEvents = 'auto';
-
-        requestAnimationFrame(() => {
-            backBtn.style.transition = 'opacity 0.4s ease';
-            backBtn.style.opacity = '1';
-        });
-    }
-};
-
+// ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
 if (!window.currentAreaId && !window.currentSpotId) {
-
-    showDebug('=== goBack ⓪ START ===');
-
     lockAndHideUI();
-    showDebug('① lockAndHideUI 完了');
 
     const regionToLoad = window.currentRegion || 'KANTO';
-    showDebug('② regionToLoad=' + regionToLoad);
-
-    // Regionクリックを先に完全停止
-    if (window.map && window.regionNearestClickHandler) {
-        window.map.off('click', window.regionNearestClickHandler);
-        showDebug('③ regionNearestClickHandler OFF');
-    }
 
     setIdealQuery('pref', null);
     setIdealQuery('area', null);
@@ -3133,13 +3122,6 @@ if (!window.currentAreaId && !window.currentSpotId) {
 
     window.prefBounds = null;
     window.areaBounds = null;
-
-    showDebug(
-        '④ state reset' +
-        '\ncurrentPref=' + window.currentPref +
-        '\nprefBounds=' + window.prefBounds +
-        '\nareaBounds=' + window.areaBounds
-    );
 
     if (typeof destroyAreaUI === 'function') destroyAreaUI();
 
@@ -3163,97 +3145,33 @@ if (!window.currentAreaId && !window.currentSpotId) {
     const alertBar = document.getElementById("alert-bar");
     if (alertBar) alertBar.textContent = "";
 
-    showDebug(
-        '⑤ before loadRegionMap' +
-        '\nzoom=' + window.map.getZoom() +
-        '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng +
-        '\nmaxBounds=' + (window.map.options.maxBounds ? 'あり' : 'null')
-    );
+    // -----------------------------------------
+    // Regionへの復帰が完全に終わってから後処理
+    // -----------------------------------------
+    Promise.resolve(loadRegionMap(regionToLoad))
+        .then(() => {
 
-    loadRegionMap(regionToLoad);
+            // Region用マーカー状態へ戻す
+            showPrefSpots();
 
-    showDebug(
-        '⑥ after loadRegionMap' +
-        '\nzoom=' + window.map.getZoom() +
-        '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng +
-        '\nmaxBounds=' + (window.map.options.maxBounds ? 'あり' : 'null')
-    );
+            // 戻るボタンはRegionでは非表示
+            const backBtn = document.getElementById('map-back-btn');
 
-    showPrefSpots();
+            if (backBtn) {
+                backBtn.style.opacity = '0';
+                backBtn.style.pointerEvents = 'none';
+                backBtn.style.display = 'none';
+            }
 
-    showDebug('⑦ showPrefSpots 完了');
-
-    // Regionの移動が終わってからクリックを復帰
-    const releaseRegion = () => {
-
-        showDebug(
-            '⑧ releaseRegion' +
-            '\nzoom=' + window.map.getZoom() +
-            '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng +
-            '\nmaxBounds=' + (window.map.options.maxBounds ? 'あり' : 'null')
-        );
-
-        if (window.currentPref) {
-            showDebug('⑨ currentPrefあり → return');
-            return;
-        }
-
-        if (window.map && window.regionNearestClickHandler) {
-            window.map.off('click', window.regionNearestClickHandler);
-            window.map.on('click', window.regionNearestClickHandler);
-            showDebug('⑨ regionNearestClickHandler ON');
-        }
-
-        const backBtn = document.getElementById('map-back-btn');
-
-        if (backBtn) {
-            backBtn.style.opacity = '0';
-            backBtn.style.pointerEvents = 'none';
-            backBtn.style.display = 'none';
-        }
-
-        window.goBackGuard = false;
-
-        showDebug(
-            '⑩ releaseRegion COMPLETE' +
-            '\ngoBackGuard=' + window.goBackGuard
-        );
-    };
-
-    window.map.once('moveend', () => {
-        showDebug(
-            '★ moveend発生' +
-            '\nzoom=' + window.map.getZoom() +
-            '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng
-        );
-
-        releaseRegion();
-    });
-
-    showDebug('⑪ moveend待機登録');
-
-    // すでに目的地にいる場合
-    if (
-        window.map.getZoom() === window.regionData?.zoom &&
-        Math.abs(window.map.getCenter().lat - window.regionData?.lat) < 0.0001 &&
-        Math.abs(window.map.getCenter().lng - window.regionData?.lng) < 0.0001
-    ) {
-        showDebug('⑫ すでにRegion位置 → releaseRegion予定');
-        setTimeout(releaseRegion, 50);
-    } else {
-        showDebug(
-            '⑫ Region位置ではない' +
-            '\n現在zoom=' + window.map.getZoom() +
-            '\n目的zoom=' + window.regionData?.zoom
-        );
-    }
-
-    showDebug('=== goBack ⓪ END ===');
+            // 最後にガード解除
+            window.goBackGuard = false;
+        })
+        .catch(() => {
+            window.goBackGuard = false;
+        });
 
     return;
 }
-
-
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
     if (window.currentSpotId != null) {
         lockAndHideUI(); // ★ ガード開始
