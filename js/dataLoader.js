@@ -3105,121 +3105,97 @@ function goBack() {
         }
     };
 
+    // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
+    if (!window.currentAreaId && !window.currentSpotId) {
 
-// ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
-if (!window.currentAreaId && !window.currentSpotId) {
+        lockAndHideUI();
 
-    showDebug('【GO BACK ⓪】START');
+        const regionToLoad = window.currentRegion || 'KANTO';
 
-    lockAndHideUI();
-    showDebug('【GO BACK ⓪】① lockAndHideUI 完了');
+        setIdealQuery('pref', null);
+        setIdealQuery('area', null);
+        setIdealQuery('spot', null);
 
-    const regionToLoad = window.currentRegion || 'KANTO';
-    showDebug('【GO BACK ⓪】② regionToLoad=' + regionToLoad);
+        window.currentPref = null;
+        window.prefData = null;
+        window.currentAreaId = null;
+        window.currentSpotId = null;
 
-    setIdealQuery('pref', null);
-    setIdealQuery('area', null);
-    setIdealQuery('spot', null);
-    showDebug('【GO BACK ⓪】③ query reset 完了');
+        window.prefBounds = null;
+        window.areaBounds = null;
 
-    window.currentPref = null;
-    window.prefData = null;
-    window.currentAreaId = null;
-    window.currentSpotId = null;
+        if (typeof destroyAreaUI === 'function') destroyAreaUI();
+        
+        // 👇 【追加】広域マップに戻る際は、県用のスワイプ機能を確実にOFFにする
+        if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
 
-    window.prefBounds = null;
-    window.areaBounds = null;
+        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
+            window.markerControl.clearLayers();
+        }
 
-    showDebug(
-        '【GO BACK ⓪】④ state reset' +
-        '\ncurrentPref=' + window.currentPref +
-        '\nprefData=' + (window.prefData ? 'あり' : 'null') +
-        '\nprefBounds=' + (window.prefBounds ? 'あり' : 'null') +
-        '\nareaBounds=' + (window.areaBounds ? 'あり' : 'null')
-    );
+        if (window.phase1Group) {
+            window.phase1Group.clearLayers();
+        }
 
-    if (typeof destroyAreaUI === 'function') destroyAreaUI();
-    showDebug('【GO BACK ⓪】⑤ destroyAreaUI 完了');
+        if (window.areaSpotLayer) {
+            window.areaSpotLayer.clearLayers();
+        }
 
-    if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
-        window.markerControl.clearLayers();
+        if (window.prefSpotLayer) {
+            window.map.removeLayer(window.prefSpotLayer);
+            window.prefSpotLayer = null;
+        }
+
+        const alertBar = document.getElementById("alert-bar");
+        if (alertBar) alertBar.textContent = "";
+
+        // -----------------------------------------
+        // Regionへの復帰が完全に終わってから後処理
+        // -----------------------------------------
+        Promise.resolve(loadRegionMap(regionToLoad))
+            .then(() => {
+                const completeRegionReturn = () => {
+                    // Region用マーカー状態へ戻す
+                    if (typeof showPrefSpots === 'function') {
+                        showPrefSpots();
+                    }
+
+                    // 戻るボタンはRegionでは非表示
+                    const backBtn = document.getElementById('map-back-btn');
+                    if (backBtn) {
+                        backBtn.style.opacity = '0';
+                        backBtn.style.pointerEvents = 'none';
+                        backBtn.style.display = 'none';
+                    }
+
+                    // 👇 【修正】UI処理が完了した最後のタイミングでガードを解除する
+                    window.goBackGuard = false;
+                };
+
+                // 👇 【追加】アニメーションが確実に終わるのを待ってからガードを外す
+                if (window.map && window.regionData) {
+                    const center = window.map.getCenter();
+                    const targetZoom = window.regionData.zoom;
+                    const isSameLoc = Math.abs(center.lat - window.regionData.lat) < 0.0001 && 
+                                      Math.abs(center.lng - window.regionData.lng) < 0.0001 && 
+                                      window.map.getZoom() === targetZoom;
+
+                    if (isSameLoc) {
+                        setTimeout(completeRegionReturn, 50);
+                    } else {
+                        window.map.once('moveend', completeRegionReturn);
+                    }
+                } else {
+                    completeRegionReturn();
+                }
+            })
+            .catch((error) => {
+                console.error('Regionマップ読み込みエラー:', error);
+                window.goBackGuard = false;
+            });
+
+        return;
     }
-
-    if (window.phase1Group) {
-        window.phase1Group.clearLayers();
-    }
-
-    if (window.areaSpotLayer) {
-        window.areaSpotLayer.clearLayers();
-    }
-
-    if (window.prefSpotLayer) {
-        window.map.removeLayer(window.prefSpotLayer);
-        window.prefSpotLayer = null;
-    }
-
-    showDebug('【GO BACK ⓪】⑥ レイヤー整理完了');
-
-    const alertBar = document.getElementById("alert-bar");
-    if (alertBar) alertBar.textContent = "";
-
-    showDebug(
-        '【GO BACK ⓪】⑦ loadRegionMap 前' +
-        '\nzoom=' + window.map.getZoom() +
-        '\ncenter=' +
-        window.map.getCenter().lat.toFixed(5) + ',' +
-        window.map.getCenter().lng.toFixed(5) +
-        '\nmaxBounds=' +
-        (window.map.options.maxBounds ? 'あり' : 'null')
-    );
-
-    // -----------------------------------------
-    // Regionへの復帰が完全に終わってから後処理
-    // -----------------------------------------
-    Promise.resolve(loadRegionMap(regionToLoad))
-        .then(() => {
-
-            showDebug(
-                '【GO BACK ⓪】⑧ loadRegionMap 完了' +
-                '\nzoom=' + window.map.getZoom() +
-                '\ncenter=' +
-                window.map.getCenter().lat.toFixed(5) + ',' +
-                window.map.getCenter().lng.toFixed(5) +
-                '\nmaxBounds=' +
-                (window.map.options.maxBounds ? 'あり' : 'null')
-            );
-
-            // Region用マーカー状態へ戻す
-            showPrefSpots();
-
-            showDebug('【GO BACK ⓪】⑨ showPrefSpots 完了');
-
-            // 戻るボタンはRegionでは非表示
-            const backBtn = document.getElementById('map-back-btn');
-
-            if (backBtn) {
-                backBtn.style.opacity = '0';
-                backBtn.style.pointerEvents = 'none';
-                backBtn.style.display = 'none';
-            }
-
-            showDebug('【GO BACK ⓪】⑩ 戻るボタン非表示');
-
-            // 最後にガード解除
-            window.goBackGuard = false;
-
-            showDebug(
-                '【GO BACK ⓪】⑪ COMPLETE' +
-                '\ngoBackGuard=' + window.goBackGuard
-            );
-        })
-        .catch(() => {
-            showDebug('【GO BACK ⓪】ERROR: loadRegionMap失敗');
-            window.goBackGuard = false;
-        });
-
-    return;
-}
 
 
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
