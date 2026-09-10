@@ -766,18 +766,6 @@ marker._spotClickHandler = function () {
 }
 
 
-// =====================================
-// ■ マーカーレイヤーの保存用金庫
-// =====================================
-//window.prefSpotLayerCache = window.prefSpotLayerCache || {};
-// =====================================================
-// ■ 全県共有スポットマーカーの画面状態を確定
-//
-// Region : 5pxグリッドでマージ
-// Pref   : 選択県=100%、他県=35%
-// Area   : 選択県=100%、他県=35%
-// Spot   : 全て非表示
-// =====================================================
 function showPrefSpots() {
 
     if (!window.regionSpotMarkers) return;
@@ -815,11 +803,27 @@ function showPrefSpots() {
     // ② Region画面
     // =================================================
     if (!window.currentPref) {
-        el.style.opacity = '1';
-        el.style.pointerEvents = 'none';
 
+        window.regionSpotMarkers.forEach(marker => {
 
-    //    applyRegionMerge();
+            const el = marker.getElement();
+            if (!el) return;
+
+            if (marker._regionClickHandler) {
+                marker.off('click', marker._regionClickHandler);
+            }
+
+            if (marker._spotClickHandler) {
+                marker.off('click', marker._spotClickHandler);
+            }
+
+            // ★ Regionでは全県100%に戻す
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'none';
+
+            marker._regionRepresentative = false;
+        });
+
         return;
     }
 
