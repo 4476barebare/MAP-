@@ -3141,15 +3141,19 @@ function goBack() {
         // 復活したRegionの「県選択クリック」を叩き起こして逆戻りするのを防ぐため、
         // 衝撃が消え去るまで処理を10ミリ秒だけ意図的に遅延させます。
         setTimeout(() => {
+            showdebug('A');
             loadRegionMap(regionToLoad);
+            showdebug('B');
             
             if (typeof renderCrowdImage === 'function') {
                 renderCrowdImage();
             }
+            showdebug('C');
             if (backBtn) {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
+            showdebug('D');
             showPrefSpots();
         }, 10);
 
