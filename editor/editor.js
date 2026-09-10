@@ -6,7 +6,7 @@ let currentFileName = "untitled.js";
 
 
 /* =====================================================
-   編集モード
+   編集状態
 ===================================================== */
 
 let editMode = false;
@@ -41,19 +41,14 @@ const editor = CodeMirror(
         lineWrapping: false,
 
         /*
-         * iOS標準選択を優先
+         * CodeMirrorの通常入力欄。
+         *
+         * 編集開始はJSから明示的に行う。
          */
 
-        inputStyle: "contenteditable",
+        inputStyle: "textarea",
 
-        spellcheck: false,
-
-        /*
-         * CodeMirror標準のfoldgutterは
-         * 今回使わない。
-         */
-
-        foldGutter: false
+        spellcheck: false
 
     }
 
@@ -61,7 +56,7 @@ const editor = CodeMirror(
 
 
 /* =====================================================
-   起動時は編集不可
+   起動時
 ===================================================== */
 
 editor.setOption(
@@ -71,7 +66,7 @@ editor.setOption(
 
 
 /* =====================================================
-   インデント取得
+   インデント
 ===================================================== */
 
 function getIndent(text) {
@@ -86,7 +81,7 @@ function getIndent(text) {
     }
 
 
-    let indent = 0;
+    let result = 0;
 
 
     for (
@@ -99,24 +94,23 @@ function getIndent(text) {
             match[0][i] === "\t"
         ) {
 
-            indent += 4;
+            result += 4;
 
         } else {
 
-            indent += 1;
-
+            result++;
         }
 
     }
 
 
-    return indent;
+    return result;
 
 }
 
 
 /* =====================================================
-   ブロック開始判定
+   ブロック開始
 ===================================================== */
 
 function isBlockStart(text) {
@@ -132,24 +126,11 @@ function isBlockStart(text) {
 
 
     /*
-     * JavaScript
-     *
      * async function
-     * function
-     * if
-     * else
-     * for
-     * while
-     * switch
-     * try
-     * catch
-     * finally
-     * class
      */
 
     if (
-        /^(async\s+)?function\b/.test(line) ||
-        /^(if|else|for|while|switch|try|catch|finally|class)\b/.test(line)
+        /^(async\s+)?function\b/.test(line)
     ) {
 
         return true;
@@ -157,7 +138,31 @@ function isBlockStart(text) {
 
 
     /*
-     * 行末が {
+     * class
+     */
+
+    if (
+        /^class\b/.test(line)
+    ) {
+
+        return true;
+    }
+
+
+    /*
+     * if / else / for / while / switch
+     */
+
+    if (
+        /^(if|else|for|while|switch|try|catch|finally)\b/.test(line)
+    ) {
+
+        return true;
+    }
+
+
+    /*
+     * その他の { ブロック
      */
 
     if (
@@ -169,12 +174,11 @@ function isBlockStart(text) {
 
 
     /*
-     * HTMLタグ
+     * HTML
      */
 
     if (
-        /^<[A-Za-z][^>]*>$/.test(line) &&
-        !/^<\//.test(line)
+        /^<[A-Za-z][^>]*>$/.test(line)
     ) {
 
         return true;
@@ -187,7 +191,7 @@ function isBlockStart(text) {
 
 
 /* =====================================================
-   対応するブロック終了行
+   ブロック終了
 ===================================================== */
 
 function findBlockEnd(startLine) {
@@ -201,7 +205,7 @@ function findBlockEnd(startLine) {
 
 
     /*
-     * { } を使うブロック
+     * { } を優先
      */
 
     let braceCount = 0;
@@ -210,28 +214,23 @@ function findBlockEnd(startLine) {
 
 
     for (
-        let lineNo = startLine;
-        lineNo < total;
-        lineNo++
+        let i = startLine;
+        i < total;
+        i++
     ) {
 
         const text =
-            editor.getLine(lineNo);
+            editor.getLine(i);
 
-
-        /*
-         * コメントを完全に解析するものではないが、
-         * 通常のJSコードでは十分機能する。
-         */
 
         for (
-            let i = 0;
-            i < text.length;
-            i++
+            let j = 0;
+            j < text.length;
+            j++
         ) {
 
             if (
-                text[i] === "{"
+                text[j] === "{"
             ) {
 
                 braceCount++;
@@ -241,7 +240,7 @@ function findBlockEnd(startLine) {
             }
 
             else if (
-                text[i] === "}"
+                text[j] === "}"
             ) {
 
                 braceCount--;
@@ -254,10 +253,11 @@ function findBlockEnd(startLine) {
         if (
             hasBrace &&
             braceCount === 0 &&
-            lineNo > startLine
+            i > startLine
         ) {
 
-            return lineNo;
+            return i;
+
         }
 
     }
@@ -272,13 +272,13 @@ function findBlockEnd(startLine) {
 
 
     for (
-        let lineNo = startLine + 1;
-        lineNo < total;
-        lineNo++
+        let i = startLine + 1;
+        i < total;
+        i++
     ) {
 
         const text =
-            editor.getLine(lineNo);
+            editor.getLine(i);
 
 
         if (!text.trim()) {
@@ -291,7 +291,7 @@ function findBlockEnd(startLine) {
             getIndent(text) <= startIndent
         ) {
 
-            return lineNo - 1;
+            return i - 1;
         }
 
     }
@@ -303,21 +303,17 @@ function findBlockEnd(startLine) {
 
 
 /* =====================================================
-   折り畳み階層を解析
+   折り畳み情報を作る
 ===================================================== */
 
-function analyzeFoldData() {
+function buildFoldData() {
 
     foldData = [];
 
 
-    const total =
-        editor.lineCount();
-
-
     for (
         let i = 0;
-        i < total;
+        i < editor.lineCount();
         i++
     ) {
 
@@ -352,124 +348,101 @@ function analyzeFoldData() {
 
             to: end,
 
-            indent: getIndent(text),
+            folded: false,
 
-            parent: null,
-
-            level: 0,
-
-            folded: false
+            marker: null
 
         });
 
     }
 
-
-    /*
-     * 親子関係を作る
-     */
-
-    foldData.forEach(
-        function(item) {
-
-            let parent = null;
+}
 
 
-            foldData.forEach(
-                function(candidate) {
+/* =====================================================
+   折り畳みマーカーを作る
+===================================================== */
 
-                    if (
-                        candidate === item
-                    ) {
+function createFoldMarker(data) {
 
-                        return;
-                    }
+    const marker =
+        editor.markText(
 
+            CodeMirror.Pos(
+                data.from,
+                0
+            ),
 
-                    if (
-                        candidate.from < item.from &&
-                        candidate.to >= item.to &&
-                        candidate.indent < item.indent
-                    ) {
+            CodeMirror.Pos(
+                data.to + 1,
+                0
+            ),
 
-                        if (
-                            !parent ||
-                            candidate.from > parent.from
-                        ) {
+            {
 
-                            parent = candidate;
+                collapsed: true,
 
-                        }
+                inclusiveLeft: false,
 
-                    }
-
-                }
-            );
-
-
-            item.parent = parent;
-
-
-            if (parent) {
-
-                item.level =
-                    parent.level + 1;
-
-            } else {
-
-                item.level = 0;
+                inclusiveRight: false
 
             }
 
-        }
-    );
+        );
+
+
+    data.marker =
+        marker;
+
+
+    data.folded =
+        true;
 
 }
 
 
 /* =====================================================
-   指定行の折り畳み情報
+   指定ブロックを展開
 ===================================================== */
 
-function getFoldDataAtLine(lineNo) {
+function unfoldBlock(data) {
 
-    for (
-        let i = 0;
-        i < foldData.length;
-        i++
+    if (
+        !data.marker
     ) {
 
-        if (
-            foldData[i].from === lineNo
-        ) {
-
-            return foldData[i];
-
-        }
-
+        return;
     }
 
 
-    return null;
+    data.marker.clear();
+
+
+    data.marker =
+        null;
+
+
+    data.folded =
+        false;
 
 }
 
 
 /* =====================================================
-   親の「直下」の子だけ取得
+   指定ブロックを折り畳む
 ===================================================== */
 
-function getDirectChildren(parent) {
+function foldBlock(data) {
 
-    return foldData.filter(
-        function(item) {
+    if (
+        data.marker
+    ) {
 
-            return (
-                item.parent === parent
-            );
+        return;
+    }
 
-        }
-    );
+
+    createFoldMarker(data);
 
 }
 
@@ -478,187 +451,73 @@ function getDirectChildren(parent) {
    初期状態
 ===================================================== */
 
-function foldInitial() {
+function initializeFolds() {
 
-    analyzeFoldData();
+    buildFoldData();
 
+
+    /*
+     * 最初はすべてのブロックを折る。
+     *
+     * ただし親を折った時点で
+     * 子も画面から隠れる。
+     */
 
     editor.operation(
         function() {
 
             /*
-             * 最上位ブロックだけを折る。
+             * 外側のブロックだけ折る。
              */
 
-            foldData
-                .filter(
-                    function(item) {
+            foldData.forEach(
+                function(data) {
 
-                        return (
-                            item.parent === null
-                        );
+                    let parent =
+                        false;
+
+
+                    foldData.forEach(
+                        function(other) {
+
+                            if (
+                                other === data
+                            ) {
+
+                                return;
+                            }
+
+
+                            if (
+                                other.from < data.from &&
+                                other.to >= data.to
+                            ) {
+
+                                parent = true;
+
+                            }
+
+                        }
+                    );
+
+
+                    if (!parent) {
+
+                        foldBlock(data);
 
                     }
-                )
-                .sort(
-                    function(a, b) {
 
-                        return b.from - a.from;
-
-                    }
-                )
-                .forEach(
-                    function(item) {
-
-                        editor.foldCode(
-                            CodeMirror.Pos(
-                                item.from,
-                                0
-                            )
-                        );
-
-
-                        item.folded = true;
-
-                    }
-                );
+                }
+            );
 
         }
     );
 
-
-    refreshFoldRows();
-
 }
 
 
 /* =====================================================
-   折り畳み状態の再描画
-===================================================== */
-
-function refreshFoldRows() {
-
-    /*
-     * 一旦、現在表示されている
-     * 行から折り畳み対象行を探す。
-     */
-
-    const lines =
-        document.querySelectorAll(
-            ".CodeMirror-line"
-        );
-
-
-    for (
-        let i = 0;
-        i < lines.length;
-        i++
-    ) {
-
-        const lineElement =
-            lines[i];
-
-
-        const lineNo =
-            parseInt(
-                lineElement.dataset.line,
-                10
-            );
-
-
-        if (
-            isNaN(lineNo)
-        ) {
-
-            continue;
-        }
-
-
-        const data =
-            getFoldDataAtLine(lineNo);
-
-
-        if (!data) {
-
-            continue;
-        }
-
-
-        /*
-         * 行全体をタップ対象にする。
-         */
-
-        lineElement.classList.add(
-            "editor-fold-line"
-        );
-
-
-        /*
-         * 既存アイコンを削除
-         */
-
-        const oldIcon =
-            lineElement.querySelector(
-                ".editor-fold-icon"
-            );
-
-
-        if (oldIcon) {
-
-            oldIcon.remove();
-
-        }
-
-
-        /*
-         * 行頭に表示だけ追加
-         */
-
-        const icon =
-            document.createElement(
-                "span"
-            );
-
-
-        icon.className =
-            "editor-fold-icon";
-
-
-        icon.textContent =
-            data.folded
-                ? "▶"
-                : "▼";
-
-
-        lineElement.insertBefore(
-            icon,
-            lineElement.firstChild
-        );
-
-
-        if (
-            data.folded
-        ) {
-
-            lineElement.classList.add(
-                "is-folded"
-            );
-
-        } else {
-
-            lineElement.classList.remove(
-                "is-folded"
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   行DOMへ行番号をセット
+   行DOMに行番号
 ===================================================== */
 
 editor.on(
@@ -673,7 +532,7 @@ editor.on(
 
 
 /* =====================================================
-   ★ 折り畳み行タップ
+   ★ 折り畳み対象行をタップ
 ===================================================== */
 
 editor.getWrapperElement()
@@ -682,8 +541,8 @@ editor.getWrapperElement()
         function(event) {
 
             /*
-             * 編集モード中は
-             * 普通のコード編集を優先。
+             * 編集中は
+             * CodeMirrorに任せる。
              */
 
             if (editMode) {
@@ -719,8 +578,20 @@ editor.getWrapperElement()
             }
 
 
+            /*
+             * その行に対応するブロック
+             */
+
             const data =
-                getFoldDataAtLine(lineNo);
+                foldData.find(
+                    function(item) {
+
+                        return (
+                            item.from === lineNo
+                        );
+
+                    }
+                );
 
 
             if (!data) {
@@ -730,122 +601,31 @@ editor.getWrapperElement()
 
 
             /*
-             * -----------------------------------------
-             * 現在折り畳まれている
-             * -----------------------------------------
+             * ------------------------------------------------
+             * 折り畳まれている
+             * ------------------------------------------------
              */
 
             if (
                 data.folded
             ) {
 
-                /*
-                 * まず親を開く。
-                 */
-
-                editor.unfold(
-                    CodeMirror.Pos(
-                        data.from,
-                        0
-                    )
-                );
-
-
-                data.folded = false;
-
-
-                /*
-                 * 重要：
-                 *
-                 * 子ブロックは開かない。
-                 *
-                 * したがって
-                 *
-                 * function
-                 *     ↓
-                 *   if
-                 *       ↓
-                 *     for
-                 *
-                 * と1階層ずつ見える。
-                 */
-
-
-                refreshFoldRows();
-
+                unfoldBlock(data);
 
                 return;
             }
 
 
             /*
-             * -----------------------------------------
-             * 現在展開されている
-             * -----------------------------------------
+             * ------------------------------------------------
+             * 展開されている
              *
-             * 直下の子を持っている場合は、
-             * 子を1段階だけ折る。
-             *
-             * 子がなければ自分自身を折る。
+             * この行をもう一度押したら
+             * 自分自身を折り畳む。
+             * ------------------------------------------------
              */
 
-            const children =
-                getDirectChildren(data);
-
-
-            if (
-                children.length > 0
-            ) {
-
-                children
-                    .sort(
-                        function(a, b) {
-
-                            return b.from - a.from;
-
-                        }
-                    )
-                    .forEach(
-                        function(child) {
-
-                            editor.foldCode(
-                                CodeMirror.Pos(
-                                    child.from,
-                                    0
-                                )
-                            );
-
-
-                            child.folded = true;
-
-                        }
-                    );
-
-
-                refreshFoldRows();
-
-
-                return;
-            }
-
-
-            /*
-             * 子がなければ
-             * 自分自身を折る。
-             */
-
-            editor.foldCode(
-                CodeMirror.Pos(
-                    data.from,
-                    0
-                )
-            );
-
-
-            data.folded = true;
-
-
-            refreshFoldRows();
+            foldBlock(data);
 
         },
         false
@@ -853,30 +633,104 @@ editor.getWrapperElement()
 
 
 /* =====================================================
-   ★ ダブルタップで編集開始
+   ★ ダブルタップ
 ===================================================== */
+
+let lastTapTime = 0;
+
+
+/*
+ * clickではなくtouchendを使って
+ * ダブルタップを明確に判定する。
+ */
 
 editor.getWrapperElement()
     .addEventListener(
-        "dblclick",
+        "touchend",
         function(event) {
 
             /*
-             * 折り畳み行だった場合は
-             * 編集モードに入るだけでなく、
-             * その行を編集対象にする。
+             * 折り畳み行は
+             * touchendでは編集開始しない。
              */
 
-            editMode = true;
+            const lineElement =
+                event.target.closest(
+                    ".CodeMirror-line"
+                );
 
 
-            editor.setOption(
-                "readOnly",
-                false
-            );
+            if (
+                lineElement
+            ) {
+
+                const lineNo =
+                    parseInt(
+                        lineElement.dataset.line,
+                        10
+                    );
 
 
-            editor.focus();
+                const fold =
+                    foldData.find(
+                        function(item) {
+
+                            return (
+                                item.from === lineNo
+                            );
+
+                        }
+                    );
+
+
+                if (fold) {
+
+                    return;
+                }
+
+            }
+
+
+            const now =
+                Date.now();
+
+
+            if (
+                now - lastTapTime < 350
+            ) {
+
+                /*
+                 * ★ ダブルタップ
+                 */
+
+                editMode = true;
+
+
+                editor.setOption(
+                    "readOnly",
+                    false
+                );
+
+
+                /*
+                 * CodeMirror自身の入力欄へ
+                 * 明示的にフォーカス
+                 */
+
+                editor.focus();
+
+
+                lastTapTime = 0;
+
+
+                return;
+
+            }
+
+
+            lastTapTime =
+                now;
+
 
         },
         false
@@ -965,25 +819,12 @@ function loadFile(event) {
 
             }
 
-            else if (
-                ext === "json"
-            ) {
-
-                mode = "javascript";
-
-            }
-
 
             editor.setOption(
                 "mode",
                 mode
             );
 
-
-            /*
-             * 読み込み直後は
-             * 編集不可に戻す。
-             */
 
             editMode = false;
 
@@ -999,7 +840,7 @@ function loadFile(event) {
 
                     editor.refresh();
 
-                    foldInitial();
+                    initializeFolds();
 
                 },
                 300
@@ -1088,24 +929,12 @@ document.getElementById(
     "save-button"
 ).addEventListener(
     "click",
-    function() {
-
-        downloadFile();
-
-    }
-);
-
-
-document.getElementById(
-    "file-input"
-).addEventListener(
-    "change",
-    loadFile
+    downloadFile
 );
 
 
 /* =====================================================
-   初期状態
+   初期化
 ===================================================== */
 
 setTimeout(
@@ -1113,7 +942,7 @@ setTimeout(
 
         editor.refresh();
 
-        foldInitial();
+        initializeFolds();
 
     },
     300
