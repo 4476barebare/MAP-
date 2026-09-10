@@ -3107,17 +3107,19 @@ const showBackBtnOnly = () => {
 };
 
 if (!window.currentAreaId && !window.currentSpotId) {
+
+    showDebug('=== goBack ⓪ START ===');
+
     lockAndHideUI();
+    showDebug('① lockAndHideUI 完了');
 
     const regionToLoad = window.currentRegion || 'KANTO';
-if (window.map) {
-    window.map.stop();
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-}
+    showDebug('② regionToLoad=' + regionToLoad);
+
     // Regionクリックを先に完全停止
     if (window.map && window.regionNearestClickHandler) {
         window.map.off('click', window.regionNearestClickHandler);
+        showDebug('③ regionNearestClickHandler OFF');
     }
 
     setIdealQuery('pref', null);
@@ -3131,6 +3133,13 @@ if (window.map) {
 
     window.prefBounds = null;
     window.areaBounds = null;
+
+    showDebug(
+        '④ state reset' +
+        '\ncurrentPref=' + window.currentPref +
+        '\nprefBounds=' + window.prefBounds +
+        '\nareaBounds=' + window.areaBounds
+    );
 
     if (typeof destroyAreaUI === 'function') destroyAreaUI();
 
@@ -3154,18 +3163,45 @@ if (window.map) {
     const alertBar = document.getElementById("alert-bar");
     if (alertBar) alertBar.textContent = "";
 
+    showDebug(
+        '⑤ before loadRegionMap' +
+        '\nzoom=' + window.map.getZoom() +
+        '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng +
+        '\nmaxBounds=' + (window.map.options.maxBounds ? 'あり' : 'null')
+    );
+
     loadRegionMap(regionToLoad);
 
+    showDebug(
+        '⑥ after loadRegionMap' +
+        '\nzoom=' + window.map.getZoom() +
+        '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng +
+        '\nmaxBounds=' + (window.map.options.maxBounds ? 'あり' : 'null')
+    );
+
     showPrefSpots();
+
+    showDebug('⑦ showPrefSpots 完了');
 
     // Regionの移動が終わってからクリックを復帰
     const releaseRegion = () => {
 
-        if (window.currentPref) return;
+        showDebug(
+            '⑧ releaseRegion' +
+            '\nzoom=' + window.map.getZoom() +
+            '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng +
+            '\nmaxBounds=' + (window.map.options.maxBounds ? 'あり' : 'null')
+        );
+
+        if (window.currentPref) {
+            showDebug('⑨ currentPrefあり → return');
+            return;
+        }
 
         if (window.map && window.regionNearestClickHandler) {
             window.map.off('click', window.regionNearestClickHandler);
             window.map.on('click', window.regionNearestClickHandler);
+            showDebug('⑨ regionNearestClickHandler ON');
         }
 
         const backBtn = document.getElementById('map-back-btn');
@@ -3177,9 +3213,24 @@ if (window.map) {
         }
 
         window.goBackGuard = false;
+
+        showDebug(
+            '⑩ releaseRegion COMPLETE' +
+            '\ngoBackGuard=' + window.goBackGuard
+        );
     };
 
-    window.map.once('moveend', releaseRegion);
+    window.map.once('moveend', () => {
+        showDebug(
+            '★ moveend発生' +
+            '\nzoom=' + window.map.getZoom() +
+            '\ncenter=' + window.map.getCenter().lat + ',' + window.map.getCenter().lng
+        );
+
+        releaseRegion();
+    });
+
+    showDebug('⑪ moveend待機登録');
 
     // すでに目的地にいる場合
     if (
@@ -3187,11 +3238,21 @@ if (window.map) {
         Math.abs(window.map.getCenter().lat - window.regionData?.lat) < 0.0001 &&
         Math.abs(window.map.getCenter().lng - window.regionData?.lng) < 0.0001
     ) {
+        showDebug('⑫ すでにRegion位置 → releaseRegion予定');
         setTimeout(releaseRegion, 50);
+    } else {
+        showDebug(
+            '⑫ Region位置ではない' +
+            '\n現在zoom=' + window.map.getZoom() +
+            '\n目的zoom=' + window.regionData?.zoom
+        );
     }
+
+    showDebug('=== goBack ⓪ END ===');
 
     return;
 }
+
 
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
     if (window.currentSpotId != null) {
