@@ -2,26 +2,31 @@
   --bg-color: #ffffff;
   --text-color: #111111;
   --tag-color: #0066cc;
-  --highlight-bg: #f8f9fa;
+  --highlight-bg: #f8f9fa; /* メイン背景の薄いグレー */
   --icon-color: #444444;
-  /* ボーダーの代わりのシャドウ定義 */
+  
+  /* 統一されたグレーのアクティブ枠色（より静かで洗練されたトーン） */
+  --active-ring: #bbbbbb; 
+  
+  /* シャドウ定義 */
   --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-footer: 0 -2px 10px rgba(0, 0, 0, 0.08);
   --shadow-block: 0 1px 4px rgba(0, 0, 0, 0.05);
-  --shadow-active: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-input: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-active: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-input-pill: 0 8px 24px rgba(0, 0, 0, 0.15); /* チャット欄専用の深い影 */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* 画面全体のレイアウト固定（スクロールさせない） */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: var(--highlight-bg); /* 背景を少しグレーにしてブロックの白を際立たせる */
+  background-color: var(--highlight-bg); 
   color: var(--text-color);
   display: flex;
   flex-direction: column;
   height: 100dvh; 
-  overflow: hidden;
+  overflow: hidden; /* body自体は絶対にスクロールしない */
+  position: relative; /* チャット欄を絶対配置するための基準 */
 }
 
 button {
@@ -30,14 +35,13 @@ button {
 }
 .text-btn { font-size: 14px; font-weight: bold; }
 
-/* SVGアイコン共通設定 */
 .svg-icon {
   width: 20px; height: 20px;
   fill: none; stroke: currentColor;
   stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
 }
 
-/* ヘッダー（シャドウ） */
+/* ヘッダー＆ツールバー（上部に完全に固定） */
 #main-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 8px 12px;
@@ -48,7 +52,6 @@ button {
 .file-title { font-weight: bold; font-size: 14px; }
 .header-actions { display: flex; gap: 12px; }
 
-/* サブヘッダー（左詰め・極小化） */
 #sub-header {
   display: flex; align-items: center; justify-content: flex-start; gap: 12px;
   padding: 6px 12px;
@@ -61,17 +64,19 @@ button {
 .divider { width: 1px; height: 16px; background-color: #ddd; margin: 0 4px; }
 .icon-btn { color: var(--icon-color); }
 
-/* メイン編集エリア（8px・余白極小） */
+/* メイン編集エリア（裏側でスクロールする） */
 #editor-area {
-  flex: 1; overflow-y: auto;
-  padding: 6px; /* 極小余白 */
+  flex: 1; 
+  overflow-y: auto; /* ここだけがスクロールする */
+  padding: 6px; 
+  padding-bottom: 140px; /* 浮かんだチャット欄の下に文字が隠れないよう、底に大きな余白を確保 */
   font-family: monospace;
-  font-size: 8px; /* 極小フォント */
+  font-size: 8px; 
   line-height: 1.4;
-  -webkit-text-size-adjust: none; /* スマホの自動文字拡大を防止 */
+  -webkit-text-size-adjust: none; 
 }
 
-/* コードブロック（ボーダー廃止、シャドウ化） */
+/* コードブロック */
 .code-block {
   margin-bottom: 6px;
   padding: 6px;
@@ -80,37 +85,53 @@ button {
   box-shadow: var(--shadow-block);
   transition: all 0.2s ease;
 }
+/* アクティブ時の色を黒からグレー（--active-ring）へ変更 */
 .code-block.active {
-  /* アクティブ時は少し浮き上がり、Geminiのように外枠をハイライト */
-  box-shadow: 0 0 0 1.5px var(--text-color), var(--shadow-active);
+  box-shadow: 0 0 0 1.5px var(--active-ring), var(--shadow-active);
   transform: translateY(-1px);
 }
 .tag { color: var(--tag-color); font-weight: bold; }
 
-/* チャット風入力エリア（重ね付け・シャドウ） */
+/* ーーーーーーーーーーーーーーーーーーーーーーーーー
+   チャット欄（フローティングUI）
+   ーーーーーーーーーーーーーーーーーーーーーーーーー */
 #chat-input-area {
-  padding: 8px;
-  background-color: var(--bg-color);
-  box-shadow: var(--shadow-footer);
-  padding-bottom: env(safe-area-inset-bottom, 8px);
-  width: 100%;
+  position: absolute; /* 画面最下部に絶対配置して浮かせる */
+  bottom: 0; left: 0; width: 100%;
+  padding: 12px;
+  padding-bottom: env(safe-area-inset-bottom, 12px);
   z-index: 100;
+  
+  /* スクロールする文字が下部で自然に消えるようなグラデーションマスク */
+  background: linear-gradient(to bottom, rgba(248,249,250,0) 0%, rgba(248,249,250,0.8) 30%, rgba(248,249,250,1) 100%);
+  pointer-events: none; /* 余白部分はタップを貫通させる */
 }
-.chat-input-wrapper { position: relative; width: 100%; }
+
+/* 入力エリア本体（影をつけて浮かせる） */
+.chat-input-wrapper { 
+  position: relative; 
+  width: 100%; 
+  pointer-events: auto; /* ここだけタップを有効化 */
+}
 
 #chat-textarea {
   width: 100%;
   min-height: 40px; max-height: 120px;
-  border: none; /* ボーダー廃止 */
+  border: none;
+  /* 外側のボーダーを廃止し、美しい深い影（shadow-input-pill）だけを適用 */
+  box-shadow: var(--shadow-input-pill); 
   border-radius: 20px;
-  box-shadow: inset 0 0 0 1px #e0e0e0, var(--shadow-input); /* 内側に微細な線とシャドウ */
-  padding: 10px 44px 10px 16px; /* 右側にボタン用のスペース */
+  padding: 10px 44px 10px 16px; 
   font-size: 16px; font-family: inherit;
   resize: none; outline: none;
-  background-color: var(--highlight-bg);
+  background-color: var(--bg-color);
   box-sizing: border-box; 
+  transition: box-shadow 0.2s;
 }
-#chat-textarea:focus { box-shadow: inset 0 0 0 1.5px var(--text-color), var(--shadow-input); }
+/* フォーカス時も統一グレー（--active-ring）を使用 */
+#chat-textarea:focus { 
+  box-shadow: 0 0 0 1.5px var(--active-ring), var(--shadow-input-pill); 
+}
 
 #btn-send {
   position: absolute; right: 4px; bottom: 4px;
@@ -122,8 +143,8 @@ button {
 }
 #btn-send:active { transform: scale(0.9); }
 
-/* ドリルダウンメニュー */
-#drawer-menu { /* 省略（前回と同じ構造ですがボーダーを消しています） */
+/* ドリルダウンメニュー（変更なし） */
+#drawer-menu { 
   position: absolute; top: 0; left: 0; bottom: 0; width: 85%; max-width: 300px;
   background-color: var(--bg-color); box-shadow: 4px 0 16px rgba(0,0,0,0.1);
   z-index: 200; transform: translateX(-100%); transition: transform 0.3s ease;
@@ -134,4 +155,4 @@ button {
 .breadcrumb { margin-left: 12px; font-size: 12px; font-weight: bold; }
 .element-list { list-style: none; flex: 1; overflow-y: auto; }
 .element-item { padding: 12px 16px; font-size: 12px; font-family: monospace; border-bottom: 1px solid #eee; }
-.add-btn { padding: 16px; width: 100%; font-weight: bold; box-shadow: var(--shadow-footer); }
+.add-btn { padding: 16px; width: 100%; font-weight: bold; box-shadow: var(--shadow-header); }
