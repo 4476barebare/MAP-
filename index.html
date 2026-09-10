@@ -1203,6 +1203,8 @@ if (typeof loadPrefectureData === 'function') {
 
                             if (btn) {
                                 btn.style.display = 'block';
+                                
+                                btn.style.pointerEvents = 'auto';
 
                                 requestAnimationFrame(() => {
                                     btn.style.opacity = '1';
@@ -3895,7 +3897,7 @@ function disablePrefSwipe() {
 // ==========================================
 // ★ 画面に文字を出すデバッグ用関数（スクロール＆コピペ対応版）
 // ==========================================
-function showDebug(msg) {
+function showdebug(msg) {
     let debugBox = document.getElementById('my-debug-box');
     if (!debugBox) {
         debugBox = document.createElement('div');
