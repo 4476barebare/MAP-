@@ -65,15 +65,20 @@
   </main>
 
   <!-- チャット風入力欄（復活＆邪魔なバー抑制策を追加） -->
+  <!-- チャット風入力欄（OSのお節介を極限まで無効化するハック版） -->
   <div id="chat-input-area">
     <textarea id="chat-textarea" placeholder="テキストを編集・追記..."
-              autocomplete="off" 
+              name="dummy-random-string-xyz" 
+              autocomplete="nope" 
               autocorrect="off" 
-              autocapitalize="off" 
+              autocapitalize="none" 
               spellcheck="false" 
-              data-form-type="other"></textarea>
+              inputmode="text"
+              data-lpignore="true" 
+              data-1p-ignore></textarea>
     <button id="btn-send">↑</button>
   </div>
+
 
   <script src="editor.js"></script>
 </body>
