@@ -1,1 +1,353 @@
-あ
+/* =====================================================
+   全体
+===================================================== */
+
+html,
+body {
+
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background: #121212;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+}
+
+
+/* =====================================================
+   ツールバー
+===================================================== */
+
+#toolbar {
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    box-sizing: border-box;
+
+    padding: 0 10px;
+
+    background: #000;
+
+    border-bottom: 1px solid #333;
+
+    z-index: 100;
+}
+
+
+#toolbar-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+button {
+
+    border: none;
+
+    background: none;
+
+    color: #0A84FF;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    padding: 6px 8px;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+#file-name-display {
+
+    max-width: 140px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    color: #999;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   エディター領域
+===================================================== */
+
+#editor-container {
+
+    position: fixed;
+
+    top: 44px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   CodeMirror本体
+===================================================== */
+
+.CodeMirror {
+
+    width: 100%;
+    height: 100%;
+
+    background: #1a1a1c;
+
+    color: #d4d4d4;
+
+    font-family:
+        Menlo,
+        Monaco,
+        "Courier New",
+        monospace;
+
+    font-size: 8px;
+
+    line-height: 14px;
+
+    /*
+     * iOSの選択操作を優先
+     */
+
+    -webkit-user-select: text !important;
+    user-select: text !important;
+
+    -webkit-touch-callout: default;
+
+    /*
+     * ダブルタップなどのブラウザ標準操作を
+     * CodeMirrorが邪魔しないようにする
+     */
+
+    touch-action: manipulation;
+}
+
+
+/* =====================================================
+   スクロール
+===================================================== */
+
+.CodeMirror-scroll {
+
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* =====================================================
+   ガター
+===================================================== */
+
+.CodeMirror-gutters {
+
+    background: #1a1a1c;
+
+    border-right: none;
+}
+
+
+.CodeMirror-linenumber {
+
+    color: #555;
+
+    font-size: 8px;
+}
+
+
+/*
+ * foldgutterそのものは表示しない。
+ *
+ * ▼は「ボタン」ではなく、
+ * 行の状態を示す表示として
+ * JS側で行頭に描画する。
+ */
+
+.CodeMirror-foldgutter {
+
+    display: none;
+}
+
+
+/* =====================================================
+   行
+===================================================== */
+
+/*
+ * 折り畳み対象行だけ
+ * タップ領域として使う。
+ */
+
+.editor-fold-line {
+
+    position: relative;
+
+    min-height: 14px;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color:
+        rgba(10, 132, 255, 0.12);
+}
+
+
+/*
+ * 展開/折り畳み記号
+ *
+ * これはクリック対象ではない。
+ */
+
+.editor-fold-icon {
+
+    display: inline-block;
+
+    width: 12px;
+
+    margin-right: 2px;
+
+    color: #777;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif;
+
+    font-size: 7px;
+
+    line-height: 14px;
+
+    vertical-align: top;
+
+    pointer-events: none;
+
+    user-select: none;
+
+    -webkit-user-select: none;
+}
+
+
+/*
+ * 折り畳まれている場合
+ */
+
+.editor-fold-line.is-folded
+.editor-fold-icon {
+
+    color: #0A84FF;
+}
+
+
+/* =====================================================
+   選択
+===================================================== */
+
+.CodeMirror-selected {
+
+    background:
+        rgba(10, 132, 255, 0.25) !important;
+}
+
+
+/* =====================================================
+   構文色
+===================================================== */
+
+.cm-s-default .cm-comment {
+
+    color: #777;
+}
+
+
+.cm-s-default .cm-string {
+
+    color: #c88251;
+}
+
+
+.cm-s-default .cm-keyword {
+
+    color: #569cd6;
+}
+
+
+.cm-s-default .cm-def {
+
+    color: #569cd6;
+}
+
+
+.cm-s-default .cm-number {
+
+    color: #b5cea8;
+}
+
+
+.cm-s-default .cm-variable-2 {
+
+    color: #a381d6;
+}
+
+
+.cm-s-default .cm-tag {
+
+    color: #569cd6;
+}
+
+
+.cm-s-default .cm-attribute {
+
+    color: #4ec9b0;
+}
+
+
+/* =====================================================
+   iOS入力欄
+===================================================== */
+
+/*
+ * CodeMirrorの入力用要素そのものは
+ * 通常表示しない。
+ *
+ * 編集開始はJSから明示的に行う。
+ */
+
+.CodeMirror textarea {
+
+    -webkit-user-select: text !important;
+
+    user-select: text !important;
+}
