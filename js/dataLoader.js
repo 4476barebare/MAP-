@@ -3148,24 +3148,18 @@ function goBack() {
             if (typeof renderCrowdImage === 'function') {
                 renderCrowdImage();
             }
+            showPrefSpots(); 
             showdebug('C');
             if (backBtn) {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
             showdebug('D');
-            showPrefSpots();
+            
+            window.goBackGuard = false; 
         }, 10);
 
-        setTimeout(() => {
-            if (backBtn) {
-                backBtn.style.display = 'none';
-                backBtn.style.pointerEvents = 'auto';
-            }
-            showPrefSpots();
 
-            window.goBackGuard = false; 
-        }, 300);
 
         return;
     }
