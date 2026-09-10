@@ -3105,11 +3105,10 @@ function goBack() {
         }
     };
 
+    // =====================================================
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
+    // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
-
-        lockAndHideUI();
-
         const regionToLoad = window.currentRegion || 'KANTO';
 
         setIdealQuery('pref', null);
@@ -3120,83 +3119,45 @@ function goBack() {
         window.prefData = null;
         window.currentAreaId = null;
         window.currentSpotId = null;
-
+        
         window.prefBounds = null;
         window.areaBounds = null;
 
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
-        
-        // 👇 【追加】広域マップに戻る際は、県用のスワイプ機能を確実にOFFにする
         if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
-
-        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') {
-            window.markerControl.clearLayers();
-        }
-
-        if (window.phase1Group) {
-            window.phase1Group.clearLayers();
-        }
-
-        if (window.areaSpotLayer) {
-            window.areaSpotLayer.clearLayers();
-        }
-
+        
+        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
+        if (window.phase1Group) window.phase1Group.clearLayers();
+        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
         if (window.prefSpotLayer) {
             window.map.removeLayer(window.prefSpotLayer);
             window.prefSpotLayer = null;
         }
-
+        
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
-        // -----------------------------------------
-        // Regionへの復帰が完全に終わってから後処理
-        // -----------------------------------------
-        Promise.resolve(loadRegionMap(regionToLoad))
-            .then(() => {
-                const completeRegionReturn = () => {
-                    // Region用マーカー状態へ戻す
-                    if (typeof showPrefSpots === 'function') {
-                        showPrefSpots();
-                    }
+        // ★核心の修正：戻るボタンの「クリックの衝撃」がマップに貫通し、
+        // 復活したRegionの「県選択クリック」を叩き起こして逆戻りするのを防ぐため、
+        // 衝撃が消え去るまで処理を10ミリ秒だけ意図的に遅延させます。
+        setTimeout(() => {
+            loadRegionMap(regionToLoad);
+            
+            if (typeof renderCrowdImage === 'function') {
+                renderCrowdImage();
+            }
+        }, 10);
 
-                    // 戻るボタンはRegionでは非表示
-                    const backBtn = document.getElementById('map-back-btn');
-                    if (backBtn) {
-                        backBtn.style.opacity = '0';
-                        backBtn.style.pointerEvents = 'none';
-                        backBtn.style.display = 'none';
-                    }
-
-                    // 👇 【修正】UI処理が完了した最後のタイミングでガードを解除する
-                    window.goBackGuard = false;
-                };
-
-                // 👇 【追加】アニメーションが確実に終わるのを待ってからガードを外す
-                if (window.map && window.regionData) {
-                    const center = window.map.getCenter();
-                    const targetZoom = window.regionData.zoom;
-                    const isSameLoc = Math.abs(center.lat - window.regionData.lat) < 0.0001 && 
-                                      Math.abs(center.lng - window.regionData.lng) < 0.0001 && 
-                                      window.map.getZoom() === targetZoom;
-
-                    if (isSameLoc) {
-                        setTimeout(completeRegionReturn, 50);
-                    } else {
-                        window.map.once('moveend', completeRegionReturn);
-                    }
-                } else {
-                    completeRegionReturn();
-                }
-            })
-            .catch((error) => {
-                console.error('Regionマップ読み込みエラー:', error);
-                window.goBackGuard = false;
-            });
+        setTimeout(() => {
+            if (backBtn) {
+                backBtn.style.display = 'none';
+                backBtn.style.pointerEvents = 'auto';
+            }
+            window.goBackGuard = false; 
+        }, 300);
 
         return;
     }
-
 
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
     if (window.currentSpotId != null) {
