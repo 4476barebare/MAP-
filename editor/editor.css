@@ -51,35 +51,30 @@ button {
 .file-title { font-weight: bold; font-size: 14px; }
 .header-actions { display: flex; gap: 12px; }
 
+/* メイン編集エリアの底の余白を少し増やす（ツールバー展開時に隠れないように） */
+#editor-area {
+  flex: 1; overflow-y: auto;
+  padding: 6px; 
+  padding-bottom: 180px; /* 変更：140px -> 180px */
+  font-family: monospace; font-size: 8px; line-height: 1.4;
+  -webkit-text-size-adjust: none; 
+}
+
+/* 💡 サブヘッダーをチャット欄用に見た目変更 */
 #sub-header {
   display: flex; align-items: center; justify-content: flex-start; gap: 12px;
   padding: 6px 12px;
-  background-color: var(--bg-color);
-  box-shadow: var(--shadow-header);
+  background-color: transparent; /* 背景を透明にしてフローティングになじませる */
+  box-shadow: none; /* 影を削除 */
   transition: all 0.2s ease;
-  z-index: 99;
-  flex-shrink: 0;
-  /* スマホ画面よりボタンが多い場合は横スクロール */
   overflow-x: auto; 
   -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
+  margin-bottom: 8px; /* 入力欄との隙間 */
 }
 #sub-header.hidden { display: none; }
 #sub-header::-webkit-scrollbar { display: none; }
-.divider { width: 1px; height: 16px; background-color: #ddd; margin: 0 4px; flex-shrink: 0;}
-.icon-btn { color: var(--icon-color); flex-shrink: 0; }
 
-/* メイン編集エリア */
-#editor-area {
-  flex: 1; 
-  overflow-y: auto; 
-  -webkit-overflow-scrolling: touch;
-  padding: 6px; 
-  padding-bottom: 140px; /* チャット欄の下に隠れないための余白 */
-  font-family: monospace;
-  font-size: 8px; 
-  line-height: 1.4;
-  -webkit-text-size-adjust: none; 
-}
 
 .code-block {
   margin-bottom: 6px; padding: 6px; border-radius: 6px;
