@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>スマホ特化型コードエディタUIプロトタイプ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- メインヘッダー（常に固定） -->
+  <header id="main-header">
+    <button class="icon-btn" id="btn-menu">＝</button>
+    <div class="file-title">index.html</div>
+    <div class="header-actions">
+      <button class="text-btn">ロード</button>
+      <button class="text-btn">出力</button>
+    </div>
+  </header>
+
+  <!-- サブヘッダー（チャット欄展開時のみ表示） -->
+  <div id="sub-header" class="hidden">
+    <button class="icon-btn" id="btn-undo">↩️</button>
+    <button class="icon-btn" id="btn-redo">↪️</button>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="btn-left">←</button>
+    <button class="icon-btn" id="btn-right">→</button>
+    <div class="spacer"></div>
+    <button class="icon-btn" id="btn-close-chat">✖️</button>
+  </div>
+
+  <!-- ドリルダウン用メニュー（左からスライドイン） -->
+  <nav id="drawer-menu">
+    <div class="drawer-header">
+      <button class="icon-btn" id="btn-back">＜</button>
+      <div class="breadcrumb">全体 &gt; main-content</div>
+    </div>
+    <ul class="element-list">
+      <li class="element-item" data-target="block1"><span class="tag">div</span> .header-section</li>
+      <li class="element-item" data-target="block2"><span class="tag">div</span> .main-content</li>
+      <li class="element-item" data-target="block3"><span class="tag">function</span> init()</li>
+    </ul>
+    <button class="add-btn">＋ 子要素を追加</button>
+  </nav>
+
+  <!-- メイン編集エリア（ビューワー兼ポインター） -->
+  <main id="editor-area">
+    <div class="code-block" id="block1">
+      <span class="tag">&lt;div class="header-section"&gt;</span><br>
+      &nbsp;&nbsp;&lt;h1&gt;スマホエディタの世界へようこそ&lt;/h1&gt;<br>
+      <span class="tag">&lt;/div&gt;</span>
+    </div>
+    
+    <div class="code-block" id="block2">
+      <span class="tag">&lt;div class="main-content"&gt;</span><br>
+      &nbsp;&nbsp;&lt;p&gt;ここをタップして、下のチャット欄で編集します。&lt;/p&gt;<br>
+      &nbsp;&nbsp;&lt;p&gt;タグだけ色が付くシンプルなUIです。&lt;/p&gt;<br>
+      <span class="tag">&lt;/div&gt;</span>
+    </div>
+
+    <div class="code-block" id="block3">
+      <span class="tag">function init() {</span><br>
+      &nbsp;&nbsp;console.log("Started");<br>
+      <span class="tag">}</span>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
