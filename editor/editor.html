@@ -64,18 +64,20 @@
     </div>
   </main>
 
-  <!-- チャット風入力欄（復活＆邪魔なバー抑制策を追加） -->
-  <!-- チャット風入力欄（OSのお節介を極限まで無効化するハック版） -->
+
   <div id="chat-input-area">
-       <textarea id="chat-textarea"
-          placeholder="テキストを編集・追記..."
-          autocomplete="new-password"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          inputmode="text"
-          data-form-type="other"></textarea>
-    <button id="btn-send">↑</button>
+    <div class="chat-input-wrapper">
+      <textarea id="chat-textarea" placeholder="テキストを編集・追記..."
+                name="dummy-random-string-xyz" 
+                autocomplete="nope" 
+                autocorrect="off" 
+                autocapitalize="none" 
+                spellcheck="false" 
+                inputmode="text"
+                data-lpignore="true" 
+                data-1p-ignore></textarea>
+      <button id="btn-send">↑</button>
+    </div>
   </div>
 
 
