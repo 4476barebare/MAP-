@@ -3092,15 +3092,15 @@ function goBack() {
     const showBackBtnOnly = () => {
         if (isReleased) return;
         isReleased = true;
-        // ★ 削除：ここにあった window.goBackGuard = false; を消去
+        
         const backBtn = document.getElementById('map-back-btn');
         if (backBtn) {
             backBtn.style.display = 'block';
             requestAnimationFrame(() => {
                 backBtn.style.transition = 'opacity 0.4s ease';
-                btn.style.pointerEvents = 'auto';
-                backBtn.style.opacity = '1';
+                // 👇 【修正】 btn になっていたタイポを backBtn に修正
                 backBtn.style.pointerEvents = 'auto'; 
+                backBtn.style.opacity = '1';
             });
         }
     };
@@ -3137,9 +3137,6 @@ function goBack() {
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
-        // ★核心の修正：戻るボタンの「クリックの衝撃」がマップに貫通し、
-        // 復活したRegionの「県選択クリック」を叩き起こして逆戻りするのを防ぐため、
-        // 衝撃が消え去るまで処理を10ミリ秒だけ意図的に遅延させます。
         setTimeout(() => {
             showdebug('A');
             loadRegionMap(regionToLoad);
@@ -3148,14 +3145,17 @@ function goBack() {
             if (typeof renderCrowdImage === 'function') {
                 renderCrowdImage();
             }
- 
         }, 10);
 
-setTimeout(() => {
-
+        setTimeout(() => {
             showdebug('C');
-            showPrefSpots();
+            if (typeof showPrefSpots === 'function') {
+                showPrefSpots();
+            }
             showdebug('D');
+            
+            // 👇 【修正】ここでちゃんと backBtn を定義してあげる
+            const backBtn = document.getElementById('map-back-btn');
             if (backBtn) {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
@@ -3167,6 +3167,8 @@ setTimeout(() => {
 
         return;
     }
+
+    // --- 以降は ① スポット詳細 → Phase2 ... と続きます ---
 
     // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
     if (window.currentSpotId != null) {
