@@ -24,7 +24,6 @@ body {
   overflow: hidden;
 }
 
-/* ボタン共通 */
 button {
   background: none;
   border: none;
@@ -49,7 +48,7 @@ button {
 .file-title { font-weight: bold; font-size: 16px;}
 .header-actions { display: flex; gap: 12px; }
 
-/* サブヘッダー（入力時専用ツールバー） */
+/* サブヘッダー */
 #sub-header {
   display: flex;
   align-items: center;
@@ -87,7 +86,42 @@ button {
   font-weight: bold;
 }
 
-/* ドリルダウンメニュー（左からスライド） */
+/* チャット風入力エリア */
+#chat-input-area {
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--bg-color);
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+}
+#chat-textarea {
+  flex: 1;
+  min-height: 40px;
+  max-height: 120px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 16px; /* ズーム防止 */
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  background-color: var(--highlight-bg);
+}
+#btn-send {
+  margin-left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--text-color);
+  color: var(--bg-color);
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ドリルダウンメニュー */
 #drawer-menu {
   position: absolute;
   top: 0; left: 0; bottom: 0;
