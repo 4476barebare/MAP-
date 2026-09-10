@@ -3109,13 +3109,12 @@ const showBackBtnOnly = () => {
 if (!window.currentAreaId && !window.currentSpotId) {
     lockAndHideUI();
 
-    // PREF側のzoom / moveend監視を完全に停止
-    if (typeof stopZoomGuard === 'function') {
-        stopZoomGuard();
-    }
-
     const regionToLoad = window.currentRegion || 'KANTO';
-
+if (window.map) {
+    window.map.stop();
+    window.map.setMaxBounds(null);
+    window.map.options.maxBoundsViscosity = 0;
+}
     // Regionクリックを先に完全停止
     if (window.map && window.regionNearestClickHandler) {
         window.map.off('click', window.regionNearestClickHandler);
