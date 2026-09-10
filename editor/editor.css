@@ -86,32 +86,45 @@ button {
   font-weight: bold;
 }
 
-/* チャット風入力エリア */
+/* チャット風入力エリア（親コンテナ） */
 #chat-input-area {
-  display: flex;
-  align-items: flex-end;
   padding: 12px;
   border-top: 1px solid var(--border-color);
   background-color: var(--bg-color);
   padding-bottom: env(safe-area-inset-bottom, 12px);
+  width: 100%;
 }
+
+/* テキストエリアとボタンを包むラッパー（重要） */
+.chat-input-wrapper {
+  position: relative; /* ボタンを絶対配置するための基準点 */
+  width: 100%;
+}
+
 #chat-textarea {
-  flex: 1;
+  width: 100%; /* 横幅いっぱいに広げる */
   min-height: 40px;
   max-height: 120px;
   border: 1px solid var(--border-color);
   border-radius: 20px;
-  padding: 10px 16px;
-  font-size: 16px; /* ズーム防止 */
+  /* 右側のpaddingを大きく取り、文字がボタンの下に隠れないようにする */
+  padding: 10px 50px 10px 16px; 
+  font-size: 16px;
   font-family: inherit;
   resize: none;
   outline: none;
   background-color: var(--highlight-bg);
+  /* はみ出し防止 */
+  box-sizing: border-box; 
 }
+
 #btn-send {
-  margin-left: 12px;
-  width: 40px;
-  height: 40px;
+  /* ラッパーの右下に絶対配置して重ねる */
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 32px; /* 少しだけ小さくして収まりを良くする */
+  height: 32px;
   border-radius: 50%;
   background-color: var(--text-color);
   color: var(--bg-color);
@@ -119,7 +132,14 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
+  /* 押したときのアニメーション */
+  transition: transform 0.1s; 
 }
+
+#btn-send:active {
+  transform: scale(0.9);
+}
+
 
 /* ドリルダウンメニュー */
 #drawer-menu {
