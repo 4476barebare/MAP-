@@ -20,7 +20,6 @@ body {
   color: var(--text-color);
   display: flex;
   flex-direction: column;
-  /* スマホのキーボード高さを考慮した高さ設定 */
   height: 100dvh; 
   overflow: hidden;
 }
@@ -86,41 +85,6 @@ button {
 .tag {
   color: var(--tag-color);
   font-weight: bold;
-}
-
-/* チャット風入力エリア */
-#chat-input-area {
-  display: flex;
-  align-items: flex-end;
-  padding: 12px;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--bg-color);
-  padding-bottom: env(safe-area-inset-bottom, 12px); /* iPhoneの下部バー対応 */
-}
-#chat-textarea {
-  flex: 1;
-  min-height: 40px;
-  max-height: 120px; /* 広がりすぎないように */
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  padding: 10px 16px;
-  font-size: 16px; /* スマホでのズーム防止 */
-  font-family: inherit;
-  resize: none;
-  outline: none;
-  background-color: var(--highlight-bg);
-}
-#btn-send {
-  margin-left: 12px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--text-color);
-  color: var(--bg-color);
-  font-weight: bold;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 /* ドリルダウンメニュー（左からスライド） */
