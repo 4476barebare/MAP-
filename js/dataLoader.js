@@ -798,7 +798,7 @@ function selectArea(area) {
                     btn.style.display = 'block';
                     requestAnimationFrame(() => {
                         btn.style.transition = 'opacity 0.4s ease';
-                        btn.style.pointerEvents = 'auto';
+                        //btn.style.pointerEvents = 'auto';
                         btn.style.opacity = '1';
                     });
                 }
