@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }).setView([35.6, 140.0], 7);
 
   L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
-    attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
+    attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">© 国土地理院</a>'
   }).addTo(map);
 
   // ★ 汎用化: fish-dot-marker
