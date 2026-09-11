@@ -93,14 +93,15 @@
 
     #aji-map {
       width: 100%;
-      height: 25vh;
-      min-height: 200px;
-      max-height: 300px;
+      /* ★変更: 横長の25vhをやめ、縦横比1:1（正方形）にして関東をスッポリ収める */
+      aspect-ratio: 1 / 1;
+      max-height: 50vh; /* 画面全体を覆い尽くさないよう上限を設ける */
       margin: 15px 0 5px 0;
       border: 1px solid #ccc;
       border-radius: 5px;
       z-index: 1;
     }
+
 
     .aji-dot-marker {
       background-color: #ff3333;
