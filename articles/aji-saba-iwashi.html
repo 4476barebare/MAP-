@@ -22,132 +22,9 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="../css/main.css">
-  
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <style>
-    .article {
-      max-width: 720px;
-      margin: 0px auto;
-      padding: 10px;
-      line-height: 1.9;
-    }
-    
-    .article-header h1 {
-      font-size: 20px;
-      color: #191970;
-      border-left: 4px solid #191970;
-      padding-left: 10px;
-    }
-    
-    .article-meta {
-      font-size: 12px;
-      color: #666;
-      text-align: right;
-    }
-    
-    .article img {
-      width: 100%;
-      height: auto;
-      margin-bottom: 15px;
-    }
-    
-    .article-section {
-      margin-bottom: 28px;
-    }
-    
-    .article-section h2 {
-      font-weight: bold;
-      font-size: 16px;
-      color: #191970;
-      border-bottom: 1px solid #191970;
-      padding-bottom: 5px;
-      margin-bottom: 15px;
-    }
-    
-    .article-section h3 {
-      font-size: 15px;
-      color: #191970;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-    
-    .article-section p {
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-
-    .info-box {
-      background-color: #f5f8fc;
-      border: 1px solid #dcdcdc;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      font-size: 14px;
-    }
-
-    .info-box strong {
-      color: #191970;
-    }
-
-    #aji-map {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      max-height: 50vh;
-      margin: 15px 0 5px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      z-index: 1;
-    }
-
-    .aji-dot-marker {
-      background-color: #ff3333;
-      border-radius: 50%;
-      box-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
-    }
-
-    #debug-area {
-      background-color: #000;
-      color: #0f0;
-      font-family: monospace;
-      font-size: 12px;
-      padding: 10px;
-      border-radius: 5px;
-      height: 200px;
-      overflow-y: auto;
-      margin-bottom: 15px;
-      line-height: 1.4;
-    }
-    
-    /* アジスポットリンクリスト用 */
-    .pref-link-heading {
-      font-size: 15px;
-      color: #191970;
-      margin: 20px 0 10px 0;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #ccc;
-    }
-    
-    .spot-link-item {
-      display: inline-block;
-      background: #eef3f8;
-      border: 1px solid #dce4ee;
-      padding: 6px 12px;
-      border-radius: 4px;
-      margin-bottom: 8px;
-    }
-    
-    .spot-link-item a {
-      color: #191970;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    
-    .spot-link-item a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
 </head>
 
 <body>
@@ -272,14 +149,12 @@
       </p>
     </section>
 
-    <!-- ★ マップ表示・リンクリストエリア -->
     <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
       <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東のアジ生息・釣果スポット</h3>
       <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットがアジの釣れるポイントです。</p>
-      <div id="aji-map"></div>
       
-      <!-- デバッグエリア -->
-      <div id="debug-area">[System Log Start]<br></div>
+      <!-- aria-labelはJSから動的付与します -->
+      <div id="aji-map" role="region"></div>
 
       <!-- スポットリンクリスト表示エリア -->
       <div id="aji-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
@@ -322,236 +197,17 @@
 </footer>
 
 <script src="../js/header.js"></script>
-
-<!-- Leaflet JS本体 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- ★ 修正版：県ごとにグループ化してリスト生成 -->
+
+<!-- ★ ここに追加！記事固有の設定をグローバル変数として定義 -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  
-  const debugArea = document.getElementById('debug-area');
-  function logDebug(msg) {
-    if (debugArea) {
-      debugArea.innerHTML += msg + "<br>";
-      debugArea.scrollTop = debugArea.scrollHeight;
-    }
-  }
-
-  const map = L.map('aji-map', {
-    zoomControl: false,
-    dragging: false,
-    touchZoom: false,
-    scrollWheelZoom: false,
-    doubleClickZoom: false,
-    boxZoom: false,
-    keyboard: false,
-    zoomSnap: 0.5,
-    zoomDelta: 0.5
-  }).setView([35.6, 140.0], 7);
-
-  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
-    attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
-  }).addTo(map);
-
-  const dotIcon = L.divIcon({
-    className: 'aji-dot-marker',
-    html: '',
-    iconSize: [3, 3],
-    iconAnchor: [1.5, 1.5]
-  });
-
-  async function loadAjiSpots() {
-    const region = 'KANTO';
-    const regionUrl = `../${region}/${region}_region.csv`;
-
-    logDebug(`▶ Region CSV取得開始: ${regionUrl}`);
-
-    try {
-      const res = await fetch(regionUrl);
-      if (!res.ok) {
-        logDebug(`<span style="color:#ff5555;">[Error] Region CSV fetch failed: status ${res.status}</span>`);
-        throw new Error("Region CSV fetch failed");
-      }
-      
-      const text = await res.text();
-      const lines = text.trim().split('\n');
-      logDebug(`✅ Region CSV 取得成功: 全 ${lines.length} 行`);
-      
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-      const typeIdx = headers.indexOf('type');
-      const urlIdx = headers.indexOf('url');
-      
-      if (typeIdx === -1 || urlIdx === -1) return;
-
-      const prefCodes = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',').map(c => c.trim());
-        if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
-          const urlVal = cols[urlIdx];
-          const pCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
-          if (pCode) prefCodes.push(pCode);
-        }
-      }
-      logDebug(`📝 抽出した県コード: ${prefCodes.join(', ')}`);
-      
-      const fetchPromises = prefCodes.map(async (prefCode) => {
-          const locUrl = `../${region}/${prefCode}_location.json`;
-          const fishUrl = `../${region}/${prefCode}_fish.json`;
-          
-          const [locRes, fishRes] = await Promise.all([
-              fetch(locUrl).catch(() => null),
-              fetch(fishUrl).catch(() => null)
-          ]);
-          
-          const locData = locRes && locRes.ok ? await locRes.json() : [];
-          const fishData = fishRes && fishRes.ok ? await fishRes.json() : {};
-          
-          let fishSpotCount = 0;
-          if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
-              Object.values(fishData).forEach(area => {
-                  if (area && typeof area === 'object') {
-                      fishSpotCount += Object.keys(area).length;
-                  }
-              });
-          }
-          
-          logDebug(`🔄 ${prefCode}: locData ${Array.isArray(locData) ? locData.length : 0}件 / fishData ${fishSpotCount}スポット 取得完了`);
-          
-          return { locData, fishData, prefCode };
-      });
-      
-      const results = await Promise.all(fetchPromises);
-      let totalAjiSpots = 0;
-      
-      const bounds = L.latLngBounds();
-      
-      const ajiSpotLinks = [];
-      
-      results.forEach(({ locData, fishData, prefCode }) => {
-          let prefAjiSpots = 0;
-          const fishMap = {};
-          
-          let prefNameJP = prefCode;
-          const areaDict = {};
-
-          if (Array.isArray(locData)) {
-              locData.forEach(s => {
-                  if (s.name === prefCode && s.individualId === 'parent' && s.notes) {
-                      prefNameJP = s.notes;
-                  }
-                  if (s.areaId === prefCode && s.individualId && s.individualId !== 'parent') {
-                      areaDict[s.individualId] = s.name;
-                  }
-              });
-          }
-          
-          if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
-              Object.values(fishData).forEach(areaData => {
-                  if (areaData && typeof areaData === 'object') {
-                      Object.entries(areaData).forEach(([spotName, fishes]) => {
-                          if (fishes && typeof fishes === 'object') {
-                              fishMap[spotName] = Object.keys(fishes).join(',');
-                          }
-                      });
-                  }
-              });
-          }
-          
-          if (Array.isArray(locData)) {
-              locData.forEach(spot => {
-                  if (spot.type === 'pref' || spot.type === 'area') return;
-                  
-                  const locStr = (spot.URL || '') + (spot.notes || '') + (spot.name || '');
-                  const fStr = fishMap[spot.name] || fishMap[spot.individualId] || '';
-                  
-                  const searchStr = locStr + fStr;
-                  
-                  if (searchStr.includes('アジ')) {
-                      prefAjiSpots++;
-                      totalAjiSpots++;
-                      if (spot.lat && spot.lng) {
-                          L.marker([spot.lat, spot.lng], { icon: dotIcon }).addTo(map);
-                          bounds.extend([spot.lat, spot.lng]);
-                      }
-
-                      const spotAreaIdStr = String(spot.areaId || '');
-                      const areaIndividualId = spotAreaIdStr.replace(`${prefCode}_`, '');
-                      const areaNameJP = areaDict[areaIndividualId] || '';
-
-                      if (areaNameJP) {
-                          const href = `https://turiiko-navi.com/?region=関東地方&pref=${encodeURIComponent(prefNameJP)}&area=${encodeURIComponent(areaNameJP)}&spot=${encodeURIComponent(spot.name)}`;
-                          ajiSpotLinks.push({
-                              prefName: prefNameJP,
-                              spotName: spot.name,
-                              href: href
-                          });
-                      }
-                  }
-              });
-          }
-          logDebug(`🐟 ${prefCode} のアジ生息スポット: ${prefAjiSpots} 件`);
-      });
-      
-      logDebug(`<b>🌟 総合計 アジ生息スポット数: ${totalAjiSpots} 件</b>`);
-
-      if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: [10, 10] });
-          map.setZoom(map.getZoom() + 0.5);
-          logDebug(`🗺️ マップの自動調整完了 (Zoom: ${map.getZoom()})`);
-      }
-
-      // ★ 変更: 県ごとにグループ化してリストを出力する処理
-      const listContainer = document.getElementById('aji-spot-list');
-      if (listContainer && ajiSpotLinks.length > 0) {
-          
-          // 1. 県名(prefName)をキーにして配列に仕分ける
-          const groupedLinks = {};
-          ajiSpotLinks.forEach(link => {
-              if (!groupedLinks[link.prefName]) {
-                  groupedLinks[link.prefName] = [];
-              }
-              groupedLinks[link.prefName].push(link);
-          });
-
-          // 2. グループごとに見出し(h4)とリストを生成
-          for (const [pref, links] of Object.entries(groupedLinks)) {
-              
-              // 県名の見出し作成
-              const heading = document.createElement('h4');
-              heading.className = 'pref-link-heading';
-              heading.textContent = pref;
-              listContainer.appendChild(heading);
-
-              // リンク一覧のUL作成
-              const ul = document.createElement('ul');
-              ul.style.listStyleType = 'none';
-              ul.style.paddingLeft = '0';
-              ul.style.display = 'flex';
-              ul.style.flexWrap = 'wrap';
-              ul.style.gap = '8px';
-              ul.style.margin = '0 0 15px 0';
-
-              links.forEach(link => {
-                  const li = document.createElement('li');
-                  li.className = 'spot-link-item';
-                  // ★リンクのテキストをスポット名（〇〇漁港など）のみに限定
-                  li.innerHTML = `<a href="${link.href}">${link.spotName}</a>`;
-                  ul.appendChild(li);
-              });
-              
-              listContainer.appendChild(ul);
-          }
-          logDebug(`🔗 アジスポットリンク ${ajiSpotLinks.length} 件を県別にグループ化して生成しました`);
-      }
-      
-    } catch (e) {
-      logDebug(`<span style="color:#ff5555;">[Fatal Error] ${e.message}</span>`);
-    }
-  }
-
-  loadAjiSpots();
-});
+  window.TARGET_FISH = 'アジ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
 </script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
 
 </body>
 </html>
