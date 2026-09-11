@@ -5,19 +5,19 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   
-  // ★ HTML側で定義されたグローバル変数を読み込み（未定義時のフォールバックも設定）
-  const targetFish = window.TARGET_FISH || 'アジ';
+  // HTML側で定義されたグローバル変数を読み込み（未定義時のフォールバックも設定）
+  const targetFish = window.TARGET_FISH || '対象魚';
   const targetRegionCode = window.TARGET_REGION_CODE || 'KANTO';
   const targetRegionNameJP = window.TARGET_REGION_NAME_JP || '関東地方';
 
-  // 1. マップ枠のSEO（aria-label）を動的に生成
-  const mapContainer = document.getElementById('aji-map');
+  // ★ 汎用化: fish-map
+  const mapContainer = document.getElementById('fish-map');
   if (mapContainer) {
     mapContainer.setAttribute('aria-label', `${targetRegionNameJP}の${targetFish}釣果スポット分布マップ`);
   }
 
-  // 2. マップ初期化（完全固定モード）
-  const map = L.map('aji-map', {
+  // ★ 汎用化: fish-map
+  const map = L.map('fish-map', {
     zoomControl: false,
     dragging: false,
     touchZoom: false,
@@ -33,8 +33,9 @@ document.addEventListener("DOMContentLoaded", function () {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
   }).addTo(map);
 
+  // ★ 汎用化: fish-dot-marker
   const dotIcon = L.divIcon({
-    className: 'aji-dot-marker',
+    className: 'fish-dot-marker',
     html: '',
     iconSize: [3, 3],
     iconAnchor: [1.5, 1.5]
@@ -91,7 +92,6 @@ document.addEventListener("DOMContentLoaded", function () {
           let prefNameJP = prefCode;
           const areaDict = {};
 
-          // 逆引き用辞書の作成
           if (Array.isArray(locData)) {
               locData.forEach(s => {
                   if (s.name === prefCode && s.individualId === 'parent' && s.notes) {
@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", function () {
               });
           }
           
-          // ツリー構造を展開
           if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
               Object.values(fishData).forEach(areaData => {
                   if (areaData && typeof areaData === 'object') {
@@ -116,7 +115,6 @@ document.addEventListener("DOMContentLoaded", function () {
               });
           }
           
-          // 魚種検索とプロット
           if (Array.isArray(locData)) {
               locData.forEach(spot => {
                   if (spot.type === 'pref' || spot.type === 'area') return;
@@ -148,14 +146,13 @@ document.addEventListener("DOMContentLoaded", function () {
           }
       });
       
-      // オートズームの適用
       if (bounds.isValid()) {
           map.fitBounds(bounds, { padding: [10, 10] });
           map.setZoom(map.getZoom() + 0.5);
       }
 
-      // リンクリストの出力
-      const listContainer = document.getElementById('aji-spot-list');
+      // ★ 汎用化: fish-spot-list
+      const listContainer = document.getElementById('fish-spot-list');
       if (listContainer && fishSpotLinks.length > 0) {
           
           const groupedLinks = {};
