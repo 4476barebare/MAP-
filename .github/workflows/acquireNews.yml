@@ -1,0 +1,76 @@
+name: "acquire News JSON from XREA"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '29 1,13 * * *'
+      timezone: 'Asia/Tokyo' # 🌟 日本時間の 01:29 と 13:29 に正確に発火します
+
+# 🌟 デプロイの渋滞や衝突を防ぐ安全装置
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  fetch-and-deploy:
+    runs-on: ubuntu-latest
+    
+    # 🌟 GitHub Pagesへのデプロイ権限を証明するために必須の記述
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # リベース時のエラー防止のために全履歴を取得
+
+      # ========================================================
+      # 1. XREAサーバーから最新のnews.jsonをダウンロード
+      # ※Node.jsは不要！curlで直接ファイルを保存するので爆速です
+      # ========================================================
+      - name: Download news.json
+        run: |
+          mkdir -p data
+          curl -sS https://turiiko.shop/actions/news/news.json -o data/news.json
+
+      # ========================================================
+      # 2. 取得したデータをリポジトリに保存する処理
+      # ========================================================
+      - name: Commit and Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # ダウンロードしたJSONをステージング
+          git add data/news.json
+          
+          # 変更がある場合のみコミットしてプッシュ
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: XREAから最新のnews.jsonを取得"
+            
+            # リモートで別の更新があっても衝突しないようリベース
+            git pull --rebase origin main
+            
+            git push origin main
+          else
+            echo "✅ ニュースデータに変更がなかったためコミットをスキップしました。"
+          fi
+
+      # ========================================================
+      # 3. GitHub Pages への直接デプロイ
+      # ========================================================
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './'
+
+      - name: Deploy to GitHub Pages
+        id: deployment 
+        uses: actions/deploy-pages@v4
