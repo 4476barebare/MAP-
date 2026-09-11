@@ -71,7 +71,8 @@
    マップ表示・リンクリスト関連
 ========================================= */
 
-#aji-map {
+/* ★ 汎用化: aji-map -> fish-map */
+#fish-map {
   width: 100%;
   aspect-ratio: 1 / 1;
   max-height: 50vh;
@@ -81,7 +82,8 @@
   z-index: 1;
 }
 
-.aji-dot-marker {
+/* ★ 汎用化: aji-dot-marker -> fish-dot-marker */
+.fish-dot-marker {
   background-color: #ff3333;
   border-radius: 50%;
   box-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
