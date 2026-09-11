@@ -23,7 +23,6 @@
   <!-- CSS -->
   <link rel="stylesheet" href="../css/main.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- 分割した専用CSSを読み込み -->
   <link rel="stylesheet" href="../css/fish_article.css">
 </head>
 
@@ -149,15 +148,15 @@
       </p>
     </section>
 
+    <!-- ★ 汎用化: aji-map -> fish-map, aji-spot-list -> fish-spot-list -->
     <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
-      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東のアジ生息・釣果スポット</h3>
-      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットがアジの釣れるポイントです。</p>
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
       
-      <!-- aria-labelはJSから動的付与します -->
-      <div id="aji-map" role="region"></div>
+      <div id="fish-map" role="region"></div>
 
       <!-- スポットリンクリスト表示エリア -->
-      <div id="aji-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
     </section>
 
   </article>
@@ -199,14 +198,13 @@
 <script src="../js/header.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- ★ ここに追加！記事固有の設定をグローバル変数として定義 -->
+<!-- 記事固有の設定 -->
 <script>
   window.TARGET_FISH = 'アジ';
   window.TARGET_REGION_CODE = 'KANTO';
   window.TARGET_REGION_NAME_JP = '関東地方';
 </script>
 
-<!-- 汎用化された分割JSを読み込み -->
 <script src="../js/fish_article.js"></script>
 
 </body>
