@@ -121,19 +121,29 @@
     }
     
     /* アジスポットリンクリスト用 */
+    .pref-link-heading {
+      font-size: 15px;
+      color: #191970;
+      margin: 20px 0 10px 0;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #ccc;
+    }
+    
     .spot-link-item {
       display: inline-block;
       background: #eef3f8;
       border: 1px solid #dce4ee;
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: 4px;
       margin-bottom: 8px;
     }
+    
     .spot-link-item a {
       color: #191970;
       text-decoration: none;
       font-weight: bold;
     }
+    
     .spot-link-item a:hover {
       text-decoration: underline;
     }
@@ -271,7 +281,7 @@
       <!-- デバッグエリア -->
       <div id="debug-area">[System Log Start]<br></div>
 
-      <!-- ★ 追加: スポットリンクリスト表示エリア -->
+      <!-- スポットリンクリスト表示エリア -->
       <div id="aji-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
     </section>
 
@@ -315,7 +325,7 @@
 
 <!-- Leaflet JS本体 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- ★ 修正版：リンク逆引き＆生成ロジック追加 -->
+<!-- ★ 修正版：県ごとにグループ化してリスト生成 -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   
@@ -415,24 +425,20 @@ document.addEventListener("DOMContentLoaded", function () {
       
       const bounds = L.latLngBounds();
       
-      // ★ 追加: スポットリンクリスト用の配列
       const ajiSpotLinks = [];
       
       results.forEach(({ locData, fishData, prefCode }) => {
           let prefAjiSpots = 0;
           const fishMap = {};
           
-          // ★ 追加: location.jsonから県名(日本語)とエリア名(日本語)の逆引き辞書を作成
           let prefNameJP = prefCode;
           const areaDict = {};
 
           if (Array.isArray(locData)) {
               locData.forEach(s => {
-                  // 県名の取得 (individualId === 'parent')
                   if (s.name === prefCode && s.individualId === 'parent' && s.notes) {
                       prefNameJP = s.notes;
                   }
-                  // エリア名の辞書登録 (areaIdが県名と一致し、individualIdを持つエリア)[span_0](start_span)[span_0](end_span)
                   if (s.areaId === prefCode && s.individualId && s.individualId !== 'parent') {
                       areaDict[s.individualId] = s.name;
                   }
@@ -468,8 +474,6 @@ document.addEventListener("DOMContentLoaded", function () {
                           bounds.extend([spot.lat, spot.lng]);
                       }
 
-                      // ★ 追加: アジスポットのリンクURLを生成
-                      // spot.areaId (例: "IBARAKI_HITACHI") から "HITACHI" を抽出[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)
                       const spotAreaIdStr = String(spot.areaId || '');
                       const areaIndividualId = spotAreaIdStr.replace(`${prefCode}_`, '');
                       const areaNameJP = areaDict[areaIndividualId] || '';
@@ -496,26 +500,48 @@ document.addEventListener("DOMContentLoaded", function () {
           logDebug(`🗺️ マップの自動調整完了 (Zoom: ${map.getZoom()})`);
       }
 
-      // ★ 追加: リストコンテナにリンクを出力
+      // ★ 変更: 県ごとにグループ化してリストを出力する処理
       const listContainer = document.getElementById('aji-spot-list');
       if (listContainer && ajiSpotLinks.length > 0) {
-          const ul = document.createElement('ul');
-          ul.style.listStyleType = 'none';
-          ul.style.paddingLeft = '0';
-          ul.style.display = 'flex';
-          ul.style.flexWrap = 'wrap';
-          ul.style.gap = '8px';
-          ul.style.margin = '0';
-
-          ajiSpotLinks.forEach(link => {
-              const li = document.createElement('li');
-              li.className = 'spot-link-item';
-              li.innerHTML = `<a href="${link.href}">${link.prefName} ${link.spotName}</a>`;
-              ul.appendChild(li);
-          });
           
-          listContainer.appendChild(ul);
-          logDebug(`🔗 アジスポットリンク ${ajiSpotLinks.length} 件を生成しました`);
+          // 1. 県名(prefName)をキーにして配列に仕分ける
+          const groupedLinks = {};
+          ajiSpotLinks.forEach(link => {
+              if (!groupedLinks[link.prefName]) {
+                  groupedLinks[link.prefName] = [];
+              }
+              groupedLinks[link.prefName].push(link);
+          });
+
+          // 2. グループごとに見出し(h4)とリストを生成
+          for (const [pref, links] of Object.entries(groupedLinks)) {
+              
+              // 県名の見出し作成
+              const heading = document.createElement('h4');
+              heading.className = 'pref-link-heading';
+              heading.textContent = pref;
+              listContainer.appendChild(heading);
+
+              // リンク一覧のUL作成
+              const ul = document.createElement('ul');
+              ul.style.listStyleType = 'none';
+              ul.style.paddingLeft = '0';
+              ul.style.display = 'flex';
+              ul.style.flexWrap = 'wrap';
+              ul.style.gap = '8px';
+              ul.style.margin = '0 0 15px 0';
+
+              links.forEach(link => {
+                  const li = document.createElement('li');
+                  li.className = 'spot-link-item';
+                  // ★リンクのテキストをスポット名（〇〇漁港など）のみに限定
+                  li.innerHTML = `<a href="${link.href}">${link.spotName}</a>`;
+                  ul.appendChild(li);
+              });
+              
+              listContainer.appendChild(ul);
+          }
+          logDebug(`🔗 アジスポットリンク ${ajiSpotLinks.length} 件を県別にグループ化して生成しました`);
       }
       
     } catch (e) {
