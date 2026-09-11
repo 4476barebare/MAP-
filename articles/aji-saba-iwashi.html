@@ -165,7 +165,7 @@
 
     <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
       <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東のアジ生息・釣果スポット</h3>
-      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドット（2×2px）がアジの釣れるポイントです。</p>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットがアジの釣れるポイントです。</p>
       <div id="aji-map"></div>
       
       <!-- デバッグエリア -->
@@ -281,7 +281,7 @@
 
 <!-- Leaflet JS本体 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- ★ 修正版：JSONツリー構造をパースする抽出スクリプト -->
+<!-- ★ 修正版：タイル変更・操作無効化・自動フィット対応 -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   
@@ -293,11 +293,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  // ★変更点: 全ての地図操作（ドラッグ、ズーム等）を無効化
   const map = L.map('aji-map', {
-    zoomControl: false
-  }).setView([35.6, 140.0], 7);
+    zoomControl: false,
+    dragging: false,
+    touchZoom: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false
+  }).setView([35.6, 140.0], 7); // 初期値（あとで自動調整される）
 
-  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
+  // ★変更点: ort（航空写真）タイルに変更[span_0](start_span)[span_0](end_span)
+  L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
   }).addTo(map);
 
@@ -353,10 +361,8 @@ document.addEventListener("DOMContentLoaded", function () {
           ]);
           
           const locData = locRes && locRes.ok ? await locRes.json() : [];
-          // 配列ではないため {} をデフォルトとする
           const fishData = fishRes && fishRes.ok ? await fishRes.json() : {};
           
-          // 魚種データ（ツリー構造）の保有スポット数をカウント
           let fishSpotCount = 0;
           if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
               Object.values(fishData).forEach(area => {
@@ -374,17 +380,18 @@ document.addEventListener("DOMContentLoaded", function () {
       const results = await Promise.all(fetchPromises);
       let totalAjiSpots = 0;
       
+      // ★追加: 自動フィット計算用のBounds
+      const bounds = L.latLngBounds();
+      
       results.forEach(({ locData, fishData, prefCode }) => {
           let prefAjiSpots = 0;
           const fishMap = {};
           
-          // ★ 修正箇所：階層構造のfishDataを展開し、スポット名ごとに魚種名リストを結合する
           if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
               Object.values(fishData).forEach(areaData => {
                   if (areaData && typeof areaData === 'object') {
                       Object.entries(areaData).forEach(([spotName, fishes]) => {
                           if (fishes && typeof fishes === 'object') {
-                              // {"アジ": {...}, "メバル": {...}} から "アジ,メバル" を生成
                               fishMap[spotName] = Object.keys(fishes).join(',');
                           }
                       });
@@ -396,9 +403,7 @@ document.addEventListener("DOMContentLoaded", function () {
               locData.forEach(spot => {
                   if (spot.type === 'pref' || spot.type === 'area') return;
                   
-                  // locData側の文字列
                   const locStr = (spot.URL || '') + (spot.notes || '') + (spot.name || '');
-                  // fishData側の文字列（スポット名、またはIDで照合）
                   const fStr = fishMap[spot.name] || fishMap[spot.individualId] || '';
                   
                   const searchStr = locStr + fStr;
@@ -408,6 +413,8 @@ document.addEventListener("DOMContentLoaded", function () {
                       totalAjiSpots++;
                       if (spot.lat && spot.lng) {
                           L.marker([spot.lat, spot.lng], { icon: dotIcon }).addTo(map);
+                          // ★追加: Boundsを拡張する
+                          bounds.extend([spot.lat, spot.lng]);
                       }
                   }
               });
@@ -416,6 +423,12 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       
       logDebug(`<b>🌟 総合計 アジ生息スポット数: ${totalAjiSpots} 件</b>`);
+
+      // ★追加: 取得した全アジスポットの座標から、最適なズーム・中心位置に自動フィット
+      if (bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [10, 10] }); // 端が切れないよう少し余白を持たせる
+          logDebug(`🗺️ マップの自動調整完了`);
+      }
       
     } catch (e) {
       logDebug(`<span style="color:#ff5555;">[Fatal Error] ${e.message}</span>`);
