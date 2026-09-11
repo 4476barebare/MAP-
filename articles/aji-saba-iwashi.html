@@ -91,23 +91,35 @@
       color: #191970;
     }
 
-    /* ★ 画面の1/4サイズに可変するマップ枠 */
     #aji-map {
       width: 100%;
-      height: 25vh; /* 画面高の25% (1/4) */
+      height: 25vh;
       min-height: 200px;
       max-height: 300px;
-      margin: 15px 0;
+      margin: 15px 0 5px 0;
       border: 1px solid #ccc;
       border-radius: 5px;
       z-index: 1;
     }
 
-    /* 2×2のドットマーカー用 */
     .aji-dot-marker {
       background-color: #ff3333;
       border-radius: 50%;
       box-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
+    }
+
+    /* ★ 画面表示用のデバッグエリア */
+    #debug-area {
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 10px;
+      border-radius: 5px;
+      height: 200px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      line-height: 1.4;
     }
   </style>
 </head>
@@ -152,11 +164,13 @@
       アジ、サバ、イワシは誰もが知っている最もポピュラーな魚です。いずれも大きな群れを作って回遊する魚で、夜行性が強く常夜灯などの光に群がりやすい習性があります。3魚種とも数釣れるので、ファミリーフィッシングには格好のターゲットです。
     </p>
 
-    <!-- ★ マップ表示エリア -->
     <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
       <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東のアジ生息・釣果スポット</h3>
       <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドット（2×2px）がアジの釣れるポイントです。</p>
       <div id="aji-map"></div>
+      
+      <!-- ★ 追加: デバッグエリア -->
+      <div id="debug-area">[System Log Start]<br></div>
     </section>
     
     <section class="article-section">
@@ -256,7 +270,7 @@
       <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
       <button id="showContact" class="policy-btn">お問い合わせ</button>
     </div>
-    <!-- サイトポリシー省略 (既存テンプレート準拠) -->
+    <!-- サイトポリシー省略 -->
   </div>
 </div>
 
@@ -269,20 +283,27 @@
 
 <!-- Leaflet JS本体 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- ★ index.htmlと同等ロジックでアジのスポットを抽出・描画 -->
+<!-- ★ デバッグ機能付きのアジ抽出スクリプト -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   
-  // 1. マップの初期化（1/4サイズ、関東広域）
+  // デバッグ出力用関数
+  const debugArea = document.getElementById('debug-area');
+  function logDebug(msg) {
+    if (debugArea) {
+      debugArea.innerHTML += msg + "<br>";
+      debugArea.scrollTop = debugArea.scrollHeight;
+    }
+  }
+
   const map = L.map('aji-map', {
-    zoomControl: false // 小さな画面では非表示にしてスッキリさせる
+    zoomControl: false
   }).setView([35.6, 140.0], 7);
 
   L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
   }).addTo(map);
 
-  // 2×2のドットアイコン
   const dotIcon = L.divIcon({
     className: 'aji-dot-marker',
     html: '',
@@ -290,60 +311,74 @@ document.addEventListener("DOMContentLoaded", function () {
     iconAnchor: [1, 1]
   });
 
-  // 2. KANTO_region.csv から全県データをかき集めて表示する関数
   async function loadAjiSpots() {
     const region = 'KANTO';
+    // articlesディレクトリから見た相対パス（ルートがどこにあるかに依存します）
     const regionUrl = `../${region}/${region}_region.csv`;
 
+    logDebug(`▶ Region CSV取得開始: ${regionUrl}`);
+
     try {
-      // Step 1: Region CSVを取得し、全県のプレフィックス(CHIBA等)を抽出
       const res = await fetch(regionUrl);
-      if (!res.ok) throw new Error("Region CSV fetch failed");
+      if (!res.ok) {
+        logDebug(`<span style="color:#ff5555;">[Error] Region CSV fetch failed: status ${res.status}</span>`);
+        throw new Error("Region CSV fetch failed");
+      }
       
       const text = await res.text();
       const lines = text.trim().split('\n');
-      if (lines.length < 2) return;
+      logDebug(`✅ Region CSV 取得成功: 全 ${lines.length} 行`);
+      
+      if (lines.length < 2) {
+        logDebug(`<span style="color:#ff5555;">[Error] CSVの行数が足りません</span>`);
+        return;
+      }
       
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
       const typeIdx = headers.indexOf('type');
       const urlIdx = headers.indexOf('url');
       
-      if (typeIdx === -1 || urlIdx === -1) return;
+      if (typeIdx === -1 || urlIdx === -1) {
+        logDebug(`<span style="color:#ff5555;">[Error] 'type' または 'url' 列が見つかりません</span>`);
+        return;
+      }
 
       const prefCodes = [];
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',').map(c => c.trim());
         if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
           const urlVal = cols[urlIdx];
-          // URL(例: /KANTO/CHIBA_location.json)から CHIBA を取り出す
           const pCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
           if (pCode) prefCodes.push(pCode);
         }
       }
+      logDebug(`📝 抽出した県コード: ${prefCodes.join(', ')}`);
       
-      // Step 2: 抽出した各県コードに対して location.json と fish.json の両方を取得する
+      // JSONのフェッチ
       const fetchPromises = prefCodes.map(async (prefCode) => {
           const locUrl = `../${region}/${prefCode}_location.json`;
           const fishUrl = `../${region}/${prefCode}_fish.json`;
           
           const [locRes, fishRes] = await Promise.all([
-              fetch(locUrl).catch(() => null),
-              fetch(fishUrl).catch(() => null)
+              fetch(locUrl).catch((e) => { logDebug(`<span style="color:#ff5555;">[Error] loc ${prefCode}: ${e.message}</span>`); return null; }),
+              fetch(fishUrl).catch((e) => { logDebug(`<span style="color:#ff5555;">[Error] fish ${prefCode}: ${e.message}</span>`); return null; })
           ]);
           
           const locData = locRes && locRes.ok ? await locRes.json() : [];
           const fishData = fishRes && fishRes.ok ? await fishRes.json() : [];
           
-          return { locData, fishData };
+          logDebug(`🔄 ${prefCode}: locData ${locData.length}件 / fishData ${fishData.length}件 取得完了`);
+          
+          return { locData, fishData, prefCode };
       });
       
-      // すべての県のフェッチが完了するのを待つ
       const results = await Promise.all(fetchPromises);
+      let totalAjiSpots = 0;
       
-      // Step 3: ロードしたデータを合体し、「アジ」を抽出してプロット
-      results.forEach(({ locData, fishData }) => {
-          // 高速検索用にfishDataをMap化
+      results.forEach(({ locData, fishData, prefCode }) => {
+          let prefAjiSpots = 0;
           const fishMap = {};
+          
           if (Array.isArray(fishData)) {
               fishData.forEach(f => {
                   fishMap[f.individualId] = f;
@@ -354,26 +389,32 @@ document.addEventListener("DOMContentLoaded", function () {
               locData.forEach(spot => {
                   if (spot.type === 'pref' || spot.type === 'area') return;
                   
-                  // _location.jsonと_fish.jsonの対象文字列をすべて結合
                   const fSpot = fishMap[spot.individualId] || {};
+                  // 対象文字列を結合
                   const searchStr = (spot.URL || '') + (spot.notes || '') + (spot.name || '') + 
                                     (fSpot.fish || '') + (fSpot.notes || '') + (fSpot.URL || '');
                   
-                  // 「アジ」が含まれていて、座標が存在する場合のみドットを打つ
                   if (searchStr.includes('アジ')) {
+                      prefAjiSpots++;
+                      totalAjiSpots++;
+                      // プロット処理
                       if (spot.lat && spot.lng) {
                           L.marker([spot.lat, spot.lng], { icon: dotIcon }).addTo(map);
                       }
                   }
               });
           }
+          logDebug(`🐟 ${prefCode} のアジ生息スポット: ${prefAjiSpots} 件`);
       });
+      
+      logDebug(`<b>🌟 総合計 アジ生息スポット数: ${totalAjiSpots} 件</b>`);
+      
     } catch (e) {
-      console.error('アジスポットマップの展開エラー:', e);
+      logDebug(`<span style="color:#ff5555;">[Fatal Error] ${e.message}</span>`);
+      console.error(e);
     }
   }
 
-  // ロード開始
   loadAjiSpots();
 });
 </script>
