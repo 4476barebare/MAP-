@@ -93,15 +93,13 @@
 
     #aji-map {
       width: 100%;
-      /* ★変更: 横長の25vhをやめ、縦横比1:1（正方形）にして関東をスッポリ収める */
       aspect-ratio: 1 / 1;
-      max-height: 50vh; /* 画面全体を覆い尽くさないよう上限を設ける */
+      max-height: 50vh;
       margin: 15px 0 5px 0;
       border: 1px solid #ccc;
       border-radius: 5px;
       z-index: 1;
     }
-
 
     .aji-dot-marker {
       background-color: #ff3333;
@@ -164,15 +162,6 @@
       アジ、サバ、イワシは誰もが知っている最もポピュラーな魚です。いずれも大きな群れを作って回遊する魚で、夜行性が強く常夜灯などの光に群がりやすい習性があります。3魚種とも数釣れるので、ファミリーフィッシングには格好のターゲットです。
     </p>
 
-    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
-      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東のアジ生息・釣果スポット</h3>
-      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットがアジの釣れるポイントです。</p>
-      <div id="aji-map"></div>
-      
-      <!-- デバッグエリア -->
-      <div id="debug-area">[System Log Start]<br></div>
-    </section>
-    
     <section class="article-section">
       <h2>生態とそれぞれの特徴</h2>
       <p>
@@ -242,6 +231,29 @@
       </p>
     </section>
 
+    <section class="article-section">
+      <h2>ねらい目と釣った後の楽しみ</h2>
+      <h3>ねらい目は「まずめ時」</h3>
+      <p>
+        イワシは日中でも釣れますが、アジやサバは夜行性が強く、朝夕の「まずめ時」に時合いが集中するパターンが多いようです。できれば暗いうちからサオを出すようにして、夜明けからの2〜3時間を集中的に釣るようにするとよいでしょう。
+      </p>
+      
+      <h3>美味しい食べ方</h3>
+      <p>
+        釣った魚は食べるのも大きな楽しみです。から揚げ、酢漬け、甘露煮、粕漬け、干物など、様々な料理で美味しくいただけます。サバはみそ煮にしても絶品です。
+      </p>
+    </section>
+
+    <!-- ★ 移動＆修正: マップ表示エリアを最下部へ配置 -->
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東のアジ生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットがアジの釣れるポイントです。</p>
+      <div id="aji-map"></div>
+      
+      <!-- デバッグエリア -->
+      <div id="debug-area">[System Log Start]<br></div>
+    </section>
+
   </article>
 </main>
 
@@ -282,7 +294,7 @@
 
 <!-- Leaflet JS本体 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- ★ 修正版：タイル変更・操作無効化・自動フィット対応 -->
+<!-- ★ 修正版：マーカーサイズ拡大・ズーム微調整 -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   
@@ -294,7 +306,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ★変更点: 全ての地図操作（ドラッグ、ズーム等）を無効化
+  // ★ 0.5刻みのズームを許可する設定を追加
   const map = L.map('aji-map', {
     zoomControl: false,
     dragging: false,
@@ -302,19 +314,21 @@ document.addEventListener("DOMContentLoaded", function () {
     scrollWheelZoom: false,
     doubleClickZoom: false,
     boxZoom: false,
-    keyboard: false
-  }).setView([35.6, 140.0], 7); // 初期値（あとで自動調整される）
+    keyboard: false,
+    zoomSnap: 0.5,
+    zoomDelta: 0.5
+  }).setView([35.6, 140.0], 7);
 
-  // ★変更点: ort（航空写真）タイルに変更[span_0](start_span)[span_0](end_span)
   L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg', {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
   }).addTo(map);
 
+  // ★ 3×3サイズに拡大し、アンカーを中心に設定
   const dotIcon = L.divIcon({
     className: 'aji-dot-marker',
     html: '',
-    iconSize: [2, 2],
-    iconAnchor: [1, 1]
+    iconSize: [3, 3],
+    iconAnchor: [1.5, 1.5]
   });
 
   async function loadAjiSpots() {
@@ -351,7 +365,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       logDebug(`📝 抽出した県コード: ${prefCodes.join(', ')}`);
       
-      // JSONのフェッチ
       const fetchPromises = prefCodes.map(async (prefCode) => {
           const locUrl = `../${region}/${prefCode}_location.json`;
           const fishUrl = `../${region}/${prefCode}_fish.json`;
@@ -381,7 +394,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const results = await Promise.all(fetchPromises);
       let totalAjiSpots = 0;
       
-      // ★追加: 自動フィット計算用のBounds
       const bounds = L.latLngBounds();
       
       results.forEach(({ locData, fishData, prefCode }) => {
@@ -414,7 +426,6 @@ document.addEventListener("DOMContentLoaded", function () {
                       totalAjiSpots++;
                       if (spot.lat && spot.lng) {
                           L.marker([spot.lat, spot.lng], { icon: dotIcon }).addTo(map);
-                          // ★追加: Boundsを拡張する
                           bounds.extend([spot.lat, spot.lng]);
                       }
                   }
@@ -425,10 +436,11 @@ document.addEventListener("DOMContentLoaded", function () {
       
       logDebug(`<b>🌟 総合計 アジ生息スポット数: ${totalAjiSpots} 件</b>`);
 
-      // ★追加: 取得した全アジスポットの座標から、最適なズーム・中心位置に自動フィット
+      // ★ ズームを少し深く調整 (+0.5) して余白を減らす
       if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: [10, 10] }); // 端が切れないよう少し余白を持たせる
-          logDebug(`🗺️ マップの自動調整完了`);
+          map.fitBounds(bounds, { padding: [10, 10] });
+          map.setZoom(map.getZoom() + 0.5);
+          logDebug(`🗺️ マップの自動調整完了 (Zoom: ${map.getZoom()})`);
       }
       
     } catch (e) {
