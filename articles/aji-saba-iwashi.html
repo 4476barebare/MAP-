@@ -108,7 +108,6 @@
       box-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
     }
 
-    /* ★ 画面表示用のデバッグエリア */
     #debug-area {
       background-color: #000;
       color: #0f0;
@@ -169,7 +168,7 @@
       <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドット（2×2px）がアジの釣れるポイントです。</p>
       <div id="aji-map"></div>
       
-      <!-- ★ 追加: デバッグエリア -->
+      <!-- デバッグエリア -->
       <div id="debug-area">[System Log Start]<br></div>
     </section>
     
@@ -270,7 +269,6 @@
       <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
       <button id="showContact" class="policy-btn">お問い合わせ</button>
     </div>
-    <!-- サイトポリシー省略 -->
   </div>
 </div>
 
@@ -283,11 +281,10 @@
 
 <!-- Leaflet JS本体 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- ★ デバッグ機能付きのアジ抽出スクリプト -->
+<!-- ★ 修正版：JSONツリー構造をパースする抽出スクリプト -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   
-  // デバッグ出力用関数
   const debugArea = document.getElementById('debug-area');
   function logDebug(msg) {
     if (debugArea) {
@@ -313,7 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function loadAjiSpots() {
     const region = 'KANTO';
-    // articlesディレクトリから見た相対パス（ルートがどこにあるかに依存します）
     const regionUrl = `../${region}/${region}_region.csv`;
 
     logDebug(`▶ Region CSV取得開始: ${regionUrl}`);
@@ -329,19 +325,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const lines = text.trim().split('\n');
       logDebug(`✅ Region CSV 取得成功: 全 ${lines.length} 行`);
       
-      if (lines.length < 2) {
-        logDebug(`<span style="color:#ff5555;">[Error] CSVの行数が足りません</span>`);
-        return;
-      }
-      
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
       const typeIdx = headers.indexOf('type');
       const urlIdx = headers.indexOf('url');
       
-      if (typeIdx === -1 || urlIdx === -1) {
-        logDebug(`<span style="color:#ff5555;">[Error] 'type' または 'url' 列が見つかりません</span>`);
-        return;
-      }
+      if (typeIdx === -1 || urlIdx === -1) return;
 
       const prefCodes = [];
       for (let i = 1; i < lines.length; i++) {
@@ -360,14 +348,25 @@ document.addEventListener("DOMContentLoaded", function () {
           const fishUrl = `../${region}/${prefCode}_fish.json`;
           
           const [locRes, fishRes] = await Promise.all([
-              fetch(locUrl).catch((e) => { logDebug(`<span style="color:#ff5555;">[Error] loc ${prefCode}: ${e.message}</span>`); return null; }),
-              fetch(fishUrl).catch((e) => { logDebug(`<span style="color:#ff5555;">[Error] fish ${prefCode}: ${e.message}</span>`); return null; })
+              fetch(locUrl).catch(() => null),
+              fetch(fishUrl).catch(() => null)
           ]);
           
           const locData = locRes && locRes.ok ? await locRes.json() : [];
-          const fishData = fishRes && fishRes.ok ? await fishRes.json() : [];
+          // 配列ではないため {} をデフォルトとする
+          const fishData = fishRes && fishRes.ok ? await fishRes.json() : {};
           
-          logDebug(`🔄 ${prefCode}: locData ${locData.length}件 / fishData ${fishData.length}件 取得完了`);
+          // 魚種データ（ツリー構造）の保有スポット数をカウント
+          let fishSpotCount = 0;
+          if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
+              Object.values(fishData).forEach(area => {
+                  if (area && typeof area === 'object') {
+                      fishSpotCount += Object.keys(area).length;
+                  }
+              });
+          }
+          
+          logDebug(`🔄 ${prefCode}: locData ${Array.isArray(locData) ? locData.length : 0}件 / fishData ${fishSpotCount}スポット 取得完了`);
           
           return { locData, fishData, prefCode };
       });
@@ -379,9 +378,17 @@ document.addEventListener("DOMContentLoaded", function () {
           let prefAjiSpots = 0;
           const fishMap = {};
           
-          if (Array.isArray(fishData)) {
-              fishData.forEach(f => {
-                  fishMap[f.individualId] = f;
+          // ★ 修正箇所：階層構造のfishDataを展開し、スポット名ごとに魚種名リストを結合する
+          if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
+              Object.values(fishData).forEach(areaData => {
+                  if (areaData && typeof areaData === 'object') {
+                      Object.entries(areaData).forEach(([spotName, fishes]) => {
+                          if (fishes && typeof fishes === 'object') {
+                              // {"アジ": {...}, "メバル": {...}} から "アジ,メバル" を生成
+                              fishMap[spotName] = Object.keys(fishes).join(',');
+                          }
+                      });
+                  }
               });
           }
           
@@ -389,15 +396,16 @@ document.addEventListener("DOMContentLoaded", function () {
               locData.forEach(spot => {
                   if (spot.type === 'pref' || spot.type === 'area') return;
                   
-                  const fSpot = fishMap[spot.individualId] || {};
-                  // 対象文字列を結合
-                  const searchStr = (spot.URL || '') + (spot.notes || '') + (spot.name || '') + 
-                                    (fSpot.fish || '') + (fSpot.notes || '') + (fSpot.URL || '');
+                  // locData側の文字列
+                  const locStr = (spot.URL || '') + (spot.notes || '') + (spot.name || '');
+                  // fishData側の文字列（スポット名、またはIDで照合）
+                  const fStr = fishMap[spot.name] || fishMap[spot.individualId] || '';
+                  
+                  const searchStr = locStr + fStr;
                   
                   if (searchStr.includes('アジ')) {
                       prefAjiSpots++;
                       totalAjiSpots++;
-                      // プロット処理
                       if (spot.lat && spot.lng) {
                           L.marker([spot.lat, spot.lng], { icon: dotIcon }).addTo(map);
                       }
@@ -411,7 +419,6 @@ document.addEventListener("DOMContentLoaded", function () {
       
     } catch (e) {
       logDebug(`<span style="color:#ff5555;">[Fatal Error] ${e.message}</span>`);
-      console.error(e);
     }
   }
 
