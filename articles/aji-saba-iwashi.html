@@ -119,6 +119,24 @@
       margin-bottom: 15px;
       line-height: 1.4;
     }
+    
+    /* アジスポットリンクリスト用 */
+    .spot-link-item {
+      display: inline-block;
+      background: #eef3f8;
+      border: 1px solid #dce4ee;
+      padding: 6px 10px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .spot-link-item a {
+      color: #191970;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .spot-link-item a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -244,7 +262,7 @@
       </p>
     </section>
 
-    <!-- ★ 移動＆修正: マップ表示エリアを最下部へ配置 -->
+    <!-- ★ マップ表示・リンクリストエリア -->
     <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
       <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東のアジ生息・釣果スポット</h3>
       <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットがアジの釣れるポイントです。</p>
@@ -252,6 +270,9 @@
       
       <!-- デバッグエリア -->
       <div id="debug-area">[System Log Start]<br></div>
+
+      <!-- ★ 追加: スポットリンクリスト表示エリア -->
+      <div id="aji-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
     </section>
 
   </article>
@@ -294,7 +315,7 @@
 
 <!-- Leaflet JS本体 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<!-- ★ 修正版：マーカーサイズ拡大・ズーム微調整 -->
+<!-- ★ 修正版：リンク逆引き＆生成ロジック追加 -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   
@@ -306,7 +327,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ★ 0.5刻みのズームを許可する設定を追加
   const map = L.map('aji-map', {
     zoomControl: false,
     dragging: false,
@@ -323,7 +343,6 @@ document.addEventListener("DOMContentLoaded", function () {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">地理院タイル</a>'
   }).addTo(map);
 
-  // ★ 3×3サイズに拡大し、アンカーを中心に設定
   const dotIcon = L.divIcon({
     className: 'aji-dot-marker',
     html: '',
@@ -396,9 +415,29 @@ document.addEventListener("DOMContentLoaded", function () {
       
       const bounds = L.latLngBounds();
       
+      // ★ 追加: スポットリンクリスト用の配列
+      const ajiSpotLinks = [];
+      
       results.forEach(({ locData, fishData, prefCode }) => {
           let prefAjiSpots = 0;
           const fishMap = {};
+          
+          // ★ 追加: location.jsonから県名(日本語)とエリア名(日本語)の逆引き辞書を作成
+          let prefNameJP = prefCode;
+          const areaDict = {};
+
+          if (Array.isArray(locData)) {
+              locData.forEach(s => {
+                  // 県名の取得 (individualId === 'parent')
+                  if (s.name === prefCode && s.individualId === 'parent' && s.notes) {
+                      prefNameJP = s.notes;
+                  }
+                  // エリア名の辞書登録 (areaIdが県名と一致し、individualIdを持つエリア)[span_0](start_span)[span_0](end_span)
+                  if (s.areaId === prefCode && s.individualId && s.individualId !== 'parent') {
+                      areaDict[s.individualId] = s.name;
+                  }
+              });
+          }
           
           if (fishData && typeof fishData === 'object' && !Array.isArray(fishData)) {
               Object.values(fishData).forEach(areaData => {
@@ -428,6 +467,21 @@ document.addEventListener("DOMContentLoaded", function () {
                           L.marker([spot.lat, spot.lng], { icon: dotIcon }).addTo(map);
                           bounds.extend([spot.lat, spot.lng]);
                       }
+
+                      // ★ 追加: アジスポットのリンクURLを生成
+                      // spot.areaId (例: "IBARAKI_HITACHI") から "HITACHI" を抽出[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)
+                      const spotAreaIdStr = String(spot.areaId || '');
+                      const areaIndividualId = spotAreaIdStr.replace(`${prefCode}_`, '');
+                      const areaNameJP = areaDict[areaIndividualId] || '';
+
+                      if (areaNameJP) {
+                          const href = `https://turiiko-navi.com/?region=関東地方&pref=${encodeURIComponent(prefNameJP)}&area=${encodeURIComponent(areaNameJP)}&spot=${encodeURIComponent(spot.name)}`;
+                          ajiSpotLinks.push({
+                              prefName: prefNameJP,
+                              spotName: spot.name,
+                              href: href
+                          });
+                      }
                   }
               });
           }
@@ -436,11 +490,32 @@ document.addEventListener("DOMContentLoaded", function () {
       
       logDebug(`<b>🌟 総合計 アジ生息スポット数: ${totalAjiSpots} 件</b>`);
 
-      // ★ ズームを少し深く調整 (+0.5) して余白を減らす
       if (bounds.isValid()) {
           map.fitBounds(bounds, { padding: [10, 10] });
           map.setZoom(map.getZoom() + 0.5);
           logDebug(`🗺️ マップの自動調整完了 (Zoom: ${map.getZoom()})`);
+      }
+
+      // ★ 追加: リストコンテナにリンクを出力
+      const listContainer = document.getElementById('aji-spot-list');
+      if (listContainer && ajiSpotLinks.length > 0) {
+          const ul = document.createElement('ul');
+          ul.style.listStyleType = 'none';
+          ul.style.paddingLeft = '0';
+          ul.style.display = 'flex';
+          ul.style.flexWrap = 'wrap';
+          ul.style.gap = '8px';
+          ul.style.margin = '0';
+
+          ajiSpotLinks.forEach(link => {
+              const li = document.createElement('li');
+              li.className = 'spot-link-item';
+              li.innerHTML = `<a href="${link.href}">${link.prefName} ${link.spotName}</a>`;
+              ul.appendChild(li);
+          });
+          
+          listContainer.appendChild(ul);
+          logDebug(`🔗 アジスポットリンク ${ajiSpotLinks.length} 件を生成しました`);
       }
       
     } catch (e) {
