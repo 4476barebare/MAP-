@@ -2,7 +2,7 @@ name: Recalculate InLand Weather Data
 
 on:
   schedule:
-    - cron: '0 2 * * *' # 🌟 timezone指定があるため「そのまま日本時間の深夜2時」と書きます
+    - cron: '24 0 * * *' # 🌟 timezone指定があるため「そのまま日本時間の深夜2時」と書きますた
       timezone: 'Asia/Tokyo'
   workflow_dispatch:
 
