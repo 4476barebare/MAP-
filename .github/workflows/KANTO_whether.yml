@@ -3,7 +3,7 @@ name: Coastal Area Weather Control
 on:
   workflow_dispatch:
   schedule:
-    - cron: '24 0 * * *'
+    - cron: '19 0 * * *'
       timezone: 'Asia/Tokyo' # 1日1回自動実行（JST 01:30 相当）
 
 # 🌟 これを追加（デプロイの渋滞エラーを防止する安全装置です）
