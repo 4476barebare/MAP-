@@ -33,12 +33,12 @@ jobs:
 
       # ========================================================
       # 1. XREAサーバーから最新のnews.jsonをダウンロード
-      # ※Node.jsは不要！curlで直接ファイルを保存するので爆速です
       # ========================================================
-      - name: Download news.json
+      - name: "Download news.json"
         run: |
           mkdir -p data
-          curl -sS https://turiiko.shop/actions/news/news.json -o data/news.json
+          # ★ URLのパスを /data/ に直し、末尾に「?t=$(date +%s)」をつけてキャッシュを完全回避します
+          curl -sS "https://turiiko.shop/actions/data/news.json?t=$(date +%s)" -o data/news.json
 
       # ========================================================
       # 2. 取得したデータをリポジトリに保存する処理
