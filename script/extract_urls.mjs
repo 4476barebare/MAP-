@@ -27,8 +27,7 @@ if (!fs.existsSync(inputPath)) {
 }
 
 const csvData = fs.readFileSync(inputPath, 'utf8').trim().split('\n');
-// 出力用のヘッダー（フロントエンドの仕様に合わせる）
-const results = ['group,name,lat,lng,notes']; 
+const results = ['group,name,lat,lng,notes']; // ヘッダー
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -52,31 +51,42 @@ async function processUrls() {
         }
 
         try {
-            // URLにアクセスしてリダイレクト先を取得
-            const response = await fetch(url);
-            const finalUrl = decodeURIComponent(response.url);
-
+            // URLにアクセスしてHTMLを取得
+            const response = await fetch(url, {
+                headers: { 'User-Agent': 'Mozilla/5.0' }
+            });
+            const html = await response.text();
+            
             let lat = '';
             let lng = '';
 
-            // パターン1: 展開後のURL内に @緯度,経度 が含まれている場合
-            const match1 = finalUrl.match(/@([0-9.-]+),([0-9.-]+)/);
-            if (match1) {
-                lat = match1[1];
-                lng = match1[2];
-            } else {
-                // パターン2: ページ内のHTMLソースコードから座標を抜き出す
-                const html = await response.text();
-                const match2 = html.match(/\[\[\[([0-9.-]+),([0-9.-]+)\]/);
-                if (match2) {
-                    lng = match2[1];
-                    lat = match2[2];
+            // 修正ポイント: HTMLの中から [経度, 緯度] または [緯度, 経度] のペアをすべて抽出する
+            const matches = [...html.matchAll(/\[([0-9]+\.[0-9]+),([0-9]+\.[0-9]+)\]/g)];
+            
+            for (const match of matches) {
+                const v1 = parseFloat(match[1]);
+                const v2 = parseFloat(match[2]);
+
+                // 日本の緯度・経度の範囲（緯度: 30〜45 / 経度: 130〜150）に合致するペアを探す
+                if (v1 >= 30 && v1 <= 45 && v2 >= 130 && v2 <= 150) {
+                    lat = v1.toString();
+                    lng = v2.toString();
+                    break;
+                } else if (v2 >= 30 && v2 <= 45 && v1 >= 130 && v1 <= 150) {
+                    lat = v2.toString();
+                    lng = v1.toString();
+                    break;
                 }
             }
 
             // URLはnotes列に入れておく
             results.push(`shop,${name},${lat},${lng},${url}`);
-            console.log(`✅ 成功: ${name} (Lat: ${lat}, Lng: ${lng})`);
+            
+            if (lat && lng) {
+                console.log(`✅ 成功: ${name} (Lat: ${lat}, Lng: ${lng})`);
+            } else {
+                console.log(`⚠️ 座標の取得に失敗: ${name}`);
+            }
             
             // サーバー負荷とブロック回避のため少し待機
             await sleep(500); 
