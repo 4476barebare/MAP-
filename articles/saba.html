@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>サバ | 堤防から沖まで！サバの生態と実践的釣り方ガイド | 釣り行こNAVI</title>
+  <meta name="description" content="堤防から沖まで狙えるサバの生態から、サビキ釣り・ルアー釣り・ビシ釣り・カゴ釣りでの攻略法、レンジやベイトの見極め方、安全に美味しく食べるための注意点まで徹底解説。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【完全攻略】ただの「大衆魚」じゃない！堤防から沖まで熱くさせるサバの釣り方・生態ガイド">
+  <meta property="og:description" content="堤防から沖まで狙えるサバの生態から、サビキ釣り・ルアー釣り・ビシ釣り・カゴ釣りでの攻略法、レンジやベイトの見極め方、安全に美味しく食べるための注意点まで徹底解説。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/saba.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/saba.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/saba.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+  <article class="article" data-tags="sabiki lure uki">
+
+    <header class="article-header">
+      <h1>【完全攻略】ただの「大衆魚」じゃない！堤防から沖まで熱くさせるサバの釣り方・生態ガイド</h1>
+      <div class="article-meta">
+        <time datetime="2026-09-15">2026.09.15</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/saba.jpg" alt="サバの水中写真">
+      「群れさえいれば誰でも釣れる」――サバに対してそんなイメージを持っていませんか？ 確かにサバは身近なターゲットですが、実は季節・水温・潮・ベイト（エサ）、そして「レンジ（泳層）」を的確に読めるかどうかで、釣果に天と地ほどの差が出る奥深い魚です。ヒットした瞬間に見せる強烈な横走りの引き、そして鮮度抜群のサバを味わえるのは釣り人の特権です。
+    </p>
+    <p>
+      本記事では、堤防でのサビキ釣りから、ナブラを撃つルアーゲーム、沖のビシ釣り・カゴ釣りまで、サバの生態と実践的な攻略法を徹底解説します。
+    </p>
+
+    <section class="article-section">
+      <h2>1. 日本で釣れる2大サバ（マサバとゴマサバ）</h2>
+      <p>
+        堤防や沖釣りで私たちがよく目にするサバは、主に「マサバ」と「ゴマサバ」の2種類です。
+      </p>
+      <ul>
+        <li><strong>マサバ（真サバ）：</strong>背中に特徴的な波状の模様があり、腹側は銀白色をしています。比較的冷たい海水を好み、秋から冬にかけて脂が乗る「秋サバ」「寒サバ」として珍重されます。大分県の「関サバ」や三浦半島の「松輪サバ」など、高級ブランド化しているのもこのマサバです。</li>
+        <li><strong>ゴマサバ：</strong>腹側までゴマのような黒い斑点が散らばっているのが特徴で、マサバよりも暖かい海域を好みます。マサバより脂は少なめですが、夏でも味が落ちにくいという強みがあります。高知県のブランドサバ「清水サバ」はこのゴマサバです。</li>
+      </ul>
+      <div class="info-box">
+        釣り上げたときは腹が真っ白で「マサバだ！」と思っても、時間が経つと斑点が浮き出てきてゴマサバだったと判明することもあります。
+      </div>
+    </section>
+
+    <section class="article-section">
+      <h2>2. サバの生態と行動パターン</h2>
+      <p>
+        サバを釣る上で、群れがどこにいるのかを考えることは非常に重要です。サバにはいくつか特徴的な習性があります。
+      </p>
+      <ul>
+        <li><strong>典型的な「回遊魚」：</strong>特定の根に居着くのではなく、エサを求めて長距離を泳ぎ続けます。そのため、「昨日は爆釣したのに今日はゼロ」ということもあれば、「突然群れが入ってきてお祭り騒ぎ」になることも普通に起こります。</li>
+        <li><strong>止まると死んでしまう！？：</strong>流線型で筋肉質な体を持つサバは、非常に遊泳力の高い魚です。泳ぎながら口から海水を取り込み、エラを通して呼吸をするため、常に泳ぎ続けています。</li>
+        <li><strong>意外と深場も回遊する：</strong>表層のイメージが強いですが、マサバの調査では海面から水深約200mまでの範囲を昼夜で移動する「日周鉛直回遊」が確認されています。</li>
+        <li><strong>大好物は小魚とプランクトン：</strong>成長に合わせて動物プランクトンから、イワシやシラス、小イカなどの小魚まで幅広く捕食します。ルアー釣りでは「今、サバが何を食べているか」を合わせることが重要です。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 釣り場とハイシーズン</h2>
+      <p>
+        防波堤から狙う場合、サバの数釣りが最も盛り上がるのは「初夏〜秋」の水温が高い時期です。
+      </p>
+      <p>ポイント探しでは、次の2点を優先して確認しましょう。</p>
+      <ol>
+        <li><strong>ベイト（エサとなる小魚）がいる</strong>（最重要！）</li>
+        <li><strong>潮が動いている・潮通しが良い</strong>（堤防の先端や外側など）</li>
+      </ol>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 状況別・サバの攻略メソッド</h2>
+
+      <h3>① 手軽に大爆釣！「サビキ釣り」</h3>
+      <p>
+        防波堤に群れが入っているなら、アミエビをコマセ（撒き餌）にしたサビキ釣りが最強です。
+      </p>
+      <ul>
+        <li><strong>サバのタナ（泳層）を見つける：</strong>同じポイントでも、イワシは上層、アジは下層（底）、サバは中層を泳いでいるのが一般的なパターンです。そのため、毎回底まで落とすのではなく、表層→3m→5m…と探り、釣れた水深（レンジ）を重点的に攻めるのが効率的です。</li>
+        <li><strong>手返しの「速さ」が命：</strong>群れが通過する一瞬の勝負になるため、釣れたらすぐに仕掛けを再投入するスピード感が釣果に直結します。沖に鳥山や群れが見える場合は、ウキを使った「飛ばしサビキ」で遠撃ちしましょう。</li>
+      </ul>
+
+      <h3>② ルアーで狙う！「スピード＆レンジ攻略」</h3>
+      <p>
+        魚食性が強く反応が速いサバは、ルアーフィッシングの好敵手です。
+      </p>
+      <ul>
+        <li><strong>基本はメタルジグ（5〜20g）：</strong>カラーは小魚を模したシルバーを基準に選びます。</li>
+        <li><strong>アクションは「速さ」：</strong>激しいジャークよりも、一定レンジをキープした「高速ただ巻き」や、軽い「ワンピッチジャーク」に猛烈にアタックしてきます。</li>
+        <li><strong>ナブラ撃ちの極意：</strong>海面で小魚が逃げ惑う「ナブラ」を発見したら、ど真ん中ではなく「群れの進行方向（数秒後に通る場所）」にルアーをキャストするのが群れを散らさないコツです。</li>
+      </ul>
+
+      <h3>③ 沖の大型を狙う「ビシ釣り・カゴ釣り」</h3>
+      <p>
+        30cmを超える大型で脂の乗ったサバを狙うなら、船からのビシ釣りや遠投カゴ釣りが有効です。
+      </p>
+      <ul>
+        <li><strong>横走りに注意：</strong>サバは掛かったあとに猛烈なスピードで横走りします。隣の釣り人と仕掛けが絡む「オマツリ」の原因になりやすいため、水面まで寄せたらモタモタせず、太いハリスを信じて強引に船内（陸）へ抜き上げましょう。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>5. 【重要】サバを美味しく安全に食べるために</h2>
+      <p>
+        釣ったばかりの新鮮なサバは、刺身やしめサバ、塩焼き、味噌煮と何をしても美味しい魚です。しかし、サバ釣りでは釣るテクニック以上に重要なことがあります。
+      </p>
+      <ul>
+        <li><strong>「鮮度」が命！すぐに冷やす：</strong>サバは非常に傷みやすい（足が早い）魚です。釣れたら長時間バケツで泳がせず、すぐに締めて氷の効いたクーラーボックスに入れましょう。</li>
+        <li><strong>寄生虫（アニサキス）とヒスタミン食中毒に注意：</strong>生食する場合はアニサキスのリスクがあるため、十分な知識と適切な処理（冷凍など）、または加熱が必要です。酢で締めただけではアニサキスは死滅しません。また、常温放置はヒスタミン食中毒の原因になるため厳禁です。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>6. サバ釣り上達への近道</h2>
+      <p>
+        サバ釣りで最も大切なのは、高級な道具を使うことよりも「サバの群れが今、どの深さ（レンジ）で、何を食べているか」を考えることです。
+      </p>
+      <div class="info-box">
+        この「海を観察する力」を身につければ、あなたのサバ釣りの釣果は劇的に変わるはずです。最高の引きと美味を求めて、防波堤へ向かいましょう！
+      </div>
+    </section>
+
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+
+      <div id="fish-map" role="region"></div>
+
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article></main>
+
+<section class="article-list">
+  <a href="beginner-fishing.html" class="article-card">
+    <img src="images/beginner-fishing.jpg" alt="初心者釣り">
+    <h2>初心者でも迷わない釣りの始め方</h2>
+  </a>
+  <a href="rod-selection.html" class="article-card">
+    <img src="images/rod-selection.jpg" alt="竿選び">
+    <h2>初心者向け失敗しない竿の選び方</h2>
+  </a>
+  <a href="gofishing.html" class="article-card">
+    <img src="images/gofishing.jpg" alt="潮と時間帯の解説">
+    <h2>いつ釣りに出掛けるべきか</h2>
+  </a>
+  <a href="firstfishing.html" class="article-card">
+    <img src="images/firstfishing.jpg" alt="場所選び">
+    <h2>失敗しない場所選び</h2>
+  </a>
+</section>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定（外部JSでこの変数を読み取ってマップを生成） -->
+<script>
+  window.TARGET_FISH = 'サバ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
