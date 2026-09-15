@@ -1,6 +1,5 @@
 name: Extract Maps Takeout Data
 
-# 手動実行（workflow_dispatch）をトリガーにする
 on:
   workflow_dispatch:
     inputs:
@@ -14,7 +13,6 @@ on:
         default: 'processed_shops.csv'
         type: string
 
-# 自動コミットのための権限設定
 permissions:
   contents: write
 
@@ -31,8 +29,11 @@ jobs:
         with:
           node-version: '20'
 
+      # 👇 今回追加した部分：仮想ブラウザライブラリをインストール
+      - name: Puppeteerのインストール
+        run: npm install puppeteer
+
       - name: 抽出スクリプトを実行
-        # 入力ファイルと出力ファイルを引数として渡す
         run: node script/extract_urls.mjs "${{ github.event.inputs.input_file }}" "${{ github.event.inputs.output_file }}"
 
       - name: 抽出結果をコミット＆プッシュ
@@ -40,6 +41,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add data/${{ github.event.inputs.output_file }}
-          # 変更がなければエラーにならないようにする
           git commit -m "Auto-extract: Maps takeout data to ${{ github.event.inputs.output_file }}" || echo "No changes to commit"
           git push
