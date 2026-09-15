@@ -698,6 +698,71 @@ li {
 }
 
 
+
+/* =========================
+   メニューリスト (横長カード)
+========================= */
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px 16px 16px;
+}
+
+.menu-card {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #191970;
+  transition: 0.15s ease;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.menu-card:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.menu-thumb {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0; /* 画像サイズを固定し、テキストに押し潰されないようにする */
+}
+
+.menu-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.menu-text {
+  flex: 1; /* 残りのスペースをすべてテキストエリアにする */
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.menu-text h2 {
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.4;
+  /* テキストが長い場合は2行で「...」と省略する */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
 /* =========================================
    SEO対策用：スポット一覧（アコーディオン）
 ========================================= */
