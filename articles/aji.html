@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>アジ | 堤防から船まで！アジの生態と実践的釣り方ガイド | 釣り行こNAVI</title>
+  <meta name="description" content="堤防からファミリーで手軽に狙えるアジの生態から、サビキ釣り・ウキ釣り・アジングでの釣り方、タナ（泳層）の違いまで徹底解説。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド">
+  <meta property="og:description" content="堤防からファミリーで手軽に狙えるアジの生態から、サビキ釣り・ウキ釣り・アジングでの釣り方まで徹底解説。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/aji.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/aji.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/aji.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="sabiki uki ajing">
+
+    <header class="article-header">
+      <h1>【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド</h1>
+      <div class="article-meta">
+        <time datetime="2026-09-15">2026.09.15</time>
+      </div>
+    </header>
+    
+    <img src="images/aji.jpg" alt="アジの水中写真">
+    <p>
+      刺身にタタキ、アジフライなど、私たちの食卓に欠かせない国民的魚「アジ」。<br>
+      堤防からファミリーで手軽に狙える一方で、ルアーで繊細にアプローチしたり、船から大型を狙ったりと、釣り人を一生飽きさせない奥深いゲーム性を秘めたターゲットです。
+    </p>
+    <p>
+      本記事では、ただ釣るだけでなく「狙って釣る」ために知っておきたいアジの生態から、スタイル別の攻略法までを徹底解説します。
+    </p>
+
+    <section class="article-section">
+      <h2>1. アジ（マアジ）の基本生態と、釣り人だけが知る「2つの顔」</h2>
+      <p>
+        一般的にアジ釣りでターゲットとなるのはスズキ目アジ科の「マアジ」です。<br>
+        アジ科の魚には、尾ビレ側の側線に「ゼイゴ」と呼ばれるノコギリ状の硬いウロコがあり、サバやイワシなどの回遊魚と見分ける明確な目印になります。
+      </p>
+
+      <div class="info-box">
+        <strong>💡 現場のワンポイント！</strong><br>
+        釣り上げたアジを素手で強く握ると、このゼイゴや背ビレで手を怪我することがあります。安全かつ魚を傷つけないために、フィッシュグリップ（魚バサミ）を用意しておくのがおすすめです。
+      </div>
+
+      <p>
+        また、マアジには生態によって大きく2つのタイプが存在します。
+      </p>
+      <ul>
+        <li><strong>黒アジ（回遊型）：</strong>外洋を大群で広く回遊し、体色が黒っぽくスマートな体型。</li>
+        <li><strong>金アジ / 黄アジ（居着き型）：</strong>湾内の岩礁帯などの浅場に定住し、体色が黄色みを帯びた個体。回遊しないためエサをたっぷり食べて脂の乗りが別格ですが、市場にはほとんど出回らないため、<strong>釣り上げた人だけが味わえる至高のターゲット</strong>です。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>2. なぜアジは常夜灯に集まる？「食性」から読み解くアプローチ</h2>
+      <p>
+        夜の堤防でアジを狙う際、常夜灯の周りは一級ポイントになります。しかし、アジは単に「明るいから」集まっているわけではありません。
+      </p>
+      <p>
+        光に集まる習性を持つ動物プランクトンが寄り、それを捕食するためにアミやシラスなどの小魚（ベイト）が集まり、さらにそれを狙ってアジが集結するという<strong>「食物連鎖のピラミッド」</strong>が光の下で出来上がっているのです。
+      </p>
+
+      <div class="info-box">
+        <strong>💡 現場のワンポイント！</strong><br>
+        警戒心の強い大型のアジほど、明るい中心部には出ず、<strong>「光と影の境目（明暗の境界）」</strong>に身を潜めてエサを待ち構えています。仕掛けやルアーを投入する際は、この暗がりとの境界線を意識して狙い撃ちましょう。
+      </div>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 釣果を分ける絶対条件：「タナ（泳層）」の把握</h2>
+      <p>
+        同じ堤防に複数の回遊魚の群れが入っている場合、海の中では明確な棲み分けが起きています。
+      </p>
+      <ul>
+        <li><strong>上層：</strong>イワシ</li>
+        <li><strong>中層：</strong>サバ</li>
+        <li><strong>下層（底付近）：アジ</strong></li>
+      </ul>
+      <p>
+        アジを狙うなら、まずは仕掛けをしっかり底まで沈めることが基本中の基本です。ただし、夜間の常夜灯周りなどでは表層付近まで浮いて捕食することもあるため、「アジ＝底」という固定観念に縛られず、反応のある深さ（レンジ）を探り当てることが爆釣への近道です。
+      </p>
+
+      <div class="info-box">
+        <strong>💡 ためしてナットク！「毛糸の目印」</strong><br>
+        サビキ釣りなどでタナ（深さ）を見失わないために、道糸に適度な間隔で色違いの毛糸を結んでおきましょう。アジが食ってきた深さが一目でわかり、次も同じ層を正確に狙えるため釣果が劇的に伸びます。
+      </div>
+    </section>
+    
+    <section class="article-section">
+      <h2>4. スタイル別！アジ攻略のアプローチ</h2>
+      <p>
+        アジは群れで行動するため、釣り場やサイズに合わせた最適なアプローチを選ぶことが重要です。
+      </p>
+
+      <h3>① ファミリーフィッシングの王道「サビキ釣り」</h3>
+      <p>
+        コマセ（撒き餌）カゴにアミエビを詰め、海中で煙幕を作って擬似餌の針に食わせる、堤防での数釣りに最強の釣法です。
+      </p>
+      <ul>
+        <li><strong>実践テクニック：</strong>1匹掛かってもすぐに巻き上げず、数秒待つことで他の針にも次々とアジが掛かる「追い食い」を狙えます。</li>
+        <li><strong>エサ選びのコツ：</strong>集魚力を重視するなら「冷凍アミエビブロック」一択ですが、独特の匂いや解凍の手間が気になる方には、手が汚れず常温保存できる「チューブタイプ（フルーツの香り付きなど）」がファミリー向けに重宝します。</li>
+      </ul>
+
+      <h3>② 見切る大アジに口を使わせる「ウキ釣り」</h3>
+      <p>
+        20cmを超える良型のアジになると警戒心が格段に上がり、サビキの太い糸や複数の針を嫌って食わなくなることがあります。
+      </p>
+      <ul>
+        <li><strong>実践テクニック：</strong>そんな時は、繊細な1本針の「ウキ釣り」の出番です。アミエビを海にパラパラと撒き、その流れに仕掛けを自然に同調（リンク）させることで、警戒心の強い大アジに思わず口を使わせることができます。小気味よいダイレクトな引きを楽しめるのも魅力です。</li>
+      </ul>
+
+      <h3>③ ゲーム性抜群のルアーゲーム「アジング」</h3>
+      <p>
+        1g前後の極小ジグヘッドとワームを使い、繊細なアタリを掛けていく近年大人気のルアーフィッシングです。
+      </p>
+      <ul>
+        <li><strong>実践テクニック：</strong>ルアーが着水したら「1、2、3…」とカウントダウンし、表層から底までどの深さにアジがいるか（レンジ）を探り当てることが最も重要です。</li>
+        <li><strong>ルアーカラーより「食事」に合わせる：</strong>釣れないとルアーの色を頻繁に変えたくなりますが、それよりも「今アジがプランクトンを漂って食べているのか（スローフォール）、小魚を追い回しているのか（速い動き）」という食事内容に合わせてアクションを変えるほうが圧倒的に効果的です。</li>
+      </ul>
+
+      <h3>④ 沖の深場を攻める「船のビシ釣り」</h3>
+      <p>
+        水深30〜100mの深場に潜む30cmオーバーの大アジを狙うなら、遊漁船からの「ビシ釣り」が王道です。
+      </p>
+      <ul>
+        <li><strong>実践テクニック：</strong>オモリ一体型のコマセカゴ（ビシ）を使い、船長から指示されたタナでしっかりコマセを振ってアジを寄せます。</li>
+        <li><strong>口切れに注意：</strong>アジは引きが強い反面、口の周りが非常に薄い膜でできているため、強引に巻き上げると簡単に「口切れ」してバレてしまいます。リールのドラグを少し緩めに設定し、水面まで来たら必ずタモ網ですくうのが大物確保の鉄則です。</li>
+      </ul>
+    </section>
+
+    <!-- 汎用化: aji-map -> fish-map, aji-spot-list -> fish-spot-list -->
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+      
+      <div id="fish-map" role="region"></div>
+
+      <!-- スポットリンクリスト表示エリア -->
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article>
+</main>
+
+<section class="article-list">
+  <a href="beginner-fishing.html" class="article-card">
+    <img src="images/beginner-fishing.jpg" alt="初心者釣り">
+    <h2>初心者でも迷わない釣りの始め方</h2>
+  </a>
+  <a href="rod-selection.html" class="article-card">
+    <img src="images/rod-selection.jpg" alt="竿選び">
+    <h2>初心者向け失敗しない竿の選び方</h2>
+  </a>
+  <a href="gofishing.html" class="article-card">
+    <img src="images/gofishing.jpg" alt="潮と時間帯の解説">
+    <h2>いつ釣りに出掛けるべきか</h2>
+  </a>
+  <a href="firstfishing.html" class="article-card">
+    <img src="images/firstfishing.jpg" alt="場所選び">
+    <h2>失敗しない場所選び</h2>
+  </a>
+</section>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定（外部JSでこの変数を読み取ってマップを生成） -->
+<script>
+  window.TARGET_FISH = 'アジ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
