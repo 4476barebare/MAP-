@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>イワシ | 堤防サビキの定番から奥深き食文化まで徹底ガイド | 釣り行こNAVI</title>
+  <meta name="description" content="防波堤で大人気のイワシの生態から、サビキ釣りでの数釣り攻略法、食物連鎖における重要性、全国各地の奥深い郷土料理まで徹底解説。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【完全版】ただの小魚じゃない！海を支える「イワシ」の生態・釣り方・食文化ガイド">
+  <meta property="og:description" content="防波堤で大人気のイワシの生態から、サビキ釣りでの数釣り攻略法、食物連鎖における重要性、全国各地の奥深い郷土料理まで徹底解説。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/iwashi.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/iwashi.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/iwashi.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+  <main>
+  <article class="article" data-tags="sabiki oyogase iwashi">
+
+    <header class="article-header">
+      <h1>【完全版】ただの小魚じゃない！海を支える「イワシ」の生態・釣り方・食文化ガイド</h1>
+      <div class="article-meta">
+        <time datetime="2026-09-15">2026.09.15</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/iwashi.jpg" alt="イワシの水中写真">
+      身近な大衆魚の代表格として、私たちの食卓にもおなじみの「イワシ」。防波堤に行けばファミリーフィッシングで大漁に釣れる人気のターゲットです。しかし、実は「イワシ」という名前の単一の魚は存在しないことをご存知でしょうか？
+    </p>
+    <p>
+      日本で釣りの対象となる代表的なイワシは、主に以下の3種類に分類されます。
+    </p>
+    <ul>
+      <li><strong>マイワシ：</strong>体側に黒い斑点が並ぶのが最大の特徴。最大30cmほどと比較的大型に成長し、食味も抜群です。地方によってはオオバイワシやヒラゴとも呼ばれます。</li>
+      <li><strong>カタクチイワシ：</strong>下あごが短く、口が大きく開くのが特徴。最大15cmほどで、サビキ釣りで鈴なりに釣れる代表格です。シコイワシ、セグロ、タレクチといった数多くの地方名で親しまれています。</li>
+      <li><strong>ウルメイワシ：</strong>目が大きく、体が細長いスマートな体型。最大25cmほどになり、脂が多く非常に美味なイワシです。</li>
+    </ul>
+
+    <section class="article-section">
+      <h2>1. 【トリビア】なぜイワシはあんなに巨大な群れを作るのか？</h2>
+      <p>
+        イワシは一匹一匹が強い魚ではありません。そのため、巨大な群れを作ることで捕食者に狙われにくくする防衛戦略をとっています。
+      </p>
+      <p>
+        しかし、皮肉なことにこの大群は、サバやブリ、マグロなどの大型魚、さらには鳥やイルカたちに「ここに大量のエサがあるぞ！」と知らせる目印にもなってしまいます。海面でイワシが逃げ惑い、鳥が突っ込み、青物が水面を割る激しい現象は、イワシの群れが引き起こす海のドラマです。
+      </p>
+      <div class="info-box">
+        イワシはプランクトンを食べて莫大な生物量を誇り、それを大型魚へ受け渡す「食物連鎖の中間的な存在」です。「海の掃除屋」ではなく、海全体の生態系を支える<strong>「海の食料庫」</strong>と言っても過言ではありません。
+      </div>
+    </section>
+
+    <section class="article-section">
+      <h2>2. イワシの釣り方攻略：堤防サビキ＆究極の食物連鎖フィッシング</h2>
+
+      <h3>① 手軽で最強！「サビキ釣り」のコツ</h3>
+      <p>
+        湾内の岸近くや堤防に群れが回遊してきたら、サビキ釣りの大チャンスです。ここで絶対に意識すべきは「タナ（泳層）」です。同じポイントに様々な魚がいても、アジが底付近、サバが中層を泳ぐのに対し、<strong>イワシは最も「上層」を回遊する</strong>のが基本パターンです。
+      </p>
+      <p>
+        通常のサビキ仕掛けでも十分に釣れますが、アミコマセを専用ケースで直接針にこすりつける「トリック仕掛け」を使うと、さらに圧倒的な釣果を叩き出すことができます。
+      </p>
+
+      <h3>② イワシをエサにする「泳がせ釣り」</h3>
+      <p>
+        釣り人にとって、「イワシの群れがいる＝それを食べる大型魚（フィッシュイーター）がいる」という強力なヒントになります。
+      </p>
+      <p>
+        釣ったばかりの活きのいいイワシをそのまま針に掛け、海へ泳がせてヒラメ、マゴチ、スズキ、青物などを狙う「泳がせ釣り（のませ釣り）」は最高にスリリングです。※ただし、カタクチイワシに混じって釣れる「トウゴロウイワシ」はウロコが硬くエサには不向きなので注意しましょう。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 「足が早い」からこそ発達した、奥深き日本のイワシ食文化</h2>
+      <p>
+        <img src="images/thumlreshiru.jpg" alt="郷土料理とイワシ">
+        イワシは身が柔らかく脂が多い上、内臓の酵素による自己消化が激しいため、非常に「傷みやすい（足が早い）」魚です。冷蔵技術がなかった時代、大量に獲れるイワシをいかに保存するかという課題から、日本全国で驚くほど多種多様な加工文化が生まれました。
+      </p>
+      <ul>
+        <li><strong>江戸時代の農業を支えたイワシ：</strong>千葉県の九十九里などでは、食用だけでなく「干鰯（ほしか）」や「〆粕」に加工され、肥料として全国に出荷されていました。イワシは魚食だけでなく、日本の農業や生活そのものを支えていたのです。</li>
+        <li><strong>全国の絶品郷土料理：</strong>
+          <ul>
+            <li><strong>せぐろいわしのごま漬け（千葉）：</strong>塩漬けにしたカタクチイワシをゴマや柚子と酢漬けにした保存食。</li>
+            <li><strong>こんかいわし（石川）：</strong>塩漬けにしたイワシを米ぬか（こんか）に漬けて発酵させ、脂の酸化を抑えつつ独特の旨味を引き出した熟成食品。</li>
+            <li><strong>うの花きずし / 唐ずし（山口）：</strong>シャリの代わりに「おから」を使い、酢締めしたイワシを包む生活の知恵から生まれたお寿司。</li>
+          </ul>
+        </li>
+        <li><strong>自家製アンチョビも作れる：</strong>イタリア料理でおなじみのアンチョビも、実はカタクチイワシを塩漬けにしてオリーブオイルに漬けたもの。釣れたイワシで簡単に自作できます。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 釣り人の特権「七度洗えば鯛の味」</h2>
+      <p>
+        昔からイワシの美味しさを表現する言葉に<strong>「七度洗えば鯛の味」</strong>というものがあります。これは、身の脂や特有の臭みを流水で丁寧に洗い流すことで、鯛にも匹敵するほどの極上の味わいになるという、先人たちの魚食文化の知恵です。
+      </p>
+      <div class="info-box">
+        スーパーには並ばない「釣りたて・鮮度抜群」のイワシを持ち帰り、丁寧に処理して刺身やタタキでいただく。それはまさに、自分で釣った人だけが味わえる至高の贅沢です。
+      </div>
+    </section>
+
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+
+      <div id="fish-map" role="region"></div>
+
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article>
+  </main>
+
+<section class="article-list">
+  <a href="beginner-fishing.html" class="article-card">
+    <img src="images/beginner-fishing.jpg" alt="初心者釣り">
+    <h2>初心者でも迷わない釣りの始め方</h2>
+  </a>
+  <a href="rod-selection.html" class="article-card">
+    <img src="images/rod-selection.jpg" alt="竿選び">
+    <h2>初心者向け失敗しない竿の選び方</h2>
+  </a>
+  <a href="gofishing.html" class="article-card">
+    <img src="images/gofishing.jpg" alt="潮と時間帯の解説">
+    <h2>いつ釣りに出掛けるべきか</h2>
+  </a>
+  <a href="firstfishing.html" class="article-card">
+    <img src="images/firstfishing.jpg" alt="場所選び">
+    <h2>失敗しない場所選び</h2>
+  </a>
+</section>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定 -->
+<script>
+  window.TARGET_FISH = 'イワシ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
