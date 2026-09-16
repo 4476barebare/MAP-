@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>シロギス | 「海の女王」シロギス攻略ガイド | 釣り行こNAVI</title>
+  <meta name="description" content="シロギスの生態や季節ごとの動き、狙うべき地形変化、チョイ投げ・本格投げ釣りのタックル、エサ付け、キャスティング、サビキで海底を読み解く方法まで、実践的に徹底解説。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="「海の女王」シロギス攻略ガイド！投げて探る、戦略的ゲームフィッシングの魅力">
+  <meta property="og:description" content="シロギスの生態や季節ごとの動き、狙うべき地形変化、チョイ投げ・本格投げ釣りのタックル、エサ付け、キャスティング、サビキで海底を読み解く方法まで、実践的に徹底解説。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/shirogisu.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/shirogisu.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/shirogisu.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+  <article class="article" data-tags="投げ釣り チョイ投げ シロギス">
+
+    <header class="article-header">
+      <h1>「海の女王」シロギス攻略ガイド！投げて探る、戦略的ゲームフィッシングの魅力</h1>
+      <div class="article-meta">
+        <time datetime="2026-09-16">2026.09.16</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/shirogisu.jpg" alt="シロギスの水中写真">
+      銀白色に輝く美しい魚体と、天ぷらに代表される上品な味わいから「海の女王」と称されるシロギス。20cm前後の可愛らしいサイズ感とは裏腹に、竿先を引ったくるような鋭く力強いアタリを出して釣り人を魅了します。
+    </p>
+    <p>
+      初心者向けの「チョイ投げ」から、100m以上先を狙う本格的な「投げ釣り」まで楽しみ方は様々ですが、シロギス釣りの本質は単に遠くへ飛ばすことではありません。「広大な海の中から、魚が潜む地形の変化と距離を推理する」という、非常に戦略的で奥の深いルアーゲームのような面白さが詰まっています。
+    </p>
+
+    <section class="article-section">
+      <h2>1. シロギスの生態と、釣れる「季節・場所」</h2>
+      <p>
+        シロギスは北海道南部から九州までの沿岸に広く分布し、群れを作って行動する魚です。成長すると30cmを超えることもあり、その強烈な引きと大きさから釣り人の間では「ヒジタタキ」という敬称で呼ばれることもあります。
+      </p>
+
+      <h3>季節ごとの動き</h3>
+      <p>
+        シロギスは水温の変化によって居場所を変える回遊魚です。
+      </p>
+      <ul>
+        <li><strong>春〜夏（ハイシーズン）：</strong>初夏の産卵期に向けて、水深の浅いサーフ（砂浜）や防波堤周辺に群れで接岸してきます。</li>
+        <li><strong>秋：</strong>浅場でも十分に数が狙え、近距離（10〜20m）の波打ち際でアタリが連発することもある好シーズンです。</li>
+        <li><strong>冬：</strong>水温低下とともに深場（水深20〜30mなど）へと落ちて越冬するため、陸っぱりよりも船釣りや水深のある港湾部が有利になります。</li>
+      </ul>
+
+      <h3>狙うべきは「ただの砂底」ではなく「変化」</h3>
+      <p>
+        シロギスは砂泥底を好み、砂と一緒に多毛類（ゴカイなど）や甲殻類を吸い込むように捕食します。しかし、砂漠のように平坦な場所を適当に泳いでいるわけではありません。以下のようなどこかに「変化」がある場所が、エサの集まる一級ポイントになります。
+      </p>
+      <ul>
+        <li><strong>カケアガリ：</strong>海底の水深が急に浅く（深く）斜めになっている場所。</li>
+        <li><strong>ヨブ：</strong>波の力で海底の砂がえぐられ、凹凸や波状になっている場所。</li>
+        <li><strong>根まわり・ミオ筋：</strong>沈み根（岩礁）と砂地の境目や、船の通り道として深く掘られた溝状の場所。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>2. タックルとエサの極意</h2>
+      <p>
+        防波堤からの手軽な釣りか、砂浜からの遠投かで道具立てが変わります。
+      </p>
+      <ul>
+        <li><strong>お手軽チョイ投げスタイル：</strong>防波堤や小規模な砂浜なら、ルアーロッド（エギングやシーバス用など）に小型〜中型のスピニングリールで十分に楽しめます。オモリの軸が動いて食い込みが良い「ジェットテンビン」を使うのがおすすめです。</li>
+        <li><strong>本格投げ釣りスタイル：</strong>100m以上沖のブレイク（カケアガリ）を狙うなら、3.6〜4.2mの投げ専用竿に、L型テンビンや海草テンビン（20〜35号程度）を組み合わせます。</li>
+      </ul>
+
+      <h3>エサ付けは「小さく・美しく」が鉄則</h3>
+      <p>
+        エサはアオイソメが万能ですが、細身で動きの良いジャリメや、昔から特効エサとされるチロリ（イワイソメ）を状況で使い分けるのがベストです。シロギス釣りにおいて「エサがデカければ大物が釣れる」という考えは捨てましょう。
+      </p>
+      <ul>
+        <li>遠投時の空気抵抗を減らし、キャスト切れを防ぐためにもエサは大きく付けすぎないことが重要です。</li>
+        <li>細い虫エサを適度な長さに切り、ハリに対して真っ直ぐ、かつハリ先をしっかり出すように美しくセットするのが釣果アップの秘訣です。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>3. キャスティング（投擲）の基本とコツ</h2>
+      <p>
+        シロギス釣りでつまずきやすいのが「投げる」動作です。腕力任せにフルスイングするのは、仕掛けが絡む原因になるばかりか飛距離も出ません。
+      </p>
+      <ul>
+        <li><strong>竿の反発力を活かす：</strong>力でオモリを投げるのではなく、リールを持つ手で竿を前に押し出し、竿尻を持つ手で胸元へ引きつける「テコの原理」を使います。これにより竿がしっかり曲がり、元に戻る反発力でオモリが飛んでいきます。</li>
+        <li><strong>リリース角度は約45度：</strong>竿が前方70〜80度まで傾いたタイミングで指を離し、オモリが斜め45度上空へ射出される軌道を意識しましょう。</li>
+        <li><strong>着水前の「サミング」：</strong>オモリが海面へ落ちる直前に、リールの糸の放出を指で軽く抑えて止めます。これにより、空中で仕掛けが一直線に伸び、道糸への糸絡みを劇的に防ぐことができます。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 必修テクニック：「サビキ」で海底を読み解く</h2>
+      <p>
+        仕掛けを投げ入れたら、ただ待つのではなく自ら魚を探しに行きます。この仕掛けをゆっくり手前へ引きずってくる動作を「サビキ（引き釣り）」と呼びます。
+      </p>
+      <ol>
+        <li><strong>海底の解像度を上げる：</strong>オモリが着底したら、ゆっくりとリールを巻くか、竿を横にサビいて仕掛けを手前に移動させます。すると、手元に「ザラザラ（砂）」「ゴツゴツ（石）」「急に重くなる（カケアガリ）」といった海底の地形情報が伝わってきます。</li>
+        <li><strong>変化で食わせる：</strong>重く感じるカケアガリやヨブのくぼみに差し掛かったら、そこで仕掛けを少し止めてアタリを待ちます。</li>
+        <li><strong>距離をメモライズする：</strong>シロギスは群れで固まっているため、1匹釣れたら同じ距離・同じ方向に連続して潜んでいる可能性が大です。アタリがあった距離（例：80m付近など）を必ず記憶し、次もその距離を重点的に攻めるのが数を伸ばす最大のコツです。</li>
+      </ol>
+
+      <h3>アワセ（フッキング）について</h3>
+      <p>
+        「ブルブルッ！」と気持ちの良いアタリが出ても、焦って竿を大きくあおる必要はありません。そのまま一定の速度でゆっくりと引き続けることで、魚が自然にハリ掛かり（向こうアワセ）してくれます。さらにそのまま引き続けることで、2匹、3匹と連掛け（多点掛け）を狙うこともシロギス釣りの醍醐味です。
+      </p>
+    </section>
+
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+
+      <div id="fish-map" role="region"></div>
+
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article></main>
+
+<section class="article-list">
+  <a href="beginner-fishing.html" class="article-card">
+    <img src="images/beginner-fishing.jpg" alt="初心者釣り">
+    <h2>初心者でも迷わない釣りの始め方</h2>
+  </a>
+  <a href="rod-selection.html" class="article-card">
+    <img src="images/rod-selection.jpg" alt="竿選び">
+    <h2>初心者向け失敗しない竿の選び方</h2>
+  </a>
+  <a href="gofishing.html" class="article-card">
+    <img src="images/gofishing.jpg" alt="潮と時間帯の解説">
+    <h2>いつ釣りに出掛けるべきか</h2>
+  </a>
+  <a href="firstfishing.html" class="article-card">
+    <img src="images/firstfishing.jpg" alt="場所選び">
+    <h2>失敗しない場所選び</h2>
+  </a>
+</section>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定（外部JSでこの変数を読み取ってマップを生成） -->
+<script>
+  window.TARGET_FISH = 'シロギス';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
