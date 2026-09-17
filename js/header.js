@@ -61,7 +61,8 @@ function getAlertText(pref, callback) {
         }
 
         var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
-        var color = (warnings.length > 0) ? "#ff0000" : "#ffd400";
+        // 赤を少し明るめにし、黄色も視認性の高い色に微調整
+        var color = (warnings.length > 0) ? "#ff4d4d" : "#ffea00";
         return { text: finalMsgs.join(" / "), color: color };
       })
       .catch(function() {
@@ -72,9 +73,9 @@ function getAlertText(pref, callback) {
     var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
     
     if (validResults.length > 0) {
-      // 複数行のHTMLを構築（見やすく白フチ文字に設定）
+      // ★ 修正点：白フチをやめ、濃い黒フチ＋ドロップシャドウで文字をくっきりさせる
       var htmlLines = validResults.map(function(res) {
-        return '<div style="color: ' + res.color + '; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; font-size: 14px; font-weight: bold; margin-bottom: 2px;">' + prefix + res.text + '</div>';
+        return '<div style="color: ' + res.color + '; text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000, 0px 0px 4px rgba(0,0,0,0.8); font-size: 15px; font-weight: bold; margin-bottom: 6px; letter-spacing: 0.5px;">' + prefix + res.text + '</div>';
       }).join("");
       
       updateMapAlert(htmlLines);
@@ -82,7 +83,7 @@ function getAlertText(pref, callback) {
       updateMapAlert(""); // どこのコードにも情報がなければ非表示
     }
 
-    // index.html側にある古い DOM 書き換え処理は無効化させる
+    // index.html側の古い表示は消す
     if (callback) callback({ text: "", color: "" });
   });
 }
@@ -101,13 +102,13 @@ function updateMapAlert(html) {
     alertDiv.id = 'map-jma-alert';
     // マップ上の上辺中央に絶対配置
     alertDiv.style.position = 'absolute';
-    alertDiv.style.top = '10px';
+    alertDiv.style.top = '12px'; // 少し余裕を持たせる
     alertDiv.style.left = '50%';
     alertDiv.style.transform = 'translateX(-50%)';
-    alertDiv.style.zIndex = '9999'; // マップのどのUIよりも最前面に設定
-    alertDiv.style.background = 'transparent'; // 背景透明
+    alertDiv.style.zIndex = '9999'; // マップUIの最前面
+    alertDiv.style.background = 'transparent'; // 背景は完全透明
     alertDiv.style.textAlign = 'center';
-    alertDiv.style.pointerEvents = 'none'; // 地図の操作（クリック・スワイプ）の邪魔をしない
+    alertDiv.style.pointerEvents = 'none'; // クリックの邪魔をしない
     alertDiv.style.width = '90%';
     container.appendChild(alertDiv);
   }
