@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>カレイ | 【完全攻略】海底の「座布団」を狙い撃ち！カレイの生態から投げ釣り・船釣り攻略法 | 釣り行こNAVI</title>
+  <meta name="description" content="冬の防波堤の風物詩であるカレイ釣りの魅力や生態、ポイント選びの鉄則から投げ釣り・船釣りでの実践的な攻略法まで徹底解説。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【完全攻略】海底の「座布団」を狙い撃ち！カレイの生態から投げ釣り・船釣り攻略法">
+  <meta property="og:description" content="冬の防波堤の風物詩であるカレイ釣りの魅力や生態、ポイント選びの鉄則から投げ釣り・船釣りでの実践的な攻略法まで徹底解説。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/karei.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/karei.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/karei.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="カレイ 投げ釣り 船釣り">
+
+    <header class="article-header">
+      <h1>【完全攻略】海底の「座布団」を狙い撃ち！カレイの生態から投げ釣り・船釣り攻略法</h1>
+      <div class="article-meta">
+        <time datetime="2026-09-17">2026.09.17</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/karei.jpg" alt="海底に潜むカレイ">
+      冬の防波堤にストーブを持ち込み、アタリをじっと待つ――そんな風物詩としておなじみのカレイ釣り。マコガレイやイシガレイをはじめ、日本沿岸では非常に多くのカレイが釣りのターゲットになっています。
+    </p>
+    <p>
+      釣り人の間では、50cmを超えるような特大サイズに敬意を込めて「座布団」と呼びます。ヒットした瞬間に海底に張り付くような重量感は、一度味わうと病みつきになる強烈な魅力を持っています。
+    </p>
+
+    <section class="article-section">
+      <h2>1. カレイってどんな魚？知られざる生態の秘密</h2>
+      <p>
+        カレイの最大の特徴といえば、あの平べったい体。しかし彼らは、生まれた瞬間から平たいわけではありません。稚魚の時は普通の魚と同じように縦向きで泳いでいますが、成長とともに片側の眼が移動し、海底に身を横たえる「底生魚」としての姿へと変態を遂げます。
+      </p>
+      <p>
+        海底では砂泥の中に身を隠し、目玉だけをキョロキョロと出しながら、ゴカイなどのエサが近づくのを待ち構えています。
+      </p>
+
+      <div class="info-box">
+        <strong>💡 カレイとヒラメの見分け方</strong><br>
+        <img src="images/distinguishkarei.jpg" alt="カレイとヒラメの見分け方" style="margin-top:10px; margin-bottom:10px; border-radius:4px;">
+        <br>
+        どちらも平たい体ですが、「左ヒラメに右カレイ」という言葉があるように、お腹を手前にして置いたとき、顔が左を向くのがヒラメ、右を向くのがカレイと一般的に見分けることができます（※一部例外もあります）。
+      </div>
+    </section>
+
+    <section class="article-section">
+      <h2>2. 「カレイ＝冬」と言われる本当の理由</h2>
+      <p>
+        一般的にカレイ釣りは秋から春にかけてがシーズンとされていますが、これには明確な理由があります。
+      </p>
+      <p>
+        カレイの多くは、夏の間は水温の安定した深場に潜んでいます。しかし、秋になって水温が下がり始めると移動を開始し、冬から春の産卵期に向けて沿岸の浅場（港湾やサーフなど）へと大挙して押し寄せてきます。
+      </p>
+      <p>
+        つまり、「冬だから釣れる」のではなく、「産卵というビッグイベントのために、私たちが竿を出せる岸沿いにやってくる」というのが正解なのです。産卵を終えた春先には、体力を回復させるために再び荒食いをする「戻りカレイ」のシーズンも到来します。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. ポイント選びの鉄則：ただの「砂地」は素通りせよ！</h2>
+      <p>
+        カレイは砂地や泥底を好みますが、砂漠のように何もない平坦な場所を適当に泳いでいるわけではありません。狙うべきは、エサが集まりやすくカレイの通り道になる「海底の変化」です。
+      </p>
+      <ul>
+        <li><strong>カケアガリ（斜面）やヨブ（凹凸）：</strong>水深が変わる境界線は、エサとなる底生生物が溜まりやすい一級ポイントです。</li>
+        <li><strong>岩礁や隠れ根の周り：</strong>きれいな砂地よりも、障害物が点在する場所の方がカレイの魚影は濃くなります。</li>
+        <li><strong>船道（ミオ筋）：</strong>船が通るために周囲より深く掘れている溝は、カレイの絶好の移動ルートです。※船のスクリューに糸を巻き込まれないよう注意が必要です。</li>
+      </ul>
+      <p>
+        「投げ釣り＝100mの遠投」というイメージを持たれがちですが、足元の地形に変化があれば、30〜50mほどのちょい投げでも十分に勝負になります。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 実践！防波堤からの「投げ釣り」攻略法</h2>
+      <p>
+        カレイの投げ釣りは、基本的に「置き竿」でじっくりアタリを待つ釣りです。
+      </p>
+      <ul>
+        <li><strong>タックルと仕掛け：</strong>3.6〜4.2m前後の投げ竿（オモリ負荷20〜30号）に、大型スピニングリールを合わせます。初心者ならシーバスロッドなどの強めのルアーロッドでも代用可能です。仕掛けは根掛かりしにくい「ジェットテンビン」や「海草テンビン」に、市販のカレイ用2本針仕掛けをセットします。</li>
+        <li><strong>エサは豪華にアピール！：</strong>定番のアオイソメに加え、匂いの強いイワイソメや、色つやの良いコガネムシなどを組み合わせるのが効果的です。大型狙いなら、針先を隠しすぎずにイソメを数匹まとめて掛ける「房掛け」にして、ボリュームと匂いで強烈にアピールしましょう。</li>
+        <li><strong>釣果を分ける「誘い」と「一点集中」：</strong>一人で2〜3本の竿を出し、遠・中・近と扇状に距離を変えて投げ分けるのがセオリーです。投げて放置するのではなく、時々竿をあおって仕掛けを1〜2mほど手前に引きずってみましょう。このとき立つ「砂煙」が、好奇心旺盛なカレイのスイッチを入れます。<br>また、カレイは群れていることが多いため、1匹釣れたら「その距離・その方向」に全集中して打ち返すのが数を伸ばす絶対条件です。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>5. 船からの「掛かり釣り」という選択肢</h2>
+      <p>
+        東京湾などで人気の船釣りでは、船をアンカーで固定する「掛かり釣り」でマコガレイを狙います。
+      </p>
+      <p>
+        船からでも、遠投して探る竿と船の真下に落とす竿の2本立てが基本です。4〜5分間隔で竿をゆっくり持ち上げてアタリを聞く「ききアワセ」を繰り返し、仕掛けを少しずつ手前に寄せてくる誘いが釣果を左右します。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>6. アタリから取り込みまでの極意：焦りは最大の敵</h2>
+      <p>
+        カレイはエサを見つけても一気に飲み込まず、モゾモゾと少しずつ吸い込むように食べます。そのため、竿先に「クッ」と小さなアタリが出ても、即アワセは厳禁です。
+      </p>
+      <p>
+        少し待ってから、糸を張って竿をゆっくり大きく持ち上げ（聞き合わせ）、ドスッとした重みを感じたら一定のスピードで巻き上げましょう。
+      </p>
+      <p>
+        水圧を受ける平たい体は、水中では信じられないほどの重さを発揮します。強引なゴリ巻きは口切れやハリス切れの原因になるため、竿の弾力を活かしていなし、海面まで浮かせたら最後は必ずタモ網ですくい取ってください。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>7. 釣った後の最高のご褒美</h2>
+      <p>
+        カレイは釣り味だけでなく、食味も一級品です。大分県の「城下カレイ（マコガレイ）」に代表されるように、高級魚としても知られています。
+      </p>
+      <p>
+        定番の「煮付け」にすれば柔らかい身がほろっと崩れ、ご飯やお酒が止まりません。他にも唐揚げや塩焼き、鮮度が良ければ刺身にしても極上の味わいが楽しめます。
+      </p>
+      <div class="info-box">
+        極寒の海辺で試行錯誤し、狙い通りに引きずり出した一枚の価値は計り知れません。底質と地形を読み解き、ぜひあなただけの「座布団」を釣り上げてください！
+      </div>
+    </section>
+
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+
+      <div id="fish-map" role="region"></div>
+
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article>
+</main>
+
+<section class="article-list">
+  <a href="beginner-fishing.html" class="article-card">
+    <img src="images/beginner-fishing.jpg" alt="初心者釣り">
+    <h2>初心者でも迷わない釣りの始め方</h2>
+  </a>
+  <a href="rod-selection.html" class="article-card">
+    <img src="images/rod-selection.jpg" alt="竿選び">
+    <h2>初心者向け失敗しない竿の選び方</h2>
+  </a>
+  <a href="gofishing.html" class="article-card">
+    <img src="images/gofishing.jpg" alt="潮と時間帯の解説">
+    <h2>いつ釣りに出掛けるべきか</h2>
+  </a>
+  <a href="firstfishing.html" class="article-card">
+    <img src="images/firstfishing.jpg" alt="場所選び">
+    <h2>失敗しない場所選び</h2>
+  </a>
+</section>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定（外部JSでこの変数を読み取ってマップを生成） -->
+<script>
+  window.TARGET_FISH = 'カレイ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
