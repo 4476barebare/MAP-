@@ -1,11 +1,20 @@
+// ==========================================
+// ★ 気象庁アラート取得関数（index.htmlの修正不要版）
+// ==========================================
 function getAlertText(pref, callback) {
-  // 1. 既存のHTML上の古いアラート枠(DOM)を完全に非表示にする
+  // 古いHTML上のアラート枠が残っていても完全に隠す
   var oldWrap = document.querySelector('.alert-wrap');
   if (oldWrap) oldWrap.style.display = 'none';
 
-  // 2. URLを $ で分割して複数の地域コードを配列化
-  var areaIds = (pref.url || "").split('$').filter(Boolean);
-  var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ": " : "";
+  // URL直打ち時など、データが不完全なタイミングで呼ばれた場合はエラーを出さずにクリア
+  if (!pref || !pref.url) {
+    clearMapAlert();
+    if (callback) callback({ text: "", color: "" });
+    return;
+  }
+
+  var areaIds = pref.url.split('$').filter(Boolean);
+  var prefix = (typeof pref.notes === "string") ? pref.notes + ": " : "";
   
   var codeMap = {
     "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
@@ -14,12 +23,11 @@ function getAlertText(pref, callback) {
   };
 
   if (areaIds.length === 0) {
-    updateMapAlert(""); 
+    clearMapAlert();
     if (callback) callback({ text: "", color: "" });
     return;
   }
 
-  // 3. 複数コードを並列でFetchして処理
   Promise.all(areaIds.map(function(areaId) {
     return fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
       .then(function(res) { return res.json(); })
@@ -55,13 +63,9 @@ function getAlertText(pref, callback) {
           }
         }
 
-        // その地域コードに情報がない場合は null を返す
-        if (warnings.length === 0 && advisories.length === 0) {
-          return null;
-        }
+        if (warnings.length === 0 && advisories.length === 0) return null;
 
         var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
-        // 赤を少し明るめにし、黄色も視認性の高い色に微調整
         var color = (warnings.length > 0) ? "#ff4d4d" : "#ffea00";
         return { text: finalMsgs.join(" / "), color: color };
       })
@@ -69,21 +73,19 @@ function getAlertText(pref, callback) {
         return null;
       });
   })).then(function(results) {
-    // 4. null（情報なし・エラー）を除外して有効な結果だけ抽出
     var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
     
     if (validResults.length > 0) {
-      // ★ 修正点：白フチをやめ、濃い黒フチ＋ドロップシャドウで文字をくっきりさせる
       var htmlLines = validResults.map(function(res) {
         return '<div style="color: ' + res.color + '; text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000, 0px 0px 4px rgba(0,0,0,0.8); font-size: 15px; font-weight: bold; margin-bottom: 6px; letter-spacing: 0.5px;">' + prefix + res.text + '</div>';
       }).join("");
       
       updateMapAlert(htmlLines);
     } else {
-      updateMapAlert(""); // どこのコードにも情報がなければ非表示
+      clearMapAlert();
     }
 
-    // index.html側の古い表示は消す
+    // ★ index.html 側には空文字を返すことで、古いDOMエラーを起こさずに安全に処理を終わらせる
     if (callback) callback({ text: "", color: "" });
   });
 }
@@ -92,23 +94,23 @@ function getAlertText(pref, callback) {
 // ★ マップ最上部レイヤーにアラートを描画する関数
 // ==========================================
 function updateMapAlert(html) {
-  if (!window.map) return;
-  var container = window.map.getContainer();
+  // window.mapの準備タイミングに依存せず、HTML上の地図枠を直接狙うことでURL直打ち時のバグを回避
+  var container = document.getElementById('lf-map');
+  if (!container) return;
+
   var alertDiv = document.getElementById('map-jma-alert');
   
-  // 初回のみ要素を生成してマップコンテナ内に追加
   if (!alertDiv) {
     alertDiv = document.createElement('div');
     alertDiv.id = 'map-jma-alert';
-    // マップ上の上辺中央に絶対配置
     alertDiv.style.position = 'absolute';
-    alertDiv.style.top = '12px'; // 少し余裕を持たせる
+    alertDiv.style.top = '12px';
     alertDiv.style.left = '50%';
     alertDiv.style.transform = 'translateX(-50%)';
-    alertDiv.style.zIndex = '9999'; // マップUIの最前面
-    alertDiv.style.background = 'transparent'; // 背景は完全透明
+    alertDiv.style.zIndex = '9999'; 
+    alertDiv.style.background = 'transparent';
     alertDiv.style.textAlign = 'center';
-    alertDiv.style.pointerEvents = 'none'; // クリックの邪魔をしない
+    alertDiv.style.pointerEvents = 'none'; 
     alertDiv.style.width = '90%';
     container.appendChild(alertDiv);
   }
@@ -117,12 +119,12 @@ function updateMapAlert(html) {
     alertDiv.innerHTML = html;
     alertDiv.style.display = 'block';
   } else {
-    // 情報がない場合は確実に非表示
-    alertDiv.style.display = 'none';
+    clearMapAlert();
   }
 }
+
 // ==========================================
-// ★ マップ上のアラートを完全にクリア（非表示）にする関数
+// ★ 中身を完全にクリアして非表示にする関数
 // ==========================================
 function clearMapAlert() {
   var alertDiv = document.getElementById('map-jma-alert');
