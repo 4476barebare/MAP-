@@ -3161,6 +3161,7 @@ function goBack() {
                 backBtn.style.pointerEvents = 'auto';
             }
              //showdebug('E');
+             clearMapAlert();
             
             window.goBackGuard = false; 
         }, 300);
