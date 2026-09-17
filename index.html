@@ -1239,14 +1239,10 @@ if (typeof loadPrefectureData === 'function') {
                         }
                         
                         if (typeof getAlertText === 'function' && window.prefData) {
-                            getAlertText(window.prefData, function(result) {
-                                const el = document.getElementById("alert-bar");
-                                if (el) {
-                                    el.textContent = result.text;
-                                    el.style.color = result.color;
-                                }
-                            });
+                            // コールバックによる古いDOM操作を排除し、直接関数だけを呼ぶ
+                            getAlertText(window.prefData);
                         }
+
 
                         requestAnimationFrame(() => {
                             const btn = document.getElementById('map-back-btn');
@@ -2940,12 +2936,11 @@ function renderPrefectureUI() {
         }
 
         // 気象庁アラートの取得
-        getAlertText(window.prefData, function(result) {
-            const el = document.getElementById("alert-bar");
-            if (!el) return;
-            el.textContent = result.text;
-            el.style.color = result.color;
-        });
+                // 気象庁アラートの取得
+        if (typeof getAlertText === 'function') {
+            getAlertText(window.prefData);
+        }
+
     } catch (err) {
         console.error("UI初期化エラー:", err);
     }
