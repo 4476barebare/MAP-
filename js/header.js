@@ -1,19 +1,30 @@
 // ==========================================
-// ★ 気象庁アラート取得関数（index.htmlの修正不要版）
+// ★ 気象庁アラート取得関数
 // ==========================================
 function getAlertText(pref, callback) {
   // 古いHTML上のアラート枠が残っていても完全に隠す
   var oldWrap = document.querySelector('.alert-wrap');
   if (oldWrap) oldWrap.style.display = 'none';
 
-  // URL直打ち時など、データが不完全なタイミングで呼ばれた場合はエラーを出さずにクリア
-  if (!pref || !pref.url) {
+  // データが不完全な場合はクリア
+  if (!pref || (!pref.url && !pref.URL)) {
+    window._currentAlertUrl = null;
     clearMapAlert();
     if (callback) callback({ text: "", color: "" });
     return;
   }
 
-  var areaIds = pref.url.split('$').filter(Boolean);
+  // 大文字小文字(.url / .URL)の両方の揺れに対応
+  var targetUrl = pref.url || pref.URL || "";
+  
+  // ★ 二重取得防止（同じ県なら無駄なFetchを走らせない）
+  if (window._currentAlertUrl === targetUrl) {
+    if (callback) callback({ text: "", color: "" });
+    return;
+  }
+  window._currentAlertUrl = targetUrl;
+
+  var areaIds = targetUrl.split('$').filter(Boolean);
   var prefix = (typeof pref.notes === "string") ? pref.notes + ": " : "";
   
   var codeMap = {
@@ -85,7 +96,7 @@ function getAlertText(pref, callback) {
       clearMapAlert();
     }
 
-    // ★ index.html 側には空文字を返すことで、古いDOMエラーを起こさずに安全に処理を終わらせる
+    // index.html側がエラーで止まらないように空文字を渡して終了
     if (callback) callback({ text: "", color: "" });
   });
 }
@@ -94,7 +105,6 @@ function getAlertText(pref, callback) {
 // ★ マップ最上部レイヤーにアラートを描画する関数
 // ==========================================
 function updateMapAlert(html) {
-  // window.mapの準備タイミングに依存せず、HTML上の地図枠を直接狙うことでURL直打ち時のバグを回避
   var container = document.getElementById('lf-map');
   if (!container) return;
 
@@ -133,6 +143,27 @@ function clearMapAlert() {
     alertDiv.style.display = 'none';
   }
 }
+
+// ==========================================
+// ★ URL直打ち対策（index.htmlを編集せず自動で表示させるガード処理）
+// ==========================================
+setInterval(function() {
+  if (window.prefData) {
+    var url = window.prefData.url || window.prefData.URL || "";
+    // 直打ち等で window.prefData はあるのにアラートが呼ばれていない場合、自動で叩く
+    if (url && window._currentAlertUrl !== url) {
+      if (typeof getAlertText === 'function') {
+        getAlertText(window.prefData);
+      }
+    }
+  } else {
+    // 戻るボタン等で広域マップに戻って window.prefData が空になったら、アラートを消す
+    if (window._currentAlertUrl !== null) {
+      window._currentAlertUrl = null;
+      clearMapAlert();
+    }
+  }
+}, 800);
 
 
 function loadNews() {
