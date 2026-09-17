@@ -1,44 +1,52 @@
 function getAlertText(pref, callback) {
+  // 1. 既存のHTML上の古いアラート枠(DOM)を完全に非表示にする
+  var oldWrap = document.querySelector('.alert-wrap');
+  if (oldWrap) oldWrap.style.display = 'none';
 
-  var areaId = pref.url;
-  var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ":" : "";
+  // 2. URLを $ で分割して複数の地域コードを配列化
+  var areaIds = (pref.url || "").split('$').filter(Boolean);
+  var prefix = (pref && typeof pref.notes === "string") ? pref.notes + ": " : "";
   
-  // 【重要】正式なコード表のみに絞ります
   var codeMap = {
     "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
-    "09": "土砂災害警報",
+    "09": "土砂災害警戒情報",
     "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "20": "濃霧注意報"
   };
 
-  fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      data.sort(function(a, b) { return new Date(a.reportDatetime) - new Date(b.reportDatetime); });
+  if (areaIds.length === 0) {
+    updateMapAlert(""); 
+    if (callback) callback({ text: "", color: "" });
+    return;
+  }
 
-      var statusMap = {};
-      data.forEach(function(report) {
-        if (report.warning && report.warning.class10Items) {
-          report.warning.class10Items.forEach(function(area) {
-            area.kinds.forEach(function(kind) {
-              if (kind.status === "発表" || kind.status === "継続") {
-                statusMap[kind.code] = true;
-              } else if (kind.status === "解除") {
-                statusMap[kind.code] = false;
-              }
+  // 3. 複数コードを並列でFetchして処理
+  Promise.all(areaIds.map(function(areaId) {
+    return fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        data.sort(function(a, b) { return new Date(a.reportDatetime) - new Date(b.reportDatetime); });
+
+        var statusMap = {};
+        data.forEach(function(report) {
+          if (report.warning && report.warning.class10Items) {
+            report.warning.class10Items.forEach(function(area) {
+              area.kinds.forEach(function(kind) {
+                if (kind.status === "発表" || kind.status === "継続") {
+                  statusMap[kind.code] = true;
+                } else if (kind.status === "解除") {
+                  statusMap[kind.code] = false;
+                }
+              });
             });
-          });
-        }
-      });
+          }
+        });
 
-      var warnings = [];
-      var advisories = [];
-      
-      for (var code in statusMap) {
-        if (statusMap[code] === true) {
-          // 【改良】定義されているものだけを拾う。不明なコードは無視する
-          if (codeMap[code]) {
+        var warnings = [];
+        var advisories = [];
+        
+        for (var code in statusMap) {
+          if (statusMap[code] === true && codeMap[code]) {
             var name = codeMap[code];
-            // 「警報」「警戒」という文字が含まれるか判定
             if (name.indexOf("警報") !== -1 || name.indexOf("警戒") !== -1) {
               warnings.push(name);
             } else {
@@ -46,18 +54,71 @@ function getAlertText(pref, callback) {
             }
           }
         }
-      }
 
-      // 表示ロジック
-      var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
-      var color = (warnings.length > 0) ? "#ff0000" : "#ffd400";
-      var text = (warnings.length === 0 && advisories.length === 0) ? "現在警報・注意報はありません" : finalMsgs.join(" / ");
+        // その地域コードに情報がない場合は null を返す
+        if (warnings.length === 0 && advisories.length === 0) {
+          return null;
+        }
 
-      callback({ text: prefix + text, color: color });
-    })
-    .catch(function() {
-      callback({ text: prefix + "現在警報はありません", color: "#ffffff" });
-    });
+        var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
+        var color = (warnings.length > 0) ? "#ff0000" : "#ffd400";
+        return { text: finalMsgs.join(" / "), color: color };
+      })
+      .catch(function() {
+        return null;
+      });
+  })).then(function(results) {
+    // 4. null（情報なし・エラー）を除外して有効な結果だけ抽出
+    var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
+    
+    if (validResults.length > 0) {
+      // 複数行のHTMLを構築（見やすく白フチ文字に設定）
+      var htmlLines = validResults.map(function(res) {
+        return '<div style="color: ' + res.color + '; text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff; font-size: 14px; font-weight: bold; margin-bottom: 2px;">' + prefix + res.text + '</div>';
+      }).join("");
+      
+      updateMapAlert(htmlLines);
+    } else {
+      updateMapAlert(""); // どこのコードにも情報がなければ非表示
+    }
+
+    // index.html側にある古い DOM 書き換え処理は無効化させる
+    if (callback) callback({ text: "", color: "" });
+  });
+}
+
+// ==========================================
+// ★ マップ最上部レイヤーにアラートを描画する関数
+// ==========================================
+function updateMapAlert(html) {
+  if (!window.map) return;
+  var container = window.map.getContainer();
+  var alertDiv = document.getElementById('map-jma-alert');
+  
+  // 初回のみ要素を生成してマップコンテナ内に追加
+  if (!alertDiv) {
+    alertDiv = document.createElement('div');
+    alertDiv.id = 'map-jma-alert';
+    // マップ上の上辺中央に絶対配置
+    alertDiv.style.position = 'absolute';
+    alertDiv.style.top = '10px';
+    alertDiv.style.left = '50%';
+    alertDiv.style.transform = 'translateX(-50%)';
+    alertDiv.style.zIndex = '9999'; // マップのどのUIよりも最前面に設定
+    alertDiv.style.background = 'transparent'; // 背景透明
+    alertDiv.style.textAlign = 'center';
+    alertDiv.style.pointerEvents = 'none'; // 地図の操作（クリック・スワイプ）の邪魔をしない
+    alertDiv.style.width = '90%';
+    container.appendChild(alertDiv);
+  }
+  
+  if (html) {
+    alertDiv.innerHTML = html;
+    alertDiv.style.display = 'block';
+  } else {
+    // 情報がない場合は確実に非表示
+    alertDiv.style.display = 'none';
+  }
 }
 
 
