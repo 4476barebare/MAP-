@@ -121,6 +121,16 @@ function updateMapAlert(html) {
     alertDiv.style.display = 'none';
   }
 }
+// ==========================================
+// ★ マップ上のアラートを完全にクリア（非表示）にする関数
+// ==========================================
+function clearMapAlert() {
+  var alertDiv = document.getElementById('map-jma-alert');
+  if (alertDiv) {
+    alertDiv.innerHTML = "";
+    alertDiv.style.display = 'none';
+  }
+}
 
 
 function loadNews() {
