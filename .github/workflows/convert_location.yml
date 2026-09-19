@@ -12,10 +12,9 @@ on:
           - TOKYO
           - IBARAKI
           - CHIBA
-          - SAITAMA
+          - SAITAMAGUNMA
           - KANAGAWA
           - TOCHIGI
-          - GUNMA
 
 permissions:
   contents: write
