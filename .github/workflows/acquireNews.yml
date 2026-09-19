@@ -3,7 +3,7 @@ name: "acquire News JSON from XREA"
 on:
   workflow_dispatch:
   schedule:
-    - cron: '29 1,13 * * *'
+    - cron: '29 13 * * *'
       timezone: 'Asia/Tokyo' # 🌟 日本時間の 01:29 と 13:29 に正確に発火します
 
 # 🌟 デプロイの渋滞や衝突を防ぐ安全装置
