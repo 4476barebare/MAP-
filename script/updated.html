@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CSV areaId 振り分けツール</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #333; }
+        .control-group { margin-bottom: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 5px; }
+        input[type="file"] { margin-bottom: 10px; }
+        button {
+            padding: 10px 20px; font-weight: bold; cursor: pointer;
+            background-color: #007bff; color: white; border: none; border-radius: 4px;
+        }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        button:hover:not(:disabled) { background-color: #0056b3; }
+        #logArea {
+            background-color: #1e1e1e; color: #4af626; padding: 15px; border-radius: 4px;
+            height: 150px; overflow-y: auto; font-family: monospace; font-size: 14px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>CSV areaId 振り分けツール</h2>
+    
+    <div class="control-group">
+        <label>1. スポット用CSV (location.csv) を選択</label>
+        <input type="file" id="locFile" accept=".csv" />
+    </div>
+
+    <div class="control-group">
+        <label>2. フィッシュ用CSV (fish.csv) を選択</label>
+        <input type="file" id="fishFile" accept=".csv" />
+    </div>
+
+    <div class="control-group">
+        <button id="convertBtn" onclick="processCSV()">結合してダウンロード</button>
+    </div>
+
+    <div id="logArea">ここに処理結果が表示されます...</div>
+</div>
+
+<script>
+    const logArea = document.getElementById('logArea');
+    const convertBtn = document.getElementById('convertBtn');
+
+    function log(msg) {
+        logArea.textContent += msg + "\n";
+        logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    // CSVをパースする簡易関数
+    function parseCSV(text) {
+        const lines = text.replace(/^\uFEFF/, '').trim().split('\n');
+        const headers = lines[0].split(',').map(h => h.trim());
+        const data = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const cols = lines[i].split(',');
+            const row = {};
+            headers.forEach((h, idx) => {
+                row[h] = cols[idx] ? cols[idx].trim() : '';
+            });
+            data.push({ originalLine: cols, obj: row });
+        }
+        return { headers, data };
+    }
+
+    async function processCSV() {
+        const locFileInput = document.getElementById('locFile');
+        const fishFileInput = document.getElementById('fishFile');
+
+        if (!locFileInput.files.length || !fishFileInput.files.length) {
+            alert("2つのCSVファイルを選択してください！");
+            return;
+        }
+
+        log("🚀 処理を開始します...");
+        convertBtn.disabled = true;
+
+        try {
+            // ファイルの読み込み
+            const locText = await locFileInput.files[0].text();
+            const fishText = await fishFileInput.files[0].text();
+            const fishFileName = fishFileInput.files[0].name.replace('.csv', '_updated.csv');
+
+            const locParsed = parseCSV(locText);
+            const fishParsed = parseCSV(fishText);
+
+            // 1. スポットCSVから辞書を作成 (name -> areaId)
+            const areaMap = {};
+            locParsed.data.forEach(item => {
+                if (item.obj.name && item.obj.areaId) {
+                    areaMap[item.obj.name] = item.obj.areaId;
+                }
+            });
+
+            // 2. フィッシュCSVに areaId 列が存在するか確認
+            const fishHeaders = [...fishParsed.headers];
+            let areaIdIndex = fishHeaders.indexOf('areaId');
+            let isNewCol = false;
+
+            if (areaIdIndex === -1) {
+                fishHeaders.push('areaId');
+                areaIdIndex = fishHeaders.length - 1;
+                isNewCol = true;
+            }
+
+            // 3. データをマージ
+            let updateCount = 0;
+            const outputLines = [fishHeaders.join(',')];
+
+            fishParsed.data.forEach(item => {
+                const spotName = item.obj.parent || ''; // parent列を基準にする
+                const matchedAreaId = areaMap[spotName] || '';
+                
+                const newRow = [...item.originalLine];
+                
+                if (matchedAreaId) updateCount++;
+
+                if (isNewCol) {
+                    newRow.push(matchedAreaId);
+                } else {
+                    newRow[areaIdIndex] = matchedAreaId;
+                }
+                
+                outputLines.push(newRow.join(','));
+            });
+
+            // 4. ダウンロード処理
+            const csvContent = "\uFEFF" + outputLines.join('\n'); // BOM付きUTF-8
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fishFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            log(`✅ 処理完了！\n${fishParsed.data.length}行中、${updateCount}行に areaId を付与しました。`);
+            log(`📥 ${fishFileName} をダウンロードしました。`);
+
+        } catch (error) {
+            log(`❌ エラーが発生しました: ${error.message}`);
+        } finally {
+            convertBtn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
