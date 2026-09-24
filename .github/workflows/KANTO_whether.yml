@@ -29,7 +29,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0 # 🌟 修正：全履歴を取得してrebaseのエラーを防ぐ
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -56,7 +56,8 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: [coastalArea] 天気コントロール処理の更新を反映"
             
-            # 🌟 プッシュする前に、リモートの最新の変更を取り込む安全装置
+            # 🌟 修正：リモートの履歴を完全に取得してからリベースする
+            git fetch origin main
             git pull --rebase origin main
             
             git push origin main
