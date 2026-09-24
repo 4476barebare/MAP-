@@ -55,6 +55,10 @@ jobs:
           
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: [coastalArea] 天気コントロール処理の更新を反映"
+            
+            # 🌟 プッシュする前に、リモートの最新の変更を取り込む安全装置
+            git pull --rebase origin main
+            
             git push origin main
           else
             echo "✅ データに変更がなかったためコミットをスキップしました。"
