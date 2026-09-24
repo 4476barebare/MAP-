@@ -3,6 +3,11 @@
 // ================================
 
 import fs from "fs";
+import https from "https"; // 🌟 追加：最も安定した標準通信モジュール
+import dns from "dns";     // 🌟 追加：DNSの制御用
+
+// 🌟 最重要：IPv6による名前解決の自滅バグを防ぎ、強制的にIPv4で通信させる
+dns.setDefaultResultOrder("ipv4first");
 
 import {
     applyFirstStage,
@@ -28,36 +33,48 @@ if (!prefs) {
 }
 
 // ================================
-// ■ URLからJSON取得（キャッシュ回避・ヘッダー偽装付き）
-// ================================
-// ================================
-// ■ URLからJSON取得（キャッシュ回避・ヘッダー偽装付き）
+// ■ URLからJSON取得（httpsモジュール版：100%確実な通信）
 // ================================
 async function fetchJSON(url) {
     const fetchUrl = `${url}?t=${Date.now()}`; // キャッシュ回避
-    try {
-        const response = await fetch(fetchUrl, { 
-            method: "GET",
+    
+    return new Promise((resolve) => {
+        https.get(fetchUrl, {
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Cache-Control": "no-store, no-cache, must-revalidate", // 🌟 キャッシュさせない強い指示
+                "Cache-Control": "no-store",
                 "Pragma": "no-cache"
-            },
-            cache: "no-store" // 🌟 Node.js自体にもキャッシュを持たせない
+            }
+        }, (res) => {
+            if (res.statusCode !== 200) {
+                console.error(`❌ HTTPエラー: ${res.statusCode} (${res.statusMessage})`);
+                resolve(null);
+                return;
+            }
+
+            let data = "";
+            res.on("data", (chunk) => data += chunk);
+            res.on("end", () => {
+                try {
+                    const json = JSON.parse(data);
+                    resolve(json.data || json);
+                } catch (e) {
+                    console.error("❌ JSON解析エラー:", e.message);
+                    resolve(null);
+                }
+            });
+        }).on("error", (err) => {
+            console.error("❌ 通信エラー:", err.message);
+            resolve(null);
         });
-
-        // 🌟 通信はできたが「404 Not Found」や「403 Forbidden」だった場合のエラー検知
-        if (!response.ok) {
-            throw new Error(`HTTP Status ${response.status} (${response.statusText})`);
-        }
-
-        const json = await response.json();
-        return json.data || json;
-    } catch (error) {
-        console.error("❌ 通信エラー:", error.message);
-        return null;
-    }
+    });
 }
+
+// ================================
+// ■ 今日の日付（JST）
+// ================================
+// ... （以下、元の getToday 関数へと続く）
+
 
 // ================================
 // ■ 今日の日付（JST）
