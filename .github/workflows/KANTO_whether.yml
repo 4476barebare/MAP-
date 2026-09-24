@@ -56,11 +56,15 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: [coastalArea] 天気コントロール処理の更新を反映"
             
-            # 🌟 修正：リモートの履歴を完全に取得してからリベースする
+            # 🌟 1. 最新の履歴を強制取得
             git fetch origin main
-            git pull --rebase origin main
             
-            git push origin main
+            # 🌟 2. 履歴を繋ぐ（衝突してもBotの変更を強制優先してエラーを潰す）
+            git pull --rebase origin main -X ours
+            
+            # 🌟 3. 確実なブランチ指定でプッシュ
+            git push origin HEAD:main
+            
           else
             echo "✅ データに変更がなかったためコミットをスキップしました。"
           fi
