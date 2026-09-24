@@ -6,7 +6,6 @@ on:
     - cron: '19 0 * * *'
       timezone: 'Asia/Tokyo' # 1日1回自動実行（JST 01:30 相当）
 
-# 🌟 これを追加（デプロイの渋滞エラーを防止する安全装置です）
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -20,7 +19,6 @@ jobs:
   run:
     runs-on: ubuntu-latest
     
-    # 🌟 GitHub Pagesへのデプロイ権限を証明するために必須の記述
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -29,23 +27,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # 🌟 修正：全履歴を取得してrebaseのエラーを防ぐ
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "24"
 
-      # ========================================================
-      # 🌟 JSを実行（第1引数: 地域名, 第2引数: 参照するURL）
-      # ========================================================
       - name: Run Coastal Area Control
         run: |
           node js/coastalArea_control.js KANTO "https://turiiko.shop/actions/data/KANTO_load.json"
 
-      # ========================================================
-      # スクリプトが更新したデータをリポジトリに保存
-      # ========================================================
       - name: Commit and Push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -56,27 +48,18 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: [coastalArea] 天気コントロール処理の更新を反映"
             
-            # 🌟 1. 最新の履歴を強制取得
             git fetch origin main
-            
-            # 🌟 2. 履歴を繋ぐ（衝突してもBotの変更を強制優先してエラーを潰す）
             git pull --rebase origin main -X ours
-            
-            # 🌟 3. 確実なブランチ指定でプッシュ
             git push origin HEAD:main
-            
           else
             echo "✅ データに変更がなかったためコミットをスキップしました。"
           fi
 
-      # ========================================================
-      # GitHub Pages への直接デプロイ
-      # ========================================================
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './'
 
       - name: Deploy to GitHub Pages
-        id: deployment # 🌟 デプロイIDを付与（推奨）
+        id: deployment 
         uses: actions/deploy-pages@v4
