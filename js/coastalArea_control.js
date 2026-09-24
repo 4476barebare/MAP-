@@ -3,11 +3,7 @@
 // ================================
 
 import fs from "fs";
-import https from "https"; // 🌟 追加：最も安定した標準通信モジュール
-import dns from "dns";     // 🌟 追加：DNSの制御用
-
-// 🌟 最重要：IPv6による名前解決の自滅バグを防ぎ、強制的にIPv4で通信させる
-dns.setDefaultResultOrder("ipv4first");
+import { execSync } from "child_process"; // 🌟 追加：OSのコマンド(curl)を実行するモジュール
 
 import {
     applyFirstStage,
@@ -33,48 +29,34 @@ if (!prefs) {
 }
 
 // ================================
-// ■ URLからJSON取得（httpsモジュール版：100%確実な通信）
+// ■ URLからJSON取得（🌟 Node.js通信を捨てて確実な curl を使う版）
 // ================================
 async function fetchJSON(url) {
     const fetchUrl = `${url}?t=${Date.now()}`; // キャッシュ回避
     
-    return new Promise((resolve) => {
-        https.get(fetchUrl, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Cache-Control": "no-store",
-                "Pragma": "no-cache"
-            }
-        }, (res) => {
-            if (res.statusCode !== 200) {
-                console.error(`❌ HTTPエラー: ${res.statusCode} (${res.statusMessage})`);
-                resolve(null);
-                return;
-            }
-
-            let data = "";
-            res.on("data", (chunk) => data += chunk);
-            res.on("end", () => {
-                try {
-                    const json = JSON.parse(data);
-                    resolve(json.data || json);
-                } catch (e) {
-                    console.error("❌ JSON解析エラー:", e.message);
-                    resolve(null);
-                }
-            });
-        }).on("error", (err) => {
-            console.error("❌ 通信エラー:", err.message);
-            resolve(null);
-        });
-    });
+    try {
+        // 🌟 OSの標準機能である curl コマンドを組み立てて実行
+        // -sS: エラー時のみ出力, -H: ヘッダー偽装
+        const command = `curl -sS "${fetchUrl}" -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0" -H "Cache-Control: no-cache"`;
+        
+        // curlを実行し、結果の文字列を受け取る
+        const result = execSync(command, { encoding: "utf8" });
+        
+        const json = JSON.parse(result);
+        return json.data || json;
+        
+    } catch (error) {
+        // curl自体の失敗、またはJSONパースの失敗
+        console.error("❌ 通信エラー (curl実行失敗):", error.message);
+        if (error.stdout) console.error("詳細:", error.stdout);
+        return null;
+    }
 }
 
 // ================================
 // ■ 今日の日付（JST）
 // ================================
 // ... （以下、元の getToday 関数へと続く）
-
 
 // ================================
 // ■ 今日の日付（JST）
