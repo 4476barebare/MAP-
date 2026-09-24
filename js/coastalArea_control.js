@@ -30,14 +30,27 @@ if (!prefs) {
 // ================================
 // ■ URLからJSON取得（キャッシュ回避・ヘッダー偽装付き）
 // ================================
+// ================================
+// ■ URLからJSON取得（キャッシュ回避・ヘッダー偽装付き）
+// ================================
 async function fetchJSON(url) {
     const fetchUrl = `${url}?t=${Date.now()}`; // キャッシュ回避
     try {
         const response = await fetch(fetchUrl, { 
+            method: "GET",
             headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-            }
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Cache-Control": "no-store, no-cache, must-revalidate", // 🌟 キャッシュさせない強い指示
+                "Pragma": "no-cache"
+            },
+            cache: "no-store" // 🌟 Node.js自体にもキャッシュを持たせない
         });
+
+        // 🌟 通信はできたが「404 Not Found」や「403 Forbidden」だった場合のエラー検知
+        if (!response.ok) {
+            throw new Error(`HTTP Status ${response.status} (${response.statusText})`);
+        }
+
         const json = await response.json();
         return json.data || json;
     } catch (error) {
