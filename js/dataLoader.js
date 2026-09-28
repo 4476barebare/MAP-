@@ -3387,12 +3387,26 @@ function buildSpotRestoreObject() {
     };
 }
 
+
 // ==========================================
-// 道路レイヤー管理 (Leafletネイティブ状態判定 & キャッシュ版)
+// 道路レイヤー管理 (SVGレンダラー ＆ 超軽量CSS制御版)
 // ==========================================
+
+// ★ CSSを一括制御するためのスタイルを動的に追加
+const roadStyleEl = document.createElement('style');
+roadStyleEl.innerHTML = `
+    .road-motorway {
+        stroke-width: var(--motorway-weight, 2px) !important;
+        transition: opacity 0.3s ease;
+    }
+    .road-trunk {
+        stroke-width: var(--trunk-weight, 1.5px) !important;
+        transition: opacity 0.3s ease;
+    }
+`;
+document.head.appendChild(roadStyleEl);
+
 let roadLayerGroup = null;
-let motorwayLayers = [];
-let trunkLayers = [];
 let motorwayRenderer = null;
 let trunkRenderer = null;
 
@@ -3403,7 +3417,7 @@ let cachedTrunkData = null;
 async function initRoadLayers(map) {
     if (roadLayerGroup) return;
 
-    // レンダラー＆Pane設定
+    // Pane設定
     if (!map.getPane('trunkPane')) {
         map.createPane('trunkPane');
         map.getPane('trunkPane').style.zIndex = 401;
@@ -3414,8 +3428,9 @@ async function initRoadLayers(map) {
         map.getPane('motorwayPane').style.filter = 'drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.7))';
     }
 
-    trunkRenderer = L.canvas({ pane: 'trunkPane' });
-    motorwayRenderer = L.canvas({ pane: 'motorwayPane' });
+    // ★ CanvasではなくSVGレンダラーを使用し、paddingを広くとって画面外をマーカーと同じようにDOMで保持する
+    trunkRenderer = L.svg({ pane: 'trunkPane', padding: 1.5 });
+    motorwayRenderer = L.svg({ pane: 'motorwayPane', padding: 1.5 });
 
     roadLayerGroup = L.layerGroup();
 
@@ -3430,14 +3445,12 @@ async function initRoadLayers(map) {
         if (cachedMotorwayData) {
             cachedMotorwayData.forEach(item => {
                 const polyline = L.Polyline.fromEncoded(item.p, {
+                    className: 'road-motorway', // ★CSSで太さを一括制御
                     color: '#155934',
-                    opacity: 1,
-                    renderer: motorwayRenderer,
-                    interactive: false // クリック不要
+                    interactive: false, // ポップアップ・クリック不要
+                    renderer: motorwayRenderer
                 });
-                // ポップアップのバインドは行わない
-                motorwayLayers.push(polyline);
-                roadLayerGroup.addLayer(polyline); // 最初からグループに入れて保持しておく
+                roadLayerGroup.addLayer(polyline);
             });
         }
 
@@ -3449,14 +3462,12 @@ async function initRoadLayers(map) {
         if (cachedTrunkData) {
             cachedTrunkData.forEach(item => {
                 const polyline = L.Polyline.fromEncoded(item.p, {
+                    className: 'road-trunk', // ★CSSで太さを一括制御
                     color: '#DCDCDC',
-                    opacity: 0.5,
-                    renderer: trunkRenderer,
-                    interactive: false // クリック不要
+                    interactive: false, // ポップアップ・クリック不要
+                    renderer: trunkRenderer
                 });
-                // ポップアップのバインドは行わない
-                trunkLayers.push(polyline);
-                roadLayerGroup.addLayer(polyline); // 最初からグループに入れて保持しておく
+                roadLayerGroup.addLayer(polyline);
             });
         }
     } catch (e) {
@@ -3476,23 +3487,26 @@ function updateRoadStyle() {
     if (!window.map || !roadLayerGroup || !window.map.hasLayer(roadLayerGroup)) return;
 
     const currentZoom = window.map.getZoom();
+    const motorwayPane = window.map.getPane('motorwayPane');
+    const trunkPane = window.map.getPane('trunkPane');
 
-    // ズーム13.5以下で表示、それより拡大されたら線を細くして見えなくする（または0にする）
+    if (!motorwayPane || !trunkPane) return;
+
+    // ズーム13.5以下で表示
     if (currentZoom <= 13.5) {
         const motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8);
         const trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
 
-        motorwayLayers.forEach(layer => {
-            layer.setStyle({ weight: motorwayWeight, opacity: 1 });
-        });
+        // ★ 究極の高速化：JSで千件のループを回すのをやめ、親PaneのCSS変数を書き換えるだけで瞬時に一括変更
+        motorwayPane.style.setProperty('--motorway-weight', motorwayWeight + 'px');
+        trunkPane.style.setProperty('--trunk-weight', trunkWeight + 'px');
 
-        trunkLayers.forEach(layer => {
-            layer.setStyle({ weight: trunkWeight, opacity: 0.5 });
-        });
+        motorwayPane.style.opacity = '1';
+        trunkPane.style.opacity = '0.5'; 
     } else {
-        // ★ 変更点: clearLayers()で消すのではなく、透明にして見えなくするだけで保持する
-        motorwayLayers.forEach(layer => layer.setStyle({ opacity: 0 }));
-        trunkLayers.forEach(layer => layer.setStyle({ opacity: 0 }));
+        // ★ ズームインしたらデータは捨てずに透明にして見えなくするだけ
+        motorwayPane.style.opacity = '0';
+        trunkPane.style.opacity = '0';
     }
 }
 
