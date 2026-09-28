@@ -3396,7 +3396,7 @@ let trunkLayers = [];
 let motorwayRenderer = null;
 let trunkRenderer = null;
 
-// JSONデータのメモリキャッシュ（初回のみフェッチ）
+// JSONデータのメモリキャッシュ（初回のみフェッチして保持）
 let cachedMotorwayData = null;
 let cachedTrunkData = null;
 
@@ -3432,10 +3432,12 @@ async function initRoadLayers(map) {
                 const polyline = L.Polyline.fromEncoded(item.p, {
                     color: '#155934',
                     opacity: 1,
-                    renderer: motorwayRenderer
+                    renderer: motorwayRenderer,
+                    interactive: false // クリック不要
                 });
-                bindRoadPopup(polyline, item.n, item.r, '高速道路');
+                // ポップアップのバインドは行わない
                 motorwayLayers.push(polyline);
+                roadLayerGroup.addLayer(polyline); // 最初からグループに入れて保持しておく
             });
         }
 
@@ -3449,10 +3451,12 @@ async function initRoadLayers(map) {
                 const polyline = L.Polyline.fromEncoded(item.p, {
                     color: '#DCDCDC',
                     opacity: 0.5,
-                    renderer: trunkRenderer
+                    renderer: trunkRenderer,
+                    interactive: false // クリック不要
                 });
-                bindRoadPopup(polyline, item.n, item.r, '国道');
+                // ポップアップのバインドは行わない
                 trunkLayers.push(polyline);
+                roadLayerGroup.addLayer(polyline); // 最初からグループに入れて保持しておく
             });
         }
     } catch (e) {
@@ -3467,37 +3471,28 @@ async function initRoadLayers(map) {
     map.on('zoomend', updateRoadStyle);
 }
 
-function bindRoadPopup(layer, featureName, featureRef, typeName) {
-    const refStr = featureRef ? featureRef + '号' : '';
-    const label = refStr ? refStr + ' (' + featureName + ')' : featureName;
-    const content = "<div style='font-size:14px; font-weight:bold;'>" + typeName + "<br><span style='color:#0055ff;'>" + label + "</span></div>";
-    layer.bindPopup(content);
-}
-
 function updateRoadStyle() {
+    // 道路レイヤーグループがマップに存在しない場合は計算をスキップ
     if (!window.map || !roadLayerGroup || !window.map.hasLayer(roadLayerGroup)) return;
 
     const currentZoom = window.map.getZoom();
 
+    // ズーム13.5以下で表示、それより拡大されたら線を細くして見えなくする（または0にする）
     if (currentZoom <= 13.5) {
         const motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8);
         const trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
 
         motorwayLayers.forEach(layer => {
-            layer.setStyle({ weight: motorwayWeight });
-            if (!roadLayerGroup.hasLayer(layer)) {
-                roadLayerGroup.addLayer(layer);
-            }
+            layer.setStyle({ weight: motorwayWeight, opacity: 1 });
         });
 
         trunkLayers.forEach(layer => {
-            layer.setStyle({ weight: trunkWeight });
-            if (!roadLayerGroup.hasLayer(layer)) {
-                roadLayerGroup.addLayer(layer);
-            }
+            layer.setStyle({ weight: trunkWeight, opacity: 0.5 });
         });
     } else {
-        roadLayerGroup.clearLayers();
+        // ★ 変更点: clearLayers()で消すのではなく、透明にして見えなくするだけで保持する
+        motorwayLayers.forEach(layer => layer.setStyle({ opacity: 0 }));
+        trunkLayers.forEach(layer => layer.setStyle({ opacity: 0 }));
     }
 }
 
@@ -3507,7 +3502,7 @@ function updateRoadStyle() {
 window.showRoadLayers = function() {
     if (!window.map) return;
 
-    // ① 作成済みの場合の分岐
+    // ① 作成済みの場合のガード分岐
     if (roadLayerGroup) {
         // 既に表示中であれば即リターン
         if (window.map.hasLayer(roadLayerGroup)) return;
@@ -3530,4 +3525,3 @@ window.hideRoadLayers = function() {
         window.map.removeLayer(roadLayerGroup);
     }
 };
-
