@@ -891,7 +891,9 @@ function showPrefSpots() {
             el.style.pointerEvents = 'none';
 
             marker._regionRepresentative = false;
+            
         });
+        showRoadLayers();
 
         return;
     }
@@ -941,6 +943,8 @@ function showPrefSpots() {
         }
 
         marker._regionRepresentative = false;
+        showRoadLayers();
+
     });
 }
 // =====================================================
