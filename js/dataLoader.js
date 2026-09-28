@@ -3388,40 +3388,48 @@ function buildSpotRestoreObject() {
 }
 
 // ==========================================
-// 道路レイヤー管理
+// 道路レイヤー管理 (Leafletネイティブ状態判定 & キャッシュ版)
 // ==========================================
 let roadLayerGroup = null;
 let motorwayLayers = [];
 let trunkLayers = [];
-let isRoadVisible = false;
 let motorwayRenderer = null;
 let trunkRenderer = null;
 
-function initRoadLayers(map) {
+// JSONデータのメモリキャッシュ（初回のみフェッチ）
+let cachedMotorwayData = null;
+let cachedTrunkData = null;
+
+async function initRoadLayers(map) {
     if (roadLayerGroup) return;
 
-    // Pane設定
-    map.createPane('trunkPane');
-    map.getPane('trunkPane').style.zIndex = 401;
-
-    map.createPane('motorwayPane');
-    map.getPane('motorwayPane').style.zIndex = 402;
-    map.getPane('motorwayPane').style.filter = 'drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.7))';
+    // レンダラー＆Pane設定
+    if (!map.getPane('trunkPane')) {
+        map.createPane('trunkPane');
+        map.getPane('trunkPane').style.zIndex = 401;
+    }
+    if (!map.getPane('motorwayPane')) {
+        map.createPane('motorwayPane');
+        map.getPane('motorwayPane').style.zIndex = 402;
+        map.getPane('motorwayPane').style.filter = 'drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.7))';
+    }
 
     trunkRenderer = L.canvas({ pane: 'trunkPane' });
     motorwayRenderer = L.canvas({ pane: 'motorwayPane' });
 
-    roadLayerGroup = L.layerGroup().addTo(map);
+    roadLayerGroup = L.layerGroup();
 
-    // KANTO固定ではなく、現在のリージョンを参照するようにしています
     const regionCode = window.currentRegion || 'KANTO';
-    
-    // 高速道路データの取得
-    fetch(`/${regionCode}/enc_motorway.json`)
-        .then(res => res.json())
-        .then(data => {
-            data.forEach(item => {
-                var polyline = L.Polyline.fromEncoded(item.p, {
+
+    try {
+        // 高速道路データの取得とキャッシュ
+        if (!cachedMotorwayData) {
+            const res = await fetch(`/${regionCode}/enc_motorway.json`);
+            if (res.ok) cachedMotorwayData = await res.json();
+        }
+        if (cachedMotorwayData) {
+            cachedMotorwayData.forEach(item => {
+                const polyline = L.Polyline.fromEncoded(item.p, {
                     color: '#155934',
                     opacity: 1,
                     renderer: motorwayRenderer
@@ -3429,15 +3437,16 @@ function initRoadLayers(map) {
                 bindRoadPopup(polyline, item.n, item.r, '高速道路');
                 motorwayLayers.push(polyline);
             });
-            if (isRoadVisible) updateRoadStyle();
-        }).catch(e => console.log('高速道路データなし'));
+        }
 
-    // 国道データの取得
-    fetch(`/${regionCode}/enc_trunk.json`)
-        .then(res => res.json())
-        .then(data => {
-            data.forEach(item => {
-                var polyline = L.Polyline.fromEncoded(item.p, {
+        // 国道データの取得とキャッシュ
+        if (!cachedTrunkData) {
+            const res = await fetch(`/${regionCode}/enc_trunk.json`);
+            if (res.ok) cachedTrunkData = await res.json();
+        }
+        if (cachedTrunkData) {
+            cachedTrunkData.forEach(item => {
+                const polyline = L.Polyline.fromEncoded(item.p, {
                     color: '#DCDCDC',
                     opacity: 0.5,
                     renderer: trunkRenderer
@@ -3445,29 +3454,34 @@ function initRoadLayers(map) {
                 bindRoadPopup(polyline, item.n, item.r, '国道');
                 trunkLayers.push(polyline);
             });
-            if (isRoadVisible) updateRoadStyle();
-        }).catch(e => console.log('国道データなし'));
+        }
+    } catch (e) {
+        console.error('道路データの読み込みエラー:', e);
+    }
 
-    // ズーム時のスタイル更新イベントを登録
+    // 作成完了後マップに追加して描画更新
+    roadLayerGroup.addTo(map);
+    updateRoadStyle();
+
+    // ズーム更新イベント
     map.on('zoomend', updateRoadStyle);
 }
 
 function bindRoadPopup(layer, featureName, featureRef, typeName) {
-    var refStr = featureRef ? featureRef + '号' : '';
-    var label = refStr ? refStr + ' (' + featureName + ')' : featureName;
-    var content = "<div style='font-size:14px; font-weight:bold;'>" + typeName + "<br><span style='color:#0055ff;'>" + label + "</span></div>";
+    const refStr = featureRef ? featureRef + '号' : '';
+    const label = refStr ? refStr + ' (' + featureName + ')' : featureName;
+    const content = "<div style='font-size:14px; font-weight:bold;'>" + typeName + "<br><span style='color:#0055ff;'>" + label + "</span></div>";
     layer.bindPopup(content);
 }
 
 function updateRoadStyle() {
-    if (!window.map || !roadLayerGroup || !isRoadVisible) return;
+    if (!window.map || !roadLayerGroup || !window.map.hasLayer(roadLayerGroup)) return;
 
-    var currentZoom = window.map.getZoom();
+    const currentZoom = window.map.getZoom();
 
-    // ズーム13.5以下で表示（Phase1の最大ズーム付近まで）
     if (currentZoom <= 13.5) {
-        var motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8); 
-        var trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
+        const motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8);
+        const trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
 
         motorwayLayers.forEach(layer => {
             layer.setStyle({ weight: motorwayWeight });
@@ -3483,33 +3497,37 @@ function updateRoadStyle() {
             }
         });
     } else {
-        // ズーム13.5を超えたら非表示
         roadLayerGroup.clearLayers();
     }
 }
 
-// 道路を表示する関数
+// ==========================================
+// ★ レイヤー自体の存在・表示状態のみで判定する関数
+// ==========================================
 window.showRoadLayers = function() {
-    isRoadVisible = true;
     if (!window.map) return;
-    
-    if (!roadLayerGroup) {
-        initRoadLayers(window.map);
-    } else {
-        if (!window.map.hasLayer(roadLayerGroup)) {
-            roadLayerGroup.addTo(window.map);
-        }
+
+    // ① 作成済みの場合の分岐
+    if (roadLayerGroup) {
+        // 既に表示中であれば即リターン
+        if (window.map.hasLayer(roadLayerGroup)) return;
+
+        // 非表示状態ならマップに再追加して即リターン
+        roadLayerGroup.addTo(window.map);
         updateRoadStyle();
+        return;
+    }
+
+    // ② 未作成であれば初期化・ロード処理を実行
+    initRoadLayers(window.map);
+};
+
+window.hideRoadLayers = function() {
+    if (!window.map || !roadLayerGroup) return;
+
+    // マップに載っている場合のみ取り外す
+    if (window.map.hasLayer(roadLayerGroup)) {
+        window.map.removeLayer(roadLayerGroup);
     }
 };
 
-// 道路を非表示にする関数
-window.hideRoadLayers = function() {
-    isRoadVisible = false;
-    if (roadLayerGroup) {
-        roadLayerGroup.clearLayers();
-        if (window.map.hasLayer(roadLayerGroup)) {
-            window.map.removeLayer(roadLayerGroup);
-        }
-    }
-};
