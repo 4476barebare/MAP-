@@ -3392,7 +3392,7 @@ function buildSpotRestoreObject() {
 
 
 // ==========================================
-// 道路レイヤー管理 (SVGレンダラー ＆ 超軽量CSS制御版)
+// 道路レイヤー管理 (非同期バックグラウンドロード ＆ 自動フェードイン版)
 // ==========================================
 
 // ★ CSSを一括制御するためのスタイルを動的に追加
@@ -3400,11 +3400,9 @@ const roadStyleEl = document.createElement('style');
 roadStyleEl.innerHTML = `
     .road-motorway {
         stroke-width: var(--motorway-weight, 2px) !important;
-        transition: opacity 0.3s ease;
     }
     .road-trunk {
         stroke-width: var(--trunk-weight, 1.5px) !important;
-        transition: opacity 0.3s ease;
     }
 `;
 document.head.appendChild(roadStyleEl);
@@ -3413,25 +3411,37 @@ let roadLayerGroup = null;
 let motorwayRenderer = null;
 let trunkRenderer = null;
 
-// JSONデータのメモリキャッシュ（初回のみフェッチして保持）
+// JSONデータのメモリキャッシュ
 let cachedMotorwayData = null;
 let cachedTrunkData = null;
 
-async function initRoadLayers(map) {
-    if (roadLayerGroup) return;
+// ★ 非同期状態管理用フラグ
+window.isRoadReady = false;
+window._isRoadLoading = false;
+window._shouldShowRoad = false; // 表示すべき画面(広域・エリア等)かどうかのフラグ
+
+function initRoadLayers(map) {
+    if (window.isRoadReady || window._isRoadLoading) return;
+    window._isRoadLoading = true;
 
     // Pane設定
     if (!map.getPane('trunkPane')) {
         map.createPane('trunkPane');
-        map.getPane('trunkPane').style.zIndex = 401;
+        const trunkPane = map.getPane('trunkPane');
+        trunkPane.style.zIndex = 401;
+        trunkPane.style.opacity = '0'; // 最初は透明
+        trunkPane.style.transition = 'opacity 2s ease'; // ★ フェードイン用
     }
     if (!map.getPane('motorwayPane')) {
         map.createPane('motorwayPane');
-        map.getPane('motorwayPane').style.zIndex = 402;
-        map.getPane('motorwayPane').style.filter = 'drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.7))';
+        const motorwayPane = map.getPane('motorwayPane');
+        motorwayPane.style.zIndex = 402;
+        motorwayPane.style.filter = 'drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.7))';
+        motorwayPane.style.opacity = '0'; // 最初は透明
+        motorwayPane.style.transition = 'opacity 2s ease'; // ★ フェードイン用
     }
 
-    // ★ CanvasではなくSVGレンダラーを使用し、paddingを広くとって画面外をマーカーと同じようにDOMで保持する
+    // SVGレンダラー
     trunkRenderer = L.svg({ pane: 'trunkPane', padding: 1.5 });
     motorwayRenderer = L.svg({ pane: 'motorwayPane', padding: 1.5 });
 
@@ -3439,54 +3449,88 @@ async function initRoadLayers(map) {
 
     const regionCode = window.currentRegion || 'KANTO';
 
-    try {
-        // 高速道路データの取得とキャッシュ
-        if (!cachedMotorwayData) {
-            const res = await fetch(`/${regionCode}/enc_motorway.json`);
-            if (res.ok) cachedMotorwayData = await res.json();
-        }
+    // ★ 裏側で勝手にロードを進める（awaitで止めない）
+    Promise.all([
+        cachedMotorwayData ? Promise.resolve(cachedMotorwayData) : fetch(`/${regionCode}/enc_motorway.json`).then(r => r.ok ? r.json() : null),
+        cachedTrunkData ? Promise.resolve(cachedTrunkData) : fetch(`/${regionCode}/enc_trunk.json`).then(r => r.ok ? r.json() : null)
+    ]).then(([motorwayData, trunkData]) => {
+        cachedMotorwayData = motorwayData;
+        cachedTrunkData = trunkData;
+
         if (cachedMotorwayData) {
             cachedMotorwayData.forEach(item => {
                 const polyline = L.Polyline.fromEncoded(item.p, {
-                    className: 'road-motorway', // ★CSSで太さを一括制御
+                    className: 'road-motorway',
                     color: '#155934',
-                    interactive: false, // ポップアップ・クリック不要
+                    interactive: false,
                     renderer: motorwayRenderer
                 });
                 roadLayerGroup.addLayer(polyline);
             });
         }
 
-        // 国道データの取得とキャッシュ
-        if (!cachedTrunkData) {
-            const res = await fetch(`/${regionCode}/enc_trunk.json`);
-            if (res.ok) cachedTrunkData = await res.json();
-        }
         if (cachedTrunkData) {
             cachedTrunkData.forEach(item => {
                 const polyline = L.Polyline.fromEncoded(item.p, {
-                    className: 'road-trunk', // ★CSSで太さを一括制御
+                    className: 'road-trunk',
                     color: '#DCDCDC',
-                    interactive: false, // ポップアップ・クリック不要
+                    interactive: false,
                     renderer: trunkRenderer
                 });
                 roadLayerGroup.addLayer(polyline);
             });
         }
-    } catch (e) {
-        console.error('道路データの読み込みエラー:', e);
+
+        window.isRoadReady = true;
+        window._isRoadLoading = false;
+
+        // ズーム更新イベント
+        map.on('zoomend', updateRoadStyle);
+
+        // ★ 準備ができた瞬間に「表示すべき画面」なら自動でフェードイン発火
+        if (window._shouldShowRoad) {
+            triggerRoadFadeIn();
+        }
+
+    }).catch(e => {
+        console.error('道路データのバックグラウンド読み込みエラー:', e);
+        window._isRoadLoading = false;
+    });
+}
+
+// 準備完了後、レイヤーをマップに追加してフェードインする処理
+function triggerRoadFadeIn() {
+    if (!window.map || !window.isRoadReady || !roadLayerGroup) return;
+
+    if (!window.map.hasLayer(roadLayerGroup)) {
+        roadLayerGroup.addTo(window.map);
     }
 
-    // 作成完了後マップに追加して描画更新
-    roadLayerGroup.addTo(map);
-    updateRoadStyle();
+    // 線の太さを先に更新
+    const currentZoom = window.map.getZoom();
+    const motorwayPane = window.map.getPane('motorwayPane');
+    const trunkPane = window.map.getPane('trunkPane');
 
-    // ズーム更新イベント
-    map.on('zoomend', updateRoadStyle);
+    if (motorwayPane && trunkPane && currentZoom <= 13.5) {
+        const motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8);
+        const trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
+
+        motorwayPane.style.setProperty('--motorway-weight', motorwayWeight + 'px');
+        trunkPane.style.setProperty('--trunk-weight', trunkWeight + 'px');
+    }
+
+    // DOMの反映を待ってから opacity を上げてフェードイン
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            if (currentZoom <= 13.5) {
+                if (motorwayPane) motorwayPane.style.opacity = '1';
+                if (trunkPane) trunkPane.style.opacity = '0.5';
+            }
+        });
+    });
 }
 
 function updateRoadStyle() {
-    // 道路レイヤーグループがマップに存在しない場合は計算をスキップ
     if (!window.map || !roadLayerGroup || !window.map.hasLayer(roadLayerGroup)) return;
 
     const currentZoom = window.map.getZoom();
@@ -3495,19 +3539,16 @@ function updateRoadStyle() {
 
     if (!motorwayPane || !trunkPane) return;
 
-    // ズーム13.5以下で表示
     if (currentZoom <= 13.5) {
         const motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8);
         const trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
 
-        // ★ 究極の高速化：JSで千件のループを回すのをやめ、親PaneのCSS変数を書き換えるだけで瞬時に一括変更
         motorwayPane.style.setProperty('--motorway-weight', motorwayWeight + 'px');
         trunkPane.style.setProperty('--trunk-weight', trunkWeight + 'px');
 
         motorwayPane.style.opacity = '1';
         trunkPane.style.opacity = '0.5'; 
     } else {
-        // ★ ズームインしたらデータは捨てずに透明にして見えなくするだけ
         motorwayPane.style.opacity = '0';
         trunkPane.style.opacity = '0';
     }
@@ -3517,28 +3558,32 @@ function updateRoadStyle() {
 // ★ レイヤー自体の存在・表示状態のみで判定する関数
 // ==========================================
 window.showRoadLayers = function() {
+    window._shouldShowRoad = true;
     if (!window.map) return;
 
-    // ① 作成済みの場合のガード分岐
-    if (roadLayerGroup) {
-        // 既に表示中であれば即リターン
-        if (window.map.hasLayer(roadLayerGroup)) return;
-
-        // 非表示状態ならマップに再追加して即リターン
-        roadLayerGroup.addTo(window.map);
+    if (window.isRoadReady) {
+        if (!window.map.hasLayer(roadLayerGroup)) {
+            roadLayerGroup.addTo(window.map);
+        }
         updateRoadStyle();
-        return;
+    } else {
+        // 未作成・ロード中ならバックグラウンド処理を開始するだけで、処理を止めない（華麗にスルー）
+        initRoadLayers(window.map);
     }
-
-    // ② 未作成であれば初期化・ロード処理を実行
-    initRoadLayers(window.map);
 };
 
 window.hideRoadLayers = function() {
+    window._shouldShowRoad = false;
     if (!window.map || !roadLayerGroup) return;
 
-    // マップに載っている場合のみ取り外す
+    const motorwayPane = window.map.getPane('motorwayPane');
+    const trunkPane = window.map.getPane('trunkPane');
+    
+    if (motorwayPane) motorwayPane.style.opacity = '0';
+    if (trunkPane) trunkPane.style.opacity = '0';
+
     if (window.map.hasLayer(roadLayerGroup)) {
         window.map.removeLayer(roadLayerGroup);
     }
 };
+
