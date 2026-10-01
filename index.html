@@ -1864,6 +1864,7 @@ function toWeatherIcon(code) {
 }
 
 function renderCrowdImage() {
+
     // ==================================================
     // マップ生成前に呼ばれた場合
     // ==================================================
@@ -1880,13 +1881,18 @@ function renderCrowdImage() {
         return;
     }
 
+    // ==================================================
     // 初回だけON
+    // ==================================================
     if (typeof window.radarEnabled === 'undefined') {
         window.radarEnabled = true;
     }
 
-    // トグルボタンのイベント
+    // ==================================================
+    // トグルボタン
+    // ==================================================
     const btn = document.getElementById('radarToggleBtn');
+
     if (btn && !btn.dataset.listenerAdded) {
         btn.dataset.listenerAdded = "true";
         btn.addEventListener('click', function() {
@@ -1900,12 +1906,19 @@ function renderCrowdImage() {
     // ==================================================
     if (!window.radarEnabled) {
         removeCrowdImage();
+
         const header = document.querySelector('.menu-header-row');
         const cloudsUI = document.getElementById('cloudsUI');
         const headerText = document.querySelector('.header-text');
 
-        if (header) header.style.display = '';
-        if (cloudsUI) cloudsUI.textContent = '';
+        if (header) {
+            header.style.display = '';
+        }
+
+        if (cloudsUI) {
+            cloudsUI.textContent = '';
+        }
+
         if (headerText) {
             if (window.todayTide) {
                 headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
@@ -1913,6 +1926,7 @@ function renderCrowdImage() {
                 headerText.textContent = "";
             }
         }
+
         if (btn) {
             btn.style.display = '';
             btn.textContent = 'ON';
@@ -1930,11 +1944,13 @@ function renderCrowdImage() {
         btn.classList.remove('is-off');
     }
 
-    // 一旦既存のタイマーやレイヤーをクリーンアップ
+    // ★ここが重要：以前のレイヤーとタイマーを破棄し、世代を更新する
     removeCrowdImage();
     const myGeneration = window.crowdRenderGeneration;
 
+    // ==================================================
     // Pane準備
+    // ==================================================
     if (!window.map.getPane('rainPane')) {
         window.map.createPane('rainPane');
         const pane = window.map.getPane('rainPane');
@@ -1942,16 +1958,24 @@ function renderCrowdImage() {
         pane.style.pointerEvents = 'none';
     }
 
+    // ==================================================
     // 時刻計算
+    // ==================================================
     const now = new Date();
-    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    const nowJST = new Date(
+        now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" })
+    );
+
     const hour = nowJST.getHours();
     const slots = [0, 3, 6, 9, 12, 15, 18, 21];
 
+    // ==================================================
     // スライド用データ (KANTO固定)
+    // ==================================================
     const images = [];
     let baseIndex = slots.findIndex(h => h > hour);
     let dayOffset = 0;
+
     if (baseIndex === -1) {
         baseIndex = 0;
         dayOffset = 1;
@@ -1976,15 +2000,22 @@ function renderCrowdImage() {
         });
     }
 
+    // ==================================================
     // header UI
+    // ==================================================
     const header = document.querySelector('.menu-header-row');
     const cloudsUI = document.getElementById('cloudsUI');
     const headerText = document.querySelector('.header-text');
 
-    if (!header || !cloudsUI || !headerText) return;
+    if (!header || !cloudsUI || !headerText) {
+        return;
+    }
 
     header.style.display = '';
 
+    // ==================================================
+    // Phase2では雨雲UIを出さない
+    // ==================================================
     if (window.phase2Initialized) {
         cloudsUI.textContent = '';
         if (window.todayTide) {
@@ -1995,23 +2026,36 @@ function renderCrowdImage() {
         return;
     }
 
+    // ==================================================
+    // 初期UI
+    // ==================================================
     let currentIndex = 0;
+    // ロード中は準備中のような表示にしておくのもありですが、一旦時間を表示しておきます
     cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
+
     if (window.todayTide) {
         headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
     } else {
         headerText.textContent = "";
     }
 
+    // ==================================================
     // 座標・ズーム固定
-    const best = { lat: 37.25, lng: 138.3, baseZoom: 7 };
+    // ==================================================
+    const best = {
+        lat: 37.25,
+        lng: 138.3,
+        baseZoom: 7
+    };
 
     function calcBounds() {
         const z = window.map.getZoom();
         const scale = Math.pow(2, z - best.baseZoom);
         const size = 512 * scale;
+
         const topLeft = window.map.project([best.lat, best.lng], z);
         const bottomRight = topLeft.add([size, size]);
+
         return L.latLngBounds(
             window.map.unproject(topLeft, z),
             window.map.unproject(bottomRight, z)
@@ -2019,39 +2063,55 @@ function renderCrowdImage() {
     }
 
     const MAX_OPACITY = 0.6;
-    window.crowdLayers = []; // ★ 4枚のレイヤーを保持する配列
+    window.crowdLayers = [];
+    let loadedCount = 0;
 
     // ==================================================
-    // ★ 4枚すべてのレイヤーを最初に生成＆配置
+    // ★ 4枚のレイヤーを「完全に透明」で事前配置＆ロード待機
     // ==================================================
-    images.forEach((img, i) => {
+    images.forEach((img, index) => {
         const layer = L.imageOverlay(
             img.url,
             calcBounds(),
             {
                 pane: 'rainPane',
-                opacity: i === 0 ? MAX_OPACITY : 0 // 1枚目だけ表示、他は透明
+                opacity: 0 // 全て透明でセット
             }
-        ).addTo(window.map);
+        );
 
-        // DOMに追加されたらCSSトランジションを付与して滑らかなフェードを有効化
-        const applyTransition = (el) => {
+        // CSSトランジションを付与してフワッとした切り替えを有効化
+        layer.on('add', () => {
+            const el = layer.getElement();
             if (el) el.style.transition = 'opacity 1.2s ease-in-out';
-        };
+        });
 
-        const imgEl = layer.getElement();
-        if (imgEl) {
-            applyTransition(imgEl);
-        } else {
-            layer.once('add', () => applyTransition(layer.getElement()));
-        }
+        // ロード完了監視
+        layer.on('load', () => {
+            loadedCount++;
+            // 4枚すべて読み込み終わったら自動発火
+            if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
+                startCrowdSlideshow();
+            }
+        });
 
+        // 読み込みエラー時も止まらないようにする
+        layer.on('error', () => {
+            loadedCount++;
+            if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
+                startCrowdSlideshow();
+            }
+        });
+
+        layer.addTo(window.map);
         window.crowdLayers.push(layer);
     });
 
-    window.crowdLayer = window.crowdLayers[0]; // 互換性のため（現在表示中）
+    // 互換性のため
+    window.crowdLayer = window.crowdLayers[0];
 
-    // Zoom変更時のBounds更新
+    // ==================================================
+    // Zoom変更
+    // ==================================================
     window.crowdZoomHandler = function() {
         if (myGeneration !== window.crowdRenderGeneration) return;
         window.crowdLayers.forEach(layer => {
@@ -2061,32 +2121,42 @@ function renderCrowdImage() {
     window.map.on("zoomend", window.crowdZoomHandler);
 
     // ==================================================
-    // ★ スライドタイマー (DOMの追加/破棄を廃止)
+    // ★ 準備完了で発火するスライドショー処理
     // ==================================================
-    window.crowdSlideTimer = setInterval(() => {
-        if (myGeneration !== window.crowdRenderGeneration || !window.radarEnabled) {
-            clearInterval(window.crowdSlideTimer);
-            return;
-        }
+    function startCrowdSlideshow() {
+        if (myGeneration !== window.crowdRenderGeneration || !window.radarEnabled) return;
 
-        const oldIndex = currentIndex;
-        currentIndex = (currentIndex + 1) % images.length;
-        
-        cloudsUI.textContent = `雨雲レーダー ${images[currentIndex].displayHour}時`;
+        // 1. 最初の一枚目をフワッとフェードイン
+        window.crowdLayers[0].setOpacity(MAX_OPACITY);
 
-        const oldLayer = window.crowdLayers[oldIndex];
-        const newLayer = window.crowdLayers[currentIndex];
+        // 2. スライドショー開始 (DOMの生成・破棄は一切行わない)
+        window.crowdSlideTimer = setInterval(() => {
+            if (myGeneration !== window.crowdRenderGeneration || !window.radarEnabled) {
+                clearInterval(window.crowdSlideTimer);
+                return;
+            }
 
-        // 以前の子タイマー(JSフェード)を廃止し、opacityを切り替えるだけ
-        // (あとはCSSエンジンが自動でクロスフェードしてくれます)
-        if (newLayer) newLayer.setOpacity(MAX_OPACITY);
-        if (oldLayer) oldLayer.setOpacity(0);
+            const oldIndex = currentIndex;
+            currentIndex = (currentIndex + 1) % images.length;
+            
+            cloudsUI.textContent = `雨雲レーダー ${images[currentIndex].displayHour}時`;
 
-        window.crowdLayer = newLayer;
-    }, 2500);
+            const oldLayer = window.crowdLayers[oldIndex];
+            const newLayer = window.crowdLayers[currentIndex];
+
+            // CSSトランジションに任せて opacity を切り替えるだけ
+            if (newLayer) newLayer.setOpacity(MAX_OPACITY);
+            if (oldLayer) oldLayer.setOpacity(0);
+
+            window.crowdLayer = newLayer;
+
+        }, 2500);
+    }
 }
 
+
 function removeCrowdImage() {
+    // 描画世代を無効化
     window.crowdRenderGeneration = (window.crowdRenderGeneration || 0) + 1;
 
     // スライド停止
@@ -2095,7 +2165,7 @@ function removeCrowdImage() {
         window.crowdSlideTimer = null;
     }
 
-    // 不要になったJSフェード管理庫のクリア処理
+    // フェード処理管理庫のクリア（念のため残す）
     if (window.crowdFadeTimers) {
         window.crowdFadeTimers.forEach(timer => clearInterval(timer));
         window.crowdFadeTimers.clear();
@@ -2108,19 +2178,23 @@ function removeCrowdImage() {
     window.crowdZoomHandler = null;
 
     // ==================================================
-    // ★ 4枚のレイヤー削除処理
+    // ★ 4枚保持しているレイヤーを一括削除
     // ==================================================
     if (window.map) {
         const layersToRemove = [];
 
-        // 保持している4枚のレイヤーを回収
+        // 保持している配列から回収
         if (window.crowdLayers && window.crowdLayers.length > 0) {
             window.crowdLayers.forEach(layer => {
                 if (layer) layersToRemove.push(layer);
             });
         }
+        
+        if (window.crowdLayer && !layersToRemove.includes(window.crowdLayer)) {
+            layersToRemove.push(window.crowdLayer);
+        }
 
-        // 万が一 rainPane に残っているものがあれば念のため全回収
+        // rainPane内に残っている ImageOverlay も全回収（無限増殖対策）
         window.map.eachLayer(layer => {
             if (layer instanceof L.ImageOverlay && layer.options && layer.options.pane === 'rainPane') {
                 if (!layersToRemove.includes(layer)) {
@@ -2129,6 +2203,7 @@ function removeCrowdImage() {
             }
         });
 
+        // 一括削除
         layersToRemove.forEach(layer => {
             if (window.map.hasLayer(layer)) {
                 window.map.removeLayer(layer);
@@ -2137,9 +2212,11 @@ function removeCrowdImage() {
     }
 
     window.crowdLayer = null;
-    window.crowdLayers = []; // 配列もクリア
+    window.crowdLayers = [];
 
-    // headerUI制御
+    // ==================================================
+    // header制御
+    // ==================================================
     const header = document.querySelector('.menu-header-row');
     if (!header) return;
 
@@ -2162,6 +2239,7 @@ function removeCrowdImage() {
         header.style.display = '';
     }
 }
+
 
 // ================================
 // ■ 地域選択用マーカーを「フェードアウト」で非表示にする関数
