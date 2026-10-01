@@ -3693,6 +3693,313 @@ function showdebug(msg) {
     debugBox.scrollTop = debugBox.scrollHeight;
 }
 
+/* ============================================================
+ * 釣り行こNAVI 等深線レイヤーコントローラー
+ * ============================================================ */
+
+const DepthMapController = (function() {
+    let mapInstance = null;
+    let depthLayer = null;
+
+    // --- 設定項目 ---
+    // ★ パスを KANTO/ に変更
+    const DEPTH_FILES = [
+        '/KANTO/enc_depth20.json',
+        '/KANTO/enc_depth50.json',
+        '/KANTO/enc_depth100.json',
+        '/KANTO/enc_depth150.json',
+        '/KANTO/enc_depth200.json'
+    ];
+
+    // パターン3：モダン・モノトーンブルー
+    const MULTIPLY_COLORS = {
+        20: '#8ca8d9',  // くすみパステルブルー
+        50: '#5a82c4',  // ミディアムブルー
+        100: '#385799', // スレートブルー
+        150: '#22326b', // ダークスレートブルー
+        200: '#191970'  // ミッドナイトブルー
+    };
+
+    const EDGE_COLORS = {
+        20: '#5a82c4',  
+        50: '#385799',  
+        100: '#22326b', 
+        150: '#191970', 
+        200: '#0d0d3b'  
+    };
+
+    const KANTO_MIN_LAT = 34.70;
+    const KANTO_MAX_LAT = 37.25;
+    const KANTO_MIN_LNG = 138.30;
+    const KANTO_MAX_LNG = 141.05;
+
+    const MASK_POLYGONS = [
+        [ // 南本牧ふ頭
+            [35.417144, 139.683673],
+            [35.407659, 139.695856],
+            [35.399341, 139.691122],
+            [35.392806, 139.682261],
+            [35.395479, 139.677406],
+            [35.401718, 139.669637]
+        ]
+    ];
+
+    // --- ユーティリティ関数 ---
+    function decodePolyline(encoded) {
+        const points = [];
+        let index = 0; let lat = 0; let lng = 0;
+        while (index < encoded.length) {
+            let result = 0; let shift = 0; let byte;
+            do { byte = encoded.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+            lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+            result = 0; shift = 0;
+            do { byte = encoded.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+            lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+            points.push([lat / 1e5, lng / 1e5]);
+        }
+        return points;
+    }
+
+    function addPolygonPath(ctx, item, topLeft, map) {
+        const pts = item.latlngs.map(ll => {
+            const lp = map.latLngToLayerPoint(ll);
+            return { x: lp.x - topLeft.x, y: lp.y - topLeft.y };
+        });
+        
+        if (pts.length === 0) return;
+        
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            ctx.lineTo(pts[i].x, pts[i].y);
+        }
+    }
+
+    // --- レイヤークラス ---
+    const DepthCanvasLayer = L.Layer.extend({
+        initialize: function(options) {
+            L.setOptions(this, options);
+            this._data = [];
+            this._loaded = false;
+            this._visible = true;
+            this._drawing = false;
+        },
+
+        onAdd: function(map) {
+            this._map = map;
+            this._canvas = L.DomUtil.create('canvas', 'depth-canvas-layer');
+            this._canvas.style.position = 'absolute';
+            this._canvas.style.transition = 'opacity 0.25s ease-in-out'; // フェード用
+            
+            // ★ 等深線を常にタイルのすぐ上（雨雲やアイコンより下）に配置するための調整
+            this._canvas.style.zIndex = "50"; 
+            
+            map.getPane('overlayPane').appendChild(this._canvas);
+            this._ctx = this._canvas.getContext('2d');
+            
+            this._resizeCanvas();
+            map.on('zoomstart', this._onZoomStart, this);
+            map.on('moveend zoomend resize', this._redraw, this);
+
+            this._loadData();
+        },
+
+        onRemove: function(map) {
+            map.off('zoomstart', this._onZoomStart, this);
+            map.off('moveend zoomend resize', this._redraw, this);
+
+            if (this._canvas && this._canvas.parentNode) {
+                this._canvas.parentNode.removeChild(this._canvas);
+            }
+            this._canvas = null;
+            this._ctx = null;
+            this._map = null;
+        },
+
+        _onZoomStart: function() {
+            if (this._canvas && this._visible) {
+                this._canvas.style.opacity = '0';
+            }
+        },
+
+        _resizeCanvas: function() {
+            if (!this._map || !this._canvas) return;
+            const size = this._map.getSize();
+            const ratio = window.devicePixelRatio || 1;
+            this._canvas.width = Math.round(size.x * ratio);
+            this._canvas.height = Math.round(size.y * ratio);
+            this._canvas.style.width = size.x + 'px';
+            this._canvas.style.height = size.y + 'px';
+            this._ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+        },
+
+        _loadData: function() {
+            const self = this;
+            Promise.all(
+                DEPTH_FILES.map(url => fetch(url).then(res => {
+                    if (!res.ok) throw new Error(url + '\nHTTP ' + res.status);
+                    return res.json();
+                }))
+            ).then(results => {
+                self._data = results.map((items, index) => {
+                    const groupsMap = {};
+                    items.forEach(item => {
+                        if (!item.p) return;
+                        const points = decodePolyline(item.p);
+                        if (points.length >= 3) {
+                            const g = item.group || 'default';
+                            if (!groupsMap[g]) groupsMap[g] = [];
+                            groupsMap[g].push({ latlngs: points.map(p => L.latLng(p[0], p[1])) });
+                        }
+                    });
+                    return { depth: [20, 50, 100, 150, 200][index], groups: Object.values(groupsMap) };
+                });
+                self._loaded = true;
+                self._redraw();
+            }).catch(err => {
+                console.error('等深線読み込みエラー:', err);
+            });
+        },
+
+        _redraw: function() {
+            if (!this._visible || !this._loaded || this._drawing) return;
+            this._drawing = true;
+            this._resizeCanvas();
+
+            const map = this._map;
+            const ctx = this._ctx;
+            const size = map.getSize();
+            
+            const topLeft = map.containerPointToLayerPoint([0, 0]);
+            L.DomUtil.setPosition(this._canvas, topLeft);
+            ctx.clearRect(0, 0, size.x, size.y);
+
+            const boundsBox = [
+                L.latLng(KANTO_MAX_LAT, KANTO_MIN_LNG),
+                L.latLng(KANTO_MAX_LAT, KANTO_MAX_LNG),
+                L.latLng(KANTO_MIN_LAT, KANTO_MAX_LNG),
+                L.latLng(KANTO_MIN_LAT, KANTO_MIN_LNG)
+            ];
+
+            ctx.save();
+            ctx.beginPath();
+            boundsBox.forEach((ll, index) => {
+                const lp = map.latLngToLayerPoint(ll);
+                const x = lp.x - topLeft.x, y = lp.y - topLeft.y;
+                if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.clip(); 
+
+            this._data.forEach(layer => {
+                ctx.save();
+                
+                // 1. 面の描画
+                ctx.globalAlpha = 0.40;
+                ctx.fillStyle = MULTIPLY_COLORS[layer.depth] || '#191970';
+                ctx.globalCompositeOperation = 'multiply';
+
+                layer.groups.forEach(groupItems => {
+                    ctx.beginPath();
+                    groupItems.forEach(item => {
+                        addPolygonPath(ctx, item, topLeft, map);
+                        ctx.closePath(); 
+                    });
+                    ctx.fill('evenodd');
+                });
+
+                // 2. 立体エッジの描画
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.beginPath();
+                layer.groups.forEach(groupItems => {
+                    groupItems.forEach(item => {
+                        addPolygonPath(ctx, item, topLeft, map);
+                    });
+                });
+                
+                ctx.globalAlpha = 1.0;
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = EDGE_COLORS[layer.depth] || '#191970';
+                ctx.shadowColor = 'rgba(0, 0, 30, 0.9)';
+                ctx.shadowBlur = 8;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+                ctx.lineJoin = 'round';
+                ctx.stroke();
+
+                ctx.restore();
+            });
+
+            // 3. マスク処理
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0,0,0,1)'; 
+            MASK_POLYGONS.forEach(polygon => {
+                ctx.beginPath();
+                polygon.forEach((ll, index) => {
+                    const lp = map.latLngToLayerPoint(L.latLng(ll[0], ll[1]));
+                    const x = lp.x - topLeft.x, y = lp.y - topLeft.y;
+                    if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.closePath();
+                ctx.fill();
+            });
+            ctx.restore();
+
+            ctx.restore(); // 全体クリップ解除
+            this._drawing = false;
+
+            if (this._canvas && this._visible) {
+                this._canvas.style.opacity = '1';
+            }
+        },
+
+        setVisible: function(visible) {
+            this._visible = visible;
+            if (!this._canvas) return;
+            
+            if (visible) {
+                this._canvas.style.display = 'block';
+                setTimeout(() => { this._redraw(); }, 10);
+            } else {
+                this._canvas.style.opacity = '0';
+                setTimeout(() => { this._canvas.style.display = 'none'; }, 250);
+            }
+        },
+
+        isVisible: function() { return this._visible; }
+    });
+
+    // --- 外部公開API ---
+    return {
+        /**
+         * 初期化＆強制表示関数
+         * @param {Object} leafletMap - 描画先のLeafletマップオブジェクト
+         */
+        initAndShow: function(leafletMap) {
+            if (!leafletMap) return;
+            mapInstance = leafletMap;
+
+            if (!depthLayer) {
+                depthLayer = new DepthCanvasLayer();
+                depthLayer.addTo(mapInstance);
+            }
+        },
+
+        /**
+         * 将来ボタンを追加した時用のトグル関数
+         */
+        toggle: function() {
+            if (!mapInstance || !depthLayer) return false;
+            const isNowVisible = depthLayer.isVisible();
+            depthLayer.setVisible(!isNowVisible);
+            return !isNowVisible;
+        },
+
+        isActive: function() {
+            return depthLayer ? depthLayer.isVisible() : false;
+        }
+    };
+})();
 
 </script>
 
