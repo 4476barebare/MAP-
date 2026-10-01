@@ -654,6 +654,11 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
       }
     ).addTo(window.map);
 
+    // 👇 【ここに追加】 マップが生成された瞬間に等深線レイヤーをセットして常に表示する
+    if (typeof DepthMapController !== 'undefined') {
+        DepthMapController.initAndShow(window.map);
+    }
+
     if (window.currentAreaId === null) {
     
     }
@@ -686,8 +691,6 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     ? window.map.touchZoom.enable()
     : window.map.touchZoom.disable();
 }
-
-
 
 
 function prefetchAround(area) {
