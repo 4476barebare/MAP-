@@ -1284,7 +1284,7 @@ async function loadPrefectureData(prefCode) {
     }
 }
 /**
- * sitemap.xmlから記事データを抽出し、配列で指定した順番とスタイルで自動描画する
+ * sitemap.xmlから記事データを抽出し、XMLに記述されている出現順にカテゴリ別に描画する
  * @param {string} targetDomId - 出力先のDOM要素のID
  */
 async function loadAndRenderCategorizedArticles(targetDomId) {
@@ -1293,18 +1293,6 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
 
     targetDom.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">記事を読み込み中...</div>';
 
-    // ==========================================
-    // ⚙️ 表示順とスタイルのルール設定（配列）
-    // 上から書いた順番どおりに画面に出力されます。
-    // ==========================================
-    const displayRules = [
-        { category: "サビキ釣り", style: "compact" },
-        { category: "100均で揃う釣具紹介", style: "compact" },
-        { category: "アジ", style: "list" },
-        { category: "サバ", style: "list" },
-        { category: "イワシ", style: "list" }
-    ];
-
     try {
         const res = await fetch('sitemap.xml');
         if (!res.ok) throw new Error('サイトマップの取得に失敗しました');
@@ -1312,9 +1300,12 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
 
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-        const articles = [];
+        
+        // カテゴリの出現順を保持する配列と、データを格納するオブジェクト
+        const categoryOrder = [];
+        const groupedArticles = {};
 
-        // 1. 全 <url> タグを走査して記事データを抽出
+        // 1. 全 <url> タグを上から順に走査
         xmlDoc.querySelectorAll("url").forEach(urlNode => {
             const locNode = urlNode.querySelector("loc");
             if (!locNode) return;
@@ -1335,34 +1326,40 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
                 }
             });
 
+            // 記事データが見つかった場合
             if (articleData) {
                 articleData.url = url;
-                articles.push(articleData);
+                const cat = articleData.category || "その他の記事";
+                
+                // 初めて登場したカテゴリなら、順番リストと入れ物を作成する
+                if (!categoryOrder.includes(cat)) {
+                    categoryOrder.push(cat);
+                    groupedArticles[cat] = [];
+                }
+                
+                // そのカテゴリの配列に記事を追加（XMLの記述順）
+                groupedArticles[cat].push(articleData);
             }
         });
 
-        // 日付が新しい順に事前ソート（各カテゴリ内で新着順にするため）
-        articles.sort((a, b) => new Date(b.date || "1970-01-01") - new Date(a.date || "1970-01-01"));
-
-        // 2. ルール配列の順番どおりにHTMLを組み立てる
+        // 2. 描画処理
         let html = '';
-        const usedUrls = new Set(); // 描画済みの記事を記録する金庫
 
-        displayRules.forEach(rule => {
-            // このルールに合致する記事だけを抽出
-            const matchedArticles = articles.filter(a => a.category === rule.category);
-            
-            // 記事が1件もなければ見出しごとスキップして次へ
-            if (matchedArticles.length === 0) return;
+        // XMLで初めて登場したカテゴリの順番どおりに処理
+        categoryOrder.forEach(categoryName => {
+            const articles = groupedArticles[categoryName];
+            if (articles.length === 0) return;
 
-            // 見出しを出力
-            html += `<h2 class="category-heading">${rule.category}</h2>`;
+            html += `<h2 class="category-heading">${categoryName}</h2>`;
 
-            // スタイルの出し分け
-            if (rule.style === "compact") {
+            // スタイル別に記事を分類
+            const compactItems = articles.filter(a => a.style === "compact");
+            const listItems = articles.filter(a => a.style !== "compact"); // 指定なし、またはlistは横長扱い
+
+            // ▼ コンパクトスタイル（横2列オーバーレイ）の出力
+            if (compactItems.length > 0) {
                 html += `<div class="compact-article-grid">`;
-                matchedArticles.forEach(item => {
-                    usedUrls.add(item.url); // 記録
+                compactItems.forEach(item => {
                     html += `
                     <a href="${item.url}" class="compact-card">
                         <img src="${item.image}" alt="${item.title}" loading="lazy">
@@ -1370,10 +1367,12 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
                     </a>`;
                 });
                 html += `</div>`;
-            } else {
+            }
+
+            // ▼ 横長リストスタイルの出力（灰色のdescriptionは出力しない）
+            if (listItems.length > 0) {
                 html += `<div class="list-article-grid">`;
-                matchedArticles.forEach(item => {
-                    usedUrls.add(item.url); // 記録
+                listItems.forEach(item => {
                     html += `
                     <a href="${item.url}" class="list-card">
                         <div class="list-thumb">
@@ -1381,7 +1380,6 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
                         </div>
                         <div class="list-text">
                             <h3>${item.title}</h3>
-                            <p>${item.description || ''}</p>
                         </div>
                     </a>`;
                 });
@@ -1389,24 +1387,8 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
             }
         });
 
-        // 3. ルールに書き忘れた「その他の記事」の救済処理
-        const otherArticles = articles.filter(a => !usedUrls.has(a.url));
-        if (otherArticles.length > 0) {
-            html += `<h2 class="category-heading">その他の記事</h2>`;
-            html += `<div class="list-article-grid">`;
-            otherArticles.forEach(item => {
-                html += `
-                <a href="${item.url}" class="list-card">
-                    <div class="list-thumb">
-                        <img src="${item.image}" alt="${item.title}" loading="lazy">
-                    </div>
-                    <div class="list-text">
-                        <h3>${item.title}</h3>
-                        <p>${item.description || ''}</p>
-                    </div>
-                </a>`;
-            });
-            html += `</div>`;
+        if (html === '') {
+            html = '<div style="text-align:center; padding:20px; color:#666;">記事が見つかりませんでした。</div>';
         }
 
         // 完成したHTMLを流し込む
@@ -1417,7 +1399,6 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
         targetDom.innerHTML = '<div style="color:red; padding:20px;">記事の読み込みに失敗しました。</div>';
     }
 }
-
 
 // ==========================================
 // ★ ページ初期ロード時のメインフロー
