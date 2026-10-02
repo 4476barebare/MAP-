@@ -6,32 +6,32 @@
   <!-- ======================== -->
   <url>
     <loc>https://turiiko-navi.com/articles/beginner-fishing.html</loc>
-    <!-- ARTICLE_DATA: {"title":"初心者でも迷わない釣りの始め方", "description":"釣り初心者のための基本ガイド", "image":"articles/images/beginner-fishing.jpg", "category":"釣りを始めよう"} -->
+    <!-- ARTICLE_DATA: {"title":"初心者でも迷わない釣りの始め方", "description":"釣り初心者のための基本ガイド", "image":"articles/images/beginner-fishing.jpg", "category":"はじめての釣り", "style":"compact"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/rod-selection.html</loc>
-    <!-- ARTICLE_DATA: {"title":"初心者向け失敗しない竿の選び方", "description":"失敗しない釣り竿の選び方解説", "image":"articles/images/rod-selection.jpg", "category":"釣りを始めよう"} -->
+    <!-- ARTICLE_DATA: {"title":"初心者向け失敗しない竿の選び方", "description":"失敗しない釣り竿の選び方解説", "image":"articles/images/rod-selection.jpg", "category":"はじめての釣り", "style":"compact"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/gofishing.html</loc>
-    <!-- ARTICLE_DATA: {"title":"いつ釣りに出掛けるべきか", "description":"潮と時間帯の最適なタイミング解説", "image":"articles/images/gofishing.jpg", "category":"初心者向け記事"} -->
+    <!-- ARTICLE_DATA: {"title":"いつ釣りに出掛けるべきか", "description":"潮と時間帯の最適なタイミング解説", "image":"articles/images/gofishing.jpg", "category":"はじめての釣り", "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/firstfishing.html</loc>
-    <!-- ARTICLE_DATA: {"title":"失敗しない場所選び", "description":"釣り初心者のための場所選びのコツ", "image":"articles/images/firstfishing.jpg", "category":"初心者向け記事"} -->
+    <!-- ARTICLE_DATA: {"title":"失敗しない場所選び", "description":"釣り初心者のための場所選びのコツ", "image":"articles/images/firstfishing.jpg", "category":"はじめての釣り", "style":"list"} -->
   </url>
 
   <url>
     <loc>https://turiiko-navi.com/articles/aji.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド", "description":"アジの生態と実践的な釣り方解説", "image":"articles/images/aji.jpg", "category":"対象魚別ガイド"} -->
+    <!-- ARTICLE_DATA: {"title":"【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド", "description":"アジの生態と実践的な釣り方解説", "image":"articles/images/aji.jpg", "category":"はじめての釣り", "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/saba.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【完全攻略】ただの「大衆魚」じゃない！堤防から沖まで熱くさせるサバの釣り方・生態ガイド", "description":"サバの生態と堤防・沖釣り攻略法", "image":"articles/images/saba.jpg", "category":"対象魚別ガイド"} -->
+    <!-- ARTICLE_DATA: {"title":"【完全攻略】ただの「大衆魚」じゃない！堤防から沖まで熱くさせるサバの釣り方・生態ガイド", "description":"サバの生態と堤防・沖釣り攻略法", "image":"articles/images/saba.jpg", "category":"はじめての釣り", "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/iwashi.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【完全版】堤防サビキの定番から奥深き食文化まで！イワシの生態と実践的釣り方ガイド", "description":"イワシの生態とサビキ釣り解説", "image":"articles/images/iwashi.jpg", "category":"対象魚別ガイド"} -->
+    <!-- ARTICLE_DATA: {"title":"【完全版】堤防サビキの定番から奥深き食文化まで！イワシの生態と実践的釣り方ガイド", "description":"イワシの生態とサビキ釣り解説", "image":"articles/images/iwashi.jpg", "category":"はじめての釣り", "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/shirogisu.html</loc>
