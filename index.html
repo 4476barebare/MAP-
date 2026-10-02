@@ -1301,7 +1301,6 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlText, "application/xml");
         
-        // カテゴリの出現順を保持する配列と、データを格納するオブジェクト
         const categoryOrder = [];
         const groupedArticles = {};
 
@@ -1313,7 +1312,7 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
 
             let articleData = null;
             urlNode.childNodes.forEach(child => {
-                if (child.nodeType === 8) { // コメントノード
+                if (child.nodeType === 8) { 
                     const commentText = child.nodeValue;
                     if (commentText.includes('ARTICLE_DATA:')) {
                         try {
@@ -1326,64 +1325,59 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
                 }
             });
 
-            // 記事データが見つかった場合
             if (articleData) {
                 articleData.url = url;
                 const cat = articleData.category || "その他の記事";
                 
-                // 初めて登場したカテゴリなら、順番リストと入れ物を作成する
                 if (!categoryOrder.includes(cat)) {
                     categoryOrder.push(cat);
                     groupedArticles[cat] = [];
                 }
-                
-                // そのカテゴリの配列に記事を追加（XMLの記述順）
                 groupedArticles[cat].push(articleData);
             }
         });
 
-        // 2. 描画処理
+        // 2. 描画処理 (既存の main.css のクラス名を使用)
         let html = '';
 
-        // XMLで初めて登場したカテゴリの順番どおりに処理
         categoryOrder.forEach(categoryName => {
             const articles = groupedArticles[categoryName];
             if (articles.length === 0) return;
 
+            // カテゴリ見出し
             html += `<h2 class="category-heading">${categoryName}</h2>`;
 
-            // スタイル別に記事を分類
             const compactItems = articles.filter(a => a.style === "compact");
-            const listItems = articles.filter(a => a.style !== "compact"); // 指定なし、またはlistは横長扱い
+            const listItems = articles.filter(a => a.style !== "compact"); 
 
-            // ▼ コンパクトスタイル（横2列オーバーレイ）の出力
+            // ▼ 旧版クラスに統合：横2列オーバーレイ（article-list / article-card）
             if (compactItems.length > 0) {
-                html += `<div class="compact-article-grid">`;
+                html += `<section class="article-list">`;
                 compactItems.forEach(item => {
                     html += `
-                    <a href="${item.url}" class="compact-card">
+                    <a href="${item.url}" class="article-card">
                         <img src="${item.image}" alt="${item.title}" loading="lazy">
-                        <h3 class="compact-title">${item.title}</h3>
+                        <h2>${item.title}</h2>
                     </a>`;
                 });
-                html += `</div>`;
+                html += `</section>`;
             }
 
-            // ▼ 横長リストスタイルの出力（灰色のdescriptionは出力しない）
+            // ▼ 旧版クラスに統合：横長リスト（menu-list / menu-card）
             if (listItems.length > 0) {
-                html += `<div class="list-article-grid">`;
+                html += `<section class="menu-list">`;
                 listItems.forEach(item => {
                     html += `
-                    <a href="${item.url}" class="list-card">
-                        <div class="list-thumb">
+                    <a href="${item.url}" class="menu-card">
+                        <div class="menu-thumb">
                             <img src="${item.image}" alt="${item.title}" loading="lazy">
                         </div>
-                        <div class="list-text">
-                            <h3>${item.title}</h3>
+                        <div class="menu-text">
+                            <h2>${item.title}</h2>
                         </div>
                     </a>`;
                 });
-                html += `</div>`;
+                html += `</section>`;
             }
         });
 
@@ -1391,7 +1385,6 @@ async function loadAndRenderCategorizedArticles(targetDomId) {
             html = '<div style="text-align:center; padding:20px; color:#666;">記事が見つかりませんでした。</div>';
         }
 
-        // 完成したHTMLを流し込む
         targetDom.innerHTML = html;
 
     } catch (err) {
