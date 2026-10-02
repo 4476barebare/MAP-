@@ -8,24 +8,45 @@
 }
 
 /* ============================
+   共通：浮き上がり＆沈み込みアニメーション
+============================ */
+.compact-card,
+.list-card {
+  transition: 0.15s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.compact-card:hover,
+.list-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.compact-card:active,
+.list-card:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* ============================
    コンパクトスタイル (2列オーバーレイ)
 ============================ */
 .compact-article-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 12px; /* 少し余白を広げました */
   padding: 0 10px;
   margin-bottom: 20px;
 }
 
 .compact-card {
   position: relative;
-  border-radius: 8px;
+  border-radius: 10px; /* 丸みを旧版に合わせました */
   overflow: hidden;
   aspect-ratio: 4 / 3;
   display: block;
   text-decoration: none;
-  background: #f0f0f0;
+  background: #fff;
 }
 
 .compact-card img {
@@ -35,7 +56,6 @@
   display: block;
 }
 
-/* 下からせり上がる黒グラデーション */
 .compact-card::after {
   content: '';
   position: absolute;
@@ -58,34 +78,38 @@
   z-index: 2;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2; /* 2行で「...」に省略 */
+  -webkit-line-clamp: 2;
   overflow: hidden;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
 
 /* ============================
-   横長リストスタイル
+   横長リストスタイル（スッキリ正方形アイコン化）
 ============================ */
 .list-article-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 0 10px;
   margin-bottom: 20px;
 }
 
 .list-card {
   display: flex;
+  align-items: center; /* 縦の中央で揃える */
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow: hidden;
+  border-radius: 10px;
+  padding: 10px 12px;  /* カード全体の内側に余白を作る */
+  gap: 12px;           /* 画像とテキストの隙間 */
   text-decoration: none;
 }
 
 .list-thumb {
-  width: 120px;
+  width: 60px;  /* タイトル2行分の高さに近い正方形 */
+  height: 60px;
   flex-shrink: 0;
+  border-radius: 6px; /* 画像の角も少し丸める */
+  overflow: hidden;
 }
 
 .list-thumb img {
@@ -96,31 +120,24 @@
 }
 
 .list-text {
-  padding: 10px;
   flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .list-text h3 {
   font-size: 14px;
-  margin: 0 0 4px 0;
+  margin: 0;
   line-height: 1.4;
   color: #191970;
-}
-
-.list-text p {
-  font-size: 12px;
-  color: #666;
-  margin: 0;
   display: -webkit-box;
-  -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-
+/* meta由来の灰色テキストは非表示にする */
+.list-text p {
+  display: none;
+}
 
 
 /* =========================================
