@@ -212,6 +212,10 @@
     </div>
   </a>
 </section>
+
+<!-- ▼ 既存の直書きメニューを消して、これを1つだけ置く -->
+<div id="article-list-container"></div>
+  
 <!-- 👆ここまで追加 -->
 
 
@@ -1376,6 +1380,120 @@ async function loadPrefectureData(prefCode) {
         return false;
     }
 }
+/**
+ * sitemap.xmlから記事データを抽出し、カテゴリ別のルールに従って自動描画する
+ * @param {string} targetDomId - 出力先のDOM要素のID
+ */
+async function loadAndRenderCategorizedArticles(targetDomId) {
+    const targetDom = document.getElementById(targetDomId);
+    if (!targetDom) return;
+
+    targetDom.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">記事を読み込み中...</div>';
+
+    // ==========================================
+    // ⚙️ カテゴリごとの表示ルール設定
+    // 後からカテゴリが増えた場合、ここに追記するだけでOK！
+    // style: "compact" (横2列のオーバレイ) または "list" (横長リスト)
+    // ==========================================
+    const categoryRules = {
+        "初心者向け記事": { style: "compact" },
+        "対象魚別ガイド": { style: "list" },
+        "デフォルト": { style: "list" } // 設定にない未知のカテゴリ用
+    };
+
+    try {
+        const res = await fetch('sitemap.xml');
+        if (!res.ok) throw new Error('サイトマップの取得に失敗しました');
+        const xmlText = await res.text();
+
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+        const articles = [];
+
+        // 全 <url> タグを走査してコメントアウトからJSONを抽出
+        xmlDoc.querySelectorAll("url").forEach(urlNode => {
+            const locNode = urlNode.querySelector("loc");
+            if (!locNode) return;
+            const url = locNode.textContent.trim();
+
+            let articleData = null;
+            urlNode.childNodes.forEach(child => {
+                if (child.nodeType === 8) { // nodeType 8 = コメントノード
+                    const commentText = child.nodeValue;
+                    if (commentText.includes('ARTICLE_DATA:')) {
+                        try {
+                            const jsonStr = commentText.replace('ARTICLE_DATA:', '').trim();
+                            articleData = JSON.parse(jsonStr);
+                        } catch (e) {
+                            console.error('記事JSONパースエラー:', e, commentText);
+                        }
+                    }
+                }
+            });
+
+            if (articleData) {
+                articleData.url = url;
+                articles.push(articleData);
+            }
+        });
+
+        // カテゴリごとにグループ化
+        const groupedData = {};
+        articles.forEach(a => {
+            const cat = a.category || "その他";
+            if (!groupedData[cat]) groupedData[cat] = [];
+            groupedData[cat].push(a);
+        });
+
+        // ルールに従ってHTMLを組み立て
+        let html = '';
+        for (const cat in groupedData) {
+            const rule = categoryRules[cat] || categoryRules["デフォルト"];
+            const items = groupedData[cat];
+
+            html += `<h2 class="category-heading">${cat}</h2>`;
+
+            if (rule.style === "compact") {
+                // ▼ コンパクトスタイル（横2列オーバーレイ）
+                html += `<div class="compact-article-grid">`;
+                items.forEach(item => {
+                    html += `
+                    <a href="${item.url}" class="compact-card">
+                        <img src="${item.image}" alt="${item.title}" loading="lazy">
+                        <h3 class="compact-title">${item.title}</h3>
+                    </a>`;
+                });
+                html += `</div>`;
+
+            } else {
+                // ▼ リストスタイル（横長）
+                html += `<div class="list-article-grid">`;
+                items.forEach(item => {
+                    html += `
+                    <a href="${item.url}" class="list-card">
+                        <div class="list-thumb">
+                            <img src="${item.image}" alt="${item.title}" loading="lazy">
+                        </div>
+                        <div class="list-text">
+                            <h3>${item.title}</h3>
+                            <p>${item.description || ''}</p>
+                        </div>
+                    </a>`;
+                });
+                html += `</div>`;
+            }
+        }
+
+        // 完成したHTMLを一気に流し込む
+        targetDom.innerHTML = html;
+
+    } catch (err) {
+        console.error(err);
+        targetDom.innerHTML = '<div style="color:red; padding:20px;">記事の読み込みに失敗しました。</div>';
+    }
+}
+
+
 // ==========================================
 // ★ ページ初期ロード時のメインフロー
 // ==========================================
@@ -1406,6 +1524,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (typeof routeUpdate === 'function') {
         await routeUpdate();
     }
+loadAndRenderCategorizedArticles('article-list-container');
+  
 });
 
 function initAreaUI() {
