@@ -656,7 +656,7 @@ li {
 .category-heading {
   font-size: 16px;
   color: #191970;
-  margin: 20px 10px -5px 16px;
+  margin: 0px 10px -5px 16px;
   padding-left: 8px;
   border-left: 4px solid #191970;
 }
@@ -756,7 +756,7 @@ li {
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  padding: 10px 12px;
+  padding: 5px 12px;
   gap: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
   transition: 0.15s ease;
