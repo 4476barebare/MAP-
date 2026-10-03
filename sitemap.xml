@@ -20,7 +20,10 @@
     <loc>https://turiiko-navi.com/articles/firstfishing.html</loc>
     <!-- ARTICLE_DATA: {"title":"失敗しない場所選び", "description":"釣り初心者のための場所選びのコツ", "image":"articles/images/firstfishing.jpg", "category":"はじめての釣り", "style":"compact"} -->
   </url>
-
+  <url>
+    <loc>https://turiiko-navi.com/articles/sabiki.html</loc>
+    <!-- ARTICLE_DATA: {"title":"【堤防釣りの絶対的入門】サビキ釣り完全ガイド ― 道具の賢い揃え方から鮮度管理まで", "description":"大人から子供まではじめやすいサビキ釣り解説", "image":"articles/images/sabikifamily.jpg", "category":"サビキで釣れる魚", "style":"compact"} -->
+  </url>
   <url>
     <loc>https://turiiko-navi.com/articles/aji.html</loc>
     <!-- ARTICLE_DATA: {"title":"【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド", "description":"アジの生態と実践的な釣り方解説", "image":"articles/images/aji.jpg", "category":"サビキで釣れる魚", "style":"compact"} -->
