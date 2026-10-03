@@ -35,19 +35,19 @@
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/shirogisu.html</loc>
-    <!-- ARTICLE_DATA: {"title":"「海の女王」シロギス攻略ガイド！投げて探る、戦略的ゲームフィッシングの魅力", "description":"シロギスの生態と投げ釣り攻略ガイド", "image":"articles/images/shirogisu.jpg", "category":"対象魚別ガイド"} -->
+    <!-- ARTICLE_DATA: {"title":"「海の女王」シロギス攻略ガイド！投げて探る、戦略的ゲームフィッシングの魅力", "description":"シロギスの生態と投げ釣り攻略ガイド", "image":"articles/images/shirogisu.jpg", "category":"投げ釣りちょい投げ" "style":"compact"} -->
+  </url>
+  <url>
+    <loc>https://turiiko-navi.com/articles/karei.html</loc>
+    <!-- ARTICLE_DATA: {"title":"【完全攻略】海底の「座布団」を狙い撃ち！カレイの生態から投げ釣り・船釣り攻略法", "description":"カレイの生態と投げ釣り・船釣り攻略", "image":"articles/images/karei.jpg", "category":"投げ釣りちょい投げ" "style":"compact"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/haze.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【江戸川ハゼ釣り完全攻略】ポイント選びと江戸前の主役・マハゼの釣り方ガイド", "description":"マハゼの生態と江戸川ハゼ釣り完全攻略", "image":"articles/images/haze.jpg", "category":"対象魚別ガイド"} -->
+    <!-- ARTICLE_DATA: {"title":"【江戸川ハゼ釣り完全攻略】ポイント選びと江戸前の主役・マハゼの釣り方ガイド", "description":"マハゼの生態と江戸川ハゼ釣り完全攻略", "image":"articles/images/haze.jpg", "category":"投げ釣りちょい投げ" "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/haze-crank.html</loc>
     <!-- ARTICLE_DATA: {"title":"【ハゼクラ入門】ルアーで狙う江戸前の主役！ダイソー釣具で始める奥深きボトムゲーム", "description":"ダイソー釣具で始めるハゼクランク入門", "image":"articles/images/crankbait.jpg", "category":"対象魚別ガイド"} -->
-  </url>
-  <url>
-    <loc>https://turiiko-navi.com/articles/karei.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【完全攻略】海底の「座布団」を狙い撃ち！カレイの生態から投げ釣り・船釣り攻略法", "description":"カレイの生態と投げ釣り・船釣り攻略", "image":"articles/images/karei.jpg", "category":"対象魚別ガイド"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/mejina.html</loc>
