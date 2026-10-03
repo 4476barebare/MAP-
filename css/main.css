@@ -670,6 +670,7 @@ li {
   gap: 12px;
   padding: 16px;
    margin-top: 0px;
+   margin-bottom: 0px;
 }
 
 .article-card {
@@ -747,7 +748,8 @@ li {
   flex-direction: column;
   gap: 12px;
   padding: 0 16px 16px 16px;
-   margin-top: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .menu-card {
