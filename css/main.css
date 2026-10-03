@@ -654,10 +654,10 @@ li {
    記事カテゴリ見出し用
 ========================================= */
 .category-heading {
-   display: block;
+   display: flex;
   font-size: 16px;
   color: #191970;
-  margin: 0px 10px -5px 16px;
+  margin: 0px 10px 0px 16px;
   padding-left: 8px;
   border-left: 4px solid #191970;
 }
