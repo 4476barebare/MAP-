@@ -50,8 +50,13 @@
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/haze-crank.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【ハゼクラ入門】ルアーで狙う江戸前の主役！ダイソー釣具で始める奥深きボトムゲーム", "description":"ダイソー釣具で始めるハゼクランク入門", "image":"articles/images/crankbait.jpg", "category":"対象魚別ガイド", "style":"list"} -->
+    <!-- ARTICLE_DATA: {"title":"【ハゼクラ入門】ルアーで狙う江戸前の主役！ダイソー釣具で始める奥深きボトムゲーム", "description":"ダイソー釣具で始めるハゼクランク入門", "image":"articles/images/crankbait.jpg", "category":"ピックアップメソッド", "style":"list"} -->
   </url>
+  <url>
+    <loc>https://turiiko-navi.com/articles/ajing.html</loc>
+    <!-- ARTICLE_DATA: {"title":"アジング入門｜ルアーでアジを狙うための考え方と実践テクニック","description":"小さなワームと軽量ジグヘッドでアジを狙う、アジングの考え方と実践テクニックを解説。","image":"articles/images/ajing.jpg","category":"ピックアップメソッド","style":"list"} -->
+  </url>
+  
   <url>
     <loc>https://turiiko-navi.com/articles/mejina.html</loc>
     <!-- ARTICLE_DATA: {"title":"【徹底解説】強烈な引きと知的な駆け引き！磯・堤防の人気ターゲット「メジナ（グレ）」を釣る", "description":"メジナ（グレ）の生態と磯・堤防釣り解説", "image":"articles/images/mejina.jpg", "category":"対象魚別ガイド", "style":"list"} -->
