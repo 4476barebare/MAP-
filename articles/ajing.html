@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>アジング入門｜ルアーでアジを狙うための考え方と実践テクニック | 釣り行こNAVI</title>
+  <meta name="description" content="アジングは、小さなワームと軽量ジグヘッドを使ってアジを狙うルアーフィッシングです。レンジ、フォール、アタリの取り方など、ルアーでアジを狙うための考え方と実践テクニックを解説します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="アジング入門｜ルアーでアジを狙うための考え方と実践テクニック">
+  <meta property="og:description" content="アジングは、小さなワームと軽量ジグヘッドを使ってアジを狙うルアーフィッシングです。レンジ、フォール、アタリの取り方など、ルアーでアジを狙うための考え方と実践テクニックを解説します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/ajing.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/ajing.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/ajing.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="アジング アジ ルアー ワーム ジグヘッド">
+
+    <header class="article-header">
+      <h1>アジング入門｜ルアーでアジを狙うための考え方と実践テクニック</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-04">2026.10.04</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/ajing.jpg" alt="アジングでアジを狙う様子">
+      アジングは、小さなワームと軽量ジグヘッドを使ってアジを狙うルアーフィッシングです。「アジならサビキで簡単に釣れるのに、なぜわざわざルアーで狙うのか？」と思う方もいるかもしれません。しかし、実際にアジングを始めてみると、その面白さは単に魚を釣ることだけでなく、その日の「正解」を探していく過程にあることが分かります。
+    </p>
+    <p>
+      どの深さにアジがいるのか。どのくらいの速さでルアーを動かすのか。そして、手元に伝わったほんの小さな違和感がアタリなのか。海の状況を観察しながらルアーを微調整し、アジがルアーを食う条件を自ら見つけ出すことこそが、アジングの大きな魅力です。
+    </p>
+
+    <section class="article-section">
+      <h2>1. まず覚えたい「レンジ」とジグヘッドの考え方</h2>
+      <p>アジングで最初に身につけたいのが、ルアーが泳ぐ水深である「レンジ」を意識することです。アジの群れが同じ場所にいても、時間や潮、ベイト（エサ）の状態によって泳いでいる深さが変わります。</p>
+
+      <h3>カウントは「水深計」ではなく「再現装置」</h3>
+      <p>そこで便利なのが、ルアーを着水させてから「1、2、3……」と沈める時間を数えるカウントダウンです。重要なのは「5カウント＝水深5m」と正確な深さを知ることではなく、「5カウントで釣れた」という事実を元に、次のキャストでも同じレンジを再現できるようにすることです。</p>
+
+      <h3>ジグヘッドの重さは飛距離だけで決めない</h3>
+      <p>アジングでは0.5g前後から1g以上のジグヘッドを幅広く使用しますが、「遠くに飛ばしたいから重くする」という選び方は避けましょう。重さが変われば、沈下速度や操作感、潮への乗り方まで変わります。「釣れないから軽くする」のではなく、「今の海でルアーを思い通りに操作できる重さ」を選ぶことが重要です。</p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. アクションのキモは「フォール」にあり</h2>
+      <p>アジングにおいて非常に重要なのが、ルアーを沈ませる「フォール」の動作です。アジは動いているルアーよりも、動きが止まって沈み始めた瞬間に食ってくることが多く、ここが最大の食わせの間になります。</p>
+
+      <h3>フリーフォールとテンションフォール</h3>
+      <p>ラインを自然に送り出すフリーフォールと、ラインを張った状態で沈ませるテンションフォールがあります。同じジグヘッドでもラインの張り方で動きが変わるため、釣れない時はルアーを変える前に、フォールのさせ方を変えてみるのが有効です。</p>
+
+      <h3>「ただ巻き」と「リフト＆フォール」</h3>
+      <p>細かくロッドを動かすイメージが強いアジングですが、アジが小魚を追っている時は、一定速度で巻く「ただ巻き」が非常に強いことがあります。一方、アジが中層から底付近にいる時は、ロッドを軽く持ち上げてルアーを浮かせ、再び沈ませる「リフト＆フォール」で縦方向に探るのが効果的です。</p>
+
+      <img src="images/ajing2.jpg" alt="アジングのタックルとアジ" style="margin: 10px 0;">
+    </section>
+
+    <section class="article-section">
+      <h2>3. アタリの察知とタックル選び</h2>
+      <p>アジング初心者が苦労しやすいのがアタリの判断です。「ゴンッ」という明確な感触だけでなく、「フッと軽くなる」「急に重くなる」「カウントが止まる」など、予定していた動きと違う違和感はすべてアタリの可能性があります。状況に合わせて、即座にアワセて「掛ける」か、テンションを保って針を「乗せる」かを使い分けましょう。</p>
+
+      <h3>ワームとラインの選び方</h3>
+      <p>ワームは色に注目しがちですが、長さや太さ、テールの形など「アジが今何を食べているか」を基準に選ぶことが重要です。また、ラインは「ルアーの状態を手元に伝えるセンサー」です。操作感度が高く軽量リグに向くエステル、飛距離重視のPE、根ズレに強く扱いやすいフロロカーボンなど、特性を理解して選択します。</p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 状況別ポイント攻略（時間帯・潮・風）</h2>
+
+      <h3>常夜灯とデイアジング</h3>
+      <p>夜間は常夜灯が定番ですが、ライトの真下だけでなくプランクトンが集まりやすい「明暗の境界」や「暗い側」を探るのが基本です。また、昼間のデイアジングでは、ベイトの群れや潮目、海底の地形など目視できる情報を活用してアジの居場所をダイレクトに推測できます。</p>
+
+      <h3>ドリフトと風対策</h3>
+      <p>潮の流れにルアーを乗せて自然に流す「ドリフト」は、アジが待つ場所へルアーを送り届ける高等テクニックです。また、風が強い日はジグヘッドを重くするだけでなく、風を背負える立ち位置を探すなど、「ラインをどう水面に置くか」まで考える必要があります。</p>
+    </section>
+
+    <section class="article-section">
+      <h2>5. アジングは「観察→仮説→検証」の釣り</h2>
+      <p>釣れない時、すぐにルアーを交換するのではなく、「アジはいるか」「レンジや速度は合っているか」「フォールは適切か」と段階的に条件を疑うことが大切です。</p>
+      <p>そして、1匹釣れたらすぐに次を投げるのではなく、「どのレンジで、どんなアクションで食ったか」を思い出し、次のキャストで同じ条件を再現してみましょう。再現できれば、その1匹は「偶然」ではなく「パターン」になります。</p>
+      <p>手元に伝わる小さな違和感を見逃さず、海の中を想像しながらルアーを操作する。その1匹を偶然で終わらせず、再現できるパターンへ変えていくことこそが、アジングという釣りの奥深さなのです。</p>
+    </section>
+
+<div style="margin: 30px 0;">
+  <a href="aji.html" class="menu-card">
+    <div class="menu-thumb">
+      <img src="images/aji.jpg" alt="アジの生態と実践的な釣り方解説">
+    </div>
+    <div class="menu-text">
+      <h2>【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド</h2>
+    </div>
+  </a>
+</div>
+
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+
+      <div id="fish-map" role="region"></div>
+
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article>
+</main>
+
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定（外部JSでこの変数を読み取ってマップを生成） -->
+<script>
+  window.TARGET_FISH = 'アジ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
