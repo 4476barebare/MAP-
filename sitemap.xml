@@ -64,6 +64,11 @@
     <loc>https://turiiko-navi.com/articles/suzuki.html</loc>
     <!-- ARTICLE_DATA: {"title":"身近な海に潜む銀鱗のハンター。スズキ（シーバス）を仕留めるための総合メソッド", "description":"スズキ（シーバス）の生態とエサ釣り・ルアー攻略メソッド", "image":"articles/images/suzuki.jpg", "category":"対象魚別ガイド", "style":"list"} -->
   </url>
+  <url>
+    <loc>https://turiiko-navi.com/articles/tachiuo.html</loc>
+    <!-- ARTICLE_DATA: {"title":"夜の防波堤で狙うタチウオ釣り完全ガイド。レンジを探し、ルアーとエサを使い分ける", "description":"タチウオの生態とルアー・ウキ釣りのレンジ攻略メソッド", "image":"articles/images/tachiuo.jpg", "category":"対象魚別ガイド", "style":"list"} -->
+  </url>
+
 
 
   <!-- ======================== -->
