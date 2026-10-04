@@ -3,17 +3,49 @@
 // 魚種生息マップ生成＆リンク自動構築スクリプト (汎用版)
 // =========================================
 
+// ==========================================
+// ★ 魚種名おまとめ辞書（出世魚や別名を統一）[span_2](start_span)[span_2](end_span)
+// ==========================================
+const FISH_DICTIONARY = {
+    "ツバス": "ワカシ",
+    "ワカシ": "ワカシ",
+    "ハマチ": "イナダ",
+    "イナダ": "イナダ",
+    "メジロ": "ワラサ",
+    "ワラサ": "ワラサ",
+    "ブリ": "ブリ",
+    "セイゴ": "スズキ",
+    "フッコ": "スズキ",
+    "スズキ": "スズキ",
+    "サゴシ": "サワラ",
+    "サワラ": "サワラ",
+    "カイズ": "クロダイ",
+    "チヌ": "クロダイ",
+    "クロダイ": "クロダイ",
+    "コハダ": "コノシロ",
+    "コノシロ": "コノシロ",
+    "クチボソ": "モツゴ",
+    "モツゴ": "モツゴ",
+    "ヤマベ": "オイカワ",
+    "オイカワ": "オイカワ",
+    "グレ": "メジナ",
+    "メジナ": "メジナ"
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   
   // HTML側で定義されたグローバル変数を読み込み（未定義時のフォールバックも設定）
-  const targetFish = window.TARGET_FISH || '対象魚';
+  const targetFishStr = window.TARGET_FISH || '対象魚';
   const targetRegionCode = window.TARGET_REGION_CODE || 'KANTO';
   const targetRegionNameJP = window.TARGET_REGION_NAME_JP || '関東地方';
+
+  // ★ 複数検索対応: カンマで分割して配列化（例: "アジ,サバ" -> ["アジ", "サバ"]）
+  const targetFishArray = targetFishStr.split(',').map(f => f.trim()).filter(Boolean);
 
   // ★ 汎用化: fish-map
   const mapContainer = document.getElementById('fish-map');
   if (mapContainer) {
-    mapContainer.setAttribute('aria-label', `${targetRegionNameJP}の${targetFish}釣果スポット分布マップ`);
+    mapContainer.setAttribute('aria-label', `${targetRegionNameJP}の${targetFishStr}釣果スポット分布マップ`);
   }
 
   // ★ 汎用化: fish-map
@@ -119,11 +151,35 @@ document.addEventListener("DOMContentLoaded", function () {
               locData.forEach(spot => {
                   if (spot.type === 'pref' || spot.type === 'area') return;
                   
-                  const locStr = (spot.URL || '') + (spot.notes || '') + (spot.name || '');
-                  const fStr = fishMap[spot.name] || fishMap[spot.individualId] || '';
-                  const searchStr = locStr + fStr;
+                  // ==========================================
+                  // ★ 修正：完全一致 ＆ 複数検索 ＆ 辞書統一対応
+                  // ==========================================
                   
-                  if (searchStr.includes(targetFish)) {
+                  // 1. fish.json由来のデータ（例: "アジ,セイゴ,ハゼ"）を配列化[span_3](start_span)[span_3](end_span)
+                  const fStr = fishMap[spot.name] || fishMap[spot.individualId] || '';
+                  const fishArrayFromJSON = fStr ? fStr.split(',') : [];
+                  
+                  // 2. URL由来のデータから魚種名だけを抽出して配列化[span_4](start_span)[span_4](end_span)
+                  const fishArrayFromURL = [];
+                  if (spot.URL) {
+                      spot.URL.split(',').forEach(item => {
+                          fishArrayFromURL.push(item.split('|')[0]); 
+                      });
+                  }
+
+                  // 3. noteやnameに設定されている場合も考慮
+                  const otherArray = [spot.notes, spot.name];
+
+                  // 対象スポットが持つすべてのワードを1つの配列に合体し、空文字を除外
+                  const allSearchWordsRaw = [...fishArrayFromJSON, ...fishArrayFromURL, ...otherArray].filter(Boolean);
+                  
+                  // ★ ここで辞書を通し、「セイゴ」などを「スズキ」に変換する[span_5](start_span)[span_5](end_span)
+                  const mappedSearchWords = allSearchWordsRaw.map(word => FISH_DICTIONARY[word] || word);
+                  
+                  // ★ targetFishArray のどれか1つでも、mappedSearchWords の中に「完全一致」で存在すれば true
+                  const isMatch = targetFishArray.some(targetFish => mappedSearchWords.includes(targetFish));
+                  
+                  if (isMatch) {
                       if (spot.lat && spot.lng) {
                           L.marker([spot.lat, spot.lng], { icon: dotIcon }).addTo(map);
                           bounds.extend([spot.lat, spot.lng]);
@@ -189,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       
     } catch (e) {
-      console.error(`${targetFish}スポットマップの展開エラー:`, e);
+      console.error(`${targetFishStr}スポットマップの展開エラー:`, e);
     }
   }
 
