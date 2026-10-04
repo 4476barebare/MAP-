@@ -77,8 +77,10 @@
     <loc>https://turiiko-navi.com/articles/inada.html</loc>
     <!-- ARTICLE_DATA: {"title":"【陸っぱり青物】強烈な引きを味わう！堤防・サーフからの「イナダ」釣り完全攻略ガイド", "description":"堤防や砂浜から手軽に狙える身近な青物「イナダ」の生態から3つの釣り方までを徹底解説。", "image":"articles/images/inada.jpg", "category":"対象魚別ガイド", "style":"list"} -->
   </url>
-
-
+  <url>
+    <loc>https://turiiko-navi.com/articles/katsuo.html</loc>
+    <!-- ARTICLE_DATA: {"title":"【陸っぱり青物】堤防から弾丸ランナーを撃ち落とせ！「カツオ」の生態とショア攻略完全ガイド", "description":"堤防やサーフからも狙える超高速回遊魚「カツオ」の生態と、ショアジギング・弓角での攻略法を解説。", "image":"articles/images/katsuo.jpg", "category":"対象魚別ガイド", "style":"list"} -->
+  </url>
 
   <!-- ======================== -->
   <!-- トップページ・県トップ -->
