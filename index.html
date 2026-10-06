@@ -1507,6 +1507,9 @@ async function loadPrefectureData(prefCode) {
 
     window.fishUrl = `/${region}/${prefCode}_fish.json`;
 
+    // ★ 追加: ショップデータURLの定義
+    window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
+
     try {
         // 1. 金庫の確認と準備
         if (!window.allspotData || window.allspotData.length === 0) {
@@ -1530,12 +1533,18 @@ async function loadPrefectureData(prefCode) {
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
         }
 
+        // ★ 追加: ショップデータを事前にロードして完了を待つ
+        if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+            await window.markerControl.preloadShop01(window.prefShopUrl);
+        }
+
         return true; 
     } catch (err) {
         console.error("データ読み込みエラー:", err);
         return false;
     }
 }
+
 /**
  * sitemap.xmlから記事データを抽出し、XMLに記述されている出現順にカテゴリ別に描画する
  * @param {string} targetDomId - 出力先のDOM要素のID
