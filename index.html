@@ -274,16 +274,18 @@ function clearSpotRanking() {
 }
 
 // ==========================================
-// ★ 明日のオススメ釣り場ランキング表示関数（トップ＆県画面 両対応版）
+// ★ 明日のオススメ釣り場ランキング表示関数（自動リトライ搭載版）
 // ==========================================
-async function renderSpotRanking() {
+async function renderSpotRanking(retryCount = 0) {
     const container = document.getElementById('spot-ranking-container');
     const section = document.getElementById('fishing-recommend-section');
     if (!container || !section) return;
 
-    // ローディング表示
-    section.style.display = 'block';
-    container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
+    // 初回呼び出し時のみローディング表示
+    if (retryCount === 0) {
+        section.style.display = 'block';
+        container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
+    }
 
     const now = new Date();
     const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
@@ -299,7 +301,34 @@ async function renderSpotRanking() {
     // --------------------------------------------------
     // パターンA: 県画面（選択されている県のスポットのみ）
     // --------------------------------------------------
-    if (window.currentPref && window.spotData && window.spotData.length > 0) {
+    if (window.currentPref) {
+        // ★ リトライ条件1：スポットデータ自体がまだ無い場合
+        if (!window.spotData || window.spotData.length === 0) {
+            if (retryCount < 20) { // 最大2秒待機 (100ms × 20回)
+                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
+                return;
+            } else {
+                clearSpotRanking();
+                return;
+            }
+        }
+
+        // ★ リトライ条件2：スポットにまだ天気(whether)が付与されていない場合
+        const repSpot = window.spotData.find(s => {
+            const typeParts = (s.type || '').split('$');
+            return typeParts.includes('representative') || typeParts.includes('assistant');
+        }) || window.spotData[0];
+
+        if (!repSpot || !repSpot.whether) {
+            if (retryCount < 20) {
+                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
+                return;
+            } else {
+                clearSpotRanking();
+                return;
+            }
+        }
+
         targetSpots = window.spotData;
         const prefName = window.prefData ? window.prefData.notes : window.currentPref;
         titlePrefix = `${prefName}で`;
@@ -307,7 +336,18 @@ async function renderSpotRanking() {
     // --------------------------------------------------
     // パターンB: トップページ（関東全域のスポットから算出）
     // --------------------------------------------------
-    else if (!window.currentPref && window.allspotData && window.allspotData.length > 0 && window.regionPrefData) {
+    else {
+        // ★ リトライ条件3：トップページのマスターデータや県リストがまだ無い場合
+        if (!window.allspotData || window.allspotData.length === 0 || !window.regionPrefData) {
+            if (retryCount < 20) {
+                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
+                return;
+            } else {
+                clearSpotRanking();
+                return;
+            }
+        }
+
         titlePrefix = "関東で";
         
         const fetchPromises = window.regionPrefData.map(pref => {
@@ -322,9 +362,6 @@ async function renderSpotRanking() {
         });
 
         targetSpots = window.allspotData;
-    } else {
-        clearSpotRanking();
-        return;
     }
 
     const titleEl = section.querySelector('h2');
@@ -429,10 +466,6 @@ async function renderSpotRanking() {
 
     let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">';
     top3.forEach(item => {
-        
-        // ==========================================
-        // ★ URLの動的構築 (バグ修正済)
-        // ==========================================
         const targetVault = window.currentPref ? window.spotData : window.allspotData;
         const spotObj = targetVault.find(s => s.name === item.name);
         
@@ -440,28 +473,21 @@ async function renderSpotRanking() {
         if (spotObj) {
             const regionName = window.currentRegion || 'KANTO';
             
-            // 県名の逆引き
             let prefName = window.prefData ? window.prefData.notes : window.currentPref;
             if (!prefName && window.regionPrefData) {
                 const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
                 if (pInfo) prefName = pInfo.prefName;
             }
 
-            // エリア名の逆引き
             let areaName = '';
             const targetAreas = window.currentPref ? window.areaData : window.allspotData;
             if (targetAreas && spotObj.areaId) {
-                
-                // ★ a.type === 'area' の縛りを無くし、純粋にIDだけで親エリアを判定
                 let parentArea = targetAreas.find(a => 
                     String(a.areaId) + '_' + String(a.individualId) === String(spotObj.areaId)
                 );
-                
-                // 保険: 見つからなかった場合のフォールバック
                 if (!parentArea && window.currentPref) {
                     parentArea = targetAreas.find(a => String(spotObj.areaId).endsWith(String(a.individualId)));
                 }
-
                 if (parentArea) {
                     areaName = parentArea.name;
                 }
@@ -486,6 +512,7 @@ async function renderSpotRanking() {
 
     container.innerHTML = html;
 }
+
 
 // ==========================================
 // ★ タイトル・メタタグ動的更新関数（連携版）
