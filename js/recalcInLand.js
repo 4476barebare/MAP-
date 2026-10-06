@@ -473,6 +473,7 @@ async function run() {
             const latIdx = headers.indexOf("lat");
             const lngIdx = headers.indexOf("lng");
             const notesIdx = headers.indexOf("notes");
+            const zoomIdx = headers.indexOf("zoom"); // ★ zoomのインデックスを取得
 
             if (idIdx === -1) continue;
 
@@ -481,7 +482,11 @@ async function run() {
                 if (r.length <= idIdx) continue;
                 
                 const id = r[idIdx];
-                if (id && id.startsWith("L")) {
+                // ★ zoom列の文字列を安全に取得
+                const zoomStr = zoomIdx !== -1 && r[zoomIdx] ? r[zoomIdx].trim() : ""; 
+
+                // ★ 「L始まり」かつ「zoomが空欄ではない」場合のみ抽出
+                if (id && id.startsWith("L") && zoomStr !== "") {
                     const name = nameIdx !== -1 && r[nameIdx] ? r[nameIdx] : "";
                     const lat = latIdx !== -1 ? parseFloat(r[latIdx]) || 0 : 0;
                     const lng = lngIdx !== -1 ? parseFloat(r[lngIdx]) || 0 : 0;
