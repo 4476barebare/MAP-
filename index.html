@@ -310,7 +310,6 @@ async function renderSpotRanking() {
     else if (!window.currentPref && window.allspotData && window.allspotData.length > 0 && window.regionPrefData) {
         titlePrefix = "関東で";
         
-        // まだ天気が付与されていない県のために、全県の天気を一括フェッチ
         const fetchPromises = window.regionPrefData.map(pref => {
             const whetherUrl = `/data/${pref.prefCode}_whether.csv`;
             return loadWhetherCSV(whetherUrl).catch(() => null);
@@ -318,7 +317,6 @@ async function renderSpotRanking() {
 
         const results = await Promise.all(fetchPromises);
         
-        // 取得した天気を allspotData 全体に適用
         results.forEach(csvData => {
             if (csvData) applyWhetherToSpots(csvData, window.allspotData);
         });
@@ -433,28 +431,40 @@ async function renderSpotRanking() {
     top3.forEach(item => {
         
         // ==========================================
-        // ★ URLの動的構築 (対象がallspotDataの場合も考慮)
+        // ★ URLの動的構築 (バグ修正済)
         // ==========================================
         const targetVault = window.currentPref ? window.spotData : window.allspotData;
         const spotObj = targetVault.find(s => s.name === item.name);
         
         let url = "#";
         if (spotObj) {
-            const regionName = window.currentRegion || '関東地方';
+            const regionName = window.currentRegion || 'KANTO';
             
-            // トップページの場合は、spotObjが所属する県を逆引きする
+            // 県名の逆引き
             let prefName = window.prefData ? window.prefData.notes : window.currentPref;
             if (!prefName && window.regionPrefData) {
                 const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
                 if (pInfo) prefName = pInfo.prefName;
             }
 
-            // エリア名を逆引き
+            // エリア名の逆引き
             let areaName = '';
             const targetAreas = window.currentPref ? window.areaData : window.allspotData;
             if (targetAreas && spotObj.areaId) {
-                const parentArea = targetAreas.find(a => a.type === 'area' && spotObj.areaId.endsWith(a.individualId));
-                if (parentArea) areaName = parentArea.name;
+                
+                // ★ a.type === 'area' の縛りを無くし、純粋にIDだけで親エリアを判定
+                let parentArea = targetAreas.find(a => 
+                    String(a.areaId) + '_' + String(a.individualId) === String(spotObj.areaId)
+                );
+                
+                // 保険: 見つからなかった場合のフォールバック
+                if (!parentArea && window.currentPref) {
+                    parentArea = targetAreas.find(a => String(spotObj.areaId).endsWith(String(a.individualId)));
+                }
+
+                if (parentArea) {
+                    areaName = parentArea.name;
+                }
             }
             
             url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName || '')}&area=${encodeURIComponent(areaName || '')}&spot=${encodeURIComponent(item.name)}`;
