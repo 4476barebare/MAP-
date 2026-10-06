@@ -156,31 +156,25 @@ function showShop02(areaKey) {
                 lng += Math.sin(angle) * offset;
             }
 
-            const iconId = getIconId(shop.icon);
-            const noCircle = iconId === 'shop4';
+            // ★ テキストの判定: group名があればgroup名（個人商店や空欄を除く）、なければ店舗名
+            const displayName = shop.group && shop.group !== '個人商店' && shop.group !== 'shop'
+                ? shop.group 
+                : (shop.name || '');
 
-            const html = noCircle
-                ? `<div class="shop-marker no-circle">
-                        <svg class="shop-icon">
-                            <use href="/icon/sprite.svg#icon-${iconId}"></use>
-                        </svg>
-                   </div>`
-                : `<div class="shop-marker">
-                        <svg class="shop-icon">
-                            <use href="/icon/sprite.svg#icon-${iconId}"></use>
-                        </svg>
-                   </div>`;
-
-            // --- markerControl.js: showShop02内のマーカー生成ループ内 ---
+            const html = `
+                <div class="shop-anchor"></div>
+                <div class="shop-text">${displayName}</div>
+            `;
             
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
-                    className: '',
+                    className: 'custom-shop-marker',
                     html: html,
-                    iconSize: [24, 24],
-                    iconAnchor: [12, 12]
+                    iconSize: [0, 0],    // 基準点を完全にゼロにする
+                    iconAnchor: [0, 0]   // 座標のど真ん中に強制
                 })
             });
+
 
             // =====================================
             // ★ ポップアップの遅延生成（3大ボタン実装）
