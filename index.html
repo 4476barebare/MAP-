@@ -3162,7 +3162,7 @@ async function routeUpdate() {
                 
                 // ★ 不足していたエリアガイドの描画を事前に行う
                 if (typeof renderAreaGuide === 'function') renderAreaGuide();
-                
+                if (typeof renderSpotRanking === 'function') renderSpotRanking();
                 if (typeof openArea === 'function') openArea(parentArea.individualId);
             }
             
@@ -3223,7 +3223,7 @@ async function routeUpdate() {
         
         // ★ 不足していたエリアガイドの描画を行う
         if (typeof renderAreaGuide === 'function') renderAreaGuide();
-        
+        if (typeof renderSpotRanking === 'function') renderSpotRanking()
         if (typeof selectArea === 'function') selectArea(area); 
         if (typeof renderCrowdImage === 'function') renderCrowdImage();
         
