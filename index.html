@@ -270,24 +270,20 @@ if ('serviceWorker' in navigator) {
 function clearSpotRanking() {
     const section = document.getElementById('fishing-recommend-section');
     const container = document.getElementById('spot-ranking-container');
-    if (section) section.style.display = 'none'; // セクションごと隠す
-    if (container) container.innerHTML = '';     // 中身を空にする
+    if (section) section.style.display = 'none';
+    if (container) container.innerHTML = '';
 }
 
 // ==========================================
-// ★ 明日のオススメ釣り場ランキング表示関数（日付動的反映版）
+// ★ 明日のオススメ釣り場ランキング表示関数（スリム＆純粋リンク版）
 // ==========================================
 function renderSpotRanking() {
     const container = document.getElementById('spot-ranking-container');
     const section = document.getElementById('fishing-recommend-section');
     if (!container || !section) return;
 
-    // ★ 冒頭で一度クリア＆非表示にして安全な状態を作る
     clearSpotRanking();
 
-    // --------------------------------------------------
-    // ★ JST（日本時間）で「明日」の日付を計算し、タイトルに反映
-    // --------------------------------------------------
     const now = new Date();
     const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
     nowJST.setDate(nowJST.getDate() + 1); 
@@ -301,11 +297,10 @@ function renderSpotRanking() {
         titleEl.innerHTML = `明日（${tomorrowStr}）釣りに行くんだけど良い場所ある？`;
     }
 
-    if (!window.spotData || window.spotData.length === 0) return; // データが無ければ非表示のまま終了
+    if (!window.spotData || window.spotData.length === 0) return;
 
     const ranking = [];
 
-    // 各スポットの明日の天気を抽出し、スコアを計算
     window.spotData.forEach(spot => {
         if (spot.type === 'pref' || spot.type === 'area') return;
         const typeParts = (spot.type || '').split('$');
@@ -349,7 +344,7 @@ function renderSpotRanking() {
 
         const getIconSafe = (r) => {
             if (!Array.isArray(r) || r.length === 0) return null;
-            return calcRepresentativeIcon(r); 
+            return typeof calcRepresentativeIcon === 'function' ? calcRepresentativeIcon(r) : '';
         };
 
         const iconMorning = getIconSafe(morningRows);
@@ -379,7 +374,7 @@ function renderSpotRanking() {
         });
     });
 
-    if (ranking.length === 0) return; // 有効データが無ければ非表示のまま終了
+    if (ranking.length === 0) return;
 
     ranking.sort((a, b) => b.score - a.score);
 
@@ -393,36 +388,41 @@ function renderSpotRanking() {
             currentScore = ranking[i].score;
         }
         if (currentRank > 3) break;
-        
-        ranking[i].rank = currentRank;
         top3.push(ranking[i]);
     }
 
     let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">';
     top3.forEach(item => {
-        let rankColor = "#191970";
-        if (item.rank === 1) rankColor = "#e6b422"; 
-        else if (item.rank === 2) rankColor = "#9eabba"; 
-        else if (item.rank === 3) rankColor = "#c47222"; 
         
-        let rankNumColor = "#fff";
+        // ==========================================
+        // ★ 既存ロジック流用：URLの動的構築
+        // ==========================================
+        const spotObj = window.spotData.find(s => s.name === item.name);
+        let url = "#";
+        if (spotObj) {
+            const regionName = window.currentRegion || '関東地方';
+            const prefName = window.prefData ? window.prefData.notes : window.currentPref;
+            const parentArea = window.areaData ? window.areaData.find(a => spotObj.areaId && spotObj.areaId.endsWith(a.individualId)) : null;
+            const areaName = parentArea ? parentArea.name : '';
+            
+            // クエリパラメータをエンコードしてURLを組み立てる
+            url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName)}&area=${encodeURIComponent(areaName)}&spot=${encodeURIComponent(item.name)}`;
+        }
 
         html += `
-        <li style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #c8d6e5; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
-            <div style="display: flex; align-items: center; font-weight: bold; color: #191970; font-size: 15px;">
-                <span style="display:inline-block; min-width:24px; color:${rankNumColor}; background:${rankColor}; text-align:center; border-radius:4px; margin-right:8px; font-size:13px; padding: 2px 0;">${item.rank}</span>
-                <span style="flex-grow: 1;">${item.name}</span>
-                <span style="font-size: 1.2em; white-space: nowrap;">${item.iconStr}</span>
-            </div>
-            <div style="font-size: 12px; color: #555; margin-top: 6px; padding-left: 32px; display: flex; justify-content: space-between;">
-                <span>スコア: <strong style="color: #e74c3c; font-size: 14px;">${item.score}</strong> 点</span>
-                <span>降水: ${item.pop}% / 最大風速: ${item.wind}m</span>
-            </div>
+        <li>
+            <a href="${url}" class="recommend-spot-link" style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 12px; border-radius: 6px; border: 1px solid #c8d6e5; box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-decoration: none; color: #333;">
+                <span style="font-weight: bold; color: #191970; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px;">${item.name}</span>
+                <span style="font-size: 12px; color: #555; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.3em;">${item.iconStr}</span>
+                    <span>降水: <strong style="color: #191970;">${item.pop}%</strong></span>
+                    <span>風: <strong style="color: #191970;">${item.wind}m</strong></span>
+                </span>
+            </a>
         </li>`;
     });
     html += '</ul>';
 
-    // ★ 描画が完了したら全体を表示させる
     container.innerHTML = html;
     section.style.display = 'block';
 }
