@@ -176,10 +176,8 @@ function showShop02(areaKey) {
             });
 
             // =====================================
-            // ★ 改善：ポップアップの「遅延生成（関数渡し）」
+            // ★ ポップアップの遅延生成（3大ボタン実装）
             // =====================================
-            // marker.bindPopup(HTML文字列) ではなく、関数を渡すことで
-            // クリックされるまで内部の重い計算やHTML生成を一切行わない
             marker.bindPopup(() => {
                 const title = shop.group && shop.group !== '個人商店'
                     ? shop.group + ' ' + (shop.name || '')
@@ -187,22 +185,36 @@ function showShop02(areaKey) {
 
                 const address = shop.notes || '';
 
-                const googleUrl =
-                    'https://www.google.com/search?q=' +
-                    encodeURIComponent(title + ' ' + address);
+                // 1. Googleマップ ルート案内URL (緯度・経度へダイレクト)
+                const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}`;
+
+                // 2. Google検索URL (グループ名・店名・住所のみでスッキリ検索)
+                const searchKeyword = `${title} ${address}`.trim();
+                const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchKeyword)}`;
+
+                // 3. ChatGPT質問URL (?q= パラメータでプロンプトをセット)
+                const chatGptPrompt = `${title}（${address}）の営業時間や定休日、取り扱い商品などの詳細情報を教えて`;
+                const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(chatGptPrompt)}`;
 
                 return `
                     <div class="shop-popup">
                         <div class="shop-popup-title">${title}</div>
                         <div class="shop-popup-address">${address}</div>
                         <div class="shop-popup-footer">
-                            <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-                                Googleで検索
+                            <a class="shop-popup-btn" href="${routeUrl}" target="_blank" rel="noopener noreferrer">
+                                ルート案内
+                            </a>
+                            <a class="shop-popup-btn" href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer">
+                                Google検索
+                            </a>
+                            <a class="shop-popup-btn btn-chatgpt" href="${chatGptUrl}" target="_blank" rel="noopener noreferrer">
+                                ChatGPT
                             </a>
                         </div>
                     </div>
                 `;
             });
+
 
             // ★ここ変更なし（維持）
             window.phase2Group.addLayer(marker);
