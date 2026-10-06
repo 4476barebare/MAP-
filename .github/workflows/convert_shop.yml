@@ -1,0 +1,49 @@
+name: Convert Shop CSV to JSON
+
+on:
+  workflow_dispatch:
+    inputs:
+      prefname:
+        description: '変換する都道府県 (prefname) を選択'
+        required: true
+        default: 'TOKYO'
+        type: choice
+        options:
+          - TOKYO
+          - IBARAKI
+          - CHIBA
+          - SAITAMA
+          - KANAGAWA
+          - TOCHIGI
+          - GUNMA
+
+permissions:
+  contents: write
+
+jobs:
+  convert-shop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run Converter Script
+        # 選択されたprefnameを使って入力ファイルパスを構築 (例: KANTO/TOKYO_shop.csv)
+        run: node script/convert_shop.js "KANTO/${{ github.event.inputs.prefname }}_shop.csv"
+
+      - name: Commit and Push
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 出力された同名のJSONファイルをGitに追加
+          git add "KANTO/${{ github.event.inputs.prefname }}_shop.json"
+          
+          # 変更がある場合のみコミットしてプッシュ
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-converted: ${{ github.event.inputs.prefname }} Shop CSV to JSON"
+          git push
