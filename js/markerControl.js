@@ -1,32 +1,35 @@
 window.markerControl = {
     shop01Cache: {},
     shop01AreaCache: {},
-    allShops: [] // ★ 新規追加：距離計算用に全店舗をここにプールする
+    allShops: [] // ★ 距離計算用に全店舗をここにプールする
 };
 
 function preloadShop01(url) {
-    if (markerControl.shop01Cache[url]) return Promise.resolve(); // ★ Promiseを返すように変更
+    if (markerControl.shop01Cache[url]) return Promise.resolve();
 
     return fetch(url)
-        .then(res => res.text())
-        .then(text => {
-            const lines = text.trim().split('\n');
-
-            const parsed = lines.slice(1).map(line => {
-                const cols = line.split(',');
-
+        .then(res => {
+            if (!res.ok) throw new Error("fetch失敗: " + res.status);
+            return res.json(); // ★ text() ではなく json() を使う
+        })
+        .then(jsonData => {
+            // ★ CSVを行ごとに分割して処理する重いループが丸ごと不要に！
+            
+            // 万が一のプロパティ欠損（空欄による省略）に備えて、既存フォーマットを保証する
+            const parsed = jsonData.map(shop => {
                 return {
-                    group: cols[0] || '',
-                    name: cols[1] || '',
-                    lat: parseFloat(cols[2]),
-                    lng: parseFloat(cols[3]),
-                    notes: cols[4] || '',
-                    icon: cols[5] || '',
-                    areaId: (cols[6] || '').trim()
+                    group: shop.group || '',
+                    name: shop.name || '',
+                    // すでにNode.js側で数値化されているはずですが、念のため安全に処理
+                    lat: shop.lat !== undefined ? parseFloat(shop.lat) : NaN,
+                    lng: shop.lng !== undefined ? parseFloat(shop.lng) : NaN,
+                    notes: shop.notes || '',
+                    icon: shop.icon || '',
+                    areaId: (shop.areaId || '').toString().trim()
                 };
             });
 
-            // 👇 【ここを追加】パースした店舗データを全店舗リストに合流させる
+            // パースした店舗データを全店舗リストに合流させる
             markerControl.allShops = markerControl.allShops.concat(parsed);
 
             parsed.forEach(r => {
@@ -40,6 +43,9 @@ function preloadShop01(url) {
             });
 
             markerControl.shop01Cache[url] = true;
+        })
+        .catch(err => {
+            console.error("Shopデータの読み込みエラー:", err);
         });
 }
 
