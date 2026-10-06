@@ -1678,23 +1678,41 @@ function clearSub2Weather() {
 }
 
 function showFishPopup(spot) {
-    
-    const googleUrl =
-        'https://www.google.com/search?q=' +
-        encodeURIComponent(spot.name);
+    const title = spot.name || '';
+    const address = spot.notes || '';
 
+    // 1. Googleマップ ルート案内URL (スポット名と補足情報を使って確実にセット)
+    const routeKeyword = `${title} ${address}`.trim();
+    const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(routeKeyword)}`;
+
+    // 2. Google検索URL
+    const searchKeyword = `${title} ${address}`.trim();
+    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchKeyword)}`;
+
+    // 3. ChatGPT質問URL (釣りスポット専用のプロンプトに最適化)
+    const chatGptPrompt = `釣りスポット「${title}」${address ? `（${address}）` : ''}で釣れる魚種、駐車場やトイレの有無、釣り場の特徴などの詳細情報を教えて`;
+    const chatGptUrl = `https://chatgpt.com/?q=${encodeURIComponent(chatGptPrompt)}`;
+
+    // ショップと同じCSSクラス（.shop-popup系）を使い回してデザインを完全統一
     const popupHtml = `
         <div class="shop-popup">
-            <div class="shop-popup-title"></div>
-            <div class="shop-popup-address dummy">${spot.notes || ''}</div>
+            <div class="shop-popup-title">${title}</div>
+            <div class="shop-popup-address">${address}</div>
             <div class="shop-popup-footer">
-                <a class="shop-popup-btn" href="${googleUrl}" target="_blank">
-                    Googleで検索
+                <a class="shop-popup-btn" href="${routeUrl}" target="_blank" rel="noopener noreferrer">
+                    ルート案内
+                </a>
+                <a class="shop-popup-btn" href="${googleSearchUrl}" target="_blank" rel="noopener noreferrer">
+                    Google検索
+                </a>
+                <a class="shop-popup-btn btn-chatgpt" href="${chatGptUrl}" target="_blank" rel="noopener noreferrer">
+                    ChatGPT
                 </a>
             </div>
         </div>
     `;
 
+    // 既存のポップアップを安全に解除して新しいものをバインド
     spot.marker
         ?.closePopup?.();
 
