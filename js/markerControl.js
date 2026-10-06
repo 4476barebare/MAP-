@@ -10,17 +10,13 @@ function preloadShop01(url) {
     return fetch(url)
         .then(res => {
             if (!res.ok) throw new Error("fetch失敗: " + res.status);
-            return res.json(); // ★ text() ではなく json() を使う
+            return res.json();
         })
         .then(jsonData => {
-            // ★ CSVを行ごとに分割して処理する重いループが丸ごと不要に！
-            
-            // 万が一のプロパティ欠損（空欄による省略）に備えて、既存フォーマットを保証する
             const parsed = jsonData.map(shop => {
                 return {
                     group: shop.group || '',
                     name: shop.name || '',
-                    // すでにNode.js側で数値化されているはずですが、念のため安全に処理
                     lat: shop.lat !== undefined ? parseFloat(shop.lat) : NaN,
                     lng: shop.lng !== undefined ? parseFloat(shop.lng) : NaN,
                     notes: shop.notes || '',
@@ -29,7 +25,7 @@ function preloadShop01(url) {
                 };
             });
 
-            // パースした店舗データを全店舗リストに合流させる
+            // パースした店舗データを全店舗リストに合流
             markerControl.allShops = markerControl.allShops.concat(parsed);
 
             parsed.forEach(r => {
@@ -43,12 +39,23 @@ function preloadShop01(url) {
             });
 
             markerControl.shop01Cache[url] = true;
+
+            // ★ 追加: ロード完了時に現在アクティブなエリアがあれば自動でマーカーを描画
+            if (window.currentAreaId && window.map) {
+                const isSpotMode = window.map.getContainer().classList.contains('is-spot-mode');
+                const zoom = window.map.getZoom();
+
+                if (isSpotMode || (window.currentSpotId && zoom === 13)) {
+                    showShop02(window.currentAreaId);
+                } else if (zoom >= 11) {
+                    showShop01(window.currentAreaId);
+                }
+            }
         })
         .catch(err => {
             console.error("Shopデータの読み込みエラー:", err);
         });
 }
-
 
 // -----------------------
 // phase1
