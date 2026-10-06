@@ -3131,7 +3131,7 @@ function goBack() {
 
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
-        if (typeof clearSpotRanking === 'function') clearSpotRanking();
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
         
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
         if (window.phase1Group) window.phase1Group.clearLayers();
