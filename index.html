@@ -3119,6 +3119,10 @@ async function routeUpdate() {
         const btn = document.getElementById('map-back-btn');
         if (btn) btn.style.display = 'none';
         if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
+        
+        // 👇 追加: トップ画面（広域）の直リンク時にランキングを描画
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        
         return;
     }
 
@@ -3264,6 +3268,9 @@ async function routeUpdate() {
                     
                     // ★ 不足していたエリアガイドの描画を行う
                     if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                    
+                    // 👇 追加: 県画面への直リンク時にランキングを描画
+                    if (typeof renderSpotRanking === 'function') renderSpotRanking();
 
                     requestAnimationFrame(() => {
                         const btn = document.getElementById('map-back-btn');
@@ -3284,6 +3291,7 @@ async function routeUpdate() {
         }
     }
 }
+
 
 
 // ★ Region名の変換マッピング
