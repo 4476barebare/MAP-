@@ -186,7 +186,10 @@ function showShop02(areaKey) {
                 const address = shop.notes || '';
 
                 // 1. Googleマップ ルート案内URL (緯度・経度へダイレクト)
-                const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}`;
+                // 1. Googleマップ ルート案内URL (店舗名と住所を使って確実にセット)
+const routeKeyword = `${title} ${address}`.trim();
+const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(routeKeyword)}`;
+
 
                 // 2. Google検索URL (グループ名・店名・住所のみでスッキリ検索)
                 const searchKeyword = `${title} ${address}`.trim();
