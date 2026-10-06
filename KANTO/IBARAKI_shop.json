@@ -1,0 +1,3588 @@
+[
+  {
+    "group": "DAISO",
+    "name": "かすみがうら稲吉店",
+    "lat": 36.12388,
+    "lng": 140.24677,
+    "notes": "茨城県かすみがうら市稲吉2-17-3",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピアシティ富士見ヶ丘店",
+    "lat": 36.00404,
+    "lng": 140.0331,
+    "notes": "茨城県つくばみらい市富士見ヶ丘1丁目1番",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "さくらの杜ショッピングセンター店",
+    "lat": 36.106345,
+    "lng": 140.127106,
+    "notes": "茨城県つくば市さくらの森25-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ライフガーデンみどりの店",
+    "lat": 36.02754,
+    "lng": 140.05721,
+    "notes": "茨城県つくば市みどりの中央11番7",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナンつくば学園の森店",
+    "lat": 36.0996,
+    "lng": 140.07901,
+    "notes": "茨城県つくば市学園の森2丁目34番地6",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イーアスつくば店",
+    "lat": 36.08858,
+    "lng": 140.08458,
+    "notes": "茨城県つくば市研究学園5丁目19番地イーアスつくば店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "トナリエクレオつくば店",
+    "lat": 36.08047,
+    "lng": 140.11198,
+    "notes": "\"茨城県つくば市吾妻1-7-1 トナリエクレオ3階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "\"FOOD OFFストッカー牛久ししこ店\"",
+    "lat": 35.9887,
+    "lng": 140.13951,
+    "notes": "茨城県つくば市高見原1丁目3番地10",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマルつくば竹園店",
+    "lat": 36.08019,
+    "lng": 140.11699,
+    "notes": "\"茨城県つくば市竹園1-3-1 ヨークベニマルつくば竹園店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "つくば筑穂店",
+    "lat": 36.13477,
+    "lng": 140.08527,
+    "notes": "茨城県つくば市筑穂1-13-6",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピアシティ万博記念公園駅前店",
+    "lat": 36.06036,
+    "lng": 140.05168,
+    "notes": "茨城県つくば市島名福田坪土地区画整理B48街区1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "茨城谷和原店",
+    "lat": 35.979425,
+    "lng": 139.982975,
+    "notes": "茨城県つくみらい市小絹761",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ那珂湊店",
+    "lat": 36.3456,
+    "lng": 140.58208,
+    "notes": "\"茨城県ひたちなか市栄町2-13-25 カスミ那珂湊店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "\"Standard Products ニューポートひたちなか店\"",
+    "lat": 36.404371,
+    "lng": 140.588813,
+    "notes": "\"茨城県ひたちなか市新光町35 ニューポートひたちなかファッションクルーズ1階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ニューポートひたちなか店",
+    "lat": 36.40681,
+    "lng": 140.58694,
+    "notes": "茨城県ひたちなか市新光町35ニューポートひたちなかファッションクルーズ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル佐和店",
+    "lat": 36.42553,
+    "lng": 140.54295,
+    "notes": "茨城県ひたちなか市大字高場1484",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "勝田ひたちなか店",
+    "lat": 36.39826,
+    "lng": 140.52769,
+    "notes": "茨城県ひたちなか市東石川204-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウンひたちなか店",
+    "lat": 36.41602,
+    "lng": 140.52855,
+    "notes": "茨城県ひたちなか市東石川3614-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ひたちなか店",
+    "lat": 36.34923,
+    "lng": 140.57713,
+    "notes": "茨城県ひたちなか市峰後7-7",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "茨城荒川沖店",
+    "lat": 36.03411,
+    "lng": 140.17523,
+    "notes": "茨城県稲敷郡阿見町うずら野二丁目5番地1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ阿見店",
+    "lat": 36.03891,
+    "lng": 140.21492,
+    "notes": "\"茨城県稲敷郡阿見町中郷2-7-24 カスミ阿見店2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "江戸崎SC店",
+    "lat": 35.96033,
+    "lng": 140.31898,
+    "notes": "茨城県稲敷市江戸崎4836江戸崎SC店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "パルナ西代店",
+    "lat": 35.91889,
+    "lng": 140.48776,
+    "notes": "茨城県稲敷市西代1495ショッピングセンターパルナ店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "境大橋店",
+    "lat": 36.10194,
+    "lng": 139.7968,
+    "notes": "茨城県猿島郡境町1327-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ下妻ふるさわ店",
+    "lat": 36.18117,
+    "lng": 139.97829,
+    "notes": "\"茨城県下妻市古沢字屋敷東552-1 カスミフードスクエア下妻ふるさわ店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "下妻千代川店",
+    "lat": 36.16913,
+    "lng": 139.9673,
+    "notes": "茨城県下妻市小島912-2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ下妻店",
+    "lat": 36.18177,
+    "lng": 139.95216,
+    "notes": "茨城県下妻市大字長塚24-1カスミ下妻店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピアシティ友部旭町店",
+    "lat": 36.32665,
+    "lng": 140.32071,
+    "notes": "茨城県笠間市旭町453-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスプラザ笠間店",
+    "lat": 36.39458,
+    "lng": 140.25284,
+    "notes": "茨城県笠間市寺崎1-1アクロスプラザ笠間内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "友部スクエア店",
+    "lat": 36.31615,
+    "lng": 140.31961,
+    "notes": "茨城県笠間市住吉字細谷1364-1外",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ笠間店",
+    "lat": 36.38379,
+    "lng": 140.24545,
+    "notes": "茨城県笠間市石井2096番地",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン笠間店",
+    "lat": 36.39078,
+    "lng": 140.25052,
+    "notes": "\"茨城県笠間市赤坂8 イオン笠間店2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "友部東平店",
+    "lat": 36.34865,
+    "lng": 140.31451,
+    "notes": "茨城県笠間市東平3丁目1470-1930",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスプラザひたち野うしく店",
+    "lat": 36.0071,
+    "lng": 140.16389,
+    "notes": "茨城県牛久市ひたち野東2-7-3アクロスプラザひたち野うしく内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "牛久栄町店",
+    "lat": 35.9855,
+    "lng": 140.15393,
+    "notes": "茨城県牛久市栄町4丁目36-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "エスカード牛久店",
+    "lat": 35.97548,
+    "lng": 140.13991,
+    "notes": "\"茨城県牛久市牛久町280 エスカード牛久2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミフードスクエア牛久店",
+    "lat": 35.96896,
+    "lng": 140.15155,
+    "notes": "茨城県牛久市神谷6-1-3",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン結城店",
+    "lat": 36.30614,
+    "lng": 139.868326,
+    "notes": "茨城県結城市結城11839番地1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "結城店",
+    "lat": 36.28835,
+    "lng": 139.86613,
+    "notes": "茨城県結城市新福寺6丁目1-8",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "古河鴻巣店",
+    "lat": 36.17634,
+    "lng": 139.70642,
+    "notes": "茨城県古河市鴻巣956-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ古河諸川店",
+    "lat": 36.20678,
+    "lng": 139.80785,
+    "notes": "茨城県古河市諸川2013",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルク古河諸川店",
+    "lat": 36.19963,
+    "lng": 139.82339,
+    "notes": "\"茨城県古河市諸川498-2 ベルク古河諸川店1階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マーケットシティ古河店",
+    "lat": 36.20878,
+    "lng": 139.70825,
+    "notes": "茨城県古河市松並2丁目18-10マーケットシティ古河C棟",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "古河西牛谷店",
+    "lat": 36.20122,
+    "lng": 139.73676,
+    "notes": "茨城県古河市西牛谷字杉ノ下546-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "バル古河店",
+    "lat": 36.19444,
+    "lng": 139.70923,
+    "notes": "茨城県古河市本町1-1-15バル古河内1階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "玉造店",
+    "lat": 36.09959,
+    "lng": 140.41187,
+    "notes": "茨城県行方市玉造甲1785-1．",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "高萩安良川店",
+    "lat": 36.7069,
+    "lng": 140.70592,
+    "notes": "茨城県高萩市安良川774-3",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベイシア高萩モール店",
+    "lat": 36.72902,
+    "lng": 140.71553,
+    "notes": "茨城県高萩市下手綱1058",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン坂東店",
+    "lat": 36.03764,
+    "lng": 139.89012,
+    "notes": "茨城県坂東市辺田1104-1ダイソー棟",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "茨城岩瀬店",
+    "lat": 36.36541,
+    "lng": 140.10826,
+    "notes": "茨城県桜川市明日香1-37",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルヘイ鹿嶋宮津台店",
+    "lat": 35.98422,
+    "lng": 140.64053,
+    "notes": "茨城県鹿嶋市宮津台4765-6",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "茨城鹿嶋店",
+    "lat": 35.96478,
+    "lng": 140.6245,
+    "notes": "茨城県鹿嶋市城山2丁目3番5号",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン取手店",
+    "lat": 35.91719,
+    "lng": 140.00145,
+    "notes": "茨城県取手市戸頭1118-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ジェーソン新取手店",
+    "lat": 35.91631,
+    "lng": 140.04323,
+    "notes": "茨城県取手市寺田4659ジェーソン新取手店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "リボンとりで店",
+    "lat": 35.89618,
+    "lng": 140.06227,
+    "notes": "茨城県取手市新町1-9-1リボンとりで店4階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ取手店",
+    "lat": 35.89029,
+    "lng": 140.07892,
+    "notes": "\"茨城県取手市青柳385 カスミ取手店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ藤代店",
+    "lat": 35.92062,
+    "lng": 140.11342,
+    "notes": "\"茨城県取手市藤代641 カスミ藤代店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヤオコー藤代町店",
+    "lat": 35.91689,
+    "lng": 140.11751,
+    "notes": "茨城県取手市藤代南二丁目16番地2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ守谷テラス店",
+    "lat": 35.96777,
+    "lng": 139.97476,
+    "notes": "茨城県守谷市久保が丘2-1-1守谷テラス1階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン守谷店",
+    "lat": 35.9454,
+    "lng": 139.99208,
+    "notes": "茨城県守谷市百合ヶ丘3丁目249-1イオンタウン守谷店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "小美玉羽鳥店",
+    "lat": 36.25365,
+    "lng": 140.29001,
+    "notes": "\"茨城県小美玉市羽鳥2738-68 ダイソー店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "小川ショッピングプラザ店",
+    "lat": 36.19234,
+    "lng": 140.37994,
+    "notes": "茨城県小美玉市野田字御用山354-1ダイソーB棟",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ジェーソン石下店",
+    "lat": 36.10603,
+    "lng": 139.98624,
+    "notes": "茨城県常総市新石下字八反田1779ジェーソン石下店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "水海道店",
+    "lat": 36.01632,
+    "lng": 139.99406,
+    "notes": "\"茨城県常総市水海道淵頭町4550-1 2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォレストモール常陸太田店",
+    "lat": 36.54148,
+    "lng": 140.52383,
+    "notes": "茨城県常陸太田市東部土地区画整理事業地内1街区1画地",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "常陸太田スクエア店",
+    "lat": 36.54242,
+    "lng": 140.53015,
+    "notes": "茨城県常陸太田市塙町2954伊勢甚太田スクエア内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "常陸大宮店",
+    "lat": 36.56067,
+    "lng": 140.40663,
+    "notes": "茨城県常陸大宮市姥賀町564-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "オークビレッジかみす店",
+    "lat": 35.89846,
+    "lng": 140.63583,
+    "notes": "茨城県神栖市大野原4-8-71-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "波崎店",
+    "lat": 35.76744,
+    "lng": 140.79848,
+    "notes": "茨城県神栖市波崎7651",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "神栖平泉店",
+    "lat": 35.91064,
+    "lng": 140.63506,
+    "notes": "茨城県神栖市平泉255-12",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "水戸けやき台店",
+    "lat": 36.33579,
+    "lng": 140.48865,
+    "notes": "茨城県水戸市けやき台2-3",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "水戸見和店",
+    "lat": 36.37412,
+    "lng": 140.43048,
+    "notes": "茨城県水戸市見和2丁目232-45",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コープ水戸元吉田店",
+    "lat": 36.34168,
+    "lng": 140.46439,
+    "notes": "茨城県水戸市元吉田町1048-1コープ水戸店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン水戸元吉田店",
+    "lat": 36.34942,
+    "lng": 140.47517,
+    "notes": "茨城県水戸市元吉田町字岡崎1030番12",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル水戸笠原店",
+    "lat": 36.3424,
+    "lng": 140.43584,
+    "notes": "茨城県水戸市小吹町2582-2ヨークベニマル水戸笠原店1階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ上水戸店",
+    "lat": 36.38983,
+    "lng": 140.44559,
+    "notes": "茨城県水戸市上水戸2-9-10MEGAドン・キホーテ上水戸2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "水戸千波ショッピングプラザ店",
+    "lat": 36.36454,
+    "lng": 140.45003,
+    "notes": "茨城県水戸市千波町千波山2467-3外千波ショッピングプラザプラザ内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール水戸内原店",
+    "lat": 36.37456,
+    "lng": 140.35884,
+    "notes": "茨城県水戸市内原2丁目1番地イオンモール水戸内原店3階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン水戸赤塚店",
+    "lat": 36.38153,
+    "lng": 140.41751,
+    "notes": "茨城県水戸市姫子2丁目30",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォレストモール石岡店",
+    "lat": 36.20417,
+    "lng": 140.2894,
+    "notes": "茨城県石岡市石岡12886",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ウェルサイト石岡店",
+    "lat": 36.19669,
+    "lng": 140.31102,
+    "notes": "茨城県石岡市東大橋1937-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "下館玉戸店",
+    "lat": 36.29583,
+    "lng": 139.94019,
+    "notes": "茨城県筑西市玉戸山ヶ島1018",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "DAISO",
+    "name": "潮来店",
+    "lat": 35.95187,
+    "lng": 140.56932,
+    "notes": "茨城県潮来市曲松2740-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール土浦店",
+    "lat": 36.08086,
+    "lng": 140.17955,
+    "notes": "茨城県土浦市上高津367イオンモール土浦店1階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "新治SCさん・あぴお店",
+    "lat": 36.11988,
+    "lng": 140.17523,
+    "notes": "茨城県土浦市大畑1611新治SCさんあぴお店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ土浦駅前店",
+    "lat": 36.07801,
+    "lng": 140.20352,
+    "notes": "茨城県土浦市大和町9-1カスミ土浦駅前店地下1階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "土浦高津店",
+    "lat": 36.07135,
+    "lng": 140.18349,
+    "notes": "茨城県土浦市中高津2-237-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "土浦木田余SM店",
+    "lat": 36.10754,
+    "lng": 140.21352,
+    "notes": "茨城県土浦市木田余4580-3土浦木田余SM内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "土浦蓮河原店",
+    "lat": 36.07242,
+    "lng": 140.20573,
+    "notes": "\"茨城県土浦市蓮河原新町2-4181 2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン水戸南店",
+    "lat": 36.30936,
+    "lng": 140.4398,
+    "notes": "茨城県東茨城郡茨城町大字長岡3480イオンタウン水戸南店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "茨城とうかい店",
+    "lat": 36.46545,
+    "lng": 140.56163,
+    "notes": "茨城県那珂郡東海村舟石川駅西4丁目4-6",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ東海中央店",
+    "lat": 36.45024,
+    "lng": 140.58775,
+    "notes": "茨城県那珂郡東海村村松2104-7",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サンモリノ那珂店",
+    "lat": 36.42963,
+    "lng": 140.5127,
+    "notes": "茨城県那珂市菅谷1618-2サンモリノ那珂店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや鮎川店",
+    "lat": 36.56767,
+    "lng": 140.63757,
+    "notes": "茨城県日立市鮎川町2丁目6-30",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ日立鮎川店",
+    "lat": 36.56891,
+    "lng": 140.64758,
+    "notes": "茨城県日立市鮎川町4-1-55",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン日立河原子店",
+    "lat": 36.54782,
+    "lng": 140.64174,
+    "notes": "茨城県日立市河原子町1-3-4ヨークタウン日立河原子内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや日立滑川店",
+    "lat": 36.6104,
+    "lng": 140.6618,
+    "notes": "茨城県日立市滑川町2-8-3",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルト日立滑川店",
+    "lat": 36.61616,
+    "lng": 140.67128,
+    "notes": "茨城県日立市滑川本町5-4-2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ日立豊浦店",
+    "lat": 36.66604,
+    "lng": 140.69093,
+    "notes": "\"茨城県日立市川尻町5-3-17 カスミ日立豊浦店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "日立大みか店",
+    "lat": 36.5153,
+    "lng": 140.62627,
+    "notes": "茨城県日立市大みか町2-1-15",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや東大沼店",
+    "lat": 36.52694,
+    "lng": 140.62396,
+    "notes": "茨城県日立市東大沼町3-28-8",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや南高野店",
+    "lat": 36.50371,
+    "lng": 140.60524,
+    "notes": "茨城県日立市南高野町1-7-16",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ビッグハウス鉾田店",
+    "lat": 36.19113,
+    "lng": 140.5598,
+    "notes": "茨城県鉾田市滝浜西街道482-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスショッピングガーデン鉾田店",
+    "lat": 36.15366,
+    "lng": 140.49498,
+    "notes": "茨城県鉾田市塔ヶ崎字塙下1084番地アクロスショッピングガーデン鉾田内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カインズ北茨城店",
+    "lat": 36.82768,
+    "lng": 140.77385,
+    "notes": "\"茨城県北茨城市関南町神岡下字南浜田273 カインズ北茨城店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "北茨城中郷店",
+    "lat": 36.77458,
+    "lng": 140.73267,
+    "notes": "茨城県北茨城市中郷町上桜井2762番地",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ利根町店",
+    "lat": 35.85571,
+    "lng": 140.14969,
+    "notes": "茨城県北相馬郡利根町四季の丘1-16-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "竜ヶ崎城南ショッピングセンター店",
+    "lat": 35.90591,
+    "lng": 140.19708,
+    "notes": "茨城県龍ケ崎市光順田1692",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "\"Standard Products 竜ヶ崎サプラ店\"",
+    "lat": 35.93317,
+    "lng": 140.16017,
+    "notes": "\"茨城県龍ケ崎市小柴5-1-2 ショッピングセンターサプラ1階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "竜ヶ崎サプラ店",
+    "lat": 35.93317,
+    "lng": 140.16017,
+    "notes": "\"茨城県龍ケ崎市小柴5-1-2 ショッピングセンターサプラ1階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "つくば店",
+    "lat": 36.076406,
+    "lng": 140.086016,
+    "notes": "茨城県つくば市学園南3-16-5",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "鹿島神栖店",
+    "lat": 35.914972,
+    "lng": 140.636625,
+    "notes": "茨城県神栖市平泉290番2",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "水戸店",
+    "lat": 36.345726,
+    "lng": 140.472699,
+    "notes": "茨城県水戸市元吉田町1322-1",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "土浦店",
+    "lat": 36.086876,
+    "lng": 140.186263,
+    "notes": "茨城県土浦市田中2-12-6",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 千代田モール店\"",
+    "lat": 36.12378,
+    "lng": 140.22955,
+    "notes": "茨城県かすみがうら市下稲吉２６３３－６",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "かすみがうら店",
+    "lat": 36.13549,
+    "lng": 140.22728,
+    "notes": "茨城県かすみがうら市下稲吉２６５４－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 ピアシティみらい平店\"",
+    "lat": 35.99542,
+    "lng": 140.03989,
+    "notes": "茨城県つくばみらい市陽光台１－１４－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "みどりの店",
+    "lat": 36.03533,
+    "lng": 140.05261,
+    "notes": "茨城県つくば市みどりの２－３９－２",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモールつくば店",
+    "lat": 36.0346,
+    "lng": 140.13272,
+    "notes": "茨城県つくば市稲岡６６－１イオンモールつくば　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "レプサモールつくば店",
+    "lat": 36.05053,
+    "lng": 140.13658,
+    "notes": "茨城県つくば市下原３８０－５レプサモール内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 テクノパーク桜店\"",
+    "lat": 36.11411,
+    "lng": 140.11465,
+    "notes": "茨城県つくば市桜３－１８－２",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "フォルテつくば店",
+    "lat": 36.07634,
+    "lng": 140.10231,
+    "notes": "茨城県つくば市小野崎２７８－６フォルテつくば内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 つくば筑穂店\"",
+    "lat": 36.13397,
+    "lng": 140.08148,
+    "notes": "茨城県つくば市筑穂２－１１－３",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 つくば店\"",
+    "lat": 36.07269,
+    "lng": 140.1174,
+    "notes": "茨城県つくば市二の宮１－４－３",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 コープひたちなか店\"",
+    "lat": 36.41788,
+    "lng": 140.54259,
+    "notes": "茨城県ひたちなか市高場１６７３－１９",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "MEGAドン・キホーテ勝田店",
+    "lat": 36.39314,
+    "lng": 140.52756,
+    "notes": "茨城県ひたちなか市石川町１－１ＭＥＧＡドン・キホーテ勝田店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "ひたちなか大成店",
+    "lat": 36.38477,
+    "lng": 140.53214,
+    "notes": "茨城県ひたちなか市大成町５",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "那珂湊店",
+    "lat": 36.34649,
+    "lng": 140.58168,
+    "notes": "茨城県ひたちなか市田中後４５－３",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 荒川本郷店\"",
+    "lat": 36.02289,
+    "lng": 140.17682,
+    "notes": "茨城県稲敷郡阿見町本郷３－１－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ピアシティ新利根店",
+    "lat": 35.91262,
+    "lng": 140.28537,
+    "notes": "茨城県稲敷市角崎１６６６ピアシティ新利根内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール下妻店",
+    "lat": 36.19009,
+    "lng": 139.98941,
+    "notes": "茨城県下妻市堀篭９７２－１イオンモール下妻　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "友部店",
+    "lat": 36.33123,
+    "lng": 140.3197,
+    "notes": "茨城県笠間市旭町３９７－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "結城店",
+    "lat": 36.287469,
+    "lng": 139.876769,
+    "notes": "茨城県結城市下り松３－３－１３",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "カインズ結城店",
+    "lat": 36.29734,
+    "lng": 139.87222,
+    "notes": "茨城県結城市結城公達９７８４－３カインズスーパーセンター結城店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア古河総和店",
+    "lat": 36.17731,
+    "lng": 139.71759,
+    "notes": "茨城県古河市大堤字本田前６８２ベイシア古河総和店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "あかやまＪＯＹ店",
+    "lat": 36.19896,
+    "lng": 139.71272,
+    "notes": "茨城県古河市雷電町１－１８あかやまＪＯＹ　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア玉造店",
+    "lat": 36.10145,
+    "lng": 140.41577,
+    "notes": "茨城県行方市玉造甲６４２－１ベイシア玉造店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 麻生店\"",
+    "lat": 36.01642,
+    "lng": 140.49858,
+    "notes": "茨城県行方市麻生３２８８－５０セイミヤモール麻生店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "高萩店",
+    "lat": 36.70379,
+    "lng": 140.71057,
+    "notes": "茨城県高萩市安良川４０６",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "真壁店",
+    "lat": 36.28099,
+    "lng": 140.10805,
+    "notes": "茨城県桜川市真壁町桜井３１０－１ＦＯＯＤ　ＯＦＦストッカー真壁店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "鹿島店",
+    "lat": 35.97456,
+    "lng": 140.64012,
+    "notes": "茨城県鹿嶋市宮中４７７９－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "フォレストモール取手店",
+    "lat": 35.92305,
+    "lng": 140.01033,
+    "notes": "茨城県取手市戸頭７－７－３フォレストモール取手内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友楽市守谷店",
+    "lat": 35.93615,
+    "lng": 139.9944,
+    "notes": "茨城県守谷市けやき台４－１－５西友楽市守谷内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 アクロスモール守谷店\"",
+    "lat": 35.94166,
+    "lng": 139.97891,
+    "notes": "茨城県守谷市松ケ丘６－６－１アクロスモール守谷　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "ヨークタウン守谷店",
+    "lat": 35.95879,
+    "lng": 139.99513,
+    "notes": "茨城県守谷市松並青葉１－１１－２ヨークタウン守谷内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "ＴＡＩＲＡＹＡ美野里店",
+    "lat": 36.24868,
+    "lng": 140.2997,
+    "notes": "茨城県小美玉市羽鳥２９０８－１ＴＡＩＲＡＹＡ美野里店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 ピアシティ小川店\"",
+    "lat": 36.17271,
+    "lng": 140.35179,
+    "notes": "茨城県小美玉市中延２２７７ピアシティ小川店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "メガセンタートライアル石下店",
+    "lat": 36.12478,
+    "lng": 139.97226,
+    "notes": "茨城県常総市本石下４４２１－１メガセンタートライアル石下店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "常陸大宮ＳＣピサーロ店",
+    "lat": 36.52008,
+    "lng": 140.42703,
+    "notes": "茨城県常陸大宮市下村田２３８７常陸大宮ショッピングセンターピサーロ　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 常陸大宮店\"",
+    "lat": 36.53074,
+    "lng": 140.42778,
+    "notes": "茨城県常陸大宮市泉５０８－２",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "カスミ神栖店",
+    "lat": 35.89763,
+    "lng": 140.64151,
+    "notes": "茨城県神栖市大野原４－１－４１カスミ神栖店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ピアシティ神栖土合店",
+    "lat": 35.7929,
+    "lng": 140.77126,
+    "notes": "茨城県神栖市土合西１－２－１０ピアシティ神栖土合内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ライフガーデン神栖店",
+    "lat": 35.91064,
+    "lng": 140.63506,
+    "notes": "茨城県神栖市平泉字トネ谷原８－７２ライフガーデン神栖内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 水戸河和田店\"",
+    "lat": 36.362558,
+    "lng": 140.413341,
+    "notes": "茨城県水戸市河和田町３８２９－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ロゼオ水戸店",
+    "lat": 36.341601,
+    "lng": 140.45189,
+    "notes": "茨城県水戸市笠原町９７８－３９ロゼオ水戸内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 水戸東原店\"",
+    "lat": 36.383827,
+    "lng": 140.446881,
+    "notes": "茨城県水戸市東原１－３－１２",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 石岡府中店\"",
+    "lat": 36.18893,
+    "lng": 140.27197,
+    "notes": "茨城県石岡市府中２－８－１０スーパータイヨー内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 明野店\"",
+    "lat": 36.24925,
+    "lng": 140.04274,
+    "notes": "茨城県筑西市海老ケ島７６０－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 下館店\"",
+    "lat": 36.30651,
+    "lng": 139.98141,
+    "notes": "茨城県筑西市丙１８－１３",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア潮来店",
+    "lat": 35.94662,
+    "lng": 140.56532,
+    "notes": "茨城県潮来市須賀南３２１ベイシア潮来店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 土浦小松店\"",
+    "lat": 36.07231,
+    "lng": 140.20358,
+    "notes": "茨城県土浦市小松１－４－２７コープつちうらＳＣ内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "土浦ピアタウン店",
+    "lat": 36.09201,
+    "lng": 140.20901,
+    "notes": "茨城県土浦市真鍋新町１８－１３土浦ピアタウン　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "城里ショッピングプラザ店",
+    "lat": 36.47389,
+    "lng": 140.39026,
+    "notes": "茨城県東茨城郡城里町那珂西１４１３番地",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "大洗シーサイドステーション店",
+    "lat": 36.30924,
+    "lng": 140.56894,
+    "notes": "茨城県東茨城郡大洗町港中央１１－２大洗シーサイドステーション　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "カスミ舟石川店",
+    "lat": 36.47131,
+    "lng": 140.56537,
+    "notes": "茨城県那珂郡東海村東海３－１－２５カスミ舟石川店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "那珂菅谷店",
+    "lat": 36.43215,
+    "lng": 140.49576,
+    "notes": "茨城県那珂市菅谷３８８４－２",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 那珂店\"",
+    "lat": 36.45528,
+    "lng": 140.50101,
+    "notes": "茨城県那珂市菅谷字杉原６８９－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "ヒタチエ店",
+    "lat": 36.59176,
+    "lng": 140.65894,
+    "notes": "茨城県日立市幸町１－１６－１ヒタチエ　５Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "シーマークスクエア店",
+    "lat": 36.61742,
+    "lng": 140.67749,
+    "notes": "茨城県日立市東滑川町５－１－３シーマークスクエア　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "カインズ日立店",
+    "lat": 36.49181,
+    "lng": 140.60402,
+    "notes": "茨城県日立市留町字前川１２７０－２カインズ日立店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "ヨークタウン中郷店",
+    "lat": 36.78307,
+    "lng": 140.73297,
+    "notes": "茨城県北茨城市中郷町上桜井字細谷２８２４ヨークタウン中郷内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベルク龍ケ崎店",
+    "lat": 35.9311,
+    "lng": 140.16406,
+    "notes": "\"茨城県龍ケ崎市小柴１－７ベルク龍ケ崎店 １Ｆ\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "クイズモール龍ヶ崎店",
+    "lat": 35.92821,
+    "lng": 140.13365,
+    "notes": "茨城県龍ケ崎市小通幸谷町２８８クイズモール龍ヶ崎　２Ｆ",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 龍ヶ崎店\"",
+    "lat": 35.93332,
+    "lng": 140.20563,
+    "notes": "茨城県龍ケ崎市松ケ丘１－２－１",
+    "icon": "shop4",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "つくば店",
+    "lat": 36.084716,
+    "lng": 140.098262,
+    "notes": "茨城県つくば市研究学園7-43-4",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "牛久店",
+    "lat": 35.976204,
+    "lng": 140.151532,
+    "notes": "茨城県牛久市神谷1-1-7",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "\"BiG Berry下総古河店\"",
+    "lat": 36.207756,
+    "lng": 139.754786,
+    "notes": "茨城県古河市小堤2015番3",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "守谷店",
+    "lat": 35.966957,
+    "lng": 139.969834,
+    "notes": "茨城県守谷市松前台一丁目3番2",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "\"BiG Berry 常陸神栖店\"",
+    "lat": 35.923972,
+    "lng": 140.638597,
+    "notes": "茨城県神栖市堀割2-1-28",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "水戸店",
+    "lat": 36.348765,
+    "lng": 140.449371,
+    "notes": "茨城県水戸市笠原町1254-6",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "常陸いしおか店",
+    "lat": 36.186515,
+    "lng": 140.297553,
+    "notes": "茨城県石岡市東石岡4丁目9-35",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "\"BiG Berry常陸下館店\"",
+    "lat": 36.308468,
+    "lng": 139.967095,
+    "notes": "茨城県筑西市菅谷1543",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "\"BiG Berry日立6号店\"",
+    "lat": 36.630928,
+    "lng": 140.685091,
+    "notes": "茨城県日立市相田町2-1-5",
+    "icon": "shop2",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "group": "上州屋",
+    "name": "新つくば店",
+    "lat": 36.086634,
+    "lng": 140.074375,
+    "notes": "茨城県つくば市研究学園3-10-6",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "group": "上州屋",
+    "name": "牛久店",
+    "lat": 35.986101,
+    "lng": 140.155847,
+    "notes": "茨城県牛久市上柏田4-19-8",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "上州屋",
+    "name": "水戸店",
+    "lat": 36.348007,
+    "lng": 140.449445,
+    "notes": "茨城県水戸市笠原町1250",
+    "icon": "shop2",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "上州屋",
+    "name": "日立店",
+    "lat": 36.518642,
+    "lng": 140.627806,
+    "notes": "茨城県日立市水木町2-26-1",
+    "icon": "shop2",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "\"ＨＥＡＤＨＵＮＴＥＲＳ つくば\"",
+    "lat": 36.050949,
+    "lng": 140.125928,
+    "notes": "\"茨城県つくば市稲荷前２０−７ 101\"",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "フィッシュハンター",
+    "lat": 36.385264,
+    "lng": 140.615784,
+    "notes": "茨城県ひたちなか市阿字ケ浦町３２４２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "つりえさ天国三ツ又",
+    "lat": 36.338056,
+    "lng": 140.585701,
+    "notes": "茨城県ひたちなか市海門町２丁目１１−３９",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "海遊釣餌店",
+    "lat": 36.351983,
+    "lng": 140.607678,
+    "notes": "茨城県ひたちなか市殿山町２丁目１５−１５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "つり具フィッシュオン",
+    "lat": 36.352353,
+    "lng": 140.608864,
+    "notes": "茨城県ひたちなか市平磯町９９４−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "五来漁具店",
+    "lat": 36.340372,
+    "lng": 140.594321,
+    "notes": "茨城県ひたちなか市湊本町１７−１５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "武藤商店",
+    "lat": 36.341743,
+    "lng": 140.595875,
+    "notes": "茨城県ひたちなか市湊本町２２−３",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "平田釣具店",
+    "lat": 35.956326,
+    "lng": 140.322928,
+    "notes": "茨城県稲敷市江戸崎３２７８−９",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "\"AUTREC アウトレック\"",
+    "lat": 35.956841,
+    "lng": 140.50673,
+    "notes": "茨城県稲敷市大島１７５２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "寺田釣具本店",
+    "lat": 36.12255,
+    "lng": 139.798473,
+    "notes": "茨城県猿島郡境町長井戸１６２６−３",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "松本つり具店",
+    "lat": 36.185262,
+    "lng": 139.959622,
+    "notes": "茨城県下妻市下妻乙１７８",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "こやの釣具店",
+    "lat": 36.181952,
+    "lng": 139.951217,
+    "notes": "茨城県下妻市長塚６０−１９",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "笹屋商店",
+    "lat": 36.385035,
+    "lng": 140.251892,
+    "notes": "茨城県笠間市笠間１３２４",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "菊池つり具店",
+    "lat": 36.7551,
+    "lng": 140.379027,
+    "notes": "茨城県久慈郡大子町袋田２０７８",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "渡辺つり具店",
+    "lat": 35.979352,
+    "lng": 140.139335,
+    "notes": "茨城県牛久市田宮町２７−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "中山つり具店",
+    "lat": 36.154298,
+    "lng": 139.940388,
+    "notes": "茨城県結城郡八千代町仁江戸１６４７",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "\"フィッシングショップ 諸川\"",
+    "lat": 36.197929,
+    "lng": 139.818701,
+    "notes": "茨城県古河市諸川７７８−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "利根釣具店",
+    "lat": 36.04932,
+    "lng": 139.88579,
+    "notes": "茨城県坂東市岩井３３１９−５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "宮崎釣具店",
+    "lat": 36.046528,
+    "lng": 139.891905,
+    "notes": "茨城県坂東市岩井４２９４−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "キャロッセ",
+    "lat": 36.257529,
+    "lng": 140.079768,
+    "notes": "茨城県桜川市真壁町東山田３７８−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "清宮つり具店",
+    "lat": 36.036577,
+    "lng": 140.629526,
+    "notes": "茨城県鹿嶋市角折８８４−４",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "平山つり具店",
+    "lat": 35.966878,
+    "lng": 140.667315,
+    "notes": "茨城県鹿嶋市平井２０−１９３",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "一竿堂釣具店",
+    "lat": 35.894156,
+    "lng": 140.064872,
+    "notes": "茨城県取手市取手２丁目１１−９",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "我孫子屋釣具店",
+    "lat": 35.921544,
+    "lng": 140.109799,
+    "notes": "茨城県取手市藤代２０３４−２５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "つり具屋一本",
+    "lat": 35.967442,
+    "lng": 139.973526,
+    "notes": "\"茨城県守谷市久保ケ丘２丁目３−１７ くら27コーポ\"",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TSUKUBA"
+  },
+  {
+    "name": "大形屋商店",
+    "lat": 36.169678,
+    "lng": 140.352581,
+    "notes": "茨城県小美玉市小川１３４３−２５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "大黒屋釣具店",
+    "lat": 36.539076,
+    "lng": 140.523963,
+    "notes": "茨城県常陸太田市東二町２２５４−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "ふくだ",
+    "lat": 36.53437,
+    "lng": 140.525782,
+    "notes": "茨城県常陸太田市木崎二町２０１８−１０",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "つり具のむさし",
+    "lat": 36.548151,
+    "lng": 140.408053,
+    "notes": "茨城県常陸大宮市抽ヶ台町９０４−１３",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "鹿島つりえさセンター",
+    "lat": 35.875324,
+    "lng": 140.627317,
+    "notes": "茨城県神栖市息栖３３０−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "杉山つり具",
+    "lat": 35.875849,
+    "lng": 140.698406,
+    "notes": "茨城県神栖市知手中央９丁目７−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "釣具・三平",
+    "lat": 35.906442,
+    "lng": 140.624971,
+    "notes": "茨城県神栖市筒井１８２４",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "\"フィッシング 大洗店\"",
+    "lat": 36.334726,
+    "lng": 140.552458,
+    "notes": "茨城県水戸市塩崎町８３２−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "ポップ・エム",
+    "lat": 36.335095,
+    "lng": 140.464409,
+    "notes": "茨城県水戸市吉沢町１３８−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "つり具の魚眼",
+    "lat": 36.343158,
+    "lng": 140.476443,
+    "notes": "茨城県水戸市元吉田町１７７６−２５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "冨山釣具商会",
+    "lat": 36.361238,
+    "lng": 140.503638,
+    "notes": "茨城県水戸市酒門町２５４４−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "助川釣具店",
+    "lat": 36.391282,
+    "lng": 140.44946,
+    "notes": "茨城県水戸市上水戸３丁目３−２０",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "\"うみえさ本舗 釣侍 大洗店\"",
+    "lat": 36.335594,
+    "lng": 140.550653,
+    "notes": "茨城県水戸市大串町４０９６−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "池田釣具店(笑魚堂)",
+    "lat": 36.190142,
+    "lng": 140.276196,
+    "notes": "茨城県石岡市国府２丁目１−１５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "釣り具菱屋",
+    "lat": 36.193839,
+    "lng": 140.296816,
+    "notes": "茨城県石岡市石岡２７５５−１５",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "潮来つり具センター",
+    "lat": 35.935989,
+    "lng": 140.549245,
+    "notes": "茨城県潮来市あやめ１丁目１４−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "サイト５１",
+    "lat": 35.945213,
+    "lng": 140.553495,
+    "notes": "茨城県潮来市潮来１２４０−４",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "\"共栄つり具 魚遊堂\"",
+    "lat": 36.027057,
+    "lng": 140.160347,
+    "notes": "茨城県土浦市荒川沖１６１−１４",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "\"金太郎釣具 土浦店\"",
+    "lat": 36.021321,
+    "lng": 140.160095,
+    "notes": "茨城県土浦市荒川沖４−４７",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "鉾下釣具店",
+    "lat": 36.077224,
+    "lng": 140.20254,
+    "notes": "茨城県土浦市桜町１丁目１４−３",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "釣具のAZUMAN",
+    "lat": 36.059589,
+    "lng": 140.196989,
+    "notes": "\"茨城県土浦市小岩田西１丁目１−１ 張替ビル\"",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "プロショップランカーズ",
+    "lat": 36.069328,
+    "lng": 140.203616,
+    "notes": "茨城県土浦市小松１丁目１５−２",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "小林釣具店",
+    "lat": 36.481945,
+    "lng": 140.376107,
+    "notes": "茨城県東茨城郡城里町石塚１４３７−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "小林釣具店",
+    "lat": 36.481945,
+    "lng": 140.376107,
+    "notes": "茨城県東茨城郡城里町石塚１４３７−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "金丸釣具店",
+    "lat": 36.312587,
+    "lng": 140.579675,
+    "notes": "茨城県東茨城郡大洗町磯浜町３３３",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "安藤釣具店",
+    "lat": 36.31309,
+    "lng": 140.58518,
+    "notes": "茨城県東茨城郡大洗町磯浜町６８",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "大洗釣具店",
+    "lat": 36.316558,
+    "lng": 140.585115,
+    "notes": "茨城県東茨城郡大洗町磯浜町８２３４−２６１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "たちばな釣具店",
+    "lat": 36.304764,
+    "lng": 140.567919,
+    "notes": "茨城県東茨城郡大洗町港中央",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "大洗つりえさセンター",
+    "lat": 36.310765,
+    "lng": 140.568792,
+    "notes": "茨城県東茨城郡大洗町港中央２８−２７",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "まさきや・釣具店",
+    "lat": 36.481152,
+    "lng": 140.605112,
+    "notes": "茨城県那珂郡東海村豊岡４２８",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "アングラーズショップ豪海",
+    "lat": 36.500017,
+    "lng": 140.624066,
+    "notes": "\"茨城県日立市久慈町１丁目５−１４ マイネS2\"",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "千代本つり具店",
+    "lat": 36.483726,
+    "lng": 140.613691,
+    "notes": "茨城県日立市留町",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "千代本つり具店",
+    "lat": 36.483726,
+    "lng": 140.613691,
+    "notes": "茨城県日立市留町",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "ベストフィッシュ",
+    "lat": 36.077468,
+    "lng": 140.555478,
+    "notes": "茨城県鉾田市札８１８−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "富田商店",
+    "lat": 36.078191,
+    "lng": 140.554385,
+    "notes": "茨城県鉾田市札８４６",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "name": "うみえさ本舗釣侍北茨城店",
+    "lat": 36.827127,
+    "lng": 140.775827,
+    "notes": "茨城県北茨城市関南町神岡下２１９−８",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "\"アウトドアショップ FLAT2ND\"",
+    "lat": 36.829571,
+    "lng": 140.779401,
+    "notes": "茨城県北茨城市関南町神岡下２９１−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_HITACHI"
+  },
+  {
+    "name": "増山釣具店",
+    "lat": 35.924389,
+    "lng": 140.141631,
+    "notes": "茨城県龍ケ崎市若柴町３０５４−１",
+    "icon": "shop0",
+    "areaId": "IBARAKI_KASUMIGAURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン那須店",
+    "lat": 36.98523,
+    "lng": 140.06262,
+    "notes": "栃木県那須郡那須町高久甲483-3イオンタウン那須店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "那須塩原阿波店",
+    "lat": 36.97126,
+    "lng": 140.03439,
+    "notes": "栃木県那須塩原市阿波町117-20",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル那須塩原西富山店",
+    "lat": 36.90272,
+    "lng": 139.98409,
+    "notes": "栃木県那須塩原市西富山43-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスプラザ西那須野店",
+    "lat": 36.88602,
+    "lng": 139.97163,
+    "notes": "栃木県那須塩原市太夫塚6丁目232-109",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "大田原店",
+    "lat": 36.86481,
+    "lng": 140.01102,
+    "notes": "栃木県大田原市美原2丁目3174-47",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスプラザ大田原店",
+    "lat": 36.85774,
+    "lng": 140.02368,
+    "notes": "栃木県大田原市若松町1642-8アクロスプラザ大田原内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン矢板店",
+    "lat": 36.79894,
+    "lng": 139.92897,
+    "notes": "栃木県矢板市富田字原田171-1ヨークタウン矢板店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "リオンドール小川店",
+    "lat": 36.7532913,
+    "lng": 140.1299285,
+    "notes": "栃木県那須郡那珂川町小川175",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベイシアスーパーモール今市店",
+    "lat": 36.7396052,
+    "lng": 139.7082202,
+    "notes": "栃木県日光市芹沼字石神殿1470-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "今市大桑バイパス店",
+    "lat": 36.73492,
+    "lng": 139.69327,
+    "notes": "栃木県日光市今市1373-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォルテさくら氏家店",
+    "lat": 36.70887,
+    "lng": 139.96646,
+    "notes": "栃木県さくら市氏家3485-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "氏家店",
+    "lat": 36.67923,
+    "lng": 139.96057,
+    "notes": "栃木県さくら市卯の里3-42-9",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "たいらや烏山店",
+    "lat": 36.65362,
+    "lng": 140.15707,
+    "notes": "栃木県那須烏山市金井2-4-810-12",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "とりせんドラッグウェル高根沢店",
+    "lat": 36.61845,
+    "lng": 139.98895,
+    "notes": "栃木県塩谷郡高根沢町光陽台3-11-1とりせんドラックウェル高根沢店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミュゼ豊郷台店",
+    "lat": 36.60439,
+    "lng": 139.88464,
+    "notes": "\"栃木県宇都宮市豊郷台2-87 豊郷台ショッピングセンターミュゼ2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮御幸ヶ原店",
+    "lat": 36.59232,
+    "lng": 139.92715,
+    "notes": "栃木県宇都宮市御幸ケ原町65-2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "\"Standard Products 宇都宮御幸ヶ原店\"",
+    "lat": 36.59232,
+    "lng": 139.92715,
+    "notes": "栃木県宇都宮市御幸ケ原町65-2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮細谷SCア・ミューズ店",
+    "lat": 36.5903,
+    "lng": 139.85437,
+    "notes": "栃木県宇都宮市細谷1丁目6-25",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスプラザ宝木店",
+    "lat": 36.5854598,
+    "lng": 139.8516961,
+    "notes": "栃木県宇都宮市細谷町2601-4",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮東宝木店",
+    "lat": 36.58014,
+    "lng": 139.8632,
+    "notes": "栃木県宇都宮市東宝木町5-5",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮大曽シティーカルナ店",
+    "lat": 36.57387,
+    "lng": 139.89099,
+    "notes": "栃木県宇都宮市大曽3丁目4番5号",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮越戸ショッピングセンター店",
+    "lat": 36.56941,
+    "lng": 139.92477,
+    "notes": "栃木県宇都宮市越戸3-12-7越戸ショッピングセンターA棟",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮ゆいの杜店",
+    "lat": 36.56788,
+    "lng": 139.99689,
+    "notes": "栃木県宇都宮市ゆいの杜6丁目18-5",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル鹿沼千渡店",
+    "lat": 36.56754,
+    "lng": 139.77711,
+    "notes": "栃木県鹿沼市千渡1842",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "福田屋鹿沼店",
+    "lat": 36.56404,
+    "lng": 139.75186,
+    "notes": "\"栃木県鹿沼市東末広町1073 福田屋鹿沼店3階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや今泉店",
+    "lat": 36.56301,
+    "lng": 139.9079,
+    "notes": "栃木県宇都宮市元今泉3-4-13",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "トナリエ宇都宮店",
+    "lat": 36.56047,
+    "lng": 139.89708,
+    "notes": "栃木県宇都宮市駅前通り1-4-6トナリエ宇都宮4階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コープ宇都宮鶴田店",
+    "lat": 36.55946,
+    "lng": 139.85466,
+    "notes": "栃木県宇都宮市鶴田町866番地",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮テラス店",
+    "lat": 36.55943,
+    "lng": 139.89995,
+    "notes": "\"栃木県宇都宮市宮みらい1-1 宇都宮テラス3階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮東武店",
+    "lat": 36.55931,
+    "lng": 139.88028,
+    "notes": "\"栃木県宇都宮市宮園町5-4 東武宇都宮百貨店7階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "\"Standard Products 宇都宮東武店\"",
+    "lat": 36.55931,
+    "lng": 139.88028,
+    "notes": "\"栃木県宇都宮市宮園町5-4 東武宇都宮百貨店7階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルモール宇都宮店",
+    "lat": 36.55533,
+    "lng": 139.92844,
+    "notes": "栃木県宇都宮市陽東6-2-1ベルモール宇都宮店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "カルナ駅東店",
+    "lat": 36.5553,
+    "lng": 139.908,
+    "notes": "\"栃木県宇都宮市宿郷3-16-3 2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミライト一条店",
+    "lat": 36.55358,
+    "lng": 139.88051,
+    "notes": "\"栃木県宇都宮市一条1-4 ミライト一条店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル鹿沼店",
+    "lat": 36.55307,
+    "lng": 139.76921,
+    "notes": "栃木県鹿沼市西茂呂2-23-5",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "鹿沼茂呂店",
+    "lat": 36.54524,
+    "lng": 139.76732,
+    "notes": "栃木県鹿沼市西茂呂4丁目41-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アピタ宇都宮店",
+    "lat": 36.53158,
+    "lng": 139.86775,
+    "notes": "栃木県宇都宮市江曽島本町22-7",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル石井店",
+    "lat": 36.52895,
+    "lng": 139.92117,
+    "notes": "栃木県宇都宮市石井町3351-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル西川田店",
+    "lat": 36.5253,
+    "lng": 139.8513,
+    "notes": "栃木県宇都宮市西川田町920-2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "セイムスみどり野店",
+    "lat": 36.50098,
+    "lng": 139.86055,
+    "notes": "\"栃木県宇都宮市みどり野町15-6 セイムスみどり野店内\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "宇都宮雀宮店",
+    "lat": 36.49739,
+    "lng": 139.87267,
+    "notes": "栃木県宇都宮市雀の宮2丁目7番8号",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや雀宮店",
+    "lat": 36.49357,
+    "lng": 139.8709,
+    "notes": "栃木県宇都宮市雀の宮4丁目3-13",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン宇都宮針ヶ谷店",
+    "lat": 36.4921316,
+    "lng": 139.8558893,
+    "notes": "栃木県宇都宮市針ケ谷町字新田472-6",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ジョイフル本田宇都宮店",
+    "lat": 36.48238,
+    "lng": 139.90652,
+    "notes": "\"栃木県河内郡上三川町磯岡421-1 ジョイフル本田宇都宮2F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "かましん益子店",
+    "lat": 36.46749,
+    "lng": 140.09224,
+    "notes": "栃木県芳賀郡益子町益子2024",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "フレスポおもちゃのまち店",
+    "lat": 36.46287,
+    "lng": 139.84436,
+    "notes": "栃木県下都賀郡壬生町おもちゃのまち5丁目1番35号",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "北真岡店",
+    "lat": 36.44672,
+    "lng": 140.01692,
+    "notes": "栃木県真岡市荒町4-23-20",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "とりせん東光寺店",
+    "lat": 36.44157,
+    "lng": 140.02533,
+    "notes": "栃木県真岡市東光寺3-17-3",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ショッピングモールとりせん真岡店",
+    "lat": 36.43076,
+    "lng": 139.98747,
+    "notes": "栃木県真岡市下高間木2丁目10番地5",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "上三川店",
+    "lat": 36.4285,
+    "lng": 139.90675,
+    "notes": "栃木県河内郡上三川町大字上三川字庚申塚4396",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "生鮮市場TOP栃木合戦場店",
+    "lat": 36.4024516,
+    "lng": 139.7471067,
+    "notes": "栃木県栃木市都賀町合戦場字堀ノ内847",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン栃木平柳店",
+    "lat": 36.39408,
+    "lng": 139.75165,
+    "notes": "栃木県栃木市平柳町2丁目26番20号",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "とりせん栃木店",
+    "lat": 36.38645,
+    "lng": 139.71936,
+    "notes": "栃木県栃木市箱森町12-15",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "栃木国分寺町店",
+    "lat": 36.37144,
+    "lng": 139.84431,
+    "notes": "栃木県下野市駅東6丁目2-37",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "とりせん葉鹿店",
+    "lat": 36.36882,
+    "lng": 139.38718,
+    "notes": "\"栃木県足利市葉鹿町2-21-1 とりせん葉鹿店2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークベニマル小山羽川店",
+    "lat": 36.3682,
+    "lng": 139.83682,
+    "notes": "栃木県小山市大字羽川517-135",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヤオコー足利大前店",
+    "lat": 36.35632,
+    "lng": 139.4008,
+    "notes": "栃木県足利市大前町字仲田654-4ヤオコー足利大前店1階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "小山羽川ショッピングモール店",
+    "lat": 36.34994,
+    "lng": 139.82405,
+    "notes": "栃木県小山市大字羽川57",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークタウン栃木大平町店",
+    "lat": 36.347424,
+    "lng": 139.702891,
+    "notes": "栃木県栃木市大平町下皆川215番地2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アシコタウンあしかが店",
+    "lat": 36.3368,
+    "lng": 139.47729,
+    "notes": "栃木県足利市大月町3-2アシコタウンあしかが店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ハーヴェストウォーク小山店",
+    "lat": 36.33413,
+    "lng": 139.80692,
+    "notes": "栃木県小山市喜沢1475",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "栃木大平町西野田店",
+    "lat": 36.32892,
+    "lng": 139.7142,
+    "notes": "栃木県栃木市大平町西野田157番地",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "足利朝倉店",
+    "lat": 36.32199,
+    "lng": 139.45052,
+    "notes": "栃木県足利市朝倉町244",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや足利八幡店",
+    "lat": 36.32116,
+    "lng": 139.44249,
+    "notes": "栃木県足利市八幡町1丁目12-5",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "小山本郷店",
+    "lat": 36.31887,
+    "lng": 139.80786,
+    "notes": "栃木県小山市本郷町3丁目5番地28号",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン佐野店",
+    "lat": 36.31358,
+    "lng": 139.59082,
+    "notes": "栃木県佐野市浅沼町742イオンタウン佐野店2階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ジョイホン小山駅前店",
+    "lat": 36.31309,
+    "lng": 139.80763,
+    "notes": "\"栃木県小山市駅東通り2-3-15 ジョイホン小山駅前店2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "\"Standard Products ジョイホン小山駅前店\"",
+    "lat": 36.31309,
+    "lng": 139.80763,
+    "notes": "\"栃木県小山市駅東通り2-3-15 ジョイホン小山駅前店2階\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "小山ロブレ店",
+    "lat": 36.31266,
+    "lng": 139.80528,
+    "notes": "栃木県小山市中央町3-7-1小山ロブレビル4階",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "足利福居ショッピングセンター店",
+    "lat": 36.31126,
+    "lng": 139.44672,
+    "notes": "栃木県足利市福居町254-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "小山神鳥谷店",
+    "lat": 36.30584,
+    "lng": 139.79503,
+    "notes": "栃木県小山市神鳥谷692-12",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォリオ佐野店",
+    "lat": 36.30372,
+    "lng": 139.56541,
+    "notes": "栃木県佐野市赤坂町956-19",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ小山店",
+    "lat": 36.28992,
+    "lng": 139.80595,
+    "notes": "栃木県小山市西城南6-5-1マルエツ小山店内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "野木店",
+    "lat": 36.22688,
+    "lng": 139.73981,
+    "notes": "栃木県下都賀郡野木町大字丸林650-2",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや戸祭元町店",
+    "lat": 36.5706924,
+    "lng": 139.8789234,
+    "notes": "栃木県宇都宮市下戸祭町2丁目1番15号",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "小山粟宮店",
+    "lat": 36.2782372,
+    "lng": 139.782955,
+    "notes": "栃木県小山市粟宮396",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "DAISO",
+    "name": "カルナ市貝店",
+    "lat": 36.5368799,
+    "lng": 140.0866827,
+    "notes": "栃木県芳賀郡市貝町上根1462-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 那須塩原ショッピングセンター店\"",
+    "lat": 36.96252,
+    "lng": 140.06476,
+    "notes": "栃木県那須塩原市鍋掛字鍋掛原1087-24",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ヨークタウン大田原住吉店",
+    "lat": 36.87333,
+    "lng": 140.02396,
+    "notes": "栃木県大田原市住吉町2-7-2ヨークタウン大田原住吉内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア那須塩原店",
+    "lat": 36.86982,
+    "lng": 140.00108,
+    "notes": "\"栃木県那須塩原市緑2-1155-11ベイシア那須塩原店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシアさくら氏家店",
+    "lat": 36.66632,
+    "lng": 139.9595,
+    "notes": "\"栃木県さくら市氏家725ベイシアさくら氏家店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア烏山店",
+    "lat": 36.66035,
+    "lng": 140.15892,
+    "notes": "\"栃木県那須烏山市城東1880ベイシア烏山店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 高根沢店\"",
+    "lat": 36.62163,
+    "lng": 139.99226,
+    "notes": "栃木県塩谷郡高根沢町宝石台1-7-6",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "御幸ケ原店",
+    "lat": 36.5938,
+    "lng": 139.92703,
+    "notes": "栃木県宇都宮市御幸ケ原町59-11",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "カルナ駒生店",
+    "lat": 36.5786,
+    "lng": 139.84602,
+    "notes": "\"栃木県宇都宮市駒生町1288-1かましん駒生店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "FKD宇都宮店",
+    "lat": 36.57366,
+    "lng": 139.90004,
+    "notes": "\"栃木県宇都宮市今泉町237福田屋ショッピングプラザ宇都宮店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "鹿沼店",
+    "lat": 36.57151,
+    "lng": 139.75282,
+    "notes": "栃木県鹿沼市睦町287-1ビバモール鹿沼",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "MEGAドン・キホーテ宇都宮店",
+    "lat": 36.56092,
+    "lng": 139.88501,
+    "notes": "\"栃木県宇都宮市馬場通り2-3-12MEGAドン・キホーテ宇都宮店 4F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ヨークタウン鶴田店",
+    "lat": 36.54881,
+    "lng": 139.85185,
+    "notes": "栃木県宇都宮市鶴田町1425ヨークタウン鶴田内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "アクロスプラザ鹿沼店",
+    "lat": 36.54427,
+    "lng": 139.75095,
+    "notes": "栃木県鹿沼市上殿町字百目鬼903アクロスプラザ鹿沼内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ヨークタウン若松原店",
+    "lat": 36.50611,
+    "lng": 139.86668,
+    "notes": "栃木県宇都宮市北若松原1-14-13ヨークタウン若松原内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア益子店",
+    "lat": 36.49082,
+    "lng": 140.0983,
+    "notes": "\"栃木県芳賀郡益子町七井中央10-1ベイシア益子店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 おもちゃのまち店\"",
+    "lat": 36.46169,
+    "lng": 139.82657,
+    "notes": "栃木県下都賀郡壬生町至宝3-12-31とちぎコープおもちゃのまち店別棟",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "石橋店",
+    "lat": 36.43439,
+    "lng": 139.85915,
+    "notes": "栃木県下野市石橋778-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "たいらや栃木都賀店",
+    "lat": 36.4050662,
+    "lng": 139.7470346,
+    "notes": "栃木県栃木市都賀町平川674",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン栃木店",
+    "lat": 36.39559,
+    "lng": 139.72264,
+    "notes": "\"栃木県栃木市箱森町37-9イオン栃木店 2F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 ヤオハンプラザアイム店\"",
+    "lat": 36.39071,
+    "lng": 139.73572,
+    "notes": "\"栃木県栃木市昭和町3-1ヤオハンプラザアイム店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 カスミ二宮店\"",
+    "lat": 36.38379,
+    "lng": 139.97134,
+    "notes": "栃木県真岡市石島815",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "自治医大店",
+    "lat": 36.38322,
+    "lng": 139.85143,
+    "notes": "栃木県下野市緑2-12-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア小山店",
+    "lat": 36.3282924,
+    "lng": 139.7888175,
+    "notes": "栃木県小山市城西2-13-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "とりせん佐野西店",
+    "lat": 36.32499,
+    "lng": 139.56734,
+    "notes": "栃木県佐野市堀米町2559-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール小山店",
+    "lat": 36.32182,
+    "lng": 139.84045,
+    "notes": "\"栃木県小山市中久喜1467-1イオンモール小山 2F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "アピタ足利店",
+    "lat": 36.32058,
+    "lng": 139.44989,
+    "notes": "\"栃木県足利市朝倉町245アピタ足利店 3F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "とりせん大平店",
+    "lat": 36.31836,
+    "lng": 139.71396,
+    "notes": "\"栃木県栃木市大平町西水代1837-1とりせん大平店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "足利店",
+    "lat": 36.30896,
+    "lng": 139.44011,
+    "notes": "栃木県足利市堀込町字宮前250-1",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "カインズ佐野店",
+    "lat": 36.308725,
+    "lng": 139.588681,
+    "notes": "栃木県佐野市浅沼町字辰巳240",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "ヨークタウン佐野田島町店",
+    "lat": 36.2992521,
+    "lng": 139.5676111,
+    "notes": "\"栃木県佐野市田島町字東47-5ヨークタウン佐野田島町店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール佐野新都市店",
+    "lat": 36.29879,
+    "lng": 139.60616,
+    "notes": "\"栃木県佐野市高萩町1324-1イオンモール佐野新都市 2F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "\"生活良品 とりせん小山東店\"",
+    "lat": 36.28175,
+    "lng": 139.82458,
+    "notes": "\"栃木県小山市横倉新田291-1とりせん小山東店 2F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "フォルテ間々田店",
+    "lat": 36.26631,
+    "lng": 139.77391,
+    "notes": "栃木県小山市美しが丘1-19-1フォルテ間々田内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "TAIRAYA野木店",
+    "lat": 36.23587,
+    "lng": 139.74467,
+    "notes": "栃木県下都賀郡野木町丸林607-4",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "フレスポうつのみや市場店",
+    "lat": 36.5455814,
+    "lng": 139.8932947,
+    "notes": "\"栃木県宇都宮市簗瀬町1508-2フレスポうつのみや市場内 2F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "とりせん上厚崎店",
+    "lat": 36.9547921,
+    "lng": 140.0314077,
+    "notes": "栃木県那須塩原市上厚崎219-3",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン日光今市店",
+    "lat": 36.7311581,
+    "lng": 139.703573,
+    "notes": "\"栃木県日光市豊田79-1イオン日光今市店 1F\"",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "セリア",
+    "name": "モテナス芳賀店",
+    "lat": 36.54624,
+    "lng": 140.060078,
+    "notes": "栃木県芳賀郡芳賀町祖母井南1-11-1モテナス芳賀内",
+    "icon": "shop4",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "\"BiG Berry 栃木大田原店\"",
+    "lat": 36.85691,
+    "lng": 140.01875,
+    "notes": "栃木県大田原市浅香3丁目3601-8",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "宇都宮店",
+    "lat": 36.51871,
+    "lng": 139.87704,
+    "notes": "\"栃木県宇都宮市台新田町159-1 ベルプラザHI 1F-A\"",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "\"BiG Berry 栃木バイパス店\"",
+    "lat": 36.38369,
+    "lng": 139.71651,
+    "notes": "栃木県栃木市薗部町1丁目21-20",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "佐野店",
+    "lat": 36.3032,
+    "lng": 139.59045,
+    "notes": "栃木県佐野市高萩町508-3",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "小山店",
+    "lat": 36.29726,
+    "lng": 139.80688,
+    "notes": "栃木県小山市西城南3-12-9",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "上州屋",
+    "name": "新西那須野店",
+    "lat": 36.9009,
+    "lng": 139.97888,
+    "notes": "栃木県那須塩原市東三島5丁目96-3",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "上州屋",
+    "name": "宇都宮店",
+    "lat": 36.56095,
+    "lng": 139.90321,
+    "notes": "栃木県宇都宮市元今泉1-7-23",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "上州屋",
+    "name": "キャンベル宇都宮店",
+    "lat": 36.56019,
+    "lng": 139.90425,
+    "notes": "栃木県宇都宮市元今泉4-19-1",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "上州屋",
+    "name": "鹿沼店",
+    "lat": 36.54404,
+    "lng": 139.76741,
+    "notes": "栃木県鹿沼市西茂呂4-45-6",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "上州屋",
+    "name": "新真岡店",
+    "lat": 36.42967,
+    "lng": 139.98718,
+    "notes": "栃木県真岡市下高間木2-12-3",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "上州屋",
+    "name": "足利店",
+    "lat": 36.30529,
+    "lng": 139.47099,
+    "notes": "栃木県足利市福富町1098",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "group": "上州屋",
+    "name": "小山駅南店",
+    "lat": 36.29954,
+    "lng": 139.80684,
+    "notes": "栃木県小山市西城南3-1-14",
+    "icon": "shop2",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "(有)平山釣具店",
+    "lat": 36.96984,
+    "lng": 140.0582,
+    "notes": "栃木県那須塩原市本町5-16",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "叉鬼",
+    "lat": 36.96325,
+    "lng": 139.83992,
+    "notes": "栃木県那須塩原市塩原243-2",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "\"WILD-1 西那須野店\"",
+    "lat": 36.89169,
+    "lng": 139.97929,
+    "notes": "栃木県那須塩原市五軒町5-41",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "かざりや釣具店",
+    "lat": 36.80875,
+    "lng": 139.92821,
+    "notes": "栃木県矢板市本町9-23",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "神山釣具店",
+    "lat": 36.80516,
+    "lng": 139.70761,
+    "notes": "栃木県日光市鬼怒川温泉大原1331-6",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "大島つり具店",
+    "lat": 36.7414,
+    "lng": 139.49435,
+    "notes": "栃木県日光市中宮祠2478",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "\"Surface Outfitters\"",
+    "lat": 36.72472,
+    "lng": 139.68797,
+    "notes": "栃木県日光市今市712-10",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "フィッシングめだか",
+    "lat": 36.70282,
+    "lng": 140.15442,
+    "notes": "栃木県那須烏山市大桶988-3",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "港屋",
+    "lat": 36.65348,
+    "lng": 140.15242,
+    "notes": "栃木県那須烏山市金井1丁目8-13",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "たけや",
+    "lat": 36.65295,
+    "lng": 140.16931,
+    "notes": "栃木県那須烏山市宮原180",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "\"つり具おおつか 宇都宮店\"",
+    "lat": 36.59052,
+    "lng": 139.91621,
+    "notes": "栃木県宇都宮市下川俣町206-7",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "\"タックルショップ R\"",
+    "lat": 36.5718413,
+    "lng": 139.9095705,
+    "notes": "\"栃木県宇宇都宮市中今泉1丁目21-12 Tビル 1階\"",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "B.B.MAX宇都宮店",
+    "lat": 36.54546,
+    "lng": 139.88066,
+    "notes": "栃木県宇都宮市不動前2丁目2-42",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "加藤釣具店",
+    "lat": 36.54485,
+    "lng": 139.94684,
+    "notes": "栃木県宇都宮市石井町2401",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "ふじや商店",
+    "lat": 36.5169,
+    "lng": 139.67162,
+    "notes": "栃木県鹿沼市口粟野833",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "WILD-1宇都宮西川田店",
+    "lat": 36.51492,
+    "lng": 139.84496,
+    "notes": "栃木県宇都宮市西川田本町3丁目4-5",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "ほその釣具店",
+    "lat": 36.46431,
+    "lng": 140.09512,
+    "notes": "栃木県芳賀郡益子町益子1796",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "山上湖",
+    "lat": 36.42951,
+    "lng": 139.90932,
+    "notes": "栃木県河内郡上三川町上三川4388-1",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "山野井つり具店",
+    "lat": 36.40435,
+    "lng": 139.61078,
+    "notes": "栃木県佐野市葛生東2丁目1-2",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "よろ幸",
+    "lat": 36.37886,
+    "lng": 139.73273,
+    "notes": "栃木県栃木市倭町6-4",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "岩上釣具",
+    "lat": 36.33472,
+    "lng": 139.46265,
+    "notes": "栃木県足利市大橋町2丁目1811",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "三陽釣具",
+    "lat": 36.32346,
+    "lng": 139.56409,
+    "notes": "栃木県佐野市堀米町3856-1",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "赤坂提灯店",
+    "lat": 36.31424,
+    "lng": 139.57042,
+    "notes": "栃木県佐野市大町3026",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "\"(有)スズキつり具店 東店\"",
+    "lat": 36.30927,
+    "lng": 139.83414,
+    "notes": "栃木県小山市犬塚4丁目1-10",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "(有)長島商事",
+    "lat": 36.23115,
+    "lng": 139.73523,
+    "notes": "\"栃木県下都賀郡野木町丸林408-1 長島ビル\"",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "\"アイコー 境店\"",
+    "lat": 36.13033,
+    "lng": 139.80247,
+    "notes": "茨城県猿島郡境町長井戸731-14",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "寺田釣具本店",
+    "lat": 36.12284,
+    "lng": 139.79805,
+    "notes": "茨城県猿島郡境町長井戸1626-3",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "かみやまつり具店",
+    "lat": 36.6906071,
+    "lng": 139.9476843,
+    "notes": "栃木県さくら市馬場1689-4",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "よしのや釣具店",
+    "lat": 36.8779772,
+    "lng": 140.1196889,
+    "notes": "栃木県大田原市黒羽向町1372",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "人見釣具店",
+    "lat": 36.8608854,
+    "lng": 140.1166248,
+    "notes": "栃木県大田原市黒羽向町50-2",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "ヤナセ釣具店",
+    "lat": 36.8596148,
+    "lng": 140.1214758,
+    "notes": "栃木県大田原市黒羽田町589",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  },
+  {
+    "name": "おたま小川店",
+    "lat": 36.762136,
+    "lng": 140.129225,
+    "notes": "栃木県那須郡那珂川町小川2585",
+    "icon": "shop0",
+    "areaId": "IBARAKI_TOCHIGI"
+  }
+]
