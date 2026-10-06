@@ -1316,105 +1316,103 @@ li {
 .shop-popup {
     font-size: 13px;
     line-height: 1.4;
+    color: #191970;
 }
 
 .shop-popup-title {
     font-weight: bold;
+    font-size: 14px;
     margin-bottom: 4px;
     padding-right: 20px;
+    color: #191970;
 }
 
-
-
-
-
-
-.shop-popup-btn::after {
-    content: none !important;
-}
 .shop-popup-address {
     font-size: 12px;
-    color: #191970; /* ★ 修正：#555 から変更 */
+    color: #222222 !important;
     opacity: 0.8;
     margin-bottom: 6px;
+    line-height: 1.3;
 }
 
 .shop-popup-address.dummy {
     font-size: 12px;
-    color: #191970; /* ★ 修正：#555 から変更 */
+    color: #222222 !important;
     opacity: 0.8;
     margin-bottom: 6px;
     padding-right: 20px;
 }
+
 /* ポップアップ下部のボタングループ */
 .shop-popup-footer {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
+    gap: 6px;
+    margin-top: 10px;
 }
 
-/* Gemini風：シャドウで浮かせる白いボタン */
+/* Gemini風：シャドウで浮かせる白いボタン（ダークグレー文字） */
 .shop-popup-btn {
     flex: 1 1 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px;
+    padding: 7px 10px;
     font-size: 12px;
     font-weight: bold;
-    color: #1f1f1f; /* 落ち着いたダークグレー */
-    background-color: #ffffff;
-    text-decoration: none;
+    color: #222222 !important; /* ★ 3つのボタン全てをダークグレーに統一 */
+    background-color: #ffffff !important;
+    text-decoration: none !important;
     border-radius: 8px;
     border: 1px solid #eef0f3;
-    /* ふわっと浮き上がらせる柔らかなシャドウ */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
     white-space: nowrap;
     transition: all 0.15s ease;
 }
 
+.shop-popup-btn::after {
+    content: none !important;
+}
+
+/* ChatGPTボタン専用の色指定を無効化し共通の見た目に統一 */
+.shop-popup-btn.btn-chatgpt {
+    color: #222222 !important;
+    background-color: #ffffff !important;
+}
+
 /* タップ/ホバー時のわずかな押し込み演出 */
 .shop-popup-btn:active {
-    background-color: #f7f9fb;
+    background-color: #f7f9fb !important;
     transform: translateY(1px);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 @media (hover: hover) and (pointer: fine) {
     .shop-popup-btn:hover {
-        background-color: #fdfdfd;
+        background-color: #fdfdfd !important;
         border-color: #dce1e8;
         box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
     }
 }
-
-/* 個別色（緑など）のベタ塗りは全廃し、共通の白ボタンとして統一 */
-.shop-popup-btn.btn-chatgpt {
-    background-color: #ffffff;
-}
-
-
 
 /* =========================
    LEAFLET POPUP FIX
 ========================= */
 .leaflet-popup-content-wrapper {
     padding: 4px;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .leaflet-popup-content {
-    margin: 6px 8px;
+    margin: 8px 10px;
 }
 
 .leaflet-popup-tip,
 .leaflet-popup-tip-container {
     display: none;
 }
-
 
 
 /* =========================
