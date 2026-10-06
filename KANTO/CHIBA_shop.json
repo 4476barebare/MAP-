@@ -1,0 +1,3468 @@
+[
+  {
+    "group": "セリア",
+    "name": "TAIRAYA宝珠花店",
+    "lat": 36.02793,
+    "lng": 139.82101,
+    "notes": "千葉県野田市東宝珠花126-1TAIRAYA宝珠花店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン野田七光台店",
+    "lat": 35.98158,
+    "lng": 139.85326,
+    "notes": "千葉県野田市七光台4-2 イオンタウン野田七光台店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルクスステーションモール七光台店",
+    "lat": 35.97046,
+    "lng": 139.85176,
+    "notes": "千葉県野田市光葉町1-6ベルクスステーションモール七光台2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア野田さくらの里店",
+    "lat": 35.95425,
+    "lng": 139.84689,
+    "notes": "千葉県野田市桜の里2-1ベイシア野田さくらの里店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークプライス野田店",
+    "lat": 35.95018,
+    "lng": 139.86281,
+    "notes": "千葉県野田市野田721番地1ヨークプライス野田店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "野田パルノア店",
+    "lat": 35.94903,
+    "lng": 139.87527,
+    "notes": "千葉県野田市中根新田字鹿島原57-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ウニクス野田店",
+    "lat": 35.94463,
+    "lng": 139.85005,
+    "notes": "千葉県野田市つつみ野1-1-2ウニクス野田内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "白石商店",
+    "lat": 35.93949,
+    "lng": 139.85114,
+    "notes": "千葉県野田市中野台680",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎野田山崎店",
+    "lat": 35.92638,
+    "lng": 139.89258,
+    "notes": "千葉県野田市山崎2196",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや野田みずき店",
+    "lat": 35.92454,
+    "lng": 139.88438,
+    "notes": "千葉県野田市みずき1丁目15-5",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "野田みずきショッピングセンター店",
+    "lat": 35.92342,
+    "lng": 139.88582,
+    "notes": "千葉県野田市みずき2-12野田みずきショッピングセンター内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベルク流山東深井店",
+    "lat": 35.91183,
+    "lng": 139.91002,
+    "notes": "千葉県流山市東深井871-35ベルク流山東深井店 別棟",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "プロショップケイズ",
+    "lat": 35.90334,
+    "lng": 140.49196,
+    "notes": "千葉県香取市佐原ロ2018-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "セリア",
+    "name": "柏の葉公園店",
+    "lat": 35.902,
+    "lng": 139.93605,
+    "notes": "千葉県柏市柏の葉5-5-6",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 佐原店",
+    "lat": 35.90056,
+    "lng": 140.4937,
+    "notes": "千葉県香取市佐原イ4187-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 佐原バイパス店",
+    "lat": 35.90056,
+    "lng": 140.4937,
+    "notes": "千葉県香取市佐原イ4196-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サワラシティ店",
+    "lat": 35.89992,
+    "lng": 140.48936,
+    "notes": "千葉県香取市佐原ホ1236-1ショッピングモールサワラシティ2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "セリア",
+    "name": "江戸川台店",
+    "lat": 35.89897,
+    "lng": 139.91107,
+    "notes": "千葉県流山市江戸川台東2-31カドヤ第1ビル 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "つり善",
+    "lat": 35.89814,
+    "lng": 139.90823,
+    "notes": "千葉県流山市江戸川台西1丁目57",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "シー&リバーときわ",
+    "lat": 35.89752,
+    "lng": 139.90704,
+    "notes": "千葉県流山市江戸川台西1丁目24-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "へら竿のときわ",
+    "lat": 35.89752,
+    "lng": 139.90704,
+    "notes": "千葉県流山市江戸川台西1丁目24-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークマート花野井店",
+    "lat": 35.89385,
+    "lng": 139.96371,
+    "notes": "千葉県柏市花野井681ヨークマート花野井店",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ららぽーと柏の葉店",
+    "lat": 35.89335,
+    "lng": 139.95119,
+    "notes": "千葉県柏市若柴175ららぽーと柏の葉1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ北柏店",
+    "lat": 35.88996,
+    "lng": 139.97154,
+    "notes": "千葉県柏市松葉町4-5マルエツ北柏店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "柏西原店",
+    "lat": 35.88709,
+    "lng": 139.92773,
+    "notes": "千葉県柏市西原7-8-12 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ初石店",
+    "lat": 35.88509,
+    "lng": 139.91945,
+    "notes": "千葉県流山市東初石3-94-1マルエツ初石店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "モラージュ柏店",
+    "lat": 35.88263,
+    "lng": 139.96924,
+    "notes": "千葉県柏市大山台2-3-1モラージュ柏店 Part.2",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン松ヶ崎店",
+    "lat": 35.88021,
+    "lng": 139.96765,
+    "notes": "千葉県柏市大山台1丁目6番地イオンタウン松ヶ崎店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォルテ我孫子店",
+    "lat": 35.87801,
+    "lng": 140.00722,
+    "notes": "千葉県我孫子市つくし野4-1-2",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "上州屋",
+    "name": "我孫子店",
+    "lat": 35.87784,
+    "lng": 139.998,
+    "notes": "千葉県我孫子市根戸1187",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "ブンブン",
+    "name": "ミシマ6号北柏店",
+    "lat": 35.87666,
+    "lng": 139.99097,
+    "notes": "千葉県柏市北柏台2-4",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "我孫子水戸街道店",
+    "lat": 35.8766,
+    "lng": 140.01996,
+    "notes": "千葉県我孫子市並木6-13-12",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "あびこショッピングプラザ店",
+    "lat": 35.87648,
+    "lng": 140.00951,
+    "notes": "千葉県我孫子市我孫子4-11-1あびこショッピングプラザ 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "アクロスプラザ北柏店",
+    "lat": 35.87448,
+    "lng": 139.98541,
+    "notes": "千葉県柏市北柏駅北口土地区画整理事業地区内28街区1アクロスプラザ北柏内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "我孫子天王台店",
+    "lat": 35.87218,
+    "lng": 140.04007,
+    "notes": "千葉県我孫子市天王台1-24-18",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "流山おおたかの森S・C店",
+    "lat": 35.87065,
+    "lng": 139.92299,
+    "notes": "千葉県流山市おおたかの森西1-13-1流山おおたかの森S・C ANNEX2 4F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "マルエツ天王台店",
+    "lat": 35.87061,
+    "lng": 140.03787,
+    "notes": "千葉県我孫子市天王台4-15-8マルエツ天王台店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "TAIRAYA湖北店",
+    "lat": 35.86804,
+    "lng": 140.07866,
+    "notes": "千葉県我孫子市中里字庚申前335-1 TAIRAYA湖北店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "キャスティング",
+    "name": "柏店",
+    "lat": 35.86798,
+    "lng": 139.92857,
+    "notes": "千葉県柏市豊四季114-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "我孫子手賀沼公園店",
+    "lat": 35.86702,
+    "lng": 140.01405,
+    "notes": "千葉県我孫子市緑1-9-25 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "フードスクエア我孫子寿店",
+    "lat": 35.86506,
+    "lng": 140.02484,
+    "notes": "千葉県我孫子市寿2-25-41フードスクエア我孫子寿店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "流山おおたかの森店",
+    "lat": 35.86463,
+    "lng": 139.92041,
+    "notes": "千葉県流山市おおたかの森南三丁目8番地",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "高橋つり具",
+    "lat": 35.86173,
+    "lng": 140.60707,
+    "notes": "千葉県香取市小見川5629",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "スカイプラザ柏店",
+    "lat": 35.86163,
+    "lng": 139.97092,
+    "notes": "千葉県柏市柏1-1-20スカイプラザ柏地下1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "柏モディ店",
+    "lat": 35.86059,
+    "lng": 139.97069,
+    "notes": "千葉県柏市柏1-2-26柏モディ 6F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "小見川アピオ店",
+    "lat": 35.86051,
+    "lng": 140.59755,
+    "notes": "千葉県香取市分郷218",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ドン・キホーテ柏駅前店",
+    "lat": 35.86049,
+    "lng": 139.97136,
+    "notes": "千葉県柏市柏1-3-1ドン・キホーテ柏駅前店内4階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや豊四季店",
+    "lat": 35.85927,
+    "lng": 139.94965,
+    "notes": "千葉県柏市豊四季285番地",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "布佐店",
+    "lat": 35.85901,
+    "lng": 140.10968,
+    "notes": "千葉県我孫子市布佐2499-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "つり具のつくば屋",
+    "lat": 35.85765,
+    "lng": 140.61128,
+    "notes": "千葉県香取市小見川4866-314",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マミーマート柏若葉町店",
+    "lat": 35.85464,
+    "lng": 139.96902,
+    "notes": "千葉県柏市若葉町3-41マミーマート柏若葉町店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール柏店",
+    "lat": 35.85194,
+    "lng": 139.96107,
+    "notes": "千葉県柏市豊町2-5-25 イオンモール柏店3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "キャスティング",
+    "name": "南柏店",
+    "lat": 35.84486,
+    "lng": 139.94902,
+    "notes": "千葉県流山市松ヶ丘3-305-8",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "キュア・ラ南柏店",
+    "lat": 35.8436,
+    "lng": 139.95403,
+    "notes": "千葉県柏市南柏中央3-2キュア・ラ2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "パズ新柏店",
+    "lat": 35.84328,
+    "lng": 139.98106,
+    "notes": "千葉県柏市名戸ヶ谷888-1 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスプラザ流山店",
+    "lat": 35.84269,
+    "lng": 139.94743,
+    "notes": "千葉県流山市向小金1丁目241-1アクロスプラザ流山店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "さかえつり具",
+    "lat": 35.84158,
+    "lng": 139.95502,
+    "notes": "千葉県柏市今谷上町43-34",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ安食店",
+    "lat": 35.84135,
+    "lng": 140.24489,
+    "notes": "千葉県印旛郡栄町安食台1-3-4マルエツ安食店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "千葉流山街道店",
+    "lat": 35.84093,
+    "lng": 139.8969,
+    "notes": "千葉県流山市南流山7-1-17",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "佐藤つり具店",
+    "lat": 35.8405,
+    "lng": 140.15393,
+    "notes": "千葉県印西市木下1402",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン南流山店",
+    "lat": 35.83789,
+    "lng": 139.90645,
+    "notes": "千葉県流山市南流山9-16-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ヤオコー南流山店",
+    "lat": 35.83789,
+    "lng": 139.90645,
+    "notes": "千葉県流山市南流山9-16-2ヤオコー南流山店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピアシティ柏中新宿店",
+    "lat": 35.83384,
+    "lng": 139.94734,
+    "notes": "千葉県柏市中新宿3丁目11-1ピアシティ柏中新宿店 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "セブンパークアリオ柏店",
+    "lat": 35.83376,
+    "lng": 140.0117,
+    "notes": "千葉県柏市大島田1丁目6-1セブンパークアリオ柏2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン北小金店",
+    "lat": 35.83289,
+    "lng": 139.93144,
+    "notes": "千葉県松戸市小金1 イオン北小金4階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "北小金店",
+    "lat": 35.83178,
+    "lng": 139.93314,
+    "notes": "千葉県松戸市小金40-1コモディイイダ北小金店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "新松戸5丁目店",
+    "lat": 35.828,
+    "lng": 139.90881,
+    "notes": "千葉県松戸市新松戸5-134 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "ブンブン",
+    "name": "柏店",
+    "lat": 35.82797,
+    "lng": 140.0152,
+    "notes": "千葉県柏市風早1-6-7",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ヤオコー柏高柳駅前店",
+    "lat": 35.82221,
+    "lng": 140.0013,
+    "notes": "千葉県柏市高柳1-6-6ヤオコー柏高柳駅前店 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "松戸小金原店",
+    "lat": 35.81887,
+    "lng": 139.94481,
+    "notes": "千葉県松戸市小金原6丁目5-1 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "テラスモール松戸店",
+    "lat": 35.81767,
+    "lng": 139.93282,
+    "notes": "千葉県松戸市八ヶ崎2-8-1テラスモール松戸3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや松戸栄町店",
+    "lat": 35.81093,
+    "lng": 139.89461,
+    "notes": "千葉県松戸市栄町西4丁目1193",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "フォレストモール印西牧の原店",
+    "lat": 35.8067,
+    "lng": 140.17862,
+    "notes": "千葉県印西市滝野3-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "牧の原モア店",
+    "lat": 35.80454,
+    "lng": 140.16643,
+    "notes": "千葉県印西市牧の原1-3",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "カインズ千葉ニュータウン店",
+    "lat": 35.80434,
+    "lng": 140.12485,
+    "notes": "千葉県印西市泉野1-144-6 カインズ千葉ニュータウン店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ビッグホップガーデンモール印西店",
+    "lat": 35.80307,
+    "lng": 140.16489,
+    "notes": "千葉県印西市原1-2ビッグホップガーデンモール印西 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "セブンタウン常盤平店",
+    "lat": 35.80287,
+    "lng": 139.95126,
+    "notes": "千葉県松戸市常盤平3-10-1セブンタウン常盤平2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎千葉ニュータウン店",
+    "lat": 35.8028,
+    "lng": 140.11604,
+    "notes": "千葉県印西市中央北1-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友常盤平店",
+    "lat": 35.80199,
+    "lng": 139.9514,
+    "notes": "千葉県松戸市常盤平3-11-1西友常盤平店 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール千葉NT店",
+    "lat": 35.8016,
+    "lng": 140.11069,
+    "notes": "千葉県印西市中央北2-2イオンモール千葉NTエンジョイライフ棟2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ラコマート北松戸店",
+    "lat": 35.79973,
+    "lng": 139.91388,
+    "notes": "千葉県松戸市北松戸2-6-1 ラコマート北松戸店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "千葉ニュータウン店",
+    "lat": 35.7993,
+    "lng": 140.10902,
+    "notes": "千葉県白井市桜台1-1-13アクロスプラザ千葉ニュータウン西内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "ポイント",
+    "name": "千葉ニュータウン店",
+    "lat": 35.7993,
+    "lng": 140.10902,
+    "notes": "千葉県白井市桜台1-1-5",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "松戸六高台店",
+    "lat": 35.79904,
+    "lng": 139.98422,
+    "notes": "千葉県松戸市六高台7-73",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "フォルテ千葉ニュータウン店",
+    "lat": 35.79822,
+    "lng": 140.11366,
+    "notes": "千葉県印西市中央南2-2-1フォルテ千葉ニュータウン店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "五香駅西口ビル店",
+    "lat": 35.79715,
+    "lng": 139.96577,
+    "notes": "千葉県松戸市常盤平5-19-1 3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "プラッツ五香店",
+    "lat": 35.79627,
+    "lng": 139.98067,
+    "notes": "千葉県松戸市五香8-44-6プラッツ五香店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ヤオコー松戸上本郷店",
+    "lat": 35.79572,
+    "lng": 139.91885,
+    "notes": "千葉県松戸市上本郷4005-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール成田店",
+    "lat": 35.79525,
+    "lng": 140.31891,
+    "notes": "千葉県成田市ウイング土屋24番地 イオンモール成田店1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "ヘッドハンターズ",
+    "lat": 35.79517,
+    "lng": 140.31923,
+    "notes": "千葉県成田市ウイング土屋256",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "八柱駅ビル店",
+    "lat": 35.79206,
+    "lng": 139.93851,
+    "notes": "千葉県松戸市日暮1-1-1八柱駅第2ビル 1F A号室",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "ホワイトバス",
+    "lat": 35.7917,
+    "lng": 139.90866,
+    "notes": "千葉県松戸市南花島4丁目68-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "松戸六号店",
+    "lat": 35.78953,
+    "lng": 139.91011,
+    "notes": "千葉県松戸市南花島3丁目40-11",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "フォルテ白井店",
+    "lat": 35.78924,
+    "lng": 140.04736,
+    "notes": "千葉県白井市根476-2フォルテ白井内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピアザ松戸店",
+    "lat": 35.78486,
+    "lng": 139.90105,
+    "notes": "千葉県松戸市松戸1230-1ピアザ松戸店4階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "プラーレ松戸店",
+    "lat": 35.78289,
+    "lng": 139.9025,
+    "notes": "千葉県松戸市松戸1149-1プラーレ松戸店内4階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎白井店",
+    "lat": 35.78259,
+    "lng": 140.04819,
+    "notes": "千葉県白井市根143-5",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "上州屋",
+    "name": "松戸店",
+    "lat": 35.78232,
+    "lng": 139.89893,
+    "notes": "千葉県松戸市松戸1307-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "キテミテマツド店",
+    "lat": 35.78232,
+    "lng": 139.89893,
+    "notes": "千葉県松戸市松戸1307-1キテミテマツド 5F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "西白井店",
+    "lat": 35.78212,
+    "lng": 140.02859,
+    "notes": "千葉県白井市根字木戸前1029-3",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロス新鎌ヶ谷店",
+    "lat": 35.78014,
+    "lng": 140.00142,
+    "notes": "千葉県鎌ケ谷市新鎌ケ谷二丁目12番1号2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン鎌ヶ谷店",
+    "lat": 35.77971,
+    "lng": 140.00137,
+    "notes": "千葉県鎌ケ谷市新鎌ケ谷2-7-1イオン鎌ヶ谷店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "新鎌ヶ谷店",
+    "lat": 35.77952,
+    "lng": 140.00699,
+    "notes": "千葉県鎌ケ谷市新鎌ケ谷3-16-10",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "ゴルフランド白井店",
+    "lat": 35.77914,
+    "lng": 140.02792,
+    "notes": "千葉県白井市冨士268-2",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マミーマート松戸新田店",
+    "lat": 35.7789,
+    "lng": 139.9174,
+    "notes": "千葉県松戸市松戸新田30-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "そよら成田ニュータウン店",
+    "lat": 35.77824,
+    "lng": 140.29073,
+    "notes": "千葉県成田市赤坂2-1-10 そよら成田ニュータウン3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン成田富里店",
+    "lat": 35.778,
+    "lng": 140.32346,
+    "notes": "千葉県成田市東町133番地イオンタウン成田富里店2階201-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ウニクス成田店",
+    "lat": 35.77771,
+    "lng": 140.285,
+    "notes": "千葉県成田市はなのき台2丁目25-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ショッピングプラザ鎌ヶ谷店",
+    "lat": 35.7709,
+    "lng": 139.99968,
+    "notes": "千葉県鎌ケ谷市富岡1丁目1番3号 ショッピングプラザ鎌ヶ谷店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "白井店",
+    "lat": 35.7692,
+    "lng": 140.02448,
+    "notes": "千葉県白井市冨士57-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "上州屋",
+    "name": "鎌ヶ谷店",
+    "lat": 35.76886,
+    "lng": 139.99945,
+    "notes": "千葉県鎌ケ谷市富岡1-4-38",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "鎌ヶ谷富岡店",
+    "lat": 35.76757,
+    "lng": 139.99904,
+    "notes": "千葉県鎌ケ谷市富岡1-9-28",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "松戸大橋店",
+    "lat": 35.76588,
+    "lng": 139.91072,
+    "notes": "千葉県松戸市大橋403-7 1階・2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベスタ松戸秋山2号館店",
+    "lat": 35.76477,
+    "lng": 139.93158,
+    "notes": "千葉県松戸市秋山1丁目2番27ベスタ松戸秋山2号館",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎鎌ヶ谷店",
+    "lat": 35.76228,
+    "lng": 140.00032,
+    "notes": "千葉県鎌ケ谷市道野辺本町2-10-25",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "成田ユアエルム店",
+    "lat": 35.75941,
+    "lng": 140.29672,
+    "notes": "千葉県成田市公津の杜4丁目5番3号成田ユアエルム店3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 銚子芦崎店",
+    "lat": 35.75771,
+    "lng": 140.7717,
+    "notes": "千葉県銚子市芦崎町455",
+    "icon": "shop2",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ二和向台店",
+    "lat": 35.75688,
+    "lng": 140.02263,
+    "notes": "千葉県船橋市咲ヶ丘3-1-22マルエツ二和向台店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "IGS成田店",
+    "lat": 35.75646,
+    "lng": 140.30437,
+    "notes": "千葉県成田市並木町188",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ矢切駅前店",
+    "lat": 35.756,
+    "lng": 139.90005,
+    "notes": "千葉県松戸市栗山19-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "カインズ銚子店",
+    "lat": 35.75551,
+    "lng": 140.77394,
+    "notes": "千葉県銚子市芦崎町810カインズ銚子店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "BiGBerry 成田409号店",
+    "lat": 35.75196,
+    "lng": 140.3013,
+    "notes": "千葉県成田市並木町219-9",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "鎌ヶ谷道野辺店",
+    "lat": 35.75058,
+    "lng": 140.0011,
+    "notes": "千葉県鎌ケ谷市東道野辺5-11-38 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア富里店",
+    "lat": 35.7505,
+    "lng": 140.30989,
+    "notes": "千葉県富里市七栄532ベイシア富里店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークマート東道野辺店",
+    "lat": 35.74876,
+    "lng": 139.9996,
+    "notes": "千葉県鎌ケ谷市東道野辺5丁目16-38ヨークマート東道野辺店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 波崎店",
+    "lat": 35.74865,
+    "lng": 140.8246,
+    "notes": "茨城県神栖市波崎8555",
+    "icon": "shop2",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "成田富里店",
+    "lat": 35.74857,
+    "lng": 140.30945,
+    "notes": "千葉県富里市七栄1005-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "ツインズ",
+    "lat": 35.74289,
+    "lng": 140.31436,
+    "notes": "千葉県富里市七栄571-9",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "サミット馬込沢店",
+    "lat": 35.74205,
+    "lng": 139.99159,
+    "notes": "千葉県船橋市藤原7丁目2-2サミット馬込沢店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "富里7Aスクエア店",
+    "lat": 35.73903,
+    "lng": 140.32268,
+    "notes": "千葉県富里市七栄字東二本榎448-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "多古店",
+    "lat": 35.73866,
+    "lng": 140.46838,
+    "notes": "千葉県香取郡多古町多古字穂浪1598",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "name": "信太釣具店",
+    "lat": 35.73516,
+    "lng": 140.82826,
+    "notes": "千葉県銚子市中央町1-17",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "name": "奥野釣具店",
+    "lat": 35.73484,
+    "lng": 140.84415,
+    "notes": "千葉県銚子市竹町1524",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "市川東店",
+    "lat": 35.73453,
+    "lng": 139.94586,
+    "notes": "千葉県市川市東菅野5-13-27",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "銚子本城店",
+    "lat": 35.73431,
+    "lng": 140.8103,
+    "notes": "千葉県銚子市本城町4-457",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "メガセンタートライアル八千代店",
+    "lat": 35.7331,
+    "lng": 140.07292,
+    "notes": "千葉県八千代市緑が丘西2-13-3 メガセンタートライアル八千代店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア成田芝山店",
+    "lat": 35.7323,
+    "lng": 140.36943,
+    "notes": "千葉県山武郡芝山町岩山2299-1ベイシア成田芝山店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ八千代16号バイパス店",
+    "lat": 35.73101,
+    "lng": 140.11832,
+    "notes": "千葉県八千代市村上1245 MEGAドン・キホーテ八千代16号バイパス3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "高根公団駅ビル店",
+    "lat": 35.73015,
+    "lng": 140.02997,
+    "notes": "千葉県船橋市高根台1-6-2高根公団駅ビル 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "市川駅前店",
+    "lat": 35.72999,
+    "lng": 139.90831,
+    "notes": "千葉県市川市市川1-7-6愛愛ビル B1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン臼井店",
+    "lat": 35.7298,
+    "lng": 140.1825,
+    "notes": "千葉県佐倉市王子台1-23イオン臼井店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ダイエー市川店",
+    "lat": 35.72932,
+    "lng": 139.90851,
+    "notes": "千葉県市川市市川1-4-10ダイエー市川店7階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "京成臼井駅ビルViM店",
+    "lat": 35.729,
+    "lng": 140.17995,
+    "notes": "千葉県佐倉市王子台3-30-4京成臼井駅ビルViM2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール八千代緑が丘店",
+    "lat": 35.72786,
+    "lng": 140.07285,
+    "notes": "千葉県八千代市緑が丘2-1-3イオンモール八千代緑が丘 4F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン高根木戸店",
+    "lat": 35.72707,
+    "lng": 140.03511,
+    "notes": "千葉県船橋市習志野台1-1-3イオン高根木戸店内2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "生鮮市場TOP船橋日大前店",
+    "lat": 35.72631,
+    "lng": 140.06065,
+    "notes": "千葉県船橋市坪井東3-6-1 生鮮市場TOP船橋日大前店1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウンユーカリが丘店",
+    "lat": 35.7263,
+    "lng": 140.15073,
+    "notes": "千葉県佐倉市西ユーカリが丘6-12-3イオンタウンユーカリが丘東街区1階E112",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "そよらリーフシティ市川店",
+    "lat": 35.72526,
+    "lng": 139.90414,
+    "notes": "千葉県市川市市川南2-8-1 そよらリーフシティ市川店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "八千代店",
+    "lat": 35.72506,
+    "lng": 140.09021,
+    "notes": "千葉県八千代大和田新田410-1コープ八千代店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "旭サンモール店",
+    "lat": 35.72493,
+    "lng": 140.65942,
+    "notes": "千葉県旭市イ-2676旭サンモール店内1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100習志野台店",
+    "lat": 35.72472,
+    "lng": 140.04982,
+    "notes": "千葉県船橋市習志野台2-73-7",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ユーカリプラザ店",
+    "lat": 35.72412,
+    "lng": 140.15517,
+    "notes": "千葉県佐倉市ユーカリが丘4-1-4ユーカリプラザ 4F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友新北習志野店",
+    "lat": 35.72356,
+    "lng": 140.04102,
+    "notes": "千葉県船橋市習志野台1-35-1西友新北習志野店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "フルルガーデン八千代店",
+    "lat": 35.72243,
+    "lng": 140.11768,
+    "notes": "千葉県八千代市村上南1-3-1 イトーヨーカドー八千代店3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎夏見台2丁目店",
+    "lat": 35.72122,
+    "lng": 139.99152,
+    "notes": "千葉県船橋市夏見台2丁目2-60",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォルテ船橋店",
+    "lat": 35.71975,
+    "lng": 139.97997,
+    "notes": "千葉県船橋市行田1-50-2 フォルテ船橋2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォルテ富里店",
+    "lat": 35.7196,
+    "lng": 140.37166,
+    "notes": "千葉県富里市御料931-1 1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ザ・マーケットプレイス佐倉店",
+    "lat": 35.71923,
+    "lng": 140.19199,
+    "notes": "千葉県佐倉市染井野4-7-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ本八幡店",
+    "lat": 35.71894,
+    "lng": 139.92554,
+    "notes": "千葉県市川市南八幡4-9-1MEGAドン・キホーテ本八幡店4階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ゆめまち習志野台モール店",
+    "lat": 35.7182,
+    "lng": 140.06522,
+    "notes": "千葉県船橋市習志野台8丁目58番1号ゆめまち習志野台モール2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "大木釣具店",
+    "lat": 35.71819,
+    "lng": 140.64941,
+    "notes": "千葉県旭市ニ2116-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎芝山店",
+    "lat": 35.7181,
+    "lng": 140.01674,
+    "notes": "千葉県船橋市芝山2-1-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン旭店",
+    "lat": 35.71762,
+    "lng": 140.66776,
+    "notes": "千葉県旭市イ4337-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "スーパーセンタートライアル酒々井店",
+    "lat": 35.71762,
+    "lng": 140.25673,
+    "notes": "千葉県印旛郡酒々井町本佐倉457-2 スーパーセンタートライアル酒々井店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルク佐倉志津店",
+    "lat": 35.71746,
+    "lng": 140.14749,
+    "notes": "千葉県佐倉市上志津1764-1 ベルク佐倉志津1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "リブレ京成勝田台店",
+    "lat": 35.71506,
+    "lng": 140.12694,
+    "notes": "千葉県八千代市勝田台1-10リブレ京成勝田台店 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ニッケコルトンプラザ店",
+    "lat": 35.71503,
+    "lng": 139.93266,
+    "notes": "千葉県市川市鬼高1-1-1ニッケコルトンプラザ イーストモール 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "カインズスーパーセンター旭飯岡店",
+    "lat": 35.71486,
+    "lng": 140.69899,
+    "notes": "千葉県旭市三川字犬林セの4334-1カインズスーパーセンター旭飯岡店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "name": "イレブンつり具センター",
+    "lat": 35.71482,
+    "lng": 140.15587,
+    "notes": "千葉県佐倉市上志津1043-35",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア佐倉店",
+    "lat": 35.7145,
+    "lng": 140.21696,
+    "notes": "千葉県佐倉市寺崎北6-1-1ベイシア佐倉店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ライフガーデン佐倉店",
+    "lat": 35.71448,
+    "lng": 140.21912,
+    "notes": "千葉県佐倉市寺崎北5-1-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "下総中山店",
+    "lat": 35.71445,
+    "lng": 139.94505,
+    "notes": "千葉県船橋市本中山2丁目390番1下総中山駅高架下",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミレニティ中山店",
+    "lat": 35.71415,
+    "lng": 139.94431,
+    "notes": "千葉県船橋市本中山2丁目10-1ミレニティ中山店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "釣具いちばん館 習志野店",
+    "lat": 35.71357,
+    "lng": 140.05505,
+    "notes": "千葉県船橋市習志野台5-21-18",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール船橋店",
+    "lat": 35.71188,
+    "lng": 139.97577,
+    "notes": "千葉県船橋市山手1-1-8イオンモール船橋 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "千葉八千代店",
+    "lat": 35.71166,
+    "lng": 140.11903,
+    "notes": "千葉県八千代市勝田台南2丁目11-28",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "市川店",
+    "lat": 35.71043,
+    "lng": 139.93523,
+    "notes": "千葉県市川市鬼高3-17-17",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール銚子店",
+    "lat": 35.70999,
+    "lng": 140.7878,
+    "notes": "千葉県銚子市三崎町2-2660-1 イオンモール銚子店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サンベルクス市川鬼高店",
+    "lat": 35.70888,
+    "lng": 139.93872,
+    "notes": "千葉県市川市鬼高3-32-12 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "八日市場店",
+    "lat": 35.7054,
+    "lng": 140.56267,
+    "notes": "千葉県匝瑳市八日市場ハ805-10",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー船橋店",
+    "lat": 35.70356,
+    "lng": 139.98506,
+    "notes": "千葉県船橋市本町7-6-1 イトーヨーカドー船橋 東館5階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "上州屋",
+    "name": "東船橋店",
+    "lat": 35.70354,
+    "lng": 140.0078,
+    "notes": "千葉県船橋市駿河台1-33-5",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "コジマXビックカメラ習志野店",
+    "lat": 35.70296,
+    "lng": 140.05827,
+    "notes": "千葉県船橋市習志野4-5-5コジマXビックカメラ習志野店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "カインズ八日市場店",
+    "lat": 35.70185,
+    "lng": 140.556,
+    "notes": "千葉県匝瑳市八日市場ロ字横田118カインズスーパーセンター八日市場店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ユアエルム八千代台店",
+    "lat": 35.70085,
+    "lng": 140.09247,
+    "notes": "千葉県八千代市八千代台東1-1-10ユアエルム八千代台店3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "御園生釣具店",
+    "lat": 35.70068,
+    "lng": 140.72849,
+    "notes": "千葉県旭市飯岡1933",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ギガ船橋店",
+    "lat": 35.69981,
+    "lng": 139.98575,
+    "notes": "千葉県船橋市本町1-6-3ギガ船橋店6階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン東習志野店",
+    "lat": 35.69947,
+    "lng": 140.06642,
+    "notes": "千葉県習志野市東習志野6-7-8 イオンタウン東習志野店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "渡辺釣具店",
+    "lat": 35.69934,
+    "lng": 140.67706,
+    "notes": "千葉県旭市野中3443-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン京葉船橋インター店",
+    "lat": 35.69858,
+    "lng": 139.97507,
+    "notes": "千葉県船橋市海神町3-124-3",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "みやうち釣具店",
+    "lat": 35.69828,
+    "lng": 140.85185,
+    "notes": "千葉県銚子市外川町4丁目11246",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "上州屋",
+    "name": "船橋店",
+    "lat": 35.6963,
+    "lng": 139.99004,
+    "notes": "千葉県船橋市本町3-10-3",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "スズハルR14号店",
+    "lat": 35.6945,
+    "lng": 139.98883,
+    "notes": "千葉県船橋市本町3丁目14-16",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "花見川作新台店",
+    "lat": 35.69416,
+    "lng": 140.08177,
+    "notes": "千葉県千葉市花見川区作新台4-4-2光ビル 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "妙典店",
+    "lat": 35.6937,
+    "lng": 139.92772,
+    "notes": "千葉県市川市妙典5-2-20",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "スズハル本店",
+    "lat": 35.69303,
+    "lng": 139.98935,
+    "notes": "千葉県船橋市宮本2丁目14-31",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "津田沼ビート店",
+    "lat": 35.69228,
+    "lng": 140.02205,
+    "notes": "千葉県船橋市前原西2-19-1 津田沼ビート 4階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン市川妙典店",
+    "lat": 35.69187,
+    "lng": 139.92714,
+    "notes": "千葉県市川市妙典4-4-1 イオン市川妙典3番街1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "津田沼駅南口店",
+    "lat": 35.69099,
+    "lng": 140.02026,
+    "notes": "千葉県習志野市津田沼1-1-1 JR東日本ホテルメッツ津田沼4階・5階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "習志野店",
+    "lat": 35.6905,
+    "lng": 140.03966,
+    "notes": "千葉県習志野市藤崎6-15-10",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール津田沼North店",
+    "lat": 35.69031,
+    "lng": 140.02493,
+    "notes": "千葉県習志野市津田沼1-23-1イオンモール津田沼North 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール津田沼South店",
+    "lat": 35.68977,
+    "lng": 140.02431,
+    "notes": "千葉県習志野市津田沼1-10-30 イオンモール津田沼South5階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "奏の杜フォルテ津田沼店",
+    "lat": 35.68926,
+    "lng": 140.01556,
+    "notes": "千葉県習志野市奏の杜2-1-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "カインズ八街店",
+    "lat": 35.68893,
+    "lng": 140.31192,
+    "notes": "千葉県八街市八街は21-14カインズ八街店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン船橋花輪インター店",
+    "lat": 35.68885,
+    "lng": 139.99863,
+    "notes": "千葉県船橋市宮本9-5-15",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ららぽーとTOKYO-BAY店",
+    "lat": 35.68763,
+    "lng": 139.99222,
+    "notes": "千葉県船橋市浜町2-2-7三井ショッピングパーク ららポーとTOKYO-BAY North Gate 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ららぽーとTOKYO-BAY西館店",
+    "lat": 35.68624,
+    "lng": 139.9902,
+    "notes": "千葉県船橋市浜町2-1-1ららぽーとTOKYO-BAY西館 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "もねの里モール店",
+    "lat": 35.68507,
+    "lng": 140.19086,
+    "notes": "千葉県四街道市もねの里6-10-1もねの里モール内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友行徳店",
+    "lat": 35.68412,
+    "lng": 139.91524,
+    "notes": "千葉県市川市行徳駅前1-19-1西友行徳店 4F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "行徳駅前店",
+    "lat": 35.68411,
+    "lng": 139.91411,
+    "notes": "千葉県市川市行徳駅前1-22-8",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "宝釣具センター",
+    "lat": 35.68394,
+    "lng": 139.92647,
+    "notes": "千葉県市川市宝1-9-24",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "八街榎戸店",
+    "lat": 35.68203,
+    "lng": 140.28853,
+    "notes": "千葉県八街市八街ろ166-25",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ららテラスTOKYO-BAY店",
+    "lat": 35.68141,
+    "lng": 139.99536,
+    "notes": "千葉県船橋市若松2-2-1 1階11100",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ行徳店",
+    "lat": 35.68111,
+    "lng": 139.9149,
+    "notes": "千葉県市川市行徳駅前2-11-2マルエツ行徳店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン八街店",
+    "lat": 35.6777,
+    "lng": 140.30641,
+    "notes": "千葉県八街市文違301イオン八街SC内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "三橋つり具店",
+    "lat": 35.6767,
+    "lng": 140.02197,
+    "notes": "千葉県習志野市津田沼6-2-23",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎幕張本郷6丁目店",
+    "lat": 35.6745,
+    "lng": 140.04459,
+    "notes": "千葉県千葉市花見川区幕張本郷6-24-21",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "四街道M2プラザ店",
+    "lat": 35.67262,
+    "lng": 140.16339,
+    "notes": "千葉県四街道市大日429-2四街道M2プラザ3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "キャスティング",
+    "name": "南行徳店",
+    "lat": 35.67068,
+    "lng": 139.90222,
+    "notes": "千葉県市川市南行徳1丁目22-23",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "PIACITY yachimata asahi店",
+    "lat": 35.66941,
+    "lng": 140.339,
+    "notes": "千葉県八街市八街に252-6PIACITY yachimata asahi内",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ソコラ南行徳店",
+    "lat": 35.66865,
+    "lng": 139.90565,
+    "notes": "千葉県市川市南行徳2-20-25 ソコラ南行徳2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イトーヨーカドー四街道店",
+    "lat": 35.66756,
+    "lng": 140.16515,
+    "notes": "千葉県四街道市中央5イトーヨーカドー四街道店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友浦安店",
+    "lat": 35.66574,
+    "lng": 139.89453,
+    "notes": "千葉県浦安市北栄1-14-1西友浦安店 4F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミスターマックス新習志野店",
+    "lat": 35.66568,
+    "lng": 140.01309,
+    "notes": "千葉県習志野市茜浜2-2-1ミスターマックス新習志野内2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "浦安駅前店",
+    "lat": 35.66533,
+    "lng": 139.89336,
+    "notes": "千葉県浦安市北栄1-16-5 サカゼン浦安 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "島忠ホームズ幕張店",
+    "lat": 35.66033,
+    "lng": 140.02191,
+    "notes": "千葉県習志野市芝園1-4-1島忠ホームズ幕張店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピアシティ横芝光店",
+    "lat": 35.65991,
+    "lng": 140.48608,
+    "notes": "千葉県山武郡横芝光町横芝2122ピアシティ横芝光内",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー幕張店",
+    "lat": 35.65641,
+    "lng": 140.05116,
+    "notes": "千葉県千葉市花見川区幕張町4-417-25 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール幕張新都心店",
+    "lat": 35.65609,
+    "lng": 140.02652,
+    "notes": "千葉県千葉市美浜区豊砂1-5 イオンモール幕張新都心エキマエモール1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "フレスポ稲毛店",
+    "lat": 35.65575,
+    "lng": 140.12737,
+    "notes": "千葉県千葉市稲毛区長沼原町731-17",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "せんどう長沼店",
+    "lat": 35.6546,
+    "lng": 140.11366,
+    "notes": "千葉県千葉市稲毛区長沼町288-183せんどう長沼店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ちば若松町店",
+    "lat": 35.65368,
+    "lng": 140.15379,
+    "notes": "千葉県千葉市若葉区若松町934-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "八街松島店",
+    "lat": 35.65288,
+    "lng": 140.2644,
+    "notes": "千葉県八街市八街字松島ほ955-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ四街道店",
+    "lat": 35.65253,
+    "lng": 140.16985,
+    "notes": "千葉県四街道市めいわ2丁目1番1号MEGAドン・キホーテ四街道店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン海浜幕張店",
+    "lat": 35.65186,
+    "lng": 140.0453,
+    "notes": "千葉県千葉市美浜区ひび野1-3イオン海浜幕張店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "稲毛オーツーパーク店",
+    "lat": 35.65172,
+    "lng": 140.11948,
+    "notes": "千葉県千葉市稲毛区園生町380-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友新検見川店",
+    "lat": 35.65159,
+    "lng": 140.07164,
+    "notes": "千葉県千葉市花見川区南花園2-6-1西友新検見川店 5F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン新浦安店",
+    "lat": 35.64906,
+    "lng": 139.91496,
+    "notes": "千葉県浦安市入船1-4-1イオンスタイル新浦安3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "モナ新浦安店",
+    "lat": 35.64898,
+    "lng": 139.91318,
+    "notes": "千葉県浦安市入船1-5-1モナ新浦安B館 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "プレナ幕張店",
+    "lat": 35.64789,
+    "lng": 140.04041,
+    "notes": "千葉県千葉市美浜区ひび野2-4プレナ幕張 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンスタイル幕張ベイパーク店",
+    "lat": 35.64761,
+    "lng": 140.04808,
+    "notes": "千葉県千葉市美浜区若葉3丁目2-22-1 幕張ベイパーク ヴィレッジⅦ2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ランドローム山武店",
+    "lat": 35.646,
+    "lng": 140.36702,
+    "notes": "千葉県山武市埴谷1873-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "セリア",
+    "name": "フォルテ新浦安店",
+    "lat": 35.64268,
+    "lng": 139.92548,
+    "notes": "千葉県浦安市日の出5-1-28フォルテ新浦安 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ニューコースト新浦安店",
+    "lat": 35.64266,
+    "lng": 139.92258,
+    "notes": "千葉県浦安市明海4-1-1 ニューコースト新浦安3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ稲毛店",
+    "lat": 35.6408,
+    "lng": 140.09079,
+    "notes": "千葉県千葉市稲毛区小仲台7-2-1マルエツ稲毛店3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンスタイル検見川浜店",
+    "lat": 35.63784,
+    "lng": 140.05989,
+    "notes": "千葉県千葉市美浜区真砂4-2-6イオンスタイル検見川浜 B1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友都賀店",
+    "lat": 35.63718,
+    "lng": 140.14645,
+    "notes": "千葉県千葉市若葉区西都賀2-2-2西友都賀店 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ピアシティ稲毛海岸店",
+    "lat": 35.63663,
+    "lng": 140.07092,
+    "notes": "千葉県千葉市美浜区真砂1-2-7ピアシティ稲毛海岸 A棟",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン稲毛店",
+    "lat": 35.63571,
+    "lng": 140.09604,
+    "notes": "千葉県千葉市稲毛区小仲台1-4-20イオン稲毛店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "キャスティング",
+    "name": "千葉稲毛海岸店",
+    "lat": 35.63475,
+    "lng": 140.08107,
+    "notes": "千葉県千葉市美浜区稲毛海岸3-1-37",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "Skip天台店",
+    "lat": 35.63152,
+    "lng": 140.11327,
+    "notes": "千葉県千葉市稲毛区天台1-4-12Skip天台 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イクスピアリ店",
+    "lat": 35.63127,
+    "lng": 139.87433,
+    "notes": "千葉県浦安市舞浜1-4 イクスピアリ3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎千葉桜木店",
+    "lat": 35.63012,
+    "lng": 140.15869,
+    "notes": "千葉県千葉市若葉区桜木6-19-68",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "コープ千葉東寺山店",
+    "lat": 35.62981,
+    "lng": 140.12753,
+    "notes": "千葉県千葉市若葉区東寺山町422-1コープ千葉東寺山店 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マリンピア専門館店",
+    "lat": 35.62858,
+    "lng": 140.07518,
+    "notes": "千葉県千葉市美浜区高洲3-21-1 マリンピア専門館3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "千葉若葉店",
+    "lat": 35.62576,
+    "lng": 140.12854,
+    "notes": "千葉県千葉市若葉区東寺山町777番54",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヤオコー作草部店",
+    "lat": 35.62385,
+    "lng": 140.11705,
+    "notes": "千葉県千葉市稲毛区作草部町592-2 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イコアス千城台店",
+    "lat": 35.62267,
+    "lng": 140.18918,
+    "notes": "千葉県千葉市若葉区千城台北3-21-1イコアス千城台店 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友西千葉店",
+    "lat": 35.62192,
+    "lng": 140.10237,
+    "notes": "千葉県千葉市中央区春日2-20-9西友西千葉店 3F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "千葉桜木店",
+    "lat": 35.6214,
+    "lng": 140.15425,
+    "notes": "千葉県千葉市若葉区桜木5-2-8",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "上州屋",
+    "name": "新千葉美浜店",
+    "lat": 35.62058,
+    "lng": 140.09538,
+    "notes": "千葉県千葉市美浜区幸町2-24-38",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミスターマックス千葉美浜店",
+    "lat": 35.61923,
+    "lng": 140.08916,
+    "notes": "千葉県千葉市美浜区新港32-11",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "セイムス都町店",
+    "lat": 35.61348,
+    "lng": 140.14865,
+    "notes": "千葉県千葉市中央区都町5-8-60 セイムス都町店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "千葉駅西口店",
+    "lat": 35.61314,
+    "lng": 140.11092,
+    "notes": "千葉県千葉市中央区新千葉2-2-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ビックカメラ千葉駅前店",
+    "lat": 35.61192,
+    "lng": 140.11563,
+    "notes": "千葉県千葉市中央区富士見2-1-1マインズ千葉A館 7F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "千葉駅前店",
+    "lat": 35.61168,
+    "lng": 140.11665,
+    "notes": "千葉県千葉市中央区富士見2-3-1塚本大千葉ビルディング3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "そごう千葉店",
+    "lat": 35.61112,
+    "lng": 140.11357,
+    "notes": "千葉県千葉市中央区新町1000そごう千葉店 B1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "千葉都町店",
+    "lat": 35.60956,
+    "lng": 140.13948,
+    "notes": "千葉県千葉市中央区都町三丁目15番4号",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "西友千葉中央店",
+    "lat": 35.60915,
+    "lng": 140.12096,
+    "notes": "千葉県千葉市中央区中央2-3-3西友千葉中央店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "かわまち矢作モール店",
+    "lat": 35.60786,
+    "lng": 140.14532,
+    "notes": "千葉県千葉市中央区矢作町57-1かわまち矢作モール内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "千葉中央ショッピングセンター ミーオ1店",
+    "lat": 35.60746,
+    "lng": 140.11763,
+    "notes": "千葉県千葉市中央区本千葉町15-1 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "河井釣具店",
+    "lat": 35.60733,
+    "lng": 140.10638,
+    "notes": "千葉県横芝光町屋形5274-2",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "name": "フィッシングガレージ・ブラック",
+    "lat": 35.60344,
+    "lng": 140.14862,
+    "notes": "千葉県千葉市中央区星久喜町157-3",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンスタイル千葉みなと店",
+    "lat": 35.60174,
+    "lng": 140.11356,
+    "notes": "千葉県千葉市中央区問屋町2-29",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ成東店",
+    "lat": 35.59993,
+    "lng": 140.40718,
+    "notes": "千葉県山武市成東486-1 カスミ成東1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "大宮台店",
+    "lat": 35.59871,
+    "lng": 140.18257,
+    "notes": "千葉県千葉市若葉区大宮台7-3208-6",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "せんどう千葉みなと店",
+    "lat": 35.59799,
+    "lng": 140.11021,
+    "notes": "千葉県千葉市中央区中央港2-4-2",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや青葉の森公園店",
+    "lat": 35.59706,
+    "lng": 140.13596,
+    "notes": "千葉県千葉市中央区青葉町1265-3",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ成東店",
+    "lat": 35.59538,
+    "lng": 140.39767,
+    "notes": "千葉県山武市成東1808-1MEGAドン・キホーテ成東店内1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "リブレ京成千葉寺店",
+    "lat": 35.5909,
+    "lng": 140.1329,
+    "notes": "千葉県千葉市中央区千葉寺町971-7 リブレ京成千葉寺2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "アリオ蘇我店",
+    "lat": 35.58808,
+    "lng": 140.12259,
+    "notes": "千葉県千葉市中央区川崎町52-7アリオ蘇我 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ蘇我店",
+    "lat": 35.58548,
+    "lng": 140.12378,
+    "notes": "千葉県千葉市中央区川崎町55-3 島忠ホームズ蘇我店内1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイフロント蘇我店",
+    "lat": 35.5831,
+    "lng": 140.12463,
+    "notes": "千葉県千葉市中央区川崎町57-5ベイフロント蘇我内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォルテ蘇我店",
+    "lat": 35.58302,
+    "lng": 140.13437,
+    "notes": "千葉県千葉市中央区南町2丁目5番15号",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア東金店",
+    "lat": 35.58086,
+    "lng": 140.38466,
+    "notes": "千葉県東金市道庭字三斗蒔495-2ベイシア東金店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "セリア",
+    "name": "ライフガーデン仁戸名店",
+    "lat": 35.57981,
+    "lng": 140.1638,
+    "notes": "千葉県千葉市中央区仁戸名町698-11ライフガーデン仁戸名内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ蘇我南店",
+    "lat": 35.57808,
+    "lng": 140.13623,
+    "notes": "千葉県千葉市中央区南町3-16-26 マルエツ蘇我南2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "マミーマート仁戸名店",
+    "lat": 35.57737,
+    "lng": 140.16614,
+    "notes": "千葉県千葉市中央区仁戸名町720-34",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "東金田間店",
+    "lat": 35.57672,
+    "lng": 140.38107,
+    "notes": "千葉県東金市田間1280-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "千葉蘇我店",
+    "lat": 35.57467,
+    "lng": 140.12413,
+    "notes": "千葉県千葉市中央区川崎町1-23",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "ポイント",
+    "name": "千葉蘇我店",
+    "lat": 35.57467,
+    "lng": 140.12413,
+    "notes": "千葉県千葉市中央区川崎町1-34 GLOBO(グローボ)内",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "グローボ蘇我店",
+    "lat": 35.57467,
+    "lng": 140.12413,
+    "notes": "千葉県千葉市中央区川崎町1-34グローボ蘇我店1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ゆみーる鎌取店",
+    "lat": 35.56129,
+    "lng": 140.17747,
+    "notes": "千葉県千葉市緑区おゆみ野3丁目16番地ゆみーる鎌取店内3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "あすみが丘ブランニューモール店",
+    "lat": 35.55896,
+    "lng": 140.16039,
+    "notes": "千葉県千葉市緑区おゆみ野中央あすみが丘7-1あすみが丘ブランニューモール2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミスターマックスおゆみ野店",
+    "lat": 35.55511,
+    "lng": 140.16077,
+    "notes": "千葉県千葉市緑区おゆみ野中央2-3ミスターマックスおゆみ野店B-1棟",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "千葉東金店",
+    "lat": 35.55489,
+    "lng": 140.3614,
+    "notes": "千葉県東金市南上宿5-38",
+    "icon": "shop2",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "千葉おゆみ野店",
+    "lat": 35.5518,
+    "lng": 140.17024,
+    "notes": "千葉県千葉市緑区おゆみ野中央3-23-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "せんどう東金プラザ店",
+    "lat": 35.55153,
+    "lng": 140.38805,
+    "notes": "千葉県東金市家徳280-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "group": "DAISO",
+    "name": "古市場店",
+    "lat": 35.54877,
+    "lng": 140.13953,
+    "notes": "千葉県市原市古市場594-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ東金押堀店",
+    "lat": 35.54849,
+    "lng": 140.36107,
+    "notes": "千葉県東金市押堀33番地",
+    "icon": "shop4",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "name": "市原フィッシングセンター",
+    "lat": 35.54607,
+    "lng": 140.12151,
+    "notes": "千葉県市原市八幡北町2-3-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシアちば古市場店",
+    "lat": 35.54302,
+    "lng": 140.15179,
+    "notes": "千葉県千葉市緑区古市場町906-29ベイシアちば古市場店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "上州屋",
+    "name": "市原店",
+    "lat": 35.54155,
+    "lng": 140.10454,
+    "notes": "千葉県市原市八幡海岸通り1967-11",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア市原八幡店",
+    "lat": 35.54155,
+    "lng": 140.10454,
+    "notes": "千葉県市原市八幡字海岸2381-1ベイシア市原八幡店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "港釣具店",
+    "lat": 35.53753,
+    "lng": 140.45442,
+    "notes": "千葉県九十九里町小関2344-13",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "name": "つり具松林",
+    "lat": 35.53109,
+    "lng": 140.2623,
+    "notes": "千葉県千葉市緑区あすみが丘5丁目6-5",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "キャスティング",
+    "name": "市原16号店",
+    "lat": 35.53056,
+    "lng": 140.10364,
+    "notes": "千葉県市原市八幡海岸通1963-3",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "大網店",
+    "lat": 35.52955,
+    "lng": 140.32841,
+    "notes": "千葉県大網白里市大網81-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "やお善釣具店",
+    "lat": 35.52953,
+    "lng": 140.44733,
+    "notes": "千葉県九十九里町片貝6782",
+    "icon": "shop0",
+    "areaId": "CHIBA_CHOUSHI"
+  },
+  {
+    "name": "オンリーワンフィッシングショップ",
+    "lat": 35.52906,
+    "lng": 140.12148,
+    "notes": "千葉県市原市八幡331-3",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ユニモちはら台店",
+    "lat": 35.52817,
+    "lng": 140.17154,
+    "notes": "千葉県市原市ちはら台西3丁目4番2059 ユニモちはら台 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "もりまちちはら台モール店",
+    "lat": 35.52385,
+    "lng": 140.18109,
+    "notes": "千葉県市原市ちはら台南2-32-2もりまち ちはら台モール内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "つり具ランド",
+    "name": "市原店",
+    "lat": 35.51984,
+    "lng": 140.09467,
+    "notes": "千葉県市原市五井4771-2",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "大網白里店",
+    "lat": 35.51955,
+    "lng": 140.31569,
+    "notes": "千葉県大網白里市みやこ野1-2-8",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン大網白里店",
+    "lat": 35.51933,
+    "lng": 140.31473,
+    "notes": "千葉県大網白里市みやこ野1-1-2イオン大網白里店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "市原店",
+    "lat": 35.51895,
+    "lng": 140.10408,
+    "notes": "千葉県市原市君塚1-22-6",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "市原辰巳台店",
+    "lat": 35.51826,
+    "lng": 140.14967,
+    "notes": "千葉県市原市辰巳台東3-5-6",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "セイムス大網店",
+    "lat": 35.51687,
+    "lng": 140.32497,
+    "notes": "千葉県大網白里市経田137-1 セイムス大網店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "アクロスプラザ市原更級店",
+    "lat": 35.50998,
+    "lng": 140.10129,
+    "notes": "千葉県市原市更級4-2-1アクロスプラザ市原更級内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "市原青柳店",
+    "lat": 35.50991,
+    "lng": 140.06305,
+    "notes": "千葉県市原市青柳北2-5-6",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "アリオ市原店",
+    "lat": 35.50792,
+    "lng": 140.10181,
+    "notes": "千葉県市原市更級4丁目3番2アリオ市原店内 2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "市原せんどう国分寺店",
+    "lat": 35.50262,
+    "lng": 140.11472,
+    "notes": "千葉県市原市国分寺台中央6-10-1スーパーせんどう国分寺店",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア茂原店",
+    "lat": 35.46093,
+    "lng": 140.30122,
+    "notes": "千葉県茂原市腰当7ベイシア茂原店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン長浦店",
+    "lat": 35.45031,
+    "lng": 139.99762,
+    "notes": "千葉県袖ケ浦市長浦駅前1-7イオン長浦店2階",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "カスミ東郷店",
+    "lat": 35.44744,
+    "lng": 140.32372,
+    "notes": "千葉県茂原市谷本2122 カスミ東郷店1階",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "キャスティング",
+    "name": "茂原店",
+    "lat": 35.44588,
+    "lng": 140.29538,
+    "notes": "千葉県茂原市小林2605-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 茂原谷本店",
+    "lat": 35.44561,
+    "lng": 140.32587,
+    "notes": "千葉県茂原市谷本1810-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "長浦店",
+    "lat": 35.44342,
+    "lng": 140.00423,
+    "notes": "千葉県袖ケ浦市長浦駅前4-11-2",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "茂原店",
+    "lat": 35.43928,
+    "lng": 140.2803,
+    "notes": "千葉県茂原市内長谷425-5",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "サブマリン",
+    "lat": 35.43284,
+    "lng": 140.30998,
+    "notes": "千葉県茂原市東郷2300-10",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ライフガーデン茂原店",
+    "lat": 35.43087,
+    "lng": 140.33495,
+    "notes": "千葉県茂原市六ツ野八貫野2785-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "斉藤釣具店",
+    "lat": 35.42755,
+    "lng": 140.30014,
+    "notes": "千葉県茂原市高師824-5",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア木更津金田店",
+    "lat": 35.42753,
+    "lng": 139.93634,
+    "notes": "千葉県木更津市金田東5-2-1ベイシア木更津金田店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "アルカード茂原店",
+    "lat": 35.42682,
+    "lng": 140.30421,
+    "notes": "千葉県茂原市町保1アルカード茂原内",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "茂原マーケットプレイス店",
+    "lat": 35.42624,
+    "lng": 140.29369,
+    "notes": "千葉県茂原市茂原字堰下1189番",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ビッグハウス茂原店",
+    "lat": 35.41642,
+    "lng": 140.31993,
+    "notes": "千葉県茂原市東茂原16-3",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "岩根店",
+    "lat": 35.41243,
+    "lng": 139.93387,
+    "notes": "千葉県木更津市高砂2-2953-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "市原牛久店",
+    "lat": 35.40139,
+    "lng": 140.14502,
+    "notes": "千葉県市原市牛久1066-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア長生店",
+    "lat": 35.38297,
+    "lng": 140.35541,
+    "notes": "千葉県長生郡長生村金田3237ベイシア長生店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "Maverick Anglers Shop",
+    "lat": 35.37952,
+    "lng": 139.9467,
+    "notes": "千葉県木更津市清見台3-10-18",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "木更津太田店",
+    "lat": 35.37906,
+    "lng": 139.94264,
+    "notes": "千葉県木更津市太田4-1-33",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "シマヤ釣具木更津店",
+    "lat": 35.37729,
+    "lng": 139.96326,
+    "notes": "千葉県木更津市ほたる野4-4-4",
+    "icon": "shop0",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "上州屋",
+    "name": "木更津店",
+    "lat": 35.37695,
+    "lng": 139.94099,
+    "notes": "千葉県木更津市太田3-11-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "アピタ木更津店",
+    "lat": 35.37546,
+    "lng": 139.96263,
+    "notes": "千葉県木更津市ほたる野4-2-48アピタ木更津店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "name": "小林釣具店",
+    "lat": 35.37236,
+    "lng": 140.3671,
+    "notes": "千葉県一宮町一宮2637-6",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "上総一ノ宮店",
+    "lat": 35.37236,
+    "lng": 140.3671,
+    "notes": "千葉県長生郡一宮町一宮2676-2",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "木更津十六号店",
+    "lat": 35.36996,
+    "lng": 139.92908,
+    "notes": "千葉県木更津市桜町2-7-8",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン木更津店",
+    "lat": 35.36092,
+    "lng": 139.94481,
+    "notes": "千葉県木更津市請西南2-27-1イオンタウン木更津店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "キャスティング",
+    "name": "イオンモール木更津店",
+    "lat": 35.35668,
+    "lng": 139.90138,
+    "notes": "千葉県木更津市築地1-4",
+    "icon": "shop2",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール木更津店",
+    "lat": 35.35668,
+    "lng": 139.90138,
+    "notes": "千葉県木更津市築地1-4イオンモール木更津 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_UCHIBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "君津駅前店",
+    "lat": 35.33471,
+    "lng": 139.89804,
+    "notes": "千葉県君津市東坂田4-10-30",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン君津店",
+    "lat": 35.33452,
+    "lng": 139.88446,
+    "notes": "千葉県君津市中野5丁目17-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "セリア",
+    "name": "APITAパワー君津店",
+    "lat": 35.33219,
+    "lng": 139.89867,
+    "notes": "千葉県君津市久保1-1-1APITAパワー君津店 2F",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール富津店",
+    "lat": 35.32935,
+    "lng": 139.84605,
+    "notes": "千葉県富津市青木1丁目5-1イオンモール富津店3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "堀込釣具店",
+    "lat": 35.3264,
+    "lng": 140.39882,
+    "notes": "千葉県いすみ市岬町中原159",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "のもと釣具店",
+    "lat": 35.32571,
+    "lng": 139.8495,
+    "notes": "千葉県富津市青木1645",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "セリア",
+    "name": "君津店",
+    "lat": 35.32246,
+    "lng": 139.92044,
+    "notes": "千葉県君津市南子安6-8-31",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "第一フィッシング 君津店",
+    "lat": 35.31416,
+    "lng": 139.92807,
+    "notes": "千葉県君津市外箕輪113-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "やまいく釣具店",
+    "lat": 35.31414,
+    "lng": 139.8251,
+    "notes": "千葉県富津市富津125-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "セリア",
+    "name": "おおたやスーパーランド店",
+    "lat": 35.28497,
+    "lng": 140.30556,
+    "notes": "千葉県いすみ市弥正147",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミサキショッピングガーデン店",
+    "lat": 35.28198,
+    "lng": 140.38206,
+    "notes": "千葉県いすみ市岬町大字江場土字関内1857番地",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "榎本釣具店",
+    "lat": 35.27888,
+    "lng": 139.85417,
+    "notes": "千葉県富津市小久保2731",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシアいすみ大原店",
+    "lat": 35.27769,
+    "lng": 140.39307,
+    "notes": "千葉県いすみ市日在41ベイシアいすみ大原店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "つり具ランド",
+    "name": "大原店",
+    "lat": 35.27558,
+    "lng": 140.3954,
+    "notes": "千葉県いすみ市日在1594-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 大原店",
+    "lat": 35.26287,
+    "lng": 140.39326,
+    "notes": "千葉県いすみ市若山46-1",
+    "icon": "shop2",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "天野啓司",
+    "lat": 35.25385,
+    "lng": 140.40131,
+    "notes": "千葉県いすみ市大原10398-40",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "餌しげ釣具店",
+    "lat": 35.22078,
+    "lng": 140.37981,
+    "notes": "千葉県いすみ市小沢1338-2",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア勝浦店",
+    "lat": 35.15826,
+    "lng": 140.32845,
+    "notes": "千葉県勝浦市新官字長畑1392ベイシア勝浦店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "北見釣具店",
+    "lat": 35.15301,
+    "lng": 139.83722,
+    "notes": "千葉県鋸南町元名136",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "サンデー",
+    "lat": 35.1506,
+    "lng": 140.31241,
+    "notes": "千葉県勝浦市墨名708-6",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "京橋釣具店",
+    "lat": 35.13586,
+    "lng": 140.24818,
+    "notes": "千葉県勝浦市興津2593",
+    "icon": "shop0",
+    "areaId": "CHIBA_SOTOBOU"
+  },
+  {
+    "name": "高梨釣具店",
+    "lat": 35.12404,
+    "lng": 140.15985,
+    "notes": "千葉県鴨川市天津1538-3",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "市原釣具店",
+    "lat": 35.12117,
+    "lng": 140.18094,
+    "notes": "千葉県鴨川市天津3415",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "今井釣具店",
+    "lat": 35.11103,
+    "lng": 139.82906,
+    "notes": "千葉県鋸南町勝山120",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン鴨川店",
+    "lat": 35.10868,
+    "lng": 140.1028,
+    "notes": "千葉県鴨川市横渚973-1イオン鴨川店3階",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "おおみや釣具バイパス店",
+    "lat": 35.10849,
+    "lng": 140.09906,
+    "notes": "千葉県鴨川市横渚195-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 鴨川店",
+    "lat": 35.10675,
+    "lng": 140.10204,
+    "notes": "千葉県鴨川市横渚字鎌田105",
+    "icon": "shop2",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "近江屋釣具店",
+    "lat": 35.09949,
+    "lng": 140.103,
+    "notes": "千葉県鴨川市前原122",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ベイシア鴨川店",
+    "lat": 35.09779,
+    "lng": 140.0918,
+    "notes": "千葉県鴨川市貝渚字中川間300ベイシア鴨川店 1F",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "マリンスポット釣吉",
+    "lat": 35.04251,
+    "lng": 139.86406,
+    "notes": "千葉県南房総市富浦町福澤869-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "田仲釣具店",
+    "lat": 35.03732,
+    "lng": 139.82533,
+    "notes": "千葉県南房総市富浦町多田良1012-9",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "ヤックスドラッグ",
+    "name": "アタック5 館山バイパス店",
+    "lat": 35.02615,
+    "lng": 139.87665,
+    "notes": "千葉県館山市正木字道免830",
+    "icon": "shop2",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "館山マーケットプレイス店",
+    "lat": 35.00746,
+    "lng": 139.87025,
+    "notes": "千葉県館山市湊188-1",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン館山店",
+    "lat": 35.00626,
+    "lng": 139.86298,
+    "notes": "千葉県館山市八幡545-1イオンタウン館山店内",
+    "icon": "shop4",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "group": "つり具ランド",
+    "name": "館山店",
+    "lat": 35.00394,
+    "lng": 139.86186,
+    "notes": "千葉県館山市八幡623-16",
+    "icon": "shop2",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "サウスエンド",
+    "lat": 35.00394,
+    "lng": 139.86186,
+    "notes": "千葉県館山市八幡637-9",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "太洋釣具餌センター",
+    "lat": 34.98821,
+    "lng": 139.85326,
+    "notes": "千葉県館山市館山95-63",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "鈴木釣具店",
+    "lat": 34.9846,
+    "lng": 139.84238,
+    "notes": "千葉県館山市沼985",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "まるへい民宿",
+    "lat": 34.9846,
+    "lng": 139.84238,
+    "notes": "千葉県館山市沼985-10",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "佐野釣具店",
+    "lat": 34.97316,
+    "lng": 139.78308,
+    "notes": "千葉県館山市波左間619",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "釣具屋あどう",
+    "lat": 34.94777,
+    "lng": 139.96004,
+    "notes": "千葉県南房総市千倉町忽戸543-1",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  },
+  {
+    "name": "あづま屋釣具店",
+    "lat": 34.91785,
+    "lng": 139.89996,
+    "notes": "千葉県南房総市白浜町白浜623-35",
+    "icon": "shop0",
+    "areaId": "CHIBA_MINAMI"
+  }
+]
