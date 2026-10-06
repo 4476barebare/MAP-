@@ -1359,7 +1359,7 @@ li {
     justify-content: center;
     padding: 7px 10px;
     font-size: 12px;
-    font-weight: bold;
+    
     color: #222222 !important; /* ★ 3つのボタン全てをダークグレーに統一 */
     background-color: #ffffff !important;
     text-decoration: none !important;
