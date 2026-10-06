@@ -3081,217 +3081,183 @@ if (needsBaseLoad) {
     }
 }
 
+// ==========================================
+// ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数
+// ==========================================
 async function routeUpdate() {
-
     const isReady = await checkAndLoadRouteData();
-    if (!isReady) return;
+    if (!isReady) return; 
 
-    // ==================================================
-    // 地域画面
-    // ==================================================
-if (!window.currentPref) {
-
-    const btn = document.getElementById('map-back-btn');
-    if (btn) {
-        btn.style.display = 'none';
+    if (!window.currentPref) {
+        const btn = document.getElementById('map-back-btn');
+        if (btn) btn.style.display = 'none';
+        if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
+        return;
     }
 
-    if (typeof loadRegionMap === 'function') {
-        await loadRegionMap(window.currentRegion || 'KANTO');
-    }
-
-    showPrefSpots();
-
-    if (typeof renderCrowdImage === 'function') {
-        if (typeof renderSpotRanking === 'function') renderSpotRanking();
-        renderCrowdImage();
-    }
-
-    return;
-}
-    // ==================================================
-    // スポット画面
-    // ==================================================
+    // ─── スポット階層への直リンク復元 ───
     if (window.currentSpotId) {
         const spotId = String(window.currentSpotId).split("_");
-        const safeAreaId = window.currentAreaId || "";
+        const safeAreaId = window.currentAreaId || ""; 
+        
+        if (typeof prepareFishForArea === 'function') await prepareFishForArea(safeAreaId);
+        
+        const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
+        const targetIndivId = spotId[2] || spotId[0]; 
+        const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+        
+        if (spot) {
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+            
+            if (parentArea) {
+                setIdealQuery('area', parentArea.name);
 
-        // ------------------------------------------
-        // スポット検索
-        // ------------------------------------------
-        const list = (window.spotData || []).filter(
-            s => String(s.areaId) === safeAreaId
-        );
-        const targetIndivId = spotId[2] || spotId[0];
-        const spot = list.find(
-            s => String(s.individualId) === String(targetIndivId)
-        );
+                if (typeof drawLocation === 'function') {
+                    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+                }
 
-        if (!spot) return;
+                if (window.map) {
+                    window.map.options.maxBoundsViscosity = 0;
+                    window.map.setMaxBounds(null);
+                }
+                
+                if (typeof prefetchAround === 'function') prefetchAround(parentArea);
+                if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
+                if (typeof phase1menu === 'function') phase1menu(safeAreaId);
+                if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
+                    window.markerControl.showShop01(safeAreaId);
+                }
+                
+                // ★ 不足していたエリアガイドの描画を事前に行う
+                if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                
+                if (typeof openArea === 'function') openArea(parentArea.individualId);
+            }
+            
+            setIdealQuery('spot', spot.name);
+            window._selectSpotCompleted = true;
 
-        // ------------------------------------------
-        // 親エリア検索
-        // ------------------------------------------
-        const parentArea = (window.areaData || []).find(
-            a => safeAreaId.endsWith(String(a.individualId))
-        );
+            if (typeof drawLocation === 'function') {
+                drawLocation(spot.name, spot.lat, spot.lng, 13);
+            }
+            
+            if (window.map) {
+                window.map.once('moveend', () => {
+                    window.map.invalidateSize(true);
+                    if (typeof enableDragForArea === 'function') enableDragForArea();
+                    if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+                    window.map.getContainer().classList.add('is-spot-mode');
 
-        if (!parentArea) return;
-
-        // ------------------------------------------
-        // URL状態
-        // ------------------------------------------
-        if (window.prefData) {
-            setIdealQuery('pref', window.prefData.notes);
+                    if (spot.zoom && spot.zoom !== '') {
+                        if (typeof zoomToSpot === 'function') zoomToSpot(spot);
+                    } else {
+                        if (typeof showFishPopup === 'function') showFishPopup(spot);
+                    }
+                });
+            }
+            
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                const tileWrap = document.getElementById('tile-btn-wrap'); 
+                const tileBtn = document.getElementById('map-tile-btn'); 
+                
+                if (btn) {
+                    btn.style.display = 'block';
+                    if (tileWrap) tileWrap.style.display = 'flex'; 
+                    if (tileBtn) tileBtn.style.display = 'block'; 
+                    
+                    requestAnimationFrame(() => { 
+                        btn.style.opacity = '1'; 
+                        if (tileBtn) tileBtn.style.opacity = '1'; 
+                    });
+                }
+            });
         }
-        setIdealQuery('area', parentArea.name);
-        setIdealQuery('spot', spot.name);
+        return;
+    }
 
-        // ------------------------------------------
-        // ① スポット位置を描画
-        // ------------------------------------------
-        drawLocation(spot.name, spot.lat, spot.lng, 13);
-        showAllRegionSpots();
+    // ─── エリア階層への直リンク復元 ───
+    if (window.currentAreaId) {
+        const safeAreaId = window.currentAreaId || ""; 
+        const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+        if (!area) return;
+        
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', area.name); 
+        setIdealQuery('spot', null);      
 
-        // ------------------------------------------
-        // ② 親エリアのPhase1を構築
-        // ------------------------------------------
-        if (window.map) {
-            window.map.options.maxBoundsViscosity = 0;
-            window.map.setMaxBounds(null);
-        }
-
-        // ------------------------------------------
-        // ③ 親エリアを開く
-        // ------------------------------------------
-        if (typeof openArea === 'function') {
-            openArea(parentArea.individualId);
-        }
-
-        // ------------------------------------------
-        // ④ スポットへズーム
-        // ------------------------------------------
+        const safeZoom = area.zoom || window.prefData.zoom;
+        if (typeof drawLocation === 'function') drawLocation(area.name, area.lat, area.lng, safeZoom);
+        
+        // ★ 不足していたエリアガイドの描画を行う
+        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+        
+        if (typeof selectArea === 'function') selectArea(area); 
+        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+        
         requestAnimationFrame(() => {
-            window.map.invalidateSize(true);
-            zoomToSpot(spot);
-
-            // --------------------------------------
-            // 戻るボタンを表示
-            // --------------------------------------
             const btn = document.getElementById('map-back-btn');
             if (btn) {
                 btn.style.display = 'block';
-                requestAnimationFrame(() => {
-                    btn.style.opacity = '1';
-                });
+                requestAnimationFrame(() => { btn.style.opacity = '1'; });
             }
-            if (typeof renderSpotRanking === 'function') renderSpotRanking();
-            window._selectSpotCompleted = true;
         });
-
         return;
     }
 
-    // ==================================================
-    // エリア画面
-    // ※ currentAreaIdあり / currentSpotIdなし
-    // ==================================================
-    if (window.currentAreaId && !window.currentSpotId) {
-        const safeAreaId = window.currentAreaId;
-        const area = (window.areaData || []).find(
-            a => safeAreaId.endsWith(String(a.individualId))
-        );
-
-        if (!area) return;
-
-        if (window.prefData) {
-            setIdealQuery('pref', window.prefData.notes);
-        }
-        setIdealQuery('area', area.name);
-        setIdealQuery('spot', null);
-
-        // mapがまだ生成されていないため、
-        // まずエリア位置でdrawLocationしてmapを生成する
-        drawLocation(
-            area.name,
-            area.lat,
-            area.lng,
-            area.zoom || window.prefData.zoom
-        );
-        showAllRegionSpots();
-
-        // その後は通常のselectAreaに任せる
-        if (typeof selectArea === 'function') {
-            selectArea(area);
-            if (typeof renderCrowdImage === 'function') renderCrowdImage();
-            if (typeof renderSpotRanking === 'function') renderSpotRanking();
-        }
-
-        return;
-    }
-
-    // ==================================================
-    // 県画面
-    // ==================================================
+    // ─── 県階層への直リンク復元 ───
     if (window.prefData) {
-        setIdealQuery('pref', window.prefData.notes);
-        setIdealQuery('area', null);
-        setIdealQuery('spot', null);
+        setIdealQuery('pref', window.prefData.notes); 
+        setIdealQuery('area', null);                 
+        setIdealQuery('spot', null);                 
 
-        // ------------------------------------------
-        // ① 県位置
-        // ------------------------------------------
-        drawLocation(
-            window.prefData.name,
-            window.prefData.lat,
-            window.prefData.lng,
-            window.prefData.zoom
-        );
-        showAllRegionSpots();
+        const targetZoom = window.prefData.zoom;
+        
+        const isMapJustCreated = !window.map;
+        const center = window.map ? window.map.getCenter() : null;
+        const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                          window.map.getZoom() === targetZoom);
 
-        // ------------------------------------------
-        // ② 県画面UI
-        // ------------------------------------------
+        if (typeof drawLocation === 'function') drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        
         const finalizePref = () => {
-            if (window.map) {
-                window.map.invalidateSize(true);
-            }
-
+            if (window.map) window.map.invalidateSize(true);
+            
             requestAnimationFrame(() => {
-                if (typeof showPrefSpots === 'function') {
-                    showPrefSpots();
-                }
-                if (typeof initAreaUI === 'function') {
-                    initAreaUI();
-                }
-                if (typeof renderPrefWeather === 'function') {
-                    renderPrefWeather();
-                }
-
-                if (typeof disableAreaSwipe === 'function') {
-                    disableAreaSwipe();
-                }
-                if (typeof enablePrefSwipe === 'function') {
-                    enablePrefSwipe();
-                }
-                if (typeof renderCrowdImage === 'function') renderCrowdImage();
-
                 requestAnimationFrame(() => {
-                    const btn = document.getElementById('map-back-btn');
-                    if (btn) {
-                        btn.style.display = 'block';
-                        requestAnimationFrame(() => {
-                            btn.style.opacity = '1';
-                        });
-                    }
-                    window.goBackGuard = false;
+                    if (typeof showPrefSpots === 'function') showPrefSpots();
+                    if (typeof initAreaUI === 'function') initAreaUI();
+                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
+
+                    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                    if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                    
+                    // ★ 不足していたエリアガイドの描画を行う
+                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
+
+                    requestAnimationFrame(() => {
+                        const btn = document.getElementById('map-back-btn');
+                        if (btn) {
+                            btn.style.display = 'block';
+                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                        }
+                        window.goBackGuard = false; 
+                    });
                 });
             });
         };
-        requestAnimationFrame(finalizePref);
-        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+
+        if (isSameLoc) {
+            finalizePref();
+        } else {
+            if (window.map) window.map.once('moveend', finalizePref);
+        }
     }
 }
+
 
 // ★ Region名の変換マッピング
 const REGION_MAP = {
