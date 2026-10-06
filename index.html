@@ -1357,7 +1357,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     window.prefWeatherUrl = `/data/${prefCode}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
     window.fishUrl = `/${region}/${prefCode}_fish.json`;
-    window.prefShopUrl = `/${region}/${prefCode}_shop.csv`;
+    window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
 
     let prefName = fallbackPrefName;
 
@@ -3006,7 +3006,7 @@ function renderPrefectureUI() {
     // データがない場合は何もしない
     if (!window.prefData) return;
 
-    const shopUrl = `/KANTO/${window.currentPref}_shop.csv`;
+    const shopUrl = `/KANTO/${window.currentPref}_shop.json`;
 
     try {
         // エリアガイドの描画
@@ -3055,7 +3055,7 @@ function preloadCsvFiles(regionCode, prefCode) {
     if (!regionCode || !prefCode) return;
     
     const whetherUrl = `/data/${prefCode}_whether.csv`;
-    const shopUrl    = `/${regionCode}/${prefCode}_shop.csv`;
+    const shopUrl    = `/${regionCode}/${prefCode}_shop.json`;
 
     if (!window.fetchCacheStatus[prefCode]) {
         window.fetchCacheStatus[prefCode] = true;
@@ -3539,7 +3539,7 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
     window.prefInlandWeatherUrl = `/data/${regionCode}_inLand_recalculated.csv`;
     window.fishUrl              = `/${regionCode}/${prefCode}_fish.json`;
-    window.prefShopUrl          = `/${regionCode}/${prefCode}_shop.csv`;
+    window.prefShopUrl          = `/${regionCode}/${prefCode}_shop.json`;
 
     setIdealQuery('pref', prefName || prefCode);
     setIdealQuery('area', null);
