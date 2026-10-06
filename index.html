@@ -262,6 +262,7 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('ServiceWorkerの登録失敗:', err));
   });
 }
+
 // ==========================================
 // ★ オススメ釣り場ランキング：クリア＆非表示関数
 // ==========================================
@@ -273,14 +274,16 @@ function clearSpotRanking() {
 }
 
 // ==========================================
-// ★ 明日のオススメ釣り場ランキング表示関数（スリム＆純粋リンク版）
+// ★ 明日のオススメ釣り場ランキング表示関数（トップ＆県画面 両対応版）
 // ==========================================
-function renderSpotRanking() {
+async function renderSpotRanking() {
     const container = document.getElementById('spot-ranking-container');
     const section = document.getElementById('fishing-recommend-section');
     if (!container || !section) return;
 
-    clearSpotRanking();
+    // ローディング表示
+    section.style.display = 'block';
+    container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
 
     const now = new Date();
     const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
@@ -290,16 +293,50 @@ function renderSpotRanking() {
     const tDate = nowJST.getDate();
     const tomorrowStr = `${tMonth}月${tDate}日`;
 
-    const titleEl = section.querySelector('h2');
-    if (titleEl) {
-        titleEl.innerHTML = `明日（${tomorrowStr}）釣りに行くんだけど良い場所ある？`;
+    let targetSpots = [];
+    let titlePrefix = "";
+
+    // --------------------------------------------------
+    // パターンA: 県画面（選択されている県のスポットのみ）
+    // --------------------------------------------------
+    if (window.currentPref && window.spotData && window.spotData.length > 0) {
+        targetSpots = window.spotData;
+        const prefName = window.prefData ? window.prefData.notes : window.currentPref;
+        titlePrefix = `${prefName}で`;
+    } 
+    // --------------------------------------------------
+    // パターンB: トップページ（関東全域のスポットから算出）
+    // --------------------------------------------------
+    else if (!window.currentPref && window.allspotData && window.allspotData.length > 0 && window.regionPrefData) {
+        titlePrefix = "関東で";
+        
+        // まだ天気が付与されていない県のために、全県の天気を一括フェッチ
+        const fetchPromises = window.regionPrefData.map(pref => {
+            const whetherUrl = `/data/${pref.prefCode}_whether.csv`;
+            return loadWhetherCSV(whetherUrl).catch(() => null);
+        });
+
+        const results = await Promise.all(fetchPromises);
+        
+        // 取得した天気を allspotData 全体に適用
+        results.forEach(csvData => {
+            if (csvData) applyWhetherToSpots(csvData, window.allspotData);
+        });
+
+        targetSpots = window.allspotData;
+    } else {
+        clearSpotRanking();
+        return;
     }
 
-    if (!window.spotData || window.spotData.length === 0) return;
+    const titleEl = section.querySelector('h2');
+    if (titleEl) {
+        titleEl.innerHTML = `明日（${tomorrowStr}）${titlePrefix}釣りに行くんだけど良い場所ある？`;
+    }
 
     const ranking = [];
 
-    window.spotData.forEach(spot => {
+    targetSpots.forEach(spot => {
         if (spot.type === 'pref' || spot.type === 'area') return;
         const typeParts = (spot.type || '').split('$');
         if (typeParts.includes('representative') || typeParts.includes('assistant') || typeParts.includes('substitute')) return;
@@ -372,7 +409,10 @@ function renderSpotRanking() {
         });
     });
 
-    if (ranking.length === 0) return;
+    if (ranking.length === 0) {
+        clearSpotRanking();
+        return;
+    }
 
     ranking.sort((a, b) => b.score - a.score);
 
@@ -393,18 +433,31 @@ function renderSpotRanking() {
     top3.forEach(item => {
         
         // ==========================================
-        // ★ 既存ロジック流用：URLの動的構築
+        // ★ URLの動的構築 (対象がallspotDataの場合も考慮)
         // ==========================================
-        const spotObj = window.spotData.find(s => s.name === item.name);
+        const targetVault = window.currentPref ? window.spotData : window.allspotData;
+        const spotObj = targetVault.find(s => s.name === item.name);
+        
         let url = "#";
         if (spotObj) {
             const regionName = window.currentRegion || '関東地方';
-            const prefName = window.prefData ? window.prefData.notes : window.currentPref;
-            const parentArea = window.areaData ? window.areaData.find(a => spotObj.areaId && spotObj.areaId.endsWith(a.individualId)) : null;
-            const areaName = parentArea ? parentArea.name : '';
             
-            // クエリパラメータをエンコードしてURLを組み立てる
-            url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName)}&area=${encodeURIComponent(areaName)}&spot=${encodeURIComponent(item.name)}`;
+            // トップページの場合は、spotObjが所属する県を逆引きする
+            let prefName = window.prefData ? window.prefData.notes : window.currentPref;
+            if (!prefName && window.regionPrefData) {
+                const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
+                if (pInfo) prefName = pInfo.prefName;
+            }
+
+            // エリア名を逆引き
+            let areaName = '';
+            const targetAreas = window.currentPref ? window.areaData : window.allspotData;
+            if (targetAreas && spotObj.areaId) {
+                const parentArea = targetAreas.find(a => a.type === 'area' && spotObj.areaId.endsWith(a.individualId));
+                if (parentArea) areaName = parentArea.name;
+            }
+            
+            url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName || '')}&area=${encodeURIComponent(areaName || '')}&spot=${encodeURIComponent(item.name)}`;
         }
 
         html += `
@@ -422,7 +475,6 @@ function renderSpotRanking() {
     html += '</ul>';
 
     container.innerHTML = html;
-    section.style.display = 'block';
 }
 
 // ==========================================
@@ -2592,24 +2644,26 @@ function loadWhetherCSV(url) {
     });
 }
 
-function applyWhetherToSpots(csvData) {
-
+// ================================
+// ■ 天気データをスポットに適用する関数（汎用化）
+// ================================
+function applyWhetherToSpots(csvData, targetArray = window.spotData) {
     if (!Array.isArray(csvData)) return;
-    if (!Array.isArray(window.spotData)) return;
+    if (!Array.isArray(targetArray)) return;
 
     const map = {};
-
     for (const row of csvData) {
         if (!row.name || !row.whether) continue;
         map[row.name] = row.whether;
     }
 
-    for (const spot of window.spotData) {
+    for (const spot of targetArray) {
         if (map[spot.name] !== undefined) {
             spot.whether = map[spot.name];
         }
     }
 }
+
 // ================================
 // ■ 安全CSV分割（3カラム固定）
 // ================================
@@ -3039,6 +3093,7 @@ if (!window.currentPref) {
     showPrefSpots();
 
     if (typeof renderCrowdImage === 'function') {
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
         renderCrowdImage();
     }
 
