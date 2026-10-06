@@ -67,13 +67,13 @@ function showShop01(areaKey) {
     if (!shops.length) return;
 
     // -------------------------
-    // phase1Groupに統合（ここが本体）
+    // phase1Groupに統合
     // -------------------------
     if (!window.phase1Group) {
         window.phase1Group = L.layerGroup().addTo(window.map);
     }
 
-    // 既存shop01だけ消す（グループ内管理）
+    // 既存shop01だけ消す
     window.phase1Group.eachLayer(layer => {
         if (layer.options && layer.options._shop01) {
             window.phase1Group.removeLayer(layer);
@@ -81,22 +81,25 @@ function showShop01(areaKey) {
     });
 
     // -------------------------
-    // 描画
+    // 描画（Phase2と同じ .shop-anchor を使用）
     // -------------------------
     for (let i = 0; i < shops.length; i++) {
         const s = shops[i];
 
         if (isNaN(s.lat) || isNaN(s.lng)) continue;
 
-        const marker = L.circleMarker([s.lat, s.lng], {
-            radius: 3,
-            color: '#191970',
-            weight: 1,
-            fillColor: '#fff',
-            fillOpacity: 1
+        // ★ Phase2と同じクラス（custom-shop-marker, shop-anchor）でドットのみ描画
+        const marker = L.marker([s.lat, s.lng], {
+            icon: L.divIcon({
+                className: 'custom-shop-marker',
+                html: '<div class="shop-anchor"></div>',
+                iconSize: [0, 0],
+                iconAnchor: [0, 0]
+            }),
+            interactive: false // Phase1ではタップ判定をオフにして超軽量化
         });
 
-        // ★識別フラグ
+        // 識別フラグ
         marker.options._shop01 = true;
 
         window.phase1Group.addLayer(marker);
