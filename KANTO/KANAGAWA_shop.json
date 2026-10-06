@@ -1,0 +1,3975 @@
+[
+  {
+    "group": "DAISO",
+    "name": "相鉄ライフいずみ野店",
+    "lat": 35.4306925,
+    "lng": 139.4905302,
+    "notes": "神奈川県横浜市泉区和泉町6214-1相鉄ライフいずみ野2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜弘明寺店",
+    "lat": 35.4240461,
+    "lng": 139.5877583,
+    "notes": "神奈川県横浜市南区弘明寺町270 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "海老名かしわ台店",
+    "lat": 35.4646834,
+    "lng": 139.4096946,
+    "notes": "神奈川県海老名市柏ケ谷3-4-8",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "三浦海岸店",
+    "lat": 35.1886302,
+    "lng": 139.6548088,
+    "notes": "神奈川県三浦市南下浦町上宮田字木ノ間1434-3",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ジアウトレット湘南平塚店",
+    "lat": 35.3925682,
+    "lng": 139.362666,
+    "notes": "神奈川県平塚市大神字一之堰605 ジ アウトレット湘南平塚 1202ダイソー",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "平塚田村店",
+    "lat": 35.3728133,
+    "lng": 139.3639245,
+    "notes": "神奈川県平塚市田村7丁目6237",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ中津店",
+    "lat": 35.5155,
+    "lng": 139.33829,
+    "notes": "神奈川県愛甲郡愛川町中津3397-1マルエツ中津店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ綾瀬店",
+    "lat": 35.41397,
+    "lng": 139.44508,
+    "notes": "神奈川県綾瀬市上土棚南1-8-25マルエツ綾瀬店 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ綾瀬店",
+    "lat": 35.45869,
+    "lng": 139.42722,
+    "notes": "神奈川県綾瀬市大上2-1-1MEGAドン・キホーテ綾瀬店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロス伊勢原店",
+    "lat": 35.40213,
+    "lng": 139.34467,
+    "notes": "神奈川県伊勢原市歌川2-5-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー伊勢原店",
+    "lat": 35.39496,
+    "lng": 139.31502,
+    "notes": "神奈川県伊勢原市桜台1丁目8-1 イトーヨーカドー伊勢原店5階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "伊勢原田中店",
+    "lat": 35.40142,
+    "lng": 139.31404,
+    "notes": "神奈川県伊勢原市田中257-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "伊勢原エムアイプラザ店",
+    "lat": 35.4029,
+    "lng": 139.29576,
+    "notes": "神奈川県伊勢原市板戸8番",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "浦賀店",
+    "lat": 35.24567,
+    "lng": 139.71478,
+    "notes": "神奈川県横須賀市浦賀6-2-18",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ウィング久里浜店",
+    "lat": 35.23084,
+    "lng": 139.70259,
+    "notes": "神奈川県横須賀市久里浜4-4-10 ウィング久里浜2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横須賀モアーズシティ店",
+    "lat": 35.27821,
+    "lng": 139.66986,
+    "notes": "神奈川県横須賀市若松町2丁目30 横須賀モアーズシティ7階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヴィスポ横須賀店",
+    "lat": 35.27505,
+    "lng": 139.68115,
+    "notes": "神奈川県横須賀市平成町2-14-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コースカベイサイドストアーズ店",
+    "lat": 35.28213,
+    "lng": 139.66556,
+    "notes": "神奈川県横須賀市本町2丁目1-12コースカベイサイドストアーズ4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "APT横須賀店",
+    "lat": 35.28118,
+    "lng": 139.66261,
+    "notes": "神奈川県横須賀市本町3-27横須賀APT 店内2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "あおば下川井店",
+    "lat": 35.4862,
+    "lng": 139.52014,
+    "notes": "神奈川県横浜市旭区下川井町57-1 食品館あおば下川井2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー若葉台店",
+    "lat": 35.50507,
+    "lng": 139.49796,
+    "notes": "神奈川県横浜市旭区若葉台3-7-1 イトーヨーカドー若葉台2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "希望が丘K-1SC店",
+    "lat": 35.46009,
+    "lng": 139.50989,
+    "notes": "神奈川県横浜市旭区中希望が丘177-1希望が丘K-1SC店 3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "旭鶴ヶ峰店",
+    "lat": 35.47231,
+    "lng": 139.54469,
+    "notes": "神奈川県横浜市旭区鶴ケ峰1-7-10 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜鶴ヶ峰店",
+    "lat": 35.47803,
+    "lng": 139.53897,
+    "notes": "神奈川県横浜市旭区鶴ヶ峰本町1-27-13 横浜鶴ヶ峰店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ドン・キホーテ二俣川店",
+    "lat": 35.46469,
+    "lng": 139.53183,
+    "notes": "神奈川県横浜市旭区二俣川1-43-1ドン・キホーテ二俣川店内4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "相鉄ライフ南まきが原店",
+    "lat": 35.45187,
+    "lng": 139.52533,
+    "notes": "神奈川県横浜市旭区柏町127相鉄ライフ南まきが原内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "磯子駅前店",
+    "lat": 35.40149,
+    "lng": 139.61784,
+    "notes": "神奈川県横浜市磯子区磯子3-6-23磯子アイランドビル2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "らびすた新杉田店",
+    "lat": 35.38573,
+    "lng": 139.61917,
+    "notes": "神奈川県横浜市磯子区杉田1-1-1 らびすた新杉田2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "東急ストア根岸店",
+    "lat": 35.41627,
+    "lng": 139.63585,
+    "notes": "神奈川県横浜市磯子区東町17-30東急ストア根岸店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "東急ストア洋光台店",
+    "lat": 35.37777,
+    "lng": 139.59671,
+    "notes": "神奈川県横浜市磯子区洋光台4-1-3洋光台東急ストア2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや洋光台店",
+    "lat": 35.37138,
+    "lng": 139.60089,
+    "notes": "神奈川県横浜市磯子区洋光台6-31-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー桂台店",
+    "lat": 35.3532,
+    "lng": 139.56636,
+    "notes": "神奈川県横浜市栄区桂台中15-1イトーヨーカドー桂台2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アピタ金沢文庫店",
+    "lat": 35.34075,
+    "lng": 139.62003,
+    "notes": "神奈川県横浜市金沢区釜利谷東2-1-1アピタ金沢文庫店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン金沢八景店",
+    "lat": 35.33385,
+    "lng": 139.62245,
+    "notes": "神奈川県横浜市金沢区泥亀1-27-1イオン金沢八景店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー能見台店",
+    "lat": 35.35841,
+    "lng": 139.62717,
+    "notes": "神奈川県横浜市金沢区能見台東3-1 イトーヨーカドー能見台3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ビアレ横浜店",
+    "lat": 35.3619,
+    "lng": 139.63928,
+    "notes": "神奈川県横浜市金沢区並木2丁目13-7ビアレ横浜3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンスタイル戸塚店",
+    "lat": 35.40872,
+    "lng": 139.5377,
+    "notes": "神奈川県横浜市戸塚区吉田町884",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン戸塚汲沢店",
+    "lat": 35.39051,
+    "lng": 139.52063,
+    "notes": "神奈川県横浜市戸塚区汲沢町1158-1 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "戸塚モディ店",
+    "lat": 35.40051,
+    "lng": 139.53456,
+    "notes": "神奈川県横浜市戸塚区戸塚町10戸塚モディ 5階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ライズモール戸塚店",
+    "lat": 35.38,
+    "lng": 139.52586,
+    "notes": "神奈川県横浜市戸塚区戸塚町1313-4 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アピタ戸塚店",
+    "lat": 35.39878,
+    "lng": 139.53925,
+    "notes": "神奈川県横浜市戸塚区上倉田町769-1アピタ戸塚 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜戸塚原宿店",
+    "lat": 35.38129,
+    "lng": 139.50237,
+    "notes": "神奈川県横浜市戸塚区深谷町234-1 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "東戸塚西口プラザ店",
+    "lat": 35.43124,
+    "lng": 139.5544,
+    "notes": "神奈川県横浜市戸塚区川上町87東戸塚西口プラザ2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "バロー横浜下永谷店",
+    "lat": 35.4125,
+    "lng": 139.56061,
+    "notes": "神奈川県横浜市港南区下永谷5-2-1 バロー横浜下永谷店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー上永谷店",
+    "lat": 35.40054,
+    "lng": 139.57185,
+    "notes": "神奈川県横浜市港南区丸山台1丁目12イトーヨーカドー上永谷3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンフードスタイル港南台店",
+    "lat": 35.37504,
+    "lng": 139.5773,
+    "notes": "神奈川県横浜市港南区港南台3-1-2イオンフードスタイル港南台4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "たまや横浜港南台店",
+    "lat": 35.36775,
+    "lng": 139.58932,
+    "notes": "神奈川県横浜市港南区港南台6-12-5たまや港南台店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ロピア港南台店",
+    "lat": 35.3749,
+    "lng": 139.56708,
+    "notes": "神奈川県横浜市港南区港南台9-1-2 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "グッディプレイス港南中央店",
+    "lat": 35.40141,
+    "lng": 139.59244,
+    "notes": "神奈川県横浜市港南区港南中央通12-31グッディプレイス港南中央店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アカフーパーク上大岡店",
+    "lat": 35.40649,
+    "lng": 139.59625,
+    "notes": "神奈川県横浜市港南区上大岡西2-1-28 アカフーパーク1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "上大岡西店",
+    "lat": 35.40259,
+    "lng": 139.59821,
+    "notes": "神奈川県横浜市港南区上大岡西3丁目11-8 業務スーパー上大岡店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Pit Terrace新綱島店",
+    "lat": 35.5351,
+    "lng": 139.63652,
+    "notes": "神奈川県横浜市港北区綱島東1-11-9 Pit Terrace2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "大倉山駅前店",
+    "lat": 35.52225,
+    "lng": 139.62956,
+    "notes": "神奈川県横浜市港北区大倉山2-1-13グリーンパークビル1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "T-PLATZ綱島店",
+    "lat": 35.53225,
+    "lng": 139.63658,
+    "notes": "神奈川県横浜市港北区樽町2-6-40 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "日吉東急店",
+    "lat": 35.55425,
+    "lng": 139.6472,
+    "notes": "神奈川県横浜市港北区日吉2-1-1日吉東急店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "エスポット新横浜店",
+    "lat": 35.51826,
+    "lng": 139.61383,
+    "notes": "神奈川県横浜市港北区北新横浜1-3-16エスポット新横浜店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "オルト新子安店",
+    "lat": 35.48739,
+    "lng": 139.65279,
+    "notes": "神奈川県横浜市神奈川区新子安1-2-4オルトヨコハマ2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ユーコープ神大寺店",
+    "lat": 35.48658,
+    "lng": 139.61473,
+    "notes": "神奈川県横浜市神奈川区神大寺2-41-1 ユーコープ神大寺店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロス東神奈川店",
+    "lat": 35.50048,
+    "lng": 139.64398,
+    "notes": "神奈川県横浜市神奈川区西寺尾1丁目16-15 アクロスプラザ東神奈川店内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "瀬谷阿久和店",
+    "lat": 35.45562,
+    "lng": 139.49634,
+    "notes": "神奈川県横浜市瀬谷区阿久和西1-30-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "相鉄ライフ三ツ境店",
+    "lat": 35.46843,
+    "lng": 139.50266,
+    "notes": "神奈川県横浜市瀬谷区三ツ境2-19 相鉄ライフ三ツ境4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "スマイルストリート瀬谷店",
+    "lat": 35.47101,
+    "lng": 139.48396,
+    "notes": "神奈川県横浜市瀬谷区中央1-4相鉄瀬谷駅北口新ビル2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "みなとみらい東急スクエア店",
+    "lat": 35.45666,
+    "lng": 139.63402,
+    "notes": "神奈川県横浜市西区みなとみらい2-3-2 みなとみらい東急スクエア地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マークイズみなとみらい店",
+    "lat": 35.45771,
+    "lng": 139.63176,
+    "notes": "神奈川県横浜市西区みなとみらい3-5-1 地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "サミット横浜岡野店",
+    "lat": 35.45936,
+    "lng": 139.6106,
+    "notes": "神奈川県横浜市西区岡野2-5-18",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products横浜ジョイナス店",
+    "lat": 35.46487,
+    "lng": 139.62051,
+    "notes": "神奈川県横浜市西区南幸1-5-1 ジョイナス2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100西横浜店",
+    "lat": 35.45218,
+    "lng": 139.61264,
+    "notes": "神奈川県横浜市西区浜松町2-25 横浜ハイコーポ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜駅前西口店",
+    "lat": 35.46759,
+    "lng": 139.6216,
+    "notes": "神奈川県横浜市西区北幸1丁目1番13号横浜駅前ビル地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和藤が丘店",
+    "lat": 35.54501,
+    "lng": 139.52496,
+    "notes": "神奈川県横浜市青葉区もえぎ野1-2 三和藤が丘店内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ハーモス荏田店",
+    "lat": 35.55554,
+    "lng": 139.55428,
+    "notes": "神奈川県横浜市青葉区荏田西2-14-3ハーモス荏田1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "エトモ市が尾店",
+    "lat": 35.55104,
+    "lng": 139.54106,
+    "notes": "神奈川県横浜市青葉区市ケ尾町1063-4エトモ市が尾3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "青葉台東急スクエア店",
+    "lat": 35.54291,
+    "lng": 139.51593,
+    "notes": "神奈川県横浜市青葉区青葉台2-5-1 South-1 別館 地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "T-BOX横浜藤が丘店",
+    "lat": 35.54533,
+    "lng": 139.52887,
+    "notes": "神奈川県横浜市青葉区藤が丘1-28-17T-BOX 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和こどもの国店",
+    "lat": 35.55713,
+    "lng": 139.48427,
+    "notes": "神奈川県横浜市青葉区奈良1-2-1 三和こどもの国店1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドーたまプラーザ店",
+    "lat": 35.57848,
+    "lng": 139.55615,
+    "notes": "神奈川県横浜市青葉区美しが丘1-6-1 イトーヨーカドーたまプラーザ3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜いずみ中央店",
+    "lat": 35.42148,
+    "lng": 139.4841,
+    "notes": "神奈川県横浜市泉区上飯田町2060 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜サニーアイル店",
+    "lat": 35.44763,
+    "lng": 139.483,
+    "notes": "神奈川県横浜市泉区上飯田町4685-1サニーアイル2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー立場店",
+    "lat": 35.41462,
+    "lng": 139.49994,
+    "notes": "神奈川県横浜市泉区中田西1-1-15 イトーヨーカドー立場2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "そうてつローゼン山手台店",
+    "lat": 35.4172,
+    "lng": 139.52335,
+    "notes": "神奈川県横浜市泉区領家2-10-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "関内マリナード店",
+    "lat": 35.44661,
+    "lng": 139.63356,
+    "notes": "神奈川県横浜市中区港町5-24-2 関内地下街マリナード内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Productsコレットマーレ店",
+    "lat": 35.45356,
+    "lng": 139.62924,
+    "notes": "神奈川県横浜市中区桜木町1-1-7 コレットマーレ5階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ぴおシティー桜木町店",
+    "lat": 35.45356,
+    "lng": 139.62924,
+    "notes": "神奈川県横浜市中区桜木町1-1桜木町ゴールデンセンター地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ホームセンターコーナン本牧フロント店",
+    "lat": 35.43,
+    "lng": 139.66518,
+    "notes": "神奈川県横浜市中区小港町2丁目100番地4",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ新山下店",
+    "lat": 35.43977,
+    "lng": 139.6602,
+    "notes": "神奈川県横浜市中区新山下2-12-34",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜セルテ店",
+    "lat": 35.445,
+    "lng": 139.63579,
+    "notes": "神奈川県横浜市中区真砂町3-33横浜セルテ 店内2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナンビーバートザン鶴見駒岡店",
+    "lat": 35.52605,
+    "lng": 139.6497,
+    "notes": "神奈川県横浜市鶴見区駒岡2-3-5",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "LICOPA鶴見店",
+    "lat": 35.50898,
+    "lng": 139.68623,
+    "notes": "神奈川県横浜市鶴見区鶴見中央3-15-30 LICOPA鶴見2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "港北東急ショッピングセンター店",
+    "lat": 35.54421,
+    "lng": 139.57259,
+    "notes": "神奈川県横浜市都筑区茅ヶ崎中央5-1港北東急ショッピングセンター店7階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドーららぽーと横浜店",
+    "lat": 35.5173,
+    "lng": 139.56642,
+    "notes": "神奈川県横浜市都筑区池辺町4035-1 イトーヨーカドーららぽーと横浜店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "港北ノースポートモール店",
+    "lat": 35.5521,
+    "lng": 139.57941,
+    "notes": "神奈川県横浜市都筑区中川中央1-25-1港北ノースポートモール地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "センター北あいたい店",
+    "lat": 35.55347,
+    "lng": 139.57835,
+    "notes": "神奈川県横浜市都筑区中川中央1丁目1番3号 ショッピングタウンあいたい4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ルララこうほく店",
+    "lat": 35.54883,
+    "lng": 139.57788,
+    "notes": "神奈川県横浜市都筑区中川中央2丁目2-1ルララこうほく店内3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ビエラ蒔田店",
+    "lat": 35.43134,
+    "lng": 139.60883,
+    "notes": "神奈川県横浜市南区花之木町3-48-1 ビエラ蒔田2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ井土ヶ谷店",
+    "lat": 35.43431,
+    "lng": 139.60371,
+    "notes": "神奈川県横浜市南区南太田3-18-17",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー横浜別所店",
+    "lat": 35.41596,
+    "lng": 139.59471,
+    "notes": "神奈川県横浜市南区別所1-14-1イトーヨーカドー横浜別所店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "横浜洪福寺松原店",
+    "lat": 35.45761,
+    "lng": 139.60458,
+    "notes": "神奈川県横浜市保土ケ谷区宮田町1-4-2",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "権太坂スクエア店",
+    "lat": 35.4383,
+    "lng": 139.57448,
+    "notes": "神奈川県横浜市保土ケ谷区権太坂3-1-3権太坂スクエア2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "トモズ和田町店",
+    "lat": 35.46244,
+    "lng": 139.58594,
+    "notes": "神奈川県横浜市保土ケ谷区星川3-8-1板津興産ビル2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ西谷店",
+    "lat": 35.47717,
+    "lng": 139.56845,
+    "notes": "神奈川県横浜市保土ケ谷区西谷3-14-11 マルエツ西谷店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ホームセンターコーナン保土ヶ谷星川店",
+    "lat": 35.46064,
+    "lng": 139.59543,
+    "notes": "神奈川県横浜市保土ケ谷区川辺町2-13",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン天王町店",
+    "lat": 35.45879,
+    "lng": 139.599,
+    "notes": "神奈川県横浜市保土ケ谷区川辺町3 イオンスタイル天王町3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ユーコープ竹山店",
+    "lat": 35.50293,
+    "lng": 139.56154,
+    "notes": "神奈川県横浜市緑区鴨居6-1-11 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "そうてつローゼン十日市場店",
+    "lat": 35.5252,
+    "lng": 139.51524,
+    "notes": "神奈川県横浜市緑区十日市場町807そうてつローゼン十日市場店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "中山駅ヴェルデ店",
+    "lat": 35.5151,
+    "lng": 139.53969,
+    "notes": "神奈川県横浜市緑区中山1丁目26番1号 中山駅前ビルヴェルデ4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カエデウォーク長津田店",
+    "lat": 35.51853,
+    "lng": 139.4987,
+    "notes": "神奈川県横浜市緑区長津田みなみ台4丁目7-1 カエデウォーク長津田店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "海老名下今泉店",
+    "lat": 35.46563,
+    "lng": 139.3889,
+    "notes": "神奈川県海老名市下今泉5-3-7 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ビナウォーク海老名店",
+    "lat": 35.45306,
+    "lng": 139.39218,
+    "notes": "神奈川県海老名市中央1-1-1 ビナウォーク1番館2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Productsビナウォーク海老名店",
+    "lat": 35.45168,
+    "lng": 139.39296,
+    "notes": "神奈川県海老名市中央1-4-1 ビナウォーク5番館2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン海老名店",
+    "lat": 35.45042,
+    "lng": 139.39313,
+    "notes": "神奈川県海老名市中央2-4-1イオン海老名店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "鎌倉とうきゅう店",
+    "lat": 35.31823,
+    "lng": 139.55078,
+    "notes": "神奈川県鎌倉市小町1丁目2番地12号鎌倉とうきゅう店6階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "鎌倉大船店",
+    "lat": 35.34458,
+    "lng": 139.53903,
+    "notes": "神奈川県鎌倉市大船4-17-18 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "大船松竹SC店",
+    "lat": 35.35425,
+    "lng": 139.5385,
+    "notes": "神奈川県鎌倉市大船6-1-1松竹SC B棟2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "そよら湘南茅ヶ崎店",
+    "lat": 35.33498,
+    "lng": 139.40909,
+    "notes": "神奈川県茅ヶ崎市茅ヶ崎2-7-71 そよら湘南茅ヶ崎店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ茅ヶ崎店",
+    "lat": 35.35066,
+    "lng": 139.40781,
+    "notes": "神奈川県茅ヶ崎市香川1-1-38マルエツ茅ヶ崎店1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "茅ヶ崎店",
+    "lat": 35.33241,
+    "lng": 139.40514,
+    "notes": "神奈川県茅ヶ崎市新栄町12-12トラストビル2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ブランチ茅ヶ崎店",
+    "lat": 35.32172,
+    "lng": 139.38724,
+    "notes": "神奈川県茅ヶ崎市浜見平3番1号BRANCH茅ヶ崎2 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠茅ヶ崎店",
+    "lat": 35.33762,
+    "lng": 139.40887,
+    "notes": "神奈川県茅ケ崎市本村4-6-51",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "アツギトレリス店",
+    "lat": 35.44865,
+    "lng": 139.34334,
+    "notes": "神奈川県厚木市戸室5-31-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "厚木妻田店",
+    "lat": 35.46335,
+    "lng": 139.36012,
+    "notes": "神奈川県厚木市妻田北1丁目10番3号",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "フードワン厚木長谷店",
+    "lat": 35.42737,
+    "lng": 139.34267,
+    "notes": "神奈川県厚木市長谷6-20フードワン厚木長谷店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "小田急マルシェ相武台店",
+    "lat": 35.49939,
+    "lng": 139.40881,
+    "notes": "神奈川県座間市相武台一丁目33番2号小田急マルシェ相武台店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和相模が丘店",
+    "lat": 35.50757,
+    "lng": 139.42868,
+    "notes": "神奈川県座間市相模が丘6-25-2三和相模が丘店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ハーモス座間店",
+    "lat": 35.48108,
+    "lng": 139.41203,
+    "notes": "神奈川県座間市立野台1-19-1 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ドン・キホーテ小田原店",
+    "lat": 35.25528,
+    "lng": 139.15747,
+    "notes": "神奈川県小田原市栄町2-8-15 ドン・キホーテ小田原店5階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "鴨宮店",
+    "lat": 35.27856,
+    "lng": 139.17711,
+    "notes": "神奈川県小田原市鴨宮字宝町636-1 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "小田原久野店",
+    "lat": 35.2719,
+    "lng": 139.1535,
+    "notes": "神奈川県小田原市久野269",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "フレスポ小田原シティーモール店",
+    "lat": 35.2819,
+    "lng": 139.1937,
+    "notes": "神奈川県小田原市前川100 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "秦野下大槻店",
+    "lat": 35.36132,
+    "lng": 139.26265,
+    "notes": "神奈川県秦野市下大槻220-4",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォルテ秦野店",
+    "lat": 35.38243,
+    "lng": 139.21184,
+    "notes": "神奈川県秦野市曽屋1210",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "秦野東田原店",
+    "lat": 35.38562,
+    "lng": 139.21477,
+    "notes": "神奈川県秦野市東田原97-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ロピア渋沢店",
+    "lat": 35.37476,
+    "lng": 139.19751,
+    "notes": "神奈川県秦野市平沢307-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークマート東逗子店",
+    "lat": 35.29816,
+    "lng": 139.59917,
+    "notes": "神奈川県逗子市桜山4-5 ヨークマート東逗子店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "逗子銀座店",
+    "lat": 35.29545,
+    "lng": 139.57727,
+    "notes": "神奈川県逗子市逗子1-8-6ココカラファイン逗子店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "トラペズ宮崎台店",
+    "lat": 35.58717,
+    "lng": 139.59138,
+    "notes": "神奈川県川崎市宮前区宮崎2-10-8 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "宮前平駅前店",
+    "lat": 35.58441,
+    "lng": 139.58147,
+    "notes": "神奈川県川崎市宮前区小台2-6-2",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "パシオス野川店",
+    "lat": 35.57584,
+    "lng": 139.6105,
+    "notes": "神奈川県川崎市宮前区西野川2-34-63",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "新川崎スクエア店",
+    "lat": 35.55024,
+    "lng": 139.67383,
+    "notes": "神奈川県川崎市幸区鹿島田1-1-3新川崎スクエア3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "クロスガーデン川崎店",
+    "lat": 35.5356,
+    "lng": 139.66713,
+    "notes": "神奈川県川崎市幸区小倉5-19-23 クロスガーデン川崎 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ラゾーナ川崎プラザ店",
+    "lat": 35.53139,
+    "lng": 139.6958,
+    "notes": "神奈川県川崎市幸区堀川町72-1 1階 11500",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "溝の口プライム店",
+    "lat": 35.59963,
+    "lng": 139.6129,
+    "notes": "神奈川県川崎市高津区溝口1-8-7溝の口プライム2階・3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "エディオン溝の口店",
+    "lat": 35.60796,
+    "lng": 139.61279,
+    "notes": "神奈川県川崎市高津区溝口6-11-1 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ川崎坂戸店",
+    "lat": 35.59799,
+    "lng": 139.62222,
+    "notes": "神奈川県川崎市高津区坂戸1-13-8",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100川崎旭町店",
+    "lat": 35.53206,
+    "lng": 139.71674,
+    "notes": "神奈川県川崎市川崎区旭町2-16-10",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products川崎アゼリア店",
+    "lat": 35.53012,
+    "lng": 139.69797,
+    "notes": "神奈川県川崎市川崎区駅前本町26-2 川崎アゼリア地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "川崎モアーズ店",
+    "lat": 35.53063,
+    "lng": 139.69987,
+    "notes": "神奈川県川崎市川崎区駅前本町7番地川崎モアーズ5階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "いなげや川崎京町店",
+    "lat": 35.51336,
+    "lng": 139.69447,
+    "notes": "神奈川県川崎市川崎区京町2丁目22番1号",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "小田銀座店",
+    "lat": 35.51044,
+    "lng": 139.70203,
+    "notes": "神奈川県川崎市川崎区小田4-36-14",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー川崎店",
+    "lat": 35.51519,
+    "lng": 139.70789,
+    "notes": "神奈川県川崎市川崎区小田栄2-2-1 イトーヨーカドー川崎2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ川崎大師店",
+    "lat": 35.53868,
+    "lng": 139.73335,
+    "notes": "神奈川県川崎市川崎区中瀬3-20-20島忠ホームズ川崎大師2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "カルナーザ川崎店",
+    "lat": 35.51914,
+    "lng": 139.71642,
+    "notes": "神奈川県川崎市川崎区追分町16-1カルナーザ川崎2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マーケットスクエア川崎イースト店",
+    "lat": 35.53283,
+    "lng": 139.71068,
+    "notes": "神奈川県川崎市川崎区富士見1丁目5番5マーケットスクエア川崎イースト3階0302",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王ストア稲田堤店",
+    "lat": 35.63369,
+    "lng": 139.53146,
+    "notes": "神奈川県川崎市多摩区菅2-9-9 京王ストア稲田堤2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヤオコー川崎枡形店",
+    "lat": 35.62075,
+    "lng": 139.55283,
+    "notes": "神奈川県川崎市多摩区枡形1-5-1 ヤオコー川崎枡形店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ中原店",
+    "lat": 35.57924,
+    "lng": 139.63881,
+    "notes": "神奈川県川崎市中原区下小田中1-28-1 マルエツ中原2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー武蔵小杉駅前店",
+    "lat": 35.57586,
+    "lng": 139.65785,
+    "notes": "神奈川県川崎市中原区小杉町3-420イトーヨーカドー武蔵小杉駅前店4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ビーンズ武蔵中原店",
+    "lat": 35.58139,
+    "lng": 139.64101,
+    "notes": "神奈川県川崎市中原区上小田中4-2-1ビーンズ武蔵中原店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "新丸子店",
+    "lat": 35.58055,
+    "lng": 139.66286,
+    "notes": "神奈川県川崎市中原区新丸子東1-777",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "トモズ武蔵新城店",
+    "lat": 35.58546,
+    "lng": 139.63091,
+    "notes": "神奈川県川崎市中原区新城1-3-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "サンドラッグ元住吉店",
+    "lat": 35.56565,
+    "lng": 139.65004,
+    "notes": "神奈川県川崎市中原区木月3丁目7番7号",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "川崎麻生店",
+    "lat": 35.60924,
+    "lng": 139.47153,
+    "notes": "神奈川県川崎市麻生区栗木2-1-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "新百合ヶ丘エルミロード店",
+    "lat": 35.60312,
+    "lng": 139.50932,
+    "notes": "神奈川県川崎市麻生区上麻生1-4-1 新百合ヶ丘エルミロード4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ柿生店",
+    "lat": 35.58905,
+    "lng": 139.49649,
+    "notes": "神奈川県川崎市麻生区上麻生5-41-1マルエツ柿生店1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和百合ヶ丘店",
+    "lat": 35.60564,
+    "lng": 139.51495,
+    "notes": "神奈川県川崎市麻生区百合丘2-3-1スーパー三和百合ヶ丘店A館地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "上溝横山店",
+    "lat": 35.55983,
+    "lng": 139.36525,
+    "notes": "神奈川県相模原市中央区横山6-8-21 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ザ・マーケットプレイス相模原店",
+    "lat": 35.57578,
+    "lng": 139.34633,
+    "notes": "神奈川県相模原市中央区下九沢57番地1ザ・マーケットプレイス相模原",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "相模原小町通店",
+    "lat": 35.57236,
+    "lng": 139.35895,
+    "notes": "神奈川県相模原市中央区小町通2丁目1-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "相模原it´s店",
+    "lat": 35.58185,
+    "lng": 139.36964,
+    "notes": "神奈川県相模原市中央区相模原1-1-19相模原it´s 4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和富士見店",
+    "lat": 35.56848,
+    "lng": 139.37433,
+    "notes": "神奈川県相模原市中央区富士見6丁目5番7号 三和富士見店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "エスポット淵野辺店",
+    "lat": 35.56742,
+    "lng": 139.39885,
+    "notes": "神奈川県相模原市中央区淵野辺5丁目1番9号 エスポット淵野辺店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "相模原陽光台店",
+    "lat": 35.54874,
+    "lng": 139.37767,
+    "notes": "神奈川県相模原市中央区陽光台6-4-13",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和麻溝店",
+    "lat": 35.53011,
+    "lng": 139.37659,
+    "notes": "神奈川県相模原市南区下溝598-1三和麻溝店B館2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ相模原店",
+    "lat": 35.55467,
+    "lng": 139.4144,
+    "notes": "神奈川県相模原市南区古淵2-9-1 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー相模原店",
+    "lat": 35.51546,
+    "lng": 139.42496,
+    "notes": "神奈川県相模原市南区松が枝町17-1 イトーヨーカドー相模原店4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和東林間店",
+    "lat": 35.52093,
+    "lng": 139.43993,
+    "notes": "神奈川県相模原市南区上鶴間7-4-3スーパー三和東林間店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "相模大野ステーションスクエア店",
+    "lat": 35.53163,
+    "lng": 139.43677,
+    "notes": "神奈川県相模原市南区相模大野3-8-1相模大野ステーションスクエアA館7階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ニトリモール相模原店",
+    "lat": 35.55579,
+    "lng": 139.40965,
+    "notes": "神奈川県相模原市南区大野台6-1-1ニトリモール相模原店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ラクアル・オダサガ店",
+    "lat": 35.51585,
+    "lng": 139.42218,
+    "notes": "神奈川県相模原市南区南台3-20-1 3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王クラウン街橋本店",
+    "lat": 35.59443,
+    "lng": 139.34499,
+    "notes": "神奈川県相模原市緑区橋本2-3-2京王クラウン街橋本2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン橋本店",
+    "lat": 35.5963,
+    "lng": 139.34448,
+    "notes": "神奈川県相模原市緑区橋本6-2-1 イオン橋本店5階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "スーパーアルプス城山店",
+    "lat": 35.59765,
+    "lng": 139.30894,
+    "notes": "神奈川県相模原市緑区原宿3-8-15",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "相模原城山店",
+    "lat": 35.59602,
+    "lng": 139.31384,
+    "notes": "神奈川県相模原市緑区原宿南1-5-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和西橋本店",
+    "lat": 35.5946,
+    "lng": 139.3299,
+    "notes": "神奈川県相模原市緑区西橋本4-1-1 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ラ・フロール橋本店",
+    "lat": 35.59723,
+    "lng": 139.33752,
+    "notes": "神奈川県相模原市緑区西橋本5-1-1ラ・フロール橋本店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "アリオ橋本店",
+    "lat": 35.59094,
+    "lng": 139.34982,
+    "notes": "神奈川県相模原市緑区大山町1-22 アリオ橋本2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "エスポット湯河原店",
+    "lat": 35.1444,
+    "lng": 139.11427,
+    "notes": "神奈川県足柄下郡湯河原町吉浜1576-47 エスポット湯河原店内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミマスモール店",
+    "lat": 35.33631,
+    "lng": 139.15259,
+    "notes": "神奈川県足柄上郡大井町金子343",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー大和鶴間店",
+    "lat": 35.49052,
+    "lng": 139.45724,
+    "notes": "神奈川県大和市下鶴間1丁目3番1号イトーヨーカドー大和鶴間店 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "いなげや高座渋谷店",
+    "lat": 35.43326,
+    "lng": 139.46147,
+    "notes": "神奈川県大和市渋谷5丁目40番地1 いなげや高座渋谷店内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン大和店",
+    "lat": 35.43484,
+    "lng": 139.46628,
+    "notes": "神奈川県大和市渋谷六丁目6番地1．",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "いなげや大和相模大塚駅前店",
+    "lat": 35.47283,
+    "lng": 139.44337,
+    "notes": "神奈川県大和市上草柳187-2いなげや大和相模大塚駅前店",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ大和店",
+    "lat": 35.44223,
+    "lng": 139.46674,
+    "notes": "神奈川県大和市上和田2670-1 島忠ホームズ大和2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "大和プロス店",
+    "lat": 35.46969,
+    "lng": 139.46121,
+    "notes": "神奈川県大和市大和東1-1-1 大和プロス地下1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "中央林間東急スクエア店",
+    "lat": 35.50732,
+    "lng": 139.44565,
+    "notes": "神奈川県大和市中央林間4-12-1 中央林間東急スクエア3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン中央林間店",
+    "lat": 35.50435,
+    "lng": 139.44981,
+    "notes": "神奈川県大和市中央林間7-7-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "大和りんかんモール店",
+    "lat": 35.50322,
+    "lng": 139.45056,
+    "notes": "神奈川県大和市中央林間7丁目6番1号 大和りんかんモール店内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ザ・ビッグ二宮店",
+    "lat": 35.31421,
+    "lng": 139.24326,
+    "notes": "神奈川県中郡二宮町一色1207-1ザ・ビッグ二宮店",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "小田急OX長後店",
+    "lat": 35.41234,
+    "lng": 139.46423,
+    "notes": "神奈川県藤沢市下土棚509-13",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "藤沢湘南台店",
+    "lat": 35.39419,
+    "lng": 139.46498,
+    "notes": "神奈川県藤沢市湘南台2丁目21番地の3",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ロピア石川店",
+    "lat": 35.38585,
+    "lng": 139.44788,
+    "notes": "神奈川県藤沢市石川5-9-26",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー湘南台店",
+    "lat": 35.39233,
+    "lng": 139.44699,
+    "notes": "神奈川県藤沢市石川6-2-1 イトーヨーカドー湘南台店3階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "藤沢川名店",
+    "lat": 35.33139,
+    "lng": 139.50151,
+    "notes": "神奈川県藤沢市川名791-1",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミスターマックス湘南藤沢店",
+    "lat": 35.34048,
+    "lng": 139.46497,
+    "notes": "神奈川県藤沢市辻堂新町4-3-5ミスターマックス湘南藤沢店 1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ラズ湘南辻堂店",
+    "lat": 35.33808,
+    "lng": 139.44797,
+    "notes": "神奈川県藤沢市辻堂神台1丁目2-12ラズ湘南辻堂店内2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "なぎさモール辻堂店",
+    "lat": 35.32479,
+    "lng": 139.4425,
+    "notes": "神奈川県藤沢市辻堂西海岸2丁目11番2号",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "トレアージュ白旗店",
+    "lat": 35.3488,
+    "lng": 139.47931,
+    "notes": "神奈川県藤沢市藤沢2-3-15トレアージュ白旗B棟1階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ダイエー藤沢店",
+    "lat": 35.33976,
+    "lng": 139.48405,
+    "notes": "神奈川県藤沢市藤沢520ダイエー藤沢店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ODAKYU湘南GATE店",
+    "lat": 35.33739,
+    "lng": 139.48758,
+    "notes": "神奈川県藤沢市南藤沢21-1 ODAKYU湘南GATE4階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "オーケーストア藤沢店",
+    "lat": 35.33794,
+    "lng": 139.49178,
+    "notes": "神奈川県藤沢市南藤沢6-23 オーケーストア藤沢店5階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヴェルミ大雄山店",
+    "lat": 35.31888,
+    "lng": 139.10382,
+    "notes": "神奈川県南足柄市関本591-1ヴェルミ2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "平塚河内店",
+    "lat": 35.33677,
+    "lng": 139.31194,
+    "notes": "神奈川県平塚市河内2-18-56",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヤオコー平塚宮松町店",
+    "lat": 35.33455,
+    "lng": 139.35156,
+    "notes": "神奈川県平塚市宮松町9番7号ヤオコー平塚宮松町店 2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "平塚ユーユー駅前館店",
+    "lat": 35.32867,
+    "lng": 139.34911,
+    "notes": "神奈川県平塚市紅谷町5番20号ユーユー駅前館6階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "OSC湘南シティ店",
+    "lat": 35.3285,
+    "lng": 139.35825,
+    "notes": "神奈川県平塚市代官町33-1 OSC湘南シティ店2階",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "DAISO",
+    "name": "ららぽーと湘南平塚店",
+    "lat": 35.33515,
+    "lng": 139.35132,
+    "notes": "神奈川県平塚市天沼10-1ららぽーと湘南平塚3階 33210",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ゆめが丘ソラトス店",
+    "lat": 35.404136,
+    "lng": 139.483759,
+    "notes": "神奈川県横浜市泉区ゆめが丘３１ゆめが丘ソラトス ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "フォルテ横浜川和町店",
+    "lat": 35.5279852,
+    "lng": 139.5476659,
+    "notes": "神奈川県横浜市都筑区川和町３０３０フォルテ横浜川和町店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "海老名柏ヶ谷店",
+    "lat": 35.4574338,
+    "lng": 139.4124709,
+    "notes": "神奈川県海老名市柏ケ谷４−１２−２ ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ららテラス 武蔵小杉店",
+    "lat": 35.5749513,
+    "lng": 139.6586094,
+    "notes": "神奈川県川崎市中原区新丸子東３−１３０２ららテラス 武蔵小杉 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "コピオ相模原インター店",
+    "lat": 35.589364,
+    "lng": 139.3026689,
+    "notes": "神奈川県相模原市緑区向原４−２−３コピオ相模原インター店 Ａ館１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ライフ鶴見店",
+    "lat": 35.51495,
+    "lng": 139.66472,
+    "notes": "神奈川県横浜市鶴見区北寺尾２−１９ライフ鶴見店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友鶴見店",
+    "lat": 35.50845,
+    "lng": 139.67523,
+    "notes": "神奈川県横浜市鶴見区豊岡町２−１西友鶴見店 ５Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "島忠ホームズ新川崎店",
+    "lat": 35.53624,
+    "lng": 139.67471,
+    "notes": "神奈川県横浜市鶴見区江ケ崎町１５−３０島忠ホームズ新川崎店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "MEGAドンキホーテUNY横浜大口店",
+    "lat": 35.49329,
+    "lng": 139.6476,
+    "notes": "神奈川県横浜市神奈川区神之木町２−３０ＭＥＧＡドン・キホーテＵNY横浜大口店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "横浜ベイクォーター店",
+    "lat": 35.46689,
+    "lng": 139.62659,
+    "notes": "神奈川県横浜市神奈川区金港町１−１０横浜ベイクォーター ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ユーコープ片倉店",
+    "lat": 35.4867,
+    "lng": 139.60443,
+    "notes": "神奈川県横浜市神奈川区片倉１−１６−３ユーコープ片倉店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "横浜曙町店",
+    "lat": 35.43988,
+    "lng": 139.62823,
+    "notes": "神奈川県横浜市中区曙町３−３９−１ボーノ・タウン・アケボノ １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "コレットマーレ店",
+    "lat": 35.45356,
+    "lng": 139.62924,
+    "notes": "神奈川県横浜市中区桜木町１−１−７コレットマーレ ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "フジ横浜南店",
+    "lat": 35.436,
+    "lng": 139.61349,
+    "notes": "神奈川県横浜市南区南太田１−２１−６フジ横浜南店 Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "そうてつローゼン六ツ川店",
+    "lat": 35.42671,
+    "lng": 139.57877,
+    "notes": "神奈川県横浜市南区六ツ川３−７５そうてつローゼン六ツ川店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ヤオコー横浜磯子店",
+    "lat": 35.40308,
+    "lng": 139.61914,
+    "notes": "神奈川県横浜市磯子区磯子３−４−２３ヤオコー横浜磯子店 Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ブランチ横浜南部市場店",
+    "lat": 35.38027,
+    "lng": 139.63661,
+    "notes": "神奈川県横浜市金沢区鳥浜町１−１ブランチ横浜南部市場 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "トレッサ横浜店",
+    "lat": 35.5242,
+    "lng": 139.64546,
+    "notes": "神奈川県横浜市港北区師岡町７００番地トレッサ横浜南棟 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "綱島店",
+    "lat": 35.53633,
+    "lng": 139.63258,
+    "notes": "神奈川県横浜市港北区綱島西２−６−１７黒川ビル １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ＳＯＣＯＬＡ日吉店",
+    "lat": 35.54556,
+    "lng": 139.64476,
+    "notes": "神奈川県横浜市港北区箕輪町２−７−４２ＳＯＣＯＬＡ日吉 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "たまや深谷店",
+    "lat": 35.38864,
+    "lng": 139.49588,
+    "notes": "神奈川県横浜市戸塚区深谷町１４０４−１たまや深谷店別棟 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "サミット下倉田店",
+    "lat": 35.37885,
+    "lng": 139.54475,
+    "notes": "神奈川県横浜市戸塚区下倉田町１８８３サミット下倉田店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "サクラス戸塚店",
+    "lat": 35.40112,
+    "lng": 139.53107,
+    "notes": "神奈川県横浜市戸塚区戸塚町４２５３−１サクラス戸塚 Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "港南台バーズ店",
+    "lat": 35.37504,
+    "lng": 139.5773,
+    "notes": "神奈川県横浜市港南区港南台３−１−３港南台バーズ店 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "上大岡店",
+    "lat": 35.4073,
+    "lng": 139.59494,
+    "notes": "神奈川県横浜市港南区上大岡西１−１８−３ミオカ リスト館 ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "四季の森フォレオ店",
+    "lat": 35.49858,
+    "lng": 139.54114,
+    "notes": "神奈川県横浜市旭区上白根３−４１−１横浜四季の森フォレオ ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友鶴ヶ峰店",
+    "lat": 35.47538,
+    "lng": 139.54836,
+    "notes": "神奈川県横浜市旭区鶴ケ峰２−２２西友鶴ヶ峰店 ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "トライアル西友二俣川店",
+    "lat": 35.46196,
+    "lng": 139.53346,
+    "notes": "神奈川県横浜市旭区二俣川２−５２−１トライアル西友二俣川店 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "スーパービバホーム長津田店",
+    "lat": 35.52021,
+    "lng": 139.5013,
+    "notes": "神奈川県横浜市緑区長津田みなみ台４−６−１スーパービバホーム長津田店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ダイエー十日市場店",
+    "lat": 35.52467,
+    "lng": 139.517,
+    "notes": "神奈川県横浜市緑区十日市場町８１８−２ダイエー十日市場店 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品三ツ境ｅモール店",
+    "lat": 35.46703,
+    "lng": 139.49599,
+    "notes": "神奈川県横浜市瀬谷区二ツ橋町３０８−１ｅモールＢ棟 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "フジ本郷台店",
+    "lat": 35.36775,
+    "lng": 139.55305,
+    "notes": "神奈川県横浜市栄区小菅ケ谷１−２−２フジ本郷台店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品岡津店",
+    "lat": 35.42526,
+    "lng": 139.52617,
+    "notes": "神奈川県横浜市泉区岡津町１２１−１ビッグ・エー横浜岡津町店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "Ａコープ中田店",
+    "lat": 35.41048,
+    "lng": 139.511,
+    "notes": "神奈川県横浜市泉区中田南３−２−３８Ａコープ中田店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ヨークマート立場店",
+    "lat": 35.41542,
+    "lng": 139.49918,
+    "notes": "神奈川県横浜市泉区和泉中央北２−１−１ヨークマート立場店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "たまプラーザ店",
+    "lat": 35.57664,
+    "lng": 139.55777,
+    "notes": "神奈川県横浜市青葉区新石川２−１−１５たまプラーザテラス リンクプラザ ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友市ヶ尾店",
+    "lat": 35.54963,
+    "lng": 139.54111,
+    "notes": "神奈川県横浜市青葉区市ケ尾町１０５５−５西友市ヶ尾店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "横浜青葉ガーデン桂台店",
+    "lat": 35.54681,
+    "lng": 139.50063,
+    "notes": "神奈川県横浜市青葉区桂台２−４−１横浜青葉ガーデン桂台内",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品センター南モール店",
+    "lat": 35.54667,
+    "lng": 139.5764,
+    "notes": "神奈川県横浜市都筑区茅ケ崎中央５３−１コーナン港北センター南モール ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "コーナン港北インター店",
+    "lat": 35.52135,
+    "lng": 139.58932,
+    "notes": "神奈川県横浜市都筑区折本町１９１コーナン港北インター店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "オーケー港北店",
+    "lat": 35.5375,
+    "lng": 139.56151,
+    "notes": "神奈川県横浜市都筑区葛が谷８オーケー港北店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "モザイクモール港北店",
+    "lat": 35.55502,
+    "lng": 139.57796,
+    "notes": "神奈川県横浜市都筑区中川中央１−３１−１−２モザイクモール港北 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "コーナン川崎小田栄店",
+    "lat": 35.51393,
+    "lng": 139.7101,
+    "notes": "神奈川県川崎市川崎区小田栄２−３−１ホームセンターコーナン川崎小田栄店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "川崎ルフロン店",
+    "lat": 35.52806,
+    "lng": 139.6951,
+    "notes": "神奈川県川崎市川崎区日進町１−１１川崎ルフロン ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "マルエツ出来野店",
+    "lat": 35.53276,
+    "lng": 139.74013,
+    "notes": "神奈川県川崎市川崎区出来野１０−１５マルエツ出来野店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ウィングキッチン京急川崎店",
+    "lat": 35.5321,
+    "lng": 139.70049,
+    "notes": "神奈川県川崎市川崎区砂子１−３−１ウィングキッチン京急川崎 ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "サウザンド・モール鹿島田店",
+    "lat": 35.54927,
+    "lng": 139.67676,
+    "notes": "神奈川県川崎市幸区新塚越２０１サウザンド・モール ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "元住吉駅前店",
+    "lat": 35.56535,
+    "lng": 139.6537,
+    "notes": "神奈川県川崎市中原区木月１−２２−７平成第一ビル ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "マルイファミリー溝口店",
+    "lat": 35.59903,
+    "lng": 139.61256,
+    "notes": "神奈川県川崎市高津区溝口１−４−１マルイファミリー溝口 ９Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "イトーヨーカドー溝ノ口店",
+    "lat": 35.59841,
+    "lng": 139.61635,
+    "notes": "神奈川県川崎市高津区久本３−６−２０イトーヨーカドー溝ノ口店 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品向ヶ丘遊園駅前店",
+    "lat": 35.61629,
+    "lng": 139.56398,
+    "notes": "神奈川県川崎市多摩区登戸２７３５番地向ヶ丘中和ビル ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "Odakyu OX 生田店",
+    "lat": 35.61536,
+    "lng": 139.54193,
+    "notes": "神奈川県川崎市多摩区生田７−８−４Ｏｄａｋｙｕ ＯＸ 生田店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "Odakyu OX 読売ランド店",
+    "lat": 35.61471,
+    "lng": 139.52809,
+    "notes": "神奈川県川崎市多摩区西生田３−８−２Ｏｄａｋｙｕ ＯＸ 読売ランド店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "フジ稲田堤店",
+    "lat": 35.63705,
+    "lng": 139.52432,
+    "notes": "神奈川県川崎市多摩区菅３−１２−３６フジ稲田堤店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "クロス向ヶ丘店",
+    "lat": 35.61464,
+    "lng": 139.56709,
+    "notes": "神奈川県川崎市多摩区登戸２７７９−１クロス向ヶ丘 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ジェーソン中野島店",
+    "lat": 35.6308,
+    "lng": 139.55225,
+    "notes": "神奈川県川崎市多摩区中野島６−２２−５ジェーソン中野島店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ノジマ宮前店",
+    "lat": 35.58247,
+    "lng": 139.59084,
+    "notes": "神奈川県川崎市宮前区馬絹１−９−５ノジマ宮前 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ヤオコー新百合ヶ丘店",
+    "lat": 35.60137,
+    "lng": 139.50554,
+    "notes": "神奈川県川崎市麻生区上麻生３−１−１ヤオコー新百合ヶ丘店 別棟 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ミウィ橋本店",
+    "lat": 35.59433,
+    "lng": 139.34656,
+    "notes": "神奈川県相模原市緑区橋本３−２８−１ミウィ橋本 ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "コトエ橋本店",
+    "lat": 35.59646,
+    "lng": 139.33459,
+    "notes": "神奈川県相模原市緑区西橋本５−４−３コトエ橋本 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "相模原店",
+    "lat": 35.55975,
+    "lng": 139.38081,
+    "notes": "神奈川県相模原市中央区並木１−７",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品相模原小山店",
+    "lat": 35.58292,
+    "lng": 139.35625,
+    "notes": "神奈川県相模原市中央区小山３−３７−１コーナン相模原小山店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "上溝店",
+    "lat": 35.56101,
+    "lng": 139.35895,
+    "notes": "神奈川県相模原市中央区上溝５−１４−１９イオン上溝 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "グッディプレイス相模原店",
+    "lat": 35.57459,
+    "lng": 139.36653,
+    "notes": "神奈川県相模原市中央区中央１−２−１グッディプレイス相模原 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ライフ上鶴間店",
+    "lat": 35.52542,
+    "lng": 139.44565,
+    "notes": "神奈川県相模原市南区上鶴間１−１６−２ライフ上鶴間店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ボーノ相模大野店",
+    "lat": 35.53107,
+    "lng": 139.43491,
+    "notes": "神奈川県相模原市南区相模大野３−２ボーノ相模大野ショッピングセンター ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "イトーヨーカドー古淵店",
+    "lat": 35.55271,
+    "lng": 139.41872,
+    "notes": "神奈川県相模原市南区古淵３−１３−３３イトーヨーカドー古淵店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ｍｉｎａｎｏｂａ相模原店",
+    "lat": 35.52104,
+    "lng": 139.42471,
+    "notes": "神奈川県相模原市南区南台３−１−３０ｍｉｎａｎｏｂａ相模原 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品野比店",
+    "lat": 35.21582,
+    "lng": 139.68764,
+    "notes": "神奈川県横須賀市野比１−３９−８Ｆｕｊｉスーパー １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "フジ佐原店",
+    "lat": 35.24151,
+    "lng": 139.6787,
+    "notes": "神奈川県横須賀市佐原１−７−３フジ佐原店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友衣笠店",
+    "lat": 35.25728,
+    "lng": 139.66257,
+    "notes": "神奈川県横須賀市衣笠栄町１−７０西友衣笠店 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "さいか屋横須賀店",
+    "lat": 35.2822,
+    "lng": 139.66962,
+    "notes": "神奈川県横須賀市大滝町１−１３さいか屋横須賀ショッピングプラザ ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ＬＩＶＩＮよこすか店",
+    "lat": 35.27595,
+    "lng": 139.68282,
+    "notes": "神奈川県横須賀市平成町３−２1−４ＬＩＶＩＮよこすか ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ラスカ平塚店",
+    "lat": 35.32837,
+    "lng": 139.35066,
+    "notes": "神奈川県平塚市宝町１−１ラスカ平塚 ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ユニディ湘南平塚店",
+    "lat": 35.32791,
+    "lng": 139.3611,
+    "notes": "神奈川県平塚市久領堤１−２ユニディ湘南平塚店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "西友平塚店",
+    "lat": 35.35156,
+    "lng": 139.34233,
+    "notes": "神奈川県平塚市東中原１−１−２５西友平塚店 Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品鎌倉大船モール店",
+    "lat": 35.3468,
+    "lng": 139.51753,
+    "notes": "神奈川県鎌倉市岡本１１８８−１鎌倉大船モール ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友大船店",
+    "lat": 35.35371,
+    "lng": 139.53342,
+    "notes": "神奈川県鎌倉市大船１−２５−３０西友大船店 ５Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "湘南モールフィル店",
+    "lat": 35.33865,
+    "lng": 139.46452,
+    "notes": "神奈川県藤沢市辻堂新町４−１−１湘南モールフィル １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ダイエー湘南台店",
+    "lat": 35.3974,
+    "lng": 139.46761,
+    "notes": "神奈川県藤沢市湘南台１−３−３ダイエー湘南台店 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "湘南藤沢オーパ店",
+    "lat": 35.33821,
+    "lng": 139.48672,
+    "notes": "神奈川県藤沢市南藤沢２２−３湘南藤沢オーパ ４Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "ユーコープ湘南台店",
+    "lat": 35.39432,
+    "lng": 139.46091,
+    "notes": "神奈川県藤沢市円行２−１０−１ユーコープ湘南台店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "三和藤沢橋店",
+    "lat": 35.34475,
+    "lng": 139.48599,
+    "notes": "神奈川県藤沢市藤沢８0８三和藤沢橋店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "小田原駅前店",
+    "lat": 35.25528,
+    "lng": 139.15747,
+    "notes": "神奈川県小田原市栄町２−８−８第７０東京ビル１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "フレスポ小田原シティーモール店",
+    "lat": 35.2819,
+    "lng": 139.1937,
+    "notes": "神奈川県小田原市前川１２０フレスポ小田原シティーモール 南館 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ダイナシティ小田原店",
+    "lat": 35.28172,
+    "lng": 139.18855,
+    "notes": "神奈川県小田原市中里２９６−１ダイナシティ イースト ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "茅ヶ崎店",
+    "lat": 35.33529,
+    "lng": 139.39827,
+    "notes": "神奈川県茅ヶ崎市矢畑６２０−１",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "三崎店",
+    "lat": 35.15388,
+    "lng": 139.63213,
+    "notes": "神奈川県三浦市原町１６−７",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "セリア",
+    "name": "秦野ショッピングセンター店",
+    "lat": 35.37057,
+    "lng": 139.23523,
+    "notes": "神奈川県秦野市曽屋４７８４秦野ショッピングセンター Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "フードワン鶴巻店",
+    "lat": 35.3832,
+    "lng": 139.2796,
+    "notes": "神奈川県秦野市鶴巻北１−１６−３フードワン鶴巻店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "本厚木ミロード店",
+    "lat": 35.43974,
+    "lng": 139.36497,
+    "notes": "神奈川県厚木市泉町１−１小田急本厚木ミロード１ ５Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ガーデンシティ厚木店",
+    "lat": 35.44216,
+    "lng": 139.36661,
+    "notes": "神奈川県厚木市中町１−５−１０厚木ガーデンシティビル ５Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ビバモール厚木南インター店",
+    "lat": 35.40993,
+    "lng": 139.36078,
+    "notes": "神奈川県厚木市酒井１６０１−４ビバモール厚木南インター店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "三和厚木飯山店",
+    "lat": 35.46212,
+    "lng": 139.33485,
+    "notes": "神奈川県厚木市飯山南５−１７−１０三和厚木飯山店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "大和駅前店",
+    "lat": 35.47069,
+    "lng": 139.46141,
+    "notes": "神奈川県大和市大和東１−２−１大和スカイビル ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ラプラ中央林間店",
+    "lat": 35.50905,
+    "lng": 139.44907,
+    "notes": "神奈川県大和市中央林間８−２５−８ラプラ中央林間 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "つきみ野生鮮市場店",
+    "lat": 35.50711,
+    "lng": 139.46161,
+    "notes": "神奈川県大和市つきみ野４−１０−３つきみ野生鮮市場 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "海老名マルイ店",
+    "lat": 35.45275,
+    "lng": 139.39313,
+    "notes": "神奈川県海老名市中央１−６−１海老名マルイ ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "三和座間東原店",
+    "lat": 35.48305,
+    "lng": 139.42683,
+    "notes": "神奈川県座間市東原１−１３−２三和座間東原店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンモール座間店",
+    "lat": 35.49826,
+    "lng": 139.42268,
+    "notes": "神奈川県座間市広野台２−１０−４イオンモール座間 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "フジ塚原店",
+    "lat": 35.30096,
+    "lng": 139.12801,
+    "notes": "神奈川県南足柄市塚原２６５２−１フジ塚原店 生活館 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "ロピア綾瀬店",
+    "lat": 35.42854,
+    "lng": 139.43655,
+    "notes": "神奈川県綾瀬市深谷南１−１０−２２ロピア綾瀬店 ２Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "いなげや上土棚店",
+    "lat": 35.40814,
+    "lng": 139.44875,
+    "notes": "神奈川県綾瀬市上土棚南５−９−５いなげや綾瀬上土棚南店 １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "生活良品寒川店",
+    "lat": 35.39096,
+    "lng": 139.38052,
+    "notes": "神奈川県高座郡寒川町倉見１１８６",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "アメリア寒川ＳＣ店",
+    "lat": 35.37281,
+    "lng": 139.39462,
+    "notes": "神奈川県高座郡寒川町岡田５−１７−２アメリア寒川ＳＣ Ｂ棟１Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "西友二宮店",
+    "lat": 35.30873,
+    "lng": 139.24751,
+    "notes": "神奈川県中郡二宮町中里２−６−２８西友二宮店 ３Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "セリア",
+    "name": "コピオ愛川店",
+    "lat": 35.53265,
+    "lng": 139.32933,
+    "notes": "神奈川県愛甲郡愛川町角田５８０コピオ愛川ショッピングセンター １Ｆ",
+    "icon": "shop4",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "キャスティング",
+    "name": "246溝の口店",
+    "lat": 35.60796,
+    "lng": 139.61279,
+    "notes": "神奈川県川崎市高津区溝口6-11-1",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "鶴見駒岡店",
+    "lat": 35.53036,
+    "lng": 139.64975,
+    "notes": "神奈川県横浜市鶴見区駒岡2-16-48",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "横浜港北店",
+    "lat": 35.5163,
+    "lng": 139.56403,
+    "notes": "神奈川県横浜市都筑区池辺町4261-14",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "横浜磯子店",
+    "lat": 35.39848,
+    "lng": 139.61366,
+    "notes": "神奈川県横浜市磯子区森2-9-22",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "湘南平塚店",
+    "lat": 35.36675,
+    "lng": 139.362,
+    "notes": "神奈川県平塚市田村5-2-22",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "横須賀根岸店",
+    "lat": 35.25376,
+    "lng": 139.68504,
+    "notes": "神奈川県横須賀市根岸町5-17-21",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "元住吉店",
+    "lat": 35.56073,
+    "lng": 139.6534,
+    "notes": "神奈川県川崎市中原区木月4-4-1 木月パレス101号",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "ベリーパーク in 王禅寺",
+    "lat": 35.58943,
+    "lng": 139.52458,
+    "notes": "神奈川県川崎市麻生区王禅寺1227-2",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "横浜港北ＮＴ店",
+    "lat": 35.54252,
+    "lng": 139.56949,
+    "notes": "神奈川県横浜市都筑区茅ヶ崎南5-1-40 ラダック茅ヶ崎２Ｆ",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "横濱西口５番街店",
+    "lat": 35.46487,
+    "lng": 139.62051,
+    "notes": "神奈川県横浜市西区南幸1丁目5-29 太洋第二ビル B1F",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "横浜十日市場店",
+    "lat": 35.51859,
+    "lng": 139.50375,
+    "notes": "神奈川県横浜市緑区霧が丘2丁目8-4",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "港南下永谷店",
+    "lat": 35.41416,
+    "lng": 139.55968,
+    "notes": "神奈川県横浜市港南区下永谷6-9-1 スリーツリーハウス1F",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "戸塚中継店",
+    "lat": 35.38905,
+    "lng": 139.52061,
+    "notes": "神奈川県横浜市戸塚区汲沢町1207-3",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "南橋本店",
+    "lat": 35.56926,
+    "lng": 139.34991,
+    "notes": "神奈川県相模原市緑区下九沢472-10",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "さがみ上鶴間店",
+    "lat": 35.5219,
+    "lng": 139.45079,
+    "notes": "神奈川県相模原市南区上鶴間3-1-10",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "大和店",
+    "lat": 35.48219,
+    "lng": 139.45186,
+    "notes": "神奈川県大和市上草柳7-2-5",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "ふじさわ六会店",
+    "lat": 35.38568,
+    "lng": 139.47433,
+    "notes": "神奈川県藤沢市亀井野4-15-1",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "湘南本店",
+    "lat": 35.33575,
+    "lng": 139.4924,
+    "notes": "神奈川県藤沢市南藤沢16-16 FDIビル１F",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "厚木412号店",
+    "lat": 35.44981,
+    "lng": 139.35699,
+    "notes": "神奈川県厚木市水引2-12-33",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "平塚八幡店",
+    "lat": 35.34521,
+    "lng": 139.35661,
+    "notes": "神奈川県平塚市東八幡3-10-5",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "秦野246号店",
+    "lat": 35.3773,
+    "lng": 139.21457,
+    "notes": "神奈川県秦野市桜町2-4-38",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "小田原店",
+    "lat": 35.28765,
+    "lng": 139.1684,
+    "notes": "神奈川県小田原市成田168-6",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "＠ベリーネット店",
+    "lat": 35.33627,
+    "lng": 139.4913,
+    "notes": "神奈川県藤沢市南藤沢17-7",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "ブンブン",
+    "name": "ホームズ川崎大師店",
+    "lat": 35.53868,
+    "lng": 139.73335,
+    "notes": "神奈川県川崎市川崎区中瀬3-20-20 ホームズ川崎大師店 2F",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "ブンブン",
+    "name": "イオン相模原店",
+    "lat": 35.55387,
+    "lng": 139.41663,
+    "notes": "神奈川県相模原市南区古淵2‐10‐1イオン相模原ショッピングセンター１F別棟１",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "ポイント",
+    "name": "相模原店",
+    "lat": 35.57055,
+    "lng": 139.37984,
+    "notes": "神奈川県相模原市中央区矢部2丁目16-16",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "ポイント",
+    "name": "横浜都筑店",
+    "lat": 35.56264,
+    "lng": 139.57988,
+    "notes": "神奈川県横浜市都筑区牛久保2丁目1-22",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "ポイント",
+    "name": "横浜港南台店",
+    "lat": 35.37954,
+    "lng": 139.57973,
+    "notes": "神奈川県横浜市港南区港南台2-24-8",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "ポイント",
+    "name": "金沢文庫ユニオンセンター店",
+    "lat": 35.33875,
+    "lng": 139.6244,
+    "notes": "神奈川県横浜市金沢区泥亀2-5-1-100（ユニオンセンター2F）",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "ポイント",
+    "name": "横須賀佐原店",
+    "lat": 35.24181,
+    "lng": 139.67987,
+    "notes": "神奈川県横須賀市佐原1丁目8-1",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "ポイント",
+    "name": "藤沢長後店",
+    "lat": 35.42025,
+    "lng": 139.46881,
+    "notes": "神奈川県藤沢市長後1066-1",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "横浜南部市場店",
+    "lat": 35.38027,
+    "lng": 139.63661,
+    "notes": "神奈川県横浜市金沢区鳥浜町１−１ ブランチ横浜南部市場内",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "平塚八幡店",
+    "lat": 35.34393,
+    "lng": 139.35553,
+    "notes": "神奈川県平塚市東八幡２丁目４−２７ 上州屋",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "上州屋",
+    "name": "戸塚原宿店",
+    "lat": 35.37328,
+    "lng": 139.50229,
+    "notes": "神奈川県横浜市戸塚区原宿４丁目３９−１０",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "関内店",
+    "lat": 35.44556,
+    "lng": 139.64249,
+    "notes": "神奈川県横浜市中区日本大通１５ 横浜朝日会館 B1F",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "アウトドアワールド 厚木店",
+    "lat": 35.42174,
+    "lng": 139.34695,
+    "notes": "神奈川県厚木市愛甲２丁目６−１６",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "上州屋",
+    "name": "横須賀佐島店",
+    "lat": 35.22956,
+    "lng": 139.62068,
+    "notes": "神奈川県横須賀市長坂４丁目２−２０",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "上州屋",
+    "name": "横須賀中央店",
+    "lat": 35.27747,
+    "lng": 139.67868,
+    "notes": "神奈川県横須賀市日の出町２丁目１３−２０ 上州屋",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "group": "上州屋",
+    "name": "鶴ケ峰店",
+    "lat": 35.47324,
+    "lng": 139.54385,
+    "notes": "神奈川県横浜市旭区四季美台２５−１２",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "圏央道厚木インター店",
+    "lat": 35.47398,
+    "lng": 139.36797,
+    "notes": "神奈川県厚木市下依知１丁目８−８",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "上州屋",
+    "name": "アウトドアワールドつきみ野店",
+    "lat": 35.49932,
+    "lng": 139.46809,
+    "notes": "神奈川県横浜市瀬谷区目黒町６−１１",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "小田原店",
+    "lat": 35.28231,
+    "lng": 139.16827,
+    "notes": "神奈川県小田原市飯泉５４４−１",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "group": "上州屋",
+    "name": "川崎東口店",
+    "lat": 35.52717,
+    "lng": 139.69896,
+    "notes": "神奈川県川崎市川崎区小川町１６−１８ 川崎第2セントラル",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "溝ノ口店",
+    "lat": 35.59779,
+    "lng": 139.60362,
+    "notes": "神奈川県川崎市高津区下作延４丁目２３−１",
+    "icon": "shop2",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "フライフィッシングなごみ",
+    "lat": 35.522236,
+    "lng": 139.601142,
+    "notes": "神奈川県横浜市都筑区大熊町８７",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "ヤノシルクライン",
+    "lat": 35.521877,
+    "lng": 139.230362,
+    "notes": "神奈川県愛甲郡清川村宮ヶ瀬９７１−６１ 2",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "かめや釣具 小田原店",
+    "lat": 35.277021,
+    "lng": 139.166504,
+    "notes": "神奈川県小田原市飯泉９５４−２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "釣侍 小田原店",
+    "lat": 35.200815,
+    "lng": 139.138554,
+    "notes": "神奈川県小田原市根府川２２４−１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "平山おとり店",
+    "lat": 35.353895,
+    "lng": 139.053934,
+    "notes": "神奈川県足柄上郡山北町平山１２３４−１２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "佐藤商店 オトリ店",
+    "lat": 35.5351834,
+    "lng": 139.0716256,
+    "notes": "山梨県南都留郡道志村大室指３５５九",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "朝日園つり具センター",
+    "lat": 35.5041508,
+    "lng": 139.6929236,
+    "notes": "神奈川県横浜市鶴見区朝日町２丁目２丁目８３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "シマヤ釣具 川崎本店",
+    "lat": 35.53003,
+    "lng": 139.73381,
+    "notes": "神奈川県川崎市川崎区台町１３−１２ シマヤ釣具川崎本店",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "勇竿 東扇島公園店",
+    "lat": 35.48791,
+    "lng": 139.74812,
+    "notes": "神奈川県川崎市川崎区東扇島９４−１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "勇竿釣具店",
+    "lat": 35.52941,
+    "lng": 139.72739,
+    "notes": "神奈川県川崎市川崎区観音１丁目１９−４ 第一協同ビル",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "つりえさ安齋",
+    "lat": 35.50162,
+    "lng": 139.67607,
+    "notes": "神奈川県横浜市鶴見区鶴見中央５丁目２７−２ 和光海事",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "フィッシング中原",
+    "lat": 35.57959,
+    "lng": 139.64485,
+    "notes": "神奈川県川崎市中原区上小田中６丁目１６−８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "ルアーショップSAWA",
+    "lat": 35.5261,
+    "lng": 139.6478,
+    "notes": "神奈川県横浜市鶴見区駒岡２丁目５−１９",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "プロショップＭＯＧＩ",
+    "lat": 35.56841,
+    "lng": 139.54965,
+    "notes": "神奈川県横浜市青葉区あざみ野２丁目１２−４",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "船大物釣り専門店 フィッシングアリーズ",
+    "lat": 35.50016,
+    "lng": 139.6078,
+    "notes": "神奈川県横浜市港北区鳥山町５２９−１２ 加瀬ビル９９",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "ブルーダン",
+    "lat": 35.44901,
+    "lng": 139.63901,
+    "notes": "神奈川県横浜市中区本町３丁目24−１ 806",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "I.D.A WORKS",
+    "lat": 35.43913,
+    "lng": 139.6461,
+    "notes": "神奈川県横浜市中区元町５丁目２０６−４",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "ＳＥＡＷＯＬＦ",
+    "lat": 35.43137,
+    "lng": 139.66893,
+    "notes": "神奈川県横浜市中区錦町１６−１ マリーンハイツ 11F",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "横浜竿の汐よし",
+    "lat": 35.4267,
+    "lng": 139.58076,
+    "notes": "神奈川県横浜市南区六ツ川２丁目１２１−６",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "サオヒロ",
+    "lat": 35.46736,
+    "lng": 139.53586,
+    "notes": "神奈川県横浜市旭区本村町４７",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "サザン・フィッシング",
+    "lat": 35.37284,
+    "lng": 139.58603,
+    "notes": "神奈川県横浜市港南区港南台６丁目４−１１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "つり具タックル",
+    "lat": 35.23929,
+    "lng": 139.67984,
+    "notes": "神奈川県横須賀市佐原１丁目１５−３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "やまみつ釣りボート",
+    "lat": 35.26266,
+    "lng": 139.72481,
+    "notes": "神奈川県横須賀市走水１丁目２−２０",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "斉田ボート店",
+    "lat": 35.26372,
+    "lng": 139.73083,
+    "notes": "神奈川県横須賀市走水２丁目６",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "LOHAS KAYAK 東京湾で釣りができるカヤックレンタル&ガイド",
+    "lat": 35.26097,
+    "lng": 139.73508,
+    "notes": "神奈川県横須賀市走水２丁目２０−３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "清藤釣具店",
+    "lat": 35.25011,
+    "lng": 139.73663,
+    "notes": "神奈川県横須賀市鴨居３丁目２２−３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "つり具ヤギタ",
+    "lat": 35.23408,
+    "lng": 139.69427,
+    "notes": "神奈川県横須賀市佐原５丁目２１−９",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "関根釣具店",
+    "lat": 35.22481,
+    "lng": 139.71257,
+    "notes": "神奈川県横須賀市久里浜７丁目１４−４",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "大浜屋",
+    "lat": 35.2235,
+    "lng": 139.71199,
+    "notes": "神奈川県横須賀市久里浜７丁目２９−６",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "エサの釣り王",
+    "lat": 35.19493,
+    "lng": 139.66574,
+    "notes": "神奈川県横須賀市津久井１丁目３−７ コースト津久井浜 201",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "大海神〜未来への扉〜釣具、釣餌、釣具リサイクル",
+    "lat": 35.14345,
+    "lng": 139.62057,
+    "notes": "神奈川県三浦市三崎１丁目２−２１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "角井商店",
+    "lat": 35.1392,
+    "lng": 139.61943,
+    "notes": "神奈川県三浦市三崎２丁目１９−６",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "山星船具店",
+    "lat": 35.14045,
+    "lng": 139.61795,
+    "notes": "神奈川県三浦市三崎３丁目７−１１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "釣餌フェニックス",
+    "lat": 35.13996,
+    "lng": 139.61746,
+    "notes": "神奈川県三浦市三崎３丁目１２−８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "一休フィッシングセンター",
+    "lat": 35.13681,
+    "lng": 139.61238,
+    "notes": "神奈川県三浦市三崎町城ヶ島６５８−２九",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "シーサイド三浦",
+    "lat": 35.20201,
+    "lng": 139.62608,
+    "notes": "神奈川県横須賀市長井１丁目１２−８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "えびすや",
+    "lat": 35.2048,
+    "lng": 139.62686,
+    "notes": "神奈川県横須賀市長井１丁目６−２０",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "カヤマ釣具店",
+    "lat": 35.20781,
+    "lng": 139.62578,
+    "notes": "神奈川県横須賀市長井１丁目２４−１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "フィッシングショップ・タネムラ",
+    "lat": 35.20781,
+    "lng": 139.62578,
+    "notes": "神奈川県横須賀市長井１丁目２４−１１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "活エサの徳丸 三浦林ＩＣ店",
+    "lat": 35.219,
+    "lng": 139.63383,
+    "notes": "神奈川県横須賀市林２丁目９−１２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "細谷・釣具店",
+    "lat": 35.23967,
+    "lng": 139.60359,
+    "notes": "神奈川県横須賀市秋谷２丁目１２−２７",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "HFC /葉山釣具センター",
+    "lat": 35.28357,
+    "lng": 139.56721,
+    "notes": "神奈川県三浦郡葉山町堀内３６３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "愛古堂",
+    "lat": 35.29405,
+    "lng": 139.57857,
+    "notes": "神奈川県逗子市逗子５丁目４−２８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "島きち丸",
+    "lat": 35.30724,
+    "lng": 139.48134,
+    "notes": "神奈川県藤沢市片瀬海岸２丁目２０−２５",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "井上つりえさ店",
+    "lat": 35.29995,
+    "lng": 139.48189,
+    "notes": "神奈川県藤沢市江の島１丁目６−２２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "ソルトウォーターハウス",
+    "lat": 35.32407,
+    "lng": 139.4863,
+    "notes": "神奈川県藤沢市鵠沼藤が谷２丁目２−９",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "藤沢釣具",
+    "lat": 35.33392,
+    "lng": 139.48624,
+    "notes": "神奈川県藤沢市鵠沼石上２丁目１−２ 鵠沼フラワーマンション 1F",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "ウキ屋",
+    "lat": 35.35198,
+    "lng": 139.48561,
+    "notes": "神奈川県藤沢市西富２丁目２０−３０",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "中古釣具のスプールエッジ 横浜戸塚店",
+    "lat": 35.37073,
+    "lng": 139.50151,
+    "notes": "神奈川県横浜市戸塚区原宿５丁目４２−８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "フィッシング・スペースＹＯＵ・ＳＨＩ",
+    "lat": 35.43855,
+    "lng": 139.46246,
+    "notes": "神奈川県大和市渋谷２丁目２４−１０",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "プロショップマリン",
+    "lat": 35.51664,
+    "lng": 139.42761,
+    "notes": "神奈川県相模原市南区松が枝町７−１３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "フジモリ・フィッシング・タックル",
+    "lat": 35.52729,
+    "lng": 139.42984,
+    "notes": "神奈川県相模原市南区旭町２−４",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "FFT釣具",
+    "lat": 35.52729,
+    "lng": 139.42984,
+    "notes": "神奈川県相模原市南区旭町２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_YOKOHAMA"
+  },
+  {
+    "name": "釣具いちばん館相模原橋本店",
+    "lat": 35.59807,
+    "lng": 139.31886,
+    "notes": "神奈川県相模原市緑区二本松３丁目２１−１８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "GETフィッシング",
+    "lat": 35.5821,
+    "lng": 139.35545,
+    "notes": "神奈川県相模原市中央区清新５丁目２４−１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "フィッシング相模屋 水郷田名店",
+    "lat": 35.54267,
+    "lng": 139.3318,
+    "notes": "神奈川県相模原市中央区水郷田名４丁目１０−１２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "フィッシング相模屋",
+    "lat": 35.545,
+    "lng": 139.36388,
+    "notes": "神奈川県相模原市中央区上溝４０７−１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "ハーツ",
+    "lat": 35.54201,
+    "lng": 139.36703,
+    "notes": "神奈川県相模原市中央区上溝７９７−１８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "大川屋おとり店",
+    "lat": 35.51159,
+    "lng": 139.33095,
+    "notes": "神奈川県愛甲郡愛川町中津５９３２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "上大島友鮎販売所",
+    "lat": 35.5775,
+    "lng": 139.30782,
+    "notes": "神奈川県相模原市緑区大島３８４３−１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "やぐち釣具店",
+    "lat": 35.58472,
+    "lng": 139.27296,
+    "notes": "神奈川県相模原市緑区太井６１０−７",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "ルアーショップジップ",
+    "lat": 35.37123,
+    "lng": 139.3756,
+    "notes": "神奈川県高座郡寒川町一之宮５丁目８−６８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "磯屋",
+    "lat": 35.31793,
+    "lng": 139.39671,
+    "notes": "神奈川県茅ヶ崎市南湖４丁目２４−１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "内藤釣具店",
+    "lat": 35.31877,
+    "lng": 139.38051,
+    "notes": "神奈川県茅ヶ崎市柳島１８７７−２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "タマリバ/ツリグノタマリバ",
+    "lat": 35.32644,
+    "lng": 139.39827,
+    "notes": "神奈川県茅ヶ崎市共恵１丁目１７−３ 茅ヶ崎トモエコーポ 1A",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "Lure Shop ROOM",
+    "lat": 35.33681,
+    "lng": 139.45247,
+    "notes": "神奈川県藤沢市辻堂元町１丁目８−１３ サムコーポ 1-4",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  },
+  {
+    "name": "かめや釣具 平塚店",
+    "lat": 35.35548,
+    "lng": 139.35779,
+    "notes": "神奈川県平塚市東真土２丁目４−２０",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "アングラーズクラブ RISE",
+    "lat": 35.34077,
+    "lng": 139.35152,
+    "notes": "神奈川県平塚市西八幡２丁目３−６４ 原田ビル ２F",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "オリジナル釣竿製造販売 工房哲",
+    "lat": 35.3206,
+    "lng": 139.3623,
+    "notes": "神奈川県平塚市幸町２６−１５ ポートテラス浦田",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "つり具やまだ",
+    "lat": 35.32971,
+    "lng": 139.33852,
+    "notes": "神奈川県平塚市平塚２丁目２１−２１−２１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "1925LLC STORE",
+    "lat": 35.31087,
+    "lng": 139.31602,
+    "notes": "神奈川県中郡大磯町大磯９９０",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "みとめや釣具店",
+    "lat": 35.3081,
+    "lng": 139.31549,
+    "notes": "神奈川県中郡大磯町大磯１０７４",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "すずき釣具店",
+    "lat": 35.3067,
+    "lng": 139.31259,
+    "notes": "神奈川県中郡大磯町大磯１３７３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "森釣具店",
+    "lat": 35.3052,
+    "lng": 139.25502,
+    "notes": "神奈川県中郡二宮町二宮１３２２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "長谷川釣具店",
+    "lat": 35.25024,
+    "lng": 139.16145,
+    "notes": "神奈川県小田原市本町２丁目５−７",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "早川河川漁協 おとりあゆ販売所",
+    "lat": 35.2445,
+    "lng": 139.1416,
+    "notes": "神奈川県小田原市早川３丁目１０ 株)マリンボックス 小田原早川店内",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "小田原F.B.C",
+    "lat": 35.24058,
+    "lng": 139.14679,
+    "notes": "神奈川県小田原市早川１丁目１４−１５",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "小田原マリンターミナル",
+    "lat": 35.19118,
+    "lng": 139.13783,
+    "notes": "神奈川県小田原市江之浦１８４",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "有限会社 あおき釣具店",
+    "lat": 35.15765,
+    "lng": 139.1338,
+    "notes": "神奈川県足柄下郡真鶴町真鶴３８３−６",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "松本釣具店",
+    "lat": 35.28524,
+    "lng": 139.15335,
+    "notes": "神奈川県小田原市蓮正寺３７０−４６",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "大鐘つり具店",
+    "lat": 35.36155,
+    "lng": 139.08679,
+    "notes": "神奈川県足柄上郡山北町山北５８７",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "ルアーショップキーワード",
+    "lat": 35.33994,
+    "lng": 139.14189,
+    "notes": "神奈川県足柄上郡松田町松田惣領２０３−３",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "舞網工房 マイアミクラフト",
+    "lat": 35.37488,
+    "lng": 139.17917,
+    "notes": "神奈川県秦野市柳町２丁目８−２１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "山木商店",
+    "lat": 35.1898,
+    "lng": 139.03062,
+    "notes": "神奈川県足柄下郡箱根町箱根６１",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "フィッシングショップノザキ",
+    "lat": 35.20706,
+    "lng": 139.02112,
+    "notes": "神奈川県足柄下郡箱根町元箱根７８",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_SEISHO"
+  },
+  {
+    "name": "活エサの徳丸 三浦林ＩＣ店",
+    "lat": 35.219,
+    "lng": 139.63383,
+    "notes": "神奈川県横須賀市林２丁目９−１２",
+    "icon": "shop0",
+    "areaId": "KANAGAWA_MIURA"
+  }
+]
