@@ -1,0 +1,5513 @@
+[
+  {
+    "group": "上州屋",
+    "name": "奥戸店",
+    "lat": 35.73081,
+    "lng": 139.86899,
+    "notes": "東京都葛飾区奥戸6-2-1",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "東陽町店",
+    "lat": 35.67616,
+    "lng": 139.81668,
+    "notes": "東京都江東区東陽7-5-4",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "新橋駅前店",
+    "lat": 35.66631,
+    "lng": 139.7574,
+    "notes": "東京都港区新橋2-16-1ニュー新橋ビル2F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "三鷹東八店",
+    "lat": 35.68098,
+    "lng": 139.56747,
+    "notes": "東京都三鷹市新川6-23-24",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "渋谷東口店",
+    "lat": 35.66074,
+    "lng": 139.703,
+    "notes": "東京都渋谷区渋谷1-15-21ポーラ渋谷ビルB1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "新宿店",
+    "lat": 35.69669,
+    "lng": 139.70126,
+    "notes": "東京都新宿区歌舞伎町2-44-1東京都健康プラザハイジアB1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "青梅河辺店",
+    "lat": 35.78345,
+    "lng": 139.29256,
+    "notes": "東京都青梅市河辺町8-2-8",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "神田駅前店",
+    "lat": 35.69192,
+    "lng": 139.77194,
+    "notes": "東京都千代田区鍛冶町2-6-1堀内ビルB1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "足立入谷店",
+    "lat": 35.80217,
+    "lng": 139.77077,
+    "notes": "東京都足立区入谷1-1",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "足立平野店",
+    "lat": 35.78125,
+    "lng": 139.80357,
+    "notes": "東京都足立区平野1-4-3",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "蒲田店",
+    "lat": 35.55894,
+    "lng": 139.71896,
+    "notes": "東京都大田区蒲田4-42-3イースタンコーポ蒲田1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "東大和店",
+    "lat": 35.74726,
+    "lng": 139.41809,
+    "notes": "東京都東大和市蔵敷3-887",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "八王子店",
+    "lat": 35.6834661,
+    "lng": 139.3450517,
+    "notes": "東京都八王子市左入町194-1",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "上州屋",
+    "name": "池袋店",
+    "lat": 35.73281,
+    "lng": 139.7137,
+    "notes": "東京都豊島区東池袋1-43-6 D-BOX 2F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "上州屋",
+    "name": "練馬光が丘店",
+    "lat": 35.75791,
+    "lng": 139.62102,
+    "notes": "東京都練馬区高松5-12-1",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "羽村店",
+    "lat": 35.77121,
+    "lng": 139.30818,
+    "notes": "東京都羽村市栄町2-10-30",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "葛飾青戸店",
+    "lat": 35.74696,
+    "lng": 139.84485,
+    "notes": "東京都葛飾区白鳥2-14-12 白鳥ｻﾝｹｲｺｰﾎﾟ1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "葛西店",
+    "lat": 35.65382,
+    "lng": 139.8728,
+    "notes": "東京都江戸川区南葛西2-2-3",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "門前仲町永代通り店",
+    "lat": 35.67155,
+    "lng": 139.79623,
+    "notes": "東京都江東区富岡1-7-7",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "国立店",
+    "lat": 35.68243,
+    "lng": 139.43968,
+    "notes": "東京都国立市谷保7174-1",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "渋谷ファイヤー通り店",
+    "lat": 35.66241,
+    "lng": 139.70108,
+    "notes": "東京都渋谷区神南一丁目11番5号 ダイネス壱番館渋谷Ｂ2Ｆ",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "きぬた世田谷通り店",
+    "lat": 35.63482,
+    "lng": 139.60988,
+    "notes": "東京都世田谷区砧5-1-4 ﾒｿﾞﾝﾄﾞｰﾙ2F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "神田南口店",
+    "lat": 35.68993,
+    "lng": 139.77168,
+    "notes": "東京都千代田区鍛冶町1-5-1",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "西新井店",
+    "lat": 35.78259,
+    "lng": 139.77235,
+    "notes": "東京都足立区西新井7-23-8 吉田ビル2F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "足立環七店",
+    "lat": 35.77888,
+    "lng": 139.79723,
+    "notes": "東京都足立区島根3-1-4",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "蒲田店",
+    "lat": 35.56137,
+    "lng": 139.71986,
+    "notes": "東京都大田区蒲田5-29-3 酒巻ﾋﾞﾙ1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "町田鶴川店",
+    "lat": 35.5883799,
+    "lng": 139.454058,
+    "notes": "東京都町田市野津田町923",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "BiG Berry多摩東久留米店",
+    "lat": 35.74794,
+    "lng": 139.51509,
+    "notes": "東京都東久留米市前沢1丁目5-27 サニーヒルズ前沢1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "多摩ニュータウン店",
+    "lat": 35.62342,
+    "lng": 139.39197,
+    "notes": "東京都八王子市松木51-6",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "八王子めじろ台店",
+    "lat": 35.63852,
+    "lng": 139.30852,
+    "notes": "東京都八王子市椚田町592-10",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "いたばし川越街道店",
+    "lat": 35.75931,
+    "lng": 139.68002,
+    "notes": "東京都板橋区東新町1-21-10 2階",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "タックルベリー",
+    "name": "池袋東店",
+    "lat": 35.73351,
+    "lng": 139.71434,
+    "notes": "東京都豊島区東池袋1-44-8 パークサイドビル地下1階",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ＳＯＣＯＬＡ若葉台店",
+    "lat": 35.6167851,
+    "lng": 139.4630241,
+    "notes": "東京都稲城市坂浜４－２５－１ＳＯＣＯＬＡ若葉台　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "イオンタウン稲城長沼店",
+    "lat": 35.6458732,
+    "lng": 139.4964033,
+    "notes": "東京都稲城市東長沼１２１２－１イオンタウン稲城長沼内",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友羽村店",
+    "lat": 35.75793,
+    "lng": 139.31688,
+    "notes": "東京都羽村市五ノ神１－８－１４西友羽村店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "イトーヨーカドー四つ木店",
+    "lat": 35.73731,
+    "lng": 139.83873,
+    "notes": "東京都葛飾区四つ木２－２１－１イトーヨーカドー四つ木店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "いなげや金町店",
+    "lat": 35.76947,
+    "lng": 139.8616,
+    "notes": "東京都葛飾区新宿６－２－８いなげや金町店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "MARK　IS　葛飾かなまち店",
+    "lat": 35.76988,
+    "lng": 139.86743,
+    "notes": "東京都葛飾区東金町１－１０－１ＭＡＲＫ　ＩＳ　葛飾かなまち ３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "マルエツ松江店",
+    "lat": 35.69807,
+    "lng": 139.86911,
+    "notes": "東京都江戸川区松江１－１５－１６マルエツ松江店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ラパーク瑞江店",
+    "lat": 35.69284,
+    "lng": 139.89702,
+    "notes": "東京都江戸川区瑞江２－１－２ラパーク瑞江　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン葛西店",
+    "lat": 35.66868,
+    "lng": 139.85797,
+    "notes": "東京都江戸川区西葛西３－９－１９イオン葛西店　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "イオン船堀店",
+    "lat": 35.68566,
+    "lng": 139.85841,
+    "notes": "東京都江戸川区船堀１－１－５１イオン船堀　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "アリオ葛西店",
+    "lat": 35.65335,
+    "lng": 139.88069,
+    "notes": "東京都江戸川区東葛西９－３－３アリオ葛西　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "南小岩店",
+    "lat": 35.72937,
+    "lng": 139.88116,
+    "notes": "東京都江戸川区南小岩６－２７－１６Ｔｈｅ　Ｄｏｍｅ　池田ビル　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友平井店",
+    "lat": 35.70665,
+    "lng": 139.84174,
+    "notes": "東京都江戸川区平井５－１５－５西友平井店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "カメイドクロック店",
+    "lat": 35.69574,
+    "lng": 139.82907,
+    "notes": "東京都江東区亀戸６－３１－６カメイドクロック　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "サンドラッグ東大島店",
+    "lat": 35.68934,
+    "lng": 139.84319,
+    "notes": "東京都江東区大島８－３３－１９サンドラッグ東大島店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "東砂店",
+    "lat": 35.68478,
+    "lng": 139.83955,
+    "notes": "東京都江東区東砂１－３－３８",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友東陽町店",
+    "lat": 35.67403,
+    "lng": 139.81653,
+    "notes": "東京都江東区東陽４－１２－３０西友東陽町店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "豊洲店",
+    "lat": 35.65705,
+    "lng": 139.79845,
+    "notes": "東京都江東区豊洲３－４－８スーパービバホーム豊洲　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "赤札堂砂町店",
+    "lat": 35.67956,
+    "lng": 139.8327,
+    "notes": "東京都江東区北砂４－２５－２赤札堂砂町店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ｍｉｎａｍｏｎｉ有明店",
+    "lat": 35.63655,
+    "lng": 139.78593,
+    "notes": "東京都江東区有明１－４－３４ｍｉｎａｍｏｎｉ有明　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ウィング高輪ＷＥＳＴ店",
+    "lat": 35.62857,
+    "lng": 139.73698,
+    "notes": "東京都港区高輪４－１０－１８ウィング高輪ＷＥＳＴ　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "田町センタービル店",
+    "lat": 35.64587,
+    "lng": 139.7467,
+    "notes": "東京都港区芝５－３４－７田町センタービル　Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "アクアシティお台場店",
+    "lat": 35.6278,
+    "lng": 139.77359,
+    "notes": "東京都港区台場１－７－１アクアシティお台場　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "いなげや荒川東日暮里店",
+    "lat": 35.72685,
+    "lng": 139.77823,
+    "notes": "東京都荒川区東日暮里５－７－６いなげや荒川東日暮里店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ミーツ国分寺店",
+    "lat": 35.70069,
+    "lng": 139.48045,
+    "notes": "東京都国分寺市本町３－１－１ミーツ国分寺　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "Ｏｄａｋｙｕ　ＯＸ狛江店",
+    "lat": 35.63324,
+    "lng": 139.57796,
+    "notes": "東京都狛江市元和泉１－２－１Ｏｄａｋｙｕ　ＯＸ狛江店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "いなげや三鷹牟礼店",
+    "lat": 35.68859,
+    "lng": 139.57654,
+    "notes": "東京都三鷹市牟礼６－２－２０いなげや三鷹牟礼店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "代官山アドレス・ディセ店",
+    "lat": 35.64916,
+    "lng": 139.70331,
+    "notes": "東京都渋谷区代官山町１７－６代官山アドレス・ディセ　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ﾋﾟｰｺｯｸｽﾄｱ東小金井店",
+    "lat": 35.70104,
+    "lng": 139.52144,
+    "notes": "東京都小金井市中町２－２３－２３ピーコックストア東小金井店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "SOCOLA武蔵小金井クロス店",
+    "lat": 35.69944,
+    "lng": 139.50548,
+    "notes": "東京都小金井市本町６－２－３０ＳＯＣＯＬＡ武蔵小金井クロス　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "トライアル西友花小金井店",
+    "lat": 35.72786,
+    "lng": 139.51178,
+    "notes": "東京都小平市花小金井１－２－２３トライアル西友花小金井店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "アクロスプラザ小平店",
+    "lat": 35.7152,
+    "lng": 139.47829,
+    "notes": "東京都小平市上水本町４－２２－１アクロスプラザ小平　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友小平店",
+    "lat": 35.73639,
+    "lng": 139.48883,
+    "notes": "東京都小平市美園町１－３３－２西友小平店　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "イトーヨーカドー昭島店",
+    "lat": 35.71405,
+    "lng": 139.3600464,
+    "notes": "東京都昭島市代官山２－３－１イトーヨーカドー昭島店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ＴＡＩＲＡＹＡ昭島店",
+    "lat": 35.7152,
+    "lng": 139.38112,
+    "notes": "東京都昭島市中神町１１４９－１ＴＡＩＲＡＹＡ昭島店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "アクロスプラザ昭島店",
+    "lat": 35.72303,
+    "lng": 139.37399,
+    "notes": "東京都昭島市武蔵野２－１１－４０アクロスプラザ昭島内",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ﾋﾟｰｺｯｸｽﾄｱ高田馬場店",
+    "lat": 35.71183,
+    "lng": 139.70471,
+    "notes": "東京都新宿区高田馬場１－２８－７ピーコックストア　Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "新宿マルイアネックス店",
+    "lat": 35.69008,
+    "lng": 139.7047,
+    "notes": "東京都新宿区新宿３－１－２６新宿マルイアネックス店　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "サミットストア高井戸東店",
+    "lat": 35.68668,
+    "lng": 139.62367,
+    "notes": "東京都杉並区高井戸東４－１－１３サミットストア高井戸東店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西荻高架下店",
+    "lat": 35.70369,
+    "lng": 139.59586,
+    "notes": "東京都杉並区松庵３－４１－１西荻高架下　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "Odakyu　OX　祖師谷店",
+    "lat": 35.64267,
+    "lng": 139.60858,
+    "notes": "東京都世田谷区砧８－１０－１Ｏｄａｋｙｕ　ＯＸ　祖師谷店　Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "マルエツ中里店",
+    "lat": 35.63945,
+    "lng": 139.66754,
+    "notes": "東京都世田谷区上馬２－２６－２０マルエツ中里店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ＳＯＣＯＬＡ用賀店",
+    "lat": 35.63429,
+    "lng": 139.6234,
+    "notes": "東京都世田谷区上用賀６－６－６ＳＯＣＯＬＡ用賀　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ビッグ・エー世田谷船橋店",
+    "lat": 35.65824,
+    "lng": 139.62141,
+    "notes": "東京都世田谷区船橋６－２６－８ビッグ・エー世田谷船橋店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友三軒茶屋店",
+    "lat": 35.64465,
+    "lng": 139.67021,
+    "notes": "東京都世田谷区太子堂４－２４－８西友三軒茶屋店　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友清瀬店",
+    "lat": 35.77325,
+    "lng": 139.52049,
+    "notes": "東京都清瀬市元町１－４－５西友清瀬店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友ひばりヶ丘店",
+    "lat": 35.75069,
+    "lng": 139.54538,
+    "notes": "東京都西東京市住吉町３－９－８西友ひばりヶ丘店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "フレスポひばりが丘店",
+    "lat": 35.74469,
+    "lng": 139.54243,
+    "notes": "東京都西東京市谷戸町２－３－７フレスポひばりが丘　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ＬＩＶＩＮ田無店",
+    "lat": 35.72832,
+    "lng": 139.54041,
+    "notes": "東京都西東京市田無町２－１－１ＬＩＶＩＮ田無　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友河辺店",
+    "lat": 35.78596,
+    "lng": 139.28471,
+    "notes": "東京都青梅市河辺町１０－９－１西友河辺店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ノジマ青梅インター店",
+    "lat": 35.79347,
+    "lng": 139.31699,
+    "notes": "東京都青梅市新町６－１６－１５ノジマ青梅インター店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "青梅千ヶ瀬店",
+    "lat": 35.7858,
+    "lng": 139.27162,
+    "notes": "東京都青梅市千ケ瀬町４－２８９－２",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友加賀鹿浜店",
+    "lat": 35.78908,
+    "lng": 139.76054,
+    "notes": "東京都足立区加賀１－３西友加賀鹿浜店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "オリンピック関原店",
+    "lat": 35.76906,
+    "lng": 139.78975,
+    "notes": "東京都足立区関原２－１５－４オリンピック関原店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "足立神明店",
+    "lat": 35.79329,
+    "lng": 139.83435,
+    "notes": "東京都足立区神明２－６－１４ＬＩＸＩＬビバ足立神明店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ライフ竹の塚店",
+    "lat": 35.80111,
+    "lng": 139.78328,
+    "notes": "東京都足立区西伊興４－１－２２ライフ竹の塚店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "パサージオ西新井店",
+    "lat": 35.77478,
+    "lng": 139.7896,
+    "notes": "東京都足立区西新井栄町１－１７－１パサージオ　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友青井店",
+    "lat": 35.77008,
+    "lng": 139.8177,
+    "notes": "東京都足立区青井３－１－１西友青井店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "北千住マルイ店",
+    "lat": 35.75108,
+    "lng": 139.80457,
+    "notes": "東京都足立区千住３－９２北千住マルイ　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ポンテポルタ千住店",
+    "lat": 35.74215,
+    "lng": 139.79526,
+    "notes": "東京都足立区千住橋戸町１－１３ポンテポルタ千住　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ニトリ環七梅島店",
+    "lat": 35.77822,
+    "lng": 139.80237,
+    "notes": "東京都足立区梅島２－３１－２６ニトリ環七梅島店　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "保木間店",
+    "lat": 35.78982,
+    "lng": 139.80733,
+    "notes": "東京都足立区保木間１－９－７グリーンマークシティ保木間内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "京王リトナード永山店",
+    "lat": 35.6301,
+    "lng": 139.44801,
+    "notes": "東京都多摩市永山１－１８－１京王リトナード永山　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "多摩貝取店",
+    "lat": 35.61913,
+    "lng": 139.44217,
+    "notes": "東京都多摩市貝取３－８コープ貝取店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ザ・スクエア聖蹟桜ヶ丘店",
+    "lat": 35.6516,
+    "lng": 139.44586,
+    "notes": "東京都多摩市関戸１－１－５ザ・スクエア聖蹟桜ヶ丘　Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "多摩ｾﾝﾀｰﾏｸﾞﾚﾌﾞEAST店",
+    "lat": 35.62417,
+    "lng": 139.42345,
+    "notes": "東京都多摩市落合１－３９－１マグレブＥＡＳＴ　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "クロスガーデン多摩店",
+    "lat": 35.62009,
+    "lng": 139.42334,
+    "notes": "東京都多摩市落合２－３３クロスガーデン多摩　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "浅草ＥＫＩＭＩＳＥ店",
+    "lat": 35.71185,
+    "lng": 139.79832,
+    "notes": "東京都台東区花川戸１－４－１浅草ＥＫＩＭＩＳＥ　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "上野マルイ店",
+    "lat": 35.71087,
+    "lng": 139.77582,
+    "notes": "東京都台東区上野６－１５－１上野マルイ　７Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "イトーヨーカドー大森店",
+    "lat": 35.58647,
+    "lng": 139.73343,
+    "notes": "東京都大田区大森北２－１３－１イトーヨーカドー大森店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "イグジットメルサ銀座店",
+    "lat": 35.67092,
+    "lng": 139.76434,
+    "notes": "東京都中央区銀座５－７－１０ＥＸＩＴＭＥＬＳＡ　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "中野マルイ店",
+    "lat": 35.70427,
+    "lng": 139.66496,
+    "notes": "東京都中野区中野３－３４－２８中野マルイ　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "Odakyu　OX　玉川学園店",
+    "lat": 35.56364,
+    "lng": 139.46352,
+    "notes": "東京都町田市玉川学園２－２１－９Ｏｄａｋｙｕ　ＯＸ　玉川学園店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "町田マルイ店",
+    "lat": 35.54238,
+    "lng": 139.4449,
+    "notes": "東京都町田市原町田６－１－６町田マルイ　６Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "島忠ホームズ町田三輪店",
+    "lat": 35.57868,
+    "lng": 139.50021,
+    "notes": "東京都町田市三輪町２８１－１島忠ホームズ町田三輪店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "コピオ多摩境店",
+    "lat": 35.60442,
+    "lng": 139.36058,
+    "notes": "東京都町田市小山ヶ丘４－５－２コピオ多摩境店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "町田小山店",
+    "lat": 35.59391,
+    "lng": 139.37575,
+    "notes": "東京都町田市小山町９８７－１",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "西友町田店",
+    "lat": 35.54366,
+    "lng": 139.44362,
+    "notes": "東京都町田市森野１－１４－１７西友町田店　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "いなげや町田成瀬台店",
+    "lat": 35.54977,
+    "lng": 139.47903,
+    "notes": "東京都町田市成瀬台２－３－１いなげや町田成瀬台店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "キッチンコート西調布店",
+    "lat": 35.65365,
+    "lng": 139.53113,
+    "notes": "東京都調布市下石原３－１１－１キッチンコート西調布店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "島忠ホームズ仙川店",
+    "lat": 35.65909,
+    "lng": 139.58626,
+    "notes": "東京都調布市若葉町２－１－７島忠ホームズ仙川店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友調布店",
+    "lat": 35.65371,
+    "lng": 139.54408,
+    "notes": "東京都調布市小島町１－１０－１西友調布店　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "いなげや調布仙川店",
+    "lat": 35.66561,
+    "lng": 139.58347,
+    "notes": "東京都調布市仙川町３－４－１",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "コープ調布染地店",
+    "lat": 35.6399,
+    "lng": 139.55704,
+    "notes": "東京都調布市染地３－１－８１５コープ調布染地店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "島忠ホームズ小平店",
+    "lat": 35.73857,
+    "lng": 139.51025,
+    "notes": "東京都東久留米市前沢５－３３－１７島忠ホームズ小平店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "サンドラッグ滝山団地店",
+    "lat": 35.74485,
+    "lng": 139.50525,
+    "notes": "東京都東久留米市滝山４－１－４０サンドラッグ滝山団地店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "クルネ東久留米店",
+    "lat": 35.75971,
+    "lng": 139.51143,
+    "notes": "東京都東久留米市野火止１－３－３東久留米ショッピングセンター　クルネ　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友久米川店",
+    "lat": 35.74976,
+    "lng": 139.47214,
+    "notes": "東京都東村山市栄町２－３－４西友久米川店　６Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "イトーヨーカドー東村山店",
+    "lat": 35.75891,
+    "lng": 139.46661,
+    "notes": "東京都東村山市本町２－２－１９イトーヨーカドー東村山店　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "東大和リビングテラス店",
+    "lat": 35.7429577,
+    "lng": 139.4269584,
+    "notes": "東京都東大和市清原１－１２１３－７東大和リビングテラス内",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ニトリ東大和店",
+    "lat": 35.74664,
+    "lng": 139.43581,
+    "notes": "東京都東大和市仲原４－２－１ニトリ東大和店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ｻﾞ･ﾏｰｹｯﾄﾌﾟﾚｲｽ東大和店",
+    "lat": 35.73752,
+    "lng": 139.42412,
+    "notes": "東京都東大和市立野３－１３４４－１ザ・マーケットプレイス東大和　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "豊田駅前店",
+    "lat": 35.65981,
+    "lng": 139.38116,
+    "notes": "東京都日野市多摩平１－１京王自動車豊田ビル　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "日野落川店",
+    "lat": 35.65699,
+    "lng": 139.43005,
+    "notes": "東京都日野市落川１０７０番地リヴェージュ百草園　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "三和八王子みなみ野店",
+    "lat": 35.63137,
+    "lng": 139.32745,
+    "notes": "東京都八王子市みなみ野１－８－１Ｍｉｏみなみ野ショッピングセンター　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "八王子オクトーレ店",
+    "lat": 35.65731,
+    "lng": 139.33884,
+    "notes": "東京都八王子市旭町９－１八王子オクトーレ　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "高倉店",
+    "lat": 35.66365,
+    "lng": 139.36714,
+    "notes": "東京都八王子市高倉町６６－１１コルモピア高倉店３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ｻｻﾞﾝｽｶｲﾀﾜｰ八王子店",
+    "lat": 35.65405,
+    "lng": 139.33881,
+    "notes": "東京都八王子市子安町４－７－１サザンスカイタワー八王子　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "セレオ西八王子店",
+    "lat": 35.65642,
+    "lng": 139.31218,
+    "notes": "東京都八王子市千人町２－２１－１セレオ西八王子　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "コピオ長房店",
+    "lat": 35.65852,
+    "lng": 139.29938,
+    "notes": "東京都八王子市長房町３４０－１２コピオ長房店　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "イーアス高尾店",
+    "lat": 35.64354,
+    "lng": 139.28918,
+    "notes": "東京都八王子市東浅川町５５０－１イーアス高尾　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "フォルテ八王子店",
+    "lat": 35.68246,
+    "lng": 139.30013,
+    "notes": "東京都八王子市楢原町１４６３－１フォルテ八王子　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "フレンテ南大沢店",
+    "lat": 35.61526,
+    "lng": 139.38229,
+    "notes": "東京都八王子市南大沢２－１－６フレンテ南大沢　新館３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "志村ｼｮｯﾋﾟﾝｸﾞｾﾝﾀｰ店",
+    "lat": 35.77845,
+    "lng": 139.68677,
+    "notes": "東京都板橋区志村３－２６－４志村ショッピングセンター　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友成増店",
+    "lat": 35.77829,
+    "lng": 139.63332,
+    "notes": "東京都板橋区成増３－１１－３西友成増店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "東武ストア前野町店",
+    "lat": 35.76393,
+    "lng": 139.68466,
+    "notes": "東京都板橋区前野町６－３－１東武ストア前野町店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "サンドラッグ戸越公園店",
+    "lat": 35.60786,
+    "lng": 139.71819,
+    "notes": "東京都品川区戸越６－７－７サンドラッグ戸越公園店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "品川ｼｰｻｲﾄﾞﾌｫﾚｽﾄ店",
+    "lat": 35.61023,
+    "lng": 139.74866,
+    "notes": "東京都品川区東品川４－１２－４品川シーサイドフォレストオーバルガーデン　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友大森店",
+    "lat": 35.58815,
+    "lng": 139.73045,
+    "notes": "東京都品川区南大井６－２７－２５西友大森店　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "府中くるる店",
+    "lat": 35.67155,
+    "lng": 139.48073,
+    "notes": "東京都府中市宮町１－５０府中くるる　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ライフ府中中河原店",
+    "lat": 35.66021,
+    "lng": 139.45845,
+    "notes": "東京都府中市住吉町１－８４－１ライフ府中中河原店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "フレスポ府中店",
+    "lat": 35.68247,
+    "lng": 139.46025,
+    "notes": "東京都府中市西原町１－６－２フレスポ府中　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "吉祥寺マルイ店",
+    "lat": 35.70188,
+    "lng": 139.57922,
+    "notes": "東京都武蔵野市吉祥寺南町１－７－１吉祥寺マルイ　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友吉祥寺店",
+    "lat": 35.70576,
+    "lng": 139.58124,
+    "notes": "東京都武蔵野市吉祥寺本町１－１２－１０西友吉祥寺店　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "東急百貨店吉祥寺店",
+    "lat": 35.70517,
+    "lng": 139.578,
+    "notes": "東京都武蔵野市吉祥寺本町２－３－１東急百貨店吉祥寺店　８Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "西友福生店",
+    "lat": 35.74327,
+    "lng": 139.32808,
+    "notes": "東京都福生市東町５－１西友福生店　Ｐａｒｔ２　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "マルフジ南田園店",
+    "lat": 35.72596,
+    "lng": 139.33141,
+    "notes": "東京都福生市南田園２－８－７",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "茗荷谷店",
+    "lat": 35.71725,
+    "lng": 139.73714,
+    "notes": "東京都文京区小日向４－６－１２茗荷谷駅ＭＦビル　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "池袋Ｐ’パルコ店",
+    "lat": 35.73285,
+    "lng": 139.71278,
+    "notes": "東京都豊島区東池袋１－５０－３５池袋Ｐ’ＰＡＲＣＯ　５Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "池袋ｻﾝｼｬｲﾝｼﾃｨｱﾙﾀ店",
+    "lat": 35.72929,
+    "lng": 139.71919,
+    "notes": "東京都豊島区東池袋３－１－３池袋サンシャインシティアルタ　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "東池袋店",
+    "lat": 35.72801,
+    "lng": 139.71915,
+    "notes": "東京都豊島区東池袋４－２７－１０サンソウゴ池袋第一ビル　Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "サミット王子桜田通り店",
+    "lat": 35.76408,
+    "lng": 139.73251,
+    "notes": "東京都北区王子５－１－４０サミットストア王子桜田通り店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ジャパンミート王子店",
+    "lat": 35.76504,
+    "lng": 139.73285,
+    "notes": "東京都北区王子５－２－１０ジャパンミート王子店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "コモディイイダ滝野川店",
+    "lat": 35.74367,
+    "lng": 139.72296,
+    "notes": "東京都北区滝野川７－２５－８コモディイイダ滝野川店　別館　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "錦糸町マルイ店",
+    "lat": 35.695,
+    "lng": 139.81371,
+    "notes": "東京都墨田区江東橋３－９－１０錦糸町マルイ　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "オリナス錦糸町店",
+    "lat": 35.70058,
+    "lng": 139.81612,
+    "notes": "東京都墨田区太平４－１－２オリナスコア　Ｂ１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "八広店",
+    "lat": 35.72169,
+    "lng": 139.82236,
+    "notes": "東京都墨田区八広１－７－８オリンピック八広店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "自由が丘店",
+    "lat": 35.60843,
+    "lng": 139.66745,
+    "notes": "東京都目黒区自由が丘２－１０－８自由が丘エヌケービル　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "若葉ケヤキモール店",
+    "lat": 35.72045,
+    "lng": 139.43433,
+    "notes": "東京都立川市若葉町１－７－１若葉ケヤキモール　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ビックカメラ立川店",
+    "lat": 35.69924,
+    "lng": 139.41466,
+    "notes": "東京都立川市曙町２－１２－２ビックカメラ立川店　７Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "立川高島屋ｼｮｯﾋﾟﾝｸﾞｾﾝﾀｰ店",
+    "lat": 35.70085,
+    "lng": 139.41315,
+    "notes": "東京都立川市曙町２－３９－３立川高島屋Ｓ．Ｃ．　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "ららぽーと立川立飛店",
+    "lat": 35.71406,
+    "lng": 139.4115,
+    "notes": "東京都立川市泉町９３５－１ららぽーと立川立飛　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "セリア",
+    "name": "江古田店",
+    "lat": 35.73685,
+    "lng": 139.67415,
+    "notes": "東京都練馬区旭丘１－７１－６プロパティ江古田ビル　１Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "石神井公園ピアレス店",
+    "lat": 35.74355,
+    "lng": 139.60725,
+    "notes": "東京都練馬区石神井町２－１４－１石神井公園ピアレス １Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ＬＩＶＩＮオズ大泉店",
+    "lat": 35.75226,
+    "lng": 139.59521,
+    "notes": "東京都練馬区東大泉２－１０－１１ＬＩＶＩＮオズ大泉　４Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "ゆめりあﾌｪﾝﾃ大泉学園店",
+    "lat": 35.74894,
+    "lng": 139.58556,
+    "notes": "東京都練馬区東大泉５－４３－１ゆめりあフェンテ大泉学園　３Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "セリア",
+    "name": "コモディイイダ大泉店",
+    "lat": 35.74834,
+    "lng": 139.57214,
+    "notes": "東京都練馬区南大泉４－５０－１０コモディイイダ大泉店　２Ｆ",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "サンスイ",
+    "name": "渋谷本店",
+    "lat": 35.6584369,
+    "lng": 139.7011709,
+    "notes": "東京都渋谷区２丁目２２−７ 新生ビル 1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "サンスイ",
+    "name": "SHIBUYA SANSUI Part 2",
+    "lat": 35.65625,
+    "lng": 139.70511,
+    "notes": "東京都渋谷区渋谷３丁目１６−１",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "サンスイ",
+    "name": "SHIBUYA SANSUI Part 1",
+    "lat": 35.65625,
+    "lng": 139.70511,
+    "notes": "東京都渋谷区渋谷３丁目１６−２ ニュー三水ビル 1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "サンスイ",
+    "name": "上野店",
+    "lat": 35.7092,
+    "lng": 139.77307,
+    "notes": "東京都台東区上野２丁目７−１３",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "サンスイ",
+    "name": "池袋店",
+    "lat": 35.73235,
+    "lng": 139.71315,
+    "notes": "東京都豊島区東池袋１丁目４２−１４",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "青戸店",
+    "lat": 35.75657,
+    "lng": 139.85529,
+    "notes": "東京都葛飾区青戸7-25-10",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "錦糸町店",
+    "lat": 35.69129,
+    "lng": 139.81496,
+    "notes": "東京都江東区毛利1-12-10",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "東久留米店",
+    "lat": 35.73759,
+    "lng": 139.51822,
+    "notes": "東京都小平市花小金井3-34-26",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "八幡山店",
+    "lat": 35.66754,
+    "lng": 139.61372,
+    "notes": "東京都世田谷区八幡山3-38-16",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "足立環七店",
+    "lat": 35.77907,
+    "lng": 139.79907,
+    "notes": "東京都足立区島根1-8-3",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "日本橋店",
+    "lat": 35.68876,
+    "lng": 139.77409,
+    "notes": "東京都中央区日本橋本町3-3-6 ワカ末ビル 1F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "八王子店",
+    "lat": 35.64742,
+    "lng": 139.33514,
+    "notes": "東京都八王子市緑町927-1",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "キャスティング",
+    "name": "品川シーサイド店",
+    "lat": 35.61023,
+    "lng": 139.74866,
+    "notes": "東京都品川区東品川4-12-4 品川シーサイドパークタワー2F",
+    "icon": "shop2",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "キャスティング",
+    "name": "府中店",
+    "lat": 35.66962,
+    "lng": 139.50308,
+    "notes": "東京都府中市若松町1-28-3",
+    "icon": "shop2",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "セイムスあきる野引田店",
+    "lat": 35.72479,
+    "lng": 139.26744,
+    "notes": "東京都あきる野市引田558-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "あきる野雨間店",
+    "lat": 35.7236745,
+    "lng": 139.2888902,
+    "notes": "東京都あきる野市雨間字西郷735-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "あきるのプレイス店",
+    "lat": 35.73089,
+    "lng": 139.28729,
+    "notes": "東京都あきる野市秋川1-17-1 あきるのプレイス4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和稲城店",
+    "lat": 35.64058,
+    "lng": 139.48924,
+    "notes": "東京都稲城市向陽台3丁目8番1号 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "フレスポ若葉台店",
+    "lat": 35.62041,
+    "lng": 139.47118,
+    "notes": "東京都稲城市若葉台2-4-2フレスポ若葉台2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アメリア稲城SC店",
+    "lat": 35.63568,
+    "lng": 139.51495,
+    "notes": "東京都稲城市矢野口2284-1アメリア稲城SC店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "羽村店",
+    "lat": 35.75861,
+    "lng": 139.31192,
+    "notes": "東京都羽村市羽東2-7-6",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎葛飾鎌倉店",
+    "lat": 35.74408,
+    "lng": 139.8817,
+    "notes": "東京都葛飾区鎌倉4-2-1 地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "亀有リリオ店",
+    "lat": 35.76653,
+    "lng": 139.84875,
+    "notes": "東京都葛飾区亀有3丁目26-1亀有リリオ5階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヴィナシス金町店",
+    "lat": 35.76802,
+    "lng": 139.87103,
+    "notes": "東京都葛飾区金町6-2-1 ヴィナシス金町2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー高砂店",
+    "lat": 35.75052,
+    "lng": 139.86858,
+    "notes": "東京都葛飾区高砂3-12-5イトーヨーカドー高砂店内3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ小菅店",
+    "lat": 35.75576,
+    "lng": 139.82639,
+    "notes": "東京都葛飾区小菅3-11-7コモディイイダ小菅 1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "新小岩ルミエール店",
+    "lat": 35.71494,
+    "lng": 139.85986,
+    "notes": "東京都葛飾区新小岩1-39-7",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "新小岩北口店",
+    "lat": 35.71832,
+    "lng": 139.85738,
+    "notes": "東京都葛飾区西新小岩1-8-7",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ユアエルム青戸店",
+    "lat": 35.74494,
+    "lng": 139.85553,
+    "notes": "東京都葛飾区青戸3丁目36-1ユアエルム7番街1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東急ストア金町店",
+    "lat": 35.77205,
+    "lng": 139.87099,
+    "notes": "東京都葛飾区東金町1-36-1 東急ストア金町店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "いなげやお花茶屋店",
+    "lat": 35.74606,
+    "lng": 139.84315,
+    "notes": "東京都葛飾区白鳥1-6-1いなげやお花茶屋店1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コープ葛飾白鳥店",
+    "lat": 35.75254,
+    "lng": 139.84848,
+    "notes": "東京都葛飾区白鳥4丁目10番17号コープみらい葛飾白鳥店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "赤札堂堀切店",
+    "lat": 35.74728,
+    "lng": 139.82727,
+    "notes": "東京都葛飾区堀切3-7-4 赤札堂堀切3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "京成立石駅前店",
+    "lat": 35.73748,
+    "lng": 139.8493,
+    "notes": "東京都葛飾区立石1-20-9",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "オリンピック立石店",
+    "lat": 35.74203,
+    "lng": 139.84908,
+    "notes": "東京都葛飾区立石7-10-7 Olympic立石店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ一之江駅前店",
+    "lat": 35.68559,
+    "lng": 139.88353,
+    "notes": "東京都江戸川区一之江8-13-9 FRONT101 マルエツ一之江駅前3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ライフ篠崎店",
+    "lat": 35.70583,
+    "lng": 139.90366,
+    "notes": "東京都江戸川区篠崎町7-27-1ライフ篠崎店4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ライフ瑞江店",
+    "lat": 35.69334,
+    "lng": 139.89775,
+    "notes": "東京都江戸川区瑞江2-2-1ライフ瑞江店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サニーモール西葛西店",
+    "lat": 35.66786,
+    "lng": 139.8625,
+    "notes": "東京都江戸川区西葛西4-2-28サニーモール西葛西3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "船堀店",
+    "lat": 35.68216,
+    "lng": 139.86757,
+    "notes": "東京都江戸川区船堀4-16-20 1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎中葛西3丁目店",
+    "lat": 35.6643,
+    "lng": 139.87279,
+    "notes": "東京都江戸川区中葛西3-37-9",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ葛西店",
+    "lat": 35.65335,
+    "lng": 139.88069,
+    "notes": "東京都江戸川区東葛西9-3-6",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "新鮮市場南葛西店",
+    "lat": 35.64809,
+    "lng": 139.87338,
+    "notes": "東京都江戸川区南葛西4丁目3-14新鮮市場南葛西店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "小岩サンロード店",
+    "lat": 35.73338,
+    "lng": 139.88293,
+    "notes": "東京都江戸川区南小岩7-26-17井門小岩ビル",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "平井店",
+    "lat": 35.70546,
+    "lng": 139.84494,
+    "notes": "東京都江戸川区平井4-8-6シャトーマルイ1・2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ亀戸店",
+    "lat": 35.69795,
+    "lng": 139.82028,
+    "notes": "東京都江東区亀戸2-1-1 コモディイイダ亀戸店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アトレ亀戸店",
+    "lat": 35.69763,
+    "lng": 139.82707,
+    "notes": "東京都江東区亀戸5-1-1アトレ亀戸店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "亀戸十三間通り店",
+    "lat": 35.70012,
+    "lng": 139.82574,
+    "notes": "東京都江東区亀戸5丁目15番2号ティ・ビー・シービル1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "南砂町ショッピングセンターSUNAMO店",
+    "lat": 35.66461,
+    "lng": 139.8356,
+    "notes": "東京都江東区新砂3-4-31 南砂町ショッピングセンターSUNAMO2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "南砂町駅前店",
+    "lat": 35.66858,
+    "lng": 139.82986,
+    "notes": "東京都江東区新砂3丁目1番4 どらっぐぱぱす2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン東大島店",
+    "lat": 35.69115,
+    "lng": 139.84224,
+    "notes": "東京都江東区大島7丁目38-30 イオン東大島4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン東雲店",
+    "lat": 35.64655,
+    "lng": 139.80237,
+    "notes": "東京都江東区東雲1丁目9-10イオン東雲2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東陽町駅店",
+    "lat": 35.66941,
+    "lng": 139.81805,
+    "notes": "東京都江東区東陽4-1-7 佐藤ダイヤビルディング1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products イオンスタイル南砂店",
+    "lat": 35.67184,
+    "lng": 139.83594,
+    "notes": "東京都江東区南砂6-7-1 イオンスタイル南砂店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ららぽーと豊洲店",
+    "lat": 35.65537,
+    "lng": 139.79123,
+    "notes": "東京都江東区豊洲2-4-9アーバンドックららぽーと豊洲1-3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アリオ北砂店",
+    "lat": 35.68245,
+    "lng": 139.82556,
+    "notes": "東京都江東区北砂2-17-1 アリオ北砂店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー木場店",
+    "lat": 35.6655,
+    "lng": 139.80321,
+    "notes": "東京都江東区木場1-5-30 イトーヨーカドー木場2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "赤札堂深川店",
+    "lat": 35.67348,
+    "lng": 139.7961,
+    "notes": "東京都江東区門前仲町2-10-1 赤札堂深川4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "有明ガーデン店",
+    "lat": 35.63832,
+    "lng": 139.79355,
+    "notes": "東京都江東区有明2-1-8 有明ガーデン3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "デックス東京ビーチ店",
+    "lat": 35.62906,
+    "lng": 139.77589,
+    "notes": "東京都港区台場一丁目6番1号デックス東京ビーチアイランドモール4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ町屋店",
+    "lat": 35.7481,
+    "lng": 139.78239,
+    "notes": "東京都荒川区町屋3-18-11 コモディイイダ町屋店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "三ノ輪店",
+    "lat": 35.73119,
+    "lng": 139.79051,
+    "notes": "東京都荒川区東日暮里1丁目5-10 大関横丁鈴木酒販ビル2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "LaLaテラス南千住店",
+    "lat": 35.73583,
+    "lng": 139.80193,
+    "notes": "東京都荒川区南千住4-7-2LaLaテラス南千住店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東京国分寺東元町店",
+    "lat": 35.6928,
+    "lng": 139.48045,
+    "notes": "東京都国分寺市東元町4-16",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "東京国分寺北町店",
+    "lat": 35.71728,
+    "lng": 139.46004,
+    "notes": "東京都国分寺市北町1丁目2-6",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "国分寺駅前店",
+    "lat": 35.70123,
+    "lng": 139.48134,
+    "notes": "東京都国分寺市本町2-10 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン国立店",
+    "lat": 35.67678,
+    "lng": 139.42709,
+    "notes": "東京都国立市泉3-29-11",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "国立駅前店",
+    "lat": 35.69849,
+    "lng": 139.44453,
+    "notes": "東京都国立市中1-8-4",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンフードスタイル国立店",
+    "lat": 35.68309,
+    "lng": 139.44757,
+    "notes": "東京都国立市富士見台1-12-4 イオンフードスタイル国立2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "さえき国立さくら通り店",
+    "lat": 35.68742,
+    "lng": 139.43317,
+    "notes": "東京都国立市富士見台4丁目3-2 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "小田急マルシェ狛江店",
+    "lat": 35.63197,
+    "lng": 139.57704,
+    "notes": "東京都狛江市元和泉1-8-8",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "東急ストア三鷹センター店",
+    "lat": 35.69979,
+    "lng": 139.56133,
+    "notes": "東京都三鷹市下連雀3-28-23三鷹センター東急ストア店1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ三鷹店",
+    "lat": 35.68913,
+    "lng": 139.55533,
+    "notes": "東京都三鷹市上連雀6-29-7 コモディイイダ三鷹店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "渋谷センター街店",
+    "lat": 35.66151,
+    "lng": 139.69699,
+    "notes": "東京都渋谷区宇田川町35-2",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王クラウン街笹塚店",
+    "lat": 35.67398,
+    "lng": 139.66753,
+    "notes": "東京都渋谷区笹塚1-56-18京王クラウン街笹塚ウエストブロック",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "原宿店",
+    "lat": 35.67178,
+    "lng": 139.7036,
+    "notes": "東京都渋谷区神宮前1-19-24ビレッジ107 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アコルデ代々木上原店",
+    "lat": 35.66904,
+    "lng": 139.67982,
+    "notes": "東京都渋谷区西原3丁目8番5号",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "渋谷マークシティ店",
+    "lat": 35.65793,
+    "lng": 139.698,
+    "notes": "東京都渋谷区道玄坂1-12-1 渋谷マークシティ1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 渋谷マークシティ店",
+    "lat": 35.65793,
+    "lng": 139.698,
+    "notes": "東京都渋谷区道玄坂1-12-1 渋谷マークシティ1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ノノワ東小金井店",
+    "lat": 35.7021254,
+    "lng": 139.5230377,
+    "notes": "東京都小金井市梶野町5-1-1 ノノワ東小金井1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "オリンピック小金井店",
+    "lat": 35.70796,
+    "lng": 139.48706,
+    "notes": "東京都小金井市貫井北町4-3-1 Olympic小金井店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ武蔵小金井駅前店",
+    "lat": 35.70175,
+    "lng": 139.50563,
+    "notes": "東京都小金井市本町5-11-2 MEGAドン・キホーテ武蔵小金井駅前店4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products MEGAドン・キホーテ武蔵小金井駅前店",
+    "lat": 35.70175,
+    "lng": 139.50563,
+    "notes": "東京都小金井市本町5-11-2 MEGAドン・キホーテ武蔵小金井駅前店4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンフードスタイル小金井店",
+    "lat": 35.70532,
+    "lng": 139.50212,
+    "notes": "東京都小金井市本町5-34-14 イオンフードスタイル小金井2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー武蔵小金井店",
+    "lat": 35.70048,
+    "lng": 139.50565,
+    "notes": "東京都小金井市本町6-14-9 イトーヨーカドー武蔵小金井店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "花小金井店",
+    "lat": 35.73929,
+    "lng": 139.50717,
+    "notes": "東京都小平市花小金井4-4-12",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100花小金井店",
+    "lat": 35.73544,
+    "lng": 139.50603,
+    "notes": "東京都小平市花小金井8-33-15",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "一橋学園中央通り店",
+    "lat": 35.72346,
+    "lng": 139.48143,
+    "notes": "東京都小平市学園東町1-4-39 平山ビル2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン小平店",
+    "lat": 35.74335,
+    "lng": 139.46756,
+    "notes": "東京都小平市小川東町2-12-1 イオン小平2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "FLAT小平店",
+    "lat": 35.7413165,
+    "lng": 139.4662818,
+    "notes": "東京都小平市小川東町3-7-1 FLAT小平1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ザ・ビッグ 昭島店",
+    "lat": 35.71625,
+    "lng": 139.3732,
+    "notes": "東京都昭島市宮沢町500-1ザ・ビッグ昭島3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "いなげや昭島中神店",
+    "lat": 35.7054,
+    "lng": 139.3756,
+    "notes": "東京都昭島市朝日町3-1-26いなげや昭島中神店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ昭島店",
+    "lat": 35.70163,
+    "lng": 139.34914,
+    "notes": "東京都昭島市田中町3-8-5",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヤオコー西武立川駅前店",
+    "lat": 35.72554,
+    "lng": 139.36977,
+    "notes": "東京都昭島市美堀町1-1-1ヤオコー西武立川駅前店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピーコックストア目白店",
+    "lat": 35.72167,
+    "lng": 139.70053,
+    "notes": "東京都新宿区下落合3-14-21 ピーコックストア目白2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "新宿サブナード店",
+    "lat": 35.6934567,
+    "lng": 139.6991676,
+    "notes": "東京都新宿区歌舞伎町1丁目靖国通り下 新宿サブナード地下街内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "高田馬場店",
+    "lat": 35.71127,
+    "lng": 139.70383,
+    "notes": "東京都新宿区高田馬場1丁目33-13 千年ビル 地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎市谷柳町店",
+    "lat": 35.69902,
+    "lng": 139.72589,
+    "notes": "東京都新宿区市谷柳町37マージュ市谷柳町地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ビックカメラ新宿東口店",
+    "lat": 35.69143,
+    "lng": 139.70296,
+    "notes": "東京都新宿区新宿3-29-1 ビックカメラ新宿東口店8階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products ビックカメラ新宿東口店",
+    "lat": 35.69143,
+    "lng": 139.70296,
+    "notes": "東京都新宿区新宿3-29-1 ビックカメラ新宿東口店8階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "新宿コクーンタワー店",
+    "lat": 35.69154,
+    "lng": 139.69728,
+    "notes": "東京都新宿区西新宿1-7-3 地下2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王モールアネックス店",
+    "lat": 35.68821,
+    "lng": 139.69714,
+    "notes": "東京都新宿区西新宿1丁目19番地京王モールアネックス内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークフーズ早稲田店",
+    "lat": 35.70587,
+    "lng": 139.72253,
+    "notes": "東京都新宿区早稲田町74-10ヨークフーズ早稲田店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "大久保二丁目明治通り店",
+    "lat": 35.70273,
+    "lng": 139.70811,
+    "notes": "東京都新宿区大久保2-5-20",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "飯田橋店",
+    "lat": 35.70197,
+    "lng": 139.74352,
+    "notes": "東京都新宿区揚場町1-11 飯田橋中央ビル1階・2階・3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピーコックストア阿佐谷店",
+    "lat": 35.70083,
+    "lng": 139.63786,
+    "notes": "東京都杉並区阿佐谷南1-32-10ピーコックストア阿佐谷店地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王リトナード永福町店",
+    "lat": 35.67678,
+    "lng": 139.6418,
+    "notes": "東京都杉並区永福2丁目60-31 京王リトナード永福町3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピーコックストア井荻店",
+    "lat": 35.72424,
+    "lng": 139.6147,
+    "notes": "東京都杉並区下井草5-18-8ピーコックストア井荻店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピーコックストア久我山店",
+    "lat": 35.68872,
+    "lng": 139.59935,
+    "notes": "東京都杉並区久我山4丁目2-6 ピーコックストア久我山店 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王リトナード高井戸店",
+    "lat": 35.68354,
+    "lng": 139.61421,
+    "notes": "東京都杉並区高井戸西2-1-26 京王リトナード高井戸2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "高井戸店",
+    "lat": 35.68723,
+    "lng": 139.62167,
+    "notes": "東京都杉並区高井戸東4丁目2-4マクドナルド2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "高円寺パル店",
+    "lat": 35.70382,
+    "lng": 139.64893,
+    "notes": "東京都杉並区高円寺南4-24-9",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "西荻南店",
+    "lat": 35.70401,
+    "lng": 139.6059,
+    "notes": "東京都杉並区西荻南4-34",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サミット和泉店",
+    "lat": 35.68291,
+    "lng": 139.65593,
+    "notes": "東京都杉並区和泉4-50-11 サミット和泉店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "オオゼキ杉並和田店",
+    "lat": 35.69081,
+    "lng": 139.66588,
+    "notes": "東京都杉並区和田1丁目17番4号オオゼキ杉並和田店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "喜多見駅前店",
+    "lat": 35.63726,
+    "lng": 139.5885,
+    "notes": "東京都世田谷区喜多見9丁目1番2号小田急喜多見ル・ジュール1階・2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "経堂店",
+    "lat": 35.65129,
+    "lng": 139.63815,
+    "notes": "東京都世田谷区宮坂2-19-5ピーコックストア経堂店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "二子玉川ライズSC店",
+    "lat": 35.61204,
+    "lng": 139.62845,
+    "notes": "東京都世田谷区玉川2-21-1 二子玉川ライズSC ステーションマーケット1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 二子玉川ライズ・ショッピングセンター店",
+    "lat": 35.61204,
+    "lng": 139.62845,
+    "notes": "東京都世田谷区玉川2-21-1 二子玉川ライズショッピングセンター1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "明大前店",
+    "lat": 35.6694,
+    "lng": 139.65092,
+    "notes": "東京都世田谷区松原1-38-10明大前ビル",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "オオゼキ松原店",
+    "lat": 35.65995,
+    "lng": 139.64267,
+    "notes": "東京都世田谷区松原4丁目10-4 オオゼキ松原店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王リトナード八幡山店",
+    "lat": 35.66965,
+    "lng": 139.61731,
+    "notes": "東京都世田谷区上北沢4-36-23",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "世田谷4丁目店",
+    "lat": 35.64307,
+    "lng": 139.65166,
+    "notes": "東京都世田谷区世田谷4-7-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "成城学園店",
+    "lat": 35.64729,
+    "lng": 139.59656,
+    "notes": "東京都世田谷区成城8-18-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ダイエー三軒茶屋店",
+    "lat": 35.64261,
+    "lng": 139.67372,
+    "notes": "東京都世田谷区太子堂1-14-16 ダイエー三軒茶屋店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王ストア代田橋店",
+    "lat": 35.67141,
+    "lng": 139.65887,
+    "notes": "東京都世田谷区大原2-26-12京王ストア代田橋2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "千歳烏山クレア店",
+    "lat": 35.66922,
+    "lng": 139.60106,
+    "notes": "東京都世田谷区南烏山4-12-7 クレア店内2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "レシピ下北沢店",
+    "lat": 35.66085,
+    "lng": 139.66707,
+    "notes": "東京都世田谷区北沢2-20-17Recipe SHIMOKITA5階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "清瀬店",
+    "lat": 35.77512,
+    "lng": 139.52361,
+    "notes": "東京都清瀬市上清戸1-14-56",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "いなげや秋津駅前店",
+    "lat": 35.77794,
+    "lng": 139.49973,
+    "notes": "東京都清瀬市野塩1-337-1いなげや秋津駅前店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール日の出店",
+    "lat": 35.74148,
+    "lng": 139.27971,
+    "notes": "東京都西多摩郡日の出町大字平井字三吉野桜木237-3 イオンモール日の出2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サミット向台町店",
+    "lat": 35.71764,
+    "lng": 139.53416,
+    "notes": "東京都西東京市向台町3-5-74",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンタウン田無芝久保店",
+    "lat": 35.72319,
+    "lng": 139.52835,
+    "notes": "東京都西東京市芝久保町1-12-5イオンタウン田無芝久保店 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コープひばりが丘店",
+    "lat": 35.74427,
+    "lng": 139.53848,
+    "notes": "東京都西東京市谷戸町2-1-80",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンスタイル河辺店",
+    "lat": 35.78539,
+    "lng": 139.2859,
+    "notes": "東京都青梅市河辺町10-7-1イオンスタイル河辺4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヤオコー青梅今寺店",
+    "lat": 35.79289,
+    "lng": 139.30304,
+    "notes": "東京都青梅市今寺5丁目14-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "オザム青梅新町店",
+    "lat": 35.78887,
+    "lng": 139.3102,
+    "notes": "東京都青梅市新町6-1-10",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "おうめ新町9丁目店",
+    "lat": 35.77962,
+    "lng": 139.32077,
+    "notes": "東京都青梅市新町9-2019-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや青梅今寺店",
+    "lat": 35.79903,
+    "lng": 139.30194,
+    "notes": "東京都青梅市藤橋2丁目560-6",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨドバシAKIBA店",
+    "lat": 35.69864,
+    "lng": 139.77461,
+    "notes": "東京都千代田区神田花岡町1-1 ヨドバシカメラ マルチメディアAkiba7階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "神田神保町すずらん通り店",
+    "lat": 35.69567,
+    "lng": 139.76064,
+    "notes": "東京都千代田区神田神保町1-1-17東京堂神保町第3ビルディング 1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東急ストア綾瀬店",
+    "lat": 35.76225,
+    "lng": 139.82582,
+    "notes": "東京都足立区綾瀬3-1-2綾瀬東急ストア1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 足立ひとつや店",
+    "lat": 35.77961,
+    "lng": 139.81131,
+    "notes": "東京都足立区一ツ家3-2-5",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "足立ひとつや店",
+    "lat": 35.77961,
+    "lng": 139.81131,
+    "notes": "東京都足立区一ツ家3-2-5",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルクスモール足立花畑店",
+    "lat": 35.80735,
+    "lng": 139.81143,
+    "notes": "東京都足立区花畑5丁目13番2号ベルクスモール足立花畑 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨークプライス西新井店",
+    "lat": 35.77024,
+    "lng": 139.78214,
+    "notes": "東京都足立区興野1-12-7 ヨークプライス西新井2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "足立江北店",
+    "lat": 35.78196,
+    "lng": 139.76123,
+    "notes": "東京都足立区江北7-21-10 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ舎人店",
+    "lat": 35.81244,
+    "lng": 139.76541,
+    "notes": "東京都足立区舎人6-1-6 コモディイイダ舎人店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ西新井店",
+    "lat": 35.78522,
+    "lng": 139.78255,
+    "notes": "東京都足立区西新井2-26-16",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products アリオ西新井店",
+    "lat": 35.77469,
+    "lng": 139.78578,
+    "notes": "東京都足立区西新井栄町1-20-1 アリオ西新井店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アリオ西新井店",
+    "lat": 35.77469,
+    "lng": 139.78578,
+    "notes": "東京都足立区西新井栄町1丁目20番1号 アリオ西新井店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナンドイト西新井店",
+    "lat": 35.77469,
+    "lng": 139.77147,
+    "notes": "東京都足立区西新井本町2-31-1 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "北千住店",
+    "lat": 35.75048,
+    "lng": 139.80084,
+    "notes": "東京都足立区千住二丁目16番舛田ビル2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "五反野駅前店",
+    "lat": 35.76601,
+    "lng": 139.8093,
+    "notes": "東京都足立区足立3丁目34番11号",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ららテラス北綾瀬店",
+    "lat": 35.77782,
+    "lng": 139.83162,
+    "notes": "東京都足立区谷中4-8-1 ららテラス北綾瀬4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "竹の塚Joyぷらざ店",
+    "lat": 35.79463,
+    "lng": 139.79491,
+    "notes": "東京都足立区竹ノ塚5-7-3 竹の塚Joyぷらざ1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サミット五反野店",
+    "lat": 35.76735,
+    "lng": 139.80878,
+    "notes": "東京都足立区中央本町2-26-12 サミット五反野2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ足立入谷店",
+    "lat": 35.80542,
+    "lng": 139.7661,
+    "notes": "東京都足立区入谷1-26-15マルエツ足立入谷店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "カリブ梅島店",
+    "lat": 35.76675,
+    "lng": 139.79877,
+    "notes": "東京都足立区梅田6-9-16カリブ梅島店1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン西新井店",
+    "lat": 35.77791,
+    "lng": 139.79047,
+    "notes": "東京都足立区梅島3-32-7イオン西新井店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "保木間1丁目店",
+    "lat": 35.79024,
+    "lng": 139.81015,
+    "notes": "東京都足立区保木間1-33-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ多摩永山店",
+    "lat": 35.62974,
+    "lng": 139.4393,
+    "notes": "東京都多摩市貝取1-65-1コモディイイダ永山店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "京王聖蹟桜ヶ丘ショッピングセンター店",
+    "lat": 35.65112,
+    "lng": 139.44717,
+    "notes": "東京都多摩市関戸1-10-1 京王聖蹟桜ヶ丘ショッピングセンターB館6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 京王聖蹟桜ヶ丘ショッピングセンター店",
+    "lat": 35.65112,
+    "lng": 139.44717,
+    "notes": "東京都多摩市関戸1-10-1 京王聖蹟桜ヶ丘ショッピングセンターB館6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヴィータモールせいせき店",
+    "lat": 35.64963,
+    "lng": 139.44705,
+    "notes": "東京都多摩市関戸4-72 ヴィータ聖蹟桜ヶ丘5階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "サミット東寺方店",
+    "lat": 35.64145,
+    "lng": 139.43558,
+    "notes": "東京都多摩市東寺方660-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イコット多摩センター店",
+    "lat": 35.6242,
+    "lng": 139.427,
+    "notes": "東京都多摩市落合1-35イコット多摩センター2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ココリア多摩センター店",
+    "lat": 35.6223,
+    "lng": 139.42476,
+    "notes": "東京都多摩市落合1-46-1ココリア多摩センター4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "松坂屋上野店",
+    "lat": 35.70752,
+    "lng": 139.77332,
+    "notes": "東京都台東区上野3-29-5 松坂屋上野店6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "セイムス浅草雷門通り店",
+    "lat": 35.71122,
+    "lng": 139.79741,
+    "notes": "東京都台東区浅草1-1-2 浅草スクエア3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "浅草ROX店",
+    "lat": 35.71286,
+    "lng": 139.79274,
+    "notes": "東京都台東区浅草1-25-15浅草ROX4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "多慶屋御徒町店",
+    "lat": 35.70684,
+    "lng": 139.77687,
+    "notes": "東京都台東区台東4-12-1 TAKEYA1 4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ東上野店",
+    "lat": 35.71383,
+    "lng": 139.7827,
+    "notes": "東京都台東区東上野5-17-11",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ココスナカムラ入谷店",
+    "lat": 35.72012,
+    "lng": 139.78444,
+    "notes": "東京都台東区入谷1-6-6ココスナカムラ入谷店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "下丸子駅前店",
+    "lat": 35.57183,
+    "lng": 139.68497,
+    "notes": "東京都大田区下丸子3丁目3-13",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツかまた店",
+    "lat": 35.55963,
+    "lng": 139.71613,
+    "notes": "東京都大田区蒲田5-47-7マルエツかまた店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 大森駅前店",
+    "lat": 35.58871,
+    "lng": 139.72731,
+    "notes": "東京都大田区山王2-4-1 大森駅前ビル3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "大森駅前店",
+    "lat": 35.58871,
+    "lng": 139.72731,
+    "notes": "東京都大田区山王2-4-1大森駅前ビル3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "長原東急ストア店",
+    "lat": 35.60224,
+    "lng": 139.69804,
+    "notes": "東京都大田区上池台1-10-10長原東急ストア店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "上池台東急ストア店",
+    "lat": 35.59175,
+    "lng": 139.69846,
+    "notes": "東京都大田区上池台5-23-5上池台東急ストア2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products グランデュオ蒲田店",
+    "lat": 35.56243,
+    "lng": 139.71542,
+    "notes": "東京都大田区西蒲田7-68-1 グランデュオ蒲田西館3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東急プラザ蒲田店",
+    "lat": 35.56174,
+    "lng": 139.71475,
+    "notes": "東京都大田区西蒲田7丁目69番1号東急プラザ蒲田M2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マチノマ大森店",
+    "lat": 35.57465,
+    "lng": 139.72681,
+    "notes": "東京都大田区大森西3-1-38マチノマ大森2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Luz大森店",
+    "lat": 35.58633,
+    "lng": 139.72838,
+    "notes": "東京都大田区大森北1-10-14Luz大森2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "大田池上店",
+    "lat": 35.57253,
+    "lng": 139.70129,
+    "notes": "東京都大田区池上7-1-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "雑色水門通り店",
+    "lat": 35.54873,
+    "lng": 139.71759,
+    "notes": "東京都大田区東六郷2-13-6WELL HIGASHIROKUGO1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ新糀谷店",
+    "lat": 35.55085,
+    "lng": 139.73288,
+    "notes": "東京都大田区萩中2-12-5 マルエツ新糀谷2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "糀谷萩中商店街店",
+    "lat": 35.5518,
+    "lng": 139.73062,
+    "notes": "東京都大田区萩中2-7-7",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン本羽田萩中店",
+    "lat": 35.549,
+    "lng": 139.73161,
+    "notes": "東京都大田区本羽田2-3-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マロニエゲート銀座店",
+    "lat": 35.67354,
+    "lng": 139.76494,
+    "notes": "東京都中央区銀座3-2-1 マロニエゲート銀座2 6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products マロニエゲート銀座店",
+    "lat": 35.67354,
+    "lng": 139.76494,
+    "notes": "東京都中央区銀座3-2-1 マロニエゲート銀座2 6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "晴海トリトン店",
+    "lat": 35.65556,
+    "lng": 139.78183,
+    "notes": "東京都中央区晴海1-8-16 晴海トリトン店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ららテラスHARUMIFLAG店",
+    "lat": 35.65213,
+    "lng": 139.7756,
+    "notes": "東京都中央区晴海5-2-31 ららテラスHARUMIFLAG2階 21100",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "人形町駅店",
+    "lat": 35.68666,
+    "lng": 139.78159,
+    "notes": "東京都中央区日本橋人形町3-7-13 B1階・1階・2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products ヤエチカ店",
+    "lat": 35.67986,
+    "lng": 139.76961,
+    "notes": "東京都中央区八重洲2-1 八重洲地下街 地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ中野店",
+    "lat": 35.71018,
+    "lng": 139.67293,
+    "notes": "東京都中野区上高田2-1-28 コモディイイダ中野店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100中野中央店",
+    "lat": 35.69715,
+    "lng": 139.68605,
+    "notes": "東京都中野区中央1-21-2 メゾン淀橋YSビル",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "中野早稲田通店",
+    "lat": 35.7092,
+    "lng": 139.66577,
+    "notes": "東京都中野区中野5-52-14宮田ビル中野内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "中野ブロードウェイ店",
+    "lat": 35.7092,
+    "lng": 139.66577,
+    "notes": "東京都中野区中野5-52-15中野ブロードウェイ地下1階 プチパリ内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ユニゾンモール東中野店",
+    "lat": 35.70659,
+    "lng": 139.68742,
+    "notes": "東京都中野区東中野5-1-1ユニゾンモール東中野1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "中野坂上店",
+    "lat": 35.69444,
+    "lng": 139.68172,
+    "notes": "東京都中野区本町2丁目28番11-101号 不二ハイツビル内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100野方店",
+    "lat": 35.72321,
+    "lng": 139.65099,
+    "notes": "東京都中野区野方6-50-10 MT野方1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和玉川学園店",
+    "lat": 35.56284,
+    "lng": 139.46208,
+    "notes": "東京都町田市玉川学園2-11三和玉川学園店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "町田金井店",
+    "lat": 35.57617,
+    "lng": 139.46884,
+    "notes": "東京都町田市金井8丁目16-25",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "スーパー三和小川店",
+    "lat": 35.52601,
+    "lng": 139.46509,
+    "notes": "東京都町田市金森4-1-2 スーパー三和小川店地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products ミーナ町田店",
+    "lat": 35.54137,
+    "lng": 139.4476,
+    "notes": "東京都町田市原町田4-1-17 ミーナ町田7階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミーナ町田店",
+    "lat": 35.54137,
+    "lng": 139.4476,
+    "notes": "東京都町田市原町田4丁目1-17ミーナ町田7階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "町田東急ツインズ店",
+    "lat": 35.54259,
+    "lng": 139.44643,
+    "notes": "東京都町田市原町田6-4-1町田東急ツインズ ウエスト8階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "町田ジョルナ店",
+    "lat": 35.54181,
+    "lng": 139.44673,
+    "notes": "東京都町田市原町田6-6-14 地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アメリア町田根岸ショッピングセンター店",
+    "lat": 35.57642,
+    "lng": 139.41084,
+    "notes": "東京都町田市根岸2丁目18-1アメリア町田根岸SC 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミスターマックス町田多摩境店",
+    "lat": 35.60717,
+    "lng": 139.34789,
+    "notes": "東京都町田市小山ヶ丘6-1-10ミスターマックス町田多摩境店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "FOOD ONE森野店",
+    "lat": 35.55436,
+    "lng": 139.43661,
+    "notes": "東京都町田市森野3-15-22 FOOD ONE森野店内2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和鶴川店",
+    "lat": 35.6008,
+    "lng": 139.45537,
+    "notes": "東京都町田市真光寺町1-24-1三和鶴川店 B館2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 南町田グランベリーパーク店",
+    "lat": 35.51003,
+    "lng": 139.4704,
+    "notes": "東京都町田市鶴間3-4-1 南町田グランベリーパーク1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "そうてつローゼン成瀬店",
+    "lat": 35.53659,
+    "lng": 139.47087,
+    "notes": "東京都町田市南成瀬1丁目3番5号そうてつローゼン成瀬店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "本町田店",
+    "lat": 35.57238,
+    "lng": 139.44469,
+    "notes": "東京都町田市本町田3217-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "キテラタウン調布店",
+    "lat": 35.65766,
+    "lng": 139.56815,
+    "notes": "東京都調布市菊野台1丁目33番3キテラタウン調布1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー国領店",
+    "lat": 35.64819,
+    "lng": 139.56502,
+    "notes": "東京都調布市国領町8-2-64 イトーヨーカドー国領店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "調布ロイヤルプラザ店",
+    "lat": 35.65059,
+    "lng": 139.54317,
+    "notes": "東京都調布市小島町2-51-3調布ロイヤルプラザ地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "調布とうきゅう店",
+    "lat": 35.64981,
+    "lng": 139.54317,
+    "notes": "東京都調布市小島町2-52-1調布とうきゅう2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "つつじヶ丘駅前店",
+    "lat": 35.65928,
+    "lng": 139.57483,
+    "notes": "東京都調布市西つつじケ丘3-37-2 PARK MODERNつつじヶ丘地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "仙川ハーモニーロード店",
+    "lat": 35.66068,
+    "lng": 139.58464,
+    "notes": "東京都調布市仙川町1-12-44 1階2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ調布店",
+    "lat": 35.65737,
+    "lng": 139.54675,
+    "notes": "東京都調布市調布ヶ丘1-18-1マルエツ調布店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products トリエ京王調布店",
+    "lat": 35.65106,
+    "lng": 139.54543,
+    "notes": "東京都調布市布田4-4-22 トリエ京王調布A館3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスプラザ東久留米店",
+    "lat": 35.77182,
+    "lng": 139.54486,
+    "notes": "東京都東久留米市上の原2丁目3番18号",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東久留米駅前店",
+    "lat": 35.7601,
+    "lng": 139.5354,
+    "notes": "東京都東久留米市新川町1-3-6 1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "サンドラッグ東久留米前沢店",
+    "lat": 35.74578,
+    "lng": 139.51361,
+    "notes": "東京都東久留米市前沢4-3-21サンドラッグ東久留米前沢店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー東久留米店",
+    "lat": 35.75894,
+    "lng": 139.52893,
+    "notes": "東京都東久留米市本町3-8-1 イトーヨーカドー東久留米2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ東村山店",
+    "lat": 35.76809,
+    "lng": 139.48708,
+    "notes": "東京都東村山市久米川町1-36",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東村山店",
+    "lat": 35.77003,
+    "lng": 139.47229,
+    "notes": "東京都東村山市久米川町5-7-3",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東大和向原店",
+    "lat": 35.7424,
+    "lng": 139.44061,
+    "notes": "東京都東大和市向原1-3-5",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "BIGBOX東大和店",
+    "lat": 35.73317,
+    "lng": 139.43388,
+    "notes": "東京都東大和市桜が丘1-1330-19BIGBOX東大和2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "リコパ東大和店",
+    "lat": 35.73585,
+    "lng": 139.42262,
+    "notes": "東京都東大和市桜が丘2-142-1 リコパ東大和2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products リコパ東大和店",
+    "lat": 35.73585,
+    "lng": 139.42262,
+    "notes": "東京都東大和市桜が丘2-142-1 リコパ東大和2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルク東大和立野店",
+    "lat": 35.7465,
+    "lng": 139.41679,
+    "notes": "東京都東大和市立野2-2-1 ベルク東大和立野店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和旭が丘店",
+    "lat": 35.66089,
+    "lng": 139.36412,
+    "notes": "東京都日野市旭が丘6-7-5 三和旭が丘店地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "高幡不動駅前店",
+    "lat": 35.66122,
+    "lng": 139.41373,
+    "notes": "東京都日野市高幡1008-9グラシア高幡不動1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオンモール多摩平の森店",
+    "lat": 35.66244,
+    "lng": 139.38092,
+    "notes": "東京都日野市多摩平2丁目4番1イオンモール多摩平の森3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "アクロスモール八王子みなみ野店",
+    "lat": 35.63086,
+    "lng": 139.32941,
+    "notes": "東京都八王子市みなみ野一丁目2番1号",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "八王子OPA店",
+    "lat": 35.6558,
+    "lng": 139.33621,
+    "notes": "東京都八王子市旭町1-12 八王子OPA3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー八王子店",
+    "lat": 35.63758,
+    "lng": 139.29297,
+    "notes": "東京都八王子市狭間町1462-1イトーヨーカドー八王子店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コピオ西八王子駅前店",
+    "lat": 35.65483,
+    "lng": 139.3131,
+    "notes": "東京都八王子市散田町3-17-1 コピオ西八王子駅前2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "グルメシティ高尾店",
+    "lat": 35.64237,
+    "lng": 139.28502,
+    "notes": "東京都八王子市初沢町1227-4 グルメシティ高尾2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ラーレ八王子諏訪店",
+    "lat": 35.68106,
+    "lng": 139.29517,
+    "notes": "東京都八王子市諏訪町499",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "やまや北野台店",
+    "lat": 35.63633,
+    "lng": 139.35252,
+    "notes": "東京都八王子市打越町930番地6",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "フォレストモール八王子大和田店",
+    "lat": 35.66322,
+    "lng": 139.34912,
+    "notes": "東京都八王子市大和田町5-7-18",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ドン・キホーテ八王子駅前店",
+    "lat": 35.65797,
+    "lng": 139.3373,
+    "notes": "東京都八王子市中町1-3 ドン・キホーテ八王子駅前店7階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コピオ楢原店",
+    "lat": 35.6870948,
+    "lng": 139.3027414,
+    "notes": "東京都八王子市楢原町952-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー南大沢店",
+    "lat": 35.61299,
+    "lng": 139.37923,
+    "notes": "東京都八王子市南大沢2-28-1 イトーヨーカドー南大沢店内4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products イトーヨーカドー南大沢店",
+    "lat": 35.61299,
+    "lng": 139.37923,
+    "notes": "東京都八王子市南大沢2-28-1 イトーヨーカドー南大沢店内4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ザ・マーケットプレイス八王子店",
+    "lat": 35.65554,
+    "lng": 139.30397,
+    "notes": "東京都八王子市並木町35番1号ザ・マーケットプレイス八王子2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "三和堀之内店",
+    "lat": 35.62405,
+    "lng": 139.40106,
+    "notes": "東京都八王子市別所2-1三和堀之内店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ぐりーんうぉーく多摩店",
+    "lat": 35.6119,
+    "lng": 139.396,
+    "notes": "東京都八王子市別所2-56",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コピオ北野店",
+    "lat": 35.64563,
+    "lng": 139.35484,
+    "notes": "東京都八王子市北野町545-3コピオ北野店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "フードワン堀之内店",
+    "lat": 35.63072,
+    "lng": 139.39735,
+    "notes": "東京都八王子市堀之内483-6フードワン八王子堀之内店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "八王子くぬぎだ店",
+    "lat": 35.63783,
+    "lng": 139.29956,
+    "notes": "東京都八王子市椚田町1209",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "高島平とうきゅう店",
+    "lat": 35.79032,
+    "lng": 139.66605,
+    "notes": "東京都板橋区高島平9-23-1 高島平とうきゅう店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 高島平とうきゅう店",
+    "lat": 35.79032,
+    "lng": 139.66605,
+    "notes": "東京都板橋区高島平9-23-1 高島平とうきゅう店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルクスモール浮間舟渡店",
+    "lat": 35.7919,
+    "lng": 139.68706,
+    "notes": "東京都板橋区舟渡1丁目6番22号ベルクスモール浮間舟渡2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "セブンタウン小豆沢店",
+    "lat": 35.77998,
+    "lng": 139.69478,
+    "notes": "東京都板橋区小豆沢3-9-5",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ上板橋店",
+    "lat": 35.76118,
+    "lng": 139.67566,
+    "notes": "東京都板橋区上板橋1-19-16 コモディイイダ上板橋店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ成増店",
+    "lat": 35.77803,
+    "lng": 139.63029,
+    "notes": "東京都板橋区成増2-21-2 MEGAドン・キホーテ成増6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products MEGAドン・キホーテ成増店",
+    "lat": 35.77803,
+    "lng": 139.63029,
+    "notes": "東京都板橋区成増2-21-2 MEGAドン・キホーテ成増6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "成増2丁目店",
+    "lat": 35.77832,
+    "lng": 139.62958,
+    "notes": "東京都板橋区成増2-26",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "本蓮沼駅前店",
+    "lat": 35.76786,
+    "lng": 139.70169,
+    "notes": "東京都板橋区泉町10-5 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "三徳ときわ台店",
+    "lat": 35.76407,
+    "lng": 139.68712,
+    "notes": "東京都板橋区前野町2-17-6 三徳ときわ台2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヒューリック志村坂上店",
+    "lat": 35.76878,
+    "lng": 139.69006,
+    "notes": "東京都板橋区前野町3-20-1 ヒューリック志村坂上3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ハッピーロード大山店",
+    "lat": 35.74957,
+    "lng": 139.69966,
+    "notes": "東京都板橋区大山町39",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "よしや大谷口店",
+    "lat": 35.74723,
+    "lng": 139.68652,
+    "notes": "東京都板橋区大谷口2-66-1 よしや大谷口店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "よしや中板橋店",
+    "lat": 35.75674,
+    "lng": 139.69797,
+    "notes": "東京都板橋区中板橋16-10よしや中板橋店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "オリンピックおりーぶ志村坂下店",
+    "lat": 35.78538,
+    "lng": 139.68767,
+    "notes": "東京都板橋区東坂下2-12-8 Olympicおりーぶ志村坂下店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ東新町店",
+    "lat": 35.75418,
+    "lng": 139.68327,
+    "notes": "東京都板橋区東新町2-8-15 コモディイイダ東新町店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "よしや常盤台店",
+    "lat": 35.75785,
+    "lng": 139.68892,
+    "notes": "東京都板橋区南常盤台1-30-6 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イオン西台店",
+    "lat": 35.78628,
+    "lng": 139.67496,
+    "notes": "東京都板橋区蓮根3-8-12 イオン西台 駅前館4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100戸越公園駅前店",
+    "lat": 35.60847,
+    "lng": 139.71715,
+    "notes": "東京都品川区戸越6-6-6 三栄第一ビル地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 大井町トラックス店",
+    "lat": 35.6082685,
+    "lng": 139.7167915,
+    "notes": "東京都品川区広町2-3725-2 大井町トラックス オフィス棟2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "武蔵小山駅前店",
+    "lat": 35.61962,
+    "lng": 139.70526,
+    "notes": "東京都品川区小山3丁目21-15",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "西小山駅ビル店",
+    "lat": 35.61554,
+    "lng": 139.6989,
+    "notes": "東京都品川区小山6-3-10 3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東急ストア目黒店",
+    "lat": 35.63606,
+    "lng": 139.71404,
+    "notes": "東京都品川区上大崎2-24-13 東急ストア目黒2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "五反田TOC店",
+    "lat": 35.62196,
+    "lng": 139.71898,
+    "notes": "東京都品川区西五反田7-22-17 五反田TOCビル地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 五反田TOC店",
+    "lat": 35.62196,
+    "lng": 139.71898,
+    "notes": "東京都品川区西五反田7-22-17 五反田TOCビル地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー大井町店",
+    "lat": 35.6072,
+    "lng": 139.73395,
+    "notes": "東京都品川区大井1-3-6IY大井町店7階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "大崎ニューシティ店",
+    "lat": 35.62012,
+    "lng": 139.72948,
+    "notes": "東京都品川区大崎1-6-5大崎ニューシティ5号館1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "青物横丁駅前店",
+    "lat": 35.61031,
+    "lng": 139.74248,
+    "notes": "東京都品川区南品川2-4-1 1、2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "パトリア品川八潮ショッピングセンター店",
+    "lat": 35.59917,
+    "lng": 139.74966,
+    "notes": "東京都品川区八潮5-5-3パトリア品川八潮SC店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "戸越銀座店",
+    "lat": 35.61507,
+    "lng": 139.71504,
+    "notes": "東京都品川区平塚1-8-3",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ミッテン府中店",
+    "lat": 35.67078,
+    "lng": 139.47974,
+    "notes": "東京都府中市宮町1-41-2 ミッテン府中8階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "府中四谷SC店",
+    "lat": 35.66842,
+    "lng": 139.438,
+    "notes": "東京都府中市四谷5-23-12府中四谷SC2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠府中店",
+    "lat": 35.67808,
+    "lng": 139.46786,
+    "notes": "東京都府中市日鋼町1-26 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "府中車返店",
+    "lat": 35.66153,
+    "lng": 139.51151,
+    "notes": "東京都府中市白糸台5-25",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "ぷらりと京王府中店",
+    "lat": 35.67246,
+    "lng": 139.4798,
+    "notes": "東京都府中市府中町1丁目2番地1ぷらりと京王府中西5階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "MINANO分倍河原店",
+    "lat": 35.66759,
+    "lng": 139.46944,
+    "notes": "東京都府中市片町3-22-26MINANO分倍河原2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products イオンモールむさし村山店",
+    "lat": 35.74655,
+    "lng": 139.38516,
+    "notes": "東京都武蔵村山市榎1-1-3 イオンモールむさし村山店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "武蔵村山榎店",
+    "lat": 35.74923,
+    "lng": 139.38341,
+    "notes": "東京都武蔵村山市榎3-113-6TAIRAYA武蔵村山店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "武蔵村山本町店",
+    "lat": 35.75754,
+    "lng": 139.38283,
+    "notes": "東京都武蔵村山市本町3-24-1",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "キラリナ京王吉祥寺店",
+    "lat": 35.70307,
+    "lng": 139.5808,
+    "notes": "東京都武蔵野市吉祥寺南町2丁目1番25号キラリナ京王吉祥寺地下1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products ヨドバシ吉祥寺店",
+    "lat": 35.70472,
+    "lng": 139.5815,
+    "notes": "東京都武蔵野市吉祥寺本町1-19-1 ヨドバシ吉祥寺6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ヨドバシ吉祥寺店",
+    "lat": 35.70472,
+    "lng": 139.5815,
+    "notes": "東京都武蔵野市吉祥寺本町1-19-1 ヨドバシ吉祥寺6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "吉祥寺サンロード店",
+    "lat": 35.70405,
+    "lng": 139.57979,
+    "notes": "東京都武蔵野市吉祥寺本町1-9-10吉祥寺ファミリープラザビル2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "イトーヨーカドー武蔵境店",
+    "lat": 35.70159,
+    "lng": 139.54472,
+    "notes": "東京都武蔵野市境南町2-2-20 イトーヨーカドー武蔵境店東館4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products イトーヨーカドー武蔵境店",
+    "lat": 35.70159,
+    "lng": 139.54472,
+    "notes": "東京都武蔵野市境南町2-2-20 イトーヨーカドー武蔵境店東館4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "福生駅前店",
+    "lat": 35.74202,
+    "lng": 139.32733,
+    "notes": "東京都福生市福生768 （2階・3階・4階）",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "メトロ・エム後楽園店",
+    "lat": 35.70718,
+    "lng": 139.75084,
+    "notes": "東京都文京区春日1-2-3 メトロ・エム後楽園店4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "茗荷谷駅前店",
+    "lat": 35.71796,
+    "lng": 139.73605,
+    "notes": "東京都文京区大塚1-4-15 アトラスタワー茗荷谷2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎庚申塚店",
+    "lat": 35.73888,
+    "lng": 139.72993,
+    "notes": "東京都豊島区西巣鴨2-6-12",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "池袋東武店",
+    "lat": 35.72994,
+    "lng": 139.71051,
+    "notes": "東京都豊島区西池袋1-1-25 東武百貨店池袋本店6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 池袋東武店",
+    "lat": 35.72994,
+    "lng": 139.71051,
+    "notes": "東京都豊島区西池袋1-1-25 東武百貨店池袋本店6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "椎名町店",
+    "lat": 35.72787,
+    "lng": 139.6931,
+    "notes": "東京都豊島区長崎2丁目13-15 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ラグーン池袋店",
+    "lat": 35.73034,
+    "lng": 139.7157,
+    "notes": "東京都豊島区東池袋1-21-1 ラグーン池袋3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "iTerrace 落合南長崎店",
+    "lat": 35.72423,
+    "lng": 139.68275,
+    "notes": "東京都豊島区南長崎4-5-20iTerrace落合南長崎店地下2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "よしや大塚店",
+    "lat": 35.73405,
+    "lng": 139.72847,
+    "notes": "東京都豊島区北大塚2-24-20 よしや大塚店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "王子駅前店",
+    "lat": 35.75397,
+    "lng": 139.73795,
+    "notes": "東京都北区王子1-9-3",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "十条銀座商店街店",
+    "lat": 35.76381,
+    "lng": 139.72174,
+    "notes": "東京都北区十条仲原1-28-12",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products LaLaガーデン赤羽店",
+    "lat": 35.77945,
+    "lng": 139.72339,
+    "notes": "東京都北区赤羽2-14-2 ダイソー3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "LaLaガーデン赤羽店",
+    "lat": 35.77945,
+    "lng": 139.72339,
+    "notes": "東京都北区赤羽2-14-2 ダイソー5階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "島忠ホームズ北赤羽店",
+    "lat": 35.7836,
+    "lng": 139.69754,
+    "notes": "東京都北区浮間5-3-24",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コーナン王子堀船店",
+    "lat": 35.75174,
+    "lng": 139.74391,
+    "notes": "東京都北区堀船1丁目23番13号",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "東京ソラマチ店",
+    "lat": 35.71034,
+    "lng": 139.8112,
+    "notes": "東京都墨田区押上1-1-2 東京スカイツリータウン・ソラマチ イーストヤード4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "くすりの福太郎菊川店",
+    "lat": 35.68981,
+    "lng": 139.80614,
+    "notes": "東京都墨田区菊川3-23-4ライツ菊川2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "アルカキット錦糸町店",
+    "lat": 35.69742,
+    "lng": 139.81267,
+    "notes": "東京都墨田区錦糸2-2-1 アルカキット錦糸町店7階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products アルカキット錦糸町店",
+    "lat": 35.69742,
+    "lng": 139.81267,
+    "notes": "東京都墨田区錦糸2-2-1 アルカキット錦糸町店7階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "錦糸町テルミナ店",
+    "lat": 35.69592,
+    "lng": 139.81456,
+    "notes": "東京都墨田区江東橋3-14-5 錦糸町テルミナ4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ビエラ江東橋店",
+    "lat": 35.68993,
+    "lng": 139.81113,
+    "notes": "東京都墨田区江東橋5丁目5番3号",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "マルエツ錦糸町店",
+    "lat": 35.70047,
+    "lng": 139.80983,
+    "notes": "東京都墨田区太平1-14-1 マルエツ錦糸町2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ東向島店",
+    "lat": 35.71898,
+    "lng": 139.81374,
+    "notes": "東京都墨田区東向島1-28-10 コモディイイダ東向島店1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ベルクス墨田鐘ヶ淵店",
+    "lat": 35.73088,
+    "lng": 139.81824,
+    "notes": "東京都墨田区墨田2丁目36番13号",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "両国店",
+    "lat": 35.69429,
+    "lng": 139.79701,
+    "notes": "東京都墨田区両国4-30-8",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "目黒不動店",
+    "lat": 35.62909,
+    "lng": 139.71201,
+    "notes": "東京都目黒区下目黒2-14-16 1階・2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "清水台東急ストア店",
+    "lat": 35.631,
+    "lng": 139.70418,
+    "notes": "東京都目黒区下目黒4-11-18清水台東急ストア 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "フレル・ウィズ自由が丘店",
+    "lat": 35.60776,
+    "lng": 139.67032,
+    "notes": "東京都目黒区自由が丘1-6-9 フレル・ウィズ自由が丘3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products フレル・ウィズ自由が丘店",
+    "lat": 35.60776,
+    "lng": 139.67032,
+    "notes": "東京都目黒区自由が丘1-6-9 フレル・ウィズ自由が丘店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "学芸大学駅前店",
+    "lat": 35.6292,
+    "lng": 139.68626,
+    "notes": "東京都目黒区鷹番2-20-10 1階・2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "オオゼキ碑文谷店",
+    "lat": 35.62111,
+    "lng": 139.6821,
+    "notes": "東京都目黒区碑文谷4丁目16オオゼキ碑文谷店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ガクダイコウカシタ店",
+    "lat": 35.62666,
+    "lng": 139.68355,
+    "notes": "東京都目黒区碑文谷6-7-22 1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "セイムス立川栄町店",
+    "lat": 35.71729,
+    "lng": 139.42436,
+    "notes": "東京都立川市栄町5-37-4 セイムス立川栄町店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "立川幸町店",
+    "lat": 35.72142,
+    "lng": 139.42908,
+    "notes": "東京都立川市幸町3-19-1ダイレックス立川幸町2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "エキュート立川店",
+    "lat": 35.69767,
+    "lng": 139.41368,
+    "notes": "東京都立川市柴崎町3-1-1エキュート立川店3階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "立川フロム中武店",
+    "lat": 35.69992,
+    "lng": 139.41487,
+    "notes": "東京都立川市曙町2-11-2 フロム中武4階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "MEGAドン・キホーテ立川店",
+    "lat": 35.70065,
+    "lng": 139.41621,
+    "notes": "東京都立川市曙町2-18-18MEGAドン・キホーテ立川6階",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "立川富士見町店",
+    "lat": 35.69119,
+    "lng": 139.39775,
+    "notes": "東京都立川市富士見町7-39-11",
+    "icon": "shop4",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "group": "DAISO",
+    "name": "コモディイイダ中村橋店",
+    "lat": 35.73799,
+    "lng": 139.63435,
+    "notes": "東京都練馬区貫井1-18-3 コモディイイダ中村橋店内",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "富士見台駅前店",
+    "lat": 35.73541,
+    "lng": 139.62929,
+    "notes": "東京都練馬区貫井3-2-7 丸市ビル1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "光が丘IMA店",
+    "lat": 35.75798,
+    "lng": 139.62582,
+    "notes": "東京都練馬区光が丘3丁目9番2号光が丘IMA南館内1階・2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ピーコックストア高野台店",
+    "lat": 35.74119,
+    "lng": 139.61568,
+    "notes": "東京都練馬区高野台1-7-17ピーコックストア高野台店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "ローソンストア100上石神井店",
+    "lat": 35.7297,
+    "lng": 139.5921,
+    "notes": "東京都練馬区上石神井2-37-32 第3栄ビル1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "よしや早宮店",
+    "lat": 35.74756,
+    "lng": 139.64955,
+    "notes": "東京都練馬区早宮3-42よしや早宮店2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "練馬中村店",
+    "lat": 35.72816,
+    "lng": 139.63957,
+    "notes": "東京都練馬区中村南3-16-10 2階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "練馬土支田店",
+    "lat": 35.76567,
+    "lng": 139.6133,
+    "notes": "東京都練馬区土支田4丁目9-5",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "練馬駅前店",
+    "lat": 35.73792,
+    "lng": 139.65518,
+    "notes": "東京都練馬区練馬1-3-10 1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "group": "DAISO",
+    "name": "Standard Products 練馬駅前店",
+    "lat": 35.73792,
+    "lng": 139.65518,
+    "notes": "東京都練馬区練馬1-3-10 1階",
+    "icon": "shop4",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "市川商店",
+    "lat": 35.7129689,
+    "lng": 138.9344066,
+    "notes": "東京都あきる野市乙津８６７−２",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "秋川 中村おとり店",
+    "lat": 35.724861,
+    "lng": 139.2247512,
+    "notes": "東京都あきる野市五日市",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "鮎と渓流 岡野釣具店",
+    "lat": 35.71986,
+    "lng": 139.31793,
+    "notes": "東京都あきる野市小川８１９−６",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "わたやつり具店",
+    "lat": 35.7565,
+    "lng": 139.3089,
+    "notes": "東京都羽村市羽東３丁目８−３",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "ウラシマ釣具店",
+    "lat": 35.78037,
+    "lng": 139.29765,
+    "notes": "東京都羽村市小作台２丁目２−１８",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "竿しば",
+    "lat": 35.718841,
+    "lng": 139.849641,
+    "notes": "東京都葛飾区西新小岩３丁目３−１３−７",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "桂釣具店",
+    "lat": 35.7492178,
+    "lng": 139.8512424,
+    "notes": "東京都葛飾区青戸５丁目１２−８",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "毛塚屋",
+    "lat": 35.745189,
+    "lng": 139.824097,
+    "notes": "東京都葛飾区堀切４丁目５−２０",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "うつぼや釣具店",
+    "lat": 35.7383472,
+    "lng": 139.8469149,
+    "notes": "東京都葛飾区立石１丁目２２−５ Ｙ’ｓ２４２",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "花形釣具店",
+    "lat": 35.683521,
+    "lng": 139.888959,
+    "notes": "東京都江戸川区江戸川３丁目５０",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣房釣具店",
+    "lat": 35.683622,
+    "lng": 139.857278,
+    "notes": "東京都江戸川区船堀２丁目２−３２",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "つり吉 江戸川店",
+    "lat": 35.706464,
+    "lng": 139.8776591,
+    "notes": "東京都江戸川区大杉２丁目１１−１７",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "㈲餌島商店",
+    "lat": 35.702624,
+    "lng": 139.883838,
+    "notes": "東京都江戸川区大杉３丁目１８−１１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "㈲釣房商店 釣餌卸",
+    "lat": 35.649072,
+    "lng": 139.8705981,
+    "notes": "東京都江戸川区南葛西４丁目５−１６ 釣房商店釣餌卸",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "小笠原商店",
+    "lat": 35.675415,
+    "lng": 139.852647,
+    "notes": "東京都江戸川区北葛西２丁目１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ツールプレイス",
+    "lat": 35.6707446,
+    "lng": 139.7913323,
+    "notes": "東京都江東区１３ ＭＯビル 牡丹1-13-1 MOビル1F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ランブルフィツシュ",
+    "lat": 35.6972826,
+    "lng": 139.8333652,
+    "notes": "東京都江東区亀戸７丁目１１−１３",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "hage",
+    "lat": 35.6684636,
+    "lng": 139.7740538,
+    "notes": "東京都江東区常盤２丁目１１−１ 新光社ビル 102",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣りえさ自販機",
+    "lat": 35.645101,
+    "lng": 139.82749,
+    "notes": "東京都江東区新木場１丁目６−１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣りえさ自販機",
+    "lat": 35.6451546,
+    "lng": 139.8345522,
+    "notes": "東京都江東区新木場１丁目８",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣友",
+    "lat": 35.657183,
+    "lng": 139.8096051,
+    "notes": "東京都江東区潮見１丁目８−９",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "餌勝商店 葛西橋店",
+    "lat": 35.6763003,
+    "lng": 139.8407673,
+    "notes": "東京都江東区東砂５丁目１７−３",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "清水釣具商会",
+    "lat": 35.6751679,
+    "lng": 139.8406058,
+    "notes": "東京都江東区東砂６丁目２０−９",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "竜雲つり具店",
+    "lat": 35.64464,
+    "lng": 139.73558,
+    "notes": "東京都港区高輪１丁目１−１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣道楽屋ＳＡＢＡＬＯ",
+    "lat": 35.65759,
+    "lng": 139.75237,
+    "notes": "東京都港区芝公園１丁目７−７ 山口ビル 2階",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "studio P.rhythm",
+    "lat": 35.6715,
+    "lng": 139.73804,
+    "notes": "東京都港区赤坂２丁目１５−１５ 赤坂プラザビル2階",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣具アニー",
+    "lat": 35.7479522,
+    "lng": 139.7668621,
+    "notes": "東京都荒川区東尾久５丁目７−１０ トーア 103 マンション",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ルアーショップ忍",
+    "lat": 35.70462,
+    "lng": 139.4556,
+    "notes": "東京都国分寺市日吉町３丁目１２−８ ライオンズマンション国立第３ 101",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "ルアーショップコング",
+    "lat": 35.7047,
+    "lng": 139.48572,
+    "notes": "東京都国分寺市本多５丁目３−１２ エスティー国分寺",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "サンゴ堂 SANGO-DO",
+    "lat": 35.66128,
+    "lng": 139.70349,
+    "notes": "東京都渋谷区渋谷１丁目１７−１４ Acn渋谷ビル 1F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "The Tacklebox",
+    "lat": 35.70928,
+    "lng": 139.48584,
+    "notes": "東京都小平市上水南町２丁目１３−１７",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "金子釣具店",
+    "lat": 35.70158,
+    "lng": 139.37932,
+    "notes": "東京都昭島市玉川町５丁目２−２",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "テンポンド",
+    "lat": 35.71228,
+    "lng": 139.63872,
+    "notes": "東京都杉並区阿佐谷北４丁目１６−１０",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ジャンクフード",
+    "lat": 35.71367,
+    "lng": 139.63699,
+    "notes": "東京都杉並区阿佐谷北６丁目１７−４ メインヴィレッジ阿佐ヶ谷",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "フィッシングショップ 照楽園",
+    "lat": 35.70641,
+    "lng": 139.61739,
+    "notes": "東京都杉並区上荻１丁目１９−１０ 上荻ホワイトビル B1",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "Anglo & Company",
+    "lat": 35.59864,
+    "lng": 139.64857,
+    "notes": "東京都世田谷区玉堤２丁目３−９",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ビバフィッシング・ハラシマ",
+    "lat": 35.65444,
+    "lng": 139.61253,
+    "notes": "東京都世田谷区千歳台５丁目１−１８ 第二サンコーポ",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "高修釣具",
+    "lat": 35.65984,
+    "lng": 139.62375,
+    "notes": "東京都世田谷区八幡山１丁目２−３",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "フィッシングパラダイス",
+    "lat": 35.6360559,
+    "lng": 139.6630297,
+    "notes": "東京都世田谷区野沢２丁目３３−５ グランドメゾン野沢",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "吉川つり具店",
+    "lat": 35.78104,
+    "lng": 139.28802,
+    "notes": "東京都青梅市河辺町５丁目２５−１６",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "甲州屋 青梅店",
+    "lat": 35.78954,
+    "lng": 139.25357,
+    "notes": "東京都青梅市上町３４０",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "甲州屋 新町店",
+    "lat": 35.78588,
+    "lng": 139.29317,
+    "notes": "東京都青梅市新町１丁目１−１９",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "三好屋釣具店",
+    "lat": 35.78933,
+    "lng": 139.26233,
+    "notes": "東京都青梅市西分町２丁目６１",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "川よし釣具店",
+    "lat": 35.78517,
+    "lng": 139.27165,
+    "notes": "東京都青梅市千ヶ瀬町４丁目２５９",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "（有）横手商店",
+    "lat": 35.80498,
+    "lng": 139.20514,
+    "notes": "東京都青梅市沢井１丁目４０８",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "キーポン",
+    "lat": 35.7041,
+    "lng": 139.77271,
+    "notes": "東京都千代田区外神田５丁目５−５ 沼田ビル",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "トラウトアイランド",
+    "lat": 35.7041,
+    "lng": 139.77271,
+    "notes": "東京都千代田区外神田５丁目５−５−１０",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "神田釣り具 factory360°",
+    "lat": 35.69791,
+    "lng": 139.75945,
+    "notes": "東京都千代田区神田猿楽町１丁目３−１１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "Lure Fishing Shop ヤマグチヤ",
+    "lat": 35.69321,
+    "lng": 139.76321,
+    "notes": "東京都千代田区神田錦町２丁目２−１４",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "神田つり具の櫻井",
+    "lat": 35.69097,
+    "lng": 139.7728,
+    "notes": "東京都千代田区鍛冶町１丁目８−１ B1",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "キャプテン A クラフト",
+    "lat": 35.782857,
+    "lng": 139.8068501,
+    "notes": "東京都足立区一ツ家１丁目２２−１９",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "フィッシングフールグランパ",
+    "lat": 35.7855101,
+    "lng": 139.8390613,
+    "notes": "東京都足立区大谷田５丁目２２−１１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "日の丸釣具 保木間店",
+    "lat": 35.7932053,
+    "lng": 139.8078654,
+    "notes": "東京都足立区東保木間２丁目３−５ 政和",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "六木釣具",
+    "lat": 35.7956898,
+    "lng": 139.8416107,
+    "notes": "東京都足立区六木３丁目９−６",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "つるや釣具店",
+    "lat": 35.7066358,
+    "lng": 139.7880578,
+    "notes": "東京都台東区寿１丁目５−１ 郷ビル 2F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "クレオール",
+    "lat": 35.70466,
+    "lng": 139.784,
+    "notes": "東京都台東区小島１丁目１７−７",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "Line Slack ラインスラック",
+    "lat": 35.71914,
+    "lng": 139.79982,
+    "notes": "東京都台東区浅草６丁目４０−４",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ルアーショップシラネ",
+    "lat": 35.7049521,
+    "lng": 139.7901176,
+    "notes": "東京都台東区蔵前３丁目２１−１０",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣り餌のマルヤ",
+    "lat": 35.70518,
+    "lng": 139.78093,
+    "notes": "東京都台東区台東３丁目３０−２",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "東作本店",
+    "lat": 35.71062,
+    "lng": 139.78235,
+    "notes": "東京都台東区東上野３丁目３２−１３",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "プロショップトモ",
+    "lat": 35.71315,
+    "lng": 139.78133,
+    "notes": "東京都台東区東上野５丁目７−２",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "浅草釣具店",
+    "lat": 35.71914,
+    "lng": 139.78699,
+    "notes": "東京都台東区入谷１丁目２−２",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ウェイブ大田店",
+    "lat": 35.56895,
+    "lng": 139.68263,
+    "notes": "東京都大田区下丸子４丁目１７−１ 長野ハイム 1F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "つり具 DAIEI",
+    "lat": 35.56416,
+    "lng": 139.70985,
+    "notes": "東京都大田区西蒲田７丁目１３−１ TRUST VALUE 蒲田",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "Lure Shop FLOW",
+    "lat": 35.55885,
+    "lng": 139.73051,
+    "notes": "東京都大田区西糀谷１丁目１４−３",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ハネダクラフト",
+    "lat": 35.56244,
+    "lng": 139.70132,
+    "notes": "東京都大田区多摩川１丁目４−６ 泉多摩川マンション",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "キャスターハウス",
+    "lat": 35.58701,
+    "lng": 139.73047,
+    "notes": "東京都大田区大森北１丁目１７−５",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "バスメイト BASSMATE",
+    "lat": 35.56399,
+    "lng": 139.70657,
+    "notes": "東京都大田区東矢口３丁目６−７",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "竿好工房",
+    "lat": 35.55393,
+    "lng": 139.72894,
+    "notes": "東京都大田区南蒲田３丁目３−１５−７",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "RE-Born ガレージ",
+    "lat": 35.58582,
+    "lng": 139.68004,
+    "notes": "東京都大田区北嶺町３６−１４",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "春海屋釣具店",
+    "lat": 35.6624568,
+    "lng": 139.7288494,
+    "notes": "東京都中央区月島２丁目１４−１０",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "鱸屋",
+    "lat": 35.69224,
+    "lng": 139.77972,
+    "notes": "東京都中央区日本橋小伝馬町１６−７ STビル",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "TRANSCENDENCE",
+    "lat": 35.72849,
+    "lng": 139.63651,
+    "notes": "東京都中野区上鷺宮１丁目９−６",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "t-Route 中野坂上本店",
+    "lat": 35.7007,
+    "lng": 139.68562,
+    "notes": "東京都中野区中央１丁目２６−１ 1階",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "玉屋釣具店",
+    "lat": 35.65513,
+    "lng": 139.56653,
+    "notes": "東京都調布市菊野台１丁目１８−１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣具 小平商店",
+    "lat": 35.67874,
+    "lng": 139.55566,
+    "notes": "東京都調布市深大寺東町８丁目１８−１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "土方つり具店",
+    "lat": 35.75709,
+    "lng": 139.4691,
+    "notes": "東京都東村山市本町３丁目２−６",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣具の浮三",
+    "lat": 35.73973,
+    "lng": 139.43993,
+    "notes": "東京都東大和市向原２丁目１０４７−４",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "旭が丘釣具センター",
+    "lat": 35.65907,
+    "lng": 139.36394,
+    "notes": "東京都日野市旭が丘５丁目１１−１２ コーポ５旭ケ丘",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "車屋釣り具店",
+    "lat": 35.67415,
+    "lng": 139.42026,
+    "notes": "東京都日野市万願寺１丁目９−１０",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "ZENIYAルアーショップ",
+    "lat": 35.6575,
+    "lng": 139.33357,
+    "notes": "東京都八王子市寺町４９",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "湖舟",
+    "lat": 35.63773,
+    "lng": 139.31732,
+    "notes": "東京都八王子市小比企町１８４０−１２",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "フェニックスつり具店",
+    "lat": 35.6256,
+    "lng": 139.39674,
+    "notes": "東京都八王子市松木３４−７",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "バスメイトインフィニティ",
+    "lat": 35.6598,
+    "lng": 139.31676,
+    "notes": "東京都八王子市千人町１丁目２−１９ Ⅱ２F",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "江川釣具店",
+    "lat": 35.66171,
+    "lng": 139.32858,
+    "notes": "東京都八王子市大横町１４−１５",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "GARA-Gee ガレイジー",
+    "lat": 35.6383511,
+    "lng": 139.3915749,
+    "notes": "東京都八王子市堀之内７５７",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "ギル 五反田店",
+    "lat": 35.62189,
+    "lng": 139.72157,
+    "notes": "東京都品川区西五反田８丁目５−１ 1階",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "浜川",
+    "lat": 35.59758,
+    "lng": 139.73862,
+    "notes": "東京都品川区南大井１丁目３",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "フライショップリバーランド",
+    "lat": 35.66966,
+    "lng": 139.47516,
+    "notes": "東京都府中市宮西町５丁目７−１ 矢島マンション",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "遠山つり具店",
+    "lat": 35.67754,
+    "lng": 139.51787,
+    "notes": "東京都府中市朝日町２丁目３０−３",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "釣道具まるかつ",
+    "lat": 35.71446,
+    "lng": 139.55363,
+    "notes": "東京都武蔵野市関前３丁目２２−１０ プレザントヒルズ 1F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "吉や",
+    "lat": 35.70214,
+    "lng": 139.58188,
+    "notes": "東京都武蔵野市吉祥寺南町２丁目５−９",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "海吉 UMIKITI",
+    "lat": 35.70405,
+    "lng": 139.58179,
+    "notes": "東京都武蔵野市吉祥寺本町１丁目２３−３ 富福ビル 2F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "Loop to Loop",
+    "lat": 35.70407,
+    "lng": 139.54466,
+    "notes": "東京都武蔵野市境１丁目４−３ イーストフィールド １F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣道楽フルヤ",
+    "lat": 35.73508,
+    "lng": 139.32146,
+    "notes": "東京都福生市北田園２丁目１３−７",
+    "icon": "shop0",
+    "areaId": "TOKYO_OKUTAMA"
+  },
+  {
+    "name": "（有）つり具すがも",
+    "lat": 35.7276648,
+    "lng": 139.7422666,
+    "notes": "東京都文京区千石１丁目２８−６",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "タックルアイランド 池袋店",
+    "lat": 35.73351,
+    "lng": 139.71101,
+    "notes": "東京都豊島区池袋２丁目４７−６ 第２オンダビル",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "ハーミット",
+    "lat": 35.73175,
+    "lng": 139.72517,
+    "notes": "東京都豊島区東池袋２丁目１５−６ 幸ビル 2F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "滝本釣具店",
+    "lat": 35.78286,
+    "lng": 139.71921,
+    "notes": "東京都北区赤羽３丁目３−１",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣具 山田",
+    "lat": 35.76247,
+    "lng": 139.74336,
+    "notes": "東京都北区豊島７丁目６−２",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "竿辰本店",
+    "lat": 35.709119,
+    "lng": 139.8090436,
+    "notes": "東京都墨田区業平２丁目１６−９",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "釣具のスーパーディスカウント大和屋",
+    "lat": 35.6966989,
+    "lng": 139.7789461,
+    "notes": "東京都墨田区石原３丁目２３−１０",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "フィッシング・ゼロ",
+    "lat": 35.7022306,
+    "lng": 139.8039274,
+    "notes": "東京都墨田区石原４丁目３２−５ 宮林ビル",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "トノムラ",
+    "lat": 35.7202057,
+    "lng": 139.8134371,
+    "notes": "東京都墨田区東向島２丁目２３",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  },
+  {
+    "name": "Oldememories",
+    "lat": 35.63528,
+    "lng": 139.69154,
+    "notes": "東京都目黒区五本木２丁目１４−１０ B1F",
+    "icon": "shop0",
+    "areaId": "TOKYO_HARUMI"
+  }
+]
