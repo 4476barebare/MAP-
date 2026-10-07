@@ -3158,6 +3158,7 @@ function goBack() {
         }
  
         clearSpotUI();
+        if (typeof hideRoadLayers === 'function') hideRoadLayers();
 
         if (restoreSpot.areaId && window.currentAreaId !== restoreSpot.areaId) {
             window.currentAreaId = restoreSpot.areaId;
@@ -3173,7 +3174,7 @@ function goBack() {
         window._isRestoringSpot = true;
         selectSpot(restoreSpot); // ★ ここに渡され、外部で false になる
         if (typeof showPrefSpots === 'function') showPrefSpots();
-
+       
         const checkCompletion = setInterval(() => {
             if (window._selectSpotCompleted) {
                 clearInterval(checkCompletion);
