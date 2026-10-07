@@ -1156,7 +1156,6 @@ function handleRegionNearest(latlng) {
         `${nearest.regionCode}_${nearest.prefCode}`
     );
 }
-
 // ================================
 // ■ 初期画面のRegionマップ読み込み（ニアレスト機能版）
 // ================================
@@ -1201,6 +1200,11 @@ function loadRegionMap() {
         if (window.map && window.regionNearestClickHandler) {
             window.map.off('click', window.regionNearestClickHandler);
             window.map.on('click', window.regionNearestClickHandler);
+        }
+
+        // 👇追加: 戻るボタン等で広域マップに戻ったときにも確実に道路レイヤーを表示
+        if (typeof showRoadLayers === 'function') {
+            showRoadLayers();
         }
 
         return;
@@ -1299,12 +1303,17 @@ function loadRegionMap() {
             // 全県マスターデータを読み込んでドットを描画
             showAllRegionSpots();
 
+            // 👇追加: 初回アクセス（広域画面）時に確実に道路レイヤーを表示
+            if (typeof showRoadLayers === 'function') {
+                showRoadLayers();
+            }
+
             // ==========================================
             // ★ Region画面専用のニアレスト機能（最も近い県を判定）
             // ==========================================
-window.regionNearestClickHandler = function(e) {
-    handleRegionNearest(e.latlng);
-};
+            window.regionNearestClickHandler = function(e) {
+                handleRegionNearest(e.latlng);
+            };
 
             // マップにニアレスト機能をバインド
             if (window.map) {
@@ -3116,7 +3125,6 @@ if (needsBaseLoad) {
         return false;
     }
 }
-
 // ==========================================
 // ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数
 // ==========================================
@@ -3235,6 +3243,9 @@ async function routeUpdate() {
         if (typeof renderSpotRanking === 'function') renderSpotRanking()
         if (typeof selectArea === 'function') selectArea(area); 
         if (typeof renderCrowdImage === 'function') renderCrowdImage();
+
+        // 👇追加: エリア画面への直リンク時に確実に道路レイヤーを表示
+        if (typeof showRoadLayers === 'function') showRoadLayers();
         
         requestAnimationFrame(() => {
             const btn = document.getElementById('map-back-btn');
@@ -3267,6 +3278,9 @@ async function routeUpdate() {
             
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
+                    // 👇追加: 県画面への直リンク時に確実に道路レイヤーを表示
+                    if (typeof showRoadLayers === 'function') showRoadLayers();
+
                     if (typeof showPrefSpots === 'function') showPrefSpots();
                     if (typeof initAreaUI === 'function') initAreaUI();
                     if (typeof renderPrefWeather === 'function') renderPrefWeather();
@@ -3300,8 +3314,6 @@ async function routeUpdate() {
         }
     }
 }
-
-
 
 // ★ Region名の変換マッピング
 const REGION_MAP = {
