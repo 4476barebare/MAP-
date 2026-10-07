@@ -1203,9 +1203,7 @@ function loadRegionMap() {
         }
 
         // 👇追加: 戻るボタン等で広域マップに戻ったときにも確実に道路レイヤーを表示
-        if (typeof showRoadLayers === 'function') {
-            showRoadLayers();
-        }
+        if (typeof showRoadLayers === 'function') showRoadLayers();
 
         return;
     }
@@ -1304,9 +1302,7 @@ function loadRegionMap() {
             showAllRegionSpots();
 
             // 👇追加: 初回アクセス（広域画面）時に確実に道路レイヤーを表示
-            if (typeof showRoadLayers === 'function') {
-                showRoadLayers();
-            }
+            if (typeof showRoadLayers === 'function') showRoadLayers();
 
             // ==========================================
             // ★ Region画面専用のニアレスト機能（最も近い県を判定）
@@ -1327,7 +1323,6 @@ function loadRegionMap() {
             console.error("Regionマップの初期化エラー:", err);
         });
 }
-
 // ==========================================
 // 3. マーカー等から県が選択された時のトリガー
 // ==========================================
@@ -1360,7 +1355,6 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
     window.currentPref = prefCode;
     window.prefBounds = null;
     window.areaBounds = null;
-//clearRegionMerge();
 
     window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
     window.prefWeatherUrl = `/data/${prefCode}_whether.csv`;
@@ -1426,6 +1420,9 @@ if (typeof loadPrefectureData === 'function') {
             function executeUI() {
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
+                        // 👇 追加: 県が選択された時に確実に道路レイヤーを表示
+                        if (typeof showRoadLayers === 'function') showRoadLayers();
+
                         if (typeof showPrefSpots === 'function') showPrefSpots();
                         if (typeof initAreaUI === 'function') initAreaUI();
                         if (typeof renderPrefWeather === 'function') renderPrefWeather();
@@ -1440,7 +1437,6 @@ if (typeof loadPrefectureData === 'function') {
                         }
                         
                         if (typeof getAlertText === 'function' && window.prefData) {
-                            // コールバックによる古いDOM操作を排除し、直接関数だけを呼ぶ
                             getAlertText(window.prefData);
                         }
                         if (typeof renderSpotRanking === 'function') renderSpotRanking();
@@ -1476,7 +1472,6 @@ if (typeof loadPrefectureData === 'function') {
         }
     }
 };
-
 // =====================================================
 // ■ 3. 広域用のグリッド間引き関数
 // =====================================================
@@ -3240,12 +3235,13 @@ async function routeUpdate() {
         
         // ★ 不足していたエリアガイドの描画を行う
         if (typeof renderAreaGuide === 'function') renderAreaGuide();
-        if (typeof renderSpotRanking === 'function') renderSpotRanking()
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        
+        // 👇 追加: エリア画面への直リンク時に道路レイヤーを表示
+        if (typeof showRoadLayers === 'function') showRoadLayers();
+
         if (typeof selectArea === 'function') selectArea(area); 
         if (typeof renderCrowdImage === 'function') renderCrowdImage();
-
-        // 👇追加: エリア画面への直リンク時に確実に道路レイヤーを表示
-        if (typeof showRoadLayers === 'function') showRoadLayers();
         
         requestAnimationFrame(() => {
             const btn = document.getElementById('map-back-btn');
@@ -3278,7 +3274,7 @@ async function routeUpdate() {
             
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    // 👇追加: 県画面への直リンク時に確実に道路レイヤーを表示
+                    // 👇 追加: 県画面への直リンク時に確実に道路レイヤーを表示
                     if (typeof showRoadLayers === 'function') showRoadLayers();
 
                     if (typeof showPrefSpots === 'function') showPrefSpots();
