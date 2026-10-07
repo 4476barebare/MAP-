@@ -3242,7 +3242,7 @@ async function routeUpdate() {
 
         if (typeof selectArea === 'function') selectArea(area); 
         if (typeof renderCrowdImage === 'function') renderCrowdImage();
-        
+        if (typeof showPrefSpots === 'function') showPrefSpots();
         requestAnimationFrame(() => {
             const btn = document.getElementById('map-back-btn');
             if (btn) {
