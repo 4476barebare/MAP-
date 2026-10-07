@@ -1006,7 +1006,15 @@ marker._spotClickHandler = function () {
 
 function showPrefSpots() {
 
-    if (!window.regionSpotMarkers) return;
+    // 👇 修正：マーカーデータがまだ生成されていない場合は、生成を待ってから再度自身を実行する
+    if (!window.regionSpotMarkers || window.regionSpotMarkers.length === 0) {
+        if (typeof showAllRegionSpots === 'function') {
+            showAllRegionSpots().then(() => {
+                showPrefSpots();
+            });
+        }
+        return;
+    }
 
     const selectedPref = String(window.currentPref || '');
 
@@ -1014,6 +1022,8 @@ function showPrefSpots() {
     // ① スポット詳細画面
     // =================================================
     if (window.currentSpotId) {
+//...（以下そのまま）
+
 
         window.regionSpotMarkers.forEach(marker => {
 
