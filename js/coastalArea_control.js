@@ -123,29 +123,28 @@ function loadCSV(filePath) {
 }
 
 // ================================
-// ■ CSV出力（上書き）（⚠️ 元のまま一切変更なし）
+// ■ CSV出力（上書き）
 // ================================
 function saveCSV(filePath, spots) {
-
-    const today = new Date()
-        .toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
-
+    const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" });
     let csv = "name,date,whether\n";
 
     for (const s of spots) {
-
-        // whetherがないものは出さない（前提維持）
         if (!s.whether) continue;
+
+        // ★ JSON文字列内のダブルクォーテーションをエスケープし、全体をダブルクォーテーションで囲む
+        const jsonStr = JSON.stringify(s.whether).replace(/"/g, '""');
 
         csv += [
             s.name || "",
-            today, // ★ここが重要（出力日固定）
-            JSON.stringify(s.whether)
+            today,
+            `"${jsonStr}"` // カンマ区切りによる列のズレを防ぐ
         ].join(",") + "\n";
     }
 
     fs.writeFileSync(filePath, csv, "utf-8");
 }
+
 
 // ================================
 // ■ メイン処理
