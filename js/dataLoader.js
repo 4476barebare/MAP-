@@ -3468,8 +3468,8 @@ function triggerRoadFadeIn() {
     const trunkPane = window.map.getPane('trunkPane');
 
     if (motorwayPane && trunkPane && currentZoom <= 13.5) {
-        const motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8);
-        const trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
+        const motorwayWeight = Math.max(1.0, 1.5 + (currentZoom - 10) * 0.8);
+        const trunkWeight    = Math.max(0.5, 1 + (currentZoom - 10) * 0.5);
 
         motorwayPane.style.setProperty('--motorway-weight', motorwayWeight + 'px');
         trunkPane.style.setProperty('--trunk-weight', trunkWeight + 'px');
@@ -3496,8 +3496,8 @@ function updateRoadStyle() {
     if (!motorwayPane || !trunkPane) return;
 
     if (currentZoom <= 13.5) {
-        const motorwayWeight = Math.max(1.0, 2 + (currentZoom - 10) * 0.8);
-        const trunkWeight    = Math.max(0.5, 1.5 + (currentZoom - 10) * 0.5);
+        const motorwayWeight = Math.max(1.0, 1.5 + (currentZoom - 10) * 0.8);
+        const trunkWeight    = Math.max(0.5, 1.0 + (currentZoom - 10) * 0.5);
 
         motorwayPane.style.setProperty('--motorway-weight', motorwayWeight + 'px');
         trunkPane.style.setProperty('--trunk-weight', trunkWeight + 'px');
