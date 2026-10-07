@@ -12,68 +12,48 @@ window.currentAreaId = null;
 //    ＋ 魚データを各スポットへ付与
 // ==========================================
 async function loadLocationJSON() {
-
     const pref = window.currentPref;
-
-
     // ==========================================
     // グリッド座標解析
     // ==========================================
     function parseGrid(str) {
-
         if (!str) {
             return {
                 x: null,
                 y: null
             };
         }
-
         const x = str.match(/x\s*:\s*(-?\d+)/);
         const y = str.match(/y\s*:\s*(-?\d+)/);
-
         return {
             x: x ? parseInt(x[1]) : null,
             y: y ? parseInt(y[1]) : null
         };
     }
-
     // ==========================================
     // ★ fishDataを準備
     //
     // 既に存在する場合は再取得しない
     // ==========================================
     let fishData = window.fishData || null;
-
-
     if (!fishData && window.fishUrl) {
-
         try {
-
             const response =
                 await fetch(window.fishUrl);
-
-
             if (response.ok) {
-
                 fishData =
                     await response.json();
-
                 window.fishData =
                     fishData;
             }
-
         } catch (error) {
-
             console.error(
                 '魚データ読み込みエラー:',
                 error
             );
-
             fishData = null;
         }
     }
-
-
     // ==========================================
     // 分岐A：
     // 既に県データが生成されている場合
@@ -87,12 +67,7 @@ async function loadLocationJSON() {
         window.prefData = window[`${pref}_prefData`];
         window.areaData = window[`${pref}_areaData`];
         window.spotData = window[`${pref}_spotData`];
-        
-        // 👇【ここに追加】キャッシュからBoundsも復元する
         window.prefBounds = window[`${pref}_prefBounds`] || null;
-
-
-
         // ------------------------------------------
         // ★ キャッシュされたスポットにも
         //   fishデータを再付与
@@ -101,8 +76,6 @@ async function loadLocationJSON() {
             window.spotData,
             fishData
         );
-
-
         // ------------------------------------------
         // エリアグラフ
         // ------------------------------------------
@@ -124,8 +97,6 @@ async function loadLocationJSON() {
             window[`${pref}_areaGraph`] =
                 window.areaGraph;
         }
-
-
         // ------------------------------------------
         // SEO
         // ------------------------------------------
@@ -138,8 +109,6 @@ async function loadLocationJSON() {
             document.getElementById(
                 'seo-list-title'
             );
-
-
         if (
             container &&
             titleSpan &&
@@ -152,16 +121,12 @@ async function loadLocationJSON() {
             container.innerHTML =
                 window[`${pref}_seoHtml`] || '';
         }
-
-
         return {
             main: window.prefData,
             areas: window.areaData,
             spots: window.spotData
         };
     }
-
-
     // ==========================================
     // 分岐B：
     // 金庫(allspotData)から対象県を抽出
@@ -170,27 +135,19 @@ async function loadLocationJSON() {
         window.allspotData ||
         window.ALL_REGION_SPOTS ||
         [];
-
-
     let main = null;
     const areas = [];
     const spots = [];
-
-
     // ==========================================
     // 対象県のデータを抽出
     // ==========================================
     const targetRows =
         vaultData.filter(row => {
-
             return (
                 row._prefCode === pref ||
-
                 (!row.areaId &&
                     row.name === pref) ||
-
                 row.areaId === pref ||
-
                 (
                     row.areaId &&
                     typeof row.areaId === 'string' &&
@@ -200,43 +157,32 @@ async function loadLocationJSON() {
                 )
             );
         });
-
-
     // ==========================================
     // squareX / squareY 初期化
     // ==========================================
     targetRows.forEach(row => {
-
         row.squareX = null;
         row.squareY = null;
     });
-
-
     // ==========================================
     // 県本体(main)の抽出
     // ==========================================
     targetRows.forEach(row => {
-
         if (
             (!row.areaId ||
                 row.individualId === 'parent') &&
             row.name === pref
         ) {
-
             main = row;
         }
     });
-
-
     // ==========================================
     // エリア(areas)の抽出
     // ==========================================
     targetRows.forEach(row => {
-
         if (
             (row.areaId || '').trim() === pref
         ) {
-
             if (
                 row.url &&
                 row.url.includes('x:') &&
@@ -252,13 +198,9 @@ async function loadLocationJSON() {
                 row.squareY =
                     grid.y;
             }
-
-
             areas.push(row);
         }
     });
-
-
 // ==========================================
 // スポット(spots)の抽出
 // ==========================================
@@ -273,8 +215,6 @@ targetRows.forEach(row => {
         spots.push(row);
     }
 });
-
-
     // ==========================================
     // ★ 魚データをスポットへ付与
     // ==========================================
@@ -282,16 +222,12 @@ targetRows.forEach(row => {
         spots,
         fishData
     );
-
-
     // ==========================================
     // グローバル変数へ代入
     // ==========================================
     window.prefData = main;
     window.areaData = areas;
     window.spotData = spots;
-
-    // 👇【ここに追加】県全体の Bounds を計算して window.prefBounds に格納する
     window.prefBounds = null;
     if (spots.length > 0 && typeof L !== 'undefined') {
         let minLat = Infinity, maxLat = -Infinity;
