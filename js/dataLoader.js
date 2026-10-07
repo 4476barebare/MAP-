@@ -3236,7 +3236,7 @@ function goBack() {
         showSpotsForArea(window.currentAreaId);
         window._isRestoringSpot = true;
         selectSpot(restoreSpot); // ★ ここに渡され、外部で false になる
-        showPrefSpots();
+        if (typeof showPrefSpots === 'function') showPrefSpots();
 
         const checkCompletion = setInterval(() => {
             if (window._selectSpotCompleted) {
