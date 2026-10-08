@@ -103,7 +103,7 @@ function loadCSV(filePath) {
 
     const lines = text.split("\n").filter(Boolean);
 
-    const header = lines.shift().split(",");
+    const header = lines.shift().replace(/^\uFEFF/, "").split(",");
 
     return lines.map(line => {
 
