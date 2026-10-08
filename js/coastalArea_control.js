@@ -132,14 +132,14 @@ function saveCSV(filePath, spots) {
     for (const s of spots) {
         if (!s.whether) continue;
 
-        // ★ JSON文字列内のダブルクォーテーションをエスケープし、全体をダブルクォーテーションで囲む
-        const jsonStr = JSON.stringify(s.whether).replace(/"/g, '""');
+const jsonStr = JSON.stringify(s.whether);
 
-        csv += [
-            s.name || "",
-            today,
-            `"${jsonStr}"` // カンマ区切りによる列のズレを防ぐ
-        ].join(",") + "\n";
+csv += [
+    s.name || "",
+    today,
+    jsonStr
+].join(",") + "\n";
+        
     }
 
     fs.writeFileSync(filePath, csv, "utf-8");
