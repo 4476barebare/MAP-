@@ -81,6 +81,11 @@
     <loc>https://turiiko-navi.com/articles/katsuo.html</loc>
     <!-- ARTICLE_DATA: {"title":"堤防から弾丸ランナーを撃ち落とせ！「カツオ」の生態とショア攻略完全ガイド", "description":"堤防やサーフからも狙える超高速回遊魚「カツオ」の生態と、ショアジギング・弓角での攻略法を解説。", "image":"articles/images/katsuo.jpg", "category":"対象魚別ガイド", "style":"list"} -->
   </url>
+  <url>
+    <loc>https://turiiko-navi.com/articles/sawara.html</loc>
+    <!-- ARTICLE_DATA: {"title":"サワラ・サゴシのルアー釣り攻略ガイド：食わせるまでは大胆に、掛けたら主導権を渡さない", "description":"ショアから狙うサワラ・サゴシの攻略法。掛けるまでは大胆に、掛けたら主導権を渡さないファイトのコツを解説。", "image":"articles/images/sawara.jpg", "category":"対象魚別ガイド", "style":"list"} -->
+  </url>
+
 
   <!-- ======================== -->
   <!-- トップページ・県トップ -->
