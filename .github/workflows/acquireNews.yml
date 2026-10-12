@@ -43,7 +43,7 @@ jobs:
           
           # ② ★ マップ＆釣果ブログの結合データをエクスポートAPIから取得（ファイル名を compiled_data.json として保存）
           # ※ 注意: 以下のURLパス (`agltest/export.php` の部分) は、実際にAPIのPHPファイルを置いた場所に合わせて修正してください
-          curl -sS "https://turiiko.shop/agltest/export.php?key=kR7xQm2Zt9WbLp4NvY8dshoko&t=$(date +%s)" -o data/compiled_data.json
+          curl -sS "https://turiiko.shop/agltest/export_map_data.php?key=kR7xQm2Zt9WbLp4NvY8dshoko&t=$(date +%s)" -o data/compiled_data.json
 
       # ========================================================
       # 2. 取得したデータをリポジトリに保存する処理
