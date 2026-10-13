@@ -2901,7 +2901,7 @@ function renderAccessInfo(spot) {
 }
 
 // ==========================================
-// ★ 新規：最寄りの釣具店を描画する関数（.typeによる分岐対応版）
+// ★ 新規：最寄りの釣具店を描画する関数（ロジック修正・番号なし版）
 // ==========================================
 function renderShopSection(spot) {
     const accessBox = document.getElementById('accessInfoBox');
@@ -2916,36 +2916,47 @@ function renderShopSection(spot) {
 
     const spotLatLng = L.latLng(spot.lat, spot.lng);
 
-    // =====================================================
-    // ★ 追加：.type ロジックを用いた条件分岐
-    // =====================================================
+    // 1. 有効な全店舗（座標あり）を抽出し、距離を計算して近い順にソートしておく
+    const allValidShops = window.markerControl.allShops
+        .filter(s => !isNaN(s.lat) && !isNaN(s.lng))
+        .map(s => {
+            const dist = spotLatLng.distanceTo(L.latLng(s.lat, s.lng));
+            return { ...s, distance: dist };
+        })
+        .sort((a, b) => a.distance - b.distance);
+
+    if (allValidShops.length === 0) return;
+
+    const displayShops = [];
+
+    // 2. まずは既存の「ショップicon縛り(shop4以外)」をした最寄りの1件を探して追加
+    const firstShop = allValidShops.find(s => s.icon !== 'shop4');
+    if (firstShop) {
+        displayShops.push(firstShop);
+    }
+
+    // 3. .type ロジックを用いた条件分岐
     const typeParts = (spot.type || "").split('$');
     const isMainSpot = typeParts.includes("representative") || 
                        typeParts.includes("assistant") || 
                        typeParts.includes("substitute");
 
-    // 抽出条件の分岐
-    let validShops;
     if (isMainSpot) {
-        // 代表格のスポット： .icon を問わず、座標がある全ての店舗を対象にする
-        validShops = window.markerControl.allShops.filter(s => !isNaN(s.lat) && !isNaN(s.lng));
-    } else {
-        // 通常のスポット： 従来通り 100円均一(shop4) などを除外
-        validShops = window.markerControl.allShops.filter(s => s.icon !== 'shop4' && !isNaN(s.lat) && !isNaN(s.lng));
+        // 追加で「ショップicon縛りを無くした2件」を、1件目と被らないように追加
+        let addedCount = 0;
+        for (const shop of allValidShops) {
+            if (addedCount >= 2) break; // 2件追加したら終了
+            
+            // 既に表示リストに入っている店舗（1件目で選ばれた店舗）はスキップ
+            if (displayShops.some(s => s.name === shop.name && s.lat === shop.lat && s.lng === shop.lng)) {
+                continue;
+            }
+            displayShops.push(shop);
+            addedCount++;
+        }
     }
-    
-    if (validShops.length === 0) return;
 
-    // 距離を計算して近い順に並び替え
-    const shopsWithDist = validShops.map(s => {
-        const dist = spotLatLng.distanceTo(L.latLng(s.lat, s.lng));
-        return { ...s, distance: dist };
-    });
-    shopsWithDist.sort((a, b) => a.distance - b.distance);
-    
-    // 表示件数の分岐（代表格は3件、それ以外は1件）
-    const displayLimit = isMainSpot ? 3 : 1;
-    const topShops = shopsWithDist.slice(0, displayLimit);
+    if (displayShops.length === 0) return;
 
     // HTML組み立て
     const shopDiv = document.createElement('div');
@@ -2957,7 +2968,7 @@ function renderShopSection(spot) {
     let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🎣 最寄りの釣具店</div>`;
     html += `<div style="font-size: 13px; line-height: 1.5;">`;
 
-    topShops.forEach((shop, index) => {
+    displayShops.forEach((shop) => {
         const realDistKm = (shop.distance * 1.35) / 1000;
         const time = Math.round(realDistKm * 1.5); 
         
@@ -2965,12 +2976,8 @@ function renderShopSection(spot) {
             ? `${shop.group} ${shop.name}`
             : shop.name;
 
-        // 複数表示の場合はナンバリングと改行を入れる
-        if (isMainSpot) {
-            html += `<div style="margin-bottom: 4px;">${index + 1}. ${shopName} まで車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
-        } else {
-            html += `<div>${shopName} まで車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
-        }
+        // 番号(1. 2. 3.)を無くし、スッキリと表示
+        html += `<div style="margin-bottom: 4px;">${shopName} まで車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
     });
 
     html += `</div>`;
