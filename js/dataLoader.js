@@ -2900,9 +2900,8 @@ function renderAccessInfo(spot) {
     }
 }
 
-
 // ==========================================
-// ★ 新規：最寄りの釣具店を描画する関数
+// ★ 新規：最寄りの釣具店を描画する関数（.typeによる分岐対応版）
 // ==========================================
 function renderShopSection(spot) {
     const accessBox = document.getElementById('accessInfoBox');
@@ -2917,10 +2916,24 @@ function renderShopSection(spot) {
 
     const spotLatLng = L.latLng(spot.lat, spot.lng);
 
-    // ★ 100円均一(shop4)を除外し、緯度経度が正常な店舗だけを抽出
-    const validShops = window.markerControl.allShops.filter(s => s.icon !== 'shop4' && !isNaN(s.lat) && !isNaN(s.lng));
+    // =====================================================
+    // ★ 追加：.type ロジックを用いた条件分岐
+    // =====================================================
+    const typeParts = (spot.type || "").split('$');
+    const isMainSpot = typeParts.includes("representative") || 
+                       typeParts.includes("assistant") || 
+                       typeParts.includes("substitute");
+
+    // 抽出条件の分岐
+    let validShops;
+    if (isMainSpot) {
+        // 代表格のスポット： .icon を問わず、座標がある全ての店舗を対象にする
+        validShops = window.markerControl.allShops.filter(s => !isNaN(s.lat) && !isNaN(s.lng));
+    } else {
+        // 通常のスポット： 従来通り 100円均一(shop4) などを除外
+        validShops = window.markerControl.allShops.filter(s => s.icon !== 'shop4' && !isNaN(s.lat) && !isNaN(s.lng));
+    }
     
-    // 対象店舗がない場合は終了
     if (validShops.length === 0) return;
 
     // 距離を計算して近い順に並び替え
@@ -2928,18 +2941,11 @@ function renderShopSection(spot) {
         const dist = spotLatLng.distanceTo(L.latLng(s.lat, s.lng));
         return { ...s, distance: dist };
     });
-    
     shopsWithDist.sort((a, b) => a.distance - b.distance);
     
-    // 一番近い店舗を取得して時間を計算（車で時速40km想定）
-    const nearestShop = shopsWithDist[0];
-    const realDistKm = (nearestShop.distance * 1.35) / 1000;
-    const time = Math.round(realDistKm * 1.5); 
-    
-    // 店舗名（キャスティングや上州屋などのグループ名があればくっつける）
-    const shopName = nearestShop.group && nearestShop.group !== '個人商店' && nearestShop.group !== 'shop'
-        ? `${nearestShop.group} ${nearestShop.name}`
-        : nearestShop.name;
+    // 表示件数の分岐（代表格は3件、それ以外は1件）
+    const displayLimit = isMainSpot ? 3 : 1;
+    const topShops = shopsWithDist.slice(0, displayLimit);
 
     // HTML組み立て
     const shopDiv = document.createElement('div');
@@ -2949,11 +2955,29 @@ function renderShopSection(spot) {
     shopDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
 
     let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🎣 最寄りの釣具店</div>`;
-    html += `<div style="font-size: 13px; line-height: 1.5;">${shopName} まで車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">`;
 
+    topShops.forEach((shop, index) => {
+        const realDistKm = (shop.distance * 1.35) / 1000;
+        const time = Math.round(realDistKm * 1.5); 
+        
+        const shopName = shop.group && shop.group !== '個人商店' && shop.group !== 'shop'
+            ? `${shop.group} ${shop.name}`
+            : shop.name;
+
+        // 複数表示の場合はナンバリングと改行を入れる
+        if (isMainSpot) {
+            html += `<div style="margin-bottom: 4px;">${index + 1}. ${shopName} まで車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
+        } else {
+            html += `<div>${shopName} まで車で 約${time}分 (${realDistKm.toFixed(1)}km)</div>`;
+        }
+    });
+
+    html += `</div>`;
     shopDiv.innerHTML = html;
     accessBox.appendChild(shopDiv);
 }
+
 
 function clearAccessInfo() {
     const container = document.getElementById('accessInfoBox');
