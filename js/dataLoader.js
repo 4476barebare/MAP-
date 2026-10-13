@@ -2894,11 +2894,17 @@ function renderAccessInfo(spot) {
     container.innerHTML = html;
     container.style.display = 'block';
 
-    // 👇 【ここに追加】アクセス情報を描画した直後に「最寄り釣具店」も追加描画する
+    // 👇 【ここに追加】アクセス情報を描画した直後に「最寄り釣具店」を描画
     if (typeof renderShopSection === 'function') {
         renderShopSection(spot);
     }
+    
+    // 👇 【ここに追加】さらに「20km圏内の釣果」を描画
+    if (typeof renderRecentCatches === 'function') {
+        renderRecentCatches(spot);
+    }
 }
+
 
 // ==========================================
 // ★ 新規：最寄りの釣具店を描画する関数（ロジック修正・番号なし版）
@@ -2983,6 +2989,71 @@ function renderShopSection(spot) {
     html += `</div>`;
     shopDiv.innerHTML = html;
     accessBox.appendChild(shopDiv);
+}
+
+// ==========================================
+// ★ 新規：20km圏内のリアルタイム釣果を描画する関数
+// ==========================================
+async function renderRecentCatches(spot) {
+    const accessBox = document.getElementById('accessInfoBox');
+    if (!accessBox || !spot || !spot.lat || !spot.lng) return;
+
+    // 既存の釣果エリアがあれば削除（重複防止）
+    const oldCatchArea = document.getElementById('spot-catch-section');
+    if (oldCatchArea) oldCatchArea.remove();
+
+    // 1. JSONデータのフェッチ（初回のみ通信し、以降はキャッシュを利用）
+    if (!window.compiledCatchData) {
+        try {
+            const res = await fetch('/data/compiled_data.json');
+            if (!res.ok) throw new Error("JSON fetch failed");
+            window.compiledCatchData = await res.json();
+        } catch (e) {
+            console.error("釣果データの読み込みに失敗しました:", e);
+            return;
+        }
+    }
+
+    const data = window.compiledCatchData;
+    if (!data) return;
+
+    // map_data と blog_data を結合
+    const allCatches = [...(data.map_data || []), ...(data.blog_data || [])];
+    const spotLatLng = L.latLng(spot.lat, spot.lng);
+
+    // 2. 20km以内の釣果を抽出 (LeafletのdistanceToはメートル単位で返るため 20000m = 20km)
+    const nearbyCatches = allCatches.filter(c => {
+        if (!c.lat || !c.lng || !c.fish) return false;
+        const dist = spotLatLng.distanceTo(L.latLng(c.lat, c.lng));
+        return dist <= 20000; 
+    });
+
+    // 20km圏内に釣果が見つからない場合はDOMを生成せずに終了
+    if (nearbyCatches.length === 0) return;
+
+    // 3. 釣れた魚種を抽出し、重複を削除する（例: ["アジ", "シーバス"]）
+    const fishNames = [...new Set(nearbyCatches.map(c => c.fish))];
+
+    // 4. HTMLの構築
+    const catchDiv = document.createElement('div');
+    catchDiv.id = 'spot-catch-section';
+    catchDiv.style.marginTop = '12px';
+    catchDiv.style.paddingTop = '10px';
+    catchDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
+
+    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px; color: #e65100;">🔥 いまこの周辺で釣れてます！</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">20km圏内の最新釣果：<strong>${fishNames.join('、')}</strong></div>`;
+
+    catchDiv.innerHTML = html;
+
+    // 5. 「主な対象魚」の直下に挿入する（見つからなければアクセス情報の末尾へ）
+    const fishSection = document.getElementById('spot-fish-section');
+    if (fishSection) {
+        // 対象魚要素の "次の要素" の前に挿入（＝直下に追加）
+        fishSection.parentNode.insertBefore(catchDiv, fishSection.nextSibling);
+    } else {
+        accessBox.appendChild(catchDiv);
+    }
 }
 
 
