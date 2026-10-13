@@ -3041,8 +3041,8 @@ async function renderRecentCatches(spot) {
     catchDiv.style.paddingTop = '10px';
     catchDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
 
-    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px; color: #e65100;">🔥 いまこの周辺で釣れてます！</div>`;
-    html += `<div style="font-size: 13px; line-height: 1.5;">20km圏内の最新釣果：<strong>${fishNames.join('、')}</strong></div>`;
+    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px; color: #e65100;">いまこの周辺で釣れている魚種</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;"><strong>${fishNames.join('、')}</strong></div>`;
 
     catchDiv.innerHTML = html;
 
