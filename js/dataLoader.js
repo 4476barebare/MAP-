@@ -3015,7 +3015,7 @@ async function renderRecentCatches(spot) {
     const nearbyCatches = allCatches.filter(c => {
         if (!c.lat || !c.lng || !c.fish) return false;
         const dist = spotLatLng.distanceTo(L.latLng(c.lat, c.lng));
-        return dist <= 20000; 
+        return dist <= 10000; 
     });
 
     if (nearbyCatches.length === 0) return;
