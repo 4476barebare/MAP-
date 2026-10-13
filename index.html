@@ -559,10 +559,16 @@ function updateSeoMeta() {
                 // 重複を削除して文字列化
                 const uniqueNames = [...new Set(names)];
                 
-                // 👇 【ここに追加】抽出完了後、新しいfunctionを呼び出して発火！
-                if (typeof renderFishSection === 'function') {
-                    renderFishSection(uniqueNames);
-                }
+// index.html の updateSeoMeta() 内
+// 👇 【ここに追加】抽出完了後、新しいfunctionを呼び出して発火！
+if (typeof renderFishSection === 'function') {
+    renderFishSection(uniqueNames);
+    
+    // ★ 追加：対象魚のDOMが確実に生成された直後に釣果関数を呼ぶ！
+    if (typeof renderRecentCatches === 'function') {
+        renderRecentCatches(targetSpot);
+    }
+}
 
                 if (uniqueNames.length > 0) {
                     extraInfo += `対象魚や周辺情報: ${uniqueNames.join('、')}など。`;
