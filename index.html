@@ -1248,9 +1248,8 @@ function fetchRegionCsvText() {
     }
     return window._regionCsvTextPromise;
 }
-
 // ==========================================
-// ★ URLクエリから直接システム変数をセットする関数
+// ★ URLクエリから直接システム変数をセットする関数（茨城県栃木県・部分一致対応版）
 // ==========================================
 async function applyQueryToStateFromCsv() {
     const params = new URLSearchParams(window.location.search);
@@ -1260,44 +1259,96 @@ async function applyQueryToStateFromCsv() {
 
     if (!qPref) return;
 
-    // 1. キャッシュ済みRegion CSVから現在の県を確定
-    try {
-        const text = await fetchRegionCsvText();
-        const lines = text.trim().split('\n');
-        
-        if (lines.length > 0) {
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-            const nameIdx  = headers.indexOf('name');
-            const notesIdx = headers.indexOf('notes');
-            const urlIdx   = headers.indexOf('url');
-            
-            if (nameIdx !== -1 && notesIdx !== -1 && urlIdx !== -1) {
-                for (let i = 1; i < lines.length; i++) {
-                    const cols = lines[i].split(',').map(c => c.trim());
-                    if (cols[notesIdx] === qPref) {
-                        window.currentPref = cols[nameIdx];
-                        if (cols[urlIdx]) {
+    // 1. Region CSVの探索 (完全一致だけでなく「茨城県 ⇔ 茨城県栃木県」の部分一致も許容)
+    if (window.regionUrl) {
+        try {
+            const text = typeof fetchRegionCsvText === 'function'
+                ? await fetchRegionCsvText()
+                : await fetch(window.regionUrl).then(r => r.ok ? r.text() : '');
+
+            const lines = text.trim().split('\n');
+            if (lines.length > 0) {
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                const nameIdx  = headers.indexOf('name');
+                const notesIdx = headers.indexOf('notes');
+                const urlIdx   = headers.indexOf('url');
+                
+                if (notesIdx !== -1 && urlIdx !== -1) {
+                    for (let i = 1; i < lines.length; i++) {
+                        const cols = lines[i].split(',').map(c => c.trim());
+                        const csvNote = cols[notesIdx] || '';
+                        const csvName = nameIdx !== -1 ? cols[nameIdx] : '';
+                        const urlVal  = cols[urlIdx] || '';
+
+                        // url列から確実な県コード(IBARAKI等)も抽出しておく
+                        const extractedCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0]?.split('_')[0] || csvName;
+
+                        // ★ 完全一致、または双方向の部分一致（"茨城県" と "茨城県栃木県"）でヒットさせる
+                        if (
+                            csvNote && (
+                                csvNote === qPref ||
+                                csvNote.includes(qPref) ||
+                                qPref.includes(csvNote) ||
+                                csvName === qPref ||
+                                extractedCode === qPref
+                            )
+                        ) {
+                            window.currentPref = csvName || extractedCode;
                             window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
+                            break;
                         }
-                        break;
                     }
                 }
             }
+        } catch (err) {
+            console.error("Region CSV逆引きエラー:", err);
         }
-    } catch (err) {
-        console.error("Region CSV逆引きエラー:", err);
     }
 
-    // 2. エリア・スポットのID特定（必要時のみ全県データを取得）
+    // 2. 金庫データの準備（まだ無ければ取得）
+    let vaultData = window.allspotData || window.ALL_REGION_SPOTS;
+    if (!vaultData || vaultData.length === 0) {
+        if (typeof fetchAllRegionSpots === 'function') {
+            vaultData = await fetchAllRegionSpots();
+        }
+    }
+
+    if (!vaultData || vaultData.length === 0) return;
+
+    // ★ フォールバック：CSV側で万が一見つからなかった場合も、JSONの親データ(parent)のnotesから逆引きする
+    if (!window.currentPref) {
+        const parentRow = vaultData.find(r =>
+            r.individualId === 'parent' &&
+            r.notes && (
+                r.notes === qPref ||
+                r.notes.includes(qPref) ||
+                qPref.includes(r.notes) ||
+                r.name === qPref
+            )
+        );
+        if (parentRow) {
+            window.currentPref = parentRow.name;
+            window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
+        }
+    }
+
+    // 3. エリア・スポットのID特定（★対象県のデータだけに絞って他県の同名スポット上書きを防止）
     if (qArea || qSpot) {
-        const vaultData = await fetchAllRegionSpots();
-        for (const row of vaultData) {
+        const prefRows = window.currentPref
+            ? vaultData.filter(r => r._prefCode === window.currentPref || (r.areaId && String(r.areaId).startsWith(window.currentPref)))
+            : vaultData;
+
+        for (const row of prefRows) {
             const rowName = row.name;
             if (qArea && rowName === qArea && row.areaId && row.individualId) {
                 window.currentAreaId = row.areaId + "_" + row.individualId;
             }
             if (qSpot && rowName === qSpot && row.type !== 'pref' && row.type !== 'area') {
                 window.currentSpotId = row.individualId;
+                // areaクエリが省略されていた場合でもスポットからareaIdを自動補完
+                if (!qArea && row.areaId) {
+                    window.currentAreaId = row.areaId;
+                }
             }
         }
     }
