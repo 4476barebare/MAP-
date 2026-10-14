@@ -213,8 +213,24 @@ async function loadLocationJSON() {
 
     return { main, areas, spots };
 }
+// ★ ベースタイルの初回ロード完了を待つヘルパー関数
+window.runAfterTileLoad = function(callback, fallbackMs = 600) {
+    if (!window.gsiLayer || window._firstTileLoaded) {
+        requestAnimationFrame(callback);
+        return;
+    }
+    let done = false;
+    const exec = () => {
+        if (done) return;
+        done = true;
+        window._firstTileLoaded = true;
+        callback();
+    };
+    window.gsiLayer.once('load', exec);
+    setTimeout(exec, fallbackMs);
+};
 
-function drawLocation(name, lat, lng, zoom, options = {}) {
+function drawLocation(name, lat, lng, zoom, options = {}, initialTileUrl = null) {
 
   const defaultOptions = {
     center: [lat, lng],
@@ -241,25 +257,23 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     window.phase1Group = L.layerGroup().addTo(window.map);
     window.phase2Group = L.layerGroup().addTo(window.map);
 
-    // ★ keepBufferを 8 → 2 に変更し、画面内のタイル読み込みに通信帯域を集中させる
+    // ★ スポット直リンク時は最初から指定タイル(photo等)をセットして無駄なort通信を防ぐ
+    const startTile = initialTileUrl || window.gsiLayers.ort;
+
     window.gsiLayer = L.tileLayer(
-      window.gsiLayers.ort,
+      startTile,
       {
         attribution: '© 国土地理院',
-        keepBuffer: 2
+        keepBuffer: 2,
+        updateWhenIdle: false
       }
     ).addTo(window.map);
 
-    // ★ 等深線レイヤー(5ファイル)は、ベースタイルの初回読み込み完了後（または800ms後）に遅延実行
+    // ★ 等深線(5ファイル)はベースタイルが読み込まれた後に実行
     if (typeof DepthMapController !== 'undefined') {
-        let depthStarted = false;
-        const startDepth = () => {
-            if (depthStarted) return;
-            depthStarted = true;
+        window.runAfterTileLoad(() => {
             DepthMapController.initAndShow(window.map);
-        };
-        window.gsiLayer.once('load', startDepth);
-        setTimeout(startDepth, 800);
+        }, 800);
     }
 
     return;
@@ -291,6 +305,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     ? window.map.touchZoom.enable()
     : window.map.touchZoom.disable();
 }
+
 
 function applyFishDataToSpots(spots, fishData) {
 
