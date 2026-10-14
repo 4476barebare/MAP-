@@ -276,7 +276,6 @@ function clearSpotRanking() {
     if (section) section.style.display = 'none';
     if (container) container.innerHTML = '';
 }
-
 // ==========================================
 // ★ 明日のオススメ釣り場ランキング表示関数（自動リトライ搭載版）
 // ==========================================
@@ -380,6 +379,9 @@ async function renderSpotRanking(retryCount = 0) {
         const typeParts = (spot.type || '').split('$');
         if (typeParts.includes('representative') || typeParts.includes('assistant') || typeParts.includes('substitute')) return;
 
+        // ★ zoomが指定されていないスポットを除外
+        if (!spot.zoom || String(spot.zoom).trim() === '') return;
+
         const whether = spot.whether;
         if (!whether || !whether.hourly || !whether.hourly[1] || !whether.hourly[1].weather) return;
         
@@ -453,8 +455,14 @@ async function renderSpotRanking(retryCount = 0) {
         return;
     }
 
+    // ★ 同率スコアを完全にランダムにするため、事前に配列をシャッフルしてからスコア順にソート
+    for (let i = ranking.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ranking[i], ranking[j]] = [ranking[j], ranking[i]];
+    }
     ranking.sort((a, b) => b.score - a.score);
 
+    // ★ 上位3位以内 かつ 最大6件まで選出
     const top3 = [];
     let currentRank = 1;
     let currentScore = ranking[0].score;
@@ -464,7 +472,7 @@ async function renderSpotRanking(retryCount = 0) {
             currentRank++;
             currentScore = ranking[i].score;
         }
-        if (currentRank > 3) break;
+        if (currentRank > 3 || top3.length >= 6) break;
         top3.push(ranking[i]);
     }
 
@@ -516,8 +524,6 @@ async function renderSpotRanking(retryCount = 0) {
 
     container.innerHTML = html;
 }
-
-
 // ==========================================
 // ★ タイトル・メタタグ動的更新関数（連携版）
 // ==========================================
