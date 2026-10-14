@@ -8,21 +8,52 @@ window.spotData = []
 window.currentAreaId = null;
 
 // ==========================================
-// ★ スポット用データを金庫(allspotData)から読み込む関数
-//    ＋ 魚データを各スポットへ付与
+// ★ 魚データ(fish.json)をバックグラウンドで取得・付与する関数
+// ==========================================
+window.fishDataCache = window.fishDataCache || {};
+window.fishDataPromise = null;
+
+function loadFishDataAsync(pref, fishUrl) {
+    if (!pref || !fishUrl) return Promise.resolve(null);
+
+    if (window.fishDataCache[pref]) {
+        window.fishData = window.fishDataCache[pref];
+        if (window.spotData) applyFishDataToSpots(window.spotData, window.fishData);
+        return Promise.resolve(window.fishData);
+    }
+
+    window.fishDataPromise = fetch(fishUrl)
+        .then(res => (res.ok ? res.json() : null))
+        .then(fishData => {
+            if (fishData) {
+                window.fishData = fishData;
+                window.fishDataCache[pref] = fishData;
+                if (window[`${pref}_spotData`]) {
+                    applyFishDataToSpots(window[`${pref}_spotData`], fishData);
+                }
+                if (window.currentPref === pref && window.spotData) {
+                    applyFishDataToSpots(window.spotData, fishData);
+                }
+            }
+            return fishData;
+        })
+        .catch(error => {
+            console.error('魚データ読み込みエラー:', error);
+            return null;
+        });
+
+    return window.fishDataPromise;
+}
+
+// ==========================================
+// ★ スポット用データを金庫(allspotData)から即座に読み込む関数
+//   （fish.jsonの通信待ちを排除し、0msで座標を展開）
 // ==========================================
 async function loadLocationJSON() {
     const pref = window.currentPref;
-    // ==========================================
-    // グリッド座標解析
-    // ==========================================
+
     function parseGrid(str) {
-        if (!str) {
-            return {
-                x: null,
-                y: null
-            };
-        }
+        if (!str) return { x: null, y: null };
         const x = str.match(/x\s*:\s*(-?\d+)/);
         const y = str.match(/y\s*:\s*(-?\d+)/);
         return {
@@ -30,205 +61,106 @@ async function loadLocationJSON() {
             y: y ? parseInt(y[1]) : null
         };
     }
-    // ==========================================
-    // ★ fishDataを準備
-    //
-    // 既に存在する場合は再取得しない
-    // ==========================================
-    let fishData = window.fishData || null;
-    if (!fishData && window.fishUrl) {
-        try {
-            const response =
-                await fetch(window.fishUrl);
-            if (response.ok) {
-                fishData =
-                    await response.json();
-                window.fishData =
-                    fishData;
-            }
-        } catch (error) {
-            console.error(
-                '魚データ読み込みエラー:',
-                error
-            );
-            fishData = null;
-        }
+
+    // ★ 魚データはawaitせず裏側で非同期取得を開始（タイルの読み込みを止めない）
+    if (window.fishUrl) {
+        loadFishDataAsync(pref, window.fishUrl);
     }
+
     // ==========================================
-    // 分岐A：
-    // 既に県データが生成されている場合
+    // 分岐A：既に県データが生成されている場合
     // ==========================================
     if (
         window[`${pref}_prefData`] &&
         window[`${pref}_areaData`] &&
         window[`${pref}_spotData`]
     ) {
-
         window.prefData = window[`${pref}_prefData`];
         window.areaData = window[`${pref}_areaData`];
         window.spotData = window[`${pref}_spotData`];
         window.prefBounds = window[`${pref}_prefBounds`] || null;
-        // ------------------------------------------
-        // ★ キャッシュされたスポットにも
-        //   fishデータを再付与
-        // ------------------------------------------
-        applyFishDataToSpots(
-            window.spotData,
-            fishData
-        );
-        // ------------------------------------------
-        // エリアグラフ
-        // ------------------------------------------
-        if (
-            window[`${pref}_areaGraph`]
-        ) {
 
-            window.areaGraph =
-                window[`${pref}_areaGraph`];
-
-        } else if (
-            typeof buildAreaGraphFromGrid === 'function'
-        ) {
-
-            buildAreaGraphFromGrid(
-                window.areaData
-            );
-
-            window[`${pref}_areaGraph`] =
-                window.areaGraph;
+        if (window.fishDataCache[pref]) {
+            applyFishDataToSpots(window.spotData, window.fishDataCache[pref]);
         }
-        // ------------------------------------------
-        // SEO
-        // ------------------------------------------
-        const container =
-            document.getElementById(
-                'seo-link-container'
-            );
 
-        const titleSpan =
-            document.getElementById(
-                'seo-list-title'
-            );
-        if (
-            container &&
-            titleSpan &&
-            window.prefData
-        ) {
-
-            titleSpan.textContent =
-                `${window.prefData.notes}の釣りスポット一覧を見る`;
-
-            container.innerHTML =
-                window[`${pref}_seoHtml`] || '';
+        if (window[`${pref}_areaGraph`]) {
+            window.areaGraph = window[`${pref}_areaGraph`];
+        } else if (typeof buildAreaGraphFromGrid === 'function') {
+            buildAreaGraphFromGrid(window.areaData);
+            window[`${pref}_areaGraph`] = window.areaGraph;
         }
+
+        const container = document.getElementById('seo-link-container');
+        const titleSpan = document.getElementById('seo-list-title');
+        if (container && titleSpan && window.prefData) {
+            titleSpan.textContent = `${window.prefData.notes}の釣りスポット一覧を見る`;
+            container.innerHTML = window[`${pref}_seoHtml`] || '';
+        }
+
         return {
             main: window.prefData,
             areas: window.areaData,
             spots: window.spotData
         };
     }
+
     // ==========================================
-    // 分岐B：
-    // 金庫(allspotData)から対象県を抽出
+    // 分岐B：金庫(allspotData)から対象県を抽出
     // ==========================================
-    const vaultData =
-        window.allspotData ||
-        window.ALL_REGION_SPOTS ||
-        [];
+    const vaultData = window.allspotData || window.ALL_REGION_SPOTS || [];
     let main = null;
     const areas = [];
     const spots = [];
-    // ==========================================
-    // 対象県のデータを抽出
-    // ==========================================
-    const targetRows =
-        vaultData.filter(row => {
-            return (
-                row._prefCode === pref ||
-                (!row.areaId &&
-                    row.name === pref) ||
-                row.areaId === pref ||
-                (
-                    row.areaId &&
-                    typeof row.areaId === 'string' &&
-                    row.areaId.startsWith(
-                        pref + '_'
-                    )
-                )
-            );
-        });
-    // ==========================================
-    // squareX / squareY 初期化
-    // ==========================================
+
+    const targetRows = vaultData.filter(row => {
+        return (
+            row._prefCode === pref ||
+            (!row.areaId && row.name === pref) ||
+            row.areaId === pref ||
+            (row.areaId && typeof row.areaId === 'string' && row.areaId.startsWith(pref + '_'))
+        );
+    });
+
     targetRows.forEach(row => {
         row.squareX = null;
         row.squareY = null;
     });
-    // ==========================================
-    // 県本体(main)の抽出
-    // ==========================================
+
     targetRows.forEach(row => {
-        if (
-            (!row.areaId ||
-                row.individualId === 'parent') &&
-            row.name === pref
-        ) {
+        if ((!row.areaId || row.individualId === 'parent') && row.name === pref) {
             main = row;
         }
     });
-    // ==========================================
-    // エリア(areas)の抽出
-    // ==========================================
+
     targetRows.forEach(row => {
-        if (
-            (row.areaId || '').trim() === pref
-        ) {
-            if (
-                row.url &&
-                row.url.includes('x:') &&
-                row.url.includes('y:')
-            ) {
-
-                const grid =
-                    parseGrid(row.url);
-
-                row.squareX =
-                    grid.x;
-
-                row.squareY =
-                    grid.y;
+        if ((row.areaId || '').trim() === pref) {
+            if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
+                const grid = parseGrid(row.url);
+                row.squareX = grid.x;
+                row.squareY = grid.y;
             }
             areas.push(row);
         }
     });
-// ==========================================
-// スポット(spots)の抽出
-// ==========================================
-targetRows.forEach(row => {
-    // pref や area などの親データは除外
-    if (row.type === 'pref' || row.type === 'area') return;
 
-    const icon = row.icon;
+    targetRows.forEach(row => {
+        if (row.type === 'pref' || row.type === 'area') return;
+        const icon = row.icon;
+        if (icon && icon.trim() !== '') {
+            spots.push(row);
+        }
+    });
 
-    // iconが入っているものを全てスポットとして抽出
-    if (icon && icon.trim() !== '') {
-        spots.push(row);
+    if (window.fishDataCache[pref]) {
+        applyFishDataToSpots(spots, window.fishDataCache[pref]);
     }
-});
-    // ==========================================
-    // ★ 魚データをスポットへ付与
-    // ==========================================
-    applyFishDataToSpots(
-        spots,
-        fishData
-    );
-    // ==========================================
-    // グローバル変数へ代入
-    // ==========================================
+
     window.prefData = main;
     window.areaData = areas;
     window.spotData = spots;
     window.prefBounds = null;
+
     if (spots.length > 0 && typeof L !== 'undefined') {
         let minLat = Infinity, maxLat = -Infinity;
         let minLng = Infinity, maxLng = -Infinity;
@@ -242,7 +174,6 @@ targetRows.forEach(row => {
                 maxLng = Math.max(maxLng, lng);
             }
         });
-        // 画面端のスポットも確実に入るように10%（0.1）の余白をつける
         const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.05);
         const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.05);
         window.prefBounds = L.latLngBounds(
@@ -251,88 +182,107 @@ targetRows.forEach(row => {
         );
     }
 
-    // ==========================================
-    // キャッシュ用変数へ保存
-    // ==========================================
     window[`${pref}_prefData`] = main;
     window[`${pref}_areaData`] = areas;
     window[`${pref}_spotData`] = spots;
-    
-    // 👇【ここに追加】計算したBoundsを次回のためにキャッシュしておく
-    window[`${pref}_prefBounds`] = window.prefBounds; 
+    window[`${pref}_prefBounds`] = window.prefBounds;
 
-
-
-
-    // ==========================================
-    // エリアグラフの構築
-    // ==========================================
-    if (
-        typeof buildAreaGraphFromGrid === 'function'
-    ) {
-
-        buildAreaGraphFromGrid(
-            areas
-        );
-
-        window[`${pref}_areaGraph`] =
-            window.areaGraph;
+    if (typeof buildAreaGraphFromGrid === 'function') {
+        buildAreaGraphFromGrid(areas);
+        window[`${pref}_areaGraph`] = window.areaGraph;
     }
 
+    if (typeof buildSeoHtmlString === 'function') {
+        const seoHtml = buildSeoHtmlString(main, areas, spots);
+        window[`${pref}_seoHtml`] = seoHtml;
 
-    // ==========================================
-    // SEO用HTML
-    // ==========================================
-    if (
-        typeof buildSeoHtmlString === 'function'
-    ) {
-
-        const seoHtml =
-            buildSeoHtmlString(
-                main,
-                areas,
-                spots
-            );
-
-
-        window[`${pref}_seoHtml`] =
-            seoHtml;
-
-
-        const container =
-            document.getElementById(
-                'seo-link-container'
-            );
-
-        const titleSpan =
-            document.getElementById(
-                'seo-list-title'
-            );
-
-
-        if (
-            container &&
-            titleSpan &&
-            main
-        ) {
-
-            titleSpan.textContent =
-                `${main.notes}の釣りスポット一覧を見る`;
-
-            container.innerHTML =
-                seoHtml;
+        const container = document.getElementById('seo-link-container');
+        const titleSpan = document.getElementById('seo-list-title');
+        if (container && titleSpan && main) {
+            titleSpan.textContent = `${main.notes}の釣りスポット一覧を見る`;
+            container.innerHTML = seoHtml;
         }
     }
 
+    return { main, areas, spots };
+}
 
-    // ==========================================
-    // 完了
-    // ==========================================
-    return {
-        main,
-        areas,
-        spots
-    };
+function drawLocation(name, lat, lng, zoom, options = {}) {
+
+  const defaultOptions = {
+    center: [lat, lng],
+    zoom,
+    zoomControl: false,
+    scrollWheelZoom: false,
+    dragging: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    keyboard: false,
+    touchZoom: false,
+  };
+
+  const mapOptions = { ...defaultOptions, ...options };
+
+  if (!window.map) {
+
+    window.map = L.map('lf-map', mapOptions);
+
+    window.map.options.zoomSnap = 0.5;
+    window.map.options.zoomDelta = 0.5;
+    window.map.attributionControl.setPosition('topright');
+
+    window.phase1Group = L.layerGroup().addTo(window.map);
+    window.phase2Group = L.layerGroup().addTo(window.map);
+
+    // ★ keepBufferを 8 → 2 に変更し、画面内のタイル読み込みに通信帯域を集中させる
+    window.gsiLayer = L.tileLayer(
+      window.gsiLayers.ort,
+      {
+        attribution: '© 国土地理院',
+        keepBuffer: 2
+      }
+    ).addTo(window.map);
+
+    // ★ 等深線レイヤー(5ファイル)は、ベースタイルの初回読み込み完了後（または800ms後）に遅延実行
+    if (typeof DepthMapController !== 'undefined') {
+        let depthStarted = false;
+        const startDepth = () => {
+            if (depthStarted) return;
+            depthStarted = true;
+            DepthMapController.initAndShow(window.map);
+        };
+        window.gsiLayer.once('load', startDepth);
+        setTimeout(startDepth, 800);
+    }
+
+    return;
+  }
+
+  window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
+
+  mapOptions.scrollWheelZoom
+    ? window.map.scrollWheelZoom.enable()
+    : window.map.scrollWheelZoom.disable();
+
+  mapOptions.dragging
+    ? window.map.dragging.enable()
+    : window.map.dragging.disable();
+
+  mapOptions.doubleClickZoom
+    ? window.map.doubleClickZoom.enable()
+    : window.map.doubleClickZoom.disable();
+
+  mapOptions.boxZoom
+    ? window.map.boxZoom.enable()
+    : window.map.boxZoom.disable();
+
+  mapOptions.keyboard
+    ? window.map.keyboard.enable()
+    : window.map.keyboard.disable();
+
+  mapOptions.touchZoom
+    ? window.map.touchZoom.enable()
+    : window.map.touchZoom.disable();
 }
 
 function applyFishDataToSpots(spots, fishData) {
@@ -554,80 +504,6 @@ function disableAreaSwipe() {
 
     window._areaSwipeEnabled = false;
 }
-
-function drawLocation(name, lat, lng, zoom, options = {}) {
-
-  const defaultOptions = {
-    center: [lat, lng],
-    zoom,
-    zoomControl: false,
-    scrollWheelZoom: false,
-    dragging: false,
-    doubleClickZoom: false,
-    boxZoom: false,
-    keyboard: false,
-    touchZoom: false,
-  };
-
-  const mapOptions = { ...defaultOptions, ...options };
-
-  if (!window.map) {
-
-    window.map = L.map('lf-map', mapOptions);
-
-    window.map.options.zoomSnap = 0.5;
-    window.map.options.zoomDelta = 0.5;
-    window.map.attributionControl.setPosition('topright');
-
-    window.phase1Group = L.layerGroup().addTo(map);
-    window.phase2Group = L.layerGroup().addTo(map);
-
-    window.gsiLayer = L.tileLayer(
-      window.gsiLayers.ort,
-      {
-        attribution: '© 国土地理院',
-        keepBuffer: 8
-      }
-    ).addTo(window.map);
-
-    // 👇 【ここに追加】 マップが生成された瞬間に等深線レイヤーをセットして常に表示する
-    if (typeof DepthMapController !== 'undefined') {
-        DepthMapController.initAndShow(window.map);
-    }
-
-    if (window.currentAreaId === null) {
-    
-    }
-    return;
-  }
-
-  window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-
-  mapOptions.scrollWheelZoom
-    ? window.map.scrollWheelZoom.enable()
-    : window.map.scrollWheelZoom.disable();
-
-  mapOptions.dragging
-    ? window.map.dragging.enable()
-    : window.map.dragging.disable();
-
-  mapOptions.doubleClickZoom
-    ? window.map.doubleClickZoom.enable()
-    : window.map.doubleClickZoom.disable();
-
-  mapOptions.boxZoom
-    ? window.map.boxZoom.enable()
-    : window.map.boxZoom.disable();
-
-  mapOptions.keyboard
-    ? window.map.keyboard.enable()
-    : window.map.keyboard.disable();
-
-  mapOptions.touchZoom
-    ? window.map.touchZoom.enable()
-    : window.map.touchZoom.disable();
-}
-
 
 function prefetchAround(area) {
 
