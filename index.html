@@ -28,6 +28,12 @@
 
   <!-- favicon（まだ無いなら仮でもOK） -->
 <link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
+<!-- ★追加：タイルサーバーへの事前接続＆Region CSVの最優先プリロード -->
+<link rel="preconnect" href="https://cyberjapandata.gsi.go.jp" crossorigin>
+<link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
+<link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+
 <link rel="stylesheet" href="/css/main.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3144580987453028"
@@ -1061,195 +1067,112 @@ function handleRegionNearest(latlng) {
         `${nearest.regionCode}_${nearest.prefCode}`
     );
 }
-// ================================
-// ■ 初期画面のRegionマップ読み込み（ニアレスト機能版）
-// ================================
-let isRegionLoaded = false;
-function loadRegionMap() {
+// ==========================================
+// ★ 新設：指定した1県だけのlocation.jsonを最速で取得する関数
+// ==========================================
+window._loadedPrefSet = window._loadedPrefSet || new Set();
+
+async function fetchSinglePrefSpots(prefCode) {
+    if (!prefCode) return [];
+    if (window._loadedPrefSet.has(prefCode) && window.allspotData) {
+        return window.allspotData;
+    }
+
     const regionCode = window.currentRegion || 'KANTO';
+    const url = `/${regionCode}/${prefCode}_location.json`;
 
-    // 1. マップのリセット
-    if (window.map) {
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
-        window.map.setMaxBounds(null);
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-        window.map.stop();
-        
-        // 念のためエリア用のニアレスト機能が残っていれば外す
-        if (window.nearestClickHandler) {
-            window.map.off('click', window.nearestClickHandler);
-            window.nearestClickEnabled = false;
+    try {
+        const res = await fetch(url);
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (Array.isArray(data)) {
+            data.forEach(s => s._prefCode = prefCode);
+            window.allspotData = (window.allspotData || []).concat(data);
+            window.ALL_REGION_SPOTS = window.allspotData;
+            window._loadedPrefSet.add(prefCode);
         }
+        return window.allspotData;
+    } catch (e) {
+        console.error("単一県JSON取得エラー:", e);
+        return [];
     }
-
-    if (window.regionData) {
-        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
-    }
-
-    // すでにロード済みの場合（戻るボタン等での再描画）
-    if (isRegionLoaded && window.regionPrefData && window.regionPrefData.length > 0) {
-        const titleSpan = document.getElementById('seo-list-title');
-        const linkContainer = document.getElementById('seo-link-container');
-        if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
-        if (linkContainer && window.regionSeoHtml) linkContainer.innerHTML = window.regionSeoHtml;
-        
-        if (typeof showAllRegionSpots === 'function') {
-            showAllRegionSpots();
-        }
-
-        // ★ 再表示の際にもRegion用のニアレストクリックを再登録
-        if (window.map && window.regionNearestClickHandler) {
-            window.map.off('click', window.regionNearestClickHandler);
-            window.map.on('click', window.regionNearestClickHandler);
-        }
-
-        // 👇追加: 戻るボタン等で広域マップに戻ったときにも確実に道路レイヤーを表示
-        if (typeof showRoadLayers === 'function') showRoadLayers();
-
-        return;
-    }
-
-    return fetch(window.regionUrl) 
-        .then(res => {
-            if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
-            return res.text();
-        })
-        .then(text => {
-            const lines = text.trim().split('\n');
-            if (lines.length < 2) return;
-
-            const headers = lines[0].split(',').map(h => h.trim());
-            const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
-            const latIdx   = headers.findIndex(h => h.toLowerCase() === 'lat');
-            const lngIdx   = headers.findIndex(h => h.toLowerCase() === 'lng');
-            const zoomIdx  = headers.findIndex(h => h.toLowerCase() === 'zoom');
-            const nameIdx  = headers.findIndex(h => h.toLowerCase() === 'name');
-            const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
-            const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
-
-            if (typeIdx === -1) return;
-
-            // ★ 県テキストマーカーの代わりにデータを保持する配列を用意
-            window.regionPrefData = [];
-            let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
-            let isMapDrawn = false;
-
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i]) continue;
-                const cols = lines[i].split(',').map(c => c.trim());
-                const type = cols[typeIdx];
-
-                if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
-                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
-                    const lat = parseFloat(cols[latIdx]);
-                    const lng = parseFloat(cols[lngIdx]);
-                    const zoom = parseFloat(cols[zoomIdx]);
-                    window.regionData = { name, lat, lng, zoom };
-                    drawLocation(name, lat, lng, zoom);
-                    isMapDrawn = true;
-                }
-
-                if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
-                    const urlVal = cols[urlIdx];
-                    const prefName = cols[notesIdx];
-                    if (!urlVal) continue;
-
-                    const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
-                    const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
-                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
-
-                    const parts = urlVal.split('/');
-                    let prefCode = '';
-                    let lat, lng;
-                    
-                    if (parts.length >= 4) {
-                        prefCode = parts[1].split('_')[0]; 
-                        lat = parseFloat(parts[2]);
-                        lng = parseFloat(parts[3]);
-                    } else if (parts.length === 3) {
-                        prefCode = parts[0].split('_')[0]; 
-                        lat = parseFloat(parts[1]);
-                        lng = parseFloat(parts[2]);
-                    } else continue;
-
-                    if (isNaN(lat) || isNaN(lng)) continue;
-
-                    if (typeof preloadCsvFiles === 'function') {
-    setTimeout(() => preloadCsvFiles(regionCode, prefCode), 3000);
 }
 
-                    // ★ テキストマーカーを描画せず、裏のデータベースとして座標を登録
-                    window.regionPrefData.push({
-                        regionCode: regionCode,
-                        prefCode: prefCode,
-                        prefName: prefName,
-                        lat: lat,
-                        lng: lng
-                    });
+// =====================================================
+// ■ 全県データをバックグラウンドで取得・合体する金庫生成関数
+//   （既に単一県ロード済みの県はスキップして差分だけ取得）
+// =====================================================
+window._isAllRegionLoaded = false;
+window._allRegionSpotsPromise = null;
+
+async function fetchAllRegionSpots() {
+    if (window._isAllRegionLoaded && window.allspotData && window.allspotData.length > 0) {
+        return window.allspotData;
+    }
+    if (window._allRegionSpotsPromise) {
+        return window._allRegionSpotsPromise;
+    }
+
+    window._allRegionSpotsPromise = (async () => {
+        window.allspotData = window.allspotData || [];
+        try {
+            const regionCode = window.currentRegion || 'KANTO';
+            const text = await fetchRegionCsvText();
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const typeIdx = headers.indexOf('type');
+            const urlIdx = headers.indexOf('url');
+            
+            if (typeIdx === -1 || urlIdx === -1) return window.allspotData;
+
+            const prefList = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.trim());
+                if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
+                    const urlVal = cols[urlIdx];
+                    const prefCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
+                    if (prefCode && !window._loadedPrefSet.has(prefCode)) {
+                        prefList.push(prefCode);
+                    }
                 }
             }
             
-            regionHtml += '</ul>';
-            const regionTitle = (window.regionData ? window.regionData.name : '関東地方') + 'の釣りエリア一覧';
-            window.regionSeoHtml = regionHtml;
-            window.regionSeoTitle = regionTitle;
-
-            const titleSpan = document.getElementById('seo-list-title');
-            const linkContainer = document.getElementById('seo-link-container');
-            if (titleSpan) titleSpan.textContent = regionTitle;
-            if (linkContainer) linkContainer.innerHTML = regionHtml;
-
-            // 全県マスターデータを読み込んでドットを描画
-            showAllRegionSpots();
-
-            // 👇追加: 初回アクセス（広域画面）時に確実に道路レイヤーを表示
-            if (typeof showRoadLayers === 'function') showRoadLayers();
-
-            // ==========================================
-            // ★ Region画面専用のニアレスト機能（最も近い県を判定）
-            // ==========================================
-            window.regionNearestClickHandler = function(e) {
-                handleRegionNearest(e.latlng);
-            };
-
-            // マップにニアレスト機能をバインド
-            if (window.map) {
-                window.map.off('click', window.regionNearestClickHandler); // 念のため解除
-                window.map.on('click', window.regionNearestClickHandler);
-            }
-
-            isRegionLoaded = true;
-        })
-        .catch(err => {
-            console.error("Regionマップの初期化エラー:", err);
-        });
-}
-// ==========================================
-// ★ 新設：Region CSVを1回だけ取得して使い回すキャッシュ関数
-// ==========================================
-window._regionCsvTextPromise = null;
-function fetchRegionCsvText() {
-    if (!window._regionCsvTextPromise) {
-        const regionCode = window.currentRegion || 'KANTO';
-        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
-        window._regionCsvTextPromise = fetch(rUrl)
-            .then(res => {
-                if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
-                return res.text();
-            })
-            .catch(err => {
-                window._regionCsvTextPromise = null;
-                throw err;
+            const fetchPromises = prefList.map(prefCode => {
+                const url = `/${regionCode}/${prefCode}_location.json`;
+                return fetch(url)
+                    .then(r => r.ok ? r.json() : [])
+                    .then(data => {
+                        if (Array.isArray(data)) {
+                            data.forEach(s => s._prefCode = prefCode);
+                            window._loadedPrefSet.add(prefCode);
+                        }
+                        return data;
+                    })
+                    .catch(() => []);
             });
-    }
-    return window._regionCsvTextPromise;
+            
+            const results = await Promise.all(fetchPromises);
+            results.forEach(prefData => {
+                if (Array.isArray(prefData)) {
+                    window.allspotData = window.allspotData.concat(prefData);
+                }
+            });
+            
+            window.ALL_REGION_SPOTS = window.allspotData;
+            window._isAllRegionLoaded = true;
+            return window.allspotData;
+        } catch (err) {
+            console.error("全県データ結合エラー:", err);
+            window._allRegionSpotsPromise = null;
+            return window.allspotData;
+        }
+    })();
+
+    return window._allRegionSpotsPromise;
 }
+
 // ==========================================
-// ★ URLクエリから直接システム変数をセットする関数（茨城県栃木県・部分一致対応版）
+// ★ URLクエリから直接システム変数をセットする関数（単一県高速逆引き版）
 // ==========================================
 async function applyQueryToStateFromCsv() {
     const params = new URLSearchParams(window.location.search);
@@ -1259,13 +1182,10 @@ async function applyQueryToStateFromCsv() {
 
     if (!qPref) return;
 
-    // 1. Region CSVの探索 (完全一致だけでなく「茨城県 ⇔ 茨城県栃木県」の部分一致も許容)
+    // 1. Region CSVから県コード(currentPref)を特定
     if (window.regionUrl) {
         try {
-            const text = typeof fetchRegionCsvText === 'function'
-                ? await fetchRegionCsvText()
-                : await fetch(window.regionUrl).then(r => r.ok ? r.text() : '');
-
+            const text = await fetchRegionCsvText();
             const lines = text.trim().split('\n');
             if (lines.length > 0) {
                 const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
@@ -1279,11 +1199,8 @@ async function applyQueryToStateFromCsv() {
                         const csvNote = cols[notesIdx] || '';
                         const csvName = nameIdx !== -1 ? cols[nameIdx] : '';
                         const urlVal  = cols[urlIdx] || '';
-
-                        // url列から確実な県コード(IBARAKI等)も抽出しておく
                         const extractedCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0]?.split('_')[0] || csvName;
 
-                        // ★ 完全一致、または双方向の部分一致（"茨城県" と "茨城県栃木県"）でヒットさせる
                         if (
                             csvNote && (
                                 csvNote === qPref ||
@@ -1305,26 +1222,15 @@ async function applyQueryToStateFromCsv() {
         }
     }
 
-    // 2. 金庫データの準備（まだ無ければ取得）
-    let vaultData = window.allspotData || window.ALL_REGION_SPOTS;
-    if (!vaultData || vaultData.length === 0) {
-        if (typeof fetchAllRegionSpots === 'function') {
-            vaultData = await fetchAllRegionSpots();
-        }
-    }
-
-    if (!vaultData || vaultData.length === 0) return;
-
-    // ★ フォールバック：CSV側で万が一見つからなかった場合も、JSONの親データ(parent)のnotesから逆引きする
-    if (!window.currentPref) {
+    // 2. ★全県ではなく「対象の1県だけ」のJSONを即座に取得！
+    let vaultData = [];
+    if (window.currentPref) {
+        vaultData = await fetchSinglePrefSpots(window.currentPref);
+    } else {
+        vaultData = await fetchAllRegionSpots();
         const parentRow = vaultData.find(r =>
             r.individualId === 'parent' &&
-            r.notes && (
-                r.notes === qPref ||
-                r.notes.includes(qPref) ||
-                qPref.includes(r.notes) ||
-                r.name === qPref
-            )
+            r.notes && (r.notes === qPref || r.notes.includes(qPref) || qPref.includes(r.notes) || r.name === qPref)
         );
         if (parentRow) {
             window.currentPref = parentRow.name;
@@ -1332,7 +1238,9 @@ async function applyQueryToStateFromCsv() {
         }
     }
 
-    // 3. エリア・スポットのID特定（★対象県のデータだけに絞って他県の同名スポット上書きを防止）
+    if (!vaultData || vaultData.length === 0) return;
+
+    // 3. 対象県のデータ内からエリア・スポットIDを特定
     if (qArea || qSpot) {
         const prefRows = window.currentPref
             ? vaultData.filter(r => r._prefCode === window.currentPref || (r.areaId && String(r.areaId).startsWith(window.currentPref)))
@@ -1345,7 +1253,6 @@ async function applyQueryToStateFromCsv() {
             }
             if (qSpot && rowName === qSpot && row.type !== 'pref' && row.type !== 'area') {
                 window.currentSpotId = row.individualId;
-                // areaクエリが省略されていた場合でもスポットからareaIdを自動補完
                 if (!qArea && row.areaId) {
                     window.currentAreaId = row.areaId;
                 }
@@ -1354,70 +1261,273 @@ async function applyQueryToStateFromCsv() {
     }
 }
 
-// =====================================================
-// ■ 1. 全県データをバックグラウンドで取得・合体する金庫生成関数（重複起動防止付き）
-// =====================================================
-window._allRegionSpotsPromise = null;
-async function fetchAllRegionSpots() {
-    if (window.allspotData && window.allspotData.length > 0) {
-        return window.allspotData;
-    }
-    if (window._allRegionSpotsPromise) {
-        return window._allRegionSpotsPromise;
+// ==========================================
+// ★ ページ初期ロード時のメインフロー（単一県先行＆タイル完全最優先版）
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (!params.get('region') && !params.get('pref')) {
+        setIdealQuery('region', '関東地方');
     }
 
-    window._allRegionSpotsPromise = (async () => {
-        window.allspotData = [];
-        try {
-            const regionCode = window.currentRegion || 'KANTO';
-            const text = await fetchRegionCsvText();
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-            const typeIdx = headers.indexOf('type');
-            const urlIdx = headers.indexOf('url');
-            
-            if (typeIdx === -1 || urlIdx === -1) return [];
+    window.currentRegion = getRegionCode();
+    window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
 
-            const prefList = [];
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',').map(c => c.trim());
-                if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
-                    const urlVal = cols[urlIdx];
-                    const prefCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
-                    if (prefCode) prefList.push(prefCode);
-                }
-            }
-            
-            const fetchPromises = prefList.map(prefCode => {
-                const url = `/${regionCode}/${prefCode}_location.json`;
-                return fetch(url)
-                    .then(r => r.ok ? r.json() : [])
-                    .then(data => {
-                        if (Array.isArray(data)) {
-                            data.forEach(s => s._prefCode = prefCode);
-                        }
-                        return data;
-                    })
-                    .catch(() => []);
-            });
-            
-            const results = await Promise.all(fetchPromises);
-            results.forEach(prefData => {
-                if (Array.isArray(prefData)) {
-                    window.allspotData = window.allspotData.concat(prefData);
-                }
-            });
-            
-            window.ALL_REGION_SPOTS = window.allspotData;
-            return window.allspotData;
-        } catch (err) {
-            console.error("全県データ結合エラー:", err);
-            window._allRegionSpotsPromise = null;
-            return [];
+    // 1. Region CSVと対象1県のJSONだけを取得して現在位置を確定
+    await applyQueryToStateFromCsv();
+
+    // 2. ★ 最優先でマップ（タイル）を描画！
+    if (typeof routeUpdate === 'function') {
+        await routeUpdate();
+    }
+
+    // 3. ★ ベースタイルの読み込み完了後に、残りの全県データ・ICデータ・記事一覧を裏で取得
+    window.runAfterTileLoad(() => {
+        if (typeof loadICData === 'function') loadICData();
+        if (typeof loadAndRenderCategorizedArticles === 'function') {
+            loadAndRenderCategorizedArticles('article-list-container');
         }
-    })();
+        // 他県のドットマーカーデータを裏で揃えてマップに追加
+        fetchAllRegionSpots().then(() => {
+            if (window.currentPref && !window.currentSpotId && typeof showPrefSpots === 'function') {
+                window.regionSpotMarkers = []; // 全県分で再構築
+                showPrefSpots();
+            }
+        });
+    }, 600);
+});
 
-    return window._allRegionSpotsPromise;
+// ==========================================
+// ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数（一発表示版）
+// ==========================================
+async function routeUpdate() {
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return; 
+
+    if (!window.currentPref) {
+        const btn = document.getElementById('map-back-btn');
+        if (btn) btn.style.display = 'none';
+        if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
+        window.runAfterTileLoad(() => {
+            fetchAllRegionSpots().then(() => {
+                if (typeof renderSpotRanking === 'function') renderSpotRanking();
+            });
+        }, 800);
+        return;
+    }
+
+    // ─── スポット階層への直リンク復元（★3段階移動を廃止し、一発でスポットを描画） ───
+    if (window.currentSpotId) {
+        const spotId = String(window.currentSpotId).split("_");
+        const safeAreaId = window.currentAreaId || ""; 
+        
+        const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
+        const targetIndivId = spotId[2] || spotId[0]; 
+        const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+        
+        if (spot) {
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+            if (parentArea) setIdealQuery('area', parentArea.name);
+            setIdealQuery('spot', spot.name);
+            window._selectSpotCompleted = true;
+
+            // パターン1：詳細ズームがある通常スポット（最初から目的のタイルとズームで一発生成！）
+            if (spot.zoom && spot.zoom !== '') {
+                const typeParts = (spot.type || '').split('$');
+                const isSpecial = typeParts.includes('special');
+                const targetZoom = isSpecial ? 14 : (spot.zoom < 14 ? 14 : spot.zoom);
+
+                let tileUrl = window.TILE_URLS.photo;
+                if (typeParts.includes('ort')) tileUrl = window.TILE_URLS.ort;
+                else if (typeParts.includes('airphoto')) tileUrl = window.TILE_URLS.airphoto;
+                else if (typeParts.includes('rinya')) tileUrl = window.TILE_URLS.rinya;
+
+                window.currentSpotBaseTile = tileUrl;
+
+                // ★ 1回目のdrawLocationでいきなりスポットの座標・ズーム・写真タイルを描画！
+                drawLocation(spot.name, spot.lat, spot.lng, targetZoom, {
+                    dragging: true,
+                    scrollWheelZoom: true,
+                    doubleClickZoom: true,
+                    touchZoom: true
+                }, tileUrl);
+
+                window.map.getContainer().classList.add('is-spot-mode');
+                const el = document.getElementById("nearest-spot");
+                if (el) el.textContent = spot.name || '';
+
+                // タイルリクエスト送出直後にUI・マーカー・範囲制限をセット
+                requestAnimationFrame(() => {
+                    if (typeof renderAccessInfo === 'function') renderAccessInfo(spot);
+                    if (typeof showFishMarkers === 'function') showFishMarkers(spot.URL);
+                    if (spot.whether && typeof createWeekItem === 'function') createWeekItem(spot.whether);
+                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                    if (parentArea && typeof openArea === 'function') openArea(parentArea.individualId);
+
+                    window.map.setMaxZoom(18);
+                    let bounds = window.map.getBounds();
+                    let zoomLimit = (isSpecial || spot.zoom < 14) ? 14 : spot.zoom;
+                    if (isSpecial || spot.zoom < 14) {
+                        bounds = bounds.pad(14 - spot.zoom);
+                    }
+                    if (spot.URL && typeof spot.URL === 'string' && spot.URL.trim() !== '') {
+                        spot.URL.split(',').forEach(item => {
+                            const parts = item.split('|');
+                            const fLat = parseFloat(parts[1]), fLng = parseFloat(parts[2]);
+                            if (!isNaN(fLat) && !isNaN(fLng)) bounds.extend([fLat, fLng]);
+                        });
+                    }
+                    bounds = bounds.pad(0.05);
+                    window.map.setMaxBounds(bounds);
+                    window.map.options.maxBoundsViscosity = 1.0;
+                    window._zoomGuardBase = zoomLimit;
+                    window._zoomGuardActive = true;
+                    window.map.setMinZoom(zoomLimit);
+                    window.goBackGuard = false;
+                });
+            }
+            // パターン2：zoom値がない管理釣り場等のスポット（最初からzoom 13で生成してポップアップ表示）
+            else {
+                drawLocation(spot.name, spot.lat, spot.lng, 13);
+                window.map.getContainer().classList.add('is-spot-mode');
+                requestAnimationFrame(() => {
+                    if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
+                    if (typeof phase1menu === 'function') phase1menu(safeAreaId);
+                    if (window.markerControl && typeof window.markerControl.showShop02 === 'function') {
+                        window.markerControl.showShop02(safeAreaId);
+                    }
+                    if (typeof enableDragForArea === 'function') enableDragForArea();
+                    if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                    if (parentArea && typeof openArea === 'function') openArea(parentArea.individualId);
+                    if (typeof showFishPopup === 'function') showFishPopup(spot);
+                });
+            }
+
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                const tileWrap = document.getElementById('tile-btn-wrap'); 
+                const tileBtn = document.getElementById('map-tile-btn'); 
+                if (btn) {
+                    btn.style.display = 'block';
+                    if (tileWrap) tileWrap.style.display = 'flex'; 
+                    if (tileBtn) tileBtn.style.display = 'block'; 
+                    requestAnimationFrame(() => { 
+                        btn.style.opacity = '1'; 
+                        if (tileBtn) tileBtn.style.opacity = '1'; 
+                    });
+                }
+            });
+        }
+        return;
+    }
+
+    // ─── エリア階層への直リンク復元 ───
+    if (window.currentAreaId) {
+        const safeAreaId = window.currentAreaId || ""; 
+        const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+        if (!area) return;
+        
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', area.name); 
+        setIdealQuery('spot', null);      
+
+        const safeZoom = area.zoom || window.prefData.zoom;
+        // ★ 真っ先にエリアのタイルを描画開始
+        if (typeof drawLocation === 'function') drawLocation(area.name, area.lat, area.lng, safeZoom);
+        
+        requestAnimationFrame(() => {
+            if (typeof renderAreaGuide === 'function') renderAreaGuide();
+            if (typeof selectArea === 'function') selectArea(area);
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.display = 'block';
+                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+            }
+        });
+
+        // 道路と雨雲はベースタイルの後に実行
+        window.runAfterTileLoad(() => {
+            if (typeof showRoadLayers === 'function') showRoadLayers();
+            if (typeof renderCrowdImage === 'function') renderCrowdImage();
+            if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        }, 500);
+        return;
+    }
+
+    // ─── 県階層への直リンク復元 ───
+    if (window.prefData) {
+        setIdealQuery('pref', window.prefData.notes); 
+        setIdealQuery('area', null);                 
+        setIdealQuery('spot', null);                 
+
+        const targetZoom = window.prefData.zoom;
+        const isMapJustCreated = !window.map;
+        const center = window.map ? window.map.getCenter() : null;
+        const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                          window.map.getZoom() === targetZoom);
+
+        // ★ 真っ先に県のタイルを描画開始
+        if (typeof drawLocation === 'function') drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        
+        const finalizePref = () => {
+            if (window.map) window.map.invalidateSize(true);
+            
+            requestAnimationFrame(() => {
+                if (typeof showPrefSpots === 'function') showPrefSpots();
+                if (typeof initAreaUI === 'function') initAreaUI();
+                if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                if (typeof renderAreaGuide === 'function') renderAreaGuide();
+
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                }
+                window.goBackGuard = false; 
+
+                // ★ 重い道路・雨雲・ランキングはタイル完了後に描画
+                window.runAfterTileLoad(() => {
+                    if (typeof showRoadLayers === 'function') showRoadLayers();
+                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                    if (typeof renderSpotRanking === 'function') renderSpotRanking();
+                }, 500);
+            });
+        };
+
+        if (isSameLoc) {
+            finalizePref();
+        } else {
+            if (window.map) window.map.once('moveend', finalizePref);
+        }
+    }
+}
+
+// ==========================================
+// ★ 新設：Region CSVを1回だけ取得して使い回すキャッシュ関数
+// ==========================================
+window._regionCsvTextPromise = null;
+function fetchRegionCsvText() {
+    if (!window._regionCsvTextPromise) {
+        const regionCode = window.currentRegion || 'KANTO';
+        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
+        window._regionCsvTextPromise = fetch(rUrl)
+            .then(res => {
+                if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
+                return res.text();
+            })
+            .catch(err => {
+                window._regionCsvTextPromise = null;
+                throw err;
+            });
+    }
+    return window._regionCsvTextPromise;
 }
 
 // ==========================================
@@ -3579,218 +3689,7 @@ function disablePrefSwipe() {
     el.removeEventListener('touchend', window._prefSwipeEnd);
     window._prefSwipeEnabled = false;
 }
-// ==========================================
-// ★ ページ初期ロード時のメインフロー（タイル最優先版）
-// ==========================================
-document.addEventListener('DOMContentLoaded', async () => {
 
-    const params = new URLSearchParams(window.location.search);
-
-    if (!params.get('region') && !params.get('pref')) {
-        setIdealQuery('region', '関東地方');
-    }
-
-    window.currentRegion = getRegionCode();
-    window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
-
-    // 1. まず軽量なRegion CSVから現在位置クエリを解析
-    await applyQueryToStateFromCsv();
-
-    // 2. 県指定がある場合は、座標特定のためにprefJSON(allspotData)を準備
-    if (window.currentPref) {
-        await fetchAllRegionSpots();
-    }
-
-    // 3. ★ 最優先でマップ（タイル）とマーカーを描画！
-    if (typeof routeUpdate === 'function') {
-        await routeUpdate();
-    }
-
-    // 4. ★ タイル描画が動き出した後に、優先度の低いデータ（IC・記事一覧）を裏で読み込む
-    setTimeout(() => {
-        if (typeof loadICData === 'function') loadICData();
-        if (typeof loadAndRenderCategorizedArticles === 'function') {
-            loadAndRenderCategorizedArticles('article-list-container');
-        }
-    }, 300);
-});
-// ==========================================
-// ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数（元の正常動作版）
-// ==========================================
-async function routeUpdate() {
-    const isReady = await checkAndLoadRouteData();
-    if (!isReady) return; 
-
-    if (!window.currentPref) {
-        const btn = document.getElementById('map-back-btn');
-        if (btn) btn.style.display = 'none';
-        if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
-        if (typeof renderSpotRanking === 'function') renderSpotRanking();
-        return;
-    }
-
-    // ─── スポット階層への直リンク復元 ───
-    if (window.currentSpotId) {
-        const spotId = String(window.currentSpotId).split("_");
-        const safeAreaId = window.currentAreaId || ""; 
-        
-        if (typeof prepareFishForArea === 'function') await prepareFishForArea(safeAreaId);
-        
-        const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
-        const targetIndivId = spotId[2] || spotId[0]; 
-        const spot = list.find(s => String(s.individualId) === String(targetIndivId));
-        
-        if (spot) {
-            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-            const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
-            
-            if (parentArea) {
-                setIdealQuery('area', parentArea.name);
-
-                // ★ 1回目のdrawLocationで確実にwindow.mapを生成する
-                if (typeof drawLocation === 'function') {
-                    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-                }
-
-                if (window.map) {
-                    window.map.options.maxBoundsViscosity = 0;
-                    window.map.setMaxBounds(null);
-                }
-                
-                if (typeof prefetchAround === 'function') prefetchAround(parentArea);
-                if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
-                if (typeof phase1menu === 'function') phase1menu(safeAreaId);
-                if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
-                    window.markerControl.showShop01(safeAreaId);
-                }
-                
-                if (typeof renderAreaGuide === 'function') renderAreaGuide();
-                if (typeof renderSpotRanking === 'function') renderSpotRanking();
-                if (typeof openArea === 'function') openArea(parentArea.individualId);
-            }
-            
-            setIdealQuery('spot', spot.name);
-            window._selectSpotCompleted = true;
-
-            // ★ 2回目のdrawLocationでスポットへ移動し、moveendを発火させる
-            if (typeof drawLocation === 'function') {
-                drawLocation(spot.name, spot.lat, spot.lng, 13);
-            }
-            
-            if (window.map) {
-                window.map.once('moveend', () => {
-                    window.map.invalidateSize(true);
-                    if (typeof enableDragForArea === 'function') enableDragForArea();
-                    if (typeof enablePhase2 === 'function') enablePhase2(window.map);
-                    window.map.getContainer().classList.add('is-spot-mode');
-
-                    if (spot.zoom && spot.zoom !== '') {
-                        if (typeof zoomToSpot === 'function') zoomToSpot(spot);
-                    } else {
-                        if (typeof showFishPopup === 'function') showFishPopup(spot);
-                    }
-                });
-            }
-            
-            requestAnimationFrame(() => {
-                const btn = document.getElementById('map-back-btn');
-                const tileWrap = document.getElementById('tile-btn-wrap'); 
-                const tileBtn = document.getElementById('map-tile-btn'); 
-                
-                if (btn) {
-                    btn.style.display = 'block';
-                    if (tileWrap) tileWrap.style.display = 'flex'; 
-                    if (tileBtn) tileBtn.style.display = 'block'; 
-                    
-                    requestAnimationFrame(() => { 
-                        btn.style.opacity = '1'; 
-                        if (tileBtn) tileBtn.style.opacity = '1'; 
-                    });
-                }
-            });
-        }
-        return;
-    }
-
-    // ─── エリア階層への直リンク復元 ───
-    if (window.currentAreaId) {
-        const safeAreaId = window.currentAreaId || ""; 
-        const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
-        if (!area) return;
-        
-        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-        setIdealQuery('area', area.name); 
-        setIdealQuery('spot', null);      
-
-        const safeZoom = area.zoom || window.prefData.zoom;
-        if (typeof drawLocation === 'function') drawLocation(area.name, area.lat, area.lng, safeZoom);
-        
-        if (typeof renderAreaGuide === 'function') renderAreaGuide();
-        if (typeof renderSpotRanking === 'function') renderSpotRanking();
-        if (typeof showRoadLayers === 'function') showRoadLayers();
-
-        if (typeof selectArea === 'function') selectArea(area); 
-        if (typeof renderCrowdImage === 'function') renderCrowdImage();
-        if (typeof showPrefSpots === 'function') showPrefSpots();
-        requestAnimationFrame(() => {
-            const btn = document.getElementById('map-back-btn');
-            if (btn) {
-                btn.style.display = 'block';
-                requestAnimationFrame(() => { btn.style.opacity = '1'; });
-            }
-        });
-        return;
-    }
-
-    // ─── 県階層への直リンク復元 ───
-    if (window.prefData) {
-        setIdealQuery('pref', window.prefData.notes); 
-        setIdealQuery('area', null);                 
-        setIdealQuery('spot', null);                 
-
-        const targetZoom = window.prefData.zoom;
-        const isMapJustCreated = !window.map;
-        const center = window.map ? window.map.getCenter() : null;
-        const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
-                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
-                          window.map.getZoom() === targetZoom);
-
-        if (typeof drawLocation === 'function') drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
-        
-        const finalizePref = () => {
-            if (window.map) window.map.invalidateSize(true);
-            
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    if (typeof showRoadLayers === 'function') showRoadLayers();
-                    if (typeof showPrefSpots === 'function') showPrefSpots();
-                    if (typeof initAreaUI === 'function') initAreaUI();
-                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
-                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
-                    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
-                    if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
-                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
-                    if (typeof renderSpotRanking === 'function') renderSpotRanking();
-
-                    requestAnimationFrame(() => {
-                        const btn = document.getElementById('map-back-btn');
-                        if (btn) {
-                            btn.style.display = 'block';
-                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
-                        }
-                        window.goBackGuard = false; 
-                    });
-                });
-            });
-        };
-
-        if (isSameLoc) {
-            finalizePref();
-        } else {
-            if (window.map) window.map.once('moveend', finalizePref);
-        }
-    }
-}
 // ==========================================
 // ★ 画面に文字を出すデバッグ用関数（スクロール＆コピペ対応版）
 // ==========================================
