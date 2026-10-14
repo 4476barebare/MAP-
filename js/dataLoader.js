@@ -12,6 +12,7 @@ window.currentAreaId = null;
 // ==========================================
 window.fishDataCache = window.fishDataCache || {};
 window.fishDataPromise = null;
+
 function loadFishDataAsync(pref, fishUrl) {
     if (!pref || !fishUrl) return Promise.resolve(null);
 
@@ -32,8 +33,6 @@ function loadFishDataAsync(pref, fishUrl) {
                 }
                 if (window.currentPref === pref && window.spotData) {
                     applyFishDataToSpots(window.spotData, fishData);
-
-                    // ★ 追加：スポット画面を表示中なら魚マーカーと対象魚セクションを即時反映
                     if (window.currentSpotId) {
                         const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                         if (activeSpot && activeSpot.URL) {
@@ -52,9 +51,9 @@ function loadFishDataAsync(pref, fishUrl) {
 
     return window.fishDataPromise;
 }
+
 // ==========================================
-// ★ スポット用データを金庫(allspotData)から即座に読み込む関数
-//   （fish.jsonの通信待ちを排除し、0msで座標を展開）
+// ★ スポット用データを金庫(allspotData)から読み込む関数
 // ==========================================
 async function loadLocationJSON() {
     const pref = window.currentPref;
@@ -69,14 +68,12 @@ async function loadLocationJSON() {
         };
     }
 
-    // ★ 魚データはawaitせず裏側で非同期取得を開始（タイルの読み込みを止めない）
+    // 魚データは裏側で非同期取得（タイル描画を止めない）
     if (window.fishUrl) {
         loadFishDataAsync(pref, window.fishUrl);
     }
 
-    // ==========================================
     // 分岐A：既に県データが生成されている場合
-    // ==========================================
     if (
         window[`${pref}_prefData`] &&
         window[`${pref}_areaData`] &&
@@ -112,9 +109,7 @@ async function loadLocationJSON() {
         };
     }
 
-    // ==========================================
     // 分岐B：金庫(allspotData)から対象県を抽出
-    // ==========================================
     const vaultData = window.allspotData || window.ALL_REGION_SPOTS || [];
     let main = null;
     const areas = [];
@@ -213,24 +208,7 @@ async function loadLocationJSON() {
 
     return { main, areas, spots };
 }
-// ★ ベースタイルの初回ロード完了を待つヘルパー関数
-window.runAfterTileLoad = function(callback, fallbackMs = 600) {
-    if (!window.gsiLayer || window._firstTileLoaded) {
-        requestAnimationFrame(callback);
-        return;
-    }
-    let done = false;
-    const exec = () => {
-        if (done) return;
-        done = true;
-        window._firstTileLoaded = true;
-        callback();
-    };
-    window.gsiLayer.once('load', exec);
-    setTimeout(exec, fallbackMs);
-};
-
-function drawLocation(name, lat, lng, zoom, options = {}, initialTileUrl = null) {
+function drawLocation(name, lat, lng, zoom, options = {}) {
 
   const defaultOptions = {
     center: [lat, lng],
@@ -257,23 +235,24 @@ function drawLocation(name, lat, lng, zoom, options = {}, initialTileUrl = null)
     window.phase1Group = L.layerGroup().addTo(window.map);
     window.phase2Group = L.layerGroup().addTo(window.map);
 
-    // ★ スポット直リンク時は最初から指定タイル(photo等)をセットして無駄なort通信を防ぐ
-    const startTile = initialTileUrl || window.gsiLayers.ort;
-
     window.gsiLayer = L.tileLayer(
-      startTile,
+      window.gsiLayers.ort,
       {
         attribution: '© 国土地理院',
-        keepBuffer: 2,
-        updateWhenIdle: false
+        keepBuffer: 2
       }
     ).addTo(window.map);
 
-    // ★ 等深線(5ファイル)はベースタイルが読み込まれた後に実行
+    // ★ 等深線レイヤー(5ファイル)は、初回タイル読み込み完了後（または800ms後）に開始
     if (typeof DepthMapController !== 'undefined') {
-        window.runAfterTileLoad(() => {
+        let depthStarted = false;
+        const startDepth = () => {
+            if (depthStarted) return;
+            depthStarted = true;
             DepthMapController.initAndShow(window.map);
-        }, 800);
+        };
+        window.gsiLayer.once('load', startDepth);
+        setTimeout(startDepth, 800);
     }
 
     return;
@@ -306,6 +285,22 @@ function drawLocation(name, lat, lng, zoom, options = {}, initialTileUrl = null)
     : window.map.touchZoom.disable();
 }
 
+// ★ ベースタイルの初回ロード完了を待つヘルパー関数
+window.runAfterTileLoad = function(callback, fallbackMs = 600) {
+    if (!window.gsiLayer || window._firstTileLoaded) {
+        requestAnimationFrame(callback);
+        return;
+    }
+    let done = false;
+    const exec = () => {
+        if (done) return;
+        done = true;
+        window._firstTileLoaded = true;
+        callback();
+    };
+    window.gsiLayer.once('load', exec);
+    setTimeout(exec, fallbackMs);
+};
 
 function applyFishDataToSpots(spots, fishData) {
 
