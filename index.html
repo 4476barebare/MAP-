@@ -1538,20 +1538,13 @@ function filterMergedGridSpots(allSpots, map, gridSize = 5) {
 
     return result;
 }
-
 async function loadPrefectureData(prefCode) {
-
     window.fishData = null; 
-
     window.currentPref = prefCode;
 
     const region = window.currentRegion || 'KANTO';
-
     window.regionUrl = `/${region}/${region}_region.csv`;
-
     window.fishUrl = `/${region}/${prefCode}_fish.json`;
-
-    // ★ 追加: ショップデータURLの定義
     window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
 
     try {
@@ -1564,22 +1557,45 @@ async function loadPrefectureData(prefCode) {
             }
         }
 
-        // 2. 抽出と振り分けはすべて loadLocationJSON に任せる
+        // 2. 座標データ(prefData/areaData/spotData)だけ即座に展開して返す（タイル描画を止めない！）
         await loadLocationJSON();
         
-        // 3. 天気データの取得
+        // 3. ★ 天気データとショップデータは await せず裏で取得し、完了次第UIを更新する
         const whetherUrl = `/data/${prefCode}_whether.csv`;
-        const whetherCsv = await loadWhetherCSV(whetherUrl);
-        applyWhetherToSpots(whetherCsv);
-       
-        if (typeof loadInlandWhetherCSV === 'function') {
-            const inlandCsv = await loadInlandWhetherCSV(region);
+        Promise.all([
+            loadWhetherCSV(whetherUrl).catch(() => null),
+            typeof loadInlandWhetherCSV === 'function' ? loadInlandWhetherCSV(region).catch(() => null) : Promise.resolve(null)
+        ]).then(([whetherCsv, inlandCsv]) => {
+            if (whetherCsv) applyWhetherToSpots(whetherCsv);
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
-        }
 
-        // ★ 追加: ショップデータを事前にロードして完了を待つ
+            // 現在開いている画面の天気UIを自動更新
+            if (window.currentPref === prefCode) {
+                if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                if (window.currentAreaId && typeof phase1menu === 'function') {
+                    phase1menu(window.currentAreaId);
+                }
+                if (window.phase2Initialized && window.map && typeof showNearestSpotName === 'function') {
+                    showNearestSpotName(window.map);
+                }
+                if (window.currentSpotId && window.spotData) {
+                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    if (activeSpot && activeSpot.whether && typeof createWeekItem === 'function') {
+                        createWeekItem(activeSpot.whether);
+                    }
+                }
+                if (typeof renderSpotRanking === 'function') renderSpotRanking();
+            }
+        });
+
         if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
-            await window.markerControl.preloadShop01(window.prefShopUrl);
+            window.markerControl.preloadShop01(window.prefShopUrl).then(() => {
+                // スポット詳細画面を開いている場合は最寄り釣具店リストを更新
+                if (window.currentSpotId && window.spotData && typeof renderShopSection === 'function') {
+                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    if (activeSpot) renderShopSection(activeSpot);
+                }
+            });
         }
 
         return true; 
@@ -1588,7 +1604,6 @@ async function loadPrefectureData(prefCode) {
         return false;
     }
 }
-
 /**
  * sitemap.xmlから記事データを抽出し、XMLに記述されている出現順にカテゴリ別に描画する
  * @param {string} targetDomId - 出力先のDOM要素のID
@@ -3141,34 +3156,21 @@ function getRegionCode() {
     return REGION_MAP[q] || 'KANTO'; // デフォルトはKANTO
 }
 
-
-
-
 window.icData = [];
 window.isIcLoaded = false;
-
-// 1. 初回アクセス時に非同期でロードし始める
 async function loadICData() {
     try {
-        // パスは実際の環境に合わせてください
         const res = await fetch('data/KANTO_geo.json'); 
         if (res.ok) {
             window.icData = await res.json();
             window.isIcLoaded = true;
-            
-            // ロードが完了したらデバッグ関数で画面に表示
-            if (typeof showdebug === 'function') {
-                //showdebug(`✅ ICデータロード完了: ${window.icData.length}件`);
-            } else {
-                //console.log(`✅ ICデータロード完了: ${window.icData.length}件`);
+            // ★ 追加：スポット画面表示中にICデータが届いたらアクセス情報を再描画
+            if (window.currentSpotId && window.spotData && typeof renderAccessInfo === 'function') {
+                const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                if (activeSpot) renderAccessInfo(activeSpot);
             }
         }
-    } catch (err) {
-        //console.error("ICデータのフェッチエラー:", err);
-        if (typeof showdebug === 'function') {
-            //showdebug("❌ ICデータのロードに失敗しました");
-        }
-    }
+    } catch (err) {}
 }
 
 // ==========================================
@@ -3555,38 +3557,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }, 300);
 });
-
 // ==========================================
-// ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数（タイル最優先版）
+// ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数（元の正常動作版）
 // ==========================================
 async function routeUpdate() {
-    // ─── トップ画面（Region） ───
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return; 
+
     if (!window.currentPref) {
         const btn = document.getElementById('map-back-btn');
         if (btn) btn.style.display = 'none';
-
-        // 1. 真っ先にregion.csvからマップとortタイルを描画
-        if (typeof loadRegionMap === 'function') {
-            await loadRegionMap(window.currentRegion || 'KANTO');
-        }
-        // 2. 全県データが揃った後にランキングを計算・表示
-        fetchAllRegionSpots().then(() => {
-            if (typeof renderSpotRanking === 'function') renderSpotRanking();
-        });
+        if (typeof loadRegionMap === 'function') loadRegionMap(window.currentRegion || 'KANTO');
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
         return;
     }
 
-    // ─── 県・エリア・スポット指定時 ───
-    // 1. まず待ち時間ゼロでメモリから座標データ(prefData / areaData / spotData)を展開
-    await loadLocationJSON();
-
-    // 2. 天気CSV・ショップJSONの取得はawaitせず裏で並行スタート（タイルの描画を止めない！）
-    const bgDataPromise = loadPrefectureData(window.currentPref);
-
-    // ─── A. スポット階層への直リンク復元 ───
+    // ─── スポット階層への直リンク復元 ───
     if (window.currentSpotId) {
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
+        
+        if (typeof prepareFishForArea === 'function') await prepareFishForArea(safeAreaId);
         
         const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
         const targetIndivId = spotId[2] || spotId[0]; 
@@ -3598,15 +3589,33 @@ async function routeUpdate() {
             
             if (parentArea) {
                 setIdealQuery('area', parentArea.name);
+
+                // ★ 1回目のdrawLocationで確実にwindow.mapを生成する
+                if (typeof drawLocation === 'function') {
+                    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+                }
+
+                if (window.map) {
+                    window.map.options.maxBoundsViscosity = 0;
+                    window.map.setMaxBounds(null);
+                }
+                
+                if (typeof prefetchAround === 'function') prefetchAround(parentArea);
                 if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
+                if (typeof phase1menu === 'function') phase1menu(safeAreaId);
+                if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
+                    window.markerControl.showShop01(safeAreaId);
+                }
+                
                 if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                if (typeof renderSpotRanking === 'function') renderSpotRanking();
                 if (typeof openArea === 'function') openArea(parentArea.individualId);
             }
             
             setIdealQuery('spot', spot.name);
             window._selectSpotCompleted = true;
 
-            // ★ ここで即座にマップ生成＆タイル読み込み開始！
+            // ★ 2回目のdrawLocationでスポットへ移動し、moveendを発火させる
             if (typeof drawLocation === 'function') {
                 drawLocation(spot.name, spot.lat, spot.lng, 13);
             }
@@ -3625,20 +3634,6 @@ async function routeUpdate() {
                     }
                 });
             }
-
-            // 裏で読み込んでいた天気・ショップ・魚データが届き次第UIへ反映
-            bgDataPromise.then(async () => {
-                if (window.fishDataPromise) await window.fishDataPromise;
-                if (typeof phase1menu === 'function') phase1menu(safeAreaId);
-                if (window.markerControl && typeof window.markerControl.showShop02 === 'function') {
-                    window.markerControl.showShop02(safeAreaId);
-                }
-                if (spot.whether && typeof createWeekItem === 'function') createWeekItem(spot.whether);
-                if (spot.URL && typeof showFishMarkers === 'function') showFishMarkers(spot.URL);
-                if (typeof renderAccessInfo === 'function') renderAccessInfo(spot);
-                if (typeof updateSeoMeta === 'function') updateSeoMeta();
-                if (typeof renderSpotRanking === 'function') renderSpotRanking();
-            });
             
             requestAnimationFrame(() => {
                 const btn = document.getElementById('map-back-btn');
@@ -3660,7 +3655,7 @@ async function routeUpdate() {
         return;
     }
 
-    // ─── B. エリア階層への直リンク復元 ───
+    // ─── エリア階層への直リンク復元 ───
     if (window.currentAreaId) {
         const safeAreaId = window.currentAreaId || ""; 
         const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
@@ -3671,20 +3666,15 @@ async function routeUpdate() {
         setIdealQuery('spot', null);      
 
         const safeZoom = area.zoom || window.prefData.zoom;
-        // ★ 即座にタイル読み込み開始！
         if (typeof drawLocation === 'function') drawLocation(area.name, area.lat, area.lng, safeZoom);
         
         if (typeof renderAreaGuide === 'function') renderAreaGuide();
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        if (typeof showRoadLayers === 'function') showRoadLayers();
+
         if (typeof selectArea === 'function') selectArea(area); 
+        if (typeof renderCrowdImage === 'function') renderCrowdImage();
         if (typeof showPrefSpots === 'function') showPrefSpots();
-
-        // 裏で天気・ショップデータが揃い次第メニューと雨雲・ランキングを描画
-        bgDataPromise.then(() => {
-            if (typeof phase1menu === 'function') phase1menu(safeAreaId);
-            if (typeof renderCrowdImage === 'function') renderCrowdImage();
-            if (typeof renderSpotRanking === 'function') renderSpotRanking();
-        });
-
         requestAnimationFrame(() => {
             const btn = document.getElementById('map-back-btn');
             if (btn) {
@@ -3695,7 +3685,7 @@ async function routeUpdate() {
         return;
     }
 
-    // ─── C. 県階層への直リンク復元 ───
+    // ─── 県階層への直リンク復元 ───
     if (window.prefData) {
         setIdealQuery('pref', window.prefData.notes); 
         setIdealQuery('area', null);                 
@@ -3708,38 +3698,31 @@ async function routeUpdate() {
                           Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
                           window.map.getZoom() === targetZoom);
 
-        // ★ 即座にタイル読み込み開始！
         if (typeof drawLocation === 'function') drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
         
         const finalizePref = () => {
             if (window.map) window.map.invalidateSize(true);
             
             requestAnimationFrame(() => {
-                // 1. まずマーカーとエリア枠組みを即時表示
-                if (typeof showPrefSpots === 'function') showPrefSpots();
-                if (typeof initAreaUI === 'function') initAreaUI();
-                if (typeof renderAreaGuide === 'function') renderAreaGuide();
-                if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
-                if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
-                if (typeof showRoadLayers === 'function') showRoadLayers();
-
-                // 2. 天気CSV・ショップJSONが届き次第、天気・雨雲・ランキングを反映
-                bgDataPromise.then(() => {
+                requestAnimationFrame(() => {
+                    if (typeof showRoadLayers === 'function') showRoadLayers();
+                    if (typeof showPrefSpots === 'function') showPrefSpots();
+                    if (typeof initAreaUI === 'function') initAreaUI();
                     if (typeof renderPrefWeather === 'function') renderPrefWeather();
                     if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                    if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
                     if (typeof renderSpotRanking === 'function') renderSpotRanking();
-                    if (typeof getAlertText === 'function' && window.prefData) {
-                        getAlertText(window.prefData);
-                    }
-                });
 
-                requestAnimationFrame(() => {
-                    const btn = document.getElementById('map-back-btn');
-                    if (btn) {
-                        btn.style.display = 'block';
-                        requestAnimationFrame(() => { btn.style.opacity = '1'; });
-                    }
-                    window.goBackGuard = false; 
+                    requestAnimationFrame(() => {
+                        const btn = document.getElementById('map-back-btn');
+                        if (btn) {
+                            btn.style.display = 'block';
+                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                        }
+                        window.goBackGuard = false; 
+                    });
                 });
             });
         };
@@ -3751,7 +3734,6 @@ async function routeUpdate() {
         }
     }
 }
-
 // ==========================================
 // ★ 画面に文字を出すデバッグ用関数（スクロール＆コピペ対応版）
 // ==========================================
