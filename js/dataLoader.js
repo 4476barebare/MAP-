@@ -12,7 +12,6 @@ window.currentAreaId = null;
 // ==========================================
 window.fishDataCache = window.fishDataCache || {};
 window.fishDataPromise = null;
-
 function loadFishDataAsync(pref, fishUrl) {
     if (!pref || !fishUrl) return Promise.resolve(null);
 
@@ -33,6 +32,15 @@ function loadFishDataAsync(pref, fishUrl) {
                 }
                 if (window.currentPref === pref && window.spotData) {
                     applyFishDataToSpots(window.spotData, fishData);
+
+                    // ★ 追加：スポット画面を表示中なら魚マーカーと対象魚セクションを即時反映
+                    if (window.currentSpotId) {
+                        const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                        if (activeSpot && activeSpot.URL) {
+                            if (typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
+                            if (typeof updateSeoMeta === 'function') updateSeoMeta();
+                        }
+                    }
                 }
             }
             return fishData;
@@ -44,7 +52,6 @@ function loadFishDataAsync(pref, fishUrl) {
 
     return window.fishDataPromise;
 }
-
 // ==========================================
 // ★ スポット用データを金庫(allspotData)から即座に読み込む関数
 //   （fish.jsonの通信待ちを排除し、0msで座標を展開）
