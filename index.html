@@ -283,7 +283,7 @@ function clearSpotRanking() {
     if (container) container.innerHTML = '';
 }
 // ==========================================
-// ★ 明日のオススメ釣り場ランキング表示関数（自動リトライ搭載版）
+// ★ 明日のオススメ釣り場ランキング表示関数（初回タイル優先＆自動リトライ搭載版）
 // ==========================================
 async function renderSpotRanking(retryCount = 0) {
     const container = document.getElementById('spot-ranking-container');
@@ -294,6 +294,14 @@ async function renderSpotRanking(retryCount = 0) {
     if (retryCount === 0) {
         section.style.display = 'block';
         container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
+
+        // ★ マップの初回タイル読み込みがまだ終わっていない場合は、タイル完了後までCSV取得を待機する
+        if (!window._firstTileLoaded && typeof window.runAfterTileLoad === 'function') {
+            window.runAfterTileLoad(() => {
+                setTimeout(() => renderSpotRanking(1), 300);
+            }, 2500);
+            return;
+        }
     }
 
     const now = new Date();
@@ -313,7 +321,7 @@ async function renderSpotRanking(retryCount = 0) {
     if (window.currentPref) {
         // ★ リトライ条件1：スポットデータ自体がまだ無い場合
         if (!window.spotData || window.spotData.length === 0) {
-            if (retryCount < 20) { // 最大2秒待機 (100ms × 20回)
+            if (retryCount < 25) {
                 setTimeout(() => renderSpotRanking(retryCount + 1), 100);
                 return;
             } else {
@@ -329,7 +337,7 @@ async function renderSpotRanking(retryCount = 0) {
         }) || window.spotData[0];
 
         if (!repSpot || !repSpot.whether) {
-            if (retryCount < 20) {
+            if (retryCount < 25) {
                 setTimeout(() => renderSpotRanking(retryCount + 1), 100);
                 return;
             } else {
@@ -348,7 +356,7 @@ async function renderSpotRanking(retryCount = 0) {
     else {
         // ★ リトライ条件3：トップページのマスターデータや県リストがまだ無い場合
         if (!window.allspotData || window.allspotData.length === 0 || !window.regionPrefData) {
-            if (retryCount < 20) {
+            if (retryCount < 25) {
                 setTimeout(() => renderSpotRanking(retryCount + 1), 100);
                 return;
             } else {
