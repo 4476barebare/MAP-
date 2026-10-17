@@ -1832,114 +1832,138 @@ async function loadPrefectureData(prefCode) {
         return false;
     }
 }
+
 /**
  * sitemap.xmlから記事データを抽出し、XMLに記述されている出現順にカテゴリ別に描画する
+ * （初回タイル描画を優先するためのタイミング調整 ＆ 画像サイズ指定版）
  * @param {string} targetDomId - 出力先のDOM要素のID
  */
-async function loadAndRenderCategorizedArticles(targetDomId) {
+function loadAndRenderCategorizedArticles(targetDomId) {
     const targetDom = document.getElementById(targetDomId);
     if (!targetDom) return;
 
     targetDom.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">記事を読み込み中...</div>';
 
-    try {
-        const res = await fetch('sitemap.xml');
-        if (!res.ok) throw new Error('サイトマップの取得に失敗しました');
-        const xmlText = await res.text();
+    let isLoaded = false;
 
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-        
-        const categoryOrder = [];
-        const groupedArticles = {};
+    const executeLoad = async () => {
+        if (isLoaded) return;
+        isLoaded = true;
+        if (observer) observer.disconnect();
 
-        // 1. 全 <url> タグを上から順に走査
-        xmlDoc.querySelectorAll("url").forEach(urlNode => {
-            const locNode = urlNode.querySelector("loc");
-            if (!locNode) return;
-            const url = locNode.textContent.trim();
+        try {
+            const res = await fetch('sitemap.xml');
+            if (!res.ok) throw new Error('サイトマップの取得に失敗しました');
+            const xmlText = await res.text();
 
-            let articleData = null;
-            urlNode.childNodes.forEach(child => {
-                if (child.nodeType === 8) { 
-                    const commentText = child.nodeValue;
-                    if (commentText.includes('ARTICLE_DATA:')) {
-                        try {
-                            const jsonStr = commentText.replace('ARTICLE_DATA:', '').trim();
-                            articleData = JSON.parse(jsonStr);
-                        } catch (e) {
-                            console.error('記事JSONパースエラー:', e, commentText);
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+            
+            const categoryOrder = [];
+            const groupedArticles = {};
+
+            // 1. 全 <url> タグを上から順に走査
+            xmlDoc.querySelectorAll("url").forEach(urlNode => {
+                const locNode = urlNode.querySelector("loc");
+                if (!locNode) return;
+                const url = locNode.textContent.trim();
+
+                let articleData = null;
+                urlNode.childNodes.forEach(child => {
+                    if (child.nodeType === 8) { 
+                        const commentText = child.nodeValue;
+                        if (commentText.includes('ARTICLE_DATA:')) {
+                            try {
+                                const jsonStr = commentText.replace('ARTICLE_DATA:', '').trim();
+                                articleData = JSON.parse(jsonStr);
+                            } catch (e) {
+                                console.error('記事JSONパースエラー:', e, commentText);
+                            }
                         }
                     }
+                });
+
+                if (articleData) {
+                    articleData.url = url;
+                    const cat = articleData.category || "その他の記事";
+                    
+                    if (!categoryOrder.includes(cat)) {
+                        categoryOrder.push(cat);
+                        groupedArticles[cat] = [];
+                    }
+                    groupedArticles[cat].push(articleData);
                 }
             });
 
-            if (articleData) {
-                articleData.url = url;
-                const cat = articleData.category || "その他の記事";
-                
-                if (!categoryOrder.includes(cat)) {
-                    categoryOrder.push(cat);
-                    groupedArticles[cat] = [];
-                }
-                groupedArticles[cat].push(articleData);
-            }
-        });
+            // 2. 描画処理 (既存の main.css のクラス名を使用 + サイズ指定と優先度制御を追加)
+            let html = '';
 
-        // 2. 描画処理 (既存の main.css のクラス名を使用)
-        let html = '';
+            categoryOrder.forEach(categoryName => {
+                const articles = groupedArticles[categoryName];
+                if (articles.length === 0) return;
 
-        categoryOrder.forEach(categoryName => {
-            const articles = groupedArticles[categoryName];
-            if (articles.length === 0) return;
+                // カテゴリ見出し
+                html += `<h2 class="category-heading">${categoryName}</h2>`;
 
-            // カテゴリ見出し
-            html += `<h2 class="category-heading">${categoryName}</h2>`;
+                const compactItems = articles.filter(a => a.style === "compact");
+                const listItems = articles.filter(a => a.style !== "compact"); 
 
-            const compactItems = articles.filter(a => a.style === "compact");
-            const listItems = articles.filter(a => a.style !== "compact"); 
-
-            // ▼ 旧版クラスに統合：横2列オーバーレイ（article-list / article-card）
-            if (compactItems.length > 0) {
-                html += `<section class="article-list">`;
-                compactItems.forEach(item => {
-                    html += `
-                    <a href="${item.url}" class="article-card">
-                        <img src="${item.image}" alt="${item.title}" loading="lazy">
-                        <h2>${item.title}</h2>
-                    </a>`;
-                });
-                html += `</section>`;
-            }
-
-            // ▼ 旧版クラスに統合：横長リスト（menu-list / menu-card）
-            if (listItems.length > 0) {
-                html += `<section class="menu-list">`;
-                listItems.forEach(item => {
-                    html += `
-                    <a href="${item.url}" class="menu-card">
-                        <div class="menu-thumb">
-                            <img src="${item.image}" alt="${item.title}" loading="lazy">
-                        </div>
-                        <div class="menu-text">
+                // ▼ 横2列オーバーレイ（article-list / article-card：4:3比率）
+                if (compactItems.length > 0) {
+                    html += `<section class="article-list">`;
+                    compactItems.forEach(item => {
+                        html += `
+                        <a href="${item.url}" class="article-card">
+                            <img src="${item.image}" alt="${item.title}" width="320" height="240" loading="lazy" decoding="async" fetchpriority="low">
                             <h2>${item.title}</h2>
-                        </div>
-                    </a>`;
-                });
-                html += `</section>`;
+                        </a>`;
+                    });
+                    html += `</section>`;
+                }
+
+                // ▼ 横長リスト（menu-list / menu-card：60x60正方形アイコン）
+                if (listItems.length > 0) {
+                    html += `<section class="menu-list">`;
+                    listItems.forEach(item => {
+                        html += `
+                        <a href="${item.url}" class="menu-card">
+                            <div class="menu-thumb">
+                                <img src="${item.image}" alt="${item.title}" width="60" height="60" loading="lazy" decoding="async" fetchpriority="low">
+                            </div>
+                            <div class="menu-text">
+                                <h2>${item.title}</h2>
+                            </div>
+                        </a>`;
+                    });
+                    html += `</section>`;
+                }
+            });
+
+            if (html === '') {
+                html = '<div style="text-align:center; padding:20px; color:#666;">記事が見つかりませんでした。</div>';
             }
-        });
 
-        if (html === '') {
-            html = '<div style="text-align:center; padding:20px; color:#666;">記事が見つかりませんでした。</div>';
+            targetDom.innerHTML = html;
+
+        } catch (err) {
+            console.error(err);
+            targetDom.innerHTML = '<div style="color:red; padding:20px;">記事の読み込みに失敗しました。</div>';
         }
+    };
 
-        targetDom.innerHTML = html;
-
-    } catch (err) {
-        console.error(err);
-        targetDom.innerHTML = '<div style="color:red; padding:20px;">記事の読み込みに失敗しました。</div>';
+    // 記事枠が画面の下300px以内に近づいたら即座に読み込み開始
+    let observer = null;
+    if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                executeLoad();
+            }
+        }, { rootMargin: '300px' });
+        observer.observe(targetDom);
     }
+
+    // スクロールされなくても、マップの初期タイル読み込みが落ち着いた3.5秒後に裏で読み込む
+    setTimeout(executeLoad, 3500);
 }
 
 function initAreaUI() {
