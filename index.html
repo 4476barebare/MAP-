@@ -2886,88 +2886,6 @@ document.getElementById('map-back-btn')?.addEventListener('click', () => {
     goBack(window.currentHash);
 });
 
-
-// ================================
-// ■ 天気CSVの読み込み（パース済みの爆速キャッシュ対応）
-// ================================
-function loadWhetherCSV(url) {
-    const prefCode = window.currentPref; // 現在の県
-
-    // ★ 分岐A：既に「パース済みの天気データ」が存在すれば、即座にそれを返す（JSON.parseを全スキップ）
-    if (prefCode && window[`${prefCode}_whetherData`]) {
-        return Promise.resolve(window[`${prefCode}_whetherData`]);
-    }
-
-    // ★ 分岐B：キャッシュが無ければ、フェッチして重いパース処理を実行する
-    const textPromise = window.fetchCache && window.fetchCache[url]
-        ? window.fetchCache[url]
-        : fetch(url).then(res => {
-            if (!res.ok) throw new Error("whether csv fetch失敗");
-            return res.text();
-        });
-
-    return textPromise.then(text => {
-        const lines = text.trim().split("\n");
-        lines.shift();
-
-        const parsedData = lines.map(line => {
-            const obj = splitCSVLine(line);
-            if (!obj) return null;
-
-            let parsed;
-            try {
-                parsed = JSON.parse(obj.whether); // ←これが一番重い処理
-            } catch (e) {
-                return null;
-            }
-
-            // ===== ここからデータ整形・付与 =====
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-
-            let csvDate = null;
-            if (obj.date) {
-                const safeDateStr = obj.date.replace(/-/g, "/");
-                csvDate = new Date(safeDateStr);
-                csvDate.setHours(0, 0, 0, 0);
-            }
-
-            const isToday = csvDate && csvDate.getTime() === today.getTime();
-            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
-
-            if (isToday) {
-                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
-                    parsed.daily[4] = null; 
-                }
-            } 
-            else if (isYesterday) {
-                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
-                    parsed.hourly[0] = parsed.hourly[1];
-                    parsed.hourly[1] = parsed.hourly[2];
-                    parsed.hourly[2] = null;
-                }
-            }
-            // ===== ここまで追加・修正 =====
-
-            return {
-                name: obj.name,
-                date: obj.date,
-                whether: parsed 
-            };
-        }).filter(Boolean);
-
-        // ★ 次回のために「パース済みの結果」を金庫に保存しておく
-        if (prefCode) {
-            window[`${prefCode}_whetherData`] = parsedData;
-        }
-
-        return parsedData;
-    });
-}
-
 // ================================
 // ■ 天気データをスポットに適用する関数（汎用化）
 // ================================
@@ -3332,25 +3250,122 @@ function getParsedPrefQuery() {
     return { region: 'KANTO', pref: '千葉県' };
 }
 
+// ================================
+// ■ 天気CSVの読み込み（県別フラグ管理＆二重通信防止版）
+// ================================
+window.fetchCacheStatus = window.fetchCacheStatus || {};
+window.whetherPromiseCache = window.whetherPromiseCache || {};
+
+function loadWhetherCSV(url) {
+    // URL（例: /data/CHIBA_whether.csv）から確実に県コード（CHIBA）を抽出
+    const match = url && url.match(/\/([A-Za-z0-9-]+)_whether\.csv/);
+    const prefCode = match ? match[1] : window.currentPref;
+
+    // ★ 1. 既に完了データがあれば即座に返してスキップ
+    if (prefCode && window[`${prefCode}_whetherData`]) {
+        return Promise.resolve(window[`${prefCode}_whetherData`]);
+    }
+
+    // ★ 2. 既に1回目が読み込み中（フラグON）なら、2回目は通信せず1回目の結果を共有してスキップ
+    if (prefCode && window.fetchCacheStatus[prefCode] && window.whetherPromiseCache[prefCode]) {
+        return window.whetherPromiseCache[prefCode];
+    }
+
+    // ★ 1回目の呼び出し開始時点で県別フラグを立てる
+    if (prefCode) {
+        window.fetchCacheStatus[prefCode] = true;
+    }
+
+    const promise = fetch(url).then(res => {
+        if (!res.ok) throw new Error("whether csv fetch失敗");
+        return res.text();
+    }).then(text => {
+        const lines = text.trim().split("\n");
+        lines.shift();
+
+        const parsedData = lines.map(line => {
+            const obj = splitCSVLine(line);
+            if (!obj) return null;
+
+            let parsed;
+            try {
+                parsed = JSON.parse(obj.whether);
+            } catch (e) {
+                return null;
+            }
+
+            // ===== データ整形・付与 =====
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            let csvDate = null;
+            if (obj.date) {
+                const safeDateStr = obj.date.replace(/-/g, "/");
+                csvDate = new Date(safeDateStr);
+                csvDate.setHours(0, 0, 0, 0);
+            }
+
+            const isToday = csvDate && csvDate.getTime() === today.getTime();
+            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
+
+            if (isToday) {
+                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
+                    parsed.daily[4] = null; 
+                }
+            } 
+            else if (isYesterday) {
+                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
+                    parsed.hourly[0] = parsed.hourly[1];
+                    parsed.hourly[1] = parsed.hourly[2];
+                    parsed.hourly[2] = null;
+                }
+            }
+
+            return {
+                name: obj.name,
+                date: obj.date,
+                whether: parsed 
+            };
+        }).filter(Boolean);
+
+        // ★ 1回目の処理完了後、県コード付きの金庫に保存
+        if (prefCode) {
+            window[`${prefCode}_whetherData`] = parsedData;
+        }
+
+        return parsedData;
+    }).catch(err => {
+        // エラー時は次回リトライできるようにフラグを戻す
+        if (prefCode) {
+            window.fetchCacheStatus[prefCode] = false;
+            delete window.whetherPromiseCache[prefCode];
+        }
+        throw err;
+    });
+
+    if (prefCode) {
+        window.whetherPromiseCache[prefCode] = promise;
+    }
+
+    return promise;
+}
 // ==========================================
 // 爆速化：バックグラウンドCSVプリロード (index.html)
 // ==========================================
-// 状態管理用のオブジェクトが未定義の場合は初期化
-window.fetchCacheStatus = window.fetchCacheStatus || {};
-
 function preloadCsvFiles(regionCode, prefCode) {
     if (!regionCode || !prefCode) return;
-    
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-    const shopUrl    = `/${regionCode}/${prefCode}_shop.json`;
 
-    if (!window.fetchCacheStatus[prefCode]) {
-        window.fetchCacheStatus[prefCode] = true;
-        fetch(whetherUrl, { priority: 'low' }).catch(()=>{});
-        // fetch(shopUrl, { priority: 'low' }).catch(()=>{}); // 必要ならショップも
+    // ★ 既に1回目の処理が完了しているか、読み込み中フラグが立っていれば完全にスキップ
+    if (window.fetchCacheStatus[prefCode] || window[`${prefCode}_whetherData`]) {
+        return;
     }
-}
 
+    const whetherUrl = `/data/${prefCode}_whether.csv`;
+    loadWhetherCSV(whetherUrl).catch(() => {});
+}
 
 async function checkAndLoadRouteData() {
     const prefCode = window.currentPref;
