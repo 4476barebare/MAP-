@@ -220,6 +220,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     boxZoom: false,
     keyboard: false,
     touchZoom: false,
+    fadeAnimation: false // ★初期タイルの0.2秒フェード待ちによるLCP遅延を防止
   };
 
   const mapOptions = { ...defaultOptions, ...options };
@@ -241,18 +242,20 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         attribution: '© 国土地理院',
         keepBuffer: 2
       }
-    ).addTo(window.map);
+    );
 
-    // ★ 等深線レイヤー(5ファイル)は、初回タイル読み込み完了後（または800ms後）に開始
+    // ★ マップタイル画像の通信優先度を最優先(high)に設定
+    window.gsiLayer.on('tileloadstart', (e) => {
+        if (e.tile) e.tile.setAttribute('fetchpriority', 'high');
+    });
+
+    window.gsiLayer.addTo(window.map);
+
+    // ★ 等深線レイヤー(5ファイル)は、LCP描画確定後に開始するよう runAfterTileLoad に統一
     if (typeof DepthMapController !== 'undefined') {
-        let depthStarted = false;
-        const startDepth = () => {
-            if (depthStarted) return;
-            depthStarted = true;
+        window.runAfterTileLoad(() => {
             DepthMapController.initAndShow(window.map);
-        };
-        window.gsiLayer.once('load', startDepth);
-        setTimeout(startDepth, 800);
+        }, 3500);
     }
 
     return;
@@ -285,21 +288,37 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     : window.map.touchZoom.disable();
 }
 
-// ★ ベースタイルの初回ロード完了を待つヘルパー関数
-window.runAfterTileLoad = function(callback, fallbackMs = 600) {
-    if (!window.gsiLayer || window._firstTileLoaded) {
+// ★ ベースタイルのLCP描画が完全に確定してから重いバックグラウンド処理を走らせるヘルパー関数
+window.runAfterTileLoad = function(callback, delayAfterLoadMs = 3500) {
+    if (window._firstTileLoaded) {
         requestAnimationFrame(callback);
         return;
     }
-    let done = false;
+    let triggered = false;
     const exec = () => {
-        if (done) return;
-        done = true;
+        if (triggered) return;
+        triggered = true;
         window._firstTileLoaded = true;
+        window.removeEventListener('scroll', exec);
+        window.removeEventListener('touchstart', exec);
+        window.removeEventListener('mousemove', exec);
         callback();
     };
-    window.gsiLayer.once('load', exec);
-    setTimeout(exec, fallbackMs);
+
+    // ユーザーが画面に触れた場合は即座に実行
+    window.addEventListener('scroll', exec, { passive: true, once: true });
+    window.addEventListener('touchstart', exec, { passive: true, once: true });
+    window.addEventListener('mousemove', exec, { passive: true, once: true });
+
+    // タイル読み込み完了後、描画確定のために十分な余白（デフォルト3.5秒）を空けて実行
+    if (window.gsiLayer) {
+        window.gsiLayer.once('load', () => {
+            requestAnimationFrame(() => {
+                setTimeout(exec, delayAfterLoadMs);
+            });
+        });
+    }
+    setTimeout(exec, delayAfterLoadMs + 1000);
 };
 
 function applyFishDataToSpots(spots, fishData) {
