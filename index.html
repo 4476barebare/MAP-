@@ -1395,9 +1395,8 @@ function loadRegionMap() {
             console.error("Regionマップの初期化エラー:", err);
         });
 }
-
 // ==========================================
-// ★ ページ初期ロード時のメインフロー（1県先行＆タイル最優先版）
+// ★ ページ初期ロード時のメインフロー（LCPタイル描画最優先版）
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
 
@@ -1412,21 +1411,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (params.get('pref')) {
         await applyQueryToStateFromCsv();
-    } else {
-        fetchAllRegionSpots();
     }
 
     if (typeof routeUpdate === 'function') {
         await routeUpdate();
     }
 
-    setTimeout(() => {
-        fetchAllRegionSpots();
-        if (typeof loadICData === 'function') loadICData();
-        if (typeof loadAndRenderCategorizedArticles === 'function') {
-            loadAndRenderCategorizedArticles('article-list-container');
-        }
-    }, 500);
+    // ★ ICデータや記事一覧などのバックグラウンド処理は、LCPタイル描画完了後に実行
+    if (typeof window.runAfterTileLoad === 'function') {
+        window.runAfterTileLoad(() => {
+            fetchAllRegionSpots();
+            if (typeof loadICData === 'function') loadICData();
+            if (typeof loadAndRenderCategorizedArticles === 'function') {
+                loadAndRenderCategorizedArticles('article-list-container');
+            }
+        }, 3500);
+    }
 });
 
 // ==========================================
