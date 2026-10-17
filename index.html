@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 👇 この1行を追加して自動リンク（点線）を防ぐ -->
+  <!-- 👇 自動リンク（点線）を防ぐ -->
   <meta name="format-detection" content="telephone=no, address=no, email=no">
 
   <!-- SEO -->
@@ -16,33 +16,30 @@
   <!-- OGP -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="釣り行こNAVI | 釣りスポットマップ">
-    <meta property="og:description" content="「明日釣りに行くんだけど良い場所ある？」と迷ったら釣り行こNAVI！関東全域の釣り場から天気予報、波予報、風向き、タイドグラフ、過去の実績などが写真地図から確認できます。">
+  <meta property="og:description" content="「明日釣りに行くんだけど良い場所ある？」と迷ったら釣り行こNAVI！関東全域の釣り場から天気予報、波予報、風向き、タイドグラフ、過去の実績などが写真地図から確認できます。">
   <meta property="og:url" content="https://turiiko-navi.com/">
   <meta property="og:image" content="https://turiiko-navi.com/ogp.jpg">
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="釣り行こNAVI">
-    <meta name="twitter:description" content="「明日釣りに行くんだけど良い場所ある？」と迷ったら釣り行こNAVI！関東全域の釣り場から天気予報、波予報、風向き、タイドグラフ、過去の実績などが写真地図から確認できます。">
+  <meta name="twitter:description" content="「明日釣りに行くんだけど良い場所ある？」と迷ったら釣り行こNAVI！関東全域の釣り場から天気予報、波予報、風向き、タイドグラフ、過去の実績などが写真地図から確認できます。">
   <meta name="twitter:image" content="https://turiiko-navi.com/ogp.jpg">
 
-  <!-- favicon（まだ無いなら仮でもOK） -->
-<link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
-<!-- ★修正：crossoriginを外して国土地理院への事前接続を有効化＆unpkgを追加 -->
-<link rel="preconnect" href="https://cyberjapandata.gsi.go.jp">
-<link rel="preconnect" href="https://unpkg.com">
-<link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
-<link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+  <!-- favicon -->
+  <link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
 
-<!-- ★追加：トップページ初期表示のLCPタイルをHTMLから即座に優先検出させる -->
-<link rel="preload" as="image" href="https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/201.jpg" fetchpriority="high">
+  <!-- ★ タイルサーバーとCDNへの事前接続（crossoriginを外して有効化） -->
+  <link rel="preconnect" href="https://cyberjapandata.gsi.go.jp">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
+  <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
 
-<link rel="stylesheet" href="/css/main.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3144580987453028"
      crossorigin="anonymous"></script>
 </head>
-
 <body>
 
 <header>
@@ -234,14 +231,13 @@
   <div class="footer-policy">サイトポリシー</div>
 </footer>
 
-<!-- Leaflet本体の直下あたりに追加 -->
+<!-- ★ 修正：polyline-encodedをリダイレクトなしの直接URLに変更 -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/polyline-encoded"></script> <!-- ★追加 -->
+<script src="https://unpkg.com/polyline-encoded@0.0.9/Polyline.encoded.js"></script>
 
 <script src="/js/header.js"></script>
 <script src="/js/markerControl.js"></script>
 <script src="/js/dataLoader.js"></script>
-
 
 <script>
 window.prefData = null;
