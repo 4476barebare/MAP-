@@ -28,11 +28,14 @@
 
   <!-- favicon（まだ無いなら仮でもOK） -->
 <link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
-<!-- ★追加：タイルサーバーへの事前接続＆Region CSVの最優先プリロード -->
-<link rel="preconnect" href="https://cyberjapandata.gsi.go.jp" crossorigin>
-<link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+<!-- ★修正：crossoriginを外して国土地理院への事前接続を有効化＆unpkgを追加 -->
+<link rel="preconnect" href="https://cyberjapandata.gsi.go.jp">
+<link rel="preconnect" href="https://unpkg.com">
 <link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
 <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+
+<!-- ★追加：トップページ初期表示のLCPタイルをHTMLから即座に優先検出させる -->
+<link rel="preload" as="image" href="https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/201.jpg" fetchpriority="high">
 
 <link rel="stylesheet" href="/css/main.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -1840,11 +1843,9 @@ async function loadPrefectureData(prefCode) {
         return false;
     }
 }
-
 /**
- * sitemap.xmlから記事データを抽出し、XMLに記述されている出現順にカテゴリ別に描画する
- * （初回タイル描画を優先するためのタイミング調整 ＆ 画像サイズ指定版）
- * @param {string} targetDomId - 出力先のDOM要素のID
+ * sitemap.xmlから記事データを抽出し、カテゴリ別に描画する
+ * （スクロール・タッチ連動で初期ロードの2.4MB渋滞を完全にゼロにする版）
  */
 function loadAndRenderCategorizedArticles(targetDomId) {
     const targetDom = document.getElementById(targetDomId);
@@ -1857,7 +1858,10 @@ function loadAndRenderCategorizedArticles(targetDomId) {
     const executeLoad = async () => {
         if (isLoaded) return;
         isLoaded = true;
-        if (observer) observer.disconnect();
+
+        window.removeEventListener('scroll', executeLoad);
+        window.removeEventListener('touchstart', executeLoad);
+        window.removeEventListener('mousemove', executeLoad);
 
         try {
             const res = await fetch('sitemap.xml');
@@ -1870,7 +1874,6 @@ function loadAndRenderCategorizedArticles(targetDomId) {
             const categoryOrder = [];
             const groupedArticles = {};
 
-            // 1. 全 <url> タグを上から順に走査
             xmlDoc.querySelectorAll("url").forEach(urlNode => {
                 const locNode = urlNode.querySelector("loc");
                 if (!locNode) return;
@@ -1903,20 +1906,17 @@ function loadAndRenderCategorizedArticles(targetDomId) {
                 }
             });
 
-            // 2. 描画処理 (既存の main.css のクラス名を使用 + サイズ指定と優先度制御を追加)
             let html = '';
 
             categoryOrder.forEach(categoryName => {
                 const articles = groupedArticles[categoryName];
                 if (articles.length === 0) return;
 
-                // カテゴリ見出し
                 html += `<h2 class="category-heading">${categoryName}</h2>`;
 
                 const compactItems = articles.filter(a => a.style === "compact");
                 const listItems = articles.filter(a => a.style !== "compact"); 
 
-                // ▼ 横2列オーバーレイ（article-list / article-card：4:3比率）
                 if (compactItems.length > 0) {
                     html += `<section class="article-list">`;
                     compactItems.forEach(item => {
@@ -1929,7 +1929,6 @@ function loadAndRenderCategorizedArticles(targetDomId) {
                     html += `</section>`;
                 }
 
-                // ▼ 横長リスト（menu-list / menu-card：60x60正方形アイコン）
                 if (listItems.length > 0) {
                     html += `<section class="menu-list">`;
                     listItems.forEach(item => {
@@ -1959,19 +1958,10 @@ function loadAndRenderCategorizedArticles(targetDomId) {
         }
     };
 
-    // 記事枠が画面の下300px以内に近づいたら即座に読み込み開始
-    let observer = null;
-    if ('IntersectionObserver' in window) {
-        observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                executeLoad();
-            }
-        }, { rootMargin: '300px' });
-        observer.observe(targetDom);
-    }
-
-    // スクロールされなくても、マップの初期タイル読み込みが落ち着いた3.5秒後に裏で読み込む
-    setTimeout(executeLoad, 3500);
+    // ユーザーが画面に触れるかスクロールした瞬間に即座に読み込む
+    window.addEventListener('scroll', executeLoad, { passive: true, once: true });
+    window.addEventListener('touchstart', executeLoad, { passive: true, once: true });
+    window.addEventListener('mousemove', executeLoad, { passive: true, once: true });
 }
 
 function initAreaUI() {
