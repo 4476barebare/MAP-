@@ -3497,7 +3497,7 @@ function updateRoadStyle() {
 }
 
 // ==========================================
-// ★ レイヤー自体の存在・表示状態のみで判定する関数
+// ★ レイヤー自体の存在・表示状態のみで判定する関数（初回タイル優先版）
 // ==========================================
 window.showRoadLayers = function() {
     window._shouldShowRoad = true;
@@ -3509,8 +3509,18 @@ window.showRoadLayers = function() {
         }
         updateRoadStyle();
     } else {
-        // 未作成・ロード中ならバックグラウンド処理を開始するだけで、処理を止めない（華麗にスルー）
-        initRoadLayers(window.map);
+        // ★ 初回ロード時は、マップタイルの読み込みが完了してから道路JSONの取得を開始する
+        const startInit = () => {
+            if (window._shouldShowRoad && window.map) {
+                initRoadLayers(window.map);
+            }
+        };
+
+        if (typeof window.runAfterTileLoad === 'function') {
+            window.runAfterTileLoad(startInit, 2000);
+        } else {
+            setTimeout(startInit, 1500);
+        }
     }
 };
 
