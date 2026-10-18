@@ -287,38 +287,34 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     ? window.map.touchZoom.enable()
     : window.map.touchZoom.disable();
 }
-
-// ★ ベースタイルのLCP描画が完全に確定してから重いバックグラウンド処理を走らせるヘルパー関数
-window.runAfterTileLoad = function(callback, delayAfterLoadMs = 3500) {
+// ★ ベースタイルのLCP確定を邪魔しないよう、初回ユーザー操作時にバックグラウンド処理を走らせるヘルパー関数
+window.runAfterTileLoad = function(callback) {
     if (window._firstTileLoaded) {
         requestAnimationFrame(callback);
         return;
     }
-    let triggered = false;
-    const exec = () => {
-        if (triggered) return;
-        triggered = true;
-        window._firstTileLoaded = true;
-        window.removeEventListener('scroll', exec);
-        window.removeEventListener('touchstart', exec);
-        window.removeEventListener('mousemove', exec);
-        callback();
-    };
 
-    // ユーザーが画面に触れた場合は即座に実行
-    window.addEventListener('scroll', exec, { passive: true, once: true });
-    window.addEventListener('touchstart', exec, { passive: true, once: true });
-    window.addEventListener('mousemove', exec, { passive: true, once: true });
-
-    // タイル読み込み完了後、描画確定のために十分な余白（デフォルト3.5秒）を空けて実行
-    if (window.gsiLayer) {
-        window.gsiLayer.once('load', () => {
-            requestAnimationFrame(() => {
-                setTimeout(exec, delayAfterLoadMs);
+    if (!window._tileLoadCallbacks) {
+        window._tileLoadCallbacks = [];
+        const triggerAll = () => {
+            if (window._firstTileLoaded) return;
+            window._firstTileLoaded = true;
+            ['scroll', 'touchstart', 'mousemove', 'pointerdown', 'click', 'keydown'].forEach(evt => {
+                window.removeEventListener(evt, triggerAll);
             });
+            const list = window._tileLoadCallbacks.slice();
+            window._tileLoadCallbacks = [];
+            list.forEach(fn => {
+                try { fn(); } catch (e) { console.error(e); }
+            });
+        };
+
+        ['scroll', 'touchstart', 'mousemove', 'pointerdown', 'click', 'keydown'].forEach(evt => {
+            window.addEventListener(evt, triggerAll, { passive: true, once: true });
         });
     }
-    setTimeout(exec, delayAfterLoadMs + 1000);
+
+    window._tileLoadCallbacks.push(callback);
 };
 
 function applyFishDataToSpots(spots, fishData) {
