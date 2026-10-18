@@ -3412,8 +3412,8 @@ function initRoadLayers(map) {
 
     // ★ 裏側で勝手にロードを進める（awaitで止めない）
     Promise.all([
-        cachedMotorwayData ? Promise.resolve(cachedMotorwayData) : fetch(`/${regionCode}/enc_motorway.json`).then(r => r.ok ? r.json() : null),
-        cachedTrunkData ? Promise.resolve(cachedTrunkData) : fetch(`/${regionCode}/enc_trunk.json`).then(r => r.ok ? r.json() : null)
+        cachedMotorwayData ? Promise.resolve(cachedMotorwayData) : fetch(`/${regionCode}/enc_motorway.json`, { priority: 'low' }).then(r => r.ok ? r.json() : null),
+        cachedTrunkData ? Promise.resolve(cachedTrunkData) : fetch(`/${regionCode}/enc_trunk.json`, { priority: 'low' }).then(r => r.ok ? r.json() : null)
     ]).then(([motorwayData, trunkData]) => {
         cachedMotorwayData = motorwayData;
         cachedTrunkData = trunkData;
