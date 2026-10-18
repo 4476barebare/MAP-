@@ -295,11 +295,9 @@ async function renderSpotRanking(retryCount = 0) {
         section.style.display = 'block';
         container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
 
-        // ★ マップの初回タイル読み込みがまだ終わっていない場合は、タイル完了後までCSV取得を待機する
+        // ★ マップの初回タイル読み込みがまだ終わっていない場合は、タイル完了キューに繋いで順番に実行する
         if (!window._firstTileLoaded && typeof window.runAfterTileLoad === 'function') {
-            window.runAfterTileLoad(() => {
-                setTimeout(() => renderSpotRanking(1), 300);
-            }, 2500);
+            window.runAfterTileLoad(() => renderSpotRanking(1));
             return;
         }
     }
@@ -1090,86 +1088,104 @@ async function showAllRegionSpots() {
         return;
     }
 
-    window.regionSpotMarkers = [];
-    window.regionSpotMarkerMap = new Map();
-
-    if (window.regionAllSpotLayer) {
-        window.map.removeLayer(window.regionAllSpotLayer);
+    if (window._buildingRegionSpotsPromise) {
+        return window._buildingRegionSpotsPromise;
     }
 
-    window.regionAllSpotLayer = L.layerGroup();
-
-    const allSpots = await fetchAllRegionSpots();
-
-    const targetSpots = allSpots.filter(
-        s => s.type !== 'pref' && s.type !== 'area'
-    );
-
-    targetSpots.forEach(spot => {
-        if (
-            !Number.isFinite(Number(spot.lat)) ||
-            !Number.isFinite(Number(spot.lng))
-        ) {
-            return;
-        }
-
-        let type = 'spot';
-        if (spot.icon && spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
-        }
-
-        const marker = L.marker(
-            [Number(spot.lat), Number(spot.lng)],
-            {
-                icon: L.divIcon({
-                    className: `pref-dot ${type}`,
-                    html: '',
-                    iconSize: [5, 5],
-                    iconAnchor: [2.5, 2.5]
-                }),
-                interactive: true,
-                keyboard: false
-            }
+    window._buildingRegionSpotsPromise = (async () => {
+        const allSpots = await fetchAllRegionSpots();
+        const targetSpots = allSpots.filter(
+            s => s.type !== 'pref' && s.type !== 'area'
         );
 
-        marker._spotData = spot;
-        marker._prefCode = spot._prefCode;
+        if (window.regionAllSpotLayer) {
+            window.map.removeLayer(window.regionAllSpotLayer);
+        }
 
-        marker._spotClickHandler = function () {
-            const spotAreaId = String(spot.areaId || '').trim();
-            const areaIndividualId = spotAreaId.replace(`${window.currentPref}_`, '');
-            const area = (window.areaData || []).find(
-                a => String(a.individualId || '').trim() === areaIndividualId
-            );
-            if (!area) return;
-            selectArea(area);
-        };
+        window.regionSpotMarkers = [];
+        window.regionSpotMarkerMap = new Map();
+        window.regionAllSpotLayer = L.layerGroup().addTo(window.map);
 
-        marker._regionClickHandler = function () {
-            handleRegionNearest(marker.getLatLng());
-        };
+        // ★ 1フレームあたり8ms以内に収まる数だけドットを生成し、次フレームへバトンを渡す（カクつきゼロ）
+        await new Promise(resolve => {
+            let i = 0;
+            function addSlice() {
+                const start = performance.now();
+                while (i < targetSpots.length && (performance.now() - start) < 8) {
+                    const spot = targetSpots[i++];
+                    const lat = Number(spot.lat);
+                    const lng = Number(spot.lng);
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
 
-        window.regionSpotMarkers.push(marker);
-        window.regionSpotMarkerMap.set(spot, marker);
-        window.regionAllSpotLayer.addLayer(marker);
-    });
+                    let type = 'spot';
+                    if (spot.icon && spot.icon.startsWith('fish')) {
+                        const match = spot.icon.match(/fish\d+/);
+                        if (match) type = match[0];
+                    }
 
-    window.regionAllSpotLayer.addTo(window.map);
+                    const marker = L.marker(
+                        [lat, lng],
+                        {
+                            icon: L.divIcon({
+                                className: `pref-dot ${type}`,
+                                html: '',
+                                iconSize: [5, 5],
+                                iconAnchor: [2.5, 2.5]
+                            }),
+                            interactive: true,
+                            keyboard: false
+                        }
+                    );
 
-    if (window.regionMarkers && window.regionMarkers.length > 0) {
-        window.regionMarkers.forEach(m => {
-            if (m.setZIndexOffset) {
-                m.setZIndexOffset(1000);
+                    marker._spotData = spot;
+                    marker._prefCode = spot._prefCode;
+
+                    marker._spotClickHandler = function () {
+                        const spotAreaId = String(spot.areaId || '').trim();
+                        const areaIndividualId = spotAreaId.replace(`${window.currentPref}_`, '');
+                        const area = (window.areaData || []).find(
+                            a => String(a.individualId || '').trim() === areaIndividualId
+                        );
+                        if (!area) return;
+                        selectArea(area);
+                    };
+
+                    marker._regionClickHandler = function () {
+                        handleRegionNearest(marker.getLatLng());
+                    };
+
+                    window.regionSpotMarkers.push(marker);
+                    window.regionSpotMarkerMap.set(spot, marker);
+                    window.regionAllSpotLayer.addLayer(marker);
+                }
+
+                if (i < targetSpots.length) {
+                    requestAnimationFrame(addSlice);
+                } else {
+                    resolve();
+                }
             }
+            requestAnimationFrame(addSlice);
         });
-    }
+
+        if (window.regionMarkers && window.regionMarkers.length > 0) {
+            window.regionMarkers.forEach(m => {
+                if (m.setZIndexOffset) {
+                    m.setZIndexOffset(1000);
+                }
+            });
+        }
+        window._buildingRegionSpotsPromise = null;
+    })();
+
+    return window._buildingRegionSpotsPromise;
 }
 
 function showPrefSpots() {
     if (!window.regionSpotMarkers || window.regionSpotMarkers.length === 0) {
         if (typeof showAllRegionSpots === 'function') {
-            showAllRegionSpots().then(() => {
+            window.runAfterTileLoad(async () => {
+                await showAllRegionSpots();
                 showPrefSpots();
             });
         }
@@ -1273,15 +1289,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         await routeUpdate();
     }
 
-    // ★ ICデータや記事一覧などのバックグラウンド処理は、LCPタイル描画完了後に実行
+    // ★ タイル描画完了後、ドット・道路・等深線の次に裏データと記事一覧を順番にバトンリレー実行する
     if (typeof window.runAfterTileLoad === 'function') {
+        window.runAfterTileLoad(() => fetchAllRegionSpots());
         window.runAfterTileLoad(() => {
-            fetchAllRegionSpots();
-            if (typeof loadICData === 'function') loadICData();
+            if (typeof renderSpotRanking === 'function') return renderSpotRanking(1);
+        });
+        window.runAfterTileLoad(() => {
+            if (typeof loadICData === 'function') return loadICData();
+        });
+        window.runAfterTileLoad(() => {
             if (typeof loadAndRenderCategorizedArticles === 'function') {
-                loadAndRenderCategorizedArticles('article-list-container');
+                return loadAndRenderCategorizedArticles('article-list-container');
             }
-        }, 3500);
+        });
     }
 });
 
@@ -1788,28 +1809,25 @@ async function loadPrefectureData(prefCode) {
     window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
 
     try {
-        // 1. 金庫の確認と準備
-        if (!window.allspotData || window.allspotData.length === 0) {
-            if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
-                window.allspotData = window.ALL_REGION_SPOTS;
-            } else {
-                await fetchAllRegionSpots();
-            }
+        // ★ 1. 全7県(fetchAllRegionSpots)は待たず、選択された1県だけのJSONを取得して即座にタイル描画へ進む
+        if (!window._loadedPrefSet || !window._loadedPrefSet.has(prefCode)) {
+            await fetchSinglePrefSpots(prefCode);
         }
 
         // 2. 座標データ(prefData/areaData/spotData)だけ即座に展開して返す（タイル描画を止めない！）
         await loadLocationJSON();
         
-        // 3. ★ 天気データとショップデータは await せず裏で取得し、完了次第UIを更新する
-        const whetherUrl = `/data/${prefCode}_whether.csv`;
-        Promise.all([
-            loadWhetherCSV(whetherUrl).catch(() => null),
-            typeof loadInlandWhetherCSV === 'function' ? loadInlandWhetherCSV(region).catch(() => null) : Promise.resolve(null)
-        ]).then(([whetherCsv, inlandCsv]) => {
+        // ★ 3. 天気CSVとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で順番に取得する
+        window.runAfterTileLoad(async () => {
+            const whetherUrl = `/data/${prefCode}_whether.csv`;
+            const [whetherCsv, inlandCsv] = await Promise.all([
+                loadWhetherCSV(whetherUrl).catch(() => null),
+                typeof loadInlandWhetherCSV === 'function' ? loadInlandWhetherCSV(region).catch(() => null) : Promise.resolve(null)
+            ]);
+
             if (whetherCsv) applyWhetherToSpots(whetherCsv);
             if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
 
-            // 現在開いている画面の天気UIを自動更新
             if (window.currentPref === prefCode) {
                 if (typeof renderPrefWeather === 'function') renderPrefWeather();
                 if (window.currentAreaId && typeof phase1menu === 'function') {
@@ -1824,19 +1842,17 @@ async function loadPrefectureData(prefCode) {
                         createWeekItem(activeSpot.whether);
                     }
                 }
-                if (typeof renderSpotRanking === 'function') renderSpotRanking();
+                if (typeof renderSpotRanking === 'function') renderSpotRanking(1);
             }
-        });
 
-        if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
-            window.markerControl.preloadShop01(window.prefShopUrl).then(() => {
-                // スポット詳細画面を開いている場合は最寄り釣具店リストを更新
+            if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+                await window.markerControl.preloadShop01(window.prefShopUrl);
                 if (window.currentSpotId && window.spotData && typeof renderShopSection === 'function') {
                     const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                     if (activeSpot) renderShopSection(activeSpot);
                 }
-            });
-        }
+            }
+        });
 
         return true; 
     } catch (err) {
@@ -1959,10 +1975,8 @@ function loadAndRenderCategorizedArticles(targetDomId) {
         }
     };
 
-    // ユーザーが画面に触れるかスクロールした瞬間に即座に読み込む
-    window.addEventListener('scroll', executeLoad, { passive: true, once: true });
-    window.addEventListener('touchstart', executeLoad, { passive: true, once: true });
-    window.addEventListener('mousemove', executeLoad, { passive: true, once: true });
+    // ★ ユーザー操作待ちを廃止し、タイル・マップレイヤー完了後のキューから即座に実行する
+    return executeLoad();
 }
 
 function initAreaUI() {
@@ -3977,30 +3991,48 @@ const DepthMapController = (function() {
 
         _loadData: function() {
             const self = this;
-            Promise.all(
-                DEPTH_FILES.map(url => fetch(url).then(res => {
+            this._loadPromise = Promise.all(
+                DEPTH_FILES.map(url => fetch(url, { priority: 'low' }).then(res => {
                     if (!res.ok) throw new Error(url + '\nHTTP ' + res.status);
                     return res.json();
                 }))
-            ).then(results => {
-                self._data = results.map((items, index) => {
+            ).then(async results => {
+                const parsedLayers = [];
+                // ★ 5層のデコード処理を1フレーム8ms以内に分割してメインスレッドのロック（カクつき）を防ぐ
+                for (let index = 0; index < results.length; index++) {
+                    const items = results[index];
                     const groupsMap = {};
-                    items.forEach(item => {
-                        if (!item.p) return;
-                        const points = decodePolyline(item.p);
-                        if (points.length >= 3) {
-                            const g = item.group || 'default';
-                            if (!groupsMap[g]) groupsMap[g] = [];
-                            groupsMap[g].push({ latlngs: points.map(p => L.latLng(p[0], p[1])) });
+                    let i = 0;
+                    await new Promise(resolve => {
+                        function decodeSlice() {
+                            const start = performance.now();
+                            while (i < items.length && (performance.now() - start) < 8) {
+                                const item = items[i++];
+                                if (!item.p) continue;
+                                const points = decodePolyline(item.p);
+                                if (points.length >= 3) {
+                                    const g = item.group || 'default';
+                                    if (!groupsMap[g]) groupsMap[g] = [];
+                                    groupsMap[g].push({ latlngs: points.map(p => L.latLng(p[0], p[1])) });
+                                }
+                            }
+                            if (i < items.length) {
+                                requestAnimationFrame(decodeSlice);
+                            } else {
+                                resolve();
+                            }
                         }
+                        requestAnimationFrame(decodeSlice);
                     });
-                    return { depth: [20, 50, 100, 150, 200][index], groups: Object.values(groupsMap) };
-                });
+                    parsedLayers.push({ depth: [20, 50, 100, 150, 200][index], groups: Object.values(groupsMap) });
+                }
+                self._data = parsedLayers;
                 self._loaded = true;
                 self._redraw();
             }).catch(err => {
                 console.error('等深線読み込みエラー:', err);
             });
+            return this._loadPromise;
         },
 
         _redraw: function() {
@@ -4119,13 +4151,14 @@ const DepthMapController = (function() {
          * @param {Object} leafletMap - 描画先のLeafletマップオブジェクト
          */
         initAndShow: function(leafletMap) {
-            if (!leafletMap) return;
+            if (!leafletMap) return Promise.resolve();
             mapInstance = leafletMap;
 
             if (!depthLayer) {
                 depthLayer = new DepthCanvasLayer();
                 depthLayer.addTo(mapInstance);
             }
+            return depthLayer._loadPromise || Promise.resolve();
         },
 
         /**
