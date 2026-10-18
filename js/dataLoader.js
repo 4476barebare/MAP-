@@ -240,22 +240,35 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
       window.gsiLayers.ort,
       {
         attribution: '© 国土地理院',
-        keepBuffer: 2
+        keepBuffer: 2,
+        updateWhenIdle: true
       }
     );
 
-    // ★ マップタイル画像の通信優先度を最優先(high)に設定
+    // ★ マップタイル画像の通信優先度を最優先(high)にし、非同期デコードを指定
     window.gsiLayer.on('tileloadstart', (e) => {
-        if (e.tile) e.tile.setAttribute('fetchpriority', 'high');
+        if (e.tile) {
+            e.tile.setAttribute('fetchpriority', 'high');
+            e.tile.decoding = 'async';
+        }
+    });
+
+    // ★ ベースタイルの読み込み完了イベントで後続キューを順次スタート
+    window.gsiLayer.once('load', () => {
+        requestAnimationFrame(() => {
+            if (typeof window._flushTileQueue === 'function') {
+                window._flushTileQueue();
+            }
+        });
     });
 
     window.gsiLayer.addTo(window.map);
 
-    // ★ 等深線レイヤー(5ファイル)は、LCP描画確定後に開始するよう runAfterTileLoad に統一
+    // ★ 等深線レイヤー(5ファイル)は、ベースタイル描画完了後のキューで開始
     if (typeof DepthMapController !== 'undefined') {
         window.runAfterTileLoad(() => {
-            DepthMapController.initAndShow(window.map);
-        }, 3500);
+            return DepthMapController.initAndShow(window.map);
+        });
     }
 
     return;
@@ -287,34 +300,38 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
     ? window.map.touchZoom.enable()
     : window.map.touchZoom.disable();
 }
-// ★ ベースタイルのLCP確定を邪魔しないよう、初回ユーザー操作時にバックグラウンド処理を走らせるヘルパー関数
+
+// ★ ユーザー操作待ちを完全廃止：ベースタイルの load 完了後、1フレームに1タスクずつ順番にバトンリレー実行する
+window._tileLoadCallbacks = [];
+window._isFlushingTileQueue = false;
+
+window._flushTileQueue = function() {
+    window._firstTileLoaded = true;
+    if (window._isFlushingTileQueue) return;
+    window._isFlushingTileQueue = true;
+
+    const step = async () => {
+        if (window._tileLoadCallbacks.length === 0) {
+            window._isFlushingTileQueue = false;
+            return;
+        }
+        const fn = window._tileLoadCallbacks.shift();
+        try {
+            await fn();
+        } catch (e) {
+            console.error(e);
+        }
+        requestAnimationFrame(step);
+    };
+
+    requestAnimationFrame(step);
+};
+
 window.runAfterTileLoad = function(callback) {
-    if (window._firstTileLoaded) {
-        requestAnimationFrame(callback);
-        return;
-    }
-
-    if (!window._tileLoadCallbacks) {
-        window._tileLoadCallbacks = [];
-        const triggerAll = () => {
-            if (window._firstTileLoaded) return;
-            window._firstTileLoaded = true;
-            ['scroll', 'touchstart', 'mousemove', 'pointerdown', 'click', 'keydown'].forEach(evt => {
-                window.removeEventListener(evt, triggerAll);
-            });
-            const list = window._tileLoadCallbacks.slice();
-            window._tileLoadCallbacks = [];
-            list.forEach(fn => {
-                try { fn(); } catch (e) { console.error(e); }
-            });
-        };
-
-        ['scroll', 'touchstart', 'mousemove', 'pointerdown', 'click', 'keydown'].forEach(evt => {
-            window.addEventListener(evt, triggerAll, { passive: true, once: true });
-        });
-    }
-
     window._tileLoadCallbacks.push(callback);
+    if (window._firstTileLoaded) {
+        window._flushTileQueue();
+    }
 };
 
 function applyFishDataToSpots(spots, fishData) {
@@ -3378,7 +3395,7 @@ window._isRoadLoading = false;
 window._shouldShowRoad = false; // 表示すべき画面(広域・エリア等)かどうかのフラグ
 
 function initRoadLayers(map) {
-    if (window.isRoadReady || window._isRoadLoading) return;
+    if (window.isRoadReady || window._isRoadLoading) return Promise.resolve();
     window._isRoadLoading = true;
 
     // Pane設定
@@ -3406,48 +3423,58 @@ function initRoadLayers(map) {
 
     const regionCode = window.currentRegion || 'KANTO';
 
-    // ★ 裏側で勝手にロードを進める（awaitで止めない）
-    Promise.all([
+    return Promise.all([
         cachedMotorwayData ? Promise.resolve(cachedMotorwayData) : fetch(`/${regionCode}/enc_motorway.json`, { priority: 'low' }).then(r => r.ok ? r.json() : null),
         cachedTrunkData ? Promise.resolve(cachedTrunkData) : fetch(`/${regionCode}/enc_trunk.json`, { priority: 'low' }).then(r => r.ok ? r.json() : null)
     ]).then(([motorwayData, trunkData]) => {
-        cachedMotorwayData = motorwayData;
-        cachedTrunkData = trunkData;
+        cachedMotorwayData = motorwayData || [];
+        cachedTrunkData = trunkData || [];
 
-        if (cachedMotorwayData) {
-            cachedMotorwayData.forEach(item => {
-                const polyline = L.Polyline.fromEncoded(item.p, {
-                    className: 'road-motorway',
-                    color: '#155934',
-                    interactive: false,
-                    renderer: motorwayRenderer
-                });
-                roadLayerGroup.addLayer(polyline);
-            });
-        }
+        // ★ ポリライン生成を1フレーム8ms以内に分割し、カクつき（TBT悪化）をゼロにする
+        return new Promise(resolve => {
+            let mIdx = 0;
+            let tIdx = 0;
 
-        if (cachedTrunkData) {
-            cachedTrunkData.forEach(item => {
-                const polyline = L.Polyline.fromEncoded(item.p, {
-                    className: 'road-trunk',
-                    color: '#DCDCDC',
-                    interactive: false,
-                    renderer: trunkRenderer
-                });
-                roadLayerGroup.addLayer(polyline);
-            });
-        }
+            function buildRoadSlice() {
+                const start = performance.now();
 
-        window.isRoadReady = true;
-        window._isRoadLoading = false;
+                while (mIdx < cachedMotorwayData.length && (performance.now() - start) < 8) {
+                    const item = cachedMotorwayData[mIdx++];
+                    const polyline = L.Polyline.fromEncoded(item.p, {
+                        className: 'road-motorway',
+                        color: '#155934',
+                        interactive: false,
+                        renderer: motorwayRenderer
+                    });
+                    roadLayerGroup.addLayer(polyline);
+                }
 
-        // ズーム更新イベント
-        map.on('zoomend', updateRoadStyle);
+                while (tIdx < cachedTrunkData.length && (performance.now() - start) < 8) {
+                    const item = cachedTrunkData[tIdx++];
+                    const polyline = L.Polyline.fromEncoded(item.p, {
+                        className: 'road-trunk',
+                        color: '#DCDCDC',
+                        interactive: false,
+                        renderer: trunkRenderer
+                    });
+                    roadLayerGroup.addLayer(polyline);
+                }
 
-        // ★ 準備ができた瞬間に「表示すべき画面」なら自動でフェードイン発火
-        if (window._shouldShowRoad) {
-            triggerRoadFadeIn();
-        }
+                if (mIdx < cachedMotorwayData.length || tIdx < cachedTrunkData.length) {
+                    requestAnimationFrame(buildRoadSlice);
+                } else {
+                    window.isRoadReady = true;
+                    window._isRoadLoading = false;
+                    map.on('zoomend', updateRoadStyle);
+                    if (window._shouldShowRoad) {
+                        triggerRoadFadeIn();
+                    }
+                    resolve();
+                }
+            }
+
+            requestAnimationFrame(buildRoadSlice);
+        });
 
     }).catch(e => {
         console.error('道路データのバックグラウンド読み込みエラー:', e);
@@ -3524,18 +3551,12 @@ window.showRoadLayers = function() {
         }
         updateRoadStyle();
     } else {
-        // ★ 初回ロード時は、マップタイルの読み込みが完了してから道路JSONの取得を開始する
-        const startInit = () => {
+        // ★ 初回ロード時は、ベースタイルの読み込み完了キューで道路JSONの取得・分割描画を行う
+        window.runAfterTileLoad(() => {
             if (window._shouldShowRoad && window.map) {
-                initRoadLayers(window.map);
+                return initRoadLayers(window.map);
             }
-        };
-
-        if (typeof window.runAfterTileLoad === 'function') {
-            window.runAfterTileLoad(startInit, 2000);
-        } else {
-            setTimeout(startInit, 1500);
-        }
+        });
     }
 };
 
