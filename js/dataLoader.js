@@ -305,6 +305,17 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
 window._tileLoadCallbacks = [];
 window._isFlushingTileQueue = false;
 
+// ★ 1フレームの描画を確実にブラウザへ返してから次の処理へ進むフレーム待機ヘルパー
+window._yieldFrame = function() {
+    return new Promise(resolve => {
+        requestAnimationFrame(() => {
+            const ch = new MessageChannel();
+            ch.port1.onmessage = () => resolve();
+            ch.port2.postMessage(null);
+        });
+    });
+};
+
 window._flushTileQueue = function() {
     window._firstTileLoaded = true;
     if (window._isFlushingTileQueue) return;
@@ -321,10 +332,11 @@ window._flushTileQueue = function() {
         } catch (e) {
             console.error(e);
         }
-        requestAnimationFrame(step);
+        await window._yieldFrame();
+        step();
     };
 
-    requestAnimationFrame(step);
+    window._yieldFrame().then(step);
 };
 
 window.runAfterTileLoad = function(callback) {
@@ -3438,7 +3450,7 @@ function initRoadLayers(map) {
             function buildRoadSlice() {
                 const start = performance.now();
 
-                while (mIdx < cachedMotorwayData.length && (performance.now() - start) < 8) {
+                while (mIdx < cachedMotorwayData.length && (performance.now() - start) < 4) {
                     const item = cachedMotorwayData[mIdx++];
                     const polyline = L.Polyline.fromEncoded(item.p, {
                         className: 'road-motorway',
@@ -3449,7 +3461,7 @@ function initRoadLayers(map) {
                     roadLayerGroup.addLayer(polyline);
                 }
 
-                while (tIdx < cachedTrunkData.length && (performance.now() - start) < 8) {
+                while (tIdx < cachedTrunkData.length && (performance.now() - start) < 4) {
                     const item = cachedTrunkData[tIdx++];
                     const polyline = L.Polyline.fromEncoded(item.p, {
                         className: 'road-trunk',
