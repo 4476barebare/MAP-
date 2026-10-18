@@ -240,7 +240,7 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
       window.gsiLayers.ort,
       {
         attribution: '© 国土地理院',
-        keepBuffer: 2,
+        keepBuffer: 0, // ★ 初回表示時は画面外の余分なタイル取得をゼロにし、表示領域のタイルだけに全帯域を集中させる
         updateWhenIdle: true
       }
     );
@@ -253,8 +253,9 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         }
     });
 
-    // ★ ベースタイルの読み込み完了イベントで後続キューを順次スタート
+    // ★ ベースタイルの読み込み完了イベントで keepBuffer を 2 に戻し、後続キューを順次スタート
     window.gsiLayer.once('load', () => {
+        window.gsiLayer.options.keepBuffer = 2;
         requestAnimationFrame(() => {
             if (typeof window._flushTileQueue === 'function') {
                 window._flushTileQueue();
