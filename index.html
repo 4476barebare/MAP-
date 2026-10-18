@@ -26,20 +26,19 @@
     <meta name="twitter:description" content="「明日釣りに行くんだけど良い場所ある？」と迷ったら釣り行こNAVI！関東全域の釣り場から天気予報、波予報、風向き、タイドグラフ、過去の実績などが写真地図から確認できます。">
   <meta name="twitter:image" content="https://turiiko-navi.com/ogp.jpg">
 
-  <!-- favicon（まだ無いなら仮でもOK） -->
-<link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
+  <!-- favicon -->
+  <link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
 
-  <!-- タイルサーバーとCDNへの事前接続（crossoriginを外して有効化） -->
-  <link rel="preconnect" href="https://cyberjapandata.gsi.go.jp">
-  <link rel="preconnect" href="https://unpkg.com">
+  <!-- タイルサーバーへの事前接続と初期CSVの先読み -->
+  <link rel="preconnect" href="https://cyberjapandata.gsi.go.jp" crossorigin>
   <link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
-  <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="preload" href="/KANTO/KANTO_region.csv" as="fetch" crossorigin="anonymous">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3144580987453028"
-     crossorigin="anonymous"></script>
 </head>
+
 
 <body>
 
@@ -1252,151 +1251,6 @@ function handleRegionNearest(latlng) {
     window.selectPrefecture(`${nearest.regionCode}_${nearest.prefCode}`);
 }
 
-let isRegionLoaded = false;
-function loadRegionMap() {
-    const regionCode = window.currentRegion || 'KANTO';
-
-    if (window.map) {
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
-        window.map.setMaxBounds(null);
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-        window.map.stop();
-        
-        if (window.nearestClickHandler) {
-            window.map.off('click', window.nearestClickHandler);
-            window.nearestClickEnabled = false;
-        }
-    }
-
-    if (window.regionData) {
-        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
-    }
-
-    if (isRegionLoaded && window.regionPrefData && window.regionPrefData.length > 0) {
-        const titleSpan = document.getElementById('seo-list-title');
-        const linkContainer = document.getElementById('seo-link-container');
-        if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
-        if (linkContainer && window.regionSeoHtml) linkContainer.innerHTML = window.regionSeoHtml;
-        
-        if (typeof showAllRegionSpots === 'function') showAllRegionSpots();
-
-        if (window.map && window.regionNearestClickHandler) {
-            window.map.off('click', window.regionNearestClickHandler);
-            window.map.on('click', window.regionNearestClickHandler);
-        }
-
-        if (typeof showRoadLayers === 'function') showRoadLayers();
-        return Promise.resolve();
-    }
-
-    return fetchRegionCsvText()
-        .then(text => {
-            const lines = text.trim().split('\n');
-            if (lines.length < 2) return;
-
-            const headers = lines[0].split(',').map(h => h.trim());
-            const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
-            const latIdx   = headers.findIndex(h => h.toLowerCase() === 'lat');
-            const lngIdx   = headers.findIndex(h => h.toLowerCase() === 'lng');
-            const zoomIdx  = headers.findIndex(h => h.toLowerCase() === 'zoom');
-            const nameIdx  = headers.findIndex(h => h.toLowerCase() === 'name');
-            const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
-            const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
-
-            if (typeIdx === -1) return;
-
-            window.regionPrefData = [];
-            let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
-
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i]) continue;
-                const cols = lines[i].split(',').map(c => c.trim());
-                const type = cols[typeIdx];
-
-                if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
-                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
-                    const lat = parseFloat(cols[latIdx]);
-                    const lng = parseFloat(cols[lngIdx]);
-                    const zoom = parseFloat(cols[zoomIdx]);
-                    window.regionData = { name, lat, lng, zoom };
-                    drawLocation(name, lat, lng, zoom);
-                }
-
-                if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
-                    const urlVal = cols[urlIdx];
-                    const prefName = cols[notesIdx];
-                    if (!urlVal) continue;
-
-                    const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
-                    const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
-                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
-
-                    const parts = urlVal.split('/');
-                    let prefCode = '';
-                    let lat, lng;
-                    
-                    if (parts.length >= 4) {
-                        prefCode = parts[1].split('_')[0]; 
-                        lat = parseFloat(parts[2]);
-                        lng = parseFloat(parts[3]);
-                    } else if (parts.length === 3) {
-                        prefCode = parts[0].split('_')[0]; 
-                        lat = parseFloat(parts[1]);
-                        lng = parseFloat(parts[2]);
-                    } else continue;
-
-                    if (isNaN(lat) || isNaN(lng)) continue;
-
-                    if (typeof preloadCsvFiles === 'function') {
-                        /* setTimeout(() => preloadCsvFiles(regionCode, prefCode), 3000); 廃止 */
-                    }
-
-                    window.regionPrefData.push({
-                        regionCode: regionCode,
-                        prefCode: prefCode,
-                        prefName: prefName,
-                        lat: lat,
-                        lng: lng
-                    });
-                }
-            }
-            
-            regionHtml += '</ul>';
-            const regionTitle = (window.regionData ? window.regionData.name : '関東地方') + 'の釣りエリア一覧';
-            window.regionSeoHtml = regionHtml;
-            window.regionSeoTitle = regionTitle;
-
-            const titleSpan = document.getElementById('seo-list-title');
-            const linkContainer = document.getElementById('seo-link-container');
-            if (titleSpan) titleSpan.textContent = regionTitle;
-            if (linkContainer) linkContainer.innerHTML = regionHtml;
-
-            if (typeof window.runAfterTileLoad === 'function') {
-                window.runAfterTileLoad(showAllRegionSpots);
-            } else {
-                showAllRegionSpots();
-            }
-            if (typeof showRoadLayers === 'function') showRoadLayers();
-
-            window.regionNearestClickHandler = function(e) {
-                handleRegionNearest(e.latlng);
-            };
-
-            if (window.map) {
-                window.map.off('click', window.regionNearestClickHandler);
-                window.map.on('click', window.regionNearestClickHandler);
-            }
-
-            isRegionLoaded = true;
-        })
-        .catch(err => {
-            console.error("Regionマップの初期化エラー:", err);
-        });
-}
 // ==========================================
 // ★ ページ初期ロード時のメインフロー（LCPタイル描画最優先版）
 // ==========================================
@@ -1602,6 +1456,151 @@ async function routeUpdate() {
             if (window.map) window.map.once('moveend', finalizePref);
         }
     }
+}
+let isRegionLoaded = false;
+function loadRegionMap() {
+    const regionCode = window.currentRegion || 'KANTO';
+
+    if (window.map) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+        window.map.stop();
+        
+        if (window.nearestClickHandler) {
+            window.map.off('click', window.nearestClickHandler);
+            window.nearestClickEnabled = false;
+        }
+    }
+
+    if (window.regionData) {
+        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
+    }
+
+    if (isRegionLoaded && window.regionPrefData && window.regionPrefData.length > 0) {
+        const titleSpan = document.getElementById('seo-list-title');
+        const linkContainer = document.getElementById('seo-link-container');
+        if (titleSpan && window.regionSeoTitle) titleSpan.textContent = window.regionSeoTitle;
+        if (linkContainer && window.regionSeoHtml) linkContainer.innerHTML = window.regionSeoHtml;
+        
+        if (typeof window.runAfterTileLoad === 'function') {
+            window.runAfterTileLoad(showAllRegionSpots);
+        } else if (typeof showAllRegionSpots === 'function') {
+            showAllRegionSpots();
+        }
+
+        if (window.map && window.regionNearestClickHandler) {
+            window.map.off('click', window.regionNearestClickHandler);
+            window.map.on('click', window.regionNearestClickHandler);
+        }
+
+        if (typeof showRoadLayers === 'function') showRoadLayers();
+        return Promise.resolve();
+    }
+
+    return fetchRegionCsvText()
+        .then(text => {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return;
+
+            const headers = lines[0].split(',').map(h => h.trim());
+            const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
+            const latIdx   = headers.findIndex(h => h.toLowerCase() === 'lat');
+            const lngIdx   = headers.findIndex(h => h.toLowerCase() === 'lng');
+            const zoomIdx  = headers.findIndex(h => h.toLowerCase() === 'zoom');
+            const nameIdx  = headers.findIndex(h => h.toLowerCase() === 'name');
+            const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
+            const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
+
+            if (typeIdx === -1) return;
+
+            window.regionPrefData = [];
+            let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue;
+                const cols = lines[i].split(',').map(c => c.trim());
+                const type = cols[typeIdx];
+
+                if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
+                    const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
+                    const lat = parseFloat(cols[latIdx]);
+                    const lng = parseFloat(cols[lngIdx]);
+                    const zoom = parseFloat(cols[zoomIdx]);
+                    window.regionData = { name, lat, lng, zoom };
+                    drawLocation(name, lat, lng, zoom);
+                }
+
+                if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
+                    const urlVal = cols[urlIdx];
+                    const prefName = cols[notesIdx];
+                    if (!urlVal) continue;
+
+                    const regionNameJP = window.regionData ? window.regionData.name : '関東地方';
+                    const linkUrl = `/?region=${encodeURIComponent(regionNameJP)}&pref=${encodeURIComponent(prefName)}`;
+                    regionHtml += `<li style="margin:8px 0; font-size:14px;"><a href="${linkUrl}" style="color:#191970; text-decoration:none; position:relative; padding-left:12px; transition:opacity 0.2s ease;"><span style="position:absolute; left:0; top:50%; transform:translateY(-50%); font-size:8px; opacity:0.6;">▶</span>${prefName}の釣り場一覧を見る</a></li>`;
+
+                    const parts = urlVal.split('/');
+                    let prefCode = '';
+                    let lat, lng;
+                    
+                    if (parts.length >= 4) {
+                        prefCode = parts[1].split('_')[0]; 
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
+                    } else if (parts.length === 3) {
+                        prefCode = parts[0].split('_')[0]; 
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    } else continue;
+
+                    if (isNaN(lat) || isNaN(lng)) continue;
+
+                    window.regionPrefData.push({
+                        regionCode: regionCode,
+                        prefCode: prefCode,
+                        prefName: prefName,
+                        lat: lat,
+                        lng: lng
+                    });
+                }
+            }
+            
+            regionHtml += '</ul>';
+            const regionTitle = (window.regionData ? window.regionData.name : '関東地方') + 'の釣りエリア一覧';
+            window.regionSeoHtml = regionHtml;
+            window.regionSeoTitle = regionTitle;
+
+            const titleSpan = document.getElementById('seo-list-title');
+            const linkContainer = document.getElementById('seo-link-container');
+            if (titleSpan) titleSpan.textContent = regionTitle;
+            if (linkContainer) linkContainer.innerHTML = regionHtml;
+
+            if (typeof window.runAfterTileLoad === 'function') {
+                window.runAfterTileLoad(showAllRegionSpots);
+            } else {
+                showAllRegionSpots();
+            }
+            if (typeof showRoadLayers === 'function') showRoadLayers();
+
+            window.regionNearestClickHandler = function(e) {
+                handleRegionNearest(e.latlng);
+            };
+
+            if (window.map) {
+                window.map.off('click', window.regionNearestClickHandler);
+                window.map.on('click', window.regionNearestClickHandler);
+            }
+
+            isRegionLoaded = true;
+        })
+        .catch(err => {
+            console.error("Regionマップの初期化エラー:", err);
+        });
 }
 
 // ==========================================
