@@ -1479,12 +1479,6 @@ let isRegionLoaded = false;
 function loadRegionMap() {
     const regionCode = window.currentRegion || 'KANTO';
 
-    // ★ CSVの通信完了を待たず、0秒で関東の初期座標のマップを生成してタイル通信(LCP)を最優先スタートさせる
-    if (!window.map && !window.regionData) {
-        window.regionData = { name: '関東地方', lat: 35.65, lng: 139.8, zoom: 8.5 };
-        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
-    }
-
     if (window.map) {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -1555,11 +1549,8 @@ function loadRegionMap() {
                     const lat = parseFloat(cols[latIdx]);
                     const lng = parseFloat(cols[lngIdx]);
                     const zoom = parseFloat(cols[zoomIdx]);
-                    const prev = window.regionData;
                     window.regionData = { name, lat, lng, zoom };
-                    if (!window.map || !prev || Math.abs(prev.lat - lat) > 0.001 || Math.abs(prev.lng - lng) > 0.001 || prev.zoom !== zoom) {
-                        drawLocation(name, lat, lng, zoom);
-                    }
+                    drawLocation(name, lat, lng, zoom);
                 }
 
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
@@ -1983,8 +1974,18 @@ function loadAndRenderCategorizedArticles(targetDomId) {
         }
     };
 
-    // ★ ユーザー操作待ちを廃止し、タイル・マップレイヤー完了後のキューから即座に実行する
-    return executeLoad();
+    // ★ IntersectionObserver で記事枠が画面に近づいた瞬間（400px手前）に自動で読み込む（初期表示のLCP乗っ取りを完全防止）
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries.some(entry => entry.isIntersecting)) {
+                observer.disconnect();
+                executeLoad();
+            }
+        }, { rootMargin: '400px 0px' });
+        observer.observe(targetDom);
+    } else {
+        executeLoad();
+    }
 }
 
 function initAreaUI() {
