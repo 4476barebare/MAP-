@@ -29,9 +29,10 @@
   <!-- favicon -->
   <link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
 
-  <!-- タイルサーバーへの事前接続と初期CSVの先読み -->
+  <!-- タイルサーバー・CDNへの事前接続と初期CSVの先読み -->
   <link rel="preconnect" href="https://cyberjapandata.gsi.go.jp" crossorigin>
   <link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
   <link rel="dns-prefetch" href="https://unpkg.com">
   <link rel="preload" href="/KANTO/KANTO_region.csv" as="fetch" crossorigin="anonymous">
 
@@ -365,16 +366,12 @@ async function renderSpotRanking(retryCount = 0) {
 
         titlePrefix = "関東で";
         
-        const fetchPromises = window.regionPrefData.map(pref => {
+        // ★ 7県分の天気CSVを一斉取得せず、1県ずつ順番に取得・4msスライスでパースして帯域とCPUを保護する
+        for (const pref of window.regionPrefData) {
             const whetherUrl = `/data/${pref.prefCode}_whether.csv`;
-            return loadWhetherCSV(whetherUrl).catch(() => null);
-        });
-
-        const results = await Promise.all(fetchPromises);
-        
-        results.forEach(csvData => {
+            const csvData = await loadWhetherCSV(whetherUrl).catch(() => null);
             if (csvData) applyWhetherToSpots(csvData, window.allspotData);
-        });
+        }
 
         targetSpots = window.allspotData;
     }
@@ -1111,7 +1108,7 @@ async function showAllRegionSpots() {
             let i = 0;
             function addSlice() {
                 const start = performance.now();
-                while (i < targetSpots.length && (performance.now() - start) < 8) {
+                while (i < targetSpots.length && (performance.now() - start) < 4) {
                     const spot = targetSpots[i++];
                     const lat = Number(spot.lat);
                     const lng = Number(spot.lng);
@@ -1482,6 +1479,12 @@ let isRegionLoaded = false;
 function loadRegionMap() {
     const regionCode = window.currentRegion || 'KANTO';
 
+    // ★ CSVの通信完了を待たず、0秒で関東の初期座標のマップを生成してタイル通信(LCP)を最優先スタートさせる
+    if (!window.map && !window.regionData) {
+        window.regionData = { name: '関東地方', lat: 35.65, lng: 139.8, zoom: 8.5 };
+        drawLocation(window.regionData.name, window.regionData.lat, window.regionData.lng, window.regionData.zoom);
+    }
+
     if (window.map) {
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
@@ -1552,8 +1555,11 @@ function loadRegionMap() {
                     const lat = parseFloat(cols[latIdx]);
                     const lng = parseFloat(cols[lngIdx]);
                     const zoom = parseFloat(cols[zoomIdx]);
+                    const prev = window.regionData;
                     window.regionData = { name, lat, lng, zoom };
-                    drawLocation(name, lat, lng, zoom);
+                    if (!window.map || !prev || Math.abs(prev.lat - lat) > 0.001 || Math.abs(prev.lng - lng) > 0.001 || prev.zoom !== zoom) {
+                        drawLocation(name, lat, lng, zoom);
+                    }
                 }
 
                 if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
@@ -1881,46 +1887,48 @@ function loadAndRenderCategorizedArticles(targetDomId) {
         window.removeEventListener('mousemove', executeLoad);
 
         try {
-            const res = await fetch('sitemap.xml');
+            const res = await fetch('sitemap.xml', { priority: 'low' });
             if (!res.ok) throw new Error('サイトマップの取得に失敗しました');
             const xmlText = await res.text();
 
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-            
             const categoryOrder = [];
             const groupedArticles = {};
 
-            xmlDoc.querySelectorAll("url").forEach(urlNode => {
-                const locNode = urlNode.querySelector("loc");
-                if (!locNode) return;
-                const url = locNode.textContent.trim();
+            // ★ DOMParserによる巨大なXMLツリー構築（Long Task）を廃止し、4msスライスの正規表現で高速抽出する
+            const urlBlocks = xmlText.split('<url>');
+            let idx = 1;
 
-                let articleData = null;
-                urlNode.childNodes.forEach(child => {
-                    if (child.nodeType === 8) { 
-                        const commentText = child.nodeValue;
-                        if (commentText.includes('ARTICLE_DATA:')) {
-                            try {
-                                const jsonStr = commentText.replace('ARTICLE_DATA:', '').trim();
-                                articleData = JSON.parse(jsonStr);
-                            } catch (e) {
-                                console.error('記事JSONパースエラー:', e, commentText);
+            await new Promise(resolve => {
+                function parseXmlSlice() {
+                    const start = performance.now();
+                    while (idx < urlBlocks.length && (performance.now() - start) < 4) {
+                        const block = urlBlocks[idx++];
+                        if (!block.includes('ARTICLE_DATA:')) continue;
+
+                        const locMatch = block.match(/<loc>([^<]+)<\/loc>/);
+                        const dataMatch = block.match(/<!--\s*ARTICLE_DATA:\s*(\{[\s\S]*?\})\s*-->/);
+                        if (!locMatch || !dataMatch) continue;
+
+                        try {
+                            const articleData = JSON.parse(dataMatch[1]);
+                            articleData.url = locMatch[1].trim();
+                            const cat = articleData.category || "その他の記事";
+                            if (!categoryOrder.includes(cat)) {
+                                categoryOrder.push(cat);
+                                groupedArticles[cat] = [];
                             }
+                            groupedArticles[cat].push(articleData);
+                        } catch (e) {
+                            console.error('記事JSONパースエラー:', e);
                         }
                     }
-                });
-
-                if (articleData) {
-                    articleData.url = url;
-                    const cat = articleData.category || "その他の記事";
-                    
-                    if (!categoryOrder.includes(cat)) {
-                        categoryOrder.push(cat);
-                        groupedArticles[cat] = [];
+                    if (idx < urlBlocks.length) {
+                        requestAnimationFrame(parseXmlSlice);
+                    } else {
+                        resolve();
                     }
-                    groupedArticles[cat].push(articleData);
                 }
+                requestAnimationFrame(parseXmlSlice);
             });
 
             let html = '';
@@ -3289,60 +3297,74 @@ function loadWhetherCSV(url) {
         window.fetchCacheStatus[prefCode] = true;
     }
 
-    const promise = fetch(url).then(res => {
+    const promise = fetch(url, { priority: 'low' }).then(res => {
         if (!res.ok) throw new Error("whether csv fetch失敗");
         return res.text();
-    }).then(text => {
+    }).then(async text => {
         const lines = text.trim().split("\n");
         lines.shift();
 
-        const parsedData = lines.map(line => {
-            const obj = splitCSVLine(line);
-            if (!obj) return null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
 
-            let parsed;
-            try {
-                parsed = JSON.parse(obj.whether);
-            } catch (e) {
-                return null;
-            }
+        const parsedData = [];
+        let i = 0;
 
-            // ===== データ整形・付与 =====
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+        // ★ 巨大な天気JSONのパース処理を1フレーム4ms以内に分割し、Long Task（TBT悪化）を完全に防ぐ
+        await new Promise(resolve => {
+            function parseSlice() {
+                const start = performance.now();
+                while (i < lines.length && (performance.now() - start) < 4) {
+                    const line = lines[i++];
+                    const obj = splitCSVLine(line);
+                    if (!obj) continue;
 
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(obj.whether);
+                    } catch (e) {
+                        continue;
+                    }
 
-            let csvDate = null;
-            if (obj.date) {
-                const safeDateStr = obj.date.replace(/-/g, "/");
-                csvDate = new Date(safeDateStr);
-                csvDate.setHours(0, 0, 0, 0);
-            }
+                    let csvDate = null;
+                    if (obj.date) {
+                        const safeDateStr = obj.date.replace(/-/g, "/");
+                        csvDate = new Date(safeDateStr);
+                        csvDate.setHours(0, 0, 0, 0);
+                    }
 
-            const isToday = csvDate && csvDate.getTime() === today.getTime();
-            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
+                    const isToday = csvDate && csvDate.getTime() === today.getTime();
+                    const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
 
-            if (isToday) {
-                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
-                    parsed.daily[4] = null; 
+                    if (isToday) {
+                        if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
+                            parsed.daily[4] = null; 
+                        }
+                    } else if (isYesterday) {
+                        if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
+                            parsed.hourly[0] = parsed.hourly[1];
+                            parsed.hourly[1] = parsed.hourly[2];
+                            parsed.hourly[2] = null;
+                        }
+                    }
+
+                    parsedData.push({
+                        name: obj.name,
+                        date: obj.date,
+                        whether: parsed 
+                    });
                 }
-            } 
-            else if (isYesterday) {
-                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
-                    parsed.hourly[0] = parsed.hourly[1];
-                    parsed.hourly[1] = parsed.hourly[2];
-                    parsed.hourly[2] = null;
+
+                if (i < lines.length) {
+                    requestAnimationFrame(parseSlice);
+                } else {
+                    resolve();
                 }
             }
-
-            return {
-                name: obj.name,
-                date: obj.date,
-                whether: parsed 
-            };
-        }).filter(Boolean);
+            requestAnimationFrame(parseSlice);
+        });
 
         // ★ 1回目の処理完了後、県コード付きの金庫に保存
         if (prefCode) {
@@ -3991,52 +4013,58 @@ const DepthMapController = (function() {
 
         _loadData: function() {
             const self = this;
-            this._loadPromise = Promise.all(
-                DEPTH_FILES.map(url => fetch(url, { priority: 'low' }).then(res => {
-                    if (!res.ok) throw new Error(url + '\nHTTP ' + res.status);
-                    return res.json();
-                }))
-            ).then(async results => {
-                const parsedLayers = [];
-                // ★ 5層のデコード処理を1フレーム8ms以内に分割してメインスレッドのロック（カクつき）を防ぐ
-                for (let index = 0; index < results.length; index++) {
-                    const items = results[index];
-                    const groupsMap = {};
-                    let i = 0;
-                    await new Promise(resolve => {
-                        function decodeSlice() {
-                            const start = performance.now();
-                            while (i < items.length && (performance.now() - start) < 8) {
-                                const item = items[i++];
-                                if (!item.p) continue;
-                                const points = decodePolyline(item.p);
-                                if (points.length >= 3) {
-                                    const g = item.group || 'default';
-                                    if (!groupsMap[g]) groupsMap[g] = [];
-                                    groupsMap[g].push({ latlngs: points.map(p => L.latLng(p[0], p[1])) });
+            this._loadPromise = (async () => {
+                try {
+                    const parsedLayers = [];
+                    // ★ 5ファイルを1ファイルずつ順番に取得・4msスライスでデコードする（同時通信とメインスレッドのロックを完全防止）
+                    for (let index = 0; index < DEPTH_FILES.length; index++) {
+                        const url = DEPTH_FILES[index];
+                        const res = await fetch(url, { priority: 'low' });
+                        if (!res.ok) throw new Error(url + '\nHTTP ' + res.status);
+                        const items = await res.json();
+
+                        const groupsMap = {};
+                        let i = 0;
+                        await new Promise(resolve => {
+                            function decodeSlice() {
+                                const start = performance.now();
+                                while (i < items.length && (performance.now() - start) < 4) {
+                                    const item = items[i++];
+                                    if (!item.p) continue;
+                                    const points = decodePolyline(item.p);
+                                    if (points.length >= 3) {
+                                        const g = item.group || 'default';
+                                        if (!groupsMap[g]) groupsMap[g] = [];
+                                        groupsMap[g].push({ latlngs: points.map(p => L.latLng(p[0], p[1])) });
+                                    }
+                                }
+                                if (i < items.length) {
+                                    requestAnimationFrame(decodeSlice);
+                                } else {
+                                    resolve();
                                 }
                             }
-                            if (i < items.length) {
-                                requestAnimationFrame(decodeSlice);
-                            } else {
-                                resolve();
-                            }
-                        }
-                        requestAnimationFrame(decodeSlice);
-                    });
-                    parsedLayers.push({ depth: [20, 50, 100, 150, 200][index], groups: Object.values(groupsMap) });
+                            requestAnimationFrame(decodeSlice);
+                        });
+                        parsedLayers.push({ depth: [20, 50, 100, 150, 200][index], groups: Object.values(groupsMap) });
+                    }
+                    self._data = parsedLayers;
+                    self._loaded = true;
+                    await self._redrawAsync();
+                } catch (err) {
+                    console.error('等深線読み込みエラー:', err);
                 }
-                self._data = parsedLayers;
-                self._loaded = true;
-                self._redraw();
-            }).catch(err => {
-                console.error('等深線読み込みエラー:', err);
-            });
+            })();
             return this._loadPromise;
         },
 
         _redraw: function() {
-            if (!this._visible || !this._loaded || this._drawing) return;
+            this._redrawAsync();
+        },
+
+        _redrawAsync: async function() {
+            if (!this._visible || !this._loaded || !this._map || !this._canvas) return;
+            const renderId = (this._renderId = (this._renderId || 0) + 1);
             this._drawing = true;
             this._resizeCanvas();
 
@@ -4055,19 +4083,21 @@ const DepthMapController = (function() {
                 L.latLng(KANTO_MIN_LAT, KANTO_MIN_LNG)
             ];
 
-            ctx.save();
-            ctx.beginPath();
-            boundsBox.forEach((ll, index) => {
-                const lp = map.latLngToLayerPoint(ll);
-                const x = lp.x - topLeft.x, y = lp.y - topLeft.y;
-                if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-            });
-            ctx.closePath();
-            ctx.clip(); 
+            // ★ 5層（20m〜200m）を1フレームに1層ずつ分割描画し、Canvas描画のLong Task（100ms超え）をゼロにする
+            for (let lIdx = 0; lIdx < this._data.length; lIdx++) {
+                if (renderId !== this._renderId || !this._map) return;
+                const layer = this._data[lIdx];
 
-            this._data.forEach(layer => {
                 ctx.save();
-                
+                ctx.beginPath();
+                boundsBox.forEach((ll, index) => {
+                    const lp = map.latLngToLayerPoint(ll);
+                    const x = lp.x - topLeft.x, y = lp.y - topLeft.y;
+                    if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.closePath();
+                ctx.clip();
+
                 // 1. 面の描画
                 ctx.globalAlpha = 0.40;
                 ctx.fillStyle = MULTIPLY_COLORS[layer.depth] || '#191970';
@@ -4102,7 +4132,11 @@ const DepthMapController = (function() {
                 ctx.stroke();
 
                 ctx.restore();
-            });
+
+                await new Promise(r => requestAnimationFrame(r));
+            }
+
+            if (renderId !== this._renderId || !this._map) return;
 
             // 3. マスク処理
             ctx.save();
@@ -4120,7 +4154,6 @@ const DepthMapController = (function() {
             });
             ctx.restore();
 
-            ctx.restore(); // 全体クリップ解除
             this._drawing = false;
 
             if (this._canvas && this._visible) {
