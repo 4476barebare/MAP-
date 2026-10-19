@@ -4,6 +4,30 @@
 // =========================================
 
 // ==========================================
+// ★ ソナーレーダーの間引き・表示バランス設定
+// ==========================================
+const SONAR_CONFIG = {
+    // 全魚種のデフォルト設定（マダイやハゼなどにちょうどいいバランス）
+    default: {
+        maxSonars: 12,        // マップ上に表示するソナーの最大数
+        minDistanceKm: 12.0,  // ソナー同士の最小間隔（km）※これより近い釣果は1つのソナーに統合
+        hitRadiusKm: 6.0,     // スポットリンクを「釣果反応」として光らせる半径（km）
+        sonarSizePx: 56       // ソナー円のサイズ（px）
+    },
+    // 釣果情報が多すぎる魚種・個別調整したい魚種のオーバーライド設定
+    overrides: {
+        "スズキ":       { maxSonars: 10, minDistanceKm: 18.0, sonarSizePx: 48 },
+        "シーバス":     { maxSonars: 10, minDistanceKm: 18.0, sonarSizePx: 48 },
+        "ブラックバス": { maxSonars: 10, minDistanceKm: 18.0, sonarSizePx: 48 },
+        "アジ":         { maxSonars: 12, minDistanceKm: 15.0, sonarSizePx: 50 },
+        "クロダイ":     { maxSonars: 10, minDistanceKm: 15.0, sonarSizePx: 50 },
+        "タチウオ":     { maxSonars: 10, minDistanceKm: 14.0, sonarSizePx: 52 },
+        "ハゼ":         { maxSonars: 12, minDistanceKm: 10.0, sonarSizePx: 56 },
+        "マダイ":       { maxSonars: 12, minDistanceKm: 8.0,  sonarSizePx: 60 }
+    }
+};
+
+// ==========================================
 // ★ 魚種名おまとめ辞書（出世魚や別名・compiled_dataの表記ゆれを統一）
 // ==========================================
 const FISH_DICTIONARY = {
@@ -49,7 +73,7 @@ function normalizeFishName(rawName) {
     return FISH_DICTIONARY[cleaned] || cleaned;
 }
 
-// ★ 2点間の距離（km）を計算（ソナー圏内のスポット判定用）
+// ★ 2点間の距離（km）を計算
 function calcDistanceKm(lat1, lng1, lat2, lng2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -60,9 +84,28 @@ function calcDistanceKm(lat1, lng1, lat2, lng2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// ★ 対象魚種に応じたソナー設定を取得（HTML側の個別変数指定にも対応）
+function getSonarSettings(targetFishArray) {
+    let settings = { ...SONAR_CONFIG.default };
+    for (const fish of targetFishArray) {
+        if (SONAR_CONFIG.overrides[fish]) {
+            settings = { ...settings, ...SONAR_CONFIG.overrides[fish] };
+            break;
+        }
+    }
+    // 記事HTML側で window.SONAR_MAX_COUNT などが個別に定義されていれば最優先で適用
+    if (typeof window.SONAR_MAX_COUNT === 'number') settings.maxSonars = window.SONAR_MAX_COUNT;
+    if (typeof window.SONAR_MIN_DIST_KM === 'number') settings.minDistanceKm = window.SONAR_MIN_DIST_KM;
+    if (typeof window.SONAR_SIZE_PX === 'number') settings.sonarSizePx = window.SONAR_SIZE_PX;
+    return settings;
+}
+
 // ★ ソナーレーダー＆ハイライト用のCSSを自動注入
-function injectSonarStyles() {
-    if (document.getElementById('sonar-radar-styles')) return;
+function injectSonarStyles(sizePx) {
+    const existing = document.getElementById('sonar-radar-styles');
+    if (existing) existing.remove();
+
+    const sweepSize = Math.max(20, sizePx - 8);
     const style = document.createElement('style');
     style.id = 'sonar-radar-styles';
     style.textContent = `
@@ -74,19 +117,19 @@ function injectSonarStyles() {
         }
         .sonar-emitter {
             position: relative;
-            width: 64px;
-            height: 64px;
+            width: ${sizePx}px;
+            height: ${sizePx}px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         /* 中心の輝点 */
         .sonar-core {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             background-color: #00ffcc;
             border-radius: 50%;
-            box-shadow: 0 0 8px #00ffcc, 0 0 14px #00ffcc;
+            box-shadow: 0 0 6px #00ffcc, 0 0 12px #00ffcc;
             z-index: 3;
         }
         /* 広がるソナー波紋（3重リング） */
@@ -94,13 +137,13 @@ function injectSonarStyles() {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             transform: translate(-50%, -50%);
             border-radius: 50%;
-            border: 1.5px solid rgba(0, 255, 204, 0.9);
-            background: radial-gradient(circle, rgba(0, 255, 204, 0.28) 0%, rgba(0, 255, 204, 0) 70%);
-            box-shadow: 0 0 8px rgba(0, 255, 204, 0.5);
+            border: 1.5px solid rgba(0, 255, 204, 0.85);
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.22) 0%, rgba(0, 255, 204, 0) 70%);
+            box-shadow: 0 0 6px rgba(0, 255, 204, 0.4);
             opacity: 0;
             animation: sonar-ping 3.2s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
         }
@@ -112,12 +155,12 @@ function injectSonarStyles() {
             position: absolute;
             top: 4px;
             left: 4px;
-            width: 56px;
-            height: 56px;
+            width: ${sweepSize}px;
+            height: ${sweepSize}px;
             border-radius: 50%;
-            background: conic-gradient(from 0deg, rgba(0, 255, 204, 0) 0deg, rgba(0, 255, 204, 0.02) 260deg, rgba(0, 255, 204, 0.45) 360deg);
+            background: conic-gradient(from 0deg, rgba(0, 255, 204, 0) 0deg, rgba(0, 255, 204, 0.02) 260deg, rgba(0, 255, 204, 0.4) 360deg);
             animation: sonar-rotate 4s linear infinite;
-            border: 1px dashed rgba(0, 255, 204, 0.35);
+            border: 1px dashed rgba(0, 255, 204, 0.3);
             box-sizing: border-box;
         }
 
@@ -128,8 +171,8 @@ function injectSonarStyles() {
                 opacity: 1;
             }
             100% {
-                width: 64px;
-                height: 64px;
+                width: ${sizePx}px;
+                height: ${sizePx}px;
                 opacity: 0;
             }
         }
@@ -152,6 +195,7 @@ function injectSonarStyles() {
             margin-bottom: 8px;
             border: 1px solid rgba(0, 255, 204, 0.4);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            line-height: 1.4;
         }
         .sonar-status-dot {
             width: 8px;
@@ -192,8 +236,6 @@ function injectSonarStyles() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  injectSonarStyles();
-  
   // HTML側で定義されたグローバル変数を読み込み（未定義時のフォールバックも設定）
   const targetFishStr = window.TARGET_FISH || '対象魚';
   const targetRegionCode = window.TARGET_REGION_CODE || 'KANTO';
@@ -205,15 +247,21 @@ document.addEventListener("DOMContentLoaded", function () {
     .map(f => normalizeFishName(f))
     .filter(Boolean);
 
-  // ★ 見出しの「対象魚」バグ自動補正（HTML側のスクリプト実行順による表示漏れをカバー）
+  // ★ 魚種ごとのソナー設定を取得してCSS注入
+  const sonarSettings = getSonarSettings(targetFishArray);
+  injectSonarStyles(sonarSettings.sonarSizePx);
+
+  // ★ 修正：見出しの「document.write(...)」露出バグを完全に解消
   const mapContainer = document.getElementById('fish-map');
   if (mapContainer) {
     mapContainer.setAttribute('aria-label', `${targetRegionNameJP}の${targetFishStr}釣果スポット分布マップ`);
     const parentSection = mapContainer.closest('section');
     if (parentSection) {
       const h3 = parentSection.querySelector('h3');
-      if (h3 && h3.textContent.includes('対象魚') && targetFishStr !== '対象魚') {
-        h3.textContent = h3.textContent.replace('対象魚', targetFishStr);
+      if (h3) {
+        // <h3>内の<script>タグを完全に除去してクリーンな見出しテキストで上書き
+        const shortRegion = targetRegionNameJP.replace('地方', '');
+        h3.textContent = `📍 ${shortRegion}の${targetFishStr}生息・釣果スポット`;
       }
     }
   }
@@ -235,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function () {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">© 国土地理院</a>'
   }).addTo(map);
 
-  // ★ 通常の生息ドット（赤）とソナーアイコン（エメラルドグリーン）のPane分け（ソナーを最前面に）
+  // ★ ソナーレイヤーを最前面に配置
   map.createPane('sonarPane');
   map.getPane('sonarPane').style.zIndex = 650;
 
@@ -246,6 +294,7 @@ document.addEventListener("DOMContentLoaded", function () {
     iconAnchor: [1.5, 1.5]
   });
 
+  const halfSize = sonarSettings.sonarSizePx / 2;
   const sonarIcon = L.divIcon({
     className: 'sonar-marker-wrapper',
     html: `
@@ -257,8 +306,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="sonar-core"></div>
       </div>
     `,
-    iconSize: [64, 64],
-    iconAnchor: [32, 32]
+    iconSize: [sonarSettings.sonarSizePx, sonarSettings.sonarSizePx],
+    iconAnchor: [halfSize, halfSize]
   });
 
   async function loadFishSpots() {
@@ -266,7 +315,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const compiledDataUrl = `../data/compiled_data.json`;
 
     try {
-      // ★ Region CSV と compiled_data.json を並列取得
       const [res, compiledRes] = await Promise.all([
         fetch(regionUrl),
         fetch(compiledDataUrl).catch(() => null)
@@ -274,8 +322,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (!res.ok) throw new Error("Region CSV fetch failed");
       
-      // 1. compiled_data.json から対象魚種の釣果座標（ソナー発信源）を抽出
-      const sonarPoints = [];
+      // 1. compiled_data.json から対象魚種の全釣果座標を抽出
+      const allMatchedCatchPoints = []; // スポットリンクの「釣果反応」判定用（間引き前）
+      const displaySonarPoints = [];    // マップ上にソナー描画する用（間引き後）
+      let totalCatchReports = 0;
+
       if (compiledRes && compiledRes.ok) {
         const compiledJson = await compiledRes.json();
         const rawList = [
@@ -288,7 +339,7 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!item || !item.fish || !item.lat || !item.lng) return;
           const normFish = normalizeFishName(item.fish);
           if (targetFishArray.includes(normFish)) {
-            // 小数点第3位で丸めて同一ポイントの重複ソナーを統合
+            totalCatchReports++;
             const key = `${Number(item.lat).toFixed(3)}_${Number(item.lng).toFixed(3)}`;
             const existing = uniqueCoords.get(key);
             if (!existing || item.date > existing.date) {
@@ -303,7 +354,25 @@ document.addEventListener("DOMContentLoaded", function () {
             }
           }
         });
-        sonarPoints.push(...uniqueCoords.values());
+
+        allMatchedCatchPoints.push(...uniqueCoords.values());
+
+        // ★ 間引きロジック：釣果報告数が多い順 ＞ 日付が新しい順 にソート
+        const sortedCandidates = [...allMatchedCatchPoints].sort((a, b) => {
+          if (b.count !== a.count) return b.count - a.count;
+          return b.date.localeCompare(a.date);
+        });
+
+        // ★ 空間クラスタリング：すでに採用したソナーから minDistanceKm 以内のものはスキップし、最大 maxSonars 個に制限
+        for (const candidate of sortedCandidates) {
+          if (displaySonarPoints.length >= sonarSettings.maxSonars) break;
+          const isTooClose = displaySonarPoints.some(
+            selected => calcDistanceKm(candidate.lat, candidate.lng, selected.lat, selected.lng) < sonarSettings.minDistanceKm
+          );
+          if (!isTooClose) {
+            displaySonarPoints.push(candidate);
+          }
+        }
       }
 
       // 2. 各都道府県のスポットデータを取得
@@ -404,9 +473,9 @@ document.addEventListener("DOMContentLoaded", function () {
                           L.marker([sLat, sLng], { icon: dotIcon }).addTo(map);
                           bounds.extend([sLat, sLng]);
 
-                          // ★ ソナー発信源から半径6km以内にあるスポットを「ソナー反応あり」と判定
-                          sonarPoints.forEach(sp => {
-                              if (calcDistanceKm(sLat, sLng, sp.lat, sp.lng) <= 6.0) {
+                          // ★ リンクのハイライト判定は間引き後のソナー位置と一致させる（地図の見た目とリストを完全同期）
+                          displaySonarPoints.forEach(sp => {
+                              if (calcDistanceKm(sLat, sLng, sp.lat, sp.lng) <= sonarSettings.hitRadiusKm) {
                                   isSonarHit = true;
                                   if (sp.date > latestCatchDate) {
                                       latestCatchDate = sp.date;
@@ -434,8 +503,8 @@ document.addEventListener("DOMContentLoaded", function () {
           }
       });
 
-      // 3. ソナーレーダーをマップに描画
-      sonarPoints.forEach(sp => {
+      // 3. 間引き済みのソナーレーダーをマップに描画
+      displaySonarPoints.forEach(sp => {
           L.marker([sp.lat, sp.lng], {
               icon: sonarIcon,
               pane: 'sonarPane',
@@ -444,13 +513,17 @@ document.addEventListener("DOMContentLoaded", function () {
           bounds.extend([sp.lat, sp.lng]);
       });
 
-      // ソナー反応がある場合、マップ直上に潜水艦ソナー風のステータスバーを表示
-      if (sonarPoints.length > 0 && mapContainer) {
+      // ステータスバー表示（間引かれた場合は「全〇件の釣果から主要〇エリアを表示中」とスマートに表記）
+      if (displaySonarPoints.length > 0 && mapContainer) {
           const banner = document.createElement('div');
           banner.className = 'sonar-status-banner';
+          const countText = allMatchedCatchPoints.length > displaySonarPoints.length
+            ? `直近の釣果反応（計${totalCatchReports}件）から主要 <strong>${displaySonarPoints.length}エリア</strong> をソナー表示中！`
+            : `直近の釣果反応を <strong>${displaySonarPoints.length}地点</strong> でキャッチ！`;
+
           banner.innerHTML = `
             <span class="sonar-status-dot"></span>
-            <span>SONAR ACTIVE：直近の釣果反応を <strong>${sonarPoints.length}地点</strong> でキャッチ！下の「🔥釣果反応」リンクから詳細マップへ飛べます</span>
+            <span>SONAR ACTIVE：${countText}下の「📡釣果反応」から詳細マップへ飛べます</span>
           `;
           mapContainer.parentNode.insertBefore(banner, mapContainer);
       }
@@ -460,7 +533,7 @@ document.addEventListener("DOMContentLoaded", function () {
           map.setZoom(map.getZoom() + 0.5);
       }
 
-      // 4. スポットリストの描画（ソナー反応があるスポットを各都道府県の先頭に浮上＆強調）
+      // 4. スポットリストの描画
       const listContainer = document.getElementById('fish-spot-list');
       if (listContainer && fishSpotLinks.length > 0) {
           
@@ -473,7 +546,6 @@ document.addEventListener("DOMContentLoaded", function () {
           });
 
           for (const [pref, links] of Object.entries(groupedLinks)) {
-              // ソナー反応ありを先頭にソート
               links.sort((a, b) => (b.isSonarHit ? 1 : 0) - (a.isSonarHit ? 1 : 0));
 
               const heading = document.createElement('h4');
