@@ -692,7 +692,7 @@ li {
    アクセス情報（エリアガイド直上）
 ========================= */
 #accessInfoBox {
-    display: none; /* 初期は非表示 */
+    /*display: none;  初期は非表示 */
     background: #fff;
     padding: 15px 16px 0 16px; /* 下にあるエリアガイドとシームレスに繋げる */
     color: #191970;
