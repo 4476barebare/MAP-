@@ -100,12 +100,24 @@
     <div class="week-labels" id="weekLabels"></div>
     <div class="week-table" id="weekTable"></div>
   </div>
-
 </div>
-
-<!-- 👇 アクセス情報表示エリア (エリアガイドの直上) -->
-<section class="access-info" id="accessInfoBox" aria-label="アクセス情報">
-      <!-- JSで動的に流し込まれます -->
+<!-- 👇 アクセス情報表示エリア（初期状態はサイト説明を表示し、スポット選択時に切り替える） -->
+<section class="access-info" id="accessInfoBox" aria-label="サイト案内・アクセス情報">
+  <div id="default-site-guide">
+    <h3>「釣り行こNAVI」の特徴と使い方</h3>
+    <p style="font-size: 13px; line-height: 1.6; color: #333; margin-bottom: 10px;">
+      「釣り行こNAVI」は、関東全域（東京・神奈川・千葉・茨城・埼玉・群馬・栃木）の海釣り・堤防・河川スポットを網羅したインタラクティブ釣り場マップです。国土地理院の航空写真や海底の等深線（水深データ）を重ね合わせ、ポイントの地形やカケアガリを視覚的に把握できます。
+    </p>
+    <div style="font-weight: bold; font-size: 13px; color: #191970; margin-bottom: 4px;">🗺️ マップの基本操作と機能</div>
+    <ul style="font-size: 13px; line-height: 1.6; padding-left: 18px; margin: 0 0 10px 0;">
+      <li><strong>エリア・釣り場検索：</strong>地図上のピンや県・エリアメニューから目的の釣り場へズームできます。</li>
+      <li><strong>ピンポイント気象・潮汐：</strong>各スポットの2時間ごとの天気・風向・風速・波高・水温、およびタイドグラフ（潮見表）をワンタップで確認できます。</li>
+      <li><strong>対象魚と最新釣果：</strong>各釣り場で狙える魚種や、周辺20km圏内のリアルタイム釣果情報、最寄りの釣具店・ICからのアクセスルートを表示します。</li>
+    </ul>
+    <p style="font-size: 12px; color: #555; margin: 0;">
+      ※ページ下部の「おすすめ釣り場ランキング」や「入門・対象魚別ガイド記事」もあわせてご活用ください。
+    </p>
+  </div>
 </section>
 <!-- 👇 明日のオススメ釣り場ランキングセクション -->
 <section id="fishing-recommend-section" style="margin: 10px; padding: 15px; background-color: #eef3f8; border-radius: 8px; border: 1px solid #dce4ee;">
