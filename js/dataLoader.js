@@ -2985,12 +2985,25 @@ async function renderRecentCatches(spot) {
         accessBox.appendChild(catchDiv);
     }
 }
+// ★ 初回ロード時に初期HTML（サイト説明）を記憶しておく
+window.addEventListener('DOMContentLoaded', () => {
+    const box = document.getElementById('accessInfoBox');
+    if (box) {
+        window._defaultAccessBoxHtml = box.innerHTML;
+    }
+});
 
+// ★ スポット画面から戻る時は、非表示にせず「サイトの使い方」に戻す
 function clearAccessInfo() {
     const container = document.getElementById('accessInfoBox');
     if (container) {
-        container.innerHTML = '';
-        container.style.display = 'none';
+        if (window._defaultAccessBoxHtml) {
+            container.innerHTML = window._defaultAccessBoxHtml;
+            container.style.display = 'block';
+        } else {
+            container.innerHTML = '';
+            container.style.display = 'none';
+        }
     }
 }
 
