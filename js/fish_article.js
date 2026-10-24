@@ -241,6 +241,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const targetRegionCode = window.TARGET_REGION_CODE || 'KANTO';
   const targetRegionNameJP = window.TARGET_REGION_NAME_JP || '関東地方';
 
+  // 見出し・aria-label用の表示名（カンマ区切りを「・」区切りに。単一魚種は従来どおり）
+  const displayFishStr = targetFishStr.split(',').map(f => f.trim()).filter(Boolean).join('・');
+
   // ★ 複数検索対応＆辞書正規化: カンマで分割して配列化
   const targetFishArray = targetFishStr
     .split(',')
@@ -254,14 +257,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // ★ 修正：見出しの「document.write(...)」露出バグを完全に解消
   const mapContainer = document.getElementById('fish-map');
   if (mapContainer) {
-    mapContainer.setAttribute('aria-label', `${targetRegionNameJP}の${targetFishStr}釣果スポット分布マップ`);
+    mapContainer.setAttribute('aria-label', `${targetRegionNameJP}の${displayFishStr}釣果スポット分布マップ`);
     const parentSection = mapContainer.closest('section');
     if (parentSection) {
       const h3 = parentSection.querySelector('h3');
       if (h3) {
         // <h3>内の<script>タグを完全に除去してクリーンな見出しテキストで上書き
         const shortRegion = targetRegionNameJP.replace('地方', '');
-        h3.textContent = `📍 ${shortRegion}の${targetFishStr}生息・釣果スポット`;
+        h3.textContent = `📍 ${shortRegion}の${displayFishStr}生息・釣果スポット`;
       }
     }
   }
