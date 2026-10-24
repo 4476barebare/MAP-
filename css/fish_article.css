@@ -115,3 +115,14 @@
 .spot-link-item a:hover {
   text-decoration: underline;
 }
+
+/* =========================================
+   記事内の関連リンクカード(.menu-card)
+   .article-section h2 の下線・余白がカード内h2に効かないよう打ち消す
+========================================= */
+.article-section .menu-card h2 {
+  font-size: 14px;
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
