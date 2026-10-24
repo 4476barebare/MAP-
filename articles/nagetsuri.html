@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>砂浜の投げ釣り | 砂浜の投げ釣り入門｜シロギス・カレイの仕掛けと釣れるポイントの見つけ方 | 釣り行こNAVI</title>
+  <meta name="description" content="砂浜の投げ釣りを、シロギスの引き釣りとカレイの置き竿の違いから解説。ジャリメを使った仕掛けとエサ付け、払い出しなど海底地形の読み方、距離と方向を変えるポイント探し、外道や安全面までまとめました。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="砂浜の投げ釣り入門｜シロギス・カレイの仕掛けと釣れるポイントの見つけ方">
+  <meta property="og:description" content="砂浜の投げ釣りを、シロギスの引き釣りとカレイの置き竿の違いから解説。ジャリメを使った仕掛けとエサ付け、払い出しなど海底地形の読み方、距離と方向を変えるポイント探し、外道や安全面までまとめました。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/nagetsuri.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/nagetsuri.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/nagetsuri.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="投げ釣り サーフ シロギス カレイ">
+
+    <header class="article-header">
+      <h1>砂浜の投げ釣り入門｜シロギス・カレイの仕掛けと釣れるポイントの見つけ方</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-24">2026.10.24</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/nagetsuri.jpg" alt="砂浜での投げ釣り">
+      広い砂浜から沖へ仕掛けを投げ、海底に潜む魚を狙う投げ釣り。足場がよく、釣り座も限られないため、初心者が最初に挑戦しやすい釣りのひとつです。
+    </p>
+    <p>
+      主役は暖かい季節のシロギスと、秋から冬に人気の高まるカレイ。同じ砂底の魚でも、釣り方は「探す」と「待つ」で大きく変わります。この記事では砂浜ならではの釣り方の違いと海底の読み方に絞って解説します。生態やタックルの詳細は<a href="shirogisu.html">シロギス</a>・<a href="karei.html">カレイ</a>の記事もあわせてご覧ください。
+    </p>
+
+    <section class="article-section">
+      <h2>1. 砂浜の投げ釣りは「探す」と「待つ」</h2>
+      <p>
+        砂底にはゴカイ類や小型の甲殻類が暮らしていて、これをエサにするシロギスやカレイが集まってきます。ただ砂浜は広い分、魚がどこにいるのか分からないのが難しいところ。そこで釣り方は大きく2つに分かれます。
+      </p>
+      <ul>
+        <li><strong>引き釣り（シロギス向き）：</strong>投げたらオモリを海底に沿ってゆっくり引き、群れの居場所を探ります。距離や方向を変えて広範囲を探れるのが強みです。</li>
+        <li><strong>置き竿（カレイ向き）：</strong>地形の変化や実績のある場所に仕掛けを置き、じっくりアタリを待ちます。</li>
+      </ul>
+      <p>
+        シロギスを置き竿で狙うことも、カレイを誘うこともできますが、最初は「シロギスは引く、カレイは置く」と覚えると整理しやすいでしょう。
+      </p>
+      <p>
+        考え方の違いをまとめると、シロギスは「群れの位置と距離」を探す釣り、カレイは「仕掛けを置く場所とタイミング」を見極める釣りです。なおカレイの接岸時期は地域や種類で異なり、秋から冬に好機を迎える地域が多いものの、全国一律ではありません。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. エサは細身のジャリメが基本</h2>
+      <p>
+        定番はジャリメ（石ゴカイ）。細身で小さなハリにも付けやすく、どちらの魚にも使えます。
+      </p>
+
+      <h3>シロギスは「小さく・自然に」</h3>
+      <p>
+        <img src="images/shirogisu2.jpg" alt="シロギス">
+        ジャリメをハリに沿わせる通し刺しにし、ハリ先を出してタラシは1cm程度に。仕掛けは市販のシロギス用で十分で、最初はハリ数の少ないものが絡みにくく扱いやすくなります。反応が悪ければ、タラシを少し長くして動きで誘ってみましょう。
+      </p>
+
+      <h3>カレイは「大きく・目立たせる」</h3>
+      <p>
+        <img src="images/karei2.jpg" alt="カレイ">
+        ハリとハリスが大きめの市販カレイ仕掛けに、ジャリメを数本まとめる房掛けが有効です。アオイソメやイワイソメの併用もあります。ただし小魚のアタリばかり出るときは、エサの量を減らすのも手です。
+      </p>
+      <p>
+        竿は、近距離を狙うチョイ投げなら扱いやすい短めの竿や汎用タックルでも始められます。遠投が必要な本格仕様の投げ竿は、慣れてから検討しても遅くありません。
+      </p>
+      <p>
+        テンビンは、底を引く釣りならL型、根掛かりが気になる場所ならジェットテンビンが選択肢。向き不向きは海底の状態次第です。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 砂浜の海底を読む3つの方法</h2>
+      <p>
+        平坦に見える砂浜でも、海底には波と流れでできた斜面や溝があります。カケアガリやヨブの特徴は魚種別の記事に任せ、ここでは砂浜で見つける方法を紹介します。
+      </p>
+      <ul>
+        <li><strong>オモリで探る：</strong>最初はエサなしでオモリだけを引くと、斜面や底質の違いが手元の抵抗として伝わります。ただし重くなる場所が必ずヨブとは限らず、海藻や貝殻でも変わるため、同じコースを何度か通して確かめましょう。斜面らしき場所を見つけたら位置を覚え、同じ場所へ投げ直して、斜面の上・下・途中を探り分けると魚の付き場を絞れます。</li>
+        <li><strong>払い出しを見る：</strong>波が引いて沖へ戻る流れのこと。泡の動きや波の崩れ方で見つけられ、砂が削れて溝ができやすい場所です。ただし、あれば必ず釣れるわけではありません。</li>
+        <li><strong>波打ち際の形を見る：</strong>砂浜が張り出した場所と引っ込んだ場所では、沖の地形が違うことがあります。波の崩れ方や泡の流れにも違いが出ますが、風や波で見え方は変わるため、あくまで目安にとどめ、仕掛けの感触と照らし合わせて判断します。</li>
+      </ul>
+
+      <div class="info-box">
+        <strong>⚠️ 強い払い出しは離岸流かも</strong><br>
+        沖へ強く流れる払い出しは、離岸流（リップカレント）の可能性があります。流れがあるからと波打ち際へ近づいたり、海へ入ったりするのは厳禁。強い流れや高波の日は釣りを避け、安全な位置から海況を観察し、釣果より安全を優先してください。
+      </div>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 距離と方向を変えて魚を探す</h2>
+      <p>
+        一投で釣れなくても、すぐに移動する必要はありません。投げ分けながら魚の居場所を絞り込みます。
+      </p>
+      <ol>
+        <li><strong>沖から手前へ：</strong>まず沖を探り、反応がなければ少しずつ手前へ。シロギスは波打ち際近くまで寄ることもあるので、遠投だけにこだわらないことが大切です。</li>
+        <li><strong>同じ距離で左右へ：</strong>投げる方向が変わると、かけ上がりや溝を通る位置も変わります。一投ごとに少しずつ角度を変えてみましょう。</li>
+        <li><strong>アタリを再現する：</strong>釣れた距離と方向を覚え、同じ場所へ投げ直します。色分けされた道糸なら、何色付近で出たかが目印になります。カレイも同じです。</li>
+      </ol>
+      <p>
+        続けてアタリがあれば群れがいる可能性大。一度きりなら群れが移動したのかもしれません。
+      </p>
+
+      <h3>アタリが出たら</h3>
+      <p>
+        シロギスは大きく竿をあおらず、糸をたるませないよう一定の速度で巻き上げます。慣れるまでは、複数掛けを狙うより1匹ずつ確実に取り込むことを意識しましょう。カレイは小さな反応ですぐに合わせず、魚の重みが伝わってから落ち着いて巻きます。一定時間アタリがなければエサの残り具合を確かめ、むやみに遠投を繰り返さず、地形や実績を手掛かりに投入点を調整します。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>5. 本命以外も楽しい砂浜の外道</h2>
+      <p>
+        砂浜の投げ釣りでは、釣り場の水深や底質、季節によってさまざまな魚が掛かります。代表的な顔ぶれを紹介します。
+      </p>
+      <ul>
+        <li><strong>イシモチ（シログチ）：</strong>砂泥底や河口周辺で釣れ、シロギスより大型になることも。塩焼きや蒸し料理で親しまれます。呼び名には地域差があります。</li>
+        <li><strong>セイゴ：</strong>スズキの若魚。河口付近や小魚が集まる場所で思いがけず掛かり、強く走ることがあるので糸をたるませず慎重に寄せます。</li>
+        <li><strong>メゴチ・ヒイラギ：</strong>どちらもシロギス仕掛けによく混じる小型の魚。ぬめりが強く、メゴチには鋭い部分もあるため、魚つかみがあると安全です。</li>
+        <li><strong>ハゼ類：</strong>河口や汽水域に近い砂浜で多く、河川の流れ込みがある場所は狙ってみる価値があります。</li>
+        <li><strong>アナゴ：</strong>夜釣りや河口周辺で釣れ、置き竿との相性が良い魚。仕掛けに絡みつくため、プライヤーが役立ちます。</li>
+      </ul>
+      <p>
+        ヒラメやマゴチも掛かることはありますが、虫エサでは狙いにくい魚。本格的に狙うなら泳がせ釣りやルアーが向いています。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>6. 釣果を伸ばす4つの工夫</h2>
+      <ul>
+        <li><strong>エサをこまめに確認：</strong>ジャリメは弱ると魚へのアピールが落ちます。アタリがなくても、時間を決めてエサの状態とハリ先が出ているかをチェックしましょう。</li>
+        <li><strong>引く速度を変える：</strong>シロギス狙いの基本はゆっくり引くことですが、速ければよいわけではありません。反応がなければ速度を変えたり、途中で止めたりして探ります。</li>
+        <li><strong>置き竿でも誘いを入れる：</strong>カレイ狙いでも、竿をゆっくり動かしてエサの位置を少しずらすと気付かせやすくなります。動かしすぎて狙いの場所から外れないよう注意。</li>
+        <li><strong>波と潮を観察する：</strong>波が穏やかな日は仕掛けが扱いやすく、地形も読みやすくなります。逆に波が強い日は仕掛けが流され、底の感触も分かりにくくなります。無理は禁物です。</li>
+      </ul>
+    </section>
+
+    <section class="article-section">
+      <h2>7. 砂浜ならではの準備と安全</h2>
+      <ul>
+        <li><strong>竿立てを使う：</strong>竿やリールに砂が入ると故障の原因に。砂の上に直接置かないようにします。置き竿で複数本出すときは、仕掛けが絡まないよう投入方向も分けましょう。</li>
+        <li><strong>キャスト前に周囲を確認：</strong>後方や左右に人がいないかを必ず見ます。散歩する人や海水浴客がいる場所では特に注意。</li>
+        <li><strong>装備を整える：</strong>ライフジャケットと滑りにくい履物は必須。ハサミ、プライヤー、魚つかみ、エサ箱、クーラーボックスも用意しましょう。</li>
+        <li><strong>最初は扱いやすいタックルで：</strong>竿やオモリの適合範囲を超える無理な投げ方は、破損や仕掛けの飛散につながります。まずはチョイ投げで感覚をつかみましょう。</li>
+      </ul>
+      <div class="info-box">
+        まずは市販の仕掛けとジャリメを用意し、無理のない距離から始めてみましょう。釣れた魚だけでなく、仕掛けを引く感触や波の動きにも注目すれば、砂浜が「ただの平らな場所」ではなくなってきます。
+      </div>
+    </section>
+
+    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
+      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+
+      <div id="fish-map" role="region"></div>
+
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article>
+</main>
+
+<section class="article-list">
+  <a href="shirogisu.html" class="article-card">
+    <img src="images/shirogisu.jpg" alt="シロギス">
+    <h2>「海の女王」シロギス攻略ガイド</h2>
+  </a>
+  <a href="karei.html" class="article-card">
+    <img src="images/karei.jpg" alt="カレイ">
+    <h2>【完全攻略】カレイの生態から投げ釣り・船釣り攻略法</h2>
+  </a>
+</section>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定（外部JSでこの変数を読み取ってマップを生成） -->
+<script>
+  window.TARGET_FISH = 'シロギス,カレイ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
