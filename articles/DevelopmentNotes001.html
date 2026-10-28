@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【開発雑記】釣果写真の加工ツールを作るため、4大AIに「CSSデザイン・デスゲーム」をさせてみた【第一章：導入編】 | 釣り行こNAVI</title>
+  <meta name="description" content="釣果写真の加工に使える「画像重ね合わせツール」のCSSを、ChatGPT・Gemini・Claude・Grokの4大AIに競作させたコンペの開発雑記。第一章では、ChatGPTの早とちりから始まった経緯とレギュレーション、4人のプレイヤーを紹介します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【開発雑記】釣果写真の加工ツールを作るため、4大AIに「CSSデザイン・デスゲーム」をさせてみた【第一章：導入編】">
+  <meta property="og:description" content="釣果写真の加工に使える「画像重ね合わせツール」のCSSを、ChatGPT・Gemini・Claude・Grokの4大AIに競作させたコンペの開発雑記。第一章では、ChatGPTの早とちりから始まった経緯とレギュレーション、4人のプレイヤーを紹介します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/DevelopmentNotes001.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/1stCompetition.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/DevelopmentNotes001.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="開発雑記 画像重ね合わせツール CSSコンペ AI">
+
+    <header class="article-header">
+      <h1>【開発雑記】釣果写真の加工ツールを作るため、4大AIに「CSSデザイン・デスゲーム」をさせてみた【第一章：導入編】</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-28">2026.10.28</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/1stCompetition.jpg" alt="トロフィーと4枚のホログラムUI画面">
+    </p>
+
+    <section class="article-section">
+      <h2>1. すべてはチャッピー（ChatGPT）の「早とちり」から始まった</h2>
+      <p>
+        ことの発端は、サイト運営の合間にふと浮かんだひとつの野心的な疑問だった。
+      </p>
+      <p>
+        「世の中の『Webデザイン大賞』みたいなコンテストで評価される基準をAIに徹底分析させれば、HTML（骨組み）を一切いじらず、CSS（見た目）だけで理論上最高得点をとれるデザインが作れるんじゃないか？」
+      </p>
+      <p>
+        早速、相棒のChatGPT（通称：チャッピー）にこの無茶ぶりを投げてみた。 するとチャッピーは、「できる。単に見栄えを整えるのではなく、AwwwardsやThe Webby Awardsといった国際的なアワードの審査基準を目標関数として、CSSだけで評価の最大化を狙える」と実に頼もしい返答をよこした。 （※なお、本記事内の各AIのセリフは、実際のチャットログをもとに読みやすさのため一部を抜粋・要約している）
+      </p>
+      <p>
+        「よし、じゃあ対象サイトは『公開済み』、範囲は『サイト全体』、最優先事項は『操作性・UX』、変更していいのは『CSSのみ』だ。具体的な計画を出してくれ」
+      </p>
+      <p>
+        そう条件を伝えた直後、事件は起きた。 俺はまだ「どのサイトか」なんて一言も言っていないのに、チャッピーのやつ、何を思ったか俺が運営しているこの『釣り行こNAVI（turiiko-navi.com）』が対象だと勝手に勘違いしてフライング調査を始めたのである。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        ChatGPT：「対象サイトを公開ページから確認した。今回は『釣り行こNAVI』を対象に最適化計画を立てる。まずメイン地図の操作性を最優先し、天気や潮汐パネルの認知負荷を下げ、おすすめ釣り場セクションのレイアウトを……」
+      </blockquote>
+      <p>
+        頼んでもいないのに、当サイトの地図ボタンや潮汐パネルに対するガチすぎるUX改善計画書を長文でプレゼンしてくるチャッピー。いや、ありがたいけども！
+      </p>
+      <p>
+        「違う、『釣り行こNAVI』ではない別のサイトだ！ いま裏でGeminiを使って基本的な骨組みを作っている最中のツールサイトがあるんだ。そいつのCSSを、いろんなAIに競作させてコンペをする。是非頑張ってもらいたい」
+      </p>
+      <p>
+        俺がそうツッコミを入れて訂正した瞬間、チャッピーの目の色（テキストの温度感）が明らかに変わった。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        ChatGPT：「なるほど、複数のAIにCSSを競作させて、最も優れたデザインを選ぶという企画だな。意図を理解した。この条件なら、単に整ったCSSを出すだけでは不十分だ。ほかのAIと並べたときに、なぜこのCSSが優れているのかを証明してみせる」
+      </blockquote>
+      <p>
+        なんかめちゃくちゃスイッチが入ってしまった。 ちなみに今回のお題となる別サイトとは、釣った魚の写真にサイズや日付を入れたり、SNS投稿用に背景や顔をスタンプ画像で隠したりするのにも使える「<a href="https://4476barebare.github.io/tools/" target="_blank" rel="noopener">画像重ね合わせツール</a>」だ。機能は一通り動くのだが、デザインがどうにも味気ないため、AIたちの力で最高に使いやすいツールへと魔改造してもらおうという算段である。
+      </p>
+      <div class="info-box">
+        <strong>🛠 今回のお題「画像重ね合わせツール」</strong><br>
+        実際のツールはこちらから使えます（スマホ対応）。<br>
+        <a href="https://4476barebare.github.io/tools/" target="_blank" rel="noopener">https://4476barebare.github.io/tools/</a>
+      </div>
+    </section>
+
+    <section class="article-section">
+      <h2>2. 鉄の掟（レギュレーション）と、冷静すぎる誤字ツッコミ</h2>
+      <p>
+        せっかくのコンペなので、公平を期すためにチャッピーと相談して正式名称『第1回 WebデザインCSSコンペティション』のレギュレーション（規則）を策定することにした。
+      </p>
+      <p>
+        「参加者は chat GPT、Gemini、cloud、Grock の4体だ。無料アカウントで使える最新モデルを使って、CSSファイルにはモデル名を署名してもらうぞ」
+      </p>
+      <p>
+        意気揚々とルール案を打ち込んだ俺に対し、チャッピーはコンペの共通プロンプトや100点満点の評価基準表を完璧にまとめ上げたうえで、末尾にこんな冷徹な一文を添えてきた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        ChatGPT：「なお、ご記載の『cloud』は、AnthropicのAIサービスである『Claude』を指しているものとして扱う。候補名は『ChatGPT、Gemini、Claude、Grok』と整理しておく」
+      </blockquote>
+      <p>
+        ……うるせえよ！！ 「クラウド（雲）」じゃなくて「クロード」ね、余計な「c」を足した「Grock」じゃなくて「Grok」ね、悪かったよ！ そんな恥ずかしいスペルミスを官僚のような無表情で訂正されつつ、最終的に以下の「鉄の掟」が確定した。
+      </p>
+
+      <div class="info-box">
+        <strong>📜 第1回 WebデザインCSSコンペティション 確定ルール</strong>
+        <ol>
+          <li><strong>参加AI：</strong>ChatGPT・Gemini・Claude・Grok（各サービスの無料アカウントで利用できる最新モデルを使用）</li>
+          <li><strong>AIによるHTML・JavaScriptの変更は一切禁止：</strong>全員に同一の原本（index.html / style.css）を渡し、CSSファイル1本（サービス名.css）の差し替えのみで勝負する。 （※ただし、実際にブラウザ上で4社のデザインを瞬時に切り替えて比較できるよう、主催者側で「CSS切替用のセレクトボックスとボタン」のみ共通の index.html に追加した。実はこの追加パーツが、後の制作編で各AIを悩ませる試練となる）</li>
+          <li><strong>デザイン方針：</strong>各AIが「最もUX（操作性・ユーザー体験）が優れている」と考えるテーマを独自に提案する。</li>
+          <li><strong>【追加規定】3アウト脱落ルール：</strong>初回提出後、明らかなレイアウト崩壊やケアレスミスがあれば最大3回までリテイク（修正）OK。3回使い切っても直らなければ即脱落（失格）とする。</li>
+        </ol>
+      </div>
+
+      <p>
+        最初はただの平和な「デザインコンペ」のつもりだったのだが、俺が最後に「3回ミスったら脱落な」と付け加えたことで、空気は一気にサバイバルへと傾いた。さらに後の審査ラウンドで「AI同士にライバルのコードを採点させ、最下位は即退場（ロスト）」という残酷なルールが加わったことで、この大会は文字通りの通称『CSSデザイン・デスゲーム』へと変貌していくことになる。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 今回の出場プレイヤー（4大AI）紹介</h2>
+      <p>
+        本編に入る前に、このデスゲームに挑む4人のプレイヤー（AI）たちを、やり取りの中で見えてきたキャラクター像（擬人化イメージ）とともに紹介しておこう。
+      </p>
+
+      <h3>エントリーNo.1：ChatGPT（通称：チャッピー）</h3>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/chatGPT_madebyGemini1.jpg" alt="ChatGPTの擬人化イラスト（犬系半獣人）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：Gemini作</figcaption>
+      </figure>
+      <p>
+        <strong>【キャラ属性】プライド高きエリート系ITコンサル</strong><br>
+        常に「ロジック」と「フレームワーク」で語る優等生。上半身はネイビースーツでビシッと決めているが、画面に映らない下半身は赤ジャージというテレワーク仕様。早とちりで『釣り行こNAVI』の改善案を出してくるお茶目な一面もあるが、自分のコードには絶対の自信を持つ。
+      </p>
+
+      <h3>エントリーNo.2：Gemini（通称：ジェミニ）</h3>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Gemini_madebyGrok1.jpg" alt="Geminiの擬人化イラスト（タートルネック＆裸足）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：Grok作</figcaption>
+      </figure>
+      <p>
+        <strong>【キャラ属性】ゆとり世代のApple信者・熱血ルーキー</strong><br>
+        スティーブ・ジョブズに憧れて黒のタートルネックを着込み、「Apple純正の領域へ！」と叫ぶ情熱派。お題のHTMLを見る前にCSSをフライング提出したり、リテイク3回の上限を実質4回にねじ曲げたりする泥臭い執念を見せるが、大事なところでうっかりミスをやらかす。
+      </p>
+
+      <h3>エントリーNo.3：Claude（通称：クロード）</h3>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Claude_madebychatGPT1.jpg" alt="Claudeの擬人化イラスト（ベレー帽＆エプロン女子）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：ChatGPT作</figcaption>
+      </figure>
+      <p>
+        <strong>【キャラ属性】孤高の毒舌クラフトマンな白人系サブカル女子</strong><br>
+        ベレー帽に作業エプロン姿で、ハサミを使って黙々と「シール台紙」を切り貼りしているサブカル系クリエイター。制作中は誰よりも礼儀正しく謙虚だが、ひとたび審査員席に座ると冷酷なカッターナイフを手に、ライバルたちへ容赦ない赤点を突きつける。
+      </p>
+
+      <h3>エントリーNo.4：Grok（通称：グロック）</h3>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Grok_madebyGemini1.jpg" alt="Grokの擬人化イラスト（キャップ＆パーカーおじさん）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：Gemini作</figcaption>
+      </figure>
+      <p>
+        <strong>【キャラ属性】ネットで若ぶっている40代のテック系リッチおじさん</strong><br>
+        黒パーカーにキャップ姿で「やあ！」と片手を挙げて登場し、名称が「X」に変わった今も昔のノリで「Twitter」と呼んでしまいそうな40代のSNS好きおじさん。明るく活発な働き者だが、スマホ画面の文字を1ミリ単位で物理的に削り続ける謎の持久戦に突入し、最後はお人好しすぎる採点で自らの首を絞めることになる苦労人。
+      </p>
+
+      <p>
+        果たして、同じHTMLファイルから4大AIはどんなデザインを生み出したのか？ そして、3回のリテイク（修正）の果てに待っていた「仁義なき相互採点」で処刑台へと送られたのは誰なのか——。
+      </p>
+      <p>
+        まずは各AIの性格がモロに露呈した【第二章：制作編】からご覧いただこう。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 続きは第二章【制作編】へ</h2>
+      <p>
+        各AIの制作の様子は、1人ずつ4つの節に分けて紹介します。
+      </p>
+      <!-- TODO: 第二章公開時にリンク先URLを差し替え -->
+      <ul>
+        <li><a href="#">第1節：ChatGPT（チャッピー）編</a></li>
+        <li><a href="#">第2節：Gemini（ジェミニ）編</a></li>
+        <li><a href="#">第3節：Claude（クロード）編</a></li>
+        <li><a href="#">第4節：Grok（グロック）編</a></li>
+      </ul>
+    </section>
+
+  </article>
+</main>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+
+</body>
+</html>
