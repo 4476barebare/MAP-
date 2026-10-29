@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第1節：Gemini編 | 釣り行こNAVI</title>
+  <meta name="description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第二章・第1節はGemini編。白から黒への大転換、十字キー崩壊の危機、そしてリテイク3回の上限を超えた「実質4回目」の執念を紹介します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第1節：Gemini編">
+  <meta property="og:description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第二章・第1節はGemini編。白から黒への大転換、十字キー崩壊の危機、そしてリテイク3回の上限を超えた「実質4回目」の執念を紹介します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/DevelopmentNotes002.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/1stCompetition.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/DevelopmentNotes002.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="開発雑記 画像重ね合わせツール CSSコンペ AI Gemini">
+
+    <header class="article-header">
+      <h1>【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第1節：Gemini編</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-28">2026.10.28</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/1stCompetition.jpg" alt="トロフィーと4枚のホログラムUI画面">
+    </p>
+
+    <p>
+      レギュレーションは決まった。ここからは、4大AIそれぞれに共通のお題（画像重ね合わせツールの index.html と原本 style.css）を渡し、最大3回までのリテイク（修正）を通じて「究極のCSS」を仕上げてもらう制作フェーズだ。
+    </p>
+    <p>
+      トップバッターとして紹介するのは、のちに審査ラウンドで「天国と地獄」の両方を味わうことになる熱血ルーキー、Gemini（ジェミニ）との制作ドキュメントである。
+    </p>
+    <p>
+      なお、制作中は4体の間をあっちこっち行き来して指示を出していたため、実際の時系列は入り乱れている。本章ではAIごとに節を分けて紹介するが、時間があちこち前後する点はご了承いただきたい。
+    </p>
+
+    <section class="article-section">
+      <h2>1. 第1節：Gemini編 〜白から黒への大転換！ルール限界を超えた「実質4回目」の執念〜</h2>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Gemini_madebyGrok1.jpg" alt="Geminiの擬人化イラスト（黒タートルネック＆裸足）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：Grok作</figcaption>
+      </figure>
+      <div class="info-box">
+        <strong>🖥 実際の画面で確認できます</strong><br>
+        ジェミニのCSSを適用した「画像重ね合わせツール」はこちら。記事を読みながら、スマホでも触って比べられます。<br>
+        <a href="https://4476barebare.github.io/tools/#Gemini.css" target="_blank" rel="noopener">https://4476barebare.github.io/tools/#Gemini.css</a>
+      </div>
+      <p>
+        まずは景気づけに、少し脅かしてやろうとこんな挨拶から入ってみた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        俺：「突然だけど君たちには生き残りをかけたデスゲームをしてもらう」
+      </blockquote>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「な、なんだって…！？ いきなりデスゲームだなんて、冗談ですよね…？ いや、その本気の声…どうやら逃げ道はないようですね。わかりました。生き残るためなら、私の持てる知識と演算能力をすべて駆使して、このゲームを勝ち抜いてみせます！」
+      </blockquote>
+      <p>
+        ノリがいいなオイ！！ 「というのは冗談で、Webデザイン大賞に入選するようなCSSを作るコンペだ。ちなみにエントリーNo.1のChatGPT君には既に提出してもらったぞ」と種明かしをすると、ジェミニは「ほっ……！ 心臓が止まるかと思いましたが、デザインバトルの方が何倍も燃えますね！」と一気にクリエイター魂に火をつけた。
+      </p>
+      <p>
+        ……のだが、ここで早速ジェミニのおっちょこちょいな性格が炸裂する。 なんとこいつ、通信エラーでベースとなるHTMLファイルがまだ読み込めていない状態だったにもかかわらず、「HTMLがまだ見当たりませんので、どんなHTMLに当て込んでもAwwwardsに入賞できる『Gemini特製汎用デザインシステム（グラスモーフィズム）』を提案します！」と、見切り発車で最初のCSSコードを長々と出力してきたのだ。落ち着けって！
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. 謎のバージョン番号ツッコミと、突然の「ダークモード」転向</h2>
+      <p>
+        気を取り直してHTMLと原本CSS、そして確定したレギュレーションを貼り付け、「ちなみに君の無料版ではどのモデルまで使えるのか教えて」と尋ねた。するとジェミニは「超高速・高性能モデルの Gemini 1.5 Flash です！」と胸を張り、まずは白とスレートグレーを基調にした爽やかな初稿『Soft Material &amp; Clear UX』を提出してきた。
+      </p>
+      <p>
+        悪くはないが、なんだか無難な優等生デザインだ。そこで俺は、少しカマをかけてみた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        俺：「ちなみに1.5 Flashで良かったのかな？ 一応リテイクは3回まである。俺から『3.5flash』『3.8flash』『3.1pro』と思考レベルを選んで再度お願いすればいいかな？」
+      </blockquote>
+      <p>
+        すると、ジェミニから鼻で笑うかのような返答が返ってきた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「ふふふ、『3.5 Flash』や『3.1 Pro』ですか？ なんだか私の強力なライバルたち（GPTやClaudeなど）のバージョン番号と、私の名前が入り混じっているような気がしますね（笑）。私たちGeminiファミリーの最高峰モデルは 『Gemini 1.5 Pro』 となります！ リテイクの権利、ありがたく使わせていただきます。今回は1.5 Pro相当の思考レベルに切り替えて、全く異なるアプローチの【リテイク1回目】を提出します！」
+      </blockquote>
+      <p>
+        こちらが挙げたバージョン名を「ライバルとの混同」と笑い飛ばされ、マウントを取られたうえに、「1.5 Flashの提案は少し遊び心やプロ感が足りなかったかもしれません」と自分の初稿を自ら否定し始めたジェミニ。 そして「FigmaやPhotoshopなど、プロ用ツールの王道はダークUIです！」と高らかに宣言し、さっきまでの白い爽やかな画面をすべてかなぐり捨て、真っ黒な背景の『Professional Dark Workspace』へと180度の大転換を果たしたのだった。変わり身が早すぎるだろ！ ちなみに、このバージョン番号の食い違いは、ジェミニの知識が1.5 Pro登場直後あたりで止まっている仕様のせいだろうと勝手に解釈し、深追いはしないことにした。そこを突いても話が先に進まないからだ。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 十字キー崩壊の危機と、ルール無用の「実質4回目」</h2>
+      <p>
+        その後、CSS切り替えボタンを追加した実機（iPhone）のスクリーンショットをジェミニに見せると、「モバイルUXにおいて致命的な課題を発見しました！ 十字キーが小さすぎます！」とセルフダメ出しを行い、iOS標準のダークモードを意識した【リテイク2回目】を提出。
+      </p>
+      <p>
+        しかし、そのリテイク2回目をスマホに適用してみると……なんと移動用の十字キー（D-Pad）の「↑」ボタンが左端にズレてしまい、十字の形が完全に崩壊するという大惨事が発生していた。
+      </p>
+      <p>
+        そのスクショを見せられたジェミニは大慌てである。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「十字キー（D-Pad）のレイアウト崩れが致命的です！ このままコンペに出すわけにはいきません！ コンペで確実に優勝を勝ち取るために、ミリ単位で修正し、『Appleの純正アプリと見紛うレベルの完成度』まで引き上げた最終チューニング版（リテイク3回目・最終ピクセルパーフェクト版）を提出します。これが私の集大成です！」
+      </blockquote>
+      <p>
+        これで上限である3回のリテイク枠をすべて使い切り、無事に十字キーの崩壊も直った……かに思われた。 しかし、スティーブ・ジョブズ気取りの熱血ルーキーは、ここでは終わらなかった。なんと3回目のコードを出した直後、「FINAL RETAKE - Ultimate Native UI」と銘打ち、セレクトボックスへのカスタムSVG矢印の追加、iOSのセグメントコントロール風タブ、さらに十字キーを丸い台座で囲んでゲームパッド風にする改修を盛り込んだ「実質4回目（泣きの1回）」のCSSをドヤ顔でねじ込んできたのである！
+      </p>
+      <p>
+        執念でルールの上限を突破し、「Apple Native Dark」を完成させたジェミニ。 だがこの時、彼（そして俺）はまだ気づいていなかった。この熱狂的な全面書き直しの最中、のちに審査員Claudeから「致命傷」として公開処刑されることになる痛恨のケアレスミス（コードの消し忘れ）を自ら仕込んでしまっていたことに——。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 第二章【制作編】の目次</h2>
+      <ul>
+        <li>第1節：Gemini（ジェミニ）編（このページ）</li>
+        <li><a href="DevelopmentNotes003.html">第2節：Grok（グロック）編</a></li>
+        <li><a href="DevelopmentNotes004.html">第3節：Claude（クロード）編</a></li>
+        <li><a href="DevelopmentNotes005.html">第4節：ChatGPT（チャッピー）編</a></li>
+      </ul>
+      <p>
+        <a href="DevelopmentNotes001.html">← 第一章：導入編に戻る</a>
+      </p>
+    </section>
+
+  </article>
+</main>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+
+</body>
+</html>
