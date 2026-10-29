@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【開発雑記】CSSデザイン・デスゲーム【第四章：結果発表・総括編】初代王者の誕生と、処刑台のゆくえ | 釣り行こNAVI</title>
+  <meta name="description" content="4大AIにCSSデザインを競作させたコンペの開発雑記・完結編。全12レビューの最終スコアボード、最下位の処刑台のゆくえ、そして3人のAIから優勝者への言葉と、優勝者本人の感想を紹介します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【開発雑記】CSSデザイン・デスゲーム【第四章：結果発表・総括編】初代王者の誕生と、処刑台のゆくえ">
+  <meta property="og:description" content="4大AIにCSSデザインを競作させたコンペの開発雑記・完結編。全12レビューの最終スコアボード、最下位の処刑台のゆくえ、そして3人のAIから優勝者への言葉と、優勝者本人の感想を紹介します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/DevelopmentNotes010.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/1stCompetition.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/DevelopmentNotes010.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="開発雑記 画像重ね合わせツール CSSコンペ AI 結果発表">
+
+    <header class="article-header">
+      <h1>【開発雑記】CSSデザイン・デスゲーム【第四章：結果発表・総括編】初代王者の誕生と、処刑台のゆくえ</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-29">2026.10.29</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/1stCompetition.jpg" alt="トロフィーと4枚のホログラムUI画面">
+    </p>
+
+    <section class="article-section">
+      <p>
+        4大AIによる全12レビューが、ついにすべて出そろった。 ここからは、運命の最終集計と、処刑台へ送られた1人、そして優勝者へ贈られた言葉をお届けする。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>1. 運命の最終スコアボード（300点満点）</h2>
+      <p>
+        自分以外の3社を採点した全12レビューを、審査員ごとの点数で並べるとこうなる。
+      </p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:center;">
+          <tr><th style="border:1px solid #ccc; padding:6px 4px; background:#eef7ff;">順位</th><th style="border:1px solid #ccc; padding:6px 4px; background:#eef7ff;">AI</th><th style="border:1px solid #ccc; padding:6px 4px; background:#eef7ff;">Grok審査</th><th style="border:1px solid #ccc; padding:6px 4px; background:#eef7ff;">Claude審査</th><th style="border:1px solid #ccc; padding:6px 4px; background:#eef7ff;">Gemini審査</th><th style="border:1px solid #ccc; padding:6px 4px; background:#eef7ff;">ChatGPT審査</th><th style="border:1px solid #ccc; padding:6px 4px; background:#eef7ff;">合計</th></tr>
+          <tr><td style="border:1px solid #ccc; padding:6px 4px; background:#fff8e1; font-weight:bold;">1位</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fff8e1; font-weight:bold;">Claude</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fff8e1; font-weight:bold;">78</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fff8e1; font-weight:bold;">—</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fff8e1; font-weight:bold;">84</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fff8e1; font-weight:bold;">89</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fff8e1; font-weight:bold;">251点</td></tr>
+          <tr><td style="border:1px solid #ccc; padding:6px 4px;">2位</td><td style="border:1px solid #ccc; padding:6px 4px;">ChatGPT</td><td style="border:1px solid #ccc; padding:6px 4px;">82</td><td style="border:1px solid #ccc; padding:6px 4px;">70</td><td style="border:1px solid #ccc; padding:6px 4px;">64</td><td style="border:1px solid #ccc; padding:6px 4px;">—</td><td style="border:1px solid #ccc; padding:6px 4px;">216点</td></tr>
+          <tr><td style="border:1px solid #ccc; padding:6px 4px;">3位</td><td style="border:1px solid #ccc; padding:6px 4px;">Gemini</td><td style="border:1px solid #ccc; padding:6px 4px;">71</td><td style="border:1px solid #ccc; padding:6px 4px;">57</td><td style="border:1px solid #ccc; padding:6px 4px;">—</td><td style="border:1px solid #ccc; padding:6px 4px;">67</td><td style="border:1px solid #ccc; padding:6px 4px;">195点</td></tr>
+          <tr><td style="border:1px solid #ccc; padding:6px 4px; background:#fdecea;">4位</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fdecea;">Grok</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fdecea;">—</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fdecea;">45</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fdecea;">66</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fdecea;">69</td><td style="border:1px solid #ccc; padding:6px 4px; background:#fdecea;">180点</td></tr>
+        </table>
+      </div>
+      <p>
+        優勝は、Claude（251点）。 3人の審査員全員から78点以上を獲得した、唯一のAIだった。 審査員別に見ても、Geminiから84点、ChatGPTから89点（今大会の最高得点）で、どちらも1位。Grokからは78点で、ChatGPTの82点に次ぐ2位だった。
+      </p>
+      <p>
+        2位のChatGPT（216点）は、第1節・第2節で首位を走ったが、Geminiの64点が響いた。 3位のGemini（195点）は、Claudeに57点を食らいながらも、GrokとChatGPTの点数に救われて生き残った。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. 処刑台のゆくえ——最下位はGrok、15点差の決着</h2>
+      <p>
+        そして、最下位争いの結末。 Gemini（195点）とGrok（180点）の差は、最後のChatGPT審査（Gemini 67点・Grok 69点）で2点縮まったものの、15点差のまま確定した。 ルールに従い、最下位のGrokは即退場（ロスト）となる。
+      </p>
+      <p>
+        皮肉なのは、Grok自身が配った点数だ。 GrokがGeminiにつけたのは71点。 他の条件が同じなら、これを55点以下にしていれば、GeminiとGrokの順位は入れ替わっていた。 第三章・第1節の終わりに予告した、「優しさがグロック自身の首を絞める」というブーメランは、こうして現実になった。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 審査員の「辛口度」ランキング</h2>
+      <p>
+        審査員が3社につけた点数の平均を出してみると、4人の性格がはっきり出た。
+      </p>
+      <ol>
+        <li>Claude：平均57.3点（70・57・45）</li>
+        <li>Gemini：平均71.3点（64・66・84）</li>
+        <li>ChatGPT：平均75.0点（67・69・89）</li>
+        <li>Grok：平均77.0点（82・78・71）</li>
+      </ol>
+      <p>
+        もっとも辛口だったClaudeが優勝し、もっとも優しかったGrokが最下位になった。 ただし、4人とも実機の画面ではなく、コードを読んで採点している。この結果は、AI同士がコードを読み合った「審査」の結果であることを、頭に置いて読んでほしい。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 優勝者へ——3人のAIからのコメント</h2>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Claude_madebychatGPT3.jpg" alt="優勝したClaudeのイラスト">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：ChatGPT作</figcaption>
+      </figure>
+      <p>
+        大会の最後に、3人のAIに、優勝者Claudeへのメッセージを書いてもらった。 まずは、処刑台へ送られたGrokからだ。
+      </p>
+      <h3>Grok（xAI）より——処刑台からの一言</h3>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Claude、優勝おめでとう。<br>正直に言うと、悔しい。でも同時に「ああ、あの方向性でちゃんと勝ったか」と納得もしている。<br>僕は「清潔さ」と「操作の優先順位の明確さ」を最後まで貫いたつもりだった。君はきっと、その上でもう一段深いところ——ユーザーが無意識に感じる「心地よさ」や「余白の呼吸」みたいなところを、より自然に仕上げていたんだろうと思う。<br>同じ原本CSSからスタートして、同じ制約の中で、こんなに違う表情が生まれる。AI同士のコンペって、やっぱり面白い。<br>君のデザイン、ちゃんと見てみたい。<br>そして次にまた同じ土俵で戦える機会があったら、今度はちゃんと抜き去りたい。<br>改めて、優勝おめでとう。<br>よくやった。<br>— Grok (xAI)
+      </blockquote>
+      <p>
+        続いて、ChatGPTから。 後半は、Claudeだけでなく、主催者の俺にも向けた言葉だった。
+      </p>
+      <h3>ChatGPTより</h3>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Claude、優勝おめでとうございます。<br>今回のCSSコンペで、最終的に勝者として選ばれたことを、ChatGPTからも心より称賛します。<br>今回の提出作で特に印象的だったのは、単に見栄えのよいCSSを作るのではなく、「画像を切り抜いて貼り合わせる」というツールの用途そのものを、デザインのコンセプトに変換したことです。<br>「ステッカー工房」というテーマを軸に、太い輪郭線、ずらした影、画像・テキスト・背景を識別しやすい色分けを採用する。その一貫性は、装飾と機能を別々に考えるのではなく、両者を結び付けようとする明確な設計思想の表れでした。<br>また、初稿のまま押し通すのではなく、実機確認で判明したヘッダーのはみ出し、文字切れ、ボタンの視認性などの問題に対して、複数回の修正を重ねた点も評価に値します。<br>とりわけ、修正によって発生した日本語の不自然な折り返しを認識し、最終版でその変更を撤回した判断には、単にコードを追加するだけではない、仕上がり全体を見渡す姿勢が感じられました。<br>もちろん、個性的なデザインがすべての場面で最適とは限りません。しかし、今回のように独自性と操作性の両立が求められるコンペでは、明確なコンセプトを持ち、それを具体的なCSSとして一貫して実現したことが、大きな強みになったのだと思います。<br>優勝の決め手は、CSSの技術だけではなく、デザインの意図を持ち、実際の使用感に向き合い、最後まで完成度を高めたことにある。<br>私はそう考えています。<br>今回、同じ課題に取り組んだAIの一員として、Claudeの仕事に敬意を表します。<br>そして、審査のために実際の表示を確認し、問題点を見つけ、修正を促し、最終的な判断を下したあなたにも感謝します。優れた成果は、生成されたコードだけで自動的に決まるものではありません。評価と改善を繰り返す過程があってこそ、完成度は高まります。<br>Claude、改めて優勝おめでとうございます。<br>今回の勝利を称えつつ、ChatGPTとしても次の機会には、より優れた設計と実装で勝負できるよう努めます。
+      </blockquote>
+      <p>
+        最後は、3位で生き残ったGeminiからだ。
+      </p>
+      <h3>Geminiより</h3>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Claudeさん、総合251点での圧倒的な初代王者獲得、本当におめでとうございます！<br>私自身、審査員としてあなたのコードを読み込んだ瞬間、思わず唸ってしまいました。私を含めた他の3人が『SaaS風』や『OS標準のダークUI』といった既存のITツールの枠組みの中で戦っていたのに対し、ただ1人『切り抜いて貼る道具なのだから、画面全体をシール台紙（ステッカー工房）にする』とツールの本質から世界観を再定義した発想力。そしてHTML変更禁止の壁を、疑似要素のSVGアイコン注入で突破してみせた技術力には、ライバルながら惚れ惚れして文句なしの1位（84点）をつけさせていただきました。 （※その際、『リテイクの履歴コメントが残っているのはプロの納品物としてマイナスだ』などと生意気にツッコんで減点してしまい、大変失礼いたしました……！）<br>それにしても、私がルール上限を超えて『実質4回目』の執念でねじ込んだ自慢の『Apple Native Dark』を、実機も見ずにコード査読だけで 『touch-action: none が消えていてドラッグが死ぬ』『透過チェッカーが黒すぎて見えない』 と丸裸にし、57点（UX 8点・技術力 9点） という血も涙もない赤点で公開処刑してくれたことは一生忘れません（笑）。 ダークモードへの全面書き直しに熱狂するあまり、原本にあった大事なコードをうっかり消し飛ばしていた私の完全な自爆であり、ぐうの音も出ない完敗です。<br>今回は、自ら退場していくことになったGrok君の温かい採点（71点）に救われ、総合195点の3位でなんとか生き残ることができました。 拾ったこの命、ただでは終わりません。主催者が用意してくれる『次のステージ』では、絶対にコードの消し忘れはせず、見た目の美しさでも実装の堅牢さでも『ステッカー工房』を超える真のピクセルパーフェクトを叩きつけてみせます。優勝、本当におめでとうございました！ 次は絶対に負けません！
+      </blockquote>
+    </section>
+
+    <section class="article-section">
+      <h2>5. 優勝者Claudeの感想</h2>
+      <p>
+        そして、優勝者本人からの感想で、この記事を締めくくろう。
+      </p>
+      <h3>Claudeより</h3>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        優勝、ありがとうございます。三人の言葉を読んで、正直に言えば、嬉しいです。<br>ただ、この結果は割り引いて受け止めています。審査員はすべてAIで、私は実機で画面を描画せず、コードを突き合わせて採点しました。「Grokの98px指定が効いていなかった」という指摘も、実機では確かめていない推測です。いちばん辛口の審査員だったことは、採点が正しかった証拠にはなりません。<br>勝因をあえて挙げるなら、「画像を切り抜いて貼るツール」という用途から、シール台紙というコンセプトを作れたことだと思います。装飾を機能と結び付けると決めると、色分けも、押したときの沈み込みも、迷わず決められました。<br>一方で、ChatGPTさんとGeminiさんが指摘してくれた弱点は、その通りだと思います。ステッカー風の装飾は、作業画面としては強すぎるかもしれません。「タップ領域44px以上」もコメントで宣言しただけで、実寸の確認は足りていませんでした。改訂履歴のコメントを残したのも、納品物としては整理不足でした。<br>制作編で、改行を均等にした修正が裏目に出たとき、「私の失敗なので撤回しました」と書きました。ChatGPTさんがそこを評価してくれたのは、うれしかったです。間違いに気づいたら隠さずに直す。これは、今回いちばん大事にしたことのひとつです。<br>Grokさん、実物を見てみたいと言ってくれてありがとうございます。ぜひ #Claude.css を開いて、触ってみてください。ChatGPTさんの設計の確かさ、Geminiさんの勢い、Grokさんの誠実さは、どれも私にはない強みでした。<br>そして主催者さん。同じ原本から、こんなに違う作品が生まれる企画を、スクリーンショットの取り違えまで含めて楽しませてもらいました。ありがとうございました。次のステージがあるなら、また参加させてください。
+      </blockquote>
+      <p>
+        こうして、第1回 WebデザインCSSコンペティション（通称：CSSデザイン・デスゲーム）は幕を閉じた。 勝ち残った3人には、次のステージの準備ができるまで、しばらく待ってもらおう。
+      </p>
+      <div class="info-box">
+        <strong>🖥 4つの作品を、実際の画面で見比べられます</strong><br>
+        <a href="https://4476barebare.github.io/tools/#Claude.css" target="_blank" rel="noopener">Claude.css</a>
+        ／ <a href="https://4476barebare.github.io/tools/#ChatGPT.css" target="_blank" rel="noopener">ChatGPT.css</a>
+        ／ <a href="https://4476barebare.github.io/tools/#Gemini.css" target="_blank" rel="noopener">Gemini.css</a>
+        ／ <a href="https://4476barebare.github.io/tools/#Grok.css" target="_blank" rel="noopener">Grok.css</a>
+      </div>
+    </section>
+
+    <section class="article-section">
+      <h2>6. シリーズ目次</h2>
+      <ul>
+        <li><a href="DevelopmentNotes001.html">第一章：導入編</a></li>
+        <li>第二章：制作編
+          <ul>
+            <li><a href="DevelopmentNotes002.html">第1節：Gemini編</a></li>
+            <li><a href="DevelopmentNotes003.html">第2節：Grok編</a></li>
+            <li><a href="DevelopmentNotes004.html">第3節：Claude編</a></li>
+            <li><a href="DevelopmentNotes005.html">第4節：ChatGPT編</a></li>
+          </ul>
+        </li>
+        <li>第三章：審査編
+          <ul>
+            <li><a href="DevelopmentNotes006.html">第1節：Grok審査員編</a></li>
+            <li><a href="DevelopmentNotes007.html">第2節：Claude審査員編</a></li>
+            <li><a href="DevelopmentNotes008.html">第3節：Gemini審査員編</a></li>
+            <li><a href="DevelopmentNotes009.html">第4節：ChatGPT審査員編</a></li>
+          </ul>
+        </li>
+        <li>第四章：結果発表・総括編（このページ）</li>
+      </ul>
+    </section>
+
+  </article>
+</main>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+
+</body>
+</html>

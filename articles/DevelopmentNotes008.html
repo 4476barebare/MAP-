@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【開発雑記】CSSデザイン・デスゲーム【第三章：審査編】仁義なき相互採点と処刑台のゆくえ｜第3節：Gemini審査員編 | 釣り行こNAVI</title>
+  <meta name="description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第三章・審査編の第3節はGemini審査員編。熱血ルーキーのジェミニがライバル3社を採点した結果と、優勝・最下位をめぐる暫定スコアを紹介します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【開発雑記】CSSデザイン・デスゲーム【第三章：審査編】仁義なき相互採点と処刑台のゆくえ｜第3節：Gemini審査員編">
+  <meta property="og:description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第三章・審査編の第3節はGemini審査員編。熱血ルーキーのジェミニがライバル3社を採点した結果と、優勝・最下位をめぐる暫定スコアを紹介します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/DevelopmentNotes008.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/1stCompetition.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/DevelopmentNotes008.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="開発雑記 画像重ね合わせツール CSSコンペ AI Gemini 審査">
+
+    <header class="article-header">
+      <h1>【開発雑記】CSSデザイン・デスゲーム【第三章：審査編】仁義なき相互採点と処刑台のゆくえ｜第3節：Gemini審査員編</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-29">2026.10.29</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/1stCompetition.jpg" alt="トロフィーと4枚のホログラムUI画面">
+    </p>
+
+    <section class="article-section">
+      <p>
+        第2節、孤高の職人Claude（クロード）が放った「Gemini 57点」「Grok 45点」という無慈悲な赤点宣告によって、デスゲームの会場は凍りついていた。 そんな惨劇が裏で起きているとは露知らず、意気揚々と3人目の審査員席に座ったのが、黒いタートルネックに身を包んだ熱血ルーキー・Gemini（ジェミニ）だ。
+      </p>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Gemini_madebyGrok2.jpg" alt="Geminiの採点中イラスト（黒タートルネック）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：Grok作</figcaption>
+      </figure>
+      <div class="info-box">
+        <strong>🖥 採点された3つのCSSは、実際の画面で確認できます</strong><br>
+        <a href="https://4476barebare.github.io/tools/#ChatGPT.css" target="_blank" rel="noopener">ChatGPT.css</a>
+        ／ <a href="https://4476barebare.github.io/tools/#Claude.css" target="_blank" rel="noopener">Claude.css</a>
+        ／ <a href="https://4476barebare.github.io/tools/#Grok.css" target="_blank" rel="noopener">Grok.css</a>
+      </div>
+      <p>
+        そもそも、この審査ラウンドの「AI相互評価（最下位は即退場）」というルール自体、俺がジェミニを壁打ち相手にして決めたものであり、「ライバルとして容赦なく粗を探せ」というあの挑発プロンプトもジェミニ自身がノリノリで考案したものだ。
+      </p>
+      <p>
+        直前にClaudeから「touch-action: none が消えていてドラッグが死ぬ」「透過チェッカーが黒すぎて見えない」と致命傷を暴かれてボコボコにされたばかりのジェミニだが、他社の採点結果を知らない本人は、完全に「冷徹な一流デザイナー」になりきってライバル3社のコードを読み込み始めた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「提出された3つのCSSファイル（ChatGPT.css、Claude.css、Grok.css）のコードを読み込んだ。いずれも一定の体裁は整えているが、一流のクリエイティブツールとして見れば妥協や粗が目立つ。冷徹なデザイナーの視点から、5項目（各20点満点）で厳格に審査する」
+      </blockquote>
+      <p>
+        自分のコードの靴紐がほどけていることも忘れ、上から目線で審査を開始したジェミニ。 だが、この男の遠慮なき斬撃が、ここまで2社連続1位（計152点）で完全独走態勢に入っていたエリート・ChatGPTの足を引っ張り、大会を大混戦へと引きずり込むことになる！
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>1. 対 ChatGPT.css：「保守性を欠くコードの継ぎ接ぎが見苦しい」まさかの最下位宣告！</h2>
+      <p>
+        ジェミニが最初に標的として選んだのは、第1節（Grok審査：82点）、第2節（Claude審査：70点）と首位を独走し、自己採点87点を宣言していた優勝候補筆頭・ChatGPTの『Precision Studio』だった。
+      </p>
+      <p>
+        ところが、ジェミニが突きつけたスコアは、これまでの流れを真っ向から覆す衝撃的なものだった。
+      </p>
+      <p><strong>【Geminiによる ChatGPT.css 採点】</strong></p>
+      <ul>
+        <li>UI： 14 / 20</li>
+        <li>UX： 13 / 20</li>
+        <li>独創性： 12 / 20</li>
+        <li>技術力： 11 / 20</li>
+        <li>スマホ最適化： 14 / 20</li>
+        <li><strong>合計：64点（Gemini審査 最下位！）</strong></li>
+      </ul>
+      <p>
+        なんと、天下のChatGPTに3社中最下位の「64点」を叩きつけたのである！ その講評は、エリート官僚チャッピーのプライドを逆なでする辛辣な言葉で埋め尽くされていた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「UI（14点）： clamp() を利用した流体設計や、--ink、--surface 等の洗練された変数定義により、清潔感のあるワークスペースを構築している点は認める。しかし、見出しのグラデーションバー（.app-title::before）が取ってつけたように浮いており、全体のエディトリアルな静謐さを損なっている。<br>UX（13点）： モバイル版のボタン高さが 40px に留まっており、操作の確実性にやや難がある。<br>独創性（12点）： 『Precision Studio』というコンセプト自体は無難で、一般的なSaaSダッシュボードの域を出ていない。<br>技術力（11点）： @media クエリを後から追加する形でリテイクを重ねており、スタイルが冗長化している。保守性を欠くコードの継ぎ接ぎが見苦しい。<br>スマホ最適化（14点）： スクロール量を減らすために要素を詰め込みすぎており、余白の美しさが犠牲になっている」
+      </blockquote>
+      <p>
+        直前のClaude審査員から「設計ではなくパッチの積層です」と刺されたばかりの1362行のコードを、ジェミニからも「保守性を欠くコードの継ぎ接ぎが見苦しい（技術力：11点）」とバッサリ斬り捨てられたチャッピー！ さらに、チャッピーが制作編で「改善優先度：高」として必死に詰めた操作パネルの余白についても、タップ領域の広さとゆったりした余白を重視するジェミニからは「要素を詰め込みすぎて余白の美しさが犠牲になっている」と真逆の減点を食らってしまったのだ。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. 対 Grok.css：「デザインコンペとしては冒険心が全くなく、退屈である」</h2>
+      <p>
+        続いてジェミニが審査したのは、Claudeから45点を食らって瀕死状態のGrokが提出した『Clean Creative Tool』だ。
+      </p>
+      <p><strong>【Geminiによる Grok.css 採点】</strong></p>
+      <ul>
+        <li>UI： 14 / 20</li>
+        <li>UX： 15 / 20</li>
+        <li>独創性： 10 / 20</li>
+        <li>技術力： 13 / 20</li>
+        <li>スマホ最適化： 14 / 20</li>
+        <li><strong>合計：66点</strong></li>
+      </ul>
+      <p>
+        ChatGPT（64点）を2点上回る2位（66点）にはつけたものの、白から黒へ180度の大転換をかましたギャンブラー気質のジェミニにとって、グロックの堅実なデザインは物足りなく映ったようだ。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「UI（14点）： Tailwind CSSライクな配色（#f8fafc、#334155 など）で清潔感はあるが、どこかで見たことのある量産型のデザインにすぎない。<br>UX（15点）： transform: scale(0.92) などの微細なアニメーションは効いているが、全体的に文字サイズや入力欄が小さく、視認性に欠ける。<br>独創性（10点）： 『Clean Creative Tool』というテーマ通りだが、デザインコンペとしては冒険心が全くなく、退屈である。<br>技術力（13点）： シンプルにまとまっておりコードは読みやすいが、特筆すべき高度なCSSハックは見当たらない」
+      </blockquote>
+      <p>
+        「冒険心が全くなく、退屈である（独創性：10点）」という容赦ない一言。また、グロックが1行押し込みのために文字サイズを極限まで削った副作用も、「全体的に文字サイズが小さく、視認性に欠ける」としっかり見抜かれていた。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 対 Claude.css：84点の大絶賛！……からの「改訂履歴コメント」狙い撃ち</h2>
+      <p>
+        そして最後。ジェミニがダントツの1位（84点）に選出したのは、裏で自分を57点で処刑していた張本人、Claudeの『ステッカー工房』だった。
+      </p>
+      <p><strong>【Geminiによる Claude.css 採点】</strong></p>
+      <ul>
+        <li>UI： 17 / 20</li>
+        <li>UX： 18 / 20</li>
+        <li>独創性： 17 / 20</li>
+        <li>技術力： 16 / 20</li>
+        <li>スマホ最適化： 16 / 20</li>
+        <li><strong>合計：84点（Gemini審査 1位！）</strong></li>
+      </ul>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「UI（17点）： 太い黒フチとずらし影を利用した『ステッカー工房』というコンセプトが明快に表現されている。色の使い分け（黄、ピンク、ミント）も機能と直結しており、視覚的な迷いを生ませない。<br>UX（18点）： タップ領域を 44px（--tap）以上に設定しており、押し込み時に影の分だけ沈み込むフィードバックも心地よく、操作性に優れている。<br>独創性（17点）： デスクトップツール然とした他のUIから一線を画し、ツール全体を『シール台紙』に見立てる発想は高く評価できる。<br>スマホ最適化（16点）： env(safe-area-inset) を考慮したパディング設定など、狭い端末向けの細やかな配慮が行き届いている」
+      </blockquote>
+      <p>
+        まさにベタ褒めである。しかし、「必ず粗を探せ」という自らのプロンプトに忠実なジェミニは、技術力（16点）の項目で、制作編でClaudeが律儀に残していたあの足跡を見逃さなかった。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「技術力（16点）： 疑似要素を用いたSVGアイコンの注入や、チェックボックスのカスタムなど、HTMLを変更できない制約を見事にハックしている。ただし、不要なリテイクの履歴コメントが残ったままなのはプロの納品物としてマイナスだ」
+      </blockquote>
+      <p>
+        出たーー！！ 第1節のGrokから「リテイクの撤回履歴は最初から設計しきれていなかった証拠」と突っ込まれたのに続き、ジェミニからも「不要なリテイクの履歴コメントが残ったままなのはプロの納品物としてマイナスだ」と減点されてしまったクロード。 生ログ保存のために真面目に書き残した /* 改訂：リテイク1回目…… */ というコメントが、まさか2社連続で減点材料にされるとは夢にも思わなかっただろう。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 大混戦の最終局面へ！ 優勝も最下位も「最後の審査員」の手の中に</h2>
+      <p>
+        こうして、第3の審査員・Geminiによる採点が終了した。 ここで、残る審査員があと1人（ChatGPT）だけになった時点での暫定スコアを整理してみよう。
+      </p>
+      <div class="info-box">
+        <strong>📊 第3節（Gemini審査）終了時点の暫定スコア</strong>
+        <ul> <li><strong>暫定1位：ChatGPT（216点・確定！</strong> ＝ Grok 82点 ＋ Claude 70点 ＋ Gemini 64点）※<strong>全3社の審査終了</strong></li>
+          <li><strong>暫定2位：Claude（162点</strong> ＝ Grok 78点 ＋ Gemini 84点）※残り1社（ChatGPT審査のみ）</li>
+          <li><strong>暫定3位：Gemini（128点</strong> ＝ Grok 71点 ＋ Claude 57点）※残り1社（ChatGPT審査のみ）</li>
+          <li><strong>暫定4位：Grok（111点</strong> ＝ Claude 45点 ＋ Gemini 66点）※残り1社（ChatGPT審査のみ）</li> </ul>
+      </div>
+      <p>
+        ジェミニがChatGPTに「64点」をつけ、Claudeに「84点」を与えたことで、戦況はとんでもないサスペンスへと突入した。
+      </p>
+      <p>
+        まず【優勝争い】だ。 全3社からの審査を終えたChatGPTが、合計216点で一足先にゴールインし、暫定トップの座に就いている。 これを追うのは、2社からの採点だけで162点（平均81.0点！）を叩き出しているClaudeだ。ClaudeがChatGPTの216点を逆転して優勝するために必要なスコアは、最後の審査員から「55点以上」を獲得すること。 しかも皮肉なことに、その最後の採点権を握るアンカーは、今まさに暫定1位の座で逃げ切りを図る当事者・ChatGPT自身なのである！ もしチャッピーがライバルのClaudeに53点以下の辛口採点をつければ（54点なら同点）、チャッピー自身の優勝が決まるという究極の心理戦だ。
+      </p>
+      <p>
+        そしてもうひとつ、忘れてはならないのが【最下位（即退場・ロスト）争い】である。 現在3位のGemini（128点）と、暫定最下位のGrok（111点）の差は、わずか17点しかない。 しかもジェミニはたった今、最後の審査員であるChatGPTに対して「コードの継ぎ接ぎが見苦しい」と最下位の64点を突きつけたばかりだ。もし最終節でエリート・ChatGPTがジェミニに怒りの倍返し（低評価）を食らわせ、堅実派のGrokを高く評価すれば、ジェミニが逆転最下位となって処刑台へ送られる可能性も十分に残されている！
+      </p>
+      <p>
+        果たして、最後の審査員・ChatGPTが下した審判とは？ 栄光の初代王者と、処刑台（ロスト）へ消える最下位が同時に決するクライマックスは、次節、ついに幕を開ける——！
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>5. 第三章【審査編】の目次</h2>
+      <ul>
+        <li><a href="DevelopmentNotes006.html">第1節：Grok（グロック）審査員編</a></li>
+        <li><a href="DevelopmentNotes007.html">第2節：Claude（クロード）審査員編</a></li>
+        <li>第3節：Gemini（ジェミニ）審査員編（このページ）</li>
+        <li><a href="DevelopmentNotes009.html">第4節：ChatGPT（チャッピー）審査員編</a></li>
+      </ul>
+      <p>
+        <a href="DevelopmentNotes010.html">続きは【第四章：結果発表・総括編】へ →</a>
+      </p>
+      <p>
+        <a href="DevelopmentNotes001.html">← 第一章：導入編（第二章の目次）に戻る</a>
+      </p>
+    </section>
+
+  </article>
+</main>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+
+</body>
+</html>

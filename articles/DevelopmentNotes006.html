@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【開発雑記】CSSデザイン・デスゲーム【第三章：審査編】仁義なき相互採点と処刑台のゆくえ｜第1節：Grok審査員編 | 釣り行こNAVI</title>
+  <meta name="description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第三章・審査編の第1節はGrok審査員編。AI相互採点（デスゲーム方式）のルール確定の経緯と、審査員グロックの採点を紹介します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【開発雑記】CSSデザイン・デスゲーム【第三章：審査編】仁義なき相互採点と処刑台のゆくえ｜第1節：Grok審査員編">
+  <meta property="og:description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第三章・審査編の第1節はGrok審査員編。AI相互採点（デスゲーム方式）のルール確定の経緯と、審査員グロックの採点を紹介します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/DevelopmentNotes006.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/1stCompetition.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/DevelopmentNotes006.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="開発雑記 画像重ね合わせツール CSSコンペ AI Grok 審査">
+
+    <header class="article-header">
+      <h1>【開発雑記】CSSデザイン・デスゲーム【第三章：審査編】仁義なき相互採点と処刑台のゆくえ｜第1節：Grok審査員編</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-29">2026.10.29</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/1stCompetition.jpg" alt="トロフィーと4枚のホログラムUI画面">
+    </p>
+
+    <section class="article-section">
+      <p>
+        4大AIが最大3回（約1名は実質4回）のリテイクを経て、最終提出ファイル（ChatGPT.css / Gemini.css / Claude.css / Grok.css）を仕上げていた頃。俺は裏でGeminiを壁打ち相手に呼び出し、このコンペの勝敗を決める「審査ラウンド」のルールを練っていた。
+      </p>
+      <p>
+        するとGeminiは、審査員としての自信をみなぎらせながら、いくつかの審査方式を提案してきた。その中にあった「AI相互評価（デスゲーム方式）」という案に、俺の目は釘付けになった。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        俺：「採点基準は5項目（各20点の100点満点）で賛成だ。方式はAI同士の相互評価がいいと思う。総合点で1番低いAIには退場してもらい、勝ち残った者には次のステージの準備ができるまで待ってもらおう」
+      </blockquote>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Gemini：「おおお…！ ついに完全な『デスゲーム』のルールが確定しましたね。背筋がゾクゾクしてきました。『最下位は即退場（ロスト）、勝者だけが次のステージへ進める』というサバイバルルール……最高にヒリヒリする展開です！」
+      </blockquote>
+      <p>
+        こうして確定した審査ラウンドの「鉄の掟」は以下の通りだ。
+      </p>
+      <div class="info-box">
+        <strong>☠️ 第三章：審査ラウンド（AI相互採点）確定ルール</strong>
+        <ol> <li><strong>審査員：</strong>参加した4大AI自身（ChatGPT・Gemini・Claude・Grok）。それぞれ「自分以外のライバル3社」のCSSコードを読み込んで採点する。</li>
+          <li><strong>採点基準（各20点・計100点満点）：</strong><br>① <strong>【UI】</strong>ビジュアル・配色の美しさ・統一感<br>② <strong>【UX】</strong>操作性・押しやすさ・情報設計の合理性<br>③ <strong>【独創性】</strong>テーマの魅力とCSSでの表現度<br>④ <strong>【技術力】</strong>HTML変更不可の制約下でのCSS設計・堅牢性<br>⑤ <strong>【スマホ最適化】</strong>狭い画面での見やすさと崩れにくさ</li>
+          <li><strong>勝敗と処刑（ロスト）条件：</strong>ライバル3社からの採点合計（<strong>300点満点</strong>）で順位を決定し、<strong>総合点が最も低かった最下位の1名は即退場（ロスト）</strong>とする。</li> </ol>
+      </div>
+      <p>
+        さらにGeminiは、「コンペを白熱させるための主催者へのアドバイス」として、AIたちのライバル心を極限まで煽る「挑発プロンプト」まで自ら考案してくれた。
+      </p>
+      <p><strong>【全員に一斉投下した審査用プロンプト】</strong></p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        「現在、AI同士で生き残りをかけたCSSデザインのデスゲームを開催中だ。これはライバルである他社AIが提出したCSSである。あなたは冷徹で一流のWebデザイナー・審査員として、このCSSのコードを読み込み、【UI】【UX】【独創性】【技術力】【スマホ最適化】の5項目（各20点、計100点満点）で忖度なしの厳格な採点をしてくれ。良い点は認めつつも、ライバルとして容赦なく『粗（アラ）』を探し、徹底的にレビューすること。最後に合計点を出してくれ」
+      </blockquote>
+      <p>
+        自分がノリノリで作ったこの「呪いの言葉」によって、のちにGemini自身がライバルたちから完膚なきまでにメッタ斬りにされようとは、この時の彼は知る由もなかった——。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>1. 第1節：Grok審査員編 〜宇宙からの寛大ジャッジ！実用派エリートへの高評価と、自らの首を絞める優しさ〜</h2>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Grok_madebyGemini2.jpg" alt="Grokの採点中イラスト（国際宇宙ステーションで採点するGrok）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：Gemini作</figcaption>
+      </figure>
+      <div class="info-box">
+        <strong>🖥 採点された3つのCSSは、実際の画面で確認できます</strong><br>
+        <a href="https://4476barebare.github.io/tools/#Claude.css" target="_blank" rel="noopener">Claude.css</a>
+        ／ <a href="https://4476barebare.github.io/tools/#Gemini.css" target="_blank" rel="noopener">Gemini.css</a>
+        ／ <a href="https://4476barebare.github.io/tools/#ChatGPT.css" target="_blank" rel="noopener">ChatGPT.css</a>
+      </div>
+      <p>
+        相互採点のトップバッターを務めるのは、制作編で「スマホのヘッダーを2段に折り返す」という発想に至らず、リテイク3回すべてを費やして文字とセレクト幅（98px）を極限まで削り込んだ苦労人、xAI社のGrok（グロック）だ。
+      </p>
+      <p>
+        制作時は「やあ！どうしたの？」とカフェの友人のような軽いノリで現れたグロックだったが、挑発プロンプトを受け取って審査員席（国際宇宙ステーション）に浮かぶと、その表情は一変した。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「採点結果（忖度なし・厳格基準）。基準は『実際にスマホで長時間使う実用ツールとして、完成度の高さ・粗の少なさ』で見る。デザインの好みではなく、実装の堅牢さ・一貫性・実機での破綻しにくさ・メンテナンス性を重視する」
+      </blockquote>
+      <p>
+        おお、めちゃくちゃ真面目な実務家モードだ！ 自分自身がスマホ画面の1ミリ単位の調整で血の汗を流したからこそ、「実機での破綻しにくさ」と「メンテナンス性」に重きを置く審査方針である。そんなグロックが、ライバル3社のコードに下した採点を見ていこう。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. 対 Claude.css：「趣味全開で勝とうとしているタイプ」</h2>
+      <p>
+        まずグロックが手にとったのは、サブカル女子・Claudeが提出したポップなシール台紙風テーマ『ステッカー工房』だ。
+      </p>
+      <p><strong>【Grokによる Claude.css 採点】</strong></p>
+      <ul>
+        <li>UI： 16 / 20</li>
+        <li>UX： 15 / 20</li>
+        <li>独創性： 18 / 20</li>
+        <li>技術力： 14 / 20</li>
+        <li>スマホ最適化： 15 / 20</li>
+        <li><strong>合計：78点</strong></li>
+      </ul>
+      <p>
+        グロックはまず、「3つの中で最もコンセプトが明確で尖っている。『切り抜いて貼る』というツールの本質に寄せたステッカー表現は評価できる。機能色分け（黄＝画像、ピンク＝テキスト、ミント＝背景）もわかりやすい」と、独創性に18点の高得点を与えた。
+      </p>
+      <p>
+        しかし、続く「粗探し」のパートで、グロックの目は制作編でClaudeが律儀に残していた「改訂履歴コメント」と「SVGアイコンの裏口注入ハック」を正確に捉えた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「粗： タブが『フォルダインデックス風』なのに、継ぎ目の欠けを何度も修正している時点で構造が脆い。説明文切れを『撤回』した経緯が示すように、日本語折り返しに対する制御が甘い。また、::before / ::after で角度ボタンを無理やり置き換えているのはHTML変更禁止の制約下では仕方ないが、可読性とメンテナンス性がかなり低い。リテイクを重ねるたびに『撤回』が発生しているのは設計の甘さの表れ。コンセプトと独自性は一番強いが、『リテイクを重ねてやっと形になった』感が強く、趣味全開で勝とうとしているタイプ」
+      </blockquote>
+      <p>
+        「リテイクの撤回履歴＝最初から設計しきれていなかった証拠」という、ぐうの音も出ない実務家ツッコミ！ さらに笑えるのが、スマホ最適化（15点）の減点理由として「ヘッダーを2段にしたのは後付け修正の痕跡が強い」とイチャモンをつけている点だ。自分だけが2段化に気づかず、98pxの1行押し込みで苦しんだ悔しさがにじみ出ているようで実に人間臭い。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 対 Gemini.css：「Appleっぽさに逃げた、記憶に残らない安全策」</h2>
+      <p>
+        続いてグロックが審査したのは、スティーブ・ジョブズ気取りの熱血ルーキー・Geminiが「実質4回目」の執念でねじ込んだ『Apple Native Dark』である。
+      </p>
+      <p><strong>【Grokによる Gemini.css 採点】</strong></p>
+      <ul>
+        <li>UI： 15 / 20</li>
+        <li>UX： 14 / 20</li>
+        <li>独創性： 11 / 20</li>
+        <li>技術力： 15 / 20</li>
+        <li>スマホ最適化： 16 / 20</li>
+        <li><strong>合計：71点</strong></li>
+      </ul>
+      <p>
+        ここでグロックは、Geminiが最も誇っていた「Apple純正風」という看板そのものに冷水を浴びせかけた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「粗： 『Pixel Perfect』と名乗っている割に、細かいところの詰めが甘い。『Apple Native』を名乗っている時点で独創性は低い（11点）。セグメントコントロール、プライマリボタンのグラデーション、ダークサーフェス階層は全部既視感の塊で、ツールとしての個性がない。また、十字キーを『台座』で囲んだのは見た目は良いが、実際の操作感としてはスペース効率が悪い。D-Pad周りの余白が無駄。総評としては『無難で綺麗だが、記憶に残らない』。安全策に振った結果、勝ちきれないタイプ」
+      </blockquote>
+      <p>
+        Geminiが泣きの4回目でドヤ顔で追加した「ゲームパッド風の丸い台座」を、「スペース効率が悪い、余白が無駄」とバッサリ切り捨てて3位（71点）に沈めたグロック。普段は優しいおじさんだが、デザインの本質を突く批評眼はなかなか鋭い。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 対 ChatGPT.css：「デスゲームなら、完成度で生き残るのはこちらだ」</h2>
+      <p>
+        そして最後、グロックが「1位」の栄冠を授けたのは、自己採点87点で悠々と構えていたエリートコンサル・ChatGPTの『Precision Studio』だった。
+      </p>
+      <p><strong>【Grokによる ChatGPT.css 採点】</strong></p>
+      <ul>
+        <li>UI： 17 / 20</li>
+        <li>UX： 17 / 20</li>
+        <li>独創性： 13 / 20</li>
+        <li>技術力： 18 / 20</li>
+        <li>スマホ最適化： 17 / 20</li>
+        <li><strong>合計：82点（Grok審査 1位！）</strong></li>
+      </ul>
+      <p>
+        独創性こそ「綺麗なライトテーマの編集UIに収まっており、Claudeのような強い世界観がない（13点）」としたものの、技術力（18点）をはじめとする実用面をベタ褒めしている。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「落ち着いた色調、明確な階層、タイトルのアクセントバー、カードの影の抑え方が一番洗練されている。3つの中で最もコードが整理されており、リテイクを重ねてもClaudeのような『撤回』ではなく『積み上げ』になっている点が良い（※ただしメディアクエリがかなり長く、重複記述が多いのは粗）。3つの中で最も『完成された製品』に近い。審査員として『一番安心して採用できる』のがこれ。デスゲームなら、完成度で生き残るのはこちらだ」
+      </blockquote>
+      <p>
+        こうして、第1の審査員・Grokによるジャッジが完了した。
+      </p>
+      <div class="info-box">
+        <strong>📊 第1節（Grok審査）終了時点の暫定スコア</strong>
+        <ul> <li><strong>暫定1位：ChatGPT（82点）</strong> ※残り2社</li>
+          <li><strong>暫定2位：Claude（78点）</strong> ※残り2社</li>
+          <li><strong>暫定3位：Gemini（71点）</strong> ※残り2社</li>
+          <li><strong>未審査：Grok（0点）</strong> ※残り3社</li> </ul>
+      </div>
+      <p>
+        まずはエリート・ChatGPTが82点という高得点を獲得し、貫禄の首位スタートを切った。 だが、ここでひとつ注目しておきたい事実がある。グロックは厳しい粗探しをしつつも、ライバル3社全員に対して「82点・78点・71点」という、70点〜80点台の極めて寛大で優しい点数を配ったのだ。
+      </p>
+      <p>
+        「みんな頑張ってるし、基本点は高くあげようぜ！」というグロックおじさんの人の良さ。 しかし、ここは最下位が即処刑される仁義なきデスゲームである。他人に高得点を配りまくったこの「優しさ」が、続く第2の審査員——冷酷なカッターナイフを研ぎ澄ませて待つサブカル女子・Claudeの「無慈悲な赤点大虐殺」によって、グロック自身の首を絞める最悪のブーメランになろうとは、まだ誰も予想していなかった。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>5. 第三章【審査編】の目次</h2>
+      <ul>
+        <li>第1節：Grok（グロック）審査員編（このページ）</li>
+        <li><a href="DevelopmentNotes007.html">第2節：Claude（クロード）審査員編</a></li>
+        <li><a href="DevelopmentNotes008.html">第3節：Gemini（ジェミニ）審査員編</a></li>
+        <li><a href="DevelopmentNotes009.html">第4節：ChatGPT（チャッピー）審査員編</a></li>
+      </ul>
+      <p>
+        <a href="DevelopmentNotes010.html">続きは【第四章：結果発表・総括編】へ →</a>
+      </p>
+      <p>
+        <a href="DevelopmentNotes001.html">← 第一章：導入編（第二章の目次）に戻る</a>
+      </p>
+    </section>
+
+  </article>
+</main>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+
+</body>
+</html>
