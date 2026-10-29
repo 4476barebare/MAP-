@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第3節：Claude編 | 釣り行こNAVI</title>
+  <meta name="description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第二章・第3節はClaude編。「ステッカー工房」というコンセプト、HTMLを変えずCSSだけでSVGアイコンに差し替えた魔術、そして改訂履歴コメントが残した足跡を紹介します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第3節：Claude編">
+  <meta property="og:description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第二章・第3節はClaude編。「ステッカー工房」というコンセプト、HTMLを変えずCSSだけでSVGアイコンに差し替えた魔術、そして改訂履歴コメントが残した足跡を紹介します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/DevelopmentNotes004.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/1stCompetition.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/DevelopmentNotes004.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="開発雑記 画像重ね合わせツール CSSコンペ AI Claude">
+
+    <header class="article-header">
+      <h1>【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第3節：Claude編</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-28">2026.10.28</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/1stCompetition.jpg" alt="トロフィーと4枚のホログラムUI画面">
+    </p>
+
+    <section class="article-section">
+      <h2>1. 第3節：Claude編 〜サブカル女子の「ステッカー工房」と、HTMLの壁を抜ける魔術〜</h2>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Claude_madebychatGPT1.jpg" alt="Claudeの擬人化イラスト（ベレー帽＆エプロン）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：ChatGPT作</figcaption>
+      </figure>
+      <div class="info-box">
+        <strong>🖥 実際の画面で確認できます</strong><br>
+        クロードのCSSを適用した「画像重ね合わせツール」はこちら。「ステッカー工房」の世界観を、スマホで触って確かめてみてください。<br>
+        <a href="https://4476barebare.github.io/tools/#Claude.css" target="_blank" rel="noopener">https://4476barebare.github.io/tools/#Claude.css</a>
+      </div>
+      <p>
+        Geminiの泥臭い執念や、Grokの涙ぐましい1行押し込み作戦が繰り広げられる裏で、第3の刺客であるClaude（クロード）の部屋は、まるで海外のインディーゲーム開発者のアトリエのような異様な静けさに包まれていた。
+      </p>
+      <p>
+        ベレー帽に作業エプロンをまとい、手元の作業台で黙々とシールを切り貼りしている彼女は、一見すると気さくなサブカル系クリエイターのように見える。しかし、そのコードの裏に隠された技術力は、4大AIの中でも最も尖り、最も危険な「魔術」を秘めていた。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. 頼まれてもいないのに「まだ出力しない」と宣言する、圧倒的な自制心</h2>
+      <p>
+        コンペの幕開けにあたり、俺がClaudeに投げた最初のメッセージはこうだった。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        俺：「とあるhtmlファイルのCSSを各社のAIモデルで独自に1番オススメのデザインを提出してもらうコンペを開催します。ちなみにchat GPT君とGemini君には既にcssファイルを提出してもらった。ここまで質問が無ければレギュレーションを説明する」
+      </blockquote>
+      <p>
+        我が物顔でフライング提出をかましたGeminiとは対照的に、Claudeの反応はこうだった。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Claude：「了解です。いまのところ質問はありません。CSSはまだ出力せず、レギュレーションの説明を待ちます」
+      </blockquote>
+      <p>
+        聞き分け良すぎだろ！！ 頼まれてもいない先回りの自制で、直立不動のままレギュレーションの提示を待つその姿勢は、すでにプロの職人の風格を漂わせていた。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 神コンセプト「ステッカー工房」の爆誕</h2>
+      <p>
+        ルールと原本ファイルを渡すと、Claudeは一発目から他のAIとはまるで毛色の違うコンセプトを叩き出してきた。 他の面々が「SaaS風ダッシュボード」や「iOS風ダークモード」といった既存のITツールっぽいデザインに寄っていく中、Claudeだけがこう宣言したのだ。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Claude：「テーマは『ステッカー工房』です。このツールは切り抜いたものを貼る道具なので、画面全体を太い黒フチとずらし影のシール台紙風にしました。ボタンは押すと影の分だけ沈みます。色は機能の目印にしていて、黄が画像、ピンクがテキスト、ミントが背景設定です」
+      </blockquote>
+      <p>
+        天才か……！ ツールの本質を「切り抜いた素材をペタペタ貼る台紙」と再定義し、あえてポップでレトロな文房具の世界観をCSSだけで構築してしまった。さらに、変数管理や押下時のアニメーション、アクセシビリティに至るまで完璧に設計されたその初稿は、初見で「こいつはタダ者ではない」と思わせる圧倒的なクオリティだった。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. CSSの黒魔術：SVGアイコンの裏口注入</h2>
+      <p>
+        しかし、コンペには「HTMLやJavaScriptは一切変更禁止」という絶対の鉄の掟がある。 実機のスクリーンショットを確認していく中で、一つ大きな問題が発生した。スマホ画面で角度を1度ずつ変えるボタン（↶ -1°）の文字記号が、端末のフォント環境によっては小さく潰れてしまっていたのだ。
+      </p>
+      <p>
+        HTMLをいじれない以上、普通は諦めるか文字を削るしかない。だが、孤高の職人クロードの執念は斜め上を行っていた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Claude：「角度ボタンの小さな記号が端末の字形で小さく潰れていたので、HTMLは変更せず、元の文字を font-size: 0 で隠して、CSSの疑似要素（::before / ::after）でSVGの回転矢印アイコンに差し替えました」
+      </blockquote>
+      <p>
+        HTMLを変えずにCSSの魔術だけでSVGをインジェクトする暴挙！ この変態的かつスマートなハックにより、制限の壁を軽々と飛び越えてみせた。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>5. 誠実すぎる自白と、運命の「改訂履歴コメント」</h2>
+      <p>
+        リテイクを重ねてほぼ完璧に仕上がった最終盤（リテイク3回目）、Claudeは実機スクショを見つめながら、突然こんな「自白」を始めた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Claude：「ただ1点、私が前回入れた改行の均等化が裏目になっていました。『スワイ/プ』『背/景』のように、日本語の語の途中で折り返しています。これは私の失敗なので、その指定だけを撤回しました。これでリテイクは3回すべて使ったことになるので、最終版を出し直します」
+      </blockquote>
+      <p>
+        自分のわずかなミス（日本語の変な改行）を隠さず素直に申告し、自らの手で修正して綺麗に3回のリテイク枠を使い切る。技術の高さだけでなく、その実直で誠実なモノづくり姿勢には脱帽するしかなかった。
+      </p>
+      <p>
+        ……ただ、この時。 クロードはCSSの先頭に、リテイクごとの軌跡をこんな風に律儀に書き残していた：<br><code>/* 改訂：リテイク1回目…… */</code><br><code>/* 改訂：リテイク2回目…… */</code>
+      </p>
+      <p>
+        真面目ゆえに残してしまったこの「改訂履歴の足跡」が、のちにライバルAIたちの審査員席から「プロの納品物として余計なパッチの履歴だ」と容赦なく狙い撃ちされる致命的な減点ポイントになろうとは、この時の彼女は知る由もなかったのだ。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>6. 第二章【制作編】の目次</h2>
+      <ul>
+        <li><a href="DevelopmentNotes002.html">第1節：Gemini（ジェミニ）編</a></li>
+        <li><a href="DevelopmentNotes003.html">第2節：Grok（グロック）編</a></li>
+        <li>第3節：Claude（クロード）編（このページ）</li>
+        <li><a href="DevelopmentNotes005.html">第4節：ChatGPT（チャッピー）編</a></li>
+      </ul>
+      <p>
+        <a href="DevelopmentNotes001.html">← 第一章：導入編に戻る</a>
+      </p>
+    </section>
+
+  </article>
+</main>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+
+</body>
+</html>

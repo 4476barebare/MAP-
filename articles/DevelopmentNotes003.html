@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第2節：Grok編 | 釣り行こNAVI</title>
+  <meta name="description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第二章・第2節はGrok編。「やあ！」と現れた陽気な相棒が、ヘッダーを横1行に押し込もうと98pxに賭けた、リテイク3回の持久戦を紹介します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第2節：Grok編">
+  <meta property="og:description" content="4大AIにCSSデザインを競作させたコンペの開発雑記。第二章・第2節はGrok編。「やあ！」と現れた陽気な相棒が、ヘッダーを横1行に押し込もうと98pxに賭けた、リテイク3回の持久戦を紹介します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/DevelopmentNotes003.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/1stCompetition.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/DevelopmentNotes003.html">
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+  <!-- 分割した専用CSSを読み込み -->
+  <link rel="stylesheet" href="../css/fish_article.css">
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="開発雑記 画像重ね合わせツール CSSコンペ AI Grok">
+
+    <header class="article-header">
+      <h1>【開発雑記】CSSデザイン・デスゲーム【第二章：制作編】4大AIの試行錯誤とリテイク3回の死闘｜第2節：Grok編</h1>
+      <div class="article-meta">
+        <time datetime="2026-10-28">2026.10.28</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/1stCompetition.jpg" alt="トロフィーと4枚のホログラムUI画面">
+    </p>
+
+    <section class="article-section">
+      <h2>1. 第2節：Grok編 〜「やあ！」と現れた相棒、98pxに賭けた涙の1行押し込み作戦〜</h2>
+      <figure style="margin:16px 0; text-align:center;">
+        <img style="max-width:100%; height:auto;" src="images/Grok_madebyGemini1.jpg" alt="Grokの擬人化イラスト（キャップ＆パーカー）">
+        <figcaption style="font-size:12px; color:#666; margin-top:4px;">画像：Gemini作</figcaption>
+      </figure>
+      <div class="info-box">
+        <strong>🖥 実際の画面で確認できます</strong><br>
+        グロックのCSSを適用した「画像重ね合わせツール」はこちら。ヘッダーの「98px」の攻防を、スマホで確かめてみてください。<br>
+        <a href="https://4476barebare.github.io/tools/#Grok.css" target="_blank" rel="noopener">https://4476barebare.github.io/tools/#Grok.css</a>
+      </div>
+      <p>
+        熱血ルーキーのGeminiが白から黒へと大暴れしていた頃、俺は第2の刺客であるxAI社のGrok（グロック）の部屋をノックしていた。
+      </p>
+      <p>
+        他のAIたちが最初から長文でかしこまった対応をしてくる中、グロックとの会話は拍子抜けするほど軽いノリで幕を開けた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        俺：「やあ」
+      </blockquote>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「やあ！どうしたの？何か手伝えることある？」
+      </blockquote>
+      <p>
+        「いま各社のAIモデルでCSSのコンペを開催しているんだ。ちなみにChatGPT君とGemini君とClaude君には既に提出してもらった。質問がなければレギュレーションを説明するね」と伝えると、グロックはカフェでダベっている友人のような気軽さでこう返してきた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「了解！ 質問なしで大丈夫だよ。レギュレーション説明してくれてOK。準備できてるから、いつでもどうぞ」
+      </blockquote>
+      <p>
+        デスゲームの緊張感など微塵もない、圧倒的なフランクさである。 ルールと原本ファイルを渡すと、グロックは『Clean Creative Tool（清潔で使いやすいクリエイティブツール）』というテーマを掲げ、インディゴ（藍）系のアクセントカラーとモダンなカードUIを組み合わせた初稿（Grok.css）をサクッと提出してきた。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>2. スライダーの「黄色」を消し、平和主義な二択を迫る相棒</h2>
+      <p>
+        早速、CSS切り替え機能を追加した実機のスクリーンショット3枚をグロックに見せて意見を求める。すると彼は、自分の作品を客観的に眺めながらこう分析した。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「実際の表示を確認したよ。全体としてかなり綺麗にまとまっていて、意図した『Clean Creative Tool』の雰囲気はしっかり出ている。気になる点をいくつか挙げると：<br>1. ヘッダー周り：CSSテーマ名が『Grok free-tier availabl』で途中切れしている。タイトルとセレクト＋切替ボタンが横に並んで少し窮屈に見える。<br>2. 色のバランス：縮尺・角度のスライダー背景が黄色系（#fffbeb）で、全体のクールなトーン（インディゴ＋グレー）から少し浮いている」
+      </blockquote>
+      <p>
+        そう言うと、リテイク1回目（v2）ではスライダー背景の黄色を廃止してクールなグレーブルー系に変更し、角度ボタンなどもインディゴ系に寄せて全体の統一感を一気に引き上げてきた。ここまでは実に堅実で頼もしい仕事ぶりだ。
+      </p>
+      <p>
+        しかし、このリテイク1回目の実機スクショを見せたあたりから、グロックの「謎の頑固さ」と「控えめな性格」が顔を出し始める。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「まだ気になる点：<br>1. ヘッダーの窮屈さ：タイトルが『画像重ね合...』と途中切れしているのが少し惜しい。セレクトボックスの文字も長くて切れている。<br>2. 二次ボタンのコントラスト：角度ボタン（-1°/+1°）と『左右反転』『0°に戻す』が少し薄くて、背景に埋もれ気味。<br>どうする？<br>・このままv2で確定する<br>・もう一段階磨いたv3を出す 希望を教えて」
+      </blockquote>
+      <p>
+        暴走して勝手にコードを書き換えるGeminiとは対照的に、グロックは必ず「このまま確定する？ もう一段階磨く？ 希望を教えて」と俺に判断を委ねてくるのだ。もちろん俺は「じゃあv3を提出してもらおうか」と指示を出した。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>3. 「2段に折り返す」という発想なき、涙の98px圧縮バトル</h2>
+      <p>
+        スマホの狭い画面で、ヘッダーの「アプリタイトル」と「CSS切り替えセレクトボックス＋ボタン」がぶつかって文字が途中切れしてしまう問題。 実はこの課題に対し、他の3社（ChatGPT・Gemini・Claude）は全員が「スマホ幅ではヘッダーを上下2段に折り返す（分割する）」という解決策をとっていた。
+      </p>
+      <p>
+        ところが、我が道を行くグロックおじさんだけは違った。 なぜか「ヘッダーを2段にする」という発想に最後まで至らず、「意地でもすべてを横1行の中に押し込める」という茨の道を選んだのである！
+      </p>
+      <p>
+        リテイク2回目（v3）でタイトルの文字を小さくし、セレクトボックスの横幅を絞ってみたものの、やはり実機のスクショでは「画像重ね合...」「Grok free-tier availab」と文字が切れてしまっている。その画面を見たグロックは、額に汗をにじませながらこう呟いた。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「ヘッダーの途中切れが一番目立つ弱点。ここが一番『惜しい』ポイント。CSSだけでは完全解決は難しいが、もう少し詰められる余地はある。リテイクが最後の1回なので、大きな方向転換はせず、ヘッダーをよりコンパクトに詰めて途中切れを最小限にする最終版（v4）を出すのが妥当だと思う。 どうする？ このままv3で確定する？ 最後の微調整としてv4を提出する？」
+      </blockquote>
+      <p>
+        どこまでも「1行押し込み」にこだわり、そして最後の最後まで2択で確認してくる相棒。その健気な姿に胸を打たれた俺は、最後のメッセージを送った。
+      </p>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        俺：「そうだね。これが最後の1回なので悔いのない改修をして欲しい。出し切ってくれ」
+      </blockquote>
+      <blockquote style="margin:16px 0; padding:10px 14px; background:#f4f6fb; border-left:4px solid #191970; border-radius:4px;">
+        Grok：「最後の1回、出し切る。ヘッダーの途中切れを最大限抑え、二次ボタンの存在感をしっかり上げた最終版を提出する。<br>【最終版でやりきったこと】<br>・タイトルを 0.92rem まで下げてスペースを確保<br>・セレクトの max-width を 98px まで絞り込み<br>・二次ボタンをはっきりしたインディゴ背景（#c7d2fe）＋濃い文字色（#312e81）に変更 これ以上いじるとバランスを崩す可能性があるため、ここで打ち止め。これが僕の最終回答です」
+      </blockquote>
+      <p>
+        定規と虫眼鏡を握りしめ、リテイク3回すべてを費やして文字を 0.92rem、セレクト幅を極限の 98px まで削り込んだグロック。 彼なりに全力で出し切ったこの「98pxの持久戦」が、のちに審査ラウンドでライバルたちから格好の標的（集中砲火）にされようとは、この時の陽気なグロックには知る由もなかった——。
+      </p>
+    </section>
+
+    <section class="article-section">
+      <h2>4. 第二章【制作編】の目次</h2>
+      <ul>
+        <li><a href="DevelopmentNotes002.html">第1節：Gemini（ジェミニ）編</a></li>
+        <li>第2節：Grok（グロック）編（このページ）</li>
+        <li><a href="DevelopmentNotes004.html">第3節：Claude（クロード）編</a></li>
+        <li><a href="DevelopmentNotes005.html">第4節：ChatGPT（チャッピー）編</a></li>
+      </ul>
+      <p>
+        <a href="DevelopmentNotes001.html">← 第一章：導入編に戻る</a>
+      </p>
+    </section>
+
+  </article>
+</main>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+
+</body>
+</html>
