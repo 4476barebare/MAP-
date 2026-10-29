@@ -97,6 +97,10 @@
     <loc>https://turiiko-navi.com/articles/sawara.html</loc>
     <!-- ARTICLE_DATA: {"title":"サワラ・サゴシのルアー釣り攻略ガイド：食わせるまでは大胆に、掛けたら主導権を渡さない", "description":"ショアから狙うサワラ・サゴシの攻略法。掛けるまでは大胆に、掛けたら主導権を渡さないファイトのコツを解説。", "image":"articles/images/sawara.jpg", "category":"対象魚別ガイド", "style":"list"} -->
   </url>
+  <url>
+    <loc>https://turiiko-navi.com/articles/DevelopmentNotes001.html</loc>
+    <!-- ARTICLE_DATA: {"title":"【開発雑記】釣果写真の加工ツールを作るため、4大AIに「CSSデザイン・デスゲーム」をさせてみた【第一章：導入編】", "description":"釣果写真の加工にも使える画像重ね合わせツールのCSSを、4大AIに競作させたコンペの開発雑記。第一章は導入編。", "image":"articles/images/1stCompetition.jpg", "category":"開発雑記", "style":"list"} -->
+  </url>
 
 
   <!-- ======================== -->
