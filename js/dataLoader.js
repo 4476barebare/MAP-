@@ -1752,13 +1752,18 @@ function zoomToSpot(spot) {
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
 
-    const tileWrap = document.getElementById('tile-btn-wrap');
-    const tileBtn = document.getElementById('map-tile-btn');
-    if (tileWrap && tileBtn) {
-        tileWrap.style.display = 'flex';
-        tileBtn.style.display = 'block'; 
-        requestAnimationFrame(() => { tileBtn.style.opacity = '1'; });
-    }
+const tileWrap = document.getElementById('tile-btn-wrap');
+const tileBtn = document.getElementById('map-tile-btn');
+const postBtn = document.getElementById('map-post-btn'); // ★追加
+if (tileWrap && tileBtn) {
+    tileWrap.style.display = 'flex';
+    tileBtn.style.display = 'block';
+    if (postBtn) postBtn.style.display = 'block'; // ★追加
+    requestAnimationFrame(() => {
+        tileBtn.style.opacity = '1';
+        if (postBtn) postBtn.style.opacity = '1'; // ★追加
+    });
+}
 
     // ★ 修正：システム変数の強制上書きを削除し、純粋にセットだけ行うように戻す
     if (safe?.individualId != null) {
@@ -3078,15 +3083,21 @@ function goBack() {
             backBtn.style.opacity = '0';
         }
 
-        const tileWrap = document.getElementById('tile-btn-wrap');
-        const tileBtn = document.getElementById('map-tile-btn');
-        if (tileWrap && tileBtn) {
-            tileBtn.style.opacity = '0';
-            setTimeout(() => { 
-                tileWrap.style.display = 'none'; 
-                tileBtn.style.display = 'none'; 
-            }, 300); 
-        }
+if (typeof togglePostMode === 'function') togglePostMode(false); // ★戻る時に投稿モードを強制終了
+
+const tileWrap = document.getElementById('tile-btn-wrap');
+const tileBtn = document.getElementById('map-tile-btn');
+const postBtn = document.getElementById('map-post-btn'); // ★追加
+if (tileWrap && tileBtn) {
+    tileBtn.style.opacity = '0';
+    if (postBtn) postBtn.style.opacity = '0'; // ★追加
+    setTimeout(() => { 
+        tileWrap.style.display = 'none'; 
+        tileBtn.style.display = 'none'; 
+        if (postBtn) postBtn.style.display = 'none'; // ★追加
+    }, 300); 
+}
+
     };
 
     // =====================================

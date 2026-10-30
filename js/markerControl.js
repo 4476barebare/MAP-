@@ -247,3 +247,207 @@ markerControl.preloadShop01 = preloadShop01;
 markerControl.showShop01 = showShop01;
 markerControl.showShop02 = showShop02;
 markerControl.getIconId = getIconId;
+
+// ==========================================
+// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用)
+// ==========================================
+
+// 1. 設定エリア（後からいつでも編集可能）
+const GAS_TEMP_PIN_URL = 'ここにデプロイした https://script.google.com/macros/s/.../exec のURLを貼る';
+
+// 魚種辞書リスト（配列の文字を書き換えるだけで選択肢に反映されます）
+const FISH_DICTIONARY = [
+  'アジ', 'サバ', 'イワシ', 'シーバス', 'クロダイ', 'マダイ',
+  'ヒラメ', 'マゴチ', 'カサゴ', 'メバル', 'アオリイカ', 'タチウオ',
+  'ブリ・イナダ', 'カンパチ', 'サワラ', 'カワハギ', 'シロギス', 'ハゼ',
+  'カレイ', 'メジナ', 'ブラックバス', 'ヘラブナ', 'コイ', 'ニジマス'
+];
+
+let isPostModeActive = false;
+let savedNormalBounds = null;
+let lastTempPinPostTime = 0; // 10秒連投制限用キャッシュ
+
+// 2. 端末固有UUIDの取得・発行
+function getMyUuid() {
+  let uuid = localStorage.getItem('fishing_user_uuid');
+  if (!uuid) {
+    uuid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem('fishing_user_uuid', uuid);
+  }
+  return uuid;
+}
+
+// 3. 投稿モード用のDOM（中心の＋マーク ＆ 下部パネル）を初回のみ生成
+function ensurePostModeDom() {
+  const mapEl = document.getElementById('lf-map');
+  if (!mapEl || document.getElementById('post-center-crosshair')) return;
+
+  // ① 画面中心の「＋」マーク（ドラッグを邪魔しない pointer-events: none）
+  const crosshair = document.createElement('div');
+  crosshair.id = 'post-center-crosshair';
+  crosshair.style.cssText = `
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 36px;
+    height: 36px;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1000;
+  `;
+  crosshair.innerHTML = `
+    <div style="position:absolute;top:50%;left:0;width:100%;height:2px;background:#ff3b30;transform:translateY(-50%);box-shadow:0 0 3px #fff;"></div>
+    <div style="position:absolute;left:50%;top:0;width:2px;height:100%;background:#ff3b30;transform:translateX(-50%);box-shadow:0 0 3px #fff;"></div>
+    <div style="position:absolute;top:50%;left:50%;width:8px;height:8px;border:2px solid #ff3b30;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.4);"></div>
+  `;
+  mapEl.appendChild(crosshair);
+
+  // ② 投稿用UIパネル（魚種選択スイッチ ＋ 投稿ボタン）
+  const panel = document.createElement('div');
+  panel.id = 'post-mode-panel';
+  panel.style.cssText = `
+    display: none;
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 1001;
+    width: calc(100% - 28px);
+    max-width: 340px;
+    box-sizing: border-box;
+    text-align: center;
+  `;
+
+  const optionsHtml = FISH_DICTIONARY.map(f => `<option value="${f}">${f}</option>`).join('');
+  panel.innerHTML = `
+    <div style="font-size:12px;font-weight:bold;color:#191970;margin-bottom:6px;">
+      中心の「＋」に釣れた場所を合わせてください
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <select id="post-fish-select" style="flex:1;padding:7px;font-size:13px;border:1px solid #ccc;border-radius:6px;background:#fff;">
+        ${optionsHtml}
+      </select>
+      <button id="post-submit-btn" style="padding:7px 14px;background:#ff6d00;color:#fff;font-size:13px;font-weight:bold;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
+        投稿する
+      </button>
+    </div>
+  `;
+
+  // パネル操作時に下の地図が誤反応しないよう伝播を止める
+  if (typeof L !== 'undefined' && L.DomEvent) {
+    L.DomEvent.disableClickPropagation(panel);
+    L.DomEvent.disableScrollPropagation(panel);
+  }
+
+  mapEl.appendChild(panel);
+
+  // 投稿ボタンのクリックイベント
+  document.getElementById('post-submit-btn').addEventListener('click', submitCenterTempPin);
+}
+
+// 4. 投稿モードのON / OFF切り替え
+function togglePostMode(forceState) {
+  if (!window.map) return;
+  ensurePostModeDom();
+
+  const nextState = (typeof forceState === 'boolean') ? forceState : !isPostModeActive;
+  isPostModeActive = nextState;
+
+  const crosshair = document.getElementById('post-center-crosshair');
+  const panel     = document.getElementById('post-mode-panel');
+  const postBtn   = document.getElementById('map-post-btn');
+
+  if (isPostModeActive) {
+    // ON：現在のboundsを記憶し、＋マークが画面端の釣り場にも届くよう50%広げる
+    if (window.map.options.maxBounds) {
+      savedNormalBounds = window.map.options.maxBounds;
+      window.map.setMaxBounds(savedNormalBounds.pad(0.5));
+    }
+    if (crosshair) crosshair.style.display = 'block';
+    if (panel) panel.style.display = 'block';
+    if (postBtn) postBtn.classList.add('active');
+  } else {
+    // OFF：元のboundsに戻し、＋マークとパネルを隠す
+    if (savedNormalBounds) {
+      window.map.setMaxBounds(savedNormalBounds);
+      savedNormalBounds = null;
+    }
+    if (crosshair) crosshair.style.display = 'none';
+    if (panel) panel.style.display = 'none';
+    if (postBtn) postBtn.classList.remove('active');
+  }
+}
+
+// 5. 中心座標（＋マークの位置）をGASへPOST送信
+async function submitCenterTempPin() {
+  if (!window.map) return;
+
+  // ① 先頭で10秒キャッシュを参照して連投ブロック
+  const now = Date.now();
+  if (now - lastTempPinPostTime < 10000) {
+    const remain = Math.ceil((10000 - (now - lastTempPinPostTime)) / 1000);
+    alert(`連投制限中です。あと ${remain} 秒お待ちください。`);
+    return;
+  }
+
+  const selectEl = document.getElementById('post-fish-select');
+  const submitBtn = document.getElementById('post-submit-btn');
+  const fishName = selectEl ? selectEl.value : FISH_DICTIONARY[0];
+
+  // 画面中心（＋マーク）の座標を取得
+  const center = window.map.getCenter();
+  const myUuid = getMyUuid();
+
+  const payload = {
+    action: 'add',
+    id: 'p_' + now + '_' + Math.random().toString(36).substring(2, 6),
+    fish: fishName,
+    lat: Number(center.lat.toFixed(6)),
+    lng: Number(center.lng.toFixed(6)),
+    uuid: myUuid,
+    time: now
+  };
+
+  lastTempPinPostTime = now;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = '送信中...';
+  }
+
+  try {
+    const res = await fetch(GAS_TEMP_PIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (result.status === 'success') {
+      alert(`「${fishName}」の釣果ピンを送信しました！`);
+      togglePostMode(false); // 送信成功後に投稿モードを閉じる
+    } else {
+      alert('送信エラー: ' + (result.message || 'しばらくしてからお試しください'));
+    }
+  } catch (err) {
+    console.error('GAS送信失敗:', err);
+    alert('通信に失敗しました。');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = '投稿する';
+    }
+  }
+}
+
+// 専用アイコンのクリックイベント登録
+document.addEventListener('DOMContentLoaded', () => {
+  const postBtn = document.getElementById('map-post-btn');
+  if (postBtn) {
+    postBtn.addEventListener('click', () => togglePostMode());
+  }
+});
