@@ -189,11 +189,9 @@ function showShop02(areaKey) {
 
                 const address = shop.notes || '';
 
-                // 1. Googleマップ ルート案内URL (緯度・経度へダイレクト)
                 // 1. Googleマップ ルート案内URL (店舗名と住所を使って確実にセット)
-const routeKeyword = `${title} ${address}`.trim();
-const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(routeKeyword)}`;
-
+                const routeKeyword = `${title} ${address}`.trim();
+                const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(routeKeyword)}`;
 
                 // 2. Google検索URL (グループ名・店名・住所のみでスッキリ検索)
                 const searchKeyword = `${title} ${address}`.trim();
@@ -222,8 +220,6 @@ const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURI
                 `;
             });
 
-
-            // ★ここ変更なし（維持）
             window.phase2Group.addLayer(marker);
         });
     });
@@ -253,9 +249,9 @@ markerControl.getIconId = getIconId;
 // ==========================================
 
 // 1. 設定エリア（後からいつでも編集可能）
-const GAS_TEMP_PIN_URL = 'ここにデプロイした https://script.google.com/macros/s/.../exec のURLを貼る';
+const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
 
-// 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前に変更）
+// 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
 const POST_FISH_LIST = [
   'アジ', 'サバ', 'イワシ', 'シーバス', 'クロダイ', 'マダイ',
   'ヒラメ', 'マゴチ', 'カサゴ', 'メバル', 'アオリイカ', 'タチウオ',
@@ -277,7 +273,7 @@ function getMyUuid() {
   return uuid;
 }
 
-// 3. 投稿モード用のDOM（中心の＋マーク ＆ 下部パネル）を初回のみ生成
+// 3. 投稿モード用のDOM（中心の＋マーク ＆ スポット名直下のコンパクトUI）を初回のみ生成
 function ensurePostModeDom() {
   const mapEl = document.getElementById('lf-map');
   if (!mapEl || document.getElementById('post-center-crosshair')) return;
@@ -290,11 +286,11 @@ function ensurePostModeDom() {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 1000;
+    z-index: 9100;
   `;
   crosshair.innerHTML = `
     <div style="position:absolute;top:50%;left:0;width:100%;height:2px;background:#ff3b30;transform:translateY(-50%);box-shadow:0 0 3px #fff;"></div>
@@ -303,38 +299,34 @@ function ensurePostModeDom() {
   `;
   mapEl.appendChild(crosshair);
 
-  // ② 投稿用UIパネル（魚種選択スイッチ ＋ 投稿ボタン）
+  // ② 投稿用UIパネル（左上・スポット名のすぐ下にコンパクト1行配置、z-index: 9500で最前面）
   const panel = document.createElement('div');
   panel.id = 'post-mode-panel';
   panel.style.cssText = `
     display: none;
     position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.95);
-    padding: 10px 12px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    z-index: 1001;
-    width: calc(100% - 28px);
-    max-width: 340px;
-    box-sizing: border-box;
-    text-align: center;
+    top: 48px;
+    left: 20px;
+    background: rgba(25, 25, 112, 0.9);
+    padding: 5px 8px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    z-index: 9500;
+    pointer-events: auto;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.3);
   `;
 
   const optionsHtml = POST_FISH_LIST.map(f => `<option value="${f}">${f}</option>`).join('');
 
   panel.innerHTML = `
-    <div style="font-size:12px;font-weight:bold;color:#191970;margin-bottom:6px;">
-      中心の「＋」に釣れた場所を合わせてください
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <select id="post-fish-select" style="flex:1;padding:7px;font-size:13px;border:1px solid #ccc;border-radius:6px;background:#fff;">
+    <div style="display:flex;gap:6px;align-items:center;">
+      <select id="post-fish-select" style="padding:3px 6px;font-size:12px;font-weight:bold;color:#191970;border:none;border-radius:12px;background:#fff;outline:none;cursor:pointer;">
         ${optionsHtml}
       </select>
-      <button id="post-submit-btn" style="padding:7px 14px;background:#ff6d00;color:#fff;font-size:13px;font-weight:bold;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
-        投稿する
+      <button id="post-submit-btn" style="padding:3px 10px;background:#ff6d00;color:#fff;font-size:12px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;white-space:nowrap;">
+        ＋へ投稿
       </button>
     </div>
   `;
@@ -440,7 +432,7 @@ async function submitCenterTempPin() {
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.textContent = '投稿する';
+      submitBtn.textContent = '＋へ投稿';
     }
   }
 }
