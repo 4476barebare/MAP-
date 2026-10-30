@@ -300,19 +300,18 @@ function showPostStatus(message, autoHideMs = 2500) {
   }
 }
 
-// 4. 投稿モード用のDOMを初回のみ生成（.map-ui-sub2 の枠内に収める）
+// 4. 投稿モード用のDOMを初回のみ生成（スタイルはすべてmain.cssで管理）
 function ensurePostModeDom() {
   const mapEl = document.getElementById('lf-map');
-  const sub2 = document.querySelector('.map-ui-sub2');
-  if (!mapEl || !sub2 || document.getElementById('post-center-crosshair')) return;
+  if (!mapEl || document.getElementById('post-center-crosshair')) return;
 
-  // ① 画面中心の「＋」照準（マップ直下・中央固定）
+  // ① 画面中心の「＋」照準
   const crosshair = document.createElement('div');
   crosshair.id = 'post-center-crosshair';
   crosshair.className = 'post-center-crosshair';
   mapEl.appendChild(crosshair);
 
-  // ② 投稿用パネル（スポット画面で非表示になっている .map-ui-sub2 の中に格納！）
+  // ② 左上（スポット名直下）の投稿用パネル
   const panel = document.createElement('div');
   panel.id = 'post-mode-panel';
   panel.className = 'post-mode-panel';
@@ -320,11 +319,13 @@ function ensurePostModeDom() {
   const optionsHtml = POST_FISH_LIST.map(f => `<option value="${f}">${f}</option>`).join('');
 
   panel.innerHTML = `
-    <select id="post-fish-select" class="post-fish-select">
-      ${optionsHtml}
-    </select>
-    <button id="post-submit-btn" class="post-submit-btn">投稿</button>
-    <span id="post-status-msg" class="post-status-msg"></span>
+    <div class="post-mode-row">
+      <select id="post-fish-select" class="post-fish-select">
+        ${optionsHtml}
+      </select>
+      <button id="post-submit-btn" class="post-submit-btn">投稿</button>
+    </div>
+    <div id="post-status-msg" class="post-status-msg"></div>
   `;
 
   // パネル操作時に下の地図が誤反応しないよう伝播を止める
@@ -333,7 +334,7 @@ function ensurePostModeDom() {
     L.DomEvent.disableScrollPropagation(panel);
   }
 
-  sub2.appendChild(panel);
+  mapEl.appendChild(panel);
 
   document.getElementById('post-submit-btn').addEventListener('click', submitCenterTempPin);
 }
@@ -349,7 +350,6 @@ function togglePostMode(forceState) {
   const crosshair = document.getElementById('post-center-crosshair');
   const panel     = document.getElementById('post-mode-panel');
   const postBtn   = document.getElementById('map-post-btn');
-  const sub2      = document.querySelector('.map-ui-sub2');
 
   if (isPostModeActive) {
     // ON：現在のboundsを記憶し、＋マークが画面端の釣り場にも届くよう50%広げる
@@ -358,7 +358,6 @@ function togglePostMode(forceState) {
       window.map.setMaxBounds(savedNormalBounds.pad(0.5));
     }
     showPostStatus('');
-    if (sub2) sub2.style.display = 'inline-flex'; // スポット画面で空いている sub2 を有効化
     if (crosshair) crosshair.classList.add('is-open');
     if (panel) panel.classList.add('is-open');
     if (postBtn) postBtn.classList.add('active');
@@ -369,13 +368,11 @@ function togglePostMode(forceState) {
       savedNormalBounds = null;
     }
     showPostStatus('');
-    if (sub2) sub2.style.display = 'none'; // sub2 を再度非表示に戻す
     if (crosshair) crosshair.classList.remove('is-open');
     if (panel) panel.classList.remove('is-open');
     if (postBtn) postBtn.classList.remove('active');
   }
 }
-
 
 // 6. 中心座標（＋マークの位置）をGASへPOST送信
 async function submitCenterTempPin() {
