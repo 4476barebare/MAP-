@@ -1644,19 +1644,54 @@ function zoomToSpot(spot) {
     window.currentSpotBaseTile = tileUrl;
     const hasOSM = window.osmLayer && window.map.hasLayer(window.osmLayer);
 
+    const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
+
     let isMoveEnded = false;
     let isFadeEnded = !hasOSM; 
+    let isSpotPrepEnded = false;
+
+    // ★ スポット画面の遷移中に裏側で「IP+UUIDの生成（生成済みならスキップ）」と「切り替え用タイルのプリフェッチ」を同時実行
+    if (typeof window.prepareSpotActionButtons === 'function') {
+        window.prepareSpotActionButtons(safe, targetZoom).finally(() => {
+            isSpotPrepEnded = true;
+            checkAndUnlockGuard();
+        });
+    } else {
+        isSpotPrepEnded = true;
+    }
 
     const safetyTimer = setTimeout(() => {
         isFadeEnded = true;
+        isSpotPrepEnded = true;
         checkAndUnlockGuard();
     }, 3000);
 
+    let isSpotButtonsShown = false;
     const checkAndUnlockGuard = () => {
-        if (isMoveEnded && isFadeEnded) {
+        if (isMoveEnded && isFadeEnded && isSpotPrepEnded) {
+            if (isSpotButtonsShown) return;
+            isSpotButtonsShown = true;
             clearTimeout(safetyTimer);
+
+            // ★ データ（IP+UUID ＆ 代替タイル）とカメラ遷移がすべて揃ったタイミングで両ボタンを同時にフェードイン
+            const tileWrap = document.getElementById('tile-btn-wrap');
+            const tileBtn = document.getElementById('map-tile-btn');
+            const postBtn = document.getElementById('map-post-btn');
+            if (tileWrap && tileBtn) {
+                tileWrap.style.display = 'flex';
+                tileBtn.style.display = 'block';
+                tileBtn.style.pointerEvents = 'auto';
+                if (postBtn) {
+                    postBtn.style.display = 'block';
+                    postBtn.style.pointerEvents = 'auto';
+                }
+                requestAnimationFrame(() => {
+                    tileBtn.style.opacity = '1';
+                    if (postBtn) postBtn.style.opacity = '1';
+                });
+            }
+
             setTimeout(() => {
-                
                 window.goBackGuard = false;
                 window.map.scrollWheelZoom.enable();
                 window.map.doubleClickZoom.enable();
@@ -1738,8 +1773,6 @@ function zoomToSpot(spot) {
         }
     }
 
-    const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
-
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     window.map.dragging.disable();
@@ -1747,23 +1780,23 @@ function zoomToSpot(spot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
+    // ★ 遷移開始時は両ボタンを一旦透明・非活性で待機させておく（準備完了後に checkAndUnlockGuard でフェードイン）
+    const tileWrap = document.getElementById('tile-btn-wrap');
+    const tileBtn = document.getElementById('map-tile-btn');
+    const postBtn = document.getElementById('map-post-btn');
+    if (tileWrap && tileBtn) {
+        tileBtn.style.opacity = '0';
+        tileBtn.style.pointerEvents = 'none';
+        if (postBtn) {
+            postBtn.style.opacity = '0';
+            postBtn.style.pointerEvents = 'none';
+        }
+    }
+
     window.map.flyTo([targetLat, targetLng], targetZoom, { duration: 0.5 });
 
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
-
-const tileWrap = document.getElementById('tile-btn-wrap');
-const tileBtn = document.getElementById('map-tile-btn');
-const postBtn = document.getElementById('map-post-btn'); // ★追加
-if (tileWrap && tileBtn) {
-    tileWrap.style.display = 'flex';
-    tileBtn.style.display = 'block';
-    if (postBtn) postBtn.style.display = 'block'; // ★追加
-    requestAnimationFrame(() => {
-        tileBtn.style.opacity = '1';
-        if (postBtn) postBtn.style.opacity = '1'; // ★追加
-    });
-}
 
     // ★ 修正：システム変数の強制上書きを削除し、純粋にセットだけ行うように戻す
     if (safe?.individualId != null) {

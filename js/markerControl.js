@@ -249,12 +249,11 @@ markerControl.showShop02 = showShop02;
 markerControl.getIconId = getIconId;
 
 // ==========================================
-// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用)
+// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・IP+UUID＋代替タイルプリフェッチ同期版)
 // ==========================================
 
 // 1. 設定エリア（後からいつでも編集可能）
 const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
-
 // 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
 const POST_FISH_LIST = [
   'アジ', 'サバ', 'イワシ', 'シーバス', 'クロダイ', 'マダイ',
@@ -268,15 +267,135 @@ let savedNormalBounds = null;
 let lastTempPinPostTime = 0; // 10秒連投制限用キャッシュ
 let postStatusTimer = null;
 
-// 2. 端末固有UUIDの取得・発行
-function getMyUuid() {
+// ★ セッション中の「IP+UUID」メモリキャッシュ＆重複生成防止ガード
+window._cachedUserIdentity = null;
+window._userIdentityPromise = null;
+window._prefetchedAltTileSpots = new Set();
+
+// 2. 端末固有UUIDの取得・発行（LocalStorage永続化）
+function getBaseUuid() {
   let uuid = localStorage.getItem('fishing_user_uuid');
   if (!uuid) {
-    uuid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      uuid = 'u_' + crypto.randomUUID();
+    } else {
+      uuid = 'u_' + ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+    }
     localStorage.setItem('fishing_user_uuid', uuid);
   }
   return uuid;
 }
+
+// 2-2. IPアドレス＋UUIDの非同期生成（生成済みなら通信せず即座にスキップ）
+function ensureUserIdentityAsync() {
+  if (window._cachedUserIdentity) {
+    return Promise.resolve(window._cachedUserIdentity);
+  }
+  if (window._userIdentityPromise) {
+    return window._userIdentityPromise;
+  }
+
+  window._userIdentityPromise = (async () => {
+    const baseUuid = getBaseUuid();
+    let ipStr = sessionStorage.getItem('fishing_user_ip');
+
+    if (!ipStr) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 1500);
+        const res = await fetch('https://api.ipify.org?format=json', {
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.ip) {
+            ipStr = String(data.ip).trim();
+            sessionStorage.setItem('fishing_user_ip', ipStr);
+          }
+        }
+      } catch (e) {
+        // タイムアウトやブロッカー環境でもボタン表示を止めないフォールバック
+        ipStr = 'noip';
+      }
+    }
+
+    window._cachedUserIdentity = `${ipStr || 'noip'}_${baseUuid}`;
+    return window._cachedUserIdentity;
+  })();
+
+  return window._userIdentityPromise;
+}
+
+// 同期取得ヘルパー（準備完了後の送信時に使用）
+function getMyUuid() {
+  return window._cachedUserIdentity || `noip_${getBaseUuid()}`;
+}
+
+// 2-3. タイル切り替えボタン用の代替タイル（OSM等）をバックグラウンドでプリフェッチ
+function prefetchAlternateSpotTiles(spot, targetZoom) {
+  if (!spot || !window.TILE_URLS) return Promise.resolve();
+
+  const spotKey = `${spot.individualId || spot.name}_${targetZoom}`;
+  if (window._prefetchedAltTileSpots.has(spotKey)) {
+    return Promise.resolve();
+  }
+  window._prefetchedAltTileSpots.add(spotKey);
+
+  const lat = Number(spot.lat);
+  const lng = Number(spot.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return Promise.resolve();
+
+  const fetchZoom = Math.floor(targetZoom || 14);
+  const n = Math.pow(2, fetchZoom);
+  const tileX = Math.floor(((lng + 180) / 360) * n);
+  const latRad = (lat * Math.PI) / 180;
+  const tileY = Math.floor(
+    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
+  );
+
+  // スポット画面の初期タイルは gsiLayer (photo/ort等) なので、切り替え先となる OSM タイルを中心に先読み
+  const altTemplate = window.TILE_URLS.osm || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const subdomains = ['a', 'b', 'c'];
+  const promises = [];
+
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      const tx = tileX + dx;
+      const ty = tileY + dy;
+      const sub = subdomains[Math.abs(tx + ty) % subdomains.length];
+      const url = altTemplate
+        .replace('{s}', sub)
+        .replace('{z}', fetchZoom)
+        .replace('{x}', tx)
+        .replace('{y}', ty);
+
+      promises.push(
+        new Promise(resolve => {
+          const img = new Image();
+          const timer = setTimeout(resolve, 1200);
+          img.onload = img.onerror = () => {
+            clearTimeout(timer);
+            resolve();
+          };
+          img.src = url;
+        })
+      );
+    }
+  }
+
+  return Promise.all(promises);
+}
+
+// 2-4. スポット画面用の「IP+UUID生成」と「切り替え用タイル先読み」を一括実行する準備関数
+window.prepareSpotActionButtons = function(spot, targetZoom) {
+  return Promise.all([
+    ensureUserIdentityAsync(),
+    prefetchAlternateSpotTiles(spot, targetZoom)
+  ]);
+};
 
 // 3. パネル内のステータスメッセージ表示（alert廃止）
 function showPostStatus(message, autoHideMs = 2500) {
@@ -394,7 +513,8 @@ async function submitCenterTempPin() {
   const fishName = selectEl ? selectEl.value : POST_FISH_LIST[0];
 
   const center = window.map.getCenter();
-  const myUuid = getMyUuid();
+  // ボタンが表示された時点で IP+UUID は確実に準備済み（万が一の際も await で保証）
+  const myUuid = window._cachedUserIdentity || (await ensureUserIdentityAsync());
 
   const payload = {
     action: 'add',
