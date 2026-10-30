@@ -65,10 +65,12 @@
     
     <!-- エリア画面用の天気UI (スポット画面では非表示になる) -->
     <div class="map-ui-sub2"></div>
-<!-- スポット画面用の右端ボタン枠（縦並び） -->
+<!-- スポット画面用の右端ボタン枠（縦並び・投稿ボタンの左横にUIを展開） -->
 <div id="tile-btn-wrap" style="display: none; flex-direction: column; align-items: flex-end; gap: 8px; padding-right: 18px; margin-top: 4px;">
   <button id="map-tile-btn" class="map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;"></button>
-  <button id="map-post-btn" class="map-post-btn" aria-label="釣果ピン投稿モード" style="display: none; opacity: 0; transition: opacity 0.4s ease;">📍釣果投稿</button>
+  <div id="post-btn-row" class="post-btn-row">
+    <button id="map-post-btn" class="map-post-btn" aria-label="釣果ピン投稿モード" style="display: none; opacity: 0; transition: opacity 0.4s ease;">📍釣果投稿</button>
+  </div>
 </div>
     
   </div>
@@ -1391,26 +1393,22 @@ async function routeUpdate() {
                 });
             }
             
-requestAnimationFrame(() => {
-    const btn = document.getElementById('map-back-btn');
-    const tileWrap = document.getElementById('tile-btn-wrap'); 
-    const tileBtn = document.getElementById('map-tile-btn'); 
-    const postBtn = document.getElementById('map-post-btn'); // ★追加
-    
-    if (btn) {
-        btn.style.display = 'block';
-        if (tileWrap) tileWrap.style.display = 'flex'; 
-        if (tileBtn) tileBtn.style.display = 'block'; 
-        if (postBtn) postBtn.style.display = 'block'; // ★追加
-        
-        requestAnimationFrame(() => { 
-            btn.style.opacity = '1'; 
-            if (tileBtn) tileBtn.style.opacity = '1'; 
-            if (postBtn) postBtn.style.opacity = '1'; // ★追加
-        });
-    }
-});
-
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                const tileWrap = document.getElementById('tile-btn-wrap'); 
+                const tileBtn = document.getElementById('map-tile-btn'); 
+                
+                if (btn) {
+                    btn.style.display = 'block';
+                    if (tileWrap) tileWrap.style.display = 'flex'; 
+                    if (tileBtn) tileBtn.style.display = 'block'; 
+                    
+                    requestAnimationFrame(() => { 
+                        btn.style.opacity = '1'; 
+                        if (tileBtn) tileBtn.style.opacity = '1'; 
+                    });
+                }
+            });
         }
         return;
     }
