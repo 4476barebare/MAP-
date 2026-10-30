@@ -1,6 +1,3 @@
-
-const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
-
 window.markerControl = {
     shop01Cache: {},
     shop01AreaCache: {},
@@ -192,9 +189,11 @@ function showShop02(areaKey) {
 
                 const address = shop.notes || '';
 
+                // 1. Googleマップ ルート案内URL (緯度・経度へダイレクト)
                 // 1. Googleマップ ルート案内URL (店舗名と住所を使って確実にセット)
-                const routeKeyword = `${title} ${address}`.trim();
-                const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(routeKeyword)}`;
+const routeKeyword = `${title} ${address}`.trim();
+const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(routeKeyword)}`;
+
 
                 // 2. Google検索URL (グループ名・店名・住所のみでスッキリ検索)
                 const searchKeyword = `${title} ${address}`.trim();
@@ -223,6 +222,8 @@ function showShop02(areaKey) {
                 `;
             });
 
+
+            // ★ここ変更なし（維持）
             window.phase2Group.addLayer(marker);
         });
     });
@@ -250,6 +251,9 @@ markerControl.getIconId = getIconId;
 // ==========================================
 // ★ スポット詳細画面：釣果ピン投稿モード (doPost専用)
 // ==========================================
+
+// 1. 設定エリア（後からいつでも編集可能）
+const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbyc9w4Z8L4wW3n66j4j_example/exec';
 
 // 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
 const POST_FISH_LIST = [
@@ -300,43 +304,45 @@ function showPostStatus(message, autoHideMs = 2500) {
   }
 }
 
-// 4. 投稿モード用のDOMを初回のみ生成（スタイルはすべてmain.cssで管理）
+// 4. 投稿モード用のDOM（中心照準 ＆ 投稿ボタン左横パネル）を生成
 function ensurePostModeDom() {
   const mapEl = document.getElementById('lf-map');
+  const postBtnRow = document.getElementById('post-btn-row');
   if (!mapEl || document.getElementById('post-center-crosshair')) return;
 
-  // ① 画面中心の「＋」照準
+  // ① 画面中心の「＋」照準（白線＋濃紺シャドウ）
   const crosshair = document.createElement('div');
   crosshair.id = 'post-center-crosshair';
   crosshair.className = 'post-center-crosshair';
   mapEl.appendChild(crosshair);
 
-  // ② 左上（スポット名直下）の投稿用パネル
-  const panel = document.createElement('div');
-  panel.id = 'post-mode-panel';
-  panel.className = 'post-mode-panel';
+  // ② 投稿ボタンのすぐ左に展開するコンパクトパネル
+  if (postBtnRow && !document.getElementById('post-mode-panel')) {
+    const panel = document.createElement('div');
+    panel.id = 'post-mode-panel';
+    panel.className = 'post-mode-panel';
 
-  const optionsHtml = POST_FISH_LIST.map(f => `<option value="${f}">${f}</option>`).join('');
+    const optionsHtml = POST_FISH_LIST.map(f => `<option value="${f}">${f}</option>`).join('');
 
-  panel.innerHTML = `
-    <div class="post-mode-row">
+    panel.innerHTML = `
       <select id="post-fish-select" class="post-fish-select">
         ${optionsHtml}
       </select>
       <button id="post-submit-btn" class="post-submit-btn">投稿</button>
-    </div>
-    <div id="post-status-msg" class="post-status-msg"></div>
-  `;
+      <span id="post-status-msg" class="post-status-msg"></span>
+    `;
 
-  // パネル操作時に下の地図が誤反応しないよう伝播を止める
-  if (typeof L !== 'undefined' && L.DomEvent) {
-    L.DomEvent.disableClickPropagation(panel);
-    L.DomEvent.disableScrollPropagation(panel);
+    // 地図ドラッグ等への伝播防止
+    if (typeof L !== 'undefined' && L.DomEvent) {
+      L.DomEvent.disableClickPropagation(panel);
+      L.DomEvent.disableScrollPropagation(panel);
+    }
+
+    // 投稿ボタンの左隣（先頭）に挿入
+    postBtnRow.insertBefore(panel, postBtnRow.firstChild);
+
+    document.getElementById('post-submit-btn').addEventListener('click', submitCenterTempPin);
   }
-
-  mapEl.appendChild(panel);
-
-  document.getElementById('post-submit-btn').addEventListener('click', submitCenterTempPin);
 }
 
 // 5. 投稿モードのON / OFF切り替え
@@ -352,7 +358,6 @@ function togglePostMode(forceState) {
   const postBtn   = document.getElementById('map-post-btn');
 
   if (isPostModeActive) {
-    // ON：現在のboundsを記憶し、＋マークが画面端の釣り場にも届くよう50%広げる
     if (window.map.options.maxBounds && !savedNormalBounds) {
       savedNormalBounds = window.map.options.maxBounds;
       window.map.setMaxBounds(savedNormalBounds.pad(0.5));
@@ -362,7 +367,6 @@ function togglePostMode(forceState) {
     if (panel) panel.classList.add('is-open');
     if (postBtn) postBtn.classList.add('active');
   } else {
-    // OFF：元のboundsに戻し、＋マークとパネルを隠す
     if (savedNormalBounds) {
       window.map.setMaxBounds(savedNormalBounds);
       savedNormalBounds = null;
@@ -378,11 +382,10 @@ function togglePostMode(forceState) {
 async function submitCenterTempPin() {
   if (!window.map) return;
 
-  // ① 先頭で10秒キャッシュを参照して連投ブロック
   const now = Date.now();
   if (now - lastTempPinPostTime < 10000) {
     const remain = Math.ceil((10000 - (now - lastTempPinPostTime)) / 1000);
-    showPostStatus(`連投制限中（あと${remain}秒）`, 2000);
+    showPostStatus(`あと${remain}秒`, 2000);
     return;
   }
 
@@ -420,7 +423,7 @@ async function submitCenterTempPin() {
 
     if (result.status === 'success') {
       if (submitBtn) submitBtn.textContent = '完了';
-      showPostStatus(`${fishName}を投稿しました`, 1000);
+      showPostStatus('投稿完了', 1000);
       setTimeout(() => {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -429,7 +432,7 @@ async function submitCenterTempPin() {
         togglePostMode(false);
       }, 900);
     } else {
-      showPostStatus(result.message || '送信できませんでした', 3000);
+      showPostStatus(result.message || '送信失敗', 3000);
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = '投稿';
@@ -437,7 +440,7 @@ async function submitCenterTempPin() {
     }
   } catch (err) {
     console.error('GAS送信失敗:', err);
-    showPostStatus('通信エラーが発生しました', 3000);
+    showPostStatus('通信エラー', 3000);
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = '投稿';
