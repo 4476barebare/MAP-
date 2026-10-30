@@ -255,8 +255,8 @@ markerControl.getIconId = getIconId;
 // 1. 設定エリア（後からいつでも編集可能）
 const GAS_TEMP_PIN_URL = 'ここにデプロイした https://script.google.com/macros/s/.../exec のURLを貼る';
 
-// 魚種辞書リスト（配列の文字を書き換えるだけで選択肢に反映されます）
-const FISH_DICTIONARY = [
+// 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前に変更）
+const POST_FISH_LIST = [
   'アジ', 'サバ', 'イワシ', 'シーバス', 'クロダイ', 'マダイ',
   'ヒラメ', 'マゴチ', 'カサゴ', 'メバル', 'アオリイカ', 'タチウオ',
   'ブリ・イナダ', 'カンパチ', 'サワラ', 'カワハギ', 'シロギス', 'ハゼ',
@@ -323,7 +323,8 @@ function ensurePostModeDom() {
     text-align: center;
   `;
 
-  const optionsHtml = FISH_DICTIONARY.map(f => `<option value="${f}">${f}</option>`).join('');
+  const optionsHtml = POST_FISH_LIST.map(f => `<option value="${f}">${f}</option>`).join('');
+
   panel.innerHTML = `
     <div style="font-size:12px;font-weight:bold;color:#191970;margin-bottom:6px;">
       中心の「＋」に釣れた場所を合わせてください
@@ -397,7 +398,7 @@ async function submitCenterTempPin() {
 
   const selectEl = document.getElementById('post-fish-select');
   const submitBtn = document.getElementById('post-submit-btn');
-  const fishName = selectEl ? selectEl.value : FISH_DICTIONARY[0];
+  const fishName = selectEl ? selectEl.value : POST_FISH_LIST[0];
 
   // 画面中心（＋マーク）の座標を取得
   const center = window.map.getCenter();
