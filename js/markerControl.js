@@ -253,7 +253,7 @@ markerControl.getIconId = getIconId;
 // ==========================================
 
 // 1. 設定エリア（後からいつでも編集可能）
-const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbyc9w4Z8L4wW3n66j4j_example/exec';
+const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
 
 // 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
 const POST_FISH_LIST = [
