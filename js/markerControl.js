@@ -1,3 +1,6 @@
+
+const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
+
 window.markerControl = {
     shop01Cache: {},
     shop01AreaCache: {},
@@ -248,9 +251,6 @@ markerControl.getIconId = getIconId;
 // ★ スポット詳細画面：釣果ピン投稿モード (doPost専用)
 // ==========================================
 
-// 1. 設定エリア（後からいつでも編集可能）
-const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
-
 // 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
 const POST_FISH_LIST = [
   'アジ', 'サバ', 'イワシ', 'シーバス', 'クロダイ', 'マダイ',
@@ -262,6 +262,7 @@ const POST_FISH_LIST = [
 let isPostModeActive = false;
 let savedNormalBounds = null;
 let lastTempPinPostTime = 0; // 10秒連投制限用キャッシュ
+let postStatusTimer = null;
 
 // 2. 端末固有UUIDの取得・発行
 function getMyUuid() {
@@ -273,62 +274,58 @@ function getMyUuid() {
   return uuid;
 }
 
-// 3. 投稿モード用のDOM（中心の＋マーク ＆ スポット名直下のコンパクトUI）を初回のみ生成
+// 3. パネル内のステータスメッセージ表示（alert廃止）
+function showPostStatus(message, autoHideMs = 2500) {
+  const msgEl = document.getElementById('post-status-msg');
+  if (!msgEl) return;
+
+  if (postStatusTimer) {
+    clearTimeout(postStatusTimer);
+    postStatusTimer = null;
+  }
+
+  if (!message) {
+    msgEl.textContent = '';
+    msgEl.classList.remove('is-visible');
+    return;
+  }
+
+  msgEl.textContent = message;
+  msgEl.classList.add('is-visible');
+
+  if (autoHideMs > 0) {
+    postStatusTimer = setTimeout(() => {
+      msgEl.classList.remove('is-visible');
+    }, autoHideMs);
+  }
+}
+
+// 4. 投稿モード用のDOMを初回のみ生成（スタイルはすべてmain.cssで管理）
 function ensurePostModeDom() {
   const mapEl = document.getElementById('lf-map');
   if (!mapEl || document.getElementById('post-center-crosshair')) return;
 
-  // ① 画面中心の「＋」マーク（ドラッグを邪魔しない pointer-events: none）
+  // ① 画面中心の「＋」照準
   const crosshair = document.createElement('div');
   crosshair.id = 'post-center-crosshair';
-  crosshair.style.cssText = `
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 34px;
-    height: 34px;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 9100;
-  `;
-  crosshair.innerHTML = `
-    <div style="position:absolute;top:50%;left:0;width:100%;height:2px;background:#ff3b30;transform:translateY(-50%);box-shadow:0 0 3px #fff;"></div>
-    <div style="position:absolute;left:50%;top:0;width:2px;height:100%;background:#ff3b30;transform:translateX(-50%);box-shadow:0 0 3px #fff;"></div>
-    <div style="position:absolute;top:50%;left:50%;width:8px;height:8px;border:2px solid #ff3b30;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.4);"></div>
-  `;
+  crosshair.className = 'post-center-crosshair';
   mapEl.appendChild(crosshair);
 
-  // ② 投稿用UIパネル（左上・スポット名のすぐ下にコンパクト1行配置、z-index: 9500で最前面）
+  // ② 左上（スポット名直下）の投稿用パネル
   const panel = document.createElement('div');
   panel.id = 'post-mode-panel';
-  panel.style.cssText = `
-    display: none;
-    position: absolute;
-    top: 48px;
-    left: 20px;
-    background: rgba(25, 25, 112, 0.9);
-    padding: 5px 8px;
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
-    z-index: 9500;
-    pointer-events: auto;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255,255,255,0.3);
-  `;
+  panel.className = 'post-mode-panel';
 
   const optionsHtml = POST_FISH_LIST.map(f => `<option value="${f}">${f}</option>`).join('');
 
   panel.innerHTML = `
-    <div style="display:flex;gap:6px;align-items:center;">
-      <select id="post-fish-select" style="padding:3px 6px;font-size:12px;font-weight:bold;color:#191970;border:none;border-radius:12px;background:#fff;outline:none;cursor:pointer;">
+    <div class="post-mode-row">
+      <select id="post-fish-select" class="post-fish-select">
         ${optionsHtml}
       </select>
-      <button id="post-submit-btn" style="padding:3px 10px;background:#ff6d00;color:#fff;font-size:12px;font-weight:bold;border:none;border-radius:12px;cursor:pointer;white-space:nowrap;">
-        ＋へ投稿
-      </button>
+      <button id="post-submit-btn" class="post-submit-btn">投稿</button>
     </div>
+    <div id="post-status-msg" class="post-status-msg"></div>
   `;
 
   // パネル操作時に下の地図が誤反応しないよう伝播を止める
@@ -339,11 +336,10 @@ function ensurePostModeDom() {
 
   mapEl.appendChild(panel);
 
-  // 投稿ボタンのクリックイベント
   document.getElementById('post-submit-btn').addEventListener('click', submitCenterTempPin);
 }
 
-// 4. 投稿モードのON / OFF切り替え
+// 5. 投稿モードのON / OFF切り替え
 function togglePostMode(forceState) {
   if (!window.map) return;
   ensurePostModeDom();
@@ -357,12 +353,13 @@ function togglePostMode(forceState) {
 
   if (isPostModeActive) {
     // ON：現在のboundsを記憶し、＋マークが画面端の釣り場にも届くよう50%広げる
-    if (window.map.options.maxBounds) {
+    if (window.map.options.maxBounds && !savedNormalBounds) {
       savedNormalBounds = window.map.options.maxBounds;
       window.map.setMaxBounds(savedNormalBounds.pad(0.5));
     }
-    if (crosshair) crosshair.style.display = 'block';
-    if (panel) panel.style.display = 'block';
+    showPostStatus('');
+    if (crosshair) crosshair.classList.add('is-open');
+    if (panel) panel.classList.add('is-open');
     if (postBtn) postBtn.classList.add('active');
   } else {
     // OFF：元のboundsに戻し、＋マークとパネルを隠す
@@ -370,13 +367,14 @@ function togglePostMode(forceState) {
       window.map.setMaxBounds(savedNormalBounds);
       savedNormalBounds = null;
     }
-    if (crosshair) crosshair.style.display = 'none';
-    if (panel) panel.style.display = 'none';
+    showPostStatus('');
+    if (crosshair) crosshair.classList.remove('is-open');
+    if (panel) panel.classList.remove('is-open');
     if (postBtn) postBtn.classList.remove('active');
   }
 }
 
-// 5. 中心座標（＋マークの位置）をGASへPOST送信
+// 6. 中心座標（＋マークの位置）をGASへPOST送信
 async function submitCenterTempPin() {
   if (!window.map) return;
 
@@ -384,7 +382,7 @@ async function submitCenterTempPin() {
   const now = Date.now();
   if (now - lastTempPinPostTime < 10000) {
     const remain = Math.ceil((10000 - (now - lastTempPinPostTime)) / 1000);
-    alert(`連投制限中です。あと ${remain} 秒お待ちください。`);
+    showPostStatus(`連投制限中（あと${remain}秒）`, 2000);
     return;
   }
 
@@ -392,7 +390,6 @@ async function submitCenterTempPin() {
   const submitBtn = document.getElementById('post-submit-btn');
   const fishName = selectEl ? selectEl.value : POST_FISH_LIST[0];
 
-  // 画面中心（＋マーク）の座標を取得
   const center = window.map.getCenter();
   const myUuid = getMyUuid();
 
@@ -409,8 +406,9 @@ async function submitCenterTempPin() {
   lastTempPinPostTime = now;
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.textContent = '送信中...';
+    submitBtn.textContent = '送信中';
   }
+  showPostStatus('');
 
   try {
     const res = await fetch(GAS_TEMP_PIN_URL, {
@@ -421,18 +419,28 @@ async function submitCenterTempPin() {
     const result = await res.json();
 
     if (result.status === 'success') {
-      alert(`「${fishName}」の釣果ピンを送信しました！`);
-      togglePostMode(false); // 送信成功後に投稿モードを閉じる
+      if (submitBtn) submitBtn.textContent = '完了';
+      showPostStatus(`${fishName}を投稿しました`, 1000);
+      setTimeout(() => {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = '投稿';
+        }
+        togglePostMode(false);
+      }, 900);
     } else {
-      alert('送信エラー: ' + (result.message || 'しばらくしてからお試しください'));
+      showPostStatus(result.message || '送信できませんでした', 3000);
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '投稿';
+      }
     }
   } catch (err) {
     console.error('GAS送信失敗:', err);
-    alert('通信に失敗しました。');
-  } finally {
+    showPostStatus('通信エラーが発生しました', 3000);
     if (submitBtn) {
       submitBtn.disabled = false;
-      submitBtn.textContent = '＋へ投稿';
+      submitBtn.textContent = '投稿';
     }
   }
 }
