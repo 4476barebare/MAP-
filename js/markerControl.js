@@ -249,7 +249,7 @@ markerControl.showShop02 = showShop02;
 markerControl.getIconId = getIconId;
 
 // ==========================================
-// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・IP+UUID遅延加算＋半径3m重複ガード・即時キャッシュ反映版)
+// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・3連続上限＋4件目以降クールタイム待機制＋半径3m重複ガード版)
 // ==========================================
 
 // 1. 設定エリア（後からいつでも編集可能）
@@ -257,6 +257,9 @@ const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-F
 
 // 同じ座標の周囲に同一魚種があるか判定する閾値（メートル）
 const DUPLICATE_FISH_RADIUS_M = 3.0;
+
+// 連続投稿できる上限数（3件までは連続投稿可、4件目からは過去3件前＝2件目の+5分クールタイム消化を待つ）
+const MAX_BURST_POSTS = 3;
 
 // 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
 const POST_FISH_LIST = [
@@ -487,31 +490,61 @@ function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH
   return false;
 }
 
-// 2-5. IP+UUID / IP一致による投稿時間（time）のペナルティ加算計算
-function calcAdjustedPostTime(myIdentity, nowMs) {
+// 2-5. IP+UUID / IP一致による「3連続投稿上限チェック」＆「投稿時間（time）のペナルティ加算計算」
+function evaluatePostCooldownAndTime(myIdentity, nowMs) {
   const pins = loadTempPinsCache();
 
   const splitIdx = myIdentity.indexOf('_u_');
   const myIp = splitIdx !== -1 ? myIdentity.slice(0, splitIdx) : 'noip';
+  const myUuidPart = splitIdx !== -1 ? myIdentity.slice(splitIdx + 1) : myIdentity;
 
+  const userMatchedPins = [];
   let exactMatchCount = 0;
   let ipOnlyMatchCount = 0;
 
   for (let i = 0; i < pins.length; i++) {
-    const pUuid = String(pins[i]?.uuid || '');
+    const pin = pins[i];
+    const pUuid = String(pin?.uuid || '');
     if (!pUuid) continue;
 
-    if (pUuid === myIdentity) {
+    const pSplitIdx = pUuid.indexOf('_u_');
+    const pIp = pSplitIdx !== -1 ? pUuid.slice(0, pSplitIdx) : 'noip';
+    const pUuidPart = pSplitIdx !== -1 ? pUuid.slice(pSplitIdx + 1) : pUuid;
+
+    const isExactMatch = (pUuid === myIdentity) || (pUuidPart === myUuidPart);
+    const isIpMatch = (myIp !== 'noip' && pIp !== 'noip' && pIp === myIp);
+
+    if (isExactMatch) {
       exactMatchCount++;
-    } else if (myIp !== 'noip') {
-      const pSplitIdx = pUuid.indexOf('_u_');
-      const pIp = pSplitIdx !== -1 ? pUuid.slice(0, pSplitIdx) : '';
-      if (pIp && pIp === myIp) {
-        ipOnlyMatchCount++;
-      }
+      userMatchedPins.push(pin);
+    } else if (isIpMatch) {
+      ipOnlyMatchCount++;
+      userMatchedPins.push(pin);
     }
   }
 
+  // 投稿時刻(time)の昇順でソート
+  userMatchedPins.sort((a, b) => Number(a.time || 0) - Number(b.time || 0));
+
+  // ★ 3件までは連続で投稿でき、4件目からは「2件目（直近から2つ前＝後ろから2番目）の +5分クールタイム」が経過するまで投稿不可にする
+  // 例: 1件目(t+0)、2件目(t+5分)、3件目(t+10分) → 4件目を打つには2件目の time (t+5分) を過ぎている必要がある
+  //     4件目(t+15分)を打った後、5件目を打つには3件目の time (t+10分) を過ぎている必要がある
+  if (userMatchedPins.length >= MAX_BURST_POSTS) {
+    const gatePinIndex = userMatchedPins.length - (MAX_BURST_POSTS - 1); // 4件目なら index=1 (2件目のピン)
+    const gatePin = userMatchedPins[gatePinIndex];
+    const unlockTimeMs = Number(gatePin?.time || 0);
+
+    if (nowMs < unlockTimeMs) {
+      const waitSec = Math.ceil((unlockTimeMs - nowMs) / 1000);
+      return {
+        blocked: true,
+        waitSeconds: waitSec,
+        unlockTimeMs: unlockTimeMs
+      };
+    }
+  }
+
+  // クールタイムを通過した場合、今回の投稿時間（time）を計算
   let delayMinutes = 0;
   if (exactMatchCount > 0) {
     // IP+UUID全一致が既にあれば、1件あるごとに +5分 × 件数
@@ -523,6 +556,8 @@ function calcAdjustedPostTime(myIdentity, nowMs) {
   }
 
   return {
+    blocked: false,
+    waitSeconds: 0,
     adjustedTime: nowMs + (delayMinutes * 60 * 1000),
     delayMinutes: delayMinutes,
     exactMatchCount: exactMatchCount,
@@ -690,7 +725,7 @@ function togglePostMode(forceState) {
   }
 }
 
-// 6. 中心座標（＋マークの位置）をGASへPOST送信（即時ダミー配列反映 ＆ 半径3m重複ガード ＆ 投稿時間の段階加算）
+// 6. 中心座標（＋マークの位置）をGASへPOST送信（3連続上限＋4件目クールタイム待機 ＆ 半径3m重複ガード）
 async function submitCenterTempPin() {
   if (!window.map) return;
 
@@ -715,8 +750,17 @@ async function submitCenterTempPin() {
 
   const myUuid = window._cachedUserIdentity || (await ensureUserIdentityAsync());
 
-  // ★ ダミーデータ（window.tempFishPins）内の既存投稿を参照し、投稿時間（time）にペナルティ（+5分×件数 / IP一致+5分）を加算
-  const { adjustedTime, delayMinutes } = calcAdjustedPostTime(myUuid, now);
+  // ★ ガード③：3件までは連続投稿可、4件目からは「2件目の+5分クールタイム」が経過するまで投稿自体をブロック
+  const evalResult = evaluatePostCooldownAndTime(myUuid, now);
+  if (evalResult.blocked) {
+    const min = Math.floor(evalResult.waitSeconds / 60);
+    const sec = evalResult.waitSeconds % 60;
+    const waitLabel = min > 0 ? `あと${min}分${sec}秒` : `あと${sec}秒`;
+    showPostStatus(`連投制限(${waitLabel})`, 3000);
+    return;
+  }
+
+  const { adjustedTime, delayMinutes } = evalResult;
 
   const newPin = {
     id: 'p_' + now + '_' + Math.random().toString(36).substring(2, 6),
@@ -729,8 +773,7 @@ async function submitCenterTempPin() {
     bad: []
   };
 
-  // ★ 最重要：GASの通信完了やレスポンス形式を待たず、送信開始の瞬間にダミーデータ（window.tempFishPins ＆ sessionStorage）へ即座に格納！
-  // これにより、直後に同じ場所で同じ魚種を押しても100%「付近に同魚種あり」で弾かれ、2件目以降の +5分×件数 も確実に蓄積される
+  // 送信開始の瞬間にダミーデータ（window.tempFishPins ＆ sessionStorage）へ即座に格納
   const currentPins = loadTempPinsCache();
   currentPins.push(newPin);
   saveTempPinsCache(currentPins);
@@ -762,7 +805,6 @@ async function submitCenterTempPin() {
         togglePostMode(false);
       }, 900);
     } else {
-      // GAS側でエラーが返った場合のみダミーデータから巻き戻す
       const rolledBack = loadTempPinsCache().filter(p => p.id !== newPin.id);
       saveTempPinsCache(rolledBack);
 
