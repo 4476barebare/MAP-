@@ -249,7 +249,7 @@ markerControl.showShop02 = showShop02;
 markerControl.getIconId = getIconId;
 
 // ==========================================
-// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・IP+UUID遅延加算＋半径3m重複ガード版)
+// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・IP+UUID遅延加算＋半径3m重複ガード・即時キャッシュ反映版)
 // ==========================================
 
 // 1. 設定エリア（後からいつでも編集可能）
@@ -266,8 +266,36 @@ const POST_FISH_LIST = [
   'カレイ', 'メジナ', 'ブラックバス', 'ヘラブナ', 'コイ', 'ニジマス'
 ];
 
-// ★ 将来 doGet で初期ロードする仮ピン配列（現在は連投タイムスタンプ判定・重複判定用のダミー配列として定義）
-window.tempFishPins = window.tempFishPins || [];
+// ★ ダミーデータ兼ローカルキャッシュ（sessionStorageと連動し、リロードしても自分が投稿したデータを保持して比較可能にする）
+const TEMP_PINS_STORAGE_KEY = 'fishing_temp_pins_dummy_cache';
+
+function loadTempPinsCache() {
+  if (Array.isArray(window.tempFishPins) && window.tempFishPins.length > 0) {
+    return window.tempFishPins;
+  }
+  try {
+    const raw = sessionStorage.getItem(TEMP_PINS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        window.tempFishPins = parsed;
+        return window.tempFishPins;
+      }
+    }
+  } catch (e) {}
+  window.tempFishPins = [];
+  return window.tempFishPins;
+}
+
+function saveTempPinsCache(pins) {
+  window.tempFishPins = Array.isArray(pins) ? pins : [];
+  try {
+    sessionStorage.setItem(TEMP_PINS_STORAGE_KEY, JSON.stringify(window.tempFishPins));
+  } catch (e) {}
+}
+
+// 初期ロード時にキャッシュを展開
+loadTempPinsCache();
 
 let isPostModeActive = false;
 let savedNormalBounds = null;
@@ -340,12 +368,40 @@ function getMyUuid() {
   return window._cachedUserIdentity || `noip_${getBaseUuid()}`;
 }
 
-// 2-3. 魚種名の比較用正規化ヘルパー（出世魚辞書や表記ゆれを吸収して比較）
+// 2-3. 魚種名の比較用正規化ヘルパー（出世魚辞書や「シーバス⇔スズキ」「シロギス⇔キス」の表記ゆれを完全吸収）
+const EXTRA_FISH_SYNONYMS = {
+  'シーバス': 'スズキ',
+  'スズキ': 'スズキ',
+  'セイゴ': 'スズキ',
+  'フッコ': 'スズキ',
+  'シロギス': 'シロギス',
+  'キス': 'シロギス',
+  'ピンギス': 'シロギス',
+  'ブリ': 'ブリ',
+  'イナダ': 'ブリ',
+  'ワカシ': 'ブリ',
+  'ワラサ': 'ブリ',
+  'ハマチ': 'ブリ',
+  'メジロ': 'ブリ',
+  'ツバス': 'ブリ',
+  'クロダイ': 'クロダイ',
+  'チヌ': 'クロダイ',
+  'カイズ': 'クロダイ',
+  'メジナ': 'メジナ',
+  'グレ': 'メジナ',
+  'サワラ': 'サワラ',
+  'サゴシ': 'サワラ'
+};
+
 function normalizeFishForCheck(name) {
   if (!name) return '';
   const raw = String(name).trim();
+  if (EXTRA_FISH_SYNONYMS[raw]) {
+    return EXTRA_FISH_SYNONYMS[raw];
+  }
   if (typeof FISH_DICTIONARY === 'object' && FISH_DICTIONARY !== null && FISH_DICTIONARY[raw]) {
-    return FISH_DICTIONARY[raw];
+    const dictMapped = FISH_DICTIONARY[raw];
+    return EXTRA_FISH_SYNONYMS[dictMapped] || dictMapped;
   }
   return raw;
 }
@@ -354,8 +410,11 @@ function normalizeFishForCheck(name) {
 function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH_RADIUS_M) {
   if (!centerLatLng || !fishName || typeof L === 'undefined') return false;
 
+  const cLat = Number(centerLatLng.lat.toFixed(6));
+  const cLng = Number(centerLatLng.lng.toFixed(6));
+  const targetPoint = L.latLng(cLat, cLng);
+
   const targetNorm = normalizeFishForCheck(fishName);
-  // 例: 「ブリ・イナダ」のように中黒を含む選択肢は分割しても照合できるようにする
   const targetVariants = new Set([
     fishName,
     targetNorm,
@@ -364,17 +423,37 @@ function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH
 
   const isSameFish = (otherName) => {
     if (!otherName) return false;
-    const otherNorm = normalizeFishForCheck(otherName);
-    return targetVariants.has(otherName) || targetVariants.has(otherNorm);
+    const rawOther = String(otherName).trim();
+    const otherNorm = normalizeFishForCheck(rawOther);
+    if (targetVariants.has(rawOther) || targetVariants.has(otherNorm)) return true;
+    const parts = rawOther.split('・');
+    return parts.some(p => targetVariants.has(p) || targetVariants.has(normalizeFishForCheck(p)));
   };
 
-  // ① 現在マップ上に表示されている既存魚種マーカー（window.fishLayer）をチェック
+  // ① ダミーデータ兼仮ピン配列（window.tempFishPins）を最優先でチェック
+  const tempPins = loadTempPinsCache();
+  for (let i = 0; i < tempPins.length; i++) {
+    const pin = tempPins[i];
+    if (!pin) continue;
+    if (Array.isArray(pin.bad) && pin.bad.length >= 10) continue;
+
+    const lat = Number(pin.lat);
+    const lng = Number(pin.lng);
+    if (Number.isFinite(lat) && Number.isFinite(lng) && isSameFish(pin.fish)) {
+      const dist = targetPoint.distanceTo(L.latLng(lat, lng));
+      if (dist <= radiusMeters) {
+        return true;
+      }
+    }
+  }
+
+  // ② 現在マップ上に表示されている既存魚種マーカー（window.fishLayer）をチェック
   if (window.fishLayer && typeof window.fishLayer.eachLayer === 'function') {
     let foundInLayer = false;
     window.fishLayer.eachLayer(layer => {
       if (foundInLayer || typeof layer.getLatLng !== 'function') return;
       const ll = layer.getLatLng();
-      if (!ll || centerLatLng.distanceTo(ll) > radiusMeters) return;
+      if (!ll || targetPoint.distanceTo(ll) > radiusMeters) return;
 
       const html = layer.options?.icon?.options?.html || '';
       const textName = html.replace(/<[^>]*>/g, '').trim();
@@ -385,7 +464,7 @@ function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH
     if (foundInLayer) return true;
   }
 
-  // ② 現在選択中のスポットデータ（spot.URL）に紐づく魚種座標も念のためチェック
+  // ③ 現在選択中のスポットデータ（spot.URL）に紐づく魚種座標もチェック
   if (window.currentSpotId && Array.isArray(window.spotData)) {
     const parts = String(window.currentSpotId).split('_');
     const spotKey = parts[parts.length - 1];
@@ -397,27 +476,9 @@ function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH
         const lat = parseFloat(latStr);
         const lng = parseFloat(lngStr);
         if (!isNaN(lat) && !isNaN(lng) && isSameFish(fName)) {
-          if (centerLatLng.distanceTo(L.latLng(lat, lng)) <= radiusMeters) {
+          if (targetPoint.distanceTo(L.latLng(lat, lng)) <= radiusMeters) {
             return true;
           }
-        }
-      }
-    }
-  }
-
-  // ③ 仮ピン配列（window.tempFishPins：自分が直前に投稿したピンや将来doGetで取得したピン）をチェック
-  if (Array.isArray(window.tempFishPins)) {
-    for (let i = 0; i < window.tempFishPins.length; i++) {
-      const pin = window.tempFishPins[i];
-      if (!pin) continue;
-      // バッド10件以上で却下済みのピンは無視
-      if (Array.isArray(pin.bad) && pin.bad.length >= 10) continue;
-
-      const lat = Number(pin.lat);
-      const lng = Number(pin.lng);
-      if (Number.isFinite(lat) && Number.isFinite(lng) && isSameFish(pin.fish)) {
-        if (centerLatLng.distanceTo(L.latLng(lat, lng)) <= radiusMeters) {
-          return true;
         }
       }
     }
@@ -428,13 +489,13 @@ function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH
 
 // 2-5. IP+UUID / IP一致による投稿時間（time）のペナルティ加算計算
 function calcAdjustedPostTime(myIdentity, nowMs) {
-  const pins = Array.isArray(window.tempFishPins) ? window.tempFishPins : [];
+  const pins = loadTempPinsCache();
 
   const splitIdx = myIdentity.indexOf('_u_');
   const myIp = splitIdx !== -1 ? myIdentity.slice(0, splitIdx) : 'noip';
 
   let exactMatchCount = 0;
-  let hasIpOnlyMatch = false;
+  let ipOnlyMatchCount = 0;
 
   for (let i = 0; i < pins.length; i++) {
     const pUuid = String(pins[i]?.uuid || '');
@@ -446,16 +507,18 @@ function calcAdjustedPostTime(myIdentity, nowMs) {
       const pSplitIdx = pUuid.indexOf('_u_');
       const pIp = pSplitIdx !== -1 ? pUuid.slice(0, pSplitIdx) : '';
       if (pIp && pIp === myIp) {
-        hasIpOnlyMatch = true;
+        ipOnlyMatchCount++;
       }
     }
   }
 
   let delayMinutes = 0;
   if (exactMatchCount > 0) {
+    // IP+UUID全一致が既にあれば、1件あるごとに +5分 × 件数
     delayMinutes += exactMatchCount * 5;
   }
-  if (hasIpOnlyMatch) {
+  if (ipOnlyMatchCount > 0) {
+    // IPだけ一致があれば +5分
     delayMinutes += 5;
   }
 
@@ -463,7 +526,7 @@ function calcAdjustedPostTime(myIdentity, nowMs) {
     adjustedTime: nowMs + (delayMinutes * 60 * 1000),
     delayMinutes: delayMinutes,
     exactMatchCount: exactMatchCount,
-    hasIpOnlyMatch: hasIpOnlyMatch
+    ipOnlyMatchCount: ipOnlyMatchCount
   };
 }
 
@@ -627,7 +690,7 @@ function togglePostMode(forceState) {
   }
 }
 
-// 6. 中心座標（＋マークの位置）をGASへPOST送信（半径3m重複ガード ＆ 投稿時間の段階加算つき）
+// 6. 中心座標（＋マークの位置）をGASへPOST送信（即時ダミー配列反映 ＆ 半径3m重複ガード ＆ 投稿時間の段階加算）
 async function submitCenterTempPin() {
   if (!window.map) return;
 
@@ -636,7 +699,7 @@ async function submitCenterTempPin() {
   const fishName = selectEl ? selectEl.value : POST_FISH_LIST[0];
   const center = window.map.getCenter();
 
-  // ★ ガード①：半径3m以内に同じ魚種が既に存在する場合は送信前にブロック（連投クールダウンも消費しない）
+  // ★ ガード①：半径3m以内に同じ魚種が既に存在する場合は送信前にブロック
   if (hasSameFishNearby(center, fishName, DUPLICATE_FISH_RADIUS_M)) {
     showPostStatus('付近に同魚種あり', 2500);
     return;
@@ -652,8 +715,8 @@ async function submitCenterTempPin() {
 
   const myUuid = window._cachedUserIdentity || (await ensureUserIdentityAsync());
 
-  // ★ window.tempFishPins 内の既存投稿を参照し、投稿時間（time）にペナルティ（+5分×件数 / IP一致+5分）を加算
-  const { adjustedTime } = calcAdjustedPostTime(myUuid, now);
+  // ★ ダミーデータ（window.tempFishPins）内の既存投稿を参照し、投稿時間（time）にペナルティ（+5分×件数 / IP一致+5分）を加算
+  const { adjustedTime, delayMinutes } = calcAdjustedPostTime(myUuid, now);
 
   const newPin = {
     id: 'p_' + now + '_' + Math.random().toString(36).substring(2, 6),
@@ -665,6 +728,12 @@ async function submitCenterTempPin() {
     good: [],
     bad: []
   };
+
+  // ★ 最重要：GASの通信完了やレスポンス形式を待たず、送信開始の瞬間にダミーデータ（window.tempFishPins ＆ sessionStorage）へ即座に格納！
+  // これにより、直後に同じ場所で同じ魚種を押しても100%「付近に同魚種あり」で弾かれ、2件目以降の +5分×件数 も確実に蓄積される
+  const currentPins = loadTempPinsCache();
+  currentPins.push(newPin);
+  saveTempPinsCache(currentPins);
 
   lastTempPinPostTime = now;
   if (submitBtn) {
@@ -682,12 +751,9 @@ async function submitCenterTempPin() {
     const result = await res.json();
 
     if (result.status === 'success') {
-      // ★ 次回の連投時・3m重複チェック時に即座に参照されるよう window.tempFishPins にも追加
-      if (!Array.isArray(window.tempFishPins)) window.tempFishPins = [];
-      window.tempFishPins.push(newPin);
-
       if (submitBtn) submitBtn.textContent = '完了';
-      showPostStatus('投稿完了', 1000);
+      const msg = delayMinutes > 0 ? `投稿完了(+${delayMinutes}分)` : '投稿完了';
+      showPostStatus(msg, 1200);
       setTimeout(() => {
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -696,6 +762,10 @@ async function submitCenterTempPin() {
         togglePostMode(false);
       }, 900);
     } else {
+      // GAS側でエラーが返った場合のみダミーデータから巻き戻す
+      const rolledBack = loadTempPinsCache().filter(p => p.id !== newPin.id);
+      saveTempPinsCache(rolledBack);
+
       showPostStatus(result.message || '送信失敗', 3000);
       if (submitBtn) {
         submitBtn.disabled = false;
