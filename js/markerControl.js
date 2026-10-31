@@ -249,11 +249,15 @@ markerControl.showShop02 = showShop02;
 markerControl.getIconId = getIconId;
 
 // ==========================================
-// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・IP+UUID＋代替タイルプリフェッチ同期版)
+// ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・IP+UUID遅延加算＋半径3m重複ガード版)
 // ==========================================
 
 // 1. 設定エリア（後からいつでも編集可能）
 const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
+
+// 同じ座標の周囲に同一魚種があるか判定する閾値（メートル）
+const DUPLICATE_FISH_RADIUS_M = 3.0;
+
 // 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
 const POST_FISH_LIST = [
   'アジ', 'サバ', 'イワシ', 'シーバス', 'クロダイ', 'マダイ',
@@ -262,9 +266,12 @@ const POST_FISH_LIST = [
   'カレイ', 'メジナ', 'ブラックバス', 'ヘラブナ', 'コイ', 'ニジマス'
 ];
 
+// ★ 将来 doGet で初期ロードする仮ピン配列（現在は連投タイムスタンプ判定・重複判定用のダミー配列として定義）
+window.tempFishPins = window.tempFishPins || [];
+
 let isPostModeActive = false;
 let savedNormalBounds = null;
-let lastTempPinPostTime = 0; // 10秒連投制限用キャッシュ
+let lastTempPinPostTime = 0; // 10秒連打ブロック用キャッシュ
 let postStatusTimer = null;
 
 // ★ セッション中の「IP+UUID」メモリキャッシュ＆重複生成防止ガード
@@ -317,7 +324,6 @@ function ensureUserIdentityAsync() {
           }
         }
       } catch (e) {
-        // タイムアウトやブロッカー環境でもボタン表示を止めないフォールバック
         ipStr = 'noip';
       }
     }
@@ -329,12 +335,139 @@ function ensureUserIdentityAsync() {
   return window._userIdentityPromise;
 }
 
-// 同期取得ヘルパー（準備完了後の送信時に使用）
+// 同期取得ヘルパー
 function getMyUuid() {
   return window._cachedUserIdentity || `noip_${getBaseUuid()}`;
 }
 
-// 2-3. タイル切り替えボタン用の代替タイル（OSM等）をバックグラウンドでプリフェッチ
+// 2-3. 魚種名の比較用正規化ヘルパー（出世魚辞書や表記ゆれを吸収して比較）
+function normalizeFishForCheck(name) {
+  if (!name) return '';
+  const raw = String(name).trim();
+  if (typeof FISH_DICTIONARY === 'object' && FISH_DICTIONARY !== null && FISH_DICTIONARY[raw]) {
+    return FISH_DICTIONARY[raw];
+  }
+  return raw;
+}
+
+// 2-4. 周囲3m以内に同じ魚種が既に存在するかチェックするガード関数
+function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH_RADIUS_M) {
+  if (!centerLatLng || !fishName || typeof L === 'undefined') return false;
+
+  const targetNorm = normalizeFishForCheck(fishName);
+  // 例: 「ブリ・イナダ」のように中黒を含む選択肢は分割しても照合できるようにする
+  const targetVariants = new Set([
+    fishName,
+    targetNorm,
+    ...fishName.split('・').map(s => normalizeFishForCheck(s))
+  ]);
+
+  const isSameFish = (otherName) => {
+    if (!otherName) return false;
+    const otherNorm = normalizeFishForCheck(otherName);
+    return targetVariants.has(otherName) || targetVariants.has(otherNorm);
+  };
+
+  // ① 現在マップ上に表示されている既存魚種マーカー（window.fishLayer）をチェック
+  if (window.fishLayer && typeof window.fishLayer.eachLayer === 'function') {
+    let foundInLayer = false;
+    window.fishLayer.eachLayer(layer => {
+      if (foundInLayer || typeof layer.getLatLng !== 'function') return;
+      const ll = layer.getLatLng();
+      if (!ll || centerLatLng.distanceTo(ll) > radiusMeters) return;
+
+      const html = layer.options?.icon?.options?.html || '';
+      const textName = html.replace(/<[^>]*>/g, '').trim();
+      if (isSameFish(textName)) {
+        foundInLayer = true;
+      }
+    });
+    if (foundInLayer) return true;
+  }
+
+  // ② 現在選択中のスポットデータ（spot.URL）に紐づく魚種座標も念のためチェック
+  if (window.currentSpotId && Array.isArray(window.spotData)) {
+    const parts = String(window.currentSpotId).split('_');
+    const spotKey = parts[parts.length - 1];
+    const activeSpot = window.spotData.find(s => String(s.individualId) === String(spotKey));
+    if (activeSpot && typeof activeSpot.URL === 'string' && activeSpot.URL.trim() !== '') {
+      const items = activeSpot.URL.split(',');
+      for (let i = 0; i < items.length; i++) {
+        const [fName, latStr, lngStr] = items[i].split('|');
+        const lat = parseFloat(latStr);
+        const lng = parseFloat(lngStr);
+        if (!isNaN(lat) && !isNaN(lng) && isSameFish(fName)) {
+          if (centerLatLng.distanceTo(L.latLng(lat, lng)) <= radiusMeters) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  // ③ 仮ピン配列（window.tempFishPins：自分が直前に投稿したピンや将来doGetで取得したピン）をチェック
+  if (Array.isArray(window.tempFishPins)) {
+    for (let i = 0; i < window.tempFishPins.length; i++) {
+      const pin = window.tempFishPins[i];
+      if (!pin) continue;
+      // バッド10件以上で却下済みのピンは無視
+      if (Array.isArray(pin.bad) && pin.bad.length >= 10) continue;
+
+      const lat = Number(pin.lat);
+      const lng = Number(pin.lng);
+      if (Number.isFinite(lat) && Number.isFinite(lng) && isSameFish(pin.fish)) {
+        if (centerLatLng.distanceTo(L.latLng(lat, lng)) <= radiusMeters) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+// 2-5. IP+UUID / IP一致による投稿時間（time）のペナルティ加算計算
+function calcAdjustedPostTime(myIdentity, nowMs) {
+  const pins = Array.isArray(window.tempFishPins) ? window.tempFishPins : [];
+
+  const splitIdx = myIdentity.indexOf('_u_');
+  const myIp = splitIdx !== -1 ? myIdentity.slice(0, splitIdx) : 'noip';
+
+  let exactMatchCount = 0;
+  let hasIpOnlyMatch = false;
+
+  for (let i = 0; i < pins.length; i++) {
+    const pUuid = String(pins[i]?.uuid || '');
+    if (!pUuid) continue;
+
+    if (pUuid === myIdentity) {
+      exactMatchCount++;
+    } else if (myIp !== 'noip') {
+      const pSplitIdx = pUuid.indexOf('_u_');
+      const pIp = pSplitIdx !== -1 ? pUuid.slice(0, pSplitIdx) : '';
+      if (pIp && pIp === myIp) {
+        hasIpOnlyMatch = true;
+      }
+    }
+  }
+
+  let delayMinutes = 0;
+  if (exactMatchCount > 0) {
+    delayMinutes += exactMatchCount * 5;
+  }
+  if (hasIpOnlyMatch) {
+    delayMinutes += 5;
+  }
+
+  return {
+    adjustedTime: nowMs + (delayMinutes * 60 * 1000),
+    delayMinutes: delayMinutes,
+    exactMatchCount: exactMatchCount,
+    hasIpOnlyMatch: hasIpOnlyMatch
+  };
+}
+
+// 2-6. タイル切り替えボタン用の代替タイル（OSM等）をバックグラウンドでプリフェッチ
 function prefetchAlternateSpotTiles(spot, targetZoom) {
   if (!spot || !window.TILE_URLS) return Promise.resolve();
 
@@ -356,7 +489,6 @@ function prefetchAlternateSpotTiles(spot, targetZoom) {
     ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
   );
 
-  // スポット画面の初期タイルは gsiLayer (photo/ort等) なので、切り替え先となる OSM タイルを中心に先読み
   const altTemplate = window.TILE_URLS.osm || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
   const subdomains = ['a', 'b', 'c'];
   const promises = [];
@@ -389,7 +521,7 @@ function prefetchAlternateSpotTiles(spot, targetZoom) {
   return Promise.all(promises);
 }
 
-// 2-4. スポット画面用の「IP+UUID生成」と「切り替え用タイル先読み」を一括実行する準備関数
+// 2-7. スポット画面用の「IP+UUID生成」と「切り替え用タイル先読み」を一括実行する準備関数
 window.prepareSpotActionButtons = function(spot, targetZoom) {
   return Promise.all([
     ensureUserIdentityAsync(),
@@ -451,13 +583,11 @@ function ensurePostModeDom() {
       <span id="post-status-msg" class="post-status-msg"></span>
     `;
 
-    // 地図ドラッグ等への伝播防止
     if (typeof L !== 'undefined' && L.DomEvent) {
       L.DomEvent.disableClickPropagation(panel);
       L.DomEvent.disableScrollPropagation(panel);
     }
 
-    // 投稿ボタンの左隣（先頭）に挿入
     postBtnRow.insertBefore(panel, postBtnRow.firstChild);
 
     document.getElementById('post-submit-btn').addEventListener('click', submitCenterTempPin);
@@ -497,10 +627,22 @@ function togglePostMode(forceState) {
   }
 }
 
-// 6. 中心座標（＋マークの位置）をGASへPOST送信
+// 6. 中心座標（＋マークの位置）をGASへPOST送信（半径3m重複ガード ＆ 投稿時間の段階加算つき）
 async function submitCenterTempPin() {
   if (!window.map) return;
 
+  const selectEl = document.getElementById('post-fish-select');
+  const submitBtn = document.getElementById('post-submit-btn');
+  const fishName = selectEl ? selectEl.value : POST_FISH_LIST[0];
+  const center = window.map.getCenter();
+
+  // ★ ガード①：半径3m以内に同じ魚種が既に存在する場合は送信前にブロック（連投クールダウンも消費しない）
+  if (hasSameFishNearby(center, fishName, DUPLICATE_FISH_RADIUS_M)) {
+    showPostStatus('付近に同魚種あり', 2500);
+    return;
+  }
+
+  // ★ ガード②：物理的な誤連打ガード（10秒）
   const now = Date.now();
   if (now - lastTempPinPostTime < 10000) {
     const remain = Math.ceil((10000 - (now - lastTempPinPostTime)) / 1000);
@@ -508,22 +650,20 @@ async function submitCenterTempPin() {
     return;
   }
 
-  const selectEl = document.getElementById('post-fish-select');
-  const submitBtn = document.getElementById('post-submit-btn');
-  const fishName = selectEl ? selectEl.value : POST_FISH_LIST[0];
-
-  const center = window.map.getCenter();
-  // ボタンが表示された時点で IP+UUID は確実に準備済み（万が一の際も await で保証）
   const myUuid = window._cachedUserIdentity || (await ensureUserIdentityAsync());
 
-  const payload = {
-    action: 'add',
+  // ★ window.tempFishPins 内の既存投稿を参照し、投稿時間（time）にペナルティ（+5分×件数 / IP一致+5分）を加算
+  const { adjustedTime } = calcAdjustedPostTime(myUuid, now);
+
+  const newPin = {
     id: 'p_' + now + '_' + Math.random().toString(36).substring(2, 6),
     fish: fishName,
     lat: Number(center.lat.toFixed(6)),
     lng: Number(center.lng.toFixed(6)),
     uuid: myUuid,
-    time: now
+    time: adjustedTime,
+    good: [],
+    bad: []
   };
 
   lastTempPinPostTime = now;
@@ -537,11 +677,15 @@ async function submitCenterTempPin() {
     const res = await fetch(GAS_TEMP_PIN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ action: 'add', ...newPin })
     });
     const result = await res.json();
 
     if (result.status === 'success') {
+      // ★ 次回の連投時・3m重複チェック時に即座に参照されるよう window.tempFishPins にも追加
+      if (!Array.isArray(window.tempFishPins)) window.tempFishPins = [];
+      window.tempFishPins.push(newPin);
+
       if (submitBtn) submitBtn.textContent = '完了';
       showPostStatus('投稿完了', 1000);
       setTimeout(() => {
