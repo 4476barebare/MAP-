@@ -1,3 +1,263 @@
+
+// ==========================================
+// ★ SNS釣果データ (integrated_catch.json) 読み込み＆控えめソナー表示
+// ==========================================
+
+const SNS_SONAR_CONFIG = {
+    maxSonars: 15,        // マップ上に同時表示するソナーの最大数
+    minDistanceKm: 12.0,  // ソナー同士の最小間隔（km）※これより近い地点は1つに統合
+    sonarSizePx: 54,      // ソナー円のサイズ（px）
+    hideAtZoom: 13.5      // これより拡大（スポット詳細など）したらソナーを隠す
+};
+
+window.snsCatchData = [];
+window.isSnsCatchLoaded = false;
+window._isSnsCatchLoading = false;
+window.snsSonarLayerGroup = null;
+
+// 2点間の距離（km）を計算（fish_article.js 準拠）
+function calcSnsDistanceKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// ゆっくり・薄く表示するソナー用CSSの注入
+function injectSubtleSnsSonarStyles(sizePx) {
+    if (document.getElementById('sns-subtle-sonar-styles')) return;
+
+    const sweepSize = Math.max(20, sizePx - 8);
+    const style = document.createElement('style');
+    style.id = 'sns-subtle-sonar-styles';
+    style.textContent = `
+        .sns-sonar-wrapper {
+            background: transparent;
+            border: none;
+            pointer-events: none;
+        }
+        .sns-sonar-emitter {
+            position: relative;
+            width: ${sizePx}px;
+            height: ${sizePx}px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 中心の輝点（控えめな発光） */
+        .sns-sonar-core {
+            width: 4px;
+            height: 4px;
+            background-color: rgba(0, 255, 204, 0.55);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(0, 255, 204, 0.45);
+            z-index: 3;
+        }
+        /* ゆっくり広がる薄い波紋（2重リング・6.5秒周期） */
+        .sns-sonar-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(0, 255, 204, 0.35);
+            background: radial-gradient(circle, rgba(0, 255, 204, 0.08) 0%, rgba(0, 255, 204, 0) 70%);
+            opacity: 0;
+            animation: sns-sonar-ping 6.5s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
+        }
+        .sns-sonar-wave.delay-1 {
+            animation-delay: 3.25s;
+        }
+        /* ゆっくり回る薄い走査線（10秒周期） */
+        .sns-sonar-sweep {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: ${sweepSize}px;
+            height: ${sweepSize}px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, rgba(0, 255, 204, 0) 0deg, rgba(0, 255, 204, 0.01) 260deg, rgba(0, 255, 204, 0.14) 360deg);
+            animation: sns-sonar-rotate 10s linear infinite;
+            border: 1px dashed rgba(0, 255, 204, 0.12);
+            box-sizing: border-box;
+        }
+        @keyframes sns-sonar-ping {
+            0% {
+                width: 6px;
+                height: 6px;
+                opacity: 0.75;
+            }
+            100% {
+                width: ${sizePx}px;
+                height: ${sizePx}px;
+                opacity: 0;
+            }
+        }
+        @keyframes sns-sonar-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// ==========================================
+// 1. リポジトリに取り込んだ integrated_catch.json を読み込む関数
+// ==========================================
+window.loadSnsCatchData = async function(regionCode) {
+    if (window.isSnsCatchLoaded) return window.snsCatchData;
+    if (window._isSnsCatchLoading) return window._snsCatchPromise;
+
+    const targetRegion = regionCode || window.currentRegion || 'KANTO';
+    const url = `/${targetRegion}/integrated_catch.json`;
+
+    window._isSnsCatchLoading = true;
+    window._snsCatchPromise = fetch(url, { priority: 'low' })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            window.snsCatchData = Array.isArray(data) ? data : [];
+            window.isSnsCatchLoaded = true;
+            window._isSnsCatchLoading = false;
+            return window.snsCatchData;
+        })
+        .catch(err => {
+            console.warn('SNS釣果データの読み込みスキップ:', err);
+            window.snsCatchData = [];
+            window._isSnsCatchLoading = false;
+            return [];
+        });
+
+    return window._snsCatchPromise;
+};
+
+// ==========================================
+// 2. 読み込んだデータをマップ上にソナー風表示する関数
+//    （targetFish を指定すれば特定魚種のみ、省略すれば全魚種を対象に描画）
+// ==========================================
+window.showSnsSonarLayer = async function(targetFish = null) {
+    if (!window.map) return;
+
+    injectSubtleSnsSonarStyles(SNS_SONAR_CONFIG.sonarSizePx);
+
+    // データ未取得なら先に読み込む
+    if (!window.isSnsCatchLoaded) {
+        await window.loadSnsCatchData();
+    }
+    if (!window.snsCatchData.length) return;
+
+    // 専用Paneの作成（スポット名マーカーより背面、道路やタイルより前面の zIndex: 450）
+    if (!window.map.getPane('snsSonarPane')) {
+        window.map.createPane('snsSonarPane');
+        const pane = window.map.getPane('snsSonarPane');
+        pane.style.zIndex = 450;
+        pane.style.pointerEvents = 'none';
+        pane.style.transition = 'opacity 0.6s ease';
+    }
+
+    if (!window.snsSonarLayerGroup) {
+        window.snsSonarLayerGroup = L.layerGroup().addTo(window.map);
+        window.map.on('zoomend', updateSnsSonarVisibility);
+    } else {
+        window.snsSonarLayerGroup.clearLayers();
+        if (!window.map.hasLayer(window.snsSonarLayerGroup)) {
+            window.snsSonarLayerGroup.addTo(window.map);
+        }
+    }
+
+    // 1. 同一座標ごとに集計（釣果件数と最新日付を算出）
+    const uniqueCoords = new Map();
+    window.snsCatchData.forEach(item => {
+        if (!item || !item.lat || !item.lng) return;
+        if (targetFish && item.fish !== targetFish) return;
+
+        const key = `${Number(item.lat).toFixed(3)}_${Number(item.lng).toFixed(3)}`;
+        const existing = uniqueCoords.get(key);
+        const itemDate = String(item.date || '');
+
+        if (!existing) {
+            uniqueCoords.set(key, {
+                lat: Number(item.lat),
+                lng: Number(item.lng),
+                date: itemDate,
+                count: 1
+            });
+        } else {
+            existing.count += 1;
+            if (itemDate > existing.date) existing.date = itemDate;
+        }
+    });
+
+    // 2. 釣果報告数が多い順 ＞ 日付が新しい順 にソート
+    const sortedCandidates = [...uniqueCoords.values()].sort((a, b) => {
+        if (b.count !== a.count) return b.count - a.count;
+        return b.date.localeCompare(a.date);
+    });
+
+    // 3. 空間クラスタリング（minDistanceKm 以内の重複ソナーを間引き、最大 maxSonars 個に制限）
+    const displayPoints = [];
+    for (const candidate of sortedCandidates) {
+        if (displayPoints.length >= SNS_SONAR_CONFIG.maxSonars) break;
+        const isTooClose = displayPoints.some(
+            selected => calcSnsDistanceKm(candidate.lat, candidate.lng, selected.lat, selected.lng) < SNS_SONAR_CONFIG.minDistanceKm
+        );
+        if (!isTooClose) {
+            displayPoints.push(candidate);
+        }
+    }
+
+    // 4. ソナーマーカーの生成と追加（少しずつタイミングをずらして同時点滅の威圧感を防ぐ）
+    const size = SNS_SONAR_CONFIG.sonarSizePx;
+    const half = size / 2;
+
+    displayPoints.forEach((pt, idx) => {
+        const offsetSec = ((idx * 0.9) % 3.2).toFixed(2);
+        const icon = L.divIcon({
+            className: 'sns-sonar-wrapper',
+            html: `
+              <div class="sns-sonar-emitter">
+                <div class="sns-sonar-sweep"></div>
+                <div class="sns-sonar-wave" style="animation-delay: ${offsetSec}s;"></div>
+                <div class="sns-sonar-wave delay-1" style="animation-delay: ${(Number(offsetSec) + 3.25).toFixed(2)}s;"></div>
+                <div class="sns-sonar-core"></div>
+              </div>
+            `,
+            iconSize: [size, size],
+            iconAnchor: [half, half]
+        });
+
+        L.marker([pt.lat, pt.lng], {
+            icon: icon,
+            pane: 'snsSonarPane',
+            interactive: false,
+            keyboard: false
+        }).addTo(window.snsSonarLayerGroup);
+    });
+
+    updateSnsSonarVisibility();
+};
+
+// ズームレベルに応じた表示・非表示の切り替え
+function updateSnsSonarVisibility() {
+    if (!window.map) return;
+    const pane = window.map.getPane('snsSonarPane');
+    if (!pane) return;
+
+    const currentZoom = window.map.getZoom();
+    if (currentZoom > SNS_SONAR_CONFIG.hideAtZoom) {
+        pane.style.opacity = '0';
+    } else {
+        pane.style.opacity = '1';
+    }
+}
+
 window.markerControl = {
     shop01Cache: {},
     shop01AreaCache: {},
