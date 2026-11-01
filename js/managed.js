@@ -100,9 +100,20 @@ function renderRegion() {
     if (linkContainer) linkContainer.innerHTML = regionHtml;
 
     if (typeof window.runAfterTileLoad === 'function') {
-        window.runAfterTileLoad(showAllRegionSpots);
+        window.runAfterTileLoad(async () => {
+            if (typeof showAllRegionSpots === 'function') {
+                await showAllRegionSpots();
+            }
+            if (typeof window.showSnsSonarLayer === 'function') {
+                await window.showSnsSonarLayer();
+            }
+        });
     } else if (typeof showAllRegionSpots === 'function') {
-        showAllRegionSpots();
+        showAllRegionSpots().then(() => {
+            if (typeof window.showSnsSonarLayer === 'function') {
+                return window.showSnsSonarLayer();
+            }
+        });
     }
 
     if (typeof showRoadLayers === 'function') showRoadLayers();
@@ -115,4 +126,44 @@ function renderRegion() {
         window.map.off('click', window.regionNearestClickHandler);
         window.map.on('click', window.regionNearestClickHandler);
     }
+}
+
+
+// ==========================================
+// REGION 初期ロード管理
+// ==========================================
+async function region_management() {
+    const btn = document.getElementById('map-back-btn');
+    if (btn) btn.style.display = 'none';
+
+    if (window.map) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.dragging.enable();
+        window.map.scrollWheelZoom.enable();
+        window.map.doubleClickZoom.enable();
+        window.map.touchZoom.enable();
+        window.map.stop();
+
+        if (window.nearestClickHandler) {
+            window.map.off('click', window.nearestClickHandler);
+            window.nearestClickEnabled = false;
+        }
+    }
+
+    const isRegionReady = await loadRegionCSV();
+    if (!isRegionReady) return;
+
+    if (window.regionData) {
+        drawLocation(
+            window.regionData.name,
+            window.regionData.lat,
+            window.regionData.lng,
+            window.regionData.zoom
+        );
+    }
+
+    renderRegion();
+    if (typeof renderSpotRanking === 'function') renderSpotRanking();
 }
