@@ -2,9 +2,9 @@ name: Sync SNS Catch Data from Google Drive
 
 on:
   schedule:
-    # UTC 10:00 = JST 19:00 に毎日実行
+    # UTC 10:00 = JST 毎日19:00 に自動実行
     - cron: '0 10 * * *'
-  workflow_dispatch: # 手動テスト実行ボタンも有効化
+  workflow_dispatch: # 手動テスト実行ボタン
 
 permissions:
   contents: write
@@ -20,17 +20,25 @@ jobs:
 
       - name: Fetch integrated_catch.json from GAS
         env:
-          # GitHub Secrets に登録するか、直接ここにURLを貼っても動作します
-          GAS_URL: https://script.google.com/macros/s/AKfycby45YnjGN_dUefR0q6eFwKKQRsfzeoRJ9Dwa-UNbfvz429VFZaoQ40ntfoq593JwKPArw/exec
+          SNS_SECRET: ${{ secrets.SNS_secretkey }}
+          # ※SNS_secretkeyに「URLそのもの」を入れた場合は下のGAS_BASE_URLは変更不要です
+          # ※SNS_secretkeyに「合言葉」を入れた場合は、ここにGASのURLを貼ってください
+          GAS_BASE_URL: "https://script.google.com/macros/s/ここにGASのURL/exec"
         run: |
           mkdir -p KANTO
-          # GASのリダイレクト(-L)を追跡して取得
-          curl -sSL "$GAS_URL" -o /tmp/integrated_catch.json
 
-          # 取得したファイルが空でなく、正しいJSON配列であるか検証（Ubuntu標準のjqを使用）
+          if [[ "$SNS_SECRET" == https://* ]]; then
+            TARGET_URL="$SNS_SECRET"
+          else
+            TARGET_URL="${GAS_BASE_URL}?key=${SNS_SECRET}"
+          fi
+
+          # GASのリダイレクト(-L)を追跡してJSONを取得
+          curl -sSL "$TARGET_URL" -o /tmp/integrated_catch.json
+
+          # 正しいJSON配列であるか検証（エラー時はここでストップし本番ファイルを保護）
           jq -e 'type == "array"' /tmp/integrated_catch.json > /dev/null
 
-          # 検証OKなら KANTO/integrated_catch.json へ配置
           mv /tmp/integrated_catch.json KANTO/integrated_catch.json
           echo "Successfully fetched $(jq 'length' KANTO/integrated_catch.json) records."
 
@@ -40,7 +48,6 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add KANTO/integrated_catch.json
 
-          # 差分がある時だけコミット＆プッシュ
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
