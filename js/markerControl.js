@@ -1,27 +1,31 @@
 // ==========================================
 // ★ SNS釣果データ (integrated_catch.json) 読み込み＆ソナー表示
-// （ズーム別サイズ調整 ＋ 投稿経過日数による4段階縮小対応版）
+// （ズーム12以下で表示 ／ 12.5以上で非表示＆0pxクリック剥奪版）
 // ==========================================
 
 const DEFAULT_SNS_SONAR_OPTIONS = {
   targetFish: null,     // 特定魚種のみ表示する場合は魚種名を指定（nullなら全魚種）
   maxSonars: 15,        // 表示するソナーの最大数
   minDistanceKm: 12.0,  // ソナー同士の最小間隔（km）
-  hideAtZoom: 13.5,     // これより拡大（スポット詳細画面）したら非表示
-  // ★ ズームレベルごとの基準ソナーサイズ（px）定義（当日〜6日前のサイズ）
+  maxVisibleZoom: 12.0, // ★ ズーム12以下（8, 9, 10, 11, 12 と広域）の時だけ表示し、12.5以上は非表示
+  // ズームレベルごとの基準ソナーサイズ（px）（当日〜6日前のサイズ）
   sizeByZoom: {
-    0: 36,   // 広域（Zoom 7〜8など）
-    9: 48,   // 県全体（Zoom 9〜10）
-    11: 64,  // エリア拡大（Zoom 11〜12）
-    13: 76   // エリア詳細（Zoom 13）
-  }
+    0: 36,   // 広域（Zoom 8以下）
+    9: 48,   // Zoom 9〜10
+    11: 64,  // Zoom 11
+    12: 76   // Zoom 12
+  },
+  onSonarClick: null    // 魚種テキストをクリックした時のコールバック
 };
 
 window.snsCatchData = [];
 window.isSnsCatchLoaded = false;
 window._isSnsCatchLoading = false;
 window.snsSonarLayerGroup = null;
+window.snsSonarTextLayerGroup = null;
+window._snsDisplayPoints = [];
 window._currentSnsSonarOptions = { ...DEFAULT_SNS_SONAR_OPTIONS };
+window._isSnsSonarOpaque = false; // ソナーが不透明（ON状態）かどうかのフラグ
 
 // 2点間の距離（km）を計算
 function calcSnsDistanceKm(lat1, lng1, lat2, lng2) {
@@ -46,7 +50,7 @@ function resolveBaseSonarSizeForZoom(zoom, sizeByZoom) {
   return resolvedSize;
 }
 
-// ★ 投稿日（YYYY/MM/DD）から経過日数を計算し、4段階の縮小倍率を返す
+// 投稿日（YYYY/MM/DD）から経過日数を計算し、4段階の縮小倍率を返す
 // 当日〜6日前: 1.0 / 7〜13日前: 0.5 / 14〜20日前: 0.25 / 21日以前: 0.125
 function getSonarAgeScale(dateStr) {
   if (!dateStr) return 0.125;
@@ -64,10 +68,10 @@ function getSonarAgeScale(dateStr) {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const diffDays = Math.max(0, Math.floor((today.getTime() - postDate.getTime()) / 86400000));
 
-  if (diffDays <= 6) return 1.0;      // 当日〜6日前：引数値そのまま
-  if (diffDays <= 13) return 0.5;     // 7日前〜13日前：半分
-  if (diffDays <= 20) return 0.25;    // 14日前〜20日前：更に半分 (1/4)
-  return 0.125;                       // 21日以前：更に半分 (1/8)
+  if (diffDays <= 6) return 1.0;
+  if (diffDays <= 13) return 0.5;
+  if (diffDays <= 20) return 0.25;
+  return 0.125;
 }
 
 // SNSのsource名からCSSクラス名に変換
@@ -79,6 +83,33 @@ function getSnsColorClass(source) {
   if (s.includes('threads')) return 'sns-threads';
   return 'sns-default';
 }
+
+// ==========================================
+// ★ ソナー自体を透明にする関数（テキストも0pxにしてクリック範囲を奪う）
+// ==========================================
+window.hideSnsSonarLayer = function() {
+  window._isSnsSonarOpaque = false;
+  if (!window.map) return;
+
+  const sonarPane = window.map.getPane('snsSonarPane');
+  if (sonarPane) {
+    sonarPane.style.opacity = '0';
+    sonarPane.style.pointerEvents = 'none';
+  }
+
+  const textPane = window.map.getPane('snsSonarTextPane');
+  if (textPane) {
+    textPane.style.opacity = '0';
+    textPane.style.pointerEvents = 'none';
+  }
+
+  if (window.snsSonarTextLayerGroup) {
+    window.snsSonarTextLayerGroup.eachLayer(marker => {
+      const hit = marker.getElement()?.querySelector('.sns-sonar-fish-hit');
+      if (hit) hit.classList.add('is-hidden-hit');
+    });
+  }
+};
 
 // ==========================================
 // 1. リポジトリの integrated_catch.json を読み込む関数
@@ -113,10 +144,18 @@ window.loadSnsCatchData = async function(regionCode) {
 };
 
 // ==========================================
-// 2. 読み込んだデータをマップ上にソナー表示する関数
+// 2. ソナー本体を描画する関数
+//    （先頭で不透明なら透明に戻して以降の処理をスキップ）
 // ==========================================
 window.showSnsSonarLayer = async function(customOptions = {}) {
   if (!window.map) return;
+
+  const existingPane = window.map.getPane('snsSonarPane');
+  // ★ 先頭ガード：すでに不透明であれば透明に戻し、以下の処理をスキップ
+  if (window._isSnsSonarOpaque || (existingPane && existingPane.style.opacity === '1')) {
+    window.hideSnsSonarLayer();
+    return;
+  }
 
   const opts = {
     ...DEFAULT_SNS_SONAR_OPTIONS,
@@ -134,8 +173,9 @@ window.showSnsSonarLayer = async function(customOptions = {}) {
     window.map.createPane('snsSonarPane');
     const pane = window.map.getPane('snsSonarPane');
     pane.style.zIndex = 450;
+    pane.style.opacity = '0';
     pane.style.pointerEvents = 'none';
-    pane.style.transition = 'opacity 0.6s ease';
+    pane.style.transition = 'opacity 0.4s ease';
   }
 
   if (!window.snsSonarLayerGroup) {
@@ -148,7 +188,7 @@ window.showSnsSonarLayer = async function(customOptions = {}) {
     }
   }
 
-  // 1. 同一座標ごとに集計（最新日付と投稿SNS `source` を保持）
+  // 1. 同一座標ごとに集計
   const uniqueCoords = new Map();
   window.snsCatchData.forEach(item => {
     if (!item || !item.lat || !item.lng) return;
@@ -163,23 +203,31 @@ window.showSnsSonarLayer = async function(customOptions = {}) {
         lat: Number(item.lat),
         lng: Number(item.lng),
         date: itemDate,
+        fish: item.fish || '',
+        area_name: item.area_name || '',
+        url: item.url || '',
         source: item.source || 'SNS',
-        count: 1
+        count: 1,
+        records: [item]
       });
     } else {
       existing.count += 1;
+      existing.records.push(item);
       if (itemDate >= existing.date) {
         existing.date = itemDate;
+        if (item.fish) existing.fish = item.fish;
+        if (item.area_name) existing.area_name = item.area_name;
+        if (item.url) existing.url = item.url;
         if (item.source) existing.source = item.source;
       }
     }
   });
 
-  // 2. 日付が新しい順（同じ日付帯なら件数順）にソート
+  // 2. 新しい期間帯 ＞ 釣果件数順 ＞ 日付順 にソート
   const sortedCandidates = [...uniqueCoords.values()].sort((a, b) => {
     const scaleA = getSonarAgeScale(a.date);
     const scaleB = getSonarAgeScale(b.date);
-    if (scaleB !== scaleA) return scaleB - scaleA; // 新しい期間帯を優先
+    if (scaleB !== scaleA) return scaleB - scaleA;
     if (b.count !== a.count) return b.count - a.count;
     return b.date.localeCompare(a.date);
   });
@@ -195,8 +243,9 @@ window.showSnsSonarLayer = async function(customOptions = {}) {
       displayPoints.push(candidate);
     }
   }
+  window._snsDisplayPoints = displayPoints;
 
-  // 4. 現在のズーム基準サイズ × 投稿経過日数の倍率 でソナーを生成
+  // 4. ソナーマーカーの生成
   const currentZoom = window.map.getZoom();
   const baseSize = resolveBaseSonarSizeForZoom(currentZoom, opts.sizeByZoom);
 
@@ -214,15 +263,21 @@ window.showSnsSonarLayer = async function(customOptions = {}) {
       keyboard: false
     });
 
-    // ズーム変更時にも経過日数倍率（ageScale）を維持して再計算できるよう保持
     marker._snsMeta = { ageScale, snsClass, offsetSec, delay2Sec };
     marker.addTo(window.snsSonarLayerGroup);
   });
 
+  window._isSnsSonarOpaque = true;
+
+  // ★ ズーム12以下（広域・8・9・10・11・12）の時だけ別関数のテキスト描画を呼び出す
+  if (currentZoom <= opts.maxVisibleZoom) {
+    window.renderSnsSonarTextLayer(displayPoints, opts);
+  }
+
   updateSnsSonarOnZoom();
 };
 
-// DivIcon 生成ヘルパー
+// ソナー本体のDivIcon生成ヘルパー
 function createSnsSonarDivIcon(sizePx, snsClass, offsetSec, delay2Sec) {
   const half = sizePx / 2;
   return L.divIcon({
@@ -240,22 +295,106 @@ function createSnsSonarDivIcon(sizePx, snsClass, offsetSec, delay2Sec) {
   });
 }
 
-// ズーム変更時に「ズーム基準サイズ × 経過日数倍率」でサイズを自動更新
-function updateSnsSonarOnZoom() {
+// ==========================================
+// 3. ★ 別関数：ソナーの中心に魚種テキスト（各社カラー連動）を描画しクリック範囲を制御する関数
+// ==========================================
+window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_OPTIONS) {
   if (!window.map) return;
-  const pane = window.map.getPane('snsSonarPane');
-  if (!pane) return;
+
+  if (!window.map.getPane('snsSonarTextPane')) {
+    window.map.createPane('snsSonarTextPane');
+    const textPane = window.map.getPane('snsSonarTextPane');
+    textPane.style.zIndex = 455;
+    textPane.style.pointerEvents = 'none';
+    textPane.style.transition = 'opacity 0.3s ease';
+  }
+
+  if (!window.snsSonarTextLayerGroup) {
+    window.snsSonarTextLayerGroup = L.layerGroup().addTo(window.map);
+  } else {
+    window.snsSonarTextLayerGroup.clearLayers();
+    if (!window.map.hasLayer(window.snsSonarTextLayerGroup)) {
+      window.snsSonarTextLayerGroup.addTo(window.map);
+    }
+  }
+
+  const currentZoom = window.map.getZoom();
+  // ズーム12.5以上（currentZoom > 12.0）の時は 0px 非表示にしてクリック範囲を奪う
+  const isHiddenHit = currentZoom > opts.maxVisibleZoom;
+  const hiddenClass = isHiddenHit ? 'is-hidden-hit' : '';
+
+  points.forEach(pt => {
+    const snsClass = getSnsColorClass(pt.source);
+    const safeFish = String(pt.fish || '').replace(/[<>&"']/g, '');
+
+    const textMarker = L.marker([pt.lat, pt.lng], {
+      icon: L.divIcon({
+        className: 'sns-sonar-text-wrapper',
+        html: `<span class="sns-sonar-fish-hit ${snsClass} ${hiddenClass}">${safeFish}</span>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      }),
+      pane: 'snsSonarTextPane',
+      interactive: true,
+      keyboard: false
+    });
+
+    textMarker._pointData = pt;
+
+    textMarker.on('click', (e) => {
+      // ズーム12.5以上 または 透明状態ならクリックを完全無視
+      if (!window._isSnsSonarOpaque || window.map.getZoom() > opts.maxVisibleZoom) return;
+      if (e.originalEvent) e.originalEvent.stopPropagation();
+
+      if (typeof opts.onSonarClick === 'function') {
+        opts.onSonarClick(pt, textMarker, e);
+      } else {
+        console.log('SNS釣果テキストクリック:', pt);
+      }
+    });
+
+    textMarker.addTo(window.snsSonarTextLayerGroup);
+  });
+
+  const textPane = window.map.getPane('snsSonarTextPane');
+  if (textPane) {
+    textPane.style.opacity = isHiddenHit ? '0' : '1';
+  }
+};
+
+// ==========================================
+// 4. ズーム変更時の判定：
+//    ズーム12以下（8,9,10,11,12と広域）のみ表示
+//    ズーム12.5〜18は非表示＆テキスト0pxでクリック範囲を奪う
+// ==========================================
+function updateSnsSonarOnZoom() {
+  if (!window.map || !window._isSnsSonarOpaque) return;
+
+  const sonarPane = window.map.getPane('snsSonarPane');
+  if (!sonarPane) return;
 
   const opts = window._currentSnsSonarOptions || DEFAULT_SNS_SONAR_OPTIONS;
   const currentZoom = window.map.getZoom();
 
-  if (currentZoom > opts.hideAtZoom) {
-    pane.style.opacity = '0';
+  // ★ ズーム12.5以上（12.5, 13, 14, 15, 16, 17, 18）は非表示＆クリック範囲を0pxに剥奪
+  if (currentZoom > opts.maxVisibleZoom) {
+    sonarPane.style.opacity = '0';
+    const textPane = window.map.getPane('snsSonarTextPane');
+    if (textPane) textPane.style.opacity = '0';
+
+    if (window.snsSonarTextLayerGroup) {
+      window.snsSonarTextLayerGroup.eachLayer(m => {
+        const hit = m.getElement()?.querySelector('.sns-sonar-fish-hit');
+        if (hit) hit.classList.add('is-hidden-hit');
+      });
+    }
     return;
   }
-  pane.style.opacity = '1';
 
+  // ★ ズーム12以下（広域・8・9・10・11・12）はソナーを表示＆サイズ更新
+  sonarPane.style.opacity = '1';
   const baseSize = resolveBaseSonarSizeForZoom(currentZoom, opts.sizeByZoom);
+
   if (window.snsSonarLayerGroup) {
     window.snsSonarLayerGroup.eachLayer(marker => {
       if (marker._snsMeta) {
@@ -265,7 +404,21 @@ function updateSnsSonarOnZoom() {
       }
     });
   }
+
+  // テキストレイヤーが未生成なら呼び出し、生成済みなら6pxクリック範囲を有効化
+  if (!window.snsSonarTextLayerGroup || window.snsSonarTextLayerGroup.getLayers().length === 0) {
+    window.renderSnsSonarTextLayer(window._snsDisplayPoints, opts);
+  } else {
+    const textPane = window.map.getPane('snsSonarTextPane');
+    if (textPane) textPane.style.opacity = '1';
+
+    window.snsSonarTextLayerGroup.eachLayer(m => {
+      const hit = m.getElement()?.querySelector('.sns-sonar-fish-hit');
+      if (hit) hit.classList.remove('is-hidden-hit');
+    });
+  }
 }
+
 
 window.markerControl = {
     shop01Cache: {},
