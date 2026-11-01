@@ -21,7 +21,7 @@ jobs:
       - name: Fetch integrated_catch.json from GAS
         env:
           # GitHub Secrets に登録するか、直接ここにURLを貼っても動作します
-          GAS_URL: ${https://script.google.com/macros/s/AKfycby45YnjGN_dUefR0q6eFwKKQRsfzeoRJ9Dwa-UNbfvz429VFZaoQ40ntfoq593JwKPArw/exec}
+          GAS_URL: https://script.google.com/macros/s/AKfycby45YnjGN_dUefR0q6eFwKKQRsfzeoRJ9Dwa-UNbfvz429VFZaoQ40ntfoq593JwKPArw/exec
         run: |
           mkdir -p KANTO
           # GASのリダイレクト(-L)を追跡して取得
