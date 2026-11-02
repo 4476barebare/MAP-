@@ -2309,15 +2309,11 @@ function toWeatherIcon(code) {
 }
 
 function renderCrowdImage() {
-    if (typeof showdebug === 'function') {
-        showdebug('[RAIN] renderCrowdImage開始 / map=' + !!window.map + ' / radarEnabled=' + window.radarEnabled);
-    }
 
     // ==================================================
     // マップ生成前に呼ばれた場合
     // ==================================================
     if (!window.map) {
-        if (typeof showdebug === 'function') showdebug('[RAIN] map未生成のため再試行待ち');
         if (!window._crowdRenderRetry) {
             window._crowdRenderRetry = setInterval(() => {
                 if (window.map) {
@@ -2354,7 +2350,6 @@ function renderCrowdImage() {
     // OFF時
     // ==================================================
     if (!window.radarEnabled) {
-        if (typeof showdebug === 'function') showdebug('[RAIN] radarEnabled=false のため雨雲画像を非表示');
         removeCrowdImage();
 
         const header = document.querySelector('.menu-header-row');
@@ -2404,7 +2399,7 @@ function renderCrowdImage() {
     if (!window.map.getPane('rainPane')) {
         window.map.createPane('rainPane');
         const pane = window.map.getPane('rainPane');
-        pane.style.zIndex = 350;
+        pane.style.zIndex = 9999;
         pane.style.pointerEvents = 'none';
     }
 
@@ -2463,7 +2458,6 @@ function renderCrowdImage() {
         }
         return;
     }
-    if (typeof showdebug === 'function') showdebug('[RAIN] UI要素取得OK');
 
     header.style.display = '';
 
@@ -2471,7 +2465,6 @@ function renderCrowdImage() {
     // Phase2では雨雲UIを出さない
     // ==================================================
     if (window.phase2Initialized) {
-        if (typeof showdebug === 'function') showdebug('[RAIN] phase2Initialized=true のため雨雲画像処理を終了');
         cloudsUI.textContent = '';
         if (window.todayTide) {
             headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
@@ -2518,7 +2511,6 @@ function renderCrowdImage() {
     }
 
     const MAX_OPACITY = 0.6;
-    if (typeof showdebug === 'function') showdebug('[RAIN] 雨雲画像4枚のレイヤー作成開始 / ' + images.map(img => img.url).join(' | '));
     window.crowdLayers = [];
     let loadedCount = 0;
 
@@ -2544,8 +2536,7 @@ function renderCrowdImage() {
         // ロード完了監視
         layer.on('load', () => {
             loadedCount++;
-            if (typeof showdebug === 'function') showdebug('[RAIN] 画像ロード成功 ' + loadedCount + '/' + images.length + ' : ' + img.url);
-            // 4枚すべて読み込み終わったら自動発火
+                // 4枚すべて読み込み終わったら自動発火
             if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
                 startCrowdSlideshow();
             }
@@ -2554,8 +2545,7 @@ function renderCrowdImage() {
         // 読み込みエラー時も止まらないようにする
         layer.on('error', () => {
             loadedCount++;
-            if (typeof showdebug === 'function') showdebug('[RAIN] 画像ロード失敗 ' + loadedCount + '/' + images.length + ' : ' + img.url);
-            if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
+                if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
                 startCrowdSlideshow();
             }
         });
@@ -2564,7 +2554,6 @@ function renderCrowdImage() {
         window.crowdLayers.push(layer);
     });
 
-    if (typeof showdebug === 'function') showdebug('[RAIN] 画像レイヤー4枚を地図へ追加完了');
 
     // 互換性のため
     window.crowdLayer = window.crowdLayers[0];
@@ -2588,8 +2577,7 @@ function renderCrowdImage() {
             showdebug('[RAIN] スライドショー開始判定 / generation=' + myGeneration + '/' + window.crowdRenderGeneration + ' / radarEnabled=' + window.radarEnabled);
         }
         if (myGeneration !== window.crowdRenderGeneration || !window.radarEnabled) {
-            if (typeof showdebug === 'function') showdebug('[RAIN] スライドショー開始を中止');
-            return;
+                return;
         }
 
         // 1. 最初の一枚目をフワッとフェードイン
