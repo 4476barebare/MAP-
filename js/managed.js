@@ -4,6 +4,14 @@
 async function loadRegionCSV() {
     const regionCode = window.currentRegion || 'KANTO';
 
+    if (
+        window.regionPrefData &&
+        window.regionPrefData.length > 0 &&
+        window.regionPrefData[0].regionCode === regionCode
+    ) {
+        return true;
+    }
+
     try {
         const text = await fetchRegionCsvText();
         const lines = text.trim().split('\n');
