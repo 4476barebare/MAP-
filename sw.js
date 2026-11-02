@@ -44,7 +44,7 @@ async function handleTileRequest(request) {
     // 期限切れは一度ネットワーク更新を試みる
     try {
       const fresh = await fetch(request);
-      if (fresh && fresh.ok) {
+      if (fresh && (fresh.ok || fresh.type === 'opaque')) {
         await cache.put(request, fresh.clone());
         await meta.put(request.url, new Response(String(Date.now())));
         return fresh;
@@ -57,10 +57,14 @@ async function handleTileRequest(request) {
   }
 
   const response = await fetch(request);
-  if (response && response.ok && (response.type === 'basic' || response.type === 'cors' || response.type === 'default')) {
-    // Cache Storageへの書き込み完了を待ってから応答する
-    await cache.put(request, response.clone());
-    await meta.put(request.url, new Response(String(Date.now())));
+  if (response && (response.ok || response.type === 'opaque')) {
+    // 保存に失敗しても地図表示自体は止めない
+    try {
+      await cache.put(request, response.clone());
+      await meta.put(request.url, new Response(String(Date.now())));
+    } catch (error) {
+      // ストレージ容量不足などの場合はネットワーク応答をそのまま返す
+    }
   }
   return response;
 }
