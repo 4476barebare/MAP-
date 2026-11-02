@@ -155,7 +155,6 @@ function renderRegion() {
 // REGION 初期ロード管理
 // ==========================================
 async function region_management() {
-    if (typeof showdebug === 'function') showdebug('[REGION] region_management開始');
     const btn = document.getElementById('map-back-btn');
     if (btn) btn.style.display = 'none';
 
@@ -176,7 +175,6 @@ async function region_management() {
     }
 
     const isRegionReady = await loadRegionCSV();
-    if (typeof showdebug === 'function') showdebug('[REGION] loadRegionCSV=' + isRegionReady);
     if (!isRegionReady) return;
 
     if (window.regionData) {
