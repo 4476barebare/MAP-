@@ -3185,11 +3185,7 @@ if (tileWrap && tileBtn) {
         if (alertBar) alertBar.textContent = "";
 
         setTimeout(() => {
-            region_management().then(() => {
-                if (typeof renderCrowdImage === 'function') {
-                    renderCrowdImage();
-                }
-            });
+            region_management();
         }, 10);
 
         setTimeout(() => {
