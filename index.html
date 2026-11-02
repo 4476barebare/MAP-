@@ -2453,9 +2453,6 @@ function renderCrowdImage() {
     const headerText = document.querySelector('.header-text');
 
     if (!header || !cloudsUI || !headerText) {
-        if (typeof showdebug === 'function') {
-            showdebug('[RAIN] UI要素不足 / header=' + !!header + ' / cloudsUI=' + !!cloudsUI + ' / headerText=' + !!headerText);
-        }
         return;
     }
 
@@ -2573,9 +2570,6 @@ function renderCrowdImage() {
     // ★ 準備完了で発火するスライドショー処理
     // ==================================================
     function startCrowdSlideshow() {
-        if (typeof showdebug === 'function') {
-            showdebug('[RAIN] スライドショー開始判定 / generation=' + myGeneration + '/' + window.crowdRenderGeneration + ' / radarEnabled=' + window.radarEnabled);
-        }
         if (myGeneration !== window.crowdRenderGeneration || !window.radarEnabled) {
                 return;
         }
@@ -2587,9 +2581,6 @@ function renderCrowdImage() {
             const el = window.crowdLayers[0].getElement();
             const paneStyle = pane ? window.getComputedStyle(pane) : null;
             const imageStyle = el ? window.getComputedStyle(el) : null;
-            showdebug('[RAIN] rainPane / inline z=' + (pane ? pane.style.zIndex : 'なし') + ' / computed z=' + (paneStyle ? paneStyle.zIndex : 'なし') + ' / display=' + (paneStyle ? paneStyle.display : 'なし') + ' / visibility=' + (paneStyle ? paneStyle.visibility : 'なし') + ' / opacity=' + (paneStyle ? paneStyle.opacity : 'なし'));
-            showdebug('[RAIN] 先頭画像 / inline opacity=' + (el ? el.style.opacity : '要素なし') + ' / computed opacity=' + (imageStyle ? imageStyle.opacity : 'なし') + ' / display=' + (imageStyle ? imageStyle.display : 'なし') + ' / visibility=' + (imageStyle ? imageStyle.visibility : 'なし') + ' / z=' + (imageStyle ? imageStyle.zIndex : 'なし'));
-            showdebug('[RAIN] 先頭画像DOM=' + !!el + ' / map.hasLayer=' + window.map.hasLayer(window.crowdLayers[0]));
         }
 
         // 2. スライドショー開始 (DOMの生成・破棄は一切行わない)
