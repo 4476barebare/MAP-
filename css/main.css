@@ -2364,6 +2364,7 @@ li {
   font-size: 13px;
   color: #191970;
   margin-bottom: 2px;
+  padding-right: 20px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2390,41 +2391,40 @@ li {
 }
 
 .sns-catch-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 5px 8px;
-  font-size: 11px;
+  gap: 4px;
+  padding: 2px 0;
+  font-size: 12px;
   font-weight: bold;
-  text-decoration: none !important;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none !important;
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
   transition: opacity 0.15s ease;
-  overflow: hidden;
   white-space: nowrap;
 }
 
 .sns-catch-btn.sns-x {
-  background-color: #111111;
-  color: #ffffff !important;
-  border: 1px solid #333333;
+  color: #111111 !important;
 }
 .sns-catch-btn.sns-instagram {
-  background-color: #e1306c;
-  color: #ffffff !important;
+  color: #e1306c !important;
 }
 .sns-catch-btn.sns-facebook {
-  background-color: #18a0fb;
-  color: #ffffff !important;
+  color: #18a0fb !important;
 }
 .sns-catch-btn.sns-threads {
-  background-color: #ffffff;
   color: #111111 !important;
-  border: 1px solid #cccccc;
+}
+.sns-catch-btn.sns-default {
+  color: #191970 !important;
 }
 
 .sns-catch-btn:active {
-  opacity: 0.8;
+  opacity: 0.65;
 }
 
 .sns-catch-label {
