@@ -109,34 +109,33 @@ function renderRegion() {
 
     if (typeof window.runAfterTileLoad === 'function') {
         window.runAfterTileLoad(async () => {
-                try {
+            try {
                 if (typeof showAllRegionSpots === 'function') {
                     await showAllRegionSpots();
-            
+                }
                 if (typeof window.showSnsSonarLayer === 'function') {
-                                await window.showSnsSonarLayer();
-            
+                    await window.showSnsSonarLayer();
+                }
             } catch (e) {
-                        throw e;
+                throw e;
             } finally {
-                        if (typeof renderCrowdImage === 'function') {
+                if (typeof renderCrowdImage === 'function') {
                     renderCrowdImage();
-                            }
+                }
             }
         });
     } else if (typeof showAllRegionSpots === 'function') {
         showAllRegionSpots().then(async () => {
             try {
                 if (typeof window.showSnsSonarLayer === 'function') {
-                                await window.showSnsSonarLayer();
-                            }
+                    await window.showSnsSonarLayer();
+                }
             } finally {
                 if (typeof renderCrowdImage === 'function') {
-                                renderCrowdImage();
+                    renderCrowdImage();
                 }
             }
-        }).catch(e => {
-            });
+        }).catch(() => {});
     }
 
     if (typeof showRoadLayers === 'function') showRoadLayers();
