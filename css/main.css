@@ -2160,12 +2160,13 @@ li {
   pointer-events: none !important;
 }
 
+/* ★ JS側のサイズ指定を上書きして約1.6倍の視認しやすいサイズに拡大 */
 .sns-sonar-emitter {
-  --sonar-size: 68px;
+  --sonar-size: 86px;
   --sonar-rgb: 255, 255, 255;
   position: relative;
-  width: var(--sonar-size);
-  height: var(--sonar-size);
+  width: calc(var(--sonar-size) * 1.65);
+  height: calc(var(--sonar-size) * 1.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2185,18 +2186,18 @@ li {
 /* デフォルト */
 .sns-default   { --sonar-rgb: 255, 255, 255; --sns-badge-bg: #191970; --sns-badge-color: #ffffff; }
 
-/* ★ 中心の輝点（濃すぎないよう極小・薄めに調整） */
+/* ★ 中心の輝点 */
 .sns-sonar-core {
-  width: 2.5px;
-  height: 2.5px;
-  background-color: rgba(var(--sonar-rgb), 0.3);
+  width: 3px;
+  height: 3px;
+  background-color: rgba(var(--sonar-rgb), 0.45);
   border-radius: 50%;
-  box-shadow: 0 0 2px rgba(var(--sonar-rgb), 0.25);
+  box-shadow: 0 0 4px rgba(var(--sonar-rgb), 0.4);
   z-index: 3;
   pointer-events: none;
 }
 
-/* ★ 魚種テキスト（6px・各社カラー連動） */
+/* ★ 魚種テキスト（Threads・Instagram・Facebook：テーマカラー太字＋薄影） */
 .sns-sonar-fish-hit {
   position: relative;
   z-index: 6;
@@ -2208,20 +2209,38 @@ li {
   padding: 3px 4px;
   font-size: 6px;
   line-height: 1;
-  font-weight: bold;
+  font-weight: 900;
   color: rgb(var(--sonar-rgb));
   white-space: nowrap;
   transform: translate(-50%, -50%);
-  text-shadow:
-    0 0 2px rgba(0, 0, 0, 0.95),
-    0 0 3px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* ★ X専用：黒シャドウを廃止し、黒文字にくっきりした白枠（白フチ）を付与 */
+/* Threads / Instagram / Facebook 個別微調整（テーマカラー太字＋薄影） */
+.sns-sonar-fish-hit.sns-threads {
+  color: #ffffff;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.sns-sonar-fish-hit.sns-instagram {
+  color: #ff4096;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.sns-sonar-fish-hit.sns-facebook {
+  color: #18a0fb;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* ★ X専用：現状の見やすい「黒字＋白枠（白縁取り）」を維持 */
 .sns-sonar-fish-hit.sns-x {
   color: #111111;
+  font-weight: bold;
   text-shadow:
      0.8px  0.8px 0 #ffffff,
     -0.8px -0.8px 0 #ffffff,
@@ -2246,61 +2265,79 @@ li {
   cursor: default !important;
 }
 
-/* ゆっくり広がる薄い波紋 */
+/* ★ ソナー波紋（視認性向上：1.5px線・発光感アップ・4.5秒周期） */
 .sns-sonar-wave {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 4px;
-  height: 4px;
+  width: 6px;
+  height: 6px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 1px solid rgba(var(--sonar-rgb), 0.35);
+  border: 1.5px solid rgba(var(--sonar-rgb), 0.78);
   background: radial-gradient(
     circle,
-    rgba(var(--sonar-rgb), 0.08) 0%,
+    rgba(var(--sonar-rgb), 0.18) 0%,
     rgba(var(--sonar-rgb), 0) 70%
   );
+  box-shadow: 0 0 6px rgba(var(--sonar-rgb), 0.45);
   opacity: 0;
   pointer-events: none;
-  animation: sns-sonar-ping 6.5s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
+  animation: sns-sonar-ping 4.5s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
 }
 
-/* Xのソナー波紋も暗い海や山に沈まないよう極薄の白フチを添える */
+/* Xのソナー波紋は暗い海や山でもはっきり見えるよう白い外周光彩を付与 */
 .sns-x .sns-sonar-wave {
-  border-color: rgba(20, 20, 20, 0.55);
-  box-shadow: 0 0 2px rgba(255, 255, 255, 0.45);
+  border: 1.5px solid rgba(20, 20, 20, 0.88);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(20, 20, 20, 0) 70%
+  );
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.85),
+    inset 0 0 3px rgba(255, 255, 255, 0.55);
 }
 
-/* ゆっくり回る薄い走査線 */
+/* ★ 走査線（スイープも視認性を少し引き上げ） */
 .sns-sonar-sweep {
   position: absolute;
-  top: 7.5%;
-  left: 7.5%;
-  width: 85%;
-  height: 85%;
+  top: 6%;
+  left: 6%;
+  width: 88%;
+  height: 88%;
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
     rgba(var(--sonar-rgb), 0) 0deg,
-    rgba(var(--sonar-rgb), 0.01) 260deg,
-    rgba(var(--sonar-rgb), 0.12) 360deg
+    rgba(var(--sonar-rgb), 0.02) 250deg,
+    rgba(var(--sonar-rgb), 0.24) 360deg
   );
-  animation: sns-sonar-rotate 10s linear infinite;
-  border: 1px dashed rgba(var(--sonar-rgb), 0.12);
+  animation: sns-sonar-rotate 7s linear infinite;
+  border: 1px dashed rgba(var(--sonar-rgb), 0.28);
   box-sizing: border-box;
   pointer-events: none;
 }
 
+.sns-x .sns-sonar-sweep {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0) 0deg,
+    rgba(255, 255, 255, 0.02) 250deg,
+    rgba(255, 255, 255, 0.2) 360deg
+  );
+}
+
 @keyframes sns-sonar-ping {
   0% {
-    width: 4px;
-    height: 4px;
-    opacity: 0.7;
+    width: 6px;
+    height: 6px;
+    opacity: 0.92;
   }
   100% {
-    width: var(--sonar-size);
-    height: var(--sonar-size);
+    width: calc(var(--sonar-size) * 1.65);
+    height: calc(var(--sonar-size) * 1.65);
     opacity: 0;
   }
 }
