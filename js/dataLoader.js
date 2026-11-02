@@ -3157,8 +3157,6 @@ if (tileWrap && tileBtn) {
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
-        const regionToLoad = window.currentRegion || 'KANTO';
-
         setIdealQuery('pref', null);
         setIdealQuery('area', null);
         setIdealQuery('spot', null);
