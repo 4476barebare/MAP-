@@ -2173,7 +2173,7 @@ li {
   transition: width 0.3s ease, height 0.3s ease;
 }
 
-/* --- 投稿SNS別のカラーテーマ（ご指定色） --- */
+/* --- 投稿SNS別のカラーテーマ（ソナー＆テキスト共通） --- */
 /* X: 黒 */
 .sns-x         { --sonar-rgb: 20, 20, 20; --sns-badge-bg: #111111; --sns-badge-color: #ffffff; }
 /* Instagram: ピンク */
@@ -2219,6 +2219,20 @@ li {
   -webkit-user-select: none;
 }
 
+/* ★ X専用：黒シャドウを廃止し、黒文字にくっきりした白枠（白フチ）を付与 */
+.sns-sonar-fish-hit.sns-x {
+  color: #111111;
+  text-shadow:
+     0.8px  0.8px 0 #ffffff,
+    -0.8px -0.8px 0 #ffffff,
+     0.8px -0.8px 0 #ffffff,
+    -0.8px  0.8px 0 #ffffff,
+     0px    0.8px 0 #ffffff,
+     0px   -0.8px 0 #ffffff,
+     0.8px  0px   0 #ffffff,
+    -0.8px  0px   0 #ffffff;
+}
+
 /* ズーム12.5以上時：完全非表示＆クリック無効化 */
 .sns-sonar-fish-hit.is-hidden-hit {
   display: none !important;
@@ -2250,6 +2264,12 @@ li {
   opacity: 0;
   pointer-events: none;
   animation: sns-sonar-ping 6.5s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
+}
+
+/* Xのソナー波紋も暗い海や山に沈まないよう極薄の白フチを添える */
+.sns-x .sns-sonar-wave {
+  border-color: rgba(20, 20, 20, 0.55);
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.45);
 }
 
 /* ゆっくり回る薄い走査線 */
