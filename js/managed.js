@@ -115,11 +115,17 @@ function renderRegion() {
             if (typeof window.showSnsSonarLayer === 'function') {
                 await window.showSnsSonarLayer();
             }
+            if (typeof renderCrowdImage === 'function') {
+                renderCrowdImage();
+            }
         });
     } else if (typeof showAllRegionSpots === 'function') {
-        showAllRegionSpots().then(() => {
+        showAllRegionSpots().then(async () => {
             if (typeof window.showSnsSonarLayer === 'function') {
-                return window.showSnsSonarLayer();
+                await window.showSnsSonarLayer();
+            }
+            if (typeof renderCrowdImage === 'function') {
+                renderCrowdImage();
             }
         });
     }
