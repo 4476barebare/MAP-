@@ -3187,13 +3187,11 @@ if (tileWrap && tileBtn) {
         if (alertBar) alertBar.textContent = "";
 
         setTimeout(() => {
-             //showdebug('A');
-            loadRegionMap(regionToLoad);
-             //showdebug('B');
-            
-            if (typeof renderCrowdImage === 'function') {
-                renderCrowdImage();
-            }
+            region_management().then(() => {
+                if (typeof renderCrowdImage === 'function') {
+                    renderCrowdImage();
+                }
+            });
         }, 10);
 
         setTimeout(() => {
