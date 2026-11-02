@@ -322,7 +322,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
     const snsName = getSnsDisplayName(pt.source);
     const safeFish = String(pt.fish || '').replace(/[<>&"']/g, '');
     const safeArea = String(pt.area_name || '釣り場付近').replace(/[<>&"']/g, '');
-    const safeDate = String(pt.date || '').replace(/^\d{4}\//, ''); // YYYY/MM/DD -> MM/DD
+    const safeDate = String(pt.date || '').replace(/^\d{4}\//, '');
 
     const textMarker = L.marker([pt.lat, pt.lng], {
       icon: L.divIcon({
@@ -338,7 +338,6 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
 
     textMarker._pointData = pt;
 
-    // ★ ポップアップのバインド（エリア名、魚種名改行、SNSボタンリンク）
     const popupHtml = `
       <div class="sns-catch-popup">
         <div class="sns-catch-popup-title">${safeArea}</div>
@@ -426,8 +425,6 @@ function updateSnsSonarOnZoom() {
     });
   }
 }
-
-// (※この下に既存の window.markerControl = { ... } が続きます)
 
 
 window.markerControl = {
