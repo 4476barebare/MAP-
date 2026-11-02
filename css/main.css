@@ -2149,7 +2149,6 @@ li {
   display: inline-block;
 }
 
-
 /* =========================================
    広域・エリアマップ：SNS釣果ソナーレーダー
 ========================================= */
@@ -2162,8 +2161,8 @@ li {
 }
 
 .sns-sonar-emitter {
-  --sonar-size: 54px;
-  --sonar-rgb: 0, 255, 204;
+  --sonar-size: 68px;
+  --sonar-rgb: 255, 255, 255;
   position: relative;
   width: var(--sonar-size);
   height: var(--sonar-size);
@@ -2174,25 +2173,30 @@ li {
   transition: width 0.3s ease, height 0.3s ease;
 }
 
-/* --- 投稿SNS別のカラーテーマ（ソナー＆テキスト共通） --- */
-.sns-instagram { --sonar-rgb: 255, 64, 150; }
-.sns-x         { --sonar-rgb: 29, 161, 242; }
-.sns-facebook  { --sonar-rgb: 24, 119, 242; }
-.sns-threads   { --sonar-rgb: 185, 115, 255; }
-.sns-default   { --sonar-rgb: 0, 255, 204; }
+/* --- 投稿SNS別のカラーテーマ（ご指定色） --- */
+/* X: 黒 */
+.sns-x         { --sonar-rgb: 20, 20, 20; --sns-badge-bg: #111111; --sns-badge-color: #ffffff; }
+/* Instagram: ピンク */
+.sns-instagram { --sonar-rgb: 225, 48, 108; --sns-badge-bg: #e1306c; --sns-badge-color: #ffffff; }
+/* Facebook: 水色 */
+.sns-facebook  { --sonar-rgb: 24, 160, 251; --sns-badge-bg: #18a0fb; --sns-badge-color: #ffffff; }
+/* Threads: 白 */
+.sns-threads   { --sonar-rgb: 255, 255, 255; --sns-badge-bg: #ffffff; --sns-badge-color: #111111; }
+/* デフォルト */
+.sns-default   { --sonar-rgb: 255, 255, 255; --sns-badge-bg: #191970; --sns-badge-color: #ffffff; }
 
-/* 中心の輝点 */
+/* ★ 中心の輝点（濃すぎないよう極小・薄めに調整） */
 .sns-sonar-core {
-  width: clamp(2px, calc(var(--sonar-size) * 0.1), 5px);
-  height: clamp(2px, calc(var(--sonar-size) * 0.1), 5px);
-  background-color: rgba(var(--sonar-rgb), 0.7);
+  width: 2.5px;
+  height: 2.5px;
+  background-color: rgba(var(--sonar-rgb), 0.3);
   border-radius: 50%;
-  box-shadow: 0 0 5px rgba(var(--sonar-rgb), 0.55);
+  box-shadow: 0 0 2px rgba(var(--sonar-rgb), 0.25);
   z-index: 3;
   pointer-events: none;
 }
 
-/* ★ 別関数で描画する魚種テキスト（6px・各社ソナーカラー連動） */
+/* ★ 魚種テキスト（6px・各社カラー連動） */
 .sns-sonar-fish-hit {
   position: relative;
   z-index: 6;
@@ -2201,21 +2205,21 @@ li {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 3px;
+  padding: 3px 4px;
   font-size: 6px;
   line-height: 1;
   font-weight: bold;
-  color: rgb(var(--sonar-rgb)); /* 各社のソナーカラーと連動 */
+  color: rgb(var(--sonar-rgb));
   white-space: nowrap;
   transform: translate(-50%, -50%);
   text-shadow:
     0 0 2px rgba(0, 0, 0, 0.95),
-    0 0 4px rgba(0, 0, 0, 0.85);
+    0 0 3px rgba(0, 0, 0, 0.85);
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* ★ ズーム13以下の時：非表示 0px にしてクリック範囲を完全に奪う */
+/* ズーム12.5以上時：完全非表示＆クリック無効化 */
 .sns-sonar-fish-hit.is-hidden-hit {
   display: none !important;
   font-size: 0px !important;
@@ -2228,19 +2232,19 @@ li {
   cursor: default !important;
 }
 
-/* ゆっくり広がる薄い波紋（2重リング・6.5秒周期） */
+/* ゆっくり広がる薄い波紋 */
 .sns-sonar-wave {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 2px;
-  height: 2px;
+  width: 4px;
+  height: 4px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 1px solid rgba(var(--sonar-rgb), 0.38);
+  border: 1px solid rgba(var(--sonar-rgb), 0.35);
   background: radial-gradient(
     circle,
-    rgba(var(--sonar-rgb), 0.1) 0%,
+    rgba(var(--sonar-rgb), 0.08) 0%,
     rgba(var(--sonar-rgb), 0) 70%
   );
   opacity: 0;
@@ -2248,7 +2252,7 @@ li {
   animation: sns-sonar-ping 6.5s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
 }
 
-/* ゆっくり回る薄い走査線（10秒周期） */
+/* ゆっくり回る薄い走査線 */
 .sns-sonar-sweep {
   position: absolute;
   top: 7.5%;
@@ -2260,19 +2264,19 @@ li {
     from 0deg,
     rgba(var(--sonar-rgb), 0) 0deg,
     rgba(var(--sonar-rgb), 0.01) 260deg,
-    rgba(var(--sonar-rgb), 0.15) 360deg
+    rgba(var(--sonar-rgb), 0.12) 360deg
   );
   animation: sns-sonar-rotate 10s linear infinite;
-  border: 1px dashed rgba(var(--sonar-rgb), 0.14);
+  border: 1px dashed rgba(var(--sonar-rgb), 0.12);
   box-sizing: border-box;
   pointer-events: none;
 }
 
 @keyframes sns-sonar-ping {
   0% {
-    width: 2px;
-    height: 2px;
-    opacity: 0.75;
+    width: 4px;
+    height: 4px;
+    opacity: 0.7;
   }
   100% {
     width: var(--sonar-size);
@@ -2284,4 +2288,95 @@ li {
 @keyframes sns-sonar-rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* =========================================
+   SNS釣果ポップアップ（.shop-popupのCSS流用）
+========================================= */
+
+.sns-catch-popup {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #191970;
+  min-width: 160px;
+  max-width: 220px;
+}
+
+.sns-catch-popup-title {
+  font-weight: bold;
+  font-size: 13px;
+  color: #191970;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sns-catch-popup-fish {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 6px;
+}
+
+.sns-catch-popup-date {
+  font-size: 11px;
+  color: #666666;
+  font-weight: normal;
+  margin-left: 4px;
+}
+
+.sns-catch-popup-footer {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(25, 25, 112, 0.2);
+}
+
+.sns-catch-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  text-decoration: none !important;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.15s ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sns-catch-btn.sns-x {
+  background-color: #111111;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+.sns-catch-btn.sns-instagram {
+  background-color: #e1306c;
+  color: #ffffff !important;
+}
+.sns-catch-btn.sns-facebook {
+  background-color: #18a0fb;
+  color: #ffffff !important;
+}
+.sns-catch-btn.sns-threads {
+  background-color: #ffffff;
+  color: #111111 !important;
+  border: 1px solid #cccccc;
+}
+
+.sns-catch-btn:active {
+  opacity: 0.8;
+}
+
+.sns-catch-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sns-catch-arrow {
+  margin-left: 4px;
+  flex-shrink: 0;
 }
