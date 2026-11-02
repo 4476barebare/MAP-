@@ -89,11 +89,6 @@ async function loadRegionCSV() {
 // REGION 初期表示：SEO・マーカー・レイヤー等
 // ==========================================
 function renderRegion() {
-    if (typeof showdebug === 'function') {
-        showdebug('[REGION] renderRegion開始');
-        showdebug('[REGION] runAfterTileLoad=' + (typeof window.runAfterTileLoad) + ' / firstTileLoaded=' + window._firstTileLoaded);
-        showdebug('[REGION] showAllRegionSpots=' + (typeof showAllRegionSpots) + ' / sonar=' + (typeof window.showSnsSonarLayer) + ' / rain=' + (typeof renderCrowdImage));
-    }
     const regionName = window.regionData ? window.regionData.name : '関東地方';
     let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
 
@@ -113,54 +108,35 @@ function renderRegion() {
     if (linkContainer) linkContainer.innerHTML = regionHtml;
 
     if (typeof window.runAfterTileLoad === 'function') {
-        if (typeof showdebug === 'function') showdebug('[REGION] タイル読み込みキューへ登録');
         window.runAfterTileLoad(async () => {
-            if (typeof showdebug === 'function') showdebug('[REGION] キュー実行開始');
-            try {
+                try {
                 if (typeof showAllRegionSpots === 'function') {
                     await showAllRegionSpots();
-                    if (typeof showdebug === 'function') showdebug('[REGION] showAllRegionSpots完了');
-                } else if (typeof showdebug === 'function') {
-                    showdebug('[REGION] showAllRegionSpotsが未定義');
-                }
+            
                 if (typeof window.showSnsSonarLayer === 'function') {
-                    if (typeof showdebug === 'function') showdebug('[REGION] ソナー開始');
-                    await window.showSnsSonarLayer();
-                    if (typeof showdebug === 'function') showdebug('[REGION] ソナー完了');
-                } else if (typeof showdebug === 'function') {
-                    showdebug('[REGION] showSnsSonarLayerが未定義');
-                }
+                                await window.showSnsSonarLayer();
+            
             } catch (e) {
-                if (typeof showdebug === 'function') showdebug('[REGION] スポット/ソナー例外: ' + (e && e.message ? e.message : e));
-                throw e;
+                        throw e;
             } finally {
-                if (typeof showdebug === 'function') showdebug('[REGION] 雨雲画像呼び出し直前 / renderCrowdImage=' + (typeof renderCrowdImage));
-                if (typeof renderCrowdImage === 'function') {
+                        if (typeof renderCrowdImage === 'function') {
                     renderCrowdImage();
-                    if (typeof showdebug === 'function') showdebug('[REGION] 雨雲画像呼び出し完了');
-                }
+                            }
             }
         });
     } else if (typeof showAllRegionSpots === 'function') {
-        if (typeof showdebug === 'function') showdebug('[REGION] キューなし分岐で実行');
         showAllRegionSpots().then(async () => {
             try {
                 if (typeof window.showSnsSonarLayer === 'function') {
-                    if (typeof showdebug === 'function') showdebug('[REGION] ソナー開始（キューなし）');
-                    await window.showSnsSonarLayer();
-                    if (typeof showdebug === 'function') showdebug('[REGION] ソナー完了（キューなし）');
-                }
+                                await window.showSnsSonarLayer();
+                            }
             } finally {
                 if (typeof renderCrowdImage === 'function') {
-                    if (typeof showdebug === 'function') showdebug('[REGION] 雨雲画像呼び出し（キューなし）');
-                    renderCrowdImage();
+                                renderCrowdImage();
                 }
             }
         }).catch(e => {
-            if (typeof showdebug === 'function') showdebug('[REGION] キューなし分岐の例外: ' + (e && e.message ? e.message : e));
-        });
-    } else if (typeof showdebug === 'function') {
-        showdebug('[REGION] runAfterTileLoadなし / showAllRegionSpotsも未定義');
+            });
     }
 
     if (typeof showRoadLayers === 'function') showRoadLayers();
@@ -211,9 +187,6 @@ async function region_management() {
             window.regionData.lng,
             window.regionData.zoom
         );
-        if (typeof showdebug === 'function') showdebug('[REGION] drawLocation実行 / map=' + !!window.map);
-    } else if (typeof showdebug === 'function') {
-        showdebug('[REGION] regionDataなし');
     }
 
     renderRegion();
