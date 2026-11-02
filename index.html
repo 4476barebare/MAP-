@@ -276,16 +276,17 @@ window.TILE_URLS = {
 };
 window.gsiLayers = window.TILE_URLS;
 
-// 👇【ここに追加！】キャッシュ用の金庫を空っぽのオブジェクトとして定義しておく
+// タイルキャッシュ用の管理領域
 window.prefSpotLayerCache = {};
-// 既存のJSファイル（dataLoader.js など）に追記
+
+// Service Workerを可能な限り早く登録する。
+// 初回訪問では制御開始前に発生した通信を捕捉できないため、次回訪問から確実に利用する。
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    // さっき作った sw.js を裏側で起動させる
-    navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('ServiceWorkerの登録完了！タイルのキャッシュを開始します。'))
-      .catch(err => console.log('ServiceWorkerの登録失敗:', err));
-  });
+  navigator.serviceWorker.register('/sw.js')
+    .then(registration => {
+      if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    })
+    .catch(err => console.error('Service Worker登録失敗:', err));
 }
 
 // ==========================================
