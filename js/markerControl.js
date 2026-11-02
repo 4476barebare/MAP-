@@ -154,10 +154,10 @@ window.showSnsSonarLayer = async function(customOptions = {}) {
   if (!window.map) return;
 
   const existingPane = window.map.getPane('snsSonarPane');
-  if (window._isSnsSonarOpaque || (existingPane && existingPane.style.opacity === '1')) {
-    window.hideSnsSonarLayer();
-    return;
-  }
+  //if (window._isSnsSonarOpaque || (existingPane && existingPane.style.opacity === '1')) {
+  //  window.hideSnsSonarLayer();
+  //  return;
+  //}
 
   const opts = {
     ...DEFAULT_SNS_SONAR_OPTIONS,
