@@ -353,7 +353,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
 
     textMarker.bindPopup(popupHtml, {
       offset: [0, -6],
-      closeButton: false,
+      closeButton: true,
       autoPanPadding: [20, 20]
     });
 
