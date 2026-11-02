@@ -150,13 +150,6 @@ window.loadSnsCatchData = async function(regionCode) {
 window.showSnsSonarLayer = async function(customOptions = {}) {
   if (!window.map) return;
 
-  const existingPane = window.map.getPane('snsSonarPane');
-  // ★ 先頭ガード：すでに不透明であれば透明に戻し、以下の処理をスキップ
-  if (window._isSnsSonarOpaque || (existingPane && existingPane.style.opacity === '1')) {
-    window.hideSnsSonarLayer();
-    return;
-  }
-
   const opts = {
     ...DEFAULT_SNS_SONAR_OPTIONS,
     ...customOptions,
