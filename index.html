@@ -2309,11 +2309,15 @@ function toWeatherIcon(code) {
 }
 
 function renderCrowdImage() {
+    if (typeof showdebug === 'function') {
+        showdebug('[RAIN] renderCrowdImage開始 / map=' + !!window.map + ' / radarEnabled=' + window.radarEnabled);
+    }
 
     // ==================================================
     // マップ生成前に呼ばれた場合
     // ==================================================
     if (!window.map) {
+        if (typeof showdebug === 'function') showdebug('[RAIN] map未生成のため再試行待ち');
         if (!window._crowdRenderRetry) {
             window._crowdRenderRetry = setInterval(() => {
                 if (window.map) {
@@ -2350,6 +2354,7 @@ function renderCrowdImage() {
     // OFF時
     // ==================================================
     if (!window.radarEnabled) {
+        if (typeof showdebug === 'function') showdebug('[RAIN] radarEnabled=false のため雨雲画像を非表示');
         removeCrowdImage();
 
         const header = document.querySelector('.menu-header-row');
