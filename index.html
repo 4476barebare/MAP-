@@ -2458,8 +2458,12 @@ function renderCrowdImage() {
     const headerText = document.querySelector('.header-text');
 
     if (!header || !cloudsUI || !headerText) {
+        if (typeof showdebug === 'function') {
+            showdebug('[RAIN] UI要素不足 / header=' + !!header + ' / cloudsUI=' + !!cloudsUI + ' / headerText=' + !!headerText);
+        }
         return;
     }
+    if (typeof showdebug === 'function') showdebug('[RAIN] UI要素取得OK');
 
     header.style.display = '';
 
@@ -2467,6 +2471,7 @@ function renderCrowdImage() {
     // Phase2では雨雲UIを出さない
     // ==================================================
     if (window.phase2Initialized) {
+        if (typeof showdebug === 'function') showdebug('[RAIN] phase2Initialized=true のため雨雲画像処理を終了');
         cloudsUI.textContent = '';
         if (window.todayTide) {
             headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
@@ -2513,6 +2518,7 @@ function renderCrowdImage() {
     }
 
     const MAX_OPACITY = 0.6;
+    if (typeof showdebug === 'function') showdebug('[RAIN] 雨雲画像4枚のレイヤー作成開始 / ' + images.map(img => img.url).join(' | '));
     window.crowdLayers = [];
     let loadedCount = 0;
 
@@ -2538,6 +2544,7 @@ function renderCrowdImage() {
         // ロード完了監視
         layer.on('load', () => {
             loadedCount++;
+            if (typeof showdebug === 'function') showdebug('[RAIN] 画像ロード成功 ' + loadedCount + '/' + images.length + ' : ' + img.url);
             // 4枚すべて読み込み終わったら自動発火
             if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
                 startCrowdSlideshow();
@@ -2547,6 +2554,7 @@ function renderCrowdImage() {
         // 読み込みエラー時も止まらないようにする
         layer.on('error', () => {
             loadedCount++;
+            if (typeof showdebug === 'function') showdebug('[RAIN] 画像ロード失敗 ' + loadedCount + '/' + images.length + ' : ' + img.url);
             if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
                 startCrowdSlideshow();
             }
@@ -2554,6 +2562,9 @@ function renderCrowdImage() {
 
         layer.addTo(window.map);
         window.crowdLayers.push(layer);
+    });
+
+    if (typeof showdebug === 'function') showdebug('[RAIN] 画像レイヤー4枚を地図へ追加完了');
     });
 
     // 互換性のため
