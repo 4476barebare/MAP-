@@ -24,8 +24,14 @@ self.addEventListener('fetch', event => {
 });
 
 async function handleTileRequest(request) {
-  const cache = await caches.open(CACHE_NAME);
-  const meta = await caches.open(CACHE_META_NAME);
+  let cache;
+  let meta;
+  try {
+    cache = await caches.open(CACHE_NAME);
+    meta = await caches.open(CACHE_META_NAME);
+  } catch (error) {
+    return fetch(request);
+  }
   const cached = await cache.match(request);
 
   if (cached) {
@@ -35,7 +41,11 @@ async function handleTileRequest(request) {
 
     // メタ情報がない既存キャッシュは、今回から14日間の起点として扱う
     if (!savedAt || !Number.isFinite(timestamp)) {
-      await meta.put(request.url, new Response(String(Date.now())));
+      try {
+        await meta.put(request.url, new Response(String(Date.now())));
+      } catch (error) {
+        // メタ情報を保存できなくても既存タイルを表示する
+      }
       return cached;
     }
 
