@@ -178,7 +178,7 @@ async function region_management() {
     if (!isRegionReady) return;
 
     if (window.regionData) {
-        drawLocation(
+        await drawLocation(
             window.regionData.name,
             window.regionData.lat,
             window.regionData.lng,
@@ -200,9 +200,6 @@ async function region_management() {
     });
 
     await Promise.all(prefList.map(prefCode => fetchSinglePrefSpots(prefCode)));
-
-    // マーカーは天気・fishの取得を待たずに生成を開始
-    if (typeof showAllRegionSpots === 'function') showAllRegionSpots();
 
     const dataPromises = prefList.map(prefCode => {
         const fishUrl = `/${window.currentRegion || 'KANTO'}/${prefCode}_fish.json`;
