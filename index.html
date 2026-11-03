@@ -1000,7 +1000,40 @@ function loadRegionCsvData() {
                 rows.push(row);
             }
 
-            const parsedData = { regionCode, url: rUrl, headers, rows };
+            // 都道府県行のURL情報をここで一度だけ正規化して保持する。
+            const prefRows = [];
+            for (const row of rows) {
+                if (row.type !== 'pref' || !row.url) continue;
+
+                const parts = row.url.split('/');
+                let prefCode = '';
+                let lat = NaN;
+                let lng = NaN;
+
+                if (parts.length >= 4) {
+                    prefCode = parts[1].split('_')[0];
+                    lat = parseFloat(parts[2]);
+                    lng = parseFloat(parts[3]);
+                } else if (parts.length === 3) {
+                    prefCode = parts[0].split('_')[0];
+                    lat = parseFloat(parts[1]);
+                    lng = parseFloat(parts[2]);
+                } else {
+                    continue;
+                }
+
+                if (!prefCode) continue;
+
+                prefRows.push({
+                    prefCode,
+                    prefName: row.notes || '',
+                    lat,
+                    lng,
+                    row
+                });
+            }
+
+            const parsedData = { regionCode, url: rUrl, headers, rows, prefRows };
             if (window.regionCsvParsedRegion === regionCode &&
                 window.regionCsvParsedUrl === rUrl) {
                 window.regionCsvParsedData = parsedData;
@@ -1084,10 +1117,9 @@ async function fetchAllRegionSpots() {
             }
 
             const prefList = [];
-            for (const row of csvData.rows) {
-                if (row.type === 'pref' && row.url) {
-                    const prefCode = row.url.split('/')[1]?.split('_')[0] || row.url.split('/')[0].split('_')[0];
-                    if (prefCode && !prefList.includes(prefCode)) prefList.push(prefCode);
+            for (const pref of csvData.prefRows || []) {
+                if (pref.prefCode && !prefList.includes(pref.prefCode)) {
+                    prefList.push(pref.prefCode);
                 }
             }
 
@@ -1120,14 +1152,11 @@ async function applyQueryToStateFromCsv() {
         try {
             const csvData = await loadRegionCsvData();
 
-            if (csvData.headers.includes('notes') && csvData.headers.includes('url')) {
-                for (const row of csvData.rows) {
-                    if (csvData.headers.includes('type') && row.type !== 'pref') continue;
-
-                    const csvNote = row.notes || '';
-                    const csvName = row.name || '';
-                    const urlVal = row.url || '';
-                    const extractedCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0]?.split('_')[0] || csvName;
+            if (csvData.prefRows) {
+                for (const pref of csvData.prefRows) {
+                    const csvNote = pref.prefName || '';
+                    const csvName = pref.row.name || '';
+                    const extractedCode = pref.prefCode;
 
                     if (
                         csvNote && (
