@@ -292,26 +292,94 @@ if ('serviceWorker' in navigator) {
 // ==========================================
 // ★ オススメ釣り場ランキング：クリア＆非表示関数
 // ==========================================
+// SNS釣果の近隣判定距離。ランキングとスポット画面で共通利用する。
+window.SNS_CATCH_RADIUS_KM = 10;
+
+// 指定スポット周辺のSNS釣果を取得し、同じ投稿URLの重複を除外する。
+window.getNearbySnsCatchRecords = function(spot, radiusKm = window.SNS_CATCH_RADIUS_KM) {
+    if (!spot || !Array.isArray(window.snsCatchData)) return [];
+    const spotLat = Number(spot.lat);
+    const spotLng = Number(spot.lng);
+    if (!Number.isFinite(spotLat) || !Number.isFinite(spotLng)) return [];
+
+    const distanceKm = (lat1, lng1, lat2, lng2) => {
+        const rad = Math.PI / 180;
+        const dLat = (lat2 - lat1) * rad;
+        const dLng = (lng2 - lng1) * rad;
+        const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+        return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    };
+
+    const getPostDate = dateStr => {
+        const parts = String(dateStr || '').trim().replace(/-/g, '/').split('/');
+        if (parts.length < 3) return null;
+        const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        return Number.isNaN(date.getTime()) ? null : date;
+    };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const uniquePosts = new Map();
+
+    window.snsCatchData.forEach(record => {
+        if (!record) return;
+        const lat = Number(record.lat);
+        const lng = Number(record.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const distance = distanceKm(spotLat, spotLng, lat, lng);
+        if (distance > radiusKm) return;
+
+        const postDate = getPostDate(record.date);
+        if (!postDate) return;
+        const ageDays = Math.max(0, Math.floor((today - postDate) / 86400000));
+        const key = record.url
+            ? 'url:' + record.url
+            : 'record:' + lat.toFixed(5) + '_' + lng.toFixed(5) + '_' + record.date + '_' + (record.fish || '');
+
+        const candidate = { ...record, distanceKm: distance, ageDays: ageDays };
+        const existing = uniquePosts.get(key);
+        if (!existing || distance < existing.distanceKm ||
+            (distance === existing.distanceKm && ageDays < existing.ageDays)) {
+            uniquePosts.set(key, candidate);
+        }
+    });
+
+    return [...uniquePosts.values()].sort((a, b) => a.ageDays - b.ageDays);
+};
+
+// 投稿の新しさに応じたランキング加点。
+function getSnsCatchBonus(posts) {
+    if (!posts || posts.length === 0) return 0;
+    const days = posts[0].ageDays;
+    if (days <= 1) return 15;
+    if (days <= 3) return 12;
+    if (days <= 6) return 9;
+    if (days <= 10) return 5;
+    if (days <= 14) return 2;
+    return 0;
+}
+
 function clearSpotRanking() {
     const section = document.getElementById('fishing-recommend-section');
     const container = document.getElementById('spot-ranking-container');
     if (section) section.style.display = 'none';
     if (container) container.innerHTML = '';
 }
+
 // ==========================================
-// ★ 明日のオススメ釣り場ランキング表示関数（初回タイル優先＆自動リトライ搭載版）
+// ★ 明日のオススメ釣り場ランキング表示関数
 // ==========================================
 async function renderSpotRanking(retryCount = 0) {
     const container = document.getElementById('spot-ranking-container');
     const section = document.getElementById('fishing-recommend-section');
     if (!container || !section) return;
 
-    // 初回呼び出し時のみローディング表示
     if (retryCount === 0) {
         section.style.display = 'block';
         container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
 
-        // ★ マップの初回タイル読み込みがまだ終わっていない場合は、タイル完了キューに繋いで順番に実行する
         if (!window._firstTileLoaded && typeof window.runAfterTileLoad === 'function') {
             window.runAfterTileLoad(() => renderSpotRanking(1));
             return;
@@ -320,31 +388,26 @@ async function renderSpotRanking(retryCount = 0) {
 
     const now = new Date();
     const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-    nowJST.setDate(nowJST.getDate() + 1); 
-    
+    nowJST.setDate(nowJST.getDate() + 1);
+
     const tMonth = nowJST.getMonth() + 1;
     const tDate = nowJST.getDate();
-    const tomorrowStr = `${tMonth}月${tDate}日`;
+    const tomorrowStr = tMonth + "月" + tDate + "日";
 
     let targetSpots = [];
     let titlePrefix = "";
 
-    // --------------------------------------------------
-    // パターンA: 県画面（選択されている県のスポットのみ）
-    // --------------------------------------------------
+    // 県画面：選択県のスポットのみ
     if (window.currentPref) {
-        // ★ リトライ条件1：スポットデータ自体がまだ無い場合
         if (!window.spotData || window.spotData.length === 0) {
             if (retryCount < 25) {
                 setTimeout(() => renderSpotRanking(retryCount + 1), 100);
                 return;
-            } else {
-                clearSpotRanking();
-                return;
             }
+            clearSpotRanking();
+            return;
         }
 
-        // ★ リトライ条件2：スポットにまだ天気(whether)が付与されていない場合
         const repSpot = window.spotData.find(s => {
             const typeParts = (s.type || '').split('$');
             return typeParts.includes('representative') || typeParts.includes('assistant');
@@ -354,46 +417,42 @@ async function renderSpotRanking(retryCount = 0) {
             if (retryCount < 25) {
                 setTimeout(() => renderSpotRanking(retryCount + 1), 100);
                 return;
-            } else {
-                clearSpotRanking();
-                return;
             }
+            clearSpotRanking();
+            return;
         }
 
         targetSpots = window.spotData;
         const prefName = window.prefData ? window.prefData.notes : window.currentPref;
-        titlePrefix = `${prefName}で`;
-    } 
-    // --------------------------------------------------
-    // パターンB: トップページ（関東全域のスポットから算出）
-    // --------------------------------------------------
-    else {
-        // ★ リトライ条件3：トップページのマスターデータや県リストがまだ無い場合
+        titlePrefix = prefName + "で";
+    } else {
+        // REGION画面：関東全域
         if (!window.allspotData || window.allspotData.length === 0 || !window.regionPrefData) {
             if (retryCount < 25) {
                 setTimeout(() => renderSpotRanking(retryCount + 1), 100);
                 return;
-            } else {
-                clearSpotRanking();
-                return;
             }
+            clearSpotRanking();
+            return;
         }
 
         titlePrefix = "関東で";
-        
-        // ★ 7県分の天気CSVを一斉取得せず、1県ずつ順番に取得・4msスライスでパースして帯域とCPUを保護する
         for (const pref of window.regionPrefData) {
-            const whetherUrl = `/data/${pref.prefCode}_whether.csv`;
+            const whetherUrl = "/data/" + pref.prefCode + "_whether.csv";
             const csvData = await loadWhetherCSV(whetherUrl).catch(() => null);
             if (csvData) applyWhetherToSpots(csvData, window.allspotData);
         }
-
         targetSpots = window.allspotData;
+    }
+
+    // SNS釣果データはランキングとスポット画面で同じデータを使う。
+    if (typeof window.loadSnsCatchData === 'function' && !window.isSnsCatchLoaded) {
+        await window.loadSnsCatchData(window.currentRegion || 'KANTO').catch(() => []);
     }
 
     const titleEl = section.querySelector('h2');
     if (titleEl) {
-        titleEl.innerHTML = `明日（${tomorrowStr}）${titlePrefix}釣りに行くんだけど良い場所ある？`;
+        titleEl.innerHTML = "明日（" + tomorrowStr + "）" + titlePrefix + "釣りに行くんだけど良い場所ある？";
     }
 
     const ranking = [];
@@ -401,76 +460,84 @@ async function renderSpotRanking(retryCount = 0) {
     targetSpots.forEach(spot => {
         if (spot.type === 'pref' || spot.type === 'area') return;
         const typeParts = (spot.type || '').split('$');
-        if (typeParts.includes('representative') || typeParts.includes('assistant') || typeParts.includes('substitute')) return;
+        if (typeParts.includes('representative') ||
+            typeParts.includes('assistant') ||
+            typeParts.includes('substitute')) return;
 
-        // ★ zoomが指定されていないスポットを除外
+        // 直接スポット画面へ遷移できないスポットは対象外。
         if (!spot.zoom || String(spot.zoom).trim() === '') return;
 
         const whether = spot.whether;
         if (!whether || !whether.hourly || !whether.hourly[1] || !whether.hourly[1].weather) return;
-        
+
         const tomorrowWeather = whether.hourly[1].weather;
-        let maxPop = -Infinity;
-        let maxWind = -Infinity;
-        let maxWave = -Infinity;
-        
         const morningRows = [];
         const afternoonRows = [];
+        let maxPop = -Infinity;
+        let maxWind = -Infinity;
+        let popTotal = 0;
+        let popCount = 0;
 
         for (let i = 0; i < tomorrowWeather.length; i++) {
             const row = tomorrowWeather[i];
             if (!Array.isArray(row)) continue;
 
-            const hour = i * 2; 
-            if (hour >= 5 && hour <= 12) {
-                morningRows.push(row);
-            } else if (hour >= 13 && hour <= 20) {
-                afternoonRows.push(row);
+            const hour = i * 2;
+            if (hour >= 5 && hour <= 12) morningRows.push(row);
+            else if (hour >= 13 && hour <= 20) afternoonRows.push(row);
+
+            const pop = row[2];
+            if (typeof pop === "number" && hour >= 5 && hour <= 20) {
+                maxPop = Math.max(maxPop, pop);
+                popTotal += pop;
+                popCount++;
             }
-            
-            const pop = row[2];  
-            const wind = row[4]; 
-            const wave = row[6]; 
-            
-            if (typeof pop === "number") maxPop = Math.max(maxPop, pop);
+
+            const wind = row[4];
             if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
-            if (typeof wave === "number") maxWave = Math.max(maxWave, wave);
         }
 
-        let displayPop = 0;
-        if (maxPop !== -Infinity) {
-            displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
-        }
+        if (popCount === 0) return;
 
-        const getIconSafe = (r) => {
-            if (!Array.isArray(r) || r.length === 0) return null;
-            return typeof calcRepresentativeIcon === 'function' ? calcRepresentativeIcon(r) : '';
+        // 表示用の降水確率は従来どおり時間帯の最大値を丸める。
+        const displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
+
+        // 代表天気の生成は既存ロジックをそのまま利用する。
+        const getIconSafe = rows => {
+            if (!Array.isArray(rows) || rows.length === 0) return null;
+            return typeof calcRepresentativeIcon === 'function' ? calcRepresentativeIcon(rows) : '';
         };
 
         const iconMorning = getIconSafe(morningRows);
         const iconAfternoon = getIconSafe(afternoonRows);
-
         let iconStr = '';
         if (iconMorning && iconAfternoon) {
             iconStr = iconMorning === iconAfternoon
                 ? iconMorning
-                : `${iconMorning}<span style="font-size:0.8em; margin:0 2px;">→</span>${iconAfternoon}`;
+                : iconMorning + '<span style="font-size:0.8em; margin:0 2px;">→</span>' + iconAfternoon;
         } else {
             iconStr = iconMorning || iconAfternoon || '';
         }
 
-        let windPenalty = maxWind !== -Infinity ? (maxWind * 5) : 0;
-        let popPenalty = displayPop * 0.5;
-        let wavePenalty = maxWave !== -Infinity ? (maxWave * 10) : 0;
-        
-        let score = 100 - popPenalty - windPenalty - wavePenalty; 
-        
+        // 海・淡水に共通する降水傾向だけで天気スコアを算出する。
+        // 風速・波高・潮汐は順位付けに使用しない。
+        const averagePop = popTotal / popCount;
+        const weatherScore = Math.max(0, 100 - averagePop * 0.7);
+
+        const nearbyPosts = typeof window.getNearbySnsCatchRecords === 'function'
+            ? window.getNearbySnsCatchRecords(spot)
+            : [];
+        const snsBonus = getSnsCatchBonus(nearbyPosts);
+
         ranking.push({
             name: spot.name,
-            score: Math.round(score),
+            spot: spot,
+            score: Math.round(weatherScore + snsBonus),
             pop: displayPop,
-            wind: maxWind !== -Infinity ? Math.round(maxWind) : 0,
-            iconStr: iconStr
+            wind: maxWind !== -Infinity ? Math.round(maxWind) : null,
+            iconStr: iconStr,
+            hasSnsBonus: snsBonus > 0,
+            snsBonus: snsBonus
         });
     });
 
@@ -479,15 +546,16 @@ async function renderSpotRanking(retryCount = 0) {
         return;
     }
 
-    // ★ 同率スコアを完全にランダムにするため、事前に配列をシャッフルしてからスコア順にソート
+    // 同点の並び順だけランダム化し、スコア順に表示する。
     for (let i = ranking.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [ranking[i], ranking[j]] = [ranking[j], ranking[i]];
     }
     ranking.sort((a, b) => b.score - a.score);
 
-    // ★ 上位3位以内 かつ 最大6件まで選出
-    const top3 = [];
+    // 上位3順位まで。REGIONは最大5件、県画面は最大6件。
+    const maxItems = window.currentPref ? 6 : 5;
+    const topItems = [];
     let currentRank = 1;
     let currentScore = ranking[0].score;
 
@@ -496,19 +564,17 @@ async function renderSpotRanking(retryCount = 0) {
             currentRank++;
             currentScore = ranking[i].score;
         }
-        if (currentRank > 3 || top3.length >= 6) break;
-        top3.push(ranking[i]);
+        if (currentRank > 3 || topItems.length >= maxItems) break;
+        topItems.push(ranking[i]);
     }
 
-    let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">';
-    top3.forEach(item => {
-        const targetVault = window.currentPref ? window.spotData : window.allspotData;
-        const spotObj = targetVault.find(s => s.name === item.name);
-        
+    let html = '<ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">';
+    topItems.forEach(item => {
+        const spotObj = item.spot;
         let url = "#";
+
         if (spotObj) {
             const regionName = window.currentRegion || 'KANTO';
-            
             let prefName = window.prefData ? window.prefData.notes : window.currentPref;
             if (!prefName && window.regionPrefData) {
                 const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
@@ -518,31 +584,41 @@ async function renderSpotRanking(retryCount = 0) {
             let areaName = '';
             const targetAreas = window.currentPref ? window.areaData : window.allspotData;
             if (targetAreas && spotObj.areaId) {
-                let parentArea = targetAreas.find(a => 
+                let parentArea = targetAreas.find(a =>
                     String(a.areaId) + '_' + String(a.individualId) === String(spotObj.areaId)
                 );
                 if (!parentArea && window.currentPref) {
                     parentArea = targetAreas.find(a => String(spotObj.areaId).endsWith(String(a.individualId)));
                 }
-                if (parentArea) {
-                    areaName = parentArea.name;
-                }
+                if (parentArea) areaName = parentArea.name;
             }
-            
-            url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName || '')}&area=${encodeURIComponent(areaName || '')}&spot=${encodeURIComponent(item.name)}`;
+
+            url = "/?region=" + encodeURIComponent(regionName) +
+                "&pref=" + encodeURIComponent(prefName || '') +
+                "&area=" + encodeURIComponent(areaName || '') +
+                "&spot=" + encodeURIComponent(item.name);
         }
 
-        html += `
-        <li>
-            <a href="${url}" class="recommend-spot-link" style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 12px; border-radius: 6px; border: 1px solid #c8d6e5; box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-decoration: none; color: #333;">
-                <span style="font-weight: bold; color: #191970; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px;">${item.name}</span>
-                <span style="font-size: 12px; color: #555; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 1.3em;">${item.iconStr}</span>
-                    <span>降水: <strong style="color: #191970;">${item.pop}%</strong></span>
-                    <span>風: <strong style="color: #191970;">${item.wind}m</strong></span>
-                </span>
-            </a>
-        </li>`;
+        const windHtml = item.wind !== null
+            ? '<span>風: <strong style="color:#191970;">' + item.wind + 'm</strong></span>'
+            : '';
+        const snsHtml = item.hasSnsBonus
+            ? '<span style="display:block; text-align:right; font-size:6px; line-height:1.2; color:#687386; margin-top:3px;">SNS釣果あり</span>'
+            : '';
+
+        html += '<li>' +
+            '<a href="' + url + '" class="recommend-spot-link" style="display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;">' +
+                '<span style="display:flex; justify-content:space-between; align-items:center; width:100%;">' +
+                    '<span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">' + item.name + '</span>' +
+                    '<span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;">' +
+                        '<span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">' + item.iconStr + '</span>' +
+                        '<span>降水: <strong style="color:#191970;">' + item.pop + '%</strong></span>' +
+                        windHtml +
+                    '</span>' +
+                '</span>' +
+                snsHtml +
+            '</a>' +
+        '</li>';
     });
     html += '</ul>';
 
