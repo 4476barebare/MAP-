@@ -303,14 +303,40 @@ if ('serviceWorker' in navigator) {
       showdebug('[SW] 登録成功 / active=' + activeState);
 
       if ('caches' in window) {
-        caches.keys().then(names => {
-          showdebug('[CACHE] ' + names.join(', '));
-          return caches.open('tile-cache-v1').then(cache => cache.keys());
-        }).then(keys => {
-          showdebug('[CACHE] tile-cache-v1=' + keys.length + '件');
-        }).catch(error => {
-          showdebug('[CACHE] 確認失敗: ' + error.message);
-        });
+        // 全件列挙は行わず、直近のChromeログに出たGSIタイル6枚だけを直接照合する。
+        const testTileUrls = [
+          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/201.jpg',
+          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/455/201.jpg',
+          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/200.jpg',
+          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/455/200.jpg',
+          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/202.jpg',
+          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/455/202.jpg'
+        ];
+
+        const runTileCacheProbe = () => {
+          const openStartedAt = performance.now();
+          caches.open('tile-cache-v1').then(cache => {
+            showdebug('[CACHE TEST] open ' + (performance.now() - openStartedAt).toFixed(1) + 'ms');
+
+            return Promise.all(testTileUrls.map(url => {
+              const matchStartedAt = performance.now();
+              return cache.match(url).then(response => {
+                const elapsed = (performance.now() - matchStartedAt).toFixed(1);
+                const path = new URL(url).pathname;
+                showdebug('[CACHE TEST] ' + (response ? 'HIT' : 'MISS') + ' ' + elapsed + 'ms ' + path);
+              });
+            }));
+          }).catch(error => {
+            showdebug('[CACHE TEST] 確認失敗: ' + error.message);
+          });
+        };
+
+        // 初回の地図タイル読み込みと競合しないよう、ページのload後に測定する。
+        if (document.readyState === 'complete') {
+          runTileCacheProbe();
+        } else {
+          window.addEventListener('load', runTileCacheProbe, { once: true });
+        }
       }
     })
     .catch(err => {
