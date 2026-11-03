@@ -316,11 +316,14 @@ async function drawLocation(name, lat, lng, zoom, options = {}) {
                   const finishAfterPaint = () => {
                       requestAnimationFrame(() => requestAnimationFrame(resolve));
                   };
-                  if (window.gsiLayer._loading) {
-                      window.gsiLayer.once('load', finishAfterPaint);
-                  } else {
-                      finishAfterPaint();
-                  }
+                  // GridLayer自身のmoveend処理が終わってから、最終表示範囲のタイル状態を確認する。
+                  requestAnimationFrame(() => {
+                      if (window.gsiLayer._loading) {
+                          window.gsiLayer.once('load', finishAfterPaint);
+                      } else {
+                          finishAfterPaint();
+                      }
+                  });
               });
           });
       }
