@@ -4,84 +4,91 @@
 async function loadRegionCSV() {
     const regionCode = window.currentRegion || 'KANTO';
 
-    if (
-        window.regionPrefData &&
-        window.regionPrefData.length > 0 &&
-        window.regionPrefData[0].regionCode === regionCode
-    ) {
+    if (window.regionCsvLoadedRegion === regionCode &&
+        window.regionData &&
+        Array.isArray(window.regionPrefData)) {
         return true;
     }
 
-    try {
-        const text = await fetchRegionCsvText();
-        const lines = text.trim().split('\n');
-        if (lines.length < 2) return false;
+    if (window.regionCsvLoadPromise && window.regionCsvLoadingRegion === regionCode) {
+        return window.regionCsvLoadPromise;
+    }
 
-        const headers = lines[0].split(',').map(h => h.trim());
-        const typeIdx  = headers.findIndex(h => h.toLowerCase() === 'type');
-        const latIdx   = headers.findIndex(h => h.toLowerCase() === 'lat');
-        const lngIdx   = headers.findIndex(h => h.toLowerCase() === 'lng');
-        const zoomIdx  = headers.findIndex(h => h.toLowerCase() === 'zoom');
-        const nameIdx  = headers.findIndex(h => h.toLowerCase() === 'name');
-        const urlIdx   = headers.findIndex(h => h.toLowerCase() === 'url');
-        const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
+    window.regionCsvLoadingRegion = regionCode;
+    window.regionCsvLoadPromise = (async () => {
+        try {
+            const csvData = await loadRegionCsvData();
+            if (!csvData || !csvData.headers.includes('type')) return false;
 
-        if (typeIdx === -1) return false;
+            const headers = csvData.headers;
+            const typeIdx = headers.indexOf('type');
+            const latIdx = headers.indexOf('lat');
+            const lngIdx = headers.indexOf('lng');
+            const zoomIdx = headers.indexOf('zoom');
+            const nameIdx = headers.indexOf('name');
+            const urlIdx = headers.indexOf('url');
+            const notesIdx = headers.indexOf('notes');
 
-        window.regionData = null;
-        window.regionPrefData = [];
+            window.regionData = null;
+            window.regionPrefData = [];
 
-        for (let i = 1; i < lines.length; i++) {
-            if (!lines[i]) continue;
-            const cols = lines[i].split(',').map(c => c.trim());
-            const type = cols[typeIdx];
-
-            if (type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
-                const name = nameIdx !== -1 ? cols[nameIdx] : '地域エリア';
-                const lat = parseFloat(cols[latIdx]);
-                const lng = parseFloat(cols[lngIdx]);
-                const zoom = parseFloat(cols[zoomIdx]);
-                window.regionData = { name, lat, lng, zoom };
-            }
-
-            if (type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
-                const urlVal = cols[urlIdx];
-                const prefName = cols[notesIdx];
-                if (!urlVal) continue;
-
-                const parts = urlVal.split('/');
-                let prefCode = '';
-                let lat, lng;
-
-                if (parts.length >= 4) {
-                    prefCode = parts[1].split('_')[0];
-                    lat = parseFloat(parts[2]);
-                    lng = parseFloat(parts[3]);
-                } else if (parts.length === 3) {
-                    prefCode = parts[0].split('_')[0];
-                    lat = parseFloat(parts[1]);
-                    lng = parseFloat(parts[2]);
-                } else {
-                    continue;
+            for (const row of csvData.rows) {
+                if (row.type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
+                    window.regionData = {
+                        name: nameIdx !== -1 ? row.name : '地域エリア',
+                        lat: parseFloat(row.lat),
+                        lng: parseFloat(row.lng),
+                        zoom: parseFloat(row.zoom)
+                    };
                 }
 
-                if (isNaN(lat) || isNaN(lng)) continue;
+                if (row.type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
+                    const urlVal = row.url;
+                    const prefName = row.notes;
+                    if (!urlVal) continue;
 
-                window.regionPrefData.push({
-                    regionCode: regionCode,
-                    prefCode: prefCode,
-                    prefName: prefName,
-                    lat: lat,
-                    lng: lng
-                });
+                    const parts = urlVal.split('/');
+                    let prefCode = '';
+                    let lat, lng;
+
+                    if (parts.length >= 4) {
+                        prefCode = parts[1].split('_')[0];
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
+                    } else if (parts.length === 3) {
+                        prefCode = parts[0].split('_')[0];
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    } else {
+                        continue;
+                    }
+
+                    if (isNaN(lat) || isNaN(lng)) continue;
+
+                    window.regionPrefData.push({
+                        regionCode,
+                        prefCode,
+                        prefName,
+                        lat,
+                        lng
+                    });
+                }
+            }
+
+            window.regionCsvLoadedRegion = regionCode;
+            return !!window.regionData;
+        } catch (err) {
+            console.error("Region CSVの読み込みエラー:", err);
+            return false;
+        } finally {
+            if (window.regionCsvLoadingRegion === regionCode) {
+                window.regionCsvLoadPromise = null;
+                window.regionCsvLoadingRegion = null;
             }
         }
+    })();
 
-        return !!window.regionData;
-    } catch (err) {
-        console.error("Region CSVの読み込みエラー:", err);
-        return false;
-    }
+    return window.regionCsvLoadPromise;
 }
 
 
