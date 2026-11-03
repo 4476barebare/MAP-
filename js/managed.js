@@ -189,6 +189,16 @@ async function region_management() {
     if (typeof updateSeoMeta === 'function') updateSeoMeta();
 
     const prefList = (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean);
+
+    // 県別スポットデータと同時に、道路・等深線・ICの共通JSONは通信だけ先行させる。
+    Promise.all([
+        typeof window.loadRoadData === 'function' ? window.loadRoadData() : Promise.resolve(null),
+        typeof DepthMapController !== 'undefined' ? DepthMapController.loadData() : Promise.resolve(null),
+        typeof loadICData === 'function' ? loadICData() : Promise.resolve(null)
+    ]).catch(error => {
+        console.error('共通データ先行取得エラー:', error);
+    });
+
     await Promise.all(prefList.map(prefCode => fetchSinglePrefSpots(prefCode)));
 
     // マーカーは天気・fishの取得を待たずに生成を開始
