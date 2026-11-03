@@ -696,10 +696,11 @@ async function region_management() {
 // 魚種データ処理
 // ==========================================
 
-// ==========================================\n// ★ 魚種データ取得・付与\n// ==========================================
+// ==========================================
+// ★ 魚種データ取得・付与
+// ==========================================
 window.fishDataCache = window.fishDataCache || {};
 window.fishDataPromises = window.fishDataPromises || {};
-window.fishDataPromise = null;
 
 function loadFishDataForPref(pref, fishUrl) {
     if (!pref || !fishUrl) return Promise.resolve(null);
@@ -735,7 +736,6 @@ function loadFishDataForPref(pref, fishUrl) {
 function loadFishDataAsync(pref, fishUrl) {
     if (!pref || !fishUrl) return Promise.resolve(null);
     const promise = loadFishDataForPref(pref, fishUrl);
-    window.fishDataPromise = promise;
     return promise.then(fishData => {
         if (fishData && window.currentPref === pref) {
             window.fishData = fishData;
@@ -963,12 +963,6 @@ window.loadSnsCatchData = async function(regionCode) {
 // ソナー本体描画
 window.showSnsSonarLayer = async function(customOptions = {}) {
   if (!window.map) return;
-
-  const existingPane = window.map.getPane('snsSonarPane');
-  //if (window._isSnsSonarOpaque || (existingPane && existingPane.style.opacity === '1')) {
-  //  window.hideSnsSonarLayer();
-  //  return;
-  //}
 
   const opts = {
     ...DEFAULT_SNS_SONAR_OPTIONS,
