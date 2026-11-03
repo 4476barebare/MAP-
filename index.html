@@ -1373,6 +1373,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.currentRegion = getRegionCode();
     window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
 
+    // クエリ反映前の状態を確認し、ページ初期表示かどうかを確定する。
+    window.isInitialMapLoad = (
+        !window.currentPref &&
+        !window.currentAreaId &&
+        !window.currentSpotId &&
+        !window.prefData &&
+        (!Array.isArray(window.areaData) || window.areaData.length === 0) &&
+        (!Array.isArray(window.spotData) || window.spotData.length === 0) &&
+        !window.currentHash
+    );
+
     if (params.get('pref')) {
         await applyQueryToStateFromCsv();
     }
@@ -1380,6 +1391,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (typeof routeUpdate === 'function') {
         await routeUpdate();
     }
+
+    // 初期URL復帰が完了したら、以後のユーザー操作ではタイル待機を行わない。
+    window.isInitialMapLoad = false;
 
     // ★ タイル描画完了後、ドット・道路・等深線の次に裏データと記事一覧を順番にバトンリレー実行する
     if (typeof window.runAfterTileLoad === 'function') {
@@ -1432,7 +1446,7 @@ async function routeUpdate() {
                 setIdealQuery('area', parentArea.name);
 
                 if (typeof drawLocation === 'function') {
-                    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+                    await drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
                 }
 
                 if (window.map) {
@@ -1456,7 +1470,7 @@ async function routeUpdate() {
             window._selectSpotCompleted = true;
 
             if (typeof drawLocation === 'function') {
-                drawLocation(spot.name, spot.lat, spot.lng, 13);
+                await drawLocation(spot.name, spot.lat, spot.lng, 13);
             }
             
             if (window.map) {
@@ -1498,7 +1512,7 @@ async function routeUpdate() {
         setIdealQuery('spot', null);      
 
         const safeZoom = area.zoom || window.prefData.zoom;
-        if (typeof drawLocation === 'function') drawLocation(area.name, area.lat, area.lng, safeZoom);
+        if (typeof drawLocation === 'function') await drawLocation(area.name, area.lat, area.lng, safeZoom);
         
         if (typeof renderAreaGuide === 'function') renderAreaGuide();
         if (typeof renderSpotRanking === 'function') renderSpotRanking();
@@ -1529,7 +1543,7 @@ async function routeUpdate() {
                           Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
                           window.map.getZoom() === targetZoom);
 
-        if (typeof drawLocation === 'function') drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        if (typeof drawLocation === 'function') await drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
         
         const finalizePref = () => {
             if (window.map) window.map.invalidateSize(true);
