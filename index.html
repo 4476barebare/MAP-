@@ -1504,10 +1504,6 @@ async function routeUpdate() {
             setIdealQuery('spot', spot.name);
             window._selectSpotCompleted = true;
 
-            if (typeof drawLocation === 'function') {
-                await drawLocation(spot.name, spot.lat, spot.lng, 13);
-            }
-            
             if (window.map) {
                 window.map.once('moveend', () => {
                     window.map.invalidateSize(true);
@@ -1521,6 +1517,10 @@ async function routeUpdate() {
                         if (typeof showFishPopup === 'function') showFishPopup(spot);
                     }
                 });
+            }
+
+            if (typeof drawLocation === 'function') {
+                await drawLocation(spot.name, spot.lat, spot.lng, 13);
             }
             
             requestAnimationFrame(() => {
