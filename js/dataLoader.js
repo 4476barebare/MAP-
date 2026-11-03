@@ -11,45 +11,58 @@ window.currentAreaId = null;
 // ★ 魚データ(fish.json)をバックグラウンドで取得・付与する関数
 // ==========================================
 window.fishDataCache = window.fishDataCache || {};
+window.fishDataPromises = window.fishDataPromises || {};
 window.fishDataPromise = null;
 
-function loadFishDataAsync(pref, fishUrl) {
+function loadFishDataForPref(pref, fishUrl) {
     if (!pref || !fishUrl) return Promise.resolve(null);
-
     if (window.fishDataCache[pref]) {
-        window.fishData = window.fishDataCache[pref];
-        if (window.spotData) applyFishDataToSpots(window.spotData, window.fishData);
-        return Promise.resolve(window.fishData);
+        const cachedSpots = window.prefSpotData?.[pref];
+        if (Array.isArray(cachedSpots)) applyFishDataToSpots(cachedSpots, window.fishDataCache[pref]);
+        return Promise.resolve(window.fishDataCache[pref]);
     }
+    if (window.fishDataPromises[pref]) return window.fishDataPromises[pref];
 
-    window.fishDataPromise = fetch(fishUrl)
-        .then(res => (res.ok ? res.json() : null))
+    window.fishDataPromises[pref] = fetch(fishUrl)
+        .then(res => {
+            if (!res.ok) throw new Error("fish.json fetch failed: " + res.status);
+            return res.json();
+        })
         .then(fishData => {
-            if (fishData) {
-                window.fishData = fishData;
+            if (fishData && typeof fishData === 'object') {
                 window.fishDataCache[pref] = fishData;
-                if (window[`${pref}_spotData`]) {
-                    applyFishDataToSpots(window[`${pref}_spotData`], fishData);
-                }
-                if (window.currentPref === pref && window.spotData) {
-                    applyFishDataToSpots(window.spotData, fishData);
-                    if (window.currentSpotId) {
-                        const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
-                        if (activeSpot && activeSpot.URL) {
-                            if (typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
-                            if (typeof updateSeoMeta === 'function') updateSeoMeta();
-                        }
-                    }
-                }
+                const targetSpots = window.prefSpotData?.[pref];
+                if (Array.isArray(targetSpots)) applyFishDataToSpots(targetSpots, fishData);
             }
             return fishData;
         })
         .catch(error => {
-            console.error('魚データ読み込みエラー:', error);
+            delete window.fishDataPromises[pref];
+            console.error('魚データ読み込みエラー:', pref, error);
             return null;
         });
 
-    return window.fishDataPromise;
+    return window.fishDataPromises[pref];
+}
+
+function loadFishDataAsync(pref, fishUrl) {
+    if (!pref || !fishUrl) return Promise.resolve(null);
+    const promise = loadFishDataForPref(pref, fishUrl);
+    window.fishDataPromise = promise;
+    return promise.then(fishData => {
+        if (fishData && window.currentPref === pref) {
+            window.fishData = fishData;
+            if (window.spotData) applyFishDataToSpots(window.spotData, fishData);
+            if (window.currentSpotId && window.spotData) {
+                const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                if (activeSpot && activeSpot.URL) {
+                    if (typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
+                    if (typeof updateSeoMeta === 'function') updateSeoMeta();
+                }
+            }
+        }
+        return fishData;
+    });
 }
 
 // ==========================================
