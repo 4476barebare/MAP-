@@ -3463,98 +3463,98 @@ let trunkRenderer = null;
 // JSONデータのメモリキャッシュ
 let cachedMotorwayData = null;
 let cachedTrunkData = null;
+let roadDataPromise = null;
+let roadRenderPromise = null;
 
-// ★ 非同期状態管理用フラグ
 window.isRoadReady = false;
 window._isRoadLoading = false;
-window._shouldShowRoad = false; // 表示すべき画面(広域・エリア等)かどうかのフラグ
+window._shouldShowRoad = false;
 
-function initRoadLayers(map) {
-    if (window.isRoadReady || window._isRoadLoading) return Promise.resolve();
-    window._isRoadLoading = true;
-
-    // Pane設定
-    if (!map.getPane('trunkPane')) {
-        map.createPane('trunkPane');
-        const trunkPane = map.getPane('trunkPane');
-        trunkPane.style.zIndex = 401;
-        trunkPane.style.opacity = '0'; // 最初は透明
-        trunkPane.style.transition = 'opacity 2s ease'; // ★ フェードイン用
-    }
-    if (!map.getPane('motorwayPane')) {
-        map.createPane('motorwayPane');
-        const motorwayPane = map.getPane('motorwayPane');
-        motorwayPane.style.zIndex = 402;
-        motorwayPane.style.filter = 'drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.7))';
-        motorwayPane.style.opacity = '0'; // 最初は透明
-        motorwayPane.style.transition = 'opacity 2s ease'; // ★ フェードイン用
-    }
-
-    // SVGレンダラー
-    trunkRenderer = L.svg({ pane: 'trunkPane', padding: 1.5 });
-    motorwayRenderer = L.svg({ pane: 'motorwayPane', padding: 1.5 });
-
-    roadLayerGroup = L.layerGroup();
-
+// 道路JSONの取得のみ。読み込み中・読み込み済みなら既存Promise/データを再利用する。
+window.loadRoadData = function() {
+    if (cachedMotorwayData && cachedTrunkData) return Promise.resolve([cachedMotorwayData, cachedTrunkData]);
+    if (roadDataPromise) return roadDataPromise;
     const regionCode = window.currentRegion || 'KANTO';
-
-    return Promise.all([
-        cachedMotorwayData ? Promise.resolve(cachedMotorwayData) : fetch(`/${regionCode}/enc_motorway.json`, { priority: 'low' }).then(r => r.ok ? r.json() : null),
-        cachedTrunkData ? Promise.resolve(cachedTrunkData) : fetch(`/${regionCode}/enc_trunk.json`, { priority: 'low' }).then(r => r.ok ? r.json() : null)
+    roadDataPromise = Promise.all([
+        fetch(`/${regionCode}/enc_motorway.json`, { priority: 'low' }).then(r => {
+            if (!r.ok) throw new Error('motorway JSON fetch failed: ' + r.status);
+            return r.json();
+        }),
+        fetch(`/${regionCode}/enc_trunk.json`, { priority: 'low' }).then(r => {
+            if (!r.ok) throw new Error('trunk JSON fetch failed: ' + r.status);
+            return r.json();
+        })
     ]).then(([motorwayData, trunkData]) => {
         cachedMotorwayData = motorwayData || [];
         cachedTrunkData = trunkData || [];
-
-        // ★ ポリライン生成を1フレーム8ms以内に分割し、カクつき（TBT悪化）をゼロにする
-        return new Promise(resolve => {
-            let mIdx = 0;
-            let tIdx = 0;
-
-            function buildRoadSlice() {
-                const start = performance.now();
-
-                while (mIdx < cachedMotorwayData.length && (performance.now() - start) < 4) {
-                    const item = cachedMotorwayData[mIdx++];
-                    const polyline = L.Polyline.fromEncoded(item.p, {
-                        className: 'road-motorway',
-                        color: '#155934',
-                        interactive: false,
-                        renderer: motorwayRenderer
-                    });
-                    roadLayerGroup.addLayer(polyline);
-                }
-
-                while (tIdx < cachedTrunkData.length && (performance.now() - start) < 4) {
-                    const item = cachedTrunkData[tIdx++];
-                    const polyline = L.Polyline.fromEncoded(item.p, {
-                        className: 'road-trunk',
-                        color: '#DCDCDC',
-                        interactive: false,
-                        renderer: trunkRenderer
-                    });
-                    roadLayerGroup.addLayer(polyline);
-                }
-
-                if (mIdx < cachedMotorwayData.length || tIdx < cachedTrunkData.length) {
-                    requestAnimationFrame(buildRoadSlice);
-                } else {
-                    window.isRoadReady = true;
-                    window._isRoadLoading = false;
-                    map.on('zoomend', updateRoadStyle);
-                    if (window._shouldShowRoad) {
-                        triggerRoadFadeIn();
-                    }
-                    resolve();
-                }
-            }
-
-            requestAnimationFrame(buildRoadSlice);
-        });
-
-    }).catch(e => {
-        console.error('道路データのバックグラウンド読み込みエラー:', e);
-        window._isRoadLoading = false;
+        return [cachedMotorwayData, cachedTrunkData];
+    }).catch(error => {
+        roadDataPromise = null;
+        console.error('道路JSON取得エラー:', error);
+        throw error;
     });
+    return roadDataPromise;
+};
+
+// 取得済みJSONから道路レイヤーを生成・描画する。
+function renderRoadLayers(map) {
+    if (!map || window.isRoadReady) return Promise.resolve();
+    if (roadRenderPromise) return roadRenderPromise;
+    window._isRoadLoading = true;
+    if (!map.getPane('trunkPane')) {
+        map.createPane('trunkPane');
+        const pane = map.getPane('trunkPane');
+        pane.style.zIndex = 401;
+        pane.style.opacity = '0';
+        pane.style.transition = 'opacity 2s ease';
+    }
+    if (!map.getPane('motorwayPane')) {
+        map.createPane('motorwayPane');
+        const pane = map.getPane('motorwayPane');
+        pane.style.zIndex = 402;
+        pane.style.filter = 'drop-shadow(2px 3px 4px rgba(0, 0, 0, 0.7))';
+        pane.style.opacity = '0';
+        pane.style.transition = 'opacity 2s ease';
+    }
+    trunkRenderer = L.svg({ pane: 'trunkPane', padding: 1.5 });
+    motorwayRenderer = L.svg({ pane: 'motorwayPane', padding: 1.5 });
+    roadLayerGroup = L.layerGroup();
+
+    roadRenderPromise = window.loadRoadData().then(() => new Promise(resolve => {
+        let mIdx = 0, tIdx = 0;
+        function buildRoadSlice() {
+            const start = performance.now();
+            while (mIdx < cachedMotorwayData.length && (performance.now() - start) < 4) {
+                const item = cachedMotorwayData[mIdx++];
+                roadLayerGroup.addLayer(L.Polyline.fromEncoded(item.p, {
+                    className: 'road-motorway', color: '#155934',
+                    interactive: false, renderer: motorwayRenderer
+                }));
+            }
+            while (tIdx < cachedTrunkData.length && (performance.now() - start) < 4) {
+                const item = cachedTrunkData[tIdx++];
+                roadLayerGroup.addLayer(L.Polyline.fromEncoded(item.p, {
+                    className: 'road-trunk', color: '#DCDCDC',
+                    interactive: false, renderer: trunkRenderer
+                }));
+            }
+            if (mIdx < cachedMotorwayData.length || tIdx < cachedTrunkData.length) {
+                requestAnimationFrame(buildRoadSlice);
+            } else {
+                window.isRoadReady = true;
+                window._isRoadLoading = false;
+                map.on('zoomend', updateRoadStyle);
+                if (window._shouldShowRoad) triggerRoadFadeIn();
+                resolve();
+            }
+        }
+        requestAnimationFrame(buildRoadSlice);
+    })).catch(error => {
+        window._isRoadLoading = false;
+        roadRenderPromise = null;
+        console.error('道路レイヤー描画エラー:', error);
+    });
+    return roadRenderPromise;
 }
 
 // 準備完了後、レイヤーをマップに追加してフェードインする処理
@@ -3619,18 +3619,14 @@ function updateRoadStyle() {
 window.showRoadLayers = function() {
     window._shouldShowRoad = true;
     if (!window.map) return;
-
     if (window.isRoadReady) {
-        if (!window.map.hasLayer(roadLayerGroup)) {
-            roadLayerGroup.addTo(window.map);
-        }
+        if (!window.map.hasLayer(roadLayerGroup)) roadLayerGroup.addTo(window.map);
         updateRoadStyle();
     } else {
-        // ★ 初回ロード時は、ベースタイルの読み込み完了キューで道路JSONの取得・分割描画を行う
+        // JSON取得は先行し、ベースタイル完了後のキューでは描画だけを行う
         window.runAfterTileLoad(() => {
-            if (window._shouldShowRoad && window.map) {
-                return initRoadLayers(window.map);
-            }
+            if (!window._shouldShowRoad || !window.map) return;
+            return renderRoadLayers(window.map);
         });
     }
 };
