@@ -221,7 +221,7 @@ async function loadLocationJSON() {
 
     return { main, areas, spots };
 }
-function drawLocation(name, lat, lng, zoom, options = {}) {
+async function drawLocation(name, lat, lng, zoom, options = {}) {
 
   const defaultOptions = {
     center: [lat, lng],
@@ -266,12 +266,21 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         }
     });
 
-    // ★ ベースタイルの読み込み完了イベントで keepBuffer を 2 に戻し、後続キューを順次スタート
+    // 初期ロード時は、ベースタイルの読み込みと画面反映が終わるまで呼び出し元を待機させる。
+    let resolveInitialTileLoad;
+    const initialTileLoadPromise = window.isInitialMapLoad
+        ? new Promise(resolve => { resolveInitialTileLoad = resolve; })
+        : null;
+
+    // ベースタイルの読み込み完了イベントで keepBuffer を 2 に戻し、後続キューを順次スタート
     window.gsiLayer.once('load', () => {
         window.gsiLayer.options.keepBuffer = 2;
         requestAnimationFrame(() => {
             if (typeof window._flushTileQueue === 'function') {
                 window._flushTileQueue();
+            }
+            if (resolveInitialTileLoad) {
+                requestAnimationFrame(resolveInitialTileLoad);
             }
         });
     });
@@ -285,7 +294,36 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
         });
     }
 
+    if (initialTileLoadPromise) await initialTileLoadPromise;
     return;
+  }
+
+  // 初期URL復帰中の地図移動も、移動完了後の表示タイルが揃うまで待つ。
+  let initialMoveTilePromise = null;
+  if (window.isInitialMapLoad && window.gsiLayer) {
+      const currentCenter = window.map.getCenter();
+      const currentZoom = window.map.getZoom();
+      const isSameView =
+          Math.abs(currentCenter.lat - lat) < 0.000001 &&
+          Math.abs(currentCenter.lng - lng) < 0.000001 &&
+          currentZoom === zoom;
+
+      if (isSameView) {
+          initialMoveTilePromise = Promise.resolve();
+      } else {
+          initialMoveTilePromise = new Promise(resolve => {
+              window.map.once('moveend', () => {
+                  const finishAfterPaint = () => {
+                      requestAnimationFrame(() => requestAnimationFrame(resolve));
+                  };
+                  if (window.gsiLayer._loading) {
+                      window.gsiLayer.once('load', finishAfterPaint);
+                  } else {
+                      finishAfterPaint();
+                  }
+              });
+          });
+      }
   }
 
   window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
@@ -313,6 +351,8 @@ function drawLocation(name, lat, lng, zoom, options = {}) {
   mapOptions.touchZoom
     ? window.map.touchZoom.enable()
     : window.map.touchZoom.disable();
+
+  if (initialMoveTilePromise) await initialMoveTilePromise;
 }
 
 // ★ ユーザー操作待ちを完全廃止：ベースタイルの load 完了後、1フレームに1タスクずつ順番にバトンリレー実行する
