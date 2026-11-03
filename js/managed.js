@@ -186,6 +186,29 @@ async function region_management() {
         );
     }
 
+    if (typeof updateSeoMeta === 'function') updateSeoMeta();
+
+    const prefList = (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean);
+    await Promise.all(prefList.map(prefCode => fetchSinglePrefSpots(prefCode)));
+
+    // マーカーは天気・fishの取得を待たずに生成を開始
+    if (typeof showAllRegionSpots === 'function') showAllRegionSpots();
+
+    const dataPromises = prefList.map(prefCode => {
+        const fishUrl = `/${window.currentRegion || 'KANTO'}/${prefCode}_fish.json`;
+        return Promise.all([
+            typeof loadRegionWeatherForPref === 'function'
+                ? loadRegionWeatherForPref(prefCode)
+                : Promise.resolve(null),
+            typeof loadFishDataForPref === 'function'
+                ? loadFishDataForPref(prefCode, fishUrl)
+                : Promise.resolve(null)
+        ]);
+    });
+
     renderRegion();
+    await Promise.all(dataPromises);
+    if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
     if (typeof renderSpotRanking === 'function') renderSpotRanking();
+    return true;
 }
