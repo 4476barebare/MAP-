@@ -574,7 +574,8 @@ async function renderSpotRanking(retryCount = 0) {
         let url = "#";
 
         if (spotObj) {
-            const regionName = window.currentRegion || 'KANTO';
+            const regionCode = window.currentRegion || 'KANTO';
+            const regionName = window.regionData?.name || (regionCode === 'KANTO' ? '関東地方' : regionCode);
             let prefName = window.prefData ? window.prefData.notes : window.currentPref;
             if (!prefName && window.regionPrefData) {
                 const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
@@ -603,11 +604,11 @@ async function renderSpotRanking(retryCount = 0) {
             ? '<span>風: <strong style="color:#191970;">' + item.wind + 'm</strong></span>'
             : '';
         const snsHtml = item.hasSnsBonus
-            ? '<span style="display:block; text-align:right; font-size:6px; line-height:1.2; color:#687386; margin-top:3px;">SNS釣果あり</span>'
+            ? '<span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span>'
             : '';
 
         html += '<li>' +
-            '<a href="' + url + '" class="recommend-spot-link" style="display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;">' +
+            '<a href="' + url + '" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;">' +
                 '<span style="display:flex; justify-content:space-between; align-items:center; width:100%;">' +
                     '<span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">' + item.name + '</span>' +
                     '<span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;">' +
@@ -1401,6 +1402,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数
 // ==========================================
 async function routeUpdate() {
+    // 旧URLなどに残る region=KANTO を表示名へ正規化する。
+    const regionParam = new URLSearchParams(window.location.search).get('region');
+    const regionName = Object.keys(REGION_MAP).find(name => REGION_MAP[name] === regionParam);
+    if (regionName) setIdealQuery('region', regionName);
     if (!window.currentPref) {
         await region_management();
         return;
