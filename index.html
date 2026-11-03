@@ -951,30 +951,74 @@ function formatDate(str) {
 }
 
 // ==========================================
-// ★ 1. Region CSVを1回だけ取得して使い回すキャッシュ関数
+// ★ Region CSVを1回取得・共通解析して使い回す
 // ==========================================
-window._regionCsvTextPromise = null;
-window._regionCsvTextUrl = null;
-function fetchRegionCsvText() {
+window.regionCsvParsedData = null;
+window.regionCsvParsedPromise = null;
+window.regionCsvParsedRegion = null;
+window.regionCsvParsedUrl = null;
+
+function loadRegionCsvData() {
     const regionCode = window.currentRegion || 'KANTO';
     const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
 
-    if (!window._regionCsvTextPromise || window._regionCsvTextUrl !== rUrl) {
-        window._regionCsvTextUrl = rUrl;
-        window._regionCsvTextPromise = fetch(rUrl)
-            .then(res => {
-                if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
-                return res.text();
-            })
-            .catch(err => {
-                if (window._regionCsvTextUrl === rUrl) {
-                    window._regionCsvTextPromise = null;
-                    window._regionCsvTextUrl = null;
-                }
-                throw err;
-            });
+    if (window.regionCsvParsedData &&
+        window.regionCsvParsedRegion === regionCode &&
+        window.regionCsvParsedUrl === rUrl) {
+        return Promise.resolve(window.regionCsvParsedData);
     }
-    return window._regionCsvTextPromise;
+
+    if (window.regionCsvParsedPromise &&
+        window.regionCsvParsedRegion === regionCode &&
+        window.regionCsvParsedUrl === rUrl) {
+        return window.regionCsvParsedPromise;
+    }
+
+    window.regionCsvParsedData = null;
+    window.regionCsvParsedRegion = regionCode;
+    window.regionCsvParsedUrl = rUrl;
+
+    window.regionCsvParsedPromise = fetch(rUrl)
+        .then(res => {
+            if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
+            return res.text();
+        })
+        .then(text => {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) throw new Error("Region CSV is empty: " + rUrl);
+
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const rows = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue;
+                const cols = lines[i].split(',').map(c => c.trim());
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = cols[index] || '';
+                });
+                rows.push(row);
+            }
+
+            const parsedData = { regionCode, url: rUrl, headers, rows };
+            if (window.regionCsvParsedRegion === regionCode &&
+                window.regionCsvParsedUrl === rUrl) {
+                window.regionCsvParsedData = parsedData;
+            }
+            return parsedData;
+        })
+        .catch(err => {
+            if (window.regionCsvParsedRegion === regionCode &&
+                window.regionCsvParsedUrl === rUrl) {
+                window.regionCsvParsedPromise = null;
+                window.regionCsvParsedData = null;
+                window.regionCsvParsedRegion = null;
+                window.regionCsvParsedUrl = null;
+            }
+            throw err;
+        });
+
+    return window.regionCsvParsedPromise;
 }
 
 // ==========================================
@@ -1034,20 +1078,15 @@ async function fetchAllRegionSpots() {
 
     window._allRegionSpotsPromise = (async () => {
         try {
-            const text = await fetchRegionCsvText();
-            const lines = text.trim().split('\n');
-            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-            const typeIdx = headers.indexOf('type');
-            const urlIdx = headers.indexOf('url');
-            if (typeIdx === -1 || urlIdx === -1) return rebuildAllSpotData();
+            const csvData = await loadRegionCsvData();
+            if (!csvData.headers.includes('type') || !csvData.headers.includes('url')) {
+                return rebuildAllSpotData();
+            }
 
             const prefList = [];
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i]) continue;
-                const cols = lines[i].split(',').map(c => c.trim());
-                if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
-                    const urlVal = cols[urlIdx];
-                    const prefCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
+            for (const row of csvData.rows) {
+                if (row.type === 'pref' && row.url) {
+                    const prefCode = row.url.split('/')[1]?.split('_')[0] || row.url.split('/')[0].split('_')[0];
                     if (prefCode && !prefList.includes(prefCode)) prefList.push(prefCode);
                 }
             }
@@ -1079,40 +1118,29 @@ async function applyQueryToStateFromCsv() {
 
     if (window.regionUrl) {
         try {
-            const text = await fetchRegionCsvText();
-            const lines = text.trim().split('\n');
-            
-            if (lines.length > 0) {
-                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-                const typeIdx  = headers.indexOf('type');
-                const nameIdx  = headers.indexOf('name');
-                const notesIdx = headers.indexOf('notes');
-                const urlIdx   = headers.indexOf('url');
-                
-                if (notesIdx !== -1 && urlIdx !== -1) {
-                    for (let i = 1; i < lines.length; i++) {
-                        if (!lines[i]) continue;
-                        const cols = lines[i].split(',').map(c => c.trim());
-                        if (typeIdx !== -1 && cols[typeIdx] !== 'pref') continue;
+            const csvData = await loadRegionCsvData();
 
-                        const csvNote = cols[notesIdx] || '';
-                        const csvName = nameIdx !== -1 ? cols[nameIdx] : '';
-                        const urlVal  = cols[urlIdx] || '';
-                        const extractedCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0]?.split('_')[0] || csvName;
+            if (csvData.headers.includes('notes') && csvData.headers.includes('url')) {
+                for (const row of csvData.rows) {
+                    if (csvData.headers.includes('type') && row.type !== 'pref') continue;
 
-                        if (
-                            csvNote && (
-                                csvNote === qPref ||
-                                csvNote.includes(qPref) ||
-                                qPref.includes(csvNote) ||
-                                csvName === qPref ||
-                                extractedCode === qPref
-                            )
-                        ) {
-                            window.currentPref = csvName || extractedCode;
-                            window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
-                            break;
-                        }
+                    const csvNote = row.notes || '';
+                    const csvName = row.name || '';
+                    const urlVal = row.url || '';
+                    const extractedCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0]?.split('_')[0] || csvName;
+
+                    if (
+                        csvNote && (
+                            csvNote === qPref ||
+                            csvNote.includes(qPref) ||
+                            qPref.includes(csvNote) ||
+                            csvName === qPref ||
+                            extractedCode === qPref
+                        )
+                    ) {
+                        window.currentPref = csvName || extractedCode;
+                        window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
+                        break;
                     }
                 }
             }
@@ -1436,6 +1464,7 @@ async function routeUpdate() {
     if (!isReady) return;
 
     if (window.currentSpotId) {
+        if (typeof loadRegionCSV === 'function') await loadRegionCSV();
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
@@ -1510,6 +1539,7 @@ async function routeUpdate() {
     }
 
     if (window.currentAreaId) {
+        if (typeof loadRegionCSV === 'function') await loadRegionCSV();
         const safeAreaId = window.currentAreaId || ""; 
         const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
         if (!area) return;
@@ -1539,6 +1569,7 @@ async function routeUpdate() {
     }
 
     if (window.prefData) {
+        if (typeof loadRegionCSV === 'function') await loadRegionCSV();
         setIdealQuery('pref', window.prefData.notes); 
         setIdealQuery('area', null);                 
         setIdealQuery('spot', null);                 
