@@ -8,64 +8,6 @@ window.spotData = []
 window.currentAreaId = null;
 
 // ==========================================
-// ★ 魚データ(fish.json)をバックグラウンドで取得・付与する関数
-// ==========================================
-window.fishDataCache = window.fishDataCache || {};
-window.fishDataPromises = window.fishDataPromises || {};
-window.fishDataPromise = null;
-
-function loadFishDataForPref(pref, fishUrl) {
-    if (!pref || !fishUrl) return Promise.resolve(null);
-    if (window.fishDataCache[pref]) {
-        const cachedSpots = window.prefSpotData?.[pref];
-        if (Array.isArray(cachedSpots)) applyFishDataToSpots(cachedSpots, window.fishDataCache[pref]);
-        return Promise.resolve(window.fishDataCache[pref]);
-    }
-    if (window.fishDataPromises[pref]) return window.fishDataPromises[pref];
-
-    window.fishDataPromises[pref] = fetch(fishUrl)
-        .then(res => {
-            if (!res.ok) throw new Error("fish.json fetch failed: " + res.status);
-            return res.json();
-        })
-        .then(fishData => {
-            if (fishData && typeof fishData === 'object') {
-                window.fishDataCache[pref] = fishData;
-                const targetSpots = window.prefSpotData?.[pref];
-                if (Array.isArray(targetSpots)) applyFishDataToSpots(targetSpots, fishData);
-            }
-            return fishData;
-        })
-        .catch(error => {
-            delete window.fishDataPromises[pref];
-            console.error('魚データ読み込みエラー:', pref, error);
-            return null;
-        });
-
-    return window.fishDataPromises[pref];
-}
-
-function loadFishDataAsync(pref, fishUrl) {
-    if (!pref || !fishUrl) return Promise.resolve(null);
-    const promise = loadFishDataForPref(pref, fishUrl);
-    window.fishDataPromise = promise;
-    return promise.then(fishData => {
-        if (fishData && window.currentPref === pref) {
-            window.fishData = fishData;
-            if (window.spotData) applyFishDataToSpots(window.spotData, fishData);
-            if (window.currentSpotId && window.spotData) {
-                const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
-                if (activeSpot && activeSpot.URL) {
-                    if (typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
-                    if (typeof updateSeoMeta === 'function') updateSeoMeta();
-                }
-            }
-        }
-        return fishData;
-    });
-}
-
-// ==========================================
 // ★ スポット用データを金庫(allspotData)から読み込む関数
 // ==========================================
 async function loadLocationJSON() {
@@ -403,72 +345,6 @@ window.runAfterTileLoad = function(callback) {
     }
 };
 
-function applyFishDataToSpots(spots, fishData) {
-
-    if (!Array.isArray(spots)) return;
-
-    if (!fishData || typeof fishData !== 'object') {
-        spots.forEach(spot => {
-            spot.URL = "";
-        });
-        return;
-    }
-
-    const fishDict = {};
-
-    for (const regKey in fishData) {
-
-        const areaSpots = fishData[regKey];
-
-        if (!areaSpots || typeof areaSpots !== 'object') {
-            continue;
-        }
-
-        for (const spotName in areaSpots) {
-            fishDict[spotName] = areaSpots[spotName];
-        }
-    }
-
-    spots.forEach(spot => {
-
-        const spotFishData = fishDict[spot.name];
-
-        if (!spotFishData) {
-            spot.URL = "";
-            return;
-        }
-
-        const fishList = [];
-
-        for (const fishName in spotFishData) {
-
-            const info = spotFishData[fishName];
-
-            if (
-                info &&
-                typeof info.coords === 'string' &&
-                info.coords !== ''
-            ) {
-
-                const points = info.coords.split('|');
-
-                points.forEach(pt => {
-
-                    const [lat, lng] = pt.split(',');
-
-                    if (lat && lng) {
-                        fishList.push(
-                            `${fishName}|${lat}|${lng}`
-                        );
-                    }
-
-                });
-            }
-        }
-
-        spot.URL = fishList.join(',');
-    });
-}
 // ==========================================
 // ★ SEO対策用：HTML文字列を一括生成する関数（対象魚非表示版）
 // ==========================================
