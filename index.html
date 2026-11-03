@@ -1464,7 +1464,6 @@ async function routeUpdate() {
     if (!isReady) return;
 
     if (window.currentSpotId) {
-        if (typeof loadRegionCSV === 'function') await loadRegionCSV();
         const spotId = String(window.currentSpotId).split("_");
         const safeAreaId = window.currentAreaId || ""; 
         
