@@ -282,69 +282,13 @@ window.prefSpotLayerCache = {};
 // Service Workerを可能な限り早く登録する。
 // 初回訪問では制御開始前に発生した通信を捕捉できないため、次回訪問から確実に利用する。
 if ('serviceWorker' in navigator) {
-  // Service Workerから届くタイルキャッシュ診断を画面に表示する。
-  navigator.serviceWorker.addEventListener('message', event => {
-    const data = event.data;
-    if (!data || data.type !== 'TILE_CACHE_DEBUG') return;
-    const path = new URL(data.url).pathname;
-    showdebug('[SW ' + data.result + '] ' + path);
-  });
-
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    showdebug('[SW] controllerchange: ' + (navigator.serviceWorker.controller ? 'controlled' : 'none'));
-  });
-
-  showdebug('[SW] API対応あり / controller=' + (navigator.serviceWorker.controller ? 'あり' : 'なし'));
-
   navigator.serviceWorker.register('/sw.js')
     .then(registration => {
       if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      const activeState = registration.active ? registration.active.state : 'なし';
-      showdebug('[SW] 登録成功 / active=' + activeState);
-
-      if ('caches' in window) {
-        // 全件列挙は行わず、直近のChromeログに出たGSIタイル6枚だけを直接照合する。
-        const testTileUrls = [
-          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/201.jpg',
-          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/455/201.jpg',
-          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/200.jpg',
-          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/455/200.jpg',
-          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/454/202.jpg',
-          'https://cyberjapandata.gsi.go.jp/xyz/ort/9/455/202.jpg'
-        ];
-
-        const runTileCacheProbe = () => {
-          const openStartedAt = performance.now();
-          caches.open('tile-cache-v1').then(cache => {
-            showdebug('[CACHE TEST] open ' + (performance.now() - openStartedAt).toFixed(1) + 'ms');
-
-            return Promise.all(testTileUrls.map(url => {
-              const matchStartedAt = performance.now();
-              return cache.match(url).then(response => {
-                const elapsed = (performance.now() - matchStartedAt).toFixed(1);
-                const path = new URL(url).pathname;
-                showdebug('[CACHE TEST] ' + (response ? 'HIT' : 'MISS') + ' ' + elapsed + 'ms ' + path);
-              });
-            }));
-          }).catch(error => {
-            showdebug('[CACHE TEST] 確認失敗: ' + error.message);
-          });
-        };
-
-        // 初回の地図タイル読み込みと競合しないよう、ページのload後に測定する。
-        if (document.readyState === 'complete') {
-          runTileCacheProbe();
-        } else {
-          window.addEventListener('load', runTileCacheProbe, { once: true });
-        }
-      }
     })
     .catch(err => {
-      showdebug('[SW] 登録失敗: ' + err.message);
       console.error('Service Worker登録失敗:', err);
     });
-} else {
-  showdebug('[SW] API非対応');
 }
 
 // ==========================================
@@ -1421,6 +1365,11 @@ function handleRegionNearest(latlng) {
 // ★ ページ初期ロード時のメインフロー（LCPタイル描画最優先版）
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
+
+    // 地図タイルの読み込みと並行してCache Storageを先行オープンする。
+    if ('caches' in window) {
+        window.tileCacheOpenPromise = caches.open('tile-cache-v1').catch(() => null);
+    }
 
     const params = new URLSearchParams(window.location.search);
 
@@ -2727,12 +2676,6 @@ function renderCrowdImage() {
 
         // 1. 最初の一枚目をフワッとフェードイン
         window.crowdLayers[0].setOpacity(MAX_OPACITY);
-        if (typeof showdebug === 'function') {
-            const pane = window.map.getPane('rainPane');
-            const el = window.crowdLayers[0].getElement();
-            const paneStyle = pane ? window.getComputedStyle(pane) : null;
-            const imageStyle = el ? window.getComputedStyle(el) : null;
-        }
 
         // 2. スライドショー開始 (DOMの生成・破棄は一切行わない)
         window.crowdSlideTimer = setInterval(() => {
