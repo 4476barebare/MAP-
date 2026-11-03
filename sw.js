@@ -1,6 +1,7 @@
 // GSI tile cache: Cache Storage / 14-day retention
 const CACHE_NAME = 'tile-cache-v1';
 const CACHE_META_NAME = 'tile-cache-meta-v1';
+const MAP_DATA_CACHE_NAME = 'map-data-cache-v1';
 const TILE_HOST = 'cyberjapandata.gsi.go.jp';
 const MAX_AGE = 14 * 24 * 60 * 60 * 1000;
 
@@ -10,18 +11,45 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith('map-data-cache-') && key !== MAP_DATA_CACHE_NAME).map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('fetch', event => {
   const request = event.request;
-  if (request.method !== 'GET' || !request.url.includes(TILE_HOST)) return;
+  if (request.method !== 'GET') return;
+  if (isLongLivedMapData(request)) {
+    event.respondWith(handleMapDataRequest(request));
+    return;
+  }
+  if (!request.url.includes(TILE_HOST)) return;
 
   // 地図タイル以外のGSIリソースは対象外
   if (!/\/xyz\/[^/]+\/\d+\/\d+\/\d+\.(?:jpg|jpeg|png|webp)(?:\?|$)/i.test(request.url)) return;
 
   event.respondWith(handleTileRequest(request));
 });
+
+function isLongLivedMapData(request) {
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return false;
+  return /^\/(?:KANTO\/enc_(?:motorway|trunk|depth(?:20|50|100|150|200))\.json|data\/KANTO_geo\.json)$/.test(url.pathname);
+}
+
+async function handleMapDataRequest(request) {
+  const cache = await caches.open(MAP_DATA_CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (response && response.ok) {
+    try { await cache.put(request, response.clone()); }
+    catch (error) { /* 保存失敗時もネットワーク応答を返す */ }
+  }
+  return response;
+}
 
 async function handleTileRequest(request) {
   let cache;
