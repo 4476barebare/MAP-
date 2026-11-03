@@ -30,7 +30,7 @@ self.addEventListener('fetch', event => {
   // 地図タイル以外のGSIリソースは対象外
   if (!/\/xyz\/[^/]+\/\d+\/\d+\/\d+\.(?:jpg|jpeg|png|webp)(?:\?|$)/i.test(request.url)) return;
 
-  event.respondWith(handleTileRequest(request));
+  event.respondWith(handleTileRequest(request, event));
 });
 
 function isLongLivedMapData(request) {
@@ -51,14 +51,34 @@ async function handleMapDataRequest(request) {
   return response;
 }
 
-async function handleTileRequest(request) {
+function reportTileCacheDebug(event, request, result) {
+  if (!event || !event.clientId) return;
+  const report = self.clients.get(event.clientId).then(client => {
+    if (client) {
+      client.postMessage({
+        type: 'TILE_CACHE_DEBUG',
+        url: request.url,
+        result: result
+      });
+    }
+  }).catch(() => {});
+  event.waitUntil(report);
+}
+
+async function handleTileRequest(request, event) {
   let cache;
   let meta;
   try {
     cache = await caches.open(CACHE_NAME);
     meta = await caches.open(CACHE_META_NAME);
   } catch (error) {
-    return fetch(request);
+    reportTileCacheDebug(event, request, 'cache-open-error→fetch');
+    try {
+      return await fetch(request);
+    } catch (fetchError) {
+      reportTileCacheDebug(event, request, 'fetch-error');
+      throw fetchError;
+    }
   }
   const cached = await cache.match(request);
 
@@ -74,35 +94,53 @@ async function handleTileRequest(request) {
       } catch (error) {
         // メタ情報を保存できなくても既存タイルを表示する
       }
+      reportTileCacheDebug(event, request, 'cache-hit-no-meta');
       return cached;
     }
 
-    if (Date.now() - timestamp < MAX_AGE) return cached;
+    if (Date.now() - timestamp < MAX_AGE) {
+      reportTileCacheDebug(event, request, 'cache-hit');
+      return cached;
+    }
 
     // 期限切れは一度ネットワーク更新を試みる
     try {
       const fresh = await fetch(request);
       if (fresh && (fresh.ok || fresh.type === 'opaque')) {
-        await cache.put(request, fresh.clone());
-        await meta.put(request.url, new Response(String(Date.now())));
+        try {
+          await cache.put(request, fresh.clone());
+          await meta.put(request.url, new Response(String(Date.now())));
+        } catch (error) {
+          // 更新保存に失敗しても取得したタイルを返す
+        }
+        reportTileCacheDebug(event, request, 'expired-cache→fetch-update');
         return fresh;
       }
+      reportTileCacheDebug(event, request, 'expired-cache→fetch-failed-status-' + fresh.status);
       return cached;
     } catch (error) {
       // オフライン時は期限切れでも手元のタイルを表示
+      reportTileCacheDebug(event, request, 'expired-cache→fetch-error');
       return cached;
     }
   }
 
-  const response = await fetch(request);
-  if (response && (response.ok || response.type === 'opaque')) {
-    // 保存に失敗しても地図表示自体は止めない
-    try {
-      await cache.put(request, response.clone());
-      await meta.put(request.url, new Response(String(Date.now())));
-    } catch (error) {
-      // ストレージ容量不足などの場合はネットワーク応答をそのまま返す
+  try {
+    const response = await fetch(request);
+    if (response && (response.ok || response.type === 'opaque')) {
+      try {
+        await cache.put(request, response.clone());
+        await meta.put(request.url, new Response(String(Date.now())));
+        reportTileCacheDebug(event, request, 'cache-miss→fetch-and-save');
+      } catch (error) {
+        reportTileCacheDebug(event, request, 'cache-miss→fetch-save-error');
+      }
+    } else {
+      reportTileCacheDebug(event, request, 'cache-miss→fetch-status-' + (response ? response.status : 'no-response'));
     }
+    return response;
+  } catch (error) {
+    reportTileCacheDebug(event, request, 'cache-miss→fetch-error');
+    throw error;
   }
-  return response;
 }
