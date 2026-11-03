@@ -21,13 +21,10 @@ async function loadRegionCSV() {
             if (!csvData || !csvData.headers.includes('type')) return false;
 
             const headers = csvData.headers;
-            const typeIdx = headers.indexOf('type');
             const latIdx = headers.indexOf('lat');
             const lngIdx = headers.indexOf('lng');
             const zoomIdx = headers.indexOf('zoom');
             const nameIdx = headers.indexOf('name');
-            const urlIdx = headers.indexOf('url');
-            const notesIdx = headers.indexOf('notes');
 
             window.regionData = null;
             window.regionPrefData = [];
@@ -41,38 +38,18 @@ async function loadRegionCSV() {
                         zoom: parseFloat(row.zoom)
                     };
                 }
+            }
 
-                if (row.type === 'pref' && urlIdx !== -1 && notesIdx !== -1) {
-                    const urlVal = row.url;
-                    const prefName = row.notes;
-                    if (!urlVal) continue;
+            for (const pref of csvData.prefRows || []) {
+                if (isNaN(pref.lat) || isNaN(pref.lng)) continue;
 
-                    const parts = urlVal.split('/');
-                    let prefCode = '';
-                    let lat, lng;
-
-                    if (parts.length >= 4) {
-                        prefCode = parts[1].split('_')[0];
-                        lat = parseFloat(parts[2]);
-                        lng = parseFloat(parts[3]);
-                    } else if (parts.length === 3) {
-                        prefCode = parts[0].split('_')[0];
-                        lat = parseFloat(parts[1]);
-                        lng = parseFloat(parts[2]);
-                    } else {
-                        continue;
-                    }
-
-                    if (isNaN(lat) || isNaN(lng)) continue;
-
-                    window.regionPrefData.push({
-                        regionCode,
-                        prefCode,
-                        prefName,
-                        lat,
-                        lng
-                    });
-                }
+                window.regionPrefData.push({
+                    regionCode,
+                    prefCode: pref.prefCode,
+                    prefName: pref.prefName,
+                    lat: pref.lat,
+                    lng: pref.lng
+                });
             }
 
             window.regionCsvLoadedRegion = regionCode;
