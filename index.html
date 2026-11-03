@@ -3355,24 +3355,33 @@ function getRegionCode() {
 
 window.icData = [];
 window.isIcLoaded = false;
-async function loadICData() {
-    try {
-        const res = await fetch('data/KANTO_geo.json'); 
-        if (res.ok) {
-            window.icData = await res.json();
+let icDataPromise = null;
+function loadICData() {
+    if (window.isIcLoaded) return Promise.resolve(window.icData);
+    if (icDataPromise) return icDataPromise;
+    icDataPromise = fetch('data/KANTO_geo.json')
+        .then(res => {
+            if (!res.ok) throw new Error('IC JSON fetch failed: ' + res.status);
+            return res.json();
+        })
+        .then(data => {
+            window.icData = data;
             window.isIcLoaded = true;
-            // ★ 追加：スポット画面表示中にICデータが届いたらアクセス情報を再描画し、対象魚・釣果も再連携
             if (window.currentSpotId && window.spotData && typeof renderAccessInfo === 'function') {
                 const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                 if (activeSpot) {
                     renderAccessInfo(activeSpot);
-                    if (typeof waitAndRenderSpotDetails === 'function') {
-                        waitAndRenderSpotDetails(activeSpot.name);
-                    }
+                    if (typeof waitAndRenderSpotDetails === 'function') waitAndRenderSpotDetails(activeSpot.name);
                 }
             }
-        }
-    } catch (err) {}
+            return data;
+        })
+        .catch(error => {
+            icDataPromise = null;
+            console.error('ICデータ読み込みエラー:', error);
+            return null;
+        });
+    return icDataPromise;
 }
 
 // ==========================================
@@ -3785,6 +3794,29 @@ const DepthMapController = (function() {
         '/KANTO/enc_depth200.json'
     ];
 
+    let rawDepthData = null;
+    let depthDataPromise = null;
+
+    // 等深線JSONの取得のみ。5ファイルの通信を並列で開始する。
+    function loadDepthData() {
+        if (rawDepthData) return Promise.resolve(rawDepthData);
+        if (depthDataPromise) return depthDataPromise;
+        depthDataPromise = Promise.all(DEPTH_FILES.map(url =>
+            fetch(url, { priority: 'low' }).then(res => {
+                if (!res.ok) throw new Error(url + '\\nHTTP ' + res.status);
+                return res.json();
+            })
+        )).then(data => {
+            rawDepthData = data;
+            return rawDepthData;
+        }).catch(error => {
+            depthDataPromise = null;
+            console.error('等深線JSON取得エラー:', error);
+            throw error;
+        });
+        return depthDataPromise;
+    }
+
     // パターン3：モダン・モノトーンブルー
     const MULTIPLY_COLORS = {
         20: '#8ca8d9',  // くすみパステルブルー
@@ -3911,12 +3943,10 @@ const DepthMapController = (function() {
             this._loadPromise = (async () => {
                 try {
                     const parsedLayers = [];
-                    // ★ 5ファイルを1ファイルずつ順番に取得・4msスライスでデコードする（同時通信とメインスレッドのロックを完全防止）
+                    // 先行取得済みJSONを受け取り、既存どおり4ms単位で順番にデコードする。
+                    const sourceData = await loadDepthData();
                     for (let index = 0; index < DEPTH_FILES.length; index++) {
-                        const url = DEPTH_FILES[index];
-                        const res = await fetch(url, { priority: 'low' });
-                        if (!res.ok) throw new Error(url + '\nHTTP ' + res.status);
-                        const items = await res.json();
+                        const items = sourceData[index];
 
                         const groupsMap = {};
                         let i = 0;
@@ -4078,6 +4108,11 @@ const DepthMapController = (function() {
          * 初期化＆強制表示関数
          * @param {Object} leafletMap - 描画先のLeafletマップオブジェクト
          */
+        // JSON取得のみ。デコード・描画はinitAndShow()で行う。
+        loadData: function() {
+            return loadDepthData();
+        },
+
         initAndShow: function(leafletMap) {
             if (!leafletMap) return Promise.resolve();
             mapInstance = leafletMap;
