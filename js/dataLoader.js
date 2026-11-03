@@ -258,33 +258,12 @@ async function drawLocation(name, lat, lng, zoom, options = {}) {
       }
     );
 
-    // ★ マップタイルの読み込み開始・完了・失敗を画面上で診断する。
-    window._tileDebugStartAt = performance.now();
-    window._tileDebugCount = 0;
-
+    // タイル画像の取得優先度と非同期デコードを指定する。
     window.gsiLayer.on('tileloadstart', (e) => {
         if (e.tile) {
             e.tile.setAttribute('fetchpriority', 'high');
             e.tile.decoding = 'async';
         }
-        if (window._tileDebugCount < 40) {
-            const path = e.tile && e.tile.src ? new URL(e.tile.src).pathname : '(URL不明)';
-            showdebug('[TILE +' + Math.round(performance.now() - window._tileDebugStartAt) + 'ms] start ' + path);
-            window._tileDebugCount++;
-        }
-    });
-
-    window.gsiLayer.on('tileload', (e) => {
-        if (window._tileDebugCount < 60) {
-            const path = e.tile && e.tile.src ? new URL(e.tile.src).pathname : '(URL不明)';
-            showdebug('[TILE +' + Math.round(performance.now() - window._tileDebugStartAt) + 'ms] loaded ' + path);
-            window._tileDebugCount++;
-        }
-    });
-
-    window.gsiLayer.on('tileerror', (e) => {
-        const path = e.tile && e.tile.src ? new URL(e.tile.src).pathname : '(URL不明)';
-        showdebug('[TILE +' + Math.round(performance.now() - window._tileDebugStartAt) + 'ms] ERROR ' + path);
     });
 
     // 初期ロード時は、ベースタイルの読み込みと画面反映が終わるまで呼び出し元を待機させる。
@@ -3266,19 +3245,18 @@ if (tileWrap && tileBtn) {
         }, 10);
 
         setTimeout(() => {
-             //showdebug('C');
+
             if (typeof showPrefSpots === 'function') {
                 showPrefSpots();
             }
-             //showdebug('D');
-            
+
             // 👇 【修正】ここでちゃんと backBtn を定義してあげる
             const backBtn = document.getElementById('map-back-btn');
             if (backBtn) {
                 backBtn.style.display = 'none';
                 backBtn.style.pointerEvents = 'auto';
             }
-             //showdebug('E');
+
              clearMapAlert();
             
             window.goBackGuard = false; 
