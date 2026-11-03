@@ -70,6 +70,393 @@ async function loadRegionCSV() {
 
 
 // ==========================================
+// ★ Region CSVを1回取得・共通解析して使い回す
+// ==========================================
+window.regionCsvParsedData = null;
+window.regionCsvParsedPromise = null;
+window.regionCsvParsedRegion = null;
+window.regionCsvParsedUrl = null;
+
+function loadRegionCsvData() {
+    const regionCode = window.currentRegion || 'KANTO';
+    const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
+
+    if (window.regionCsvParsedData &&
+        window.regionCsvParsedRegion === regionCode &&
+        window.regionCsvParsedUrl === rUrl) {
+        return Promise.resolve(window.regionCsvParsedData);
+    }
+
+    if (window.regionCsvParsedPromise &&
+        window.regionCsvParsedRegion === regionCode &&
+        window.regionCsvParsedUrl === rUrl) {
+        return window.regionCsvParsedPromise;
+    }
+
+    window.regionCsvParsedData = null;
+    window.regionCsvParsedRegion = regionCode;
+    window.regionCsvParsedUrl = rUrl;
+
+    window.regionCsvParsedPromise = fetch(rUrl)
+        .then(res => {
+            if (!res.ok) throw new Error("Region CSV fetch failed: " + res.status);
+            return res.text();
+        })
+        .then(text => {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) throw new Error("Region CSV is empty: " + rUrl);
+
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            const rows = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue;
+                const cols = lines[i].split(',').map(c => c.trim());
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = cols[index] || '';
+                });
+                rows.push(row);
+            }
+
+            // 都道府県行のURL情報をここで一度だけ正規化して保持する。
+            const prefRows = [];
+            for (const row of rows) {
+                if (row.type !== 'pref' || !row.url) continue;
+
+                const parts = row.url.split('/');
+                let prefCode = '';
+                let lat = NaN;
+                let lng = NaN;
+
+                if (parts.length >= 4) {
+                    prefCode = parts[1].split('_')[0];
+                    lat = parseFloat(parts[2]);
+                    lng = parseFloat(parts[3]);
+                } else if (parts.length === 3) {
+                    prefCode = parts[0].split('_')[0];
+                    lat = parseFloat(parts[1]);
+                    lng = parseFloat(parts[2]);
+                } else {
+                    continue;
+                }
+
+                if (!prefCode) continue;
+
+                prefRows.push({
+                    prefCode,
+                    prefName: row.notes || '',
+                    lat,
+                    lng,
+                    row
+                });
+            }
+
+            const parsedData = { regionCode, url: rUrl, headers, rows, prefRows };
+            if (window.regionCsvParsedRegion === regionCode &&
+                window.regionCsvParsedUrl === rUrl) {
+                window.regionCsvParsedData = parsedData;
+            }
+            return parsedData;
+        })
+        .catch(err => {
+            if (window.regionCsvParsedRegion === regionCode &&
+                window.regionCsvParsedUrl === rUrl) {
+                window.regionCsvParsedPromise = null;
+                window.regionCsvParsedData = null;
+                window.regionCsvParsedRegion = null;
+                window.regionCsvParsedUrl = null;
+            }
+            throw err;
+        });
+
+    return window.regionCsvParsedPromise;
+}
+
+// ==========================================
+// ★ 2. 指定した1県だけのlocation.jsonを最速で取得する関数
+// ==========================================
+window._loadedPrefSet = window._loadedPrefSet || new Set();
+window.prefSpotData = window.prefSpotData || {};
+window.prefSpotPromises = window.prefSpotPromises || {};
+
+function rebuildAllSpotData() {
+    window.allspotData = Object.values(window.prefSpotData).flat();
+    window.ALL_REGION_SPOTS = window.allspotData;
+    return window.allspotData;
+}
+
+async function fetchSinglePrefSpots(prefCode) {
+    if (!prefCode) return [];
+    if (Array.isArray(window.prefSpotData[prefCode])) return window.prefSpotData[prefCode];
+    if (window.prefSpotPromises[prefCode]) return window.prefSpotPromises[prefCode];
+
+    const regionCode = window.currentRegion || 'KANTO';
+    const url = `/${regionCode}/${prefCode}_location.json`;
+
+    window.prefSpotPromises[prefCode] = fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error("location.json fetch failed: " + res.status);
+            return res.json();
+        })
+        .then(data => {
+            if (!Array.isArray(data)) throw new Error("location.json形式エラー: " + prefCode);
+            data.forEach(s => s._prefCode = prefCode);
+            window.prefSpotData[prefCode] = data;
+            window._loadedPrefSet.add(prefCode);
+            rebuildAllSpotData();
+            return data;
+        })
+        .catch(error => {
+            delete window.prefSpotPromises[prefCode];
+            console.error("単一県JSON取得エラー:", error);
+            return [];
+        });
+
+    return window.prefSpotPromises[prefCode];
+}
+
+// =====================================================
+// ■ 3. 全県データをバックグラウンドで取得・合体する金庫生成関数
+// =====================================================
+window._isAllRegionLoaded = false;
+window._allRegionSpotsPromise = null;
+
+async function fetchAllRegionSpots() {
+    if (window._isAllRegionLoaded && Object.keys(window.prefSpotData).length > 0) {
+        return rebuildAllSpotData();
+    }
+    if (window._allRegionSpotsPromise) return window._allRegionSpotsPromise;
+
+    window._allRegionSpotsPromise = (async () => {
+        try {
+            const csvData = await loadRegionCsvData();
+            if (!csvData.headers.includes('type') || !csvData.headers.includes('url')) {
+                return rebuildAllSpotData();
+            }
+
+            const prefList = [];
+            for (const pref of csvData.prefRows || []) {
+                if (pref.prefCode && !prefList.includes(pref.prefCode)) {
+                    prefList.push(pref.prefCode);
+                }
+            }
+
+            await Promise.all(prefList.map(prefCode => fetchSinglePrefSpots(prefCode)));
+            window._isAllRegionLoaded = prefList.every(prefCode => Array.isArray(window.prefSpotData[prefCode]));
+            if (!window._isAllRegionLoaded) window._allRegionSpotsPromise = null;
+            return rebuildAllSpotData();
+        } catch (err) {
+            console.error("全県データ読み込みエラー:", err);
+            window._allRegionSpotsPromise = null;
+            return rebuildAllSpotData();
+        }
+    })();
+
+    return window._allRegionSpotsPromise;
+}
+
+
+// =====================================================
+// ■ 広域マップで全県のドットを描画する関数
+// =====================================================
+async function showAllRegionSpots() {
+    if (!window.map) return;
+
+    if (
+        window.regionSpotMarkers &&
+        window.regionSpotMarkers.length > 0 &&
+        window.regionAllSpotLayer &&
+        window._isAllRegionLoaded
+    ) {
+        if (!window.map.hasLayer(window.regionAllSpotLayer)) {
+            window.regionAllSpotLayer.addTo(window.map);
+        }
+        return;
+    }
+
+    if (window._buildingRegionSpotsPromise) {
+        return window._buildingRegionSpotsPromise;
+    }
+
+    window._buildingRegionSpotsPromise = (async () => {
+        await fetchAllRegionSpots();
+        const allSpots = Object.values(window.prefSpotData || {}).flat();
+        const targetSpots = allSpots.filter(
+            s => s.type !== 'pref' && s.type !== 'area'
+        );
+
+        if (window.regionAllSpotLayer) {
+            window.map.removeLayer(window.regionAllSpotLayer);
+        }
+
+        window.regionSpotMarkers = [];
+        window.regionSpotMarkerMap = new Map();
+        window.regionAllSpotLayer = L.layerGroup().addTo(window.map);
+
+        // ★ 1フレームあたり8ms以内に収まる数だけドットを生成し、次フレームへバトンを渡す（カクつきゼロ）
+        await new Promise(resolve => {
+            let i = 0;
+            function addSlice() {
+                const start = performance.now();
+                while (i < targetSpots.length && (performance.now() - start) < 4) {
+                    const spot = targetSpots[i++];
+                    const lat = Number(spot.lat);
+                    const lng = Number(spot.lng);
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+
+                    let type = 'spot';
+                    if (spot.icon && spot.icon.startsWith('fish')) {
+                        const match = spot.icon.match(/fish\d+/);
+                        if (match) type = match[0];
+                    }
+
+                    const marker = L.marker(
+                        [lat, lng],
+                        {
+                            icon: L.divIcon({
+                                className: `pref-dot ${type}`,
+                                html: '',
+                                iconSize: [5, 5],
+                                iconAnchor: [2.5, 2.5]
+                            }),
+                            interactive: true,
+                            keyboard: false
+                        }
+                    );
+
+                    marker._spotData = spot;
+                    marker._prefCode = spot._prefCode;
+
+                    marker._spotClickHandler = function () {
+                        const spotAreaId = String(spot.areaId || '').trim();
+                        const areaIndividualId = spotAreaId.replace(`${window.currentPref}_`, '');
+                        const area = (window.areaData || []).find(
+                            a => String(a.individualId || '').trim() === areaIndividualId
+                        );
+                        if (!area) return;
+                        selectArea(area);
+                    };
+
+                    marker._regionClickHandler = function () {
+                        handleRegionNearest(marker.getLatLng());
+                    };
+
+                    window.regionSpotMarkers.push(marker);
+                    window.regionSpotMarkerMap.set(spot, marker);
+                    window.regionAllSpotLayer.addLayer(marker);
+                }
+
+                if (i < targetSpots.length) {
+                    requestAnimationFrame(addSlice);
+                } else {
+                    resolve();
+                }
+            }
+            requestAnimationFrame(addSlice);
+        });
+
+        if (window.regionMarkers && window.regionMarkers.length > 0) {
+            window.regionMarkers.forEach(m => {
+                if (m.setZIndexOffset) {
+                    m.setZIndexOffset(1000);
+                }
+            });
+        }
+        window._buildingRegionSpotsPromise = null;
+    })();
+
+    return window._buildingRegionSpotsPromise;
+}
+
+function showPrefSpots() {
+    if (!window.regionSpotMarkers || window.regionSpotMarkers.length === 0) {
+        if (typeof showAllRegionSpots === 'function') {
+            window.runAfterTileLoad(async () => {
+                await showAllRegionSpots();
+                showPrefSpots();
+            });
+        }
+        return;
+    }
+
+    const selectedPref = String(window.currentPref || '');
+
+    if (window.currentSpotId) {
+        window.regionSpotMarkers.forEach(marker => {
+            const el = marker.getElement();
+            if (!el) return;
+            if (marker._regionClickHandler) marker.off('click', marker._regionClickHandler);
+            if (marker._spotClickHandler) marker.off('click', marker._spotClickHandler);
+            el.style.opacity = '0';
+            el.style.pointerEvents = 'none';
+            marker._regionRepresentative = false;
+        });
+        return;
+    }
+
+    if (!window.currentPref) {
+        window.regionSpotMarkers.forEach(marker => {
+            const el = marker.getElement();
+            if (!el) return;
+            if (marker._regionClickHandler) marker.off('click', marker._regionClickHandler);
+            if (marker._spotClickHandler) marker.off('click', marker._spotClickHandler);
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'none';
+            marker._regionRepresentative = false;
+        });
+        showRoadLayers();
+        return;
+    }
+
+    window.regionSpotMarkers.forEach(marker => {
+        const spot = marker._spotData;
+        const el = marker.getElement();
+        if (!spot || !el) return;
+
+        const markerPref = String(marker._prefCode || '');
+        if (marker._regionClickHandler) marker.off('click', marker._regionClickHandler);
+        if (marker._spotClickHandler) marker.off('click', marker._spotClickHandler);
+
+        if (markerPref === selectedPref) {
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'auto';
+            marker.on('click', marker._spotClickHandler);
+        } else {
+            el.style.opacity = '0.35';
+            el.style.pointerEvents = 'none';
+        }
+        marker._regionRepresentative = false;
+    });
+    showRoadLayers();
+}
+
+function handleRegionNearest(latlng) {
+    if (!window.map) return;
+    if (!window.regionPrefData || !window.regionPrefData.length) return;
+
+    let nearest = null;
+    let minDist = Infinity;
+
+    for (const pref of window.regionPrefData) {
+        const dist = window.map.distance(latlng, L.latLng(pref.lat, pref.lng));
+        if (dist < minDist) {
+            minDist = dist;
+            nearest = pref;
+        }
+    }
+
+    if (!nearest) return;
+
+    if (window.regionNearestClickHandler) {
+        window.map.off('click', window.regionNearestClickHandler);
+    }
+
+    window.selectPrefecture(`${nearest.regionCode}_${nearest.prefCode}`);
+}
+
+
+// ==========================================
 // REGION 初期表示：SEO・マーカー・レイヤー等
 // ==========================================
 function renderRegion() {
