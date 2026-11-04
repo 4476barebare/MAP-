@@ -83,11 +83,29 @@ async function handleTileRequest(request, event) {
       throw fetchError;
     }
   }
-  const cached = await cache.match(request);
+  let cached = null;
+  try {
+    cached = await cache.match(request);
+  } catch (error) {
+    // SafariなどでCache Storageの読み取りに失敗した場合はネットワークへ退避
+    reportTileCacheDebug(event, request, 'cache-match-error→fetch');
+    try {
+      return await fetch(request);
+    } catch (fetchError) {
+      reportTileCacheDebug(event, request, 'cache-match-error→fetch-error');
+      throw fetchError;
+    }
+  }
 
   if (cached) {
-    const savedAt = await meta.match(request.url);
-    const savedAtText = savedAt ? await savedAt.text() : '';
+    let savedAt = null;
+    let savedAtText = '';
+    try {
+      savedAt = await meta.match(request.url);
+      savedAtText = savedAt ? await savedAt.text() : '';
+    } catch (error) {
+      // メタ情報の読み取り失敗はキャッシュ本体の利用可否に影響させない
+    }
     const timestamp = Number(savedAtText);
 
     // メタ情報がない既存キャッシュは、今回から14日間の起点として扱う
