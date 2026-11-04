@@ -1105,7 +1105,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
     window.map.createPane('snsSonarTextPane');
     const textPane = window.map.getPane('snsSonarTextPane');
     textPane.style.zIndex = 655;
-    textPane.style.pointerEvents = 'auto';
+    textPane.style.pointerEvents = 'none';
     textPane.style.transition = 'opacity 0.3s ease';
   }
 
@@ -1133,7 +1133,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
       icon: L.divIcon({
         className: 'sns-sonar-text-wrapper',
         html: `<span class="sns-sonar-fish-hit ${snsClass} ${hiddenClass}">${safeFish}</span>`,
-        iconSize: [1, 1],
+        iconSize: [0, 0],
         iconAnchor: [0, 0]
       }),
       pane: 'snsSonarTextPane',
@@ -1163,28 +1163,11 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
 
     textMarker.addTo(window.snsSonarTextLayerGroup);
 
-    // ゼロサイズのLeafletマーカーではクリック判定が不安定になるため、
-    // 表示テキスト自体でタップを受けてポップアップを開く
-    const hitElement = textMarker.getElement()?.querySelector('.sns-sonar-fish-hit');
-    if (hitElement) {
-      hitElement.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!window._isSnsSonarOpaque || window.map.getZoom() > opts.maxVisibleZoom) return;
-
-        textMarker.openPopup();
-        if (typeof opts.onSonarClick === 'function') {
-          opts.onSonarClick(pt, textMarker, e);
-        }
-      });
-    }
   });
 
   const textPane = window.map.getPane('snsSonarTextPane');
   if (textPane) {
     textPane.style.opacity = isHiddenHit ? '0' : '1';
-    textPane.style.pointerEvents = isHiddenHit ? 'none' : 'auto';
   }
 };
 
@@ -1217,6 +1200,9 @@ function updateSnsSonarOnZoom() {
   }
 
   sonarPane.style.opacity = '1';
+  const textPane = window.map.getPane('snsSonarTextPane');
+  if (textPane) textPane.style.pointerEvents = 'auto';
+
   const baseSize = resolveBaseSonarSizeForZoom(currentZoom, opts.sizeByZoom);
 
   if (window.snsSonarLayerGroup) {
