@@ -3538,9 +3538,39 @@ const DepthMapController = (function() {
         return parsedDepthPromise;
     }
 
+    // LeafletのCanvas描画完了後、南本牧ふ頭の範囲をdestination-outで除外する。
+    const MaskedCanvasRenderer = L.Canvas.extend({
+        _postDraw: function() {
+            L.Canvas.prototype._postDraw.call(this);
+
+            if (!this._map || !this._ctx || !this._bounds) return;
+
+            const ctx = this._ctx;
+            const bounds = this._bounds;
+            ctx.save();
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = '#000';
+
+            MASK_POLYGONS.forEach(polygon => {
+                ctx.beginPath();
+                polygon.forEach((ll, index) => {
+                    const point = this._map.latLngToLayerPoint(L.latLng(ll[0], ll[1]));
+                    const x = point.x - bounds.min.x;
+                    const y = point.y - bounds.min.y;
+                    if (index === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.closePath();
+                ctx.fill();
+            });
+
+            ctx.restore();
+        }
+    });
+
     function createDepthLayers(map, parsedLayers) {
         parsedLayers.forEach(layerData => {
-            const renderer = L.canvas({
+            const renderer = new MaskedCanvasRenderer({
                 pane: 'overlayPane',
                 padding: 1.5
             });
