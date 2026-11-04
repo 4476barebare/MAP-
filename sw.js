@@ -53,7 +53,11 @@ async function handleMapDataRequest(request) {
 
 function reportTileCacheDebug(event, request, result) {
   if (!event || !event.clientId) return;
-  const report = self.clients.get(event.clientId).then(client => {
+
+  // fetchイベントの非同期処理後にwaitUntil()を呼ぶと、
+  // Safari / FirefoxでInvalidStateErrorになる場合がある。
+  // デバッグ通知は応答処理の寿命管理に含めず、失敗してもタイル取得に影響させない。
+  self.clients.get(event.clientId).then(client => {
     if (client) {
       client.postMessage({
         type: 'TILE_CACHE_DEBUG',
@@ -62,7 +66,6 @@ function reportTileCacheDebug(event, request, result) {
       });
     }
   }).catch(() => {});
-  event.waitUntil(report);
 }
 
 async function handleTileRequest(request, event) {
