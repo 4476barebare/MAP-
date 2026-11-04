@@ -1038,11 +1038,6 @@ async function applyQueryToStateFromCsv() {
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // 地図タイルの読み込みと並行してCache Storageを先行オープンする。
-    if ('caches' in window) {
-        window.tileCacheOpenPromise = caches.open('tile-cache-v1').catch(() => null);
-    }
-
     const params = new URLSearchParams(window.location.search);
 
     if (!params.get('region') && !params.get('pref')) {
