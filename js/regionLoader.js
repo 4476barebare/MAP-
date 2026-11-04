@@ -1150,7 +1150,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
         <div class="sns-catch-popup-footer">
           <a class="sns-catch-btn ${snsClass}" href="${pt.url}" target="_blank" rel="noopener noreferrer">
             <span class="sns-catch-label">${snsName}で釣果を見る</span>
-            <span class="sns-catch-arrow">↗</span>
+            //<span class="sns-catch-arrow">↗</span>
           </a>
         </div>
       </div>
