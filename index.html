@@ -3580,8 +3580,10 @@ const DepthMapController = (function() {
                 ctx.beginPath();
                 polygon.forEach((ll, index) => {
                     const point = this._map.latLngToLayerPoint(L.latLng(ll[0], ll[1]));
-                    const x = point.x - bounds.min.x;
-                    const y = point.y - bounds.min.y;
+                    // Leaflet Canvasは_ctxに-bounds.minのtranslateを設定済み。
+                    // ここでbounds.minを再度引くとマスクが画面外へずれる。
+                    const x = point.x;
+                    const y = point.y;
                     if (index === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 });
