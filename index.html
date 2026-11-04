@@ -3483,6 +3483,62 @@ const DepthMapController = (function() {
         return points;
     }
 
+    // 5ファイルを一度だけ統合・デコードし、以後のレイヤー再生成でも再利用する。
+    let parsedDepthData = null;
+    let parsedDepthPromise = null;
+
+    function loadParsedDepthData() {
+        if (parsedDepthData) return Promise.resolve(parsedDepthData);
+        if (parsedDepthPromise) return parsedDepthPromise;
+
+        parsedDepthPromise = loadDepthData().then(async sourceData => {
+            const parsedLayers = [];
+            const depths = [20, 50, 100, 150, 200];
+
+            for (let index = 0; index < depths.length; index++) {
+                const items = sourceData[index] || [];
+                const groupsMap = {};
+                let i = 0;
+
+                await new Promise(resolve => {
+                    function decodeSlice() {
+                        const start = performance.now();
+                        while (i < items.length && (performance.now() - start) < 4) {
+                            const item = items[i++];
+                            if (!item || !item.p) continue;
+
+                            const points = decodePolyline(item.p);
+                            if (points.length >= 3) {
+                                const group = item.group || 'default';
+                                if (!groupsMap[group]) groupsMap[group] = [];
+                                groupsMap[group].push({
+                                    latlngs: points.map(point => L.latLng(point[0], point[1]))
+                                });
+                            }
+                        }
+
+                        if (i < items.length) requestAnimationFrame(decodeSlice);
+                        else resolve();
+                    }
+                    requestAnimationFrame(decodeSlice);
+                });
+
+                parsedLayers.push({
+                    depth: depths[index],
+                    groups: Object.values(groupsMap)
+                });
+            }
+
+            parsedDepthData = parsedLayers;
+            return parsedDepthData;
+        }).catch(error => {
+            parsedDepthPromise = null;
+            throw error;
+        });
+
+        return parsedDepthPromise;
+    }
+
     function addPolygonPath(ctx, item, topLeft, map) {
         const pts = item.latlngs.map(ll => {
             const lp = map.latLngToLayerPoint(ll);
@@ -3512,6 +3568,7 @@ const DepthMapController = (function() {
             this._canvas = L.DomUtil.create('canvas', 'depth-canvas-layer');
             this._canvas.style.position = 'absolute';
             this._canvas.style.transition = 'opacity 0.25s ease-in-out'; // フェード用
+            this._canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))'; // 等深線の立体感を維持
             
             // ★ 等深線を常にタイルのすぐ上（雨雲やアイコンより下）に配置するための調整
             this._canvas.style.zIndex = "50"; 
@@ -3557,46 +3614,13 @@ const DepthMapController = (function() {
 
         _loadData: function() {
             const self = this;
-            this._loadPromise = (async () => {
-                try {
-                    const parsedLayers = [];
-                    // 先行取得済みJSONを受け取り、既存どおり4ms単位で順番にデコードする。
-                    const sourceData = await loadDepthData();
-                    for (let index = 0; index < DEPTH_FILES.length; index++) {
-                        const items = sourceData[index];
-
-                        const groupsMap = {};
-                        let i = 0;
-                        await new Promise(resolve => {
-                            function decodeSlice() {
-                                const start = performance.now();
-                                while (i < items.length && (performance.now() - start) < 4) {
-                                    const item = items[i++];
-                                    if (!item.p) continue;
-                                    const points = decodePolyline(item.p);
-                                    if (points.length >= 3) {
-                                        const g = item.group || 'default';
-                                        if (!groupsMap[g]) groupsMap[g] = [];
-                                        groupsMap[g].push({ latlngs: points.map(p => L.latLng(p[0], p[1])) });
-                                    }
-                                }
-                                if (i < items.length) {
-                                    requestAnimationFrame(decodeSlice);
-                                } else {
-                                    resolve();
-                                }
-                            }
-                            requestAnimationFrame(decodeSlice);
-                        });
-                        parsedLayers.push({ depth: [20, 50, 100, 150, 200][index], groups: Object.values(groupsMap) });
-                    }
-                    self._data = parsedLayers;
-                    self._loaded = true;
-                    await self._redrawAsync();
-                } catch (err) {
-                    console.error('等深線読み込みエラー:', err);
-                }
-            })();
+            this._loadPromise = loadParsedDepthData().then(parsedLayers => {
+                self._data = parsedLayers;
+                self._loaded = true;
+                return self._redrawAsync();
+            }).catch(err => {
+                console.error('等深線読み込みエラー:', err);
+            });
             return this._loadPromise;
         },
 
