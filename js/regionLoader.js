@@ -1105,7 +1105,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
     window.map.createPane('snsSonarTextPane');
     const textPane = window.map.getPane('snsSonarTextPane');
     textPane.style.zIndex = 655;
-    textPane.style.pointerEvents = 'none';
+    textPane.style.pointerEvents = 'auto';
     textPane.style.transition = 'opacity 0.3s ease';
   }
 
@@ -1176,6 +1176,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
   const textPane = window.map.getPane('snsSonarTextPane');
   if (textPane) {
     textPane.style.opacity = isHiddenHit ? '0' : '1';
+    textPane.style.pointerEvents = isHiddenHit ? 'none' : 'auto';
   }
 };
 
@@ -1192,7 +1193,10 @@ function updateSnsSonarOnZoom() {
   if (currentZoom > opts.maxVisibleZoom) {
     sonarPane.style.opacity = '0';
     const textPane = window.map.getPane('snsSonarTextPane');
-    if (textPane) textPane.style.opacity = '0';
+    if (textPane) {
+      textPane.style.opacity = '0';
+      textPane.style.pointerEvents = 'none';
+    }
 
     if (window.snsSonarTextLayerGroup) {
       window.snsSonarTextLayerGroup.eachLayer(m => {
@@ -1221,7 +1225,10 @@ function updateSnsSonarOnZoom() {
     window.renderSnsSonarTextLayer(window._snsDisplayPoints, opts);
   } else {
     const textPane = window.map.getPane('snsSonarTextPane');
-    if (textPane) textPane.style.opacity = '1';
+    if (textPane) {
+      textPane.style.opacity = '1';
+      textPane.style.pointerEvents = 'auto';
+    }
 
     window.snsSonarTextLayerGroup.eachLayer(m => {
       const hit = m.getElement()?.querySelector('.sns-sonar-fish-hit');
