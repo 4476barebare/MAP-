@@ -3666,10 +3666,6 @@ const DepthMapController = (function() {
                 ctx.globalAlpha = 1.0;
                 ctx.lineWidth = 1.5;
                 ctx.strokeStyle = EDGE_COLORS[layer.depth] || '#191970';
-                ctx.shadowColor = 'rgba(0, 0, 30, 0.9)';
-                ctx.shadowBlur = 8;
-                ctx.shadowOffsetX = 3;
-                ctx.shadowOffsetY = 3;
                 ctx.lineJoin = 'round';
                 ctx.stroke();
 
