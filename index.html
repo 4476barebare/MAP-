@@ -3533,10 +3533,23 @@ const DepthMapController = (function() {
         return parsedDepthPromise;
     }
 
-    // LeafletのCanvas描画完了後、南本牧ふ頭の範囲をdestination-outで除外する。
+    // 南本牧ふ頭の等深線を除外するマスク範囲。
+    const MASK_POLYGONS = [
+        [
+            [35.417144, 139.683673],
+            [35.407659, 139.695856],
+            [35.399341, 139.691122],
+            [35.392806, 139.682261],
+            [35.395479, 139.677406],
+            [35.401718, 139.669637]
+        ]
+    ];
+
+    // Leaflet 1.9.4の実際の描画更新メソッド_redrawを拡張する。
+    // 描画後に同じCanvasへdestination-outでマスクを適用する。
     const MaskedCanvasRenderer = L.Canvas.extend({
-        _postDraw: function() {
-            L.Canvas.prototype._postDraw.call(this);
+        _redraw: function() {
+            L.Canvas.prototype._redraw.call(this);
 
             if (!this._map || !this._ctx || !this._bounds) return;
 
