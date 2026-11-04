@@ -3596,9 +3596,7 @@ const DepthMapController = (function() {
         },
 
         _onZoomStart: function() {
-            if (this._canvas && this._visible) {
-                this._canvas.style.opacity = '0';
-            }
+            // ズーム中も直前の描画を残し、zoomend後の新しい描画が完成してから差し替える。
         },
 
         _resizeCanvas: function() {
@@ -3632,15 +3630,18 @@ const DepthMapController = (function() {
             if (!this._visible || !this._loaded || !this._map || !this._canvas) return;
             const renderId = (this._renderId = (this._renderId || 0) + 1);
             this._drawing = true;
-            this._resizeCanvas();
 
             const map = this._map;
-            const ctx = this._ctx;
             const size = map.getSize();
-            
             const topLeft = map.containerPointToLayerPoint([0, 0]);
-            L.DomUtil.setPosition(this._canvas, topLeft);
-            ctx.clearRect(0, 0, size.x, size.y);
+
+            // 描画途中のCanvasを表に出さず、完成した画像だけを表示Canvasへ反映する。
+            const renderCanvas = document.createElement('canvas');
+            const ratio = window.devicePixelRatio || 1;
+            renderCanvas.width = Math.round(size.x * ratio);
+            renderCanvas.height = Math.round(size.y * ratio);
+            const ctx = renderCanvas.getContext('2d');
+            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
             const boundsBox = [
                 L.latLng(KANTO_MAX_LAT, KANTO_MIN_LNG),
@@ -3716,11 +3717,16 @@ const DepthMapController = (function() {
             });
             ctx.restore();
 
-            this._drawing = false;
+            if (renderId !== this._renderId || !this._map || !this._canvas || !this._visible) return;
 
-            if (this._canvas && this._visible) {
-                this._canvas.style.opacity = '1';
-            }
+            // 完成したフレームだけを表示Canvasへ一括反映する。
+            this._resizeCanvas();
+            L.DomUtil.setPosition(this._canvas, topLeft);
+            this._ctx.clearRect(0, 0, size.x, size.y);
+            this._ctx.drawImage(renderCanvas, 0, 0, renderCanvas.width, renderCanvas.height, 0, 0, size.x, size.y);
+
+            this._drawing = false;
+            this._canvas.style.opacity = '1';
         },
 
         setVisible: function(visible) {
