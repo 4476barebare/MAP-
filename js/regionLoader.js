@@ -1133,7 +1133,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
       icon: L.divIcon({
         className: 'sns-sonar-text-wrapper',
         html: `<span class="sns-sonar-fish-hit ${snsClass} ${hiddenClass}">${safeFish}</span>`,
-        iconSize: [0, 0],
+        iconSize: [1, 1],
         iconAnchor: [0, 0]
       }),
       pane: 'snsSonarTextPane',
@@ -1161,16 +1161,24 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
       autoPanPadding: [20, 20]
     });
 
-    textMarker.on('click', (e) => {
-      if (!window._isSnsSonarOpaque || window.map.getZoom() > opts.maxVisibleZoom) return;
-      if (e.originalEvent) e.originalEvent.stopPropagation();
-      textMarker.openPopup();
-      if (typeof opts.onSonarClick === 'function') {
-        opts.onSonarClick(pt, textMarker, e);
-      }
-    });
-
     textMarker.addTo(window.snsSonarTextLayerGroup);
+
+    // ゼロサイズのLeafletマーカーではクリック判定が不安定になるため、
+    // 表示テキスト自体でタップを受けてポップアップを開く
+    const hitElement = textMarker.getElement()?.querySelector('.sns-sonar-fish-hit');
+    if (hitElement) {
+      hitElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!window._isSnsSonarOpaque || window.map.getZoom() > opts.maxVisibleZoom) return;
+
+        textMarker.openPopup();
+        if (typeof opts.onSonarClick === 'function') {
+          opts.onSonarClick(pt, textMarker, e);
+        }
+      });
+    }
   });
 
   const textPane = window.map.getPane('snsSonarTextPane');
