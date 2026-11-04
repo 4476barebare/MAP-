@@ -3395,14 +3395,15 @@ function showdebug(msg) {
 
 /* ============================================================
  * 釣り行こNAVI 等深線レイヤーコントローラー
+ * Leaflet Canvas Renderer管理方式
  * ============================================================ */
 
 const DepthMapController = (function() {
     let mapInstance = null;
-    let depthLayer = null;
+    let depthLayers = [];
+    let visible = true;
+    let loadPromise = null;
 
-    // --- 設定項目 ---
-    // ★ パスを KANTO/ に変更
     const DEPTH_FILES = [
         '/KANTO/enc_depth20.json',
         '/KANTO/enc_depth50.json',
@@ -3411,13 +3412,31 @@ const DepthMapController = (function() {
         '/KANTO/enc_depth200.json'
     ];
 
+    const MULTIPLY_COLORS = {
+        20: '#8ca8d9',
+        50: '#5a82c4',
+        100: '#385799',
+        150: '#22326b',
+        200: '#191970'
+    };
+
+    const EDGE_COLORS = {
+        20: '#5a82c4',
+        50: '#385799',
+        100: '#22326b',
+        150: '#191970',
+        200: '#0d0d3b'
+    };
+
     let rawDepthData = null;
     let depthDataPromise = null;
+    let parsedDepthData = null;
+    let parsedDepthPromise = null;
 
-    // 等深線JSONの取得のみ。5ファイルの通信を並列で開始する。
     function loadDepthData() {
         if (rawDepthData) return Promise.resolve(rawDepthData);
         if (depthDataPromise) return depthDataPromise;
+
         depthDataPromise = Promise.all(DEPTH_FILES.map(url =>
             fetch(url, { priority: 'low' }).then(res => {
                 if (!res.ok) throw new Error(url + '\\nHTTP ' + res.status);
@@ -3431,61 +3450,40 @@ const DepthMapController = (function() {
             console.error('等深線JSON取得エラー:', error);
             throw error;
         });
+
         return depthDataPromise;
     }
 
-    // パターン3：モダン・モノトーンブルー
-    const MULTIPLY_COLORS = {
-        20: '#8ca8d9',  // くすみパステルブルー
-        50: '#5a82c4',  // ミディアムブルー
-        100: '#385799', // スレートブルー
-        150: '#22326b', // ダークスレートブルー
-        200: '#191970'  // ミッドナイトブルー
-    };
-
-    const EDGE_COLORS = {
-        20: '#5a82c4',  
-        50: '#385799',  
-        100: '#22326b', 
-        150: '#191970', 
-        200: '#0d0d3b'  
-    };
-
-    const KANTO_MIN_LAT = 34.70;
-    const KANTO_MAX_LAT = 37.25;
-    const KANTO_MIN_LNG = 138.30;
-    const KANTO_MAX_LNG = 141.05;
-
-    const MASK_POLYGONS = [
-        [ // 南本牧ふ頭
-            [35.417144, 139.683673],
-            [35.407659, 139.695856],
-            [35.399341, 139.691122],
-            [35.392806, 139.682261],
-            [35.395479, 139.677406],
-            [35.401718, 139.669637]
-        ]
-    ];
-
-    // --- ユーティリティ関数 ---
     function decodePolyline(encoded) {
         const points = [];
-        let index = 0; let lat = 0; let lng = 0;
+        let index = 0;
+        let lat = 0;
+        let lng = 0;
+
         while (index < encoded.length) {
-            let result = 0; let shift = 0; let byte;
-            do { byte = encoded.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+            let result = 0;
+            let shift = 0;
+            let byte;
+            do {
+                byte = encoded.charCodeAt(index++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
             lat += (result & 1) ? ~(result >> 1) : (result >> 1);
-            result = 0; shift = 0;
-            do { byte = encoded.charCodeAt(index++) - 63; result |= (byte & 0x1f) << shift; shift += 5; } while (byte >= 0x20);
+
+            result = 0;
+            shift = 0;
+            do {
+                byte = encoded.charCodeAt(index++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
             lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+
             points.push([lat / 1e5, lng / 1e5]);
         }
         return points;
     }
-
-    // 5ファイルを一度だけ統合・デコードし、以後のレイヤー再生成でも再利用する。
-    let parsedDepthData = null;
-    let parsedDepthPromise = null;
 
     function loadParsedDepthData() {
         if (parsedDepthData) return Promise.resolve(parsedDepthData);
@@ -3503,7 +3501,8 @@ const DepthMapController = (function() {
                 await new Promise(resolve => {
                     function decodeSlice() {
                         const start = performance.now();
-                        while (i < items.length && (performance.now() - start) < 4) {
+
+                        while (i < items.length && performance.now() - start < 4) {
                             const item = items[i++];
                             if (!item || !item.p) continue;
 
@@ -3511,9 +3510,9 @@ const DepthMapController = (function() {
                             if (points.length >= 3) {
                                 const group = item.group || 'default';
                                 if (!groupsMap[group]) groupsMap[group] = [];
-                                groupsMap[group].push({
-                                    latlngs: points.map(point => L.latLng(point[0], point[1]))
-                                });
+                                groupsMap[group].push(points.map(point =>
+                                    L.latLng(point[0], point[1])
+                                ));
                             }
                         }
 
@@ -3539,219 +3538,64 @@ const DepthMapController = (function() {
         return parsedDepthPromise;
     }
 
-    function addPolygonPath(ctx, item, topLeft, map) {
-        const pts = item.latlngs.map(ll => {
-            const lp = map.latLngToLayerPoint(ll);
-            return { x: lp.x - topLeft.x, y: lp.y - topLeft.y };
+    function createDepthLayers(map, parsedLayers) {
+        parsedLayers.forEach(layerData => {
+            const renderer = L.canvas({
+                pane: 'overlayPane',
+                padding: 1.5
+            });
+
+            const canvas = renderer._container;
+            if (canvas) {
+                canvas.style.zIndex = '50';
+                canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))';
+                canvas.style.mixBlendMode = 'multiply';
+                canvas.style.pointerEvents = 'none';
+            }
+
+            const groupLayers = [];
+            layerData.groups.forEach(rings => {
+                const polygon = L.polygon(rings, {
+                    renderer: renderer,
+                    color: EDGE_COLORS[layerData.depth] || '#191970',
+                    weight: 1.5,
+                    opacity: 1,
+                    lineJoin: 'round',
+                    fill: true,
+                    fillColor: MULTIPLY_COLORS[layerData.depth] || '#191970',
+                    fillOpacity: 0.40,
+                    fillRule: 'evenodd',
+                    interactive: false,
+                    bubblingMouseEvents: false
+                });
+
+                polygon.addTo(map);
+                groupLayers.push(polygon);
+            });
+
+            depthLayers.push({
+                depth: layerData.depth,
+                renderer: renderer,
+                layers: groupLayers
+            });
         });
-        
-        if (pts.length === 0) return;
-        
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) {
-            ctx.lineTo(pts[i].x, pts[i].y);
-        }
     }
 
-    // --- レイヤークラス ---
-    const DepthCanvasLayer = L.Layer.extend({
-        initialize: function(options) {
-            L.setOptions(this, options);
-            this._data = [];
-            this._loaded = false;
-            this._visible = true;
-            this._drawing = false;
-        },
-
-        onAdd: function(map) {
-            this._map = map;
-            this._canvas = L.DomUtil.create('canvas', 'depth-canvas-layer');
-            this._canvas.style.position = 'absolute';
-            this._canvas.style.transition = 'opacity 0.25s ease-in-out'; // フェード用
-            this._canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))'; // 等深線の立体感を維持
-            
-            // ★ 等深線を常にタイルのすぐ上（雨雲やアイコンより下）に配置するための調整
-            this._canvas.style.zIndex = "50"; 
-            
-            map.getPane('overlayPane').appendChild(this._canvas);
-            this._ctx = this._canvas.getContext('2d');
-            
-            this._resizeCanvas();
-            map.on('zoomstart', this._onZoomStart, this);
-            map.on('moveend zoomend resize', this._redraw, this);
-
-            this._loadData();
-        },
-
-        onRemove: function(map) {
-            map.off('zoomstart', this._onZoomStart, this);
-            map.off('moveend zoomend resize', this._redraw, this);
-
-            if (this._canvas && this._canvas.parentNode) {
-                this._canvas.parentNode.removeChild(this._canvas);
-            }
-            this._canvas = null;
-            this._ctx = null;
-            this._map = null;
-        },
-
-        _onZoomStart: function() {
-            // ズーム中も直前の描画を残し、zoomend後の新しい描画が完成してから差し替える。
-        },
-
-        _resizeCanvas: function() {
-            if (!this._map || !this._canvas) return;
-            const size = this._map.getSize();
-            const ratio = window.devicePixelRatio || 1;
-            this._canvas.width = Math.round(size.x * ratio);
-            this._canvas.height = Math.round(size.y * ratio);
-            this._canvas.style.width = size.x + 'px';
-            this._canvas.style.height = size.y + 'px';
-            this._ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-        },
-
-        _loadData: function() {
-            const self = this;
-            this._loadPromise = loadParsedDepthData().then(parsedLayers => {
-                self._data = parsedLayers;
-                self._loaded = true;
-                return self._redrawAsync();
-            }).catch(err => {
-                console.error('等深線読み込みエラー:', err);
+    function removeDepthLayers() {
+        depthLayers.forEach(layerData => {
+            layerData.layers.forEach(layer => {
+                if (mapInstance && mapInstance.hasLayer(layer)) {
+                    mapInstance.removeLayer(layer);
+                }
             });
-            return this._loadPromise;
-        },
-
-        _redraw: function() {
-            this._redrawAsync();
-        },
-
-        _redrawAsync: async function() {
-            if (!this._visible || !this._loaded || !this._map || !this._canvas) return;
-            const renderId = (this._renderId = (this._renderId || 0) + 1);
-            this._drawing = true;
-
-            const map = this._map;
-            const size = map.getSize();
-            const topLeft = map.containerPointToLayerPoint([0, 0]);
-
-            // 描画途中のCanvasを表に出さず、完成した画像だけを表示Canvasへ反映する。
-            const renderCanvas = document.createElement('canvas');
-            const ratio = window.devicePixelRatio || 1;
-            renderCanvas.width = Math.round(size.x * ratio);
-            renderCanvas.height = Math.round(size.y * ratio);
-            const ctx = renderCanvas.getContext('2d');
-            ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-            const boundsBox = [
-                L.latLng(KANTO_MAX_LAT, KANTO_MIN_LNG),
-                L.latLng(KANTO_MAX_LAT, KANTO_MAX_LNG),
-                L.latLng(KANTO_MIN_LAT, KANTO_MAX_LNG),
-                L.latLng(KANTO_MIN_LAT, KANTO_MIN_LNG)
-            ];
-
-            // ★ 5層（20m〜200m）を1フレームに1層ずつ分割描画し、Canvas描画のLong Task（100ms超え）をゼロにする
-            for (let lIdx = 0; lIdx < this._data.length; lIdx++) {
-                if (renderId !== this._renderId || !this._map) return;
-                const layer = this._data[lIdx];
-
-                ctx.save();
-                ctx.beginPath();
-                boundsBox.forEach((ll, index) => {
-                    const lp = map.latLngToLayerPoint(ll);
-                    const x = lp.x - topLeft.x, y = lp.y - topLeft.y;
-                    if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                });
-                ctx.closePath();
-                ctx.clip();
-
-                // 1. 面の描画
-                ctx.globalAlpha = 0.40;
-                ctx.fillStyle = MULTIPLY_COLORS[layer.depth] || '#191970';
-                ctx.globalCompositeOperation = 'multiply';
-
-                layer.groups.forEach(groupItems => {
-                    ctx.beginPath();
-                    groupItems.forEach(item => {
-                        addPolygonPath(ctx, item, topLeft, map);
-                        ctx.closePath(); 
-                    });
-                    ctx.fill('evenodd');
-                });
-
-                // 2. 立体エッジの描画
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.beginPath();
-                layer.groups.forEach(groupItems => {
-                    groupItems.forEach(item => {
-                        addPolygonPath(ctx, item, topLeft, map);
-                    });
-                });
-                
-                ctx.globalAlpha = 1.0;
-                ctx.lineWidth = 1.5;
-                ctx.strokeStyle = EDGE_COLORS[layer.depth] || '#191970';
-                ctx.lineJoin = 'round';
-                ctx.stroke();
-
-                ctx.restore();
-
-                await new Promise(r => requestAnimationFrame(r));
+            if (mapInstance && mapInstance.hasLayer(layerData.renderer)) {
+                mapInstance.removeLayer(layerData.renderer);
             }
+        });
+        depthLayers = [];
+    }
 
-            if (renderId !== this._renderId || !this._map) return;
-
-            // 3. マスク処理
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.fillStyle = 'rgba(0,0,0,1)'; 
-            MASK_POLYGONS.forEach(polygon => {
-                ctx.beginPath();
-                polygon.forEach((ll, index) => {
-                    const lp = map.latLngToLayerPoint(L.latLng(ll[0], ll[1]));
-                    const x = lp.x - topLeft.x, y = lp.y - topLeft.y;
-                    if (index === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                });
-                ctx.closePath();
-                ctx.fill();
-            });
-            ctx.restore();
-
-            if (renderId !== this._renderId || !this._map || !this._canvas || !this._visible) return;
-
-            // 完成したフレームだけを表示Canvasへ一括反映する。
-            this._resizeCanvas();
-            L.DomUtil.setPosition(this._canvas, topLeft);
-            this._ctx.clearRect(0, 0, size.x, size.y);
-            this._ctx.drawImage(renderCanvas, 0, 0, renderCanvas.width, renderCanvas.height, 0, 0, size.x, size.y);
-
-            this._drawing = false;
-            this._canvas.style.opacity = '1';
-        },
-
-        setVisible: function(visible) {
-            this._visible = visible;
-            if (!this._canvas) return;
-            
-            if (visible) {
-                this._canvas.style.display = 'block';
-                setTimeout(() => { this._redraw(); }, 10);
-            } else {
-                this._canvas.style.opacity = '0';
-                setTimeout(() => { this._canvas.style.display = 'none'; }, 250);
-            }
-        },
-
-        isVisible: function() { return this._visible; }
-    });
-
-    // --- 外部公開API ---
     return {
-        /**
-         * 初期化＆強制表示関数
-         * @param {Object} leafletMap - 描画先のLeafletマップオブジェクト
-         */
-        // JSON取得のみ。デコード・描画はinitAndShow()で行う。
         loadData: function() {
             return loadDepthData();
         },
@@ -3760,29 +3604,36 @@ const DepthMapController = (function() {
             if (!leafletMap) return Promise.resolve();
             mapInstance = leafletMap;
 
-            if (!depthLayer) {
-                depthLayer = new DepthCanvasLayer();
-                depthLayer.addTo(mapInstance);
-            }
-            return depthLayer._loadPromise || Promise.resolve();
+            if (loadPromise) return loadPromise;
+
+            loadPromise = loadParsedDepthData().then(parsedLayers => {
+                createDepthLayers(mapInstance, parsedLayers);
+                return parsedLayers;
+            }).catch(error => {
+                loadPromise = null;
+                console.error('等深線レイヤー生成エラー:', error);
+                throw error;
+            });
+
+            return loadPromise;
         },
 
-        /**
-         * 将来ボタンを追加した時用のトグル関数
-         */
         toggle: function() {
-            if (!mapInstance || !depthLayer) return false;
-            const isNowVisible = depthLayer.isVisible();
-            depthLayer.setVisible(!isNowVisible);
-            return !isNowVisible;
+            visible = !visible;
+            depthLayers.forEach(layerData => {
+                layerData.layers.forEach(layer => {
+                    if (visible) layer.addTo(mapInstance);
+                    else if (mapInstance.hasLayer(layer)) mapInstance.removeLayer(layer);
+                });
+            });
+            return visible;
         },
 
         isActive: function() {
-            return depthLayer ? depthLayer.isVisible() : false;
+            return visible;
         }
     };
 })();
-
 </script>
 
 </body>
