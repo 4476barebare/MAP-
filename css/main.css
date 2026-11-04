@@ -2160,6 +2160,11 @@ li {
   pointer-events: none !important;
 }
 
+/* 魚種ラベルはクリック対象にする */
+.sns-sonar-text-wrapper {
+  pointer-events: auto !important;
+}
+
 /* ★ JS側のサイズ指定を上書きして約1.6倍の視認しやすいサイズに拡大 */
 .sns-sonar-emitter {
   --sonar-size: 86px;
