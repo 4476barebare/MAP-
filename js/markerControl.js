@@ -1,6 +1,6 @@
 // ==========================================
 // ★ SNS釣果データ (integrated_catch.json) 読み込み＆ソナー表示
-// （ズーム12以下で表示 ／ 12.5以上で非表示＆ポップアップ対応版）
+// （ズーム12以下で表示 ／ 12.5以上で非表示＆確実ポップアップ表示対応版）
 // ==========================================
 
 const DEFAULT_SNS_SONAR_OPTIONS = {
@@ -26,6 +26,7 @@ window.snsSonarTextLayerGroup = null;
 window._snsDisplayPoints = [];
 window._currentSnsSonarOptions = { ...DEFAULT_SNS_SONAR_OPTIONS };
 window._isSnsSonarOpaque = false;
+window._activeSnsPopup = null;
 
 // 2点間の距離（km）を計算
 function calcSnsDistanceKm(lat1, lng1, lat2, lng2) {
@@ -110,11 +111,15 @@ window.hideSnsSonarLayer = function() {
     textPane.style.pointerEvents = 'none';
   }
 
+  if (window._activeSnsPopup) {
+    window.map.closePopup(window._activeSnsPopup);
+    window._activeSnsPopup = null;
+  }
+
   if (window.snsSonarTextLayerGroup) {
     window.snsSonarTextLayerGroup.eachLayer(marker => {
       const hit = marker.getElement()?.querySelector('.sns-sonar-fish-hit');
       if (hit) hit.classList.add('is-hidden-hit');
-      marker.closePopup?.();
     });
   }
 };
@@ -292,7 +297,7 @@ function createSnsSonarDivIcon(sizePx, snsClass, offsetSec, delay2Sec) {
   });
 }
 
-// ★ テキスト描画＆クリック時ポップアップ
+// ★ テキスト描画＆クリック時ポップアップ（地図クリック暴発防止・確実表示版）
 window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_OPTIONS) {
   if (!window.map) return;
 
@@ -333,6 +338,7 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
       }),
       pane: 'snsSonarTextPane',
       interactive: true,
+      bubblingMouseEvents: false,
       keyboard: false
     });
 
@@ -351,19 +357,33 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
       </div>
     `;
 
-    textMarker.bindPopup(popupHtml, {
-      offset: [0, -6],
-      closeButton: true,
-      autoPanPadding: [20, 20]
-    });
+    // マーカーがDOMに追加されたタイミングで、内部の <span> 要素に直接クリックイベントをバインド
+    textMarker.on('add', () => {
+      const el = textMarker.getElement();
+      const hitEl = el ? el.querySelector('.sns-sonar-fish-hit') : null;
+      if (!hitEl) return;
 
-    textMarker.on('click', (e) => {
-      if (!window._isSnsSonarOpaque || window.map.getZoom() > opts.maxVisibleZoom) return;
-      if (e.originalEvent) e.originalEvent.stopPropagation();
-      textMarker.openPopup();
-      if (typeof opts.onSonarClick === 'function') {
-        opts.onSonarClick(pt, textMarker, e);
-      }
+      // 地図のドラッグや県・エリア選択クリックが発火しないよう完全に止める
+      L.DomEvent.disableClickPropagation(hitEl);
+      L.DomEvent.disableScrollPropagation(hitEl);
+
+      L.DomEvent.on(hitEl, 'click', (ev) => {
+        L.DomEvent.stop(ev);
+        if (!window._isSnsSonarOpaque || window.map.getZoom() > opts.maxVisibleZoom) return;
+
+        window._activeSnsPopup = L.popup({
+          offset: [0, -6],
+          closeButton: true,
+          autoPanPadding: [20, 20]
+        })
+          .setLatLng([pt.lat, pt.lng])
+          .setContent(popupHtml)
+          .openOn(window.map);
+
+        if (typeof opts.onSonarClick === 'function') {
+          opts.onSonarClick(pt, textMarker, ev);
+        }
+      });
     });
 
     textMarker.addTo(window.snsSonarTextLayerGroup);
@@ -372,7 +392,6 @@ window.renderSnsSonarTextLayer = function(points = [], opts = DEFAULT_SNS_SONAR_
   const textPane = window.map.getPane('snsSonarTextPane');
   if (textPane) {
     textPane.style.opacity = isHiddenHit ? '0' : '1';
-    textPane.style.pointerEvents = isHiddenHit ? 'none' : 'auto';
   }
 };
 
@@ -391,11 +410,15 @@ function updateSnsSonarOnZoom() {
     const textPane = window.map.getPane('snsSonarTextPane');
     if (textPane) textPane.style.opacity = '0';
 
+    if (window._activeSnsPopup) {
+      window.map.closePopup(window._activeSnsPopup);
+      window._activeSnsPopup = null;
+    }
+
     if (window.snsSonarTextLayerGroup) {
       window.snsSonarTextLayerGroup.eachLayer(m => {
         const hit = m.getElement()?.querySelector('.sns-sonar-fish-hit');
         if (hit) hit.classList.add('is-hidden-hit');
-        m.closePopup?.();
       });
     }
     return;
@@ -420,7 +443,6 @@ function updateSnsSonarOnZoom() {
     const textPane = window.map.getPane('snsSonarTextPane');
     if (textPane) {
       textPane.style.opacity = '1';
-      textPane.style.pointerEvents = 'auto';
     }
 
     window.snsSonarTextLayerGroup.eachLayer(m => {
