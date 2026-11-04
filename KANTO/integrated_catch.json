@@ -80,6 +80,76 @@
     "model": "Grok"
   },
   {
+    "date": "2026/11/03",
+    "fish": "タチウオ",
+    "lat": 35.2494,
+    "lng": 139.7392,
+    "area_name": "鴨居大室港",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0Brb2TSMVAXhK4ieWCFEpHoQeQUAnTGXdvdFgZysDYQKGc9xXsM1nHRwqHwv3u4PRl&id=100025074422781",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "アジ",
+    "lat": 35.2494,
+    "lng": 139.7392,
+    "area_name": "鴨居大室港",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0Brb2TSMVAXhK4ieWCFEpHoQeQUAnTGXdvdFgZysDYQKGc9xXsM1nHRwqHwv3u4PRl&id=100025074422781",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "カワハギ",
+    "lat": 35.2494,
+    "lng": 139.7392,
+    "area_name": "鴨居大室港",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0Brb2TSMVAXhK4ieWCFEpHoQeQUAnTGXdvdFgZysDYQKGc9xXsM1nHRwqHwv3u4PRl&id=100025074422781",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "ブラックバス",
+    "lat": 35.742,
+    "lng": 140.832,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/hiroyasu.moro/posts/pfbid0wofGVud4EucT1xXU6KiWujfv5BzfY1ZzkrRLUshxWdQjeSi8sETMBPWY4SYVekf1l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "ブラックバス",
+    "lat": 35.895,
+    "lng": 140.5,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/hiroyasu.moro/posts/pfbid0wofGVud4EucT1xXU6KiWujfv5BzfY1ZzkrRLUshxWdQjeSi8sETMBPWY4SYVekf1l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "ブラックバス",
+    "lat": 35.885,
+    "lng": 140.06,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/hiroyasu.moro/posts/pfbid0wofGVud4EucT1xXU6KiWujfv5BzfY1ZzkrRLUshxWdQjeSi8sETMBPWY4SYVekf1l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "ブラックバス",
+    "lat": 36.18,
+    "lng": 139.7,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/hiroyasu.moro/posts/pfbid0wofGVud4EucT1xXU6KiWujfv5BzfY1ZzkrRLUshxWdQjeSi8sETMBPWY4SYVekf1l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/02",
     "fish": "メジナ",
     "lat": 35.9329,
@@ -548,6 +618,36 @@
     "url": "https://x.com/udon_a_udon_a/status/2117180671294906555",
     "source": "X",
     "model": "Grok"
+  },
+  {
+    "date": "2026/11/02",
+    "fish": "ブラックバス",
+    "lat": 35.9189,
+    "lng": 139.5398,
+    "area_name": "入間川",
+    "url": "https://www.instagram.com/reel/DfQHXtAzY86/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/02",
+    "fish": "ブラックバス",
+    "lat": 35.8655,
+    "lng": 139.4005,
+    "area_name": "入間川",
+    "url": "https://www.instagram.com/reel/DfQHXtAzY86/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/02",
+    "fish": "ブラックバス",
+    "lat": 35.8535,
+    "lng": 139.313,
+    "area_name": "入間川",
+    "url": "https://www.instagram.com/reel/DfQHXtAzY86/",
+    "source": "Instagram",
+    "model": "Muse"
   },
   {
     "date": "2026/11/01",
