@@ -3533,17 +3533,34 @@ const DepthMapController = (function() {
         return parsedDepthPromise;
     }
 
-    // 南本牧ふ頭の等深線を除外するマスク範囲。
-    const MASK_POLYGONS = [
-        [
-            [35.417144, 139.683673],
-            [35.407659, 139.695856],
-            [35.399341, 139.691122],
-            [35.392806, 139.682261],
-            [35.395479, 139.677406],
-            [35.401718, 139.669637]
-        ]
-    ];
+    // 等深線の陸地除外マスク。KANTOフォルダのEncoded Polylineを読み込む。
+    let MASK_POLYGONS = null;
+    let maskDataPromise = null;
+
+    function loadMaskData() {
+        if (MASK_POLYGONS) return Promise.resolve(MASK_POLYGONS);
+        if (maskDataPromise) return maskDataPromise;
+
+        maskDataPromise = fetch('/KANTO/contourlinesExclusionlist.json', { priority: 'low' })
+            .then(res => {
+                if (!res.ok) throw new Error('contourlinesExclusionlist.json HTTP ' + res.status);
+                return res.json();
+            })
+            .then(items => {
+                MASK_POLYGONS = (items || [])
+                    .filter(item => item && item.p)
+                    .map(item => decodePolyline(item.p))
+                    .filter(points => points.length >= 4);
+                return MASK_POLYGONS;
+            })
+            .catch(error => {
+                maskDataPromise = null;
+                console.error('等深線マスクJSON取得エラー:', error);
+                throw error;
+            });
+
+        return maskDataPromise;
+    }
 
     // Leaflet 1.9.4の実際の描画更新メソッド_redrawを拡張する。
     // 描画後に同じCanvasへdestination-outでマスクを適用する。
@@ -3644,7 +3661,11 @@ const DepthMapController = (function() {
 
             if (loadPromise) return loadPromise;
 
-            loadPromise = loadParsedDepthData().then(parsedLayers => {
+            loadPromise = Promise.all([
+                loadParsedDepthData(),
+                loadMaskData()
+            ]).then(results => {
+                const parsedLayers = results[0];
                 createDepthLayers(mapInstance, parsedLayers);
                 return parsedLayers;
             }).catch(error => {
