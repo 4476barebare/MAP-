@@ -60,16 +60,18 @@
     <!-- ① 上段は元の綺麗な状態に戻す -->
     <div class="map-ui-sub">
       <div id="nearest-spot" class="nearest-spot"></div>
-      <button id="map-back-btn" class="map-tool-btn map-back-btn" aria-label="前の画面に戻る">戻る</button>
     </div>
     
     <!-- エリア画面用の天気UI (スポット画面では非表示になる) -->
     <div class="map-ui-sub2"></div>
-<!-- スポット画面用の右端ボタン枠（縦並び・投稿ボタンの左横にUIを展開） -->
-<div id="tile-btn-wrap" style="display: none; flex-direction: column; align-items: flex-end; gap: 8px; padding-right: 18px; margin-top: 4px;">
-  <button id="map-tile-btn" class="map-tool-btn map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;">タイル切替</button>
-  <div id="post-btn-row" class="post-btn-row">
-    <button id="map-post-btn" class="map-tool-btn map-post-btn" aria-label="釣果投稿β" style="display: none; opacity: 0; transition: opacity 0.4s ease;">投稿β版</button>
+<!-- 地図ツールバー：上から表示順にボタンを追加 -->
+<div id="map-tool-bar">
+  <button id="map-back-btn" class="map-tool-btn map-back-btn" aria-label="前の画面に戻る">戻る</button>
+  <div id="tile-btn-wrap" style="display: none; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 4px;">
+    <button id="map-tile-btn" class="map-tool-btn map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;">タイル切替</button>
+    <div id="post-btn-row" class="post-btn-row">
+      <button id="map-post-btn" class="map-tool-btn map-post-btn" aria-label="釣果投稿β" style="display: none; opacity: 0; transition: opacity 0.4s ease;">投稿β版</button>
+    </div>
   </div>
 </div>
     
