@@ -1119,10 +1119,13 @@ li {
   cursor: pointer;
   pointer-events: auto;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  width: 60px;
+  box-sizing: border-box;
+  text-align: center;
   white-space: nowrap;
   -webkit-appearance: none;
   appearance: none;
-  transition: opacity 0.2s ease, background 0.2s ease, transform 0.1s ease;
+  transition: opacity 0.2s ease, background 0.2s ease;
 }
 
 .map-tool-btn.active {
@@ -1130,8 +1133,13 @@ li {
 }
 
 .map-tool-btn:active {
-  background: #191970;
-  transform: scale(0.95);
+  animation: map-tool-btn-press 0.18s ease-out;
+}
+
+@keyframes map-tool-btn-press {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(0.92); }
+  100% { transform: scale(1); }
 }
 
 /* 戻るボタン */
