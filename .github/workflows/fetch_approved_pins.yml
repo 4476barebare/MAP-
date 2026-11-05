@@ -1,0 +1,69 @@
+name: Fetch Approved Temp Pins
+
+on:
+  schedule:
+    # 毎日 日本時間 4:30 (UTC 19:30) に実行
+    - cron: '30 19 * * *'
+  workflow_dispatch: # 手動でのテスト実行も可能にする
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch approved pins from GAS
+        env:
+          GAS_URL: ${{ secrets.TEMP_PIN_GAS_URL }}
+          SECRET_KEY: "aZ3kP9xQw7LmN2vB8tRc"
+        run: |
+          # 1. GASから本採用データを取得
+          curl -sSL "${GAS_URL}?action=export_approved&key=${SECRET_KEY}" -o response.json
+
+          # 2. レスポンスの検証
+          STATUS=$(jq -r '.status' response.json)
+          if [ "$STATUS" != "ok" ]; then
+            echo "Error: Failed to fetch approved pins or invalid key. Response:"
+            cat response.json
+            exit 1
+          fi
+
+          # 3. approved配列を抽出
+          jq '.approved' response.json > new_pins.json
+          NEW_COUNT=$(jq 'length' new_pins.json)
+          echo "Fetched $NEW_COUNT approved pins."
+
+          # 4. 本採用が0件の日はここで処理を終了（コミットしない）
+          if [ "$NEW_COUNT" -eq 0 ]; then
+            echo "No new approved pins today."
+            exit 0
+          fi
+
+          # 5. 本番用ファイル (user_pins.json) の準備とマージ
+          if [ ! -f "user_pins.json" ]; then
+            echo "[]" > user_pins.json
+          fi
+          
+          # 既存ファイルと新規取得分を結合
+          jq -s '.[0] + .[1]' user_pins.json new_pins.json > merged.json
+          mv merged.json user_pins.json
+          echo "Merged successfully. Total pins: $(jq 'length' user_pins.json)"
+
+      - name: Commit and Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add user_pins.json
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: add new approved user pins"
+            git push
+          fi
