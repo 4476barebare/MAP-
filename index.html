@@ -60,7 +60,7 @@
     <!-- ① 上段は元の綺麗な状態に戻す -->
     <div class="map-ui-sub">
       <div id="nearest-spot" class="nearest-spot"></div>
-      <button id="map-back-btn" class="map-back-btn" aria-label="前の画面に戻る"></button>
+      <button id="map-back-btn" class="map-tool-btn map-back-btn" aria-label="前の画面に戻る">戻る</button>
     </div>
     
     <!-- エリア画面用の天気UI (スポット画面では非表示になる) -->
@@ -69,7 +69,7 @@
 <div id="tile-btn-wrap" style="display: none; flex-direction: column; align-items: flex-end; gap: 8px; padding-right: 18px; margin-top: 4px;">
   <button id="map-tile-btn" class="map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;"></button>
   <div id="post-btn-row" class="post-btn-row">
-    <button id="map-post-btn" class="map-post-btn" aria-label="釣果投稿β" style="display: none; opacity: 0; transition: opacity 0.4s ease;">投稿β版</button>
+    <button id="map-post-btn" class="map-tool-btn map-post-btn" aria-label="釣果投稿β" style="display: none; opacity: 0; transition: opacity 0.4s ease;">投稿β版</button>
   </div>
 </div>
     
@@ -2416,20 +2416,6 @@ function clearRegionMarkers() {
         });
     }
 }
-
-// ================================
-// ■ 戻るボタンの設定など（独立して実行）
-// ================================
-fetch('/icon/back.svg')
-    .then(res => res.text())
-    .then(svg => {
-        const btn = document.getElementById('map-back-btn');
-        if (!btn) return;
-
-        btn.innerHTML = svg;
-        const svgEl = btn.querySelector('svg');
-        if (svgEl) svgEl.classList.add('back-icon');
-    });
 
 // 👇 タイル切り替えボタンのSVG読み込みとクリックイベント
 fetch('/icon/tile.svg')
