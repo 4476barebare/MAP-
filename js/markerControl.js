@@ -1286,3 +1286,59 @@ document.addEventListener('DOMContentLoaded', () => {
     postBtn.addEventListener('click', () => togglePostMode());
   }
 });
+
+
+// ★ GASのdoGetで仮ピン一覧を初回1回のみロードする独立関数（取得済み・通信中はスキップ）
+window._isTempPinsLoaded = false;
+window._tempPinsLoadingPromise = null;
+
+window.loadTempFishPinsOnce = function() {
+  // 1. すでにGASから取得済みなら通信をスキップして即座に現在のキャッシュを返す
+  if (window._isTempPinsLoaded) {
+    return Promise.resolve(loadTempPinsCache());
+  }
+
+  // 2. 現在通信中であれば二重リクエストを防ぎ、進行中のPromiseを返す
+  if (window._tempPinsLoadingPromise) {
+    return window._tempPinsLoadingPromise;
+  }
+
+  window._tempPinsLoadingPromise = fetch(GAS_TEMP_PIN_URL, {
+    method: 'GET',
+    priority: 'low'
+  })
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      // お掃除タイマー実行中（status: 'cleaning'）はフラグを立てずローカルキャッシュを維持
+      if (!data || data.status !== 'ok' || !Array.isArray(data.pins)) {
+        return loadTempPinsCache();
+      }
+
+      // doGet完了前に自分がローカルで先行追加したピンがあれば失われないようマージ
+      const remotePins = data.pins;
+      const remoteIds = new Set(remotePins.map(p => p && p.id));
+      const localOnlyPins = loadTempPinsCache().filter(
+        p => p && p.id && !remoteIds.has(p.id)
+      );
+
+      const mergedPins = remotePins.concat(localOnlyPins);
+      saveTempPinsCache(mergedPins);
+
+      // 取得済みフラグをON（これ以降この関数が呼ばれてもGAS通信は発生しない）
+      window._isTempPinsLoaded = true;
+      return mergedPins;
+    })
+    .catch(err => {
+      console.warn('仮ピンデータの読み込みスキップ:', err);
+      return loadTempPinsCache();
+    })
+    .finally(() => {
+      window._tempPinsLoadingPromise = null;
+    });
+
+  return window._tempPinsLoadingPromise;
+};
+
