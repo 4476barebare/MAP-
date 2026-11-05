@@ -4,7 +4,7 @@ on:
   schedule:
     # 毎日 日本時間 4:30 (UTC 19:30) に実行
     - cron: '30 19 * * *'
-  workflow_dispatch: # 手動でのテスト実行も可能にする
+  workflow_dispatch: # 手動でのテスト実行ボタンも有効化
 
 permissions:
   contents: write
@@ -23,47 +23,50 @@ jobs:
           GAS_URL: ${{ secrets.TEMP_PIN_GAS_URL }}
           SECRET_KEY: "aZ3kP9xQw7LmN2vB8tRc"
         run: |
-          # 1. GASから本採用データを取得
-          curl -sSL "${GAS_URL}?action=export_approved&key=${SECRET_KEY}" -o response.json
+          mkdir -p KANTO
+          TARGET_FILE="KANTO/user_pins.json"
+
+          # 1. GASから本採用データを取得（リダイレクト追跡 -L）
+          curl -sSL "${GAS_URL}?action=export_approved&key=${SECRET_KEY}" -o /tmp/response.json
 
           # 2. レスポンスの検証
-          STATUS=$(jq -r '.status' response.json)
+          STATUS=$(jq -r '.status' /tmp/response.json)
           if [ "$STATUS" != "ok" ]; then
-            echo "Error: Failed to fetch approved pins or invalid key. Response:"
-            cat response.json
+            echo "Error: Failed to fetch approved pins. Response:"
+            cat /tmp/response.json
             exit 1
           fi
 
           # 3. approved配列を抽出
-          jq '.approved' response.json > new_pins.json
-          NEW_COUNT=$(jq 'length' new_pins.json)
+          jq '.approved' /tmp/response.json > /tmp/new_pins.json
+          NEW_COUNT=$(jq 'length' /tmp/new_pins.json)
           echo "Fetched $NEW_COUNT approved pins."
 
-          # 4. 本採用が0件の日はここで処理を終了（コミットしない）
+          # 4. 本採用が0件の日はここで終了（コミットしない）
           if [ "$NEW_COUNT" -eq 0 ]; then
             echo "No new approved pins today."
             exit 0
           fi
 
-          # 5. 本番用ファイル (user_pins.json) の準備とマージ
-          if [ ! -f "user_pins.json" ]; then
-            echo "[]" > user_pins.json
+          # 5. KANTO/user_pins.json がまだ無ければ空配列で初期化
+          if [ ! -f "$TARGET_FILE" ]; then
+            echo "[]" > "$TARGET_FILE"
           fi
-          
-          # 既存ファイルと新規取得分を結合
-          jq -s '.[0] + .[1]' user_pins.json new_pins.json > merged.json
-          mv merged.json user_pins.json
-          echo "Merged successfully. Total pins: $(jq 'length' user_pins.json)"
+
+          # 6. 既存の KANTO/user_pins.json と新規取得分を結合（重複IDは除外）
+          jq -s '.[0] + .[1] | unique_by(.id)' "$TARGET_FILE" /tmp/new_pins.json > /tmp/merged.json
+          mv /tmp/merged.json "$TARGET_FILE"
+          echo "Merged successfully. Total pins in $TARGET_FILE: $(jq 'length' "$TARGET_FILE")"
 
       - name: Commit and Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add user_pins.json
+          git add KANTO/user_pins.json
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "chore: add new approved user pins"
+            git commit -m "chore: update KANTO/user_pins.json"
             git push
           fi
