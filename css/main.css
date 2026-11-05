@@ -1125,21 +1125,25 @@ li {
   white-space: nowrap;
   -webkit-appearance: none;
   appearance: none;
-  transition: opacity 0.2s ease, background 0.2s ease;
+  transform: translateY(0);
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease,
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
+/* ON状態：押し込まれた位置を維持 */
 .map-tool-btn.active {
   background: #191970;
+  transform: translateY(3px);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
+/* 通常ボタン：押している間だけ沈み、離すと浮く */
 .map-tool-btn:active {
-  animation: map-tool-btn-press 0.18s ease-out;
-}
-
-@keyframes map-tool-btn-press {
-  0%   { transform: scale(1); }
-  35%  { transform: scale(0.92); }
-  100% { transform: scale(1); }
+  transform: translateY(3px);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
 }
 
 /* 戻るボタン */
