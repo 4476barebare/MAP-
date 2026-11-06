@@ -66,6 +66,13 @@
     <div class="map-ui-sub2"></div>
 <!-- 地図ツールバー：上から表示順にボタンを追加 -->
 <div id="map-tool-bar">
+  <div class="menu-header-row" style="display:none;">
+    <div class="header-row">
+      <div id="cloudsUI"></div>
+      <button id="radarToggleBtn" class="radar-toggle-btn">OFF</button>
+      <div class="header-text"></div>
+    </div>
+  </div>
   <button id="map-back-btn" class="map-tool-btn map-back-btn" aria-label="前の画面に戻る">戻る</button>
   <div id="tile-btn-wrap" style="display: none; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 4px;">
     <button id="map-tile-btn" class="map-tool-btn map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;">タイル切替</button>
@@ -77,14 +84,6 @@
     
   </div>
 <div id="map-menu" class="map-menu">
-  
-  <div class="menu-header-row" style="display:none;">
-    <div class="header-row">
-      <div id="cloudsUI"></div>
-<button id="radarToggleBtn" class="radar-toggle-btn">OFF</button>
-      <div class="header-text"></div>
-    </div>
-  </div>
   
   <ul>
   </ul>
