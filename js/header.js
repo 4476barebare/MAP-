@@ -91,7 +91,7 @@ function getAlertText(pref, callback) {
     
     if (validResults.length > 0) {
       var htmlLines = validResults.map(function(res) {
-        return '<span class="jma-alert-message" style="color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px;">' + prefix + res.text + '</span>';
+        return '<span class="jma-alert-message" style="display:inline-block; color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px; margin-right: 12px;">' + prefix + res.text + '</span>';
       }).join("");
       
       updateMapAlert(htmlLines);
