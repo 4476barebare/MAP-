@@ -1249,8 +1249,8 @@ async function submitCenterTempPin() {
   const currentPins = loadTempPinsCache();
   currentPins.push(newPin);
   saveTempPinsCache(currentPins);
-  if (typeof window.renderUserAndTempPins === 'function') {
-    window.renderUserAndTempPins();
+  if (typeof window.fadeInUserAndTempPins === 'function') {
+    window.fadeInUserAndTempPins();
   }
 
   lastTempPinPostTime = now;
@@ -1584,10 +1584,37 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
       }),
       pane: 'userPinPane',
       interactive: true,
+      bubblingMouseEvents: false,
       keyboard: false
     });
 
-    marker.bindPopup(() => createTempPinVotePopup(pin));
+    // DOM追加時に内部の <span> へ直接クリックイベントをバインドし、確実にポップアップを開く
+    marker.on('add', () => {
+      const el = marker.getElement();
+      const hitEl = el ? el.querySelector('.temp-fish') : null;
+      if (!hitEl) return;
+
+      L.DomEvent.disableClickPropagation(hitEl);
+      L.DomEvent.disableScrollPropagation(hitEl);
+
+      L.DomEvent.on(hitEl, 'click', (ev) => {
+        L.DomEvent.stop(ev);
+        if (!window.map) return;
+
+        const pane = window.map.getPane('userPinPane');
+        if (pane && pane.style.opacity === '0') return;
+
+        L.popup({
+          offset: [0, -6],
+          closeButton: true,
+          autoPanPadding: [20, 20]
+        })
+          .setLatLng([lat, lng])
+          .setContent(createTempPinVotePopup(pin))
+          .openOn(window.map);
+      });
+    });
+
     window.tempFishPinLayer.addLayer(marker);
   });
 };
