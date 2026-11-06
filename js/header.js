@@ -88,7 +88,7 @@ function getAlertText(pref, callback) {
     
     if (validResults.length > 0) {
       var htmlLines = validResults.map(function(res) {
-        return '<div style="color: ' + res.color + '; text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000, 0px 0px 4px rgba(0,0,0,0.8); font-size: 15px; font-weight: bold; margin-bottom: 6px; letter-spacing: 0.5px;">' + prefix + res.text + '</div>';
+        return '<span class="jma-alert-message" style="color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px;">' + prefix + res.text + '</span>';
       }).join("");
       
       updateMapAlert(htmlLines);
@@ -105,29 +105,42 @@ function getAlertText(pref, callback) {
 // ★ マップ最上部レイヤーにアラートを描画する関数
 // ==========================================
 function updateMapAlert(html) {
-  var container = document.getElementById('lf-map');
-  if (!container) return;
+  var toolbar = document.getElementById('map-tool-bar');
+  if (!toolbar) return;
 
   var alertDiv = document.getElementById('map-jma-alert');
-  
+
   if (!alertDiv) {
     alertDiv = document.createElement('div');
     alertDiv.id = 'map-jma-alert';
-    alertDiv.style.position = 'absolute';
-    alertDiv.style.top = '12px';
-    alertDiv.style.left = '50%';
-    alertDiv.style.transform = 'translateX(-50%)';
-    alertDiv.style.zIndex = '9999'; 
-    alertDiv.style.background = 'transparent';
-    alertDiv.style.textAlign = 'center';
-    alertDiv.style.pointerEvents = 'none'; 
-    alertDiv.style.width = '90%';
-    container.appendChild(alertDiv);
+    alertDiv.innerHTML =
+      '<div class="jma-alert-viewport"><div class="jma-alert-track"></div></div>' +
+      '<div class="map-tool-btn jnn-label" aria-hidden="true">JNN</div>';
+    toolbar.insertBefore(alertDiv, toolbar.firstChild);
   }
-  
+
   if (html) {
-    alertDiv.innerHTML = html;
-    alertDiv.style.display = 'block';
+    var viewport = alertDiv.querySelector('.jma-alert-viewport');
+    var track = alertDiv.querySelector('.jma-alert-track');
+
+    track.innerHTML = html;
+    track.classList.remove('is-scrolling');
+    track.style.animationDuration = '';
+
+    if (!window.prefData) {
+      alertDiv.style.display = 'none';
+      return;
+    }
+
+    alertDiv.style.display = 'flex';
+
+    requestAnimationFrame(function() {
+      if (track.scrollWidth > viewport.clientWidth) {
+        track.style.animationDuration =
+          Math.max(24, (track.scrollWidth + viewport.clientWidth) / 12) + 's';
+        track.classList.add('is-scrolling');
+      }
+    });
   } else {
     clearMapAlert();
   }
