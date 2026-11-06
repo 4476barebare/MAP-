@@ -3391,133 +3391,28 @@ function getAlertText(pref, callback) {
       " / prefData URL=" + (pref ? (pref.url || pref.URL || "なし") : "prefなし"));
   }
 
-  // 古いHTML上のアラート枠が残っていても完全に隠す
   var oldWrap = document.querySelector('.alert-wrap');
   if (oldWrap) oldWrap.style.display = 'none';
 
-  // データが不完全な場合も、県画面ではJNN表示枠を維持する
   if (!pref || (!pref.url && !pref.URL)) {
-    if (window.prefData) updateMapAlert("");
     window._currentAlertUrl = null;
     clearMapAlert();
     if (callback) callback({ text: "", color: "" });
     return;
   }
 
-  // 大文字小文字(.url / .URL)の両方の揺れに対応
   var targetUrl = pref.url || pref.URL || "";
-
-  // 同じ県の取得が完了済みなら、表示中の内容を消さずに終了
   if (window._currentAlertUrl === targetUrl) {
     if (callback) callback({ text: "", color: "" });
     return;
   }
 
-  if (window.prefData) updateMapAlert("");
+  updateMapAlert("");
   window._currentAlertUrl = targetUrl;
   var requestId = (window._jmaAlertRequestId || 0) + 1;
   window._jmaAlertRequestId = requestId;
   var requestPrefCode = window.currentPref;
-
-  var areaIds = targetUrl.split(' = {
-    "03": "大雨警報", "04": "洪水警報", "05": "暴風警報", "07": "波浪警報", "08": "高潮警報",
-    "09": "土砂災害警戒情報",
-    "10": "大雨注意報", "14": "雷注意報", "15": "強風注意報", "16": "波浪注意報", "20": "濃霧注意報"
-  };
-
-  if (areaIds.length === 0) {
-    clearMapAlert();
-    if (callback) callback({ text: "", color: "" });
-    return;
-  }
-
-  Promise.all(areaIds.map(function(areaId) {
-    if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] JSON取得開始");
-    return fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
-      .then(function(res) {
-        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] HTTP=" + res.status + " / ok=" + res.ok);
-        return res.json();
-      })
-      .then(function(data) {
-        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 配列=" + Array.isArray(data) + " / report件数=" + (Array.isArray(data) ? data.length : "N/A"));
-        data.sort(function(a, b) { return new Date(a.reportDatetime) - new Date(b.reportDatetime); });
-
-        var statusMap = {};
-        data.forEach(function(report, reportIndex) {
-          if (report.warning && report.warning.class10Items) {
-            if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] report[" + reportIndex + "] " + (report.reportDatetime || "") + " / class10Items=" + report.warning.class10Items.length);
-            report.warning.class10Items.forEach(function(area) {
-              (area.kinds || []).forEach(function(kind) {
-                if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] code=" + kind.code + " / status=" + kind.status + " / name=" + (kind.name || ""));
-                if (kind.status === "発表" || kind.status === "継続") {
-                  statusMap[kind.code] = true;
-                } else if (kind.status === "解除") {
-                  statusMap[kind.code] = false;
-                }
-              });
-            });
-          } else if (typeof window.showdebug === "function") {
-            window.showdebug("[JMA " + areaId + "] report[" + reportIndex + "] warning/class10Itemsなし");
-          }
-        });
-        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] statusMap=" + JSON.stringify(statusMap));
-
-        var warnings = [];
-        var advisories = [];
-        
-        for (var code in statusMap) {
-          if (statusMap[code] === true && codeMap[code]) {
-            var name = codeMap[code];
-            if (name.indexOf("警報") !== -1 || name.indexOf("警戒") !== -1) {
-              warnings.push(name);
-            } else {
-              advisories.push(name);
-            }
-          }
-        }
-
-        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 警報=" + warnings.join("/") + " / 注意報=" + advisories.join("/"));
-        if (warnings.length === 0 && advisories.length === 0) {
-          if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 表示対象なし");
-          return null;
-        }
-
-        var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
-        var color = (warnings.length > 0) ? "#ff4d4d" : "#ffea00";
-        return { text: finalMsgs.join(" / "), color: color };
-      })
-      .catch(function(err) {
-        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 取得・解析エラー=" + (err && err.message ? err.message : err));
-        return null;
-      });
-  })).then(function(results) {
-    if (requestId !== window._jmaAlertRequestId ||
-        window.currentPref !== requestPrefCode ||
-        !window.prefData ||
-        (window.prefData.url || window.prefData.URL || "") !== targetUrl) return;
-
-    var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
-    if (typeof window.showdebug === "function") {
-      window.showdebug("[JMA] 全コード処理完了 / 有効結果=" + validResults.length + "件");
-      validResults.forEach(function(r, i) { window.showdebug("[JMA] 結果[" + i + "]=" + r.text); });
-    }
-    
-    if (validResults.length > 0) {
-      var htmlLines = validResults.map(function(res) {
-        return '<span class="jma-alert-message" style="display:inline-block; color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px; margin-right: 12px;">' + prefix + res.text + '</span>';
-      }).join("");
-      
-      if (typeof window.showdebug === "function") window.showdebug("[JMA] 最終表示文字列=" + htmlLines.replace(/<[^>]*>/g, ""));
-      updateMapAlert(htmlLines);
-    } else {
-      if (typeof window.showdebug === "function") window.showdebug("[JMA] 全コードで表示対象なし");
-      clearMapAlert();
-    }
-
-    // index.html側がエラーで止まらないように空文字を渡して終了
-    if (callback) callback({ text: "", color: "" });
-  });
-}).filter(Boolean);
+  var areaIds = targetUrl.split('$').filter(Boolean);
   var prefix = (typeof pref.notes === "string") ? pref.notes + ": " : "";
 
   var codeMap = {
@@ -3541,6 +3436,7 @@ function getAlertText(pref, callback) {
       })
       .then(function(data) {
         if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 配列=" + Array.isArray(data) + " / report件数=" + (Array.isArray(data) ? data.length : "N/A"));
+        if (!Array.isArray(data)) return null;
         data.sort(function(a, b) { return new Date(a.reportDatetime) - new Date(b.reportDatetime); });
 
         var statusMap = {};
@@ -3565,7 +3461,6 @@ function getAlertText(pref, callback) {
 
         var warnings = [];
         var advisories = [];
-        
         for (var code in statusMap) {
           if (statusMap[code] === true && codeMap[code]) {
             var name = codeMap[code];
@@ -3594,20 +3489,19 @@ function getAlertText(pref, callback) {
   })).then(function(results) {
     if (requestId !== window._jmaAlertRequestId ||
         window.currentPref !== requestPrefCode ||
-        !window.prefData ||
-        (window.prefData.url || window.prefData.URL || "") !== targetUrl) return;
+        !window.currentPref ||
+        (window.prefData && (window.prefData.url || window.prefData.URL || "") !== targetUrl)) return;
 
     var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
     if (typeof window.showdebug === "function") {
       window.showdebug("[JMA] 全コード処理完了 / 有効結果=" + validResults.length + "件");
       validResults.forEach(function(r, i) { window.showdebug("[JMA] 結果[" + i + "]=" + r.text); });
     }
-    
+
     if (validResults.length > 0) {
       var htmlLines = validResults.map(function(res) {
         return '<span class="jma-alert-message" style="display:inline-block; color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px; margin-right: 12px;">' + prefix + res.text + '</span>';
       }).join("");
-      
       if (typeof window.showdebug === "function") window.showdebug("[JMA] 最終表示文字列=" + htmlLines.replace(/<[^>]*>/g, ""));
       updateMapAlert(htmlLines);
     } else {
@@ -3615,7 +3509,6 @@ function getAlertText(pref, callback) {
       clearMapAlert();
     }
 
-    // index.html側がエラーで止まらないように空文字を渡して終了
     if (callback) callback({ text: "", color: "" });
   });
 }
@@ -3669,7 +3562,6 @@ function clearMapAlert() {
 window.getAlertText = getAlertText;
 window.updateMapAlert = updateMapAlert;
 window.clearMapAlert = clearMapAlert;
-
 
 /* ============================================================
  * 釣り行こNAVI 等深線レイヤーコントローラー
