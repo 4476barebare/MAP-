@@ -1084,6 +1084,50 @@ li {
     flex: 0 0 80px;
 }
 
+/* 気象庁アラート：ツールバー最上段 */
+#map-jma-alert {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    width: 346px;
+    max-width: calc(100vw - 8px);
+    pointer-events: none;
+}
+
+#map-jma-alert .jma-alert-viewport {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 260px;
+    max-width: calc(100vw - 110px);
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: right;
+}
+
+#map-jma-alert .jma-alert-track {
+    display: inline-block;
+    width: max-content;
+    white-space: nowrap;
+    text-align: right;
+}
+
+#map-jma-alert .jma-alert-track.is-scrolling {
+    animation-name: jma-alert-marquee;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+#map-jma-alert .jnn-label {
+    flex: 0 0 80px;
+    pointer-events: none;
+    cursor: default;
+}
+
+@keyframes jma-alert-marquee {
+    from { transform: translateX(100%); }
+    to { transform: translateX(-100%); }
+}
+
 .leaflet-container {
     z-index: 0;
 }
