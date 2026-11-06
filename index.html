@@ -69,7 +69,7 @@
   <div class="menu-header-row" style="display:none;">
     <div class="header-row">
       <div id="cloudsUI"></div>
-      <button id="radarToggleBtn" class="radar-toggle-btn">OFF</button>
+      <button id="radarToggleBtn" class="map-tool-btn radar-toggle-btn">雨雲</button>
       <div class="header-text"></div>
     </div>
   </div>
@@ -2080,8 +2080,9 @@ function renderCrowdImage() {
 
         if (btn) {
             btn.style.display = '';
-            btn.textContent = 'ON';
+            btn.textContent = '雨雲';
             btn.classList.add('is-off');
+            btn.classList.remove('active');
         }
         return;
     }
@@ -2091,8 +2092,9 @@ function renderCrowdImage() {
     // ==================================================
     if (btn) {
         btn.style.display = '';
-        btn.textContent = 'OFF';
+        btn.textContent = '雨雲';
         btn.classList.remove('is-off');
+        btn.classList.add('active');
     }
 
     // ★ここが重要：以前のレイヤーとタイマーを破棄し、世代を更新する
