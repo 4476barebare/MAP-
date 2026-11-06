@@ -1369,6 +1369,7 @@ window.loadTempFishPinsOnce = function() {
 
 // ==========================================
 // ★ 本採用ピン (KANTO/user_pins.json) ＆ 仮ピン (doGet) の表示・フェードイン・投票制御
+// （本採用レイヤーと仮ピンレイヤー完全分離 ＆ 潮汐ラッパー透過対応版）
 // ==========================================
 
 window.approvedUserPins = [];
@@ -1376,30 +1377,63 @@ window._isApprovedPinsLoaded = false;
 window._approvedPinsLoadingPromise = null;
 window.userApprovedPinLayer = null;
 window.tempFishPinLayer = null;
+window._isTempPinLayerVisible = false;
+window._activeTempPinPopup = null;
 
-// 専用Pane (userPinPane) の生成・取得ヘルパー（投稿ボタンと同じ 0.4s ease トランジション）
-function ensureUserPinPane() {
-  if (!window.map) return null;
-  let pane = window.map.getPane('userPinPane');
-  if (!pane) {
-    pane = window.map.createPane('userPinPane');
-    pane.style.zIndex = 620;
-    pane.style.opacity = '0';
-    pane.style.pointerEvents = 'none';
-    pane.style.transition = 'opacity 0.4s ease';
+// 本採用ピン用Pane (approvedPinPane) と 仮ピン専用Pane (tempPinPane) を別々に生成
+function ensureUserPinPanes() {
+  if (!window.map) return { approvedPane: null, tempPane: null };
+
+  // スポット画面で .tide-wrapper (z-index:8000) が地図全体のクリックを塞ぐのを防止
+  const tideWrapper = document.querySelector('.tide-wrapper');
+  if (tideWrapper) {
+    tideWrapper.style.pointerEvents = 'none';
   }
-  return pane;
+
+  // ① 本採用ピン専用Pane（クリック判定なし・z-index: 620）
+  let approvedPane = window.map.getPane('approvedPinPane');
+  if (!approvedPane) {
+    approvedPane = window.map.createPane('approvedPinPane');
+    approvedPane.style.zIndex = 620;
+    approvedPane.style.opacity = '0';
+    approvedPane.style.pointerEvents = 'none';
+    approvedPane.style.transition = 'opacity 0.4s ease';
+  }
+
+  // ② 仮ピン専用Pane（本採用や既存魚種より上の独立レイヤー・z-index: 665）
+  let tempPane = window.map.getPane('tempPinPane');
+  if (!tempPane) {
+    tempPane = window.map.createPane('tempPinPane');
+    tempPane.style.zIndex = 665;
+    tempPane.style.opacity = '0';
+    tempPane.style.pointerEvents = 'none';
+    tempPane.style.transition = 'opacity 0.4s ease';
+  }
+
+  return { approvedPane, tempPane };
 }
 
-// ズーム遷移開始時や戻るボタン押下時に透明化・クリック無効化する関数
+// ズーム遷移開始時や戻るボタン押下時に透明化・ポップアップ消去する関数
 window.hideUserAndTempPins = function() {
+  window._isTempPinLayerVisible = false;
   if (!window.map) return;
-  const pane = window.map.getPane('userPinPane');
-  if (pane) {
-    pane.style.opacity = '0';
-    pane.style.pointerEvents = 'none';
+
+  const approvedPane = window.map.getPane('approvedPinPane');
+  if (approvedPane) {
+    approvedPane.style.opacity = '0';
+    approvedPane.style.pointerEvents = 'none';
   }
-  window.map.closePopup();
+
+  const tempPane = window.map.getPane('tempPinPane');
+  if (tempPane) {
+    tempPane.style.opacity = '0';
+    tempPane.style.pointerEvents = 'none';
+  }
+
+  if (window._activeTempPinPopup) {
+    window.map.closePopup(window._activeTempPinPopup);
+    window._activeTempPinPopup = null;
+  }
 };
 
 // レイヤー完全消去（スポット詳細離脱時）
@@ -1464,14 +1498,14 @@ function isMatchingIdentity(storedIdentity, currentIdentity) {
 // 投稿ボタンのフェードインと同じタイミングで呼び出す表示＆フェードイン関数
 window.fadeInUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
   if (!window.map) return;
-  const pane = ensureUserPinPane();
+  const { approvedPane, tempPane } = ensureUserPinPanes();
+  window._isTempPinLayerVisible = true;
   window.renderUserAndTempPins(centerLatLng, radiusMeters);
-  if (pane) {
-    requestAnimationFrame(() => {
-      pane.style.pointerEvents = 'auto';
-      pane.style.opacity = '1';
-    });
-  }
+
+  requestAnimationFrame(() => {
+    if (approvedPane) approvedPane.style.opacity = '1';
+    if (tempPane) tempPane.style.opacity = '1';
+  });
 };
 
 // 単独呼び出し用（データ未取得なら取得してからフェードイン表示）
@@ -1487,12 +1521,13 @@ window.showUserAndTempPins = async function(centerLatLng, radiusMeters = 1500) {
   window.fadeInUserAndTempPins(centerLatLng, radiusMeters);
 };
 
-// 描画実行関数（メモリ上のキャッシュから即座にマーカー配置）
+// 描画実行関数（本採用レイヤーと仮ピンレイヤーを別々に構築）
 window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
   if (!window.map) return;
 
-  ensureUserPinPane();
+  ensureUserPinPanes();
 
+  // ① 本採用ピン用レイヤーグループ
   if (!window.userApprovedPinLayer) {
     window.userApprovedPinLayer = L.layerGroup().addTo(window.map);
   } else {
@@ -1502,6 +1537,7 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
     }
   }
 
+  // ② 仮ピン専用レイヤーグループ
   if (!window.tempFishPinLayer) {
     window.tempFishPinLayer = L.layerGroup().addTo(window.map);
   } else {
@@ -1517,7 +1553,9 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
 
   const approvedIds = new Set();
 
-  // ① 本採用ピン: 既存の魚種マーカーに下点線 (.fish-text.approved-fish)
+  // ==========================================
+  // 1. 本採用ピンの描画 (approvedPinPane / 非インタラクティブ)
+  // ==========================================
   const approvedList = Array.isArray(window.approvedUserPins) ? window.approvedUserPins : [];
   approvedList.forEach(pin => {
     if (!pin) return;
@@ -1538,15 +1576,17 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
         iconSize: [0, 0],
         iconAnchor: [0, 0]
       }),
-      pane: 'userPinPane',
+      pane: 'approvedPinPane',
       interactive: false,
       keyboard: false
     });
 
-    window.userApprovedPinLayer.addLayer(marker);
+    marker.addTo(window.userApprovedPinLayer);
   });
 
-  // ② 仮ピン: テキスト半透明＋下点線は不透明 (.fish-text.temp-fish)
+  // ==========================================
+  // 2. 仮ピンの描画 (tempPinPane / 独立レイヤー＆確実ポップアップ)
+  // ==========================================
   const tempList = loadTempPinsCache();
   const myIdentity = getMyUuid();
   const now = Date.now();
@@ -1575,22 +1615,21 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
     const safeFish = String(pin.fish || '').replace(/[<>&"']/g, '');
     if (!safeFish) return;
 
-    const marker = L.marker([lat, lng], {
+    const tempMarker = L.marker([lat, lng], {
       icon: L.divIcon({
-        className: 'fish-label',
+        className: 'temp-pin-wrapper fish-label',
         html: `<span class="fish-text temp-fish">${safeFish}</span>`,
         iconSize: [0, 0],
         iconAnchor: [0, 0]
       }),
-      pane: 'userPinPane',
+      pane: 'tempPinPane',
       interactive: true,
       bubblingMouseEvents: false,
       keyboard: false
     });
 
-    // DOM追加時に内部の <span> へ直接クリックイベントをバインドし、確実にポップアップを開く
-    marker.on('add', () => {
-      const el = marker.getElement();
+    tempMarker.on('add', () => {
+      const el = tempMarker.getElement();
       const hitEl = el ? el.querySelector('.temp-fish') : null;
       if (!hitEl) return;
 
@@ -1599,12 +1638,9 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
 
       L.DomEvent.on(hitEl, 'click', (ev) => {
         L.DomEvent.stop(ev);
-        if (!window.map) return;
+        if (!window.map || !window._isTempPinLayerVisible) return;
 
-        const pane = window.map.getPane('userPinPane');
-        if (pane && pane.style.opacity === '0') return;
-
-        L.popup({
+        window._activeTempPinPopup = L.popup({
           offset: [0, -6],
           closeButton: true,
           autoPanPadding: [20, 20]
@@ -1615,7 +1651,7 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
       });
     });
 
-    window.tempFishPinLayer.addLayer(marker);
+    tempMarker.addTo(window.tempFishPinLayer);
   });
 };
 
@@ -1662,6 +1698,8 @@ function createTempPinVotePopup(pin) {
     </div>
   `;
 
+  L.DomEvent.disableClickPropagation(wrap);
+
   const goodBtn = wrap.querySelector('.btn-vote-good');
   const badBtn  = wrap.querySelector('.btn-vote-bad');
 
@@ -1707,7 +1745,10 @@ async function submitTempPinVote(pinId, voteType) {
   }
   saveTempPinsCache(pins);
 
-  if (window.map) window.map.closePopup();
+  if (window.map && window._activeTempPinPopup) {
+    window.map.closePopup(window._activeTempPinPopup);
+    window._activeTempPinPopup = null;
+  }
   window.renderUserAndTempPins();
 
   try {
