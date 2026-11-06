@@ -6,11 +6,9 @@ function getAlertText(pref, callback) {
   var oldWrap = document.querySelector('.alert-wrap');
   if (oldWrap) oldWrap.style.display = 'none';
 
-  // 警報がない場合も、県画面ではJNN表示枠を先に用意する
-  if (window.prefData) updateMapAlert("");
-
-  // データが不完全な場合はクリア
+  // データが不完全な場合も、県画面ではJNN表示枠を維持する
   if (!pref || (!pref.url && !pref.URL)) {
+    if (window.prefData) updateMapAlert("");
     window._currentAlertUrl = null;
     clearMapAlert();
     if (callback) callback({ text: "", color: "" });
@@ -19,15 +17,18 @@ function getAlertText(pref, callback) {
 
   // 大文字小文字(.url / .URL)の両方の揺れに対応
   var targetUrl = pref.url || pref.URL || "";
-  
-  // ★ 二重取得防止（同じ県なら無駄なFetchを走らせない）
+
+  // 同じ県の取得が完了済みなら、表示中の内容を消さずに終了
   if (window._currentAlertUrl === targetUrl) {
     if (callback) callback({ text: "", color: "" });
     return;
   }
+
+  if (window.prefData) updateMapAlert("");
   window._currentAlertUrl = targetUrl;
   var requestId = (window._jmaAlertRequestId || 0) + 1;
   window._jmaAlertRequestId = requestId;
+  var requestPrefCode = window.currentPref;
 
   var areaIds = targetUrl.split('$').filter(Boolean);
   var prefix = (typeof pref.notes === "string") ? pref.notes + ": " : "";
@@ -90,6 +91,7 @@ function getAlertText(pref, callback) {
       });
   })).then(function(results) {
     if (requestId !== window._jmaAlertRequestId ||
+        window.currentPref !== requestPrefCode ||
         !window.prefData ||
         (window.prefData.url || window.prefData.URL || "") !== targetUrl) return;
 
