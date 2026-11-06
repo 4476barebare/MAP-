@@ -1039,8 +1039,16 @@ li {
     flex-direction: column;
     align-items: flex-end;
     gap: 8px;
+    padding-top: 22px;
+    box-sizing: border-box;
     z-index: 9100;
     pointer-events: none;
+}
+
+#map-tool-bar > .menu-header-row {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 #map-tool-bar > .map-tool-btn,
