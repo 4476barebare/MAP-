@@ -3412,7 +3412,11 @@ function getAlertText(pref, callback) {
   var requestId = (window._jmaAlertRequestId || 0) + 1;
   window._jmaAlertRequestId = requestId;
   var requestPrefCode = window.currentPref;
-  var areaIds = targetUrl.split('$').filter(Boolean);
+  var areaIds = targetUrl.split('$').map(function(id) {
+    return String(id).trim();
+  }).filter(Boolean).map(function(id) {
+    return id.padStart(6, '0');
+  });
   var prefix = (typeof pref.notes === "string") ? pref.notes + ": " : "";
 
   var codeMap = {
@@ -3432,6 +3436,7 @@ function getAlertText(pref, callback) {
     return fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
       .then(function(res) {
         if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] HTTP=" + res.status + " / ok=" + res.ok);
+        if (!res.ok) throw new Error("HTTP " + res.status);
         return res.json();
       })
       .then(function(data) {
