@@ -152,7 +152,12 @@ function updateMapAlert(html) {
 function clearMapAlert() {
   var alertDiv = document.getElementById('map-jma-alert');
   if (alertDiv) {
-    alertDiv.innerHTML = "";
+    var track = alertDiv.querySelector('.jma-alert-track');
+    if (track) {
+      track.innerHTML = "";
+      track.classList.remove('is-scrolling');
+      track.style.animationDuration = '';
+    }
     alertDiv.style.display = 'none';
   }
 }
