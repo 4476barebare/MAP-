@@ -827,7 +827,7 @@ li {
     background: #f0f4ff; /* テーマカラーに合わせた極薄いブルー */
     border-radius: 8px;
     color: #191970;
-    border: 1px solid rgba(25, 25, 112, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     transition: background 0.2s ease;
     font-size: 14px;
 }
@@ -2052,6 +2052,7 @@ li {
   box-sizing: border-box;
   display: none;
   z-index: 8000;
+  pointer-events: none; /* ★背面の仮ピンマーカーやポップアップのクリックを阻害しないよう透過 */
 }
 
 #tideCanvas {
@@ -2512,13 +2513,23 @@ li {
   padding-bottom: 1px;
 }
 
+/* 仮ピンマーカー専用ラッパー */
+.temp-pin-wrapper {
+  background: transparent;
+  border: none;
+  pointer-events: none !important;
+}
+
 /* 仮ピンマーカー：テキスト本体は半透明、下点線は不透明 */
 .fish-text.temp-fish {
   color: rgba(255, 255, 255, 0.6) !important;
   border-bottom: 1.5px dotted #ffffff; /* 点線は完全不透明 */
-  padding-bottom: 1px;
+  padding: 2px 3px 1px 3px;
   cursor: pointer;
-  pointer-events: auto;
+  pointer-events: auto !important;
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
   text-shadow:
     -1px -1px 0 rgba(25, 25, 112, 0.6),
      1px -1px 0 rgba(25, 25, 112, 0.6),
