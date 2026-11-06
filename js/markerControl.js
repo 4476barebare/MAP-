@@ -1641,9 +1641,10 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
         if (!window.map || !window._isTempPinLayerVisible) return;
 
         window._activeTempPinPopup = L.popup({
-          offset: [0, -6],
-          closeButton: true,
-          autoPanPadding: [20, 20]
+          className: 'temp-vote-leaflet-popup',
+          offset: [0, -4],
+          closeButton: false,
+          autoPanPadding: [16, 16]
         })
           .setLatLng([lat, lng])
           .setContent(createTempPinVotePopup(pin))
@@ -1655,7 +1656,7 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
   });
 };
 
-// ポップアップ生成: 自身のIP+UUIDと同じであれば「いいね」ボタンを押せない
+// ポップアップ生成: テキスト情報一切なし、👍(カウント数) 👎(カウント数) の横並びのみ（自身のIP+UUIDと同じであれば「いいね」押下不可）
 function createTempPinVotePopup(pin) {
   const myIdentity = getMyUuid();
   const goodList = Array.isArray(pin.good) ? pin.good : [];
@@ -1667,35 +1668,16 @@ function createTempPinVotePopup(pin) {
   const alreadyBad  = badList.some(u => isMatchingIdentity(u, myIdentity));
   const isSettled   = (goodList.length >= 10 || badList.length >= 10);
 
-  // いいねボタン: 自身の投稿である場合(isMine)、すでにいいね済みの場合、決着済みなら押せない
+  // いいねボタン: 自身の投稿である場合(isMine)、すでに評価済みの場合、決着済みなら押せない
   const canGood = !isMine && !alreadyGood && !alreadyBad && !isSettled;
   // バッドボタン: すでに評価済みまたは決着済みなら押せない
   const canBad  = !alreadyGood && !alreadyBad && !isSettled;
 
-  let noteText = '釣果情報の評価にご協力ください';
-  if (isMine) {
-    noteText = 'あなたの投稿です（いいね不可）';
-  } else if (alreadyGood || alreadyBad) {
-    noteText = '評価済みです';
-  } else if (isSettled) {
-    noteText = '評価確定済みです';
-  }
-
-  const safeFish = String(pin.fish || '').replace(/[<>&"']/g, '');
-
   const wrap = document.createElement('div');
-  wrap.className = 'shop-popup temp-pin-popup';
+  wrap.className = 'temp-pin-popup';
   wrap.innerHTML = `
-    <div class="shop-popup-title">${safeFish}（仮ピン）</div>
-    <div class="shop-popup-address">${noteText}</div>
-    <div class="shop-popup-footer">
-      <button type="button" class="shop-popup-btn btn-vote-good" ${canGood ? '' : 'disabled'}>
-        👍 いいね (${goodList.length})
-      </button>
-      <button type="button" class="shop-popup-btn btn-vote-bad" ${canBad ? '' : 'disabled'}>
-        👎 バッド (${badList.length})
-      </button>
-    </div>
+    <button type="button" class="temp-vote-btn btn-vote-good" ${canGood ? '' : 'disabled'}>👍(${goodList.length})</button>
+    <button type="button" class="temp-vote-btn btn-vote-bad" ${canBad ? '' : 'disabled'}>👎(${badList.length})</button>
   `;
 
   L.DomEvent.disableClickPropagation(wrap);
