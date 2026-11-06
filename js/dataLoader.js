@@ -1605,7 +1605,7 @@ function zoomToSpot(spot) {
             isSpotButtonsShown = true;
             clearTimeout(safetyTimer);
 
-            // ★ データ（IP+UUID ＆ 代替タイル）とカメラ遷移がすべて揃ったタイミングで両ボタンを同時にフェードイン
+            // ★ データ（IP+UUID・代替タイル・本採用/仮ピン）とカメラ遷移がすべて揃ったタイミングで両ボタンとピンを同時にフェードイン
             const tileWrap = document.getElementById('tile-btn-wrap');
             const tileBtn = document.getElementById('map-tile-btn');
             const postBtn = document.getElementById('map-post-btn');
@@ -1621,6 +1621,9 @@ function zoomToSpot(spot) {
                     tileBtn.style.opacity = '1';
                     if (postBtn) postBtn.style.opacity = '1';
                 });
+            }
+            if (typeof window.fadeInUserAndTempPins === 'function') {
+                window.fadeInUserAndTempPins(safe);
             }
 
             setTimeout(() => {
@@ -1712,7 +1715,10 @@ function zoomToSpot(spot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // ★ 遷移開始時は両ボタンを一旦透明・非活性で待機させておく（準備完了後に checkAndUnlockGuard でフェードイン）
+    // ★ 遷移開始時は両ボタンとユーザーピンレイヤーを一旦透明・非活性で待機させておく（準備完了後に checkAndUnlockGuard で同時フェードイン）
+    if (typeof window.clearUserAndTempPins === 'function') {
+        window.clearUserAndTempPins();
+    }
     const tileWrap = document.getElementById('tile-btn-wrap');
     const tileBtn = document.getElementById('map-tile-btn');
     const postBtn = document.getElementById('map-post-btn');
@@ -3017,6 +3023,9 @@ function clearSpotUI() {
         window.map.removeLayer(window.fishLayer);
         window.fishLayer = null;
     }
+    if (typeof window.clearUserAndTempPins === 'function') {
+        window.clearUserAndTempPins();
+    }
 }
 
 window.goBackGuard = false;
@@ -3049,6 +3058,7 @@ function goBack() {
         }
 
 if (typeof togglePostMode === 'function') togglePostMode(false); // ★戻る時に投稿モードを強制終了
+if (typeof window.hideUserAndTempPins === 'function') window.hideUserAndTempPins(); // ★戻る時にピンも同時にフェードアウト
 
 const tileWrap = document.getElementById('tile-btn-wrap');
 const tileBtn = document.getElementById('map-tile-btn');

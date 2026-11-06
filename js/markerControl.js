@@ -922,7 +922,22 @@ function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH
     if (foundInLayer) return true;
   }
 
-  // ③ 現在選択中のスポットデータ（spot.URL）に紐づく魚種座標もチェック
+  // ③ 本採用ピン配列（window.approvedUserPins）もチェック
+  if (Array.isArray(window.approvedUserPins)) {
+    for (let i = 0; i < window.approvedUserPins.length; i++) {
+      const pin = window.approvedUserPins[i];
+      if (!pin) continue;
+      const lat = Number(pin.lat);
+      const lng = Number(pin.lng);
+      if (Number.isFinite(lat) && Number.isFinite(lng) && isSameFish(pin.fish)) {
+        if (targetPoint.distanceTo(L.latLng(lat, lng)) <= radiusMeters) {
+          return true;
+        }
+      }
+    }
+  }
+
+  // ④ 現在選択中のスポットデータ（spot.URL）に紐づく魚種座標もチェック
   if (window.currentSpotId && Array.isArray(window.spotData)) {
     const parts = String(window.currentSpotId).split('_');
     const spotKey = parts[parts.length - 1];
@@ -1074,11 +1089,13 @@ function prefetchAlternateSpotTiles(spot, targetZoom) {
   return Promise.all(promises);
 }
 
-// 2-7. スポット画面用の「IP+UUID生成」と「切り替え用タイル先読み」を一括実行する準備関数
+// 2-7. スポット画面用の「IP+UUID生成」「切り替え用タイル先読み」「本採用・仮ピンデータ取得」を一括実行する準備関数
 window.prepareSpotActionButtons = function(spot, targetZoom) {
   return Promise.all([
     ensureUserIdentityAsync(),
-    prefetchAlternateSpotTiles(spot, targetZoom)
+    prefetchAlternateSpotTiles(spot, targetZoom),
+    window.loadTempFishPinsOnce ? window.loadTempFishPinsOnce() : Promise.resolve(),
+    window.loadApprovedUserPinsOnce ? window.loadApprovedUserPinsOnce() : Promise.resolve()
   ]);
 };
 
@@ -1228,10 +1245,13 @@ async function submitCenterTempPin() {
     bad: []
   };
 
-  // 送信開始の瞬間にダミーデータ（window.tempFishPins ＆ sessionStorage）へ即座に格納
+  // 送信開始の瞬間にダミーデータ（window.tempFishPins ＆ sessionStorage）へ即座に格納し、画面にも即座に描画
   const currentPins = loadTempPinsCache();
   currentPins.push(newPin);
   saveTempPinsCache(currentPins);
+  if (typeof window.renderUserAndTempPins === 'function') {
+    window.renderUserAndTempPins();
+  }
 
   lastTempPinPostTime = now;
   if (submitBtn) {
@@ -1262,6 +1282,9 @@ async function submitCenterTempPin() {
     } else {
       const rolledBack = loadTempPinsCache().filter(p => p.id !== newPin.id);
       saveTempPinsCache(rolledBack);
+      if (typeof window.renderUserAndTempPins === 'function') {
+        window.renderUserAndTempPins();
+      }
 
       showPostStatus(result.message || '送信失敗', 3000);
       if (submitBtn) {
@@ -1345,7 +1368,7 @@ window.loadTempFishPinsOnce = function() {
 
 
 // ==========================================
-// ★ 本採用ピン (KANTO/user_pins.json) ＆ 仮ピン (doGet) の表示・投票制御
+// ★ 本採用ピン (KANTO/user_pins.json) ＆ 仮ピン (doGet) の表示・フェードイン・投票制御
 // ==========================================
 
 window.approvedUserPins = [];
@@ -1353,6 +1376,38 @@ window._isApprovedPinsLoaded = false;
 window._approvedPinsLoadingPromise = null;
 window.userApprovedPinLayer = null;
 window.tempFishPinLayer = null;
+
+// 専用Pane (userPinPane) の生成・取得ヘルパー（投稿ボタンと同じ 0.4s ease トランジション）
+function ensureUserPinPane() {
+  if (!window.map) return null;
+  let pane = window.map.getPane('userPinPane');
+  if (!pane) {
+    pane = window.map.createPane('userPinPane');
+    pane.style.zIndex = 620;
+    pane.style.opacity = '0';
+    pane.style.pointerEvents = 'none';
+    pane.style.transition = 'opacity 0.4s ease';
+  }
+  return pane;
+}
+
+// ズーム遷移開始時や戻るボタン押下時に透明化・クリック無効化する関数
+window.hideUserAndTempPins = function() {
+  if (!window.map) return;
+  const pane = window.map.getPane('userPinPane');
+  if (pane) {
+    pane.style.opacity = '0';
+    pane.style.pointerEvents = 'none';
+  }
+  window.map.closePopup();
+};
+
+// レイヤー完全消去（スポット詳細離脱時）
+window.clearUserAndTempPins = function() {
+  window.hideUserAndTempPins();
+  if (window.userApprovedPinLayer) window.userApprovedPinLayer.clearLayers();
+  if (window.tempFishPinLayer) window.tempFishPinLayer.clearLayers();
+};
 
 // 本採用ピンデータの初回ロード
 window.loadApprovedUserPinsOnce = function(regionCode) {
@@ -1406,13 +1461,20 @@ function isMatchingIdentity(storedIdentity, currentIdentity) {
   return false;
 }
 
-// レイヤー消去
-window.clearUserAndTempPins = function() {
-  if (window.userApprovedPinLayer) window.userApprovedPinLayer.clearLayers();
-  if (window.tempFishPinLayer) window.tempFishPinLayer.clearLayers();
+// 投稿ボタンのフェードインと同じタイミングで呼び出す表示＆フェードイン関数
+window.fadeInUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
+  if (!window.map) return;
+  const pane = ensureUserPinPane();
+  window.renderUserAndTempPins(centerLatLng, radiusMeters);
+  if (pane) {
+    requestAnimationFrame(() => {
+      pane.style.pointerEvents = 'auto';
+      pane.style.opacity = '1';
+    });
+  }
 };
 
-// 本採用・仮ピンの一括ロード＆描画
+// 単独呼び出し用（データ未取得なら取得してからフェードイン表示）
 window.showUserAndTempPins = async function(centerLatLng, radiusMeters = 1500) {
   if (!window.map) return;
 
@@ -1422,12 +1484,14 @@ window.showUserAndTempPins = async function(centerLatLng, radiusMeters = 1500) {
     ensureUserIdentityAsync()
   ]);
 
-  window.renderUserAndTempPins(centerLatLng, radiusMeters);
+  window.fadeInUserAndTempPins(centerLatLng, radiusMeters);
 };
 
-// 描画実行関数
+// 描画実行関数（メモリ上のキャッシュから即座にマーカー配置）
 window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
   if (!window.map) return;
+
+  ensureUserPinPane();
 
   if (!window.userApprovedPinLayer) {
     window.userApprovedPinLayer = L.layerGroup().addTo(window.map);
@@ -1447,7 +1511,7 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
     }
   }
 
-  const basePoint = centerLatLng
+  const basePoint = centerLatLng && centerLatLng.lat != null && centerLatLng.lng != null
     ? L.latLng(centerLatLng.lat, centerLatLng.lng)
     : window.map.getCenter();
 
@@ -1474,7 +1538,9 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
         iconSize: [0, 0],
         iconAnchor: [0, 0]
       }),
-      interactive: false
+      pane: 'userPinPane',
+      interactive: false,
+      keyboard: false
     });
 
     window.userApprovedPinLayer.addLayer(marker);
@@ -1516,7 +1582,9 @@ window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
         iconSize: [0, 0],
         iconAnchor: [0, 0]
       }),
-      interactive: true
+      pane: 'userPinPane',
+      interactive: true,
+      keyboard: false
     });
 
     marker.bindPopup(() => createTempPinVotePopup(pin));
