@@ -1342,3 +1342,291 @@ window.loadTempFishPinsOnce = function() {
   return window._tempPinsLoadingPromise;
 };
 
+
+
+// ==========================================
+// ★ 本採用ピン (KANTO/user_pins.json) ＆ 仮ピン (doGet) の表示・投票制御
+// ==========================================
+
+window.approvedUserPins = [];
+window._isApprovedPinsLoaded = false;
+window._approvedPinsLoadingPromise = null;
+window.userApprovedPinLayer = null;
+window.tempFishPinLayer = null;
+
+// 本採用ピンデータの初回ロード
+window.loadApprovedUserPinsOnce = function(regionCode) {
+  if (window._isApprovedPinsLoaded) {
+    return Promise.resolve(window.approvedUserPins);
+  }
+  if (window._approvedPinsLoadingPromise) {
+    return window._approvedPinsLoadingPromise;
+  }
+
+  const targetRegion = regionCode || window.currentRegion || 'KANTO';
+  const url = `/${targetRegion}/user_pins.json`;
+
+  window._approvedPinsLoadingPromise = fetch(url, { priority: 'low' })
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      window.approvedUserPins = Array.isArray(data) ? data : [];
+      window._isApprovedPinsLoaded = true;
+      return window.approvedUserPins;
+    })
+    .catch(err => {
+      console.warn('本採用ピンデータの読み込みスキップ:', err);
+      window.approvedUserPins = [];
+      return [];
+    })
+    .finally(() => {
+      window._approvedPinsLoadingPromise = null;
+    });
+
+  return window._approvedPinsLoadingPromise;
+};
+
+// 本人・投票者UUID照合ヘルパー (IP部分・UUID部分の一致も判定)
+function isMatchingIdentity(storedIdentity, currentIdentity) {
+  if (!storedIdentity || !currentIdentity) return false;
+  if (storedIdentity === currentIdentity) return true;
+
+  const curSplit = currentIdentity.indexOf('_u_');
+  const curIp = curSplit !== -1 ? currentIdentity.slice(0, curSplit) : 'noip';
+  const curUuid = curSplit !== -1 ? currentIdentity.slice(curSplit + 1) : currentIdentity;
+
+  const stSplit = String(storedIdentity).indexOf('_u_');
+  const stIp = stSplit !== -1 ? storedIdentity.slice(0, stSplit) : 'noip';
+  const stUuid = stSplit !== -1 ? storedIdentity.slice(stSplit + 1) : storedIdentity;
+
+  if (curUuid && stUuid && curUuid === stUuid) return true;
+  if (curIp !== 'noip' && stIp !== 'noip' && curIp === stIp) return true;
+  return false;
+}
+
+// レイヤー消去
+window.clearUserAndTempPins = function() {
+  if (window.userApprovedPinLayer) window.userApprovedPinLayer.clearLayers();
+  if (window.tempFishPinLayer) window.tempFishPinLayer.clearLayers();
+};
+
+// 本採用・仮ピンの一括ロード＆描画
+window.showUserAndTempPins = async function(centerLatLng, radiusMeters = 1500) {
+  if (!window.map) return;
+
+  await Promise.all([
+    window.loadApprovedUserPinsOnce(),
+    window.loadTempFishPinsOnce(),
+    ensureUserIdentityAsync()
+  ]);
+
+  window.renderUserAndTempPins(centerLatLng, radiusMeters);
+};
+
+// 描画実行関数
+window.renderUserAndTempPins = function(centerLatLng, radiusMeters = 1500) {
+  if (!window.map) return;
+
+  if (!window.userApprovedPinLayer) {
+    window.userApprovedPinLayer = L.layerGroup().addTo(window.map);
+  } else {
+    window.userApprovedPinLayer.clearLayers();
+    if (!window.map.hasLayer(window.userApprovedPinLayer)) {
+      window.userApprovedPinLayer.addTo(window.map);
+    }
+  }
+
+  if (!window.tempFishPinLayer) {
+    window.tempFishPinLayer = L.layerGroup().addTo(window.map);
+  } else {
+    window.tempFishPinLayer.clearLayers();
+    if (!window.map.hasLayer(window.tempFishPinLayer)) {
+      window.tempFishPinLayer.addTo(window.map);
+    }
+  }
+
+  const basePoint = centerLatLng
+    ? L.latLng(centerLatLng.lat, centerLatLng.lng)
+    : window.map.getCenter();
+
+  const approvedIds = new Set();
+
+  // ① 本採用ピン: 既存の魚種マーカーに下点線 (.fish-text.approved-fish)
+  const approvedList = Array.isArray(window.approvedUserPins) ? window.approvedUserPins : [];
+  approvedList.forEach(pin => {
+    if (!pin) return;
+    const lat = Number(pin.lat);
+    const lng = Number(pin.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    if (pin.id) approvedIds.add(pin.id);
+    if (basePoint && basePoint.distanceTo(L.latLng(lat, lng)) > radiusMeters) return;
+
+    const safeFish = String(pin.fish || '').replace(/[<>&"']/g, '');
+    if (!safeFish) return;
+
+    const marker = L.marker([lat, lng], {
+      icon: L.divIcon({
+        className: 'fish-label',
+        html: `<span class="fish-text approved-fish">${safeFish}</span>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      }),
+      interactive: false
+    });
+
+    window.userApprovedPinLayer.addLayer(marker);
+  });
+
+  // ② 仮ピン: テキスト半透明＋下点線は不透明 (.fish-text.temp-fish)
+  const tempList = loadTempPinsCache();
+  const myIdentity = getMyUuid();
+  const now = Date.now();
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+
+  tempList.forEach(pin => {
+    if (!pin) return;
+    if (pin.id && approvedIds.has(pin.id)) return;
+
+    const lat = Number(pin.lat);
+    const lng = Number(pin.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    if (basePoint && basePoint.distanceTo(L.latLng(lat, lng)) > radiusMeters) return;
+
+    const goodList = Array.isArray(pin.good) ? pin.good : [];
+    const badList  = Array.isArray(pin.bad)  ? pin.bad  : [];
+
+    if (badList.length >= 10) return;
+
+    // 自分の投稿または1時間経過後のみ表示
+    const isMine = isMatchingIdentity(pin.uuid, myIdentity);
+    const isOneHourPassed = (now - Number(pin.time || 0)) >= ONE_HOUR_MS;
+    if (!isMine && !isOneHourPassed) return;
+
+    const safeFish = String(pin.fish || '').replace(/[<>&"']/g, '');
+    if (!safeFish) return;
+
+    const marker = L.marker([lat, lng], {
+      icon: L.divIcon({
+        className: 'fish-label',
+        html: `<span class="fish-text temp-fish">${safeFish}</span>`,
+        iconSize: [0, 0],
+        iconAnchor: [0, 0]
+      }),
+      interactive: true
+    });
+
+    marker.bindPopup(() => createTempPinVotePopup(pin));
+    window.tempFishPinLayer.addLayer(marker);
+  });
+};
+
+// ポップアップ生成: 自身のIP+UUIDと同じであれば「いいね」ボタンを押せない
+function createTempPinVotePopup(pin) {
+  const myIdentity = getMyUuid();
+  const goodList = Array.isArray(pin.good) ? pin.good : [];
+  const badList  = Array.isArray(pin.bad)  ? pin.bad  : [];
+
+  // 自身のIP+UUIDと同一かチェック
+  const isMine = isMatchingIdentity(pin.uuid, myIdentity);
+  const alreadyGood = goodList.some(u => isMatchingIdentity(u, myIdentity));
+  const alreadyBad  = badList.some(u => isMatchingIdentity(u, myIdentity));
+  const isSettled   = (goodList.length >= 10 || badList.length >= 10);
+
+  // いいねボタン: 自身の投稿である場合(isMine)、すでにいいね済みの場合、決着済みなら押せない
+  const canGood = !isMine && !alreadyGood && !alreadyBad && !isSettled;
+  // バッドボタン: すでに評価済みまたは決着済みなら押せない
+  const canBad  = !alreadyGood && !alreadyBad && !isSettled;
+
+  let noteText = '釣果情報の評価にご協力ください';
+  if (isMine) {
+    noteText = 'あなたの投稿です（いいね不可）';
+  } else if (alreadyGood || alreadyBad) {
+    noteText = '評価済みです';
+  } else if (isSettled) {
+    noteText = '評価確定済みです';
+  }
+
+  const safeFish = String(pin.fish || '').replace(/[<>&"']/g, '');
+
+  const wrap = document.createElement('div');
+  wrap.className = 'shop-popup temp-pin-popup';
+  wrap.innerHTML = `
+    <div class="shop-popup-title">${safeFish}（仮ピン）</div>
+    <div class="shop-popup-address">${noteText}</div>
+    <div class="shop-popup-footer">
+      <button type="button" class="shop-popup-btn btn-vote-good" ${canGood ? '' : 'disabled'}>
+        👍 いいね (${goodList.length})
+      </button>
+      <button type="button" class="shop-popup-btn btn-vote-bad" ${canBad ? '' : 'disabled'}>
+        👎 バッド (${badList.length})
+      </button>
+    </div>
+  `;
+
+  const goodBtn = wrap.querySelector('.btn-vote-good');
+  const badBtn  = wrap.querySelector('.btn-vote-bad');
+
+  if (canGood && goodBtn) {
+    goodBtn.addEventListener('click', (e) => {
+      L.DomEvent.stop(e);
+      submitTempPinVote(pin.id, 'good');
+    });
+  }
+  if (canBad && badBtn) {
+    badBtn.addEventListener('click', (e) => {
+      L.DomEvent.stop(e);
+      submitTempPinVote(pin.id, 'bad');
+    });
+  }
+
+  return wrap;
+}
+
+// いいね / バッド投票送信
+async function submitTempPinVote(pinId, voteType) {
+  const pins = loadTempPinsCache();
+  const targetPin = pins.find(p => p && p.id === pinId);
+  if (!targetPin) return;
+
+  const myIdentity = window._cachedUserIdentity || (await ensureUserIdentityAsync());
+
+  if (!Array.isArray(targetPin.good)) targetPin.good = [];
+  if (!Array.isArray(targetPin.bad)) targetPin.bad = [];
+
+  if (
+    targetPin.good.some(u => isMatchingIdentity(u, myIdentity)) ||
+    targetPin.bad.some(u => isMatchingIdentity(u, myIdentity))
+  ) {
+    return;
+  }
+
+  if (voteType === 'good') {
+    if (isMatchingIdentity(targetPin.uuid, myIdentity)) return; // 自身のピンにはいいね不可
+    targetPin.good.push(myIdentity);
+  } else if (voteType === 'bad') {
+    targetPin.bad.push(myIdentity);
+  }
+  saveTempPinsCache(pins);
+
+  if (window.map) window.map.closePopup();
+  window.renderUserAndTempPins();
+
+  try {
+    await fetch(GAS_TEMP_PIN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'vote',
+        id: pinId,
+        voteType: voteType,
+        uuid: myIdentity
+      })
+    });
+  } catch (err) {
+    console.error('投票送信エラー:', err);
+  }
+}
