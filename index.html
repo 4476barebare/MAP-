@@ -68,6 +68,10 @@
 
   <!-- 地図ツールバー：map-ui-topとは独立して配置 -->
   <div id="map-tool-bar">
+    <div id="map-jma-alert">
+      <div class="jma-alert-viewport"><div class="jma-alert-track"></div></div>
+      <div class="map-tool-btn jnn-label" aria-hidden="true">JNN予報</div>
+    </div>
     <div class="menu-header-row" style="display:none;">
       <div class="header-row">
         <div id="cloudsUI"></div>
@@ -1369,9 +1373,6 @@ if (typeof loadPrefectureData === 'function') {
                             window.markerControl.preloadShop01(window.prefShopUrl);
                         }
                         
-                        if (typeof getAlertText === 'function' && window.prefData) {
-                            getAlertText(window.prefData);
-                        }
                         if (typeof renderSpotRanking === 'function') renderSpotRanking();
                         requestAnimationFrame(() => {
                             const btn = document.getElementById('map-back-btn');
@@ -1448,6 +1449,12 @@ async function loadPrefectureData(prefCode) {
 
         // 2. 座標データ(prefData/areaData/spotData)だけ即座に展開して返す（タイル描画を止めない！）
         await loadLocationJSON();
+
+        // 県データ一式の展開完了後に、気象庁アラートを更新する
+        if (window.currentPref === prefCode && window.prefData &&
+            typeof getAlertText === 'function') {
+            getAlertText(window.prefData);
+        }
         
         // ★ 3. 天気CSVとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で順番に取得する
         window.runAfterTileLoad(async () => {
@@ -3164,6 +3171,7 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     
     // 👇 古いデータを空っぽにしないと、新しいJSONを読み込みに行きません
     window.prefData = null;
+    if (typeof clearMapAlert === 'function') clearMapAlert();
     window.areaData = [];
     window.spotData = [];
     window.fishData = null; 
