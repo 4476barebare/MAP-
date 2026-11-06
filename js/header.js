@@ -118,7 +118,7 @@ function updateMapAlert(html) {
     alertDiv.id = 'map-jma-alert';
     alertDiv.innerHTML =
       '<div class="jma-alert-viewport"><div class="jma-alert-track"></div></div>' +
-      '<div class="map-tool-btn jnn-label" aria-hidden="true">JNN</div>';
+      '<div class="map-tool-btn jnn-label" aria-hidden="true">JNN予報</div>';
     toolbar.insertBefore(alertDiv, toolbar.firstChild);
   }
 
