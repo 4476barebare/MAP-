@@ -1457,6 +1457,12 @@ async function loadPrefectureData(prefCode) {
         await loadLocationJSON();
 
         // 県データ一式の展開完了後に、気象庁アラートを更新する
+        if (typeof window.showdebug === 'function') {
+            window.showdebug("[JMA] loadPrefectureData到達 / prefCode=" + prefCode +
+                " / currentPref=" + window.currentPref +
+                " / prefData=" + !!window.prefData +
+                " / getAlertText=" + (typeof getAlertText));
+        }
         if (window.currentPref === prefCode && window.prefData &&
             typeof getAlertText === 'function') {
             getAlertText(window.prefData);
