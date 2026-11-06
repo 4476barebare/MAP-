@@ -1457,15 +1457,20 @@ async function loadPrefectureData(prefCode) {
         await loadLocationJSON();
 
         // 県データ一式の展開完了後に、気象庁アラートを更新する
+        // 県画面では、アラート取得関数の成否に関係なくJNNラベルを表示する
+        var jnnRow = document.getElementById('map-jma-alert');
+        if (jnnRow && window.currentPref === prefCode) {
+            jnnRow.style.display = 'flex';
+        }
         if (typeof window.showdebug === 'function') {
             window.showdebug("[JMA] loadPrefectureData到達 / prefCode=" + prefCode +
                 " / currentPref=" + window.currentPref +
                 " / prefData=" + !!window.prefData +
-                " / getAlertText=" + (typeof getAlertText));
+                " / window.getAlertText=" + (typeof window.getAlertText));
         }
         if (window.currentPref === prefCode && window.prefData &&
-            typeof getAlertText === 'function') {
-            getAlertText(window.prefData);
+            typeof window.getAlertText === 'function') {
+            window.getAlertText(window.prefData);
         }
         
         // ★ 3. 天気CSVとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で順番に取得する
