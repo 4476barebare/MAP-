@@ -2,6 +2,11 @@
 // ★ 気象庁アラート取得関数
 // ==========================================
 function getAlertText(pref, callback) {
+  if (typeof window.showdebug === "function") {
+    window.showdebug("[JMA] getAlertText実行 / currentPref=" + (window.currentPref || "null") +
+      " / prefData URL=" + (pref ? (pref.url || pref.URL || "なし") : "prefなし"));
+  }
+
   // 古いHTML上のアラート枠が残っていても完全に隠す
   var oldWrap = document.querySelector('.alert-wrap');
   if (oldWrap) oldWrap.style.display = 'none';
@@ -45,23 +50,23 @@ function getAlertText(pref, callback) {
   }
 
   Promise.all(areaIds.map(function(areaId) {
-    if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] JSON取得開始");
+    if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] JSON取得開始");
     return fetch("https://www.jma.go.jp/bosai/warning/data/r8/" + areaId + ".json")
       .then(function(res) {
-        if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] HTTP=" + res.status + " / ok=" + res.ok);
+        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] HTTP=" + res.status + " / ok=" + res.ok);
         return res.json();
       })
       .then(function(data) {
-        if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] 配列=" + Array.isArray(data) + " / report件数=" + (Array.isArray(data) ? data.length : "N/A"));
+        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 配列=" + Array.isArray(data) + " / report件数=" + (Array.isArray(data) ? data.length : "N/A"));
         data.sort(function(a, b) { return new Date(a.reportDatetime) - new Date(b.reportDatetime); });
 
         var statusMap = {};
         data.forEach(function(report, reportIndex) {
           if (report.warning && report.warning.class10Items) {
-            if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] report[" + reportIndex + "] " + (report.reportDatetime || "") + " / class10Items=" + report.warning.class10Items.length);
+            if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] report[" + reportIndex + "] " + (report.reportDatetime || "") + " / class10Items=" + report.warning.class10Items.length);
             report.warning.class10Items.forEach(function(area) {
               (area.kinds || []).forEach(function(kind) {
-                if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] code=" + kind.code + " / status=" + kind.status + " / name=" + (kind.name || ""));
+                if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] code=" + kind.code + " / status=" + kind.status + " / name=" + (kind.name || ""));
                 if (kind.status === "発表" || kind.status === "継続") {
                   statusMap[kind.code] = true;
                 } else if (kind.status === "解除") {
@@ -69,11 +74,11 @@ function getAlertText(pref, callback) {
                 }
               });
             });
-          } else if (typeof showdebug === "function") {
-            showdebug("[JMA " + areaId + "] report[" + reportIndex + "] warning/class10Itemsなし");
+          } else if (typeof window.showdebug === "function") {
+            window.showdebug("[JMA " + areaId + "] report[" + reportIndex + "] warning/class10Itemsなし");
           }
         });
-        if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] statusMap=" + JSON.stringify(statusMap));
+        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] statusMap=" + JSON.stringify(statusMap));
 
         var warnings = [];
         var advisories = [];
@@ -89,9 +94,9 @@ function getAlertText(pref, callback) {
           }
         }
 
-        if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] 警報=" + warnings.join("/") + " / 注意報=" + advisories.join("/"));
+        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 警報=" + warnings.join("/") + " / 注意報=" + advisories.join("/"));
         if (warnings.length === 0 && advisories.length === 0) {
-          if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] 表示対象なし");
+          if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 表示対象なし");
           return null;
         }
 
@@ -100,7 +105,7 @@ function getAlertText(pref, callback) {
         return { text: finalMsgs.join(" / "), color: color };
       })
       .catch(function(err) {
-        if (typeof showdebug === "function") showdebug("[JMA " + areaId + "] 取得・解析エラー=" + (err && err.message ? err.message : err));
+        if (typeof window.showdebug === "function") window.showdebug("[JMA " + areaId + "] 取得・解析エラー=" + (err && err.message ? err.message : err));
         return null;
       });
   })).then(function(results) {
@@ -110,9 +115,9 @@ function getAlertText(pref, callback) {
         (window.prefData.url || window.prefData.URL || "") !== targetUrl) return;
 
     var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
-    if (typeof showdebug === "function") {
-      showdebug("[JMA] 全コード処理完了 / 有効結果=" + validResults.length + "件");
-      validResults.forEach(function(r, i) { showdebug("[JMA] 結果[" + i + "]=" + r.text); });
+    if (typeof window.showdebug === "function") {
+      window.showdebug("[JMA] 全コード処理完了 / 有効結果=" + validResults.length + "件");
+      validResults.forEach(function(r, i) { window.showdebug("[JMA] 結果[" + i + "]=" + r.text); });
     }
     
     if (validResults.length > 0) {
@@ -120,10 +125,10 @@ function getAlertText(pref, callback) {
         return '<span class="jma-alert-message" style="display:inline-block; color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px; margin-right: 12px;">' + prefix + res.text + '</span>';
       }).join("");
       
-      if (typeof showdebug === "function") showdebug("[JMA] 最終表示文字列=" + htmlLines.replace(/<[^>]*>/g, ""));
+      if (typeof window.showdebug === "function") window.showdebug("[JMA] 最終表示文字列=" + htmlLines.replace(/<[^>]*>/g, ""));
       updateMapAlert(htmlLines);
     } else {
-      if (typeof showdebug === "function") showdebug("[JMA] 全コードで表示対象なし");
+      if (typeof window.showdebug === "function") window.showdebug("[JMA] 全コードで表示対象なし");
       clearMapAlert();
     }
 
@@ -555,9 +560,9 @@ if (showPolicyBtn && showContactBtn) {
 ).filter(Boolean);
   var prefix = (typeof pref.notes === "string") ? pref.notes + ": " : "";
 
-  if (typeof showdebug === "function") {
-    showdebug("[JMA] 県=" + (pref.name || window.currentPref || "不明") + " / URL=" + targetUrl);
-    showdebug("[JMA] 取得対象コード=" + areaIds.join(", ") + " / 件数=" + areaIds.length);
+  if (typeof window.showdebug === "function") {
+    window.showdebug("[JMA] 県=" + (pref.name || window.currentPref || "不明") + " / URL=" + targetUrl);
+    window.showdebug("[JMA] 取得対象コード=" + areaIds.join(", ") + " / 件数=" + areaIds.length);
   }
   
   var codeMap = {
