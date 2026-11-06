@@ -1,5 +1,35 @@
 [
   {
+    "date": "2026/11/05",
+    "fish": "シーバス",
+    "lat": 36.335,
+    "lng": 140.485,
+    "area_name": "那珂川",
+    "url": "https://www.threads.com/@stand_by_jii/post/DfXRMxfGgel",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/05",
+    "fish": "シーバス",
+    "lat": 36.45,
+    "lng": 140.35,
+    "area_name": "那珂川",
+    "url": "https://www.threads.com/@stand_by_jii/post/DfXRMxfGgel",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/05",
+    "fish": "シーバス",
+    "lat": 36.55,
+    "lng": 140.2,
+    "area_name": "那珂川",
+    "url": "https://www.threads.com/@stand_by_jii/post/DfXRMxfGgel",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/04",
     "fish": "アオリイカ",
     "lat": 35.2396,
@@ -138,6 +168,26 @@
     "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid02ztsdeVtA6rqSZbsB6bgbnGKiCTs4rQuPxzjYn7hHx32iXjiCCrUawudrGvuzzT3wl&id=100006201278309",
     "source": "Facebook",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/04",
+    "fish": "ブラックバス",
+    "lat": 35.795,
+    "lng": 140.235,
+    "area_name": "印旛沼",
+    "url": "https://x.com/mayanrocks175/status/2117951191372177629",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/04",
+    "fish": "ワカサギ",
+    "lat": 35.21,
+    "lng": 139,
+    "area_name": "芦ノ湖",
+    "url": "https://x.com/suzuki_boat/status/2118123617359905060",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/03",
@@ -338,6 +388,36 @@
     "url": "https://www.instagram.com/p/DfURCuKz6IK/",
     "source": "Instagram",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "クロダイ",
+    "lat": 35.5372,
+    "lng": 139.7644,
+    "area_name": "多摩川",
+    "url": "https://x.com/tanabe_fishing/status/2117950400997560336",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "クロダイ",
+    "lat": 35.5867,
+    "lng": 139.6675,
+    "area_name": "多摩川",
+    "url": "https://x.com/tanabe_fishing/status/2117950400997560336",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/03",
+    "fish": "クロダイ",
+    "lat": 35.6262,
+    "lng": 139.5841,
+    "area_name": "多摩川",
+    "url": "https://x.com/tanabe_fishing/status/2117950400997560336",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/02",
