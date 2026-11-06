@@ -2457,3 +2457,37 @@ li {
   margin-left: 4px;
   flex-shrink: 0;
 }
+
+
+/* =========================================
+   本採用ピン＆仮ピン マーカー・投票UI
+========================================= */
+
+/* 本採用マーカー：既存フィッシュマーカーに下点線 */
+.fish-text.approved-fish {
+  border-bottom: 1.5px dotted #ffffff;
+  padding-bottom: 1px;
+}
+
+/* 仮ピンマーカー：テキスト本体は半透明、下点線は不透明 */
+.fish-text.temp-fish {
+  color: rgba(255, 255, 255, 0.6) !important;
+  border-bottom: 1.5px dotted #ffffff; /* 点線は完全不透明 */
+  padding-bottom: 1px;
+  cursor: pointer;
+  pointer-events: auto;
+  text-shadow:
+    -1px -1px 0 rgba(25, 25, 112, 0.6),
+     1px -1px 0 rgba(25, 25, 112, 0.6),
+    -1px  1px 0 rgba(25, 25, 112, 0.6),
+     1px  1px 0 rgba(25, 25, 112, 0.6);
+}
+
+/* 投票ポップアップの無効化ボタン（自身のピン・評価済み等） */
+.temp-pin-popup .shop-popup-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: #f0f0f0 !important;
+  color: #888888 !important;
+}
