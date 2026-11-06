@@ -3105,6 +3105,7 @@ if (tileWrap && tileBtn) {
 
         window.currentPref = null;
         window.prefData = null;
+        if (typeof clearMapAlert === 'function') clearMapAlert();
         window.currentAreaId = null;
         window.currentSpotId = null;
         
