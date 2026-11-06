@@ -1044,8 +1044,36 @@ li {
 }
 
 #map-tool-bar > .map-tool-btn,
-#map-tool-bar > #tile-btn-wrap {
+#map-tool-bar > #tile-btn-wrap,
+#map-tool-bar > .menu-header-row {
     pointer-events: auto;
+}
+
+/* 雨雲レーダーUI：既存要素をツールバー最上段へ移設 */
+#map-tool-bar > .menu-header-row {
+    padding: 0;
+    margin: 0;
+    color: #fff;
+}
+
+#map-tool-bar .menu-header-row .header-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: auto;
+    gap: 6px;
+}
+
+#map-tool-bar #cloudsUI {
+    order: 1;
+}
+
+#map-tool-bar .header-text {
+    order: 2;
+}
+
+#map-tool-bar #radarToggleBtn {
+    order: 3;
 }
 
 .leaflet-container {
