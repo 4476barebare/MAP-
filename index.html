@@ -1290,6 +1290,12 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName) {
 
     window.currentRegion = region;
     window.currentPref = prefCode;
+
+    // 県切り替え開始時に、前の県の取得結果が後から反映されないよう無効化
+    window._jmaAlertRequestId = (window._jmaAlertRequestId || 0) + 1;
+    window._currentAlertUrl = null;
+    if (typeof clearMapAlert === 'function') clearMapAlert();
+
     window.prefBounds = null;
     window.areaBounds = null;
 
@@ -2687,12 +2693,6 @@ function renderPrefectureUI() {
         // ショップマーカーのプリロード
         if (window.markerControl && window.markerControl.preloadShop01) {
             window.markerControl.preloadShop01(shopUrl);
-        }
-
-        // 気象庁アラートの取得
-                // 気象庁アラートの取得
-        if (typeof getAlertText === 'function') {
-            getAlertText(window.prefData);
         }
 
     } catch (err) {
