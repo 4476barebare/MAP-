@@ -1086,7 +1086,7 @@ li {
 
 /* 気象庁アラート：ツールバー最上段 */
 #map-jma-alert {
-    display: none;
+    display: flex;
     align-items: center;
     gap: 6px;
     width: 346px;
