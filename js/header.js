@@ -6,6 +6,9 @@ function getAlertText(pref, callback) {
   var oldWrap = document.querySelector('.alert-wrap');
   if (oldWrap) oldWrap.style.display = 'none';
 
+  // 警報がない場合も、県画面ではJNN表示枠を先に用意する
+  if (window.prefData) updateMapAlert("");
+
   // データが不完全な場合はクリア
   if (!pref || (!pref.url && !pref.URL)) {
     window._currentAlertUrl = null;
@@ -158,7 +161,7 @@ function clearMapAlert() {
       track.classList.remove('is-scrolling');
       track.style.animationDuration = '';
     }
-    alertDiv.style.display = 'none';
+    alertDiv.style.display = window.prefData ? 'flex' : 'none';
   }
 }
 
