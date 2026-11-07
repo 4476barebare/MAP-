@@ -1479,7 +1479,7 @@ async function loadPrefectureData(prefCode) {
     window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
 
     try {
-        // ★ 1. 全7県(fetchAllRegionSpots)は待たず、選択された1県だけのJSONを取得して即座にタイル描画へ進む
+        // ★ 1. 共通ローダーで選択県だけを取得し、全県データの集約を待たずに進む
         if (!window._loadedPrefSet || !window._loadedPrefSet.has(prefCode)) {
             await loadPrefectureSpots(prefCode, 'select');
         }
