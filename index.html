@@ -999,9 +999,9 @@ async function applyQueryToStateFromCsv() {
 
     let vaultData = [];
     if (window.currentPref) {
-        vaultData = await fetchSinglePrefSpots(window.currentPref);
+        vaultData = await loadPrefectureSpots(window.currentPref, 'select');
     } else {
-        vaultData = await fetchAllRegionSpots();
+        vaultData = await loadPrefectureSpots(null, 'all');
         const parentRow = vaultData.find(r =>
             r.individualId === 'parent' &&
             r.notes && (
@@ -1077,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ★ タイル描画完了後、ドット・道路・等深線の次に裏データと記事一覧を順番にバトンリレー実行する
     if (typeof window.runAfterTileLoad === 'function') {
-        window.runAfterTileLoad(() => fetchAllRegionSpots());
+        window.runAfterTileLoad(() => loadPrefectureSpots(null, 'all'));
         window.runAfterTileLoad(() => {
             // ★ 県・エリア・スポットURLでは各画面の入口側で描画するため、REGION画面のときだけ呼ぶ
             if (!window.currentPref && typeof renderSpotRanking === 'function') return renderSpotRanking(1);
@@ -1481,7 +1481,7 @@ async function loadPrefectureData(prefCode) {
     try {
         // ★ 1. 全7県(fetchAllRegionSpots)は待たず、選択された1県だけのJSONを取得して即座にタイル描画へ進む
         if (!window._loadedPrefSet || !window._loadedPrefSet.has(prefCode)) {
-            await fetchSinglePrefSpots(prefCode);
+            await loadPrefectureSpots(prefCode, 'select');
         }
 
         // 2. 座標データ(prefData/areaData/spotData)だけ即座に展開して返す（タイル描画を止めない！）
