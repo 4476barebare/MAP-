@@ -111,7 +111,7 @@ function resolveSpotPrefName(parentPrefNotes, areaNameJP, spot) {
     // 3. areaId（"IBARAKI_TOCHIGI" 等）のサブコードから判定
     const areaIdUpper = String(spot?.areaId || '').toUpperCase();
     for (const [code, pName] of Object.entries(AREA_CODE_TO_PREF_MAP)) {
-        if (areaIdUpper.endsWith('_' + code) && matchedPrefs.includes(pName)) {
+        if ((areaIdUpper.endsWith('_' + code) || areaIdUpper.includes(code)) && matchedPrefs.includes(pName)) {
             return pName;
         }
     }
@@ -298,7 +298,7 @@ function getSonarSettings(targetFishArray) {
     return settings;
 }
 
-// ★ 既存ソナーレーダー＆ハイライト用のCSSを自動注入（SONAR ACTIVEバナーは廃止）
+// ★ 既存ソナーレーダー＆ハイライト用のCSSを自動注入
 function injectSonarStyles(sizePx) {
     const existing = document.getElementById('sonar-radar-styles');
     if (existing) existing.remove();
@@ -365,26 +365,6 @@ function injectSonarStyles(sizePx) {
         @keyframes sonar-rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
-        }
-
-        .spot-link-item.sonar-hit a {
-            background: linear-gradient(135deg, #0b192c 0%, #16325b 100%) !important;
-            color: #00ffcc !important;
-            border: 1px solid #00ffcc !important;
-            font-weight: bold;
-            box-shadow: 0 0 8px rgba(0, 255, 204, 0.35);
-            position: relative;
-        }
-        .sonar-badge {
-            display: inline-block;
-            background: #00ffcc;
-            color: #0b192c;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 1px 5px;
-            border-radius: 3px;
-            margin-right: 4px;
-            vertical-align: text-bottom;
         }
     `;
     document.head.appendChild(style);
@@ -671,7 +651,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      // 1-B. markerControl.js ロジック流用：SNSデータ（integrated_catch.json）から対象魚種のSNSソナーを抽出
+      // 1-B. SNSデータから対象魚種のSNSソナーを抽出
       const snsUniqueCoords = new Map();
       window._articleSnsCatches.forEach(item => {
         if (!item || !item.lat || !item.lng || !item.fish) return;
@@ -719,7 +699,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      // 2. 各都道府県のスポットデータを取得
+      // 2. 各都道府県のスポットデータを取得（統合JSONに対応）
       const text = await res.text();
       const lines = text.trim().split('\n');
       if (lines.length < 2) return;
@@ -730,15 +710,18 @@ document.addEventListener("DOMContentLoaded", function () {
       
       if (typeIdx === -1 || urlIdx === -1) return;
 
-      const prefCodes = [];
+      const prefCodesSet = new Set();
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',').map(c => c.trim());
-        if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
-          const urlVal = cols[urlIdx];
-          const pCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
-          if (pCode) prefCodes.push(pCode);
+        const rowType = cols[typeIdx];
+        const urlVal = cols[urlIdx];
+        if ((rowType === 'pref' || rowType === 'spot') && urlVal) {
+          const fileName = urlVal.split('/').pop() || '';
+          const pCode = fileName.split('_')[0];
+          if (pCode) prefCodesSet.add(pCode);
         }
       }
+      const prefCodes = [...prefCodesSet];
       
       const fetchPromises = prefCodes.map(async (prefCode) => {
           const locUrl = `../${targetRegionCode}/${prefCode}_location.json`;
@@ -760,9 +743,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const fishSpotLinks = [];
       const allZoomSpots = [];
 
-      // 既存ソナー＋SNSソナーの両方を「釣果反応」ハイライト判定に利用
-      const allActiveSonars = [...displaySonarPoints, ...displaySnsSonarPoints];
-      
       results.forEach(({ locData, fishData, prefCode }) => {
           const fishMap = {};
           let rawPrefNameJP = prefCode;
@@ -770,11 +750,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
           if (Array.isArray(locData)) {
               locData.forEach(s => {
-                  if (s.name === prefCode && s.individualId === 'parent' && s.notes) {
+                  if ((s.individualId === 'parent' || s.name === prefCode) && s.notes && !s.areaId) {
                       rawPrefNameJP = s.notes;
                   }
-                  if (s.areaId === prefCode && s.individualId && s.individualId !== 'parent') {
-                      areaDict[s.individualId] = s.name;
+                  if (s.individualId && s.individualId !== 'parent') {
+                      const aId = String(s.areaId || '').trim();
+                      if (aId === prefCode || (aId !== '' && !aId.includes('_'))) {
+                          areaDict[s.individualId] = s.name;
+                      }
                   }
               });
           }
@@ -793,18 +776,20 @@ document.addEventListener("DOMContentLoaded", function () {
           
           if (Array.isArray(locData)) {
               locData.forEach(spot => {
-                  if (spot.type === 'pref' || spot.type === 'area') return;
+                  if (spot.type === 'pref' || spot.type === 'area' || spot.individualId === 'parent') return;
+                  const spotAreaIdStr = String(spot.areaId || '').trim();
+                  if (!spotAreaIdStr || spotAreaIdStr === prefCode || !spotAreaIdStr.includes('_')) return;
 
                   const sLat = Number(spot.lat);
                   const sLng = Number(spot.lng);
                   const hasValidCoord = Number.isFinite(sLat) && Number.isFinite(sLng);
 
-                  const spotAreaIdStr = String(spot.areaId || '');
-                  const areaIndividualId = spotAreaIdStr.replace(`${prefCode}_`, '');
+                  const areaIndividualId = spotAreaIdStr.startsWith(`${prefCode}_`)
+                      ? spotAreaIdStr.slice(prefCode.length + 1)
+                      : spotAreaIdStr.split('_').slice(1).join('_');
                   const areaNameJP = areaDict[areaIndividualId] || '';
 
-                  // URLクエリ用のprefパラメータはメインマップのルーティングに合わせて親notes（"茨城県栃木県"等）を維持しつつ、
-                  // カードや見出しの表示用には単一県名（"茨城県" / "栃木県"）を自動解決する
+                  // 統合JSON（"茨城県栃木県" 等）からスポットごとの単一県名（"茨城県" / "栃木県"）を解決
                   const displayPrefName = resolveSpotPrefName(rawPrefNameJP, areaNameJP, spot);
 
                   const spotHref = areaNameJP
@@ -837,8 +822,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   const fishArrayFromJSON = fStr ? fStr.split(',') : [];
                   
                   const fishArrayFromURL = [];
-                  if (spot.URL) {
-                      spot.URL.split(',').forEach(item => {
+                  const rawSpotUrl = spot.URL || spot.url || '';
+                  if (rawSpotUrl && rawSpotUrl.includes('|')) {
+                      rawSpotUrl.split(',').forEach(item => {
                           fishArrayFromURL.push(item.split('|')[0]); 
                       });
                   }
@@ -850,30 +836,16 @@ document.addEventListener("DOMContentLoaded", function () {
                   const isMatch = targetFishArray.some(targetFish => mappedSearchWords.includes(targetFish));
                   
                   if (isMatch) {
-                      let isSonarHit = false;
-                      let latestCatchDate = '';
-
                       if (hasValidCoord) {
                           L.marker([sLat, sLng], { icon: dotIcon }).addTo(map);
                           bounds.extend([sLat, sLng]);
-
-                          allActiveSonars.forEach(sp => {
-                              if (calcDistanceKm(sLat, sLng, sp.lat, sp.lng) <= sonarSettings.hitRadiusKm) {
-                                  isSonarHit = true;
-                                  if (sp.date > latestCatchDate) {
-                                      latestCatchDate = sp.date;
-                                  }
-                              }
-                          });
                       }
 
                       if (spotHref) {
                           fishSpotLinks.push({
                               prefName: displayPrefName,
                               spotName: spot.name,
-                              href: spotHref,
-                              isSonarHit: isSonarHit,
-                              latestCatchDate: latestCatchDate
+                              href: spotHref
                           });
                       }
                   }
@@ -903,7 +875,7 @@ document.addEventListener("DOMContentLoaded", function () {
           bounds.extend([sp.lat, sp.lng]);
       });
 
-      // 3-B. 既存ソナーの上にSNSデータ由来のソナーを重ねて描画（markerControl.js ロジック）
+      // 3-B. 既存ソナーの上にSNSデータ由来のソナーを重ねて描画
       const snsBaseSize = 48;
       displaySnsSonarPoints.forEach((pt, idx) => {
           const ageScale = getSonarAgeScale(pt.date);
@@ -926,7 +898,7 @@ document.addEventListener("DOMContentLoaded", function () {
           map.setZoom(map.getZoom() + 0.5);
       }
 
-      // 4. スポットリストの描画（複合県も個別の県名見出しで整理）
+      // 4. スポットリストの描画（釣果反応のエフェクト・バッジを廃止し、純粋なリンク一覧に）
       const listContainer = document.getElementById('fish-spot-list');
       if (listContainer && fishSpotLinks.length > 0) {
           const groupedLinks = {};
@@ -937,8 +909,13 @@ document.addEventListener("DOMContentLoaded", function () {
               groupedLinks[link.prefName].push(link);
           });
 
-          for (const [pref, links] of Object.entries(groupedLinks)) {
-              links.sort((a, b) => (b.isSonarHit ? 1 : 0) - (a.isSonarHit ? 1 : 0));
+          // 県名でソート（お好みで）
+          const sortedPrefs = Object.keys(groupedLinks).sort();
+
+          for (const pref of sortedPrefs) {
+              const links = groupedLinks[pref];
+              // スポット名でソート
+              links.sort((a, b) => a.spotName.localeCompare(b.spotName, 'ja'));
 
               const heading = document.createElement('h4');
               heading.className = 'pref-link-heading';
@@ -955,11 +932,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
               links.forEach(link => {
                   const li = document.createElement('li');
-                  li.className = link.isSonarHit ? 'spot-link-item sonar-hit' : 'spot-link-item';
-                  const badgeHtml = link.isSonarHit
-                      ? `<span class="sonar-badge">📡釣果反応</span>`
-                      : '';
-                  li.innerHTML = `<a href="${link.href}" title="${link.prefName} ${link.spotName}の釣り場と天気・潮汐情報を見る">${badgeHtml}${link.spotName}</a>`;
+                  li.className = 'spot-link-item'; // .sonar-hit クラスを付与しない
+                  li.innerHTML = `<a href="${link.href}" title="${link.prefName} ${link.spotName}の釣り場と天気・潮汐情報を見る">${link.spotName}</a>`;
                   ul.appendChild(li);
               });
               
