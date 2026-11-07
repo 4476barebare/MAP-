@@ -1091,6 +1091,354 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// ==========================================================
+// index.html の routeUpdate と window.selectPrefecture をこの2つに差し替える
+// （変更箇所は「★」コメント付き。それ以外は現行のまま）
+// 前提：prefLoader.js を regionLoader.js の次に読み込むこと
+// ==========================================================
+
+async function routeUpdate() {
+    // 旧URLなどに残る region=KANTO を表示名へ正規化する。
+    const regionParam = new URLSearchParams(window.location.search).get('region');
+    const regionName = Object.keys(REGION_MAP).find(name => REGION_MAP[name] === regionParam);
+    if (regionName) setIdealQuery('region', regionName);
+    if (!window.currentPref) {
+        await region_management();
+        return;
+    }
+
+    // ★ 追加：PREF画面の最優先ロード
+    //   REGION CSV → 選択県JSON → drawLocation → 他県JSON並列取得（集約は描画後に1回）
+    //   失敗しても従来フロー（checkAndLoadRouteData 以降）で続行する
+    if (typeof pref_management === 'function') {
+        try {
+            await pref_management(window.currentPref);
+        } catch (err) {
+            console.error('pref_management エラー（従来フローで続行）:', err);
+        }
+    }
+
+    const isReady = await checkAndLoadRouteData();
+    if (!isReady) return;
+
+    if (window.currentSpotId) {
+        const spotId = String(window.currentSpotId).split("_");
+        const safeAreaId = window.currentAreaId || ""; 
+        
+        if (typeof prepareFishForArea === 'function') await prepareFishForArea(safeAreaId);
+        
+        const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
+        const targetIndivId = spotId[2] || spotId[0]; 
+        const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+        
+        if (spot) {
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+            
+            if (parentArea) {
+                setIdealQuery('area', parentArea.name);
+
+                if (typeof drawLocation === 'function') {
+                    await drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+                }
+
+                if (window.map) {
+                    window.map.options.maxBoundsViscosity = 0;
+                    window.map.setMaxBounds(null);
+                }
+                
+                if (typeof prefetchAround === 'function') prefetchAround(parentArea);
+                if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
+                if (typeof phase1menu === 'function') phase1menu(safeAreaId);
+                if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
+                    window.markerControl.showShop01(safeAreaId);
+                }
+                
+                if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                if (typeof renderSpotRanking === 'function') renderSpotRanking();
+                if (typeof openArea === 'function') openArea(parentArea.individualId);
+            }
+            
+            setIdealQuery('spot', spot.name);
+            window._selectSpotCompleted = true;
+
+            if (window.map) {
+                window.map.once('moveend', () => {
+                    window.map.invalidateSize(true);
+                    if (typeof enableDragForArea === 'function') enableDragForArea();
+                    if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+                    window.map.getContainer().classList.add('is-spot-mode');
+
+                    if (spot.zoom && spot.zoom !== '') {
+                        if (typeof zoomToSpot === 'function') zoomToSpot(spot);
+                    } else {
+                        if (typeof showFishPopup === 'function') showFishPopup(spot);
+                    }
+                });
+            }
+
+            if (typeof drawLocation === 'function') {
+                await drawLocation(spot.name, spot.lat, spot.lng, 13);
+            }
+            
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                // ★ タイル切替ボタン・釣果投稿ボタンは zoomToSpot 内の準備完了（IP+UUID ＆ 代替タイル先読み）後にフェードインさせる
+                if (btn) {
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => { 
+                        btn.style.opacity = '1'; 
+                    });
+                }
+            });
+        }
+        return;
+    }
+
+    if (window.currentAreaId) {
+        if (typeof loadRegionCSV === 'function') await loadRegionCSV();
+        const safeAreaId = window.currentAreaId || ""; 
+        const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+        if (!area) return;
+        
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        setIdealQuery('area', area.name); 
+        setIdealQuery('spot', null);      
+
+        const safeZoom = area.zoom || window.prefData.zoom;
+        if (typeof drawLocation === 'function') await drawLocation(area.name, area.lat, area.lng, safeZoom);
+        
+        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        if (typeof showRoadLayers === 'function') showRoadLayers();
+
+        if (typeof selectArea === 'function') selectArea(area); 
+        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+        if (typeof showPrefSpots === 'function') showPrefSpots();
+        requestAnimationFrame(() => {
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.display = 'block';
+                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+            }
+        });
+        return;
+    }
+
+    if (window.prefData) {
+        if (typeof loadRegionCSV === 'function') await loadRegionCSV();
+        setIdealQuery('pref', window.prefData.notes); 
+        setIdealQuery('area', null);                 
+        setIdealQuery('spot', null);                 
+
+        const targetZoom = window.prefData.zoom;
+        const isMapJustCreated = !window.map;
+        const center = window.map ? window.map.getCenter() : null;
+        const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                          Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                          window.map.getZoom() === targetZoom);
+
+        if (typeof drawLocation === 'function') await drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+        
+        const finalizePref = () => {
+            if (window.map) window.map.invalidateSize(true);
+            
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (typeof showRoadLayers === 'function') showRoadLayers();
+                    if (typeof showPrefSpots === 'function') showPrefSpots();
+                    if (typeof initAreaUI === 'function') initAreaUI();
+                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                    if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                    if (typeof renderSpotRanking === 'function') renderSpotRanking();
+
+                    requestAnimationFrame(() => {
+                        const btn = document.getElementById('map-back-btn');
+                        if (btn) {
+                            btn.style.display = 'block';
+                            requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                        }
+                        window.goBackGuard = false; 
+                    });
+                });
+            });
+        };
+
+        if (isSameLoc) {
+            finalizePref();
+        } else {
+            if (window.map) window.map.once('moveend', finalizePref);
+        }
+    }
+}
+
+window.selectPrefecture = async function (csvParam, fallbackPrefName) {
+    // ★ 追加：県画面に移行する際はRegion用のニアレストクリックを確実に解除する
+    if (window.regionNearestClickHandler && window.map) {
+        window.map.off('click', window.regionNearestClickHandler);
+    }
+
+    let region = window.currentRegion || 'KANTO';
+    let prefCode = csvParam;
+
+    if (csvParam.includes('_location')) {
+        prefCode = csvParam.split('_')[0];
+    } else if (csvParam.includes('_')) {
+        const parts = csvParam.split('_');
+        region = parts[0];
+        prefCode = parts[1];
+    } else if (csvParam.includes('.csv')) {
+        const match =
+            csvParam.match(/\/([A-Za-z-]+)_/) ||
+            csvParam.match(/^([A-Za-z-]+)_/);
+
+        if (match) {
+            prefCode = match[1];
+        }
+    }
+
+    window.currentRegion = region;
+    window.currentPref = prefCode;
+
+    // 県切り替え開始時に、前の県の取得結果が後から反映されないよう無効化
+    window._jmaAlertRequestId = (window._jmaAlertRequestId || 0) + 1;
+    window._currentAlertUrl = null;
+    if (typeof clearMapAlert === 'function') clearMapAlert();
+
+    window.prefBounds = null;
+    window.areaBounds = null;
+
+    window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
+    window.prefWeatherUrl = `/data/${prefCode}_whether.csv`;
+    window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
+    window.fishUrl = `/${region}/${prefCode}_fish.json`;
+    window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
+
+    let prefName = fallbackPrefName;
+
+    // =====================================================
+    // 県データの抽出
+    // =====================================================
+    if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
+        const targetPrefData = window.ALL_REGION_SPOTS.find(
+            r => r.name === prefCode && r.individualId === "parent"
+        );
+
+        if (targetPrefData) {
+            window.prefData = targetPrefData;
+            prefName = targetPrefData.notes;
+        }
+    }
+
+    if (prefName) {
+        setIdealQuery('pref', prefName);
+    } else {
+        setIdealQuery('pref', prefCode);
+    }
+
+    setIdealQuery('area', null);
+    setIdealQuery('spot', null);
+
+    // ★ 差し替え：drawLocation と他県JSONの並列取得は pref_management に任せる
+    //   （内部で既存マップからの移動完了まで待ってから戻る）
+    let drawn = false;
+    if (typeof pref_management === 'function') {
+        try {
+            drawn = await pref_management(prefCode);
+        } catch (err) {
+            console.error('pref_management エラー（従来フローで続行）:', err);
+        }
+    }
+
+    if (typeof loadPrefectureData === 'function') {
+        await loadPrefectureData(prefCode);
+    }
+
+    if (window.prefData && window.map) {
+        const targetZoom = window.prefData.zoom;
+
+        // pref_management が使えなかった場合のみ、従来どおりここで描画する
+        if (!drawn) {
+            await loadLocationJSON();
+
+            drawLocation(
+                window.prefData.name,
+                window.prefData.lat,
+                window.prefData.lng,
+                targetZoom
+            );
+        }
+
+        const finalizePref = () => {
+            window.map.invalidateSize(true);
+
+            if (
+                typeof loadPrefectureData === 'function' &&
+                (!window.spotData || window.spotData.length === 0)
+            ) {
+                loadPrefectureData(prefCode).then(() => {
+                    executeUI();
+                });
+            } else {
+                executeUI();
+            }
+
+            function executeUI() {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        // 👇 追加: 県が選択された時に確実に道路レイヤーを表示
+                        if (typeof showRoadLayers === 'function') showRoadLayers();
+
+                        if (typeof showPrefSpots === 'function') showPrefSpots();
+                        if (typeof initAreaUI === 'function') initAreaUI();
+                        if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                        
+                        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+
+                        if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+                            window.markerControl.preloadShop01(window.prefShopUrl);
+                        }
+                        
+                        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+                        requestAnimationFrame(() => {
+                            const btn = document.getElementById('map-back-btn');
+
+                            if (btn) {
+                                btn.style.display = 'block';
+
+                                requestAnimationFrame(() => {
+                                    btn.style.opacity = '1';
+                                });
+                            }
+                            
+                            window.goBackGuard = false;
+                        });
+                    });
+                });
+            }
+        };
+
+        const center = window.map.getCenter();
+
+        const isSameLoc =
+            Math.abs(center.lat - window.prefData.lat) < 0.0001 &&
+            Math.abs(center.lng - window.prefData.lng) < 0.0001 &&
+            window.map.getZoom() === targetZoom;
+
+        if (isSameLoc) {
+            finalizePref();
+        } else {
+            window.map.once('moveend', finalizePref);
+        }
+    }
+};
+  
 // ==========================================
 // ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数
 // ==========================================
