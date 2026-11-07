@@ -3339,6 +3339,42 @@ function disablePrefSwipe() {
     window._prefSwipeEnabled = false;
 }
 
+// ==========================================
+// ★ 画面に文字を出すデバッグ用関数（スクロール＆コピペ対応版）
+// ==========================================
+function showdebug(msg) {
+    let debugBox = document.getElementById('my-debug-box');
+    if (!debugBox) {
+        debugBox = document.createElement('div');
+        debugBox.id = 'my-debug-box';
+        debugBox.style.position = 'fixed';
+        debugBox.style.top = '10px';
+        debugBox.style.left = '10px';
+        debugBox.style.padding = '10px';
+        debugBox.style.background = 'rgba(0, 0, 0, 0.8)';
+        debugBox.style.color = '#00ff00';
+        debugBox.style.fontFamily = 'monospace';
+        debugBox.style.fontSize = '10px';
+        debugBox.style.zIndex = '999999';
+        debugBox.style.borderRadius = '5px';
+        
+        // ★ スクロールとコピー操作を有効化
+        debugBox.style.maxHeight = '70vh';        // 縦幅の最大値を画面の70%に制限
+        debugBox.style.width = '80vw';            // 横幅も余裕を持たせる（任意）
+        debugBox.style.overflowY = 'auto';        // はみ出たら縦スクロール
+        debugBox.style.pointerEvents = 'auto';    // クリック・スクロールを許可
+        debugBox.style.userSelect = 'text';       // テキスト選択・コピーを許可
+        debugBox.style.WebkitUserSelect = 'text'; // iOS Safari用のコピペ許可
+        
+        document.body.appendChild(debugBox);
+    }
+
+    // メッセージの追記
+    debugBox.innerHTML += msg + '<br>';
+    
+    // ★ 新しいログが追加されたら、自動的に一番下へスクロールする
+    debugBox.scrollTop = debugBox.scrollHeight;
+}
 
 // ==========================================
 // 気象庁アラート取得・表示
@@ -3430,7 +3466,7 @@ function getAlertText(pref, callback) {
         var color = (warnings.length > 0) ? "#ff4d4d" : "#ffea00";
         return { text: finalMsgs.join(" / "), color: color };
       })
-      .catch(function() {
+      .catch(function(err) {
         return null;
       });
   })).then(function(results) {
@@ -3440,7 +3476,6 @@ function getAlertText(pref, callback) {
         (window.prefData && (window.prefData.url || window.prefData.URL || "") !== targetUrl)) return;
 
     var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
-
     if (validResults.length > 0) {
       var htmlLines = validResults.map(function(res) {
         return '<span class="jma-alert-message" style="display:inline-block; color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px; margin-right: 12px;">' + prefix + res.text + '</span>';
