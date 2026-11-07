@@ -274,11 +274,17 @@ function loadRegionCsvData() {
 }
 
 // ==========================================
-// ★ 2. 指定した1県だけのlocation.jsonを最速で取得する関数
+// ★ 都道府県 location.json の共通ロード管理
+// mode:
+//   select = 選択県のみ
+//   other  = 選択県を除く同一地方の全県
+//   all    = 同一地方の全県（選択県を含む）
+// 県別データは個別に保持し、all の場合だけ全県配列を再構築する。
 // ==========================================
 window._loadedPrefSet = window._loadedPrefSet || new Set();
 window.prefSpotData = window.prefSpotData || {};
 window.prefSpotPromises = window.prefSpotPromises || {};
+window._isAllRegionLoaded = window._isAllRegionLoaded || false;
 
 function rebuildAllSpotData() {
     window.allspotData = Object.values(window.prefSpotData).flat();
@@ -286,76 +292,67 @@ function rebuildAllSpotData() {
     return window.allspotData;
 }
 
-async function fetchSinglePrefSpots(prefCode) {
-    if (!prefCode) return [];
-    if (Array.isArray(window.prefSpotData[prefCode])) return window.prefSpotData[prefCode];
+function fetchAndStorePrefSpots(prefCode) {
+    if (!prefCode) return Promise.resolve([]);
+    if (Array.isArray(window.prefSpotData[prefCode])) return Promise.resolve(window.prefSpotData[prefCode]);
     if (window.prefSpotPromises[prefCode]) return window.prefSpotPromises[prefCode];
 
     const regionCode = window.currentRegion || 'KANTO';
     const url = `/${regionCode}/${prefCode}_location.json`;
 
-    window.prefSpotPromises[prefCode] = fetch(url)
+    const promise = fetch(url, { priority: 'low' })
         .then(res => {
             if (!res.ok) throw new Error("location.json fetch failed: " + res.status);
             return res.json();
         })
         .then(data => {
             if (!Array.isArray(data)) throw new Error("location.json形式エラー: " + prefCode);
-            data.forEach(s => s._prefCode = prefCode);
+            data.forEach(s => { s._prefCode = prefCode; });
             window.prefSpotData[prefCode] = data;
             window._loadedPrefSet.add(prefCode);
-            rebuildAllSpotData();
             return data;
         })
         .catch(error => {
             delete window.prefSpotPromises[prefCode];
-            console.error("単一県JSON取得エラー:", error);
+            console.error("都道府県JSON取得エラー:", prefCode, error);
             return [];
         });
 
-    return window.prefSpotPromises[prefCode];
+    window.prefSpotPromises[prefCode] = promise;
+    return promise;
 }
 
-// =====================================================
-// ■ 3. 全県データをバックグラウンドで取得・合体する金庫生成関数
-// =====================================================
-window._isAllRegionLoaded = false;
-window._allRegionSpotsPromise = null;
+window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
+    if (!['select', 'other', 'all'].includes(mode)) {
+        throw new Error('loadPrefectureSpots: mode は select / other / all のいずれかを指定してください');
+    }
+    if ((mode === 'select' || mode === 'other') && !prefCode) return [];
 
-async function fetchAllRegionSpots() {
-    if (window._isAllRegionLoaded && Object.keys(window.prefSpotData).length > 0) {
+    const csvData = await loadRegionCsvData();
+    if (!csvData || !Array.isArray(csvData.prefRows)) return [];
+
+    const prefList = [...new Set(
+        csvData.prefRows.map(row => row.prefCode).filter(Boolean)
+    )];
+
+    let targetList = prefList;
+    if (mode === 'select') targetList = [prefCode];
+    if (mode === 'other') targetList = prefList.filter(code => code !== prefCode);
+
+    const loadedRows = await Promise.all(targetList.map(fetchAndStorePrefSpots));
+
+    if (mode === 'all') {
+        window._isAllRegionLoaded = prefList.every(code => Array.isArray(window.prefSpotData[code]));
         return rebuildAllSpotData();
     }
-    if (window._allRegionSpotsPromise) return window._allRegionSpotsPromise;
 
-    window._allRegionSpotsPromise = (async () => {
-        try {
-            const csvData = await loadRegionCsvData();
-            if (!csvData.headers.includes('type') || !csvData.headers.includes('url')) {
-                return rebuildAllSpotData();
-            }
+    if (mode === 'other') {
+        window._isAllRegionLoaded = prefList.every(code => Array.isArray(window.prefSpotData[code]));
+        return loadedRows.flat();
+    }
 
-            const prefList = [];
-            for (const pref of csvData.prefRows || []) {
-                if (pref.prefCode && !prefList.includes(pref.prefCode)) {
-                    prefList.push(pref.prefCode);
-                }
-            }
-
-            await Promise.all(prefList.map(prefCode => fetchSinglePrefSpots(prefCode)));
-            window._isAllRegionLoaded = prefList.every(prefCode => Array.isArray(window.prefSpotData[prefCode]));
-            if (!window._isAllRegionLoaded) window._allRegionSpotsPromise = null;
-            return rebuildAllSpotData();
-        } catch (err) {
-            console.error("全県データ読み込みエラー:", err);
-            window._allRegionSpotsPromise = null;
-            return rebuildAllSpotData();
-        }
-    })();
-
-    return window._allRegionSpotsPromise;
-}
-
+    return window.prefSpotData[prefCode] || loadedRows[0] || [];
+};
 
 // =====================================================
 // ■ 広域マップで全県のドットを描画する関数
@@ -380,7 +377,7 @@ async function showAllRegionSpots() {
     }
 
     window._buildingRegionSpotsPromise = (async () => {
-        await fetchAllRegionSpots();
+        await loadPrefectureSpots(window.currentPref, 'all');
         const allSpots = Object.values(window.prefSpotData || {}).flat();
         const targetSpots = allSpots.filter(
             s => s.type !== 'pref' && s.type !== 'area'
@@ -670,7 +667,7 @@ async function region_management() {
         console.error('共通データ先行取得エラー:', error);
     });
 
-    await Promise.all(prefList.map(prefCode => fetchSinglePrefSpots(prefCode)));
+    await loadPrefectureSpots(null, 'all');
 
     const dataPromises = prefList.map(prefCode => {
         const fishUrl = `/${window.currentRegion || 'KANTO'}/${prefCode}_fish.json`;
