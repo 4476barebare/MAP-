@@ -1,6 +1,6 @@
 // =========================================
 // fish_article.js
-// 魚種生息マップ生成＆ソナーレーダー演出＆SNS最新釣果スポットカード＆リンク自動構築スクリプト
+// 魚種生息マップ生成＆ソナーレーダー演出（compiled_data + SNSソナー重畳）＆SNS最新釣果スポットカード＆リンク自動構築スクリプト
 // =========================================
 
 // ==========================================
@@ -74,6 +74,52 @@ const ARTICLE_TILE_URLS = {
     photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
 
+// ==========================================
+// ★ 複合県JSON（"茨城県栃木県" 等）から単一都道府県名を解決するヘルパー
+// ==========================================
+const PREF_EXTRACT_REGEX = /(東京都|北海道|(?:京都|大阪)府|.{2,3}県)/g;
+const AREA_CODE_TO_PREF_MAP = {
+    "TOCHIGI": "栃木県",
+    "IBARAKI": "茨城県",
+    "GUNMA": "群馬県",
+    "SAITAMA": "埼玉県",
+    "CHIBA": "千葉県",
+    "TOKYO": "東京都",
+    "KANAGAWA": "神奈川県"
+};
+
+function resolveSpotPrefName(parentPrefNotes, areaNameJP, spot) {
+    const rawPref = String(parentPrefNotes || '').trim();
+    const matchedPrefs = rawPref.match(PREF_EXTRACT_REGEX);
+    if (!matchedPrefs || matchedPrefs.length <= 1) {
+        return rawPref;
+    }
+
+    // 1. スポットの notes（住所表記など）に県名が含まれていれば最優先
+    const spotNotes = String(spot?.notes || '');
+    for (const p of matchedPrefs) {
+        if (spotNotes.includes(p)) return p;
+    }
+
+    // 2. エリア名（"栃木鬼怒川エリア" 等）に県名の語幹が含まれていれば採用
+    const areaStr = String(areaNameJP || '');
+    for (const p of matchedPrefs) {
+        const stem = p.replace(/[都府県]$/, '');
+        if (stem && areaStr.includes(stem)) return p;
+    }
+
+    // 3. areaId（"IBARAKI_TOCHIGI" 等）のサブコードから判定
+    const areaIdUpper = String(spot?.areaId || '').toUpperCase();
+    for (const [code, pName] of Object.entries(AREA_CODE_TO_PREF_MAP)) {
+        if (areaIdUpper.endsWith('_' + code) && matchedPrefs.includes(pName)) {
+            return pName;
+        }
+    }
+
+    // 4. いずれにも該当しない場合は先頭の県名（例: "茨城県栃木県" -> "茨城県"）
+    return matchedPrefs[0];
+}
+
 // ★ 正規化ヘルパー
 function normalizeFishName(rawName) {
     if (!rawName) return "";
@@ -99,6 +145,57 @@ function calcDistanceKm(lat1, lng1, lat2, lng2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+// ==========================================
+// ★ markerControl.js 流用：SNSソナー用の経過日数スケール・SNSクラス判定・アイコン生成
+// ==========================================
+function getSonarAgeScale(dateStr) {
+    if (!dateStr) return 0.125;
+    const parts = String(dateStr).trim().replace(/-/g, '/').split('/');
+    if (parts.length < 3) return 0.125;
+
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+
+    const postDate = new Date(year, month, day);
+    if (isNaN(postDate.getTime())) return 0.125;
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.max(0, Math.floor((today.getTime() - postDate.getTime()) / 86400000));
+
+    if (diffDays <= 6) return 1.0;
+    if (diffDays <= 13) return 0.5;
+    if (diffDays <= 20) return 0.25;
+    return 0.125;
+}
+
+function getSnsColorClass(source) {
+    const s = String(source || '').toLowerCase();
+    if (s.includes('instagram')) return 'sns-instagram';
+    if (s === 'x' || s.includes('twitter')) return 'sns-x';
+    if (s.includes('facebook')) return 'sns-facebook';
+    if (s.includes('threads')) return 'sns-threads';
+    return 'sns-default';
+}
+
+function createSnsSonarDivIcon(sizePx, snsClass, offsetSec, delay2Sec) {
+    const half = sizePx / 2;
+    return L.divIcon({
+        className: 'sns-sonar-wrapper',
+        html: `
+          <div class="sns-sonar-emitter ${snsClass}" style="--sonar-size: ${sizePx}px;">
+            <div class="sns-sonar-sweep"></div>
+            <div class="sns-sonar-wave" style="animation-delay: ${offsetSec}s;"></div>
+            <div class="sns-sonar-wave" style="animation-delay: ${delay2Sec}s;"></div>
+            <div class="sns-sonar-core"></div>
+          </div>
+        `,
+        iconSize: [sizePx * 1.65, sizePx * 1.65],
+        iconAnchor: [half * 1.65, half * 1.65]
+    });
+}
+
 // ★ dataLoader.js の zoomToSpot と完全一致するタイル情報＋タイル内相対座標（%）＋周辺2x2キャッシュ用URLを算出
 function buildSpotTileData(spot) {
     const lat = Number(spot.lat);
@@ -121,8 +218,6 @@ function buildSpotTileData(spot) {
         baseTileUrl = tileUrls.photo;
     }
 
-    // Leafletは小数ズーム（例: 16.5）のとき Math.ceil(16.5) = 17 のタイルを読み込んで縮小表示するため、
-    // キャッシュヒット率を100%にするため Math.ceil で実際のズームタイルに合わせる（上限18）
     const targetZoom = isSpecial ? 14 : (rawZoom < 14 ? 14 : rawZoom);
     const fetchZoom = Math.min(18, Math.ceil(targetZoom));
 
@@ -134,14 +229,12 @@ function buildSpotTileData(spot) {
     const tileX = Math.floor(exactX);
     const tileY = Math.floor(exactY);
 
-    // タイル内でのスポットの相対位置（0〜100%）を算出し、object-position で中心を合わせる
     const offsetXPercent = Math.round((exactX - tileX) * 100);
     const offsetYPercent = Math.round((exactY - tileY) * 100);
 
     const baseUrl = baseTileUrl.replace('{z}', fetchZoom);
     const thumbUrl = baseUrl.replace('{x}', tileX).replace('{y}', tileY);
 
-    // 隣接する周囲タイル（2x2）も遷移先スポット画面のキャッシュとして使えるようリスト化
     const stepX = (exactX - tileX) >= 0.5 ? 1 : -1;
     const stepY = (exactY - tileY) >= 0.5 ? 1 : -1;
     const preloadUrls = [];
@@ -156,7 +249,7 @@ function buildSpotTileData(spot) {
 
     return {
         thumbUrl,
-         objectPosition: `${offsetXPercent}% ${offsetYPercent}%`,
+        objectPosition: `${offsetXPercent}% ${offsetYPercent}%`,
         preloadUrls
     };
 }
@@ -205,7 +298,7 @@ function getSonarSettings(targetFishArray) {
     return settings;
 }
 
-// ★ ソナーレーダー＆ハイライト用のCSSを自動注入
+// ★ 既存ソナーレーダー＆ハイライト用のCSSを自動注入（SONAR ACTIVEバナーは廃止）
 function injectSonarStyles(sizePx) {
     const existing = document.getElementById('sonar-radar-styles');
     if (existing) existing.remove();
@@ -274,35 +367,6 @@ function injectSonarStyles(sizePx) {
             to { transform: rotate(360deg); }
         }
 
-        .sonar-status-banner {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #0b192c;
-            color: #00ffcc;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            border: 1px solid rgba(0, 255, 204, 0.4);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-            line-height: 1.4;
-        }
-        .sonar-status-dot {
-            width: 8px;
-            height: 8px;
-            background: #00ffcc;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #00ffcc;
-            animation: sonar-blink 1.2s infinite alternate;
-            flex-shrink: 0;
-        }
-        @keyframes sonar-blink {
-            from { opacity: 0.3; }
-            to { opacity: 1; }
-        }
-
         .spot-link-item.sonar-hit a {
             background: linear-gradient(135deg, #0b192c 0%, #16325b 100%) !important;
             color: #00ffcc !important;
@@ -328,11 +392,6 @@ function injectSonarStyles(sizePx) {
 
 // ==========================================
 // ★ SNS最新釣果から最寄りスポットカードを生成する関数
-//    引数:
-//      targetContainer: DOM要素またはセレクタ文字列
-//      maxCount: 連続生成する最大件数（デフォルト 1）
-//      targetIndex: 複数検索の「◯件目（1始まり）」だけを単品表示する場合に指定（未指定・0なら maxCount 件を連続表示）
-//      maxDistKm: 最寄りスポットとして許容する最大直線距離km（デフォルト 15）
 // ==========================================
 window._articleAllZoomSpots = [];
 window._articleSnsCatches = [];
@@ -349,7 +408,6 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         ? Math.floor(Number(targetIndex))
         : null;
 
-    // 単品指定（例: 3件目のみ）の場合は最低でも3件目まで探索する
     const countLimit = singleIdx ? singleIdx : Math.max(1, Number(maxCount) || 1);
     const distLimitKm = Math.max(0.1, Number(maxDistKm) || 15);
 
@@ -362,7 +420,6 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         return;
     }
 
-    // 1. 対象魚種に一致するSNS投稿を抽出し、日付の最新順（降順）にソート
     const matchedPosts = snsList
         .filter(item => {
             if (!item || item.lat == null || item.lng == null || !item.fish) return false;
@@ -378,7 +435,6 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         return;
     }
 
-    // 2. 最新投稿から順に、maxDistKm 以内で最も近い「未出のスポット」を countLimit 件まで探索
     const selectedCards = [];
     const usedSpotKeys = new Set();
 
@@ -392,7 +448,7 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         let minDistance = Infinity;
 
         for (const spot of spots) {
-            const spotKey = `${spot.prefName}_${spot.spotName}`;
+            const spotKey = `${spot.rawPrefName}_${spot.spotName}`;
             if (usedSpotKeys.has(spotKey)) continue;
 
             const d = calcDistanceKm(pLat, pLng, spot.lat, spot.lng);
@@ -403,11 +459,11 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         }
 
         if (nearestSpot) {
-            const spotKey = `${nearestSpot.prefName}_${nearestSpot.spotName}`;
+            const spotKey = `${nearestSpot.rawPrefName}_${nearestSpot.spotName}`;
             usedSpotKeys.add(spotKey);
 
             selectedCards.push({
-                prefName: nearestSpot.prefName,
+                displayPrefName: nearestSpot.displayPrefName,
                 spotName: nearestSpot.spotName,
                 href: nearestSpot.href,
                 thumbUrl: nearestSpot.thumbUrl,
@@ -420,7 +476,6 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         }
     }
 
-    // 第3引数（targetIndex）が指定されている場合は、その「◯件目」の1件だけを抽出（届かなければ空）
     const displayCards = singleIdx
         ? (selectedCards[singleIdx - 1] ? [selectedCards[singleIdx - 1]] : [])
         : selectedCards;
@@ -430,7 +485,6 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         return;
     }
 
-    // 周囲タイル（2x2）も裏側でプリロードして遷移時のキャッシュヒット率を高める
     displayCards.forEach(card => {
         (card.preloadUrls || []).forEach(u => {
             if (!window._preloadedArticleTiles.has(u)) {
@@ -441,9 +495,8 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         });
     });
 
-    // 3. アジ記事の関連リンクと同一の .menu-card 構造でDOM生成（県名・ALT・地理院&Leaflet署名付き）
     const cardsHtml = displayCards.map(item => {
-        const safePref = String(item.prefName || '').replace(/[<>&"']/g, '');
+        const safePref = String(item.displayPrefName || '').replace(/[<>&"']/g, '');
         const safeSpot = String(item.spotName || '').replace(/[<>&"']/g, '');
         const fullSpotTitle = safePref ? `${safePref} ${safeSpot}` : safeSpot;
         const altText = `${safeSpot}の画像`;
@@ -516,8 +569,14 @@ document.addEventListener("DOMContentLoaded", function () {
     attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank">© 国土地理院</a>'
   }).addTo(map);
 
+  // 既存ソナーPane（背面: 650）と SNSソナーPane（前面: 655）を重ねて配置
   map.createPane('sonarPane');
   map.getPane('sonarPane').style.zIndex = 650;
+  map.getPane('sonarPane').style.pointerEvents = 'none';
+
+  map.createPane('snsSonarPane');
+  map.getPane('snsSonarPane').style.zIndex = 655;
+  map.getPane('snsSonarPane').style.pointerEvents = 'none';
 
   const dotIcon = L.divIcon({
     className: 'fish-dot-marker',
@@ -563,9 +622,9 @@ document.addEventListener("DOMContentLoaded", function () {
         window._articleSnsCatches = [];
       }
       
+      // 1-A. compiled_data.json から対象魚種の既存ソナー座標を抽出
       const allMatchedCatchPoints = [];
       const displaySonarPoints = [];
-      let totalCatchReports = 0;
 
       if (compiledRes && compiledRes.ok) {
         const compiledJson = await compiledRes.json();
@@ -579,7 +638,6 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!item || !item.fish || !item.lat || !item.lng) return;
           const normFish = normalizeFishName(item.fish);
           if (targetFishArray.includes(normFish)) {
-            totalCatchReports++;
             const key = `${Number(item.lat).toFixed(3)}_${Number(item.lng).toFixed(3)}`;
             const existing = uniqueCoords.get(key);
             if (!existing || item.date > existing.date) {
@@ -613,6 +671,55 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
+      // 1-B. markerControl.js ロジック流用：SNSデータ（integrated_catch.json）から対象魚種のSNSソナーを抽出
+      const snsUniqueCoords = new Map();
+      window._articleSnsCatches.forEach(item => {
+        if (!item || !item.lat || !item.lng || !item.fish) return;
+        if (!isTargetFishMatched(item.fish, targetFishArray)) return;
+
+        const key = `${Number(item.lat).toFixed(3)}_${Number(item.lng).toFixed(3)}`;
+        const existing = snsUniqueCoords.get(key);
+        const itemDate = String(item.date || '');
+
+        if (!existing) {
+          snsUniqueCoords.set(key, {
+            lat: Number(item.lat),
+            lng: Number(item.lng),
+            date: itemDate,
+            fish: item.fish || '',
+            source: item.source || 'SNS',
+            count: 1
+          });
+        } else {
+          existing.count += 1;
+          if (itemDate >= existing.date) {
+            existing.date = itemDate;
+            if (item.fish) existing.fish = item.fish;
+            if (item.source) existing.source = item.source;
+          }
+        }
+      });
+
+      const sortedSnsCandidates = [...snsUniqueCoords.values()].sort((a, b) => {
+        const scaleA = getSonarAgeScale(a.date);
+        const scaleB = getSonarAgeScale(b.date);
+        if (scaleB !== scaleA) return scaleB - scaleA;
+        if (b.count !== a.count) return b.count - a.count;
+        return b.date.localeCompare(a.date);
+      });
+
+      const displaySnsSonarPoints = [];
+      for (const candidate of sortedSnsCandidates) {
+        if (displaySnsSonarPoints.length >= sonarSettings.maxSonars) break;
+        const isTooClose = displaySnsSonarPoints.some(
+          selected => calcDistanceKm(candidate.lat, candidate.lng, selected.lat, selected.lng) < sonarSettings.minDistanceKm
+        );
+        if (!isTooClose) {
+          displaySnsSonarPoints.push(candidate);
+        }
+      }
+
+      // 2. 各都道府県のスポットデータを取得
       const text = await res.text();
       const lines = text.trim().split('\n');
       if (lines.length < 2) return;
@@ -652,16 +759,19 @@ document.addEventListener("DOMContentLoaded", function () {
       const bounds = L.latLngBounds();
       const fishSpotLinks = [];
       const allZoomSpots = [];
+
+      // 既存ソナー＋SNSソナーの両方を「釣果反応」ハイライト判定に利用
+      const allActiveSonars = [...displaySonarPoints, ...displaySnsSonarPoints];
       
       results.forEach(({ locData, fishData, prefCode }) => {
           const fishMap = {};
-          let prefNameJP = prefCode;
+          let rawPrefNameJP = prefCode;
           const areaDict = {};
 
           if (Array.isArray(locData)) {
               locData.forEach(s => {
                   if (s.name === prefCode && s.individualId === 'parent' && s.notes) {
-                      prefNameJP = s.notes;
+                      rawPrefNameJP = s.notes;
                   }
                   if (s.areaId === prefCode && s.individualId && s.individualId !== 'parent') {
                       areaDict[s.individualId] = s.name;
@@ -692,17 +802,22 @@ document.addEventListener("DOMContentLoaded", function () {
                   const spotAreaIdStr = String(spot.areaId || '');
                   const areaIndividualId = spotAreaIdStr.replace(`${prefCode}_`, '');
                   const areaNameJP = areaDict[areaIndividualId] || '';
+
+                  // URLクエリ用のprefパラメータはメインマップのルーティングに合わせて親notes（"茨城県栃木県"等）を維持しつつ、
+                  // カードや見出しの表示用には単一県名（"茨城県" / "栃木県"）を自動解決する
+                  const displayPrefName = resolveSpotPrefName(rawPrefNameJP, areaNameJP, spot);
+
                   const spotHref = areaNameJP
-                      ? `https://turiiko-navi.com/?region=${encodeURIComponent(targetRegionNameJP)}&pref=${encodeURIComponent(prefNameJP)}&area=${encodeURIComponent(areaNameJP)}&spot=${encodeURIComponent(spot.name)}`
+                      ? `https://turiiko-navi.com/?region=${encodeURIComponent(targetRegionNameJP)}&pref=${encodeURIComponent(rawPrefNameJP)}&area=${encodeURIComponent(areaNameJP)}&spot=${encodeURIComponent(spot.name)}`
                       : '';
 
-                  // ★ 全登録スポットのうち zoom 値があるスポットを SNS最寄りカード候補としてプール
                   if (hasValidCoord && spot.zoom != null && String(spot.zoom).trim() !== '' && spotHref) {
                       const tileInfo = buildSpotTileData(spot);
                       const fallbackInfo = buildSpotTileData({ ...spot, type: 'ort' });
                       if (tileInfo && tileInfo.thumbUrl) {
                           allZoomSpots.push({
-                              prefName: prefNameJP,
+                              rawPrefName: rawPrefNameJP,
+                              displayPrefName: displayPrefName,
                               areaName: areaNameJP,
                               spotName: spot.name,
                               lat: sLat,
@@ -742,7 +857,7 @@ document.addEventListener("DOMContentLoaded", function () {
                           L.marker([sLat, sLng], { icon: dotIcon }).addTo(map);
                           bounds.extend([sLat, sLng]);
 
-                          displaySonarPoints.forEach(sp => {
+                          allActiveSonars.forEach(sp => {
                               if (calcDistanceKm(sLat, sLng, sp.lat, sp.lng) <= sonarSettings.hitRadiusKm) {
                                   isSonarHit = true;
                                   if (sp.date > latestCatchDate) {
@@ -754,7 +869,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                       if (spotHref) {
                           fishSpotLinks.push({
-                              prefName: prefNameJP,
+                              prefName: displayPrefName,
                               spotName: spot.name,
                               href: spotHref,
                               isSonarHit: isSonarHit,
@@ -768,10 +883,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       window._articleAllZoomSpots = allZoomSpots;
 
-      // ★ 記事内の .sns-nearest-spots コンテナを自動検出してカードを生成
-      //    data-count: 連続表示件数（デフォルト 1）
-      //    data-index: ◯件目を単品表示（指定時はその順位の1件のみ描画）
-      //    data-max-km: 最大距離km（デフォルト 15）
       document.querySelectorAll('.sns-nearest-spots').forEach(el => {
           const countAttr = el.getAttribute('data-count');
           const indexAttr = el.getAttribute('data-index');
@@ -782,6 +893,7 @@ document.addEventListener("DOMContentLoaded", function () {
           window.renderSnsNearestSpotCards(el, count, targetIdx, maxKm);
       });
 
+      // 3-A. 既存ソナーレーダーを描画
       displaySonarPoints.forEach(sp => {
           L.marker([sp.lat, sp.lng], {
               icon: sonarIcon,
@@ -791,25 +903,30 @@ document.addEventListener("DOMContentLoaded", function () {
           bounds.extend([sp.lat, sp.lng]);
       });
 
-      if (displaySonarPoints.length > 0 && mapContainer) {
-          const banner = document.createElement('div');
-          banner.className = 'sonar-status-banner';
-          const countText = allMatchedCatchPoints.length > displaySonarPoints.length
-            ? `直近の釣果反応（計${totalCatchReports}件）から主要 <strong>${displaySonarPoints.length}エリア</strong> をソナー表示中！`
-            : `直近の釣果反応を <strong>${displaySonarPoints.length}地点</strong> でキャッチ！`;
+      // 3-B. 既存ソナーの上にSNSデータ由来のソナーを重ねて描画（markerControl.js ロジック）
+      const snsBaseSize = 48;
+      displaySnsSonarPoints.forEach((pt, idx) => {
+          const ageScale = getSonarAgeScale(pt.date);
+          const finalSize = Math.max(6, Math.round(snsBaseSize * ageScale * 10) / 10);
+          const offsetSec = ((idx * 0.9) % 3.2).toFixed(2);
+          const delay2Sec = (Number(offsetSec) + 3.25).toFixed(2);
+          const snsClass = getSnsColorClass(pt.source);
 
-          banner.innerHTML = `
-            <span class="sonar-status-dot"></span>
-            <span>SONAR ACTIVE：${countText}下の「📡釣果反応」から詳細マップへ飛べます</span>
-          `;
-          mapContainer.parentNode.insertBefore(banner, mapContainer);
-      }
+          L.marker([pt.lat, pt.lng], {
+              icon: createSnsSonarDivIcon(finalSize, snsClass, offsetSec, delay2Sec),
+              pane: 'snsSonarPane',
+              interactive: false,
+              keyboard: false
+          }).addTo(map);
+          bounds.extend([pt.lat, pt.lng]);
+      });
       
       if (bounds.isValid()) {
           map.fitBounds(bounds, { padding: [15, 15] });
           map.setZoom(map.getZoom() + 0.5);
       }
 
+      // 4. スポットリストの描画（複合県も個別の県名見出しで整理）
       const listContainer = document.getElementById('fish-spot-list');
       if (listContainer && fishSpotLinks.length > 0) {
           const groupedLinks = {};
