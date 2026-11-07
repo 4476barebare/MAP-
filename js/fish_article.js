@@ -75,7 +75,7 @@ const ARTICLE_TILE_URLS = {
 };
 
 // ==========================================
-// ★ 複合県JSON（"茨城県栃木県" 等）から単一都道府県名を解決するヘルパー
+// ★ 複合県JSON（"茨城県栃木県"、"埼玉県群馬県" 等）から単一都道府県名を解決するヘルパー
 // ==========================================
 const PREF_EXTRACT_REGEX = /(東京都|北海道|(?:京都|大阪)府|.{2,3}県)/g;
 const AREA_CODE_TO_PREF_MAP = {
@@ -298,7 +298,7 @@ function getSonarSettings(targetFishArray) {
     return settings;
 }
 
-// ★ 既存ソナーレーダー＆ハイライト用のCSSを自動注入
+// ★ マップ上のソナーレーダー用のCSSを自動注入
 function injectSonarStyles(sizePx) {
     const existing = document.getElementById('sonar-radar-styles');
     if (existing) existing.remove();
@@ -699,7 +699,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      // 2. 各都道府県のスポットデータを取得（統合JSONに対応）
+      // 2. 各都道府県のスポットデータを取得（元の確実なCSV抽出ロジックを維持）
       const text = await res.text();
       const lines = text.trim().split('\n');
       if (lines.length < 2) return;
@@ -713,11 +713,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const prefCodesSet = new Set();
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',').map(c => c.trim());
-        const rowType = cols[typeIdx];
-        const urlVal = cols[urlIdx];
-        if ((rowType === 'pref' || rowType === 'spot') && urlVal) {
-          const fileName = urlVal.split('/').pop() || '';
-          const pCode = fileName.split('_')[0];
+        if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
+          const urlVal = cols[urlIdx];
+          const pCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
           if (pCode) prefCodesSet.add(pCode);
         }
       }
@@ -750,14 +748,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
           if (Array.isArray(locData)) {
               locData.forEach(s => {
-                  if ((s.individualId === 'parent' || s.name === prefCode) && s.notes && !s.areaId) {
+                  if (s.individualId === 'parent' && s.notes) {
                       rawPrefNameJP = s.notes;
                   }
-                  if (s.individualId && s.individualId !== 'parent') {
-                      const aId = String(s.areaId || '').trim();
-                      if (aId === prefCode || (aId !== '' && !aId.includes('_'))) {
-                          areaDict[s.individualId] = s.name;
-                      }
+                  if (s.areaId === prefCode && s.individualId && s.individualId !== 'parent') {
+                      areaDict[s.individualId] = s.name;
                   }
               });
           }
@@ -777,16 +772,13 @@ document.addEventListener("DOMContentLoaded", function () {
           if (Array.isArray(locData)) {
               locData.forEach(spot => {
                   if (spot.type === 'pref' || spot.type === 'area' || spot.individualId === 'parent') return;
-                  const spotAreaIdStr = String(spot.areaId || '').trim();
-                  if (!spotAreaIdStr || spotAreaIdStr === prefCode || !spotAreaIdStr.includes('_')) return;
 
                   const sLat = Number(spot.lat);
                   const sLng = Number(spot.lng);
                   const hasValidCoord = Number.isFinite(sLat) && Number.isFinite(sLng);
 
-                  const areaIndividualId = spotAreaIdStr.startsWith(`${prefCode}_`)
-                      ? spotAreaIdStr.slice(prefCode.length + 1)
-                      : spotAreaIdStr.split('_').slice(1).join('_');
+                  const spotAreaIdStr = String(spot.areaId || '');
+                  const areaIndividualId = spotAreaIdStr.replace(`${prefCode}_`, '');
                   const areaNameJP = areaDict[areaIndividualId] || '';
 
                   // 統合JSON（"茨城県栃木県" 等）からスポットごとの単一県名（"茨城県" / "栃木県"）を解決
@@ -822,9 +814,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   const fishArrayFromJSON = fStr ? fStr.split(',') : [];
                   
                   const fishArrayFromURL = [];
-                  const rawSpotUrl = spot.URL || spot.url || '';
-                  if (rawSpotUrl && rawSpotUrl.includes('|')) {
-                      rawSpotUrl.split(',').forEach(item => {
+                  if (spot.URL) {
+                      spot.URL.split(',').forEach(item => {
                           fishArrayFromURL.push(item.split('|')[0]); 
                       });
                   }
@@ -898,9 +889,10 @@ document.addEventListener("DOMContentLoaded", function () {
           map.setZoom(map.getZoom() + 0.5);
       }
 
-      // 4. スポットリストの描画（釣果反応のエフェクト・バッジを廃止し、純粋なリンク一覧に）
+      // 4. スポットリストの描画（釣果反応の水色エフェクト・バッジなし、複合県も個別の県名見出しで出力）
       const listContainer = document.getElementById('fish-spot-list');
       if (listContainer && fishSpotLinks.length > 0) {
+          listContainer.innerHTML = '';
           const groupedLinks = {};
           fishSpotLinks.forEach(link => {
               if (!groupedLinks[link.prefName]) {
@@ -909,14 +901,7 @@ document.addEventListener("DOMContentLoaded", function () {
               groupedLinks[link.prefName].push(link);
           });
 
-          // 県名でソート（お好みで）
-          const sortedPrefs = Object.keys(groupedLinks).sort();
-
-          for (const pref of sortedPrefs) {
-              const links = groupedLinks[pref];
-              // スポット名でソート
-              links.sort((a, b) => a.spotName.localeCompare(b.spotName, 'ja'));
-
+          for (const [pref, links] of Object.entries(groupedLinks)) {
               const heading = document.createElement('h4');
               heading.className = 'pref-link-heading';
               heading.textContent = pref;
@@ -932,7 +917,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
               links.forEach(link => {
                   const li = document.createElement('li');
-                  li.className = 'spot-link-item'; // .sonar-hit クラスを付与しない
+                  li.className = 'spot-link-item';
                   li.innerHTML = `<a href="${link.href}" title="${link.prefName} ${link.spotName}の釣り場と天気・潮汐情報を見る">${link.spotName}</a>`;
                   ul.appendChild(li);
               });
