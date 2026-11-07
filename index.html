@@ -3427,12 +3427,14 @@ function getAlertText(pref, callback) {
         return res.json();
       })
       .then(function(data) {
-        if (!Array.isArray(data)) return null;
+        if (!Array.isArray(data)) return { state: "error" };
         data.sort(function(a, b) { return new Date(a.reportDatetime) - new Date(b.reportDatetime); });
 
         var statusMap = {};
+        var hasWarningData = false;
         data.forEach(function(report) {
           if (report.warning && report.warning.class10Items) {
+            hasWarningData = true;
             report.warning.class10Items.forEach(function(area) {
               (area.kinds || []).forEach(function(kind) {
                 if (kind.status === "発表" || kind.status === "継続") {
@@ -3444,6 +3446,9 @@ function getAlertText(pref, callback) {
             });
           }
         });
+
+        // どのreportにも警報データの構造がない場合は、正常に処理できていないと判断する
+        if (!hasWarningData) return { state: "error" };
 
         var warnings = [];
         var advisories = [];
@@ -3459,15 +3464,15 @@ function getAlertText(pref, callback) {
         }
 
         if (warnings.length === 0 && advisories.length === 0) {
-          return null;
+          return { state: "none" };
         }
 
         var finalMsgs = (warnings.length > 0) ? warnings : advisories.slice(0, 3);
         var color = (warnings.length > 0) ? "#ff4d4d" : "#ffea00";
-        return { text: finalMsgs.join(" / "), color: color };
+        return { state: "alert", text: finalMsgs.join(" / "), color: color };
       })
-      .catch(function(err) {
-        return null;
+      .catch(function() {
+        return { state: "error" };
       });
   })).then(function(results) {
     if (requestId !== window._jmaAlertRequestId ||
@@ -3475,14 +3480,24 @@ function getAlertText(pref, callback) {
         !window.currentPref ||
         (window.prefData && (window.prefData.url || window.prefData.URL || "") !== targetUrl)) return;
 
-    var validResults = results.filter(function(r) { return r !== null && r.text !== ""; });
+    var validResults = results.filter(function(r) { return r && r.state === "alert"; });
+    var errorCount = results.filter(function(r) { return !r || r.state === "error"; }).length;
+
+    var buildMessage = function(text, color) {
+      return '<span class="jma-alert-message" style="display:inline-block; color: ' + color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px; margin-right: 12px;">' + prefix + text + '</span>';
+    };
+
     if (validResults.length > 0) {
-      var htmlLines = validResults.map(function(res) {
-        return '<span class="jma-alert-message" style="display:inline-block; color: ' + res.color + '; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 11px; font-weight: bold; letter-spacing: 0.3px; margin-right: 12px;">' + prefix + res.text + '</span>';
-      }).join("");
-      updateMapAlert(htmlLines);
+      // 一部の地域で取得に失敗していても、取得できた警報・注意報は表示する
+      updateMapAlert(validResults.map(function(res) {
+        return buildMessage(res.text, res.color);
+      }).join(""));
+    } else if (errorCount > 0) {
+      // データ処理に失敗した場合はエラーメッセージを表示し、次回の呼び出しで再取得できるようにする
+      window._currentAlertUrl = null;
+      updateMapAlert(buildMessage("警報・注意報の取得に失敗しました", "#ffa940"));
     } else {
-      clearMapAlert();
+      updateMapAlert(buildMessage("現在警報注意報はありません", "#ffffff"));
     }
 
     if (callback) callback({ text: "", color: "" });
