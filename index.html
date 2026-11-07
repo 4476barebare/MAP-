@@ -1480,9 +1480,8 @@ async function loadPrefectureData(prefCode) {
 
     try {
         // ★ 1. 共通ローダーで選択県だけを取得し、全県データの集約を待たずに進む
-        if (!window._loadedPrefSet || !window._loadedPrefSet.has(prefCode)) {
-            await loadPrefectureSpots(prefCode, 'select');
-        }
+        // キャッシュ済みの場合も allspotData への反映を保証するため、毎回共通ローダーを通す。
+        await loadPrefectureSpots(prefCode, 'select');
 
         // 2. 座標データ(prefData/areaData/spotData)だけ即座に展開して返す（タイル描画を止めない！）
         await loadLocationJSON();
