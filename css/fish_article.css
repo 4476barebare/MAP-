@@ -135,7 +135,7 @@ header {
 
 /* =========================
    横長：正方形アイコンカード (.menu-list / .menu-card)
-   ※記事本文内・記事外どちらに置いても崩れないよう独立定義
+   ※タイルサムネイルの署名オーバーレイ対応
 ========================= */
 .menu-list {
   display: flex;
@@ -157,9 +157,11 @@ header {
   gap: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   transition: 0.15s ease;
+  position: relative;
 }
 
 .menu-thumb {
+  position: relative;
   width: 60px;
   height: 60px;
   flex-shrink: 0;
@@ -175,6 +177,23 @@ header {
   object-fit: cover;
   display: block;
   margin: 0;
+}
+
+/* タイルサムネイル用の署名ラベル（Leaflet | © 国土地理院） */
+.thumb-attribution {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.72);
+  color: #333;
+  font-size: 6px;
+  line-height: 1.1;
+  padding: 1px 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+  transform: scale(0.75);
+  transform-origin: right bottom;
 }
 
 .menu-text {
