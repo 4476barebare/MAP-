@@ -351,6 +351,9 @@ window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
         return loadedRows.flat();
     }
 
+    // loadLocationJSON() は allspotData を参照するため、
+    // select 取得後も現在ロード済みの県データを必ず集約しておく。
+    rebuildAllSpotData();
     return window.prefSpotData[prefCode] || loadedRows[0] || [];
 };
 
