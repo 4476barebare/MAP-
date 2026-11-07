@@ -74,52 +74,6 @@ const ARTICLE_TILE_URLS = {
     photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
 
-// ==========================================
-// ★ 複合県JSON（"茨城県栃木県"、"埼玉県群馬県" 等）から単一都道府県名を解決するヘルパー
-// ==========================================
-const PREF_EXTRACT_REGEX = /(東京都|北海道|(?:京都|大阪)府|.{2,3}県)/g;
-const AREA_CODE_TO_PREF_MAP = {
-    "TOCHIGI": "栃木県",
-    "IBARAKI": "茨城県",
-    "GUNMA": "群馬県",
-    "SAITAMA": "埼玉県",
-    "CHIBA": "千葉県",
-    "TOKYO": "東京都",
-    "KANAGAWA": "神奈川県"
-};
-
-function resolveSpotPrefName(parentPrefNotes, areaNameJP, spot) {
-    const rawPref = String(parentPrefNotes || '').trim();
-    const matchedPrefs = rawPref.match(PREF_EXTRACT_REGEX);
-    if (!matchedPrefs || matchedPrefs.length <= 1) {
-        return rawPref;
-    }
-
-    // 1. スポットの notes（住所表記など）に県名が含まれていれば最優先
-    const spotNotes = String(spot?.notes || '');
-    for (const p of matchedPrefs) {
-        if (spotNotes.includes(p)) return p;
-    }
-
-    // 2. エリア名（"栃木鬼怒川エリア" 等）に県名の語幹が含まれていれば採用
-    const areaStr = String(areaNameJP || '');
-    for (const p of matchedPrefs) {
-        const stem = p.replace(/[都府県]$/, '');
-        if (stem && areaStr.includes(stem)) return p;
-    }
-
-    // 3. areaId（"IBARAKI_TOCHIGI" 等）のサブコードから判定
-    const areaIdUpper = String(spot?.areaId || '').toUpperCase();
-    for (const [code, pName] of Object.entries(AREA_CODE_TO_PREF_MAP)) {
-        if ((areaIdUpper.endsWith('_' + code) || areaIdUpper.includes(code)) && matchedPrefs.includes(pName)) {
-            return pName;
-        }
-    }
-
-    // 4. いずれにも該当しない場合は先頭の県名（例: "茨城県栃木県" -> "茨城県"）
-    return matchedPrefs[0];
-}
-
 // ★ 正規化ヘルパー
 function normalizeFishName(rawName) {
     if (!rawName) return "";
@@ -428,7 +382,7 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         let minDistance = Infinity;
 
         for (const spot of spots) {
-            const spotKey = `${spot.rawPrefName}_${spot.spotName}`;
+            const spotKey = `${spot.prefName}_${spot.spotName}`;
             if (usedSpotKeys.has(spotKey)) continue;
 
             const d = calcDistanceKm(pLat, pLng, spot.lat, spot.lng);
@@ -439,11 +393,11 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
         }
 
         if (nearestSpot) {
-            const spotKey = `${nearestSpot.rawPrefName}_${nearestSpot.spotName}`;
+            const spotKey = `${nearestSpot.prefName}_${nearestSpot.spotName}`;
             usedSpotKeys.add(spotKey);
 
             selectedCards.push({
-                displayPrefName: nearestSpot.displayPrefName,
+                prefName: nearestSpot.prefName,
                 spotName: nearestSpot.spotName,
                 href: nearestSpot.href,
                 thumbUrl: nearestSpot.thumbUrl,
@@ -476,7 +430,7 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
     });
 
     const cardsHtml = displayCards.map(item => {
-        const safePref = String(item.displayPrefName || '').replace(/[<>&"']/g, '');
+        const safePref = String(item.prefName || '').replace(/[<>&"']/g, '');
         const safeSpot = String(item.spotName || '').replace(/[<>&"']/g, '');
         const fullSpotTitle = safePref ? `${safePref} ${safeSpot}` : safeSpot;
         const altText = `${safeSpot}の画像`;
@@ -699,7 +653,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
 
-      // 2. 各都道府県のスポットデータを取得（元の確実なCSV抽出ロジックを維持）
+      // 2. 各都道府県のスポットデータを取得
       const text = await res.text();
       const lines = text.trim().split('\n');
       if (lines.length < 2) return;
@@ -710,16 +664,17 @@ document.addEventListener("DOMContentLoaded", function () {
       
       if (typeIdx === -1 || urlIdx === -1) return;
 
-      const prefCodesSet = new Set();
+      const prefCodes = [];
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(',').map(c => c.trim());
         if (cols[typeIdx] === 'pref' && cols[urlIdx]) {
           const urlVal = cols[urlIdx];
           const pCode = urlVal.split('/')[1]?.split('_')[0] || urlVal.split('/')[0].split('_')[0];
-          if (pCode) prefCodesSet.add(pCode);
+          if (pCode && !prefCodes.includes(pCode)) {
+            prefCodes.push(pCode);
+          }
         }
       }
-      const prefCodes = [...prefCodesSet];
       
       const fetchPromises = prefCodes.map(async (prefCode) => {
           const locUrl = `../${targetRegionCode}/${prefCode}_location.json`;
@@ -743,13 +698,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       results.forEach(({ locData, fishData, prefCode }) => {
           const fishMap = {};
-          let rawPrefNameJP = prefCode;
+          let prefNameJP = prefCode;
           const areaDict = {};
 
           if (Array.isArray(locData)) {
               locData.forEach(s => {
-                  if (s.individualId === 'parent' && s.notes) {
-                      rawPrefNameJP = s.notes;
+                  // JSONのparent行のnotes（例: "茨城県栃木県"）をそのまま取得
+                  if ((s.name === prefCode || s.individualId === 'parent') && s.individualId === 'parent' && s.notes) {
+                      prefNameJP = s.notes;
                   }
                   if (s.areaId === prefCode && s.individualId && s.individualId !== 'parent') {
                       areaDict[s.individualId] = s.name;
@@ -781,11 +737,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   const areaIndividualId = spotAreaIdStr.replace(`${prefCode}_`, '');
                   const areaNameJP = areaDict[areaIndividualId] || '';
 
-                  // 統合JSON（"茨城県栃木県" 等）からスポットごとの単一県名（"茨城県" / "栃木県"）を解決
-                  const displayPrefName = resolveSpotPrefName(rawPrefNameJP, areaNameJP, spot);
-
+                  // JSONから取得した prefNameJP（"茨城県栃木県" 等）をそのままURL・見出し・カードに使用
                   const spotHref = areaNameJP
-                      ? `https://turiiko-navi.com/?region=${encodeURIComponent(targetRegionNameJP)}&pref=${encodeURIComponent(rawPrefNameJP)}&area=${encodeURIComponent(areaNameJP)}&spot=${encodeURIComponent(spot.name)}`
+                      ? `https://turiiko-navi.com/?region=${encodeURIComponent(targetRegionNameJP)}&pref=${encodeURIComponent(prefNameJP)}&area=${encodeURIComponent(areaNameJP)}&spot=${encodeURIComponent(spot.name)}`
                       : '';
 
                   if (hasValidCoord && spot.zoom != null && String(spot.zoom).trim() !== '' && spotHref) {
@@ -793,8 +747,7 @@ document.addEventListener("DOMContentLoaded", function () {
                       const fallbackInfo = buildSpotTileData({ ...spot, type: 'ort' });
                       if (tileInfo && tileInfo.thumbUrl) {
                           allZoomSpots.push({
-                              rawPrefName: rawPrefNameJP,
-                              displayPrefName: displayPrefName,
+                              prefName: prefNameJP,
                               areaName: areaNameJP,
                               spotName: spot.name,
                               lat: sLat,
@@ -834,7 +787,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                       if (spotHref) {
                           fishSpotLinks.push({
-                              prefName: displayPrefName,
+                              prefName: prefNameJP,
                               spotName: spot.name,
                               href: spotHref
                           });
@@ -889,7 +842,7 @@ document.addEventListener("DOMContentLoaded", function () {
           map.setZoom(map.getZoom() + 0.5);
       }
 
-      // 4. スポットリストの描画（釣果反応の水色エフェクト・バッジなし、複合県も個別の県名見出しで出力）
+      // 4. スポットリストの描画（釣果反応の水色エフェクト廃止・JSONのnotesである「茨城県栃木県」等をそのまま見出しに出力）
       const listContainer = document.getElementById('fish-spot-list');
       if (listContainer && fishSpotLinks.length > 0) {
           listContainer.innerHTML = '';
