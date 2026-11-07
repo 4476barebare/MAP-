@@ -60,8 +60,7 @@ async function pref_management(prefCode = window.currentPref) {
 
     const mapExistedBefore = !!window.map;
 
-    try {
-        // 地図の操作制限を解除（region_management と同じ初期化）
+    // 地図の操作制限を解除（region_management と同じ初期化）
         if (window.map) {
             window.map.setMinZoom(0);
             window.map.setMaxZoom(18);
@@ -116,10 +115,7 @@ async function pref_management(prefCode = window.currentPref) {
 
         await markersPromise;
 
-        return !!window.prefData;
-    } finally {
-        // 描画失敗時も他県取得は loadPrefectureSpots 側で個別に完結する。
-    }
+    return !!window.prefData;
 }
 
 
