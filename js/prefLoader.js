@@ -91,29 +91,25 @@ async function pref_management(prefCode = window.currentPref) {
             ? Promise.resolve()
             : applyPrefWeatherAndFish(prefCode, regionCode);
 
-        // ---------- 3. 地図移動の完了後に全県データを集約 ----------
+        // ---------- 3. 地図描画だけを待って呼び出し元へ戻す ----------
         await drawPromise;
         if (mapExistedBefore && !window.isInitialMapLoad) {
             await waitMapSettled();
         }
-        await otherPromise;
-        await loadPrefectureSpots(prefCode, 'all');
 
-        const finalParent = getPrefParentRow(prefCode);
-        if (finalParent) window.prefData = finalParent;
-
-        // ---------- 4. 全県マーカー表示。天気・魚種の取得は既に並行開始済み ----------
-        const markersPromise = showPrefMarkers().catch(err => {
-            console.error('マーカー表示エラー:', err);
-        });
-        if (window._prefBgDone) {
-            window._prefBackgroundLoad = Promise.resolve();
-        } else {
-            window._prefBackgroundLoad = runPrefBackgroundLoads(prefCode, markersPromise, bgGen, selectedBgPromise)
-                .catch(err => console.error('天気・魚種の付与エラー:', err));
-        }
-
-        await markersPromise;
+        // 他県データの集約・マーカー生成・他県の天気魚種付与は裏で継続する。
+        window._prefBackgroundLoad = otherPromise
+            .then(() => loadPrefectureSpots(prefCode, 'all'))
+            .then(() => {
+                const finalParent = getPrefParentRow(prefCode);
+                if (finalParent) window.prefData = finalParent;
+                return showPrefMarkers();
+            })
+            .then(() => {
+                if (window._prefBgDone) return;
+                return runPrefBackgroundLoads(prefCode, Promise.resolve(), bgGen, selectedBgPromise);
+            })
+            .catch(err => console.error('都道府県バックグラウンド処理エラー:', err));
 
     return !!window.prefData;
 }
