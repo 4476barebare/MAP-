@@ -13,7 +13,7 @@
 // 通信の並列化と、メインスレッドの重い処理（集約・再構築）の並列化は分けて扱う。
 //
 // 依存（regionLoader.js・変更なし）:
-//   loadRegionCSV / loadRegionCsvData / fetchSinglePrefSpots / rebuildAllSpotData
+//   loadRegionCSV / loadRegionCsvData / loadPrefectureSpots / rebuildAllSpotData
 //   window.prefSpotData / window.prefSpotPromises / window._loadedPrefSet
 // 依存（dataLoader.js）: drawLocation
 // ==========================================
@@ -33,50 +33,6 @@ function toDrawTarget(row, fallbackName) {
     const zoom = parseFloat(row.zoom);
     if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(zoom)) return null;
     return { name: row.name || fallbackName, lat, lng, zoom };
-}
-
-// 軽い格納のみ（タグ付け＋県別マップへの登録）。全県集約（rebuildAllSpotData）はここでは行わない。
-function commitPrefRows(prefCode, data) {
-    data.forEach(s => { s._prefCode = prefCode; });
-    window.prefSpotData[prefCode] = data;
-    window._loadedPrefSet.add(prefCode);
-}
-
-// ==========================================
-// 他県の location.json を取得（未取得のものだけ・低優先度）
-// - 取得済み        : null を返す（何もしない）
-// - 他で取得中      : その Promise を共有（二重リクエストしない）
-// - 未取得          : fetch → 保留 → ゲートが開いたら格納
-// 共有 Promise は window.prefSpotPromises に登録するので、
-// fetchSinglePrefSpots / fetchAllRegionSpots からも同じ Promise が使われる。
-// ==========================================
-function startOtherPrefFetch(prefCode, gate) {
-    if (!prefCode) return null;
-    if (Array.isArray(window.prefSpotData[prefCode])) return null;
-    if (window.prefSpotPromises[prefCode]) return window.prefSpotPromises[prefCode];
-
-    const regionCode = window.currentRegion || 'KANTO';
-    const url = `/${regionCode}/${prefCode}_location.json`;
-
-    const promise = fetch(url, { priority: 'low' })
-        .then(res => {
-            if (!res.ok) throw new Error('location.json fetch failed: ' + res.status);
-            return res.json();
-        })
-        .then(async data => {
-            if (!Array.isArray(data)) throw new Error('location.json形式エラー: ' + prefCode);
-            await gate;                       // 描画が落ち着くまで保持（通信は完了済み）
-            commitPrefRows(prefCode, data);   // 軽い格納のみ
-            return data;
-        })
-        .catch(error => {
-            delete window.prefSpotPromises[prefCode];
-            console.error('他県JSON取得エラー:', prefCode, error);
-            return [];
-        });
-
-    window.prefSpotPromises[prefCode] = promise;
-    return promise;
 }
 
 // flyTo の完了待ち（moveend 未発火の同一座標ケース用にタイムアウト付き）
@@ -128,7 +84,7 @@ async function pref_management(prefCode = window.currentPref) {
         const isRegionReady = await loadRegionCSV();       // キャッシュがあれば再利用
         if (!isRegionReady) return false;
 
-        await fetchSinglePrefSpots(prefCode);              // 取得済みなら再利用
+        await loadPrefectureSpots(prefCode, 'select');      // 選択県だけ先行取得
         const parent = getPrefParentRow(prefCode);
         const target = toDrawTarget(parent, prefCode);     // zoom は必ず location.json から
         if (!target) {
@@ -137,46 +93,40 @@ async function pref_management(prefCode = window.currentPref) {
         }
         window.prefData = parent;
 
-        // ---------- 2. 描画と並行：他県データ取得 ----------
-        // drawLocation を先に起動（同期区間でタイル要求が発行される）→ その後に他県の通信を開始
+        // ---------- 2. 地図描画を開始し、他県取得・選択県の付帯データを並行開始 ----------
         const drawPromise = drawLocation(target.name, target.lat, target.lng, target.zoom);
+        const otherPromise = loadPrefectureSpots(prefCode, 'other');
 
-        const csvData = await loadRegionCsvData();         // キャッシュ済み
-        const otherCodes = (csvData.prefRows || [])
-            .map(p => p.prefCode)
-            .filter((code, i, arr) => code && code !== prefCode && arr.indexOf(code) === i);
-        const otherPromises = otherCodes
-            .map(code => startOtherPrefFetch(code, gate))
-            .filter(Boolean);
+        const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
+        const selectedBgPromise = window._prefBgDone
+            ? Promise.resolve()
+            : applyPrefWeatherAndFish(prefCode, regionCode);
 
-        // ---------- 3. 描画後：既存の後続処理へ接続 ----------
+        // ---------- 3. 地図移動の完了後に全県データを集約 ----------
         await drawPromise;
-        // 既存マップからの flyTo（非初期ロード）は drawLocation が完了を待たないので、移動完了を待つ
         if (mapExistedBefore && !window.isInitialMapLoad) {
             await waitMapSettled();
         }
-        openGate();                                        // ここから格納を許可
+        openGate();
 
-        await Promise.all(otherPromises);                  // 取得中なら完了を待つ
-        await fetchAllRegionSpots();                       // 全県集約は1回だけ（_isAllRegionLoaded もここで確定）
+        await otherPromise;
+        await loadPrefectureSpots(prefCode, 'all');
 
         const finalParent = getPrefParentRow(prefCode);
         if (finalParent) window.prefData = finalParent;
 
-        // ---------- 4. 全県マーカー表示 ＋ 裏で天気・魚種の付与 ----------
+        // ---------- 4. 全県マーカー表示。天気・魚種の取得は既に並行開始済み ----------
         const markersPromise = showPrefMarkers().catch(err => {
             console.error('マーカー表示エラー:', err);
         });
-        const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
         if (window._prefBgDone) {
-            // 全県の天気・魚種を付与済み（エリア→県の復帰など）なら再実行しない
             window._prefBackgroundLoad = Promise.resolve();
         } else {
-            window._prefBackgroundLoad = runPrefBackgroundLoads(prefCode, markersPromise, bgGen)
+            window._prefBackgroundLoad = runPrefBackgroundLoads(prefCode, markersPromise, bgGen, selectedBgPromise)
                 .catch(err => console.error('天気・魚種の付与エラー:', err));
         }
 
-        await markersPromise;                              // 天気・魚種の完了は待たない
+        await markersPromise;
 
         return !!window.prefData;
     } finally {
@@ -226,13 +176,13 @@ function applyPrefWeatherAndFish(prefCode, regionCode) {
 }
 
 // 対象県 → （マーカー完了後）内陸CSVを1回だけ取得 → 他県を1県ずつ順番に
-async function runPrefBackgroundLoads(prefCode, markersPromise, gen) {
+async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPromise) {
     const regionCode = window.currentRegion || 'KANTO';
     const isStale = () => window._prefBgGen !== gen;   // 新しい pref_management が走ったら中断
     const yieldFrame = () => (typeof window._yieldFrame === 'function' ? window._yieldFrame() : Promise.resolve());
 
     // 1. 対象県：天気＋魚種（通信はマーカー描画と並行）
-    await applyPrefWeatherAndFish(prefCode, regionCode);
+    await (selectedPromise || applyPrefWeatherAndFish(prefCode, regionCode));
     if (isStale()) return;
 
     // 2. 内陸CSV：一括解析なので、マーカー描画が済んでから1回だけ取得
