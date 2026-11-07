@@ -1,16 +1,11 @@
 // ==========================================
-// prefLoader.js : PREF 画面のロード管理（regionLoader.js の構造に倣う）
+// prefLoader.js : PREF 画面のロード管理
 //
 // 方針
-//  1. 最優先：REGION CSV（キャッシュ再利用）→ 選択県の location.json（取得済みなら再利用）
-//             → zoom / lat / lng を location.json から確定 → drawLocation()
-//  2. 描画と並行：他県の location.json を「未取得のものだけ」低優先度で並列取得。
-//             取得結果は window.prefSpotData へ入れず保留し、描画が落ち着くまで集約しない。
-//  3. 描画後：保留データを県ごとに格納 → 全県集約を1回だけ実行（fetchAllRegionSpots）。
-//  4. 全県データ確定後：全県スポットマーカー表示 ＋ その裏で天気・魚種の付与を開始。
-//     呼び出し元（routeUpdate / selectPrefecture）の既存の後続処理には手を入れない。
-//
-// 通信の並列化と、メインスレッドの重い処理（集約・再構築）の並列化は分けて扱う。
+//  1. 選択県の location.json を loadPrefectureSpots(select) で取得し、drawLocation() を開始。
+//  2. 描画と並行して他県データ（other）と選択県の天気・魚種データを取得。
+//  3. 描画後に全県データ（all）を集約し、県マーカーを表示。
+//  4. 他県の天気・魚種データはマーカー表示の裏で順次付与する。
 //
 // 依存（regionLoader.js・変更なし）:
 //   loadRegionCSV / loadRegionCsvData / loadPrefectureSpots / rebuildAllSpotData
@@ -63,11 +58,6 @@ async function pref_management(prefCode = window.currentPref) {
     window.currentPref = prefCode;
     window.prefLocationUrl = `/${regionCode}/${prefCode}_location.json`;
 
-    // 集約・格納を保留するゲート（描画が落ち着いたら開く）。呼び出しごとに新規作成。
-    let openGate;
-    const gate = new Promise(resolve => { openGate = resolve; });
-    const gateSafetyTimer = setTimeout(() => openGate(), 6000); // 万一の詰まり防止
-
     const mapExistedBefore = !!window.map;
 
     try {
@@ -107,8 +97,6 @@ async function pref_management(prefCode = window.currentPref) {
         if (mapExistedBefore && !window.isInitialMapLoad) {
             await waitMapSettled();
         }
-        openGate();
-
         await otherPromise;
         await loadPrefectureSpots(prefCode, 'all');
 
@@ -130,8 +118,7 @@ async function pref_management(prefCode = window.currentPref) {
 
         return !!window.prefData;
     } finally {
-        clearTimeout(gateSafetyTimer);
-        openGate();
+        // 描画失敗時も他県取得は loadPrefectureSpots 側で個別に完結する。
     }
 }
 
