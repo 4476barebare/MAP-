@@ -1,24 +1,252 @@
 /* =========================================
-   記事カテゴリ見出し用
+   fish_article.css
+   対象魚解説・記事ページ専用スタイル（main.css非依存・単体完結版）
 ========================================= */
+
+/* =========================
+   ベース・リセット
+========================= */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  background: #fff;
+  color: #191970;
+  overflow-x: hidden;
+}
+
+li,
+button {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+li:active,
+button:active {
+  background: transparent;
+}
+
+/* =========================
+   ヘッダー全体
+========================= */
+header {
+  border-bottom: 1px solid #191970;
+  background: #fff;
+  z-index: 2500;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  position: relative;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #191970;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #191970;
+  font-size: 0.8rem;
+}
+
+/* =========================
+   記事本文レイアウト
+========================= */
+.article {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 10px;
+  line-height: 1.9;
+}
+
+.article-header h1 {
+  font-size: 20px;
+  color: #191970;
+  border-left: 4px solid #191970;
+  padding-left: 10px;
+}
+
+.article-meta {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+}
+
+.article img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+.article-section {
+  margin-bottom: 28px;
+}
+
+.article-section > h2 {
+  font-weight: bold;
+  font-size: 16px;
+  color: #191970;
+  border-bottom: 1px solid #191970;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+}
+
+.article-section h3 {
+  font-size: 15px;
+  color: #191970;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.article-section p {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.info-box {
+  background-color: #f5f8fc;
+  border: 1px solid #dcdcdc;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.info-box strong {
+  color: #191970;
+}
+
+/* =========================
+   横長：正方形アイコンカード (.menu-list / .menu-card)
+   ※タイルサムネイルの署名オーバーレイ対応
+========================= */
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 16px;
+  margin: 0;
+}
+
+.menu-card {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #191970;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 8px;
+  gap: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: 0.15s ease;
+  position: relative;
+}
+
+.menu-thumb {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #eef3f8;
+}
+
+.article .menu-thumb img,
+.menu-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  margin: 0;
+}
+
+/* タイルサムネイル用の署名ラベル（Leaflet | © 国土地理院） */
+.thumb-attribution {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.72);
+  color: #333;
+  font-size: 6px;
+  line-height: 1.1;
+  padding: 1px 2px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+  transform: scale(0.75);
+  transform-origin: right bottom;
+}
+
+.menu-text {
+  flex: 1;
+  padding: 0 4px 0 0;
+  display: flex;
+  align-items: center;
+}
+
+.article-section .menu-card h2,
+.menu-text h2 {
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  line-height: 1.4;
+  color: #191970;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.menu-card:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================
+   横2列：オーバーレイカード (.article-list / .article-card)
+========================= */
 .category-heading {
   font-size: 16px;
   color: #191970;
-  margin: 24px 16px 12px 16px; /* 上に24px、下に12pxの余白をしっかり取る */
+  margin: 24px 16px 12px 16px;
   padding-left: 8px;
   border-left: 4px solid #191970;
   line-height: 1.2;
 }
 
-/* =========================================
-   横2列：オーバーレイ化 (.article-list / .article-card)
-========================================= */
 .article-list {
+  max-width: 720px;
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 0 16px 8px 16px; /* 左右の余白を16pxに統一、下余白を微調整 */
-  margin: 0; /* 余計なマージンをリセット */
+  padding: 0 16px 8px 16px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .article-card {
@@ -32,7 +260,7 @@
   background: #fff;
   text-decoration: none;
   transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   transition: 0.15s ease;
 }
 
@@ -47,7 +275,6 @@
   margin: 0;
 }
 
-/* 下からせり上がる黒グラデーション */
 .article-card::after {
   content: '';
   position: absolute;
@@ -55,12 +282,11 @@
   left: 0;
   right: 0;
   height: 60%;
-  background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
   pointer-events: none;
   z-index: 1;
 }
 
-/* 浮かび上がる白文字テキスト（最大2行） */
 .article-card h2 {
   position: absolute;
   bottom: 8px;
@@ -75,324 +301,100 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 .article-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 .article-card:active {
   transform: translateY(1px) scale(0.98);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* =========================================
-   横長：正方形アイコン化 (.menu-list / .menu-card)
-========================================= */
-.menu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0 16px 0 16px; /* 左右の余白を16pxに統一 */
-  margin: 0; /* リスト間の余分な隙間を消す */
-}
-
-.menu-card {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: #191970;
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  padding: 8px; /* 内側の余白を少し整える */
-  gap: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  transition: 0.15s ease;
-}
-
-.menu-thumb {
-  width: 60px;
-  height: 60px;
-  flex-shrink: 0;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.menu-thumb img {
+/* =========================
+   マップ表示・リンクリスト関連
+========================= */
+#fish-map {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  aspect-ratio: 1 / 1;
+  max-height: 50vh;
+  margin: 15px 0 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  z-index: 1;
 }
 
-.menu-text {
-  flex: 1;
-  padding: 0 4px 0 0; /* 右側に少しだけゆとりを持たせる */
-  display: flex;
-  align-items: center;
+.leaflet-control-attribution {
+  font-size: 8px;
+  background: rgba(255, 255, 255, 0.5);
 }
 
-.menu-text h2 {
-  font-size: 14px;
-  margin: 0;
-  line-height: 1.4;
+.fish-dot-marker {
+  background-color: #ff3333;
+  border-radius: 50%;
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.pref-link-heading {
+  font-size: 15px;
   color: #191970;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  margin: 20px 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ccc;
 }
 
-.menu-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+.spot-link-item {
+  display: inline-block;
+  background: #eef3f8;
+  border: 1px solid #dce4ee;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
 }
 
-.menu-card:active {
-  transform: translateY(1px) scale(0.98);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.spot-link-item a {
+  color: #191970;
+  text-decoration: none;
+  font-weight: bold;
 }
 
-/* =========================================
-   県選択マーカー (共通ベース)
-========================================= */
-.pref-choice-marker {
-    background: transparent;
-    border: none;
+.spot-link-item a:hover {
+  text-decoration: underline;
 }
 
-.pref-choice-label {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 8px; /* 美しい角丸 */
-    cursor: pointer;
-    transition: all 0.3s ease; /* ホバーやフェードのアニメーション用 */
-}
-
-/* -----------------------------------------
-   スタイル①：グラスモーフィズム（オススメ）
------------------------------------------ */
-.pref-choice-label {
-    background: rgba(25, 25, 112, 0.85); /* #191970 の透過 */
-    color: #ffffff;
-    backdrop-filter: blur(5px); /* 下の地図をすりガラス状にぼかす */
-    -webkit-backdrop-filter: blur(5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-}
-
-.pref-choice-label:hover {
-    background: rgba(25, 25, 112, 1); /* ホバーでソリッドなミッドナイトブルーに */
-    transform: translateY(-3px); /* ふわっと浮き上がる */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-
-/* 雨雲文字のレイアウト調整 */
-#cloudsUI {
-    margin-left: 8px;    /* ボタンとの隙間 */
-    margin-right: auto;  /* 日付を右端に押し出す魔法 */
-}
-
-/* 雨雲レーダーの文字と、右側の日付だけに個別に影をつける */
-#cloudsUI,
-.header-text {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-/* ==================================
-   雨雲レーダー トグルボタン用CSS
-================================== */
-
-/* ① 基本スタイル（マイルド・マリンブルー） */
-#map-menu #radarToggleBtn {
-    order: -1;
-    margin-left: 4px;   
-    margin-right: 8px;
-    width: auto;
-    min-width: 44px;
-    padding: 2px 10px;
-    text-align: center;
-    flex-shrink: 0;
-    
-    background: rgba(0, 20, 40, 0.8);
-    color: #4ba3e3; 
-    border: 1px solid #4ba3e3;
-    font-size: 10px;
-    font-weight: bold;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 0 6px rgba(75, 163, 227, 0.4); 
-    outline: none;
-    letter-spacing: 0.5px;
-}
-
-/* ② OFF状態のスタイル */
-#map-menu #radarToggleBtn.is-off {
-    background: #222;
-    color: #666;
-    border-color: #444;
-    box-shadow: none;
-    text-shadow: none;
-}
-
-/* ==================================
-   ③ ホバー・タップの制御
-================================== */
-
-/* スマホ等でタップした「瞬間」だけ、押し込んだ感触を出す */
-#map-menu #radarToggleBtn:active {
-    opacity: 0.7;
-    transform: scale(0.95);
-}
-
-/* 「マウスが使えるデバイス（PCなど）」でのみホバー効果をオンにする魔法 */
-@media (hover: hover) and (pointer: fine) {
-    
-    /* ONの時のホバー */
-    #map-menu #radarToggleBtn:hover {
-        background: #4ba3e3;
-        color: #fff;
-        box-shadow: 0 0 10px rgba(75, 163, 227, 0.6);
-    }
-
-    /* OFFの時のホバー */
-    #map-menu #radarToggleBtn.is-off:hover {
-        background: #333;
-        color: #ddd;
-        border-color: #666;
-    }
-}
-
-
-
-
-
-.crowd-img-icon {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-.crowd-img-icon img {
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-}
-/* =======================
-   ヘッダー全体
-======================= */
-header {
-  border-bottom:1px solid #191970;
-  background:#fff;
-  z-index: 2500;
-}
-
-.header-inner {
-  max-width:1100px;
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10px 12px;
-  position:relative;
-}
-
-.logo {
-  font-weight:700;
-  font-size:0.8rem;
-  color:#191970;
-  display:flex;
-  align-items:center;
-}
-
-.nav {
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.nav a {
-  text-decoration:none;
-  color:#191970;
-  font-size:0.8rem;
-}
-
-
-/* =======================
-   ニュースオーバーレイ
-======================= */
-#newsOverlay {
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:3000;
-}
-
-.news-window {
-  position:relative;
-  width:85%;
-  max-width:900px;
-  height:70vh;
-  background:#fff;
-  border-radius:4px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
-
-/* =======================
-   汎用オーバーレイ（カレンダー用）
-   ※既存class維持
-======================= */
+/* =========================
+   カレンダー・ニュース・ポリシーモーダル＆フッター
+========================= */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6); /* ★これが暗幕 */
+  background: rgba(0, 0, 0, 0.6);
   display: none;
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
 
-/* 中身 */
 .overlay-content {
-  width: 92%;  /* 少し小さく */
+  width: 92%;
   height: 88%;
   background: transparent;
   border-radius: 4px;
   overflow: hidden;
   position: relative;
-  margin-top: 10px;  /* ボタン高さ＋余裕 */
+  margin-top: 10px;
 }
 
-
-
-/* =======================
-   カレンダー本体
-======================= */
 #calendarWrapper {
   width: 100%;
   height: 100%;
   display: flex;
-
   overflow-x: auto;
-  overflow-y: hidden; /* ★これ追加 */
+  overflow-y: hidden;
   background: transparent;
-
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
 }
@@ -400,31 +402,26 @@ header {
 .month {
   min-width: 100%;
   scroll-snap-align: start;
-
   display: flex;
   flex-direction: column;
   background: transparent;
-  overflow: hidden; /* ★これ追加 */
+  overflow: hidden;
 }
 
 .month-title {
-    text-align: center;
-    color: #fff;
+  text-align: center;
+  color: #fff;
 }
 
-
-/* カレンダー全体 */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
   padding: 6px;
   background: transparent;
-
-  overflow: hidden; /* ★保険 */
+  overflow: hidden;
 }
 
-/* セル */
 .cell {
   background: #fff;
   border-radius: 4px;
@@ -433,88 +430,81 @@ header {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* 空白セル */
 .cell.empty {
   background: transparent;
   box-shadow: none;
 }
 
-/* 曜日ヘッダー */
 .week-head {
   background: #f0f4ff;
-
-  display: flex;              /* ★追加 */
-  align-items: center;        /* ★縦中央 */
-  justify-content: center;    /* ★横中央 */
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.65rem;
   font-weight: 600;
-
   padding: 2px 0;
   min-height: 20px;
-
   border-radius: 4px;
 }
 
-/* 日付 */
 .day {
   font-size: 0.85rem;
   font-weight: 600;
   text-align: right;
 }
 
-/* カレンダーの潮名 */
 .tide {
   font-size: 0.7rem;
   text-align: center;
-  color: #191970; /* ★ 修正：#444 から変更 */
-  opacity: 0.8;   /* ★ 追加：透明度で薄さを表現 */
+  color: #191970;
+  opacity: 0.8;
 }
 
-
-
-
-/* 大潮（強調） */
 .tide-big {
   color: #e60033;
   font-weight: 700;
 }
 
-/* 過去日 */
 .past {
   opacity: 0.4;
 }
 
-/* 今日 */
 .today {
   border: 2px solid #191970;
 }
-/* =========================
-   ニュースモーダル
-========================= */
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.modal-content {
+  width: min(90vw, 700px);
+  margin: 5vh auto;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
 
 #newsModal .modal-content {
   height: 80vh;
   overflow-y: auto;
 }
 
-/* =========================
-   リスト
-========================= */
-
 #newsList {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
-
-/* =========================
-   アイテム全体
-   ★高さ固定を廃止（重要）
-========================= */
 
 .news-item {
   width: 320px;
@@ -526,10 +516,6 @@ header {
   display: block;
 }
 
-/* =========================
-   行レイアウト
-========================= */
-
 .news-row {
   display: flex;
   align-items: center;
@@ -537,10 +523,6 @@ header {
   min-height: 50px;
   padding: 6px 0;
 }
-
-/* =========================
-   サムネイル
-========================= */
 
 .news-thumb {
   width: 60px;
@@ -550,14 +532,9 @@ header {
   border-radius: 4px;
 }
 
-/* 画像なし時 */
 .news-item.no-image .news-thumb {
   display: none;
 }
-
-/* =========================
-   テキスト領域
-========================= */
 
 .news-text {
   flex: 1;
@@ -567,23 +544,14 @@ header {
   min-height: 50px;
 }
 
-/* =========================
-   タイトル
-========================= */
-
 .news-title {
   font-size: 13px;
   line-height: 1.3;
-
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
-
-/* =========================
-   メタ情報
-========================= */
 
 .news-meta {
   display: flex;
@@ -591,313 +559,72 @@ header {
   margin-top: 2px;
 }
 
-/* ニュースのメタ情報（日付など） */
 .news-source,
 .news-date {
   font-size: 10px;
   line-height: 1;
-  color: #191970; /* ★ 修正：#aaa から変更 */
-  opacity: 0.6;   /* ★ 追加：透明度で薄さを表現 */
+  color: #191970;
+  opacity: 0.6;
 }
 
-/* ソースだけ少し強調 */
 .news-source {
   padding-left: 2px;
 }
 
-/* =========================
-   広告
-========================= */
-
-.ad-block,
-.ad-placeholder {
-  display: none;
+.modal-content h1 {
+  text-align: center;
+  font-size: 12px;
+  margin-bottom: 16px;
 }
 
-.alert-wrap {
-  position: relative;
+.modal-content h2 {
   font-size: 12px;
-  padding: 6px 10px;
-  padding-right: 48px; /* ★署名分の逃げ */
-  background: #111;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+
+.modal-content p {
+  font-size: 12px;
+  margin-bottom: 10px;
+  color: #191970;
+  opacity: 0.9;
+}
+
+#policyModal .policy-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+#policyModal .policy-btn {
+  padding: 8px 12px;
+  border: 1px solid #191970;
+  background: #fff;
+  color: #191970;
+  font-size: 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+#policyModal .policy-btn:hover {
+  background: #f3f3f3;
+}
+
+#policyModal .policy-btn.active {
+  background: #191970;
   color: #fff;
-  /* ★ 追加：枠の高さを固定して地図のガクつきを防ぐ */
-  min-height: 28px; 
+  border-color: #191970;
+}
+
+#policyModal #contactSection,
+#policyModal #policySection {
   box-sizing: border-box;
 }
 
-#alert-bar {
-  display: block;              /* ★spanのままだと詰むのでブロック化 */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  /* ★ 追加：テキストが空("")でも、必ず1行分の文字の高さをキープする */
-  min-height: 1.2em;
-}
-
-#alert-signature {
-  position: absolute;
-  right: 6px;
-  bottom: 2px;
-  font-size: 8px;
-  opacity: 0.5;
-  z-index: 10;
-  pointer-events: none;
-}
-
-html,
-body {
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    background: #fff;
-    color: #191970; /* ★ 追加：ベースのテキスト色をミッドナイトブルーに統一 */
-    overflow-x: hidden;
-}
-
-/* =========================
-   基本UI
-========================= */
-li,
-button {
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-li:active,
-button:active {
-    background: transparent;
-}
-
-li {
-    user-select: none;
-    cursor: pointer;
-}
-
-.banner {
-  display: block;
-  max-width: 728px;
-  margin: 20px 5px 5px 5px;
-  background: #fff;
-  border-radius: 4px;
-  overflow: hidden; /* ←これが本体 */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-}
-
-.banner img {
-  width: 100%;
-  display: block;
-}
-
-/* =========================
-   アクセス情報（エリアガイド直上）
-========================= */
-#accessInfoBox {
-    /*display: none;  初期は非表示 */
-    background: #fff;
-    padding: 15px 16px 0 16px; /* 下にあるエリアガイドとシームレスに繋げる */
-    color: #191970;
-}
-
-#accessInfoBox h3 {
-    font-size: 16px;
-    color: #191970;
-    margin: 0 0 12px 0;
-    padding-left: 10px;
-    border-left: 4px solid #191970; /* エリアガイドと同じ左線デザイン */
-}
-
-#accessInfoBox ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#accessInfoBox li {
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px dashed rgba(25, 25, 112, 0.2); /* 控えめな区切り線 */
-}
-
-#accessInfoBox li:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-/* =========================
-   エリアガイド全体
-========================= */
-#area-guide {
-  padding: 5px 16px 16px 16px;
-  background: #fff;
-}
-
-#area-guide h1 {
-    color: #191970;
-  font-size: 18px;
-  margin-bottom: 12px;
-  border-left: 4px solid #191970;
-  padding-left: 10px;
-}
-
-/* =========================
-   各エリア
-========================= */
-.area {
-  border-bottom: 1px solid #191970;
-  padding: 12px 0;
-  transition: all 0.25s ease;
-}
-
-/* タイトル */
-.area h2 {
-    color: #191970;
-  font-size: 16px;
-  margin: 0;
-  cursor: pointer;
-}
-
-/* =========================
-   本文 共通
-========================= */
-.area .text {
-  font-size: 14px;
-  margin-top: 8px;
-  line-height: 1.6;
-
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.2s ease;
-}
-
-
-/* 半開き時だけフェードを乗せる */
-#area-guide.collapsed-mode .area .text {
-  position: relative;
-  max-height: 48px;
-  opacity: 0.8;
-}
-
-/* フェード部分 */
-#area-guide.collapsed-mode .area .text::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 24px;
-
-  /* 背景と同じ色でフェード */
-  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
-}
-
-/* =========================
-   選択中モード
-========================= */
-
-/* 選択対象 → 全開 */
-#area-guide.active-mode .area.active .text {
-  max-height: 500px;
-  opacity: 1;
-}
-
-/* 選択外 → 完全に閉じる */
-#area-guide.active-mode .area:not(.active) .text {
-  max-height: 0;
-  opacity: 0;
-  margin-top: 0;
-}
-
-/* =========================================
-   SEO対策用：スポット一覧（アコーディオン）
-========================================= */
-.seo-spot-list {
-    margin: 20px auto;
-    max-width: 800px;
-    padding: 0 16px;
-    color: #191970;
-}
-
-/* アコーディオンのトグルボタン部分 */
-.seo-spot-list summary {
-    cursor: pointer;
-    font-weight: bold;
-    padding: 12px 16px;
-    background: #f0f4ff; /* テーマカラーに合わせた極薄いブルー */
-    border-radius: 8px;
-    color: #191970;
-    border: 1px solid rgba(25, 25, 112, 0.2);
-    transition: background 0.2s ease;
-    font-size: 14px;
-}
-
-.seo-spot-list summary:hover {
-    background: #e0e8ff;
-}
-
-/* 開いた中身のコンテナ */
-#seo-link-container {
-    padding: 10px;
-    background: #fff;
-}
-
-/* エリア名の見出し */
-#seo-link-container h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-    padding-bottom: 6px;
-    font-size: 15px;
-    color: #191970;
-    border-bottom: 1px solid #191970; /* 境界線もミッドナイトブルー */
-}
-
-/* リスト全体 */
-#seo-link-container ul {
-    list-style-type: none;
-    padding-left: 5px;
-    margin: 0;
-}
-
-/* 各スポットの項目 */
-#seo-link-container li {
-    margin: 8px 0;
-    font-size: 14px;
-}
-
-/* スポットのリンク */
-#seo-link-container a {
-    color: #191970;
-    text-decoration: none;
-    position: relative;
-    padding-left: 12px;
-    transition: opacity 0.2s ease;
-}
-
-/* リンクの左側に小さなアクセントをつける */
-#seo-link-container a::before {
-    content: "▶";
-    font-size: 8px;
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #191970;
-    opacity: 0.6;
-}
-
-#seo-link-container a:hover {
-    opacity: 0.7;
-    text-decoration: underline;
-}
-
-/* =========================
-   フッター
-========================= */
-
 .site-footer {
   text-align: center;
-  padding: 10px 10px;
+  padding: 10px;
   font-size: 12px;
   color: #191970;
   cursor: pointer;
@@ -907,1685 +634,10 @@ li {
 .site-footer:active {
   background: #f0f0f0;
 }
-/* =========================
-   モーダル（サイトポリシー）
-========================= */
-
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 9999;
- overflow: hidden;
-}
-
-.modal-content {
-  width: min(90vw, 700px);
-  margin: 5vh auto;
-  padding: 10px;
-  border-radius: 8px;
-  background: #fff;
-  box-sizing: border-box;
-  overflow-wrap: anywhere;
-
-}
-/* ========================
-   ポリシー本文
-========================= */
-
-.modal-content h1 {
-      text-align: center;
-  font-size: 12px;
-  margin-bottom: 16px;
-}
-
-.modal-content h2 {
-  font-size:12px;
-  margin-top: 16px;
-  margin-bottom: 6px;
-}
-
-
-.modal-content p {
-  font-size: 12px;
-  margin-bottom: 10px;
-  color: #191970; /* ★ 修正：#444 から変更 */
-  opacity: 0.9;   /* 少しだけ柔らかくする */
-}
-
-/* ===== ポリシーモーダル追加UI（既存非干渉） ===== */
-
-/* タブ領域 */
-#policyModal .policy-toggle {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-
-/* ボタン（スコープ限定） */
-#policyModal .policy-btn {
-  padding: 8px 12px;
-  border: 1px solid #191970; /* ★ 修正：#d0d0d0 から変更 */
-  background: #fff;
-  color: #191970; /* ★ 修正：#333 から変更 */
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-/* ホバー */
-#policyModal .policy-btn:hover {
-  background: #f3f3f3;
-}
-
-
-/* アクティブ */
-#policyModal .policy-btn.active {
-  background: #191970; /* ★ 修正：#2f3b4a から変更 */
-  color: #fff;
-  border-color: #191970;
-}
-
-
-/* 念のため：モーダル内セクション暴走防止 */
-#policyModal #contactSection,
-#policyModal #policySection {
-  box-sizing: border-box;
-}
-
-
-
-/* =========================
-   レスポンシブ
-========================= */
 
 @media (max-width: 600px) {
   .modal-content {
     margin: 5vh 5vw;
     padding: 16px;
   }
-
-  .policy-link {
-    padding: 10px 16px;
-    font-size: 14px;
-  }
-}
-
-/* =========================
-   Leaflet
-========================= */
-.leaflet-control-attribution {
-    font-size: 8px;
-    background: rgba(255, 255, 255, 0.5);
-}
-
-#lf-map {
-    width: 100%;
-    height: 80vh;
-    position: relative;
-    z-index: 0;
-    touch-action: none;
-}
-
-/* 地図ツールバー */
-#map-tool-bar {
-    position: absolute;
-    top: 12px;
-    right: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    z-index: 9100;
-    pointer-events: none;
-}
-
-#map-tool-bar > .map-tool-btn,
-#map-tool-bar > #tile-btn-wrap,
-#map-tool-bar > .menu-header-row {
-    pointer-events: auto;
-}
-
-/* 雨雲レーダーUI：既存要素をツールバー最上段へ移設 */
-#map-tool-bar > .menu-header-row {
-    display: block;
-    padding: 0;
-    margin: 0;
-    color: #fff;
-    pointer-events: auto;
-}
-
-#map-tool-bar .menu-header-row .header-row {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: auto;
-    gap: 6px;
-    pointer-events: auto;
-}
-
-#map-tool-bar .menu-header-row .header-row > * {
-    pointer-events: auto;
-}
-
-#map-tool-bar #cloudsUI {
-    order: 1;
-}
-
-#map-tool-bar .header-text {
-    order: 2;
-}
-
-#map-tool-bar #radarToggleBtn {
-    order: 3;
-    flex: 0 0 80px;
-}
-
-/* 気象庁アラート：ツールバー最上段 */
-#map-jma-alert {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 346px;
-    max-width: calc(100vw - 8px);
-    pointer-events: none;
-}
-
-#map-jma-alert .jma-alert-viewport {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: 260px;
-    max-width: calc(100vw - 110px);
-    overflow: hidden;
-    white-space: nowrap;
-    text-align: right;
-}
-
-#map-jma-alert .jma-alert-track {
-    display: inline-block;
-    width: max-content;
-    white-space: nowrap;
-    text-align: right;
-}
-
-#map-jma-alert .jma-alert-track.is-scrolling {
-    animation-name: jma-alert-marquee;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-}
-
-#map-jma-alert .jnn-label {
-    flex: 0 0 80px;
-    pointer-events: none;
-    cursor: default;
-}
-
-@keyframes jma-alert-marquee {
-    from { transform: translateX(100%); }
-    to { transform: translateX(-100%); }
-}
-
-.leaflet-container {
-    z-index: 0;
-}
-
-/* Leafletのタイル画像を強制的に綺麗に補間する設定 */
-.leaflet-container .leaflet-tile {
-    /* ぼやけを抑えるためのブラウザ設定 */
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-    image-rendering: pixelated;
-}
-
-/* =========================
-   map-ui-top（全体）
-========================= */
-.map-ui-top {
-  top: 12px;
-  width: 100%;
-  z-index: 9000;
-  display: flex;
-  position: absolute;
-  flex-direction: column; /* ←これが本体 */
-  box-sizing: border-box;
-}
-
-/* =========================
-   AD
-========================= */
-.ad-box {
-  display: none;
-  width: 320px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #ccc;
-  margin-left: auto;    /* 左右の余白を自動に */
-  margin-right: auto;
-  font-size: 12px;
-  color: #333;
-  pointer-events: auto;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-}
-
-/* =========================
-   sub row（新規追加）
-========================= */
-.map-ui-sub {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* 両端寄せ */
-  width: auto;
-  margin: 5px 20px 0px 20px;
-  box-sizing: border-box;
-}
-
-/* =========================
-   nearest spot
-========================= */
-.nearest-spot {
-  max-width: 70vw;
-  padding-left: 3px;
-  padding-right: 3px;
-  font-size: 16px;
-  color: #fff;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9),0 0 3px rgba(0,0,0,0.8);
-  white-space: nowrap;
-  overflow: hidden;              /* ←これ必須 */
-  text-overflow: ellipsis;
-  text-align: center;
-}
-
-/* =========================
-   BACK BUTTON
-========================= */
-/* =========================
-   共通ツールボタン
-========================= */
-.map-tool-btn {
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: bold;
-  cursor: pointer;
-  pointer-events: auto;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  width: 80px;
-  box-sizing: border-box;
-  text-align: center;
-  white-space: nowrap;
-  -webkit-appearance: none;
-  appearance: none;
-  transform: translateY(0);
-  transition:
-    opacity 0.2s ease,
-    background 0.2s ease,
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
-}
-
-/* ON状態：押し込まれた位置を維持 */
-.map-tool-btn.active {
-  transform: translateY(3px);
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-/* 通常ボタン：押している間だけ沈み、離すと浮く */
-.map-tool-btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.25);
-}
-
-/* 戻るボタン */
-.map-back-btn {
-  display: none;
-}
-
-.map-ui-sub2 {
-  display: none;
-  height: 20px;
-  line-height: 20px;
-  box-sizing: border-box;
-  max-width: 70vw;
-  width: fit-content;
-  padding: 0 3px;
-  margin-top: -3px;
-  margin-left: 24px;
-  font-size: 14px;
-  color: #fff;
-  font-weight: bold;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9),0 0 3px rgba(0,0,0,0.8);
-}
-
-.map-ui-sub2 .sub2-weather {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-/* タイル切り替えボタン */
-.map-tile-btn {
-  display: none;
-}
-
-
-/* =========================
-   PREF DOT
-========================= */
-.pref-dot {
-    width: 5px;
-    height: 5px;
-}
-
-.pref-dot.spot {
-    background: #191970;
-}
-
-.marker-status {
-    font-size: 10px;
-    color: yellow;
-    text-shadow: 0 0 2px black;
-    margin-top: 2px;
-}
-
-
-/* ========================= PREF DOT ========================= */
-.pref-dot { width: 5px; height: 5px; }
-
-.pref-dot.spot  { background: #191970; }
-.pref-dot.fish1 { background: #6495ED; }
-.pref-dot.fish2 { background: #2E8B57; }
-.pref-dot.fish3 { background: #D2691E; }
-.pref-dot.fish4 { background: #4B0082; }
-.pref-dot.fish6 { background: #006400; }
-
-/* =========================
-   テキストマーカー用
-========================= */
-.custom-text-marker {
-    position: absolute !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: visible !important;
-}
-
-.spot-text {
-    position: absolute;
-    left: 8px; /* 既存のドットの右横に配置 */
-    top: 0;
-    transform: translateY(-50%);
-    white-space: nowrap;
-    font-size: 11px;
-    font-weight: bold;
-    cursor: pointer;
-    /* 白フチをつけて読みやすくする */
-    text-shadow: 
-        1px 1px 0 #fff, -1px -1px 0 #fff, 
-        1px -1px 0 #fff, -1px 1px 0 #fff;
-}
-
-/* ★既存のCSS（ドットの色）と同じカラーコードを文字色に使い回す */
-.spot-text.spot  { color: #191970; }
-.spot-text.fish1 { color: #6495ED; }
-.spot-text.fish2 { color: #2E8B57; }
-.spot-text.fish3 { color: #D2691E; }
-.spot-text.fish4 { color: #4B0082; }
-.spot-text.fish6 { color: #006400; }
-
-/* スポット画面に入った時だけ文字を少し大きくする */
-.is-spot-mode .spot-text {
-    font-size: 13px !important; /* デフォルト11pxから拡大 */
-    
-    /* 文字が大きくなった分、ドットとの距離を微調整したい場合はコチラ */
-    /* left: 10px !important; */
-}
-
-/* =========================
-   SHOP MARKER (テキストマーカー版)
-========================= */
-/* マーカーの基準枠をゼロ化 */
-.custom-shop-marker {
-    position: absolute !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: visible !important;
-}
-
-/* 座標中心のドット（白塗り、#191970のフチ） */
-.shop-anchor {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background-color: #ffffff;
-    border:1px solid #191970;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    box-sizing: border-box;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-/* ドット右横のテキスト（ご指定の極小フォント） */
-.shop-text {
-    position: absolute;
-    left: 7px; /* ドットの少し右から開始 */
-    top: 0;
-    transform: translateY(-50%);
-    white-space: nowrap;
-    font-size: 7.5px; /* 6〜8pxの間の読みやすいサイズ */
-    font-weight: bold;
-    color: #191970;
-    /* 地図と被っても読めるように強めの白フチをつける */
-    text-shadow: 
-        1px 1px 0 #fff, -1px -1px 0 #fff, 
-        1px -1px 0 #fff, -1px 1px 0 #fff,
-        0px 2px 2px rgba(255,255,255,0.8);
-    cursor: pointer;
-    pointer-events: auto;
-}
-
-
-/* =========================
-   POPUP
-========================= */
-.shop-popup {
-    font-size: 13px;
-    line-height: 1.4;
-    color: #191970;
-}
-
-.shop-popup-title {
-    font-weight: bold;
-    font-size: 14px;
-    margin-bottom: 4px;
-    padding-right: 20px;
-    color: #191970;
-}
-
-.shop-popup-address {
-    font-size: 12px;
-    color: #222222 !important;
-    opacity: 0.8;
-    margin-bottom: 6px;
-    line-height: 1.3;
-}
-
-.shop-popup-address.dummy {
-    font-size: 12px;
-    color: #222222 !important;
-    opacity: 0.8;
-    margin-bottom: 6px;
-    padding-right: 20px;
-}
-
-/* ポップアップ下部のボタングループ */
-.shop-popup-footer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 10px;
-}
-
-/* Gemini風：シャドウで浮かせる白いボタン（ダークグレー文字） */
-.shop-popup-btn {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 7px 10px;
-    font-size: 12px;
-    
-    color: #222222 !important; /* ★ 3つのボタン全てをダークグレーに統一 */
-    background-color: #ffffff !important;
-    text-decoration: none !important;
-    border-radius: 8px;
-    border: 1px solid #eef0f3;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-    white-space: nowrap;
-    transition: all 0.15s ease;
-}
-
-.shop-popup-btn::after {
-    content: none !important;
-}
-
-/* ChatGPTボタン専用の色指定を無効化し共通の見た目に統一 */
-.shop-popup-btn.btn-chatgpt {
-    color: #222222 !important;
-    background-color: #ffffff !important;
-}
-
-/* タップ/ホバー時のわずかな押し込み演出 */
-.shop-popup-btn:active {
-    background-color: #f7f9fb !important;
-    transform: translateY(1px);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .shop-popup-btn:hover {
-        background-color: #fdfdfd !important;
-        border-color: #dce1e8;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
-    }
-}
-
-/* =========================
-   LEAFLET POPUP FIX
-========================= */
-.leaflet-popup-content-wrapper {
-    padding: 4px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.leaflet-popup-content {
-    margin: 8px 10px;
-}
-
-.leaflet-popup-tip,
-.leaflet-popup-tip-container {
-    display: none;
-}
-
-
-/* =========================
-   OSMタイルの下敷き遮蔽 (GSIチラ見え防止)
-========================= */
-.osm-solid-layer {
-    /* タイル画像がロードされるまでの間、GSIを隠すための背景色 */
-    /* #f2efe9 はOSMの陸地に近い色です */
-    background-color: #f2efe9 !important; 
-    
-    /* タイル間の隙間（1pxの線）が見えるのを防ぐ環境依存の対策 */
-    box-shadow: 0 0 0 1px #f2efe9;
-}
-
-
-
-
-/* 共通 */
-/* 魚マーカーの親枠（Leafletが配置する基準点） */
-.fish-label {
-  position: absolute !important;
-  width: 0 !important;      /* 枠の幅をゼロにする */
-  height: 0 !important;     /* 枠の高さをゼロにする */
-  overflow: visible !important; /* 中身の文字は消さずに表示する */
-}
-
-/* 実際に魚の名前が表示される文字部分 */
-.fish-text {
-  position: absolute !important;
-  display: inline-block;
-  white-space: nowrap;      /* 文字の折り返しを防ぐ */
-  
-  /* 【最重要】文字の塊の「真ん中」を、上で設定した基準点（0,0）に強制的に一致させる */
-  top: 0 !important;
-  left: 0 !important;
-  transform: translate(-50%, -50%) !important; 
-  
-  /* 以下は見やすさのための装飾（既存のスタイルに合わせて調整してください） */
-
-  font-weight: bold;
-  color: #fff;
-  text-shadow:
-    -1px -1px 0 #191970,
-     1px -1px 0 #191970,
-    -1px  1px 0 #191970,
-     1px  1px 0 #191970;
-}
-
-
-.zoom-18 .fish-text { font-size: 10px; }
-.zoom-17 .fish-text { font-size: 8px; }
-.zoom-16 .fish-text { font-size: 6px; }
-
-
-
-
-/* =========================
-   MAP MENU
-========================= */
-.map-menu {
-    display: none;
-
-    position: absolute;
-    bottom: 4px;
-    left: 0;
-    right: 0;
-
-    margin: 0 4px;
-
-    /* ★スクロール成立条件 */
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    /* ★iOSスクロール */
-    -webkit-overflow-scrolling: touch;
-
-    /* ★タッチ操作許可 */
-    touch-action: pan-y;
-
-    z-index: 1980;
-
-    pointer-events: auto;
-
-    
-}
-
-/* =========================
-   POINTER EVENTS 統一
-========================= */
-#map-menu,
-#map-menu ul,
-#map-menu li,
-#map-menu button {
-    pointer-events: auto;
-}
-
-/* =========================
-   UL
-========================= */
-.map-menu ul {
-    list-style: none;
-    width: 100%;
-    background: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* =========================
-   LI
-========================= */
-.map-menu li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    width: 100%;
-    box-sizing: border-box;
-
-    padding: 4px 8px;
-    margin: 2px 0;
-
-    font-size: 13px;
-    color: #fff;
-
-    cursor: pointer;
-
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 4px;
-
-    /* アニメーション初期値 */
-    opacity: 1;
-    transform: translateY(0);
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* 最後の要素 */
-.map-menu li:last-child {
-    border-bottom: none;
-    padding-bottom: 3px;
-}
-
-/* =========================
-   HEADER ROW (ul外出し版)
-========================= */
-.menu-header-row {
-    display: block;
-    padding: 4px 8px;
-    background: transparent;
-    color: #fff; /* ★ liから外れたので文字色を白に再設定 */
-}
-
-/* 中のレイアウト設定 */
-.menu-header-row .header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    font-size: 12px;
-    white-space: nowrap;
-}
-
-/* ★ 影は文字部分だけに直接かける（ボタンには影響しない） */
-#cloudsUI,
-.header-text {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-
-
-/* =========================
-   アニメーション
-========================= */
-.map-menu li.new-item {
-    opacity: 0;
-    transform: translateY(6px);
-}
-
-.map-menu li.new-item.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* =========================
-   PHASE LOCK
-========================= */
-#map-menu.phase2-lock li {
-    pointer-events: none;
-}
-
-#map-menu.phase2-lock li .spot-text {
-    pointer-events: auto;
-    cursor: pointer;
-}
-
-/* =========================
-   BUTTON
-========================= */
-#map-menu button {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: inherit;
-
-    font-size: inherit;
-    text-align: left;
-
-    padding: 0;
-
-    cursor: pointer;
-}
-
-/* =========================
-   右側天気（修正版）
-========================= */
-.pref-weather {
-    /* ★ absolute禁止 */
-    position: static;
-
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    font-size: 12px;
-    white-space: nowrap;
-
-    /* ★ 右寄せ */
-    margin-left: auto;
-
-    /* ★ タッチ有効 */
-    pointer-events: auto;
-    touch-action: pan-y;
-}
-
-/* 中身 */
-.pref-weather div {
-    display: inline-block;
-    text-align: right;
-}
-
-.pref-weather .col-icon {
-    width: 42px;
-    display: flex;         /* inline-flexやめる */
-    justify-content: center;
-    align-items: center;
-    overflow: visible;
-}
-
-.num-fixed {
-    display: inline-block;
-    width: 2ch;          /* 数字3桁分で固定（1の幅基準） */
-    text-align: right;
-    white-space: nowrap;
-}
-
-/* 中身右寄せ維持 */
-.pref-weather .col-temp,
-.pref-weather .col-pop,
-.pref-weather .col-wind {
-    text-align: right;
-}
-
-/* 地名 */
-.pref-name {
-    position: absolute;
-    font-size: 6px;
-    bottom: 0;
-    opacity: 0.6;
-    margin-left: 4px;
-}
-
-
-
-/* =====週間7枠 ===== */
-
-.week {
-  display: flex;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  margin: 4px;
-  text-align: center;
-  font-size: 10px;
-  color: #fff;
-  z-index: 8500;
-  
-  /* ▼ 追加：Hourly(.weather)と全く同じ「スクロール枠」としての性質を持たせる魔法 */
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  pointer-events: auto;
-}
-
-
-
-/* =========================
-   WEEKLY LABELS (絶対配置で指定位置に浮かせる)
-========================= */
-.week-labels {
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  width: 22px;           /* Hourly同様、パディング分の枠を用意 */
-  z-index: 8505;
-  pointer-events: none;
-  left: -1px;
-}
-
-.week-label {
-  display: flex;
-  width: 100%;
-  height: 14px;
-  line-height: 14px;
-  align-items: center;
-  justify-content: flex-start;
-  background: transparent !important;
-  border-radius: 0 !important;
-  
-}
-
-/* =========================
-   WEEKLY TABLE & ROWS (全幅維持 ＋ パディングで中身だけ逃がす)
-========================= */
-.week-table {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background: transparent;
-  position: relative;
-  
-  /* ▼ ここが画面スクロールの足場にするための魔法の設定です */
-  pointer-events: auto; /* 指のタッチをしっかりキャッチ（クリックも維持） */
-  touch-action: pan-y;  /* 縦方向の画面スクロールを強制的に許可 */
-}
-
-
-.week-row {
-  display: grid;
-  background-color: rgba(0, 0, 0, 0.5);
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  height: 14px;
-  position: relative;
-  padding-left: 14px;    /* ★ Hourlyに合わせてデータを右へ寄せる（微調整可能） */
-  box-sizing: border-box;
-}
-
-/* ─── テーブル側の角丸・透明化コントロール（週間用） ─── */
-
-/* 1行目（日付）: 背景を透過せず、BOXの一番上として角を丸める */
-.week-table .week-row:nth-child(1) {
-  /* background-color: transparent !important; を削除しました */
-  border-radius: 4px 4px 0 0;
-}
-
-/* ※ 2行目の角丸指定は不要になったので削除します */
-
-/* 最終行: BOXの下の角を丸める */
-.week-table .week-row:last-child {
-  border-radius: 0 0 4px 4px;
-}
-
-
-/* ─── セルのレイアウト ─── */
-.week-cell {
-  display: flex;
-  align-items: flex-end; /* 数値と単位の「底」を揃える */
-  justify-content: center;
-  height: 14px;
-  min-width: 0;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-/* テキストやアイコン行（日付・潮・天気）のみ中央揃えにするための追加クラス */
-.week-cell.text-center {
-  align-items: center;
-  
-}
-
-.week-row div.active {
-  background: rgba(255, 255, 255, 0.35);
-}
-
-
-/* ===== hourlyテーブル ===== */
-.weather {
-  display: flex;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 88px;
-  font-size: 10px;
-  color: #fff;
-  margin: 4px;
-  z-index: 8600;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-  pointer-events: auto;
-}
-
-
-
-.weather-cell {
-  display:flex;
-  align-items: flex-end;
-  justify-content:center;
-  min-width:0;
-  font-variant-numeric: tabular-nums;
-}
-
-/* =========================
-   WEATHER LABELS (絶対配置で指定位置に浮かせる)
-========================= */
-.weather-labels {
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  width: 22px;           /* ★ パディングと同じ幅を持たせる */
-  z-index: 8605;
-  pointer-events: none;
-}
-
-.weather-label {
-  display: flex;
-  width: 100%;
-  height: 14px;
-  line-height: 14px;
-  align-items: center;
-  justify-content: flex-start;
-  background: transparent !important;
-  border-radius: 0 !important;
-}
-
-.label-text {
-  display: inline-block;
-  font-size: 10px;
-  transform: scale(0.65);
-  transform-origin: left center;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: normal;
-  white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-  margin-left: 2px;
-}
-
-/* =========================
-   WEATHER TABLE & ROWS (全幅維持 ＋ パディングで中身だけ逃がす)
-========================= */
-.weather-table {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background: transparent;
-  position: relative;
-  touch-action: auto;
-  pointer-events: auto;
-}
-
-.weather-row {
-  display: grid;
-  background-color: rgba(0, 0, 0, 0.5);
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  height: 14px;
-  position: relative;
-  /* ★ 最重要ポイント：背景は左端から塗りつつ、データだけを右に22px逃がす */
-  padding-left: 4px;
-  box-sizing: border-box; /* paddingを含めてwidth:100%にする魔法 */
-}
-
-/* ─── テーブル側の角丸・透明化コントロール ─── */
-
-.weather-table .weather-row:nth-child(1) {
-  background-color: transparent !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,0.8);
-}
-
-.weather-table .weather-row:nth-child(2) {
-  border-radius: 4px 4px 0 0;
-}
-
-.weather-table .weather-row:last-child {
-  border-radius: 0 0 4px 4px;
-}
-
-/* =========================
-   ラベルの位置微調整 (雨と風を2行の中間に配置)
-========================= */
-
-/* 4行目（雨）は常に半行分（7px）下にずらす */
-.weather-labels .weather-label:nth-child(4) {
-  position: relative;
-  top: 7px;
-}
-
-/* 6行目（風）は「全体が7行ある場合」のみ半行分（7px）下にずらす 
-  （＝6行目が、最後から2番目の要素である場合のみ適用する魔法） */
-.weather-labels .weather-label:nth-child(6):nth-last-child(2) {
-  position: relative;
-  top: 7px;
-}
-
-
-.value-wrap {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-/* 数値カラム（固定幅） */
-.num {
-  width: 3ch;              /* 最大桁に合わせる */
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-/* 単位カラム（固定幅） */
-.unit {
-  width: 2ch;              /* ←これが効く */
-  font-size: 6px;
-  text-align: left;
-  opacity: 0.8;
-}
-
-.unit-text {
-  font-size: 6px;
-  opacity: 0.8;
-  /* width指定なし */
-}
-
-.wind-dir {
-  font-family: system-ui, sans-serif;
-  font-size: 8px;
-  font-weight: 700;
-  line-height: 14px;
-}
-
-.tide-wrapper {
-    position: absolute;
-      left: 0;
-  right: 0;
-  bottom: 0px;
-  width: 100%;
-  height: 80vh;
-  padding-left: 4px;
-  padding-right: 4px;
-  justify-content: flex-end; /* ★右寄せ */
-  box-sizing: border-box;
-  display: none;
-  z-index: 8000;
-  pointer-events: none; /* ★背面の仮ピンマーカーやポップアップのクリックを阻害しないよう透過 */
-}
-
-#tideCanvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  margin-left: auto; /* ★これ */
-  pointer-events: none;
-  position: relative;
-  z-index: 8010;
-
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent 0px,
-    black 4px,
-    black calc(100% - 4px),
-    transparent 100%
-  );
-
-  mask-image: linear-gradient(
-    to right,
-    transparent 0px,
-    black 4px,
-    black calc(100% - 4px),
-    transparent 100%
-  );
-}
-
-/* =========================================
-   スポット詳細：釣果ピン投稿モードUI
-========================================= */
-
-/* ボタン行コンテナ（投稿パネルと投稿ボタンを横並び右揃え） */
-.post-btn-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-}
-
-/* 釣果投稿切替ボタン */
-.map-post-btn {
-  /* 共通ツールボタンのデザインを使用 */
-}
-
-.map-post-btn.active {
-  background: #191970;
-}
-
-/* 画面中心の「＋」照準（白線＋濃紺シャドウ） */
-.post-center-crosshair {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 26px;
-  height: 26px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 9100;
-}
-
-.post-center-crosshair.is-open {
-  display: block;
-}
-
-.post-center-crosshair::before,
-.post-center-crosshair::after {
-  content: "";
-  position: absolute;
-  background: #ffffff;
-  box-shadow: 0 0 2px #191970, 0 0 4px rgba(0, 0, 0, 0.85);
-}
-
-/* 横線 */
-.post-center-crosshair::before {
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1.5px;
-  transform: translateY(-50%);
-}
-
-/* 縦線 */
-.post-center-crosshair::after {
-  left: 50%;
-  top: 0;
-  width: 1.5px;
-  height: 100%;
-  transform: translateX(-50%);
-}
-
-/* 投稿ボタンのすぐ左に展開するパネル（白背景＋191970枠・文字） */
-.post-mode-panel {
-  display: none;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 6px;
-  pointer-events: auto;
-  white-space: nowrap;
-}
-
-.post-mode-panel.is-open {
-  display: inline-flex;
-}
-
-/* 魚種セレクト（白背景＋191970文字） */
-.post-fish-select {
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: bold;
-  color: #191970;
-  background: #ffffff;
-  border: 1px solid #191970;
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  outline: none;
-  cursor: pointer;
-}
-
-/* 投稿実行ボタン（白背景＋191970枠・文字） */
-.post-submit-btn {
-  padding: 2px 8px;
-  font-size: 12px;
-  font-weight: bold;
-  color: #191970;
-  background: #ffffff;
-  border: 1px solid #191970;
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.15s ease;
-}
-
-.post-submit-btn:active {
-  background: #191970;
-  color: #ffffff;
-  transform: translateY(1px);
-}
-
-.post-submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* インラインステータスメッセージ */
-.post-status-msg {
-  display: none;
-  font-size: 11px;
-  font-weight: bold;
-  color: #191970;
-  white-space: nowrap;
-}
-
-.post-status-msg.is-visible {
-  display: inline-block;
-}
-
-/* =========================================
-   広域・エリアマップ：SNS釣果ソナーレーダー
-========================================= */
-
-.sns-sonar-wrapper,
-.sns-sonar-text-wrapper {
-  background: transparent;
-  border: none;
-  pointer-events: none !important;
-}
-
-
-/* ★ JS側のサイズ指定を上書きして約1.6倍の視認しやすいサイズに拡大 */
-.sns-sonar-emitter {
-  --sonar-size: 86px;
-  --sonar-rgb: 255, 255, 255;
-  position: relative;
-  width: calc(var(--sonar-size) * 1.65);
-  height: calc(var(--sonar-size) * 1.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  transition: width 0.3s ease, height 0.3s ease;
-}
-
-/* --- 投稿SNS別のカラーテーマ（ソナー＆テキスト共通） --- */
-/* X: 黒 */
-.sns-x         { --sonar-rgb: 20, 20, 20; --sns-badge-bg: #111111; --sns-badge-color: #ffffff; }
-/* Instagram: ピンク */
-.sns-instagram { --sonar-rgb: 225, 48, 108; --sns-badge-bg: #e1306c; --sns-badge-color: #ffffff; }
-/* Facebook: 水色 */
-.sns-facebook  { --sonar-rgb: 24, 160, 251; --sns-badge-bg: #18a0fb; --sns-badge-color: #ffffff; }
-/* Threads: 白 */
-.sns-threads   { --sonar-rgb: 255, 255, 255; --sns-badge-bg: #ffffff; --sns-badge-color: #111111; }
-/* デフォルト */
-.sns-default   { --sonar-rgb: 255, 255, 255; --sns-badge-bg: #191970; --sns-badge-color: #ffffff; }
-
-/* ★ 中心の輝点 */
-.sns-sonar-core {
-  width: 3px;
-  height: 3px;
-  background-color: rgba(var(--sonar-rgb), 0.45);
-  border-radius: 50%;
-  box-shadow: 0 0 4px rgba(var(--sonar-rgb), 0.4);
-  z-index: 3;
-  pointer-events: none;
-}
-
-/* ★ 魚種テキスト（Threads・Instagram・Facebook：テーマカラー太字＋薄影） */
-.sns-sonar-fish-hit {
-  position: relative;
-  z-index: 6;
-  pointer-events: auto;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3px 4px;
-  font-size: 6px;
-  line-height: 1;
-  font-weight: 900;
-  color: rgb(var(--sonar-rgb));
-  white-space: nowrap;
-  transform: translate(-50%, -50%);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-/* Threads / Instagram / Facebook 個別微調整（テーマカラー太字＋薄影） */
-.sns-sonar-fish-hit.sns-threads {
-  color: #ffffff;
-  font-weight: 900;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-.sns-sonar-fish-hit.sns-instagram {
-  color: #ff4096;
-  font-weight: 900;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-.sns-sonar-fish-hit.sns-facebook {
-  color: #18a0fb;
-  font-weight: 900;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-/* ★ X専用：現状の見やすい「黒字＋白枠（白縁取り）」を維持 */
-.sns-sonar-fish-hit.sns-x {
-  color: #111111;
-  font-weight: bold;
-  text-shadow:
-     0.8px  0.8px 0 #ffffff,
-    -0.8px -0.8px 0 #ffffff,
-     0.8px -0.8px 0 #ffffff,
-    -0.8px  0.8px 0 #ffffff,
-     0px    0.8px 0 #ffffff,
-     0px   -0.8px 0 #ffffff,
-     0.8px  0px   0 #ffffff,
-    -0.8px  0px   0 #ffffff;
-}
-
-/* ズーム12.5以上時：完全非表示＆クリック無効化 */
-.sns-sonar-fish-hit.is-hidden-hit {
-  display: none !important;
-  font-size: 0px !important;
-  width: 0px !important;
-  height: 0px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-  pointer-events: none !important;
-  cursor: default !important;
-}
-
-/* ★ ソナー波紋（視認性向上：1.5px線・発光感アップ・4.5秒周期） */
-.sns-sonar-wave {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 6px;
-  height: 6px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border: 1.5px solid rgba(var(--sonar-rgb), 0.78);
-  background: radial-gradient(
-    circle,
-    rgba(var(--sonar-rgb), 0.18) 0%,
-    rgba(var(--sonar-rgb), 0) 70%
-  );
-  box-shadow: 0 0 6px rgba(var(--sonar-rgb), 0.45);
-  opacity: 0;
-  pointer-events: none;
-  animation: sns-sonar-ping 4.5s cubic-bezier(0.1, 0.4, 0.3, 1) infinite;
-}
-
-/* Xのソナー波紋は暗い海や山でもはっきり見えるよう白い外周光彩を付与 */
-.sns-x .sns-sonar-wave {
-  border: 1.5px solid rgba(20, 20, 20, 0.88);
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.14) 0%,
-    rgba(20, 20, 20, 0) 70%
-  );
-  box-shadow:
-    0 0 4px rgba(255, 255, 255, 0.85),
-    inset 0 0 3px rgba(255, 255, 255, 0.55);
-}
-
-/* ★ 走査線（スイープも視認性を少し引き上げ） */
-.sns-sonar-sweep {
-  position: absolute;
-  top: 6%;
-  left: 6%;
-  width: 88%;
-  height: 88%;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    rgba(var(--sonar-rgb), 0) 0deg,
-    rgba(var(--sonar-rgb), 0.02) 250deg,
-    rgba(var(--sonar-rgb), 0.24) 360deg
-  );
-  animation: sns-sonar-rotate 7s linear infinite;
-  border: 1px dashed rgba(var(--sonar-rgb), 0.28);
-  box-sizing: border-box;
-  pointer-events: none;
-}
-
-.sns-x .sns-sonar-sweep {
-  border-color: rgba(255, 255, 255, 0.35);
-  background: conic-gradient(
-    from 0deg,
-    rgba(255, 255, 255, 0) 0deg,
-    rgba(255, 255, 255, 0.02) 250deg,
-    rgba(255, 255, 255, 0.2) 360deg
-  );
-}
-
-@keyframes sns-sonar-ping {
-  0% {
-    width: 6px;
-    height: 6px;
-    opacity: 0.92;
-  }
-  100% {
-    width: calc(var(--sonar-size) * 1.65);
-    height: calc(var(--sonar-size) * 1.65);
-    opacity: 0;
-  }
-}
-
-@keyframes sns-sonar-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* =========================================
-   SNS釣果ポップアップ（.shop-popupのCSS流用）
-========================================= */
-
-.sns-catch-popup {
-  font-size: 13px;
-  line-height: 1.4;
-  color: #191970;
-  min-width: 160px;
-  max-width: 220px;
-}
-
-.sns-catch-popup-title {
-  font-weight: bold;
-  font-size: 13px;
-  color: #191970;
-  margin-bottom: 2px;
-  padding-right: 20px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sns-catch-popup-fish {
-  font-size: 14px;
-  font-weight: bold;
-  color: #333333;
-  margin-bottom: 6px;
-}
-
-.sns-catch-popup-date {
-  font-size: 11px;
-  color: #666666;
-  font-weight: normal;
-  margin-left: 4px;
-}
-
-.sns-catch-popup-footer {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px dashed rgba(25, 25, 112, 0.2);
-}
-
-.sns-catch-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 0;
-  font-size: 12px;
-  font-weight: bold;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0;
-  box-shadow: none !important;
-  text-decoration: underline !important;
-  text-underline-offset: 2px;
-  transition: opacity 0.15s ease;
-  white-space: nowrap;
-}
-
-.sns-catch-btn.sns-x {
-  color: #111111 !important;
-}
-.sns-catch-btn.sns-instagram {
-  color: #e1306c !important;
-}
-.sns-catch-btn.sns-facebook {
-  color: #18a0fb !important;
-}
-.sns-catch-btn.sns-threads {
-  color: #111111 !important;
-}
-.sns-catch-btn.sns-default {
-  color: #191970 !important;
-}
-
-.sns-catch-btn:active {
-  opacity: 0.65;
-}
-
-.sns-catch-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sns-catch-arrow {
-  margin-left: 4px;
-  flex-shrink: 0;
-}
-
-
-/* =========================================
-   本採用ピン＆仮ピン マーカー・投票UI
-========================================= */
-
-/* 本採用マーカー：既存フィッシュマーカーに下点線 */
-.fish-text.approved-fish {
-  border-bottom: 1.5px dotted #ffffff;
-  padding-bottom: 1px;
-}
-
-/* 仮ピンマーカー専用ラッパー */
-.temp-pin-wrapper {
-  background: transparent;
-  border: none;
-  pointer-events: none !important;
-}
-
-/* 仮ピンマーカー：テキスト本体は半透明、下点線は不透明 */
-.fish-text.temp-fish {
-  color: rgba(255, 255, 255, 0.6) !important;
-  border-bottom: 1.5px dotted #ffffff; /* 点線は完全不透明 */
-  padding: 2px 3px 1px 3px;
-  cursor: pointer;
-  pointer-events: auto !important;
-  z-index: 10;
-  user-select: none;
-  -webkit-user-select: none;
-  text-shadow:
-    -1px -1px 0 rgba(25, 25, 112, 0.6),
-     1px -1px 0 rgba(25, 25, 112, 0.6),
-    -1px  1px 0 rgba(25, 25, 112, 0.6),
-     1px  1px 0 rgba(25, 25, 112, 0.6);
-}
-
-/* 仮ピン投票用：超コンパクトLeafletポップアップ枠 */
-.temp-vote-leaflet-popup .leaflet-popup-content-wrapper {
-  padding: 2px;
-  border-radius: 6px;
-}
-
-.temp-vote-leaflet-popup .leaflet-popup-content {
-  margin: 2px 3px !important;
-  width: auto !important;
-}
-
-/* 👍(カウント数) 👎(カウント数) の横並びコンテナ */
-.temp-pin-popup {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-/* コンパクト投票ボタン */
-.temp-vote-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3px 6px;
-  font-size: 11px;
-  font-weight: bold;
-  line-height: 1.1;
-  color: #191970;
-  background-color: #ffffff;
-  border: 1px solid #dce1e8;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: transform 0.1s ease, background-color 0.1s ease;
-}
-
-.temp-vote-btn:active {
-  background-color: #f0f4ff;
-  transform: translateY(1px);
-}
-
-/* 無効化ボタン（自身のピン・評価済み等） */
-.temp-vote-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-  background-color: #f2f2f2;
-  color: #888888;
-  box-shadow: none;
 }
