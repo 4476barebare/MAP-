@@ -3099,6 +3099,12 @@ if (tileWrap && tileBtn) {
     // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
     // =====================================================
     if (!window.currentAreaId && !window.currentSpotId) {
+        // ★ Region画面では何もしない（Regionの作り直しを防ぐ）
+        if (!window.currentPref) return;
+
+        // ★ 実行中の二重 goBack を防ぐ（region_management 完了後に解除）
+        window.goBackGuard = true;
+
         setIdealQuery('pref', null);
         setIdealQuery('area', null);
         setIdealQuery('spot', null);
@@ -3112,9 +3118,12 @@ if (tileWrap && tileBtn) {
         window.prefBounds = null;
         window.areaBounds = null;
 
+        // ★ 県の裏ロード（天気・魚種の付与）を中断する
+        window._prefBgGen = (window._prefBgGen || 0) + 1;
+
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
-        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        // ★ renderSpotRanking() は region_management 側で描画するため、ここでは呼ばない
         
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
         if (window.phase1Group) window.phase1Group.clearLayers();
@@ -3127,27 +3136,26 @@ if (tileWrap && tileBtn) {
         const alertBar = document.getElementById("alert-bar");
         if (alertBar) alertBar.textContent = "";
 
-        setTimeout(() => {
-            region_management();
-        }, 10);
+        // ★ ドットをRegion表示に戻す（currentPref が null なので全県・通常表示になる）
+        if (typeof showPrefSpots === 'function') showPrefSpots();
 
-        setTimeout(() => {
-
-            if (typeof showPrefSpots === 'function') {
-                showPrefSpots();
+        // ★ setTimeout(10/300ms) をやめ、region_management の完了を待って後始末する
+        (async () => {
+            try {
+                await new Promise(resolve => requestAnimationFrame(() => resolve()));
+                await region_management();
+            } catch (err) {
+                console.error('region_management エラー:', err);
+            } finally {
+                const backBtn = document.getElementById('map-back-btn');
+                if (backBtn) {
+                    backBtn.style.display = 'none';
+                    backBtn.style.pointerEvents = 'auto';
+                }
+                if (typeof clearMapAlert === 'function') clearMapAlert();
+                window.goBackGuard = false;
             }
-
-            // 👇 【修正】ここでちゃんと backBtn を定義してあげる
-            const backBtn = document.getElementById('map-back-btn');
-            if (backBtn) {
-                backBtn.style.display = 'none';
-                backBtn.style.pointerEvents = 'auto';
-            }
-
-             clearMapAlert();
-            
-            window.goBackGuard = false; 
-        }, 300);
+        })();
 
         return;
     }
@@ -3285,7 +3293,13 @@ if (tileWrap && tileBtn) {
 
     // =====================================================
     // ③ Area -> Pref（県画面に戻る）
+    //    描画・他県データ確認・マーカー表示は pref_management に任せる
     // =====================================================
+    // ★ 実行中の二重 goBack を防ぐ（completePrefReturn で解除）
+    window.goBackGuard = true;
+    // ★ 遷移中にエリアスワイプが入らないよう、先に無効化する
+    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
@@ -3303,8 +3317,6 @@ if (tileWrap && tileBtn) {
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
 
-    drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-
     let isPrefReturned = false;
     const completePrefReturn = () => {
         if (isPrefReturned) return;
@@ -3320,25 +3332,52 @@ if (tileWrap && tileBtn) {
         window.currentSpotId = null;
 
         initAreaUI();
-        showPrefSpots();
+        // ★ showPrefSpots は pref_management 内で実行済みのため呼ばない
         renderPrefWeather();
         resetAreaGuide();
 
-        // 👇【ここに追加！】エリアスワイプをOFFにし、県スワイプをONにする
+        // エリアスワイプをOFFにし、県スワイプをONにする
         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
         if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
 
-        releaseLockAndShowBtn();
+        // ★ 旧 releaseLockAndShowBtn()（未定義だった）の代わりにガード解除
+        //   戻るボタンは県画面でも表示のままなので、再表示処理は不要
+        window.goBackGuard = false;
     };
 
-    const centerPref = window.map.getCenter();
-    const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 && Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 && window.map.getZoom() === window.prefData.zoom;
+    (async () => {
+        try {
+            let drawn = false;
+            try {
+                if (typeof pref_management === 'function') {
+                    drawn = await pref_management(window.currentPref);
+                }
+            } catch (err) {
+                console.error('pref_management エラー（従来の描画で続行）:', err);
+            }
 
-    if (isSamePref) {
-        completePrefReturn();
-    } else {
-        window.map.once('moveend', completePrefReturn);
-    }
+            // pref_management が使えなかった場合のみ、従来どおりここで描画する
+            if (!drawn) {
+                drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+
+                const centerPref = window.map.getCenter();
+                const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 &&
+                                   Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 &&
+                                   window.map.getZoom() === window.prefData.zoom;
+                if (!isSamePref) {
+                    await new Promise(resolve => {
+                        const timer = setTimeout(resolve, 1500); // moveend が来ない場合の保険
+                        window.map.once('moveend', () => { clearTimeout(timer); resolve(); });
+                    });
+                }
+            }
+
+            completePrefReturn();
+        } catch (err) {
+            console.error('エリア→県の復帰エラー:', err);
+            window.goBackGuard = false;
+        }
+    })();
 }
 
 

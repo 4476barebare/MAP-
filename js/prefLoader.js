@@ -168,8 +168,13 @@ async function pref_management(prefCode = window.currentPref) {
             console.error('マーカー表示エラー:', err);
         });
         const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
-        window._prefBackgroundLoad = runPrefBackgroundLoads(prefCode, markersPromise, bgGen)
-            .catch(err => console.error('天気・魚種の付与エラー:', err));
+        if (window._prefBgDone) {
+            // 全県の天気・魚種を付与済み（エリア→県の復帰など）なら再実行しない
+            window._prefBackgroundLoad = Promise.resolve();
+        } else {
+            window._prefBackgroundLoad = runPrefBackgroundLoads(prefCode, markersPromise, bgGen)
+                .catch(err => console.error('天気・魚種の付与エラー:', err));
+        }
 
         await markersPromise;                              // 天気・魚種の完了は待たない
 
@@ -254,4 +259,7 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen) {
         await applyPrefWeatherAndFish(code, regionCode);
         applyInland(code);
     }
+
+    // 中断されずに全県ぶん終えたら完了フラグを立てる
+    if (!isStale()) window._prefBgDone = true;
 }
