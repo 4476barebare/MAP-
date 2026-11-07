@@ -61,55 +61,55 @@ async function pref_management(prefCode = window.currentPref) {
     const mapExistedBefore = !!window.map;
 
     // 地図の操作制限を解除（region_management と同じ初期化）
-        if (window.map) {
-            window.map.setMinZoom(0);
-            window.map.setMaxZoom(18);
-            window.map.setMaxBounds(null);
-            window.map.options.maxBoundsViscosity = 0;
-            window.map.stop();
-        }
+    if (window.map) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+        window.map.stop();
+    }
 
-        // ---------- 1. 最優先：選択県の表示準備 ----------
-        const isRegionReady = await loadRegionCSV();       // キャッシュがあれば再利用
-        if (!isRegionReady) return false;
+    // ---------- 1. 最優先：選択県の表示準備 ----------
+    const isRegionReady = await loadRegionCSV();       // キャッシュがあれば再利用
+    if (!isRegionReady) return false;
 
-        await loadPrefectureSpots(prefCode, 'select');      // 選択県だけ先行取得
-        const parent = getPrefParentRow(prefCode);
-        const target = toDrawTarget(parent, prefCode);     // zoom は必ず location.json から
-        if (!target) {
-            console.error('pref_management: location.json から drawLocation 用データを確定できません:', prefCode);
-            return false;
-        }
-        window.prefData = parent;
+    await loadPrefectureSpots(prefCode, 'select');      // 選択県だけ先行取得
+    const parent = getPrefParentRow(prefCode);
+    const target = toDrawTarget(parent, prefCode);     // zoom は必ず location.json から
+    if (!target) {
+        console.error('pref_management: location.json から drawLocation 用データを確定できません:', prefCode);
+        return false;
+    }
+    window.prefData = parent;
 
-        // ---------- 2. 地図描画を開始し、他県取得・選択県の付帯データを並行開始 ----------
-        const drawPromise = drawLocation(target.name, target.lat, target.lng, target.zoom);
-        const otherPromise = loadPrefectureSpots(prefCode, 'other');
+    // ---------- 2. 地図描画を開始し、他県取得・選択県の付帯データを並行開始 ----------
+    const drawPromise = drawLocation(target.name, target.lat, target.lng, target.zoom);
+    const otherPromise = loadPrefectureSpots(prefCode, 'other');
 
-        const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
-        const selectedBgPromise = window._prefBgDone
-            ? Promise.resolve()
-            : applyPrefWeatherAndFish(prefCode, regionCode);
+    const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
+    const selectedBgPromise = window._prefBgDone
+        ? Promise.resolve()
+        : applyPrefWeatherAndFish(prefCode, regionCode);
 
-        // ---------- 3. 地図描画だけを待って呼び出し元へ戻す ----------
-        await drawPromise;
-        if (mapExistedBefore && !window.isInitialMapLoad) {
-            await waitMapSettled();
-        }
+    // ---------- 3. 地図描画だけを待って呼び出し元へ戻す ----------
+    await drawPromise;
+    if (mapExistedBefore && !window.isInitialMapLoad) {
+        await waitMapSettled();
+    }
 
-        // 他県データの集約・マーカー生成・他県の天気魚種付与は裏で継続する。
-        window._prefBackgroundLoad = otherPromise
-            .then(() => loadPrefectureSpots(prefCode, 'all'))
-            .then(() => {
-                const finalParent = getPrefParentRow(prefCode);
-                if (finalParent) window.prefData = finalParent;
-                return showPrefMarkers();
-            })
-            .then(() => {
-                if (window._prefBgDone) return;
-                return runPrefBackgroundLoads(prefCode, Promise.resolve(), bgGen, selectedBgPromise);
-            })
-            .catch(err => console.error('都道府県バックグラウンド処理エラー:', err));
+    // 他県データの集約・マーカー生成・他県の天気魚種付与は裏で継続する。
+    window._prefBackgroundLoad = otherPromise
+        .then(() => loadPrefectureSpots(prefCode, 'all'))
+        .then(() => {
+            const finalParent = getPrefParentRow(prefCode);
+            if (finalParent) window.prefData = finalParent;
+            return showPrefMarkers();
+        })
+        .then(() => {
+            if (window._prefBgDone) return;
+            return runPrefBackgroundLoads(prefCode, Promise.resolve(), bgGen, selectedBgPromise);
+        })
+        .catch(err => console.error('都道府県バックグラウンド処理エラー:', err));
 
     return !!window.prefData;
 }
