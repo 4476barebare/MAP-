@@ -1,5 +1,115 @@
 [
   {
+    "date": "2026/11/06",
+    "fish": "ブラックバス",
+    "lat": 35.6186,
+    "lng": 139.1917,
+    "area_name": "相模湖",
+    "url": "https://x.com/OGAWATEI_boat/status/2118614725399572838",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ブラックバス",
+    "lat": 35.3168,
+    "lng": 139.3702,
+    "area_name": "相模川",
+    "url": "https://x.com/shigetmp/status/2118617811249758564",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ブラックバス",
+    "lat": 35.44,
+    "lng": 139.37,
+    "area_name": "相模川",
+    "url": "https://x.com/shigetmp/status/2118617811249758564",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ブラックバス",
+    "lat": 35.546,
+    "lng": 139.318,
+    "area_name": "相模川",
+    "url": "https://x.com/shigetmp/status/2118617811249758564",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ブラックバス",
+    "lat": 35.589,
+    "lng": 139.283,
+    "area_name": "相模川",
+    "url": "https://x.com/shigetmp/status/2118617811249758564",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ワカサギ",
+    "lat": 36.5561,
+    "lng": 139.1823,
+    "area_name": "赤城山大沼",
+    "url": "https://x.com/ao18719048/status/2118617058745401734",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ブラックバス",
+    "lat": 35.2147,
+    "lng": 140.0883,
+    "area_name": "亀山ダム",
+    "url": "https://x.com/NomuraBoat/status/2118616155841782032",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ブラックバス",
+    "lat": 35.9548,
+    "lng": 140.3152,
+    "area_name": "新利根川",
+    "url": "https://www.facebook.com/kenichiro.kishi.77/posts/pfbid02chGmtRo1xo1G9v86JZrMZRb7VJFLgUozVbvhyv7vzSYwiu7it59LmdDn3ZfUpprl",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "アジ",
+    "lat": 35.2825,
+    "lng": 139.6725,
+    "area_name": "横須賀市",
+    "url": "https://www.threads.com/@k.naitou/post/DfZszyeH5FI",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "アジ",
+    "lat": 35.2281,
+    "lng": 139.7089,
+    "area_name": "横須賀市",
+    "url": "https://www.threads.com/@k.naitou/post/DfZszyeH5FI",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "アジ",
+    "lat": 35.1953,
+    "lng": 139.6147,
+    "area_name": "横須賀市",
+    "url": "https://www.threads.com/@k.naitou/post/DfZszyeH5FI",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/05",
     "fish": "シーバス",
     "lat": 36.335,
@@ -28,6 +138,36 @@
     "url": "https://www.threads.com/@stand_by_jii/post/DfXRMxfGgel",
     "source": "Threads",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/05",
+    "fish": "シーバス",
+    "lat": 36.3,
+    "lng": 140.62,
+    "area_name": "鹿島灘",
+    "url": "https://x.com/kuma_y_fishing/status/2118252891765194831",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/05",
+    "fish": "シーバス",
+    "lat": 36.14,
+    "lng": 140.585,
+    "area_name": "鹿島灘",
+    "url": "https://x.com/kuma_y_fishing/status/2118252891765194831",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/05",
+    "fish": "シーバス",
+    "lat": 35.98,
+    "lng": 140.67,
+    "area_name": "鹿島灘",
+    "url": "https://x.com/kuma_y_fishing/status/2118252891765194831",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/04",
