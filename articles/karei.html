@@ -20,9 +20,12 @@
   <!-- favicon -->
   <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
 
+  
   <!-- CSS（fish_article.css 単体で完結） -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="../css/fish_article.css">
+<!-- CSS（fish_article.css 単体で完結） -->
+
 </head>
 
 <body>
@@ -163,7 +166,7 @@
       </div>
     </section>
 
-    <div style="margin: 30px 0;">
+    <div class="menu-list">
       <a href="nagetsuri.html" class="menu-card">
         <div class="menu-thumb">
           <img src="images/nagetsuri.jpg" alt="砂浜での投げ釣り">
@@ -174,9 +177,9 @@
       </a>
     </div>
 
-    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
-      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
-      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+    <section class="article-section map-section">
+      <h3>📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p class="map-note">※マップ上の赤いドットが釣れるポイントです。</p>
 
       <div id="fish-map" role="region"></div>
 
