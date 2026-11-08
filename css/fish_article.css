@@ -164,7 +164,7 @@ body > header,
 }
 
 .article-section {
-  margin-bottom: 28px;
+  
 }
 
 /* ---- 日本語の折り返しを自然にする（対応していないブラウザでは無視されるだけ） ----
@@ -564,6 +564,7 @@ body > header,
    マップ表示・リンクリスト関連
 ========================= */
 .article-section.map-section {
+   margin-top: 28px;
   background: var(--navy-tint);
   border: 1px solid var(--navy-line);
   border-radius: 8px;
