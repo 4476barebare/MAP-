@@ -121,7 +121,9 @@ body > header,
    記事本文レイアウト
 ========================= */
 .article {
-  max-width: 720px;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 12px 16px;
   line-height: 1.9;
