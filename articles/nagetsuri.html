@@ -19,10 +19,13 @@
 
   <!-- favicon -->
   <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  
+  <!-- CSS（fish_article.css 単体で完結） -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- 分割した専用CSSを読み込み -->
   <link rel="stylesheet" href="../css/fish_article.css">
-  <link rel="stylesheet" href="../css/main.css">
+<!-- 分割した専用CSSを読み込み -->
+
 </head>
 
 <body>
@@ -103,7 +106,7 @@
         ジャリメをハリに沿わせる通し刺しにし、ハリ先を出してタラシは1cm程度に。仕掛けは市販のシロギス用で十分で、最初はハリ数の少ないものが絡みにくく扱いやすくなります。反応が悪ければ、タラシを少し長くして動きで誘ってみましょう。
       </p>
 
-      <div style="margin: 30px 0;">
+      <div class="menu-list">
         <a href="shirogisu.html" class="menu-card">
           <div class="menu-thumb">
             <img src="images/shirogisu.jpg" alt="シロギスの解説">
@@ -120,7 +123,7 @@
         ハリとハリスが大きめの市販カレイ仕掛けに、ジャリメを数本まとめる房掛けが有効です。アオイソメやイワイソメの併用もあります。ただし小魚のアタリばかり出るときは、エサの量を減らすのも手です。
       </p>
 
-      <div style="margin: 30px 0;">
+      <div class="menu-list">
         <a href="karei.html" class="menu-card">
           <div class="menu-thumb">
             <img src="images/karei.jpg" alt="カレイの解説">
@@ -209,7 +212,7 @@
       </div>
     </section>
 
-    <div style="margin: 30px 0;">
+    <div class="menu-list">
       <a href="karei.html" class="menu-card">
         <div class="menu-thumb">
           <img src="images/karei.jpg" alt="海底に潜むカレイ">
@@ -220,7 +223,7 @@
       </a>
     </div>
 
-    <div style="margin: 30px 0;">
+    <div class="menu-list">
       <a href="shirogisu.html" class="menu-card">
         <div class="menu-thumb">
           <img src="images/shirogisu.jpg" alt="シロギスの解説">
@@ -231,9 +234,9 @@
       </a>
     </div>
 
-    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
-      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
-      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+    <section class="article-section map-section">
+      <h3>📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p class="map-note">※マップ上の赤いドットが釣れるポイントです。</p>
 
       <div id="fish-map" role="region"></div>
 
