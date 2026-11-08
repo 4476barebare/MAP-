@@ -20,12 +20,15 @@
   <!-- favicon -->
   <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="../css/main.css">
+  
+  <!-- CSS（fish_article.css 単体で完結） -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- 分割した専用CSSを読み込み -->
   <link rel="stylesheet" href="../css/fish_article.css">
-  <link rel="stylesheet" href="/css/main.css">
+<!-- CSS -->
+
+
+  <!-- 分割した専用CSSを読み込み -->
+
 </head>
 
 <body>
@@ -165,9 +168,9 @@
       </p>
     </section>
 
-    <section class="article-section" style="background:#f9f9f9; padding:10px; border-radius:8px;">
-      <h3 style="margin-top:0; border-left: 4px solid #191970; padding-left:8px;">📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
-      <p style="font-size:12px; margin-bottom:5px; color:#666;">※マップ上の赤いドットが釣れるポイントです。</p>
+    <section class="article-section map-section">
+      <h3>📍 関東の<script>document.write(window.TARGET_FISH || '対象魚');</script>生息・釣果スポット</h3>
+      <p class="map-note">※マップ上の赤いドットが釣れるポイントです。</p>
 
       <div id="fish-map" role="region"></div>
 
