@@ -1,5 +1,225 @@
 [
   {
+    "date": "2026/11/07",
+    "fish": "アジ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118902618148024430",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "メジナ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118902400174129380",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "クロダイ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118880786279755900",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "カサゴ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118880533816152320",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "アジ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118968568796594421",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "カサゴ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118968568796594421",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "クロダイ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118968568796594421",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "メジナ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118968568796594421",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "タカノハダイ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118968568796594421",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "アナゴ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/QKL8j35ImXpcih8/status/2118842119846842719",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "クロダイ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/QKL8j35ImXpcih8/status/2118842119846842719",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "カンパチ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2118968568796594421",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "サッパ",
+    "lat": 35.5484,
+    "lng": 140.0886,
+    "area_name": "市原",
+    "url": "https://x.com/fishing_catch55/status/2119029650022396412",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "アジ",
+    "lat": 35.5484,
+    "lng": 140.0886,
+    "area_name": "市原",
+    "url": "https://x.com/fishing_catch55/status/2119029650022396412",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "アジ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://x.com/sakana_datahook/status/2119041096361902450",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "イワシ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://x.com/sakana_datahook/status/2119041096361902450",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "イシモチ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://x.com/sakana_datahook/status/2119041096361902450",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "アジ",
+    "lat": 35.3956,
+    "lng": 139.6455,
+    "area_name": "磯子",
+    "url": "https://x.com/sakana_datahook/status/2119041096361902450",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "メジナ",
+    "lat": 35.3956,
+    "lng": 139.6455,
+    "area_name": "磯子",
+    "url": "https://x.com/sakana_datahook/status/2119041096361902450",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "キス",
+    "lat": 35.3342,
+    "lng": 139.6381,
+    "area_name": "金沢漁港",
+    "url": "https://www.facebook.com/reel/1340534168097069/",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "アジ",
+    "lat": 35.3342,
+    "lng": 139.6381,
+    "area_name": "金沢漁港",
+    "url": "https://www.facebook.com/reel/1340534168097069/",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/07",
+    "fish": "ブラックバス",
+    "lat": 35.5866,
+    "lng": 139.2625,
+    "area_name": "津久井湖",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid02fH1qwqrin91nNBWw7QBJPLRkAtsdhKr1FhQdbJxtUciA95ynJHfGnpdZ2shGwoU8l&id=100007756750141",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/06",
     "fish": "ブラックバス",
     "lat": 35.6186,
@@ -108,6 +328,116 @@
     "url": "https://www.threads.com/@k.naitou/post/DfZszyeH5FI",
     "source": "Threads",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "イワシ",
+    "lat": 35.4294,
+    "lng": 139.6923,
+    "area_name": "本牧海づり施設",
+    "url": "https://x.com/fishing_catch55/status/2118667272424481203",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "アジ",
+    "lat": 35.4294,
+    "lng": 139.6923,
+    "area_name": "本牧海づり施設",
+    "url": "https://x.com/fishing_catch55/status/2118667272424481203",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "サッパ",
+    "lat": 35.5398,
+    "lng": 140.0654,
+    "area_name": "市原海づり公園",
+    "url": "https://x.com/fishing_catch55/status/2118667272424481203",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "イナダ",
+    "lat": 35.0041,
+    "lng": 139.8566,
+    "area_name": "館山",
+    "url": "https://x.com/tateyamarine/status/2118878506662887872",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "イナダ",
+    "lat": 35.2155,
+    "lng": 139.1472,
+    "area_name": "米神堤防",
+    "url": "https://x.com/turizamuraiodaw/status/2118625190615855359",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "ソウダカツオ",
+    "lat": 35.2155,
+    "lng": 139.1472,
+    "area_name": "米神堤防",
+    "url": "https://x.com/turizamuraiodaw/status/2118625190615855359",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "タチウオ",
+    "lat": 35.3323,
+    "lng": 139.6358,
+    "area_name": "金沢八景",
+    "url": "https://x.com/okitsuri_idx/status/2118692384641028105",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "タチウオ",
+    "lat": 35.6375,
+    "lng": 139.9077,
+    "area_name": "浦安",
+    "url": "https://x.com/okitsuri_idx/status/2118692384641028105",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "タチウオ",
+    "lat": 35.5161,
+    "lng": 139.7548,
+    "area_name": "川崎",
+    "url": "https://x.com/okitsuri_idx/status/2118692384641028105",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "タチウオ",
+    "lat": 35.3056,
+    "lng": 139.8118,
+    "area_name": "富津",
+    "url": "https://x.com/okitsuri_idx/status/2118692384641028105",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/06",
+    "fish": "タチウオ",
+    "lat": 35.2657,
+    "lng": 139.6976,
+    "area_name": "大津",
+    "url": "https://x.com/okitsuri_idx/status/2118692384641028105",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/05",
