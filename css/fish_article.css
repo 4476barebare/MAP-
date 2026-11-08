@@ -339,6 +339,10 @@ body > header,
 /* =========================
    横長：正方形アイコンカード (.menu-list / .menu-card)
 ========================= */
+.article > .menu-list {
+  margin-bottom: 24px;
+}
+
 .menu-list {
   display: flex;
   flex-direction: column;
