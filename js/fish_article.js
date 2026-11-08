@@ -466,12 +466,73 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
     container.innerHTML = headingHtml + cardsHtml;
 };
 
+// ==========================================
+// ★ 記事タイトル・本文見出しの1行フィット
+//   最小サイズでも収まらない場合は元サイズに戻して自然に折り返す
+// ==========================================
+function fitArticleHeadings() {
+  const targets = document.querySelectorAll(
+    '.article-header h1, .article-section > h2, .article-section > h3'
+  );
+
+  targets.forEach(el => {
+    if (!el.dataset.fitBaseFont) {
+      const style = getComputedStyle(el);
+      el.dataset.fitBaseFont = style.fontSize;
+      el.dataset.fitOriginalFont = el.style.fontSize;
+      el.dataset.fitOriginalWhiteSpace = el.style.whiteSpace;
+    }
+
+    const baseSize = parseFloat(el.dataset.fitBaseFont);
+    if (!Number.isFinite(baseSize) || baseSize <= 0) return;
+
+    el.style.fontSize = el.dataset.fitOriginalFont;
+    el.style.whiteSpace = 'nowrap';
+
+    const fits = () => el.scrollWidth <= el.clientWidth + 1;
+    const minSize = baseSize * 0.72;
+
+    el.style.fontSize = minSize + 'px';
+    if (!fits()) {
+      el.style.fontSize = el.dataset.fitOriginalFont;
+      el.style.whiteSpace = el.dataset.fitOriginalWhiteSpace;
+      return;
+    }
+
+    let low = minSize;
+    let high = baseSize;
+    for (let i = 0; i < 8; i++) {
+      const mid = (low + high) / 2;
+      el.style.fontSize = mid + 'px';
+      if (fits()) low = mid;
+      else high = mid;
+    }
+
+    el.style.fontSize = low + 'px';
+    el.style.whiteSpace = 'nowrap';
+  });
+}
+
+function scheduleArticleHeadingFit() {
+  if (window._articleHeadingFitFrame) {
+    cancelAnimationFrame(window._articleHeadingFitFrame);
+  }
+  window._articleHeadingFitFrame = requestAnimationFrame(fitArticleHeadings);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const targetFishStr = window.TARGET_FISH || '対象魚';
   const targetRegionCode = window.TARGET_REGION_CODE || 'KANTO';
   const targetRegionNameJP = window.TARGET_REGION_NAME_JP || '関東地方';
 
   const displayFishStr = targetFishStr.split(',').map(f => f.trim()).filter(Boolean).join('・');
+
+  // 記事見出しは初回表示・画面幅変更・Webフォント読込後に再計算
+  scheduleArticleHeadingFit();
+  window.addEventListener('resize', scheduleArticleHeadingFit, { passive: true });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(scheduleArticleHeadingFit);
+  }
 
   const targetFishArray = targetFishStr
     .split(',')
