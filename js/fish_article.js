@@ -442,7 +442,7 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
             : '';
 
         return `
-<div style="margin: 30px 0;">
+<div class="sns-spot-wrap">
   <a href="${item.href}" class="menu-card">
     <div class="menu-thumb">
       <img src="${item.thumbUrl}" alt="${altText}" loading="lazy" decoding="async"${posStyle}${onErrorAttr}>
@@ -455,7 +455,15 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
 </div>`;
     }).join('');
 
-    container.innerHTML = cardsHtml;
+    // 見出し：既定は「最近の釣果情報」。data-heading="任意の文言" で変更、data-heading="none" で非表示
+    const headingAttr = container.getAttribute('data-heading');
+    const headingText = headingAttr === null ? '🎣 最近の釣果情報' : String(headingAttr).trim();
+    const safeHeading = headingText.replace(/[<>&"']/g, '');
+    const headingHtml = safeHeading && safeHeading !== 'none'
+        ? `<h3 class="sns-heading">${safeHeading}</h3>`
+        : '';
+
+    container.innerHTML = headingHtml + cardsHtml;
 };
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -855,10 +863,21 @@ document.addEventListener("DOMContentLoaded", function () {
           });
 
           for (const [pref, links] of Object.entries(groupedLinks)) {
-              const heading = document.createElement('h4');
-              heading.className = 'pref-link-heading';
-              heading.textContent = pref;
-              listContainer.appendChild(heading);
+              // 県ごとの折りたたみ（最初の1県だけ開いた状態で出力）
+              const details = document.createElement('details');
+              details.className = 'pref-fold';
+              if (!listContainer.querySelector('details')) details.open = true;
+
+              const summary = document.createElement('summary');
+              summary.className = 'pref-link-heading';
+              const nameSpan = document.createElement('span');
+              nameSpan.textContent = pref;
+              const countSpan = document.createElement('span');
+              countSpan.className = 'pref-count';
+              countSpan.textContent = `${links.length}か所`;
+              summary.appendChild(nameSpan);
+              summary.appendChild(countSpan);
+              details.appendChild(summary);
 
               const ul = document.createElement('ul');
               ul.style.listStyleType = 'none';
@@ -866,7 +885,7 @@ document.addEventListener("DOMContentLoaded", function () {
               ul.style.display = 'flex';
               ul.style.flexWrap = 'wrap';
               ul.style.gap = '8px';
-              ul.style.margin = '0 0 15px 0';
+              ul.style.margin = '12px 0 15px 0';
 
               links.forEach(link => {
                   const li = document.createElement('li');
@@ -875,7 +894,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   ul.appendChild(li);
               });
               
-              listContainer.appendChild(ul);
+              details.appendChild(ul);
+              listContainer.appendChild(details);
           }
       }
       
