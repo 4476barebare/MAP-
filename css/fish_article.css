@@ -165,6 +165,28 @@ body > header,
   margin-bottom: 28px;
 }
 
+/* ---- 日本語の折り返しを自然にする（対応していないブラウザでは無視されるだけ） ----
+   見出し：行の長さを均等にし、可能なら文節の途中で折り返さない
+   本文　：行末に1〜2文字だけ残る・「ー」「っ」が行頭に来るのを避ける */
+.article-section > h2,
+.article-section h3,
+.article-header h1 {
+  text-wrap: balance;
+  word-break: auto-phrase;
+}
+
+.article > p,
+.article-section p,
+.article-section li {
+  line-break: strict;
+  text-wrap: pretty;
+}
+
+/* HTML側で「この塊は途中で折り返さない」と指定したいとき用： <span class="nb">（詳細版）</span> */
+.nb {
+  white-space: nowrap;
+}
+
 /* 本文の文字サイズを p / li で統一 */
 .article > p,
 .article-section p,
@@ -181,20 +203,19 @@ body > header,
   font-weight: bold;
   font-size: 16px;
   color: var(--navy);
-  border-bottom: 1px solid var(--navy-line);
-  padding-bottom: 6px;
+  padding-bottom: 8px;
   margin: 0 0 15px;
 }
 
-/* 下罫線の左端だけテーマカラーで強調 */
+/* 下線：左端の濃い紺から右へ向かってフェードアウト（背景の細い線は無し） */
 .article-section > h2::after {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -1px;
-  width: 64px;
+  bottom: 0;
+  width: 100%;
   height: 3px;
-  background: var(--navy);
+  background: linear-gradient(90deg, var(--navy) 0%, rgba(25, 25, 112, 0.35) 45%, rgba(25, 25, 112, 0) 100%);
 }
 
 .article-section h3 {
