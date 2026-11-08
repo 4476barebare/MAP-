@@ -1,0 +1,109 @@
+name: Sync Weather JSON Data from GAS
+
+on:
+  workflow_dispatch:
+  schedule:
+    # UTC 16:00 = JST 毎日 午前1:00 に自動実行
+    - cron: '10 16 * * *'
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  sync-weather:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch Coastal and Inland Weather JSONs
+        env:
+          GAS_URL: "https://script.google.com/macros/s/AKfycbxBd3qlpXVBOYC9Q-Aa7gJ-EZlSPln7Oh9A0dkD3eyA43CKQFKcp5fyjszu2ZuwC4MD/exec"
+          SECRET_KEY: "mZ4vP1wL9q"
+          REGION_CSV: "KANTO/KANTO_region.csv"
+        run: |
+          mkdir -p data
+
+          if [ ! -f "$REGION_CSV" ]; then
+            echo "❌ エラー: $REGION_CSV が見つかりません。"
+            exit 1
+          fi
+
+          # KANTO_region.csv の末尾列(type)が "pref" の行から 1列目(name) を抽出
+          PREFS=$(awk -F',' 'NR>1 {gsub(/\r/, "", $0); if ($11 == "pref") print $1}' "$REGION_CSV")
+
+          if [ -z "$PREFS" ]; then
+            echo "❌ エラー: $REGION_CSV から pref 行を抽出できませんでした。"
+            exit 1
+          fi
+
+          for PREF in $PREFS; do
+            echo "========================================="
+            echo "📥 Fetching weather data for [$PREF] ..."
+            echo "========================================="
+
+            # 1. 沿岸部天気 (${PREF}_whether.json)
+            COASTAL_TMP="/tmp/${PREF}_whether.json"
+            curl -sSL "${GAS_URL}?key=${SECRET_KEY}&pref=${PREF}" -o "$COASTAL_TMP"
+
+            if jq -e '.spots != null and (.count | type == "number")' "$COASTAL_TMP" > /dev/null 2>&1; then
+              mv "$COASTAL_TMP" "data/${PREF}_whether.json"
+              echo "  ✅ Saved data/${PREF}_whether.json ($(jq '.count' "data/${PREF}_whether.json") spots)"
+            else
+              echo "  ❌ Error: Invalid JSON for ${PREF}_whether.json"
+              cat "$COASTAL_TMP"
+              exit 1
+            fi
+
+            # 2. 内陸部天気 (${PREF}_InLandwhether.json)
+            INLAND_TMP="/tmp/${PREF}_InLandwhether.json"
+            curl -sSL "${GAS_URL}?key=${SECRET_KEY}&pref=${PREF}&type=inland" -o "$INLAND_TMP"
+
+            if jq -e '.spots != null and (.count | type == "number")' "$INLAND_TMP" > /dev/null 2>&1; then
+              mv "$INLAND_TMP" "data/${PREF}_InLandwhether.json"
+              echo "  ✅ Saved data/${PREF}_InLandwhether.json ($(jq '.count' "data/${PREF}_InLandwhether.json") spots)"
+            else
+              echo "  ❌ Error: Invalid JSON for ${PREF}_InLandwhether.json"
+              cat "$INLAND_TMP"
+              exit 1
+            fi
+          done
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          git add data/*_whether.json data/*_InLandwhether.json
+
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: [KANTO] 沿岸・内陸天気JSONデータの更新を反映"
+            git fetch origin main
+            git pull --rebase origin main -X ours
+            git push origin HEAD:main
+          else
+            echo "✅ データに変更がなかったためコミットをスキップしました。"
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
