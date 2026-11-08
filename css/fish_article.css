@@ -181,7 +181,7 @@ body > header,
 .article-section p,
 .article-section li {
   line-break: strict;
-  text-wrap: pretty;
+  text-wrap: wrap;
 }
 
 /* HTML側で「この塊は途中で折り返さない」と指定したいとき用： <span class="nb">（詳細版）</span> */
