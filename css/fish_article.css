@@ -144,6 +144,13 @@ body > header,
   margin-bottom: 14px;
 }
 
+/* 記事内の画像は、どこに置いても本文幅を超えないようにする（インラインstyle付きの画像・info-box内など）。
+   :where() で詳細度を0にしているため、下のカード用サムネ等の個別指定が常に優先される。Leafletのタイルは除外 */
+.article :where(img:not(.leaflet-tile, .leaflet-marker-icon)) {
+  max-width: 100%;
+  height: auto;
+}
+
 /* 画像：記事直下・セクション直下・冒頭<p>内のみ対象（Leafletのタイル画像に影響させない） */
 .article > p > img,
 .article-section > img {
@@ -231,6 +238,18 @@ body > header,
 
 .info-box strong {
   color: var(--navy);
+}
+
+/* info-box内の画像：箱の幅いっぱいに収める。直後の <br> による余分な空行は消す */
+.info-box img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.info-box img + br {
+  display: none;
 }
 
 /* =========================
@@ -538,8 +557,7 @@ body > header,
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  max-height: 50vh;
-  max-height: 50dvh;
+  max-height: 480px; /* vh/dvh は使わない：スマホのアドレスバー開閉で枠が伸縮し、表示範囲がズレるため */
   margin: 12px 0 5px 0;
   border: 1px solid var(--navy-line);
   border-radius: 6px;
