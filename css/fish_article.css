@@ -173,7 +173,7 @@ body > header,
 .article-section > h2,
 .article-section h3,
 .article-header h1 {
-  text-wrap: balance;
+  text-wrap: wrap;
   word-break: auto-phrase;
 }
 
