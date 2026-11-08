@@ -454,7 +454,7 @@ body > header,
 
 /* SNS最寄りスポットカードの余白（HTML側のインラインstyleの代替） */
 .sns-spot-wrap {
-  margin: 24px 0;
+  margin: 12px 0;
 }
 
 /* 見出し（JSが自動挿入する .sns-heading）の直下はカードを詰める */
@@ -564,7 +564,7 @@ body > header,
    マップ表示・リンクリスト関連
 ========================= */
 .article-section.map-section {
-   margin-top: 28px;
+  margin-top: 28px;
   background: var(--navy-tint);
   border: 1px solid var(--navy-line);
   border-radius: 8px;
