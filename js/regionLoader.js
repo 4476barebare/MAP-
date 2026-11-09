@@ -606,15 +606,6 @@ function renderRegion() {
 
     if (typeof showRoadLayers === 'function') showRoadLayers();
 
-    window.regionNearestClickHandler = function(e) {
-        handleRegionNearest(e.latlng);
-    };
-
-    if (window.map) {
-        window.map.off('click', window.regionNearestClickHandler);
-        window.map.on('click', window.regionNearestClickHandler);
-    }
-
     return markerPromise;
 }
 
@@ -639,6 +630,11 @@ async function region_management() {
         if (window.nearestClickHandler) {
             window.map.off('click', window.nearestClickHandler);
             window.nearestClickEnabled = false;
+        }
+
+        // 前回のREGION画面で登録したクリックイベントを先に解除する。
+        if (window.regionNearestClickHandler) {
+            window.map.off('click', window.regionNearestClickHandler);
         }
     }
 
@@ -668,16 +664,16 @@ async function region_management() {
     await Promise.all([drawPromise, otherPromise]);
     await renderRegion();
 
-    // マーカー表示後の共通レイヤー取得は、地図表示を妨げないようバックグラウンドで進める。
-    Promise.all([
+    // マーカー表示後に共通レイヤー・天気・魚種データを取得する。
+    const commonPromise = Promise.all([
         typeof window.loadRoadData === 'function' ? window.loadRoadData() : Promise.resolve(null),
         typeof DepthMapController !== 'undefined' ? DepthMapController.loadData() : Promise.resolve(null),
         typeof loadICData === 'function' ? loadICData() : Promise.resolve(null)
     ]).catch(error => {
         console.error('共通データ先行取得エラー:', error);
+        return null;
     });
 
-    // 天気と魚種は独立してバックグラウンド取得する。
     const weatherPromises = prefList.map(prefCode => (
         typeof loadRegionWeatherForPref === 'function'
             ? loadRegionWeatherForPref(prefCode)
@@ -691,8 +687,8 @@ async function region_management() {
             : Promise.resolve(null);
     });
 
-    // 天気データの全県分の処理完了を待ち、魚種データには待たされずランキングを更新する。
-    Promise.all(weatherPromises)
+    // 天気データが揃った時点でランキングを更新する。魚種や共通レイヤーは待たない。
+    const weatherPromise = Promise.all(weatherPromises)
         .then(() => {
             if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
             if (typeof renderSpotRanking === 'function') renderSpotRanking();
@@ -701,10 +697,20 @@ async function region_management() {
             console.error('全県天気データ読み込みエラー:', error);
         });
 
-    // 魚種データはランキングとは独立して完了させる。
-    Promise.all(fishPromises).catch(error => {
+    const fishPromise = Promise.all(fishPromises).catch(error => {
         console.error('全県魚種データ読み込みエラー:', error);
     });
+
+    // すべてのロードが完了（成功・失敗を問わずsettled）してから地図クリックを有効化する。
+    await Promise.allSettled([commonPromise, weatherPromise, fishPromise]);
+
+    if (window.map) {
+        window.regionNearestClickHandler = function(e) {
+            handleRegionNearest(e.latlng);
+        };
+        window.map.off('click', window.regionNearestClickHandler);
+        window.map.on('click', window.regionNearestClickHandler);
+    }
 
     return true;
 }
