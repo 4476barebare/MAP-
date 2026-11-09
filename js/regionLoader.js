@@ -326,7 +326,7 @@ window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
     if (!['select', 'other', 'all'].includes(mode)) {
         throw new Error('loadPrefectureSpots: mode は select / other / all のいずれかを指定してください');
     }
-    if ((mode === 'select' || mode === 'other') && !prefCode) return [];
+    if (mode === 'select' && !prefCode) return [];
 
     const csvData = await loadRegionCsvData();
     if (!csvData || !Array.isArray(csvData.prefRows)) return [];
@@ -578,35 +578,30 @@ function renderRegion() {
     if (titleSpan) titleSpan.textContent = regionTitle;
     if (linkContainer) linkContainer.innerHTML = regionHtml;
 
+    // マーカー生成・ソナー表示まで完了するPromiseを返す。
+    // runAfterTileLoad のキューを利用し、タイル表示後に実行する。
+    const buildRegionMarkers = async () => {
+        try {
+            if (typeof showAllRegionSpots === 'function') {
+                await showAllRegionSpots();
+            }
+            if (typeof window.showSnsSonarLayer === 'function') {
+                await window.showSnsSonarLayer();
+            }
+        } finally {
+            if (typeof renderCrowdImage === 'function') {
+                renderCrowdImage();
+            }
+        }
+    };
+
+    let markerPromise;
     if (typeof window.runAfterTileLoad === 'function') {
-        window.runAfterTileLoad(async () => {
-            try {
-                if (typeof showAllRegionSpots === 'function') {
-                    await showAllRegionSpots();
-                }
-                if (typeof window.showSnsSonarLayer === 'function') {
-                    await window.showSnsSonarLayer();
-                }
-            } catch (e) {
-                throw e;
-            } finally {
-                if (typeof renderCrowdImage === 'function') {
-                    renderCrowdImage();
-                }
-            }
+        markerPromise = new Promise((resolve, reject) => {
+            window.runAfterTileLoad(() => buildRegionMarkers().then(resolve, reject));
         });
-    } else if (typeof showAllRegionSpots === 'function') {
-        showAllRegionSpots().then(async () => {
-            try {
-                if (typeof window.showSnsSonarLayer === 'function') {
-                    await window.showSnsSonarLayer();
-                }
-            } finally {
-                if (typeof renderCrowdImage === 'function') {
-                    renderCrowdImage();
-                }
-            }
-        }).catch(() => {});
+    } else {
+        markerPromise = buildRegionMarkers();
     }
 
     if (typeof showRoadLayers === 'function') showRoadLayers();
@@ -648,20 +643,30 @@ async function region_management() {
     const isRegionReady = await loadRegionCSV();
     if (!isRegionReady) return;
 
-    if (window.regionData) {
-        await drawLocation(
+    if (typeof updateSeoMeta === 'function') updateSeoMeta();
+
+    const prefList = [...new Set(
+        (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean)
+    )];
+    const regionCode = window.currentRegion || 'KANTO';
+
+    // 地図描画と、選択県を除く全県（region画面では実質全県）の取得を同時に開始する。
+    const drawPromise = window.regionData
+        ? drawLocation(
             window.regionData.name,
             window.regionData.lat,
             window.regionData.lng,
             window.regionData.zoom
-        );
-    }
+        )
+        : Promise.resolve();
 
-    if (typeof updateSeoMeta === 'function') updateSeoMeta();
+    const otherPromise = loadPrefectureSpots(null, 'other');
 
-    const prefList = (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean);
+    // 地図描画と県データ取得の両方が終わってから、全県マーカーを生成する。
+    await Promise.all([drawPromise, otherPromise]);
+    await renderRegion();
 
-    // 県別スポットデータと同時に、道路・等深線・ICの共通JSONは通信だけ先行させる。
+    // マーカー表示後の共通レイヤー取得は、地図表示を妨げないようバックグラウンドで進める。
     Promise.all([
         typeof window.loadRoadData === 'function' ? window.loadRoadData() : Promise.resolve(null),
         typeof DepthMapController !== 'undefined' ? DepthMapController.loadData() : Promise.resolve(null),
@@ -670,10 +675,9 @@ async function region_management() {
         console.error('共通データ先行取得エラー:', error);
     });
 
-    await loadPrefectureSpots(null, 'all');
-
+    // 魚種データと天気データはマーカー表示後にバックグラウンドで取得する。
     const dataPromises = prefList.map(prefCode => {
-        const fishUrl = `/${window.currentRegion || 'KANTO'}/${prefCode}_fish.json`;
+        const fishUrl = `/${regionCode}/${prefCode}_fish.json`;
         return Promise.all([
             typeof loadRegionWeatherForPref === 'function'
                 ? loadRegionWeatherForPref(prefCode)
@@ -684,10 +688,16 @@ async function region_management() {
         ]);
     });
 
-    renderRegion();
-    await Promise.all(dataPromises);
-    if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
-    if (typeof renderSpotRanking === 'function') renderSpotRanking();
+    // 全県の天気・魚種データが揃った時点でランキングを更新する。
+    Promise.all(dataPromises)
+        .then(() => {
+            if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
+            if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        })
+        .catch(error => {
+            console.error('全県天気・魚種データ読み込みエラー:', error);
+        });
+
     return true;
 }
 
