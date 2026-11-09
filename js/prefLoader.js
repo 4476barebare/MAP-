@@ -136,22 +136,21 @@ async function showPrefMarkers() {
 // ==========================================
 window.prefWeatherJsonCache = window.prefWeatherJsonCache || {};
 window.prefWeatherJsonPromises = window.prefWeatherJsonPromises || {};
+window.prefWeatherJsonApplied = window.prefWeatherJsonApplied || {};
+window.prefWeatherJsonApplyPromises = window.prefWeatherJsonApplyPromises || {};
+window.regionWeatherAllDone = window.regionWeatherAllDone || {};
+window.regionWeatherAllPromises = window.regionWeatherAllPromises || {};
+window.regionWeatherAllResults = window.regionWeatherAllResults || {};
 
 function loadPrefWeatherJson(prefCode, inland = false) {
     if (!prefCode) return Promise.resolve(null);
+    const regionCode = window.currentRegion || 'KANTO';
+    const key = regionCode + '_' + (inland ? 'inland_' : 'coastal_') + prefCode;
+    if (window.prefWeatherJsonCache[key]) return Promise.resolve(window.prefWeatherJsonCache[key]);
+    if (window.prefWeatherJsonPromises[key]) return window.prefWeatherJsonPromises[key];
 
-    const key = (inland ? 'inland_' : 'coastal_') + prefCode;
-    if (window.prefWeatherJsonCache[key]) {
-        return Promise.resolve(window.prefWeatherJsonCache[key]);
-    }
-    if (window.prefWeatherJsonPromises[key]) {
-        return window.prefWeatherJsonPromises[key];
-    }
-
-    const fileName = inland
-        ? `${prefCode}_InLandwhether.json`
-        : `${prefCode}_whether.json`;
-    const url = `/data/${fileName}`;
+    const fileName = inland ? prefCode + '_InLandwhether.json' : prefCode + '_whether.json';
+    const url = '/data/' + fileName;
 
     window.prefWeatherJsonPromises[key] = fetch(url)
         .then(res => {
@@ -170,55 +169,95 @@ function loadPrefWeatherJson(prefCode, inland = false) {
             console.error("天気JSON取得エラー:", prefCode, inland ? '内陸' : '沿岸', error);
             return null;
         });
-
     return window.prefWeatherJsonPromises[key];
 }
 
 function applyPrefWeatherJson(prefCode, inland = false) {
+    if (!prefCode) return Promise.resolve(0);
+    const regionCode = window.currentRegion || 'KANTO';
+    const applyKey = regionCode + '_' + (inland ? 'inland_' : 'coastal_') + prefCode;
+
+    if (window.prefWeatherJsonApplied[applyKey]) return Promise.resolve(0);
+    if (window.prefWeatherJsonApplyPromises[applyKey]) return window.prefWeatherJsonApplyPromises[applyKey];
+
     const rows = window.prefSpotData && window.prefSpotData[prefCode];
-    if (!Array.isArray(rows)) return 0;
+    if (!Array.isArray(rows)) return Promise.resolve(0);
 
-    return loadPrefWeatherJson(prefCode, inland).then(data => {
-        if (!data || !data.spots) return 0;
-
+    const applyPromise = loadPrefWeatherJson(prefCode, inland).then(data => {
+        if (!data || !data.spots || typeof data.spots !== 'object') return 0;
         let applied = 0;
         for (const spot of rows) {
             if (inland) {
                 const spotId = String(spot.individualId || spot.id || "");
                 if (!spotId.startsWith("L")) continue;
             }
-
             const weather = data.spots[spot.name];
             if (!weather) continue;
-
             spot.whether = weather;
             applied++;
         }
+        window.prefWeatherJsonApplied[applyKey] = true;
         return applied;
     });
+
+    window.prefWeatherJsonApplyPromises[applyKey] = applyPromise.then(result => {
+        delete window.prefWeatherJsonApplyPromises[applyKey];
+        return result;
+    }).catch(error => {
+        delete window.prefWeatherJsonApplyPromises[applyKey];
+        console.error("天気JSON付与エラー:", prefCode, inland ? '内陸' : '沿岸', error);
+        return 0;
+    });
+    return window.prefWeatherJsonApplyPromises[applyKey];
 }
 
-async function runPrefWeatherJson(prefCode, mode, inland) {
-    if (!prefCode || !['select', 'other'].includes(mode)) {
-        throw new Error("天気JSONの mode は select / other を指定してください");
+function runPrefWeatherJson(prefCode, mode, inland) {
+    if (!['select', 'other', 'all'].includes(mode) || (mode !== 'all' && !prefCode)) {
+        return Promise.reject(new Error("天気JSONの mode は select / other / all を指定してください"));
+    }
+    const regionCode = window.currentRegion || 'KANTO';
+    const allKey = regionCode + '_' + (inland ? 'inland' : 'coastal');
+
+    if (mode === 'all') {
+        if (window.regionWeatherAllDone[allKey]) return Promise.resolve(window.regionWeatherAllResults[allKey] || 0);
+        if (window.regionWeatherAllPromises[allKey]) return window.regionWeatherAllPromises[allKey];
     }
 
-    await loadPrefectureSpots(prefCode, mode);
+    const runPromise = (async () => {
+        const csvData = await loadRegionCsvData();
+        const prefList = [...new Set((csvData && csvData.prefRows || []).map(row => row.prefCode).filter(Boolean))];
+        const targetList = mode === 'select'
+            ? [prefCode]
+            : mode === 'other'
+                ? prefList.filter(code => code !== prefCode)
+                : prefList;
 
-    const csvData = await loadRegionCsvData();
-    const prefList = [...new Set(
-        (csvData?.prefRows || []).map(row => row.prefCode).filter(Boolean)
-    )];
+        let totalApplied = 0;
+        let allSucceeded = true;
+        for (const code of targetList) {
+            if (!Array.isArray(window.prefSpotData && window.prefSpotData[code])) {
+                await fetchSinglePrefSpots(code);
+            }
+            totalApplied += await applyPrefWeatherJson(code, inland);
+            const applyKey = regionCode + '_' + (inland ? 'inland_' : 'coastal_') + code;
+            if (!window.prefWeatherJsonApplied[applyKey]) allSucceeded = false;
+        }
+        return { totalApplied, allSucceeded };
+    })();
 
-    const targetList = mode === 'select'
-        ? [prefCode]
-        : prefList.filter(code => code !== prefCode);
+    if (mode !== 'all') return runPromise.then(result => result.totalApplied);
 
-    let totalApplied = 0;
-    for (const code of targetList) {
-        totalApplied += await applyPrefWeatherJson(code, inland);
-    }
-    return totalApplied;
+    const allPromise = runPromise.then(result => {
+        if (result.allSucceeded) {
+            window.regionWeatherAllDone[allKey] = true;
+            window.regionWeatherAllResults[allKey] = result.totalApplied;
+        }
+        return result.totalApplied;
+    }).finally(() => {
+        delete window.regionWeatherAllPromises[allKey];
+    });
+    window.regionWeatherAllPromises[allKey] = allPromise;
+    return allPromise;
 }
 
 function AddWeather(prefCode, mode = 'select') {

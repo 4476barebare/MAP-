@@ -648,6 +648,7 @@ async function region_management() {
     const isRegionReady = await loadRegionCSV();
     if (!isRegionReady) return;
 
+    // 最優先で地域地図を描画する。完了するまで追加データの取得を始めない。
     if (window.regionData) {
         await drawLocation(
             window.regionData.name,
@@ -659,9 +660,12 @@ async function region_management() {
 
     if (typeof updateSeoMeta === 'function') updateSeoMeta();
 
-    const prefList = (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean);
+    const prefList = [...new Set(
+        (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean)
+    )];
+    const regionCode = window.currentRegion || 'KANTO';
 
-    // 県別スポットデータと同時に、道路・等深線・ICの共通JSONは通信だけ先行させる。
+    // drawLocation 完了後に、共通レイヤーと全県スポットの取得を開始する。
     Promise.all([
         typeof window.loadRoadData === 'function' ? window.loadRoadData() : Promise.resolve(null),
         typeof DepthMapController !== 'undefined' ? DepthMapController.loadData() : Promise.resolve(null),
@@ -670,24 +674,33 @@ async function region_management() {
         console.error('共通データ先行取得エラー:', error);
     });
 
-    await loadPrefectureSpots(null, 'all');
+    await Promise.all(prefList.map(prefCode => fetchSinglePrefSpots(prefCode)));
 
-    const dataPromises = prefList.map(prefCode => {
-        const fishUrl = `/${window.currentRegion || 'KANTO'}/${prefCode}_fish.json`;
-        return Promise.all([
-            typeof loadRegionWeatherForPref === 'function'
-                ? loadRegionWeatherForPref(prefCode)
-                : Promise.resolve(null),
-            typeof loadFishDataForPref === 'function'
-                ? loadFishDataForPref(prefCode, fishUrl)
-                : Promise.resolve(null)
-        ]);
+    // スポットデータが揃った段階で地域ページを表示する。
+    renderRegion();
+
+    // 魚種データは天気付与と並行して取得する。
+    Promise.all(prefList.map(prefCode => {
+        const fishUrl = '/' + regionCode + '/' + prefCode + '_fish.json';
+        return typeof loadFishDataForPref === 'function'
+            ? loadFishDataForPref(prefCode, fishUrl)
+            : Promise.resolve(null);
+    })).catch(error => {
+        console.error('魚種データ先行取得エラー:', error);
     });
 
-    renderRegion();
-    await Promise.all(dataPromises);
-    if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
-    if (typeof renderSpotRanking === 'function') renderSpotRanking();
+    // 沿岸を全県順番に付与し、その完了直後に内陸を全県順番に付与する。
+    // 両方の完了を待ってからランキングを更新する。
+    AddWeather(null, 'all')
+        .then(() => AddInLandWeather(null, 'all'))
+        .then(() => {
+            if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
+            if (typeof renderSpotRanking === 'function') renderSpotRanking();
+        })
+        .catch(error => {
+            console.error('全県天気データ付与エラー:', error);
+        });
+
     return true;
 }
 
