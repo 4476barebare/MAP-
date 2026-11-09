@@ -135,12 +135,10 @@ async function showPrefMarkers() {
 // 既存処理との重複はそのまま残す（通信は各ローダーのキャッシュで共有される）。
 // ==========================================
 
-// 県別天気CSVを取得して、その県の行へ付与（内陸は別）
-async function applyPrefWeather(prefCode) {
-    const rows = window.prefSpotData && window.prefSpotData[prefCode];
-    if (!Array.isArray(rows)) return;
-    const csv = await loadWhetherCSV(`/data/${prefCode}_whether.csv`).catch(() => null);
-    if (csv) applyWhetherToSpots(csv, rows);
+// 県別の沿岸天気JSONを取得して、その県の行へ付与。
+// 内陸天気JSONは従来どおり、マーカー表示後に別途付与する。
+function applyPrefWeather(prefCode) {
+    return AddWeather(prefCode, 'select');
 }
 
 // 1県ぶんの天気＋魚種を並列で付与
@@ -164,19 +162,12 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
     await (selectedPromise || applyPrefWeatherAndFish(prefCode, regionCode));
     if (isStale()) return;
 
-    // 2. 内陸CSV：一括解析なので、マーカー描画が済んでから1回だけ取得
+    // 2. 内陸天気JSON：マーカー描画完了後に選択県へ付与
     await markersPromise;
-    const inlandCsv = typeof loadInlandWhetherCSV === 'function'
-        ? await loadInlandWhetherCSV(regionCode).catch(() => null)
-        : null;
-    const applyInland = code => {
-        const rows = window.prefSpotData && window.prefSpotData[code];
-        if (inlandCsv && Array.isArray(rows)) applyInlandWhetherToSpots(inlandCsv, rows);
-    };
-    applyInland(prefCode);
+    await AddInLandWeather(prefCode, 'select');
     if (isStale()) return;
 
-    // 3. 他県：1県ずつ順番に（県ごとに「県CSV → 内陸（取得済みデータ）」の順で、従来と同じ上書き順）
+    // 3. 他県：1県ずつ順番に、沿岸JSON → 内陸JSON → 魚種JSONの付与を進める
     const csvData = await loadRegionCsvData();
     const otherCodes = (csvData.prefRows || [])
         .map(p => p.prefCode)
@@ -186,7 +177,7 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
         if (isStale()) return;
         await yieldFrame();
         await applyPrefWeatherAndFish(code, regionCode);
-        applyInland(code);
+        await AddInLandWeather(code, 'select');
     }
 
     // 中断されずに全県ぶん終えたら完了フラグを立てる
