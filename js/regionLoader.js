@@ -73,30 +73,6 @@ function toWeatherIcon(code) {
 // ==========================================
 window.prefWhetherPromises = window.prefWhetherPromises || {};
 
-function loadRegionWeatherForPref(prefCode) {
-    const targetArray = window.prefSpotData?.[prefCode];
-    if (!prefCode || !Array.isArray(targetArray)) return Promise.resolve(null);
-    if (window.prefWhetherPromises[prefCode]) return window.prefWhetherPromises[prefCode];
-
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-    const regionCode = window.currentRegion || 'KANTO';
-    window.prefWhetherPromises[prefCode] = Promise.all([
-        loadWhetherCSV(whetherUrl).catch(() => null),
-        typeof loadInlandWhetherCSV === 'function'
-            ? loadInlandWhetherCSV(regionCode).catch(() => null)
-            : Promise.resolve(null)
-    ]).then(([whetherCsv, inlandCsv]) => {
-        if (whetherCsv) applyWhetherToSpots(whetherCsv, targetArray);
-        if (inlandCsv) applyInlandWhetherToSpots(inlandCsv, targetArray);
-        return targetArray;
-    }).catch(error => {
-        delete window.prefWhetherPromises[prefCode];
-        console.error("県別天気データ読み込みエラー:", prefCode, error);
-        return null;
-    });
-
-    return window.prefWhetherPromises[prefCode];
-}
 
 // ==========================================
 // REGION 初期表示：CSV取得・解析
