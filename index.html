@@ -445,11 +445,7 @@ async function renderSpotRanking(retryCount = 0) {
         }
 
         titlePrefix = "関東で";
-        for (const pref of window.regionPrefData) {
-            const whetherUrl = "/data/" + pref.prefCode + "_whether.csv";
-            const csvData = await loadWhetherCSV(whetherUrl).catch(() => null);
-            if (csvData) applyWhetherToSpots(csvData, window.allspotData);
-        }
+        // REGIONの天気はregion_managementで全県JSONの付与完了後にランキングを呼び出す。
         targetSpots = window.allspotData;
     }
 
