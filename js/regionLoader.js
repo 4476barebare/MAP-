@@ -614,6 +614,8 @@ function renderRegion() {
         window.map.off('click', window.regionNearestClickHandler);
         window.map.on('click', window.regionNearestClickHandler);
     }
+
+    return markerPromise;
 }
 
 
