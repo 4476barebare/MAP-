@@ -677,28 +677,34 @@ async function region_management() {
         console.error('共通データ先行取得エラー:', error);
     });
 
-    // 魚種データと天気データはマーカー表示後にバックグラウンドで取得する。
-    const dataPromises = prefList.map(prefCode => {
+    // 天気と魚種は独立してバックグラウンド取得する。
+    const weatherPromises = prefList.map(prefCode => (
+        typeof loadRegionWeatherForPref === 'function'
+            ? loadRegionWeatherForPref(prefCode)
+            : Promise.resolve(null)
+    ));
+
+    const fishPromises = prefList.map(prefCode => {
         const fishUrl = `/${regionCode}/${prefCode}_fish.json`;
-        return Promise.all([
-            typeof loadRegionWeatherForPref === 'function'
-                ? loadRegionWeatherForPref(prefCode)
-                : Promise.resolve(null),
-            typeof loadFishDataForPref === 'function'
-                ? loadFishDataForPref(prefCode, fishUrl)
-                : Promise.resolve(null)
-        ]);
+        return typeof loadFishDataForPref === 'function'
+            ? loadFishDataForPref(prefCode, fishUrl)
+            : Promise.resolve(null);
     });
 
-    // 全県の天気・魚種データが揃った時点でランキングを更新する。
-    Promise.all(dataPromises)
+    // 天気データの全県分の処理完了を待ち、魚種データには待たされずランキングを更新する。
+    Promise.all(weatherPromises)
         .then(() => {
             if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
             if (typeof renderSpotRanking === 'function') renderSpotRanking();
         })
         .catch(error => {
-            console.error('全県天気・魚種データ読み込みエラー:', error);
+            console.error('全県天気データ読み込みエラー:', error);
         });
+
+    // 魚種データはランキングとは独立して完了させる。
+    Promise.all(fishPromises).catch(error => {
+        console.error('全県魚種データ読み込みエラー:', error);
+    });
 
     return true;
 }
