@@ -611,6 +611,148 @@ function renderRegion() {
 
 
 // ==========================================
+// 新JSON天気データ取得・付与
+// AddWeather(prefCode, mode)       : 沿岸部
+// AddInLandWeather(prefCode, mode) : 内陸部
+// mode = select / other / all
+// ==========================================
+window.prefWeatherJsonCache = window.prefWeatherJsonCache || {};
+window.prefWeatherJsonPromises = window.prefWeatherJsonPromises || {};
+window.prefWeatherJsonApplied = window.prefWeatherJsonApplied || {};
+window.prefWeatherJsonApplyPromises = window.prefWeatherJsonApplyPromises || {};
+window.regionWeatherAllDone = window.regionWeatherAllDone || {};
+window.regionWeatherAllPromises = window.regionWeatherAllPromises || {};
+window.regionWeatherAllResults = window.regionWeatherAllResults || {};
+
+function loadPrefWeatherJson(prefCode, inland = false) {
+    if (!prefCode) return Promise.resolve(null);
+    const regionCode = window.currentRegion || 'KANTO';
+    const key = regionCode + '_' + (inland ? 'inland_' : 'coastal_') + prefCode;
+    if (window.prefWeatherJsonCache[key]) return Promise.resolve(window.prefWeatherJsonCache[key]);
+    if (window.prefWeatherJsonPromises[key]) return window.prefWeatherJsonPromises[key];
+
+    const fileName = inland ? prefCode + '_InLandwhether.json' : prefCode + '_whether.json';
+    const url = '/data/' + fileName;
+
+    window.prefWeatherJsonPromises[key] = fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error("Weather JSON fetch failed: " + res.status);
+            return res.json();
+        })
+        .then(data => {
+            if (!data || !data.spots || typeof data.spots !== 'object') {
+                throw new Error("Weather JSON の spots が見つかりません: " + url);
+            }
+            window.prefWeatherJsonCache[key] = data;
+            return data;
+        })
+        .catch(error => {
+            delete window.prefWeatherJsonPromises[key];
+            console.error("天気JSON取得エラー:", prefCode, inland ? '内陸' : '沿岸', error);
+            return null;
+        });
+    return window.prefWeatherJsonPromises[key];
+}
+
+function applyPrefWeatherJson(prefCode, inland = false) {
+    if (!prefCode) return Promise.resolve(0);
+    const regionCode = window.currentRegion || 'KANTO';
+    const applyKey = regionCode + '_' + (inland ? 'inland_' : 'coastal_') + prefCode;
+
+    if (window.prefWeatherJsonApplied[applyKey]) return Promise.resolve(0);
+    if (window.prefWeatherJsonApplyPromises[applyKey]) return window.prefWeatherJsonApplyPromises[applyKey];
+
+    const rows = window.prefSpotData && window.prefSpotData[prefCode];
+    if (!Array.isArray(rows)) return Promise.resolve(0);
+
+    const applyPromise = loadPrefWeatherJson(prefCode, inland).then(data => {
+        if (!data || !data.spots || typeof data.spots !== 'object') return 0;
+        let applied = 0;
+        for (const spot of rows) {
+            if (inland) {
+                const spotId = String(spot.individualId || spot.id || "");
+                if (!spotId.startsWith("L")) continue;
+            }
+            const weather = data.spots[spot.name];
+            if (!weather) continue;
+            spot.whether = weather;
+            applied++;
+        }
+        window.prefWeatherJsonApplied[applyKey] = true;
+        return applied;
+    });
+
+    window.prefWeatherJsonApplyPromises[applyKey] = applyPromise.then(result => {
+        delete window.prefWeatherJsonApplyPromises[applyKey];
+        return result;
+    }).catch(error => {
+        delete window.prefWeatherJsonApplyPromises[applyKey];
+        console.error("天気JSON付与エラー:", prefCode, inland ? '内陸' : '沿岸', error);
+        return 0;
+    });
+    return window.prefWeatherJsonApplyPromises[applyKey];
+}
+
+function runPrefWeatherJson(prefCode, mode, inland) {
+    if (!['select', 'other', 'all'].includes(mode) || (mode !== 'all' && !prefCode)) {
+        return Promise.reject(new Error("天気JSONの mode は select / other / all を指定してください"));
+    }
+    const regionCode = window.currentRegion || 'KANTO';
+    const allKey = regionCode + '_' + (inland ? 'inland' : 'coastal');
+
+    if (mode === 'all') {
+        if (window.regionWeatherAllDone[allKey]) return Promise.resolve(window.regionWeatherAllResults[allKey] || 0);
+        if (window.regionWeatherAllPromises[allKey]) return window.regionWeatherAllPromises[allKey];
+    }
+
+    const runPromise = (async () => {
+        const csvData = await loadRegionCsvData();
+        const prefList = [...new Set((csvData && csvData.prefRows || []).map(row => row.prefCode).filter(Boolean))];
+        const targetList = mode === 'select'
+            ? [prefCode]
+            : mode === 'other'
+                ? prefList.filter(code => code !== prefCode)
+                : prefList;
+
+        let totalApplied = 0;
+        let allSucceeded = true;
+        for (const code of targetList) {
+            if (!Array.isArray(window.prefSpotData && window.prefSpotData[code])) {
+                // このリポジトリの県別location管理関数を利用して取得する。
+                await loadPrefectureSpots(code, 'select');
+            }
+            totalApplied += await applyPrefWeatherJson(code, inland);
+            const applyKey = regionCode + '_' + (inland ? 'inland_' : 'coastal_') + code;
+            if (!window.prefWeatherJsonApplied[applyKey]) allSucceeded = false;
+        }
+        return { totalApplied, allSucceeded };
+    })();
+
+    if (mode !== 'all') return runPromise.then(result => result.totalApplied);
+
+    const allPromise = runPromise.then(result => {
+        if (!result.allSucceeded) {
+            throw new Error("全県の天気JSON付与が完了していません。失敗した県は再試行できます: " + allKey);
+        }
+        window.regionWeatherAllDone[allKey] = true;
+        window.regionWeatherAllResults[allKey] = result.totalApplied;
+        return result.totalApplied;
+    }).finally(() => {
+        delete window.regionWeatherAllPromises[allKey];
+    });
+    window.regionWeatherAllPromises[allKey] = allPromise;
+    return allPromise;
+}
+
+function AddWeather(prefCode, mode = 'select') {
+    return runPrefWeatherJson(prefCode, mode, false);
+}
+
+function AddInLandWeather(prefCode, mode = 'select') {
+    return runPrefWeatherJson(prefCode, mode, true);
+}
+
+// ==========================================
 // REGION 初期ロード管理
 // ==========================================
 async function region_management() {
@@ -648,7 +790,7 @@ async function region_management() {
     )];
     const regionCode = window.currentRegion || 'KANTO';
 
-    // 地図描画と、選択県を除く全県（region画面では実質全県）の取得を同時に開始する。
+    // 地図描画と全県のlocation.json取得を並行して進める。
     const drawPromise = window.regionData
         ? drawLocation(
             window.regionData.name,
@@ -658,13 +800,13 @@ async function region_management() {
         )
         : Promise.resolve();
 
-    const otherPromise = loadPrefectureSpots(null, 'other');
+    const spotsPromise = loadPrefectureSpots(null, 'other');
 
-    // 地図描画と県データ取得の両方が終わってから、全県マーカーを生成する。
-    await Promise.all([drawPromise, otherPromise]);
-    await renderRegion();
+    // drawLocation完了後、全件マーカー表示と沿岸・内陸の天気JSON取得を同時に開始する。
+    await Promise.all([drawPromise, spotsPromise]);
 
-    // マーカー表示後に共通レイヤー・天気・魚種データを取得する。
+    const markerPromise = renderRegion();
+
     const commonPromise = Promise.all([
         typeof window.loadRoadData === 'function' ? window.loadRoadData() : Promise.resolve(null),
         typeof DepthMapController !== 'undefined' ? DepthMapController.loadData() : Promise.resolve(null),
@@ -674,11 +816,15 @@ async function region_management() {
         return null;
     });
 
-    const weatherPromises = prefList.map(prefCode => (
-        typeof loadRegionWeatherForPref === 'function'
-            ? loadRegionWeatherForPref(prefCode)
-            : Promise.resolve(null)
-    ));
+    const weatherPromise = Promise.all([
+        AddWeather(null, 'all'),
+        AddInLandWeather(null, 'all')
+    ]).then(() => {
+        if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
+        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+    }).catch(error => {
+        console.error('全県天気JSON読み込みエラー:', error);
+    });
 
     const fishPromises = prefList.map(prefCode => {
         const fishUrl = `/${regionCode}/${prefCode}_fish.json`;
@@ -687,22 +833,12 @@ async function region_management() {
             : Promise.resolve(null);
     });
 
-    // 天気データが揃った時点でランキングを更新する。魚種や共通レイヤーは待たない。
-    const weatherPromise = Promise.all(weatherPromises)
-        .then(() => {
-            if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
-            if (typeof renderSpotRanking === 'function') renderSpotRanking();
-        })
-        .catch(error => {
-            console.error('全県天気データ読み込みエラー:', error);
-        });
-
     const fishPromise = Promise.all(fishPromises).catch(error => {
         console.error('全県魚種データ読み込みエラー:', error);
     });
 
-    // すべてのロードが完了（成功・失敗を問わずsettled）してから地図クリックを有効化する。
-    await Promise.allSettled([commonPromise, weatherPromise, fishPromise]);
+    // マーカー・天気・魚種・共通レイヤーの処理完了後に地図クリックを有効化する。
+    await Promise.allSettled([markerPromise, commonPromise, weatherPromise, fishPromise]);
 
     if (window.map) {
         window.regionNearestClickHandler = function(e) {
@@ -714,7 +850,6 @@ async function region_management() {
 
     return true;
 }
-
 
 // ==========================================
 // 魚種データ処理
