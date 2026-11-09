@@ -248,10 +248,11 @@ function runPrefWeatherJson(prefCode, mode, inland) {
     if (mode !== 'all') return runPromise.then(result => result.totalApplied);
 
     const allPromise = runPromise.then(result => {
-        if (result.allSucceeded) {
-            window.regionWeatherAllDone[allKey] = true;
-            window.regionWeatherAllResults[allKey] = result.totalApplied;
+        if (!result.allSucceeded) {
+            throw new Error("全県の天気JSON付与が完了していません。失敗した県は再試行できます: " + allKey);
         }
+        window.regionWeatherAllDone[allKey] = true;
+        window.regionWeatherAllResults[allKey] = result.totalApplied;
         return result.totalApplied;
     }).finally(() => {
         delete window.regionWeatherAllPromises[allKey];
