@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # UTC 16:00 = JST 毎日 午前1:00 に自動実行
-    - cron: '10 16 * * *'
+    - cron: '10 19 * * *'
 
 concurrency:
   group: "pages"
