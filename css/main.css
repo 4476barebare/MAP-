@@ -1,109 +1,125 @@
-/* =========================
-   SNS釣果モーダル一覧
-========================= */
-#snsCatchModal .modal-content {
-  height: 80vh;
-  overflow-y: auto;
-  padding: 12px;
+/* =========================================
+   SNS釣果モーダル（ヘッダー）
+========================================= */
+
+/* 暗幕：外側タップで閉じられる領域 */
+#snsModal {
+  background: rgba(10, 10, 50, 0.55);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
 }
 
-#snsCatchList {
+/* 本体：上下に余白を残し、中だけスクロール */
+#snsModal .modal-content {
+  width: min(92vw, 560px);
+  max-height: 78vh;
+  max-height: 78dvh;
+  margin: 11vh auto 0;
+  padding: 0 10px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: #f4f7fd;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* 固定タイトル（疑似要素） */
+#snsModal .modal-content::before {
+  content: "SNS釣果 ・ 外側タップで閉じる";
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: block;
+  margin: 0 -10px 8px;
+  padding: 12px 14px 10px;
+  background: #191970;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+#snsList {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.sns-catch-row-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  background: #f8faff;
-  border: 1px solid rgba(25, 25, 112, 0.12);
-  border-radius: 6px;
+  gap: 8px;
   font-size: 12px;
   color: #191970;
-  gap: 8px;
+}
+
+/* 1件 = 2段カード
+   1段目：魚種 ……………… SNSバッジ
+   2段目：日付 県 釣り場 …… リンク */
+.sns-modal-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "fish fish fish source"
+    "date pref place link";
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 6px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid rgba(25, 25, 112, 0.12);
+  border-left: 4px solid #191970;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.sns-modal-row > span {
+  min-width: 0;
   white-space: nowrap;
-}
-
-.sns-catch-row-item:hover {
-  background: #edf2fc;
-}
-
-.sns-catch-col {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.sns-catch-col.col-date {
-  flex: 0 0 46px;
-  font-weight: bold;
-  font-size: 11px;
-  opacity: 0.8;
-}
+.sns-col-fish  { grid-area: fish;  font-size: 15px; font-weight: bold; }
+.sns-col-date  { grid-area: date;  font-size: 11px; opacity: 0.65; }
+.sns-col-pref  { grid-area: pref;  font-size: 11px; font-weight: bold; }
+.sns-col-place { grid-area: place; font-size: 11px; opacity: 0.8; }
 
-.sns-catch-col.col-pref {
-  flex: 0 0 54px;
-  font-weight: bold;
-}
-
-.sns-catch-col.col-area {
-  flex: 1 1 90px;
-}
-
-.sns-catch-col.col-fish {
-  flex: 1 1 80px;
-  font-weight: bold;
-}
-
-.sns-catch-col.col-source {
-  flex: 0 0 65px;
-  text-align: center;
-}
-
-.sns-catch-col.col-link {
-  flex: 0 0 50px;
-  text-align: right;
-}
-
-/* SNSバッジ */
-.sns-badge-pill {
-  display: inline-block;
-  padding: 2px 6px;
+/* SNSバッジ（色は既存の .sns-x 等の変数を利用） */
+.sns-col-source {
+  grid-area: source;
+  justify-self: end;
+  padding: 2px 8px;
   font-size: 10px;
   font-weight: bold;
-  border-radius: 4px;
+  border-radius: 999px;
+  background: var(--sns-badge-bg, #191970);
+  color: var(--sns-badge-color, #fff);
+  border: 1px solid rgba(25, 25, 112, 0.15);
 }
-.sns-badge-pill.sns-x         { background: #111; color: #fff; }
-.sns-badge-pill.sns-instagram { background: #e1306c; color: #fff; }
-.sns-badge-pill.sns-facebook  { background: #18a0fb; color: #fff; }
-.sns-badge-pill.sns-threads   { background: #333; color: #fff; }
-.sns-badge-pill.sns-default   { background: #191970; color: #fff; }
 
-/* リンクボタン */
-.sns-link-btn {
-  text-decoration: underline;
+/* リンク：押しやすいピル型ボタン */
+a.sns-col-link {
+  grid-area: link;
+  justify-self: end;
+  padding: 5px 12px;
   font-size: 11px;
   font-weight: bold;
+  text-decoration: none;
   color: #191970;
-}
-.sns-link-btn:hover {
-  opacity: 0.7;
+  background: #eef2ff;
+  border: 1px solid rgba(25, 25, 112, 0.25);
+  border-radius: 999px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: rgba(25, 25, 112, 0.15);
 }
 
-@media (max-width: 600px) {
-  .sns-catch-row-item {
-    font-size: 11px;
-    padding: 6px 6px;
-    gap: 4px;
+a.sns-col-link:active {
+  background: #191970;
+  color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.sns-col-link:hover {
+    background: #191970;
+    color: #fff;
   }
-  .sns-catch-col.col-date { flex: 0 0 40px; }
-  .sns-catch-col.col-pref { flex: 0 0 46px; }
-  .sns-catch-col.col-source { flex: 0 0 55px; }
 }
-
-
 
 
 /* =========================================
