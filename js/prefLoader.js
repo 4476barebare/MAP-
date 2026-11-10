@@ -167,6 +167,9 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
     await AddInLandWeather(prefCode, 'select');
     if (isStale()) return;
 
+    // 選択県の沿岸・内陸天気JSONが揃ってからPREF画面UIを初期化する。
+    if (typeof initAreaUI === 'function') initAreaUI();
+
     // 3. 他県：1県ずつ順番に、沿岸JSON → 内陸JSON → 魚種JSONの付与を進める
     const csvData = await loadRegionCsvData();
     const otherCodes = (csvData.prefRows || [])
