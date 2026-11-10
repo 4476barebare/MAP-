@@ -476,10 +476,6 @@ async function renderSpotRanking(retryCount = 0) {
         targetSpots = window.allspotData;
     }
 
-    // SNS釣果データはランキングとスポット画面で同じデータを使う。
-    if (typeof window.loadSnsCatchData === 'function' && !window.isSnsCatchLoaded) {
-        await window.loadSnsCatchData(window.currentRegion || 'KANTO').catch(() => []);
-    }
 
     const titleEl = section.querySelector('h2');
     if (titleEl) {
@@ -1292,9 +1288,12 @@ async function routeUpdate() {
         }
     }
 
-    // ★ 各分岐の共通した最後に一度、SNS釣果データの取得を開始
+    // ★ 各分岐の共通した最後に一度、SNS釣果データを取得し、完了後にソナーマーカーを呼び出す
     if (typeof window.loadSnsCatchData === 'function') {
-        window.loadSnsCatchData(window.currentRegion || 'KANTO');
+        await window.loadSnsCatchData(window.currentRegion || 'KANTO');
+        if (typeof window.showSnsSonarLayer === 'function') {
+            await window.showSnsSonarLayer();
+        }
     }
 }
 
@@ -3196,42 +3195,6 @@ function disablePrefSwipe() {
     window._prefSwipeEnabled = false;
 }
 
-// ==========================================
-// ★ 画面に文字を出すデバッグ用関数（スクロール＆コピペ対応版）
-// ==========================================
-function showdebug(msg) {
-    let debugBox = document.getElementById('my-debug-box');
-    if (!debugBox) {
-        debugBox = document.createElement('div');
-        debugBox.id = 'my-debug-box';
-        debugBox.style.position = 'fixed';
-        debugBox.style.top = '10px';
-        debugBox.style.left = '10px';
-        debugBox.style.padding = '10px';
-        debugBox.style.background = 'rgba(0, 0, 0, 0.8)';
-        debugBox.style.color = '#00ff00';
-        debugBox.style.fontFamily = 'monospace';
-        debugBox.style.fontSize = '10px';
-        debugBox.style.zIndex = '999999';
-        debugBox.style.borderRadius = '5px';
-        
-        // ★ スクロールとコピー操作を有効化
-        debugBox.style.maxHeight = '70vh';        // 縦幅の最大値を画面の70%に制限
-        debugBox.style.width = '80vw';            // 横幅も余裕を持たせる（任意）
-        debugBox.style.overflowY = 'auto';        // はみ出たら縦スクロール
-        debugBox.style.pointerEvents = 'auto';    // クリック・スクロールを許可
-        debugBox.style.userSelect = 'text';       // テキスト選択・コピーを許可
-        debugBox.style.WebkitUserSelect = 'text'; // iOS Safari用のコピペ許可
-        
-        document.body.appendChild(debugBox);
-    }
-
-    // メッセージの追記
-    debugBox.innerHTML += msg + '<br>';
-    
-    // ★ 新しいログが追加されたら、自動的に一番下へスクロールする
-    debugBox.scrollTop = debugBox.scrollHeight;
-}
 
 // ==========================================
 // 気象庁アラート取得・表示
