@@ -32,12 +32,11 @@
   <!-- タイルサーバー・CDNへの事前接続と初期CSVの先読み -->
   <link rel="preconnect" href="https://cyberjapandata.gsi.go.jp" crossorigin>
   <link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-  <link rel="dns-prefetch" href="https://unpkg.com">
+  <link rel="preload" href="/lib/leaflet/leaflet.js?v=1.9.4" as="script">
   <link rel="preload" href="/KANTO/KANTO_region.csv" as="fetch" crossorigin="anonymous">
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="/lib/leaflet/leaflet.css?v=1.9.4"/>
 </head>
 
 
@@ -252,9 +251,9 @@
   <div class="footer-policy">サイトポリシー</div>
 </footer>
 
-<!-- ★ deferを付けず実行順序を100%維持（polyline-encodedのみリダイレクトなしの直接URL化） -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/polyline-encoded@0.0.9/Polyline.encoded.js"></script>
+<!-- ★ deferを付けず実行順序を100%維持（Leaflet・polyline-encodedは自前配信） -->
+<script src="/lib/leaflet/leaflet.js?v=1.9.4"></script>
+<script src="/lib/leaflet/Polyline.encoded.js?v=0.0.9"></script>
 <script src="/js/header.js"></script>
 <script src="/js/markerControl.js"></script>
 <script src="/js/dataLoader.js"></script>
