@@ -1492,16 +1492,13 @@ async function loadPrefectureData(prefCode) {
             getAlertText(window.prefData);
         }
         
-        // ★ 3. 天気CSVとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で順番に取得する
+        // ★ 3. 天気JSONとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で取得する
+        // 既存の画面遷移・後続処理を維持し、天気取得部分だけ新JSON関数へ切り替える。
         window.runAfterTileLoad(async () => {
-            const whetherUrl = `/data/${prefCode}_whether.csv`;
-            const [whetherCsv, inlandCsv] = await Promise.all([
-                loadWhetherCSV(whetherUrl).catch(() => null),
-                typeof loadInlandWhetherCSV === 'function' ? loadInlandWhetherCSV(region).catch(() => null) : Promise.resolve(null)
+            await Promise.all([
+                AddWeather(prefCode, 'select').catch(() => null),
+                AddInLandWeather(prefCode, 'select').catch(() => null)
             ]);
-
-            if (whetherCsv) applyWhetherToSpots(whetherCsv);
-            if (inlandCsv) applyInlandWhetherToSpots(inlandCsv);
 
             if (window.currentPref === prefCode) {
                 if (typeof renderPrefWeather === 'function') renderPrefWeather();
