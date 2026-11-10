@@ -2910,13 +2910,11 @@ function loadInlandWhetherCSV(regionCode) {
 function preloadCsvFiles(regionCode, prefCode) {
     if (!regionCode || !prefCode) return;
 
-    // ★ 既に1回目の処理が完了しているか、読み込み中フラグが立っていれば完全にスキップ
-    if (window.fetchCacheStatus[prefCode] || window[`${prefCode}_whetherData`]) {
-        return;
-    }
-
-    const whetherUrl = `/data/${prefCode}_whether.csv`;
-    loadWhetherCSV(whetherUrl).catch(() => {});
+    // 旧関数名・引数を暫定維持し、天気JSONの先行取得へ委譲する。
+    Promise.all([
+        AddWeather(prefCode, 'select'),
+        AddInLandWeather(prefCode, 'select')
+    ]).catch(() => {});
 }
 
 async function checkAndLoadRouteData() {
