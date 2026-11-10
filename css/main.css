@@ -1,3 +1,111 @@
+/* =========================
+   SNS釣果モーダル一覧
+========================= */
+#snsCatchModal .modal-content {
+  height: 80vh;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+#snsCatchList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sns-catch-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  background: #f8faff;
+  border: 1px solid rgba(25, 25, 112, 0.12);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #191970;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.sns-catch-row-item:hover {
+  background: #edf2fc;
+}
+
+.sns-catch-col {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sns-catch-col.col-date {
+  flex: 0 0 46px;
+  font-weight: bold;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.sns-catch-col.col-pref {
+  flex: 0 0 54px;
+  font-weight: bold;
+}
+
+.sns-catch-col.col-area {
+  flex: 1 1 90px;
+}
+
+.sns-catch-col.col-fish {
+  flex: 1 1 80px;
+  font-weight: bold;
+}
+
+.sns-catch-col.col-source {
+  flex: 0 0 65px;
+  text-align: center;
+}
+
+.sns-catch-col.col-link {
+  flex: 0 0 50px;
+  text-align: right;
+}
+
+/* SNSバッジ */
+.sns-badge-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 4px;
+}
+.sns-badge-pill.sns-x         { background: #111; color: #fff; }
+.sns-badge-pill.sns-instagram { background: #e1306c; color: #fff; }
+.sns-badge-pill.sns-facebook  { background: #18a0fb; color: #fff; }
+.sns-badge-pill.sns-threads   { background: #333; color: #fff; }
+.sns-badge-pill.sns-default   { background: #191970; color: #fff; }
+
+/* リンクボタン */
+.sns-link-btn {
+  text-decoration: underline;
+  font-size: 11px;
+  font-weight: bold;
+  color: #191970;
+}
+.sns-link-btn:hover {
+  opacity: 0.7;
+}
+
+@media (max-width: 600px) {
+  .sns-catch-row-item {
+    font-size: 11px;
+    padding: 6px 6px;
+    gap: 4px;
+  }
+  .sns-catch-col.col-date { flex: 0 0 40px; }
+  .sns-catch-col.col-pref { flex: 0 0 46px; }
+  .sns-catch-col.col-source { flex: 0 0 55px; }
+}
+
+
+
+
 /* =========================================
    記事カテゴリ見出し用
 ========================================= */
