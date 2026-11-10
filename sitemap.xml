@@ -29,6 +29,10 @@
     <!-- ARTICLE_DATA: {"title":"【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド", "description":"アジの生態と実践的な釣り方解説", "image":"articles/images/aji.jpg", "category":"サビキで釣れる魚", "style":"compact"} -->
   </url>
   <url>
+    <loc>https://turiiko-navi.com/articles/saba2.html</loc>
+    <!-- ARTICLE_DATA: {"title":"【現代科学】判明したサバの生態と未知の領域", "description":"サバはどこで生まれ、なぜ港に湧いて消えるのか。釣るとすぐ弱る理由から、現代科学でも解けていない回遊と産卵の謎まで解説。", "image":"articles/images/saba2.jpg", "category":"サイエンス", "style":"list"} -->
+  </url>
+  <url>
     <loc>https://turiiko-navi.com/articles/saba.html</loc>
     <!-- ARTICLE_DATA: {"title":"ただの「大衆魚」じゃない！堤防から沖まで熱くさせるサバの釣り方・生態ガイド", "description":"サバの生態と堤防・沖釣り攻略法", "image":"articles/images/saba.jpg", "category":"サビキで釣れる魚", "style":"list"} -->
   </url>
