@@ -777,7 +777,12 @@ li {
 #default-site-guide.guide-collapse.collapsed-mode > .guide-text {
   position: relative;
   max-height: 48px;
+  overflow: hidden;
   opacity: 0.8;
+}
+
+#site-guide-toggle {
+  cursor: pointer;
 }
 
 /* フェード部分 */
