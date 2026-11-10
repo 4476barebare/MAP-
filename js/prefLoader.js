@@ -74,10 +74,6 @@ async function pref_management(prefCode = window.currentPref) {
     if (!isRegionReady) return false;
 
     await loadPrefectureSpots(prefCode, 'select');      // 選択県だけ先行取得
-    if (typeof showdebug === 'function') {
-        const rows = window.prefSpotData && window.prefSpotData[prefCode];
-        showdebug(`[PREF] select完了 / pref=${prefCode} / rows=${Array.isArray(rows) ? rows.length : 'none'} / parent=${!!getPrefParentRow(prefCode)}`);
-    }
     const parent = getPrefParentRow(prefCode);
     const target = toDrawTarget(parent, prefCode);     // zoom は必ず location.json から
     if (!target) {
@@ -87,15 +83,8 @@ async function pref_management(prefCode = window.currentPref) {
     window.prefData = parent;
 
     // ---------- 2. 地図描画を開始し、他県取得・選択県の付帯データを並行開始 ----------
-    if (typeof showdebug === 'function') showdebug(`[PREF] drawLocation開始 / pref=${prefCode} / zoom=${target.zoom}`);
     const drawPromise = drawLocation(target.name, target.lat, target.lng, target.zoom);
-    const otherPromise = loadPrefectureSpots(prefCode, 'other').then(rows => {
-        if (typeof showdebug === 'function') {
-            const keys = Object.keys(window.prefSpotData || {});
-            showdebug(`[PREF] other完了 / fetchedRows=${Array.isArray(rows) ? rows.length : 'none'} / loadedPrefs=${keys.length} / prefSpotDataKeys=${keys.join(',')}`);
-        }
-        return rows;
-    });
+    const otherPromise = loadPrefectureSpots(prefCode, 'other');
 
     const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
     const selectedBgPromise = window._prefBgDone
@@ -104,7 +93,6 @@ async function pref_management(prefCode = window.currentPref) {
 
     // ---------- 3. 地図描画だけを待って呼び出し元へ戻す ----------
     await drawPromise;
-    if (typeof showdebug === 'function') showdebug(`[PREF] drawLocation完了 / pref=${prefCode} / map=${!!window.map}`);
     if (mapExistedBefore && !window.isInitialMapLoad) {
         await waitMapSettled();
     }
@@ -112,12 +100,7 @@ async function pref_management(prefCode = window.currentPref) {
     // 他県データの集約・マーカー生成・他県の天気魚種付与は裏で継続する。
     window._prefBackgroundLoad = otherPromise
         .then(() => loadPrefectureSpots(prefCode, 'all'))
-        .then(rows => {
-            if (typeof showdebug === 'function') {
-                const keys = Object.keys(window.prefSpotData || {});
-                const allRows = window.ALL_REGION_SPOTS || window.allspotData;
-                showdebug(`[PREF] all完了 / returnedRows=${Array.isArray(rows) ? rows.length : 'none'} / ALL_REGION_SPOTS=${Array.isArray(allRows) ? allRows.length : 'none'} / loadedPrefs=${keys.length}`);
-            }
+        .then(() => {
             const finalParent = getPrefParentRow(prefCode);
             if (finalParent) window.prefData = finalParent;
             return showPrefMarkers();
@@ -127,7 +110,6 @@ async function pref_management(prefCode = window.currentPref) {
             return runPrefBackgroundLoads(prefCode, Promise.resolve(), bgGen, selectedBgPromise);
         })
         .catch(err => {
-            if (typeof showdebug === 'function') showdebug(`[PREF] background ERROR / ${String(err && err.message || err)}`);
             console.error('都道府県バックグラウンド処理エラー:', err);
         });
 
@@ -143,26 +125,14 @@ async function pref_management(prefCode = window.currentPref) {
 // ==========================================
 async function showPrefMarkers() {
     if (window.currentSpotId) {
-        if (typeof showdebug === 'function') showdebug('[PREF] showPrefMarkers中止 / currentSpotIdあり');
         return;
     }
     if (typeof showAllRegionSpots !== 'function') {
-        if (typeof showdebug === 'function') showdebug('[PREF] showAllRegionSpots未定義');
         return;
     }
-    if (typeof showdebug === 'function') {
-        const allRows = window.ALL_REGION_SPOTS || window.allspotData;
-        showdebug(`[PREF] showAllRegionSpots開始 / dataRows=${Array.isArray(allRows) ? allRows.length : 'none'} / map=${!!window.map}`);
-    }
     await showAllRegionSpots();
-    if (typeof showdebug === 'function') {
-        showdebug(`[PREF] showAllRegionSpots完了 / markers=${window.regionSpotMarkers ? window.regionSpotMarkers.length : 'none'} / layer=${!!window.regionAllSpotLayer}`);
-    }
     if (typeof showPrefSpots === 'function') {
-        if (typeof showdebug === 'function') showdebug(`[PREF] showPrefSpots実行 / pref=${window.currentPref} / markers=${window.regionSpotMarkers ? window.regionSpotMarkers.length : 'none'}`);
         showPrefSpots();
-    } else if (typeof showdebug === 'function') {
-        showdebug('[PREF] showPrefSpots未定義');
     }
 }
 

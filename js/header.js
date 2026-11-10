@@ -122,26 +122,34 @@ function loadSnsModalList() {
   const snsList = document.getElementById("snsList");
   if (!snsList) return;
 
-  snsList.innerHTML = "読み込み中...";
+  const renderSorted = (items) => {
+    if (!Array.isArray(items) || items.length === 0) {
+      snsList.innerHTML = "SNS釣果データがありません";
+      return;
+    }
 
-  window.loadSnsCatchData()
-    .then(items => {
-      if (!Array.isArray(items) || items.length === 0) {
-        snsList.innerHTML = "SNS釣果データがありません";
-        return;
-      }
-
-      const sorted = [...items].sort((a, b) => {
-        const da = new Date(String(a.date || '').replace(/-/g, '/')).getTime() || 0;
-        const db = new Date(String(b.date || '').replace(/-/g, '/')).getTime() || 0;
-        return db - da;
-      });
-
-      renderSnsModalList(sorted);
-    })
-    .catch(() => {
-      snsList.innerHTML = "取得失敗";
+    const sorted = [...items].sort((a, b) => {
+      const da = new Date(String(a.date || '').replace(/-/g, '/')).getTime() || 0;
+      const db = new Date(String(b.date || '').replace(/-/g, '/')).getTime() || 0;
+      return db - da;
     });
+
+    renderSnsModalList(sorted);
+  };
+
+  if (window.isSnsCatchLoaded) {
+    renderSorted(window.snsCatchData);
+    return;
+  }
+
+  snsList.innerHTML = "読み込み中...";
+  if (window._snsCatchPromise) {
+    window._snsCatchPromise
+      .then(items => renderSorted(items))
+      .catch(() => { snsList.innerHTML = "取得失敗"; });
+  } else {
+    renderSorted(window.snsCatchData);
+  }
 }
 
 function renderSnsModalList(items) {

@@ -561,9 +561,6 @@ function renderRegion() {
             if (typeof showAllRegionSpots === 'function') {
                 await showAllRegionSpots();
             }
-            if (typeof window.showSnsSonarLayer === 'function') {
-                await window.showSnsSonarLayer();
-            }
         } finally {
             if (typeof renderCrowdImage === 'function') {
                 renderCrowdImage();

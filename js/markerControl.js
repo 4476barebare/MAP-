@@ -124,47 +124,9 @@ window.hideSnsSonarLayer = function() {
   }
 };
 
-// JSONデータ取得（header.jsへ移植済み・未定義時のみフォールバック定義）
-if (typeof window.loadSnsCatchData !== 'function') {
-  window.loadSnsCatchData = async function(regionCode) {
-    if (window.isSnsCatchLoaded) return window.snsCatchData;
-    if (window._isSnsCatchLoading) return window._snsCatchPromise;
-
-    const targetRegion = regionCode || window.currentRegion || 'KANTO';
-    const url = `/${targetRegion}/integrated_catch.json`;
-
-    window._isSnsCatchLoading = true;
-    window._snsCatchPromise = fetch(url, { priority: 'low' })
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(data => {
-        window.snsCatchData = Array.isArray(data) ? data : [];
-        window.isSnsCatchLoaded = true;
-        window._isSnsCatchLoading = false;
-        return window.snsCatchData;
-      })
-      .catch(err => {
-        console.warn('SNS釣果データの読み込みスキップ:', err);
-        window.snsCatchData = [];
-        window._isSnsCatchLoading = false;
-        return [];
-      });
-
-    return window._snsCatchPromise;
-  };
-}
-
-// ソナー本体描画
+// ソナー本体描画（SNSデータ取得は header.js / routeUpdate 側に一本化）
 window.showSnsSonarLayer = async function(customOptions = {}) {
   if (!window.map) return;
-
-  const existingPane = window.map.getPane('snsSonarPane');
-  //if (window._isSnsSonarOpaque || (existingPane && existingPane.style.opacity === '1')) {
-  //  window.hideSnsSonarLayer();
-  //  return;
-  //}
 
   const opts = {
     ...DEFAULT_SNS_SONAR_OPTIONS,
@@ -173,10 +135,7 @@ window.showSnsSonarLayer = async function(customOptions = {}) {
   };
   window._currentSnsSonarOptions = opts;
 
-  if (!window.isSnsCatchLoaded) {
-    await window.loadSnsCatchData();
-  }
-  if (!window.snsCatchData.length) return;
+  if (!Array.isArray(window.snsCatchData) || !window.snsCatchData.length) return;
 
   if (!window.map.getPane('snsSonarPane')) {
     window.map.createPane('snsSonarPane');
