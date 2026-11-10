@@ -773,14 +773,16 @@ li {
 
 
 /* 半開き時だけフェードを乗せる */
-#area-guide.collapsed-mode .area .text {
+.guide-collapse.collapsed-mode .area .text,
+#default-site-guide.guide-collapse.collapsed-mode > .guide-text {
   position: relative;
   max-height: 48px;
   opacity: 0.8;
 }
 
 /* フェード部分 */
-#area-guide.collapsed-mode .area .text::after {
+.guide-collapse.collapsed-mode .area .text::after,
+#default-site-guide.guide-collapse.collapsed-mode > .guide-text::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -797,13 +799,14 @@ li {
 ========================= */
 
 /* 選択対象 → 全開 */
-#area-guide.active-mode .area.active .text {
+.guide-collapse.active-mode .area.active .text,
+#default-site-guide.guide-collapse.active-mode > .guide-text {
   max-height: 500px;
   opacity: 1;
 }
 
 /* 選択外 → 完全に閉じる */
-#area-guide.active-mode .area:not(.active) .text {
+.guide-collapse.active-mode .area:not(.active) .text {
   max-height: 0;
   opacity: 0;
   margin-top: 0;
