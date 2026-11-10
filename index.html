@@ -1280,7 +1280,7 @@ async function routeUpdate() {
                 });
             };
 
-            if (isSameLoc) {
+            if (prefDrawn || isSameLoc) {
                 finalizePref();
             } else {
                 if (window.map) window.map.once('moveend', finalizePref);
@@ -1419,6 +1419,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
                         if (typeof showRoadLayers === 'function') showRoadLayers();
 
                         if (typeof showPrefSpots === 'function') showPrefSpots();
+                        if (typeof initAreaUI === 'function') initAreaUI();
                         if (typeof renderPrefWeather === 'function') renderPrefWeather();
                         if (!options.keepRadar && typeof renderCrowdImage === 'function') renderCrowdImage();
                         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
@@ -1452,9 +1453,9 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
         const isSameLoc =
             Math.abs(center.lat - window.prefData.lat) < 0.0001 &&
             Math.abs(center.lng - window.prefData.lng) < 0.0001 &&
-            window.map.getZoom() === targetZoom;
+            window.map.getZoom() === Number(targetZoom);
 
-        if (isSameLoc) {
+        if (drawn || isSameLoc) {
             finalizePref();
         } else {
             window.map.once('moveend', finalizePref);
