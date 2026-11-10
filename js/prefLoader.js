@@ -74,6 +74,9 @@ async function pref_management(prefCode = window.currentPref) {
     if (!isRegionReady) return false;
 
     await loadPrefectureSpots(prefCode, 'select');      // 選択県だけ先行取得
+    if (typeof loadLocationJSON === 'function') {
+        await loadLocationJSON();                      // areaData / spotData を先に確実に展開
+    }
     const parent = getPrefParentRow(prefCode);
     const target = toDrawTarget(parent, prefCode);     // zoom は必ず location.json から
     if (!target) {
@@ -106,7 +109,13 @@ async function pref_management(prefCode = window.currentPref) {
             return showPrefMarkers();
         })
         .then(() => {
-            if (window._prefBgDone) return;
+            if (window._prefBgDone) {
+                if (!window.currentAreaId && !window.currentSpotId) {
+                    if (typeof initAreaUI === 'function') initAreaUI();
+                    if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                }
+                return;
+            }
             return runPrefBackgroundLoads(prefCode, Promise.resolve(), bgGen, selectedBgPromise);
         })
         .catch(err => {
@@ -175,8 +184,11 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
     await AddInLandWeather(prefCode, 'select');
     if (isStale()) return;
 
-    // 選択県の沿岸・内陸天気JSONが揃ってからPREF画面UIを初期化する。
-    if (typeof initAreaUI === 'function') initAreaUI();
+    // 選択県の沿岸・内陸天気JSONが揃ってからPREF画面UIを初期化する（エリア・スポット画面遷移後は上書きしない）。
+    if (!window.currentAreaId && !window.currentSpotId) {
+        if (typeof initAreaUI === 'function') initAreaUI();
+        if (typeof renderPrefWeather === 'function') renderPrefWeather();
+    }
 
     // 3. 他県：1県ずつ順番に、沿岸JSON → 内陸JSON → 魚種JSONの付与を進める
     const csvData = await loadRegionCsvData();
