@@ -1,3 +1,180 @@
+// ==========================================
+// ★ SNS釣果データ (integrated_catch.json) 取得＆ヘッダーモーダル一覧表示
+// ==========================================
+window.snsCatchData = window.snsCatchData || [];
+window.isSnsCatchLoaded = window.isSnsCatchLoaded || false;
+window._isSnsCatchLoading = window._isSnsCatchLoading || false;
+
+// SNS釣果データ取得関数 (markerControl.js から移植・共通利用)
+window.loadSnsCatchData = async function(regionCode) {
+  if (window.isSnsCatchLoaded && Array.isArray(window.snsCatchData) && window.snsCatchData.length > 0) {
+    return window.snsCatchData;
+  }
+  if (window._isSnsCatchLoading && window._snsCatchPromise) {
+    return window._snsCatchPromise;
+  }
+
+  const targetRegion = regionCode || window.currentRegion || 'KANTO';
+  const url = `/${targetRegion}/integrated_catch.json`;
+
+  window._isSnsCatchLoading = true;
+  window._snsCatchPromise = fetch(url, { priority: 'low' })
+    .then(res => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then(data => {
+      window.snsCatchData = Array.isArray(data) ? data : [];
+      window.isSnsCatchLoaded = true;
+      window._isSnsCatchLoading = false;
+      return window.snsCatchData;
+    })
+    .catch(err => {
+      console.warn('SNS釣果データの読み込みスキップ:', err);
+      window.snsCatchData = [];
+      window._isSnsCatchLoading = false;
+      return [];
+    });
+
+  return window._snsCatchPromise;
+};
+
+// prefコードや座標から県名（日本語）を取得するヘルパー
+const PREF_CODE_NAME_MAP = {
+  TOKYO: '東京都',
+  KANAGAWA: '神奈川県',
+  CHIBA: '千葉県',
+  IBARAKI: '茨城県',
+  SAITAMA: '埼玉県',
+  GUNMA: '群馬県',
+  TOCHIGI: '栃木県'
+};
+
+function resolveSnsPrefName(item) {
+  if (!item) return '-';
+  const rawPref = String(item.pref || item.prefecture || item.prefCode || '').trim();
+  if (rawPref) {
+    const upper = rawPref.toUpperCase();
+    if (PREF_CODE_NAME_MAP[upper]) return PREF_CODE_NAME_MAP[upper];
+    if (window.regionPrefData && Array.isArray(window.regionPrefData)) {
+      const found = window.regionPrefData.find(p => p.prefCode === upper || p.prefName === rawPref);
+      if (found && found.prefName) return found.prefName;
+    }
+    return rawPref;
+  }
+
+  const lat = Number(item.lat);
+  const lng = Number(item.lng);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    if (window.allspotData && window.allspotData.length > 0) {
+      let nearestSpot = null;
+      let minDist = Infinity;
+      for (let i = 0; i < window.allspotData.length; i++) {
+        const s = window.allspotData[i];
+        if (!s || s.type === 'pref' || !s.lat || !s.lng) continue;
+        const d = Math.pow(Number(s.lat) - lat, 2) + Math.pow(Number(s.lng) - lng, 2);
+        if (d < minDist) {
+          minDist = d;
+          nearestSpot = s;
+        }
+      }
+      if (nearestSpot && nearestSpot._prefCode) {
+        const code = String(nearestSpot._prefCode).toUpperCase();
+        if (PREF_CODE_NAME_MAP[code]) return PREF_CODE_NAME_MAP[code];
+      }
+    }
+    if (window.regionPrefData && window.regionPrefData.length > 0) {
+      let nearestPref = '';
+      let minD = Infinity;
+      window.regionPrefData.forEach(p => {
+        const d = Math.pow(Number(p.lat) - lat, 2) + Math.pow(Number(p.lng) - lng, 2);
+        if (d < minD) {
+          minD = d;
+          nearestPref = p.prefName;
+        }
+      });
+      if (nearestPref) return nearestPref;
+    }
+  }
+
+  return window.prefData && window.prefData.notes ? window.prefData.notes : '-';
+}
+
+function getHeaderSnsClass(source) {
+  const s = String(source || '').toLowerCase();
+  if (s.includes('instagram')) return 'sns-instagram';
+  if (s === 'x' || s.includes('twitter')) return 'sns-x';
+  if (s.includes('facebook')) return 'sns-facebook';
+  if (s.includes('threads')) return 'sns-threads';
+  return 'sns-default';
+}
+
+function getHeaderSnsDisplayName(source) {
+  const s = String(source || '').toLowerCase();
+  if (s.includes('instagram')) return 'Instagram';
+  if (s === 'x' || s.includes('twitter')) return 'X';
+  if (s.includes('facebook')) return 'Facebook';
+  if (s.includes('threads')) return 'Threads';
+  return source ? String(source) : 'SNS';
+}
+
+function loadSnsModalList() {
+  const snsList = document.getElementById("snsList");
+  if (!snsList) return;
+
+  snsList.innerHTML = "読み込み中...";
+
+  window.loadSnsCatchData()
+    .then(items => {
+      if (!Array.isArray(items) || items.length === 0) {
+        snsList.innerHTML = "SNS釣果データがありません";
+        return;
+      }
+
+      const sorted = [...items].sort((a, b) => {
+        const da = new Date(String(a.date || '').replace(/-/g, '/')).getTime() || 0;
+        const db = new Date(String(b.date || '').replace(/-/g, '/')).getTime() || 0;
+        return db - da;
+      });
+
+      renderSnsModalList(sorted);
+    })
+    .catch(() => {
+      snsList.innerHTML = "取得失敗";
+    });
+}
+
+function renderSnsModalList(items) {
+  const snsList = document.getElementById("snsList");
+  if (!snsList) return;
+
+  snsList.innerHTML = "";
+
+  items.forEach(item => {
+    const el = document.createElement("div");
+    el.className = "sns-modal-row";
+
+    const dateText = String(item.date || '').trim() || '-';
+    const prefName = resolveSnsPrefName(item);
+    const placeName = String(item.area_name || item.place || item.location || '釣り場付近').replace(/[<>&"']/g, '');
+    const fishName = String(item.fish || '-').replace(/[<>&"']/g, '');
+    const snsName = getHeaderSnsDisplayName(item.source);
+    const snsClass = getHeaderSnsClass(item.source);
+    const linkUrl = item.url || '#';
+
+    el.innerHTML = `
+      <span class="sns-col-date">${dateText}</span>
+      <span class="sns-col-pref">${prefName}</span>
+      <span class="sns-col-place" title="${placeName}">${placeName}</span>
+      <span class="sns-col-fish" title="${fishName}">${fishName}</span>
+      <span class="sns-col-source ${snsClass}">${snsName}</span>
+      <a class="sns-col-link ${snsClass}" href="${linkUrl}" target="_blank" rel="noopener noreferrer">リンク↗</a>
+    `;
+
+    snsList.appendChild(el);
+  });
+}
+
 function loadNews() {
 
   const newsList = document.getElementById("newsList");
@@ -135,6 +312,23 @@ if (newsLink && newsModal) {
   newsModal.addEventListener("click", (e) => {
     if (e.target === newsModal) {
       newsModal.style.display = "none";
+    }
+  });
+}
+
+const snsLink = document.getElementById("snsBtn");
+const snsModal = document.getElementById("snsModal");
+
+if (snsLink && snsModal) {
+  snsLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    snsModal.style.display = "block";
+    loadSnsModalList();
+  });
+
+  snsModal.addEventListener("click", (e) => {
+    if (e.target === snsModal) {
+      snsModal.style.display = "none";
     }
   });
 }

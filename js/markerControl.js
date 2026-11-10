@@ -18,9 +18,9 @@ const DEFAULT_SNS_SONAR_OPTIONS = {
   onSonarClick: null
 };
 
-window.snsCatchData = [];
-window.isSnsCatchLoaded = false;
-window._isSnsCatchLoading = false;
+window.snsCatchData = window.snsCatchData || [];
+window.isSnsCatchLoaded = window.isSnsCatchLoaded || false;
+window._isSnsCatchLoading = window._isSnsCatchLoading || false;
 window.snsSonarLayerGroup = null;
 window.snsSonarTextLayerGroup = null;
 window._snsDisplayPoints = [];
@@ -124,35 +124,37 @@ window.hideSnsSonarLayer = function() {
   }
 };
 
-// JSONデータ取得
-window.loadSnsCatchData = async function(regionCode) {
-  if (window.isSnsCatchLoaded) return window.snsCatchData;
-  if (window._isSnsCatchLoading) return window._snsCatchPromise;
+// JSONデータ取得（header.jsへ移植済み・未定義時のみフォールバック定義）
+if (typeof window.loadSnsCatchData !== 'function') {
+  window.loadSnsCatchData = async function(regionCode) {
+    if (window.isSnsCatchLoaded) return window.snsCatchData;
+    if (window._isSnsCatchLoading) return window._snsCatchPromise;
 
-  const targetRegion = regionCode || window.currentRegion || 'KANTO';
-  const url = `/${targetRegion}/integrated_catch.json`;
+    const targetRegion = regionCode || window.currentRegion || 'KANTO';
+    const url = `/${targetRegion}/integrated_catch.json`;
 
-  window._isSnsCatchLoading = true;
-  window._snsCatchPromise = fetch(url, { priority: 'low' })
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      window.snsCatchData = Array.isArray(data) ? data : [];
-      window.isSnsCatchLoaded = true;
-      window._isSnsCatchLoading = false;
-      return window.snsCatchData;
-    })
-    .catch(err => {
-      console.warn('SNS釣果データの読み込みスキップ:', err);
-      window.snsCatchData = [];
-      window._isSnsCatchLoading = false;
-      return [];
-    });
+    window._isSnsCatchLoading = true;
+    window._snsCatchPromise = fetch(url, { priority: 'low' })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        window.snsCatchData = Array.isArray(data) ? data : [];
+        window.isSnsCatchLoaded = true;
+        window._isSnsCatchLoading = false;
+        return window.snsCatchData;
+      })
+      .catch(err => {
+        console.warn('SNS釣果データの読み込みスキップ:', err);
+        window.snsCatchData = [];
+        window._isSnsCatchLoading = false;
+        return [];
+      });
 
-  return window._snsCatchPromise;
-};
+    return window._snsCatchPromise;
+  };
+}
 
 // ソナー本体描画
 window.showSnsSonarLayer = async function(customOptions = {}) {
