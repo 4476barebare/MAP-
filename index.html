@@ -110,8 +110,9 @@
 </div>
 <!-- 👇 アクセス情報表示エリア（初期状態はサイト説明を表示し、スポット選択時に切り替える） -->
 <section class="access-info" id="accessInfoBox" aria-label="サイト案内・アクセス情報">
-  <div id="default-site-guide">
-    <h3>「釣り行こNAVI」の特徴と使い方</h3>
+  <div id="default-site-guide" class="guide-collapse collapsed-mode">
+    <h3 id="site-guide-toggle" role="button" tabindex="0" aria-expanded="false">「釣り行こNAVI」の特徴と使い方</h3>
+    <div class="guide-text">
     <p style="font-size: 13px; line-height: 1.6; color: #333; margin-bottom: 10px;">
       「釣り行こNAVI」は、関東全域（東京・神奈川・千葉・茨城・埼玉・群馬・栃木）の海釣り・堤防・河川スポットを網羅したインタラクティブ釣り場マップです。国土地理院の航空写真や海底の等深線（水深データ）を重ね合わせ、ポイントの地形やカケアガリを視覚的に把握できます。
     </p>
@@ -124,6 +125,7 @@
     <p style="font-size: 12px; color: #555; margin: 0;">
       ※ページ下部の「おすすめ釣り場ランキング」や「入門・対象魚別ガイド記事」もあわせてご活用ください。
     </p>
+    </div>
   </div>
 </section>
 <!-- 👇 明日のオススメ釣り場ランキングセクション -->
@@ -139,7 +141,7 @@
 </section>
 
 
-<section id="area-guide" class="collapsed-mode">
+<section id="area-guide" class="guide-collapse collapsed-mode">
     <h1></h1>
 </section>
 
@@ -261,6 +263,25 @@
 <script src="/js/prefLoader.js"></script>
 
 <script>
+// サイト説明文の開閉
+const siteGuideToggle = document.getElementById('site-guide-toggle');
+const siteGuide = document.getElementById('default-site-guide');
+if (siteGuideToggle && siteGuide) {
+  const toggleSiteGuide = () => {
+    const isOpen = siteGuide.classList.contains('active-mode');
+    siteGuide.classList.toggle('active-mode', !isOpen);
+    siteGuide.classList.toggle('collapsed-mode', isOpen);
+    siteGuideToggle.setAttribute('aria-expanded', String(!isOpen));
+  };
+  siteGuideToggle.addEventListener('click', toggleSiteGuide);
+  siteGuideToggle.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleSiteGuide();
+    }
+  });
+}
+
 window.prefData = null;
 window.areaData = [];
 window.spotData = [];
