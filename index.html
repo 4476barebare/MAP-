@@ -2498,36 +2498,29 @@ document.getElementById('map-back-btn')?.addEventListener('click', () => {
 });
 
 // ================================
-// ■ 天気データをスポットに適用する関数（汎用化）
+// ■ 旧天気適用関数の互換ラッパー（実体はJSON）
 // ================================
-function applyWeatherToSpots(csvData, targetArray = window.spotData, inlandOnly = false) {
-    if (!Array.isArray(csvData) || !Array.isArray(targetArray)) return;
-
-    const weatherMap = new Map();
-    for (const row of csvData) {
-        if (!row.name || !row.whether) continue;
-        weatherMap.set(row.name, row.whether);
-    }
+function applyWeatherToSpots(weatherData, targetArray = window.spotData, inlandOnly = false) {
+    const weatherMap = weatherData && weatherData.spots;
+    if (!weatherMap || typeof weatherMap !== 'object' || !Array.isArray(targetArray)) return;
 
     for (const spot of targetArray) {
         if (inlandOnly) {
             const spotId = String(spot.individualId || spot.id || "");
             if (!spotId.startsWith("L")) continue;
         }
-
-        if (weatherMap.has(spot.name)) {
-            spot.whether = weatherMap.get(spot.name);
-        }
+        const weather = weatherMap[spot.name];
+        if (weather) spot.whether = weather;
     }
 }
 
-// 既存の呼び出し元との互換性を維持する薄いラッパー
-function applyWhetherToSpots(csvData, targetArray = window.spotData) {
-    applyWeatherToSpots(csvData, targetArray, false);
+// 旧関数名・引数形式を維持
+function applyWhetherToSpots(weatherData, targetArray = window.spotData) {
+    applyWeatherToSpots(weatherData, targetArray, false);
 }
 
-function applyInlandWhetherToSpots(csvData, targetArray = window.spotData) {
-    applyWeatherToSpots(csvData, targetArray, true);
+function applyInlandWhetherToSpots(weatherData, targetArray = window.spotData) {
+    applyWeatherToSpots(weatherData, targetArray, true);
 }
 
 
@@ -2760,34 +2753,10 @@ function loadWhetherCSV(url) {
 // 旧仕様は地域一括CSVだったが、現在は選択県の内陸JSONを取得する。
 // 旧呼び出し元が regionCode を渡しても、currentPref を優先して県別JSONへ接続する。
 function loadInlandWhetherCSV(regionCode) {
-    const prefCode = (regionCode && regionCode !== window.currentRegion)
-        ? regionCode
-        : window.currentPref;
+    // 旧引数 regionCode は互換性のため受け取る。JSONは現在表示中の県単位で取得する。
+    const prefCode = window.currentPref;
     if (!prefCode) return Promise.resolve(null);
     return loadPrefWeatherJson(prefCode, true);
-}
-
-// 旧 apply 関数も引数形式を維持し、JSONの spots を対象配列へ適用する。
-function applyWeatherToSpots(weatherData, targetArray = window.spotData, inlandOnly = false) {
-    const weatherMap = weatherData && weatherData.spots;
-    if (!weatherMap || typeof weatherMap !== 'object' || !Array.isArray(targetArray)) return;
-
-    for (const spot of targetArray) {
-        if (inlandOnly) {
-            const spotId = String(spot.individualId || spot.id || "");
-            if (!spotId.startsWith("L")) continue;
-        }
-        const weather = weatherMap[spot.name];
-        if (weather) spot.whether = weather;
-    }
-}
-
-function applyWhetherToSpots(weatherData, targetArray = window.spotData) {
-    applyWeatherToSpots(weatherData, targetArray, false);
-}
-
-function applyInlandWhetherToSpots(weatherData, targetArray = window.spotData) {
-    applyWeatherToSpots(weatherData, targetArray, true);
 }
 
 // ==========================================
