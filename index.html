@@ -1415,7 +1415,6 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
                         if (typeof showRoadLayers === 'function') showRoadLayers();
 
                         if (typeof showPrefSpots === 'function') showPrefSpots();
-                        if (typeof initAreaUI === 'function') initAreaUI();
                         if (typeof renderPrefWeather === 'function') renderPrefWeather();
                         if (!options.keepRadar && typeof renderCrowdImage === 'function') renderCrowdImage();
                         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
