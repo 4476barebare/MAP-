@@ -1314,8 +1314,8 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
     window.areaBounds = null;
 
     window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
-    window.prefWeatherUrl = `/data/${prefCode}_whether.csv`;
-    window.prefInlandWeatherUrl = `/data/${region}_inLand_recalculated.csv`;
+    window.prefWeatherUrl = `/data/${prefCode}_whether.json`;
+    window.prefInlandWeatherUrl = `/data/${prefCode}_InLandwhether.json`;
     window.fishUrl = `/${region}/${prefCode}_fish.json`;
     window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
 
@@ -2745,167 +2745,53 @@ function getParsedPrefQuery() {
 }
 
 // ================================
-// ■ 天気CSVの読み込み（県別フラグ管理＆二重通信防止版）
+// ■ 旧天気CSV関数名の互換ラッパー（実体は県別JSON）
 // ================================
-window.fetchCacheStatus = window.fetchCacheStatus || {};
-window.whetherPromiseCache = window.whetherPromiseCache || {};
 
-// 県別・内陸別の天気CSV取得と解析を共通化する。
-// CSV分割関数はこの中だけで使用し、外部には公開しない。
-function loadWeatherCsvData(url, cacheKey, useChunking, lowPriority) {
-    if (cacheKey && window[cacheKey]) {
-        return Promise.resolve(window[cacheKey]);
-    }
-
-    const fetchOptions = lowPriority ? { priority: 'low' } : undefined;
-
-    return fetch(url, fetchOptions).then(res => {
-        if (!res.ok) throw new Error("whether csv fetch失敗: " + url);
-        return res.text();
-    }).then(text => {
-        const lines = text.trim().split("\n");
-        lines.shift();
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-
-        // CSVは name,date,whether の3カラム。
-        // whether内のJSONにカンマが含まれるため、先頭2つのカンマだけで分割する。
-        const splitCSVLine = line => {
-            const first = line.indexOf(",");
-            if (first === -1) return null;
-
-            const second = line.indexOf(",", first + 1);
-            if (second === -1) return null;
-
-            return {
-                name: line.slice(0, first),
-                date: line.slice(first + 1, second),
-                whether: line.slice(second + 1)
-            };
-        };
-
-        const parseLine = line => {
-            const obj = splitCSVLine(line);
-            if (!obj) return null;
-
-            let parsed;
-            try {
-                parsed = JSON.parse(obj.whether);
-            } catch (e) {
-                return null;
-            }
-
-            let csvDate = null;
-            if (obj.date) {
-                const safeDateStr = obj.date.replace(/-/g, "/");
-                csvDate = new Date(safeDateStr);
-                csvDate.setHours(0, 0, 0, 0);
-            }
-
-            const isToday = csvDate && csvDate.getTime() === today.getTime();
-            const isYesterday = csvDate && csvDate.getTime() === yesterday.getTime();
-
-            if (isToday) {
-                if (Array.isArray(parsed.daily) && parsed.daily.length >= 5) {
-                    parsed.daily[4] = null;
-                }
-            } else if (isYesterday) {
-                if (Array.isArray(parsed.hourly) && parsed.hourly.length >= 3) {
-                    parsed.hourly[0] = parsed.hourly[1];
-                    parsed.hourly[1] = parsed.hourly[2];
-                    parsed.hourly[2] = null;
-                }
-            }
-
-            return {
-                name: obj.name,
-                date: obj.date,
-                whether: parsed
-            };
-        };
-
-        const parsedData = [];
-
-        if (!useChunking) {
-            for (const line of lines) {
-                const row = parseLine(line);
-                if (row) parsedData.push(row);
-            }
-            if (cacheKey) window[cacheKey] = parsedData;
-            return parsedData;
-        }
-
-        let i = 0;
-        return new Promise(resolve => {
-            function parseSlice() {
-                const start = performance.now();
-                while (i < lines.length && (performance.now() - start) < 4) {
-                    const row = parseLine(lines[i++]);
-                    if (row) parsedData.push(row);
-                }
-
-                if (i < lines.length) {
-                    requestAnimationFrame(parseSlice);
-                } else {
-                    if (cacheKey) window[cacheKey] = parsedData;
-                    resolve(parsedData);
-                }
-            }
-            requestAnimationFrame(parseSlice);
-        });
-    });
-}
-
-// 県別CSV：従来の県コード別キャッシュ・Promise共有・4ms分割を維持
+// 既存呼び出しとの互換性のため関数名・引数を維持する。
+// URLから県コードを取り出し、JSONを取得する。CSV fetch / parse は行わない。
 function loadWhetherCSV(url) {
-    const match = url && url.match(/\/([A-Za-z0-9-]+)_whether\.csv/);
+    const match = url && url.match(/\/([A-Za-z0-9-]+)_whether\.csv(?:$|[?#])/);
     const prefCode = match ? match[1] : window.currentPref;
-    const cacheKey = prefCode ? `${prefCode}_whetherData` : null;
-
-    if (cacheKey && window[cacheKey]) {
-        return Promise.resolve(window[cacheKey]);
-    }
-
-    if (prefCode && window.fetchCacheStatus[prefCode] && window.whetherPromiseCache[prefCode]) {
-        return window.whetherPromiseCache[prefCode];
-    }
-
-    if (prefCode) {
-        window.fetchCacheStatus[prefCode] = true;
-    }
-
-    const promise = loadWeatherCsvData(url, cacheKey, true, true).catch(err => {
-        if (prefCode) {
-            window.fetchCacheStatus[prefCode] = false;
-            delete window.whetherPromiseCache[prefCode];
-        }
-        throw err;
-    });
-
-    if (prefCode) {
-        window.whetherPromiseCache[prefCode] = promise;
-    }
-
-    return promise;
+    if (!prefCode) return Promise.resolve(null);
+    return loadPrefWeatherJson(prefCode, false);
 }
 
-// 内陸CSV：従来の地域コード別キャッシュと一括解析を維持
+// 旧仕様は地域一括CSVだったが、現在は選択県の内陸JSONを取得する。
+// 旧呼び出し元が regionCode を渡しても、currentPref を優先して県別JSONへ接続する。
 function loadInlandWhetherCSV(regionCode) {
-    if (!regionCode) return Promise.resolve(null);
-
-    const cacheKey = `${regionCode}_inlandWhetherData`;
-    const url = `/data/${regionCode}_inLand_recalculated.csv`;
-
-    return loadWeatherCsvData(url, cacheKey, false, false).catch(err => {
-        console.warn(err);
-        return null;
-    });
+    const prefCode = (regionCode && regionCode !== window.currentRegion)
+        ? regionCode
+        : window.currentPref;
+    if (!prefCode) return Promise.resolve(null);
+    return loadPrefWeatherJson(prefCode, true);
 }
+
+// 旧 apply 関数も引数形式を維持し、JSONの spots を対象配列へ適用する。
+function applyWeatherToSpots(weatherData, targetArray = window.spotData, inlandOnly = false) {
+    const weatherMap = weatherData && weatherData.spots;
+    if (!weatherMap || typeof weatherMap !== 'object' || !Array.isArray(targetArray)) return;
+
+    for (const spot of targetArray) {
+        if (inlandOnly) {
+            const spotId = String(spot.individualId || spot.id || "");
+            if (!spotId.startsWith("L")) continue;
+        }
+        const weather = weatherMap[spot.name];
+        if (weather) spot.whether = weather;
+    }
+}
+
+function applyWhetherToSpots(weatherData, targetArray = window.spotData) {
+    applyWeatherToSpots(weatherData, targetArray, false);
+}
+
+function applyInlandWhetherToSpots(weatherData, targetArray = window.spotData) {
+    applyWeatherToSpots(weatherData, targetArray, true);
+}
+
 // ==========================================
-// 爆速化：バックグラウンドCSVプリロード (index.html)
+// 爆速化：バックグラウンド天気JSONプリロード (index.html)
 // ==========================================
 function preloadCsvFiles(regionCode, prefCode) {
     if (!regionCode || !prefCode) return;
@@ -3209,8 +3095,8 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
 
 
     window.prefLocationUrl      = `/${regionCode}/${prefCode}_location.json`;
-    window.prefWeatherUrl       = `/data/${prefCode}_whether.csv`;
-    window.prefInlandWeatherUrl = `/data/${regionCode}_inLand_recalculated.csv`;
+    window.prefWeatherUrl       = `/data/${prefCode}_whether.json`;
+    window.prefInlandWeatherUrl = `/data/${prefCode}_InLandwhether.json`;
     window.fishUrl              = `/${regionCode}/${prefCode}_fish.json`;
     window.prefShopUrl          = `/${regionCode}/${prefCode}_shop.json`;
 
