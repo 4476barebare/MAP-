@@ -38,11 +38,11 @@
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/shirogisu.html</loc>
-    <!-- ARTICLE_DATA: {"title":"「海の女王」シロギス攻略ガイド！投げて探る、戦略的ゲームフィッシングの魅力", "description":"シロギスの生態と投げ釣り攻略ガイド", "image":"articles/images/shirogisu.jpg", "category":"投げ釣りちょい投げ", "style":"compact"} -->
+    <!-- ARTICLE_DATA: {"title":"「海の女王」シロギス（キス）釣り完全攻略！ちょい投げ・投げ釣りの仕掛けとポイントの探し方", "description":"「海の女王」シロギス（キス）のちょい投げ・投げ釣り仕掛けとポイント攻略ガイド", "image":"articles/images/shirogisu.jpg", "category":"投げ釣りちょい投げ", "style":"compact"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/karei.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【完全攻略】海底の「座布団」を狙い撃ち！カレイの生態から投げ釣り・船釣り攻略法", "description":"カレイの生態と投げ釣り・船釣り攻略", "image":"articles/images/karei.jpg", "category":"投げ釣りちょい投げ", "style":"compact"} -->
+    <!-- ARTICLE_DATA: {"title":"【カレイ釣り完全攻略】海底の「座布団カレイ」を狙い撃つ！堤防の投げ釣り・船釣り攻略法", "description":"座布団カレイを狙う海底地形の見極め方と、堤防の投げ釣り・ちょい投げ仕掛け攻略", "image":"articles/images/karei.jpg", "category":"投げ釣りちょい投げ", "style":"compact"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/haze.html</loc>
@@ -91,7 +91,7 @@
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/katsuo.html</loc>
-    <!-- ARTICLE_DATA: {"title":"堤防から弾丸ランナーを撃ち落とせ！「カツオ」の生態とショア攻略完全ガイド", "description":"堤防やサーフからも狙える超高速回遊魚「カツオ」の生態と、ショアジギング・弓角での攻略法を解説。", "image":"articles/images/katsuo.jpg", "category":"対象魚別ガイド", "style":"list"} -->
+    <!-- ARTICLE_DATA: {"title":"堤防から弾丸青物を撃ち落とせ！「カツオ」の釣り方・ルアー＆弓角ショア攻略完全ガイド", "description":"堤防やサーフからカツオ（本ガツオ・ソウダガツオ）を狙うショアジギング・弓角の釣り方と青物攻略法を解説。", "image":"articles/images/katsuo.jpg", "category":"対象魚別ガイド", "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/sawara.html</loc>
