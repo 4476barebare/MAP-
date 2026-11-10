@@ -2744,7 +2744,7 @@ function getParsedPrefQuery() {
 // 既存呼び出しとの互換性のため関数名・引数を維持する。
 // URLから県コードを取り出し、JSONを取得する。CSV fetch / parse は行わない。
 function loadWhetherCSV(url) {
-    const match = url && url.match(/\/([A-Za-z0-9-]+)_whether\.csv(?:$|[?#])/);
+    const match = url && url.match(/\/([A-Za-z0-9-]+)_whether\.(?:csv|json)(?:$|[?#])/);
     const prefCode = match ? match[1] : window.currentPref;
     if (!prefCode) return Promise.resolve(null);
     return loadPrefWeatherJson(prefCode, false);
