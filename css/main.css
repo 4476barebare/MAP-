@@ -2660,6 +2660,13 @@ html.is-modal-open body {
   color: #191970;
 }
 
+/* 日付が切り替わる位置の区切り線（ヘッダー下の線と同じ見た目・幅） */
+.sns-date-divider {
+  height: 0;
+  margin: 3px -10px;
+  border-top: 1px solid rgba(25, 25, 112, 0.15);
+}
+
 /* 1件 = 2段のスリムカード
    上段：魚種 ………… [SNS] [リンク↗]
    下段：日付 県 釣り場 */
