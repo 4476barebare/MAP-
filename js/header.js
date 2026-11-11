@@ -328,16 +328,25 @@ const snsLink = document.getElementById("snsBtn");
 const snsModal = document.getElementById("snsModal");
 
 if (snsLink && snsModal) {
+  const openSns = () => {
+    snsModal.style.display = "block";
+    document.documentElement.classList.add("is-modal-open"); // 背景スクロール停止
+    loadSnsModalList();
+  };
+
+  const closeSns = () => {
+    snsModal.style.display = "none";
+    document.documentElement.classList.remove("is-modal-open");
+  };
+
   snsLink.addEventListener("click", (e) => {
     e.preventDefault();
-    snsModal.style.display = "block";
-    loadSnsModalList();
+    openSns();
   });
 
+  // 暗幕（外側）タップで閉じる
   snsModal.addEventListener("click", (e) => {
-    if (e.target === snsModal) {
-      snsModal.style.display = "none";
-    }
+    if (e.target === snsModal) closeSns();
   });
 }
 
