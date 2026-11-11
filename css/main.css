@@ -493,58 +493,36 @@ header {
   border: 2px solid #191970;
 }
 /* =========================
-   ニュースモーダル
-========================= */
-
-#newsModal .modal-content {
-  height: 80vh;
-  overflow-y: auto;
-}
-
-/* =========================
-   リスト
-========================= */
-
-#newsList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* =========================
-   アイテム全体
-   ★高さ固定を廃止（重要）
+   ニュースカード
+   （モーダル枠・暗幕・ヘッダー・日付区切りは
+     ファイル末尾の「共通モーダル」を使用）
 ========================= */
 
 .news-item {
-  width: 320px;
+  background: #fff;
+  border: 1px solid rgba(25, 25, 112, 0.12);
+  border-left: 3px solid #191970;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 5px 8px 5px 10px;
 }
 
 .news-item a {
   color: inherit;
   text-decoration: none;
   display: block;
+  -webkit-tap-highlight-color: rgba(25, 25, 112, 0.1);
 }
-
-/* =========================
-   行レイアウト
-========================= */
 
 .news-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 50px;
-  padding: 6px 0;
+  gap: 8px;
 }
 
-/* =========================
-   サムネイル
-========================= */
-
 .news-thumb {
-  width: 60px;
-  height: 50px;
+  width: 56px;
+  height: 44px;
   object-fit: cover;
   flex-shrink: 0;
   border-radius: 4px;
@@ -555,58 +533,45 @@ header {
   display: none;
 }
 
-/* =========================
-   テキスト領域
-========================= */
-
 .news-text {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 50px;
 }
 
-/* =========================
-   タイトル
-========================= */
-
 .news-title {
-  font-size: 13px;
-  line-height: 1.3;
-
+  font-size: 12.5px;
+  font-weight: bold;
+  line-height: 1.35;
+  color: #191970;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
-/* =========================
-   メタ情報
-========================= */
-
 .news-meta {
   display: flex;
   gap: 8px;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
-/* ニュースのメタ情報（日付など） */
 .news-source,
 .news-date {
   font-size: 10px;
-  line-height: 1;
-  color: #191970; /* ★ 修正：#aaa から変更 */
-  opacity: 0.6;   /* ★ 追加：透明度で薄さを表現 */
+  line-height: 1.2;
+  color: #191970;
+  opacity: 0.65;
 }
 
-/* ソースだけ少し強調 */
 .news-source {
-  padding-left: 2px;
+  font-weight: bold;
 }
 
 /* =========================
-   広告
+   広告（現在は非表示）
 ========================= */
 
 .ad-block,
@@ -2599,7 +2564,7 @@ li {
 }
 
 /* =========================================
-   SNS釣果モーダル（ヘッダー）
+   共通モーダル（SNS釣果 / 釣りNEWS）
 ========================================= */
 
 /* モーダル表示中は背景をスクロールさせない */
@@ -2610,7 +2575,8 @@ html.is-modal-open body {
 }
 
 /* 暗幕：外側タップで閉じられる領域 */
-#snsModal {
+#snsModal,
+#newsModal {
   background: rgba(10, 10, 50, 0.55);
   -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
@@ -2619,7 +2585,8 @@ html.is-modal-open body {
 }
 
 /* 本体：上下に余白を残し、中だけスクロール */
-#snsModal .modal-content {
+#snsModal .modal-content,
+#newsModal .modal-content {
   width: min(92vw, 560px);
   max-height: 78vh;
   max-height: 78dvh;
@@ -2636,8 +2603,11 @@ html.is-modal-open body {
 }
 
 /* 固定タイトル（薄い青背景＋#191970文字） */
-#snsModal .modal-content::before {
-  content: "SNS釣果 ・ 外側タップで閉じる";
+#snsModal .modal-content::before { content: "SNS釣果 ・ 外側タップで閉じる"; }
+#newsModal .modal-content::before { content: "釣りNEWS ・ 外側タップで閉じる"; }
+
+#snsModal .modal-content::before,
+#newsModal .modal-content::before {
   position: sticky;
   top: 0;
   z-index: 2;
@@ -2652,7 +2622,8 @@ html.is-modal-open body {
   border-bottom: 1px solid rgba(25, 25, 112, 0.15);
 }
 
-#snsList {
+#snsList,
+#newsList {
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -2661,7 +2632,7 @@ html.is-modal-open body {
 }
 
 /* 日付が切り替わる位置の区切り線（ヘッダー下の線と同じ見た目・幅） */
-.sns-date-divider {
+.modal-date-divider {
   height: 0;
   margin: 3px -10px;
   border-top: 1px solid rgba(25, 25, 112, 0.15);
