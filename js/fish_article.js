@@ -622,23 +622,17 @@ document.addEventListener("DOMContentLoaded", function () {
   async function loadFishSpots() {
     const regionUrl = `../${targetRegionCode}/${targetRegionCode}_region.csv`;
     const compiledDataUrl = `../data/compiled_data.json`;
-    const snsCatchUrl = `../${targetRegionCode}/integrated_catch.json`;
 
     try {
-      const [res, compiledRes, snsRes] = await Promise.all([
+      const [res, compiledRes, snsJson] = await Promise.all([
         fetch(regionUrl),
         fetch(compiledDataUrl).catch(() => null),
-        fetch(snsCatchUrl).catch(() => null)
+        window.loadSnsCatchData(targetRegionCode).catch(() => [])
       ]);
 
       if (!res.ok) throw new Error("Region CSV fetch failed");
 
-      if (snsRes && snsRes.ok) {
-        const snsJson = await snsRes.json().catch(() => []);
-        window._articleSnsCatches = Array.isArray(snsJson) ? snsJson : [];
-      } else {
-        window._articleSnsCatches = [];
-      }
+      window._articleSnsCatches = Array.isArray(snsJson) ? snsJson : [];
       
       // 1-A. compiled_data.json から対象魚種の既存ソナー座標を抽出
       const allMatchedCatchPoints = [];
