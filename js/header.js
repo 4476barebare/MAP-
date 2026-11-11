@@ -158,11 +158,23 @@ function renderSnsModalList(items) {
 
   snsList.innerHTML = "";
 
+  let prevDateKey = null; // 日付が切り替わる位置に区切り線を入れるための記憶
+
   items.forEach(item => {
     const el = document.createElement("div");
     el.className = "sns-modal-row";
 
     const dateText = String(item.date || '').trim() || '-';
+
+    // 日付（YYYY/MM/DD）が前の行と変わったら、区切り線を挿入
+    const dateKey = dateText.replace(/-/g, '/').slice(0, 10);
+    if (prevDateKey !== null && dateKey !== prevDateKey) {
+      const divider = document.createElement("div");
+      divider.className = "sns-date-divider";
+      divider.setAttribute("aria-hidden", "true");
+      snsList.appendChild(divider);
+    }
+    prevDateKey = dateKey;
     const prefName = resolveSnsPrefName(item);
     const placeName = String(item.area_name || item.place || item.location || '釣り場付近').replace(/[<>&"']/g, '');
     const fishName = String(item.fish || '-').replace(/[<>&"']/g, '');
