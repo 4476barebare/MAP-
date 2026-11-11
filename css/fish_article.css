@@ -455,7 +455,7 @@ body > header,
 
 /* SNS最寄りスポットカードの余白（HTML側のインラインstyleの代替） */
 .sns-spot-wrap {
-  margin: 12px 0;
+  margin: 12px 16px;
 }
 
 /* 見出し（JSが自動挿入する .sns-heading）の直下はカードを詰める */
