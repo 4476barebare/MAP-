@@ -1,5 +1,75 @@
 [
   {
+    "date": "2026/11/10",
+    "fish": "ワカサギ",
+    "lat": 36.4773,
+    "lng": 138.8783,
+    "area_name": "榛名湖",
+    "url": "https://x.com/romansutei/status/2120038451601150096",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/10",
+    "fish": "ヒラメ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/yuzao2012/status/2120013591457976356",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/10",
+    "fish": "ブラックバス",
+    "lat": 35.6186,
+    "lng": 139.1917,
+    "area_name": "相模湖",
+    "url": "https://x.com/nissoen_bass60/status/2119976736930857298",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/10",
+    "fish": "アジ",
+    "lat": 35.45,
+    "lng": 139.63,
+    "area_name": "横浜エリア",
+    "url": "https://x.com/takaakikimura40/status/2119973598932897956",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/10",
+    "fish": "アジ",
+    "lat": 35.47,
+    "lng": 139.67,
+    "area_name": "横浜エリア",
+    "url": "https://x.com/takaakikimura40/status/2119973598932897956",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/10",
+    "fish": "アジ",
+    "lat": 35.5,
+    "lng": 139.71,
+    "area_name": "横浜エリア",
+    "url": "https://x.com/takaakikimura40/status/2119973598932897956",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/10",
+    "fish": "シーバス",
+    "lat": 35.67,
+    "lng": 139.885,
+    "area_name": "旧江戸川",
+    "url": "https://www.instagram.com/p/DfjH4e4v4uQ/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/09",
     "fish": "アンコウ",
     "lat": 36.8306,
@@ -356,6 +426,16 @@
     "lng": 139.1917,
     "area_name": "相模湖",
     "url": "https://x.com/Angler_nolt/status/2119375484551156146",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/08",
+    "fish": "カワハギ",
+    "lat": 35.2778,
+    "lng": 139.7139,
+    "area_name": "海辺つり公園",
+    "url": "https://x.com/Castmode_jp/status/2120032294165496096",
     "source": "X",
     "model": "Grok"
   },
