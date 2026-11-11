@@ -1,139 +1,4 @@
 /* =========================================
-   SNS釣果モーダル（ヘッダー）
-========================================= */
-
-/* 暗幕：外側タップで閉じられる領域 */
-#snsModal {
-  background: rgba(10, 10, 50, 0.55);
-  -webkit-backdrop-filter: blur(2px);
-  backdrop-filter: blur(2px);
-}
-
-/* 本体：上下に余白を残し、中だけスクロール */
-#snsModal .modal-content {
-  width: min(92vw, 560px);
-  max-height: 78vh;
-  max-height: 78dvh;
-  margin: 11vh auto 0;
-  padding: 0 10px 12px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  background: #f4f7fd;
-  border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
-}
-
-/* 固定タイトル（疑似要素） */
-#snsModal .modal-content::before {
-  content: "SNS釣果 ・ 外側タップで閉じる";
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: block;
-  margin: 0 -10px 8px;
-  padding: 12px 14px 10px;
-  background: #191970;
-  color: #fff;
-  font-size: 12px;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-
-#snsList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 12px;
-  color: #191970;
-}
-
-#snsList {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 12px;
-  color: #191970;
-}
-
-/* 1件 = 2段のスリムカード
-   上段：魚種 ………… [SNS] [リンク↗]
-   下段：日付 県 釣り場 */
-.sns-modal-row {
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
-  grid-template-areas:
-    "fish fish fish source link"
-    "date pref place place place";
-  align-items: center;
-  column-gap: 6px;
-  row-gap: 0;
-  padding: 5px 10px 6px;
-  background: #fff;
-  border: 1px solid rgba(25, 25, 112, 0.12);
-  border-left: 3px solid #191970;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.sns-modal-row > span {
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sns-col-fish  { grid-area: fish;  font-size: 14px; font-weight: bold; line-height: 1.3; }
-.sns-col-date  { grid-area: date;  font-size: 10.5px; opacity: 0.65; line-height: 1.3; }
-.sns-col-pref  { grid-area: pref;  font-size: 10.5px; font-weight: bold; line-height: 1.3; }
-.sns-col-place { grid-area: place; font-size: 10.5px; opacity: 0.8; line-height: 1.3; }
-
-/* SNSバッジ */
-.sns-col-source {
-  grid-area: source;
-  justify-self: end;
-  padding: 1px 8px;
-  font-size: 10px;
-  font-weight: bold;
-  line-height: 1.5;
-  border-radius: 999px;
-  background: var(--sns-badge-bg, #191970);
-  color: var(--sns-badge-color, #fff);
-  border: 1px solid rgba(25, 25, 112, 0.15);
-}
-
-/* リンク：小さめピル */
-a.sns-col-link {
-  grid-area: link;
-  justify-self: end;
-  padding: 1px 9px;
-  font-size: 10px;
-  font-weight: bold;
-  line-height: 1.5;
-  text-decoration: none;
-  color: #191970;
-  background: #eef2ff;
-  border: 1px solid rgba(25, 25, 112, 0.25);
-  border-radius: 999px;
-  white-space: nowrap;
-  -webkit-tap-highlight-color: rgba(25, 25, 112, 0.15);
-}
-
-
-a.sns-col-link:active {
-  background: #191970;
-  color: #fff;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  a.sns-col-link:hover {
-    background: #191970;
-    color: #fff;
-  }
-}
-
-
-/* =========================================
    記事カテゴリ見出し用
 ========================================= */
 .category-heading {
@@ -2731,4 +2596,141 @@ li {
   background-color: #f2f2f2;
   color: #888888;
   box-shadow: none;
+}
+
+/* =========================================
+   SNS釣果モーダル（ヘッダー）
+========================================= */
+
+/* モーダル表示中は背景をスクロールさせない */
+html.is-modal-open,
+html.is-modal-open body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* 暗幕：外側タップで閉じられる領域 */
+#snsModal {
+  background: rgba(10, 10, 50, 0.55);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  overscroll-behavior: contain;
+  touch-action: none; /* 暗幕上のスワイプを背面に伝えない */
+}
+
+/* 本体：上下に余白を残し、中だけスクロール */
+#snsModal .modal-content {
+  width: min(92vw, 560px);
+  max-height: 78vh;
+  max-height: 78dvh;
+  margin: 11vh auto 0;
+  margin: 11dvh auto 0;
+  padding: 0 10px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: #f4f7fd;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* 固定タイトル（薄い青背景＋#191970文字） */
+#snsModal .modal-content::before {
+  content: "SNS釣果 ・ 外側タップで閉じる";
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: block;
+  margin: 0 -10px 8px;
+  padding: 10px 14px 8px;
+  background: #f4f7fd;
+  color: #191970;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(25, 25, 112, 0.15);
+}
+
+#snsList {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: #191970;
+}
+
+/* 1件 = 2段のスリムカード
+   上段：魚種 ………… [SNS] [リンク↗]
+   下段：日付 県 釣り場 */
+.sns-modal-row {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "fish fish fish source link"
+    "date pref place place place";
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 0;
+  padding: 5px 10px 6px;
+  background: #fff;
+  border: 1px solid rgba(25, 25, 112, 0.12);
+  border-left: 3px solid #191970;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sns-modal-row > span {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sns-col-fish  { grid-area: fish;  font-size: 14px;   font-weight: bold; line-height: 1.3; }
+.sns-col-date  { grid-area: date;  font-size: 10.5px; opacity: 0.65;     line-height: 1.3; }
+.sns-col-pref  { grid-area: pref;  font-size: 10.5px; font-weight: bold; line-height: 1.3; }
+.sns-col-place { grid-area: place; font-size: 10.5px; opacity: 0.8;      line-height: 1.3; }
+
+/* SNSバッジ（色は既存の .sns-x 等の変数を利用） */
+.sns-col-source {
+  grid-area: source;
+  justify-self: end;
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.5;
+  border-radius: 999px;
+  background: var(--sns-badge-bg, #191970);
+  color: var(--sns-badge-color, #fff);
+  border: 1px solid rgba(25, 25, 112, 0.15);
+}
+
+/* リンク：小さめピル */
+a.sns-col-link {
+  grid-area: link;
+  justify-self: end;
+  padding: 1px 9px;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1.5;
+  text-decoration: none;
+  color: #191970;
+  background: #eef2ff;
+  border: 1px solid rgba(25, 25, 112, 0.25);
+  border-radius: 999px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: rgba(25, 25, 112, 0.15);
+}
+
+a.sns-col-link:active {
+  background: #191970;
+  color: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.sns-col-link:hover {
+    background: #191970;
+    color: #fff;
+  }
 }
