@@ -170,7 +170,7 @@ function renderSnsModalList(items) {
     const dateKey = dateText.replace(/-/g, '/').slice(0, 10);
     if (prevDateKey !== null && dateKey !== prevDateKey) {
       const divider = document.createElement("div");
-      divider.className = "sns-date-divider";
+      divider.className = "modal-date-divider";
       divider.setAttribute("aria-hidden", "true");
       snsList.appendChild(divider);
     }
@@ -230,7 +230,22 @@ function renderNews(items) {
 
   newsList.innerHTML = "";
 
+  let prevDateKey = null; // 日付が切り替わる位置に区切り線を入れるための記憶
+
   items.forEach((item, index) => {
+
+    // 配信日（端末のローカル日付）が前の記事と変わったら区切り線を挿入
+    const d = new Date(item.pubDate);
+    const dateKey = isNaN(d.getTime())
+      ? ""
+      : d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+    if (prevDateKey !== null && dateKey !== prevDateKey) {
+      const divider = document.createElement("div");
+      divider.className = "modal-date-divider";
+      divider.setAttribute("aria-hidden", "true");
+      newsList.appendChild(divider);
+    }
+    prevDateKey = dateKey;
 
     const el = document.createElement("div");
     el.className = "news-item";
@@ -319,20 +334,30 @@ function renderAdBlock() {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+// 共通：モーダルの開閉（開いている間は背景スクロールを止める）
+function openOverlayModal(modal) {
+  modal.style.display = "block";
+  document.documentElement.classList.add("is-modal-open");
+}
+
+function closeOverlayModal(modal) {
+  modal.style.display = "none";
+  document.documentElement.classList.remove("is-modal-open");
+}
+
 const newsLink = document.getElementById("newsBtn");
 const newsModal = document.getElementById("newsModal");
 
 if (newsLink && newsModal) {
   newsLink.addEventListener("click", (e) => {
     e.preventDefault();
-    newsModal.style.display = "block";
+    openOverlayModal(newsModal);
     loadNews();
   });
 
+  // 暗幕（外側）タップで閉じる
   newsModal.addEventListener("click", (e) => {
-    if (e.target === newsModal) {
-      newsModal.style.display = "none";
-    }
+    if (e.target === newsModal) closeOverlayModal(newsModal);
   });
 }
 
@@ -340,25 +365,15 @@ const snsLink = document.getElementById("snsBtn");
 const snsModal = document.getElementById("snsModal");
 
 if (snsLink && snsModal) {
-  const openSns = () => {
-    snsModal.style.display = "block";
-    document.documentElement.classList.add("is-modal-open"); // 背景スクロール停止
-    loadSnsModalList();
-  };
-
-  const closeSns = () => {
-    snsModal.style.display = "none";
-    document.documentElement.classList.remove("is-modal-open");
-  };
-
   snsLink.addEventListener("click", (e) => {
     e.preventDefault();
-    openSns();
+    openOverlayModal(snsModal);
+    loadSnsModalList();
   });
 
   // 暗幕（外側）タップで閉じる
   snsModal.addEventListener("click", (e) => {
-    if (e.target === snsModal) closeSns();
+    if (e.target === snsModal) closeOverlayModal(snsModal);
   });
 }
 
