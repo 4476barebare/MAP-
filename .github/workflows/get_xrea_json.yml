@@ -30,11 +30,18 @@ jobs:
 
       # XREAからcompiled_data.jsonを取得し、JSONとして検証
       - name: "Download and Verify compiled_data.json"
+        env:
+          XREA_EXPORT_KEY: ${{ secrets.XREA_EXPORT_KEY }}
         run: |
           mkdir -p data
 
+          if [ -z "$XREA_EXPORT_KEY" ]; then
+            echo "❌ GitHub Actions Secret XREA_EXPORT_KEY が設定されていません。"
+            exit 1
+          fi
+
           UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-          URL="https://turiiko.shop/agltest/export.php?key=kR7xQm2Zt9WbLp4NvY8dshoko&t=$(date +%s)"
+          URL="https://turiiko.shop/agltest/export_map_data.php?key=${XREA_EXPORT_KEY}&t=$(date +%s)"
           TMP_FILE="/tmp/compiled_data.json.tmp"
           DEST="data/compiled_data.json"
 
