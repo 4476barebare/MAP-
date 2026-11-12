@@ -212,12 +212,82 @@ function escapeHtml(str) {
   }[ch]));
 }
 
+// Date を "YYYY-MM-DD" にする（端末ローカル日付）
+function formatDateKey(d) {
+  return d.getFullYear() + "-" +
+    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+    String(d.getDate()).padStart(2, "0");
+}
+
 // 端末ローカルの今日を "YYYY-MM-DD" で返す
 function getTodayDateKey() {
-  const n = new Date();
-  return n.getFullYear() + "-" +
-    String(n.getMonth() + 1).padStart(2, "0") + "-" +
-    String(n.getDate()).padStart(2, "0");
+  return formatDateKey(new Date());
+}
+
+// ---- イベント記事（カテゴリ名に「イベント」を含むもの）----
+const NEWS_EVENT_KEYWORD = "イベント";
+
+function isEventNewsItem(item) {
+  return !!item && String(item.category || "").includes(NEWS_EVENT_KEYWORD);
+}
+
+function toHalfWidthDigits(str) {
+  return String(str).replace(/[０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+}
+
+// 記事の「日付キー」を返す。
+//  ・イベント記事：タイトル先頭の【11月15日開催】から開催日を読み取る（年は掲載日から補完）
+//  ・それ以外／読み取れない場合：JSONの date（掲載日）
+function getNewsDateKey(item) {
+  const baseKey = String((item && item.date) || "");
+  if (!isEventNewsItem(item)) return baseKey;
+
+  const m = toHalfWidthDigits(item.title).match(/^\s*【\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+  const b = baseKey.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m || !b) return baseKey;
+
+  const month = Number(m[1]);
+  const day = Number(m[2]);
+  const pub = new Date(Number(b[1]), Number(b[2]) - 1, Number(b[3]));
+  let event = new Date(pub.getFullYear(), month - 1, day);
+
+  // 存在しない日付（13月・2/31など）は採用しない
+  if (event.getMonth() !== month - 1 || event.getDate() !== day) return baseKey;
+
+  // 掲載日より2か月以上前になる場合は翌年（12月掲載の1月開催など）
+  if (pub - event > 60 * 86400000) {
+    event = new Date(pub.getFullYear() + 1, month - 1, day);
+  }
+  return formatDateKey(event);
+}
+
+// カレンダーに載せる文言：タイトル先頭の【…】を除いた残り（【】が無ければタイトル全体）
+function getEventCalendarLabel(title) {
+  const t = String(title || "").trim();
+  return t.replace(/^【[^】]*】\s*/, "") || t;
+}
+
+// ニュースJSONの取得（ニュース一覧・カレンダー共通。成功時はキャッシュ、失敗時は次回再取得）
+let _newsItemsPromise = null;
+
+function fetchNewsItems() {
+  if (_newsItemsPromise) return _newsItemsPromise;
+
+  _newsItemsPromise = fetch(NEWS_JSON_URL)
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(data => {
+      const rawItems = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
+      return rawItems.filter(item => item && item.title && item.source_url);
+    })
+    .catch(err => {
+      _newsItemsPromise = null;
+      throw err;
+    });
+
+  return _newsItemsPromise;
 }
 
 // 並び順：① 未来日付を先頭（近い順） ② 過去は新しい順 ③ 同日は釣りニュースを先に、その後はJSON順
@@ -225,10 +295,10 @@ function sortNewsItems(items) {
   const todayKey = getTodayDateKey();
 
   return items
-    .map((item, index) => ({ item, index }))
+    .map((item, index) => ({ item, index, dateKey: getNewsDateKey(item) }))
     .sort((a, b) => {
-      const da = String(a.item.date || "");
-      const db = String(b.item.date || "");
+      const da = a.dateKey;
+      const db = b.dateKey;
       const futureA = da > todayKey;
       const futureB = db > todayKey;
 
@@ -275,15 +345,8 @@ function loadNews() {
 
   newsList.innerHTML = "読み込み中...";
 
-  fetch(NEWS_JSON_URL)
-    .then(res => {
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    })
-    .then(data => {
-      const rawItems = Array.isArray(data) ? data : (data && Array.isArray(data.items) ? data.items : []);
-      const items = rawItems.filter(item => item && item.title && item.source_url);
-
+  fetchNewsItems()
+    .then(items => {
       if (items.length === 0) {
         newsList.innerHTML = "記事がありません";
         return;
@@ -308,7 +371,7 @@ function renderNews(items) {
 
   items.forEach((item, index) => {
 
-    const dateKey = String(item.date || "");
+    const dateKey = getNewsDateKey(item);
     if (prevDateKey !== null && dateKey !== prevDateKey) {
       const divider = document.createElement("div");
       divider.className = "modal-date-divider";
@@ -389,6 +452,31 @@ function renderNews(items) {
   });
 }
 
+// カレンダーの各日付セルに、その日のイベント記事を書き込む
+function renderCalendarEvents(items) {
+  const cells = document.querySelectorAll("#calendarWrapper .cell[data-date]");
+  if (!cells.length) return;
+
+  const byDate = {};
+  items.filter(isEventNewsItem).forEach(item => {
+    const key = getNewsDateKey(item);
+    (byDate[key] = byDate[key] || []).push(item);
+  });
+
+  cells.forEach(cell => {
+    const slot = cell.querySelector(".cal-events");
+    if (!slot) return;
+
+    const list = byDate[cell.dataset.date] || [];
+    slot.innerHTML = list.map(item => {
+      const label = escapeHtml(getEventCalendarLabel(item.title));
+      const fullTitle = escapeHtml(item.title);
+      const href = escapeHtml(item.source_url);
+      return `<a class="cal-event" href="${href}" target="_blank" rel="noopener" title="${fullTitle}">${label}</a>`;
+    }).join("");
+  });
+}
+
 function renderAdBlock() {
   const ad = document.createElement("div");
   ad.className = "ad-block";
@@ -416,8 +504,8 @@ function renderAdBlock() {
 document.addEventListener("DOMContentLoaded", function () {
 
 // 共通：モーダルの開閉（開いている間は背景スクロールを止める）
-function openOverlayModal(modal) {
-  modal.style.display = "block";
+function openOverlayModal(modal, display = "block") {
+  modal.style.display = display;
   document.documentElement.classList.add("is-modal-open");
 }
 
@@ -511,6 +599,11 @@ const WEEK_LABELS = ["日","月","火","水","木","金","土"];
 
 function createMonth(year, month) {
 
+  // 月の繰り上がり・繰り下がり（0月・13月）を正規化
+  const base = new Date(year, month - 1, 1);
+  year = base.getFullYear();
+  month = base.getMonth() + 1;
+
   const first = new Date(year, month - 1, 1);
   const last = new Date(year, month, 0);
 
@@ -584,9 +677,10 @@ function createMonth(year, month) {
     }
 
     html += `
-      <div class="${cls}">
+      <div class="${cls}" data-date="${key}">
         <div class="day">${d}</div>
         <div class="tide ${tideClass}">${tide}</div>
+        <div class="cal-events"></div>
       </div>
     `;
   }
@@ -612,29 +706,33 @@ if (calendarBtn && calendarOverlay && calendarWrapper) {
 
   renderCalendar(baseYear, baseMonth);
 
+  // イベント記事は初回にカレンダーを開いたときだけ取得する
+  let calendarEventsLoaded = false;
+  const loadCalendarEvents = () => {
+    if (calendarEventsLoaded) return;
+    fetchNewsItems()
+      .then(items => {
+        renderCalendarEvents(items);
+        calendarEventsLoaded = true;
+      })
+      .catch(() => {});
+  };
+
   calendarBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    calendarOverlay.style.display = "flex";
+    openOverlayModal(calendarOverlay, "flex");
 
     requestAnimationFrame(() => {
       calendarWrapper.scrollLeft = calendarWrapper.clientWidth;
     });
+
+    loadCalendarEvents();
   });
 
-calendarOverlay.addEventListener("mousedown", (e) => {
-  const rect = calendarWrapper.getBoundingClientRect();
-
-  const inside =
-    e.clientX >= rect.left &&
-    e.clientX <= rect.right &&
-    e.clientY >= rect.top &&
-    e.clientY <= rect.bottom;
-
-  if (!inside) {
-    calendarOverlay.style.display = "none";
-  }
-});
-  
+  // 暗幕（外側）タップで閉じる
+  calendarOverlay.addEventListener("click", (e) => {
+    if (e.target === calendarOverlay) closeOverlayModal(calendarOverlay);
+  });
 
 }
 
