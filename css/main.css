@@ -549,13 +549,30 @@ header {
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
+/* メタ行：[favicon サイト名]  日付 */
 .news-meta {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-top: 3px;
+}
+
+.news-site {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.news-favicon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 2px;
 }
 
 .news-source,
@@ -568,6 +585,15 @@ header {
 
 .news-source {
   font-weight: bold;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.news-date {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* 予告・イベントなど未来日付の表示 */
@@ -577,21 +603,9 @@ header {
   font-weight: bold;
 }
 
-/* その他カテゴリ：favicon + タイトル + サイト名のシンプルなリンク */
+/* その他カテゴリ：タイトル + サイト名のシンプルなリンク */
 .news-item.news-link-item {
   border-left-color: rgba(25, 25, 112, 0.35);
-}
-
-.news-link-item .news-row {
-  align-items: flex-start;
-}
-
-.news-favicon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  margin-top: 1px;
-  border-radius: 3px;
 }
 
 .news-link-item .news-title {
