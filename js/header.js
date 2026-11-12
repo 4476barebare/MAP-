@@ -4,39 +4,58 @@
 window.snsCatchData = window.snsCatchData || [];
 window.isSnsCatchLoaded = window.isSnsCatchLoaded || false;
 window._isSnsCatchLoading = window._isSnsCatchLoading || false;
+window._snsCatchDataCache = window._snsCatchDataCache || {};
+window._snsCatchPromises = window._snsCatchPromises || {};
 
-// SNS釣果データ取得関数 (markerControl.js から移植・共通利用)
-window.loadSnsCatchData = async function(regionCode) {
-  if (window.isSnsCatchLoaded && Array.isArray(window.snsCatchData) && window.snsCatchData.length > 0) {
-    return window.snsCatchData;
-  }
-  if (window._isSnsCatchLoading && window._snsCatchPromise) {
-    return window._snsCatchPromise;
-  }
-
+// SNS釣果データ取得関数（ヘッダー・記事ページ共通）
+window.loadSnsCatchData = function(regionCode) {
   const targetRegion = regionCode || window.currentRegion || 'KANTO';
-  const url = `/${targetRegion}/integrated_catch.json`;
 
+  if (Object.prototype.hasOwnProperty.call(window._snsCatchDataCache, targetRegion)) {
+    window.snsCatchData = window._snsCatchDataCache[targetRegion];
+    window.isSnsCatchLoaded = true;
+    window._isSnsCatchLoading = false;
+    window._snsCatchActiveRegion = targetRegion;
+    return Promise.resolve(window.snsCatchData);
+  }
+
+  if (window._snsCatchPromises[targetRegion]) {
+    return window._snsCatchPromises[targetRegion];
+  }
+
+  const url = `/${targetRegion}/integrated_catch.json`;
   window._isSnsCatchLoading = true;
-  window._snsCatchPromise = fetch(url, { priority: 'low' })
+  window._snsCatchActiveRegion = targetRegion;
+
+  const promise = fetch(url, { priority: 'low' })
     .then(res => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json();
     })
     .then(data => {
-      window.snsCatchData = Array.isArray(data) ? data : [];
-      window.isSnsCatchLoaded = true;
-      window._isSnsCatchLoading = false;
-      return window.snsCatchData;
+      const items = Array.isArray(data) ? data : [];
+      window._snsCatchDataCache[targetRegion] = items;
+
+      if (window._snsCatchActiveRegion === targetRegion) {
+        window.snsCatchData = items;
+        window.isSnsCatchLoaded = true;
+      }
+      return items;
     })
     .catch(err => {
       console.warn('SNS釣果データの読み込みスキップ:', err);
-      window.snsCatchData = [];
-      window._isSnsCatchLoading = false;
       return [];
+    })
+    .finally(() => {
+      delete window._snsCatchPromises[targetRegion];
+      if (window._snsCatchActiveRegion === targetRegion) {
+        window._isSnsCatchLoading = false;
+      }
     });
 
-  return window._snsCatchPromise;
+  window._snsCatchPromises[targetRegion] = promise;
+  window._snsCatchPromise = promise;
+  return promise;
 };
 
 // prefコードや座標から県名（日本語）を取得するヘルパー
@@ -137,19 +156,11 @@ function loadSnsModalList() {
     renderSnsModalList(sorted);
   };
 
-  if (window.isSnsCatchLoaded) {
-    renderSorted(window.snsCatchData);
-    return;
-  }
-
   snsList.innerHTML = "読み込み中...";
-  if (window._snsCatchPromise) {
-    window._snsCatchPromise
-      .then(items => renderSorted(items))
-      .catch(() => { snsList.innerHTML = "取得失敗"; });
-  } else {
-    renderSorted(window.snsCatchData);
-  }
+  const targetRegion = window.TARGET_REGION_CODE || window.currentRegion || 'KANTO';
+  window.loadSnsCatchData(targetRegion)
+    .then(items => renderSorted(items))
+    .catch(() => { snsList.innerHTML = "取得失敗"; });
 }
 
 function renderSnsModalList(items) {
@@ -678,8 +689,10 @@ function createMonth(year, month) {
 
     html += `
       <div class="${cls}" data-date="${key}">
-        <div class="day">${d}</div>
-        <div class="tide ${tideClass}">${tide}</div>
+        <div class="cell-head">
+          <div class="day">${d}</div>
+          <div class="tide ${tideClass}">${tide}</div>
+        </div>
         <div class="cal-events"></div>
       </div>
     `;
