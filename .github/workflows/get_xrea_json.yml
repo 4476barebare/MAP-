@@ -1,4 +1,4 @@
-name: "acquire Map JSON from XREA"
+name: "acquire fishJSON from XREA"
 on:
 workflow_dispatch:
 schedule:
