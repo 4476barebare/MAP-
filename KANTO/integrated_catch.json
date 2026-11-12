@@ -1,5 +1,145 @@
 [
   {
+    "date": "2026/11/11",
+    "fish": "ワラサ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2120417113626329524",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "イトヒキアジ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2120417113626329524",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "クロダイ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2120417113626329524",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "メジナ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2120417113626329524",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "メバル",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2120417113626329524",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "ハゼ",
+    "lat": 35.3789,
+    "lng": 139.9142,
+    "area_name": "木更津港内",
+    "url": "https://x.com/OnishiFishingF/status/2120424885130519035",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "クロダイ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/yuzao2012/status/2120415590309572691",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "カワハギ",
+    "lat": 35.1416,
+    "lng": 139.8335,
+    "area_name": "保田港",
+    "url": "https://x.com/hotakunimaru/status/2120417474936185221",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "ワカサギ",
+    "lat": 36.4773,
+    "lng": 138.8783,
+    "area_name": "榛名湖",
+    "url": "https://www.instagram.com/p/Dfl3_3JpTza/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "ニジマス",
+    "lat": 35.5392,
+    "lng": 139.3175,
+    "area_name": "清水橋上流",
+    "url": "https://www.facebook.com/kogakifishing/posts/pfbid038LNCb7xWookUuiN3GhVXbqVeW2qEq5cr1uqjcRCaVA1dDz2vMVxxZCmFa7gkNYtWl",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "シーバス",
+    "lat": 35.6,
+    "lng": 139.9,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/orca.kisarazu/posts/pfbid02ysgkX1DKKmWtb5RNFbTgYUGw6FMvh5yx1jK6CcRzmrjpeNCL3izvYKe5iYrWqaoal",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "シーバス",
+    "lat": 35.48,
+    "lng": 139.85,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/orca.kisarazu/posts/pfbid02ysgkX1DKKmWtb5RNFbTgYUGw6FMvh5yx1jK6CcRzmrjpeNCL3izvYKe5iYrWqaoal",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "シーバス",
+    "lat": 35.36,
+    "lng": 139.72,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/orca.kisarazu/posts/pfbid02ysgkX1DKKmWtb5RNFbTgYUGw6FMvh5yx1jK6CcRzmrjpeNCL3izvYKe5iYrWqaoal",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/11",
+    "fish": "シーバス",
+    "lat": 35.2,
+    "lng": 139.74,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/orca.kisarazu/posts/pfbid02ysgkX1DKKmWtb5RNFbTgYUGw6FMvh5yx1jK6CcRzmrjpeNCL3izvYKe5iYrWqaoal",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/10",
     "fish": "ワカサギ",
     "lat": 36.4773,
@@ -66,6 +206,16 @@
     "lng": 139.885,
     "area_name": "旧江戸川",
     "url": "https://www.instagram.com/p/DfjH4e4v4uQ/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/10",
+    "fish": "ヒメマス",
+    "lat": 35.21,
+    "lng": 139,
+    "area_name": "芦ノ湖",
+    "url": "https://www.instagram.com/p/DfmFAStRk_U/",
     "source": "Instagram",
     "model": "Muse"
   },
