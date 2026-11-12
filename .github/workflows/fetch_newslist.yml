@@ -1,4 +1,4 @@
-name: "acquire News and Map JSON from GAS and XREA"
+name: "acquire News JSON from GAS"
 
 on:
   workflow_dispatch:
