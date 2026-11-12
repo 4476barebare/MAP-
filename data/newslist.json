@@ -1,12 +1,39 @@
 {
-  "generated": "2026-11-12T05:58:45+09:00",
+  "generated": "2026-11-12T10:51:30+09:00",
   "count": 156,
   "items": [
+    {
+      "date": "2026-12-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=activo.jp&sz=128",
+      "thumbnail": "",
+      "title": "【12月13日開催】茅ヶ崎ヘッドランドで清掃活動「ウキブイ大作戦」 要予約・定員30名",
+      "source_name": "activo",
+      "source_url": "https://activo.jp/articles/130013",
+      "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-12-06",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.735style.org&sz=128",
+      "thumbnail": "",
+      "title": "【12月6日開催】逗子海岸で定例ビーチクリーン 毎月第1日曜に実施",
+      "source_name": "735style",
+      "source_url": "https://www.735style.org/post/2026年11月-ビーチクリーン",
+      "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-11-29",
+      "favicon": "https://www.google.com/s2/favicons?domain=activo.jp&sz=128",
+      "thumbnail": "",
+      "title": "【11月29日開催】由比ガ浜で参加型ビーチクリーン（学生団体platzwa主催）",
+      "source_name": "activo",
+      "source_url": "https://activo.jp/articles/129876",
+      "category": "ビーチクリーンイベント"
+    },
     {
       "date": "2026-11-21",
       "favicon": "https://www.google.com/s2/favicons?domain=www.vln.metro.tokyo.lg.jp&sz=128",
       "thumbnail": "",
-      "title": "片瀬東浜海岸で『第229回海さくらゴミ拾い』 ボランティアを募集中",
+      "title": "【11月21日開催】片瀬東浜海岸で『第229回海さくらゴミ拾い』 ボランティアを募集中",
       "source_name": "東京都ボランティア・市民活動センター",
       "source_url": "https://www.vln.metro.tokyo.lg.jp/join/info/894405",
       "category": "ビーチクリーンイベント"
@@ -18,6 +45,15 @@
       "title": "【11月15日開催】片瀬海岸西浜で「えのすいecoデー」 ビーチクリーンと漂着物アート",
       "source_name": "鎌暮らし",
       "source_url": "https://kamakurashi.com/gyoji/enosui-ecoday-194/",
+      "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=prtimes.jp&sz=128",
+      "thumbnail": "",
+      "title": "【11月14日開催】湘南3海岸でビーチクリーン「LOVE OCEAN」 手ぶら・無料で参加可",
+      "source_name": "PR TIMES",
+      "source_url": "https://prtimes.jp/main/html/rd/p/000000373.000049154.html",
       "category": "ビーチクリーンイベント"
     },
     {
@@ -1210,15 +1246,6 @@
     },
     {
       "date": "2026-11-04",
-      "favicon": "https://www.google.com/s2/favicons?domain=prtimes.jp&sz=128",
-      "thumbnail": "",
-      "title": "【11月14日開催】湘南3海岸でビーチクリーン「LOVE OCEAN」 手ぶら・無料で参加可",
-      "source_name": "PR TIMES",
-      "source_url": "https://prtimes.jp/main/html/rd/p/000000373.000049154.html",
-      "category": "ビーチクリーンイベント"
-    },
-    {
-      "date": "2026-11-04",
       "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
       "thumbnail": "",
       "title": "秩父市大滝の国道140号近くでクマ（成獣）1頭を目撃",
@@ -1261,15 +1288,6 @@
       "source_name": "釧路新聞",
       "source_url": "https://kushironews.jp/2026/11/03/714861/",
       "category": "水産業"
-    },
-    {
-      "date": "2026-11-03",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.735style.org&sz=128",
-      "thumbnail": "",
-      "title": "【12月6日開催】逗子海岸で定例ビーチクリーン 毎月第1日曜に実施",
-      "source_name": "735style",
-      "source_url": "https://www.735style.org/post/2026年11月-ビーチクリーン",
-      "category": "ビーチクリーンイベント"
     },
     {
       "date": "2026-11-03",
@@ -1345,15 +1363,6 @@
     },
     {
       "date": "2026-11-01",
-      "favicon": "https://www.google.com/s2/favicons?domain=activo.jp&sz=128",
-      "thumbnail": "",
-      "title": "【11月29日開催】由比ガ浜で参加型ビーチクリーン（学生団体platzwa主催）",
-      "source_name": "activo",
-      "source_url": "https://activo.jp/articles/129876",
-      "category": "ビーチクリーンイベント"
-    },
-    {
-      "date": "2026-11-01",
       "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
       "thumbnail": "https://castingnet.jp/cmsimg/tpc207160-main.png",
       "title": "キャスティング『キャスクイズ』11月前半、正解者1名にダイワのワカサギリールセットが当たる（11/1～15）",
@@ -1369,15 +1378,6 @@
       "source_name": "キャスティング",
       "source_url": "https://castingnet.jp/news/detail.php?no=267823",
       "category": "釣りニュース"
-    },
-    {
-      "date": "2026-10-30",
-      "favicon": "https://www.google.com/s2/favicons?domain=activo.jp&sz=128",
-      "thumbnail": "",
-      "title": "【12月13日開催】茅ヶ崎ヘッドランドで清掃活動「ウキブイ大作戦」 要予約・定員30名",
-      "source_name": "activo",
-      "source_url": "https://activo.jp/articles/130013",
-      "category": "ビーチクリーンイベント"
     },
     {
       "date": "2026-10-30",
