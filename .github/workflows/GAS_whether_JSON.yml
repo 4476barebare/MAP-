@@ -2,12 +2,10 @@ name: Sync Weather JSON Data from GAS
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '5 20 * * *'
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
