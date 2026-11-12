@@ -1,24 +1,40 @@
-name: Fetch Newslist from Google Drive
+name: "acquire News and Map JSON from GAS and XREA"
 
 on:
+  workflow_dispatch:
   schedule:
-    # 毎日 日本時間 19:00 (UTC 10:00) に実行（※時間は自由に変更可能です）
-    - cron: '0 10 * * *'
-  workflow_dispatch: # 手動でのテスト実行ボタン
+    - cron: '29 13 * * *'
+      timezone: 'Asia/Tokyo' # 🌟 日本時間の 13:29 に正確に発火します
+
+# 🌟 デプロイの渋滞や衝突を防ぐ安全装置
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  fetch-newslist:
+  fetch-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    
+    # 🌟 GitHub Pagesへのデプロイ権限を証明するために必須の記述
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # リベース時のエラー防止のために全履歴を取得
 
-      - name: Fetch newslist.json from GAS
+      # ========================================================
+      # 1. GAS(Googleドライブ)とXREAサーバーから最新JSONを取得
+      # ========================================================
+      - name: "Download JSON data"
         env:
           GAS_URL: ${{ secrets.DRIVE_FETCHER_GAS_URL }}
           SECRET_KEY: "aZ3kP9xQw7LmN2vB8tRc"
@@ -26,36 +42,59 @@ jobs:
           FILE_NAME: "newslist.json"
         run: |
           mkdir -p data
-
-          # GASのURLにパラメータを付与して叩く（-Lでリダイレクト追跡）
-          TARGET_URL="${GAS_URL}?folder=${FOLDER_NAME}&file=${FILE_NAME}&key=${SECRET_KEY}"
           
+          # ① ニュースデータの取得（GAS経由でGoogleドライブのMuse/newslist.jsonを取得）
+          TARGET_URL="${GAS_URL}?folder=${FOLDER_NAME}&file=${FILE_NAME}&key=${SECRET_KEY}"
           curl -sSL "$TARGET_URL" -o /tmp/downloaded_news.json
           
-          # 正しいJSONであるか、GASからのエラーメッセージが返ってきていないかを検証
+          # GASからのレスポンスがエラーでないか・正しいJSONか検証してから data/newslist.json に上書き配置
           STATUS=$(jq -r '.status // empty' /tmp/downloaded_news.json)
           if [ "$STATUS" == "error" ]; then
-            echo "Error fetching file:"
+            echo "Error fetching newslist.json from GAS:"
             cat /tmp/downloaded_news.json
             exit 1
           fi
-          
-          # 破損ファイルでないかパースチェック
           jq . /tmp/downloaded_news.json > /dev/null
-          
-          # 検証を通過したら data/newslist.json として配置
           mv /tmp/downloaded_news.json data/newslist.json
-          echo "Successfully fetched and verified data/newslist.json"
+          echo "✅ data/newslist.json の取得・検証完了"
+          
+          # ② マップ＆釣果ブログの結合データをエクスポートAPI(XREA)から取得
+          # ※ 古いデータが除外されたクリーンな状態のものがダウンロードされ、完全上書きされます
+          curl -sS "https://turiiko.shop/agltest/export.php?key=kR7xQm2Zt9WbLp4NvY8dshoko&t=$(date +%s)" -o data/compiled_data.json
+          echo "✅ data/compiled_data.json の取得完了"
 
+      # ========================================================
+      # 2. 取得したデータをリポジトリに保存する処理
+      # ========================================================
       - name: Commit and Push
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # ダウンロードしたJSONを両方ステージング（既存のファイルは最新の状態で完全上書きされます）
           git add data/newslist.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
+          git add data/compiled_data.json
+          
+          # 変更がある場合のみコミットしてプッシュ
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: 最新のニュース(newslist.json)と釣果データで完全上書き更新"
+            
+            # リモートで別の更新があっても衝突しないようリベース
+            git pull --rebase origin main
+            
+            git push origin main
           else
-            git commit -m "chore: update data/newslist.json from Google Drive"
-            git push
+            echo "✅ データに変更がなかったためコミットをスキップしました。"
           fi
+
+      # ========================================================
+      # 3. GitHub Pages への直接デプロイ
+      # ========================================================
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './'
+
+      - name: Deploy to GitHub Pages
+        id: deployment 
+        uses: actions/deploy-pages@v4
