@@ -624,26 +624,31 @@ document.addEventListener("DOMContentLoaded", function () {
     const compiledDataUrl = `../data/compiled_data.json`;
 
     try {
+      // 必須の地域CSVと、独立して扱うデータを並行取得
       const [res, compiledRes, snsJson] = await Promise.all([
         fetch(regionUrl),
         fetch(compiledDataUrl).catch(() => null),
-        window.loadSnsCatchData(targetRegionCode).catch(() => [])
+        Promise.resolve()
+          .then(() => window.loadSnsCatchData(targetRegionCode))
+          .catch(() => [])
       ]);
 
-      if (!res.ok) throw new Error("Region CSV fetch failed");
+      if (!res || !res.ok) throw new Error("Region CSV fetch failed");
 
       window._articleSnsCatches = Array.isArray(snsJson) ? snsJson : [];
-      
+
       // 1-A. compiled_data.json から対象魚種の既存ソナー座標を抽出
+      // 取得・JSON解析・構造検証に失敗しても、他のスポット描画は継続する
       const allMatchedCatchPoints = [];
       const displaySonarPoints = [];
 
       if (compiledRes && compiledRes.ok) {
-        const compiledJson = await compiledRes.json();
-        const rawList = [
-          ...(compiledJson.map_data || []),
-          ...(compiledJson.blog_data || [])
-        ];
+        try {
+          const compiledJson = await compiledRes.json();
+          if (compiledJson && typeof compiledJson === 'object') {
+            const mapData = Array.isArray(compiledJson.map_data) ? compiledJson.map_data : [];
+            const blogData = Array.isArray(compiledJson.blog_data) ? compiledJson.blog_data : [];
+            const rawList = [...mapData, ...blogData];
 
         const uniqueCoords = new Map();
         rawList.forEach(item => {
@@ -680,6 +685,12 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!isTooClose) {
             displaySonarPoints.push(candidate);
           }
+        }
+          }
+        } catch (e) {
+          console.warn("compiled_data.json の読み込みに失敗しました。既存ソナーをスキップして続行します:", e);
+          allMatchedCatchPoints.length = 0;
+          displaySonarPoints.length = 0;
         }
       }
 
@@ -763,9 +774,28 @@ document.addEventListener("DOMContentLoaded", function () {
               fetch(fishUrl).catch(() => null)
           ]);
           
-          const locData = locRes && locRes.ok ? await locRes.json() : [];
-          const fishData = fishRes && fishRes.ok ? await fishRes.json() : {};
-          
+          // 片方のJSONが壊れていても、もう片方と他県の読み込みは継続
+          let locData = [];
+          let fishData = {};
+
+          if (locRes && locRes.ok) {
+              try {
+                  const json = await locRes.json();
+                  if (Array.isArray(json)) locData = json;
+              } catch (e) {
+                  console.warn(`${prefCode}_location.json の読み込みに失敗しました:`, e);
+              }
+          }
+
+          if (fishRes && fishRes.ok) {
+              try {
+                  const json = await fishRes.json();
+                  if (json && typeof json === 'object' && !Array.isArray(json)) fishData = json;
+              } catch (e) {
+                  console.warn(`${prefCode}_fish.json の読み込みに失敗しました:`, e);
+              }
+          }
+
           return { locData, fishData, prefCode };
       });
       
