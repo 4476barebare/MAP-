@@ -324,11 +324,8 @@ function renderNews(items) {
     const isUpcoming = dateKey > todayKey;
     const dateClass = isUpcoming ? "news-date is-upcoming" : "news-date";
 
-    const metaHtml = `
-              <div class="news-meta">
-                ${source ? `<div class="news-source">${source}</div>` : ""}
-                ${dateText ? `<div class="${dateClass}">${dateText}</div>` : ""}
-              </div>`;
+    const sourceHtml = source ? `<div class="news-source">${source}</div>` : "";
+    const dateHtml = dateText ? `<div class="${dateClass}">${dateText}</div>` : "";
 
     const el = document.createElement("div");
 
@@ -342,7 +339,8 @@ function renderNews(items) {
           <div class="news-row">
             ${thumb ? `<img class="news-thumb" src="${thumb}" loading="lazy" alt="">` : ""}
             <div class="news-text">
-              <div class="news-title">${title}</div>${metaHtml}
+              <div class="news-title">${title}</div>
+              <div class="news-meta">${sourceHtml}${dateHtml}</div>
             </div>
           </div>
         </a>
@@ -357,16 +355,22 @@ function renderNews(items) {
         };
       }
     } else {
-      // ---- その他カテゴリ：favicon + タイトル + サイト名 ----
+      // ---- その他カテゴリ：タイトル / [favicon サイト名] 日付 ----
       const favicon = item.favicon ? escapeHtml(item.favicon) : "";
+      const faviconHtml = favicon
+        ? `<img class="news-favicon" src="${favicon}" width="12" height="12" loading="lazy" alt="">`
+        : "";
+      const siteHtml = (faviconHtml || sourceHtml)
+        ? `<div class="news-site">${faviconHtml}${sourceHtml}</div>`
+        : "";
       el.className = "news-item news-link-item";
 
       el.innerHTML = `
         <a href="${link}" target="_blank" rel="noopener">
           <div class="news-row">
-            ${favicon ? `<img class="news-favicon" src="${favicon}" width="16" height="16" loading="lazy" alt="">` : ""}
             <div class="news-text">
-              <div class="news-title">${title}</div>${metaHtml}
+              <div class="news-title">${title}</div>
+              <div class="news-meta">${siteHtml}${dateHtml}</div>
             </div>
           </div>
         </a>
