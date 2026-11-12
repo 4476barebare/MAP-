@@ -1,0 +1,83 @@
+name: "acquire Map JSON from XREA"
+on:
+workflow_dispatch:
+schedule:
+- cron: '29 4 * * *' # 🌟 日本時間(JST)の 13:29 (UTC 04:29) に正確に発火します
+🌟 デプロイの渋滞や衝突を防ぐ安全装置
+concurrency:
+group: "pages"
+cancel-in-progress: true
+permissions:
+contents: write
+pages: write
+id-token: write
+jobs:
+fetch-and-deploy:
+runs-on: ubuntu-latest
+# 🌟 GitHub Pagesへのデプロイ権限を証明するために必須の記述
+environment:
+name: github-pages
+url: ${{ steps.deployment.outputs.page_url }}
+steps:
+- name: Checkout repository
+uses: actions/checkout@v4
+with:
+fetch-depth: 0 # リベース時のエラー防止のために全履歴を取得
+# ========================================================
+# 1. XREAサーバーから最新のcompiled_data.jsonを検証付きで取得
+# ========================================================
+- name: "Download and Verify compiled_data.json"
+run: |
+mkdir -p data
+UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+URL="https://turiiko.shop/agltest/export.php?key=kR7xQm2Zt9WbLp4NvY8dshoko&t=$(date +%s)"
+TMP_FILE="/tmp/compiled_data.json.tmp"
+DEST="data/compiled_data.json"
+echo "Fetching: ￼
+HTTP_CODE=(curl -sSL -w "%{http_code}" -A "$UA" 
+-H "Accept: application/json, text/plain, /" 
+-H "Accept-Language: ja,en-US;q=0.9,en;q=0.8" 
+--retry 3 --retry-delay 3 --connect-timeout 15 --max-time 60 
+"$URL" -o "$TMP_FILE")
+echo "HTTP Status: $HTTP_CODE"
+if [ "$HTTP_CODE" -ne 200 ]; then
+echo "❌ HTTPエラー ($HTTP_CODE) が発生しました。XREAのWAF/海外IP制限の可能性があります。レスポンス内容:"
+head -n 20 "$TMP_FILE" || true
+exit 1
+fi
+# 空ファイルまたはHTMLエラーページでないか（有効なJSONか）をjqで厳密にチェック
+if ! jq -e . "$TMP_FILE" > /dev/null 2>&1; then
+echo "❌ 取得したデータが正しいJSONではありません（HTMLエラー等）。上書きを中止します。先頭内容:"
+head -n 20 "$TMP_FILE" || true
+exit 1
+fi
+mv "$TMP_FILE" "$DEST"
+echo "✅ ￼(wc -c < "$DEST") bytes)"
+# ========================================================
+# 2. 取得したデータをリポジトリに保存する処理
+# ========================================================
+- name: Commit and Push
+run: |
+git config --local user.email "github-actions[bot]@users.noreply.github.com"
+git config --local user.name "github-actions[bot]"
+# ダウンロードしたJSONをステージング
+git add data/compiled_data.json
+# 変更がある場合のみコミットしてプッシュ
+if ! git diff --cached --quiet; then
+git commit -m "🤖 auto: 最新の釣果データ(compiled_data.json)で完全上書き更新"
+# リモートで別の更新があっても衝突しないようリベース
+git pull --rebase origin main
+git push origin main
+else
+echo "✅ データに変更がなかったためコミットをスキップしました。"
+fi
+# ========================================================
+# 3. GitHub Pages への直接デプロイ
+# ========================================================
+- name: Upload Artifact
+uses: actions/upload-pages-artifact@v3
+with:
+path: './'
+- name: Deploy to GitHub Pages
+id: deployment
+uses: actions/deploy-pages@v4
