@@ -1,0 +1,179 @@
+name: "Evening Data Sync (18:00 JST)"
+
+on:
+  schedule:
+    # UTC 09:00 = 日本時間(JST) 毎日 18:00
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+# デプロイ渋滞・Git競合を防ぐ排他制御（朝ワークフローと同一グループで直列化）
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  evening-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Initialize Summary Table
+        run: |
+          echo "### 🌇 夕方のデータ同期 実行結果 (JST 18:00)" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 対象データ | 保存先 | ステータス | 詳細 |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| :--- | :--- | :--- | :--- |" >> "$GITHUB_STEP_SUMMARY"
+
+      # ========================================================
+      # 1. SNS釣果データの回収 (汎用GAS: Gemini/integrated_catch.json)
+      # ========================================================
+      - name: "1. Fetch SNS Catch Data (GAS: Gemini folder)"
+        continue-on-error: true
+        env:
+          GAS_URL: ${{ secrets.DRIVE_FETCHER_GAS_URL }}
+          SECRET_KEY: "aZ3kP9xQw7LmN2vB8tRc"
+          FOLDER_NAME: "Gemini"
+          FILE_NAME: "integrated_catch.json"
+        run: |
+          mkdir -p KANTO
+          DEST="KANTO/integrated_catch.json"
+          TMP_FILE="/tmp/integrated_catch.json.tmp"
+          TARGET_URL="${GAS_URL}?folder=${FOLDER_NAME}&file=${FILE_NAME}&key=${SECRET_KEY}"
+
+          if ! curl -sSL --fail --retry 2 --connect-timeout 15 --max-time 45 "$TARGET_URL" -o "$TMP_FILE"; then
+            echo "❌ [SNS Catch] GAS通信エラー"
+            echo "| 1. SNS釣果データ | \`KANTO/integrated_catch.json\` | ❌ 失敗 | GAS通信エラー |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if ! jq -e 'type == "array"' "$TMP_FILE" > /dev/null 2>&1; then
+            echo "❌ [SNS Catch] 取得データがJSON配列ではありません"
+            head -n 10 "$TMP_FILE" || true
+            echo "| 1. SNS釣果データ | \`KANTO/integrated_catch.json\` | ❌ 失敗 | JSON配列検証NG |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if [ -f "$DEST" ] && cmp -s "$TMP_FILE" "$DEST"; then
+            echo "⏭️ [SNS Catch] 本日のデータは取得済み（変更なし）のためスキップ"
+            echo "| 1. SNS釣果データ | \`KANTO/integrated_catch.json\` | ⏭️ 更新なし | 変更なし（取得済み） |" >> "$GITHUB_STEP_SUMMARY"
+          else
+            mv "$TMP_FILE" "$DEST"
+            COUNT=$(jq 'length' "$DEST")
+            echo "✅ [SNS Catch] 更新完了 (${COUNT}件)"
+            echo "| 1. SNS釣果データ | \`KANTO/integrated_catch.json\` | ✅ 更新完了 | 全 ${COUNT}件 |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          # 連続リクエストによるGAS負荷を避けるため2秒待機
+          sleep 2
+
+      # ========================================================
+      # 2. ニュースリストの回収 (汎用GAS: Muse/newslist.json)
+      # ========================================================
+      - name: "2. Fetch Newslist Data (GAS: Muse folder)"
+        continue-on-error: true
+        env:
+          GAS_URL: ${{ secrets.DRIVE_FETCHER_GAS_URL }}
+          SECRET_KEY: "aZ3kP9xQw7LmN2vB8tRc"
+          FOLDER_NAME: "Muse"
+          FILE_NAME: "newslist.json"
+        run: |
+          mkdir -p data
+          DEST="data/newslist.json"
+          TMP_FILE="/tmp/newslist.json.tmp"
+          TARGET_URL="${GAS_URL}?folder=${FOLDER_NAME}&file=${FILE_NAME}&key=${SECRET_KEY}"
+
+          if ! curl -sSL --fail --retry 2 --connect-timeout 15 --max-time 45 "$TARGET_URL" -o "$TMP_FILE"; then
+            echo "❌ [Newslist] GAS通信エラー"
+            echo "| 2. ニュースリスト | \`data/newslist.json\` | ❌ 失敗 | GAS通信エラー |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          STATUS=$(jq -r 'if type == "object" then .status // empty else empty end' "$TMP_FILE" 2>/dev/null || echo "invalid")
+          if [ "$STATUS" = "error" ] || ! jq -e . "$TMP_FILE" > /dev/null 2>&1; then
+            echo "❌ [Newslist] GASエラーまたは無効なJSON"
+            head -n 10 "$TMP_FILE" || true
+            echo "| 2. ニュースリスト | \`data/newslist.json\` | ❌ 失敗 | JSON検証NG |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if [ -f "$DEST" ] && cmp -s "$TMP_FILE" "$DEST"; then
+            echo "⏭️ [Newslist] 本日のデータは取得済み（変更なし）のためスキップ"
+            echo "| 2. ニュースリスト | \`data/newslist.json\` | ⏭️ 更新なし | 変更なし（取得済み） |" >> "$GITHUB_STEP_SUMMARY"
+          else
+            mv "$TMP_FILE" "$DEST"
+            echo "✅ [Newslist] 更新完了"
+            echo "| 2. ニュースリスト | \`data/newslist.json\` | ✅ 更新完了 | 最新データを反映 |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ========================================================
+      # 3. 関東雨雲画像の回収 ＆ XREAクリーンアップ
+      # ========================================================
+      - name: "3. Setup Node.js for Cloud Images"
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: "3. Acquire KANTO Cloud Images & Cleanup"
+        continue-on-error: true
+        run: |
+          if node js/acquireCrowds.cjs; then
+            curl -s --max-time 2 "https://turiiko.shop/cloudGenerator2/cleanup.php" > /dev/null 2>&1 &
+            sleep 1
+            echo "✅ [Cloud Images] 雨雲画像の取得とクリーンアップ完了"
+            echo "| 3. 関東雨雲画像 | \`KANTO / 画像群\` | ✅ 実行完了 | フェッチ＆XREAクリーンアップ済 |" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "❌ [Cloud Images] スクリプト実行エラー"
+            echo "| 3. 関東雨雲画像 | \`KANTO / 画像群\` | ❌ 失敗 | acquireCrowds.cjs エラー |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      # ========================================================
+      # 4. 変更確認・コミット・プッシュ
+      # ========================================================
+      - name: "4. Commit and Push Changes"
+        id: commit
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 auto: 夕方のデータ定期同期 (18:00 JST)"
+            git pull --rebase --autostash origin main
+            git push origin main
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ **リポジトリへ変更をコミット＆プッシュしました。**" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "⏭️ **全データに変更がなかったため、コミットとデプロイをスキップしました。**" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ========================================================
+      # 5. GitHub Pages デプロイ（更新がある時 または 手動実行時のみ）
+      # ========================================================
+      - name: "5. Upload Pages Artifact"
+        if: steps.commit.outputs.pushed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './'
+
+      - name: "6. Deploy to GitHub Pages"
+        id: deployment
+        if: steps.commit.outputs.pushed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/deploy-pages@v4
