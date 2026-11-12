@@ -34,7 +34,7 @@ URL="https://turiiko.shop/agltest/export.php?key=kR7xQm2Zt9WbLp4NvY8dshoko&t=$(d
 TMP_FILE="/tmp/compiled_data.json.tmp"
 DEST="data/compiled_data.json"
 echo "Fetching: ￼
-HTTP_CODE=(curl -sSL -w "%{http_code}" -A "$UA" 
+￼(curl -sSL -w "%{http_code}" -A "$UA" 
 -H "Accept: application/json, text/plain, /" 
 -H "Accept-Language: ja,en-US;q=0.9,en;q=0.8" 
 --retry 3 --retry-delay 3 --connect-timeout 15 --max-time 60 
