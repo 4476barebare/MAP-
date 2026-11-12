@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-12T10:51:30+09:00",
-  "count": 156,
+  "generated": "2026-11-12T18:05:17+09:00",
+  "count": 158,
   "items": [
     {
       "date": "2026-12-13",
@@ -55,6 +55,150 @@
       "source_name": "PR TIMES",
       "source_url": "https://prtimes.jp/main/html/rd/p/000000373.000049154.html",
       "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=sankei.com&sz=128",
+      "thumbnail": "",
+      "title": "福島・小名浜港で今季初のサンマ水揚げ 9トンで2週間遅れ、小ぶりながら鮮度は良好",
+      "source_name": "産経ニュース",
+      "source_url": "https://www.sankei.com/article/20261112-WMZBCVR3DVMR5NB5TYEAQ2OQY4/",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=asahi.com&sz=128",
+      "thumbnail": "",
+      "title": "秦野市で山に放したクマが再出没、小学校の集団下校を見守り 再捕獲後に駆除",
+      "source_name": "朝日新聞",
+      "source_url": "https://www.asahi.com/articles/ASVC12GCXVC1UJUB007M.html",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-59.jpg?fit=1024%2C722&ssl=1",
+      "title": "常磐サーフのヒラメ釣り大会に300人超が参加、計65枚の釣果でにぎわう",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455379/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-47.jpg?fit=1024%2C722&ssl=1",
+      "title": "DRESSのフィッシュグリップとフックリリーサーを紹介、ライトターゲットから大型魚まで対応",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455114/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-44.jpg?fit=1024%2C722&ssl=1",
+      "title": "シマノのサーフロッド「26ネッサ XR」が5年ぶりにモデルチェンジ、ガイドやグリップを見直し",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455054/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/705aa5d875a5f688cf05f2be70f460cf.jpg?fit=1024%2C722&ssl=1",
+      "title": "鹿児島の秋の風物詩「秋太郎」バショウカジキのボートキャスティング、跳ねを探して追う釣り方を解説",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455117/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/2026111212web00.jpg",
+      "title": "水深500mの深場釣りで46cmの良型キンメダイ、大型クロムツや深海カニも【すどう丸】",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416708/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/2026111211web01.jpg",
+      "title": "福井の海上釣り堀でシマアジが5連発、食い渋りでも効いた対策を紹介",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416692/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106cb1501.jpg",
+      "title": "サワラキャスティングでマイクロベイトを攻略、ルアー選びと巻き速度のコツを解説",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416679/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106cb1200.jpg",
+      "title": "三重・愛知のティップランでアオリイカがサイズアップ、沖のルアー釣果速報5選",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416671/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/4f2ce4bf9f241b4ffd688c2ff76ea433.jpg",
+      "title": "岡山の港湾部でカサゴ狙いのワーム釣りに30cm級オニオコゼが食いつく",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416643/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106kt1501.jpg",
+      "title": "芦ノ湖のワカサギ釣りで398尾をキャッチ、7点掛けの鈴成りも",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416663/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/697d04dcd2c42ba6ebe25ffc582fb954.jpg",
+      "title": "釣った「ヒラ」を塩して置くだけの干しものレシピ、旨みがアップ",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416504/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106kt1801.jpg",
+      "title": "東京湾のコマセ五目釣りで3kg超えのワラサ、イサキはトップ58尾【平作丸】",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416656/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
+      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/c551ddcf68f490554d54d65e5acb8ef0.jpg?fit=1200%2C675&ssl=1",
+      "title": "奈良・平成榛原こどものもり公園で家族向けマス釣り体験教室を11月22日に開催、参加者募集中",
+      "source_name": "釣具新聞",
+      "source_url": "https://tsurigu-np.jp/news/33512/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
+      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-18.jpg?fit=1920%2C1440&ssl=1",
+      "title": "スポーツライフプラネッツが多摩川河川敷で清掃、従業員と家族27人がゴミ12.2kgを回収",
+      "source_name": "釣具新聞",
+      "source_url": "https://tsurigu-np.jp/news/33420/",
+      "category": "釣りニュース"
     },
     {
       "date": "2026-11-11",
@@ -229,15 +373,6 @@
     },
     {
       "date": "2026-11-11",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.fnn.jp&sz=128",
-      "thumbnail": "",
-      "title": "強い台風32号は南鳥島近海を東北東へ、12日には温帯低気圧に変わる見込み 太平洋側は高波に注意",
-      "source_name": "FNNプライムオンライン",
-      "source_url": "https://www.fnn.jp/articles/-/1150297",
-      "category": "台風"
-    },
-    {
-      "date": "2026-11-11",
       "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
       "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/02-2.jpg?fit=1024%2C722&ssl=1",
       "title": "ZENITHの2026年新作ベイトロッド「ルナティックピーク」登場 GT・ヒラマサ狙いの2機種 6万3800円から",
@@ -280,6 +415,15 @@
       "source_name": "釣具新聞",
       "source_url": "https://tsurigu-np.jp/news/32785/",
       "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-11",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "台風32号は11日夜に南鳥島近海で温帯低気圧に変わった 日本の周辺に台風はなし",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/ee590b55ca5c6ca9d7ebd82e874001ff6c58c0a1",
+      "category": "台風"
     },
     {
       "date": "2026-11-10",
@@ -1156,24 +1300,6 @@
     },
     {
       "date": "2026-11-06",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/0E118EF5-9CC8-483B-9C90-33A98D14D7ED.jpg?resize=768%2C1024&#038;ssl=1",
-      "title": "REAL FISHER『海老ジグ』、青物から根魚まで各地で釣果が続くエビ型メタルジグ",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454799/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-06",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2025/01/4e7a04814fea12948195fe1a33bc7a67.jpg?resize=1024%2C747&#038;ssl=1",
-      "title": "レヴォニック『シンディ』、0.8mm極薄ボディでキレのあるダートを生むジャークベイト",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454584/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-06",
       "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
       "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/05/ac686665fa584f8b6c16a10ca739fe36.jpg",
       "title": "船シロギス釣り入門、予約から服装・道具・エサの付け方・釣り方まで基本を解説",
@@ -1218,24 +1344,6 @@
       "category": "クマ出没"
     },
     {
-      "date": "2026-11-05",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/10/IMG_8237.jpeg?resize=800%2C542&#038;ssl=1",
-      "title": "静岡県・御前崎港の一部を釣り人に開放、60名が参加して釣りを楽しむ",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33066/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-05",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/10/DSC087041.jpg?resize=1024%2C595&#038;ssl=1",
-      "title": "北海道・苫小牧東港一本防波堤で『水辺感謝の日』清掃、約170人参加で約400袋のゴミを回収",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33141/",
-      "category": "釣りニュース"
-    },
-    {
       "date": "2026-11-04",
       "favicon": "https://www.google.com/s2/favicons?domain=news.web.nhk&sz=128",
       "thumbnail": "",
@@ -1254,33 +1362,6 @@
       "category": "クマ出没"
     },
     {
-      "date": "2026-11-04",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc268007-main.png",
-      "title": "キャスティング全店『ポイント活用7days』開催、最大2,000円引き（11/11～11/17）",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=268007",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-04",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-4.jpg?resize=1024%2C768&#038;ssl=1",
-      "title": "釣り糸メーカーのサンライン、山口・柳井市の海岸で清掃活動を実施し57袋分のゴミを回収",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33150/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-04",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc267997-main.png",
-      "title": "キャスティング、60歳以上会員向け『グランドジェネレーションDAY』で最大500円引き（11/9～11/15）",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=267997",
-      "category": "釣りニュース"
-    },
-    {
       "date": "2026-11-03",
       "favicon": "https://www.google.com/s2/favicons?domain=kushironews.jp&sz=128",
       "thumbnail": "",
@@ -1288,24 +1369,6 @@
       "source_name": "釧路新聞",
       "source_url": "https://kushironews.jp/2026/11/03/714861/",
       "category": "水産業"
-    },
-    {
-      "date": "2026-11-03",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/10/S__51429393_0-1.jpg?resize=800%2C578&#038;ssl=1",
-      "title": "三重・津市で釣具店『フィッシング遊』と地元中学生が海岸清掃とヒラメ稚魚の放流を実施",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33280/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-03",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/10/ae46b1f460ee46f789c27b264a6cb421-14.jpg?resize=610%2C402&#038;ssl=1",
-      "title": "横須賀市・長井新宿港でカワハギの稚魚3,000尾を放流、日本釣振興会神奈川県支部が実施",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33079/",
-      "category": "釣りニュース"
     },
     {
       "date": "2026-11-02",
@@ -1360,51 +1423,6 @@
       "source_name": "ミナギマン",
       "source_url": "https://minagiman.com/blog/26stephano-bb/",
       "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-01",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc207160-main.png",
-      "title": "キャスティング『キャスクイズ』11月前半、正解者1名にダイワのワカサギリールセットが当たる（11/1～15）",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=207160",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-01",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc267823-main.png",
-      "title": "キャスティング『釣り自慢』フォトコンテスト開催、カワハギ・ヒラメ・トラウトの3部門（11/1～12/31）",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=267823",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-10-30",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc267632-main.png",
-      "title": "『釣りフェス2027 in Yokohama』（2027年1月22～24日）の前売券をキャスティング店舗で販売中",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=267632",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-10-30",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc234254-main.png",
-      "title": "キャスティング公式アプリ限定のクーポンを配信中、店頭で提示して特典を受けられる",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=234254",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-10-30",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc146370-main.png",
-      "title": "キャスティング、毎月『3』の付く日は『3キャスDAY』全店で税込5,500円以上の買い物がポイント5倍",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=146370",
-      "category": "釣りニュース"
     }
   ]
 }
