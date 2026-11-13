@@ -1,5 +1,105 @@
 [
   {
+    "date": "2026/11/12",
+    "fish": "ハゼ",
+    "lat": 35.9723,
+    "lng": 139.8034,
+    "area_name": "江戸川",
+    "url": "https://x.com/Maruya_Yusen/status/2120745661041975529",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "ハゼ",
+    "lat": 35.7788,
+    "lng": 139.8967,
+    "area_name": "江戸川",
+    "url": "https://x.com/Maruya_Yusen/status/2120745661041975529",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "ハゼ",
+    "lat": 35.6792,
+    "lng": 139.9083,
+    "area_name": "江戸川",
+    "url": "https://x.com/Maruya_Yusen/status/2120745661041975529",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "アカムツ",
+    "lat": 35.7358,
+    "lng": 140.8353,
+    "area_name": "波崎港",
+    "url": "https://x.com/jintokumasa/status/2120745924872069213",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "アラ",
+    "lat": 35.7358,
+    "lng": 140.8353,
+    "area_name": "波崎港",
+    "url": "https://x.com/jintokumasa/status/2120745924872069213",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "ワラサ",
+    "lat": 35.7358,
+    "lng": 140.8353,
+    "area_name": "波崎港",
+    "url": "https://x.com/jintokumasa/status/2120745924872069213",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "クロムツ",
+    "lat": 35.7358,
+    "lng": 140.8353,
+    "area_name": "波崎港",
+    "url": "https://x.com/jintokumasa/status/2120745924872069213",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "ムシガレイ",
+    "lat": 35.7358,
+    "lng": 140.8353,
+    "area_name": "波崎港",
+    "url": "https://x.com/jintokumasa/status/2120745924872069213",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "アジ",
+    "lat": 35.7358,
+    "lng": 140.8353,
+    "area_name": "波崎港",
+    "url": "https://x.com/jintokumasa/status/2120745924872069213",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "クロダイ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2120746040584511979",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
     "date": "2026/11/11",
     "fish": "ワラサ",
     "lat": 35.9329,
@@ -586,6 +686,46 @@
     "lng": 139.7139,
     "area_name": "海辺つり公園",
     "url": "https://x.com/Castmode_jp/status/2120032294165496096",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/08",
+    "fish": "ヒラメ",
+    "lat": 36.82,
+    "lng": 140.78,
+    "area_name": "常磐サーフ",
+    "url": "https://x.com/lurenewstv/status/2120788693430759546",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/08",
+    "fish": "ヒラメ",
+    "lat": 36.6,
+    "lng": 140.66,
+    "area_name": "常磐サーフ",
+    "url": "https://x.com/lurenewstv/status/2120788693430759546",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/08",
+    "fish": "ヒラメ",
+    "lat": 36.37,
+    "lng": 140.6,
+    "area_name": "常磐サーフ",
+    "url": "https://x.com/lurenewstv/status/2120788693430759546",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/08",
+    "fish": "ヒラメ",
+    "lat": 36.17,
+    "lng": 140.58,
+    "area_name": "常磐サーフ",
+    "url": "https://x.com/lurenewstv/status/2120788693430759546",
     "source": "X",
     "model": "Grok"
   },

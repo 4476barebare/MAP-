@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-12T18:05:17+09:00",
-  "count": 158,
+  "generated": "2026-11-13T05:59:42+09:00",
+  "count": 162,
   "items": [
     {
       "date": "2026-12-13",
@@ -18,6 +18,15 @@
       "title": "【12月6日開催】逗子海岸で定例ビーチクリーン 毎月第1日曜に実施",
       "source_name": "735style",
       "source_url": "https://www.735style.org/post/2026年11月-ビーチクリーン",
+      "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-12-05",
+      "favicon": "https://www.google.com/s2/favicons?domain=topics.smt.docomo.ne.jp&sz=128",
+      "thumbnail": "",
+      "title": "【12月5日開催】幕張の浜で毎月恒例のビーチクリーン、手ぶら参加可でボランティア証明も発行",
+      "source_name": "ｄメニューニュース",
+      "source_url": "https://topics.smt.docomo.ne.jp/article/eventbank/region/eventbank-10654200",
       "category": "ビーチクリーンイベント"
     },
     {
@@ -198,6 +207,69 @@
       "title": "スポーツライフプラネッツが多摩川河川敷で清掃、従業員と家族27人がゴミ12.2kgを回収",
       "source_name": "釣具新聞",
       "source_url": "https://tsurigu-np.jp/news/33420/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.tv-asahi.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "駿河湾のシラスが豊漁、漁開始2カ月で去年1年分を上回る 網走港ではサンマが入れ食い状態に",
+      "source_name": "テレビ朝日",
+      "source_url": "https://news.tv-asahi.co.jp/news_economy/articles/900204059.html",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.fnn.jp&sz=128",
+      "thumbnail": "",
+      "title": "八王子市小津町でクマを撮影、同地区3回目の出没で市が箱わな設置 連日の目撃に「過去20年でこんな頻度はない」",
+      "source_name": "FNNプライムオンライン",
+      "source_url": "https://www.fnn.jp/articles/-/1151458",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.jp&sz=128",
+      "thumbnail": "",
+      "title": "秩父市田村でクマを目撃、12日夕方5時半ごろ",
+      "source_name": "NEWSjp",
+      "source_url": "https://news.jp/i/1493634439654654004",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/f4840c710191b997a73b13d3576f31b6.jpg?fit=1024%2C722&ssl=1",
+      "title": "爆風の大江川でソウルシャッドのボトム巻きが炸裂、3人1時間半でバス7匹をキャッチ",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455482/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/342e6f7f699f948080e802f4be7afb6a.jpg?fit=1024%2C722&ssl=1",
+      "title": "川村光大郎が語る晩秋〜初冬の切り札メタルバイブ「フルーミー」、シミーフォールでバスを誘う",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455082/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/232332.jpg?fit=1024%2C722&ssl=1",
+      "title": "ヤマガ「ブルーカレントⅢ 78」はアジングからエギング・タチウオまで1本でこなす汎用ロッド",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455161/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-12",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/02-3.jpg?fit=1024%2C722&ssl=1",
+      "title": "テイルウォークのスロージギングロッド「スローバンプSD」登場、疲れにくいグリップと高感度が特徴 全6機種",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455237/",
       "category": "釣りニュース"
     },
     {
@@ -1254,24 +1326,6 @@
       "category": "釣りニュース"
     },
     {
-      "date": "2026-11-07",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/01/75c140d3601436d9bf49d9f8aa3af58a-6.jpg?resize=1024%2C439&#038;ssl=1",
-      "title": "アクアウェーブ『半素手グローブ』、指先が出て素手感覚で使える極薄グローブ",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454343/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-07",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc268480-main.jpeg",
-      "title": "東京・東久留米の落合川で釣り場清掃を実施",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=268480",
-      "category": "釣りニュース"
-    },
-    {
       "date": "2026-11-06",
       "favicon": "https://www.google.com/s2/favicons?domain=news.web.nhk&sz=128",
       "thumbnail": "",
@@ -1297,24 +1351,6 @@
       "source_name": "dメニューニュース",
       "source_url": "https://topics.smt.docomo.ne.jp/article/fushinsha_joho/region/fushinsha_joho-1491240666374095483",
       "category": "クマ出没"
-    },
-    {
-      "date": "2026-11-06",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/05/ac686665fa584f8b6c16a10ca739fe36.jpg",
-      "title": "船シロギス釣り入門、予約から服装・道具・エサの付け方・釣り方まで基本を解説",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/400377/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-06",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/IMG_0621.jpg?resize=800%2C532&#038;ssl=1",
-      "title": "六甲マリンパークで『播州釣針・海釣り祭』、45名が参加しサゴシやタチウオが釣れる",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33140/",
-      "category": "釣りニュース"
     },
     {
       "date": "2026-11-05",
