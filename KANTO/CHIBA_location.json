@@ -797,7 +797,7 @@
     "icon": "spot"
   },
   {
-    "name": "船方港",
+    "name": "船形港",
     "zoom": 15,
     "individualId": "61",
     "lat": 35.023391,
@@ -1807,13 +1807,13 @@
     "icon": "spot"
   },
   {
-    "name": "奏川",
+    "name": "湊川",
     "zoom": 15,
     "individualId": "L71",
     "lat": 35.221049,
     "lng": 139.925416,
     "areaId": "CHIBA_MINAMI",
-    "notes": "奏川漁業協同組合",
+    "notes": "湊川漁業協同組合",
     "icon": "spot"
   },
   {
