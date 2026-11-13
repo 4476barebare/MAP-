@@ -597,11 +597,63 @@ window.regionWeatherAllDone = window.regionWeatherAllDone || {};
 window.regionWeatherAllPromises = window.regionWeatherAllPromises || {};
 window.regionWeatherAllResults = window.regionWeatherAllResults || {};
 
+function getTodayYmdJST() {
+    const now = new Date();
+    const jst = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
+    const y = jst.getFullYear();
+    const m = String(jst.getMonth() + 1).padStart(2, '0');
+    const d = String(jst.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+function calcWeatherDateDiffDays(jsonDateStr) {
+    if (!jsonDateStr || typeof jsonDateStr !== 'string') return 0;
+    const m = jsonDateStr.trim().match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (!m) return 0;
+    const jsonUtc = Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+
+    const now = new Date();
+    const jst = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
+    const todayUtc = Date.UTC(jst.getFullYear(), jst.getMonth(), jst.getDate());
+
+    const diff = Math.floor((todayUtc - jsonUtc) / 86400000);
+    return diff > 0 ? diff : 0;
+}
+
+function normalizeWeatherJsonByDate(data) {
+    if (!data || !data.spots || typeof data.spots !== 'object') return data;
+    const diffDays = calcWeatherDateDiffDays(data.date);
+    if (diffDays <= 0) return data;
+
+    for (const spotName of Object.keys(data.spots)) {
+        const w = data.spots[spotName];
+        if (!w || typeof w !== 'object') continue;
+
+        if (Array.isArray(w.hourly)) {
+            const hourlyLen = w.hourly.length;
+            if (diffDays < hourlyLen) {
+                w.hourly = w.hourly.slice(diffDays);
+            } else {
+                const dailySkip = diffDays - hourlyLen;
+                w.hourly = [];
+                if (Array.isArray(w.daily) && dailySkip > 0) {
+                    w.daily = w.daily.slice(dailySkip);
+                }
+            }
+        }
+    }
+
+    data.date = getTodayYmdJST();
+    return data;
+}
+
 function loadPrefWeatherJson(prefCode, inland = false) {
     if (!prefCode) return Promise.resolve(null);
     const regionCode = window.currentRegion || 'KANTO';
     const key = regionCode + '_' + (inland ? 'inland_' : 'coastal_') + prefCode;
-    if (window.prefWeatherJsonCache[key]) return Promise.resolve(window.prefWeatherJsonCache[key]);
+    if (window.prefWeatherJsonCache[key]) {
+        return Promise.resolve(normalizeWeatherJsonByDate(window.prefWeatherJsonCache[key]));
+    }
     if (window.prefWeatherJsonPromises[key]) return window.prefWeatherJsonPromises[key];
 
     const fileName = inland ? prefCode + '_InLandwhether.json' : prefCode + '_whether.json';
@@ -616,6 +668,7 @@ function loadPrefWeatherJson(prefCode, inland = false) {
             if (!data || !data.spots || typeof data.spots !== 'object') {
                 throw new Error("Weather JSON の spots が見つかりません: " + url);
             }
+            normalizeWeatherJsonByDate(data);
             window.prefWeatherJsonCache[key] = data;
             return data;
         })
