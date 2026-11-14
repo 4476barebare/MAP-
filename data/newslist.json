@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-14T06:02:37+09:00",
-  "count": 170,
+  "generated": "2026-11-14T18:01:14+09:00",
+  "count": 174,
   "items": [
     {
       "date": "2026-12-13",
@@ -39,6 +39,15 @@
       "category": "ビーチクリーンイベント"
     },
     {
+      "date": "2026-11-28",
+      "favicon": "https://www.google.com/s2/favicons?domain=prtimes.jp&sz=128",
+      "thumbnail": "",
+      "title": "【11月28日開催】鎌倉・由比ガ浜と逗子・小坪で「LOVE OCEAN」ビーチ＆港クリーン 手ぶら参加可",
+      "source_name": "PR TIMES",
+      "source_url": "https://prtimes.jp/main/html/rd/p/000000376.000049154.html",
+      "category": "ビーチクリーンイベント"
+    },
+    {
       "date": "2026-11-21",
       "favicon": "https://www.google.com/s2/favicons?domain=www.vln.metro.tokyo.lg.jp&sz=128",
       "thumbnail": "",
@@ -64,6 +73,141 @@
       "source_name": "PR TIMES",
       "source_url": "https://prtimes.jp/main/html/rd/p/000000373.000049154.html",
       "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.asahi.com&sz=128",
+      "thumbnail": "",
+      "title": "首都圏のクマ目撃、10月は神奈川が前年比5.4倍・埼玉が1.4倍に 木の実の不作が背景",
+      "source_name": "朝日新聞",
+      "source_url": "https://www.asahi.com/articles/ASVCF1515VCFUTIL022M.html?iref=_national_national_list_n",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/8089e50294910c6cb163e5cb54ad137b.jpg?fit=1024%2C722&ssl=1",
+      "title": "エギングで偏光グラスが効く5つの理由、Gillseeのレンズカラーの使い分けも解説",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455053/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-66.jpg?fit=1024%2C722&ssl=1",
+      "title": "第一精工「MCオマツリシャープナー」、糸がらみ解消ピックとフック研ぎを1本に",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455522/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-60.jpg?fit=1024%2C722&ssl=1",
+      "title": "ダイワのGORE-TEX防水グローブ、スマホ操作対応で遠赤外線の温もりをキープ",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455412/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-40.jpg?fit=1024%2C722&ssl=1",
+      "title": "デュエルのぶっ飛びシンペン「モンスターショット」と「ヘビーショット」の違いと使い分け",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/454886/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/dbc522619ead8082eb8dc58ad83c4e0a.jpg",
+      "title": "シーバスのサヨリパターン攻略法3選、ルアーと状況別の使い分けを解説",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416853/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/IMG_8790-1.jpg",
+      "title": "根室港で不漁のはずのサンマが大量接岸、岸壁から簡単に釣れる",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417084/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/b78fd2dbbe64dc2cbdfb5b3f02fa75fe.jpg",
+      "title": "福井・若狭の海岸でモクズガニ獲り、タモ網1本で2時間に7匹",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416822/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6.jpeg",
+      "title": "マルキューの人工エサ「ハイブリッドクロス」で投げキス釣り、釣れ具合は抜群も不満点あり",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416836/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106sb0300.jpg",
+      "title": "福岡・玄界灘の落とし込みでヒラマサが連発、最新釣果情報14選",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416935/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/33d082eb0a4d89549dfb13165328f4d5.jpg",
+      "title": "秋の青物ジギングで最凶の根掛かり、回避術と発生時の対応策を解説",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416798/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/image1-1.jpeg",
+      "title": "バスロッドのファストテーパーとは、先調子のメリット・デメリットと向いている釣りを解説",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416809/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261113kt0201.jpg",
+      "title": "堤防釣りに代わる家族向けイカダ釣り、大物のチャンスも",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416909/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/901c27ff6392d802422dee995229f4b4.jpg",
+      "title": "岡山の漁港でまきエサなしのサヨリ釣り、サイトフィッシングで15匹",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/416777/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-14",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
+      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-19.jpg?fit=1920%2C1440&ssl=1",
+      "title": "フリーノットの遠赤外線ソックス「光電子」、薄手で暖かく日常使いも",
+      "source_name": "釣具新聞",
+      "source_url": "https://tsurigu-np.jp/products/33419/",
+      "category": "釣りニュース"
     },
     {
       "date": "2026-11-13",
@@ -289,6 +433,24 @@
       "source_name": "釣具新聞",
       "source_url": "https://tsurigu-np.jp/news/33387/",
       "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.jp&sz=128",
+      "thumbnail": "",
+      "title": "岩手のサンマ水揚げが8〜10月で610トン、前年同期の1割で2009年以降最低",
+      "source_name": "NEWSjp",
+      "source_url": "https://news.jp/i/1493948057708101672",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "静岡の大学で「さんま祭り」、根室産サンマを1尾200円で販売 一方で鮮魚店は仕入れを断念",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/4861029a7b2a704add66c0e08bc7e1d1ed97b7f3",
+      "category": "水産業"
     },
     {
       "date": "2026-11-12",
@@ -1117,132 +1279,6 @@
       "source_name": "NEWSjp",
       "source_url": "https://news.jp/i/1492661026062909730",
       "category": "クマ出没"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/07/aaga-1.jpg?resize=1024%2C530&amp;ssl=1",
-      "title": "アブガルシアの名作スプーン「トビー」にエリアトラウト仕様「トビーエリア」が12月下旬登場",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454517/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/004.jpg?resize=1024%2C574&#038;ssl=1",
-      "title": "オクマの強力ベイトリール「KOMODO SS」、最大ドラグ13kgで大型ルアーと大型魚に対応",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455069/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/ae46b1f460ee46f789c27b264a6cb421-5.jpg?resize=1024%2C327&#038;ssl=1",
-      "title": "「釣りフェス2027」1月22〜24日にパシフィコ横浜で過去最大規模開催、前売券と限定ゴールドチケット発売中",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33284/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-21.jpg?resize=1024%2C722&#038;ssl=1",
-      "title": "ジャッカルからライトゲーム専用ダブルハンドル「65/70」が12月登場、カーボンシャフト採用で超軽量",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454534/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/75c140d3601436d9bf49d9f8aa3af58a-2.jpg?resize=1024%2C514&#038;ssl=1",
-      "title": "明邦化学工業「フリーボードケース」、スプーンとジグヘッド収納に特化した両面観音開きケース",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454550/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/J2048x1536-02708_0.jpg?resize=1024%2C768&#038;ssl=1",
-      "title": "ライトゲームのメソッド解説：手を止めてもルアーは潮に動く。「止める」操作の考え方",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455003/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/TOP-1.jpeg",
-      "title": "兵庫・垂水漁港でライトゲーム、豆アジがツ抜けし足元のカサゴが連発",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416173/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106cb0400.jpg",
-      "title": "福井・敦賀港の堤防エサ釣りでサヨリ好調、夫婦2人で74匹を釣る",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416519/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/1b894f277974e5566274348ae7c79cac.jpg",
-      "title": "東京湾・深川冨士見の仕立船でハゼ釣り、竿頭50尾で揚げたて天ぷらも堪能",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416474/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/2026110907web02-1-1.jpg",
-      "title": "関東の船釣り情報4選：湾奥タチウオ好調、ルアー五目でサワラ盛期、マダイ、魚の持ち込み食堂",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416512/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2024/08/fv.jpg?ssl=1",
-      "title": "メガバスのリスペクトカラー最新作「GPステインリアクション」、完全受注生産で受注は12月6日まで",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454907/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/9c9324b75a9f1dfdd4b5940226608ffb.jpg",
-      "title": "東京湾で親子釣り体験教室、平和島・まる八から13組26人が船アジ釣りに挑戦",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416453/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/IMG_0705.jpg?resize=800%2C463&#038;ssl=1",
-      "title": "日本釣振興会「水辺感謝の日」、大阪府の釣り場4カ所で167名が一斉清掃を実施",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33229/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/2-1.jpg",
-      "title": "関門マダイ1DAYバトル2026参戦記：良型マダイ不発もキジハタでアコウ賞を獲得",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416164/",
-      "category": "釣りニュース"
     },
     {
       "date": "2026-11-09",
