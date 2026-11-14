@@ -528,6 +528,10 @@ function formatPrefWeather(whether) {
         icon: Math.round(codeSum / codeCount),
         temp: Math.round(maxTemp),
         pop: displayPop, // ★ 修正：maxPop → displayPop
+        wind: Math.round(maxWind)
+    };
+}
+
 // ==========================================
 // ★ Prefスワイプ用①：RegionのCSVから県リストと位置関係を取得・グラフ化する関数
 // ==========================================
@@ -764,10 +768,6 @@ function disablePrefSwipe() {
     el.removeEventListener('touchstart', window._prefSwipeStart);
     el.removeEventListener('touchend', window._prefSwipeEnd);
     window._prefSwipeEnabled = false;
-}
-
-        wind: Math.round(maxWind)
-    };
 }
 
 function updateMapAlert(html) {
