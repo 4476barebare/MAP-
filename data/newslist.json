@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-13T18:03:18+09:00",
-  "count": 166,
+  "generated": "2026-11-14T06:02:37+09:00",
+  "count": 170,
   "items": [
     {
       "date": "2026-12-13",
@@ -207,6 +207,87 @@
       "title": "日本釣振興会が山口の小学校で環境学習、座学と釣り・稚魚放流で水辺の自然を学ぶ",
       "source_name": "釣具新聞",
       "source_url": "https://tsurigu-np.jp/news/33151/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.fnn.jp&sz=128",
+      "thumbnail": "",
+      "title": "世界初の完全養殖ウナギを商品化した大分・山田水産に市長賞詞、2028年度に10万匹の生産を目指す",
+      "source_name": "FNNプライムオンライン",
+      "source_url": "https://www.fnn.jp/articles/-/1151692",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "八王子市西寺方町でツキノワグマを撮影、13日未明に市が注意喚起",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/b9e9487113ad42e27b26ebedae64279a94a68da9",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=times.abema.tv&sz=128",
+      "thumbnail": "",
+      "title": "あきる野市入野でクマらしき動物を目撃、12日夜10時ごろに道路脇で",
+      "source_name": "ABEMA TIMES",
+      "source_url": "https://times.abema.tv/articles/-/10288842",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=cdn.sannichi.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "甲府市・笛吹川河川内でクマ2頭を目撃、13日夕方に市が注意喚起",
+      "source_name": "山梨日日新聞",
+      "source_url": "https://cdn.sannichi.co.jp/article/2026/11/13/80733710",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-65.jpg?fit=1024%2C722&ssl=1",
+      "title": "タフコン下で「海老ラバ」だけがアタリ連発、REAL FISHERのタイラバ3種の使い分けを実釣報告で解説",
+      "source_name": "LureNewsR",
+      "source_url": "https://www.lurenewsr.com/455480/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-54.jpg?fit=1024%2C722&ssl=1",
+      "title": "ダイワ「スティーズ GRANDEE Feel」に青木大介監修の追加2機種、12月発売へ",
+      "source_name": "LureNewsR",
+      "source_url": "https://www.lurenewsr.com/455277/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/03-1.jpg?fit=1024%2C722&ssl=1",
+      "title": "天龍ロッドを伊勢湾で試せる少人数実釣会「伊勢湾ジギングミーティング」12月6日開催、定員8名",
+      "source_name": "LureNewsR",
+      "source_url": "https://www.lurenewsr.com/455263/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/cde945c4f2ca6c9c14695a2008d332d2.jpg?fit=1024%2C722&ssl=1",
+      "title": "アオリイカ不調のティップラン、釣れる人と釣れない人の差は「基本動作」にあるとガイドが解説",
+      "source_name": "LureNewsR",
+      "source_url": "https://www.lurenewsr.com/455555/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-13",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
+      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-24.jpg?fit=1920%2C1440&ssl=1",
+      "title": "「にいがたフィッシングショー2027」来年2月13・14日に朱鷺メッセで開催決定、多数メーカー出展へ",
+      "source_name": "釣具新聞",
+      "source_url": "https://tsurigu-np.jp/news/33387/",
       "category": "釣りニュース"
     },
     {
@@ -1236,15 +1317,6 @@
       "category": "釣りニュース"
     },
     {
-      "date": "2026-11-09",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc267997-main.png",
-      "title": "キャスティングで60歳以上対象の割引デー、11月9日から15日まで最大500円引き",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=267997",
-      "category": "釣りニュース"
-    },
-    {
       "date": "2026-11-08",
       "favicon": "https://www.google.com/s2/favicons?domain=www.fnn.jp&sz=128",
       "thumbnail": "",
@@ -1297,42 +1369,6 @@
       "source_name": "LureNewsR",
       "source_url": "https://www.lurenewsr.com/454436/",
       "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-08",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/04/20170614itmgrp_imgls_12_imglsp_main_view.jpg?resize=600%2C85&#038;ssl=1",
-      "title": "FGノットを「速く・簡単に」結ぶためのコツを紹介",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/453984/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-08",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/06/001_main.jpg?resize=1024%2C682&#038;ssl=1",
-      "title": "ヤマシタのライトエギング用エギ「ナオリー レンジLS」、真下に落ちる水平フォールが特徴",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455001/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-08",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/ae58fd1ff8ee98b701eb7194436ef7c6.jpg?resize=1024%2C722&#038;ssl=1",
-      "title": "秦拓馬の連載「俺達。通信」、投げ続けるトップウォーターの釣りの魅力を語る",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454732/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-08",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/62.jpg?resize=1024%2C834&#038;ssl=1",
-      "title": "テイルウォーク『エラン スーパーワイドパワー』、最大ドラグ14kgの巨大魚向けベイトリール",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/454950/",
-      "category": "釣りニュース"
     },
     {
       "date": "2026-11-07",

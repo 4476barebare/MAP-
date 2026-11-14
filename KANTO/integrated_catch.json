@@ -1,5 +1,55 @@
 [
   {
+    "date": "2026/11/13",
+    "fish": "アユ",
+    "lat": 35.7864,
+    "lng": 139.8694,
+    "area_name": "水元公園",
+    "url": "https://x.com/dashigakari/status/2121105922336645121",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "クロダイ",
+    "lat": 35.9329,
+    "lng": 140.6974,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2121088313729941846",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "ブラックバス",
+    "lat": 35.2147,
+    "lng": 140.0883,
+    "area_name": "亀山ダム",
+    "url": "https://x.com/tsuri_map/status/2121151179543486465",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "マダイ",
+    "lat": 35.9515,
+    "lng": 140.6693,
+    "area_name": "鹿嶋旧港",
+    "url": "https://www.instagram.com/p/Dfqo19_DyOk/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "ブラックバス",
+    "lat": 36.4773,
+    "lng": 138.8783,
+    "area_name": "榛名湖",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0toFtpJdHYodmzSYXuDZmVWmX2GKhMjWetzSj2yyazjB36wVSDL7A3dHuo9XGnHSWl&id=100005146321267",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/12",
     "fish": "ハゼ",
     "lat": 35.9723,
@@ -98,6 +148,46 @@
     "url": "https://x.com/KashimaUoturien/status/2120746040584511979",
     "source": "X",
     "model": "Grok"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "シーバス",
+    "lat": 35.6,
+    "lng": 139.9,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/mangrovestudio/posts/pfbid02kmNCJW2Zh9XFNa8QEbBi3bpsyuGdcA9DP5E7EkxVZsPp6jiFgr8vTnRFgSS4oXL4l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "シーバス",
+    "lat": 35.48,
+    "lng": 139.85,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/mangrovestudio/posts/pfbid02kmNCJW2Zh9XFNa8QEbBi3bpsyuGdcA9DP5E7EkxVZsPp6jiFgr8vTnRFgSS4oXL4l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "シーバス",
+    "lat": 35.36,
+    "lng": 139.72,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/mangrovestudio/posts/pfbid02kmNCJW2Zh9XFNa8QEbBi3bpsyuGdcA9DP5E7EkxVZsPp6jiFgr8vTnRFgSS4oXL4l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/12",
+    "fish": "シーバス",
+    "lat": 35.2,
+    "lng": 139.74,
+    "area_name": "東京湾",
+    "url": "https://www.facebook.com/mangrovestudio/posts/pfbid02kmNCJW2Zh9XFNa8QEbBi3bpsyuGdcA9DP5E7EkxVZsPp6jiFgr8vTnRFgSS4oXL4l",
+    "source": "Facebook",
+    "model": "Muse"
   },
   {
     "date": "2026/11/11",
