@@ -57,6 +57,8 @@ async function pref_management(prefCode = window.currentPref) {
     const regionCode = window.currentRegion || 'KANTO';
     window.currentPref = prefCode;
     window.prefLocationUrl = `/${regionCode}/${prefCode}_location.json`;
+    window._prefMarkersReady = false;
+    window._prefAreaUIReady = false;
 
     const mapExistedBefore = !!window.map;
 
@@ -134,6 +136,8 @@ async function pref_management(prefCode = window.currentPref) {
 // ==========================================
 async function showPrefMarkers() {
     if (window.currentSpotId) {
+        window._prefMarkersReady = true;
+        tryEnableNearestClick();
         return;
     }
     if (typeof showAllRegionSpots !== 'function') {
@@ -143,6 +147,8 @@ async function showPrefMarkers() {
     if (typeof showPrefSpots === 'function') {
         showPrefSpots();
     }
+    window._prefMarkersReady = true;
+    tryEnableNearestClick();
 }
 
 // ==========================================
@@ -209,8 +215,17 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
 
 // ==========================================
 // PREF画面UI・天気・気象警報
-// ※ 初回移動では関数の記述内容を変更しない
 // ==========================================
+
+// マーカー表示とエリアUI描画の両方が完了した場合だけ地図クリックを有効化
+function tryEnableNearestClick() {
+    if (!window._prefMarkersReady || !window._prefAreaUIReady) return;
+    if (!window.map || !window.nearestClickHandler || window._nearestClickRegistered) return;
+
+    window.nearestClickEnabled = true;
+    window.map.on('click', window.nearestClickHandler);
+    window._nearestClickRegistered = true;
+}
 
 function initAreaUI() {
 
@@ -331,8 +346,8 @@ function initAreaUI() {
         selectArea(nearest);
     };
 
-    window.nearestClickEnabled = true;
-    window.map.on('click', window.nearestClickHandler);
+    window._prefAreaUIReady = true;
+    tryEnableNearestClick();
 }
 
 function destroyAreaUI() {
@@ -351,6 +366,8 @@ function destroyAreaUI() {
         window.nearestClickHandler = null;
     }
 
+    window._nearestClickRegistered = false;
+    window._prefAreaUIReady = false;
     window.nearestClickEnabled = false;
     document.getElementById('map-menu').style.display = 'none';
 }
