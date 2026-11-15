@@ -1,5 +1,95 @@
 [
   {
+    "date": "2026/11/14",
+    "fish": "ヒラメ",
+    "lat": 36.273,
+    "lng": 140.565,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/maggie_fishing/status/2121427080227569750",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "ヒラメ",
+    "lat": 36.075,
+    "lng": 140.64,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/maggie_fishing/status/2121427080227569750",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "ヒラメ",
+    "lat": 35.845,
+    "lng": 140.775,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/maggie_fishing/status/2121427080227569750",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "アジ",
+    "lat": 36.8306,
+    "lng": 140.8037,
+    "area_name": "大津港",
+    "url": "https://x.com/min39copecope/status/2121400418907693564",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "フナ",
+    "lat": 36.2308,
+    "lng": 139.5292,
+    "area_name": "近藤沼",
+    "url": "https://x.com/m6Ldmi5bSxtoitk/status/2121517127131648440",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "ニゴイ",
+    "lat": 36.2308,
+    "lng": 139.5292,
+    "area_name": "近藤沼",
+    "url": "https://x.com/m6Ldmi5bSxtoitk/status/2121517127131648440",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "アジ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/eFootballojsan/status/2121577779607355840",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "ブラックバス",
+    "lat": 36.4773,
+    "lng": 138.8783,
+    "area_name": "榛名湖",
+    "url": "https://x.com/gunbassman12/status/2121575461184827397",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/14",
+    "fish": "メジナ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://www.threads.com/@tapipi_cycle/post/DfuGCl7GsFa",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/13",
     "fish": "アユ",
     "lat": 35.7864,
@@ -47,6 +137,46 @@
     "area_name": "榛名湖",
     "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0toFtpJdHYodmzSYXuDZmVWmX2GKhMjWetzSj2yyazjB36wVSDL7A3dHuo9XGnHSWl&id=100005146321267",
     "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "アジ",
+    "lat": 35.5457,
+    "lng": 140.0683,
+    "area_name": "オリジナルメーカー海づり公園",
+    "url": "https://x.com/udon_a_udon_a/status/2121202759445942679",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "カタクチイワシ",
+    "lat": 35.5457,
+    "lng": 140.0683,
+    "area_name": "オリジナルメーカー海づり公園",
+    "url": "https://x.com/udon_a_udon_a/status/2121202759445942679",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "サッパ",
+    "lat": 35.5457,
+    "lng": 140.0683,
+    "area_name": "オリジナルメーカー海づり公園",
+    "url": "https://x.com/udon_a_udon_a/status/2121202759445942679",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/13",
+    "fish": "シーバス",
+    "lat": 36.3375,
+    "lng": 140.5847,
+    "area_name": "那珂川",
+    "url": "https://www.threads.com/@stand_by_jii/post/DfsMYyBgYoG",
+    "source": "Threads",
     "model": "Muse"
   },
   {
