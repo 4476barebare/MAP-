@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-15T18:01:13+09:00",
-  "count": 176,
+  "generated": "2026-11-16T06:08:03+09:00",
+  "count": 180,
   "items": [
     {
       "date": "2026-12-13",
@@ -54,6 +54,15 @@
       "title": "【11月21日開催】片瀬東浜海岸で『第229回海さくらゴミ拾い』 ボランティアを募集中",
       "source_name": "東京都ボランティア・市民活動センター",
       "source_url": "https://www.vln.metro.tokyo.lg.jp/join/info/894405",
+      "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=sunsetbeachpark.jp&sz=128",
+      "thumbnail": "",
+      "title": "【11月21日開催】千葉・稲毛海浜公園いなげの浜でビーチクリーン「GO!GO!ボランティア」 参加無料・申込締切11月18日",
+      "source_name": "SUNSET BEACH PARK INAGE",
+      "source_url": "https://sunsetbeachpark.jp/%e3%80%90%e5%8d%83%e8%91%89%e9%96%8b%e5%ba%9c900%e5%b9%b4%e8%a8%98%e5%bf%b5%e3%80%912026%e5%b9%b411%e6%9c%8821%e6%97%a5%e5%9c%9f-gogo%e3%83%9c%e3%83%a9%e3%83%b3%e3%83%86%e3%82%a3%e3%82%a2/2026/11/15/",
       "category": "ビーチクリーンイベント"
     },
     {
@@ -190,6 +199,69 @@
       "source_name": "鎌暮らし",
       "source_url": "https://kamakurashi.com/gyoji/enosui-ecoday-194/",
       "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-11-15",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "島根県沖でズワイガニ漁の底引き網漁船同士が衝突し1隻沈没、乗組員10人全員救助 8人が搬送され3人が入院",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/5478b56b0430647ee8bea504c30140f79516cf5c",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-15",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.kobe-np.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "播磨灘の養殖カキが例年並みの出来栄えに回復、昨年の大量死から立ち直り水揚げ始まる",
+      "source_name": "神戸新聞",
+      "source_url": "https://www.kobe-np.co.jp/news/society/202611/0021036126.shtml",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-15",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.asahi.com&sz=128",
+      "thumbnail": "",
+      "title": "沖縄・読谷村の都屋漁港でスマガツオ約4トンを水揚げ、漁協は「数十年ぶりの大漁」と喜ぶ",
+      "source_name": "朝日新聞",
+      "source_url": "https://www.asahi.com/articles/ASVCG2T9PVCGDIFI004M.html?iref=ogimage_rek",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-15",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2025/06/ontheblue_yoko-1.jpg?resize=1024%2C300&ssl=1",
+      "title": "遊漁船発ブランドON THE BLUE、SLJとタイラバを1本でこなすバーチカル特化ロッド2機種を発売",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455414/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-15",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/57acf72a279cfee56322e45698fb6a4e.jpg?resize=1024%2C722&ssl=1",
+      "title": "フィンチの定番パーカー「ラビダ スウェット フーディー」2026年モデル登場、新色2色でフードの立ちにこだわり",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455403/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-15",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/125051-12-a3b68d1436664d79bcc8ebf282360368-3181x2121-1.webp?resize=1200%2C800&ssl=1",
+      "title": "DUO×有楽製菓「ブラックサンダールアー」が新パッケージで再登場、12月10日発売へ",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455026/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-15",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/03-2.png?resize=1024%2C777&ssl=1",
+      "title": "スミスが2027年チャビング新製品を動画で予告、専用ミノー「水鞠」など3アイテムがチラ見え",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455269/",
+      "category": "釣りニュース"
     },
     {
       "date": "2026-11-14",
@@ -1242,42 +1314,6 @@
       "title": "秋の大阪湾はサバが好反応でサバフグは減少の兆し",
       "source_name": "TSURINEWS",
       "source_url": "https://tsurinews.jp/416324/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-10",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106sb1100.jpg",
-      "title": "福岡・玄界灘の落とし込みで10kg超ヒラマサや大型ヒラメとマダイも好調",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416597/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-10",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106cb1701.jpg",
-      "title": "伊勢湾奥のサワラ狙いは高速巻きが不発でスロー巻きでサゴシとワラサ",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416589/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-10",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/IMG_6100.jpg",
-      "title": "福島・相馬沖のヒラメ釣りは代用エサ「銀兵」で17尾の竿頭",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416478/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-10",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261106hr0201.jpg",
-      "title": "栃木・栗谷沢ダムは宙釣り不可の小規模ダム湖でヘラブナ攻略",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416582/",
       "category": "釣りニュース"
     },
     {
