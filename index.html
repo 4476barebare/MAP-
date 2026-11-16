@@ -2878,7 +2878,7 @@ const DepthMapController = (function() {
                                 const group = item.group || 'default';
                                 if (!groupsMap[group]) groupsMap[group] = [];
                                 groupsMap[group].push(points.map(point =>
-                                    L.latLng(point[0], point[1])
+                                    typeof L !== 'undefined' ? L.latLng(point[0], point[1]) : point
                                 ));
                             }
                         }
@@ -2934,42 +2934,46 @@ const DepthMapController = (function() {
         return maskDataPromise;
     }
 
-    // Leaflet 1.9.4の実際の描画更新メソッド_redrawを拡張する。
-    // 描画後に同じCanvasへdestination-outでマスクを適用する。
-    const MaskedCanvasRenderer = L.Canvas.extend({
-        _redraw: function() {
-            L.Canvas.prototype._redraw.call(this);
+    // Leaflet 1.9.4の実際の描画更新メソッド_redrawを拡張する（L未定義時の即時評価エラーを防ぐため遅延生成）。
+    let MaskedCanvasRenderer = null;
+    function getMaskedCanvasRendererClass() {
+        if (MaskedCanvasRenderer) return MaskedCanvasRenderer;
+        if (typeof L === 'undefined' || !L.Canvas) return null;
+        MaskedCanvasRenderer = L.Canvas.extend({
+            _redraw: function() {
+                L.Canvas.prototype._redraw.call(this);
 
-            if (!this._map || !this._ctx || !this._bounds) return;
+                if (!this._map || !this._ctx || !this._bounds) return;
 
-            const ctx = this._ctx;
-            const bounds = this._bounds;
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.fillStyle = '#000';
+                const ctx = this._ctx;
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.fillStyle = '#000';
 
-            MASK_POLYGONS.forEach(polygon => {
-                ctx.beginPath();
-                polygon.forEach((ll, index) => {
-                    const point = this._map.latLngToLayerPoint(L.latLng(ll[0], ll[1]));
-                    // Leaflet Canvasは_ctxに-bounds.minのtranslateを設定済み。
-                    // ここでbounds.minを再度引くとマスクが画面外へずれる。
-                    const x = point.x;
-                    const y = point.y;
-                    if (index === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
+                MASK_POLYGONS.forEach(polygon => {
+                    ctx.beginPath();
+                    polygon.forEach((ll, index) => {
+                        const point = this._map.latLngToLayerPoint(L.latLng(ll[0], ll[1]));
+                        const x = point.x;
+                        const y = point.y;
+                        if (index === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.fill();
                 });
-                ctx.closePath();
-                ctx.fill();
-            });
 
-            ctx.restore();
-        }
-    });
+                ctx.restore();
+            }
+        });
+        return MaskedCanvasRenderer;
+    }
 
     function createDepthLayers(map, parsedLayers) {
+        const RendererClass = getMaskedCanvasRendererClass();
+        if (!map || !RendererClass) return;
         parsedLayers.forEach(layerData => {
-            const renderer = new MaskedCanvasRenderer({
+            const renderer = new RendererClass({
                 pane: 'overlayPane',
                 padding: 1.5
             });
@@ -3030,7 +3034,7 @@ const DepthMapController = (function() {
         },
 
         initAndShow: function(leafletMap) {
-            if (!leafletMap) return Promise.resolve();
+            if (!leafletMap || typeof L === 'undefined') return Promise.resolve();
             mapInstance = leafletMap;
 
             if (loadPromise) return loadPromise;
