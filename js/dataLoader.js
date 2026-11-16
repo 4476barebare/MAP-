@@ -2522,38 +2522,7 @@ function calcAccessInfo(spotLat, spotLng) {
     });
 }
 
-// ==========================================
-// ★ 本番用：アクセス情報をHTML(DOM)に書き出す関数
-// ==========================================
-function renderAccessInfo(spot) {
-    const container = document.getElementById('accessInfoBox');
-    if (!container || !spot || !spot.lat || !spot.lng) {
-        if (container) container.style.display = 'none';
-        return;
-    }
-
-    const accessTexts = calcAccessInfo(spot.lat, spot.lng);
-
-    if (accessTexts.length === 0) {
-        container.style.display = 'none';
-        return;
-    }
-
-    let html = `<h3>${spot.name}の周辺アクセス情報</h3>`;
-    html += '<ul>';
-    accessTexts.forEach(text => {
-        html += `<li>${text}</li>`;
-    });
-    html += '</ul>';
-
-    container.innerHTML = html;
-    container.style.display = 'block';
-
-    // 👇 【ここに追加】アクセス情報を描画した直後に「最寄り釣具店」を描画
-    if (typeof renderShopSection === 'function') {
-        renderShopSection(spot);
-    }
-}
+// renderAccessInfo は /js/spotLoader.js へ移動済み
 // ==========================================
 // ★ 新規：最寄りの釣具店を描画する関数（ロジック修正・番号なし版）
 // ==========================================
@@ -2636,7 +2605,12 @@ function renderShopSection(spot) {
 
     html += `</div>`;
     shopDiv.innerHTML = html;
-    accessBox.appendChild(shopDiv);
+    const nextSection = document.getElementById('spot-fish-section') || document.getElementById('spot-catch-section');
+    if (nextSection && nextSection.parentNode === accessBox) {
+        accessBox.insertBefore(shopDiv, nextSection);
+    } else {
+        accessBox.appendChild(shopDiv);
+    }
 }
 // ==========================================
 // ★ 新規：20km圏内のリアルタイム釣果を描画する関数 (setTimeout削除のクリーン版)

@@ -1,5 +1,5 @@
 // ==========================================
-// 逆引き辞書JSONローダー ＆ スポット詳細遷移（spotLoader.js）
+// 逆引き辞書JSONローダー ＆ スポット詳細制御（spotLoader.js）
 // ==========================================
 window.prefDictionaryCache = window.prefDictionaryCache || {};
 window.prefDictionaryPromises = window.prefDictionaryPromises || {};
@@ -56,15 +56,144 @@ function loadPrefDictionaryJson(prefCode = window.currentPref) {
 window.loadPrefDictionaryJson = loadPrefDictionaryJson;
 
 // ==========================================
-// スポット詳細画面へのズーム遷移（同時に逆引き辞書JSONをロード）
+// 逆引き辞書からスポット情報を取得するヘルパー
+// ==========================================
+function getSpotDictionaryEntry(spot) {
+    if (!spot || !spot.name) return null;
+    const spotName = String(spot.name).trim();
+    const regionCode = window.currentRegion || 'KANTO';
+    const prefCode = spot._prefCode || (spot.areaId ? String(spot.areaId).split('_')[0] : '') || window.currentPref;
+
+    if (prefCode && window.prefDictionaryCache) {
+        const cleanPref = String(prefCode).trim().split('/').pop().split('_')[0];
+        const key = regionCode + '_' + cleanPref;
+        if (window.prefDictionaryCache[key] && window.prefDictionaryCache[key][spotName]) {
+            return window.prefDictionaryCache[key][spotName];
+        }
+    }
+
+    if (window.spotDictionary && window.spotDictionary[spotName]) {
+        return window.spotDictionary[spotName];
+    }
+
+    if (window.prefDictionaryCache) {
+        for (const k of Object.keys(window.prefDictionaryCache)) {
+            const dict = window.prefDictionaryCache[k];
+            if (dict && dict[spotName]) {
+                return dict[spotName];
+            }
+        }
+    }
+
+    return null;
+}
+window.getSpotDictionaryEntry = getSpotDictionaryEntry;
+
+// ==========================================
+// スポット詳細情報（逆引き辞書＋周辺アクセス情報）をDOMに描画
+// ==========================================
+function escapeSpotHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function renderAccessInfo(spot) {
+    const container = document.getElementById('accessInfoBox');
+    if (!container || !spot || !spot.lat || !spot.lng) {
+        if (container) container.style.display = 'none';
+        return;
+    }
+
+    const dictEntry = getSpotDictionaryEntry(spot);
+    const accessTexts = typeof calcAccessInfo === 'function' ? calcAccessInfo(spot.lat, spot.lng) : [];
+
+    // 1. waterName + 半角スペース + regionalName（未設定・存在しなければ省略）
+    const waterName = dictEntry && dictEntry.waterName ? String(dictEntry.waterName).trim() : '';
+    const regionalName = dictEntry && dictEntry.regionalName ? String(dictEntry.regionalName).trim() : '';
+    const waterRegionalText = [waterName, regionalName].filter(Boolean).join(' ');
+
+    // 2. alternateName と fishingCooperative（1行改行し上に詰めて横並び・右揃え）
+    let altText = '';
+    if (dictEntry && dictEntry.alternateName) {
+        if (Array.isArray(dictEntry.alternateName)) {
+            altText = dictEntry.alternateName.map(a => String(a).trim()).filter(Boolean).join('・');
+        } else {
+            altText = String(dictEntry.alternateName).trim();
+        }
+    }
+    const coopText = dictEntry && dictEntry.fishingCooperative ? String(dictEntry.fishingCooperative).trim() : '';
+
+    // 3. description
+    const descText = dictEntry && dictEntry.description ? String(dictEntry.description).trim() : '';
+
+    let html = '<div class="spot-header-wrap">';
+    if (waterRegionalText) {
+        html += `<div class="spot-water-regional">${escapeSpotHtml(waterRegionalText)}</div>`;
+    }
+    html += `<h3 class="spot-main-title">${escapeSpotHtml(spot.name)}</h3>`;
+    if (altText || coopText) {
+        html += '<div class="spot-sub-meta">';
+        if (altText) {
+            html += `<span class="spot-alt-name">${escapeSpotHtml(altText)}</span>`;
+        }
+        if (coopText) {
+            html += `<span class="spot-coop-name">${escapeSpotHtml(coopText)}</span>`;
+        }
+        html += '</div>';
+    }
+    html += '</div>';
+
+    if (descText) {
+        const descClass = accessTexts.length > 0 ? 'spot-description has-access-list' : 'spot-description';
+        html += `<p class="${descClass}">${escapeSpotHtml(descText)}</p>`;
+    }
+
+    if (accessTexts.length > 0) {
+        html += '<ul class="spot-access-list">';
+        accessTexts.forEach(text => {
+            html += `<li>${text}</li>`;
+        });
+        html += '</ul>';
+    }
+
+    // 初期ガイドが残っている場合はクリアし、#spot-access-main のみ更新して後続セクション（釣具店・対象魚・釣果）を維持
+    if (container.querySelector('#default-site-guide')) {
+        container.innerHTML = '';
+    }
+
+    let mainBlock = document.getElementById('spot-access-main');
+    if (!mainBlock || mainBlock.parentNode !== container) {
+        mainBlock = document.createElement('div');
+        mainBlock.id = 'spot-access-main';
+        container.insertBefore(mainBlock, container.firstChild);
+    }
+    mainBlock.innerHTML = html;
+    container.style.display = 'block';
+
+    if (typeof renderShopSection === 'function') {
+        renderShopSection(spot);
+    }
+}
+window.renderAccessInfo = renderAccessInfo;
+
+// ==========================================
+// スポット詳細画面へのズーム遷移
 // ==========================================
 function zoomToSpot(spot) {
     if (!window.map || !spot) return;
 
-    // ★ スポット所属県（または現在選択中の県）の逆引き辞書JSONを非同期で先行ロード
+    // ★ スポット所属県（または現在選択中の県）の逆引き辞書JSONを非同期でロードし、完了時に表示を更新
     const targetPrefCode = spot._prefCode || (spot.areaId ? String(spot.areaId).split('_')[0] : '') || window.currentPref;
     if (typeof loadPrefDictionaryJson === 'function' && targetPrefCode) {
-        loadPrefDictionaryJson(targetPrefCode);
+        loadPrefDictionaryJson(targetPrefCode).then(dict => {
+            if (dict && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
+                renderAccessInfo(spot);
+            }
+        });
     }
 
     if (!spot.zoom || spot.zoom === '') {
