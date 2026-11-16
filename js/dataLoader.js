@@ -192,7 +192,7 @@ async function drawLocation(name, lat, lng, zoom, options = {}) {
     window.phase2Group = L.layerGroup().addTo(window.map);
 
     window.gsiLayer = L.tileLayer(
-      window.gsiLayers.ort,
+      window.currentSpotBaseTile || window.gsiLayers.ort,
       {
         attribution: '© 国土地理院',
         keepBuffer: 0, // ★ 初回表示時は画面外の余分なタイル取得をゼロにし、表示領域のタイルだけに全帯域を集中させる

@@ -1,5 +1,12 @@
 // ==========================================
-// 逆引き辞書JSONローダー ＆ スポット詳細制御（spotLoader.js）
+// 逆引き辞書JSONローダー ＆ スポット詳細ロード管理（spotLoader.js）
+//
+// 方針（prefLoader.js の pref_management と同設計）
+//  1. 対象スポットの所属県 location.json だけを loadPrefectureSpots(prefCode, 'select') で取得し、
+//     対象スポットの座標・ズーム・タイルで drawLocation() を最優先開始・完了させる。
+//  2. drawLocation() 完了後、後続のスポット画面描画（逆引き辞書・アクセス情報・zoomToSpot）を開始。
+//  3. 天気・魚種・釣具店データもまず対象スポットの所属県（select）だけを先行取得して即時反映。
+//  4. 所属県の先行処理が終わった後、裏で他県データ（other -> all）と他県天気を順次取得。
 // ==========================================
 window.prefDictionaryCache = window.prefDictionaryCache || {};
 window.prefDictionaryPromises = window.prefDictionaryPromises || {};
@@ -181,17 +188,293 @@ function renderAccessInfo(spot) {
 window.renderAccessInfo = renderAccessInfo;
 
 // ==========================================
+// スポット詳細画面のドラッグ境界・ズームガード更新ヘルパー
+// ==========================================
+function updateSpotMaxBounds(safe) {
+    if (!window.map || !safe || !safe.zoom || String(safe.zoom).trim() === '') return;
+    const typeParts = (safe.type || '').split('$');
+    const isSpecial = typeParts.includes('special');
+
+    window.map.setMaxBounds(null);
+    let bounds = window.map.getBounds();
+    let zoomLimit;
+
+    if (isSpecial || safe.zoom < 14) {
+        const paddingDiff = 14 - safe.zoom;
+        bounds = bounds.pad(paddingDiff);
+        zoomLimit = 14;
+    } else {
+        zoomLimit = safe.zoom;
+    }
+
+    if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
+        const fishList = safe.URL.split(',');
+        fishList.forEach(item => {
+            const parts = item.split('|');
+            const fLat = parseFloat(parts[1]);
+            const fLng = parseFloat(parts[2]);
+            if (!isNaN(fLat) && !isNaN(fLng)) {
+                bounds.extend([fLat, fLng]);
+            }
+        });
+    }
+
+    bounds = bounds.pad(0.05);
+
+    window.map.setMaxBounds(bounds);
+    window.map.options.maxBoundsViscosity = 1.0;
+
+    window._zoomGuardBase = zoomLimit;
+    window._zoomGuardActive = true;
+    window.map.setMinZoom(zoomLimit);
+}
+window.updateSpotMaxBounds = updateSpotMaxBounds;
+
+// ==========================================
+// spot_management：SPOT画面の最優先ロード管理（pref_management と同設計）
+// ==========================================
+async function spot_management(prefCode = window.currentPref, areaId = window.currentAreaId, spotId = window.currentSpotId) {
+    if (!prefCode || !spotId) return false;
+
+    const regionCode = window.currentRegion || 'KANTO';
+    window.currentPref = prefCode;
+    window.prefLocationUrl = `/${regionCode}/${prefCode}_location.json`;
+    window.prefWeatherUrl = `/data/${prefCode}_whether.json`;
+    window.prefInlandWeatherUrl = `/data/${prefCode}_InLandwhether.json`;
+    window.prefShopUrl = `/${regionCode}/${prefCode}_shop.json`;
+    // drawLocation完了前に魚データの通信が走らないよう一旦nullにする
+    window.fishUrl = null;
+
+    if (window.nearestClickHandler && window.map) {
+        window.map.off('click', window.nearestClickHandler);
+    }
+    window._nearestClickRegistered = false;
+
+    const mapExistedBefore = !!window.map;
+    if (window.map) {
+        window.map.setMinZoom(0);
+        window.map.setMaxZoom(18);
+        window.map.setMaxBounds(null);
+        window.map.options.maxBoundsViscosity = 0;
+        window.map.stop();
+    }
+
+    // ---------- 1. 最優先：対象スポット所属県（select）のデータのみ取得してターゲットを特定 ----------
+    const isRegionReady = await loadRegionCSV();
+    if (!isRegionReady) return false;
+
+    await loadPrefectureSpots(prefCode, 'select');
+    if (typeof loadLocationJSON === 'function') {
+        await loadLocationJSON();
+    }
+
+    const spotParts = String(spotId).split('_');
+    const safeAreaId = areaId || '';
+    const targetIndivId = spotParts[2] || spotParts[0];
+    const list = (window.spotData || []).filter(s => String(s.areaId) === safeAreaId);
+    const spot = list.find(s => String(s.individualId) === String(targetIndivId))
+        || (window.spotData || []).find(s => String(s.individualId) === String(targetIndivId));
+
+    if (!spot) {
+        console.error('spot_management: 対象スポットが見つかりません:', prefCode, areaId, spotId);
+        return false;
+    }
+
+    if (!window.currentAreaId && spot.areaId) {
+        window.currentAreaId = spot.areaId;
+    }
+    const finalAreaId = window.currentAreaId || safeAreaId;
+    const parentArea = (window.areaData || []).find(a => finalAreaId.endsWith(a.individualId));
+
+    const hasSpotZoom = !!(spot.zoom && String(spot.zoom).trim() !== '');
+    const typeParts = (spot.type || '').split('$');
+    const isSpecial = typeParts.includes('special');
+    const targetZoom = hasSpotZoom
+        ? (isSpecial ? 14 : (Number(spot.zoom) < 14 ? 14 : Number(spot.zoom)))
+        : 13;
+
+    let tileUrl = window.TILE_URLS.ort;
+    if (hasSpotZoom) {
+        if (typeParts.includes('ort')) {
+            tileUrl = window.TILE_URLS.ort;
+        } else if (typeParts.includes('airphoto')) {
+            tileUrl = window.TILE_URLS.airphoto;
+        } else if (typeParts.includes('rinya')) {
+            tileUrl = window.TILE_URLS.rinya;
+        } else {
+            tileUrl = window.TILE_URLS.photo;
+        }
+        window.currentSpotBaseTile = tileUrl;
+    } else {
+        window.currentSpotBaseTile = null;
+    }
+
+    // ---------- 2. 対象スポットの座標・ズームで drawLocation を直接実行して完了まで待機 ----------
+    await drawLocation(spot.name, Number(spot.lat), Number(spot.lng), targetZoom);
+    if (mapExistedBefore && !window.isInitialMapLoad && typeof waitMapSettled === 'function') {
+        await waitMapSettled();
+    }
+
+    // ---------- 3. drawLocation 完了後：後続のスポット描画と所属県（select）の先行データ取得を開始 ----------
+    window.fishUrl = `/${regionCode}/${prefCode}_fish.json`;
+
+    if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+    if (parentArea) setIdealQuery('area', parentArea.name);
+    setIdealQuery('spot', spot.name);
+    window._selectSpotCompleted = true;
+
+    // 逆引き辞書JSONとICデータを即時開始（完了時にアクセス枠とSEO構造化データを更新）
+    const dictPromise = loadPrefDictionaryJson(prefCode).then(dict => {
+        if (dict && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
+            renderAccessInfo(spot);
+            if (typeof updateSeoMeta === 'function') updateSeoMeta();
+        }
+        return dict;
+    });
+    const icPromise = typeof loadICData === 'function' ? loadICData() : Promise.resolve(null);
+
+    if (window.map) {
+        window.map.invalidateSize(true);
+        window.map.getContainer().classList.add('is-spot-mode');
+    }
+
+    if (hasSpotZoom) {
+        zoomToSpot(spot);
+    } else {
+        renderAccessInfo(spot);
+        if (typeof showSpotsForArea === 'function') showSpotsForArea(finalAreaId);
+        if (typeof phase1menu === 'function') phase1menu(finalAreaId);
+        if (typeof enableDragForArea === 'function') enableDragForArea();
+        if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+        if (typeof showFishPopup === 'function') showFishPopup(spot);
+    }
+
+    requestAnimationFrame(() => {
+        const btn = document.getElementById('map-back-btn');
+        if (btn) {
+            btn.style.display = 'block';
+            requestAnimationFrame(() => {
+                btn.style.opacity = '1';
+            });
+        }
+    });
+
+    if (typeof renderAreaGuide === 'function') renderAreaGuide();
+    if (parentArea && typeof openArea === 'function') openArea(parentArea.individualId);
+
+    const jnnRow = document.getElementById('map-jma-alert');
+    if (jnnRow && window.currentPref === prefCode) {
+        jnnRow.style.display = 'flex';
+    }
+    if (window.currentPref === prefCode && window.prefData && typeof getAlertText === 'function') {
+        getAlertText(window.prefData);
+    }
+
+    // 所属県（prefCode）の天気・魚種・釣具店データを先行取得（対象スポットの沿岸/内陸区分を最優先）
+    const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
+    const isInlandSpot = String(spot.individualId || spot.id || '').startsWith('L');
+
+    const primaryWeatherPromise = isInlandSpot
+        ? AddInLandWeather(prefCode, 'select')
+        : AddWeather(prefCode, 'select');
+
+    const fishPromise = typeof loadFishDataAsync === 'function'
+        ? loadFishDataAsync(prefCode, window.fishUrl).then(fishData => {
+            if (window.currentPref === prefCode && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
+                updateSpotMaxBounds(spot);
+            }
+            return fishData;
+        })
+        : Promise.resolve(null);
+
+    primaryWeatherPromise.then(() => {
+        if (window.currentPref === prefCode && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
+            if (spot.whether && typeof createWeekItem === 'function') {
+                createWeekItem(spot.whether);
+            }
+        }
+    });
+
+    const secondaryWeatherPromise = isInlandSpot
+        ? AddWeather(prefCode, 'select')
+        : AddInLandWeather(prefCode, 'select');
+
+    const shopPromise = (window.markerControl && typeof window.markerControl.preloadShop01 === 'function')
+        ? window.markerControl.preloadShop01(window.prefShopUrl).then(() => {
+            if (window.currentPref === prefCode) {
+                if (!hasSpotZoom && finalAreaId && typeof window.markerControl.showShop01 === 'function') {
+                    window.markerControl.showShop01(finalAreaId);
+                }
+                if (window.currentSpotId && String(window.currentSpotId) === String(spot.individualId) && typeof renderShopSection === 'function') {
+                    renderShopSection(spot);
+                }
+            }
+        })
+        : Promise.resolve(null);
+
+    const selectedPrefDonePromise = Promise.allSettled([
+        dictPromise,
+        icPromise,
+        primaryWeatherPromise,
+        secondaryWeatherPromise,
+        fishPromise,
+        shopPromise
+    ]).then(() => {
+        if (window.currentPref === prefCode) {
+            if (window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
+                if (spot.whether && typeof createWeekItem === 'function' && window.activeCol == null) {
+                    createWeekItem(spot.whether);
+                }
+                if (typeof waitAndRenderSpotDetails === 'function') {
+                    waitAndRenderSpotDetails(spot.name);
+                }
+            }
+            if (typeof renderSpotRanking === 'function') {
+                renderSpotRanking();
+            }
+        }
+    });
+
+    // ---------- 4. 所属県の先行処理が完了した後に、裏で他県データ（other -> all）と他県天気を順次取得 ----------
+    window._prefBackgroundLoad = selectedPrefDonePromise
+        .then(() => loadPrefectureSpots(prefCode, 'other'))
+        .then(() => loadPrefectureSpots(prefCode, 'all'))
+        .then(() => {
+            if (typeof getPrefParentRow === 'function') {
+                const finalParent = getPrefParentRow(prefCode);
+                if (finalParent) window.prefData = finalParent;
+            }
+            if (typeof showPrefMarkers === 'function') {
+                return showPrefMarkers();
+            }
+        })
+        .then(() => {
+            if (window._prefBgDone) return;
+            if (typeof runPrefBackgroundLoads === 'function') {
+                return runPrefBackgroundLoads(prefCode, Promise.resolve(), bgGen, Promise.resolve());
+            }
+        })
+        .catch(err => {
+            console.error('スポット画面バックグラウンド処理エラー:', err);
+        });
+
+    return true;
+}
+window.spot_management = spot_management;
+
+// ==========================================
 // スポット詳細画面へのズーム遷移
 // ==========================================
 function zoomToSpot(spot) {
     if (!window.map || !spot) return;
 
-    // ★ スポット所属県（または現在選択中の県）の逆引き辞書JSONを非同期でロードし、完了時に表示を更新
+    // ★ スポット所属県（または現在選択中の県）の逆引き辞書JSONを非同期でロードし、完了時に表示とSEO構造化データを更新
     const targetPrefCode = spot._prefCode || (spot.areaId ? String(spot.areaId).split('_')[0] : '') || window.currentPref;
     if (typeof loadPrefDictionaryJson === 'function' && targetPrefCode) {
         loadPrefDictionaryJson(targetPrefCode).then(dict => {
             if (dict && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
                 renderAccessInfo(spot);
+                if (typeof updateSeoMeta === 'function') updateSeoMeta();
             }
         });
     }
@@ -202,29 +485,27 @@ function zoomToSpot(spot) {
         }
         return;
     }
-    
 
     window.goBackGuard = true;
 
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
     window.currentSpotBaseTile = null;
-    
 
     disablePhase2(window.map);
     resetSpotLayers();
     clearSub2Weather();
     removeCrowdImage();
-    
+
     renderAccessInfo(spot);
 
     const safe = spot;
     const typeParts = (safe.type || '').split('$');
-    const isSpecial = typeParts.includes('special'); 
+    const isSpecial = typeParts.includes('special');
 
     const targetLat = safe.lat;
     const targetLng = safe.lng;
-    
+
     let tileUrl;
     if (typeParts.includes('ort')) {
         tileUrl = window.TILE_URLS.ort;
@@ -242,7 +523,7 @@ function zoomToSpot(spot) {
     const targetZoom = isSpecial ? 14 : (safe.zoom < 14 ? 14 : safe.zoom);
 
     let isMoveEnded = false;
-    let isFadeEnded = !hasOSM; 
+    let isFadeEnded = !hasOSM;
     let isSpotPrepEnded = false;
 
     // ★ スポット画面の遷移中に裏側で「IP+UUIDの生成（生成済みならスキップ）」と「切り替え用タイルのプリフェッチ」を同時実行
@@ -300,14 +581,16 @@ function zoomToSpot(spot) {
 
     if (hasOSM) {
         if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(tileUrl, { 
-                attribution: '国土地理院', 
+            window.gsiLayer = L.tileLayer(tileUrl, {
+                attribution: '国土地理院',
                 detectRetina: false,
-                opacity: 0, 
-                zIndex: 100 
+                opacity: 0,
+                zIndex: 100
             }).addTo(window.map);
         } else {
-            window.gsiLayer.setUrl(tileUrl);
+            if (window.gsiLayer._url !== tileUrl) {
+                window.gsiLayer.setUrl(tileUrl);
+            }
             window.gsiLayer.setOpacity(0);
             window.gsiLayer.setZIndex(100);
             if (!window.map.hasLayer(window.gsiLayer)) {
@@ -323,7 +606,7 @@ function zoomToSpot(spot) {
             if (gsiContainer) {
                 gsiContainer.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setOpacity(1);
-                
+
                 if (osmContainer) {
                     osmContainer.style.transition = 'opacity 2s ease';
                     window.osmLayer.setOpacity(0);
@@ -357,12 +640,15 @@ function zoomToSpot(spot) {
         }
     } else {
         if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(tileUrl, { 
-                attribution: '国土地理院', 
-                detectRetina: false 
+            window.gsiLayer = L.tileLayer(tileUrl, {
+                attribution: '国土地理院',
+                detectRetina: false
             }).addTo(window.map);
         } else {
-            window.gsiLayer.setUrl(tileUrl);
+            // ★ spot_management の drawLocation で既に同じ tileUrl が設定済みの場合は再リクエストさせない
+            if (window.gsiLayer._url !== tileUrl) {
+                window.gsiLayer.setUrl(tileUrl);
+            }
             if (!window.map.hasLayer(window.gsiLayer)) {
                 window.gsiLayer.addTo(window.map);
             }
@@ -394,12 +680,9 @@ function zoomToSpot(spot) {
         }
     }
 
-    window.map.flyTo([targetLat, targetLng], targetZoom, { duration: 0.5 });
-
     const el = document.getElementById("nearest-spot");
     if (el) el.textContent = safe.name || '';
 
-    // ★ 修正：システム変数の強制上書きを削除し、純粋にセットだけ行うように戻す
     if (safe?.individualId != null) {
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         const parentArea = window.areaData.find(a => String(a.areaId + '_' + a.individualId) === String(safe.areaId));
@@ -408,50 +691,35 @@ function zoomToSpot(spot) {
         window.currentSpotId = safe.individualId;
     }
 
-    window.map.once('moveend', () => {
+    const finalizeZoomToSpot = () => {
         window.map.invalidateSize(true);
         showFishMarkers(safe.URL);
         createWeekItem(safe.whether);
 
         window.map.setMaxZoom(18);
-
-        let bounds = window.map.getBounds();
-        let zoomLimit;
-
-        if (isSpecial || safe.zoom < 14) {
-            const paddingDiff = 14 - safe.zoom;
-            bounds = bounds.pad(paddingDiff);
-            zoomLimit = 14;
-        } else {
-            zoomLimit = safe.zoom;
-        }
-
-        if (safe.URL && typeof safe.URL === 'string' && safe.URL.trim() !== '') {
-            const fishList = safe.URL.split(',');
-            fishList.forEach(item => {
-                const parts = item.split('|');
-                const fLat = parseFloat(parts[1]);
-                const fLng = parseFloat(parts[2]);
-                if (!isNaN(fLat) && !isNaN(fLng)) {
-                    bounds.extend([fLat, fLng]);
-                }
-            });
-        }
-        
-        bounds = bounds.pad(0.05);
-
-        window.map.setMaxBounds(bounds);
-        window.map.options.maxBoundsViscosity = 1.0; 
-
-        window._zoomGuardBase = zoomLimit;
-        window._zoomGuardActive = true;
-        window.map.setMinZoom(zoomLimit);
+        updateSpotMaxBounds(safe);
 
         window.map.dragging.enable();
-        showPrefSpots();
-        
+        // ★ 既に広域ドットが存在する場合のみ非表示化する（未生成時に showAllRegionSpots が暴発するのを防ぐ）
+        if (window.regionSpotMarkers && window.regionSpotMarkers.length > 0 && typeof showPrefSpots === 'function') {
+            showPrefSpots();
+        }
+
         isMoveEnded = true;
         checkAndUnlockGuard();
-    });
+    };
+
+    const center = window.map.getCenter();
+    const isSameLoc = center &&
+        Math.abs(center.lat - Number(targetLat)) < 0.0001 &&
+        Math.abs(center.lng - Number(targetLng)) < 0.0001 &&
+        window.map.getZoom() === Number(targetZoom);
+
+    if (isSameLoc) {
+        finalizeZoomToSpot();
+    } else {
+        window.map.flyTo([targetLat, targetLng], targetZoom, { duration: 0.5 });
+        window.map.once('moveend', finalizeZoomToSpot);
+    }
 }
 window.zoomToSpot = zoomToSpot;
