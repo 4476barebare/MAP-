@@ -164,6 +164,12 @@ async function loadLocationJSON() {
     return { main, areas, spots };
 }
 async function drawLocation(name, lat, lng, zoom, options = {}) {
+  if (typeof L === 'undefined') {
+    if (typeof window._flushTileQueue === 'function') {
+      window._flushTileQueue();
+    }
+    return;
+  }
 
   const defaultOptions = {
     center: [lat, lng],
@@ -2446,14 +2452,24 @@ function getAngleDiff(b1, b2) {
     return diff;
 }
 
+function calcDistanceMeters(lat1, lng1, lat2, lng2) {
+    if (typeof L !== 'undefined' && typeof L.latLng === 'function') {
+        return L.latLng(lat1, lng1).distanceTo(L.latLng(lat2, lng2));
+    }
+    const rad = Math.PI / 180;
+    const dLat = (lat2 - lat1) * rad;
+    const dLng = (lng2 - lng1) * rad;
+    const a = Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+    return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+window.calcDistanceMeters = calcDistanceMeters;
+
 function calcAccessInfo(spotLat, spotLng) {
     if (!window.icData || window.icData.length === 0) return [];
 
-    const spotLatLng = L.latLng(spotLat, spotLng);
-    
     const mappedData = window.icData.map(item => {
-        const itemLatLng = L.latLng(item.lat, item.lng);
-        const distance = spotLatLng.distanceTo(itemLatLng);
+        const distance = calcDistanceMeters(spotLat, spotLng, Number(item.lat), Number(item.lng));
         const bearing = getBearing(spotLat, spotLng, item.lat, item.lng);
         return { ...item, distance, bearing };
     });
@@ -2537,13 +2553,11 @@ function renderShopSection(spot) {
     // ショップデータがまだ無い場合は終了
     if (!window.markerControl || !window.markerControl.allShops || window.markerControl.allShops.length === 0) return;
 
-    const spotLatLng = L.latLng(spot.lat, spot.lng);
-
     // 1. 有効な全店舗（座標あり）を抽出し、距離を計算して近い順にソートしておく
     const allValidShops = window.markerControl.allShops
         .filter(s => !isNaN(s.lat) && !isNaN(s.lng))
         .map(s => {
-            const dist = spotLatLng.distanceTo(L.latLng(s.lat, s.lng));
+            const dist = calcDistanceMeters(Number(spot.lat), Number(spot.lng), Number(s.lat), Number(s.lng));
             return { ...s, distance: dist };
         })
         .sort((a, b) => a.distance - b.distance);
@@ -2638,12 +2652,11 @@ async function renderRecentCatches(spot) {
     if (!data) return;
 
     const allCatches = [...(data.map_data || []), ...(data.blog_data || [])];
-    const spotLatLng = L.latLng(spot.lat, spot.lng);
 
-    // 20km以内の釣果を抽出
+    // 10km以内の釣果を抽出（L未定義時も純粋JSで距離計算）
     const nearbyCatches = allCatches.filter(c => {
         if (!c.lat || !c.lng || !c.fish) return false;
-        const dist = spotLatLng.distanceTo(L.latLng(c.lat, c.lng));
+        const dist = calcDistanceMeters(Number(spot.lat), Number(spot.lng), Number(c.lat), Number(c.lng));
         return dist <= 10000; 
     });
 

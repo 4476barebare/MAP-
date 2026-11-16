@@ -309,21 +309,12 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         window.currentSpotBaseTile = null;
     }
 
-    // ---------- 2. 対象スポットの座標・ズームで drawLocation を直接実行して完了まで待機 ----------
-    await drawLocation(spot.name, Number(spot.lat), Number(spot.lng), targetZoom);
-    if (mapExistedBefore && !window.isInitialMapLoad && typeof waitMapSettled === 'function') {
-        await waitMapSettled();
-    }
-
-    // ---------- 3. drawLocation 完了後：後続のスポット描画と所属県（select）の先行データ取得を開始 ----------
-    window.fishUrl = `/${regionCode}/${prefCode}_fish.json`;
-
     if (window.prefData) setIdealQuery('pref', window.prefData.notes);
     if (parentArea) setIdealQuery('area', parentArea.name);
     setIdealQuery('spot', spot.name);
     window._selectSpotCompleted = true;
 
-    // 逆引き辞書JSONとICデータを即時開始（完了時にアクセス枠とSEO構造化データを更新）
+    // 逆引き辞書JSONとICデータを drawLocation と並行して開始し、取得次第すぐにアクセス枠と構造化データを更新
     const dictPromise = loadPrefDictionaryJson(prefCode).then(dict => {
         if (dict && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
             renderAccessInfo(spot);
@@ -332,6 +323,16 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         return dict;
     });
     const icPromise = typeof loadICData === 'function' ? loadICData() : Promise.resolve(null);
+    renderAccessInfo(spot);
+
+    // ---------- 2. 対象スポットの座標・ズームで drawLocation を直接実行して完了まで待機 ----------
+    await drawLocation(spot.name, Number(spot.lat), Number(spot.lng), targetZoom);
+    if (mapExistedBefore && !window.isInitialMapLoad && typeof waitMapSettled === 'function') {
+        await waitMapSettled();
+    }
+
+    // ---------- 3. drawLocation 完了後：後続のスポット描画と所属県（select）の先行データ取得を開始 ----------
+    window.fishUrl = `/${regionCode}/${prefCode}_fish.json`;
 
     if (window.map) {
         window.map.invalidateSize(true);
