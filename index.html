@@ -368,7 +368,7 @@ if ('serviceWorker' in navigator) {
       if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
     })
     .catch(err => {
-      console.error('Service Worker登録失敗:', err);
+      console.warn('Service Worker登録スキップ:', err && err.message ? err.message : err);
     });
 }
 
@@ -735,6 +735,7 @@ function updateSeoMeta() {
         mapAltText = `${pref || ''}${area || ''}にある「${spotName}」の釣り場と周辺環境を示す空撮マップ`;
 
         if (targetSpot) {
+            const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
             let extraInfo = "";
 
             // ★ spot.URL から魚種や貸しボートなどの名前を抽出
@@ -750,8 +751,11 @@ function updateSeoMeta() {
                 }
             }
 
-            // 抽出した情報を基本のDescriptionの先頭に合体させる
-            newDesc = extraInfo + newDesc;
+            if (dictEntry && dictEntry.description) {
+                newDesc = extraInfo + dictEntry.description;
+            } else {
+                newDesc = extraInfo + newDesc;
+            }
         }
 
         // ★ タイルロード等を一切阻害せず、アクセス情報枠と魚データの準備完了まで待機してから2点を描画
@@ -811,17 +815,31 @@ function updateSeoMeta() {
     }
 
     if (targetSpot && targetSpot.lat && targetSpot.lng) {
+        const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
         const jsonLdData = {
             "@context": "https://schema.org",
             "@type": "Place",
             "name": targetSpot.name,
-            "description": newDesc,
+            "description": (dictEntry && dictEntry.description) ? dictEntry.description : newDesc,
             "geo": {
                 "@type": "GeoCoordinates",
                 "latitude": parseFloat(targetSpot.lat),
                 "longitude": parseFloat(targetSpot.lng)
             }
         };
+        if (dictEntry) {
+            if (dictEntry.alternateName) {
+                jsonLdData.alternateName = dictEntry.alternateName;
+            }
+            if (dictEntry.addressRegion || dictEntry.addressLocality) {
+                jsonLdData.address = {
+                    "@type": "PostalAddress",
+                    "addressCountry": "JP",
+                    "addressRegion": dictEntry.addressRegion || pref || "",
+                    "addressLocality": dictEntry.addressLocality || ""
+                };
+            }
+        }
 
         const script = document.createElement('script');
         script.setAttribute('type', 'application/ld+json');
@@ -898,12 +916,16 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
         renderRecentCatches(targetSpot);
     }
 
-    // ③ 魚データが後から届いた場合のために meta description と JSON-LD も最新化
-    if (uniqueNames.length > 0) {
+    // ③ 魚データや逆引き辞書が後から届いた場合のために meta description と JSON-LD も最新化
+    const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
+    if (uniqueNames.length > 0 || (dictEntry && dictEntry.description)) {
         const pref = params.get('pref') || '';
         const area = params.get('area') || '';
-        const baseDesc = `${pref}${area}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
-        const fullDesc = `対象魚や周辺情報: ${uniqueNames.join('、')}など。` + baseDesc;
+        const baseDesc = (dictEntry && dictEntry.description)
+            ? dictEntry.description
+            : `${pref}${area}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
+        const extraPrefix = uniqueNames.length > 0 ? `対象魚や周辺情報: ${uniqueNames.join('、')}など。` : '';
+        const fullDesc = extraPrefix + baseDesc;
 
         const descMeta = document.querySelector('meta[name="description"]');
         if (descMeta) descMeta.setAttribute('content', fullDesc);
@@ -914,7 +936,18 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
         if (ldScript && targetSpot.lat && targetSpot.lng) {
             try {
                 const ldData = JSON.parse(ldScript.textContent);
-                ldData.description = fullDesc;
+                ldData.description = (dictEntry && dictEntry.description) ? dictEntry.description : fullDesc;
+                if (dictEntry) {
+                    if (dictEntry.alternateName) ldData.alternateName = dictEntry.alternateName;
+                    if (dictEntry.addressRegion || dictEntry.addressLocality) {
+                        ldData.address = {
+                            "@type": "PostalAddress",
+                            "addressCountry": "JP",
+                            "addressRegion": dictEntry.addressRegion || pref || "",
+                            "addressLocality": dictEntry.addressLocality || ""
+                        };
+                    }
+                }
                 ldScript.textContent = JSON.stringify(ldData);
             } catch (e) {}
         }
@@ -1147,7 +1180,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ★ タイル描画完了後、ドット・道路・等深線の次に裏データと記事一覧を順番にバトンリレー実行する
     if (typeof window.runAfterTileLoad === 'function') {
-        window.runAfterTileLoad(() => loadPrefectureSpots(null, 'all'));
+        window.runAfterTileLoad(() => {
+            if (!window.currentPref) return loadPrefectureSpots(null, 'all');
+        });
         window.runAfterTileLoad(() => {
             // ★ 県・エリア・スポットURLでは各画面の入口側で描画するため、REGION画面のときだけ呼ぶ
             if (!window.currentPref && typeof renderSpotRanking === 'function') return renderSpotRanking(1);
@@ -1175,11 +1210,18 @@ async function routeUpdate() {
     if (!window.currentPref) {
         await region_management();
     } else {
-        // ★ 追加：PREF画面の最優先ロード
-        //   REGION CSV → 選択県JSON → drawLocation → 他県JSON並列取得（集約は描画後に1回）
-        //   失敗しても従来フロー（checkAndLoadRouteData 以降）で続行する
+        // ★ SPOT画面の最優先ロード（対象スポットのデータのみ先行取得 → drawLocation完了 → 後続描画＆所属県の天気・辞書先行取得）
+        let spotHandled = false;
+        if (window.currentSpotId && typeof spot_management === 'function') {
+            try {
+                spotHandled = await spot_management(window.currentPref, window.currentAreaId, window.currentSpotId);
+            } catch (err) {
+                console.error('spot_management エラー（従来フローで続行）:', err);
+            }
+        }
+
         let prefDrawn = false;
-        if (typeof pref_management === 'function') {
+        if (!spotHandled && typeof pref_management === 'function') {
             try {
                 prefDrawn = await pref_management(window.currentPref);
             } catch (err) {
@@ -1187,10 +1229,14 @@ async function routeUpdate() {
             }
         }
 
-        const isReady = await checkAndLoadRouteData();
-        if (!isReady) return;
+        if (!spotHandled) {
+            const isReady = await checkAndLoadRouteData();
+            if (!isReady) return;
+        }
 
-        if (window.currentSpotId) {
+        if (spotHandled) {
+            // spot_management で描画・先行ロード開始済み
+        } else if (window.currentSpotId) {
             const spotId = String(window.currentSpotId).split("_");
             const safeAreaId = window.currentAreaId || ""; 
             
