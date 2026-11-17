@@ -1,5 +1,155 @@
 [
   {
+    "date": "2026/11/16",
+    "fish": "イシダイ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122235095998398793",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "メジナ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122235095998398793",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ウミタナゴ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122235095998398793",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ボラ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122235095998398793",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ベラ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122226586590314719",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "メジナ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122226586590314719",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "キス",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122226586590314719",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "カレイ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2122226586590314719",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ニジマス",
+    "lat": 35.7836,
+    "lng": 139.2612,
+    "area_name": "釜の淵公園",
+    "url": "https://x.com/fcxF6Yadze99374/status/2122175189803032828",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ハマチ",
+    "lat": 35.1415,
+    "lng": 139.619,
+    "area_name": "みうら海王",
+    "url": "https://www.facebook.com/miura.kaiou/posts/pfbid09xBaqYC3rmCXmMJom5w4Q3so8aymURr68CsVEjZQCD2Pa754q52mxuxJRAzJP2Q5l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "マダイ",
+    "lat": 35.1415,
+    "lng": 139.619,
+    "area_name": "みうら海王",
+    "url": "https://www.facebook.com/miura.kaiou/posts/pfbid09xBaqYC3rmCXmMJom5w4Q3so8aymURr68CsVEjZQCD2Pa754q52mxuxJRAzJP2Q5l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ブラックバス",
+    "lat": 36.1245,
+    "lng": 140.4042,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/DfzFgFwFPSe/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ブラックバス",
+    "lat": 36.0353,
+    "lng": 140.4763,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/DfzFgFwFPSe/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ブラックバス",
+    "lat": 35.9421,
+    "lng": 140.5216,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/DfzFgFwFPSe/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ブラックバス",
+    "lat": 35.8854,
+    "lng": 140.4495,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/DfzFgFwFPSe/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/15",
     "fish": "イナダ",
     "lat": 35.9184,
@@ -177,6 +327,66 @@
     "area_name": "霞ヶ浦",
     "url": "https://www.instagram.com/p/Dfwv_0rk5Pt/",
     "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/15",
+    "fish": "タチウオ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/vellfire1222/status/2121988283353944236",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/15",
+    "fish": "サワラ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/vellfire1222/status/2121988283353944236",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/15",
+    "fish": "アナゴ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/vellfire1222/status/2121988283353944236",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/15",
+    "fish": "アジ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/vellfire1222/status/2121988283353944236",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/15",
+    "fish": "エソ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/vellfire1222/status/2121988283353944236",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/15",
+    "fish": "ブラックバス",
+    "lat": 35.795,
+    "lng": 140.235,
+    "area_name": "印旛沼",
+    "url": "https://www.threads.com/@masaki__max__takasaki/post/Dfy1kRUn7Wo",
+    "source": "Threads",
     "model": "Muse"
   },
   {
