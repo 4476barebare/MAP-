@@ -367,9 +367,7 @@ if ('serviceWorker' in navigator) {
     .then(registration => {
       if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
     })
-    .catch(err => {
-      console.warn('Service Worker登録スキップ:', err && err.message ? err.message : err);
-    });
+    .catch(() => {});
 }
 
 // ==========================================
@@ -888,8 +886,9 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
     const isFishDataReady = !!window.fishData || retryCount >= 25;
     const isShopDataReady = !!(window.markerControl && window.markerControl.allShops && window.markerControl.allShops.length > 0) || retryCount >= 25;
 
+    const isIcReady = !!window.isIcLoaded || retryCount >= 25;
     // 必須条件が揃っていなければ 100ms 後に非同期リトライ（最大50回＝5秒）
-    if ((!targetSpot || !window.isIcLoaded || !isAccessBoxRendered || !isZoomToSpotDone || !isFishDataReady || !isShopDataReady) && retryCount < 50) {
+    if ((!targetSpot || !isIcReady || !isAccessBoxRendered || !isZoomToSpotDone || !isFishDataReady || !isShopDataReady) && retryCount < 50) {
         _spotDetailsRenderTimer = setTimeout(() => {
             waitAndRenderSpotDetails(spotName, retryCount + 1);
         }, 100);
@@ -1060,6 +1059,275 @@ function formatDate(str) {
 }
 
 // ==========================================
+// ★ WRS（クローラー）が外部JSを間引いた場合の安全フォールバック定義
+// （通常ブラウザでは外部JS側が既に定義されているため上書きしない）
+// ==========================================
+window._loadedPrefSet = window._loadedPrefSet || new Set();
+window.prefSpotData = window.prefSpotData || {};
+window.prefSpotPromises = window.prefSpotPromises || {};
+window.prefDictionaryCache = window.prefDictionaryCache || {};
+window.prefDictionaryPromises = window.prefDictionaryPromises || {};
+
+if (typeof window.loadRegionCsvData !== 'function') {
+    window.loadRegionCsvData = function() {
+        const regionCode = window.currentRegion || 'KANTO';
+        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
+        if (window.regionCsvParsedData && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
+            return Promise.resolve(window.regionCsvParsedData);
+        }
+        if (window.regionCsvParsedPromise && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
+            return window.regionCsvParsedPromise;
+        }
+        window.regionCsvParsedRegion = regionCode;
+        window.regionCsvParsedUrl = rUrl;
+        window.regionCsvParsedPromise = fetch(rUrl)
+            .then(res => {
+                if (!res.ok) throw new Error('Region CSV fetch failed: ' + res.status);
+                return res.text();
+            })
+            .then(text => {
+                const lines = text.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                const rows = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i]) continue;
+                    const cols = lines[i].split(',').map(c => c.trim());
+                    const row = {};
+                    headers.forEach((h, idx) => { row[h] = cols[idx] || ''; });
+                    rows.push(row);
+                }
+                const prefRows = [];
+                for (const row of rows) {
+                    if (row.type !== 'pref' || !row.url) continue;
+                    const parts = row.url.split('/');
+                    let prefCode = '', lat = NaN, lng = NaN;
+                    if (parts.length >= 4) {
+                        prefCode = parts[1].split('_')[0];
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
+                    } else if (parts.length === 3) {
+                        prefCode = parts[0].split('_')[0];
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    }
+                    if (prefCode) prefRows.push({ prefCode, prefName: row.notes || '', lat, lng, row });
+                }
+                const parsedData = { regionCode, url: rUrl, headers, rows, prefRows };
+                window.regionCsvParsedData = parsedData;
+                return parsedData;
+            });
+        return window.regionCsvParsedPromise;
+    };
+}
+
+if (typeof window.loadRegionCSV !== 'function') {
+    window.loadRegionCSV = async function() {
+        try {
+            const csvData = await window.loadRegionCsvData();
+            if (!csvData) return false;
+            window.regionPrefData = (csvData.prefRows || []).map(p => ({
+                regionCode: csvData.regionCode,
+                prefCode: p.prefCode,
+                prefName: p.prefName,
+                lat: p.lat,
+                lng: p.lng
+            }));
+            for (const row of csvData.rows || []) {
+                if (row.type === 'region') {
+                    window.regionData = {
+                        name: row.name || '関東地方',
+                        lat: parseFloat(row.lat),
+                        lng: parseFloat(row.lng),
+                        zoom: parseFloat(row.zoom)
+                    };
+                }
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+}
+
+if (typeof window.loadPrefectureSpots !== 'function') {
+    window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
+        const regionCode = window.currentRegion || 'KANTO';
+        const fetchPref = code => {
+            if (!code) return Promise.resolve([]);
+            if (Array.isArray(window.prefSpotData[code])) return Promise.resolve(window.prefSpotData[code]);
+            if (window.prefSpotPromises[code]) return window.prefSpotPromises[code];
+            const url = `/${regionCode}/${code}_location.json`;
+            window.prefSpotPromises[code] = fetch(url)
+                .then(r => r.ok ? r.json() : [])
+                .then(data => {
+                    if (!Array.isArray(data)) return [];
+                    data.forEach(s => { s._prefCode = code; });
+                    window.prefSpotData[code] = data;
+                    window._loadedPrefSet.add(code);
+                    return data;
+                })
+                .catch(() => []);
+            return window.prefSpotPromises[code];
+        };
+        if (mode === 'select' && prefCode) {
+            await fetchPref(prefCode);
+            window.allspotData = Object.values(window.prefSpotData).flat();
+            window.ALL_REGION_SPOTS = window.allspotData;
+            return window.prefSpotData[prefCode] || [];
+        }
+        try {
+            const csvData = await window.loadRegionCsvData();
+            const prefList = [...new Set((csvData.prefRows || []).map(r => r.prefCode).filter(Boolean))];
+            const targets = mode === 'other' ? prefList.filter(c => c !== prefCode) : prefList;
+            await Promise.all(targets.map(fetchPref));
+        } catch (e) {}
+        window.allspotData = Object.values(window.prefSpotData).flat();
+        window.ALL_REGION_SPOTS = window.allspotData;
+        return window.allspotData;
+    };
+}
+
+if (typeof window.loadLocationJSON !== 'function') {
+    window.loadLocationJSON = async function() {
+        const pref = window.currentPref;
+        const rows = (window.prefSpotData && window.prefSpotData[pref]) || (window.allspotData || []).filter(r => r._prefCode === pref);
+        window.prefData = rows.find(r => (!r.areaId || r.individualId === 'parent') && r.name === pref) || null;
+        window.areaData = rows.filter(r => (r.areaId || '').trim() === pref);
+        window.spotData = rows.filter(r => r.type !== 'pref' && r.type !== 'area' && r.icon && r.icon.trim() !== '');
+        return { main: window.prefData, areas: window.areaData, spots: window.spotData };
+    };
+}
+
+if (typeof window.loadPrefDictionaryJson !== 'function') {
+    window.loadPrefDictionaryJson = function(prefCode = window.currentPref) {
+        if (!prefCode) return Promise.resolve(null);
+        let cleanPref = String(prefCode).trim().split('/').pop().split('_')[0];
+        const regionCode = window.currentRegion || 'KANTO';
+        const key = regionCode + '_' + cleanPref;
+        if (window.prefDictionaryCache[key]) {
+            window.spotDictionary = window.prefDictionaryCache[key];
+            return Promise.resolve(window.prefDictionaryCache[key]);
+        }
+        if (window.prefDictionaryPromises[key]) return window.prefDictionaryPromises[key];
+        const url = '/' + regionCode + '/' + cleanPref + '_dictionary.json';
+        window.prefDictionaryPromises[key] = fetch(url)
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(data => {
+                window.prefDictionaryCache[key] = data;
+                window.spotDictionary = data;
+                return data;
+            })
+            .catch(() => {
+                delete window.prefDictionaryPromises[key];
+                return null;
+            });
+        return window.prefDictionaryPromises[key];
+    };
+}
+
+if (typeof window.getSpotDictionaryEntry !== 'function') {
+    window.getSpotDictionaryEntry = function(spot) {
+        if (!spot || !spot.name) return null;
+        const spotName = String(spot.name).trim();
+        const regionCode = window.currentRegion || 'KANTO';
+        const prefCode = spot._prefCode || (spot.areaId ? String(spot.areaId).split('_')[0] : '') || window.currentPref;
+        if (prefCode && window.prefDictionaryCache) {
+            const cleanPref = String(prefCode).trim().split('/').pop().split('_')[0];
+            const key = regionCode + '_' + cleanPref;
+            if (window.prefDictionaryCache[key] && window.prefDictionaryCache[key][spotName]) {
+                return window.prefDictionaryCache[key][spotName];
+            }
+        }
+        if (window.spotDictionary && window.spotDictionary[spotName]) {
+            return window.spotDictionary[spotName];
+        }
+        return null;
+    };
+}
+
+if (typeof window.renderAccessInfo !== 'function') {
+    window.renderAccessInfo = function(spot) {
+        const container = document.getElementById('accessInfoBox');
+        if (!container || !spot || !spot.lat || !spot.lng) return;
+        const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const dictEntry = typeof window.getSpotDictionaryEntry === 'function' ? window.getSpotDictionaryEntry(spot) : null;
+        const accessTexts = typeof window.calcAccessInfo === 'function' ? window.calcAccessInfo(spot.lat, spot.lng) : [];
+        const waterName = dictEntry && dictEntry.waterName ? String(dictEntry.waterName).trim() : '';
+        const regionalName = dictEntry && dictEntry.regionalName ? String(dictEntry.regionalName).trim() : '';
+        const waterRegionalText = [waterName, regionalName].filter(Boolean).join(' ');
+        let altText = '';
+        if (dictEntry && dictEntry.alternateName) {
+            altText = Array.isArray(dictEntry.alternateName)
+                ? dictEntry.alternateName.map(a => String(a).trim()).filter(Boolean).join('・')
+                : String(dictEntry.alternateName).trim();
+        }
+        const coopText = dictEntry && dictEntry.fishingCooperative ? String(dictEntry.fishingCooperative).trim() : '';
+        const descText = dictEntry && dictEntry.description ? String(dictEntry.description).trim() : '';
+
+        let html = '<div class="spot-header-wrap">';
+        if (waterRegionalText) html += `<div class="spot-water-regional">${esc(waterRegionalText)}</div>`;
+        html += `<h3 class="spot-main-title">${esc(spot.name)}</h3>`;
+        if (altText || coopText) {
+            html += '<div class="spot-sub-meta">';
+            if (altText) html += `<span class="spot-alt-name">${esc(altText)}</span>`;
+            if (coopText) html += `<span class="spot-coop-name">${esc(coopText)}</span>`;
+            html += '</div>';
+        }
+        html += '</div>';
+        if (descText) {
+            const descClass = accessTexts.length > 0 ? 'spot-description has-access-list' : 'spot-description';
+            html += `<p class="${descClass}">${esc(descText)}</p>`;
+        }
+        if (accessTexts.length > 0) {
+            html += '<ul class="spot-access-list">';
+            accessTexts.forEach(t => { html += `<li>${t}</li>`; });
+            html += '</ul>';
+        }
+        if (container.querySelector('#default-site-guide')) container.innerHTML = '';
+        let mainBlock = document.getElementById('spot-access-main');
+        if (!mainBlock || mainBlock.parentNode !== container) {
+            mainBlock = document.createElement('div');
+            mainBlock.id = 'spot-access-main';
+            container.insertBefore(mainBlock, container.firstChild);
+        }
+        mainBlock.innerHTML = html;
+        container.style.display = 'block';
+    };
+}
+
+if (typeof window.spot_management !== 'function') {
+    window.spot_management = async function(prefCode = window.currentPref, areaId = window.currentAreaId, spotId = window.currentSpotId) {
+        if (!prefCode || !spotId) return false;
+        await window.loadRegionCSV();
+        await window.loadPrefectureSpots(prefCode, 'select');
+        await window.loadLocationJSON();
+        const spotParts = String(spotId).split('_');
+        const targetIndivId = spotParts[2] || spotParts[0];
+        const spot = (window.spotData || []).find(s => String(s.individualId) === String(targetIndivId));
+        if (!spot) return false;
+        const finalAreaId = areaId || spot.areaId || '';
+        const parentArea = (window.areaData || []).find(a => finalAreaId.endsWith(a.individualId));
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        if (parentArea) setIdealQuery('area', parentArea.name);
+        setIdealQuery('spot', spot.name);
+        window.renderAccessInfo(spot);
+        await window.loadPrefDictionaryJson(prefCode).then(dict => {
+            if (dict) {
+                window.renderAccessInfo(spot);
+                if (typeof updateSeoMeta === 'function') updateSeoMeta();
+            }
+        });
+        if (typeof drawLocation === 'function') {
+            await drawLocation(spot.name, Number(spot.lat), Number(spot.lng), Number(spot.zoom) || 14);
+        }
+        return true;
+    };
+}
+
+// ==========================================
 // ★ 4. URLクエリから直接システム変数をセットする関数
 // ==========================================
 async function applyQueryToStateFromCsv() {
@@ -1208,7 +1476,7 @@ async function routeUpdate() {
     const regionName = Object.keys(REGION_MAP).find(name => REGION_MAP[name] === regionParam);
     if (regionName) setIdealQuery('region', regionName);
     if (!window.currentPref) {
-        await region_management();
+        if (typeof region_management === 'function') await region_management();
     } else {
         // ★ SPOT画面の最優先ロード（対象スポットのデータのみ先行取得 → drawLocation完了 → 後続描画＆所属県の天気・辞書先行取得）
         let spotHandled = false;
