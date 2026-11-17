@@ -2,7 +2,6 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// リポジトリのルートを基準に入出力する
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PREF_CODE = "CHIBA";
 const PREF_NAME_FALLBACK = "千葉県";
@@ -11,7 +10,6 @@ const SITE_URL = "https://turiiko-navi.com";
 
 const LOCATION_PATH = path.join(ROOT, "KANTO", "CHIBA_location.json");
 const FISH_PATH = path.join(ROOT, "KANTO", "CHIBA_fish.json");
-const DICTIONARY_PATH = path.join(ROOT, "KANTO", "CHIBA_dictionary.json");
 const OUTPUT_PATH = path.join(ROOT, "ai-data", "CHIBA.md");
 
 function readJson(filePath) {
@@ -32,20 +30,13 @@ function cleanText(value) {
     return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
-function formatCoordinate(value) {
-    const number = Number(value);
-    return Number.isFinite(number) ? number.toFixed(6) : "";
-}
-
-// フロントの対象魚種表示と同じく、CHIBA_fish.json内の
-// 有効なcoordsを持つカタカナ名だけを取得する。
-// 別名辞書による統合や、魚種名の補完は行わない。
 function getRegisteredFish(spotFishData) {
     if (!spotFishData || typeof spotFishData !== "object") return [];
 
     const names = [];
 
     for (const [fishName, info] of Object.entries(spotFishData)) {
+        // フロントの対象魚種表示と同様、施設名などを除外する。
         if (!/^[ァ-ヴー]+$/.test(fishName)) continue;
         if (!info || typeof info.coords !== "string" || info.coords === "") continue;
 
@@ -67,13 +58,12 @@ function makeMapUrl(prefName, areaName, spotName) {
         "&spot=" + encodeURIComponent(spotName);
 }
 
-function buildMarkdown(locationData, fishData, dictionaryData) {
+function buildMarkdown(locationData, fishData) {
     const prefRow = locationData.find(row =>
         row.name === PREF_CODE && row.individualId === "parent"
     );
     const prefName = cleanText(prefRow?.notes) || PREF_NAME_FALLBACK;
 
-    // エリア行は areaId=CHIBA。個別スポットは areaId=CHIBA_エリアID。
     const areaRows = locationData.filter(row =>
         row.areaId === PREF_CODE && row.individualId && row.individualId !== "parent"
     );
@@ -100,14 +90,12 @@ function buildMarkdown(locationData, fishData, dictionaryData) {
 
     const spotRecords = spots.map(spot => {
         const areaName = areaNames.get(spot.areaId) || spot.areaId;
-        const dictionary = dictionaryData[spot.name] || {};
         const fishNames = getRegisteredFish(fishData[spot.areaId]?.[spot.name]);
 
         return {
             source: spot,
             name: cleanText(spot.name),
             areaName,
-            dictionary,
             fishNames,
             mapUrl: makeMapUrl(prefName, areaName, spot.name)
         };
@@ -129,7 +117,7 @@ function buildMarkdown(locationData, fishData, dictionaryData) {
     lines.push("");
     lines.push("> 本ファイルは釣り行こNAVIのスポット情報を、AIが参照しやすいMarkdownにまとめたものです。");
     lines.push("> 正規スポットはCHIBA_location.jsonのうち、zoomが指定され、エリアに所属し、アイコンが設定された行を対象としています。");
-    lines.push("> 登録魚種はCHIBA_fish.jsonに記録され、有効な座標データを持つカタカナ名のみを掲載しています。別名統合や推測による追加は行っていません。");
+    lines.push("> 登録魚種はCHIBA_fish.jsonに記録された魚種名を使用し、別名統合や推測による追加は行っていません。");
     lines.push("> 登録魚種はサイト内データ上の対象魚種を示すもので、現在の釣果や釣獲を保証するものではありません。");
     lines.push("");
     lines.push("## データ概要");
@@ -169,39 +157,17 @@ function buildMarkdown(locationData, fishData, dictionaryData) {
 
         areaRecords.forEach(record => {
             const spot = record.source;
-            const dictionary = record.dictionary;
-
             lines.push("#### " + record.name);
             lines.push("");
 
-            const address = [dictionary.addressRegion, dictionary.addressLocality]
-                .map(cleanText).filter(Boolean).join("");
-            if (address) lines.push("- 所在地: " + address);
-
-            if (dictionary.regionalName) lines.push("- 地域名: " + cleanText(dictionary.regionalName));
-            if (dictionary.waterName) lines.push("- 水域名: " + cleanText(dictionary.waterName));
-
-            if (Array.isArray(dictionary.alternateName) && dictionary.alternateName.length > 0) {
-                lines.push("- 別名: " + dictionary.alternateName.map(cleanText).filter(Boolean).join("、"));
+            if (Number.isFinite(Number(spot.lat)) && Number.isFinite(Number(spot.lng))) {
+                lines.push("- 座標: " + Number(spot.lat).toFixed(6) + ", " + Number(spot.lng).toFixed(6));
             }
-
-            if (dictionary.fishingCooperative) {
-                lines.push("- 漁業協同組合: " + cleanText(dictionary.fishingCooperative));
-            }
-
-            const lat = formatCoordinate(spot.lat);
-            const lng = formatCoordinate(spot.lng);
-            if (lat && lng) lines.push("- 座標: " + lat + ", " + lng);
 
             if (record.fishNames.length > 0) {
                 lines.push("- 登録魚種: " + record.fishNames.join("、"));
             } else {
                 lines.push("- 登録魚種: CHIBA_fish.jsonに登録なし");
-            }
-
-            if (dictionary.description) {
-                lines.push("");
-                lines.push(cleanText(dictionary.description));
             }
 
             lines.push("");
@@ -212,7 +178,7 @@ function buildMarkdown(locationData, fishData, dictionaryData) {
 
     lines.push("---");
     lines.push("");
-    lines.push("データ出典: KANTO/CHIBA_location.json、KANTO/CHIBA_fish.json、KANTO/CHIBA_dictionary.json");
+    lines.push("データ出典: KANTO/CHIBA_location.json、KANTO/CHIBA_fish.json");
     lines.push("");
 
     return {
@@ -227,9 +193,7 @@ function buildMarkdown(locationData, fishData, dictionaryData) {
 try {
     const locationData = readJson(LOCATION_PATH);
     const fishData = readJson(FISH_PATH);
-    const dictionaryData = readJson(DICTIONARY_PATH);
-
-    const result = buildMarkdown(locationData, fishData, dictionaryData);
+    const result = buildMarkdown(locationData, fishData);
 
     fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
     fs.writeFileSync(OUTPUT_PATH, result.markdown, "utf8");
