@@ -18,18 +18,18 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Generate CHIBA.md
+      - name: Generate CHIBA Markdown files
         run: node script/generate_chiba_md.js
 
       - name: Commit and push generated Markdown
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ai-data/CHIBA.md
+          git add ai-data/CHIBA.md ai-data/CHIBA_fish.md
 
           if git diff --cached --quiet; then
-            echo "CHIBA.mdに変更はありません。"
+            echo "CHIBA.md / CHIBA_fish.mdに変更はありません。"
           else
-            git commit -m "Generate CHIBA AI Markdown"
+            git commit -m "Generate CHIBA AI Markdown files"
             git push
           fi
