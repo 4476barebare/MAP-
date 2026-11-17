@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://turiiko-navi.com/sitemap.xml
