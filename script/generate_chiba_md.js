@@ -11,6 +11,7 @@ const SITE_URL = "https://turiiko-navi.com";
 const LOCATION_PATH = path.join(ROOT, "KANTO", "CHIBA_location.json");
 const FISH_PATH = path.join(ROOT, "KANTO", "CHIBA_fish.json");
 const OUTPUT_PATH = path.join(ROOT, "ai-data", "CHIBA.md");
+const FISH_OUTPUT_PATH = path.join(ROOT, "ai-data", "CHIBA_fish.md");
 
 function readJson(filePath) {
     if (!fs.existsSync(filePath)) {
@@ -112,8 +113,16 @@ function buildMarkdown(locationData, fishData) {
     const fishSpecies = [...fishToSpots.keys()].sort((a, b) => a.localeCompare(b, "ja"));
     const spotsWithFish = spotRecords.filter(record => record.fishNames.length > 0);
 
+    const updatedDate = getJstDate();
     const lines = [];
-    lines.push("# " + prefName + "の釣りスポット・登録魚種一覧");
+    lines.push("---");
+    lines.push('title: "' + prefName + 'の釣りスポット情報"');
+    lines.push('last_updated: "' + updatedDate + '"');
+    lines.push('timezone: "Asia/Tokyo"');
+    lines.push('source: "釣り行こNAVI"');
+    lines.push("---");
+    lines.push("");
+    lines.push("# " + prefName + "の釣りスポット一覧");
     lines.push("");
     lines.push("> 本ファイルは釣り行こNAVIのスポット情報を、AIが参照しやすいMarkdownにまとめたものです。");
     lines.push("> 正規スポットはCHIBA_location.jsonのうち、zoomが指定され、エリアに所属し、アイコンが設定された行を対象としています。");
@@ -129,18 +138,46 @@ function buildMarkdown(locationData, fishData) {
     lines.push("- 対象都道府県: " + prefName);
     lines.push("- 地図サイト: " + SITE_URL + "/");
     lines.push("");
-    lines.push("## 魚種から釣り場を探す");
+    lines.push("## 関連データ");
     lines.push("");
-    lines.push("各魚種名はCHIBA_fish.jsonの登録名をそのまま使用しています。");
+    lines.push("- 魚種別の釣り場一覧: [CHIBA_fish.md](CHIBA_fish.md)");
+    lines.push("- SNS釣果データ: [CHIBA_catch.json](CHIBA_catch.json)（別スクリプトで生成予定）");
     lines.push("");
+
+    const fishLines = [];
+    fishLines.push("---");
+    fishLines.push('title: "' + prefName + 'の魚種別釣り場一覧"');
+    fishLines.push('last_updated: "' + updatedDate + '"');
+    fishLines.push('timezone: "Asia/Tokyo"');
+    fishLines.push('source: "釣り行こNAVI"');
+    fishLines.push("---");
+    fishLines.push("");
+    fishLines.push("# " + prefName + "の魚種別釣り場一覧");
+    fishLines.push("");
+    fishLines.push("> 本ファイルは、魚種名から対象スポットを逆引きするための一覧です。");
+    fishLines.push("> 魚種名はCHIBA_fish.jsonの登録名をそのまま使用し、別名統合や推測による追加は行っていません。");
+    fishLines.push("> 登録はサイト内データ上の対象魚種を示すもので、現在の釣果や釣獲を保証するものではありません。");
+    fishLines.push("");
+    fishLines.push("- スポット情報: [CHIBA.md](CHIBA.md)");
+    fishLines.push("- SNS釣果データ: [CHIBA_catch.json](CHIBA_catch.json)（別スクリプトで生成予定）");
+    fishLines.push("");
+    fishLines.push("## 魚種から釣り場を探す");
+    fishLines.push("");
+    fishLines.push("各魚種名はCHIBA_fish.jsonの登録名をそのまま使用しています。");
+    fishLines.push("");
 
     fishSpecies.forEach(fishName => {
         const records = fishToSpots.get(fishName);
-        lines.push("### " + fishName + "（" + records.length + "スポット）");
-        lines.push("");
-        lines.push(records.map(record => record.name + "（" + record.areaName + "）").join("、"));
-        lines.push("");
+        fishLines.push("### " + fishName + "（" + records.length + "スポット）");
+        fishLines.push("");
+        fishLines.push(records.map(record => record.name + "（" + record.areaName + "）").join("、"));
+        fishLines.push("");
     });
+
+    fishLines.push("---");
+    fishLines.push("");
+    fishLines.push("データ出典: KANTO/CHIBA_location.json、KANTO/CHIBA_fish.json");
+    fishLines.push("");
 
     lines.push("## エリア別スポット情報");
     lines.push("");
@@ -183,6 +220,7 @@ function buildMarkdown(locationData, fishData) {
 
     return {
         markdown: lines.join("\n"),
+        fishMarkdown: fishLines.join("\n"),
         spotCount: spotRecords.length,
         spotsWithFish: spotsWithFish.length,
         fishlessCount: spotRecords.length - spotsWithFish.length,
@@ -197,13 +235,15 @@ try {
 
     fs.mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
     fs.writeFileSync(OUTPUT_PATH, result.markdown, "utf8");
+    fs.writeFileSync(FISH_OUTPUT_PATH, result.fishMarkdown, "utf8");
 
-    console.log("CHIBA.mdを生成しました。");
+    console.log("CHIBA.mdとCHIBA_fish.mdを生成しました。");
     console.log("正規スポット: " + result.spotCount + "件");
     console.log("魚種登録あり: " + result.spotsWithFish + "件");
     console.log("魚種登録なし: " + result.fishlessCount + "件");
     console.log("登録魚種: " + result.speciesCount + "種");
     console.log("出力先: " + OUTPUT_PATH);
+    console.log("出力先: " + FISH_OUTPUT_PATH);
 } catch (error) {
     console.error("CHIBA.md生成エラー:", error);
     process.exit(1);
