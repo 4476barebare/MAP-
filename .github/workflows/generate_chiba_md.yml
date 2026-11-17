@@ -1,0 +1,35 @@
+name: Generate CHIBA AI Markdown
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-chiba-md:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate CHIBA.md
+        run: node script/generate_chiba_md.js
+
+      - name: Commit and push generated Markdown
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ai-data/CHIBA.md
+
+          if git diff --cached --quiet; then
+            echo "CHIBA.mdに変更はありません。"
+          else
+            git commit -m "Generate CHIBA AI Markdown"
+            git push
+          fi
