@@ -31,6 +31,15 @@ function cleanText(value) {
     return String(value ?? "").replace(/\s+/g, " ").trim();
 }
 
+function getJstDate() {
+    return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Tokyo",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).format(new Date());
+}
+
 function getRegisteredFish(spotFishData) {
     if (!spotFishData || typeof spotFishData !== "object") return [];
 
