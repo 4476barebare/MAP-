@@ -1,5 +1,235 @@
 [
   {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.6416,
+    "lng": 139.9105,
+    "area_name": "境川（浦安）",
+    "url": "https://x.com/ponchan28ponpon/status/2122598959353065605",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.6,
+    "lng": 139.9,
+    "area_name": "東京湾",
+    "url": "https://www.threads.com/@glory_fishing/post/DfzzhWXEjQ2",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.48,
+    "lng": 139.85,
+    "area_name": "東京湾",
+    "url": "https://www.threads.com/@glory_fishing/post/DfzzhWXEjQ2",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.36,
+    "lng": 139.72,
+    "area_name": "東京湾",
+    "url": "https://www.threads.com/@glory_fishing/post/DfzzhWXEjQ2",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.2,
+    "lng": 139.74,
+    "area_name": "東京湾",
+    "url": "https://www.threads.com/@glory_fishing/post/DfzzhWXEjQ2",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.742,
+    "lng": 140.832,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid028984YasoAwUs6DxEP8VpRgHXVndXa5XDkVhjZGmuefnaPb3aWX2E8Lg1vYExTGonl&id=61553642762308",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.895,
+    "lng": 140.5,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid028984YasoAwUs6DxEP8VpRgHXVndXa5XDkVhjZGmuefnaPb3aWX2E8Lg1vYExTGonl&id=61553642762308",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.885,
+    "lng": 140.06,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid028984YasoAwUs6DxEP8VpRgHXVndXa5XDkVhjZGmuefnaPb3aWX2E8Lg1vYExTGonl&id=61553642762308",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 36.18,
+    "lng": 139.7,
+    "area_name": "利根川",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid028984YasoAwUs6DxEP8VpRgHXVndXa5XDkVhjZGmuefnaPb3aWX2E8Lg1vYExTGonl&id=61553642762308",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "マダイ",
+    "lat": 35.0456,
+    "lng": 139.8251,
+    "area_name": "富浦",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid02bz1g5S9Cyc8jezCuBjSNop52Tv86EBM8a9mRHf8TSoYJ2j85XZNb7gNjjUsoG1uAl&id=100004228746503",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "タチウオ",
+    "lat": 35.6,
+    "lng": 139.9,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1QQgLBkUS/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "タチウオ",
+    "lat": 35.48,
+    "lng": 139.85,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1QQgLBkUS/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "タチウオ",
+    "lat": 35.36,
+    "lng": 139.72,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1QQgLBkUS/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "タチウオ",
+    "lat": 35.2,
+    "lng": 139.74,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1QQgLBkUS/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "サワラ",
+    "lat": 35.6,
+    "lng": 139.9,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "サワラ",
+    "lat": 35.48,
+    "lng": 139.85,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "サワラ",
+    "lat": 35.36,
+    "lng": 139.72,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "サワラ",
+    "lat": 35.2,
+    "lng": 139.74,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.6,
+    "lng": 139.9,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.48,
+    "lng": 139.85,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.36,
+    "lng": 139.72,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "シーバス",
+    "lat": 35.2,
+    "lng": 139.74,
+    "area_name": "東京湾",
+    "url": "https://www.instagram.com/p/Df1jzTtEpDG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "ブラックバス",
+    "lat": 35.2147,
+    "lng": 140.0883,
+    "area_name": "亀山ダム",
+    "url": "https://www.instagram.com/p/Df17v3QlNcg/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/16",
     "fish": "イシダイ",
     "lat": 35.9184,
@@ -147,6 +377,56 @@
     "area_name": "霞ヶ浦",
     "url": "https://www.instagram.com/p/DfzFgFwFPSe/",
     "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "トウゴロウイワシ",
+    "lat": 35.1528,
+    "lng": 139.1481,
+    "area_name": "真鶴港",
+    "url": "https://x.com/raku_chata_ekpk/status/2122337091770253708",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "アジ",
+    "lat": 35.1528,
+    "lng": 139.1481,
+    "area_name": "真鶴港",
+    "url": "https://x.com/raku_chata_ekpk/status/2122337091770253708",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "ボラ",
+    "lat": 35.1528,
+    "lng": 139.1481,
+    "area_name": "真鶴港",
+    "url": "https://x.com/raku_chata_ekpk/status/2122337091770253708",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "アジ",
+    "lat": 35.4294,
+    "lng": 139.6923,
+    "area_name": "本牧海づり施設",
+    "url": "https://x.com/fishing_catch55/status/2122291161184530730",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/16",
+    "fish": "シーバス",
+    "lat": 36.3375,
+    "lng": 140.5847,
+    "area_name": "那珂川",
+    "url": "https://www.threads.com/@stand_by_jii/post/Df0BvTXk81u",
+    "source": "Threads",
     "model": "Muse"
   },
   {
