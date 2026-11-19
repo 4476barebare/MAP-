@@ -80,7 +80,6 @@ jobs:
               PREFS="${INPUT_PREF:-CHIBA}"
             fi
           else
-            # pushイベント時は変更されたファイルから対象県を自動抽出
             if [ -z "${BEFORE_SHA}" ] || [ "${BEFORE_SHA}" = "0000000000000000000000000000000000000000" ]; then
               PREFS="ALL"
             else
@@ -88,7 +87,12 @@ jobs:
               if echo "${CHANGED}" | grep -Eq '^(data/KANTO_geo\.json|script/generate_pref_md\.js)$'; then
                 PREFS="ALL"
               else
-                PREFS=$(echo "${CHANGED}"                   | grep -E "^${REGION}/[A-Za-z0-9-]+_(location|fish|dictionary|shop)\.json$"                   | sed -E "s|^${REGION}/([A-Za-z0-9-]+)_(location|fish|dictionary|shop)\.json$||"                   | tr '[:lower:]' '[:upper:]'                   | sort -u                   | paste -sd ',' -)
+                PREFS=$(echo "${CHANGED}" \
+                  | grep -E "^${REGION}/[A-Za-z0-9-]+_(location|fish|dictionary|shop)\.json$" \
+                  | sed -E "s|^${REGION}/([A-Za-z0-9-]+)_(location|fish|dictionary|shop)\.json$|\1|" \
+                  | tr '[:lower:]' '[:upper:]' \
+                  | sort -u \
+                  | paste -sd ',' -)
                 if [ -z "${PREFS}" ]; then
                   PREFS="ALL"
                 fi
@@ -118,7 +122,7 @@ jobs:
           git add -- 'ai-data/*.md' ':!ai-data/*_catch.md' llms.txt
 
           if git diff --cached --quiet; then
-            echo "スポット関連のAI用Markdownに変更はありません。"
+            echo "スポット関連のAI用Markdownおよびllms.txtに変更はありません。"
           else
             git commit -m "auto: Generate pref spot AI Markdown (${TARGET_PREFS})"
             git pull --rebase --autostash origin main
