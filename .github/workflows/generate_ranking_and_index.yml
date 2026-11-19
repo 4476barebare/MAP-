@@ -1,0 +1,88 @@
+name: Generate Tomorrow Ranking & Static HTML
+
+on:
+  workflow_dispatch:
+    inputs:
+      output_html:
+        description: "生成するHTMLファイル名（テスト時は index2.html、本番時は index.html）"
+        required: true
+        default: "index2.html"
+        type: string
+      region_code:
+        description: "対象リージョンコード"
+        required: true
+        default: "KANTO"
+        type: string
+  workflow_call:
+    inputs:
+      output_html:
+        required: false
+        default: "index2.html"
+        type: string
+      region_code:
+        required: false
+        default: "KANTO"
+        type: string
+
+concurrency:
+  group: "ranking-static-html"
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-ranking-html:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate Ranking Cache, Tomorrow MD and HTML
+        env:
+          TARGET_REGION: ${{ inputs.region_code || 'KANTO' }}
+          OUTPUT_HTML: ${{ inputs.output_html || 'index2.html' }}
+          TEMPLATE_PATH: "template/index.txt"
+        run: |
+          echo "Region     : ${TARGET_REGION}"
+          echo "Template   : ${TEMPLATE_PATH}"
+          echo "Output HTML: ${OUTPUT_HTML}"
+          node script/generate_ranking_and_index.js "${TARGET_REGION}" "${OUTPUT_HTML}"
+
+      - name: Refresh llms.txt if generator exists
+        env:
+          TARGET_REGION: ${{ inputs.region_code || 'KANTO' }}
+        run: |
+          if [ -f "script/generate_pref_md.js" ]; then
+            node script/generate_pref_md.js LLMS "${TARGET_REGION}"
+          fi
+
+      - name: Commit and push generated files
+        env:
+          TARGET_REGION: ${{ inputs.region_code || 'KANTO' }}
+          OUTPUT_HTML: ${{ inputs.output_html || 'index2.html' }}
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -- "${OUTPUT_HTML}" "ai-data/ranking_cache.json" "ai-data/${TARGET_REGION}_tomorrow.md"
+          if [ -f "llms.txt" ]; then
+            git add -- llms.txt
+          fi
+
+          if git diff --cached --quiet; then
+            echo "ランキング・静的HTMLに変更はありません。"
+          else
+            git commit -m "auto: Generate tomorrow ranking and ${OUTPUT_HTML}"
+            git pull --rebase --autostash origin main
+            git push origin main
+          fi
