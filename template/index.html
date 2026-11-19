@@ -1,0 +1,3433 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 👇 この1行を追加して自動リンク（点線）を防ぐ -->
+  <meta name="format-detection" content="telephone=no, address=no, email=no">
+
+  <!-- SEO -->
+  <title>関東の釣り場マップ・最新釣果さかな地図｜明日行ける釣りスポット探し【釣り行こNAVI】</title>
+  <meta name="description" content="「明日釣り行くんだけどいい場所ある？」と迷ったら釣り行こNAVI！関東全域（千葉・神奈川・茨城・東京・埼玉・群馬・栃木）の海釣り・堤防スポットを網羅したリアルタイム釣果さかな地図。SNS最新釣果ソナー、海底地形（等深線）、ピンポイント天気・風向・波予報・タイドグラフ（潮見表）から今日・明日釣れる場所がひと目でわかります。">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://turiiko-navi.com/">
+  <link rel="describedby" type="text/markdown" title="釣り行こNAVI AI向けデータ目次" href="https://turiiko-navi.com/llms.txt">
+  <link id="ai-md-link" rel="alternate" type="text/markdown" title="釣り行こNAVI AI向けMarkdownデータ" href="https://turiiko-navi.com/llms.txt">
+
+  <script type="application/ld+json" id="base-json-ld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://turiiko-navi.com/#website",
+        "name": "釣り行こNAVI",
+        "alternateName": ["さかな地図", "釣り行こナビ", "関東釣り場マップ"],
+        "url": "https://turiiko-navi.com/",
+        "description": "関東全域の釣り場・海釣り堤防スポットを航空写真と海底地形（等深線）、リアルタイムSNS釣果ソナー、ピンポイント気象・潮見表（タイドグラフ）で探せるインタラクティブ釣り地図サイト。"
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://turiiko-navi.com/#webapp",
+        "name": "釣り行こNAVI リアルタイム釣果さかな地図",
+        "url": "https://turiiko-navi.com/",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "All",
+        "description": "「明日釣り行くんだけどいい場所ある？」に答える関東の釣り場マップ。東京湾内房（保田港・木更津周辺）、外房・勝浦、茨城（大洗港・那珂湊）、神奈川（うみかぜ公園・平潟湾）など関東各地の最新SNS釣果、2時間ごとの天気・風向・波高・水温、タイドグラフ、海底の等深線（カケアガリ）を地図上で一括確認できます。"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://turiiko-navi.com/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "明日関東で釣りに行くんだけどいい場所ある？今釣れているおすすめの釣り場は？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "関東で今釣れているおすすめの海釣り・堤防スポットは、東京湾内房（保田港・木更津周辺）、外房・勝浦エリア、茨城（大洗港・那珂湊・鹿島周辺）、神奈川（横須賀うみかぜ公園・金沢八景・平潟湾）などです。釣り行こNAVIの「明日のオススメ釣り場ランキング」と「リアルタイムSNS釣果ソナー」では、明日の降水確率・風速と直近のSNS釣果データから、明日好条件で釣れるスポットを地図上でひと目で探せます。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "釣り行こNAVIの「さかな地図（釣り場マップ）」では何が確認できますか？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "国土地理院の航空写真と海底の等深線（水深・カケアガリ）を重ねたマップ上で、各釣り場で釣れる対象魚、周辺10km圏内の最新SNS釣果、2時間ごとのピンポイント天気・風向・風速・波高・タイドグラフ（潮見表）、および最寄りICや釣具店からのアクセス情報を無料で確認できます。"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- OGP -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="関東の釣り場マップ・最新釣果さかな地図｜明日行ける釣りスポット探し【釣り行こNAVI】">
+  <meta property="og:description" content="「明日釣り行くんだけどいい場所ある？」と迷ったら釣り行こNAVI！関東全域の海釣り・堤防スポットから最新SNS釣果、海底地形（等深線）、天気・風向・波予報・タイドグラフが写真地図からひと目で確認できます。">
+  <meta property="og:url" content="https://turiiko-navi.com/">
+  <meta property="og:image" content="https://turiiko-navi.com/ogp.jpg">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="関東の釣り場マップ・最新釣果さかな地図【釣り行こNAVI】">
+  <meta name="twitter:description" content="「明日釣り行くんだけどいい場所ある？」と迷ったら釣り行こNAVI！関東全域の釣り場から最新SNS釣果、等深線、天気・波予報、風向き、タイドグラフが写真地図から確認できます。">
+  <meta name="twitter:image" content="https://turiiko-navi.com/ogp.jpg">
+
+  <!-- favicon -->
+  <link rel="icon" href="/icon/favicon.svg" type="image/svg+xml">
+
+  <!-- タイルサーバー・CDNへの事前接続と初期CSVの先読み -->
+  <link rel="preconnect" href="https://cyberjapandata.gsi.go.jp" crossorigin>
+  <link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
+  <link rel="preload" href="/lib/leaflet/leaflet.js?v=1.9.4" as="script">
+  <link rel="preload" href="/KANTO/KANTO_region.csv" as="fetch" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/lib/leaflet/leaflet.css?v=1.9.4"/>
+</head>
+
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">釣り行こNAVI</div>
+    <nav class="nav">
+    <a href="#" id="calendarBtn">カレンダー</a>
+    <a href="#" id="newsBtn">釣りNEWS</a>
+    <a href="#" id="snsBtn">SNS釣果</a>
+    </nav>
+  </div>
+</header>
+
+<div id="lf-map">
+  <div class="map-ui-top">
+    <div class="ad-box">AD 320×50</div>
+    
+    <!-- ① 上段は元の綺麗な状態に戻す -->
+    <div class="map-ui-sub">
+      <div id="nearest-spot" class="nearest-spot"></div>
+    </div>
+    
+    <!-- エリア画面用の天気UI (スポット画面では非表示になる) -->
+    <div class="map-ui-sub2"></div>
+  </div>
+
+  <!-- 地図ツールバー：map-ui-topとは独立して配置 -->
+  <div id="map-tool-bar">
+    <div id="map-jma-alert">
+      <div class="jma-alert-viewport"><div class="jma-alert-track"></div></div>
+      <div class="map-tool-btn jnn-label" aria-hidden="true">JMA予報</div>
+    </div>
+    <div class="menu-header-row" style="display:none;">
+      <div class="header-row">
+        <div id="cloudsUI"></div>
+        <button id="radarToggleBtn" class="map-tool-btn radar-toggle-btn">雨雲レーダー</button>
+        <div class="header-text"></div>
+      </div>
+    </div>
+    <button id="map-back-btn" class="map-tool-btn map-back-btn" aria-label="前の画面に戻る">戻る</button>
+    <div id="tile-btn-wrap" style="display: none; flex-direction: column; align-items: flex-end; gap: 8px;">
+      <button id="map-tile-btn" class="map-tool-btn map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;">タイル切替</button>
+      <div id="post-btn-row" class="post-btn-row">
+        <button id="map-post-btn" class="map-tool-btn map-post-btn" aria-label="釣果投稿" style="display: none; opacity: 0; transition: opacity 0.4s ease;">投稿β版</button>
+      </div>
+    </div>
+  </div>
+<div id="map-menu" class="map-menu">
+  
+  <ul>
+  </ul>
+  
+</div>
+
+  
+ <!-- ★ここ重要：weatherを先に固定 -->
+  <div class="weather" id="weatherBox">
+    <div class="weather-labels" id="labels"></div>
+    <div class="weather-table" id="table"></div>
+  </div>
+  <div class="tide-wrapper">
+  <canvas id="tideCanvas"></canvas>
+</div>
+  <!-- ★weekは必ず後ろ -->
+  <div class="week">
+    <div class="week-labels" id="weekLabels"></div>
+    <div class="week-table" id="weekTable"></div>
+  </div>
+</div>
+<!-- 👇 アクセス情報表示エリア（初期状態はサイト説明を表示し、スポット選択時に切り替える） -->
+<section class="access-info" id="accessInfoBox" aria-label="サイト案内・アクセス情報">
+  <div id="default-site-guide" class="guide-collapse collapsed-mode">
+    <h3 id="site-guide-toggle" role="button" tabindex="0" aria-expanded="false">「釣り行こNAVI」の特徴と使い方（関東の釣り場・さかな地図）</h3>
+    <div class="guide-text">
+    <p style="font-size: 13px; line-height: 1.6; color: #333; margin-bottom: 10px;">
+      「釣り行こNAVI」は、「明日釣り行くんだけどいい場所ある？」という場所探しに答える、関東全域（千葉・神奈川・茨城・東京・埼玉・群馬・栃木）のリアルタイム釣果さかな地図（釣り場マップ）です。東京湾内房（保田港・木更津周辺）、外房・勝浦、茨城（大洗港・那珂湊）、神奈川（うみかぜ公園・平潟湾）などの海釣り・堤防・河川スポットを網羅し、国土地理院の航空写真と海底の等深線（水深・カケアガリ）を重ね合わせてポイントの地形を視覚的に把握できます。
+    </p>
+    <div style="font-weight: bold; font-size: 13px; color: #191970; margin-bottom: 4px;">🗺️ さかな地図の基本操作と機能</div>
+    <ul style="font-size: 13px; line-height: 1.6; padding-left: 18px; margin: 0 0 10px 0;">
+      <li><strong>エリア・釣り場検索＆等深線マップ：</strong>地図上のピンや県・エリアメニューから目的の釣り場へズームし、航空写真と水深データからカケアガリや根の位置を確認できます。</li>
+      <li><strong>ピンポイント天気・風向・潮見表（タイドグラフ）：</strong>各スポットの2時間ごとの天気・風向・風速・波高・水温、およびタイドグラフをワンタップで確認できます。</li>
+      <li><strong>リアルタイムSNS釣果ソナー＆対象魚：</strong>今釣れている魚がわかるSNS最新釣果ソナーや、各釣り場の対象魚、最寄りの釣具店・ICからのアクセスルートを表示します。</li>
+    </ul>
+    <p style="font-size: 12px; color: #555; margin: 0;">
+      ※すぐ下の「明日釣りに行くんだけど良い場所ある？（おすすめ釣り場ランキング）」やページ下部の「対象魚別・ダイソー釣具攻略ガイド記事」もあわせてご活用ください。
+    </p>
+    </div>
+  </div>
+</section>
+<!-- 👇 明日のオススメ釣り場ランキングセクション -->
+<section id="fishing-recommend-section" style="margin: 10px; padding: 15px; background-color: #eef3f8; border-radius: 8px; border: 1px solid #dce4ee;">
+  <h2 id="spot-ranking-title" style="font-size: 16px; color: #191970; margin-top: 0; margin-bottom: 8px; border-left: 4px solid #191970; padding-left: 8px;">
+    <!-- {{RANKING_TITLE}} -->明日釣りに行くんだけど良い場所ある？<!-- {{/RANKING_TITLE}} -->
+  </h2>
+
+  <!-- ここに事前生成されたランキングHTML（県選択時はpref用キャッシュへ即時差し替え） -->
+  <div id="spot-ranking-container" style="font-size: 14px; color: #333;">
+    <!-- {{RANKING_HTML}} -->おすすめスポットを分析中...<!-- {{/RANKING_HTML}} -->
+  </div>
+</section>
+
+
+<section id="area-guide" class="guide-collapse collapsed-mode">
+    <h1></h1>
+</section>
+
+<div id="newsModal" class="modal">
+  <div class="modal-content">
+    <div id="newsList"></div>
+  </div>
+</div>
+
+<div id="snsModal" class="modal">
+  <div class="modal-content">
+    <div id="snsList"></div>
+  </div>
+</div>
+
+<div id="calendarOverlay" class="overlay">
+  <div class="overlay-content">
+  <div id="calendarWrapper"></div>
+  </div>
+</div>
+
+<section class="article-list">
+    <div id="article-list-container"></div>
+</section>
+
+<!-- トップページ下部などに追加 -->
+<details class="seo-spot-list">
+  <summary>
+    <span id="seo-list-title">釣りスポット一覧を見る</span>
+  </summary>
+  <div id="seo-link-container">
+    <!-- ★ ロード時に一瞬でここにHTML文字列が流し込まれます -->
+  </div>
+</details>
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+
+    <!-- タブ切替 -->
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+
+    <!-- サイトポリシー -->
+    <section id="policySection">
+      <h1>サイトポリシー</h1>
+
+      <h2>1. 免責事項</h2>
+      <p>
+        当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、
+        その完全性・正確性・最新性を保証するものではありません。
+        当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。
+      </p>
+
+      <h2>2. 掲載情報について</h2>
+      <p>
+        掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、
+        現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。
+        利用前に必ず現地の最新情報をご確認ください。
+      </p>
+
+      <h2>3. 釣行データについて</h2>
+      <p>
+        当サイトの釣行データは過去の記録に基づくものであり、
+        現在の釣果や釣りの可否を保証するものではありません。
+        また海洋環境や生態系の状態を保証するものではありません。
+      </p>
+
+      <h2>4. 安全について</h2>
+      <p>
+        釣りを行う際は安全に十分配慮してください。
+        釣り場所によっては管理者の許可が必要な場合があります。
+        必ず現地のルールに従ってください。
+      </p>
+
+      <p>最終更新日：2026年5月</p>
+    </section>
+
+    <!-- お問い合わせ -->
+    <section id="contactSection" style="display:none;">
+      <h1>お問い合わせ</h1>
+
+      <p>
+        当サイトへのご連絡は以下の用途に限ります。<br>
+        ・バグ報告<br>
+        ・その他の連絡事項
+      </p>
+
+      <p>
+        ※すべての内容に返信・個別対応は行いません。<br>
+        内容は確認のみ行い、必要に応じてサイト改善に反映します。
+      </p>
+
+      <h2>連絡先</h2>
+
+      <p>
+        <a href="mailto:info@turiiko.shop?subject=バグ報告&body=【発生場所】%0A【内容】%0A【再現手順】%0A">
+          バグ報告を送る
+        </a>
+      </p>
+
+      <p>
+        <a href="mailto:info@turiiko.shop?subject=その他&body=【内容】%0A">
+          その他の連絡
+        </a>
+      </p>
+    </section>
+
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<!-- ★ deferを付けず実行順序を100%維持（Leaflet・polyline-encodedは自前配信） -->
+<script src="/lib/leaflet/leaflet.js?v=1.9.4"></script>
+<script src="/lib/leaflet/Polyline.encoded.js?v=0.0.9"></script>
+<script src="/js/header.js"></script>
+<script src="/js/markerControl.js"></script>
+<script src="/js/dataLoader.js"></script>
+<script src="/js/regionLoader.js"></script>
+<script src="/js/prefLoader.js"></script>
+<script src="/js/spotLoader.js"></script>
+
+<script>
+// サイト説明文の開閉
+const siteGuideToggle = document.getElementById('site-guide-toggle');
+const siteGuide = document.getElementById('default-site-guide');
+if (siteGuideToggle && siteGuide) {
+  const toggleSiteGuide = () => {
+    const isOpen = siteGuide.classList.contains('active-mode');
+    siteGuide.classList.toggle('active-mode', !isOpen);
+    siteGuide.classList.toggle('collapsed-mode', isOpen);
+    siteGuideToggle.setAttribute('aria-expanded', String(!isOpen));
+  };
+  siteGuideToggle.addEventListener('click', toggleSiteGuide);
+  siteGuideToggle.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggleSiteGuide();
+    }
+  });
+}
+
+window.prefData = null;
+window.areaData = [];
+window.spotData = [];
+window.currentHash = '';
+window.currentAreaId = null;
+window.currentSpotId = null;
+window.currentPref = null;
+window.fishUrl = null;
+window.nearestClickEnabled = true;
+window.nearestClickHandler = null;
+window.TILE_URLS = {
+  ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
+  photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+  osm: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  // 👇 新規追加（国土画像情報 と 森林基本図）
+  airphoto: 'https://cyberjapandata.gsi.go.jp/xyz/airphoto/{z}/{x}/{y}.png',
+  rinya: 'https://cyberjapandata.gsi.go.jp/xyz/rinya_m/{z}/{x}/{y}.png'
+};
+window.gsiLayers = window.TILE_URLS;
+
+// タイルキャッシュ用の管理領域
+window.prefSpotLayerCache = {};
+
+// Service Workerを可能な限り早く登録する。
+// 初回訪問では制御開始前に発生した通信を捕捉できないため、次回訪問から確実に利用する。
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(registration => {
+      if (registration.waiting) registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+    })
+    .catch(() => {});
+}
+
+// ==========================================
+// ★ オススメ釣り場ランキング：クリア＆非表示関数
+// ==========================================
+// SNS釣果の近隣判定距離。ランキングとスポット画面で共通利用する。
+window.SNS_CATCH_RADIUS_KM = 10;
+
+// 指定スポット周辺のSNS釣果を取得し、同じ投稿URLの重複を除外する。
+window.getNearbySnsCatchRecords = function(spot, radiusKm = window.SNS_CATCH_RADIUS_KM) {
+    if (!spot || !Array.isArray(window.snsCatchData)) return [];
+    const spotLat = Number(spot.lat);
+    const spotLng = Number(spot.lng);
+    if (!Number.isFinite(spotLat) || !Number.isFinite(spotLng)) return [];
+
+    const distanceKm = (lat1, lng1, lat2, lng2) => {
+        const rad = Math.PI / 180;
+        const dLat = (lat2 - lat1) * rad;
+        const dLng = (lng2 - lng1) * rad;
+        const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
+        return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    };
+
+    const getPostDate = dateStr => {
+        const parts = String(dateStr || '').trim().replace(/-/g, '/').split('/');
+        if (parts.length < 3) return null;
+        const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        return Number.isNaN(date.getTime()) ? null : date;
+    };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const uniquePosts = new Map();
+
+    window.snsCatchData.forEach(record => {
+        if (!record) return;
+        const lat = Number(record.lat);
+        const lng = Number(record.lng);
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+        const distance = distanceKm(spotLat, spotLng, lat, lng);
+        if (distance > radiusKm) return;
+
+        const postDate = getPostDate(record.date);
+        if (!postDate) return;
+        const ageDays = Math.max(0, Math.floor((today - postDate) / 86400000));
+        const key = record.url
+            ? 'url:' + record.url
+            : 'record:' + lat.toFixed(5) + '_' + lng.toFixed(5) + '_' + record.date + '_' + (record.fish || '');
+
+        const candidate = { ...record, distanceKm: distance, ageDays: ageDays };
+        const existing = uniquePosts.get(key);
+        if (!existing || distance < existing.distanceKm ||
+            (distance === existing.distanceKm && ageDays < existing.ageDays)) {
+            uniquePosts.set(key, candidate);
+        }
+    });
+
+    return [...uniquePosts.values()].sort((a, b) => a.ageDays - b.ageDays);
+};
+
+// 投稿の新しさに応じたランキング加点。
+function getSnsCatchBonus(posts) {
+    if (!posts || posts.length === 0) return 0;
+    const days = posts[0].ageDays;
+    if (days <= 1) return 15;
+    if (days <= 3) return 12;
+    if (days <= 6) return 9;
+    if (days <= 10) return 5;
+    if (days <= 14) return 2;
+    return 0;
+}
+
+function clearSpotRanking() {
+    const section = document.getElementById('fishing-recommend-section');
+    const container = document.getElementById('spot-ranking-container');
+    if (section) section.style.display = 'none';
+    if (container) container.innerHTML = '';
+}
+
+// ==========================================
+// ★ 事前生成ランキングキャッシュ読み込み（/ai-data/ranking_cache.json）
+// ==========================================
+window._rankingCacheData = window._rankingCacheData || null;
+window._rankingCachePromise = window._rankingCachePromise || null;
+
+function loadRankingCache() {
+    if (window._rankingCacheData) return Promise.resolve(window._rankingCacheData);
+    if (window._rankingCachePromise) return window._rankingCachePromise;
+
+    window._rankingCachePromise = fetch('/ai-data/ranking_cache.json')
+        .then(res => {
+            if (!res.ok) throw new Error('ranking_cache.json HTTP ' + res.status);
+            return res.json();
+        })
+        .then(data => {
+            if (data && typeof data === 'object') {
+                window._rankingCacheData = data;
+                return data;
+            }
+            return null;
+        })
+        .catch(() => {
+            window._rankingCachePromise = null;
+            return null;
+        });
+
+    return window._rankingCachePromise;
+}
+
+// ==========================================
+// ★ 明日のオススメ釣り場ランキング表示関数（事前生成キャッシュ優先＋フォールバック）
+// ==========================================
+async function renderSpotRanking(retryCount = 0) {
+    const container = document.getElementById('spot-ranking-container');
+    const section = document.getElementById('fishing-recommend-section');
+    if (!container || !section) return;
+
+    const targetPrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : null;
+    const titleEl = section.querySelector('h2');
+
+    // 1. 関東トップ(REGION)で既にSSG埋め込み済みHTMLが存在する場合はチラつきを防ぎそのまま維持
+    if (!targetPrefCode && retryCount <= 1) {
+        const embeddedList = container.querySelector('ul[data-ssg-ranking="REGION"]');
+        if (embeddedList) {
+            section.style.display = 'block';
+            return;
+        }
+    }
+
+    // 2. 事前生成された /ai-data/ranking_cache.json から即時差し替え（県切替・REGION復帰）
+    if (retryCount <= 1) {
+        const cache = await loadRankingCache();
+        if (cache) {
+            // 非同期fetch中に別県へ遷移していた場合は上書きしない
+            const latestPrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : null;
+            if (latestPrefCode !== targetPrefCode) return;
+
+            const entry = targetPrefCode
+                ? (cache.prefs && cache.prefs[targetPrefCode])
+                : cache.region;
+
+            if (entry && entry.html) {
+                section.style.display = 'block';
+                if (titleEl && entry.title) {
+                    titleEl.textContent = entry.title;
+                }
+                container.innerHTML = entry.html;
+                return;
+            }
+        }
+    }
+
+    // 3. キャッシュ未生成・取得失敗時は従来のクライアント側計算ロジックへフォールバック
+    if (retryCount === 0) {
+        section.style.display = 'block';
+        container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
+
+        if (!window._firstTileLoaded && typeof window.runAfterTileLoad === 'function') {
+            window.runAfterTileLoad(() => renderSpotRanking(1));
+            return;
+        }
+    }
+
+    const now = new Date();
+    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
+    nowJST.setDate(nowJST.getDate() + 1);
+
+    const tMonth = nowJST.getMonth() + 1;
+    const tDate = nowJST.getDate();
+    const tomorrowStr = tMonth + "月" + tDate + "日";
+
+    let targetSpots = [];
+    let titlePrefix = "";
+
+    // 県画面：選択県のスポットのみ
+    if (window.currentPref) {
+        if (!window.spotData || window.spotData.length === 0) {
+            if (retryCount < 25) {
+                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
+                return;
+            }
+            clearSpotRanking();
+            return;
+        }
+
+        const repSpot = window.spotData.find(s => {
+            const typeParts = (s.type || '').split('$');
+            return typeParts.includes('representative') || typeParts.includes('assistant');
+        }) || window.spotData[0];
+
+        if (!repSpot || !repSpot.whether) {
+            if (retryCount < 25) {
+                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
+                return;
+            }
+            clearSpotRanking();
+            return;
+        }
+
+        targetSpots = window.spotData;
+        const prefName = window.prefData ? window.prefData.notes : window.currentPref;
+        titlePrefix = prefName + "で";
+    } else {
+        // REGION画面：関東全域
+        if (!window.allspotData || window.allspotData.length === 0 || !window.regionPrefData) {
+            if (retryCount < 25) {
+                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
+                return;
+            }
+            clearSpotRanking();
+            return;
+        }
+
+        titlePrefix = "関東で";
+        // REGIONの天気はregion_managementで全県JSONの付与完了後にランキングを呼び出す。
+        targetSpots = window.allspotData;
+    }
+
+
+    if (titleEl) {
+        titleEl.innerHTML = "明日（" + tomorrowStr + "）" + titlePrefix + "釣りに行くんだけど良い場所ある？";
+    }
+
+    const ranking = [];
+
+    targetSpots.forEach(spot => {
+        if (spot.type === 'pref' || spot.type === 'area') return;
+        const typeParts = (spot.type || '').split('$');
+        if (typeParts.includes('representative') ||
+            typeParts.includes('assistant') ||
+            typeParts.includes('substitute')) return;
+
+        // 直接スポット画面へ遷移できないスポットは対象外。
+        if (!spot.zoom || String(spot.zoom).trim() === '') return;
+
+        const whether = spot.whether;
+        if (!whether || !whether.hourly || !whether.hourly[1] || !whether.hourly[1].weather) return;
+
+        const tomorrowWeather = whether.hourly[1].weather;
+        const morningRows = [];
+        const afternoonRows = [];
+        let maxPop = -Infinity;
+        let maxWind = -Infinity;
+        let popTotal = 0;
+        let popCount = 0;
+
+        for (let i = 0; i < tomorrowWeather.length; i++) {
+            const row = tomorrowWeather[i];
+            if (!Array.isArray(row)) continue;
+
+            const hour = i * 2;
+            if (hour >= 5 && hour <= 12) morningRows.push(row);
+            else if (hour >= 13 && hour <= 20) afternoonRows.push(row);
+
+            const pop = row[2];
+            if (typeof pop === "number" && hour >= 5 && hour <= 20) {
+                maxPop = Math.max(maxPop, pop);
+                popTotal += pop;
+                popCount++;
+            }
+
+            const wind = row[4];
+            if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
+        }
+
+        if (popCount === 0) return;
+
+        // 表示用の降水確率は従来どおり時間帯の最大値を丸める。
+        const displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
+
+        // 代表天気の生成は既存ロジックをそのまま利用する。
+        const getIconSafe = rows => {
+            if (!Array.isArray(rows) || rows.length === 0) return null;
+            return typeof calcRepresentativeIcon === 'function' ? calcRepresentativeIcon(rows) : '';
+        };
+
+        const iconMorning = getIconSafe(morningRows);
+        const iconAfternoon = getIconSafe(afternoonRows);
+        let iconStr = '';
+        if (iconMorning && iconAfternoon) {
+            iconStr = iconMorning === iconAfternoon
+                ? iconMorning
+                : iconMorning + '<span style="font-size:0.8em; margin:0 2px;">→</span>' + iconAfternoon;
+        } else {
+            iconStr = iconMorning || iconAfternoon || '';
+        }
+
+        // 海・淡水に共通する降水傾向だけで天気スコアを算出する。
+        // 風速・波高・潮汐は順位付けに使用しない。
+        const averagePop = popTotal / popCount;
+        const weatherScore = Math.max(0, 100 - averagePop * 0.7);
+
+        const nearbyPosts = typeof window.getNearbySnsCatchRecords === 'function'
+            ? window.getNearbySnsCatchRecords(spot)
+            : [];
+        const snsBonus = getSnsCatchBonus(nearbyPosts);
+
+        ranking.push({
+            name: spot.name,
+            spot: spot,
+            score: Math.round(weatherScore + snsBonus),
+            pop: displayPop,
+            wind: maxWind !== -Infinity ? Math.round(maxWind) : null,
+            iconStr: iconStr,
+            hasSnsBonus: snsBonus > 0,
+            snsBonus: snsBonus
+        });
+    });
+
+    if (ranking.length === 0) {
+        clearSpotRanking();
+        return;
+    }
+
+    // 同点の並び順だけランダム化し、スコア順に表示する。
+    for (let i = ranking.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ranking[i], ranking[j]] = [ranking[j], ranking[i]];
+    }
+    ranking.sort((a, b) => b.score - a.score);
+
+    // 上位3順位まで。REGIONは最大5件、県画面は最大6件。
+    const maxItems = window.currentPref ? 6 : 5;
+    const topItems = [];
+    let currentRank = 1;
+    let currentScore = ranking[0].score;
+
+    for (let i = 0; i < ranking.length; i++) {
+        if (ranking[i].score < currentScore) {
+            currentRank++;
+            currentScore = ranking[i].score;
+        }
+        if (currentRank > 3 || topItems.length >= maxItems) break;
+        topItems.push(ranking[i]);
+    }
+
+    let html = '<ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">';
+    topItems.forEach(item => {
+        const spotObj = item.spot;
+        let url = "#";
+
+        if (spotObj) {
+            const regionCode = window.currentRegion || 'KANTO';
+            const regionName = window.regionData?.name || (regionCode === 'KANTO' ? '関東地方' : regionCode);
+            let prefName = window.prefData ? window.prefData.notes : window.currentPref;
+            if (!prefName && window.regionPrefData) {
+                const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
+                if (pInfo) prefName = pInfo.prefName;
+            }
+
+            let areaName = '';
+            const targetAreas = window.currentPref ? window.areaData : window.allspotData;
+            if (targetAreas && spotObj.areaId) {
+                let parentArea = targetAreas.find(a =>
+                    String(a.areaId) + '_' + String(a.individualId) === String(spotObj.areaId)
+                );
+                if (!parentArea && window.currentPref) {
+                    parentArea = targetAreas.find(a => String(spotObj.areaId).endsWith(String(a.individualId)));
+                }
+                if (parentArea) areaName = parentArea.name;
+            }
+
+            url = "/?region=" + encodeURIComponent(regionName) +
+                "&pref=" + encodeURIComponent(prefName || '') +
+                "&area=" + encodeURIComponent(areaName || '') +
+                "&spot=" + encodeURIComponent(item.name);
+        }
+
+        const windHtml = item.wind !== null
+            ? '<span>風: <strong style="color:#191970;">' + item.wind + 'm</strong></span>'
+            : '';
+        const snsHtml = item.hasSnsBonus
+            ? '<span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span>'
+            : '';
+
+        html += '<li>' +
+            '<a href="' + url + '" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;">' +
+                '<span style="display:flex; justify-content:space-between; align-items:center; width:100%;">' +
+                    '<span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">' + item.name + '</span>' +
+                    '<span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;">' +
+                        '<span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">' + item.iconStr + '</span>' +
+                        '<span>降水: <strong style="color:#191970;">' + item.pop + '%</strong></span>' +
+                        windHtml +
+                    '</span>' +
+                '</span>' +
+                snsHtml +
+            '</a>' +
+        '</li>';
+    });
+    html += '</ul>';
+
+    container.innerHTML = html;
+}
+// ==========================================
+// ★ タイトル・メタタグ動的更新関数（連携版）
+// ==========================================
+function updateSeoMeta() {
+    const params = new URLSearchParams(window.location.search);
+    const pref = params.get('pref');
+    const area = params.get('area');
+    const spotName = params.get('spot');
+
+    // 1. 基本のセット（広域トップ・場所探し＆さかな地図クエリ最適化）
+    let newTitle = "関東の釣り場マップ・最新釣果さかな地図｜明日行ける釣りスポット探し【釣り行こNAVI】";
+    let newDesc  = "「明日釣り行くんだけどいい場所ある？」と迷ったら釣り行こNAVI！関東全域（千葉・神奈川・茨城・東京・埼玉・群馬・栃木）の海釣り・堤防スポットを網羅したリアルタイム釣果さかな地図。SNS最新釣果ソナー、海底地形（等深線）、ピンポイント天気・風向・波予報・タイドグラフ（潮見表）から今日・明日釣れる場所がひと目でわかります。";
+
+    const regionParam = params.get('region');
+    const isRegionTop = !!regionParam && !pref && !area && !spotName;
+    const currentUrl = isRegionTop && window.currentRegion === 'KANTO'
+        ? window.location.origin + window.location.pathname
+        : window.location.origin + window.location.pathname + window.location.search;
+    
+    let mapAltText = "関東地方の釣り場・最新釣果さかな地図（空撮＆等深線マップ）";
+    let targetSpot = null;
+
+    // --------------------------------------------------
+    // ■ 階層ごとのテキスト出し分け＆魚種データ抽出
+    // --------------------------------------------------
+    if (spotName) {
+        if (window.spotData && window.spotData.length > 0) {
+            targetSpot = window.spotData.find(s => s.name === spotName);
+        }
+
+        newTitle = `${spotName}の釣り場・天気・潮汐情報 | 釣り行こNAVI`;
+        newDesc = `${pref || ''}${area || ''}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
+        mapAltText = `${pref || ''}${area || ''}にある「${spotName}」の釣り場と周辺環境を示す空撮マップ`;
+
+        if (targetSpot) {
+            const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
+            let extraInfo = "";
+
+            // ★ spot.URL から魚種や貸しボートなどの名前を抽出
+            if (targetSpot.URL && typeof targetSpot.URL === 'string') {
+                const items = targetSpot.URL.split(',');
+                const names = items.map(item => item.split('|')[0]).filter(Boolean);
+                
+                // 重複を削除して文字列化
+                const uniqueNames = [...new Set(names)];
+
+                if (uniqueNames.length > 0) {
+                    extraInfo += `対象魚や周辺情報: ${uniqueNames.join('、')}など。`;
+                }
+            }
+
+            if (dictEntry && dictEntry.description) {
+                newDesc = extraInfo + dictEntry.description;
+            } else {
+                newDesc = extraInfo + newDesc;
+            }
+        }
+
+        // ★ タイルロード等を一切阻害せず、アクセス情報枠と魚データの準備完了まで待機してから2点を描画
+        waitAndRenderSpotDetails(spotName);
+
+    } else if (area) {
+        newTitle = `${area}${pref ? `（${pref}）` : ''}の釣り場マップ・釣れる魚と最新釣果・潮見表｜釣り行こNAVI`;
+        newDesc  = `${pref || ''}「${area}」の釣り場・堤防ポイント一覧マップ。${area}周辺で今釣れている対象魚や最新SNS釣果、海底の等深線（カケアガリ）、2時間ごとのピンポイント天気・風向・波予報・タイドグラフ（潮見表）を写真地図から確認できます。`;
+        mapAltText = `${pref || ''}「${area}」周辺の釣りスポット・等深線マップ`;
+    } else if (pref) {
+        newTitle = `${pref}の釣り場マップ・最新SNS釣果＆天気・潮見表｜明日行ける釣りスポット【釣り行こNAVI】`;
+        newDesc  = `「明日${pref}で釣りに行くんだけどいい場所ある？」と思ったら釣り行こNAVI。${pref}の海釣り・堤防・河川スポットを空撮さかな地図と等深線で一覧表示。リアルタイムSNS釣果、ピンポイント天気・風速・波高・タイドグラフ（潮見表）を簡単に検索できます。`;
+        mapAltText = `${pref}の釣りスポット・最新釣果さかな地図`;
+    } else if (params.get('region')) {
+        const regionName = window.regionData?.name || params.get('region');
+        const prefNames = (window.regionPrefData || []).map(item => item.prefName).filter(Boolean);
+        const prefText = prefNames.length ? prefNames.join('、') : '千葉・神奈川・茨城・東京・埼玉・群馬・栃木';
+        const shortRegion = regionName.replace('地方', '');
+        newTitle = `${shortRegion}の釣り場マップ・最新釣果さかな地図｜明日行ける釣りスポット探し【釣り行こNAVI】`;
+        newDesc = `「明日釣り行くんだけどいい場所ある？」と迷ったら釣り行こNAVI！${prefText}の海釣り・堤防スポットを網羅したリアルタイム釣果さかな地図。SNS最新釣果ソナー、海底地形（等深線）、天気・風向・波予報・タイドグラフ（潮見表）から今日・明日釣れる場所がひと目でわかります。`;
+        mapAltText = `${regionName}の釣り場・最新釣果さかな地図（空撮＆等深線マップ）`;
+    }
+
+    // --------------------------------------------------
+    // ■ HTMLへの反映処理（タイトル・メタタグ）
+    // --------------------------------------------------
+    document.title = newTitle;
+
+    const setMeta = (selector, attr, value) => {
+        const el = document.querySelector(selector);
+        if (el) el.setAttribute(attr, value);
+    };
+
+    setMeta('meta[name="description"]', 'content', newDesc);
+    setMeta('link[rel="canonical"]', 'href', currentUrl);
+    setMeta('meta[property="og:url"]', 'content', currentUrl);
+    setMeta('meta[property="og:title"]', 'content', newTitle);
+    setMeta('meta[property="og:description"]', 'content', newDesc);
+    setMeta('meta[name="twitter:title"]', 'content', newTitle);
+    setMeta('meta[name="twitter:description"]', 'content', newDesc);
+
+    // AI向けMarkdownリンク（<link id="ai-md-link">）を現在表示中の階層に合わせて更新
+    let aiMdUrl = 'https://turiiko-navi.com/llms.txt';
+    let aiMdTitle = '釣り行こNAVI AI向けデータ目次';
+    const activePrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : '';
+    if (activePrefCode) {
+        const activeAreaId = (targetSpot && targetSpot.areaId) || window.currentAreaId || '';
+        const regularSpotCount = Array.isArray(window.spotData)
+            ? window.spotData.filter(s => s && s.zoom != null && String(s.zoom).trim() !== '' && s.icon && String(s.icon).trim() !== '').length
+            : 0;
+        const hasSplitAreaMd = Array.isArray(window.areaData) && window.areaData.length > 1 && regularSpotCount >= 15;
+        if (activeAreaId && hasSplitAreaMd && (spotName || area)) {
+            const safeAreaSeg = String(activeAreaId).trim().replace(/[^A-Za-z0-9_-]/g, '_');
+            aiMdUrl = `https://turiiko-navi.com/ai-data/${safeAreaSeg}.md`;
+            aiMdTitle = `${pref || activePrefCode} ${area || safeAreaSeg} 釣りスポット情報 (Markdown)`;
+        } else {
+            aiMdUrl = `https://turiiko-navi.com/ai-data/${activePrefCode}.md`;
+            aiMdTitle = `${pref || activePrefCode} 釣りスポット情報 (Markdown)`;
+        }
+    }
+    setMeta('#ai-md-link', 'href', aiMdUrl);
+    setMeta('#ai-md-link', 'title', aiMdTitle);
+
+    // --------------------------------------------------
+    // ■ マップへの代替テキスト（aria-label）付与
+    // --------------------------------------------------
+    const mapContainer = document.getElementById('lf-map');
+    if (mapContainer) {
+        mapContainer.setAttribute('role', 'region');
+        mapContainer.setAttribute('aria-label', mapAltText);
+    }
+
+    // --------------------------------------------------
+    // ■ 構造化データ（JSON-LD）の動的生成と更新
+    // --------------------------------------------------
+    let oldScript = document.getElementById('seo-json-ld');
+    if (oldScript) {
+        oldScript.remove();
+    }
+
+    if (targetSpot && targetSpot.lat && targetSpot.lng) {
+        const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
+        const jsonLdData = {
+            "@context": "https://schema.org",
+            "@type": "Place",
+            "name": targetSpot.name,
+            "description": (dictEntry && dictEntry.description) ? dictEntry.description : newDesc,
+            "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": parseFloat(targetSpot.lat),
+                "longitude": parseFloat(targetSpot.lng)
+            }
+        };
+        if (dictEntry) {
+            if (dictEntry.alternateName) {
+                jsonLdData.alternateName = dictEntry.alternateName;
+            }
+            if (dictEntry.addressRegion || dictEntry.addressLocality) {
+                jsonLdData.address = {
+                    "@type": "PostalAddress",
+                    "addressCountry": "JP",
+                    "addressRegion": dictEntry.addressRegion || pref || "",
+                    "addressLocality": dictEntry.addressLocality || ""
+                };
+            }
+        }
+
+        const script = document.createElement('script');
+        script.setAttribute('type', 'application/ld+json');
+        script.setAttribute('id', 'seo-json-ld');
+        script.textContent = JSON.stringify(jsonLdData);
+        document.head.appendChild(script);
+    }
+}
+
+// ==========================================
+// ★ スポット詳細の「主な対象魚」「最新の釣果情報」を準備完了まで待機して描画する関数
+// ==========================================
+let _spotDetailsRenderTimer = null;
+
+function waitAndRenderSpotDetails(spotName, retryCount = 0) {
+    if (_spotDetailsRenderTimer) {
+        clearTimeout(_spotDetailsRenderTimer);
+        _spotDetailsRenderTimer = null;
+    }
+
+    // URLのspotパラメータが変わっていたら（別画面へ遷移していたら）中止
+    const params = new URLSearchParams(window.location.search);
+    const currentSpotParam = params.get('spot');
+    if (!currentSpotParam || currentSpotParam !== spotName) return;
+
+    // 1. スポットデータの準備確認
+    const targetSpot = (window.spotData && window.spotData.length > 0)
+        ? window.spotData.find(s => s.name === spotName)
+        : null;
+
+    // 2. アクセス情報枠 (#accessInfoBox) と ICデータ (window.isIcLoaded) の準備確認
+    const accessBox = document.getElementById('accessInfoBox');
+    const h3El = accessBox ? accessBox.querySelector('h3') : null;
+    const isAccessBoxRendered = !!(
+        accessBox &&
+        accessBox.style.display !== 'none' &&
+        h3El &&
+        h3El.textContent.includes(spotName)
+    );
+
+    // 3. スポットへのズーム遷移 (zoomToSpot内のrenderAccessInfo) が完了しているか確認
+    const hasSpotZoom = !!(targetSpot && targetSpot.zoom && String(targetSpot.zoom).trim() !== '');
+    const isZoomToSpotDone = !hasSpotZoom || !!window.currentSpotBaseTile;
+
+    // 4. 魚データ (window.fishData) と釣具店データの到着確認（2.5秒経過時はタイムアウト許容して描画へ進む）
+    const isFishDataReady = !!window.fishData || retryCount >= 25;
+    const isShopDataReady = !!(window.markerControl && window.markerControl.allShops && window.markerControl.allShops.length > 0) || retryCount >= 25;
+
+    const isIcReady = !!window.isIcLoaded || retryCount >= 25;
+    // 必須条件が揃っていなければ 100ms 後に非同期リトライ（最大50回＝5秒）
+    if ((!targetSpot || !isIcReady || !isAccessBoxRendered || !isZoomToSpotDone || !isFishDataReady || !isShopDataReady) && retryCount < 50) {
+        _spotDetailsRenderTimer = setTimeout(() => {
+            waitAndRenderSpotDetails(spotName, retryCount + 1);
+        }, 100);
+        return;
+    }
+
+    if (!targetSpot || !accessBox) return;
+
+    // 準備完了後、最新の targetSpot.URL から魚種リストを抽出
+    let uniqueNames = [];
+    if (targetSpot.URL && typeof targetSpot.URL === 'string') {
+        const items = targetSpot.URL.split(',');
+        const names = items.map(item => item.split('|')[0]).filter(Boolean);
+        uniqueNames = [...new Set(names)];
+    }
+
+    // ① 主な対象魚を描画
+    if (typeof renderFishSection === 'function') {
+        renderFishSection(uniqueNames);
+    }
+
+    // ② 最新の釣果情報を描画（対象魚が無いスポットでも独立して実行）
+    if (typeof renderRecentCatches === 'function') {
+        renderRecentCatches(targetSpot);
+    }
+
+    // ③ 魚データや逆引き辞書が後から届いた場合のために meta description と JSON-LD も最新化
+    const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
+    if (uniqueNames.length > 0 || (dictEntry && dictEntry.description)) {
+        const pref = params.get('pref') || '';
+        const area = params.get('area') || '';
+        const baseDesc = (dictEntry && dictEntry.description)
+            ? dictEntry.description
+            : `${pref}${area}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
+        const extraPrefix = uniqueNames.length > 0 ? `対象魚や周辺情報: ${uniqueNames.join('、')}など。` : '';
+        const fullDesc = extraPrefix + baseDesc;
+
+        const descMeta = document.querySelector('meta[name="description"]');
+        if (descMeta) descMeta.setAttribute('content', fullDesc);
+        const ogDescMeta = document.querySelector('meta[property="og:description"]');
+        if (ogDescMeta) ogDescMeta.setAttribute('content', fullDesc);
+
+        const ldScript = document.getElementById('seo-json-ld');
+        if (ldScript && targetSpot.lat && targetSpot.lng) {
+            try {
+                const ldData = JSON.parse(ldScript.textContent);
+                ldData.description = (dictEntry && dictEntry.description) ? dictEntry.description : fullDesc;
+                if (dictEntry) {
+                    if (dictEntry.alternateName) ldData.alternateName = dictEntry.alternateName;
+                    if (dictEntry.addressRegion || dictEntry.addressLocality) {
+                        ldData.address = {
+                            "@type": "PostalAddress",
+                            "addressCountry": "JP",
+                            "addressRegion": dictEntry.addressRegion || pref || "",
+                            "addressLocality": dictEntry.addressLocality || ""
+                        };
+                    }
+                }
+                ldScript.textContent = JSON.stringify(ldData);
+            } catch (e) {}
+        }
+    }
+}
+
+// ==========================================
+// ★ URLに日本語クエリを付与・更新する共通関数 (タイトル連動版)
+// ==========================================
+let _titleUpdateTimer = null; 
+
+function setIdealQuery(type, value) {
+    const url = new URL(location.href);
+    
+    if (value) {
+        url.searchParams.set(type, value);
+    } else {
+        url.searchParams.delete(type);
+    }
+
+    window.history.replaceState(null, '', url);
+
+    clearTimeout(_titleUpdateTimer);
+    // タイトル更新関数を新しい名前に変更
+    _titleUpdateTimer = setTimeout(updateSeoMeta, 50); 
+}
+
+// ==========================================
+// ★ 新規追加：内部IDから日本語名を逆引きしてURLクエリにセットする関数
+// ==========================================
+async function updateQueryFromIds(pref, currentAreaId, currentSpotId) {
+    
+    // --------------------------------------------------
+    // パターン1：第一引数 (pref) のみ存在する場合
+    // --------------------------------------------------
+    if (pref && !currentAreaId && !currentSpotId) {
+        
+        // ★ グローバル化されたURLをそのまま使う！
+        if (!window.regionUrl) return;
+        
+        try {
+            const res = await fetch(window.regionUrl);
+            if (res.ok) {
+                const text = await res.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length > 0) {
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    const nameIdx = headers.findIndex(h => h.toLowerCase() === 'name');
+                    const notesIdx = headers.findIndex(h => h.toLowerCase() === 'notes');
+                    
+                    if (nameIdx !== -1 && notesIdx !== -1) {
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.trim());
+                            if (cols[nameIdx] === pref) {
+                                setIdealQuery('pref', cols[notesIdx]);
+                                // ★ regionもついでにセットできるならここで！
+                                // setIdealQuery('region', 取得したregion名など);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Region CSVフェッチエラー:", err);
+        }
+    }
+
+    // --------------------------------------------------
+    // パターン2：第二引数 (currentAreaId) まで存在する場合
+    // --------------------------------------------------
+    else if (pref && currentAreaId && !currentSpotId) {
+        if (window.areaData) {
+            // 第二引数を "_" でスプリットした [0] を取得
+            const splitAreaId = String(currentAreaId).split('_')[0]; 
+            
+            // window.areaDataの individualId 列と同じものを探す
+            const area = window.areaData.find(a => String(a.individualId) === splitAreaId);
+            
+            if (area) {
+                // name列を area クエリとしてセット
+                setIdealQuery('area', area.name);
+            }
+        }
+    }
+
+    // --------------------------------------------------
+    // パターン3：第三引数 (currentSpotId) まで存在する場合
+    // --------------------------------------------------
+    else if (pref && currentAreaId && currentSpotId) {
+        if (window.spotData) {
+            // areaId列が currentAreaId と同じで、さらに individualId が currentSpotId と同じ行を探す
+            const spot = window.spotData.find(s => 
+                String(s.areaId) === String(currentAreaId) && 
+                String(s.individualId) === String(currentSpotId)
+            );
+            
+            if (spot) {
+                // name列を spot クエリとしてセット
+                setIdealQuery('spot', spot.name);
+            }
+        }
+    }
+}
+
+function formatDate(str) {
+  const [y, m, d] = str.split("-");
+  return `${y} ${Number(m)}/${Number(d)}`;
+}
+
+// ==========================================
+// ★ WRS（クローラー）が外部JSを間引いた場合の安全フォールバック定義
+// （通常ブラウザでは外部JS側が既に定義されているため上書きしない）
+// ==========================================
+window._loadedPrefSet = window._loadedPrefSet || new Set();
+window.prefSpotData = window.prefSpotData || {};
+window.prefSpotPromises = window.prefSpotPromises || {};
+window.prefDictionaryCache = window.prefDictionaryCache || {};
+window.prefDictionaryPromises = window.prefDictionaryPromises || {};
+
+if (typeof window.loadRegionCsvData !== 'function') {
+    window.loadRegionCsvData = function() {
+        const regionCode = window.currentRegion || 'KANTO';
+        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
+        if (window.regionCsvParsedData && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
+            return Promise.resolve(window.regionCsvParsedData);
+        }
+        if (window.regionCsvParsedPromise && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
+            return window.regionCsvParsedPromise;
+        }
+        window.regionCsvParsedRegion = regionCode;
+        window.regionCsvParsedUrl = rUrl;
+        window.regionCsvParsedPromise = fetch(rUrl)
+            .then(res => {
+                if (!res.ok) throw new Error('Region CSV fetch failed: ' + res.status);
+                return res.text();
+            })
+            .then(text => {
+                const lines = text.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                const rows = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i]) continue;
+                    const cols = lines[i].split(',').map(c => c.trim());
+                    const row = {};
+                    headers.forEach((h, idx) => { row[h] = cols[idx] || ''; });
+                    rows.push(row);
+                }
+                const prefRows = [];
+                for (const row of rows) {
+                    if (row.type !== 'pref' || !row.url) continue;
+                    const parts = row.url.split('/');
+                    let prefCode = '', lat = NaN, lng = NaN;
+                    if (parts.length >= 4) {
+                        prefCode = parts[1].split('_')[0];
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
+                    } else if (parts.length === 3) {
+                        prefCode = parts[0].split('_')[0];
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    }
+                    if (prefCode) prefRows.push({ prefCode, prefName: row.notes || '', lat, lng, row });
+                }
+                const parsedData = { regionCode, url: rUrl, headers, rows, prefRows };
+                window.regionCsvParsedData = parsedData;
+                return parsedData;
+            });
+        return window.regionCsvParsedPromise;
+    };
+}
+
+if (typeof window.loadRegionCSV !== 'function') {
+    window.loadRegionCSV = async function() {
+        try {
+            const csvData = await window.loadRegionCsvData();
+            if (!csvData) return false;
+            window.regionPrefData = (csvData.prefRows || []).map(p => ({
+                regionCode: csvData.regionCode,
+                prefCode: p.prefCode,
+                prefName: p.prefName,
+                lat: p.lat,
+                lng: p.lng
+            }));
+            for (const row of csvData.rows || []) {
+                if (row.type === 'region') {
+                    window.regionData = {
+                        name: row.name || '関東地方',
+                        lat: parseFloat(row.lat),
+                        lng: parseFloat(row.lng),
+                        zoom: parseFloat(row.zoom)
+                    };
+                }
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+}
+
+if (typeof window.loadPrefectureSpots !== 'function') {
+    window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
+        const regionCode = window.currentRegion || 'KANTO';
+        const fetchPref = code => {
+            if (!code) return Promise.resolve([]);
+            if (Array.isArray(window.prefSpotData[code])) return Promise.resolve(window.prefSpotData[code]);
+            if (window.prefSpotPromises[code]) return window.prefSpotPromises[code];
+            const url = `/${regionCode}/${code}_location.json`;
+            window.prefSpotPromises[code] = fetch(url)
+                .then(r => r.ok ? r.json() : [])
+                .then(data => {
+                    if (!Array.isArray(data)) return [];
+                    data.forEach(s => { s._prefCode = code; });
+                    window.prefSpotData[code] = data;
+                    window._loadedPrefSet.add(code);
+                    return data;
+                })
+                .catch(() => []);
+            return window.prefSpotPromises[code];
+        };
+        if (mode === 'select' && prefCode) {
+            await fetchPref(prefCode);
+            window.allspotData = Object.values(window.prefSpotData).flat();
+            window.ALL_REGION_SPOTS = window.allspotData;
+            return window.prefSpotData[prefCode] || [];
+        }
+        try {
+            const csvData = await window.loadRegionCsvData();
+            const prefList = [...new Set((csvData.prefRows || []).map(r => r.prefCode).filter(Boolean))];
+            const targets = mode === 'other' ? prefList.filter(c => c !== prefCode) : prefList;
+            await Promise.all(targets.map(fetchPref));
+        } catch (e) {}
+        window.allspotData = Object.values(window.prefSpotData).flat();
+        window.ALL_REGION_SPOTS = window.allspotData;
+        return window.allspotData;
+    };
+}
+
+if (typeof window.loadLocationJSON !== 'function') {
+    window.loadLocationJSON = async function() {
+        const pref = window.currentPref;
+        const rows = (window.prefSpotData && window.prefSpotData[pref]) || (window.allspotData || []).filter(r => r._prefCode === pref);
+        window.prefData = rows.find(r => (!r.areaId || r.individualId === 'parent') && r.name === pref) || null;
+        window.areaData = rows.filter(r => (r.areaId || '').trim() === pref);
+        window.spotData = rows.filter(r => r.type !== 'pref' && r.type !== 'area' && r.icon && r.icon.trim() !== '');
+        return { main: window.prefData, areas: window.areaData, spots: window.spotData };
+    };
+}
+
+if (typeof window.loadPrefDictionaryJson !== 'function') {
+    window.loadPrefDictionaryJson = function(prefCode = window.currentPref) {
+        if (!prefCode) return Promise.resolve(null);
+        let cleanPref = String(prefCode).trim().split('/').pop().split('_')[0];
+        const regionCode = window.currentRegion || 'KANTO';
+        const key = regionCode + '_' + cleanPref;
+        if (window.prefDictionaryCache[key]) {
+            window.spotDictionary = window.prefDictionaryCache[key];
+            return Promise.resolve(window.prefDictionaryCache[key]);
+        }
+        if (window.prefDictionaryPromises[key]) return window.prefDictionaryPromises[key];
+        const url = '/' + regionCode + '/' + cleanPref + '_dictionary.json';
+        window.prefDictionaryPromises[key] = fetch(url)
+            .then(r => {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(data => {
+                window.prefDictionaryCache[key] = data;
+                window.spotDictionary = data;
+                return data;
+            })
+            .catch(() => {
+                delete window.prefDictionaryPromises[key];
+                return null;
+            });
+        return window.prefDictionaryPromises[key];
+    };
+}
+
+if (typeof window.getSpotDictionaryEntry !== 'function') {
+    window.getSpotDictionaryEntry = function(spot) {
+        if (!spot || !spot.name) return null;
+        const spotName = String(spot.name).trim();
+        const regionCode = window.currentRegion || 'KANTO';
+        const prefCode = spot._prefCode || (spot.areaId ? String(spot.areaId).split('_')[0] : '') || window.currentPref;
+        if (prefCode && window.prefDictionaryCache) {
+            const cleanPref = String(prefCode).trim().split('/').pop().split('_')[0];
+            const key = regionCode + '_' + cleanPref;
+            if (window.prefDictionaryCache[key] && window.prefDictionaryCache[key][spotName]) {
+                return window.prefDictionaryCache[key][spotName];
+            }
+        }
+        if (window.spotDictionary && window.spotDictionary[spotName]) {
+            return window.spotDictionary[spotName];
+        }
+        return null;
+    };
+}
+
+if (typeof window.renderAccessInfo !== 'function') {
+    window.renderAccessInfo = function(spot) {
+        const container = document.getElementById('accessInfoBox');
+        if (!container || !spot || !spot.lat || !spot.lng) return;
+        const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const dictEntry = typeof window.getSpotDictionaryEntry === 'function' ? window.getSpotDictionaryEntry(spot) : null;
+        const accessTexts = typeof window.calcAccessInfo === 'function' ? window.calcAccessInfo(spot.lat, spot.lng) : [];
+        const waterName = dictEntry && dictEntry.waterName ? String(dictEntry.waterName).trim() : '';
+        const regionalName = dictEntry && dictEntry.regionalName ? String(dictEntry.regionalName).trim() : '';
+        const waterRegionalText = [waterName, regionalName].filter(Boolean).join(' ');
+        let altText = '';
+        if (dictEntry && dictEntry.alternateName) {
+            altText = Array.isArray(dictEntry.alternateName)
+                ? dictEntry.alternateName.map(a => String(a).trim()).filter(Boolean).join('・')
+                : String(dictEntry.alternateName).trim();
+        }
+        const coopText = dictEntry && dictEntry.fishingCooperative ? String(dictEntry.fishingCooperative).trim() : '';
+        const descText = dictEntry && dictEntry.description ? String(dictEntry.description).trim() : '';
+
+        let html = '<div class="spot-header-wrap">';
+        if (waterRegionalText) html += `<div class="spot-water-regional">${esc(waterRegionalText)}</div>`;
+        html += `<h3 class="spot-main-title">${esc(spot.name)}</h3>`;
+        if (altText || coopText) {
+            html += '<div class="spot-sub-meta">';
+            if (altText) html += `<span class="spot-alt-name">${esc(altText)}</span>`;
+            if (coopText) html += `<span class="spot-coop-name">${esc(coopText)}</span>`;
+            html += '</div>';
+        }
+        html += '</div>';
+        if (descText) {
+            const descClass = accessTexts.length > 0 ? 'spot-description has-access-list' : 'spot-description';
+            html += `<p class="${descClass}">${esc(descText)}</p>`;
+        }
+        if (accessTexts.length > 0) {
+            html += '<ul class="spot-access-list">';
+            accessTexts.forEach(t => { html += `<li>${t}</li>`; });
+            html += '</ul>';
+        }
+        if (container.querySelector('#default-site-guide')) container.innerHTML = '';
+        let mainBlock = document.getElementById('spot-access-main');
+        if (!mainBlock || mainBlock.parentNode !== container) {
+            mainBlock = document.createElement('div');
+            mainBlock.id = 'spot-access-main';
+            container.insertBefore(mainBlock, container.firstChild);
+        }
+        mainBlock.innerHTML = html;
+        container.style.display = 'block';
+    };
+}
+
+if (typeof window.spot_management !== 'function') {
+    window.spot_management = async function(prefCode = window.currentPref, areaId = window.currentAreaId, spotId = window.currentSpotId) {
+        if (!prefCode || !spotId) return false;
+        await window.loadRegionCSV();
+        await window.loadPrefectureSpots(prefCode, 'select');
+        await window.loadLocationJSON();
+        const spotParts = String(spotId).split('_');
+        const targetIndivId = spotParts[2] || spotParts[0];
+        const spot = (window.spotData || []).find(s => String(s.individualId) === String(targetIndivId));
+        if (!spot) return false;
+        const finalAreaId = areaId || spot.areaId || '';
+        const parentArea = (window.areaData || []).find(a => finalAreaId.endsWith(a.individualId));
+        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+        if (parentArea) setIdealQuery('area', parentArea.name);
+        setIdealQuery('spot', spot.name);
+        window.renderAccessInfo(spot);
+        await window.loadPrefDictionaryJson(prefCode).then(dict => {
+            if (dict) {
+                window.renderAccessInfo(spot);
+                if (typeof updateSeoMeta === 'function') updateSeoMeta();
+            }
+        });
+        if (typeof drawLocation === 'function') {
+            await drawLocation(spot.name, Number(spot.lat), Number(spot.lng), Number(spot.zoom) || 14);
+        }
+        return true;
+    };
+}
+
+// ==========================================
+// ★ 4. URLクエリから直接システム変数をセットする関数
+// ==========================================
+async function applyQueryToStateFromCsv() {
+    const params = new URLSearchParams(window.location.search);
+    const qPref = params.get('pref');
+    const qArea = params.get('area');
+    const qSpot = params.get('spot');
+
+    if (!qPref) return;
+
+    if (window.regionUrl) {
+        try {
+            const csvData = await loadRegionCsvData();
+
+            if (csvData.prefRows) {
+                for (const pref of csvData.prefRows) {
+                    const csvNote = pref.prefName || '';
+                    const csvName = pref.row.name || '';
+                    const extractedCode = pref.prefCode;
+
+                    if (
+                        csvNote && (
+                            csvNote === qPref ||
+                            csvNote.includes(qPref) ||
+                            qPref.includes(csvNote) ||
+                            csvName === qPref ||
+                            extractedCode === qPref
+                        )
+                    ) {
+                        window.currentPref = csvName || extractedCode;
+                        window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
+                        break;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error("Region CSV逆引きエラー:", err);
+        }
+    }
+
+    let vaultData = [];
+    if (window.currentPref) {
+        vaultData = await loadPrefectureSpots(window.currentPref, 'select');
+    } else {
+        vaultData = await loadPrefectureSpots(null, 'all');
+        const parentRow = vaultData.find(r =>
+            r.individualId === 'parent' &&
+            r.notes && (
+                r.notes === qPref ||
+                r.notes.includes(qPref) ||
+                qPref.includes(r.notes) ||
+                r.name === qPref
+            )
+        );
+        if (parentRow) {
+            window.currentPref = parentRow.name;
+            window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
+        }
+    }
+
+    if (!vaultData || vaultData.length === 0) return;
+
+    if (qArea || qSpot) {
+        const prefRows = window.currentPref
+            ? vaultData.filter(r => r._prefCode === window.currentPref || (r.areaId && String(r.areaId).startsWith(window.currentPref)))
+            : vaultData;
+
+        for (const row of prefRows) {
+            const rowName = row.name;
+            if (qArea && rowName === qArea && row.areaId && row.individualId) {
+                window.currentAreaId = row.areaId + "_" + row.individualId;
+            }
+            if (qSpot && rowName === qSpot && row.type !== 'pref' && row.type !== 'area') {
+                window.currentSpotId = row.individualId;
+                if (!qArea && row.areaId) {
+                    window.currentAreaId = row.areaId;
+                }
+            }
+        }
+    }
+}
+
+// ==========================================
+// ★ ページ初期ロード時のメインフロー（LCPタイル描画最優先版）
+// ==========================================
+document.addEventListener('DOMContentLoaded', async () => {
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (!params.get('region') && !params.get('pref')) {
+        setIdealQuery('region', '関東地方');
+    }
+
+    window.currentRegion = getRegionCode();
+    window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
+
+    // クエリ反映前の状態を確認し、ページ初期表示かどうかを確定する。
+    window.isInitialMapLoad = (
+        !window.currentPref &&
+        !window.currentAreaId &&
+        !window.currentSpotId &&
+        !window.prefData &&
+        (!Array.isArray(window.areaData) || window.areaData.length === 0) &&
+        (!Array.isArray(window.spotData) || window.spotData.length === 0) &&
+        !window.currentHash
+    );
+
+    if (params.get('pref')) {
+        await applyQueryToStateFromCsv();
+    }
+
+    if (typeof routeUpdate === 'function') {
+        await routeUpdate();
+    }
+
+    // 初期URL復帰が完了したら、以後のユーザー操作ではタイル待機を行わない。
+    window.isInitialMapLoad = false;
+
+    // ★ タイル描画完了後、ドット・道路・等深線の次に裏データと記事一覧を順番にバトンリレー実行する
+    if (typeof window.runAfterTileLoad === 'function') {
+        window.runAfterTileLoad(() => {
+            if (!window.currentPref) return loadPrefectureSpots(null, 'all');
+        });
+        window.runAfterTileLoad(() => {
+            // ★ 県・エリア・スポットURLでは各画面の入口側で描画するため、REGION画面のときだけ呼ぶ
+            if (!window.currentPref && typeof renderSpotRanking === 'function') return renderSpotRanking(1);
+        });
+        window.runAfterTileLoad(() => {
+            if (typeof loadICData === 'function') return loadICData();
+        });
+        window.runAfterTileLoad(() => {
+            if (typeof loadAndRenderCategorizedArticles === 'function') {
+                return loadAndRenderCategorizedArticles('article-list-container');
+            }
+        });
+    }
+});
+
+// ==========================================
+// ★ URL直打ち（初期ロード）からの復帰専用：routeUpdate関数
+// （PREF画面のロード・描画は prefLoader.js の pref_management に任せる）
+// ==========================================
+async function routeUpdate() {
+    // 旧URLなどに残る region=KANTO を表示名へ正規化する。
+    const regionParam = new URLSearchParams(window.location.search).get('region');
+    const regionName = Object.keys(REGION_MAP).find(name => REGION_MAP[name] === regionParam);
+    if (regionName) setIdealQuery('region', regionName);
+    if (!window.currentPref) {
+        if (typeof region_management === 'function') await region_management();
+    } else {
+        // ★ SPOT画面の最優先ロード（対象スポットのデータのみ先行取得 → drawLocation完了 → 後続描画＆所属県の天気・辞書先行取得）
+        let spotHandled = false;
+        if (window.currentSpotId && typeof spot_management === 'function') {
+            try {
+                spotHandled = await spot_management(window.currentPref, window.currentAreaId, window.currentSpotId);
+            } catch (err) {
+                console.error('spot_management エラー（従来フローで続行）:', err);
+            }
+        }
+
+        let prefDrawn = false;
+        if (!spotHandled && typeof pref_management === 'function') {
+            try {
+                prefDrawn = await pref_management(window.currentPref);
+            } catch (err) {
+                console.error('pref_management エラー（従来フローで続行）:', err);
+            }
+        }
+
+        if (!spotHandled) {
+            const isReady = await checkAndLoadRouteData();
+            if (!isReady) return;
+        }
+
+        if (spotHandled) {
+            // spot_management で描画・先行ロード開始済み
+        } else if (window.currentSpotId) {
+            const spotId = String(window.currentSpotId).split("_");
+            const safeAreaId = window.currentAreaId || ""; 
+            
+            if (typeof prepareFishForArea === 'function') await prepareFishForArea(safeAreaId);
+            
+            const list = window.spotData.filter(s => String(s.areaId) === safeAreaId);
+            const targetIndivId = spotId[2] || spotId[0]; 
+            const spot = list.find(s => String(s.individualId) === String(targetIndivId));
+            
+            if (spot) {
+                if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+                const parentArea = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+                
+                if (parentArea) {
+                    setIdealQuery('area', parentArea.name);
+
+                    if (typeof drawLocation === 'function') {
+                        await drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
+                    }
+
+                    if (window.map) {
+                        window.map.options.maxBoundsViscosity = 0;
+                        window.map.setMaxBounds(null);
+                    }
+                    
+                    if (typeof prefetchAround === 'function') prefetchAround(parentArea);
+                    if (typeof showSpotsForArea === 'function') showSpotsForArea(safeAreaId);
+                    if (typeof phase1menu === 'function') phase1menu(safeAreaId);
+                    if (window.markerControl && typeof window.markerControl.showShop01 === 'function') {
+                        window.markerControl.showShop01(safeAreaId);
+                    }
+                    
+                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                    if (typeof renderSpotRanking === 'function') renderSpotRanking();
+                    if (typeof openArea === 'function') openArea(parentArea.individualId);
+                }
+                
+                setIdealQuery('spot', spot.name);
+                window._selectSpotCompleted = true;
+
+                if (window.map) {
+                    window.map.once('moveend', () => {
+                        window.map.invalidateSize(true);
+                        if (typeof enableDragForArea === 'function') enableDragForArea();
+                        if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+                        window.map.getContainer().classList.add('is-spot-mode');
+
+                        if (spot.zoom && spot.zoom !== '') {
+                            if (typeof zoomToSpot === 'function') zoomToSpot(spot);
+                        } else {
+                            if (typeof showFishPopup === 'function') showFishPopup(spot);
+                        }
+                    });
+                }
+
+                if (typeof drawLocation === 'function') {
+                    await drawLocation(spot.name, spot.lat, spot.lng, 13);
+                }
+                
+                requestAnimationFrame(() => {
+                    const btn = document.getElementById('map-back-btn');
+                    // ★ タイル切替ボタン・釣果投稿ボタンは zoomToSpot 内の準備完了（IP+UUID ＆ 代替タイル先読み）後にフェードインさせる
+                    if (btn) {
+                        btn.style.display = 'block';
+                        requestAnimationFrame(() => { 
+                            btn.style.opacity = '1'; 
+                        });
+                    }
+                });
+            }
+        } else if (window.currentAreaId) {
+            if (typeof loadRegionCSV === 'function') await loadRegionCSV();
+            const safeAreaId = window.currentAreaId || ""; 
+            const area = window.areaData.find(a => safeAreaId.endsWith(a.individualId));
+            if (!area) return;
+            
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            setIdealQuery('area', area.name); 
+            setIdealQuery('spot', null);      
+
+            const safeZoom = area.zoom || window.prefData.zoom;
+            if (typeof drawLocation === 'function') await drawLocation(area.name, area.lat, area.lng, safeZoom);
+            
+            if (typeof renderAreaGuide === 'function') renderAreaGuide();
+            if (typeof renderSpotRanking === 'function') renderSpotRanking();
+            if (typeof showRoadLayers === 'function') showRoadLayers();
+
+            if (typeof selectArea === 'function') selectArea(area); 
+            if (typeof renderCrowdImage === 'function') renderCrowdImage();
+            if (typeof showPrefSpots === 'function') showPrefSpots();
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.display = 'block';
+                    requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                }
+            });
+        } else if (window.prefData) {
+            if (typeof loadRegionCSV === 'function') await loadRegionCSV();
+            setIdealQuery('pref', window.prefData.notes); 
+            setIdealQuery('area', null);                 
+            setIdealQuery('spot', null);                 
+
+            const targetZoom = window.prefData.zoom;
+            const isMapJustCreated = !window.map;
+            const center = window.map ? window.map.getCenter() : null;
+            const isSameLoc = isMapJustCreated || (center && Math.abs(center.lat - window.prefData.lat) < 0.0001 && 
+                              Math.abs(center.lng - window.prefData.lng) < 0.0001 && 
+                              window.map.getZoom() === targetZoom);
+
+            // ★ pref_management が描画済みの場合は、同一座標への再描画を省く
+            if (!prefDrawn && typeof drawLocation === 'function') await drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
+            
+            const finalizePref = () => {
+                if (window.map) window.map.invalidateSize(true);
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        if (typeof showRoadLayers === 'function') showRoadLayers();
+                        if (typeof showPrefSpots === 'function') showPrefSpots();
+                        if (typeof initAreaUI === 'function') initAreaUI();
+                        if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                        if (typeof renderCrowdImage === 'function') renderCrowdImage();
+                        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+
+                        requestAnimationFrame(() => {
+                            const btn = document.getElementById('map-back-btn');
+                            if (btn) {
+                                btn.style.display = 'block';
+                                requestAnimationFrame(() => { btn.style.opacity = '1'; });
+                            }
+                            window.goBackGuard = false; 
+                        });
+                    });
+                });
+            };
+
+            if (prefDrawn || isSameLoc) {
+                finalizePref();
+            } else {
+                if (window.map) window.map.once('moveend', finalizePref);
+            }
+        }
+    }
+
+    // ★ 各分岐の共通した最後に一度、SNS釣果データを取得し、完了後にソナーマーカーを呼び出す
+    if (typeof window.loadSnsCatchData === 'function') {
+        await window.loadSnsCatchData(window.currentRegion || 'KANTO');
+        if (typeof window.showSnsSonarLayer === 'function') {
+            await window.showSnsSonarLayer();
+        }
+    }
+}
+
+// ==========================================
+// 3. マーカー・県スワイプ等から県が選択された時のトリガー
+//    options.keepRadar: true なら雨雲レーダーを再描画しない（県スワイプ用）
+// ==========================================
+window.selectPrefecture = async function (csvParam, fallbackPrefName, options = {}) {
+    // ★ 追加：県画面に移行する際はRegion用のニアレストクリックを確実に解除する
+    if (window.regionNearestClickHandler && window.map) {
+        window.map.off('click', window.regionNearestClickHandler);
+    }
+
+    let region = window.currentRegion || 'KANTO';
+    let prefCode = csvParam;
+
+    if (csvParam.includes('_location')) {
+        prefCode = csvParam.split('_')[0];
+    } else if (csvParam.includes('_')) {
+        const parts = csvParam.split('_');
+        region = parts[0];
+        prefCode = parts[1];
+    } else if (csvParam.includes('.csv')) {
+        const match =
+            csvParam.match(/\/([A-Za-z-]+)_/) ||
+            csvParam.match(/^([A-Za-z-]+)_/);
+
+        if (match) {
+            prefCode = match[1];
+        }
+    }
+
+    window.currentRegion = region;
+    window.currentPref = prefCode;
+
+    // 県切り替え開始時に、前の県の取得結果が後から反映されないよう無効化
+    window._jmaAlertRequestId = (window._jmaAlertRequestId || 0) + 1;
+    window._currentAlertUrl = null;
+    if (typeof clearMapAlert === 'function') clearMapAlert();
+
+    window.prefBounds = null;
+    window.areaBounds = null;
+
+    window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
+    window.prefWeatherUrl = `/data/${prefCode}_whether.json`;
+    window.prefInlandWeatherUrl = `/data/${prefCode}_InLandwhether.json`;
+    window.fishUrl = `/${region}/${prefCode}_fish.json`;
+    window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
+
+    let prefName = fallbackPrefName;
+
+    // =====================================================
+    // 県データの抽出
+    // =====================================================
+    if (window.ALL_REGION_SPOTS && window.ALL_REGION_SPOTS.length > 0) {
+        const targetPrefData = window.ALL_REGION_SPOTS.find(
+            r => r.name === prefCode && r.individualId === "parent"
+        );
+
+        if (targetPrefData) {
+            window.prefData = targetPrefData;
+            prefName = targetPrefData.notes;
+        }
+    }
+
+    if (prefName) {
+        setIdealQuery('pref', prefName);
+    } else {
+        setIdealQuery('pref', prefCode);
+    }
+
+    setIdealQuery('area', null);
+    setIdealQuery('spot', null);
+
+    // ★ 差し替え：drawLocation と他県JSONの並列取得は pref_management に任せる
+    //   （内部で既存マップからの移動完了まで待ってから戻る）
+    let drawn = false;
+    if (typeof pref_management === 'function') {
+        try {
+            drawn = await pref_management(prefCode);
+        } catch (err) {
+            console.error('pref_management エラー（従来フローで続行）:', err);
+        }
+    }
+
+    if (typeof loadPrefectureData === 'function') {
+        await loadPrefectureData(prefCode);
+    }
+
+    if (window.prefData && window.map) {
+        const targetZoom = window.prefData.zoom;
+
+        // pref_management が使えなかった場合のみ、従来どおりここで描画する
+        if (!drawn) {
+            await loadLocationJSON();
+
+            drawLocation(
+                window.prefData.name,
+                window.prefData.lat,
+                window.prefData.lng,
+                targetZoom
+            );
+        }
+
+        const finalizePref = () => {
+            window.map.invalidateSize(true);
+
+            if (
+                typeof loadPrefectureData === 'function' &&
+                (!window.spotData || window.spotData.length === 0)
+            ) {
+                loadPrefectureData(prefCode).then(() => {
+                    executeUI();
+                });
+            } else {
+                executeUI();
+            }
+
+            function executeUI() {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        // 👇 追加: 県が選択された時に確実に道路レイヤーを表示
+                        if (typeof showRoadLayers === 'function') showRoadLayers();
+
+                        if (typeof showPrefSpots === 'function') showPrefSpots();
+                        if (typeof initAreaUI === 'function') initAreaUI();
+                        if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                        if (!options.keepRadar && typeof renderCrowdImage === 'function') renderCrowdImage();
+                        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
+                        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
+                        
+                        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+
+                        // ★ preloadShop01 は loadPrefectureData のキュー側で実行されるため、ここでは呼ばない（二重登録防止）
+                        
+                        if (typeof renderSpotRanking === 'function') renderSpotRanking();
+                        requestAnimationFrame(() => {
+                            const btn = document.getElementById('map-back-btn');
+
+                            if (btn) {
+                                btn.style.display = 'block';
+
+                                requestAnimationFrame(() => {
+                                    btn.style.opacity = '1';
+                                });
+                            }
+                            
+                            window.goBackGuard = false;
+                        });
+                    });
+                });
+            }
+        };
+
+        const center = window.map.getCenter();
+
+        const isSameLoc =
+            Math.abs(center.lat - window.prefData.lat) < 0.0001 &&
+            Math.abs(center.lng - window.prefData.lng) < 0.0001 &&
+            window.map.getZoom() === Number(targetZoom);
+
+        if (drawn || isSameLoc) {
+            finalizePref();
+        } else {
+            window.map.once('moveend', finalizePref);
+        }
+    }
+};
+  
+// =====================================================
+// ■ 3. 広域用のグリッド間引き関数
+// =====================================================
+function filterMergedGridSpots(allSpots, map, gridSize = 5) {
+    if (!map || !Array.isArray(allSpots) || allSpots.length === 0) return [];
+
+    const occupiedCells = new Set();
+    const result = [];
+
+    for (let i = 0; i < allSpots.length; i++) {
+        const spot = allSpots[i];
+        if (!spot.lat || !spot.lng) continue;
+
+        const p = map.latLngToLayerPoint([spot.lat, spot.lng]);
+        const cellX = Math.floor(p.x / gridSize);
+        const cellY = Math.floor(p.y / gridSize);
+        const cellKey = `${cellX}_${cellY}`;
+
+        if (!occupiedCells.has(cellKey)) {
+            occupiedCells.add(cellKey);
+            result.push(spot);
+        }
+    }
+
+    return result;
+}
+async function loadPrefectureData(prefCode) {
+    window.fishData = null; 
+    window.currentPref = prefCode;
+
+    const region = window.currentRegion || 'KANTO';
+    window.regionUrl = `/${region}/${region}_region.csv`;
+    window.fishUrl = `/${region}/${prefCode}_fish.json`;
+    window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
+
+    try {
+        // ★ 1. 共通ローダーで選択県だけを取得し、全県データの集約を待たずに進む
+        // キャッシュ済みの場合も allspotData への反映を保証するため、毎回共通ローダーを通す。
+        await loadPrefectureSpots(prefCode, 'select');
+
+        // 2. 座標データ(prefData/areaData/spotData)だけ即座に展開して返す（タイル描画を止めない！）
+        await loadLocationJSON();
+
+        // 県データ一式の展開完了後に、気象庁アラートを更新する
+        // 県画面では、アラート取得関数の成否に関係なくJNNラベルを表示する
+        var jnnRow = document.getElementById('map-jma-alert');
+        if (jnnRow && window.currentPref === prefCode) {
+            jnnRow.style.display = 'flex';
+        }
+        if (window.currentPref === prefCode && window.prefData) {
+            getAlertText(window.prefData);
+        }
+        
+        // ★ 3. 天気JSONとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で取得する
+        // 既存の画面遷移・後続処理を維持し、天気取得部分だけ新JSON関数へ切り替える。
+        window.runAfterTileLoad(async () => {
+            await Promise.all([
+                AddWeather(prefCode, 'select').catch(() => null),
+                AddInLandWeather(prefCode, 'select').catch(() => null)
+            ]);
+
+            if (window.currentPref === prefCode) {
+                if (typeof renderPrefWeather === 'function') renderPrefWeather();
+                if (window.currentAreaId && typeof phase1menu === 'function') {
+                    phase1menu(window.currentAreaId);
+                }
+                if (window.phase2Initialized && window.map && typeof showNearestSpotName === 'function') {
+                    showNearestSpotName(window.map);
+                }
+                if (window.currentSpotId && window.spotData) {
+                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    if (activeSpot && activeSpot.whether && typeof createWeekItem === 'function') {
+                        createWeekItem(activeSpot.whether);
+                    }
+                }
+                // ★ renderSpotRanking は各画面の入口側で1回だけ呼ぶ（ここでは呼ばない）
+            }
+
+            if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+                await window.markerControl.preloadShop01(window.prefShopUrl);
+                if (window.currentSpotId && window.spotData && typeof renderShopSection === 'function') {
+                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    if (activeSpot) renderShopSection(activeSpot);
+                }
+            }
+        });
+
+        return true; 
+    } catch (err) {
+        console.error("データ読み込みエラー:", err);
+        return false;
+    }
+}
+/**
+ * sitemap.xmlから記事データを抽出し、カテゴリ別に描画する
+ * （スクロール・タッチ連動で初期ロードの2.4MB渋滞を完全にゼロにする版）
+ */
+function loadAndRenderCategorizedArticles(targetDomId) {
+    const targetDom = document.getElementById(targetDomId);
+    if (!targetDom) return;
+
+    targetDom.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">記事を読み込み中...</div>';
+
+    let isLoaded = false;
+
+    const executeLoad = async () => {
+        if (isLoaded) return;
+        isLoaded = true;
+
+        window.removeEventListener('scroll', executeLoad);
+        window.removeEventListener('touchstart', executeLoad);
+        window.removeEventListener('mousemove', executeLoad);
+
+        try {
+            const res = await fetch('sitemap.xml', { priority: 'low' });
+            if (!res.ok) throw new Error('サイトマップの取得に失敗しました');
+            const xmlText = await res.text();
+
+            const categoryOrder = [];
+            const groupedArticles = {};
+
+            // ★ DOMParserによる巨大なXMLツリー構築（Long Task）を廃止し、4msスライスの正規表現で高速抽出する
+            const urlBlocks = xmlText.split('<url>');
+            let idx = 1;
+
+            await new Promise(resolve => {
+                function parseXmlSlice() {
+                    const start = performance.now();
+                    while (idx < urlBlocks.length && (performance.now() - start) < 4) {
+                        const block = urlBlocks[idx++];
+                        if (!block.includes('ARTICLE_DATA:')) continue;
+
+                        const locMatch = block.match(/<loc>([^<]+)<\/loc>/);
+                        const dataMatch = block.match(/<!--\s*ARTICLE_DATA:\s*(\{[\s\S]*?\})\s*-->/);
+                        if (!locMatch || !dataMatch) continue;
+
+                        try {
+                            const articleData = JSON.parse(dataMatch[1]);
+                            articleData.url = locMatch[1].trim();
+                            const cat = articleData.category || "その他の記事";
+                            if (!categoryOrder.includes(cat)) {
+                                categoryOrder.push(cat);
+                                groupedArticles[cat] = [];
+                            }
+                            groupedArticles[cat].push(articleData);
+                        } catch (e) {
+                            console.error('記事JSONパースエラー:', e);
+                        }
+                    }
+                    if (idx < urlBlocks.length) {
+                        requestAnimationFrame(parseXmlSlice);
+                    } else {
+                        resolve();
+                    }
+                }
+                requestAnimationFrame(parseXmlSlice);
+            });
+
+            let html = '';
+
+            categoryOrder.forEach(categoryName => {
+                const articles = groupedArticles[categoryName];
+                if (articles.length === 0) return;
+
+                html += `<h2 class="category-heading">${categoryName}</h2>`;
+
+                const compactItems = articles.filter(a => a.style === "compact");
+                const listItems = articles.filter(a => a.style !== "compact"); 
+
+                if (compactItems.length > 0) {
+                    html += `<section class="article-list">`;
+                    compactItems.forEach(item => {
+                        html += `
+                        <a href="${item.url}" class="article-card">
+                            <img src="${item.image}" alt="${item.title}" width="320" height="240" loading="lazy" decoding="async" fetchpriority="low">
+                            <h2>${item.title}</h2>
+                        </a>`;
+                    });
+                    html += `</section>`;
+                }
+
+                if (listItems.length > 0) {
+                    html += `<section class="menu-list">`;
+                    listItems.forEach(item => {
+                        html += `
+                        <a href="${item.url}" class="menu-card">
+                            <div class="menu-thumb">
+                                <img src="${item.image}" alt="${item.title}" width="60" height="60" loading="lazy" decoding="async" fetchpriority="low">
+                            </div>
+                            <div class="menu-text">
+                                <h2>${item.title}</h2>
+                            </div>
+                        </a>`;
+                    });
+                    html += `</section>`;
+                }
+            });
+
+            if (html === '') {
+                html = '<div style="text-align:center; padding:20px; color:#666;">記事が見つかりませんでした。</div>';
+            }
+
+            targetDom.innerHTML = html;
+
+        } catch (err) {
+            console.error(err);
+            targetDom.innerHTML = '<div style="color:red; padding:20px;">記事の読み込みに失敗しました。</div>';
+        }
+    };
+
+    // ★ IntersectionObserver で記事枠が画面に近づいた瞬間（400px手前）に自動で読み込む（初期表示のLCP乗っ取りを完全防止）
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries.some(entry => entry.isIntersecting)) {
+                observer.disconnect();
+                executeLoad();
+            }
+        }, { rootMargin: '400px 0px' });
+        observer.observe(targetDom);
+    } else {
+        executeLoad();
+    }
+}
+
+
+
+
+
+
+
+// =======================
+// ZOOM GUARD
+// =======================
+function startZoomGuard() {
+    if (!window.map) return;
+    window._zoomGuardBase = window.map.getZoom();
+    window._zoomGuardActive = true;
+}
+
+function isZoomGuardFailed(threshold = 0.3) {
+    if (!window._zoomGuardActive || !window.map) return false;
+    return (window.map.getZoom() - window._zoomGuardBase) > threshold;
+}
+
+function stopZoomGuard() {
+    window._zoomGuardActive = false;
+    window._zoomGuardBase = null;
+}
+
+
+// =======================
+// STATE
+// =======================
+let pinchStartDistance = 0;
+let pinchTriggered = false;
+
+// =======================
+// DISTANCE
+// =======================
+function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// =======================
+// TOUCH START
+// =======================
+document.addEventListener('touchstart', (e) => {
+
+    if (e.touches.length !== 2) return;
+
+    // 状態だけ記録（Leafletには触らない）
+    pinchStartDistance = getDistance(e.touches);
+    pinchTriggered = false;
+
+}, { passive: true });
+
+// =======================
+// TOUCH MOVE
+// =======================
+document.addEventListener('touchmove', (e) => {
+
+    if (e.touches.length !== 2) return;
+
+    const currentDistance = getDistance(e.touches);
+
+    const isPinchIn = currentDistance < pinchStartDistance - 20;
+
+    if (!pinchTriggered && isPinchIn) {
+
+        pinchTriggered = true;
+
+        if (isZoomGuardFailed()) return;
+
+        //const isPrefView = !window.currentAreaId && !window.currentSpotId;
+        //if (isPrefView) return;
+
+        goBack(window.currentHash);
+    }
+
+}, { passive: true });
+
+// =======================
+// RESET
+// =======================
+document.addEventListener('touchend', (e) => {
+
+    if (e.touches.length > 0) return;
+
+    pinchStartDistance = 0;
+    pinchTriggered = false;
+
+});
+
+
+
+function renderCrowdImage() {
+
+    // ==================================================
+    // マップ生成前に呼ばれた場合
+    // ==================================================
+    if (!window.map) {
+        if (!window._crowdRenderRetry) {
+            window._crowdRenderRetry = setInterval(() => {
+                if (window.map) {
+                    clearInterval(window._crowdRenderRetry);
+                    window._crowdRenderRetry = null;
+                    renderCrowdImage();
+                }
+            }, 100);
+        }
+        return;
+    }
+
+    // ==================================================
+    // 初回だけON
+    // ==================================================
+    if (typeof window.radarEnabled === 'undefined') {
+        window.radarEnabled = true;
+    }
+
+    // ==================================================
+    // トグルボタン
+    // ==================================================
+    const btn = document.getElementById('radarToggleBtn');
+
+    if (btn && !btn.dataset.listenerAdded) {
+        btn.dataset.listenerAdded = "true";
+        btn.addEventListener('click', function() {
+            window.radarEnabled = !window.radarEnabled;
+            renderCrowdImage();
+        });
+    }
+
+    // ==================================================
+    // OFF時
+    // ==================================================
+    if (!window.radarEnabled) {
+        removeCrowdImage();
+
+        const header = document.querySelector('.menu-header-row');
+        const cloudsUI = document.getElementById('cloudsUI');
+        const headerText = document.querySelector('.header-text');
+
+        if (header) {
+            header.style.display = '';
+        }
+
+        if (cloudsUI) {
+            cloudsUI.textContent = '';
+        }
+
+        if (headerText) {
+            if (window.todayTide) {
+                headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+            } else {
+                headerText.textContent = "";
+            }
+        }
+
+        if (btn) {
+            btn.style.display = '';
+            btn.textContent = '雨雲';
+            btn.classList.add('is-off');
+            btn.classList.remove('active');
+        }
+        return;
+    }
+
+    // ==================================================
+    // ON表示
+    // ==================================================
+    if (btn) {
+        btn.style.display = '';
+        btn.textContent = '雨雲';
+        btn.classList.remove('is-off');
+        btn.classList.add('active');
+    }
+
+    // ★ここが重要：以前のレイヤーとタイマーを破棄し、世代を更新する
+    removeCrowdImage();
+    const myGeneration = window.crowdRenderGeneration;
+
+    // ==================================================
+    // Pane準備
+    // ==================================================
+    if (!window.map.getPane('rainPane')) {
+        window.map.createPane('rainPane');
+        const pane = window.map.getPane('rainPane');
+        pane.style.zIndex = 9999;
+        pane.style.pointerEvents = 'none';
+    }
+
+    // ==================================================
+    // 時刻計算
+    // ==================================================
+    const now = new Date();
+    const nowJST = new Date(
+        now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" })
+    );
+
+    const hour = nowJST.getHours();
+    const slots = [0, 3, 6, 9, 12, 15, 18, 21];
+
+    // ==================================================
+    // スライド用データ (KANTO固定)
+    // ==================================================
+    const images = [];
+    let baseIndex = slots.findIndex(h => h > hour);
+    let dayOffset = 0;
+
+    if (baseIndex === -1) {
+        baseIndex = 0;
+        dayOffset = 1;
+    }
+
+    for (let i = 0; i < 4; i++) {
+        const rawIndex = baseIndex + i;
+        const idx = rawIndex % slots.length;
+        const extraDay = Math.floor(rawIndex / slots.length);
+
+        const tmpDate = new Date(nowJST);
+        tmpDate.setDate(tmpDate.getDate() + dayOffset + extraDay);
+
+        const y = tmpDate.getFullYear();
+        const m = String(tmpDate.getMonth() + 1).padStart(2, "0");
+        const d = String(tmpDate.getDate()).padStart(2, "0");
+        const hh = String(slots[idx]).padStart(2, "0");
+
+        images.push({
+            url: `js/crowdsimg/KANTO_${y}-${m}-${d}_${hh}.png`,
+            displayHour: slots[idx] + ((dayOffset + extraDay) * 24)
+        });
+    }
+
+    // ==================================================
+    // header UI
+    // ==================================================
+    const header = document.querySelector('.menu-header-row');
+    const cloudsUI = document.getElementById('cloudsUI');
+    const headerText = document.querySelector('.header-text');
+
+    if (!header || !cloudsUI || !headerText) {
+        return;
+    }
+
+    header.style.display = '';
+
+    // ==================================================
+    // Phase2では雨雲UIを出さない
+    // ==================================================
+    if (window.phase2Initialized) {
+        cloudsUI.textContent = '';
+        if (window.todayTide) {
+            headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+        } else {
+            headerText.textContent = "";
+        }
+        return;
+    }
+
+    // ==================================================
+    // 初期UI
+    // ==================================================
+    let currentIndex = 0;
+    // ロード中は準備中のような表示にしておくのもありですが、一旦時間を表示しておきます
+    cloudsUI.textContent = `雨雲レーダー ${images[0].displayHour}時`;
+
+    if (window.todayTide) {
+        headerText.textContent = formatDate(window.todayTide.date) + " " + window.todayTide.tide;
+    } else {
+        headerText.textContent = "";
+    }
+
+    // ==================================================
+    // 座標・ズーム固定
+    // ==================================================
+    const best = {
+        lat: 37.25,
+        lng: 138.3,
+        baseZoom: 7
+    };
+
+    function calcBounds() {
+        const z = window.map.getZoom();
+        const scale = Math.pow(2, z - best.baseZoom);
+        const size = 512 * scale;
+
+        const topLeft = window.map.project([best.lat, best.lng], z);
+        const bottomRight = topLeft.add([size, size]);
+
+        return L.latLngBounds(
+            window.map.unproject(topLeft, z),
+            window.map.unproject(bottomRight, z)
+        );
+    }
+
+    const MAX_OPACITY = 0.6;
+    window.crowdLayers = [];
+    let loadedCount = 0;
+
+    // ==================================================
+    // ★ 4枚のレイヤーを「完全に透明」で事前配置＆ロード待機
+    // ==================================================
+    images.forEach((img, index) => {
+        const layer = L.imageOverlay(
+            img.url,
+            calcBounds(),
+            {
+                pane: 'rainPane',
+                opacity: 0 // 全て透明でセット
+            }
+        );
+
+        // CSSトランジションを付与してフワッとした切り替えを有効化
+        layer.on('add', () => {
+            const el = layer.getElement();
+            if (el) el.style.transition = 'opacity 1.2s ease-in-out';
+        });
+
+        // ロード完了監視
+        layer.on('load', () => {
+            loadedCount++;
+                // 4枚すべて読み込み終わったら自動発火
+            if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
+                startCrowdSlideshow();
+            }
+        });
+
+        // 読み込みエラー時も止まらないようにする
+        layer.on('error', () => {
+            loadedCount++;
+                if (loadedCount === images.length && myGeneration === window.crowdRenderGeneration) {
+                startCrowdSlideshow();
+            }
+        });
+
+        layer.addTo(window.map);
+        window.crowdLayers.push(layer);
+    });
+
+
+    // 互換性のため
+    window.crowdLayer = window.crowdLayers[0];
+
+    // ==================================================
+    // Zoom変更
+    // ==================================================
+    window.crowdZoomHandler = function() {
+        if (myGeneration !== window.crowdRenderGeneration) return;
+        window.crowdLayers.forEach(layer => {
+            if (layer) layer.setBounds(calcBounds());
+        });
+    };
+    window.map.on("zoomend", window.crowdZoomHandler);
+
+    // ==================================================
+    // ★ 準備完了で発火するスライドショー処理
+    // ==================================================
+    function startCrowdSlideshow() {
+        if (myGeneration !== window.crowdRenderGeneration || !window.radarEnabled) {
+                return;
+        }
+
+        // 1. 最初の一枚目をフワッとフェードイン
+        window.crowdLayers[0].setOpacity(MAX_OPACITY);
+
+        // 2. スライドショー開始 (DOMの生成・破棄は一切行わない)
+        window.crowdSlideTimer = setInterval(() => {
+            if (myGeneration !== window.crowdRenderGeneration || !window.radarEnabled) {
+                clearInterval(window.crowdSlideTimer);
+                return;
+            }
+
+            const oldIndex = currentIndex;
+            currentIndex = (currentIndex + 1) % images.length;
+            
+            cloudsUI.textContent = `雨雲レーダー ${images[currentIndex].displayHour}時`;
+
+            const oldLayer = window.crowdLayers[oldIndex];
+            const newLayer = window.crowdLayers[currentIndex];
+
+            // CSSトランジションに任せて opacity を切り替えるだけ
+            if (newLayer) newLayer.setOpacity(MAX_OPACITY);
+            if (oldLayer) oldLayer.setOpacity(0);
+
+            window.crowdLayer = newLayer;
+
+        }, 2500);
+    }
+}
+
+
+function removeCrowdImage() {
+    // 描画世代を無効化
+    window.crowdRenderGeneration = (window.crowdRenderGeneration || 0) + 1;
+
+    // スライド停止
+    if (window.crowdSlideTimer) {
+        clearInterval(window.crowdSlideTimer);
+        window.crowdSlideTimer = null;
+    }
+
+    // フェード処理管理庫のクリア（念のため残す）
+    if (window.crowdFadeTimers) {
+        window.crowdFadeTimers.forEach(timer => clearInterval(timer));
+        window.crowdFadeTimers.clear();
+    }
+
+    // Zoomイベント解除
+    if (window.map && window.crowdZoomHandler) {
+        window.map.off("zoomend", window.crowdZoomHandler);
+    }
+    window.crowdZoomHandler = null;
+
+    // ==================================================
+    // ★ 4枚保持しているレイヤーを一括削除
+    // ==================================================
+    if (window.map) {
+        const layersToRemove = [];
+
+        // 保持している配列から回収
+        if (window.crowdLayers && window.crowdLayers.length > 0) {
+            window.crowdLayers.forEach(layer => {
+                if (layer) layersToRemove.push(layer);
+            });
+        }
+        
+        if (window.crowdLayer && !layersToRemove.includes(window.crowdLayer)) {
+            layersToRemove.push(window.crowdLayer);
+        }
+
+        // rainPane内に残っている ImageOverlay も全回収（無限増殖対策）
+        window.map.eachLayer(layer => {
+            if (layer instanceof L.ImageOverlay && layer.options && layer.options.pane === 'rainPane') {
+                if (!layersToRemove.includes(layer)) {
+                    layersToRemove.push(layer);
+                }
+            }
+        });
+
+        // 一括削除
+        layersToRemove.forEach(layer => {
+            if (window.map.hasLayer(layer)) {
+                window.map.removeLayer(layer);
+            }
+        });
+    }
+
+    window.crowdLayer = null;
+    window.crowdLayers = [];
+
+    // ==================================================
+    // header制御
+    // ==================================================
+    const header = document.querySelector('.menu-header-row');
+    if (!header) return;
+
+    const cloudsUI = document.getElementById('cloudsUI');
+    const headerText = document.querySelector('.header-text');
+
+    if (window.phase2Initialized) {
+        if (cloudsUI) cloudsUI.textContent = '';
+    } else {
+        if (cloudsUI) cloudsUI.textContent = '';
+        if (headerText) headerText.textContent = '';
+    }
+
+    const leftEmpty = !cloudsUI || cloudsUI.textContent === '';
+    const rightEmpty = !headerText || headerText.textContent === '';
+
+    if (leftEmpty && rightEmpty) {
+        header.style.display = 'none';
+    } else {
+        header.style.display = '';
+    }
+}
+
+// ================================
+// ■ 地域選択用マーカーを「フェードアウト」で非表示にする関数
+// ================================
+function clearRegionMarkers() {
+    if (window.regionMarkers && window.map) {
+        window.regionMarkers.forEach(m => {
+            const el = m.getElement(); // マーカーのHTML要素を取得
+            if (el) {
+                // CSSトランジションを当てて透明にする
+                el.style.transition = 'opacity 0.3s ease';
+                el.style.opacity = '0';
+                
+                // 0.3秒（フェードアウト完了）後にマップから取り外す
+                setTimeout(() => {
+                    window.map.removeLayer(m);
+                    el.style.opacity = '1'; // 次回表示時のために透明度を戻しておく
+                }, 300);
+            } else {
+                window.map.removeLayer(m);
+            }
+        });
+    }
+}
+
+// タイル切り替えボタンのクリックイベント
+document.getElementById('map-tile-btn')?.addEventListener('click', () => {
+            if (!window.map || !window.gsiLayer) return;
+
+            // ★ 管理変数から取得
+            const osmUrl = window.TILE_URLS.osm;
+            const currentUrl = window.gsiLayer._url;
+
+            if (currentUrl === osmUrl) {
+                // 1. OSMから、記憶しているスポット本来のタイル（ort か photo）に戻す
+                const baseTile = window.currentSpotBaseTile || window.TILE_URLS.photo;
+                window.gsiLayer.setUrl(baseTile);
+                
+                window.map.attributionControl.removeAttribution('© OpenStreetMap contributors');
+                window.map.attributionControl.addAttribution('国土地理院');
+            } else {
+                // 2. 本来のタイルからOSMに切り替える
+                window.gsiLayer.setUrl(osmUrl);
+                
+                window.map.attributionControl.removeAttribution('国土地理院');
+                window.map.attributionControl.addAttribution('© OpenStreetMap contributors');
+            }
+
+            // =====================================
+            // ★ 最強の強制リフレッシュ
+            // =====================================
+            setTimeout(() => {
+                // Leafletの内部メソッドを使ってコンテナを強制再構築
+                window.map._resetView(window.map.getCenter(), window.map.getZoom());
+            }, 50);
+        });
+
+
+document.getElementById('map-back-btn')?.addEventListener('click', () => {
+    goBack(window.currentHash);
+});
+
+// ================================
+// ■ 旧天気適用関数の互換ラッパー（実体はJSON）
+// ================================
+function applyWeatherToSpots(weatherData, targetArray = window.spotData, inlandOnly = false) {
+    const weatherMap = weatherData && weatherData.spots;
+    if (!weatherMap || typeof weatherMap !== 'object' || !Array.isArray(targetArray)) return;
+
+    for (const spot of targetArray) {
+        if (inlandOnly) {
+            const spotId = String(spot.individualId || spot.id || "");
+            if (!spotId.startsWith("L")) continue;
+        }
+        const weather = weatherMap[spot.name];
+        if (weather) spot.whether = weather;
+    }
+}
+
+// 旧関数名・引数形式を維持
+function applyWhetherToSpots(weatherData, targetArray = window.spotData) {
+    applyWeatherToSpots(weatherData, targetArray, false);
+}
+
+function applyInlandWhetherToSpots(weatherData, targetArray = window.spotData) {
+    applyWeatherToSpots(weatherData, targetArray, true);
+}
+
+
+
+function openArea(areaKey, isUserAction = false) {
+
+  const container = document.getElementById('area-guide');
+
+  // モード切替
+  container.classList.remove('collapsed-mode');
+  container.classList.add('active-mode');
+
+  document.querySelectorAll('#area-guide .area').forEach(area => {
+
+    const text = area.querySelector('.text');
+
+    if (area.id === areaKey) {
+
+      area.classList.add('active');
+      text.classList.add('open');
+
+      // 先頭寄せ
+      container.insertBefore(area, container.children[1]);
+
+      // ★ ユーザー操作時のみスクロール
+      if (isUserAction) {
+        area.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+
+    } else {
+      area.classList.remove('active');
+      text.classList.remove('open');
+    }
+
+  });
+}
+
+// ================================
+// ■ エリアガイドの描画（グローバル関数として復活）
+// ================================
+function renderAreaGuide() {
+    const container = document.getElementById('area-guide');
+    if (!container) return; // コンテナがない場合はスキップ
+
+    // window.prefData がまだ無い場合は処理を抜ける
+    if (!window.prefData) return;
+
+    container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
+
+    if (!window.areaData) return;
+
+    window.areaData.forEach(area => {
+        const div = document.createElement('div');
+        div.className = 'area';
+        div.id = area.individualId; // ←ここ重要
+
+        div.innerHTML = `
+            <h2>${area.name}</h2>
+            <p class="text">${area.notes}</p>
+        `;
+
+        div.querySelector('h2').addEventListener('click', () => {
+            
+            // =====================================================
+            // ★ Phase2（ズーム13固定 ＆ OSMタイル）状態の判定
+            // =====================================================
+            let isPhase2OSM = false;
+            if (window.map && window.map.getZoom() === 13) {
+                window.map.eachLayer(layer => {
+                    if (layer instanceof L.TileLayer) {
+                        const url = layer._url || '';
+                        if (url.includes('openstreetmap')) {
+                            isPhase2OSM = true;
+                        }
+                    }
+                });
+            }
+
+            // =====================================================
+            // ★ スポット画面 または Phase2状態から別のエリアへ飛ぶ時のクリーンアップ処理
+            // =====================================================
+            if (window.currentSpotId || isPhase2OSM) {
+                
+                // 1. ズーム・移動制限の解除
+                if (typeof stopZoomGuard === 'function') stopZoomGuard();
+                if (window.map) {
+                    window.map.dragging.enable();
+                    window.map.scrollWheelZoom.enable();
+                    window.map.doubleClickZoom.enable();
+                    window.map.touchZoom.enable();
+                    window.map.setMinZoom(0);
+                    window.map.setMaxZoom(18);
+                    window.map.setMaxBounds(null);
+                    if (window.map.options) window.map.options.maxBoundsViscosity = 0;
+
+                    // 2. 特殊レイヤー（魚・マーカー等）の消去
+                    if (window.fishLayer) window.map.removeLayer(window.fishLayer);
+                    if (window.phase2Group) window.phase2Group.clearLayers();
+                    if (window.phase1Group) window.phase1Group.clearLayers();
+                    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+
+                    // 3. 拡大用タイルの剥離と基本タイル（ort）への切り替え
+                    window.map.eachLayer(layer => {
+                        if (layer === window.gsiLayer) return;
+                        if (layer instanceof L.TileLayer) {
+                            const url = layer._url || '';
+                            if (url.includes('seamlessphoto') || url.includes('openstreetmap')) {
+                                window.map.removeLayer(layer);
+                            }
+                        }
+                    });
+                    
+                    if (!window.gsiLayer) {
+                        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
+                    } else {
+                        window.gsiLayer.setUrl(window.gsiLayers.ort);
+                        window.gsiLayer.addTo(window.map); // ★確実に再追加
+                    }
+                    
+                    // Phase2の無効化処理があれば呼ぶ
+                    if (typeof disablePhase2 === 'function') disablePhase2(window.map);
+                }
+
+                // 4. UI（DOM）の完全クリア
+                if (typeof removeWeekItem === 'function') removeWeekItem();
+                if (typeof resetWeatherUI === 'function') resetWeatherUI();
+                if (typeof clearSub2Weather === 'function') clearSub2Weather();
+                
+                // 👇 【ここに追加】エリア移動時にアクセス情報を必ず閉じる
+                if (typeof clearAccessInfo === 'function') clearAccessInfo();
+
+                
+                const nearest = document.getElementById("nearest-spot");
+                if (nearest) nearest.textContent = "";
+
+                // 5. 状態のリセット
+                window.currentSpotId = null;
+            }
+
+            // =====================================================
+            // ★ 新しいエリアへのジャンプ処理（routeUpdateは直打ち専用なので呼ばない）
+            // =====================================================
+            
+            // クエリをセット
+            if (window.prefData) setIdealQuery('pref', window.prefData.notes);
+            setIdealQuery('area', area.name);
+            setIdealQuery('spot', null);
+
+            // システム変数の更新
+            window.currentAreaId = area.areaId + '_' + area.individualId;
+            window.currentSpotId = null;
+
+            // routeUpdateを完全に排除し、直接selectAreaを呼ぶ
+            if (typeof selectArea === 'function') selectArea(area);
+            
+            openArea(area.individualId, true);
+
+
+        });
+
+        container.appendChild(div);
+    });
+}
+
+function resetAreaGuide() {
+
+  const container = document.getElementById('area-guide');
+
+  container.classList.remove('active-mode');
+  container.classList.add('collapsed-mode');
+
+  // ★ DOMを初期状態に戻す
+  renderAreaGuide();
+
+}
+
+// ==========================================
+// 2. 県域UIの初期化関数
+// ==========================================
+function renderPrefectureUI() {
+    // データがない場合は何もしない
+    if (!window.prefData) return;
+
+    const shopUrl = `/KANTO/${window.currentPref}_shop.json`;
+
+    try {
+        // エリアガイドの描画
+        renderAreaGuide();
+
+        // ショップマーカーのプリロード
+        if (window.markerControl && window.markerControl.preloadShop01) {
+            window.markerControl.preloadShop01(shopUrl);
+        }
+
+    } catch (err) {
+        console.error("UI初期化エラー:", err);
+    }
+}
+
+// ==========================================
+// ★ 追加：URLの pref クエリから Region と Pref を安全に抽出する関数
+// ==========================================
+function getParsedPrefQuery() {
+    const url = new URL(location.href);
+    const query = url.searchParams.get('pref');
+    //if (!query) return { region: null, pref: null };
+    
+
+    //const parts = query.split('_');
+    //if (parts.length >= 2) {
+    //    return { region: parts[0], pref: parts[1] };
+    //}
+    //return { region: 'KANTO', pref: parts[0] };
+    return { region: 'KANTO', pref: '千葉県' };
+}
+
+// ================================
+// ■ 旧天気CSV関数名の互換ラッパー（実体は県別JSON）
+// ================================
+
+// 既存呼び出しとの互換性のため関数名・引数を維持する。
+// URLから県コードを取り出し、JSONを取得する。CSV fetch / parse は行わない。
+function loadWhetherCSV(url) {
+    const match = url && url.match(/\/([A-Za-z0-9-]+)_whether\.(?:csv|json)(?:$|[?#])/);
+    const prefCode = match ? match[1] : window.currentPref;
+    if (!prefCode) return Promise.resolve(null);
+    return loadPrefWeatherJson(prefCode, false);
+}
+
+// 旧仕様は地域一括CSVだったが、現在は選択県の内陸JSONを取得する。
+// 旧呼び出し元が regionCode を渡しても、currentPref を優先して県別JSONへ接続する。
+function loadInlandWhetherCSV(regionCode) {
+    // 旧引数 regionCode は互換性のため受け取る。JSONは現在表示中の県単位で取得する。
+    const prefCode = window.currentPref;
+    if (!prefCode) return Promise.resolve(null);
+    return loadPrefWeatherJson(prefCode, true);
+}
+
+// ==========================================
+// 爆速化：バックグラウンド天気JSONプリロード (index.html)
+// ==========================================
+function preloadCsvFiles(regionCode, prefCode) {
+    if (!regionCode || !prefCode) return;
+
+    // 旧関数名・引数を暫定維持し、天気JSONの先行取得へ委譲する。
+    Promise.all([
+        AddWeather(prefCode, 'select'),
+        AddInLandWeather(prefCode, 'select')
+    ]).catch(() => {});
+}
+
+async function checkAndLoadRouteData() {
+    const prefCode = window.currentPref;
+
+    if (!prefCode) {
+        return true;
+    }
+
+    try {
+let needsBaseLoad = false;
+
+if (!window.prefData) {
+    needsBaseLoad = true;
+
+} else if (
+    !Array.isArray(window.spotData) ||
+    window.spotData.length === 0
+) {
+    needsBaseLoad = true;
+
+} else {
+    const rep = window.spotData.find(s => {
+        const typeParts = (s.type || '').split('$');
+        return typeParts.includes('representative');
+    });
+
+    if (rep && !rep.whether) {
+        needsBaseLoad = true;
+    }
+}
+
+if (needsBaseLoad) {
+    await loadPrefectureData(prefCode);
+}
+
+
+        return true;
+
+    } catch (err) {
+        console.error("データロードエラー:", err);
+        return false;
+    }
+}
+
+// ★ Region名の変換マッピング
+const REGION_MAP = {
+    "関東地方": "KANTO",
+    "KANTO": "KANTO" // 互換性のため
+};
+
+// URLクエリからRegionを取得する際、マッピングを通す
+function getRegionCode() {
+    const url = new URL(location.href);
+    const q = url.searchParams.get('region');
+    return REGION_MAP[q] || 'KANTO'; // デフォルトはKANTO
+}
+
+window.icData = [];
+window.isIcLoaded = false;
+let icDataPromise = null;
+function loadICData() {
+    if (window.isIcLoaded) return Promise.resolve(window.icData);
+    if (icDataPromise) return icDataPromise;
+    icDataPromise = fetch('data/KANTO_geo.json')
+        .then(res => {
+            if (!res.ok) throw new Error('IC JSON fetch failed: ' + res.status);
+            return res.json();
+        })
+        .then(data => {
+            window.icData = data;
+            window.isIcLoaded = true;
+            if (window.currentSpotId && window.spotData && typeof renderAccessInfo === 'function') {
+                const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                if (activeSpot) {
+                    renderAccessInfo(activeSpot);
+                    if (typeof waitAndRenderSpotDetails === 'function') waitAndRenderSpotDetails(activeSpot.name);
+                }
+            }
+            return data;
+        })
+        .catch(error => {
+            icDataPromise = null;
+            console.error('ICデータ読み込みエラー:', error);
+            return null;
+        });
+    return icDataPromise;
+}
+
+// ==========================================
+// ★ 魚種名おまとめ辞書（出世魚や別名を統一）
+// ==========================================
+const FISH_DICTIONARY = {
+    "ツバス": "ワカシ",
+    "ワカシ": "ワカシ",
+    "ハマチ": "イナダ",
+    "イナダ": "イナダ",
+    "メジロ": "ワラサ",
+    "ワラサ": "ワラサ",
+    "ブリ": "ブリ",
+    "セイゴ": "スズキ",
+    "フッコ": "スズキ",
+    "スズキ": "スズキ",
+    "サゴシ": "サワラ",
+    "サワラ": "サワラ",
+    "カイズ": "クロダイ",
+    "チヌ": "クロダイ",
+    "クロダイ": "クロダイ",
+    "コハダ": "コノシロ",
+    "コノシロ": "コノシロ",
+    "クチボソ": "モツゴ",
+    "モツゴ": "モツゴ",
+    "ヤマベ": "オイカワ",
+    "オイカワ": "オイカワ",
+    "グレ": "メジナ",
+    "メジナ": "メジナ"
+};
+
+// ==========================================
+// ★ 新規：対象魚種データを描画する関数（辞書変換＆ソート対応版）
+// ==========================================
+function renderFishSection(uniqueNames) {
+    const accessBox = document.getElementById('accessInfoBox');
+    if (!accessBox) return;
+
+    // 既存の魚種エリアがあれば削除（重複防止）
+    const oldFishArea = document.getElementById('spot-fish-section');
+    if (oldFishArea) oldFishArea.remove();
+
+    if (!uniqueNames || uniqueNames.length === 0) return;
+
+    // 1. 全角カタカナ（と長音符）のみにフィルターし、周辺施設などを弾く
+    const fishOnly = uniqueNames.filter(name => /^[ァ-ヴー]+$/.test(name));
+
+    // 2. 辞書を使って名称を変換（辞書にない魚はそのままの名前を使う）
+    const mappedFish = fishOnly.map(name => FISH_DICTIONARY[name] || name);
+
+    // 3. 変換した結果、重複したもの（例：セイゴとフッコが両方いて「スズキ」が2つになった場合）を再度まとめる
+    const finalFishList = [...new Set(mappedFish)];
+
+    // 4. あいうえお順（五十音順）にソートする
+    finalFishList.sort((a, b) => a.localeCompare(b, 'ja'));
+
+    // 魚種が1つも残らなかった場合は表示せずに終了
+    if (finalFishList.length === 0) return;
+
+    // 魚種表示用のコンテナを生成
+    const fishDiv = document.createElement('div');
+    fishDiv.id = 'spot-fish-section';
+    fishDiv.style.marginTop = '12px';
+    fishDiv.style.paddingTop = '10px';
+    fishDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
+
+    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🐟 主な対象魚</div>`;
+    html += `<div style="font-size: 13px; line-height: 1.5;">${finalFishList.join('、')}</div>`;
+
+    fishDiv.innerHTML = html;
+    const catchSection = document.getElementById('spot-catch-section');
+    if (catchSection && catchSection.parentNode === accessBox) {
+        accessBox.insertBefore(fishDiv, catchSection);
+    } else {
+        accessBox.appendChild(fishDiv);
+    }
+}
+
+
+
+/* ============================================================
+ * 釣り行こNAVI 等深線レイヤーコントローラー
+ * Leaflet Canvas Renderer管理方式
+ * ============================================================ */
+
+const DepthMapController = (function() {
+    let mapInstance = null;
+    let depthLayers = [];
+    let visible = true;
+    let loadPromise = null;
+
+    const DEPTH_FILES = [
+        '/KANTO/enc_depth20.json',
+        '/KANTO/enc_depth50.json',
+        '/KANTO/enc_depth100.json',
+        '/KANTO/enc_depth150.json',
+        '/KANTO/enc_depth200.json'
+    ];
+
+    const MULTIPLY_COLORS = {
+        20: '#8ca8d9',
+        50: '#5a82c4',
+        100: '#385799',
+        150: '#22326b',
+        200: '#191970'
+    };
+
+    const EDGE_COLORS = {
+        20: '#5a82c4',
+        50: '#385799',
+        100: '#22326b',
+        150: '#191970',
+        200: '#0d0d3b'
+    };
+
+    let rawDepthData = null;
+    let depthDataPromise = null;
+    let parsedDepthData = null;
+    let parsedDepthPromise = null;
+
+    function loadDepthData() {
+        if (rawDepthData) return Promise.resolve(rawDepthData);
+        if (depthDataPromise) return depthDataPromise;
+
+        depthDataPromise = Promise.all(DEPTH_FILES.map(url =>
+            fetch(url, { priority: 'low' }).then(res => {
+                if (!res.ok) throw new Error(url + '\\nHTTP ' + res.status);
+                return res.json();
+            })
+        )).then(data => {
+            rawDepthData = data;
+            return rawDepthData;
+        }).catch(error => {
+            depthDataPromise = null;
+            console.error('等深線JSON取得エラー:', error);
+            throw error;
+        });
+
+        return depthDataPromise;
+    }
+
+    function decodePolyline(encoded) {
+        const points = [];
+        let index = 0;
+        let lat = 0;
+        let lng = 0;
+
+        while (index < encoded.length) {
+            let result = 0;
+            let shift = 0;
+            let byte;
+            do {
+                byte = encoded.charCodeAt(index++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+            lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+            result = 0;
+            shift = 0;
+            do {
+                byte = encoded.charCodeAt(index++) - 63;
+                result |= (byte & 0x1f) << shift;
+                shift += 5;
+            } while (byte >= 0x20);
+            lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+            points.push([lat / 1e5, lng / 1e5]);
+        }
+        return points;
+    }
+
+    function loadParsedDepthData() {
+        if (parsedDepthData) return Promise.resolve(parsedDepthData);
+        if (parsedDepthPromise) return parsedDepthPromise;
+
+        parsedDepthPromise = loadDepthData().then(async sourceData => {
+            const parsedLayers = [];
+            const depths = [20, 50, 100, 150, 200];
+
+            for (let index = 0; index < depths.length; index++) {
+                const items = sourceData[index] || [];
+                const groupsMap = {};
+                let i = 0;
+
+                await new Promise(resolve => {
+                    function decodeSlice() {
+                        const start = performance.now();
+
+                        while (i < items.length && performance.now() - start < 4) {
+                            const item = items[i++];
+                            if (!item || !item.p) continue;
+
+                            const points = decodePolyline(item.p);
+                            if (points.length >= 3) {
+                                const group = item.group || 'default';
+                                if (!groupsMap[group]) groupsMap[group] = [];
+                                groupsMap[group].push(points.map(point =>
+                                    typeof L !== 'undefined' ? L.latLng(point[0], point[1]) : point
+                                ));
+                            }
+                        }
+
+                        if (i < items.length) requestAnimationFrame(decodeSlice);
+                        else resolve();
+                    }
+                    requestAnimationFrame(decodeSlice);
+                });
+
+                parsedLayers.push({
+                    depth: depths[index],
+                    groups: Object.values(groupsMap)
+                });
+            }
+
+            parsedDepthData = parsedLayers;
+            return parsedDepthData;
+        }).catch(error => {
+            parsedDepthPromise = null;
+            throw error;
+        });
+
+        return parsedDepthPromise;
+    }
+
+    // 等深線の陸地除外マスク。KANTOフォルダのEncoded Polylineを読み込む。
+    let MASK_POLYGONS = null;
+    let maskDataPromise = null;
+
+    function loadMaskData() {
+        if (MASK_POLYGONS) return Promise.resolve(MASK_POLYGONS);
+        if (maskDataPromise) return maskDataPromise;
+
+        maskDataPromise = fetch('/KANTO/contourlinesExclusionlist.json', { priority: 'low' })
+            .then(res => {
+                if (!res.ok) throw new Error('contourlinesExclusionlist.json HTTP ' + res.status);
+                return res.json();
+            })
+            .then(items => {
+                MASK_POLYGONS = (items || [])
+                    .filter(item => item && item.p)
+                    .map(item => decodePolyline(item.p))
+                    .filter(points => points.length >= 4);
+                return MASK_POLYGONS;
+            })
+            .catch(error => {
+                maskDataPromise = null;
+                console.error('等深線マスクJSON取得エラー:', error);
+                throw error;
+            });
+
+        return maskDataPromise;
+    }
+
+    // Leaflet 1.9.4の実際の描画更新メソッド_redrawを拡張する（L未定義時の即時評価エラーを防ぐため遅延生成）。
+    let MaskedCanvasRenderer = null;
+    function getMaskedCanvasRendererClass() {
+        if (MaskedCanvasRenderer) return MaskedCanvasRenderer;
+        if (typeof L === 'undefined' || !L.Canvas) return null;
+        MaskedCanvasRenderer = L.Canvas.extend({
+            _redraw: function() {
+                L.Canvas.prototype._redraw.call(this);
+
+                if (!this._map || !this._ctx || !this._bounds) return;
+
+                const ctx = this._ctx;
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.fillStyle = '#000';
+
+                MASK_POLYGONS.forEach(polygon => {
+                    ctx.beginPath();
+                    polygon.forEach((ll, index) => {
+                        const point = this._map.latLngToLayerPoint(L.latLng(ll[0], ll[1]));
+                        const x = point.x;
+                        const y = point.y;
+                        if (index === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    });
+                    ctx.closePath();
+                    ctx.fill();
+                });
+
+                ctx.restore();
+            }
+        });
+        return MaskedCanvasRenderer;
+    }
+
+    function createDepthLayers(map, parsedLayers) {
+        const RendererClass = getMaskedCanvasRendererClass();
+        if (!map || !RendererClass) return;
+        parsedLayers.forEach(layerData => {
+            const renderer = new RendererClass({
+                pane: 'overlayPane',
+                padding: 1.5
+            });
+
+            const canvas = renderer._container;
+            if (canvas) {
+                canvas.style.zIndex = '50';
+                canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))';
+                canvas.style.mixBlendMode = 'multiply';
+                canvas.style.pointerEvents = 'none';
+            }
+
+            const groupLayers = [];
+            layerData.groups.forEach(rings => {
+                const polygon = L.polygon(rings, {
+                    renderer: renderer,
+                    color: EDGE_COLORS[layerData.depth] || '#191970',
+                    weight: 1.5,
+                    opacity: 1,
+                    lineJoin: 'round',
+                    fill: true,
+                    fillColor: MULTIPLY_COLORS[layerData.depth] || '#191970',
+                    fillOpacity: 0.40,
+                    fillRule: 'evenodd',
+                    interactive: false,
+                    bubblingMouseEvents: false
+                });
+
+                polygon.addTo(map);
+                groupLayers.push(polygon);
+            });
+
+            depthLayers.push({
+                depth: layerData.depth,
+                renderer: renderer,
+                layers: groupLayers
+            });
+        });
+    }
+
+    function removeDepthLayers() {
+        depthLayers.forEach(layerData => {
+            layerData.layers.forEach(layer => {
+                if (mapInstance && mapInstance.hasLayer(layer)) {
+                    mapInstance.removeLayer(layer);
+                }
+            });
+            if (mapInstance && mapInstance.hasLayer(layerData.renderer)) {
+                mapInstance.removeLayer(layerData.renderer);
+            }
+        });
+        depthLayers = [];
+    }
+
+    return {
+        loadData: function() {
+            return loadDepthData();
+        },
+
+        initAndShow: function(leafletMap) {
+            if (!leafletMap || typeof L === 'undefined') return Promise.resolve();
+            mapInstance = leafletMap;
+
+            if (loadPromise) return loadPromise;
+
+            loadPromise = Promise.all([
+                loadParsedDepthData(),
+                loadMaskData()
+            ]).then(results => {
+                const parsedLayers = results[0];
+                createDepthLayers(mapInstance, parsedLayers);
+                return parsedLayers;
+            }).catch(error => {
+                loadPromise = null;
+                console.error('等深線レイヤー生成エラー:', error);
+                throw error;
+            });
+
+            return loadPromise;
+        },
+
+        toggle: function() {
+            visible = !visible;
+            depthLayers.forEach(layerData => {
+                layerData.layers.forEach(layer => {
+                    if (visible) layer.addTo(mapInstance);
+                    else if (mapInstance.hasLayer(layer)) mapInstance.removeLayer(layer);
+                });
+            });
+            return visible;
+        },
+
+        isActive: function() {
+            return visible;
+        }
+    };
+})();
+</script>
+
+</body>
