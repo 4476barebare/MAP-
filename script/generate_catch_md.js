@@ -31,9 +31,9 @@ const PREF_NAME_FALLBACK_MAP = {
 const REGION_NAME = REGION_NAME_MAP[REGION_CODE] || REGION_CODE;
 const SITE_URL = "https://turiiko-navi.com";
 
-// 県範囲の切り出し距離上限（最寄りの正規スポットがこの距離以内の投稿を採用）
+// 県範囲の切り出し距離上限（リージョン内全正規スポットと比較し、最寄りが対象県かつこの距離以内の代表点を採用）
 const MAX_ASSIGN_DISTANCE_KM = Number(process.env.MAX_ASSIGN_DISTANCE_KM || 15);
-// generate_chiba_md.js と同じエリア分割閾値（ナビゲーションリンクの出し分けに使用）
+// エリア分割MDリンクの出し分け用閾値（generate_chiba_md.js と同一）
 const AREA_SPLIT_THRESHOLD = 30;
 
 const REGION_DIR = path.join(ROOT, REGION_CODE);
@@ -100,11 +100,13 @@ function calcDistanceKm(lat1, lng1, lat2, lng2) {
     return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function makeMapUrl(prefName, areaName, spotName) {
+function makePrefMapUrl(prefName) {
     return SITE_URL + "/?region=" + encodeURIComponent(REGION_NAME) +
-        "&pref=" + encodeURIComponent(prefName) +
-        "&area=" + encodeURIComponent(areaName) +
-        "&spot=" + encodeURIComponent(spotName);
+        "&pref=" + encodeURIComponent(prefName);
+}
+
+function formatCoord(lat, lng) {
+    return `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
 }
 
 function resolveSnsSourceName(item) {
@@ -128,7 +130,7 @@ function splitFishNames(rawFish) {
 
 // ==========================================
 // リージョン内の全 *_location.json を自動検出してロード
-// （県境の誤判定を防ぐため、他県の正規スポットも含めて最寄り判定を行う）
+// （県範囲の境界判定のみに使用し、個別スポットへの紐付けは行わない）
 // ==========================================
 function discoverPrefCodes(regionDir) {
     if (!fs.existsSync(regionDir)) {
@@ -155,22 +157,17 @@ function loadPrefLocationMeta(prefCode) {
     const areaRows = locationData.filter(row =>
         row.areaId === prefCode && row.individualId && row.individualId !== "parent"
     );
-    const areaList = [];
-    const areaMap = new Map();
-
-    areaRows.forEach(area => {
+    const areaList = areaRows.map(area => {
         const areaKey = area.areaId + "_" + area.individualId;
-        const info = {
+        return {
             areaKey,
             fileName: `${sanitizeFileSegment(areaKey)}.md`,
             name: cleanText(area.name)
         };
-        areaList.push(info);
-        areaMap.set(areaKey, info);
     });
 
-    // 正規スポット（generate_chiba_md.js と同一条件）
-    const spots = locationData
+    // 範囲判定用の正規スポット座標群（個別スポット紐付けには使用しない）
+    const boundaryPoints = locationData
         .filter(row =>
             hasZoom(row.zoom) &&
             row.type !== "pref" &&
@@ -184,46 +181,34 @@ function loadPrefLocationMeta(prefCode) {
             const lat = Number(spot.lat);
             const lng = Number(spot.lng);
             if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-            const spotName = cleanText(spot.name);
-            const areaInfo = areaMap.get(spot.areaId);
-            const areaName = areaInfo ? areaInfo.name : spot.areaId;
-            const areaFileName = areaInfo ? areaInfo.fileName : `${sanitizeFileSegment(spot.areaId)}.md`;
-
             return {
                 prefCode,
-                prefName,
                 areaKey: spot.areaId,
-                areaName,
-                areaFileName,
-                spotName,
                 lat,
-                lng,
-                mapUrl: makeMapUrl(prefName, areaName, spot.name)
+                lng
             };
         })
         .filter(Boolean);
 
-    const activeAreaKeys = new Set(spots.map(s => s.areaKey));
+    const activeAreaKeys = new Set(boundaryPoints.map(p => p.areaKey));
     const activeAreas = areaList.filter(a => activeAreaKeys.has(a.areaKey));
-    const shouldSplitByArea = spots.length >= AREA_SPLIT_THRESHOLD && activeAreas.length > 1;
+    const shouldSplitByArea = boundaryPoints.length >= AREA_SPLIT_THRESHOLD && activeAreas.length > 1;
 
     return {
         prefCode,
         prefName,
         locationPath,
         areas: activeAreas,
-        areaMap,
-        spots,
+        boundaryPoints,
         shouldSplitByArea
     };
 }
 
 // ==========================================
-// 釣果レコードを対象県へ振り分け・投稿URL単位で重複統合
+// 対象県とその周辺範囲の代表点レコードを切り出し・投稿単位で統合
+// （個別スポットへの紐付けは一切行わず、元の area_name と代表点座標をそのまま保持）
 // ==========================================
-function extractPrefCatches(catchList, targetPrefMeta, allRegionSpots, todayUtcMs) {
-    // 同じ投稿（URL）が複数魚種・複数座標（東京湾や外房堤防など）に展開されているため、
-    // 対象県内で投稿単位に統合してAIの二重カウントを防ぐ。
+function extractPrefCatches(catchList, targetPrefMeta, allRegionBoundaryPoints, todayUtcMs) {
     const postMap = new Map();
 
     for (const raw of catchList) {
@@ -236,33 +221,35 @@ function extractPrefCatches(catchList, targetPrefMeta, allRegionSpots, todayUtcM
         const parsedDate = parseCatchDate(raw.date);
         if (!parsedDate) continue;
 
-        // リージョン内の全正規スポットから最寄り地点を探索
-        let nearestSpot = null;
+        // リージョン内の全正規スポット座標から最も近い県を判定し、対象県かつ上限距離以内なら採用
+        let nearestPrefCode = null;
         let minDistKm = Infinity;
-        for (const spot of allRegionSpots) {
-            const dist = calcDistanceKm(lat, lng, spot.lat, spot.lng);
+        for (const pt of allRegionBoundaryPoints) {
+            const dist = calcDistanceKm(lat, lng, pt.lat, pt.lng);
             if (dist < minDistKm) {
                 minDistKm = dist;
-                nearestSpot = spot;
+                nearestPrefCode = pt.prefCode;
             }
         }
 
-        if (!nearestSpot) continue;
+        if (nearestPrefCode !== targetPrefMeta.prefCode) continue;
         if (minDistKm > MAX_ASSIGN_DISTANCE_KM) continue;
-        if (nearestSpot.prefCode !== targetPrefMeta.prefCode) continue;
 
         const url = cleanText(raw.url);
-        const areaLabel = cleanText(raw.area_name) || nearestSpot.spotName;
+        const areaName = cleanText(raw.area_name);
+        if (!areaName) continue;
+
         const source = resolveSnsSourceName(raw);
         const fishList = splitFishNames(raw.fish);
         if (fishList.length === 0) continue;
 
         const ageDays = Math.max(0, Math.floor((todayUtcMs - parsedDate.utcMs) / 86400000));
+        const coordKey = formatCoord(lat, lng);
 
-        // 同一URLかつ同一投稿場所ラベルで統合（1投稿が複数地点にまたがる場合は最も近い地点を代表にし、他近隣も保持）
+        // 同一投稿URLかつ同一エリア名で統合（複数魚種・複数代表点の重複展開をまとめる）
         const postKey = url
-            ? `url:${url}|area:${areaLabel}`
-            : `fallback:${parsedDate.iso}|${areaLabel}|${lat.toFixed(4)},${lng.toFixed(4)}`;
+            ? `url:${url}|area:${areaName}`
+            : `fallback:${parsedDate.iso}|${areaName}|${coordKey}`;
 
         let entry = postMap.get(postKey);
         if (!entry) {
@@ -270,31 +257,20 @@ function extractPrefCatches(catchList, targetPrefMeta, allRegionSpots, todayUtcM
                 dateIso: parsedDate.iso,
                 dateUtcMs: parsedDate.utcMs,
                 ageDays,
-                areaLabel,
+                areaName,
                 source,
                 url,
                 fishSet: new Set(),
-                nearestSpot,
-                minDistKm,
-                matchedSpots: new Map()
+                coordsMap: new Map()
             };
             postMap.set(postKey, entry);
         }
 
         fishList.forEach(f => entry.fishSet.add(f));
-
-        const existingSpotMatch = entry.matchedSpots.get(nearestSpot.spotName);
-        if (!existingSpotMatch || minDistKm < existingSpotMatch.distKm) {
-            entry.matchedSpots.set(nearestSpot.spotName, {
-                spot: nearestSpot,
-                distKm: minDistKm
-            });
+        if (!entry.coordsMap.has(coordKey)) {
+            entry.coordsMap.set(coordKey, { lat, lng, label: coordKey });
         }
 
-        if (minDistKm < entry.minDistKm) {
-            entry.minDistKm = minDistKm;
-            entry.nearestSpot = nearestSpot;
-        }
         if (parsedDate.utcMs > entry.dateUtcMs) {
             entry.dateUtcMs = parsedDate.utcMs;
             entry.dateIso = parsedDate.iso;
@@ -304,38 +280,33 @@ function extractPrefCatches(catchList, targetPrefMeta, allRegionSpots, todayUtcM
 
     const posts = [...postMap.values()].map(entry => {
         const fishes = [...entry.fishSet].sort((a, b) => a.localeCompare(b, "ja"));
-        const otherSpots = [...entry.matchedSpots.values()]
-            .filter(m => m.spot.spotName !== entry.nearestSpot.spotName)
-            .sort((a, b) => a.distKm - b.distKm)
-            .map(m => m.spot.spotName);
+        const coords = [...entry.coordsMap.values()];
 
         return {
             dateIso: entry.dateIso,
             dateUtcMs: entry.dateUtcMs,
             ageDays: entry.ageDays,
-            areaLabel: entry.areaLabel,
+            areaName: entry.areaName,
             source: entry.source,
             url: entry.url,
             fishes,
-            primarySpot: entry.nearestSpot,
-            distanceKm: entry.minDistKm,
-            otherSpots
+            coords
         };
     });
 
-    // 日付降順 → エリア名 → 最寄りスポット名
+    // 日付降順 → 投稿地名 → 魚種
     posts.sort((a, b) => {
         if (b.dateUtcMs !== a.dateUtcMs) return b.dateUtcMs - a.dateUtcMs;
-        const areaCmp = a.primarySpot.areaName.localeCompare(b.primarySpot.areaName, "ja");
+        const areaCmp = a.areaName.localeCompare(b.areaName, "ja");
         if (areaCmp !== 0) return areaCmp;
-        return a.primarySpot.spotName.localeCompare(b.primarySpot.spotName, "ja");
+        return a.fishes.join("、").localeCompare(b.fishes.join("、"), "ja");
     });
 
     return posts;
 }
 
 // ==========================================
-// 集計ヘルパー
+// 集計ヘルパー（すべて投稿の area_name ベース）
 // ==========================================
 function summarizeByFish(posts) {
     const map = new Map();
@@ -347,16 +318,13 @@ function summarizeByFish(posts) {
                     fish,
                     postCount: 0,
                     latestDate: post.dateIso,
-                    areaSpots: new Map()
+                    areaNames: new Map()
                 };
                 map.set(fish, item);
             }
             item.postCount += 1;
             if (post.dateIso > item.latestDate) item.latestDate = post.dateIso;
-
-            const areaName = post.primarySpot.areaName;
-            if (!item.areaSpots.has(areaName)) item.areaSpots.set(areaName, new Set());
-            item.areaSpots.get(areaName).add(post.primarySpot.spotName);
+            item.areaNames.set(post.areaName, (item.areaNames.get(post.areaName) || 0) + 1);
         }
     }
 
@@ -367,44 +335,59 @@ function summarizeByFish(posts) {
     });
 }
 
-function summarizeAreaHighlight(areaPosts) {
-    const fishCount = new Map();
-    const spotCount = new Map();
-
-    for (const post of areaPosts) {
-        for (const fish of post.fishes) {
-            fishCount.set(fish, (fishCount.get(fish) || 0) + 1);
+function summarizeByAreaName(posts) {
+    const map = new Map();
+    for (const post of posts) {
+        let item = map.get(post.areaName);
+        if (!item) {
+            item = {
+                areaName: post.areaName,
+                postCount: 0,
+                latestDate: post.dateIso,
+                fishCount: new Map(),
+                coordSet: new Set()
+            };
+            map.set(post.areaName, item);
         }
-        const sName = post.primarySpot.spotName;
-        spotCount.set(sName, (spotCount.get(sName) || 0) + 1);
+        item.postCount += 1;
+        if (post.dateIso > item.latestDate) item.latestDate = post.dateIso;
+        for (const fish of post.fishes) {
+            item.fishCount.set(fish, (item.fishCount.get(fish) || 0) + 1);
+        }
+        for (const coord of post.coords) {
+            item.coordSet.add(coord.label);
+        }
     }
 
-    const topFishes = [...fishCount.entries()]
-        .sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0], "ja")))
-        .map(([name, count]) => `${name}（${count}件）`);
+    return [...map.values()].sort((a, b) => {
+        if (b.postCount !== a.postCount) return b.postCount - a.postCount;
+        if (b.latestDate !== a.latestDate) return b.latestDate.localeCompare(a.latestDate);
+        return a.areaName.localeCompare(b.areaName, "ja");
+    });
+}
 
-    const topSpots = [...spotCount.entries()]
+function formatFishCounts(fishCountMap) {
+    return [...fishCountMap.entries()]
         .sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0], "ja")))
-        .slice(0, 5)
-        .map(([name]) => name);
+        .map(([name, count]) => `${name}（${count}件）`)
+        .join("、");
+}
 
-    return { topFishes, topSpots };
+function formatAreaCounts(areaCountMap, limit = 8) {
+    return [...areaCountMap.entries()]
+        .sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : a[0].localeCompare(b[0], "ja")))
+        .slice(0, limit)
+        .map(([name]) => name)
+        .join("、");
 }
 
 function formatPostLine(post) {
-    const distText = post.distanceKm < 0.1
-        ? "0.1km未満"
-        : `約${post.distanceKm.toFixed(1)}km`;
-
-    const spotLink = `[${post.primarySpot.spotName}](${post.primarySpot.mapUrl})`;
-    const otherSpotsText = post.otherSpots.length > 0
-        ? `（ほか近隣: ${post.otherSpots.slice(0, 3).join("、")}）`
-        : "";
+    const coordLabels = post.coords.map(c => c.label).join(" / ");
     const sourceText = post.url
         ? `[${post.source}](${post.url})`
         : post.source;
 
-    return `- **${post.dateIso}** | 魚種: ${post.fishes.join("、")} | 投稿地: ${post.areaLabel} | 最寄りスポット: ${spotLink}（${distText}）${otherSpotsText} | 出典: ${sourceText}`;
+    return `- **${post.dateIso}** | 投稿地: ${post.areaName} | 魚種: ${post.fishes.join("、")} | 代表点: ${coordLabels} | 出典: ${sourceText}`;
 }
 
 // ==========================================
@@ -413,27 +396,19 @@ function formatPostLine(post) {
 function buildCatchMarkdown(prefMeta, posts, updatedDate) {
     const recent7d = posts.filter(p => p.ageDays <= 7);
     const recent14d = posts.filter(p => p.ageDays <= 14);
-    const allFishSummary = summarizeByFish(posts);
-    const recent14dFishSummary = summarizeByFish(recent14d);
+
+    const recent7dByArea = summarizeByAreaName(recent7d);
+    const recent14dByFish = summarizeByFish(recent14d);
+    const allByFish = summarizeByFish(posts);
+    const allByArea = summarizeByAreaName(posts);
 
     const dateRangeEnd = posts.length > 0 ? posts[0].dateIso : "";
     const dateRangeStart = posts.length > 0 ? posts[posts.length - 1].dateIso : "";
-
-    const postsByArea = new Map();
-    for (const area of prefMeta.areas) {
-        postsByArea.set(area.areaKey, []);
-    }
-    for (const post of posts) {
-        const key = post.primarySpot.areaKey;
-        if (!postsByArea.has(key)) postsByArea.set(key, []);
-        postsByArea.get(key).push(post);
-    }
-
-    const activeAreaCount = [...postsByArea.values()].filter(arr => arr.length > 0).length;
+    const prefMapUrl = makePrefMapUrl(prefMeta.prefName);
 
     const lines = [];
     lines.push("---");
-    lines.push(`title: "${prefMeta.prefName}の最新SNS釣果情報"`);
+    lines.push(`title: "${prefMeta.prefName}および周辺の最新SNS釣果情報"`);
     lines.push(`pref_code: "${prefMeta.prefCode}"`);
     lines.push(`pref_name: "${prefMeta.prefName}"`);
     lines.push(`post_count: ${posts.length}`);
@@ -448,10 +423,11 @@ function buildCatchMarkdown(prefMeta, posts, updatedDate) {
     lines.push('source: "釣り行こNAVI"');
     lines.push("---");
     lines.push("");
-    lines.push(`# ${prefMeta.prefName}の最新SNS釣果情報`);
+    lines.push(`# ${prefMeta.prefName}および周辺の最新SNS釣果情報`);
     lines.push("");
-    lines.push(`> 本ファイルは、${REGION_CODE}/integrated_catch.json に収録されたSNS釣果報告から、${prefMeta.prefName}の正規スポットに最も近く（かつ${MAX_ASSIGN_DISTANCE_KM}km以内）に該当する投稿を自動抽出したものです。`);
-    lines.push("> 同一投稿URLが複数魚種や広域座標（東京湾・利根川など）に展開されている場合は、都道府県内で1投稿として統合・重複排除しています。");
+    lines.push(`> 本ファイルは、${REGION_CODE}/integrated_catch.json に収録されたSNS釣果報告のうち、${prefMeta.prefName}およびその周辺範囲に代表点座標が位置する投稿を自動抽出したものです。`);
+    lines.push("> 記載の座標は元のSNS投稿のエリア・地名（area_name）をもとに設定した代表点であり、特定の釣り場スポットへの紐付けではありません。");
+    lines.push("> 同一投稿URLが複数魚種や広域代表点（東京湾・利根川など）に展開されている場合は、1投稿として統合・重複排除しています。");
     lines.push("> SNS釣果は過去の投稿実績を示すものであり、今後の釣果や現地の立入可否・ルールを保証するものではありません。");
     lines.push("");
 
@@ -463,117 +439,101 @@ function buildCatchMarkdown(prefMeta, posts, updatedDate) {
         const areaLinks = prefMeta.areas.map(a => `[${a.name}](${a.fileName})`).join(" / ");
         lines.push(`- エリア別スポット詳細: ${areaLinks}`);
     }
-    lines.push(`- 地図サイト: ${SITE_URL}/`);
+    lines.push(`- 地図サイト（${prefMeta.prefName}）: ${prefMapUrl}`);
     lines.push("");
 
     lines.push("## 釣果データ概要");
     lines.push("");
-    lines.push(`- 対象都道府県: ${prefMeta.prefName}`);
+    lines.push(`- 対象範囲: ${prefMeta.prefName}および周辺`);
     lines.push(`- 抽出投稿数（ユニーク投稿）: ${posts.length}件`);
     lines.push(`- 直近7日間の投稿数: ${recent7d.length}件`);
     lines.push(`- 直近14日間の投稿数: ${recent14d.length}件`);
     if (dateRangeStart && dateRangeEnd) {
         lines.push(`- 収録期間: ${dateRangeStart} 〜 ${dateRangeEnd}`);
     }
-    lines.push(`- 釣果報告のあった魚種数: ${allFishSummary.length}種`);
-    lines.push(`- 釣果報告のあったエリア数: ${activeAreaCount}エリア`);
+    lines.push(`- 釣果報告のあった魚種数: ${allByFish.length}種`);
+    lines.push(`- 投稿地（エリア名）数: ${allByArea.length}件`);
     lines.push("");
 
     // ------------------------------------------
-    // 冒頭サマリー（直近7日・14日のハイライト）
+    // 冒頭サマリー（直近7日・14日）
     // ------------------------------------------
     lines.push("## 直近の釣果ハイライト");
     lines.push("");
 
-    lines.push("### 直近7日間のエリア別状況");
+    lines.push("### 直近7日間の投稿地別まとめ");
     lines.push("");
-    if (recent7d.length === 0) {
-        lines.push(`直近7日間（更新日 ${updatedDate} 基準）の${prefMeta.prefName}内SNS釣果投稿はありません。`);
+    if (recent7dByArea.length === 0) {
+        lines.push(`直近7日間（更新日 ${updatedDate} 基準）の${prefMeta.prefName}および周辺のSNS釣果投稿はありません。`);
         lines.push("");
     } else {
-        for (const area of prefMeta.areas) {
-            const areaRecent = recent7d.filter(p => p.primarySpot.areaKey === area.areaKey);
-            if (areaRecent.length === 0) continue;
-            const { topFishes, topSpots } = summarizeAreaHighlight(areaRecent);
-            lines.push(`- **${area.name}**（${areaRecent.length}件）: 主な魚種は ${topFishes.join("、")}。反応のあった周辺スポットは ${topSpots.join("、")}。`);
+        for (const item of recent7dByArea) {
+            lines.push(`- **${item.areaName}**（${item.postCount}件・最新 ${item.latestDate}）: ${formatFishCounts(item.fishCount)}`);
         }
         lines.push("");
     }
 
     lines.push("### 直近14日間の魚種別トレンド");
     lines.push("");
-    if (recent14dFishSummary.length === 0) {
-        lines.push(`直近14日間の${prefMeta.prefName}内SNS釣果投稿はありません。`);
+    if (recent14dByFish.length === 0) {
+        lines.push(`直近14日間の${prefMeta.prefName}および周辺のSNS釣果投稿はありません。`);
         lines.push("");
     } else {
-        for (const item of recent14dFishSummary.slice(0, 15)) {
-            const areaDescriptions = [...item.areaSpots.entries()].map(([areaName, spotSet]) => {
-                const spotsStr = [...spotSet].slice(0, 3).join("・");
-                return `${areaName}（${spotsStr}周辺）`;
-            });
-            lines.push(`- **${item.fish}**（${item.postCount}件・最新 ${item.latestDate}）: ${areaDescriptions.join("、")}`);
+        for (const item of recent14dByFish.slice(0, 15)) {
+            lines.push(`- **${item.fish}**（${item.postCount}件・最新 ${item.latestDate}）: ${formatAreaCounts(item.areaNames)}`);
         }
         lines.push("");
     }
 
     // ------------------------------------------
-    // エリア別の釣果投稿一覧（日付降順）
+    // 最新SNS釣果一覧（日付降順・代表点そのまま）
     // ------------------------------------------
-    lines.push("## エリア別のSNS釣果一覧");
+    lines.push("## 最新SNS釣果一覧（日付降順）");
     lines.push("");
-
     if (posts.length === 0) {
-        lines.push(`現在、${prefMeta.prefName}範囲（正規スポットから${MAX_ASSIGN_DISTANCE_KM}km以内）に該当するSNS釣果データはありません。`);
+        lines.push(`現在、${prefMeta.prefName}および周辺範囲に該当するSNS釣果データはありません。`);
         lines.push("");
     } else {
-        for (const area of prefMeta.areas) {
-            const areaPosts = postsByArea.get(area.areaKey) || [];
-            lines.push(`### ${area.name}（${areaPosts.length}件）`);
-            lines.push("");
-            if (prefMeta.shouldSplitByArea) {
-                lines.push(`- エリア詳細スポット情報: [${area.name}（${area.fileName}）](${area.fileName})`);
-                lines.push("");
-            }
-
-            if (areaPosts.length === 0) {
-                lines.push("収録期間内のSNS釣果投稿はありません。");
-                lines.push("");
-                continue;
-            }
-
-            const { topFishes } = summarizeAreaHighlight(areaPosts);
-            lines.push(`報告魚種まとめ: ${topFishes.join("、")}`);
-            lines.push("");
-
-            for (const post of areaPosts) {
-                lines.push(formatPostLine(post));
-            }
-            lines.push("");
+        for (const post of posts) {
+            lines.push(formatPostLine(post));
         }
+        lines.push("");
     }
 
     // ------------------------------------------
-    // 魚種別の最新釣果逆引き（全収録期間）
+    // 投稿地別の最新釣果まとめ（全収録期間）
     // ------------------------------------------
-    lines.push("## 魚種別の最新釣果まとめ（全収録期間）");
+    lines.push("## 投稿地別の最新釣果まとめ（全収録期間）");
     lines.push("");
-    if (allFishSummary.length === 0) {
+    if (allByArea.length === 0) {
         lines.push("収録期間内の釣果報告はありません。");
         lines.push("");
     } else {
-        for (const item of allFishSummary) {
-            const areaDescriptions = [...item.areaSpots.entries()].map(([areaName, spotSet]) => {
-                const spotsStr = [...spotSet].slice(0, 4).join("・");
-                return `${areaName}（${spotsStr}周辺）`;
-            });
-            lines.push(`- **${item.fish}**（${item.postCount}件・最新 ${item.latestDate}）: ${areaDescriptions.join("、")}`);
+        for (const item of allByArea) {
+            const coordsStr = [...item.coordSet].slice(0, 4).join(" / ");
+            lines.push(`- **${item.areaName}**（${item.postCount}件・最新 ${item.latestDate}）: ${formatFishCounts(item.fishCount)} | 代表点: ${coordsStr}`);
+        }
+        lines.push("");
+    }
+
+    // ------------------------------------------
+    // 魚種別の最新釣果まとめ（全収録期間）
+    // ------------------------------------------
+    lines.push("## 魚種別の最新釣果まとめ（全収録期間）");
+    lines.push("");
+    if (allByFish.length === 0) {
+        lines.push("収録期間内の釣果報告はありません。");
+        lines.push("");
+    } else {
+        for (const item of allByFish) {
+            lines.push(`- **${item.fish}**（${item.postCount}件・最新 ${item.latestDate}）: ${formatAreaCounts(item.areaNames, 12)}`);
         }
         lines.push("");
     }
 
     lines.push("---");
     lines.push("");
-    lines.push(`データ出典: ${REGION_CODE}/integrated_catch.json、${REGION_CODE}/${prefMeta.prefCode}_location.json`);
+    lines.push(`データ出典: ${REGION_CODE}/integrated_catch.json（範囲判定参照: ${REGION_CODE}/*_location.json）`);
     lines.push("");
 
     return {
@@ -582,8 +542,8 @@ function buildCatchMarkdown(prefMeta, posts, updatedDate) {
             postCount: posts.length,
             recent7dCount: recent7d.length,
             recent14dCount: recent14d.length,
-            fishSpeciesCount: allFishSummary.length,
-            activeAreaCount
+            fishSpeciesCount: allByFish.length,
+            areaNameCount: allByArea.length
         }
     };
 }
@@ -602,7 +562,6 @@ try {
         throw new Error(`*_location.json が見つかりません: ${REGION_DIR}`);
     }
 
-    // 対象県の解決（ALL / 単一県 / カンマ区切り複数県）
     let targetPrefCodes;
     if (TARGET_ARG === "ALL") {
         targetPrefCodes = availablePrefCodes;
@@ -618,31 +577,30 @@ try {
         }
     }
 
-    // リージョン内の全県 *_location.json をロードして最寄り判定母集団を作る
     const prefMetaMap = new Map();
-    const allRegionSpots = [];
+    const allRegionBoundaryPoints = [];
     for (const code of availablePrefCodes) {
         const meta = loadPrefLocationMeta(code);
         prefMetaMap.set(code, meta);
-        allRegionSpots.push(...meta.spots);
+        allRegionBoundaryPoints.push(...meta.boundaryPoints);
     }
 
     const updatedDate = getJstDateString();
     const todayUtcMs = getTodayJstUtcMs();
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-    console.log(`SNS釣果Markdown生成開始（対象: ${targetPrefCodes.join(", ")} / リージョン: ${REGION_CODE} / 全正規スポット母数: ${allRegionSpots.length}件 / 元レコード: ${rawCatchData.length}件）`);
+    console.log(`SNS釣果Markdown生成開始（対象: ${targetPrefCodes.join(", ")} / リージョン: ${REGION_CODE} / 範囲判定参照点数: ${allRegionBoundaryPoints.length}件 / 元レコード: ${rawCatchData.length}件）`);
 
     for (const prefCode of targetPrefCodes) {
         const prefMeta = prefMetaMap.get(prefCode);
-        const posts = extractPrefCatches(rawCatchData, prefMeta, allRegionSpots, todayUtcMs);
+        const posts = extractPrefCatches(rawCatchData, prefMeta, allRegionBoundaryPoints, todayUtcMs);
         const result = buildCatchMarkdown(prefMeta, posts, updatedDate);
 
         const outPath = path.join(OUTPUT_DIR, `${prefCode}_catch.md`);
         fs.writeFileSync(outPath, result.markdown, "utf8");
 
         console.log(
-            `[${prefCode}] 生成完了: ${outPath} | 投稿: ${result.stats.postCount}件 (7日以内: ${result.stats.recent7dCount}件 / 14日以内: ${result.stats.recent14dCount}件 / 魚種: ${result.stats.fishSpeciesCount}種)`
+            `[${prefCode}] 生成完了: ${outPath} | 投稿: ${result.stats.postCount}件 (7日以内: ${result.stats.recent7dCount}件 / 14日以内: ${result.stats.recent14dCount}件 / 投稿地: ${result.stats.areaNameCount}件 / 魚種: ${result.stats.fishSpeciesCount}種)`
         );
     }
 } catch (error) {
