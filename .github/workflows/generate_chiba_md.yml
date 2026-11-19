@@ -1,6 +1,16 @@
 name: Generate CHIBA AI Markdown
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "KANTO/CHIBA_location.json"
+      - "KANTO/CHIBA_fish.json"
+      - "KANTO/CHIBA_dictionary.json"
+      - "KANTO/CHIBA_shop.json"
+      - "data/KANTO_geo.json"
+      - "script/generate_chiba_md.js"
   workflow_dispatch:
 
 permissions:
@@ -19,17 +29,18 @@ jobs:
           node-version: "20"
 
       - name: Generate CHIBA Markdown files
-        run: node script/generate_chiba_md.js
+        run: node script/generate_chiba_md.js CHIBA KANTO
 
       - name: Commit and push generated Markdown
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ai-data/CHIBA.md ai-data/CHIBA_fish.md
+          git add 'ai-data/CHIBA.md' 'ai-data/CHIBA_*.md'
 
           if git diff --cached --quiet; then
-            echo "CHIBA.md / CHIBA_fish.mdに変更はありません。"
+            echo "CHIBA関連のAI用Markdownに変更はありません。"
           else
             git commit -m "Generate CHIBA AI Markdown files"
+            git pull --rebase
             git push
           fi
