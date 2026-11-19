@@ -105,10 +105,22 @@ async function loadRegionCSV() {
             window.regionData = null;
             window.regionPrefData = [];
 
+            const regionDisplayMap = { KANTO: '関東地方' };
+            const resolveRegionDisplayName = (rawName, notesVal, code) => {
+                const n = String(rawName || '').trim();
+                const nt = String(notesVal || '').trim();
+                const c = String(code || '').trim().toUpperCase();
+                if (n && !/^[A-Za-z0-9_-]+$/.test(n)) return n;
+                if (nt && !/^[A-Za-z0-9_-]+$/.test(nt)) return nt;
+                if (regionDisplayMap[n.toUpperCase()]) return regionDisplayMap[n.toUpperCase()];
+                if (regionDisplayMap[c]) return regionDisplayMap[c];
+                return n || '関東地方';
+            };
+
             for (const row of csvData.rows) {
                 if (row.type === 'region' && latIdx !== -1 && lngIdx !== -1 && zoomIdx !== -1) {
                     window.regionData = {
-                        name: nameIdx !== -1 ? row.name : '地域エリア',
+                        name: resolveRegionDisplayName(nameIdx !== -1 ? row.name : '', row.notes, regionCode),
                         lat: parseFloat(row.lat),
                         lng: parseFloat(row.lng),
                         zoom: parseFloat(row.zoom)
@@ -536,7 +548,8 @@ function handleRegionNearest(latlng) {
 // REGION 初期表示：SEO・マーカー・レイヤー等
 // ==========================================
 function renderRegion() {
-    const regionName = window.regionData ? window.regionData.name : '関東地方';
+    const rawRegionName = window.regionData ? window.regionData.name : '関東地方';
+    const regionName = String(rawRegionName).trim().toUpperCase() === 'KANTO' ? '関東地方' : (rawRegionName || '関東地方');
     let regionHtml = '<ul style="list-style-type:none; padding-left:5px; margin:0;">';
 
     (window.regionPrefData || []).forEach(pref => {

@@ -557,6 +557,35 @@ if (snsLink && snsModal) {
   });
 }
 
+const rankingBasisBtn = document.getElementById("rankingBasisBtn");
+const rankingBasisModal = document.getElementById("rankingBasisModal");
+const closeRankingBasisBtn = document.getElementById("closeRankingBasisBtn");
+
+if (rankingBasisBtn && rankingBasisModal) {
+  rankingBasisBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    openOverlayModal(rankingBasisModal);
+  });
+
+  if (closeRankingBasisBtn) {
+    closeRankingBasisBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      closeOverlayModal(rankingBasisModal);
+    });
+  }
+
+  // 暗幕（外側）タップで閉じる
+  rankingBasisModal.addEventListener("click", (e) => {
+    if (e.target === rankingBasisModal) closeOverlayModal(rankingBasisModal);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && rankingBasisModal.style.display !== "none" && rankingBasisModal.style.display !== "") {
+      closeOverlayModal(rankingBasisModal);
+    }
+  });
+}
+
 const calendarBtn = document.getElementById("calendarBtn");
 const calendarOverlay = document.getElementById("calendarOverlay");
 const calendarWrapper = document.getElementById("calendarWrapper");
