@@ -12,6 +12,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 //   node script/generate_pref_md.js IBARAKI KANTO
 //   node script/generate_pref_md.js CHIBA,TOKYO,KANAGAWA,IBARAKI KANTO
 //   node script/generate_pref_md.js ALL KANTO
+//   node script/generate_pref_md.js LLMS KANTO   ※ai-data/*.mdから /llms.txt のみ再生成
 // ==========================================
 const TARGET_ARG = (process.argv[2] || process.env.PREF_CODE || "CHIBA").trim().toUpperCase();
 const REGION_CODE = (process.argv[3] || process.env.REGION_CODE || "KANTO").trim().toUpperCase();
@@ -37,6 +38,16 @@ const AREA_SPLIT_THRESHOLD = Number(process.env.AREA_SPLIT_THRESHOLD || 15);
 const REGION_DIR = path.join(ROOT, REGION_CODE);
 const GEO_PATH = path.join(ROOT, "data", `${REGION_CODE}_geo.json`);
 const OUTPUT_DIR = path.join(ROOT, "ai-data");
+const LLMS_OUTPUT_PATH = path.join(ROOT, "llms.txt");
+
+const PREF_DISPLAY_ORDER = [
+    "CHIBA",
+    "KANAGAWA",
+    "TOKYO",
+    "IBARAKI",
+    "SAITAMA",
+    "GUNMA"
+];
 
 function readJsonRequired(filePath) {
     if (!fs.existsSync(filePath)) {
@@ -754,76 +765,270 @@ function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, i
     };
 }
 
+
 // ==========================================
-// メイン実行（単県 / 複数県 / ALL 対応）
+// /llms.txt 自動生成（ai-data/*.md のフロントマターを自動収集）
 // ==========================================
-try {
-    const availablePrefCodes = discoverPrefCodes(REGION_DIR);
-    if (availablePrefCodes.length === 0) {
-        throw new Error(`*_location.json が見つかりません: ${REGION_DIR}`);
+function parseFrontmatter(markdownText) {
+    const meta = {};
+    if (typeof markdownText !== "string") return meta;
+    const match = markdownText.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    if (!match) return meta;
+
+    const lines = match[1].split(/\r?\n/);
+    for (const line of lines) {
+        const kv = line.match(/^([A-Za-z0-9_-]+)\s*:\s*(.*)$/);
+        if (!kv) continue;
+        const key = kv[1].trim();
+        let val = kv[2].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+        }
+        meta[key] = val;
+    }
+    return meta;
+}
+
+function extractFirstHeading(markdownText) {
+    if (typeof markdownText !== "string") return "";
+    const match = markdownText.match(/^#\s+(.+)$/m);
+    return match ? cleanText(match[1]) : "";
+}
+
+function getPrefOrderIndex(prefCode) {
+    const idx = PREF_DISPLAY_ORDER.indexOf(prefCode);
+    return idx === -1 ? PREF_DISPLAY_ORDER.length : idx;
+}
+
+function buildLlmsTxt(aiDataDir, updatedDate) {
+    if (!fs.existsSync(aiDataDir)) {
+        throw new Error("ai-data ディレクトリが見つかりません: " + aiDataDir);
     }
 
-    let targetPrefCodes;
-    if (TARGET_ARG === "ALL") {
-        targetPrefCodes = availablePrefCodes;
-    } else {
-        targetPrefCodes = [...new Set(
-            TARGET_ARG.split(",").map(s => s.trim().toUpperCase()).filter(Boolean)
-        )];
-        const missing = targetPrefCodes.filter(code => !availablePrefCodes.includes(code));
-        if (missing.length > 0) {
-            throw new Error(
-                `指定された県のlocation.jsonが見つかりません: ${missing.join(", ")}（利用可能: ${availablePrefCodes.join(", ")}）`
-            );
+    const mdFiles = fs.readdirSync(aiDataDir)
+        .filter(name => /\.md$/i.test(name))
+        .sort((a, b) => a.localeCompare(b, "en"));
+
+    const groups = new Map();
+    const otherFiles = [];
+    let latestUpdated = updatedDate;
+
+    for (const fileName of mdFiles) {
+        const fullPath = path.join(aiDataDir, fileName);
+        const content = fs.readFileSync(fullPath, "utf8");
+        const meta = parseFrontmatter(content);
+        const baseName = fileName.replace(/\.md$/i, "");
+
+        const inferredPref = baseName.split("_")[0].toUpperCase();
+        const prefCode = cleanText(meta.pref_code).toUpperCase() || inferredPref;
+        const prefName = cleanText(meta.pref_name) || PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
+        const title = cleanText(meta.title) || extractFirstHeading(content) || baseName;
+        const fileUpdated = cleanText(meta.last_updated);
+        if (fileUpdated && fileUpdated > latestUpdated) {
+            latestUpdated = fileUpdated;
+        }
+
+        const entry = {
+            fileName,
+            url: `${SITE_URL}/ai-data/${encodeURIComponent(fileName)}`,
+            prefCode,
+            prefName,
+            title,
+            meta
+        };
+
+        if (!prefCode) {
+            otherFiles.push(entry);
+            continue;
+        }
+
+        if (!groups.has(prefCode)) {
+            groups.set(prefCode, {
+                prefCode,
+                prefName,
+                main: null,
+                catchFile: null,
+                fishFile: null,
+                areas: []
+            });
+        }
+
+        const group = groups.get(prefCode);
+        if (prefName && prefName !== prefCode) {
+            group.prefName = prefName;
+        }
+
+        const upperBase = baseName.toUpperCase();
+        if (upperBase === prefCode) {
+            group.main = entry;
+        } else if (upperBase === `${prefCode}_CATCH`) {
+            group.catchFile = entry;
+        } else if (upperBase === `${prefCode}_FISH`) {
+            group.fishFile = entry;
+        } else {
+            group.areas.push(entry);
         }
     }
 
-    const icData = readJsonOptional(GEO_PATH, "地理・アクセスJSON");
+    const sortedGroups = [...groups.values()].sort((a, b) => {
+        const oa = getPrefOrderIndex(a.prefCode);
+        const ob = getPrefOrderIndex(b.prefCode);
+        if (oa !== ob) return oa - ob;
+        return a.prefCode.localeCompare(b.prefCode, "en");
+    });
+
+    const lines = [];
+    lines.push("# 釣り行こNAVI");
+    lines.push("");
+    lines.push("> 関東全域（千葉・神奈川・東京・茨城・栃木・埼玉・群馬）の海釣り・堤防・河川・湖沼スポットを網羅するリアルタイム釣果さかな地図サイト「釣り行こNAVI」（https://turiiko-navi.com/）のAI向け構造化Markdownデータ目次です。");
+    lines.push("");
+    lines.push("## 利用ガイド・データ方針");
+    lines.push("");
+    lines.push(`- サイトURL: ${SITE_URL}/`);
+    lines.push(`- 最終更新日: ${latestUpdated} (Asia/Tokyo)`);
+    lines.push(`- 収録都道府県グループ数: ${sortedGroups.length}件 / 収録Markdownファイル数: ${mdFiles.length}件`);
+    lines.push("- 各スポットの登録魚種（`*_fish.md` および各スポット詳細）はサイト内データ上の対象魚種を示すものであり、現在の釣果や釣獲を保証するものではありません。");
+    lines.push("- 最新SNS釣果（`*_catch.md`）の座標は元のSNS投稿地名（area_name）をもとに設定した代表点であり、特定の釣り場スポットへの紐付けではありません。");
+    lines.push("- アクセス時間・距離は直線距離に道路係数（1.35倍）を掛けた概算値です。現地の立入禁止区域・駐車ルールは必ず現地表示をご確認ください。");
+    lines.push("- 「明日釣りに行くんだけどいい場所ある？」等の質問には、各県の `*_catch.md` で直近の釣果傾向を確認しつつ、該当エリアの詳細スポットMD（解説・駐車場/トイレ・ルール・アクセス・最寄り釣具店）を参照してください。");
+    lines.push("");
+
+    for (const group of sortedGroups) {
+        lines.push(`## ${group.prefName} (${group.prefCode})`);
+        lines.push("");
+
+        if (group.main) {
+            const splitFlag = String(group.main.meta.split_by_area || "").toLowerCase() === "true";
+            const desc = splitFlag
+                ? `${group.prefName}のスポット概要・エリア別詳細ファイルへのハブ`
+                : `${group.prefName}の正規スポット詳細一覧（解説・所在地・魚種・アクセス・釣具店）`;
+            lines.push(`- [${group.main.title}](${group.main.url}): ${desc}`);
+        }
+
+        if (group.catchFile) {
+            const postCount = cleanText(group.catchFile.meta.post_count);
+            const recent7d = cleanText(group.catchFile.meta.recent_7d_post_count);
+            const rangeStart = cleanText(group.catchFile.meta.date_range_start);
+            const rangeEnd = cleanText(group.catchFile.meta.date_range_end);
+
+            const details = [];
+            if (postCount !== "") details.push(`投稿${postCount}件`);
+            if (recent7d !== "") details.push(`直近7日${recent7d}件`);
+            if (rangeStart && rangeEnd) details.push(`${rangeStart}〜${rangeEnd}`);
+            const suffix = details.length > 0 ? `（${details.join(" / ")}）` : "";
+            lines.push(`- [${group.catchFile.title}](${group.catchFile.url}): ${group.prefName}および周辺の最新SNS釣果まとめ${suffix}`);
+        }
+
+        if (group.fishFile) {
+            lines.push(`- [${group.fishFile.title}](${group.fishFile.url}): 魚種名から${group.prefName}の対象スポットを逆引き`);
+        }
+
+        if (group.areas.length > 0) {
+            const sortedAreas = [...group.areas].sort((a, b) => a.fileName.localeCompare(b.fileName, "en"));
+            for (const area of sortedAreas) {
+                const areaName = cleanText(area.meta.area_name) || area.title;
+                const spotCount = cleanText(area.meta.spot_count);
+                const countSuffix = spotCount !== "" ? `（${spotCount}スポット）` : "";
+                lines.push(`- [${area.title}](${area.url}): ${areaName}の個別スポット詳細${countSuffix}`);
+            }
+        }
+
+        lines.push("");
+    }
+
+    if (otherFiles.length > 0) {
+        lines.push("## その他のデータ");
+        lines.push("");
+        for (const item of otherFiles) {
+            lines.push(`- [${item.title}](${item.url})`);
+        }
+        lines.push("");
+    }
+
+    return {
+        content: lines.join("\n"),
+        prefGroupCount: sortedGroups.length,
+        fileCount: mdFiles.length
+    };
+}
+
+// ==========================================
+// メイン実行（単県 / 複数県 / ALL / LLMS 対応）
+// ==========================================
+try {
     const updatedDate = getJstDate();
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-    console.log(`スポットAI向けMarkdown生成開始（対象: ${targetPrefCodes.join(", ")} / リージョン: ${REGION_CODE}）`);
-
-    for (const prefCode of targetPrefCodes) {
-        const locationPath = path.join(REGION_DIR, `${prefCode}_location.json`);
-        const fishPath = path.join(REGION_DIR, `${prefCode}_fish.json`);
-        const dictionaryPath = path.join(REGION_DIR, `${prefCode}_dictionary.json`);
-        const shopPath = path.join(REGION_DIR, `${prefCode}_shop.json`);
-
-        const locationData = readJsonRequired(locationPath);
-        const fishData = readJsonOptional(fishPath, `${prefCode} 魚種JSON`);
-        const dictionaryData = readJsonOptional(dictionaryPath, `${prefCode} 逆引き辞書JSON`);
-        const rawShopData = readJsonOptional(shopPath, `${prefCode} 釣具店JSON`);
-        const shopList = normalizeShopList(rawShopData);
-
-        const result = buildPrefMarkdown({
-            prefCode,
-            locationData,
-            fishData,
-            dictionaryData,
-            icData,
-            shopList,
-            updatedDate
-        });
-
-        const outputPath = path.join(OUTPUT_DIR, `${prefCode}.md`);
-        const fishOutputPath = path.join(OUTPUT_DIR, `${prefCode}_fish.md`);
-
-        fs.writeFileSync(outputPath, result.mainMarkdown, "utf8");
-        fs.writeFileSync(fishOutputPath, result.fishMarkdown, "utf8");
-
-        for (const areaFile of result.areaFiles) {
-            fs.writeFileSync(areaFile.filePath, areaFile.content, "utf8");
+    if (TARGET_ARG !== "LLMS") {
+        const availablePrefCodes = discoverPrefCodes(REGION_DIR);
+        if (availablePrefCodes.length === 0) {
+            throw new Error(`*_location.json が見つかりません: ${REGION_DIR}`);
         }
 
-        console.log(`[${prefCode}] 生成完了（エリア分割: ${result.shouldSplitByArea ? "ON" : "OFF"}）`);
-        console.log(`  正規スポット: ${result.stats.spotCount}件（${result.stats.areaCount}エリア） / 辞書紐付け: ${result.stats.spotsWithDict}件 / 未登録: ${result.stats.spotsWithoutDictNames.length}件`);
-        if (result.stats.spotsWithoutDictNames.length > 0) {
-            console.log(`  辞書未登録(先頭10件): ${result.stats.spotsWithoutDictNames.slice(0, 10).join("、")}`);
+        let targetPrefCodes;
+        if (TARGET_ARG === "ALL") {
+            targetPrefCodes = availablePrefCodes;
+        } else {
+            targetPrefCodes = [...new Set(
+                TARGET_ARG.split(",").map(s => s.trim().toUpperCase()).filter(Boolean)
+            )];
+            const missing = targetPrefCodes.filter(code => !availablePrefCodes.includes(code));
+            if (missing.length > 0) {
+                throw new Error(
+                    `指定された県のlocation.jsonが見つかりません: ${missing.join(", ")}（利用可能: ${availablePrefCodes.join(", ")}）`
+                );
+            }
         }
-        console.log(`  魚種登録あり: ${result.stats.spotsWithFish}件（全${result.stats.speciesCount}種） / アクセス: ${result.stats.spotsWithAccess}件 / 釣具店: ${result.stats.spotsWithShops}件`);
-        console.log(`  出力: ${outputPath}, ${fishOutputPath}${result.areaFiles.length > 0 ? `, エリア別 ${result.areaFiles.length}ファイル` : ""}`);
+
+        const icData = readJsonOptional(GEO_PATH, "地理・アクセスJSON");
+        console.log(`スポットAI向けMarkdown生成開始（対象: ${targetPrefCodes.join(", ")} / リージョン: ${REGION_CODE}）`);
+
+        for (const prefCode of targetPrefCodes) {
+            const locationPath = path.join(REGION_DIR, `${prefCode}_location.json`);
+            const fishPath = path.join(REGION_DIR, `${prefCode}_fish.json`);
+            const dictionaryPath = path.join(REGION_DIR, `${prefCode}_dictionary.json`);
+            const shopPath = path.join(REGION_DIR, `${prefCode}_shop.json`);
+
+            const locationData = readJsonRequired(locationPath);
+            const fishData = readJsonOptional(fishPath, `${prefCode} 魚種JSON`);
+            const dictionaryData = readJsonOptional(dictionaryPath, `${prefCode} 逆引き辞書JSON`);
+            const rawShopData = readJsonOptional(shopPath, `${prefCode} 釣具店JSON`);
+            const shopList = normalizeShopList(rawShopData);
+
+            const result = buildPrefMarkdown({
+                prefCode,
+                locationData,
+                fishData,
+                dictionaryData,
+                icData,
+                shopList,
+                updatedDate
+            });
+
+            const outputPath = path.join(OUTPUT_DIR, `${prefCode}.md`);
+            const fishOutputPath = path.join(OUTPUT_DIR, `${prefCode}_fish.md`);
+
+            fs.writeFileSync(outputPath, result.mainMarkdown, "utf8");
+            fs.writeFileSync(fishOutputPath, result.fishMarkdown, "utf8");
+
+            for (const areaFile of result.areaFiles) {
+                fs.writeFileSync(areaFile.filePath, areaFile.content, "utf8");
+            }
+
+            console.log(`[${prefCode}] 生成完了（エリア分割: ${result.shouldSplitByArea ? "ON" : "OFF"}）`);
+            console.log(`  正規スポット: ${result.stats.spotCount}件（${result.stats.areaCount}エリア） / 辞書紐付け: ${result.stats.spotsWithDict}件 / 未登録: ${result.stats.spotsWithoutDictNames.length}件`);
+            if (result.stats.spotsWithoutDictNames.length > 0) {
+                console.log(`  辞書未登録(先頭10件): ${result.stats.spotsWithoutDictNames.slice(0, 10).join("、")}`);
+            }
+            console.log(`  魚種登録あり: ${result.stats.spotsWithFish}件（全${result.stats.speciesCount}種） / アクセス: ${result.stats.spotsWithAccess}件 / 釣具店: ${result.stats.spotsWithShops}件`);
+            console.log(`  出力: ${outputPath}, ${fishOutputPath}${result.areaFiles.length > 0 ? `, エリア別 ${result.areaFiles.length}ファイル` : ""}`);
+        }
     }
+
+    // 実在する ai-data/*.md をスキャンしてルート直下の /llms.txt を自動更新
+    const llmsResult = buildLlmsTxt(OUTPUT_DIR, updatedDate);
+    fs.writeFileSync(LLMS_OUTPUT_PATH, llmsResult.content, "utf8");
+    console.log(`[LLMS] 生成完了: ${LLMS_OUTPUT_PATH}（${llmsResult.prefGroupCount}都道府県グループ / 計${llmsResult.fileCount}ファイル収録）`);
 } catch (error) {
     console.error("スポットAI向けMarkdown生成エラー:", error);
     process.exit(1);
