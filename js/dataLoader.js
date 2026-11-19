@@ -2627,21 +2627,39 @@ function renderShopSection(spot) {
     }
 }
 // ==========================================
-// ★ 新規：20km圏内のリアルタイム釣果を描画する関数 (setTimeout削除のクリーン版)
+// ★ 新規：10km圏内のリアルタイム釣果を描画する関数（多重挿入ガード＆Promise共有版）
 // ==========================================
 async function renderRecentCatches(spot) {
     const accessBox = document.getElementById('accessInfoBox');
     if (!accessBox || !spot || !spot.lat || !spot.lng) return;
 
-    // 既存の釣果エリアがあれば削除
-    const oldCatchArea = document.getElementById('spot-catch-section');
-    if (oldCatchArea) oldCatchArea.remove();
+    const spotKey = String(spot.individualId || spot.name || '');
+
+    // 同じスポットの釣果欄が既に挿入済みなら即リターン
+    const existingBefore = document.getElementById('spot-catch-section');
+    if (existingBefore) {
+        if (existingBefore.dataset.spotKey === spotKey) return;
+        existingBefore.remove();
+    }
 
     if (!window.compiledCatchData) {
         try {
-            const res = await fetch('/data/compiled_data.json');
-            if (!res.ok) throw new Error("JSON fetch failed");
-            window.compiledCatchData = await res.json();
+            if (!window._compiledCatchDataPromise) {
+                window._compiledCatchDataPromise = fetch('/data/compiled_data.json')
+                    .then(res => {
+                        if (!res.ok) throw new Error("JSON fetch failed");
+                        return res.json();
+                    })
+                    .then(json => {
+                        window.compiledCatchData = json;
+                        return json;
+                    })
+                    .catch(e => {
+                        window._compiledCatchDataPromise = null;
+                        throw e;
+                    });
+            }
+            await window._compiledCatchDataPromise;
         } catch (e) {
             console.error("釣果データの読み込みに失敗しました:", e);
             return;
@@ -2650,6 +2668,17 @@ async function renderRecentCatches(spot) {
 
     const data = window.compiledCatchData;
     if (!data) return;
+
+    // 非同期取得完了後：スポット画面から離脱済み、または既に同スポットが挿入済みなら即リターン
+    if (accessBox.querySelector('#default-site-guide')) return;
+    if (window.currentSpotId && spot.individualId != null && String(window.currentSpotId) !== String(spot.individualId)) {
+        return;
+    }
+    const existingAfter = document.getElementById('spot-catch-section');
+    if (existingAfter) {
+        if (existingAfter.dataset.spotKey === spotKey) return;
+        existingAfter.remove();
+    }
 
     const allCatches = [...(data.map_data || []), ...(data.blog_data || [])];
 
@@ -2669,6 +2698,7 @@ async function renderRecentCatches(spot) {
     // HTMLの構築
     const catchDiv = document.createElement('div');
     catchDiv.id = 'spot-catch-section';
+    catchDiv.dataset.spotKey = spotKey;
     catchDiv.style.marginTop = '12px';
     catchDiv.style.paddingTop = '10px';
     catchDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
