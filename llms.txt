@@ -1,0 +1,50 @@
+# 釣り行こNAVI
+
+> 関東全域（千葉・神奈川・東京・茨城・栃木・埼玉・群馬）の海釣り・堤防・河川・湖沼スポットを網羅するリアルタイム釣果さかな地図サイト「釣り行こNAVI」（https://turiiko-navi.com/）のAI向け構造化Markdownデータ目次です。
+
+## 利用ガイド・データ方針
+
+- サイトURL: https://turiiko-navi.com/
+- 最終更新日: 2026-11-19 (Asia/Tokyo)
+- 収録都道府県グループ数: 4件 / 収録Markdownファイル数: 25件
+- 各スポットの登録魚種（`*_fish.md` および各スポット詳細）はサイト内データ上の対象魚種を示すものであり、現在の釣果や釣獲を保証するものではありません。
+- 最新SNS釣果（`*_catch.md`）の座標は元のSNS投稿地名（area_name）をもとに設定した代表点であり、特定の釣り場スポットへの紐付けではありません。
+- アクセス時間・距離は直線距離に道路係数（1.35倍）を掛けた概算値です。現地の立入禁止区域・駐車ルールは必ず現地表示をご確認ください。
+- 「明日釣りに行くんだけどいい場所ある？」等の質問には、各県の `*_catch.md` で直近の釣果傾向を確認しつつ、該当エリアの詳細スポットMD（解説・駐車場/トイレ・ルール・アクセス・最寄り釣具店）を参照してください。
+
+## 千葉県 (CHIBA)
+
+- [千葉県の釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA.md): 千葉県のスポット概要・エリア別詳細ファイルへのハブ
+- [千葉県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/CHIBA_catch.md): 千葉県および周辺の最新SNS釣果まとめ（投稿67件 / 直近7日18件 / 2026-10-19〜2026-11-17）
+- [千葉県の魚種別釣り場一覧](https://turiiko-navi.com/ai-data/CHIBA_fish.md): 魚種名から千葉県の対象スポットを逆引き
+- [千葉県 銚子九十九里エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA_CHOUSHI.md): 銚子九十九里エリアの個別スポット詳細（20スポット）
+- [千葉県 南房総エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA_MINAMI.md): 南房総エリアの個別スポット詳細（58スポット）
+- [千葉県 外房エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA_SOTOBOU.md): 外房エリアの個別スポット詳細（27スポット）
+- [千葉県 東京湾内房エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA_UCHIBOU.md): 東京湾内房エリアの個別スポット詳細（49スポット）
+
+## 神奈川県 (KANAGAWA)
+
+- [神奈川県の釣りスポット情報](https://turiiko-navi.com/ai-data/KANAGAWA.md): 神奈川県のスポット概要・エリア別詳細ファイルへのハブ
+- [神奈川県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/KANAGAWA_catch.md): 神奈川県および周辺の最新SNS釣果まとめ（投稿101件 / 直近7日12件 / 2026-10-26〜2026-11-17）
+- [神奈川県の魚種別釣り場一覧](https://turiiko-navi.com/ai-data/KANAGAWA_fish.md): 魚種名から神奈川県の対象スポットを逆引き
+- [神奈川県 三浦半島エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/KANAGAWA_MIURA.md): 三浦半島エリアの個別スポット詳細（44スポット）
+- [神奈川県 湘南西湘エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/KANAGAWA_SEISHO.md): 湘南西湘エリアの個別スポット詳細（33スポット）
+- [神奈川県 川崎横浜エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/KANAGAWA_YOKOHAMA.md): 川崎横浜エリアの個別スポット詳細（27スポット）
+
+## 東京都 (TOKYO)
+
+- [東京都の釣りスポット情報](https://turiiko-navi.com/ai-data/TOKYO.md): 東京都のスポット概要・エリア別詳細ファイルへのハブ
+- [東京都および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/TOKYO_catch.md): 東京都および周辺の最新SNS釣果まとめ（投稿14件 / 直近7日4件 / 2026-10-23〜2026-11-16）
+- [東京都の魚種別釣り場一覧](https://turiiko-navi.com/ai-data/TOKYO_fish.md): 魚種名から東京都の対象スポットを逆引き
+- [東京都 臨海都心エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/TOKYO_HARUMI.md): 臨海都心エリアの個別スポット詳細（41スポット）
+- [東京都 奥多摩八王子エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/TOKYO_OKUTAMA.md): 奥多摩八王子エリアの個別スポット詳細（9スポット）
+
+## 茨城県栃木県 (IBARAKI)
+
+- [茨城県栃木県の釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI.md): 茨城県栃木県のスポット概要・エリア別詳細ファイルへのハブ
+- [茨城県栃木県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/IBARAKI_catch.md): 茨城県栃木県および周辺の最新SNS釣果まとめ（投稿60件 / 直近7日16件 / 2026-10-27〜2026-11-17）
+- [茨城県栃木県の魚種別釣り場一覧](https://turiiko-navi.com/ai-data/IBARAKI_fish.md): 魚種名から茨城県栃木県の対象スポットを逆引き
+- [茨城県栃木県 北茨城エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI_HITACHI.md): 北茨城エリアの個別スポット詳細（15スポット）
+- [茨城県栃木県 霞ヶ浦エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI_KASUMIGAURA.md): 霞ヶ浦エリアの個別スポット詳細（21スポット）
+- [茨城県栃木県 栃木鬼怒川エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI_TOCHIGI.md): 栃木鬼怒川エリアの個別スポット詳細（19スポット）
+- [茨城県栃木県 つくばエリアの釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI_TSUKUBA.md): つくばエリアの個別スポット詳細（7スポット）
