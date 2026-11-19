@@ -188,8 +188,8 @@
   <div id="spot-ranking-container" style="font-size: 14px; color: #333;">
     <!-- {{RANKING_HTML}} -->おすすめスポットを分析中...<!-- {{/RANKING_HTML}} -->
   </div>
-  <div style="margin-top: 8px; text-align: right;">
-    <button type="button" id="rankingBasisBtn" style="background: #ffffff; border: 1px solid #b8c7dc; color: #191970; font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer;">
+  <div class="ranking-basis-trigger-wrap">
+    <button type="button" id="rankingBasisBtn" class="ranking-basis-trigger">
       算出根拠（天気詳細・周辺SNS釣果）とデータ一覧を見る
     </button>
   </div>
@@ -234,16 +234,13 @@
 
 <!-- 明日のオススメ釣り場 選出根拠＆各県データ一覧（静的埋め込みポップアップ） -->
 <div id="rankingBasisModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="rankingBasisModalTitle">
-  <div class="modal-content" style="font-size: 13px; line-height: 1.65; color: #222;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; border-bottom:1px solid #dce4ee; padding-bottom:8px; margin-bottom:12px;">
-      <h2 id="rankingBasisModalTitle" style="font-size:15px; color:#191970; margin:0;">
-        <!-- {{RANKING_BASIS_TITLE}} -->明日のオススメ釣り場 選出根拠・データ一覧<!-- {{/RANKING_BASIS_TITLE}} -->
-      </h2>
-      <button type="button" id="closeRankingBasisBtn" aria-label="閉じる" style="background:#eef3f8; border:1px solid #c8d6e5; color:#191970; font-size:12px; padding:3px 10px; border-radius:4px; cursor:pointer; flex-shrink:0;">閉じる</button>
-    </div>
+  <div class="modal-content">
+    <h2 id="rankingBasisModalTitle">
+      <!-- {{RANKING_BASIS_TITLE}} -->明日のオススメ釣り場 選出根拠・データ一覧<!-- {{/RANKING_BASIS_TITLE}} -->
+    </h2>
     <div id="rankingBasisBody">
       <!-- {{RANKING_BASIS_HTML}} -->
-      <p style="margin:0; color:#555;">明日の天気詳細と周辺SNS釣果の選出根拠データを準備中です。</p>
+      <div class="basis-summary-card"><p>明日の天気詳細と周辺SNS釣果の選出根拠データを準備中です。</p></div>
       <!-- {{/RANKING_BASIS_HTML}} -->
     </div>
   </div>
@@ -300,6 +297,7 @@
       <p>
         当サイトへのご連絡は以下の用途に限ります。<br>
         ・バグ報告<br>
+        ・掲載内容の修正・取り下げのご連絡<br>
         ・その他の連絡事項
       </p>
 
@@ -308,17 +306,15 @@
         内容は確認のみ行い、必要に応じてサイト改善に反映します。
       </p>
 
-      <h2>連絡先</h2>
+      <h2>連絡先（公式Xアカウント）</h2>
 
       <p>
-        <a href="mailto:info@turiiko.shop?subject=バグ報告&body=【発生場所】%0A【内容】%0A【再現手順】%0A">
-          バグ報告を送る
-        </a>
+        公式Xアカウント（@TsuriikoNAVI）のリプライまたはDMよりご連絡ください。
       </p>
 
       <p>
-        <a href="mailto:info@turiiko.shop?subject=その他&body=【内容】%0A">
-          その他の連絡
+        <a href="https://x.com/TsuriikoNAVI" target="_blank" rel="noopener noreferrer" class="contact-x-btn">
+          X（@TsuriikoNAVI）へ連絡する ↗
         </a>
       </p>
     </section>
