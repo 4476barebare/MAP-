@@ -15,7 +15,7 @@ source: "釣り行こNAVI"
 
 - スポット情報トップ: [CHIBA.md](CHIBA.md)
 - エリア別詳細: [東京湾内房エリア](CHIBA_UCHIBOU.md) / [南房総エリア](CHIBA_MINAMI.md) / [外房エリア](CHIBA_SOTOBOU.md) / [銚子九十九里エリア](CHIBA_CHOUSHI.md)
-- SNS釣果データ: CHIBA_catch.md（別スクリプトで生成予定）
+- 最新SNS釣果データ: [CHIBA_catch.md](CHIBA_catch.md)
 
 ## 魚種から釣り場を探す
 

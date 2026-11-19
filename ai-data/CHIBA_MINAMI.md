@@ -24,6 +24,7 @@ source: "釣り行こNAVI"
 
 - 都道府県トップ: [千葉県の釣りスポット一覧（CHIBA.md）](CHIBA.md)
 - 魚種別の釣り場一覧: [CHIBA_fish.md](CHIBA_fish.md)
+- 最新SNS釣果データ: [CHIBA_catch.md](CHIBA_catch.md)
 - 同県の他エリア: [東京湾内房エリア](CHIBA_UCHIBOU.md) / [外房エリア](CHIBA_SOTOBOU.md) / [銚子九十九里エリア](CHIBA_CHOUSHI.md)
 
 ## 掲載スポット一覧

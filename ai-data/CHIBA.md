@@ -23,12 +23,12 @@ source: "釣り行こNAVI"
 - 解説・逆引き辞書登録スポット: 154件
 - 登録魚種があるスポット: 154件
 - 登録魚種の種類数: 65種
-- 地図サイト: https://turiiko-navi.com/
+- 地図サイト（千葉県）: https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E5%8D%83%E8%91%89%E7%9C%8C
 
 ## 関連データ
 
 - 魚種別の釣り場一覧: [CHIBA_fish.md](CHIBA_fish.md)
-- SNS釣果データ: CHIBA_catch.md（別スクリプトで生成予定）
+- 最新SNS釣果データ: [CHIBA_catch.md](CHIBA_catch.md)
 
 ## エリア別スポット詳細ファイル
 

@@ -24,6 +24,7 @@ source: "釣り行こNAVI"
 
 - 都道府県トップ: [千葉県の釣りスポット一覧（CHIBA.md）](CHIBA.md)
 - 魚種別の釣り場一覧: [CHIBA_fish.md](CHIBA_fish.md)
+- 最新SNS釣果データ: [CHIBA_catch.md](CHIBA_catch.md)
 - 同県の他エリア: [東京湾内房エリア](CHIBA_UCHIBOU.md) / [南房総エリア](CHIBA_MINAMI.md) / [銚子九十九里エリア](CHIBA_CHOUSHI.md)
 
 ## 掲載スポット一覧
@@ -385,7 +386,7 @@ source: "釣り行こNAVI"
 - 管轄・関係漁協: 養老川漁業協同組合
 - 座標: 35.306064, 140.148599
 - 登録魚種: アユ
-- アクセス: 市原鶴舞ICから約13分 (8.9km) / 木更津JCTICから約35分 (23.2km)
+- アクセス: 市原鶴舞ICから約13分 (8.9km) / 木更津JCTから約35分 (23.2km)
 - 最寄りの釣具店: シマヤ釣具木更津店 まで車で 約38分 (25.1km)
 - 地図: [養老川](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E5%8D%83%E8%91%89%E7%9C%8C&area=%E5%A4%96%E6%88%BF%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E9%A4%8A%E8%80%81%E5%B7%9D)
 
