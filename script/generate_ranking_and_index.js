@@ -802,9 +802,528 @@ function buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults
 }
 
 // ==========================================
+// ai-data/*.md → 超軽量静的HTML（*.html）＆ ai-data/index.html 一括変換
+// ==========================================
+function parseMdFrontmatter(mdText) {
+    const match = String(mdText || "").match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+    if (!match) return { meta: {}, body: String(mdText || "") };
+
+    const meta = {};
+    for (const line of match[1].split(/\r?\n/)) {
+        const kv = line.match(/^([A-Za-z0-9_]+)\s*:\s*(.*)$/);
+        if (!kv) continue;
+        let val = kv[2].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.slice(1, -1);
+        }
+        meta[kv[1]] = val;
+    }
+    return {
+        meta,
+        body: String(mdText || "").slice(match[0].length)
+    };
+}
+
+function extractFirstMdHeading(mdBody) {
+    const m = String(mdBody || "").match(/^#\s+(.+)$/m);
+    return m ? cleanText(m[1]) : "";
+}
+
+function rewriteMdHrefToHtml(rawHref) {
+    const href = String(rawHref || "").trim();
+    if (!href) return "#";
+
+    // llms.txt は軽量HTML目次へ誘導
+    if (/^(?:\.\.\/|\/|https:\/\/turiiko-navi\.com\/)?llms\.txt(?:$|[?#])/i.test(href)) {
+        return "/ai-data/index.html";
+    }
+
+    // 同一サイト / 相対パスの .md リンクを .html 版へ書き換え
+    if (/^https:\/\/turiiko-navi\.com\/ai-data\/[^?#]+\.md(?:$|[?#])/i.test(href)) {
+        return href.replace(/\.md(?=$|[?#])/i, ".html");
+    }
+    if (!/^https?:\/\//i.test(href) && !/^mailto:/i.test(href) && /\.md(?:$|[?#])/i.test(href)) {
+        return href.replace(/\.md(?=$|[?#])/i, ".html");
+    }
+
+    return href;
+}
+
+function renderInlineMdToHtml(text) {
+    // 先にHTMLエスケープした上でリンク・太字・コードを安全に変換
+    const tokens = [];
+    const placeholder = idx => `\u0000TOK${idx}\u0000`;
+
+    // 1. Markdownリンク [label](url) を退避
+    let work = String(text || "").replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, rawUrl) => {
+        const idx = tokens.length;
+        const href = rewriteMdHrefToHtml(rawUrl);
+        const isExternal = /^https?:\/\//i.test(href) && !href.startsWith(SITE_URL);
+        const attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : "";
+        tokens.push(`<a href="${escapeHtml(href)}"${attrs}>${escapeHtml(label)}</a>`);
+        return placeholder(idx);
+    });
+
+    // 2. インラインコード `...` を退避
+    work = work.replace(/`([^`]+)`/g, (_, code) => {
+        const idx = tokens.length;
+        tokens.push(`<code>${escapeHtml(code)}</code>`);
+        return placeholder(idx);
+    });
+
+    // 3. 残りをエスケープ
+    work = escapeHtml(work);
+
+    // 4. 太字 **...**
+    work = work.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+
+    // 5. 退避トークンを復元
+    work = work.replace(/\u0000TOK(\d+)\u0000/g, (_, i) => tokens[Number(i)] || "");
+    return work;
+}
+
+function splitMdTableRow(line) {
+    let trimmed = line.trim();
+    if (trimmed.startsWith("|")) trimmed = trimmed.slice(1);
+    if (trimmed.endsWith("|")) trimmed = trimmed.slice(0, -1);
+    return trimmed.split("|").map(cell => cell.trim());
+}
+
+function isMdTableSeparator(line) {
+    const trimmed = line.trim();
+    if (!trimmed.includes("|")) return false;
+    const cells = splitMdTableRow(trimmed);
+    return cells.length > 0 && cells.every(c => /^:?-{3,}:?$/.test(c));
+}
+
+function convertMarkdownBodyToHtml(mdBody) {
+    const lines = String(mdBody || "").split(/\r?\n/);
+    const out = [];
+    let i = 0;
+
+    while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+            i++;
+            continue;
+        }
+
+        // 水平線
+        if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+            out.push("<hr>");
+            i++;
+            continue;
+        }
+
+        // 見出し (#〜####)
+        const hMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
+        if (hMatch) {
+            const level = hMatch[1].length;
+            out.push(`<h${level}>${renderInlineMdToHtml(hMatch[2])}</h${level}>`);
+            i++;
+            continue;
+        }
+
+        // 引用ブロック (>)
+        if (trimmed.startsWith(">")) {
+            const quoteLines = [];
+            while (i < lines.length && lines[i].trim().startsWith(">")) {
+                quoteLines.push(lines[i].trim().replace(/^>\s?/, ""));
+                i++;
+            }
+            const inner = quoteLines.filter(Boolean).map(q => `<p>${renderInlineMdToHtml(q)}</p>`).join("");
+            if (inner) out.push(`<blockquote>${inner}</blockquote>`);
+            continue;
+        }
+
+        // テーブル
+        if (trimmed.includes("|") && i + 1 < lines.length && isMdTableSeparator(lines[i + 1])) {
+            const headerCells = splitMdTableRow(trimmed);
+            i += 2;
+            const bodyRows = [];
+            while (i < lines.length && lines[i].trim().includes("|") && !lines[i].trim().startsWith("#")) {
+                bodyRows.push(splitMdTableRow(lines[i]));
+                i++;
+            }
+            let tbl = '<div class="table-wrap"><table><thead><tr>';
+            for (const hc of headerCells) {
+                tbl += `<th>${renderInlineMdToHtml(hc)}</th>`;
+            }
+            tbl += "</tr></thead><tbody>";
+            for (const row of bodyRows) {
+                tbl += "<tr>";
+                for (let c = 0; c < headerCells.length; c++) {
+                    tbl += `<td>${renderInlineMdToHtml(row[c] ?? "")}</td>`;
+                }
+                tbl += "</tr>";
+            }
+            tbl += "</tbody></table></div>";
+            out.push(tbl);
+            continue;
+        }
+
+        // 箇条書き (- / *)
+        if (/^[-*]\s+/.test(trimmed)) {
+            const items = [];
+            while (i < lines.length && /^[-*]\s+/.test(lines[i].trim())) {
+                items.push(lines[i].trim().replace(/^[-*]\s+/, ""));
+                i++;
+            }
+            out.push("<ul>" + items.map(it => `<li>${renderInlineMdToHtml(it)}</li>`).join("") + "</ul>");
+            continue;
+        }
+
+        // 番号付きリスト (1. )
+        if (/^\d+\.\s+/.test(trimmed)) {
+            const items = [];
+            while (i < lines.length && /^\d+\.\s+/.test(lines[i].trim())) {
+                items.push(lines[i].trim().replace(/^\d+\.\s+/, ""));
+                i++;
+            }
+            out.push("<ol>" + items.map(it => `<li>${renderInlineMdToHtml(it)}</li>`).join("") + "</ol>");
+            continue;
+        }
+
+        // 通常段落
+        const paraLines = [];
+        while (
+            i < lines.length &&
+            lines[i].trim() &&
+            !/^(#{1,4}\s+|>\s?|[-*]\s+|\d+\.\s+|-{3,}$)/.test(lines[i].trim()) &&
+            !(lines[i].trim().includes("|") && i + 1 < lines.length && isMdTableSeparator(lines[i + 1]))
+        ) {
+            paraLines.push(lines[i].trim());
+            i++;
+        }
+        if (paraLines.length > 0) {
+            out.push(`<p>${paraLines.map(renderInlineMdToHtml).join("<br>")}</p>`);
+        }
+    }
+
+    return out.join("\n");
+}
+
+function wrapLightweightHtmlPage({ title, description, updatedDate, bodyHtml, mdFileName }) {
+    const safeTitle = escapeHtml(title || "釣り行こNAVI データ");
+    const safeDesc = escapeHtml(description || `${title || "釣り行こNAVI"}のテキスト・構造化データページです。`);
+    const mdLinkHtml = mdFileName
+        ? ` ｜ <a href="${escapeHtml(mdFileName)}">Markdown原本</a>`
+        : "";
+    const metaInfo = updatedDate ? `最終更新: ${escapeHtml(updatedDate)} (JST)` : "";
+
+    return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${safeTitle}｜釣り行こNAVI</title>
+  <meta name="description" content="${safeDesc}">
+  <meta name="robots" content="noindex, follow">
+  <link rel="canonical" href="${SITE_URL}/">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", sans-serif; line-height: 1.7; color: #222; background: #f8fafc; margin: 0; padding: 0; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 16px 16px 40px; background: #fff; min-height: 100vh; box-sizing: border-box; }
+    .top-nav { font-size: 12px; color: #555; padding-bottom: 10px; margin-bottom: 14px; border-bottom: 1px solid #dce4ee; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+    .top-nav a { color: #191970; text-decoration: none; font-weight: bold; }
+    .top-nav a:hover { text-decoration: underline; }
+    h1 { font-size: 20px; color: #191970; margin: 0 0 12px; line-height: 1.4; }
+    h2 { font-size: 16px; color: #191970; border-left: 4px solid #191970; padding-left: 8px; margin: 22px 0 10px; }
+    h3 { font-size: 15px; color: #243b6b; margin: 18px 0 8px; }
+    h4 { font-size: 14px; color: #191970; margin: 14px 0 6px; }
+    p { margin: 0 0 10px; font-size: 14px; }
+    ul, ol { margin: 0 0 12px; padding-left: 20px; font-size: 14px; }
+    li { margin-bottom: 4px; }
+    blockquote { margin: 0 0 14px; padding: 10px 12px; background: #eef3f8; border-left: 3px solid #191970; font-size: 13px; color: #333; }
+    blockquote p:last-child { margin-bottom: 0; }
+    a { color: #191970; }
+    code { background: #eef3f8; padding: 1px 4px; border-radius: 3px; font-size: 0.92em; }
+    hr { border: none; border-top: 1px solid #dce4ee; margin: 20px 0; }
+    .table-wrap { overflow-x: auto; margin: 0 0 14px; }
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { border: 1px solid #d5dfec; padding: 6px 8px; text-align: left; }
+    th { background: #eef3f8; color: #191970; }
+    .foot-nav { margin-top: 28px; padding-top: 12px; border-top: 1px solid #dce4ee; font-size: 12px; color: #555; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="top-nav" aria-label="データナビゲーション">
+      <div><a href="/">← 釣り行こNAVI 地図トップ</a> ｜ <a href="/ai-data/index.html">データ目次</a> ｜ <a href="/ai-data/${escapeHtml(REGION_CODE)}_tomorrow.html">明日のオススメ根拠</a>${mdLinkHtml}</div>
+      <div>${metaInfo}</div>
+    </nav>
+    ${bodyHtml}
+    <footer class="foot-nav">
+      <a href="/">釣り行こNAVI（関東の釣り場マップ・最新釣果さかな地図）</a> ｜ <a href="/ai-data/index.html">全県データ目次（HTML）</a> ｜ <a href="/llms.txt">llms.txt</a>
+    </footer>
+  </main>
+</body>
+</html>
+`;
+}
+
+function syncAiDataHtmlPages(aiDataDir, todayInfo) {
+    if (!fs.existsSync(aiDataDir)) {
+        return { tomorrowFiles: [], groups: [], generatedHtmlCount: 0, htmlFileSet: new Set() };
+    }
+
+    const mdFiles = fs.readdirSync(aiDataDir)
+        .filter(name => /\.md$/i.test(name))
+        .sort((a, b) => a.localeCompare(b, "en"));
+
+    const tomorrowFiles = [];
+    const groupsMap = new Map();
+    const htmlFileSet = new Set();
+    let generatedHtmlCount = 0;
+
+    for (const mdFileName of mdFiles) {
+        const mdPath = path.join(aiDataDir, mdFileName);
+        const mdContent = fs.readFileSync(mdPath, "utf8");
+        const { meta, body } = parseMdFrontmatter(mdContent);
+        const baseName = mdFileName.replace(/\.md$/i, "");
+        const upperBase = baseName.toUpperCase();
+        const htmlFileName = `${baseName}.html`;
+        const htmlPath = path.join(aiDataDir, htmlFileName);
+
+        const inferredPref = baseName.split("_")[0].toUpperCase();
+        const prefCode = cleanText(meta.pref_code).toUpperCase() || inferredPref;
+        const prefName = cleanText(meta.pref_name) || PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
+        const title = cleanText(meta.title) || extractFirstMdHeading(body) || baseName;
+        const updatedDate = cleanText(meta.last_updated) || todayInfo.iso;
+
+        const bodyHtml = convertMarkdownBodyToHtml(body);
+        const pageHtml = wrapLightweightHtmlPage({
+            title,
+            description: `${title}（${prefName}）。釣り行こNAVIの構造化データ・テキスト版ページ。`,
+            updatedDate,
+            bodyHtml,
+            mdFileName
+        });
+
+        fs.writeFileSync(htmlPath, pageHtml, "utf8");
+        htmlFileSet.add(htmlFileName);
+        generatedHtmlCount++;
+
+        const entry = {
+            mdFileName,
+            htmlFileName,
+            htmlUrl: `/ai-data/${encodeURIComponent(htmlFileName)}`,
+            prefCode,
+            prefName,
+            title,
+            meta
+        };
+
+        if (/_TOMORROW$/.test(upperBase)) {
+            tomorrowFiles.push(entry);
+            continue;
+        }
+
+        if (!groupsMap.has(prefCode)) {
+            groupsMap.set(prefCode, {
+                prefCode,
+                prefName,
+                main: null,
+                catchFile: null,
+                fishFile: null,
+                areas: []
+            });
+        }
+        const group = groupsMap.get(prefCode);
+        if (prefName && prefName !== prefCode) group.prefName = prefName;
+
+        if (upperBase === prefCode) group.main = entry;
+        else if (upperBase === `${prefCode}_CATCH`) group.catchFile = entry;
+        else if (upperBase === `${prefCode}_FISH`) group.fishFile = entry;
+        else group.areas.push(entry);
+    }
+
+    const sortedGroups = [...groupsMap.values()].sort((a, b) => {
+        const ia = PREF_DISPLAY_ORDER.indexOf(a.prefCode);
+        const ib = PREF_DISPLAY_ORDER.indexOf(b.prefCode);
+        const oa = ia === -1 ? PREF_DISPLAY_ORDER.length : ia;
+        const ob = ib === -1 ? PREF_DISPLAY_ORDER.length : ib;
+        if (oa !== ob) return oa - ob;
+        return a.prefCode.localeCompare(b.prefCode, "en");
+    });
+
+    // ai-data/index.html（全県データ目次の軽量HTML版）を生成
+    const idxParts = [];
+    idxParts.push("<h1>釣り行こNAVI 関東の釣り場・最新釣果データ目次</h1>");
+    idxParts.push(`<p>関東全域の釣り場スポット詳細（解説・駐車場・ルール・最寄りIC/釣具店）、魚種逆引き、最新SNS釣果、明日のオススメ釣り場選出根拠を、軽量なテキストHTMLページで閲覧できるデータ目次です。</p>`);
+
+    if (tomorrowFiles.length > 0) {
+        idxParts.push("<h2>明日のオススメ釣り場ランキング（天気・SNS釣果根拠）</h2><ul>");
+        for (const tf of tomorrowFiles) {
+            const targetDate = cleanText(tf.meta.target_date);
+            const suffix = targetDate ? `（対象日: ${escapeHtml(targetDate)}）` : "";
+            idxParts.push(`<li><a href="${escapeHtml(tf.htmlUrl)}">${escapeHtml(tf.title)}</a>${suffix}</li>`);
+        }
+        idxParts.push("</ul>");
+    }
+
+    for (const g of sortedGroups) {
+        idxParts.push(`<h2>${escapeHtml(g.prefName)}</h2><ul>`);
+        if (g.main) {
+            idxParts.push(`<li><a href="${escapeHtml(g.main.htmlUrl)}">${escapeHtml(g.main.title)}</a>（スポット概要・一覧）</li>`);
+        }
+        if (g.catchFile) {
+            idxParts.push(`<li><a href="${escapeHtml(g.catchFile.htmlUrl)}">${escapeHtml(g.catchFile.title)}</a>（周辺最新SNS釣果まとめ）</li>`);
+        }
+        if (g.fishFile) {
+            idxParts.push(`<li><a href="${escapeHtml(g.fishFile.htmlUrl)}">${escapeHtml(g.fishFile.title)}</a>（魚種別スポット逆引き）</li>`);
+        }
+        const sortedAreas = [...g.areas].sort((a, b) => a.htmlFileName.localeCompare(b.htmlFileName, "en"));
+        for (const a of sortedAreas) {
+            const spotCount = cleanText(a.meta.spot_count);
+            const suffix = spotCount ? `（${escapeHtml(spotCount)}スポット）` : "";
+            idxParts.push(`<li><a href="${escapeHtml(a.htmlUrl)}">${escapeHtml(a.title)}</a>${suffix}</li>`);
+        }
+        idxParts.push("</ul>");
+    }
+
+    const indexHtml = wrapLightweightHtmlPage({
+        title: "関東の釣り場・最新釣果データ目次",
+        description: "釣り行こNAVIの関東全域釣り場スポット詳細・魚種逆引き・最新SNS釣果・明日のオススメ根拠データ目次。",
+        updatedDate: todayInfo.iso,
+        bodyHtml: idxParts.join("\n"),
+        mdFileName: "../llms.txt"
+    });
+    fs.writeFileSync(path.join(aiDataDir, "index.html"), indexHtml, "utf8");
+    htmlFileSet.add("index.html");
+    generatedHtmlCount++;
+
+    return {
+        tomorrowFiles,
+        groups: sortedGroups,
+        generatedHtmlCount,
+        htmlFileSet
+    };
+}
+
+// ==========================================
+// 静的ポップアップ（#rankingBasisModal）用HTMLの生成
+// ==========================================
+function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, currentPrefCode }) {
+    const parts = [];
+
+    if (items.length > 0) {
+        const summarySpots = items.map(it => {
+            const snsNote = it.hasSnsBonus ? "・直近SNS釣果あり" : "";
+            return `${it.name}（${it.prefName}／降水${it.pop}%${it.wind != null ? `・風${it.wind}m/s` : ""}${snsNote}）`;
+        });
+        parts.push(
+            `<p style="margin:0 0 10px;">明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}で天候条件と周辺10km圏内の直近SNS釣果から上位選出された釣り場は、${escapeHtml(summarySpots.join("、"))}です。</p>`
+        );
+    } else {
+        parts.push(`<p style="margin:0 0 10px;">明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}における算出対象スポットはありません。</p>`);
+    }
+
+    parts.push(
+        `<p style="margin:0 0 12px; font-size:12px; color:#555; background:#f4f7fb; padding:8px 10px; border-radius:4px;">` +
+        `算出基準: 明日5〜20時の平均降水確率から算出する天候スコア（100点満点）に、周辺10km圏内の最新SNS釣果経過日数ボーナス（1日以内+15点〜14日以内+2点）を加算しています。` +
+        `</p>`
+    );
+
+    if (items.length > 0) {
+        parts.push('<div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">');
+        items.forEach((item, idx) => {
+            const locText = [item.prefName, item.areaName].filter(Boolean).join(" / ");
+            const condParts = [];
+            if (item.iconText || item.weatherSummaryText) {
+                condParts.push(`${item.iconText} ${item.weatherSummaryText}`.trim());
+            }
+            if (item.maxTemp != null && item.minTemp != null) {
+                condParts.push(`気温 ${item.minTemp}〜${item.maxTemp}°C`);
+            } else if (item.maxTemp != null) {
+                condParts.push(`最高気温 ${item.maxTemp}°C`);
+            }
+            condParts.push(`最大降水 ${item.pop}%`);
+            if (item.wind != null) condParts.push(`最大風速 ${item.wind}m/s`);
+            if (item.maxWave != null) condParts.push(`最大波高 ${item.maxWave}m`);
+            if (item.waterTempAvg != null) condParts.push(`平均水温 ${item.waterTempAvg}°C`);
+
+            let snsHtml = "周辺10km圏内に直近SNS釣果報告なし（明日の天候条件により選出）";
+            if (item.nearbyPosts.length > 0) {
+                const within14d = item.nearbyPosts.filter(p => p.ageDays <= 14);
+                const list = (within14d.length > 0 ? within14d : item.nearbyPosts).slice(0, 3);
+                snsHtml = list.map(p => {
+                    const distStr = p.distanceKm < 0.1 ? "0.1km未満" : `約${p.distanceKm.toFixed(1)}km`;
+                    const fishStr = p.fishes.length > 0 ? p.fishes.join("・") : "釣果あり";
+                    const placeStr = p.areaName || "周辺";
+                    const srcHtml = p.url
+                        ? `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer" style="color:#191970;">${escapeHtml(p.source)}↗</a>`
+                        : escapeHtml(p.source);
+                    return `${escapeHtml(p.dateIso)} ${escapeHtml(fishStr)}（${escapeHtml(placeStr)}・${escapeHtml(distStr)}・${srcHtml}）`;
+                }).join(" ／ ");
+            }
+
+            const areaHtmlFile = String(item.areaMdFile || "").replace(/\.md$/i, ".html");
+            const detailLinkHtml = dataCatalog && dataCatalog.htmlFileSet.has(areaHtmlFile)
+                ? ` ｜ <a href="/ai-data/${encodeURIComponent(areaHtmlFile)}" style="color:#191970;">${escapeHtml(item.areaName || item.prefName)}のスポット詳細一覧</a>`
+                : "";
+
+            parts.push(
+                `<article style="border:1px solid #d5dfec; border-radius:6px; padding:10px; background:#fff;">` +
+                `<h3 style="font-size:14px; color:#191970; margin:0 0 6px;">${idx + 1}. ${escapeHtml(item.name)}<span style="font-size:12px; font-weight:normal; color:#555;">（${escapeHtml(locText)}）</span></h3>` +
+                `<ul style="margin:0; padding-left:18px; font-size:12px; line-height:1.6;">` +
+                `<li><strong>スコア:</strong> ${item.score}点（天候 ${item.weatherScore}点 + SNS釣果 ${item.snsBonus}点）</li>` +
+                `<li><strong>明日の天気根拠:</strong> ${escapeHtml(condParts.join(" / "))}</li>` +
+                (item.timeSlots.length > 0 ? `<li><strong>時間帯別予報:</strong> ${escapeHtml(item.timeSlots.join(" ｜ "))}</li>` : "") +
+                `<li><strong>周辺10kmの直近SNS釣果:</strong> ${snsHtml}</li>` +
+                `</ul>` +
+                `<div style="margin-top:6px; font-size:12px;"><a href="${escapeHtml(item.url)}" style="color:#191970; font-weight:bold;">地図でポイントを見る</a>${detailLinkHtml}</div>` +
+                `</article>`
+            );
+        });
+        parts.push("</div>");
+    }
+
+    // 各県の軽量HTMLデータページへの通常リンク一覧（ブラウザで直接描画＆全AIが辿れる導線）
+    parts.push('<section style="border-top:1px solid #dce4ee; padding-top:10px;">');
+    parts.push('<h3 style="font-size:13px; color:#191970; margin:0 0 6px;">各県の釣り場詳細・最新SNS釣果データ一覧（テキストHTML版）</h3>');
+    parts.push('<ul style="margin:0; padding-left:18px; font-size:12px; line-height:1.8;">');
+
+    const tomorrowHtmlName = `${REGION_CODE}_tomorrow.html`;
+    if (dataCatalog && dataCatalog.htmlFileSet.has(tomorrowHtmlName)) {
+        parts.push(
+            `<li><a href="/ai-data/${encodeURIComponent(tomorrowHtmlName)}" style="color:#191970; font-weight:bold;">明日（${escapeHtml(tomorrowInfo.label)}）の${escapeHtml(SHORT_REGION_NAME)}おすすめ釣り場・全県詳細根拠</a></li>`
+        );
+    }
+
+    if (dataCatalog && dataCatalog.groups.length > 0) {
+        // 県画面では現在選択中の県を先頭に寄せる
+        const orderedGroups = currentPrefCode
+            ? [
+                ...dataCatalog.groups.filter(g => g.prefCode === currentPrefCode),
+                ...dataCatalog.groups.filter(g => g.prefCode !== currentPrefCode)
+              ]
+            : dataCatalog.groups;
+
+        for (const g of orderedGroups) {
+            const links = [];
+            if (g.main) links.push(`<a href="${escapeHtml(g.main.htmlUrl)}" style="color:#191970;">スポット一覧</a>`);
+            if (g.catchFile) links.push(`<a href="${escapeHtml(g.catchFile.htmlUrl)}" style="color:#191970;">最新SNS釣果</a>`);
+            if (g.fishFile) links.push(`<a href="${escapeHtml(g.fishFile.htmlUrl)}" style="color:#191970;">魚種逆引き</a>`);
+            if (links.length > 0) {
+                parts.push(`<li><strong>${escapeHtml(g.prefName)}:</strong> ${links.join(" / ")}</li>`);
+            }
+        }
+    }
+
+    if (dataCatalog && dataCatalog.htmlFileSet.has("index.html")) {
+        parts.push(`<li><a href="/ai-data/index.html" style="color:#191970;">関東全域の釣り場・釣果データ目次を見る</a></li>`);
+    }
+
+    parts.push("</ul></section>");
+    return parts.join("\n");
+}
+
+// ==========================================
 // 原本 template/index.txt から静的HTMLをビルド
 // ==========================================
-function buildHtmlFromTemplate(templatePath, regionTitle, regionHtml) {
+function buildHtmlFromTemplate(templatePath, regionTitle, regionHtml, basisTitle, basisHtml) {
     if (!fs.existsSync(templatePath)) {
         throw new Error(`原本テンプレートが見つかりません: ${templatePath}`);
     }
@@ -812,6 +1331,8 @@ function buildHtmlFromTemplate(templatePath, regionTitle, regionHtml) {
 
     const titlePattern = /<!--\s*\{\{RANKING_TITLE\}\}\s*-->[\s\S]*?<!--\s*\{\{\/RANKING_TITLE\}\}\s*-->/;
     const bodyPattern = /<!--\s*\{\{RANKING_HTML\}\}\s*-->[\s\S]*?<!--\s*\{\{\/RANKING_HTML\}\}\s*-->/;
+    const basisTitlePattern = /<!--\s*\{\{RANKING_BASIS_TITLE\}\}\s*-->[\s\S]*?<!--\s*\{\{\/RANKING_BASIS_TITLE\}\}\s*-->/;
+    const basisBodyPattern = /<!--\s*\{\{RANKING_BASIS_HTML\}\}\s*-->[\s\S]*?<!--\s*\{\{\/RANKING_BASIS_HTML\}\}\s*-->/;
 
     if (!titlePattern.test(html)) {
         throw new Error("原本テンプレート内に <!-- {{RANKING_TITLE}} --> プレースホルダーが見つかりません。");
@@ -825,6 +1346,13 @@ function buildHtmlFromTemplate(templatePath, regionTitle, regionHtml) {
 
     html = html.replace(titlePattern, () => safeTitle);
     html = html.replace(bodyPattern, () => safeBody);
+
+    if (basisTitlePattern.test(html)) {
+        html = html.replace(basisTitlePattern, () => escapeHtml(basisTitle || "明日のオススメ釣り場 選出根拠・データ一覧"));
+    }
+    if (basisBodyPattern.test(html)) {
+        html = html.replace(basisBodyPattern, () => basisHtml || "");
+    }
 
     return html;
 }
@@ -859,7 +1387,6 @@ try {
 
     // 2. 各県別ランキング算出（最大6件）
     const prefResults = [];
-    const prefsCacheMap = {};
     for (const prefData of prefDataList) {
         const items = buildRankingForSpots(prefData.spots, snsCatchData, todayInfo.utcMs, tomorrowInfo.iso, 6);
         const title = `明日（${tomorrowInfo.label}）${prefData.prefName}で釣りに行くんだけど良い場所ある？`;
@@ -872,19 +1399,49 @@ try {
             html,
             items
         });
-
-        prefsCacheMap[prefData.prefCode] = {
-            prefCode: prefData.prefCode,
-            prefName: prefData.prefName,
-            title,
-            html,
-            count: items.length
-        };
     }
 
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-    // 出力1: フロント差し替え用キャッシュJSON（ai-data/ranking_cache.json）
+    // 出力1: AI用・根拠付きランキングMD（ai-data/KANTO_tomorrow.md）
+    const tomorrowMd = buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults);
+    fs.writeFileSync(TOMORROW_MD_PATH, tomorrowMd, "utf8");
+
+    // 出力2: ai-data/*.md 全件を超軽量静的HTML（ai-data/*.html）＋目次（ai-data/index.html）へ一括変換
+    const dataCatalog = syncAiDataHtmlPages(OUTPUT_DIR, todayInfo);
+
+    // 出力3: 静的ポップアップ用HTML（関東全域＋各県別）を生成し、ranking_cache.json へ格納
+    const regionBasisTitle = `明日（${tomorrowInfo.label}）${SHORT_REGION_NAME}のおすすめ選出根拠・データ一覧`;
+    const regionBasisHtml = buildBasisPopupHtml({
+        scopeLabel: SHORT_REGION_NAME,
+        tomorrowInfo,
+        items: regionItems,
+        dataCatalog,
+        currentPrefCode: null
+    });
+
+    const prefsCacheMap = {};
+    for (const pr of prefResults) {
+        const prefBasisTitle = `明日（${tomorrowInfo.label}）${pr.prefName}のおすすめ選出根拠・データ一覧`;
+        const prefBasisHtml = buildBasisPopupHtml({
+            scopeLabel: pr.prefName,
+            tomorrowInfo,
+            items: pr.items,
+            dataCatalog,
+            currentPrefCode: pr.prefCode
+        });
+
+        prefsCacheMap[pr.prefCode] = {
+            prefCode: pr.prefCode,
+            prefName: pr.prefName,
+            title: pr.title,
+            html: pr.html,
+            basisTitle: prefBasisTitle,
+            basisHtml: prefBasisHtml,
+            count: pr.items.length
+        };
+    }
+
     const cachePayload = {
         regionCode: REGION_CODE,
         generatedDate: todayInfo.iso,
@@ -893,29 +1450,28 @@ try {
         region: {
             title: regionTitle,
             html: regionHtml,
+            basisTitle: regionBasisTitle,
+            basisHtml: regionBasisHtml,
             count: regionItems.length
         },
         prefs: prefsCacheMap
     };
     fs.writeFileSync(RANKING_CACHE_PATH, JSON.stringify(cachePayload, null, 2), "utf8");
 
-    // 出力2: AI用・根拠付きランキングMD（ai-data/KANTO_tomorrow.md）
-    const tomorrowMd = buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults);
-    fs.writeFileSync(TOMORROW_MD_PATH, tomorrowMd, "utf8");
-
-    // 出力3: 原本テンプレートから静的HTMLを生成（テスト時は index2.html、本番時は index.html）
-    const builtHtml = buildHtmlFromTemplate(TEMPLATE_PATH, regionTitle, regionHtml);
+    // 出力4: 原本テンプレートから静的HTMLを生成（テスト時は index2.html、本番時は index.html）
+    const builtHtml = buildHtmlFromTemplate(TEMPLATE_PATH, regionTitle, regionHtml, regionBasisTitle, regionBasisHtml);
     fs.writeFileSync(OUTPUT_HTML_PATH, builtHtml, "utf8");
 
-    console.log(`明日のオススメランキング＆静的HTMLの生成が完了しました（対象日: ${tomorrowInfo.iso}）`);
+    console.log(`明日のオススメランキング・静的ポップアップ・軽量HTMLの生成が完了しました（対象日: ${tomorrowInfo.iso}）`);
     console.log(`  対象県(${prefCodes.length}): ${prefCodes.join(", ")}`);
     console.log(`  関東全域トップ: ${regionItems.map(i => `${i.name}(${i.score}点/天候${i.weatherScore}+SNS${i.snsBonus})`).join("、") || "なし"}`);
     for (const pr of prefResults) {
         console.log(`  [${pr.prefCode}] ${pr.items.length}件: ${pr.items.map(i => `${i.name}(${i.score})`).join("、") || "なし"}`);
     }
-    console.log(`  出力HTML : ${OUTPUT_HTML_PATH}`);
-    console.log(`  出力JSON : ${RANKING_CACHE_PATH}`);
-    console.log(`  出力MD   : ${TOMORROW_MD_PATH}`);
+    console.log(`  出力HTML     : ${OUTPUT_HTML_PATH}`);
+    console.log(`  出力JSON     : ${RANKING_CACHE_PATH}`);
+    console.log(`  出力MD       : ${TOMORROW_MD_PATH}`);
+    console.log(`  軽量HTML生成 : ${dataCatalog.generatedHtmlCount}ファイル（ai-data/*.html + index.html）`);
 } catch (error) {
     console.error("ランキング＆静的HTML生成エラー:", error);
     process.exit(1);
