@@ -1,0 +1,81 @@
+name: Generate SNS Catch AI Markdown
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "KANTO/integrated_catch.json"
+      - "KANTO/*_location.json"
+      - "script/generate_catch_md.js"
+  schedule:
+    # 朝(JST 06:00)・夕方(JST 18:00)のデータ同期後に自動実行（変更なければスキップ）
+    # UTC 21:15 = JST 06:15 / UTC 09:15 = JST 18:15
+    - cron: "15 21 * * *"
+    - cron: "15 9 * * *"
+  workflow_dispatch:
+    inputs:
+      pref_code:
+        description: "対象県コード (CHIBA / TOKYO / KANAGAWA / IBARAKI / ALL / カンマ区切り)"
+        required: true
+        default: "CHIBA"
+        type: string
+      region_code:
+        description: "対象リージョンコード"
+        required: true
+        default: "KANTO"
+        type: string
+
+concurrency:
+  group: "ai-data-catch-md"
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  # 自動実行(push / schedule)時の対象県。全県展開時は "ALL" または "CHIBA,TOKYO,KANAGAWA,IBARAKI" に変更
+  DEFAULT_PREFS: "CHIBA"
+  DEFAULT_REGION: "KANTO"
+
+jobs:
+  generate-catch-md:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate SNS Catch Markdown files
+        env:
+          TARGET_PREFS: ${{ inputs.pref_code || env.DEFAULT_PREFS }}
+          TARGET_REGION: ${{ inputs.region_code || env.DEFAULT_REGION }}
+        run: |
+          echo "Target Prefs : ${TARGET_PREFS}"
+          echo "Target Region: ${TARGET_REGION}"
+          node script/generate_catch_md.js "${TARGET_PREFS}" "${TARGET_REGION}"
+
+      - name: Commit and push generated Markdown
+        env:
+          TARGET_PREFS: ${{ inputs.pref_code || env.DEFAULT_PREFS }}
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -- 'ai-data/*_catch.md'
+
+          if git diff --cached --quiet; then
+            echo "SNS釣果のAI用Markdownに変更はありません。"
+          else
+            git commit -m "auto: Generate SNS catch AI Markdown (${TARGET_PREFS})"
+            git pull --rebase --autostash origin main
+            git push origin main
+          fi
