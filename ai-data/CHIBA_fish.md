@@ -1,6 +1,8 @@
 ---
 title: "千葉県の魚種別釣り場一覧"
-last_updated: "2026-11-17"
+pref_code: "CHIBA"
+pref_name: "千葉県"
+last_updated: "2026-11-19"
 timezone: "Asia/Tokyo"
 source: "釣り行こNAVI"
 ---
@@ -11,8 +13,9 @@ source: "釣り行こNAVI"
 > 魚種名はCHIBA_fish.jsonの登録名をそのまま使用し、別名統合や推測による追加は行っていません。
 > 登録はサイト内データ上の対象魚種を示すもので、現在の釣果や釣獲を保証するものではありません。
 
-- スポット情報: [CHIBA.md](CHIBA.md)
-- SNS釣果データ: [CHIBA_catch.json](CHIBA_catch.json)（別スクリプトで生成予定）
+- スポット情報トップ: [CHIBA.md](CHIBA.md)
+- エリア別詳細: [東京湾内房エリア](CHIBA_UCHIBOU.md) / [南房総エリア](CHIBA_MINAMI.md) / [外房エリア](CHIBA_SOTOBOU.md) / [銚子九十九里エリア](CHIBA_CHOUSHI.md)
+- SNS釣果データ: CHIBA_catch.md（別スクリプトで生成予定）
 
 ## 魚種から釣り場を探す
 
