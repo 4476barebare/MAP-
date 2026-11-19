@@ -468,18 +468,6 @@ window.getNearbySnsCatchRecords = function(spot, radiusKm = window.SNS_CATCH_RAD
     return [...uniquePosts.values()].sort((a, b) => a.ageDays - b.ageDays);
 };
 
-// 投稿の新しさに応じたランキング加点。
-function getSnsCatchBonus(posts) {
-    if (!posts || posts.length === 0) return 0;
-    const days = posts[0].ageDays;
-    if (days <= 1) return 15;
-    if (days <= 3) return 12;
-    if (days <= 6) return 9;
-    if (days <= 10) return 5;
-    if (days <= 14) return 2;
-    return 0;
-}
-
 function clearSpotRanking() {
     const section = document.getElementById('fishing-recommend-section');
     const container = document.getElementById('spot-ranking-container');
@@ -518,9 +506,9 @@ function loadRankingCache() {
 }
 
 // ==========================================
-// ★ 明日のオススメ釣り場ランキング表示関数（事前生成キャッシュ優先＋フォールバック）
+// ★ 明日のオススメ釣り場ランキング差し替え関数（事前生成キャッシュ専用）
 // ==========================================
-async function renderSpotRanking(retryCount = 0) {
+async function renderSpotRanking() {
     const container = document.getElementById('spot-ranking-container');
     const section = document.getElementById('fishing-recommend-section');
     if (!container || !section) return;
@@ -528,8 +516,8 @@ async function renderSpotRanking(retryCount = 0) {
     const targetPrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : null;
     const titleEl = section.querySelector('h2');
 
-    // 1. 関東トップ(REGION)で既にSSG埋め込み済みHTMLが存在する場合はチラつきを防ぎそのまま維持
-    if (!targetPrefCode && retryCount <= 1) {
+    // 関東トップ(REGION)で既にSSG埋め込み済みHTMLが表示されている場合は通信せず維持
+    if (!targetPrefCode) {
         const embeddedList = container.querySelector('ul[data-ssg-ranking="REGION"]');
         if (embeddedList) {
             section.style.display = 'block';
@@ -537,277 +525,34 @@ async function renderSpotRanking(retryCount = 0) {
         }
     }
 
-    // 2. 事前生成された /ai-data/ranking_cache.json から即時差し替え（県切替・REGION復帰）
-    if (retryCount <= 1) {
-        const cache = await loadRankingCache();
-        if (cache) {
-            // 非同期fetch中に別県へ遷移していた場合は上書きしない
-            const latestPrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : null;
-            if (latestPrefCode !== targetPrefCode) return;
+    // 事前生成された /ai-data/ranking_cache.json から県別／関東版へ即時差し替え
+    const cache = await loadRankingCache();
+    if (!cache) return;
 
-            const entry = targetPrefCode
-                ? (cache.prefs && cache.prefs[targetPrefCode])
-                : cache.region;
+    // 非同期fetch中に別画面へ遷移していた場合は上書きしない
+    const latestPrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : null;
+    if (latestPrefCode !== targetPrefCode) return;
 
-            if (entry && entry.html) {
-                section.style.display = 'block';
-                if (titleEl && entry.title) {
-                    titleEl.textContent = entry.title;
-                }
-                container.innerHTML = entry.html;
-                const basisTitleEl = document.getElementById('rankingBasisModalTitle');
-                const basisBodyEl = document.getElementById('rankingBasisBody');
-                if (basisTitleEl && entry.basisTitle) {
-                    basisTitleEl.textContent = entry.basisTitle;
-                }
-                if (basisBodyEl && entry.basisHtml) {
-                    basisBodyEl.innerHTML = entry.basisHtml;
-                }
-                return;
-            }
-        }
+    const entry = targetPrefCode
+        ? (cache.prefs && cache.prefs[targetPrefCode])
+        : cache.region;
+
+    if (!entry || !entry.html) return;
+
+    section.style.display = 'block';
+    if (titleEl && entry.title) {
+        titleEl.textContent = entry.title;
     }
+    container.innerHTML = entry.html;
 
-    // 3. キャッシュ未生成・取得失敗時は従来のクライアント側計算ロジックへフォールバック
-    if (retryCount === 0) {
-        section.style.display = 'block';
-        container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
-
-        if (!window._firstTileLoaded && typeof window.runAfterTileLoad === 'function') {
-            window.runAfterTileLoad(() => renderSpotRanking(1));
-            return;
-        }
+    const basisTitleEl = document.getElementById('rankingBasisModalTitle');
+    const basisBodyEl = document.getElementById('rankingBasisBody');
+    if (basisTitleEl && entry.basisTitle) {
+        basisTitleEl.textContent = entry.basisTitle;
     }
-
-    const now = new Date();
-    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-    nowJST.setDate(nowJST.getDate() + 1);
-
-    const tMonth = nowJST.getMonth() + 1;
-    const tDate = nowJST.getDate();
-    const tomorrowStr = tMonth + "月" + tDate + "日";
-
-    let targetSpots = [];
-    let titlePrefix = "";
-
-    // 県画面：選択県のスポットのみ
-    if (window.currentPref) {
-        if (!window.spotData || window.spotData.length === 0) {
-            if (retryCount < 25) {
-                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
-                return;
-            }
-            clearSpotRanking();
-            return;
-        }
-
-        const repSpot = window.spotData.find(s => {
-            const typeParts = (s.type || '').split('$');
-            return typeParts.includes('representative') || typeParts.includes('assistant');
-        }) || window.spotData[0];
-
-        if (!repSpot || !repSpot.whether) {
-            if (retryCount < 25) {
-                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
-                return;
-            }
-            clearSpotRanking();
-            return;
-        }
-
-        targetSpots = window.spotData;
-        const prefName = window.prefData ? window.prefData.notes : window.currentPref;
-        titlePrefix = prefName + "で";
-    } else {
-        // REGION画面：関東全域
-        if (!window.allspotData || window.allspotData.length === 0 || !window.regionPrefData) {
-            if (retryCount < 25) {
-                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
-                return;
-            }
-            clearSpotRanking();
-            return;
-        }
-
-        titlePrefix = "関東で";
-        // REGIONの天気はregion_managementで全県JSONの付与完了後にランキングを呼び出す。
-        targetSpots = window.allspotData;
+    if (basisBodyEl && entry.basisHtml) {
+        basisBodyEl.innerHTML = entry.basisHtml;
     }
-
-
-    if (titleEl) {
-        titleEl.innerHTML = "明日（" + tomorrowStr + "）" + titlePrefix + "釣りに行くんだけど良い場所ある？";
-    }
-
-    const ranking = [];
-
-    targetSpots.forEach(spot => {
-        if (spot.type === 'pref' || spot.type === 'area') return;
-        const typeParts = (spot.type || '').split('$');
-        if (typeParts.includes('representative') ||
-            typeParts.includes('assistant') ||
-            typeParts.includes('substitute')) return;
-
-        // 直接スポット画面へ遷移できないスポットは対象外。
-        if (!spot.zoom || String(spot.zoom).trim() === '') return;
-
-        const whether = spot.whether;
-        if (!whether || !whether.hourly || !whether.hourly[1] || !whether.hourly[1].weather) return;
-
-        const tomorrowWeather = whether.hourly[1].weather;
-        const morningRows = [];
-        const afternoonRows = [];
-        let maxPop = -Infinity;
-        let maxWind = -Infinity;
-        let popTotal = 0;
-        let popCount = 0;
-
-        for (let i = 0; i < tomorrowWeather.length; i++) {
-            const row = tomorrowWeather[i];
-            if (!Array.isArray(row)) continue;
-
-            const hour = i * 2;
-            if (hour >= 5 && hour <= 12) morningRows.push(row);
-            else if (hour >= 13 && hour <= 20) afternoonRows.push(row);
-
-            const pop = row[2];
-            if (typeof pop === "number" && hour >= 5 && hour <= 20) {
-                maxPop = Math.max(maxPop, pop);
-                popTotal += pop;
-                popCount++;
-            }
-
-            const wind = row[4];
-            if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
-        }
-
-        if (popCount === 0) return;
-
-        // 表示用の降水確率は従来どおり時間帯の最大値を丸める。
-        const displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
-
-        // 代表天気の生成は既存ロジックをそのまま利用する。
-        const getIconSafe = rows => {
-            if (!Array.isArray(rows) || rows.length === 0) return null;
-            return typeof calcRepresentativeIcon === 'function' ? calcRepresentativeIcon(rows) : '';
-        };
-
-        const iconMorning = getIconSafe(morningRows);
-        const iconAfternoon = getIconSafe(afternoonRows);
-        let iconStr = '';
-        if (iconMorning && iconAfternoon) {
-            iconStr = iconMorning === iconAfternoon
-                ? iconMorning
-                : iconMorning + '<span style="font-size:0.8em; margin:0 2px;">→</span>' + iconAfternoon;
-        } else {
-            iconStr = iconMorning || iconAfternoon || '';
-        }
-
-        // 海・淡水に共通する降水傾向だけで天気スコアを算出する。
-        // 風速・波高・潮汐は順位付けに使用しない。
-        const averagePop = popTotal / popCount;
-        const weatherScore = Math.max(0, 100 - averagePop * 0.7);
-
-        const nearbyPosts = typeof window.getNearbySnsCatchRecords === 'function'
-            ? window.getNearbySnsCatchRecords(spot)
-            : [];
-        const snsBonus = getSnsCatchBonus(nearbyPosts);
-
-        ranking.push({
-            name: spot.name,
-            spot: spot,
-            score: Math.round(weatherScore + snsBonus),
-            pop: displayPop,
-            wind: maxWind !== -Infinity ? Math.round(maxWind) : null,
-            iconStr: iconStr,
-            hasSnsBonus: snsBonus > 0,
-            snsBonus: snsBonus
-        });
-    });
-
-    if (ranking.length === 0) {
-        clearSpotRanking();
-        return;
-    }
-
-    // 同点の並び順だけランダム化し、スコア順に表示する。
-    for (let i = ranking.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [ranking[i], ranking[j]] = [ranking[j], ranking[i]];
-    }
-    ranking.sort((a, b) => b.score - a.score);
-
-    // 上位3順位まで。REGIONは最大5件、県画面は最大6件。
-    const maxItems = window.currentPref ? 6 : 5;
-    const topItems = [];
-    let currentRank = 1;
-    let currentScore = ranking[0].score;
-
-    for (let i = 0; i < ranking.length; i++) {
-        if (ranking[i].score < currentScore) {
-            currentRank++;
-            currentScore = ranking[i].score;
-        }
-        if (currentRank > 3 || topItems.length >= maxItems) break;
-        topItems.push(ranking[i]);
-    }
-
-    let html = '<ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">';
-    topItems.forEach(item => {
-        const spotObj = item.spot;
-        let url = "#";
-
-        if (spotObj) {
-            const regionCode = window.currentRegion || 'KANTO';
-            const regionName = window.regionData?.name || (regionCode === 'KANTO' ? '関東地方' : regionCode);
-            let prefName = window.prefData ? window.prefData.notes : window.currentPref;
-            if (!prefName && window.regionPrefData) {
-                const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
-                if (pInfo) prefName = pInfo.prefName;
-            }
-
-            let areaName = '';
-            const targetAreas = window.currentPref ? window.areaData : window.allspotData;
-            if (targetAreas && spotObj.areaId) {
-                let parentArea = targetAreas.find(a =>
-                    String(a.areaId) + '_' + String(a.individualId) === String(spotObj.areaId)
-                );
-                if (!parentArea && window.currentPref) {
-                    parentArea = targetAreas.find(a => String(spotObj.areaId).endsWith(String(a.individualId)));
-                }
-                if (parentArea) areaName = parentArea.name;
-            }
-
-            url = "/?region=" + encodeURIComponent(regionName) +
-                "&pref=" + encodeURIComponent(prefName || '') +
-                "&area=" + encodeURIComponent(areaName || '') +
-                "&spot=" + encodeURIComponent(item.name);
-        }
-
-        const windHtml = item.wind !== null
-            ? '<span>風: <strong style="color:#191970;">' + item.wind + 'm</strong></span>'
-            : '';
-        const snsHtml = item.hasSnsBonus
-            ? '<span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span>'
-            : '';
-
-        html += '<li>' +
-            '<a href="' + url + '" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;">' +
-                '<span style="display:flex; justify-content:space-between; align-items:center; width:100%;">' +
-                    '<span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">' + item.name + '</span>' +
-                    '<span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;">' +
-                        '<span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">' + item.iconStr + '</span>' +
-                        '<span>降水: <strong style="color:#191970;">' + item.pop + '%</strong></span>' +
-                        windHtml +
-                    '</span>' +
-                '</span>' +
-                snsHtml +
-            '</a>' +
-        '</li>';
-    });
-    html += '</ul>';
-
-    container.innerHTML = html;
 }
 // ==========================================
 // ★ タイトル・メタタグ動的更新関数（連携版）
@@ -1585,10 +1330,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!window.currentPref) return loadPrefectureSpots(null, 'all');
         });
         window.runAfterTileLoad(() => {
-            // ★ 県・エリア・スポットURLでは各画面の入口側で描画するため、REGION画面のときだけ呼ぶ
-            if (!window.currentPref && typeof renderSpotRanking === 'function') return renderSpotRanking(1);
-        });
-        window.runAfterTileLoad(() => {
             if (typeof loadICData === 'function') return loadICData();
         });
         window.runAfterTileLoad(() => {
@@ -2036,7 +1777,6 @@ async function loadPrefectureData(prefCode) {
                         createWeekItem(activeSpot.whether);
                     }
                 }
-                // ★ renderSpotRanking は各画面の入口側で1回だけ呼ぶ（ここでは呼ばない）
             }
 
             if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
