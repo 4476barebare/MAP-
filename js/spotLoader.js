@@ -361,6 +361,7 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
     });
 
     if (typeof renderAreaGuide === 'function') renderAreaGuide();
+    if (typeof renderSpotRanking === 'function') renderSpotRanking();
     if (parentArea && typeof openArea === 'function') openArea(parentArea.individualId);
 
     const jnnRow = document.getElementById('map-jma-alert');
@@ -429,9 +430,6 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
                 if (typeof waitAndRenderSpotDetails === 'function') {
                     waitAndRenderSpotDetails(spot.name);
                 }
-            }
-            if (typeof renderSpotRanking === 'function') {
-                renderSpotRanking();
             }
         }
     });

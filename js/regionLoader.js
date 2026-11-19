@@ -823,6 +823,7 @@ async function region_management() {
     if (!isRegionReady) return;
 
     if (typeof updateSeoMeta === 'function') updateSeoMeta();
+    if (typeof renderSpotRanking === 'function') renderSpotRanking();
 
     const prefList = [...new Set(
         (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean)
@@ -860,7 +861,6 @@ async function region_management() {
         AddInLandWeather(null, 'all')
     ]).then(() => {
         if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
-        if (typeof renderSpotRanking === 'function') renderSpotRanking();
     }).catch(error => {
         console.error('全県天気JSON読み込みエラー:', error);
     });

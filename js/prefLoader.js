@@ -839,7 +839,6 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
     if (typeof destroyAreaUI === 'function') destroyAreaUI();
-    if (typeof clearSpotRanking === 'function') clearSpotRanking();
 
 
     window.prefLocationUrl      = `/${regionCode}/${prefCode}_location.json`;
