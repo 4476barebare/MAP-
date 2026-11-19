@@ -1208,26 +1208,29 @@ function syncAiDataHtmlPages(aiDataDir, todayInfo) {
 function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, currentPrefCode }) {
     const parts = [];
 
+    // サマリー＋算出基準カード
+    parts.push('<div class="basis-summary-card">');
     if (items.length > 0) {
         const summarySpots = items.map(it => {
             const snsNote = it.hasSnsBonus ? "・直近SNS釣果あり" : "";
             return `${it.name}（${it.prefName}／降水${it.pop}%${it.wind != null ? `・風${it.wind}m/s` : ""}${snsNote}）`;
         });
         parts.push(
-            `<p style="margin:0 0 10px;">明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}で天候条件と周辺10km圏内の直近SNS釣果から上位選出された釣り場は、${escapeHtml(summarySpots.join("、"))}です。</p>`
+            `<p>明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}で天候条件と周辺10km圏内の直近SNS釣果から上位選出された釣り場は、${escapeHtml(summarySpots.join("、"))}です。</p>`
         );
     } else {
-        parts.push(`<p style="margin:0 0 10px;">明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}における算出対象スポットはありません。</p>`);
+        parts.push(`<p>明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}における算出対象スポットはありません。</p>`);
     }
-
     parts.push(
-        `<p style="margin:0 0 12px; font-size:12px; color:#555; background:#f4f7fb; padding:8px 10px; border-radius:4px;">` +
+        `<p class="basis-criteria">` +
         `算出基準: 明日5〜20時の平均降水確率から算出する天候スコア（100点満点）に、周辺10km圏内の最新SNS釣果経過日数ボーナス（1日以内+15点〜14日以内+2点）を加算しています。` +
         `</p>`
     );
+    parts.push("</div>");
 
+    // 各スポットの天気根拠・周辺SNS釣果カード
     if (items.length > 0) {
-        parts.push('<div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">');
+        parts.push('<div class="basis-spot-list">');
         items.forEach((item, idx) => {
             const locText = [item.prefName, item.areaName].filter(Boolean).join(" / ");
             const condParts = [];
@@ -1253,7 +1256,7 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
                     const fishStr = p.fishes.length > 0 ? p.fishes.join("・") : "釣果あり";
                     const placeStr = p.areaName || "周辺";
                     const srcHtml = p.url
-                        ? `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer" style="color:#191970;">${escapeHtml(p.source)}↗</a>`
+                        ? `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.source)}↗</a>`
                         : escapeHtml(p.source);
                     return `${escapeHtml(p.dateIso)} ${escapeHtml(fishStr)}（${escapeHtml(placeStr)}・${escapeHtml(distStr)}・${srcHtml}）`;
                 }).join(" ／ ");
@@ -1261,39 +1264,41 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
 
             const areaHtmlFile = String(item.areaMdFile || "").replace(/\.md$/i, ".html");
             const detailLinkHtml = dataCatalog && dataCatalog.htmlFileSet.has(areaHtmlFile)
-                ? ` ｜ <a href="/ai-data/${encodeURIComponent(areaHtmlFile)}" style="color:#191970;">${escapeHtml(item.areaName || item.prefName)}のスポット詳細一覧</a>`
+                ? `<a href="/ai-data/${encodeURIComponent(areaHtmlFile)}" class="basis-action-pill">${escapeHtml(item.areaName || item.prefName)}のスポット詳細一覧</a>`
                 : "";
 
             parts.push(
-                `<article style="border:1px solid #d5dfec; border-radius:6px; padding:10px; background:#fff;">` +
-                `<h3 style="font-size:14px; color:#191970; margin:0 0 6px;">${idx + 1}. ${escapeHtml(item.name)}<span style="font-size:12px; font-weight:normal; color:#555;">（${escapeHtml(locText)}）</span></h3>` +
-                `<ul style="margin:0; padding-left:18px; font-size:12px; line-height:1.6;">` +
+                `<article class="basis-spot-card">` +
+                `<h3 class="basis-spot-title">${idx + 1}. ${escapeHtml(item.name)} <span class="basis-spot-loc">（${escapeHtml(locText)}）</span></h3>` +
+                `<ul class="basis-spot-meta">` +
                 `<li><strong>スコア:</strong> ${item.score}点（天候 ${item.weatherScore}点 + SNS釣果 ${item.snsBonus}点）</li>` +
                 `<li><strong>明日の天気根拠:</strong> ${escapeHtml(condParts.join(" / "))}</li>` +
                 (item.timeSlots.length > 0 ? `<li><strong>時間帯別予報:</strong> ${escapeHtml(item.timeSlots.join(" ｜ "))}</li>` : "") +
                 `<li><strong>周辺10kmの直近SNS釣果:</strong> ${snsHtml}</li>` +
                 `</ul>` +
-                `<div style="margin-top:6px; font-size:12px;"><a href="${escapeHtml(item.url)}" style="color:#191970; font-weight:bold;">地図でポイントを見る</a>${detailLinkHtml}</div>` +
+                `<div class="basis-spot-actions">` +
+                `<a href="${escapeHtml(item.url)}" class="basis-action-pill">地図でポイントを見る</a>` +
+                detailLinkHtml +
+                `</div>` +
                 `</article>`
             );
         });
         parts.push("</div>");
     }
 
-    // 各県の軽量HTMLデータページへの通常リンク一覧（ブラウザで直接描画＆全AIが辿れる導線）
-    parts.push('<section style="border-top:1px solid #dce4ee; padding-top:10px;">');
-    parts.push('<h3 style="font-size:13px; color:#191970; margin:0 0 6px;">各県の釣り場詳細・最新SNS釣果データ一覧（テキストHTML版）</h3>');
-    parts.push('<ul style="margin:0; padding-left:18px; font-size:12px; line-height:1.8;">');
+    // 各県の軽量HTMLデータページへの通常リンク一覧
+    parts.push('<section class="basis-links-card">');
+    parts.push('<h3>各県の釣り場詳細・最新SNS釣果データ一覧（テキストHTML版）</h3>');
+    parts.push('<ul class="basis-links-list">');
 
     const tomorrowHtmlName = `${REGION_CODE}_tomorrow.html`;
     if (dataCatalog && dataCatalog.htmlFileSet.has(tomorrowHtmlName)) {
         parts.push(
-            `<li><a href="/ai-data/${encodeURIComponent(tomorrowHtmlName)}" style="color:#191970; font-weight:bold;">明日（${escapeHtml(tomorrowInfo.label)}）の${escapeHtml(SHORT_REGION_NAME)}おすすめ釣り場・全県詳細根拠</a></li>`
+            `<li><a href="/ai-data/${encodeURIComponent(tomorrowHtmlName)}"><strong>明日（${escapeHtml(tomorrowInfo.label)}）の${escapeHtml(SHORT_REGION_NAME)}おすすめ釣り場・全県詳細根拠</strong></a></li>`
         );
     }
 
     if (dataCatalog && dataCatalog.groups.length > 0) {
-        // 県画面では現在選択中の県を先頭に寄せる
         const orderedGroups = currentPrefCode
             ? [
                 ...dataCatalog.groups.filter(g => g.prefCode === currentPrefCode),
@@ -1303,9 +1308,9 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
 
         for (const g of orderedGroups) {
             const links = [];
-            if (g.main) links.push(`<a href="${escapeHtml(g.main.htmlUrl)}" style="color:#191970;">スポット一覧</a>`);
-            if (g.catchFile) links.push(`<a href="${escapeHtml(g.catchFile.htmlUrl)}" style="color:#191970;">最新SNS釣果</a>`);
-            if (g.fishFile) links.push(`<a href="${escapeHtml(g.fishFile.htmlUrl)}" style="color:#191970;">魚種逆引き</a>`);
+            if (g.main) links.push(`<a href="${escapeHtml(g.main.htmlUrl)}">スポット一覧</a>`);
+            if (g.catchFile) links.push(`<a href="${escapeHtml(g.catchFile.htmlUrl)}">最新SNS釣果</a>`);
+            if (g.fishFile) links.push(`<a href="${escapeHtml(g.fishFile.htmlUrl)}">魚種逆引き</a>`);
             if (links.length > 0) {
                 parts.push(`<li><strong>${escapeHtml(g.prefName)}:</strong> ${links.join(" / ")}</li>`);
             }
@@ -1313,7 +1318,7 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
     }
 
     if (dataCatalog && dataCatalog.htmlFileSet.has("index.html")) {
-        parts.push(`<li><a href="/ai-data/index.html" style="color:#191970;">関東全域の釣り場・釣果データ目次を見る</a></li>`);
+        parts.push(`<li><a href="/ai-data/index.html">関東全域の釣り場・釣果データ目次を見る</a></li>`);
     }
 
     parts.push("</ul></section>");
