@@ -516,11 +516,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // 共通：モーダルの開閉（開いている間は背景スクロールを止める）
 function openOverlayModal(modal, display = "block") {
+  if (!modal) return;
   modal.style.display = display;
+  const content = modal.querySelector(".modal-content");
+  if (content) content.scrollTop = 0;
   document.documentElement.classList.add("is-modal-open");
 }
 
 function closeOverlayModal(modal) {
+  if (!modal) return;
   modal.style.display = "none";
   document.documentElement.classList.remove("is-modal-open");
 }
@@ -559,7 +563,6 @@ if (snsLink && snsModal) {
 
 const rankingBasisBtn = document.getElementById("rankingBasisBtn");
 const rankingBasisModal = document.getElementById("rankingBasisModal");
-const closeRankingBasisBtn = document.getElementById("closeRankingBasisBtn");
 
 if (rankingBasisBtn && rankingBasisModal) {
   rankingBasisBtn.addEventListener("click", (e) => {
@@ -567,22 +570,45 @@ if (rankingBasisBtn && rankingBasisModal) {
     openOverlayModal(rankingBasisModal);
   });
 
-  if (closeRankingBasisBtn) {
-    closeRankingBasisBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeOverlayModal(rankingBasisModal);
-    });
-  }
-
   // 暗幕（外側）タップで閉じる
   rankingBasisModal.addEventListener("click", (e) => {
     if (e.target === rankingBasisModal) closeOverlayModal(rankingBasisModal);
   });
+}
 
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && rankingBasisModal.style.display !== "none" && rankingBasisModal.style.display !== "") {
-      closeOverlayModal(rankingBasisModal);
-    }
+const policyLink = document.getElementById("policyLink");
+const policyModal = document.getElementById("policyModal");
+const showPolicyBtn = document.getElementById("showPolicy");
+const showContactBtn = document.getElementById("showContact");
+const policySection = document.getElementById("policySection");
+const contactSection = document.getElementById("contactSection");
+
+if (policyLink && policyModal) {
+  policyLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    openOverlayModal(policyModal);
+  });
+
+  // 暗幕（外側）タップで閉じる
+  policyModal.addEventListener("click", (e) => {
+    if (e.target === policyModal) closeOverlayModal(policyModal);
+  });
+}
+
+// タブ切替（サイトポリシー / お問い合わせ）
+if (showPolicyBtn && showContactBtn && policySection && contactSection) {
+  showPolicyBtn.addEventListener("click", () => {
+    policySection.style.display = "block";
+    contactSection.style.display = "none";
+    showPolicyBtn.classList.add("active");
+    showContactBtn.classList.remove("active");
+  });
+
+  showContactBtn.addEventListener("click", () => {
+    policySection.style.display = "none";
+    contactSection.style.display = "block";
+    showContactBtn.classList.add("active");
+    showPolicyBtn.classList.remove("active");
   });
 }
 
@@ -778,50 +804,15 @@ if (calendarBtn && calendarOverlay && calendarWrapper) {
 
 }
 
+
+// Escapeキーで開いているモーダルを閉じる
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  [newsModal, snsModal, rankingBasisModal, policyModal, calendarOverlay].forEach((m) => {
+    if (m && m.style.display !== "none" && m.style.display !== "") {
+      closeOverlayModal(m);
+    }
+  });
 });
 
-
-const policyLink = document.getElementById("policyLink");
-const policyModal = document.getElementById("policyModal");
-
-const showPolicyBtn = document.getElementById("showPolicy");
-const showContactBtn = document.getElementById("showContact");
-
-const policySection = document.getElementById("policySection");
-const contactSection = document.getElementById("contactSection");
-
-if (policyLink && policyModal) {
-
-    // 開く
-    policyLink.addEventListener("click", (e) => {
-        e.preventDefault();
-        policyModal.style.display = "block";
-    });
-
-    // 背景クリックで閉じる
-    policyModal.addEventListener("click", (e) => {
-        if (e.target === policyModal) {
-            policyModal.style.display = "none";
-        }
-    });
-}
-
-// タブ切替
-if (showPolicyBtn && showContactBtn) {
-
-    showPolicyBtn.addEventListener("click", () => {
-        policySection.style.display = "block";
-        contactSection.style.display = "none";
-
-        showPolicyBtn.classList.add("active");
-        showContactBtn.classList.remove("active");
-    });
-
-    showContactBtn.addEventListener("click", () => {
-        policySection.style.display = "none";
-        contactSection.style.display = "block";
-
-        showContactBtn.classList.add("active");
-        showPolicyBtn.classList.remove("active");
-    });
-}
+});
