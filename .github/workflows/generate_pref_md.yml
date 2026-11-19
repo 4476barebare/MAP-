@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       pref_code:
-        description: "生成対象の都道府県を選択（ALLで全県一括生成）"
+        description: "生成対象の都道府県を選択（ALLで全県一括 / LLMSでllms.txtのみ再生成）"
         required: true
         default: "CHIBA"
         type: choice
@@ -26,6 +26,7 @@ on:
           - SAITAMA
           - GUNMA
           - ALL
+          - LLMS
       custom_prefs:
         description: "複数県を指定したい場合のみ入力（例: CHIBA,TOKYO / 空欄なら上の選択を使用）"
         required: false
@@ -87,12 +88,7 @@ jobs:
               if echo "${CHANGED}" | grep -Eq '^(data/KANTO_geo\.json|script/generate_pref_md\.js)$'; then
                 PREFS="ALL"
               else
-                PREFS=$(echo "${CHANGED}" \
-                  | grep -E "^${REGION}/[A-Za-z0-9-]+_(location|fish|dictionary|shop)\.json$" \
-                  | sed -E "s|^${REGION}/([A-Za-z0-9-]+)_(location|fish|dictionary|shop)\.json$|\1|" \
-                  | tr '[:lower:]' '[:upper:]' \
-                  | sort -u \
-                  | paste -sd ',' -)
+                PREFS=$(echo "${CHANGED}"                   | grep -E "^${REGION}/[A-Za-z0-9-]+_(location|fish|dictionary|shop)\.json$"                   | sed -E "s|^${REGION}/([A-Za-z0-9-]+)_(location|fish|dictionary|shop)\.json$||"                   | tr '[:lower:]' '[:upper:]'                   | sort -u                   | paste -sd ',' -)
                 if [ -z "${PREFS}" ]; then
                   PREFS="ALL"
                 fi
@@ -119,7 +115,7 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add -- 'ai-data/*.md' ':!ai-data/*_catch.md'
+          git add -- 'ai-data/*.md' ':!ai-data/*_catch.md' llms.txt
 
           if git diff --cached --quiet; then
             echo "スポット関連のAI用Markdownに変更はありません。"
