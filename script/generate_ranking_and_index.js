@@ -335,9 +335,41 @@ function discoverPrefCodes() {
     if (!fs.existsSync(REGION_DIR)) {
         throw new Error("リージョンディレクトリが見つかりません: " + REGION_DIR);
     }
-    const found = fs.readdirSync(REGION_DIR)
-        .filter(name => /_location\.json$/i.test(name))
-        .map(name => name.replace(/_location\.json$/i, "").toUpperCase());
+
+    // 現行フロント（regionLoader.js）と同じく {REGION}_region.csv の定義県を優先採用
+    const csvPath = path.join(REGION_DIR, `${REGION_CODE}_region.csv`);
+    let found = [];
+    if (fs.existsSync(csvPath)) {
+        const lines = fs.readFileSync(csvPath, "utf8").trim().split(/\r?\n/);
+        if (lines.length >= 2) {
+            const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+            const typeIdx = headers.indexOf("type");
+            const urlIdx = headers.indexOf("url");
+            if (typeIdx !== -1 && urlIdx !== -1) {
+                const seen = new Set();
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i]) continue;
+                    const cols = lines[i].split(",").map(c => c.trim());
+                    if (cols[typeIdx] !== "pref" || !cols[urlIdx]) continue;
+                    const parts = cols[urlIdx].split("/");
+                    let code = "";
+                    if (parts.length >= 4) code = parts[1].split("_")[0];
+                    else if (parts.length === 3) code = parts[0].split("_")[0];
+                    code = code.trim().toUpperCase();
+                    if (code && !seen.has(code) && fs.existsSync(path.join(REGION_DIR, `${code}_location.json`))) {
+                        seen.add(code);
+                        found.push(code);
+                    }
+                }
+            }
+        }
+    }
+
+    if (found.length === 0) {
+        found = fs.readdirSync(REGION_DIR)
+            .filter(name => /_location\.json$/i.test(name))
+            .map(name => name.replace(/_location\.json$/i, "").toUpperCase());
+    }
 
     return found.sort((a, b) => {
         const ia = PREF_DISPLAY_ORDER.indexOf(a);
@@ -547,6 +579,7 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
             typeParts.includes("substitute")) continue;
 
         if (!hasZoom(spot.zoom)) continue;
+        if (!spot.icon || String(spot.icon).trim() === "") continue;
 
         const tomorrowDayData = spot.whether?.hourly?.[1];
         if (!tomorrowDayData || !Array.isArray(tomorrowDayData.weather)) continue;
@@ -875,7 +908,8 @@ try {
     fs.writeFileSync(OUTPUT_HTML_PATH, builtHtml, "utf8");
 
     console.log(`明日のオススメランキング＆静的HTMLの生成が完了しました（対象日: ${tomorrowInfo.iso}）`);
-    console.log(`  関東全域トップ: ${regionItems.map(i => `${i.name}(${i.score}点)`).join("、") || "なし"}`);
+    console.log(`  対象県(${prefCodes.length}): ${prefCodes.join(", ")}`);
+    console.log(`  関東全域トップ: ${regionItems.map(i => `${i.name}(${i.score}点/天候${i.weatherScore}+SNS${i.snsBonus})`).join("、") || "なし"}`);
     for (const pr of prefResults) {
         console.log(`  [${pr.prefCode}] ${pr.items.length}件: ${pr.items.map(i => `${i.name}(${i.score})`).join("、") || "なし"}`);
     }
