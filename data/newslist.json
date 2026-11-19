@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-18T18:08:59+09:00",
-  "count": 205,
+  "generated": "2026-11-19T06:06:05+09:00",
+  "count": 214,
   "items": [
     {
       "date": "2026-12-13",
@@ -273,6 +273,114 @@
       "category": "釣りニュース"
     },
     {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.tv-asahi.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "前橋市の住宅街に出没した親子グマ、子グマ1頭を麻酔銃で捕獲も親グマは行方不明、70校は19日から再開",
+      "source_name": "テレ朝NEWS",
+      "source_url": "https://news.tv-asahi.co.jp/news_society/articles/900204512.html",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/5500882d3caea4482b77ce48a502abb4.jpg?resize=1024%2C722&ssl=1",
+      "title": "イッセイ赤松健が明石沖のジギングで実践する、ネコメタルの重心・フック・素材の使い分けを紹介",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455697/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/videoframe_96878.png?resize=1024%2C576&ssl=1",
+      "title": "デュエルのエギを4タイプに分類、池内プロが状況別の使い分けを動画で解説",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455935/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/bd415d5ab5049f4359ba7e79e37bd53f.png?resize=1024%2C572&ssl=1",
+      "title": "偏光グラスGillsee、SNS投稿や紹介でポイントが貯まるパートナープログラムを開始",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456177/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/202612_DM_Swimmer_2000_920.jpg?resize=1200%2C552&ssl=1",
+      "title": "デュオのドラッグメタルにスイミングジグが12月登場、大型青物やオオニベ対応の3サイズ",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/455734/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
+      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/ae46b1f460ee46f789c27b264a6cb421-14.jpg?resize=535%2C1024&ssl=1",
+      "title": "ルミカの集魚シンカー「光略カスタムシンカー」にナツメ型が登場、流線形で根掛かり軽減",
+      "source_name": "釣具新聞",
+      "source_url": "https://tsurigu-np.jp/products/33365/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=newsdig.tbs.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "記録的なサンマ不漁のなか根室港にサンマの群れが入り込み、岸壁が釣り客でにぎわう",
+      "source_name": "TBS NEWS DIG",
+      "source_url": "https://newsdig.tbs.co.jp/articles/hbc/3094975",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.ntv.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "佐渡の寒ブリが今季最多の400本水揚げ、海水温上昇による不漁のなか待望の大漁",
+      "source_name": "TeNY NEWS NNN",
+      "source_url": "https://news.ntv.co.jp/n/teny/category/society/tea6d1ac76d38f493ab93040634b513676",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.47news.jp&sz=128",
+      "thumbnail": "",
+      "title": "石川・手取川のサケ遡上が10月末時点でわずか3匹、昨年の121匹から激減し採卵に懸念",
+      "source_name": "47NEWS",
+      "source_url": "https://www.47news.jp/15246855.html",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "HMKLのトラウトエリア用ミノー「ザッガー50 B1ハーフ」に新色を追加、浅場・障害物周り向け",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63919/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "HMKLのトラウトエリア用ジグミノー「ジグミノー50ヘビー」に新色を追加、ボトム攻略向けのヘビーウェイト",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63915/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "HMKLのトラウトエリア用シャッド「ラトリンシャッド45Fエリアバージョン」が発売、45mm・2.5gのフローティング",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63911/",
+      "category": "釣具新製品"
+    },
+    {
       "date": "2026-11-17",
       "favicon": "https://www.google.com/s2/favicons?domain=news.livedoor.com&sz=128",
       "thumbnail": "",
@@ -316,15 +424,6 @@
       "source_name": "釣り人Ｐのフィッシング日記",
       "source_url": "https://turibitop.com/daiwa-shoreline-shiner-sl-news/",
       "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.tv-asahi.co.jp&sz=128",
-      "thumbnail": "",
-      "title": "前橋市の住宅街に親子グマ2頭が出没、50代男性が負傷し子グマ1頭を麻酔銃で捕獲、親グマは捜索中で市立70校が休校",
-      "source_name": "テレ朝NEWS",
-      "source_url": "https://news.tv-asahi.co.jp/news_society/articles/900204512.html",
-      "category": "クマ出没"
     },
     {
       "date": "2026-11-17",
@@ -550,6 +649,33 @@
       "source_name": "釣具新聞",
       "source_url": "https://tsurigu-np.jp/news/33415/",
       "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "イマカツのトラウトエリア用シャッド「スピニック」が発売、ダート性能とレンジキープを融合",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63901/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "ラパラのバルサ製ジョイントミノー「カウントダウン ジョインテッドエリート」が発売",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63898/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "ヴァルケインのトラウト用ロッド「ダーインスレイヴ アンコントロール」に6フィートモデルが登場",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63894/",
+      "category": "釣具新製品"
     },
     {
       "date": "2026-11-16",
@@ -1215,51 +1341,6 @@
       "title": "堤防釣りに代わる家族向けイカダ釣り、大物のチャンスも",
       "source_name": "TSURINEWS",
       "source_url": "https://tsurinews.jp/416909/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-14",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/901c27ff6392d802422dee995229f4b4.jpg",
-      "title": "岡山の漁港でまきエサなしのサヨリ釣り、サイトフィッシングで15匹",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/416777/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-14",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-19.jpg?fit=1920%2C1440&ssl=1",
-      "title": "フリーノットの遠赤外線ソックス「光電子」、薄手で暖かく日常使いも",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/products/33419/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-14",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/01-3.jpg?resize=807%2C1024&ssl=1",
-      "title": "ティップランは深場だけの釣りじゃない、水深8mの浅場でアオリイカ連発 新エギのスローフォールが決め手",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455642/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-14",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/IMG_0555.jpg?resize=1024%2C683&ssl=1",
-      "title": "伊藤巧の切り札ワームはノリーズ「ネオティーサン」、ネコリグ2種の使い分けと水質別カラーを解説",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455279/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-14",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/66af231e4c084c71cebd820c0c3b6ecf.jpg?resize=1024%2C722&ssl=1",
-      "title": "加藤誠司のレヴォニック「ドットシックスVer1.5」、0.6mm極薄ボディのクランク3モデルを解説",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455278/",
       "category": "釣りニュース"
     },
     {

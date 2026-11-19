@@ -1,5 +1,105 @@
 [
   {
+    "date": "2026/11/18",
+    "fish": "メジナ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/tsuri_map/status/2122963205483872488",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "アナゴ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/tsuri_map/status/2122963205483872488",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "アジ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/tsuri_map/status/2122963205483872488",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "クロダイ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/tsuri_map/status/2122963205483872488",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "ブラックバス",
+    "lat": 35.5866,
+    "lng": 139.2625,
+    "area_name": "津久井湖",
+    "url": "https://www.facebook.com/kenichi.ataku/posts/pfbid0hcZ116yhujRPYEvPmyTH9EGBitWyrmC3ADkYmqBiM1FT3dHXE8Ei1YDEgyvhh3Rul",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "ヘラブナ",
+    "lat": 35.21,
+    "lng": 139,
+    "area_name": "芦ノ湖",
+    "url": "https://www.instagram.com/p/Df37SspCslh/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "カマス",
+    "lat": 36.1245,
+    "lng": 140.4042,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.threads.com/@baitjunky/post/Df4RU_EEiYk",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "カマス",
+    "lat": 36.0353,
+    "lng": 140.4763,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.threads.com/@baitjunky/post/Df4RU_EEiYk",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "カマス",
+    "lat": 35.9421,
+    "lng": 140.5216,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.threads.com/@baitjunky/post/Df4RU_EEiYk",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "カマス",
+    "lat": 35.8854,
+    "lng": 140.4495,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.threads.com/@baitjunky/post/Df4RU_EEiYk",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/17",
     "fish": "シーバス",
     "lat": 35.6416,
@@ -228,6 +328,36 @@
     "url": "https://www.instagram.com/p/Df17v3QlNcg/",
     "source": "Instagram",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "マゴチ",
+    "lat": 36.273,
+    "lng": 140.565,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/oreoresagility/status/2122965660250820730",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "マゴチ",
+    "lat": 36.075,
+    "lng": 140.64,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/oreoresagility/status/2122965660250820730",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/17",
+    "fish": "マゴチ",
+    "lat": 35.845,
+    "lng": 140.775,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/oreoresagility/status/2122965660250820730",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/16",
@@ -4558,15 +4688,5 @@
     "url": "https://x.com/ponchan28ponpon/status/2115039450145407026",
     "source": "X",
     "model": "Grok"
-  },
-  {
-    "date": "2026/10/19",
-    "fish": "クエ",
-    "lat": 35.1416,
-    "lng": 140.2912,
-    "area_name": "勝浦松部港",
-    "url": "https://www.facebook.com/tatsuya.yoshino.29/posts/pfbid02PWp3qFf1V5CF1sm3yf5BPBkZNpaUSeqrY896kB1P9x6r5YYcHgDrwLjDmfP2GB2jl",
-    "source": "Facebook",
-    "model": "Muse"
   }
 ]
