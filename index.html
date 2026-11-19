@@ -12,7 +12,8 @@
   <meta name="description" content="「明日釣り行くんだけどいい場所ある？」と迷ったら釣り行こNAVI！関東全域（千葉・神奈川・茨城・東京・埼玉・群馬・栃木）の海釣り・堤防スポットを網羅したリアルタイム釣果さかな地図。SNS最新釣果ソナー、海底地形（等深線）、ピンポイント天気・風向・波予報・タイドグラフ（潮見表）から今日・明日釣れる場所がひと目でわかります。">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://turiiko-navi.com/">
-  <link rel="alternate" type="text/markdown" title="釣り行こNAVI AI向けデータ目次" href="[https://turiiko-navi.com/llms.txt](https://turiiko-navi.com/llms.txt)">
+  <link rel="describedby" type="text/markdown" title="釣り行こNAVI AI向けデータ目次" href="https://turiiko-navi.com/llms.txt">
+  <link id="ai-md-link" rel="alternate" type="text/markdown" title="釣り行こNAVI AI向けMarkdownデータ" href="https://turiiko-navi.com/llms.txt">
 
   <script type="application/ld+json" id="base-json-ld">
   {
@@ -179,13 +180,18 @@
 </section>
 <!-- 👇 明日のオススメ釣り場ランキングセクション -->
 <section id="fishing-recommend-section" style="margin: 10px; padding: 15px; background-color: #eef3f8; border-radius: 8px; border: 1px solid #dce4ee;">
-  <h2 style="font-size: 16px; color: #191970; margin-top: 0; margin-bottom: 8px; border-left: 4px solid #191970; padding-left: 8px;">
-    明日釣りに行くんだけど良い場所ある？
+  <h2 id="spot-ranking-title" style="font-size: 16px; color: #191970; margin-top: 0; margin-bottom: 8px; border-left: 4px solid #191970; padding-left: 8px;">
+    明日（11月20日）関東で釣りに行くんだけど良い場所ある？
   </h2>
 
-  <!-- ここにJSでランキングが流し込まれます -->
+  <!-- ここに事前生成されたランキングHTML（県選択時はpref用キャッシュへ即時差し替え） -->
   <div id="spot-ranking-container" style="font-size: 14px; color: #333;">
-    おすすめスポットを分析中...
+    <ul data-ssg-ranking="REGION" data-target-date="2026-11-20" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;"><li><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&amp;area=%E9%9C%9E%E3%83%B6%E6%B5%A6%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E6%BD%AE%E6%9D%A5%E5%89%8D%E5%B7%9D" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;"><span style="display:flex; justify-content:space-between; align-items:center; width:100%;"><span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">潮来前川</span><span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;"><span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">☀️</span><span>降水: <strong style="color:#191970;">0%</strong></span><span>風: <strong style="color:#191970;">9m</strong></span></span></span><span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span></a></li><li><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&amp;area=%E6%B9%98%E5%8D%97%E8%A5%BF%E6%B9%98%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E6%B4%A5%E4%B9%85%E4%BA%95%E6%B9%96" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;"><span style="display:flex; justify-content:space-between; align-items:center; width:100%;"><span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">津久井湖</span><span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;"><span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">☀️</span><span>降水: <strong style="color:#191970;">0%</strong></span><span>風: <strong style="color:#191970;">5m</strong></span></span></span><span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span></a></li><li><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&amp;area=%E6%B9%98%E5%8D%97%E8%A5%BF%E6%B9%98%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E7%9B%B8%E6%A8%A1%E6%B9%96" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;"><span style="display:flex; justify-content:space-between; align-items:center; width:100%;"><span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">相模湖</span><span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;"><span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">☀️</span><span>降水: <strong style="color:#191970;">0%</strong></span><span>風: <strong style="color:#191970;">5m</strong></span></span></span><span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span></a></li><li><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&amp;area=%E9%9C%9E%E3%83%B6%E6%B5%A6%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E9%9C%9E%E3%83%B6%E6%B5%A6%E5%8D%97%E9%83%A8" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;"><span style="display:flex; justify-content:space-between; align-items:center; width:100%;"><span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">霞ヶ浦南部</span><span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;"><span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">☀️</span><span>降水: <strong style="color:#191970;">0%</strong></span><span>風: <strong style="color:#191970;">8m</strong></span></span></span><span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span></a></li><li><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&amp;area=%E9%9C%9E%E3%83%B6%E6%B5%A6%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E5%8C%97%E5%88%A9%E6%A0%B9%E5%B7%9D%E5%91%A8%E8%BE%BA" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;"><span style="display:flex; justify-content:space-between; align-items:center; width:100%;"><span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">北利根川周辺</span><span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;"><span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">☀️</span><span>降水: <strong style="color:#191970;">0%</strong></span><span>風: <strong style="color:#191970;">8m</strong></span></span></span><span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span></a></li></ul>
+  </div>
+  <div class="ranking-basis-trigger-wrap">
+    <button type="button" id="rankingBasisBtn" class="ranking-basis-trigger">
+      算出根拠（天気詳細・周辺SNS釣果）とデータ一覧を見る
+    </button>
   </div>
 </section>
 
@@ -225,6 +231,38 @@
     <!-- ★ ロード時に一瞬でここにHTML文字列が流し込まれます -->
   </div>
 </details>
+
+<!-- 明日のオススメ釣り場 選出根拠＆各県データ一覧（静的埋め込みポップアップ） -->
+<div id="rankingBasisModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="rankingBasisModalTitle">
+  <div class="modal-content">
+    <h2 id="rankingBasisModalTitle">
+      明日（11月20日）関東のおすすめ選出根拠・データ一覧
+    </h2>
+    <div id="rankingBasisBody">
+      <div class="basis-summary-card">
+<p>明日（2026-11-20）の関東で天候条件と周辺10km圏内の直近SNS釣果から上位選出された釣り場は、潮来前川（茨城県栃木県／降水0%・風9m/s・直近SNS釣果あり）、津久井湖（神奈川県／降水0%・風5m/s・直近SNS釣果あり）、相模湖（神奈川県／降水0%・風5m/s・直近SNS釣果あり）、霞ヶ浦南部（茨城県栃木県／降水0%・風8m/s・直近SNS釣果あり）、北利根川周辺（茨城県栃木県／降水0%・風8m/s・直近SNS釣果あり）です。</p>
+<p class="basis-criteria">算出基準: 明日5〜20時の平均降水確率から算出する天候スコア（100点満点）に、周辺10km圏内の最新SNS釣果経過日数ボーナス（1日以内+15点〜14日以内+2点）を加算しています。</p>
+</div>
+<div class="basis-spot-list">
+<article class="basis-spot-card"><h3 class="basis-spot-title">1. 潮来前川 <span class="basis-spot-loc">（茨城県栃木県 / 霞ヶ浦エリア）</span></h3><ul class="basis-spot-meta"><li><strong>スコア:</strong> 115点（天候 100点 + SNS釣果 15点）</li><li><strong>明日の天気根拠:</strong> ☀️ 快晴 / 気温 9〜15°C / 最大降水 0% / 最大風速 9m/s</li><li><strong>時間帯別予報:</strong> 6時: ☀️快晴 / 10°C / 降水0% / 風6m/s ｜ 12時: ☀️快晴 / 14°C / 降水0% / 風7m/s ｜ 18時: ☀️快晴 / 11°C / 降水0% / 風7m/s</li><li><strong>周辺10kmの直近SNS釣果:</strong> 2026-11-18 カマス（霞ヶ浦・約4.4km・<a href="https://www.threads.com/@baitjunky/post/Df4RU_EEiYk" target="_blank" rel="noopener noreferrer">Threads↗</a>） ／ 2026-11-17 シーバス（利根川・約8.5km・<a href="https://www.facebook.com/permalink.php?story_fbid=pfbid028984YasoAwUs6DxEP8VpRgHXVndXa5XDkVhjZGmuefnaPb3aWX2E8Lg1vYExTGonl&amp;id=61553642762308" target="_blank" rel="noopener noreferrer">Facebook↗</a>） ／ 2026-11-16 ブラックバス（霞ヶ浦・約4.4km・<a href="https://www.instagram.com/p/DfzFgFwFPSe/" target="_blank" rel="noopener noreferrer">Instagram↗</a>）</li></ul><div class="basis-spot-actions"><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&amp;area=%E9%9C%9E%E3%83%B6%E6%B5%A6%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E6%BD%AE%E6%9D%A5%E5%89%8D%E5%B7%9D" class="basis-action-pill">地図でポイントを見る</a><a href="/ai-data/IBARAKI_KASUMIGAURA.html" class="basis-action-pill">霞ヶ浦エリアのスポット詳細一覧</a></div></article>
+<article class="basis-spot-card"><h3 class="basis-spot-title">2. 津久井湖 <span class="basis-spot-loc">（神奈川県 / 湘南西湘エリア）</span></h3><ul class="basis-spot-meta"><li><strong>スコア:</strong> 115点（天候 100点 + SNS釣果 15点）</li><li><strong>明日の天気根拠:</strong> ☀️ 快晴 / 気温 4〜11°C / 最大降水 0% / 最大風速 5m/s</li><li><strong>時間帯別予報:</strong> 6時: ☀️快晴 / 5°C / 降水0% / 風2m/s ｜ 12時: ☀️快晴 / 11°C / 降水1% / 風5m/s ｜ 18時: ☀️快晴 / 6°C / 降水0% / 風2m/s</li><li><strong>周辺10kmの直近SNS釣果:</strong> 2026-11-18 ブラックバス（津久井湖・約1.4km・<a href="https://www.facebook.com/kenichi.ataku/posts/pfbid0hcZ116yhujRPYEvPmyTH9EGBitWyrmC3ADkYmqBiM1FT3dHXE8Ei1YDEgyvhh3Rul" target="_blank" rel="noopener noreferrer">Facebook↗</a>） ／ 2026-11-15 ブラックバス（相模湖・約6.1km・<a href="https://x.com/sagamiko_prof/status/2121846304108364148" target="_blank" rel="noopener noreferrer">X↗</a>） ／ 2026-11-11 ニジマス（清水橋上流・約8.6km・<a href="https://www.facebook.com/kogakifishing/posts/pfbid038LNCb7xWookUuiN3GhVXbqVeW2qEq5cr1uqjcRCaVA1dDz2vMVxxZCmFa7gkNYtWl" target="_blank" rel="noopener noreferrer">Facebook↗</a>）</li></ul><div class="basis-spot-actions"><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&amp;area=%E6%B9%98%E5%8D%97%E8%A5%BF%E6%B9%98%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E6%B4%A5%E4%B9%85%E4%BA%95%E6%B9%96" class="basis-action-pill">地図でポイントを見る</a><a href="/ai-data/KANAGAWA_SEISHO.html" class="basis-action-pill">湘南西湘エリアのスポット詳細一覧</a></div></article>
+<article class="basis-spot-card"><h3 class="basis-spot-title">3. 相模湖 <span class="basis-spot-loc">（神奈川県 / 湘南西湘エリア）</span></h3><ul class="basis-spot-meta"><li><strong>スコア:</strong> 115点（天候 100点 + SNS釣果 15点）</li><li><strong>明日の天気根拠:</strong> ☀️ 快晴 / 気温 4〜10°C / 最大降水 0% / 最大風速 5m/s</li><li><strong>時間帯別予報:</strong> 6時: ☀️快晴 / 5°C / 降水0% / 風2m/s ｜ 12時: ☀️快晴 / 10°C / 降水1% / 風5m/s ｜ 18時: ☀️快晴 / 5°C / 降水0% / 風2m/s</li><li><strong>周辺10kmの直近SNS釣果:</strong> 2026-11-18 ブラックバス（津久井湖・約8.0km・<a href="https://www.facebook.com/kenichi.ataku/posts/pfbid0hcZ116yhujRPYEvPmyTH9EGBitWyrmC3ADkYmqBiM1FT3dHXE8Ei1YDEgyvhh3Rul" target="_blank" rel="noopener noreferrer">Facebook↗</a>） ／ 2026-11-15 ブラックバス（相模湖・約1.2km・<a href="https://x.com/sagamiko_prof/status/2121846304108364148" target="_blank" rel="noopener noreferrer">X↗</a>） ／ 2026-11-10 ブラックバス（相模湖・約1.2km・<a href="https://x.com/nissoen_bass60/status/2119976736930857298" target="_blank" rel="noopener noreferrer">X↗</a>）</li></ul><div class="basis-spot-actions"><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&amp;area=%E6%B9%98%E5%8D%97%E8%A5%BF%E6%B9%98%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E7%9B%B8%E6%A8%A1%E6%B9%96" class="basis-action-pill">地図でポイントを見る</a><a href="/ai-data/KANAGAWA_SEISHO.html" class="basis-action-pill">湘南西湘エリアのスポット詳細一覧</a></div></article>
+<article class="basis-spot-card"><h3 class="basis-spot-title">4. 霞ヶ浦南部 <span class="basis-spot-loc">（茨城県栃木県 / 霞ヶ浦エリア）</span></h3><ul class="basis-spot-meta"><li><strong>スコア:</strong> 115点（天候 100点 + SNS釣果 15点）</li><li><strong>明日の天気根拠:</strong> ☀️ 快晴 / 気温 8〜14°C / 最大降水 0% / 最大風速 8m/s</li><li><strong>時間帯別予報:</strong> 6時: ☀️快晴 / 9°C / 降水0% / 風5m/s ｜ 12時: ☀️快晴 / 14°C / 降水0% / 風6m/s ｜ 18時: ☀️快晴 / 10°C / 降水0% / 風6m/s</li><li><strong>周辺10kmの直近SNS釣果:</strong> 2026-11-18 カマス（霞ヶ浦・約5.9km・<a href="https://www.threads.com/@baitjunky/post/Df4RU_EEiYk" target="_blank" rel="noopener noreferrer">Threads↗</a>） ／ 2026-11-17 シーバス（利根川・約8.1km・<a href="https://www.facebook.com/permalink.php?story_fbid=pfbid028984YasoAwUs6DxEP8VpRgHXVndXa5XDkVhjZGmuefnaPb3aWX2E8Lg1vYExTGonl&amp;id=61553642762308" target="_blank" rel="noopener noreferrer">Facebook↗</a>） ／ 2026-11-16 ブラックバス（霞ヶ浦・約5.9km・<a href="https://www.instagram.com/p/DfzFgFwFPSe/" target="_blank" rel="noopener noreferrer">Instagram↗</a>）</li></ul><div class="basis-spot-actions"><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&amp;area=%E9%9C%9E%E3%83%B6%E6%B5%A6%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E9%9C%9E%E3%83%B6%E6%B5%A6%E5%8D%97%E9%83%A8" class="basis-action-pill">地図でポイントを見る</a><a href="/ai-data/IBARAKI_KASUMIGAURA.html" class="basis-action-pill">霞ヶ浦エリアのスポット詳細一覧</a></div></article>
+<article class="basis-spot-card"><h3 class="basis-spot-title">5. 北利根川周辺 <span class="basis-spot-loc">（茨城県栃木県 / 霞ヶ浦エリア）</span></h3><ul class="basis-spot-meta"><li><strong>スコア:</strong> 115点（天候 100点 + SNS釣果 15点）</li><li><strong>明日の天気根拠:</strong> ☀️ 快晴 / 気温 9〜14°C / 最大降水 0% / 最大風速 8m/s</li><li><strong>時間帯別予報:</strong> 6時: ☀️快晴 / 9°C / 降水0% / 風5m/s ｜ 12時: ☀️快晴 / 14°C / 降水0% / 風7m/s ｜ 18時: ☀️快晴 / 11°C / 降水0% / 風6m/s</li><li><strong>周辺10kmの直近SNS釣果:</strong> 2026-11-18 カマス（霞ヶ浦・約0.3km・<a href="https://www.threads.com/@baitjunky/post/Df4RU_EEiYk" target="_blank" rel="noopener noreferrer">Threads↗</a>） ／ 2026-11-17 シーバス（利根川・約5.5km・<a href="https://www.facebook.com/permalink.php?story_fbid=pfbid028984YasoAwUs6DxEP8VpRgHXVndXa5XDkVhjZGmuefnaPb3aWX2E8Lg1vYExTGonl&amp;id=61553642762308" target="_blank" rel="noopener noreferrer">Facebook↗</a>） ／ 2026-11-16 ブラックバス（霞ヶ浦・約0.3km・<a href="https://www.instagram.com/p/DfzFgFwFPSe/" target="_blank" rel="noopener noreferrer">Instagram↗</a>）</li></ul><div class="basis-spot-actions"><a href="/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&amp;area=%E9%9C%9E%E3%83%B6%E6%B5%A6%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E5%8C%97%E5%88%A9%E6%A0%B9%E5%B7%9D%E5%91%A8%E8%BE%BA" class="basis-action-pill">地図でポイントを見る</a><a href="/ai-data/IBARAKI_KASUMIGAURA.html" class="basis-action-pill">霞ヶ浦エリアのスポット詳細一覧</a></div></article>
+</div>
+<section class="basis-links-card">
+<h3>各県の釣り場詳細・最新SNS釣果データ一覧（テキストHTML版）</h3>
+<ul class="basis-links-list">
+<li><a href="/ai-data/KANTO_tomorrow.html"><strong>明日（11月20日）の関東おすすめ釣り場・全県詳細根拠</strong></a></li>
+<li><strong>千葉県:</strong> <a href="/ai-data/CHIBA.html">スポット一覧</a> / <a href="/ai-data/CHIBA_catch.html">最新SNS釣果</a> / <a href="/ai-data/CHIBA_fish.html">魚種逆引き</a></li>
+<li><strong>神奈川県:</strong> <a href="/ai-data/KANAGAWA.html">スポット一覧</a> / <a href="/ai-data/KANAGAWA_catch.html">最新SNS釣果</a> / <a href="/ai-data/KANAGAWA_fish.html">魚種逆引き</a></li>
+<li><strong>東京都:</strong> <a href="/ai-data/TOKYO.html">スポット一覧</a> / <a href="/ai-data/TOKYO_catch.html">最新SNS釣果</a> / <a href="/ai-data/TOKYO_fish.html">魚種逆引き</a></li>
+<li><strong>茨城県栃木県:</strong> <a href="/ai-data/IBARAKI.html">スポット一覧</a> / <a href="/ai-data/IBARAKI_catch.html">最新SNS釣果</a> / <a href="/ai-data/IBARAKI_fish.html">魚種逆引き</a></li>
+<li><a href="/ai-data/index.html">関東全域の釣り場・釣果データ目次を見る</a></li>
+</ul></section>
+    </div>
+  </div>
+</div>
 
 <div id="policyModal" class="modal">
   <div class="modal-content">
@@ -277,6 +315,7 @@
       <p>
         当サイトへのご連絡は以下の用途に限ります。<br>
         ・バグ報告<br>
+        ・掲載内容の修正・取り下げのご連絡<br>
         ・その他の連絡事項
       </p>
 
@@ -285,17 +324,15 @@
         内容は確認のみ行い、必要に応じてサイト改善に反映します。
       </p>
 
-      <h2>連絡先</h2>
+      <h2>連絡先（公式Xアカウント）</h2>
 
       <p>
-        <a href="mailto:info@turiiko.shop?subject=バグ報告&body=【発生場所】%0A【内容】%0A【再現手順】%0A">
-          バグ報告を送る
-        </a>
+        公式Xアカウント（@TsuriikoNAVI）のリプライまたはDMよりご連絡ください。
       </p>
 
       <p>
-        <a href="mailto:info@turiiko.shop?subject=その他&body=【内容】%0A">
-          その他の連絡
+        <a href="https://x.com/TsuriikoNAVI" target="_blank" rel="noopener noreferrer" class="contact-x-btn">
+          X（@TsuriikoNAVI）へ連絡する ↗
         </a>
       </p>
     </section>
@@ -431,18 +468,6 @@ window.getNearbySnsCatchRecords = function(spot, radiusKm = window.SNS_CATCH_RAD
     return [...uniquePosts.values()].sort((a, b) => a.ageDays - b.ageDays);
 };
 
-// 投稿の新しさに応じたランキング加点。
-function getSnsCatchBonus(posts) {
-    if (!posts || posts.length === 0) return 0;
-    const days = posts[0].ageDays;
-    if (days <= 1) return 15;
-    if (days <= 3) return 12;
-    if (days <= 6) return 9;
-    if (days <= 10) return 5;
-    if (days <= 14) return 2;
-    return 0;
-}
-
 function clearSpotRanking() {
     const section = document.getElementById('fishing-recommend-section');
     const container = document.getElementById('spot-ranking-container');
@@ -451,253 +476,83 @@ function clearSpotRanking() {
 }
 
 // ==========================================
-// ★ 明日のオススメ釣り場ランキング表示関数
+// ★ 事前生成ランキングキャッシュ読み込み（/ai-data/ranking_cache.json）
 // ==========================================
-async function renderSpotRanking(retryCount = 0) {
+window._rankingCacheData = window._rankingCacheData || null;
+window._rankingCachePromise = window._rankingCachePromise || null;
+
+function loadRankingCache() {
+    if (window._rankingCacheData) return Promise.resolve(window._rankingCacheData);
+    if (window._rankingCachePromise) return window._rankingCachePromise;
+
+    window._rankingCachePromise = fetch('/ai-data/ranking_cache.json')
+        .then(res => {
+            if (!res.ok) throw new Error('ranking_cache.json HTTP ' + res.status);
+            return res.json();
+        })
+        .then(data => {
+            if (data && typeof data === 'object') {
+                window._rankingCacheData = data;
+                return data;
+            }
+            return null;
+        })
+        .catch(() => {
+            window._rankingCachePromise = null;
+            return null;
+        });
+
+    return window._rankingCachePromise;
+}
+
+// ==========================================
+// ★ 明日のオススメ釣り場ランキング差し替え関数（事前生成キャッシュ専用）
+// ==========================================
+async function renderSpotRanking() {
     const container = document.getElementById('spot-ranking-container');
     const section = document.getElementById('fishing-recommend-section');
     if (!container || !section) return;
 
-    if (retryCount === 0) {
-        section.style.display = 'block';
-        container.innerHTML = '<div style="font-size: 13px; color: #666; padding: 10px;">おすすめスポットを分析中...</div>';
-
-        if (!window._firstTileLoaded && typeof window.runAfterTileLoad === 'function') {
-            window.runAfterTileLoad(() => renderSpotRanking(1));
-            return;
-        }
-    }
-
-    const now = new Date();
-    const nowJST = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Tokyo" }));
-    nowJST.setDate(nowJST.getDate() + 1);
-
-    const tMonth = nowJST.getMonth() + 1;
-    const tDate = nowJST.getDate();
-    const tomorrowStr = tMonth + "月" + tDate + "日";
-
-    let targetSpots = [];
-    let titlePrefix = "";
-
-    // 県画面：選択県のスポットのみ
-    if (window.currentPref) {
-        if (!window.spotData || window.spotData.length === 0) {
-            if (retryCount < 25) {
-                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
-                return;
-            }
-            clearSpotRanking();
-            return;
-        }
-
-        const repSpot = window.spotData.find(s => {
-            const typeParts = (s.type || '').split('$');
-            return typeParts.includes('representative') || typeParts.includes('assistant');
-        }) || window.spotData[0];
-
-        if (!repSpot || !repSpot.whether) {
-            if (retryCount < 25) {
-                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
-                return;
-            }
-            clearSpotRanking();
-            return;
-        }
-
-        targetSpots = window.spotData;
-        const prefName = window.prefData ? window.prefData.notes : window.currentPref;
-        titlePrefix = prefName + "で";
-    } else {
-        // REGION画面：関東全域
-        if (!window.allspotData || window.allspotData.length === 0 || !window.regionPrefData) {
-            if (retryCount < 25) {
-                setTimeout(() => renderSpotRanking(retryCount + 1), 100);
-                return;
-            }
-            clearSpotRanking();
-            return;
-        }
-
-        titlePrefix = "関東で";
-        // REGIONの天気はregion_managementで全県JSONの付与完了後にランキングを呼び出す。
-        targetSpots = window.allspotData;
-    }
-
-
+    const targetPrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : null;
     const titleEl = section.querySelector('h2');
-    if (titleEl) {
-        titleEl.innerHTML = "明日（" + tomorrowStr + "）" + titlePrefix + "釣りに行くんだけど良い場所ある？";
+
+    // 関東トップ(REGION)で既にSSG埋め込み済みHTMLが表示されている場合は通信せず維持
+    if (!targetPrefCode) {
+        const embeddedList = container.querySelector('ul[data-ssg-ranking="REGION"]');
+        if (embeddedList) {
+            section.style.display = 'block';
+            return;
+        }
     }
 
-    const ranking = [];
+    // 事前生成された /ai-data/ranking_cache.json から県別／関東版へ即時差し替え
+    const cache = await loadRankingCache();
+    if (!cache) return;
 
-    targetSpots.forEach(spot => {
-        if (spot.type === 'pref' || spot.type === 'area') return;
-        const typeParts = (spot.type || '').split('$');
-        if (typeParts.includes('representative') ||
-            typeParts.includes('assistant') ||
-            typeParts.includes('substitute')) return;
+    // 非同期fetch中に別画面へ遷移していた場合は上書きしない
+    const latestPrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : null;
+    if (latestPrefCode !== targetPrefCode) return;
 
-        // 直接スポット画面へ遷移できないスポットは対象外。
-        if (!spot.zoom || String(spot.zoom).trim() === '') return;
+    const entry = targetPrefCode
+        ? (cache.prefs && cache.prefs[targetPrefCode])
+        : cache.region;
 
-        const whether = spot.whether;
-        if (!whether || !whether.hourly || !whether.hourly[1] || !whether.hourly[1].weather) return;
+    if (!entry || !entry.html) return;
 
-        const tomorrowWeather = whether.hourly[1].weather;
-        const morningRows = [];
-        const afternoonRows = [];
-        let maxPop = -Infinity;
-        let maxWind = -Infinity;
-        let popTotal = 0;
-        let popCount = 0;
-
-        for (let i = 0; i < tomorrowWeather.length; i++) {
-            const row = tomorrowWeather[i];
-            if (!Array.isArray(row)) continue;
-
-            const hour = i * 2;
-            if (hour >= 5 && hour <= 12) morningRows.push(row);
-            else if (hour >= 13 && hour <= 20) afternoonRows.push(row);
-
-            const pop = row[2];
-            if (typeof pop === "number" && hour >= 5 && hour <= 20) {
-                maxPop = Math.max(maxPop, pop);
-                popTotal += pop;
-                popCount++;
-            }
-
-            const wind = row[4];
-            if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
-        }
-
-        if (popCount === 0) return;
-
-        // 表示用の降水確率は従来どおり時間帯の最大値を丸める。
-        const displayPop = maxPop < 5 ? 0 : Math.round(maxPop / 10) * 10;
-
-        // 代表天気の生成は既存ロジックをそのまま利用する。
-        const getIconSafe = rows => {
-            if (!Array.isArray(rows) || rows.length === 0) return null;
-            return typeof calcRepresentativeIcon === 'function' ? calcRepresentativeIcon(rows) : '';
-        };
-
-        const iconMorning = getIconSafe(morningRows);
-        const iconAfternoon = getIconSafe(afternoonRows);
-        let iconStr = '';
-        if (iconMorning && iconAfternoon) {
-            iconStr = iconMorning === iconAfternoon
-                ? iconMorning
-                : iconMorning + '<span style="font-size:0.8em; margin:0 2px;">→</span>' + iconAfternoon;
-        } else {
-            iconStr = iconMorning || iconAfternoon || '';
-        }
-
-        // 海・淡水に共通する降水傾向だけで天気スコアを算出する。
-        // 風速・波高・潮汐は順位付けに使用しない。
-        const averagePop = popTotal / popCount;
-        const weatherScore = Math.max(0, 100 - averagePop * 0.7);
-
-        const nearbyPosts = typeof window.getNearbySnsCatchRecords === 'function'
-            ? window.getNearbySnsCatchRecords(spot)
-            : [];
-        const snsBonus = getSnsCatchBonus(nearbyPosts);
-
-        ranking.push({
-            name: spot.name,
-            spot: spot,
-            score: Math.round(weatherScore + snsBonus),
-            pop: displayPop,
-            wind: maxWind !== -Infinity ? Math.round(maxWind) : null,
-            iconStr: iconStr,
-            hasSnsBonus: snsBonus > 0,
-            snsBonus: snsBonus
-        });
-    });
-
-    if (ranking.length === 0) {
-        clearSpotRanking();
-        return;
+    section.style.display = 'block';
+    if (titleEl && entry.title) {
+        titleEl.textContent = entry.title;
     }
+    container.innerHTML = entry.html;
 
-    // 同点の並び順だけランダム化し、スコア順に表示する。
-    for (let i = ranking.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [ranking[i], ranking[j]] = [ranking[j], ranking[i]];
+    const basisTitleEl = document.getElementById('rankingBasisModalTitle');
+    const basisBodyEl = document.getElementById('rankingBasisBody');
+    if (basisTitleEl && entry.basisTitle) {
+        basisTitleEl.textContent = entry.basisTitle;
     }
-    ranking.sort((a, b) => b.score - a.score);
-
-    // 上位3順位まで。REGIONは最大5件、県画面は最大6件。
-    const maxItems = window.currentPref ? 6 : 5;
-    const topItems = [];
-    let currentRank = 1;
-    let currentScore = ranking[0].score;
-
-    for (let i = 0; i < ranking.length; i++) {
-        if (ranking[i].score < currentScore) {
-            currentRank++;
-            currentScore = ranking[i].score;
-        }
-        if (currentRank > 3 || topItems.length >= maxItems) break;
-        topItems.push(ranking[i]);
+    if (basisBodyEl && entry.basisHtml) {
+        basisBodyEl.innerHTML = entry.basisHtml;
     }
-
-    let html = '<ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">';
-    topItems.forEach(item => {
-        const spotObj = item.spot;
-        let url = "#";
-
-        if (spotObj) {
-            const regionCode = window.currentRegion || 'KANTO';
-            const regionName = window.regionData?.name || (regionCode === 'KANTO' ? '関東地方' : regionCode);
-            let prefName = window.prefData ? window.prefData.notes : window.currentPref;
-            if (!prefName && window.regionPrefData) {
-                const pInfo = window.regionPrefData.find(p => p.prefCode === spotObj._prefCode);
-                if (pInfo) prefName = pInfo.prefName;
-            }
-
-            let areaName = '';
-            const targetAreas = window.currentPref ? window.areaData : window.allspotData;
-            if (targetAreas && spotObj.areaId) {
-                let parentArea = targetAreas.find(a =>
-                    String(a.areaId) + '_' + String(a.individualId) === String(spotObj.areaId)
-                );
-                if (!parentArea && window.currentPref) {
-                    parentArea = targetAreas.find(a => String(spotObj.areaId).endsWith(String(a.individualId)));
-                }
-                if (parentArea) areaName = parentArea.name;
-            }
-
-            url = "/?region=" + encodeURIComponent(regionName) +
-                "&pref=" + encodeURIComponent(prefName || '') +
-                "&area=" + encodeURIComponent(areaName || '') +
-                "&spot=" + encodeURIComponent(item.name);
-        }
-
-        const windHtml = item.wind !== null
-            ? '<span>風: <strong style="color:#191970;">' + item.wind + 'm</strong></span>'
-            : '';
-        const snsHtml = item.hasSnsBonus
-            ? '<span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span>'
-            : '';
-
-        html += '<li>' +
-            '<a href="' + url + '" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;">' +
-                '<span style="display:flex; justify-content:space-between; align-items:center; width:100%;">' +
-                    '<span style="font-weight:bold; color:#191970; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:8px;">' + item.name + '</span>' +
-                    '<span style="font-size:12px; color:#555; white-space:nowrap; display:flex; align-items:center; gap:8px;">' +
-                        '<span style="width:48px; min-width:48px; flex:0 0 48px; display:inline-flex; justify-content:center; align-items:center; text-align:center; font-size:1.3em;">' + item.iconStr + '</span>' +
-                        '<span>降水: <strong style="color:#191970;">' + item.pop + '%</strong></span>' +
-                        windHtml +
-                    '</span>' +
-                '</span>' +
-                snsHtml +
-            '</a>' +
-        '</li>';
-    });
-    html += '</ul>';
-
-    container.innerHTML = html;
 }
 // ==========================================
 // ★ タイトル・メタタグ動的更新関数（連携版）
@@ -795,6 +650,28 @@ function updateSeoMeta() {
     setMeta('meta[property="og:description"]', 'content', newDesc);
     setMeta('meta[name="twitter:title"]', 'content', newTitle);
     setMeta('meta[name="twitter:description"]', 'content', newDesc);
+
+    // AI向けMarkdownリンク（<link id="ai-md-link">）を現在表示中の階層に合わせて更新
+    let aiMdUrl = 'https://turiiko-navi.com/llms.txt';
+    let aiMdTitle = '釣り行こNAVI AI向けデータ目次';
+    const activePrefCode = window.currentPref ? String(window.currentPref).trim().toUpperCase() : '';
+    if (activePrefCode) {
+        const activeAreaId = (targetSpot && targetSpot.areaId) || window.currentAreaId || '';
+        const regularSpotCount = Array.isArray(window.spotData)
+            ? window.spotData.filter(s => s && s.zoom != null && String(s.zoom).trim() !== '' && s.icon && String(s.icon).trim() !== '').length
+            : 0;
+        const hasSplitAreaMd = Array.isArray(window.areaData) && window.areaData.length > 1 && regularSpotCount >= 15;
+        if (activeAreaId && hasSplitAreaMd && (spotName || area)) {
+            const safeAreaSeg = String(activeAreaId).trim().replace(/[^A-Za-z0-9_-]/g, '_');
+            aiMdUrl = `https://turiiko-navi.com/ai-data/${safeAreaSeg}.md`;
+            aiMdTitle = `${pref || activePrefCode} ${area || safeAreaSeg} 釣りスポット情報 (Markdown)`;
+        } else {
+            aiMdUrl = `https://turiiko-navi.com/ai-data/${activePrefCode}.md`;
+            aiMdTitle = `${pref || activePrefCode} 釣りスポット情報 (Markdown)`;
+        }
+    }
+    setMeta('#ai-md-link', 'href', aiMdUrl);
+    setMeta('#ai-md-link', 'title', aiMdTitle);
 
     // --------------------------------------------------
     // ■ マップへの代替テキスト（aria-label）付与
@@ -1136,7 +1013,7 @@ if (typeof window.loadRegionCSV !== 'function') {
             for (const row of csvData.rows || []) {
                 if (row.type === 'region') {
                     window.regionData = {
-                        name: row.name || '関東地方',
+                        name: (String(row.name || '').trim().toUpperCase() === 'KANTO' ? '関東地方' : (row.name || '関東地方')),
                         lat: parseFloat(row.lat),
                         lng: parseFloat(row.lng),
                         zoom: parseFloat(row.zoom)
@@ -1451,10 +1328,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (typeof window.runAfterTileLoad === 'function') {
         window.runAfterTileLoad(() => {
             if (!window.currentPref) return loadPrefectureSpots(null, 'all');
-        });
-        window.runAfterTileLoad(() => {
-            // ★ 県・エリア・スポットURLでは各画面の入口側で描画するため、REGION画面のときだけ呼ぶ
-            if (!window.currentPref && typeof renderSpotRanking === 'function') return renderSpotRanking(1);
         });
         window.runAfterTileLoad(() => {
             if (typeof loadICData === 'function') return loadICData();
@@ -1904,7 +1777,6 @@ async function loadPrefectureData(prefCode) {
                         createWeekItem(activeSpot.whether);
                     }
                 }
-                // ★ renderSpotRanking は各画面の入口側で1回だけ呼ぶ（ここでは呼ばない）
             }
 
             if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
