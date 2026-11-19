@@ -1,5 +1,85 @@
 [
   {
+    "date": "2026/11/19",
+    "fish": "メジナ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2123318338323644419",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/19",
+    "fish": "メバル",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2123318338323644419",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/19",
+    "fish": "ウマズラハギ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2123318338323644419",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/19",
+    "fish": "カワハギ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2123318338323644419",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/19",
+    "fish": "イナダ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2123318338323644419",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/19",
+    "fish": "イシダイ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2123318338323644419",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/19",
+    "fish": "シーバス",
+    "lat": 35.4294,
+    "lng": 139.6923,
+    "area_name": "本牧海づり施設",
+    "url": "https://x.com/MigakuZ80887/status/2123250085803036949",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/19",
+    "fish": "シーバス",
+    "lat": 35.6258,
+    "lng": 139.8864,
+    "area_name": "ディズニーリゾート付近（千葉県）",
+    "url": "https://x.com/ponchan28ponpon/status/2123326100990546217",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
     "date": "2026/11/18",
     "fish": "メジナ",
     "lat": 35.446,
@@ -58,6 +138,56 @@
     "url": "https://www.instagram.com/p/Df37SspCslh/",
     "source": "Instagram",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "アジ",
+    "lat": 35.5458,
+    "lng": 140.0717,
+    "area_name": "市原市海釣り施設",
+    "url": "https://x.com/Hamuta1008/status/2123033182991950156",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "イワシ",
+    "lat": 35.5458,
+    "lng": 140.0717,
+    "area_name": "市原市海釣り施設",
+    "url": "https://x.com/Hamuta1008/status/2123033182991950156",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "コノシロ",
+    "lat": 35.5458,
+    "lng": 140.0717,
+    "area_name": "市原市海釣り施設",
+    "url": "https://x.com/Hamuta1008/status/2123033182991950156",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "クロダイ",
+    "lat": 35.5458,
+    "lng": 140.0717,
+    "area_name": "市原市海釣り施設",
+    "url": "https://x.com/Hamuta1008/status/2123033182991950156",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/18",
+    "fish": "タチウオ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/kujira3150/status/2123269003007107492",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/17",
@@ -758,6 +888,16 @@
     "url": "https://www.threads.com/@masaki__max__takasaki/post/Dfy1kRUn7Wo",
     "source": "Threads",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/15",
+    "fish": "アジ",
+    "lat": 34.9961,
+    "lng": 139.8603,
+    "area_name": "館山港",
+    "url": "https://x.com/HUQnK94p7L20174/status/2121769744756101437",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/14",
