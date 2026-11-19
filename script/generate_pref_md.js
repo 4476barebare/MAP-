@@ -809,6 +809,7 @@ function buildLlmsTxt(aiDataDir, updatedDate) {
         .filter(name => /\.md$/i.test(name))
         .sort((a, b) => a.localeCompare(b, "en"));
 
+    const tomorrowFiles = [];
     const groups = new Map();
     const otherFiles = [];
     let latestUpdated = updatedDate;
@@ -818,6 +819,7 @@ function buildLlmsTxt(aiDataDir, updatedDate) {
         const content = fs.readFileSync(fullPath, "utf8");
         const meta = parseFrontmatter(content);
         const baseName = fileName.replace(/\.md$/i, "");
+        const upperBase = baseName.toUpperCase();
 
         const inferredPref = baseName.split("_")[0].toUpperCase();
         const prefCode = cleanText(meta.pref_code).toUpperCase() || inferredPref;
@@ -836,6 +838,12 @@ function buildLlmsTxt(aiDataDir, updatedDate) {
             title,
             meta
         };
+
+        // 明日のオススメランキングMD（*_tomorrow.md）は最上部の専用セクションへ振り分ける
+        if (/_TOMORROW$/.test(upperBase)) {
+            tomorrowFiles.push(entry);
+            continue;
+        }
 
         if (!prefCode) {
             otherFiles.push(entry);
@@ -858,7 +866,6 @@ function buildLlmsTxt(aiDataDir, updatedDate) {
             group.prefName = prefName;
         }
 
-        const upperBase = baseName.toUpperCase();
         if (upperBase === prefCode) {
             group.main = entry;
         } else if (upperBase === `${prefCode}_CATCH`) {
@@ -890,8 +897,24 @@ function buildLlmsTxt(aiDataDir, updatedDate) {
     lines.push("- 各スポットの登録魚種（`*_fish.md` および各スポット詳細）はサイト内データ上の対象魚種を示すものであり、現在の釣果や釣獲を保証するものではありません。");
     lines.push("- 最新SNS釣果（`*_catch.md`）の座標は元のSNS投稿地名（area_name）をもとに設定した代表点であり、特定の釣り場スポットへの紐付けではありません。");
     lines.push("- アクセス時間・距離は直線距離に道路係数（1.35倍）を掛けた概算値です。現地の立入禁止区域・駐車ルールは必ず現地表示をご確認ください。");
-    lines.push("- 「明日釣りに行くんだけどいい場所ある？」等の質問には、各県の `*_catch.md` で直近の釣果傾向を確認しつつ、該当エリアの詳細スポットMD（解説・駐車場/トイレ・ルール・アクセス・最寄り釣具店）を参照してください。");
+    lines.push("- 「明日釣りに行くんだけどいい場所ある？」等の質問には、まず下の「明日のオススメ釣り場ランキング（`*_tomorrow.md`）」で明日の天気予報詳細と周辺SNS釣果の根拠を確認し、必要に応じて各県の `*_catch.md` や該当エリアの詳細スポットMD（解説・駐車場/トイレ・ルール・アクセス・最寄り釣具店）を参照してください。");
     lines.push("");
+
+    if (tomorrowFiles.length > 0) {
+        lines.push("## 明日のオススメ釣り場ランキング（天気・釣果根拠付き）");
+        lines.push("");
+        const sortedTomorrow = [...tomorrowFiles].sort((a, b) => a.fileName.localeCompare(b.fileName, "en"));
+        for (const item of sortedTomorrow) {
+            const targetDate = cleanText(item.meta.target_date);
+            const itemUpdated = cleanText(item.meta.last_updated);
+            const details = [];
+            if (targetDate) details.push(`対象日 ${targetDate}`);
+            if (itemUpdated) details.push(`更新 ${itemUpdated}`);
+            const suffix = details.length > 0 ? `（${details.join(" / ")}）` : "";
+            lines.push(`- [${item.title}](${item.url}): 明日の天気予報詳細（時間帯別の天気・気温・降水・風速・波高）と周辺10km圏内の直近SNS釣果を備考としてまとめた最新おすすめランキング${suffix}`);
+        }
+        lines.push("");
+    }
 
     for (const group of sortedGroups) {
         lines.push(`## ${group.prefName} (${group.prefCode})`);
