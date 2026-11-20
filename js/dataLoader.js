@@ -385,20 +385,50 @@ function showSpotsForArea(areaKey) {
     }
 }
 
-async function selectSpot(spot) {
-    if (!window.map || !spot) return;
+async function selectSpot(spotOrCoords) {
+    if (!window.map) return;
+
+    const mapCenter = window.map.getCenter();
+    let targetLat = NaN;
+    let targetLng = NaN;
+    let targetName = '';
+    let spotObj = null;
+
+    if (Array.isArray(spotOrCoords) && spotOrCoords.length >= 2) {
+        targetLat = Number(spotOrCoords[0]);
+        targetLng = Number(spotOrCoords[1]);
+    } else if (spotOrCoords && typeof spotOrCoords === 'object') {
+        targetLat = Number(spotOrCoords.lat);
+        targetLng = Number(spotOrCoords.lng);
+        targetName = spotOrCoords.name || '';
+        if ('zoom' in spotOrCoords || 'individualId' in spotOrCoords || 'areaId' in spotOrCoords) {
+            spotObj = spotOrCoords;
+        }
+    } else if (mapCenter) {
+        targetLat = Number(mapCenter.lat);
+        targetLng = Number(mapCenter.lng);
+    }
+
+    if (!Number.isFinite(targetLat) || !Number.isFinite(targetLng)) {
+        if (!mapCenter) return;
+        targetLat = Number(mapCenter.lat);
+        targetLng = Number(mapCenter.lng);
+    }
+
     hideRoadLayers();
 
     const currentZoom = window.map.getZoom();
 
-    if (currentZoom === 13 && !window._isRestoringSpot) {
-        if (spot.zoom !== '') {
-            if (typeof zoomToSpot === 'function') zoomToSpot(spot);
+    if (currentZoom === 13 && !window._isRestoringSpot && spotObj) {
+        if (spotObj.zoom !== '') {
+            if (typeof zoomToSpot === 'function') zoomToSpot(spotObj);
         } else {
-            if (typeof showFishPopup === 'function') showFishPopup(spot);
+            if (typeof showFishPopup === 'function') showFishPopup(spotObj);
         }
         return;
     }
+
+    window._selectSpotCompleted = false;
 
     if (window.markerControl) {
         markerControl.showShop02(window.currentAreaId);
@@ -475,11 +505,11 @@ async function selectSpot(spot) {
 
 
     const center = window.map.getCenter();
-    const isSameLoc = center && Math.abs(center.lat - spot.lat) < 0.0001 && 
-                      Math.abs(center.lng - spot.lng) < 0.0001 && 
+    const isSameLoc = center && Math.abs(center.lat - targetLat) < 0.0001 && 
+                      Math.abs(center.lng - targetLng) < 0.0001 && 
                       window.map.getZoom() === 13;
 
-    drawLocation(spot.name, spot.lat, spot.lng, 13);
+    drawLocation(targetName, targetLat, targetLng, 13);
 
     const finalizeSelectSpot = () => {
         window.map.invalidateSize(true);

@@ -4,9 +4,8 @@
 // 方針（prefLoader.js の pref_management と同設計）
 //  1. 対象スポットの所属県 location.json だけを loadPrefectureSpots(prefCode, 'select') で取得し、
 //     対象スポットの座標・ズーム・タイルで drawLocation() を最優先開始・完了させる。
-//  2. drawLocation() 完了後、後続のスポット画面描画（逆引き辞書・アクセス情報・zoomToSpot）を開始。
-//  3. 天気・魚種・釣具店データもまず対象スポットの所属県（select）だけを先行取得して即時反映。
-//  4. 所属県の先行処理が終わった後、裏で他県データ（other -> all）と他県天気を順次取得。
+//  2. drawLocation() 完了後、所属県（select）の天気・魚種・釣具店データ取得と zoomToSpot() を開始。
+//  3. 他県データの取得は行わず、所属県データと演出準備が揃ったタイミングで戻るボタン・タイル切替・投稿ボタンを同時フェードイン。
 // ==========================================
 window.prefDictionaryCache = window.prefDictionaryCache || {};
 window.prefDictionaryPromises = window.prefDictionaryPromises || {};
@@ -314,7 +313,6 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
     if (window.prefData) setIdealQuery('pref', window.prefData.notes);
     if (parentArea) setIdealQuery('area', parentArea.name);
     setIdealQuery('spot', spot.name);
-    window._selectSpotCompleted = true;
 
     // 逆引き辞書JSONとICデータを drawLocation と並行して開始し、取得次第すぐにアクセス枠と構造化データを更新
     const dictPromise = loadPrefDictionaryJson(prefCode).then(dict => {
@@ -335,7 +333,7 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         await waitMapSettled();
     }
 
-    // ---------- 3. drawLocation 完了後：後続のスポット描画と所属県（select）の先行データ取得を開始 ----------
+    // ---------- 3. drawLocation 完了後：所属県（select）のデータ取得と後続のスポット描画を開始 ----------
     window.fishUrl = `/${regionCode}/${prefCode}_fish.json`;
 
     if (window.map) {
@@ -343,41 +341,7 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         window.map.getContainer().classList.add('is-spot-mode');
     }
 
-    if (hasSpotZoom) {
-        zoomToSpot(spot);
-    } else {
-        renderAccessInfo(spot);
-        if (typeof showSpotsForArea === 'function') showSpotsForArea(finalAreaId);
-        if (typeof phase1menu === 'function') phase1menu(finalAreaId);
-        if (typeof enableDragForArea === 'function') enableDragForArea();
-        if (typeof enablePhase2 === 'function') enablePhase2(window.map);
-        if (typeof showFishPopup === 'function') showFishPopup(spot);
-    }
-
-    requestAnimationFrame(() => {
-        const btn = document.getElementById('map-back-btn');
-        if (btn) {
-            btn.style.display = 'block';
-            requestAnimationFrame(() => {
-                btn.style.opacity = '1';
-            });
-        }
-    });
-
-    if (typeof renderAreaGuide === 'function') renderAreaGuide();
-    if (typeof renderSpotRanking === 'function') renderSpotRanking();
-    if (parentArea && typeof openArea === 'function') openArea(parentArea.individualId);
-
-    const jnnRow = document.getElementById('map-jma-alert');
-    if (jnnRow && window.currentPref === prefCode) {
-        jnnRow.style.display = 'flex';
-    }
-    if (window.currentPref === prefCode && window.prefData && typeof getAlertText === 'function') {
-        getAlertText(window.prefData);
-    }
-
-    // 所属県（prefCode）の天気・魚種・釣具店データを先行取得（対象スポットの沿岸/内陸区分を最優先）
-    const bgGen = (window._prefBgGen = (window._prefBgGen || 0) + 1);
+    // 所属県（prefCode）の天気・魚種・釣具店データを取得（他県データは不要のため取得しない）
     const isInlandSpot = String(spot.individualId || spot.id || '').startsWith('L');
 
     const primaryWeatherPromise = isInlandSpot
@@ -418,13 +382,18 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         })
         : Promise.resolve(null);
 
+    // Phase2復帰に必要な所属県データ（天気・釣具店）の準備完了Promise
+    const prefReturnReadyPromise = Promise.allSettled([
+        primaryWeatherPromise,
+        secondaryWeatherPromise,
+        shopPromise
+    ]);
+
     const selectedPrefDonePromise = Promise.allSettled([
         dictPromise,
         icPromise,
-        primaryWeatherPromise,
-        secondaryWeatherPromise,
-        fishPromise,
-        shopPromise
+        prefReturnReadyPromise,
+        fishPromise
     ]).then(() => {
         if (window.currentPref === prefCode) {
             if (window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
@@ -438,28 +407,57 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         }
     });
 
-    // ---------- 4. 所属県の先行処理が完了した後に、裏で他県データ（other -> all）と他県天気を順次取得 ----------
-    window._prefBackgroundLoad = selectedPrefDonePromise
-        .then(() => typeof loadPrefectureSpots === 'function' ? loadPrefectureSpots(prefCode, 'other') : null)
-        .then(() => typeof loadPrefectureSpots === 'function' ? loadPrefectureSpots(prefCode, 'all') : null)
-        .then(() => {
-            if (typeof getPrefParentRow === 'function') {
-                const finalParent = getPrefParentRow(prefCode);
-                if (finalParent) window.prefData = finalParent;
+    window._prefBackgroundLoad = selectedPrefDonePromise;
+
+    if (hasSpotZoom) {
+        // 戻るボタンはタイル切替・投稿ボタンと同様に、所属県データと演出準備が揃ってから同時フェードインさせる
+        zoomToSpot(spot, { prefDataPromise: prefReturnReadyPromise });
+    } else {
+        const backBtn = document.getElementById('map-back-btn');
+        if (backBtn) {
+            backBtn.style.opacity = '0';
+            backBtn.style.pointerEvents = 'none';
+            backBtn.style.display = 'block';
+        }
+        renderAccessInfo(spot);
+        if (typeof showSpotsForArea === 'function') showSpotsForArea(finalAreaId);
+        if (typeof phase1menu === 'function') phase1menu(finalAreaId);
+        if (typeof enableDragForArea === 'function') enableDragForArea();
+        if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+        if (typeof showFishPopup === 'function') showFishPopup(spot);
+
+        // ズーム13スポットも所属県データ完了（最大3秒保険）で戻るボタンをフェードイン
+        Promise.race([
+            prefReturnReadyPromise,
+            new Promise(resolve => setTimeout(resolve, 3000))
+        ]).then(() => {
+            if (window.currentPref !== prefCode) return;
+            const btn = document.getElementById('map-back-btn');
+            if (btn) {
+                btn.style.display = 'block';
+                btn.style.transition = 'opacity 0.4s ease';
+                btn.style.pointerEvents = 'auto';
+                requestAnimationFrame(() => {
+                    btn.style.opacity = '1';
+                });
             }
-            if (typeof showPrefMarkers === 'function') {
-                return showPrefMarkers();
+            if (!hasSpotZoom && finalAreaId && typeof phase1menu === 'function') {
+                phase1menu(finalAreaId);
             }
-        })
-        .then(() => {
-            if (window._prefBgDone) return;
-            if (typeof runPrefBackgroundLoads === 'function') {
-                return runPrefBackgroundLoads(prefCode, Promise.resolve(), bgGen, Promise.resolve());
-            }
-        })
-        .catch(err => {
-            console.error('スポット画面バックグラウンド処理エラー:', err);
         });
+    }
+
+    if (typeof renderAreaGuide === 'function') renderAreaGuide();
+    if (typeof renderSpotRanking === 'function') renderSpotRanking();
+    if (parentArea && typeof openArea === 'function') openArea(parentArea.individualId);
+
+    const jnnRow = document.getElementById('map-jma-alert');
+    if (jnnRow && window.currentPref === prefCode) {
+        jnnRow.style.display = 'flex';
+    }
+    if (window.currentPref === prefCode && window.prefData && typeof getAlertText === 'function') {
+        getAlertText(window.prefData);
+    }
 
     return true;
 }
@@ -468,7 +466,7 @@ window.spot_management = spot_management;
 // ==========================================
 // スポット詳細画面へのズーム遷移
 // ==========================================
-function zoomToSpot(spot) {
+function zoomToSpot(spot, options = {}) {
     if (!window.map || !spot) return;
 
     // ★ スポット所属県（または現在選択中の県）の逆引き辞書JSONを非同期でロードし、完了時に表示とSEO構造化データを更新
@@ -530,6 +528,7 @@ function zoomToSpot(spot) {
     let isMoveEnded = false;
     let isFadeEnded = !hasOSM;
     let isSpotPrepEnded = false;
+    let isPrefDataReady = !(options && options.prefDataPromise && typeof options.prefDataPromise.then === 'function');
 
     // ★ スポット画面の遷移中に裏側で「IP+UUIDの生成（生成済みならスキップ）」と「切り替え用タイルのプリフェッチ」を同時実行
     if (typeof window.prepareSpotActionButtons === 'function') {
@@ -541,23 +540,39 @@ function zoomToSpot(spot) {
         isSpotPrepEnded = true;
     }
 
+    // ★ URL直打ち時は所属県データ（天気・釣具店）の準備完了も待機してから戻るボタン等を同時フェードインさせる
+    if (!isPrefDataReady) {
+        options.prefDataPromise.finally(() => {
+            isPrefDataReady = true;
+            checkAndUnlockGuard();
+        });
+    }
+
     const safetyTimer = setTimeout(() => {
         isFadeEnded = true;
         isSpotPrepEnded = true;
+        isPrefDataReady = true;
         checkAndUnlockGuard();
     }, 3000);
 
     let isSpotButtonsShown = false;
     const checkAndUnlockGuard = () => {
-        if (isMoveEnded && isFadeEnded && isSpotPrepEnded) {
+        if (isMoveEnded && isFadeEnded && isSpotPrepEnded && isPrefDataReady) {
             if (isSpotButtonsShown) return;
             isSpotButtonsShown = true;
             clearTimeout(safetyTimer);
 
-            // ★ データ（IP+UUID・代替タイル・本採用/仮ピン）とカメラ遷移がすべて揃ったタイミングで両ボタンとピンを同時にフェードイン
+            // ★ データ（所属県データ・IP+UUID・代替タイル・本採用/仮ピン）とカメラ遷移がすべて揃ったタイミングで
+            //    戻るボタン・タイル切替ボタン・投稿ボタン・ピンを同時にフェードイン
+            const backBtn = document.getElementById('map-back-btn');
             const tileWrap = document.getElementById('tile-btn-wrap');
             const tileBtn = document.getElementById('map-tile-btn');
             const postBtn = document.getElementById('map-post-btn');
+            if (backBtn) {
+                backBtn.style.display = 'block';
+                backBtn.style.transition = 'opacity 0.4s ease';
+                backBtn.style.pointerEvents = 'auto';
+            }
             if (tileWrap && tileBtn) {
                 tileWrap.style.display = 'flex';
                 tileBtn.style.display = 'block';
@@ -566,11 +581,12 @@ function zoomToSpot(spot) {
                     postBtn.style.display = 'block';
                     postBtn.style.pointerEvents = 'auto';
                 }
-                requestAnimationFrame(() => {
-                    tileBtn.style.opacity = '1';
-                    if (postBtn) postBtn.style.opacity = '1';
-                });
             }
+            requestAnimationFrame(() => {
+                if (backBtn) backBtn.style.opacity = '1';
+                if (tileBtn) tileBtn.style.opacity = '1';
+                if (postBtn) postBtn.style.opacity = '1';
+            });
             if (typeof window.fadeInUserAndTempPins === 'function') {
                 window.fadeInUserAndTempPins(safe);
             }
@@ -669,9 +685,14 @@ function zoomToSpot(spot) {
     window.map.doubleClickZoom.disable();
     window.map.touchZoom.disable();
 
-    // ★ 遷移開始時は両ボタンとユーザーピンレイヤーを一旦透明・非活性で待機させておく（準備完了後に checkAndUnlockGuard で同時フェードイン）
+    // ★ 遷移開始時は戻るボタン・両ボタン・ユーザーピンレイヤーを一旦透明・非活性で待機させておく（準備完了後に checkAndUnlockGuard で同時フェードイン）
     if (typeof window.clearUserAndTempPins === 'function') {
         window.clearUserAndTempPins();
+    }
+    const backBtnInit = document.getElementById('map-back-btn');
+    if (backBtnInit) {
+        backBtnInit.style.opacity = '0';
+        backBtnInit.style.pointerEvents = 'none';
     }
     const tileWrap = document.getElementById('tile-btn-wrap');
     const tileBtn = document.getElementById('map-tile-btn');
