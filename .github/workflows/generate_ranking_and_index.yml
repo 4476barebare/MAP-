@@ -1,12 +1,18 @@
 name: Generate Tomorrow Ranking & Static HTML
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "template/index.txt"
+      - "script/generate_ranking_and_index.js"
   workflow_dispatch:
     inputs:
       output_html:
-        description: "生成するHTMLファイル名（テスト時は index2.html、本番時は index.html）"
+        description: "生成するHTMLファイル名（本番: index.html / テスト: index2.html）"
         required: true
-        default: "index2.html"
+        default: "index.html"
         type: string
       region_code:
         description: "対象リージョンコード"
@@ -17,7 +23,7 @@ on:
     inputs:
       output_html:
         required: false
-        default: "index2.html"
+        default: "index.html"
         type: string
       region_code:
         required: false
@@ -25,16 +31,22 @@ on:
         type: string
 
 concurrency:
-  group: "ranking-static-html"
+  group: "pages"
   cancel-in-progress: false
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-ranking-html:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
@@ -45,12 +57,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Generate Ranking Cache, Tomorrow MD, Lightweight HTMLs and Index HTML
         env:
           TARGET_REGION: ${{ inputs.region_code || 'KANTO' }}
-          OUTPUT_HTML: ${{ inputs.output_html || 'index2.html' }}
+          OUTPUT_HTML: ${{ inputs.output_html || 'index.html' }}
           TEMPLATE_PATH: "template/index.txt"
         run: |
           echo "Region     : ${TARGET_REGION}"
@@ -67,9 +79,10 @@ jobs:
           fi
 
       - name: Commit and push generated files
+        id: commit
         env:
           TARGET_REGION: ${{ inputs.region_code || 'KANTO' }}
-          OUTPUT_HTML: ${{ inputs.output_html || 'index2.html' }}
+          OUTPUT_HTML: ${{ inputs.output_html || 'index.html' }}
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -84,8 +97,21 @@ jobs:
 
           if git diff --cached --quiet; then
             echo "ランキング・静的HTMLに変更はありません。"
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "auto: Generate tomorrow ranking, lightweight HTMLs and ${OUTPUT_HTML}"
             git pull --rebase --autostash origin main
             git push origin main
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Upload Pages Artifact
+        if: steps.commit.outputs.pushed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: steps.commit.outputs.pushed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: actions/deploy-pages@v4
