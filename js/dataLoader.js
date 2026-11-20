@@ -1200,6 +1200,17 @@ function isSpotContextForRoad() {
     return !!(window.currentSpotId || new URLSearchParams(window.location.search).get('spot'));
 }
 
+function isPhase2ContextForRoad() {
+    const mapContainer = (window.map && typeof window.map.getContainer === 'function')
+        ? window.map.getContainer()
+        : null;
+    return !!(
+        window.phase2Initialized ||
+        window._isRestoringSpot ||
+        (mapContainer && mapContainer.classList.contains('is-spot-mode'))
+    );
+}
+
 function fetchRoadJsonWithRetry(url, retries = 1) {
     return fetch(url, { priority: 'low' }).then(r => {
         if (!r.ok) throw new Error('road JSON fetch failed: ' + r.status);
@@ -1288,7 +1299,9 @@ function renderRoadLayers(map) {
                     window.isRoadReady = true;
                     window._isRoadLoading = false;
                     map.on('zoomend', updateRoadStyle);
-                    if (window._shouldShowRoad && !isSpotContextForRoad()) triggerRoadFadeIn();
+                    if (window._shouldShowRoad && !isSpotContextForRoad() && !isPhase2ContextForRoad()) {
+                        triggerRoadFadeIn();
+                    }
                     resolve();
                 }
             }
@@ -1305,6 +1318,7 @@ function renderRoadLayers(map) {
 // 準備完了後、レイヤーをマップに追加してフェードインする処理
 function triggerRoadFadeIn() {
     if (!window.map || !window.isRoadReady || !roadLayerGroup) return;
+    if (!window._shouldShowRoad || isSpotContextForRoad() || isPhase2ContextForRoad()) return;
 
     if (!window.map.hasLayer(roadLayerGroup)) {
         roadLayerGroup.addTo(window.map);
@@ -1326,7 +1340,9 @@ function triggerRoadFadeIn() {
     // DOMの反映を待ってから opacity を上げてフェードイン
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-            if (currentZoom <= 13.5) {
+            if (!window._shouldShowRoad || isSpotContextForRoad() || isPhase2ContextForRoad()) return;
+            const latestZoom = window.map ? window.map.getZoom() : currentZoom;
+            if (latestZoom <= 13.5) {
                 if (motorwayPane) motorwayPane.style.opacity = '1';
                 if (trunkPane) trunkPane.style.opacity = '0.5';
             }
@@ -1337,11 +1353,17 @@ function triggerRoadFadeIn() {
 function updateRoadStyle() {
     if (!window.map || !roadLayerGroup || !window.map.hasLayer(roadLayerGroup)) return;
 
-    const currentZoom = window.map.getZoom();
     const motorwayPane = window.map.getPane('motorwayPane');
     const trunkPane = window.map.getPane('trunkPane');
-
     if (!motorwayPane || !trunkPane) return;
+
+    if (!window._shouldShowRoad || isSpotContextForRoad() || isPhase2ContextForRoad()) {
+        motorwayPane.style.opacity = '0';
+        trunkPane.style.opacity = '0';
+        return;
+    }
+
+    const currentZoom = window.map.getZoom();
 
     if (currentZoom <= 13.5) {
         const motorwayWeight = Math.max(1.0, 1.5 + (currentZoom - 10) * 0.8);
@@ -1359,26 +1381,42 @@ function updateRoadStyle() {
 }
 
 // ==========================================
+// ★ Phase2復帰時などに「非表示のまま」バックグラウンドで道路データの取得・生成だけ進める関数
+// ==========================================
+window.preloadRoadLayers = function() {
+    if (!window.map || window.isRoadReady || window._isRoadLoading || isSpotContextForRoad()) return;
+    // 表示フラグ(_shouldShowRoad)は立てずに裏で取得・ポリライン生成のみ完了させる
+    const runPreload = () => {
+        if (!window.map || window.isRoadReady || window._isRoadLoading || isSpotContextForRoad()) return;
+        return renderRoadLayers(window.map);
+    };
+    if (window._firstTileLoaded || typeof window.runAfterTileLoad !== 'function') {
+        runPreload();
+    } else {
+        window.runAfterTileLoad(runPreload);
+    }
+};
+
+// ==========================================
 // ★ レイヤー自体の存在・表示状態のみで判定する関数（初回タイル優先版）
 // ==========================================
 window.showRoadLayers = function() {
-    // ★ スポット画面では道路データは不要のため一切取得・描画しない
-    if (isSpotContextForRoad()) {
+    // ★ スポット詳細画面・Phase2画面では道路を表示しない
+    if (isSpotContextForRoad() || isPhase2ContextForRoad()) {
         window._shouldShowRoad = false;
         return;
     }
     window._shouldShowRoad = true;
     if (!window.map) return;
     if (window.isRoadReady) {
-        if (!window.map.hasLayer(roadLayerGroup)) roadLayerGroup.addTo(window.map);
-        updateRoadStyle();
+        triggerRoadFadeIn();
     } else {
         if (window._roadQueued || window._isRoadLoading) return;
         window._roadQueued = true;
         // JSON取得は先行し、ベースタイル完了後のキューでは描画だけを行う
         const runRoad = () => {
             window._roadQueued = false;
-            if (!window._shouldShowRoad || !window.map || isSpotContextForRoad()) return;
+            if (!window._shouldShowRoad || !window.map || isSpotContextForRoad() || isPhase2ContextForRoad()) return;
             return renderRoadLayers(window.map);
         };
         if (typeof window.runAfterTileLoad === 'function') {

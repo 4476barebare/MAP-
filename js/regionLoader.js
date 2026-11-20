@@ -494,6 +494,15 @@ function showPrefSpots() {
         return;
     }
 
+    const mapContainer = (window.map && typeof window.map.getContainer === 'function')
+        ? window.map.getContainer()
+        : null;
+    const isPhase2Mode = !!(
+        window.phase2Initialized ||
+        window._isRestoringSpot ||
+        (mapContainer && mapContainer.classList.contains('is-spot-mode'))
+    );
+
     if (!window.currentPref) {
         window.regionSpotMarkers.forEach(marker => {
             const el = marker.getElement();
@@ -504,7 +513,7 @@ function showPrefSpots() {
             el.style.pointerEvents = 'none';
             marker._regionRepresentative = false;
         });
-        if (typeof showRoadLayers === 'function') showRoadLayers();
+        if (!isPhase2Mode && typeof showRoadLayers === 'function') showRoadLayers();
         return;
     }
 
@@ -527,7 +536,7 @@ function showPrefSpots() {
         }
         marker._regionRepresentative = false;
     });
-    if (typeof showRoadLayers === 'function') showRoadLayers();
+    if (!isPhase2Mode && typeof showRoadLayers === 'function') showRoadLayers();
 }
 
 function handleRegionNearest(latlng) {
