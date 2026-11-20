@@ -912,9 +912,13 @@ if (typeof window.loadFishDataAsync !== 'function') {
                 window.fishData = fishData;
                 if (window.spotData) window.applyFishDataToSpots(window.spotData, fishData);
                 if (window.currentSpotId && window.spotData) {
-                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    const activeSpot = (window.currentAreaId
+                        ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
+                        : null)
+                        || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                     if (activeSpot && activeSpot.URL) {
-                        if (typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
+                        const hasZoom = !!(activeSpot.zoom && String(activeSpot.zoom).trim() !== '');
+                        if (hasZoom && typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
                         if (typeof updateSeoMeta === 'function') updateSeoMeta();
                     }
                 }
@@ -1895,7 +1899,10 @@ if (typeof window.spot_management !== 'function') {
         await window.loadLocationJSON();
         const spotParts = String(spotId).split('_');
         const targetIndivId = spotParts[2] || spotParts[0];
-        const spot = (window.spotData || []).find(s => String(s.individualId) === String(targetIndivId));
+        const spot = (areaId
+            ? (window.spotData || []).find(s => String(s.areaId) === String(areaId) && String(s.individualId) === String(targetIndivId))
+            : null)
+            || (window.spotData || []).find(s => String(s.individualId) === String(targetIndivId));
         if (!spot) return false;
         const finalAreaId = areaId || spot.areaId || '';
         const parentArea = (window.areaData || []).find(a => finalAreaId.endsWith(a.individualId));
@@ -2495,7 +2502,10 @@ async function loadPrefectureData(prefCode) {
                     showNearestSpotName(window.map);
                 }
                 if (window.currentSpotId && window.spotData) {
-                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    const activeSpot = (window.currentAreaId
+                        ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
+                        : null)
+                        || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                     if (activeSpot && activeSpot.whether && typeof createWeekItem === 'function') {
                         createWeekItem(activeSpot.whether);
                     }
@@ -2505,7 +2515,10 @@ async function loadPrefectureData(prefCode) {
             if (window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
                 await window.markerControl.preloadShop01(window.prefShopUrl);
                 if (window.currentSpotId && window.spotData && typeof renderShopSection === 'function') {
-                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    const activeSpot = (window.currentAreaId
+                        ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
+                        : null)
+                        || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                     if (activeSpot) renderShopSection(activeSpot);
                 }
             }
