@@ -1,356 +1,12 @@
 window.selectArea = selectArea;
 window.selectSpot = selectSpot;
-window.goBack = goBack;
-window.drawLocation = drawLocation;
-window.prefData = null;
-window.areaData = [];
-window.spotData = [];
-window.currentAreaId = null;
+window.prefData = window.prefData ?? null;
+window.areaData = window.areaData || [];
+window.spotData = window.spotData || [];
+window.currentAreaId = window.currentAreaId ?? null;
 window.fishDataCache = window.fishDataCache || {};
 
-// ==========================================
-// ★ スポット用データを金庫(allspotData)から読み込む関数
-// ==========================================
-async function loadLocationJSON() {
-    const pref = window.currentPref;
-
-    function parseGrid(str) {
-        if (!str) return { x: null, y: null };
-        const x = str.match(/x\s*:\s*(-?\d+)/);
-        const y = str.match(/y\s*:\s*(-?\d+)/);
-        return {
-            x: x ? parseInt(x[1]) : null,
-            y: y ? parseInt(y[1]) : null
-        };
-    }
-
-    // 魚データは裏側で非同期取得（タイル描画を止めない）
-    if (window.fishUrl && typeof loadFishDataAsync === 'function') {
-        loadFishDataAsync(pref, window.fishUrl);
-    }
-
-    // 分岐A：既に県データが生成されている場合
-    if (
-        window[`${pref}_prefData`] &&
-        window[`${pref}_areaData`] &&
-        window[`${pref}_spotData`]
-    ) {
-        window.prefData = window[`${pref}_prefData`];
-        window.areaData = window[`${pref}_areaData`];
-        window.spotData = window[`${pref}_spotData`];
-        window.prefBounds = window[`${pref}_prefBounds`] || null;
-
-        if (window.fishDataCache && window.fishDataCache[pref] && typeof applyFishDataToSpots === 'function') {
-            applyFishDataToSpots(window.spotData, window.fishDataCache[pref]);
-        }
-
-        if (window[`${pref}_areaGraph`]) {
-            window.areaGraph = window[`${pref}_areaGraph`];
-        } else if (typeof buildAreaGraphFromGrid === 'function') {
-            buildAreaGraphFromGrid(window.areaData);
-            window[`${pref}_areaGraph`] = window.areaGraph;
-        }
-
-        const container = document.getElementById('seo-link-container');
-        const titleSpan = document.getElementById('seo-list-title');
-        if (container && titleSpan && window.prefData) {
-            titleSpan.textContent = `${window.prefData.notes}の釣りスポット一覧を見る`;
-            container.innerHTML = window[`${pref}_seoHtml`] || '';
-        }
-
-        return {
-            main: window.prefData,
-            areas: window.areaData,
-            spots: window.spotData
-        };
-    }
-
-    // 分岐B：金庫(allspotData)から対象県を抽出
-    const vaultData = window.allspotData || window.ALL_REGION_SPOTS || [];
-    let main = null;
-    const areas = [];
-    const spots = [];
-
-    const targetRows = vaultData.filter(row => {
-        return (
-            row._prefCode === pref ||
-            (!row.areaId && row.name === pref) ||
-            row.areaId === pref ||
-            (row.areaId && typeof row.areaId === 'string' && row.areaId.startsWith(pref + '_'))
-        );
-    });
-
-    targetRows.forEach(row => {
-        row.squareX = null;
-        row.squareY = null;
-    });
-
-    targetRows.forEach(row => {
-        if ((!row.areaId || row.individualId === 'parent') && row.name === pref) {
-            main = row;
-        }
-    });
-
-    targetRows.forEach(row => {
-        if ((row.areaId || '').trim() === pref) {
-            if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
-                const grid = parseGrid(row.url);
-                row.squareX = grid.x;
-                row.squareY = grid.y;
-            }
-            areas.push(row);
-        }
-    });
-
-    targetRows.forEach(row => {
-        if (row.type === 'pref' || row.type === 'area') return;
-        const icon = row.icon;
-        if (icon && icon.trim() !== '') {
-            spots.push(row);
-        }
-    });
-
-    if (window.fishDataCache && window.fishDataCache[pref] && typeof applyFishDataToSpots === 'function') {
-        applyFishDataToSpots(spots, window.fishDataCache[pref]);
-    }
-
-    window.prefData = main;
-    window.areaData = areas;
-    window.spotData = spots;
-    window.prefBounds = null;
-
-    if (spots.length > 0 && typeof L !== 'undefined') {
-        let minLat = Infinity, maxLat = -Infinity;
-        let minLng = Infinity, maxLng = -Infinity;
-        spots.forEach(spot => {
-            const lat = Number(spot.lat);
-            const lng = Number(spot.lng);
-            if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                minLat = Math.min(minLat, lat);
-                maxLat = Math.max(maxLat, lat);
-                minLng = Math.min(minLng, lng);
-                maxLng = Math.max(maxLng, lng);
-            }
-        });
-        const latBuffer = Math.max((maxLat - minLat) * 0.1, 0.05);
-        const lngBuffer = Math.max((maxLng - minLng) * 0.1, 0.05);
-        window.prefBounds = L.latLngBounds(
-            [minLat - latBuffer, minLng - lngBuffer],
-            [maxLat + latBuffer, maxLng + lngBuffer]
-        );
-    }
-
-    window[`${pref}_prefData`] = main;
-    window[`${pref}_areaData`] = areas;
-    window[`${pref}_spotData`] = spots;
-    window[`${pref}_prefBounds`] = window.prefBounds;
-
-    if (typeof buildAreaGraphFromGrid === 'function') {
-        buildAreaGraphFromGrid(areas);
-        window[`${pref}_areaGraph`] = window.areaGraph;
-    }
-
-    if (typeof buildSeoHtmlString === 'function') {
-        const seoHtml = buildSeoHtmlString(main, areas, spots);
-        window[`${pref}_seoHtml`] = seoHtml;
-
-        const container = document.getElementById('seo-link-container');
-        const titleSpan = document.getElementById('seo-list-title');
-        if (container && titleSpan && main) {
-            titleSpan.textContent = `${main.notes}の釣りスポット一覧を見る`;
-            container.innerHTML = seoHtml;
-        }
-    }
-
-    return { main, areas, spots };
-}
-async function drawLocation(name, lat, lng, zoom, options = {}) {
-  if (typeof L === 'undefined') {
-    if (typeof window._flushTileQueue === 'function') {
-      window._flushTileQueue();
-    }
-    return;
-  }
-
-  const defaultOptions = {
-    center: [lat, lng],
-    zoom,
-    zoomControl: false,
-    scrollWheelZoom: false,
-    dragging: false,
-    doubleClickZoom: false,
-    boxZoom: false,
-    keyboard: false,
-    touchZoom: false,
-    fadeAnimation: false // ★初期タイルの0.2秒フェード待ちによるLCP遅延を防止
-  };
-
-  const mapOptions = { ...defaultOptions, ...options };
-
-  if (!window.map) {
-
-    window.map = L.map('lf-map', mapOptions);
-
-    window.map.options.zoomSnap = 0.5;
-    window.map.options.zoomDelta = 0.5;
-    window.map.attributionControl.setPosition('topright');
-
-    window.phase1Group = L.layerGroup().addTo(window.map);
-    window.phase2Group = L.layerGroup().addTo(window.map);
-
-    window.gsiLayer = L.tileLayer(
-      window.currentSpotBaseTile || window.gsiLayers.ort,
-      {
-        attribution: '© 国土地理院',
-        keepBuffer: 0, // ★ 初回表示時は画面外の余分なタイル取得をゼロにし、表示領域のタイルだけに全帯域を集中させる
-        updateWhenIdle: true
-      }
-    );
-
-    // タイル画像の取得優先度と非同期デコードを指定する。
-    window.gsiLayer.on('tileloadstart', (e) => {
-        if (e.tile) {
-            e.tile.setAttribute('fetchpriority', 'high');
-            e.tile.decoding = 'async';
-        }
-    });
-
-    // 初期ロード時は、ベースタイルの読み込みと画面反映が終わるまで呼び出し元を待機させる。
-    let resolveInitialTileLoad;
-    const initialTileLoadPromise = window.isInitialMapLoad
-        ? new Promise(resolve => { resolveInitialTileLoad = resolve; })
-        : null;
-
-    // ベースタイルの読み込み完了イベントで keepBuffer を 2 に戻し、後続キューを順次スタート
-    window.gsiLayer.once('load', () => {
-        window.gsiLayer.options.keepBuffer = 2;
-        requestAnimationFrame(() => {
-            if (typeof window._flushTileQueue === 'function') {
-                window._flushTileQueue();
-            }
-            if (resolveInitialTileLoad) {
-                requestAnimationFrame(resolveInitialTileLoad);
-            }
-        });
-    });
-
-    window.gsiLayer.addTo(window.map);
-
-    // ★ 等深線レイヤー(5ファイル)は、ベースタイル描画完了後のキューで開始
-    if (typeof DepthMapController !== 'undefined') {
-        window.runAfterTileLoad(() => {
-            return DepthMapController.initAndShow(window.map);
-        });
-    }
-
-    if (initialTileLoadPromise) await initialTileLoadPromise;
-    return;
-  }
-
-  // 初期URL復帰中の地図移動も、移動完了後の表示タイルが揃うまで待つ。
-  let initialMoveTilePromise = null;
-  if (window.isInitialMapLoad && window.gsiLayer) {
-      const currentCenter = window.map.getCenter();
-      const currentZoom = window.map.getZoom();
-      const isSameView =
-          Math.abs(currentCenter.lat - lat) < 0.000001 &&
-          Math.abs(currentCenter.lng - lng) < 0.000001 &&
-          currentZoom === zoom;
-
-      if (isSameView) {
-          initialMoveTilePromise = Promise.resolve();
-      } else {
-          initialMoveTilePromise = new Promise(resolve => {
-              window.map.once('moveend', () => {
-                  const finishAfterPaint = () => {
-                      requestAnimationFrame(() => requestAnimationFrame(resolve));
-                  };
-                  // GridLayer自身のmoveend処理が終わってから、最終表示範囲のタイル状態を確認する。
-                  requestAnimationFrame(() => {
-                      if (window.gsiLayer._loading) {
-                          window.gsiLayer.once('load', finishAfterPaint);
-                      } else {
-                          finishAfterPaint();
-                      }
-                  });
-              });
-          });
-      }
-  }
-
-  window.map.flyTo([lat, lng], zoom, { duration: 0.5 });
-
-  mapOptions.scrollWheelZoom
-    ? window.map.scrollWheelZoom.enable()
-    : window.map.scrollWheelZoom.disable();
-
-  mapOptions.dragging
-    ? window.map.dragging.enable()
-    : window.map.dragging.disable();
-
-  mapOptions.doubleClickZoom
-    ? window.map.doubleClickZoom.enable()
-    : window.map.doubleClickZoom.disable();
-
-  mapOptions.boxZoom
-    ? window.map.boxZoom.enable()
-    : window.map.boxZoom.disable();
-
-  mapOptions.keyboard
-    ? window.map.keyboard.enable()
-    : window.map.keyboard.disable();
-
-  mapOptions.touchZoom
-    ? window.map.touchZoom.enable()
-    : window.map.touchZoom.disable();
-
-  if (initialMoveTilePromise) await initialMoveTilePromise;
-}
-
-// ★ ユーザー操作待ちを完全廃止：ベースタイルの load 完了後、1フレームに1タスクずつ順番にバトンリレー実行する
-window._tileLoadCallbacks = [];
-window._isFlushingTileQueue = false;
-
-// ★ 1フレームの描画を確実にブラウザへ返してから次の処理へ進むフレーム待機ヘルパー
-window._yieldFrame = function() {
-    return new Promise(resolve => {
-        requestAnimationFrame(() => {
-            const ch = new MessageChannel();
-            ch.port1.onmessage = () => resolve();
-            ch.port2.postMessage(null);
-        });
-    });
-};
-
-window._flushTileQueue = function() {
-    window._firstTileLoaded = true;
-    if (window._isFlushingTileQueue) return;
-    window._isFlushingTileQueue = true;
-
-    const step = async () => {
-        if (window._tileLoadCallbacks.length === 0) {
-            window._isFlushingTileQueue = false;
-            return;
-        }
-        const fn = window._tileLoadCallbacks.shift();
-        try {
-            await fn();
-        } catch (e) {
-            console.error(e);
-        }
-        await window._yieldFrame();
-        step();
-    };
-
-    window._yieldFrame().then(step);
-};
-
-window.runAfterTileLoad = function(callback) {
-    window._tileLoadCallbacks.push(callback);
-    if (window._firstTileLoaded) {
-        window._flushTileQueue();
-    }
-};
+// loadLocationJSON / drawLocation / タイル待機キュー(runAfterTileLoad等) は index.txt へ移動済み
 
 // ==========================================
 // ★ SEO対策用：HTML文字列を一括生成する関数（対象魚非表示版）
@@ -1501,359 +1157,7 @@ function clearSub2Weather() {
 
 // showFishPopup 〜 clearSpotUI は /js/spotLoader.js へ移動済み
 
-window.goBackGuard = false;
-
-function goBack() {
-    // 実行中なら弾く
-    if (window.goBackGuard) return;
-
-    // ★ 判定に使う変数を先に取得
-    const z = window.map ? window.map.getZoom() : 0;
-    const area = window.currentAreaId && window.areaData 
-        ? window.areaData.find(a => String(a.individualId) === String(window.currentAreaId.split('_')[1])) 
-        : null;
-
-    // =====================================
-    // 共通処理：各分岐に入った瞬間にガードをかけ、UIを隠す
-    // =====================================
-    const lockAndHideUI = () => {
-        window.goBackGuard = true; // ★ ご指示の通り、分岐の適切な開始位置でロック
-
-        if (window.map) {
-            window.map.getContainer().classList.remove('is-spot-mode');
-        }
-
-        const backBtn = document.getElementById('map-back-btn');
-        if (backBtn) {
-            backBtn.style.pointerEvents = 'none'; 
-            backBtn.style.transition = 'opacity 0.3s ease';
-            backBtn.style.opacity = '0';
-        }
-
-if (typeof togglePostMode === 'function') togglePostMode(false); // ★戻る時に投稿モードを強制終了
-if (typeof window.hideUserAndTempPins === 'function') window.hideUserAndTempPins(); // ★戻る時にピンも同時にフェードアウト
-
-const tileWrap = document.getElementById('tile-btn-wrap');
-const tileBtn = document.getElementById('map-tile-btn');
-const postBtn = document.getElementById('map-post-btn'); // ★追加
-if (tileWrap && tileBtn) {
-    tileBtn.style.opacity = '0';
-    if (postBtn) postBtn.style.opacity = '0'; // ★追加
-    setTimeout(() => { 
-        tileWrap.style.display = 'none'; 
-        tileBtn.style.display = 'none'; 
-        if (postBtn) postBtn.style.display = 'none'; // ★追加
-    }, 300); 
-}
-
-    };
-
-    // =====================================
-    // 共通処理：UIを再表示する（※ロック解除はしない）
-    // =====================================
-    let isReleased = false;
-    const showBackBtnOnly = () => {
-        if (isReleased) return;
-        isReleased = true;
-        
-        const backBtn = document.getElementById('map-back-btn');
-        if (backBtn) {
-            backBtn.style.display = 'block';
-            requestAnimationFrame(() => {
-                backBtn.style.transition = 'opacity 0.4s ease';
-                // 👇 【修正】 btn になっていたタイポを backBtn に修正
-                backBtn.style.pointerEvents = 'auto'; 
-                backBtn.style.opacity = '1';
-            });
-        }
-    };
-
-    // =====================================================
-    // ⓪ 県トップ画面(PREF) → 広域マップ(REGION)へ戻る
-    // =====================================================
-    if (!window.currentAreaId && !window.currentSpotId) {
-        // ★ Region画面では何もしない（Regionの作り直しを防ぐ）
-        if (!window.currentPref) return;
-
-        // ★ 実行中の二重 goBack を防ぐ（region_management 完了後に解除）
-        window.goBackGuard = true;
-
-        setIdealQuery('pref', null);
-        setIdealQuery('area', null);
-        setIdealQuery('spot', null);
-
-        window.currentPref = null;
-        window.prefData = null;
-        if (typeof clearMapAlert === 'function') clearMapAlert();
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-        
-        window.prefBounds = null;
-        window.areaBounds = null;
-
-        // ★ 県の裏ロード（天気・魚種の付与）を中断する
-        window._prefBgGen = (window._prefBgGen || 0) + 1;
-
-        if (typeof destroyAreaUI === 'function') destroyAreaUI();
-        if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
-        // ★ renderSpotRanking() は region_management 側で描画するため、ここでは呼ばない
-        
-        if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
-        if (window.phase1Group) window.phase1Group.clearLayers();
-        if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-        if (window.prefSpotLayer) {
-            window.map.removeLayer(window.prefSpotLayer);
-            window.prefSpotLayer = null;
-        }
-        
-        const alertBar = document.getElementById("alert-bar");
-        if (alertBar) alertBar.textContent = "";
-
-        // ★ ドットをRegion表示に戻す（currentPref が null なので全県・通常表示になる）
-        if (typeof showPrefSpots === 'function') showPrefSpots();
-
-        // ★ setTimeout(10/300ms) をやめ、region_management の完了を待って後始末する
-        (async () => {
-            try {
-                await new Promise(resolve => requestAnimationFrame(() => resolve()));
-                if (typeof region_management === 'function') await region_management();
-            } catch (err) {
-                console.error('region_management エラー:', err);
-            } finally {
-                const backBtn = document.getElementById('map-back-btn');
-                if (backBtn) {
-                    backBtn.style.display = 'none';
-                    backBtn.style.pointerEvents = 'auto';
-                }
-                if (typeof clearMapAlert === 'function') clearMapAlert();
-                window.goBackGuard = false;
-            }
-        })();
-
-        return;
-    }
-
-    // --- 以降は ① スポット詳細 → Phase2 ... と続きます ---
-
-    // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
-    if (window.currentSpotId != null) {
-        lockAndHideUI(); // ★ ガード開始
-
-        const restoreSpot = typeof buildSpotRestoreObject === 'function' ? buildSpotRestoreObject() : null;
-
-        if (typeof stopZoomGuard === 'function') stopZoomGuard();
-        window.map.dragging.enable();
-        window.map.scrollWheelZoom.enable();
-        window.map.doubleClickZoom.enable();
-        window.map.touchZoom.enable();
-
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
-
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
-
-        if (window.phase2Group) window.phase2Group.clearLayers();
-
-        if (!restoreSpot) {
-            window.goBackGuard = false; 
-            return;
-        }
- 
-        if (typeof clearSpotUI === 'function') clearSpotUI();
-        if (typeof hideRoadLayers === 'function') hideRoadLayers();
-
-        if (restoreSpot.areaId && window.currentAreaId !== restoreSpot.areaId) {
-            window.currentAreaId = restoreSpot.areaId;
-        }
-
-        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-        const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
-        if (parentArea) setIdealQuery('area', parentArea.name);
-        setIdealQuery('spot', null);
-        window.currentSpotId = null;
-
-        showSpotsForArea(window.currentAreaId);
-        window._isRestoringSpot = true;
-        selectSpot(restoreSpot); // ★ ここに渡され、外部で false になる
-        if (typeof showPrefSpots === 'function') showPrefSpots();
-       
-        const checkCompletion = setInterval(() => {
-            if (window._selectSpotCompleted) {
-                clearInterval(checkCompletion);
-                window._selectSpotCompleted = false;
-                
-                //clearSpotUI();
-                enablePhase2(window.map);
-                phase1menu(window.currentAreaId);
-                showBackBtnOnly(); 
-            }
-        }, 50);
-        
-        return;
-    }
-
-    // ② Phase2 (ズーム13 OSM) → Phase1 (ズーム13.5付近 エリアort) へ戻る
-    if (window.currentSpotId == null && window.currentAreaId != null && z >= 12.5 && z <= 13.5) {
-        lockAndHideUI(); // ★ ガード開始
-
-        disablePhase2(window.map);
-        clearSub2Weather();
-        
-        const nsEl = document.getElementById("nearest-spot");
-        if (nsEl) nsEl.textContent = "";
-        
-        window.map.eachLayer(layer => {
-            if (layer === window.gsiLayer) return;
-            if (layer instanceof L.TileLayer) {
-                const url = layer._url || '';
-                if (url.includes('seamlessphoto')) window.map.removeLayer(layer);
-            }
-        });
-
-        if (window.osmLayer) {
-            const osmContainer = window.osmLayer.getContainer();
-            if (osmContainer) {
-                osmContainer.style.transition = 'opacity 2s ease';
-                window.osmLayer.setOpacity(0);
-                setTimeout(() => {
-                    if (window.osmLayer) window.osmLayer.setZIndex(1);
-                }, 2000);
-            }
-        }
-
-        window.map.setMinZoom(0);
-        window.map.setMaxZoom(18);
-
-        window.map.setMaxBounds(null);
-        window.map.options.maxBoundsViscosity = 0;
-
-        if (window.phase2Group) window.phase2Group.clearLayers();
-
-        if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
-        } else {
-            window.gsiLayer.setUrl(window.gsiLayers.ort);
-            if (!window.map.hasLayer(window.gsiLayer)) {
-                window.gsiLayer.addTo(window.map);
-            }
-        }
-        
-        requestAnimationFrame(() => {
-            const gsiContainer = window.gsiLayer.getContainer();
-            if (gsiContainer) {
-                gsiContainer.style.transition = 'opacity 2s ease';
-                window.gsiLayer.setZIndex(100);
-                window.gsiLayer.setOpacity(1);
-            }
-        });
-
-        selectArea(area); // ★ ここに渡され、外部で false になる
-        renderCrowdImage();
-        
-        const targetZoom = area.zoom || window.prefData.zoom;
-        const center = window.map.getCenter();
-        const isSame = Math.abs(center.lat - area.lat) < 0.0001 && Math.abs(center.lng - area.lng) < 0.0001 && window.map.getZoom() === targetZoom;
-
-        if (isSame) {
-            setTimeout(showBackBtnOnly, 50);
-        } else {
-            window.map.once('moveend', showBackBtnOnly);
-            setTimeout(showBackBtnOnly, 800); 
-        }
-        return;
-    }
-
-    // =====================================================
-    // ③ Area -> Pref（県画面に戻る）
-    //    描画・他県データ確認・マーカー表示は pref_management に任せる
-    // =====================================================
-    // ★ 実行中の二重 goBack を防ぐ（completePrefReturn で解除）
-    window.goBackGuard = true;
-    // ★ 遷移中にエリアスワイプが入らないよう、先に無効化する
-    if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
-
-    if (window.osmLayer) {
-        window.map.removeLayer(window.osmLayer);
-        window.osmLayer = null;
-    }
-
-    if (window.phase1Group) window.phase1Group.clearLayers();
-    if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
-
-    if (!window.gsiLayer) {
-        window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
-    } else {
-        window.gsiLayer.setUrl(window.gsiLayers.ort);
-    }
-
-    window.map.setMaxBounds(null);
-    window.map.options.maxBoundsViscosity = 0;
-
-    let isPrefReturned = false;
-    const completePrefReturn = () => {
-        if (isPrefReturned) return;
-        isPrefReturned = true;
-
-        window.map.invalidateSize(true);
-        
-        if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-        setIdealQuery('area', null);
-        setIdealQuery('spot', null);
-
-        window.currentAreaId = null;
-        window.currentSpotId = null;
-
-        if (typeof initAreaUI === 'function') initAreaUI();
-        // ★ showPrefSpots は pref_management 内で実行済みのため呼ばない
-        if (typeof renderPrefWeather === 'function') renderPrefWeather();
-        resetAreaGuide();
-
-        // エリアスワイプをOFFにし、県スワイプをONにする
-        if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
-        if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
-
-        // ★ 旧 releaseLockAndShowBtn()（未定義だった）の代わりにガード解除
-        //   戻るボタンは県画面でも表示のままなので、再表示処理は不要
-        window.goBackGuard = false;
-    };
-
-    (async () => {
-        try {
-            let drawn = false;
-            try {
-                if (typeof pref_management === 'function') {
-                    drawn = await pref_management(window.currentPref);
-                }
-            } catch (err) {
-                console.error('pref_management エラー（従来の描画で続行）:', err);
-            }
-
-            // pref_management が使えなかった場合のみ、従来どおりここで描画する
-            if (!drawn) {
-                drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, window.prefData.zoom);
-
-                const centerPref = window.map.getCenter();
-                const isSamePref = Math.abs(centerPref.lat - window.prefData.lat) < 0.0001 &&
-                                   Math.abs(centerPref.lng - window.prefData.lng) < 0.0001 &&
-                                   window.map.getZoom() === window.prefData.zoom;
-                if (!isSamePref) {
-                    await new Promise(resolve => {
-                        const timer = setTimeout(resolve, 1500); // moveend が来ない場合の保険
-                        window.map.once('moveend', () => { clearTimeout(timer); resolve(); });
-                    });
-                }
-            }
-
-            completePrefReturn();
-        } catch (err) {
-            console.error('エリア→県の復帰エラー:', err);
-            window.goBackGuard = false;
-        }
-    })();
-}
-
-
+// goBack は index.txt へ移動済み
 
 
 // buildSpotRestoreObject は /js/spotLoader.js へ移動済み
@@ -1889,36 +1193,50 @@ let roadRenderPromise = null;
 window.isRoadReady = false;
 window._isRoadLoading = false;
 window._shouldShowRoad = false;
+window._roadQueued = false;
 
-// 道路JSONの取得のみ。読み込み中・読み込み済みなら既存Promise/データを再利用する。
+function isSpotContextForRoad() {
+    if (typeof window.isSpotScreen === 'function') return window.isSpotScreen();
+    return !!(window.currentSpotId || new URLSearchParams(window.location.search).get('spot'));
+}
+
+function fetchRoadJsonWithRetry(url, retries = 1) {
+    return fetch(url, { priority: 'low' }).then(r => {
+        if (!r.ok) throw new Error('road JSON fetch failed: ' + r.status);
+        return r.json();
+    }).catch(err => {
+        if (retries > 0) {
+            return new Promise(resolve => setTimeout(resolve, 350))
+                .then(() => fetchRoadJsonWithRetry(url, retries - 1));
+        }
+        throw err;
+    });
+}
+
+// 道路JSONの取得のみ。読み込み中・読み込み済みなら既存Promise/データを再利用する（スポット画面では取得しない）。
 window.loadRoadData = function() {
+    if (isSpotContextForRoad()) return Promise.resolve(null);
     if (cachedMotorwayData && cachedTrunkData) return Promise.resolve([cachedMotorwayData, cachedTrunkData]);
     if (roadDataPromise) return roadDataPromise;
     const regionCode = window.currentRegion || 'KANTO';
     roadDataPromise = Promise.all([
-        fetch(`/${regionCode}/enc_motorway.json`, { priority: 'low' }).then(r => {
-            if (!r.ok) throw new Error('motorway JSON fetch failed: ' + r.status);
-            return r.json();
-        }),
-        fetch(`/${regionCode}/enc_trunk.json`, { priority: 'low' }).then(r => {
-            if (!r.ok) throw new Error('trunk JSON fetch failed: ' + r.status);
-            return r.json();
-        })
+        fetchRoadJsonWithRetry(`/${regionCode}/enc_motorway.json`, 1),
+        fetchRoadJsonWithRetry(`/${regionCode}/enc_trunk.json`, 1)
     ]).then(([motorwayData, trunkData]) => {
         cachedMotorwayData = motorwayData || [];
         cachedTrunkData = trunkData || [];
         return [cachedMotorwayData, cachedTrunkData];
     }).catch(error => {
         roadDataPromise = null;
-        console.error('道路JSON取得エラー:', error);
-        throw error;
+        console.warn('道路JSON取得スキップ:', error && error.message ? error.message : error);
+        return null;
     });
     return roadDataPromise;
 };
 
 // 取得済みJSONから道路レイヤーを生成・描画する。
 function renderRoadLayers(map) {
-    if (!map || window.isRoadReady) return Promise.resolve();
+    if (!map || window.isRoadReady || isSpotContextForRoad()) return Promise.resolve();
     if (roadRenderPromise) return roadRenderPromise;
     window._isRoadLoading = true;
     if (!map.getPane('trunkPane')) {
@@ -1940,39 +1258,46 @@ function renderRoadLayers(map) {
     motorwayRenderer = L.svg({ pane: 'motorwayPane', padding: 1.5 });
     roadLayerGroup = L.layerGroup();
 
-    roadRenderPromise = window.loadRoadData().then(() => new Promise(resolve => {
-        let mIdx = 0, tIdx = 0;
-        function buildRoadSlice() {
-            const start = performance.now();
-            while (mIdx < cachedMotorwayData.length && (performance.now() - start) < 4) {
-                const item = cachedMotorwayData[mIdx++];
-                roadLayerGroup.addLayer(L.Polyline.fromEncoded(item.p, {
-                    className: 'road-motorway', color: '#155934',
-                    interactive: false, renderer: motorwayRenderer
-                }));
-            }
-            while (tIdx < cachedTrunkData.length && (performance.now() - start) < 4) {
-                const item = cachedTrunkData[tIdx++];
-                roadLayerGroup.addLayer(L.Polyline.fromEncoded(item.p, {
-                    className: 'road-trunk', color: '#DCDCDC',
-                    interactive: false, renderer: trunkRenderer
-                }));
-            }
-            if (mIdx < cachedMotorwayData.length || tIdx < cachedTrunkData.length) {
-                requestAnimationFrame(buildRoadSlice);
-            } else {
-                window.isRoadReady = true;
-                window._isRoadLoading = false;
-                map.on('zoomend', updateRoadStyle);
-                if (window._shouldShowRoad) triggerRoadFadeIn();
-                resolve();
-            }
+    roadRenderPromise = window.loadRoadData().then(data => {
+        if (!data || !cachedMotorwayData || !cachedTrunkData || isSpotContextForRoad()) {
+            window._isRoadLoading = false;
+            roadRenderPromise = null;
+            return;
         }
-        requestAnimationFrame(buildRoadSlice);
-    })).catch(error => {
+        return new Promise(resolve => {
+            let mIdx = 0, tIdx = 0;
+            function buildRoadSlice() {
+                const start = performance.now();
+                while (mIdx < cachedMotorwayData.length && (performance.now() - start) < 4) {
+                    const item = cachedMotorwayData[mIdx++];
+                    roadLayerGroup.addLayer(L.Polyline.fromEncoded(item.p, {
+                        className: 'road-motorway', color: '#155934',
+                        interactive: false, renderer: motorwayRenderer
+                    }));
+                }
+                while (tIdx < cachedTrunkData.length && (performance.now() - start) < 4) {
+                    const item = cachedTrunkData[tIdx++];
+                    roadLayerGroup.addLayer(L.Polyline.fromEncoded(item.p, {
+                        className: 'road-trunk', color: '#DCDCDC',
+                        interactive: false, renderer: trunkRenderer
+                    }));
+                }
+                if (mIdx < cachedMotorwayData.length || tIdx < cachedTrunkData.length) {
+                    requestAnimationFrame(buildRoadSlice);
+                } else {
+                    window.isRoadReady = true;
+                    window._isRoadLoading = false;
+                    map.on('zoomend', updateRoadStyle);
+                    if (window._shouldShowRoad && !isSpotContextForRoad()) triggerRoadFadeIn();
+                    resolve();
+                }
+            }
+            requestAnimationFrame(buildRoadSlice);
+        });
+    }).catch(error => {
         window._isRoadLoading = false;
         roadRenderPromise = null;
-        console.error('道路レイヤー描画エラー:', error);
+        console.warn('道路レイヤー描画スキップ:', error && error.message ? error.message : error);
     });
     return roadRenderPromise;
 }
@@ -2037,17 +1362,30 @@ function updateRoadStyle() {
 // ★ レイヤー自体の存在・表示状態のみで判定する関数（初回タイル優先版）
 // ==========================================
 window.showRoadLayers = function() {
+    // ★ スポット画面では道路データは不要のため一切取得・描画しない
+    if (isSpotContextForRoad()) {
+        window._shouldShowRoad = false;
+        return;
+    }
     window._shouldShowRoad = true;
     if (!window.map) return;
     if (window.isRoadReady) {
         if (!window.map.hasLayer(roadLayerGroup)) roadLayerGroup.addTo(window.map);
         updateRoadStyle();
     } else {
+        if (window._roadQueued || window._isRoadLoading) return;
+        window._roadQueued = true;
         // JSON取得は先行し、ベースタイル完了後のキューでは描画だけを行う
-        window.runAfterTileLoad(() => {
-            if (!window._shouldShowRoad || !window.map) return;
+        const runRoad = () => {
+            window._roadQueued = false;
+            if (!window._shouldShowRoad || !window.map || isSpotContextForRoad()) return;
             return renderRoadLayers(window.map);
-        });
+        };
+        if (typeof window.runAfterTileLoad === 'function') {
+            window.runAfterTileLoad(runRoad);
+        } else {
+            runRoad();
+        }
     }
 };
 

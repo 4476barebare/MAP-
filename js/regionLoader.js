@@ -280,15 +280,16 @@ function rebuildAllSpotData() {
     return window.allspotData;
 }
 
-function fetchAndStorePrefSpots(prefCode) {
+function fetchAndStorePrefSpots(prefCode, priority = 'low') {
     if (!prefCode) return Promise.resolve([]);
     if (Array.isArray(window.prefSpotData[prefCode])) return Promise.resolve(window.prefSpotData[prefCode]);
     if (window.prefSpotPromises[prefCode]) return window.prefSpotPromises[prefCode];
 
     const regionCode = window.currentRegion || 'KANTO';
     const url = `/${regionCode}/${prefCode}_location.json`;
+    const maxRetries = priority === 'high' ? 1 : 0;
 
-    const promise = fetch(url, { priority: 'low' })
+    const doFetch = (attempt) => fetch(url, { priority })
         .then(res => {
             if (!res.ok) throw new Error("location.json fetch failed: " + res.status);
             return res.json();
@@ -301,11 +302,16 @@ function fetchAndStorePrefSpots(prefCode) {
             return data;
         })
         .catch(error => {
+            if (attempt < maxRetries) {
+                return new Promise(resolve => setTimeout(resolve, 300))
+                    .then(() => doFetch(attempt + 1));
+            }
             delete window.prefSpotPromises[prefCode];
-            console.error("都道府県JSON取得エラー:", prefCode, error);
+            console.warn("都道府県JSON取得スキップ:", prefCode, error && error.message ? error.message : error);
             return [];
         });
 
+    const promise = doFetch(0);
     window.prefSpotPromises[prefCode] = promise;
     return promise;
 }
@@ -327,7 +333,8 @@ window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
     if (mode === 'select') targetList = [prefCode];
     if (mode === 'other') targetList = prefList.filter(code => code !== prefCode);
 
-    const loadedRows = await Promise.all(targetList.map(fetchAndStorePrefSpots));
+    const fetchPriority = mode === 'select' ? 'high' : 'low';
+    const loadedRows = await Promise.all(targetList.map(code => fetchAndStorePrefSpots(code, fetchPriority)));
 
     if (mode === 'all') {
         window._isAllRegionLoaded = prefList.every(code => Array.isArray(window.prefSpotData[code]));
@@ -470,7 +477,11 @@ function showPrefSpots() {
 
     const selectedPref = String(window.currentPref || '');
 
-    if (window.currentSpotId) {
+    const isSpotMode = (typeof window.isSpotScreen === 'function')
+        ? window.isSpotScreen()
+        : !!(window.currentSpotId || new URLSearchParams(window.location.search).get('spot'));
+
+    if (isSpotMode) {
         window.regionSpotMarkers.forEach(marker => {
             const el = marker.getElement();
             if (!el) return;
@@ -493,7 +504,7 @@ function showPrefSpots() {
             el.style.pointerEvents = 'none';
             marker._regionRepresentative = false;
         });
-        showRoadLayers();
+        if (typeof showRoadLayers === 'function') showRoadLayers();
         return;
     }
 
@@ -516,7 +527,7 @@ function showPrefSpots() {
         }
         marker._regionRepresentative = false;
     });
-    showRoadLayers();
+    if (typeof showRoadLayers === 'function') showRoadLayers();
 }
 
 function handleRegionNearest(latlng) {
