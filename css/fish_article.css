@@ -1420,3 +1420,166 @@ a.sns-col-link:active {
 #policyModal .contact-x-btn:hover {
   opacity: 0.85;
 }
+
+
+/* =========================================
+   index.html と共通：サイトポリシーモーダル
+========================================= */
+/* 暗幕：外側タップで閉じられる領域 */
+#snsModal,
+#newsModal,
+#policyModal,
+#rankingBasisModal {
+  background: rgba(10, 10, 50, 0.55);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  overscroll-behavior: contain;
+  touch-action: none; /* 暗幕上のスワイプを背面に伝えない */
+}
+
+/* 本体：上下に余白を残し、中だけスクロール */
+#snsModal .modal-content,
+#newsModal .modal-content,
+#policyModal .modal-content,
+#rankingBasisModal .modal-content {
+  width: min(92vw, 560px);
+  max-height: 78vh;
+  max-height: 78dvh;
+  margin: 11vh auto 0;
+  margin: 11dvh auto 0;
+  padding: 0 10px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: #f4f7fd;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* 固定タイトル（薄い青背景＋#191970文字） */
+#snsModal .modal-content::before          { content: "SNS釣果 ・ 外側タップで閉じる"; }
+#newsModal .modal-content::before         { content: "釣りNEWS ・ 外側タップで閉じる"; }
+#policyModal .modal-content::before       { content: "サイトポリシー・お問い合わせ ・ 外側タップで閉じる"; }
+#rankingBasisModal .modal-content::before { content: "選出根拠・データ一覧 ・ 外側タップで閉じる"; }
+
+#snsModal .modal-content::before,
+#newsModal .modal-content::before,
+#policyModal .modal-content::before,
+#rankingBasisModal .modal-content::before {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: block;
+  margin: 0 -10px 8px;
+  padding: 10px 14px 8px;
+  background: #f4f7fd;
+  color: #191970;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(25, 25, 112, 0.15);
+}
+
+/* =========================================
+   index.html と共通：サイトポリシー＆お問い合わせカード
+========================================= */
+/* =========================================
+   共通モーダル内：サイトポリシー＆お問い合わせ（カード統一）
+========================================= */
+
+#policyModal .policy-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+#policyModal .policy-btn {
+  flex: 1 1 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  border: 1px solid rgba(25, 25, 112, 0.25);
+  border-radius: 999px;
+  background: #fff;
+  color: #191970;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+#policyModal .policy-btn.active {
+  background: #191970;
+  color: #fff;
+  border-color: #191970;
+}
+
+#policyModal #policySection,
+#policyModal #contactSection {
+  padding: 12px 12px 14px;
+  background: #fff;
+  border: 1px solid rgba(25, 25, 112, 0.12);
+  border-left: 3px solid #191970;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  color: #191970;
+  line-height: 1.65;
+}
+
+#policyModal #policySection h1,
+#policyModal #contactSection h1 {
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
+  color: #191970;
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(25, 25, 112, 0.15);
+}
+
+#policyModal #policySection h2,
+#policyModal #contactSection h2 {
+  font-size: 12.5px;
+  font-weight: bold;
+  color: #191970;
+  margin: 12px 0 4px;
+}
+
+#policyModal #policySection p,
+#policyModal #contactSection p {
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0 0 8px;
+  color: #191970;
+  opacity: 0.9;
+}
+
+#policyModal #policySection p:last-child,
+#policyModal #contactSection p:last-child {
+  margin-bottom: 0;
+}
+
+.contact-x-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff !important;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.contact-x-btn:active {
+  opacity: 0.75;
+  transform: translateY(1px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .contact-x-btn:hover {
+    opacity: 0.85;
+  }
+}
