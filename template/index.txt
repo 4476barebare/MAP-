@@ -595,7 +595,7 @@ function updateSeoMeta() {
         }
 
         // ★ タイルロード等を一切阻害せず、アクセス情報枠と魚データの準備完了まで待機してから2点を描画
-        waitAndRenderSpotDetails(spotName);
+        if (typeof waitAndRenderSpotDetails === 'function') waitAndRenderSpotDetails(spotName);
 
     } else if (area) {
         newTitle = `${area}${pref ? `（${pref}）` : ''}の釣り場マップ・釣れる魚と最新釣果・潮見表｜釣り行こNAVI`;
@@ -707,111 +707,7 @@ function updateSeoMeta() {
     }
 }
 
-// ==========================================
-// ★ スポット詳細の「主な対象魚」「最新の釣果情報」を準備完了まで待機して描画する関数
-// ==========================================
-let _spotDetailsRenderTimer = null;
-
-function waitAndRenderSpotDetails(spotName, retryCount = 0) {
-    if (_spotDetailsRenderTimer) {
-        clearTimeout(_spotDetailsRenderTimer);
-        _spotDetailsRenderTimer = null;
-    }
-
-    // URLのspotパラメータが変わっていたら（別画面へ遷移していたら）中止
-    const params = new URLSearchParams(window.location.search);
-    const currentSpotParam = params.get('spot');
-    if (!currentSpotParam || currentSpotParam !== spotName) return;
-
-    // 1. スポットデータの準備確認
-    const targetSpot = (window.spotData && window.spotData.length > 0)
-        ? window.spotData.find(s => s.name === spotName)
-        : null;
-
-    // 2. アクセス情報枠 (#accessInfoBox) と ICデータ (window.isIcLoaded) の準備確認
-    const accessBox = document.getElementById('accessInfoBox');
-    const h3El = accessBox ? accessBox.querySelector('h3') : null;
-    const isAccessBoxRendered = !!(
-        accessBox &&
-        accessBox.style.display !== 'none' &&
-        h3El &&
-        h3El.textContent.includes(spotName)
-    );
-
-    // 3. スポットへのズーム遷移 (zoomToSpot内のrenderAccessInfo) が完了しているか確認
-    const hasSpotZoom = !!(targetSpot && targetSpot.zoom && String(targetSpot.zoom).trim() !== '');
-    const isZoomToSpotDone = !hasSpotZoom || !!window.currentSpotBaseTile;
-
-    // 4. 魚データ (window.fishData) と釣具店データの到着確認（2.5秒経過時はタイムアウト許容して描画へ進む）
-    const isFishDataReady = !!window.fishData || retryCount >= 25;
-    const isShopDataReady = !!(window.markerControl && window.markerControl.allShops && window.markerControl.allShops.length > 0) || retryCount >= 25;
-
-    const isIcReady = !!window.isIcLoaded || retryCount >= 25;
-    // 必須条件が揃っていなければ 100ms 後に非同期リトライ（最大50回＝5秒）
-    if ((!targetSpot || !isIcReady || !isAccessBoxRendered || !isZoomToSpotDone || !isFishDataReady || !isShopDataReady) && retryCount < 50) {
-        _spotDetailsRenderTimer = setTimeout(() => {
-            waitAndRenderSpotDetails(spotName, retryCount + 1);
-        }, 100);
-        return;
-    }
-
-    if (!targetSpot || !accessBox) return;
-
-    // 準備完了後、最新の targetSpot.URL から魚種リストを抽出
-    let uniqueNames = [];
-    if (targetSpot.URL && typeof targetSpot.URL === 'string') {
-        const items = targetSpot.URL.split(',');
-        const names = items.map(item => item.split('|')[0]).filter(Boolean);
-        uniqueNames = [...new Set(names)];
-    }
-
-    // ① 主な対象魚を描画
-    if (typeof renderFishSection === 'function') {
-        renderFishSection(uniqueNames);
-    }
-
-    // ② 最新の釣果情報を描画（対象魚が無いスポットでも独立して実行）
-    if (typeof renderRecentCatches === 'function') {
-        renderRecentCatches(targetSpot);
-    }
-
-    // ③ 魚データや逆引き辞書が後から届いた場合のために meta description と JSON-LD も最新化
-    const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
-    if (uniqueNames.length > 0 || (dictEntry && dictEntry.description)) {
-        const pref = params.get('pref') || '';
-        const area = params.get('area') || '';
-        const baseDesc = (dictEntry && dictEntry.description)
-            ? dictEntry.description
-            : `${pref}${area}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
-        const extraPrefix = uniqueNames.length > 0 ? `対象魚や周辺情報: ${uniqueNames.join('、')}など。` : '';
-        const fullDesc = extraPrefix + baseDesc;
-
-        const descMeta = document.querySelector('meta[name="description"]');
-        if (descMeta) descMeta.setAttribute('content', fullDesc);
-        const ogDescMeta = document.querySelector('meta[property="og:description"]');
-        if (ogDescMeta) ogDescMeta.setAttribute('content', fullDesc);
-
-        const ldScript = document.getElementById('seo-json-ld');
-        if (ldScript && targetSpot.lat && targetSpot.lng) {
-            try {
-                const ldData = JSON.parse(ldScript.textContent);
-                ldData.description = (dictEntry && dictEntry.description) ? dictEntry.description : fullDesc;
-                if (dictEntry) {
-                    if (dictEntry.alternateName) ldData.alternateName = dictEntry.alternateName;
-                    if (dictEntry.addressRegion || dictEntry.addressLocality) {
-                        ldData.address = {
-                            "@type": "PostalAddress",
-                            "addressCountry": "JP",
-                            "addressRegion": dictEntry.addressRegion || pref || "",
-                            "addressLocality": dictEntry.addressLocality || ""
-                        };
-                    }
-                }
-                ldScript.textContent = JSON.stringify(ldData);
-            } catch (e) {}
-        }
-    }
-}
+// waitAndRenderSpotDetails は /js/spotLoader.js へ移動済み
 
 // ==========================================
 // ★ URLに日本語クエリを付与・更新する共通関数 (タイトル連動版)
@@ -927,6 +823,103 @@ window.prefSpotData = window.prefSpotData || {};
 window.prefSpotPromises = window.prefSpotPromises || {};
 window.prefDictionaryCache = window.prefDictionaryCache || {};
 window.prefDictionaryPromises = window.prefDictionaryPromises || {};
+window.fishDataCache = window.fishDataCache || {};
+window.fishDataPromises = window.fishDataPromises || {};
+
+if (typeof window.toWeatherIcon !== 'function') {
+    window.toWeatherIcon = function(code) {
+        if (code >= 70) return "☔️";
+        if (code >= 60) return "☂️";
+        if (code >= 30) return "☁️";
+        if (code >= 10) return "⛅";
+        if (code === 1) return "🌤";
+        if (code === 2) return "⛅";
+        return "☀️";
+    };
+}
+
+if (typeof window.applyFishDataToSpots !== 'function') {
+    window.applyFishDataToSpots = function(spots, fishData) {
+        if (!Array.isArray(spots)) return;
+        if (!fishData || typeof fishData !== 'object') {
+            spots.forEach(spot => { spot.URL = ""; });
+            return;
+        }
+        const fishDict = {};
+        for (const regKey in fishData) {
+            const areaSpots = fishData[regKey];
+            if (!areaSpots || typeof areaSpots !== 'object') continue;
+            for (const spotName in areaSpots) {
+                fishDict[spotName] = areaSpots[spotName];
+            }
+        }
+        spots.forEach(spot => {
+            const spotFishData = fishDict[spot.name];
+            if (!spotFishData) { spot.URL = ""; return; }
+            const fishList = [];
+            for (const fishName in spotFishData) {
+                const info = spotFishData[fishName];
+                if (info && typeof info.coords === 'string' && info.coords !== '') {
+                    info.coords.split('|').forEach(pt => {
+                        const [lat, lng] = pt.split(',');
+                        if (lat && lng) fishList.push(`${fishName}|${lat}|${lng}`);
+                    });
+                }
+            }
+            spot.URL = fishList.join(',');
+        });
+    };
+}
+
+if (typeof window.loadFishDataForPref !== 'function') {
+    window.loadFishDataForPref = function(pref, fishUrl) {
+        if (!pref || !fishUrl) return Promise.resolve(null);
+        if (window.fishDataCache[pref]) {
+            const cachedSpots = window.prefSpotData?.[pref];
+            if (Array.isArray(cachedSpots)) window.applyFishDataToSpots(cachedSpots, window.fishDataCache[pref]);
+            return Promise.resolve(window.fishDataCache[pref]);
+        }
+        if (window.fishDataPromises[pref]) return window.fishDataPromises[pref];
+        window.fishDataPromises[pref] = fetch(fishUrl)
+            .then(res => {
+                if (!res.ok) throw new Error("fish.json fetch failed: " + res.status);
+                return res.json();
+            })
+            .then(fishData => {
+                if (fishData && typeof fishData === 'object') {
+                    window.fishDataCache[pref] = fishData;
+                    const targetSpots = window.prefSpotData?.[pref];
+                    if (Array.isArray(targetSpots)) window.applyFishDataToSpots(targetSpots, fishData);
+                }
+                return fishData;
+            })
+            .catch(() => {
+                delete window.fishDataPromises[pref];
+                return null;
+            });
+        return window.fishDataPromises[pref];
+    };
+}
+
+if (typeof window.loadFishDataAsync !== 'function') {
+    window.loadFishDataAsync = function(pref, fishUrl) {
+        if (!pref || !fishUrl) return Promise.resolve(null);
+        return window.loadFishDataForPref(pref, fishUrl).then(fishData => {
+            if (fishData && window.currentPref === pref) {
+                window.fishData = fishData;
+                if (window.spotData) window.applyFishDataToSpots(window.spotData, fishData);
+                if (window.currentSpotId && window.spotData) {
+                    const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    if (activeSpot && activeSpot.URL) {
+                        if (typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
+                        if (typeof updateSeoMeta === 'function') updateSeoMeta();
+                    }
+                }
+            }
+            return fishData;
+        });
+    };
+}
 
 if (typeof window.loadRegionCsvData !== 'function') {
     window.loadRegionCsvData = function() {
@@ -1733,16 +1726,16 @@ async function loadPrefectureData(prefCode) {
         if (jnnRow && window.currentPref === prefCode) {
             jnnRow.style.display = 'flex';
         }
-        if (window.currentPref === prefCode && window.prefData) {
+        if (window.currentPref === prefCode && window.prefData && typeof getAlertText === 'function') {
             getAlertText(window.prefData);
         }
         
         // ★ 3. 天気JSONとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で取得する
         // 既存の画面遷移・後続処理を維持し、天気取得部分だけ新JSON関数へ切り替える。
-        window.runAfterTileLoad(async () => {
+        const loadDeferredPrefExtras = async () => {
             await Promise.all([
-                AddWeather(prefCode, 'select').catch(() => null),
-                AddInLandWeather(prefCode, 'select').catch(() => null)
+                typeof AddWeather === 'function' ? AddWeather(prefCode, 'select').catch(() => null) : Promise.resolve(null),
+                typeof AddInLandWeather === 'function' ? AddInLandWeather(prefCode, 'select').catch(() => null) : Promise.resolve(null)
             ]);
 
             if (window.currentPref === prefCode) {
@@ -1768,7 +1761,12 @@ async function loadPrefectureData(prefCode) {
                     if (activeSpot) renderShopSection(activeSpot);
                 }
             }
-        });
+        };
+        if (typeof window.runAfterTileLoad === 'function') {
+            window.runAfterTileLoad(loadDeferredPrefExtras);
+        } else {
+            loadDeferredPrefExtras();
+        }
 
         return true; 
     } catch (err) {
@@ -1913,24 +1911,7 @@ function loadAndRenderCategorizedArticles(targetDomId) {
 
 
 
-// =======================
-// ZOOM GUARD
-// =======================
-function startZoomGuard() {
-    if (!window.map) return;
-    window._zoomGuardBase = window.map.getZoom();
-    window._zoomGuardActive = true;
-}
-
-function isZoomGuardFailed(threshold = 0.3) {
-    if (!window._zoomGuardActive || !window.map) return false;
-    return (window.map.getZoom() - window._zoomGuardBase) > threshold;
-}
-
-function stopZoomGuard() {
-    window._zoomGuardActive = false;
-    window._zoomGuardBase = null;
-}
+// startZoomGuard / isZoomGuardFailed / stopZoomGuard は /js/spotLoader.js へ移動済み
 
 
 // =======================
@@ -1976,12 +1957,12 @@ document.addEventListener('touchmove', (e) => {
 
         pinchTriggered = true;
 
-        if (isZoomGuardFailed()) return;
+        if (typeof isZoomGuardFailed === 'function' && isZoomGuardFailed()) return;
 
         //const isPrefView = !window.currentAreaId && !window.currentSpotId;
         //if (isPrefView) return;
 
-        goBack(window.currentHash);
+        if (typeof goBack === 'function') goBack(window.currentHash);
     }
 
 }, { passive: true });
@@ -2406,41 +2387,11 @@ function clearRegionMarkers() {
     }
 }
 
-// タイル切り替えボタンのクリックイベント
-document.getElementById('map-tile-btn')?.addEventListener('click', () => {
-            if (!window.map || !window.gsiLayer) return;
-
-            // ★ 管理変数から取得
-            const osmUrl = window.TILE_URLS.osm;
-            const currentUrl = window.gsiLayer._url;
-
-            if (currentUrl === osmUrl) {
-                // 1. OSMから、記憶しているスポット本来のタイル（ort か photo）に戻す
-                const baseTile = window.currentSpotBaseTile || window.TILE_URLS.photo;
-                window.gsiLayer.setUrl(baseTile);
-                
-                window.map.attributionControl.removeAttribution('© OpenStreetMap contributors');
-                window.map.attributionControl.addAttribution('国土地理院');
-            } else {
-                // 2. 本来のタイルからOSMに切り替える
-                window.gsiLayer.setUrl(osmUrl);
-                
-                window.map.attributionControl.removeAttribution('国土地理院');
-                window.map.attributionControl.addAttribution('© OpenStreetMap contributors');
-            }
-
-            // =====================================
-            // ★ 最強の強制リフレッシュ
-            // =====================================
-            setTimeout(() => {
-                // Leafletの内部メソッドを使ってコンテナを強制再構築
-                window.map._resetView(window.map.getCenter(), window.map.getZoom());
-            }, 50);
-        });
+// #map-tile-btn クリックイベントは /js/spotLoader.js へ移動済み
 
 
 document.getElementById('map-back-btn')?.addEventListener('click', () => {
-    goBack(window.currentHash);
+    if (typeof goBack === 'function') goBack(window.currentHash);
 });
 
 // ================================
@@ -2692,7 +2643,7 @@ function getParsedPrefQuery() {
 function loadWhetherCSV(url) {
     const match = url && url.match(/\/([A-Za-z0-9-]+)_whether\.(?:csv|json)(?:$|[?#])/);
     const prefCode = match ? match[1] : window.currentPref;
-    if (!prefCode) return Promise.resolve(null);
+    if (!prefCode || typeof loadPrefWeatherJson !== 'function') return Promise.resolve(null);
     return loadPrefWeatherJson(prefCode, false);
 }
 
@@ -2701,7 +2652,7 @@ function loadWhetherCSV(url) {
 function loadInlandWhetherCSV(regionCode) {
     // 旧引数 regionCode は互換性のため受け取る。JSONは現在表示中の県単位で取得する。
     const prefCode = window.currentPref;
-    if (!prefCode) return Promise.resolve(null);
+    if (!prefCode || typeof loadPrefWeatherJson !== 'function') return Promise.resolve(null);
     return loadPrefWeatherJson(prefCode, true);
 }
 
@@ -2713,8 +2664,8 @@ function preloadCsvFiles(regionCode, prefCode) {
 
     // 旧関数名・引数を暫定維持し、天気JSONの先行取得へ委譲する。
     Promise.all([
-        AddWeather(prefCode, 'select'),
-        AddInLandWeather(prefCode, 'select')
+        typeof AddWeather === 'function' ? AddWeather(prefCode, 'select') : Promise.resolve(null),
+        typeof AddInLandWeather === 'function' ? AddInLandWeather(prefCode, 'select') : Promise.resolve(null)
     ]).catch(() => {});
 }
 
@@ -2774,112 +2725,7 @@ function getRegionCode() {
     return REGION_MAP[q] || 'KANTO'; // デフォルトはKANTO
 }
 
-window.icData = [];
-window.isIcLoaded = false;
-let icDataPromise = null;
-function loadICData() {
-    if (window.isIcLoaded) return Promise.resolve(window.icData);
-    if (icDataPromise) return icDataPromise;
-    icDataPromise = fetch('data/KANTO_geo.json')
-        .then(res => {
-            if (!res.ok) throw new Error('IC JSON fetch failed: ' + res.status);
-            return res.json();
-        })
-        .then(data => {
-            window.icData = data;
-            window.isIcLoaded = true;
-            if (window.currentSpotId && window.spotData && typeof renderAccessInfo === 'function') {
-                const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
-                if (activeSpot) {
-                    renderAccessInfo(activeSpot);
-                    if (typeof waitAndRenderSpotDetails === 'function') waitAndRenderSpotDetails(activeSpot.name);
-                }
-            }
-            return data;
-        })
-        .catch(error => {
-            icDataPromise = null;
-            console.error('ICデータ読み込みエラー:', error);
-            return null;
-        });
-    return icDataPromise;
-}
-
-// ==========================================
-// ★ 魚種名おまとめ辞書（出世魚や別名を統一）
-// ==========================================
-const FISH_DICTIONARY = {
-    "ツバス": "ワカシ",
-    "ワカシ": "ワカシ",
-    "ハマチ": "イナダ",
-    "イナダ": "イナダ",
-    "メジロ": "ワラサ",
-    "ワラサ": "ワラサ",
-    "ブリ": "ブリ",
-    "セイゴ": "スズキ",
-    "フッコ": "スズキ",
-    "スズキ": "スズキ",
-    "サゴシ": "サワラ",
-    "サワラ": "サワラ",
-    "カイズ": "クロダイ",
-    "チヌ": "クロダイ",
-    "クロダイ": "クロダイ",
-    "コハダ": "コノシロ",
-    "コノシロ": "コノシロ",
-    "クチボソ": "モツゴ",
-    "モツゴ": "モツゴ",
-    "ヤマベ": "オイカワ",
-    "オイカワ": "オイカワ",
-    "グレ": "メジナ",
-    "メジナ": "メジナ"
-};
-
-// ==========================================
-// ★ 新規：対象魚種データを描画する関数（辞書変換＆ソート対応版）
-// ==========================================
-function renderFishSection(uniqueNames) {
-    const accessBox = document.getElementById('accessInfoBox');
-    if (!accessBox) return;
-
-    // 既存の魚種エリアがあれば削除（重複防止）
-    const oldFishArea = document.getElementById('spot-fish-section');
-    if (oldFishArea) oldFishArea.remove();
-
-    if (!uniqueNames || uniqueNames.length === 0) return;
-
-    // 1. 全角カタカナ（と長音符）のみにフィルターし、周辺施設などを弾く
-    const fishOnly = uniqueNames.filter(name => /^[ァ-ヴー]+$/.test(name));
-
-    // 2. 辞書を使って名称を変換（辞書にない魚はそのままの名前を使う）
-    const mappedFish = fishOnly.map(name => FISH_DICTIONARY[name] || name);
-
-    // 3. 変換した結果、重複したもの（例：セイゴとフッコが両方いて「スズキ」が2つになった場合）を再度まとめる
-    const finalFishList = [...new Set(mappedFish)];
-
-    // 4. あいうえお順（五十音順）にソートする
-    finalFishList.sort((a, b) => a.localeCompare(b, 'ja'));
-
-    // 魚種が1つも残らなかった場合は表示せずに終了
-    if (finalFishList.length === 0) return;
-
-    // 魚種表示用のコンテナを生成
-    const fishDiv = document.createElement('div');
-    fishDiv.id = 'spot-fish-section';
-    fishDiv.style.marginTop = '12px';
-    fishDiv.style.paddingTop = '10px';
-    fishDiv.style.borderTop = '1px dashed rgba(25, 25, 112, 0.2)';
-
-    let html = `<div style="font-weight: bold; font-size: 13px; margin-bottom: 4px;">🐟 主な対象魚</div>`;
-    html += `<div style="font-size: 13px; line-height: 1.5;">${finalFishList.join('、')}</div>`;
-
-    fishDiv.innerHTML = html;
-    const catchSection = document.getElementById('spot-catch-section');
-    if (catchSection && catchSection.parentNode === accessBox) {
-        accessBox.insertBefore(fishDiv, catchSection);
-    } else {
-        accessBox.appendChild(fishDiv);
-    }
-}
+// loadICData / FISH_DICTIONARY / renderFishSection は /js/spotLoader.js へ移動済み
 
 
 
