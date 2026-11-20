@@ -348,10 +348,25 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         ? (typeof AddInLandWeather === 'function' ? AddInLandWeather(prefCode, 'select') : Promise.resolve(0))
         : (typeof AddWeather === 'function' ? AddWeather(prefCode, 'select') : Promise.resolve(0));
 
+    const isCurrentTargetSpot = () => (
+        window.currentPref === prefCode &&
+        window.currentSpotId &&
+        String(window.currentSpotId) === String(spot.individualId) &&
+        (!window.currentAreaId || !spot.areaId || String(window.currentAreaId) === String(spot.areaId))
+    );
+
     const fishPromise = typeof loadFishDataAsync === 'function'
         ? loadFishDataAsync(prefCode, window.fishUrl).then(fishData => {
-            if (window.currentPref === prefCode && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
+            if (isCurrentTargetSpot()) {
+                if (!spot.URL && fishData && typeof applyFishDataToSpots === 'function') {
+                    applyFishDataToSpots([spot], fishData);
+                }
+                if (hasSpotZoom && spot.URL && typeof showFishMarkers === 'function') {
+                    showFishMarkers(spot.URL);
+                }
                 updateSpotMaxBounds(spot);
+                if (typeof updateSeoMeta === 'function') updateSeoMeta();
+                if (typeof waitAndRenderSpotDetails === 'function') waitAndRenderSpotDetails(spot.name);
             }
             return fishData;
         })
@@ -819,6 +834,17 @@ function showFishPopup(spot) {
 function showFishMarkers(url) {
   if (!window.map) return;
 
+  // 同一URLの魚マーカーがすでに地図上に表示済みなら再描画をスキップ
+  if (
+    url &&
+    typeof url === 'string' &&
+    window.fishLayer &&
+    window.map.hasLayer(window.fishLayer) &&
+    window.fishLayer._renderedUrl === url
+  ) {
+    return;
+  }
+
   // 1. 古い魚のマーカーが残っていればマップから削除する
   if (window.fishLayer) {
     window.map.removeLayer(window.fishLayer);
@@ -831,6 +857,7 @@ function showFishMarkers(url) {
   }
 
   window.fishLayer = L.layerGroup();
+  window.fishLayer._renderedUrl = url;
   const fishList = url.split(',');
 
   // 緯度・経度が空の不正なデータをフィルタリング
@@ -2073,8 +2100,11 @@ function buildSpotRestoreObject() {
     const parts = String(spotId).split('_');
     const spotKey = parts[parts.length - 1]; 
 
-    // ★ 修正：現在の areaId に依存せず、全スポットからIDだけで検索する
-    const spot = window.spotData.find(s => String(s.individualId) === String(spotKey));
+    // ★ areaId一致を優先し、無ければ全スポットからIDで検索する
+    const spot = (window.currentAreaId
+        ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(spotKey))
+        : null)
+        || window.spotData.find(s => String(s.individualId) === String(spotKey));
 
     if (!spot) return null;
 
@@ -2106,12 +2136,14 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
     const currentSpotParam = params.get('spot');
     if (!currentSpotParam || currentSpotParam !== spotName) return;
 
-    // 1. スポットデータの準備確認
+    // 1. スポットデータの準備確認（areaId一致を優先）
     const targetSpot = (window.spotData && window.spotData.length > 0)
-        ? window.spotData.find(s => s.name === spotName)
+        ? ((window.currentAreaId
+            ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && s.name === spotName)
+            : null) || window.spotData.find(s => s.name === spotName))
         : null;
 
-    // 2. アクセス情報枠 (#accessInfoBox) と ICデータ (window.isIcLoaded) の準備確認
+    // 2. アクセス情報枠 (#accessInfoBox) の準備確認
     const accessBox = document.getElementById('accessInfoBox');
     const h3El = accessBox ? accessBox.querySelector('h3') : null;
     const isAccessBoxRendered = !!(
@@ -2125,13 +2157,12 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
     const hasSpotZoom = !!(targetSpot && targetSpot.zoom && String(targetSpot.zoom).trim() !== '');
     const isZoomToSpotDone = !hasSpotZoom || !!window.currentSpotBaseTile;
 
-    // 4. 魚データ (window.fishData) と釣具店データの到着確認（2.5秒経過時はタイムアウト許容して描画へ進む）
-    const isFishDataReady = !!window.fishData || retryCount >= 25;
-    const isShopDataReady = !!(window.markerControl && window.markerControl.allShops && window.markerControl.allShops.length > 0) || retryCount >= 25;
+    // 4. 魚データ (window.fishData / targetSpot.URL) の到着確認（2.5秒経過時はタイムアウト許容）
+    //    ※ 釣具店・ICデータは到着時に独立挿入されるため、魚種テキスト描画を2.5秒待たせない
+    const isFishDataReady = !!window.fishData || !!(targetSpot && targetSpot.URL) || retryCount >= 25;
 
-    const isIcReady = !!window.isIcLoaded || retryCount >= 25;
     // 必須条件が揃っていなければ 100ms 後に非同期リトライ（最大50回＝5秒）
-    if ((!targetSpot || !isIcReady || !isAccessBoxRendered || !isZoomToSpotDone || !isFishDataReady || !isShopDataReady) && retryCount < 50) {
+    if ((!targetSpot || !isAccessBoxRendered || !isZoomToSpotDone || !isFishDataReady) && retryCount < 50) {
         _spotDetailsRenderTimer = setTimeout(() => {
             waitAndRenderSpotDetails(spotName, retryCount + 1);
         }, 100);
@@ -2211,7 +2242,10 @@ function loadICData() {
             window.icData = data;
             window.isIcLoaded = true;
             if (window.currentSpotId && window.spotData && typeof renderAccessInfo === 'function') {
-                const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                const activeSpot = (window.currentAreaId
+                    ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
+                    : null)
+                    || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                 if (activeSpot) {
                     renderAccessInfo(activeSpot);
                     if (typeof waitAndRenderSpotDetails === 'function') waitAndRenderSpotDetails(activeSpot.name);

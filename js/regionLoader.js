@@ -959,9 +959,13 @@ function loadFishDataAsync(pref, fishUrl) {
             window.fishData = fishData;
             if (window.spotData) applyFishDataToSpots(window.spotData, fishData);
             if (window.currentSpotId && window.spotData) {
-                const activeSpot = window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                const activeSpot = (window.currentAreaId
+                    ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
+                    : null)
+                    || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
                 if (activeSpot && activeSpot.URL) {
-                    if (typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
+                    const hasZoom = !!(activeSpot.zoom && String(activeSpot.zoom).trim() !== '');
+                    if (hasZoom && typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
                     if (typeof updateSeoMeta === 'function') updateSeoMeta();
                 }
             }
