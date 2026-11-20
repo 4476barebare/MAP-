@@ -1538,11 +1538,19 @@ if (tileWrap && tileBtn) {
 
     // --- 以降は ① スポット詳細 → Phase2 ... と続きます ---
 
-    // ① スポット詳細 → Phase2 (エリアOSM) へ戻る
+    // ① スポット詳細 → Phase2 (エリアOSM) へ戻る（現在座標から直接ズーム13へ引く）
     if (window.currentSpotId != null) {
         lockAndHideUI(); // ★ ガード開始
 
-        const restoreSpot = typeof buildSpotRestoreObject === 'function' ? buildSpotRestoreObject() : null;
+        const currentCenter = window.map ? window.map.getCenter() : null;
+        if (!currentCenter) {
+            window.goBackGuard = false;
+            return;
+        }
+        const restoreCoords = {
+            lat: Number(currentCenter.lat),
+            lng: Number(currentCenter.lng)
+        };
 
         if (typeof stopZoomGuard === 'function') stopZoomGuard();
         window.map.dragging.enable();
@@ -1558,28 +1566,44 @@ if (tileWrap && tileBtn) {
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        if (!restoreSpot) {
-            window.goBackGuard = false; 
-            return;
-        }
- 
         if (typeof clearSpotUI === 'function') clearSpotUI();
         if (typeof hideRoadLayers === 'function') hideRoadLayers();
 
-        if (restoreSpot.areaId && window.currentAreaId !== restoreSpot.areaId) {
-            window.currentAreaId = restoreSpot.areaId;
+        // currentAreaId が未設定の場合のみ、現在座標の最寄りスポットからエリアIDを補完する
+        if (!window.currentAreaId && Array.isArray(window.spotData) && window.spotData.length > 0) {
+            let nearest = null;
+            let minDist = Infinity;
+            for (const s of window.spotData) {
+                const sLat = Number(s.lat);
+                const sLng = Number(s.lng);
+                if (!Number.isFinite(sLat) || !Number.isFinite(sLng)) continue;
+                const d = (sLat - restoreCoords.lat) ** 2 + (sLng - restoreCoords.lng) ** 2;
+                if (d < minDist) {
+                    minDist = d;
+                    nearest = s;
+                }
+            }
+            if (nearest && nearest.areaId) {
+                window.currentAreaId = nearest.areaId;
+            }
         }
 
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
-        const parentArea = window.areaData.find(a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId);
+        const parentArea = (window.areaData || []).find(
+            a => window.currentAreaId && String(a.areaId + '_' + a.individualId) === window.currentAreaId
+        );
         if (parentArea) setIdealQuery('area', parentArea.name);
         setIdealQuery('spot', null);
         window.currentSpotId = null;
 
         if (typeof showSpotsForArea === 'function') showSpotsForArea(window.currentAreaId);
+        window._selectSpotCompleted = false;
         window._isRestoringSpot = true;
-        if (typeof selectSpot === 'function') selectSpot(restoreSpot); // ★ ここに渡され、外部で false になる
-        if (typeof showPrefSpots === 'function') showPrefSpots();
+        if (typeof selectSpot === 'function') selectSpot(restoreCoords); // ★ 現在座標を直接渡してPhase2へ復帰
+        // 既に広域ドットが生成済みの場合のみ表示状態を更新（未生成時に他県全件ロードを暴発させない）
+        if (window.regionSpotMarkers && window.regionSpotMarkers.length > 0 && typeof showPrefSpots === 'function') {
+            showPrefSpots();
+        }
        
         const checkCompletion = setInterval(() => {
             if (window._selectSpotCompleted) {
