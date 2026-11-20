@@ -1,10 +1,15 @@
 name: "Evening Data Sync (18:00 JST)"
 
 on:
-  schedule:
-    # UTC 09:00 = 日本時間(JST) 毎日 18:00
-    - cron: '0 9 * * *'
+  # GitHub Actions の cron 遅延対策のため schedule は廃止し、
+  # cron-job.org から workflow_dispatch で起動する構成へ一本化
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: "変更がなくても GitHub Pages へ強制デプロイする"
+        required: false
+        default: false
+        type: boolean
 
 # デプロイ渋滞・Git競合を防ぐ排他制御（朝ワークフローと同一グループで直列化）
 concurrency:
@@ -165,15 +170,15 @@ jobs:
           fi
 
       # ========================================================
-      # 5. GitHub Pages デプロイ（更新がある時 または 手動実行時のみ）
+      # 5. GitHub Pages デプロイ（更新がある時 または force_deploy=true 時のみ）
       # ========================================================
       - name: "5. Upload Pages Artifact"
-        if: steps.commit.outputs.pushed == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true
         uses: actions/upload-pages-artifact@v3
         with:
           path: './'
 
       - name: "6. Deploy to GitHub Pages"
         id: deployment
-        if: steps.commit.outputs.pushed == 'true' || github.event_name == 'workflow_dispatch'
+        if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true
         uses: actions/deploy-pages@v4
