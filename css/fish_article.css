@@ -1405,3 +1405,18 @@ a.sns-col-link:active {
   }
 }
 
+
+/* サイトポリシー内の公式Xお問い合わせボタン */
+#policyModal .contact-x-btn {
+  display: inline-block;
+  padding: 9px 14px;
+  border-radius: 6px;
+  background: var(--navy);
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  text-decoration: none;
+}
+#policyModal .contact-x-btn:hover {
+  opacity: 0.85;
+}
