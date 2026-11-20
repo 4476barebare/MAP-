@@ -456,14 +456,18 @@ function preloadShop01(url) {
 
             markerControl.shop01Cache[url] = true;
 
-            // ★ 追加: ロード完了時に現在アクティブなエリアがあれば自動でマーカーを描画
+            // ★ ロード完了時に現在アクティブなエリアがあれば画面状態に応じてマーカーを描画
+            //    ※ 個別スポット詳細（zoom > 13 等）ではショップマーカーを描画しない
             if (window.currentAreaId && window.map) {
                 const isSpotMode = window.map.getContainer().classList.contains('is-spot-mode');
                 const zoom = window.map.getZoom();
+                const isSpotDetail = zoom > 13 || (!!window.currentSpotId && zoom !== 13) || !!window.currentSpotBaseTile;
 
-                if (isSpotMode || (window.currentSpotId && zoom === 13)) {
+                if (isSpotDetail) {
+                    // スポット詳細画面ではショップマーカーを表示しない（アクセス枠の最寄り店舗計算用データのみ保持）
+                } else if (zoom === 13 && (isSpotMode || window.phase2Initialized)) {
                     showShop02(window.currentAreaId);
-                } else if (zoom >= 11) {
+                } else if (!isSpotMode && !window.currentSpotId && zoom >= 11) {
                     showShop01(window.currentAreaId);
                 }
             }

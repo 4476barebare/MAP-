@@ -497,6 +497,8 @@ function zoomToSpot(spot) {
 
     if (typeof disablePhase2 === 'function') disablePhase2(window.map);
     resetSpotLayers();
+    if (window.phase2Group) window.phase2Group.clearLayers();
+    if (window.phase1Group) window.phase1Group.clearLayers();
     if (typeof clearSub2Weather === 'function') clearSub2Weather();
     if (typeof removeCrowdImage === 'function') removeCrowdImage();
 
@@ -696,6 +698,8 @@ function zoomToSpot(spot) {
 
     const finalizeZoomToSpot = () => {
         window.map.invalidateSize(true);
+        if (window.phase2Group) window.phase2Group.clearLayers();
+        if (window.phase1Group) window.phase1Group.clearLayers();
         showFishMarkers(safe.URL);
         createWeekItem(safe.whether);
 
