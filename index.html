@@ -1607,6 +1607,9 @@ if (tileWrap && tileBtn) {
                 //clearSpotUI();
                 if (typeof enablePhase2 === 'function') enablePhase2(window.map);
                 if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
+                // ★ Phase2では道路は非表示のまま、未ロードなら裏でバックグラウンド取得・生成を開始する
+                if (typeof hideRoadLayers === 'function') hideRoadLayers();
+                if (typeof window.preloadRoadLayers === 'function') window.preloadRoadLayers();
                 showBackBtnOnly(); 
             }
         }, 50);
@@ -1618,6 +1621,7 @@ if (tileWrap && tileBtn) {
     if (window.currentSpotId == null && window.currentAreaId != null && z >= 12.5 && z <= 13.5) {
         lockAndHideUI(); // ★ ガード開始
 
+        window._isRestoringSpot = false;
         if (typeof disablePhase2 === 'function') disablePhase2(window.map);
         if (typeof clearSub2Weather === 'function') clearSub2Weather();
         
