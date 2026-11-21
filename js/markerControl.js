@@ -673,7 +673,7 @@ markerControl.getIconId = getIconId;
 // ==========================================
 
 // 1. 設定エリア（後からいつでも編集可能）
-const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbzupqGAv-ib_-FXJv7U-Lea4iGL2uaBaqYIB6oKzbpbk2vWGAWMxSBHEPfhuD5IxFJ17g/exec';
+const GAS_TEMP_PIN_URL = 'https://script.google.com/macros/s/AKfycbw2GAO-bqXb_SqveXbEpvytsBqXQEuTEVMUNeKYGWl7asMolQzeLz5-e4UsAWkAO-AoQw/exec';
 
 // 同じ座標の周囲に同一魚種があるか判定する閾値（メートル）
 const DUPLICATE_FISH_RADIUS_M = 3.0;
@@ -1305,14 +1305,8 @@ window.loadTempFishPinsOnce = function() {
         return loadTempPinsCache();
       }
 
-      // doGet完了前に自分がローカルで先行追加したピンがあれば失われないようマージ
-      const remotePins = data.pins;
-      const remoteIds = new Set(remotePins.map(p => p && p.id));
-      const localOnlyPins = loadTempPinsCache().filter(
-        p => p && p.id && !remoteIds.has(p.id)
-      );
-
-      const mergedPins = remotePins.concat(localOnlyPins);
+      // GAS側の最新配列を正（マスター）としてローカルキャッシュを上書き（リセット・お掃除済みピンの復活を防止）
+      const mergedPins = data.pins;
       saveTempPinsCache(mergedPins);
 
       // 取得済みフラグをON（これ以降この関数が呼ばれてもGAS通信は発生しない）
