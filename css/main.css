@@ -776,13 +776,14 @@ li {
 /* =========================
    アクセス情報（エリアガイド直上）
 ========================= */
+#siteGuideBox,
 #accessInfoBox {
-    /*display: none;  初期は非表示 */
     background: #fff;
-    padding: 15px 16px 0 16px; /* 下にあるエリアガイドとシームレスに繋げる */
+    padding: 15px 16px 0 16px; /* 下にあるセクションとシームレスに繋げる */
     color: #191970;
 }
 
+#siteGuideBox h3,
 #accessInfoBox h3 {
     font-size: 16px;
     color: #191970;
@@ -836,12 +837,14 @@ li {
     border-bottom: 1px dashed rgba(25, 25, 112, 0.2);
 }
 
+#siteGuideBox ul,
 #accessInfoBox ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
+#siteGuideBox li,
 #accessInfoBox li {
     font-size: 14px;
     line-height: 1.5;
@@ -850,6 +853,7 @@ li {
     border-bottom: 1px dashed rgba(25, 25, 112, 0.2); /* 控えめな区切り線 */
 }
 
+#siteGuideBox li:last-child,
 #accessInfoBox li:last-child {
     border-bottom: none;
     margin-bottom: 0;
