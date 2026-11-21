@@ -328,6 +328,24 @@ function getSnsCatchBonus(posts) {
     return 0;
 }
 
+// 周辺10km・直近14日以内のSNS釣果から表示用の魚種名を抽出（重複排除・最新/最寄り優先・最大3魚種）
+function extractRecentSnsFishes(posts, maxCount = 3) {
+    if (!Array.isArray(posts) || posts.length === 0) return [];
+    const seen = new Set();
+    const fishes = [];
+    for (const post of posts) {
+        if (!post || post.ageDays > 14 || !Array.isArray(post.fishes)) continue;
+        for (const rawFish of post.fishes) {
+            const fish = cleanText(rawFish);
+            if (!fish || seen.has(fish)) continue;
+            seen.add(fish);
+            fishes.push(fish);
+            if (fishes.length >= maxCount) return fishes;
+        }
+    }
+    return fishes;
+}
+
 // ==========================================
 // リージョン内全県のスポット＋天気ロード
 // ==========================================
@@ -603,6 +621,7 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
             weatherScore: Math.round(wDetail.weatherScore),
             snsBonus,
             hasSnsBonus: snsBonus > 0,
+            snsFishes: snsBonus > 0 ? extractRecentSnsFishes(nearbyPosts, 3) : [],
             pop: wDetail.displayPop,
             wind: wDetail.maxWind,
             maxTemp: wDetail.maxTemp,
@@ -654,9 +673,16 @@ function renderRankingListHtml(topItems, scopeTag, tomorrowIso) {
         const windHtml = item.wind !== null
             ? `<span>風: <strong style="color:#191970;">${item.wind}m</strong></span>`
             : "";
-        const snsHtml = item.hasSnsBonus
-            ? `<span style="position:absolute; right:12px; bottom:5px; font-size:6px; line-height:1; color:#687386; white-space:nowrap;">SNS釣果あり</span>`
-            : "";
+        let snsHtml = "";
+        if (item.hasSnsBonus) {
+            const fishText = Array.isArray(item.snsFishes) && item.snsFishes.length > 0
+                ? item.snsFishes.slice(0, 3).join("・")
+                : "";
+            const fishHtml = fishText
+                ? `<span class="recommend-sns-fish">${escapeHtml(fishText)}</span>`
+                : "";
+            snsHtml = `<span class="recommend-sns-badge">${fishHtml}<span class="recommend-sns-label">SNS釣果あり</span></span>`;
+        }
 
         html += `<li>` +
             `<a href="${escapeHtml(item.url)}" class="recommend-spot-link" style="position:relative; display:flex; flex-direction:column; background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; box-shadow:0 1px 3px rgba(0,0,0,0.05); text-decoration:none; color:#333;">` +
