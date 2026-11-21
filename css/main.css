@@ -3171,3 +3171,43 @@ a.basis-action-pill:active {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* =========================================
+   明日のオススメ釣り場ランキング：SNS釣果バッジ
+   ※色・サイズ・位置はCSSだけで後から変更可能
+========================================= */
+
+.recommend-spot-link .recommend-sns-badge {
+  position: absolute;
+  right: 12px;
+  bottom: 3px;
+  left: 12px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.recommend-spot-link .recommend-sns-fish {
+  font-size: 8.5px;
+  font-weight: bold;
+  color: #191970;
+  line-height: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recommend-spot-link .recommend-sns-label {
+  font-size: 6px;
+  font-weight: normal;
+  color: #687386;
+  line-height: 1;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
