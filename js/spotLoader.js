@@ -405,11 +405,17 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         shopPromise
     ]);
 
+    // 周辺10kmリアルタイム釣果JSONも drawLocation 完了直後に並列先読み（ボット打ち切り前の取得率を向上）
+    const catchPromise = typeof loadCompiledCatchData === 'function'
+        ? loadCompiledCatchData()
+        : Promise.resolve(null);
+
     const selectedPrefDonePromise = Promise.allSettled([
         dictPromise,
         icPromise,
         prefReturnReadyPromise,
-        fishPromise
+        fishPromise,
+        catchPromise
     ]).then(() => {
         if (window.currentPref === prefCode) {
             if (window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
@@ -1934,6 +1940,40 @@ function renderShopSection(spot) {
     }
 }
 // ==========================================
+// ★ リアルタイム釣果JSON (/data/compiled_data.json) 取得ヘルパー
+// （Promise共有・一時切断時の1回自動リトライ・失敗時の静かなスキップ）
+// ==========================================
+function loadCompiledCatchData(retries = 1) {
+    if (window.compiledCatchData) {
+        return Promise.resolve(window.compiledCatchData);
+    }
+    if (window._compiledCatchDataPromise) {
+        return window._compiledCatchDataPromise;
+    }
+
+    const doFetch = (attempt) => fetch('/data/compiled_data.json', { priority: 'low' })
+        .then(res => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(json => {
+            window.compiledCatchData = json;
+            return json;
+        })
+        .catch(() => {
+            if (attempt < retries) {
+                return new Promise(resolve => setTimeout(resolve, 300))
+                    .then(() => doFetch(attempt + 1));
+            }
+            window._compiledCatchDataPromise = null;
+            return null;
+        });
+
+    window._compiledCatchDataPromise = doFetch(0);
+    return window._compiledCatchDataPromise;
+}
+
+// ==========================================
 // ★ 新規：10km圏内のリアルタイム釣果を描画する関数（多重挿入ガード＆Promise共有版）
 // ==========================================
 async function renderRecentCatches(spot) {
@@ -1949,31 +1989,7 @@ async function renderRecentCatches(spot) {
         existingBefore.remove();
     }
 
-    if (!window.compiledCatchData) {
-        try {
-            if (!window._compiledCatchDataPromise) {
-                window._compiledCatchDataPromise = fetch('/data/compiled_data.json')
-                    .then(res => {
-                        if (!res.ok) throw new Error("JSON fetch failed");
-                        return res.json();
-                    })
-                    .then(json => {
-                        window.compiledCatchData = json;
-                        return json;
-                    })
-                    .catch(e => {
-                        window._compiledCatchDataPromise = null;
-                        throw e;
-                    });
-            }
-            await window._compiledCatchDataPromise;
-        } catch (e) {
-            console.error("釣果データの読み込みに失敗しました:", e);
-            return;
-        }
-    }
-
-    const data = window.compiledCatchData;
+    const data = window.compiledCatchData || (await loadCompiledCatchData());
     if (!data) return;
 
     // 非同期取得完了後：スポット画面から離脱済み、または既に同スポットが挿入済みなら即リターン
@@ -2218,10 +2234,10 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
 window.icData = [];
 window.isIcLoaded = false;
 let icDataPromise = null;
-function loadICData() {
+function loadICData(retries = 1) {
     if (window.isIcLoaded) return Promise.resolve(window.icData);
     if (icDataPromise) return icDataPromise;
-    icDataPromise = fetch('data/KANTO_geo.json')
+    const doFetch = (attempt) => fetch('data/KANTO_geo.json', { priority: 'low' })
         .then(res => {
             if (!res.ok) throw new Error('IC JSON fetch failed: ' + res.status);
             return res.json();
@@ -2241,11 +2257,15 @@ function loadICData() {
             }
             return data;
         })
-        .catch(error => {
+        .catch(() => {
+            if (attempt < retries) {
+                return new Promise(resolve => setTimeout(resolve, 300))
+                    .then(() => doFetch(attempt + 1));
+            }
             icDataPromise = null;
-            console.error('ICデータ読み込みエラー:', error);
             return null;
         });
+    icDataPromise = doFetch(0);
     return icDataPromise;
 }
 
@@ -3426,6 +3446,7 @@ window.createHourlyWeather = createHourlyWeather;
 window.createTideGraph = createTideGraph;
 window.calcAccessInfo = calcAccessInfo;
 window.renderShopSection = renderShopSection;
+window.loadCompiledCatchData = loadCompiledCatchData;
 window.renderRecentCatches = renderRecentCatches;
 window.clearAccessInfo = clearAccessInfo;
 window.resetSpotLayers = resetSpotLayers;
