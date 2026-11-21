@@ -423,63 +423,6 @@ if ('serviceWorker' in navigator) {
 // ==========================================
 // ★ オススメ釣り場ランキング：クリア＆非表示関数
 // ==========================================
-// SNS釣果の近隣判定距離。ランキングとスポット画面で共通利用する。
-window.SNS_CATCH_RADIUS_KM = 10;
-
-// 指定スポット周辺のSNS釣果を取得し、同じ投稿URLの重複を除外する。
-window.getNearbySnsCatchRecords = function(spot, radiusKm = window.SNS_CATCH_RADIUS_KM) {
-    if (!spot || !Array.isArray(window.snsCatchData)) return [];
-    const spotLat = Number(spot.lat);
-    const spotLng = Number(spot.lng);
-    if (!Number.isFinite(spotLat) || !Number.isFinite(spotLng)) return [];
-
-    const distanceKm = (lat1, lng1, lat2, lng2) => {
-        const rad = Math.PI / 180;
-        const dLat = (lat2 - lat1) * rad;
-        const dLng = (lng2 - lng1) * rad;
-        const a = Math.sin(dLat / 2) ** 2 +
-            Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLng / 2) ** 2;
-        return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    };
-
-    const getPostDate = dateStr => {
-        const parts = String(dateStr || '').trim().replace(/-/g, '/').split('/');
-        if (parts.length < 3) return null;
-        const date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        return Number.isNaN(date.getTime()) ? null : date;
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const uniquePosts = new Map();
-
-    window.snsCatchData.forEach(record => {
-        if (!record) return;
-        const lat = Number(record.lat);
-        const lng = Number(record.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-
-        const distance = distanceKm(spotLat, spotLng, lat, lng);
-        if (distance > radiusKm) return;
-
-        const postDate = getPostDate(record.date);
-        if (!postDate) return;
-        const ageDays = Math.max(0, Math.floor((today - postDate) / 86400000));
-        const key = record.url
-            ? 'url:' + record.url
-            : 'record:' + lat.toFixed(5) + '_' + lng.toFixed(5) + '_' + record.date + '_' + (record.fish || '');
-
-        const candidate = { ...record, distanceKm: distance, ageDays: ageDays };
-        const existing = uniquePosts.get(key);
-        if (!existing || distance < existing.distanceKm ||
-            (distance === existing.distanceKm && ageDays < existing.ageDays)) {
-            uniquePosts.set(key, candidate);
-        }
-    });
-
-    return [...uniquePosts.values()].sort((a, b) => a.ageDays - b.ageDays);
-};
-
 function clearSpotRanking() {
     const section = document.getElementById('fishing-recommend-section');
     const container = document.getElementById('spot-ranking-container');
