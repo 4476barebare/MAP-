@@ -1,5 +1,245 @@
 [
   {
+    "date": "2026/11/20",
+    "fish": "カサゴ",
+    "lat": 35.2652,
+    "lng": 139.6917,
+    "area_name": "海辺つり公園",
+    "url": "https://x.com/you2ya/status/2123687941923090501",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "アジ",
+    "lat": 35.27,
+    "lng": 139.683,
+    "area_name": "うみかぜ公園",
+    "url": "https://x.com/tsuri_map/status/2123650064933429456",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ウミタナゴ",
+    "lat": 35.27,
+    "lng": 139.683,
+    "area_name": "うみかぜ公園",
+    "url": "https://x.com/tsuri_map/status/2123650064933429456",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "メジナ",
+    "lat": 35.27,
+    "lng": 139.683,
+    "area_name": "うみかぜ公園",
+    "url": "https://x.com/tsuri_map/status/2123650064933429456",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "カワハギ",
+    "lat": 35.27,
+    "lng": 139.683,
+    "area_name": "うみかぜ公園",
+    "url": "https://x.com/tsuri_map/status/2123650064933429456",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ハゼ",
+    "lat": 35.9723,
+    "lng": 139.8034,
+    "area_name": "江戸川",
+    "url": "https://x.com/Maruya_Yusen/status/2123691280098271510",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ハゼ",
+    "lat": 35.7788,
+    "lng": 139.8967,
+    "area_name": "江戸川",
+    "url": "https://x.com/Maruya_Yusen/status/2123691280098271510",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ハゼ",
+    "lat": 35.6792,
+    "lng": 139.9083,
+    "area_name": "江戸川",
+    "url": "https://x.com/Maruya_Yusen/status/2123691280098271510",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 36.073,
+    "lng": 140.207,
+    "area_name": "霞ヶ浦水系",
+    "url": "https://www.facebook.com/fishing.shimano/posts/pfbid0j9ZQrkNED8R1k24zvF2uEfsk3tLMo5gPzVbGJy5M4g6scMXAy4fjuEFYZh1ephcJl",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 36.136,
+    "lng": 140.407,
+    "area_name": "霞ヶ浦水系",
+    "url": "https://www.facebook.com/fishing.shimano/posts/pfbid0j9ZQrkNED8R1k24zvF2uEfsk3tLMo5gPzVbGJy5M4g6scMXAy4fjuEFYZh1ephcJl",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 35.935,
+    "lng": 140.54,
+    "area_name": "霞ヶ浦水系",
+    "url": "https://www.facebook.com/fishing.shimano/posts/pfbid0j9ZQrkNED8R1k24zvF2uEfsk3tLMo5gPzVbGJy5M4g6scMXAy4fjuEFYZh1ephcJl",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 35.986,
+    "lng": 140.612,
+    "area_name": "霞ヶ浦水系",
+    "url": "https://www.facebook.com/fishing.shimano/posts/pfbid0j9ZQrkNED8R1k24zvF2uEfsk3tLMo5gPzVbGJy5M4g6scMXAy4fjuEFYZh1ephcJl",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "シーバス",
+    "lat": 36.1245,
+    "lng": 140.4042,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "シーバス",
+    "lat": 36.0353,
+    "lng": 140.4763,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "シーバス",
+    "lat": 35.9421,
+    "lng": 140.5216,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "シーバス",
+    "lat": 35.8854,
+    "lng": 140.4495,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "コイ",
+    "lat": 36.1245,
+    "lng": 140.4042,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "コイ",
+    "lat": 36.0353,
+    "lng": 140.4763,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "コイ",
+    "lat": 35.9421,
+    "lng": 140.5216,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "コイ",
+    "lat": 35.8854,
+    "lng": 140.4495,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.facebook.com/toshinobu.sakai.1/posts/pfbid0FNVUHksq4fi4SiNjkREwwUmiM1jkD6nKoMTJ8C2YBNrGYS3D3Cs6hXX38V6PjkJ3l",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 36.1245,
+    "lng": 140.4042,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/Df90v3AEjQG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 36.0353,
+    "lng": 140.4763,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/Df90v3AEjQG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 35.9421,
+    "lng": 140.5216,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/Df90v3AEjQG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/20",
+    "fish": "ブラックバス",
+    "lat": 35.8854,
+    "lng": 140.4495,
+    "area_name": "霞ヶ浦",
+    "url": "https://www.instagram.com/p/Df90v3AEjQG/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/19",
     "fish": "メジナ",
     "lat": 35.9184,
