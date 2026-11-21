@@ -897,51 +897,66 @@ li {
    本文 共通
 ========================= */
 .area .text {
+  position: relative;
   font-size: 14px;
   margin-top: 8px;
   line-height: 1.6;
-
   overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.2s ease;
+  transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.25s ease;
 }
 
+#default-site-guide > .guide-text {
+  position: relative;
+  overflow: hidden;
+  transition: max-height 0.38s ease, opacity 0.25s ease, padding-bottom 0.25s ease;
+}
 
 /* 半開き時だけフェードを乗せる */
 .guide-collapse.collapsed-mode .area .text,
 #default-site-guide.guide-collapse.collapsed-mode > .guide-text {
-  position: relative;
   max-height: 48px;
-  overflow: hidden;
-  opacity: 0.8;
+  opacity: 0.85;
+  padding-bottom: 0;
 }
 
 #site-guide-toggle {
   cursor: pointer;
 }
 
-/* フェード部分 */
-.guide-collapse.collapsed-mode .area .text::after,
-#default-site-guide.guide-collapse.collapsed-mode > .guide-text::after {
+/* フェード部分（開閉に合わせて滑らかに透過） */
+.guide-collapse .area .text::after,
+#default-site-guide.guide-collapse > .guide-text::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 24px;
-
-  /* 背景と同じ色でフェード */
+  pointer-events: none;
   background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.guide-collapse.collapsed-mode .area .text::after,
+#default-site-guide.guide-collapse.collapsed-mode > .guide-text::after {
+  opacity: 1;
 }
 
 /* =========================
    選択中モード
 ========================= */
 
-/* 選択対象 → 全開 */
-.guide-collapse.active-mode .area.active .text,
-#default-site-guide.guide-collapse.active-mode > .guide-text {
-  max-height: 500px;
+/* 選択対象 → 全開（スマホ狭幅でもはみ出さない十分な高さを確保） */
+.guide-collapse.active-mode .area.active .text {
+  max-height: 800px;
   opacity: 1;
+}
+
+#default-site-guide.guide-collapse.active-mode > .guide-text {
+  max-height: 1200px;
+  opacity: 1;
+  padding-bottom: 6px;
 }
 
 /* 選択外 → 完全に閉じる */
