@@ -167,8 +167,8 @@
     <div class="week-table" id="weekTable"></div>
   </div>
 </div>
-<!-- 👇 アクセス情報表示エリア（初期状態はサイト説明を表示し、スポット選択時に切り替える） -->
-<section class="access-info" id="accessInfoBox" aria-label="サイト案内・アクセス情報">
+<!-- 👇 サイト案内（「釣り行こNAVI」の特徴と使い方：REGION画面のみ表示） -->
+<section class="access-info" id="siteGuideBox" aria-label="サイト案内">
   <div id="default-site-guide" class="guide-collapse collapsed-mode">
     <h3 id="site-guide-toggle" role="button" tabindex="0" aria-expanded="false">「釣り行こNAVI」の特徴と使い方（関東の釣り場・さかな地図）</h3>
     <div class="guide-text">
@@ -187,6 +187,8 @@
     </div>
   </div>
 </section>
+<!-- 👇 スポット詳細・アクセス情報表示エリア（SPOT画面のみ表示） -->
+<section class="access-info" id="accessInfoBox" aria-label="スポット詳細・アクセス情報" style="display: none;"></section>
 <!-- 👇 明日のオススメ釣り場ランキングセクション -->
 <section id="fishing-recommend-section" style="margin: 10px; padding: 15px; background-color: #eef3f8; border-radius: 8px; border: 1px solid #dce4ee;">
   <h2 id="spot-ranking-title" style="font-size: 16px; color: #191970; margin-top: 0; margin-bottom: 8px; border-left: 4px solid #191970; padding-left: 8px;">
@@ -205,9 +207,7 @@
 </section>
 
 
-<section id="area-guide" class="guide-collapse collapsed-mode">
-    <h1></h1>
-</section>
+<section id="area-guide" class="guide-collapse collapsed-mode" style="display: none;"></section>
 
 <div id="newsModal" class="modal">
   <div class="modal-content">
@@ -382,6 +382,14 @@ if (siteGuideToggle && siteGuide) {
     }
   });
 }
+// PREF/AREA/SPOTのURL直打ち時は初期描画時点で「特徴と使い方」を即座に非表示にする
+(function() {
+  const initialParams = new URLSearchParams(window.location.search);
+  const siteGuideBoxEl = document.getElementById('siteGuideBox');
+  if (siteGuideBoxEl && (initialParams.get('pref') || initialParams.get('area') || initialParams.get('spot'))) {
+    siteGuideBoxEl.style.display = 'none';
+  }
+})();
 
 window.prefData = null;
 window.areaData = [];
@@ -1512,6 +1520,7 @@ if (tileWrap && tileBtn) {
 
         if (typeof destroyAreaUI === 'function') destroyAreaUI();
         if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
+        if (typeof syncGuideSections === 'function') syncGuideSections();
         // ★ renderSpotRanking() は region_management 側で描画するため、ここでは呼ばない
         
         if (window.markerControl && typeof window.markerControl.clearLayers === 'function') window.markerControl.clearLayers();
@@ -1608,6 +1617,7 @@ if (tileWrap && tileBtn) {
         if (parentArea) setIdealQuery('area', parentArea.name);
         setIdealQuery('spot', null);
         window.currentSpotId = null;
+        if (typeof syncGuideSections === 'function') syncGuideSections();
 
         if (typeof showSpotsForArea === 'function') showSpotsForArea(window.currentAreaId);
         window._selectSpotCompleted = false;
@@ -1752,6 +1762,7 @@ if (tileWrap && tileBtn) {
         // ★ showPrefSpots は pref_management 内で実行済みのため呼ばない
         if (typeof renderPrefWeather === 'function') renderPrefWeather();
         if (typeof resetAreaGuide === 'function') resetAreaGuide();
+        if (typeof syncGuideSections === 'function') syncGuideSections();
 
         // エリアスワイプをOFFにし、県スワイプをONにする
         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
@@ -1888,7 +1899,6 @@ if (typeof window.renderAccessInfo !== 'function') {
             accessTexts.forEach(t => { html += `<li>${t}</li>`; });
             html += '</ul>';
         }
-        if (container.querySelector('#default-site-guide')) container.innerHTML = '';
         let mainBlock = document.getElementById('spot-access-main');
         if (!mainBlock || mainBlock.parentNode !== container) {
             mainBlock = document.createElement('div');
@@ -1897,6 +1907,10 @@ if (typeof window.renderAccessInfo !== 'function') {
         }
         mainBlock.innerHTML = html;
         container.style.display = 'block';
+        const siteGuideBox = document.getElementById('siteGuideBox');
+        if (siteGuideBox) siteGuideBox.style.display = 'none';
+        const areaGuide = document.getElementById('area-guide');
+        if (areaGuide) areaGuide.style.display = 'none';
     };
 }
 
@@ -2150,9 +2164,8 @@ async function routeUpdate() {
                         window.markerControl.showShop01(safeAreaId);
                     }
                     
-                    if (typeof renderAreaGuide === 'function') renderAreaGuide();
                     if (typeof renderSpotRanking === 'function') renderSpotRanking();
-                    if (typeof openArea === 'function') openArea(parentArea.individualId);
+                    if (typeof syncGuideSections === 'function') syncGuideSections();
                 }
                 
                 setIdealQuery('spot', spot.name);
@@ -2201,7 +2214,7 @@ async function routeUpdate() {
             const safeZoom = area.zoom || window.prefData.zoom;
             if (typeof drawLocation === 'function') await drawLocation(area.name, area.lat, area.lng, safeZoom);
             
-            if (typeof renderAreaGuide === 'function') renderAreaGuide();
+            if (typeof syncGuideSections === 'function') syncGuideSections();
             if (typeof renderSpotRanking === 'function') renderSpotRanking();
             if (typeof showRoadLayers === 'function') showRoadLayers();
 
@@ -2243,7 +2256,7 @@ async function routeUpdate() {
                         if (typeof renderCrowdImage === 'function') renderCrowdImage();
                         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
                         if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
-                        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                        if (typeof syncGuideSections === 'function') syncGuideSections();
                         if (typeof renderSpotRanking === 'function') renderSpotRanking();
 
                         requestAnimationFrame(() => {
@@ -2306,6 +2319,8 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
 
     window.currentRegion = region;
     window.currentPref = prefCode;
+    window.currentAreaId = null;
+    window.currentSpotId = null;
 
     // 県切り替え開始時に、前の県の取得結果が後から反映されないよう無効化
     window._jmaAlertRequestId = (window._jmaAlertRequestId || 0) + 1;
@@ -2345,6 +2360,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
 
     setIdealQuery('area', null);
     setIdealQuery('spot', null);
+    if (typeof syncGuideSections === 'function') syncGuideSections();
 
     // ★ 差し替え：drawLocation と他県JSONの並列取得は pref_management に任せる
     //   （内部で既存マップからの移動完了まで待ってから戻る）
@@ -2403,7 +2419,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
                         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
                         if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
                         
-                        if (typeof renderAreaGuide === 'function') renderAreaGuide();
+                        if (typeof syncGuideSections === 'function') syncGuideSections();
 
                         // ★ preloadShop01 は loadPrefectureData のキュー側で実行されるため、ここでは呼ばない（二重登録防止）
                         
@@ -3192,36 +3208,150 @@ function applyInlandWhetherToSpots(weatherData, targetArray = window.spotData) {
 
 
 
+function getCurrentAreaIndividualId() {
+    if (!window.currentAreaId) return null;
+    const raw = String(window.currentAreaId).trim();
+    if (!raw) return null;
+
+    if (Array.isArray(window.areaData) && window.areaData.length > 0) {
+        const matched = window.areaData.find(a =>
+            String(a.areaId + '_' + a.individualId) === raw ||
+            String(a.individualId) === raw
+        );
+        if (matched && matched.individualId != null) {
+            return String(matched.individualId);
+        }
+    }
+
+    const idx = raw.lastIndexOf('_');
+    return idx !== -1 ? raw.slice(idx + 1) : raw;
+}
+
+// ==========================================
+// ★ 全画面共通：「特徴と使い方」「スポット詳細」「エリアガイド」の表示同期
+//   REGION       : 特徴と使い方のみ表示（エリアガイドはクリア＆非表示）
+//   PREF         : エリアガイドのみ表示（全エリア折りたたみ）
+//   AREA / Phase2: エリアガイドのみ表示（選択中エリアを開き、選択外を閉じる）
+//   SPOT         : スポット詳細のみ表示（特徴と使い方・エリアガイドは非表示）
+// ==========================================
+function syncGuideSections(options = {}) {
+    const siteGuideBox = document.getElementById('siteGuideBox');
+    const accessBox = document.getElementById('accessInfoBox');
+    const areaGuide = document.getElementById('area-guide');
+
+    const params = new URLSearchParams(window.location.search);
+    const hasPref = !!(window.currentPref || params.get('pref'));
+    const hasSpot = !!(window.currentSpotId || params.get('spot'));
+    const hasArea = !!window.currentAreaId;
+
+    // 1. 「特徴と使い方」：REGION画面のみ表示
+    if (siteGuideBox) {
+        siteGuideBox.style.display = hasPref ? 'none' : 'block';
+    }
+
+    // 2. スポット詳細枠：SPOT画面以外ではクリアして非表示
+    if (!hasSpot) {
+        if (typeof clearAccessInfo === 'function') {
+            clearAccessInfo();
+        } else if (accessBox) {
+            accessBox.innerHTML = '';
+            accessBox.style.display = 'none';
+        }
+    }
+
+    // 3. 「◯◯県の釣りエリアガイド」
+    if (!areaGuide) return;
+
+    // REGION または SPOT 画面では非表示（REGION時は中身もクリア）
+    if (!hasPref || hasSpot) {
+        areaGuide.style.display = 'none';
+        if (!hasPref) {
+            areaGuide.innerHTML = '';
+            areaGuide.classList.remove('active-mode');
+            areaGuide.classList.add('collapsed-mode');
+            areaGuide.dataset.renderedPref = '';
+        }
+        return;
+    }
+
+    // PREF / AREA / Phase2 画面
+    if (!window.prefData) {
+        areaGuide.style.display = 'none';
+        return;
+    }
+
+    const prefKey = String(window.currentPref || window.prefData.name || '');
+    const needsRender =
+        areaGuide.dataset.renderedPref !== prefKey ||
+        !areaGuide.querySelector('.area') ||
+        (!hasArea && areaGuide.classList.contains('active-mode'));
+
+    if (needsRender) {
+        renderAreaGuide();
+    } else {
+        areaGuide.style.display = 'block';
+    }
+
+    if (hasArea) {
+        const areaIndivId = getCurrentAreaIndividualId();
+        if (areaIndivId) {
+            openArea(areaIndivId, !!options.scrollToArea);
+        }
+    } else {
+        // PREF画面：全エリアを折りたたみ状態（collapsed-mode）に統一
+        areaGuide.classList.remove('active-mode');
+        areaGuide.classList.add('collapsed-mode');
+        areaGuide.querySelectorAll('.area').forEach(areaEl => {
+            areaEl.classList.remove('active');
+            const text = areaEl.querySelector('.text');
+            if (text) text.classList.remove('open');
+        });
+    }
+}
+window.syncGuideSections = syncGuideSections;
+
 function openArea(areaKey, isUserAction = false) {
-
   const container = document.getElementById('area-guide');
+  if (!container) return;
 
-  // モード切替
+  // SPOT画面ではエリアガイドを非表示のままにする
+  if (typeof window.isSpotScreen === 'function' && window.isSpotScreen()) {
+    container.style.display = 'none';
+    return;
+  }
+
+  if (!container.querySelector('.area') && window.prefData) {
+    renderAreaGuide();
+  }
+
+  container.style.display = 'block';
+
+  // モード切替（選択中エリアのみ開き、選択外を閉じる）
   container.classList.remove('collapsed-mode');
   container.classList.add('active-mode');
 
-  document.querySelectorAll('#area-guide .area').forEach(area => {
+  const targetKey = String(areaKey || '');
 
+  document.querySelectorAll('#area-guide .area').forEach(area => {
     const text = area.querySelector('.text');
 
-    if (area.id === areaKey) {
-
+    if (String(area.id) === targetKey) {
       area.classList.add('active');
-      text.classList.add('open');
+      if (text) text.classList.add('open');
 
       // 先頭寄せ
-      container.insertBefore(area, container.children[1]);
+      if (container.children[1] && container.children[1] !== area) {
+        container.insertBefore(area, container.children[1]);
+      }
 
       // ★ ユーザー操作時のみスクロール
       if (isUserAction) {
         area.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }
-
     } else {
       area.classList.remove('active');
-      text.classList.remove('open');
+      if (text) text.classList.remove('open');
     }
-
   });
 }
 
@@ -3232,9 +3362,14 @@ function renderAreaGuide() {
     const container = document.getElementById('area-guide');
     if (!container) return; // コンテナがない場合はスキップ
 
-    // window.prefData がまだ無い場合は処理を抜ける
-    if (!window.prefData) return;
+    // REGION画面・SPOT画面では表示しない
+    if (!window.prefData || !window.currentPref || (typeof window.isSpotScreen === 'function' && window.isSpotScreen())) {
+        container.style.display = 'none';
+        return;
+    }
 
+    container.style.display = 'block';
+    container.dataset.renderedPref = String(window.currentPref || window.prefData.name || '');
     container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
 
     if (!window.areaData) return;
@@ -3343,9 +3478,7 @@ function renderAreaGuide() {
             // routeUpdateを完全に排除し、直接selectAreaを呼ぶ
             if (typeof selectArea === 'function') selectArea(area);
             
-            openArea(area.individualId, true);
-
-
+            syncGuideSections({ scrollToArea: true });
         });
 
         container.appendChild(div);
@@ -3353,15 +3486,19 @@ function renderAreaGuide() {
 }
 
 function resetAreaGuide() {
-
   const container = document.getElementById('area-guide');
+  if (!container) return;
+
+  if (!window.currentPref || !window.prefData) {
+    syncGuideSections();
+    return;
+  }
 
   container.classList.remove('active-mode');
   container.classList.add('collapsed-mode');
 
-  // ★ DOMを初期状態に戻す
+  // ★ DOMを初期状態（元のエリア順・折りたたみ）に戻す
   renderAreaGuide();
-
 }
 
 // ==========================================
@@ -3374,8 +3511,8 @@ function renderPrefectureUI() {
     const shopUrl = `/KANTO/${window.currentPref}_shop.json`;
 
     try {
-        // エリアガイドの描画
-        renderAreaGuide();
+        // ガイド表示の同期
+        syncGuideSections();
 
         // ショップマーカーのプリロード
         if (window.markerControl && window.markerControl.preloadShop01) {
