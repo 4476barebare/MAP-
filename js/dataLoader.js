@@ -6,42 +6,7 @@ window.spotData = window.spotData || [];
 window.currentAreaId = window.currentAreaId ?? null;
 window.fishDataCache = window.fishDataCache || {};
 
-// loadLocationJSON / drawLocation / タイル待機キュー(runAfterTileLoad等) は index.txt へ移動済み
-
-// ==========================================
-// ★ SEO対策用：HTML文字列を一括生成する関数（対象魚非表示版）
-// ==========================================
-function buildSeoHtmlString(mainData, areasData, spotsData) {
-    if (!mainData) return '';
-    const regionName = window.currentRegion || '関東地方';
-    const prefName = mainData.notes;
-    let html = '';
-    
-    areasData.forEach(area => {
-        const areaKey = area.areaId + '_' + area.individualId;
-        
-        // ★ 修正：null, undefined, 空文字('') をすべて弾き、確実にzoom値があるものだけを厳選
-        const areaSpots = spotsData.filter(s => 
-            s.areaId === areaKey && 
-            s.icon && s.icon.trim() !== '' &&
-            s.zoom != null && s.zoom !== '' 
-        );
-        
-        if (areaSpots.length > 0) {
-            html += `<h3 style="margin-top:15px; border-bottom:1px solid #ccc;">${area.name}</h3>`;
-            html += `<ul style="list-style-type:none; padding-left:10px;">`;
-            
-            areaSpots.forEach(spot => {
-                const url = `/?region=${encodeURIComponent(regionName)}&pref=${encodeURIComponent(prefName)}&area=${encodeURIComponent(area.name)}&spot=${encodeURIComponent(spot.name)}`;
-                
-                html += `<li style="margin:5px 0;"><a href="${url}" style="color:#0066cc; text-decoration:underline;">${spot.name}</a></li>`;
-            });
-            
-            html += `</ul>`;
-        }
-    });
-    return html;
-}
+// buildSeoHtmlString / loadLocationJSON / drawLocation / タイル待機キュー(runAfterTileLoad等) は index.txt へ移動済み
 
 function buildAreaGraphFromGrid(areas) {
 
