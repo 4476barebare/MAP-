@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-21T06:03:52+09:00",
-  "count": 230,
+  "generated": "2026-11-21T18:04:51+09:00",
+  "count": 234,
   "items": [
     {
       "date": "2026-12-13",
@@ -48,6 +48,15 @@
       "category": "ビーチクリーンイベント"
     },
     {
+      "date": "2026-11-23",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.city.edogawa.tokyo.jp&sz=128",
+      "thumbnail": "",
+      "title": "【11月23日開催】葛西海浜公園・西なぎさでビーチクリーン、裸足で遊べる浜を目指し清掃",
+      "source_name": "江戸川区ホームページ",
+      "source_url": "https://www.city.edogawa.tokyo.jp/event/20261115event2.html",
+      "category": "ビーチクリーンイベント"
+    },
+    {
       "date": "2026-11-22",
       "favicon": "https://www.google.com/s2/favicons?domain=cleanup.frontier.love&sz=128",
       "thumbnail": "",
@@ -73,6 +82,186 @@
       "source_name": "SUNSET BEACH PARK INAGE",
       "source_url": "https://sunsetbeachpark.jp/%e3%80%90%e5%8d%83%e8%91%89%e9%96%8b%e5%ba%9c900%e5%b9%b4%e8%a8%98%e5%bf%b5%e3%80%912026%e5%b9%b411%e6%9c%8821%e6%97%a5%e5%9c%9f-gogo%e3%83%9c%e3%83%a9%e3%83%b3%e3%83%86%e3%82%a3%e3%82%a2/2026/11/15/",
       "category": "ビーチクリーンイベント"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=turibitop.com&sz=128",
+      "thumbnail": "",
+      "title": "紋別・藻別川の河口は12月10日までサケ・マス採捕禁止、12月11日以降も内水面は全面禁止",
+      "source_name": "釣り人Ｐのフィッシング日記",
+      "source_url": "https://turibitop.com/mobetsu-salmon-news/",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.ntv.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "前橋の住宅街で21日朝もクマ目撃、暗きょに潜む可能性で捕獲準備と交通規制",
+      "source_name": "日テレNEWS NNN",
+      "source_url": "https://news.ntv.co.jp/category/society/f9a69a2fb2b8495d96f1ade5f605793f",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "埼玉・秩父市でクマ2頭を目撃、成獣と幼獣が国道140号沿いに出没",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/8e9ba968fde20f63e0542e96d9988fe2ecd5131d",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/main_24bellezza_ux.jpg?resize=1024%2C453&ssl=1",
+      "title": "オリムピックのエリアトラウトロッド「24 ベレッツァUX」、2万円台前半で上位機種譲りの性能を実現",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456132/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/IMG_0832.jpg?resize=1024%2C768&ssl=1",
+      "title": "ブレードジギング上達のカギはベイトの位置を立体的に捉えること、サワラ狙いの実践解説",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456308/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/56f3cbca0bda549ac3d42cd844c99574-1.jpg?resize=1024%2C722&ssl=1",
+      "title": "アジングのエキスパート6人がジグ単で愛用するワームとジグヘッドを紹介",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456139/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/75c140d3601436d9bf49d9f8aa3af58a-9.jpg?resize=1024%2C584&ssl=1",
+      "title": "アクアウェーブのティップラン専用エギ「アオリクスTR」、3.5号50gなど珍しい号数を展開",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456207/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/63d1935a90574ac9577bdc9debb5af4f.jpg?resize=1024%2C722&ssl=1",
+      "title": "ジャクソンの「トラウトアンリミテッド」が20余年ぶりにフルリニューアル、予約受付を開始",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456039/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/IMG_9258-1.jpg",
+      "title": "体は小さいのに尾ビレが異様に長い魚たち、ヨメゴチなど全長が伸びる理由を紹介",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417839/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f.jpeg",
+      "title": "ロッドとリールは購入から10年が買い替えの目安、見た目はきれいでも内部劣化に注意",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417543/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f.png",
+      "title": "大阪南港の堤防で83cmのブリがヒット、タチウオは釣り方次第で14本の釣果",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417527/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/202611217web00.jpg",
+      "title": "ひとつテンヤのタックル無料貸し出しを実施中、今週の船釣りニュース6選",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417503/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/6c06a9ad3b6920ec7b8153a83564cf79.png",
+      "title": "ヤエン釣りのエサは冷凍アジと冷凍アユどちらが釣れるか、実釣比較でアオリ2杯",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417252/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-1.jpg",
+      "title": "初めてのルアー釣りで息子がニジマスをキャッチ、親子で挑んだプールトラウト釣行",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417516/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-21",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
+      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/6f439f96d80301af2b7cdcb3fc1511b2.jpeg?resize=1024%2C576&ssl=1",
+      "title": "女性向け釣りアパレルShipsmastの透湿防水パンツ登場、重ね着できるゆったり設計",
+      "source_name": "釣具新聞",
+      "source_url": "https://tsurigu-np.jp/products/33471/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-20",
+      "favicon": "https://www.google.com/s2/favicons?domain=hokkoku.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "富山湾の「ひみ寒ぶり」出荷が始まる、初日1463本のうち261本を認定し新ルールに移行",
+      "source_name": "北國新聞",
+      "source_url": "https://www.hokkoku.co.jp/articles/-/2296477",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-20",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "ATTICのトラウト用マイクロクランク「Micro FURIL SR」が発売、28mm・2.0gでスレた魚に対応",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/20/newitem/lure/63942/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-20",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.47news.jp&sz=128",
+      "thumbnail": "",
+      "title": "太平洋クロマグロの国際交渉が決着、日本の大型魚漁獲枠が25％拡大",
+      "source_name": "47NEWS",
+      "source_url": "https://www.47news.jp/15261709.html",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-20",
+      "favicon": "https://www.google.com/s2/favicons?domain=kahoku.news&sz=128",
+      "thumbnail": "",
+      "title": "宮城県沖でタチウオの水揚げが前年の1割強に激減、海水温低下が要因か",
+      "source_name": "河北新報",
+      "source_url": "https://kahoku.news/articles/JY72YGLMXEKHN.html",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-20",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.tv-asahi.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "前橋の住宅街で20日朝もクマ目撃、市立小中学校などが再び休校に",
+      "source_name": "テレ朝NEWS",
+      "source_url": "https://news.tv-asahi.co.jp/news_society/articles/000549327.html",
+      "category": "クマ出没"
     },
     {
       "date": "2026-11-20",
@@ -246,49 +435,58 @@
       "category": "釣りニュース"
     },
     {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=hokkoku.co.jp&sz=128",
+      "date": "2026-11-19",
+      "favicon": "https://www.google.com/s2/favicons?domain=turibitop.com&sz=128",
       "thumbnail": "",
-      "title": "富山湾の「ひみ寒ぶり」出荷が始まる、初日1463本のうち261本を認定し新ルールに移行",
-      "source_name": "北國新聞",
-      "source_url": "https://www.hokkoku.co.jp/articles/-/2296477",
+      "title": "斜里・小清水の海岸で11月20〜30日はサケ釣り自粛を要請、秋サケ来遊は前年の57％",
+      "source_name": "釣り人Ｐのフィッシング日記",
+      "source_url": "https://turibitop.com/shari-koshimizu-salmon-news/",
       "category": "水産業"
     },
     {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "date": "2026-11-19",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.fnn.jp&sz=128",
       "thumbnail": "",
-      "title": "ATTICのトラウト用マイクロクランク「Micro FURIL SR」が発売、28mm・2.0gでスレた魚に対応",
-      "source_name": "トラウトフィッシングニュース",
-      "source_url": "https://troutnews.info/2026/11/20/newitem/lure/63942/",
-      "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.47news.jp&sz=128",
-      "thumbnail": "",
-      "title": "太平洋クロマグロの国際交渉が決着、日本の大型魚漁獲枠が25％拡大",
-      "source_name": "47NEWS",
-      "source_url": "https://www.47news.jp/15261709.html",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=kahoku.news&sz=128",
-      "thumbnail": "",
-      "title": "宮城県沖でタチウオの水揚げが前年の1割強に激減、海水温低下が要因か",
-      "source_name": "河北新報",
-      "source_url": "https://kahoku.news/articles/JY72YGLMXEKHN.html",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.tv-asahi.co.jp&sz=128",
-      "thumbnail": "",
-      "title": "前橋の住宅街で20日朝もクマ目撃、市立小中学校などが再び休校に",
-      "source_name": "テレ朝NEWS",
-      "source_url": "https://news.tv-asahi.co.jp/news_society/articles/000549327.html",
+      "title": "前橋の住宅街で再びクマ目撃、通学中の高校生を追いかける 行方不明の親グマの可能性",
+      "source_name": "FNNプライムオンライン",
+      "source_url": "https://www.fnn.jp/articles/-/1155261",
       "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-19",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "宮城の海洋総合実習船「宮城丸」が気仙沼港に帰港、水産高生20人が45日間の航海実習を終える",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/b78e2156f99a713cee60af536c34240eadf4ae29",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-19",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "広島の養殖カキの被害が拡大、県が生産者への支援を検討",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/7b218790002810ba855020cd4bd96c36406c653c",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-19",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.jp&sz=128",
+      "thumbnail": "",
+      "title": "東京・青梅市裏宿町でクマとみられる動物を目撃、警視庁が注意呼びかけ",
+      "source_name": "NEWSjp",
+      "source_url": "https://news.jp/i/1496172161216544935",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-19",
+      "favicon": "https://www.google.com/s2/favicons?domain=topics.smt.docomo.ne.jp&sz=128",
+      "thumbnail": "",
+      "title": "水産庁が来年度から水揚げ魚の「広域輸送」を支援、不漁の港の加工業を下支えへ",
+      "source_name": "ｄメニューニュース",
+      "source_url": "https://topics.smt.docomo.ne.jp/article/yomiuri/business/yomiuri-20261119-GYT1T00202",
+      "category": "水産業"
     },
     {
       "date": "2026-11-19",
@@ -507,58 +705,121 @@
       "category": "釣りニュース"
     },
     {
-      "date": "2026-11-19",
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=n-seikei.jp&sz=128",
+      "thumbnail": "",
+      "title": "創業120年の小樽の水産加工会社が破産開始、ホッケ不漁と原料高で3期連続赤字",
+      "source_name": "JC-NET",
+      "source_url": "https://n-seikei.jp/2026/11/maruichi-doi-suisan-otaru-hasan-kaishi-2026.html",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=minyu-net.com&sz=128",
+      "thumbnail": "",
+      "title": "福島のサケ漁は今季壊滅的、稚魚放流の見通し立たず来年以降の継続に危機感",
+      "source_name": "福島民友新聞社",
+      "source_url": "https://minyu-net.com/news/detail/2026111809304957381",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-18",
       "favicon": "https://www.google.com/s2/favicons?domain=turibitop.com&sz=128",
       "thumbnail": "",
-      "title": "斜里・小清水の海岸で11月20〜30日はサケ釣り自粛を要請、秋サケ来遊は前年の57％",
+      "title": "ダイワのワカサギ電動リール「クリスティア ワカサギ CRS II」が11月発売、名人誘いスイッチ搭載で約90g",
       "source_name": "釣り人Ｐのフィッシング日記",
-      "source_url": "https://turibitop.com/shari-koshimizu-salmon-news/",
-      "category": "水産業"
+      "source_url": "https://turibitop.com/daiwa-crystia-wakasagi-crs2-news/",
+      "category": "釣具新製品"
     },
     {
-      "date": "2026-11-19",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.fnn.jp&sz=128",
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.tv-asahi.co.jp&sz=128",
       "thumbnail": "",
-      "title": "前橋の住宅街で再びクマ目撃、通学中の高校生を追いかける 行方不明の親グマの可能性",
-      "source_name": "FNNプライムオンライン",
-      "source_url": "https://www.fnn.jp/articles/-/1155261",
+      "title": "前橋市の住宅街に出没した親子グマ、子グマ1頭を麻酔銃で捕獲も親グマは行方不明、70校は19日から再開",
+      "source_name": "テレ朝NEWS",
+      "source_url": "https://news.tv-asahi.co.jp/news_society/articles/900204512.html",
       "category": "クマ出没"
     },
     {
-      "date": "2026-11-19",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=newsdig.tbs.co.jp&sz=128",
       "thumbnail": "",
-      "title": "宮城の海洋総合実習船「宮城丸」が気仙沼港に帰港、水産高生20人が45日間の航海実習を終える",
-      "source_name": "Yahoo!ニュース",
-      "source_url": "https://news.yahoo.co.jp/articles/b78e2156f99a713cee60af536c34240eadf4ae29",
+      "title": "記録的なサンマ不漁のなか根室港にサンマの群れが入り込み、岸壁が釣り客でにぎわう",
+      "source_name": "TBS NEWS DIG",
+      "source_url": "https://newsdig.tbs.co.jp/articles/hbc/3094975",
       "category": "水産業"
     },
     {
-      "date": "2026-11-19",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.ntv.co.jp&sz=128",
       "thumbnail": "",
-      "title": "広島の養殖カキの被害が拡大、県が生産者への支援を検討",
-      "source_name": "Yahoo!ニュース",
-      "source_url": "https://news.yahoo.co.jp/articles/7b218790002810ba855020cd4bd96c36406c653c",
+      "title": "佐渡の寒ブリが今季最多の400本水揚げ、海水温上昇による不漁のなか待望の大漁",
+      "source_name": "TeNY NEWS NNN",
+      "source_url": "https://news.ntv.co.jp/n/teny/category/society/tea6d1ac76d38f493ab93040634b513676",
       "category": "水産業"
     },
     {
-      "date": "2026-11-19",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.jp&sz=128",
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.47news.jp&sz=128",
       "thumbnail": "",
-      "title": "東京・青梅市裏宿町でクマとみられる動物を目撃、警視庁が注意呼びかけ",
-      "source_name": "NEWSjp",
-      "source_url": "https://news.jp/i/1496172161216544935",
-      "category": "クマ出没"
+      "title": "石川・手取川のサケ遡上が10月末時点でわずか3匹、昨年の121匹から激減し採卵に懸念",
+      "source_name": "47NEWS",
+      "source_url": "https://www.47news.jp/15246855.html",
+      "category": "水産業"
     },
     {
-      "date": "2026-11-19",
-      "favicon": "https://www.google.com/s2/favicons?domain=topics.smt.docomo.ne.jp&sz=128",
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
       "thumbnail": "",
-      "title": "水産庁が来年度から水揚げ魚の「広域輸送」を支援、不漁の港の加工業を下支えへ",
-      "source_name": "ｄメニューニュース",
-      "source_url": "https://topics.smt.docomo.ne.jp/article/yomiuri/business/yomiuri-20261119-GYT1T00202",
+      "title": "HMKLのトラウトエリア用ミノー「ザッガー50 B1ハーフ」に新色を追加、浅場・障害物周り向け",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63919/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "HMKLのトラウトエリア用ジグミノー「ジグミノー50ヘビー」に新色を追加、ボトム攻略向けのヘビーウェイト",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63915/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "HMKLのトラウトエリア用シャッド「ラトリンシャッド45Fエリアバージョン」が発売、45mm・2.5gのフローティング",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63911/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=digital.asahi.com&sz=128",
+      "thumbnail": "",
+      "title": "サケの来遊数は25年に約690万匹まで減少、野生魚の保全が回復のカギに",
+      "source_name": "朝日新聞",
+      "source_url": "https://digital.asahi.com/articles/ASVCJ1JSRVCJUTFL018M.html",
       "category": "水産業"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=japan-fishing.minagiman.com&sz=128",
+      "thumbnail": "",
+      "title": "ダイワのベイトフィネスリール「27スティーズBF TW パワーチューン」が12月発売、初の9.2ギア搭載",
+      "source_name": "ミナギマン",
+      "source_url": "https://japan-fishing.minagiman.com/daiwa-27-steez-bf-tw-powertune/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-18",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.point-i.jp&sz=128",
+      "thumbnail": "",
+      "title": "大型マダイや根魚に特化した固定式インチク「ファルケンR LEAPSHOOT-a」登場",
+      "source_name": "釣具のポイント",
+      "source_url": "https://www.point-i.jp/shop_topics/3289908",
+      "category": "釣具新製品"
     },
     {
       "date": "2026-11-18",
@@ -786,121 +1047,85 @@
       "category": "釣りニュース"
     },
     {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=n-seikei.jp&sz=128",
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.livedoor.com&sz=128",
       "thumbnail": "",
-      "title": "創業120年の小樽の水産加工会社が破産開始、ホッケ不漁と原料高で3期連続赤字",
-      "source_name": "JC-NET",
-      "source_url": "https://n-seikei.jp/2026/11/maruichi-doi-suisan-otaru-hasan-kaishi-2026.html",
+      "title": "AIとIoTで育てる陸上養殖サバ「福の鯖」、浪江町の閉鎖循環式施設で生産",
+      "source_name": "ライブドアニュース",
+      "source_url": "https://news.livedoor.com/article/detail/32836233/",
       "category": "水産業"
     },
     {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=minyu-net.com&sz=128",
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=suisan-h.hatenablog.com&sz=128",
       "thumbnail": "",
-      "title": "福島のサケ漁は今季壊滅的、稚魚放流の見通し立たず来年以降の継続に危機感",
-      "source_name": "福島民友新聞社",
-      "source_url": "https://minyu-net.com/news/detail/2026111809304957381",
+      "title": "秋サケ漁獲は11月10日現在で約302万尾・前年比45％減、来年度のクロマグロ等のTACを承認",
+      "source_name": "水産北海道ブログ",
+      "source_url": "https://suisan-h.hatenablog.com/entry/2026/11/17/162735",
       "category": "水産業"
     },
     {
-      "date": "2026-11-18",
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "下関からニューヨークへ今季初のトラフグを出荷、養殖の身欠き約200キロで年明けは天然トラフグや白子も",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/1abad60d6b8d41eed51e99621144dce461dfe2a6",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "秋田・男鹿市で高級魚タマカイの陸上養殖が本格化、温泉施設跡地に水槽が完成し初出荷は2027年予定",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/b160a54f36457881f0ab038b272af9689c5595e6",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-17",
       "favicon": "https://www.google.com/s2/favicons?domain=turibitop.com&sz=128",
       "thumbnail": "",
-      "title": "ダイワのワカサギ電動リール「クリスティア ワカサギ CRS II」が11月発売、名人誘いスイッチ搭載で約90g",
+      "title": "ダイワの海サクラ向けミノー「ショアラインシャイナーSL」が12月に再登場、重心移動を改良し2サイズ6色",
       "source_name": "釣り人Ｐのフィッシング日記",
-      "source_url": "https://turibitop.com/daiwa-crystia-wakasagi-crs2-news/",
+      "source_url": "https://turibitop.com/daiwa-shoreline-shiner-sl-news/",
       "category": "釣具新製品"
     },
     {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.tv-asahi.co.jp&sz=128",
-      "thumbnail": "",
-      "title": "前橋市の住宅街に出没した親子グマ、子グマ1頭を麻酔銃で捕獲も親グマは行方不明、70校は19日から再開",
-      "source_name": "テレ朝NEWS",
-      "source_url": "https://news.tv-asahi.co.jp/news_society/articles/900204512.html",
-      "category": "クマ出没"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=newsdig.tbs.co.jp&sz=128",
-      "thumbnail": "",
-      "title": "記録的なサンマ不漁のなか根室港にサンマの群れが入り込み、岸壁が釣り客でにぎわう",
-      "source_name": "TBS NEWS DIG",
-      "source_url": "https://newsdig.tbs.co.jp/articles/hbc/3094975",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.ntv.co.jp&sz=128",
-      "thumbnail": "",
-      "title": "佐渡の寒ブリが今季最多の400本水揚げ、海水温上昇による不漁のなか待望の大漁",
-      "source_name": "TeNY NEWS NNN",
-      "source_url": "https://news.ntv.co.jp/n/teny/category/society/tea6d1ac76d38f493ab93040634b513676",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.47news.jp&sz=128",
-      "thumbnail": "",
-      "title": "石川・手取川のサケ遡上が10月末時点でわずか3匹、昨年の121匹から激減し採卵に懸念",
-      "source_name": "47NEWS",
-      "source_url": "https://www.47news.jp/15246855.html",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-18",
+      "date": "2026-11-17",
       "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
       "thumbnail": "",
-      "title": "HMKLのトラウトエリア用ミノー「ザッガー50 B1ハーフ」に新色を追加、浅場・障害物周り向け",
+      "title": "イマカツのトラウトエリア用シャッド「スピニック」が発売、ダート性能とレンジキープを融合",
       "source_name": "トラウトフィッシングニュース",
-      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63919/",
+      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63901/",
       "category": "釣具新製品"
     },
     {
-      "date": "2026-11-18",
+      "date": "2026-11-17",
       "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
       "thumbnail": "",
-      "title": "HMKLのトラウトエリア用ジグミノー「ジグミノー50ヘビー」に新色を追加、ボトム攻略向けのヘビーウェイト",
+      "title": "ラパラのバルサ製ジョイントミノー「カウントダウン ジョインテッドエリート」が発売",
       "source_name": "トラウトフィッシングニュース",
-      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63915/",
+      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63898/",
       "category": "釣具新製品"
     },
     {
-      "date": "2026-11-18",
+      "date": "2026-11-17",
       "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
       "thumbnail": "",
-      "title": "HMKLのトラウトエリア用シャッド「ラトリンシャッド45Fエリアバージョン」が発売、45mm・2.5gのフローティング",
+      "title": "ヴァルケインのトラウト用ロッド「ダーインスレイヴ アンコントロール」に6フィートモデルが登場",
       "source_name": "トラウトフィッシングニュース",
-      "source_url": "https://troutnews.info/2026/11/18/newitem/lure/63911/",
+      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63894/",
       "category": "釣具新製品"
     },
     {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=digital.asahi.com&sz=128",
+      "date": "2026-11-17",
+      "favicon": "https://www.google.com/s2/favicons?domain=suisan-navi.jp&sz=128",
       "thumbnail": "",
-      "title": "サケの来遊数は25年に約690万匹まで減少、野生魚の保全が回復のカギに",
-      "source_name": "朝日新聞",
-      "source_url": "https://digital.asahi.com/articles/ASVCJ1JSRVCJUTFL018M.html",
+      "title": "8〜10月のサンマ水揚げは前年比81％減の8796トンで過去最低、船上冷凍の実証試験で挽回図る",
+      "source_name": "水産ナビ",
+      "source_url": "https://suisan-navi.jp/fishing/sanma-senjo-reito-taisaku-2026/",
       "category": "水産業"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=japan-fishing.minagiman.com&sz=128",
-      "thumbnail": "",
-      "title": "ダイワのベイトフィネスリール「27スティーズBF TW パワーチューン」が12月発売、初の9.2ギア搭載",
-      "source_name": "ミナギマン",
-      "source_url": "https://japan-fishing.minagiman.com/daiwa-27-steez-bf-tw-powertune/",
-      "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.point-i.jp&sz=128",
-      "thumbnail": "",
-      "title": "大型マダイや根魚に特化した固定式インチク「ファルケンR LEAPSHOOT-a」登場",
-      "source_name": "釣具のポイント",
-      "source_url": "https://www.point-i.jp/shop_topics/3289908",
-      "category": "釣具新製品"
     },
     {
       "date": "2026-11-17",
@@ -1080,195 +1305,6 @@
       "title": "釣り場の落水事故対策にボタン一つでSOSを通知する「よびもり」の実証実験",
       "source_name": "釣具新聞",
       "source_url": "https://tsurigu-np.jp/news/33138/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/b7421be6dcb02dd64e2d4ebcab5eb08c.jpg?resize=1024%2C722&ssl=1",
-      "title": "ジャクソンの卵型グッズ「ロッドエッグ」、2ピースロッドの固着外しと束ねに便利",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455905/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-67.jpg?resize=1024%2C722&ssl=1",
-      "title": "デュエルの「クイックリーダー」、ループtoループで初心者でも30秒ほどでリーダーを結束",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455548/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/04/main_24supercorto.jpg?resize=1024%2C453&ssl=1",
-      "title": "オリムピックのアジングロッド最高峰「24スーパーコルト」、トレカM40Xで軽さと感度を追求",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455052/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4_000000000256.png?resize=449%2C449&ssl=1",
-      "title": "ジャクソンのサワラ・サゴシ向けブレードジグ「メタルエフェクト サゴシチューン」、ダブルフックでフッキング率向上",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455607/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/8089e50294910c6cb163e5cb54ad137b-9.jpg?resize=640%2C480&ssl=1",
-      "title": "釣具のキャスティングのスタッフが東京・落合川の清掃に参加、釣り場環境の保全に尽力",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33415/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
-      "thumbnail": "https://castingnet.jp/cmsimg/tpc269101-3.png",
-      "title": "キャスティング福岡店でアパレルアウトレットセールを11月27日から12月13日まで開催",
-      "source_name": "キャスティング",
-      "source_url": "https://castingnet.jp/news/detail.php?no=269101",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.livedoor.com&sz=128",
-      "thumbnail": "",
-      "title": "AIとIoTで育てる陸上養殖サバ「福の鯖」、浪江町の閉鎖循環式施設で生産",
-      "source_name": "ライブドアニュース",
-      "source_url": "https://news.livedoor.com/article/detail/32836233/",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=suisan-h.hatenablog.com&sz=128",
-      "thumbnail": "",
-      "title": "秋サケ漁獲は11月10日現在で約302万尾・前年比45％減、来年度のクロマグロ等のTACを承認",
-      "source_name": "水産北海道ブログ",
-      "source_url": "https://suisan-h.hatenablog.com/entry/2026/11/17/162735",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
-      "thumbnail": "",
-      "title": "下関からニューヨークへ今季初のトラフグを出荷、養殖の身欠き約200キロで年明けは天然トラフグや白子も",
-      "source_name": "Yahoo!ニュース",
-      "source_url": "https://news.yahoo.co.jp/articles/1abad60d6b8d41eed51e99621144dce461dfe2a6",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
-      "thumbnail": "",
-      "title": "秋田・男鹿市で高級魚タマカイの陸上養殖が本格化、温泉施設跡地に水槽が完成し初出荷は2027年予定",
-      "source_name": "Yahoo!ニュース",
-      "source_url": "https://news.yahoo.co.jp/articles/b160a54f36457881f0ab038b272af9689c5595e6",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=turibitop.com&sz=128",
-      "thumbnail": "",
-      "title": "ダイワの海サクラ向けミノー「ショアラインシャイナーSL」が12月に再登場、重心移動を改良し2サイズ6色",
-      "source_name": "釣り人Ｐのフィッシング日記",
-      "source_url": "https://turibitop.com/daiwa-shoreline-shiner-sl-news/",
-      "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
-      "thumbnail": "",
-      "title": "イマカツのトラウトエリア用シャッド「スピニック」が発売、ダート性能とレンジキープを融合",
-      "source_name": "トラウトフィッシングニュース",
-      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63901/",
-      "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
-      "thumbnail": "",
-      "title": "ラパラのバルサ製ジョイントミノー「カウントダウン ジョインテッドエリート」が発売",
-      "source_name": "トラウトフィッシングニュース",
-      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63898/",
-      "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
-      "thumbnail": "",
-      "title": "ヴァルケインのトラウト用ロッド「ダーインスレイヴ アンコントロール」に6フィートモデルが登場",
-      "source_name": "トラウトフィッシングニュース",
-      "source_url": "https://troutnews.info/2026/11/17/newitem/lure/63894/",
-      "category": "釣具新製品"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=suisan-navi.jp&sz=128",
-      "thumbnail": "",
-      "title": "8〜10月のサンマ水揚げは前年比81％減の8796トンで過去最低、船上冷凍の実証試験で挽回図る",
-      "source_name": "水産ナビ",
-      "source_url": "https://suisan-navi.jp/fishing/sanma-senjo-reito-taisaku-2026/",
-      "category": "水産業"
-    },
-    {
-      "date": "2026-11-16",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/image-28.png?resize=724%2C1024&ssl=1",
-      "title": "ハヤブサの「OPENSPACE」で11月22日にアクアポニックス収穫体験とBBQ、屋内釣り堀も併設",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/news/33552/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-16",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/ae46b1f460ee46f789c27b264a6cb421-8.jpg?fit=1024%2C722&ssl=1",
-      "title": "ゼニスの人気アジングロッド「AIM」にチタンガイド搭載の限定モデルが登場",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455669/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-16",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-41.jpg?fit=1024%2C722&ssl=1",
-      "title": "オリムピックのアジングロッド上位機種「26コルト・プロトタイプ」が3年ぶりに刷新、ティップとリールシートを見直し",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455044/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-16",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/00001.jpg?fit=1024%2C722&ssl=1",
-      "title": "がまかつから新型ジグヘッド「宵姫ステルスグライド」登場、群れを散らさない独自フォルムが特長",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455657/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-16",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/8fd521c0855a22811ad556d6444de32e.jpg?fit=1024%2C722&ssl=1",
-      "title": "11月18日放送の釣り番組「The HIT」は五三川のおかっぱり、志達海輝プロとモモ連発を狙う",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455472/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-16",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/f36cd0e165435b941d874d4eeb92298d.jpg?fit=1024%2C722&ssl=1",
-      "title": "メガバス39周年サンクスフェアがスタート、抽選で39名に限定ポップXが当たる",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455549/",
       "category": "釣りニュース"
     },
     {
