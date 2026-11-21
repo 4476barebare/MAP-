@@ -430,6 +430,13 @@ async function showAllRegionSpots() {
                             a => String(a.individualId || '').trim() === areaIndividualId
                         );
                         if (!area) return;
+                        if (window.prefData && typeof setIdealQuery === 'function') {
+                            setIdealQuery('pref', window.prefData.notes);
+                            setIdealQuery('area', area.name);
+                            setIdealQuery('spot', null);
+                        }
+                        window.currentAreaId = `${area.areaId}_${area.individualId}`;
+                        window.currentSpotId = null;
                         selectArea(area);
                     };
 
@@ -844,6 +851,7 @@ async function region_management() {
 
     if (typeof updateSeoMeta === 'function') updateSeoMeta();
     if (typeof renderSpotRanking === 'function') renderSpotRanking();
+    if (typeof syncGuideSections === 'function') syncGuideSections();
 
     const prefList = [...new Set(
         (window.regionPrefData || []).map(item => item.prefCode).filter(Boolean)

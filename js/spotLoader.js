@@ -166,11 +166,6 @@ function renderAccessInfo(spot) {
         html += '</ul>';
     }
 
-    // 初期ガイドが残っている場合はクリアし、#spot-access-main のみ更新して後続セクション（釣具店・対象魚・釣果）を維持
-    if (container.querySelector('#default-site-guide')) {
-        container.innerHTML = '';
-    }
-
     let mainBlock = document.getElementById('spot-access-main');
     if (!mainBlock || mainBlock.parentNode !== container) {
         mainBlock = document.createElement('div');
@@ -179,6 +174,12 @@ function renderAccessInfo(spot) {
     }
     mainBlock.innerHTML = html;
     container.style.display = 'block';
+
+    // SPOT画面表示中は「特徴と使い方」と「エリアガイド」を確実に非表示にする
+    const siteGuideBox = document.getElementById('siteGuideBox');
+    if (siteGuideBox) siteGuideBox.style.display = 'none';
+    const areaGuide = document.getElementById('area-guide');
+    if (areaGuide) areaGuide.style.display = 'none';
 
     if (typeof renderShopSection === 'function') {
         renderShopSection(spot);
@@ -462,9 +463,8 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         });
     }
 
-    if (typeof renderAreaGuide === 'function') renderAreaGuide();
     if (typeof renderSpotRanking === 'function') renderSpotRanking();
-    if (parentArea && typeof openArea === 'function') openArea(parentArea.individualId);
+    if (typeof syncGuideSections === 'function') syncGuideSections();
 
     const jnnRow = document.getElementById('map-jma-alert');
     if (jnnRow && window.currentPref === prefCode) {
@@ -731,6 +731,7 @@ function zoomToSpot(spot, options = {}) {
         setIdealQuery('spot', safe.name);
         window.currentSpotId = safe.individualId;
     }
+    if (typeof syncGuideSections === 'function') syncGuideSections();
 
     const finalizeZoomToSpot = () => {
         window.map.invalidateSize(true);
@@ -1976,7 +1977,7 @@ async function renderRecentCatches(spot) {
     if (!data) return;
 
     // 非同期取得完了後：スポット画面から離脱済み、または既に同スポットが挿入済みなら即リターン
-    if (accessBox.querySelector('#default-site-guide')) return;
+    if ((typeof window.isSpotScreen === 'function' && !window.isSpotScreen()) || accessBox.style.display === 'none') return;
     if (window.currentSpotId && spot.individualId != null && String(window.currentSpotId) !== String(spot.individualId)) {
         return;
     }
@@ -2025,25 +2026,12 @@ async function renderRecentCatches(spot) {
         accessBox.appendChild(catchDiv);
     }
 }
-// ★ 初回ロード時に初期HTML（サイト説明）を記憶しておく
-window.addEventListener('DOMContentLoaded', () => {
-    const box = document.getElementById('accessInfoBox');
-    if (box) {
-        window._defaultAccessBoxHtml = box.innerHTML;
-    }
-});
-
-// ★ スポット画面から戻る時は、非表示にせず「サイトの使い方」に戻す
+// ★ スポット詳細情報枠をクリアして非表示にする（「特徴と使い方」は #siteGuideBox で独立管理）
 function clearAccessInfo() {
     const container = document.getElementById('accessInfoBox');
     if (container) {
-        if (window._defaultAccessBoxHtml) {
-            container.innerHTML = window._defaultAccessBoxHtml;
-            container.style.display = 'block';
-        } else {
-            container.innerHTML = '';
-            container.style.display = 'none';
-        }
+        container.innerHTML = '';
+        container.style.display = 'none';
     }
 }
 

@@ -176,6 +176,11 @@ function selectArea(area) {
         : area;
 
     if (!areaObj) return;
+    if (areaObj.areaId && areaObj.individualId) {
+        window.currentAreaId = `${areaObj.areaId}_${areaObj.individualId}`;
+    }
+    window.currentSpotId = null;
+    if (typeof syncGuideSections === 'function') syncGuideSections();
     if (typeof showPrefSpots === 'function') showPrefSpots();
     
     window.map.setMaxBounds(null);
@@ -210,7 +215,11 @@ function selectArea(area) {
 
     const finalizeArea = () => {
         window.map.invalidateSize(true);
-        openArea(areaObj.individualId);
+        if (typeof syncGuideSections === 'function') {
+            syncGuideSections();
+        } else if (typeof openArea === 'function') {
+            openArea(areaObj.individualId);
+        }
         showSpotsForArea(window.currentAreaId);
         // 👇【ここに追加】県スワイプをOFFにしてから、エリアスワイプをONにする
         if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
@@ -487,6 +496,7 @@ async function selectSpot(spotOrCoords) {
             
             enablePhase2(window.map);
             window.map.getContainer().classList.add('is-spot-mode');
+            if (typeof syncGuideSections === 'function') syncGuideSections();
             window._isRestoringSpot = false;
             window._selectSpotCompleted = true;
             window.goBackGuard = false;
@@ -823,6 +833,7 @@ function enablePhase2(map) {
                             if (window.markerControl && typeof markerControl.showShop02 === 'function') {
                                 markerControl.showShop02(window.currentAreaId);
                             }
+                            if (typeof syncGuideSections === 'function') syncGuideSections();
 
                             if (typeof updateSeoMeta === 'function') updateSeoMeta();
                         }
