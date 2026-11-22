@@ -776,21 +776,24 @@ li {
 }
 
 /* =========================
-   ページ主題 H1（地図直下・全画面共通の唯一のH1）
+   ページ主題 H1（地図直下・全画面共通の唯一のH1：控えめな1行キャプション調）
 ========================= */
 .page-main-heading-wrap {
     background: #fff;
-    padding: 10px 16px 2px 16px;
+    padding: 6px 12px 0 12px;
 }
 
 .page-main-h1 {
-    font-size: 13.5px;
-    font-weight: 700;
-    line-height: 1.45;
-    color: #191970;
+    font-size: clamp(10px, 2.85vw, 12px);
+    font-weight: 500;
+    line-height: 1.4;
+    color: rgba(25, 25, 112, 0.72);
     margin: 0;
-    padding-left: 8px;
-    border-left: 4px solid #191970;
+    padding: 0;
+    border-left: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* =========================
