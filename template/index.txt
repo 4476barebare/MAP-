@@ -494,10 +494,10 @@ function buildPageMainH1Text(params) {
   const area = params.get('area');
   const spotName = params.get('spot');
   if (spotName) {
-    return `${spotName}｜週間天気・アクセス情報から釣り場解説・最新釣果`;
+    return '週間天気・アクセス情報から釣り場解説・最新釣果';
   }
   if (area) {
-    return `${area}｜天気・タイドグラフ・釣果・最寄りの釣具店まで完全収録`;
+    return '天気・タイドグラフ・釣果・最寄りの釣具店まで完全収録';
   }
   if (pref) {
     return `${pref}の天気と最新釣果で明日のおすすめランキング`;
