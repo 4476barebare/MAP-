@@ -71,7 +71,13 @@ function enableAreaSwipe() {
 
         if (!currentArea) return;
 
-        const graph = window.areaGraph[currentArea.name];
+        if ((!window.areaGraph || !window.areaGraph[currentArea.name]) && Array.isArray(window.areaData) && window.areaData.length > 0) {
+            buildAreaGraphFromGrid(window.areaData);
+            if (window.currentPref) {
+                window[`${window.currentPref}_areaGraph`] = window.areaGraph;
+            }
+        }
+        const graph = window.areaGraph && window.areaGraph[currentArea.name];
         if (!graph) return;
 
         let nextName = null;
@@ -170,111 +176,23 @@ function prefetchAround(area) {
     });
 }
 
-window._prefetchedAreaOrtKeys = window._prefetchedAreaOrtKeys || new Set();
-
-function resolveAreaObject(areaOrId) {
-    if (areaOrId && typeof areaOrId === 'object' && areaOrId.lat != null && areaOrId.lng != null) {
-        return areaOrId;
-    }
-    const list = Array.isArray(window.areaData) ? window.areaData : [];
-    if (!list.length) return null;
-
-    if (typeof areaOrId === 'string' && areaOrId.trim() !== '') {
-        const key = areaOrId.trim();
-        return list.find(a =>
-            a.name === key ||
-            String(a.areaId + '_' + a.individualId) === key ||
-            String(a.individualId) === key
-        ) || null;
-    }
-
-    if (window.currentAreaId) {
-        const curKey = String(window.currentAreaId).trim();
-        const curIndiv = curKey.includes('_') ? curKey.split('_').pop() : curKey;
-        return list.find(a =>
-            String(a.areaId + '_' + a.individualId) === curKey ||
-            String(a.individualId) === curIndiv
-        ) || null;
-    }
-
-    return null;
-}
-
-// Phase2滞在中に戻り先エリア（Phase1）の ort タイル（3x3枚）を裏で先読みキャッシュする
-function prefetchAreaOrtTiles(areaOrId) {
-    const areaObj = resolveAreaObject(areaOrId);
-    if (!areaObj || !window.TILE_URLS || !window.TILE_URLS.ort) {
-        return Promise.resolve();
-    }
-
-    const lat = Number(areaObj.lat);
-    const lng = Number(areaObj.lng);
-    const rawZoom = Number(areaObj.zoom || (window.prefData && window.prefData.zoom) || 11);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || !Number.isFinite(rawZoom)) {
-        return Promise.resolve();
-    }
-
-    const fetchZoom = Math.floor(rawZoom);
-    const cacheKey = `${areaObj.areaId || ''}_${areaObj.individualId || areaObj.name}_${fetchZoom}`;
-    if (window._prefetchedAreaOrtKeys.has(cacheKey)) {
-        return Promise.resolve();
-    }
-    window._prefetchedAreaOrtKeys.add(cacheKey);
-
-    const n = Math.pow(2, fetchZoom);
-    const tileX = Math.floor(((lng + 180) / 360) * n);
-    const latRad = (lat * Math.PI) / 180;
-    const tileY = Math.floor(
-        ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
-    );
-
-    const ortTemplate = window.TILE_URLS.ort;
-    const promises = [];
-
-    for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
-            const tx = tileX + dx;
-            const ty = tileY + dy;
-            if (tx < 0 || ty < 0 || tx >= n || ty >= n) continue;
-
-            const url = ortTemplate
-                .replace('{z}', fetchZoom)
-                .replace('{x}', tx)
-                .replace('{y}', ty);
-
-            promises.push(
-                new Promise(resolve => {
-                    const img = new Image();
-                    const timer = setTimeout(resolve, 1200);
-                    img.onload = img.onerror = () => {
-                        clearTimeout(timer);
-                        resolve();
-                    };
-                    img.src = url;
-                })
-            );
-        }
-    }
-
-    return Promise.all(promises);
-}
-window.prefetchAreaOrtTiles = prefetchAreaOrtTiles;
-
 function selectArea(area, options = {}) {
     const areaObj = typeof area === 'string'
         ? window.areaData.find(a => a.name === area)
         : area;
 
     if (!areaObj) return;
-    window._phase2ReadyGen = (window._phase2ReadyGen || 0) + 1;
+    const fromPhase2Return = !!(options && options.fromPhase2Return);
 
     if (areaObj.areaId && areaObj.individualId) {
         window.currentAreaId = `${areaObj.areaId}_${areaObj.individualId}`;
     }
     window.currentSpotId = null;
     if (typeof syncGuideSections === 'function') syncGuideSections();
-    if (typeof showPrefSpots === 'function') showPrefSpots();
+    // Phase2復帰時はズーム13の途中で道路・ドット処理が走らないよう移動完了後にまとめて反映する
+    if (!fromPhase2Return && typeof showPrefSpots === 'function') showPrefSpots();
     
+    window.map.stop();
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
     
@@ -287,10 +205,8 @@ function selectArea(area, options = {}) {
         window.map.removeLayer(markerControl.shop01Layer);
         markerControl.shop01Layer = null;
     }
-
-    prefetchAround(areaObj);
     
-    const targetZoom = areaObj.zoom || window.prefData.zoom;
+    const targetZoom = areaObj.zoom || (window.prefData && window.prefData.zoom) || 11;
     const center = window.map.getCenter();
     const isSameLoc = center && Math.abs(center.lat - areaObj.lat) < 0.0001 && 
                       Math.abs(center.lng - areaObj.lng) < 0.0001 && 
@@ -303,10 +219,11 @@ function selectArea(area, options = {}) {
         targetZoom
     );
     
-    document.getElementById('map-menu').style.display = 'none';
-
-    const fromPhase2Return = !!(options && options.fromPhase2Return);
-    const returnFadeGen = options ? options.fadeGen : null;
+    // Phase2からの復帰時はメニューを一度消してちらつかせない
+    if (!fromPhase2Return) {
+        const menuEl = document.getElementById('map-menu');
+        if (menuEl) menuEl.style.display = 'none';
+    }
 
     const finalizeArea = () => {
         window.map.invalidateSize(true);
@@ -321,71 +238,30 @@ function selectArea(area, options = {}) {
         enableAreaSwipe();
         phase1menu(window.currentAreaId);
 
-        const revealPhase1UI = () => {
-            if (returnFadeGen != null && window._tileFadeGen !== returnFadeGen) return;
-
-            if (fromPhase2Return && window.osmLayer) {
-                const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
-                if (gsiContainer) {
-                    gsiContainer.style.transition = 'opacity 0.4s ease';
-                    window.gsiLayer.setZIndex(100);
-                    window.gsiLayer.setOpacity(1);
-                }
-                const osmContainer = window.osmLayer.getContainer();
-                if (osmContainer) {
-                    osmContainer.style.transition = 'opacity 0.6s ease';
-                }
-                window.osmLayer.setOpacity(0);
-                setTimeout(() => {
-                    if (returnFadeGen != null && window._tileFadeGen !== returnFadeGen) return;
-                    if (window.osmLayer) window.osmLayer.setZIndex(1);
-                }, 650);
-            }
-
-            if (window.markerControl) {
-                markerControl.showShop01(window.currentAreaId);
-            }
-
-            const btn = document.getElementById('map-back-btn');
-            if (btn) {
-                btn.style.display = 'block';
-                btn.style.pointerEvents = 'auto';
-                requestAnimationFrame(() => {
-                    btn.style.transition = 'opacity 0.4s ease';
-                    btn.style.opacity = '1';
-                });
-            }
-            window.goBackGuard = false;
-            showRoadLayers();
-            saveMapState();
-        };
-
-        if (fromPhase2Return && window.gsiLayer) {
-            // flyTo完了後の1フレーム後に新ズームortの読み込み状態を確認し、揃ってからOSMをフェードアウト
+        requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                if (returnFadeGen != null && window._tileFadeGen !== returnFadeGen) return;
-                const isGsiLoading = !!(
-                    (typeof window.gsiLayer.isLoading === 'function' && window.gsiLayer.isLoading()) ||
-                    window.gsiLayer._loading
-                );
-                if (isGsiLoading) {
-                    let revealed = false;
-                    const triggerReveal = () => {
-                        if (revealed) return;
-                        revealed = true;
-                        revealPhase1UI();
-                    };
-                    window.gsiLayer.once('load', triggerReveal);
-                    setTimeout(triggerReveal, 800);
-                } else {
-                    revealPhase1UI();
+                if (fromPhase2Return) {
+                    if (typeof showPrefSpots === 'function') showPrefSpots();
+                    if (typeof renderCrowdImage === 'function') renderCrowdImage();
                 }
+                if (window.markerControl) {
+                    markerControl.showShop01(window.currentAreaId);
+                }
+
+                const btn = document.getElementById('map-back-btn');
+                if (btn) {
+                    btn.style.display = 'block';
+                    btn.style.pointerEvents = 'auto';
+                    requestAnimationFrame(() => {
+                        btn.style.transition = 'opacity 0.4s ease';
+                        btn.style.opacity = '1';
+                    });
+                }
+                window.goBackGuard = false;
+                showRoadLayers();
+                saveMapState();
             });
-        } else {
-            requestAnimationFrame(() => {
-                requestAnimationFrame(revealPhase1UI);
-            });
-        }
+        });
     };
 
     if (isSameLoc) {
@@ -406,64 +282,78 @@ function saveMapState() {
 }
 
 function showSpotsForArea(areaKey) {
-
-    if (!window.areaSpotLayer) {
-        window.areaSpotLayer = L.layerGroup().addTo(window.map);
-    } else {
-        window.areaSpotLayer.clearLayers();
-    }
-
-    // 以下そのまま
+    if (!window.map) return;
 
     // =====================================================
     // ★ 変更点1: マーカー表示用（エリア制限を外して県内全件抽出）
     // =====================================================
-    const allPrefSpots = window.spotData.filter(s => 
+    const allPrefSpots = (window.spotData || []).filter(s => 
         s.icon && s.icon.trim() !== ''
     );
     
     // =====================================================
     // ★ 変更点2: ズーム計算用（クリックされたエリアのみ抽出）
     // =====================================================
-    const targetAreaSpots = window.spotData.filter(s => 
+    const targetAreaSpots = (window.spotData || []).filter(s => 
         s.areaId === areaKey && s.icon && s.icon.trim() !== ''
     );
 
     if (!allPrefSpots.length) return;
 
-    let minLat = Infinity, maxLat = -Infinity;
-    let minLng = Infinity, maxLng = -Infinity;
+    const currentPrefKey = String(window.currentPref || '');
+    const canReuseMarkers = !!(
+        window.areaSpotLayer &&
+        window.map.hasLayer(window.areaSpotLayer) &&
+        window.areaSpotLayer.getLayers().length === allPrefSpots.length &&
+        window._areaSpotLayerPref === currentPrefKey
+    );
 
-    // 1. 県内の【全スポット】に対してテキストマーカーを生成して地図に追加
-    allPrefSpots.forEach(spot => {
-        let type = 'spot';
-        if (spot.icon && spot.icon.startsWith('fish')) {
-            const match = spot.icon.match(/fish\d+/);
-            if (match) type = match[0];
+    if (!canReuseMarkers) {
+        if (!window.areaSpotLayer) {
+            window.areaSpotLayer = L.layerGroup().addTo(window.map);
+        } else {
+            window.areaSpotLayer.clearLayers();
+            if (!window.map.hasLayer(window.areaSpotLayer)) {
+                window.areaSpotLayer.addTo(window.map);
+            }
         }
 
-        const isFish = type.startsWith('fish');
+        // 1. 県内の【全スポット】に対してテキストマーカーを生成して地図に追加
+        allPrefSpots.forEach(spot => {
+            let type = 'spot';
+            if (spot.icon && spot.icon.startsWith('fish')) {
+                const match = spot.icon.match(/fish\d+/);
+                if (match) type = match[0];
+            }
 
-        const marker = L.marker([spot.lat, spot.lng], {
-            icon: L.divIcon({
-                className: 'custom-text-marker',
-                html: `<div class="spot-text ${type}">${spot.name}</div>`,
-                iconSize: [0, 0],
-                iconAnchor: [0, 0]
-            }),
-            zIndexOffset: isFish
-                ? 600 + Math.floor(Math.random() * 50)
-                : Math.floor(Math.random() * 500)
+            const isFish = type.startsWith('fish');
+
+            const marker = L.marker([spot.lat, spot.lng], {
+                icon: L.divIcon({
+                    className: 'custom-text-marker',
+                    html: `<div class="spot-text ${type}">${spot.name}</div>`,
+                    iconSize: [0, 0],
+                    iconAnchor: [0, 0]
+                }),
+                zIndexOffset: isFish
+                    ? 600 + Math.floor(Math.random() * 50)
+                    : Math.floor(Math.random() * 500)
+            });
+            
+            spot.marker = marker;
+
+            marker.on('click', function () {
+                selectSpot(spot);
+            });
+
+            window.areaSpotLayer.addLayer(marker);
         });
-        
-        spot.marker = marker;
 
-        marker.on('click', function () {
-            selectSpot(spot);
-        });
+        window._areaSpotLayerPref = currentPrefKey;
+    }
 
-        window.areaSpotLayer.addLayer(marker);
-    });
+    let minLat = Infinity, maxLat = -Infinity;
+    let minLng = Infinity, maxLng = -Infinity;
 
     // 2. カメラの枠（Bounds）計算は【対象エリア】の座標だけを使って行う
     if (targetAreaSpots.length > 0) {
@@ -525,7 +415,6 @@ async function selectSpot(spotOrCoords) {
     const currentZoom = window.map.getZoom();
 
     if (currentZoom === 13 && !window._isRestoringSpot && spotObj) {
-        window._phase2ReadyGen = (window._phase2ReadyGen || 0) + 1;
         if (typeof zoomToSpot !== 'function' && typeof window.ensureSpotLoader === 'function') {
             await window.ensureSpotLoader();
         }
@@ -537,58 +426,9 @@ async function selectSpot(spotOrCoords) {
         return;
     }
 
-    // Phase2遷移中は戻るボタン＆ピンチインをロックし、準備完了（移動・OSM準備・戻り先ort先読み）まで待機させる
+    // ズーム13移動中（約0.5秒）のみ戻る・ピンチインの途中誤爆を防ぐ（ボタン自体は非表示にしない）
     window.goBackGuard = true;
-    const backBtnInit = document.getElementById('map-back-btn');
-    if (backBtnInit) {
-        backBtnInit.style.pointerEvents = 'none';
-        backBtnInit.style.transition = 'opacity 0.25s ease';
-        backBtnInit.style.opacity = '0';
-    }
-
     window._selectSpotCompleted = false;
-
-    const fadeGen = (window._tileFadeGen = (window._tileFadeGen || 0) + 1);
-    const phase2ReadyGen = (window._phase2ReadyGen = (window._phase2ReadyGen || 0) + 1);
-
-    let isMoveEnded = false;
-    let isOsmReady = false;
-    let isOrtPrefetched = false;
-    let isPhase2Unlocked = false;
-
-    const tryUnlockPhase2Back = () => {
-        if (isPhase2Unlocked || window._phase2ReadyGen !== phase2ReadyGen) return;
-        if (!isMoveEnded || !isOsmReady || !isOrtPrefetched) return;
-        isPhase2Unlocked = true;
-        clearTimeout(phase2SafetyTimer);
-
-        // スポット詳細やエリア外へ既に遷移していた場合は上書きしない
-        if (window.currentSpotId != null || !window.currentAreaId) return;
-
-        const btn = document.getElementById('map-back-btn');
-        if (btn) {
-            btn.style.display = 'block';
-            btn.style.pointerEvents = 'auto';
-            requestAnimationFrame(() => {
-                btn.style.transition = 'opacity 0.4s ease';
-                btn.style.opacity = '1';
-            });
-        }
-        window.goBackGuard = false;
-    };
-
-    const phase2SafetyTimer = setTimeout(() => {
-        isMoveEnded = true;
-        isOsmReady = true;
-        isOrtPrefetched = true;
-        tryUnlockPhase2Back();
-    }, 2500);
-
-    // 戻り先（Phase1）のエリアortタイルを裏で先読みキャッシュ開始
-    prefetchAreaOrtTiles(window.currentAreaId).finally(() => {
-        isOrtPrefetched = true;
-        tryUnlockPhase2Back();
-    });
 
     if (window.markerControl) {
         markerControl.showShop02(window.currentAreaId);
@@ -620,6 +460,8 @@ async function selectSpot(spotOrCoords) {
         window.osmLayer.setOpacity(0);
     }
 
+    const fadeGen = (window._tileFadeGen = (window._tileFadeGen || 0) + 1);
+
     const doOsmFade = () => {
         if (window._tileFadeGen !== fadeGen) return;
         const osmContainer = window.osmLayer ? window.osmLayer.getContainer() : null;
@@ -635,18 +477,9 @@ async function selectSpot(spotOrCoords) {
             }
             setTimeout(() => {
                 if (window._tileFadeGen !== fadeGen) return;
-                if (window.gsiLayer) {
-                    window.gsiLayer.setZIndex(1);
-                    // OSMが画面を完全に覆った裏で、スポット詳細タイル(photo等)が残っていれば先回りして ort へ戻しておく
-                    if (window.gsiLayers && window.gsiLayer._url !== window.gsiLayers.ort) {
-                        window.gsiLayer.setUrl(window.gsiLayers.ort);
-                    }
-                }
+                if (window.gsiLayer) window.gsiLayer.setZIndex(1);
             }, 2000);
         }
-
-        isOsmReady = true;
-        tryUnlockPhase2Back();
     };
 
     if (window.osmLayer.isLoading && window.osmLayer.isLoading()) {
@@ -673,6 +506,9 @@ async function selectSpot(spotOrCoords) {
     disableAreaSwipe();
     if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
 
+
+
+    window.map.stop();
     const center = window.map.getCenter();
     const isSameLoc = center && Math.abs(center.lat - targetLat) < 0.0001 && 
                       Math.abs(center.lng - targetLng) < 0.0001 && 
@@ -694,8 +530,7 @@ async function selectSpot(spotOrCoords) {
             if (typeof syncGuideSections === 'function') syncGuideSections();
             window._isRestoringSpot = false;
             window._selectSpotCompleted = true;
-            isMoveEnded = true;
-            tryUnlockPhase2Back();
+            window.goBackGuard = false;
         });
     };
 
@@ -989,15 +824,10 @@ function enablePhase2(map) {
                             window.currentSpotId = null; 
 
                             const newArea = window.areaData.find(a => String(a.areaId + '_' + a.individualId) === window.currentAreaId);
-                            if (newArea) {
-                                if (typeof prefetchAreaOrtTiles === 'function') {
-                                    prefetchAreaOrtTiles(newArea);
-                                }
-                                if (window.prefData && typeof setIdealQuery === 'function') {
-                                    setIdealQuery('pref', window.prefData.notes);
-                                    setIdealQuery('area', newArea.name);
-                                    setIdealQuery('spot', null);
-                                }
+                            if (newArea && window.prefData && typeof setIdealQuery === 'function') {
+                                setIdealQuery('pref', window.prefData.notes);
+                                setIdealQuery('area', newArea.name);
+                                setIdealQuery('spot', null);
                             }
 
                             if (typeof clearSpotUI === 'function') clearSpotUI();
@@ -1056,7 +886,7 @@ function enablePhase2(map) {
     removeCrowdImage();
 }
 
-function disablePhase2(map) {
+function disablePhase2(map, options = {}) {
     if (!map) return;
 
     window.phase2Initialized = false;
@@ -1076,13 +906,19 @@ function disablePhase2(map) {
     // ★ 追加：広域に戻る時に、プリロード済み履歴をリセットする
     window._preloadedSpots = new Set();
 
-    requestAnimationFrame(() => {
+    const keepMenu = !!(options && options.keepMenu);
+    if (keepMenu) {
         const menu = document.getElementById("map-menu");
-        if (menu) {
-            menu.classList.remove("phase2-lock");
-            menu.style.display = "none";
-        }
-    });
+        if (menu) menu.classList.remove("phase2-lock");
+    } else {
+        requestAnimationFrame(() => {
+            const menu = document.getElementById("map-menu");
+            if (menu) {
+                menu.classList.remove("phase2-lock");
+                menu.style.display = "none";
+            }
+        });
+    }
 }
 
 function processSpotUtils(map) {

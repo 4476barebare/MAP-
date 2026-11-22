@@ -442,6 +442,22 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
             backBtn.style.display = 'block';
         }
         renderAccessInfo(spot);
+        // zoomなしスポットのURL直打ち時は Phase2 関数群（areaLoader.js）を揃えてから展開する
+        if (typeof enablePhase2 !== 'function' && typeof window.ensureAreaLoader === 'function') {
+            await window.ensureAreaLoader();
+            if (window.prefShopUrl && window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+                window.markerControl.preloadShop01(window.prefShopUrl).then(() => {
+                    if (window.currentPref === prefCode) {
+                        if (finalAreaId && typeof window.markerControl.showShop02 === 'function') {
+                            window.markerControl.showShop02(finalAreaId);
+                        }
+                        if (window.currentSpotId && String(window.currentSpotId) === String(spot.individualId) && typeof renderShopSection === 'function') {
+                            renderShopSection(spot);
+                        }
+                    }
+                });
+            }
+        }
         if (typeof showSpotsForArea === 'function') showSpotsForArea(finalAreaId);
         if (typeof phase1menu === 'function') phase1menu(finalAreaId);
         if (typeof enableDragForArea === 'function') enableDragForArea();
