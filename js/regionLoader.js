@@ -353,6 +353,124 @@ window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
 };
 
 // =====================================================
+// ■ スポットドット（.pref-dot）マーカー共通生成ヘルパー
+// =====================================================
+function createRegionSpotDotMarker(spot, fallbackPrefCode = '') {
+    if (!spot || typeof L === 'undefined') return null;
+    const lat = Number(spot.lat);
+    const lng = Number(spot.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+    let type = 'spot';
+    if (spot.icon && spot.icon.startsWith('fish')) {
+        const match = spot.icon.match(/fish\d+/);
+        if (match) type = match[0];
+    }
+
+    const marker = L.marker(
+        [lat, lng],
+        {
+            icon: L.divIcon({
+                className: `pref-dot ${type}`,
+                html: '',
+                iconSize: [5, 5],
+                iconAnchor: [2.5, 2.5]
+            }),
+            interactive: true,
+            keyboard: false
+        }
+    );
+
+    const resolvedPref = spot._prefCode
+        || (spot.areaId ? String(spot.areaId).split('_')[0] : '')
+        || fallbackPrefCode
+        || window.currentPref
+        || '';
+
+    marker._spotData = spot;
+    marker._prefCode = resolvedPref;
+
+    marker._spotClickHandler = function () {
+        const spotAreaId = String(spot.areaId || '').trim();
+        const areaIndividualId = spotAreaId.replace(`${window.currentPref}_`, '');
+        const area = (window.areaData || []).find(
+            a => String(a.individualId || '').trim() === areaIndividualId
+        );
+        if (!area) return;
+        if (window.prefData && typeof setIdealQuery === 'function') {
+            setIdealQuery('pref', window.prefData.notes);
+            setIdealQuery('area', area.name);
+            setIdealQuery('spot', null);
+        }
+        window.currentAreaId = `${area.areaId}_${area.individualId}`;
+        window.currentSpotId = null;
+        if (typeof selectArea === 'function') selectArea(area);
+    };
+
+    marker._regionClickHandler = function () {
+        handleRegionNearest(marker.getLatLng());
+    };
+
+    return marker;
+}
+
+// =====================================================
+// ■ URL直打ちスポットからの復帰用：他県通信せず所属県だけのドットを即時生成
+//   （window._isAllRegionLoaded は変更しないため、後の全県ドット展開も壊れない）
+// =====================================================
+function ensureCurrentPrefSpots(prefCode = window.currentPref) {
+    if (!window.map || !prefCode || typeof L === 'undefined') return false;
+
+    const targetPref = String(prefCode).trim();
+    if (
+        window.regionSpotMarkers &&
+        window.regionSpotMarkers.length > 0 &&
+        window.regionAllSpotLayer &&
+        (window._isAllRegionLoaded || window.regionSpotMarkers.some(m => String(m._prefCode || '') === targetPref))
+    ) {
+        if (!window.map.hasLayer(window.regionAllSpotLayer)) {
+            window.regionAllSpotLayer.addTo(window.map);
+        }
+        return true;
+    }
+
+    const sourceRows = (window.prefSpotData && Array.isArray(window.prefSpotData[targetPref]) && window.prefSpotData[targetPref].length > 0)
+        ? window.prefSpotData[targetPref]
+        : (Array.isArray(window.spotData) ? window.spotData : []);
+
+    const targetSpots = sourceRows.filter(
+        s => s && s.type !== 'pref' && s.type !== 'area'
+    );
+    if (!targetSpots.length) return false;
+
+    if (!window.regionAllSpotLayer) {
+        window.regionAllSpotLayer = L.layerGroup().addTo(window.map);
+    } else if (!window.map.hasLayer(window.regionAllSpotLayer)) {
+        window.regionAllSpotLayer.addTo(window.map);
+    }
+
+    if (!Array.isArray(window.regionSpotMarkers)) {
+        window.regionSpotMarkers = [];
+    }
+    if (!(window.regionSpotMarkerMap instanceof Map)) {
+        window.regionSpotMarkerMap = new Map();
+    }
+
+    for (let i = 0; i < targetSpots.length; i++) {
+        const spot = targetSpots[i];
+        if (window.regionSpotMarkerMap.has(spot)) continue;
+        const marker = createRegionSpotDotMarker(spot, targetPref);
+        if (!marker) continue;
+        window.regionSpotMarkers.push(marker);
+        window.regionSpotMarkerMap.set(spot, marker);
+        window.regionAllSpotLayer.addLayer(marker);
+    }
+
+    return window.regionSpotMarkers.length > 0;
+}
+window.ensureCurrentPrefSpots = ensureCurrentPrefSpots;
+
+// =====================================================
 // ■ 広域マップで全県のドットを描画する関数
 // =====================================================
 async function showAllRegionSpots() {
@@ -389,60 +507,15 @@ async function showAllRegionSpots() {
         window.regionSpotMarkerMap = new Map();
         window.regionAllSpotLayer = L.layerGroup().addTo(window.map);
 
-        // ★ 1フレームあたり8ms以内に収まる数だけドットを生成し、次フレームへバトンを渡す（カクつきゼロ）
+        // ★ 1フレームあたり4ms以内に収まる数だけドットを生成し、次フレームへバトンを渡す（カクつきゼロ）
         await new Promise(resolve => {
             let i = 0;
             function addSlice() {
                 const start = performance.now();
                 while (i < targetSpots.length && (performance.now() - start) < 4) {
                     const spot = targetSpots[i++];
-                    const lat = Number(spot.lat);
-                    const lng = Number(spot.lng);
-                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-
-                    let type = 'spot';
-                    if (spot.icon && spot.icon.startsWith('fish')) {
-                        const match = spot.icon.match(/fish\d+/);
-                        if (match) type = match[0];
-                    }
-
-                    const marker = L.marker(
-                        [lat, lng],
-                        {
-                            icon: L.divIcon({
-                                className: `pref-dot ${type}`,
-                                html: '',
-                                iconSize: [5, 5],
-                                iconAnchor: [2.5, 2.5]
-                            }),
-                            interactive: true,
-                            keyboard: false
-                        }
-                    );
-
-                    marker._spotData = spot;
-                    marker._prefCode = spot._prefCode;
-
-                    marker._spotClickHandler = function () {
-                        const spotAreaId = String(spot.areaId || '').trim();
-                        const areaIndividualId = spotAreaId.replace(`${window.currentPref}_`, '');
-                        const area = (window.areaData || []).find(
-                            a => String(a.individualId || '').trim() === areaIndividualId
-                        );
-                        if (!area) return;
-                        if (window.prefData && typeof setIdealQuery === 'function') {
-                            setIdealQuery('pref', window.prefData.notes);
-                            setIdealQuery('area', area.name);
-                            setIdealQuery('spot', null);
-                        }
-                        window.currentAreaId = `${area.areaId}_${area.individualId}`;
-                        window.currentSpotId = null;
-                        selectArea(area);
-                    };
-
-                    marker._regionClickHandler = function () {
-                        handleRegionNearest(marker.getLatLng());
-                    };
+                    const marker = createRegionSpotDotMarker(spot);
+                    if (!marker) continue;
 
                     window.regionSpotMarkers.push(marker);
                     window.regionSpotMarkerMap.set(spot, marker);

@@ -640,9 +640,16 @@ function zoomToSpot(spot, options = {}) {
             }
         }
 
+        const fadeGen = (window._tileFadeGen = (window._tileFadeGen || 0) + 1);
+
         // ★ 修正：キャッシュ済みで load イベントが発火しない対策
         const doGsiFade = () => {
-            const gsiContainer = window.gsiLayer.getContainer();
+            if (window._tileFadeGen !== fadeGen) {
+                isFadeEnded = true;
+                checkAndUnlockGuard();
+                return;
+            }
+            const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
             const osmContainer = window.osmLayer ? window.osmLayer.getContainer() : null;
 
             if (gsiContainer) {
@@ -654,7 +661,9 @@ function zoomToSpot(spot, options = {}) {
                     window.osmLayer.setOpacity(0);
                 }
                 setTimeout(() => {
-                    if (window.osmLayer) window.osmLayer.setZIndex(1);
+                    if (window._tileFadeGen === fadeGen && window.osmLayer) {
+                        window.osmLayer.setZIndex(1);
+                    }
                     isFadeEnded = true;
                     checkAndUnlockGuard();
                 }, 2000);
@@ -667,12 +676,12 @@ function zoomToSpot(spot, options = {}) {
         if (window.gsiLayer.isLoading && window.gsiLayer.isLoading()) {
             let isLoaded = false;
             window.gsiLayer.once('load', () => {
-                if (isLoaded) return;
+                if (isLoaded || window._tileFadeGen !== fadeGen) return;
                 isLoaded = true;
                 doGsiFade();
             });
             setTimeout(() => {
-                if (!isLoaded) {
+                if (!isLoaded && window._tileFadeGen === fadeGen) {
                     isLoaded = true;
                     doGsiFade();
                 }
