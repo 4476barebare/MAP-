@@ -445,7 +445,11 @@ async function showAllRegionSpots() {
             await loadPrefectureSpots(window.currentPref, 'all');
             const allSpots = Object.values(window.prefSpotData || {}).flat();
             const targetSpots = allSpots.filter(
-                s => s.type !== 'pref' && s.type !== 'area'
+                s => s &&
+                    s.type !== 'pref' &&
+                    s.type !== 'area' &&
+                    s.individualId !== 'parent' &&
+                    s.icon && String(s.icon).trim() !== ''
             );
 
             if (window.regionAllSpotLayer) {
