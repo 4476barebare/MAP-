@@ -355,6 +355,8 @@ window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
 // =====================================================
 // ■ スポットドット（.pref-dot）マーカー共通生成ヘルパー
 // =====================================================
+window._allRegionMarkersBuilt = window._allRegionMarkersBuilt || false;
+
 function createRegionSpotDotMarker(spot, fallbackPrefCode = '') {
     if (!spot || typeof L === 'undefined') return null;
     const lat = Number(spot.lat);
@@ -415,68 +417,13 @@ function createRegionSpotDotMarker(spot, fallbackPrefCode = '') {
 }
 
 // =====================================================
-// ■ URL直打ちスポットからの復帰用：他県通信せず所属県だけのドットを即時生成
-//   （window._isAllRegionLoaded は変更しないため、後の全県ドット展開も壊れない）
-// =====================================================
-function ensureCurrentPrefSpots(prefCode = window.currentPref) {
-    if (!window.map || !prefCode || typeof L === 'undefined') return false;
-
-    const targetPref = String(prefCode).trim();
-    if (
-        window.regionSpotMarkers &&
-        window.regionSpotMarkers.length > 0 &&
-        window.regionAllSpotLayer &&
-        (window._isAllRegionLoaded || window.regionSpotMarkers.some(m => String(m._prefCode || '') === targetPref))
-    ) {
-        if (!window.map.hasLayer(window.regionAllSpotLayer)) {
-            window.regionAllSpotLayer.addTo(window.map);
-        }
-        return true;
-    }
-
-    const sourceRows = (window.prefSpotData && Array.isArray(window.prefSpotData[targetPref]) && window.prefSpotData[targetPref].length > 0)
-        ? window.prefSpotData[targetPref]
-        : (Array.isArray(window.spotData) ? window.spotData : []);
-
-    const targetSpots = sourceRows.filter(
-        s => s && s.type !== 'pref' && s.type !== 'area'
-    );
-    if (!targetSpots.length) return false;
-
-    if (!window.regionAllSpotLayer) {
-        window.regionAllSpotLayer = L.layerGroup().addTo(window.map);
-    } else if (!window.map.hasLayer(window.regionAllSpotLayer)) {
-        window.regionAllSpotLayer.addTo(window.map);
-    }
-
-    if (!Array.isArray(window.regionSpotMarkers)) {
-        window.regionSpotMarkers = [];
-    }
-    if (!(window.regionSpotMarkerMap instanceof Map)) {
-        window.regionSpotMarkerMap = new Map();
-    }
-
-    for (let i = 0; i < targetSpots.length; i++) {
-        const spot = targetSpots[i];
-        if (window.regionSpotMarkerMap.has(spot)) continue;
-        const marker = createRegionSpotDotMarker(spot, targetPref);
-        if (!marker) continue;
-        window.regionSpotMarkers.push(marker);
-        window.regionSpotMarkerMap.set(spot, marker);
-        window.regionAllSpotLayer.addLayer(marker);
-    }
-
-    return window.regionSpotMarkers.length > 0;
-}
-window.ensureCurrentPrefSpots = ensureCurrentPrefSpots;
-
-// =====================================================
 // ■ 広域マップで全県のドットを描画する関数
 // =====================================================
 async function showAllRegionSpots() {
     if (!window.map) return;
 
     if (
+        window._allRegionMarkersBuilt &&
         window.regionSpotMarkers &&
         window.regionSpotMarkers.length > 0 &&
         window.regionAllSpotLayer &&
@@ -493,86 +440,112 @@ async function showAllRegionSpots() {
     }
 
     window._buildingRegionSpotsPromise = (async () => {
-        await loadPrefectureSpots(window.currentPref, 'all');
-        const allSpots = Object.values(window.prefSpotData || {}).flat();
-        const targetSpots = allSpots.filter(
-            s => s.type !== 'pref' && s.type !== 'area'
-        );
+        try {
+            window._allRegionMarkersBuilt = false;
+            await loadPrefectureSpots(window.currentPref, 'all');
+            const allSpots = Object.values(window.prefSpotData || {}).flat();
+            const targetSpots = allSpots.filter(
+                s => s.type !== 'pref' && s.type !== 'area'
+            );
 
-        if (window.regionAllSpotLayer) {
-            window.map.removeLayer(window.regionAllSpotLayer);
-        }
-
-        window.regionSpotMarkers = [];
-        window.regionSpotMarkerMap = new Map();
-        window.regionAllSpotLayer = L.layerGroup().addTo(window.map);
-
-        // ★ 1フレームあたり4ms以内に収まる数だけドットを生成し、次フレームへバトンを渡す（カクつきゼロ）
-        await new Promise(resolve => {
-            let i = 0;
-            function addSlice() {
-                const start = performance.now();
-                while (i < targetSpots.length && (performance.now() - start) < 4) {
-                    const spot = targetSpots[i++];
-                    const marker = createRegionSpotDotMarker(spot);
-                    if (!marker) continue;
-
-                    window.regionSpotMarkers.push(marker);
-                    window.regionSpotMarkerMap.set(spot, marker);
-                    window.regionAllSpotLayer.addLayer(marker);
-                }
-
-                if (i < targetSpots.length) {
-                    requestAnimationFrame(addSlice);
-                } else {
-                    resolve();
-                }
+            if (window.regionAllSpotLayer) {
+                window.map.removeLayer(window.regionAllSpotLayer);
             }
-            requestAnimationFrame(addSlice);
-        });
 
-        if (window.regionMarkers && window.regionMarkers.length > 0) {
-            window.regionMarkers.forEach(m => {
-                if (m.setZIndexOffset) {
-                    m.setZIndexOffset(1000);
+            window.regionSpotMarkers = [];
+            window.regionSpotMarkerMap = new Map();
+            window.regionAllSpotLayer = L.layerGroup().addTo(window.map);
+
+            // ★ 1フレームあたり4ms以内に収まる数だけドットを生成し、次フレームへバトンを渡す（カクつきゼロ）
+            await new Promise(resolve => {
+                let i = 0;
+                function addSlice() {
+                    const start = performance.now();
+                    while (i < targetSpots.length && (performance.now() - start) < 4) {
+                        const spot = targetSpots[i++];
+                        const marker = createRegionSpotDotMarker(spot);
+                        if (!marker) continue;
+
+                        window.regionSpotMarkers.push(marker);
+                        window.regionSpotMarkerMap.set(spot, marker);
+                        window.regionAllSpotLayer.addLayer(marker);
+                    }
+
+                    if (i < targetSpots.length) {
+                        requestAnimationFrame(addSlice);
+                    } else {
+                        resolve();
+                    }
                 }
+                requestAnimationFrame(addSlice);
             });
+
+            if (window.regionMarkers && window.regionMarkers.length > 0) {
+                window.regionMarkers.forEach(m => {
+                    if (m.setZIndexOffset) {
+                        m.setZIndexOffset(1000);
+                    }
+                });
+            }
+
+            window._allRegionMarkersBuilt = window.regionSpotMarkers.length > 0 && !!window._isAllRegionLoaded;
+        } finally {
+            window._buildingRegionSpotsPromise = null;
         }
-        window._buildingRegionSpotsPromise = null;
     })();
 
     return window._buildingRegionSpotsPromise;
 }
 
 function showPrefSpots() {
-    if (!window.regionSpotMarkers || window.regionSpotMarkers.length === 0) {
-        if (typeof showAllRegionSpots === 'function') {
-            window.runAfterTileLoad(async () => {
-                await showAllRegionSpots();
-                showPrefSpots();
+    const isSpotMode = (typeof window.isSpotScreen === 'function')
+        ? window.isSpotScreen()
+        : !!(window.currentSpotId || new URLSearchParams(window.location.search).get('spot'));
+
+    // スポット詳細画面ではドットを隠すだけ（未生成時に全県ロードを暴発させない）
+    if (isSpotMode) {
+        if (Array.isArray(window.regionSpotMarkers) && window.regionSpotMarkers.length > 0) {
+            window.regionSpotMarkers.forEach(marker => {
+                const el = marker.getElement();
+                if (!el) return;
+                if (marker._regionClickHandler) marker.off('click', marker._regionClickHandler);
+                if (marker._spotClickHandler) marker.off('click', marker._spotClickHandler);
+                el.style.opacity = '0';
+                el.style.pointerEvents = 'none';
+                marker._regionRepresentative = false;
             });
         }
         return;
     }
 
-    const selectedPref = String(window.currentPref || '');
-
-    const isSpotMode = (typeof window.isSpotScreen === 'function')
-        ? window.isSpotScreen()
-        : !!(window.currentSpotId || new URLSearchParams(window.location.search).get('spot'));
-
-    if (isSpotMode) {
-        window.regionSpotMarkers.forEach(marker => {
-            const el = marker.getElement();
-            if (!el) return;
-            if (marker._regionClickHandler) marker.off('click', marker._regionClickHandler);
-            if (marker._spotClickHandler) marker.off('click', marker._spotClickHandler);
-            el.style.opacity = '0';
-            el.style.pointerEvents = 'none';
-            marker._regionRepresentative = false;
-        });
+    // 全県ドットが未構築であれば、必ず showAllRegionSpots() を完走させてから表示状態を反映する
+    if (
+        !window._allRegionMarkersBuilt ||
+        !window.regionSpotMarkers ||
+        window.regionSpotMarkers.length === 0 ||
+        !window.regionAllSpotLayer
+    ) {
+        if (typeof showAllRegionSpots === 'function') {
+            const buildAndShow = async () => {
+                await showAllRegionSpots();
+                if (window.regionSpotMarkers && window.regionSpotMarkers.length > 0) {
+                    showPrefSpots();
+                }
+            };
+            if (window._firstTileLoaded || typeof window.runAfterTileLoad !== 'function') {
+                buildAndShow();
+            } else {
+                window.runAfterTileLoad(buildAndShow);
+            }
+        }
         return;
     }
+
+    if (window.map && !window.map.hasLayer(window.regionAllSpotLayer)) {
+        window.regionAllSpotLayer.addTo(window.map);
+    }
+
+    const selectedPref = String(window.currentPref || '');
 
     const mapContainer = (window.map && typeof window.map.getContainer === 'function')
         ? window.map.getContainer()
