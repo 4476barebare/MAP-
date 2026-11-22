@@ -61,7 +61,8 @@
 }
 
 /* 浮かび上がる白文字テキスト（最大2行） */
-.article-card h2 {
+.article-card h2,
+.article-card h3 {
   position: absolute;
   bottom: 8px;
   left: 8px;
@@ -135,7 +136,8 @@
   align-items: center;
 }
 
-.menu-text h2 {
+.menu-text h2,
+.menu-text h3 {
   font-size: 14px;
   margin: 0;
   line-height: 1.4;
@@ -774,12 +776,30 @@ li {
 }
 
 /* =========================
+   ページ主題 H1（地図直下・全画面共通の唯一のH1）
+========================= */
+.page-main-heading-wrap {
+    background: #fff;
+    padding: 10px 16px 2px 16px;
+}
+
+.page-main-h1 {
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.45;
+    color: #191970;
+    margin: 0;
+    padding-left: 8px;
+    border-left: 4px solid #191970;
+}
+
+/* =========================
    アクセス情報（エリアガイド直上）
 ========================= */
 #siteGuideBox,
 #accessInfoBox {
     background: #fff;
-    padding: 15px 16px 0 16px; /* 下にあるセクションとシームレスに繋げる */
+    padding: 10px 16px 0 16px; /* 下にあるセクションとシームレスに繋げる */
     color: #191970;
 }
 
@@ -790,6 +810,50 @@ li {
     margin: 0 0 12px 0;
     padding-left: 10px;
     border-left: 4px solid #191970; /* エリアガイドと同じ左線デザイン */
+}
+
+/* サイト案内（details折りたたみ：Safariリーダー誤判定防止＋タップしやすい見た目） */
+.site-guide-details {
+    margin: 0;
+}
+
+.site-guide-details > summary#site-guide-toggle {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #191970;
+    margin: 0;
+    padding: 8px 10px;
+    background: #f0f4ff;
+    border: 1px solid rgba(25, 25, 112, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.site-guide-details > summary#site-guide-toggle::-webkit-details-marker {
+    display: none;
+}
+
+.site-guide-details > summary#site-guide-toggle::after {
+    content: "▼";
+    font-size: 10px;
+    flex-shrink: 0;
+    opacity: 0.75;
+    transition: transform 0.2s ease;
+}
+
+.site-guide-details[open] > summary#site-guide-toggle::after {
+    transform: rotate(180deg);
+}
+
+.site-guide-details[open] > .guide-text {
+    padding: 10px 4px 4px 4px;
 }
 
 /* スポット詳細ヘッダー・逆引き辞書レイアウト */
@@ -868,7 +932,8 @@ li {
   background: #fff;
 }
 
-#area-guide h1 {
+#area-guide h1,
+#area-guide h2 {
     color: #191970;
   font-size: 18px;
   margin-bottom: 12px;
@@ -886,7 +951,8 @@ li {
 }
 
 /* タイトル */
-.area h2 {
+.area h2,
+.area h3 {
     color: #191970;
   font-size: 16px;
   margin: 0;
@@ -2946,7 +3012,9 @@ a.sns-col-link:active {
 }
 
 #policyModal #policySection h1,
-#policyModal #contactSection h1 {
+#policyModal #contactSection h1,
+#policyModal #policySection h2,
+#policyModal #contactSection h2 {
   text-align: left;
   font-size: 14px;
   font-weight: bold;
@@ -2956,8 +3024,8 @@ a.sns-col-link:active {
   border-bottom: 1px solid rgba(25, 25, 112, 0.15);
 }
 
-#policyModal #policySection h2,
-#policyModal #contactSection h2 {
+#policyModal #policySection h3,
+#policyModal #contactSection h3 {
   font-size: 12.5px;
   font-weight: bold;
   color: #191970;
@@ -2965,7 +3033,9 @@ a.sns-col-link:active {
 }
 
 #policyModal #policySection p,
-#policyModal #contactSection p {
+#policyModal #contactSection p,
+#policyModal #policySection .policy-para,
+#policyModal #contactSection .policy-para {
   font-size: 12px;
   line-height: 1.65;
   margin: 0 0 8px;
@@ -2974,7 +3044,9 @@ a.sns-col-link:active {
 }
 
 #policyModal #policySection p:last-child,
-#policyModal #contactSection p:last-child {
+#policyModal #contactSection p:last-child,
+#policyModal #policySection .policy-para:last-child,
+#policyModal #contactSection .policy-para:last-child {
   margin-bottom: 0;
 }
 
@@ -3068,7 +3140,8 @@ a.sns-col-link:active {
   padding: 8px 10px;
 }
 
-.basis-summary-card p {
+.basis-summary-card p,
+.basis-summary-card .basis-summary-text {
   font-size: 12px;
   line-height: 1.6;
   margin: 0 0 6px;
