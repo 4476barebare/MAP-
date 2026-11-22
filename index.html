@@ -166,30 +166,34 @@
     <div class="week-table" id="weekTable"></div>
   </div>
 </div>
-<!-- 👇 サイト案内（「釣り行こNAVI」の特徴と使い方：REGION画面のみ表示） -->
-<section class="access-info" id="siteGuideBox" aria-label="サイト案内">
-  <div id="default-site-guide" class="guide-collapse collapsed-mode">
-    <h3 id="site-guide-toggle" role="button" tabindex="0" aria-expanded="false">「釣り行こNAVI」の特徴と使い方（関東の釣り場・さかな地図）</h3>
+<!-- 👇 ページ主題H1（地図直下・全画面共通の唯一のH1：updateSeoMetaと連動） -->
+<div class="page-main-heading-wrap">
+  <h1 id="page-main-h1" class="page-main-h1">関東の釣り場マップ・天気と最新釣果で明日のおすすめランキング</h1>
+</div>
+<!-- 👇 サイト案内（「釣り行こNAVI」の特徴と使い方：REGION画面のみ表示・Safari誤判定防止のためdetails折りたたみ） -->
+<aside class="access-info" id="siteGuideBox" aria-label="サイト案内">
+  <details id="default-site-guide" class="site-guide-details">
+    <summary id="site-guide-toggle">「釣り行こNAVI」の特徴と使い方（関東の釣り場・さかな地図）</summary>
     <div class="guide-text">
-    <p style="font-size: 13px; line-height: 1.6; color: #333; margin-bottom: 10px;">
-      「釣り行こNAVI」は、「明日釣り行くんだけどいい場所ある？」という場所探しに答える、関東全域（千葉・神奈川・茨城・東京・埼玉・群馬・栃木）のリアルタイム釣果さかな地図（釣り場マップ）です。東京湾内房（保田港・木更津周辺）、外房・勝浦、茨城（大洗港・那珂湊）、神奈川（うみかぜ公園・平潟湾）などの海釣り・堤防・河川スポットを網羅し、国土地理院の航空写真と海底の等深線（水深・カケアガリ）を重ね合わせてポイントの地形を視覚的に把握できます。
-    </p>
-    <div style="font-weight: bold; font-size: 13px; color: #191970; margin-bottom: 4px;">🗺️ さかな地図の基本操作と機能</div>
-    <ul style="font-size: 13px; line-height: 1.6; padding-left: 18px; margin: 0 0 10px 0;">
-      <li><strong>エリア・釣り場検索＆等深線マップ：</strong>地図上のピンや県・エリアメニューから目的の釣り場へズームし、航空写真と水深データからカケアガリや根の位置を確認できます。</li>
-      <li><strong>ピンポイント天気・風向・潮見表（タイドグラフ）：</strong>各スポットの2時間ごとの天気・風向・風速・波高・水温、およびタイドグラフをワンタップで確認できます。</li>
-      <li><strong>リアルタイムSNS釣果ソナー＆対象魚：</strong>今釣れている魚がわかるSNS最新釣果ソナーや、各釣り場の対象魚、最寄りの釣具店・ICからのアクセスルートを表示します。</li>
-    </ul>
-    <p style="font-size: 12px; color: #555; margin: 0;">
-      ※すぐ下の「明日釣りに行くんだけど良い場所ある？（おすすめ釣り場ランキング）」やページ下部の「対象魚別・ダイソー釣具攻略ガイド記事」もあわせてご活用ください。
-    </p>
+      <div class="guide-para" style="font-size: 13px; line-height: 1.6; color: #333; margin-bottom: 10px;">
+        「釣り行こNAVI」は、「明日釣り行くんだけどいい場所ある？」という場所探しに答える、関東全域（千葉・神奈川・茨城・東京・埼玉・群馬・栃木）のリアルタイム釣果さかな地図（釣り場マップ）です。東京湾内房（保田港・木更津周辺）、外房・勝浦、茨城（大洗港・那珂湊）、神奈川（うみかぜ公園・平潟湾）などの海釣り・堤防・河川スポットを網羅し、国土地理院の航空写真と海底の等深線（水深・カケアガリ）を重ね合わせてポイントの地形を視覚的に把握できます。
+      </div>
+      <div style="font-weight: bold; font-size: 13px; color: #191970; margin-bottom: 4px;">🗺️ さかな地図の基本操作と機能</div>
+      <ul style="font-size: 13px; line-height: 1.6; padding-left: 18px; margin: 0 0 10px 0;">
+        <li><strong>エリア・釣り場検索＆等深線マップ：</strong>地図上のピンや県・エリアメニューから目的の釣り場へズームし、航空写真と水深データからカケアガリや根の位置を確認できます。</li>
+        <li><strong>ピンポイント天気・風向・潮見表（タイドグラフ）：</strong>各スポットの2時間ごとの天気・風向・風速・波高・水温、およびタイドグラフをワンタップで確認できます。</li>
+        <li><strong>リアルタイムSNS釣果ソナー＆対象魚：</strong>今釣れている魚がわかるSNS最新釣果ソナーや、各釣り場の対象魚、最寄りの釣具店・ICからのアクセスルートを表示します。</li>
+      </ul>
+      <div class="guide-note" style="font-size: 12px; color: #555; margin: 0;">
+        ※すぐ下の「明日釣りに行くんだけど良い場所ある？（おすすめ釣り場ランキング）」やページ下部の「対象魚別・ダイソー釣具攻略ガイド記事」もあわせてご活用ください。
+      </div>
     </div>
-  </div>
-</section>
+  </details>
+</aside>
 <!-- 👇 スポット詳細・アクセス情報表示エリア（SPOT画面のみ表示） -->
-<section class="access-info" id="accessInfoBox" aria-label="スポット詳細・アクセス情報" style="display: none;"></section>
+<aside class="access-info" id="accessInfoBox" aria-label="スポット詳細・アクセス情報" style="display: none;"></aside>
 <!-- 👇 明日のオススメ釣り場ランキングセクション -->
-<section id="fishing-recommend-section" style="margin: 10px; padding: 15px; background-color: #eef3f8; border-radius: 8px; border: 1px solid #dce4ee;">
+<aside id="fishing-recommend-section" style="margin: 10px; padding: 15px; background-color: #eef3f8; border-radius: 8px; border: 1px solid #dce4ee;">
   <h2 id="spot-ranking-title" style="font-size: 16px; color: #191970; margin-top: 0; margin-bottom: 8px; border-left: 4px solid #191970; padding-left: 8px;">
     明日（11月23日）関東で釣りに行くんだけど良い場所ある？
   </h2>
@@ -203,10 +207,10 @@
       算出根拠（天気詳細・周辺SNS釣果）とデータ一覧を見る
     </button>
   </div>
-</section>
+</aside>
 
 
-<section id="area-guide" class="guide-collapse collapsed-mode" style="display: none;"></section>
+<aside id="area-guide" class="guide-collapse collapsed-mode" style="display: none;"></aside>
 
 <div id="newsModal" class="modal">
   <div class="modal-content">
@@ -226,9 +230,9 @@
   </div>
 </div>
 
-<section class="article-list">
+<aside class="article-list" aria-label="釣り攻略ガイド記事一覧">
     <div id="article-list-container"></div>
-</section>
+</aside>
 
 <!-- トップページ下部などに追加 -->
 <details class="seo-spot-list">
@@ -282,68 +286,68 @@
     </div>
 
     <!-- サイトポリシー -->
-    <section id="policySection">
-      <h1>サイトポリシー</h1>
+    <div id="policySection">
+      <h2>サイトポリシー</h2>
 
-      <h2>1. 免責事項</h2>
-      <p>
+      <h3>1. 免責事項</h3>
+      <div class="policy-para">
         当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、
         その完全性・正確性・最新性を保証するものではありません。
         当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。
-      </p>
+      </div>
 
-      <h2>2. 掲載情報について</h2>
-      <p>
+      <h3>2. 掲載情報について</h3>
+      <div class="policy-para">
         掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、
         現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。
         利用前に必ず現地の最新情報をご確認ください。
-      </p>
+      </div>
 
-      <h2>3. 釣行データについて</h2>
-      <p>
+      <h3>3. 釣行データについて</h3>
+      <div class="policy-para">
         当サイトの釣行データは過去の記録に基づくものであり、
         現在の釣果や釣りの可否を保証するものではありません。
         また海洋環境や生態系の状態を保証するものではありません。
-      </p>
+      </div>
 
-      <h2>4. 安全について</h2>
-      <p>
+      <h3>4. 安全について</h3>
+      <div class="policy-para">
         釣りを行う際は安全に十分配慮してください。
         釣り場所によっては管理者の許可が必要な場合があります。
         必ず現地のルールに従ってください。
-      </p>
+      </div>
 
-      <p>最終更新日：2026年11月20日</p>
-    </section>
+      <div class="policy-para">最終更新日：2026年11月20日</div>
+    </div>
 
     <!-- お問い合わせ -->
-    <section id="contactSection" style="display:none;">
-      <h1>お問い合わせ</h1>
+    <div id="contactSection" style="display:none;">
+      <h2>お問い合わせ</h2>
 
-      <p>
+      <div class="policy-para">
         当サイトへのご連絡は以下の用途に限ります。<br>
         ・バグ報告<br>
         ・掲載内容の修正・取り下げのご連絡<br>
         ・その他の連絡事項
-      </p>
+      </div>
 
-      <p>
+      <div class="policy-para">
         ※すべての内容に返信・個別対応は行いません。<br>
         内容は確認のみ行い、必要に応じてサイト改善に反映します。
-      </p>
+      </div>
 
-      <h2>連絡先（公式Xアカウント）</h2>
+      <h3>連絡先（公式Xアカウント）</h3>
 
-      <p>
+      <div class="policy-para">
         公式Xアカウント（@TsuriikoNAVI）のリプライまたはDMよりご連絡ください。
-      </p>
+      </div>
 
-      <p>
+      <div class="policy-para">
         <a href="https://x.com/TsuriikoNAVI" target="_blank" rel="noopener noreferrer" class="contact-x-btn">
           X（@TsuriikoNAVI）へ連絡する ↗
         </a>
-      </p>
-    </section>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -502,30 +506,36 @@ window.preloadRemainingScripts = function(routeType) {
   return window._bgScriptsPreloadPromise;
 };
 
-// サイト説明文の開閉
-const siteGuideToggle = document.getElementById('site-guide-toggle');
-const siteGuide = document.getElementById('default-site-guide');
-if (siteGuideToggle && siteGuide) {
-  const toggleSiteGuide = () => {
-    const isOpen = siteGuide.classList.contains('active-mode');
-    siteGuide.classList.toggle('active-mode', !isOpen);
-    siteGuide.classList.toggle('collapsed-mode', isOpen);
-    siteGuideToggle.setAttribute('aria-expanded', String(!isOpen));
-  };
-  siteGuideToggle.addEventListener('click', toggleSiteGuide);
-  siteGuideToggle.addEventListener('keydown', event => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggleSiteGuide();
-    }
-  });
+// 階層別ページ主題H1テキスト生成ヘルパー
+function buildPageMainH1Text(params) {
+  const pref = params.get('pref');
+  const area = params.get('area');
+  const spotName = params.get('spot');
+  if (spotName) {
+    return `${spotName}｜週間天気・アクセス情報から釣り場解説・最新釣果`;
+  }
+  if (area) {
+    return `${area}｜天気・タイドグラフ・釣果・最寄りの釣具店まで完全収録`;
+  }
+  if (pref) {
+    return `${pref}の天気と最新釣果で明日のおすすめランキング`;
+  }
+  const rawRegion = (window.regionData && window.regionData.name) || params.get('region') || '関東地方';
+  const regionName = String(rawRegion).trim().toUpperCase() === 'KANTO' ? '関東地方' : String(rawRegion).trim();
+  const shortRegion = regionName.replace('地方', '') || '関東';
+  return `${shortRegion}の釣り場マップ・天気と最新釣果で明日のおすすめランキング`;
 }
-// PREF/AREA/SPOTのURL直打ち時は初期描画時点で「特徴と使い方」を即座に非表示にする
+
+// PREF/AREA/SPOTのURL直打ち時は初期描画時点で「特徴と使い方」の非表示とH1テキストの反映を即座に行う
 (function() {
   const initialParams = new URLSearchParams(window.location.search);
   const siteGuideBoxEl = document.getElementById('siteGuideBox');
   if (siteGuideBoxEl && (initialParams.get('pref') || initialParams.get('area') || initialParams.get('spot'))) {
     siteGuideBoxEl.style.display = 'none';
+  }
+  const mainH1El = document.getElementById('page-main-h1');
+  if (mainH1El) {
+    mainH1El.textContent = buildPageMainH1Text(initialParams);
   }
 })();
 
@@ -734,9 +744,14 @@ function updateSeoMeta() {
     }
 
     // --------------------------------------------------
-    // ■ HTMLへの反映処理（タイトル・メタタグ）
+    // ■ HTMLへの反映処理（タイトル・メタタグ・主題H1）
     // --------------------------------------------------
     document.title = newTitle;
+
+    const mainH1El = document.getElementById('page-main-h1');
+    if (mainH1El) {
+        mainH1El.textContent = buildPageMainH1Text(params);
+    }
 
     const setMeta = (selector, attr, value) => {
         const el = document.querySelector(selector);
@@ -2248,7 +2263,7 @@ if (typeof window.renderAccessInfo !== 'function') {
         html += '</div>';
         if (descText) {
             const descClass = accessTexts.length > 0 ? 'spot-description has-access-list' : 'spot-description';
-            html += `<p class="${descClass}">${esc(descText)}</p>`;
+            html += `<div class="${descClass}">${esc(descText)}</div>`;
         }
         if (accessTexts.length > 0) {
             html += '<ul class="spot-access-list">';
@@ -3021,19 +3036,19 @@ function loadAndRenderCategorizedArticles(targetDomId) {
                 const listItems = articles.filter(a => a.style !== "compact"); 
 
                 if (compactItems.length > 0) {
-                    html += `<section class="article-list">`;
+                    html += `<div class="article-list">`;
                     compactItems.forEach(item => {
                         html += `
                         <a href="${item.url}" class="article-card">
                             <img src="${item.image}" alt="${item.title}" width="320" height="240" loading="lazy" decoding="async" fetchpriority="low">
-                            <h2>${item.title}</h2>
+                            <h3>${item.title}</h3>
                         </a>`;
                     });
-                    html += `</section>`;
+                    html += `</div>`;
                 }
 
                 if (listItems.length > 0) {
-                    html += `<section class="menu-list">`;
+                    html += `<div class="menu-list">`;
                     listItems.forEach(item => {
                         html += `
                         <a href="${item.url}" class="menu-card">
@@ -3041,11 +3056,11 @@ function loadAndRenderCategorizedArticles(targetDomId) {
                                 <img src="${item.image}" alt="${item.title}" width="60" height="60" loading="lazy" decoding="async" fetchpriority="low">
                             </div>
                             <div class="menu-text">
-                                <h2>${item.title}</h2>
+                                <h3>${item.title}</h3>
                             </div>
                         </a>`;
                     });
-                    html += `</section>`;
+                    html += `</div>`;
                 }
             });
 
@@ -3754,7 +3769,7 @@ function renderAreaGuide() {
 
     container.style.display = 'block';
     container.dataset.renderedPref = String(window.currentPref || window.prefData.name || '');
-    container.innerHTML = `<h1>${window.prefData.notes}の釣りエリアガイド</h1>`;
+    container.innerHTML = `<h2>${window.prefData.notes}の釣りエリアガイド</h2>`;
 
     if (!window.areaData) return;
 
@@ -3764,11 +3779,11 @@ function renderAreaGuide() {
         div.id = area.individualId; // ←ここ重要
 
         div.innerHTML = `
-            <h2>${area.name}</h2>
-            <p class="text">${area.notes}</p>
+            <h3>${area.name}</h3>
+            <div class="text">${area.notes}</div>
         `;
 
-        div.querySelector('h2').addEventListener('click', async () => {
+        div.querySelector('h3').addEventListener('click', async () => {
             if (typeof selectArea !== 'function' && typeof window.ensureAreaLoader === 'function') {
                 await window.ensureAreaLoader();
             }
