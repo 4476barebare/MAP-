@@ -394,6 +394,9 @@ async function selectSpot(spotOrCoords) {
     const currentZoom = window.map.getZoom();
 
     if (currentZoom === 13 && !window._isRestoringSpot && spotObj) {
+        if (typeof zoomToSpot !== 'function' && typeof window.ensureSpotLoader === 'function') {
+            await window.ensureSpotLoader();
+        }
         if (spotObj.zoom !== '') {
             if (typeof zoomToSpot === 'function') zoomToSpot(spotObj);
         } else {

@@ -2364,8 +2364,13 @@ function stopZoomGuard() {
     window._zoomGuardBase = null;
 }
 
-// タイル切り替えボタンのクリックイベント
-document.getElementById('map-tile-btn')?.addEventListener('click', () => {
+// タイル切り替えボタンのクリックイベント（動的ロード・重複登録対策済み）
+(function bindMapTileBtn() {
+    const bind = () => {
+        const tileBtn = document.getElementById('map-tile-btn');
+        if (!tileBtn || tileBtn.dataset.tileListenerAdded) return;
+        tileBtn.dataset.tileListenerAdded = 'true';
+        tileBtn.addEventListener('click', () => {
             if (!window.map || !window.gsiLayer) return;
 
             // ★ 管理変数から取得
@@ -2395,6 +2400,13 @@ document.getElementById('map-tile-btn')?.addEventListener('click', () => {
                 window.map._resetView(window.map.getCenter(), window.map.getZoom());
             }, 50);
         });
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bind);
+    } else {
+        bind();
+    }
+})();
 
 // ==========================================
 // ★ スポット詳細画面：釣果ピン投稿モード (doPost専用・3連続上限＋4件目以降クールタイム待機制＋半径3m重複ガード版)
@@ -2995,13 +3007,21 @@ async function submitCenterTempPin() {
   }
 }
 
-// 専用アイコンのクリックイベント登録
-document.addEventListener('DOMContentLoaded', () => {
-  const postBtn = document.getElementById('map-post-btn');
-  if (postBtn) {
-    postBtn.addEventListener('click', () => togglePostMode());
+// 専用アイコンのクリックイベント登録（動的ロード時も確実にバインド）
+(function bindMapPostBtn() {
+  const bind = () => {
+    const postBtn = document.getElementById('map-post-btn');
+    if (postBtn && !postBtn.dataset.postListenerAdded) {
+      postBtn.dataset.postListenerAdded = 'true';
+      postBtn.addEventListener('click', () => togglePostMode());
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind);
+  } else {
+    bind();
   }
-});
+})();
 
 
 // ★ GASのdoGetで仮ピン一覧を初回1回のみロードする独立関数（取得済み・通信中はスキップ）
