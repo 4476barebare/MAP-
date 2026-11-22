@@ -339,14 +339,14 @@
 <script src="/lib/leaflet/leaflet.js?v=1.9.4"></script>
 <script src="/lib/leaflet/Polyline.encoded.js?v=0.0.9"></script>
 <script src="/js/header.js"></script>
-<!-- dataLoader.js / regionLoader.js / prefLoader.js / spotLoader.js は画面種別に応じて動的ロード -->
+<!-- areaLoader.js / regionLoader.js / prefLoader.js / spotLoader.js は画面種別に応じて動的ロード -->
 
 <script>
 // ==========================================
 // ★ 画面種別ごとの動的スクリプトローダー
 //   REGION : regionLoader.js のみ最優先（通常ブラウザは描画後に残りJSを裏ロード）
-//   PREF   : regionLoader.js + prefLoader.js + dataLoader.js を最初から必須ロード
-//   AREA   : regionLoader.js + prefLoader.js + dataLoader.js を最初から必須ロード
+//   PREF   : regionLoader.js + prefLoader.js + areaLoader.js を最初から必須ロード
+//   AREA   : regionLoader.js + prefLoader.js + areaLoader.js を最初から必須ロード
 //   SPOT   : regionLoader.js + spotLoader.js を最優先（通常ブラウザは描画後に残りJSを裏ロード）
 // ==========================================
 window._loadedScriptPromises = window._loadedScriptPromises || {};
@@ -390,7 +390,8 @@ window.loadScriptOnce = function(src) {
 
 window.ensureRegionLoader = () => window.loadScriptOnce('/js/regionLoader.js');
 window.ensurePrefLoader = () => window.loadScriptOnce('/js/prefLoader.js');
-window.ensureDataLoader = () => window.loadScriptOnce('/js/dataLoader.js');
+window.ensureAreaLoader = () => window.loadScriptOnce('/js/areaLoader.js');
+window.ensureDataLoader = window.ensureAreaLoader;
 window.ensureSpotLoader = () => window.loadScriptOnce('/js/spotLoader.js');
 
 window.detectRouteTypeFromUrl = function() {
@@ -410,11 +411,11 @@ window.ensureRouteScripts = async function(routeType) {
   if (type === 'region') {
     tasks = [window.ensureRegionLoader()];
   } else if (type === 'pref' || type === 'area') {
-    // PREF / AREA画面では最初から dataLoader.js も必須ロードに含める
+    // PREF / AREA画面では最初から areaLoader.js も必須ロードに含める
     tasks = [
       window.ensureRegionLoader(),
       window.ensurePrefLoader(),
-      window.ensureDataLoader()
+      window.ensureAreaLoader()
     ];
   } else if (type === 'spot') {
     tasks = [
@@ -445,8 +446,8 @@ window.preloadRemainingScripts = function(routeType) {
     try {
       if (type === 'region') {
         await window.ensurePrefLoader();
-        await window.ensureDataLoader();
-        // REGION画面に滞在中であれば、dataLoader.js読み込み完了と同時に道路レイヤーを描画
+        await window.ensureAreaLoader();
+        // REGION画面に滞在中であれば、areaLoader.js読み込み完了と同時に道路レイヤーを描画
         if (!window.currentPref && !window.isSpotScreen() && typeof window.showRoadLayers === 'function') {
           window.showRoadLayers();
         }
@@ -454,7 +455,7 @@ window.preloadRemainingScripts = function(routeType) {
       } else if (type === 'pref' || type === 'area') {
         await window.ensureSpotLoader();
       } else if (type === 'spot') {
-        await window.ensureDataLoader();
+        await window.ensureAreaLoader();
         // SPOT画面に滞在中であれば、最寄り釣具店データを取得してアクセス枠へ反映
         if (window.currentPref && window.prefShopUrl && window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
           window.markerControl.preloadShop01(window.prefShopUrl).then(() => {
@@ -961,7 +962,7 @@ window.fishDataPromises = window.fishDataPromises || {};
 // フォールバック関数群は registerWrsFallbacks() へ集約（動的ロード完了後に未定義分のみ登録）
 
 // ==========================================
-// ★ 全画面共通コア関数（dataLoader.js から引っ越し：buildSeoHtmlString / loadLocationJSON / drawLocation / タイル待機キュー / goBack）
+// ★ 全画面共通コア関数（旧 dataLoader.js から引っ越し：buildSeoHtmlString / loadLocationJSON / drawLocation / タイル待機キュー / goBack）
 // ==========================================
 // ★ SEO対策用：HTML文字列を一括生成する関数（対象魚非表示版・region表示名正規化済み）
 function buildSeoHtmlString(mainData, areasData, spotsData) {
@@ -1549,8 +1550,8 @@ if (tileWrap && tileBtn) {
         if (typeof syncGuideSections === 'function') syncGuideSections();
 
         (async () => {
-            if (typeof selectSpot !== 'function' && typeof window.ensureDataLoader === 'function') {
-                await window.ensureDataLoader();
+            if (typeof selectSpot !== 'function' && typeof window.ensureAreaLoader === 'function') {
+                await window.ensureAreaLoader();
             }
             if (window.prefShopUrl && window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
                 window.markerControl.preloadShop01(window.prefShopUrl);
@@ -1563,7 +1564,10 @@ if (tileWrap && tileBtn) {
             } else {
                 window._selectSpotCompleted = true;
             }
-            // 既に広域ドットが生成済みの場合のみ表示状態を更新（未生成時に他県全件ロードを暴発させない）
+            // URL直打ちスポット画面から戻った場合でも、他県通信を行わず所属県のドットだけ即時生成してから表示する
+            if (typeof window.ensureCurrentPrefSpots === 'function') {
+                window.ensureCurrentPrefSpots(window.currentPref);
+            }
             if (window.regionSpotMarkers && window.regionSpotMarkers.length > 0 && typeof showPrefSpots === 'function') {
                 showPrefSpots();
             }
@@ -1590,6 +1594,9 @@ if (tileWrap && tileBtn) {
     if (window.currentSpotId == null && window.currentAreaId != null && z >= 12.5 && z <= 13.5) {
         lockAndHideUI(); // ★ ガード開始
 
+        // 進行中の古いタイルフェードタイマー（selectSpot / zoomToSpot）を無効化
+        const fadeGen = (window._tileFadeGen = (window._tileFadeGen || 0) + 1);
+
         window._isRestoringSpot = false;
         if (typeof disablePhase2 === 'function') disablePhase2(window.map);
         if (typeof clearSub2Weather === 'function') clearSub2Weather();
@@ -1605,17 +1612,6 @@ if (tileWrap && tileBtn) {
             }
         });
 
-        if (window.osmLayer) {
-            const osmContainer = window.osmLayer.getContainer();
-            if (osmContainer) {
-                osmContainer.style.transition = 'opacity 2s ease';
-                window.osmLayer.setOpacity(0);
-                setTimeout(() => {
-                    if (window.osmLayer) window.osmLayer.setZIndex(1);
-                }, 2000);
-            }
-        }
-
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
 
@@ -1624,23 +1620,57 @@ if (tileWrap && tileBtn) {
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
+        // 既に同じ ort URL がセットされている場合は setUrl() による全タイル破棄・再読込を避ける
+        let needsUrlReload = false;
         if (!window.gsiLayer) {
+            needsUrlReload = true;
             window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
         } else {
-            window.gsiLayer.setUrl(window.gsiLayers.ort);
+            if (window.gsiLayer._url !== window.gsiLayers.ort) {
+                needsUrlReload = true;
+                window.gsiLayer.setUrl(window.gsiLayers.ort);
+            }
             if (!window.map.hasLayer(window.gsiLayer)) {
                 window.gsiLayer.addTo(window.map);
             }
         }
-        
-        requestAnimationFrame(() => {
-            const gsiContainer = window.gsiLayer.getContainer();
+
+        // gsiLayer を osmLayer の直下に配置してからクロスフェードを開始する
+        window.gsiLayer.setZIndex(100);
+
+        const doReturnFade = () => {
+            if (window._tileFadeGen !== fadeGen) return;
+            const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
             if (gsiContainer) {
-                gsiContainer.style.transition = 'opacity 2s ease';
+                gsiContainer.style.transition = 'opacity 0.6s ease';
                 window.gsiLayer.setZIndex(100);
                 window.gsiLayer.setOpacity(1);
             }
-        });
+            if (window.osmLayer) {
+                const osmContainer = window.osmLayer.getContainer();
+                if (osmContainer) {
+                    osmContainer.style.transition = 'opacity 1.2s ease';
+                }
+                window.osmLayer.setOpacity(0);
+                setTimeout(() => {
+                    if (window._tileFadeGen !== fadeGen) return;
+                    if (window.osmLayer) window.osmLayer.setZIndex(1);
+                }, 1250);
+            }
+        };
+
+        if (needsUrlReload && window.gsiLayer.isLoading && window.gsiLayer.isLoading()) {
+            let isLoaded = false;
+            const triggerOnce = () => {
+                if (isLoaded) return;
+                isLoaded = true;
+                doReturnFade();
+            };
+            window.gsiLayer.once('load', triggerOnce);
+            setTimeout(triggerOnce, 1000);
+        } else {
+            requestAnimationFrame(doReturnFade);
+        }
 
         if (typeof selectArea === 'function') selectArea(area); // ★ ここに渡され、外部で false になる
         if (typeof renderCrowdImage === 'function') renderCrowdImage();
@@ -1667,6 +1697,8 @@ if (tileWrap && tileBtn) {
     // ★ 遷移中にエリアスワイプが入らないよう、先に無効化する
     if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
 
+    window._tileFadeGen = (window._tileFadeGen || 0) + 1;
+
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
         window.osmLayer = null;
@@ -1678,7 +1710,14 @@ if (tileWrap && tileBtn) {
     if (!window.gsiLayer) {
         window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
     } else {
-        window.gsiLayer.setUrl(window.gsiLayers.ort);
+        if (window.gsiLayer._url !== window.gsiLayers.ort) {
+            window.gsiLayer.setUrl(window.gsiLayers.ort);
+        }
+        if (!window.map.hasLayer(window.gsiLayer)) {
+            window.gsiLayer.addTo(window.map);
+        }
+        window.gsiLayer.setZIndex(100);
+        window.gsiLayer.setOpacity(1);
     }
 
     window.map.setMaxBounds(null);
@@ -2288,7 +2327,7 @@ async function routeUpdate() {
         if (qSpotName || window.currentSpotId) {
             await window.ensureRouteScripts('spot');
         } else {
-            // PREF / AREA画面では最初から regionLoader + prefLoader + dataLoader を必須ロード
+            // PREF / AREA画面では最初から regionLoader + prefLoader + areaLoader を必須ロード
             await window.ensureRouteScripts(window.currentAreaId ? 'area' : 'pref');
         }
 
@@ -2312,7 +2351,7 @@ async function routeUpdate() {
         }
 
         if (!spotHandled) {
-            // PREF / AREA画面（またはSPOTフォールバック時）は prefLoader + dataLoader を確実に揃える
+            // PREF / AREA画面（またはSPOTフォールバック時）は prefLoader + areaLoader を確実に揃える
             await window.ensureRouteScripts(window.currentAreaId ? 'area' : 'pref');
         }
 
@@ -3591,8 +3630,8 @@ function renderAreaGuide() {
         `;
 
         div.querySelector('h2').addEventListener('click', async () => {
-            if (typeof selectArea !== 'function' && typeof window.ensureDataLoader === 'function') {
-                await window.ensureDataLoader();
+            if (typeof selectArea !== 'function' && typeof window.ensureAreaLoader === 'function') {
+                await window.ensureAreaLoader();
             }
             
             // =====================================================
@@ -3644,11 +3683,18 @@ function renderAreaGuide() {
                         }
                     });
                     
+                    window._tileFadeGen = (window._tileFadeGen || 0) + 1;
                     if (!window.gsiLayer) {
                         window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
                     } else {
-                        window.gsiLayer.setUrl(window.gsiLayers.ort);
-                        window.gsiLayer.addTo(window.map); // ★確実に再追加
+                        if (window.gsiLayer._url !== window.gsiLayers.ort) {
+                            window.gsiLayer.setUrl(window.gsiLayers.ort);
+                        }
+                        if (!window.map.hasLayer(window.gsiLayer)) {
+                            window.gsiLayer.addTo(window.map);
+                        }
+                        window.gsiLayer.setZIndex(100);
+                        window.gsiLayer.setOpacity(1);
                     }
                     
                     // Phase2の無効化処理があれば呼ぶ
