@@ -1582,11 +1582,8 @@ if (tileWrap && tileBtn) {
             } else {
                 window._selectSpotCompleted = true;
             }
-            // URL直打ちスポット画面から戻った場合でも、他県通信を行わず所属県のドットだけ即時生成してから表示する
-            if (typeof window.ensureCurrentPrefSpots === 'function') {
-                window.ensureCurrentPrefSpots(window.currentPref);
-            }
-            if (window.regionSpotMarkers && window.regionSpotMarkers.length > 0 && typeof showPrefSpots === 'function') {
+            // URL直打ちスポット画面から戻った場合も含め、showPrefSpots() 経由で全県ドット生成へ一本化する
+            if (typeof showPrefSpots === 'function') {
                 showPrefSpots();
             }
 
