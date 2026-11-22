@@ -1242,15 +1242,15 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
             return `${it.name}（${it.prefName}／降水${it.pop}%${it.wind != null ? `・風${it.wind}m/s` : ""}${snsNote}）`;
         });
         parts.push(
-            `<p>明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}で天候条件と周辺10km圏内の直近SNS釣果から上位選出された釣り場は、${escapeHtml(summarySpots.join("、"))}です。</p>`
+            `<div class="basis-summary-text">明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}で天候条件と周辺10km圏内の直近SNS釣果から上位選出された釣り場は、${escapeHtml(summarySpots.join("、"))}です。</div>`
         );
     } else {
-        parts.push(`<p>明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}における算出対象スポットはありません。</p>`);
+        parts.push(`<div class="basis-summary-text">明日（${escapeHtml(tomorrowInfo.iso)}）の${escapeHtml(scopeLabel)}における算出対象スポットはありません。</div>`);
     }
     parts.push(
-        `<p class="basis-criteria">` +
+        `<div class="basis-criteria">` +
         `算出基準: 明日5〜20時の平均降水確率から算出する天候スコア（100点満点）に、周辺10km圏内の最新SNS釣果経過日数ボーナス（1日以内+15点〜14日以内+2点）を加算しています。` +
-        `</p>`
+        `</div>`
     );
     parts.push("</div>");
 
@@ -1294,7 +1294,7 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
                 : "";
 
             parts.push(
-                `<article class="basis-spot-card">` +
+                `<div class="basis-spot-card">` +
                 `<h3 class="basis-spot-title">${idx + 1}. ${escapeHtml(item.name)} <span class="basis-spot-loc">（${escapeHtml(locText)}）</span></h3>` +
                 `<ul class="basis-spot-meta">` +
                 `<li><strong>スコア:</strong> ${item.score}点（天候 ${item.weatherScore}点 + SNS釣果 ${item.snsBonus}点）</li>` +
@@ -1306,14 +1306,14 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
                 `<a href="${escapeHtml(item.url)}" class="basis-action-pill">地図でポイントを見る</a>` +
                 detailLinkHtml +
                 `</div>` +
-                `</article>`
+                `</div>`
             );
         });
         parts.push("</div>");
     }
 
     // 各県の軽量HTMLデータページへの通常リンク一覧
-    parts.push('<section class="basis-links-card">');
+    parts.push('<div class="basis-links-card">');
     parts.push('<h3>各県の釣り場詳細・最新SNS釣果データ一覧（テキストHTML版）</h3>');
     parts.push('<ul class="basis-links-list">');
 
@@ -1347,7 +1347,7 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
         parts.push(`<li><a href="/ai-data/index.html">関東全域の釣り場・釣果データ目次を見る</a></li>`);
     }
 
-    parts.push("</ul></section>");
+    parts.push("</ul></div>");
     return parts.join("\n");
 }
 
