@@ -338,7 +338,7 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
     window.fishUrl = `/${regionCode}/${prefCode}_fish.json`;
 
     if (window.map) {
-        window.map.invalidateSize(true);
+        window.map.invalidateSize(false);
         window.map.getContainer().classList.add('is-spot-mode');
     }
 
@@ -525,6 +525,7 @@ function zoomToSpot(spot, options = {}) {
     }
 
     window.goBackGuard = true;
+    window._navUnlockGen = (window._navUnlockGen || 0) + 1;
 
     window.map.getContainer().classList.add('is-spot-mode');
     window.mapStateSnapshot = null;
@@ -765,7 +766,7 @@ function zoomToSpot(spot, options = {}) {
     if (typeof syncGuideSections === 'function') syncGuideSections();
 
     const finalizeZoomToSpot = () => {
-        window.map.invalidateSize(true);
+        window.map.invalidateSize(false);
         if (window.phase2Group) window.phase2Group.clearLayers();
         if (window.phase1Group) window.phase1Group.clearLayers();
         showFishMarkers(safe.URL);

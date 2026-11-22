@@ -110,13 +110,16 @@ async function pref_management(prefCode = window.currentPref) {
     }
 
     // 他県データの集約・マーカー生成・他県の天気魚種付与は裏で継続する。
-    window._prefBackgroundLoad = otherPromise
+    const markersReadyPromise = otherPromise
         .then(() => loadPrefectureSpots(prefCode, 'all'))
         .then(() => {
             const finalParent = getPrefParentRow(prefCode);
             if (finalParent) window.prefData = finalParent;
             return showPrefMarkers();
-        })
+        });
+    window._prefMarkersReadyPromise = markersReadyPromise.catch(() => null);
+
+    window._prefBackgroundLoad = markersReadyPromise
         .then(() => {
             if (window._prefBgDone) {
                 if (!window.currentAreaId && !window.currentSpotId) {
@@ -244,11 +247,27 @@ function initAreaUI() {
     const ul = menu.querySelector('ul');
     if (!ul) return;
 
+    const prefKey = String(window.currentPref || '');
+    const existingAreaItems = ul.querySelectorAll('li[data-pref-area-item="true"]');
+    if (
+        menu.dataset.renderedAreaPref === prefKey &&
+        Array.isArray(window.areaData) &&
+        existingAreaItems.length === window.areaData.length &&
+        existingAreaItems.length > 0
+    ) {
+        if (!window._nearestClickRegistered && typeof tryEnableNearestClick === 'function') {
+            window._prefAreaUIReady = true;
+            tryEnableNearestClick();
+        }
+        return;
+    }
+
     // =====================
     // ■ リスト削除（スッキリ書き換え）
     // =====================
     const oldItems = ul.querySelectorAll('li'); 
     oldItems.forEach(el => el.remove());
+    menu.dataset.renderedAreaPref = prefKey;
 
     // =====================
     // ■ エリアリスト
@@ -256,6 +275,7 @@ function initAreaUI() {
     window.areaData.forEach(area => {
 
         const li = document.createElement('li');
+        li.dataset.prefAreaItem = 'true';
 
         const row = document.createElement('div');
         row.style.display = 'flex';
@@ -359,6 +379,8 @@ function initAreaUI() {
 }
 
 function destroyAreaUI() {
+    const menu = document.getElementById('map-menu');
+    if (menu) menu.dataset.renderedAreaPref = '';
     const menuUl = document.querySelector('#map-menu ul');
 
     // ★ headerを強制的に none にしていた古い記述を完全に削除しました

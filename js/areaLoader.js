@@ -183,6 +183,10 @@ function selectArea(area, options = {}) {
 
     if (!areaObj) return;
     const fromPhase2Return = !!(options && options.fromPhase2Return);
+    const extraPromises = Array.isArray(options && options.extraPromises) ? options.extraPromises : [];
+    const navGen = (options && options.navGen != null)
+        ? options.navGen
+        : (typeof window.lockBackNavigation === 'function' ? window.lockBackNavigation({ hideButton: true }) : 0);
 
     if (areaObj.areaId && areaObj.individualId) {
         window.currentAreaId = `${areaObj.areaId}_${areaObj.individualId}`;
@@ -226,7 +230,7 @@ function selectArea(area, options = {}) {
     }
 
     const finalizeArea = () => {
-        window.map.invalidateSize(true);
+        window.map.invalidateSize(false);
         if (typeof syncGuideSections === 'function') {
             syncGuideSections();
         } else if (typeof openArea === 'function') {
@@ -248,18 +252,23 @@ function selectArea(area, options = {}) {
                     markerControl.showShop01(window.currentAreaId);
                 }
 
-                const btn = document.getElementById('map-back-btn');
-                if (btn) {
-                    btn.style.display = 'block';
-                    btn.style.pointerEvents = 'auto';
-                    requestAnimationFrame(() => {
-                        btn.style.transition = 'opacity 0.4s ease';
-                        btn.style.opacity = '1';
-                    });
-                }
-                window.goBackGuard = false;
                 showRoadLayers();
                 saveMapState();
+
+                const waitTasks = [
+                    ...extraPromises,
+                    typeof window.waitTileLayerReady === 'function' ? window.waitTileLayerReady(window.gsiLayer, 1000) : Promise.resolve()
+                ];
+                if (typeof window.unlockBackNavigationWhenReady === 'function') {
+                    window.unlockBackNavigationWhenReady({
+                        gen: navGen,
+                        showButton: true,
+                        promises: waitTasks,
+                        maxWaitMs: 2800
+                    });
+                } else {
+                    window.goBackGuard = false;
+                }
             });
         });
     };
@@ -426,8 +435,10 @@ async function selectSpot(spotOrCoords) {
         return;
     }
 
-    // ズーム13移動中（約0.5秒）のみ戻る・ピンチインの途中誤爆を防ぐ（ボタン自体は非表示にしない）
-    window.goBackGuard = true;
+    // Phase2遷移中は戻るボタン＆ピンチインをロックし、ズーム移動＋OSM2秒クロスフェード＋ドット準備完了まで待機
+    const navGen = typeof window.lockBackNavigation === 'function'
+        ? window.lockBackNavigation({ hideButton: true })
+        : 0;
     window._selectSpotCompleted = false;
 
     if (window.markerControl) {
@@ -461,9 +472,14 @@ async function selectSpot(spotOrCoords) {
     }
 
     const fadeGen = (window._tileFadeGen = (window._tileFadeGen || 0) + 1);
+    let resolveOsmFade;
+    const osmFadePromise = new Promise(resolve => { resolveOsmFade = resolve; });
 
     const doOsmFade = () => {
-        if (window._tileFadeGen !== fadeGen) return;
+        if (window._tileFadeGen !== fadeGen) {
+            resolveOsmFade();
+            return;
+        }
         const osmContainer = window.osmLayer ? window.osmLayer.getContainer() : null;
         const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
 
@@ -476,9 +492,13 @@ async function selectSpot(spotOrCoords) {
                 window.gsiLayer.setOpacity(0);
             }
             setTimeout(() => {
-                if (window._tileFadeGen !== fadeGen) return;
-                if (window.gsiLayer) window.gsiLayer.setZIndex(1);
+                if (window._tileFadeGen === fadeGen && window.gsiLayer) {
+                    window.gsiLayer.setZIndex(1);
+                }
+                resolveOsmFade();
             }, 2000);
+        } else {
+            resolveOsmFade();
         }
     };
 
@@ -506,8 +526,6 @@ async function selectSpot(spotOrCoords) {
     disableAreaSwipe();
     if (typeof disablePrefSwipe === 'function') disablePrefSwipe();
 
-
-
     window.map.stop();
     const center = window.map.getCenter();
     const isSameLoc = center && Math.abs(center.lat - targetLat) < 0.0001 && 
@@ -517,7 +535,7 @@ async function selectSpot(spotOrCoords) {
     drawLocation(targetName, targetLat, targetLng, 13);
 
     const finalizeSelectSpot = () => {
-        window.map.invalidateSize(true);
+        window.map.invalidateSize(false);
         if (!window.areaBounds && window.currentAreaId) {
             showSpotsForArea(window.currentAreaId);
         }
@@ -530,7 +548,24 @@ async function selectSpot(spotOrCoords) {
             if (typeof syncGuideSections === 'function') syncGuideSections();
             window._isRestoringSpot = false;
             window._selectSpotCompleted = true;
-            window.goBackGuard = false;
+
+            const waitTasks = [
+                osmFadePromise,
+                typeof window.waitTileLayerReady === 'function' ? window.waitTileLayerReady(window.osmLayer, 1000) : Promise.resolve()
+            ];
+            if (window._buildingRegionSpotsPromise && typeof window._buildingRegionSpotsPromise.then === 'function') {
+                waitTasks.push(window._buildingRegionSpotsPromise);
+            }
+            if (typeof window.unlockBackNavigationWhenReady === 'function') {
+                window.unlockBackNavigationWhenReady({
+                    gen: navGen,
+                    showButton: true,
+                    promises: waitTasks,
+                    maxWaitMs: 3200
+                });
+            } else {
+                window.goBackGuard = false;
+            }
         });
     };
 
@@ -799,7 +834,7 @@ function enablePhase2(map) {
                             map.flyTo([nearestSpot.lat, nearestSpot.lng], 13, { duration: 0.5 });
                             
                             map.once('moveend', () => {
-                                map.invalidateSize(true);
+                                map.invalidateSize(false);
                                 
                                 if (!window.areaBounds) {
                                     showSpotsForArea(window.currentAreaId);
