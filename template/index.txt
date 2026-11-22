@@ -1082,7 +1082,7 @@ async function loadLocationJSON() {
     });
 
     targetRows.forEach(row => {
-        if ((!row.areaId || row.individualId === 'parent') && row.name === pref) {
+        if ((!row.areaId || row.individualId === 'parent') && (row.name === pref || row._prefCode === pref)) {
             main = row;
         }
     });
@@ -1217,9 +1217,10 @@ async function drawLocation(name, lat, lng, zoom, options = {}) {
         ? new Promise(resolve => { resolveInitialTileLoad = resolve; })
         : null;
 
-    // ベースタイルの読み込み完了イベントで keepBuffer を 2 に戻し、後続キューを順次スタート
+    // ベースタイルの読み込み完了イベントで keepBuffer を 2 / updateWhenIdle を false に戻し、後続キューを順次スタート
     window.gsiLayer.once('load', () => {
         window.gsiLayer.options.keepBuffer = 2;
+        window.gsiLayer.options.updateWhenIdle = false;
         requestAnimationFrame(() => {
             if (typeof window._flushTileQueue === 'function') {
                 window._flushTileQueue();
@@ -1559,9 +1560,8 @@ if (tileWrap && tileBtn) {
             if (typeof showSpotsForArea === 'function') showSpotsForArea(window.currentAreaId);
             window._selectSpotCompleted = false;
             window._isRestoringSpot = true;
-            const hasSelectSpot = typeof selectSpot === 'function';
-            if (hasSelectSpot) {
-                selectSpot(restoreCoords); // ★ 現在座標を直接渡してPhase2へ復帰（戻るボタン解禁も準備完了まで待機）
+            if (typeof selectSpot === 'function') {
+                selectSpot(restoreCoords); // ★ 現在座標を直接渡してPhase2へ復帰
             } else {
                 window._selectSpotCompleted = true;
             }
@@ -1575,15 +1575,14 @@ if (tileWrap && tileBtn) {
                     clearInterval(checkCompletion);
                     window._selectSpotCompleted = false;
 
-                    if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+                    if (!window.phase2Initialized && typeof enablePhase2 === 'function') {
+                        enablePhase2(window.map);
+                    }
                     if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
                     // ★ Phase2では道路は非表示のまま、未ロードなら裏でバックグラウンド取得・生成を開始する
                     if (typeof hideRoadLayers === 'function') hideRoadLayers();
                     if (typeof window.preloadRoadLayers === 'function') window.preloadRoadLayers();
-                    if (!hasSelectSpot) {
-                        showBackBtnOnly();
-                        window.goBackGuard = false;
-                    }
+                    showBackBtnOnly();
                 }
             }, 50);
         })();
@@ -1595,12 +1594,11 @@ if (tileWrap && tileBtn) {
     if (window.currentSpotId == null && window.currentAreaId != null && z >= 12.5 && z <= 13.5) {
         lockAndHideUI(); // ★ ガード開始
 
-        // 進行中の古いフェード・Phase2待機タイマーをすべて無効化
+        // 進行中の古いタイルフェードタイマー（selectSpot / zoomToSpot）を無効化
         const fadeGen = (window._tileFadeGen = (window._tileFadeGen || 0) + 1);
-        window._phase2ReadyGen = (window._phase2ReadyGen || 0) + 1;
 
         window._isRestoringSpot = false;
-        if (typeof disablePhase2 === 'function') disablePhase2(window.map);
+        if (typeof disablePhase2 === 'function') disablePhase2(window.map, { keepMenu: true });
         if (typeof clearSub2Weather === 'function') clearSub2Weather();
         
         const nsEl = document.getElementById("nearest-spot");
@@ -1614,6 +1612,7 @@ if (tileWrap && tileBtn) {
             }
         });
 
+        window.map.stop();
         window.map.setMinZoom(0);
         window.map.setMaxZoom(18);
 
@@ -1622,24 +1621,57 @@ if (tileWrap && tileBtn) {
 
         if (window.phase2Group) window.phase2Group.clearLayers();
 
-        // 移動完了までは osmLayer で画面を覆ったまま、裏の gsiLayer(ort) を直下に待機させる
-        const hasVisibleOsm = !!(window.osmLayer && window.map.hasLayer(window.osmLayer));
-        if (hasVisibleOsm) {
-            window.osmLayer.setZIndex(999);
-            window.osmLayer.setOpacity(1);
-        }
-
+        // 既に同じ ort URL がセットされている場合は setUrl() による全タイル破棄・再読込を避ける
+        let needsUrlReload = false;
         if (!window.gsiLayer) {
-            window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 1, zIndex: 100 }).addTo(window.map);
+            needsUrlReload = true;
+            window.gsiLayer = L.tileLayer(window.gsiLayers.ort, { opacity: 0, zIndex: 100 }).addTo(window.map);
         } else {
+            window.gsiLayer.options.updateWhenIdle = false;
             if (window.gsiLayer._url !== window.gsiLayers.ort) {
+                needsUrlReload = true;
                 window.gsiLayer.setUrl(window.gsiLayers.ort);
             }
             if (!window.map.hasLayer(window.gsiLayer)) {
                 window.gsiLayer.addTo(window.map);
             }
-            window.gsiLayer.setZIndex(100);
-            window.gsiLayer.setOpacity(1);
+        }
+
+        // gsiLayer を osmLayer の直下に配置してからスムーズにクロスフェードを開始する
+        window.gsiLayer.setZIndex(100);
+
+        const doReturnFade = () => {
+            if (window._tileFadeGen !== fadeGen) return;
+            const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
+            if (gsiContainer) {
+                gsiContainer.style.transition = 'opacity 0.6s ease';
+                window.gsiLayer.setZIndex(100);
+                window.gsiLayer.setOpacity(1);
+            }
+            if (window.osmLayer) {
+                const osmContainer = window.osmLayer.getContainer();
+                if (osmContainer) {
+                    osmContainer.style.transition = 'opacity 0.8s ease';
+                }
+                window.osmLayer.setOpacity(0);
+                setTimeout(() => {
+                    if (window._tileFadeGen !== fadeGen) return;
+                    if (window.osmLayer) window.osmLayer.setZIndex(1);
+                }, 850);
+            }
+        };
+
+        if (needsUrlReload && window.gsiLayer.isLoading && window.gsiLayer.isLoading()) {
+            let isLoaded = false;
+            const triggerOnce = () => {
+                if (isLoaded) return;
+                isLoaded = true;
+                doReturnFade();
+            };
+            window.gsiLayer.once('load', triggerOnce);
+            setTimeout(triggerOnce, 1000);
+        } else {
+            requestAnimationFrame(doReturnFade);
         }
 
         const targetAreaObj = area || (Array.isArray(window.areaData)
@@ -1647,17 +1679,12 @@ if (tileWrap && tileBtn) {
             : null);
 
         if (targetAreaObj && typeof selectArea === 'function') {
-            // 移動完了 → ort読み込み確認 → OSMフェードアウト → 戻るボタン表示を selectArea() 側へ一本化
-            selectArea(targetAreaObj, { fromPhase2Return: hasVisibleOsm, fadeGen });
+            // Phase1のUI復元・雨雲・戻るボタン解禁は selectArea() の finalizeArea() へ一本化
+            selectArea(targetAreaObj, { fromPhase2Return: true });
         } else {
-            if (hasVisibleOsm && window.osmLayer) {
-                window.osmLayer.setOpacity(0);
-                window.osmLayer.setZIndex(1);
-            }
             showBackBtnOnly();
             window.goBackGuard = false;
         }
-        if (typeof renderCrowdImage === 'function') renderCrowdImage();
         return;
     }
 
