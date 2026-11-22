@@ -82,7 +82,6 @@
   <link rel="preconnect" href="https://cyberjapandata.gsi.go.jp" crossorigin>
   <link rel="dns-prefetch" href="https://cyberjapandata.gsi.go.jp">
   <link rel="preload" href="/lib/leaflet/leaflet.js?v=1.9.4" as="script">
-  <link rel="preload" href="/KANTO/KANTO_region.csv" as="fetch" crossorigin="anonymous">
 
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/lib/leaflet/leaflet.css?v=1.9.4"/>
@@ -358,12 +357,150 @@
 <script src="/lib/leaflet/leaflet.js?v=1.9.4"></script>
 <script src="/lib/leaflet/Polyline.encoded.js?v=0.0.9"></script>
 <script src="/js/header.js"></script>
-<script src="/js/dataLoader.js"></script>
-<script src="/js/regionLoader.js"></script>
-<script src="/js/prefLoader.js"></script>
-<script src="/js/spotLoader.js"></script>
+<!-- dataLoader.js / regionLoader.js / prefLoader.js / spotLoader.js は画面種別に応じて動的ロード -->
 
 <script>
+// ==========================================
+// ★ 画面種別ごとの動的スクリプトローダー
+//   REGION : regionLoader.js のみ最優先（通常ブラウザは描画後に残りJSを裏ロード）
+//   PREF   : regionLoader.js + prefLoader.js + dataLoader.js を最初から必須ロード
+//   AREA   : regionLoader.js + prefLoader.js + dataLoader.js を最初から必須ロード
+//   SPOT   : regionLoader.js + spotLoader.js を最優先（通常ブラウザは描画後に残りJSを裏ロード）
+// ==========================================
+window._loadedScriptPromises = window._loadedScriptPromises || {};
+window._loadedScriptDone = window._loadedScriptDone || {};
+
+window.isSearchBot = function() {
+  return /Googlebot|Google-InspectionTool|AdsBot-Google|Storebot-Google|bingbot/i.test(navigator.userAgent || '');
+};
+
+window.loadScriptOnce = function(src) {
+  if (!src) return Promise.resolve(false);
+  if (window._loadedScriptDone[src]) return Promise.resolve(true);
+  if (window._loadedScriptPromises[src]) return window._loadedScriptPromises[src];
+
+  // 既に同srcのscriptタグが存在し完了している場合
+  const existing = document.querySelector(`script[src="${src}"]`);
+  if (existing && existing.dataset.loaded === 'true') {
+    window._loadedScriptDone[src] = true;
+    return Promise.resolve(true);
+  }
+
+  window._loadedScriptPromises[src] = new Promise(resolve => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = false;
+    script.onload = () => {
+      script.dataset.loaded = 'true';
+      window._loadedScriptDone[src] = true;
+      resolve(true);
+    };
+    script.onerror = () => {
+      delete window._loadedScriptPromises[src];
+      script.remove();
+      resolve(false);
+    };
+    document.head.appendChild(script);
+  });
+
+  return window._loadedScriptPromises[src];
+};
+
+window.ensureRegionLoader = () => window.loadScriptOnce('/js/regionLoader.js');
+window.ensurePrefLoader = () => window.loadScriptOnce('/js/prefLoader.js');
+window.ensureDataLoader = () => window.loadScriptOnce('/js/dataLoader.js');
+window.ensureSpotLoader = () => window.loadScriptOnce('/js/spotLoader.js');
+
+window.detectRouteTypeFromUrl = function() {
+  const params = new URLSearchParams(window.location.search);
+  const hasPref = !!(window.currentPref || params.get('pref'));
+  const hasSpot = !!(window.currentSpotId || params.get('spot'));
+  const hasArea = !!(window.currentAreaId || params.get('area'));
+  if (!hasPref) return 'region';
+  if (hasSpot) return 'spot';
+  if (hasArea) return 'area';
+  return 'pref';
+};
+
+window.ensureRouteScripts = async function(routeType) {
+  const type = routeType || window.detectRouteTypeFromUrl();
+  let tasks = [];
+  if (type === 'region') {
+    tasks = [window.ensureRegionLoader()];
+  } else if (type === 'pref' || type === 'area') {
+    // PREF / AREA画面では最初から dataLoader.js も必須ロードに含める
+    tasks = [
+      window.ensureRegionLoader(),
+      window.ensurePrefLoader(),
+      window.ensureDataLoader()
+    ];
+  } else if (type === 'spot') {
+    tasks = [
+      window.ensureRegionLoader(),
+      window.ensureSpotLoader()
+    ];
+  } else {
+    tasks = [window.ensureRegionLoader()];
+  }
+
+  await Promise.all(tasks);
+
+  // 必須JSがWRS等で読み込み失敗して未定義のままの場合のみ安全フォールバックを補完
+  if (typeof window.registerWrsFallbacks === 'function') {
+    window.registerWrsFallbacks();
+  }
+  return true;
+};
+
+window.preloadRemainingScripts = function(routeType) {
+  // 検索ボットには画面遷移用の裏JSロードをスキップし、通信枠枯渇とリソースエラーを防止する
+  if (window.isSearchBot()) return Promise.resolve();
+  if (window._bgScriptsPreloadPromise) return window._bgScriptsPreloadPromise;
+
+  const type = routeType || window.detectRouteTypeFromUrl();
+
+  window._bgScriptsPreloadPromise = (async () => {
+    try {
+      if (type === 'region') {
+        await window.ensurePrefLoader();
+        await window.ensureDataLoader();
+        // REGION画面に滞在中であれば、dataLoader.js読み込み完了と同時に道路レイヤーを描画
+        if (!window.currentPref && !window.isSpotScreen() && typeof window.showRoadLayers === 'function') {
+          window.showRoadLayers();
+        }
+        await window.ensureSpotLoader();
+      } else if (type === 'pref' || type === 'area') {
+        await window.ensureSpotLoader();
+      } else if (type === 'spot') {
+        await window.ensureDataLoader();
+        // SPOT画面に滞在中であれば、最寄り釣具店データを取得してアクセス枠へ反映
+        if (window.currentPref && window.prefShopUrl && window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+          window.markerControl.preloadShop01(window.prefShopUrl).then(() => {
+            if (window.currentSpotId && window.spotData && typeof renderShopSection === 'function') {
+              const activeSpot = (window.currentAreaId
+                ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
+                : null)
+                || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+              if (activeSpot) renderShopSection(activeSpot);
+            }
+          });
+        }
+        await window.ensurePrefLoader();
+        // SPOT画面に滞在中であれば、JMA警報バーを補完更新
+        if (window.currentPref && window.prefData && typeof getAlertText === 'function') {
+          getAlertText(window.prefData);
+        }
+      }
+    } catch (err) {
+      console.warn('バックグラウンドJS読み込みスキップ:', err);
+    } finally {
+      window._bgScriptsPreloadPromise = null;
+    }
+  })();
+
+  return window._bgScriptsPreloadPromise;
+};
+
 // サイト説明文の開閉
 const siteGuideToggle = document.getElementById('site-guide-toggle');
 const siteGuide = document.getElementById('default-site-guide');
@@ -530,8 +667,8 @@ function updateSeoMeta() {
     let newDesc  = "「明日釣り行くんだけどいい場所ある？」と迷ったら釣り行こNAVI！関東全域（千葉・神奈川・茨城・東京・埼玉・群馬・栃木）の海釣り・堤防スポットを網羅したリアルタイム釣果さかな地図。SNS最新釣果ソナー、海底地形（等深線）、ピンポイント天気・風向・波予報・タイドグラフ（潮見表）から今日・明日釣れる場所がひと目でわかります。";
 
     const regionParam = params.get('region');
-    const isRegionTop = !!regionParam && !pref && !area && !spotName;
-    const currentUrl = isRegionTop && window.currentRegion === 'KANTO'
+    const isRegionTop = !pref && !area && !spotName;
+    const currentUrl = isRegionTop && (window.currentRegion || 'KANTO') === 'KANTO'
         ? window.location.origin + window.location.pathname
         : window.location.origin + window.location.pathname + window.location.search;
     
@@ -585,8 +722,8 @@ function updateSeoMeta() {
         newTitle = `${pref}の釣り場マップ・最新SNS釣果＆天気・潮見表｜明日行ける釣りスポット【釣り行こNAVI】`;
         newDesc  = `「明日${pref}で釣りに行くんだけどいい場所ある？」と思ったら釣り行こNAVI。${pref}の海釣り・堤防・河川スポットを空撮さかな地図と等深線で一覧表示。リアルタイムSNS釣果、ピンポイント天気・風速・波高・タイドグラフ（潮見表）を簡単に検索できます。`;
         mapAltText = `${pref}の釣りスポット・最新釣果さかな地図`;
-    } else if (params.get('region')) {
-        const regionName = window.regionData?.name || params.get('region');
+    } else if (params.get('region') || window.regionData) {
+        const regionName = window.regionData?.name || params.get('region') || getRegionDisplayName();
         const prefNames = (window.regionPrefData || []).map(item => item.prefName).filter(Boolean);
         const prefText = prefNames.length ? prefNames.join('、') : '千葉・神奈川・茨城・東京・埼玉・群馬・栃木';
         const shortRegion = regionName.replace('地方', '');
@@ -694,20 +831,53 @@ function updateSeoMeta() {
 // ==========================================
 let _titleUpdateTimer = null; 
 
+function getRegionDisplayName(regionCode = window.currentRegion) {
+    const code = String(regionCode || 'KANTO').trim().toUpperCase();
+    const rawName = window.regionData && window.regionData.name ? String(window.regionData.name).trim() : '';
+    if (rawName && rawName.toUpperCase() !== code) return rawName;
+    if (typeof REGION_MAP === 'object' && REGION_MAP !== null) {
+        const mapped = Object.keys(REGION_MAP).find(name => REGION_MAP[name] === code && name !== code);
+        if (mapped) return mapped;
+    }
+    return '関東地方';
+}
+
 function setIdealQuery(type, value) {
     const url = new URL(location.href);
-    
+
     if (value) {
+        // トップ画面がクエリなし(/)のままでも、pref/area/spot遷移時にregionを自動補完してURL体系を維持する
+        if ((type === 'pref' || type === 'area' || type === 'spot') && !url.searchParams.get('region')) {
+            url.searchParams.set('region', getRegionDisplayName());
+        }
         url.searchParams.set(type, value);
     } else {
         url.searchParams.delete(type);
     }
 
-    window.history.replaceState(null, '', url);
+    // クエリパラメータの並び順を region -> pref -> area -> spot に統一（その他パラメータは末尾に保持）
+    const orderedKeys = ['region', 'pref', 'area', 'spot'];
+    const entries = [];
+    orderedKeys.forEach(k => {
+        if (url.searchParams.has(k)) {
+            entries.push([k, url.searchParams.get(k)]);
+        }
+    });
+    for (const [k, v] of url.searchParams.entries()) {
+        if (!orderedKeys.includes(k)) {
+            entries.push([k, v]);
+        }
+    }
+    const nextSearch = new URLSearchParams(entries).toString();
+    url.search = nextSearch ? ('?' + nextSearch) : '';
+
+    if (url.href !== location.href) {
+        window.history.replaceState(null, '', url);
+    }
 
     clearTimeout(_titleUpdateTimer);
     // タイトル更新関数を新しい名前に変更
-    _titleUpdateTimer = setTimeout(updateSeoMeta, 50); 
+    _titleUpdateTimer = setTimeout(updateSeoMeta, 50);
 }
 
 // ==========================================
@@ -806,234 +976,7 @@ window.prefDictionaryPromises = window.prefDictionaryPromises || {};
 window.fishDataCache = window.fishDataCache || {};
 window.fishDataPromises = window.fishDataPromises || {};
 
-if (typeof window.toWeatherIcon !== 'function') {
-    window.toWeatherIcon = function(code) {
-        if (code >= 70) return "☔️";
-        if (code >= 60) return "☂️";
-        if (code >= 30) return "☁️";
-        if (code >= 10) return "⛅";
-        if (code === 1) return "🌤";
-        if (code === 2) return "⛅";
-        return "☀️";
-    };
-}
-
-if (typeof window.applyFishDataToSpots !== 'function') {
-    window.applyFishDataToSpots = function(spots, fishData) {
-        if (!Array.isArray(spots)) return;
-        if (!fishData || typeof fishData !== 'object') {
-            spots.forEach(spot => { spot.URL = ""; });
-            return;
-        }
-        const fishDict = {};
-        for (const regKey in fishData) {
-            const areaSpots = fishData[regKey];
-            if (!areaSpots || typeof areaSpots !== 'object') continue;
-            for (const spotName in areaSpots) {
-                fishDict[spotName] = areaSpots[spotName];
-            }
-        }
-        spots.forEach(spot => {
-            const spotFishData = fishDict[spot.name];
-            if (!spotFishData) { spot.URL = ""; return; }
-            const fishList = [];
-            for (const fishName in spotFishData) {
-                const info = spotFishData[fishName];
-                if (info && typeof info.coords === 'string' && info.coords !== '') {
-                    info.coords.split('|').forEach(pt => {
-                        const [lat, lng] = pt.split(',');
-                        if (lat && lng) fishList.push(`${fishName}|${lat}|${lng}`);
-                    });
-                }
-            }
-            spot.URL = fishList.join(',');
-        });
-    };
-}
-
-if (typeof window.loadFishDataForPref !== 'function') {
-    window.loadFishDataForPref = function(pref, fishUrl) {
-        if (!pref || !fishUrl) return Promise.resolve(null);
-        if (window.fishDataCache[pref]) {
-            const cachedSpots = window.prefSpotData?.[pref];
-            if (Array.isArray(cachedSpots)) window.applyFishDataToSpots(cachedSpots, window.fishDataCache[pref]);
-            return Promise.resolve(window.fishDataCache[pref]);
-        }
-        if (window.fishDataPromises[pref]) return window.fishDataPromises[pref];
-        window.fishDataPromises[pref] = fetch(fishUrl)
-            .then(res => {
-                if (!res.ok) throw new Error("fish.json fetch failed: " + res.status);
-                return res.json();
-            })
-            .then(fishData => {
-                if (fishData && typeof fishData === 'object') {
-                    window.fishDataCache[pref] = fishData;
-                    const targetSpots = window.prefSpotData?.[pref];
-                    if (Array.isArray(targetSpots)) window.applyFishDataToSpots(targetSpots, fishData);
-                }
-                return fishData;
-            })
-            .catch(() => {
-                delete window.fishDataPromises[pref];
-                return null;
-            });
-        return window.fishDataPromises[pref];
-    };
-}
-
-if (typeof window.loadFishDataAsync !== 'function') {
-    window.loadFishDataAsync = function(pref, fishUrl) {
-        if (!pref || !fishUrl) return Promise.resolve(null);
-        return window.loadFishDataForPref(pref, fishUrl).then(fishData => {
-            if (fishData && window.currentPref === pref) {
-                window.fishData = fishData;
-                if (window.spotData) window.applyFishDataToSpots(window.spotData, fishData);
-                if (window.currentSpotId && window.spotData) {
-                    const activeSpot = (window.currentAreaId
-                        ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
-                        : null)
-                        || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
-                    if (activeSpot && activeSpot.URL) {
-                        const hasZoom = !!(activeSpot.zoom && String(activeSpot.zoom).trim() !== '');
-                        if (hasZoom && typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
-                        if (typeof updateSeoMeta === 'function') updateSeoMeta();
-                    }
-                }
-            }
-            return fishData;
-        });
-    };
-}
-
-if (typeof window.loadRegionCsvData !== 'function') {
-    window.loadRegionCsvData = function() {
-        const regionCode = window.currentRegion || 'KANTO';
-        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
-        if (window.regionCsvParsedData && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
-            return Promise.resolve(window.regionCsvParsedData);
-        }
-        if (window.regionCsvParsedPromise && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
-            return window.regionCsvParsedPromise;
-        }
-        window.regionCsvParsedRegion = regionCode;
-        window.regionCsvParsedUrl = rUrl;
-        window.regionCsvParsedPromise = fetch(rUrl)
-            .then(res => {
-                if (!res.ok) throw new Error('Region CSV fetch failed: ' + res.status);
-                return res.text();
-            })
-            .then(text => {
-                const lines = text.trim().split('\n');
-                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-                const rows = [];
-                for (let i = 1; i < lines.length; i++) {
-                    if (!lines[i]) continue;
-                    const cols = lines[i].split(',').map(c => c.trim());
-                    const row = {};
-                    headers.forEach((h, idx) => { row[h] = cols[idx] || ''; });
-                    rows.push(row);
-                }
-                const prefRows = [];
-                for (const row of rows) {
-                    if (row.type !== 'pref' || !row.url) continue;
-                    const parts = row.url.split('/');
-                    let prefCode = '', lat = NaN, lng = NaN;
-                    if (parts.length >= 4) {
-                        prefCode = parts[1].split('_')[0];
-                        lat = parseFloat(parts[2]);
-                        lng = parseFloat(parts[3]);
-                    } else if (parts.length === 3) {
-                        prefCode = parts[0].split('_')[0];
-                        lat = parseFloat(parts[1]);
-                        lng = parseFloat(parts[2]);
-                    }
-                    if (prefCode) prefRows.push({ prefCode, prefName: row.notes || '', lat, lng, row });
-                }
-                const parsedData = { regionCode, url: rUrl, headers, rows, prefRows };
-                window.regionCsvParsedData = parsedData;
-                return parsedData;
-            });
-        return window.regionCsvParsedPromise;
-    };
-}
-
-if (typeof window.loadRegionCSV !== 'function') {
-    window.loadRegionCSV = async function() {
-        try {
-            const csvData = await window.loadRegionCsvData();
-            if (!csvData) return false;
-            window.regionPrefData = (csvData.prefRows || []).map(p => ({
-                regionCode: csvData.regionCode,
-                prefCode: p.prefCode,
-                prefName: p.prefName,
-                lat: p.lat,
-                lng: p.lng
-            }));
-            for (const row of csvData.rows || []) {
-                if (row.type === 'region') {
-                    window.regionData = {
-                        name: (String(row.name || '').trim().toUpperCase() === 'KANTO' ? '関東地方' : (row.name || '関東地方')),
-                        lat: parseFloat(row.lat),
-                        lng: parseFloat(row.lng),
-                        zoom: parseFloat(row.zoom)
-                    };
-                }
-            }
-            return true;
-        } catch (e) {
-            return false;
-        }
-    };
-}
-
-if (typeof window.loadPrefectureSpots !== 'function') {
-    window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
-        const regionCode = window.currentRegion || 'KANTO';
-        const fetchPref = (code, priority = 'low') => {
-            if (!code) return Promise.resolve([]);
-            if (Array.isArray(window.prefSpotData[code])) return Promise.resolve(window.prefSpotData[code]);
-            if (window.prefSpotPromises[code]) return window.prefSpotPromises[code];
-            const url = `/${regionCode}/${code}_location.json`;
-            const maxRetries = priority === 'high' ? 1 : 0;
-            const doFetch = attempt => fetch(url, { priority })
-                .then(r => {
-                    if (!r.ok) throw new Error('HTTP ' + r.status);
-                    return r.json();
-                })
-                .then(data => {
-                    if (!Array.isArray(data)) return [];
-                    data.forEach(s => { s._prefCode = code; });
-                    window.prefSpotData[code] = data;
-                    window._loadedPrefSet.add(code);
-                    return data;
-                })
-                .catch(() => {
-                    if (attempt < maxRetries) {
-                        return new Promise(resolve => setTimeout(resolve, 300)).then(() => doFetch(attempt + 1));
-                    }
-                    delete window.prefSpotPromises[code];
-                    return [];
-                });
-            window.prefSpotPromises[code] = doFetch(0);
-            return window.prefSpotPromises[code];
-        };
-        if (mode === 'select' && prefCode) {
-            await fetchPref(prefCode, 'high');
-            window.allspotData = Object.values(window.prefSpotData).flat();
-            window.ALL_REGION_SPOTS = window.allspotData;
-            return window.prefSpotData[prefCode] || [];
-        }
-        try {
-            const csvData = await window.loadRegionCsvData();
-            const prefList = [...new Set((csvData.prefRows || []).map(r => r.prefCode).filter(Boolean))];
-            const targets = mode === 'other' ? prefList.filter(c => c !== prefCode) : prefList;
-            await Promise.all(targets.map(c => fetchPref(c, 'low')));
-        } catch (e) {}
-        window.allspotData = Object.values(window.prefSpotData).flat();
-        window.ALL_REGION_SPOTS = window.allspotData;
-        return window.allspotData;
-    };
-}
+// フォールバック関数群は registerWrsFallbacks() へ集約（動的ロード完了後に未定義分のみ登録）
 
 // ==========================================
 // ★ 全画面共通コア関数（dataLoader.js から引っ越し：buildSeoHtmlString / loadLocationJSON / drawLocation / タイル待機キュー / goBack）
@@ -1505,6 +1448,9 @@ if (tileWrap && tileBtn) {
         setIdealQuery('pref', null);
         setIdealQuery('area', null);
         setIdealQuery('spot', null);
+        if ((window.currentRegion || 'KANTO') === 'KANTO') {
+            setIdealQuery('region', null);
+        }
 
         window.currentPref = null;
         window.prefData = null;
@@ -1540,6 +1486,7 @@ if (tileWrap && tileBtn) {
         // ★ setTimeout(10/300ms) をやめ、region_management の完了を待って後始末する
         (async () => {
             try {
+                if (typeof window.ensureRegionLoader === 'function') await window.ensureRegionLoader();
                 await new Promise(resolve => requestAnimationFrame(() => resolve()));
                 if (typeof region_management === 'function') await region_management();
             } catch (err) {
@@ -1619,29 +1566,40 @@ if (tileWrap && tileBtn) {
         window.currentSpotId = null;
         if (typeof syncGuideSections === 'function') syncGuideSections();
 
-        if (typeof showSpotsForArea === 'function') showSpotsForArea(window.currentAreaId);
-        window._selectSpotCompleted = false;
-        window._isRestoringSpot = true;
-        if (typeof selectSpot === 'function') selectSpot(restoreCoords); // ★ 現在座標を直接渡してPhase2へ復帰
-        // 既に広域ドットが生成済みの場合のみ表示状態を更新（未生成時に他県全件ロードを暴発させない）
-        if (window.regionSpotMarkers && window.regionSpotMarkers.length > 0 && typeof showPrefSpots === 'function') {
-            showPrefSpots();
-        }
-       
-        const checkCompletion = setInterval(() => {
-            if (window._selectSpotCompleted) {
-                clearInterval(checkCompletion);
-                window._selectSpotCompleted = false;
-                
-                //clearSpotUI();
-                if (typeof enablePhase2 === 'function') enablePhase2(window.map);
-                if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
-                // ★ Phase2では道路は非表示のまま、未ロードなら裏でバックグラウンド取得・生成を開始する
-                if (typeof hideRoadLayers === 'function') hideRoadLayers();
-                if (typeof window.preloadRoadLayers === 'function') window.preloadRoadLayers();
-                showBackBtnOnly(); 
+        (async () => {
+            if (typeof selectSpot !== 'function' && typeof window.ensureDataLoader === 'function') {
+                await window.ensureDataLoader();
             }
-        }, 50);
+            if (window.prefShopUrl && window.markerControl && typeof window.markerControl.preloadShop01 === 'function') {
+                window.markerControl.preloadShop01(window.prefShopUrl);
+            }
+            if (typeof showSpotsForArea === 'function') showSpotsForArea(window.currentAreaId);
+            window._selectSpotCompleted = false;
+            window._isRestoringSpot = true;
+            if (typeof selectSpot === 'function') {
+                selectSpot(restoreCoords); // ★ 現在座標を直接渡してPhase2へ復帰
+            } else {
+                window._selectSpotCompleted = true;
+            }
+            // 既に広域ドットが生成済みの場合のみ表示状態を更新（未生成時に他県全件ロードを暴発させない）
+            if (window.regionSpotMarkers && window.regionSpotMarkers.length > 0 && typeof showPrefSpots === 'function') {
+                showPrefSpots();
+            }
+
+            const checkCompletion = setInterval(() => {
+                if (window._selectSpotCompleted) {
+                    clearInterval(checkCompletion);
+                    window._selectSpotCompleted = false;
+
+                    if (typeof enablePhase2 === 'function') enablePhase2(window.map);
+                    if (typeof phase1menu === 'function') phase1menu(window.currentAreaId);
+                    // ★ Phase2では道路は非表示のまま、未ロードなら裏でバックグラウンド取得・生成を開始する
+                    if (typeof hideRoadLayers === 'function') hideRoadLayers();
+                    if (typeof window.preloadRoadLayers === 'function') window.preloadRoadLayers();
+                    showBackBtnOnly();
+                }
+            }, 50);
+        })();
         
         return;
     }
@@ -1775,6 +1733,9 @@ if (tileWrap && tileBtn) {
 
     (async () => {
         try {
+            if (typeof pref_management !== 'function' && typeof window.ensurePrefLoader === 'function') {
+                await window.ensurePrefLoader();
+            }
             let drawn = false;
             try {
                 if (typeof pref_management === 'function') {
@@ -1810,6 +1771,240 @@ if (tileWrap && tileBtn) {
 
 window.goBack = goBack;
 
+
+// ==========================================
+// ★ WRS（クローラー）が動的JSを間引いた場合の安全フォールバック登録関数
+//   （ensureRouteScripts() 完了後に未定義のままの関数だけ補完する）
+// ==========================================
+function registerWrsFallbacks() {
+if (typeof window.toWeatherIcon !== 'function') {
+    window.toWeatherIcon = function(code) {
+        if (code >= 70) return "☔️";
+        if (code >= 60) return "☂️";
+        if (code >= 30) return "☁️";
+        if (code >= 10) return "⛅";
+        if (code === 1) return "🌤";
+        if (code === 2) return "⛅";
+        return "☀️";
+    };
+}
+
+if (typeof window.applyFishDataToSpots !== 'function') {
+    window.applyFishDataToSpots = function(spots, fishData) {
+        if (!Array.isArray(spots)) return;
+        if (!fishData || typeof fishData !== 'object') {
+            spots.forEach(spot => { spot.URL = ""; });
+            return;
+        }
+        const fishDict = {};
+        for (const regKey in fishData) {
+            const areaSpots = fishData[regKey];
+            if (!areaSpots || typeof areaSpots !== 'object') continue;
+            for (const spotName in areaSpots) {
+                fishDict[spotName] = areaSpots[spotName];
+            }
+        }
+        spots.forEach(spot => {
+            const spotFishData = fishDict[spot.name];
+            if (!spotFishData) { spot.URL = ""; return; }
+            const fishList = [];
+            for (const fishName in spotFishData) {
+                const info = spotFishData[fishName];
+                if (info && typeof info.coords === 'string' && info.coords !== '') {
+                    info.coords.split('|').forEach(pt => {
+                        const [lat, lng] = pt.split(',');
+                        if (lat && lng) fishList.push(`${fishName}|${lat}|${lng}`);
+                    });
+                }
+            }
+            spot.URL = fishList.join(',');
+        });
+    };
+}
+
+if (typeof window.loadFishDataForPref !== 'function') {
+    window.loadFishDataForPref = function(pref, fishUrl) {
+        if (!pref || !fishUrl) return Promise.resolve(null);
+        if (window.fishDataCache[pref]) {
+            const cachedSpots = window.prefSpotData?.[pref];
+            if (Array.isArray(cachedSpots)) window.applyFishDataToSpots(cachedSpots, window.fishDataCache[pref]);
+            return Promise.resolve(window.fishDataCache[pref]);
+        }
+        if (window.fishDataPromises[pref]) return window.fishDataPromises[pref];
+        window.fishDataPromises[pref] = fetch(fishUrl)
+            .then(res => {
+                if (!res.ok) throw new Error("fish.json fetch failed: " + res.status);
+                return res.json();
+            })
+            .then(fishData => {
+                if (fishData && typeof fishData === 'object') {
+                    window.fishDataCache[pref] = fishData;
+                    const targetSpots = window.prefSpotData?.[pref];
+                    if (Array.isArray(targetSpots)) window.applyFishDataToSpots(targetSpots, fishData);
+                }
+                return fishData;
+            })
+            .catch(() => {
+                delete window.fishDataPromises[pref];
+                return null;
+            });
+        return window.fishDataPromises[pref];
+    };
+}
+
+if (typeof window.loadFishDataAsync !== 'function') {
+    window.loadFishDataAsync = function(pref, fishUrl) {
+        if (!pref || !fishUrl) return Promise.resolve(null);
+        return window.loadFishDataForPref(pref, fishUrl).then(fishData => {
+            if (fishData && window.currentPref === pref) {
+                window.fishData = fishData;
+                if (window.spotData) window.applyFishDataToSpots(window.spotData, fishData);
+                if (window.currentSpotId && window.spotData) {
+                    const activeSpot = (window.currentAreaId
+                        ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
+                        : null)
+                        || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
+                    if (activeSpot && activeSpot.URL) {
+                        const hasZoom = !!(activeSpot.zoom && String(activeSpot.zoom).trim() !== '');
+                        if (hasZoom && typeof showFishMarkers === 'function') showFishMarkers(activeSpot.URL);
+                        if (typeof updateSeoMeta === 'function') updateSeoMeta();
+                    }
+                }
+            }
+            return fishData;
+        });
+    };
+}
+
+if (typeof window.loadRegionCsvData !== 'function') {
+    window.loadRegionCsvData = function() {
+        const regionCode = window.currentRegion || 'KANTO';
+        const rUrl = window.regionUrl || `/${regionCode}/${regionCode}_region.csv`;
+        if (window.regionCsvParsedData && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
+            return Promise.resolve(window.regionCsvParsedData);
+        }
+        if (window.regionCsvParsedPromise && window.regionCsvParsedRegion === regionCode && window.regionCsvParsedUrl === rUrl) {
+            return window.regionCsvParsedPromise;
+        }
+        window.regionCsvParsedRegion = regionCode;
+        window.regionCsvParsedUrl = rUrl;
+        window.regionCsvParsedPromise = fetch(rUrl)
+            .then(res => {
+                if (!res.ok) throw new Error('Region CSV fetch failed: ' + res.status);
+                return res.text();
+            })
+            .then(text => {
+                const lines = text.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                const rows = [];
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i]) continue;
+                    const cols = lines[i].split(',').map(c => c.trim());
+                    const row = {};
+                    headers.forEach((h, idx) => { row[h] = cols[idx] || ''; });
+                    rows.push(row);
+                }
+                const prefRows = [];
+                for (const row of rows) {
+                    if (row.type !== 'pref' || !row.url) continue;
+                    const parts = row.url.split('/');
+                    let prefCode = '', lat = NaN, lng = NaN;
+                    if (parts.length >= 4) {
+                        prefCode = parts[1].split('_')[0];
+                        lat = parseFloat(parts[2]);
+                        lng = parseFloat(parts[3]);
+                    } else if (parts.length === 3) {
+                        prefCode = parts[0].split('_')[0];
+                        lat = parseFloat(parts[1]);
+                        lng = parseFloat(parts[2]);
+                    }
+                    if (prefCode) prefRows.push({ prefCode, prefName: row.notes || '', lat, lng, row });
+                }
+                const parsedData = { regionCode, url: rUrl, headers, rows, prefRows };
+                window.regionCsvParsedData = parsedData;
+                return parsedData;
+            });
+        return window.regionCsvParsedPromise;
+    };
+}
+
+if (typeof window.loadRegionCSV !== 'function') {
+    window.loadRegionCSV = async function() {
+        try {
+            const csvData = await window.loadRegionCsvData();
+            if (!csvData) return false;
+            window.regionPrefData = (csvData.prefRows || []).map(p => ({
+                regionCode: csvData.regionCode,
+                prefCode: p.prefCode,
+                prefName: p.prefName,
+                lat: p.lat,
+                lng: p.lng
+            }));
+            for (const row of csvData.rows || []) {
+                if (row.type === 'region') {
+                    window.regionData = {
+                        name: (String(row.name || '').trim().toUpperCase() === 'KANTO' ? '関東地方' : (row.name || '関東地方')),
+                        lat: parseFloat(row.lat),
+                        lng: parseFloat(row.lng),
+                        zoom: parseFloat(row.zoom)
+                    };
+                }
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+}
+
+if (typeof window.loadPrefectureSpots !== 'function') {
+    window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
+        const regionCode = window.currentRegion || 'KANTO';
+        const fetchPref = (code, priority = 'low') => {
+            if (!code) return Promise.resolve([]);
+            if (Array.isArray(window.prefSpotData[code])) return Promise.resolve(window.prefSpotData[code]);
+            if (window.prefSpotPromises[code]) return window.prefSpotPromises[code];
+            const url = `/${regionCode}/${code}_location.json`;
+            const maxRetries = priority === 'high' ? 1 : 0;
+            const doFetch = attempt => fetch(url, { priority })
+                .then(r => {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(data => {
+                    if (!Array.isArray(data)) return [];
+                    data.forEach(s => { s._prefCode = code; });
+                    window.prefSpotData[code] = data;
+                    window._loadedPrefSet.add(code);
+                    return data;
+                })
+                .catch(() => {
+                    if (attempt < maxRetries) {
+                        return new Promise(resolve => setTimeout(resolve, 300)).then(() => doFetch(attempt + 1));
+                    }
+                    delete window.prefSpotPromises[code];
+                    return [];
+                });
+            window.prefSpotPromises[code] = doFetch(0);
+            return window.prefSpotPromises[code];
+        };
+        if (mode === 'select' && prefCode) {
+            await fetchPref(prefCode, 'high');
+            window.allspotData = Object.values(window.prefSpotData).flat();
+            window.ALL_REGION_SPOTS = window.allspotData;
+            return window.prefSpotData[prefCode] || [];
+        }
+        try {
+            const csvData = await window.loadRegionCsvData();
+            const prefList = [...new Set((csvData.prefRows || []).map(r => r.prefCode).filter(Boolean))];
+            const targets = mode === 'other' ? prefList.filter(c => c !== prefCode) : prefList;
+            await Promise.all(targets.map(c => fetchPref(c, 'low')));
+        } catch (e) {}
+        window.allspotData = Object.values(window.prefSpotData).flat();
+        window.ALL_REGION_SPOTS = window.allspotData;
+        return window.allspotData;
+    };
+}
 
 if (typeof window.loadPrefDictionaryJson !== 'function') {
     window.loadPrefDictionaryJson = function(prefCode = window.currentPref) {
@@ -1945,6 +2140,8 @@ if (typeof window.spot_management !== 'function') {
         return true;
     };
 }
+}
+window.registerWrsFallbacks = registerWrsFallbacks;
 
 // ==========================================
 // ★ 4. URLクエリから直接システム変数をセットする関数
@@ -2036,12 +2233,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const params = new URLSearchParams(window.location.search);
 
-    if (!params.get('region') && !params.get('pref')) {
-        setIdealQuery('region', '関東地方');
-    }
-
+    // トップページ(/)ではURLへ?region=関東地方を強制付与しない（クエリ有無どちらでも同じ動作に統一）
     window.currentRegion = getRegionCode();
     window.regionUrl = `/${window.currentRegion}/${window.currentRegion}_region.csv`;
+
+    // 到達画面に応じた必須JSのみ先に動的ロードする
+    const initialRouteType = window.detectRouteTypeFromUrl();
+    await window.ensureRouteScripts(initialRouteType);
 
     // クエリ反映前の状態を確認し、ページ初期表示かどうかを確定する。
     window.isInitialMapLoad = (
@@ -2065,10 +2263,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 初期URL復帰が完了したら、以後のユーザー操作ではタイル待機を行わない。
     window.isInitialMapLoad = false;
 
+    // 初期表示完了後、通常ブラウザのみ残りの遷移用JSをバックグラウンド先読みする
+    setTimeout(() => {
+        if (typeof window.preloadRemainingScripts === 'function') {
+            window.preloadRemainingScripts(initialRouteType);
+        }
+    }, 0);
+
     // ★ タイル描画完了後、ドット・道路・等深線の次に裏データと記事一覧を順番にバトンリレー実行する
     if (typeof window.runAfterTileLoad === 'function') {
         window.runAfterTileLoad(() => {
-            if (!window.currentPref) return loadPrefectureSpots(null, 'all');
+            if (!window.currentPref && typeof loadPrefectureSpots === 'function') return loadPrefectureSpots(null, 'all');
         });
         window.runAfterTileLoad(() => {
             if (typeof loadICData === 'function') return loadICData();
@@ -2086,16 +2291,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 // （PREF画面のロード・描画は prefLoader.js の pref_management に任せる）
 // ==========================================
 async function routeUpdate() {
-    // 旧URLなどに残る region=KANTO を表示名へ正規化する。
+    // 旧URLなどに残る region=KANTO を表示名へ正規化する（すでに表示名またはクエリ無しの場合は書き換えない）。
     const regionParam = new URLSearchParams(window.location.search).get('region');
-    const regionName = Object.keys(REGION_MAP).find(name => REGION_MAP[name] === regionParam);
+    const regionName = regionParam && Object.keys(REGION_MAP).find(name => REGION_MAP[name] === regionParam && name !== regionParam);
     if (regionName) setIdealQuery('region', regionName);
+
     if (!window.currentPref) {
+        await window.ensureRouteScripts('region');
         if (typeof region_management === 'function') await region_management();
     } else {
         // ★ URLにspotクエリがあるのに初回fetch失敗等でcurrentSpotIdが未確定なら、県画面へ落ちる前に1回だけ再解決する
         const urlParams = new URLSearchParams(window.location.search);
         const qSpotName = urlParams.get('spot');
+        if (qSpotName || window.currentSpotId) {
+            await window.ensureRouteScripts('spot');
+        } else {
+            // PREF / AREA画面では最初から regionLoader + prefLoader + dataLoader を必須ロード
+            await window.ensureRouteScripts(window.currentAreaId ? 'area' : 'pref');
+        }
+
         if (qSpotName && !window.currentSpotId) {
             await applyQueryToStateFromCsv();
         }
@@ -2113,6 +2327,11 @@ async function routeUpdate() {
         // ★ URLにspotクエリがあるのにデータ取得不可でスポット未確定のままなら、県画面への誤遷移（?spot消去や道路取得）を止める
         if (qSpotName && !window.currentSpotId) {
             return;
+        }
+
+        if (!spotHandled) {
+            // PREF / AREA画面（またはSPOTフォールバック時）は prefLoader + dataLoader を確実に揃える
+            await window.ensureRouteScripts(window.currentAreaId ? 'area' : 'pref');
         }
 
         let prefDrawn = false;
@@ -2293,6 +2512,11 @@ async function routeUpdate() {
 //    options.keepRadar: true なら雨雲レーダーを再描画しない（県スワイプ用）
 // ==========================================
 window.selectPrefecture = async function (csvParam, fallbackPrefName, options = {}) {
+    // ★ REGION画面から裏ロード完了前に高速クリックされた場合でも、PREF必須JSを揃えてから遷移する
+    if (typeof window.ensureRouteScripts === 'function') {
+        await window.ensureRouteScripts('pref');
+    }
+
     // ★ 追加：県画面に移行する際はRegion用のニアレストクリックを確実に解除する
     if (window.regionNearestClickHandler && window.map) {
         window.map.off('click', window.regionNearestClickHandler);
@@ -3384,7 +3608,10 @@ function renderAreaGuide() {
             <p class="text">${area.notes}</p>
         `;
 
-        div.querySelector('h2').addEventListener('click', () => {
+        div.querySelector('h2').addEventListener('click', async () => {
+            if (typeof selectArea !== 'function' && typeof window.ensureDataLoader === 'function') {
+                await window.ensureDataLoader();
+            }
             
             // =====================================================
             // ★ Phase2（ズーム13固定 ＆ OSMタイル）状態の判定
