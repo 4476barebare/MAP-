@@ -1217,10 +1217,13 @@ async function drawLocation(name, lat, lng, zoom, options = {}) {
         ? new Promise(resolve => { resolveInitialTileLoad = resolve; })
         : null;
 
-    // ベースタイルの読み込み完了イベントで keepBuffer を 2 / updateWhenIdle を false に戻し、後続キューを順次スタート
+    // ベースタイルの読み込み完了イベントで keepBuffer を 2 / updateWhenIdle を false / fadeAnimation を true に戻し、後続キューを順次スタート
     window.gsiLayer.once('load', () => {
         window.gsiLayer.options.keepBuffer = 2;
         window.gsiLayer.options.updateWhenIdle = false;
+        if (window.map && window.map.options) {
+            window.map.options.fadeAnimation = true;
+        }
         requestAnimationFrame(() => {
             if (typeof window._flushTileQueue === 'function') {
                 window._flushTileQueue();
@@ -1353,6 +1356,88 @@ window.loadLocationJSON = loadLocationJSON;
 window.drawLocation = drawLocation;
 
 window.goBackGuard = false;
+window._navUnlockGen = 0;
+
+// 遷移開始時に戻るボタンとピンチインを確実にロックして隠す（zoomToSpot と同設計）
+function lockBackNavigation(options = {}) {
+    window.goBackGuard = true;
+    const gen = (window._navUnlockGen = (window._navUnlockGen || 0) + 1);
+    const hideBtn = options.hideButton !== false;
+    const backBtn = document.getElementById('map-back-btn');
+    if (backBtn && hideBtn) {
+        backBtn.style.pointerEvents = 'none';
+        backBtn.style.transition = 'opacity 0.25s ease';
+        backBtn.style.opacity = '0';
+    }
+    return gen;
+}
+
+// タイル読み込みPromise（読み込み済み・タイムアウト時は即解決）
+function waitTileLayerReady(layer, timeoutMs = 1200) {
+    return new Promise(resolve => {
+        if (!layer) { resolve(); return; }
+        const isLoading = !!(
+            (typeof layer.isLoading === 'function' && layer.isLoading()) ||
+            layer._loading
+        );
+        if (!isLoading) {
+            requestAnimationFrame(() => resolve());
+            return;
+        }
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            clearTimeout(timer);
+            layer.off('load', finish);
+            requestAnimationFrame(() => resolve());
+        };
+        layer.once('load', finish);
+        const timer = setTimeout(finish, timeoutMs);
+    });
+}
+
+// 画面遷移の移動・タイル・フェード・必須処理がすべて完了してから戻る操作を解禁する
+function unlockBackNavigationWhenReady(options = {}) {
+    const gen = options.gen != null ? options.gen : (window._navUnlockGen = (window._navUnlockGen || 0) + 1);
+    const showButton = options.showButton !== false;
+    const waitPromises = Array.isArray(options.promises) ? options.promises.filter(Boolean) : [];
+    const maxWaitMs = Number(options.maxWaitMs) || 3000;
+
+    const finishUnlock = () => {
+        if (window._navUnlockGen !== gen) return;
+        clearTimeout(safetyTimer);
+        const backBtn = document.getElementById('map-back-btn');
+        if (backBtn) {
+            if (showButton) {
+                backBtn.style.display = 'block';
+                backBtn.style.pointerEvents = 'auto';
+                requestAnimationFrame(() => {
+                    if (window._navUnlockGen !== gen) return;
+                    backBtn.style.transition = 'opacity 0.4s ease';
+                    backBtn.style.opacity = '1';
+                });
+            } else {
+                backBtn.style.display = 'none';
+                backBtn.style.pointerEvents = 'auto';
+            }
+        }
+        setTimeout(() => {
+            if (window._navUnlockGen === gen) {
+                window.goBackGuard = false;
+            }
+        }, 150);
+    };
+
+    const safetyTimer = setTimeout(finishUnlock, maxWaitMs);
+    Promise.allSettled(waitPromises).then(() => {
+        requestAnimationFrame(() => requestAnimationFrame(finishUnlock));
+    });
+}
+
+window.lockBackNavigation = lockBackNavigation;
+window.waitTileLayerReady = waitTileLayerReady;
+window.unlockBackNavigationWhenReady = unlockBackNavigationWhenReady;
 
 function goBack() {
     // 実行中なら弾く
@@ -1427,7 +1512,7 @@ if (tileWrap && tileBtn) {
         if (!window.currentPref) return;
 
         // ★ 実行中の二重 goBack を防ぐ（region_management 完了後に解除）
-        window.goBackGuard = true;
+        const navGen = lockBackNavigation({ hideButton: true });
 
         setIdealQuery('pref', null);
         setIdealQuery('area', null);
@@ -1476,13 +1561,13 @@ if (tileWrap && tileBtn) {
             } catch (err) {
                 console.error('region_management エラー:', err);
             } finally {
-                const backBtn = document.getElementById('map-back-btn');
-                if (backBtn) {
-                    backBtn.style.display = 'none';
-                    backBtn.style.pointerEvents = 'auto';
-                }
                 if (typeof clearMapAlert === 'function') clearMapAlert();
-                window.goBackGuard = false;
+                unlockBackNavigationWhenReady({
+                    gen: navGen,
+                    showButton: false,
+                    promises: [waitTileLayerReady(window.gsiLayer, 1000)],
+                    maxWaitMs: 1500
+                });
             }
         })();
 
@@ -1582,7 +1667,10 @@ if (tileWrap && tileBtn) {
                     // ★ Phase2では道路は非表示のまま、未ロードなら裏でバックグラウンド取得・生成を開始する
                     if (typeof hideRoadLayers === 'function') hideRoadLayers();
                     if (typeof window.preloadRoadLayers === 'function') window.preloadRoadLayers();
-                    showBackBtnOnly();
+                    if (typeof selectSpot !== 'function') {
+                        showBackBtnOnly();
+                        window.goBackGuard = false;
+                    }
                 }
             }, 50);
         })();
@@ -1593,6 +1681,7 @@ if (tileWrap && tileBtn) {
     // ② Phase2 (ズーム13 OSM) → Phase1 (ズーム13.5付近 エリアort) へ戻る
     if (window.currentSpotId == null && window.currentAreaId != null && z >= 12.5 && z <= 13.5) {
         lockAndHideUI(); // ★ ガード開始
+        const navGen = (window._navUnlockGen = (window._navUnlockGen || 0) + 1);
 
         // 進行中の古いタイルフェードタイマー（selectSpot / zoomToSpot）を無効化
         const fadeGen = (window._tileFadeGen = (window._tileFadeGen || 0) + 1);
@@ -1637,27 +1726,37 @@ if (tileWrap && tileBtn) {
             }
         }
 
-        // gsiLayer を osmLayer の直下に配置してからスムーズにクロスフェードを開始する
+        // gsiLayer を osmLayer の直下に配置してからクロスフェード（2秒維持）を開始する
         window.gsiLayer.setZIndex(100);
 
+        let resolveFadeDone;
+        const fadeDonePromise = new Promise(resolve => { resolveFadeDone = resolve; });
+
         const doReturnFade = () => {
-            if (window._tileFadeGen !== fadeGen) return;
+            if (window._tileFadeGen !== fadeGen) {
+                resolveFadeDone();
+                return;
+            }
             const gsiContainer = window.gsiLayer ? window.gsiLayer.getContainer() : null;
             if (gsiContainer) {
-                gsiContainer.style.transition = 'opacity 0.6s ease';
+                gsiContainer.style.transition = 'opacity 2s ease';
                 window.gsiLayer.setZIndex(100);
                 window.gsiLayer.setOpacity(1);
             }
             if (window.osmLayer) {
                 const osmContainer = window.osmLayer.getContainer();
                 if (osmContainer) {
-                    osmContainer.style.transition = 'opacity 0.8s ease';
+                    osmContainer.style.transition = 'opacity 2s ease';
                 }
                 window.osmLayer.setOpacity(0);
                 setTimeout(() => {
-                    if (window._tileFadeGen !== fadeGen) return;
-                    if (window.osmLayer) window.osmLayer.setZIndex(1);
-                }, 850);
+                    if (window._tileFadeGen === fadeGen && window.osmLayer) {
+                        window.osmLayer.setZIndex(1);
+                    }
+                    resolveFadeDone();
+                }, 2000);
+            } else {
+                resolveFadeDone();
             }
         };
 
@@ -1680,10 +1779,14 @@ if (tileWrap && tileBtn) {
 
         if (targetAreaObj && typeof selectArea === 'function') {
             // Phase1のUI復元・雨雲・戻るボタン解禁は selectArea() の finalizeArea() へ一本化
-            selectArea(targetAreaObj, { fromPhase2Return: true });
+            selectArea(targetAreaObj, { fromPhase2Return: true, extraPromises: [fadeDonePromise], navGen });
         } else {
-            showBackBtnOnly();
-            window.goBackGuard = false;
+            unlockBackNavigationWhenReady({
+                gen: navGen,
+                showButton: true,
+                promises: [fadeDonePromise, waitTileLayerReady(window.gsiLayer, 1000)],
+                maxWaitMs: 2800
+            });
         }
         return;
     }
@@ -1692,12 +1795,21 @@ if (tileWrap && tileBtn) {
     // ③ Area -> Pref（県画面に戻る）
     //    描画・他県データ確認・マーカー表示は pref_management に任せる
     // =====================================================
-    // ★ 実行中の二重 goBack を防ぐ（completePrefReturn で解除）
-    window.goBackGuard = true;
+    lockAndHideUI();
+    const navGen = (window._navUnlockGen = (window._navUnlockGen || 0) + 1);
     // ★ 遷移中にエリアスワイプが入らないよう、先に無効化する
     if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
 
     window._tileFadeGen = (window._tileFadeGen || 0) + 1;
+    window._isRestoringSpot = false;
+    if (typeof disablePhase2 === 'function') disablePhase2(window.map);
+    if (typeof clearSub2Weather === 'function') clearSub2Weather();
+    const nsElPref = document.getElementById("nearest-spot");
+    if (nsElPref) nsElPref.textContent = "";
+
+    // pref_management() 内のバックグラウンド完了判定と整合するよう、先にエリア・スポットIDをクリアする
+    window.currentAreaId = null;
+    window.currentSpotId = null;
 
     if (window.osmLayer) {
         window.map.removeLayer(window.osmLayer);
@@ -1706,6 +1818,7 @@ if (tileWrap && tileBtn) {
 
     if (window.phase1Group) window.phase1Group.clearLayers();
     if (window.areaSpotLayer) window.areaSpotLayer.clearLayers();
+    window._areaSpotLayerPref = null;
 
     if (!window.gsiLayer) {
         window.gsiLayer = L.tileLayer(window.gsiLayers.ort).addTo(window.map);
@@ -1720,6 +1833,7 @@ if (tileWrap && tileBtn) {
         window.gsiLayer.setOpacity(1);
     }
 
+    window.map.stop();
     window.map.setMaxBounds(null);
     window.map.options.maxBoundsViscosity = 0;
 
@@ -1728,7 +1842,7 @@ if (tileWrap && tileBtn) {
         if (isPrefReturned) return;
         isPrefReturned = true;
 
-        window.map.invalidateSize(true);
+        window.map.invalidateSize(false);
         
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
         setIdealQuery('area', null);
@@ -1738,18 +1852,26 @@ if (tileWrap && tileBtn) {
         window.currentSpotId = null;
 
         if (typeof initAreaUI === 'function') initAreaUI();
-        // ★ showPrefSpots は pref_management 内で実行済みのため呼ばない
         if (typeof renderPrefWeather === 'function') renderPrefWeather();
         if (typeof resetAreaGuide === 'function') resetAreaGuide();
         if (typeof syncGuideSections === 'function') syncGuideSections();
+        if (typeof renderCrowdImage === 'function') renderCrowdImage();
 
         // エリアスワイプをOFFにし、県スワイプをONにする
         if (typeof disableAreaSwipe === 'function') disableAreaSwipe();
         if (typeof enablePrefSwipe === 'function') enablePrefSwipe();
 
-        // ★ 旧 releaseLockAndShowBtn()（未定義だった）の代わりにガード解除
-        //   戻るボタンは県画面でも表示のままなので、再表示処理は不要
-        window.goBackGuard = false;
+        // 県タイル読み込み＋全県ドット準備（_prefMarkersReadyPromise）完了後に戻る操作を解禁
+        const waitTasks = [waitTileLayerReady(window.gsiLayer, 1000)];
+        if (window._prefMarkersReadyPromise && typeof window._prefMarkersReadyPromise.then === 'function') {
+            waitTasks.push(window._prefMarkersReadyPromise);
+        }
+        unlockBackNavigationWhenReady({
+            gen: navGen,
+            showButton: true,
+            promises: waitTasks,
+            maxWaitMs: 2200
+        });
     };
 
     (async () => {
@@ -1785,7 +1907,7 @@ if (tileWrap && tileBtn) {
             completePrefReturn();
         } catch (err) {
             console.error('エリア→県の復帰エラー:', err);
-            window.goBackGuard = false;
+            unlockBackNavigationWhenReady({ gen: navGen, showButton: true, maxWaitMs: 300 });
         }
     })();
 }
@@ -2413,7 +2535,7 @@ async function routeUpdate() {
 
                 if (window.map) {
                     window.map.once('moveend', () => {
-                        window.map.invalidateSize(true);
+                        window.map.invalidateSize(false);
                         if (typeof enableDragForArea === 'function') enableDragForArea();
                         if (typeof enablePhase2 === 'function') enablePhase2(window.map);
                         window.map.getContainer().classList.add('is-spot-mode');
@@ -2485,7 +2607,7 @@ async function routeUpdate() {
             if (!prefDrawn && typeof drawLocation === 'function') await drawLocation(window.prefData.name, window.prefData.lat, window.prefData.lng, targetZoom);
             
             const finalizePref = () => {
-                if (window.map) window.map.invalidateSize(true);
+                if (window.map) window.map.invalidateSize(false);
                 
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
@@ -2533,6 +2655,8 @@ async function routeUpdate() {
 //    options.keepRadar: true なら雨雲レーダーを再描画しない（県スワイプ用）
 // ==========================================
 window.selectPrefecture = async function (csvParam, fallbackPrefName, options = {}) {
+    const navGen = lockBackNavigation({ hideButton: true });
+
     // ★ REGION画面から裏ロード完了前に高速クリックされた場合でも、PREF必須JSを揃えてから遷移する
     if (typeof window.ensureRouteScripts === 'function') {
         await window.ensureRouteScripts('pref');
@@ -2638,7 +2762,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
         }
 
         const finalizePref = () => {
-            window.map.invalidateSize(true);
+            window.map.invalidateSize(false);
 
             if (
                 typeof loadPrefectureData === 'function' &&
@@ -2669,18 +2793,15 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
                         // ★ preloadShop01 は loadPrefectureData のキュー側で実行されるため、ここでは呼ばない（二重登録防止）
                         
                         if (typeof renderSpotRanking === 'function') renderSpotRanking();
-                        requestAnimationFrame(() => {
-                            const btn = document.getElementById('map-back-btn');
-
-                            if (btn) {
-                                btn.style.display = 'block';
-
-                                requestAnimationFrame(() => {
-                                    btn.style.opacity = '1';
-                                });
-                            }
-                            
-                            window.goBackGuard = false;
+                        const waitTasks = [waitTileLayerReady(window.gsiLayer, 1000)];
+                        if (window._prefMarkersReadyPromise && typeof window._prefMarkersReadyPromise.then === 'function') {
+                            waitTasks.push(window._prefMarkersReadyPromise);
+                        }
+                        unlockBackNavigationWhenReady({
+                            gen: navGen,
+                            showButton: true,
+                            promises: waitTasks,
+                            maxWaitMs: 2200
                         });
                     });
                 });
