@@ -204,9 +204,92 @@ function calcRepresentativeIcon(rows) {
     return code != null ? toWeatherIcon(code) : "";
 }
 
-// regionLoader.js の normalizeWeatherJsonByDate と同一の日付ズレ補正
+// regionLoader.js と同一の列指向v2データ展開＆日付ズレ補正
+function expandSpotWeatherV2(rawSpot) {
+    if (!rawSpot || typeof rawSpot !== "object") return null;
+    if (Array.isArray(rawSpot.hourly) || Array.isArray(rawSpot.daily)) return rawSpot;
+
+    const hRaw = Array.isArray(rawSpot.h) ? rawSpot.h : [];
+    const dRaw = Array.isArray(rawSpot.d) ? rawSpot.d : [];
+
+    const hourly = hRaw.map(dayArr => {
+        if (!Array.isArray(dayArr) || dayArr.length < 5) return null;
+        const isCoastal = dayArr.length >= 10;
+        const codes   = dayArr[0] || [];
+        const temps   = dayArr[1] || [];
+        const pops    = dayArr[2] || [];
+        const precips = dayArr[3] || [];
+        const wspds   = dayArr[4] || [];
+        const wdirs   = isCoastal ? (dayArr[5] || []) : null;
+        const waves   = isCoastal ? (dayArr[6] || []) : null;
+
+        const len = codes.length;
+        const rows = new Array(len);
+        for (let i = 0; i < len; i++) {
+            if (isCoastal) {
+                rows[i] = [
+                    codes[i] ?? 0,
+                    temps[i] ?? 0,
+                    pops[i] ?? 0,
+                    precips[i] ?? 0,
+                    wspds[i] ?? 0,
+                    wdirs[i] ?? 0,
+                    waves[i] ?? 0
+                ];
+            } else {
+                rows[i] = [
+                    codes[i] ?? 0,
+                    temps[i] ?? 0,
+                    pops[i] ?? 0,
+                    precips[i] ?? 0,
+                    wspds[i] ?? 0
+                ];
+            }
+        }
+
+        if (isCoastal) {
+            return {
+                weather: rows,
+                oneday: {
+                    avg: Number(dayArr[7] ?? 0),
+                    sunrise: Number(dayArr[8] ?? 360),
+                    sunset: Number(dayArr[9] ?? 1080)
+                }
+            };
+        }
+        return { weather: rows };
+    }).filter(Boolean);
+
+    const daily = dRaw.map(dayArr => {
+        if (!Array.isArray(dayArr) || dayArr.length < 2) return null;
+        const isCoastal = dayArr.length >= 6;
+        if (isCoastal) {
+            return {
+                weather: [dayArr[0] ?? 0, dayArr[1] ?? 0],
+                dailyEx: {
+                    avg: Number(dayArr[2] ?? 0),
+                    wave: Number(dayArr[3] ?? 0),
+                    sunrise: Number(dayArr[4] ?? 360),
+                    sunset: Number(dayArr[5] ?? 1080)
+                }
+            };
+        }
+        return {
+            weather: [dayArr[0] ?? 0, dayArr[1] ?? 0]
+        };
+    }).filter(Boolean);
+
+    return { hourly, daily };
+}
+
 function normalizeWeatherJsonByDate(data, todayUtcMs) {
     if (!data || !data.spots || typeof data.spots !== "object") return data;
+    for (const spotName of Object.keys(data.spots)) {
+        const raw = data.spots[spotName];
+        if (raw && (Array.isArray(raw.h) || Array.isArray(raw.d)) && !Array.isArray(raw.hourly)) {
+            data.spots[spotName] = expandSpotWeatherV2(raw);
+        }
+    }
     const jsonDateStr = String(data.date || "").trim();
     const m = jsonDateStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
     if (!m) return data;
@@ -418,10 +501,18 @@ function loadPrefDataWithWeather(prefCode, todayUtcMs) {
         });
     }
 
-    const coastalRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_whether.json`), `${prefCode} 沿岸天気JSON`);
-    const inlandRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_InLandwhether.json`), `${prefCode} 内陸天気JSON`);
-    const coastalWeather = coastalRaw ? normalizeWeatherJsonByDate(coastalRaw, todayUtcMs) : null;
-    const inlandWeather = inlandRaw ? normalizeWeatherJsonByDate(inlandRaw, todayUtcMs) : null;
+    // 新天気v2（沿岸・内陸統合）を優先読み込みし、未配置県のみ旧JSONへフォールバック
+    const v2Raw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_weather_v2.json`), `${prefCode} 天気v2 JSON`);
+    const v2Weather = v2Raw ? normalizeWeatherJsonByDate(v2Raw, todayUtcMs) : null;
+
+    let coastalWeather = null;
+    let inlandWeather = null;
+    if (!v2Weather) {
+        const coastalRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_whether.json`), `${prefCode} 沿岸天気JSON`);
+        const inlandRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_InLandwhether.json`), `${prefCode} 内陸天気JSON`);
+        coastalWeather = coastalRaw ? normalizeWeatherJsonByDate(coastalRaw, todayUtcMs) : null;
+        inlandWeather = inlandRaw ? normalizeWeatherJsonByDate(inlandRaw, todayUtcMs) : null;
+    }
 
     const regularSpots = rows.filter(r =>
         hasZoom(r.zoom) &&
@@ -441,13 +532,17 @@ function loadPrefDataWithWeather(prefCode, todayUtcMs) {
         if (row.type === "pref" || row.type === "area") continue;
         const spot = { ...row, _prefCode: prefCode, _prefName: prefName };
 
-        // regionLoader.js と同じ優先順：沿岸を適用後、IDがL始まりのスポットは内陸天気で上書き
-        if (coastalWeather && coastalWeather.spots && coastalWeather.spots[spot.name]) {
-            spot.whether = coastalWeather.spots[spot.name];
-        }
-        const spotId = String(spot.individualId || spot.id || "");
-        if (spotId.startsWith("L") && inlandWeather && inlandWeather.spots && inlandWeather.spots[spot.name]) {
-            spot.whether = inlandWeather.spots[spot.name];
+        if (v2Weather && v2Weather.spots && v2Weather.spots[spot.name]) {
+            spot.whether = v2Weather.spots[spot.name];
+        } else {
+            // フォールバック：旧形式（沿岸を適用後、IDがL始まりのスポットは内陸天気で上書き）
+            if (coastalWeather && coastalWeather.spots && coastalWeather.spots[spot.name]) {
+                spot.whether = coastalWeather.spots[spot.name];
+            }
+            const spotId = String(spot.individualId || spot.id || "");
+            if (spotId.startsWith("L") && inlandWeather && inlandWeather.spots && inlandWeather.spots[spot.name]) {
+                spot.whether = inlandWeather.spots[spot.name];
+            }
         }
 
         const areaInfo = areaMap.get(spot.areaId);
@@ -821,7 +916,7 @@ function buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults
 
     lines.push("---");
     lines.push("");
-    lines.push(`データ出典: data/*_whether.json、data/*_InLandwhether.json、${REGION_CODE}/integrated_catch.json、${REGION_CODE}/*_location.json`);
+    lines.push(`データ出典: data/*_weather_v2.json、data/*_tide_v2.json、${REGION_CODE}/integrated_catch.json、${REGION_CODE}/*_location.json`);
     lines.push("");
 
     return lines.join("\n");
