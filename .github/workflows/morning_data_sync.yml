@@ -43,28 +43,29 @@ jobs:
           echo "| :--- | :--- | :--- | :--- |" >> "$GITHUB_STEP_SUMMARY"
 
       # ========================================================
-      # 1. 沿岸・内陸天気JSONの回収 (GAS -> 作業ディレクトリへ直接保存)
+      # 1. 天気v2 & 潮汐ポリラインv2 JSONの回収 (汎用GAS: Weather folder -> data/)
       #    ※同一ジョブ内の後続ステップはプッシュを待たずこの最新ファイルを直接参照する
       # ========================================================
-      - name: "1. Fetch Coastal and Inland Weather JSONs (GAS)"
+      - name: "1. Fetch Weather v2 and Tide v2 JSONs (GAS: Weather folder)"
         continue-on-error: true
         env:
-          GAS_URL: "https://script.google.com/macros/s/AKfycbxBd3qlpXVBOYC9Q-Aa7gJ-EZlSPln7Oh9A0dkD3eyA43CKQFKcp5fyjszu2ZuwC4MD/exec"
-          SECRET_KEY: "mZ4vP1wL9q"
+          GAS_URL: ${{ secrets.DRIVE_FETCHER_GAS_URL }}
+          SECRET_KEY: "aZ3kP9xQw7LmN2vB8tRc"
+          FOLDER_NAME: "Weather"
           REGION_CSV: "KANTO/KANTO_region.csv"
         run: |
           mkdir -p data
 
           if [ ! -f "$REGION_CSV" ]; then
             echo "❌ エラー: $REGION_CSV が見つかりません。"
-            echo "| 1. 天気JSON（沿岸・内陸） | \`data/*_whether.json\` | ❌ 失敗 | KANTO_region.csv 未検出 |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 1. 天気・潮汐JSON v2 | \`data/*_weather_v2.json / _tide_v2.json\` | ❌ 失敗 | KANTO_region.csv 未検出 |" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
           PREFS=$(awk -F',' 'NR>1 {gsub(/\r/, "", $0); if ($11 == "pref") print $1}' "$REGION_CSV")
           if [ -z "$PREFS" ]; then
             echo "❌ エラー: $REGION_CSV から pref 行を抽出できませんでした。"
-            echo "| 1. 天気JSON（沿岸・内陸） | \`data/*_whether.json\` | ❌ 失敗 | pref行なし |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 1. 天気・潮汐JSON v2 | \`data/*_weather_v2.json / _tide_v2.json\` | ❌ 失敗 | pref行なし |" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
 
@@ -74,59 +75,69 @@ jobs:
 
           for PREF in $PREFS; do
             echo "========================================="
-            echo "📥 Fetching weather data for [$PREF] ..."
+            echo "📥 Fetching v2 weather & tide data for [$PREF] ..."
             echo "========================================="
 
-            # 1-A. 沿岸部天気 (${PREF}_whether.json)
-            COASTAL_DEST="data/${PREF}_whether.json"
-            COASTAL_TMP="/tmp/${PREF}_whether.json"
-            if curl -sSL --fail --retry 2 --connect-timeout 15 --max-time 60 "${GAS_URL}?key=${SECRET_KEY}&pref=${PREF}" -o "$COASTAL_TMP" \
-              && jq -e '.spots != null and (.count | type == "number")' "$COASTAL_TMP" > /dev/null 2>&1; then
-              if [ -f "$COASTAL_DEST" ] && cmp -s "$COASTAL_TMP" "$COASTAL_DEST"; then
+            # 1-A. 天気v2 (${PREF}_weather_v2.json : 沿岸・内陸統合)
+            WEATHER_FILE="${PREF}_weather_v2.json"
+            WEATHER_DEST="data/${WEATHER_FILE}"
+            WEATHER_TMP="/tmp/${WEATHER_FILE}"
+            WEATHER_URL="${GAS_URL}?folder=${FOLDER_NAME}&file=${WEATHER_FILE}&key=${SECRET_KEY}"
+
+            if curl -sSL --fail --retry 2 --connect-timeout 15 --max-time 60 "$WEATHER_URL" -o "$WEATHER_TMP" \
+              && jq -e '.date != null and (.spots | type == "object") and ((.spots | length) > 0)' "$WEATHER_TMP" > /dev/null 2>&1; then
+              if [ -f "$WEATHER_DEST" ] && cmp -s "$WEATHER_TMP" "$WEATHER_DEST"; then
                 SKIPPED_FILES=$((SKIPPED_FILES + 1))
-                echo "  ⏭️ Unchanged: $COASTAL_DEST"
+                echo "  ⏭️ Unchanged: $WEATHER_DEST"
               else
-                mv "$COASTAL_TMP" "$COASTAL_DEST"
+                mv "$WEATHER_TMP" "$WEATHER_DEST"
                 UPDATED_FILES=$((UPDATED_FILES + 1))
-                echo "  ✅ Saved $COASTAL_DEST ($(jq '.count' "$COASTAL_DEST") spots)"
+                SPOT_CNT=$(jq '.spots | length' "$WEATHER_DEST")
+                FILE_DATE=$(jq -r '.date' "$WEATHER_DEST")
+                echo "  ✅ Saved $WEATHER_DEST (date: ${FILE_DATE}, ${SPOT_CNT} spots)"
               fi
             else
-              echo "  ❌ Error: Invalid JSON for ${PREF}_whether.json"
-              head -n 10 "$COASTAL_TMP" 2>/dev/null || true
-              FAILED_PREFS="${FAILED_PREFS} ${PREF}(沿岸)"
+              echo "  ❌ Error: Invalid JSON for ${WEATHER_FILE}"
+              head -n 10 "$WEATHER_TMP" 2>/dev/null || true
+              FAILED_PREFS="${FAILED_PREFS} ${PREF}(weather_v2)"
             fi
 
             sleep 1
 
-            # 1-B. 内陸部天気 (${PREF}_InLandwhether.json)
-            INLAND_DEST="data/${PREF}_InLandwhether.json"
-            INLAND_TMP="/tmp/${PREF}_InLandwhether.json"
-            if curl -sSL --fail --retry 2 --connect-timeout 15 --max-time 60 "${GAS_URL}?key=${SECRET_KEY}&pref=${PREF}&type=inland" -o "$INLAND_TMP" \
-              && jq -e '.spots != null and (.count | type == "number")' "$INLAND_TMP" > /dev/null 2>&1; then
-              if [ -f "$INLAND_DEST" ] && cmp -s "$INLAND_TMP" "$INLAND_DEST"; then
+            # 1-B. 潮汐ポリラインv2 (${PREF}_tide_v2.json : 沿岸スポット8日分1Dポリライン)
+            TIDE_FILE="${PREF}_tide_v2.json"
+            TIDE_DEST="data/${TIDE_FILE}"
+            TIDE_TMP="/tmp/${TIDE_FILE}"
+            TIDE_URL="${GAS_URL}?folder=${FOLDER_NAME}&file=${TIDE_FILE}&key=${SECRET_KEY}"
+
+            if curl -sSL --fail --retry 2 --connect-timeout 15 --max-time 60 "$TIDE_URL" -o "$TIDE_TMP" \
+              && jq -e '.date != null and (.spots | type == "object") and ((.spots | length) > 0)' "$TIDE_TMP" > /dev/null 2>&1; then
+              if [ -f "$TIDE_DEST" ] && cmp -s "$TIDE_TMP" "$TIDE_DEST"; then
                 SKIPPED_FILES=$((SKIPPED_FILES + 1))
-                echo "  ⏭️ Unchanged: $INLAND_DEST"
+                echo "  ⏭️ Unchanged: $TIDE_DEST"
               else
-                mv "$INLAND_TMP" "$INLAND_DEST"
+                mv "$TIDE_TMP" "$TIDE_DEST"
                 UPDATED_FILES=$((UPDATED_FILES + 1))
-                echo "  ✅ Saved $INLAND_DEST ($(jq '.count' "$INLAND_DEST") spots)"
+                SPOT_CNT=$(jq '.spots | length' "$TIDE_DEST")
+                FILE_DATE=$(jq -r '.date' "$TIDE_DEST")
+                echo "  ✅ Saved $TIDE_DEST (date: ${FILE_DATE}, ${SPOT_CNT} spots)"
               fi
             else
-              echo "  ❌ Error: Invalid JSON for ${PREF}_InLandwhether.json"
-              head -n 10 "$INLAND_TMP" 2>/dev/null || true
-              FAILED_PREFS="${FAILED_PREFS} ${PREF}(内陸)"
+              echo "  ❌ Error: Invalid JSON for ${TIDE_FILE}"
+              head -n 10 "$TIDE_TMP" 2>/dev/null || true
+              FAILED_PREFS="${FAILED_PREFS} ${PREF}(tide_v2)"
             fi
 
             sleep 1
           done
 
           if [ -n "$FAILED_PREFS" ]; then
-            echo "| 1. 天気JSON（沿岸・内陸） | \`data/*_whether.json\` | ⚠️ 一部失敗 | 更新 ${UPDATED_FILES} / 変化なし ${SKIPPED_FILES} / 失敗:${FAILED_PREFS} |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 1. 天気・潮汐JSON v2 | \`data/*_weather_v2.json / _tide_v2.json\` | ⚠️ 一部失敗 | 更新 ${UPDATED_FILES} / 変化なし ${SKIPPED_FILES} / 失敗:${FAILED_PREFS} |" >> "$GITHUB_STEP_SUMMARY"
             exit 1
           elif [ "$UPDATED_FILES" -eq 0 ]; then
-            echo "| 1. 天気JSON（沿岸・内陸） | \`data/*_whether.json\` | ⏭️ 更新なし | 全 ${SKIPPED_FILES}ファイル変更なし |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 1. 天気・潮汐JSON v2 | \`data/*_weather_v2.json / _tide_v2.json\` | ⏭️ 更新なし | 全 ${SKIPPED_FILES}ファイル変更なし |" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "| 1. 天気JSON（沿岸・内陸） | \`data/*_whether.json\` | ✅ 更新完了 | 更新 ${UPDATED_FILES} / 変化なし ${SKIPPED_FILES} |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 1. 天気・潮汐JSON v2 | \`data/*_weather_v2.json / _tide_v2.json\` | ✅ 更新完了 | 更新 ${UPDATED_FILES} / 変化なし ${SKIPPED_FILES} |" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       # ========================================================
@@ -344,7 +355,7 @@ jobs:
 
       # ========================================================
       # 8. ランキング・根拠ポップアップ・軽量HTML・本番 index.html の一括生成
-      #    （Step1の天気JSON・Step4のSNS釣果・Step7のMDをプッシュ待ちせずそのまま参照）
+      #    （Step1の天気v2 JSON・Step4のSNS釣果・Step7のMDをプッシュ待ちせずそのまま参照）
       # ========================================================
       - name: "8. Generate Ranking, Lightweight HTMLs & Production index.html"
         continue-on-error: true
