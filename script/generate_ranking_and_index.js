@@ -204,92 +204,9 @@ function calcRepresentativeIcon(rows) {
     return code != null ? toWeatherIcon(code) : "";
 }
 
-// regionLoader.js と同一の列指向v2データ展開＆日付ズレ補正
-function expandSpotWeatherV2(rawSpot) {
-    if (!rawSpot || typeof rawSpot !== "object") return null;
-    if (Array.isArray(rawSpot.hourly) || Array.isArray(rawSpot.daily)) return rawSpot;
-
-    const hRaw = Array.isArray(rawSpot.h) ? rawSpot.h : [];
-    const dRaw = Array.isArray(rawSpot.d) ? rawSpot.d : [];
-
-    const hourly = hRaw.map(dayArr => {
-        if (!Array.isArray(dayArr) || dayArr.length < 5) return null;
-        const isCoastal = dayArr.length >= 10;
-        const codes   = dayArr[0] || [];
-        const temps   = dayArr[1] || [];
-        const pops    = dayArr[2] || [];
-        const precips = dayArr[3] || [];
-        const wspds   = dayArr[4] || [];
-        const wdirs   = isCoastal ? (dayArr[5] || []) : null;
-        const waves   = isCoastal ? (dayArr[6] || []) : null;
-
-        const len = codes.length;
-        const rows = new Array(len);
-        for (let i = 0; i < len; i++) {
-            if (isCoastal) {
-                rows[i] = [
-                    codes[i] ?? 0,
-                    temps[i] ?? 0,
-                    pops[i] ?? 0,
-                    precips[i] ?? 0,
-                    wspds[i] ?? 0,
-                    wdirs[i] ?? 0,
-                    waves[i] ?? 0
-                ];
-            } else {
-                rows[i] = [
-                    codes[i] ?? 0,
-                    temps[i] ?? 0,
-                    pops[i] ?? 0,
-                    precips[i] ?? 0,
-                    wspds[i] ?? 0
-                ];
-            }
-        }
-
-        if (isCoastal) {
-            return {
-                weather: rows,
-                oneday: {
-                    avg: Number(dayArr[7] ?? 0),
-                    sunrise: Number(dayArr[8] ?? 360),
-                    sunset: Number(dayArr[9] ?? 1080)
-                }
-            };
-        }
-        return { weather: rows };
-    }).filter(Boolean);
-
-    const daily = dRaw.map(dayArr => {
-        if (!Array.isArray(dayArr) || dayArr.length < 2) return null;
-        const isCoastal = dayArr.length >= 6;
-        if (isCoastal) {
-            return {
-                weather: [dayArr[0] ?? 0, dayArr[1] ?? 0],
-                dailyEx: {
-                    avg: Number(dayArr[2] ?? 0),
-                    wave: Number(dayArr[3] ?? 0),
-                    sunrise: Number(dayArr[4] ?? 360),
-                    sunset: Number(dayArr[5] ?? 1080)
-                }
-            };
-        }
-        return {
-            weather: [dayArr[0] ?? 0, dayArr[1] ?? 0]
-        };
-    }).filter(Boolean);
-
-    return { hourly, daily };
-}
-
+// regionLoader.js の normalizeWeatherJsonByDate と同一の日付ズレ補正
 function normalizeWeatherJsonByDate(data, todayUtcMs) {
     if (!data || !data.spots || typeof data.spots !== "object") return data;
-    for (const spotName of Object.keys(data.spots)) {
-        const raw = data.spots[spotName];
-        if (raw && (Array.isArray(raw.h) || Array.isArray(raw.d)) && !Array.isArray(raw.hourly)) {
-            data.spots[spotName] = expandSpotWeatherV2(raw);
-        }
-    }
     const jsonDateStr = String(data.date || "").trim();
     const m = jsonDateStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
     if (!m) return data;
@@ -501,18 +418,10 @@ function loadPrefDataWithWeather(prefCode, todayUtcMs) {
         });
     }
 
-    // 新天気v2（沿岸・内陸統合）を優先読み込みし、未配置県のみ旧JSONへフォールバック
-    const v2Raw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_weather_v2.json`), `${prefCode} 天気v2 JSON`);
-    const v2Weather = v2Raw ? normalizeWeatherJsonByDate(v2Raw, todayUtcMs) : null;
-
-    let coastalWeather = null;
-    let inlandWeather = null;
-    if (!v2Weather) {
-        const coastalRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_whether.json`), `${prefCode} 沿岸天気JSON`);
-        const inlandRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_InLandwhether.json`), `${prefCode} 内陸天気JSON`);
-        coastalWeather = coastalRaw ? normalizeWeatherJsonByDate(coastalRaw, todayUtcMs) : null;
-        inlandWeather = inlandRaw ? normalizeWeatherJsonByDate(inlandRaw, todayUtcMs) : null;
-    }
+    const coastalRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_whether.json`), `${prefCode} 沿岸天気JSON`);
+    const inlandRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_InLandwhether.json`), `${prefCode} 内陸天気JSON`);
+    const coastalWeather = coastalRaw ? normalizeWeatherJsonByDate(coastalRaw, todayUtcMs) : null;
+    const inlandWeather = inlandRaw ? normalizeWeatherJsonByDate(inlandRaw, todayUtcMs) : null;
 
     const regularSpots = rows.filter(r =>
         hasZoom(r.zoom) &&
@@ -532,17 +441,13 @@ function loadPrefDataWithWeather(prefCode, todayUtcMs) {
         if (row.type === "pref" || row.type === "area") continue;
         const spot = { ...row, _prefCode: prefCode, _prefName: prefName };
 
-        if (v2Weather && v2Weather.spots && v2Weather.spots[spot.name]) {
-            spot.whether = v2Weather.spots[spot.name];
-        } else {
-            // フォールバック：旧形式（沿岸を適用後、IDがL始まりのスポットは内陸天気で上書き）
-            if (coastalWeather && coastalWeather.spots && coastalWeather.spots[spot.name]) {
-                spot.whether = coastalWeather.spots[spot.name];
-            }
-            const spotId = String(spot.individualId || spot.id || "");
-            if (spotId.startsWith("L") && inlandWeather && inlandWeather.spots && inlandWeather.spots[spot.name]) {
-                spot.whether = inlandWeather.spots[spot.name];
-            }
+        // regionLoader.js と同じ優先順：沿岸を適用後、IDがL始まりのスポットは内陸天気で上書き
+        if (coastalWeather && coastalWeather.spots && coastalWeather.spots[spot.name]) {
+            spot.whether = coastalWeather.spots[spot.name];
+        }
+        const spotId = String(spot.individualId || spot.id || "");
+        if (spotId.startsWith("L") && inlandWeather && inlandWeather.spots && inlandWeather.spots[spot.name]) {
+            spot.whether = inlandWeather.spots[spot.name];
         }
 
         const areaInfo = areaMap.get(spot.areaId);
@@ -569,12 +474,17 @@ function extractTomorrowWeatherDetail(dayData) {
     const afternoonRows = [];
 
     let maxPop = -Infinity;
+    let maxPopAll = -Infinity;
     let maxWind = -Infinity;
     let maxTemp = -Infinity;
     let minTemp = Infinity;
     let maxWave = -Infinity;
     let popTotal = 0;
     let popCount = 0;
+
+    // 2時間別12ブロックの風速減点集計（4m/s以上で1ブロックあたり 8% + (風速-4)*1% 減点、12ブロック全て4m以上で最小96%減点）
+    let windPenaltyPctRaw = 0;
+    let windStrongBlocks = 0;
 
     // 2時間刻み(0,2,4,...,22時)から代表的な時間帯スロット（朝6時/昼12時/夕18時）を拾う
     const timeSlots = [];
@@ -596,12 +506,21 @@ function extractTomorrowWeatherDetail(dayData) {
         const windDir = row[5];
         const wave = row[6];
 
-        if (typeof pop === "number" && hour >= 5 && hour <= 20) {
-            maxPop = Math.max(maxPop, pop);
-            popTotal += pop;
-            popCount++;
+        if (typeof pop === "number") {
+            maxPopAll = Math.max(maxPopAll, pop);
+            if (hour >= 5 && hour <= 20) {
+                maxPop = Math.max(maxPop, pop);
+                popTotal += pop;
+                popCount++;
+            }
         }
-        if (typeof wind === "number") maxWind = Math.max(maxWind, wind);
+        if (typeof wind === "number") {
+            maxWind = Math.max(maxWind, wind);
+            if (wind >= 4) {
+                windStrongBlocks++;
+                windPenaltyPctRaw += 8 + (wind - 4);
+            }
+        }
         if (typeof temp === "number") {
             maxTemp = Math.max(maxTemp, temp);
             minTemp = Math.min(minTemp, temp);
@@ -655,12 +574,30 @@ function extractTomorrowWeatherDetail(dayData) {
     }
 
     const averagePop = popTotal / popCount;
-    const weatherScore = Math.max(0, 100 - averagePop * 0.7);
+    const popPenaltyPct = Math.min(100, Math.max(0, averagePop));
+    const popMultiplier = Math.max(0, 1 - popPenaltyPct / 100);
+
+    const windPenaltyPct = Math.min(100, Math.max(0, windPenaltyPctRaw));
+    const windMultiplier = Math.max(0, 1 - windPenaltyPct / 100);
+
+    // 降水確率100%のスポット、または風速減点96%以上（12ブロック全て4m/s以上相当）のスポットは問答無用でランキング外
+    const isExcludedByWeather = (
+        displayPop >= 100 ||
+        maxPop >= 100 ||
+        maxPopAll >= 100 ||
+        windPenaltyPct >= 96
+    );
+
     const waterTempAvg = typeof dayData?.oneday?.avg === "number" ? Math.round(dayData.oneday.avg) : null;
 
     return {
         averagePop,
-        weatherScore,
+        popPenaltyPct: Math.round(popPenaltyPct),
+        popMultiplier,
+        windPenaltyPct: Math.round(windPenaltyPct),
+        windStrongBlocks,
+        windMultiplier,
+        isExcludedByWeather,
         displayPop,
         maxWind: maxWind !== -Infinity ? Math.round(maxWind) : null,
         maxTemp: maxTemp !== -Infinity ? Math.round(maxTemp) : null,
@@ -700,9 +637,16 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
         const wDetail = extractTomorrowWeatherDetail(tomorrowDayData);
         if (!wDetail) continue;
 
+        // 降水確率100% または 2時間別風速減点96%以上（全ブロック4m以上相当）は問答無用でランキング外
+        if (wDetail.isExcludedByWeather) continue;
+
         const nearbyPosts = getNearbySnsCatchRecords(spot, snsCatchData, todayUtcMs);
         const snsBonus = getSnsCatchBonus(nearbyPosts);
-        const totalScore = Math.round(wDetail.weatherScore + snsBonus);
+
+        // 基礎点(100点 + SNS釣果加点) に対し、降水確率減点率・2時間別風速減点率を乗算
+        const baseScore = 100 + snsBonus;
+        const totalScore = Math.round(baseScore * wDetail.popMultiplier * wDetail.windMultiplier);
+        if (totalScore <= 0) continue;
 
         candidates.push({
             name: spot.name,
@@ -713,7 +657,10 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
             url: buildSpotUrl(spot),
             fullUrl: SITE_URL + buildSpotUrl(spot),
             score: totalScore,
-            weatherScore: Math.round(wDetail.weatherScore),
+            baseScore,
+            popPenaltyPct: wDetail.popPenaltyPct,
+            windPenaltyPct: wDetail.windPenaltyPct,
+            windStrongBlocks: wDetail.windStrongBlocks,
             snsBonus,
             hasSnsBonus: snsBonus > 0,
             snsFishes: snsBonus > 0 ? extractRecentSnsFishes(nearbyPosts, 3) : [],
@@ -761,7 +708,11 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
 // 既存デザインと完全一致するHTMLリスト生成
 // ==========================================
 function renderRankingListHtml(topItems, scopeTag, tomorrowIso) {
-    if (!topItems || topItems.length === 0) return "";
+    if (!topItems || topItems.length === 0) {
+        return `<div data-ssg-ranking="${escapeHtml(scopeTag)}" data-target-date="${escapeHtml(tomorrowIso)}" style="background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; font-size:13px; color:#191970; line-height:1.6;">` +
+            `明日は降水確率100%や強風（4m/s以上が終日継続）の予報となっているため、安全を優先しおすすめ釣り場の選出を見送りました。` +
+            `</div>`;
+    }
 
     let html = `<ul data-ssg-ranking="${escapeHtml(scopeTag)}" data-target-date="${escapeHtml(tomorrowIso)}" style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">`;
     for (const item of topItems) {
@@ -820,7 +771,7 @@ function renderMdSpotBlock(item, index) {
     if (item.maxWave != null) condParts.push(`最大波高 ${item.maxWave}m`);
     if (item.waterTempAvg != null) condParts.push(`平均水温 ${item.waterTempAvg}°C`);
 
-    lines.push(`- **総合スコア**: ${item.score}点（天候スコア ${item.weatherScore}点 + 直近SNS釣果加点 ${item.snsBonus}点）`);
+    lines.push(`- **総合スコア**: ${item.score}点（基礎点 ${item.baseScore}点 [基本100+SNS釣果${item.snsBonus}] × 降水減点-${item.popPenaltyPct}% × 風速減点-${item.windPenaltyPct}%[4m以上:${item.windStrongBlocks}/12コマ]）`);
     lines.push(`- **明日の天気予報（根拠）**: ${condParts.join(" / ")}`);
     if (item.timeSlots.length > 0) {
         lines.push(`- **時間帯別の予報詳細**: ${item.timeSlots.join(" ｜ ")}`);
@@ -881,8 +832,9 @@ function buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults
     lines.push("## 算出基準");
     lines.push("");
     lines.push(`- 対象日: ${tomorrowInfo.iso}（${tomorrowInfo.label}）`);
-    lines.push("- 天候スコア: 明日5時〜20時の平均降水確率に基づく評価（100点満点）");
-    lines.push("- SNS釣果加点: 周辺10km圏内の最新投稿経過日数に応じて加点（1日以内+15点 / 3日以内+12点 / 6日以内+9点 / 10日以内+5点 / 14日以内+2点）");
+    lines.push("- 基礎点: 基本100点に周辺10km圏内の最新SNS釣果ボーナスを加算（1日以内+15点 / 3日以内+12点 / 6日以内+9点 / 10日以内+5点 / 14日以内+2点）");
+    lines.push("- 降水確率の乗算減点: 降水確率100%のスポットは除外し、100%未満は日中平均降水確率の割合で乗算減点");
+    lines.push("- 風速の乗算減点: 2時間別12コマのうち風速4m/s以上の時間帯ごとに8%＋超過1m/sあたり1%を合計して乗算減点（減点率96%以上は除外）");
     lines.push("- 関連データ: [AI向け全データ目次（llms.txt）](../llms.txt) / [釣り行こNAVIトップ](https://turiiko-navi.com/)");
     lines.push("");
 
@@ -916,7 +868,7 @@ function buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults
 
     lines.push("---");
     lines.push("");
-    lines.push(`データ出典: data/*_weather_v2.json、data/*_tide_v2.json、${REGION_CODE}/integrated_catch.json、${REGION_CODE}/*_location.json`);
+    lines.push(`データ出典: data/*_whether.json、data/*_InLandwhether.json、${REGION_CODE}/integrated_catch.json、${REGION_CODE}/*_location.json`);
     lines.push("");
 
     return lines.join("\n");
@@ -1344,7 +1296,7 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
     }
     parts.push(
         `<div class="basis-criteria">` +
-        `算出基準: 明日5〜20時の平均降水確率から算出する天候スコア（100点満点）に、周辺10km圏内の最新SNS釣果経過日数ボーナス（1日以内+15点〜14日以内+2点）を加算しています。` +
+        `算出基準: 基礎点（100点＋周辺10km圏内の直近SNS釣果ボーナス）に対し、明日の降水確率と2時間別風速（4m/s以上の時間帯ごとに減点）を乗算減点して算出しています（降水100%・終日強風は除外）。` +
         `</div>`
     );
     parts.push("</div>");
@@ -1392,7 +1344,7 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
                 `<div class="basis-spot-card">` +
                 `<h3 class="basis-spot-title">${idx + 1}. ${escapeHtml(item.name)} <span class="basis-spot-loc">（${escapeHtml(locText)}）</span></h3>` +
                 `<ul class="basis-spot-meta">` +
-                `<li><strong>スコア:</strong> ${item.score}点（天候 ${item.weatherScore}点 + SNS釣果 ${item.snsBonus}点）</li>` +
+                `<li><strong>スコア:</strong> ${item.score}点（基礎 ${item.baseScore}点 × 降水-${item.popPenaltyPct}% × 風速-${item.windPenaltyPct}%）</li>` +
                 `<li><strong>明日の天気根拠:</strong> ${escapeHtml(condParts.join(" / "))}</li>` +
                 (item.timeSlots.length > 0 ? `<li><strong>時間帯別予報:</strong> ${escapeHtml(item.timeSlots.join(" ｜ "))}</li>` : "") +
                 `<li><strong>周辺10kmの直近SNS釣果:</strong> ${snsHtml}</li>` +
@@ -1590,7 +1542,7 @@ try {
 
     console.log(`明日のオススメランキング・静的ポップアップ・軽量HTMLの生成が完了しました（対象日: ${tomorrowInfo.iso}）`);
     console.log(`  対象県(${prefCodes.length}): ${prefCodes.join(", ")}`);
-    console.log(`  関東全域トップ: ${regionItems.map(i => `${i.name}(${i.score}点/天候${i.weatherScore}+SNS${i.snsBonus})`).join("、") || "なし"}`);
+    console.log(`  関東全域トップ: ${regionItems.map(i => `${i.name}(${i.score}点/基礎${i.baseScore}/降水-${i.popPenaltyPct}%/風-${i.windPenaltyPct}%)`).join("、") || "なし"}`);
     for (const pr of prefResults) {
         console.log(`  [${pr.prefCode}] ${pr.items.length}件: ${pr.items.map(i => `${i.name}(${i.score})`).join("、") || "なし"}`);
     }
