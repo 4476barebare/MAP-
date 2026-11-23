@@ -41,6 +41,10 @@
     <!-- ARTICLE_DATA: {"title":"堤防サビキの定番から奥深き食文化まで！イワシの生態と実践的釣り方ガイド", "description":"イワシの生態とサビキ釣り解説", "image":"articles/images/iwashi.jpg", "category":"サビキで釣れる魚", "style":"list"} -->
   </url>
   <url>
+    <loc>https://turiiko-navi.com/articles/komase.html</loc>
+    <!-- ARTICLE_DATA: {"title":"ダイソー・ホームセンター・業務スーパーで作るアジパワー！？市販集魚剤の成分を分析して激安代用品を探してみた", "description":"市販集魚剤の原材料を成分分析し、ダイソー・ホームセンター・業務スーパーの身近な素材で作る激安自作集魚剤レシピとコスト試算を解説。", "image":"articles/images/komase.jpg", "category":"サビキで釣れる魚", "style":"list"} -->
+  </url>
+  <url>
     <loc>https://turiiko-navi.com/articles/shirogisu.html</loc>
     <!-- ARTICLE_DATA: {"title":"「海の女王」シロギス（キス）釣り完全攻略！ちょい投げ・投げ釣りの仕掛けとポイントの探し方", "description":"「海の女王」シロギス（キス）のちょい投げ・投げ釣り仕掛けとポイント攻略ガイド", "image":"articles/images/shirogisu.jpg", "category":"投げ釣りちょい投げ", "style":"compact"} -->
   </url>
@@ -183,7 +187,6 @@
   <!-- ======================== -->
   <!-- 千葉県 / 南房総エリア -->
   <!-- ======================== -->
-  <url><loc>https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E5%8D%83%E8%91%89%E7%9C%8C&amp;area=%E5%8D%97%E6%88%BF%E7%B7%8F%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E7%A3%AF%E6%BA%90%E3%83%95%E3%82%A3%E3%83%83%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%91%E3%83%BC%E3%82%AF</loc></url>
   <url><loc>https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E5%8D%83%E8%91%89%E7%9C%8C&amp;area=%E5%8D%97%E6%88%BF%E7%B7%8F%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E7%AC%B9%E5%B7%9D%E6%B9%96</loc></url>
   <url><loc>https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E5%8D%83%E8%91%89%E7%9C%8C&amp;area=%E5%8D%97%E6%88%BF%E7%B7%8F%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E8%B1%8A%E8%8B%B1%E6%B9%96</loc></url>
   <url><loc>https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&amp;pref=%E5%8D%83%E8%91%89%E7%9C%8C&amp;area=%E5%8D%97%E6%88%BF%E7%B7%8F%E3%82%A8%E3%83%AA%E3%82%A2&amp;spot=%E4%B8%89%E5%B3%B6%E6%B9%96</loc></url>
