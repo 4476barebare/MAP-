@@ -373,6 +373,16 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
 
     primaryWeatherPromise.then(() => {
         if (window.currentPref === prefCode && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
+            if (typeof isInlandFishingSpot === 'function' && isInlandFishingSpot(spot)) {
+                const tb = document.getElementById('map-tide-btn');
+                if (tb) {
+                    tb.classList.remove('active');
+                    tb.style.display = 'none';
+                    tb.style.opacity = '0';
+                    tb.style.pointerEvents = 'none';
+                }
+                if (typeof closeTideGraphOverlay === 'function') closeTideGraphOverlay();
+            }
             if (spot.whether && typeof renderSpotWeatherV2 === 'function') {
                 renderSpotWeatherV2(spot.whether);
             }
@@ -616,9 +626,16 @@ function zoomToSpot(spot, options = {}) {
                 tileBtn.style.display = 'block';
                 tileBtn.style.pointerEvents = 'auto';
                 if (tideBtn) {
-                    tideBtn.style.display = 'block';
-                    tideBtn.style.pointerEvents = 'auto';
+                    const isInland = typeof isInlandFishingSpot === 'function' && isInlandFishingSpot(safe);
                     tideBtn.classList.remove('active');
+                    if (isInland) {
+                        tideBtn.style.display = 'none';
+                        tideBtn.style.opacity = '0';
+                        tideBtn.style.pointerEvents = 'none';
+                    } else {
+                        tideBtn.style.display = 'block';
+                        tideBtn.style.pointerEvents = 'auto';
+                    }
                 }
                 if (postBtn) {
                     postBtn.style.display = 'block';
@@ -628,7 +645,7 @@ function zoomToSpot(spot, options = {}) {
             requestAnimationFrame(() => {
                 if (backBtn) backBtn.style.opacity = '1';
                 if (tileBtn) tileBtn.style.opacity = '1';
-                if (tideBtn) tideBtn.style.opacity = '1';
+                if (tideBtn && tideBtn.style.display !== 'none') tideBtn.style.opacity = '1';
                 if (postBtn) postBtn.style.opacity = '1';
             });
             if (typeof window.fadeInUserAndTempPins === 'function') {
@@ -1767,6 +1784,21 @@ function createTideGraph(data, sun) {
 // ==========================================
 window._currentSpotWeatherV2Data = null;
 
+function isInlandFishingSpot(spot) {
+    if (!spot) return false;
+    const rawId = String(spot.individualId || spot.id || '').trim();
+    if (rawId.startsWith('L')) return true;
+    const w = spot.whether;
+    if (w && Array.isArray(w.hourly) && w.hourly.length > 0) {
+        const firstDay = w.hourly[0];
+        if (firstDay && typeof firstDay === 'object' && !firstDay.oneday) {
+            return true;
+        }
+    }
+    return false;
+}
+window.isInlandFishingSpot = isInlandFishingSpot;
+
 function renderSpotWeatherV2(weekData) {
     if (typeof weekData === "string" && weekData !== "") {
         try {
@@ -1971,11 +2003,11 @@ function renderSpotWeatherV2(weekData) {
                 window.activeCol = col;
                 renderSpotWeatherV2(weekData);
 
-                // タイドグラフがONの場合は選択日の波形へモーフィング連動
+                // タイドグラフがONの場合は選択日の波形へ逆再生→展開モーフィング連動
                 if (window._tideGraphEnabled && window._tideOverlayState?.isOpen) {
                     const st = window._tideOverlayState;
                     if (st.spot && Array.isArray(st.tideDays) && st.tideDays[col]) {
-                        openTideGraphOverlay(st.spot, st.tideDays, col, { morphFrom: "prev" });
+                        openTideGraphOverlay(st.spot, st.tideDays, col, { morphFrom: "reverse" });
                     }
                 }
             });
@@ -1995,31 +2027,19 @@ function renderSpotWeatherV2(weekData) {
     }
 }
 
+function collapseSpotHourlyV2(root) {
+    if (!root) return;
+    root.classList.remove("is-open");
+    root.classList.add("is-collapsed");
+}
+
 function renderSpotHourlyV2(hourlyData, type, dayIndex = 0) {
     const root = document.getElementById("spot-hourly-v2");
     if (!root || !hourlyData) return;
 
-    root.innerHTML = "";
-
-    const d = new Date();
-    d.setDate(d.getDate() + dayIndex);
-    const wdays = ["日", "月", "火", "水", "木", "金", "土"];
-    const dateBadgeText = `${d.getMonth() + 1}/${d.getDate()}(${wdays[d.getDay()]})`;
-
-    // 4日目〜7日目（daily要約のみの日）はコンパクトな日別サマリーバーを表示
+    // 4日目〜7日目（daily枠）は日付・気温・水温・波高が下表と全て重複するため上枠を完全に閉じる
     if (type === "daily") {
-        const icon = safeSpotWeatherIcon(hourlyData?.weather?.[0] ?? 0);
-        const tmax = hourlyData?.weather?.[1] != null ? `${Math.round(hourlyData.weather[1])}°C` : "—";
-        const ex = hourlyData?.dailyEx;
-        const parts = [`<span class="sw2-daily-date">${dateBadgeText}</span>`, `<span>${icon} 最高 ${tmax}</span>`];
-        if (ex) {
-            if (ex.avg != null) parts.push(`<span>水温 ${Math.round(ex.avg)}°C</span>`);
-            if (ex.wave != null) parts.push(`<span>波 ${Number(ex.wave).toFixed(1)}m</span>`);
-            if (typeof ex.sunrise === "number" && typeof ex.sunset === "number") {
-                parts.push(`<span class="sw2-daily-sun">☀${formatFloatHourToHHMM(ex.sunrise / 60)} 🌙${formatFloatHourToHHMM(ex.sunset / 60)}</span>`);
-            }
-        }
-        root.innerHTML = `<div class="sw2-daily-summary">${parts.join("")}</div>`;
+        collapseSpotHourlyV2(root);
         return;
     }
 
@@ -2029,7 +2049,10 @@ function renderSpotHourlyV2(hourlyData, type, dayIndex = 0) {
             ? hourlyData.weather
             : null;
 
-    if (!Array.isArray(list) || list.length === 0) return;
+    if (!Array.isArray(list) || list.length === 0) {
+        collapseSpotHourlyV2(root);
+        return;
+    }
 
     const hours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
     const step = Math.floor(list.length / 12) || 1;
@@ -2159,7 +2182,23 @@ function renderSpotHourlyV2(hourlyData, type, dayIndex = 0) {
     gridWrap.appendChild(labelsEl);
     gridWrap.appendChild(tableEl);
 
+    const wasCollapsed = !root.classList.contains("is-open");
+    root.innerHTML = "";
     root.appendChild(gridWrap);
+
+    if (wasCollapsed) {
+        // 閉じた状態からニュッと滑らかに伸びて開くアニメーション
+        root.classList.add("is-collapsed");
+        root.classList.remove("is-open");
+        void root.offsetHeight;
+        requestAnimationFrame(() => {
+            root.classList.remove("is-collapsed");
+            root.classList.add("is-open");
+        });
+    } else {
+        root.classList.remove("is-collapsed");
+        root.classList.add("is-open");
+    }
 }
 
 function clearSpotWeatherV2() {
@@ -2167,7 +2206,11 @@ function clearSpotWeatherV2() {
     if (panel) panel.style.display = "none";
 
     const hourlyContainer = document.getElementById("spot-hourly-v2");
-    if (hourlyContainer) hourlyContainer.innerHTML = "";
+    if (hourlyContainer) {
+        hourlyContainer.classList.remove("is-open");
+        hourlyContainer.classList.add("is-collapsed");
+        hourlyContainer.innerHTML = "";
+    }
 
     const weekContainer = document.getElementById("spot-week-v2");
     if (weekContainer) weekContainer.innerHTML = "";
@@ -2183,7 +2226,7 @@ window.syncWeekTableActiveCol = function(colIdx) {
 };
 
 // ============================================================================
-// ★ タイドグラフ v2（パターンB：地図全体オーバーレイ・波形モーフィング・翌日0時連結）
+// ★ タイドグラフ v2（パターンB：地図全体オーバーレイ・逆再生モーフィング・四角領域スワイプ＆単タップ閉じ）
 // ============================================================================
 
 function decode1DPolyline(encoded) {
@@ -2333,6 +2376,21 @@ function ensureTideToggleBtn() {
 }
 
 async function toggleTideGraphMode(forceState) {
+  const spot = getCurrentActiveSpotObj();
+
+  // 内陸スポット（IDがL始まり等）ではタイドグラフボタンを非表示にし、グラフも開かない
+  if (spot && isInlandFishingSpot(spot)) {
+    window._tideGraphEnabled = false;
+    const tideBtn = ensureTideToggleBtn();
+    if (tideBtn) {
+      tideBtn.classList.remove('active');
+      tideBtn.style.display = 'none';
+      tideBtn.style.opacity = '0';
+    }
+    closeTideGraphOverlay();
+    return;
+  }
+
   const nextState = (typeof forceState === 'boolean')
     ? forceState
     : !window._tideGraphEnabled;
@@ -2348,7 +2406,6 @@ async function toggleTideGraphMode(forceState) {
 
   if (tideBtn) tideBtn.classList.add('active');
 
-  const spot = getCurrentActiveSpotObj();
   if (!spot) {
     window._tideGraphEnabled = false;
     if (tideBtn) tideBtn.classList.remove('active');
@@ -2495,7 +2552,7 @@ function openTideGraphOverlay(spot, tideDays, dayIndex = 0, options = {}) {
     totalDays: tideDays.length,
     dateLabel: dateInfo.label,
     tideName: dateInfo.tideName,
-    morphFrom: options.morphFrom || 'prev'
+    morphFrom: options.morphFrom || 'reverse'
   });
 
   bindTideOutsideCloseListener();
@@ -2579,18 +2636,16 @@ function renderTideSvgWithMorph(overlay, cfg) {
     targetYSlots[h] = valToY(cfg.series[srcIdx]);
   }
 
-  let startYSlots;
-  if (
-    cfg.morphFrom === 'prev' &&
-    Array.isArray(window._tideOverlayState.currentYSlots) &&
-    window._tideOverlayState.currentYSlots.length === 25
-  ) {
-    startYSlots = window._tideOverlayState.currentYSlots.slice();
-  } else if (cfg.morphFrom === 'flat') {
-    startYSlots = new Array(25).fill(midY);
-  } else {
-    startYSlots = targetYSlots.slice();
-  }
+  const flatYSlots = new Array(25).fill(midY);
+  const hasPrevWave = Array.isArray(window._tideOverlayState.currentYSlots) &&
+    window._tideOverlayState.currentYSlots.length === 25;
+
+  const useReverseFirst = (cfg.morphFrom === 'reverse' && hasPrevWave);
+  const startYSlots = useReverseFirst
+    ? window._tideOverlayState.currentYSlots.slice()
+    : (cfg.morphFrom === 'prev' && hasPrevWave
+        ? window._tideOverlayState.currentYSlots.slice()
+        : (cfg.morphFrom === 'flat' ? flatYSlots.slice() : targetYSlots.slice()));
 
   const srPct = Math.max(0, Math.min(100, (cfg.sun.sunrise / 1440) * 100));
   const ssPct = Math.max(srPct + 5, Math.min(100, (cfg.sun.sunset / 1440) * 100));
@@ -2634,6 +2689,10 @@ function renderTideSvgWithMorph(overlay, cfg) {
             <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="rgba(0,0,0,0.45)" />
           </filter>
         </defs>
+
+        <!-- 四角いグラフ描画エリア全体（横スワイプ日付切替＆単タップ閉じ受付用） -->
+        <rect id="tideV2SwipeBox" x="${padL}" y="${topY - 24}" width="${plotW}" height="${plotH + 48}"
+              fill="transparent" class="tide-v2-swipe-box" />
 
         <line id="tideV2SunriseLine" y1="${topY}" y2="${bottomY}" class="tide-v2-sun-line is-sunrise" />
         <line id="tideV2SunsetLine"  y1="${topY}" y2="${bottomY}" class="tide-v2-sun-line is-sunset" />
@@ -2733,21 +2792,42 @@ function renderTideSvgWithMorph(overlay, cfg) {
     peaksGroup.style.transition = 'none';
   }
 
-  const durationMs = cfg.morphFrom === 'flat' ? 560 : 460;
+  // 2段階モーフィング（逆再生：前日の波形 → 水平直線へ収束 → 翌日の波形へ立ち上がり）
+  const flattenMs = useReverseFirst ? 220 : 0;
+  const riseMs    = useReverseFirst ? 380 : (cfg.morphFrom === 'flat' ? 560 : 440);
+  const totalMs   = flattenMs + riseMs;
   const startTime = performance.now();
+
+  const easeInQuad = (t) => t * t;
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
   const stepMorph = (now) => {
-    const rawT = Math.min(1, (now - startTime) / durationMs);
+    const elapsed = now - startTime;
+
+    if (useReverseFirst && elapsed < flattenMs) {
+      // Phase 1（逆再生）: 現在の波形 → 水平直線へ戻る
+      const p1 = easeInQuad(Math.min(1, elapsed / flattenMs));
+      const interpY = new Array(25);
+      for (let h = 0; h <= 24; h++) {
+        interpY[h] = startYSlots[h] + (flatYSlots[h] - startYSlots[h]) * p1;
+      }
+      applyYSlotsToPaths(interpY);
+      window._tideOverlayState.morphRafId = requestAnimationFrame(stepMorph);
+      return;
+    }
+
+    // Phase 2: 水平直線（または開始波形） → 新しい日の波形へ立ち上がる
+    const fromSlots = useReverseFirst ? flatYSlots : startYSlots;
+    const rawT = Math.min(1, (elapsed - flattenMs) / riseMs);
     const eased = easeOutCubic(rawT);
 
     const interpY = new Array(25);
     for (let h = 0; h <= 24; h++) {
-      interpY[h] = startYSlots[h] + (targetYSlots[h] - startYSlots[h]) * eased;
+      interpY[h] = fromSlots[h] + (targetYSlots[h] - fromSlots[h]) * eased;
     }
     applyYSlotsToPaths(interpY);
 
-    if (rawT < 1) {
+    if (elapsed < totalMs) {
       window._tideOverlayState.morphRafId = requestAnimationFrame(stepMorph);
     } else {
       window._tideOverlayState.morphRafId = null;
@@ -2901,13 +2981,13 @@ function updateTooltipAtHour(overlay, targetHour) {
 }
 
 function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
-  const hitPath = document.getElementById('tideV2HitPath');
+  const hitPath  = document.getElementById('tideV2HitPath');
+  const swipeBox = document.getElementById('tideV2SwipeBox');
   const datePill = document.getElementById('tideV2DatePill');
   if (!hitPath) return;
 
   let touchStartX = 0;
   let touchStartY = 0;
-  let touchStartTime = 0;
   let isScrubbingLine = false;
 
   const updateTooltipAtClientX = (clientX) => {
@@ -2928,13 +3008,13 @@ function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
     renderTooltipFromSample(overlay, nearest);
   };
 
+  // ① 線の上でのタッチ／クリック操作（時刻・潮位ツールチップ表示 ＆ 横スワイプ日付切替）
   hitPath.addEventListener('touchstart', (e) => {
     if (!e.touches || e.touches.length !== 1) return;
     e.stopPropagation();
     const t = e.touches[0];
     touchStartX = t.clientX;
     touchStartY = t.clientY;
-    touchStartTime = Date.now();
     isScrubbingLine = true;
     updateTooltipAtClientX(t.clientX);
   }, { passive: true });
@@ -2955,9 +3035,9 @@ function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
     if (!t) return;
     const dx = t.clientX - touchStartX;
     const dy = t.clientY - touchStartY;
-    const dt = Date.now() - touchStartTime;
 
-    if (dt < 350 && Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    // 線の上でも横スワイプ（40px以上の横移動）なら日付切替
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
       shiftTideOverlayDay(dx < 0 ? 1 : -1);
     }
   }, { passive: true });
@@ -2967,6 +3047,55 @@ function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
     updateTooltipAtClientX(e.clientX);
   });
 
+  // ② 四角いグラフ描画領域全体（tideV2SwipeBox）での横スワイプ日付切替 ＆ 単タップで閉じる
+  if (swipeBox) {
+    let boxStartX = 0;
+    let boxStartY = 0;
+
+    swipeBox.addEventListener('touchstart', (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+      e.stopPropagation();
+      boxStartX = e.touches[0].clientX;
+      boxStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    swipeBox.addEventListener('touchmove', (e) => {
+      if (!e.touches || e.touches.length !== 1) return;
+      const dx = Math.abs(e.touches[0].clientX - boxStartX);
+      const dy = Math.abs(e.touches[0].clientY - boxStartY);
+      // 横スワイプ動作中は背後マップのパンを抑止
+      if (dx > 10 && dx > dy) {
+        e.stopPropagation();
+      }
+    }, { passive: true });
+
+    swipeBox.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      const t = e.changedTouches && e.changedTouches[0];
+      if (!t) return;
+      const dx = t.clientX - boxStartX;
+      const dy = t.clientY - boxStartY;
+      const dist = Math.hypot(dx, dy);
+
+      // 四角いグラフ領域内の横スワイプ（38px以上の横移動）で日付切替
+      if (Math.abs(dx) > 38 && Math.abs(dx) > Math.abs(dy) * 1.15) {
+        shiftTideOverlayDay(dx < 0 ? 1 : -1);
+        return;
+      }
+
+      // 単タップ（移動12px以下）ならタイドグラフを閉じる
+      if (dist <= 12) {
+        toggleTideGraphMode(false);
+      }
+    }, { passive: true });
+
+    swipeBox.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleTideGraphMode(false);
+    });
+  }
+
+  // ③ 上部日付ピルでの左右スワイプ＆タップ切替にも対応
   if (datePill) {
     let pillStartX = 0;
     datePill.addEventListener('touchstart', (e) => {
@@ -3004,7 +3133,7 @@ function shiftTideOverlayDay(delta) {
   if (nextIdx < 0 || nextIdx >= st.tideDays.length) return;
 
   openTideGraphOverlay(st.spot, st.tideDays, nextIdx, {
-    morphFrom: 'prev'
+    morphFrom: 'reverse'
   });
 
   if (typeof window.syncWeekTableActiveCol === 'function') {
@@ -3012,6 +3141,9 @@ function shiftTideOverlayDay(delta) {
   }
 }
 
+/**
+ * グラフ外側（マップ上部・下部等）での単タップ閉じ ＆ グラフ帯高さでの横スワイプ補助
+ */
 function bindTideOutsideCloseListener() {
   unbindTideOutsideCloseListener();
 
@@ -3023,39 +3155,27 @@ function bindTideOutsideCloseListener() {
   let mouseDownX = 0;
   let mouseDownY = 0;
 
-  const evalCloseOrSwipe = (startX, startY, endX, endY, targetEl, allowSwipe) => {
+  const evalOutsideAction = (startX, startY, endX, endY, targetEl, allowSwipe) => {
     const st = window._tideOverlayState;
     if (!st.isOpen) return;
-    if (targetEl && targetEl.closest('#map-tool-bar, #tideV2DatePill, #tideV2Tooltip')) return;
+    if (targetEl && targetEl.closest('#map-tool-bar, #tideV2DatePill, #tideV2Tooltip, #tideV2HitPath, #tideV2SwipeBox')) return;
 
-    const moveDist = Math.hypot(endX - startX, endY - startY);
     const dx = endX - startX;
     const dy = endY - startY;
+    const moveDist = Math.hypot(dx, dy);
 
     const overlay = document.getElementById('tide-overlay-v2');
-    if (allowSwipe && overlay && Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+    if (allowSwipe && overlay && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.15) {
       const rect = overlay.getBoundingClientRect();
       const relY = startY - rect.top;
-      if (relY >= rect.height * 0.25 && relY <= rect.height * 0.90) {
+      if (relY >= rect.height * 0.25 && relY <= rect.height * 0.92) {
         shiftTideOverlayDay(dx < 0 ? 1 : -1);
         return;
       }
     }
 
-    if (moveDist > 12) return;
-    if (!overlay) return;
-
-    const rect = overlay.getBoundingClientRect();
-    const px = endX - rect.left;
-    const py = endY - rect.top;
-
-    let minLineDist = Infinity;
-    for (const pt of st.samplePoints) {
-      const d = Math.hypot(pt.x - px, pt.y - py);
-      if (d < minLineDist) minLineDist = d;
-    }
-
-    if (minLineDist >= 48) {
+    // 単タップ（移動12px以下）ならタイドグラフを閉じる
+    if (moveDist <= 12) {
       toggleTideGraphMode(false);
     }
   };
@@ -3069,7 +3189,7 @@ function bindTideOutsideCloseListener() {
   const onTouchEnd = (e) => {
     const t = e.changedTouches && e.changedTouches[0];
     if (!t) return;
-    evalCloseOrSwipe(downX, downY, t.clientX, t.clientY, e.target, true);
+    evalOutsideAction(downX, downY, t.clientX, t.clientY, e.target, true);
   };
 
   const onMouseDown = (e) => {
@@ -3078,7 +3198,7 @@ function bindTideOutsideCloseListener() {
   };
 
   const onClick = (e) => {
-    evalCloseOrSwipe(mouseDownX, mouseDownY, e.clientX, e.clientY, e.target, false);
+    evalOutsideAction(mouseDownX, mouseDownY, e.clientX, e.clientY, e.target, false);
   };
 
   mapEl.addEventListener('touchstart', onTouchStart, { passive: true });
