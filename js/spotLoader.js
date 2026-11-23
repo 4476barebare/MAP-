@@ -2854,9 +2854,7 @@ function renderTideSvgWithMorph(overlay, cfg) {
       window._tideOverlayState.morphRafId = null;
       applyYSlotsToPaths(targetYSlots);
 
-      if (linePathEl) {
-        buildCurveSamplePoints(linePathEl, padL, plotW, topY, bottomY, MIN_CM, MAX_CM, cfg.maxHour);
-      }
+      buildCurveSamplePoints(cfg.series, hourToX, valToY, cfg.maxHour, cfg.dayIndex);
       renderPeakMarkers(peaks, hourToX, valToY, W);
       if (peaksGroup) {
         requestAnimationFrame(() => {
@@ -2893,23 +2891,38 @@ function buildSmoothSvgPath(pts) {
   return d;
 }
 
-function buildCurveSamplePoints(pathEl, padL, plotW, topY, bottomY, minCm, maxCm, maxHour = 24) {
-  const totalLen = pathEl.getTotalLength();
-  const steps = Math.max(1, maxHour * 4);
+function buildCurveSamplePoints(series, hourToX, valToY, maxHour = 24, dayIndex = 0) {
   const samples = [];
-  const plotH = bottomY - topY;
+  if (!Array.isArray(series) || series.length === 0) {
+    window._tideOverlayState.samplePoints = samples;
+    return;
+  }
 
-  for (let i = 0; i <= steps; i++) {
-    const pt = pathEl.getPointAtLength((totalLen * i) / steps);
-    const hourFloat = Math.max(0, Math.min(maxHour, ((pt.x - padL) / plotW) * 24));
-    const ratio = (bottomY - pt.y) / plotH;
-    const level = Math.round(minCm + ratio * (maxCm - minCm));
+  // 0時の前ブロック差分用に、前日23時の実データがあれば参照する
+  const tideDays = window._tideOverlayState.tideDays;
+  const prevDayLast = (
+    dayIndex > 0 &&
+    Array.isArray(tideDays) &&
+    Array.isArray(tideDays[dayIndex - 1]) &&
+    typeof tideDays[dayIndex - 1][23] === 'number' &&
+    Number.isFinite(tideDays[dayIndex - 1][23])
+  ) ? Number(tideDays[dayIndex - 1][23]) : null;
+
+  const limit = Math.min(maxHour, series.length - 1);
+  for (let h = 0; h <= limit; h++) {
+    const level = Math.round(Number(series[h]));
+    const prevLevel = h > 0 ? Math.round(Number(series[h - 1])) : prevDayLast;
+    const diffFromPrev = (prevLevel != null && Number.isFinite(prevLevel))
+      ? (level - prevLevel)
+      : null;
+
     samples.push({
-      x: pt.x,
-      y: pt.y,
-      hourFloat,
-      timeStr: formatFloatHourToHHMM(hourFloat),
-      level
+      x: hourToX(h),
+      y: valToY(level),
+      hourFloat: h,
+      timeStr: `${String(h).padStart(2, '0')}:00`,
+      level,
+      diffFromPrev
     });
   }
   window._tideOverlayState.samplePoints = samples;
@@ -2949,7 +2962,8 @@ function renderTooltipFromSample(overlay, nearest) {
   const tooltip    = document.getElementById('tideV2Tooltip');
   if (!cursorLine || !cursorDot || !tooltip || !nearest) return;
 
-  window._tideOverlayState.selectedHourFloat = nearest.hourFloat;
+  const state = window._tideOverlayState;
+  state.selectedHourFloat = nearest.hourFloat;
 
   cursorLine.setAttribute('x1', nearest.x.toFixed(1));
   cursorLine.setAttribute('x2', nearest.x.toFixed(1));
@@ -2959,28 +2973,45 @@ function renderTooltipFromSample(overlay, nearest) {
   cursorDot.setAttribute('cy', nearest.y.toFixed(1));
   cursorDot.style.display = 'block';
 
-  const nextPeak = (window._tideOverlayState.peaks || []).find(p => p.hourFloat >= nearest.hourFloat);
-  const nextPeakHtml = nextPeak
-    ? `<div class="tide-v2-tt-sub">次${nextPeak.type === 'high' ? '満潮' : '干潮'}: <strong>${nextPeak.timeStr}</strong> (${nextPeak.level}cm)</div>`
+  // 次満潮／次干潮の時刻を取得（当日最終ピーク以降は翌日最初のピークを参照）
+  let nextPeak = (state.peaks || []).find(p => p.hourFloat >= nearest.hourFloat) || null;
+  if (!nextPeak && Array.isArray(state.tideDays) && state.tideDays[state.dayIndex + 1]) {
+    const nextDayInfo = buildDayTideSeriesWithNextZero(state.tideDays, state.dayIndex + 1);
+    const nextDayPeaks = extractTidePeaksV2(nextDayInfo.series);
+    if (nextDayPeaks.length > 0) nextPeak = nextDayPeaks[0];
+  }
+
+  const nextPeakText = nextPeak
+    ? `<span class="tide-v2-tt-next">次${nextPeak.type === 'high' ? '満潮' : '干潮'} <strong>${nextPeak.timeStr}</strong></span>`
+    : '<span class="tide-v2-tt-next"></span>';
+
+  let diffHtml = '';
+  if (typeof nearest.diffFromPrev === 'number' && Number.isFinite(nearest.diffFromPrev)) {
+    if (nearest.diffFromPrev > 0) {
+      diffHtml = `<span class="tide-v2-tt-diff is-up">${nearest.diffFromPrev}cm↑</span>`;
+    } else if (nearest.diffFromPrev < 0) {
+      diffHtml = `<span class="tide-v2-tt-diff is-down">${Math.abs(nearest.diffFromPrev)}cm↓</span>`;
+    } else {
+      diffHtml = `<span class="tide-v2-tt-diff is-flat">0cm</span>`;
+    }
+  }
+
+  const subRowHtml = (nextPeak || diffHtml)
+    ? `<div class="tide-v2-tt-sub">${nextPeakText}${diffHtml}</div>`
     : '';
 
-  const state = window._tideOverlayState;
-  const dateInfo = getDateLabelForDayIndex(state.dayIndex);
-
   tooltip.innerHTML = `
-    <div class="tide-v2-tt-header">${dateInfo.label} ${nearest.timeStr}</div>
-    <div class="tide-v2-tt-row">
-      <span class="tide-v2-tt-dot"></span>
-      <span class="tide-v2-tt-label">潮位</span>
-      <span class="tide-v2-tt-val">${nearest.level} cm</span>
+    <div class="tide-v2-tt-top">
+      <span class="tide-v2-tt-time">${nearest.timeStr}</span>
+      <span class="tide-v2-tt-cm">${nearest.level}cm</span>
     </div>
-    ${nextPeakHtml}
+    ${subRowHtml}
   `;
   tooltip.style.display = 'block';
 
-  const ttW = tooltip.offsetWidth || 148;
+  const ttW = tooltip.offsetWidth || 132;
   const leftPos = Math.max(10, Math.min(rect.width - ttW - 10, nearest.x - ttW / 2));
-  const topPos = Math.max(40, nearest.y - (tooltip.offsetHeight || 72) - 14);
+  const topPos = Math.max(40, nearest.y - (tooltip.offsetHeight || 56) - 14);
   tooltip.style.left = `${leftPos}px`;
   tooltip.style.top = `${topPos}px`;
 }
