@@ -380,7 +380,7 @@ jobs:
           fi
 
       # ========================================================
-      # 10. 一括コミット・プッシュ
+      # 10. 一括コミット・プッシュ（リベース競合時は今回の最新ビルド結果を自動採用）
       # ========================================================
       - name: "10. Commit and Push Changes"
         id: commit
@@ -388,11 +388,32 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add .
+          git add -A
 
           if ! git diff --cached --quiet; then
             git commit -m "🤖 auto: 朝のデータ定期同期＆index.html静的ビルド (06:00 JST)"
-            git pull --rebase --autostash origin main
+
+            if ! git pull --rebase origin main; then
+              echo "⚠️ リベース競合を検出しました。今回の最新ビルド結果（--theirs）を自動採用して続行します。"
+              REBASE_MERGE_DIR="$(git rev-parse --git-path rebase-merge)"
+              REBASE_APPLY_DIR="$(git rev-parse --git-path rebase-apply)"
+              while [ -d "$REBASE_MERGE_DIR" ] || [ -d "$REBASE_APPLY_DIR" ]; do
+                # 削除競合（リモートで削除・ローカルで変更、またはその逆）を処理
+                git diff --name-only --diff-filter=DU | while IFS= read -r f; do
+                  [ -n "$f" ] && git checkout --theirs -- "$f" && git add -- "$f"
+                done
+                git diff --name-only --diff-filter=UD | while IFS= read -r f; do
+                  [ -n "$f" ] && git rm -f -- "$f"
+                done
+                # 内容競合・新規追加競合はすべて今回のビルド結果（--theirs）を優先採用
+                git diff --name-only --diff-filter=U | while IFS= read -r f; do
+                  [ -n "$f" ] && git checkout --theirs -- "$f" && git add -- "$f"
+                done
+                git add -A
+                git -c core.editor=true rebase --continue || true
+              done
+            fi
+
             git push origin main
             echo "pushed=true" >> "$GITHUB_OUTPUT"
             echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -404,15 +425,16 @@ jobs:
           fi
 
       # ========================================================
-      # 11. GitHub Pages デプロイ（更新がある時 または force_deploy=true 時のみ）
+      # 11. GitHub Pages デプロイ（Step 11 と Step 12 の実行条件を完全統一）
       # ========================================================
       - name: "11. Upload Pages Artifact"
-        if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true
+        id: upload_artifact
+        if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true || github.event.inputs.force_deploy == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: './'
 
       - name: "12. Deploy to GitHub Pages"
         id: deployment
-        if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true
+        if: (steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true || github.event.inputs.force_deploy == 'true') && steps.upload_artifact.outcome == 'success'
         uses: actions/deploy-pages@v4
