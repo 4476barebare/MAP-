@@ -139,6 +139,7 @@
     <button id="map-back-btn" class="map-tool-btn map-back-btn" aria-label="前の画面に戻る">戻る</button>
     <div id="tile-btn-wrap" style="display: none; flex-direction: column; align-items: flex-end; gap: 8px;">
       <button id="map-tile-btn" class="map-tool-btn map-tile-btn" aria-label="地図タイル切り替え" style="opacity: 0; transition: opacity 0.4s ease;">タイル切替</button>
+      <button id="map-tide-btn" class="map-tool-btn map-tide-btn" aria-label="タイドグラフ表示切替" style="display: none; opacity: 0; transition: opacity 0.4s ease;">タイドグラフ</button>
       <div id="post-btn-row" class="post-btn-row">
         <button id="map-post-btn" class="map-tool-btn map-post-btn" aria-label="釣果投稿" style="display: none; opacity: 0; transition: opacity 0.4s ease;">投稿機能</button>
       </div>
@@ -152,16 +153,15 @@
 </div>
 
   
- <!-- ★ここ重要：weatherを先に固定 -->
-  <div class="weather" id="weatherBox">
+ <!-- ★旧地図内天気・潮汐DOM（互換用非表示・実体は地図外 #spot-weather-panel と #tide-overlay-v2 を使用） -->
+  <div class="weather" id="weatherBox" style="display:none;">
     <div class="weather-labels" id="labels"></div>
     <div class="weather-table" id="table"></div>
   </div>
-  <div class="tide-wrapper">
+  <div class="tide-wrapper" style="display:none;">
   <canvas id="tideCanvas"></canvas>
 </div>
-  <!-- ★weekは必ず後ろ -->
-  <div class="week">
+  <div class="week" style="display:none;">
     <div class="week-labels" id="weekLabels"></div>
     <div class="week-table" id="weekTable"></div>
   </div>
@@ -170,6 +170,13 @@
 <div class="page-main-heading-wrap">
   <h1 id="page-main-h1" class="page-main-h1">関東の釣り場マップ・天気と最新釣果で明日のおすすめランキング</h1>
 </div>
+<!-- 👇 地図外展開：週間天気・2時間毎天気パネル（SPOT画面のみ表示） -->
+<section id="spot-weather-panel" class="spot-weather-panel" aria-label="週間天気・2時間ごと天気" style="display: none;">
+  <div class="spot-weather-card">
+    <div id="spot-hourly-v2" class="spot-hourly-v2"></div>
+    <div id="spot-week-v2" class="spot-week-v2"></div>
+  </div>
+</section>
 <!-- 👇 サイト案内（「釣り行こNAVI」の特徴と使い方：REGION画面のみ表示・Safari誤判定防止のためdetails折りたたみ） -->
 <aside class="access-info" id="siteGuideBox" aria-label="サイト案内">
   <details id="default-site-guide" class="site-guide-details">
@@ -1500,17 +1507,24 @@ function goBack() {
         }
 
 if (typeof togglePostMode === 'function') togglePostMode(false); // ★戻る時に投稿モードを強制終了
+if (typeof toggleTideGraphMode === 'function') toggleTideGraphMode(false); // ★戻る時にタイドグラフも強制終了
 if (typeof window.hideUserAndTempPins === 'function') window.hideUserAndTempPins(); // ★戻る時にピンも同時にフェードアウト
 
 const tileWrap = document.getElementById('tile-btn-wrap');
 const tileBtn = document.getElementById('map-tile-btn');
+const tideBtn = document.getElementById('map-tide-btn');
 const postBtn = document.getElementById('map-post-btn'); // ★追加
 if (tileWrap && tileBtn) {
     tileBtn.style.opacity = '0';
+    if (tideBtn) {
+        tideBtn.style.opacity = '0';
+        tideBtn.classList.remove('active');
+    }
     if (postBtn) postBtn.style.opacity = '0'; // ★追加
     setTimeout(() => { 
         tileWrap.style.display = 'none'; 
         tileBtn.style.display = 'none'; 
+        if (tideBtn) tideBtn.style.display = 'none';
         if (postBtn) postBtn.style.display = 'none'; // ★追加
     }, 300); 
 }
@@ -2733,7 +2747,7 @@ window.selectPrefecture = async function (csvParam, fallbackPrefName, options = 
     window.areaBounds = null;
 
     window.prefLocationUrl = `/${region}/${prefCode}_location.json`;
-    window.prefWeatherUrl = `/data/${prefCode}_whether.json`;
+    window.prefWeatherUrl = `/data/${prefCode}_weather_v2.json`;
     window.prefInlandWeatherUrl = `/data/${prefCode}_InLandwhether.json`;
     window.fishUrl = `/${region}/${prefCode}_fish.json`;
     window.prefShopUrl = `/${region}/${prefCode}_shop.json`;
@@ -2912,10 +2926,14 @@ async function loadPrefectureData(prefCode) {
         // ★ 3. 天気JSONとショップJSONは、ベースタイルの描画完了キュー(runAfterTileLoad)で取得する
         // 既存の画面遷移・後続処理を維持し、天気取得部分だけ新JSON関数へ切り替える。
         const loadDeferredPrefExtras = async () => {
-            await Promise.all([
-                typeof AddWeather === 'function' ? AddWeather(prefCode, 'select').catch(() => null) : Promise.resolve(null),
-                typeof AddInLandWeather === 'function' ? AddInLandWeather(prefCode, 'select').catch(() => null) : Promise.resolve(null)
-            ]);
+            if (typeof AddWeatherV2 === 'function') {
+                await AddWeatherV2(prefCode, 'select').catch(() => null);
+            } else {
+                await Promise.all([
+                    typeof AddWeather === 'function' ? AddWeather(prefCode, 'select').catch(() => null) : Promise.resolve(null),
+                    typeof AddInLandWeather === 'function' ? AddInLandWeather(prefCode, 'select').catch(() => null) : Promise.resolve(null)
+                ]);
+            }
 
             if (window.currentPref === prefCode) {
                 if (typeof renderPrefWeather === 'function') renderPrefWeather();
@@ -2930,8 +2948,8 @@ async function loadPrefectureData(prefCode) {
                         ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(window.currentSpotId))
                         : null)
                         || window.spotData.find(s => String(s.individualId) === String(window.currentSpotId));
-                    if (activeSpot && activeSpot.whether && typeof createWeekItem === 'function') {
-                        createWeekItem(activeSpot.whether);
+                    if (activeSpot && activeSpot.whether && typeof renderSpotWeatherV2 === 'function') {
+                        renderSpotWeatherV2(activeSpot.whether);
                     }
                 }
             }
@@ -3856,6 +3874,8 @@ function renderAreaGuide() {
                 }
 
                 // 4. UI（DOM）の完全クリア
+                if (typeof clearSpotWeatherV2 === 'function') clearSpotWeatherV2();
+                if (typeof toggleTideGraphMode === 'function') toggleTideGraphMode(false);
                 if (typeof removeWeekItem === 'function') removeWeekItem();
                 if (typeof resetWeatherUI === 'function') resetWeatherUI();
                 if (typeof clearSub2Weather === 'function') clearSub2Weather();
@@ -3977,6 +3997,11 @@ function loadInlandWhetherCSV(regionCode) {
 // ==========================================
 function preloadCsvFiles(regionCode, prefCode) {
     if (!regionCode || !prefCode) return;
+
+    if (typeof AddWeatherV2 === 'function') {
+        AddWeatherV2(prefCode, 'select').catch(() => {});
+        return;
+    }
 
     // 旧関数名・引数を暫定維持し、天気JSONの先行取得へ委譲する。
     Promise.all([
