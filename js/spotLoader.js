@@ -239,7 +239,7 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
     const regionCode = window.currentRegion || 'KANTO';
     window.currentPref = prefCode;
     window.prefLocationUrl = `/${regionCode}/${prefCode}_location.json`;
-    window.prefWeatherUrl = `/data/${prefCode}_whether.json`;
+    window.prefWeatherUrl = `/data/${prefCode}_weather_v2.json`;
     window.prefInlandWeatherUrl = `/data/${prefCode}_InLandwhether.json`;
     window.prefShopUrl = `/${regionCode}/${prefCode}_shop.json`;
     // drawLocation完了前に魚データの通信が走らないよう一旦nullにする
@@ -342,11 +342,9 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         window.map.getContainer().classList.add('is-spot-mode');
     }
 
-    // 所属県（prefCode）の天気・魚種・釣具店データを取得（他県データは不要のため取得しない）
-    const isInlandSpot = String(spot.individualId || spot.id || '').startsWith('L');
-
-    const primaryWeatherPromise = isInlandSpot
-        ? (typeof AddInLandWeather === 'function' ? AddInLandWeather(prefCode, 'select') : Promise.resolve(0))
+    // 所属県（prefCode）の天気v2（沿岸・内陸統合）・魚種・釣具店データを取得
+    const primaryWeatherPromise = typeof AddWeatherV2 === 'function'
+        ? AddWeatherV2(prefCode, 'select')
         : (typeof AddWeather === 'function' ? AddWeather(prefCode, 'select') : Promise.resolve(0));
 
     const isCurrentTargetSpot = () => (
@@ -375,15 +373,13 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
 
     primaryWeatherPromise.then(() => {
         if (window.currentPref === prefCode && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
-            if (spot.whether && typeof createWeekItem === 'function') {
-                createWeekItem(spot.whether);
+            if (spot.whether && typeof renderSpotWeatherV2 === 'function') {
+                renderSpotWeatherV2(spot.whether);
             }
         }
     });
 
-    const secondaryWeatherPromise = isInlandSpot
-        ? (typeof AddWeather === 'function' ? AddWeather(prefCode, 'select') : Promise.resolve(0))
-        : (typeof AddInLandWeather === 'function' ? AddInLandWeather(prefCode, 'select') : Promise.resolve(0));
+    const secondaryWeatherPromise = Promise.resolve(0);
 
     const shopPromise = (window.markerControl && typeof window.markerControl.preloadShop01 === 'function')
         ? window.markerControl.preloadShop01(window.prefShopUrl).then(() => {
@@ -419,8 +415,8 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
     ]).then(() => {
         if (window.currentPref === prefCode) {
             if (window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
-                if (spot.whether && typeof createWeekItem === 'function' && window.activeCol == null) {
-                    createWeekItem(spot.whether);
+                if (spot.whether && typeof renderSpotWeatherV2 === 'function' && window.activeCol == null) {
+                    renderSpotWeatherV2(spot.whether);
                 }
                 if (typeof waitAndRenderSpotDetails === 'function') {
                     waitAndRenderSpotDetails(spot.name);
@@ -532,6 +528,7 @@ function zoomToSpot(spot, options = {}) {
     window.currentSpotBaseTile = null;
 
     if (typeof disablePhase2 === 'function') disablePhase2(window.map);
+    if (typeof toggleTideGraphMode === 'function') toggleTideGraphMode(false);
     resetSpotLayers();
     if (window.phase2Group) window.phase2Group.clearLayers();
     if (window.phase1Group) window.phase1Group.clearLayers();
@@ -605,6 +602,9 @@ function zoomToSpot(spot, options = {}) {
             const backBtn = document.getElementById('map-back-btn');
             const tileWrap = document.getElementById('tile-btn-wrap');
             const tileBtn = document.getElementById('map-tile-btn');
+            const tideBtn = typeof ensureTideToggleBtn === 'function'
+                ? ensureTideToggleBtn()
+                : document.getElementById('map-tide-btn');
             const postBtn = document.getElementById('map-post-btn');
             if (backBtn) {
                 backBtn.style.display = 'block';
@@ -615,6 +615,11 @@ function zoomToSpot(spot, options = {}) {
                 tileWrap.style.display = 'flex';
                 tileBtn.style.display = 'block';
                 tileBtn.style.pointerEvents = 'auto';
+                if (tideBtn) {
+                    tideBtn.style.display = 'block';
+                    tideBtn.style.pointerEvents = 'auto';
+                    tideBtn.classList.remove('active');
+                }
                 if (postBtn) {
                     postBtn.style.display = 'block';
                     postBtn.style.pointerEvents = 'auto';
@@ -623,6 +628,7 @@ function zoomToSpot(spot, options = {}) {
             requestAnimationFrame(() => {
                 if (backBtn) backBtn.style.opacity = '1';
                 if (tileBtn) tileBtn.style.opacity = '1';
+                if (tideBtn) tideBtn.style.opacity = '1';
                 if (postBtn) postBtn.style.opacity = '1';
             });
             if (typeof window.fadeInUserAndTempPins === 'function') {
@@ -743,10 +749,18 @@ function zoomToSpot(spot, options = {}) {
     }
     const tileWrap = document.getElementById('tile-btn-wrap');
     const tileBtn = document.getElementById('map-tile-btn');
+    const tideBtnInit = typeof ensureTideToggleBtn === 'function'
+        ? ensureTideToggleBtn()
+        : document.getElementById('map-tide-btn');
     const postBtn = document.getElementById('map-post-btn');
     if (tileWrap && tileBtn) {
         tileBtn.style.opacity = '0';
         tileBtn.style.pointerEvents = 'none';
+        if (tideBtnInit) {
+            tideBtnInit.style.opacity = '0';
+            tideBtnInit.style.pointerEvents = 'none';
+            tideBtnInit.classList.remove('active');
+        }
         if (postBtn) {
             postBtn.style.opacity = '0';
             postBtn.style.pointerEvents = 'none';
@@ -770,7 +784,9 @@ function zoomToSpot(spot, options = {}) {
         if (window.phase2Group) window.phase2Group.clearLayers();
         if (window.phase1Group) window.phase1Group.clearLayers();
         showFishMarkers(safe.URL);
-        createWeekItem(safe.whether);
+        if (typeof renderSpotWeatherV2 === 'function') {
+            renderSpotWeatherV2(safe.whether);
+        }
 
         window.map.setMaxZoom(18);
         updateSpotMaxBounds(safe);
@@ -1745,6 +1761,1351 @@ function createTideGraph(data, sun) {
   ctx.stroke(strokePath);
 }
 
+// ==========================================
+// ★ 地図外展開：週間天気・2時間毎天気 v2（白背景 × #191970 サイトテーマ統一版）
+// ※ 旧 createWeekItem / createHourlyWeather / createTideGraph は互換のため残置
+// ==========================================
+window._currentSpotWeatherV2Data = null;
+
+function renderSpotWeatherV2(weekData) {
+    if (typeof weekData === "string" && weekData !== "") {
+        try {
+            weekData = JSON.parse(weekData);
+        } catch (e) {
+            console.error("JSONパースエラー:", e);
+            return;
+        }
+    }
+
+    const panel = document.getElementById("spot-weather-panel");
+    const hourlyContainer = document.getElementById("spot-hourly-v2");
+    const weekContainer = document.getElementById("spot-week-v2");
+    if (!panel || !hourlyContainer || !weekContainer) return;
+
+    if (!weekData || (!weekData.hourly && !weekData.daily)) {
+        panel.style.display = "none";
+        return;
+    }
+
+    window._currentSpotWeatherV2Data = weekData;
+    panel.style.display = "block";
+
+    const hourlyList = weekData?.hourly || [];
+    const rawDaily = weekData?.daily || [];
+    const tideList = window.tideWeek || [];
+
+    const dailyList = rawDaily.map(d => {
+        if (!d) return null;
+        if (Array.isArray(d)) return d;
+        if (typeof d === "string") return d.split("|").map(v => Number(v));
+        return d;
+    });
+
+    const list = [
+        ...hourlyList.map(v => ({ type: "hourly", data: v })),
+        ...dailyList.map(v => ({ type: "daily", data: v }))
+    ].filter(v => v && v.data);
+
+    if (list.length === 0) {
+        panel.style.display = "none";
+        return;
+    }
+
+    const maxCols = Math.min(7, list.length);
+    if (window.activeCol == null || window.activeCol < 0 || window.activeCol >= maxCols) {
+        window.activeCol = 0;
+    }
+
+    const hasMarine = list.slice(0, maxCols).some(it =>
+        it && (it.data?.oneday?.avg != null || it.data?.dailyEx?.avg != null)
+    );
+
+    const today = new Date();
+    const wdays = ["日", "月", "火", "水", "木", "金", "土"];
+    const getDateInfo = (i) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        return {
+            md: `${d.getMonth() + 1}/${d.getDate()}`,
+            wday: wdays[d.getDay()]
+        };
+    };
+
+    const labels = ["日付", "潮", "天気", "気温"];
+    if (hasMarine) {
+        labels.push("水温", "波高");
+    }
+
+    const labelsEl = document.createElement("div");
+    labelsEl.className = "sw2-week-labels";
+    for (const text of labels) {
+        const div = document.createElement("div");
+        div.className = "sw2-week-label";
+        div.textContent = text;
+        labelsEl.appendChild(div);
+    }
+
+    const tableEl = document.createElement("div");
+    tableEl.className = "sw2-week-table";
+
+    const rowCount = labels.length;
+    for (let row = 0; row < rowCount; row++) {
+        const tr = document.createElement("div");
+        tr.className = "sw2-week-row";
+        tr.style.gridTemplateColumns = `repeat(${maxCols}, minmax(0, 1fr))`;
+
+        for (let col = 0; col < maxCols; col++) {
+            const cell = document.createElement("div");
+            cell.className = "sw2-week-cell";
+            cell.dataset.col = String(col);
+            const item = list[col];
+
+            if (window.activeCol === col) {
+                cell.classList.add("is-active");
+            }
+
+            if (row === 0) {
+                const di = getDateInfo(col);
+                cell.classList.add("is-date");
+                cell.textContent = di.md;
+            } else if (row === 1) {
+                cell.classList.add("is-tide");
+                const tide = tideList?.[col]?.tide ?? tideList?.[col];
+                cell.textContent = tide ?? "—";
+                if (tide === "大潮") {
+                    cell.classList.add("is-big-tide");
+                }
+            } else if (row === 2) {
+                cell.classList.add("is-icon");
+                if (!item) {
+                    cell.textContent = "—";
+                } else if (item.type === "hourly") {
+                    const weatherList = item.data?.hourly2 ?? item.data?.weather ?? [];
+                    const adjustCode = (code, pop) => {
+                        const p = Number(pop);
+                        if (code >= 60) {
+                            if (p >= 80) return 70;
+                            if (p >= 60) return 60;
+                            return 60;
+                        }
+                        if (p >= 70) return 30;
+                        if (p >= 50) return 10;
+                        return code;
+                    };
+                    const map = {};
+                    let maxCount = -1;
+                    let tied = [];
+                    for (const r of weatherList) {
+                        const rawCode = Number(r?.[0]);
+                        const pop = r?.[2];
+                        if (!Number.isFinite(rawCode)) continue;
+                        const adjusted = adjustCode(rawCode, pop);
+                        map[adjusted] = (map[adjusted] || 0) + 1;
+                    }
+                    for (const k in map) {
+                        const count = map[k];
+                        const code = Number(k);
+                        if (count > maxCount) {
+                            maxCount = count;
+                            tied = [code];
+                        } else if (count === maxCount) {
+                            tied.push(code);
+                        }
+                    }
+                    const best = tied.length > 1
+                        ? Math.round(tied.reduce((a, b) => a + b, 0) / tied.length)
+                        : tied[0];
+                    cell.textContent = safeSpotWeatherIcon(best ?? 0);
+                } else {
+                    cell.textContent = safeSpotWeatherIcon(item.data?.weather?.[0] ?? 0);
+                }
+            } else if (row === 3) {
+                let val = "—";
+                if (item) {
+                    if (item.type === "hourly") {
+                        let max = -Infinity;
+                        const wList = item.data?.hourly2 ?? item.data?.weather ?? [];
+                        for (const r of wList) {
+                            const t = r?.[1];
+                            if (typeof t === "number" && t > max) max = t;
+                        }
+                        if (max !== -Infinity) val = `${Math.round(max)}°`;
+                    } else {
+                        const temp = item.data?.weather?.[1];
+                        if (temp != null) val = `${Math.round(temp)}°`;
+                    }
+                }
+                cell.textContent = val;
+            } else if (row === 4) {
+                let val = "—";
+                if (item) {
+                    const water = item.type === "hourly"
+                        ? item.data?.oneday?.avg
+                        : item.data?.dailyEx?.avg;
+                    if (water != null) val = `${Math.round(water)}°`;
+                }
+                cell.textContent = val;
+            } else if (row === 5) {
+                let val = "—";
+                if (item) {
+                    if (item.type === "hourly") {
+                        let max = -Infinity;
+                        const wList = item.data?.hourly2 ?? item.data?.weather ?? [];
+                        for (const r of wList) {
+                            const wave = r?.[6];
+                            if (typeof wave === "number" && wave > max) max = wave;
+                        }
+                        if (max !== -Infinity) val = `${max.toFixed(1)}m`;
+                    } else {
+                        const wave = item.data?.dailyEx?.wave;
+                        if (wave != null) val = `${Number(wave).toFixed(1)}m`;
+                    }
+                }
+                cell.textContent = val;
+            }
+
+            cell.addEventListener("click", () => {
+                const it = list[col];
+                if (!it) return;
+
+                window.activeCol = col;
+                renderSpotWeatherV2(weekData);
+
+                // タイドグラフがONの場合は選択日の波形へモーフィング連動
+                if (window._tideGraphEnabled && window._tideOverlayState?.isOpen) {
+                    const st = window._tideOverlayState;
+                    if (st.spot && Array.isArray(st.tideDays) && st.tideDays[col]) {
+                        openTideGraphOverlay(st.spot, st.tideDays, col, { morphFrom: "prev" });
+                    }
+                }
+            });
+
+            tr.appendChild(cell);
+        }
+        tableEl.appendChild(tr);
+    }
+
+    weekContainer.innerHTML = "";
+    weekContainer.appendChild(labelsEl);
+    weekContainer.appendChild(tableEl);
+
+    const activeItem = list[window.activeCol] || list[0];
+    if (activeItem) {
+        renderSpotHourlyV2(activeItem.data, activeItem.type, window.activeCol);
+    }
+}
+
+function renderSpotHourlyV2(hourlyData, type, dayIndex = 0) {
+    const root = document.getElementById("spot-hourly-v2");
+    if (!root || !hourlyData) return;
+
+    root.innerHTML = "";
+
+    const d = new Date();
+    d.setDate(d.getDate() + dayIndex);
+    const wdays = ["日", "月", "火", "水", "木", "金", "土"];
+    const dateBadgeText = `${d.getMonth() + 1}/${d.getDate()}(${wdays[d.getDay()]})`;
+
+    // 4日目〜7日目（daily要約のみの日）はコンパクトな日別サマリーバーを表示
+    if (type === "daily") {
+        const icon = safeSpotWeatherIcon(hourlyData?.weather?.[0] ?? 0);
+        const tmax = hourlyData?.weather?.[1] != null ? `${Math.round(hourlyData.weather[1])}°C` : "—";
+        const ex = hourlyData?.dailyEx;
+        const parts = [`<span class="sw2-daily-date">${dateBadgeText}</span>`, `<span>${icon} 最高 ${tmax}</span>`];
+        if (ex) {
+            if (ex.avg != null) parts.push(`<span>水温 ${Math.round(ex.avg)}°C</span>`);
+            if (ex.wave != null) parts.push(`<span>波 ${Number(ex.wave).toFixed(1)}m</span>`);
+            if (typeof ex.sunrise === "number" && typeof ex.sunset === "number") {
+                parts.push(`<span class="sw2-daily-sun">☀${formatFloatHourToHHMM(ex.sunrise / 60)} 🌙${formatFloatHourToHHMM(ex.sunset / 60)}</span>`);
+            }
+        }
+        root.innerHTML = `<div class="sw2-daily-summary">${parts.join("")}</div>`;
+        return;
+    }
+
+    const list = Array.isArray(hourlyData.hourly2)
+        ? hourlyData.hourly2
+        : Array.isArray(hourlyData.weather)
+            ? hourlyData.weather
+            : null;
+
+    if (!Array.isArray(list) || list.length === 0) return;
+
+    const hours = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22];
+    const step = Math.floor(list.length / 12) || 1;
+    const sliced = [];
+    for (let i = 0; i < 12; i++) {
+        sliced.push(list[i * step] ?? null);
+    }
+
+    const hasWindDir = sliced.some(r => r && r[5] != null && !isNaN(r[5]));
+
+    const normalizePop = (pop) => {
+        if (pop == null || pop === "—") return 0;
+        if (pop <= 1 && pop > 0) return Math.round(pop * 100);
+        return Math.round(pop);
+    };
+
+    const degToDir = (deg) => {
+        if (deg == null || isNaN(deg)) return "—";
+        const degNorm = (deg % 360 + 360) % 360;
+        const dirs = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"];
+        return dirs[Math.round(degNorm / 45) % 8];
+    };
+
+    const adjustWeatherCodeForPop = (code, pop) => {
+        const p = normalizePop(pop);
+        if (code >= 60) {
+            if (p >= 80) return 70;
+            if (p >= 60) return 60;
+            return 60;
+        }
+        if (p >= 70) return 30;
+        if (p >= 50) return 10;
+        return code;
+    };
+
+    const labels = ["時", "天気", "気温", "雨量", "降水", "風速"];
+    if (hasWindDir) labels.push("風向");
+
+    const labelsEl = document.createElement("div");
+    labelsEl.className = "sw2-hourly-labels";
+    labels.forEach((txt, idx) => {
+        const div = document.createElement("div");
+        div.className = idx === 0 ? "sw2-hourly-label is-head" : "sw2-hourly-label";
+        div.textContent = txt;
+        labelsEl.appendChild(div);
+    });
+
+    const tableEl = document.createElement("div");
+    tableEl.className = "sw2-hourly-table";
+
+    const timeRow = document.createElement("div");
+    timeRow.className = "sw2-hourly-row is-time";
+
+    const rowCount = labels.length - 1;
+    const rows = Array.from({ length: rowCount }, () => {
+        const rEl = document.createElement("div");
+        rEl.className = "sw2-hourly-row";
+        return rEl;
+    });
+
+    for (let i = 0; i < 12; i++) {
+        const r = sliced[i];
+
+        const c0 = document.createElement("div");
+        c0.className = "sw2-hourly-cell is-time";
+        c0.textContent = `${hours[i]}`;
+        timeRow.appendChild(c0);
+
+        if (!r) continue;
+
+        const code = r?.[0] ?? 0;
+        const temp = r?.[1];
+        const pop  = normalizePop(r?.[2]);
+        const rain = r?.[3];
+        const wind = r?.[4];
+        const dir  = r?.[5];
+
+        // 天気
+        const c1 = document.createElement("div");
+        c1.className = "sw2-hourly-cell is-icon";
+        c1.textContent = safeSpotWeatherIcon(adjustWeatherCodeForPop(code, pop));
+        rows[0].appendChild(c1);
+
+        // 気温
+        const c2 = document.createElement("div");
+        c2.className = "sw2-hourly-cell";
+        c2.textContent = temp != null ? `${Math.round(temp)}°` : "—";
+        rows[1].appendChild(c2);
+
+        // 降水量
+        const c3 = document.createElement("div");
+        c3.className = "sw2-hourly-cell";
+        const rainVal = rain != null ? Math.round(rain) : 0;
+        c3.textContent = `${rainVal}mm`;
+        if (rainVal > 0) c3.classList.add("is-rain-hit");
+        rows[2].appendChild(c3);
+
+        // 降水確率
+        const c4 = document.createElement("div");
+        c4.className = "sw2-hourly-cell";
+        c4.textContent = `${pop}%`;
+        if (pop >= 50) c4.classList.add("is-rain-hit");
+        rows[3].appendChild(c4);
+
+        // 風速
+        const c5 = document.createElement("div");
+        c5.className = "sw2-hourly-cell";
+        const windVal = wind != null ? Math.round(wind) : 0;
+        c5.textContent = `${windVal}m`;
+        if (windVal >= 7) c5.classList.add("is-strong-wind");
+        rows[4].appendChild(c5);
+
+        // 風向（沿岸のみ）
+        if (hasWindDir) {
+            const c6 = document.createElement("div");
+            c6.className = "sw2-hourly-cell is-wind-dir";
+            c6.textContent = degToDir(dir);
+            rows[5].appendChild(c6);
+        }
+    }
+
+    tableEl.appendChild(timeRow);
+    rows.forEach(r => tableEl.appendChild(r));
+
+    const gridWrap = document.createElement("div");
+    gridWrap.className = "sw2-hourly-grid-wrap";
+    gridWrap.appendChild(labelsEl);
+    gridWrap.appendChild(tableEl);
+
+    root.appendChild(gridWrap);
+}
+
+function clearSpotWeatherV2() {
+    const panel = document.getElementById("spot-weather-panel");
+    if (panel) panel.style.display = "none";
+
+    const hourlyContainer = document.getElementById("spot-hourly-v2");
+    if (hourlyContainer) hourlyContainer.innerHTML = "";
+
+    const weekContainer = document.getElementById("spot-week-v2");
+    if (weekContainer) weekContainer.innerHTML = "";
+
+    window._currentSpotWeatherV2Data = null;
+    window.activeCol = null;
+}
+
+window.syncWeekTableActiveCol = function(colIdx) {
+    if (!window._currentSpotWeatherV2Data) return;
+    window.activeCol = colIdx;
+    renderSpotWeatherV2(window._currentSpotWeatherV2Data);
+};
+
+// ============================================================================
+// ★ タイドグラフ v2（パターンB：地図全体オーバーレイ・波形モーフィング・翌日0時連結）
+// ============================================================================
+
+function decode1DPolyline(encoded) {
+  if (!encoded || typeof encoded !== 'string') return [];
+  const values = [];
+  let index = 0;
+  let curr = 0;
+
+  while (index < encoded.length) {
+    let result = 0;
+    let shift = 0;
+    let byte;
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20 && index < encoded.length);
+
+    const diff = (result & 1) ? ~(result >> 1) : (result >> 1);
+    curr += diff;
+    values.push(curr);
+  }
+  return values;
+}
+
+window.prefTideV2Cache = window.prefTideV2Cache || {};
+window.prefTideV2Promises = window.prefTideV2Promises || {};
+
+function loadPrefTideV2(prefCode = window.currentPref) {
+  if (!prefCode) return Promise.resolve(null);
+  const cleanPref = String(prefCode).trim().toUpperCase();
+  const regionCode = window.currentRegion || 'KANTO';
+  const cacheKey = `${regionCode}_${cleanPref}`;
+
+  if (window.prefTideV2Cache[cacheKey]) {
+    return Promise.resolve(window.prefTideV2Cache[cacheKey]);
+  }
+  if (window.prefTideV2Promises[cacheKey]) {
+    return window.prefTideV2Promises[cacheKey];
+  }
+
+  const url = `/data/${cleanPref}_tide_v2.json`;
+
+  window.prefTideV2Promises[cacheKey] = fetch(url)
+    .then(res => {
+      if (!res.ok) throw new Error('Tide v2 JSON fetch failed: ' + res.status);
+      return res.json();
+    })
+    .then(data => {
+      if (!data || !data.spots || typeof data.spots !== 'object') {
+        throw new Error('Invalid Tide v2 JSON format: ' + url);
+      }
+      const diffDays = (typeof calcWeatherDateDiffDays === 'function')
+        ? calcWeatherDateDiffDays(data.date)
+        : 0;
+
+      if (diffDays > 0) {
+        for (const spotName of Object.keys(data.spots)) {
+          if (Array.isArray(data.spots[spotName])) {
+            data.spots[spotName] = data.spots[spotName].slice(diffDays);
+          }
+        }
+        if (typeof getTodayYmdJST === 'function') {
+          data.date = getTodayYmdJST();
+        }
+      }
+
+      window.prefTideV2Cache[cacheKey] = data;
+      return data;
+    })
+    .catch(err => {
+      delete window.prefTideV2Promises[cacheKey];
+      console.warn('潮汐v2 JSON取得エラー:', cleanPref, err);
+      return null;
+    });
+
+  return window.prefTideV2Promises[cacheKey];
+}
+
+async function getSpotTideDaysV2(spotName, prefCode = window.currentPref) {
+  if (!spotName || !prefCode) return null;
+  const tideJson = await loadPrefTideV2(prefCode);
+  if (!tideJson || !tideJson.spots) return null;
+
+  const encodedList = tideJson.spots[spotName];
+  if (!Array.isArray(encodedList) || encodedList.length === 0) return null;
+
+  return encodedList.map(enc => decode1DPolyline(enc));
+}
+
+function buildDayTideSeriesWithNextZero(tideDays, dayIndex) {
+  if (!Array.isArray(tideDays) || !Array.isArray(tideDays[dayIndex])) {
+    return { series: [], maxHour: 0, has24h: false };
+  }
+
+  const base24 = tideDays[dayIndex].slice(0, 24).map(Number);
+  const nextDay = tideDays[dayIndex + 1];
+
+  if (
+    base24.length === 24 &&
+    Array.isArray(nextDay) &&
+    nextDay.length > 0 &&
+    typeof nextDay[0] === 'number' &&
+    Number.isFinite(nextDay[0])
+  ) {
+    base24.push(Number(nextDay[0]));
+    return { series: base24, maxHour: 24, has24h: true };
+  }
+
+  return {
+    series: base24,
+    maxHour: Math.max(0, base24.length - 1),
+    has24h: false
+  };
+}
+
+window._tideGraphEnabled = false;
+window._tideGraphDayIndex = 0;
+
+function ensureTideToggleBtn() {
+  const tileWrap = document.getElementById('tile-btn-wrap');
+  const tileBtn = document.getElementById('map-tile-btn');
+  if (!tileWrap || !tileBtn) return null;
+
+  let tideBtn = document.getElementById('map-tide-btn');
+  if (!tideBtn) {
+    tideBtn = document.createElement('button');
+    tideBtn.id = 'map-tide-btn';
+    tideBtn.type = 'button';
+    tideBtn.className = 'map-tool-btn map-tide-btn';
+    tideBtn.setAttribute('aria-label', 'タイドグラフ表示切替');
+    tideBtn.textContent = 'タイドグラフ';
+    tideBtn.style.display = 'none';
+    tideBtn.style.opacity = '0';
+    tideBtn.style.transition = 'opacity 0.4s ease';
+    tileBtn.insertAdjacentElement('afterend', tideBtn);
+  }
+
+  if (!tideBtn.dataset.tideListenerAdded) {
+    tideBtn.dataset.tideListenerAdded = 'true';
+    tideBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleTideGraphMode();
+    });
+  }
+  return tideBtn;
+}
+
+async function toggleTideGraphMode(forceState) {
+  const nextState = (typeof forceState === 'boolean')
+    ? forceState
+    : !window._tideGraphEnabled;
+
+  window._tideGraphEnabled = nextState;
+  const tideBtn = ensureTideToggleBtn();
+
+  if (!nextState) {
+    if (tideBtn) tideBtn.classList.remove('active');
+    closeTideGraphOverlay();
+    return;
+  }
+
+  if (tideBtn) tideBtn.classList.add('active');
+
+  const spot = getCurrentActiveSpotObj();
+  if (!spot) {
+    window._tideGraphEnabled = false;
+    if (tideBtn) tideBtn.classList.remove('active');
+    return;
+  }
+
+  const tideDays = await getSpotTideDaysV2(spot.name, spot._prefCode || window.currentPref);
+  if (!tideDays || tideDays.length === 0) {
+    window._tideGraphEnabled = false;
+    if (tideBtn) tideBtn.classList.remove('active');
+    return;
+  }
+
+  const initialIdx = (window.activeCol != null && window.activeCol >= 0)
+    ? window.activeCol
+    : (window._tideGraphDayIndex || 0);
+  const dayIdx = Math.min(initialIdx, tideDays.length - 1);
+  openTideGraphOverlay(spot, tideDays, dayIdx, { morphFrom: 'flat' });
+}
+
+function getCurrentActiveSpotObj() {
+  if (!window.currentSpotId || !Array.isArray(window.spotData)) return null;
+  const parts = String(window.currentSpotId).split('_');
+  const spotKey = parts[parts.length - 1];
+  return (window.currentAreaId
+    ? window.spotData.find(s => String(s.areaId) === String(window.currentAreaId) && String(s.individualId) === String(spotKey))
+    : null)
+    || window.spotData.find(s => String(s.individualId) === String(spotKey))
+    || null;
+}
+
+function extractTidePeaksV2(series) {
+  if (!Array.isArray(series) || series.length < 4) return [];
+
+  const maxHour = series.length - 1;
+  const peaks = [];
+
+  for (let i = 1; i < series.length - 1; i++) {
+    const prev = series[i - 1];
+    const curr = series[i];
+    const next = series[i + 1];
+
+    const isHigh = (curr >= prev && curr > next) || (curr > prev && curr >= next);
+    const isLow  = (curr <= prev && curr < next) || (curr < prev && curr <= next);
+
+    if (!isHigh && !isLow) continue;
+
+    const denom = 2 * (prev - 2 * curr + next);
+    let delta = 0;
+    if (denom !== 0) {
+      delta = (prev - next) / denom;
+      delta = Math.max(-0.5, Math.min(0.5, delta));
+    }
+
+    const exactHour = Math.max(0, Math.min(maxHour, i + delta));
+    const exactLevel = Math.round(curr - 0.25 * (prev - next) * delta);
+
+    const last = peaks[peaks.length - 1];
+    if (last && Math.abs(exactHour - last.hourFloat) < 2.0) {
+      if ((isHigh && exactLevel > last.level) || (isLow && exactLevel < last.level)) {
+        peaks[peaks.length - 1] = {
+          type: isHigh ? 'high' : 'low',
+          hourFloat: exactHour,
+          timeStr: formatFloatHourToHHMM(exactHour),
+          level: exactLevel
+        };
+      }
+      continue;
+    }
+
+    peaks.push({
+      type: isHigh ? 'high' : 'low',
+      hourFloat: exactHour,
+      timeStr: formatFloatHourToHHMM(exactHour),
+      level: exactLevel
+    });
+  }
+
+  return peaks;
+}
+
+function formatFloatHourToHHMM(hourFloat) {
+  const totalMin = Math.max(0, Math.min(1440, Math.round(hourFloat * 60)));
+  if (totalMin === 1440) return '24:00';
+  const hh = String(Math.floor(totalMin / 60)).padStart(2, '0');
+  const mm = String(totalMin % 60).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+window._tideOverlayState = {
+  isOpen: false,
+  spot: null,
+  tideDays: null,
+  dayIndex: 0,
+  maxHour: 24,
+  currentYSlots: null,
+  morphRafId: null,
+  selectedHourFloat: null,
+  samplePoints: [],
+  peaks: [],
+  outsideTouchHandler: null
+};
+
+function ensureTideOverlayContainer() {
+  const mapEl = document.getElementById('lf-map');
+  if (!mapEl) return null;
+
+  let overlay = document.getElementById('tide-overlay-v2');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'tide-overlay-v2';
+    overlay.className = 'tide-overlay-v2';
+    mapEl.appendChild(overlay);
+  }
+  return overlay;
+}
+
+function openTideGraphOverlay(spot, tideDays, dayIndex = 0, options = {}) {
+  const overlay = ensureTideOverlayContainer();
+  if (!overlay || !Array.isArray(tideDays) || !tideDays[dayIndex]) return;
+
+  const safeIdx = Math.max(0, Math.min(tideDays.length - 1, dayIndex));
+  window._tideGraphDayIndex = safeIdx;
+
+  const { series, maxHour, has24h } = buildDayTideSeriesWithNextZero(tideDays, safeIdx);
+  if (series.length < 2) return;
+
+  const sun = resolveSunTimesForDay(spot, safeIdx);
+  const dateInfo = getDateLabelForDayIndex(safeIdx);
+
+  window._tideOverlayState.isOpen = true;
+  window._tideOverlayState.spot = spot;
+  window._tideOverlayState.tideDays = tideDays;
+  window._tideOverlayState.dayIndex = safeIdx;
+  window._tideOverlayState.maxHour = maxHour;
+
+  renderTideSvgWithMorph(overlay, {
+    spotName: spot.name,
+    series,
+    maxHour,
+    has24h,
+    sun,
+    dayIndex: safeIdx,
+    totalDays: tideDays.length,
+    dateLabel: dateInfo.label,
+    tideName: dateInfo.tideName,
+    morphFrom: options.morphFrom || 'prev'
+  });
+
+  bindTideOutsideCloseListener();
+}
+
+function closeTideGraphOverlay() {
+  if (window._tideOverlayState.morphRafId) {
+    cancelAnimationFrame(window._tideOverlayState.morphRafId);
+    window._tideOverlayState.morphRafId = null;
+  }
+  const overlay = document.getElementById('tide-overlay-v2');
+  if (overlay) {
+    overlay.classList.remove('is-visible');
+    overlay.innerHTML = '';
+    overlay.style.display = 'none';
+  }
+  window._tideOverlayState.isOpen = false;
+  window._tideOverlayState.currentYSlots = null;
+  window._tideOverlayState.selectedHourFloat = null;
+  window._tideOverlayState.samplePoints = [];
+  unbindTideOutsideCloseListener();
+}
+
+function resolveSunTimesForDay(spot, dayIndex) {
+  const w = spot && spot.whether;
+  if (!w) return { sunrise: 360, sunset: 1080 };
+
+  if (dayIndex < 3 && Array.isArray(w.hourly) && w.hourly[dayIndex]?.oneday) {
+    const od = w.hourly[dayIndex].oneday;
+    if (typeof od.sunrise === 'number' && typeof od.sunset === 'number') {
+      return { sunrise: od.sunrise, sunset: od.sunset };
+    }
+  }
+  const dIdx = dayIndex - 3;
+  if (dIdx >= 0 && Array.isArray(w.daily) && w.daily[dIdx]?.dailyEx) {
+    const ex = w.daily[dIdx].dailyEx;
+    if (typeof ex.sunrise === 'number' && typeof ex.sunset === 'number') {
+      return { sunrise: ex.sunrise, sunset: ex.sunset };
+    }
+  }
+  return { sunrise: 360, sunset: 1080 };
+}
+
+function getDateLabelForDayIndex(dayIndex) {
+  const d = new Date();
+  d.setDate(d.getDate() + dayIndex);
+  const wdays = ['日', '月', '火', '水', '木', '金', '土'];
+  const label = `${d.getMonth() + 1}/${d.getDate()}(${wdays[d.getDay()]})`;
+  const tideRaw = window.tideWeek && window.tideWeek[dayIndex];
+  const tideName = (tideRaw && typeof tideRaw === 'object') ? (tideRaw.tide || '') : (tideRaw || '');
+  return { label, tideName };
+}
+
+function renderTideSvgWithMorph(overlay, cfg) {
+  overlay.style.display = 'block';
+  const rect = overlay.getBoundingClientRect();
+  const W = rect.width || window.innerWidth;
+  const H = rect.height || Math.round(window.innerHeight * 0.8);
+
+  const padL = 14;
+  const padR = 14;
+  const plotW = W - padL - padR;
+
+  const topY = Math.round(H * 0.34);
+  const bottomY = Math.round(H * 0.84);
+  const plotH = bottomY - topY;
+  const midY = topY + plotH * 0.55;
+
+  const MIN_CM = -30;
+  const MAX_CM = 180;
+  const valToY = (cm) => {
+    const clamped = Math.max(MIN_CM, Math.min(MAX_CM, cm));
+    const ratio = (clamped - MIN_CM) / (MAX_CM - MIN_CM);
+    return bottomY - ratio * plotH;
+  };
+  const hourToX = (h) => padL + (h / 24) * plotW;
+
+  const targetYSlots = new Array(25);
+  for (let h = 0; h <= 24; h++) {
+    const srcIdx = Math.min(h, cfg.series.length - 1);
+    targetYSlots[h] = valToY(cfg.series[srcIdx]);
+  }
+
+  let startYSlots;
+  if (
+    cfg.morphFrom === 'prev' &&
+    Array.isArray(window._tideOverlayState.currentYSlots) &&
+    window._tideOverlayState.currentYSlots.length === 25
+  ) {
+    startYSlots = window._tideOverlayState.currentYSlots.slice();
+  } else if (cfg.morphFrom === 'flat') {
+    startYSlots = new Array(25).fill(midY);
+  } else {
+    startYSlots = targetYSlots.slice();
+  }
+
+  const srPct = Math.max(0, Math.min(100, (cfg.sun.sunrise / 1440) * 100));
+  const ssPct = Math.max(srPct + 5, Math.min(100, (cfg.sun.sunset / 1440) * 100));
+  const dawnStart = Math.max(0, srPct - 3.5);
+  const dawnEnd   = Math.min(100, srPct + 3.5);
+  const duskStart = Math.max(0, ssPct - 4.0);
+  const duskEnd   = Math.min(100, ssPct + 3.0);
+
+  const peaks = extractTidePeaksV2(cfg.series);
+  window._tideOverlayState.peaks = peaks;
+
+  const sunriseStr = formatFloatHourToHHMM(cfg.sun.sunrise / 60);
+  const sunsetStr  = formatFloatHourToHHMM(cfg.sun.sunset / 60);
+
+  let svgEl = document.getElementById('tideV2Svg');
+  if (!svgEl) {
+    overlay.innerHTML = `
+      <div class="tide-v2-hud">
+        <div class="tide-v2-date-pill" id="tideV2DatePill"></div>
+      </div>
+
+      <svg id="tideV2Svg" class="tide-v2-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
+        <defs>
+          <linearGradient id="tideLineSunGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#191970" />
+            <stop id="tideStopDawnStart" offset="${dawnStart.toFixed(1)}%" stop-color="#191970" />
+            <stop id="tideStopSunrise"   offset="${srPct.toFixed(1)}%" stop-color="#ff8c00" />
+            <stop id="tideStopDawnEnd"   offset="${dawnEnd.toFixed(1)}%" stop-color="#0969da" />
+            <stop id="tideStopDuskStart" offset="${duskStart.toFixed(1)}%" stop-color="#0969da" />
+            <stop id="tideStopSunset"    offset="${ssPct.toFixed(1)}%" stop-color="#ff5722" />
+            <stop id="tideStopDuskEnd"   offset="${duskEnd.toFixed(1)}%" stop-color="#191970" />
+            <stop offset="100%" stop-color="#191970" />
+          </linearGradient>
+
+          <linearGradient id="tideAreaFillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(9, 105, 218, 0.22)" />
+            <stop offset="100%" stop-color="rgba(25, 25, 112, 0.02)" />
+          </linearGradient>
+
+          <filter id="tideLineShadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="rgba(0,0,0,0.45)" />
+          </filter>
+        </defs>
+
+        <line id="tideV2SunriseLine" y1="${topY}" y2="${bottomY}" class="tide-v2-sun-line is-sunrise" />
+        <line id="tideV2SunsetLine"  y1="${topY}" y2="${bottomY}" class="tide-v2-sun-line is-sunset" />
+
+        <path id="tideV2AreaPath" fill="url(#tideAreaFillGrad)" class="tide-v2-area-path" />
+        <path id="tideV2LineHalo" fill="none" stroke="rgba(255,255,255,0.85)"
+              stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" />
+        <path id="tideV2LinePath" fill="none" stroke="url(#tideLineSunGrad)"
+              stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
+              filter="url(#tideLineShadow)" />
+        <path id="tideV2HitPath" fill="none" stroke="transparent"
+              stroke-width="36" stroke-linecap="round" style="pointer-events: stroke; cursor: pointer;" />
+
+        <line id="tideV2CursorLine" x1="0" y1="${topY}" x2="0" y2="${bottomY}"
+              class="tide-v2-cursor-line" style="display:none;" />
+        <circle id="tideV2CursorDot" cx="0" cy="0" r="6"
+                class="tide-v2-cursor-dot" style="display:none;" />
+
+        <g id="tideV2PeaksGroup" class="tide-v2-peaks-group"></g>
+      </svg>
+
+      <div id="tideV2Tooltip" class="tide-v2-tooltip" style="display:none;"></div>
+    `;
+
+    bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY);
+  }
+
+  const datePill = document.getElementById('tideV2DatePill');
+  if (datePill) {
+    datePill.innerHTML = `
+      <span class="tide-v2-arrow">‹</span>
+      <span class="tide-v2-date-text">${cfg.dateLabel}</span>
+      ${cfg.tideName ? `<span class="tide-v2-tidename ${cfg.tideName === '大潮' ? 'is-big' : ''}">${cfg.tideName}</span>` : ''}
+      <span class="tide-v2-sun-meta">☀${sunriseStr} / 🌙${sunsetStr}</span>
+      <span class="tide-v2-arrow">›</span>
+    `;
+  }
+
+  const updateStop = (id, pct) => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute('offset', `${pct.toFixed(1)}%`);
+  };
+  updateStop('tideStopDawnStart', dawnStart);
+  updateStop('tideStopSunrise',   srPct);
+  updateStop('tideStopDawnEnd',   dawnEnd);
+  updateStop('tideStopDuskStart', duskStart);
+  updateStop('tideStopSunset',    ssPct);
+  updateStop('tideStopDuskEnd',   duskEnd);
+
+  const srLine = document.getElementById('tideV2SunriseLine');
+  const ssLine = document.getElementById('tideV2SunsetLine');
+  if (srLine) {
+    const xSr = hourToX(cfg.sun.sunrise / 60).toFixed(1);
+    srLine.setAttribute('x1', xSr);
+    srLine.setAttribute('x2', xSr);
+  }
+  if (ssLine) {
+    const xSs = hourToX(cfg.sun.sunset / 60).toFixed(1);
+    ssLine.setAttribute('x1', xSs);
+    ssLine.setAttribute('x2', xSs);
+  }
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('is-visible');
+  });
+
+  if (window._tideOverlayState.morphRafId) {
+    cancelAnimationFrame(window._tideOverlayState.morphRafId);
+    window._tideOverlayState.morphRafId = null;
+  }
+
+  const linePathEl = document.getElementById('tideV2LinePath');
+  const haloPathEl = document.getElementById('tideV2LineHalo');
+  const areaPathEl = document.getElementById('tideV2AreaPath');
+  const hitPathEl  = document.getElementById('tideV2HitPath');
+  const peaksGroup = document.getElementById('tideV2PeaksGroup');
+
+  const applyYSlotsToPaths = (ySlots) => {
+    window._tideOverlayState.currentYSlots = ySlots;
+    const pts = [];
+    for (let h = 0; h <= cfg.maxHour; h++) {
+      pts.push({ x: hourToX(h), y: ySlots[h] });
+    }
+    const dLine = buildSmoothSvgPath(pts);
+    const lastPt = pts[pts.length - 1];
+    const firstPt = pts[0];
+    const dArea = `${dLine} L ${lastPt.x.toFixed(1)} ${bottomY} L ${firstPt.x.toFixed(1)} ${bottomY} Z`;
+
+    if (linePathEl) linePathEl.setAttribute('d', dLine);
+    if (haloPathEl) haloPathEl.setAttribute('d', dLine);
+    if (areaPathEl) areaPathEl.setAttribute('d', dArea);
+    if (hitPathEl)  hitPathEl.setAttribute('d', dLine);
+  };
+
+  if (peaksGroup) {
+    peaksGroup.style.opacity = '0';
+    peaksGroup.style.transition = 'none';
+  }
+
+  const durationMs = cfg.morphFrom === 'flat' ? 560 : 460;
+  const startTime = performance.now();
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  const stepMorph = (now) => {
+    const rawT = Math.min(1, (now - startTime) / durationMs);
+    const eased = easeOutCubic(rawT);
+
+    const interpY = new Array(25);
+    for (let h = 0; h <= 24; h++) {
+      interpY[h] = startYSlots[h] + (targetYSlots[h] - startYSlots[h]) * eased;
+    }
+    applyYSlotsToPaths(interpY);
+
+    if (rawT < 1) {
+      window._tideOverlayState.morphRafId = requestAnimationFrame(stepMorph);
+    } else {
+      window._tideOverlayState.morphRafId = null;
+      applyYSlotsToPaths(targetYSlots);
+
+      if (linePathEl) {
+        buildCurveSamplePoints(linePathEl, padL, plotW, topY, bottomY, MIN_CM, MAX_CM, cfg.maxHour);
+      }
+      renderPeakMarkers(peaks, hourToX, valToY, W);
+      if (peaksGroup) {
+        requestAnimationFrame(() => {
+          peaksGroup.style.transition = 'opacity 0.25s ease';
+          peaksGroup.style.opacity = '1';
+        });
+      }
+
+      if (window._tideOverlayState.selectedHourFloat != null) {
+        updateTooltipAtHour(overlay, window._tideOverlayState.selectedHourFloat);
+      }
+    }
+  };
+
+  window._tideOverlayState.morphRafId = requestAnimationFrame(stepMorph);
+}
+
+function buildSmoothSvgPath(pts) {
+  if (!pts || pts.length === 0) return '';
+  let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? 0 : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : i + 1];
+
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+    d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
+function buildCurveSamplePoints(pathEl, padL, plotW, topY, bottomY, minCm, maxCm, maxHour = 24) {
+  const totalLen = pathEl.getTotalLength();
+  const steps = Math.max(1, maxHour * 4);
+  const samples = [];
+  const plotH = bottomY - topY;
+
+  for (let i = 0; i <= steps; i++) {
+    const pt = pathEl.getPointAtLength((totalLen * i) / steps);
+    const hourFloat = Math.max(0, Math.min(maxHour, ((pt.x - padL) / plotW) * 24));
+    const ratio = (bottomY - pt.y) / plotH;
+    const level = Math.round(minCm + ratio * (maxCm - minCm));
+    samples.push({
+      x: pt.x,
+      y: pt.y,
+      hourFloat,
+      timeStr: formatFloatHourToHHMM(hourFloat),
+      level
+    });
+  }
+  window._tideOverlayState.samplePoints = samples;
+}
+
+function renderPeakMarkers(peaks, hourToX, valToY, svgWidth) {
+  const group = document.getElementById('tideV2PeaksGroup');
+  if (!group) return;
+  group.innerHTML = '';
+
+  peaks.forEach(pk => {
+    const cx = hourToX(pk.hourFloat);
+    const cy = valToY(pk.level);
+    const isHigh = pk.type === 'high';
+    const labelY = isHigh ? cy - 12 : cy + 20;
+    const anchor = cx < 46 ? 'start' : (cx > svgWidth - 46 ? 'end' : 'middle');
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', `tide-v2-peak-item ${isHigh ? 'is-high' : 'is-low'}`);
+
+    g.innerHTML = `
+      <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4"
+              fill="#ffffff" stroke="${isHigh ? '#e60033' : '#0969da'}" stroke-width="2" />
+      <text x="${cx.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="${anchor}"
+            class="tide-v2-peak-text">
+        ${isHigh ? '満' : '干'} ${pk.timeStr} (${pk.level}cm)
+      </text>
+    `;
+    group.appendChild(g);
+  });
+}
+
+function renderTooltipFromSample(overlay, nearest) {
+  const rect = overlay.getBoundingClientRect();
+  const cursorLine = document.getElementById('tideV2CursorLine');
+  const cursorDot  = document.getElementById('tideV2CursorDot');
+  const tooltip    = document.getElementById('tideV2Tooltip');
+  if (!cursorLine || !cursorDot || !tooltip || !nearest) return;
+
+  window._tideOverlayState.selectedHourFloat = nearest.hourFloat;
+
+  cursorLine.setAttribute('x1', nearest.x.toFixed(1));
+  cursorLine.setAttribute('x2', nearest.x.toFixed(1));
+  cursorLine.style.display = 'block';
+
+  cursorDot.setAttribute('cx', nearest.x.toFixed(1));
+  cursorDot.setAttribute('cy', nearest.y.toFixed(1));
+  cursorDot.style.display = 'block';
+
+  const nextPeak = (window._tideOverlayState.peaks || []).find(p => p.hourFloat >= nearest.hourFloat);
+  const nextPeakHtml = nextPeak
+    ? `<div class="tide-v2-tt-sub">次${nextPeak.type === 'high' ? '満潮' : '干潮'}: <strong>${nextPeak.timeStr}</strong> (${nextPeak.level}cm)</div>`
+    : '';
+
+  const state = window._tideOverlayState;
+  const dateInfo = getDateLabelForDayIndex(state.dayIndex);
+
+  tooltip.innerHTML = `
+    <div class="tide-v2-tt-header">${dateInfo.label} ${nearest.timeStr}</div>
+    <div class="tide-v2-tt-row">
+      <span class="tide-v2-tt-dot"></span>
+      <span class="tide-v2-tt-label">潮位</span>
+      <span class="tide-v2-tt-val">${nearest.level} cm</span>
+    </div>
+    ${nextPeakHtml}
+  `;
+  tooltip.style.display = 'block';
+
+  const ttW = tooltip.offsetWidth || 148;
+  const leftPos = Math.max(10, Math.min(rect.width - ttW - 10, nearest.x - ttW / 2));
+  const topPos = Math.max(46, nearest.y - (tooltip.offsetHeight || 72) - 14);
+  tooltip.style.left = `${leftPos}px`;
+  tooltip.style.top = `${topPos}px`;
+}
+
+function updateTooltipAtHour(overlay, targetHour) {
+  const samples = window._tideOverlayState.samplePoints;
+  if (!samples || samples.length === 0) return;
+
+  let nearest = samples[0];
+  let minDh = Infinity;
+  for (let i = 0; i < samples.length; i++) {
+    const dh = Math.abs(samples[i].hourFloat - targetHour);
+    if (dh < minDh) {
+      minDh = dh;
+      nearest = samples[i];
+    }
+  }
+  renderTooltipFromSample(overlay, nearest);
+}
+
+function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
+  const hitPath = document.getElementById('tideV2HitPath');
+  const datePill = document.getElementById('tideV2DatePill');
+  if (!hitPath) return;
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let isScrubbingLine = false;
+
+  const updateTooltipAtClientX = (clientX) => {
+    const rect = overlay.getBoundingClientRect();
+    const localX = clientX - rect.left;
+    const samples = window._tideOverlayState.samplePoints;
+    if (!samples || samples.length === 0) return;
+
+    let nearest = samples[0];
+    let minDx = Infinity;
+    for (let i = 0; i < samples.length; i++) {
+      const dx = Math.abs(samples[i].x - localX);
+      if (dx < minDx) {
+        minDx = dx;
+        nearest = samples[i];
+      }
+    }
+    renderTooltipFromSample(overlay, nearest);
+  };
+
+  hitPath.addEventListener('touchstart', (e) => {
+    if (!e.touches || e.touches.length !== 1) return;
+    e.stopPropagation();
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    touchStartTime = Date.now();
+    isScrubbingLine = true;
+    updateTooltipAtClientX(t.clientX);
+  }, { passive: true });
+
+  hitPath.addEventListener('touchmove', (e) => {
+    if (!isScrubbingLine || !e.touches || e.touches.length !== 1) return;
+    e.stopPropagation();
+    const t = e.touches[0];
+    updateTooltipAtClientX(t.clientX);
+  }, { passive: true });
+
+  hitPath.addEventListener('touchend', (e) => {
+    if (!isScrubbingLine) return;
+    e.stopPropagation();
+    isScrubbingLine = false;
+
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    const dt = Date.now() - touchStartTime;
+
+    if (dt < 350 && Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      shiftTideOverlayDay(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  hitPath.addEventListener('click', (e) => {
+    e.stopPropagation();
+    updateTooltipAtClientX(e.clientX);
+  });
+
+  if (datePill) {
+    let pillStartX = 0;
+    datePill.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+      pillStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    datePill.addEventListener('touchend', (e) => {
+      e.stopPropagation();
+      const endX = e.changedTouches[0].clientX;
+      const dx = endX - pillStartX;
+      if (Math.abs(dx) > 35) {
+        shiftTideOverlayDay(dx < 0 ? 1 : -1);
+      } else {
+        const r = datePill.getBoundingClientRect();
+        const isLeft = (endX - r.left) < r.width / 2;
+        shiftTideOverlayDay(isLeft ? -1 : 1);
+      }
+    }, { passive: true });
+
+    datePill.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const r = datePill.getBoundingClientRect();
+      const isLeft = (e.clientX - r.left) < r.width / 2;
+      shiftTideOverlayDay(isLeft ? -1 : 1);
+    });
+  }
+}
+
+function shiftTideOverlayDay(delta) {
+  const st = window._tideOverlayState;
+  if (!st.isOpen || !st.spot || !Array.isArray(st.tideDays)) return;
+
+  const nextIdx = st.dayIndex + delta;
+  if (nextIdx < 0 || nextIdx >= st.tideDays.length) return;
+
+  openTideGraphOverlay(st.spot, st.tideDays, nextIdx, {
+    morphFrom: 'prev'
+  });
+
+  if (typeof window.syncWeekTableActiveCol === 'function') {
+    window.syncWeekTableActiveCol(nextIdx);
+  }
+}
+
+function bindTideOutsideCloseListener() {
+  unbindTideOutsideCloseListener();
+
+  const mapEl = document.getElementById('lf-map');
+  if (!mapEl) return;
+
+  let downX = 0;
+  let downY = 0;
+  let mouseDownX = 0;
+  let mouseDownY = 0;
+
+  const evalCloseOrSwipe = (startX, startY, endX, endY, targetEl, allowSwipe) => {
+    const st = window._tideOverlayState;
+    if (!st.isOpen) return;
+    if (targetEl && targetEl.closest('#map-tool-bar, #tideV2DatePill, #tideV2Tooltip')) return;
+
+    const moveDist = Math.hypot(endX - startX, endY - startY);
+    const dx = endX - startX;
+    const dy = endY - startY;
+
+    const overlay = document.getElementById('tide-overlay-v2');
+    if (allowSwipe && overlay && Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+      const rect = overlay.getBoundingClientRect();
+      const relY = startY - rect.top;
+      if (relY >= rect.height * 0.25 && relY <= rect.height * 0.90) {
+        shiftTideOverlayDay(dx < 0 ? 1 : -1);
+        return;
+      }
+    }
+
+    if (moveDist > 12) return;
+    if (!overlay) return;
+
+    const rect = overlay.getBoundingClientRect();
+    const px = endX - rect.left;
+    const py = endY - rect.top;
+
+    let minLineDist = Infinity;
+    for (const pt of st.samplePoints) {
+      const d = Math.hypot(pt.x - px, pt.y - py);
+      if (d < minLineDist) minLineDist = d;
+    }
+
+    if (minLineDist >= 48) {
+      toggleTideGraphMode(false);
+    }
+  };
+
+  const onTouchStart = (e) => {
+    if (!e.touches || e.touches.length !== 1) return;
+    downX = e.touches[0].clientX;
+    downY = e.touches[0].clientY;
+  };
+
+  const onTouchEnd = (e) => {
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+    evalCloseOrSwipe(downX, downY, t.clientX, t.clientY, e.target, true);
+  };
+
+  const onMouseDown = (e) => {
+    mouseDownX = e.clientX;
+    mouseDownY = e.clientY;
+  };
+
+  const onClick = (e) => {
+    evalCloseOrSwipe(mouseDownX, mouseDownY, e.clientX, e.clientY, e.target, false);
+  };
+
+  mapEl.addEventListener('touchstart', onTouchStart, { passive: true });
+  mapEl.addEventListener('touchend', onTouchEnd, { passive: true });
+  mapEl.addEventListener('mousedown', onMouseDown, { passive: true });
+  mapEl.addEventListener('click', onClick);
+
+  window._tideOverlayState.outsideTouchHandler = {
+    mapEl,
+    onTouchStart,
+    onTouchEnd,
+    onMouseDown,
+    onClick
+  };
+}
+
+function unbindTideOutsideCloseListener() {
+  const h = window._tideOverlayState.outsideTouchHandler;
+  if (h && h.mapEl) {
+    h.mapEl.removeEventListener('touchstart', h.onTouchStart);
+    h.mapEl.removeEventListener('touchend', h.onTouchEnd);
+    h.mapEl.removeEventListener('mousedown', h.onMouseDown);
+    h.mapEl.removeEventListener('click', h.onClick);
+  }
+  window._tideOverlayState.outsideTouchHandler = null;
+}
+
 function drawSmooth(ctx, pts) {
   ctx.beginPath();
 
@@ -2106,6 +3467,8 @@ function clearSpotUI() {
     // -------------------------
     // UI
     // -------------------------
+    if (typeof clearSpotWeatherV2 === 'function') {clearSpotWeatherV2();}
+    if (typeof toggleTideGraphMode === 'function') {toggleTideGraphMode(false);}
     if (typeof removeWeekItem === 'function') {removeWeekItem();}
     if (typeof resetWeatherUI === 'function') {resetWeatherUI();}
     if (typeof clearSub2Weather === 'function') {clearSub2Weather();}
@@ -3490,6 +4853,16 @@ window.resetWeatherUI = resetWeatherUI;
 window.removeWeekItem = removeWeekItem;
 window.createHourlyWeather = createHourlyWeather;
 window.createTideGraph = createTideGraph;
+window.renderSpotWeatherV2 = renderSpotWeatherV2;
+window.renderSpotHourlyV2 = renderSpotHourlyV2;
+window.clearSpotWeatherV2 = clearSpotWeatherV2;
+window.decode1DPolyline = decode1DPolyline;
+window.loadPrefTideV2 = loadPrefTideV2;
+window.getSpotTideDaysV2 = getSpotTideDaysV2;
+window.ensureTideToggleBtn = ensureTideToggleBtn;
+window.toggleTideGraphMode = toggleTideGraphMode;
+window.openTideGraphOverlay = openTideGraphOverlay;
+window.closeTideGraphOverlay = closeTideGraphOverlay;
 window.calcAccessInfo = calcAccessInfo;
 window.renderShopSection = renderShopSection;
 window.loadCompiledCatchData = loadCompiledCatchData;

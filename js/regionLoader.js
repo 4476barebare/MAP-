@@ -712,6 +712,12 @@ function calcWeatherDateDiffDays(jsonDateStr) {
 
 function normalizeWeatherJsonByDate(data) {
     if (!data || !data.spots || typeof data.spots !== 'object') return data;
+    for (const spotName of Object.keys(data.spots)) {
+        const raw = data.spots[spotName];
+        if (raw && (Array.isArray(raw.h) || Array.isArray(raw.d)) && !Array.isArray(raw.hourly)) {
+            data.spots[spotName] = expandSpotWeatherV2(raw);
+        }
+    }
     const diffDays = calcWeatherDateDiffDays(data.date);
     if (diffDays <= 0) return data;
 
@@ -869,6 +875,227 @@ function AddInLandWeather(prefCode, mode = 'select') {
 }
 
 // ==========================================
+// 新天気v2 JSON取得・列指向展開＆付与（沿岸・内陸統合1ファイル版）
+// AddWeatherV2(prefCode, mode) : mode = select / other / all
+// ==========================================
+window.prefWeatherV2Cache = window.prefWeatherV2Cache || {};
+window.prefWeatherV2Promises = window.prefWeatherV2Promises || {};
+window.prefWeatherV2Applied = window.prefWeatherV2Applied || {};
+window.prefWeatherV2ApplyPromises = window.prefWeatherV2ApplyPromises || {};
+window.regionWeatherV2AllDone = window.regionWeatherV2AllDone || {};
+window.regionWeatherV2AllPromises = window.regionWeatherV2AllPromises || {};
+window.regionWeatherV2AllResults = window.regionWeatherV2AllResults || {};
+
+function expandSpotWeatherV2(rawSpot) {
+    if (!rawSpot || typeof rawSpot !== 'object') return null;
+    if (Array.isArray(rawSpot.hourly) || Array.isArray(rawSpot.daily)) return rawSpot;
+
+    const hRaw = Array.isArray(rawSpot.h) ? rawSpot.h : [];
+    const dRaw = Array.isArray(rawSpot.d) ? rawSpot.d : [];
+
+    const hourly = hRaw.map(dayArr => {
+        if (!Array.isArray(dayArr) || dayArr.length < 5) return null;
+        const isCoastal = dayArr.length >= 10;
+        const codes   = dayArr[0] || [];
+        const temps   = dayArr[1] || [];
+        const pops    = dayArr[2] || [];
+        const precips = dayArr[3] || [];
+        const wspds   = dayArr[4] || [];
+        const wdirs   = isCoastal ? (dayArr[5] || []) : null;
+        const waves   = isCoastal ? (dayArr[6] || []) : null;
+
+        const len = codes.length;
+        const rows = new Array(len);
+        for (let i = 0; i < len; i++) {
+            if (isCoastal) {
+                rows[i] = [
+                    codes[i] ?? 0,
+                    temps[i] ?? 0,
+                    pops[i] ?? 0,
+                    precips[i] ?? 0,
+                    wspds[i] ?? 0,
+                    wdirs[i] ?? 0,
+                    waves[i] ?? 0
+                ];
+            } else {
+                rows[i] = [
+                    codes[i] ?? 0,
+                    temps[i] ?? 0,
+                    pops[i] ?? 0,
+                    precips[i] ?? 0,
+                    wspds[i] ?? 0
+                ];
+            }
+        }
+
+        if (isCoastal) {
+            return {
+                weather: rows,
+                oneday: {
+                    avg: Number(dayArr[7] ?? 0),
+                    sunrise: Number(dayArr[8] ?? 360),
+                    sunset: Number(dayArr[9] ?? 1080)
+                }
+            };
+        }
+        return { weather: rows };
+    }).filter(Boolean);
+
+    const daily = dRaw.map(dayArr => {
+        if (!Array.isArray(dayArr) || dayArr.length < 2) return null;
+        const isCoastal = dayArr.length >= 6;
+        if (isCoastal) {
+            return {
+                weather: [dayArr[0] ?? 0, dayArr[1] ?? 0],
+                dailyEx: {
+                    avg: Number(dayArr[2] ?? 0),
+                    wave: Number(dayArr[3] ?? 0),
+                    sunrise: Number(dayArr[4] ?? 360),
+                    sunset: Number(dayArr[5] ?? 1080)
+                }
+            };
+        }
+        return {
+            weather: [dayArr[0] ?? 0, dayArr[1] ?? 0]
+        };
+    }).filter(Boolean);
+
+    return { hourly, daily };
+}
+window.expandSpotWeatherV2 = expandSpotWeatherV2;
+
+function loadPrefWeatherV2Json(prefCode) {
+    if (!prefCode) return Promise.resolve(null);
+    const cleanPref = String(prefCode).trim().toUpperCase();
+    const regionCode = window.currentRegion || 'KANTO';
+    const key = `${regionCode}_v2_${cleanPref}`;
+
+    if (window.prefWeatherV2Cache[key]) {
+        return Promise.resolve(normalizeWeatherJsonByDate(window.prefWeatherV2Cache[key]));
+    }
+    if (window.prefWeatherV2Promises[key]) return window.prefWeatherV2Promises[key];
+
+    const url = `/data/${cleanPref}_weather_v2.json`;
+
+    window.prefWeatherV2Promises[key] = fetch(url)
+        .then(res => {
+            if (!res.ok) throw new Error('Weather v2 JSON fetch failed: ' + res.status);
+            return res.json();
+        })
+        .then(data => {
+            if (!data || !data.spots || typeof data.spots !== 'object') {
+                throw new Error('Weather v2 JSON の spots が見つかりません: ' + url);
+            }
+            for (const spotName of Object.keys(data.spots)) {
+                data.spots[spotName] = expandSpotWeatherV2(data.spots[spotName]);
+            }
+            normalizeWeatherJsonByDate(data);
+            window.prefWeatherV2Cache[key] = data;
+            return data;
+        })
+        .catch(error => {
+            delete window.prefWeatherV2Promises[key];
+            console.error('天気v2 JSON取得エラー:', cleanPref, error);
+            return null;
+        });
+
+    return window.prefWeatherV2Promises[key];
+}
+window.loadPrefWeatherV2Json = loadPrefWeatherV2Json;
+
+function applyPrefWeatherV2Json(prefCode) {
+    if (!prefCode) return Promise.resolve(0);
+    const cleanPref = String(prefCode).trim().toUpperCase();
+    const regionCode = window.currentRegion || 'KANTO';
+    const applyKey = `${regionCode}_v2_${cleanPref}`;
+
+    if (window.prefWeatherV2Applied[applyKey]) return Promise.resolve(0);
+    if (window.prefWeatherV2ApplyPromises[applyKey]) return window.prefWeatherV2ApplyPromises[applyKey];
+
+    const rows = window.prefSpotData && window.prefSpotData[cleanPref];
+    if (!Array.isArray(rows)) return Promise.resolve(0);
+
+    const applyPromise = loadPrefWeatherV2Json(cleanPref).then(data => {
+        if (!data || !data.spots || typeof data.spots !== 'object') return 0;
+        let applied = 0;
+        for (const spot of rows) {
+            const weather = data.spots[spot.name];
+            if (!weather) continue;
+            spot.whether = weather;
+            applied++;
+        }
+        window.prefWeatherV2Applied[applyKey] = true;
+        return applied;
+    });
+
+    window.prefWeatherV2ApplyPromises[applyKey] = applyPromise.then(result => {
+        delete window.prefWeatherV2ApplyPromises[applyKey];
+        return result;
+    }).catch(error => {
+        delete window.prefWeatherV2ApplyPromises[applyKey];
+        console.error('天気v2 JSON付与エラー:', cleanPref, error);
+        return 0;
+    });
+
+    return window.prefWeatherV2ApplyPromises[applyKey];
+}
+
+function runPrefWeatherV2Json(prefCode, mode = 'select') {
+    if (!['select', 'other', 'all'].includes(mode) || (mode !== 'all' && !prefCode)) {
+        return Promise.reject(new Error('天気v2 JSONの mode は select / other / all を指定してください'));
+    }
+    const regionCode = window.currentRegion || 'KANTO';
+    const allKey = `${regionCode}_v2_all`;
+
+    if (mode === 'all') {
+        if (window.regionWeatherV2AllDone[allKey]) return Promise.resolve(window.regionWeatherV2AllResults[allKey] || 0);
+        if (window.regionWeatherV2AllPromises[allKey]) return window.regionWeatherV2AllPromises[allKey];
+    }
+
+    const runPromise = (async () => {
+        const csvData = await loadRegionCsvData();
+        const prefList = [...new Set((csvData && csvData.prefRows || []).map(row => row.prefCode).filter(Boolean))];
+        const targetList = mode === 'select'
+            ? [prefCode]
+            : mode === 'other'
+                ? prefList.filter(code => code !== prefCode)
+                : prefList;
+
+        let totalApplied = 0;
+        let allSucceeded = true;
+        for (const code of targetList) {
+            if (!Array.isArray(window.prefSpotData && window.prefSpotData[code])) {
+                await loadPrefectureSpots(code, 'select');
+            }
+            totalApplied += await applyPrefWeatherV2Json(code);
+            const applyKey = `${regionCode}_v2_${String(code).trim().toUpperCase()}`;
+            if (!window.prefWeatherV2Applied[applyKey]) allSucceeded = false;
+        }
+        return { totalApplied, allSucceeded };
+    })();
+
+    if (mode !== 'all') return runPromise.then(result => result.totalApplied);
+
+    const allPromise = runPromise.then(result => {
+        if (!result.allSucceeded) {
+            throw new Error('全県の天気v2 JSON付与が完了していません。失敗した県は再試行できます: ' + allKey);
+        }
+        window.regionWeatherV2AllDone[allKey] = true;
+        window.regionWeatherV2AllResults[allKey] = result.totalApplied;
+        return result.totalApplied;
+    }).finally(() => {
+        delete window.regionWeatherV2AllPromises[allKey];
+    });
+    window.regionWeatherV2AllPromises[allKey] = allPromise;
+    return allPromise;
+}
+
+function AddWeatherV2(prefCode, mode = 'select') {
+    return runPrefWeatherV2Json(prefCode, mode);
+}
+window.AddWeatherV2 = AddWeatherV2;
+
+// ==========================================
 // REGION 初期ロード管理
 // ==========================================
 async function region_management() {
@@ -934,10 +1161,7 @@ async function region_management() {
         return null;
     });
 
-    const weatherPromise = Promise.all([
-        AddWeather(null, 'all'),
-        AddInLandWeather(null, 'all')
-    ]).then(() => {
+    const weatherPromise = AddWeatherV2(null, 'all').then(() => {
         if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
     }).catch(error => {
         console.error('全県天気JSON読み込みエラー:', error);

@@ -171,7 +171,9 @@ async function showPrefMarkers() {
 // 県別の沿岸天気JSONを取得して、その県の行へ付与。
 // 内陸天気JSONは従来どおり、マーカー表示後に別途付与する。
 function applyPrefWeather(prefCode) {
-    return AddWeather(prefCode, 'select');
+    return typeof AddWeatherV2 === 'function'
+        ? AddWeatherV2(prefCode, 'select')
+        : AddWeather(prefCode, 'select');
 }
 
 // 1県ぶんの天気＋魚種を並列で付与
@@ -195,9 +197,11 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
     await (selectedPromise || applyPrefWeatherAndFish(prefCode, regionCode));
     if (isStale()) return;
 
-    // 2. 内陸天気JSON：マーカー描画完了後に選択県へ付与
+    // 2. マーカー描画完了を待機（weather_v2は沿岸・内陸一括付与済み、旧ローダー時のみ内陸補完）
     await markersPromise;
-    await AddInLandWeather(prefCode, 'select');
+    if (typeof AddWeatherV2 !== 'function' && typeof AddInLandWeather === 'function') {
+        await AddInLandWeather(prefCode, 'select');
+    }
     if (isStale()) return;
 
     // 選択県の沿岸・内陸天気JSONが揃ってからPREF画面UIを初期化する（エリア・スポット画面遷移後は上書きしない）。
@@ -206,7 +210,7 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
         if (typeof renderPrefWeather === 'function') renderPrefWeather();
     }
 
-    // 3. 他県：1県ずつ順番に、沿岸JSON → 内陸JSON → 魚種JSONの付与を進める
+    // 3. 他県：1県ずつ順番に、天気v2 JSON → 魚種JSONの付与を進める
     const csvData = await loadRegionCsvData();
     const otherCodes = (csvData.prefRows || [])
         .map(p => p.prefCode)
@@ -216,7 +220,9 @@ async function runPrefBackgroundLoads(prefCode, markersPromise, gen, selectedPro
         if (isStale()) return;
         await yieldFrame();
         await applyPrefWeatherAndFish(code, regionCode);
-        await AddInLandWeather(code, 'select');
+        if (typeof AddWeatherV2 !== 'function' && typeof AddInLandWeather === 'function') {
+            await AddInLandWeather(code, 'select');
+        }
     }
 
     // 中断されずに全県ぶん終えたら完了フラグを立てる
@@ -864,7 +870,7 @@ function refreshPrefGlobals(regionCode, prefCode, prefName) {
 
 
     window.prefLocationUrl      = `/${regionCode}/${prefCode}_location.json`;
-    window.prefWeatherUrl       = `/data/${prefCode}_whether.json`;
+    window.prefWeatherUrl       = `/data/${prefCode}_weather_v2.json`;
     window.prefInlandWeatherUrl = `/data/${prefCode}_InLandwhether.json`;
     window.fishUrl              = `/${regionCode}/${prefCode}_fish.json`;
     window.prefShopUrl          = `/${regionCode}/${prefCode}_shop.json`;
