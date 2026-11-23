@@ -3306,3 +3306,406 @@ a.basis-action-pill:active {
   flex-shrink: 0;
   white-space: nowrap;
 }
+
+
+/* =========================================
+   地図外展開：週間天気・2時間毎天気パネル v2（白背景 × #191970 テーマ統一）
+========================================= */
+.spot-weather-panel {
+  background: #fff;
+  padding: 8px 16px 2px 16px;
+  color: #191970;
+}
+
+.spot-weather-card {
+  background: #ffffff;
+  border: 1px solid rgba(25, 25, 112, 0.16);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(25, 25, 112, 0.06);
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 2時間ごと天気エリア */
+.spot-hourly-v2 {
+  border-bottom: 1px solid rgba(25, 25, 112, 0.14);
+  background: #ffffff;
+}
+
+.sw2-hourly-grid-wrap {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+
+.sw2-hourly-labels {
+  flex: 0 0 26px;
+  width: 26px;
+  display: flex;
+  flex-direction: column;
+  background: #f4f7fd;
+  border-right: 1px solid rgba(25, 25, 112, 0.12);
+}
+
+.sw2-hourly-label {
+  height: 18px;
+  line-height: 18px;
+  font-size: 9px;
+  font-weight: bold;
+  color: #191970;
+  opacity: 0.78;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sw2-hourly-label.is-head {
+  height: 20px;
+  line-height: 20px;
+  background: #eef3f8;
+  opacity: 0.9;
+}
+
+.sw2-hourly-table {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sw2-hourly-row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  height: 18px;
+  align-items: center;
+  border-bottom: 1px dashed rgba(25, 25, 112, 0.08);
+}
+
+.sw2-hourly-row:last-child {
+  border-bottom: none;
+}
+
+.sw2-hourly-row.is-time {
+  height: 20px;
+  background: #eef3f8;
+  border-bottom: 1px solid rgba(25, 25, 112, 0.12);
+}
+
+.sw2-hourly-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 100%;
+  font-size: 10px;
+  color: #191970;
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+
+.sw2-hourly-cell.is-time {
+  font-size: 10px;
+  font-weight: bold;
+  color: #191970;
+}
+
+.sw2-hourly-cell.is-icon {
+  font-size: 11px;
+}
+
+.sw2-hourly-cell.is-wind-dir {
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.sw2-hourly-cell.is-rain-hit {
+  color: #0969da;
+  font-weight: bold;
+}
+
+.sw2-hourly-cell.is-strong-wind {
+  color: #c2410c;
+  font-weight: bold;
+}
+
+/* 4〜7日目選択時の日別コンパクトサマリーバー */
+.sw2-daily-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 10px;
+  background: #f4f7fd;
+  font-size: 11px;
+  font-weight: bold;
+  color: #191970;
+}
+
+.sw2-daily-date {
+  padding: 1px 7px;
+  background: #191970;
+  color: #ffffff;
+  border-radius: 999px;
+  font-size: 10px;
+}
+
+.sw2-daily-sun {
+  font-size: 10px;
+  font-weight: normal;
+  opacity: 0.85;
+}
+
+/* 週間天気エリア */
+.spot-week-v2 {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  background: #ffffff;
+}
+
+.sw2-week-labels {
+  flex: 0 0 26px;
+  width: 26px;
+  display: flex;
+  flex-direction: column;
+  background: #f4f7fd;
+  border-right: 1px solid rgba(25, 25, 112, 0.12);
+}
+
+.sw2-week-label {
+  height: 18px;
+  line-height: 18px;
+  font-size: 9px;
+  font-weight: bold;
+  color: #191970;
+  opacity: 0.78;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sw2-week-table {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sw2-week-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  height: 18px;
+  align-items: center;
+  border-bottom: 1px dashed rgba(25, 25, 112, 0.08);
+}
+
+.sw2-week-row:first-child {
+  background: #f8faff;
+  border-bottom: 1px solid rgba(25, 25, 112, 0.1);
+}
+
+.sw2-week-row:last-child {
+  border-bottom: none;
+}
+
+.sw2-week-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 100%;
+  font-size: 10.5px;
+  color: #191970;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease;
+}
+
+.sw2-week-cell.is-date {
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.sw2-week-cell.is-tide {
+  font-size: 10px;
+}
+
+.sw2-week-cell.is-big-tide {
+  color: #e60033;
+  font-weight: bold;
+}
+
+.sw2-week-cell.is-icon {
+  font-size: 12px;
+}
+
+.sw2-week-cell.is-active {
+  background: rgba(25, 25, 112, 0.1);
+  font-weight: bold;
+}
+
+@media (max-width: 350px) {
+  .sw2-hourly-labels,
+  .sw2-week-labels {
+    flex-basis: 22px;
+    width: 22px;
+  }
+  .sw2-hourly-label,
+  .sw2-week-label {
+    font-size: 8px;
+  }
+  .sw2-hourly-cell {
+    font-size: 8.5px;
+    letter-spacing: -0.5px;
+  }
+  .sw2-week-cell {
+    font-size: 9.5px;
+  }
+}
+
+/* =========================================
+   タイドグラフ v2（パターンB：地図全体オーバーレイ & GitHub usage風ツールチップ）
+========================================= */
+.map-tide-btn.active {
+  background: #191970;
+}
+
+.tide-overlay-v2 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.tide-overlay-v2.is-visible {
+  opacity: 1;
+}
+
+.tide-v2-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tide-v2-hud {
+  position: absolute;
+  top: 52px;
+  left: 12px;
+  z-index: 8020;
+  pointer-events: auto;
+}
+
+.tide-v2-date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #191970;
+  border: 1px solid rgba(25, 25, 112, 0.25);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: bold;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+  user-select: none;
+  cursor: pointer;
+}
+
+.tide-v2-arrow {
+  font-size: 13px;
+  opacity: 0.65;
+}
+
+.tide-v2-tidename.is-big {
+  color: #e60033;
+}
+
+.tide-v2-sun-meta {
+  font-size: 10px;
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+.tide-v2-sun-line {
+  stroke: rgba(255, 165, 0, 0.7);
+  stroke-width: 1.1;
+  stroke-dasharray: 3 3;
+}
+
+.tide-v2-cursor-line {
+  stroke: #191970;
+  stroke-width: 1.2;
+  stroke-dasharray: 3 2;
+  opacity: 0.75;
+}
+
+.tide-v2-cursor-dot {
+  fill: #0969da;
+  stroke: #ffffff;
+  stroke-width: 2.5;
+}
+
+.tide-v2-peak-text {
+  font-size: 10px;
+  font-weight: bold;
+  fill: #191970;
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+.tide-v2-tooltip {
+  position: absolute;
+  z-index: 8030;
+  min-width: 138px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.97);
+  color: #1f2328;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(31, 35, 40, 0.18);
+  font-size: 11px;
+  line-height: 1.4;
+  pointer-events: auto;
+}
+
+.tide-v2-tt-header {
+  font-weight: bold;
+  color: #191970;
+  border-bottom: 1px solid #eaeef2;
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+
+.tide-v2-tt-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tide-v2-tt-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0969da;
+  flex-shrink: 0;
+}
+
+.tide-v2-tt-val {
+  margin-left: auto;
+  font-weight: bold;
+  font-size: 12px;
+  color: #191970;
+}
+
+.tide-v2-tt-sub {
+  margin-top: 3px;
+  font-size: 10px;
+  color: #59636e;
+}
