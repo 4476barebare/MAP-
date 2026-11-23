@@ -3660,7 +3660,7 @@ a.basis-action-pill:active {
 .tide-v2-tooltip {
   position: absolute;
   z-index: 8030;
-  min-width: 138px;
+  min-width: 0;
   padding: 8px 10px;
   background: rgba(255, 255, 255, 0.97);
   color: #1f2328;
@@ -3668,41 +3668,63 @@ a.basis-action-pill:active {
   border-radius: 8px;
   box-shadow: 0 6px 18px rgba(31, 35, 40, 0.18);
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
   pointer-events: auto;
 }
 
-.tide-v2-tt-header {
-  font-weight: bold;
-  color: #191970;
-  border-bottom: 1px solid #eaeef2;
-  padding-bottom: 3px;
-  margin-bottom: 4px;
-}
-
-.tide-v2-tt-row {
+.tide-v2-tt-top {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  justify-content: flex-start;
   gap: 6px;
+  white-space: nowrap;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #eaeef2;
 }
 
-.tide-v2-tt-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #0969da;
-  flex-shrink: 0;
+.tide-v2-tt-time {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #191970;
+  letter-spacing: -0.3px;
 }
 
-.tide-v2-tt-val {
-  margin-left: auto;
-  font-weight: bold;
-  font-size: 12px;
+.tide-v2-tt-cm {
+  font-size: 13px;
+  font-weight: 700;
   color: #191970;
 }
 
 .tide-v2-tt-sub {
-  margin-top: 3px;
-  font-size: 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 10.5px;
+  color: #59636e;
+  white-space: nowrap;
+}
+
+.tide-v2-tt-next strong {
+  color: #191970;
+}
+
+.tide-v2-tt-diff {
+  font-weight: 700;
+  font-size: 10.5px;
+}
+
+.tide-v2-tt-diff.is-up {
+  color: #e60033;
+}
+
+.tide-v2-tt-diff.is-down {
+  color: #0969da;
+}
+
+.tide-v2-tt-diff.is-flat {
   color: #59636e;
 }
