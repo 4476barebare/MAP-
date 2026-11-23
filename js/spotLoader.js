@@ -628,6 +628,7 @@ function zoomToSpot(spot, options = {}) {
                 if (tideBtn) {
                     const isInland = typeof isInlandFishingSpot === 'function' && isInlandFishingSpot(safe);
                     tideBtn.classList.remove('active');
+                    tideBtn.textContent = 'タイドグラフ';
                     if (isInland) {
                         tideBtn.style.display = 'none';
                         tideBtn.style.opacity = '0';
@@ -777,6 +778,7 @@ function zoomToSpot(spot, options = {}) {
             tideBtnInit.style.opacity = '0';
             tideBtnInit.style.pointerEvents = 'none';
             tideBtnInit.classList.remove('active');
+            tideBtnInit.textContent = 'タイドグラフ';
         }
         if (postBtn) {
             postBtn.style.opacity = '0';
@@ -785,7 +787,7 @@ function zoomToSpot(spot, options = {}) {
     }
 
     const el = document.getElementById("nearest-spot");
-    if (el) el.textContent = safe.name || '';
+    if (el) el.textContent = '';
 
     if (safe?.individualId != null) {
         if (window.prefData) setIdealQuery('pref', window.prefData.notes);
@@ -2346,6 +2348,23 @@ function buildDayTideSeriesWithNextZero(tideDays, dayIndex) {
 window._tideGraphEnabled = false;
 window._tideGraphDayIndex = 0;
 
+function updateTideToggleBtnLabel(dayIndex = null) {
+  const tideBtn = document.getElementById('map-tide-btn');
+  if (!tideBtn) return;
+
+  if (!window._tideGraphEnabled || dayIndex == null) {
+    tideBtn.textContent = 'タイドグラフ';
+    return;
+  }
+
+  const d = new Date();
+  d.setDate(d.getDate() + Number(dayIndex));
+  const dd = String(d.getDate()).padStart(2, '0');
+  const tideRaw = window.tideWeek && window.tideWeek[dayIndex];
+  const tideName = (tideRaw && typeof tideRaw === 'object') ? (tideRaw.tide || '') : (tideRaw || '');
+  tideBtn.textContent = `${dd}日${tideName}`;
+}
+
 function ensureTideToggleBtn() {
   const tileWrap = document.getElementById('tile-btn-wrap');
   const tileBtn = document.getElementById('map-tile-btn');
@@ -2384,6 +2403,7 @@ async function toggleTideGraphMode(forceState) {
     const tideBtn = ensureTideToggleBtn();
     if (tideBtn) {
       tideBtn.classList.remove('active');
+      tideBtn.textContent = 'タイドグラフ';
       tideBtn.style.display = 'none';
       tideBtn.style.opacity = '0';
     }
@@ -2399,7 +2419,10 @@ async function toggleTideGraphMode(forceState) {
   const tideBtn = ensureTideToggleBtn();
 
   if (!nextState) {
-    if (tideBtn) tideBtn.classList.remove('active');
+    if (tideBtn) {
+      tideBtn.classList.remove('active');
+      tideBtn.textContent = 'タイドグラフ';
+    }
     closeTideGraphOverlay();
     return;
   }
@@ -2408,14 +2431,20 @@ async function toggleTideGraphMode(forceState) {
 
   if (!spot) {
     window._tideGraphEnabled = false;
-    if (tideBtn) tideBtn.classList.remove('active');
+    if (tideBtn) {
+      tideBtn.classList.remove('active');
+      tideBtn.textContent = 'タイドグラフ';
+    }
     return;
   }
 
   const tideDays = await getSpotTideDaysV2(spot.name, spot._prefCode || window.currentPref);
   if (!tideDays || tideDays.length === 0) {
     window._tideGraphEnabled = false;
-    if (tideBtn) tideBtn.classList.remove('active');
+    if (tideBtn) {
+      tideBtn.classList.remove('active');
+      tideBtn.textContent = 'タイドグラフ';
+    }
     return;
   }
 
@@ -2506,6 +2535,9 @@ window._tideOverlayState = {
   selectedHourFloat: null,
   samplePoints: [],
   peaks: [],
+  isScrubbingLine: false,
+  lastScrubEndTime: 0,
+  mouseScrubCleanup: null,
   outsideTouchHandler: null
 };
 
@@ -2542,6 +2574,9 @@ function openTideGraphOverlay(spot, tideDays, dayIndex = 0, options = {}) {
   window._tideOverlayState.dayIndex = safeIdx;
   window._tideOverlayState.maxHour = maxHour;
 
+  // ON中の「タイドグラフ」ボタンに日付＋潮回り（dd日中潮）を表示
+  updateTideToggleBtnLabel(safeIdx);
+
   renderTideSvgWithMorph(overlay, {
     spotName: spot.name,
     series,
@@ -2563,6 +2598,10 @@ function closeTideGraphOverlay() {
     cancelAnimationFrame(window._tideOverlayState.morphRafId);
     window._tideOverlayState.morphRafId = null;
   }
+  if (typeof window._tideOverlayState.mouseScrubCleanup === 'function') {
+    window._tideOverlayState.mouseScrubCleanup();
+    window._tideOverlayState.mouseScrubCleanup = null;
+  }
   const overlay = document.getElementById('tide-overlay-v2');
   if (overlay) {
     overlay.classList.remove('is-visible');
@@ -2573,6 +2612,8 @@ function closeTideGraphOverlay() {
   window._tideOverlayState.currentYSlots = null;
   window._tideOverlayState.selectedHourFloat = null;
   window._tideOverlayState.samplePoints = [];
+  window._tideOverlayState.isScrubbingLine = false;
+  updateTideToggleBtnLabel(null);
   unbindTideOutsideCloseListener();
 }
 
@@ -2657,16 +2698,9 @@ function renderTideSvgWithMorph(overlay, cfg) {
   const peaks = extractTidePeaksV2(cfg.series);
   window._tideOverlayState.peaks = peaks;
 
-  const sunriseStr = formatFloatHourToHHMM(cfg.sun.sunrise / 60);
-  const sunsetStr  = formatFloatHourToHHMM(cfg.sun.sunset / 60);
-
   let svgEl = document.getElementById('tideV2Svg');
   if (!svgEl) {
     overlay.innerHTML = `
-      <div class="tide-v2-hud">
-        <div class="tide-v2-date-pill" id="tideV2DatePill"></div>
-      </div>
-
       <svg id="tideV2Svg" class="tide-v2-svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">
         <defs>
           <linearGradient id="tideLineSunGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -2704,7 +2738,7 @@ function renderTideSvgWithMorph(overlay, cfg) {
               stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"
               filter="url(#tideLineShadow)" />
         <path id="tideV2HitPath" fill="none" stroke="transparent"
-              stroke-width="36" stroke-linecap="round" style="pointer-events: stroke; cursor: pointer;" />
+              stroke-width="36" stroke-linecap="round" class="tide-v2-hit-path" />
 
         <line id="tideV2CursorLine" x1="0" y1="${topY}" x2="0" y2="${bottomY}"
               class="tide-v2-cursor-line" style="display:none;" />
@@ -2718,17 +2752,6 @@ function renderTideSvgWithMorph(overlay, cfg) {
     `;
 
     bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY);
-  }
-
-  const datePill = document.getElementById('tideV2DatePill');
-  if (datePill) {
-    datePill.innerHTML = `
-      <span class="tide-v2-arrow">‹</span>
-      <span class="tide-v2-date-text">${cfg.dateLabel}</span>
-      ${cfg.tideName ? `<span class="tide-v2-tidename ${cfg.tideName === '大潮' ? 'is-big' : ''}">${cfg.tideName}</span>` : ''}
-      <span class="tide-v2-sun-meta">☀${sunriseStr} / 🌙${sunsetStr}</span>
-      <span class="tide-v2-arrow">›</span>
-    `;
   }
 
   const updateStop = (id, pct) => {
@@ -2805,7 +2828,6 @@ function renderTideSvgWithMorph(overlay, cfg) {
     const elapsed = now - startTime;
 
     if (useReverseFirst && elapsed < flattenMs) {
-      // Phase 1（逆再生）: 現在の波形 → 水平直線へ戻る
       const p1 = easeInQuad(Math.min(1, elapsed / flattenMs));
       const interpY = new Array(25);
       for (let h = 0; h <= 24; h++) {
@@ -2816,7 +2838,6 @@ function renderTideSvgWithMorph(overlay, cfg) {
       return;
     }
 
-    // Phase 2: 水平直線（または開始波形） → 新しい日の波形へ立ち上がる
     const fromSlots = useReverseFirst ? flatYSlots : startYSlots;
     const rawT = Math.min(1, (elapsed - flattenMs) / riseMs);
     const eased = easeOutCubic(rawT);
@@ -2959,7 +2980,7 @@ function renderTooltipFromSample(overlay, nearest) {
 
   const ttW = tooltip.offsetWidth || 148;
   const leftPos = Math.max(10, Math.min(rect.width - ttW - 10, nearest.x - ttW / 2));
-  const topPos = Math.max(46, nearest.y - (tooltip.offsetHeight || 72) - 14);
+  const topPos = Math.max(40, nearest.y - (tooltip.offsetHeight || 72) - 14);
   tooltip.style.left = `${leftPos}px`;
   tooltip.style.top = `${topPos}px`;
 }
@@ -2983,17 +3004,14 @@ function updateTooltipAtHour(overlay, targetHour) {
 function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
   const hitPath  = document.getElementById('tideV2HitPath');
   const swipeBox = document.getElementById('tideV2SwipeBox');
-  const datePill = document.getElementById('tideV2DatePill');
   if (!hitPath) return;
 
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let isScrubbingLine = false;
+  const st = window._tideOverlayState;
 
   const updateTooltipAtClientX = (clientX) => {
     const rect = overlay.getBoundingClientRect();
     const localX = clientX - rect.left;
-    const samples = window._tideOverlayState.samplePoints;
+    const samples = st.samplePoints;
     if (!samples || samples.length === 0) return;
 
     let nearest = samples[0];
@@ -3008,68 +3026,97 @@ function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
     renderTooltipFromSample(overlay, nearest);
   };
 
-  // ① 線の上でのタッチ／クリック操作（時刻・潮位ツールチップ表示 ＆ 横スワイプ日付切替）
+  // ① 線の上でのタッチ／ドラッグ操作（なぞり専用：横スワイプ日付切替は完全に無効化）
   hitPath.addEventListener('touchstart', (e) => {
     if (!e.touches || e.touches.length !== 1) return;
     e.stopPropagation();
-    const t = e.touches[0];
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
-    isScrubbingLine = true;
-    updateTooltipAtClientX(t.clientX);
-  }, { passive: true });
+    e.preventDefault();
+    st.isScrubbingLine = true;
+    updateTooltipAtClientX(e.touches[0].clientX);
+  }, { passive: false });
 
   hitPath.addEventListener('touchmove', (e) => {
-    if (!isScrubbingLine || !e.touches || e.touches.length !== 1) return;
+    if (!st.isScrubbingLine || !e.touches || e.touches.length !== 1) return;
     e.stopPropagation();
-    const t = e.touches[0];
-    updateTooltipAtClientX(t.clientX);
-  }, { passive: true });
+    e.preventDefault();
+    updateTooltipAtClientX(e.touches[0].clientX);
+  }, { passive: false });
 
-  hitPath.addEventListener('touchend', (e) => {
-    if (!isScrubbingLine) return;
+  const finishLineScrub = (e) => {
+    if (!st.isScrubbingLine) return;
     e.stopPropagation();
-    isScrubbingLine = false;
+    st.isScrubbingLine = false;
+    st.lastScrubEndTime = Date.now();
+  };
+  hitPath.addEventListener('touchend', finishLineScrub, { passive: true });
+  hitPath.addEventListener('touchcancel', finishLineScrub, { passive: true });
 
-    const t = e.changedTouches && e.changedTouches[0];
-    if (!t) return;
-    const dx = t.clientX - touchStartX;
-    const dy = t.clientY - touchStartY;
-
-    // 線の上でも横スワイプ（40px以上の横移動）なら日付切替
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-      shiftTideOverlayDay(dx < 0 ? 1 : -1);
-    }
-  }, { passive: true });
-
+  // PCマウスでの線上なぞり操作にも対応
+  let isMouseScrubbing = false;
+  const onWinMouseMove = (e) => {
+    if (!isMouseScrubbing) return;
+    e.stopPropagation();
+    updateTooltipAtClientX(e.clientX);
+  };
+  const onWinMouseUp = () => {
+    if (!isMouseScrubbing) return;
+    isMouseScrubbing = false;
+    st.isScrubbingLine = false;
+    st.lastScrubEndTime = Date.now();
+  };
+  hitPath.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    isMouseScrubbing = true;
+    st.isScrubbingLine = true;
+    updateTooltipAtClientX(e.clientX);
+  });
   hitPath.addEventListener('click', (e) => {
     e.stopPropagation();
     updateTooltipAtClientX(e.clientX);
   });
+  window.addEventListener('mousemove', onWinMouseMove);
+  window.addEventListener('mouseup', onWinMouseUp);
+  st.mouseScrubCleanup = () => {
+    window.removeEventListener('mousemove', onWinMouseMove);
+    window.removeEventListener('mouseup', onWinMouseUp);
+  };
 
-  // ② 四角いグラフ描画領域全体（tideV2SwipeBox）での横スワイプ日付切替 ＆ 単タップで閉じる
+  // ② 線以外の四角いグラフ描画領域全体（横スワイプ日付切替 ＆ 単タップで閉じる）
   if (swipeBox) {
     let boxStartX = 0;
     let boxStartY = 0;
+    let boxTouchActive = false;
 
     swipeBox.addEventListener('touchstart', (e) => {
-      if (!e.touches || e.touches.length !== 1) return;
+      if (st.isScrubbingLine || !e.touches || e.touches.length !== 1) return;
       e.stopPropagation();
       boxStartX = e.touches[0].clientX;
       boxStartY = e.touches[0].clientY;
+      boxTouchActive = true;
     }, { passive: true });
 
     swipeBox.addEventListener('touchmove', (e) => {
-      if (!e.touches || e.touches.length !== 1) return;
+      if (!boxTouchActive || st.isScrubbingLine || !e.touches || e.touches.length !== 1) return;
       const dx = Math.abs(e.touches[0].clientX - boxStartX);
       const dy = Math.abs(e.touches[0].clientY - boxStartY);
       // 横スワイプ動作中は背後マップのパンを抑止
-      if (dx > 10 && dx > dy) {
+      if (dx > 8 && dx > dy) {
         e.stopPropagation();
+        e.preventDefault();
       }
-    }, { passive: true });
+    }, { passive: false });
+
+    const cancelBoxTouch = () => {
+      boxTouchActive = false;
+    };
+    swipeBox.addEventListener('touchcancel', cancelBoxTouch, { passive: true });
 
     swipeBox.addEventListener('touchend', (e) => {
+      if (!boxTouchActive) return;
+      boxTouchActive = false;
+      if (st.isScrubbingLine || (Date.now() - st.lastScrubEndTime) < 180) return;
+
       e.stopPropagation();
       const t = e.changedTouches && e.changedTouches[0];
       if (!t) return;
@@ -3090,37 +3137,9 @@ function bindTideInteractiveEvents(overlay, padL, plotW, topY, bottomY) {
     }, { passive: true });
 
     swipeBox.addEventListener('click', (e) => {
+      if (st.isScrubbingLine || (Date.now() - st.lastScrubEndTime) < 220) return;
       e.stopPropagation();
       toggleTideGraphMode(false);
-    });
-  }
-
-  // ③ 上部日付ピルでの左右スワイプ＆タップ切替にも対応
-  if (datePill) {
-    let pillStartX = 0;
-    datePill.addEventListener('touchstart', (e) => {
-      e.stopPropagation();
-      pillStartX = e.touches[0].clientX;
-    }, { passive: true });
-
-    datePill.addEventListener('touchend', (e) => {
-      e.stopPropagation();
-      const endX = e.changedTouches[0].clientX;
-      const dx = endX - pillStartX;
-      if (Math.abs(dx) > 35) {
-        shiftTideOverlayDay(dx < 0 ? 1 : -1);
-      } else {
-        const r = datePill.getBoundingClientRect();
-        const isLeft = (endX - r.left) < r.width / 2;
-        shiftTideOverlayDay(isLeft ? -1 : 1);
-      }
-    }, { passive: true });
-
-    datePill.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const r = datePill.getBoundingClientRect();
-      const isLeft = (e.clientX - r.left) < r.width / 2;
-      shiftTideOverlayDay(isLeft ? -1 : 1);
     });
   }
 }
@@ -3143,6 +3162,7 @@ function shiftTideOverlayDay(delta) {
 
 /**
  * グラフ外側（マップ上部・下部等）での単タップ閉じ ＆ グラフ帯高さでの横スワイプ補助
+ * ※ 線をなぞっている最中・直後は完全に無視する
  */
 function bindTideOutsideCloseListener() {
   unbindTideOutsideCloseListener();
@@ -3158,7 +3178,8 @@ function bindTideOutsideCloseListener() {
   const evalOutsideAction = (startX, startY, endX, endY, targetEl, allowSwipe) => {
     const st = window._tideOverlayState;
     if (!st.isOpen) return;
-    if (targetEl && targetEl.closest('#map-tool-bar, #tideV2DatePill, #tideV2Tooltip, #tideV2HitPath, #tideV2SwipeBox')) return;
+    if (st.isScrubbingLine || (Date.now() - (st.lastScrubEndTime || 0)) < 220) return;
+    if (targetEl && targetEl.closest('#map-tool-bar, #tideV2Tooltip, #tideV2HitPath, #tideV2SwipeBox')) return;
 
     const dx = endX - startX;
     const dy = endY - startY;
@@ -3181,18 +3202,21 @@ function bindTideOutsideCloseListener() {
   };
 
   const onTouchStart = (e) => {
+    if (window._tideOverlayState.isScrubbingLine) return;
     if (!e.touches || e.touches.length !== 1) return;
     downX = e.touches[0].clientX;
     downY = e.touches[0].clientY;
   };
 
   const onTouchEnd = (e) => {
+    if (window._tideOverlayState.isScrubbingLine) return;
     const t = e.changedTouches && e.changedTouches[0];
     if (!t) return;
     evalOutsideAction(downX, downY, t.clientX, t.clientY, e.target, true);
   };
 
   const onMouseDown = (e) => {
+    if (window._tideOverlayState.isScrubbingLine) return;
     mouseDownX = e.clientX;
     mouseDownY = e.clientY;
   };
@@ -4979,6 +5003,7 @@ window.clearSpotWeatherV2 = clearSpotWeatherV2;
 window.decode1DPolyline = decode1DPolyline;
 window.loadPrefTideV2 = loadPrefTideV2;
 window.getSpotTideDaysV2 = getSpotTideDaysV2;
+window.updateTideToggleBtnLabel = updateTideToggleBtnLabel;
 window.ensureTideToggleBtn = ensureTideToggleBtn;
 window.toggleTideGraphMode = toggleTideGraphMode;
 window.openTideGraphOverlay = openTideGraphOverlay;
