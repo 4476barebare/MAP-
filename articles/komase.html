@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>【自作集魚剤】ダイソー・業務スーパーで作るアジパワー代用レシピ！市販品の成分分析と激安配合術 | 釣り行こNAVI</title>
+  <meta name="description" content="市販集魚剤（アジパワー・サビキパワー）の原材料を成分分析し、ダイソー・ホームセンター・業務スーパーの身近な素材で作る激安自作集魚剤レシピを徹底解説。まずはワンコインで試せるダイソー配合から、500gあたり約126円（市販品の約3割）の量産コスト試算まで公開します。">
+
+  <!-- OGP -->
+  <meta property="og:site_name" content="釣り行こNAVI">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="【自作集魚剤】ダイソー・業務スーパーで作るアジパワー代用レシピ！市販品の成分分析と激安配合術">
+  <meta property="og:description" content="市販集魚剤（アジパワー・サビキパワー）の原材料を成分分析し、ダイソー・ホームセンター・業務スーパーの身近な素材で作る激安自作集魚剤レシピを徹底解説。ワンコインで試せるダイソー配合から500g約126円の量産試算まで公開します。">
+  <meta property="og:url" content="https://turiiko-navi.com/articles/komase.html">
+  <meta property="og:image" content="https://turiiko-navi.com/articles/images/komase.jpg">
+
+  <link rel="canonical" href="https://turiiko-navi.com/articles/komase.html">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "headline": "【自作集魚剤】ダイソー・業務スーパーで作るアジパワー代用レシピ！市販品の成分分析と激安配合術",
+        "description": "市販集魚剤（アジパワー・サビキパワー）の原材料を成分分析し、ダイソー・ホームセンター・業務スーパーの身近な素材で作る激安自作集魚剤レシピを徹底解説。まずはワンコインで試せるダイソー配合から、500gあたり約126円の量産コスト試算まで公開します。",
+        "image": "https://turiiko-navi.com/articles/images/komase.jpg",
+        "datePublished": "2026-11-24",
+        "author": { "@type": "Organization", "name": "釣り行こNAVI" },
+        "publisher": { "@type": "Organization", "name": "釣り行こNAVI" },
+        "mainEntityOfPage": "https://turiiko-navi.com/articles/komase.html"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "釣り行こNAVI", "item": "https://turiiko-navi.com/" },
+          { "@type": "ListItem", "position": 2, "name": "ダイソー・業務スーパーで作る自作集魚剤レシピ", "item": "https://turiiko-navi.com/articles/komase.html" }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- favicon -->
+  <link rel="icon" href="../icon/favicon.svg" type="image/svg+xml">
+
+  <!-- CSS（fish_article.css 単体で完結） -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="../css/fish_article.css">
+
+  <style>
+    .article-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 15px 0 20px 0;
+    }
+    .article-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      line-height: 1.5;
+      background: #fff;
+    }
+    .article-table th,
+    .article-table td {
+      border: 1px solid #dce4ee;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .article-table th {
+      background-color: #eef3f8;
+      color: #191970;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .article-table tr:nth-child(even) td {
+      background-color: #fafcfe;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <div class="header-inner">
+      <a href="../index.html" class="logo">釣り行こNAVI</a>
+      <nav class="nav">
+        <a href="#" id="calendarBtn">カレンダー</a>
+        <a href="#" id="newsBtn">釣りNEWS</a>
+        <a href="#" id="snsBtn">SNS釣果</a>
+      </nav>
+    </div>
+  </header>
+
+  <div id="newsModal" class="modal">
+    <div class="modal-content">
+      <div id="newsList"></div>
+    </div>
+  </div>
+
+  <div id="snsModal" class="modal">
+    <div class="modal-content">
+      <div id="snsList"></div>
+    </div>
+  </div>
+
+  <div id="calendarOverlay" class="overlay">
+    <div class="overlay-content">
+      <div id="calendarWrapper"></div>
+    </div>
+  </div>
+
+<main>
+  <article class="article" data-tags="サビキ釣り 自作集魚剤 ダイソー釣具 アジ サバ イワシ">
+
+    <header class="article-header">
+      <h1>ダイソー・ホームセンター・業務スーパーで作るアジパワー！？市販集魚剤の成分を分析して激安代用品を探してみた</h1>
+      <div class="article-meta">
+        <time datetime="2026-11-24">2026.11.24</time>
+      </div>
+    </header>
+
+    <p>
+      <img src="images/komase.jpg" alt="ダイソーや身近な素材で作る自作集魚剤とサビキ釣り">
+      サビキ釣りやカゴ釣りでコマセを撒くたび、1袋500円前後の集魚剤があっという間に消えていく——。毎回釣具店で買い足していると、エサ代だけでも意外と出費がかさむものです。<br>
+      そこで今回は、市販の集魚剤に使われている原材料を成分レベルで分解し、<strong>ダイソーやホームセンター、業務スーパーで手に入る安価な素材で代用するレシピ</strong>を徹底検証しました。目指すのは市販品の完全コピーではなく、「原材料の役割」を身近な素材で補い、低コストで実戦投入できる自作集魚剤です。
+    </p>
+
+    <nav class="article-toc" aria-label="目次">
+      <div class="toc-title">目次</div>
+      <ol>
+        <li><a href="#sec-1">1. まずは市販集魚剤（アジパワー・サビキパワー）の原材料を分析</a></li>
+        <li><a href="#sec-2">2. 【ワンコイン入門】ダイソーだけで作るお試し自作集魚剤レシピ</a></li>
+        <li><a href="#sec-3">3. 原材料の役割別！身近な代用品の選び方</a></li>
+        <li><a href="#sec-4">4. コスパ最強の運用術：「保存用ベース」＋「釣行ごとの後入れ味付け」</a></li>
+        <li><a href="#sec-5">5. 実際に作ると何円になる？2026年11月時点の価格で徹底試算</a></li>
+        <li><a href="#sec-6">6. 自作集魚剤を使ううえで知っておきたいリアルな注意点</a></li>
+        <li><a href="#sec-7">7. 集魚剤は「役割」が分かれば、ダイソーと身近な素材で十分戦える</a></li>
+      </ol>
+    </nav>
+
+    <section class="article-section" id="sec-1">
+      <h2>1. まずは市販集魚剤（アジパワー・サビキパワー）の原材料を分析</h2>
+      <p>
+        自作集魚剤を作る第一歩は、市販品に何が入っているかを知ることです。今回はサビキ釣りの定番であるマルキューの「アジパワー」と「サビキパワー」の原材料表示を参考に、それぞれの素材が果たす役割を分解しました。
+      </p>
+
+      <h3>アジパワーの主な原材料</h3>
+      <ul>
+        <li><strong>ベース・拡散調整：</strong>糟糠類（米ぬか・ふすま等）、麩、パン粉</li>
+        <li><strong>集魚・旨味成分：</strong>魚粉、酵母、アミノ酸、乳酸菌製剤</li>
+        <li><strong>視覚アピール：</strong>キララ（光を反射する素材）</li>
+      </ul>
+
+      <h3>サビキパワーの主な原材料</h3>
+      <ul>
+        <li><strong>ベース・拡散調整：</strong>糟糠類、パン粉</li>
+        <li><strong>集魚・発酵・旨味成分：</strong>酒粕、さなぎ粉、エビ粉、アミ・オキアミエキス、乳酸菌製剤、食塩</li>
+        <li><strong>視覚アピール：</strong>キララ、着色料</li>
+      </ul>
+
+      <p>
+        こうして並べてみると、市販集魚剤は単なる「魚の好きな匂い粉」ではありません。<strong>①かさ増しと煙幕を作るベース素材、②魚を寄せる動物性タンパク質・アミノ酸・発酵成分、③海中でキラキラ光って視覚に訴える反射素材</strong>という3つの役割が組み合わさって機能しています。
+      </p>
+    </section>
+
+    <section class="article-section" id="sec-2">
+      <h2>2. 【ワンコイン入門】ダイソーだけで作るお試し自作集魚剤レシピ</h2>
+      <p>
+        いきなりホームセンターや通販で10kg単位の材料を買い込むのはハードルが高いものです。まずは<strong>ダイソーで揃う4つの素材（合計440〜550円・釣行1〜2回分）</strong>だけで、自作集魚剤の使い心地や魚の反応を試してみましょう。
+      </p>
+
+      <img src="images/material.jpg" alt="ダイソーなどで揃う自作集魚剤の代用素材">
+
+      <div class="article-table-wrap">
+        <table class="article-table">
+          <thead>
+            <tr>
+              <th>役割</th>
+              <th>ダイソーで買う商品（各110円）</th>
+              <th>売り場・代用の狙い</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ベース・かさ増し</strong></td>
+              <td>パン粉（150〜200g前後）</td>
+              <td>食品コーナー。アミエビの水分を吸い、カゴからの出方を調整する</td>
+            </tr>
+            <tr>
+              <td><strong>魚粉・動物性タンパク質</strong></td>
+              <td>ペット用煮干し（無塩タイプ）</td>
+              <td>ペットコーナー。塩分無添加で魚の旨味と香りが強い</td>
+            </tr>
+            <tr>
+              <td><strong>アミノ酸・旨味</strong></td>
+              <td>味の素（小瓶）または粉末スポドリ</td>
+              <td>食品コーナー。グルタミン酸ナトリウム等で摂食スイッチを入れる</td>
+            </tr>
+            <tr>
+              <td><strong>キララ（光反射）</strong></td>
+              <td>ネイル用グリッターラメ（シルバー等）</td>
+              <td>コスメコーナー。海中で光を乱反射し、小魚のウロコのようにアピール</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>ダイソーお試しレシピの作り方と現場での混ぜ方</h3>
+      <p>
+        準備する道具も、ダイソーの<strong>「厚手チャック付き保存袋（フリーザーバッグ）」</strong>が1枚あれば完結します。自宅での下準備は3分で終わります。
+      </p>
+      <ul>
+        <li><strong>手順① 煮干しを砕く：</strong>厚手のチャック袋にペット用煮干し（半袋〜1袋）を入れ、袋の上から麺棒やすりこぎ、空き瓶の底などで細かく砕きます。完全にパウダー状にならなくても、粗挽きと粉末が混ざった状態がむしろ煙幕と粒の演出に効きます。</li>
+        <li><strong>手順② 乾物をすべて袋で混ぜる：</strong>砕いた煮干しが入った袋へ、パン粉1袋、味の素（小さじ2〜3杯）、ネイル用グリッターラメ（小さじ1〜2杯）を入れ、空気を含ませてよく振り混ぜます。</li>
+        <li><strong>手順③ 釣り場でアミエビ・海水と合わせる：</strong>釣り場に着いたら、解凍したアミコマセブロックに自作ベース粉を混ぜ込みます。パサつく場合は海水を少しずつ足し、<strong>握ると軽くまとまり、水中でほろっと崩れる硬さ</strong>に調整してください。</li>
+      </ul>
+
+      <div class="info-box">
+        <strong>【現場で失敗しないワンポイント】</strong><br>
+        パン粉の比率が多すぎると粘りが出てカゴに詰まりやすくなります。ダイソー版はまず<strong>「アミコマセ7：自作粉3」</strong>くらいの割合から混ぜ始め、カゴには<strong>8分目</strong>までゆるく詰めるのが綺麗に煙幕を広げるコツです。
+      </div>
+    </section>
+
+    <section class="article-section" id="sec-3">
+      <h2>3. 原材料の役割別！身近な代用品の選び方</h2>
+      <p>
+        ダイソーのお試し版で感触を掴んだら、次はスーパーやホームセンターの素材も視野に入れて、役割ごとにコスパと性能を追求してみましょう。
+      </p>
+
+      <h3>糟糠類・ベース素材（米ぬか・パン粉）</h3>
+      <p>
+        米ぬかは精米所や通販、ホームセンターで圧倒的な安さで手に入り、水中での煙幕（濁り）を作るベースとして優秀です。ただし脂質を多く含むため、夏場や長期保管では酸化しやすい弱点があります。大量に買う場合は密閉容器で冷暗所に保管し、水分調整役として業務スーパーなどの大袋パン粉を組み合わせると扱いやすくなります。
+      </p>
+
+      <h3>魚粉・エビ粉・さなぎ粉の代用（ドッグフード・乾燥エビ）</h3>
+      <p>
+        大容量でコストを極限まで下げるなら、<strong>安価なドライドッグフード</strong>が強力な複合素材になります。原材料表示を見ると、穀物・魚粉・肉粉・油脂・ビタミン類がバランスよく配合されており、集魚剤のベース要素を1つで補えます。より動物性の匂いを強めたい場合は、乾燥エビの粉末やかつお節粉を足すのも有効です。
+      </p>
+
+      <h3>酵母・アミノ酸・発酵由来の素材</h3>
+      <p>
+        味の素（グルタミン酸ナトリウム）やアミノ酸ゼリー飲料、粉末スポーツ飲料は手軽にアミノ酸を補える素材です。また、サビキパワーに使われている酒粕の代用としては、酒粕そのもののほか、<strong>少量のビール（麦芽・発酵由来成分）やヤクルト・ピルクルなどの乳酸菌飲料</strong>を釣行時に液体として加える方法も試す価値があります。
+      </p>
+
+      <h3>キララ（光を反射する素材）</h3>
+      <p>
+        市販品の「キララ」の正確な組成は非公開ですが、「海中で光を反射して魚に気づかせる」という機能だけなら、<strong>ダイソーのネイル用ラメ・ホログラムや、手芸用ラメ、パール顔料、化粧品用マイカ</strong>で十分に代用できます。
+      </p>
+    </section>
+
+    <section class="article-section" id="sec-4">
+      <h2>4. コスパ最強の運用術：「保存用ベース」＋「釣行ごとの後入れ味付け」</h2>
+      <p>
+        候補となる素材を最初から全部混ぜてしまうと、水分で傷みやすくなるうえ、毎回コストも膨らみます。最も賢いのは、<strong>「長期保存できる乾物ベース」</strong>と<strong>「釣行当日に追加するトッピング」</strong>を分ける二段構えの運用です。
+      </p>
+      <ul>
+        <li><strong>自宅で作り置きする基本ベース（乾物のみ）：</strong>粉砕したドッグフード（または煮干し粉）＋パン粉＋米ぬか。水分を含まないため保存性が高く、まとめ買いの恩恵を最大限に受けられます。</li>
+        <li><strong>釣行ごとにお好みで追加する素材：</strong>味の素、アミノゼリー飲料、少量のビール、乳酸菌飲料、ネイル用ラメなど。</li>
+      </ul>
+      <p>
+        「今日は濁りとアミノ酸を強めたいからアミノゼリーとラメを追加」「活性が高いから基本ベースに味の素だけ」というように、その日の潮色や魚の反応に合わせて低コストで配合をカスタムできるのが自作ならではの強みです。
+      </p>
+    </section>
+
+    <section class="article-section" id="sec-5">
+      <h2>5. 実際に作ると何円になる？2026年11月時点の価格で徹底試算</h2>
+      <p>
+        実際にホームセンターや通販で買える大容量素材を組み合わせた場合、市販の「アジパワー」と比べてどれくらいの価格差が出るのか、2026年11月15日時点の実売価格をもとに計算しました。
+      </p>
+
+      <div class="article-table-wrap">
+        <table class="article-table">
+          <thead>
+            <tr>
+              <th>素材</th>
+              <th>調査時の商品・内容量</th>
+              <th>確認価格</th>
+              <th>1kgあたり単価</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ドッグフード</strong></td>
+              <td>LIFELEX ドッグタイムス 10kg</td>
+              <td>2,790円</td>
+              <td>279円</td>
+            </tr>
+            <tr>
+              <td><strong>パン粉</strong></td>
+              <td>スターフーズ 純生パン粉 1kg</td>
+              <td>539円</td>
+              <td>539円</td>
+            </tr>
+            <tr>
+              <td><strong>米ぬか</strong></td>
+              <td>国内産 米ぬか 15kg</td>
+              <td>2,080円</td>
+              <td>約139円</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 12px; color: #666; margin-top: -10px;">
+        ※価格は2026年11月15日調査時点の参考価格です。販売店や送料によって変動します。
+      </p>
+
+      <h3>合計16kg量産レシピのコスト比較</h3>
+      <p>
+        仮に<strong>「ドッグフード10kg ＋ パン粉1kg ＋ 米ぬか5kg」</strong>の割合で合計16kgのベースを作った場合、使用量に応じた材料費は以下の通りです。
+      </p>
+      <ul>
+        <li>ドッグフード（10kg）：2,790円</li>
+        <li>パン粉（1kg）：539円</li>
+        <li>米ぬか（5kg分）：約693円</li>
+        <li><strong>合計16kgの材料費：約4,022円（500gあたり約126円）</strong></li>
+      </ul>
+      <p>
+        市販のマルキュー「アジパワー（500g・実売444円例）」と比較すると、<strong>自作集魚剤は市販品の約3割の材料費</strong>で作れる計算です。16kgは500g袋で32袋分に相当するため、<strong>トータルで約10,000円ものコスト差</strong>が生まれます。
+      </p>
+    </section>
+
+    <section class="article-section" id="sec-6">
+      <h2>6. 自作集魚剤を使ううえで知っておきたいリアルな注意点</h2>
+      <p>
+        コスト面では圧倒的なメリットがある自作集魚剤ですが、実釣に投入する前に押さえておきたいポイントもあります。
+      </p>
+      <ul>
+        <li><strong>ドッグフードの粉砕手間：</strong>粒のままではカゴから出にくいため、フードプロセッサーやミキサー、すり鉢などで細かく砕くひと手間が必要です。</li>
+        <li><strong>水中での拡散・沈下速度の微調整：</strong>実際の釣果を左右するのは成分だけでなく、粒の大きさや比重、水を加えたときのまとまり方です。パン粉と米ぬかの比率を変えながら、自分の使うカゴに合う硬さを見つけてください。</li>
+        <li><strong>釣り場の清掃マナー：</strong>自作集魚剤はパン粉や米ぬか、ラメなどを含むため、釣行後は必ず水汲みバケツで堤防にこぼれたコマセを綺麗に洗い流してから帰りましょう。</li>
+      </ul>
+    </section>
+
+    <section class="article-section" id="sec-7">
+      <h2>7. 集魚剤は「役割」が分かれば、ダイソーと身近な素材で十分戦える</h2>
+      <p>
+        市販集魚剤には長年の研究が詰まっていますが、その中身を「ベース・旨味・光反射」という役割に分解すれば、すべてを専用品で揃える必要はありません。
+      </p>
+      <p>
+        まずは<strong>ダイソーのパン粉・ペット用煮干し・ネイル用ラメ・味の素</strong>を袋で混ぜるワンコイン配合から試してみてください。そこでの手応えをもとに、ホームセンターや業務スーパーの大容量素材へステップアップすれば、エサ代を気にせず思いきりコマセを撒ける快適なサビキ釣りが楽しめます。
+      </p>
+
+      <!-- SNS最新釣果の最寄りスポットカード -->
+      <div class="sns-nearest-spots" data-count="3" data-max-km="15"></div>
+    </section>
+
+<h2 class="category-heading">あわせて読みたい</h2>
+<div class="menu-list">
+  <a href="sabiki.html" class="menu-card">
+    <div class="menu-thumb">
+      <img src="images/sabikifamily.jpg" alt="サビキ釣り完全ガイド">
+    </div>
+    <div class="menu-text">
+      <h2>【堤防釣りの絶対的入門】サビキ釣り完全ガイド ― 道具の賢い揃え方から鮮度管理まで</h2>
+    </div>
+  </a>
+  <a href="aji.html" class="menu-card">
+    <div class="menu-thumb">
+      <img src="images/aji.jpg" alt="アジの生態と実践的な釣り方解説">
+    </div>
+    <div class="menu-text">
+      <h2>【完全版】堤防から船まで！アジ（マアジ）の生態と実践的釣り方ガイド</h2>
+    </div>
+  </a>
+  <a href="saba.html" class="menu-card">
+    <div class="menu-thumb">
+      <img src="images/saba.jpg" alt="サバの生態と堤防・沖釣り攻略法">
+    </div>
+    <div class="menu-text">
+      <h2>ただの「大衆魚」じゃない！堤防から沖まで熱くさせるサバの釣り方・生態ガイド</h2>
+    </div>
+  </a>
+  <a href="iwashi.html" class="menu-card">
+    <div class="menu-thumb">
+      <img src="images/iwashi.jpg" alt="イワシの生態とサビキ釣り解説">
+    </div>
+    <div class="menu-text">
+      <h2>堤防サビキの定番から奥深き食文化まで！イワシの生態と実践的釣り方ガイド</h2>
+    </div>
+  </a>
+</div>
+
+    <section class="article-section map-section">
+      <h3>📍 関東のアジ・サバ・イワシ生息・釣果スポット</h3>
+      <p class="map-note">※マップ上の赤いドットが釣れるポイントです。</p>
+
+      <div id="fish-map" role="region"></div>
+
+      <div id="fish-spot-list" style="margin-top: 15px; font-size: 13px;"></div>
+    </section>
+
+  </article>
+</main>
+
+
+<div id="policyModal" class="modal">
+  <div class="modal-content">
+
+    <div class="policy-toggle">
+      <button id="showPolicy" class="policy-btn active">サイトポリシー</button>
+      <button id="showContact" class="policy-btn">お問い合わせ</button>
+    </div>
+    <section id="policySection">
+      <h1>サイトポリシー</h1>
+      <h2>1. 免責事項</h2>
+      <p>当サイトに掲載している情報は、可能な範囲で正確性の確保に努めていますが、その完全性・正確性・最新性を保証するものではありません。当サイトの利用によって発生したいかなる損害についても、一切の責任を負いません。</p>
+      <h2>2. 掲載情報について</h2>
+      <p>掲載している釣りスポット情報は、公開情報および独自調査に基づくものであり、現地の状況（立入可否・規制・安全性・工事等）により変更される場合があります。利用前に必ず現地の最新情報をご確認ください。</p>
+      <h2>3. 釣行データについて</h2>
+      <p>当サイトの釣行データは過去の記録に基づくものであり、現在の釣果や釣りの可否を保証するものではありません。また海洋環境や生態系の状態を保証するものではありません。</p>
+      <h2>4. 安全について</h2>
+      <p>釣りを行う際は安全に十分配慮してください。釣り場所によっては管理者の許可が必要な場合があります。必ず現地のルールに従ってください。</p>
+      <p>最終更新日：2026年11月20日</p>
+    </section>
+    <section id="contactSection" style="display:none;">
+      <h1>お問い合わせ</h1>
+      <p>当サイトへのご連絡は以下の用途に限ります。<br>・バグ報告<br>・掲載内容の修正・取り下げのご連絡<br>・その他の連絡事項</p>
+      <p>※すべての内容に返信・個別対応は行いません。<br>内容は確認のみ行い、必要に応じてサイト改善に反映します。</p>
+      <h2>連絡先（公式Xアカウント）</h2>
+      <p>公式Xアカウント（@TsuriikoNAVI）のリプライまたはDMよりご連絡ください。</p>
+      <p><a href="https://x.com/TsuriikoNAVI" target="_blank" rel="noopener noreferrer" class="contact-x-btn">X（@TsuriikoNAVI）へ連絡する ↗</a></p>
+    </section>
+  </div>
+</div>
+
+<footer class="site-footer" id="policyLink">
+  <div>© 釣り行こNAVI</div>
+  <div class="footer-policy">サイトポリシー</div>
+</footer>
+
+<script src="../js/header.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 記事固有の設定（外部JSでこの変数を読み取ってマップを生成） -->
+<script>
+  window.TARGET_FISH = 'アジ';
+  window.TARGET_REGION_CODE = 'KANTO';
+  window.TARGET_REGION_NAME_JP = '関東地方';
+</script>
+
+<!-- 汎用化された分割JSを読み込み -->
+<script src="../js/fish_article.js"></script>
+
+</body>
+</html>
