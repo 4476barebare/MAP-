@@ -1,5 +1,165 @@
 [
   {
+    "date": "2026/11/22",
+    "fish": "メバル",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2124340138914554299",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "ワラサ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2124339953320722909",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "ブラックバス",
+    "lat": 35.5866,
+    "lng": 139.2625,
+    "area_name": "津久井湖",
+    "url": "https://x.com/CHANNEL_DASH46/status/2124407746879742230",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "メジナ",
+    "lat": 35.7144,
+    "lng": 140.8653,
+    "area_name": "外房の堤防",
+    "url": "https://x.com/Bonu1474/status/2124381796666351897",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "メジナ",
+    "lat": 35.5125,
+    "lng": 140.4528,
+    "area_name": "外房の堤防",
+    "url": "https://x.com/Bonu1474/status/2124381796666351897",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "メジナ",
+    "lat": 35.1523,
+    "lng": 140.3154,
+    "area_name": "外房の堤防",
+    "url": "https://x.com/Bonu1474/status/2124381796666351897",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "メジナ",
+    "lat": 35.1051,
+    "lng": 140.1062,
+    "area_name": "外房の堤防",
+    "url": "https://x.com/Bonu1474/status/2124381796666351897",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "アジ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/0909_masuko/status/2124420568628019555",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "アナゴ",
+    "lat": 35.289,
+    "lng": 139.734,
+    "area_name": "東扇島西公園",
+    "url": "https://x.com/0909_masuko/status/2124420568628019555",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "メバル",
+    "lat": 35.3942,
+    "lng": 139.8805,
+    "area_name": "木更津沖堤防",
+    "url": "https://x.com/ninjin23/status/2124462008812888558",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "カワムツ",
+    "lat": 35.7388,
+    "lng": 139.2483,
+    "area_name": "平井川",
+    "url": "https://x.com/GgAzMp4cKr91818/status/2124443501287154017",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "オイカワ",
+    "lat": 35.5372,
+    "lng": 139.7644,
+    "area_name": "多摩川",
+    "url": "https://x.com/GgAzMp4cKr91818/status/2124442672240939210",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "オイカワ",
+    "lat": 35.5867,
+    "lng": 139.6675,
+    "area_name": "多摩川",
+    "url": "https://x.com/GgAzMp4cKr91818/status/2124442672240939210",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "オイカワ",
+    "lat": 35.6262,
+    "lng": 139.5841,
+    "area_name": "多摩川",
+    "url": "https://x.com/GgAzMp4cKr91818/status/2124442672240939210",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "イナダ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2124420155275108602",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/22",
+    "fish": "カサゴ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2124420155275108602",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
     "date": "2026/11/21",
     "fish": "アジ",
     "lat": 35.4325,
@@ -98,6 +258,56 @@
     "url": "https://www.instagram.com/p/DgAAQexmftW/",
     "source": "Instagram",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ベラ",
+    "lat": 35.27,
+    "lng": 139.683,
+    "area_name": "うみかぜ公園",
+    "url": "https://x.com/wanimega19/status/2124049376926716384",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ハゼ",
+    "lat": 35.27,
+    "lng": 139.683,
+    "area_name": "うみかぜ公園",
+    "url": "https://x.com/wanimega19/status/2124049376926716384",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "メバル",
+    "lat": 35.2818,
+    "lng": 139.6891,
+    "area_name": "横須賀海辺釣り公園",
+    "url": "https://x.com/hlUP9YzRGU61669/status/2124341298874425762",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ウミタナゴ",
+    "lat": 35.2818,
+    "lng": 139.6891,
+    "area_name": "横須賀海辺釣り公園",
+    "url": "https://x.com/hlUP9YzRGU61669/status/2124341298874425762",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ベラ",
+    "lat": 35.2818,
+    "lng": 139.6891,
+    "area_name": "横須賀海辺釣り公園",
+    "url": "https://x.com/hlUP9YzRGU61669/status/2124341298874425762",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/20",
@@ -5116,16 +5326,6 @@
     "lng": 139.1884,
     "area_name": "相模湖",
     "url": "https://x.com/OGAWATEI_boat/status/2114643351341576471",
-    "source": "X",
-    "model": "Grok"
-  },
-  {
-    "date": "2026/10/23",
-    "fish": "シーバス",
-    "lat": 35.624021,
-    "lng": 139.767484,
-    "area_name": "都立潮風公園",
-    "url": "https://x.com/ponchan28ponpon/status/2115039450145407026",
     "source": "X",
     "model": "Grok"
   }

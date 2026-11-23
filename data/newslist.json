@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-22T18:04:15+09:00",
-  "count": 239,
+  "generated": "2026-11-23T06:01:01+09:00",
+  "count": 241,
   "items": [
     {
       "date": "2026-12-13",
@@ -100,6 +100,24 @@
       "source_name": "ｄメニューニュース",
       "source_url": "https://topics.smt.docomo.ne.jp/article/fnn/nation/fnn-1157238",
       "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-22",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.47news.jp&sz=128",
+      "thumbnail": "",
+      "title": "神奈川・山北町と松田町でクマ出没が相次ぎ小中学校が臨時休校、登下校は保護者が同行",
+      "source_name": "47NEWS",
+      "source_url": "https://www.47news.jp/15270852.html",
+      "category": "クマ出没"
+    },
+    {
+      "date": "2026-11-22",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.chibanippo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "市川沖の市川水路付近で外国貨物船が座礁、21日午後に千葉港の交通整理船が通報",
+      "source_name": "千葉日報オンライン",
+      "source_url": "https://www.chibanippo.co.jp/index%2Ephp/articles/1695851",
+      "category": "水難事故"
     },
     {
       "date": "2026-11-22",
@@ -207,6 +225,42 @@
       "title": "琵琶湖のブラックバスがIGFA世界記録に認定、4.46kg・62cmをフライで釣り上げ",
       "source_name": "釣具新聞",
       "source_url": "https://tsurigu-np.jp/news/33386/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-22",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-77.jpg?fit=1024%2C722&ssl=1",
+      "title": "遊漁船の船長が考案した万能ロッド、キャスティングとジギングを1本で両立",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456062/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-22",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-98.jpg?fit=1024%2C722&ssl=1",
+      "title": "藤田夏輝が明かす晩秋から真冬の切り札ソフトルアー、低活性のバスを狙う",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456411/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-22",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/09-2.jpg?fit=1024%2C722&ssl=1",
+      "title": "井上直美が愛用するタイラバ竿は王道モデルを少し短めに、巻くだけの奥深さを語る",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456567/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-22",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-90.jpg?fit=1024%2C722&ssl=1",
+      "title": "メジャークラフトの入門アジングロッド「鯵道1G」、1万円台前半で感度と飛距離を追求",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456233/",
       "category": "釣りニュース"
     },
     {
@@ -642,6 +696,15 @@
       "category": "釣りニュース"
     },
     {
+      "date": "2026-11-20",
+      "favicon": "https://www.google.com/s2/favicons?domain=castingnet.jp&sz=128",
+      "thumbnail": "https://castingnet.jp/cmsimg/tpc268923-main.png",
+      "title": "釣具のキャスティングが全店でブラックフライデーセールを開催、11月23日まで",
+      "source_name": "キャスティング",
+      "source_url": "https://castingnet.jp/news/detail.php?no=268923",
+      "category": "釣りニュース"
+    },
+    {
       "date": "2026-11-19",
       "favicon": "https://www.google.com/s2/favicons?domain=turibitop.com&sz=128",
       "thumbnail": "",
@@ -694,6 +757,15 @@
       "source_name": "ｄメニューニュース",
       "source_url": "https://topics.smt.docomo.ne.jp/article/yomiuri/business/yomiuri-20261119-GYT1T00202",
       "category": "水産業"
+    },
+    {
+      "date": "2026-11-19",
+      "favicon": "https://www.google.com/s2/favicons?domain=minagiman.com&sz=128",
+      "thumbnail": "",
+      "title": "シマノの大型レバーブレーキリール「26BB-X レマーレ」登場、LBリール初のインフィニティドライブ搭載で最大ドラグ11kg",
+      "source_name": "ミナギマン",
+      "source_url": "https://minagiman.com/blog/26bb-x-remare/",
+      "category": "釣具新製品"
     },
     {
       "date": "2026-11-19",
@@ -910,15 +982,6 @@
       "source_name": "TSURINEWS",
       "source_url": "https://tsurinews.jp/417226/",
       "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-19",
-      "favicon": "https://www.google.com/s2/favicons?domain=minagiman.com&sz=128",
-      "thumbnail": "",
-      "title": "シマノの大型レバーブレーキリール「26BB-X レマーレ」登場、LBリール初のインフィニティドライブ搭載で最大ドラグ11kg",
-      "source_name": "ミナギマン",
-      "source_url": "https://minagiman.com/blog/26bb-x-remare/",
-      "category": "釣具新製品"
     },
     {
       "date": "2026-11-18",
@@ -1227,42 +1290,6 @@
       "category": "釣りニュース"
     },
     {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/videoframe_96878.png?resize=1024%2C576&ssl=1",
-      "title": "デュエルのエギを4タイプに分類、池内プロが状況別の使い分けを動画で解説",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455935/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/bd415d5ab5049f4359ba7e79e37bd53f.png?resize=1024%2C572&ssl=1",
-      "title": "偏光グラスGillsee、SNS投稿や紹介でポイントが貯まるパートナープログラムを開始",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456177/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/202612_DM_Swimmer_2000_920.jpg?resize=1200%2C552&ssl=1",
-      "title": "デュオのドラッグメタルにスイミングジグが12月登場、大型青物やオオニベ対応の3サイズ",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455734/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-18",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
-      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/ae46b1f460ee46f789c27b264a6cb421-14.jpg?resize=535%2C1024&ssl=1",
-      "title": "ルミカの集魚シンカー「光略カスタムシンカー」にナツメ型が登場、流線形で根掛かり軽減",
-      "source_name": "釣具新聞",
-      "source_url": "https://tsurigu-np.jp/products/33365/",
-      "category": "釣りニュース"
-    },
-    {
       "date": "2026-11-17",
       "favicon": "https://www.google.com/s2/favicons?domain=news.livedoor.com&sz=128",
       "thumbnail": "",
@@ -1342,15 +1369,6 @@
       "source_name": "水産ナビ",
       "source_url": "https://suisan-navi.jp/fishing/sanma-senjo-reito-taisaku-2026/",
       "category": "水産業"
-    },
-    {
-      "date": "2026-11-17",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/10/IMG_3311-1.jpg?resize=1024%2C768&ssl=1",
-      "title": "編集部が実釣で確かめたタチウオのルアー攻略、効いたリグとワームを紹介",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455571/",
-      "category": "釣りニュース"
     },
     {
       "date": "2026-11-16",
