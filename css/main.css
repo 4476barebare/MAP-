@@ -3622,43 +3622,10 @@ a.basis-action-pill:active {
   cursor: pointer;
 }
 
-.tide-v2-hud {
-  position: absolute;
-  top: 52px;
-  left: 12px;
-  z-index: 8020;
-  pointer-events: auto;
-}
-
-.tide-v2-date-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  background: rgba(255, 255, 255, 0.94);
-  color: #191970;
-  border: 1px solid rgba(25, 25, 112, 0.25);
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: bold;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
-  user-select: none;
+.tide-v2-hit-path {
+  pointer-events: stroke;
+  touch-action: none;
   cursor: pointer;
-}
-
-.tide-v2-arrow {
-  font-size: 13px;
-  opacity: 0.65;
-}
-
-.tide-v2-tidename.is-big {
-  color: #e60033;
-}
-
-.tide-v2-sun-meta {
-  font-size: 10px;
-  font-weight: normal;
-  opacity: 0.8;
 }
 
 .tide-v2-sun-line {
