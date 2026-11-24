@@ -76,8 +76,10 @@
     <loc>https://turiiko-navi.com/articles/mebaru.html</loc>
     <!-- ARTICLE_DATA: {"title":"春を告げる好敵手・メバル完全攻略ガイド：生態から見極めるポイント選び、釣り方、未来へつなぐリリース基準", "description":"晩秋から春に最盛期を迎えるメバルの生態・3種の見分け方・常夜灯や藻場のポイント選び・メバリング＆エサ釣り・20cm未満のリリース基準を解説。", "image":"articles/images/mebaru.jpg", "category":"ロックフィッシュ", "style":"list"} -->
   </url>
-
-
+  <url>
+    <loc>https://turiiko-navi.com/articles/ainame.html</loc>
+    <!-- ARTICLE_DATA: {"title":"【アイナメの釣り方】ルアーより「生き餌」が圧倒的に強い！仕掛け・ポイント・クジメとの違いと別格の旨さを徹底解説", "description":"堤防や岩礁帯で大型「ビール瓶サイズ」も狙えるアイナメの完全攻略ガイド。ルアーより生き餌（イワイソメ・アオイソメ・カニ）が圧倒的に強い理由、ポイント選び、ブラクリ・投げ釣り仕掛け、クジメとの見分け方と別格の食味まで徹底解説。", "ロックフィッシュ":"articles/images/ainame.jpg", "category":"対象魚別ガイド", "style":"list"} -->
+  </url>
   <url>
     <loc>https://turiiko-navi.com/articles/mejina.html</loc>
     <!-- ARTICLE_DATA: {"title":"【徹底解説】強烈な引きと知的な駆け引き！磯・堤防の人気ターゲット「メジナ（グレ）」を釣る", "description":"メジナ（グレ）の生態と磯・堤防釣り解説", "image":"articles/images/mejina.jpg", "category":"対象魚別ガイド", "style":"list"} -->
