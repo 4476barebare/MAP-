@@ -7,7 +7,7 @@ recent_7d_post_count: 4
 recent_14d_post_count: 8
 date_range_start: "2026-10-29"
 date_range_end: "2026-11-22"
-last_updated: "2026-11-24"
+last_updated: "2026-11-25"
 timezone: "Asia/Tokyo"
 source: "釣り行こNAVI"
 ---
