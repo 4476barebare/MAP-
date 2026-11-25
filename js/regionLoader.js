@@ -287,7 +287,7 @@ function fetchAndStorePrefSpots(prefCode, priority = 'low') {
 
     const regionCode = window.currentRegion || 'KANTO';
     const url = `/${regionCode}/${prefCode}_location.json`;
-    const maxRetries = priority === 'high' ? 2 : 1;
+    const maxRetries = priority === 'high' ? 1 : 0;
 
     const doFetch = (attempt) => fetch(url, { priority })
         .then(res => {
@@ -303,7 +303,7 @@ function fetchAndStorePrefSpots(prefCode, priority = 'low') {
         })
         .catch(error => {
             if (attempt < maxRetries) {
-                return new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)))
+                return new Promise(resolve => setTimeout(resolve, 300))
                     .then(() => doFetch(attempt + 1));
             }
             delete window.prefSpotPromises[prefCode];
@@ -320,13 +320,7 @@ window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
     if (!['select', 'other', 'all'].includes(mode)) {
         throw new Error('loadPrefectureSpots: mode は select / other / all のいずれかを指定してください');
     }
-    if (mode === 'select') {
-        if (!prefCode) return [];
-        // selectモード時は KANTO_region.csv の取得完了を待たずに即座に対象県の location.json を最優先取得する
-        await fetchAndStorePrefSpots(prefCode, 'high');
-        rebuildAllSpotData();
-        return window.prefSpotData[prefCode] || [];
-    }
+    if (mode === 'select' && !prefCode) return [];
 
     const csvData = await loadRegionCsvData();
     if (!csvData || !Array.isArray(csvData.prefRows)) return [];
@@ -1158,38 +1152,31 @@ async function region_management() {
 
     const markerPromise = renderRegion();
 
-    const isBot = typeof window.isSearchBot === 'function' && window.isSearchBot();
+    const commonPromise = Promise.all([
+        typeof window.loadRoadData === 'function' ? window.loadRoadData() : Promise.resolve(null),
+        typeof DepthMapController !== 'undefined' ? DepthMapController.loadData() : Promise.resolve(null),
+        typeof loadICData === 'function' ? loadICData() : Promise.resolve(null)
+    ]).catch(error => {
+        console.error('共通データ先行取得エラー:', error);
+        return null;
+    });
 
-    const commonPromise = isBot
-        ? Promise.resolve(null)
-        : Promise.all([
-            typeof window.loadRoadData === 'function' ? window.loadRoadData() : Promise.resolve(null),
-            typeof DepthMapController !== 'undefined' ? DepthMapController.loadData() : Promise.resolve(null),
-            typeof loadICData === 'function' ? loadICData() : Promise.resolve(null)
-        ]).catch(error => {
-            console.error('共通データ先行取得エラー:', error);
-            return null;
-        });
+    const weatherPromise = AddWeatherV2(null, 'all').then(() => {
+        if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
+    }).catch(error => {
+        console.error('全県天気JSON読み込みエラー:', error);
+    });
 
-    // 検索ボット時は全県天気・魚種一括先読みを省き、ユーザー操作や県遷移時に後から読み込み直す
-    const weatherPromise = isBot
-        ? Promise.resolve(null)
-        : AddWeatherV2(null, 'all').then(() => {
-            if (typeof rebuildAllSpotData === 'function') rebuildAllSpotData();
-        }).catch(error => {
-            console.error('全県天気JSON読み込みエラー:', error);
-        });
+    const fishPromises = prefList.map(prefCode => {
+        const fishUrl = `/${regionCode}/${prefCode}_fish.json`;
+        return typeof loadFishDataForPref === 'function'
+            ? loadFishDataForPref(prefCode, fishUrl)
+            : Promise.resolve(null);
+    });
 
-    const fishPromise = isBot
-        ? Promise.resolve(null)
-        : Promise.all(prefList.map(prefCode => {
-            const fishUrl = `/${regionCode}/${prefCode}_fish.json`;
-            return typeof loadFishDataForPref === 'function'
-                ? loadFishDataForPref(prefCode, fishUrl)
-                : Promise.resolve(null);
-        })).catch(error => {
-            console.error('全県魚種データ読み込みエラー:', error);
-        });
+    const fishPromise = Promise.all(fishPromises).catch(error => {
+        console.error('全県魚種データ読み込みエラー:', error);
+    });
 
     // マーカー・天気・魚種・共通レイヤーの処理完了後に地図クリックを有効化する。
     await Promise.allSettled([markerPromise, commonPromise, weatherPromise, fishPromise]);
