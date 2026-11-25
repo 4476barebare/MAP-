@@ -38,7 +38,7 @@ function loadPrefDictionaryJson(prefCode = window.currentPref) {
 
     const url = '/' + regionCode + '/' + cleanPref + '_dictionary.json';
 
-    window.prefDictionaryPromises[key] = fetch(url)
+    const doFetch = (attempt) => fetch(url, { priority: 'high' })
         .then(res => {
             if (!res.ok) throw new Error('Dictionary JSON fetch failed: ' + res.status);
             return res.json();
@@ -52,11 +52,16 @@ function loadPrefDictionaryJson(prefCode = window.currentPref) {
             return data;
         })
         .catch(err => {
+            if (attempt < 2) {
+                return new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)))
+                    .then(() => doFetch(attempt + 1));
+            }
             delete window.prefDictionaryPromises[key];
             console.warn('逆引き辞書JSON取得スキップまたは未配置:', cleanPref, err.message);
             return null;
         });
 
+    window.prefDictionaryPromises[key] = doFetch(0);
     return window.prefDictionaryPromises[key];
 }
 window.loadPrefDictionaryJson = loadPrefDictionaryJson;
@@ -259,13 +264,16 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         window.map.stop();
     }
 
-    // ---------- 1. 最優先：対象スポット所属県（select）のデータのみ取得してターゲットを特定 ----------
-    const isRegionReady = typeof loadRegionCSV === 'function' ? await loadRegionCSV() : true;
-    if (!isRegionReady) return false;
+    // ---------- 1. 最優先：逆引き辞書JSONと所属県 location.json を並列最優先取得 ----------
+    const earlyDictPromise = loadPrefDictionaryJson(prefCode);
+    const earlySpotsPromise = typeof loadPrefectureSpots === 'function'
+        ? loadPrefectureSpots(prefCode, 'select')
+        : Promise.resolve([]);
+    const earlyRegionPromise = typeof loadRegionCSV === 'function'
+        ? loadRegionCSV().catch(() => false)
+        : Promise.resolve(true);
 
-    if (typeof loadPrefectureSpots === 'function') {
-        await loadPrefectureSpots(prefCode, 'select');
-    }
+    await Promise.all([earlySpotsPromise, earlyRegionPromise]);
     if (typeof loadLocationJSON === 'function') {
         await loadLocationJSON();
     }
@@ -315,8 +323,8 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
     if (parentArea) setIdealQuery('area', parentArea.name);
     setIdealQuery('spot', spot.name);
 
-    // 逆引き辞書JSONとICデータを drawLocation と並行して開始し、取得次第すぐにアクセス枠と構造化データを更新
-    const dictPromise = loadPrefDictionaryJson(prefCode).then(dict => {
+    // 並列先読み中の逆引き辞書JSONとICデータを待機し、取得次第すぐにアクセス枠と構造化データを更新
+    const dictPromise = earlyDictPromise.then(dict => {
         if (dict && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
             renderAccessInfo(spot);
             if (typeof updateSeoMeta === 'function') updateSeoMeta();
@@ -3935,6 +3943,9 @@ function stopZoomGuard() {
         if (!tileBtn || tileBtn.dataset.tileListenerAdded) return;
         tileBtn.dataset.tileListenerAdded = 'true';
         tileBtn.addEventListener('click', () => {
+            if (typeof window.ensureSpotActionDataLoaded === 'function') {
+                window.ensureSpotActionDataLoaded();
+            }
             if (!window.map || !window.gsiLayer) return;
 
             // ★ 管理変数から取得
@@ -4359,7 +4370,29 @@ function prefetchAlternateSpotTiles(spot, targetZoom) {
 }
 
 // 2-7. スポット画面用の「IP+UUID生成」「切り替え用タイル先読み」「本採用・仮ピンデータ取得」を一括実行する準備関数
+//      （検索ボット時は初期通信をスキップして必須JSONへ帯域を譲り、ボタン操作時に後から読み込み直す）
+window._deferredSpotActionContext = null;
+
+window.ensureSpotActionDataLoaded = function() {
+  const ctx = window._deferredSpotActionContext;
+  window._deferredSpotActionContext = null;
+  return Promise.all([
+    ensureUserIdentityAsync(),
+    ctx && ctx.spot ? prefetchAlternateSpotTiles(ctx.spot, ctx.targetZoom) : Promise.resolve(),
+    window.loadTempFishPinsOnce ? window.loadTempFishPinsOnce() : Promise.resolve(),
+    window.loadApprovedUserPinsOnce ? window.loadApprovedUserPinsOnce() : Promise.resolve()
+  ]).then(() => {
+    if (ctx && ctx.spot && window.currentSpotId && typeof window.fadeInUserAndTempPins === 'function') {
+      window.fadeInUserAndTempPins(ctx.spot);
+    }
+  });
+};
+
 window.prepareSpotActionButtons = function(spot, targetZoom) {
+  if (typeof window.isSearchBot === 'function' && window.isSearchBot()) {
+    window._deferredSpotActionContext = { spot, targetZoom };
+    return Promise.resolve();
+  }
   return Promise.all([
     ensureUserIdentityAsync(),
     prefetchAlternateSpotTiles(spot, targetZoom),
@@ -4436,6 +4469,9 @@ function ensurePostModeDom() {
 // 5. 投稿モードのON / OFF切り替え
 function togglePostMode(forceState) {
   if (!window.map) return;
+  if (typeof window.ensureSpotActionDataLoaded === 'function') {
+    window.ensureSpotActionDataLoaded();
+  }
   ensurePostModeDom();
 
   const nextState = (typeof forceState === 'boolean') ? forceState : !isPostModeActive;
