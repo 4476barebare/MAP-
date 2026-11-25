@@ -1,5 +1,65 @@
 [
   {
+    "date": "2026/11/24",
+    "fish": "オキアジ",
+    "lat": 33.1256,
+    "lng": 139.799,
+    "area_name": "八丈島堤防",
+    "url": "https://x.com/kaminato_/status/2125083697766686829",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "ムロアジ",
+    "lat": 33.1256,
+    "lng": 139.799,
+    "area_name": "八丈島堤防",
+    "url": "https://x.com/kaminato_/status/2125083697766686829",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "スマ",
+    "lat": 33.1256,
+    "lng": 139.799,
+    "area_name": "八丈島堤防",
+    "url": "https://x.com/kaminato_/status/2125083697766686829",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "ヒラメ",
+    "lat": 36.273,
+    "lng": 140.565,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/kaze_kaoru_jp/status/2125050840025350303",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "ヒラメ",
+    "lat": 36.075,
+    "lng": 140.64,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/kaze_kaoru_jp/status/2125050840025350303",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "ヒラメ",
+    "lat": 35.845,
+    "lng": 140.775,
+    "area_name": "鹿島灘サーフ",
+    "url": "https://x.com/kaze_kaoru_jp/status/2125050840025350303",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
     "date": "2026/11/23",
     "fish": "イワシ",
     "lat": 36.8306,
@@ -98,6 +158,146 @@
     "url": "https://x.com/dash_miurah/status/2124760511141274095",
     "source": "X",
     "model": "Grok"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "ヒラメ",
+    "lat": 35.269,
+    "lng": 139.5768,
+    "area_name": "葉山",
+    "url": "https://www.instagram.com/reel/DgEtAs9hrvh/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "マダイ",
+    "lat": 35.269,
+    "lng": 139.5768,
+    "area_name": "葉山",
+    "url": "https://www.instagram.com/reel/DgEtAs9hrvh/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "シーバス",
+    "lat": 35.269,
+    "lng": 139.5768,
+    "area_name": "葉山",
+    "url": "https://www.instagram.com/reel/DgEtAs9hrvh/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "カワハギ",
+    "lat": 35.269,
+    "lng": 139.5768,
+    "area_name": "葉山",
+    "url": "https://www.instagram.com/reel/DgEtAs9hrvh/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "ワラサ",
+    "lat": 35.28,
+    "lng": 139.48,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "ワラサ",
+    "lat": 35.28,
+    "lng": 139.28,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "アマダイ",
+    "lat": 35.28,
+    "lng": 139.48,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "アマダイ",
+    "lat": 35.28,
+    "lng": 139.28,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "レンコダイ",
+    "lat": 35.28,
+    "lng": 139.48,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "レンコダイ",
+    "lat": 35.28,
+    "lng": 139.28,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "ゴマサバ",
+    "lat": 35.28,
+    "lng": 139.48,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "ゴマサバ",
+    "lat": 35.28,
+    "lng": 139.28,
+    "area_name": "相模湾",
+    "url": "https://www.threads.com/@margherita_aburatsubo/post/DgFHLXqifUP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "マダイ",
+    "lat": 35.1528,
+    "lng": 139.1481,
+    "area_name": "真鶴港",
+    "url": "https://www.facebook.com/kunitoshimaru/posts/pfbid0kKbi6Gyz9Lirh4Vf8mXSr3t3pXKeSxPHUCnnuSMygZtbUc4nGnwNVfZgyQTwvwawl",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "ブラックバス",
+    "lat": 35.2147,
+    "lng": 140.0883,
+    "area_name": "亀山ダム",
+    "url": "https://www.instagram.com/reel/DgFjlihS_rd/",
+    "source": "Instagram",
+    "model": "Muse"
   },
   {
     "date": "2026/11/22",
@@ -270,6 +470,16 @@
     "model": "Muse"
   },
   {
+    "date": "2026/11/22",
+    "fish": "ブラックバス",
+    "lat": 35.9548,
+    "lng": 140.3152,
+    "area_name": "新利根川",
+    "url": "https://www.instagram.com/p/DgFPhAAI6pV/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/21",
     "fish": "アジ",
     "lat": 35.4325,
@@ -418,6 +628,56 @@
     "url": "https://x.com/hlUP9YzRGU61669/status/2124341298874425762",
     "source": "X",
     "model": "Grok"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ブラックバス",
+    "lat": 35.742,
+    "lng": 140.832,
+    "area_name": "利根川",
+    "url": "https://www.threads.com/@naoto_ishiichan/post/DgFcKn5GqYN",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ブラックバス",
+    "lat": 35.895,
+    "lng": 140.5,
+    "area_name": "利根川",
+    "url": "https://www.threads.com/@naoto_ishiichan/post/DgFcKn5GqYN",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ブラックバス",
+    "lat": 35.885,
+    "lng": 140.06,
+    "area_name": "利根川",
+    "url": "https://www.threads.com/@naoto_ishiichan/post/DgFcKn5GqYN",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ブラックバス",
+    "lat": 36.18,
+    "lng": 139.7,
+    "area_name": "利根川",
+    "url": "https://www.threads.com/@naoto_ishiichan/post/DgFcKn5GqYN",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/21",
+    "fish": "ブラックバス",
+    "lat": 35.2147,
+    "lng": 140.0883,
+    "area_name": "亀山ダム",
+    "url": "https://www.instagram.com/p/DgFeQnBE3kD/",
+    "source": "Instagram",
+    "model": "Muse"
   },
   {
     "date": "2026/11/20",
