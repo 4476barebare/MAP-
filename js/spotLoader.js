@@ -38,9 +38,13 @@ function loadPrefDictionaryJson(prefCode = window.currentPref) {
 
     const url = '/' + regionCode + '/' + cleanPref + '_dictionary.json';
 
-    window.prefDictionaryPromises[key] = fetch(url)
+    const doFetch = (attempt) => fetch(url, { priority: 'high' })
         .then(res => {
-            if (!res.ok) throw new Error('Dictionary JSON fetch failed: ' + res.status);
+            if (!res.ok) {
+                const err = new Error('Dictionary JSON fetch failed: ' + res.status);
+                err.status = res.status;
+                throw err;
+            }
             return res.json();
         })
         .then(data => {
@@ -52,11 +56,16 @@ function loadPrefDictionaryJson(prefCode = window.currentPref) {
             return data;
         })
         .catch(err => {
+            if (attempt < 2 && (!err || err.status !== 404)) {
+                return new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)))
+                    .then(() => doFetch(attempt + 1));
+            }
             delete window.prefDictionaryPromises[key];
-            console.warn('逆引き辞書JSON取得スキップまたは未配置:', cleanPref, err.message);
+            console.warn('逆引き辞書JSON取得スキップまたは未配置:', cleanPref, err && err.message ? err.message : err);
             return null;
         });
 
+    window.prefDictionaryPromises[key] = doFetch(0);
     return window.prefDictionaryPromises[key];
 }
 window.loadPrefDictionaryJson = loadPrefDictionaryJson;
@@ -259,12 +268,12 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         window.map.stop();
     }
 
-    // ---------- 1. 最優先：対象スポット所属県（select）のデータのみ取得してターゲットを特定 ----------
-    const isRegionReady = typeof loadRegionCSV === 'function' ? await loadRegionCSV() : true;
-    if (!isRegionReady) return false;
-
+    // ---------- 1. 最優先：対象スポット所属県（select）の location.json（prefData）を必ず先に取得してターゲットを特定 ----------
     if (typeof loadPrefectureSpots === 'function') {
         await loadPrefectureSpots(prefCode, 'select');
+    }
+    if (typeof loadRegionCSV === 'function') {
+        loadRegionCSV().catch(() => false);
     }
     if (typeof loadLocationJSON === 'function') {
         await loadLocationJSON();
@@ -311,11 +320,14 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         window.currentSpotBaseTile = null;
     }
 
+    // URLクエリを整えた直後に canonical・title・description を即時確定（50msタイマー待ちをしない）
     if (window.prefData) setIdealQuery('pref', window.prefData.notes);
     if (parentArea) setIdealQuery('area', parentArea.name);
     setIdealQuery('spot', spot.name);
+    if (typeof updateSeoMeta === 'function') updateSeoMeta();
 
-    // 逆引き辞書JSONとICデータを drawLocation と並行して開始し、取得次第すぐにアクセス枠と構造化データを更新
+    // ---------- 2. drawLocation と並行して「逆引き辞書の取得・描画・SEO確定」だけを最優先完了 ----------
+    renderAccessInfo(spot);
     const dictPromise = loadPrefDictionaryJson(prefCode).then(dict => {
         if (dict && window.currentSpotId && String(window.currentSpotId) === String(spot.individualId)) {
             renderAccessInfo(spot);
@@ -323,18 +335,18 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
         }
         return dict;
     });
-    const icPromise = typeof loadICData === 'function' ? loadICData() : Promise.resolve(null);
-    renderAccessInfo(spot);
 
-    // ---------- 2. 対象スポットの座標・ズームで drawLocation を直接実行して完了まで待機 ----------
-    if (typeof drawLocation === 'function') {
-        await drawLocation(spot.name, Number(spot.lat), Number(spot.lng), targetZoom);
-    }
+    const drawPromise = typeof drawLocation === 'function'
+        ? drawLocation(spot.name, Number(spot.lat), Number(spot.lng), targetZoom)
+        : Promise.resolve();
+
+    await Promise.all([drawPromise, dictPromise]);
     if (mapExistedBefore && !window.isInitialMapLoad && typeof waitMapSettled === 'function') {
         await waitMapSettled();
     }
 
-    // ---------- 3. drawLocation 完了後：所属県（select）のデータ取得と後続のスポット描画を開始 ----------
+    // ---------- 3. drawLocation ＆ 辞書確定完了後：IC・天気・魚種・釣具店などの後続描画を開始 ----------
+    const icPromise = typeof loadICData === 'function' ? loadICData() : Promise.resolve(null);
     window.fishUrl = `/${regionCode}/${prefCode}_fish.json`;
 
     if (window.map) {

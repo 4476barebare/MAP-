@@ -287,11 +287,15 @@ function fetchAndStorePrefSpots(prefCode, priority = 'low') {
 
     const regionCode = window.currentRegion || 'KANTO';
     const url = `/${regionCode}/${prefCode}_location.json`;
-    const maxRetries = priority === 'high' ? 1 : 0;
+    const maxRetries = priority === 'high' ? 2 : 0;
 
     const doFetch = (attempt) => fetch(url, { priority })
         .then(res => {
-            if (!res.ok) throw new Error("location.json fetch failed: " + res.status);
+            if (!res.ok) {
+                const err = new Error("location.json fetch failed: " + res.status);
+                err.status = res.status;
+                throw err;
+            }
             return res.json();
         })
         .then(data => {
@@ -302,8 +306,8 @@ function fetchAndStorePrefSpots(prefCode, priority = 'low') {
             return data;
         })
         .catch(error => {
-            if (attempt < maxRetries) {
-                return new Promise(resolve => setTimeout(resolve, 300))
+            if (attempt < maxRetries && (!error || error.status !== 404)) {
+                return new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)))
                     .then(() => doFetch(attempt + 1));
             }
             delete window.prefSpotPromises[prefCode];
@@ -320,7 +324,12 @@ window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
     if (!['select', 'other', 'all'].includes(mode)) {
         throw new Error('loadPrefectureSpots: mode は select / other / all のいずれかを指定してください');
     }
-    if (mode === 'select' && !prefCode) return [];
+    if (mode === 'select') {
+        if (!prefCode) return [];
+        await fetchAndStorePrefSpots(prefCode, 'high');
+        rebuildAllSpotData();
+        return window.prefSpotData[prefCode] || [];
+    }
 
     const csvData = await loadRegionCsvData();
     if (!csvData || !Array.isArray(csvData.prefRows)) return [];
