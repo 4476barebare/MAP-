@@ -457,50 +457,9 @@ window.ensureRouteScripts = async function(routeType) {
   return true;
 };
 
-window._deferredBgScriptsRoute = null;
-window._userRecoveryHooked = false;
-
-window.triggerDeferredUserRecovery = function() {
-  // 検索ボット向け省通信ルートで後回しにした処理（裏JS・道路・等深線）をユーザー操作時に後から読み込み直す
-  if (window._deferredBgScriptsRoute) {
-    const deferredRoute = window._deferredBgScriptsRoute;
-    window._deferredBgScriptsRoute = null;
-    window.preloadRemainingScripts(deferredRoute, { force: true });
-  }
-  if (window._depthDeferredForBot && typeof DepthMapController !== 'undefined' && window.map) {
-    window._depthDeferredForBot = false;
-    DepthMapController.initAndShow(window.map, { force: true });
-  }
-  if (window._roadDeferredForBot && !window.isSpotScreen() && typeof window.showRoadLayers === 'function') {
-    window._roadDeferredForBot = false;
-    window.showRoadLayers();
-  }
-};
-
-function bindUserRecoveryListeners() {
-  if (window._userRecoveryHooked) return;
-  window._userRecoveryHooked = true;
-  const onFirstInteract = () => {
-    window.removeEventListener('pointerdown', onFirstInteract, true);
-    window.removeEventListener('touchstart', onFirstInteract, true);
-    window.removeEventListener('keydown', onFirstInteract, true);
-    window.triggerDeferredUserRecovery();
-  };
-  window.addEventListener('pointerdown', onFirstInteract, { capture: true, passive: true });
-  window.addEventListener('touchstart', onFirstInteract, { capture: true, passive: true });
-  window.addEventListener('keydown', onFirstInteract, { capture: true, passive: true });
-}
-
-window.preloadRemainingScripts = function(routeType, options = {}) {
-  const force = !!(options && options.force);
-  const type = routeType || window.detectRouteTypeFromUrl();
-
-  // 検索ボットには初回画面遷移用の裏JSロードをスキップして通信枠を温存し、ユーザー操作時に後から読み込み直す
-  if (!force && window.isSearchBot()) {
-    window._deferredBgScriptsRoute = type;
-    bindUserRecoveryListeners();
-    return Promise.resolve();
-  }
+window.preloadRemainingScripts = function(routeType) {
+  // 検索ボットには画面遷移用の裏JSロードをスキップし、通信枠枯渇とリソースエラーを防止する
+  if (window.isSearchBot()) return Promise.resolve();
   if (window._bgScriptsPreloadPromise) return window._bgScriptsPreloadPromise;
 
   const type = routeType || window.detectRouteTypeFromUrl();
@@ -567,108 +526,7 @@ function buildPageMainH1Text(params) {
   return `${shortRegion}の釣り場マップ・天気と最新釣果で明日のおすすめランキング`;
 }
 
-// 県名→県コード静的マップ（KANTO_region.csv 取得待ちをゼロにして location.json と dictionary.json を即並列発射するため）
-const PREF_NAME_TO_CODE = {
-  '千葉県': 'CHIBA', '千葉': 'CHIBA', 'CHIBA': 'CHIBA',
-  '神奈川県': 'KANAGAWA', '神奈川': 'KANAGAWA', 'KANAGAWA': 'KANAGAWA',
-  '東京都': 'TOKYO', '東京': 'TOKYO', 'TOKYO': 'TOKYO',
-  '茨城県': 'IBARAKI', '茨城': 'IBARAKI', 'IBARAKI': 'IBARAKI',
-  '栃木県': 'IBARAKI', '栃木': 'IBARAKI', '茨城県栃木県': 'IBARAKI', 'TOCHIGI': 'IBARAKI',
-  '埼玉県': 'SAITAMA', '埼玉': 'SAITAMA', 'SAITAMA': 'SAITAMA',
-  '群馬県': 'GUNMA', '群馬': 'GUNMA', 'GUNMA': 'GUNMA'
-};
-
-function resolvePrefCodeFast(rawPref) {
-  if (!rawPref) return '';
-  const trimmed = String(rawPref).trim();
-  if (PREF_NAME_TO_CODE[trimmed]) return PREF_NAME_TO_CODE[trimmed];
-  const upper = trimmed.toUpperCase();
-  if (PREF_NAME_TO_CODE[upper]) return PREF_NAME_TO_CODE[upper];
-  for (const [k, code] of Object.entries(PREF_NAME_TO_CODE)) {
-    if (trimmed.includes(k) || k.includes(trimmed)) return code;
-  }
-  return '';
-}
-window.resolvePrefCodeFast = resolvePrefCodeFast;
-
-// 起動0msでURLクエリ単体からSEOメタ（canonical・title・description・og:url・JSON-LD・仮詳細枠）を即確定する
-// （万が一すべての外部JSONが遮断されても、トップページ "/" と同一視されるのを防ぐ）
-function applyInstantSeoFromQuery() {
-  const params = new URLSearchParams(window.location.search);
-  const pref = params.get('pref');
-  const area = params.get('area');
-  const spotName = params.get('spot');
-  if (!pref && !area && !spotName) return;
-
-  const setMeta = (selector, attr, value) => {
-    const el = document.querySelector(selector);
-    if (el) el.setAttribute(attr, value);
-  };
-  const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-  const currentUrl = window.location.origin + window.location.pathname + window.location.search;
-  let title = document.title;
-  let desc = '';
-
-  if (spotName) {
-    title = `${spotName}の釣り場・天気・潮汐情報 | 釣り行こNAVI`;
-    desc = `${pref || ''}${area || ''}にある「${spotName}」の釣りポイント、対象魚、最新の天気予報、潮汐データ（タイドグラフ）、アクセス情報を空撮マップで詳しく解説します。`;
-  } else if (area) {
-    title = `${area}${pref ? `（${pref}）` : ''}の釣り場マップ・釣れる魚と最新釣果・潮見表｜釣り行こNAVI`;
-    desc = `${pref || ''}「${area}」の釣り場・堤防ポイント一覧マップ。${area}周辺で今釣れている対象魚や最新SNS釣果、海底の等深線、2時間ごとの天気・風向・波予報・タイドグラフを確認できます。`;
-  } else if (pref) {
-    title = `${pref}の釣り場マップ・最新SNS釣果＆天気・潮見表｜明日行ける釣りスポット【釣り行こNAVI】`;
-    desc = `「明日${pref}で釣りに行くんだけどいい場所ある？」と思ったら釣り行こNAVI。${pref}の海釣り・堤防・河川スポットを空撮さかな地図と等深線で一覧表示。`;
-  }
-
-  document.title = title;
-  setMeta('meta[name="description"]', 'content', desc);
-  setMeta('link[rel="canonical"]', 'href', currentUrl);
-  setMeta('meta[property="og:url"]', 'content', currentUrl);
-  setMeta('meta[property="og:title"]', 'content', title);
-  setMeta('meta[property="og:description"]', 'content', desc);
-  setMeta('meta[name="twitter:title"]', 'content', title);
-  setMeta('meta[name="twitter:description"]', 'content', desc);
-
-  const fastPrefCode = resolvePrefCodeFast(pref);
-  if (fastPrefCode) {
-    setMeta('#ai-md-link', 'href', `https://turiiko-navi.com/ai-data/${fastPrefCode}.md`);
-    setMeta('#ai-md-link', 'title', `${pref} 釣りスポット情報 (Markdown)`);
-  }
-
-  // スポットURL直打ち時は、JSON到着前でもスポット名見出しと基本説明・Place構造化データを先に確保しておく
-  if (spotName) {
-    const accessBox = document.getElementById('accessInfoBox');
-    if (accessBox && !accessBox.querySelector('h3')) {
-      const areaLabel = [pref, area].filter(Boolean).join(' ');
-      accessBox.innerHTML = `<div id="spot-access-main"><div class="spot-header-wrap">${areaLabel ? `<div class="spot-water-regional">${esc(areaLabel)}</div>` : ''}<h3 class="spot-main-title">${esc(spotName)}</h3></div><p class="spot-description">${esc(desc)}</p></div>`;
-      accessBox.style.display = 'block';
-    }
-    if (!document.getElementById('seo-json-ld')) {
-      const ld = {
-        "@context": "https://schema.org",
-        "@type": "Place",
-        "name": spotName,
-        "description": desc
-      };
-      if (pref) {
-        ld.address = {
-          "@type": "PostalAddress",
-          "addressCountry": "JP",
-          "addressRegion": pref
-        };
-      }
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.id = 'seo-json-ld';
-      script.textContent = JSON.stringify(ld);
-      document.head.appendChild(script);
-    }
-  }
-}
-window.applyInstantSeoFromQuery = applyInstantSeoFromQuery;
-
-// PREF/AREA/SPOTのURL直打ち時は初期描画時点で「特徴と使い方」の非表示・H1反映・仮SEO確定を即座に行う
+// PREF/AREA/SPOTのURL直打ち時は初期描画時点で「特徴と使い方」の非表示とH1テキストの反映を即座に行う
 (function() {
   const initialParams = new URLSearchParams(window.location.search);
   const siteGuideBoxEl = document.getElementById('siteGuideBox');
@@ -679,7 +537,6 @@ window.applyInstantSeoFromQuery = applyInstantSeoFromQuery;
   if (mainH1El) {
     mainH1El.textContent = buildPageMainH1Text(initialParams);
   }
-  applyInstantSeoFromQuery();
 })();
 
 window.prefData = null;
@@ -2344,7 +2201,7 @@ if (typeof window.loadPrefDictionaryJson !== 'function') {
         }
         if (window.prefDictionaryPromises[key]) return window.prefDictionaryPromises[key];
         const url = '/' + regionCode + '/' + cleanPref + '_dictionary.json';
-        const doFetch = (attempt) => fetch(url, { priority: 'high' })
+        window.prefDictionaryPromises[key] = fetch(url)
             .then(r => {
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.json();
@@ -2355,13 +2212,9 @@ if (typeof window.loadPrefDictionaryJson !== 'function') {
                 return data;
             })
             .catch(() => {
-                if (attempt < 2) {
-                    return new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1))).then(() => doFetch(attempt + 1));
-                }
                 delete window.prefDictionaryPromises[key];
                 return null;
             });
-        window.prefDictionaryPromises[key] = doFetch(0);
         return window.prefDictionaryPromises[key];
     };
 }
@@ -2484,16 +2337,7 @@ async function applyQueryToStateFromCsv() {
 
     if (!qPref) return;
 
-    // 1. 静的マップで県コードを即解決（KANTO_region.csv の通信待ちをバイパス）
-    const fastCode = resolvePrefCodeFast(qPref);
-    if (fastCode) {
-        window.currentPref = fastCode;
-        window.prefLocationUrl = `/${window.currentRegion}/${window.currentPref}_location.json`;
-        // SPOT画面なら location.json と同時に逆引き辞書JSONも最優先並列発射しておく
-        if (qSpot && typeof window.loadPrefDictionaryJson === 'function') {
-            window.loadPrefDictionaryJson(fastCode);
-        }
-    } else if (window.regionUrl) {
+    if (window.regionUrl) {
         try {
             const csvData = await loadRegionCsvData();
 
@@ -2663,40 +2507,8 @@ async function routeUpdate() {
             }
         }
 
-        // ★ URLにspotクエリがあるのに location.json 取得失敗等でスポット未確定のままなら、
-        //   県画面への誤遷移を止めつつ、クエリ＋逆引き辞書だけでスポット詳細とSEOメタを完成させる
+        // ★ URLにspotクエリがあるのにデータ取得不可でスポット未確定のままなら、県画面への誤遷移（?spot消去や道路取得）を止める
         if (qSpotName && !window.currentSpotId) {
-            const qPrefName = urlParams.get('pref') || '';
-            const qAreaName = urlParams.get('area') || '';
-            if (typeof applyInstantSeoFromQuery === 'function') applyInstantSeoFromQuery();
-            if (window.currentPref && typeof window.loadPrefDictionaryJson === 'function') {
-                const dict = await window.loadPrefDictionaryJson(window.currentPref);
-                const entry = dict && dict[qSpotName];
-                if (entry) {
-                    const fakeSpot = {
-                        name: qSpotName,
-                        lat: Number(entry.lat) || 0,
-                        lng: Number(entry.lng) || 0,
-                        _prefCode: window.currentPref
-                    };
-                    if (typeof renderAccessInfo === 'function' && fakeSpot.lat && fakeSpot.lng) {
-                        renderAccessInfo(fakeSpot);
-                    } else if (entry.description) {
-                        const accessBox = document.getElementById('accessInfoBox');
-                        if (accessBox) {
-                            const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                            accessBox.innerHTML = `<div id="spot-access-main"><div class="spot-header-wrap"><div class="spot-water-regional">${esc([qPrefName, qAreaName].filter(Boolean).join(' '))}</div><h3 class="spot-main-title">${esc(qSpotName)}</h3></div><p class="spot-description">${esc(entry.description)}</p></div>`;
-                            accessBox.style.display = 'block';
-                        }
-                    }
-                    const descMeta = document.querySelector('meta[name="description"]');
-                    if (descMeta && entry.description) descMeta.setAttribute('content', entry.description);
-                    const ogDescMeta = document.querySelector('meta[property="og:description"]');
-                    if (ogDescMeta && entry.description) ogDescMeta.setAttribute('content', entry.description);
-                }
-            }
-            if (typeof renderSpotRanking === 'function') renderSpotRanking();
-            if (typeof syncGuideSections === 'function') syncGuideSections();
             return;
         }
 
@@ -4305,36 +4117,25 @@ const DepthMapController = (function() {
         });
     }
 
-    async function loadDepthData() {
-        if (rawDepthData) return rawDepthData;
+    function loadDepthData() {
+        if (rawDepthData) return Promise.resolve(rawDepthData);
         if (depthDataPromise) return depthDataPromise;
 
-        depthDataPromise = (async () => {
-            // 6ファイル一斉発射を避け、2本ずつ段階取得して帯域飽和とタイムアウトを防止する
-            const results = new Array(DEPTH_FILES.length).fill(null);
-            for (let i = 0; i < DEPTH_FILES.length; i += 2) {
-                const batch = [fetchDepthJsonSafe(DEPTH_FILES[i], 2)];
-                if (i + 1 < DEPTH_FILES.length) {
-                    batch.push(fetchDepthJsonSafe(DEPTH_FILES[i + 1], 2));
+        depthDataPromise = Promise.all(DEPTH_FILES.map(url => fetchDepthJsonSafe(url, 1)))
+            .then(results => {
+                const hasAny = results.some(item => Array.isArray(item) && item.length > 0);
+                if (!hasAny) {
+                    depthDataPromise = null;
+                    return null;
                 }
-                const chunk = await Promise.all(batch);
-                results[i] = chunk[0];
-                if (i + 1 < DEPTH_FILES.length) results[i + 1] = chunk[1];
-            }
-
-            const hasAny = results.some(item => Array.isArray(item) && item.length > 0);
-            if (!hasAny) {
-                depthDataPromise = null;
-                return null;
-            }
-            const normalized = results.map(item => (Array.isArray(item) ? item : []));
-            if (results.every(item => Array.isArray(item))) {
-                rawDepthData = normalized;
-            } else {
-                depthDataPromise = null;
-            }
-            return normalized;
-        })();
+                const normalized = results.map(item => (Array.isArray(item) ? item : []));
+                if (results.every(item => Array.isArray(item))) {
+                    rawDepthData = normalized;
+                } else {
+                    depthDataPromise = null;
+                }
+                return normalized;
+            });
 
         return depthDataPromise;
     }
@@ -4550,54 +4351,38 @@ const DepthMapController = (function() {
     }
 
     return {
-        loadData: function(options = {}) {
-            if (!options.force && typeof window.isSearchBot === 'function' && window.isSearchBot()) {
-                window._depthDeferredForBot = true;
-                if (typeof bindUserRecoveryListeners === 'function') bindUserRecoveryListeners();
-                return Promise.resolve(null);
-            }
+        loadData: function() {
             return loadDepthData();
         },
 
-        initAndShow: function(leafletMap, options = {}) {
+        initAndShow: function(leafletMap) {
             if (!leafletMap || typeof L === 'undefined') return Promise.resolve();
             mapInstance = leafletMap;
 
-            // 検索ボット時は等深線6本の初期通信をスキップして必須JSONに帯域を譲り、操作時に後から読み込み直す
-            if (!options.force && typeof window.isSearchBot === 'function' && window.isSearchBot()) {
-                window._depthDeferredForBot = true;
-                if (typeof bindUserRecoveryListeners === 'function') bindUserRecoveryListeners();
-                return Promise.resolve();
-            }
-
             if (loadPromise) return loadPromise;
 
-            // 先に陸地マスクを1本取得してから等深線本体を段階取得・描画する
-            loadPromise = loadMaskData()
-                .then(() => loadParsedDepthData())
-                .then(parsedLayers => {
-                    if (!Array.isArray(parsedLayers) || parsedLayers.length === 0) {
-                        loadPromise = null;
-                        return [];
-                    }
-                    createDepthLayers(mapInstance, parsedLayers);
-                    return parsedLayers;
-                }).catch(error => {
+            loadPromise = Promise.all([
+                loadParsedDepthData(),
+                loadMaskData()
+            ]).then(results => {
+                const parsedLayers = results[0];
+                if (!Array.isArray(parsedLayers) || parsedLayers.length === 0) {
                     loadPromise = null;
-                    console.warn('等深線レイヤー生成スキップ:', error && error.message ? error.message : error);
                     return [];
-                });
+                }
+                createDepthLayers(mapInstance, parsedLayers);
+                return parsedLayers;
+            }).catch(error => {
+                loadPromise = null;
+                console.warn('等深線レイヤー生成スキップ:', error && error.message ? error.message : error);
+                return [];
+            });
 
             return loadPromise;
         },
 
         toggle: function() {
             visible = !visible;
-            if (visible && depthLayers.length === 0 && (mapInstance || window.map)) {
-                window._depthDeferredForBot = false;
-                this.initAndShow(mapInstance || window.map, { force: true });
-                return visible;
-            }
             depthLayers.forEach(layerData => {
                 layerData.layers.forEach(layer => {
                     if (visible) layer.addTo(mapInstance);
