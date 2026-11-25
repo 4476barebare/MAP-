@@ -73,12 +73,16 @@
     <!-- ARTICLE_DATA: {"title":"【チニング入門】ルアーでクロダイを狙うための考え方と実践テクニック","description":"着底・ステイ・アタリの取り方など、ルアーでクロダイを狙う考え方を解説","image":"articles/images/chining.jpg","category":"ピックアップメソッド","style":"list"} -->
   </url>
   <url>
+    <loc>https://turiiko-navi.com/articles/hirame.html</loc>
+    <!-- ARTICLE_DATA: {"title":"【ヒラメ釣り完全攻略】70cm超「座布団ヒラメ」を狙うサーフ＆堤防のルアー・泳がせ釣り", "description":"サーフや堤防から狙う高級魚ヒラメの完全攻略ガイド。70cmを超える憧れの「座布団ヒラメ」をはじめ、離岸流・カケアガリなど海底地形の読み方、ミノーやメタルジグの使い分け、活きエサの泳がせ釣りまで徹底解説。", "image":"articles/images/hirame.jpg", "category":"シーズン本番いま熱い釣り", "style":"list"} -->
+  </url>
+  <url>
     <loc>https://turiiko-navi.com/articles/mebaru.html</loc>
-    <!-- ARTICLE_DATA: {"title":"春を告げる好敵手・メバル完全攻略ガイド：生態から見極めるポイント選び、釣り方、未来へつなぐリリース基準", "description":"晩秋から春に最盛期を迎えるメバルの生態・3種の見分け方・常夜灯や藻場のポイント選び・メバリング＆エサ釣り・20cm未満のリリース基準を解説。", "image":"articles/images/mebaru.jpg", "category":"ロックフィッシュ", "style":"list"} -->
+    <!-- ARTICLE_DATA: {"title":"春を告げる好敵手・メバル完全攻略ガイド：生態から見極めるポイント選び、釣り方、未来へつなぐリリース基準", "description":"晩秋から春に最盛期を迎えるメバルの生態・3種の見分け方・常夜灯や藻場のポイント選び・メバリング＆エサ釣り・20cm未満のリリース基準を解説。", "image":"articles/images/mebaru.jpg", "category":"シーズン本番いま熱い釣り", "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/ainame.html</loc>
-    <!-- ARTICLE_DATA: {"title":"【アイナメの釣り方】ルアーより「生き餌」が圧倒的に強い！仕掛け・ポイント・クジメとの違いと別格の旨さを徹底解説", "description":"堤防や岩礁帯で大型「ビール瓶サイズ」も狙えるアイナメの完全攻略ガイド。ルアーより生き餌（イワイソメ・アオイソメ・カニ）が圧倒的に強い理由、ポイント選び、ブラクリ・投げ釣り仕掛け、クジメとの見分け方と別格の食味まで徹底解説。", "image":"articles/images/ainame.jpg", "category":"ロックフィッシュ", "style":"list"} -->
+    <!-- ARTICLE_DATA: {"title":"【アイナメの釣り方】ルアーより「生き餌」が圧倒的に強い！仕掛け・ポイント・クジメとの違いと別格の旨さを徹底解説", "description":"堤防や岩礁帯で大型「ビール瓶サイズ」も狙えるアイナメの完全攻略ガイド。ルアーより生き餌（イワイソメ・アオイソメ・カニ）が圧倒的に強い理由、ポイント選び、ブラクリ・投げ釣り仕掛け、クジメとの見分け方と別格の食味まで徹底解説。", "image":"articles/images/ainame.jpg", "category":"シーズン本番いま熱い釣り", "style":"list"} -->
   </url>
   <url>
     <loc>https://turiiko-navi.com/articles/mejina.html</loc>
