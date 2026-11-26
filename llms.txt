@@ -19,7 +19,7 @@
 ## 千葉県 (CHIBA)
 
 - [千葉県の釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA.md): 千葉県のスポット概要・エリア別詳細ファイルへのハブ
-- [千葉県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/CHIBA_catch.md): 千葉県および周辺の最新SNS釣果まとめ（投稿78件 / 直近7日10件 / 2026-10-27〜2026-11-23）
+- [千葉県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/CHIBA_catch.md): 千葉県および周辺の最新SNS釣果まとめ（投稿78件 / 直近7日11件 / 2026-10-28〜2026-11-26）
 - [千葉県の魚種別釣り場一覧](https://turiiko-navi.com/ai-data/CHIBA_fish.md): 魚種名から千葉県の対象スポットを逆引き
 - [千葉県 銚子九十九里エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA_CHOUSHI.md): 銚子九十九里エリアの個別スポット詳細（20スポット）
 - [千葉県 南房総エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/CHIBA_MINAMI.md): 南房総エリアの個別スポット詳細（58スポット）
@@ -29,7 +29,7 @@
 ## 神奈川県 (KANAGAWA)
 
 - [神奈川県の釣りスポット情報](https://turiiko-navi.com/ai-data/KANAGAWA.md): 神奈川県のスポット概要・エリア別詳細ファイルへのハブ
-- [神奈川県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/KANAGAWA_catch.md): 神奈川県および周辺の最新SNS釣果まとめ（投稿125件 / 直近7日20件 / 2026-10-27〜2026-11-25）
+- [神奈川県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/KANAGAWA_catch.md): 神奈川県および周辺の最新SNS釣果まとめ（投稿130件 / 直近7日28件 / 2026-10-28〜2026-11-26）
 - [神奈川県の魚種別釣り場一覧](https://turiiko-navi.com/ai-data/KANAGAWA_fish.md): 魚種名から神奈川県の対象スポットを逆引き
 - [神奈川県 三浦半島エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/KANAGAWA_MIURA.md): 三浦半島エリアの個別スポット詳細（44スポット）
 - [神奈川県 湘南西湘エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/KANAGAWA_SEISHO.md): 湘南西湘エリアの個別スポット詳細（33スポット）
@@ -46,7 +46,7 @@
 ## 茨城県栃木県 (IBARAKI)
 
 - [茨城県栃木県の釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI.md): 茨城県栃木県のスポット概要・エリア別詳細ファイルへのハブ
-- [茨城県栃木県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/IBARAKI_catch.md): 茨城県栃木県および周辺の最新SNS釣果まとめ（投稿75件 / 直近7日13件 / 2026-10-27〜2026-11-25）
+- [茨城県栃木県および周辺の最新SNS釣果情報](https://turiiko-navi.com/ai-data/IBARAKI_catch.md): 茨城県栃木県および周辺の最新SNS釣果まとめ（投稿75件 / 直近7日14件 / 2026-10-28〜2026-11-26）
 - [茨城県栃木県の魚種別釣り場一覧](https://turiiko-navi.com/ai-data/IBARAKI_fish.md): 魚種名から茨城県栃木県の対象スポットを逆引き
 - [茨城県栃木県 北茨城エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI_HITACHI.md): 北茨城エリアの個別スポット詳細（15スポット）
 - [茨城県栃木県 霞ヶ浦エリアの釣りスポット情報](https://turiiko-navi.com/ai-data/IBARAKI_KASUMIGAURA.md): 霞ヶ浦エリアの個別スポット詳細（21スポット）

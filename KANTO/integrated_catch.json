@@ -1,5 +1,125 @@
 [
   {
+    "date": "2026/11/26",
+    "fish": "アジ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2125848435110920427",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "ベラ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2125848435110920427",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "クロダイ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2125848435110920427",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "メジナ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2125848435110920427",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "ブラックバス",
+    "lat": 35.21,
+    "lng": 139,
+    "area_name": "芦ノ湖",
+    "url": "https://www.instagram.com/p/DgMlMOJzrBI/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "ブラックバス",
+    "lat": 35.5866,
+    "lng": 139.2625,
+    "area_name": "津久井湖",
+    "url": "https://www.instagram.com/reel/DgMzPOvqEmV/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "アジ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "シーバス",
+    "lat": 35.3855,
+    "lng": 139.9172,
+    "area_name": "内房",
+    "url": "https://www.threads.com/@wardym921/post/DgMYQ9ekn6d",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "シーバス",
+    "lat": 35.3108,
+    "lng": 139.8223,
+    "area_name": "内房",
+    "url": "https://www.threads.com/@wardym921/post/DgMYQ9ekn6d",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "シーバス",
+    "lat": 35.1246,
+    "lng": 139.8286,
+    "area_name": "内房",
+    "url": "https://www.threads.com/@wardym921/post/DgMYQ9ekn6d",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "シーバス",
+    "lat": 34.9958,
+    "lng": 139.8587,
+    "area_name": "内房",
+    "url": "https://www.threads.com/@wardym921/post/DgMYQ9ekn6d",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/26",
+    "fish": "ウナギ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://www.threads.com/@t.t9737/post/DgMihq_mm5g",
+    "source": "Threads",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/25",
     "fish": "ブラックバス",
     "lat": 35.6186,
@@ -48,6 +168,86 @@
     "url": "https://www.instagram.com/p/DgJY0XLS_Cx/",
     "source": "Instagram",
     "model": "Muse"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "アジ",
+    "lat": 35.4208,
+    "lng": 139.6738,
+    "area_name": "本牧海づり施設",
+    "url": "https://x.com/BSSBULL/status/2125554809797582912",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "カタクチイワシ",
+    "lat": 35.4208,
+    "lng": 139.6738,
+    "area_name": "本牧海づり施設",
+    "url": "https://x.com/BSSBULL/status/2125554809797582912",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "アジ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://x.com/sakana_datahook/status/2125564115985035722",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "イワシ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://x.com/sakana_datahook/status/2125564115985035722",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "アジ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/sakana_datahook/status/2125564115985035722",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "クロダイ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/sakana_datahook/status/2125564115985035722",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "アジ",
+    "lat": 35.3956,
+    "lng": 139.6455,
+    "area_name": "磯子",
+    "url": "https://x.com/sakana_datahook/status/2125564115985035722",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "メジナ",
+    "lat": 35.3956,
+    "lng": 139.6455,
+    "area_name": "磯子",
+    "url": "https://x.com/sakana_datahook/status/2125564115985035722",
+    "source": "X",
+    "model": "Grok"
   },
   {
     "date": "2026/11/24",
@@ -5748,65 +5948,5 @@
     "url": "https://x.com/fishing_alcohol/status/2115372938165883368",
     "source": "X",
     "model": "Grok"
-  },
-  {
-    "date": "2026/10/27",
-    "fish": "アジ",
-    "lat": 35.1416,
-    "lng": 139.8335,
-    "area_name": "保田港",
-    "url": "https://x.com/hotakunimaru/status/2114970496454545816",
-    "source": "X",
-    "model": "Grok"
-  },
-  {
-    "date": "2026/10/27",
-    "fish": "マダイ",
-    "lat": 35.2289,
-    "lng": 139.7196,
-    "area_name": "久里浜港",
-    "url": "https://x.com/amiyamaru/status/2114991684849467767",
-    "source": "X",
-    "model": "Grok"
-  },
-  {
-    "date": "2026/10/27",
-    "fish": "カンパチ",
-    "lat": 35.28,
-    "lng": 139.48,
-    "area_name": "相模湾",
-    "url": "https://www.instagram.com/p/De_S-F-mZTP/",
-    "source": "Instagram",
-    "model": "Muse"
-  },
-  {
-    "date": "2026/10/27",
-    "fish": "カンパチ",
-    "lat": 35.28,
-    "lng": 139.28,
-    "area_name": "相模湾",
-    "url": "https://www.instagram.com/p/De_S-F-mZTP/",
-    "source": "Instagram",
-    "model": "Muse"
-  },
-  {
-    "date": "2026/10/27",
-    "fish": "アジ",
-    "lat": 36.34,
-    "lng": 140.595,
-    "area_name": "那珂湊港",
-    "url": "https://www.threads.com/@mariatan4649/post/De_nH6pEpmh",
-    "source": "Threads",
-    "model": "Muse"
-  },
-  {
-    "date": "2026/10/27",
-    "fish": "ブラックバス",
-    "lat": 35.5833,
-    "lng": 139.2333,
-    "area_name": "津久井湖",
-    "url": "https://www.instagram.com/p/DfBQFTAAbRV/",
-    "source": "Instagram",
-    "model": "Muse"
   }
 ]
