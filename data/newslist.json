@@ -1,6 +1,6 @@
 {
-  "generated": "2026-11-25T18:03:20+09:00",
-  "count": 261,
+  "generated": "2026-11-26T06:04:00+09:00",
+  "count": 267,
   "items": [
     {
       "date": "2026-12-26",
@@ -121,6 +121,42 @@
     },
     {
       "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=news.yahoo.co.jp&sz=128",
+      "thumbnail": "",
+      "title": "福島・木戸川のサケ漁は今季4匹のみ、350万匹放流も戻らず全国的な不漁が深刻に",
+      "source_name": "Yahoo!ニュース",
+      "source_url": "https://news.yahoo.co.jp/articles/864ec2c3b9e317df15140443425af8e64f0d74b0",
+      "category": "水産業"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "シマノのサクラマス用メタルジグ「オシア ペブルスティック サクラスペシャル」に新色4色を追加",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/25/lure/67591/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "シマノのサクラマス用メタルジグ「SLサーディン サクラスペシャル」発売、大型ベイト対応のセミロングジグ",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/25/uncategorized/67587/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "スミスのメタルジグ「CB.ムラマサ3S」にサクラマス向けカラー追加、長時間ステイが持ち味",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/25/lure/67583/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-25",
       "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
       "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/S__32792591.jpg?resize=914%2C1024&ssl=1",
       "title": "入鹿池のバス大会「入鹿オープンクラシック」を開催、入賞者全員にKEENのシューズを協賛",
@@ -228,6 +264,96 @@
       "category": "釣りニュース"
     },
     {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/f045516a5c2fe325041a312c25552783.jpg?fit=1024%2C722&ssl=1",
+      "title": "冬の釣りに欠かせない防寒グローブ、フリーノットの注目モデルをタイプ別に紹介",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456822/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-101.jpg?fit=1024%2C722&ssl=1",
+      "title": "根掛かりを安全に外す第一精工の「カラビナキッター」、ロッド破損やケガを防ぐ使い方",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456487/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-106.jpg?fit=1024%2C722&ssl=1",
+      "title": "藤田夏輝が明かす晩秋から冬に効く“切り札ハードルアー”とその出しどころ",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456412/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/0218efccfa565d4d2ee80984bd2a639e-3.jpg?fit=1024%2C722&ssl=1",
+      "title": "オクマのレバードラグリール「ソルテラ SLX B」登場、回転負荷を前作比50％以上低減",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456810/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/4c85c234076325c638e2c305400f29d6-125.jpg?fit=1024%2C769&ssl=1",
+      "title": "寒波で鈍ったデカバスを狙う今江克隆の毛モノ・骨モノ最新シークレットリグ",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/457003/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/56e1d29f0fb015fc3779b0ebe55d55c0.jpg?fit=1024%2C722&ssl=1",
+      "title": "入手困難なハンドメイドのチャビング専用ルアーと専用ネットを実釣レビュー",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/457211/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
+      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/5a497226e54ffd4d3a77fdc9f34d91c9-1.jpg?fit=1024%2C722&ssl=1",
+      "title": "ヤマガブランクスのライトゲームロッド「ブルーカレントⅢ」全13機種を総ざらい",
+      "source_name": "ルアーニュース",
+      "source_url": "https://www.lurenewsr.com/456952/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/TOP-1.jpg",
+      "title": "「ボウズ逃れ」だけではもったいない、カサゴをライトゲームの主役にする楽しみ方",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417803/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
+      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/20261120cb0401.jpg",
+      "title": "晩秋から初冬のチヌカカリ釣り入門、数釣りのためのタックルとダンゴ選び",
+      "source_name": "TSURINEWS",
+      "source_url": "https://tsurinews.jp/417870/",
+      "category": "釣りニュース"
+    },
+    {
+      "date": "2026-11-25",
+      "favicon": "https://www.google.com/s2/favicons?domain=tsurigu-np.jp&sz=128",
+      "thumbnail": "https://i0.wp.com/tsurigu-np.jp/tnp/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-48.jpg?fit=1920%2C1440&ssl=1",
+      "title": "結ぶだけですぐ始められるささめ針の「堤防ライトカゴ釣りセット」、夜釣りにも対応",
+      "source_name": "釣具新聞",
+      "source_url": "https://tsurigu-np.jp/products/33676/",
+      "category": "釣りニュース"
+    },
+    {
       "date": "2026-11-24",
       "favicon": "https://www.google.com/s2/favicons?domain=www.saitama-np.co.jp&sz=128",
       "thumbnail": "",
@@ -288,6 +414,24 @@
       "title": "ダイワの船タチウオテンヤにミラーカラー「Rhythm MR」登場、多面体ヘッドで乱反射を強化",
       "source_name": "釣り速報",
       "source_url": "https://www.tsurisoku.com/news/207491/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-24",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "ダイワのバーサタイルロッド「スーパーマルチスティック MX」発売、1本で多彩な釣りに対応",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/24/lure/67551/",
+      "category": "釣具新製品"
+    },
+    {
+      "date": "2026-11-24",
+      "favicon": "https://www.google.com/s2/favicons?domain=troutnews.info&sz=128",
+      "thumbnail": "",
+      "title": "メジャークラフトのトラウトロッド「ファインテール ～Original～」発売、トレカT1100G採用の第3世代",
+      "source_name": "トラウトフィッシングニュース",
+      "source_url": "https://troutnews.info/2026/11/24/lure/67544/",
       "category": "釣具新製品"
     },
     {
@@ -1164,60 +1308,6 @@
       "category": "釣りニュース"
     },
     {
-      "date": "2026-11-21",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/0001-3.jpg?fit=1024%2C722&ssl=1",
-      "title": "天龍のティップラン専用ロッドが開発最終段階に、2027年登場予定で詳細は釣りフェスで公開見込み",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456386/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-21",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/51e857499f65b060a36ca9736847fe0b-1.jpg?fit=1024%2C722&ssl=1",
-      "title": "金森隆志が晩秋から初冬の切り札に挙げるレベルバイブブースト、ライトキャロとの使い分けを解説",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456543/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-21",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/342e6f7f699f948080e802f4be7afb6a-1.jpg?fit=1024%2C722&ssl=1",
-      "title": "巻いても釣れないメバルには「止める」技術、デッドスローやポンプリトリーブなど裏スタンダードを解説",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456470/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-21",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/07-1.jpg?fit=1024%2C722&ssl=1",
-      "title": "三重・紀伊長島のティップランでアオリイカ17杯、レンジクルーザーTRの逃げ惑う演出が好反応",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456393/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-21",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/5c9a19f26a817a5e04bb1d2ac9c79404.png?resize=1200%2C675&ssl=1",
-      "title": "DUOリモートシーバスバトル2026が閉幕、ランカー36匹が上がる盛況ぶり",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456484/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-21",
-      "favicon": "https://www.google.com/s2/favicons?domain=tsurinews.jp&sz=128",
-      "thumbnail": "https://tsurinews.jp/data/wp-content/uploads/2026/11/a11b4bb3ba448d1fa402ac3dc62cc91f-1.jpeg",
-      "title": "カサゴは底狙いだけじゃない、ワームのただ巻きで15尾超えの釣果",
-      "source_name": "TSURINEWS",
-      "source_url": "https://tsurinews.jp/417547/",
-      "category": "釣りニュース"
-    },
-    {
       "date": "2026-11-20",
       "favicon": "https://www.google.com/s2/favicons?domain=hokkoku.co.jp&sz=128",
       "thumbnail": "",
@@ -1261,42 +1351,6 @@
       "source_name": "テレ朝NEWS",
       "source_url": "https://news.tv-asahi.co.jp/news_society/articles/000549327.html",
       "category": "クマ出没"
-    },
-    {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/09/75c140d3601436d9bf49d9f8aa3af58a-12.jpg?resize=1024%2C569&ssl=1",
-      "title": "「海老ジグ」8色の中で特によく釣れる2色を紹介、クルマエビグローとオキアミシルバーを使い分け",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456448/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/www.lurenewsr.com/lnr/wp-content/uploads/2023/02/3d5c0830897cb0933bd24116eeed37df.jpg?resize=240%2C62&ssl=1",
-      "title": "フィンチの丸首リバーシブル中綿ジャケット「ラビダ エアフリップ」登場、3Mシンサレートで軽く暖かい",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455937/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/11/49ad9805262d99213dadcd550a8c1560.png?resize=1024%2C736&ssl=1",
-      "title": "金森隆志が晩秋のリザーバー攻略を解説、ライトキャロで最初の深みを狙う",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/456307/",
-      "category": "釣りニュース"
-    },
-    {
-      "date": "2026-11-20",
-      "favicon": "https://www.google.com/s2/favicons?domain=www.lurenewsr.com&sz=128",
-      "thumbnail": "https://i0.wp.com/d3vctapjvpoi4i.cloudfront.net/lnr/wp-content/uploads/2026/05/S__46104624_0.jpg?resize=984%2C594&ssl=1",
-      "title": "DUELの新素材PFライン「The ONE アジング」登場、エステルの約3倍の感度で極細仕様",
-      "source_name": "ルアーニュース",
-      "source_url": "https://www.lurenewsr.com/455984/",
-      "category": "釣りニュース"
     },
     {
       "date": "2026-11-19",

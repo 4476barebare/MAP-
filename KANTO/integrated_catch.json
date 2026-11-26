@@ -1,5 +1,55 @@
 [
   {
+    "date": "2026/11/25",
+    "fish": "ブラックバス",
+    "lat": 35.6186,
+    "lng": 139.1917,
+    "area_name": "相模湖",
+    "url": "https://x.com/nissoen_bass60/status/2125496057555730870",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "ワラサ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2125427618271171049",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "カンパチ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2125427618271171049",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "アジ",
+    "lat": 35.9184,
+    "lng": 140.7061,
+    "area_name": "鹿島港魚釣園",
+    "url": "https://x.com/KashimaUoturien/status/2125427777591816637",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/25",
+    "fish": "ブラックバス",
+    "lat": 35.505,
+    "lng": 139.68,
+    "area_name": "鶴見川",
+    "url": "https://www.instagram.com/p/DgJY0XLS_Cx/",
+    "source": "Instagram",
+    "model": "Muse"
+  },
+  {
     "date": "2026/11/24",
     "fish": "オキアジ",
     "lat": 33.1256,
@@ -56,6 +106,46 @@
     "lng": 140.775,
     "area_name": "鹿島灘サーフ",
     "url": "https://x.com/kaze_kaoru_jp/status/2125050840025350303",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "イワシ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://x.com/fishing_catch55/status/2125190260720333136",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "アジ",
+    "lat": 35.4325,
+    "lng": 139.6642,
+    "area_name": "本牧",
+    "url": "https://x.com/fishing_catch55/status/2125190260720333136",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "アジ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/fishing_catch55/status/2125190260720333136",
+    "source": "X",
+    "model": "Grok"
+  },
+  {
+    "date": "2026/11/24",
+    "fish": "アナゴ",
+    "lat": 35.446,
+    "lng": 139.697,
+    "area_name": "大黒海づり施設",
+    "url": "https://x.com/fishing_catch55/status/2125190260720333136",
     "source": "X",
     "model": "Grok"
   },
@@ -297,6 +387,46 @@
     "area_name": "亀山ダム",
     "url": "https://www.instagram.com/reel/DgFjlihS_rd/",
     "source": "Instagram",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "サワラ",
+    "lat": 35.28,
+    "lng": 139.48,
+    "area_name": "相模湾",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0yY343qMRHJaCVMa2qd8w8jowUTjrRDmCrqz1px6vAQoXxPNBERA7ejwbqg9ySPrzl&id=100039749988318",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "サワラ",
+    "lat": 35.28,
+    "lng": 139.28,
+    "area_name": "相模湾",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0yY343qMRHJaCVMa2qd8w8jowUTjrRDmCrqz1px6vAQoXxPNBERA7ejwbqg9ySPrzl&id=100039749988318",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "タチウオ",
+    "lat": 35.28,
+    "lng": 139.48,
+    "area_name": "相模湾",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0yY343qMRHJaCVMa2qd8w8jowUTjrRDmCrqz1px6vAQoXxPNBERA7ejwbqg9ySPrzl&id=100039749988318",
+    "source": "Facebook",
+    "model": "Muse"
+  },
+  {
+    "date": "2026/11/23",
+    "fish": "タチウオ",
+    "lat": 35.28,
+    "lng": 139.28,
+    "area_name": "相模湾",
+    "url": "https://www.facebook.com/permalink.php?story_fbid=pfbid0yY343qMRHJaCVMa2qd8w8jowUTjrRDmCrqz1px6vAQoXxPNBERA7ejwbqg9ySPrzl&id=100039749988318",
+    "source": "Facebook",
     "model": "Muse"
   },
   {
@@ -5678,25 +5808,5 @@
     "url": "https://www.instagram.com/p/DfBQFTAAbRV/",
     "source": "Instagram",
     "model": "Muse"
-  },
-  {
-    "date": "2026/10/26",
-    "fish": "アジ",
-    "lat": 35.5398,
-    "lng": 140.0682,
-    "area_name": "オリジナルメーカー海釣り公園",
-    "url": "https://x.com/udon_a_udon_a/status/2114670164151284207",
-    "source": "X",
-    "model": "Grok"
-  },
-  {
-    "date": "2026/10/26",
-    "fish": "ブラックバス",
-    "lat": 35.6158,
-    "lng": 139.1884,
-    "area_name": "相模湖",
-    "url": "https://x.com/OGAWATEI_boat/status/2114643351341576471",
-    "source": "X",
-    "model": "Grok"
   }
 ]
