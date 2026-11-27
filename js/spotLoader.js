@@ -456,9 +456,15 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
 
     window._prefBackgroundLoad = selectedPrefDonePromise;
 
+    let resolveButtonsShown;
+    const buttonsShownPromise = new Promise(resolve => { resolveButtonsShown = resolve; });
+
     if (hasSpotZoom) {
         // 戻るボタンはタイル切替・投稿ボタンと同様に、所属県データと演出準備が揃ってから同時フェードインさせる
-        zoomToSpot(spot, { prefDataPromise: prefReturnReadyPromise });
+        zoomToSpot(spot, {
+            prefDataPromise: prefReturnReadyPromise,
+            onButtonsShown: resolveButtonsShown
+        });
     } else {
         const backBtn = document.getElementById('map-back-btn');
         if (backBtn) {
@@ -494,7 +500,10 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
             prefReturnReadyPromise,
             new Promise(resolve => setTimeout(resolve, 3000))
         ]).then(() => {
-            if (window.currentPref !== prefCode) return;
+            if (window.currentPref !== prefCode) {
+                resolveButtonsShown();
+                return;
+            }
             const btn = document.getElementById('map-back-btn');
             if (btn) {
                 btn.style.display = 'block';
@@ -507,8 +516,32 @@ async function spot_management(prefCode = window.currentPref, areaId = window.cu
             if (!hasSpotZoom && finalAreaId && typeof phase1menu === 'function') {
                 phase1menu(finalAreaId);
             }
+            resolveButtonsShown();
         });
     }
+
+    // ★ 等深線は「⑤天気・魚種・IC・釣果」＋「⑥ボタン表示」＋「裏JS先読み」がすべて終わった最後尾で開始
+    //   （※途中で goBack されてもキャンセルせず完了後に自動表示する）
+    const spotReadyForDepthPromise = Promise.allSettled([
+        selectedPrefDonePromise,
+        buttonsShownPromise
+    ]);
+    window._spotReadyForDepthPromise = spotReadyForDepthPromise;
+
+    spotReadyForDepthPromise.then(() => {
+        if (!window._depthDeferredForSpot) return;
+        const triggerDepth = () => {
+            if (typeof window.startDeferredDepthMap === 'function') {
+                window.startDeferredDepthMap();
+            }
+        };
+        const bgPromise = window._bgScriptsPreloadPromise;
+        if (bgPromise && typeof bgPromise.then === 'function') {
+            bgPromise.finally(triggerDepth);
+        } else {
+            triggerDepth();
+        }
+    });
 
     if (typeof renderSpotRanking === 'function') renderSpotRanking();
     if (typeof syncGuideSections === 'function') syncGuideSections();
@@ -670,6 +703,10 @@ function zoomToSpot(spot, options = {}) {
             });
             if (typeof window.fadeInUserAndTempPins === 'function') {
                 window.fadeInUserAndTempPins(safe);
+            }
+
+            if (options && typeof options.onButtonsShown === 'function') {
+                try { options.onButtonsShown(); } catch (e) {}
             }
 
             setTimeout(() => {
