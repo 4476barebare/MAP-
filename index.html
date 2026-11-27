@@ -891,6 +891,80 @@ function updateSeoMeta() {
         script.textContent = JSON.stringify(jsonLdData);
         document.head.appendChild(script);
     }
+
+    // --------------------------------------------------
+    // ■ パンくず構造化データ（BreadcrumbList）の動的生成と更新
+    //   （#seo-json-ld とは独立管理し、spotLoader.js の後追い更新と競合させない）
+    // --------------------------------------------------
+    let oldBreadcrumb = document.getElementById('seo-breadcrumb-ld');
+    if (oldBreadcrumb) {
+        oldBreadcrumb.remove();
+    }
+
+    if (pref || area || spotName) {
+        const siteOrigin = (window.location.origin && /^https?:/i.test(window.location.origin))
+            ? window.location.origin
+            : 'https://turiiko-navi.com';
+        const bcRegionName = typeof getRegionDisplayName === 'function'
+            ? getRegionDisplayName()
+            : '関東地方';
+        const encodedRegion = encodeURIComponent(bcRegionName);
+
+        const breadcrumbItems = [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "釣り行こNAVI",
+                "item": `${siteOrigin}/`
+            }
+        ];
+
+        if (pref) {
+            breadcrumbItems.push({
+                "@type": "ListItem",
+                "position": breadcrumbItems.length + 1,
+                "name": pref,
+                "item": `${siteOrigin}/?region=${encodedRegion}&pref=${encodeURIComponent(pref)}`
+            });
+        }
+
+        if (area) {
+            const areaUrl = pref
+                ? `${siteOrigin}/?region=${encodedRegion}&pref=${encodeURIComponent(pref)}&area=${encodeURIComponent(area)}`
+                : `${siteOrigin}/?region=${encodedRegion}&area=${encodeURIComponent(area)}`;
+            breadcrumbItems.push({
+                "@type": "ListItem",
+                "position": breadcrumbItems.length + 1,
+                "name": area,
+                "item": areaUrl
+            });
+        }
+
+        if (spotName) {
+            const spotUrlParts = [`region=${encodedRegion}`];
+            if (pref) spotUrlParts.push(`pref=${encodeURIComponent(pref)}`);
+            if (area) spotUrlParts.push(`area=${encodeURIComponent(area)}`);
+            spotUrlParts.push(`spot=${encodeURIComponent(spotName)}`);
+            breadcrumbItems.push({
+                "@type": "ListItem",
+                "position": breadcrumbItems.length + 1,
+                "name": spotName,
+                "item": `${siteOrigin}/?${spotUrlParts.join('&')}`
+            });
+        }
+
+        const breadcrumbLd = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": breadcrumbItems
+        };
+
+        const bcScript = document.createElement('script');
+        bcScript.setAttribute('type', 'application/ld+json');
+        bcScript.setAttribute('id', 'seo-breadcrumb-ld');
+        bcScript.textContent = JSON.stringify(breadcrumbLd);
+        document.head.appendChild(bcScript);
+    }
 }
 
 // waitAndRenderSpotDetails は /js/spotLoader.js へ移動済み
