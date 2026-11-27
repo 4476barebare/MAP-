@@ -877,6 +877,27 @@ li {
     line-height: 1.3;
 }
 
+#accessInfoBox .spot-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-top: 5px;
+}
+
+#accessInfoBox .spot-tag-chip {
+    display: inline-block;
+    padding: 1px 7px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: #191970;
+    background: #f0f4ff;
+    border: 1px solid rgba(25, 25, 112, 0.22);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
 #accessInfoBox .spot-sub-meta {
     display: flex;
     justify-content: flex-end;
