@@ -1,0 +1,204 @@
+name: "Manual Sync Location v2 JSONs (GAS: Gemini)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      region_code:
+        description: "対象リージョンコード（例: KANTO）"
+        required: true
+        default: "KANTO"
+        type: string
+      target_prefs:
+        description: "対象県コード（ALL で region.csv から全県自動取得 / 個別指定例: CHIBA,TOKYO）"
+        required: true
+        default: "ALL"
+        type: string
+      deploy_pages:
+        description: "ファイル更新があった場合に GitHub Pages へデプロイする"
+        required: false
+        default: true
+        type: boolean
+      force_deploy:
+        description: "変更がなくても GitHub Pages へ強制デプロイする"
+        required: false
+        default: false
+        type: boolean
+
+# デプロイ渋滞・Git競合を防ぐ排他制御（朝夕ワークフローと同一グループで直列化）
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  sync-location-v2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "1. Fetch *_location_v2.json (GAS: Gemini folder)"
+        id: fetch
+        continue-on-error: true
+        env:
+          GAS_URL: ${{ secrets.DRIVE_FETCHER_GAS_URL }}
+          SECRET_KEY: "aZ3kP9xQw7LmN2vB8tRc"
+          FOLDER_NAME: "Gemini"
+          REGION_CODE: ${{ inputs.region_code }}
+          TARGET_PREFS: ${{ inputs.target_prefs }}
+        run: |
+          set -u
+          REGION=$(echo "${REGION_CODE:-KANTO}" | tr '[:lower:]' '[:upper:]' | xargs)
+          RAW_PREFS=$(echo "${TARGET_PREFS:-ALL}" | tr '[:lower:]' '[:upper:]' | xargs)
+          REGION_CSV="${REGION}/${REGION}_region.csv"
+
+          mkdir -p "$REGION"
+
+          echo "### 📍 Location v2 JSON 手動取り込み結果 (${REGION})" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 県コード | 保存先 | ステータス | 詳細 |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| :--- | :--- | :--- | :--- |" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -z "${GAS_URL:-}" ]; then
+            echo "❌ エラー: Secret DRIVE_FETCHER_GAS_URL が未設定です。"
+            echo "| ALL | \`${REGION}/*_location_v2.json\` | ❌ 失敗 | Secret未設定 |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          if [ -z "$RAW_PREFS" ] || [ "$RAW_PREFS" = "ALL" ]; then
+            if [ ! -f "$REGION_CSV" ]; then
+              echo "❌ エラー: ${REGION_CSV} が見つかりません。"
+              echo "| ALL | \`${REGION}/*_location_v2.json\` | ❌ 失敗 | ${REGION_CSV} 未検出 |" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+            PREFS=$(awk -F',' 'NR>1 {gsub(/\r/, "", $0); if ($11 == "pref") print $1}' "$REGION_CSV")
+          else
+            PREFS=$(echo "$RAW_PREFS" | tr ',、' ' ')
+          fi
+
+          if [ -z "$PREFS" ]; then
+            echo "❌ エラー: 対象の県コードを取得できませんでした。"
+            echo "| ALL | \`${REGION}/*_location_v2.json\` | ❌ 失敗 | 対象県なし |" >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          UPDATED_FILES=0
+          SKIPPED_FILES=0
+          FAILED_PREFS=""
+
+          for PREF in $PREFS; do
+            PREF=$(echo "$PREF" | xargs)
+            [ -z "$PREF" ] && continue
+
+            FILE_NAME="${PREF}_location_v2.json"
+            DEST="${REGION}/${FILE_NAME}"
+            TMP_FILE="/tmp/${FILE_NAME}"
+            TARGET_URL="${GAS_URL}?folder=${FOLDER_NAME}&file=${FILE_NAME}&key=${SECRET_KEY}"
+
+            echo "========================================="
+            echo "📥 Fetching ${FILE_NAME} from ${FOLDER_NAME} ..."
+            echo "========================================="
+
+            if curl -sSL --fail --retry 2 --connect-timeout 15 --max-time 45 "$TARGET_URL" -o "$TMP_FILE" \
+              && jq -e 'type == "object" and (.status // "") != "error" and .v == 2 and (.pref | type == "object") and (.areas | type == "object") and (.spots | type == "object") and ((.spots | length) > 0)' "$TMP_FILE" > /dev/null 2>&1; then
+              AREA_CNT=$(jq '.areas | length' "$TMP_FILE")
+              SPOT_CNT=$(jq '.spots | length' "$TMP_FILE")
+              BYTES=$(wc -c < "$TMP_FILE")
+              SIZE_KB=$(awk -v b="$BYTES" 'BEGIN { printf "%.1f", b / 1024 }')
+
+              if [ -f "$DEST" ] && cmp -s "$TMP_FILE" "$DEST"; then
+                SKIPPED_FILES=$((SKIPPED_FILES + 1))
+                echo "  ⏭️ Unchanged: ${DEST} (areas:${AREA_CNT}, spots:${SPOT_CNT}, ${SIZE_KB}KB)"
+                echo "| ${PREF} | \`${DEST}\` | ⏭️ 更新なし | 変更なし (エリア:${AREA_CNT} / スポット:${SPOT_CNT} / ${SIZE_KB}KB) |" >> "$GITHUB_STEP_SUMMARY"
+              else
+                mv "$TMP_FILE" "$DEST"
+                UPDATED_FILES=$((UPDATED_FILES + 1))
+                echo "  ✅ Saved: ${DEST} (areas:${AREA_CNT}, spots:${SPOT_CNT}, ${SIZE_KB}KB)"
+                echo "| ${PREF} | \`${DEST}\` | ✅ 更新完了 | エリア:${AREA_CNT} / スポット:${SPOT_CNT} / ${SIZE_KB}KB |" >> "$GITHUB_STEP_SUMMARY"
+              fi
+            else
+              echo "  ❌ Error: Invalid JSON or fetch failed for ${FILE_NAME}"
+              head -n 10 "$TMP_FILE" 2>/dev/null || true
+              FAILED_PREFS="${FAILED_PREFS} ${PREF}"
+              echo "| ${PREF} | \`${DEST}\` | ❌ 失敗 | GAS取得エラーまたはv2スキーマ検証NG |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+
+            sleep 1
+          done
+
+          echo "region=${REGION}" >> "$GITHUB_OUTPUT"
+          echo "updated=${UPDATED_FILES}" >> "$GITHUB_OUTPUT"
+          echo "skipped=${SKIPPED_FILES}" >> "$GITHUB_OUTPUT"
+
+          if [ -n "$FAILED_PREFS" ]; then
+            echo "⚠️ 一部の県で取り込みに失敗しました:${FAILED_PREFS}"
+            exit 1
+          fi
+
+      - name: "2. Commit and Push Changes"
+        id: commit
+        env:
+          REGION_CODE: ${{ inputs.region_code }}
+        run: |
+          REGION=$(echo "${REGION_CODE:-KANTO}" | tr '[:lower:]' '[:upper:]' | xargs)
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if compgen -G "${REGION}/*_location_v2.json" > /dev/null; then
+            git add -- "${REGION}"/*_location_v2.json
+          fi
+
+          if ! git diff --cached --quiet; then
+            git commit -m "🤖 manual: ${REGION} Location v2 JSONをGoogleドライブから同期"
+
+            if ! git pull --rebase origin main; then
+              echo "⚠️ リベース競合を検出しました。今回の取り込み結果（--theirs）を優先して解消します。"
+              REBASE_MERGE_DIR="$(git rev-parse --git-path rebase-merge)"
+              REBASE_APPLY_DIR="$(git rev-parse --git-path rebase-apply)"
+              while [ -d "$REBASE_MERGE_DIR" ] || [ -d "$REBASE_APPLY_DIR" ]; do
+                git diff --name-only --diff-filter=DU | while IFS= read -r f; do
+                  [ -n "$f" ] && git checkout --theirs -- "$f" && git add -- "$f"
+                done
+                git diff --name-only --diff-filter=UD | while IFS= read -r f; do
+                  [ -n "$f" ] && git rm -f -- "$f"
+                done
+                git diff --name-only --diff-filter=U | while IFS= read -r f; do
+                  [ -n "$f" ] && git checkout --theirs -- "$f" && git add -- "$f"
+                done
+                git add -- "${REGION}"/*_location_v2.json
+                git -c core.editor=true rebase --continue || true
+              done
+            fi
+
+            git push origin main
+            echo "pushed=true" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "✅ **更新された Location v2 JSON をリポジトリへコミット＆プッシュしました。**" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "⏭️ **Location v2 JSON に変更がなかったため、コミットをスキップしました。**" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: "3. Upload Pages Artifact"
+        id: upload_artifact
+        if: (steps.commit.outputs.pushed == 'true' && (inputs.deploy_pages == true || github.event.inputs.deploy_pages == 'true')) || inputs.force_deploy == true || github.event.inputs.force_deploy == 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './'
+
+      - name: "4. Deploy to GitHub Pages"
+        id: deployment
+        if: ((steps.commit.outputs.pushed == 'true' && (inputs.deploy_pages == true || github.event.inputs.deploy_pages == 'true')) || inputs.force_deploy == true || github.event.inputs.force_deploy == 'true') && steps.upload_artifact.outcome == 'success'
+        uses: actions/deploy-pages@v4
