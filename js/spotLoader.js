@@ -2718,8 +2718,32 @@ function renderTideSvgWithMorph(overlay, cfg) {
   const plotH = bottomY - topY;
   const midY = topY + plotH * 0.55;
 
-  const MIN_CM = -30;
-  const MAX_CM = 180;
+  // 基本レンジは -40cm〜230cm 固定（関東の現実的な潮位に対して余裕を確保し、大潮と小潮の差を明確に表示）
+  // 範囲に迫る／超えるデータがある場合のみ、そのスポットの8日分共通スケールを余裕付きで自動拡張
+  let MIN_CM = -40;
+  let MAX_CM = 230;
+  const allDaysForScale = Array.isArray(window._tideOverlayState.tideDays)
+    ? window._tideOverlayState.tideDays
+    : [cfg.series];
+  let scaleMin = Infinity;
+  let scaleMax = -Infinity;
+  for (let d = 0; d < allDaysForScale.length; d++) {
+    const dayArr = allDaysForScale[d];
+    if (!Array.isArray(dayArr)) continue;
+    for (let i = 0; i < dayArr.length; i++) {
+      const v = Number(dayArr[i]);
+      if (!Number.isFinite(v)) continue;
+      if (v < scaleMin) scaleMin = v;
+      if (v > scaleMax) scaleMax = v;
+    }
+  }
+  if (Number.isFinite(scaleMin) && scaleMin < MIN_CM + 5) {
+    MIN_CM = Math.floor((scaleMin - 15) / 10) * 10;
+  }
+  if (Number.isFinite(scaleMax) && scaleMax > MAX_CM - 5) {
+    MAX_CM = Math.ceil((scaleMax + 15) / 10) * 10;
+  }
+
   const valToY = (cm) => {
     const clamped = Math.max(MIN_CM, Math.min(MAX_CM, cm));
     const ratio = (clamped - MIN_CM) / (MAX_CM - MIN_CM);
