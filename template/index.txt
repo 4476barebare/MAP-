@@ -654,6 +654,41 @@ async function renderSpotRanking() {
     }
 }
 // ==========================================
+// ★ スポット環境・地形タグ（v2 tags）共通SEOヘルパー
+// ==========================================
+function getSpotTagsList(spot) {
+    if (!spot || !Array.isArray(spot.tags)) return [];
+    const seen = new Set();
+    const out = [];
+    for (let i = 0; i < spot.tags.length; i++) {
+        const t = String(spot.tags[i] || '').trim();
+        if (!t || seen.has(t)) continue;
+        seen.add(t);
+        out.push(t);
+    }
+    return out;
+}
+window.getSpotTagsList = getSpotTagsList;
+
+function formatSpotTagsPrefix(tags) {
+    if (!Array.isArray(tags) || tags.length === 0) return '';
+    return `【${tags.join('・')}】`;
+}
+window.formatSpotTagsPrefix = formatSpotTagsPrefix;
+
+function applySpotTagsToJsonLd(jsonLdData, tags) {
+    if (!jsonLdData || !Array.isArray(tags) || tags.length === 0) return jsonLdData;
+    jsonLdData.keywords = tags.join(', ');
+    jsonLdData.additionalProperty = tags.map(tag => ({
+        "@type": "PropertyValue",
+        "name": "環境・地形",
+        "value": tag
+    }));
+    return jsonLdData;
+}
+window.applySpotTagsToJsonLd = applySpotTagsToJsonLd;
+
+// ==========================================
 // ★ タイトル・メタタグ動的更新関数（連携版）
 // ==========================================
 function updateSeoMeta() {
@@ -674,12 +709,16 @@ function updateSeoMeta() {
     
     let mapAltText = "関東地方の釣り場・最新釣果さかな地図（空撮＆等深線マップ）";
     let targetSpot = null;
+    let targetSpotTags = [];
 
     // --------------------------------------------------
     // ■ 階層ごとのテキスト出し分け＆魚種データ抽出
     // --------------------------------------------------
     if (spotName) {
-        if (window.spotData && window.spotData.length > 0) {
+        const v2PrefEntry = window.currentPref && window.prefLocationV2 && window.prefLocationV2[window.currentPref];
+        if (v2PrefEntry && v2PrefEntry.spotMap && v2PrefEntry.spotMap[spotName]) {
+            targetSpot = v2PrefEntry.spotMap[spotName];
+        } else if (window.spotData && window.spotData.length > 0) {
             targetSpot = window.spotData.find(s => s.name === spotName);
         }
 
@@ -689,6 +728,8 @@ function updateSeoMeta() {
 
         if (targetSpot) {
             const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
+            targetSpotTags = getSpotTagsList(targetSpot);
+            const tagPrefix = formatSpotTagsPrefix(targetSpotTags);
             let extraInfo = "";
 
             // ★ spot.URL から魚種や貸しボートなどの名前を抽出
@@ -705,9 +746,9 @@ function updateSeoMeta() {
             }
 
             if (dictEntry && dictEntry.description) {
-                newDesc = extraInfo + dictEntry.description;
+                newDesc = tagPrefix + extraInfo + dictEntry.description;
             } else {
-                newDesc = extraInfo + newDesc;
+                newDesc = tagPrefix + extraInfo + newDesc;
             }
         }
 
@@ -820,6 +861,7 @@ function updateSeoMeta() {
                 };
             }
         }
+        applySpotTagsToJsonLd(jsonLdData, targetSpotTags);
 
         const script = document.createElement('script');
         script.setAttribute('type', 'application/ld+json');
@@ -1083,50 +1125,58 @@ async function loadLocationJSON() {
         };
     }
 
-    // 分岐B：金庫(allspotData)から対象県を抽出
-    const vaultData = window.allspotData || window.ALL_REGION_SPOTS || [];
+    // 分岐B：v2正規化済みキャッシュ（window.prefLocationV2）があればO(1)で即展開
     let main = null;
-    const areas = [];
-    const spots = [];
+    let areas = [];
+    let spots = [];
+    const v2Entry = window.prefLocationV2 && window.prefLocationV2[pref];
 
-    const targetRows = vaultData.filter(row => {
-        return (
-            row._prefCode === pref ||
-            (!row.areaId && row.name === pref) ||
-            row.areaId === pref ||
-            (row.areaId && typeof row.areaId === 'string' && row.areaId.startsWith(pref + '_'))
-        );
-    });
+    if (v2Entry && v2Entry.pref) {
+        main = v2Entry.pref;
+        areas = Array.isArray(v2Entry.areas) ? v2Entry.areas : [];
+        spots = Array.isArray(v2Entry.spots) ? v2Entry.spots : [];
+    } else {
+        // 旧互換フォールバック：金庫(allspotData)から対象県を抽出
+        const vaultData = window.allspotData || window.ALL_REGION_SPOTS || [];
+        const targetRows = vaultData.filter(row => {
+            return (
+                row._prefCode === pref ||
+                (!row.areaId && row.name === pref) ||
+                row.areaId === pref ||
+                (row.areaId && typeof row.areaId === 'string' && row.areaId.startsWith(pref + '_'))
+            );
+        });
 
-    targetRows.forEach(row => {
-        row.squareX = null;
-        row.squareY = null;
-    });
+        targetRows.forEach(row => {
+            row.squareX = null;
+            row.squareY = null;
+        });
 
-    targetRows.forEach(row => {
-        if ((!row.areaId || row.individualId === 'parent') && (row.name === pref || row._prefCode === pref)) {
-            main = row;
-        }
-    });
-
-    targetRows.forEach(row => {
-        if ((row.areaId || '').trim() === pref) {
-            if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
-                const grid = parseGrid(row.url);
-                row.squareX = grid.x;
-                row.squareY = grid.y;
+        targetRows.forEach(row => {
+            if ((!row.areaId || row.individualId === 'parent') && (row.name === pref || row._prefCode === pref)) {
+                main = row;
             }
-            areas.push(row);
-        }
-    });
+        });
 
-    targetRows.forEach(row => {
-        if (row.type === 'pref' || row.type === 'area') return;
-        const icon = row.icon;
-        if (icon && icon.trim() !== '') {
-            spots.push(row);
-        }
-    });
+        targetRows.forEach(row => {
+            if ((row.areaId || '').trim() === pref) {
+                if (row.url && row.url.includes('x:') && row.url.includes('y:')) {
+                    const grid = parseGrid(row.url);
+                    row.squareX = grid.x;
+                    row.squareY = grid.y;
+                }
+                areas.push(row);
+            }
+        });
+
+        targetRows.forEach(row => {
+            if (row.type === 'pref' || row.type === 'area') return;
+            const icon = row.icon;
+            if (icon && icon.trim() !== '') {
+                spots.push(row);
+            }
+        });
+    }
 
     if (window.fishDataCache && window.fishDataCache[pref] && typeof applyFishDataToSpots === 'function') {
         applyFishDataToSpots(spots, window.fishDataCache[pref]);
@@ -2129,35 +2179,157 @@ if (typeof window.loadRegionCSV !== 'function') {
     };
 }
 
+window.prefLocationV2 = window.prefLocationV2 || {};
+if (typeof window.normalizePrefLocationPayload !== 'function') {
+    window.normalizePrefLocationPayload = function(prefCode, rawData) {
+        if (!rawData) return null;
+        if (!Array.isArray(rawData) && typeof rawData === 'object' && rawData.spots && typeof rawData.spots === 'object') {
+            const p = rawData.pref || {};
+            const prefRow = {
+                name: p.code || prefCode,
+                zoom: p.zoom,
+                individualId: 'parent',
+                lat: p.lat,
+                lng: p.lng,
+                url: p.jmaCode || p.url || '',
+                notes: p.name || prefCode,
+                squareX: null,
+                squareY: null,
+                _prefCode: prefCode
+            };
+            const areaRows = [];
+            const areaMap = {};
+            const areaByName = {};
+            if (rawData.areas && typeof rawData.areas === 'object') {
+                for (const [areaKey, a] of Object.entries(rawData.areas)) {
+                    if (!a || typeof a !== 'object') continue;
+                    const indivId = a.id != null ? String(a.id) : (areaKey.includes('_') ? areaKey.slice(areaKey.lastIndexOf('_') + 1) : areaKey);
+                    const areaPrefix = (indivId && areaKey.endsWith('_' + indivId))
+                        ? areaKey.slice(0, -(indivId.length + 1))
+                        : (areaKey.includes('_') ? areaKey.slice(0, areaKey.lastIndexOf('_')) : prefCode);
+                    const gx = (a.grid && Number.isFinite(Number(a.grid.x))) ? Number(a.grid.x) : null;
+                    const gy = (a.grid && Number.isFinite(Number(a.grid.y))) ? Number(a.grid.y) : null;
+                    const desc = a.desc != null ? String(a.desc) : (a.notes != null ? String(a.notes) : '');
+                    const areaRow = {
+                        name: a.name || '',
+                        zoom: a.zoom,
+                        individualId: indivId,
+                        lat: a.lat,
+                        lng: a.lng,
+                        areaId: areaPrefix,
+                        url: (gx != null && gy != null) ? `x:${gx};y:${gy}` : '',
+                        notes: desc,
+                        desc: desc,
+                        squareX: gx,
+                        squareY: gy,
+                        _areaKey: areaKey,
+                        _prefCode: prefCode
+                    };
+                    areaRows.push(areaRow);
+                    areaMap[areaKey] = areaRow;
+                    if (areaRow.name) areaByName[areaRow.name] = areaRow;
+                }
+            }
+            const spotRows = [];
+            const spotMap = {};
+            for (const [spotName, s] of Object.entries(rawData.spots)) {
+                if (!s || typeof s !== 'object') continue;
+                const indivId = s.id != null ? String(s.id) : (s.individualId != null ? String(s.individualId) : '');
+                const cleanTags = Array.isArray(s.tags)
+                    ? [...new Set(s.tags.map(t => String(t || '').trim()).filter(Boolean))]
+                    : [];
+                const addressStr = s.address != null ? String(s.address) : (s.notes != null ? String(s.notes) : '');
+                const spotRow = {
+                    name: spotName,
+                    id: indivId,
+                    individualId: indivId,
+                    lat: s.lat,
+                    lng: s.lng,
+                    areaId: s.areaId || '',
+                    icon: s.icon || '',
+                    tags: cleanTags,
+                    squareX: null,
+                    squareY: null,
+                    _prefCode: prefCode
+                };
+                if (s.zoom != null && String(s.zoom).trim() !== '') spotRow.zoom = s.zoom;
+                if (s.type) spotRow.type = s.type;
+                if (addressStr) { spotRow.address = addressStr; spotRow.notes = addressStr; }
+                spotRows.push(spotRow);
+                spotMap[spotName] = spotRow;
+            }
+            return { v: 2, isV2: true, pref: prefRow, areas: areaRows, spots: spotRows, areaMap, areaByName, spotMap, rows: [prefRow, ...areaRows, ...spotRows] };
+        }
+        if (Array.isArray(rawData)) {
+            let prefRow = null;
+            const areaRows = [];
+            const spotRows = [];
+            const areaMap = {};
+            const areaByName = {};
+            const spotMap = {};
+            for (const row of rawData) {
+                if (!row || typeof row !== 'object') continue;
+                row._prefCode = prefCode;
+                if ((!row.areaId || row.individualId === 'parent') && (row.name === prefCode || row._prefCode === prefCode)) {
+                    prefRow = row;
+                } else if ((row.areaId || '').trim() === prefCode && row.individualId && row.individualId !== 'parent') {
+                    const areaKey = `${row.areaId}_${row.individualId}`;
+                    areaRows.push(row);
+                    areaMap[areaKey] = row;
+                    if (row.name) areaByName[row.name] = row;
+                } else if (row.type !== 'pref' && row.type !== 'area' && row.icon && String(row.icon).trim() !== '') {
+                    if (!Array.isArray(row.tags)) row.tags = [];
+                    spotRows.push(row);
+                    if (row.name) spotMap[row.name] = row;
+                }
+            }
+            return { v: 1, isV2: false, pref: prefRow, areas: areaRows, spots: spotRows, areaMap, areaByName, spotMap, rows: rawData };
+        }
+        return null;
+    };
+}
+
 if (typeof window.loadPrefectureSpots !== 'function') {
     window.loadPrefectureSpots = async function(prefCode, mode = 'select') {
         const regionCode = window.currentRegion || 'KANTO';
         const fetchPref = (code, priority = 'low') => {
             if (!code) return Promise.resolve([]);
-            if (Array.isArray(window.prefSpotData[code])) return Promise.resolve(window.prefSpotData[code]);
+            if (Array.isArray(window.prefSpotData[code]) && window.prefLocationV2[code]) {
+                return Promise.resolve(window.prefSpotData[code]);
+            }
             if (window.prefSpotPromises[code]) return window.prefSpotPromises[code];
-            const url = `/${regionCode}/${code}_location.json`;
+            const v2Url = `/${regionCode}/${code}_location_v2.json`;
+            const legacyUrl = `/${regionCode}/${code}_location.json`;
             const maxRetries = priority === 'high' ? 1 : 0;
-            const doFetch = attempt => fetch(url, { priority })
+            const fetchJson = (url, attempt) => fetch(url, { priority })
                 .then(r => {
-                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    if (!r.ok) {
+                        const err = new Error('HTTP ' + r.status);
+                        err.status = r.status;
+                        throw err;
+                    }
                     return r.json();
                 })
-                .then(data => {
-                    if (!Array.isArray(data)) return [];
-                    data.forEach(s => { s._prefCode = code; });
-                    window.prefSpotData[code] = data;
+                .catch(err => {
+                    if (attempt < maxRetries && (!err || err.status !== 404)) {
+                        return new Promise(resolve => setTimeout(resolve, 300)).then(() => fetchJson(url, attempt + 1));
+                    }
+                    throw err;
+                });
+            window.prefSpotPromises[code] = fetchJson(v2Url, 0)
+                .catch(() => fetchJson(legacyUrl, 0))
+                .then(rawData => {
+                    const normalized = window.normalizePrefLocationPayload(code, rawData);
+                    if (!normalized || !Array.isArray(normalized.rows)) return [];
+                    window.prefLocationV2[code] = normalized;
+                    window.prefSpotData[code] = normalized.rows;
                     window._loadedPrefSet.add(code);
-                    return data;
+                    return normalized.rows;
                 })
                 .catch(() => {
-                    if (attempt < maxRetries) {
-                        return new Promise(resolve => setTimeout(resolve, 300)).then(() => doFetch(attempt + 1));
-                    }
                     delete window.prefSpotPromises[code];
                     return [];
                 });
-            window.prefSpotPromises[code] = doFetch(0);
             return window.prefSpotPromises[code];
         };
         if (mode === 'select' && prefCode) {
@@ -2247,9 +2419,13 @@ if (typeof window.renderAccessInfo !== 'function') {
         const coopText = dictEntry && dictEntry.fishingCooperative ? String(dictEntry.fishingCooperative).trim() : '';
         const descText = dictEntry && dictEntry.description ? String(dictEntry.description).trim() : '';
 
+        const spotTags = typeof getSpotTagsList === 'function' ? getSpotTagsList(spot) : [];
         let html = '<div class="spot-header-wrap">';
         if (waterRegionalText) html += `<div class="spot-water-regional">${esc(waterRegionalText)}</div>`;
         html += `<h3 class="spot-main-title">${esc(spot.name)}</h3>`;
+        if (spotTags.length > 0) {
+            html += `<div class="spot-tags-row" aria-label="釣り場の特徴">${spotTags.map(t => `<span class="spot-tag-chip">${esc(t)}</span>`).join('')}</div>`;
+        }
         if (altText || coopText) {
             html += '<div class="spot-sub-meta">';
             if (altText) html += `<span class="spot-alt-name">${esc(altText)}</span>`;
@@ -2379,19 +2555,34 @@ async function applyQueryToStateFromCsv() {
     if (!vaultData || vaultData.length === 0) return;
 
     if (qArea || qSpot) {
-        const prefRows = window.currentPref
-            ? vaultData.filter(r => r._prefCode === window.currentPref || (r.areaId && String(r.areaId).startsWith(window.currentPref)))
-            : vaultData;
-
-        for (const row of prefRows) {
-            const rowName = row.name;
-            if (qArea && rowName === qArea && row.areaId && row.individualId) {
-                window.currentAreaId = row.areaId + "_" + row.individualId;
+        const v2PrefEntry = window.currentPref && window.prefLocationV2 && window.prefLocationV2[window.currentPref];
+        if (v2PrefEntry) {
+            if (qArea && v2PrefEntry.areaByName && v2PrefEntry.areaByName[qArea]) {
+                const aRow = v2PrefEntry.areaByName[qArea];
+                window.currentAreaId = aRow._areaKey || (aRow.areaId + "_" + aRow.individualId);
             }
-            if (qSpot && rowName === qSpot && row.type !== 'pref' && row.type !== 'area') {
-                window.currentSpotId = row.individualId;
-                if (!qArea && row.areaId) {
-                    window.currentAreaId = row.areaId;
+            if (qSpot && v2PrefEntry.spotMap && v2PrefEntry.spotMap[qSpot]) {
+                const sRow = v2PrefEntry.spotMap[qSpot];
+                window.currentSpotId = sRow.individualId;
+                if (!window.currentAreaId && sRow.areaId) {
+                    window.currentAreaId = sRow.areaId;
+                }
+            }
+        } else {
+            const prefRows = window.currentPref
+                ? vaultData.filter(r => r._prefCode === window.currentPref || (r.areaId && String(r.areaId).startsWith(window.currentPref)))
+                : vaultData;
+
+            for (const row of prefRows) {
+                const rowName = row.name;
+                if (qArea && rowName === qArea && row.areaId && row.individualId) {
+                    window.currentAreaId = row.areaId + "_" + row.individualId;
+                }
+                if (qSpot && rowName === qSpot && row.type !== 'pref' && row.type !== 'area') {
+                    window.currentSpotId = row.individualId;
+                    if (!qArea && row.areaId) {
+                        window.currentAreaId = row.areaId;
+                    }
                 }
             }
         }
