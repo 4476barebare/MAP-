@@ -33,8 +33,8 @@ const SITE_URL = "https://turiiko-navi.com";
 
 // 県範囲の切り出し距離上限（リージョン内全正規スポットと比較し、最寄りが対象県かつこの距離以内の代表点を採用）
 const MAX_ASSIGN_DISTANCE_KM = Number(process.env.MAX_ASSIGN_DISTANCE_KM || 15);
-// エリア分割MDリンクの出し分け用閾値（generate_chiba_md.js と同一）
-const AREA_SPLIT_THRESHOLD = 30;
+// エリア分割MDリンクの出し分け用閾値（generate_pref_md.js と同一）
+const AREA_SPLIT_THRESHOLD = Number(process.env.AREA_SPLIT_THRESHOLD || 15);
 
 const REGION_DIR = path.join(ROOT, REGION_CODE);
 const CATCH_JSON_PATH = path.join(REGION_DIR, "integrated_catch.json");
@@ -129,66 +129,124 @@ function splitFishNames(rawFish) {
 }
 
 // ==========================================
-// リージョン内の全 *_location.json を自動検出してロード
+// リージョン内の全 *_location_v2.json / *_location.json を自動検出してロード
 // （県範囲の境界判定のみに使用し、個別スポットへの紐付けは行わない）
 // ==========================================
 function discoverPrefCodes(regionDir) {
     if (!fs.existsSync(regionDir)) {
         throw new Error("リージョンディレクトリが見つかりません: " + regionDir);
     }
-    return fs.readdirSync(regionDir)
-        .filter(name => /_location\.json$/i.test(name))
-        .map(name => name.replace(/_location\.json$/i, "").toUpperCase())
-        .sort();
+    const seen = new Set();
+    for (const name of fs.readdirSync(regionDir)) {
+        if (/_location_v2\.json$/i.test(name)) {
+            seen.add(name.replace(/_location_v2\.json$/i, "").toUpperCase());
+        } else if (/_location\.json$/i.test(name)) {
+            seen.add(name.replace(/_location\.json$/i, "").toUpperCase());
+        }
+    }
+    return [...seen].sort();
 }
 
 function loadPrefLocationMeta(prefCode) {
-    const locationPath = path.join(REGION_DIR, `${prefCode}_location.json`);
-    const locationData = readJsonRequired(locationPath);
-    if (!Array.isArray(locationData)) {
-        throw new Error(`location.json の形式が配列ではありません: ${locationPath}`);
-    }
+    const v2Path = path.join(REGION_DIR, `${prefCode}_location_v2.json`);
+    const legacyPath = path.join(REGION_DIR, `${prefCode}_location.json`);
 
-    const prefRow = locationData.find(row =>
-        row.name === prefCode && row.individualId === "parent"
-    );
-    const prefName = cleanText(prefRow?.notes) || PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
+    let prefName = PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
+    let areaList = [];
+    let boundaryPoints = [];
+    let locationPath = legacyPath;
+    let locationFileName = `${prefCode}_location.json`;
 
-    const areaRows = locationData.filter(row =>
-        row.areaId === prefCode && row.individualId && row.individualId !== "parent"
-    );
-    const areaList = areaRows.map(area => {
-        const areaKey = area.areaId + "_" + area.individualId;
-        return {
-            areaKey,
-            fileName: `${sanitizeFileSegment(areaKey)}.md`,
-            name: cleanText(area.name)
-        };
-    });
+    if (fs.existsSync(v2Path)) {
+        const v2 = readJsonRequired(v2Path);
+        if (!v2 || typeof v2 !== "object" || !v2.spots || typeof v2.spots !== "object") {
+            throw new Error(`location_v2.json の形式が不正です: ${v2Path}`);
+        }
+        locationPath = v2Path;
+        locationFileName = `${prefCode}_location_v2.json`;
+        prefName = cleanText(v2.pref?.name) || prefName;
 
-    // 範囲判定用の正規スポット座標群（個別スポット紐付けには使用しない）
-    const boundaryPoints = locationData
-        .filter(row =>
-            hasZoom(row.zoom) &&
-            row.type !== "pref" &&
-            row.type !== "area" &&
-            typeof row.areaId === "string" &&
-            row.areaId.startsWith(prefCode + "_") &&
-            typeof row.icon === "string" &&
-            row.icon.trim() !== ""
-        )
-        .map(spot => {
-            const lat = Number(spot.lat);
-            const lng = Number(spot.lng);
-            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+        if (v2.areas && typeof v2.areas === "object") {
+            areaList = Object.entries(v2.areas)
+                .filter(([, area]) => area && typeof area === "object")
+                .map(([areaKey, area]) => ({
+                    areaKey,
+                    fileName: `${sanitizeFileSegment(areaKey)}.md`,
+                    name: cleanText(area.name)
+                }));
+        }
+
+        boundaryPoints = Object.values(v2.spots)
+            .filter(spot =>
+                spot &&
+                typeof spot === "object" &&
+                hasZoom(spot.zoom) &&
+                spot.type !== "pref" &&
+                spot.type !== "area" &&
+                typeof spot.areaId === "string" &&
+                spot.areaId.startsWith(prefCode + "_") &&
+                typeof spot.icon === "string" &&
+                spot.icon.trim() !== ""
+            )
+            .map(spot => {
+                const lat = Number(spot.lat);
+                const lng = Number(spot.lng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                return {
+                    prefCode,
+                    areaKey: spot.areaId,
+                    lat,
+                    lng
+                };
+            })
+            .filter(Boolean);
+    } else {
+        const locationData = readJsonRequired(legacyPath);
+        if (!Array.isArray(locationData)) {
+            throw new Error(`location.json の形式が配列ではありません: ${legacyPath}`);
+        }
+
+        const prefRow = locationData.find(row =>
+            row.name === prefCode && row.individualId === "parent"
+        );
+        prefName = cleanText(prefRow?.notes) || prefName;
+
+        const areaRows = locationData.filter(row =>
+            row.areaId === prefCode && row.individualId && row.individualId !== "parent"
+        );
+        areaList = areaRows.map(area => {
+            const areaKey = area.areaId + "_" + area.individualId;
             return {
-                prefCode,
-                areaKey: spot.areaId,
-                lat,
-                lng
+                areaKey,
+                fileName: `${sanitizeFileSegment(areaKey)}.md`,
+                name: cleanText(area.name)
             };
-        })
-        .filter(Boolean);
+        });
+
+        // 範囲判定用の正規スポット座標群（個別スポット紐付けには使用しない）
+        boundaryPoints = locationData
+            .filter(row =>
+                hasZoom(row.zoom) &&
+                row.type !== "pref" &&
+                row.type !== "area" &&
+                typeof row.areaId === "string" &&
+                row.areaId.startsWith(prefCode + "_") &&
+                typeof row.icon === "string" &&
+                row.icon.trim() !== ""
+            )
+            .map(spot => {
+                const lat = Number(spot.lat);
+                const lng = Number(spot.lng);
+                if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+                return {
+                    prefCode,
+                    areaKey: spot.areaId,
+                    lat,
+                    lng
+                };
+            })
+            .filter(Boolean);
+    }
 
     const activeAreaKeys = new Set(boundaryPoints.map(p => p.areaKey));
     const activeAreas = areaList.filter(a => activeAreaKeys.has(a.areaKey));
@@ -198,6 +256,7 @@ function loadPrefLocationMeta(prefCode) {
         prefCode,
         prefName,
         locationPath,
+        locationFileName,
         areas: activeAreas,
         boundaryPoints,
         shouldSplitByArea
@@ -533,7 +592,7 @@ function buildCatchMarkdown(prefMeta, posts, updatedDate) {
 
     lines.push("---");
     lines.push("");
-    lines.push(`データ出典: ${REGION_CODE}/integrated_catch.json（範囲判定参照: ${REGION_CODE}/*_location.json）`);
+    lines.push(`データ出典: ${REGION_CODE}/integrated_catch.json（範囲判定参照: ${REGION_CODE}/${prefMeta.locationFileName}）`);
     lines.push("");
 
     return {
@@ -559,7 +618,7 @@ try {
 
     const availablePrefCodes = discoverPrefCodes(REGION_DIR);
     if (availablePrefCodes.length === 0) {
-        throw new Error(`*_location.json が見つかりません: ${REGION_DIR}`);
+        throw new Error(`*_location_v2.json / *_location.json が見つかりません: ${REGION_DIR}`);
     }
 
     let targetPrefCodes;
@@ -572,7 +631,7 @@ try {
         const missing = targetPrefCodes.filter(code => !availablePrefCodes.includes(code));
         if (missing.length > 0) {
             throw new Error(
-                `指定された県のlocation.jsonが見つかりません: ${missing.join(", ")}（利用可能: ${availablePrefCodes.join(", ")}）`
+                `指定された県のlocationファイルが見つかりません: ${missing.join(", ")}（利用可能: ${availablePrefCodes.join(", ")}）`
             );
         }
     }

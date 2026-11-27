@@ -374,7 +374,9 @@ function discoverPrefCodes() {
                     if (parts.length >= 4) code = parts[1].split("_")[0];
                     else if (parts.length === 3) code = parts[0].split("_")[0];
                     code = code.trim().toUpperCase();
-                    if (code && !seen.has(code) && fs.existsSync(path.join(REGION_DIR, `${code}_location.json`))) {
+                    const hasV2 = fs.existsSync(path.join(REGION_DIR, `${code}_location_v2.json`));
+                    const hasLegacy = fs.existsSync(path.join(REGION_DIR, `${code}_location.json`));
+                    if (code && !seen.has(code) && (hasV2 || hasLegacy)) {
                         seen.add(code);
                         found.push(code);
                     }
@@ -384,9 +386,15 @@ function discoverPrefCodes() {
     }
 
     if (found.length === 0) {
-        found = fs.readdirSync(REGION_DIR)
-            .filter(name => /_location\.json$/i.test(name))
-            .map(name => name.replace(/_location\.json$/i, "").toUpperCase());
+        const seen = new Set();
+        for (const name of fs.readdirSync(REGION_DIR)) {
+            if (/_location_v2\.json$/i.test(name)) {
+                seen.add(name.replace(/_location_v2\.json$/i, "").toUpperCase());
+            } else if (/_location\.json$/i.test(name)) {
+                seen.add(name.replace(/_location\.json$/i, "").toUpperCase());
+            }
+        }
+        found = [...seen];
     }
 
     return found.sort((a, b) => {
@@ -400,30 +408,84 @@ function discoverPrefCodes() {
 }
 
 function loadPrefDataWithWeather(prefCode, todayUtcMs) {
-    const locPath = path.join(REGION_DIR, `${prefCode}_location.json`);
-    const rows = readJsonOptional(locPath, `${prefCode} location JSON`);
-    if (!Array.isArray(rows)) return null;
+    const v2Path = path.join(REGION_DIR, `${prefCode}_location_v2.json`);
+    const legacyPath = path.join(REGION_DIR, `${prefCode}_location.json`);
 
-    const prefRow = rows.find(r => r.name === prefCode && r.individualId === "parent");
-    const prefName = cleanText(prefRow?.notes) || PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
-
-    const areaRows = rows.filter(r => r.areaId === prefCode && r.individualId && r.individualId !== "parent");
+    let prefName = PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
     const areaMap = new Map();
-    for (const a of areaRows) {
-        const areaKey = `${a.areaId}_${a.individualId}`;
-        areaMap.set(areaKey, {
-            areaKey,
-            name: cleanText(a.name),
-            fileName: `${sanitizeFileSegment(areaKey)}.md`
-        });
+    const rawSpotList = [];
+
+    if (fs.existsSync(v2Path)) {
+        const v2 = readJsonOptional(v2Path, `${prefCode} location v2 JSON`);
+        if (!v2 || typeof v2 !== "object" || !v2.spots || typeof v2.spots !== "object") return null;
+
+        prefName = cleanText(v2.pref?.name) || prefName;
+
+        if (v2.areas && typeof v2.areas === "object") {
+            for (const [areaKey, a] of Object.entries(v2.areas)) {
+                if (!a || typeof a !== "object") continue;
+                areaMap.set(areaKey, {
+                    areaKey,
+                    name: cleanText(a.name),
+                    fileName: `${sanitizeFileSegment(areaKey)}.md`
+                });
+            }
+        }
+
+        for (const [spotName, s] of Object.entries(v2.spots)) {
+            if (!s || typeof s !== "object") continue;
+            rawSpotList.push({
+                ...s,
+                name: spotName,
+                individualId: s.id ?? s.individualId ?? "",
+                tags: Array.isArray(s.tags) ? s.tags : []
+            });
+        }
+    } else {
+        const rows = readJsonOptional(legacyPath, `${prefCode} location JSON`);
+        if (!Array.isArray(rows)) return null;
+
+        const prefRow = rows.find(r => r.name === prefCode && r.individualId === "parent");
+        prefName = cleanText(prefRow?.notes) || prefName;
+
+        const areaRows = rows.filter(r => r.areaId === prefCode && r.individualId && r.individualId !== "parent");
+        for (const a of areaRows) {
+            const areaKey = `${a.areaId}_${a.individualId}`;
+            areaMap.set(areaKey, {
+                areaKey,
+                name: cleanText(a.name),
+                fileName: `${sanitizeFileSegment(areaKey)}.md`
+            });
+        }
+
+        for (const row of rows) {
+            if (row.type === "pref" || row.type === "area") continue;
+            if (row.individualId === "parent") continue;
+            if (!row.icon && row.areaId && !String(row.areaId).includes("_")) continue;
+            rawSpotList.push({
+                ...row,
+                tags: Array.isArray(row.tags) ? row.tags : []
+            });
+        }
     }
 
-    const coastalRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_whether.json`), `${prefCode} 沿岸天気JSON`);
-    const inlandRaw = readJsonOptional(path.join(DATA_DIR, `${prefCode}_InLandwhether.json`), `${prefCode} 内陸天気JSON`);
+    // 天気データ読込（v2統合 *_weather_v2.json を最優先し、未配置県は旧 *_whether.json にフォールバック）
+    const weatherV2Path = path.join(DATA_DIR, `${prefCode}_weather_v2.json`);
+    const weatherV2Raw = fs.existsSync(weatherV2Path)
+        ? readJsonOptional(weatherV2Path, `${prefCode} 統合天気v2 JSON`)
+        : null;
+    const weatherV2 = weatherV2Raw ? normalizeWeatherJsonByDate(weatherV2Raw, todayUtcMs) : null;
+
+    const coastalRaw = !weatherV2
+        ? readJsonOptional(path.join(DATA_DIR, `${prefCode}_whether.json`), `${prefCode} 沿岸天気JSON`)
+        : null;
+    const inlandRaw = !weatherV2
+        ? readJsonOptional(path.join(DATA_DIR, `${prefCode}_InLandwhether.json`), `${prefCode} 内陸天気JSON`)
+        : null;
     const coastalWeather = coastalRaw ? normalizeWeatherJsonByDate(coastalRaw, todayUtcMs) : null;
     const inlandWeather = inlandRaw ? normalizeWeatherJsonByDate(inlandRaw, todayUtcMs) : null;
 
-    const regularSpots = rows.filter(r =>
+    const regularSpots = rawSpotList.filter(r =>
         hasZoom(r.zoom) &&
         r.type !== "pref" &&
         r.type !== "area" &&
@@ -437,17 +499,19 @@ function loadPrefDataWithWeather(prefCode, todayUtcMs) {
     const hasSplitAreaMd = regularSpots.length >= AREA_SPLIT_THRESHOLD && activeAreaKeys.size > 1;
 
     const spots = [];
-    for (const row of rows) {
-        if (row.type === "pref" || row.type === "area") continue;
+    for (const row of rawSpotList) {
         const spot = { ...row, _prefCode: prefCode, _prefName: prefName };
 
-        // regionLoader.js と同じ優先順：沿岸を適用後、IDがL始まりのスポットは内陸天気で上書き
-        if (coastalWeather && coastalWeather.spots && coastalWeather.spots[spot.name]) {
-            spot.whether = coastalWeather.spots[spot.name];
-        }
-        const spotId = String(spot.individualId || spot.id || "");
-        if (spotId.startsWith("L") && inlandWeather && inlandWeather.spots && inlandWeather.spots[spot.name]) {
-            spot.whether = inlandWeather.spots[spot.name];
+        if (weatherV2 && weatherV2.spots && weatherV2.spots[spot.name]) {
+            spot.whether = weatherV2.spots[spot.name];
+        } else {
+            if (coastalWeather && coastalWeather.spots && coastalWeather.spots[spot.name]) {
+                spot.whether = coastalWeather.spots[spot.name];
+            }
+            const spotId = String(spot.individualId || spot.id || "");
+            if (spotId.startsWith("L") && inlandWeather && inlandWeather.spots && inlandWeather.spots[spot.name]) {
+                spot.whether = inlandWeather.spots[spot.name];
+            }
         }
 
         const areaInfo = areaMap.get(spot.areaId);
@@ -868,7 +932,7 @@ function buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults
 
     lines.push("---");
     lines.push("");
-    lines.push(`データ出典: data/*_whether.json、data/*_InLandwhether.json、${REGION_CODE}/integrated_catch.json、${REGION_CODE}/*_location.json`);
+    lines.push(`データ出典: data/*_weather_v2.json、${REGION_CODE}/integrated_catch.json、${REGION_CODE}/*_location_v2.json`);
     lines.push("");
 
     return lines.join("\n");
@@ -1444,7 +1508,7 @@ try {
 
     const prefCodes = discoverPrefCodes();
     if (prefCodes.length === 0) {
-        throw new Error(`*_location.json が見つかりません: ${REGION_DIR}`);
+        throw new Error(`*_location_v2.json / *_location.json が見つかりません: ${REGION_DIR}`);
     }
 
     const snsCatchData = readJsonOptional(CATCH_JSON_PATH, "統合SNS釣果JSON") || [];

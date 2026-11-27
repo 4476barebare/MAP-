@@ -73,10 +73,120 @@ function discoverPrefCodes(regionDir) {
     if (!fs.existsSync(regionDir)) {
         throw new Error("リージョンディレクトリが見つかりません: " + regionDir);
     }
-    return fs.readdirSync(regionDir)
-        .filter(name => /_location\.json$/i.test(name))
-        .map(name => name.replace(/_location\.json$/i, "").toUpperCase())
-        .sort();
+    const seen = new Set();
+    for (const name of fs.readdirSync(regionDir)) {
+        if (/_location_v2\.json$/i.test(name)) {
+            seen.add(name.replace(/_location_v2\.json$/i, "").toUpperCase());
+        } else if (/_location\.json$/i.test(name)) {
+            seen.add(name.replace(/_location\.json$/i, "").toUpperCase());
+        }
+    }
+    return [...seen].sort();
+}
+
+function loadPrefLocationInfo(prefCode) {
+    const prefNameFallback = PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
+    const v2Path = path.join(REGION_DIR, `${prefCode}_location_v2.json`);
+    const legacyPath = path.join(REGION_DIR, `${prefCode}_location.json`);
+
+    if (fs.existsSync(v2Path)) {
+        const v2 = readJsonRequired(v2Path);
+        if (!v2 || typeof v2 !== "object" || !v2.spots || typeof v2.spots !== "object") {
+            throw new Error(`location_v2.json の形式が不正です: ${v2Path}`);
+        }
+
+        const prefName = cleanText(v2.pref?.name) || prefNameFallback;
+        const areaMap = new Map();
+        if (v2.areas && typeof v2.areas === "object") {
+            for (const [areaKey, area] of Object.entries(v2.areas)) {
+                if (!area || typeof area !== "object") continue;
+                areaMap.set(areaKey, {
+                    areaKey,
+                    fileName: `${sanitizeFileSegment(areaKey)}.md`,
+                    name: cleanText(area.name),
+                    notes: cleanText(area.desc ?? area.notes),
+                    source: area
+                });
+            }
+        }
+
+        const spots = [];
+        for (const [spotName, s] of Object.entries(v2.spots)) {
+            if (!s || typeof s !== "object") continue;
+            if (
+                hasZoom(s.zoom) &&
+                s.type !== "pref" &&
+                s.type !== "area" &&
+                typeof s.areaId === "string" &&
+                s.areaId.startsWith(prefCode + "_") &&
+                typeof s.icon === "string" &&
+                s.icon.trim() !== ""
+            ) {
+                spots.push({
+                    ...s,
+                    name: spotName,
+                    individualId: s.id ?? s.individualId ?? "",
+                    tags: Array.isArray(s.tags) ? s.tags.map(cleanText).filter(Boolean) : []
+                });
+            }
+        }
+
+        return {
+            prefName,
+            areaMap,
+            spots,
+            locationFileName: `${prefCode}_location_v2.json`,
+            isV2: true
+        };
+    }
+
+    const locationData = readJsonRequired(legacyPath);
+    if (!Array.isArray(locationData)) {
+        throw new Error(`location.json の形式が配列ではありません: ${legacyPath}`);
+    }
+
+    const prefRow = locationData.find(row =>
+        row.name === prefCode && row.individualId === "parent"
+    );
+    const prefName = cleanText(prefRow?.notes) || prefNameFallback;
+
+    const areaRows = locationData.filter(row =>
+        row.areaId === prefCode && row.individualId && row.individualId !== "parent"
+    );
+    const areaMap = new Map();
+    areaRows.forEach(area => {
+        const areaKey = area.areaId + "_" + area.individualId;
+        areaMap.set(areaKey, {
+            areaKey,
+            fileName: `${sanitizeFileSegment(areaKey)}.md`,
+            name: cleanText(area.name),
+            notes: cleanText(area.notes),
+            source: area
+        });
+    });
+
+    const spots = locationData
+        .filter(row =>
+            hasZoom(row.zoom) &&
+            row.type !== "pref" &&
+            row.type !== "area" &&
+            typeof row.areaId === "string" &&
+            row.areaId.startsWith(prefCode + "_") &&
+            typeof row.icon === "string" &&
+            row.icon.trim() !== ""
+        )
+        .map(row => ({
+            ...row,
+            tags: Array.isArray(row.tags) ? row.tags.map(cleanText).filter(Boolean) : []
+        }));
+
+    return {
+        prefName,
+        areaMap,
+        spots,
+        locationFileName: `${prefCode}_location.json`,
+        isV2: false
+    };
 }
 
 function hasZoom(value) {
@@ -401,6 +511,10 @@ function renderSpotLines(record, prefCode, headingLevel = "###") {
         lines.push("");
     }
 
+    if (Array.isArray(record.tags) && record.tags.length > 0) {
+        lines.push(`- 特徴・環境: ${record.tags.join(" / ")}`);
+    }
+
     if (dict) {
         if (dict.address) {
             lines.push(`- 所在地: ${dict.address}`);
@@ -444,42 +558,11 @@ function renderSpotLines(record, prefCode, headingLevel = "###") {
 // ==========================================
 // 1県分のMarkdown一式ビルド
 // ==========================================
-function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, icData, shopList, updatedDate }) {
-    const prefNameFallback = PREF_NAME_FALLBACK_MAP[prefCode] || prefCode;
+function buildPrefMarkdown({ prefCode, locationInfo, fishData, dictionaryData, icData, shopList, updatedDate }) {
+    const { prefName, areaMap, spots, locationFileName } = locationInfo;
 
-    const prefRow = locationData.find(row =>
-        row.name === prefCode && row.individualId === "parent"
-    );
-    const prefName = cleanText(prefRow?.notes) || prefNameFallback;
-
-    const areaRows = locationData.filter(row =>
-        row.areaId === prefCode && row.individualId && row.individualId !== "parent"
-    );
-    const areaMap = new Map();
-    areaRows.forEach(area => {
-        const areaKey = area.areaId + "_" + area.individualId;
-        areaMap.set(areaKey, {
-            areaKey,
-            fileName: `${sanitizeFileSegment(areaKey)}.md`,
-            name: cleanText(area.name),
-            notes: cleanText(area.notes),
-            source: area
-        });
-    });
-
-    // 正規スポット: zoom指定あり、エリア所属、アイコンあり。
-    const spots = locationData.filter(row =>
-        hasZoom(row.zoom) &&
-        row.type !== "pref" &&
-        row.type !== "area" &&
-        typeof row.areaId === "string" &&
-        row.areaId.startsWith(prefCode + "_") &&
-        typeof row.icon === "string" &&
-        row.icon.trim() !== ""
-    );
-
-    if (spots.length === 0) {
-        throw new Error(`正規スポットが0件です。抽出条件と${prefCode}_location.jsonを確認してください。`);
+    if (!Array.isArray(spots) || spots.length === 0) {
+        throw new Error(`正規スポットが0件です。抽出条件と${locationFileName}を確認してください。`);
     }
 
     const fishFlatDict = buildFishFlatDict(fishData);
@@ -507,6 +590,7 @@ function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, i
             areaKey: spot.areaId,
             areaName,
             areaFileName,
+            tags: Array.isArray(spot.tags) ? spot.tags : [],
             fishNames,
             dict,
             accessTexts,
@@ -537,10 +621,11 @@ function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, i
     const spotsWithFish = spotRecords.filter(r => r.fishNames.length > 0);
     const spotsWithDict = spotRecords.filter(r => r.dict && r.dict.description);
     const spotsWithoutDict = spotRecords.filter(r => !r.dict || !r.dict.description);
+    const spotsWithTags = spotRecords.filter(r => r.tags.length > 0);
     const spotsWithAccess = spotRecords.filter(r => r.accessTexts.length > 0);
     const spotsWithShops = spotRecords.filter(r => r.shopTexts.length > 0);
 
-    const sourcesList = [`${REGION_CODE}/${prefCode}_location.json`];
+    const sourcesList = [`${REGION_CODE}/${locationFileName}`];
     if (fishData) sourcesList.push(`${REGION_CODE}/${prefCode}_fish.json`);
     if (dictionaryData) sourcesList.push(`${REGION_CODE}/${prefCode}_dictionary.json`);
     if (Array.isArray(icData) && icData.length > 0) sourcesList.push(`data/${REGION_CODE}_geo.json`);
@@ -565,7 +650,7 @@ function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, i
     mainLines.push(`# ${prefName}の釣りスポット一覧`);
     mainLines.push("");
     mainLines.push("> 本ファイルは釣り行こNAVIのスポット情報を、AIが参照しやすいMarkdownにまとめたものです。");
-    mainLines.push(`> 正規スポットは${prefCode}_location.jsonのうち、zoomが指定され、エリアに所属し、アイコンが設定された行を対象としています。`);
+    mainLines.push(`> 正規スポットは${locationFileName}のうち、zoomが指定され、エリアに所属し、アイコンが設定された行を対象としています。`);
     mainLines.push(`> 登録魚種は${prefCode}_fish.jsonに記録された魚種名を使用し、別名統合や推測による追加は行っていません。`);
     mainLines.push("> 登録魚種はサイト内データ上の対象魚種を示すもので、現在の釣果や釣獲を保証するものではありません。");
     mainLines.push("> アクセス時間・距離は直線距離に道路係数（1.35倍）を掛けた概算値です。現地の最新規制・駐車ルールは必ず現地表示をご確認ください。");
@@ -575,6 +660,9 @@ function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, i
     mainLines.push(`- 対象都道府県: ${prefName}`);
     mainLines.push(`- 正規スポット数: ${spotRecords.length}件（${activeAreas.length}エリア）`);
     mainLines.push(`- 解説・逆引き辞書登録スポット: ${spotsWithDict.length}件`);
+    if (spotsWithTags.length > 0) {
+        mainLines.push(`- 環境・地形タグ登録スポット: ${spotsWithTags.length}件`);
+    }
     mainLines.push(`- 登録魚種があるスポット: ${spotsWithFish.length}件`);
     mainLines.push(`- 登録魚種の種類数: ${fishSpecies.length}種`);
     mainLines.push(`- 地図サイト（${prefName}）: ${prefMapUrl}`);
@@ -743,7 +831,7 @@ function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, i
 
     fishLines.push("---");
     fishLines.push("");
-    fishLines.push(`データ出典: ${REGION_CODE}/${prefCode}_location.json${fishData ? `、${REGION_CODE}/${prefCode}_fish.json` : ""}`);
+    fishLines.push(`データ出典: ${REGION_CODE}/${locationFileName}${fishData ? `、${REGION_CODE}/${prefCode}_fish.json` : ""}`);
     fishLines.push("");
 
     return {
@@ -759,6 +847,7 @@ function buildPrefMarkdown({ prefCode, locationData, fishData, dictionaryData, i
             speciesCount: fishSpecies.length,
             spotsWithDict: spotsWithDict.length,
             spotsWithoutDictNames: spotsWithoutDict.map(r => r.name),
+            spotsWithTags: spotsWithTags.length,
             spotsWithAccess: spotsWithAccess.length,
             spotsWithShops: spotsWithShops.length
         }
@@ -985,7 +1074,7 @@ try {
     if (TARGET_ARG !== "LLMS") {
         const availablePrefCodes = discoverPrefCodes(REGION_DIR);
         if (availablePrefCodes.length === 0) {
-            throw new Error(`*_location.json が見つかりません: ${REGION_DIR}`);
+            throw new Error(`*_location_v2.json / *_location.json が見つかりません: ${REGION_DIR}`);
         }
 
         let targetPrefCodes;
@@ -998,7 +1087,7 @@ try {
             const missing = targetPrefCodes.filter(code => !availablePrefCodes.includes(code));
             if (missing.length > 0) {
                 throw new Error(
-                    `指定された県のlocation.jsonが見つかりません: ${missing.join(", ")}（利用可能: ${availablePrefCodes.join(", ")}）`
+                    `指定された県のlocationファイルが見つかりません: ${missing.join(", ")}（利用可能: ${availablePrefCodes.join(", ")}）`
                 );
             }
         }
@@ -1007,12 +1096,11 @@ try {
         console.log(`スポットAI向けMarkdown生成開始（対象: ${targetPrefCodes.join(", ")} / リージョン: ${REGION_CODE}）`);
 
         for (const prefCode of targetPrefCodes) {
-            const locationPath = path.join(REGION_DIR, `${prefCode}_location.json`);
+            const locationInfo = loadPrefLocationInfo(prefCode);
             const fishPath = path.join(REGION_DIR, `${prefCode}_fish.json`);
             const dictionaryPath = path.join(REGION_DIR, `${prefCode}_dictionary.json`);
             const shopPath = path.join(REGION_DIR, `${prefCode}_shop.json`);
 
-            const locationData = readJsonRequired(locationPath);
             const fishData = readJsonOptional(fishPath, `${prefCode} 魚種JSON`);
             const dictionaryData = readJsonOptional(dictionaryPath, `${prefCode} 逆引き辞書JSON`);
             const rawShopData = readJsonOptional(shopPath, `${prefCode} 釣具店JSON`);
@@ -1020,7 +1108,7 @@ try {
 
             const result = buildPrefMarkdown({
                 prefCode,
-                locationData,
+                locationInfo,
                 fishData,
                 dictionaryData,
                 icData,
@@ -1038,8 +1126,8 @@ try {
                 fs.writeFileSync(areaFile.filePath, areaFile.content, "utf8");
             }
 
-            console.log(`[${prefCode}] 生成完了（エリア分割: ${result.shouldSplitByArea ? "ON" : "OFF"}）`);
-            console.log(`  正規スポット: ${result.stats.spotCount}件（${result.stats.areaCount}エリア） / 辞書紐付け: ${result.stats.spotsWithDict}件 / 未登録: ${result.stats.spotsWithoutDictNames.length}件`);
+            console.log(`[${prefCode}] 生成完了（参照: ${locationInfo.locationFileName} / エリア分割: ${result.shouldSplitByArea ? "ON" : "OFF"}）`);
+            console.log(`  正規スポット: ${result.stats.spotCount}件（${result.stats.areaCount}エリア） / 環境タグ: ${result.stats.spotsWithTags}件 / 辞書紐付け: ${result.stats.spotsWithDict}件 / 未登録: ${result.stats.spotsWithoutDictNames.length}件`);
             if (result.stats.spotsWithoutDictNames.length > 0) {
                 console.log(`  辞書未登録(先頭10件): ${result.stats.spotsWithoutDictNames.slice(0, 10).join("、")}`);
             }
