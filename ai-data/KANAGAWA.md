@@ -3,7 +3,7 @@ title: "神奈川県の釣りスポット情報"
 pref_code: "KANAGAWA"
 pref_name: "神奈川県"
 split_by_area: true
-last_updated: "2026-11-19"
+last_updated: "2026-11-27"
 timezone: "Asia/Tokyo"
 source: "釣り行こNAVI"
 ---
@@ -11,7 +11,7 @@ source: "釣り行こNAVI"
 # 神奈川県の釣りスポット一覧
 
 > 本ファイルは釣り行こNAVIのスポット情報を、AIが参照しやすいMarkdownにまとめたものです。
-> 正規スポットはKANAGAWA_location.jsonのうち、zoomが指定され、エリアに所属し、アイコンが設定された行を対象としています。
+> 正規スポットはKANAGAWA_location_v2.jsonのうち、zoomが指定され、エリアに所属し、アイコンが設定された行を対象としています。
 > 登録魚種はKANAGAWA_fish.jsonに記録された魚種名を使用し、別名統合や推測による追加は行っていません。
 > 登録魚種はサイト内データ上の対象魚種を示すもので、現在の釣果や釣獲を保証するものではありません。
 > アクセス時間・距離は直線距離に道路係数（1.35倍）を掛けた概算値です。現地の最新規制・駐車ルールは必ず現地表示をご確認ください。
@@ -21,6 +21,7 @@ source: "釣り行こNAVI"
 - 対象都道府県: 神奈川県
 - 正規スポット数: 104件（3エリア）
 - 解説・逆引き辞書登録スポット: 104件
+- 環境・地形タグ登録スポット: 104件
 - 登録魚種があるスポット: 100件
 - 登録魚種の種類数: 62種
 - 地図サイト（神奈川県）: https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C
@@ -57,4 +58,4 @@ source: "釣り行こNAVI"
 
 ---
 
-データ出典: KANTO/KANAGAWA_location.json、KANTO/KANAGAWA_fish.json、KANTO/KANAGAWA_dictionary.json、data/KANTO_geo.json、KANTO/KANAGAWA_shop.json
+データ出典: KANTO/KANAGAWA_location_v2.json、KANTO/KANAGAWA_fish.json、KANTO/KANAGAWA_dictionary.json、data/KANTO_geo.json、KANTO/KANAGAWA_shop.json

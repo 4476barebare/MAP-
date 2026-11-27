@@ -2,7 +2,7 @@
 title: "神奈川県の魚種別釣り場一覧"
 pref_code: "KANAGAWA"
 pref_name: "神奈川県"
-last_updated: "2026-11-19"
+last_updated: "2026-11-27"
 timezone: "Asia/Tokyo"
 source: "釣り行こNAVI"
 ---
@@ -271,4 +271,4 @@ source: "釣り行こNAVI"
 
 ---
 
-データ出典: KANTO/KANAGAWA_location.json、KANTO/KANAGAWA_fish.json
+データ出典: KANTO/KANAGAWA_location_v2.json、KANTO/KANAGAWA_fish.json

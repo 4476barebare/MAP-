@@ -2,7 +2,7 @@
 title: "東京都の魚種別釣り場一覧"
 pref_code: "TOKYO"
 pref_name: "東京都"
-last_updated: "2026-11-19"
+last_updated: "2026-11-27"
 timezone: "Asia/Tokyo"
 source: "釣り行こNAVI"
 ---
@@ -191,4 +191,4 @@ source: "釣り行こNAVI"
 
 ---
 
-データ出典: KANTO/TOKYO_location.json、KANTO/TOKYO_fish.json
+データ出典: KANTO/TOKYO_location_v2.json、KANTO/TOKYO_fish.json

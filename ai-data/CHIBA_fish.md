@@ -2,7 +2,7 @@
 title: "千葉県の魚種別釣り場一覧"
 pref_code: "CHIBA"
 pref_name: "千葉県"
-last_updated: "2026-11-19"
+last_updated: "2026-11-27"
 timezone: "Asia/Tokyo"
 source: "釣り行こNAVI"
 ---
@@ -283,4 +283,4 @@ source: "釣り行こNAVI"
 
 ---
 
-データ出典: KANTO/CHIBA_location.json、KANTO/CHIBA_fish.json
+データ出典: KANTO/CHIBA_location_v2.json、KANTO/CHIBA_fish.json

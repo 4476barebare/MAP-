@@ -2,7 +2,7 @@
 title: "茨城県栃木県の魚種別釣り場一覧"
 pref_code: "IBARAKI"
 pref_name: "茨城県栃木県"
-last_updated: "2026-11-19"
+last_updated: "2026-11-27"
 timezone: "Asia/Tokyo"
 source: "釣り行こNAVI"
 ---
@@ -175,4 +175,4 @@ source: "釣り行こNAVI"
 
 ---
 
-データ出典: KANTO/IBARAKI_location.json、KANTO/IBARAKI_fish.json
+データ出典: KANTO/IBARAKI_location_v2.json、KANTO/IBARAKI_fish.json
