@@ -53,4 +53,4 @@ source: "釣り行こNAVI"
 
 ---
 
-データ出典: data/*_whether.json、data/*_InLandwhether.json、KANTO/integrated_catch.json、KANTO/*_location.json
+データ出典: data/*_weather_v2.json、KANTO/integrated_catch.json、KANTO/*_location_v2.json
