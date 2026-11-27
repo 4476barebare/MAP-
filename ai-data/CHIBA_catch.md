@@ -223,4 +223,4 @@ source: "釣り行こNAVI"
 
 ---
 
-データ出典: KANTO/integrated_catch.json（範囲判定参照: KANTO/*_location.json）
+データ出典: KANTO/integrated_catch.json（範囲判定参照: KANTO/CHIBA_location_v2.json）
