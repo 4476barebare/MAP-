@@ -202,12 +202,12 @@
 <!-- 👇 明日のオススメ釣り場ランキングセクション -->
 <aside id="fishing-recommend-section" style="margin: 10px; padding: 15px; background-color: #eef3f8; border-radius: 8px; border: 1px solid #dce4ee;">
   <h2 id="spot-ranking-title" style="font-size: 16px; color: #191970; margin-top: 0; margin-bottom: 8px; border-left: 4px solid #191970; padding-left: 8px;">
-    明日（11月28日）関東で釣りに行くんだけど良い場所ある？
+    明日（11月29日）関東で釣りに行くんだけど良い場所ある？
   </h2>
 
   <!-- ここに事前生成されたランキングHTML（県選択時はpref用キャッシュへ即時差し替え） -->
   <div id="spot-ranking-container" style="font-size: 14px; color: #333;">
-    <div data-ssg-ranking="REGION" data-target-date="2026-11-28" style="background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; font-size:13px; color:#191970; line-height:1.6;">明日は降水確率100%や強風（4m/s以上が終日継続）の予報となっているため、安全を優先しおすすめ釣り場の選出を見送りました。</div>
+    <div data-ssg-ranking="REGION" data-target-date="2026-11-29" style="background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; font-size:13px; color:#191970; line-height:1.6;">明日は降水確率100%や強風（4m/s以上が終日継続）の予報となっているため、安全を優先しおすすめ釣り場の選出を見送りました。</div>
   </div>
   <div class="ranking-basis-trigger-wrap">
     <button type="button" id="rankingBasisBtn" class="ranking-basis-trigger">
@@ -255,17 +255,17 @@
 <div id="rankingBasisModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="rankingBasisModalTitle">
   <div class="modal-content">
     <h2 id="rankingBasisModalTitle">
-      明日（11月28日）関東のおすすめ選出根拠・データ一覧
+      明日（11月29日）関東のおすすめ選出根拠・データ一覧
     </h2>
     <div id="rankingBasisBody">
       <div class="basis-summary-card">
-<div class="basis-summary-text">明日（2026-11-28）の関東における算出対象スポットはありません。</div>
+<div class="basis-summary-text">明日（2026-11-29）の関東における算出対象スポットはありません。</div>
 <div class="basis-criteria">算出基準: 基礎点（100点＋周辺10km圏内の直近SNS釣果ボーナス）に対し、明日の降水確率と2時間別風速（4m/s以上の時間帯ごとに減点）を乗算減点して算出しています（降水100%・終日強風は除外）。</div>
 </div>
 <div class="basis-links-card">
 <h3>各県の釣り場詳細・最新SNS釣果データ一覧（テキストHTML版）</h3>
 <ul class="basis-links-list">
-<li><a href="/ai-data/KANTO_tomorrow.html"><strong>明日（11月28日）の関東おすすめ釣り場・全県詳細根拠</strong></a></li>
+<li><a href="/ai-data/KANTO_tomorrow.html"><strong>明日（11月29日）の関東おすすめ釣り場・全県詳細根拠</strong></a></li>
 <li><strong>千葉県:</strong> <a href="/ai-data/CHIBA.html">スポット一覧</a> / <a href="/ai-data/CHIBA_catch.html">最新SNS釣果</a> / <a href="/ai-data/CHIBA_fish.html">魚種逆引き</a></li>
 <li><strong>神奈川県:</strong> <a href="/ai-data/KANAGAWA.html">スポット一覧</a> / <a href="/ai-data/KANAGAWA_catch.html">最新SNS釣果</a> / <a href="/ai-data/KANAGAWA_fish.html">魚種逆引き</a></li>
 <li><strong>東京都:</strong> <a href="/ai-data/TOKYO.html">スポット一覧</a> / <a href="/ai-data/TOKYO_catch.html">最新SNS釣果</a> / <a href="/ai-data/TOKYO_fish.html">魚種逆引き</a></li>
@@ -494,6 +494,17 @@ window.preloadRemainingScripts = function(routeType) {
         // SPOT画面に滞在中であれば、JMA警報バーを補完更新
         if (window.currentPref && window.prefData && typeof getAlertText === 'function') {
           getAlertText(window.prefData);
+        }
+        // SPOT画面の必須ロード＋ボタン表示＋裏JSがすべて終わった最後尾で等深線を起動
+        if (window._depthDeferredForSpot && typeof window.startDeferredDepthMap === 'function') {
+          const spotReady = window._spotReadyForDepthPromise;
+          if (spotReady && typeof spotReady.then === 'function') {
+            spotReady.finally(() => {
+              window.startDeferredDepthMap();
+            });
+          } else {
+            window.startDeferredDepthMap();
+          }
         }
       }
     } catch (err) {
@@ -1319,11 +1330,17 @@ async function drawLocation(name, lat, lng, zoom, options = {}) {
 
     window.gsiLayer.addTo(window.map);
 
-    // ★ 等深線レイヤー(5ファイル)は、ベースタイル描画完了後のキューで開始
+    // ★ 等深線レイヤー：通常画面はベースタイル完了後のキューで開始。
+    //    SPOT画面の初期表示時は天気・魚種・ボタン・裏JS完了後の最後尾まで後ろ倒しにする。
     if (typeof DepthMapController !== 'undefined') {
-        window.runAfterTileLoad(() => {
-            return DepthMapController.initAndShow(window.map);
-        });
+        const isSpotInit = typeof window.isSpotScreen === 'function' && window.isSpotScreen();
+        if (isSpotInit) {
+            window._depthDeferredForSpot = true;
+        } else {
+            window.runAfterTileLoad(() => {
+                return DepthMapController.initAndShow(window.map);
+            });
+        }
     }
 
     if (initialTileLoadPromise) await initialTileLoadPromise;
@@ -1525,6 +1542,11 @@ window.unlockBackNavigationWhenReady = unlockBackNavigationWhenReady;
 function goBack() {
     // 実行中なら弾く
     if (window.goBackGuard) return;
+
+    // すでにSPOT画面を離脱した後の戻る操作で万一等深線が未開始なら裏で自動起動（開始済みなら継続）
+    if (window.currentSpotId == null && window._depthDeferredForSpot && typeof window.startDeferredDepthMap === 'function') {
+        window.startDeferredDepthMap();
+    }
 
     // ★ 判定に使う変数を先に取得
     const z = window.map ? window.map.getZoom() : 0;
@@ -1743,6 +1765,12 @@ if (tileWrap && tileBtn) {
             // URL直打ちスポット画面から戻った場合も含め、showPrefSpots() 経由で全県ドット生成へ一本化する
             if (typeof showPrefSpots === 'function') {
                 showPrefSpots();
+            }
+            // SPOT画面で等深線読み込み開始前に戻された場合も、遷移を邪魔せず裏で自動開始（読み込み中ならキャンセルせず継続）
+            if (window._depthDeferredForSpot && typeof window.startDeferredDepthMap === 'function') {
+                setTimeout(() => {
+                    window.startDeferredDepthMap();
+                }, 400);
             }
 
             const checkCompletion = setInterval(() => {
@@ -4312,21 +4340,24 @@ const DepthMapController = (function() {
         if (rawDepthData) return Promise.resolve(rawDepthData);
         if (depthDataPromise) return depthDataPromise;
 
-        depthDataPromise = Promise.all(DEPTH_FILES.map(url => fetchDepthJsonSafe(url, 1)))
-            .then(results => {
-                const hasAny = results.some(item => Array.isArray(item) && item.length > 0);
-                if (!hasAny) {
-                    depthDataPromise = null;
-                    return null;
-                }
-                const normalized = results.map(item => (Array.isArray(item) ? item : []));
-                if (results.every(item => Array.isArray(item))) {
-                    rawDepthData = normalized;
-                } else {
-                    depthDataPromise = null;
-                }
-                return normalized;
-            });
+        // 5本一斉fetchを避け、2本→3本の2段階に分けて低優先で取得（遷移・操作との帯域競合を防止）
+        depthDataPromise = (async () => {
+            const batch1 = await Promise.all(DEPTH_FILES.slice(0, 2).map(url => fetchDepthJsonSafe(url, 1)));
+            const batch2 = await Promise.all(DEPTH_FILES.slice(2).map(url => fetchDepthJsonSafe(url, 1)));
+            const results = [...batch1, ...batch2];
+            const hasAny = results.some(item => Array.isArray(item) && item.length > 0);
+            if (!hasAny) {
+                depthDataPromise = null;
+                return null;
+            }
+            const normalized = results.map(item => (Array.isArray(item) ? item : []));
+            if (results.every(item => Array.isArray(item))) {
+                rawDepthData = normalized;
+            } else {
+                depthDataPromise = null;
+            }
+            return normalized;
+        })();
 
         return depthDataPromise;
     }
@@ -4482,22 +4513,44 @@ const DepthMapController = (function() {
         return MaskedCanvasRenderer;
     }
 
+    function applyCanvasStyle(renderer, fadeIn = false) {
+        const canvas = renderer && renderer._container;
+        if (!canvas) return;
+        canvas.style.zIndex = '50';
+        canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))';
+        canvas.style.mixBlendMode = 'multiply';
+        canvas.style.pointerEvents = 'none';
+        if (fadeIn) {
+            canvas.style.opacity = '0';
+            canvas.style.transition = 'opacity 0.6s ease';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    canvas.style.opacity = '1';
+                });
+            });
+        }
+    }
+
     function createDepthLayers(map, parsedLayers) {
         const RendererClass = getMaskedCanvasRendererClass();
         if (!map || !RendererClass) return;
+        if (depthLayers.length > 0) {
+            if (visible) {
+                depthLayers.forEach(layerData => {
+                    layerData.layers.forEach(layer => {
+                        if (!map.hasLayer(layer)) layer.addTo(map);
+                    });
+                    applyCanvasStyle(layerData.renderer, false);
+                });
+            }
+            return;
+        }
+
         parsedLayers.forEach(layerData => {
             const renderer = new RendererClass({
                 pane: 'overlayPane',
                 padding: 1.5
             });
-
-            const canvas = renderer._container;
-            if (canvas) {
-                canvas.style.zIndex = '50';
-                canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))';
-                canvas.style.mixBlendMode = 'multiply';
-                canvas.style.pointerEvents = 'none';
-            }
 
             const groupLayers = [];
             layerData.groups.forEach(rings => {
@@ -4515,9 +4568,14 @@ const DepthMapController = (function() {
                     bubblingMouseEvents: false
                 });
 
-                polygon.addTo(map);
+                if (visible) {
+                    polygon.addTo(map);
+                }
                 groupLayers.push(polygon);
             });
+
+            // addTo(map) 完了後に生成済みの renderer._container へ確実にスタイル適用＆フェードイン
+            applyCanvasStyle(renderer, visible);
 
             depthLayers.push({
                 depth: layerData.depth,
@@ -4546,38 +4604,71 @@ const DepthMapController = (function() {
             return loadDepthData();
         },
 
+        isLoadingOrLoaded: function() {
+            return !!(loadPromise || depthLayers.length > 0);
+        },
+
         initAndShow: function(leafletMap) {
-            if (!leafletMap || typeof L === 'undefined') return Promise.resolve();
-            mapInstance = leafletMap;
+            const targetMap = leafletMap || window.map;
+            if (!targetMap || typeof L === 'undefined') return Promise.resolve();
+            mapInstance = targetMap;
+            window._depthDeferredForSpot = false;
+
+            if (depthLayers.length > 0) {
+                if (visible) {
+                    depthLayers.forEach(layerData => {
+                        layerData.layers.forEach(layer => {
+                            if (!mapInstance.hasLayer(layer)) layer.addTo(mapInstance);
+                        });
+                    });
+                }
+                return Promise.resolve(parsedDepthData || []);
+            }
 
             if (loadPromise) return loadPromise;
 
-            loadPromise = Promise.all([
-                loadParsedDepthData(),
-                loadMaskData()
-            ]).then(results => {
-                const parsedLayers = results[0];
-                if (!Array.isArray(parsedLayers) || parsedLayers.length === 0) {
+            // マスク先読み → 深度5本を2段階取得・デコード（goBack等で画面遷移してもキャンセルせず完了後に自動表示）
+            loadPromise = loadMaskData()
+                .then(() => loadParsedDepthData())
+                .then(parsedLayers => {
+                    if (!Array.isArray(parsedLayers) || parsedLayers.length === 0) {
+                        loadPromise = null;
+                        return [];
+                    }
+                    const activeMap = window.map || mapInstance;
+                    if (!activeMap) {
+                        loadPromise = null;
+                        return [];
+                    }
+                    mapInstance = activeMap;
+                    createDepthLayers(activeMap, parsedLayers);
+                    return parsedLayers;
+                })
+                .catch(error => {
                     loadPromise = null;
+                    console.warn('等深線レイヤー生成スキップ:', error && error.message ? error.message : error);
                     return [];
-                }
-                createDepthLayers(mapInstance, parsedLayers);
-                return parsedLayers;
-            }).catch(error => {
-                loadPromise = null;
-                console.warn('等深線レイヤー生成スキップ:', error && error.message ? error.message : error);
-                return [];
-            });
+                });
 
             return loadPromise;
         },
 
         toggle: function() {
             visible = !visible;
+            const activeMap = window.map || mapInstance;
+            if (!activeMap) return visible;
+            mapInstance = activeMap;
+            if (visible && depthLayers.length === 0) {
+                this.initAndShow(activeMap);
+                return visible;
+            }
             depthLayers.forEach(layerData => {
                 layerData.layers.forEach(layer => {
-                    if (visible) layer.addTo(mapInstance);
-                    else if (mapInstance.hasLayer(layer)) mapInstance.removeLayer(layer);
+                    if (visible) {
+                        if (!activeMap.hasLayer(layer)) layer.addTo(activeMap);
+                    } else if (activeMap.hasLayer(layer)) {
+                        activeMap.removeLayer(layer);
+                    }
                 });
             });
             return visible;
@@ -4588,6 +4679,16 @@ const DepthMapController = (function() {
         }
     };
 })();
+
+// SPOT画面の最後尾やgoBack時に等深線を安全起動する共通ヘルパー（読み込み中・表示済みなら何もしない）
+window.startDeferredDepthMap = function() {
+    if (typeof DepthMapController === 'undefined' || !window.map) return Promise.resolve();
+    window._depthDeferredForSpot = false;
+    if (typeof DepthMapController.isLoadingOrLoaded === 'function' && DepthMapController.isLoadingOrLoaded()) {
+        return DepthMapController.initAndShow(window.map);
+    }
+    return DepthMapController.initAndShow(window.map);
+};
 </script>
 
 </body>
