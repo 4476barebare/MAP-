@@ -272,6 +272,7 @@ function loadRegionCsvData() {
 window._loadedPrefSet = window._loadedPrefSet || new Set();
 window.prefSpotData = window.prefSpotData || {};
 window.prefSpotPromises = window.prefSpotPromises || {};
+window.prefLocationV2 = window.prefLocationV2 || {};
 window._isAllRegionLoaded = window._isAllRegionLoaded || false;
 
 function rebuildAllSpotData() {
@@ -280,42 +281,228 @@ function rebuildAllSpotData() {
     return window.allspotData;
 }
 
+function parseAreaGridStr(str) {
+    if (!str) return { x: null, y: null };
+    const s = String(str);
+    const mx = s.match(/x\s*:\s*(-?\d+)/i);
+    const my = s.match(/y\s*:\s*(-?\d+)/i);
+    return {
+        x: mx ? parseInt(mx[1], 10) : null,
+        y: my ? parseInt(my[1], 10) : null
+    };
+}
+
+// location_v2.json（オブジェクト構造）または旧 location.json（配列構造）を
+// O(1)早引き構造（window.prefLocationV2[prefCode]）＋既存互換配列へ正規化
+function normalizePrefLocationPayload(prefCode, rawData) {
+    if (!rawData) return null;
+
+    // パターンA：v2オブジェクト構造 { v: 2, pref, areas, spots }
+    if (!Array.isArray(rawData) && typeof rawData === 'object' && rawData.spots && typeof rawData.spots === 'object') {
+        const p = rawData.pref || {};
+        const prefRow = {
+            name: p.code || prefCode,
+            zoom: p.zoom,
+            individualId: 'parent',
+            lat: p.lat,
+            lng: p.lng,
+            url: p.jmaCode || p.url || '',
+            notes: p.name || prefCode,
+            squareX: null,
+            squareY: null,
+            _prefCode: prefCode
+        };
+
+        const areaRows = [];
+        const areaMap = {};
+        const areaByName = {};
+        if (rawData.areas && typeof rawData.areas === 'object') {
+            for (const [areaKey, a] of Object.entries(rawData.areas)) {
+                if (!a || typeof a !== 'object') continue;
+                const indivId = a.id != null ? String(a.id) : (areaKey.includes('_') ? areaKey.slice(areaKey.lastIndexOf('_') + 1) : areaKey);
+                const areaPrefix = (indivId && areaKey.endsWith('_' + indivId))
+                    ? areaKey.slice(0, -(indivId.length + 1))
+                    : (areaKey.includes('_') ? areaKey.slice(0, areaKey.lastIndexOf('_')) : prefCode);
+                const gx = (a.grid && Number.isFinite(Number(a.grid.x))) ? Number(a.grid.x) : null;
+                const gy = (a.grid && Number.isFinite(Number(a.grid.y))) ? Number(a.grid.y) : null;
+                const desc = a.desc != null ? String(a.desc) : (a.notes != null ? String(a.notes) : '');
+
+                const areaRow = {
+                    name: a.name || '',
+                    zoom: a.zoom,
+                    individualId: indivId,
+                    lat: a.lat,
+                    lng: a.lng,
+                    areaId: areaPrefix,
+                    url: (gx != null && gy != null) ? `x:${gx};y:${gy}` : '',
+                    notes: desc,
+                    desc: desc,
+                    squareX: gx,
+                    squareY: gy,
+                    _areaKey: areaKey,
+                    _prefCode: prefCode
+                };
+                areaRows.push(areaRow);
+                areaMap[areaKey] = areaRow;
+                if (areaRow.name) areaByName[areaRow.name] = areaRow;
+            }
+        }
+
+        const spotRows = [];
+        const spotMap = {};
+        for (const [spotName, s] of Object.entries(rawData.spots)) {
+            if (!s || typeof s !== 'object') continue;
+            const indivId = s.id != null ? String(s.id) : (s.individualId != null ? String(s.individualId) : '');
+            const cleanTags = Array.isArray(s.tags)
+                ? [...new Set(s.tags.map(t => String(t || '').trim()).filter(Boolean))]
+                : [];
+            const addressStr = s.address != null ? String(s.address) : (s.notes != null ? String(s.notes) : '');
+
+            const spotRow = {
+                name: spotName,
+                id: indivId,
+                individualId: indivId,
+                lat: s.lat,
+                lng: s.lng,
+                areaId: s.areaId || '',
+                icon: s.icon || '',
+                tags: cleanTags,
+                squareX: null,
+                squareY: null,
+                _prefCode: prefCode
+            };
+            if (s.zoom != null && String(s.zoom).trim() !== '') {
+                spotRow.zoom = s.zoom;
+            }
+            if (s.type) {
+                spotRow.type = s.type;
+            }
+            if (addressStr) {
+                spotRow.address = addressStr;
+                spotRow.notes = addressStr;
+            }
+            spotRows.push(spotRow);
+            spotMap[spotName] = spotRow;
+        }
+
+        const rows = [prefRow, ...areaRows, ...spotRows];
+        return {
+            v: 2,
+            isV2: true,
+            pref: prefRow,
+            areas: areaRows,
+            spots: spotRows,
+            areaMap,
+            areaByName,
+            spotMap,
+            rows
+        };
+    }
+
+    // パターンB：旧配列形式 location.json（フォールバック互換）
+    if (Array.isArray(rawData)) {
+        let prefRow = null;
+        const areaRows = [];
+        const spotRows = [];
+        const areaMap = {};
+        const areaByName = {};
+        const spotMap = {};
+
+        for (const row of rawData) {
+            if (!row || typeof row !== 'object') continue;
+            row._prefCode = prefCode;
+            if (row.squareX === undefined) row.squareX = null;
+            if (row.squareY === undefined) row.squareY = null;
+
+            if ((!row.areaId || row.individualId === 'parent') && (row.name === prefCode || row._prefCode === prefCode)) {
+                prefRow = row;
+            } else if ((row.areaId || '').trim() === prefCode && row.individualId && row.individualId !== 'parent') {
+                if (row.url && String(row.url).includes('x:') && String(row.url).includes('y:')) {
+                    const g = parseAreaGridStr(row.url);
+                    row.squareX = g.x;
+                    row.squareY = g.y;
+                }
+                const areaKey = `${row.areaId}_${row.individualId}`;
+                row._areaKey = areaKey;
+                areaRows.push(row);
+                areaMap[areaKey] = row;
+                if (row.name) areaByName[row.name] = row;
+            } else if (row.type !== 'pref' && row.type !== 'area' && row.icon && String(row.icon).trim() !== '') {
+                if (!Array.isArray(row.tags)) row.tags = [];
+                spotRows.push(row);
+                if (row.name) spotMap[row.name] = row;
+            }
+        }
+
+        return {
+            v: 1,
+            isV2: false,
+            pref: prefRow,
+            areas: areaRows,
+            spots: spotRows,
+            areaMap,
+            areaByName,
+            spotMap,
+            rows: rawData
+        };
+    }
+
+    return null;
+}
+window.normalizePrefLocationPayload = normalizePrefLocationPayload;
+
 function fetchAndStorePrefSpots(prefCode, priority = 'low') {
     if (!prefCode) return Promise.resolve([]);
-    if (Array.isArray(window.prefSpotData[prefCode])) return Promise.resolve(window.prefSpotData[prefCode]);
+    if (Array.isArray(window.prefSpotData[prefCode]) && window.prefLocationV2[prefCode]) {
+        return Promise.resolve(window.prefSpotData[prefCode]);
+    }
     if (window.prefSpotPromises[prefCode]) return window.prefSpotPromises[prefCode];
 
     const regionCode = window.currentRegion || 'KANTO';
-    const url = `/${regionCode}/${prefCode}_location.json`;
+    const v2Url = `/${regionCode}/${prefCode}_location_v2.json`;
+    const legacyUrl = `/${regionCode}/${prefCode}_location.json`;
     const maxRetries = priority === 'high' ? 2 : 0;
 
-    const doFetch = (attempt) => fetch(url, { priority })
+    const fetchJsonWithRetry = (url, attempt) => fetch(url, { priority })
         .then(res => {
             if (!res.ok) {
-                const err = new Error("location.json fetch failed: " + res.status);
+                const err = new Error("location fetch failed: " + res.status);
                 err.status = res.status;
                 throw err;
             }
             return res.json();
         })
-        .then(data => {
-            if (!Array.isArray(data)) throw new Error("location.json形式エラー: " + prefCode);
-            data.forEach(s => { s._prefCode = prefCode; });
-            window.prefSpotData[prefCode] = data;
-            window._loadedPrefSet.add(prefCode);
-            return data;
-        })
         .catch(error => {
             if (attempt < maxRetries && (!error || error.status !== 404)) {
                 return new Promise(resolve => setTimeout(resolve, 250 * (attempt + 1)))
-                    .then(() => doFetch(attempt + 1));
+                    .then(() => fetchJsonWithRetry(url, attempt + 1));
             }
+            throw error;
+        });
+
+    const promise = fetchJsonWithRetry(v2Url, 0)
+        .catch(err => {
+            // 未移行県（404等）のみ旧 _location.json へ自動フォールバック
+            return fetchJsonWithRetry(legacyUrl, 0).catch(legacyErr => {
+                throw legacyErr || err;
+            });
+        })
+        .then(rawData => {
+            const normalized = normalizePrefLocationPayload(prefCode, rawData);
+            if (!normalized || !Array.isArray(normalized.rows)) {
+                throw new Error("location形式エラー: " + prefCode);
+            }
+            window.prefLocationV2[prefCode] = normalized;
+            window.prefSpotData[prefCode] = normalized.rows;
+            window._loadedPrefSet.add(prefCode);
+            return normalized.rows;
+        })
+        .catch(error => {
             delete window.prefSpotPromises[prefCode];
             console.warn("都道府県JSON取得スキップ:", prefCode, error && error.message ? error.message : error);
             return [];
         });
 
-    const promise = doFetch(0);
     window.prefSpotPromises[prefCode] = promise;
     return promise;
 }
@@ -1021,17 +1208,28 @@ function applyPrefWeatherV2Json(prefCode) {
     if (window.prefWeatherV2Applied[applyKey]) return Promise.resolve(0);
     if (window.prefWeatherV2ApplyPromises[applyKey]) return window.prefWeatherV2ApplyPromises[applyKey];
 
+    const v2Entry = window.prefLocationV2 && window.prefLocationV2[cleanPref];
+    const spotMap = v2Entry && v2Entry.spotMap ? v2Entry.spotMap : null;
     const rows = window.prefSpotData && window.prefSpotData[cleanPref];
-    if (!Array.isArray(rows)) return Promise.resolve(0);
+    if (!spotMap && !Array.isArray(rows)) return Promise.resolve(0);
 
     const applyPromise = loadPrefWeatherV2Json(cleanPref).then(data => {
         if (!data || !data.spots || typeof data.spots !== 'object') return 0;
         let applied = 0;
-        for (const spot of rows) {
-            const weather = data.spots[spot.name];
-            if (!weather) continue;
-            spot.whether = weather;
-            applied++;
+        if (spotMap) {
+            for (const spotName of Object.keys(data.spots)) {
+                const spot = spotMap[spotName];
+                if (!spot) continue;
+                spot.whether = data.spots[spotName];
+                applied++;
+            }
+        } else {
+            for (const spot of rows) {
+                const weather = data.spots[spot.name];
+                if (!weather) continue;
+                spot.whether = weather;
+                applied++;
+            }
         }
         window.prefWeatherV2Applied[applyKey] = true;
         return applied;

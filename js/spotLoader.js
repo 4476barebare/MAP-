@@ -145,11 +145,18 @@ function renderAccessInfo(spot) {
     // 3. description
     const descText = dictEntry && dictEntry.description ? String(dictEntry.description).trim() : '';
 
+    const spotTags = typeof window.getSpotTagsList === 'function'
+        ? window.getSpotTagsList(spot)
+        : (Array.isArray(spot.tags) ? [...new Set(spot.tags.map(t => String(t || '').trim()).filter(Boolean))] : []);
+
     let html = '<div class="spot-header-wrap">';
     if (waterRegionalText) {
         html += `<div class="spot-water-regional">${escapeSpotHtml(waterRegionalText)}</div>`;
     }
     html += `<h3 class="spot-main-title">${escapeSpotHtml(spot.name)}</h3>`;
+    if (spotTags.length > 0) {
+        html += `<div class="spot-tags-row" aria-label="釣り場の特徴">${spotTags.map(t => `<span class="spot-tag-chip">${escapeSpotHtml(t)}</span>`).join('')}</div>`;
+    }
     if (altText || coopText) {
         html += '<div class="spot-sub-meta">';
         if (altText) {
@@ -864,7 +871,7 @@ function safeSpotWeatherIcon(code) {
 
 function showFishPopup(spot) {
     const title = spot.name || '';
-    const address = spot.notes || '';
+    const address = spot.address || spot.notes || '';
 
     // 1. Googleマップ ルート案内URL (スポット名と補足情報を使って確実にセット)
     const routeKeyword = `${title} ${address}`.trim();
@@ -3769,21 +3776,29 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
         renderRecentCatches(targetSpot);
     }
 
-    // ③ 魚データや逆引き辞書が後から届いた場合のために meta description と JSON-LD も最新化
+    // ③ 魚データや逆引き辞書が後から届いた場合のために meta description と JSON-LD も最新化（tags 反映を同期）
     const dictEntry = typeof getSpotDictionaryEntry === 'function' ? getSpotDictionaryEntry(targetSpot) : null;
-    if (uniqueNames.length > 0 || (dictEntry && dictEntry.description)) {
+    const spotTags = typeof window.getSpotTagsList === 'function'
+        ? window.getSpotTagsList(targetSpot)
+        : (Array.isArray(targetSpot.tags) ? [...new Set(targetSpot.tags.map(t => String(t || '').trim()).filter(Boolean))] : []);
+    if (uniqueNames.length > 0 || (dictEntry && dictEntry.description) || spotTags.length > 0) {
         const pref = params.get('pref') || '';
         const area = params.get('area') || '';
         const baseDesc = (dictEntry && dictEntry.description)
             ? dictEntry.description
             : `${pref}${area}にある「${spotName}」の釣りポイント、最新の天気予報、潮汐データなどをマップで詳しく解説します。`;
+        const tagPrefix = typeof window.formatSpotTagsPrefix === 'function'
+            ? window.formatSpotTagsPrefix(spotTags)
+            : (spotTags.length > 0 ? `【${spotTags.join('・')}】` : '');
         const extraPrefix = uniqueNames.length > 0 ? `対象魚や周辺情報: ${uniqueNames.join('、')}など。` : '';
-        const fullDesc = extraPrefix + baseDesc;
+        const fullDesc = tagPrefix + extraPrefix + baseDesc;
 
         const descMeta = document.querySelector('meta[name="description"]');
         if (descMeta) descMeta.setAttribute('content', fullDesc);
         const ogDescMeta = document.querySelector('meta[property="og:description"]');
         if (ogDescMeta) ogDescMeta.setAttribute('content', fullDesc);
+        const twDescMeta = document.querySelector('meta[name="twitter:description"]');
+        if (twDescMeta) twDescMeta.setAttribute('content', fullDesc);
 
         const ldScript = document.getElementById('seo-json-ld');
         if (ldScript && targetSpot.lat && targetSpot.lng) {
@@ -3800,6 +3815,16 @@ function waitAndRenderSpotDetails(spotName, retryCount = 0) {
                             "addressLocality": dictEntry.addressLocality || ""
                         };
                     }
+                }
+                if (typeof window.applySpotTagsToJsonLd === 'function') {
+                    window.applySpotTagsToJsonLd(ldData, spotTags);
+                } else if (spotTags.length > 0) {
+                    ldData.keywords = spotTags.join(', ');
+                    ldData.additionalProperty = spotTags.map(tag => ({
+                        "@type": "PropertyValue",
+                        "name": "環境・地形",
+                        "value": tag
+                    }));
                 }
                 ldScript.textContent = JSON.stringify(ldData);
             } catch (e) {}
