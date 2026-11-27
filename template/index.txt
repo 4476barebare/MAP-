@@ -484,6 +484,17 @@ window.preloadRemainingScripts = function(routeType) {
         if (window.currentPref && window.prefData && typeof getAlertText === 'function') {
           getAlertText(window.prefData);
         }
+        // SPOT画面の必須ロード＋ボタン表示＋裏JSがすべて終わった最後尾で等深線を起動
+        if (window._depthDeferredForSpot && typeof window.startDeferredDepthMap === 'function') {
+          const spotReady = window._spotReadyForDepthPromise;
+          if (spotReady && typeof spotReady.then === 'function') {
+            spotReady.finally(() => {
+              window.startDeferredDepthMap();
+            });
+          } else {
+            window.startDeferredDepthMap();
+          }
+        }
       }
     } catch (err) {
       console.warn('バックグラウンドJS読み込みスキップ:', err);
@@ -1308,11 +1319,17 @@ async function drawLocation(name, lat, lng, zoom, options = {}) {
 
     window.gsiLayer.addTo(window.map);
 
-    // ★ 等深線レイヤー(5ファイル)は、ベースタイル描画完了後のキューで開始
+    // ★ 等深線レイヤー：通常画面はベースタイル完了後のキューで開始。
+    //    SPOT画面の初期表示時は天気・魚種・ボタン・裏JS完了後の最後尾まで後ろ倒しにする。
     if (typeof DepthMapController !== 'undefined') {
-        window.runAfterTileLoad(() => {
-            return DepthMapController.initAndShow(window.map);
-        });
+        const isSpotInit = typeof window.isSpotScreen === 'function' && window.isSpotScreen();
+        if (isSpotInit) {
+            window._depthDeferredForSpot = true;
+        } else {
+            window.runAfterTileLoad(() => {
+                return DepthMapController.initAndShow(window.map);
+            });
+        }
     }
 
     if (initialTileLoadPromise) await initialTileLoadPromise;
@@ -1514,6 +1531,11 @@ window.unlockBackNavigationWhenReady = unlockBackNavigationWhenReady;
 function goBack() {
     // 実行中なら弾く
     if (window.goBackGuard) return;
+
+    // すでにSPOT画面を離脱した後の戻る操作で万一等深線が未開始なら裏で自動起動（開始済みなら継続）
+    if (window.currentSpotId == null && window._depthDeferredForSpot && typeof window.startDeferredDepthMap === 'function') {
+        window.startDeferredDepthMap();
+    }
 
     // ★ 判定に使う変数を先に取得
     const z = window.map ? window.map.getZoom() : 0;
@@ -1732,6 +1754,12 @@ if (tileWrap && tileBtn) {
             // URL直打ちスポット画面から戻った場合も含め、showPrefSpots() 経由で全県ドット生成へ一本化する
             if (typeof showPrefSpots === 'function') {
                 showPrefSpots();
+            }
+            // SPOT画面で等深線読み込み開始前に戻された場合も、遷移を邪魔せず裏で自動開始（読み込み中ならキャンセルせず継続）
+            if (window._depthDeferredForSpot && typeof window.startDeferredDepthMap === 'function') {
+                setTimeout(() => {
+                    window.startDeferredDepthMap();
+                }, 400);
             }
 
             const checkCompletion = setInterval(() => {
@@ -4301,21 +4329,24 @@ const DepthMapController = (function() {
         if (rawDepthData) return Promise.resolve(rawDepthData);
         if (depthDataPromise) return depthDataPromise;
 
-        depthDataPromise = Promise.all(DEPTH_FILES.map(url => fetchDepthJsonSafe(url, 1)))
-            .then(results => {
-                const hasAny = results.some(item => Array.isArray(item) && item.length > 0);
-                if (!hasAny) {
-                    depthDataPromise = null;
-                    return null;
-                }
-                const normalized = results.map(item => (Array.isArray(item) ? item : []));
-                if (results.every(item => Array.isArray(item))) {
-                    rawDepthData = normalized;
-                } else {
-                    depthDataPromise = null;
-                }
-                return normalized;
-            });
+        // 5本一斉fetchを避け、2本→3本の2段階に分けて低優先で取得（遷移・操作との帯域競合を防止）
+        depthDataPromise = (async () => {
+            const batch1 = await Promise.all(DEPTH_FILES.slice(0, 2).map(url => fetchDepthJsonSafe(url, 1)));
+            const batch2 = await Promise.all(DEPTH_FILES.slice(2).map(url => fetchDepthJsonSafe(url, 1)));
+            const results = [...batch1, ...batch2];
+            const hasAny = results.some(item => Array.isArray(item) && item.length > 0);
+            if (!hasAny) {
+                depthDataPromise = null;
+                return null;
+            }
+            const normalized = results.map(item => (Array.isArray(item) ? item : []));
+            if (results.every(item => Array.isArray(item))) {
+                rawDepthData = normalized;
+            } else {
+                depthDataPromise = null;
+            }
+            return normalized;
+        })();
 
         return depthDataPromise;
     }
@@ -4471,22 +4502,44 @@ const DepthMapController = (function() {
         return MaskedCanvasRenderer;
     }
 
+    function applyCanvasStyle(renderer, fadeIn = false) {
+        const canvas = renderer && renderer._container;
+        if (!canvas) return;
+        canvas.style.zIndex = '50';
+        canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))';
+        canvas.style.mixBlendMode = 'multiply';
+        canvas.style.pointerEvents = 'none';
+        if (fadeIn) {
+            canvas.style.opacity = '0';
+            canvas.style.transition = 'opacity 0.6s ease';
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    canvas.style.opacity = '1';
+                });
+            });
+        }
+    }
+
     function createDepthLayers(map, parsedLayers) {
         const RendererClass = getMaskedCanvasRendererClass();
         if (!map || !RendererClass) return;
+        if (depthLayers.length > 0) {
+            if (visible) {
+                depthLayers.forEach(layerData => {
+                    layerData.layers.forEach(layer => {
+                        if (!map.hasLayer(layer)) layer.addTo(map);
+                    });
+                    applyCanvasStyle(layerData.renderer, false);
+                });
+            }
+            return;
+        }
+
         parsedLayers.forEach(layerData => {
             const renderer = new RendererClass({
                 pane: 'overlayPane',
                 padding: 1.5
             });
-
-            const canvas = renderer._container;
-            if (canvas) {
-                canvas.style.zIndex = '50';
-                canvas.style.filter = 'drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.45))';
-                canvas.style.mixBlendMode = 'multiply';
-                canvas.style.pointerEvents = 'none';
-            }
 
             const groupLayers = [];
             layerData.groups.forEach(rings => {
@@ -4504,9 +4557,14 @@ const DepthMapController = (function() {
                     bubblingMouseEvents: false
                 });
 
-                polygon.addTo(map);
+                if (visible) {
+                    polygon.addTo(map);
+                }
                 groupLayers.push(polygon);
             });
+
+            // addTo(map) 完了後に生成済みの renderer._container へ確実にスタイル適用＆フェードイン
+            applyCanvasStyle(renderer, visible);
 
             depthLayers.push({
                 depth: layerData.depth,
@@ -4535,38 +4593,71 @@ const DepthMapController = (function() {
             return loadDepthData();
         },
 
+        isLoadingOrLoaded: function() {
+            return !!(loadPromise || depthLayers.length > 0);
+        },
+
         initAndShow: function(leafletMap) {
-            if (!leafletMap || typeof L === 'undefined') return Promise.resolve();
-            mapInstance = leafletMap;
+            const targetMap = leafletMap || window.map;
+            if (!targetMap || typeof L === 'undefined') return Promise.resolve();
+            mapInstance = targetMap;
+            window._depthDeferredForSpot = false;
+
+            if (depthLayers.length > 0) {
+                if (visible) {
+                    depthLayers.forEach(layerData => {
+                        layerData.layers.forEach(layer => {
+                            if (!mapInstance.hasLayer(layer)) layer.addTo(mapInstance);
+                        });
+                    });
+                }
+                return Promise.resolve(parsedDepthData || []);
+            }
 
             if (loadPromise) return loadPromise;
 
-            loadPromise = Promise.all([
-                loadParsedDepthData(),
-                loadMaskData()
-            ]).then(results => {
-                const parsedLayers = results[0];
-                if (!Array.isArray(parsedLayers) || parsedLayers.length === 0) {
+            // マスク先読み → 深度5本を2段階取得・デコード（goBack等で画面遷移してもキャンセルせず完了後に自動表示）
+            loadPromise = loadMaskData()
+                .then(() => loadParsedDepthData())
+                .then(parsedLayers => {
+                    if (!Array.isArray(parsedLayers) || parsedLayers.length === 0) {
+                        loadPromise = null;
+                        return [];
+                    }
+                    const activeMap = window.map || mapInstance;
+                    if (!activeMap) {
+                        loadPromise = null;
+                        return [];
+                    }
+                    mapInstance = activeMap;
+                    createDepthLayers(activeMap, parsedLayers);
+                    return parsedLayers;
+                })
+                .catch(error => {
                     loadPromise = null;
+                    console.warn('等深線レイヤー生成スキップ:', error && error.message ? error.message : error);
                     return [];
-                }
-                createDepthLayers(mapInstance, parsedLayers);
-                return parsedLayers;
-            }).catch(error => {
-                loadPromise = null;
-                console.warn('等深線レイヤー生成スキップ:', error && error.message ? error.message : error);
-                return [];
-            });
+                });
 
             return loadPromise;
         },
 
         toggle: function() {
             visible = !visible;
+            const activeMap = window.map || mapInstance;
+            if (!activeMap) return visible;
+            mapInstance = activeMap;
+            if (visible && depthLayers.length === 0) {
+                this.initAndShow(activeMap);
+                return visible;
+            }
             depthLayers.forEach(layerData => {
                 layerData.layers.forEach(layer => {
-                    if (visible) layer.addTo(mapInstance);
-                    else if (mapInstance.hasLayer(layer)) mapInstance.removeLayer(layer);
+                    if (visible) {
+                        if (!activeMap.hasLayer(layer)) layer.addTo(activeMap);
+                    } else if (activeMap.hasLayer(layer)) {
+                        activeMap.removeLayer(layer);
+                    }
                 });
             });
             return visible;
@@ -4577,6 +4668,16 @@ const DepthMapController = (function() {
         }
     };
 })();
+
+// SPOT画面の最後尾やgoBack時に等深線を安全起動する共通ヘルパー（読み込み中・表示済みなら何もしない）
+window.startDeferredDepthMap = function() {
+    if (typeof DepthMapController === 'undefined' || !window.map) return Promise.resolve();
+    window._depthDeferredForSpot = false;
+    if (typeof DepthMapController.isLoadingOrLoaded === 'function' && DepthMapController.isLoadingOrLoaded()) {
+        return DepthMapController.initAndShow(window.map);
+    }
+    return DepthMapController.initAndShow(window.map);
+};
 </script>
 
 </body>
