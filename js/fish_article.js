@@ -26,61 +26,7 @@ const SONAR_CONFIG = {
 };
 
 // ==========================================
-// ★ 魚種名おまとめ辞書（出世魚や別名・compiled_dataの表記ゆれを統一）
-// ==========================================
-const FISH_DICTIONARY = {
-    "ツバス": "ワカシ",
-    "ワカシ": "ワカシ",
-    "ハマチ": "イナダ",
-    "イナダ": "イナダ",
-    "メジロ": "ワラサ",
-    "ワラサ": "ワラサ",
-    "ブリ": "ブリ",
-    "セイゴ": "スズキ",
-    "フッコ": "スズキ",
-    "シーバス": "スズキ",
-    "マルスズキ": "スズキ",
-    "タイリクスズキ": "スズキ",
-    "ヒラスズキ": "スズキ",
-    "スズキ": "スズキ",
-    "サゴシ": "サワラ",
-    "サワラ": "サワラ",
-    "カイズ": "クロダイ",
-    "チヌ": "クロダイ",
-    "クロダイ": "クロダイ",
-    "コハダ": "コノシロ",
-    "コノシロ": "コノシロ",
-    "クチボソ": "モツゴ",
-    "モツゴ": "モツゴ",
-    "ヤマベ": "オイカワ",
-    "オイカワ": "オイカワ",
-    "グレ": "メジナ",
-    "メジナ": "メジナ",
-    "マアジ": "アジ",
-    "マハゼ": "ハゼ",
-    "ウロハゼ": "ハゼ",
-    "ラージマウスバス": "ブラックバス",
-    "スモールマウスバス": "ブラックバス",
-    "マダコ": "タコ",
-    "キス": "シロギス",
-    "シロギス": "シロギス",
-    "マコガレイ": "カレイ",
-    "イシガレイ": "カレイ",
-    "ヌマガレイ": "カレイ",
-    "ホシガレイ": "カレイ",
-    "メイタガレイ": "カレイ",
-    "カレイ": "カレイ",
-    "ソウダカツオ": "カツオ",
-    "ソウダガツオ": "カツオ",
-    "マルソウダ": "カツオ",
-    "ヒラソウダ": "カツオ",
-    "ホンガツオ": "カツオ",
-    "本ガツオ": "カツオ",
-    "カツオ": "カツオ"
-};
-
-// ==========================================
-// ★ タイルURL定義（dataLoader.js の zoomToSpot 準拠）
+// ★ タイルURL定義（spotLoader.js の zoomToSpot 準拠）
 // ==========================================
 const ARTICLE_TILE_URLS = {
     ort: 'https://cyberjapandata.gsi.go.jp/xyz/ort/{z}/{x}/{y}.jpg',
@@ -89,16 +35,22 @@ const ARTICLE_TILE_URLS = {
     photo: 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'
 };
 
-// ★ 正規化ヘルパー
+// ★ 正規化ヘルパー（正本は header.js の window.toBroadFishName）
 function normalizeFishName(rawName) {
     if (!rawName) return "";
-    const cleaned = String(rawName).replace(/（.*?）|\(.*?\)/g, '').trim();
-    return FISH_DICTIONARY[cleaned] || cleaned;
+    if (typeof window.toBroadFishName === 'function') {
+        return window.toBroadFishName(rawName);
+    }
+    return String(rawName).replace(/　/g, ' ').replace(/（.*?）|\(.*?\)/g, '').trim();
 }
 
-// ★ 複合魚種名（「ブリ・イナダ」等）を分割・正規化してターゲット魚種配列と一致するか判定
+// ★ 複合魚種名（「ブリ・イナダ」等）を含めてターゲット魚種配列と同一グループか判定
+//   正本は header.js の window.isSameFishGroup
 function isTargetFishMatched(rawFishStr, targetFishArray) {
     if (!rawFishStr || !Array.isArray(targetFishArray) || targetFishArray.length === 0) return false;
+    if (typeof window.isSameFishGroup === 'function') {
+        return targetFishArray.some(target => window.isSameFishGroup(rawFishStr, target));
+    }
     const parts = String(rawFishStr).split(/[・,、／/]/).map(s => normalizeFishName(s)).filter(Boolean);
     return parts.some(p => targetFishArray.includes(p));
 }
@@ -611,9 +563,12 @@ window.renderRegisteredFishSpotCards = async function(targetContainer, maxCount 
     const filterFishRaw = String(opt.fish || container.getAttribute('data-fish') || '').trim();
     const filterPrefRaw = String(opt.pref || container.getAttribute('data-pref') || '').trim();
 
-    const filterFishList = filterFishRaw
-        ? filterFishRaw.split(/[・,、／/]/).map(f => normalizeFishName(f)).filter(Boolean)
+    const filterFishDisplayList = filterFishRaw
+        ? filterFishRaw.split(/[・,、／/]/).map(f => f.trim()).filter(Boolean)
         : [];
+    const filterFishList = filterFishDisplayList
+        .map(f => normalizeFishName(f))
+        .filter(Boolean);
     const filterPrefList = filterPrefRaw
         ? filterPrefRaw.split(/[,、]/).map(p => p.trim()).filter(Boolean)
         : [];
@@ -738,8 +693,8 @@ window.renderRegisteredFishSpotCards = async function(targetContainer, maxCount 
 
     // 見出し：既定は「📍 〇〇が狙えるスポット」。data-heading="任意の文言" で変更、data-heading="none" で非表示
     const headingAttr = container.getAttribute('data-heading');
-    const defaultFishLabel = filterFishList.length > 0
-        ? filterFishList.join('・')
+    const defaultFishLabel = filterFishDisplayList.length > 0
+        ? filterFishDisplayList.join('・')
         : (window._articleDisplayFishStr || '対象魚');
     const headingText = headingAttr === null
         ? `📍 ${defaultFishLabel}が狙えるスポット`
@@ -925,8 +880,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const uniqueCoords = new Map();
         rawList.forEach(item => {
           if (!item || !item.fish || !item.lat || !item.lng) return;
-          const normFish = normalizeFishName(item.fish);
-          if (targetFishArray.includes(normFish)) {
+          if (isTargetFishMatched(item.fish, targetFishArray)) {
             const key = `${Number(item.lat).toFixed(3)}_${Number(item.lng).toFixed(3)}`;
             const existing = uniqueCoords.get(key);
             if (!existing || item.date > existing.date) {
