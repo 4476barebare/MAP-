@@ -146,9 +146,29 @@ jobs:
           fi
 
       # ========================================================
-      # 4. 変更確認・コミット・プッシュ
+      # 4. SNS釣果JSONの魚種名統一フィルター適用（KANTO/integrated_catch.json）
+      #    ※data/fish_master.json に基づき広義名統一・NG魚種除外・関東圏外除外を一括実施
       # ========================================================
-      - name: "4. Commit and Push Changes"
+      - name: "4. Normalize SNS Catch JSON (fish_master.json)"
+        continue-on-error: true
+        run: |
+          if [ -f "script/normalize_catch_data.js" ]; then
+            if node script/normalize_catch_data.js KANTO/integrated_catch.json; then
+              echo "| 4. SNS釣果フィルター | \`KANTO/integrated_catch.json\` | ✅ 適用完了 | fish_master.json で広義名統一・NG/圏外除外済 |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "❌ [SNS Catch Filter] normalize_catch_data.js 実行エラー"
+              echo "| 4. SNS釣果フィルター | \`KANTO/integrated_catch.json\` | ❌ 失敗 | normalize_catch_data.js エラー |" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+          else
+            echo "⏭️ script/normalize_catch_data.js が見つからないためスキップ"
+            echo "| 4. SNS釣果フィルター | \`KANTO/integrated_catch.json\` | ⏭️ スキップ | スクリプト未配置 |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ========================================================
+      # 5. 変更確認・コミット・プッシュ
+      # ========================================================
+      - name: "5. Commit and Push Changes"
         id: commit
         run: |
           git config --local user.name "github-actions[bot]"
@@ -170,15 +190,15 @@ jobs:
           fi
 
       # ========================================================
-      # 5. GitHub Pages デプロイ（更新がある時 または force_deploy=true 時のみ）
+      # 6. GitHub Pages デプロイ（更新がある時 または force_deploy=true 時のみ）
       # ========================================================
-      - name: "5. Upload Pages Artifact"
+      - name: "6. Upload Pages Artifact"
         if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true
         uses: actions/upload-pages-artifact@v3
         with:
           path: './'
 
-      - name: "6. Deploy to GitHub Pages"
+      - name: "7. Deploy to GitHub Pages"
         id: deployment
         if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true
         uses: actions/deploy-pages@v4
