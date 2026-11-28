@@ -584,67 +584,6 @@ function lookupArticleSpotDictEntry(dict, spotName) {
     return null;
 }
 
-function injectRegisteredSpotStyles() {
-    if (document.getElementById('registered-spot-styles')) return;
-
-    const style = document.createElement('style');
-    style.id = 'registered-spot-styles';
-    style.textContent = `
-        .registered-spot-heading {
-            font-size: 0.95rem;
-            font-weight: 700;
-            margin: 22px 0 10px;
-            padding: 0;
-            border: none;
-            color: #1e3246;
-            line-height: 1.4;
-        }
-        .registered-spot-wrap {
-            margin: 14px 0;
-        }
-        .registered-spot-wrap .menu-text.registered-spot-text {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 2px;
-            min-width: 0;
-        }
-        .registered-spot-water-regional {
-            font-size: 0.74rem;
-            color: #5b6b7c;
-            line-height: 1.35;
-            font-weight: 500;
-        }
-        .article-section .menu-card h2.registered-spot-title,
-        .registered-spot-wrap .menu-card h2.registered-spot-title {
-            margin: 0;
-            padding: 0;
-            border: none;
-            font-size: 1rem;
-            font-weight: 700;
-            line-height: 1.35;
-            color: #162433;
-        }
-        .registered-spot-sub-meta {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: baseline;
-            gap: 2px 8px;
-            margin-top: 2px;
-            line-height: 1.35;
-        }
-        .registered-spot-alt-name {
-            font-size: 0.74rem;
-            color: #64748b;
-        }
-        .registered-spot-coop-name {
-            font-size: 0.76rem;
-            font-weight: 600;
-            color: #1a4b7c;
-        }
-    `;
-    document.head.appendChild(style);
-}
 
 window.renderRegisteredFishSpotCards = async function(targetContainer, maxCount = 1, targetIndex = null, options = {}) {
     const container = typeof targetContainer === 'string'
@@ -652,7 +591,6 @@ window.renderRegisteredFishSpotCards = async function(targetContainer, maxCount 
         : targetContainer;
     if (!container) return;
 
-    injectRegisteredSpotStyles();
 
     const renderToken = (Number(container.dataset.regSpotRenderToken) || 0) + 1;
     container.dataset.regSpotRenderToken = String(renderToken);
