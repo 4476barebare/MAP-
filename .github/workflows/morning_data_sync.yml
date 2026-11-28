@@ -340,49 +340,70 @@ jobs:
           fi
 
       # ========================================================
-      # 7. 最新SNS釣果MDの再生成（直前Step4で取得したワークスペース上の最新JSONを直接参照）
+      # 7. 釣果JSONの魚種名統一フィルター適用（compiled_data.json / integrated_catch.json）
+      #    ※data/fish_master.json に基づき広義名統一・NG魚種除外・関東圏外除外を一括実施
+      #    ※KANTO/user_pins.json は投稿時にフィルタ済みのため対象外
       # ========================================================
-      - name: "7. Generate Catch Markdowns (from workspace cache)"
+      - name: "7. Normalize Catch JSONs (fish_master.json)"
+        continue-on-error: true
+        run: |
+          if [ -f "script/normalize_catch_data.js" ]; then
+            if node script/normalize_catch_data.js data/compiled_data.json KANTO/integrated_catch.json; then
+              echo "| 7. 釣果魚種フィルター | \`compiled_data / integrated_catch\` | ✅ 適用完了 | fish_master.json で広義名統一・NG/圏外除外済 |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "❌ [Catch Filter] normalize_catch_data.js 実行エラー"
+              echo "| 7. 釣果魚種フィルター | \`compiled_data / integrated_catch\` | ❌ 失敗 | normalize_catch_data.js エラー |" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
+          else
+            echo "⏭️ script/normalize_catch_data.js が見つからないためスキップ"
+            echo "| 7. 釣果魚種フィルター | \`compiled_data / integrated_catch\` | ⏭️ スキップ | スクリプト未配置 |" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # ========================================================
+      # 8. 最新SNS釣果MDの再生成（直前Step4・Step7で取得＆正規化した最新JSONを直接参照）
+      # ========================================================
+      - name: "8. Generate Catch Markdowns (from workspace cache)"
         continue-on-error: true
         run: |
           if [ -f "script/generate_catch_md.js" ]; then
             node script/generate_catch_md.js ALL KANTO
-            echo "| 7. SNS釣果MD生成 | \`ai-data/*_catch.md\` | ✅ 生成完了 | 直前取得の最新SNS釣果から生成 |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 8. SNS釣果MD生成 | \`ai-data/*_catch.md\` | ✅ 生成完了 | 直前取得の最新SNS釣果から生成 |" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "⏭️ script/generate_catch_md.js が見つからないためスキップ"
-            echo "| 7. SNS釣果MD生成 | \`ai-data/*_catch.md\` | ⏭️ スキップ | スクリプト未配置 |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 8. SNS釣果MD生成 | \`ai-data/*_catch.md\` | ⏭️ スキップ | スクリプト未配置 |" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       # ========================================================
-      # 8. ランキング・根拠ポップアップ・軽量HTML・本番 index.html の一括生成
-      #    （Step1の天気v2 JSON・Step4のSNS釣果・Step7のMDをプッシュ待ちせずそのまま参照）
+      # 9. ランキング・根拠ポップアップ・軽量HTML・本番 index.html の一括生成
+      #    （Step1の天気v2 JSON・Step4＆Step7の正規化済みSNS釣果・Step8のMDをプッシュ待ちせずそのまま参照）
       # ========================================================
-      - name: "8. Generate Ranking, Lightweight HTMLs & Production index.html"
+      - name: "9. Generate Ranking, Lightweight HTMLs & Production index.html"
         continue-on-error: true
         env:
           TEMPLATE_PATH: "template/index.txt"
         run: |
           node script/generate_ranking_and_index.js KANTO index.html
-          echo "| 8. ランキング＆静的HTML | \`index.html / ai-data/*.html\` | ✅ 生成完了 | 最新天気・SNS釣果から一括ビルド |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| 9. ランキング＆静的HTML | \`index.html / ai-data/*.html\` | ✅ 生成完了 | 最新天気・SNS釣果から一括ビルド |" >> "$GITHUB_STEP_SUMMARY"
 
       # ========================================================
-      # 9. llms.txt の最新化
+      # 10. llms.txt の最新化
       # ========================================================
-      - name: "9. Refresh llms.txt"
+      - name: "10. Refresh llms.txt"
         continue-on-error: true
         run: |
           if [ -f "script/generate_pref_md.js" ]; then
             node script/generate_pref_md.js LLMS KANTO
-            echo "| 9. AI目次更新 | \`llms.txt\` | ✅ 更新完了 | 全MD一覧を再構築 |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 10. AI目次更新 | \`llms.txt\` | ✅ 更新完了 | 全MD一覧を再構築 |" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "⏭️ script/generate_pref_md.js が見つからないためスキップ"
-            echo "| 9. AI目次更新 | \`llms.txt\` | ⏭️ スキップ | スクリプト未配置 |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| 10. AI目次更新 | \`llms.txt\` | ⏭️ スキップ | スクリプト未配置 |" >> "$GITHUB_STEP_SUMMARY"
           fi
 
       # ========================================================
-      # 10. 一括コミット・プッシュ（リベース競合時は今回の最新ビルド結果を自動採用）
+      # 11. 一括コミット・プッシュ（リベース競合時は今回の最新ビルド結果を自動採用）
       # ========================================================
-      - name: "10. Commit and Push Changes"
+      - name: "11. Commit and Push Changes"
         id: commit
         run: |
           git config --local user.name "github-actions[bot]"
@@ -425,16 +446,16 @@ jobs:
           fi
 
       # ========================================================
-      # 11. GitHub Pages デプロイ（Step 11 と Step 12 の実行条件を完全統一）
+      # 12. GitHub Pages デプロイ（Step 12 と Step 13 の実行条件を完全統一）
       # ========================================================
-      - name: "11. Upload Pages Artifact"
+      - name: "12. Upload Pages Artifact"
         id: upload_artifact
         if: steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true || github.event.inputs.force_deploy == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: './'
 
-      - name: "12. Deploy to GitHub Pages"
+      - name: "13. Deploy to GitHub Pages"
         id: deployment
         if: (steps.commit.outputs.pushed == 'true' || inputs.force_deploy == true || github.event.inputs.force_deploy == 'true') && steps.upload_artifact.outcome == 'success'
         uses: actions/deploy-pages@v4
