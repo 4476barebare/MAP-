@@ -46,7 +46,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 90点（基礎点 112点 [基本100+SNS釣果12] × 降水減点-8% × 風速減点-13%[日中4m以上:1/8コマ]）
 - **明日の天気予報（根拠）**: 🌤→☀️ 主に晴れのち快晴 / 気温 8〜15°C / 最大降水確率 20% / 最大風速 5m/s / 最大波高 1.2m / 平均水温 17°C
 - **時間帯別の予報詳細**: 6時: ☀️快晴 / 11°C / 降水6% / 風西2m/s / 波0.9m ｜ 12時: ☀️快晴 / 12°C / 降水23% / 風北西4m/s / 波0.6m ｜ 18時: ☀️快晴 / 11°C / 降水0% / 風北3m/s / 波0.5m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約2.3km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・カタクチイワシ（投稿地: 本牧海づり施設 / 約3.4km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約2.3km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・イワシ（投稿地: 本牧海づり施設 / 約3.4km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
 - **スポット詳細MD / 地図**: [川崎横浜エリア詳細（KANAGAWA_YOKOHAMA.md）](KANAGAWA_YOKOHAMA.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&area=%E5%B7%9D%E5%B4%8E%E6%A8%AA%E6%B5%9C%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E6%A8%AA%E6%B5%9C%E6%B2%96%E5%A0%A4%E3%83%BB%E7%99%BD%E7%81%AF%E3%83%86%E3%83%88%E3%83%A9%E5%A0%A4)
 
 #### 4. 大黒町岸壁（神奈川県 / 川崎横浜エリア）
@@ -62,7 +62,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 90点（基礎点 112点 [基本100+SNS釣果12] × 降水減点-8% × 風速減点-13%[日中4m以上:1/8コマ]）
 - **明日の天気予報（根拠）**: 🌤→☀️ 主に晴れのち快晴 / 気温 8〜15°C / 最大降水確率 20% / 最大風速 5m/s / 最大波高 1.2m / 平均水温 17°C
 - **時間帯別の予報詳細**: 6時: ☀️快晴 / 11°C / 降水6% / 風西2m/s / 波0.8m ｜ 12時: ☀️快晴 / 12°C / 降水23% / 風北西4m/s / 波0.6m ｜ 18時: ☀️快晴 / 11°C / 降水0% / 風北3m/s / 波0.5m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約3.0km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・カタクチイワシ（投稿地: 本牧海づり施設 / 約4.1km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約3.0km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・イワシ（投稿地: 本牧海づり施設 / 約4.1km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
 - **スポット詳細MD / 地図**: [川崎横浜エリア詳細（KANAGAWA_YOKOHAMA.md）](KANAGAWA_YOKOHAMA.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&area=%E5%B7%9D%E5%B4%8E%E6%A8%AA%E6%B5%9C%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E6%A8%AA%E6%B5%9C%E6%B2%96%E5%A0%A4%E3%83%BB%E8%B5%A4%E7%81%AF%E3%83%8F%E3%83%8A%E3%83%AC)
 
 ## 都道府県別のおすすめ釣り場
@@ -144,7 +144,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 90点（基礎点 112点 [基本100+SNS釣果12] × 降水減点-8% × 風速減点-13%[日中4m以上:1/8コマ]）
 - **明日の天気予報（根拠）**: 🌤→☀️ 主に晴れのち快晴 / 気温 8〜15°C / 最大降水確率 20% / 最大風速 5m/s / 最大波高 1.2m / 平均水温 17°C
 - **時間帯別の予報詳細**: 6時: ☀️快晴 / 11°C / 降水6% / 風西2m/s / 波0.9m ｜ 12時: ☀️快晴 / 12°C / 降水23% / 風北西4m/s / 波0.6m ｜ 18時: ☀️快晴 / 11°C / 降水0% / 風北3m/s / 波0.5m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約2.3km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・カタクチイワシ（投稿地: 本牧海づり施設 / 約3.4km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約2.3km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・イワシ（投稿地: 本牧海づり施設 / 約3.4km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
 - **スポット詳細MD / 地図**: [川崎横浜エリア詳細（KANAGAWA_YOKOHAMA.md）](KANAGAWA_YOKOHAMA.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&area=%E5%B7%9D%E5%B4%8E%E6%A8%AA%E6%B5%9C%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E6%A8%AA%E6%B5%9C%E6%B2%96%E5%A0%A4%E3%83%BB%E7%99%BD%E7%81%AF%E3%83%86%E3%83%88%E3%83%A9%E5%A0%A4)
 
 #### 4. 大黒町岸壁（神奈川県 / 川崎横浜エリア）
@@ -160,7 +160,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 90点（基礎点 112点 [基本100+SNS釣果12] × 降水減点-8% × 風速減点-13%[日中4m以上:1/8コマ]）
 - **明日の天気予報（根拠）**: 🌤→☀️ 主に晴れのち快晴 / 気温 8〜15°C / 最大降水確率 20% / 最大風速 5m/s / 最大波高 1.2m / 平均水温 17°C
 - **時間帯別の予報詳細**: 6時: ☀️快晴 / 11°C / 降水6% / 風西2m/s / 波0.8m ｜ 12時: ☀️快晴 / 12°C / 降水23% / 風北西4m/s / 波0.6m ｜ 18時: ☀️快晴 / 11°C / 降水0% / 風北3m/s / 波0.5m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約3.0km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・カタクチイワシ（投稿地: 本牧海づり施設 / 約4.1km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-26 ウナギ（投稿地: 大黒海づり施設 / 約2.2km / [Threads](https://www.threads.com/@t.t9737/post/DgMihq_mm5g)）； 2026-11-26 アジ（投稿地: 本牧 / 約3.0km / [Threads](https://www.threads.com/@ecopre.ozaki/post/DgMxwlRk4lP)）； 2026-11-25 アジ・イワシ・クロダイ・メジナ（投稿地: 大黒海づり施設 / 約2.2km / [X](https://x.com/sakana_datahook/status/2125564115985035722)）； 2026-11-25 アジ・イワシ（投稿地: 本牧海づり施設 / 約4.1km / [X](https://x.com/BSSBULL/status/2125554809797582912)）
 - **スポット詳細MD / 地図**: [川崎横浜エリア詳細（KANAGAWA_YOKOHAMA.md）](KANAGAWA_YOKOHAMA.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C&area=%E5%B7%9D%E5%B4%8E%E6%A8%AA%E6%B5%9C%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E6%A8%AA%E6%B5%9C%E6%B2%96%E5%A0%A4%E3%83%BB%E8%B5%A4%E7%81%AF%E3%83%8F%E3%83%8A%E3%83%AC)
 
 #### 6. 鶴見川河口（神奈川県 / 川崎横浜エリア）
@@ -232,7 +232,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 47点（基礎点 109点 [基本100+SNS釣果9] × 降水減点-2% × 風速減点-56%[日中4m以上:4/8コマ]）
 - **明日の天気予報（根拠）**: ⛅→☀️ 薄曇りのち快晴 / 気温 7〜13°C / 最大降水確率 10% / 最大風速 7m/s / 最大波高 1.8m / 平均水温 18°C
 - **時間帯別の予報詳細**: 6時: ⛅薄曇り / 10°C / 降水5% / 風北西2m/s / 波1.4m ｜ 12時: ☀️快晴 / 12°C / 降水1% / 風北西7m/s / 波1.2m ｜ 18時: ☀️快晴 / 8°C / 降水0% / 風北西4m/s / 波1.0m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-23 イワシ・キス・サバ・ハゼ（投稿地: 大津港 / 約1.4km / [X](https://x.com/tsuri_map/status/2124775178139742705)）； 2026-11-14 アジ（投稿地: 大津港 / 約1.4km / [X](https://x.com/min39copecope/status/2121400418907693564)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-23 イワシ・サバ・シロギス・ハゼ（投稿地: 大津港 / 約1.4km / [X](https://x.com/tsuri_map/status/2124775178139742705)）； 2026-11-14 アジ（投稿地: 大津港 / 約1.4km / [X](https://x.com/min39copecope/status/2121400418907693564)）
 - **スポット詳細MD / 地図**: [北茨城エリア詳細（IBARAKI_HITACHI.md）](IBARAKI_HITACHI.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&area=%E5%8C%97%E8%8C%A8%E5%9F%8E%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E5%A4%A7%E6%B4%A5%E6%B8%AF)
 
 #### 2. 九ノ﨑海岸（茨城県栃木県 / 北茨城エリア）
@@ -240,7 +240,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 47点（基礎点 109点 [基本100+SNS釣果9] × 降水減点-2% × 風速減点-56%[日中4m以上:4/8コマ]）
 - **明日の天気予報（根拠）**: ⛅→☀️ 薄曇りのち快晴 / 気温 7〜13°C / 最大降水確率 10% / 最大風速 7m/s / 最大波高 1.8m / 平均水温 18°C
 - **時間帯別の予報詳細**: 6時: ⛅薄曇り / 10°C / 降水5% / 風北西2m/s / 波1.4m ｜ 12時: ☀️快晴 / 12°C / 降水0% / 風北西7m/s / 波1.2m ｜ 18時: ☀️快晴 / 8°C / 降水0% / 風北西4m/s / 波1.0m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-23 イワシ・キス・サバ・ハゼ（投稿地: 大津港 / 約2.1km / [X](https://x.com/tsuri_map/status/2124775178139742705)）； 2026-11-14 アジ（投稿地: 大津港 / 約2.1km / [X](https://x.com/min39copecope/status/2121400418907693564)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-23 イワシ・サバ・シロギス・ハゼ（投稿地: 大津港 / 約2.1km / [X](https://x.com/tsuri_map/status/2124775178139742705)）； 2026-11-14 アジ（投稿地: 大津港 / 約2.1km / [X](https://x.com/min39copecope/status/2121400418907693564)）
 - **スポット詳細MD / 地図**: [北茨城エリア詳細（IBARAKI_HITACHI.md）](IBARAKI_HITACHI.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&area=%E5%8C%97%E8%8C%A8%E5%9F%8E%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E4%B9%9D%E3%83%8E%EF%A8%91%E6%B5%B7%E5%B2%B8)
 
 #### 3. 花園川（茨城県栃木県 / 北茨城エリア）
@@ -248,7 +248,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 34点（基礎点 109点 [基本100+SNS釣果9] × 降水減点-2% × 風速減点-69%[日中4m以上:5/8コマ]）
 - **明日の天気予報（根拠）**: ⛅→☀️ 薄曇りのち快晴 / 気温 7〜13°C / 最大降水確率 10% / 最大風速 7m/s / 最大波高 1.7m / 平均水温 18°C
 - **時間帯別の予報詳細**: 6時: ⛅薄曇り / 10°C / 降水5% / 風北西2m/s / 波1.4m ｜ 12時: ☀️快晴 / 12°C / 降水1% / 風北西7m/s / 波1.2m ｜ 18時: ☀️快晴 / 8°C / 降水0% / 風北西4m/s / 波1.0m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-23 イワシ・キス・サバ・ハゼ（投稿地: 大津港 / 約7.7km / [X](https://x.com/tsuri_map/status/2124775178139742705)）； 2026-11-14 アジ（投稿地: 大津港 / 約7.7km / [X](https://x.com/min39copecope/status/2121400418907693564)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-23 イワシ・サバ・シロギス・ハゼ（投稿地: 大津港 / 約7.7km / [X](https://x.com/tsuri_map/status/2124775178139742705)）； 2026-11-14 アジ（投稿地: 大津港 / 約7.7km / [X](https://x.com/min39copecope/status/2121400418907693564)）
 - **スポット詳細MD / 地図**: [北茨城エリア詳細（IBARAKI_HITACHI.md）](IBARAKI_HITACHI.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&area=%E5%8C%97%E8%8C%A8%E5%9F%8E%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E8%8A%B1%E5%9C%92%E5%B7%9D)
 
 #### 4. 久慈川大子周辺（茨城県栃木県 / 北茨城エリア）
@@ -264,7 +264,7 @@ source: "釣り行こNAVI"
 - **総合スコア**: 30点（基礎点 100点 [基本100+SNS釣果0] × 降水減点-2% × 風速減点-69%[日中4m以上:5/8コマ]）
 - **明日の天気予報（根拠）**: ⛅→☀️ 薄曇りのち快晴 / 気温 7〜13°C / 最大降水確率 10% / 最大風速 7m/s / 最大波高 1.7m / 平均水温 18°C
 - **時間帯別の予報詳細**: 6時: ⛅薄曇り / 10°C / 降水4% / 風北西2m/s / 波1.4m ｜ 12時: ☀️快晴 / 12°C / 降水1% / 風北西7m/s / 波1.2m ｜ 18時: ☀️快晴 / 8°C / 降水0% / 風北西4m/s / 波1.0m
-- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-08 ヒラメ（投稿地: 常磐サーフ / 約8.4km / [X](https://x.com/lurenewstv/status/2120788693430759546)）； 2026-10-28 イワシ（投稿地: 大津港 / 約9.8km / [X](https://x.com/turizamuraikita/status/2115650505548710133)）
+- **備考（周辺10km圏内の直近SNS釣果）**: 2026-11-08 ヒラメ（投稿地: 常磐サーフ / 約8.4km / [X](https://x.com/lurenewstv/status/2120788693430759546)）
 - **スポット詳細MD / 地図**: [北茨城エリア詳細（IBARAKI_HITACHI.md）](IBARAKI_HITACHI.md) / [地図を見る](https://turiiko-navi.com/?region=%E9%96%A2%E6%9D%B1%E5%9C%B0%E6%96%B9&pref=%E8%8C%A8%E5%9F%8E%E7%9C%8C%E6%A0%83%E6%9C%A8%E7%9C%8C&area=%E5%8C%97%E8%8C%A8%E5%9F%8E%E3%82%A8%E3%83%AA%E3%82%A2&spot=%E5%A4%A7%E5%8C%97%E5%B7%9D)
 
 #### 6. 那須川（茨城県栃木県 / 栃木鬼怒川エリア）
