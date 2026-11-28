@@ -11,7 +11,7 @@ const explicitMasterPath = process.argv[4];
 
 if (!inputPath || !outputPath) {
     console.error('❌ エラー: 入力ファイルまたは出力ファイルのパスが指定されていません。');
-    console.error('使い方: node convert_fish.js <input.csv|input.json> <output.json> [fish_master.json]');
+    console.error('使い方: node script/convert_fish.js <input.csv|input.json> <output.json> [fish_master.json]');
     process.exit(1);
 }
 
@@ -32,6 +32,7 @@ function resolveMasterPath(customPath) {
         path.resolve(process.cwd(), 'data/fish_master.json'),
         path.resolve(process.cwd(), 'fish_master.json'),
         path.resolve(__dirname, '../data/fish_master.json'),
+        path.resolve(__dirname, '../fish_master.json'),
         path.resolve(__dirname, 'data/fish_master.json'),
         path.resolve(__dirname, 'fish_master.json')
     ];
