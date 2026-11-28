@@ -482,6 +482,338 @@ window.renderSnsNearestSpotCards = function(targetContainer, maxCount = 1, targe
 };
 
 // ==========================================
+// ★ 登録魚種スポットカード（逆引き辞書対応・日替わりローテーション・ズーム値あり限定）
+// ==========================================
+window._articleRegisteredFishZoomSpots = [];
+window._articlePrefDictionaryCache = window._articlePrefDictionaryCache || {};
+window._articlePrefDictionaryPromises = window._articlePrefDictionaryPromises || {};
+window._articleRegionCode = window._articleRegionCode || 'KANTO';
+window._articleDisplayFishStr = window._articleDisplayFishStr || '';
+
+function escapeArticleHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[ch]));
+}
+
+function getArticleTodayKey() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function hashArticleSeed(str) {
+    let h = 2166136261 >>> 0;
+    const s = String(str || '');
+    for (let i = 0; i < s.length; i++) {
+        h ^= s.charCodeAt(i);
+        h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+}
+
+function createArticleSeededRng(seed) {
+    let a = seed >>> 0;
+    return function() {
+        a = (a + 0x6D2B79F5) >>> 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+function shuffleSpotsBySeed(list, seedKey) {
+    const arr = Array.isArray(list) ? list.slice() : [];
+    const rng = createArticleSeededRng(hashArticleSeed(seedKey));
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        const tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+    }
+    return arr;
+}
+
+function loadArticlePrefDictionary(prefCode, regionCode) {
+    const targetRegion = regionCode || window._articleRegionCode || window.TARGET_REGION_CODE || 'KANTO';
+    const cleanPref = String(prefCode || '').trim().split('/').pop().split('_')[0];
+    if (!cleanPref) return Promise.resolve(null);
+
+    const cacheKey = `${targetRegion}_${cleanPref}`;
+    if (Object.prototype.hasOwnProperty.call(window._articlePrefDictionaryCache, cacheKey)) {
+        return Promise.resolve(window._articlePrefDictionaryCache[cacheKey]);
+    }
+    if (window._articlePrefDictionaryPromises[cacheKey]) {
+        return window._articlePrefDictionaryPromises[cacheKey];
+    }
+
+    const dictUrl = `../${targetRegion}/${cleanPref}_dictionary.json`;
+    const promise = fetch(dictUrl)
+        .then(res => {
+            if (!res.ok) return null;
+            return res.json();
+        })
+        .then(json => {
+            const validDict = (json && typeof json === 'object' && !Array.isArray(json)) ? json : null;
+            window._articlePrefDictionaryCache[cacheKey] = validDict;
+            return validDict;
+        })
+        .catch(() => {
+            window._articlePrefDictionaryCache[cacheKey] = null;
+            return null;
+        })
+        .finally(() => {
+            delete window._articlePrefDictionaryPromises[cacheKey];
+        });
+
+    window._articlePrefDictionaryPromises[cacheKey] = promise;
+    return promise;
+}
+
+function lookupArticleSpotDictEntry(dict, spotName) {
+    if (!dict || !spotName) return null;
+    if (dict[spotName]) return dict[spotName];
+    const trimmed = String(spotName).trim();
+    if (dict[trimmed]) return dict[trimmed];
+    return null;
+}
+
+function injectRegisteredSpotStyles() {
+    if (document.getElementById('registered-spot-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'registered-spot-styles';
+    style.textContent = `
+        .registered-spot-heading {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin: 22px 0 10px;
+            padding: 0;
+            border: none;
+            color: #1e3246;
+            line-height: 1.4;
+        }
+        .registered-spot-wrap {
+            margin: 14px 0;
+        }
+        .registered-spot-wrap .menu-text.registered-spot-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+            min-width: 0;
+        }
+        .registered-spot-water-regional {
+            font-size: 0.74rem;
+            color: #5b6b7c;
+            line-height: 1.35;
+            font-weight: 500;
+        }
+        .article-section .menu-card h2.registered-spot-title,
+        .registered-spot-wrap .menu-card h2.registered-spot-title {
+            margin: 0;
+            padding: 0;
+            border: none;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #162433;
+        }
+        .registered-spot-sub-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 2px 8px;
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+        .registered-spot-alt-name {
+            font-size: 0.74rem;
+            color: #64748b;
+        }
+        .registered-spot-coop-name {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #1a4b7c;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+window.renderRegisteredFishSpotCards = async function(targetContainer, maxCount = 1, targetIndex = null, options = {}) {
+    const container = typeof targetContainer === 'string'
+        ? document.querySelector(targetContainer)
+        : targetContainer;
+    if (!container) return;
+
+    injectRegisteredSpotStyles();
+
+    const renderToken = (Number(container.dataset.regSpotRenderToken) || 0) + 1;
+    container.dataset.regSpotRenderToken = String(renderToken);
+
+    const singleIdx = targetIndex != null && targetIndex !== '' && Number(targetIndex) >= 1
+        ? Math.floor(Number(targetIndex))
+        : null;
+
+    const countLimit = singleIdx ? singleIdx : Math.max(1, Number(maxCount) || 1);
+
+    const allRegisteredSpots = window._articleRegisteredFishZoomSpots || [];
+    if (allRegisteredSpots.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const opt = (options && typeof options === 'object') ? options : {};
+    const filterFishRaw = String(opt.fish || container.getAttribute('data-fish') || '').trim();
+    const filterPrefRaw = String(opt.pref || container.getAttribute('data-pref') || '').trim();
+
+    const filterFishList = filterFishRaw
+        ? filterFishRaw.split(/[・,、／/]/).map(f => normalizeFishName(f)).filter(Boolean)
+        : [];
+    const filterPrefList = filterPrefRaw
+        ? filterPrefRaw.split(/[,、]/).map(p => p.trim()).filter(Boolean)
+        : [];
+
+    const candidates = allRegisteredSpots.filter(spot => {
+        if (filterFishList.length > 0) {
+            const spotFishes = Array.isArray(spot.registeredFishes) ? spot.registeredFishes : [];
+            const fishOk = filterFishList.some(f => spotFishes.includes(f));
+            if (!fishOk) return false;
+        }
+        if (filterPrefList.length > 0) {
+            const prefCodeUpper = String(spot.prefCode || '').toUpperCase();
+            const prefNameStr = String(spot.prefName || '');
+            const prefOk = filterPrefList.some(fp => {
+                const fpUpper = fp.toUpperCase();
+                return prefCodeUpper === fpUpper || prefNameStr === fp || prefNameStr.includes(fp);
+            });
+            if (!prefOk) return false;
+        }
+        return true;
+    });
+
+    if (candidates.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const regionCode = window._articleRegionCode || window.TARGET_REGION_CODE || 'KANTO';
+    const baseFishKey = (window._articleTargetFishArray || []).join(',');
+    const seedKey = `${getArticleTodayKey()}|${regionCode}|${baseFishKey}|${filterFishList.join(',')}|${filterPrefList.join(',')}`;
+
+    const shuffled = shuffleSpotsBySeed(candidates, seedKey);
+    const displayCards = singleIdx
+        ? (shuffled[singleIdx - 1] ? [shuffled[singleIdx - 1]] : [])
+        : shuffled.slice(0, countLimit);
+
+    if (displayCards.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    // 選出されたスポットの所属県だけ逆引き辞書を並列取得（キャッシュ済みの県は即返却）
+    const uniquePrefCodes = [...new Set(displayCards.map(c => c.prefCode).filter(Boolean))];
+    const dictPairs = await Promise.all(
+        uniquePrefCodes.map(async code => [code, await loadArticlePrefDictionary(code, regionCode)])
+    );
+
+    // 非同期完了後に新しい描画指示が割り込んでいれば破棄
+    if (String(renderToken) !== container.dataset.regSpotRenderToken) return;
+
+    const dictByPref = Object.fromEntries(dictPairs);
+
+    displayCards.forEach(card => {
+        (card.preloadUrls || []).forEach(u => {
+            if (!window._preloadedArticleTiles.has(u)) {
+                window._preloadedArticleTiles.add(u);
+                const img = new Image();
+                img.src = u;
+            }
+        });
+    });
+
+    const cardsHtml = displayCards.map(item => {
+        const prefDict = dictByPref[item.prefCode] || null;
+        const dictEntry = lookupArticleSpotDictEntry(prefDict, item.spotName);
+
+        const waterName = dictEntry && dictEntry.waterName ? String(dictEntry.waterName).trim() : '';
+        const regionalName = dictEntry && dictEntry.regionalName ? String(dictEntry.regionalName).trim() : '';
+        const waterRegionalText = [waterName, regionalName].filter(Boolean).join(' ');
+        // 逆引き辞書が存在しない県・未登録スポットのみ県名・エリア名でフォールバック
+        const topMetaText = dictEntry
+            ? waterRegionalText
+            : [item.prefName, item.areaName].filter(Boolean).join(' ');
+
+        let altText = '';
+        if (dictEntry && dictEntry.alternateName) {
+            altText = Array.isArray(dictEntry.alternateName)
+                ? dictEntry.alternateName.map(a => String(a).trim()).filter(Boolean).join('・')
+                : String(dictEntry.alternateName).trim();
+        }
+        const coopText = dictEntry && dictEntry.fishingCooperative
+            ? String(dictEntry.fishingCooperative).trim()
+            : '';
+
+        const safeSpot = escapeArticleHtml(item.spotName || '');
+        const altAttr = escapeArticleHtml(`${item.spotName || ''}の画像`);
+        const posStyle = item.objectPosition ? ` style="object-position: ${escapeArticleHtml(item.objectPosition)};"` : '';
+        const onErrorAttr = item.fallbackThumbUrl
+            ? ` onerror="this.onerror=null;this.src='${escapeArticleHtml(item.fallbackThumbUrl)}';"`
+            : '';
+
+        const topMetaHtml = topMetaText
+            ? `<div class="registered-spot-water-regional">${escapeArticleHtml(topMetaText)}</div>`
+            : '';
+
+        const subParts = [];
+        if (altText) {
+            subParts.push(`<span class="registered-spot-alt-name">${escapeArticleHtml(altText)}</span>`);
+        }
+        if (coopText) {
+            subParts.push(`<span class="registered-spot-coop-name">${escapeArticleHtml(coopText)}</span>`);
+        }
+        const subMetaHtml = subParts.length > 0
+            ? `<div class="registered-spot-sub-meta">${subParts.join('')}</div>`
+            : '';
+
+        return `
+<div class="registered-spot-wrap">
+  <a href="${escapeArticleHtml(item.href)}" class="menu-card">
+    <div class="menu-thumb">
+      <img src="${escapeArticleHtml(item.thumbUrl)}" alt="${altAttr}" loading="lazy" decoding="async"${posStyle}${onErrorAttr}>
+      <span class="thumb-attribution">Leaflet | © 国土地理院</span>
+    </div>
+    <div class="menu-text registered-spot-text">
+      ${topMetaHtml}
+      <h2 class="registered-spot-title">${safeSpot}</h2>
+      ${subMetaHtml}
+    </div>
+  </a>
+</div>`;
+    }).join('');
+
+    // 見出し：既定は「📍 〇〇が狙えるスポット」。data-heading="任意の文言" で変更、data-heading="none" で非表示
+    const headingAttr = container.getAttribute('data-heading');
+    const defaultFishLabel = filterFishList.length > 0
+        ? filterFishList.join('・')
+        : (window._articleDisplayFishStr || '対象魚');
+    const headingText = headingAttr === null
+        ? `📍 ${defaultFishLabel}が狙えるスポット`
+        : String(headingAttr).trim();
+    const headingHtml = headingText && headingText !== 'none'
+        ? `<h3 class="registered-spot-heading">${escapeArticleHtml(headingText)}</h3>`
+        : '';
+
+    container.innerHTML = headingHtml + cardsHtml;
+};
+
+// ==========================================
 // ★ 記事タイトル・本文見出しの1行フィット
 //   最小サイズでも収まらない場合は元サイズに戻して自然に折り返す
 // ==========================================
@@ -554,6 +886,8 @@ document.addEventListener("DOMContentLoaded", function () {
     .map(f => normalizeFishName(f))
     .filter(Boolean);
   window._articleTargetFishArray = targetFishArray;
+  window._articleRegionCode = targetRegionCode;
+  window._articleDisplayFishStr = displayFishStr;
 
   const sonarSettings = getSonarSettings(targetFishArray);
   injectSonarStyles(sonarSettings.sonarSizePx);
@@ -803,6 +1137,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const bounds = L.latLngBounds();
       const fishSpotLinks = [];
       const allZoomSpots = [];
+      const registeredFishZoomSpots = [];
+      const registeredSpotKeySet = new Set();
 
       results.forEach(({ locData, fishData, prefCode }) => {
           const fishMap = {};
@@ -850,27 +1186,6 @@ document.addEventListener("DOMContentLoaded", function () {
                       ? `https://turiiko-navi.com/?region=${encodeURIComponent(targetRegionNameJP)}&pref=${encodeURIComponent(prefNameJP)}&area=${encodeURIComponent(areaNameJP)}&spot=${encodeURIComponent(spot.name)}`
                       : '';
 
-                  if (hasValidCoord && spot.zoom != null && String(spot.zoom).trim() !== '' && spotHref) {
-                      const tileInfo = buildSpotTileData(spot);
-                      const fallbackInfo = buildSpotTileData({ ...spot, type: 'ort' });
-                      if (tileInfo && tileInfo.thumbUrl) {
-                          allZoomSpots.push({
-                              prefName: prefNameJP,
-                              areaName: areaNameJP,
-                              spotName: spot.name,
-                              lat: sLat,
-                              lng: sLng,
-                              zoom: spot.zoom,
-                              type: spot.type || '',
-                              href: spotHref,
-                              thumbUrl: tileInfo.thumbUrl,
-                              fallbackThumbUrl: fallbackInfo ? fallbackInfo.thumbUrl : '',
-                              objectPosition: tileInfo.objectPosition,
-                              preloadUrls: tileInfo.preloadUrls
-                          });
-                      }
-                  }
-                  
                   const fStr = fishMap[spot.name] || fishMap[spot.individualId] || '';
                   const fishArrayFromJSON = fStr ? fStr.split(',') : [];
                   
@@ -884,8 +1199,36 @@ document.addEventListener("DOMContentLoaded", function () {
                   const otherArray = [spot.notes, spot.name];
                   const allSearchWordsRaw = [...fishArrayFromJSON, ...fishArrayFromURL, ...otherArray].filter(Boolean);
                   const mappedSearchWords = allSearchWordsRaw.map(word => normalizeFishName(word));
+                  const uniqueRegisteredFishes = [...new Set(mappedSearchWords)];
                   
-                  const isMatch = targetFishArray.some(targetFish => mappedSearchWords.includes(targetFish));
+                  const isMatch = targetFishArray.some(targetFish => uniqueRegisteredFishes.includes(targetFish));
+
+                  const hasValidZoom = spot.zoom != null && String(spot.zoom).trim() !== '' && Number.isFinite(Number(spot.zoom));
+                  let zoomSpotEntry = null;
+
+                  if (hasValidCoord && hasValidZoom && spotHref) {
+                      const tileInfo = buildSpotTileData(spot);
+                      const fallbackInfo = buildSpotTileData({ ...spot, type: 'ort' });
+                      if (tileInfo && tileInfo.thumbUrl) {
+                          zoomSpotEntry = {
+                              prefCode: prefCode,
+                              prefName: prefNameJP,
+                              areaName: areaNameJP,
+                              spotName: spot.name,
+                              lat: sLat,
+                              lng: sLng,
+                              zoom: spot.zoom,
+                              type: spot.type || '',
+                              href: spotHref,
+                              thumbUrl: tileInfo.thumbUrl,
+                              fallbackThumbUrl: fallbackInfo ? fallbackInfo.thumbUrl : '',
+                              objectPosition: tileInfo.objectPosition,
+                              preloadUrls: tileInfo.preloadUrls,
+                              registeredFishes: uniqueRegisteredFishes
+                          };
+                          allZoomSpots.push(zoomSpotEntry);
+                      }
+                  }
                   
                   if (isMatch) {
                       if (hasValidCoord) {
@@ -900,12 +1243,21 @@ document.addEventListener("DOMContentLoaded", function () {
                               href: spotHref
                           });
                       }
+
+                      if (zoomSpotEntry) {
+                          const regKey = `${prefCode}_${areaNameJP}_${spot.name}`;
+                          if (!registeredSpotKeySet.has(regKey)) {
+                              registeredSpotKeySet.add(regKey);
+                              registeredFishZoomSpots.push(zoomSpotEntry);
+                          }
+                      }
                   }
               });
           }
       });
 
       window._articleAllZoomSpots = allZoomSpots;
+      window._articleRegisteredFishZoomSpots = registeredFishZoomSpots;
 
       document.querySelectorAll('.sns-nearest-spots').forEach(el => {
           const countAttr = el.getAttribute('data-count');
@@ -915,6 +1267,19 @@ document.addEventListener("DOMContentLoaded", function () {
           const targetIdx = indexAttr != null && indexAttr !== '' ? Number(indexAttr) : null;
           const maxKm = maxKmAttr != null && maxKmAttr !== '' ? Number(maxKmAttr) : 15;
           window.renderSnsNearestSpotCards(el, count, targetIdx, maxKm);
+      });
+
+      document.querySelectorAll('.registered-fish-spots').forEach(el => {
+          const countAttr = el.getAttribute('data-count');
+          const indexAttr = el.getAttribute('data-index');
+          const fishAttr = el.getAttribute('data-fish');
+          const prefAttr = el.getAttribute('data-pref');
+          const count = countAttr != null && countAttr !== '' ? Number(countAttr) : 1;
+          const targetIdx = indexAttr != null && indexAttr !== '' ? Number(indexAttr) : null;
+          window.renderRegisteredFishSpotCards(el, count, targetIdx, {
+              fish: fishAttr || '',
+              pref: prefAttr || ''
+          });
       });
 
       // 3-A. 既存ソナーレーダーを描画
