@@ -458,13 +458,77 @@ body > header,
   margin: 12px 16px;
 }
 
-/* 見出し（JSが自動挿入する .sns-heading）の直下はカードを詰める */
-.sns-nearest-spots .sns-heading {
+/* 見出し（JSが自動挿入する .sns-heading / .registered-spot-heading）の直下はカードを詰める */
+.sns-nearest-spots .sns-heading,
+.registered-fish-spots .registered-spot-heading {
   margin-top: 24px;
 }
 
-.sns-nearest-spots .sns-heading + .sns-spot-wrap {
+.sns-nearest-spots .sns-heading + .sns-spot-wrap,
+.registered-fish-spots .registered-spot-heading + .registered-spot-wrap {
   margin-top: 12px;
+}
+
+/* 登録魚種スポットカード（SNS最寄りスポットカードと幅・余白・色調・左揃えを統一） */
+.registered-spot-wrap {
+  margin: 12px 16px;
+}
+
+.registered-spot-wrap .menu-text.registered-spot-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  text-align: left;
+}
+
+.registered-spot-water-regional {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text-sub);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.article-section .menu-card h2.registered-spot-title,
+.registered-spot-wrap .menu-card h2.registered-spot-title {
+  margin: 0;
+  padding: 0;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.4;
+  color: var(--navy);
+  text-align: left;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.registered-spot-sub-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  margin-top: 1px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.registered-spot-alt-name {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+.registered-spot-coop-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--navy);
 }
 
 /* =========================
