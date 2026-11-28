@@ -204,9 +204,85 @@ function calcRepresentativeIcon(rows) {
     return code != null ? toWeatherIcon(code) : "";
 }
 
-// regionLoader.js の normalizeWeatherJsonByDate と同一の日付ズレ補正
+// weather_v2.json（列指向 h / d 形式）を既存互換の hourly / daily 形式へ展開
+function expandSpotWeatherV2(raw) {
+    if (!raw || typeof raw !== "object") return raw;
+    if (Array.isArray(raw.hourly)) return raw;
+    if (!Array.isArray(raw.h) && !Array.isArray(raw.d)) return raw;
+
+    const hourly = Array.isArray(raw.h)
+        ? raw.h.map(dayArr => {
+            if (!Array.isArray(dayArr)) return { weather: [], oneday: null };
+            const codes = Array.isArray(dayArr[0]) ? dayArr[0] : [];
+            const temps = Array.isArray(dayArr[1]) ? dayArr[1] : [];
+            const pops  = Array.isArray(dayArr[2]) ? dayArr[2] : [];
+            const rains = Array.isArray(dayArr[3]) ? dayArr[3] : [];
+            const winds = Array.isArray(dayArr[4]) ? dayArr[4] : [];
+            const dirs  = Array.isArray(dayArr[5]) ? dayArr[5] : null;
+            const waves = Array.isArray(dayArr[6]) ? dayArr[6] : null;
+
+            const len = Math.max(codes.length, temps.length, pops.length, rains.length, winds.length);
+            const weather = [];
+            for (let i = 0; i < len; i++) {
+                weather.push([
+                    codes[i] ?? null,
+                    temps[i] ?? null,
+                    pops[i]  ?? null,
+                    rains[i] ?? null,
+                    winds[i] ?? null,
+                    dirs  ? (dirs[i]  ?? null) : null,
+                    waves ? (waves[i] ?? null) : null
+                ]);
+            }
+
+            const hasOneday = dayArr[7] != null || dayArr[8] != null || dayArr[9] != null;
+            const oneday = hasOneday
+                ? {
+                    avg: dayArr[7] ?? null,
+                    sunrise: dayArr[8] ?? null,
+                    sunset: dayArr[9] ?? null
+                  }
+                : null;
+
+            return { weather, oneday };
+        })
+        : [];
+
+    const daily = Array.isArray(raw.d)
+        ? raw.d.map(dArr => {
+            if (!Array.isArray(dArr)) return null;
+            const hasEx = dArr[2] != null || dArr[3] != null || dArr[4] != null || dArr[5] != null;
+            return {
+                weather: [dArr[0] ?? null, dArr[1] ?? null],
+                dailyEx: hasEx
+                    ? {
+                        avg: dArr[2] ?? null,
+                        wave: dArr[3] ?? null,
+                        sunrise: dArr[4] ?? null,
+                        sunset: dArr[5] ?? null
+                      }
+                    : null
+            };
+        }).filter(Boolean)
+        : [];
+
+    return { hourly, daily };
+}
+
+// regionLoader.js の normalizeWeatherJsonByDate と同一の v2展開＋日付ズレ補正
 function normalizeWeatherJsonByDate(data, todayUtcMs) {
     if (!data || !data.spots || typeof data.spots !== "object") return data;
+
+    // 1. まず全スポットを v2(h/d) -> 互換(hourly/daily) へ展開（当日データでも必ず実行）
+    for (const spotName of Object.keys(data.spots)) {
+        const w = data.spots[spotName];
+        if (!w || typeof w !== "object") continue;
+        if (!Array.isArray(w.hourly) && (Array.isArray(w.h) || Array.isArray(w.d))) {
+            data.spots[spotName] = expandSpotWeatherV2(w);
+        }
+    }
+
+    // 2. 日付ズレがある場合は先頭から経過日数分だけ繰り上げ
     const jsonDateStr = String(data.date || "").trim();
     const m = jsonDateStr.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
     if (!m) return data;
@@ -538,17 +614,20 @@ function extractTomorrowWeatherDetail(dayData) {
     const afternoonRows = [];
 
     let maxPop = -Infinity;
-    let maxPopAll = -Infinity;
-    let maxWind = -Infinity;
+    let maxWindDay = -Infinity;
+    let maxWindAll = -Infinity;
     let maxTemp = -Infinity;
     let minTemp = Infinity;
     let maxWave = -Infinity;
     let popTotal = 0;
     let popCount = 0;
 
-    // 2時間別12ブロックの風速減点集計（4m/s以上で1ブロックあたり 8% + (風速-4)*1% 減点、12ブロック全て4m以上で最小96%減点）
+    // 日中（5時〜20時＝2時間刻みで6,8,10,12,14,16,18,20時の計8コマ）のみを採点・悪天候除外の対象とする
+    // （前日の荒天が深夜0〜4時や22時に残っていても、日中の釣り日和を弾かないようにする）
+    // 風速減点：日中8コマで4m/s以上の時間帯ごとに 12% + (風速-4)*1% 減点（8コマ全て4m以上で最小96%減点→除外）
     let windPenaltyPctRaw = 0;
     let windStrongBlocks = 0;
+    let daytimeWindBlocks = 0;
 
     // 2時間刻み(0,2,4,...,22時)から代表的な時間帯スロット（朝6時/昼12時/夕18時）を拾う
     const timeSlots = [];
@@ -559,6 +638,7 @@ function extractTomorrowWeatherDetail(dayData) {
         if (!Array.isArray(row)) continue;
 
         const hour = i * 2;
+        const isDaytime = hour >= 5 && hour <= 20;
         if (hour >= 5 && hour <= 12) morningRows.push(row);
         else if (hour >= 13 && hour <= 20) afternoonRows.push(row);
 
@@ -570,19 +650,20 @@ function extractTomorrowWeatherDetail(dayData) {
         const windDir = row[5];
         const wave = row[6];
 
-        if (typeof pop === "number") {
-            maxPopAll = Math.max(maxPopAll, pop);
-            if (hour >= 5 && hour <= 20) {
-                maxPop = Math.max(maxPop, pop);
-                popTotal += pop;
-                popCount++;
-            }
+        if (typeof pop === "number" && isDaytime) {
+            maxPop = Math.max(maxPop, pop);
+            popTotal += pop;
+            popCount++;
         }
         if (typeof wind === "number") {
-            maxWind = Math.max(maxWind, wind);
-            if (wind >= 4) {
-                windStrongBlocks++;
-                windPenaltyPctRaw += 8 + (wind - 4);
+            maxWindAll = Math.max(maxWindAll, wind);
+            if (isDaytime) {
+                maxWindDay = Math.max(maxWindDay, wind);
+                daytimeWindBlocks++;
+                if (wind >= 4) {
+                    windStrongBlocks++;
+                    windPenaltyPctRaw += 12 + (wind - 4);
+                }
             }
         }
         if (typeof temp === "number") {
@@ -644,14 +725,13 @@ function extractTomorrowWeatherDetail(dayData) {
     const windPenaltyPct = Math.min(100, Math.max(0, windPenaltyPctRaw));
     const windMultiplier = Math.max(0, 1 - windPenaltyPct / 100);
 
-    // 降水確率100%のスポット、または風速減点96%以上（12ブロック全て4m/s以上相当）のスポットは問答無用でランキング外
-    const isExcludedByWeather = (
-        displayPop >= 100 ||
-        maxPop >= 100 ||
-        maxPopAll >= 100 ||
-        windPenaltyPct >= 96
-    );
+    // 日中（6時〜20時）の降水確率100%、または日中風速減点96%以上（日中8コマ全て4m/s以上相当）のみ問答無用で除外
+    // ※ 深夜帯（0〜4時・22時）の悪天候残存では除外しない
+    const isExcludedByPop = (displayPop >= 100 || maxPop >= 100);
+    const isExcludedByWind = (windPenaltyPct >= 96);
+    const isExcludedByWeather = (isExcludedByPop || isExcludedByWind);
 
+    const effectiveMaxWind = maxWindDay !== -Infinity ? maxWindDay : maxWindAll;
     const waterTempAvg = typeof dayData?.oneday?.avg === "number" ? Math.round(dayData.oneday.avg) : null;
 
     return {
@@ -660,10 +740,13 @@ function extractTomorrowWeatherDetail(dayData) {
         popMultiplier,
         windPenaltyPct: Math.round(windPenaltyPct),
         windStrongBlocks,
+        daytimeWindBlocks: daytimeWindBlocks || 8,
         windMultiplier,
+        isExcludedByPop,
+        isExcludedByWind,
         isExcludedByWeather,
         displayPop,
-        maxWind: maxWind !== -Infinity ? Math.round(maxWind) : null,
+        maxWind: effectiveMaxWind !== -Infinity ? Math.round(effectiveMaxWind) : null,
         maxTemp: maxTemp !== -Infinity ? Math.round(maxTemp) : null,
         minTemp: minTemp !== Infinity ? Math.round(minTemp) : null,
         maxWave: maxWave !== -Infinity ? Number(maxWave.toFixed(1)) : null,
@@ -682,8 +765,16 @@ function buildSpotUrl(spot) {
         "&spot=" + encodeURIComponent(spot.name || "");
 }
 
-function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso, maxItems) {
+function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso, maxItems, statsOut = null) {
     const candidates = [];
+    const stats = {
+        eligible: 0,
+        missingWeather: 0,
+        excludedPop: 0,
+        excludedWind: 0,
+        excludedZeroScore: 0,
+        candidates: 0
+    };
 
     for (const spot of targetSpots) {
         if (spot.type === "pref" || spot.type === "area") continue;
@@ -695,22 +786,37 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
         if (!hasZoom(spot.zoom)) continue;
         if (!spot.icon || String(spot.icon).trim() === "") continue;
 
+        stats.eligible++;
+
         const tomorrowDayData = spot.whether?.hourly?.[1];
-        if (!tomorrowDayData || !Array.isArray(tomorrowDayData.weather)) continue;
+        if (!tomorrowDayData || !Array.isArray(tomorrowDayData.weather)) {
+            stats.missingWeather++;
+            continue;
+        }
 
         const wDetail = extractTomorrowWeatherDetail(tomorrowDayData);
-        if (!wDetail) continue;
+        if (!wDetail) {
+            stats.missingWeather++;
+            continue;
+        }
 
-        // 降水確率100% または 2時間別風速減点96%以上（全ブロック4m以上相当）は問答無用でランキング外
-        if (wDetail.isExcludedByWeather) continue;
+        // 日中（6〜20時）の降水確率100% または 日中風速減点96%以上は問答無用でランキング外
+        if (wDetail.isExcludedByWeather) {
+            if (wDetail.isExcludedByPop) stats.excludedPop++;
+            else if (wDetail.isExcludedByWind) stats.excludedWind++;
+            continue;
+        }
 
         const nearbyPosts = getNearbySnsCatchRecords(spot, snsCatchData, todayUtcMs);
         const snsBonus = getSnsCatchBonus(nearbyPosts);
 
-        // 基礎点(100点 + SNS釣果加点) に対し、降水確率減点率・2時間別風速減点率を乗算
+        // 基礎点(100点 + SNS釣果加点) に対し、日中降水確率減点率・日中2時間別風速減点率を乗算
         const baseScore = 100 + snsBonus;
         const totalScore = Math.round(baseScore * wDetail.popMultiplier * wDetail.windMultiplier);
-        if (totalScore <= 0) continue;
+        if (totalScore <= 0) {
+            stats.excludedZeroScore++;
+            continue;
+        }
 
         candidates.push({
             name: spot.name,
@@ -725,6 +831,7 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
             popPenaltyPct: wDetail.popPenaltyPct,
             windPenaltyPct: wDetail.windPenaltyPct,
             windStrongBlocks: wDetail.windStrongBlocks,
+            daytimeWindBlocks: wDetail.daytimeWindBlocks,
             snsBonus,
             hasSnsBonus: snsBonus > 0,
             snsFishes: snsBonus > 0 ? extractRecentSnsFishes(nearbyPosts, 3) : [],
@@ -741,6 +848,11 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
             nearbyPosts: nearbyPosts.slice(0, 5),
             tieSeed: hashSeed(`${tomorrowIso}:${spot._prefCode}:${spot.name}`)
         });
+    }
+
+    stats.candidates = candidates.length;
+    if (statsOut && typeof statsOut === "object") {
+        Object.assign(statsOut, stats);
     }
 
     if (candidates.length === 0) return [];
@@ -774,7 +886,7 @@ function buildRankingForSpots(targetSpots, snsCatchData, todayUtcMs, tomorrowIso
 function renderRankingListHtml(topItems, scopeTag, tomorrowIso) {
     if (!topItems || topItems.length === 0) {
         return `<div data-ssg-ranking="${escapeHtml(scopeTag)}" data-target-date="${escapeHtml(tomorrowIso)}" style="background:#ffffff; padding:12px; border-radius:6px; border:1px solid #c8d6e5; font-size:13px; color:#191970; line-height:1.6;">` +
-            `明日は降水確率100%や強風（4m/s以上が終日継続）の予報となっているため、安全を優先しおすすめ釣り場の選出を見送りました。` +
+            `明日の日中（6時〜20時）は降水確率100%や強風（4m/s以上が継続）の予報となっているため、安全を優先しおすすめ釣り場の選出を見送りました。` +
             `</div>`;
     }
 
@@ -835,7 +947,7 @@ function renderMdSpotBlock(item, index) {
     if (item.maxWave != null) condParts.push(`最大波高 ${item.maxWave}m`);
     if (item.waterTempAvg != null) condParts.push(`平均水温 ${item.waterTempAvg}°C`);
 
-    lines.push(`- **総合スコア**: ${item.score}点（基礎点 ${item.baseScore}点 [基本100+SNS釣果${item.snsBonus}] × 降水減点-${item.popPenaltyPct}% × 風速減点-${item.windPenaltyPct}%[4m以上:${item.windStrongBlocks}/12コマ]）`);
+    lines.push(`- **総合スコア**: ${item.score}点（基礎点 ${item.baseScore}点 [基本100+SNS釣果${item.snsBonus}] × 降水減点-${item.popPenaltyPct}% × 風速減点-${item.windPenaltyPct}%[日中4m以上:${item.windStrongBlocks}/${item.daytimeWindBlocks || 8}コマ]）`);
     lines.push(`- **明日の天気予報（根拠）**: ${condParts.join(" / ")}`);
     if (item.timeSlots.length > 0) {
         lines.push(`- **時間帯別の予報詳細**: ${item.timeSlots.join(" ｜ ")}`);
@@ -897,8 +1009,8 @@ function buildTomorrowMarkdown(todayInfo, tomorrowInfo, regionItems, prefResults
     lines.push("");
     lines.push(`- 対象日: ${tomorrowInfo.iso}（${tomorrowInfo.label}）`);
     lines.push("- 基礎点: 基本100点に周辺10km圏内の最新SNS釣果ボーナスを加算（1日以内+15点 / 3日以内+12点 / 6日以内+9点 / 10日以内+5点 / 14日以内+2点）");
-    lines.push("- 降水確率の乗算減点: 降水確率100%のスポットは除外し、100%未満は日中平均降水確率の割合で乗算減点");
-    lines.push("- 風速の乗算減点: 2時間別12コマのうち風速4m/s以上の時間帯ごとに8%＋超過1m/sあたり1%を合計して乗算減点（減点率96%以上は除外）");
+    lines.push("- 降水確率の乗算減点: 明日日中（6時〜20時）の降水確率100%のスポットは除外し、100%未満は日中平均降水確率の割合で乗算減点（深夜帯0〜4時・22時は除外判定対象外）");
+    lines.push("- 風速の乗算減点: 明日日中（6時〜20時）の2時間別8コマのうち風速4m/s以上の時間帯ごとに12%＋超過1m/sあたり1%を合計して乗算減点（減点率96%以上は除外、深夜帯は対象外）");
     lines.push("- 関連データ: [AI向け全データ目次（llms.txt）](../llms.txt) / [釣り行こNAVIトップ](https://turiiko-navi.com/)");
     lines.push("");
 
@@ -1360,7 +1472,7 @@ function buildBasisPopupHtml({ scopeLabel, tomorrowInfo, items, dataCatalog, cur
     }
     parts.push(
         `<div class="basis-criteria">` +
-        `算出基準: 基礎点（100点＋周辺10km圏内の直近SNS釣果ボーナス）に対し、明日の降水確率と2時間別風速（4m/s以上の時間帯ごとに減点）を乗算減点して算出しています（降水100%・終日強風は除外）。` +
+        `算出基準: 基礎点（100点＋周辺10km圏内の直近SNS釣果ボーナス）に対し、明日日中（6時〜20時）の降水確率と2時間別風速（4m/s以上の時間帯ごとに減点）を乗算減点して算出しています（日中降水100%・強風継続は除外、深夜帯は対象外）。` +
         `</div>`
     );
     parts.push("</div>");
@@ -1523,14 +1635,16 @@ try {
     }
 
     // 1. 関東全域ランキング算出（最大5件）
-    const regionItems = buildRankingForSpots(allRegionSpots, snsCatchData, todayInfo.utcMs, tomorrowInfo.iso, 5);
+    const regionStats = {};
+    const regionItems = buildRankingForSpots(allRegionSpots, snsCatchData, todayInfo.utcMs, tomorrowInfo.iso, 5, regionStats);
     const regionTitle = `明日（${tomorrowInfo.label}）${SHORT_REGION_NAME}で釣りに行くんだけど良い場所ある？`;
     const regionHtml = renderRankingListHtml(regionItems, "REGION", tomorrowInfo.iso);
 
     // 2. 各県別ランキング算出（最大6件）
     const prefResults = [];
     for (const prefData of prefDataList) {
-        const items = buildRankingForSpots(prefData.spots, snsCatchData, todayInfo.utcMs, tomorrowInfo.iso, 6);
+        const stats = {};
+        const items = buildRankingForSpots(prefData.spots, snsCatchData, todayInfo.utcMs, tomorrowInfo.iso, 6, stats);
         const title = `明日（${tomorrowInfo.label}）${prefData.prefName}で釣りに行くんだけど良い場所ある？`;
         const html = renderRankingListHtml(items, prefData.prefCode, tomorrowInfo.iso);
 
@@ -1539,7 +1653,8 @@ try {
             prefName: prefData.prefName,
             title,
             html,
-            items
+            items,
+            stats
         });
     }
 
@@ -1606,9 +1721,11 @@ try {
 
     console.log(`明日のオススメランキング・静的ポップアップ・軽量HTMLの生成が完了しました（対象日: ${tomorrowInfo.iso}）`);
     console.log(`  対象県(${prefCodes.length}): ${prefCodes.join(", ")}`);
+    console.log(`  関東全域集計  : 対象${regionStats.eligible} / 天気欠損${regionStats.missingWeather} / 降水100%除外${regionStats.excludedPop} / 強風除外${regionStats.excludedWind} / 候補${regionStats.candidates}`);
     console.log(`  関東全域トップ: ${regionItems.map(i => `${i.name}(${i.score}点/基礎${i.baseScore}/降水-${i.popPenaltyPct}%/風-${i.windPenaltyPct}%)`).join("、") || "なし"}`);
     for (const pr of prefResults) {
-        console.log(`  [${pr.prefCode}] ${pr.items.length}件: ${pr.items.map(i => `${i.name}(${i.score})`).join("、") || "なし"}`);
+        const st = pr.stats || {};
+        console.log(`  [${pr.prefCode}] ${pr.items.length}件 (対象${st.eligible ?? 0}/欠損${st.missingWeather ?? 0}/降水除外${st.excludedPop ?? 0}/風除外${st.excludedWind ?? 0}/候補${st.candidates ?? 0}): ${pr.items.map(i => `${i.name}(${i.score})`).join("、") || "なし"}`);
     }
     console.log(`  出力HTML     : ${OUTPUT_HTML_PATH}`);
     console.log(`  出力JSON     : ${RANKING_CACHE_PATH}`);
