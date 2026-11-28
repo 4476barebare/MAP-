@@ -1,4 +1,127 @@
 // ==========================================
+// ★ 投稿モード・記事ページ共通 簡易魚種マスター（header.js）
+//   ※ 通常マップ・スポット詳細・SNS釣果の読み込み描画は事前フィルター済みのため無変換。
+//   ※ 投稿モード（選択肢・周囲3m重複判定）と記事ページ（絞り込み・照合）のみここを参照する。
+// ==========================================
+(function initCommonFishMaster() {
+  // 投稿モードのプルダウン選択肢（スポット魚種ピンと同一表記）
+  const POST_LIST = [
+    'アジ', 'イワシ', 'サバ', 'シロギス', 'ハゼ',
+    'スズキ', 'フッコ', 'セイゴ', 'クロダイ', 'キビレ',
+    'メバル', 'カサゴ', 'ソイ', 'アイナメ', 'メジナ',
+    'カレイ', 'ヒラメ', 'マゴチ', 'イシモチ', 'アナゴ',
+    'ウミタナゴ', 'カワハギ', 'サヨリ', 'コノシロ', 'サッパ',
+    'タチウオ', 'カマス', 'アオリイカ', 'ヒイカ', 'コウイカ',
+    'シリヤケイカ', 'ワカシ', 'イナダ', 'ワラサ', 'ブリ',
+    'カンパチ', 'ショゴ', 'ソウダガツオ', 'サワラ', 'マダイ',
+    'イシダイ', 'メゴチ', 'ボラ', 'ウナギ',
+    'バス', 'マブナ', 'ヘラブナ', 'コイ', 'オイカワ',
+    'クチボソ', 'モロコ', 'ウグイ', 'カワムツ', 'ニゴイ',
+    'アユ', 'テナガエビ', 'タナゴ', 'ワカサギ', 'ニジマス'
+  ];
+
+  // 広義代表名 -> グループ内表記（別名・成長段階・近縁種）
+  // data/fish_master.json の groups 定義と同期
+  const GROUP_DICT = {
+    'シーバス': ['シーバス', 'スズキ', 'フッコ', 'セイゴ', 'マルスズキ'],
+    'クロダイ': ['クロダイ', 'チヌ', 'カイズ', 'チンチン'],
+    'ブラックバス': ['ブラックバス', 'バス', 'ラージマウスバス', 'スモールマウスバス', 'コクチバス', 'オオクチバス'],
+    'フナ': ['フナ', 'マブナ', 'ギンブナ', 'キンブナ'],
+    'ヘラブナ': ['ヘラブナ', 'ヘラ'],
+    'シロギス': ['シロギス', 'キス', 'ピンギス'],
+    'オイカワ': ['オイカワ', 'ヤマベ'],
+    'クチボソ': ['クチボソ', 'モツゴ'],
+    'トラウト': ['トラウト', 'ニジマス', 'レインボートラウト', 'ブラウントラウト', 'エリアトラウト'],
+    'アジ': ['アジ', 'マアジ', 'マルアジ', 'メアジ', 'ムロアジ', 'オキアジ', 'イトヒキアジ', '豆アジ', '小アジ', '尺アジ'],
+    'イワシ': ['イワシ', 'マイワシ', 'カタクチイワシ', 'ウルメイワシ', 'シコイワシ'],
+    'サバ': ['サバ', 'マサバ', 'ゴマサバ', '小サバ'],
+    'ヒラメ': ['ヒラメ', 'ソゲ'],
+    'カレイ': ['カレイ', 'マコガレイ', 'イシガレイ', 'ヌマガレイ', 'ホシガレイ', 'ムシガレイ'],
+    'メバル': ['メバル', 'アカメバル', 'クロメバル', 'シロメバル'],
+    'ソイ': ['ソイ', 'クロソイ', 'ムラソイ', 'ベッコウゾイ'],
+    'カサゴ': ['カサゴ', 'ガシラ', 'アラカブ'],
+    'メジナ': ['メジナ', 'グレ', 'コッパメジナ'],
+    'ワカシ': ['ワカシ', 'ツバス'],
+    'イナダ': ['イナダ', 'ハマチ'],
+    'ワラサ': ['ワラサ', 'メジロ', 'サンパク'],
+    'ブリ': ['ブリ'],
+    'カンパチ': ['カンパチ', 'ショゴ', 'シオ'],
+    'ソウダガツオ': ['ソウダガツオ', 'ソウダカツオ', 'ソーダカツオ', 'ソウダ', 'マルソウダ', 'ヒラソウダ'],
+    'スマ': ['スマ', 'スマガツオ', 'スマカツオ', 'ヤイト'],
+    'カマス': ['カマス', 'アカカマス', 'ヤマトカマス', 'ミズカマス'],
+    'サワラ': ['サワラ', 'サゴシ'],
+    'イシダイ': ['イシダイ', 'シマダイ', 'サンバソウ'],
+    'マダイ': ['マダイ', 'タイ', 'チャリコ'],
+    'ハゼ': ['ハゼ', 'マハゼ', 'デキハゼ'],
+    'マゴチ': ['マゴチ', 'コチ'],
+    'アオリイカ': ['アオリイカ', 'ミズイカ', 'モイカ'],
+    'コノシロ': ['コノシロ', 'コハダ', 'シンコ'],
+    'ウグイ': ['ウグイ', 'マルタウグイ', 'マルタ']
+  };
+
+  // 別名・子魚種 -> 広義代表名 の逆引きマップを自動生成
+  const BROAD_MAP = {};
+  Object.keys(GROUP_DICT).forEach((broadName) => {
+    BROAD_MAP[broadName] = broadName;
+    GROUP_DICT[broadName].forEach((alias) => {
+      if (alias) BROAD_MAP[alias] = broadName;
+    });
+  });
+
+  function cleanFishText(name) {
+    return String(name || '')
+      .replace(/\u3000/g, ' ')
+      .replace(/（.*?）|\(.*?\)/g, '')
+      .trim();
+  }
+
+  // 任意の魚種名を広義代表名へ正規化（例: スズキ/フッコ/セイゴ -> シーバス, バス -> ブラックバス）
+  function toBroadFishName(name) {
+    const cleaned = cleanFishText(name);
+    if (!cleaned) return '';
+    return BROAD_MAP[cleaned] || cleaned;
+  }
+
+  // 複数区切り文字（・,、／/）を分解して広義代表名セットを返す
+  function toBroadFishSet(name) {
+    const cleaned = cleanFishText(name);
+    const result = new Set();
+    if (!cleaned) return result;
+    result.add(toBroadFishName(cleaned));
+    cleaned.split(/[・,、／/]/).forEach((part) => {
+      const p = part.trim();
+      if (p) result.add(toBroadFishName(p));
+    });
+    return result;
+  }
+
+  // 2つの魚種名が同一グループか判定（投稿3m重複チェック・記事ページ絞り込み用）
+  function isSameFishGroup(nameA, nameB) {
+    if (!nameA || !nameB) return false;
+    const setA = toBroadFishSet(nameA);
+    const setB = toBroadFishSet(nameB);
+    for (const v of setA) {
+      if (setB.has(v)) return true;
+    }
+    return false;
+  }
+
+  // 指定魚種が属するグループの全表記配列を返す（記事ページ照合用）
+  function getFishGroupMembers(name) {
+    const broad = toBroadFishName(name);
+    if (!broad) return [];
+    return GROUP_DICT[broad] ? GROUP_DICT[broad].slice() : [broad];
+  }
+
+  window.POST_FISH_LIST = POST_LIST;
+  window.FISH_GROUP_DICTIONARY = GROUP_DICT;
+  window.FISH_BROAD_MAP = BROAD_MAP;
+  window.toBroadFishName = toBroadFishName;
+  window.isSameFishGroup = isSameFishGroup;
+  window.getFishGroupMembers = getFishGroupMembers;
+})();
+
+// ==========================================
 // ★ SNS釣果データ (integrated_catch.json) 取得＆ヘッダーモーダル一覧表示
 // ==========================================
 window.snsCatchData = window.snsCatchData || [];

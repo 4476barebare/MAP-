@@ -3932,36 +3932,7 @@ function loadICData(retries = 1) {
 }
 
 // ==========================================
-// ★ 魚種名おまとめ辞書（出世魚や別名を統一）
-// ==========================================
-const FISH_DICTIONARY = {
-    "ツバス": "ワカシ",
-    "ワカシ": "ワカシ",
-    "ハマチ": "イナダ",
-    "イナダ": "イナダ",
-    "メジロ": "ワラサ",
-    "ワラサ": "ワラサ",
-    "ブリ": "ブリ",
-    "セイゴ": "スズキ",
-    "フッコ": "スズキ",
-    "スズキ": "スズキ",
-    "サゴシ": "サワラ",
-    "サワラ": "サワラ",
-    "カイズ": "クロダイ",
-    "チヌ": "クロダイ",
-    "クロダイ": "クロダイ",
-    "コハダ": "コノシロ",
-    "コノシロ": "コノシロ",
-    "クチボソ": "モツゴ",
-    "モツゴ": "モツゴ",
-    "ヤマベ": "オイカワ",
-    "オイカワ": "オイカワ",
-    "グレ": "メジナ",
-    "メジナ": "メジナ"
-};
-
-// ==========================================
-// ★ 新規：対象魚種データを描画する関数（辞書変換＆ソート対応版）
+// ★ 対象魚種データを描画する関数（元データ事前正規化済みのため無変換表示）
 // ==========================================
 function renderFishSection(uniqueNames) {
     const accessBox = document.getElementById('accessInfoBox');
@@ -3973,16 +3944,13 @@ function renderFishSection(uniqueNames) {
 
     if (!uniqueNames || uniqueNames.length === 0) return;
 
-    // 1. 全角カタカナ（と長音符）のみにフィルターし、周辺施設などを弾く
-    const fishOnly = uniqueNames.filter(name => /^[ァ-ヴー]+$/.test(name));
+    // 1. 全角カタカナ（と長音符）のみにフィルターし、ボート店・漁協などを弾く
+    const fishOnly = uniqueNames
+        .map(name => String(name || '').trim())
+        .filter(name => /^[ァ-ヴー]+$/.test(name));
 
-    // 2. 辞書を使って名称を変換（辞書にない魚はそのままの名前を使う）
-    const mappedFish = fishOnly.map(name => FISH_DICTIONARY[name] || name);
-
-    // 3. 変換した結果、重複したもの（例：セイゴとフッコが両方いて「スズキ」が2つになった場合）を再度まとめる
-    const finalFishList = [...new Set(mappedFish)];
-
-    // 4. あいうえお順（五十音順）にソートする
+    // 2. 重複を除外し、元データの魚種名をそのまま五十音順にソートする
+    const finalFishList = [...new Set(fishOnly)];
     finalFishList.sort((a, b) => a.localeCompare(b, 'ja'));
 
     // 魚種が1つも残らなかった場合は表示せずに終了
@@ -4083,13 +4051,13 @@ const DUPLICATE_FISH_RADIUS_M = 3.0;
 // 連続投稿できる上限数（3件までは連続投稿可、4件目からは過去3件前＝2件目の+5分クールタイム消化を待つ）
 const MAX_BURST_POSTS = 3;
 
-// 魚種辞書リスト（index.htmlのFISH_DICTIONARYと重複しない名前）
-const POST_FISH_LIST = [
-  'アジ', 'サバ', 'イワシ', 'シーバス', 'クロダイ', 'マダイ',
-  'ヒラメ', 'マゴチ', 'カサゴ', 'メバル', 'アオリイカ', 'タチウオ',
-  'ブリ・イナダ', 'カンパチ', 'サワラ', 'カワハギ', 'シロギス', 'ハゼ',
-  'カレイ', 'メジナ', 'ブラックバス', 'ヘラブナ', 'コイ', 'ニジマス'
-];
+// 投稿用魚種リスト取得ヘルパー（正本は header.js の window.POST_FISH_LIST）
+function getPostFishList() {
+  if (Array.isArray(window.POST_FISH_LIST) && window.POST_FISH_LIST.length > 0) {
+    return window.POST_FISH_LIST;
+  }
+  return ['アジ', 'イワシ', 'サバ', 'シロギス', 'ハゼ', 'スズキ', 'クロダイ'];
+}
 
 // ★ ダミーデータ兼ローカルキャッシュ（sessionStorageと連動し、リロードしても自分が投稿したデータを保持して比較可能にする）
 const TEMP_PINS_STORAGE_KEY = 'fishing_temp_pins_dummy_cache';
@@ -4193,66 +4161,22 @@ function getMyUuid() {
   return window._cachedUserIdentity || `noip_${getBaseUuid()}`;
 }
 
-// 2-3. 魚種名の比較用正規化ヘルパー（出世魚辞書や「シーバス⇔スズキ」「シロギス⇔キス」の表記ゆれを完全吸収）
-const EXTRA_FISH_SYNONYMS = {
-  'シーバス': 'スズキ',
-  'スズキ': 'スズキ',
-  'セイゴ': 'スズキ',
-  'フッコ': 'スズキ',
-  'シロギス': 'シロギス',
-  'キス': 'シロギス',
-  'ピンギス': 'シロギス',
-  'ブリ': 'ブリ',
-  'イナダ': 'ブリ',
-  'ワカシ': 'ブリ',
-  'ワラサ': 'ブリ',
-  'ハマチ': 'ブリ',
-  'メジロ': 'ブリ',
-  'ツバス': 'ブリ',
-  'クロダイ': 'クロダイ',
-  'チヌ': 'クロダイ',
-  'カイズ': 'クロダイ',
-  'メジナ': 'メジナ',
-  'グレ': 'メジナ',
-  'サワラ': 'サワラ',
-  'サゴシ': 'サワラ'
-};
-
-function normalizeFishForCheck(name) {
-  if (!name) return '';
-  const raw = String(name).trim();
-  if (EXTRA_FISH_SYNONYMS[raw]) {
-    return EXTRA_FISH_SYNONYMS[raw];
-  }
-  if (typeof FISH_DICTIONARY === 'object' && FISH_DICTIONARY !== null && FISH_DICTIONARY[raw]) {
-    const dictMapped = FISH_DICTIONARY[raw];
-    return EXTRA_FISH_SYNONYMS[dictMapped] || dictMapped;
-  }
-  return raw;
-}
-
-// 2-4. 周囲3m以内に同じ魚種が既に存在するかチェックするガード関数
+// 2-3. 周囲3m以内に同じ魚種（同一グループ含む）が既に存在するかチェックするガード関数
+//      グループ判定の正本は header.js の window.isSameFishGroup を参照
 function hasSameFishNearby(centerLatLng, fishName, radiusMeters = DUPLICATE_FISH_RADIUS_M) {
   if (!centerLatLng || !fishName || typeof L === 'undefined') return false;
 
   const cLat = Number(centerLatLng.lat.toFixed(6));
   const cLng = Number(centerLatLng.lng.toFixed(6));
   const targetPoint = L.latLng(cLat, cLng);
-
-  const targetNorm = normalizeFishForCheck(fishName);
-  const targetVariants = new Set([
-    fishName,
-    targetNorm,
-    ...fishName.split('・').map(s => normalizeFishForCheck(s))
-  ]);
+  const targetRaw = String(fishName).trim();
 
   const isSameFish = (otherName) => {
     if (!otherName) return false;
-    const rawOther = String(otherName).trim();
-    const otherNorm = normalizeFishForCheck(rawOther);
-    if (targetVariants.has(rawOther) || targetVariants.has(otherNorm)) return true;
-    const parts = rawOther.split('・');
-    return parts.some(p => targetVariants.has(p) || targetVariants.has(normalizeFishForCheck(p)));
+    if (typeof window.isSameFishGroup === 'function') {
+      return window.isSameFishGroup(targetRaw, otherName);
+    }
+    return targetRaw === String(otherName).trim();
   };
 
   // ① ダミーデータ兼仮ピン配列（window.tempFishPins）を最優先でチェック
@@ -4510,7 +4434,7 @@ function ensurePostModeDom() {
     panel.id = 'post-mode-panel';
     panel.className = 'post-mode-panel';
 
-    const optionsHtml = POST_FISH_LIST.map(f => `<option value="${f}">${f}</option>`).join('');
+    const optionsHtml = getPostFishList().map(f => `<option value="${f}">${f}</option>`).join('');
 
     panel.innerHTML = `
       <select id="post-fish-select" class="post-fish-select">
@@ -4570,7 +4494,7 @@ async function submitCenterTempPin() {
 
   const selectEl = document.getElementById('post-fish-select');
   const submitBtn = document.getElementById('post-submit-btn');
-  const fishName = selectEl ? selectEl.value : POST_FISH_LIST[0];
+  const fishName = selectEl ? selectEl.value : getPostFishList()[0];
   const center = window.map.getCenter();
 
   // ★ ガード①：半径3m以内に同じ魚種が既に存在する場合は送信前にブロック
