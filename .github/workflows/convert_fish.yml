@@ -3,14 +3,23 @@ name: Fish CSV to JSON Converter
 on:
   workflow_dispatch:
     inputs:
-      input_csv:
-        description: '入力するCSVファイル名 (例: data/IBARAKI_fish.csv)'
+      region:
+        description: '対象地方フォルダ名 (例: KANTO)'
         required: true
-        default: 'KANTO/○○_fish.csv'
-      output_json:
-        description: '出力するJSONファイル名 (例: json/IBARAKI_fish.json)'
+        default: 'KANTO'
+        type: string
+      pref:
+        description: '変換する都道府県を選択 (ALLでフォルダ内の全 *_fish.csv を一括変換)'
         required: true
-        default: 'KANTO/IBARAKI_fish.json'
+        default: 'ALL'
+        type: choice
+        options:
+          - ALL
+          - CHIBA
+          - KANAGAWA
+          - TOKYO
+          - IBARAKI
+          - SAITAMAGUNMA
 
 permissions:
   contents: write # 変換したJSONをリポジトリに保存するために必要
@@ -30,17 +39,73 @@ jobs:
         with:
           node-version: '20'
 
-      # 3. 変換スクリプトの実行 (引数としてinputとoutputを渡す)
+      # 3. 変換スクリプトの実行 (pref指定 または ALL一括変換)
       - name: Run Converter Script
-        run: node script/convert_fish.js "${{ github.event.inputs.input_csv }}" "${{ github.event.inputs.output_json }}"
+        env:
+          REGION: ${{ github.event.inputs.region }}
+          PREF: ${{ github.event.inputs.pref }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          if [ ! -d "${REGION}" ]; then
+            echo "❌ エラー: フォルダが見つかりません: ${REGION}"
+            exit 1
+          fi
+
+          if [ "${PREF}" = "ALL" ]; then
+            CSV_FILES=("${REGION}"/*_fish.csv)
+            if [ ${#CSV_FILES[@]} -eq 0 ]; then
+              echo "❌ エラー: ${REGION}/ 内に *_fish.csv が見つかりません。"
+              exit 1
+            fi
+
+            echo "🔄 ${REGION} 内の全 ${#CSV_FILES[@]} 件の *_fish.csv を一括変換します..."
+            for csv_file in "${CSV_FILES[@]}"; do
+              json_file="${csv_file%.csv}.json"
+              echo "----------------------------------------"
+              echo "▶ 変換中: ${csv_file} -> ${json_file}"
+              node script/convert_fish.js "${csv_file}" "${json_file}"
+            done
+          else
+            csv_file="${REGION}/${PREF}_fish.csv"
+            json_file="${REGION}/${PREF}_fish.json"
+
+            if [ ! -f "${csv_file}" ]; then
+              echo "❌ エラー: 入力CSVが見つかりません: ${csv_file}"
+              exit 1
+            fi
+
+            echo "▶ 変換中: ${csv_file} -> ${json_file}"
+            node script/convert_fish.js "${csv_file}" "${json_file}"
+          fi
 
       # 4. 変更があればコミット＆プッシュ
       - name: Commit and Push
+        env:
+          REGION: ${{ github.event.inputs.region }}
+          PREF: ${{ github.event.inputs.pref }}
         run: |
+          set -euo pipefail
+          shopt -s nullglob
+
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "${{ github.event.inputs.output_json }}"
-          
-          # 変更がある場合のみコミット
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-converted: ${{ github.event.inputs.input_csv }} to JSON"
-          git push
+
+          if [ "${PREF}" = "ALL" ]; then
+            JSON_FILES=("${REGION}"/*_fish.json)
+            if [ ${#JSON_FILES[@]} -gt 0 ]; then
+              git add "${JSON_FILES[@]}"
+            fi
+            COMMIT_MSG="Auto-converted: ${REGION} ALL fish CSV to JSON"
+          else
+            git add "${REGION}/${PREF}_fish.json"
+            COMMIT_MSG="Auto-converted: ${REGION}/${PREF}_fish.csv to JSON"
+          fi
+
+          if ! git diff --cached --quiet; then
+            git commit -m "${COMMIT_MSG}"
+            git push
+          else
+            echo "ℹ️ 変換結果に変更がないためコミットをスキップしました。"
+          fi
